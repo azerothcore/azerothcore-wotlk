@@ -23,6 +23,7 @@
 #include "DatabaseEnv.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
+#include "MiscPackets.h"
 #include "ObjectMgr.h"
 
 class CreatureTextBuilder
@@ -102,18 +103,18 @@ void CreatureTextMgr::LoadCreatureTexts()
         Field* fields = result->Fetch();
         CreatureTextEntry temp;
 
-        temp.entry           = fields[0].GetUInt32();
-        temp.group           = fields[1].GetUInt8();
-        temp.id              = fields[2].GetUInt8();
-        temp.text            = fields[3].GetString();
-        temp.type            = ChatMsg(fields[4].GetUInt8());
-        temp.lang            = Language(fields[5].GetUInt8());
-        temp.probability     = fields[6].GetFloat();
-        temp.emote           = Emote(fields[7].GetUInt32());
-        temp.duration        = fields[8].GetUInt32();
-        temp.sound           = fields[9].GetUInt32();
-        temp.BroadcastTextId = fields[10].GetUInt32();
-        temp.TextRange       = CreatureTextRange(fields[11].GetUInt8());
+        temp.entry           = fields[0].Get<uint32>();
+        temp.group           = fields[1].Get<uint8>();
+        temp.id              = fields[2].Get<uint8>();
+        temp.text            = fields[3].Get<std::string>();
+        temp.type            = ChatMsg(fields[4].Get<uint8>());
+        temp.lang            = Language(fields[5].Get<uint8>());
+        temp.probability     = fields[6].Get<float>();
+        temp.emote           = Emote(fields[7].Get<uint32>());
+        temp.duration        = fields[8].Get<uint32>();
+        temp.sound           = fields[9].Get<uint32>();
+        temp.BroadcastTextId = fields[10].Get<uint32>();
+        temp.TextRange       = CreatureTextRange(fields[11].Get<uint8>());
 
         if (temp.sound)
         {
@@ -180,16 +181,16 @@ void CreatureTextMgr::LoadCreatureTextLocales()
     {
         Field* fields = result->Fetch();
 
-        uint32 CreatureId           = fields[0].GetUInt32();
-        uint32 GroupId              = fields[1].GetUInt8();
-        uint32 ID                   = fields[2].GetUInt8();
+        uint32 CreatureId           = fields[0].Get<uint32>();
+        uint32 GroupId              = fields[1].Get<uint8>();
+        uint32 ID                   = fields[2].Get<uint8>();
 
-        LocaleConstant locale = GetLocaleByName(fields[3].GetString());
+        LocaleConstant locale = GetLocaleByName(fields[3].Get<std::string>());
         if (locale == LOCALE_enUS)
             continue;
 
         CreatureTextLocale& data = mLocaleTextMap[CreatureTextId(CreatureId, GroupId, ID)];
-        ObjectMgr::AddLocaleString(fields[4].GetString(), locale, data.Text);
+        ObjectMgr::AddLocaleString(fields[4].Get<std::string>(), locale, data.Text);
     } while (result->NextRow());
 
     LOG_INFO("server.loading", ">> Loaded {} Creature Text Locale in {} ms", uint32(mLocaleTextMap.size()), GetMSTimeDiffToNow(oldMSTime));
@@ -331,12 +332,10 @@ void CreatureTextMgr::SendSound(Creature* source, uint32 sound, ChatMsg msgType,
     if (!sound || !source)
         return;
 
-    WorldPacket data(SMSG_PLAY_SOUND, 4);
-    data << uint32(sound);
-    SendNonChatPacket(source, &data, msgType, target, range, teamId, gmOnly);
+    SendNonChatPacket(source, WorldPackets::Misc::Playsound(sound).Write(), msgType, target, range, teamId, gmOnly);
 }
 
-void CreatureTextMgr::SendNonChatPacket(WorldObject* source, WorldPacket* data, ChatMsg msgType, WorldObject const* target, CreatureTextRange range, TeamId teamId, bool gmOnly) const
+void CreatureTextMgr::SendNonChatPacket(WorldObject* source, WorldPacket const* data, ChatMsg msgType, WorldObject const* target, CreatureTextRange range, TeamId teamId, bool gmOnly) const
 {
     float dist = GetRangeForChatType(msgType);
 

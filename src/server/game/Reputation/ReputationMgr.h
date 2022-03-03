@@ -46,6 +46,7 @@ struct FactionState
     uint8 Flags;
     bool needSend;
     bool needSave;
+    bool roundedUp;
 };
 
 typedef std::map<RepListID, FactionState> FactionStateList;
@@ -68,6 +69,8 @@ public:                                                 // statics
     static const int32 Reputation_Bottom;
 
     static ReputationRank ReputationToRank(int32 standing);
+    static int32 ReputationRankToStanding(ReputationRank rank);
+
 public:                                                 // accessors
     uint8 GetVisibleFactionCount() const { return _visibleFactionCount; }
     uint8 GetHonoredFactionCount() const { return _honoredFactionCount; }
@@ -108,13 +111,13 @@ public:                                                 // accessors
     }
 
 public:                                                 // modifiers
-    bool SetReputation(FactionEntry const* factionEntry, int32 standing)
+    bool SetReputation(FactionEntry const* factionEntry, float standing)
     {
-        return SetReputation(factionEntry, standing, false, false, false);
+        return SetReputation(factionEntry, standing, false);
     }
-    bool ModifyReputation(FactionEntry const* factionEntry, int32 standing, bool spillOverOnly = false, bool noSpillOver = false)
+    bool ModifyReputation(FactionEntry const* factionEntry, float standing, bool noSpillOver = false, Optional<ReputationRank> repMaxCap = {})
     {
-        return SetReputation(factionEntry, standing, true, spillOverOnly, noSpillOver);
+        return SetReputation(factionEntry, standing, true, noSpillOver, repMaxCap);
     }
 
     void SetVisible(FactionTemplateEntry const* factionTemplateEntry);
@@ -125,7 +128,7 @@ public:                                                 // modifiers
     void ApplyForceReaction(uint32 faction_id, ReputationRank rank, bool apply);
 
     //! Public for chat command needs
-    bool SetOneFactionReputation(FactionEntry const* factionEntry, int32 standing, bool incremental);
+    bool SetOneFactionReputation(FactionEntry const* factionEntry, float standing, bool incremental, Optional<ReputationRank> repMaxCap = { });
 
 public:                                                 // senders
     void SendInitialReputations();
@@ -136,7 +139,7 @@ public:                                                 // senders
 private:                                                // internal helper functions
     void Initialize();
     uint32 GetDefaultStateFlags(FactionEntry const* factionEntry) const;
-    bool SetReputation(FactionEntry const* factionEntry, int32 standing, bool incremental, bool spillOverOnly, bool noSpillOver = false);
+    bool SetReputation(FactionEntry const* factionEntry, float standing, bool incremental, bool noSpillOver = false, Optional<ReputationRank> repMaxCap = { });
     void SetVisible(FactionState* faction);
     void SetAtWar(FactionState* faction, bool atWar) const;
     void SetInactive(FactionState* faction, bool inactive) const;
