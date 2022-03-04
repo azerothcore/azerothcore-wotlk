@@ -27,19 +27,19 @@ def islog(line):
     else :
         return False
 
-# def isSendSysMessage(line):
-#     substring = 'SendSysMessage'
-#     if substring in line:
-#         return True
-#     else :
-#         return False
+def isSendSysMessage(line):
+    substring = 'SendSysMessage'
+    if substring in line:
+        return True
+    else :
+        return False
 
-# def isPSendSysMessage(line):
-#     substring = 'PSendSysMessage'
-#     if substring in line:
-#         return True
-#     else :
-#         return False
+def isPSendSysMessage(line):
+    substring = 'PSendSysMessage'
+    if substring in line:
+        return True
+    else :
+        return False
 
 def isPQuery(line):
     substring = 'PQuery'
@@ -92,10 +92,10 @@ def checkSoloLine(line):
     elif isPAppend(line):
         line = line.replace("PAppend", "Append");
         return handleCleanup(line), False
-    # elif isSendSysMessage(line):
-    #     return handleCleanup(line), False
-    # elif isPSendSysMessage(line):
-    #     return handleCleanup(line), False
+    elif isSendSysMessage(line):
+        return handleCleanup(line), False
+    elif isPSendSysMessage(line):
+        return handleCleanup(line), False
     # elif isStringFormat(line):
     #     return handleCleanup(line), False
     else:
@@ -109,10 +109,10 @@ def startMultiLine(line):
         return handleCleanup(line), True
     elif islog(line):
         return handleCleanup(line), True
-    # elif isSendSysMessage(line):
-    #     return handleCleanup(line), True
-    # elif isPSendSysMessage(line):
-    #     return handleCleanup(line), True
+    elif isSendSysMessage(line):
+        return handleCleanup(line), True
+    elif isPSendSysMessage(line):
+        return handleCleanup(line), True
     elif isPQuery(line):
         line = line.replace("PQuery", "Query");
         return handleCleanup(line), True
@@ -144,6 +144,7 @@ def checkTextLine(line, existPrevLine):
 def handleCleanup(line):
     line = line.replace("%s", "{}");
     line = line.replace("%u", "{}");
+    line = line.replace("%7u", "{:7}");
     line = line.replace("%hu", "{}");
     line = line.replace("%lu", "{}");
     line = line.replace("%llu", "{}");
