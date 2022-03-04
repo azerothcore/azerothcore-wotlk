@@ -4154,6 +4154,20 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_1].SpellClassMask[1] = 0x00020000;
     });
 
+    // Nefarian: Shadowbolt, Shadow Command
+    ApplySpellFix({ 22667, 22677 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(152); // 150 yards
+    });
+
+    // Shadowbolt Volley
+    ApplySpellFix({ 22665 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(152); // 150 yards
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(41); // 150 yards
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
+    });
+
     // Manastorm
     ApplySpellFix({ 21097 }, [](SpellInfo* spellInfo)
     {

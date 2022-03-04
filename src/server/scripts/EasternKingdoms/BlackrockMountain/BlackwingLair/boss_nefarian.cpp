@@ -34,6 +34,7 @@ enum Events
     EVENT_START_EVENT,
     EVENT_SHADOW_BOLT,
     EVENT_FEAR,
+    EVENT_SILENCE,
     EVENT_MIND_CONTROL,
     EVENT_SHADOWBLINK,
     // Nefarian
@@ -128,6 +129,7 @@ enum Spells
     // BWL Spells
     SPELL_SHADOWBOLT                = 22677,
     SPELL_SHADOWBOLT_VOLLEY         = 22665,
+    SPELL_SILENCE                   = 22666,
     SPELL_SHADOW_COMMAND            = 22667,
     SPELL_FEAR                      = 22678,
     SPELL_SHADOWBLINK               = 22664,
@@ -237,7 +239,8 @@ public:
             AttackStart(SelectTarget(SelectTargetMethod::Random, 0, 200.f, true));
             events.ScheduleEvent(EVENT_SHADOW_BOLT, urand(3000, 10000));
             events.ScheduleEvent(EVENT_FEAR, urand(10000, 20000));
-            events.ScheduleEvent(EVENT_MIND_CONTROL, urand(30000, 35000));
+            events.ScheduleEvent(EVENT_SILENCE, urand(20000, 25000));
+            //events.ScheduleEvent(EVENT_MIND_CONTROL, urand(30000, 35000));
             events.ScheduleEvent(EVENT_SPAWN_ADD, 10000);
             events.ScheduleEvent(EVENT_SHADOWBLINK, 40000);
         }
@@ -339,11 +342,10 @@ public:
                             switch (urand(0, 1))
                             {
                                 case 0:
-                                    DoCastVictim(SPELL_SHADOWBOLT_VOLLEY);
+                                    DoCastAOE(SPELL_SHADOWBOLT_VOLLEY);
                                     break;
                                 case 1:
-                                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40, true))
-                                        DoCast(target, SPELL_SHADOWBOLT);
+                                    DoCastRandomTarget(SPELL_SHADOWBOLT, 0, 150.f);
                                     break;
                             }
                             DoResetThreat();
@@ -353,6 +355,10 @@ public:
                             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40, true))
                                 DoCast(target, SPELL_FEAR);
                             events.ScheduleEvent(EVENT_FEAR, urand(10000, 20000));
+                            break;
+                        case EVENT_SILENCE:
+                            DoCastRandomTarget(SPELL_SILENCE, 0, 150.f);
+                            events.ScheduleEvent(EVENT_SILENCE, urand(14000, 23000));
                             break;
                         case EVENT_MIND_CONTROL:
                             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40, true))
@@ -420,7 +426,7 @@ public:
                 me->SetFaction(FACTION_DRAGONFLIGHT_BLACK);
                 me->SetUInt32Value(UNIT_NPC_FLAGS, 0);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
+                //me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
             }
         }
 
