@@ -98,6 +98,11 @@ namespace WorldPackets
         class BuyBankSlot;
     }
 
+    namespace Combat
+    {
+        class SetSheathed;
+    }
+
     namespace Guild
     {
         class QueryGuildInfo;
@@ -779,7 +784,7 @@ public:                                                 // opcodes handlers
 
     void HandleAttackSwingOpcode(WorldPacket& recvPacket);
     void HandleAttackStopOpcode(WorldPacket& recvPacket);
-    void HandleSetSheathedOpcode(WorldPacket& recvPacket);
+    void HandleSetSheathedOpcode(WorldPackets::Combat::SetSheathed& packet);
 
     void HandleUseItemOpcode(WorldPacket& recvPacket);
     void HandleOpenItemOpcode(WorldPacket& recvPacket);
