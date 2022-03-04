@@ -287,7 +287,7 @@ Battleground* BattlegroundMgr::GetBattleground(uint32 instanceId, BattlegroundTy
     if (!instanceId)
         return nullptr;
 
-    auto GetBgWithInstanceID = [this, instanceId](BattlegroundData const* bgData) -> Battleground*
+    auto GetBgWithInstanceID = [instanceId](BattlegroundData const* bgData) -> Battleground*
     {
         auto const& itr = bgData->_Battlegrounds.find(instanceId);
         if (itr != bgData->_Battlegrounds.end())
@@ -902,7 +902,6 @@ BattlegroundTypeId BattlegroundMgr::GetRandomBG(BattlegroundTypeId bgTypeId, uin
         ids.reserve(16);
         std::vector<double> weights;
         weights.reserve(16);
-        BattlemasterListEntry const* bl = sBattlemasterListStore.LookupEntry(bgTypeId);
 
         for (int32 mapId : bgTemplate->BattlemasterEntry->mapid)
         {

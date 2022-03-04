@@ -44,10 +44,8 @@ struct GroupQueueInfo                                       // stores informatio
     uint32  OpponentsTeamRating;                            // for rated arena matches
     uint32  OpponentsMatchmakerRating;                      // for rated arena matches
     uint32  PreviousOpponentsTeamId;                        // excluded from the current queue until the timer is met
-
-    // pussywizard: for internal use
-    uint8 _bracketId;
-    uint8 _groupType;
+    uint8   BracketId;                                      // BattlegroundBracketId
+    uint8   GroupType;                                      // BattlegroundQueueGroupTypes
 };
 
 enum BattlegroundQueueGroupTypes

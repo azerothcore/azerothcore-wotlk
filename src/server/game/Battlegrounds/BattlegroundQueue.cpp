@@ -167,8 +167,8 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player* leader, Group* group, Battle
     LOG_DEBUG("bg.battleground", "Adding Group to BattlegroundQueue bgTypeId: {}, bracket_id: {}, index: {}", bgTypeId, bracketId, index);
 
     // pussywizard: store indices at which GroupQueueInfo is in m_QueuedGroups
-    ginfo->_bracketId = bracketId;
-    ginfo->_groupType = index;
+    ginfo->BracketId = bracketId;
+    ginfo->GroupType = index;
 
     //add players from group to ginfo
     if (group)
@@ -219,10 +219,10 @@ void BattlegroundQueue::PlayerInvitedToBGUpdateAverageWaitTime(GroupQueueInfo* g
         return;
 
     // pointer to last index
-    uint32* lastIndex = &m_WaitTimeLastIndex[team_index][ginfo->_bracketId];
+    uint32* lastIndex = &m_WaitTimeLastIndex[team_index][ginfo->BracketId];
 
     // set time at index to new value
-    m_WaitTimes[team_index][ginfo->_bracketId][*lastIndex] = timeInQueue;
+    m_WaitTimes[team_index][ginfo->BracketId][*lastIndex] = timeInQueue;
 
     // set last index to next one
     (*lastIndex)++;
@@ -243,11 +243,11 @@ uint32 BattlegroundQueue::GetAverageQueueWaitTime(GroupQueueInfo* ginfo) const
         return 0;
 
     // if there are enough values:
-    if (m_WaitTimes[team_index][ginfo->_bracketId][COUNT_OF_PLAYERS_TO_AVERAGE_WAIT_TIME - 1])
+    if (m_WaitTimes[team_index][ginfo->BracketId][COUNT_OF_PLAYERS_TO_AVERAGE_WAIT_TIME - 1])
     {
         uint32 sum = 0;
         for (uint32 i = 0; i < COUNT_OF_PLAYERS_TO_AVERAGE_WAIT_TIME; ++i)
-            sum += m_WaitTimes[team_index][ginfo->_bracketId][i];
+            sum += m_WaitTimes[team_index][ginfo->BracketId][i];
         return sum / COUNT_OF_PLAYERS_TO_AVERAGE_WAIT_TIME;
     }
     else
@@ -276,8 +276,8 @@ void BattlegroundQueue::RemovePlayer(ObjectGuid guid, bool decreaseInvitedCount)
 
     GroupQueueInfo* groupInfo = itr->second;
 
-    uint32 _bracketId = groupInfo->_bracketId;
-    uint32 _groupType = groupInfo->_groupType;
+    uint32 _bracketId = groupInfo->BracketId;
+    uint32 _groupType = groupInfo->GroupType;
 
     // find iterator
     auto group_itr = m_QueuedGroups[_bracketId][_groupType].end();
@@ -559,7 +559,7 @@ bool BattlegroundQueue::CheckPremadeMatch(BattlegroundBracketId bracket_id, uint
             if (!(*itr)->IsInvitedToBGInstanceGUID && ((*itr)->JoinTime < time_before || (*itr)->Players.size() < MinPlayersPerTeam))
             {
                 //we must insert group to normal queue and erase pointer from premade queue
-                (*itr)->_groupType = BG_QUEUE_NORMAL_ALLIANCE + i; // pussywizard: update GroupQueueInfo internal variable
+                (*itr)->GroupType = BG_QUEUE_NORMAL_ALLIANCE + i; // pussywizard: update GroupQueueInfo internal variable
                 m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE + i].push_front((*itr));
                 m_QueuedGroups[bracket_id][BG_QUEUE_PREMADE_ALLIANCE + i].erase(itr);
             }
@@ -645,19 +645,19 @@ bool BattlegroundQueue::CheckSkirmishForSameFaction(BattlegroundBracketId bracke
     GroupQueueInfo* ginfo = m_SelectionPools[teamIndex].SelectedGroups.back();
 
     //set itr_team to group that was added to selection pool latest
-    GroupsQueueType::iterator itr_team = m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE + teamIndex].begin();
-    for (; itr_team != m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE + teamIndex].end(); ++itr_team)
+    GroupsQueueType::iterator itr_team = m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE + static_cast<uint8>(teamIndex)].begin();
+    for (; itr_team != m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE + static_cast<uint8>(teamIndex)].end(); ++itr_team)
         if (ginfo == *itr_team)
             break;
 
-    if (itr_team == m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE + teamIndex].end())
+    if (itr_team == m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE + static_cast<uint8>(teamIndex)].end())
         return false;
 
     GroupsQueueType::iterator itr_team2 = itr_team;
     ++itr_team2;
 
     //invite players to other selection pool
-    for (; itr_team2 != m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE + teamIndex].end(); ++itr_team2)
+    for (; itr_team2 != m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE + static_cast<uint8>(teamIndex)].end(); ++itr_team2)
     {
         //if selection pool is full then break;
         if (!(*itr_team2)->IsInvitedToBGInstanceGUID && !m_SelectionPools[otherTeam].AddGroup(*itr_team2, minPlayersPerTeam))
@@ -672,20 +672,20 @@ bool BattlegroundQueue::CheckSkirmishForSameFaction(BattlegroundBracketId bracke
     {
         //set correct team
         (*itr)->teamId = otherTeam;
-        (*itr)->_groupType = static_cast<uint8>(BG_QUEUE_NORMAL_ALLIANCE) + otherTeam;
+        (*itr)->GroupType = static_cast<uint8>(BG_QUEUE_NORMAL_ALLIANCE) + static_cast<uint8>(otherTeam);
 
         //add team to other queue
-        m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE + otherTeam].push_front(*itr);
+        m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE + static_cast<uint8>(otherTeam)].push_front(*itr);
 
         //remove team from old queue
         GroupsQueueType::iterator itr2 = itr_team;
         ++itr2;
 
-        for (; itr2 != m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE + teamIndex].end(); ++itr2)
+        for (; itr2 != m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE + static_cast<uint8>(teamIndex)].end(); ++itr2)
         {
             if (*itr2 == *itr)
             {
-                m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE + teamIndex].erase(itr2);
+                m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE + static_cast<uint8>(teamIndex)].erase(itr2);
                 break;
             }
         }
@@ -925,14 +925,14 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 diff, BattlegroundTypeId 
             // now we must move team if we changed its faction to another faction queue, because then we will spam log by errors in Queue::RemovePlayer
             if (aTeam->teamId != TEAM_ALLIANCE)
             {
-                aTeam->_groupType = BG_QUEUE_PREMADE_ALLIANCE;
+                aTeam->GroupType = BG_QUEUE_PREMADE_ALLIANCE;
                 m_QueuedGroups[bracket_id][BG_QUEUE_PREMADE_ALLIANCE].push_front(aTeam);
                 m_QueuedGroups[bracket_id][BG_QUEUE_PREMADE_HORDE].erase(itr_teams[TEAM_ALLIANCE]);
             }
 
             if (hTeam->teamId != TEAM_HORDE)
             {
-                hTeam->_groupType = BG_QUEUE_PREMADE_HORDE;
+                hTeam->GroupType = BG_QUEUE_PREMADE_HORDE;
                 m_QueuedGroups[bracket_id][BG_QUEUE_PREMADE_HORDE].push_front(hTeam);
                 m_QueuedGroups[bracket_id][BG_QUEUE_PREMADE_ALLIANCE].erase(itr_teams[TEAM_HORDE]);
             }
