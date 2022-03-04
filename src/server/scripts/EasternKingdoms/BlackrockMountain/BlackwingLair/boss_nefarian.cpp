@@ -240,7 +240,7 @@ public:
             events.ScheduleEvent(EVENT_SHADOW_BOLT, urand(3000, 10000));
             events.ScheduleEvent(EVENT_FEAR, urand(10000, 20000));
             events.ScheduleEvent(EVENT_SILENCE, urand(20000, 25000));
-            //events.ScheduleEvent(EVENT_MIND_CONTROL, urand(30000, 35000));
+            events.ScheduleEvent(EVENT_MIND_CONTROL, urand(30000, 35000));
             events.ScheduleEvent(EVENT_SPAWN_ADD, 10000);
             events.ScheduleEvent(EVENT_SHADOWBLINK, 40000);
         }
@@ -426,7 +426,7 @@ public:
                 me->SetFaction(FACTION_DRAGONFLIGHT_BLACK);
                 me->SetUInt32Value(UNIT_NPC_FLAGS, 0);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
-                //me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
             }
         }
 
