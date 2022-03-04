@@ -34,6 +34,7 @@
 #include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "MapMgr.h"
+#include "MiscPackets.h"
 #include "Object.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
@@ -689,9 +690,7 @@ void Battleground::SendBroadcastText(uint32 id, ChatMsg msgType, WorldObject con
 
 void Battleground::PlaySoundToAll(uint32 soundID)
 {
-    WorldPacket data;
-    sBattlegroundMgr->BuildPlaySoundPacket(&data, soundID);
-    SendPacketToAll(&data);
+    SendPacketToAll(WorldPackets::Misc::Playsound(soundID).Write());
 }
 
 void Battleground::CastSpellOnTeam(uint32 spellId, TeamId teamId)
