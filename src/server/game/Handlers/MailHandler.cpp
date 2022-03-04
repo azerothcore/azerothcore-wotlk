@@ -17,6 +17,7 @@
 
 #include "AccountMgr.h"
 #include "CharacterCache.h"
+#include "ChatTextBuilder.h"
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
 #include "GameTime.h"
@@ -117,7 +118,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
 
     if (player->getLevel() < sWorld->getIntConfig(CONFIG_MAIL_LEVEL_REQ))
     {
-        SendNotification(GetAcoreString(LANG_MAIL_SENDER_REQ), sWorld->getIntConfig(CONFIG_MAIL_LEVEL_REQ));
+        Acore::Text::SendNotification(this, LANG_MAIL_SENDER_REQ, sWorld->getIntConfig(CONFIG_MAIL_LEVEL_REQ));
         return;
     }
 
@@ -528,7 +529,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
                     std::string senderName;
                     if (!sCharacterCache->GetCharacterNameByGuid(ObjectGuid(HighGuid::Player, m->sender), senderName))
                     {
-                        senderName = sObjectMgr->GetAcoreStringForDBCLocale(LANG_UNKNOWN);
+                        senderName = sGameLocale->GetAcoreStringForDBCLocale(LANG_UNKNOWN);
                     }
                     std::string subj = m->subject;
                     CleanStringForMysqlQuery(subj);

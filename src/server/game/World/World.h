@@ -163,7 +163,6 @@ public:
     [[nodiscard]] WorldSession* FindOfflineSession(uint32 id) const override;
     [[nodiscard]] WorldSession* FindOfflineSessionForCharacterGUID(ObjectGuid::LowType guidLow) const override;
     void AddSession(WorldSession* s) override;
-    void SendAutoBroadcast() override;
     bool KickSession(uint32 id) override;
     /// Get the number of current active sessions
     void UpdateMaxSessionCounters() override;
@@ -241,16 +240,12 @@ public:
     void SetInitialWorldSettings() override;
     void LoadConfigSettings(bool reload = false) override;
 
-    void SendWorldText(uint32 string_id, ...) override;
-    void SendGlobalText(const char* text, WorldSession* self) override;
-    void SendGMText(uint32 string_id, ...) override;
+    void SendGlobalText(std::string_view text, WorldSession* self) override;
     void SendGlobalMessage(WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) override;
     void SendGlobalGMMessage(WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) override;
     bool SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) override;
     void SendZoneText(uint32 zone, const char* text, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) override;
     void SendServerMessage(ServerMessageType messageID, std::string stringParam = "", Player* player = nullptr) override;
-
-    void SendWorldTextOptional(uint32 string_id, uint32 flag, ...) override;
 
     /// Are we in the middle of a shutdown?
     [[nodiscard]] bool IsShuttingDown() const override { return m_ShutdownTimer > 0; }
@@ -344,8 +339,6 @@ public:
     [[nodiscard]] char const* GetWorldDBRevision() const override { return m_WorldDBRevision.c_str(); }
     [[nodiscard]] char const* GetCharacterDBRevision() const override { return m_CharacterDBRevision.c_str(); }
     [[nodiscard]] char const* GetAuthDBRevision() const override { return m_AuthDBRevision.c_str(); }
-
-    void LoadAutobroadcasts() override;
 
     void UpdateAreaDependentAuras() override;
 
@@ -443,12 +436,6 @@ private:
     std::string m_WorldDBRevision;
     std::string m_CharacterDBRevision;
     std::string m_AuthDBRevision;
-
-    typedef std::map<uint8, std::string> AutobroadcastsMap;
-    AutobroadcastsMap m_Autobroadcasts;
-
-    typedef std::map<uint8, uint8> AutobroadcastsWeightMap;
-    AutobroadcastsWeightMap m_AutobroadcastsWeights;
 
     void ProcessQueryCallbacks();
     QueryCallbackProcessor _queryProcessor;

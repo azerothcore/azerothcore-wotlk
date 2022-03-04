@@ -249,14 +249,6 @@ struct AchievementReward
 
 typedef std::map<uint32, AchievementReward> AchievementRewards;
 
-struct AchievementRewardLocale
-{
-    std::vector<std::string> Subject;
-    std::vector<std::string> Text;
-};
-
-typedef std::map<uint32, AchievementRewardLocale> AchievementRewardLocales;
-
 struct CompletedAchievementData
 {
     time_t date;
@@ -365,12 +357,6 @@ public:
         return iter != m_achievementRewards.end() ? &iter->second : nullptr;
     }
 
-    AchievementRewardLocale const* GetAchievementRewardLocale(AchievementEntry const* achievement) const
-    {
-        AchievementRewardLocales::const_iterator iter = m_achievementRewardLocales.find(achievement->ID);
-        return iter != m_achievementRewardLocales.end() ? &iter->second : nullptr;
-    }
-
     AchievementCriteriaDataSet const* GetCriteriaDataSet(AchievementCriteriaEntry const* achievementCriteria) const
     {
         AchievementCriteriaDataMap::const_iterator iter = m_criteriaDataMap.find(achievementCriteria->ID);
@@ -385,7 +371,6 @@ public:
     void LoadAchievementReferenceList();
     void LoadCompletedAchievements();
     void LoadRewards();
-    void LoadRewardLocales();
 
     [[nodiscard]] AchievementEntry const* GetAchievement(uint32 achievementId) const;
 
@@ -404,7 +389,6 @@ private:
     AllCompletedAchievements m_allCompletedAchievements;
 
     AchievementRewards m_achievementRewards;
-    AchievementRewardLocales m_achievementRewardLocales;
 
     // pussywizard:
     std::map<uint32, AchievementCriteriaEntryList> m_SpecialList[ACHIEVEMENT_CRITERIA_TYPE_TOTAL];

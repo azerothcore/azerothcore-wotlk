@@ -17,6 +17,7 @@
 
 #include "MapMgr.h"
 #include "Chat.h"
+#include "ChatTextBuilder.h"
 #include "DatabaseEnv.h"
 #include "GridDefines.h"
 #include "Group.h"
@@ -168,7 +169,7 @@ Map::EnterState MapMgr::PlayerCannotEnter(uint32 mapid, Player* player, bool log
         {
             // probably there must be special opcode, because client has this string constant in GlobalStrings.lua
             // TODO: this is not a good place to send the message
-            player->GetSession()->SendAreaTriggerMessage(player->GetSession()->GetAcoreString(LANG_INSTANCE_RAID_GROUP_ONLY), mapName);
+            Acore::Text::SendAreaTriggerMessage(player->GetSession(), LANG_INSTANCE_RAID_GROUP_ONLY, mapName);
             LOG_DEBUG("maps", "MAP: Player '{}' must be in a raid group to enter instance '{}'", player->GetName(), mapName);
             return Map::CANNOT_ENTER_NOT_IN_RAID;
         }

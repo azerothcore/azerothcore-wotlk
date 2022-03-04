@@ -24,6 +24,7 @@ EndScriptData */
 
 #include "Channel.h"
 #include "Chat.h"
+#include "ChatTextBuilder.h"
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
 #include "Language.h"
@@ -65,7 +66,7 @@ public:
         if (WorldSession* session = handler->GetSession())
             name = session->GetPlayer()->GetName();
 
-        sWorld->SendWorldText(LANG_ANNOUNCE_COLOR, name.c_str(), message.data());
+        Acore::Text::SendWorldText(LANG_ANNOUNCE_COLOR, name.c_str(), message.data());
         return true;
     }
 
@@ -78,7 +79,7 @@ public:
         if (WorldSession* session = handler->GetSession())
             name = session->GetPlayer()->GetName();
 
-        sWorld->SendGMText(LANG_GM_ANNOUNCE_COLOR, name.c_str(), message.data());
+        Acore::Text::SendGMText(LANG_GM_ANNOUNCE_COLOR, name, message);
         return true;
     }
 
@@ -88,7 +89,7 @@ public:
         if (message.empty())
             return false;
 
-        sWorld->SendServerMessage(SERVER_MSG_STRING, Acore::StringFormat(handler->GetAcoreString(LANG_SYSTEMMESSAGE), message.data()).c_str());
+        sWorld->SendServerMessage(SERVER_MSG_STRING, Acore::StringFormatFmt(handler->GetAcoreString(LANG_SYSTEMMESSAGE), message.data()));
         return true;
     }
 
@@ -98,7 +99,7 @@ public:
         if (message.empty())
             return false;
 
-        sWorld->SendGMText(LANG_GM_BROADCAST, message.data());
+        Acore::Text::SendGMText(LANG_GM_BROADCAST, message);
         return true;
     }
 

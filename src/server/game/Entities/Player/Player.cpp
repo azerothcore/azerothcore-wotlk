@@ -42,6 +42,7 @@
 #include "Formulas.h"
 #include "GameEventMgr.h"
 #include "GameGraveyard.h"
+#include "GameLocale.h"
 #include "GameObjectAI.h"
 #include "GameTime.h"
 #include "GossipDef.h"
@@ -75,7 +76,9 @@
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "SpellMgr.h"
+#include "StringConvert.h"
 #include "TicketMgr.h"
+#include "Tokenize.h"
 #include "Transport.h"
 #include "UpdateData.h"
 #include "UpdateFieldFlags.h"
@@ -86,8 +89,6 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "Tokenize.h"
-#include "StringConvert.h"
 
 // TODO: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -6974,7 +6975,7 @@ void Player::ApplyItemEquipSpell(Item* item, bool apply, bool form_change)
             continue;
 
         // Spells that should stay on the caster after removing the item.
-        constexpr std::array<uint32, 1> spellExceptions = { /*Electromagnetic Gigaflux Reactivator*/ 11826 };
+        constexpr std::array<int32, 1> spellExceptions = { /*Electromagnetic Gigaflux Reactivator*/ 11826 };
         const auto found = std::find(std::begin(spellExceptions), std::end(spellExceptions), spellData.SpellId);
 
         // wrong triggering type
@@ -9276,11 +9277,11 @@ void Player::Whisper(std::string_view text, Language language, Player* target, b
     // announce afk or dnd message
     if (target->isAFK())
     {
-        ChatHandler(GetSession()).PSendSysMessage(LANG_PLAYER_AFK, target->GetName().c_str(), target->autoReplyMsg.c_str());
+        ChatHandler(GetSession()).PSendSysMessage(LANG_PLAYER_AFK, target->GetName(), target->autoReplyMsg);
     }
     else if (target->isDND())
     {
-        ChatHandler(GetSession()).PSendSysMessage(LANG_PLAYER_DND, target->GetName().c_str(), target->autoReplyMsg.c_str());
+        ChatHandler(GetSession()).PSendSysMessage(LANG_PLAYER_DND, target->GetName(), target->autoReplyMsg);
     }
 }
 
@@ -9291,7 +9292,7 @@ void Player::Whisper(uint32 textId, Player* target, bool /*isBossWhisper = false
         return;
     }
 
-    BroadcastText const* bct = sObjectMgr->GetBroadcastText(textId);
+    BroadcastText const* bct = sGameLocale->GetBroadcastText(textId);
     if (!bct)
     {
         LOG_ERROR("entities.unit", "Player::Whisper: `broadcast_text` was not {} found", textId);

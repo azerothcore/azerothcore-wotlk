@@ -329,23 +329,6 @@ struct CreatureBaseStats
 
 typedef std::unordered_map<uint16, CreatureBaseStats> CreatureBaseStatsContainer;
 
-struct CreatureLocale
-{
-    std::vector<std::string> Name;
-    std::vector<std::string> Title;
-};
-
-struct GossipMenuItemsLocale
-{
-    std::vector<std::string> OptionText;
-    std::vector<std::string> BoxText;
-};
-
-struct PointOfInterestLocale
-{
-    std::vector<std::string> Name;
-};
-
 struct EquipmentInfo
 {
     uint32  ItemEntry[MAX_EQUIPMENT_ITEMS];

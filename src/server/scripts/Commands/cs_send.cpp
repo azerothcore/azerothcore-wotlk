@@ -16,6 +16,7 @@
  */
 
 #include "Chat.h"
+#include "ChatTextBuilder.h"
 #include "DatabaseEnv.h"
 #include "Item.h"
 #include "Language.h"
@@ -130,7 +131,7 @@ public:
         draft.SendMailTo(trans, MailReceiver(target->GetConnectedPlayer(), target->GetGUID().GetCounter()), sender);
         CharacterDatabase.CommitTransaction(trans);
 
-        handler->PSendSysMessage(LANG_MAIL_SENT, handler->playerLink(target->GetName()).c_str());
+        handler->PSendSysMessage(LANG_MAIL_SENT, handler->playerLink(target->GetName()));
         return true;
     }
 
@@ -155,7 +156,7 @@ public:
         draft.SendMailTo(trans, MailReceiver(target->GetConnectedPlayer(), target->GetGUID().GetCounter()), sender);
         CharacterDatabase.CommitTransaction(trans);
 
-        handler->PSendSysMessage(LANG_MAIL_SENT, handler->playerLink(target->GetName()).c_str());
+        handler->PSendSysMessage(LANG_MAIL_SENT, handler->playerLink(target->GetName()));
         return true;
     }
 
@@ -172,15 +173,14 @@ public:
         }
 
         Player* player = target->GetConnectedPlayer();
-        std::string msg = std::string{ message };
 
         /// - Send the message
         // Use SendAreaTriggerMessage for fastest delivery.
-        player->GetSession()->SendAreaTriggerMessage("%s", msg.c_str());
-        player->GetSession()->SendAreaTriggerMessage("|cffff0000[Message from administrator]:|r");
+        Acore::Text::SendAreaTriggerMessage(player->GetSession(), message);
+        Acore::Text::SendAreaTriggerMessage(player->GetSession(), "|cffff0000[Message from administrator]:|r");
 
         // Confirmation message
-        handler->PSendSysMessage(LANG_SENDMESSAGE, handler->playerLink(target->GetName()).c_str(), msg.c_str());
+        handler->PSendSysMessage(LANG_SENDMESSAGE, handler->playerLink(target->GetName()), message);
 
         return true;
     }
@@ -208,7 +208,7 @@ public:
 
         CharacterDatabase.CommitTransaction(trans);
 
-        handler->PSendSysMessage(LANG_MAIL_SENT, handler->playerLink(target->GetName()).c_str());
+        handler->PSendSysMessage(LANG_MAIL_SENT, handler->playerLink(target->GetName()));
         return true;
     }
 };

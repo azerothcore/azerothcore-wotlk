@@ -20,6 +20,7 @@
 // TODO: Add proper implement of achievement
 
 #include "BattlefieldWG.h"
+#include "ChatTextBuilder.h"
 #include "GameTime.h"
 #include "MapMgr.h"
 #include "Opcodes.h"
@@ -285,7 +286,7 @@ void BattlefieldWG::OnBattleStart()
     m_tenacityUpdateTimer = 20000;
 
     if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE))
-        sWorld->SendWorldText(BATTLEFIELD_WG_WORLD_START_MESSAGE);
+        Acore::Text::SendWorldText(BATTLEFIELD_WG_WORLD_START_MESSAGE);
 }
 
 void BattlefieldWG::UpdateCounterVehicle(bool init)

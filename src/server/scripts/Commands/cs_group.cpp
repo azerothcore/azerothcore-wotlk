@@ -157,7 +157,7 @@ public:
                         {
                             groupSource->AddMember(playerTarget);
                             groupSource->BroadcastGroupUpdate();
-                            handler->PSendSysMessage(LANG_GROUP_PLAYER_JOINED, playerTarget->GetName().c_str(), playerSource->GetName().c_str());
+                            handler->PSendSysMessage(LANG_GROUP_PLAYER_JOINED, playerTarget->GetName(), playerSource->GetName());
                             return true;
                         }
                         else
@@ -170,7 +170,7 @@ public:
                     else
                     {
                         // group is full or target player already in a group
-                        handler->PSendSysMessage(LANG_GROUP_ALREADY_IN_GROUP, playerTarget->GetName().c_str());
+                        handler->PSendSysMessage(LANG_GROUP_ALREADY_IN_GROUP, playerTarget->GetName());
                         return true;
                     }
                 }
@@ -178,7 +178,7 @@ public:
             else
             {
                 // specified source player is not in a group
-                handler->PSendSysMessage(LANG_GROUP_NOT_IN_GROUP, playerSource->GetName().c_str());
+                handler->PSendSysMessage(LANG_GROUP_NOT_IN_GROUP, playerSource->GetName());
                 return true;
             }
         }
@@ -215,7 +215,7 @@ public:
 
         if (!groupTarget)
         {
-            handler->PSendSysMessage(LANG_GROUP_NOT_IN_GROUP, target->GetName().c_str());
+            handler->PSendSysMessage(LANG_GROUP_NOT_IN_GROUP, target->GetName());
             return true;
         }
 

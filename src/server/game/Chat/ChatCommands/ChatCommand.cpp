@@ -20,6 +20,7 @@
 #include "Chat.h"
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
+#include "GameLocale.h"
 #include "Log.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -28,16 +29,14 @@
 #include "WorldSession.h"
 
 using ChatSubCommandMap = std::map<std::string_view, Acore::Impl::ChatCommands::ChatCommandNode, StringCompareLessI_T>;
+static ChatSubCommandMap COMMAND_MAP;
 
 void Acore::Impl::ChatCommands::ChatCommandNode::LoadFromBuilder(ChatCommandBuilder const& builder)
 {
     if (std::holds_alternative<ChatCommandBuilder::InvokerEntry>(builder._data))
     {
         ASSERT(!_invoker, "Duplicate blank sub-command.");
-        AcoreStrings help;
-        std::tie(_invoker, help, _permission) = *(std::get<ChatCommandBuilder::InvokerEntry>(builder._data));
-        if (help)
-            _help.emplace<AcoreStrings>(help);
+        std::tie(_invoker, _permission) = *(std::get<ChatCommandBuilder::InvokerEntry>(builder._data));
     }
     else
         LoadCommandsIntoMap(this, _subCommands, std::get<ChatCommandBuilder::SubCommandEntry>(builder._data));
@@ -65,7 +64,6 @@ void Acore::Impl::ChatCommands::ChatCommandNode::LoadFromBuilder(ChatCommandBuil
     }
 }
 
-static ChatSubCommandMap COMMAND_MAP;
 /*static*/ ChatSubCommandMap const& Acore::Impl::ChatCommands::ChatCommandNode::GetTopLevelMap()
 {
     if (COMMAND_MAP.empty())
@@ -73,6 +71,7 @@ static ChatSubCommandMap COMMAND_MAP;
 
     return COMMAND_MAP;
 }
+
 /*static*/ void Acore::Impl::ChatCommands::ChatCommandNode::InvalidateCommandMap()
 {
     COMMAND_MAP.clear();
@@ -122,13 +121,15 @@ static ChatSubCommandMap COMMAND_MAP;
                 cmd->_permission.RequiredLevel = secLevel;
             }
 
-            if (std::holds_alternative<std::string>(cmd->_help))
+            if (!cmd->_help.empty())
+            {
                 LOG_ERROR("sql.sql", "Table `command` contains duplicate data for command '{}'. Skipped.", name);
-
-            if (std::holds_alternative<std::monostate>(cmd->_help))
-                cmd->_help.emplace<std::string>(help);
+            }
             else
-                LOG_ERROR("sql.sql", "Table `command` contains legacy help text for command '{}', which uses `trinity_string`. Skipped.", name);
+            {
+                cmd->_help = help;
+            }
+
         } while (result->NextRow());
     }
 
@@ -138,7 +139,7 @@ static ChatSubCommandMap COMMAND_MAP;
 
 void Acore::Impl::ChatCommands::ChatCommandNode::ResolveNames(std::string name)
 {
-    if (_invoker && std::holds_alternative<std::monostate>(_help))
+    if (_invoker && _help.empty())
         LOG_WARN("sql.sql", "Table `command` is missing help text for command '{}'.", name);
 
     _name = name;
@@ -192,14 +193,18 @@ void Acore::Impl::ChatCommands::ChatCommandNode::SendCommandHelp(ChatHandler& ha
     bool const hasInvoker = IsInvokerVisible(handler);
     if (hasInvoker)
     {
-        if (std::holds_alternative<AcoreStrings>(_help))
-            handler.SendSysMessage(std::get<AcoreStrings>(_help));
-        else if (std::holds_alternative<std::string>(_help))
-            handler.SendSysMessage(std::get<std::string>(_help));
+        if (auto localizeHelp = sGameLocale->GetChatCommandStringHelpLocale(_name, handler.GetSessionDbcLocale()))
+        {
+            handler.SendSysMessage(*localizeHelp);
+        }
+        else if (!_help.empty())
+        {
+            handler.SendSysMessage(_help);
+        }
         else
         {
-            handler.PSendSysMessage(LANG_CMD_HELP_GENERIC, STRING_VIEW_FMT_ARG(_name));
-            handler.PSendSysMessage(LANG_CMD_NO_HELP_AVAILABLE, STRING_VIEW_FMT_ARG(_name));
+            handler.PSendSysMessage(LANG_CMD_HELP_GENERIC, _name);
+            handler.PSendSysMessage(LANG_CMD_NO_HELP_AVAILABLE, _name);
         }
     }
 
@@ -218,14 +223,14 @@ void Acore::Impl::ChatCommands::ChatCommandNode::SendCommandHelp(ChatHandler& ha
         {
             if (!hasInvoker)
             {
-                handler.PSendSysMessage(LANG_CMD_HELP_GENERIC, STRING_VIEW_FMT_ARG(_name));
+                handler.PSendSysMessage(LANG_CMD_HELP_GENERIC, _name);
             }
 
             handler.SendSysMessage(LANG_SUBCMDS_LIST);
             header = true;
         }
 
-        handler.PSendSysMessage(subCommandHasSubCommand ? LANG_SUBCMDS_LIST_ENTRY_ELLIPSIS : LANG_SUBCMDS_LIST_ENTRY, STRING_VIEW_FMT_ARG(it->second._name));
+        handler.PSendSysMessage(subCommandHasSubCommand ? LANG_SUBCMDS_LIST_ENTRY_ELLIPSIS : LANG_SUBCMDS_LIST_ENTRY, it->second._name);
     }
 }
 
@@ -301,14 +306,14 @@ namespace Acore::Impl::ChatCommands
             if (it2)
             { /* there are multiple matching subcommands - print possibilities and return */
                 if (cmd)
-                    handler.PSendSysMessage(LANG_SUBCMD_AMBIGUOUS, STRING_VIEW_FMT_ARG(cmd->_name), COMMAND_DELIMITER, STRING_VIEW_FMT_ARG(token));
+                    handler.PSendSysMessage(LANG_SUBCMD_AMBIGUOUS, cmd->_name, COMMAND_DELIMITER, token);
                 else
-                    handler.PSendSysMessage(LANG_CMD_AMBIGUOUS, STRING_VIEW_FMT_ARG(token));
+                    handler.PSendSysMessage(LANG_CMD_AMBIGUOUS, token);
 
-                handler.PSendSysMessage(it1->second.HasVisibleSubCommands(handler) ? LANG_SUBCMDS_LIST_ENTRY_ELLIPSIS : LANG_SUBCMDS_LIST_ENTRY, STRING_VIEW_FMT_ARG(it1->first));
+                handler.PSendSysMessage(it1->second.HasVisibleSubCommands(handler) ? LANG_SUBCMDS_LIST_ENTRY_ELLIPSIS : LANG_SUBCMDS_LIST_ENTRY, it1->first);
                 do
                 {
-                    handler.PSendSysMessage(it2->second.HasVisibleSubCommands(handler) ? LANG_SUBCMDS_LIST_ENTRY_ELLIPSIS : LANG_SUBCMDS_LIST_ENTRY, STRING_VIEW_FMT_ARG(it2->first));
+                    handler.PSendSysMessage(it2->second.HasVisibleSubCommands(handler) ? LANG_SUBCMDS_LIST_ENTRY_ELLIPSIS : LANG_SUBCMDS_LIST_ENTRY, it2->first);
                 } while (++it2);
 
                 return true;
@@ -365,10 +370,10 @@ namespace Acore::Impl::ChatCommands
             if (cmd)
             {
                 cmd->SendCommandHelp(handler);
-                handler.PSendSysMessage(LANG_SUBCMD_INVALID, STRING_VIEW_FMT_ARG(cmd->_name), COMMAND_DELIMITER, STRING_VIEW_FMT_ARG(token));
+                handler.PSendSysMessage(LANG_SUBCMD_INVALID, cmd->_name, COMMAND_DELIMITER, token);
             }
             else
-                handler.PSendSysMessage(LANG_CMD_INVALID, STRING_VIEW_FMT_ARG(token));
+                handler.PSendSysMessage(LANG_CMD_INVALID, token);
             return;
         }
 
@@ -380,14 +385,14 @@ namespace Acore::Impl::ChatCommands
             if (it2)
             { /* there are multiple matching subcommands - print possibilities and return */
                 if (cmd)
-                    handler.PSendSysMessage(LANG_SUBCMD_AMBIGUOUS, STRING_VIEW_FMT_ARG(cmd->_name), COMMAND_DELIMITER, STRING_VIEW_FMT_ARG(token));
+                    handler.PSendSysMessage(LANG_SUBCMD_AMBIGUOUS, cmd->_name, COMMAND_DELIMITER, token);
                 else
-                    handler.PSendSysMessage(LANG_CMD_AMBIGUOUS, STRING_VIEW_FMT_ARG(token));
+                    handler.PSendSysMessage(LANG_CMD_AMBIGUOUS, token);
 
-                handler.PSendSysMessage(it1->second.HasVisibleSubCommands(handler) ? LANG_SUBCMDS_LIST_ENTRY_ELLIPSIS : LANG_SUBCMDS_LIST_ENTRY, STRING_VIEW_FMT_ARG(it1->first));
+                handler.PSendSysMessage(it1->second.HasVisibleSubCommands(handler) ? LANG_SUBCMDS_LIST_ENTRY_ELLIPSIS : LANG_SUBCMDS_LIST_ENTRY, it1->first);
                 do
                 {
-                    handler.PSendSysMessage(it2->second.HasVisibleSubCommands(handler) ? LANG_SUBCMDS_LIST_ENTRY_ELLIPSIS : LANG_SUBCMDS_LIST_ENTRY, STRING_VIEW_FMT_ARG(it2->first));
+                    handler.PSendSysMessage(it2->second.HasVisibleSubCommands(handler) ? LANG_SUBCMDS_LIST_ENTRY_ELLIPSIS : LANG_SUBCMDS_LIST_ENTRY, it2->first);
                 } while (++it2);
 
                 return;
@@ -408,11 +413,11 @@ namespace Acore::Impl::ChatCommands
         handler.SendSysMessage(LANG_AVAILABLE_CMDS);
         do
         {
-            handler.PSendSysMessage(it->second.HasVisibleSubCommands(handler) ? LANG_SUBCMDS_LIST_ENTRY_ELLIPSIS : LANG_SUBCMDS_LIST_ENTRY, STRING_VIEW_FMT_ARG(it->second._name));
+            handler.PSendSysMessage(it->second.HasVisibleSubCommands(handler) ? LANG_SUBCMDS_LIST_ENTRY_ELLIPSIS : LANG_SUBCMDS_LIST_ENTRY, it->second._name);
         } while (++it);
     }
     else
-        handler.PSendSysMessage(LANG_CMD_INVALID, STRING_VIEW_FMT_ARG(cmdStr));
+        handler.PSendSysMessage(LANG_CMD_INVALID, cmdStr);
 }
 
 /*static*/ std::vector<std::string> Acore::Impl::ChatCommands::ChatCommandNode::GetAutoCompletionsFor(ChatHandler const& handler, std::string_view cmdStr)

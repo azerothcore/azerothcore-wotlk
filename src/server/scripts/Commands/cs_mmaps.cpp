@@ -101,17 +101,17 @@ public:
         bool result = path.CalculatePath(x, y, z, false);
 
         Movement::PointsArray const& pointPath = path.GetPath();
-        handler->PSendSysMessage("%s's path to %s:", target->GetName().c_str(), player->GetName().c_str());
-        handler->PSendSysMessage("Building: %s", useStraightPath ? "StraightPath" : useRaycast ? "Raycast" : "SmoothPath");
-        handler->PSendSysMessage(Acore::StringFormatFmt("Result: {} - Length: {} - Type: {}", (result ? "true" : "false"), pointPath.size(), path.GetPathType()).c_str());
+        handler->PSendSysMessage("{}'s path to {}:", target->GetName(), player->GetName());
+        handler->PSendSysMessage("Building: {}", useStraightPath ? "StraightPath" : useRaycast ? "Raycast" : "SmoothPath");
+        handler->PSendSysMessage(Acore::StringFormatFmt("Result: {} - Length: {} - Type: {}", (result ? "true" : "false"), pointPath.size(), path.GetPathType()));
 
         G3D::Vector3 const& start = path.GetStartPosition();
         G3D::Vector3 const& end = path.GetEndPosition();
         G3D::Vector3 const& actualEnd = path.GetActualEndPosition();
 
-        handler->PSendSysMessage("StartPosition     (%.3f, %.3f, %.3f)", start.x, start.y, start.z);
-        handler->PSendSysMessage("EndPosition       (%.3f, %.3f, %.3f)", end.x, end.y, end.z);
-        handler->PSendSysMessage("ActualEndPosition (%.3f, %.3f, %.3f)", actualEnd.x, actualEnd.y, actualEnd.z);
+        handler->PSendSysMessage("StartPosition     ({0:.3f}, {0:.3f}, {0:.3f})", start.x, start.y, start.z);
+        handler->PSendSysMessage("EndPosition       ({0:.3f}, {0:.3f}, {0:.3f})", end.x, end.y, end.z);
+        handler->PSendSysMessage("ActualEndPosition ({0:.3f}, {0:.3f}, {0:.3f})", actualEnd.x, actualEnd.y, actualEnd.z);
 
         if (!player->IsGameMaster())
             handler->PSendSysMessage("Enable GM mode to see the path points.");
@@ -132,8 +132,8 @@ public:
         int32 gx = 32 - player->GetPositionX() / SIZE_OF_GRIDS;
         int32 gy = 32 - player->GetPositionY() / SIZE_OF_GRIDS;
 
-        handler->PSendSysMessage("%03u%02i%02i.mmtile", player->GetMapId(), gx, gy);
-        handler->PSendSysMessage("gridloc [%i, %i]", gy, gx);
+        handler->PSendSysMessage("{:03}{:02}{:02}.mmtile", player->GetMapId(), gx, gy);
+        handler->PSendSysMessage("gridloc [{}, {}]", gy, gx);
 
         // calculate navmesh tile location
         dtNavMesh const* navmesh = MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMesh(handler->GetSession()->GetPlayer()->GetMapId());
@@ -153,7 +153,7 @@ public:
         int32 tilex = int32((y - min[0]) / SIZE_OF_GRIDS);
         int32 tiley = int32((x - min[2]) / SIZE_OF_GRIDS);
 
-        handler->PSendSysMessage("Calc   [%02i, %02i]", tilex, tiley);
+        handler->PSendSysMessage("Calc   [{:02}, {:02}]", tilex, tiley);
 
         // navmesh poly -> navmesh tile location
         dtQueryFilterExt filter = dtQueryFilterExt();
@@ -174,7 +174,7 @@ public:
             {
                 if (tile)
                 {
-                    handler->PSendSysMessage("Dt     [%02i,%02i]", tile->header->x, tile->header->y);
+                    handler->PSendSysMessage("Dt     [{:02},{:02}]", tile->header->x, tile->header->y);
                     return false;
                 }
             }
@@ -204,7 +204,7 @@ public:
             if (!tile || !tile->header)
                 continue;
 
-            handler->PSendSysMessage("[%02i, %02i]", tile->header->x, tile->header->y);
+            handler->PSendSysMessage("[{:02}, {:02}]", tile->header->x, tile->header->y);
         }
 
         return true;
@@ -213,10 +213,10 @@ public:
     static bool HandleMmapStatsCommand(ChatHandler* handler)
     {
         handler->PSendSysMessage("mmap stats:");
-        //handler->PSendSysMessage("  global mmap pathfinding is %sabled", DisableMgr::IsPathfindingEnabled(mapId) ? "en" : "dis");
+        //handler->PSendSysMessage("  global mmap pathfinding is {}abled", DisableMgr::IsPathfindingEnabled(mapId) ? "en" : "dis");
 
         MMAP::MMapMgr* manager = MMAP::MMapFactory::createOrGetMMapMgr();
-        handler->PSendSysMessage(" %u maps loaded with %u tiles overall", manager->getLoadedMapsCount(), manager->getLoadedTilesCount());
+        handler->PSendSysMessage(" {} maps loaded with {} tiles overall", manager->getLoadedMapsCount(), manager->getLoadedTilesCount());
 
         dtNavMesh const* navmesh = manager->GetNavMesh(handler->GetSession()->GetPlayer()->GetMapId());
         if (!navmesh)
@@ -248,11 +248,11 @@ public:
         }
 
         handler->PSendSysMessage("Navmesh stats:");
-        handler->PSendSysMessage(" %u tiles loaded", tileCount);
-        handler->PSendSysMessage(" %u BVTree nodes", nodeCount);
-        handler->PSendSysMessage(" %u polygons (%u vertices)", polyCount, vertCount);
-        handler->PSendSysMessage(" %u triangles (%u vertices)", triCount, triVertCount);
-        handler->PSendSysMessage(" %.2f MB of data (not including pointers)", ((float)dataSize / sizeof(unsigned char)) / 1048576);
+        handler->PSendSysMessage(" {} tiles loaded", tileCount);
+        handler->PSendSysMessage(" {} BVTree nodes", nodeCount);
+        handler->PSendSysMessage(" {} polygons ({} vertices)", polyCount, vertCount);
+        handler->PSendSysMessage(" {} triangles ({} vertices)", triCount, triVertCount);
+        handler->PSendSysMessage(" {0:.2f} MB of data (not including pointers)", ((float)dataSize / sizeof(unsigned char)) / 1048576);
 
         return true;
     }
@@ -270,7 +270,7 @@ public:
 
         if (!creatureList.empty())
         {
-            handler->PSendSysMessage(Acore::StringFormatFmt("Found {} Creatures.", creatureList.size()).c_str());
+            handler->PSendSysMessage(Acore::StringFormatFmt("Found {} Creatures.", creatureList.size()));
 
             uint32 paths = 0;
             uint32 uStartTime = getMSTime();
@@ -285,10 +285,10 @@ public:
             }
 
             uint32 uPathLoadTime = getMSTimeDiff(uStartTime, getMSTime());
-            handler->PSendSysMessage("Generated %i paths in %i ms", paths, uPathLoadTime);
+            handler->PSendSysMessage("Generated {} paths in {} ms", paths, uPathLoadTime);
         }
         else
-            handler->PSendSysMessage("No creatures in %f yard range.", radius);
+            handler->PSendSysMessage("No creatures in {} yard range.", radius);
 
         return true;
     }

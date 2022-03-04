@@ -16,6 +16,7 @@
  */
 
 #include "InstanceScript.h"
+#include "ChatTextBuilder.h"
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "DatabaseEnv.h"
@@ -438,7 +439,7 @@ void InstanceScript::DoSendNotifyToInstance(char const* format, ...)
         va_end(ap);
         for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
             if (Player* player = i->GetSource())
-                player->GetSession()->SendNotification("%s", buff);
+                Acore::Text::SendNotification(player->GetSession(), buff);
     }
 }
 

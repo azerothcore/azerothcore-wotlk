@@ -21,6 +21,7 @@
 #include "CreatureAISelector.h"
 #include "DisableMgr.h"
 #include "DynamicTree.h"
+#include "GameLocale.h"
 #include "GameObjectAI.h"
 #include "GameObjectModel.h"
 #include "GameTime.h"
@@ -2152,7 +2153,7 @@ std::string const& GameObject::GetNameForLocaleIdx(LocaleConstant loc_idx) const
     if (loc_idx != DEFAULT_LOCALE)
     {
         uint8 uloc_idx = uint8(loc_idx);
-        if (GameObjectLocale const* cl = sObjectMgr->GetGameObjectLocale(GetEntry()))
+        if (GameObjectLocale const* cl = sGameLocale->GetGameObjectLocale(GetEntry()))
             if (cl->Name.size() > uloc_idx && !cl->Name[uloc_idx].empty())
                 return cl->Name[uloc_idx];
     }

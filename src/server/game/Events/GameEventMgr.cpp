@@ -17,6 +17,7 @@
 
 #include "GameEventMgr.h"
 #include "BattlegroundMgr.h"
+#include "ChatTextBuilder.h"
 #include "DisableMgr.h"
 #include "GameObjectAI.h"
 #include "GameTime.h"
@@ -1231,7 +1232,7 @@ void GameEventMgr::ApplyNewEvent(uint16 event_id)
 {
     uint8 announce = mGameEvent[event_id].announce;
     if (announce == 1 || (announce == 2 && sWorld->getIntConfig(CONFIG_EVENT_ANNOUNCE)))
-        sWorld->SendWorldText(LANG_EVENTMESSAGE, mGameEvent[event_id].description.c_str());
+        Acore::Text::SendWorldText(LANG_EVENTMESSAGE, mGameEvent[event_id].description.c_str());
 
     LOG_DEBUG("gameevent", "GameEvent {} \"{}\" started.", event_id, mGameEvent[event_id].description);
 

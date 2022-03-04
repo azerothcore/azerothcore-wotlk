@@ -16,6 +16,7 @@
  */
 
 #include "BattlegroundMgr.h"
+#include "ChatTextBuilder.h"
 #include "GossipDef.h"
 #include "Language.h"
 #include "ObjectMgr.h"
@@ -166,17 +167,17 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
         {
             // search in broadcast_text and broadcast_text_locale
             std::string strOptionText, strBoxText;
-            BroadcastText const* optionBroadcastText = sObjectMgr->GetBroadcastText(itr->second.OptionBroadcastTextID);
-            BroadcastText const* boxBroadcastText = sObjectMgr->GetBroadcastText(itr->second.BoxBroadcastTextID);
+            BroadcastText const* optionBroadcastText = sGameLocale->GetBroadcastText(itr->second.OptionBroadcastTextID);
+            BroadcastText const* boxBroadcastText = sGameLocale->GetBroadcastText(itr->second.BoxBroadcastTextID);
             LocaleConstant locale = GetSession()->GetSessionDbLocaleIndex();
 
             if (optionBroadcastText)
-                ObjectMgr::GetLocaleString(getGender() == GENDER_MALE ? optionBroadcastText->MaleText : optionBroadcastText->FemaleText, locale, strOptionText);
+                GameLocale::GetLocaleString(getGender() == GENDER_MALE ? optionBroadcastText->Text : optionBroadcastText->Text1, locale, strOptionText);
             else
                 strOptionText = itr->second.OptionText;
 
             if (boxBroadcastText)
-                ObjectMgr::GetLocaleString(getGender() == GENDER_MALE ? boxBroadcastText->MaleText : boxBroadcastText->FemaleText, locale, strBoxText);
+                GameLocale::GetLocaleString(getGender() == GENDER_MALE ? boxBroadcastText->Text : boxBroadcastText->Text1, locale, strBoxText);
             else
                 strBoxText = itr->second.BoxText;
 
@@ -186,15 +187,15 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
                 if (strOptionText.empty())
                 {
                     /// Find localizations from database.
-                    if (GossipMenuItemsLocale const* gossipMenuLocale = sObjectMgr->GetGossipMenuItemsLocale(MAKE_PAIR32(menuId, itr->second.OptionID)))
-                        ObjectMgr::GetLocaleString(gossipMenuLocale->OptionText, locale, strOptionText);
+                    if (GossipMenuItemsLocale const* gossipMenuLocale = sGameLocale->GetGossipMenuItemsLocale(MAKE_PAIR32(menuId, itr->second.OptionID)))
+                        GameLocale::GetLocaleString(gossipMenuLocale->OptionText, locale, strOptionText);
                 }
 
                 if (strBoxText.empty())
                 {
                     /// Find localizations from database.
-                    if (GossipMenuItemsLocale const* gossipMenuLocale = sObjectMgr->GetGossipMenuItemsLocale(MAKE_PAIR32(menuId, itr->second.OptionID)))
-                        ObjectMgr::GetLocaleString(gossipMenuLocale->BoxText, locale, strBoxText);
+                    if (GossipMenuItemsLocale const* gossipMenuLocale = sGameLocale->GetGossipMenuItemsLocale(MAKE_PAIR32(menuId, itr->second.OptionID)))
+                        GameLocale::GetLocaleString(gossipMenuLocale->BoxText, locale, strBoxText);
                 }
             }
 
@@ -262,12 +263,7 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
         if (gossipOptionId == GOSSIP_ACTION_TOGGLE_INSTANT_FLIGHT && source->GetUInt32Value(UNIT_NPC_FLAGS) & UNIT_NPC_FLAG_FLIGHTMASTER)
         {
             ToggleInstantFlight();
-
-            if (m_isInstantFlightOn)
-                GetSession()->SendNotification(LANG_INSTANT_FLIGHT_ON);
-            else
-                GetSession()->SendNotification(LANG_INSTANT_FLIGHT_OFF);
-
+            Acore::Text::SendNotification(GetSession(), m_isInstantFlightOn ? LANG_INSTANT_FLIGHT_ON : LANG_INSTANT_FLIGHT_OFF);
             PlayerTalkClass->SendCloseGossip();
             return;
         }

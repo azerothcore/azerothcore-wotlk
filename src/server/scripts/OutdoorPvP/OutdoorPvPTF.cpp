@@ -16,6 +16,7 @@
  */
 
 #include "OutdoorPvPTF.h"
+#include "GameLocale.h"
 #include "Language.h"
 #include "MapMgr.h"
 #include "ObjectMgr.h"
@@ -290,14 +291,14 @@ void OPvPCapturePointTF::ChangeState()
     {
         if (uint32 alliance_towers = ((OutdoorPvPTF*)m_PvP)->GetAllianceTowersControlled())
             ((OutdoorPvPTF*)m_PvP)->SetAllianceTowersControlled(--alliance_towers);
-        sWorld->SendZoneText(OutdoorPvPTFBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_TF_LOSE_A));
+        sWorld->SendZoneText(OutdoorPvPTFBuffZones[0], sGameLocale->GetAcoreStringForDBCLocale(LANG_OPVP_TF_LOSE_A));
     }
     // if changing from controlling horde to alliance
     else if (m_OldState == OBJECTIVESTATE_HORDE)
     {
         if (uint32 horde_towers = ((OutdoorPvPTF*)m_PvP)->GetHordeTowersControlled())
             ((OutdoorPvPTF*)m_PvP)->SetHordeTowersControlled(--horde_towers);
-        sWorld->SendZoneText(OutdoorPvPTFBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_TF_LOSE_H));
+        sWorld->SendZoneText(OutdoorPvPTFBuffZones[0], sGameLocale->GetAcoreStringForDBCLocale(LANG_OPVP_TF_LOSE_H));
     }
 
     uint32 artkit = 21;
@@ -312,7 +313,7 @@ void OPvPCapturePointTF::ChangeState()
                 if (alliance_towers < TF_TOWER_NUM)
                     ((OutdoorPvPTF*)m_PvP)->SetAllianceTowersControlled(++alliance_towers);
 
-                sWorld->SendZoneText(OutdoorPvPTFBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_TF_CAPTURE_A));
+                sWorld->SendZoneText(OutdoorPvPTFBuffZones[0], sGameLocale->GetAcoreStringForDBCLocale(LANG_OPVP_TF_CAPTURE_A));
 
                 for (PlayerSet::iterator itr = m_activePlayers[0].begin(); itr != m_activePlayers[0].end(); ++itr)
                     if (Player* player = ObjectAccessor::FindPlayer(*itr))
@@ -327,7 +328,7 @@ void OPvPCapturePointTF::ChangeState()
                 if (horde_towers < TF_TOWER_NUM)
                     ((OutdoorPvPTF*)m_PvP)->SetHordeTowersControlled(++horde_towers);
 
-                sWorld->SendZoneText(OutdoorPvPTFBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_TF_CAPTURE_H));
+                sWorld->SendZoneText(OutdoorPvPTFBuffZones[0], sGameLocale->GetAcoreStringForDBCLocale(LANG_OPVP_TF_CAPTURE_H));
 
                 for (PlayerSet::iterator itr = m_activePlayers[1].begin(); itr != m_activePlayers[1].end(); ++itr)
                     if (Player* player = ObjectAccessor::FindPlayer(*itr))

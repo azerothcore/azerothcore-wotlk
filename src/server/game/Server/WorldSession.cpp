@@ -25,6 +25,7 @@
 #include "CharacterPackets.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
+#include "GameLocale.h"
 #include "GameTime.h"
 #include "Group.h"
 #include "Guild.h"
@@ -723,8 +724,8 @@ bool WorldSession::ValidateHyperlinksAndMaybeKick(std::string_view str)
     if (Acore::Hyperlinks::CheckAllLinks(str))
         return true;
 
-    LOG_ERROR("network", "Player {}{} sent a message with an invalid link:\n%.*s", GetPlayer()->GetName(),
-        GetPlayer()->GetGUID().ToString(), STRING_VIEW_FMT_ARG(str));
+    LOG_ERROR("network", "Player {}{} sent a message with an invalid link:\n{}", GetPlayer()->GetName(),
+        GetPlayer()->GetGUID().ToString(), str);
 
     if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
         KickPlayer("WorldSession::ValidateHyperlinksAndMaybeKick Invalid chat link");
@@ -737,8 +738,8 @@ bool WorldSession::DisallowHyperlinksAndMaybeKick(std::string_view str)
     if (str.find('|') == std::string_view::npos)
         return true;
 
-    LOG_ERROR("network", "Player {} {} sent a message which illegally contained a hyperlink:\n%.*s", GetPlayer()->GetName(),
-        GetPlayer()->GetGUID().ToString(), STRING_VIEW_FMT_ARG(str));
+    LOG_ERROR("network", "Player {} {} sent a message which illegally contained a hyperlink:\n{}", GetPlayer()->GetName(),
+        GetPlayer()->GetGUID().ToString(), str);
 
     if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
         KickPlayer("WorldSession::DisallowHyperlinksAndMaybeKick Illegal chat link");
@@ -746,44 +747,9 @@ bool WorldSession::DisallowHyperlinksAndMaybeKick(std::string_view str)
     return false;
 }
 
-void WorldSession::SendNotification(const char* format, ...)
+std::string WorldSession::GetAcoreString(uint32 entry) const
 {
-    if (format)
-    {
-        va_list ap;
-        char szStr[1024];
-        szStr[0] = '\0';
-        va_start(ap, format);
-        vsnprintf(szStr, 1024, format, ap);
-        va_end(ap);
-
-        WorldPacket data(SMSG_NOTIFICATION, (strlen(szStr) + 1));
-        data << szStr;
-        SendPacket(&data);
-    }
-}
-
-void WorldSession::SendNotification(uint32 string_id, ...)
-{
-    char const* format = GetAcoreString(string_id);
-    if (format)
-    {
-        va_list ap;
-        char szStr[1024];
-        szStr[0] = '\0';
-        va_start(ap, string_id);
-        vsnprintf(szStr, 1024, format, ap);
-        va_end(ap);
-
-        WorldPacket data(SMSG_NOTIFICATION, (strlen(szStr) + 1));
-        data << szStr;
-        SendPacket(&data);
-    }
-}
-
-char const* WorldSession::GetAcoreString(uint32 entry) const
-{
-    return sObjectMgr->GetAcoreString(entry, GetSessionDbLocaleIndex());
+    return sGameLocale->GetAcoreString(entry, GetSessionDbLocaleIndex());
 }
 
 void WorldSession::Handle_NULL(WorldPacket& null)

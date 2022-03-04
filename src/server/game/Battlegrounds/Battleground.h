@@ -434,9 +434,6 @@ public:
     void SendChatMessage(Creature* source, uint8 textId, WorldObject* target = nullptr);
     void SendBroadcastText(uint32 id, ChatMsg msgType, WorldObject const* target = nullptr);
 
-    template<class Do>
-    void BroadcastWorker(Do& _do);
-
     void PlaySoundToAll(uint32 soundId);
     void CastSpellOnTeam(uint32 spellId, TeamId teamId);
     void RemoveAuraOnTeam(uint32 spellId, TeamId teamId);
@@ -456,9 +453,7 @@ public:
 
     void BlockMovement(Player* player);
 
-    void SendWarningToAll(uint32 entry, ...);
     void SendMessageToAll(uint32 entry, ChatMsg type, Player const* source = nullptr);
-    void PSendMessageToAll(uint32 entry, ChatMsg type, Player const* source, ...);
 
     // specialized version with 2 string id args
     void SendMessage2ToAll(uint32 entry, ChatMsg type, Player const* source, uint32 strId1 = 0, uint32 strId2 = 0);

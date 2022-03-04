@@ -24,6 +24,7 @@ EndScriptData */
 
 #include "AccountMgr.h"
 #include "Chat.h"
+#include "ChatTextBuilder.h"
 #include "DatabaseEnv.h"
 #include "Language.h"
 #include "ObjectAccessor.h"
@@ -68,22 +69,22 @@ public:
             if (!enableArg)
             {
                 if (!AccountMgr::IsPlayerAccount(session->GetSecurity()) && session->GetPlayer()->isGMChat())
-                    session->SendNotification(LANG_GM_CHAT_ON);
+                    Acore::Text::SendNotification(session, LANG_GM_CHAT_ON);
                 else
-                    session->SendNotification(LANG_GM_CHAT_OFF);
+                    Acore::Text::SendNotification(session, LANG_GM_CHAT_OFF);
                 return true;
             }
 
             if (*enableArg)
             {
                 session->GetPlayer()->SetGMChat(true);
-                session->SendNotification(LANG_GM_CHAT_ON);
+                Acore::Text::SendNotification(session, LANG_GM_CHAT_ON);
                 return true;
             }
             else
             {
                 session->GetPlayer()->SetGMChat(false);
-                session->SendNotification(LANG_GM_CHAT_OFF);
+                Acore::Text::SendNotification(session, LANG_GM_CHAT_OFF);
                 return true;
             }
         }
@@ -108,7 +109,7 @@ public:
         data << target->GetPackGUID();
         data << uint32(0);                                      // unknown
         target->SendMessageToSet(&data, true);
-        handler->PSendSysMessage(LANG_COMMAND_FLYMODE_STATUS, handler->GetNameLink(target).c_str(), enable ? "on" : "off");
+        handler->PSendSysMessage(LANG_COMMAND_FLYMODE_STATUS, handler->GetNameLink(target), enable ? "on" : "off");
         return true;
     }
 
@@ -132,17 +133,11 @@ public:
                     handler->SendSysMessage(LANG_GMS_ON_SRV);
                     handler->SendSysMessage("========================");
                 }
+
                 std::string const& name = player->GetName();
-                uint8 size = uint8(name.size());
                 uint8 security = playerSec;
-                uint8 max = ((16 - size) / 2);
-                uint8 max2 = max;
-                if ((max + max2 + size) == 16)
-                    max2 = max - 1;
-                if (handler->GetSession())
-                    handler->PSendSysMessage("|    %s GMLevel %u", name.c_str(), security);
-                else
-                    handler->PSendSysMessage("|%*s%s%*s|   %u  |", max, " ", name.c_str(), max2, " ", security);
+
+                handler->PSendSysMessage("|    {} GMLevel {}", name, security);
             }
         }
         if (footer)
@@ -171,14 +166,7 @@ public:
                 Field* fields = result->Fetch();
                 std::string name = fields[0].Get<std::string>();
                 uint8 security = fields[1].Get<uint8>();
-                uint8 max = (16 - name.length()) / 2;
-                uint8 max2 = max;
-                if ((max + max2 + name.length()) == 16)
-                    max2 = max - 1;
-                if (handler->GetSession())
-                    handler->PSendSysMessage("|    %s GMLevel %u", name.c_str(), security);
-                else
-                    handler->PSendSysMessage("|%*s%s%*s|   %u  |", max, " ", name.c_str(), max2, " ", security);
+                handler->PSendSysMessage("|    {} GMLevel {}", name, security);
             } while (result->NextRow());
             handler->SendSysMessage("========================");
         }
@@ -207,14 +195,14 @@ public:
 
             _player->SetGMVisible(true);
             _player->UpdateObjectVisibility();
-            handler->GetSession()->SendNotification(LANG_INVISIBLE_VISIBLE);
+            Acore::Text::SendNotification(handler->GetSession(), LANG_INVISIBLE_VISIBLE);
         }
         else
         {
             _player->AddAura(VISUAL_AURA, _player);
             _player->SetGMVisible(false);
             _player->UpdateObjectVisibility();
-            handler->GetSession()->SendNotification(LANG_INVISIBLE_INVISIBLE);
+            Acore::Text::SendNotification(handler->GetSession(), LANG_INVISIBLE_INVISIBLE);
         }
 
         return true;
@@ -224,7 +212,7 @@ public:
     {
         handler->GetPlayer()->SetGameMaster(true);
         handler->GetPlayer()->UpdateTriggerVisibility();
-        handler->GetSession()->SendNotification(LANG_GM_ON);
+        Acore::Text::SendNotification(handler->GetSession(), LANG_GM_ON);
         return true;
     }
 
@@ -232,7 +220,7 @@ public:
     {
         handler->GetPlayer()->SetGameMaster(false);
         handler->GetPlayer()->UpdateTriggerVisibility();
-        handler->GetSession()->SendNotification(LANG_GM_OFF);
+        Acore::Text::SendNotification(handler->GetSession(), LANG_GM_OFF);
         return true;
     }
 };

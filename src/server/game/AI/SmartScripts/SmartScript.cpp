@@ -21,6 +21,7 @@
 #include "ChatTextBuilder.h"
 #include "CreatureTextMgr.h"
 #include "GameEventMgr.h"
+#include "GameLocale.h"
 #include "GossipDef.h"
 #include "GridDefines.h"
 #include "GridNotifiers.h"
@@ -3093,7 +3094,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         case SMART_ACTION_PLAYER_TALK:
             {
                 ObjectList* targets = GetTargets(e, unit);
-                char const* text = sObjectMgr->GetAcoreString(e.action.playerTalk.textId, DEFAULT_LOCALE);
+                char const* text = sGameLocale->GetAcoreString(e.action.playerTalk.textId, DEFAULT_LOCALE);
 
                 if (targets)
                     for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)

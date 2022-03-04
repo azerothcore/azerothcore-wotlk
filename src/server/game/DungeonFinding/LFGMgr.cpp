@@ -18,6 +18,7 @@
 #include "LFGMgr.h"
 #include "BattlegroundMgr.h"
 #include "CharacterCache.h"
+#include "ChatTextBuilder.h"
 #include "Common.h"
 #include "DBCStores.h"
 #include "DisableMgr.h"
@@ -798,7 +799,7 @@ namespace lfg
     void LFGMgr::ToggleTesting()
     {
         m_Testing = !m_Testing;
-        sWorld->SendWorldText(m_Testing ? LANG_DEBUG_LFG_ON : LANG_DEBUG_LFG_OFF);
+        Acore::Text::SendWorldText(m_Testing ? LANG_DEBUG_LFG_ON : LANG_DEBUG_LFG_OFF);
     }
 
     /**

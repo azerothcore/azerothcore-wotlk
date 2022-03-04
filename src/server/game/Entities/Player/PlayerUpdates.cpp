@@ -20,6 +20,7 @@
 #include "Channel.h"
 #include "ChannelMgr.h"
 #include "Formulas.h"
+#include "GameLocale.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "Group.h"
@@ -519,7 +520,7 @@ void Player::UpdateLocalChannels(uint32 newZone)
                     char const* currentNameExt;
 
                     if (channel->flags & CHANNEL_DBC_FLAG_CITY_ONLY)
-                        currentNameExt = sObjectMgr->GetAcoreStringForDBCLocale(
+                        currentNameExt = sGameLocale->GetAcoreStringForDBCLocale(
                             LANG_CHANNEL_CITY);
                     else
                         currentNameExt = current_zone_name.c_str();

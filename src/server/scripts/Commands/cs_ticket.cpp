@@ -123,7 +123,7 @@ public:
         Player* player = handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr;
         if (player && ticket->IsAssignedNotTo(player->GetGUID()))
         {
-            handler->PSendSysMessage(LANG_COMMAND_TICKETALREADYASSIGNED, ticket->GetId(), target.c_str());
+            handler->PSendSysMessage(LANG_COMMAND_TICKETALREADYASSIGNED, ticket->GetId(), target);
             return true;
         }
 
@@ -442,7 +442,7 @@ public:
         ticket->SetViewed();
         ticket->SaveToDB(trans);
 
-        handler->SendSysMessage(ticket->FormatMessageString(*handler, true).c_str());
+        handler->SendSysMessage(ticket->FormatMessageString(*handler, true));
         return true;
     }
 
@@ -485,7 +485,7 @@ public:
         ticket->SetViewed();
         ticket->SaveToDB(trans);
 
-        handler->SendSysMessage(ticket->FormatMessageString(*handler, true).c_str());
+        handler->SendSysMessage(ticket->FormatMessageString(*handler, true));
         return true;
     }
 

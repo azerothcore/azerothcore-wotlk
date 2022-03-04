@@ -19,6 +19,7 @@
 #include "Common.h"
 #include "DBCStores.h"
 #include "Errors.h"
+#include "GameLocale.h"
 #include "ObjectMgr.h"
 #include "QuestDef.h"
 #include "SharedDefines.h"
@@ -134,7 +135,7 @@ struct LinkValidator<LinkTags::item>
 {
     static bool IsTextValid(ItemLinkData const& data, std::string_view text)
     {
-        ItemLocale const* locale = sObjectMgr->GetItemLocale(data.Item->ItemId);
+        ItemLocale const* locale = sGameLocale->GetItemLocale(data.Item->ItemId);
 
         std::array<char const*, 16> const* randomSuffixes = nullptr;
 
@@ -151,7 +152,7 @@ struct LinkValidator<LinkTags::item>
             if (!locale && i != DEFAULT_LOCALE)
                 continue;
 
-            std::string_view name = (i == DEFAULT_LOCALE) ? data.Item->Name1 : ObjectMgr::GetLocaleString(locale->Name, i);
+            std::string_view name = (i == DEFAULT_LOCALE) ? data.Item->Name1 : GameLocale::GetLocaleString(locale->Name, i);
             if (name.empty())
                 continue;
 
@@ -188,7 +189,7 @@ struct LinkValidator<LinkTags::quest>
         if (text == data.Quest->GetTitle())
             return true;
 
-        QuestLocale const* locale = sObjectMgr->GetQuestLocale(data.Quest->GetQuestId());
+        QuestLocale const* locale = sGameLocale->GetQuestLocale(data.Quest->GetQuestId());
         if (!locale)
             return false;
 
@@ -197,7 +198,7 @@ struct LinkValidator<LinkTags::quest>
             if (i == DEFAULT_LOCALE)
                 continue;
 
-            std::string_view name = ObjectMgr::GetLocaleString(locale->Title, i);
+            std::string_view name = GameLocale::GetLocaleString(locale->Title, i);
             if (!name.empty() && (text == name))
                 return true;
         }

@@ -22,6 +22,7 @@
 #include "BattlegroundSA.h"
 #include "BattlegroundWS.h"
 #include "CellImpl.h"
+#include "ChatTextBuilder.h"
 #include "Common.h"
 #include "Creature.h"
 #include "DynamicObject.h"
@@ -6323,7 +6324,7 @@ void Spell::EffectPlaySound(SpellEffIndex effIndex)
     {
         case 58730: // Restricted Flight Area
         case 58600: // Restricted Flight Area
-            player->GetSession()->SendNotification(LANG_ZONE_NOFLYZONE);
+            Acore::Text::SendNotification(player->GetSession(), LANG_ZONE_NOFLYZONE);
             break;
         default:
             break;

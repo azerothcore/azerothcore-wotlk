@@ -26,6 +26,7 @@ EndScriptData */
 #include "CharacterCache.h"
 #include "Chat.h"
 #include "GameEventMgr.h"
+#include "GameLocale.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
@@ -153,7 +154,7 @@ public:
                     ss << areaEntry->ID << " - " << name << ' ' << localeNames[locale];
                 }
 
-                handler->SendSysMessage(ss.str().c_str());
+                handler->SendSysMessage(ss.str());
 
                 if (!found)
                 {
@@ -195,7 +196,7 @@ public:
         {
             uint32 id = creatureTemplate.Entry;
             uint8 localeIndex = handler->GetSessionDbLocaleIndex();
-            if (CreatureLocale const* creatureLocale = sObjectMgr->GetCreatureLocale(id))
+            if (CreatureLocale const* creatureLocale = sGameLocale->GetCreatureLocale(id))
             {
                 if (creatureLocale->Name.size() > localeIndex && !creatureLocale->Name[localeIndex].empty())
                 {
@@ -211,11 +212,11 @@ public:
 
                         if (handler->GetSession())
                         {
-                            handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CHAT, id, id, name.c_str());
+                            handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CHAT, id, id, name);
                         }
                         else
                         {
-                            handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CONSOLE, id, name.c_str());
+                            handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CONSOLE, id, name);
                         }
 
                         if (!found)
@@ -244,11 +245,11 @@ public:
 
                 if (handler->GetSession())
                 {
-                    handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CHAT, id, id, name.c_str());
+                    handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CHAT, id, id, name);
                 }
                 else
                 {
-                    handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CONSOLE, id, name.c_str());
+                    handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CONSOLE, id, name);
                 }
 
                 if (!found)
@@ -308,15 +309,15 @@ public:
                     return true;
                 }
 
-                char const* active = activeEvents.find(id) != activeEvents.end() ? handler->GetAcoreString(LANG_ACTIVE) : "";
+                std::string active = activeEvents.find(id) != activeEvents.end() ? handler->GetAcoreString(LANG_ACTIVE) : "";
 
                 if (handler->GetSession())
                 {
-                    handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CHAT, id, id, eventData.description.c_str(), active);
+                    handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CHAT, id, id, eventData.description, active);
                 }
                 else
                 {
-                    handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CONSOLE, id, eventData.description.c_str(), active);
+                    handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CONSOLE, id, eventData.description, active);
                 }
 
                 if (!found)
@@ -455,7 +456,7 @@ public:
                     ss << handler->GetAcoreString(LANG_FACTION_NOREPUTATION);
                 }
 
-                handler->SendSysMessage(ss.str().c_str());
+                handler->SendSysMessage(ss.str());
 
                 if (!found)
                 {
@@ -500,7 +501,7 @@ public:
             if (localeIndex >= 0)
             {
                 uint8 ulocaleIndex = uint8(localeIndex);
-                if (ItemLocale const* il = sObjectMgr->GetItemLocale(itemTemplate.ItemId))
+                if (ItemLocale const* il = sGameLocale->GetItemLocale(itemTemplate.ItemId))
                 {
                     if (il->Name.size() > ulocaleIndex && !il->Name[ulocaleIndex].empty())
                     {
@@ -516,11 +517,11 @@ public:
 
                             if (handler->GetSession())
                             {
-                                handler->PSendSysMessage(LANG_ITEM_LIST_CHAT, itemTemplate.ItemId, itemTemplate.ItemId, name.c_str());
+                                handler->PSendSysMessage(LANG_ITEM_LIST_CHAT, itemTemplate.ItemId, itemTemplate.ItemId, name);
                             }
                             else
                             {
-                                handler->PSendSysMessage(LANG_ITEM_LIST_CONSOLE, itemTemplate.ItemId, name.c_str());
+                                handler->PSendSysMessage(LANG_ITEM_LIST_CONSOLE, itemTemplate.ItemId, name);
                             }
 
                             if (!found)
@@ -550,11 +551,11 @@ public:
 
                 if (handler->GetSession())
                 {
-                    handler->PSendSysMessage(LANG_ITEM_LIST_CHAT, itemTemplate.ItemId, itemTemplate.ItemId, name.c_str());
+                    handler->PSendSysMessage(LANG_ITEM_LIST_CHAT, itemTemplate.ItemId, itemTemplate.ItemId, name);
                 }
                 else
                 {
-                    handler->PSendSysMessage(LANG_ITEM_LIST_CONSOLE, itemTemplate.ItemId, name.c_str());
+                    handler->PSendSysMessage(LANG_ITEM_LIST_CONSOLE, itemTemplate.ItemId, name);
                 }
 
                 if (!found)
@@ -640,11 +641,11 @@ public:
                     // send item set in "id - [namedlink locale]" format
                     if (handler->GetSession())
                     {
-                        handler->PSendSysMessage(LANG_ITEMSET_LIST_CHAT, id, id, name.c_str(), localeNames[locale]);
+                        handler->PSendSysMessage(LANG_ITEMSET_LIST_CHAT, id, id, name, localeNames[locale]);
                     }
                     else
                     {
-                        handler->PSendSysMessage(LANG_ITEMSET_LIST_CONSOLE, id, name.c_str(), localeNames[locale]);
+                        handler->PSendSysMessage(LANG_ITEMSET_LIST_CONSOLE, id, name, localeNames[locale]);
                     }
 
                     if (!found)
@@ -687,7 +688,7 @@ public:
         for (auto const& [entry, gameObjectTemplate] : *sObjectMgr->GetGameObjectTemplates())
         {
             uint8 localeIndex = handler->GetSessionDbLocaleIndex();
-            if (GameObjectLocale const* objectLocalte = sObjectMgr->GetGameObjectLocale(gameObjectTemplate.entry))
+            if (GameObjectLocale const* objectLocalte = sGameLocale->GetGameObjectLocale(gameObjectTemplate.entry))
             {
                 if (objectLocalte->Name.size() > localeIndex && !objectLocalte->Name[localeIndex].empty())
                 {
@@ -703,11 +704,11 @@ public:
 
                         if (handler->GetSession())
                         {
-                            handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CHAT, gameObjectTemplate.entry, gameObjectTemplate.entry, name.c_str());
+                            handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CHAT, gameObjectTemplate.entry, gameObjectTemplate.entry, name);
                         }
                         else
                         {
-                            handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CONSOLE, gameObjectTemplate.entry, name.c_str());
+                            handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CONSOLE, gameObjectTemplate.entry, name);
                         }
 
                         if (!found)
@@ -736,11 +737,11 @@ public:
 
                 if (handler->GetSession())
                 {
-                    handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CHAT, gameObjectTemplate.entry, gameObjectTemplate.entry, name.c_str());
+                    handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CHAT, gameObjectTemplate.entry, gameObjectTemplate.entry, name);
                 }
                 else
                 {
-                    handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CONSOLE, gameObjectTemplate.entry, name.c_str());
+                    handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CONSOLE, gameObjectTemplate.entry, name);
                 }
 
                 if (!found)
@@ -788,7 +789,7 @@ public:
             if (localeIndex >= 0)
             {
                 uint8 ulocaleIndex = uint8(localeIndex);
-                if (QuestLocale const* questLocale = sObjectMgr->GetQuestLocale(qInfo->GetQuestId()))
+                if (QuestLocale const* questLocale = sGameLocale->GetQuestLocale(qInfo->GetQuestId()))
                 {
                     if (questLocale->Title.size() > ulocaleIndex && !questLocale->Title[ulocaleIndex].empty())
                     {
@@ -802,7 +803,7 @@ public:
                                 return true;
                             }
 
-                            char const* statusStr = "";
+                            std::string statusStr = "";
 
                             if (target)
                             {
@@ -826,11 +827,11 @@ public:
 
                             if (handler->GetSession())
                             {
-                                handler->PSendSysMessage(LANG_QUEST_LIST_CHAT, qInfo->GetQuestId(), qInfo->GetQuestId(), qInfo->GetQuestLevel(), title.c_str(), statusStr);
+                                handler->PSendSysMessage(LANG_QUEST_LIST_CHAT, qInfo->GetQuestId(), qInfo->GetQuestId(), qInfo->GetQuestLevel(), title, statusStr);
                             }
                             else
                             {
-                                handler->PSendSysMessage(LANG_QUEST_LIST_CONSOLE, qInfo->GetQuestId(), title.c_str(), statusStr);
+                                handler->PSendSysMessage(LANG_QUEST_LIST_CONSOLE, qInfo->GetQuestId(), title, statusStr);
                             }
 
                             if (!found)
@@ -858,7 +859,7 @@ public:
                     return true;
                 }
 
-                char const* statusStr = "";
+                std::string statusStr = "";
 
                 if (target)
                 {
@@ -882,11 +883,11 @@ public:
 
                 if (handler->GetSession())
                 {
-                    handler->PSendSysMessage(LANG_QUEST_LIST_CHAT, qInfo->GetQuestId(), qInfo->GetQuestId(), qInfo->GetQuestLevel(), title.c_str(), statusStr);
+                    handler->PSendSysMessage(LANG_QUEST_LIST_CHAT, qInfo->GetQuestId(), qInfo->GetQuestId(), qInfo->GetQuestLevel(), title, statusStr);
                 }
                 else
                 {
-                    handler->PSendSysMessage(LANG_QUEST_LIST_CONSOLE, qInfo->GetQuestId(), title.c_str(), statusStr);
+                    handler->PSendSysMessage(LANG_QUEST_LIST_CONSOLE, qInfo->GetQuestId(), title, statusStr);
                 }
 
                 if (!found)
@@ -981,17 +982,17 @@ public:
                     uint32 permValue = target->GetSkillPermBonusValue(skillInfo->id);
                     uint32 tempValue = target->GetSkillTempBonusValue(skillInfo->id);
 
-                    valStr = Acore::StringFormat(handler->GetAcoreString(LANG_SKILL_VALUES), curValue, maxValue, permValue, tempValue);
+                    valStr = Acore::StringFormatFmt(handler->GetAcoreString(LANG_SKILL_VALUES), curValue, maxValue, permValue, tempValue);
                 }
 
                 // send skill in "id - [namedlink locale]" format
                 if (handler->GetSession())
                 {
-                    handler->PSendSysMessage(LANG_SKILL_LIST_CHAT, skillInfo->id, skillInfo->id, name.c_str(), localeNames[locale], knownStr.c_str(), valStr.c_str());
+                    handler->PSendSysMessage(LANG_SKILL_LIST_CHAT, skillInfo->id, skillInfo->id, name, localeNames[locale], knownStr, valStr);
                 }
                 else
                 {
-                    handler->PSendSysMessage(LANG_SKILL_LIST_CONSOLE, skillInfo->id, name.c_str(), localeNames[locale], knownStr.c_str(), valStr.c_str());
+                    handler->PSendSysMessage(LANG_SKILL_LIST_CONSOLE, skillInfo->id, name, localeNames[locale], knownStr, valStr);
                 }
 
                 if (!found)
@@ -1143,7 +1144,7 @@ public:
                         ss << handler->GetAcoreString(LANG_ACTIVE);
                     }
 
-                    handler->SendSysMessage(ss.str().c_str());
+                    handler->SendSysMessage(ss.str());
 
                     if (!found)
                     {
@@ -1259,7 +1260,7 @@ public:
                 ss << handler->GetAcoreString(LANG_ACTIVE);
             }
 
-            handler->SendSysMessage(ss.str().c_str());
+            handler->SendSysMessage(ss.str());
 
             if (!found)
             {
@@ -1342,12 +1343,12 @@ public:
                 // send taxinode in "id - [name] (Map:m X:x Y:y Z:z)" format
                 if (handler->GetSession())
                 {
-                    handler->PSendSysMessage(LANG_TAXINODE_ENTRY_LIST_CHAT, nodeEntry->ID, nodeEntry->ID, name.c_str(), localeNames[locale],
+                    handler->PSendSysMessage(LANG_TAXINODE_ENTRY_LIST_CHAT, nodeEntry->ID, nodeEntry->ID, name, localeNames[locale],
                                              nodeEntry->map_id, nodeEntry->x, nodeEntry->y, nodeEntry->z);
                 }
                 else
                 {
-                    handler->PSendSysMessage(LANG_TAXINODE_ENTRY_LIST_CONSOLE, nodeEntry->ID, name.c_str(), localeNames[locale],
+                    handler->PSendSysMessage(LANG_TAXINODE_ENTRY_LIST_CONSOLE, nodeEntry->ID, name, localeNames[locale],
                                              nodeEntry->map_id, nodeEntry->x, nodeEntry->y, nodeEntry->z);
                 }
 
@@ -1417,7 +1418,7 @@ public:
         }
         else
         {
-            handler->PSendSysMessage(LANG_COMMAND_TELE_LOCATION, reply.str().c_str());
+            handler->PSendSysMessage(LANG_COMMAND_TELE_LOCATION, reply.str());
         }
 
         if (limitReached)
@@ -1495,8 +1496,8 @@ public:
                     return true;
                 }
 
-                char const* knownStr = target && target->HasTitle(titleInfo) ? handler->GetAcoreString(LANG_KNOWN) : "";
-                char const* activeStr = target && target->GetUInt32Value(PLAYER_CHOSEN_TITLE) == titleInfo->bit_index ? handler->GetAcoreString(LANG_ACTIVE) : "";
+                std::string knownStr = target && target->HasTitle(titleInfo) ? handler->GetAcoreString(LANG_KNOWN) : "";
+                std::string activeStr = target && target->GetUInt32Value(PLAYER_CHOSEN_TITLE) == titleInfo->bit_index ? handler->GetAcoreString(LANG_ACTIVE) : "";
 
                 std::string titleNameStr = Acore::StringFormat(name, targetName);
 
@@ -1584,7 +1585,7 @@ public:
                         break;
                 }
 
-                handler->SendSysMessage(ss.str().c_str());
+                handler->SendSysMessage(ss.str());
 
                 ++counter;
             }
@@ -1677,7 +1678,7 @@ public:
 
             if (result2)
             {
-                handler->PSendSysMessage(LANG_LOOKUP_PLAYER_ACCOUNT, accountName.c_str(), accountId);
+                handler->PSendSysMessage(LANG_LOOKUP_PLAYER_ACCOUNT, accountName, accountId);
 
                 do
                 {
@@ -1696,11 +1697,11 @@ public:
 
                     if (plevel > 0 && prace > 0 && prace <= RACE_DRAENEI && pclass > 0 && pclass <= CLASS_DRUID)
                     {
-                        handler->PSendSysMessage("  %s (GUID %u) - %s - %s - %u%s", name.c_str(), guid, EnumUtils::ToTitle(Races(prace)), EnumUtils::ToTitle(Classes(pclass)), plevel, (online ? " - [ONLINE]" : ""));
+                        handler->PSendSysMessage("  {} (GUID {}) - {} - {} - {}{}", name, guid, EnumUtils::ToTitle(Races(prace)), EnumUtils::ToTitle(Classes(pclass)), plevel, (online ? " - [ONLINE]" : ""));
                     }
                     else
                     {
-                        handler->PSendSysMessage(LANG_LOOKUP_PLAYER_CHARACTER, name.c_str(), guid);
+                        handler->PSendSysMessage(LANG_LOOKUP_PLAYER_CHARACTER, name, guid);
                     }
 
                     ++counter;

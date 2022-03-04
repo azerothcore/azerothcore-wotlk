@@ -19,6 +19,7 @@
 #include "AccountMgr.h"
 #include "CellImpl.h"
 #include "Common.h"
+#include "GameLocale.h"
 #include "GridNotifiersImpl.h"
 #include "Language.h"
 #include "Log.h"
@@ -39,7 +40,7 @@ Player* ChatHandler::GetPlayer() const
     return m_session ? m_session->GetPlayer() : nullptr;
 }
 
-char const* ChatHandler::GetAcoreString(uint32 entry) const
+std::string ChatHandler::GetAcoreString(uint32 entry) const
 {
     return m_session->GetAcoreString(entry);
 }
@@ -161,7 +162,7 @@ bool ChatHandler::_ParseCommands(std::string_view text)
         return false;
 
     // Send error message for GMs
-    PSendSysMessage(LANG_CMD_INVALID, STRING_VIEW_FMT_ARG(text));
+    PSendSysMessage(LANG_CMD_INVALID, text);
     SetSentErrorMessage(true);
     return true;
 }
@@ -794,9 +795,9 @@ std::string ChatHandler::GetNameLink(Player* chr) const
     return playerLink(chr->GetName());
 }
 
-char const* CliHandler::GetAcoreString(uint32 entry) const
+std::string CliHandler::GetAcoreString(uint32 entry) const
 {
-    return sObjectMgr->GetAcoreStringForDBCLocale(entry);
+    return sGameLocale->GetAcoreStringForDBCLocale(entry);
 }
 
 void CliHandler::SendSysMessage(std::string_view str, bool /*escapeCharacters*/)
@@ -880,5 +881,5 @@ LocaleConstant CliHandler::GetSessionDbcLocale() const
 
 int CliHandler::GetSessionDbLocaleIndex() const
 {
-    return sObjectMgr->GetDBCLocaleIndex();
+    return sGameLocale->GetDBCLocaleIndex();
 }

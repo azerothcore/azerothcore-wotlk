@@ -22,6 +22,7 @@
  */
 
 #include "Battleground.h"
+#include "GameLocale.h"
 #include "GameTime.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -69,16 +70,16 @@ class spell_item_titanium_seal_of_dalaran : public SpellScript
         if (Player* player = caster->ToPlayer())
         {
             LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
-            if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(TITANIUM_SEAL_OF_DALARAN_BROADCAST_TEXT_ID_FLIP))
+            if (BroadcastText const* bct = sGameLocale->GetBroadcastText(TITANIUM_SEAL_OF_DALARAN_BROADCAST_TEXT_ID_FLIP))
                 player->TextEmote(bct->GetText(loc_idx, player->getGender()));
             if (urand(0, 1))
             {
-                if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(TITANIUM_SEAL_OF_DALARAN_BROADCAST_TEXT_ID_FACE_DOWN))
+                if (BroadcastText const* bct = sGameLocale->GetBroadcastText(TITANIUM_SEAL_OF_DALARAN_BROADCAST_TEXT_ID_FACE_DOWN))
                     player->TextEmote(bct->GetText(loc_idx, player->getGender()));
             }
             else
             {
-                if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(TITANIUM_SEAL_OF_DALARAN_BROADCAST_TEXT_ID_HEADS_UP))
+                if (BroadcastText const* bct = sGameLocale->GetBroadcastText(TITANIUM_SEAL_OF_DALARAN_BROADCAST_TEXT_ID_HEADS_UP))
                     player->TextEmote(bct->GetText(loc_idx, player->getGender()));
             }
         }
@@ -602,19 +603,19 @@ class spell_item_feast : public SpellScript
             switch(GetSpellInfo()->Id)
             {
                 case SPELL_GREAT_FEAST:
-                    if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(GREAT_FEAST_BROADCAST_TEXT_ID_PREPARE))
+                    if (BroadcastText const* bct = sGameLocale->GetBroadcastText(GREAT_FEAST_BROADCAST_TEXT_ID_PREPARE))
                         player->TextEmote(bct->GetText(loc_idx, player->getGender()).c_str(), player);
                     break;
                 case SPELL_FISH_FEAST:
-                    if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(FISH_FEAST_BROADCAST_TEXT_ID_PREPARE))
+                    if (BroadcastText const* bct = sGameLocale->GetBroadcastText(FISH_FEAST_BROADCAST_TEXT_ID_PREPARE))
                         player->TextEmote(bct->GetText(loc_idx, player->getGender()).c_str(), player);
                     break;
                 case SPELL_SMALL_FEAST:
-                    if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(SMALL_FEAST_BROADCAST_TEXT_ID_PREPARE))
+                    if (BroadcastText const* bct = sGameLocale->GetBroadcastText(SMALL_FEAST_BROADCAST_TEXT_ID_PREPARE))
                         player->TextEmote(bct->GetText(loc_idx, player->getGender()).c_str(), player);
                     break;
                 case SPELL_GIGANTIC_FEAST:
-                    if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(GIGANTIC_FEAST_BROADCAST_TEXT_ID_PREPARE))
+                    if (BroadcastText const* bct = sGameLocale->GetBroadcastText(GIGANTIC_FEAST_BROADCAST_TEXT_ID_PREPARE))
                         player->TextEmote(bct->GetText(loc_idx, player->getGender()).c_str(), player);
                     break;
             }

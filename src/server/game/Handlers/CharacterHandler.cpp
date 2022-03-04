@@ -23,6 +23,7 @@
 #include "CharacterCache.h"
 #include "CharacterPackets.h"
 #include "Chat.h"
+#include "ChatTextBuilder.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
 #include "GameTime.h"
@@ -831,7 +832,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
 
         // send server info
         if (sWorld->getIntConfig(CONFIG_ENABLE_SINFO_LOGIN) == 1)
-            chH.PSendSysMessage("%s", GitRevision::GetFullVersion());
+            chH.PSendSysMessage("{}", GitRevision::GetFullVersion());
     }
 
     if (uint32 guildId = sCharacterCache->GetCharacterGuildIdByGuid(pCurrChar->GetGUID()))
@@ -879,7 +880,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
 
             // send new char string if not empty
             if (!sWorld->GetNewCharString().empty())
-                chH.PSendSysMessage("%s", sWorld->GetNewCharString().c_str());
+                chH.PSendSysMessage("{}", sWorld->GetNewCharString());
         }
     }
 
@@ -964,14 +965,14 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
     if (pCurrChar->HasAtLoginFlag(AT_LOGIN_RESET_SPELLS))
     {
         pCurrChar->resetSpells();
-        SendNotification(LANG_RESET_SPELLS);
+        Acore::Text::SendNotification(this, LANG_RESET_SPELLS);
     }
 
     if (pCurrChar->HasAtLoginFlag(AT_LOGIN_RESET_TALENTS))
     {
         pCurrChar->resetTalents(true);
         pCurrChar->SendTalentsInfoData(false);              // original talents send already in to SendInitialPacketsBeforeAddToMap, resend reset state
-        SendNotification(LANG_RESET_TALENTS);
+        Acore::Text::SendNotification(this, LANG_RESET_TALENTS);
     }
 
     if (pCurrChar->HasAtLoginFlag(AT_LOGIN_CHECK_ACHIEVS))
@@ -1037,7 +1038,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
         pCurrChar->SetTaxiCheater(true);
 
     if (pCurrChar->IsGameMaster())
-        SendNotification(LANG_GM_ON);
+        Acore::Text::SendNotification(this, LANG_GM_ON);
 
     std::string IP_str = GetRemoteAddress();
     LOG_INFO("entities.player", "Account: {} (IP: {}) Login Character:[{}] ({}) Level: {}",
@@ -1143,7 +1144,7 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
 
         // send server info
         if (sWorld->getIntConfig(CONFIG_ENABLE_SINFO_LOGIN) == 1)
-            chH.PSendSysMessage("%s", GitRevision::GetFullVersion());
+            chH.PSendSysMessage("{}", GitRevision::GetFullVersion());
 
         LOG_DEBUG("network.opcode", "WORLD: Sent server info");
     }
@@ -1232,7 +1233,7 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
         sWorld->ShutdownMsg(true, pCurrChar);
 
     if (pCurrChar->IsGameMaster())
-        SendNotification(LANG_GM_ON);
+        Acore::Text::SendNotification(this, LANG_GM_ON);
 
     m_playerLoading = false;
 }

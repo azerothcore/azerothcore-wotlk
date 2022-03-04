@@ -18,6 +18,7 @@
 #include "AsyncAuctionListing.h"
 #include "AuctionHouseMgr.h"
 #include "Chat.h"
+#include "ChatTextBuilder.h"
 #include "GameTime.h"
 #include "Language.h"
 #include "Log.h"
@@ -55,7 +56,7 @@ void WorldSession::SendAuctionHello(ObjectGuid guid, Creature* unit)
 {
     if (GetPlayer()->getLevel() < sWorld->getIntConfig(CONFIG_AUCTION_LEVEL_REQ))
     {
-        SendNotification(GetAcoreString(LANG_AUCTION_REQ), sWorld->getIntConfig(CONFIG_AUCTION_LEVEL_REQ));
+        Acore::Text::SendNotification(this, LANG_AUCTION_REQ, sWorld->getIntConfig(CONFIG_AUCTION_LEVEL_REQ));
         return;
     }
 

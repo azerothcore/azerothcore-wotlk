@@ -692,12 +692,6 @@ union GameObjectValue
     } Building;
 };
 
-struct GameObjectLocale
-{
-    std::vector<std::string> Name;
-    std::vector<std::string> CastBarCaption;
-};
-
 // `gameobject_addon` table
 struct GameObjectAddon
 {

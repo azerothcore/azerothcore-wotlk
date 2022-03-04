@@ -17,6 +17,7 @@
 
 #include "BanMgr.h"
 #include "AccountMgr.h"
+#include "ChatTextBuilder.h"
 #include "DatabaseEnv.h"
 #include "GameTime.h"
 #include "Language.h"
@@ -86,9 +87,9 @@ BanReturn BanMgr::BanAccount(std::string const& AccountName, std::string const& 
             IsPermanetly = false;
 
         if (!IsPermanetly)
-            sWorld->SendWorldText(LANG_BAN_ACCOUNT_YOUBANNEDMESSAGE_WORLD, Author.c_str(), AccountName.c_str(), secsToTimeString(TimeStringToSecs(Duration), true).c_str(), Reason.c_str());
+            Acore::Text::SendWorldText(LANG_BAN_ACCOUNT_YOUBANNEDMESSAGE_WORLD, Author.c_str(), AccountName.c_str(), secsToTimeString(TimeStringToSecs(Duration), true).c_str(), Reason.c_str());
         else
-            sWorld->SendWorldText(LANG_BAN_ACCOUNT_YOUPERMBANNEDMESSAGE_WORLD, Author.c_str(), AccountName.c_str(), Reason.c_str());
+            Acore::Text::SendWorldText(LANG_BAN_ACCOUNT_YOUPERMBANNEDMESSAGE_WORLD, Author.c_str(), AccountName.c_str(), Reason.c_str());
     }
 
     return BAN_SUCCESS;
@@ -152,9 +153,9 @@ BanReturn BanMgr::BanAccountByPlayerName(std::string const& CharacterName, std::
         AccountMgr::GetName(AccountID, AccountName);
 
         if (!IsPermanetly)
-            sWorld->SendWorldText(LANG_BAN_ACCOUNT_YOUBANNEDMESSAGE_WORLD, Author.c_str(), AccountName.c_str(), secsToTimeString(TimeStringToSecs(Duration), true).c_str(), Reason.c_str());
+            Acore::Text::SendWorldText(LANG_BAN_ACCOUNT_YOUBANNEDMESSAGE_WORLD, Author.c_str(), AccountName.c_str(), secsToTimeString(TimeStringToSecs(Duration), true).c_str(), Reason.c_str());
         else
-            sWorld->SendWorldText(LANG_BAN_ACCOUNT_YOUPERMBANNEDMESSAGE_WORLD, Author.c_str(), AccountName.c_str(), Reason.c_str());
+            Acore::Text::SendWorldText(LANG_BAN_ACCOUNT_YOUPERMBANNEDMESSAGE_WORLD, Author.c_str(), AccountName.c_str(), Reason.c_str());
     }
 
     return BAN_SUCCESS;
@@ -188,9 +189,9 @@ BanReturn BanMgr::BanIP(std::string const& IP, std::string const& Duration, std:
             IsPermanetly = false;
 
         if (IsPermanetly)
-            sWorld->SendWorldText(LANG_BAN_IP_YOUPERMBANNEDMESSAGE_WORLD, Author.c_str(), IP.c_str(), Reason.c_str());
+            Acore::Text::SendWorldText(LANG_BAN_IP_YOUPERMBANNEDMESSAGE_WORLD, Author.c_str(), IP.c_str(), Reason.c_str());
         else
-            sWorld->SendWorldText(LANG_BAN_IP_YOUBANNEDMESSAGE_WORLD, Author.c_str(), IP.c_str(), secsToTimeString(TimeStringToSecs(Duration), true).c_str(), Reason.c_str());
+            Acore::Text::SendWorldText(LANG_BAN_IP_YOUBANNEDMESSAGE_WORLD, Author.c_str(), IP.c_str(), secsToTimeString(TimeStringToSecs(Duration), true).c_str(), Reason.c_str());
     }
 
     if (!resultAccounts)
@@ -258,9 +259,9 @@ BanReturn BanMgr::BanCharacter(std::string const& CharacterName, std::string con
             IsPermanetly = false;
 
         if (!IsPermanetly)
-            sWorld->SendWorldText(LANG_BAN_CHARACTER_YOUBANNEDMESSAGE_WORLD, Author.c_str(), CharacterName.c_str(), secsToTimeString(TimeStringToSecs(Duration), true).c_str(), Reason.c_str());
+            Acore::Text::SendWorldText(LANG_BAN_CHARACTER_YOUBANNEDMESSAGE_WORLD, Author.c_str(), CharacterName.c_str(), secsToTimeString(TimeStringToSecs(Duration), true).c_str(), Reason.c_str());
         else
-            sWorld->SendWorldText(LANG_BAN_CHARACTER_YOUPERMBANNEDMESSAGE_WORLD, Author.c_str(), CharacterName.c_str(), Reason.c_str());
+            Acore::Text::SendWorldText(LANG_BAN_CHARACTER_YOUPERMBANNEDMESSAGE_WORLD, Author.c_str(), CharacterName.c_str(), Reason.c_str());
     }
 
     return BAN_SUCCESS;

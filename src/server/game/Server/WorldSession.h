@@ -332,11 +332,8 @@ public:
     void WriteMovementInfo(WorldPacket* data, MovementInfo* mi);
 
     void SendPacket(WorldPacket const* packet);
-    void SendNotification(const char* format, ...) ATTR_PRINTF(2, 3);
-    void SendNotification(uint32 string_id, ...);
     void SendPetNameInvalid(uint32 error, std::string const& name, DeclinedName* declinedName);
     void SendPartyResult(PartyOperation operation, std::string const& member, PartyResult res, uint32 val = 0);
-    void SendAreaTriggerMessage(const char* Text, ...) ATTR_PRINTF(2, 3);
     void SendSetPhaseShift(uint32 phaseShift);
     void SendQueryTimeResponse();
 
@@ -483,7 +480,7 @@ public:
     // Locales
     LocaleConstant GetSessionDbcLocale() const { return m_sessionDbcLocale; }
     LocaleConstant GetSessionDbLocaleIndex() const { return m_sessionDbLocaleIndex; }
-    char const* GetAcoreString(uint32 entry) const;
+    std::string GetAcoreString(uint32 entry) const;
 
     uint32 GetLatency() const { return m_latency; }
     void SetLatency(uint32 latency) { m_latency = latency; }

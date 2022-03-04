@@ -16,6 +16,7 @@
  */
 
 #include "BattlegroundAV.h"
+#include "ChatTextBuilder.h"
 #include "Formulas.h"
 #include "GameEventMgr.h"
 #include "GameGraveyard.h"
@@ -539,13 +540,13 @@ void BattlegroundAV::HandleAreaTrigger(Player* player, uint32 trigger)
         case 95:
         case 2608:
             if (player->GetTeamId() != TEAM_ALLIANCE)
-                player->GetSession()->SendAreaTriggerMessage("Only The Alliance can use that portal");
+                Acore::Text::SendAreaTriggerMessage(player->GetSession(), "Only The Alliance can use that portal");
             else
                 player->LeaveBattleground();
             break;
         case 2606:
             if (player->GetTeamId() != TEAM_HORDE)
-                player->GetSession()->SendAreaTriggerMessage("Only The Horde can use that portal");
+                Acore::Text::SendAreaTriggerMessage(player->GetSession(), "Only The Horde can use that portal");
             else
                 player->LeaveBattleground();
             break;

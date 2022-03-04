@@ -62,7 +62,7 @@ public:
         GameEventMgr::GameEventDataMap const& events = sGameEventMgr->GetEventMap();
         GameEventMgr::ActiveEvents const& activeEvents = sGameEventMgr->GetActiveEventList();
 
-        char const* active = handler->GetAcoreString(LANG_ACTIVE);
+        std::string active = handler->GetAcoreString(LANG_ACTIVE);
 
         for (uint16 eventId : activeEvents)
         {
@@ -70,11 +70,11 @@ public:
 
             if (handler->GetSession())
             {
-                handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CHAT, eventId, eventId, eventData.description.c_str(), active);
+                handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CHAT, eventId, eventId, eventData.description, active);
             }
             else
             {
-                handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CONSOLE, eventId, eventData.description.c_str(), active);
+                handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CONSOLE, eventId, eventData.description, active);
             }
 
             ++counter;
@@ -111,7 +111,7 @@ public:
 
         GameEventMgr::ActiveEvents const& activeEvents = sGameEventMgr->GetActiveEventList();
         bool active = activeEvents.find(eventId) != activeEvents.end();
-        char const* activeStr = active ? handler->GetAcoreString(LANG_ACTIVE) : "";
+        std::string activeStr = active ? handler->GetAcoreString(LANG_ACTIVE) : "";
 
         std::string startTimeStr = Acore::Time::TimeToTimestampStr(Seconds(eventData.start));
         std::string endTimeStr = Acore::Time::TimeToTimestampStr(Seconds(eventData.end));
@@ -123,9 +123,8 @@ public:
         std::string occurenceStr = secsToTimeString(eventData.occurence * MINUTE, true);
         std::string lengthStr = secsToTimeString(eventData.length * MINUTE, true);
 
-        handler->PSendSysMessage(LANG_EVENT_INFO, uint16(eventId), eventData.description.c_str(), activeStr,
-            startTimeStr.c_str(), endTimeStr.c_str(), occurenceStr.c_str(), lengthStr.c_str(),
-            nextStr.c_str());
+        handler->PSendSysMessage(LANG_EVENT_INFO, uint16(eventId), eventData.description, activeStr,
+            startTimeStr, endTimeStr, occurenceStr, lengthStr, nextStr);
 
         return true;
     }

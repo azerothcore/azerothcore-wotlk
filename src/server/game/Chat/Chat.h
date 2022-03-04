@@ -51,27 +51,27 @@ public:
     static char* LineFromMessage(char*& pos) { char* start = strtok(pos, "\n"); pos = nullptr; return start; }
 
     // function with different implementation for chat/console
-    virtual char const* GetAcoreString(uint32 entry) const;
+    virtual std::string GetAcoreString(uint32 entry) const;
     virtual void SendSysMessage(std::string_view str, bool escapeCharacters = false);
 
     void SendSysMessage(uint32 entry);
 
     template<typename... Args>
-    void PSendSysMessage(char const* fmt, Args&&... args)
+    void PSendSysMessage(std::string_view fmt, Args&&... args)
     {
-        SendSysMessage(Acore::StringFormat(fmt, std::forward<Args>(args)...).c_str());
+        SendSysMessage(Acore::StringFormatFmt(fmt, std::forward<Args>(args)...));
     }
 
     template<typename... Args>
     void PSendSysMessage(uint32 entry, Args&&... args)
     {
-        SendSysMessage(PGetParseString(entry, std::forward<Args>(args)...).c_str());
+        SendSysMessage(PGetParseString(entry, std::forward<Args>(args)...));
     }
 
     template<typename... Args>
     std::string PGetParseString(uint32 entry, Args&&... args) const
     {
-        return Acore::StringFormat(GetAcoreString(entry), std::forward<Args>(args)...);
+        return Acore::StringFormatFmt(GetAcoreString(entry), std::forward<Args>(args)...);
     }
 
     bool _ParseCommands(std::string_view text);
@@ -138,7 +138,7 @@ public:
     explicit CliHandler(void* callbackArg, Print* zprint) : m_callbackArg(callbackArg), m_print(zprint) { }
 
     // overwrite functions
-    char const* GetAcoreString(uint32 entry) const override;
+    std::string GetAcoreString(uint32 entry) const override;
     void SendSysMessage(std::string_view, bool escapeCharacters) override;
     bool ParseCommands(std::string_view str) override;
     std::string GetNameLink() const override;

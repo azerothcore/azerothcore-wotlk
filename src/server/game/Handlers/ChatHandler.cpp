@@ -20,6 +20,7 @@
 #include "ChannelMgr.h"
 #include "Chat.h"
 #include "ChatPackets.h"
+#include "ChatTextBuilder.h"
 #include "Common.h"
 #include "GameTime.h"
 #include "GridNotifiersImpl.h"
@@ -74,7 +75,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     if (lang == LANG_UNIVERSAL && type != CHAT_MSG_AFK && type != CHAT_MSG_DND)
     {
         LOG_ERROR("entities.player.cheat", "CMSG_MESSAGECHAT: Possible hacking-attempt: {} tried to send a message in universal language", GetPlayerInfo());
-        SendNotification(LANG_UNKNOWN_LANGUAGE);
+        Acore::Text::SendNotification(this, LANG_UNKNOWN_LANGUAGE);
         recvData.rfinish();
         return;
     }
@@ -85,7 +86,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     LanguageDesc const* langDesc = GetLanguageDescByID(lang);
     if (!langDesc)
     {
-        SendNotification(LANG_UNKNOWN_LANGUAGE);
+        Acore::Text::SendNotification(this, LANG_UNKNOWN_LANGUAGE);
         recvData.rfinish();
         return;
     }
@@ -105,7 +106,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
         if (!foundAura)
         {
-            SendNotification(LANG_NOT_LEARNED_LANGUAGE);
+            Acore::Text::SendNotification(this, LANG_NOT_LEARNED_LANGUAGE);
             recvData.rfinish();
             return;
         }
@@ -137,7 +138,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
                     if (sender->GetTotalPlayedTime() < minutes * MINUTE)
                     {
-                        SendNotification(LANG_MUTED_PLAYER, minutes);
+                        Acore::Text::SendNotification(this, LANG_MUTED_PLAYER, minutes);
                         recvData.rfinish();
                         return;
                     }
@@ -164,7 +165,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
     if (sender->HasAura(1852) && type != CHAT_MSG_WHISPER)
     {
-        SendNotification(GetAcoreString(LANG_GM_SILENCE), sender->GetName().c_str());
+        Acore::Text::SendNotification(this, LANG_GM_SILENCE, sender->GetName());
         recvData.rfinish();
         return;
     }
@@ -298,8 +299,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
         if (!_player->CanSpeak())
         {
-            std::string timeStr = secsToTimeString(m_muteTime - GameTime::GetGameTime().count());
-            SendNotification(GetAcoreString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
+            Acore::Text::SendNotification(this, LANG_WAIT_BEFORE_SPEAKING, secsToTimeString(m_muteTime - GameTime::GetGameTime().count()));
             return;
         }
     }
@@ -358,7 +358,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
                 if (sender->getLevel() < sWorld->getIntConfig(CONFIG_CHAT_SAY_LEVEL_REQ))
                 {
-                    SendNotification(GetAcoreString(LANG_SAY_REQ), sWorld->getIntConfig(CONFIG_CHAT_SAY_LEVEL_REQ));
+                    Acore::Text::SendNotification(this, LANG_SAY_REQ, sWorld->getIntConfig(CONFIG_CHAT_SAY_LEVEL_REQ));
                     return;
                 }
 
@@ -374,7 +374,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             {
                 if (sender->getLevel() < sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ))
                 {
-                    SendNotification(GetAcoreString(LANG_WHISPER_REQ), sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ));
+                    Acore::Text::SendNotification(this, LANG_WHISPER_REQ, sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ));
                     return;
                 }
 
@@ -403,7 +403,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 // pussywizard: optimization
                 if (GetPlayer()->HasAura(1852) && !receiver->IsGameMaster())
                 {
-                    SendNotification(GetAcoreString(LANG_GM_SILENCE), GetPlayer()->GetName().c_str());
+                    Acore::Text::SendNotification(this, LANG_GM_SILENCE, GetPlayer()->GetName());
                     return;
                 }
 
@@ -586,7 +586,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 {
                     if (sender->getLevel() < sWorld->getIntConfig(CONFIG_CHAT_CHANNEL_LEVEL_REQ))
                     {
-                        SendNotification(GetAcoreString(LANG_CHANNEL_REQ), sWorld->getIntConfig(CONFIG_CHAT_CHANNEL_LEVEL_REQ));
+                        Acore::Text::SendNotification(this, LANG_CHANNEL_REQ, sWorld->getIntConfig(CONFIG_CHAT_CHANNEL_LEVEL_REQ));
                         return;
                     }
                 }
@@ -730,8 +730,7 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
 
     if (!GetPlayer()->CanSpeak())
     {
-        std::string timeStr = secsToTimeString(m_muteTime - GameTime::GetGameTime().count());
-        SendNotification(GetAcoreString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
+        Acore::Text::SendNotification(this, LANG_WAIT_BEFORE_SPEAKING, secsToTimeString(m_muteTime - GameTime::GetGameTime().count()));
         return;
     }
 

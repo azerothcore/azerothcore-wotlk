@@ -21,6 +21,7 @@
 #include "BattlegroundMgr.h"
 #include "CharacterPackets.h"
 #include "Chat.h"
+#include "ChatTextBuilder.h"
 #include "Common.h"
 #include "CreatureAI.h"
 #include "DBCEnums.h"
@@ -600,7 +601,7 @@ void WorldSession::HandleCharacterAuraFrozen(PreparedQueryResult result)
     {
         Field* fields = result->Fetch();
         std::string player = fields[0].Get<std::string>();
-        handler.PSendSysMessage(LANG_COMMAND_FROZEN_PLAYERS, player.c_str());
+        handler.PSendSysMessage(LANG_COMMAND_FROZEN_PLAYERS, player);
     } while (result->NextRow());
 }
 
@@ -688,23 +689,6 @@ void WorldSession::HandleResurrectResponseOpcode(WorldPacket& recv_data)
         return;
 
     GetPlayer()->ResurectUsingRequestData();
-}
-
-void WorldSession::SendAreaTriggerMessage(const char* Text, ...)
-{
-    va_list ap;
-    char szStr [1024];
-    szStr[0] = '\0';
-
-    va_start(ap, Text);
-    vsnprintf(szStr, 1024, Text, ap);
-    va_end(ap);
-
-    uint32 length = strlen(szStr) + 1;
-    WorldPacket data(SMSG_AREA_TRIGGER_MESSAGE, 4 + length);
-    data << length;
-    data << szStr;
-    SendPacket(&data);
 }
 
 void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
@@ -1088,7 +1072,7 @@ void WorldSession::HandleWorldTeleportOpcode(WorldPacket& recv_data)
     if (AccountMgr::IsAdminAccount(GetSecurity()))
         GetPlayer()->TeleportTo(mapid, PositionX, PositionY, PositionZ, Orientation);
     else
-        SendNotification(LANG_YOU_NOT_HAVE_PERMISSION);
+        Acore::Text::SendNotification(this, LANG_YOU_NOT_HAVE_PERMISSION);
 }
 
 void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
@@ -1099,13 +1083,13 @@ void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
 
     if (!AccountMgr::IsAdminAccount(GetSecurity()))
     {
-        SendNotification(LANG_YOU_NOT_HAVE_PERMISSION);
+        Acore::Text::SendNotification(this, LANG_YOU_NOT_HAVE_PERMISSION);
         return;
     }
 
     if (charname.empty() || !normalizePlayerName (charname))
     {
-        SendNotification(LANG_NEED_CHARACTER_NAME);
+        Acore::Text::SendNotification(this, LANG_NEED_CHARACTER_NAME);
         return;
     }
 
@@ -1113,7 +1097,7 @@ void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
 
     if (!player)
     {
-        SendNotification(LANG_PLAYER_NOT_EXIST_OR_OFFLINE, charname.c_str());
+        Acore::Text::SendNotification(this, LANG_PLAYER_NOT_EXIST_OR_OFFLINE, charname);
         return;
     }
 
@@ -1127,7 +1111,7 @@ void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
 
     if (!result)
     {
-        SendNotification(LANG_ACCOUNT_FOR_PLAYER_NOT_FOUND, charname.c_str());
+        Acore::Text::SendNotification(this, LANG_ACCOUNT_FOR_PLAYER_NOT_FOUND, charname);
         return;
     }
 
@@ -1349,11 +1333,11 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket& recv_data)
                 switch (group->GetDifficultyChangePreventionReason())
                 {
                     case DIFFICULTY_PREVENTION_CHANGE_BOSS_KILLED:
-                        ChatHandler(this).PSendSysMessage("Raid was in combat recently and may not change difficulty again for %u sec.", preventionTime);
+                        ChatHandler(this).PSendSysMessage("Raid was in combat recently and may not change difficulty again for {} sec.", preventionTime);
                         break;
                     case DIFFICULTY_PREVENTION_CHANGE_RECENTLY_CHANGED:
                     default:
-                        ChatHandler(this).PSendSysMessage("Raid difficulty has changed recently, and may not change again for %u sec.", preventionTime);
+                        ChatHandler(this).PSendSysMessage("Raid difficulty has changed recently, and may not change again for {} sec.", preventionTime);
                         break;
                 }
 

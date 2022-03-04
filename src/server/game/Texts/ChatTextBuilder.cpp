@@ -16,46 +16,189 @@
  */
 
 #include "ChatTextBuilder.h"
+#include "Battleground.h"
 #include "Chat.h"
-#include "ObjectMgr.h"
-#include <cstdarg>
+#include "Player.h"
+#include "PlayerSettings.h"
+#include "Tokenize.h"
+#include "World.h"
+#include "WorldSession.h"
+
+namespace
+{
+    void SendPlayerMessage(Player* player, ChatMsg type, std::string_view message)
+    {
+        for (std::string_view line : Acore::Tokenize(message, '\n', true))
+        {
+            WorldPacket data;
+            ChatHandler::BuildChatPacket(data, type, LANG_UNIVERSAL, nullptr, nullptr, line);
+            player->SendDirectMessage(&data);
+        }
+    }
+
+    // Default send message
+    void SendPlayerMessage(Player* player, std::string_view message)
+    {
+        SendPlayerMessage(player, CHAT_MSG_SYSTEM, message);
+    }
+}
+
+void Acore::Text::SendWorldTextFmt(AcoreFmtText const& msg)
+{
+    if (!msg)
+    {
+        //LOG_ERROR("", "> SendWorldText. Empty message. Skip");
+        return;
+    }
+
+    for (auto const& [accountID, session] : sWorld->GetAllSessions())
+    {
+        Player* player = session->GetPlayer();
+        if (!player || !player->IsInWorld())
+        {
+            return;
+        }
+
+        SendPlayerMessage(player, msg(player->GetSession()->GetSessionDbLocaleIndex()));
+    }
+}
+
+void Acore::Text::SendWorldTextOptionalFmt(AcoreFmtText const& msg, uint32 flag)
+{
+    if (!msg)
+    {
+        //LOG_ERROR("", "> SendWorldTextOptionalFmt. Empty message. Skip");
+        return;
+    }
+
+    for (auto const& [accountID, session] : sWorld->GetAllSessions())
+    {
+        Player* player = session->GetPlayer();
+        if (!player || !player->IsInWorld())
+        {
+            return;
+        }
+
+        if (sWorld->getBoolConfig(CONFIG_PLAYER_SETTINGS_ENABLED) && player->GetPlayerSetting(AzerothcorePSSource, SETTING_ANNOUNCER_FLAGS).HasFlag(flag))
+        {
+            continue;
+        }
+
+        SendPlayerMessage(player, msg(player->GetSession()->GetSessionDbLocaleIndex()));
+    }
+}
+
+void Acore::Text::SendGMTextFmt(AcoreFmtText const& msg)
+{
+    if (!msg)
+    {
+        //LOG_ERROR("", "> SendGMText. Empty message. Skip");
+        return;
+    }
+
+    for (auto const& [accountID, session] : sWorld->GetAllSessions())
+    {
+        Player* player = session->GetPlayer();
+        if (!player || !player->IsInWorld())
+        {
+            return;
+        }
+
+        if (AccountMgr::IsPlayerAccount(player->GetSession()->GetSecurity()))
+        {
+            continue;
+        }
+
+        SendPlayerMessage(player, msg(player->GetSession()->GetSessionDbLocaleIndex()));
+    }
+}
+
+void Acore::Text::SendBattlegroundWarningToAllFmt(Battleground* bg, AcoreFmtText const& msg)
+{
+    if (!bg)
+    {
+        return;
+    }
+
+    for (auto const& itr : bg->GetPlayers())
+    {
+        SendPlayerMessage(itr.second, CHAT_MSG_RAID_BOSS_EMOTE, msg(itr.second->GetSession()->GetSessionDbLocaleIndex()));
+    }
+}
+
+void Acore::Text::SendBattlegroundMessageToAllFmt(Battleground* bg, ChatMsg type, AcoreFmtText const& msg)
+{
+    if (!bg)
+    {
+        return;
+    }
+
+    for (auto const& itr : bg->GetPlayers())
+    {
+        SendPlayerMessage(itr.second, type, msg(itr.second->GetSession()->GetSessionDbLocaleIndex()));
+    }
+}
+
+void Acore::Text::SendNotificationFmt(AcoreFmtText const& msg, WorldSession* session)
+{
+    if (!msg)
+    {
+        //LOG_ERROR("", "> SendWorldText. Empty message. Skip");
+        return;
+    }
+
+    SendNotification(session, msg(session->GetSessionDbLocaleIndex()));
+}
+
+void Acore::Text::SendAreaTriggerMessageFmt(AcoreFmtText const& msg, WorldSession* session)
+{
+    if (!msg)
+    {
+        //LOG_ERROR("", "> SendWorldText. Empty message. Skip");
+        return;
+    }
+
+    SendAreaTriggerMessage(session, msg(session->GetSessionDbLocaleIndex()));
+}
+
+void Acore::Text::SendNotification(WorldSession* session, std::string_view text)
+{
+    WorldPacket data(SMSG_NOTIFICATION, text.size() + 1);
+    data << text;
+    session->SendPacket(&data);
+}
+
+void Acore::Text::SendNotification(WorldSession* session, uint32 stringID)
+{
+    SendNotification(session, sGameLocale->GetAcoreString(stringID, session->GetSessionDbLocaleIndex()));
+}
+
+void Acore::Text::SendAreaTriggerMessage(WorldSession* session, std::string_view text)
+{
+    WorldPacket data(SMSG_AREA_TRIGGER_MESSAGE, 4 + text.size());
+    data << uint32(text.size());
+    data << text;
+    session->SendPacket(&data);
+}
+
+void Acore::Text::SendAreaTriggerMessage(WorldSession* session, uint32 stringID)
+{
+    SendAreaTriggerMessage(session, sGameLocale->GetAcoreString(stringID, session->GetSessionDbLocaleIndex()));
+}
 
 void Acore::BroadcastTextBuilder::operator()(WorldPacket& data, LocaleConstant locale) const
 {
-    BroadcastText const* bct = sObjectMgr->GetBroadcastText(_textId);
+    BroadcastText const* bct = sGameLocale->GetBroadcastText(_textId);
     ChatHandler::BuildChatPacket(data, _msgType, bct ? Language(bct->LanguageID) : LANG_UNIVERSAL, _source, _target, bct ? bct->GetText(locale, _gender) : "", _achievementId, "", locale);
 }
 
 size_t Acore::BroadcastTextBuilder::operator()(WorldPacket* data, LocaleConstant locale) const
 {
-    BroadcastText const* bct = sObjectMgr->GetBroadcastText(_textId);
+    BroadcastText const* bct = sGameLocale->GetBroadcastText(_textId);
     return ChatHandler::BuildChatPacket(*data, _msgType, bct ? Language(bct->LanguageID) : LANG_UNIVERSAL, _source, _target, bct ? bct->GetText(locale, _gender) : "", _achievementId, "", locale);
 }
 
 void Acore::CustomChatTextBuilder::operator()(WorldPacket& data, LocaleConstant locale) const
 {
     ChatHandler::BuildChatPacket(data, _msgType, _language, _source, _target, _text, 0, "", locale);
-}
-
-void Acore::AcoreStringChatBuilder::operator()(WorldPacket& data, LocaleConstant locale) const
-{
-    char const* text = sObjectMgr->GetAcoreString(_textId, locale);
-
-    if (_args)
-    {
-        // we need copy va_list before use or original va_list will corrupted
-        va_list ap;
-        va_copy(ap, *_args);
-
-        static size_t const BufferSize = 2048;
-        char strBuffer[BufferSize];
-        vsnprintf(strBuffer, BufferSize, text, ap);
-        va_end(ap);
-
-        ChatHandler::BuildChatPacket(data, _msgType, LANG_UNIVERSAL, _source, _target, strBuffer, 0, "", locale);
-    }
-    else
-    {
-        ChatHandler::BuildChatPacket(data, _msgType, LANG_UNIVERSAL, _source, _target, text, 0, "", locale);
-    }
 }

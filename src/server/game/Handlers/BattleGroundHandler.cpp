@@ -20,6 +20,7 @@
 #include "Battleground.h"
 #include "BattlegroundMgr.h"
 #include "Chat.h"
+#include "ChatTextBuilder.h"
 #include "DisableMgr.h"
 #include "GameTime.h"
 #include "Group.h"
@@ -54,7 +55,7 @@ void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket& recvData)
     if (!_player->GetBGAccessByLevel(bgTypeId))
     {
         // temp, must be gossip message...
-        SendNotification(LANG_YOUR_BG_LEVEL_REQ_ERROR);
+        Acore::Text::SendNotification(this, LANG_YOUR_BG_LEVEL_REQ_ERROR);
         return;
     }
 

@@ -16,6 +16,7 @@
  */
 
 #include "OutdoorPvPSI.h"
+#include "GameLocale.h"
 #include "GameObject.h"
 #include "Language.h"
 #include "MapMgr.h"
@@ -101,7 +102,7 @@ bool OutdoorPvPSI::HandleAreaTrigger(Player* player, uint32 trigger)
                 if (m_Gathered_A >= SI_MAX_RESOURCES)
                 {
                     TeamApplyBuff(TEAM_ALLIANCE, SI_CENARION_FAVOR, 0, player);
-                    sWorld->SendZoneText(OutdoorPvPSIBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_SI_CAPTURE_A));
+                    sWorld->SendZoneText(OutdoorPvPSIBuffZones[0], sGameLocale->GetAcoreStringForDBCLocale(LANG_OPVP_SI_CAPTURE_A));
                     m_LastController = TEAM_ALLIANCE;
                     m_Gathered_A = 0;
                     m_Gathered_H = 0;
@@ -127,7 +128,7 @@ bool OutdoorPvPSI::HandleAreaTrigger(Player* player, uint32 trigger)
                 if (m_Gathered_H >= SI_MAX_RESOURCES)
                 {
                     TeamApplyBuff(TEAM_HORDE, SI_CENARION_FAVOR, 0, player);
-                    sWorld->SendZoneText(OutdoorPvPSIBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_SI_CAPTURE_H));
+                    sWorld->SendZoneText(OutdoorPvPSIBuffZones[0], sGameLocale->GetAcoreStringForDBCLocale(LANG_OPVP_SI_CAPTURE_H));
                     m_LastController = TEAM_HORDE;
                     m_Gathered_A = 0;
                     m_Gathered_H = 0;

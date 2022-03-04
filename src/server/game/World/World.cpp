@@ -26,6 +26,7 @@
 #include "ArenaTeamMgr.h"
 #include "AsyncAuctionListing.h"
 #include "AuctionHouseMgr.h"
+#include "Autobroadcast.h"
 #include "BattlefieldMgr.h"
 #include "BattlegroundMgr.h"
 #include "CalendarMgr.h"
@@ -46,6 +47,7 @@
 #include "DynamicVisibility.h"
 #include "GameEventMgr.h"
 #include "GameGraveyard.h"
+#include "GameLocale.h"
 #include "GameTime.h"
 #include "GitRevision.h"
 #include "GridNotifiersImpl.h"
@@ -78,6 +80,7 @@
 #include "SpellMgr.h"
 #include "TaskScheduler.h"
 #include "TicketMgr.h"
+#include "Tokenize.h"
 #include "Transport.h"
 #include "TransportMgr.h"
 #include "UpdateTime.h"
@@ -1504,7 +1507,7 @@ void World::SetInitialWorldSettings()
     ///- Loading strings. Getting no records means core load has to be canceled because no error message can be output.
     LOG_INFO("server.loading", " ");
     LOG_INFO("server.loading", "Loading acore strings...");
-    if (!sObjectMgr->LoadAcoreStrings())
+    if (!sGameLocale->LoadAcoreStrings())
         exit(1);                                            // Error message displayed in function already
 
     ///- Update the realm entry in the database with the realm type from the config file
@@ -1583,27 +1586,8 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading instances...");
     sInstanceSaveMgr->LoadInstances();
 
-    LOG_INFO("server.loading", "Loading Broadcast texts...");
-    sObjectMgr->LoadBroadcastTexts();
-    sObjectMgr->LoadBroadcastTextLocales();
-
-    LOG_INFO("server.loading", "Loading Localization strings...");
-    uint32 oldMSTime = getMSTime();
-    sObjectMgr->LoadCreatureLocales();
-    sObjectMgr->LoadGameObjectLocales();
-    sObjectMgr->LoadItemLocales();
-    sObjectMgr->LoadItemSetNameLocales();
-    sObjectMgr->LoadQuestLocales();
-    sObjectMgr->LoadQuestOfferRewardLocale();
-    sObjectMgr->LoadQuestRequestItemsLocale();
-    sObjectMgr->LoadNpcTextLocales();
-    sObjectMgr->LoadPageTextLocales();
-    sObjectMgr->LoadGossipMenuItemsLocales();
-    sObjectMgr->LoadPointOfInterestLocales();
-
-    sObjectMgr->SetDBCLocaleIndex(GetDefaultDbcLocale());        // Get once for all the locale index of DBC language (console/broadcasts)
-    LOG_INFO("server.loading", ">> Localization strings loaded in {} ms", GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server.loading", " ");
+    LOG_INFO("server.loading", "Loading Game locale texts...");
+    sGameLocale->LoadAllLocales();
 
     LOG_INFO("server.loading", "Loading Page Texts...");
     sObjectMgr->LoadPageTexts();
@@ -1838,20 +1822,23 @@ void World::SetInitialWorldSettings()
 
     LOG_INFO("server.loading", "Loading Achievements...");
     sAchievementMgr->LoadAchievementReferenceList();
+
     LOG_INFO("server.loading", "Loading Achievement Criteria Lists...");
     sAchievementMgr->LoadAchievementCriteriaList();
+
     LOG_INFO("server.loading", "Loading Achievement Criteria Data...");
     sAchievementMgr->LoadAchievementCriteriaData();
+
     LOG_INFO("server.loading", "Loading Achievement Rewards...");
     sAchievementMgr->LoadRewards();
-    LOG_INFO("server.loading", "Loading Achievement Reward Locales...");
-    sAchievementMgr->LoadRewardLocales();
+
     LOG_INFO("server.loading", "Loading Completed Achievements...");
     sAchievementMgr->LoadCompletedAchievements();
 
     ///- Load dynamic data tables from the database
     LOG_INFO("server.loading", "Loading Item Auctions...");
     sAuctionMgr->LoadAuctionItems();
+
     LOG_INFO("server.loading", "Loading Auctions...");
     sAuctionMgr->LoadAuctions();
 
@@ -1943,7 +1930,7 @@ void World::SetInitialWorldSettings()
 
     ///- Load AutoBroadCast
     LOG_INFO("server.loading", "Loading Autobroadcasts...");
-    LoadAutobroadcasts();
+    sAutobroadcastMgr->Load();
 
     ///- Load and initialize scripts
     sObjectMgr->LoadSpellScripts();                              // must be after load Creature/Gameobject(Template/Data)
@@ -2176,41 +2163,6 @@ void World::DetectDBCLang()
     LOG_INFO("server.loading", " ");
 }
 
-void World::LoadAutobroadcasts()
-{
-    uint32 oldMSTime = getMSTime();
-
-    m_Autobroadcasts.clear();
-    m_AutobroadcastsWeights.clear();
-
-    uint32 realmId = sConfigMgr->GetOption<int32>("RealmID", 0);
-    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_AUTOBROADCAST);
-    stmt->SetData(0, realmId);
-    PreparedQueryResult result = LoginDatabase.Query(stmt);
-
-    if (!result)
-    {
-        LOG_INFO("server.loading", ">> Loaded 0 autobroadcasts definitions. DB table `autobroadcast` is empty for this realm!");
-        return;
-    }
-
-    uint32 count = 0;
-
-    do
-    {
-        Field* fields = result->Fetch();
-        uint8 id = fields[0].Get<uint8>();
-
-        m_Autobroadcasts[id] = fields[2].Get<std::string>();
-        m_AutobroadcastsWeights[id] = fields[1].Get<uint8>();
-
-        ++count;
-    } while (result->NextRow());
-
-    LOG_INFO("server.loading", ">> Loaded {} autobroadcast definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server.loading", " ");
-}
-
 /// Update the World !
 void World::Update(uint32 diff)
 {
@@ -2370,7 +2322,7 @@ void World::Update(uint32 diff)
         {
             METRIC_TIMER("world_update_time", METRIC_TAG("type", "Send autobroadcast"));
             m_timers[WUPDATE_AUTOBROADCAST].Reset();
-            SendAutoBroadcast();
+            sAutobroadcastMgr->Send();
         }
     }
 
@@ -2530,7 +2482,7 @@ namespace Acore
         explicit WorldWorldTextBuilder(uint32 textId, va_list* args = nullptr) : i_textId(textId), i_args(args) {}
         void operator()(WorldPacketList& data_list, LocaleConstant loc_idx)
         {
-            char const* text = sObjectMgr->GetAcoreString(i_textId, loc_idx);
+            char const* text = sGameLocale->GetAcoreString(i_textId, loc_idx);
 
             if (i_args)
             {
@@ -2565,91 +2517,16 @@ namespace Acore
     };
 }                                                           // namespace Acore
 
-/// Send a System Message to all players (except self if mentioned)
-void World::SendWorldText(uint32 string_id, ...)
-{
-    va_list ap;
-    va_start(ap, string_id);
-
-    Acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
-    Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
-    for (SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
-    {
-        if (!itr->second || !itr->second->GetPlayer() || !itr->second->GetPlayer()->IsInWorld())
-            continue;
-
-        wt_do(itr->second->GetPlayer());
-    }
-
-    va_end(ap);
-}
-
-void World::SendWorldTextOptional(uint32 string_id, uint32 flag, ...)
-{
-    va_list ap;
-    va_start(ap, flag);
-
-    Acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
-    Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
-    for (auto const& itr : m_sessions)
-    {
-        if (!itr.second || !itr.second->GetPlayer() || !itr.second->GetPlayer()->IsInWorld())
-        {
-            continue;
-        }
-
-        if (sWorld->getBoolConfig(CONFIG_PLAYER_SETTINGS_ENABLED))
-        {
-            if (itr.second->GetPlayer()->GetPlayerSetting(AzerothcorePSSource, SETTING_ANNOUNCER_FLAGS).HasFlag(flag))
-            {
-                continue;
-            }
-        }
-
-        wt_do(itr.second->GetPlayer());
-    }
-
-    va_end(ap);
-}
-
-/// Send a System Message to all GMs (except self if mentioned)
-void World::SendGMText(uint32 string_id, ...)
-{
-    va_list ap;
-    va_start(ap, string_id);
-
-    Acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
-    Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
-    for (SessionMap::iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
-    {
-        if (!itr->second || !itr->second->GetPlayer() || !itr->second->GetPlayer()->IsInWorld())
-            continue;
-
-        if (AccountMgr::IsPlayerAccount(itr->second->GetSecurity()))
-            continue;
-
-        wt_do(itr->second->GetPlayer());
-    }
-
-    va_end(ap);
-}
-
 /// DEPRECATED, only for debug purpose. Send a System Message to all players (except self if mentioned)
-void World::SendGlobalText(const char* text, WorldSession* self)
+void World::SendGlobalText(std::string_view text, WorldSession* self)
 {
     WorldPacket data;
 
-    // need copy to prevent corruption by strtok call in LineFromMessage original string
-    char* buf = strdup(text);
-    char* pos = buf;
-
-    while (char* line = ChatHandler::LineFromMessage(pos))
+    for (std::string_view line : Acore::Tokenize(text, '\n', true))
     {
         ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
         SendGlobalMessage(&data, self);
     }
-
-    free(buf);
 }
 
 /// Send a packet to all players (or players selected team) in the zone (except self if mentioned)
@@ -2948,68 +2825,6 @@ void World::ProcessCliCommands()
             command->m_commandFinished(callbackArg, !handler.HasSentErrorMessage());
         delete command;
     }
-}
-
-void World::SendAutoBroadcast()
-{
-    if (m_Autobroadcasts.empty())
-        return;
-
-    uint32 weight = 0;
-    AutobroadcastsWeightMap selectionWeights;
-
-    std::string msg;
-
-    for (AutobroadcastsWeightMap::const_iterator it = m_AutobroadcastsWeights.begin(); it != m_AutobroadcastsWeights.end(); ++it)
-    {
-        if (it->second)
-        {
-            weight += it->second;
-            selectionWeights[it->first] = it->second;
-        }
-    }
-
-    if (weight)
-    {
-        uint32 selectedWeight = urand(0, weight - 1);
-        weight = 0;
-        for (AutobroadcastsWeightMap::const_iterator it = selectionWeights.begin(); it != selectionWeights.end(); ++it)
-        {
-            weight += it->second;
-            if (selectedWeight < weight)
-            {
-                msg = m_Autobroadcasts[it->first];
-                break;
-            }
-        }
-    }
-    else
-        msg = m_Autobroadcasts[urand(0, m_Autobroadcasts.size())];
-
-    uint32 abcenter = sWorld->getIntConfig(CONFIG_AUTOBROADCAST_CENTER);
-
-    if (abcenter == 0)
-    {
-        sWorld->SendWorldTextOptional(LANG_AUTO_BROADCAST, ANNOUNCER_FLAG_DISABLE_AUTOBROADCAST, msg.c_str());
-    }
-
-    else if (abcenter == 1)
-    {
-        WorldPacket data(SMSG_NOTIFICATION, (msg.size() + 1));
-        data << msg;
-        sWorld->SendGlobalMessage(&data);
-    }
-
-    else if (abcenter == 2)
-    {
-        sWorld->SendWorldTextOptional(LANG_AUTO_BROADCAST, ANNOUNCER_FLAG_DISABLE_AUTOBROADCAST, msg.c_str());
-
-        WorldPacket data(SMSG_NOTIFICATION, (msg.size() + 1));
-        data << msg;
-        sWorld->SendGlobalMessage(&data);
-    }
-
-    LOG_DEBUG("server.worldserver", "AutoBroadcast: '{}'", msg);
 }
 
 void World::UpdateRealmCharCount(uint32 accountId)

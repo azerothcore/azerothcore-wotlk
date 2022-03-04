@@ -21,9 +21,10 @@
 #include "Common.h"
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
+#include "GameLocale.h"
 #include "GameTime.h"
 #include "Item.h"
-#include "Logging/Log.h"
+#include "Log.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -37,7 +38,7 @@ constexpr auto AH_MINIMUM_DEPOSIT = 100;
 // Proof of concept, we should shift the info we're obtaining in here into AuctionEntry probably
 static bool SortAuction(AuctionEntry* left, AuctionEntry* right, AuctionSortOrderVector& sortOrder, Player* player, bool checkMinBidBuyout)
 {
-    for (auto thisOrder : sortOrder)
+    for (auto const& thisOrder : sortOrder)
     {
         switch (thisOrder.sortOrder)
         {
@@ -99,14 +100,14 @@ static bool SortAuction(AuctionEntry* left, AuctionEntry* right, AuctionSortOrde
 
                 if (locale > LOCALE_enUS)
                 {
-                    if (ItemLocale const* leftIl = sObjectMgr->GetItemLocale(protoLeft->ItemId))
+                    if (ItemLocale const* leftIl = sGameLocale->GetItemLocale(protoLeft->ItemId))
                     {
-                        ObjectMgr::GetLocaleString(leftIl->Name, locale, leftName);
+                        GameLocale::GetLocaleString(leftIl->Name, locale, leftName);
                     }
 
-                    if (ItemLocale const* rightIl = sObjectMgr->GetItemLocale(protoRight->ItemId))
+                    if (ItemLocale const* rightIl = sGameLocale->GetItemLocale(protoRight->ItemId))
                     {
-                        ObjectMgr::GetLocaleString(rightIl->Name, locale, rightName);
+                        GameLocale::GetLocaleString(rightIl->Name, locale, rightName);
                     }
                 }
 
@@ -831,8 +832,8 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
 
                 // local name
                 if (loc_idx >= 0)
-                    if (ItemLocale const* il = sObjectMgr->GetItemLocale(proto->ItemId))
-                        ObjectMgr::GetLocaleString(il->Name, loc_idx, name);
+                    if (ItemLocale const* il = sGameLocale->GetItemLocale(proto->ItemId))
+                        GameLocale::GetLocaleString(il->Name, loc_idx, name);
 
                 // DO NOT use GetItemEnchantMod(proto->RandomProperty) as it may return a result
                 //  that matches the search but it may not equal item->GetItemRandomPropertyId()

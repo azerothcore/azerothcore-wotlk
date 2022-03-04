@@ -34,6 +34,7 @@
 #include "DisableMgr.h"
 #include "DynamicVisibility.h"
 #include "Formulas.h"
+#include "GameLocale.h"
 #include "GameTime.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
@@ -58,8 +59,10 @@
 #include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
+#include "StringConvert.h"
 #include "TargetedMovementGenerator.h"
 #include "TemporarySummon.h"
+#include "Tokenize.h"
 #include "Totem.h"
 #include "TotemAI.h"
 #include "Transport.h"
@@ -68,8 +71,6 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "Tokenize.h"
-#include "StringConvert.h"
 #include <math.h>
 
 float baseMoveSpeed[MAX_MOVE_TYPE] =
@@ -20417,7 +20418,7 @@ void Unit::Whisper(std::string_view text, Language language, Player* target, boo
 
 void Unit::Talk(uint32 textId, ChatMsg msgType, float textRange, WorldObject const* target)
 {
-    if (!sObjectMgr->GetBroadcastText(textId))
+    if (!sGameLocale->GetBroadcastText(textId))
     {
         LOG_ERROR("entities.unit", "Unit::Talk: `broadcast_text` (ID: {}) was not found", textId);
         return;
@@ -20451,7 +20452,7 @@ void Unit::Whisper(uint32 textId, Player* target, bool isBossWhisper /*= false*/
         return;
     }
 
-    BroadcastText const* bct = sObjectMgr->GetBroadcastText(textId);
+    BroadcastText const* bct = sGameLocale->GetBroadcastText(textId);
     if (!bct)
     {
         LOG_ERROR("entities.unit", "Unit::Whisper: `broadcast_text` was not {} found", textId);

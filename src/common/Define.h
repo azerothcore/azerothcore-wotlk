@@ -98,8 +98,6 @@
 #define UI64LIT(N) UINT64_C(N)
 #define SI64LIT(N) INT64_C(N)
 
-#define STRING_VIEW_FMT_ARG(str) static_cast<int>((str).length()), (str).data()
-
 typedef std::int64_t int64;
 typedef std::int32_t int32;
 typedef std::int16_t int16;

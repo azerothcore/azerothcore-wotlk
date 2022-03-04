@@ -504,7 +504,6 @@ public:
     [[nodiscard]] virtual WorldSession* FindOfflineSession(uint32 id) const = 0;
     [[nodiscard]] virtual WorldSession* FindOfflineSessionForCharacterGUID(ObjectGuid::LowType guidLow) const = 0;
     virtual void AddSession(WorldSession* s) = 0;
-    virtual void SendAutoBroadcast() = 0;
     virtual bool KickSession(uint32 id) = 0;
     virtual void UpdateMaxSessionCounters() = 0;
     [[nodiscard]] virtual const SessionMap& GetAllSessions() const = 0;
@@ -541,10 +540,7 @@ public:
     [[nodiscard]] virtual uint16 GetConfigMaxSkillValue() const = 0;
     virtual void SetInitialWorldSettings() = 0;
     virtual void LoadConfigSettings(bool reload = false) = 0;
-    virtual void SendWorldText(uint32 string_id, ...) = 0;
-    virtual void SendWorldTextOptional(uint32 string_id, uint32 flag, ...) = 0;
-    virtual void SendGlobalText(const char* text, WorldSession* self) = 0;
-    virtual void SendGMText(uint32 string_id, ...) = 0;
+    virtual void SendGlobalText(std::string_view text, WorldSession* self) = 0;
     virtual void SendGlobalMessage(WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
     virtual void SendGlobalGMMessage(WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
     virtual bool SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
@@ -584,7 +580,6 @@ public:
     [[nodiscard]] virtual char const* GetWorldDBRevision() const = 0;
     [[nodiscard]] virtual char const* GetCharacterDBRevision() const = 0;
     [[nodiscard]] virtual char const* GetAuthDBRevision() const = 0;
-    virtual void LoadAutobroadcasts() = 0;
     virtual void UpdateAreaDependentAuras() = 0;
     [[nodiscard]] virtual uint32 GetCleaningFlags() const = 0;
     virtual void   SetCleaningFlags(uint32 flags) = 0;

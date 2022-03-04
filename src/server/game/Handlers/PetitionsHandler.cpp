@@ -17,6 +17,7 @@
 
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
+#include "ChatTextBuilder.h"
 #include "Guild.h"
 #include "GuildMgr.h"
 #include "Language.h"

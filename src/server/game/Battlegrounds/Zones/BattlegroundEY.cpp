@@ -17,6 +17,7 @@
 
 #include "BattlegroundEY.h"
 #include "BattlegroundMgr.h"
+#include "ChatTextBuilder.h"
 #include "Creature.h"
 #include "GameGraveyard.h"
 #include "GameTime.h"

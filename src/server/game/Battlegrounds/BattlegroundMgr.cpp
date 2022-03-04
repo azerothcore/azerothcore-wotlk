@@ -31,6 +31,7 @@
 #include "BattlegroundSA.h"
 #include "BattlegroundWS.h"
 #include "Chat.h"
+#include "ChatTextBuilder.h"
 #include "Common.h"
 #include "DisableMgr.h"
 #include "Formulas.h"
@@ -602,12 +603,12 @@ void BattlegroundMgr::ToggleTesting()
     if (sWorld->getBoolConfig(CONFIG_DEBUG_BATTLEGROUND))
     {
         m_Testing = true;
-        sWorld->SendWorldText(LANG_DEBUG_BG_CONF);
+        Acore::Text::SendWorldText(LANG_DEBUG_BG_CONF);
     }
     else
     {
         m_Testing = !m_Testing;
-        sWorld->SendWorldText(m_Testing ? LANG_DEBUG_BG_ON : LANG_DEBUG_BG_OFF);
+        Acore::Text::SendWorldText(m_Testing ? LANG_DEBUG_BG_ON : LANG_DEBUG_BG_OFF);
     }
 }
 
@@ -616,12 +617,12 @@ void BattlegroundMgr::ToggleArenaTesting()
     if (sWorld->getBoolConfig(CONFIG_DEBUG_ARENA))
     {
         m_ArenaTesting = true;
-        sWorld->SendWorldText(LANG_DEBUG_ARENA_CONF);
+        Acore::Text::SendWorldText(LANG_DEBUG_ARENA_CONF);
     }
     else
     {
         m_ArenaTesting = !m_ArenaTesting;
-        sWorld->SendWorldText(m_ArenaTesting ? LANG_DEBUG_ARENA_ON : LANG_DEBUG_ARENA_OFF);
+        Acore::Text::SendWorldText(m_ArenaTesting ? LANG_DEBUG_ARENA_ON : LANG_DEBUG_ARENA_OFF);
     }
 }
 

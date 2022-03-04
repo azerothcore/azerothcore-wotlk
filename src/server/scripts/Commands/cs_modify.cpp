@@ -95,11 +95,11 @@ public:
     {
         if (Player* player = target->ToPlayer())
         {
-            handler->PSendSysMessage(resourceMessage, std::forward<Args>(args)..., handler->GetNameLink(player).c_str());
+            handler->PSendSysMessage(resourceMessage, std::forward<Args>(args)..., handler->GetNameLink(player));
 
             if (handler->needReportToTarget(player))
             {
-                ChatHandler(player->GetSession()).PSendSysMessage(resourceReportMessage, handler->GetNameLink().c_str(), std::forward<Args>(args)...);
+                ChatHandler(player->GetSession()).PSendSysMessage(resourceReportMessage, handler->GetNameLink(), std::forward<Args>(args)...);
             }
         }
     }
@@ -138,11 +138,11 @@ public:
             return false;
         }
 
-        handler->PSendSysMessage(LANG_YOU_CHANGE_HP, handler->GetNameLink(target).c_str(), healthPoints, healthPoints);
+        handler->PSendSysMessage(LANG_YOU_CHANGE_HP, handler->GetNameLink(target), healthPoints, healthPoints);
 
         if (handler->needReportToTarget(target))
         {
-            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_HP_CHANGED, handler->GetNameLink().c_str(), healthPoints, healthPoints);
+            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_HP_CHANGED, handler->GetNameLink(), healthPoints, healthPoints);
         }
 
         target->SetMaxHealth(healthPoints);
@@ -161,11 +161,11 @@ public:
             return false;
         }
 
-        handler->PSendSysMessage(LANG_YOU_CHANGE_MANA, handler->GetNameLink(target).c_str(), manaPoints, manaPoints);
+        handler->PSendSysMessage(LANG_YOU_CHANGE_MANA, handler->GetNameLink(target), manaPoints, manaPoints);
 
         if (handler->needReportToTarget(target))
         {
-            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_MANA_CHANGED, handler->GetNameLink().c_str(), manaPoints, manaPoints);
+            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_MANA_CHANGED, handler->GetNameLink(), manaPoints, manaPoints);
         }
 
         target->SetMaxPower(POWER_MANA, manaPoints);
@@ -186,11 +186,11 @@ public:
 
         energyPoints *= 10;
 
-        handler->PSendSysMessage(LANG_YOU_CHANGE_ENERGY, handler->GetNameLink(target).c_str(), energyPoints / 10, energyPoints / 10);
+        handler->PSendSysMessage(LANG_YOU_CHANGE_ENERGY, handler->GetNameLink(target), energyPoints / 10, energyPoints / 10);
 
         if (handler->needReportToTarget(target))
         {
-            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_ENERGY_CHANGED, handler->GetNameLink().c_str(), energyPoints / 10, energyPoints / 10);
+            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_ENERGY_CHANGED, handler->GetNameLink(), energyPoints / 10, energyPoints / 10);
         }
 
         target->SetMaxPower(POWER_ENERGY, energyPoints);
@@ -213,11 +213,11 @@ public:
 
         ragePoints *= 10;
 
-        handler->PSendSysMessage(LANG_YOU_CHANGE_RAGE, handler->GetNameLink(target).c_str(), ragePoints / 10, ragePoints / 10);
+        handler->PSendSysMessage(LANG_YOU_CHANGE_RAGE, handler->GetNameLink(target), ragePoints / 10, ragePoints / 10);
 
         if (handler->needReportToTarget(target))
         {
-            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_RAGE_CHANGED, handler->GetNameLink().c_str(), ragePoints / 10, ragePoints / 10);
+            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_RAGE_CHANGED, handler->GetNameLink(), ragePoints / 10, ragePoints / 10);
         }
 
         target->SetMaxPower(POWER_RAGE, ragePoints);
@@ -238,11 +238,11 @@ public:
 
         runePoints *= 10;
 
-        handler->PSendSysMessage(LANG_YOU_CHANGE_RUNIC_POWER, handler->GetNameLink(target).c_str(), runePoints / 10, runePoints / 10);
+        handler->PSendSysMessage(LANG_YOU_CHANGE_RUNIC_POWER, handler->GetNameLink(target), runePoints / 10, runePoints / 10);
 
         if (handler->needReportToTarget(target))
         {
-            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_RUNIC_POWER_CHANGED, handler->GetNameLink().c_str(), runePoints / 10, runePoints / 10);
+            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_RUNIC_POWER_CHANGED, handler->GetNameLink(), runePoints / 10, runePoints / 10);
         }
 
         target->SetMaxPower(POWER_RUNIC_POWER, runePoints);
@@ -329,10 +329,10 @@ public:
             return false;
         }
 
-        handler->PSendSysMessage(LANG_YOU_CHANGE_SPELLFLATID, spellFlatID, val, mark ? *mark : 65535, handler->GetNameLink(target).c_str());
+        handler->PSendSysMessage(LANG_YOU_CHANGE_SPELLFLATID, spellFlatID, val, mark ? *mark : 65535, handler->GetNameLink(target));
         if (handler->needReportToTarget(target))
         {
-            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_SPELLFLATID_CHANGED, handler->GetNameLink().c_str(), spellFlatID, val, mark ? *mark : 65535);
+            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_SPELLFLATID_CHANGED, handler->GetNameLink(), spellFlatID, val, mark ? *mark : 65535);
         }
 
         WorldPacket data(SMSG_SET_FLAT_SPELL_MODIFIER, (1 + 1 + 2 + 2));
@@ -418,7 +418,7 @@ public:
 
             if (player->IsInFlight() && checkInFlight)
             {
-                handler->PSendSysMessage(LANG_CHAR_IN_FLIGHT, handler->GetNameLink(player).c_str());
+                handler->PSendSysMessage(LANG_CHAR_IN_FLIGHT, handler->GetNameLink(player));
                 handler->SetSentErrorMessage(true);
                 return false;
             }
@@ -524,9 +524,9 @@ public:
             if (handler->HasLowerSecurity(player))
                 return false;
 
-            handler->PSendSysMessage(LANG_YOU_CHANGE_SIZE, scale, handler->GetNameLink(player).c_str());
+            handler->PSendSysMessage(LANG_YOU_CHANGE_SIZE, scale, handler->GetNameLink(player));
             if (handler->needReportToTarget(player))
-                ChatHandler(player->GetSession()).PSendSysMessage(LANG_YOURS_SIZE_CHANGED, handler->GetNameLink().c_str(), scale);
+                ChatHandler(player->GetSession()).PSendSysMessage(LANG_YOURS_SIZE_CHANGED, handler->GetNameLink(), scale);
         }
 
         target->SetObjectScale(scale);
@@ -633,9 +633,9 @@ public:
             LOG_DEBUG("chat.system", handler->GetAcoreString(LANG_CURRENT_MONEY), targetMoney, moneyToAdd, newmoney);
             if (newmoney <= 0)
             {
-                handler->PSendSysMessage(LANG_YOU_TAKE_ALL_MONEY, handler->GetNameLink(target).c_str());
+                handler->PSendSysMessage(LANG_YOU_TAKE_ALL_MONEY, handler->GetNameLink(target));
                 if (handler->needReportToTarget(target))
-                    ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_ALL_MONEY_GONE, handler->GetNameLink().c_str());
+                    ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_ALL_MONEY_GONE, handler->GetNameLink());
 
                 target->SetMoney(0);
             }
@@ -644,17 +644,17 @@ public:
                 if (newmoney > MAX_MONEY_AMOUNT)
                     newmoney = MAX_MONEY_AMOUNT;
 
-                handler->PSendSysMessage(LANG_YOU_TAKE_MONEY, std::abs(moneyToAdd), handler->GetNameLink(target).c_str());
+                handler->PSendSysMessage(LANG_YOU_TAKE_MONEY, std::abs(moneyToAdd), handler->GetNameLink(target));
                 if (handler->needReportToTarget(target))
-                    ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_MONEY_TAKEN, handler->GetNameLink().c_str(), std::abs(moneyToAdd));
+                    ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_MONEY_TAKEN, handler->GetNameLink(), std::abs(moneyToAdd));
                 target->SetMoney(newmoney);
             }
         }
         else
         {
-            handler->PSendSysMessage(LANG_YOU_GIVE_MONEY, moneyToAdd, handler->GetNameLink(target).c_str());
+            handler->PSendSysMessage(LANG_YOU_GIVE_MONEY, moneyToAdd, handler->GetNameLink(target));
             if (handler->needReportToTarget(target))
-                ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_MONEY_GIVEN, handler->GetNameLink().c_str(), moneyToAdd);
+                ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_MONEY_GIVEN, handler->GetNameLink(), moneyToAdd);
 
             if (moneyToAdd >= MAX_MONEY_AMOUNT)
                 moneyToAdd = MAX_MONEY_AMOUNT;
@@ -733,7 +733,7 @@ public:
 
         target->ModifyHonorPoints(amount);
 
-        handler->PSendSysMessage(LANG_COMMAND_MODIFY_HONOR, handler->GetNameLink(target).c_str(), target->GetHonorPoints());
+        handler->PSendSysMessage(LANG_COMMAND_MODIFY_HONOR, handler->GetNameLink(target), target->GetHonorPoints());
 
         return true;
     }
@@ -820,7 +820,7 @@ public:
 
             if (r >= MAX_REPUTATION_RANK)
             {
-                handler->PSendSysMessage(LANG_COMMAND_FACTION_INVPARAM, rankStr.c_str());
+                handler->PSendSysMessage(LANG_COMMAND_FACTION_INVPARAM, rankStr);
                 handler->SetSentErrorMessage(true);
                 return false;
             }
@@ -855,7 +855,7 @@ public:
         target->GetReputationMgr().SendState(target->GetReputationMgr().GetState(factionEntry));
 
         handler->PSendSysMessage(LANG_COMMAND_MODIFY_REP, factionEntry->name[handler->GetSessionDbcLocale()], factionId,
-                                 handler->GetNameLink(target).c_str(), target->GetReputationMgr().GetReputation(factionEntry));
+                                 handler->GetNameLink(target), target->GetReputationMgr().GetReputation(factionEntry));
         return true;
     }
 
@@ -929,7 +929,7 @@ public:
 
         target->ModifyArenaPoints(amount);
 
-        handler->PSendSysMessage(LANG_COMMAND_MODIFY_ARENA, handler->GetNameLink(target).c_str(), target->GetArenaPoints());
+        handler->PSendSysMessage(LANG_COMMAND_MODIFY_ARENA, handler->GetNameLink(target), target->GetArenaPoints());
 
         return true;
     }
@@ -987,11 +987,11 @@ public:
 
         char const* gender_full = gender ? "female" : "male";
 
-        handler->PSendSysMessage(LANG_YOU_CHANGE_GENDER, handler->GetNameLink(target).c_str(), gender_full);
+        handler->PSendSysMessage(LANG_YOU_CHANGE_GENDER, handler->GetNameLink(target), gender_full);
 
         if (handler->needReportToTarget(target))
         {
-            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOUR_GENDER_CHANGED, gender_full, handler->GetNameLink().c_str());
+            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOUR_GENDER_CHANGED, gender_full, handler->GetNameLink());
         }
 
         return true;

@@ -31,8 +31,8 @@
 #include "SQLOperation.h"
 #include "Transaction.h"
 #include "WorldDatabase.h"
-#include <mysqld_error.h>
 #include <limits>
+#include <mysqld_error.h>
 
 #ifdef ACORE_DEBUG
 #include <boost/stacktrace.hpp>

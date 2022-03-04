@@ -121,11 +121,12 @@ namespace Acore::Impl::ChatCommands
     };
 
     AC_GAME_API void SendErrorMessageToHandler(ChatHandler* handler, std::string_view str);
-    AC_GAME_API char const* GetAcoreString(ChatHandler const* handler, AcoreStrings which);
+    AC_GAME_API std::string GetAcoreString(ChatHandler const* handler, AcoreStrings which);
+
     template <typename... Ts>
     std::string FormatAcoreString(ChatHandler const* handler, AcoreStrings which, Ts&&... args)
     {
-        return Acore::StringFormat(GetAcoreString(handler, which), std::forward<Ts>(args)...);
+        return Acore::StringFormatFmt(GetAcoreString(handler, which), std::forward<Ts>(args)...);
     }
 }
 

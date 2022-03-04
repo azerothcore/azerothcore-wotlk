@@ -25,7 +25,7 @@ void Acore::Impl::ChatCommands::SendErrorMessageToHandler(ChatHandler* handler, 
     handler->SetSentErrorMessage(true);
 }
 
-char const* Acore::Impl::ChatCommands::GetAcoreString(ChatHandler const* handler, AcoreStrings which)
+std::string Acore::Impl::ChatCommands::GetAcoreString(ChatHandler const* handler, AcoreStrings which)
 {
     return handler->GetAcoreString(which);
 }
