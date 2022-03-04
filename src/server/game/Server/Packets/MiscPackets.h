@@ -100,6 +100,14 @@ namespace WorldPackets
             uint32 Result = 0;
             ObjectGuid Roller;
         };
+
+        class DurabilityDamageDeath final : public ServerPacket
+        {
+        public:
+            DurabilityDamageDeath() : ServerPacket(SMSG_DURABILITY_DAMAGE_DEATH, 0) { }
+
+            WorldPacket const* Write() override { return &_worldPacket; }
+        };
     }
 }
 
