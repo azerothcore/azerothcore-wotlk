@@ -14386,20 +14386,35 @@ void Unit::ApplyDiminishingAura(DiminishingGroup group, bool apply)
 float Unit::GetSpellMaxRangeForTarget(Unit const* target, SpellInfo const* spellInfo) const
 {
     if (!spellInfo->RangeEntry)
+    {
         return 0;
-    if (spellInfo->RangeEntry->RangeMin[1] == spellInfo->RangeEntry->RangeMin[0])
+    }
+
+    if (spellInfo->RangeEntry->RangeMax[1] == spellInfo->RangeEntry->RangeMax[0])
+    {
         return spellInfo->GetMaxRange();
-    if (target == nullptr)
+    }
+
+    if (!target)
+    {
         return spellInfo->GetMaxRange(true);
+    }
+
     return spellInfo->GetMaxRange(!IsHostileTo(target));
 }
 
 float Unit::GetSpellMinRangeForTarget(Unit const* target, SpellInfo const* spellInfo) const
 {
     if (!spellInfo->RangeEntry)
+    {
         return 0;
+    }
+
     if (spellInfo->RangeEntry->RangeMin[1] == spellInfo->RangeEntry->RangeMin[0])
+    {
         return spellInfo->GetMinRange();
+    }
+
     return spellInfo->GetMinRange(!IsHostileTo(target));
 }
 
