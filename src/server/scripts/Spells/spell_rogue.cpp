@@ -673,7 +673,6 @@ class spell_rog_tricks_of_the_trade_proc : public AuraScript
 };
 
 // 14161 - Ruthlessness
-
 class spell_rog_ruthlessness : public AuraScript
 {
     PrepareAuraScript(spell_rog_ruthlessness);
@@ -683,10 +682,16 @@ class spell_rog_ruthlessness : public AuraScript
         Unit* target = GetTarget();
 
         if (Optional<int32> cost = GetFinishingMoveCPCost(procInfo.GetProcSpell()))
-
             if (roll_chance_i(aurEff->GetSpellEffectInfo().PointsPerResource * (*cost)))
-
                 target->ModifyPower(POWER_COMBO_POINTS, 1);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_rog_ruthlessness::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 
 void AddSC_rogue_spell_scripts()
 {
