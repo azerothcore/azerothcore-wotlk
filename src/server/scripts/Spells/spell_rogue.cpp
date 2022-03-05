@@ -675,20 +675,12 @@ class spell_rog_tricks_of_the_trade_proc : public AuraScript
 // 14161 - Ruthlessness
 
 class spell_rog_ruthlessness : public AuraScript
-
 {
-
     PrepareAuraScript(spell_rog_ruthlessness);
 
-
-
     void HandleProc(AuraEffect* aurEff, ProcEventInfo& procInfo)
-
     {
-
         Unit* target = GetTarget();
-
-
 
         if (Optional<int32> cost = GetFinishingMoveCPCost(procInfo.GetProcSpell()))
 
