@@ -700,7 +700,7 @@ void AddSC_rogue_spell_scripts()
     RegisterSpellScript(spell_rog_cheat_death);
     RegisterSpellScript(spell_rog_deadly_poison);
     new spell_rog_killing_spree();
-    new spell_rog_ruthlessness();
+    RegisterSpellScript(spell_rog_ruthlessness);
     RegisterSpellScript(spell_rog_nerves_of_steel);
     RegisterSpellScript(spell_rog_preparation);
     RegisterSpellScript(spell_rog_prey_on_the_weak);
