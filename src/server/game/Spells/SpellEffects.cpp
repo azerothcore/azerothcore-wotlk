@@ -2138,8 +2138,10 @@ void Spell::EffectOpenLock(SpellEffIndex effIndex)
         else if (m_spellInfo->Id == 1842 && gameObjTarget->GetGOInfo()->type == GAMEOBJECT_TYPE_TRAP)
         {
             gameObjTarget->SetLootState(GO_JUST_DEACTIVATED);
-            if (!gameObjTarget->GetOwner()) // pussywizard
+            if (gameObjTarget->getLootState() == GO_JUST_DEACTIVATED && !gameObjTarget->GetOwner()) // pussywizard
+            {
                 gameObjTarget->SetRespawnTime(gameObjTarget->GetGOInfo()->GetAutoCloseTime() / IN_MILLISECONDS/*xinef*/);
+            }
             return;
         }
         // TODO: Add script for spell 41920 - Filling, becouse server it freze when use this spell
