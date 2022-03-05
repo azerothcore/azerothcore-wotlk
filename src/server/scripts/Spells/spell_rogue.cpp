@@ -672,6 +672,30 @@ class spell_rog_tricks_of_the_trade_proc : public AuraScript
     }
 };
 
+// 14161 - Ruthlessness
+
+class spell_rog_ruthlessness : public AuraScript
+
+{
+
+    PrepareAuraScript(spell_rog_ruthlessness);
+
+
+
+    void HandleProc(AuraEffect* aurEff, ProcEventInfo& procInfo)
+
+    {
+
+        Unit* target = GetTarget();
+
+
+
+        if (Optional<int32> cost = GetFinishingMoveCPCost(procInfo.GetProcSpell()))
+
+            if (roll_chance_i(aurEff->GetSpellEffectInfo().PointsPerResource * (*cost)))
+
+                target->ModifyPower(POWER_COMBO_POINTS, 1);
+
 void AddSC_rogue_spell_scripts()
 {
     RegisterSpellScript(spell_rog_savage_combat);
@@ -680,6 +704,7 @@ void AddSC_rogue_spell_scripts()
     RegisterSpellScript(spell_rog_cheat_death);
     RegisterSpellScript(spell_rog_deadly_poison);
     new spell_rog_killing_spree();
+    new spell_rog_ruthlessness();
     RegisterSpellScript(spell_rog_nerves_of_steel);
     RegisterSpellScript(spell_rog_preparation);
     RegisterSpellScript(spell_rog_prey_on_the_weak);
