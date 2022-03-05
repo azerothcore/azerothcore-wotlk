@@ -4210,6 +4210,13 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
+    // Burning Adrenaline
+    ApplySpellFix({ 23478 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].BasePoints = 4374;
+        spellInfo->Effects[EFFECT_0].DieSides = 1250;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
