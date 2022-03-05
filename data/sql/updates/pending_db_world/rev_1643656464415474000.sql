@@ -76,6 +76,3 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `equipment_id`
 
 -- Emote crafting for Technicians
 UPDATE `creature_template_addon` SET `emote`= 133 WHERE `entry`=13996;
-
--- Clean-up
-DELETE FROM `linked_respawn` WHERE `guid` BETWEEN 84533 AND 85779;
