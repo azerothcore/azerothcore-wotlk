@@ -158,6 +158,7 @@ public:
                     switch (eventId)
                     {
                         case EVENT_SPEECH_1:
+                            me->SetStandState(UNIT_STAND_STATE_STAND);
                             me->SummonCreature(NPC_VICTOR_NEFARIUS, aNefariusSpawnLoc[0], aNefariusSpawnLoc[1], aNefariusSpawnLoc[2], aNefariusSpawnLoc[3], TEMPSUMMON_TIMED_DESPAWN, 26000);
                             _eventsIntro.ScheduleEvent(EVENT_SPEECH_2, 1000);
                             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -178,7 +179,6 @@ public:
                             break;
                         case EVENT_SPEECH_4:
                             Talk(SAY_LINE1);
-                            me->SetStandState(UNIT_STAND_STATE_STAND);
                             me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                             _eventsIntro.ScheduleEvent(EVENT_SPEECH_5, 12000);
                             break;
