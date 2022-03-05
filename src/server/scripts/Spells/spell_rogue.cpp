@@ -692,7 +692,6 @@ class spell_rog_ruthlessness : public AuraScript
     }
 };
 
-
 void AddSC_rogue_spell_scripts()
 {
     RegisterSpellScript(spell_rog_savage_combat);
