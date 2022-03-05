@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `account` (
   `totaltime` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COMMENT='Account System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Account System';
 
 -- Дамп данных таблицы acore_auth.account: ~0 rows (приблизительно)
 DELETE FROM `account`;
