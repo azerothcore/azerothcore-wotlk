@@ -44,6 +44,23 @@ enum RogueSpells
     SPELL_ROGUE_TRICKS_OF_THE_TRADE_PROC        = 59628,
 };
 
+/* Returns true if the spell is a finishing move.
+ * A finishing move is a spell that cost combo points */
+Optional<int32> GetFinishingMoveCPCost(Spell const* spell)
+{
+    if (!spell)
+        return { };
+
+    return spell->GetPowerTypeCostAmount(POWER_COMBO_POINTS);
+}
+
+/* Return true if the spell is a finishing move.
+ * A finishing move is a spell that cost combo points */
+bool IsFinishingMove(Spell const* spell)
+{
+    return GetFinishingMoveCPCost(spell).has_value();
+}
+
 class spell_rog_savage_combat : public AuraScript
 {
     PrepareAuraScript(spell_rog_savage_combat);
@@ -677,12 +694,12 @@ class spell_rog_ruthlessness : public AuraScript
 {
     PrepareAuraScript(spell_rog_ruthlessness);
 
-    void HandleProc(AuraEffect* aurEff, ProcEventInfo& procInfo)
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         Unit* target = GetTarget();
 
         if (Optional<int32> cost = GetFinishingMoveCPCost(procInfo.GetProcSpell()))
-            if (roll_chance_i(aurEff->GetSpellEffectInfo().PointsPerResource * (*cost)))
+            if (target && roll_chance_i(aurEff->GetSpellEffectInfo().PointsPerResource * (*cost)))
                 target->ModifyPower(POWER_COMBO_POINTS, 1);
     }
 
