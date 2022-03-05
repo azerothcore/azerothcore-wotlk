@@ -323,8 +323,7 @@ public:
     /// Called when a player enter in battlefield zone
     virtual void OnPlayerEnterZone(Player* /*player*/) {};
 
-    void SendWarningToAllInZone(uint32 entry);
-    void SendWarningToPlayer(Player* player, uint32 entry);
+    void SendWarning(uint8 id, WorldObject const* target = nullptr);
 
     void PlayerAcceptInviteToQueue(Player* player);
     void PlayerAcceptInviteToWar(Player* player);
@@ -414,9 +413,9 @@ protected:
     virtual void SendRemoveWorldStates(Player* /*player*/) {}
 
     // use for send a packet for all player list
-    void BroadcastPacketToZone(WorldPacket& data) const;
-    void BroadcastPacketToQueue(WorldPacket& data) const;
-    void BroadcastPacketToWar(WorldPacket& data) const;
+    void BroadcastPacketToZone(WorldPacket const* data) const;
+    void BroadcastPacketToQueue(WorldPacket const* data) const;
+    void BroadcastPacketToWar(WorldPacket const* data) const;
 
     // CapturePoint system
     void AddCapturePoint(BfCapturePoint* cp) { m_capturePoints.push_back(cp); }
