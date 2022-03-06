@@ -194,9 +194,6 @@ public:
 
     virtual void PetStopAttack() { }
 
-    // intended for encounter design/debugging. do not use for other purposes. expensive.
-    int32 VisualizeBoundary(uint32 duration, Unit* owner = nullptr, bool fill = false) const;
-
     // boundary system methods
     virtual bool CheckInRoom();
     CreatureBoundary const* GetBoundary() const { return _boundary; }

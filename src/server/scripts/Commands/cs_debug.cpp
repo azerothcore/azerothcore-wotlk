@@ -102,8 +102,7 @@ public:
             { "los",            HandleDebugLoSCommand,                 SEC_ADMINISTRATOR, Console::No },
             { "moveflags",      HandleDebugMoveflagsCommand,           SEC_ADMINISTRATOR, Console::No },
             { "unitstate",      HandleDebugUnitStateCommand,           SEC_ADMINISTRATOR, Console::No },
-            { "dummy",          HandleDebugDummyCommand,               SEC_ADMINISTRATOR, Console::No },
-            { "boundary",       HandleDebugBoundaryCommand,            SEC_ADMINISTRATOR, Console::No },
+            { "dummy",          HandleDebugDummyCommand,               SEC_ADMINISTRATOR, Console::No }
         };
         static ChatCommandTable commandTable =
         {
@@ -1250,26 +1249,6 @@ public:
     static bool HandleDebugDummyCommand(ChatHandler* handler)
     {
         handler->SendSysMessage("This command does nothing right now. Edit your local core (cs_debug.cpp) to make it do whatever you need for testing.");
-        return true;
-    }
-
-    static bool HandleDebugBoundaryCommand(ChatHandler* handler, Optional<EXACT_SEQUENCE("fill")> fill, Optional<uint32> durationArg)
-    {
-        Player* player = handler->GetPlayer();
-        if (!player)
-            return false;
-        Creature* target = handler->getSelectedCreature();
-        if (!target || !target->IsAIEnabled || !target->AI())
-            return false;
-
-        uint32 duration = durationArg ? uint32(*durationArg) : 0;
-        if (duration <= 0 || duration >= 30 * MINUTE) // arbitrary upper limit
-            duration = 3 * MINUTE;
-
-        int32 errMsg = target->AI()->VisualizeBoundary(duration, player, fill.has_value());
-        if (errMsg > 0)
-            handler->PSendSysMessage(errMsg);
-
         return true;
     }
 };
