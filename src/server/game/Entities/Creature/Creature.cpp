@@ -3517,12 +3517,3 @@ void Creature::SetRespawnTime(uint32 respawn)
 {
     m_respawnTime = respawn ? GameTime::GetGameTime().count() + respawn : 0;
 }
-
-void Creature::SaveRespawnTimeToDB()
-{
-    if (Map* map = GetMap())
-    {
-        time_t respawnTimer = GetRespawnTime();
-        map->SaveCreatureRespawnTime(GetSpawnId(), respawnTimer);
-    }
-}
