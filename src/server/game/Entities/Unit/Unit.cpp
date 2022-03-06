@@ -15790,7 +15790,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                     continue;
                 }
 
-                switch(triggeredByAura->GetAuraType())
+                switch (triggeredByAura->GetAuraType())
                 {
                     case SPELL_AURA_PROC_TRIGGER_SPELL:
                         {
@@ -15930,6 +15930,19 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                             break;
                         takeCharges = true;
                         break;
+                    case SPELL_AURA_ADD_FLAT_MODIFIER:
+                    case SPELL_AURA_ADD_PCT_MODIFIER:
+                    {
+                        if (SpellModifier* mod = triggeredByAura->GetSpellModifier())
+                        {
+                            if (mod->op == SPELLMOD_CASTING_TIME && procSpell && (procSpell->GetTriggeredCastFlags() & TRIGGERED_CAST_DIRECTLY) != 0)
+                            {
+                                break;
+                            }
+                        }
+                        takeCharges = true;
+                        break;
+                    }
                     default:
                         takeCharges = true;
                         break;
