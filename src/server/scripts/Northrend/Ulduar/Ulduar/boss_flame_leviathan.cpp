@@ -178,6 +178,7 @@ enum Misc
     ACTION_DELAY_CANNON             = 5,
     ACTION_DESTROYED_TURRET         = 6,
 };
+const Position homePos = {322.39f, -14.5f, 409.8f, 3.14f};
 
 ///////////////////////////////////////////
 //
@@ -259,8 +260,7 @@ public:
             Talk(FLAME_LEVIATHAN_SAY_AGGRO);
 
             me->setActive(true);
-            me->SetHomePosition(322.4f, -14.3f, 409.8f, 3.23f);
-            TurnGates(true, false);
+            me->SetHomePosition(homePos);
             TurnHealStations(false);
             ActivateTowers();
             if (m_pInstance)
@@ -274,8 +274,8 @@ public:
         {
             if (m_pInstance && m_pInstance->GetData(TYPE_LEVIATHAN) == SPECIAL)
             {
-                me->SetHomePosition(322.4f, -14.3f, 409.8f, 3.23f);
-                me->UpdatePosition(322.4f, -14.3f, 409.8f, 3.23f);
+                me->SetHomePosition(homePos);
+                me->UpdatePosition(homePos);
                 me->StopMovingOnCurrentPos();
             }
 
@@ -368,11 +368,12 @@ public:
                 else if (_speakTimer > 41000 && _speakTimer < 60000)
                 {
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    me->SendMonsterMove(380.4f, -14.3f, 409.8f, 2000);
-                    me->UpdatePosition(380.4f, -14.3f, 409.8f, me->GetOrientation());
+                    TurnGates(true, false);
+                    me->MonsterMoveWithSpeed(homePos.GetPositionX(), homePos.GetPositionY(), homePos.GetPositionZ(), 100.0f);
+                    me->UpdatePosition(homePos);
                     _speakTimer = 60000;
                 }
-                else if (_speakTimer > 61500)
+                else if (_speakTimer > 63500)
                 {
                     me->SetInCombatWithZone();
                     if (!me->GetVictim())
