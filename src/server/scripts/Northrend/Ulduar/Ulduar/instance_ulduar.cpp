@@ -214,7 +214,7 @@ public:
                 SetData(eventId, 0);
         }
 
-        void SpawnHodirChests(Difficulty diff)
+        void SpawnHodirChests(Difficulty diff, Creature* hodir)
         {
             switch (diff)
             {
@@ -222,7 +222,7 @@ public:
                 {
                     if (!m_hodirNormalChest)
                     {
-                        if (GameObject* go = instance->SummonGameObject(
+                        if (GameObject* go = hodir->SummonGameObject(
                             GO_HODIR_CHEST_NORMAL,
                             normalChestPosition.GetPositionX(),
                             normalChestPosition.GetPositionY(),
@@ -235,7 +235,7 @@ public:
                     }
                     if (!m_hodirHardmodeChest)
                     {
-                        if (GameObject* go = instance->SummonGameObject(
+                        if (GameObject* go = hodir->SummonGameObject(
                             GO_HODIR_CHEST_HARD,
                             hardChestPosition.GetPositionX(),
                             hardChestPosition.GetPositionY(),
@@ -253,7 +253,7 @@ public:
                 {
                     if (!m_hodirNormalChest)
                     {
-                        if (GameObject* go = instance->SummonGameObject(
+                        if (GameObject* go = hodir->SummonGameObject(
                             GO_HODIR_CHEST_NORMAL_HERO,
                             normalChestPosition.GetPositionX(),
                             normalChestPosition.GetPositionY(),
@@ -266,7 +266,7 @@ public:
                     }
                     if (!m_hodirHardmodeChest)
                     {
-                        if (GameObject* go = instance->SummonGameObject(
+                        if (GameObject* go = hodir->SummonGameObject(
                             GO_HODIR_CHEST_HARD_HERO,
                             hardChestPosition.GetPositionX(),
                             hardChestPosition.GetPositionY(),
@@ -328,6 +328,7 @@ public:
                     break;
                 case NPC_HODIR:
                     m_uiHodirGUID = creature->GetGUID();
+                    SpawnHodirChests(instance->GetDifficulty(), creature);
                     break;
                 case NPC_THORIM:
                     m_uiThorimGUID = creature->GetGUID();
@@ -688,10 +689,6 @@ public:
                         m_mimironTramUsed = true;
                     if (GetData(TYPE_HODIR) == DONE)
                         setChestsLootable(TYPE_HODIR);
-                    break;
-
-                case TYPE_SPAWN_HODIR_CACHE:
-                    SpawnHodirChests(instance->GetDifficulty());
                     break;
                 case TYPE_HODIR_HM_FAIL:
                     if (GameObject* go = instance->GetGameObject(m_hodirHardmodeChest))

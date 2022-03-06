@@ -257,11 +257,6 @@ public:
                 go->SetGoState(GO_STATE_ACTIVE);
             }
 
-            if (pInstance && pInstance->GetData(TYPE_HODIR) != DONE)
-            {
-                pInstance->SetData(TYPE_SPAWN_HODIR_CACHE, 0);
-            }
-
             // Reset helpers
             if (!summons.size())
                 SpawnHelpers();
