@@ -1416,10 +1416,10 @@ public:
     void setPowerType(Powers power);
     [[nodiscard]] uint32 GetPower(Powers power) const { return GetUInt32Value(static_cast<uint16>(UNIT_FIELD_POWER1) + power); }
     [[nodiscard]] uint32 GetMaxPower(Powers power) const { return GetUInt32Value(static_cast<uint16>(UNIT_FIELD_MAXPOWER1) + power); }
-    void SetPower(Powers power, uint32 val);
+    void SetPower(Powers power, uint32 val, bool withPowerUpdate = true);
     void SetMaxPower(Powers power, uint32 val);
     // returns the change in power
-    int32 ModifyPower(Powers power, int32 val);
+    int32 ModifyPower(Powers power, int32 val, bool withPowerUpdate = true);
     int32 ModifyPowerPct(Powers power, float pct, bool apply = true);
 
     [[nodiscard]] uint32 GetAttackTime(WeaponAttackType att) const
