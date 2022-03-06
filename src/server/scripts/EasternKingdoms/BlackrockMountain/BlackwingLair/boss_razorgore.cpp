@@ -116,7 +116,7 @@ public:
 
         void OnCharmed(bool apply) override
         {
-            if (!apply)
+            if (apply)
             {
                 if (Unit* charmer = ObjectAccessor::GetUnit(*me, _charmerGUID))
                 {
