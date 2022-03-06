@@ -1136,6 +1136,9 @@ uint32 GameEventMgr::Update()                               // return the next e
         // must do the activating first, and after that the deactivating
         // so first queue it
         //LOG_ERROR("sql.sql", "Checking event {}", itr);
+
+        sScriptMgr->OnGameEventCheck(itr);
+
         if (CheckOneGameEvent(itr))
         {
             // if the world event is in NEXTPHASE state, and the time has passed to finish this event, then do so

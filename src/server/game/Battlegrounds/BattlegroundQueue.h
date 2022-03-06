@@ -72,7 +72,6 @@ public:
     void UpdateEvents(uint32 diff);
 
     void FillPlayersToBG(Battleground* bg, int32 aliFree, int32 hordeFree, BattlegroundBracketId bracket_id);
-    void FillPlayersToBGWithSpecific(Battleground* bg, int32 aliFree, int32 hordeFree, BattlegroundBracketId thisBracketId, BattlegroundQueue* specificQueue, BattlegroundBracketId specificBracketId);
     bool CheckPremadeMatch(BattlegroundBracketId bracket_id, uint32 MinPlayersPerTeam, uint32 MaxPlayersPerTeam);
     bool CheckNormalMatch(Battleground* bgTemplate, BattlegroundBracketId bracket_id, uint32 minPlayers, uint32 maxPlayers);
     bool CheckSkirmishForSameFaction(BattlegroundBracketId bracket_id, uint32 minPlayersPerTeam);
@@ -83,6 +82,7 @@ public:
     bool GetPlayerGroupInfoData(ObjectGuid guid, GroupQueueInfo* ginfo);
     void PlayerInvitedToBGUpdateAverageWaitTime(GroupQueueInfo* ginfo);
     uint32 GetAverageQueueWaitTime(GroupQueueInfo* ginfo) const;
+    void InviteGroupToBG(GroupQueueInfo* ginfo, Battleground* bg, TeamId teamId);
     [[nodiscard]] uint32 GetPlayersCountInGroupsQueue(BattlegroundBracketId bracketId, BattlegroundQueueGroupTypes bgqueue);
     [[nodiscard]] bool IsAllQueuesEmpty(BattlegroundBracketId bracket_id);
     void SendMessageBGQueue(Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry);
@@ -125,7 +125,7 @@ public:
     };
 
     //one selection pool for horde, other one for alliance
-    SelectionPool m_SelectionPools[BG_TEAMS_COUNT];
+    SelectionPool m_SelectionPools[PVP_TEAMS_COUNT];
 
     ArenaType GetArenaType() { return m_arenaType; }
     BattlegroundTypeId GetBGTypeID() { return m_bgTypeId; }
@@ -136,8 +136,8 @@ public:
 private:
     BattlegroundTypeId m_bgTypeId;
     ArenaType m_arenaType;
-    uint32 m_WaitTimes[BG_TEAMS_COUNT][MAX_BATTLEGROUND_BRACKETS][COUNT_OF_PLAYERS_TO_AVERAGE_WAIT_TIME];
-    uint32 m_WaitTimeLastIndex[BG_TEAMS_COUNT][MAX_BATTLEGROUND_BRACKETS];
+    uint32 m_WaitTimes[PVP_TEAMS_COUNT][MAX_BATTLEGROUND_BRACKETS][COUNT_OF_PLAYERS_TO_AVERAGE_WAIT_TIME];
+    uint32 m_WaitTimeLastIndex[PVP_TEAMS_COUNT][MAX_BATTLEGROUND_BRACKETS];
 
     // Event handler
     EventProcessor m_events;
