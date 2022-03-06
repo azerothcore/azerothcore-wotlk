@@ -196,7 +196,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit*, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit*, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == 59302 && pInstance) // Bane trigger
                 pInstance->SetData(DATA_YMIRON_ACHIEVEMENT, false);

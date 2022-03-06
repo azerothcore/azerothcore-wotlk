@@ -103,6 +103,7 @@ void AddSC_boss_kirtonos_the_herald();
 void AddSC_boss_darkmaster_gandling();
 void AddSC_boss_kormok();
 void AddSC_instance_scholomance();           //Scholomance
+void AddSC_boss_apothecary_hummel();
 void AddSC_instance_shadowfang_keep();       //Shadowfang keep
 void AddSC_boss_baroness_anastari();
 void AddSC_boss_jarien_and_sothos();
@@ -252,6 +253,7 @@ void AddEasternKingdomsScripts()
     AddSC_boss_darkmaster_gandling();
     AddSC_boss_kormok();
     AddSC_instance_scholomance();           //Scholomance
+    AddSC_boss_apothecary_hummel();
     AddSC_instance_shadowfang_keep();       //Shadowfang keep
     AddSC_boss_baroness_anastari();
     AddSC_boss_jarien_and_sothos();

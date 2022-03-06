@@ -293,18 +293,20 @@ public:
         }
 
         // used for shadow portal
-        void SpellHitTarget(Unit* target, const SpellInfo* spellinfo) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spellinfo) override
         {
             uint32 room = 0;
-            if (spellinfo && spellinfo->Id == SPELL_SHADOW_PORTAL && target && me->GetVictim())
+            if (spellinfo && spellinfo->Id == SPELL_SHADOW_PORTAL && target)
             {
                 room = GetData(GANDLING_ROOM_TO_USE);
                 SetGate(room, CLOSED);
                 SpawnMobsInRoom(room);
                 DoCast(target, GandlingPortalSpells[room], true); // needs triggered somehow.
-                if (target->GetGUID() == me->GetVictim()->GetGUID())
+
+                auto victim = me->GetVictim();
+                if (victim && (target->GetGUID() == victim->GetGUID()))
                 {
-                    me->AddThreat(me->GetVictim(), -1000000); // drop current player, add a ton to second. This should guarantee that we don't end up with both 1 and 2 in a cage...
+                    me->AddThreat(victim, -1000000); // drop current player, add a ton to second. This should guarantee that we don't end up with both 1 and 2 in a cage...
                     if (Unit* newTarget = SelectTarget(SelectTargetMethod::MaxThreat, 1, 200.0f)) // search in whole room
                     {
                         me->AddThreat(newTarget, 1000000);

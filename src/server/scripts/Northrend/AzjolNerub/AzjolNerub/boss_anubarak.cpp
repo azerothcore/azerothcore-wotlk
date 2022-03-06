@@ -144,7 +144,7 @@ class boss_anub_arak : public CreatureScript
 
             void SummonHelpers(float x, float y, float z, uint32 spellId)
             {
-                const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
                 me->SummonCreature(spellInfo->Effects[EFFECT_0].MiscValue, x, y, z);
             }
 
