@@ -1170,15 +1170,17 @@ public:
     {
         PrepareSpellScript(spell_hodir_shatter_chestSpellScript)
 
-        void destroyWinterCache()
+        void destroyWinterCache(SpellEffIndex effIndex)
         {
+            PreventHitDefaultEffect(effIndex);
+
             if (Unit* hodir = GetCaster())
                 hodir->GetAI()->DoAction(EVENT_FAIL_HM);
         }
 
         void Register() override
         {
-            AfterHit += SpellHitFn(spell_hodir_shatter_chestSpellScript::destroyWinterCache);
+            OnEffectHit += SpellEffectFn(spell_hodir_shatter_chestSpellScript::destroyWinterCache, EFFECT_0, SPELL_EFFECT_TRIGGER_MISSILE);
         };
     };
 
