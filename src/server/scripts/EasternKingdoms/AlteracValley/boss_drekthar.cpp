@@ -65,7 +65,7 @@ public:
             YellTimer         = urand(20 * IN_MILLISECONDS, 30 * IN_MILLISECONDS); //20 to 30 seconds
         }
 
-        void EnterCombat(Unit* victim) override
+        void EnterCombat(Unit* /*victim*/) override
         {
             Talk(YELL_AGGRO);
         }
