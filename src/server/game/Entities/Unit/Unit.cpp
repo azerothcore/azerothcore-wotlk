@@ -19900,7 +19900,7 @@ bool Unit::SetWalk(bool enable)
     return true;
 }
 
-bool Unit::SetDisableGravity(bool disable, bool /*packetOnly = false*/)
+bool Unit::SetDisableGravity(bool disable, bool /*packetOnly = false*/, bool /*updateAnimationTier = true*/)
 {
     if (disable == IsLevitating())
         return false;
@@ -19999,7 +19999,7 @@ void Unit::SendMovementFeatherFall(Player* sendTo)
     sendTo->SendDirectMessage(&data);
 }
 
-bool Unit::SetHover(bool enable, bool /*packetOnly = false*/)
+bool Unit::SetHover(bool enable, bool /*packetOnly = false*/, bool /*updateAnimationTier = true*/)
 {
     if (enable == HasUnitMovementFlag(MOVEMENTFLAG_HOVER))
         return false;

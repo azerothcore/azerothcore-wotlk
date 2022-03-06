@@ -15397,7 +15397,7 @@ bool Player::IsInWhisperWhiteList(ObjectGuid guid)
     return false;
 }
 
-bool Player::SetDisableGravity(bool disable, bool packetOnly /*= false*/)
+bool Player::SetDisableGravity(bool disable, bool packetOnly /*= false*/, bool /*updateAnimationTier = true*/)
 {
     if (!packetOnly && !Unit::SetDisableGravity(disable))
         return false;
@@ -15436,7 +15436,7 @@ bool Player::SetCanFly(bool apply, bool packetOnly /*= false*/)
     return true;
 }
 
-bool Player::SetHover(bool apply, bool packetOnly /*= false*/)
+bool Player::SetHover(bool apply, bool packetOnly /*= false*/, bool /*updateAnimationTier = true*/)
 {
     // moved inside, flag can be removed on landing and wont send appropriate packet to client when aura is removed
     if (!packetOnly /* && !Unit::SetHover(apply)*/)
