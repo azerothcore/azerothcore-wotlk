@@ -2565,7 +2565,7 @@ Die.Command.Mode = 1
 #
 #        Default:     Rate.MissChanceMultiplier.TargetCreature = 11
 #                     Rate.MissChanceMultiplier.TargetPlayer = 7
-#                     Rate.MissChanceMultiplier.OnlyAffectsPvP = 0
+#                     Rate.MissChanceMultiplier.OnlyAffectsPlayer = 0
 #
 
 Rate.MissChanceMultiplier.TargetCreature = 11
