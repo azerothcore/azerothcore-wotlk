@@ -138,7 +138,7 @@ public:
 
             // Flame Leviathan
             for (uint8 i = 0; i < 4; ++i)
-                m_leviathanTowers[i] = false;
+                m_leviathanTowers[i] = true;
 
             _leviathanVehicles.clear();
             m_unbrokenAchievement   = 1;
