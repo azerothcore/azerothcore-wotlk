@@ -15,18 +15,36 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef AllPackets_h__
-#define AllPackets_h__
+#ifndef LFGPackets_h__
+#define LFGPackets_h__
 
-#include "LFGPackets.h"
-#include "BankPackets.h"
-#include "CharacterPackets.h"
-#include "ChatPackets.h"
-#include "PetPackets.h"
-#include "CombatLogPackets.h"
-#include "GuildPackets.h"
-#include "MiscPackets.h"
-#include "TotemPackets.h"
-#include "WorldStatePackets.h"
+#include "Packet.h"
+#include "PacketUtilities.h"
 
-#endif // AllPackets_h__
+namespace WorldPackets::LFG
+{
+    class LFGJoin final : public ClientPacket
+    {
+    public:
+        LFGJoin(WorldPacket&& packet) : ClientPacket(CMSG_LFG_JOIN, std::move(packet)) { }
+
+        void Read() override;
+
+        uint32 Roles = 0;
+        Array<uint32, 50> Slots;
+        std::string Comment;
+        bool NoPartialClear = false;
+        bool Achievements = false;
+        std::array<uint8, 3> Needs = { };
+    };
+
+    class LFGLeave final : public ClientPacket
+    {
+    public:
+        LFGLeave(WorldPacket&& packet) : ClientPacket(CMSG_LFG_LEAVE, std::move(packet)) { }
+
+        void Read() override { };
+    };
+}
+
+#endif // LFGPackets_h__
