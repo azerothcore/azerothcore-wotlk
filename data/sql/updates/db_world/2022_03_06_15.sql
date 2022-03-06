@@ -1,3 +1,19 @@
+-- DB update 2022_03_06_14 -> 2022_03_06_15
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_03_06_14';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_03_06_14 2022_03_06_15 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1646090929242630500'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1646090929242630500');
 
 DELETE FROM `creature_formations` WHERE `memberGUID` IN (858, 859, 857);
@@ -81,3 +97,13 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (@PATH, 59, -12844.4, -816.441, 55.3631, 100, 0),
 (@PATH, 60, -12837, -807.25, 58.0551, 100, 0),
 (@PATH, 61, -12827.3, -800.899, 60.6489, 100, 0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_03_06_15' WHERE sql_rev = '1646090929242630500';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
