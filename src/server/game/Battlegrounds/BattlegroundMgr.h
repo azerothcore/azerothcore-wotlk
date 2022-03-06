@@ -68,7 +68,6 @@ public:
     void BuildBattlegroundListPacket(WorldPacket* data, ObjectGuid guid, Player* player, BattlegroundTypeId bgTypeId, uint8 fromWhere);
     void BuildGroupJoinedBattlegroundPacket(WorldPacket* data, GroupJoinBattlegroundResult result);
     void BuildBattlegroundStatusPacket(WorldPacket* data, Battleground* bg, uint8 queueSlot, uint8 statusId, uint32 time1, uint32 time2, uint8 arenaType, TeamId teamId, bool isRated = false, BattlegroundTypeId forceBgTypeId = BATTLEGROUND_TYPE_NONE);
-    void BuildPlaySoundPacket(WorldPacket* data, uint32 soundid);
     void SendAreaSpiritHealerQueryOpcode(Player* player, Battleground* bg, ObjectGuid guid);
 
     /* Battlegrounds */
@@ -134,7 +133,7 @@ public:
 private:
     bool CreateBattleground(CreateBattlegroundData& data);
     uint32 GetNextClientVisibleInstanceId();
-    BattlegroundTypeId GetRandomBG(BattlegroundTypeId id);
+    BattlegroundTypeId GetRandomBG(BattlegroundTypeId id, uint32 minLevel);
 
     typedef std::map<BattlegroundTypeId, Battleground*> BattlegroundTemplateContainer;
     BattlegroundTemplateContainer m_BattlegroundTemplates;
