@@ -296,10 +296,13 @@ public:
                 switch (action)
                 {
                     case EVENT_FAIL_HM:
-                        if (GameObject* go = me->FindNearestGameObject(GO_HODIR_CHEST_HARD, 500.0f))
+                        if (pInstance)
                         {
-                            go->SetGoState(GO_STATE_ACTIVE);
-                            events.ScheduleEvent(EVENT_DESPAWN_CHEST, 3000);
+                            if (GameObject* go = pInstance->instance->GetGameObject(pInstance->GetGuidData(GO_HODIR_CHEST_HARD)))
+                            {
+                                go->SetGoState(GO_STATE_ACTIVE);
+                                events.ScheduleEvent(EVENT_DESPAWN_CHEST, 3000);
+                            }
                         }
                         break;
                 }
@@ -425,7 +428,13 @@ public:
                 case EVENT_HARD_MODE_MISSED:
                     {
                         Talk(TEXT_HM_MISS);
-                        me->CastSpell(me->FindNearestGameObject(GO_HODIR_CHEST_HARD, 400.0f), SPELL_SHATTER_CHEST, false);
+                        if (pInstance)
+                        {
+                            if (GameObject* go = pInstance->instance->GetGameObject(pInstance->GetGuidData(GO_HODIR_CHEST_HARD)))
+                            {
+                                me->CastSpell(go, SPELL_SHATTER_CHEST, false);
+                            }
+                        }
                     }
                     break;
                 case EVENT_DESPAWN_CHEST:

@@ -216,73 +216,72 @@ public:
 
         void SpawnHodirChests(Difficulty diff)
         {
-            if (Creature* cr = instance->GetCreature(m_uiHodirGUID))
+            switch (diff)
             {
-                switch (diff)
+                case RAID_DIFFICULTY_10MAN_NORMAL: // 10 man chest
                 {
-                    case RAID_DIFFICULTY_10MAN_NORMAL: // 10 man chest
+                    if (!m_hodirNormalChest)
                     {
-                        if (!m_hodirNormalChest)
+                        if (GameObject* go = instance->SummonGameObject(
+                            GO_HODIR_CHEST_NORMAL,
+                            normalChestPosition.GetPositionX(),
+                            normalChestPosition.GetPositionY(),
+                            normalChestPosition.GetPositionZ(),
+                            normalChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
                         {
-                            if (GameObject* go = cr->SummonGameObject(
-                                GO_HODIR_CHEST_NORMAL,
-                                normalChestPosition.GetPositionX(),
-                                normalChestPosition.GetPositionY(),
-                                normalChestPosition.GetPositionZ(),
-                                normalChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
-                            {
-                                m_hodirNormalChest = go->GetGUID();
-                                go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-                            }
+                            m_hodirNormalChest = go->GetGUID();
+                            go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                         }
-                        if (!m_hodirHardmodeChest)
-                        {
-                            if (GameObject* go = cr->SummonGameObject(
-                                GO_HODIR_CHEST_HARD,
-                                hardChestPosition.GetPositionX(),
-                                hardChestPosition.GetPositionY(),
-                                hardChestPosition.GetPositionZ(),
-                                hardChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
-                            {
-                                m_hodirHardmodeChest = go->GetGUID();
-                                go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-                                hmHodir = true;
-                            }
-                        }
-                        break;
                     }
-                    case RAID_DIFFICULTY_25MAN_NORMAL: // 25 man chest
+                    if (!m_hodirHardmodeChest)
                     {
-                        if (!m_hodirNormalChest)
+                        if (GameObject* go = instance->SummonGameObject(
+                            GO_HODIR_CHEST_HARD,
+                            hardChestPosition.GetPositionX(),
+                            hardChestPosition.GetPositionY(),
+                            hardChestPosition.GetPositionZ(),
+                            hardChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
                         {
-                            if (GameObject* go = cr->SummonGameObject(
-                                GO_HODIR_CHEST_NORMAL_HERO,
-                                normalChestPosition.GetPositionX(),
-                                normalChestPosition.GetPositionY(),
-                                normalChestPosition.GetPositionZ(),
-                                normalChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
-                            {
-                                m_hodirNormalChest = go->GetGUID();
-                                go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-                            }
+                            m_hodirHardmodeChest = go->GetGUID();
+                            go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                            hmHodir = true;
                         }
-                        if (!m_hodirHardmodeChest)
-                        {
-                            if (GameObject* go = cr->SummonGameObject(
-                                GO_HODIR_CHEST_HARD_HERO,
-                                hardChestPosition.GetPositionX(),
-                                hardChestPosition.GetPositionY(),
-                                hardChestPosition.GetPositionZ(),
-                                hardChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
-                            {
-                                m_hodirHardmodeChest = go->GetGUID();
-                                go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-                                hmHodir = true;
-                            }
-                        }
-                        break;
                     }
+                    break;
                 }
+                case RAID_DIFFICULTY_25MAN_NORMAL: // 25 man chest
+                {
+                    if (!m_hodirNormalChest)
+                    {
+                        if (GameObject* go = instance->SummonGameObject(
+                            GO_HODIR_CHEST_NORMAL_HERO,
+                            normalChestPosition.GetPositionX(),
+                            normalChestPosition.GetPositionY(),
+                            normalChestPosition.GetPositionZ(),
+                            normalChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
+                        {
+                            m_hodirNormalChest = go->GetGUID();
+                            go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        }
+                    }
+                    if (!m_hodirHardmodeChest)
+                    {
+                        if (GameObject* go = instance->SummonGameObject(
+                            GO_HODIR_CHEST_HARD_HERO,
+                            hardChestPosition.GetPositionX(),
+                            hardChestPosition.GetPositionY(),
+                            hardChestPosition.GetPositionZ(),
+                            hardChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
+                        {
+                            m_hodirHardmodeChest = go->GetGUID();
+                            go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                            hmHodir = true;
+                        }
+                    }
+                    break;
+                }
+                default:
+                    break;
             }
         }
 
@@ -908,10 +907,8 @@ public:
 
                 // Hodir chests
                 case GO_HODIR_CHEST_HARD:
-                case GO_HODIR_CHEST_HARD_HERO:
                     return m_hodirHardmodeChest;
                 case GO_HODIR_CHEST_NORMAL:
-                case GO_HODIR_CHEST_NORMAL_HERO:
                     return m_hodirNormalChest;
 
                 // Freya Elders
