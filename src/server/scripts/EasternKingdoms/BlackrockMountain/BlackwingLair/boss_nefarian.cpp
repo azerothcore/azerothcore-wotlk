@@ -235,14 +235,13 @@ public:
 
             DoCast(me, SPELL_NEFARIANS_BARRIER);
             SetCombatMovement(false);
-            DoCastSelf(SPELL_SHADOWBLINK);
             AttackStart(SelectTarget(SelectTargetMethod::Random, 0, 200.f, true));
+            events.ScheduleEvent(EVENT_SHADOWBLINK, 500);
             events.ScheduleEvent(EVENT_SHADOW_BOLT, urand(3000, 10000));
             events.ScheduleEvent(EVENT_FEAR, urand(10000, 20000));
             events.ScheduleEvent(EVENT_SILENCE, urand(20000, 25000));
             events.ScheduleEvent(EVENT_MIND_CONTROL, urand(30000, 35000));
             events.ScheduleEvent(EVENT_SPAWN_ADD, 10000);
-            events.ScheduleEvent(EVENT_SHADOWBLINK, 40000);
         }
 
         void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
@@ -390,12 +389,12 @@ public:
                                         nefarian->setActive(true);
                                         nefarian->SetCanFly(true);
                                         nefarian->SetDisableGravity(true);
-                                        nefarian->CastSpell(nullptr, SPELL_SHADOWFLAME_INITIAL);
                                         nefarian->GetMotionMaster()->MovePath(NEFARIAN_PATH, false);
                                     }
                                     events.CancelEvent(EVENT_MIND_CONTROL);
                                     events.CancelEvent(EVENT_FEAR);
                                     events.CancelEvent(EVENT_SHADOW_BOLT);
+                                    events.CancelEvent(EVENT_SILENCE);
                                     DoCastSelf(SPELL_ROOT_SELF, true);
                                     me->SetVisible(false);
                                     return;
@@ -501,6 +500,11 @@ struct boss_nefarian : public BossAI
         if (id == 3)
         {
             Talk(SAY_INTRO);
+        }
+
+        if (id == 5)
+        {
+            DoCastAOE(SPELL_SHADOWFLAME_INITIAL);
         }
     }
 
@@ -1065,6 +1069,18 @@ enum ShadowblinkRandomSpells
     SPELL_SHADOWBLINK_TRIGGERED_9 = 22676,
 };
 
+std::unordered_map<uint32, const Position> const spellPos = {
+    { SPELL_SHADOWBLINK_TRIGGERED_1, Position(-7581.11f, -1216.19f) },
+    { SPELL_SHADOWBLINK_TRIGGERED_2, Position(-7561.54f, -1244.01f) },
+    { SPELL_SHADOWBLINK_TRIGGERED_3, Position(-7542.47f, -1191.92f) },
+    { SPELL_SHADOWBLINK_TRIGGERED_4, Position(-7538.63f, -1273.64f) },
+    { SPELL_SHADOWBLINK_TRIGGERED_5, Position(-7524.36f, -1219.12f) },
+    { SPELL_SHADOWBLINK_TRIGGERED_6, Position(-7506.58f, -1165.26f) },
+    { SPELL_SHADOWBLINK_TRIGGERED_7, Position(-7500.70f, -1249.89f) },
+    { SPELL_SHADOWBLINK_TRIGGERED_8, Position(-7486.36f, -1194.32f) },
+    { SPELL_SHADOWBLINK_TRIGGERED_9, Position(-7469.93f, -1227.93f) },
+};
+
 class spell_shadowblink : public SpellScript
 {
     PrepareSpellScript(spell_shadowblink);
@@ -1077,14 +1093,30 @@ class spell_shadowblink : public SpellScript
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         Unit* caster = GetCaster();
-        if (!caster)
+        if (!caster || !caster->ToCreature() || !caster->ToCreature()->AI())
         {
             return;
         }
 
-        std::list<uint32> spellList = { SPELL_SHADOWBLINK_TRIGGERED_1, SPELL_SHADOWBLINK_TRIGGERED_2, SPELL_SHADOWBLINK_TRIGGERED_3, SPELL_SHADOWBLINK_TRIGGERED_4, SPELL_SHADOWBLINK_TRIGGERED_5, SPELL_SHADOWBLINK_TRIGGERED_6, SPELL_SHADOWBLINK_TRIGGERED_7, SPELL_SHADOWBLINK_TRIGGERED_8, SPELL_SHADOWBLINK_TRIGGERED_9 };
-        uint32 spellId = Acore::Containers::SelectRandomContainerElement(spellList);
-        caster->CastSpell(caster, spellId, true);
+        Unit* target = caster->ToCreature()->AI()->SelectTarget(SelectTargetMethod::Random, 0, 200.f, true);
+        if (!target)
+        {
+            return;
+        }
+
+        for (auto itr : spellPos)
+        {
+            float distTarget = target->GetDistance2d(itr.second.m_positionX, itr.second.m_positionY);
+            if (distTarget <= 30.f)
+            {
+                caster->CastSpell(caster, itr.first, true);
+                return;
+            }
+        }
+
+        // Selected target is not near any known position, randomize
+        auto spellId = Acore::Containers::SelectRandomContainerElement(spellPos);
+        caster->CastSpell(caster, spellId.first, true);
     }
 
     void Register() override
