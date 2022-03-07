@@ -1,3 +1,19 @@
+-- DB update 2022_03_07_02 -> 2022_03_07_03
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_03_07_02';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_03_07_02 2022_03_07_03 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1646669102474392500'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1646669102474392500');
 
 DELETE FROM `quest_greeting` WHERE `ID` IN
@@ -212,3 +228,13 @@ INSERT INTO `quest_greeting` (`ID`, `Type`, `GreetEmoteType`, `GreetEmoteDelay`,
 (16281, 0, 1, 0, 'The Argent Dawn will turn away none who are willing to sacrifice for our cause.', 0),
 (16787, 0, 66, 0, 'Greetings, $n. If you bring me necrotic stones from the undead invaders, I can give you access to the stores of the Argent Dawn.', 0),
 (16494, 0, 1, 0, 'Good day to you, citizen. Have you come to aid us against the Scourge?', 0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_03_07_03' WHERE sql_rev = '1646669102474392500';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
