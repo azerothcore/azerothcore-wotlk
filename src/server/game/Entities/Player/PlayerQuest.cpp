@@ -149,7 +149,7 @@ void Player::SendPreparedQuest(ObjectGuid guid)
             }
         }
     }
-        // multiple entries
+    // multiple entries
     else
     {
         QEmote qe;
@@ -179,8 +179,8 @@ void Player::SendPreparedQuest(ObjectGuid guid)
 
                     int loc_idx = GetSession()->GetSessionDbLocaleIndex();
                     if (loc_idx >= 0)
-                        if (NpcTextLocale const* nl = sObjectMgr->GetNpcTextLocale(textid))
-                            ObjectMgr::GetLocaleString(nl->Text_0[0], loc_idx, title);
+                        if (NpcTextLocale const* npcTextLocale = sObjectMgr->GetNpcTextLocale(textid))
+                            ObjectMgr::GetLocaleString(npcTextLocale->Text_0[0], loc_idx, title);
                 }
                 else
                 {
@@ -188,11 +188,12 @@ void Player::SendPreparedQuest(ObjectGuid guid)
 
                     int loc_idx = GetSession()->GetSessionDbLocaleIndex();
                     if (loc_idx >= 0)
-                        if (NpcTextLocale const* nl = sObjectMgr->GetNpcTextLocale(textid))
-                            ObjectMgr::GetLocaleString(nl->Text_1[0], loc_idx, title);
+                        if (NpcTextLocale const* npcTextLocale = sObjectMgr->GetNpcTextLocale(textid))
+                            ObjectMgr::GetLocaleString(npcTextLocale->Text_1[0], loc_idx, title);
                 }
             }
         }
+
         PlayerTalkClass->SendQuestGiverQuestList(qe, title, guid);
     }
 }
