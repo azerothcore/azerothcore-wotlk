@@ -23,6 +23,7 @@
 #include "Chat.h"
 #include "Common.h"
 #include "Config.h"
+#include "Containers.h"
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
 #include "GameEventMgr.h"
@@ -5974,7 +5975,6 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
         m->stationery     = fields[6].Get<uint8>();
         m->checked        = fields[7].Get<uint8>();
         m->mailTemplateId = fields[8].Get<int16>();
-        m->auctionId      = fields[9].Get<int32>();
 
         Player* player = nullptr;
         if (serverUp)
@@ -6110,6 +6110,132 @@ void ObjectMgr::LoadQuestAreaTriggers()
 
     LOG_INFO("server.loading", ">> Loaded {} quest trigger points in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
+}
+
+QuestGreeting const* ObjectMgr::GetQuestGreeting(TypeID type, uint32 id) const
+{
+    uint32 typeIndex;
+    if (type == TYPEID_UNIT)
+        typeIndex = 0;
+    else if (type == TYPEID_GAMEOBJECT)
+        typeIndex = 1;
+    else
+        return nullptr;
+
+    return Acore::Containers::MapGetValuePtr(_questGreetingStore[typeIndex], id);
+}
+
+void ObjectMgr::LoadQuestGreetings()
+{
+    uint32 oldMSTime = getMSTime();
+
+    for (std::size_t i = 0; i < _questGreetingStore.size(); ++i)
+        _questGreetingStore[i].clear();
+
+    //                                                0   1          2                3             4
+    QueryResult result = WorldDatabase.Query("SELECT ID, Type, GreetEmoteType, GreetEmoteDelay, Greeting FROM quest_greeting");
+    if (!result)
+    {
+        LOG_INFO("server.loading", ">> Loaded 0 quest greetings. DB table `quest_greeting` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].Get<uint32>();
+        uint8 type = fields[1].Get<uint8>();
+        switch (type)
+        {
+        case 0: // Creature
+            if (!sObjectMgr->GetCreatureTemplate(id))
+            {
+                LOG_ERROR("sql.sql", "Table `quest_greeting`: creature template entry {} does not exist.", id);
+                continue;
+            }
+            break;
+        case 1: // GameObject
+            if (!sObjectMgr->GetGameObjectTemplate(id))
+            {
+                LOG_ERROR("sql.sql", "Table `quest_greeting`: gameobject template entry {} does not exist.", id);
+                continue;
+            }
+            break;
+        default:
+            continue;
+        }
+
+        uint16 greetEmoteType = fields[2].Get<uint16>();
+        uint32 greetEmoteDelay = fields[3].Get<uint32>();
+        std::string greeting = fields[4].Get<std::string>();
+
+        _questGreetingStore[type].emplace(std::piecewise_construct, std::forward_as_tuple(id), std::forward_as_tuple(greetEmoteType, greetEmoteDelay, std::move(greeting)));
+
+        ++count;
+    }
+    while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} quest_greeting in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+void ObjectMgr::LoadQuestGreetingsLocales()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _questGreetingLocaleStore.clear();
+
+    //                                               0     1      2       3
+    QueryResult result = WorldDatabase.Query("SELECT ID, Type, Locale, Greeting FROM quest_greeting_locale");
+    if (!result)
+    {
+        LOG_INFO("server.loading", ">> Loaded 0 quest_greeting locales. DB table `quest_greeting_locale` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].Get<uint32>();
+        uint8 type = fields[1].Get<uint8>();
+        switch (type)
+        {
+        case 0: // Creature
+            if (!sObjectMgr->GetCreatureTemplate(id))
+            {
+                LOG_ERROR("sql.sql", "Table `quest_greeting_locale`: creature template entry {} does not exist.", id);
+                continue;
+            }
+            break;
+        case 1: // GameObject
+            if (!sObjectMgr->GetGameObjectTemplate(id))
+            {
+                LOG_ERROR("sql.sql", "Table `quest_greeting_locale`: gameobject template entry {} does not exist.", id);
+                continue;
+            }
+            break;
+        default:
+            continue;
+        }
+
+        std::string localeName = fields[2].Get<std::string>();
+
+        LocaleConstant locale = GetLocaleByName(localeName);
+        if (locale == LOCALE_enUS)
+            continue;
+
+        QuestGreetingLocale& data = _questGreetingLocaleStore[MAKE_PAIR32(type, id)];
+        AddLocaleString(fields[3].Get<std::string>(), locale, data.Greeting);
+
+        ++count;
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} quest greeting locale strings in {} ms", (uint32)_questGreetingLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
 }
 
 void ObjectMgr::LoadQuestOfferRewardLocale()

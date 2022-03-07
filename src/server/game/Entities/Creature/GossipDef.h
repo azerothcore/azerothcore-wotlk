@@ -20,6 +20,7 @@
 
 #include "Common.h"
 #include "NPCHandler.h"
+#include "Object.h"
 #include "QuestDef.h"
 
 class WorldSession;
@@ -274,7 +275,7 @@ public:
     /*********************************************************/
     void SendQuestGiverStatus(uint8 questStatus, ObjectGuid npcGUID) const;
 
-    void SendQuestGiverQuestList(QEmote const& eEmote, const std::string& Title, ObjectGuid npcGUID);
+    void SendQuestGiverQuestList(QEmote const& eEmote, std::string const& Title, ObjectGuid guid);
 
     void SendQuestQueryResponse(Quest const* quest) const;
     void SendQuestGiverQuestDetails(Quest const* quest, ObjectGuid npcGUID, bool activateAccept) const;
