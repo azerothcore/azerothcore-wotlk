@@ -145,9 +145,17 @@ void BattlegroundAV::HandleKillUnit(Creature* unit, Player* killer)
         DelCreature(AV_CPLACE_TRIGGER18);
     }
     else if (entry == BG_AV_CreatureInfo[AV_NPC_N_MINE_N_4] || entry == BG_AV_CreatureInfo[AV_NPC_N_MINE_A_4] || entry == BG_AV_CreatureInfo[AV_NPC_N_MINE_H_4])
+    {
         ChangeMineOwner(AV_NORTH_MINE, killer->GetTeamId());
+        UpdatePlayerScore(killer, SCORE_MINES_CAPTURED, 1);
+        killer->KilledMonsterCredit(BG_AV_QUEST_CREDIT_MINE);
+    }
     else if (entry == BG_AV_CreatureInfo[AV_NPC_S_MINE_N_4] || entry == BG_AV_CreatureInfo[AV_NPC_S_MINE_A_4] || entry == BG_AV_CreatureInfo[AV_NPC_S_MINE_H_4])
+    {
         ChangeMineOwner(AV_SOUTH_MINE, killer->GetTeamId());
+        UpdatePlayerScore(killer, SCORE_MINES_CAPTURED, 1);
+        killer->KilledMonsterCredit(BG_AV_QUEST_CREDIT_MINE);
+    }
 }
 
 void BattlegroundAV::HandleQuestComplete(uint32 questid, Player* player)
@@ -573,10 +581,7 @@ bool BattlegroundAV::UpdatePlayerScore(Player* player, uint32 type, uint32 value
         case SCORE_TOWERS_DEFENDED:
             player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE, AV_OBJECTIVE_DEFEND_TOWER);
             break;
-        case SCORE_MINES_CAPTURED:
-            break;
         default:
-            Battleground::UpdatePlayerScore(player, type, value, doAddHonor);
             break;
     }
 
@@ -1083,6 +1088,8 @@ void BattlegroundAV::EventPlayerAssaultsPoint(Player* player, uint32 object)
     //update the statistic for the assaulting player
     UpdatePlayerScore(player, (IsTower(node)) ? SCORE_TOWERS_ASSAULTED : SCORE_GRAVEYARDS_ASSAULTED, 1);
     PlaySoundToAll((teamId == TEAM_ALLIANCE) ? AV_SOUND_ALLIANCE_ASSAULTS : AV_SOUND_HORDE_ASSAULTS);
+
+    player->KilledMonsterCredit((IsTower(node)) ? BG_AV_QUEST_CREDIT_TOWER : BG_AV_QUEST_CREDIT_GRAVEYARD);
 }
 
 void BattlegroundAV::FillInitialWorldStates(WorldPacket& data)

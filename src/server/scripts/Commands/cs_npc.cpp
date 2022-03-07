@@ -703,10 +703,11 @@ public:
     static bool HandleNpcMoveCommand(ChatHandler* handler)
     {
         Creature* creature = handler->getSelectedCreature();
-        ObjectGuid::LowType lowguid = creature->GetSpawnId();
 
         if (!creature)
             return false;
+
+        ObjectGuid::LowType lowguid = creature->GetSpawnId();
 
         CreatureData const* data = sObjectMgr->GetCreatureData(lowguid);
         if (!data)

@@ -3400,6 +3400,9 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
             case 44535: // Spirit Heal, abilities also have no cost
                 spellInfo->Effects[EFFECT_0].MiscValue = 127;
                 break;
+            case 45537: // Cosmetic - Lightning Beam Channel
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_IGNORE_EVADE;
+                break;
         }
 
         if (spellInfo->Speed > 0.0f)
