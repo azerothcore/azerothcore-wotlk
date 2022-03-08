@@ -9762,15 +9762,13 @@ uint32 ObjectMgr::GetQuestMoneyReward(uint8 level, uint32 questMoneyDifficulty) 
 
 void ObjectMgr::CleanupItemRefundInstance()
 {
-    LOG_INFO("server.loading", "CleanUp ItemRefundInstance...");
-    //QueryResult refundInstance_result = CharacterDatabase.Query("SELECT guid FROM characters.item_refund_instance");
-    QueryResult refundInstance_result = CharacterDatabase.Query("SELECT COUNT(*) FROM characters.item_refund_instance");
+    QueryResult refundInstance_result = CharacterDatabase.Query("SELECT COUNT(*) FROM item_refund_instance");
     if (refundInstance_result)
     {
         uint32 refundInstance_count = (*refundInstance_result)[0].Get<uint64>();
         if (refundInstance_count > 0)
         {
-            CharacterDatabase.Execute("DELETE FROM characters.item_refund_instance WHERE item_guid NOT IN (SELECT guid FROM characters.item_instance)");
+            CharacterDatabase.Execute("DELETE FROM item_refund_instance WHERE item_guid NOT IN (SELECT guid FROM characters.item_instance)");
         }
     }
     LOG_INFO("server.loading", " ");
