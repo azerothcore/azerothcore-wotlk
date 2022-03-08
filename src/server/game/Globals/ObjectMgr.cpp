@@ -9768,7 +9768,7 @@ void ObjectMgr::CleanupItemRefundInstance()
         uint32 count_broken_items = (*count_broken_items_query)[0].Get<uint64>();
         if (count_broken_items > 0)
         {
-            QueryResult del_items = CharacterDatabase.Query("DELETE FROM item_refund_instance WHERE item_guid NOT IN (SELECT guid FROM item_instance)");
+            CharacterDatabase.Execute("DELETE FROM item_refund_instance WHERE item_guid NOT IN (SELECT guid FROM item_instance)");
             LOG_INFO("server.loading", ">> Removed {} broken items", count_broken_items);
         }
         else
