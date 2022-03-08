@@ -9761,15 +9761,18 @@ uint32 ObjectMgr::GetQuestMoneyReward(uint8 level, uint32 questMoneyDifficulty) 
 }
 
 void ObjectMgr::CleanupItemRefundInstance()
-{
-    QueryResult refundInstance_result = CharacterDatabase.Query("SELECT COUNT(*) FROM item_refund_instance");
-    if (refundInstance_result)
+{    
+    QueryResult count_broken_items_query = CharacterDatabase.Query("SELECT COUNT(*) FROM item_refund_instance WHERE item_guid NOT IN (SELECT guid FROM item_instance)");
+    if (count_broken_items_query)
     {
-        uint32 refundInstance_count = (*refundInstance_result)[0].Get<uint64>();
-        if (refundInstance_count > 0)
+        uint32 count_broken_items = (*count_broken_items_query)[0].Get<uint64>();
+        if (count_broken_items > 0)
         {
-            CharacterDatabase.Execute("DELETE FROM item_refund_instance WHERE item_guid NOT IN (SELECT guid FROM characters.item_instance)");
+            QueryResult del_items = CharacterDatabase.Query("DELETE FROM item_refund_instance WHERE item_guid NOT IN (SELECT guid FROM item_instance)");
+            LOG_INFO("server.loading", ">> Removed {} broken items", count_broken_items);
         }
     }
+    else
+        LOG_INFO("server.loading", ">> Broken items not found");
     LOG_INFO("server.loading", " ");
 }
