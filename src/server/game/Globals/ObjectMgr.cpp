@@ -9771,8 +9771,8 @@ void ObjectMgr::CleanupItemRefundInstance()
             QueryResult del_items = CharacterDatabase.Query("DELETE FROM item_refund_instance WHERE item_guid NOT IN (SELECT guid FROM item_instance)");
             LOG_INFO("server.loading", ">> Removed {} broken items", count_broken_items);
         }
+        else
+            LOG_INFO("server.loading", ">> Broken items not found");
     }
-    else
-        LOG_INFO("server.loading", ">> Broken items not found");
     LOG_INFO("server.loading", " ");
 }
