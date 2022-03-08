@@ -1658,7 +1658,7 @@ void World::SetInitialWorldSettings()
 
     LOG_INFO("server.loading", "Loading Items...");                         // must be after LoadRandomEnchantmentsTable and LoadPageTexts
     sObjectMgr->LoadItemTemplates();
-    
+
     LOG_INFO("server.loading", "CleanUp ItemRefundInstance...");
     sObjectMgr->CleanupItemRefundInstance();
 
