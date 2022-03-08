@@ -9761,7 +9761,7 @@ uint32 ObjectMgr::GetQuestMoneyReward(uint8 level, uint32 questMoneyDifficulty) 
 }
 
 void ObjectMgr::CleanupItemRefundInstance()
-{    
+{
     QueryResult count_broken_items_query = CharacterDatabase.Query("SELECT COUNT(*) FROM item_refund_instance WHERE item_guid NOT IN (SELECT guid FROM item_instance)");
     if (count_broken_items_query)
     {
