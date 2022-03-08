@@ -1255,6 +1255,9 @@ void GameEventMgr::ApplyNewEvent(uint16 event_id)
     // update bg holiday
     UpdateBattlegroundSettings();
 
+    //! Run SAI scripts with SMART_EVENT_GAME_EVENT_START
+    RunSmartAIScripts(event_id, true);
+
     // If event's worldstate is 0, it means the event hasn't been started yet. In that case, reset seasonal quests.
     // When event ends (if it expires or if it's stopped via commands) worldstate will be set to 0 again, ready for another seasonal quest reset.
     if (sWorld->getWorldState(event_id) == 0)
