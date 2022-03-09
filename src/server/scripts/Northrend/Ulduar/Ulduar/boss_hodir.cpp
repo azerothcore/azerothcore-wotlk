@@ -257,11 +257,6 @@ public:
                 go->SetGoState(GO_STATE_ACTIVE);
             }
 
-            if (pInstance && pInstance->GetData(TYPE_HODIR) != DONE)
-            {
-                pInstance->SetData(TYPE_SPAWN_HODIR_CACHE, 0);
-            }
-
             // Reset helpers
             if (!summons.size())
                 SpawnHelpers();
@@ -296,10 +291,13 @@ public:
                 switch (action)
                 {
                     case EVENT_FAIL_HM:
-                        if (GameObject* go = me->FindNearestGameObject(GO_HODIR_CHEST_HARD, 500.0f))
+                        if (pInstance)
                         {
-                            go->SetGoState(GO_STATE_ACTIVE);
-                            events.ScheduleEvent(EVENT_DESPAWN_CHEST, 3000);
+                            if (GameObject* go = pInstance->instance->GetGameObject(pInstance->GetGuidData(GO_HODIR_CHEST_HARD)))
+                            {
+                                go->SetGoState(GO_STATE_ACTIVE);
+                                events.ScheduleEvent(EVENT_DESPAWN_CHEST, 3000);
+                            }
                         }
                         break;
                 }
@@ -425,7 +423,13 @@ public:
                 case EVENT_HARD_MODE_MISSED:
                     {
                         Talk(TEXT_HM_MISS);
-                        me->CastSpell(me->FindNearestGameObject(GO_HODIR_CHEST_HARD, 400.0f), SPELL_SHATTER_CHEST, false);
+                        if (pInstance)
+                        {
+                            if (GameObject* go = pInstance->instance->GetGameObject(pInstance->GetGuidData(GO_HODIR_CHEST_HARD)))
+                            {
+                                me->CastSpell(go, SPELL_SHATTER_CHEST, false);
+                            }
+                        }
                     }
                     break;
                 case EVENT_DESPAWN_CHEST:
@@ -1161,15 +1165,17 @@ public:
     {
         PrepareSpellScript(spell_hodir_shatter_chestSpellScript)
 
-        void destroyWinterCache()
+        void destroyWinterCache(SpellEffIndex effIndex)
         {
+            PreventHitDefaultEffect(effIndex);
+
             if (Unit* hodir = GetCaster())
                 hodir->GetAI()->DoAction(EVENT_FAIL_HM);
         }
 
         void Register() override
         {
-            AfterHit += SpellHitFn(spell_hodir_shatter_chestSpellScript::destroyWinterCache);
+            OnEffectHit += SpellEffectFn(spell_hodir_shatter_chestSpellScript::destroyWinterCache, EFFECT_0, SPELL_EFFECT_TRIGGER_MISSILE);
         };
     };
 

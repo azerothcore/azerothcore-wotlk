@@ -9246,6 +9246,7 @@ void ObjectMgr::LoadBroadcastTextLocales()
         return;
     }
 
+    uint32 locales_count = 0;
     do
     {
         Field* fields = result->Fetch();
@@ -9265,9 +9266,10 @@ void ObjectMgr::LoadBroadcastTextLocales()
 
         AddLocaleString(fields[2].Get<std::string>(), locale, bct->second.MaleText);
         AddLocaleString(fields[3].Get<std::string>(), locale, bct->second.FemaleText);
+        locales_count++;
     } while (result->NextRow());
 
-    LOG_INFO("server.loading", ">> Loaded {} Broadcast Text Locales in {} ms", uint32(_broadcastTextStore.size()), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} Broadcast Text Locales in {} ms", locales_count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
