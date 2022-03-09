@@ -15,18 +15,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef AllPackets_h__
-#define AllPackets_h__
-
 #include "LFGPackets.h"
-#include "BankPackets.h"
-#include "CharacterPackets.h"
-#include "ChatPackets.h"
-#include "PetPackets.h"
-#include "CombatLogPackets.h"
-#include "GuildPackets.h"
-#include "MiscPackets.h"
-#include "TotemPackets.h"
-#include "WorldStatePackets.h"
 
-#endif // AllPackets_h__
+void WorldPackets::LFG::LFGJoin::Read()
+{
+    _worldPacket >> Roles;
+    _worldPacket >> NoPartialClear;
+    _worldPacket >> Achievements;
+    Slots.resize(_worldPacket.read<uint8>());
+    for (uint32& slot : Slots)
+        _worldPacket >> slot;
+
+    _worldPacket.read_skip<uint8>(); // Needs count, hardcoded to 3 in client
+    for (uint8& needs : Needs)
+        _worldPacket >> needs;
+
+    _worldPacket >> Comment;
+}
