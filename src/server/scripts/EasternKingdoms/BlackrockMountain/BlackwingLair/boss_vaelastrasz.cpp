@@ -115,11 +115,6 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/) override
-        {
-            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ESSENCE_OF_THE_RED);
-        }
-
         void EnterCombat(Unit* victim) override
         {
             BossAI::EnterCombat(victim);
