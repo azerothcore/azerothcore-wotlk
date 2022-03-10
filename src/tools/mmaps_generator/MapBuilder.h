@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "IntermediateValues.h"
+#include "Optional.h"
 #include "TerrainBuilder.h"
 
 #include "DetourNavMesh.h"
@@ -72,41 +73,33 @@ namespace MMAP
         rcPolyMeshDetail* dmesh{nullptr};
     };
 
-    class MapBuilder
+    struct TileInfo
+    {
+        TileInfo() : m_mapId(uint32(-1)), m_tileX(), m_tileY(), m_navMeshParams() {}
+
+        uint32 m_mapId;
+        uint32 m_tileX;
+        uint32 m_tileY;
+        dtNavMeshParams m_navMeshParams;
+    };
+
+    // ToDo: move this to its own file. For now it will stay here to keep the changes to a minimum, especially in the cpp file
+    class MapBuilder;
+    class TileBuilder
     {
     public:
-        MapBuilder(float maxWalkableAngle   = 60.f,
-                   bool skipLiquid          = false,
-                   bool skipContinents      = false,
-                   bool skipJunkMaps        = true,
-                   bool skipBattlegrounds   = false,
-                   bool debugOutput         = false,
-                   bool bigBaseUnit         = false,
-                   const char* offMeshFilePath = nullptr);
+        TileBuilder(MapBuilder* mapBuilder,
+                    bool skipLiquid,
+                    bool bigBaseUnit,
+                    bool debugOutput);
 
-        ~MapBuilder();
-
-        // builds all mmap tiles for the specified map id (ignores skip settings)
-        void buildMap(uint32 mapID);
-        void buildMeshFromFile(char* name);
-
-        // builds an mmap tile for the specified map and its mesh
-        void buildSingleTile(uint32 mapID, uint32 tileX, uint32 tileY);
-
-        // builds list of maps, then builds all of mmap tiles (based on the skip settings)
-        void buildAllMaps(unsigned int threads);
+        TileBuilder(TileBuilder&&) = default;
+        ~TileBuilder();
 
         void WorkerThread();
-
-    private:
-        // detect maps and tiles
-        void discoverTiles();
-        std::set<uint32>* getTileList(uint32 mapID);
-
-        void buildNavMesh(uint32 mapID, dtNavMesh*& navMesh);
+        void WaitCompletion();
 
         void buildTile(uint32 mapID, uint32 tileX, uint32 tileY, dtNavMesh* navMesh);
-
         // move map building
         void buildMoveMapTile(uint32 mapID,
                               uint32 tileX,
@@ -116,16 +109,64 @@ namespace MMAP
                               float bmax[3],
                               dtNavMesh* navMesh);
 
+        bool shouldSkipTile(uint32 mapID, uint32 tileX, uint32 tileY) const;
+
+    private:
+        bool m_bigBaseUnit;
+        bool m_debugOutput;
+
+        MapBuilder* m_mapBuilder;
+        TerrainBuilder* m_terrainBuilder;
+        std::thread m_workerThread;
+        // build performance - not really used for now
+        rcContext* m_rcContext;
+    };
+
+    class MapBuilder
+    {
+        friend class TileBuilder;
+
+    public:
+        MapBuilder(float maxWalkableAngle,
+                   bool skipLiquid,
+                   bool skipContinents,
+                   bool skipJunkMaps,
+                   bool skipBattlegrounds ,
+                   bool debugOutput,
+                   bool bigBaseUnit,
+                   int mapid,
+                   const char* offMeshFilePath,
+                   unsigned int threads);
+
+        ~MapBuilder();
+
+        void buildMeshFromFile(char* name);
+
+        // builds an mmap tile for the specified map and its mesh
+        void buildSingleTile(uint32 mapID, uint32 tileX, uint32 tileY);
+
+        // builds list of maps, then builds all of mmap tiles (based on the skip settings)
+        void buildMaps(Optional<uint32> mapID);
+
+    private:
+        // builds all mmap tiles for the specified map id (ignores skip settings)
+        void buildMap(uint32 mapID);
+        // detect maps and tiles
+        void discoverTiles();
+        std::set<uint32>* getTileList(uint32 mapID);
+
+        void buildNavMesh(uint32 mapID, dtNavMesh*& navMesh);
+
         void getTileBounds(uint32 tileX, uint32 tileY,
                            float* verts, int vertCount,
-                           float* bmin, float* bmax);
+                           float* bmin, float* bmax) const;
         void getGridBounds(uint32 mapID, uint32& minX, uint32& minY, uint32& maxX, uint32& maxY) const;
 
-        bool shouldSkipMap(uint32 mapID);
-        bool isTransportMap(uint32 mapID);
-        bool shouldSkipTile(uint32 mapID, uint32 tileX, uint32 tileY);
-        // percentageDone - method to calculate percentage
-        uint32 percentageDone(uint32 totalTiles, uint32 totalTilesDone);
+        bool shouldSkipMap(uint32 mapID) const;
+        bool isTransportMap(uint32 mapID) const;
+
+        uint32 percentageDone(uint32 totalTiles, uint32 totalTilesDone) const;
+        uint32 currentPercentageDone() const;
 
         TerrainBuilder* m_terrainBuilder{nullptr};
         TileList m_tiles;
@@ -133,21 +174,24 @@ namespace MMAP
         bool m_debugOutput;
 
         const char* m_offMeshFilePath;
+        unsigned int m_threads;
         bool m_skipContinents;
         bool m_skipJunkMaps;
         bool m_skipBattlegrounds;
+        bool m_skipLiquid;
 
         float m_maxWalkableAngle;
         bool m_bigBaseUnit;
-        // percentageDone - variables to calculate percentage
+        int32 m_mapid;
+
         std::atomic<uint32> m_totalTiles;
-        std::atomic<uint32> m_totalTilesBuilt;
+        std::atomic<uint32> m_totalTilesProcessed;
 
         // build performance - not really used for now
         rcContext* m_rcContext{nullptr};
 
-        std::vector<std::thread> _workerThreads;
-        ProducerConsumerQueue<uint32> _queue;
+        std::vector<TileBuilder*> m_tileBuilders;
+        ProducerConsumerQueue<TileInfo> _queue;
         std::atomic<bool> _cancelationToken;
     };
 }
