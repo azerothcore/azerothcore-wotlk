@@ -12,14 +12,14 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.character_pet
+-- Дамп структуры для таблица acore_characters.character_pet
 DROP TABLE IF EXISTS `character_pet`;
 CREATE TABLE IF NOT EXISTS `character_pet` (
   `id` INT unsigned NOT NULL DEFAULT 0,
   `entry` INT unsigned NOT NULL DEFAULT 0,
   `owner` INT unsigned NOT NULL DEFAULT 0,
   `modelid` INT unsigned DEFAULT 0,
-  `CreatedBySpell` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `CreatedBySpell` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `PetType` TINYINT unsigned NOT NULL DEFAULT 0,
   `level` SMALLINT unsigned NOT NULL DEFAULT 1,
   `exp` INT unsigned NOT NULL DEFAULT 0,
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS `character_pet` (
   KEY `idx_slot` (`slot`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Pet System';
 
--- Дамп данных таблицы _acore_characters.character_pet: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.character_pet: ~0 rows (приблизительно)
 DELETE FROM `character_pet`;
 /*!40000 ALTER TABLE `character_pet` DISABLE KEYS */;
 /*!40000 ALTER TABLE `character_pet` ENABLE KEYS */;

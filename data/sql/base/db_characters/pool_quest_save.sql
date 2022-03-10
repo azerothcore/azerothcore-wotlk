@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.pool_quest_save
+-- Дамп структуры для таблица acore_characters.pool_quest_save
 DROP TABLE IF EXISTS `pool_quest_save`;
 CREATE TABLE IF NOT EXISTS `pool_quest_save` (
   `pool_id` INT unsigned NOT NULL DEFAULT 0,
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `pool_quest_save` (
   PRIMARY KEY (`pool_id`,`quest_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_characters.pool_quest_save: ~38 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.pool_quest_save: ~38 rows (приблизительно)
 DELETE FROM `pool_quest_save`;
 /*!40000 ALTER TABLE `pool_quest_save` DISABLE KEYS */;
 INSERT INTO `pool_quest_save` (`pool_id`, `quest_id`) VALUES

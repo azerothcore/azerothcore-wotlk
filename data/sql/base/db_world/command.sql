@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.command
+-- Дамп структуры для таблица acore_world.command
 DROP TABLE IF EXISTS `command`;
 CREATE TABLE IF NOT EXISTS `command` (
   `name` varchar(50) NOT NULL DEFAULT '',
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `command` (
   PRIMARY KEY (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Chat System';
 
--- Дамп данных таблицы _acore_world.command: 555 rows
+-- Дамп данных таблицы acore_world.command: 572 rows
 DELETE FROM `command`;
 /*!40000 ALTER TABLE `command` DISABLE KEYS */;
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
@@ -41,7 +41,7 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 	('achievement add', 2, 'Syntax: .achievement add $achievement\nAdd an achievement to the targeted player.\n$achievement: can be either achievement id or achievement link'),
 	('achievement checkall', 3, 'Syntax: .achievement checkall\r\nCheck all achievement criteria of the selected player.'),
 	('additem', 2, 'Syntax: .additem #itemID/[#itemName]/#itemLink #itemCount\r\nAdds the specified item to you or the selected character.\nIf #itemCount is negative, you will remove #itemID.'),
-	('additemset', 2, 'Syntax: .additemset #itemsetid\r\n\r\nAdd items from itemset of id #itemsetid to your or selected character inventory. Will add by one example each item from itemset.'),
+	('additem set', 2, 'Syntax: .additemset #itemsetid\r\n\r\nAdd items from itemset of id #itemsetid to your or selected character inventory. Will add by one example each item from itemset.'),
 	('announce', 2, 'Syntax: .announce $MessageToBroadcast\r\n\r\nSend a global message to all players online in chat log.'),
 	('appear', 1, 'Syntax: .appear [$charactername]\r\n\r\nTeleport to the given character. Either specify the character name or click on the character\'s portrait,e.g. when you are in a group. Character can be offline.'),
 	('arena captain', 3, 'Syntax: .arena captain #TeamID $name\n\nA command to set new captain to the team $name must be in the team'),
@@ -90,7 +90,7 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 	('character deleted restore', 3, 'Syntax: .character deleted restore #guid|$name [$newname] [#new account]\r\n\r\nRestores deleted characters.\r\nIf $name is supplied, only characters with that string in their name will be restored, if $guid is supplied, only the character with that GUID will be restored.\r\nIf $newname is set, the character will be restored with that name instead of the original one. If #newaccount is set, the character will be restored to specific account character list. This works only with one character!'),
 	('character erase', 4, 'Syntax: .character erase $name\r\n\r\nDelete character $name. Character finally deleted in case any deleting options.'),
 	('character level', 2, 'Syntax: .character level [$playername] [#level]\r\n\r\nSet the level of character with $playername (or the selected if not name provided) by #numberoflevels Or +1 if no #numberoflevels provided). If #numberoflevels is omitted, the level will be increase by 1. If #numberoflevels is 0, the same level will be restarted. If no character is selected and name not provided, increase your level. Command can be used for offline character. All stats and dependent values recalculated. At level decrease talents can be reset if need. Also at level decrease equipped items with greater level requirement can be lost.'),
-	('character rename', 2, 'Syntax: .character rename [$name] [reserveName]\r\n\r\nMark the character (selected in-game or with the $name argument) for rename at next login.\r\n\r\nIf [reserveName] is 1 then the player\'s current name is added to the list of reserved names.'),
+	('character rename', 2, 'Syntax: .character rename [$name] [reserveName] [$newName]\r\n\r\nMark selected in game or by $name in command character for rename at next login.\r\n\r\nIf [reserveName] is 1 then the player\'s current name is added to the list of reserved names.\r\nIf [newName] then the player will be forced rename.'),
 	('character reputation', 2, 'Syntax: .character reputation [$player_name]\r\n\r\nShow reputation information for selected player or player find by $player_name.'),
 	('character titles', 2, 'Syntax: .character titles [$player_name]\r\n\r\nShow known titles list for selected player or player find by $player_name.'),
 	('cheat', 2, 'Syntax: .cheat $subcommand\r\nType .cheat to see the list of possible subcommands or .help cheat $subcommand to see info on subcommands'),
@@ -107,7 +107,7 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 	('cooldown', 2, 'Syntax: .cooldown [#spell_id]\r\n\r\nRemove all (if spell_id not provided) or #spel_id spell cooldown from selected character or you (if no selection).'),
 	('damage', 2, 'Syntax: .damage $damage_amount [$school [$spellid]]\r\n\r\nApply $damage to target. If not $school and $spellid provided then this flat clean melee damage without any modifiers. If $school provided then damage modified by armor reduction (if school physical), and target absorbing modifiers and result applied as melee damage to target. If spell provided then damage modified and applied as spell damage. $spellid can be shift-link.'),
 	('debug', 2, 'Syntax: .debug $subcommand\nType .debug to see the list of possible subcommands or .help debug $subcommand to see info on subcommands'),
-	('debug anim', 5, 'TODO'),
+	('debug anim', 3, 'TODO'),
 	('debug areatriggers', 3, 'Syntax: .debug areatriggers\nToggle debug mode for areatriggers. In debug mode GM will be notified if reaching an areatrigger'),
 	('debug arena', 3, 'Syntax: .debug arena\r\n\r\nToggle debug mode for arenas. In debug mode GM can start arena with single player.'),
 	('debug bg', 3, 'Syntax: .debug bg\r\n\r\nToggle debug mode for battlegrounds. In debug mode GM can start battleground with single player.'),
@@ -176,17 +176,16 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 	('gm chat', 2, 'Syntax: .gm chat [on/off]\r\n\r\nEnable or disable chat GM MODE (show gm badge in messages) or show current state of on/off not provided.'),
 	('gm fly', 2, 'Syntax: .gm fly [on/off]\r\nEnable/disable gm fly mode.'),
 	('gm ingame', 0, 'Syntax: .gm ingame\r\n\r\nDisplay a list of available in game Game Masters.'),
-	('gm list', 2, 'Syntax: .gm list\r\n\r\nDisplay a list of all Game Masters accounts and security levels.'),
+	('gm list', 3, 'Syntax: .gm list\r\n\r\nDisplay a list of all Game Masters accounts and security levels.'),
 	('gm visible', 2, 'Syntax: .gm visible on/off\r\n\r\nOutput current visibility state or make GM visible(on) and invisible(off) for other players.'),
 	('gmannounce', 2, 'Syntax: .gmannounce $announcement\r\nSend an announcement to online Gamemasters.'),
 	('gmnameannounce', 2, 'Syntax: .gmnameannounce $announcement.\r\nSend an announcement to all online GM\'s, displaying the name of the sender.'),
 	('gmnotify', 2, 'Syntax: .gmnotify $notification\r\nDisplays a notification on the screen of all online GM\'s.'),
 	('go', 1, 'Syntax: .go $subcommand\nType .go to see the list of possible subcommands or .help go $subcommand to see info on subcommands'),
 	('go creature', 1, 'Syntax: .go creature #creature_guid\r\nTeleport your character to creature with guid #creature_guid.\r\n.gocreature #creature_name\r\nTeleport your character to creature with this name.\r\n.gocreature id #creature_id\r\nTeleport your character to a creature that was spawned from the template with this entry.\r\n*If* more than one creature is found, then you are teleported to the first that is found inside the database.'),
-	('go gobject', 1, 'Syntax: .go object #gameobject_guid\r\nTeleport your character to gameobject with guid #gameobject_guid'),
 	('go graveyard', 1, 'Syntax: .go graveyard #graveyardId\r\n Teleport to graveyard with the graveyardId specified.'),
 	('go grid', 1, 'Syntax: .go grid #gridX #gridY [#mapId]\r\n\r\nTeleport the gm to center of grid with provided indexes at map #mapId (or current map if it not provided).'),
-	('go object', 1, '[DEPRECATED]: use ".go gobject" instead.\r\nSyntax: .go object #object_guid\r\nTeleport your character to gameobject with guid #object_guid'),
+	('inventory', 1, 'Syntax: .inventory $subcommand \nType .inventory to see the list of possible subcommands or .help inventory $subcommand to see info on subcommands'),
 	('go taxinode', 1, 'Syntax: .go taxinode #taxinode\r\n\r\nTeleport player to taxinode coordinates. You can look up zone using .lookup taxinode $namepart'),
 	('go ticket', 2, 'Syntax: .go ticket #ticketid\r\nTeleports the user to the location where $ticketid was created.'),
 	('go trigger', 1, 'Syntax: .go trigger #trigger_id\r\n\r\nTeleport your character to areatrigger with id #trigger_id. Character will be teleported to trigger target if selected areatrigger is telporting trigger.'),
@@ -233,7 +232,7 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 	('instance savedata', 3, 'Syntax: .instance savedata\r\n  Save the InstanceData for the current player\'s map to the DB.'),
 	('instance setbossstate', 2, 'Syntax: .instance setbossstate $bossId $encounterState [$Name]\r\nSets the EncounterState for the given boss id to a new value. EncounterStates range from 0 to 5.\r\nIf no character name is provided, the current map will be used as target.'),
 	('instance unbind', 2, 'Syntax: .instance unbind <mapid|all> [difficulty]\r\n  Clear all/some of player\'s binds'),
-	('itemmove', 2, 'Syntax: .itemmove #sourceslotid #destinationslotid\r\n\r\nMove an item from slots #sourceslotid to #destinationslotid in your inventory\r\n\r\nNot yet implemented'),
+	('item move', 2, 'Syntax: .itemmove #sourceslotid #destinationslotid\r\n\r\nMove an item from slots #sourceslotid to #destinationslotid in your inventory\r\n\r\nNot yet implemented'),
 	('kick', 2, 'Syntax: .kick [$charactername] [$reason]\r\n\r\nKick the given character name from the world with or without reason. If no character name is provided then the selected player (except for yourself) will be kicked. If no reason is provided, default is "No Reason".'),
 	('learn', 2, 'Syntax: .learn #spell [all]\r\n\r\nSelected character learn a spell of id #spell. If \'all\' provided then all ranks learned.'),
 	('learn all', 2, ''),
@@ -258,7 +257,8 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 	('list', 1, 'Syntax: .list $subcommand\nType .list to see the list of possible subcommands or .help list $subcommand to see info on subcommands'),
 	('list auras', 1, 'Syntax: .list auras\nList auras (passive and active) of selected creature or player. If no creature or player is selected, list your own auras.'),
 	('list creature', 1, 'Syntax: .list creature #creature_id [#max_count]\r\n\r\nOutput creatures with creature id #creature_id found in world. Output creature guids and coordinates sorted by distance from character. Will be output maximum #max_count creatures. If #max_count not provided use 10 as default value.'),
-	('list gobject', 1, 'Syntax: .list object #gameobject_id [#max_count]\r\n\r\nOutput gameobjects with gameobject id #gameobject_id found in world. Output gameobject guids and coordinates sorted by distance from character. Will be output maximum #max_count gameobject. If #max_count not provided use 10 as default value.'),
+	('debug play music', 3, 'Syntax: .debug play music <musicId>\nPlay music with <musicId>.\nMusic will be played only for you. Other players will not hear this.'),
+	('debug dummy', 3, 'Syntax: .debug dummy <???>\n\nCatch-all debug command. Does nothing by default. If you want it to do things for testing, add the things to its script in cs_debug.cpp.'),
 	('list item', 1, 'Syntax: .list item #item_id [#max_count]\r\n\r\nOutput items with item id #item_id found in all character inventories, mails, auctions, and guild banks. Output item guids, item owner guid, owner account and owner name (guild name and guid in case guild bank). Will be output maximum #max_count items. If #max_count not provided use 10 as default value.'),
 	('list object', 1, '[DEPRECATED]: use ".list gobject" instead.\r\nSyntax: .go object #object_guid\r\nTeleport your character to gameobject with guid #object_guid'),
 	('lookup', 1, 'Syntax: .lookup $subcommand\nType .lookup to see the list of possible subcommands or .help lookup $subcommand to see info on subcommands'),
@@ -268,7 +268,7 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 	('lookup faction', 1, 'Syntax: .lookup faction $name\r\nAttempts to find the ID of the faction with the provided $name.'),
 	('lookup gobject', 1, 'Syntax: .lookup object $objname\r\n\r\nLooks up an gameobject by $objname, and returns all matches with their Gameobject ID\'s.'),
 	('lookup item', 1, 'Syntax: .lookup item $itemname\r\n\r\nLooks up an item by $itemname, and returns all matches with their Item ID\'s.'),
-	('lookup itemset', 1, 'Syntax: .lookup itemset $itemname\r\n\r\nLooks up an item set by $itemname, and returns all matches with their Item set ID\'s.'),
+	('lookup item set', 1, 'Syntax: .lookup itemset $itemname\r\n\r\nLooks up an item set by $itemname, and returns all matches with their Item set ID\'s.'),
 	('lookup map', 1, 'Syntax: .lookup map $namepart\r\n\r\nLooks up a map by $namepart, and returns all matches with their map ID\'s.'),
 	('lookup object', 1, '[DEPRECATED]: use ".lookup gobject" instead.\r\nSyntax: .go object #object_guid\r\nTeleport your character to gameobject with guid #object_guid'),
 	('lookup player', 2, ''),
@@ -313,7 +313,7 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 	('modify speed fly', 2, '.modify speed fly #rate\nModify the flying speed of the selected player to "normal flying speed"*rate. If no player is selected, modify your speed.\n #rate may range from 0.1 to 50.'),
 	('modify speed swim', 2, 'Syntax: .modify speed swim #rate\r\n\r\nModify the swim speed of the selected player to "normal swim speed"*rate. If no player is selected, modify your speed.\r\n\r\n #rate may range from 0.1 to 50.'),
 	('modify speed walk', 2, 'Syntax: .modify speed bwalk #rate\r\n\r\nModify the speed of the selected player while running to "normal walk speed"*rate. If no player is selected, modify your speed.\r\n\r\n #rate may range from 0.1 to 50.'),
-	('modify spell', 5, 'TODO'),
+	('modify spell', 4, 'TODO'),
 	('modify standstate', 2, 'Syntax: .modify standstate #emoteid\r\n\r\nChange the emote of your character while standing to #emoteid.'),
 	('modify talentpoints', 2, 'Syntax: .modify talentpoints #amount\r\n\r\nSet free talent points for selected character or character\'s pet. It will be reset to default expected at next levelup/login/quest reward.'),
 	('morph', 1, 'Syntax: .morph $subcommand\r\nType .morph to see the list of possible subcommands or ".help morph" to see info on subcommands'),
@@ -341,7 +341,7 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 	('npc playemote', 2, 'Syntax: .npc playemote #emoteid\r\n\r\nMake the selected creature emote with an emote of id #emoteid.'),
 	('npc say', 2, 'Syntax: .npc say $message\nMake selected creature say specified message.'),
 	('npc set', 3, 'Syntax: '),
-	('npc set allowmove', 5, 'Syntax: .npc set allowmove\r\n\r\nEnable or disable movement creatures in world. Not implemented.'),
+	('npc set allowmove', 3, 'Syntax: .npc set allowmove\r\n\r\nEnable or disable movement creatures in world. Not implemented.'),
 	('npc set data', 3, 'Syntax: .npc set data $field $data\nSets data for the selected creature. Used for testing Scripting'),
 	('npc set entry', 3, 'Syntax: .npc set entry $entry\nSwitch selected creature with another entry from creature_template. - New creature.id value not saved to DB.'),
 	('npc set faction original', 3, 'Syntax: .npc set faction original\r\n\r\nRevert the temporal faction of the selected creature.'),
@@ -357,7 +357,7 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 	('npc set wanderdistance', 3, 'Syntax: .npc set wanderdistance #dist\r\n\r\nAdjust wander distance of selected creature to dist.'),
 	('npc tame', 2, 'Syntax: '),
 	('npc textemote', 2, 'Syntax: .npc textemote #emoteid\r\n\r\nMake the selected creature to do textemote with an emote of id #emoteid.'),
-	('npc whisper', 2, 'Syntax: .npc whisper #playerguid #text\r\nMake the selected npc whisper #text to  #playerguid.'),
+	('npc whisper', 2, 'Syntax: .npc whisper #playername #text\r\nMake the selected npc whisper #text to  #playername.'),
 	('npc yell', 2, 'Syntax: .npc yell $message\nMake selected creature yell specified message.'),
 	('pdump', 3, 'Syntax: .pdump $subcommand\nType .pdump to see the list of possible subcommands or .help pdump $subcommand to see info on subcommands'),
 	('pdump load', 3, 'Syntax: .pdump load $filename $account [$newname] [$newguid]\r\nLoad character dump from dump file into character list of $account with saved or $newname, with saved (or first free) or $newguid guid.'),
@@ -550,11 +550,11 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 	('titles set', 2, 'Syntax: '),
 	('titles set mask', 2, 'Syntax: .titles set mask #mask\r\n\r\nAllows user to use all titles from #mask.\r\n\r\n #mask=0 disables the title-choose-field'),
 	('unaura', 2, 'Syntax: .unaura #spellid\r\n\r\nRemove aura due to spell #spellid from the selected Unit.'),
-	('unban', 2, 'Syntax: .unban $subcommand\nType .unban to see the list of possible subcommands or .help unban $subcommand to see info on subcommands'),
-	('unban account', 2, 'Syntax: .unban account $Name\r\nUnban accounts for account name pattern.'),
-	('unban character', 2, 'Syntax: .unban character $Name\r\nUnban accounts for character name pattern.'),
-	('unban ip', 2, 'Syntax : .unban ip $Ip\r\nUnban accounts for IP pattern.'),
-	('unban playeraccount', 4, ''),
+	('unban', 3, 'Syntax: .unban $subcommand\nType .unban to see the list of possible subcommands or .help unban $subcommand to see info on subcommands'),
+	('unban account', 3, 'Syntax: .unban account $Name\r\nUnban accounts for account name pattern.'),
+	('unban character', 3, 'Syntax: .unban character $Name\r\nUnban accounts for character name pattern.'),
+	('unban ip', 3, 'Syntax : .unban ip $Ip\r\nUnban accounts for IP pattern.'),
+	('unban playeraccount', 3, ''),
 	('unbindsight', 3, 'Syntax: .unbindsight\r\n\r\nRemoves bound vision. Cannot be used while currently possessing a target.'),
 	('unfreeze', 2, 'Syntax: .unfreeze (#player)\r\n"Unfreezes" #player and enables his chat again. When using this without #name it will unfreeze your target.'),
 	('unlearn', 2, 'Syntax: .unlearn #spell [all]\r\n\r\nUnlearn for selected player a spell #spell.  If \'all\' provided then all ranks unlearned.'),
@@ -579,7 +579,24 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 	('account set 2fa', 0, 'Syntax: .account set 2fa <account> <secret/off>\nProvide a base32 encoded secret to setup two-factor authentication for the account.\nSpecify \'off\' to disable two-factor authentication for the account.'),
 	('string', 2, 'Syntax: .string #id [#locale]'),
 	('gear stats', 0, 'Syntax: .gear stats'),
-	('debug lfg', 3, 'Syntax: .debug lfg\r\nToggle debug mode for lfg. In debug mode GM can start lfg queue with one player.');
+	('debug lfg', 3, 'Syntax: .debug lfg\r\nToggle debug mode for lfg. In debug mode GM can start lfg queue with one player.'),
+	('bags', 2, 'Syntax: .bags $subcommand \nType .bags to see the list of possible subcommands or .help bags $subcommand to see info on subcommands'),
+	('bags clear', 2, 'Syntax: .bags clear $itemQuality \nClear from players\' bags all items including and below $itemQuality (or all items if used .bags clear all).'),
+	('inventory count', 1, 'Syntax: .inventory count $playerName or $plaerGuid \nCount free slots in bags divided into different bag types.'),
+	('reload player_loot_template', 3, 'Syntax: .reload player_loot_template\nReload player_loot_template table.'),
+	('cache', 1, 'Character data cached during start up.\nType .cache to see a list of subcommands or .help $subcommand to see info on subcommands.'),
+	('cache info', 1, 'Syntax: .cache info $playerName\nDisplays cached data for the selected character.'),
+	('cache delete', 3, 'Syntax: .cache delete $playerName\nDeletes the cached data for the selected character. Use for debugging only!'),
+	('cache refresh', 1, 'Syntax: .cache refresh $playerName\nDeletes the current cache and refreshes it with updated data.'),
+	('teleport name npc id', 2, 'Syntax: .teleport name id #playername #creatureId\nTeleport the given character to first found creature with id #creatureId. Character can be offline.'),
+	('teleport name npc guid', 2, 'Syntax: .teleport name id #playername #creatureSpawnId\nTeleport the given character to creature with spawn id #creatureSpawnId. Character can be offline.'),
+	('teleport name npc name', 2, 'Syntax: .teleport name id #playername #creatureName\nTeleport the given character to first found creature with name (must match exactly) #creatureName. Character can be offline.'),
+	('item restore', 2, 'Syntax: .item restore [#recoveryItemId] [#playername]\r\n\r\nRestore an disposed item for the specified player. Get recoveryId from ".item restore list" command.'),
+	('item restore list', 2, 'Syntax: .item restore list [#playername]\r\n\r\nSee restorable items for the specified player.'),
+	('item refund', 3, 'Syntax: .item refund <name> <item> <extendedCost> \nRemoves the item and restores honor/arena/items according to extended cost.'),
+	('settings', 1, 'Syntax: .settings $subcommand\nType .setting to see the list of all available commands.'),
+	('settings announcer', 1, 'Syntax: .settings announcer <type> <on/off>.\nDisables receiving announcements. Valid announcement types are: \'autobroadcast\', \'arena\' and \'bg\''),
+	('reload creature_movement_override', 3, 'Syntax: .reload creature_movement_override\nReload creature_movement_override table.');
 /*!40000 ALTER TABLE `command` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

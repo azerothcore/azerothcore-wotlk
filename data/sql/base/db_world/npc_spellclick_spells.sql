@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.npc_spellclick_spells
+-- Дамп структуры для таблица acore_world.npc_spellclick_spells
 DROP TABLE IF EXISTS `npc_spellclick_spells`;
 CREATE TABLE IF NOT EXISTS `npc_spellclick_spells` (
   `npc_entry` INT unsigned NOT NULL COMMENT 'reference to creature_template',
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `npc_spellclick_spells` (
   PRIMARY KEY (`npc_entry`,`spell_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.npc_spellclick_spells: 333 rows
+-- Дамп данных таблицы acore_world.npc_spellclick_spells: 333 rows
 DELETE FROM `npc_spellclick_spells`;
 /*!40000 ALTER TABLE `npc_spellclick_spells` DISABLE KEYS */;
 INSERT INTO `npc_spellclick_spells` (`npc_entry`, `spell_id`, `cast_flags`, `user_type`) VALUES

@@ -18,9 +18,11 @@
 #ifndef AllPackets_h__
 #define AllPackets_h__
 
+#include "LFGPackets.h"
 #include "BankPackets.h"
 #include "CharacterPackets.h"
 #include "ChatPackets.h"
+#include "PetPackets.h"
 #include "CombatLogPackets.h"
 #include "GuildPackets.h"
 #include "MiscPackets.h"

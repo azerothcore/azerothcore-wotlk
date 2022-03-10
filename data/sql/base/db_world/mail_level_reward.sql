@@ -12,17 +12,17 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.mail_level_reward
+-- Дамп структуры для таблица acore_world.mail_level_reward
 DROP TABLE IF EXISTS `mail_level_reward`;
 CREATE TABLE IF NOT EXISTS `mail_level_reward` (
   `level` TINYINT unsigned NOT NULL DEFAULT 0,
-  `raceMask` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `mailTemplateId` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `senderEntry` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `raceMask` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `mailTemplateId` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `senderEntry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`level`,`raceMask`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Mail System';
 
--- Дамп данных таблицы _acore_world.mail_level_reward: 24 rows
+-- Дамп данных таблицы acore_world.mail_level_reward: 24 rows
 DELETE FROM `mail_level_reward`;
 /*!40000 ALTER TABLE `mail_level_reward` DISABLE KEYS */;
 INSERT INTO `mail_level_reward` (`level`, `raceMask`, `mailTemplateId`, `senderEntry`) VALUES

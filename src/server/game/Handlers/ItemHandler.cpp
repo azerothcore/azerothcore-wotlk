@@ -889,9 +889,9 @@ void WorldSession::HandleBuybackItem(WorldPacket& recvData)
             if (sWorld->getBoolConfig(CONFIG_ITEMDELETE_VENDOR))
             {
                 CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_RECOVERY_ITEM);
-                stmt->setUInt32(0, _player->GetGUID().GetCounter());
-                stmt->setUInt32(1, pItem->GetEntry());
-                stmt->setUInt32(2, pItem->GetCount());
+                stmt->SetData(0, _player->GetGUID().GetCounter());
+                stmt->SetData(1, pItem->GetEntry());
+                stmt->SetData(2, pItem->GetCount());
                 CharacterDatabase.Execute(stmt);
             }
 
@@ -1299,10 +1299,10 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_GIFT);
-    stmt->setUInt32(0, item->GetOwnerGUID().GetCounter());
-    stmt->setUInt32(1, item->GetGUID().GetCounter());
-    stmt->setUInt32(2, item->GetEntry());
-    stmt->setUInt32(3, item->GetUInt32Value(ITEM_FIELD_FLAGS));
+    stmt->SetData(0, item->GetOwnerGUID().GetCounter());
+    stmt->SetData(1, item->GetGUID().GetCounter());
+    stmt->SetData(2, item->GetEntry());
+    stmt->SetData(3, item->GetUInt32Value(ITEM_FIELD_FLAGS));
     trans->Append(stmt);
 
     item->SetEntry(gift->GetEntry());
@@ -1636,9 +1636,9 @@ bool WorldSession::recoveryItem(Item* pItem)
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_RECOVERY_ITEM);
 
-        stmt->setUInt32(0, pItem->GetOwnerGUID().GetCounter());
-        stmt->setUInt32(1, pItem->GetTemplate()->ItemId);
-        stmt->setUInt32(2, pItem->GetCount());
+        stmt->SetData(0, pItem->GetOwnerGUID().GetCounter());
+        stmt->SetData(1, pItem->GetTemplate()->ItemId);
+        stmt->SetData(2, pItem->GetCount());
 
         CharacterDatabase.Query(stmt);
 

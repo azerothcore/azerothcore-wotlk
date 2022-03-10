@@ -134,7 +134,7 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket& recvData)
         // pussywizard: exploit fix, can't share quests that give items to be sold
         if (object->GetTypeId() == TYPEID_PLAYER)
             if (uint32 itemId = quest->GetSrcItemId())
-                if (const ItemTemplate* srcItem = sObjectMgr->GetItemTemplate(itemId))
+                if (ItemTemplate const* srcItem = sObjectMgr->GetItemTemplate(itemId))
                     if (srcItem->SellPrice > 0)
                         return;
 
@@ -432,8 +432,8 @@ void WorldSession::HandleQuestLogRemoveQuest(WorldPacket& recvData)
             {
                 // prepare Quest Tracker datas
                 auto stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_QUEST_TRACK_ABANDON_TIME);
-                stmt->setUInt32(0, questId);
-                stmt->setUInt32(1, _player->GetGUID().GetCounter());
+                stmt->SetData(0, questId);
+                stmt->SetData(1, _player->GetGUID().GetCounter());
 
                 // add to Quest Tracker
                 CharacterDatabase.Execute(stmt);
@@ -470,7 +470,7 @@ void WorldSession::HandleQuestConfirmAccept(WorldPacket& recvData)
 
         // pussywizard: exploit fix, can't share quests that give items to be sold
         if (uint32 itemId = quest->GetSrcItemId())
-            if (const ItemTemplate* srcItem = sObjectMgr->GetItemTemplate(itemId))
+            if (ItemTemplate const* srcItem = sObjectMgr->GetItemTemplate(itemId))
                 if (srcItem->SellPrice > 0)
                     return;
 

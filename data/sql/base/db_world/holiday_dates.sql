@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.holiday_dates
+-- Дамп структуры для таблица acore_world.holiday_dates
 DROP TABLE IF EXISTS `holiday_dates`;
 CREATE TABLE IF NOT EXISTS `holiday_dates` (
   `id` INT unsigned NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `holiday_dates` (
   PRIMARY KEY (`id`,`date_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- Дамп данных таблицы _acore_world.holiday_dates: ~156 rows (приблизительно)
+-- Дамп данных таблицы acore_world.holiday_dates: ~156 rows (приблизительно)
 DELETE FROM `holiday_dates`;
 /*!40000 ALTER TABLE `holiday_dates` DISABLE KEYS */;
 INSERT INTO `holiday_dates` (`id`, `date_id`, `date_value`, `holiday_duration`) VALUES

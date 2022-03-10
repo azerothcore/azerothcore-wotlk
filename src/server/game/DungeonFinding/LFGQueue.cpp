@@ -407,7 +407,7 @@ namespace lfg
         }
 
         proposal.queues = strGuids;
-        proposal.isNew = numLfgGroups != 1 || sLFGMgr->GetOldState(proposal.group) != LFG_STATE_DUNGEON;
+        proposal.isNew = numLfgGroups != 1;
 
         if (!sLFGMgr->AllQueued(check)) // can't create proposal
             return LFG_COMPATIBILITY_PENDING;

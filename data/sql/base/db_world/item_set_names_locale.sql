@@ -12,17 +12,17 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.item_set_names_locale
+-- Дамп структуры для таблица acore_world.item_set_names_locale
 DROP TABLE IF EXISTS `item_set_names_locale`;
 CREATE TABLE IF NOT EXISTS `item_set_names_locale` (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `locale` varchar(4) NOT NULL,
   `Name` text DEFAULT NULL,
   `VerifiedBuild` SMALLINT DEFAULT 0,
   PRIMARY KEY (`ID`,`locale`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
 
--- Дамп данных таблицы _acore_world.item_set_names_locale: 14 850 rows
+-- Дамп данных таблицы acore_world.item_set_names_locale: 14 850 rows
 DELETE FROM `item_set_names_locale`;
 /*!40000 ALTER TABLE `item_set_names_locale` DISABLE KEYS */;
 INSERT INTO `item_set_names_locale` (`ID`, `locale`, `Name`, `VerifiedBuild`) VALUES

@@ -16,6 +16,7 @@
  */
 
 #include "CreatureAI.h"
+#include "EventMap.h"
 #include "InstanceScript.h"
 #include "Player.h"
 #include "ScriptMgr.h"

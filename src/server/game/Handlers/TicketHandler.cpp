@@ -227,10 +227,10 @@ void WorldSession::HandleGMSurveySubmit(WorldPacket& recv_data)
             continue;
 
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_GM_SUBSURVEY);
-        stmt->setUInt32(0, nextSurveyID);
-        stmt->setUInt32(1, subSurveyId);
-        stmt->setUInt32(2, rank);
-        stmt->setString(3, comment);
+        stmt->SetData(0, nextSurveyID);
+        stmt->SetData(1, subSurveyId);
+        stmt->SetData(2, rank);
+        stmt->SetData(3, comment);
         trans->Append(stmt);
     }
 
@@ -243,10 +243,10 @@ void WorldSession::HandleGMSurveySubmit(WorldPacket& recv_data)
     }
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_GM_SURVEY);
-    stmt->setUInt32(0, GetPlayer()->GetGUID().GetCounter());
-    stmt->setUInt32(1, nextSurveyID);
-    stmt->setUInt32(2, mainSurvey);
-    stmt->setString(3, comment);
+    stmt->SetData(0, GetPlayer()->GetGUID().GetCounter());
+    stmt->SetData(1, nextSurveyID);
+    stmt->SetData(2, mainSurvey);
+    stmt->SetData(3, comment);
 
     trans->Append(stmt);
 
@@ -266,14 +266,14 @@ void WorldSession::HandleReportLag(WorldPacket& recv_data)
     recv_data >> z;
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_LAG_REPORT);
-    stmt->setUInt32(0, GetPlayer()->GetGUID().GetCounter());
-    stmt->setUInt8 (1, lagType);
-    stmt->setUInt16(2, mapId);
-    stmt->setFloat (3, x);
-    stmt->setFloat (4, y);
-    stmt->setFloat (5, z);
-    stmt->setUInt32(6, GetLatency());
-    stmt->setUInt32(7, GameTime::GetGameTime().count());
+    stmt->SetData(0, GetPlayer()->GetGUID().GetCounter());
+    stmt->SetData (1, lagType);
+    stmt->SetData(2, mapId);
+    stmt->SetData (3, x);
+    stmt->SetData (4, y);
+    stmt->SetData (5, z);
+    stmt->SetData(6, GetLatency());
+    stmt->SetData(7, GameTime::GetGameTime().count());
     CharacterDatabase.Execute(stmt);
 }
 

@@ -12,15 +12,15 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.spell_custom_attr
+-- Дамп структуры для таблица acore_world.spell_custom_attr
 DROP TABLE IF EXISTS `spell_custom_attr`;
 CREATE TABLE IF NOT EXISTS `spell_custom_attr` (
-  `spell_id` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'spell id',
+  `spell_id` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'spell id',
   `attributes` INT unsigned NOT NULL DEFAULT 0 COMMENT 'SpellCustomAttributes',
   PRIMARY KEY (`spell_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='SpellInfo custom attributes';
 
--- Дамп данных таблицы _acore_world.spell_custom_attr: 255 rows
+-- Дамп данных таблицы acore_world.spell_custom_attr: 256 rows
 DELETE FROM `spell_custom_attr`;
 /*!40000 ALTER TABLE `spell_custom_attr` DISABLE KEYS */;
 INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
@@ -278,7 +278,8 @@ INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
 	(33946, 100663296),
 	(27130, 100663296),
 	(10170, 100663296),
-	(57874, 12288);
+	(57874, 12288),
+	(46619, 16777216);
 /*!40000 ALTER TABLE `spell_custom_attr` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

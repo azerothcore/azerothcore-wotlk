@@ -126,7 +126,7 @@ bool RASession::CheckAccessLevel(const std::string& user)
     Utf8ToUpperOnlyLatin(safeUser);
 
     auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_ACCESS);
-    stmt->setString(0, safeUser);
+    stmt->SetData(0, safeUser);
 
     PreparedQueryResult result = LoginDatabase.Query(stmt);
     if (!result)
@@ -137,12 +137,12 @@ bool RASession::CheckAccessLevel(const std::string& user)
 
     Field* fields = result->Fetch();
 
-    if (fields[1].GetUInt8() < sConfigMgr->GetOption<int32>("Ra.MinLevel", 3))
+    if (fields[1].Get<uint8>() < sConfigMgr->GetOption<int32>("Ra.MinLevel", 3))
     {
         LOG_INFO("commands.ra", "User {} has no privilege to login", user);
         return false;
     }
-    else if (fields[2].GetInt32() != -1)
+    else if (fields[2].Get<int32>() != -1)
     {
         LOG_INFO("commands.ra", "User {} has to be assigned on all realms (with RealmID = '-1')", user);
         return false;
@@ -163,12 +163,12 @@ bool RASession::CheckPassword(const std::string& user, const std::string& pass)
 
     auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_CHECK_PASSWORD_BY_NAME);
 
-    stmt->setString(0, safe_user);
+    stmt->SetData(0, safe_user);
 
     if (PreparedQueryResult result = LoginDatabase.Query(stmt))
     {
-        Acore::Crypto::SRP6::Salt salt = (*result)[0].GetBinary<Acore::Crypto::SRP6::SALT_LENGTH>();
-        Acore::Crypto::SRP6::Verifier verifier = (*result)[1].GetBinary<Acore::Crypto::SRP6::VERIFIER_LENGTH>();
+        Acore::Crypto::SRP6::Salt salt = (*result)[0].Get<Binary, Acore::Crypto::SRP6::SALT_LENGTH>();
+        Acore::Crypto::SRP6::Verifier verifier = (*result)[1].Get<Binary, Acore::Crypto::SRP6::VERIFIER_LENGTH>();
 
         if (Acore::Crypto::SRP6::CheckLogin(safe_user, safe_pass, salt, verifier))
             return true;

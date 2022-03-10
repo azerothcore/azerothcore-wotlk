@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.channels_rights
+-- Дамп структуры для таблица acore_characters.channels_rights
 DROP TABLE IF EXISTS `channels_rights`;
 CREATE TABLE IF NOT EXISTS `channels_rights` (
   `name` varchar(128) NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `channels_rights` (
   PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_characters.channels_rights: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.channels_rights: ~0 rows (приблизительно)
 DELETE FROM `channels_rights`;
 /*!40000 ALTER TABLE `channels_rights` DISABLE KEYS */;
 /*!40000 ALTER TABLE `channels_rights` ENABLE KEYS */;

@@ -222,11 +222,11 @@ void GameEventMgr::StopEvent(uint16 event_id, bool overwrite)
 
             CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ALL_GAME_EVENT_CONDITION_SAVE);
-            stmt->setUInt8(0, uint8(event_id));
+            stmt->SetData(0, uint8(event_id));
             trans->Append(stmt);
 
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GAME_EVENT_SAVE);
-            stmt->setUInt8(0, uint8(event_id));
+            stmt->SetData(0, uint8(event_id));
             trans->Append(stmt);
 
             CharacterDatabase.CommitTransaction(trans);
@@ -256,7 +256,7 @@ void GameEventMgr::LoadFromDB()
         {
             Field* fields = result->Fetch();
 
-            uint8 event_id = fields[0].GetUInt8();
+            uint8 event_id = fields[0].Get<uint8>();
             if (event_id == 0)
             {
                 LOG_ERROR("sql.sql", "`game_event` game event entry 0 is reserved and can't be used.");
@@ -264,21 +264,21 @@ void GameEventMgr::LoadFromDB()
             }
 
             GameEventData& pGameEvent = mGameEvent[event_id];
-            pGameEvent.eventId      = fields[0].GetUInt32();
-            uint64 starttime        = fields[1].GetUInt64();
+            pGameEvent.eventId      = fields[0].Get<uint32>();
+            uint64 starttime        = fields[1].Get<uint64>();
             pGameEvent.start        = time_t(starttime);
-            uint64 endtime          = fields[2].GetUInt64();
+            uint64 endtime          = fields[2].Get<uint64>();
             if (fields[2].IsNull())
                 endtime             = GameTime::GetGameTime().count() + 63072000; // add 2 years to current date
             pGameEvent.end          = time_t(endtime);
-            pGameEvent.occurence    = fields[3].GetUInt64();
-            pGameEvent.length       = fields[4].GetUInt64();
-            pGameEvent.holiday_id   = HolidayIds(fields[5].GetUInt32());
+            pGameEvent.occurence    = fields[3].Get<uint64>();
+            pGameEvent.length       = fields[4].Get<uint64>();
+            pGameEvent.holiday_id   = HolidayIds(fields[5].Get<uint32>());
 
-            pGameEvent.holidayStage = fields[6].GetUInt8();
-            pGameEvent.description  = fields[7].GetString();
-            pGameEvent.state        = (GameEventState)(fields[8].GetUInt8());
-            pGameEvent.announce     = fields[9].GetUInt8();
+            pGameEvent.holidayStage = fields[6].Get<uint8>();
+            pGameEvent.description  = fields[7].Get<std::string>();
+            pGameEvent.state        = (GameEventState)(fields[8].Get<uint8>());
+            pGameEvent.announce     = fields[9].Get<uint8>();
             pGameEvent.nextstart    = 0;
 
             ++count;
@@ -324,7 +324,7 @@ void GameEventMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                uint8 event_id = fields[0].GetUInt8();
+                uint8 event_id = fields[0].Get<uint8>();
 
                 if (event_id >= mGameEvent.size())
                 {
@@ -334,8 +334,8 @@ void GameEventMgr::LoadFromDB()
 
                 if (mGameEvent[event_id].state != GAMEEVENT_NORMAL && mGameEvent[event_id].state != GAMEEVENT_INTERNAL)
                 {
-                    mGameEvent[event_id].state = (GameEventState)(fields[1].GetUInt8());
-                    mGameEvent[event_id].nextstart    = time_t(fields[2].GetUInt32());
+                    mGameEvent[event_id].state = (GameEventState)(fields[1].Get<uint8>());
+                    mGameEvent[event_id].nextstart    = time_t(fields[2].Get<uint32>());
                 }
                 else
                 {
@@ -369,7 +369,7 @@ void GameEventMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                uint16 event_id = fields[0].GetUInt8();
+                uint16 event_id = fields[0].Get<uint8>();
 
                 if (event_id >= mGameEvent.size())
                 {
@@ -379,7 +379,7 @@ void GameEventMgr::LoadFromDB()
 
                 if (mGameEvent[event_id].state != GAMEEVENT_NORMAL && mGameEvent[event_id].state != GAMEEVENT_INTERNAL)
                 {
-                    uint16 prerequisite_event = fields[1].GetUInt32();
+                    uint16 prerequisite_event = fields[1].Get<uint32>();
                     if (prerequisite_event >= mGameEvent.size())
                     {
                         LOG_ERROR("sql.sql", "`game_event_prerequisite` game event prerequisite id ({}) is out of range compared to max event id in `game_event`", prerequisite_event);
@@ -420,8 +420,8 @@ void GameEventMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                ObjectGuid::LowType guid = fields[0].GetUInt32();
-                int16 event_id = fields[1].GetInt8();
+                ObjectGuid::LowType guid = fields[0].Get<uint32>();
+                int16 event_id = fields[1].Get<int8>();
 
                 CreatureData const* data = sObjectMgr->GetCreatureData(guid);
                 if (!data)
@@ -468,8 +468,8 @@ void GameEventMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                ObjectGuid::LowType guid = fields[0].GetUInt32();
-                int16 event_id = fields[1].GetInt8();
+                ObjectGuid::LowType guid = fields[0].Get<uint32>();
+                int16 event_id = fields[1].Get<int8>();
 
                 int32 internal_event_id = mGameEvent.size() + event_id - 1;
 
@@ -517,11 +517,11 @@ void GameEventMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                ObjectGuid::LowType guid = fields[0].GetUInt32();
-                uint32 entry = fields[1].GetUInt32();
-                uint32 entry2 = fields[2].GetUInt32();
-                uint32 entry3 = fields[3].GetUInt32();
-                uint16 event_id = fields[4].GetUInt8();
+                ObjectGuid::LowType guid = fields[0].Get<uint32>();
+                uint32 entry = fields[1].Get<uint32>();
+                uint32 entry2 = fields[2].Get<uint32>();
+                uint32 entry3 = fields[3].Get<uint32>();
+                uint16 event_id = fields[4].Get<uint8>();
 
                 if (event_id >= mGameEventModelEquip.size())
                 {
@@ -531,8 +531,8 @@ void GameEventMgr::LoadFromDB()
 
                 ModelEquipList& equiplist = mGameEventModelEquip[event_id];
                 ModelEquip newModelEquipSet;
-                newModelEquipSet.modelid = fields[5].GetUInt32();
-                newModelEquipSet.equipment_id = fields[6].GetUInt8();
+                newModelEquipSet.modelid = fields[5].Get<uint32>();
+                newModelEquipSet.equipment_id = fields[6].Get<uint8>();
                 newModelEquipSet.equipement_id_prev = 0;
                 newModelEquipSet.modelid_prev = 0;
 
@@ -576,9 +576,9 @@ void GameEventMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                uint32 id       = fields[0].GetUInt32();
-                uint32 quest    = fields[1].GetUInt32();
-                uint16 event_id = fields[2].GetUInt8();
+                uint32 id       = fields[0].Get<uint32>();
+                uint32 quest    = fields[1].Get<uint32>();
+                uint16 event_id = fields[2].Get<uint8>();
 
                 if (event_id >= mGameEventCreatureQuests.size())
                 {
@@ -616,9 +616,9 @@ void GameEventMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                uint32 id       = fields[0].GetUInt32();
-                uint32 quest    = fields[1].GetUInt32();
-                uint16 event_id = fields[2].GetUInt8();
+                uint32 id       = fields[0].Get<uint32>();
+                uint32 quest    = fields[1].Get<uint32>();
+                uint16 event_id = fields[2].Get<uint8>();
 
                 if (event_id >= mGameEventGameObjectQuests.size())
                 {
@@ -656,10 +656,10 @@ void GameEventMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                uint32 quest     = fields[0].GetUInt32();
-                uint16 event_id  = fields[1].GetUInt8();
-                uint32 condition = fields[2].GetUInt32();
-                float num       = fields[3].GetFloat();
+                uint32 quest     = fields[0].Get<uint32>();
+                uint16 event_id  = fields[1].Get<uint8>();
+                uint32 condition = fields[2].Get<uint32>();
+                float num       = fields[3].Get<float>();
 
                 if (event_id >= mGameEvent.size())
                 {
@@ -698,8 +698,8 @@ void GameEventMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                uint16 event_id  = fields[0].GetUInt8();
-                uint32 condition = fields[1].GetUInt32();
+                uint16 event_id  = fields[0].Get<uint8>();
+                uint32 condition = fields[1].Get<uint32>();
 
                 if (event_id >= mGameEvent.size())
                 {
@@ -707,10 +707,10 @@ void GameEventMgr::LoadFromDB()
                     continue;
                 }
 
-                mGameEvent[event_id].conditions[condition].reqNum = fields[2].GetFloat();
+                mGameEvent[event_id].conditions[condition].reqNum = fields[2].Get<float>();
                 mGameEvent[event_id].conditions[condition].done = 0;
-                mGameEvent[event_id].conditions[condition].max_world_state = fields[3].GetUInt16();
-                mGameEvent[event_id].conditions[condition].done_world_state = fields[4].GetUInt16();
+                mGameEvent[event_id].conditions[condition].max_world_state = fields[3].Get<uint16>();
+                mGameEvent[event_id].conditions[condition].done_world_state = fields[4].Get<uint16>();
 
                 ++count;
             } while (result->NextRow());
@@ -739,8 +739,8 @@ void GameEventMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                uint16 event_id  = fields[0].GetUInt8();
-                uint32 condition = fields[1].GetUInt32();
+                uint16 event_id  = fields[0].Get<uint8>();
+                uint32 condition = fields[1].Get<uint32>();
 
                 if (event_id >= mGameEvent.size())
                 {
@@ -751,7 +751,7 @@ void GameEventMgr::LoadFromDB()
                 GameEventConditionMap::iterator itr = mGameEvent[event_id].conditions.find(condition);
                 if (itr != mGameEvent[event_id].conditions.end())
                 {
-                    itr->second.done = fields[2].GetFloat();
+                    itr->second.done = fields[2].Get<float>();
                 }
                 else
                 {
@@ -786,9 +786,9 @@ void GameEventMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                ObjectGuid::LowType guid = fields[0].GetUInt32();
-                uint16 event_id = fields[1].GetUInt8();
-                uint32 npcflag = fields[2].GetUInt32();
+                ObjectGuid::LowType guid = fields[0].Get<uint32>();
+                uint16 event_id = fields[1].Get<uint8>();
+                uint32 npcflag = fields[2].Get<uint32>();
 
                 if (event_id >= mGameEvent.size())
                 {
@@ -825,8 +825,8 @@ void GameEventMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                uint32 questId  = fields[0].GetUInt32();
-                uint32 eventEntry = fields[1].GetUInt32(); // TODO: Change to uint8
+                uint32 questId  = fields[0].Get<uint32>();
+                uint32 eventEntry = fields[1].Get<uint32>(); // TODO: Change to uint8
 
                 Quest* questTemplate = const_cast<Quest*>(sObjectMgr->GetQuestTemplate(questId));
 
@@ -871,7 +871,7 @@ void GameEventMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                uint8 event_id  = fields[0].GetUInt8();
+                uint8 event_id  = fields[0].Get<uint8>();
 
                 if (event_id >= mGameEventVendors.size())
                 {
@@ -881,11 +881,11 @@ void GameEventMgr::LoadFromDB()
 
                 NPCVendorList& vendors = mGameEventVendors[event_id];
                 NPCVendorEntry newEntry;
-                ObjectGuid::LowType guid = fields[1].GetUInt32();
-                newEntry.item = fields[2].GetUInt32();
-                newEntry.maxcount = fields[3].GetUInt32();
-                newEntry.incrtime = fields[4].GetUInt32();
-                newEntry.ExtendedCost = fields[5].GetUInt32();
+                ObjectGuid::LowType guid = fields[1].Get<uint32>();
+                newEntry.item = fields[2].Get<uint32>();
+                newEntry.maxcount = fields[3].Get<uint32>();
+                newEntry.incrtime = fields[4].Get<uint32>();
+                newEntry.ExtendedCost = fields[5].Get<uint32>();
                 // get the event npc flag for checking if the npc will be vendor during the event or not
                 uint32 event_npc_flag = 0;
                 NPCFlagList& flist = mGameEventNPCFlags[event_id];
@@ -936,7 +936,7 @@ void GameEventMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                uint16 event_id = fields[0].GetUInt8();
+                uint16 event_id = fields[0].Get<uint8>();
 
                 if (event_id >= mGameEvent.size())
                 {
@@ -944,7 +944,7 @@ void GameEventMgr::LoadFromDB()
                     continue;
                 }
 
-                mGameEventBattlegroundHolidays[event_id] = fields[1].GetUInt32();
+                mGameEventBattlegroundHolidays[event_id] = fields[1].Get<uint32>();
 
                 ++count;
             } while (result->NextRow());
@@ -974,8 +974,8 @@ void GameEventMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                uint32 entry   = fields[0].GetUInt32();
-                int16 event_id = fields[1].GetInt8();
+                uint32 entry   = fields[0].Get<uint32>();
+                int16 event_id = fields[1].Get<int8>();
 
                 int32 internal_event_id = mGameEvent.size() + event_id - 1;
 
@@ -1021,7 +1021,7 @@ void GameEventMgr::LoadHolidayDates()
     {
         Field* fields = result->Fetch();
 
-        uint32 holidayId = fields[0].GetUInt32();
+        uint32 holidayId = fields[0].Get<uint32>();
         HolidaysEntry* entry = const_cast<HolidaysEntry*>(sHolidaysStore.LookupEntry(holidayId));
         if (!entry)
         {
@@ -1029,15 +1029,15 @@ void GameEventMgr::LoadHolidayDates()
             continue;
         }
 
-        uint8 dateId = fields[1].GetUInt8();
+        uint8 dateId = fields[1].Get<uint8>();
         if (dateId >= MAX_HOLIDAY_DATES)
         {
             LOG_ERROR("sql.sql", "holiday_dates entry has out of range date_id {}.", dateId);
             continue;
         }
-        entry->Date[dateId] = fields[2].GetUInt32();
+        entry->Date[dateId] = fields[2].Get<uint32>();
 
-        if (uint32 duration = fields[3].GetUInt32())
+        if (uint32 duration = fields[3].Get<uint32>())
             entry->Duration[0] = duration;
 
         auto itr = std::lower_bound(modifiedHolidays.begin(), modifiedHolidays.end(), entry->Id);
@@ -1074,7 +1074,7 @@ void GameEventMgr::Initialize()
     {
         Field* fields = result->Fetch();
 
-        uint32 maxEventId = fields[0].GetUInt8();
+        uint32 maxEventId = fields[0].Get<uint8>();
 
         // Id starts with 1 and vector with 0, thus increment
         maxEventId++;
@@ -1103,7 +1103,7 @@ uint32 GameEventMgr::StartSystem()                           // return the next 
 void GameEventMgr::StartArenaSeason()
 {
     uint8 season = sWorld->getIntConfig(CONFIG_ARENA_SEASON_ID);
-    QueryResult result = WorldDatabase.PQuery("SELECT eventEntry FROM game_event_arena_seasons WHERE season = '%i'", season);
+    QueryResult result = WorldDatabase.Query("SELECT eventEntry FROM game_event_arena_seasons WHERE season = '{}'", season);
 
     if (!result)
     {
@@ -1112,7 +1112,7 @@ void GameEventMgr::StartArenaSeason()
     }
 
     Field* fields = result->Fetch();
-    uint16 eventId = fields[0].GetUInt8();
+    uint16 eventId = fields[0].Get<uint8>();
 
     if (eventId >= mGameEvent.size())
     {
@@ -1136,6 +1136,9 @@ uint32 GameEventMgr::Update()                               // return the next e
         // must do the activating first, and after that the deactivating
         // so first queue it
         //LOG_ERROR("sql.sql", "Checking event {}", itr);
+
+        sScriptMgr->OnGameEventCheck(itr);
+
         if (CheckOneGameEvent(itr))
         {
             // if the world event is in NEXTPHASE state, and the time has passed to finish this event, then do so
@@ -1232,9 +1235,6 @@ void GameEventMgr::ApplyNewEvent(uint16 event_id)
 
     LOG_DEBUG("gameevent", "GameEvent {} \"{}\" started.", event_id, mGameEvent[event_id].description);
 
-    //! Run SAI scripts with SMART_EVENT_GAME_EVENT_END
-    RunSmartAIScripts(event_id, true);
-
     // spawn positive event tagget objects
     GameEventSpawn(event_id);
     // un-spawn negative event tagged objects
@@ -1251,6 +1251,9 @@ void GameEventMgr::ApplyNewEvent(uint16 event_id)
     UpdateEventNPCVendor(event_id, true);
     // update bg holiday
     UpdateBattlegroundSettings();
+
+    //! Run SAI scripts with SMART_EVENT_GAME_EVENT_START
+    RunSmartAIScripts(event_id, true);
 
     // If event's worldstate is 0, it means the event hasn't been started yet. In that case, reset seasonal quests.
     // When event ends (if it expires or if it's stopped via commands) worldstate will be set to 0 again, ready for another seasonal quest reset.
@@ -1687,14 +1690,14 @@ void GameEventMgr::HandleQuestComplete(uint32 quest_id)
                 CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
                 CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GAME_EVENT_CONDITION_SAVE);
-                stmt->setUInt8(0, uint8(event_id));
-                stmt->setUInt32(1, condition);
+                stmt->SetData(0, uint8(event_id));
+                stmt->SetData(1, condition);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_GAME_EVENT_CONDITION_SAVE);
-                stmt->setUInt8(0, uint8(event_id));
-                stmt->setUInt32(1, condition);
-                stmt->setFloat(2, citr->second.done);
+                stmt->SetData(0, uint8(event_id));
+                stmt->SetData(1, condition);
+                stmt->SetData(2, citr->second.done);
                 trans->Append(stmt);
                 CharacterDatabase.CommitTransaction(trans);
                 // check if all conditions are met, if so, update the event state
@@ -1732,13 +1735,13 @@ void GameEventMgr::SaveWorldEventStateToDB(uint16 event_id)
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GAME_EVENT_SAVE);
-    stmt->setUInt8(0, uint8(event_id));
+    stmt->SetData(0, uint8(event_id));
     trans->Append(stmt);
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_GAME_EVENT_SAVE);
-    stmt->setUInt8(0, uint8(event_id));
-    stmt->setUInt8(1, mGameEvent[event_id].state);
-    stmt->setUInt32(2, mGameEvent[event_id].nextstart ? uint32(mGameEvent[event_id].nextstart) : 0);
+    stmt->SetData(0, uint8(event_id));
+    stmt->SetData(1, mGameEvent[event_id].state);
+    stmt->SetData(2, mGameEvent[event_id].nextstart ? uint32(mGameEvent[event_id].nextstart) : 0);
     trans->Append(stmt);
     CharacterDatabase.CommitTransaction(trans);
 }
