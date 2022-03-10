@@ -99,7 +99,6 @@ public:
         {
             _Reset();
             me->SetHealth(me->CountPctFromMaxHealth(30));
-            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ESSENCE_OF_THE_RED);
 
             if (!_introDone)
             {
