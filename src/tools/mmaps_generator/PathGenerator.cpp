@@ -62,7 +62,8 @@ bool handleArgs(int argc, char** argv,
                 int& mapnum,
                 int& tileX,
                 int& tileY,
-                float& maxAngle,
+                Optional<float>& maxAngle,
+                Optional<float>& maxAngleNotSteep,
                 bool& skipLiquid,
                 bool& skipContinents,
                 bool& skipJunkMaps,
@@ -84,10 +85,22 @@ bool handleArgs(int argc, char** argv,
                 return false;
 
             float maxangle = atof(param);
-            if (maxangle <= 90.f && maxangle >= 45.f)
+            if (maxangle <= 90.f && maxangle >= 0.f)
                 maxAngle = maxangle;
             else
                 printf("invalid option for '--maxAngle', using default\n");
+        }
+        else if (strcmp(argv[i], "--maxAngleNotSteep") == 0)
+        {
+            param = argv[++i];
+            if (!param)
+                return false;
+
+            float maxangle = atof(param);
+            if (maxangle <= 90.f && maxangle >= 0.f)
+                maxAngleNotSteep = maxangle;
+            else
+                printf("invalid option for '--maxAngleNotSteep', using default\n");
         }
         else if (strcmp(argv[i], "--threads") == 0)
         {
@@ -242,8 +255,8 @@ int main(int argc, char** argv)
 {
     unsigned int threads = std::thread::hardware_concurrency();
     int mapnum = -1;
-    float maxAngle = 60.0f;
     int tileX = -1, tileY = -1;
+    Optional<float> maxAngle, maxAngleNotSteep;
     bool skipLiquid = false,
          skipContinents = false,
          skipJunkMaps = true,
@@ -255,7 +268,7 @@ int main(int argc, char** argv)
     char* file = nullptr;
 
     bool validParam = handleArgs(argc, argv, mapnum,
-                                 tileX, tileY, maxAngle,
+                                 tileX, tileY, maxAngle, maxAngleNotSteep,
                                  skipLiquid, skipContinents, skipJunkMaps, skipBattlegrounds,
                                  debugOutput, silent, bigBaseUnit, offMeshInputPath, file, threads);
 
@@ -277,7 +290,7 @@ int main(int argc, char** argv)
     if (!checkDirectories(debugOutput))
         return silent ? -3 : finish("Press ENTER to close...", -3);
 
-    MapBuilder builder(maxAngle, skipLiquid, skipContinents, skipJunkMaps,
+    MapBuilder builder(maxAngle, maxAngleNotSteep, skipLiquid, skipContinents, skipJunkMaps,
                        skipBattlegrounds, debugOutput, bigBaseUnit, offMeshInputPath);
 
     uint32 start = getMSTime();
