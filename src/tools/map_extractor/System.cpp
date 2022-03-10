@@ -843,7 +843,11 @@ bool ConvertADT(std::string const& inputPath, std::string const& outputPath, int
                 else
                 {
                     liquid_height[y][x] = CONF_use_minHeight;
-                    if (minHeight > CONF_use_minHeight) minHeight = CONF_use_minHeight;
+
+                    if (minHeight > CONF_use_minHeight)
+                    {
+                        minHeight = CONF_use_minHeight;
+                    }
                 }
             }
         }
