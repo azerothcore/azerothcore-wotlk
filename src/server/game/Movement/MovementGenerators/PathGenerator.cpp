@@ -641,12 +641,12 @@ void PathGenerator::CreateFilter()
 
         // creatures don't take environmental damage
         if (creature->CanEnterWater())
-            includeFlags |= (NAV_WATER | NAV_MAGMA);
+            includeFlags |= (NAV_WATER | NAV_MAGMA_SLIME);
     }
     else // assume Player
     {
         // perfect support not possible, just stay 'safe'
-        includeFlags |= (NAV_GROUND | NAV_WATER | NAV_MAGMA);
+        includeFlags |= (NAV_GROUND | NAV_WATER | NAV_MAGMA_SLIME);
     }
 
     _filter.setIncludeFlags(includeFlags);
@@ -671,13 +671,17 @@ void PathGenerator::UpdateFilter()
             _filter.setIncludeFlags(includedFlags);
         }
 
-        /*if (Creature const* _sourceCreature = _source->ToCreature())
+        if (Creature const* _sourceCreature = _source->ToCreature())
+        {
             if (_sourceCreature->IsInCombat() || _sourceCreature->IsInEvadeMode())
-                _filter.setIncludeFlags(_filter.getIncludeFlags() | NAV_GROUND_STEEP);*/
+            {
+                _filter.setIncludeFlags(_filter.getIncludeFlags() | NAV_GROUND_STEEP);
+            }
+        }
     }
 }
 
-NavTerrain PathGenerator::GetNavTerrain(float x, float y, float z) const
+NavTerrainFlag PathGenerator::GetNavTerrain(float x, float y, float z) const
 {
     LiquidData data;
     LiquidData const& liquidData = _source->GetMap()->GetLiquidData(_source->GetPhaseMask(), x, y, z, _source->GetCollisionHeight(), MAP_ALL_LIQUIDS);
@@ -691,7 +695,7 @@ NavTerrain PathGenerator::GetNavTerrain(float x, float y, float z) const
             return NAV_WATER;
         case MAP_LIQUID_TYPE_MAGMA:
         case MAP_LIQUID_TYPE_SLIME:
-            return NAV_MAGMA;
+            return NAV_MAGMA_SLIME;
         default:
             return NAV_GROUND;
     }
@@ -1141,9 +1145,9 @@ bool PathGenerator::IsWaterPath(Movement::PointsArray pathPoints) const
     // Check both start and end points, if they're both in water, then we can *safely* let the creature move
     for (uint32 i = 0; i < pathPoints.size(); ++i)
     {
-        NavTerrain terrain = GetNavTerrain(pathPoints[i].x, pathPoints[i].y, pathPoints[i].z);
+        NavTerrainFlag terrain = GetNavTerrain(pathPoints[i].x, pathPoints[i].y, pathPoints[i].z);
         // One of the points is not in the water
-        if (terrain != NAV_MAGMA && terrain != NAV_WATER)
+        if (terrain != NAV_MAGMA_SLIME && terrain != NAV_WATER)
         {
             waterPath = false;
             break;
