@@ -38,7 +38,10 @@ enum Spells
     SPELL_CLEAVE            = 19632,
     SPELL_WARSTOMP          = 24375,
     SPELL_FIREBALLVOLLEY    = 22425,
-    SPELL_CONFLAGRATION     = 23023
+    SPELL_CONFLAGRATION     = 23023,
+
+    SPELL_EXPLODE_ORB       = 20037,
+    SPELL_EXPLOSION         = 20038 // Instakill everything.
 };
 
 enum Summons
@@ -68,11 +71,11 @@ public:
     struct boss_razorgoreAI : public BossAI
     {
         boss_razorgoreAI(Creature* creature) : BossAI(creature, DATA_RAZORGORE_THE_UNTAMED) { }
-
+        bool died;
         void Reset() override
         {
             _Reset();
-
+            died = false;
             _charmerGUID.Clear();
             secondPhase = false;
             instance->SetData(DATA_EGG_EVENT, NOT_STARTED);
@@ -80,7 +83,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            _JustDied();
+            //_JustDied();
             Talk(SAY_DEATH);
         }
 
@@ -140,10 +143,14 @@ public:
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (!secondPhase && damage >= me->GetHealth())
+            if (!secondPhase && damage >= me->GetHealth() && !died)
             {
-                damage = me->GetHealth() - 1;
-                EnterEvadeMode();
+                died = true;
+                DoCastAOE(SPELL_EXPLODE_ORB);
+                DoCastAOE(SPELL_EXPLOSION);
+                me->SetCorpseRemoveTime(25);
+                me->SetRespawnTime(30);
+                me->SaveRespawnTime();
             }
         }
 
