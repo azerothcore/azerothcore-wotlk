@@ -105,12 +105,6 @@ enum GameObjects
 
 enum Creatures
 {
-    NPC_BRONZE_DRAKANOID       = 14263,
-    NPC_BLUE_DRAKANOID         = 14261,
-    NPC_RED_DRAKANOID          = 14264,
-    NPC_GREEN_DRAKANOID        = 14262,
-    NPC_BLACK_DRAKANOID        = 14265,
-    NPC_CHROMATIC_DRAKANOID    = 14302,
     NPC_BONE_CONSTRUCT         = 14605,
     NPC_TOTEM_C_FIRE_NOVA      = 14662,
     NPC_TOTEM_C_STONESKIN      = 14663,
@@ -175,7 +169,7 @@ Position const DrakeSpawnLoc[2] = // drakonid
 
 Position const NefarianSpawn = { -7348.849f, -1495.134f, 552.5152f, 1.798f };
 
-uint32 const Entry[5] = {NPC_BRONZE_DRAKANOID, NPC_BLUE_DRAKANOID, NPC_RED_DRAKANOID, NPC_GREEN_DRAKANOID, NPC_BLACK_DRAKANOID};
+uint32 const Entry[5] = {NPC_BRONZE_DRAKONID, NPC_BLUE_DRAKONID, NPC_RED_DRAKONID, NPC_GREEN_DRAKONID, NPC_BLACK_DRAKONID};
 
 class boss_victor_nefarius : public CreatureScript
 {
@@ -373,7 +367,7 @@ public:
                             {
                                 uint32 CreatureID;
                                 if (urand(0, 2) == 0)
-                                    CreatureID = NPC_CHROMATIC_DRAKANOID;
+                                    CreatureID = NPC_CHROMATIC_DRAKONID;
                                 else
                                     CreatureID = Entry[urand(0, 4)];
                                 if (Creature* dragon = me->SummonCreature(CreatureID, DrakeSpawnLoc[i]))
@@ -725,12 +719,12 @@ struct npc_corrupted_totem : public ScriptedAI
         std::vector<uint32> mobsEntries;
         mobsEntries.push_back(NPC_NEFARIAN);
         mobsEntries.push_back(NPC_BONE_CONSTRUCT);
-        mobsEntries.push_back(NPC_BRONZE_DRAKANOID);
-        mobsEntries.push_back(NPC_BLUE_DRAKANOID);
-        mobsEntries.push_back(NPC_RED_DRAKANOID);
-        mobsEntries.push_back(NPC_GREEN_DRAKANOID);
-        mobsEntries.push_back(NPC_BLACK_DRAKANOID);
-        mobsEntries.push_back(NPC_CHROMATIC_DRAKANOID);
+        mobsEntries.push_back(NPC_BRONZE_DRAKONID);
+        mobsEntries.push_back(NPC_BLUE_DRAKONID);
+        mobsEntries.push_back(NPC_RED_DRAKONID);
+        mobsEntries.push_back(NPC_GREEN_DRAKONID);
+        mobsEntries.push_back(NPC_BLACK_DRAKONID);
+        mobsEntries.push_back(NPC_CHROMATIC_DRAKONID);
 
         for (auto& entry : mobsEntries)
         {
@@ -827,6 +821,35 @@ struct npc_corrupted_totem : public ScriptedAI
     protected:
         TaskScheduler _scheduler;
         bool _auraAdded;
+};
+
+struct npc_drakonid_spawner : public ScriptedAI
+{
+    npc_drakonid_spawner(Creature* creature) : ScriptedAI(creature)
+    {
+        canSpawnMobs = false;
+    }
+
+    void Reset() override
+    {
+
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!canSpawnMobs)
+        {
+            return;
+        }
+
+        if (urand(0, 3)) // 33% chance of spawning a Chromatic Drakonid
+        {
+            DoCastSelf(123123);
+        }
+    }
+
+protected:
+    bool canSpawnMobs;
 };
 
 std::unordered_map<uint32, uint8> const classCallSpells =
@@ -1130,6 +1153,7 @@ void AddSC_boss_nefarian()
     new boss_victor_nefarius();
     RegisterCreatureAI(boss_nefarian);
     RegisterCreatureAI(npc_corrupted_totem);
+    RegisterCreatureAI(npc_drakonid_spawner);
     RegisterSpellScript(spell_class_call_handler);
     RegisterSpellScript(aura_class_call_wild_magic);
     RegisterSpellScript(aura_class_call_siphon_blessing);

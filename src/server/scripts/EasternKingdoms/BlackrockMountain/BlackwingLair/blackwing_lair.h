@@ -59,7 +59,21 @@ enum BWLCreatureIds
     NPC_FLAMEGOR                = 11981,
     NPC_CHROMAGGUS              = 14020,
     NPC_VICTOR_NEFARIUS         = 10162,
-    NPC_NEFARIAN                = 11583
+    NPC_NEFARIAN                = 11583,
+
+    // Nefarian fight
+    NPC_BLACK_SPAWNER           = 14307,
+    NPC_RED_SPAWNER             = 14309,
+    NPC_GREEN_SPAWNER           = 14310,
+    NPC_BRONZE_SPAWNER          = 14311,
+    NPC_BLUE_SPAWNER            = 14312,
+
+    NPC_BRONZE_DRAKONID         = 14263,
+    NPC_BLUE_DRAKONID           = 14261,
+    NPC_RED_DRAKONID            = 14264,
+    NPC_GREEN_DRAKONID          = 14262,
+    NPC_BLACK_DRAKONID          = 14265,
+    NPC_CHROMATIC_DRAKONID      = 14302
 };
 
 enum BWLGameObjectIds
@@ -90,7 +104,10 @@ enum BWLMisc
     DATA_EGG_EVENT              = 2,
     TALK_EGG_BROKEN_RAND        = 3,
 
-    SAY_NEFARIAN_VAEL_INTRO     = 14
+    SAY_NEFARIAN_VAEL_INTRO     = 14,
+
+    DATA_NEFARIAN_LEFT_TUNNEL   = 15,
+    DATA_NEFARIAN_RIGHT_TUNNEL  = 16
 };
 
 template <class AI, class T>

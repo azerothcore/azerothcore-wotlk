@@ -68,6 +68,15 @@ public:
             SetBossNumber(EncounterCount);
             LoadDoorData(doorData);
             //LoadObjectData(creatureData, gameObjectData);
+
+            // Victor Nefarius weekly mechanic drakonid spawnç
+            // Pick 2 drakonids and keep them for the whole save duration (the drakonids can't be repeated).
+            std::vector<uint32> nefarianDrakonidSpawners = { NPC_BLACK_SPAWNER, NPC_BLUE_SPAWNER, NPC_BRONZE_SPAWNER, NPC_GREEN_SPAWNER, NPC_RED_SPAWNER };
+            NefarianRightTunnel = Acore::Containers::SelectRandomContainerElement(nefarianDrakonidSpawners);
+            // delete the previous picked one so we don't get any repeated.
+            std::erase(nefarianDrakonidSpawners, NefarianRightTunnel);
+            // Pick another one
+            NefarianLeftTunnel = Acore::Containers::SelectRandomContainerElement(nefarianDrakonidSpawners);
         }
 
         void Initialize() override
@@ -341,6 +350,10 @@ public:
         uint8 EggCount;
         uint32 EggEvent;
         GuidList EggList;
+
+        // Nefarian
+        uint32 NefarianLeftTunnel;
+        uint32 NefarianRightTunnel;
 
         // Misc
         EventMap _events;
