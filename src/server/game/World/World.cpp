@@ -62,6 +62,7 @@
 #include "MMapFactory.h"
 #include "MapMgr.h"
 #include "Metric.h"
+#include "M2Stores.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "OutdoorPvPMgr.h"
@@ -1529,6 +1530,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Initialize data stores...");
     LoadDBCStores(m_dataPath);
     DetectDBCLang();
+
+    // Load cinematic cameras
+    LoadM2Cameras(m_dataPath);
 
     // Load IP Location Database
     sIPLocation->Load();
