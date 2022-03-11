@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "BattlegroundAV.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 
@@ -57,11 +56,6 @@ enum Events
     EVENT_WHIRLWIND            = 4,
     EVENT_ENRAGE               = 5,
     EVENT_CHECK_RESET          = 6
-};
-
-enum Factions
-{
-    FACTION_AV_ALLIANCE = 1534
 };
 
 struct SpellPair
