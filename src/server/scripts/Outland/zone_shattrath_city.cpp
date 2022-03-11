@@ -226,7 +226,7 @@ public:
             // Aldor vendor
             if (creature->IsVendor() && (((player->GetReputationRank(932) == REP_EXALTED) && (player->GetReputationRank(935) == REP_EXALTED) && (player->GetReputationRank(942) == REP_EXALTED)) || player->IsGameMaster()))
             {
-                AddGossipItemFor(player, 9733, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+                AddGossipItemFor(player, GOSSIP_TEXT_BROWSE_GOODS, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
                 SendGossipMenuFor(player, 11085, creature->GetGUID());
             }
             else
@@ -240,7 +240,7 @@ public:
             // Scryers vendor
             if (creature->IsVendor() && (((player->GetReputationRank(934) == REP_EXALTED) && (player->GetReputationRank(935) == REP_EXALTED) && (player->GetReputationRank(942) == REP_EXALTED)) || player->IsGameMaster()))
             {
-                AddGossipItemFor(player, 9733, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+                AddGossipItemFor(player, GOSSIP_TEXT_BROWSE_GOODS, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
                 SendGossipMenuFor(player, 11085, creature->GetGUID());
             }
             else
