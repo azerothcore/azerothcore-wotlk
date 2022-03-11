@@ -15,19 +15,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef AllPackets_h__
-#define AllPackets_h__
+#ifndef CombatPackets_h__
+#define CombatPackets_h__
 
-#include "LFGPackets.h"
-#include "BankPackets.h"
-#include "CharacterPackets.h"
-#include "ChatPackets.h"
-#include "PetPackets.h"
-#include "CombatLogPackets.h"
-#include "CombatPackets.h"
-#include "GuildPackets.h"
-#include "MiscPackets.h"
-#include "TotemPackets.h"
-#include "WorldStatePackets.h"
+#include "Packet.h"
+#include "ObjectGuid.h"
 
-#endif // AllPackets_h__
+namespace WorldPackets
+{
+    namespace Combat
+    {
+        class SetSheathed final : public ClientPacket
+        {
+        public:
+            SetSheathed(WorldPacket&& packet) : ClientPacket(CMSG_SET_SHEATHED, std::move(packet)) { }
+
+            void Read() override;
+
+            uint32 CurrentSheathState = 0;
+        };
+    }
+}
+
+#endif // CombatPackets_h__
