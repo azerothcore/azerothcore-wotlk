@@ -102,8 +102,7 @@ void WardenCheckMgr::LoadWardenChecks()
             wardenCheck.Length = length;
         }
 
-        // PROC_CHECK support missing
-        if (checkType == MEM_CHECK || checkType == MPQ_CHECK || checkType == LUA_EVAL_CHECK || checkType == DRIVER_CHECK || checkType == MODULE_CHECK)
+        if (checkType == MEM_CHECK || checkType == MPQ_CHECK || checkType == LUA_EVAL_CHECK || checkType == DRIVER_CHECK || checkType == MODULE_CHECK || checkType == PROC_CHECK)
         {
             wardenCheck.Str = str;
         }
@@ -146,7 +145,7 @@ void WardenCheckMgr::LoadWardenChecks()
             }
             default:
             {
-                if (checkType == PAGE_CHECK_A || checkType == PAGE_CHECK_B || checkType == DRIVER_CHECK)
+                if (checkType == PAGE_CHECK_A || checkType == PAGE_CHECK_B || checkType == DRIVER_CHECK || checkType == PROC_CHECK)
                     wardenCheck.Data.SetHexStr(data.c_str());
 
                 CheckIdPool[WARDEN_CHECK_OTHER_TYPE].push_back(id);

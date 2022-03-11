@@ -45,6 +45,7 @@ static constexpr uint8 GetCheckPacketBaseSize(uint8 type)
     switch (type)
     {
     case DRIVER_CHECK:
+    case PROC_CHECK:
     case MPQ_CHECK: return 1;
     case LUA_EVAL_CHECK: return 1 + sizeof(_luaEvalPrefix) - 1 + sizeof(_luaEvalMidfix) - 1 + 4 + sizeof(_luaEvalPostfix) - 1;
     case PAGE_CHECK_A: return (4 + 1);
@@ -361,6 +362,7 @@ void WardenWin::RequestChecks()
             }
             case MPQ_CHECK:
             case DRIVER_CHECK:
+            case PROC_CHECK:
             {
                 buff << uint8(check->Str.size());
                 buff.append(check->Str.c_str(), check->Str.size());
@@ -419,15 +421,18 @@ void WardenWin::RequestChecks()
                 buff.append(Acore::Crypto::HMAC_SHA1::GetDigestOf(seed, check->Str));
                 break;
             }
-            /*case PROC_CHECK:
+            case PROC_CHECK:
             {
-                buff.append(wd->i.AsByteArray(0, false).get(), wd->i.GetNumBytes());
+                std::vector<uint8> data = check->Data.ToByteVector(24, false);
+                buff.append(data.data(), data.size());
                 buff << uint8(index++);
                 buff << uint8(index++);
-                buff << uint32(wd->Address);
-                buff << uint8(wd->Length);
+                buff << uint32(check->Address);
+                buff << uint8(check->Length);
                 break;
-            }*/
+            }
+            default:
+                break;                                      // Should never happen
         }
     }
     buff << uint8(xorByte);
@@ -541,6 +546,7 @@ void WardenWin::HandleData(ByteBuffer& buff)
             case PAGE_CHECK_A:
             case PAGE_CHECK_B:
             case DRIVER_CHECK:
+            case PROC_CHECK:
             case MODULE_CHECK:
                 {
                     const uint8 byte = 0xE9;
@@ -554,6 +560,10 @@ void WardenWin::HandleData(ByteBuffer& buff)
 
                         if (type == DRIVER_CHECK)
                             LOG_DEBUG("warden", "RESULT DRIVER_CHECK fail, CheckId {} account Id {}", checkId, _session->GetAccountId());
+
+                        if (type == PROC_CHECK)
+                            LOG_DEBUG("warden", "RESULT PROC_CHECK fail, CheckId {} account Id {}", checkId, _session->GetAccountId());
+
                         checkFailed = checkId;
                         buff.rpos(buff.rpos() + 1);
                         continue;
@@ -567,6 +577,8 @@ void WardenWin::HandleData(ByteBuffer& buff)
                         LOG_DEBUG("warden", "RESULT MODULE_CHECK passed CheckId {} account Id {}", checkId, _session->GetAccountId());
                     else if (type == DRIVER_CHECK)
                         LOG_DEBUG("warden", "RESULT DRIVER_CHECK passed CheckId {} account Id {}", checkId, _session->GetAccountId());
+                    else if (type == PROC_CHECK)
+                        LOG_DEBUG("warden", "RESULT PROC_CHECK passed CheckId {} account Id {}", checkId, _session->GetAccountId());
                 break;
             }
             case LUA_EVAL_CHECK:
