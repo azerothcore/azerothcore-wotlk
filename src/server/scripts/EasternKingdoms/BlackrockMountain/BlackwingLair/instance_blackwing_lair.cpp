@@ -90,9 +90,7 @@ public:
                     chromaggusGUID = creature->GetGUID();
                     break;
                 case NPC_BLACKWING_DRAGON:
-                case NPC_BLACKWING_TASKMASTER:
                 case NPC_BLACKWING_LEGIONAIRE:
-                case NPC_BLACKWING_WARLOCK:
                 case NPC_BLACKWING_MAGE:
                     if (Creature* razor = instance->GetCreature(razorgoreGUID))
                         if (CreatureAI* razorAI = razor->AI())
