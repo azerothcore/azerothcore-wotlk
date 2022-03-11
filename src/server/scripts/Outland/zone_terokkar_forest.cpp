@@ -848,7 +848,7 @@ public:
     {
         if (creature->IsVendor() && (player->GetReputationRank(FACTION_CONSORTIUM) >= REP_FRIENDLY) || player->IsGameMaster())
         {
-            AddGossipItemFor(player, 9733, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+            AddGossipItemFor(player, GOSSIP_TEXT_BROWSE_GOODS, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
             SendGossipMenuFor(player, 9896, creature->GetGUID());
         }
         else

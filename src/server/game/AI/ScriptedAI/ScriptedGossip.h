@@ -21,6 +21,12 @@
 #include "GossipDef.h"
 #include "QuestDef.h"
 
+enum GossipItemText
+{
+    GOSSIP_TEXT_BROWSE_GOODS = 9733,    // "I'd like to browse your goods."
+    GOSSIP_TEXT_TRAIN        = 0        // "Train me!"
+};
+
 enum eTradeskill
 {
     // Skill defines
