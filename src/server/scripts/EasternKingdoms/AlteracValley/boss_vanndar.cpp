@@ -78,7 +78,7 @@ public:
                     {
                         if (Creature* marshall = bg->GetBGCreature(i))
                         {
-                            if (marshall->IsAIEnabled && !marshall->IsInCombat())
+                            if (marshall->IsAIEnabled && !marshall->GetVictim())
                             {
                                 marshall->AI()->AttackStart(victim);
                             }
