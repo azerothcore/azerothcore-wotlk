@@ -9131,8 +9131,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
         case 14189: // Seal Fate (Netherblade set)
         case 14157: // Ruthlessness
             {
-                if (!victim || victim == this)
-                    return false;
+                victim = nullptr;
                 // Need add combopoint AFTER finish movie (or they dropped in finish phase)
                 break;
             }
