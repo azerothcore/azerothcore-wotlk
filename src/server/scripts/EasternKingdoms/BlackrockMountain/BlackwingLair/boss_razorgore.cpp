@@ -78,6 +78,7 @@ public:
             _died = false;
             _charmerGUID.Clear();
             secondPhase = false;
+            summons.DespawnAll();
             instance->SetData(DATA_EGG_EVENT, NOT_STARTED);
         }
 
@@ -85,7 +86,7 @@ public:
         {
             if (secondPhase)
             {
-                instance->SetBossState(DATA_RAZORGORE_THE_UNTAMED, DONE);
+                _JustDied();
             }
         }
 
@@ -153,12 +154,16 @@ public:
                 Talk(SAY_DEATH);
                 DoCastAOE(SPELL_EXPLODE_ORB);
                 DoCastAOE(SPELL_EXPLOSION);
+
+                // Respawn shorty in case of failure during phase 1.
                 me->SetCorpseRemoveTime(25);
                 me->SetRespawnTime(30);
                 me->SaveRespawnTime();
 
                 // Might not be required, safe measure.
                 me->SetLootRecipient(nullptr);
+
+                instance->SetData(DATA_EGG_EVENT, FAIL);
             }
         }
 

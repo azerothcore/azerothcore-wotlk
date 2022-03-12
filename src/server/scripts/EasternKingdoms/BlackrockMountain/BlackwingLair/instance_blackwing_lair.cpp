@@ -109,6 +109,22 @@ public:
             }
         }
 
+        void OnUnitDeath(Unit* unit) override
+        {
+            //! HACK, needed because of buggy CreatureAI after charm
+            if (EggEvent == DONE)
+            {
+                if (unit->GetEntry() == NPC_RAZORGORE && GetBossState(DATA_RAZORGORE_THE_UNTAMED) != DONE)
+                {
+                    SetBossState(DATA_RAZORGORE_THE_UNTAMED, DONE);
+                }
+            }
+            else
+            {
+                _events.CancelEvent(EVENT_RAZOR_SPAWN);
+            }
+        }
+
         void OnGameObjectCreate(GameObject* go) override
         {
             InstanceScript::OnGameObjectCreate(go);
@@ -125,7 +141,6 @@ public:
                         EggList.push_back(go->GetGUID());
                     }
                     break;
-
                 case GO_PORTCULLIS_RAZORGORE:
                 case GO_PORTCULLIS_VAELASTRASZ:
                 case GO_PORTCULLIS_BROODLORD:
@@ -205,6 +220,8 @@ public:
                     {
                         for (ObjectGuid const& guid : EggList)
                         {
+                            // Eggs should be destroyed instead
+                            // @todo: after dynamic spawns
                             if (GameObject* egg = instance->GetGameObject(guid))
                             {
                                 egg->SetPhaseMask(2, true);
@@ -309,10 +326,18 @@ public:
                 switch (eventId)
                 {
                     case EVENT_RAZOR_SPAWN:
-                        for (uint8 i = urand(2, 5); i > 0; --i)
-                            if (Creature* summon = instance->SummonCreature(Entry[urand(0, 2)], SummonPosition[urand(0, 7)]))
-                                summon->AI()->DoZoneInCombat();
-                        _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 12000, 17000);
+                        if (EggEvent == IN_PROGRESS)
+                        {
+                            for (uint8 i = urand(2, 5); i > 0; --i)
+                            {
+                                if (Creature* summon = instance->SummonCreature(Entry[urand(0, 2)], SummonPosition[urand(0, 7)]))
+                                {
+                                    summon->AI()->DoZoneInCombat();
+                                }
+                            }
+
+                            _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 12000, 17000);
+                        }
                         break;
                     case EVENT_RAZOR_PHASE_TWO:
                         _events.CancelEvent(EVENT_RAZOR_SPAWN);
