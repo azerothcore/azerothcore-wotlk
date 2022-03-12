@@ -71,11 +71,11 @@ public:
     struct boss_razorgoreAI : public BossAI
     {
         boss_razorgoreAI(Creature* creature) : BossAI(creature, DATA_RAZORGORE_THE_UNTAMED) { }
-        bool died;
+
         void Reset() override
         {
             _Reset();
-            died = false;
+            _died = false;
             _charmerGUID.Clear();
             secondPhase = false;
             instance->SetData(DATA_EGG_EVENT, NOT_STARTED);
@@ -143,9 +143,11 @@ public:
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (!secondPhase && damage >= me->GetHealth() && !died)
+            if (!secondPhase && damage >= me->GetHealth() && !_died)
             {
-                died = true;
+                // This is required because he kills himself with the explosion spell, causing a loop.
+                _died = true;
+
                 DoCastAOE(SPELL_EXPLODE_ORB);
                 DoCastAOE(SPELL_EXPLOSION);
                 me->SetCorpseRemoveTime(25);
@@ -194,6 +196,7 @@ public:
 
     private:
         bool secondPhase;
+        bool _died;
         ObjectGuid _charmerGUID;
     };
 
