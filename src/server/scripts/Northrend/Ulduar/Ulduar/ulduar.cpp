@@ -22,6 +22,7 @@
 #include "ScriptedGossip.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "Vehicle.h"
 
 class npc_ulduar_keeper : public CreatureScript
 {
@@ -423,6 +424,31 @@ public:
     }
 };
 
+struct npc_salvaged_siege_engine : public VehicleAI
+{
+    npc_salvaged_siege_engine(Creature* creature) : VehicleAI(creature) { }
+
+    bool BeforeSpellClick(Unit* clicker) override
+    {
+        if (Vehicle* vehicle = me->GetVehicleKit())
+        {
+            if (vehicle->IsVehicleInUse())
+            {
+                if (Unit* turret = vehicle->GetPassenger(7))
+                {
+                    if (!turret->GetVehicleKit()->IsVehicleInUse())
+                    {
+                        turret->HandleSpellClick(clicker);
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+};
+
 void AddSC_ulduar()
 {
     new npc_ulduar_keeper();
@@ -435,4 +461,6 @@ void AddSC_ulduar()
 
     new AreaTrigger_at_celestial_planetarium_enterance();
     new go_call_tram();
+
+    RegisterCreatureAI(npc_salvaged_siege_engine);
 }
