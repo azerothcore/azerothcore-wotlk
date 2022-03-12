@@ -27,6 +27,8 @@
 #include "blackwing_lair.h"
 #include "TaskScheduler.h"
 
+#include <vector>
+
 enum Events
 {
     // Victor Nefarius
@@ -303,7 +305,7 @@ public:
             events.ScheduleEvent(EVENT_SILENCE, urand(20000, 25000));
             events.ScheduleEvent(EVENT_MIND_CONTROL, urand(30000, 35000));
             events.ScheduleEvent(EVENT_SPAWN_ADDS, 10000);
-            events.ScheduleEvent(EVENT_CHECK_PHASE_2, 1000);
+            events.ScheduleEvent(EVENT_CHECK_PHASE_2, 10000);
         }
 
         void JustSummoned(Creature* summon) override { summons.Summon(summon); }
