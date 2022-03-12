@@ -32,7 +32,7 @@ namespace Acore::Honor
 
     inline uint32 hk_honor_at_level(uint8 level, float multiplier = 1.0f)
     {
-        return uint32(ceil(hk_honor_at_level_f(level, multiplier)));
+        return uint32(std::ceil(hk_honor_at_level_f(level, multiplier)));
     }
 }
 

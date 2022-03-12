@@ -51,6 +51,7 @@ enum BWLCreatureIds
     NPC_BLACKWING_TASKMASTER    = 12458,
     NPC_BLACKWING_LEGIONAIRE    = 12416,
     NPC_BLACKWING_WARLOCK       = 12459,
+    NPC_BLACKWING_MAGE          = 12420,
     NPC_VAELASTRAZ              = 13020,
     NPC_BROODLORD               = 12017,
     NPC_FIREMAW                 = 11983,
@@ -63,15 +64,16 @@ enum BWLCreatureIds
 
 enum BWLGameObjectIds
 {
-    GO_BLACK_DRAGON_EGG         = 177807,
-    GO_PORTCULLIS_RAZORGORE     = 175946,
-    GO_PORTCULLIS_VAELASTRASZ   = 175185,
-    GO_PORTCULLIS_BROODLORD     = 179365,
-    GO_PORTCULLIS_THREEDRAGONS  = 179115,
-    GO_CHROMAGGUS_LEVER         = 179148,
-    GO_PORTCULLIS_CHROMAGGUS    = 179116,
-    GO_PORTCULLIS_NEFARIAN      = 179117,
-    GO_SUPPRESSION_DEVICE       = 179784
+    GO_BLACK_DRAGON_EGG             = 177807,
+    GO_PORTCULLIS_RAZORGORE         = 175946,
+    GO_PORTCULLIS_RAZORGORE_ROOM    = 176964,
+    GO_PORTCULLIS_VAELASTRASZ       = 175185,
+    GO_PORTCULLIS_BROODLORD         = 179365,
+    GO_PORTCULLIS_THREEDRAGONS      = 179115,
+    GO_CHROMAGGUS_LEVER             = 179148,
+    GO_PORTCULLIS_CHROMAGGUS        = 179116,
+    GO_PORTCULLIS_NEFARIAN          = 179117,
+    GO_SUPPRESSION_DEVICE           = 179784
 };
 
 enum BWLEvents
@@ -96,5 +98,7 @@ inline AI* GetBlackwingLairAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, BWLScriptName);
 }
+
+#define RegisterBlackwingLairCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetBlackwingLairAI)
 
 #endif

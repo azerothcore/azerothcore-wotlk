@@ -229,7 +229,7 @@ public:
                     break;
                 case EVENT_CAST_OFFENSIVE_SPELL:
                     if (!me->HasUnitState(UNIT_STATE_CASTING))
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                             me->CastSpell(target, RAND(SPELL_BLIZZARD, SPELL_FROSTBOLT, SPELL_TOUCH_OF_MISERY), false);
 
                     events.ScheduleEvent(EVENT_CAST_OFFENSIVE_SPELL, 500);

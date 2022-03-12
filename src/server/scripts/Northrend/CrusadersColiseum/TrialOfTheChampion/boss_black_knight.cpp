@@ -187,7 +187,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit*  /*target*/, const SpellInfo* spell) override
+        void SpellHitTarget(Unit*  /*target*/, SpellInfo const* spell) override
         {
             switch( spell->Id )
             {
@@ -263,7 +263,7 @@ public:
                     events.RepeatEvent(urand(5000, 6000));
                     break;
                 case EVENT_SPELL_DEATH_RESPITE:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true) )
                         me->CastSpell(target, SPELL_DEATH_RESPITE, false);
                     events.RepeatEvent(urand(13000, 15000));
                     break;
@@ -273,7 +273,7 @@ public:
                     events.RepeatEvent(urand(15000, 17000));
                     break;
                 case EVENT_SPELL_DESECRATION:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true) )
                         me->CastSpell(target, SPELL_DESECRATION, false);
                     events.RepeatEvent(urand(14000, 17000));
                     break;
@@ -282,7 +282,7 @@ public:
                     events.RepeatEvent(urand(2000, 4000));
                     break;
                 case EVENT_SPELL_MARKED_DEATH:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.000000f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.000000f, true) )
                         me->CastSpell(target, SPELL_MARKED_DEATH, false);
                     events.RepeatEvent(9000);
                     break;
@@ -410,7 +410,7 @@ public:
             events.RescheduleEvent(2, urand(3000, 4000)); // claw
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_BK_GHOUL_EXPLODE)
             {
@@ -419,14 +419,14 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             switch(spell->Id)
             {
                 case SPELL_CLAW_N:
                 case SPELL_CLAW_H:
                     DoResetThreat();
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f))
                     {
                         me->AddThreat(target, 100.0f);
                         AttackStart(target);

@@ -138,7 +138,7 @@ public:
         void JustSummoned(Creature* summoned) override
         {
             CAST_AI(npc_water_elemental::npc_water_elementalAI, summoned->AI())->balindaGUID = me->GetGUID();
-            summoned->AI()->AttackStart(SelectTarget(SELECT_TARGET_RANDOM, 0, 50, true));
+            summoned->AI()->AttackStart(SelectTarget(SelectTargetMethod::Random, 0, 50, true));
             summoned->SetFaction(me->GetFaction());
             summons.Summon(summoned);
         }

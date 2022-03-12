@@ -58,6 +58,7 @@ public:
     GraveyardStruct const* GetGraveyard(const std::string& name) const;
     GraveyardStruct const* GetDefaultGraveyard(TeamId teamId);
     GraveyardStruct const* GetClosestGraveyard(Player* player, TeamId teamId, bool nearCorpse = false);
+    GraveyardStruct const* GetClosestGraveyard(uint32 mapId, float x, float y, float z, TeamId teamId, uint32 areaId, uint32 zoneId, bool isDeathKnight);
     GraveyardData const* FindGraveyardData(uint32 id, uint32 zone);
     GraveyardContainer const& GetGraveyardData() const { return _graveyardStore; }
     bool AddGraveyardLink(uint32 id, uint32 zoneId, TeamId teamId, bool persist = true);

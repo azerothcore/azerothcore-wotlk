@@ -17,6 +17,7 @@
 
 #include "npc_stave_of_ancients.h"
 #include "CreatureGroups.h"
+#include "GameTime.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -392,7 +393,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void SpellHit(Unit* /*Caster*/, const SpellInfo* Spell) override
+        void SpellHit(Unit* /*Caster*/, SpellInfo const* Spell) override
         {
             uint32 serpentStings[12] = { 1978, 13549, 13550, 13551, 13552, 13553, 13554, 13555, 25295, 27016, 49000, 49001 };
 
@@ -602,7 +603,7 @@ public:
             if (Precious()->isDead())
             {
                 // Make it so that Precious respawns after Simone
-                uint32 respawnTime = me->GetRespawnTime() - time(nullptr);
+                uint32 respawnTime = me->GetRespawnTime() - GameTime::GetGameTime().count();
                 Precious()->SetRespawnTime(respawnTime);
                 return;
             }
@@ -773,7 +774,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void SpellHit(Unit* /*Caster*/, const SpellInfo* Spell) override
+        void SpellHit(Unit* /*Caster*/, SpellInfo const* Spell) override
         {
             if (!InNormalForm())
             {
@@ -983,7 +984,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void SpellHit(Unit* /*Caster*/, const SpellInfo* Spell) override
+        void SpellHit(Unit* /*Caster*/, SpellInfo const* Spell) override
         {
             if (InNormalForm())
             {
@@ -1154,7 +1155,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void SpellHit(Unit* /*Caster*/, const SpellInfo* Spell) override
+        void SpellHit(Unit* /*Caster*/, SpellInfo const* Spell) override
         {
             if (InNormalForm())
             {

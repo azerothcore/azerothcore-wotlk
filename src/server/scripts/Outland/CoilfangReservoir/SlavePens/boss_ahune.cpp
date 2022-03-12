@@ -217,7 +217,7 @@ public:
                     break;
 
                 case EVENT_SPELL_COLD_SLAP:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_NEAREST, 0, 5.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 5.0f, true))
                         if (target->GetPositionZ() < me->GetPositionZ() + 6.0f)
                         {
                             int32 dmg = urand(5500, 6000);
@@ -232,7 +232,7 @@ public:
                     {
                         float dist = (float)urand(3, 10);
                         float angle = rand_norm() * 2 * M_PI;
-                        me->CastSpell(MinionSummonPos.GetPositionX() + cos(angle)*dist, MinionSummonPos.GetPositionY() + sin(angle)*dist, MinionSummonPos.GetPositionZ(), SPELL_SUMMON_HAILSTONE, false);
+                        me->CastSpell(MinionSummonPos.GetPositionX() + cos(angle)*dist, MinionSummonPos.GetPositionY() + std::sin(angle)*dist, MinionSummonPos.GetPositionZ(), SPELL_SUMMON_HAILSTONE, false);
                         events.RepeatEvent(30000);
                     }
                     break;
@@ -241,12 +241,12 @@ public:
                     {
                         float dist = (float)urand(3, 10);
                         float angle = rand_norm() * 2 * M_PI;
-                        me->CastSpell(MinionSummonPos.GetPositionX() + cos(angle)*dist, MinionSummonPos.GetPositionY() + sin(angle)*dist, MinionSummonPos.GetPositionZ(), SPELL_SUMMON_COLDWAVE, false);
+                        me->CastSpell(MinionSummonPos.GetPositionX() + cos(angle)*dist, MinionSummonPos.GetPositionY() + std::sin(angle)*dist, MinionSummonPos.GetPositionZ(), SPELL_SUMMON_COLDWAVE, false);
                     }
                     {
                         float dist = (float)urand(3, 10);
                         float angle = rand_norm() * 2 * M_PI;
-                        me->CastSpell(MinionSummonPos.GetPositionX() + cos(angle)*dist, MinionSummonPos.GetPositionY() + sin(angle)*dist, MinionSummonPos.GetPositionZ(), SPELL_SUMMON_FROSTWIND, false);
+                        me->CastSpell(MinionSummonPos.GetPositionX() + cos(angle)*dist, MinionSummonPos.GetPositionY() + std::sin(angle)*dist, MinionSummonPos.GetPositionZ(), SPELL_SUMMON_FROSTWIND, false);
                     }
                     events.RepeatEvent(6000);
                     break;
@@ -302,7 +302,7 @@ public:
 
             bool finished = false;
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
-            if (!players.isEmpty())
+            if (!players.IsEmpty())
                 for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
                     if (Player* player = i->GetSource())
                     {

@@ -22,6 +22,7 @@
 #include "CreatureAI.h"
 #include "CreatureAIImpl.h"
 #include "InstanceScript.h"
+#include "EventMap.h"
 
 #define CAST_AI(a, b)   (dynamic_cast<a*>(b))
 

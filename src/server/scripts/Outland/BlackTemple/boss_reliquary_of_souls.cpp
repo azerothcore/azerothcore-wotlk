@@ -523,7 +523,7 @@ public:
             }
         }
 
-        void JustDied(Unit*  /*killer*/) override
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(ANGER_SAY_DEATH);
             if (me->IsSummon())

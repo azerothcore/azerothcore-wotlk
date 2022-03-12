@@ -143,12 +143,12 @@ public:
                     events.ScheduleEvent(EVENT_SUMMON_IMAGE2, 1000);
                     break;
                 case EVENT_SPELL_MIND_REND:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f))
                         me->CastSpell(target, SPELL_MIND_REND, false);
                     events.ScheduleEvent(EVENT_SPELL_MIND_REND, 10000);
                     break;
                 case EVENT_SPELL_FEAR:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 20.0f))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 20.0f))
                     {
                         Talk(SAY_FEAR);
                         me->CastSpell(target, SPELL_FEAR, false);
@@ -156,7 +156,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_FEAR, 25000);
                     break;
                 case EVENT_SPELL_DOMINATION:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 30.0f))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 30.0f))
                     {
                         Talk(SAY_MIND);
                         me->CastSpell(target, SPELL_DOMINATION, false);
@@ -164,7 +164,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_DOMINATION, 30000);
                     break;
                 case EVENT_SPELL_MANA_BURN:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, PowerUsersSelector(me, POWER_MANA, 40.0f, false)))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, POWER_MANA, 40.0f, false)))
                         me->CastSpell(target, SPELL_MANA_BURN, false);
                     events.ScheduleEvent(EVENT_SPELL_MANA_BURN, 30000);
                     break;

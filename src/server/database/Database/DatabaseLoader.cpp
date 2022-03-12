@@ -41,15 +41,15 @@ DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::st
         std::string const dbString = sConfigMgr->GetOption<std::string>(name + "DatabaseInfo", "");
         if (dbString.empty())
         {
-            LOG_ERROR(_logger, "Database %s not specified in configuration file!", name.c_str());
+            LOG_ERROR(_logger, "Database {} not specified in configuration file!", name);
             return false;
         }
 
         uint8 const asyncThreads = sConfigMgr->GetOption<uint8>(name + "Database.WorkerThreads", 1);
         if (asyncThreads < 1 || asyncThreads > 32)
         {
-            LOG_ERROR(_logger, "%s database: invalid number of worker threads specified. "
-                      "Please pick a value between 1 and 32.", name.c_str());
+            LOG_ERROR(_logger, "{} database: invalid number of worker threads specified. "
+                      "Please pick a value between 1 and 32.", name);
             return false;
         }
 
@@ -68,7 +68,7 @@ DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::st
 
                 while (reconnectCount < attempts)
                 {
-                    LOG_INFO(_logger, "> Retrying after %u seconds", static_cast<uint32>(reconnectSeconds.count()));
+                    LOG_WARN(_logger, "> Retrying after {} seconds", static_cast<uint32>(reconnectSeconds.count()));
                     std::this_thread::sleep_for(reconnectSeconds);
                     error = pool.Open();
 
@@ -96,8 +96,8 @@ DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::st
             // If the error wasn't handled quit
             if (error)
             {
-                LOG_ERROR(_logger, "DatabasePool %s NOT opened. There were errors opening the MySQL connections. "
-                          "Check your log file for specific errors", name.c_str());
+                LOG_ERROR(_logger, "DatabasePool {} NOT opened. There were errors opening the MySQL connections. "
+                          "Check your log file for specific errors", name);
 
                 return false;
             }
@@ -118,7 +118,7 @@ DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::st
         {
             if (!DBUpdater<T>::Populate(pool))
             {
-                LOG_ERROR(_logger, "Could not populate the %s database, see log for details.", name.c_str());
+                LOG_ERROR(_logger, "Could not populate the {} database, see log for details.", name);
                 return false;
             }
 
@@ -129,7 +129,7 @@ DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::st
         {
             if (!DBUpdater<T>::Update(pool, _modulesList))
             {
-                LOG_ERROR(_logger, "Could not update the %s database, see log for details.", name.c_str());
+                LOG_ERROR(_logger, "Could not update the {} database, see log for details.", name);
                 return false;
             }
 
@@ -141,7 +141,7 @@ DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::st
     {
         if (!pool.PrepareStatements())
         {
-            LOG_ERROR(_logger, "Could not prepare statements of the %s database, see log for details.", name.c_str());
+            LOG_ERROR(_logger, "Could not prepare statements of the {} database, see log for details.", name);
             return false;
         }
 
@@ -153,7 +153,22 @@ DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::st
 
 bool DatabaseLoader::Load()
 {
-    return OpenDatabases() && PopulateDatabases() && UpdateDatabases() && PrepareStatements();
+    if (!_updateFlags)
+        LOG_INFO("sql.updates", "Automatic database updates are disabled for all databases!");
+
+    if (!OpenDatabases())
+        return false;
+
+    if (!PopulateDatabases())
+        return false;
+
+    if (!UpdateDatabases())
+        return false;
+
+    if (!PrepareStatements())
+        return false;
+
+    return true;
 }
 
 bool DatabaseLoader::OpenDatabases()
@@ -205,7 +220,7 @@ DatabaseLoader& DatabaseLoader::AddDatabase<CharacterDatabaseConnection>(Databas
 template AC_DATABASE_API
 DatabaseLoader& DatabaseLoader::AddDatabase<WorldDatabaseConnection>(DatabaseWorkerPool<WorldDatabaseConnection>&, std::string const&);
 
-#ifdef PLAYERBOTS
+#ifdef MOD_PLAYERBOTS
 template AC_DATABASE_API
-DatabaseLoader& DatabaseLoader::AddDatabase<PlayerbotDatabaseConnection>(DatabaseWorkerPool<PlayerbotDatabaseConnection>&, std::string const&);
+DatabaseLoader& DatabaseLoader::AddDatabase<PlayerbotsDatabaseConnection>(DatabaseWorkerPool<PlayerbotsDatabaseConnection>&, std::string const&);
 #endif

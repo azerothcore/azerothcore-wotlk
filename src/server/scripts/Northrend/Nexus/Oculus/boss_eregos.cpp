@@ -223,7 +223,7 @@ public:
                     Talk(SAY_SHIELD);
                     me->CastSpell(me, SPELL_PLANAR_SHIFT, false);
                     for( uint8 i = 0; i < 3; ++i )
-                        if( Unit* t = SelectTarget(SELECT_TARGET_RANDOM, 0, 300.0f, false) )
+                        if( Unit* t = SelectTarget(SelectTargetMethod::Random, 0, 300.0f, false) )
                             if( Creature* pa = me->SummonCreature(NPC_PLANAR_ANOMALY, *me, TEMPSUMMON_TIMED_DESPAWN, 17000) )
                             {
                                 pa->SetCanFly(true);

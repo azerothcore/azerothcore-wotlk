@@ -191,9 +191,15 @@ class spell_dru_omen_of_clarity : public AuraScript
     bool CheckProc(ProcEventInfo& eventInfo)
     {
         SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
-        if (!spellInfo || spellInfo->IsPassive())
+        if (!spellInfo)
         {
             return true;
+        }
+
+        // Prevent passive spells to proc. (I.e shapeshift passives & passive talents)
+        if (spellInfo->IsPassive())
+        {
+            return false;
         }
 
         if (eventInfo.GetTypeMask() & PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS)
@@ -559,7 +565,7 @@ class spell_dru_lifebloom : public AuraScript
         // final heal
         int32 stack = GetStackAmount();
         int32 healAmount = aurEff->GetAmount();
-        const SpellInfo* finalHeal = sSpellMgr->GetSpellInfo(SPELL_DRUID_LIFEBLOOM_FINAL_HEAL);
+        SpellInfo const* finalHeal = sSpellMgr->GetSpellInfo(SPELL_DRUID_LIFEBLOOM_FINAL_HEAL);
 
         if (Unit* caster = GetCaster())
         {
@@ -580,7 +586,7 @@ class spell_dru_lifebloom : public AuraScript
             {
                 Unit* caster = GetCaster();
                 int32 healAmount = GetSpellInfo()->Effects[EFFECT_1].CalcValue(caster ? caster : target, 0, target) * dispelInfo->GetRemovedCharges();
-                const SpellInfo* finalHeal = sSpellMgr->GetSpellInfo(SPELL_DRUID_LIFEBLOOM_FINAL_HEAL);
+                SpellInfo const* finalHeal = sSpellMgr->GetSpellInfo(SPELL_DRUID_LIFEBLOOM_FINAL_HEAL);
                 if (caster)
                 {
                     // healing with bonus

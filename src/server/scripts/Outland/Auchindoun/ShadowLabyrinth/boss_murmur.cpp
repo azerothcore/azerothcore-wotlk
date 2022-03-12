@@ -117,7 +117,7 @@ public:
                     me->CastSpell(me, DUNGEON_MODE(SPELL_SONIC_BOOM_EFFECT_N, SPELL_SONIC_BOOM_EFFECT_H), true);
                     break;
                 case EVENT_SPELL_MURMURS_TOUCH:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 80.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 80.0f, true))
                         me->CastSpell(target, DUNGEON_MODE(SPELL_MURMURS_TOUCH_N, SPELL_MURMURS_TOUCH_H), false);
                     events.RepeatEvent(urand(25000, 35000));
                     break;
@@ -127,7 +127,7 @@ public:
                     events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_MAGNETIC:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 80.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 80.0f, true))
                     {
                         me->CastSpell(target, SPELL_MAGNETIC_PULL, false);
                         events.RepeatEvent(urand(15000, 30000));

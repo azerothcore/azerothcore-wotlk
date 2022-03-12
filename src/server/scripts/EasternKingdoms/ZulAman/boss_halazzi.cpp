@@ -127,7 +127,7 @@ public:
                 damage = 0;
         }
 
-        void SpellHit(Unit*, const SpellInfo* spell) override
+        void SpellHit(Unit*, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_TRANSFORM_SPLIT2)
                 EnterPhase(PHASE_HUMAN);
@@ -245,7 +245,7 @@ public:
 
                 if (ShockTimer <= diff)
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                     {
                         if (target->IsNonMeleeSpellCast(false))
                             DoCast(target, SPELL_EARTHSHOCK);

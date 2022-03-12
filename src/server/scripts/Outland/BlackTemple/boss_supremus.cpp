@@ -111,7 +111,7 @@ public:
             if (summon->GetEntry() == NPC_SUPREMUS_PUNCH_STALKER)
             {
                 summon->ToTempSummon()->InitStats(20000);
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                     summon->GetMotionMaster()->MoveFollow(target, 0.0f, 0.0f, MOTION_SLOT_CONTROLLED);
             }
             else
@@ -165,7 +165,7 @@ public:
                     SchedulePhase(!me->HasAura(SPELL_SNARE_SELF));
                     break;
                 case EVENT_SWITCH_TARGET:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                     {
                         DoResetThreat();
                         me->AddThreat(target, 5000000.0f);
@@ -184,7 +184,7 @@ public:
                     events.ScheduleEvent(EVENT_CHECK_DIST, 1, EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_SPELL_VOLCANIC_ERUPTION:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                     {
                         me->CastSpell(target, SPELL_VOLCANIC_ERUPTION, true);
                         Talk(EMOTE_GROUND_CRACK);

@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.addons
+-- Дамп структуры для таблица acore_characters.addons
 DROP TABLE IF EXISTS `addons`;
 CREATE TABLE IF NOT EXISTS `addons` (
   `name` varchar(120) NOT NULL DEFAULT '',
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `addons` (
   PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Addons';
 
--- Дамп данных таблицы _acore_characters.addons: ~23 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.addons: ~23 rows (приблизительно)
 DELETE FROM `addons`;
 /*!40000 ALTER TABLE `addons` DISABLE KEYS */;
 INSERT INTO `addons` (`name`, `crc`) VALUES

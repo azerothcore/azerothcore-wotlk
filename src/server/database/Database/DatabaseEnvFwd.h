@@ -33,8 +33,8 @@ class CharacterDatabaseConnection;
 class LoginDatabaseConnection;
 class WorldDatabaseConnection;
 
-#ifdef PLAYERBOTS
-class PlayerbotDatabaseConnection;
+#ifdef MOD_PLAYERBOTS
+class PlayerbotsDatabaseConnection;
 #endif
 
 class PreparedStatementBase;
@@ -46,8 +46,8 @@ using CharacterDatabasePreparedStatement = PreparedStatement<CharacterDatabaseCo
 using LoginDatabasePreparedStatement = PreparedStatement<LoginDatabaseConnection>;
 using WorldDatabasePreparedStatement = PreparedStatement<WorldDatabaseConnection>;
 
-#ifdef PLAYERBOTS
-using PlayerbotDatabasePreparedStatement = PreparedStatement<PlayerbotDatabaseConnection>;
+#ifdef MOD_PLAYERBOTS
+using PlayerbotsDatabasePreparedStatement = PreparedStatement<PlayerbotsDatabaseConnection>;
 #endif
 
 class PreparedResultSet;
@@ -79,8 +79,8 @@ using CharacterDatabaseTransaction = SQLTransaction<CharacterDatabaseConnection>
 using LoginDatabaseTransaction = SQLTransaction<LoginDatabaseConnection>;
 using WorldDatabaseTransaction = SQLTransaction<WorldDatabaseConnection>;
 
-#ifdef PLAYERBOTS
-using PlayerbotDatabaseTransaction = SQLTransaction<PlayerbotDatabaseConnection>;
+#ifdef MOD_PLAYERBOTS
+using PlayerbotsDatabaseTransaction = SQLTransaction<PlayerbotsDatabaseConnection>;
 #endif
 
 class SQLQueryHolderBase;
@@ -94,8 +94,8 @@ using CharacterDatabaseQueryHolder = SQLQueryHolder<CharacterDatabaseConnection>
 using LoginDatabaseQueryHolder = SQLQueryHolder<LoginDatabaseConnection>;
 using WorldDatabaseQueryHolder = SQLQueryHolder<WorldDatabaseConnection>;
 
-#ifdef PLAYERBOTS
-using PlayerbotDatabaseQueryHolder = SQLQueryHolder<PlayerbotDatabaseConnection>;
+#ifdef MOD_PLAYERBOTS
+using PlayerbotsDatabaseQueryHolder = SQLQueryHolder<PlayerbotsDatabaseConnection>;
 #endif
 
 class SQLQueryHolderCallback;

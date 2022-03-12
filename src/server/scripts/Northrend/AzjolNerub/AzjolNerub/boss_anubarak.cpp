@@ -144,7 +144,7 @@ class boss_anub_arak : public CreatureScript
 
             void SummonHelpers(float x, float y, float z, uint32 spellId)
             {
-                const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
                 me->SummonCreature(spellInfo->Effects[EFFECT_0].MiscValue, x, y, z);
             }
 
@@ -172,7 +172,7 @@ class boss_anub_arak : public CreatureScript
                         events.ScheduleEvent(EVENT_LEECHING_SWARM, 20000);
                         break;
                     case EVENT_POUND:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 10.0f))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 10.0f))
                         {
                             me->CastSpell(me, SPELL_SELF_ROOT, true);
                             me->DisableRotate(true);

@@ -33,9 +33,9 @@ public:
         CLIENT_UPDATE_MASK_BITS = sizeof(ClientUpdateMaskType) * 8,
     };
 
-    UpdateMask()  { }
+    UpdateMask()  = default;
 
-    UpdateMask(UpdateMask const& right) : _bits(nullptr)
+    UpdateMask(UpdateMask const& right)
     {
         SetCount(right.GetCount());
         memcpy(_bits, right._bits, sizeof(uint8) * _blockCount * 32);

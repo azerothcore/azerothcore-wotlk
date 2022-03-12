@@ -91,6 +91,9 @@ public:
     // Called when the creature summon successfully other creature
     void JustSummoned(Creature* creature) override;
 
+    // Called when a summoned unit dies
+    void SummonedCreatureDies(Creature* summon, Unit* killer) override;
+
     // Tell creature to attack and follow the victim
     void AttackStart(Unit* who) override;
 
@@ -98,10 +101,10 @@ public:
     void MoveInLineOfSight(Unit* who) override;
 
     // Called when hit by a spell
-    void SpellHit(Unit* unit, const SpellInfo* spellInfo) override;
+    void SpellHit(Unit* unit, SpellInfo const* spellInfo) override;
 
     // Called when spell hits a target
-    void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override;
+    void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override;
 
     // Called at any Damage from any attacker (before damage apply)
     void DamageTaken(Unit* done_by, uint32& damage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask) override;
@@ -143,7 +146,7 @@ public:
     void OnCharmed(bool apply) override;
 
     // Called when victim is in line of sight
-    bool CanAIAttack(const Unit* who) const override;
+    bool CanAIAttack(Unit const* who) const override;
 
     // Used in scripts to share variables
     void DoAction(int32 param = 0) override;
@@ -161,7 +164,7 @@ public:
     ObjectGuid GetGUID(int32 id = 0) const override;
 
     //core related
-    static int32 Permissible(const Creature*);
+    static int32 Permissible(Creature const*);
 
     // Called at movepoint reached
     void MovepointReached(uint32 id);
@@ -172,6 +175,8 @@ public:
     void SetFly(bool fly = true);
 
     void SetSwim(bool swim = true);
+
+    void SetEvadeDisabled(bool disable = true);
 
     void SetInvincibilityHpLevel(uint32 level) { mInvincibilityHpLevel = level; }
 
@@ -223,6 +228,7 @@ private:
     uint32 GetWPCount() { return mWayPoints ? mWayPoints->size() : 0; }
     bool mCanRepeatPath;
     bool mRun;
+    bool mEvadeDisabled;
     bool mCanAutoAttack;
     bool mCanCombatMove;
     bool mForcedPaused;
@@ -252,7 +258,7 @@ public:
     void InitializeAI() override;
     void Reset() override;
     SmartScript* GetScript() { return &mScript; }
-    static int32 Permissible(const GameObject* g);
+    static int32 Permissible(GameObject const* g);
 
     bool GossipHello(Player* player, bool reportUse) override;
     bool GossipSelect(Player* player, uint32 sender, uint32 action) override;
@@ -265,7 +271,10 @@ public:
     void OnGameEvent(bool start, uint16 eventId) override;
     void OnStateChanged(uint32 state, Unit* unit) override;
     void EventInform(uint32 eventId) override;
-    void SpellHit(Unit* unit, const SpellInfo* spellInfo) override;
+    void SpellHit(Unit* unit, SpellInfo const* spellInfo) override;
+
+    // Called when a summoned unit dies
+    void SummonedCreatureDies(Creature* summon, Unit* killer) override;
 
 protected:
     SmartScript mScript;

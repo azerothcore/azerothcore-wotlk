@@ -301,7 +301,7 @@ public:
                     }
                 case EVENT_PALEHOOF_IMPALE:
                     {
-                        if (Unit* tgt = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* tgt = SelectTarget(SelectTargetMethod::Random, 0))
                             me->CastSpell(tgt, IsHeroic() ? SPELL_IMPALE_H : SPELL_IMPALE_N, false);
 
                         events.RepeatEvent(8000 + rand() % 4000);
@@ -415,7 +415,7 @@ public:
             {
                 case EVENT_JORMUNGAR_ACID_SPIT:
                     {
-                        if (Unit* tgt = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* tgt = SelectTarget(SelectTargetMethod::Random, 0))
                             me->CastSpell(tgt, SPELL_ACID_SPIT, false);
 
                         events.RepeatEvent(2000 + rand() % 2000);
@@ -441,7 +441,7 @@ public:
                     }
                 case EVENT_JORMUNGAR_POISON_BREATH:
                     {
-                        if (Unit* tgt = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* tgt = SelectTarget(SelectTargetMethod::Random, 0))
                             me->CastSpell(tgt, IsHeroic() ? SPELL_POISON_BREATH_H : SPELL_POISON_BREATH_N, false);
 
                         events.RepeatEvent(8000 + rand() % 4000);
@@ -551,7 +551,7 @@ public:
                     }
                 case EVENT_RHINO_WOUND:
                     {
-                        if (Unit* tgt = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* tgt = SelectTarget(SelectTargetMethod::Random, 0))
                             me->CastSpell(tgt, IsHeroic() ? SPELL_GRIEVOUS_WOUND_H : SPELL_GRIEVOUS_WOUND_N, false);
 
                         events.RepeatEvent(18000 + rand() % 4000);

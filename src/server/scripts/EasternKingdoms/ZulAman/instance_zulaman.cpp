@@ -186,7 +186,7 @@ public:
                 return;
 
             Map::PlayerList const& PlayerList = instance->GetPlayers();
-            if (PlayerList.isEmpty())
+            if (PlayerList.IsEmpty())
                 return;
 
             Map::PlayerList::const_iterator i = PlayerList.begin();

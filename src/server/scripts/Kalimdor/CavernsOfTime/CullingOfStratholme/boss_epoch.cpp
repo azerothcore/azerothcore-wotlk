@@ -85,7 +85,7 @@ public:
                 events.ScheduleEvent(EVENT_SPELL_TIME_STOP, 20000);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_TIME_STEP_H || spellInfo->Id == SPELL_TIME_STEP_N)
             {
@@ -114,7 +114,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_CURSE_OF_EXERTION:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                         me->CastSpell(target, SPELL_CURSE_OF_EXERTION, false);
                     events.RepeatEvent(9000);
                     break;
@@ -129,7 +129,7 @@ public:
                 case EVENT_SPELL_TIME_WARP:
                     Talk(SAY_TIME_WARP);
                     me->CastSpell(me, SPELL_TIME_WARP, false);
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                         me->CastSpell(target, DUNGEON_MODE(SPELL_TIME_STEP_N, SPELL_TIME_STEP_H), true);
 
                     events.RepeatEvent(25000);

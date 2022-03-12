@@ -132,7 +132,7 @@ public:
                         break;
                     }
                 case EVENT_SPELL_CHARGE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_CHARGE, false);
                     events.RepeatEvent(urand(15000, 25000));
                     break;

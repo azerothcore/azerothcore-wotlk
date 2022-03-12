@@ -21,7 +21,6 @@
 #include "Opcodes.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"
-#include "WorldSession.h"
 
 uint32 AsyncAuctionListingMgr::auctionListingDiff = 0;
 bool AsyncAuctionListingMgr::auctionListingAllowed = false;

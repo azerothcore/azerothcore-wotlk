@@ -20,7 +20,6 @@
 #include "Constants.h"
 #include "DoodadHandler.h"
 #include "WorldModelHandler.h"
-#include <limits.h>
 
 Geometry::Geometry() : Transform(false)
 {

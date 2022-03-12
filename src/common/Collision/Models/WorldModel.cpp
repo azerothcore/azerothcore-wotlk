@@ -41,7 +41,7 @@ namespace VMAP
         const Vector3 p(ray.direction().cross(e2));
         const float a = e1.dot(p);
 
-        if (fabs(a) < EPS)
+        if (std::fabs(a) < EPS)
         {
             // Determinant is ill-conditioned; abort early
             return false;

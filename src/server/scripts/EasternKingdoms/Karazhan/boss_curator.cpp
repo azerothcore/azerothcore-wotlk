@@ -130,7 +130,7 @@ public:
                     me->CastSpell(me, SPELL_ASTRAL_DECONSTRUCTION, true);
                     break;
                 case EVENT_SPELL_HATEFUL_BOLT:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, urand(1, 2), 40.0f))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, urand(1, 2), 40.0f))
                         me->CastSpell(target, SPELL_HATEFUL_BOLT, false);
                     events.ScheduleEvent(EVENT_SPELL_HATEFUL_BOLT, urand(5000, 7500) * (events.GetNextEventTime(EVENT_SPELL_BERSERK) == 0 ? 1 : 2));
                     break;

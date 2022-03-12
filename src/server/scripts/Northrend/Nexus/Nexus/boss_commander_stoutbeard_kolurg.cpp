@@ -115,7 +115,7 @@ public:
                     events.ScheduleEvent(EVENT_WHIRLWIND, 16000);
                     break;
                 case EVENT_COMMANDER_CHARGE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_FARTHEST, 0, 25.0f))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, 25.0f))
                         me->CastSpell(target, SPELL_CHARGE, false);
                     events.ScheduleEvent(EVENT_COMMANDER_CHARGE, 20000);
                     break;

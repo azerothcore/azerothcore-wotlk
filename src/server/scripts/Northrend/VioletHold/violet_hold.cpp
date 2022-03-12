@@ -525,7 +525,7 @@ public:
 
                 if (uiImpaleTimer <= diff)
                 {
-                    Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 5.0f, true);
+                    Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 5.0f, true);
                     if (pTarget)
                         DoCast(pTarget, SPELL_IMPALE);
                     uiImpaleTimer = 4000;
@@ -600,7 +600,7 @@ public:
 
                 if (uiArcainBarrageTimer <= diff)
                 {
-                    Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true);
+                    Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true);
                     if (pTarget)
                         DoCast(pTarget, SPELL_ARCANE_BARRAGE);
                     uiArcainBarrageTimer = 6000;
@@ -619,7 +619,7 @@ public:
 
                 if (uiFrostboltTimer <= diff)
                 {
-                    Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true);
+                    Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true);
                     if (pTarget)
                         DoCast(pTarget, SPELL_FROSTBOLT);
                     uiFrostboltTimer = 6000;
@@ -676,7 +676,7 @@ public:
             {
                 if (uiSpellLockTimer <= diff)
                 {
-                    Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true);
+                    Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true);
                     if (pTarget)
                         DoCast(pTarget, SPELL_SPELL_LOCK);
                     uiSpellLockTimer = 9000;
@@ -774,7 +774,7 @@ public:
             {
                 if (uiTacticalBlinkTimer <= diff)
                 {
-                    Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true);
+                    Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true);
                     if (pTarget)
                         DoCast(pTarget, SPELL_TACTICAL_BLINK);
                     uiTacticalBlinkTimer = 10000;
@@ -786,7 +786,7 @@ public:
             {
                 if (uiBackstabTimer <= diff)
                 {
-                    Unit* pTarget = SelectTarget(SELECT_TARGET_NEAREST, 0, 5.0f, true);
+                    Unit* pTarget = SelectTarget(SelectTargetMethod::MaxDistance, 0, 5.0f, true);
                     if (pTarget && !pTarget->HasInArc(M_PI, me))
                         DoCast(pTarget, SPELL_BACKSTAB);
                     TacticalBlinkCasted = false;
@@ -838,7 +838,7 @@ public:
             {
                 if (uiArcaneBlastTimer <= diff)
                 {
-                    Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true);
+                    Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true);
                     if (pTarget)
                         DoCast(pTarget, SPELL_ARCANE_BLAST);
                     uiArcaneBlastTimer = 6000;
@@ -847,7 +847,7 @@ public:
 
                 if (uiSlowTimer <= diff)
                 {
-                    Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true);
+                    Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true);
                     if (pTarget)
                         DoCast(pTarget, SPELL_SLOW);
                     uiSlowTimer = 5000;
@@ -859,7 +859,7 @@ public:
             {
                 if (uiChainsOfIceTimer <= diff)
                 {
-                    Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true);
+                    Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true);
                     if (pTarget)
                         DoCast(pTarget, SPELL_CHAINS_OF_ICE);
                     uiChainsOfIceTimer = 7000;
@@ -962,7 +962,7 @@ public:
 
             if (uiArcaneStreamTimer <= diff)
             {
-                Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 35.0f, true);
+                Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 35.0f, true);
                 if (pTarget)
                     DoCast(pTarget, SPELL_ARCANE_STREAM);
                 uiArcaneStreamTimer = urand(0, 5000) + 5000;

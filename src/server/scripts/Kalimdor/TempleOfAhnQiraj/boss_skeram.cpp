@@ -96,7 +96,7 @@ public:
             if (_flag & (1 << 7))
                 _flag = 0;
 
-            if (Unit* Target = SelectTarget(SELECT_TARGET_RANDOM))
+            if (Unit* Target = SelectTarget(SelectTargetMethod::Random))
                 creature->AI()->AttackStart(Target);
 
             float ImageHealthPct;
@@ -151,7 +151,7 @@ public:
                     case EVENT_FULLFILMENT:
                         /// @todo For some weird reason boss does not cast this
                         // Spell actually works, tested in duel
-                        DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true), SPELL_TRUE_FULFILLMENT, true);
+                        DoCast(SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true), SPELL_TRUE_FULFILLMENT, true);
                         events.ScheduleEvent(EVENT_FULLFILMENT, urand(20000, 30000));
                         break;
                     case EVENT_BLINK:

@@ -182,10 +182,12 @@ if(BUILD_SHARED_LIBS)
   WarnAboutSpacesInBuildPath()
 endif()
 
-if (USE_CPP_20)
+if (CONFIG_ABORT_INCORRECT_OPTIONS)
   message("")
-  message(" *** Enabled C++20 standart")
-  message(" *** Please note that this is an experimental feature!")
+  message(" WARNING !")
+  message(" Enabled abort if core found incorrect option in config files")
+
+  add_definitions(-DCONFIG_ABORT_INCORRECT_OPTIONS)
 endif()
 
 message("")

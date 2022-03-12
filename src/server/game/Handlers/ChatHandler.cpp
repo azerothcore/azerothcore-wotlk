@@ -19,7 +19,9 @@
 #include "CellImpl.h"
 #include "ChannelMgr.h"
 #include "Chat.h"
+#include "ChatPackets.h"
 #include "Common.h"
+#include "GameTime.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "Guild.h"
@@ -38,10 +40,6 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-
-#ifdef PLAYERBOTS
-#include "Playerbot.h"
-#endif
 
 inline bool isNasty(uint8 c)
 {
@@ -68,14 +66,14 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
     if (type >= MAX_CHAT_MSG_TYPE)
     {
-        LOG_ERROR("network.opcode", "CHAT: Wrong message type received: %u", type);
+        LOG_ERROR("network.opcode", "CHAT: Wrong message type received: {}", type);
         recvData.rfinish();
         return;
     }
 
     if (lang == LANG_UNIVERSAL && type != CHAT_MSG_AFK && type != CHAT_MSG_DND)
     {
-        LOG_ERROR("entities.player.cheat", "CMSG_MESSAGECHAT: Possible hacking-attempt: %s tried to send a message in universal language", GetPlayerInfo().c_str());
+        LOG_ERROR("entities.player.cheat", "CMSG_MESSAGECHAT: Possible hacking-attempt: {} tried to send a message in universal language", GetPlayerInfo());
         SendNotification(LANG_UNKNOWN_LANGUAGE);
         recvData.rfinish();
         return;
@@ -189,8 +187,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 }
                 break;
             default:
-                LOG_ERROR("network", "Player %s (%s) sent a chatmessage with an invalid language/message type combination",
-                               GetPlayer()->GetName().c_str(), GetPlayer()->GetGUID().ToString().c_str());
+                LOG_ERROR("network", "Player {} ({}) sent a chatmessage with an invalid language/message type combination",
+                               GetPlayer()->GetName(), GetPlayer()->GetGUID().ToString());
 
                 recvData.rfinish();
                 return;
@@ -300,7 +298,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
         if (!_player->CanSpeak())
         {
-            std::string timeStr = secsToTimeString(m_muteTime - time(nullptr));
+            std::string timeStr = secsToTimeString(m_muteTime - GameTime::GetGameTime().count());
             SendNotification(GetAcoreString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
             return;
         }
@@ -326,8 +324,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         {
             if (isNasty(c))
             {
-                LOG_ERROR("network", "Player %s %s sent a message containing invalid character %u - blocked", GetPlayer()->GetName().c_str(),
-                    GetPlayer()->GetGUID().ToString().c_str(), uint8(c));
+                LOG_ERROR("network", "Player {} {} sent a message containing invalid character {} - blocked", GetPlayer()->GetName(),
+                    GetPlayer()->GetGUID().ToString(), uint8(c));
                 return;
             }
         }
@@ -413,16 +411,14 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 if (!senderIsPlayer && !sender->isAcceptWhispers() && !sender->IsInWhisperWhiteList(receiver->GetGUID()))
                     sender->AddWhisperWhiteList(receiver->GetGUID());
 
-#ifdef PLAYERBOTS
-                if (receiver->GetPlayerbotAI())
+                if (!sScriptMgr->CanPlayerUseChat(GetPlayer(), type, lang, msg, receiver))
                 {
-                    receiver->GetPlayerbotAI()->HandleCommand(type, msg, GetPlayer());
-                    GetPlayer()->m_speakTime = 0;
-                    GetPlayer()->m_speakCount = 0;
+                    return;
                 }
-                else
-#endif
-                    GetPlayer()->Whisper(msg, Language(lang), receiver);
+
+                sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, receiver);
+
+                GetPlayer()->Whisper(msg, Language(lang), receiver);
             }
             break;
         case CHAT_MSG_PARTY:
@@ -444,21 +440,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 {
                     return;
                 }
-
-#ifdef PLAYERBOTS
-                for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
-                {
-                    if (Player* player = itr->GetSource())
-                    {
-                        if (player->GetPlayerbotAI())
-                        {
-                            player->GetPlayerbotAI()->HandleCommand(type, msg, GetPlayer());
-                            GetPlayer()->m_speakTime  = 0;
-                            GetPlayer()->m_speakCount = 0;
-                        }
-                    }
-                }
-#endif
 
                 sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
 
@@ -482,22 +463,10 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
                         guild->BroadcastToGuild(this, false, msg, lang == LANG_ADDON ? LANG_ADDON : LANG_UNIVERSAL);
                     }
-
-#ifdef PLAYERBOTS
-                    if (PlayerbotMgr* mgr = GetPlayer()->GetPlayerbotMgr())
+                    else
                     {
-                        for (PlayerBotMap::const_iterator it = mgr->GetPlayerBotsBegin(); it != mgr->GetPlayerBotsEnd(); ++it)
-                        {
-                            if (Player* const bot = it->second)
-                            {
-                                if (bot->GetGuildId() == GetPlayer()->GetGuildId())
-                                {
-                                    bot->GetPlayerbotAI()->HandleCommand(type, msg, GetPlayer());
-                                }
-                            }
-                        }
+                        sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg);
                     }
-#endif
                 }
             }
             break;
@@ -507,7 +476,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 {
                     if (Guild* guild = sGuildMgr->GetGuildById(GetPlayer()->GetGuildId()))
                     {
-                        if (sScriptMgr->CanPlayerUseChat(GetPlayer(), type, lang, msg, guild))
+                        if (!sScriptMgr->CanPlayerUseChat(GetPlayer(), type, lang, msg, guild))
                         {
                             return;
                         }
@@ -535,21 +504,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     return;
                 }
 
-#ifdef PLAYERBOTS
-                for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
-                {
-                    if (Player* player = itr->GetSource())
-                    {
-                        if (player->GetPlayerbotAI())
-                        {
-                            player->GetPlayerbotAI()->HandleCommand(type, msg, GetPlayer());
-                            GetPlayer()->m_speakTime  = 0;
-                            GetPlayer()->m_speakCount = 0;
-                        }
-                    }
-                }
-#endif
-
                 sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
 
                 WorldPacket data;
@@ -573,21 +527,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     return;
                 }
 
-#ifdef PLAYERBOTS
-                for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
-                {
-                    if (Player* player = itr->GetSource())
-                    {
-                        if (player->GetPlayerbotAI())
-                        {
-                            player->GetPlayerbotAI()->HandleCommand(type, msg, GetPlayer());
-                            GetPlayer()->m_speakTime  = 0;
-                            GetPlayer()->m_speakCount = 0;
-                        }
-                    }
-                }
-#endif
-
                 sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
 
                 WorldPacket data;
@@ -605,21 +544,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 {
                     return;
                 }
-
-#ifdef PLAYERBOTS
-                for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
-                {
-                    if (Player* player = itr->GetSource())
-                    {
-                        if (player->GetPlayerbotAI())
-                        {
-                            player->GetPlayerbotAI()->HandleCommand(type, msg, GetPlayer());
-                            GetPlayer()->m_speakTime  = 0;
-                            GetPlayer()->m_speakCount = 0;
-                        }
-                    }
-                }
-#endif
 
                 sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
 
@@ -687,14 +611,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                             return;
                         }
 
-#ifdef PLAYERBOTS
-                        if (_player->GetPlayerbotMgr() && chn->GetFlags() & 0x18)
-                        {
-                            _player->GetPlayerbotMgr()->HandleCommand(type, msg);
-                        }
-
-                        sRandomPlayerbotMgr->HandleCommand(type, msg, _player);
-#endif
                         sScriptMgr->OnPlayerChat(sender, type, lang, msg, chn);
 
                         chn->Say(sender->GetGUID(), msg.c_str(), lang);
@@ -761,28 +677,27 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 break;
             }
         default:
-            LOG_ERROR("network.opcode", "CHAT: unknown message type %u, lang: %u", type, lang);
+            LOG_ERROR("network.opcode", "CHAT: unknown message type {}, lang: {}", type, lang);
             break;
     }
 }
 
-void WorldSession::HandleEmoteOpcode(WorldPacket& recvData)
+void WorldSession::HandleEmoteOpcode(WorldPackets::Chat::EmoteClient& packet)
 {
-    if (!GetPlayer()->IsAlive() || GetPlayer()->HasUnitState(UNIT_STATE_DIED))
-        return;
-
     if (GetPlayer()->IsSpectator())
         return;
 
-    uint32 emote;
-    recvData >> emote;
+    uint32 emoteId = packet.EmoteID;
 
     // restrict to the only emotes hardcoded in client
-    if (emote != EMOTE_ONESHOT_NONE && emote != EMOTE_ONESHOT_WAVE)
+    if (emoteId != EMOTE_ONESHOT_NONE && emoteId != EMOTE_ONESHOT_WAVE)
         return;
 
-    sScriptMgr->OnPlayerEmote(GetPlayer(), emote);
-    GetPlayer()->HandleEmoteCommand(emote);
+    if (!_player->IsAlive() || _player->HasUnitState(UNIT_STATE_DIED))
+        return;
+
+    sScriptMgr->OnPlayerEmote(_player, emoteId);
+    _player->HandleEmoteCommand(emoteId);
 }
 
 namespace Acore
@@ -826,7 +741,7 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
 
     if (!GetPlayer()->CanSpeak())
     {
-        std::string timeStr = secsToTimeString(m_muteTime - time(nullptr));
+        std::string timeStr = secsToTimeString(m_muteTime - GameTime::GetGameTime().count());
         SendNotification(GetAcoreString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
         return;
     }
@@ -906,7 +821,7 @@ void WorldSession::HandleChannelDeclineInvite(WorldPacket& recvPacket)
     // used only with EXTRA_LOGS
     (void)recvPacket;
 
-    LOG_DEBUG("network", "Opcode %u", recvPacket.GetOpcode());
+    LOG_DEBUG("network", "Opcode {}", recvPacket.GetOpcode());
 }
 
 void WorldSession::SendPlayerNotFoundNotice(std::string const& name)

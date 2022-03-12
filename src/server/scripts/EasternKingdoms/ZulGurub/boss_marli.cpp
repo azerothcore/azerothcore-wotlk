@@ -108,7 +108,7 @@ public:
                 {
                     case EVENT_SPAWN_START_SPIDERS:
 
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         {
                             Talk(SAY_SPIDER_SPAWN);
                             Creature* Spider = me->SummonCreature(15041, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
@@ -140,7 +140,7 @@ public:
                         events.ScheduleEvent(EVENT_ASPECT_OF_MARLI, urand(13000, 18000), 0, PHASE_TWO);
                         break;
                     case EVENT_SPAWN_SPIDER:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         {
                             Creature* Spider = me->SummonCreature(15041, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
                             if (Spider)
@@ -173,7 +173,7 @@ public:
                             int i = 0;
                             while (i++ < 3) // max 3 tries to get a random target with power_mana
                             {
-                                target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);  // not aggro leader
+                                target = SelectTarget(SelectTargetMethod::Random, 1, 100, true);  // not aggro leader
                                 if (target && target->getPowerType() == POWER_MANA)
                                     break;
                             }

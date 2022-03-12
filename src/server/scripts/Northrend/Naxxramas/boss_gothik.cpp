@@ -178,7 +178,7 @@ struct NotOnSameSide
 public:
     explicit NotOnSameSide(Unit* pSource) : m_inLiveSide(IN_LIVE_SIDE(pSource)) { }
 
-    bool operator() (const Unit* pTarget)
+    bool operator() (Unit const* pTarget)
     {
         return (m_inLiveSide != IN_LIVE_SIDE(pTarget));
     }
@@ -353,7 +353,7 @@ public:
         bool CheckGroupSplitted()
         {
             Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
-            if (!PlayerList.isEmpty())
+            if (!PlayerList.IsEmpty())
             {
                 bool checklife = false;
                 bool checkdead = false;
@@ -384,7 +384,7 @@ public:
             return false;
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spellInfo) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
         {
             uint8 pos = urand(0, 4);
             switch (spellInfo->Id)
@@ -453,7 +453,7 @@ public:
                         me->CastSpell(me, SPELL_TELEPORT_LIVE, false);
                     }
                     me->getThreatMgr().resetAggro(NotOnSameSide(me));
-                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_NEAREST, 0))
+                    if (Unit* pTarget = SelectTarget(SelectTargetMethod::MaxDistance, 0))
                     {
                         me->getThreatMgr().addThreat(pTarget, 100.0f);
                         AttackStart(pTarget);

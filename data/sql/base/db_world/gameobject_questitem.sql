@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.gameobject_questitem
+-- Дамп структуры для таблица acore_world.gameobject_questitem
 DROP TABLE IF EXISTS `gameobject_questitem`;
 CREATE TABLE IF NOT EXISTS `gameobject_questitem` (
   `GameObjectEntry` INT unsigned NOT NULL DEFAULT 0,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `gameobject_questitem` (
   PRIMARY KEY (`GameObjectEntry`,`Idx`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.gameobject_questitem: 862 rows
+-- Дамп данных таблицы acore_world.gameobject_questitem: 862 rows
 DELETE FROM `gameobject_questitem`;
 /*!40000 ALTER TABLE `gameobject_questitem` DISABLE KEYS */;
 INSERT INTO `gameobject_questitem` (`GameObjectEntry`, `Idx`, `ItemId`, `VerifiedBuild`) VALUES

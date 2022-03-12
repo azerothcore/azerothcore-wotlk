@@ -167,7 +167,7 @@ public:
                     events.ScheduleEvent(EVENT_ANOMALUS_HEALTH, 1000);
                     break;
                 case EVENT_ANOMALUS_ARCANE_ATTRACTION:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                         me->CastSpell(target, SPELL_ARCANE_ATTRACTION, false);
                     events.ScheduleEvent(EVENT_ANOMALUS_ARCANE_ATTRACTION, 15000);
                     break;

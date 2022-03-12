@@ -27,7 +27,6 @@ EndScriptData
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "WorldSession.h"
 
 #define GOSSIP_NETHER_DRAKE     "I'm ready to fly! Take me up, dragon!"
 #define GOSSIP_IRONWING         "I'd like to take a flight around Stormwind Harbor."

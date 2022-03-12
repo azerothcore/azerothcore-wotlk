@@ -466,7 +466,7 @@ public:
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_HEX:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 20.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 20.0f, true) )
                         me->CastSpell(target, SPELL_HEX, false);
                     events.RepeatEvent(45000);
                     EventMapGCD(events, 1500);
@@ -613,7 +613,7 @@ public:
                         events.RepeatEvent(10000);
                     break;
                 case EVENT_SPELL_HAMMER_OF_JUSTICE:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_NEAREST, 0, 15.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 15.0f, true) )
                     {
                         me->CastSpell(target, SPELL_HAMMER_OF_JUSTICE, false);
                         events.RepeatEvent(40000);
@@ -714,7 +714,7 @@ public:
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_DISPEL:
-                    if( Unit* target = (urand(0, 1) ? SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 30.0f, true) : SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_DISPEL, 40.0f)) )
+                    if( Unit* target = (urand(0, 1) ? SelectTarget(SelectTargetMethod::MaxThreat, 0, 30.0f, true) : SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_DISPEL, 40.0f)) )
                         me->CastSpell(target, SPELL_DISPEL, false);
                     events.RepeatEvent(urand(10000, 15000));
                     EventMapGCD(events, 1500);
@@ -874,7 +874,7 @@ public:
                         events.RepeatEvent(6000);
                     break;
                 case EVENT_SPELL_DISPEL:
-                    if( Unit* target = (urand(0, 1) ? SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 30.0f, true) : SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_DISPEL, 40.0f)) )
+                    if( Unit* target = (urand(0, 1) ? SelectTarget(SelectTargetMethod::MaxThreat, 0, 30.0f, true) : SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_DISPEL, 40.0f)) )
                         me->CastSpell(target, SPELL_DISPEL, false);
                     events.RepeatEvent(urand(10000, 15000));
                     EventMapGCD(events, 1500);
@@ -1011,7 +1011,7 @@ public:
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_FEAR:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 20.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 20.0f, true) )
                         me->CastSpell(target, SPELL_FEAR, false);
                     events.RepeatEvent(urand(10000, 15000));
                     EventMapGCD(events, 1500);
@@ -1175,7 +1175,7 @@ public:
                         events.RepeatEvent(6000);
                     break;
                 case EVENT_SPELL_POLYMORPH:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true) )
                         me->CastSpell(target, SPELL_POLYMORPH, false);
                     events.RepeatEvent(15000);
                     EventMapGCD(events, 1500);
@@ -1323,7 +1323,7 @@ public:
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_WYVERN_STING:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 35.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 35.0f, true) )
                     {
                         me->CastSpell(target, SPELL_WYVERN_STING, false);
                         events.RepeatEvent(60000);
@@ -1457,7 +1457,7 @@ public:
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_ENTANGLING_ROOTS:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true) )
                         me->CastSpell(target, SPELL_ENTANGLING_ROOTS, false);
                     events.RepeatEvent(urand(10000, 15000));
                     EventMapGCD(events, 1500);
@@ -1469,7 +1469,7 @@ public:
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_CYCLONE:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_NEAREST, 0, 20.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 20.0f, true) )
                         me->CastSpell(target, SPELL_CYCLONE, false);
                     events.RepeatEvent(urand(25000, 40000));
                     EventMapGCD(events, 1500);
@@ -1926,7 +1926,7 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_BLIND:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_BOTTOMAGGRO, 0, 20.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::MinThreat, 0, 20.0f, true) )
                     {
                         me->CastSpell(target, SPELL_BLIND, false);
                         events.RepeatEvent(120000);
@@ -2074,7 +2074,7 @@ public:
                         events.RepeatEvent(5000);
                         break;
                     }
-                    if( Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 25.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 25.0f, true) )
                     {
                         me->CastSpell(target, SPELL_EARTH_SHOCK_ENH, false);
                         events.RepeatEvent(urand(6000, 8000));
@@ -2089,7 +2089,7 @@ public:
                         events.RepeatEvent(5000);
                         break;
                     }
-                    if( Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 5.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 5.0f, true) )
                     {
                         me->CastSpell(target, SPELL_LAVA_LASH, false);
                         events.RepeatEvent(urand(6000, 8000));
@@ -2104,7 +2104,7 @@ public:
                         events.RepeatEvent(5000);
                         break;
                     }
-                    if( Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 5.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 5.0f, true) )
                     {
                         me->CastSpell(target, SPELL_STORMSTRIKE, false);
                         events.RepeatEvent(urand(8000, 9000));
@@ -2217,7 +2217,7 @@ public:
                         events.RepeatEvent(5000);
                         break;
                     }
-                    if( Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 5.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 5.0f, true) )
                     {
                         me->CastSpell(target, SPELL_CRUSADER_STRIKE, false);
                         events.RepeatEvent(urand(6000, 8000));
@@ -2252,7 +2252,7 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_HAMMER_OF_JUSTICE_RET:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 15.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 15.0f, true) )
                     {
                         me->CastSpell(target, SPELL_HAMMER_OF_JUSTICE_RET, false);
                         events.RepeatEvent(40000);
@@ -2272,7 +2272,7 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_JUDGEMENT_OF_COMMAND:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 20.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 20.0f, true) )
                     {
                         me->CastSpell(target, SPELL_JUDGEMENT_OF_COMMAND, false);
                         events.RepeatEvent(urand(10000, 15000));
@@ -2282,7 +2282,7 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_REPENTANCE:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_BOTTOMAGGRO, 0, 20.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::MinThreat, 0, 20.0f, true) )
                     {
                         me->CastSpell(target, SPELL_REPENTANCE, false);
                         events.RepeatEvent(60000);

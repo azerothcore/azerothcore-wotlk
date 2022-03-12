@@ -19,6 +19,7 @@
 #define __BATTLEGROUNDAV_H
 
 #include "Battleground.h"
+#include "BattlegroundScore.h"
 
 #define LANG_BG_AV_A_CAPTAIN_BUFF       "Begone. Uncouth scum! The Alliance shall prevail in Alterac Valley!"
 #define LANG_BG_AV_H_CAPTAIN_BUFF       "Now is the time to attack! For the Horde!"
@@ -50,6 +51,16 @@
 #define BG_AV_REP_SURVIVING_CAPTAIN     125
 
 #define AV_EVENT_START_BATTLE           9166 // Achievement: The Alterac Blitz
+
+enum BG_AV_BroadcastTexts
+{
+    BG_AV_TEXT_START_ONE_MINUTE     = 10638,
+    BG_AV_TEXT_START_HALF_MINUTE    = 10639,
+    BG_AV_TEXT_BATTLE_HAS_BEGUN     = 10640,
+
+    BG_AV_TEXT_ALLIANCE_NEAR_LOSE   = 23210,
+    BG_AV_TEXT_HORDE_NEAR_LOSE      = 23211
+};
 
 enum BG_AV_Sounds
 {
@@ -100,11 +111,14 @@ enum BG_AV_Sounds
 
 enum BG_AV_OTHER_VALUES
 {
-    AV_STATICCPLACE_MAX        = 123,
-    AV_NORTH_MINE              = 0,
-    AV_SOUTH_MINE              = 1,
-    AV_MINE_TICK_TIMER         = 45000,
-    AV_MINE_RECLAIM_TIMER      = 1200000 //TODO: get the right value.. this is currently 20 minutes
+    AV_STATICCPLACE_MAX         = 123,
+    AV_NORTH_MINE               = 0,
+    AV_SOUTH_MINE               = 1,
+    AV_MINE_TICK_TIMER          = 45000,
+    AV_MINE_RECLAIM_TIMER       = 1200000, //TODO: get the right value.. this is currently 20 minutes
+    BG_AV_QUEST_CREDIT_MINE     = 13796,
+    BG_AV_QUEST_CREDIT_TOWER    = 13778,
+    BG_AV_QUEST_CREDIT_GRAVEYARD = 13756
 };
 
 enum BG_AV_ObjectIds
@@ -1341,6 +1355,7 @@ enum BG_AV_BUFF
     AV_BUFF_A_CAPTAIN = 23693, //the buff which the alliance captain does
     AV_BUFF_H_CAPTAIN = 22751 //the buff which the horde captain does
 };
+
 enum BG_AV_States
 {
     POINT_NEUTRAL              =  0,
@@ -1551,17 +1566,47 @@ struct BG_AV_NodeInfo
 
 inline BG_AV_Nodes& operator++(BG_AV_Nodes& i) { return i = BG_AV_Nodes(i + 1); }
 
-struct BattlegroundAVScore : public BattlegroundScore
+struct BattlegroundAVScore final : public BattlegroundScore
 {
-    explicit BattlegroundAVScore(Player* player) : BattlegroundScore(player), GraveyardsAssaulted(0), GraveyardsDefended(0), TowersAssaulted(0), TowersDefended(0), MinesCaptured(0), LeadersKilled(0), SecondaryObjectives(0) { }
-    ~BattlegroundAVScore() override { }
-    uint32 GraveyardsAssaulted;
-    uint32 GraveyardsDefended;
-    uint32 TowersAssaulted;
-    uint32 TowersDefended;
-    uint32 MinesCaptured;
-    uint32 LeadersKilled;
-    uint32 SecondaryObjectives;
+    friend class BattlegroundAV;
+
+protected:
+    explicit BattlegroundAVScore(ObjectGuid playerGuid) : BattlegroundScore(playerGuid) { }
+
+    void UpdateScore(uint32 type, uint32 value) override
+    {
+        switch (type)
+        {
+        case SCORE_GRAVEYARDS_ASSAULTED:
+            GraveyardsAssaulted += value;
+            break;
+        case SCORE_GRAVEYARDS_DEFENDED:
+            GraveyardsDefended += value;
+            break;
+        case SCORE_TOWERS_ASSAULTED:
+            TowersAssaulted += value;
+            break;
+        case SCORE_TOWERS_DEFENDED:
+            TowersDefended += value;
+            break;
+        case SCORE_MINES_CAPTURED:
+            MinesCaptured += value;
+            break;
+        default:
+            BattlegroundScore::UpdateScore(type, value);
+            break;
+        }
+    }
+
+    void BuildObjectivesBlock(WorldPacket& data) final;
+
+    uint32 GraveyardsAssaulted = 0;
+    uint32 GraveyardsDefended = 0;
+    uint32 TowersAssaulted = 0;
+    uint32 TowersDefended = 0;
+    uint32 MinesCaptured = 0;
+    //uint32 LeadersKilled;
+    //uint32 SecondaryObjectives;
 
     uint32 GetAttr1() const final { return GraveyardsAssaulted; }
     uint32 GetAttr2() const final { return GraveyardsDefended; }
@@ -1570,11 +1615,11 @@ struct BattlegroundAVScore : public BattlegroundScore
     uint32 GetAttr5() const final { return MinesCaptured; }
 };
 
-class BattlegroundAV : public Battleground
+class AC_GAME_API BattlegroundAV : public Battleground
 {
 public:
     BattlegroundAV();
-    ~BattlegroundAV() override;
+    ~BattlegroundAV() override = default;
 
     /* inherited from BattlegroundClass */
     void AddPlayer(Player* player) override;
@@ -1588,7 +1633,7 @@ public:
 
     /*general stuff*/
     void UpdateScore(TeamId teamId, int16 points);
-    void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
+    bool UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
 
     /*handlestuff*/ //these are functions which get called from extern
     void EventPlayerClickedOnFlag(Player* source, GameObject* gameObject) override;
@@ -1607,6 +1652,10 @@ public:
 
     TeamId GetPrematureWinner() override;
 
+    [[nodiscard]] BG_AV_NodeInfo const& GetAVNodeInfo(uint32 node) const { return m_Nodes[node]; }
+    [[nodiscard]] bool IsCaptainAlive(uint8 index) const { return m_CaptainAlive[index]; }
+    [[nodiscard]] TeamId GetMineOwner(uint8 index) const { return m_Mine_Owner[index]; }
+
 private:
     void PostUpdateImpl(uint32 diff) override;
 
@@ -1621,7 +1670,7 @@ private:
     void DefendNode(BG_AV_Nodes node, TeamId teamId);
 
     void PopulateNode(BG_AV_Nodes node);
-    void DePopulateNode(BG_AV_Nodes node);
+    void DePopulateNode(BG_AV_Nodes node, bool ignoreSpiritGuid = false);
 
     BG_AV_Nodes GetNodeThroughObject(uint32 object);
     uint32 GetObjectThroughNode(BG_AV_Nodes node);

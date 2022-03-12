@@ -97,12 +97,12 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_REPENTANCE, urand(25000, 35000));
                     break;
                 case EVENT_SPELL_HOLY_FIRE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
                         me->CastSpell(target, SPELL_HOLY_FIRE, true);
                     events.ScheduleEvent(EVENT_SPELL_HOLY_FIRE, urand(8000, 18000));
                     break;
                 case EVENT_SPELL_HOLY_WRATH:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
                         me->CastSpell(target, SPELL_HOLY_WRATH, true);
                     events.ScheduleEvent(EVENT_SPELL_HOLY_WRATH, urand(20000, 25000));
                     break;

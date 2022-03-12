@@ -365,7 +365,7 @@ public:
                     Talk(SAY_BERSERK);
                     break;
                 case EVENT_SPELL_DEATH_AND_DECAY:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                         me->CastSpell(target, SPELL_DEATH_AND_DECAY, false);
                     events.RepeatEvent(urand(22000, 30000));
                     break;
@@ -408,7 +408,7 @@ public:
                     }
                     break;
                 case EVENT_SPELL_SHADOW_BOLT:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                         me->CastSpell(target, SPELL_SHADOW_BOLT, false);
                     events.RepeatEvent(2100);
                     break;
@@ -445,7 +445,7 @@ public:
                             count = 3;
 
                         std::list<Unit*> targets;
-                        SelectTargetList(targets, NonTankTargetSelector(me, true), count, SELECT_TARGET_RANDOM);
+                        SelectTargetList(targets, NonTankTargetSelector(me, true), count, SelectTargetMethod::Random);
                         if (!targets.empty())
                             for (std::list<Unit*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
                                 me->CastSpell(*itr, SPELL_SUMMON_SHADE, true);
@@ -484,7 +484,7 @@ public:
             }
             else
             {
-                target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true);
+                target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true);
             }
 
             summon->AI()->AttackStart(target);
@@ -855,7 +855,7 @@ public:
                     events.RepeatEvent(urand(9000, 13000));
                     break;
                 case EVENT_SPELL_ADHERENT_CURSE_OF_TORPOR:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
                         me->CastSpell(target, SPELL_CURSE_OF_TORPOR, false);
                     events.RepeatEvent(urand(9000, 13000));
                     break;

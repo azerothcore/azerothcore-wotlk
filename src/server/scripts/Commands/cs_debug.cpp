@@ -33,6 +33,7 @@
 #include "Language.h"
 #include "Log.h"
 #include "MapMgr.h"
+#include "M2Stores.h"
 #include "ObjectMgr.h"
 #include "PoolMgr.h"
 #include "ScriptMgr.h"
@@ -115,7 +116,8 @@ public:
     // cinematicId - ID from CinematicSequences.dbc
     static bool HandleDebugPlayCinematicCommand(ChatHandler* handler, uint32 cinematicId)
     {
-        if (!sCinematicSequencesStore.LookupEntry(cinematicId))
+        CinematicSequencesEntry const* cineSeq = sCinematicSequencesStore.LookupEntry(cinematicId);
+        if (!cineSeq)
         {
             handler->PSendSysMessage(LANG_CINEMATIC_NOT_EXIST, cinematicId);
             handler->SetSentErrorMessage(true);
@@ -123,23 +125,19 @@ public:
         }
 
         // Dump camera locations
-        if (CinematicSequencesEntry const* cineSeq = sCinematicSequencesStore.LookupEntry(cinematicId))
+        if (std::vector<FlyByCamera> const* flyByCameras = GetFlyByCameras(cineSeq->cinematicCamera))
         {
-            auto const& itr = sFlyByCameraStore.find(cineSeq->cinematicCamera);
-            if (itr != sFlyByCameraStore.end())
+            handler->PSendSysMessage("Waypoints for sequence %u, camera %u", cinematicId, cineSeq->cinematicCamera);
+            uint32 count = 1;
+            for (FlyByCamera const& cam : *flyByCameras)
             {
-                handler->PSendSysMessage("Waypoints for sequence %u, camera %u", cinematicId, cineSeq->cinematicCamera);
-                uint32 count = 1;
-                for (FlyByCamera cam : itr->second)
-                {
-                    handler->PSendSysMessage("%02u - %7ums [%f, %f, %f] Facing %f (%f degrees)", count, cam.timeStamp, cam.locations.x, cam.locations.y, cam.locations.z, cam.locations.w, cam.locations.w * (180 / M_PI));
-                    count++;
-                }
-                handler->PSendSysMessage("%lu waypoints dumped", itr->second.size());
+                handler->PSendSysMessage("%02u - %7ums [%s (%f degrees)]", count, cam.timeStamp, cam.locations.ToString().c_str(), cam.locations.GetOrientation() * (180 / M_PI));
+                ++count;
             }
+            handler->PSendSysMessage("%u waypoints dumped", flyByCameras->size());
         }
 
-        handler->GetSession()->GetPlayer()->SendCinematicStart(cinematicId);
+        handler->GetPlayer()->SendCinematicStart(cinematicId);
         return true;
     }
 
@@ -418,7 +416,7 @@ public:
             }
             else
             {
-                LOG_ERROR("network.opcode", "Sending opcode that has unknown type '%s'", type.c_str());
+                LOG_ERROR("network.opcode", "Sending opcode that has unknown type '{}'", type);
                 break;
             }
         }
@@ -1240,7 +1238,7 @@ public:
     {
         Player* player = handler->GetSession()->GetPlayer();
 
-        LOG_INFO("sql.dev", "(@PATH, XX, %.3f, %.3f, %.5f, 0,0, 0,100, 0),", player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
+        LOG_INFO("sql.dev", "(@PATH, XX, {0:.3f}, {0:.3f}, {0:.5f}, 0,0, 0,100, 0),", player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
 
         handler->PSendSysMessage("Waypoint SQL written to SQL Developer log");
         return true;

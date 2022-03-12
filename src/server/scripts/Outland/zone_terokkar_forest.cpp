@@ -40,7 +40,6 @@ EndContentData */
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
-#include "WorldSession.h"
 
 // Ours
 enum fumping

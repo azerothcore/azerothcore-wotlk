@@ -144,7 +144,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_PHANTOM_BLAST_H)
                 bAchiev = false;
@@ -165,7 +165,7 @@ public:
             }
         }
 
-        bool CanAIAttack(const Unit* target) const override { return target->GetPositionZ() > 706.5f; }
+        bool CanAIAttack(Unit const* target) const override { return target->GetPositionZ() > 706.5f; }
 
         void UpdateAI(uint32 diff) override
         {
@@ -212,7 +212,7 @@ public:
                     events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_MIRRORED_SOUL:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 90.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 90.0f, true))
                     {
                         me->CastSpell(target, SPELL_MIRRORED_SOUL, false);
                         me->setAttackTimer(BASE_ATTACK, 2500);
@@ -221,7 +221,7 @@ public:
                     events.RepeatEvent(urand(20000, 30000));
                     break;
                 case EVENT_SPELL_WELL_OF_SOULS:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
                         me->CastSpell(target, SPELL_WELL_OF_SOULS, false);
                     events.RepeatEvent(urand(25000, 30000));
                     events.DelayEventsToMax(4000, 0);
@@ -237,7 +237,7 @@ public:
                 case EVENT_SPELL_WAILING_SOULS:
                     Talk(SAY_FACE_WAILING_SOUL);
                     Talk(EMOTE_WAILING_SOUL);
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                         me->CastCustomSpell(SPELL_WAILING_SOULS_TARGETING, SPELLVALUE_MAX_TARGETS, 1, target, false);
                     events.RepeatEvent(80000);
                     events.DelayEventsToMax(20000, 0);

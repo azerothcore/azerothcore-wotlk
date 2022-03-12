@@ -52,7 +52,8 @@ public:
             { "trigger",       HandleGoTriggerCommand,           SEC_MODERATOR,  Console::No },
             { "zonexy",        HandleGoZoneXYCommand,            SEC_MODERATOR,  Console::No },
             { "xyz",           HandleGoXYZCommand,               SEC_MODERATOR,  Console::No },
-            { "ticket",        HandleGoTicketCommand,            SEC_GAMEMASTER, Console::No }
+            { "ticket",        HandleGoTicketCommand,            SEC_GAMEMASTER, Console::No },
+            { "quest",         HandleGoQuestCommand,             SEC_MODERATOR,  Console::No },
         };
 
         static ChatCommandTable commandTable =
@@ -91,20 +92,7 @@ public:
 
     static bool HandleGoCreatureCIdCommand(ChatHandler* handler, Variant<Hyperlink<creature_entry>, uint32> cId)
     {
-        CreatureData const* spawnpoint = nullptr;
-        for (auto const& pair : sObjectMgr->GetAllCreatureData())
-        {
-            if (pair.second.id != *cId)
-                continue;
-
-            if (!spawnpoint)
-                spawnpoint = &pair.second;
-            else
-            {
-                handler->SendSysMessage(LANG_COMMAND_GOCREATMULTIPLE);
-                break;
-            }
-        }
+        CreatureData const* spawnpoint = GetCreatureData(handler, *cId);
 
         if (!spawnpoint)
         {
@@ -144,20 +132,7 @@ public:
 
     static bool HandleGoGameObjectGOIdCommand(ChatHandler* handler, uint32 goId)
     {
-        GameObjectData const* spawnpoint = nullptr;
-        for (auto const& pair : sObjectMgr->GetAllGOData())
-        {
-            if (pair.second.id != goId)
-                continue;
-
-            if (!spawnpoint)
-                spawnpoint = &pair.second;
-            else
-            {
-                handler->SendSysMessage(LANG_COMMAND_GOCREATMULTIPLE);
-                break;
-            }
-        }
+        GameObjectData const* spawnpoint = GetGameObjectData(handler, goId);
 
         if (!spawnpoint)
         {
@@ -366,6 +341,146 @@ public:
 
         ticket->TeleportTo(player);
         return true;
+    }
+
+    static bool HandleGoQuestCommand(ChatHandler* handler, std::string_view type, Quest const* quest)
+    {
+        uint32 entry = quest->GetQuestId();
+
+        if (type == "starter")
+        {
+            QuestRelations* qr = sObjectMgr->GetCreatureQuestRelationMap();
+
+            for (auto itr = qr->begin(); itr != qr->end(); ++itr)
+            {
+                if (itr->second == entry)
+                {
+                    CreatureData const* spawnpoint = GetCreatureData(handler, itr->first);
+                    if (!spawnpoint)
+                    {
+                        handler->SendSysMessage(LANG_COMMAND_GOCREATNOTFOUND);
+                        handler->SetSentErrorMessage(true);
+                        return false;
+                    }
+
+                    // We've found a creature, teleport to it.
+                    return DoTeleport(handler, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, spawnpoint->mapid);
+                }
+            }
+
+            qr = sObjectMgr->GetGOQuestRelationMap();
+
+            for (auto itr = qr->begin(); itr != qr->end(); ++itr)
+            {
+                if (itr->second == entry)
+                {
+                    GameObjectData const* spawnpoint = GetGameObjectData(handler, itr->first);
+                    if (!spawnpoint)
+                    {
+                        handler->SendSysMessage(LANG_COMMAND_GOOBJNOTFOUND);
+                        handler->SetSentErrorMessage(true);
+                        return false;
+                    }
+
+                    return DoTeleport(handler, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, spawnpoint->mapid);
+                }
+            }
+        }
+        else if (type == "ender")
+        {
+            QuestRelations* qr = sObjectMgr->GetCreatureQuestInvolvedRelationMap();
+
+            for (auto itr = qr->begin(); itr != qr->end(); ++itr)
+            {
+                if (itr->second == entry)
+                {
+                    CreatureData const* spawnpoint = GetCreatureData(handler, itr->first);
+                    if (!spawnpoint)
+                    {
+                        handler->SendSysMessage(LANG_COMMAND_GOCREATNOTFOUND);
+                        handler->SetSentErrorMessage(true);
+                        return false;
+                    }
+
+                    // We've found a creature, teleport to it.
+                    return DoTeleport(handler, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, spawnpoint->mapid);
+                }
+            }
+
+            qr = sObjectMgr->GetGOQuestInvolvedRelationMap();
+
+            for (auto itr = qr->begin(); itr != qr->end(); ++itr)
+            {
+                if (itr->second == entry)
+                {
+                    GameObjectData const* spawnpoint = GetGameObjectData(handler, itr->first);
+                    if (!spawnpoint)
+                    {
+                        handler->SendSysMessage(LANG_COMMAND_GOOBJNOTFOUND);
+                        handler->SetSentErrorMessage(true);
+                        return false;
+                    }
+
+                    return DoTeleport(handler, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, spawnpoint->mapid);
+                }
+            }
+        }
+        else
+        {
+            handler->SendSysMessage(LANG_CMD_GOQUEST_INVALID_SYNTAX);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        return false;
+    }
+
+    static CreatureData const* GetCreatureData(ChatHandler* handler, uint32 entry)
+    {
+        CreatureData const* spawnpoint = nullptr;
+        for (auto const& pair : sObjectMgr->GetAllCreatureData())
+        {
+            if (pair.second.id1 != entry)
+            {
+                continue;
+            }
+
+            if (!spawnpoint)
+            {
+                spawnpoint = &pair.second;
+            }
+            else
+            {
+                handler->SendSysMessage(LANG_COMMAND_GOCREATMULTIPLE);
+                break;
+            }
+        }
+
+        return spawnpoint;
+    }
+
+    static GameObjectData const* GetGameObjectData(ChatHandler* handler, uint32 entry)
+    {
+        GameObjectData const* spawnpoint = nullptr;
+        for (auto const& pair : sObjectMgr->GetAllGOData())
+        {
+            if (pair.second.id != entry)
+            {
+                continue;
+            }
+
+            if (!spawnpoint)
+            {
+                spawnpoint = &pair.second;
+            }
+            else
+            {
+                handler->SendSysMessage(LANG_COMMAND_GOCREATMULTIPLE);
+                break;
+            }
+        }
+
+        return spawnpoint;
     }
 };
 

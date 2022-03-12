@@ -183,7 +183,7 @@ public:
         }
 
         uint32 timer, interval;
-        const SpellInfo* spell;
+        SpellInfo const* spell;
 
         void UpdateAI(uint32 diff) override
         {
@@ -214,7 +214,7 @@ public:
         trigger_deathAI(Creature* creature) : NullCreatureAI(creature) { }
         void JustDied(Unit* killer) override
         {
-            if (me->m_spells[0])
+            if (killer && me->m_spells[0])
                 me->CastSpell(killer, me->m_spells[0], true);
         }
     };

@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_auth.uptime
+-- Дамп структуры для таблица acore_auth.uptime
 DROP TABLE IF EXISTS `uptime`;
 CREATE TABLE IF NOT EXISTS `uptime` (
   `realmid` INT unsigned NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `uptime` (
   PRIMARY KEY (`realmid`,`starttime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Uptime system';
 
--- Дамп данных таблицы _acore_auth.uptime: ~2 rows (приблизительно)
+-- Дамп данных таблицы acore_auth.uptime: ~2 rows (приблизительно)
 DELETE FROM `uptime`;
 /*!40000 ALTER TABLE `uptime` DISABLE KEYS */;
 INSERT INTO `uptime` (`realmid`, `starttime`, `uptime`, `maxplayers`, `revision`) VALUES

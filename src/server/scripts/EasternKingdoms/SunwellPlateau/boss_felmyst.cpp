@@ -307,7 +307,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_GAS_NOVA, 20000, 1);
                     break;
                 case EVENT_SPELL_ENCAPSULATE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                         me->CastSpell(target, SPELL_ENCAPSULATE_CHANNEL, false);
                     events.ScheduleEvent(EVENT_SPELL_ENCAPSULATE, 25000, 1);
                     break;
@@ -448,7 +448,7 @@ public:
             me->CastSpell(me, SPELL_DEMONIC_VAPOR_TRAIL_PERIODIC, true);
         }
 
-        void SpellHitTarget(Unit*, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit*, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_DEMONIC_VAPOR)
                 me->CastSpell(me, SPELL_SUMMON_BLAZING_DEAD, true);
@@ -470,7 +470,7 @@ public:
         void JustSummoned(Creature* summon) override
         {
             summon->SetInCombatWithZone();
-            summon->AI()->AttackStart(summon->AI()->SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f));
+            summon->AI()->AttackStart(summon->AI()->SelectTarget(SelectTargetMethod::Random, 0, 100.0f));
         }
     };
 };

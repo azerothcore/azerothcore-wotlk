@@ -16,7 +16,6 @@
  */
 
 #include "ObjectAccessor.h"
-#include "ObjectMgr.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "molten_core.h"

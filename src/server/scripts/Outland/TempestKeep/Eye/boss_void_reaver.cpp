@@ -102,9 +102,9 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_POUNDING, 15000);
                     break;
                 case EVENT_SPELL_ARCANEORB:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, -18.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, -18.0f, true))
                         me->CastSpell(target, SPELL_ARCANE_ORB, false);
-                    else if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 20.0f, true))
+                    else if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 20.0f, true))
                         me->CastSpell(target, SPELL_ARCANE_ORB, false);
                     events.ScheduleEvent(EVENT_SPELL_ARCANEORB, 4000);
                     break;

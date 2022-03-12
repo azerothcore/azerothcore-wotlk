@@ -51,7 +51,7 @@ enum Events
 
 enum Actions
 {
-    ACTION_DEACTIVATE = 0
+    ACTION_DISARMED   = 0
 };
 
 class boss_broodlord : public CreatureScript
@@ -75,16 +75,6 @@ public:
             events.ScheduleEvent(EVENT_CHECK, 1000);
         }
 
-        void JustDied(Unit* /*killer*/) override
-        {
-            _JustDied();
-
-            std::list<GameObject*> _goList;
-            GetGameObjectListWithEntryInGrid(_goList, me, GO_SUPPRESSION_DEVICE, 200.0f);
-            for (std::list<GameObject*>::const_iterator itr = _goList.begin(); itr != _goList.end(); itr++)
-                ((*itr)->AI()->DoAction(ACTION_DEACTIVATE));
-        }
-
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
@@ -102,7 +92,7 @@ public:
                         break;
                     case EVENT_BLASTWAVE:
                         DoCastVictim(SPELL_BLASTWAVE);
-                        events.ScheduleEvent(EVENT_BLASTWAVE, 8000, 16000);
+                        events.ScheduleEvent(EVENT_BLASTWAVE, 20000, 35000);
                         break;
                     case EVENT_MORTALSTRIKE:
                         DoCastVictim(SPELL_MORTALSTRIKE);
@@ -139,6 +129,19 @@ class go_suppression_device : public GameObjectScript
 {
     public:
         go_suppression_device() : GameObjectScript("go_suppression_device") { }
+
+        void OnLootStateChanged(GameObject* go, uint32 state, Unit* /*unit*/) override
+        {
+            switch (state)
+            {
+                case GO_JUST_DEACTIVATED: // This case prevents the Gameobject despawn by Disarm Trap
+                    go->SetLootState(GO_READY);
+                    [[fallthrough]];
+                case GO_ACTIVATED:
+                    go->AI()->DoAction(ACTION_DISARMED);
+                    break;
+            }
+        }
 
         struct go_suppression_deviceAI : public GameObjectAI
         {
@@ -178,27 +181,13 @@ class go_suppression_device : public GameObjectScript
                 }
             }
 
-            void OnLootStateChanged(uint32 state, Unit* /*unit*/)
-            {
-                switch (state)
-                {
-                    case GO_ACTIVATED:
-                        Deactivate();
-                        _events.CancelEvent(EVENT_SUPPRESSION_CAST);
-                        _events.ScheduleEvent(EVENT_SUPPRESSION_RESET, 30000, 120000);
-                        break;
-                    case GO_JUST_DEACTIVATED: // This case prevents the Gameobject despawn by Disarm Trap
-                        me->SetLootState(GO_READY);
-                        break;
-                }
-            }
-
             void DoAction(int32 action) override
             {
-                if (action == ACTION_DEACTIVATE)
+                if (action == ACTION_DISARMED)
                 {
                     Deactivate();
-                    _events.CancelEvent(EVENT_SUPPRESSION_RESET);
+                    _events.CancelEvent(EVENT_SUPPRESSION_CAST);
+                    _events.ScheduleEvent(EVENT_SUPPRESSION_RESET, urand(30000, 120000));
                 }
             }
 
@@ -212,6 +201,7 @@ class go_suppression_device : public GameObjectScript
                 me->SetLootState(GO_READY);
                 me->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                 _events.ScheduleEvent(EVENT_SUPPRESSION_CAST, 1000);
+                me->Respawn();
             }
 
             void Deactivate()
@@ -230,7 +220,7 @@ class go_suppression_device : public GameObjectScript
             bool _active;
         };
 
-        GameObjectAI* GetAI(GameObject* go) const
+        GameObjectAI* GetAI(GameObject* go) const override
         {
             return new go_suppression_deviceAI(go);
         }

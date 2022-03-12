@@ -40,24 +40,24 @@ public:
         full_ = head_ == tail_;
     }
 
-    bool empty() const
+    [[nodiscard]] bool empty() const
     {
         //if head and tail are equal, we are empty
         return (!full_ && (head_ == tail_));
     }
 
-    bool full() const
+    [[nodiscard]] bool full() const
     {
         //If tail is ahead the head by 1, we are full
         return full_;
     }
 
-    size_t capacity() const
+    [[nodiscard]] size_t capacity() const
     {
         return max_size_;
     }
 
-    size_t size() const
+    [[nodiscard]] size_t size() const
     {
         size_t size = max_size_;
 
@@ -98,6 +98,6 @@ private:
     size_t head_ = 0;
     size_t tail_ = 0;
     const size_t max_size_;
-    bool full_ = 0;
+    bool full_ = false;
 };
 #endif

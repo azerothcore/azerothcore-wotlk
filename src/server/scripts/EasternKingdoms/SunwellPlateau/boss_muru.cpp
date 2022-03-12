@@ -244,12 +244,12 @@ public:
                     me->CastSpell(me, SPELL_ENRAGE, true);
                     break;
                 case EVENT_SPAWN_DARKNESS:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                         me->CastSpell(target, SPELL_DARKNESS, true);
                     events.ScheduleEvent(EVENT_SPAWN_DARKNESS, 15000);
                     break;
                 case EVENT_SPAWN_BLACK_HOLE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                         me->CastSpell(target, SPELL_BLACK_HOLE, true);
                     events.ScheduleEvent(EVENT_SPAWN_BLACK_HOLE, 15000);
                     break;
@@ -482,7 +482,7 @@ public:
             if (target->GetDistance(GetCaster()) < 5.0f)
             {
                 float o = frand(0, 2 * M_PI);
-                pos.Relocate(GetCaster()->GetPositionX() + 4.0f * cos(o), GetCaster()->GetPositionY() + 4.0f * sin(o), GetCaster()->GetPositionZ() + frand(10.0f, 15.0f));
+                pos.Relocate(GetCaster()->GetPositionX() + 4.0f * cos(o), GetCaster()->GetPositionY() + 4.0f * std::sin(o), GetCaster()->GetPositionZ() + frand(10.0f, 15.0f));
             }
             else
                 pos.Relocate(GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ() + 1.0f);

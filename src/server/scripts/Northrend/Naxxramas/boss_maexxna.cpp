@@ -132,7 +132,7 @@ public:
             if (cr->GetEntry() == NPC_MAEXXNA_SPIDERLING)
             {
                 cr->SetInCombatWithZone();
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                 {
                     cr->AI()->AttackStart(target);
                 }
@@ -201,7 +201,7 @@ public:
                     Talk(EMOTE_WEB_WRAP);
                     for (uint8 i = 0; i < RAID_MODE(1, 2); ++i)
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0, true, -SPELL_WEB_WRAP))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0, true, -SPELL_WEB_WRAP))
                         {
                             target->RemoveAura(RAID_MODE(SPELL_WEB_SPRAY_10, SPELL_WEB_SPRAY_25));
                             uint8 pos = urand(0, 2);

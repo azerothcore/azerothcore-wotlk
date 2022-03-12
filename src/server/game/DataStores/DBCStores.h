@@ -23,9 +23,9 @@
 #include "DBCStructure.h"
 #include <list>
 #include <unordered_map>
+#include <unordered_set>
 
 typedef std::list<uint32> SimpleFactionsList;
-typedef std::vector<FlyByCamera> FlyByCameraCollection;
 
 SimpleFactionsList const* GetFactionTeamList(uint32 faction);
 
@@ -161,6 +161,7 @@ extern DBCStorage <SpellItemEnchantmentEntry>    sSpellItemEnchantmentStore;
 extern DBCStorage <SpellItemEnchantmentConditionEntry> sSpellItemEnchantmentConditionStore;
 extern SpellCategoryStore                        sSpellsByCategoryStore;
 extern PetFamilySpellsStore                      sPetFamilySpellsStore;
+extern std::unordered_set<uint32>                sPetTalentSpells;
 extern DBCStorage <SpellRadiusEntry>             sSpellRadiusStore;
 extern DBCStorage <SpellRangeEntry>              sSpellRangeStore;
 extern DBCStorage <SpellRuneCostEntry>           sSpellRuneCostStore;
@@ -187,9 +188,7 @@ extern DBCStorage <VehicleSeatEntry>             sVehicleSeatStore;
 extern DBCStorage <WMOAreaTableEntry>            sWMOAreaTableStore;
 //extern DBCStorage <WorldMapAreaEntry>           sWorldMapAreaStore; -- use Zone2MapCoordinates and Map2ZoneCoordinates
 extern DBCStorage <WorldMapOverlayEntry>         sWorldMapOverlayStore;
-extern std::unordered_map<uint32, FlyByCameraCollection> sFlyByCameraStore;
 
 void LoadDBCStores(const std::string& dataPath);
-void LoadM2Cameras(const std::string& dataPath);
 
 #endif

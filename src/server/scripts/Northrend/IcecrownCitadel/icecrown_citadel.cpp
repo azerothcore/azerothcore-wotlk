@@ -625,7 +625,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_DEATH_PLAGUE:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true, -SPELL_RECENTLY_INFECTED))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true, -SPELL_RECENTLY_INFECTED))
                         {
                             Talk(EMOTE_DEATH_PLAGUE_WARNING, target);
                             DoCast(target, SPELL_DEATH_PLAGUE);
@@ -1025,7 +1025,7 @@ public:
                 if (Creature* crusader = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_CAPTAIN_ARNATH + i)))
                     if (crusader->IsAlive())
                     {
-                        if (crusader->GetEntry() == crusader->GetCreatureData()->id)
+                        if (crusader->GetEntry() == crusader->GetCreatureData()->id1)
                         {
                             crusader->m_Events.AddEvent(new CaptainSurviveTalk(*crusader), crusader->m_Events.CalculateTime(delay));
                             delay += 6000;
@@ -1173,7 +1173,7 @@ public:
                     Talk(SAY_SVALNA_AGGRO);
                     break;
                 case EVENT_IMPALING_SPEAR:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true, -SPELL_IMPALING_SPEAR))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true, -SPELL_IMPALING_SPEAR))
                     {
                         DoCast(me, SPELL_AETHER_SHIELD);
                         me->AddAura(70203, me);
@@ -1207,7 +1207,7 @@ public:
     void Reset() override
     {
         me->SetCorpseDelay(DAY); // leave corpse for a long time so svalna can resurrect
-        IsUndead = (me->GetCreatureData() && me->GetCreatureData()->id != me->GetEntry());
+        IsUndead = (me->GetCreatureData() && me->GetCreatureData()->id1 != me->GetEntry());
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -1359,7 +1359,7 @@ public:
                     Events.ScheduleEvent(EVENT_ARNATH_SMITE, urand(4000, 7000));
                     break;
                 case EVENT_ARNATH_DOMINATE_MIND:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true, -SPELL_DOMINATE_MIND))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true, -SPELL_DOMINATE_MIND))
                         DoCast(target, SPELL_DOMINATE_MIND);
                     Events.ScheduleEvent(EVENT_ARNATH_DOMINATE_MIND, urand(28000, 37000));
                     break;
@@ -1437,7 +1437,7 @@ public:
                         Events.ScheduleEvent(EVENT_BRANDON_JUDGEMENT_OF_COMMAND, urand(8000, 13000));
                         break;
                     case EVENT_BRANDON_HAMMER_OF_BETRAYAL:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true))
                             DoCast(target, SPELL_HAMMER_OF_BETRAYAL);
                         Events.ScheduleEvent(EVENT_BRANDON_HAMMER_OF_BETRAYAL, urand(45000, 60000));
                         break;
@@ -1505,7 +1505,7 @@ public:
                         Events.ScheduleEvent(EVENT_GRONDEL_SUNDER_ARMOR, urand(5000, 17000));
                         break;
                     case EVENT_GRONDEL_CONFLAGRATION:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                             DoCast(target, SPELL_CONFLAGRATION);
                         Events.ScheduleEvent(EVENT_GRONDEL_CONFLAGRATION, urand(10000, 15000));
                         break;
@@ -1559,17 +1559,17 @@ public:
                 switch (eventId)
                 {
                     case EVENT_RUPERT_FEL_IRON_BOMB:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             DoCast(target, SPELL_FEL_IRON_BOMB);
                         Events.ScheduleEvent(EVENT_RUPERT_FEL_IRON_BOMB, urand(15000, 20000));
                         break;
                     case EVENT_RUPERT_MACHINE_GUN:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
                             DoCast(target, SPELL_MACHINE_GUN);
                         Events.ScheduleEvent(EVENT_RUPERT_MACHINE_GUN, urand(25000, 30000));
                         break;
                     case EVENT_RUPERT_ROCKET_LAUNCH:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
                             DoCast(target, SPELL_ROCKET_LAUNCH);
                         Events.ScheduleEvent(EVENT_RUPERT_ROCKET_LAUNCH, urand(10000, 15000));
                         break;
@@ -1711,7 +1711,7 @@ public:
                     break;
                 case 3: // Volley
                     {
-                        Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 35.0f, true);
+                        Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 35.0f, true);
                         if (target && me->GetDistance(target) > 10.0f)
                         {
                             me->CastSpell(target, 71252, false);
@@ -1740,7 +1740,7 @@ public:
                     me->CastSpell(me, 71270, true);
                     break;
                 case 32: // Frozen Orb
-                    if (Unit* target = SelectTarget(SELECT_TARGET_FARTHEST, 0, 30.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, 30.0f, true))
                         me->CastSpell(target, 71274, false);
                     events.RepeatEvent(urand(40000, 50000));
                     break;
@@ -1766,7 +1766,7 @@ public:
                 DoMeleeAttackIfReady();
         }
 
-        void SpellHitTarget(Unit* c, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* c, SpellInfo const* spell) override
         {
             if (spell->Id == 71306 && c->GetTypeId() == TYPEID_UNIT) // Twisted Winds
             {
@@ -2856,7 +2856,7 @@ public:
             return target->GetExactDist(4357.0f, 2769.0f, 356.0f) < 170.0f;
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if (spell->Id == 71906 || spell->Id == 71942)
             {
@@ -2901,7 +2901,7 @@ public:
                         uint8 count = me->GetMap()->Is25ManRaid() ? 4 : 2;
                         bool casted = false;
                         for (uint8 i = 0; i < count; ++i)
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 37.5f, true))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 37.5f, true))
                             {
                                 casted = true;
                                 me->CastSpell(target, 71906, true); // Severed Essence
@@ -3114,7 +3114,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case 1:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
                         me->CastSpell(target, 70362, false);
                     events.RepeatEvent(urand(25000, 35000));
                     break;
@@ -3215,7 +3215,7 @@ public:
                 float angle = who->GetAngle(me);
                 float dist = 3.0f;
                 pos.m_positionX += cos(angle) * dist;
-                pos.m_positionY += sin(angle) * dist;
+                pos.m_positionY += std::sin(angle) * dist;
                 me->GetMotionMaster()->MoveJump(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), 10.0f, 6.0f, 0);
             }
         }
@@ -3408,7 +3408,7 @@ public:
                     events.RepeatEvent(urand(20000, 30000));
                     break;
                 case 3:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
                         me->CastSpell(target, 70980, false);
                     events.RepeatEvent(urand(20000, 30000));
                     break;
@@ -3462,7 +3462,7 @@ public:
         {
             float dist = frand(18.0f, 39.0f);
             float o = rand_norm() * 2 * M_PI;
-            if (Creature* broodling = me->SummonCreature(NPC_NERUBAR_BROODLING, me->GetPositionX() + cos(o) * dist, me->GetPositionY() + sin(o) * dist, 250.0f, Position::NormalizeOrientation(o - M_PI)))
+            if (Creature* broodling = me->SummonCreature(NPC_NERUBAR_BROODLING, me->GetPositionX() + cos(o) * dist, me->GetPositionY() + std::sin(o) * dist, 250.0f, Position::NormalizeOrientation(o - M_PI)))
             {
                 broodling->CastSpell(broodling, SPELL_WEB_BEAM2, false);
                 broodling->GetMotionMaster()->MovePoint(POINT_ENTER_COMBAT, broodling->GetPositionX(), broodling->GetPositionY(), 213.03f, false);

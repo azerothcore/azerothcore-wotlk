@@ -210,7 +210,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_SHOCK_BLAST, urand(10000, 20000));
                     break;
                 case EVENT_SPELL_STATIC_CHARGE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f))
                         me->CastSpell(target, SPELL_STATIC_CHARGE, false);
                     events.ScheduleEvent(EVENT_SPELL_STATIC_CHARGE, 20000);
                     break;
@@ -229,7 +229,7 @@ public:
                     events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
                     break;
                 case EVENT_SPELL_FORKED_LIGHTNING:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 60.0f))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 60.0f))
                         me->CastSpell(target, SPELL_FORKED_LIGHTNING, false);
                     events.ScheduleEvent(EVENT_SPELL_FORKED_LIGHTNING, urand(2500, 5000));
                     break;
@@ -360,7 +360,7 @@ public:
             // toxic spores
             if (BoltTimer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                 {
                     if (Creature* trig = me->SummonCreature(TOXIC_SPORES_TRIGGER, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 30000))
                     {

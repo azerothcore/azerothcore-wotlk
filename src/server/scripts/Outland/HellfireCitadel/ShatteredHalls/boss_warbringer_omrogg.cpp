@@ -194,7 +194,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_THUNDER_CLAP, 25000);
                     break;
                 case EVENT_RESET_THREAT:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                     {
                         uint8 threatYell = urand(EVENT_THREAT_YELL_L_1, EVENT_THREAT_YELL_R_1);
                         if (Creature* head = threatYell == EVENT_THREAT_YELL_R_1 ? GetRightHead() : GetLeftHead())

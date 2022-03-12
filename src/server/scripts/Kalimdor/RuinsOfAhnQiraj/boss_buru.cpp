@@ -117,7 +117,7 @@ public:
             events.ScheduleEvent(EVENT_GATHERING_SPEED, 9000);
             events.ScheduleEvent(EVENT_FULL_SPEED, 60000);
 
-            if (Unit* victim = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+            if (Unit* victim = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
             {
                 DoResetThreat();
                 AttackStart(victim);
@@ -215,7 +215,7 @@ public:
         {
             if (who->GetEntry() == NPC_HATCHLING)
                 if (Creature* buru = me->GetMap()->GetCreature(_instance->GetGuidData(DATA_BURU)))
-                    if (Unit* target = buru->AI()->SelectTarget(SELECT_TARGET_RANDOM))
+                    if (Unit* target = buru->AI()->SelectTarget(SelectTargetMethod::Random))
                         who->AI()->AttackStart(target);
         }
 

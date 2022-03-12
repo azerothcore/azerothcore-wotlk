@@ -137,7 +137,7 @@ public:
                 pInstance->SetData(BOSS_ARGENT_CHALLENGE, IN_PROGRESS);
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == 66905 && me->GetHealth() == 1) // hammer throw back damage (15k)
                 me->CastSpell(me, 68197, true);
@@ -185,7 +185,7 @@ public:
                     events.RepeatEvent(16000);
                     break;
                 case EVENT_SPELL_HAMMER_RIGHTEOUS:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 55.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 55.0f, true) )
                     {
                         char buffer[100];
                         sprintf(buffer, "Eadric the Pure targets %s with the Hammer of the Righteous!", target->GetName().c_str());
@@ -358,12 +358,12 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_SMITE:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true) )
                         me->CastSpell(target, SPELL_SMITE, false);
                     events.RepeatEvent(urand(3000, 4000));
                     break;
                 case EVENT_SPELL_HOLY_FIRE:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true) )
                         me->CastSpell(target, SPELL_HOLY_FIRE, false);
                     events.RepeatEvent(urand(9000, 12000));
                     break;
@@ -451,12 +451,12 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_WAKING_NIGHTMARE, urand(20000, 30000));
                     break;
                 case EVENT_SPELL_OLD_WOUNDS:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 10.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 10.0f, true) )
                         me->CastSpell(target, SPELL_OLD_WOUNDS, true);
                     events.RepeatEvent(12000);
                     break;
                 case EVENT_SPELL_SHADOWS_PAST:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true) )
                         me->CastSpell(target, SPELL_SHADOWS_PAST, false);
                     events.RepeatEvent(urand(15000, 20000));
                     break;
@@ -695,7 +695,7 @@ public:
                     events.RepeatEvent(urand(35000, 45000));
                     break;
                 case EVENT_PRIESTESS_SPELL_MIND_CONTROL_H:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true) )
                         me->CastSpell(target, SPELL_MIND_CONTROL_H, false);
                     events.RepeatEvent(urand(22000, 30000));
                     break;

@@ -18,7 +18,6 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "ScriptedEscortAI.h"
 #include "azjol_nerub.h"
 
 enum Spells
@@ -172,7 +171,7 @@ public:
                     events.ScheduleEvent(EVENT_HADRONOX_PIERCE, 8000);
                     break;
                 case EVENT_HADRONOX_ACID:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, false))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, false))
                         me->CastSpell(target, SPELL_ACID_CLOUD, false);
                     events.ScheduleEvent(EVENT_HADRONOX_ACID, 25000);
                     break;

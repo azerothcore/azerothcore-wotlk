@@ -223,7 +223,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_FIREBALL, urand(3000, 4500));
                     break;
                 case EVENT_SPELL_FLAMESTRIKE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                     {
                         me->CastSpell(target, SPELL_FLAMESTRIKE_SUMMON, true);
                         Talk(SAY_FLAMESTRIKE);

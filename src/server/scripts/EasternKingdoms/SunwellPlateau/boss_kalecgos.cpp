@@ -196,9 +196,9 @@ public:
             }
         }
 
-        void JustDied(Unit* who) override
+        void JustDied(Unit* killer) override
         {
-            BossAI::JustDied(who);
+            BossAI::JustDied(killer);
         }
 
         void EnterCombat(Unit* who) override

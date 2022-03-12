@@ -120,7 +120,7 @@ public:
                         break;
                     case EVENT_DELUSIONSOFJINDO: // HACK
                         // Casting the delusion curse with a shade so shade will attack the same target with the curse.
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         {
                             DoCast(target, SPELL_DELUSIONSOFJINDO);
                             Creature* Shade = me->SummonCreature(NPC_SHADE_OF_JINDO, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
@@ -131,9 +131,9 @@ public:
                         break;
                     case EVENT_TELEPORT: // Possible HACK
                         // Teleports a random player and spawns 9 Sacrificed Trolls to attack player
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         {
-                            DoTeleportPlayer(target, TeleportLoc.m_positionX, TeleportLoc.m_positionY, TeleportLoc.m_positionZ, TeleportLoc.m_orientation);
+                            DoTeleportPlayer(target, TeleportLoc.m_positionX, TeleportLoc.m_positionY, TeleportLoc.m_positionZ, TeleportLoc.GetOrientation());
                             if (DoGetThreat(me->GetVictim()))
                                 DoModifyThreatPercent(target, -100);
                             Creature* SacrificedTroll;

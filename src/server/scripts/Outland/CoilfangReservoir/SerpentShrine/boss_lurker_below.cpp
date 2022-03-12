@@ -141,7 +141,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_WHIRL, 18000);
                     break;
                 case EVENT_SPELL_GEYSER:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_GEYSER, false);
                     events.ScheduleEvent(EVENT_SPELL_GEYSER, 10000);
                     break;
@@ -199,7 +199,7 @@ public:
 
             if (target)
                 me->AttackerStateUpdate(target);
-            else if ((target = SelectTarget(SELECT_TARGET_RANDOM, 0)))
+            else if ((target = SelectTarget(SelectTargetMethod::Random, 0)))
                 me->CastSpell(target, SPELL_WATER_BOLT, false);
 
             me->resetAttackTimer();

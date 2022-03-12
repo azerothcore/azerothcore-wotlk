@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.channels_bans
+-- Дамп структуры для таблица acore_characters.channels_bans
 DROP TABLE IF EXISTS `channels_bans`;
 CREATE TABLE IF NOT EXISTS `channels_bans` (
   `channelId` INT unsigned NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `channels_bans` (
   PRIMARY KEY (`channelId`,`playerGUID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_characters.channels_bans: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.channels_bans: ~0 rows (приблизительно)
 DELETE FROM `channels_bans`;
 /*!40000 ALTER TABLE `channels_bans` DISABLE KEYS */;
 /*!40000 ALTER TABLE `channels_bans` ENABLE KEYS */;

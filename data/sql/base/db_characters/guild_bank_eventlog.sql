@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.guild_bank_eventlog
+-- Дамп структуры для таблица acore_characters.guild_bank_eventlog
 DROP TABLE IF EXISTS `guild_bank_eventlog`;
 CREATE TABLE IF NOT EXISTS `guild_bank_eventlog` (
   `guildid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Guild Identificator',
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `guild_bank_eventlog` (
   KEY `Idx_LogGuid` (`LogGuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_characters.guild_bank_eventlog: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.guild_bank_eventlog: ~0 rows (приблизительно)
 DELETE FROM `guild_bank_eventlog`;
 /*!40000 ALTER TABLE `guild_bank_eventlog` DISABLE KEYS */;
 /*!40000 ALTER TABLE `guild_bank_eventlog` ENABLE KEYS */;

@@ -178,6 +178,7 @@ enum Misc
     ACTION_DELAY_CANNON             = 5,
     ACTION_DESTROYED_TURRET         = 6,
 };
+const Position homePos = {322.39f, -14.5f, 409.8f, 3.14f};
 
 ///////////////////////////////////////////
 //
@@ -240,7 +241,7 @@ public:
         }
 
         void SummonedCreatureDespawn(Creature* cr) override { summons.Despawn(cr); }
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override;
+        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override;
         void JustDied(Unit*) override;
         void KilledUnit(Unit* who) override;
         void SpellHitTarget(Unit* target, SpellInfo const* spell) override;
@@ -259,8 +260,7 @@ public:
             Talk(FLAME_LEVIATHAN_SAY_AGGRO);
 
             me->setActive(true);
-            me->SetHomePosition(322.4f, -14.3f, 409.8f, 3.23f);
-            TurnGates(true, false);
+            me->SetHomePosition(homePos);
             TurnHealStations(false);
             ActivateTowers();
             if (m_pInstance)
@@ -274,8 +274,8 @@ public:
         {
             if (m_pInstance && m_pInstance->GetData(TYPE_LEVIATHAN) == SPECIAL)
             {
-                me->SetHomePosition(322.4f, -14.3f, 409.8f, 3.23f);
-                me->UpdatePosition(322.4f, -14.3f, 409.8f, 3.23f);
+                me->SetHomePosition(homePos);
+                me->UpdatePosition(homePos);
                 me->StopMovingOnCurrentPos();
             }
 
@@ -368,11 +368,12 @@ public:
                 else if (_speakTimer > 41000 && _speakTimer < 60000)
                 {
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    me->SendMonsterMove(380.4f, -14.3f, 409.8f, 2000);
-                    me->UpdatePosition(380.4f, -14.3f, 409.8f, me->GetOrientation());
+                    TurnGates(true, false);
+                    me->MonsterMoveWithSpeed(homePos.GetPositionX(), homePos.GetPositionY(), homePos.GetPositionZ(), 100.0f);
+                    me->UpdatePosition(homePos);
                     _speakTimer = 60000;
                 }
-                else if (_speakTimer > 61500)
+                else if (_speakTimer > 63500)
                 {
                     me->SetInCombatWithZone();
                     if (!me->GetVictim())
@@ -608,7 +609,7 @@ void boss_flame_leviathan::boss_flame_leviathanAI::ScheduleEvents()
     events.RescheduleEvent(EVENT_PURSUE, 0);
 }
 
-void boss_flame_leviathan::boss_flame_leviathanAI::SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
+void boss_flame_leviathan::boss_flame_leviathanAI::SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo)
 {
     if (spellInfo->Id == SPELL_SYSTEMS_SHUTDOWN)
     {
@@ -804,10 +805,10 @@ public:
             }
         }
 
-        void JustDied(Unit* who) override
+        void JustDied(Unit* killer) override
         {
-            if (Player* killer = who->ToPlayer())
-                killer->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS, 1, 0, me);
+            if (Player* player = killer->ToPlayer())
+                player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS, 1, 0, me);
 
             if (Vehicle* vehicle = me->GetVehicle())
                 if (Unit* device = vehicle->GetPassenger(SEAT_DEVICE))
@@ -1183,7 +1184,7 @@ public:
             damage = 0;
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
         {
             if (spellInfo->SchoolMask & SPELL_SCHOOL_MASK_FIRE && !me->HasAura(SPELL_BLAZE))
                 me->CastSpell(me, SPELL_BLAZE, true);

@@ -685,7 +685,7 @@ public:
             if (a == 1)
             {
                 me->SetInCombatWithZone();
-                if (Unit* target = SelectTarget(SELECT_TARGET_NEAREST, 0, 0.0f, true))
+                if (Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 0.0f, true))
                     AttackStart(target);
             }
         }
@@ -781,7 +781,7 @@ public:
             if (a == 1)
             {
                 me->SetInCombatWithZone();
-                if (Unit* target = SelectTarget(SELECT_TARGET_NEAREST, 0, 0.0f, true))
+                if (Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 0.0f, true))
                     AttackStart(target);
             }
         }
@@ -925,7 +925,7 @@ public:
             if (a == 1)
             {
                 me->SetInCombatWithZone();
-                if (Unit* target = SelectTarget(SELECT_TARGET_NEAREST, 0, 0.0f, true))
+                if (Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 0.0f, true))
                     AttackStart(target);
             }
         }
@@ -1020,7 +1020,7 @@ public:
             if (a == 1)
             {
                 me->SetInCombatWithZone();
-                if (Unit* target = SelectTarget(SELECT_TARGET_NEAREST, 0, 0.0f, true))
+                if (Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 0.0f, true))
                     AttackStart(target);
             }
         }
@@ -1103,7 +1103,7 @@ public:
             if (a == 1)
             {
                 me->SetInCombatWithZone();
-                if (Unit* target = SelectTarget(SELECT_TARGET_NEAREST, 0, 0.0f, true))
+                if (Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 0.0f, true))
                     AttackStart(target);
             }
         }
@@ -1460,7 +1460,7 @@ public:
             summons.Despawn(s);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if (target && target->IsAlive() && spell->Id == SPELL_LICH_KING_ZAP_PLAYER)
                 Unit::DealDamage(me, target, 10000);

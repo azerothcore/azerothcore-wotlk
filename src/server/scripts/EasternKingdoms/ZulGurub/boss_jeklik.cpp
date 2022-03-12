@@ -143,7 +143,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_CHARGE_JEKLIK:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         {
                             DoCast(target, SPELL_CHARGE);
                             AttackStart(target);
@@ -159,14 +159,14 @@ public:
                         events.ScheduleEvent(EVENT_SCREECH, urand(18000, 26000), 0, PHASE_ONE);
                         break;
                     case EVENT_SPAWN_BATS:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             for (uint8 i = 0; i < 6; ++i)
                                 if (Creature* bat = me->SummonCreature(NPC_BLOODSEEKER_BAT, SpawnBat[i], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
                                     bat->AI()->AttackStart(target);
                         events.ScheduleEvent(EVENT_SPAWN_BATS, 60000, 0, PHASE_ONE);
                         break;
                     case EVENT_SHADOW_WORD_PAIN:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             DoCast(target, SPELL_SHADOW_WORD_PAIN);
                         events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, urand(12000, 18000), 0, PHASE_TWO);
                         break;
@@ -185,7 +185,7 @@ public:
                         events.ScheduleEvent(EVENT_GREATER_HEAL, urand(25000, 35000), 0, PHASE_TWO);
                         break;
                     case EVENT_SPAWN_FLYING_BATS:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             if (Creature* flyingBat = me->SummonCreature(NPC_FRENZIED_BAT, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + 15.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
                                 flyingBat->AI()->AttackStart(target);
                         events.ScheduleEvent(EVENT_SPAWN_FLYING_BATS, urand(10000, 15000), 0, PHASE_TWO);
@@ -234,7 +234,7 @@ public:
             if (Bomb_Timer <= diff)
             {
                 std::list<Unit*> targets;
-                SelectTargetList(targets, 1, SELECT_TARGET_RANDOM, 500.0f, true);
+                SelectTargetList(targets, 1, SelectTargetMethod::Random, 500.0f, true);
                 if (!targets.empty())
                 {
                     if (targets.size() > 1)

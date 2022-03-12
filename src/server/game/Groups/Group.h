@@ -43,7 +43,7 @@ struct MapEntry;
 #define MAX_RAID_SUBGROUPS MAXRAIDSIZE/MAXGROUPSIZE
 #define TARGETICONCOUNT 8
 
-enum RollVote
+enum RollVote : uint32
 {
     PASS              = 0,
     NEED              = 1,
@@ -135,7 +135,7 @@ enum DifficultyPreventionChangeType
 
 #define GROUP_UPDATE_FLAGS_COUNT          20
 // 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19
-static const uint8 GroupUpdateLength[GROUP_UPDATE_FLAGS_COUNT] = { 0, 2, 2, 2, 1, 2, 2, 2, 2, 4, 8, 8, 1, 2, 2, 2, 1, 2, 2, 8};
+static const uint8 GroupUpdateLength[GROUP_UPDATE_FLAGS_COUNT] = { 0, 2, 2, 2, 1, 2, 2, 2, 2, 4, 8, 8, 1, 2, 2, 2, 1, 2, 2, 8 };
 
 class Roll : public LootValidatorRef
 {
@@ -254,7 +254,7 @@ public:
     void RemoveUniqueGroupMemberFlag(GroupMemberFlags flag);
 
     void SetTargetIcon(uint8 id, ObjectGuid whoGuid, ObjectGuid targetGuid);
-    ObjectGuid const GetTargetIcon(uint8 id) const { return m_targetIcons[i]; }
+    ObjectGuid const GetTargetIcon(uint8 id) const { return m_targetIcons[id]; }
 
     Difficulty GetDifficulty(bool isRaid) const;
     Difficulty GetDungeonDifficulty() const;
@@ -271,8 +271,8 @@ public:
     void SendUpdateToPlayer(ObjectGuid playerGUID, MemberSlot* slot = nullptr);
     void UpdatePlayerOutOfRange(Player* player);
     // ignore: GUID of player that will be ignored
-    void BroadcastPacket(WorldPacket* packet, bool ignorePlayersInBGRaid, int group = -1, ObjectGuid ignore = ObjectGuid::Empty);
-    void BroadcastReadyCheck(WorldPacket* packet);
+    void BroadcastPacket(WorldPacket const* packet, bool ignorePlayersInBGRaid, int group = -1, ObjectGuid ignore = ObjectGuid::Empty);
+    void BroadcastReadyCheck(WorldPacket const* packet);
     void OfflineReadyCheck();
 
     /*********************************************************/
@@ -313,13 +313,9 @@ public:
     bool IsLfgHeroic() const { return isLFGGroup() && (m_lfgGroupFlags & GROUP_LFG_FLAG_IS_HEROIC); }
 
     // Difficulty Change
-    uint32 GetDifficultyChangePreventionTime() const { return _difficultyChangePreventionTime > time(nullptr) ? _difficultyChangePreventionTime - time(nullptr) : 0; }
+    uint32 GetDifficultyChangePreventionTime() const;
     DifficultyPreventionChangeType GetDifficultyChangePreventionReason() const { return _difficultyChangePreventionType; }
-    void SetDifficultyChangePrevention(DifficultyPreventionChangeType type)
-    {
-        _difficultyChangePreventionTime = time(nullptr) + MINUTE;
-        _difficultyChangePreventionType = type;
-    }
+    void SetDifficultyChangePrevention(DifficultyPreventionChangeType type);
 
 protected:
     void _homebindIfInstance(Player* player);

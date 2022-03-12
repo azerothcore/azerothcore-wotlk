@@ -83,7 +83,7 @@ public:
                 }
                 case EVENT_LAVA_BOMB:
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, MELEE_TARGET_LOOKUP_DIST, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, MELEE_TARGET_LOOKUP_DIST, true))
                     {
                         DoCast(target, SPELL_LAVA_BOMB);
                     }
@@ -97,7 +97,7 @@ public:
                     SelectTargetList(targets, [this](Unit* target)
                     {
                         return target && target->IsPlayer() && target->GetDistance(me) > MELEE_TARGET_LOOKUP_DIST && target->GetDistance(me) < 100.0f;
-                    }, 1, SELECT_TARGET_RANDOM);
+                    }, 1, SelectTargetMethod::Random);
 
                     if (!targets.empty())
                     {

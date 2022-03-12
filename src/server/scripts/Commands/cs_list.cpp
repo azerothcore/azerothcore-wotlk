@@ -85,30 +85,30 @@ public:
         QueryResult result;
 
         uint32 creatureCount = 0;
-        result = WorldDatabase.PQuery("SELECT COUNT(guid) FROM creature WHERE id='%u'", uint32(creatureId));
+        result = WorldDatabase.Query("SELECT COUNT(guid) FROM creature WHERE id1='{}' OR id2='{}' OR id3='{}'", uint32(creatureId), uint32(creatureId), uint32(creatureId));
         if (result)
-            creatureCount = (*result)[0].GetUInt64();
+            creatureCount = (*result)[0].Get<uint64>();
 
         if (handler->GetSession())
         {
             Player* player = handler->GetSession()->GetPlayer();
-            result = WorldDatabase.PQuery("SELECT guid, position_x, position_y, position_z, map, (POW(position_x - '%f', 2) + POW(position_y - '%f', 2) + POW(position_z - '%f', 2)) AS order_ FROM creature WHERE id = '%u' ORDER BY order_ ASC LIMIT %u",
-                                          player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), uint32(creatureId), count);
+            result = WorldDatabase.Query("SELECT guid, position_x, position_y, position_z, map, (POW(position_x - '{}', 2) + POW(position_y - '{}', 2) + POW(position_z - '{}', 2)) AS order_ FROM creature WHERE id1='{}' OR id2='{}' OR id3='{}' ORDER BY order_ ASC LIMIT {}",
+                                          player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), uint32(creatureId), uint32(creatureId), uint32(creatureId), count);
         }
         else
-            result = WorldDatabase.PQuery("SELECT guid, position_x, position_y, position_z, map FROM creature WHERE id = '%u' LIMIT %u",
-                                          uint32(creatureId), count);
+            result = WorldDatabase.Query("SELECT guid, position_x, position_y, position_z, map FROM creature WHERE id1='{}' OR id2='{}' OR id3='{}' LIMIT {}",
+                                          uint32(creatureId), uint32(creatureId), uint32(creatureId), count);
 
         if (result)
         {
             do
             {
                 Field* fields               = result->Fetch();
-                ObjectGuid::LowType guid    = fields[0].GetUInt32();
-                float x                     = fields[1].GetFloat();
-                float y                     = fields[2].GetFloat();
-                float z                     = fields[3].GetFloat();
-                uint16 mapId                = fields[4].GetUInt16();
+                ObjectGuid::LowType guid    = fields[0].Get<uint32>();
+                float x                     = fields[1].Get<float>();
+                float y                     = fields[2].Get<float>();
+                float z                     = fields[3].Get<float>();
+                uint16 mapId                = fields[4].Get<uint16>();
                 bool liveFound = false;
 
                 // Get map (only support base map from console)
@@ -175,15 +175,15 @@ public:
         uint32 inventoryCount = 0;
 
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_INVENTORY_COUNT_ITEM);
-        stmt->setUInt32(0, itemId);
+        stmt->SetData(0, itemId);
         result = CharacterDatabase.Query(stmt);
 
         if (result)
-            inventoryCount = (*result)[0].GetUInt64();
+            inventoryCount = (*result)[0].Get<uint64>();
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_INVENTORY_ITEM_BY_ENTRY);
-        stmt->setUInt32(0, itemId);
-        stmt->setUInt32(1, count);
+        stmt->SetData(0, itemId);
+        stmt->SetData(1, count);
         result = CharacterDatabase.Query(stmt);
 
         if (result)
@@ -191,12 +191,12 @@ public:
             do
             {
                 Field* fields           = result->Fetch();
-                uint32 itemGuid         = fields[0].GetUInt32();
-                uint32 itemBag          = fields[1].GetUInt32();
-                uint8 itemSlot          = fields[2].GetUInt8();
-                uint32 ownerGuid        = fields[3].GetUInt32();
-                uint32 ownerAccountId   = fields[4].GetUInt32();
-                std::string ownerName   = fields[5].GetString();
+                uint32 itemGuid         = fields[0].Get<uint32>();
+                uint32 itemBag          = fields[1].Get<uint32>();
+                uint8 itemSlot          = fields[2].Get<uint8>();
+                uint32 ownerGuid        = fields[3].Get<uint32>();
+                uint32 ownerAccountId   = fields[4].Get<uint32>();
+                std::string ownerName   = fields[5].Get<std::string>();
 
                 char const* itemPos = nullptr;
                 if (Player::IsEquipmentPos(itemBag, itemSlot))
@@ -224,17 +224,17 @@ public:
         uint32 mailCount = 0;
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAIL_COUNT_ITEM);
-        stmt->setUInt32(0, itemId);
+        stmt->SetData(0, itemId);
         result = CharacterDatabase.Query(stmt);
 
         if (result)
-            mailCount = (*result)[0].GetUInt64();
+            mailCount = (*result)[0].Get<uint64>();
 
         if (count > 0)
         {
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAIL_ITEMS_BY_ENTRY);
-            stmt->setUInt32(0, itemId);
-            stmt->setUInt32(1, count);
+            stmt->SetData(0, itemId);
+            stmt->SetData(1, count);
             result = CharacterDatabase.Query(stmt);
         }
         else
@@ -245,13 +245,13 @@ public:
             do
             {
                 Field* fields                   = result->Fetch();
-                ObjectGuid::LowType itemGuid    = fields[0].GetUInt32();
-                ObjectGuid::LowType itemSender  = fields[1].GetUInt32();
-                uint32 itemReceiver             = fields[2].GetUInt32();
-                uint32 itemSenderAccountId      = fields[3].GetUInt32();
-                std::string itemSenderName      = fields[4].GetString();
-                uint32 itemReceiverAccount      = fields[5].GetUInt32();
-                std::string itemReceiverName    = fields[6].GetString();
+                ObjectGuid::LowType itemGuid    = fields[0].Get<uint32>();
+                ObjectGuid::LowType itemSender  = fields[1].Get<uint32>();
+                uint32 itemReceiver             = fields[2].Get<uint32>();
+                uint32 itemSenderAccountId      = fields[3].Get<uint32>();
+                std::string itemSenderName      = fields[4].Get<std::string>();
+                uint32 itemReceiverAccount      = fields[5].Get<uint32>();
+                std::string itemReceiverName    = fields[6].Get<std::string>();
 
                 char const* itemPos = "[in mail]";
 
@@ -271,17 +271,17 @@ public:
         uint32 auctionCount = 0;
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_AUCTIONHOUSE_COUNT_ITEM);
-        stmt->setUInt32(0, itemId);
+        stmt->SetData(0, itemId);
         result = CharacterDatabase.Query(stmt);
 
         if (result)
-            auctionCount = (*result)[0].GetUInt64();
+            auctionCount = (*result)[0].Get<uint64>();
 
         if (count > 0)
         {
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_AUCTIONHOUSE_ITEM_BY_ENTRY);
-            stmt->setUInt32(0, itemId);
-            stmt->setUInt32(1, count);
+            stmt->SetData(0, itemId);
+            stmt->SetData(1, count);
             result = CharacterDatabase.Query(stmt);
         }
         else
@@ -292,10 +292,10 @@ public:
             do
             {
                 Field* fields           = result->Fetch();
-                uint32 itemGuid         = fields[0].GetUInt32();
-                uint32 owner            = fields[1].GetUInt32();
-                uint32 ownerAccountId   = fields[2].GetUInt32();
-                std::string ownerName   = fields[3].GetString();
+                uint32 itemGuid         = fields[0].Get<uint32>();
+                uint32 owner            = fields[1].Get<uint32>();
+                uint32 ownerAccountId   = fields[2].Get<uint32>();
+                std::string ownerName   = fields[3].Get<std::string>();
 
                 char const* itemPos = "[in auction]";
 
@@ -308,15 +308,15 @@ public:
         uint32 guildCount = 0;
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GUILD_BANK_COUNT_ITEM);
-        stmt->setUInt32(0, itemId);
+        stmt->SetData(0, itemId);
         result = CharacterDatabase.Query(stmt);
 
         if (result)
-            guildCount = (*result)[0].GetUInt64();
+            guildCount = (*result)[0].Get<uint64>();
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GUILD_BANK_ITEM_BY_ENTRY);
-        stmt->setUInt32(0, itemId);
-        stmt->setUInt32(1, count);
+        stmt->SetData(0, itemId);
+        stmt->SetData(1, count);
         result = CharacterDatabase.Query(stmt);
 
         if (result)
@@ -324,9 +324,9 @@ public:
             do
             {
                 Field* fields = result->Fetch();
-                uint32 itemGuid = fields[0].GetUInt32();
-                uint32 guildGuid = fields[1].GetUInt32();
-                std::string guildName = fields[2].GetString();
+                uint32 itemGuid = fields[0].Get<uint32>();
+                uint32 guildGuid = fields[1].Get<uint32>();
+                std::string guildName = fields[2].Get<std::string>();
 
                 char const* itemPos = "[in guild bank]";
 
@@ -372,18 +372,18 @@ public:
         QueryResult result;
 
         uint32 objectCount = 0;
-        result = WorldDatabase.PQuery("SELECT COUNT(guid) FROM gameobject WHERE id='%u'", uint32(gameObjectId));
+        result = WorldDatabase.Query("SELECT COUNT(guid) FROM gameobject WHERE id='{}'", uint32(gameObjectId));
         if (result)
-            objectCount = (*result)[0].GetUInt64();
+            objectCount = (*result)[0].Get<uint64>();
 
         if (handler->GetSession())
         {
             Player* player = handler->GetSession()->GetPlayer();
-            result = WorldDatabase.PQuery("SELECT guid, position_x, position_y, position_z, map, id, (POW(position_x - '%f', 2) + POW(position_y - '%f', 2) + POW(position_z - '%f', 2)) AS order_ FROM gameobject WHERE id = '%u' ORDER BY order_ ASC LIMIT %u",
+            result = WorldDatabase.Query("SELECT guid, position_x, position_y, position_z, map, id, (POW(position_x - '{}', 2) + POW(position_y - '{}', 2) + POW(position_z - '{}', 2)) AS order_ FROM gameobject WHERE id = '{}' ORDER BY order_ ASC LIMIT {}",
                                           player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), uint32(gameObjectId), count);
         }
         else
-            result = WorldDatabase.PQuery("SELECT guid, position_x, position_y, position_z, map, id FROM gameobject WHERE id = '%u' LIMIT %u",
+            result = WorldDatabase.Query("SELECT guid, position_x, position_y, position_z, map, id FROM gameobject WHERE id = '{}' LIMIT {}",
                                           uint32(gameObjectId), count);
 
         if (result)
@@ -391,12 +391,12 @@ public:
             do
             {
                 Field* fields               = result->Fetch();
-                ObjectGuid::LowType guid    = fields[0].GetUInt32();
-                float x                     = fields[1].GetFloat();
-                float y                     = fields[2].GetFloat();
-                float z                     = fields[3].GetFloat();
-                uint16 mapId                = fields[4].GetUInt16();
-                uint32 entry                = fields[5].GetUInt32();
+                ObjectGuid::LowType guid    = fields[0].Get<uint32>();
+                float x                     = fields[1].Get<float>();
+                float y                     = fields[2].Get<float>();
+                float z                     = fields[3].Get<float>();
+                uint16 mapId                = fields[4].Get<uint16>();
+                uint32 entry                = fields[5].Get<uint32>();
                 bool liveFound = false;
 
                 // Get map (only support base map from console)

@@ -21,6 +21,7 @@
 #include "BattlegroundMgr.h"
 #include "Chat.h"
 #include "DisableMgr.h"
+#include "GameTime.h"
 #include "Group.h"
 #include "Language.h"
 #include "ObjectAccessor.h"
@@ -34,7 +35,7 @@ void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket& recvData)
 {
     ObjectGuid guid;
     recvData >> guid;
-    LOG_DEBUG("network", "WORLD: Recvd CMSG_BATTLEMASTER_HELLO Message from (%s)", guid.ToString().c_str());
+    LOG_DEBUG("network", "WORLD: Recvd CMSG_BATTLEMASTER_HELLO Message from ({})", guid.ToString());
 
     Creature* unit = GetPlayer()->GetMap()->GetCreature(guid);
     if (!unit)
@@ -44,7 +45,9 @@ void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket& recvData)
         return;
 
     // Stop the npc if moving
-    unit->StopMoving();
+    if (uint32 pause = unit->GetMovementTemplate().GetInteractionPauseTimer())
+        unit->PauseMovement(pause);
+    unit->SetHomePosition(unit->GetPosition());
 
     BattlegroundTypeId bgTypeId = sBattlegroundMgr->GetBattleMasterBG(unit->GetEntry());
 
@@ -149,23 +152,38 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
     // check if player can queue:
     if (!joinAsGroup)
     {
+        lfg::LfgState lfgState = sLFGMgr->GetState(GetPlayer()->GetGUID());
         if (GetPlayer()->InBattleground()) // currently in battleground
+        {
             err = ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND;
-        else if (GetPlayer()->isUsingLfg()) // using lfg system
+        }
+        else if (lfgState > lfg::LFG_STATE_NONE && (lfgState != lfg::LFG_STATE_QUEUED || !sWorld->getBoolConfig(CONFIG_ALLOW_JOIN_BG_AND_LFG))) // using lfg system
+        {
             err = ERR_LFG_CANT_USE_BATTLEGROUND;
+        }
         else if (!_player->CanJoinToBattleground()) // has deserter debuff
+        {
             err = ERR_GROUP_JOIN_BATTLEGROUND_DESERTERS;
+        }
         else if (_player->InBattlegroundQueueForBattlegroundQueueType(bgQueueTypeIdRandom)) // queued for random bg, so can't queue for anything else
+        {
             err = ERR_IN_RANDOM_BG;
+        }
         else if (_player->InBattlegroundQueue() && bgTypeId == BATTLEGROUND_RB) // already in queue, so can't queue for random
+        {
             err = ERR_IN_NON_RANDOM_BG;
+        }
         else if (_player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_2v2) ||
-                 _player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_3v3) ||
-                 _player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_5v5)) // can't be already queued for arenas
+            _player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_3v3) ||
+            _player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_5v5)) // can't be already queued for arenas
+        {
             err = ERR_BATTLEGROUND_QUEUED_FOR_RATED;
+        }
         // don't let Death Knights join BG queues when they are not allowed to be teleported yet
         else if (_player->getClass() == CLASS_DEATH_KNIGHT && _player->GetMapId() == 609 && !_player->IsGameMaster() && !_player->HasSpell(50977))
+        {
             err = ERR_BATTLEGROUND_NONE;
+        }
 
         if (err <= 0)
         {
@@ -334,7 +352,7 @@ void WorldSession::HandlePVPLogDataOpcode(WorldPacket& /*recvData*/)
         return;
 
     WorldPacket data;
-    sBattlegroundMgr->BuildPvpLogDataPacket(&data, bg);
+    bg->BuildPvPLogDataPacket(data);
     SendPacket(&data);
 
     LOG_DEBUG("network", "WORLD: Sent MSG_PVP_LOG_DATA Message");
@@ -461,8 +479,10 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recvData)
                 sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_IN_PROGRESS, 0, bg->GetStartTime(), bg->GetArenaType(), teamId);
                 SendPacket(&data);
 
-                _player->SetBattlegroundId(bg->GetInstanceID(), bg->GetBgTypeID(), queueSlot, true, bgTypeId == BATTLEGROUND_RB, teamId);
+                // Remove from LFG queues
+                sLFGMgr->LeaveAllLfgQueues(_player->GetGUID(), false);
 
+                _player->SetBattlegroundId(bg->GetInstanceID(), bg->GetBgTypeID(), queueSlot, true, bgTypeId == BATTLEGROUND_RB, teamId);
                 sBattlegroundMgr->SendToBattleground(_player, ginfo.IsInvitedToBGInstanceGUID, bgTypeId);
             }
             break;
@@ -476,8 +496,8 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recvData)
                     if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_TRACK_DESERTERS))
                     {
                         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_DESERTER_TRACK);
-                        stmt->setUInt32(0, _player->GetGUID().GetCounter());
-                        stmt->setUInt8(1, BG_DESERTION_TYPE_LEAVE_QUEUE);
+                        stmt->SetData(0, _player->GetGUID().GetCounter());
+                        stmt->SetData(1, BG_DESERTION_TYPE_LEAVE_QUEUE);
                         CharacterDatabase.Execute(stmt);
                     }
 
@@ -546,7 +566,7 @@ void WorldSession::HandleBattlefieldStatusOpcode(WorldPacket& /*recvData*/)
             if (!bg)
                 continue;
 
-            uint32 remainingTime = (World::GetGameTimeMS() < ginfo.RemoveInviteTime ? getMSTimeDiff(World::GetGameTimeMS(), ginfo.RemoveInviteTime) : 1);
+            uint32 remainingTime = (GameTime::GetGameTimeMS().count() < ginfo.RemoveInviteTime ? getMSTimeDiff(GameTime::GetGameTimeMS().count(), ginfo.RemoveInviteTime) : 1);
             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, i, STATUS_WAIT_JOIN, remainingTime, 0, ginfo.ArenaType, TEAM_NEUTRAL, bg->isRated(), ginfo.BgTypeId);
             SendPacket(&data);
         }
@@ -563,7 +583,7 @@ void WorldSession::HandleBattlefieldStatusOpcode(WorldPacket& /*recvData*/)
                 continue;
 
             uint32 avgWaitTime = bgQueue.GetAverageQueueWaitTime(&ginfo);
-            sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bgt, i, STATUS_WAIT_QUEUE, avgWaitTime, getMSTimeDiff(ginfo.JoinTime, World::GetGameTimeMS()), ginfo.ArenaType, TEAM_NEUTRAL, ginfo.IsRated);
+            sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bgt, i, STATUS_WAIT_QUEUE, avgWaitTime, getMSTimeDiff(ginfo.JoinTime, GameTime::GetGameTimeMS().count()), ginfo.ArenaType, TEAM_NEUTRAL, ginfo.IsRated);
             SendPacket(&data);
         }
     }
@@ -667,10 +687,15 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket& recvData)
     // check if player can queue:
     if (!asGroup)
     {
+        lfg::LfgState lfgState = sLFGMgr->GetState(GetPlayer()->GetGUID());
         if (GetPlayer()->InBattleground()) // currently in battleground
+        {
             err = ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND;
-        else if (GetPlayer()->isUsingLfg()) // using lfg system
+        }
+        else if (lfgState > lfg::LFG_STATE_NONE && (lfgState != lfg::LFG_STATE_QUEUED || !sWorld->getBoolConfig(CONFIG_ALLOW_JOIN_BG_AND_LFG))) // using lfg system
+        {
             err = ERR_LFG_CANT_USE_BATTLEGROUND;
+        }
 
         if (err <= 0)
         {
@@ -806,7 +831,7 @@ void WorldSession::HandleReportPvPAFK(WorldPacket& recvData)
         return;
     }
 
-    LOG_DEBUG("bg.battleground", "WorldSession::HandleReportPvPAFK: %s reported %s", _player->GetName().c_str(), reportedPlayer->GetName().c_str());
+    LOG_DEBUG("bg.battleground", "WorldSession::HandleReportPvPAFK: {} reported {}", _player->GetName(), reportedPlayer->GetName());
 
     reportedPlayer->ReportedAfkBy(_player);
 }
