@@ -156,6 +156,7 @@ public:
 
                 // Coliseum Announcer:
                 case NPC_JAEREN:
+                case NPC_ARELAS:
                     NPC_AnnouncerGUID = creature->GetGUID();
                     //if( TeamIdInInstance == TEAM_ALLIANCE )
                     //  creature->UpdateEntry(NPC_ARELAS);
