@@ -275,7 +275,7 @@ public:
             {
                 KilledAdds++;
             }
-            
+
             if (action == ACTION_KILLED)
             {
                 Unit::Kill(me, me);
