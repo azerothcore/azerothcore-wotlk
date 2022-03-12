@@ -400,29 +400,26 @@ enum MEK_T
     MEK1_REPLY = 0,
 };
 
-enum STEAM_Texts
-{
-    STEAM_0 = 0,
-    STEAM_1,
-    STEAM_2,
-    STEAM_3,
-    STEAM_4,
-    STEAM_5,
-    STEAM_6,
-    STEAM_7,
-    STEAM_8,
-    STEAM_9,
-    STEAM_10,
-    STEAM_11,
-    STEAM_12,
-    STEAM_13,
-    STEAM_14,
-    STEAM_15,
-    STEAM_16,
-    STEAM_17,
-    STEAM_18,
-};
-
+ 
+#define STEAM_0     "Well, a useless bunch of gears, let's get to work!"
+#define STEAM_1     "I will teach you everything a real soldier should be able to do!"
+#define STEAM_2     "First of all, you need to go through drill."
+#define STEAM_3     "On the signal, show me how to greet the commander according to the regulations!"
+#define STEAM_4     "So, recruits, salute your commander!"
+#define STEAM_5     "Great job!"
+#define STEAM_6     "На поле боя важно устрашить врага бешеным боевым ревом!"
+#define STEAM_7     "As soon as I give the signal, show me what real madness is!"
+#define STEAM_8     "Show me real frenzy!"
+#define STEAM_9     "Wow, nice!"
+#define STEAM_10    "Remember that the most important factor in any battle is the spirit!"
+#define STEAM_11    "Get ready to show me how a soldier should be happy to win!"
+#define STEAM_12    "Come on! Express your delight!"
+#define STEAM_13    "Amazing!"
+#define STEAM_14    "However, the most important thing in the battle is to be able to properly celebrate the victory earned with sweat and blood!"
+#define STEAM_15    "Perform your best victory dance for me! Start on the signal!"
+#define STEAM_16    "And now - to dance!"
+#define STEAM_17    "Great!"
+#define STEAM_18    "You're the best rookie squad I've ever seen! Let's do it all over again!"
 #define MEK_1_1                 "Citizens and Friends of Gnomeregan!"
 #define MEK_1_2                 "Today we could wrest from the vile traitor Thermaplugg our glorious city!"
 #define MEK_1_3                 "Will stand shoulder to shoulder in the battle for the motherland!"
