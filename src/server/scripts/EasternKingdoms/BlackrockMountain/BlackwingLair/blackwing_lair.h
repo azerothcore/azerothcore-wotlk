@@ -20,7 +20,7 @@
 
 #include "CreatureAIImpl.h"
 
-uint32 const EncounterCount     = 8;
+constexpr uint32 EncounterCount = 8;
 
 #define BWLScriptName "instance_blackwing_lair"
 #define DataHeader    "BWL"
@@ -73,7 +73,8 @@ enum BWLCreatureIds
     NPC_RED_DRAKONID            = 14264,
     NPC_GREEN_DRAKONID          = 14262,
     NPC_BLACK_DRAKONID          = 14265,
-    NPC_CHROMATIC_DRAKONID      = 14302
+    NPC_CHROMATIC_DRAKONID      = 14302,
+    NPC_BONE_CONSTRUCT          = 14605
 };
 
 enum BWLGameObjectIds
@@ -106,8 +107,10 @@ enum BWLMisc
 
     SAY_NEFARIAN_VAEL_INTRO     = 14,
 
+    // Nefarian fight
     DATA_NEFARIAN_LEFT_TUNNEL   = 15,
-    DATA_NEFARIAN_RIGHT_TUNNEL  = 16
+    DATA_NEFARIAN_RIGHT_TUNNEL  = 16,
+    ACTION_NEFARIUS_ADD_KILLED  = 2
 };
 
 template <class AI, class T>

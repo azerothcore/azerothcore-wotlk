@@ -68,15 +68,6 @@ public:
             SetBossNumber(EncounterCount);
             LoadDoorData(doorData);
             //LoadObjectData(creatureData, gameObjectData);
-
-            // Victor Nefarius weekly mechanic drakonid spawnç
-            // Pick 2 drakonids and keep them for the whole save duration (the drakonids can't be repeated).
-            std::vector<uint32> nefarianDrakonidSpawners = { NPC_BLACK_SPAWNER, NPC_BLUE_SPAWNER, NPC_BRONZE_SPAWNER, NPC_GREEN_SPAWNER, NPC_RED_SPAWNER };
-            NefarianRightTunnel = Acore::Containers::SelectRandomContainerElement(nefarianDrakonidSpawners);
-            // delete the previous picked one so we don't get any repeated.
-            std::erase(nefarianDrakonidSpawners, NefarianRightTunnel);
-            // Pick another one
-            NefarianLeftTunnel = Acore::Containers::SelectRandomContainerElement(nefarianDrakonidSpawners);
         }
 
         void Initialize() override
@@ -84,6 +75,8 @@ public:
             // Razorgore
             EggCount = 0;
             EggEvent = 0;
+            NefarianLeftTunnel = 0;
+            NefarianRightTunnel = 0;
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -110,6 +103,24 @@ public:
                     break;
                 case NPC_VICTOR_NEFARIUS:
                     victorNefariusGUID = creature->GetGUID();
+                    break;
+                case NPC_BLACK_DRAKONID:
+                case NPC_BLUE_DRAKONID:
+                case NPC_BRONZE_DRAKONID:
+                case NPC_CHROMATIC_DRAKONID:
+                case NPC_GREEN_DRAKONID:
+                case NPC_RED_DRAKONID:
+                    if (Creature* nefarius = instance->GetCreature(victorNefariusGUID))
+                    {
+                        if (CreatureAI* nefariusAI = nefarius->AI())
+                        {
+                            nefariusAI->JustSummoned(creature);
+                        }
+                    }
+                    if (creature->AI())
+                    {
+                        creature->AI()->DoZoneInCombat();
+                    }
                     break;
                 default:
                     break;
@@ -173,6 +184,21 @@ public:
                 default:
                     break;
             }
+        }
+
+        uint32 GetData(uint32 data) const override
+        {
+            switch (data)
+            {
+                case DATA_NEFARIAN_LEFT_TUNNEL:
+                    return NefarianLeftTunnel;
+                case DATA_NEFARIAN_RIGHT_TUNNEL:
+                    return NefarianRightTunnel;
+                default:
+                    break;
+            }
+
+            return 0;
         }
 
         bool CheckRequiredBosses(uint32 bossId, Player const* /* player */) const override
@@ -277,6 +303,16 @@ public:
                         break;
                 }
             }
+
+            if (type == DATA_NEFARIAN_LEFT_TUNNEL)
+            {
+                NefarianLeftTunnel = data;
+            }
+
+            if (type == DATA_NEFARIAN_RIGHT_TUNNEL)
+            {
+                NefarianRightTunnel = data;
+            }
         }
 
         ObjectGuid GetGuidData(uint32 type) const override
@@ -285,6 +321,8 @@ public:
             {
                 case DATA_RAZORGORE_THE_UNTAMED:
                     return razorgoreGUID;
+                case DATA_LORD_VICTOR_NEFARIUS:
+                    return victorNefariusGUID;
                 case DATA_CHROMAGGUS:
                     return chromaggusGUID;
                 case DATA_GO_CHROMAGGUS_DOOR:
@@ -301,6 +339,32 @@ public:
             //! HACK, needed because of buggy CreatureAI after charm
             if (unit->GetEntry() == NPC_RAZORGORE && GetBossState(DATA_RAZORGORE_THE_UNTAMED) != DONE)
                 SetBossState(DATA_RAZORGORE_THE_UNTAMED, DONE);
+
+            switch (unit->GetEntry())
+            {
+                case NPC_BLACK_DRAKONID:
+                case NPC_BLUE_DRAKONID:
+                case NPC_BRONZE_DRAKONID:
+                case NPC_CHROMATIC_DRAKONID:
+                case NPC_GREEN_DRAKONID:
+                case NPC_RED_DRAKONID:
+                    if (Creature* summon = unit->ToCreature())
+                    {
+                        summon->UpdateEntry(NPC_BONE_CONSTRUCT);
+                        summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        summon->SetReactState(REACT_PASSIVE);
+                        summon->SetStandState(UNIT_STAND_STATE_DEAD);
+
+                        if (Creature* nefarius = instance->GetCreature(victorNefariusGUID))
+                        {
+                            if (nefarius->AI())
+                            {
+                                nefarius->AI()->DoAction(ACTION_NEFARIUS_ADD_KILLED);
+                            }
+                        }
+                    }
+                    break;
+            }
         }
 
         void Update(uint32 diff) override
@@ -336,6 +400,54 @@ public:
                         break;
                 }
             }
+        }
+
+        std::string GetSaveData() override
+        {
+            OUT_SAVE_INST_DATA;
+
+            std::ostringstream saveStream;
+            saveStream << "B W L " << GetBossSaveData() << NefarianLeftTunnel << ' ' << NefarianRightTunnel;
+
+            OUT_SAVE_INST_DATA_COMPLETE;
+            return saveStream.str();
+        }
+
+        void Load(char const* data) override
+        {
+            if (!data)
+            {
+                OUT_LOAD_INST_DATA_FAIL;
+                return;
+            }
+
+            OUT_LOAD_INST_DATA(data);
+
+            char dataHead1, dataHead2, dataHead3;
+
+            std::istringstream loadStream(data);
+            loadStream >> dataHead1 >> dataHead2 >> dataHead3;
+
+            if (dataHead1 == 'B' && dataHead2 == 'W' && dataHead3 == 'L')
+            {
+                for (uint32 i = 0; i < EncounterCount; ++i)
+                {
+                    uint32 tmpState;
+                    loadStream >> tmpState;
+                    if (tmpState == IN_PROGRESS || tmpState == FAIL || tmpState > SPECIAL)
+                        tmpState = NOT_STARTED;
+                    SetBossState(i, EncounterState(tmpState));
+                }
+
+                loadStream >> NefarianLeftTunnel;
+                loadStream >> NefarianRightTunnel;
+            }
+            else
+            {
+                OUT_LOAD_INST_DATA_FAIL;
+            }
+
+            OUT_LOAD_INST_DATA_COMPLETE;
         }
 
     protected:
