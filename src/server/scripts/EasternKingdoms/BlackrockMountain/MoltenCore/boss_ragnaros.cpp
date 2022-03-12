@@ -149,6 +149,14 @@ public:
             _lavaBurstGUIDS.clear();
         }
 
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
+        {
+            if (events.IsInPhase(PHASE_SUBMERGED) && damage >= me->GetHealth())
+            {
+                damage = 0;
+            }
+        }
+
         void DoAction(int32 action) override
         {
             if (action == ACTION_FINISH_RAGNAROS_INTRO)

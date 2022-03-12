@@ -21,6 +21,7 @@
 #include "ArenaTeam.h"
 #include "Battleground.h"
 #include "CharacterCache.h"
+#include "CinematicMgr.h"
 #include "DBCStores.h"
 #include "DatabaseEnvFwd.h"
 #include "GroupReference.h"
@@ -1036,6 +1037,7 @@ struct EntryPointData
 class Player : public Unit, public GridObject<Player>
 {
     friend class WorldSession;
+    friend class CinematicMgr;
     friend void Item::AddToUpdateQueueOf(Player* player);
     friend void Item::RemoveFromUpdateQueueOf(Player* player);
 public:
@@ -1250,7 +1252,7 @@ public:
     InventoryResult CanBankItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, Item* pItem, bool swap, bool not_loading = true) const;
     InventoryResult CanUseItem(Item* pItem, bool not_loading = true) const;
     [[nodiscard]] bool HasItemTotemCategory(uint32 TotemCategory) const;
-    bool IsTotemCategoryCompatiableWith(const ItemTemplate* pProto, uint32 requiredTotemCategoryId) const;
+    bool IsTotemCategoryCompatiableWith(ItemTemplate const* pProto, uint32 requiredTotemCategoryId) const;
     InventoryResult CanUseItem(ItemTemplate const* pItem) const;
     [[nodiscard]] InventoryResult CanUseAmmo(uint32 item) const;
     InventoryResult CanRollForItemInLFG(ItemTemplate const* item, WorldObject const* lootedObject) const;
@@ -1277,7 +1279,7 @@ public:
     void SetAmmo(uint32 item);
     void RemoveAmmo();
     [[nodiscard]] float GetAmmoDPS() const { return m_ammoDPS; }
-    bool CheckAmmoCompatibility(const ItemTemplate* ammo_proto) const;
+    bool CheckAmmoCompatibility(ItemTemplate const* ammo_proto) const;
     void QuickEquipItem(uint16 pos, Item* pItem);
     void VisualizeItem(uint8 slot, Item* pItem);
     void SetVisibleItemSlot(uint8 slot, Item* pItem);
@@ -1325,6 +1327,8 @@ public:
     [[nodiscard]] Player* GetTrader() const { return m_trade ? m_trade->GetTrader() : nullptr; }
     [[nodiscard]] TradeData* GetTradeData() const { return m_trade; }
     void TradeCancel(bool sendback);
+
+    CinematicMgr* GetCinematicMgr() const { return _cinematicMgr; }
 
     void UpdateEnchantTime(uint32 time);
     void UpdateSoulboundTradeItems();
@@ -2368,8 +2372,10 @@ public:
     [[nodiscard]] bool IsPetNeedBeTemporaryUnsummoned() const { return GetSession()->PlayerLogout() || !IsInWorld() || !IsAlive() || IsMounted()/*+in flight*/ || GetVehicle() || IsBeingTeleported(); }
     bool CanResummonPet(uint32 spellid);
 
-    void SendCinematicStart(uint32 CinematicSequenceId);
+    void SendCinematicStart(uint32 CinematicSequenceId) const;
     void SendMovieStart(uint32 MovieId);
+
+    uint32 DoRandomRoll(uint32 minimum, uint32 maximum);
 
     [[nodiscard]] uint16 GetMaxSkillValueForLevel() const;
     bool IsFFAPvP();
@@ -2443,7 +2449,10 @@ public:
     void SetMap(Map* map) override;
     void ResetMap() override;
 
-    bool isAllowedToLoot(const Creature* creature);
+    bool CanTeleport() { return m_canTeleport; }
+    void SetCanTeleport(bool value) { m_canTeleport = value; }
+
+    bool isAllowedToLoot(Creature const* creature);
 
     [[nodiscard]] DeclinedName const* GetDeclinedNames() const { return m_declinedname; }
     [[nodiscard]] uint8 GetRunesState() const { return m_runes->runeState; }
@@ -2485,6 +2494,7 @@ public:
 
     //bool isActiveObject() const { return true; }
     bool CanSeeSpellClickOn(Creature const* creature) const;
+    [[nodiscard]] bool CanSeeVendor(Creature const* creature) const;
 
     [[nodiscard]] uint32 GetChampioningFaction() const { return m_ChampioningFaction; }
     void SetChampioningFaction(uint32 faction) { m_ChampioningFaction = faction; }
@@ -2499,11 +2509,11 @@ public:
     bool IsInWhisperWhiteList(ObjectGuid guid);
     void RemoveFromWhisperWhiteList(ObjectGuid guid) { WhisperList.remove(guid); }
 
-    bool SetDisableGravity(bool disable, bool packetOnly /* = false */) override;
+    bool SetDisableGravity(bool disable, bool packetOnly = false, bool updateAnimationTier = true) override;
     bool SetCanFly(bool apply, bool packetOnly = false) override;
     bool SetWaterWalking(bool apply, bool packetOnly = false) override;
     bool SetFeatherFall(bool apply, bool packetOnly = false) override;
-    bool SetHover(bool enable, bool packetOnly = false) override;
+    bool SetHover(bool enable, bool packetOnly = false, bool updateAnimationTier = true) override;
 
     [[nodiscard]] bool CanFly() const override { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY); }
     [[nodiscard]] bool CanEnterWater() const override { return true; }
@@ -2555,22 +2565,11 @@ public:
 
     static std::unordered_map<int, bgZoneRef> bgZoneIdToFillWorldStates; // zoneId -> FillInitialWorldStates
 
-    // Cinematic camera data and remote sight functions
-    [[nodiscard]] uint32 GetActiveCinematicCamera() const { return m_activeCinematicCameraId; }
-    void SetActiveCinematicCamera(uint32 cinematicCameraId = 0) { m_activeCinematicCameraId = cinematicCameraId; }
-    [[nodiscard]] bool IsOnCinematic() const { return (m_cinematicCamera != nullptr); }
-    void BeginCinematic();
-    void EndCinematic();
-    void UpdateCinematicLocation(uint32 diff);
-
-    std::string GetMapAreaAndZoneString();
-    std::string GetCoordsMapAreaAndZoneString();
-
     void SetFarSightDistance(float radius);
     void ResetFarSightDistance();
     [[nodiscard]] Optional<float> GetFarSightDistance() const;
 
-    float GetSightRange(const WorldObject* target = nullptr) const override;
+    float GetSightRange(WorldObject const* target = nullptr) const override;
 
     std::string GetPlayerName();
 
@@ -2860,6 +2859,8 @@ private:
     Item* _StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool update);
     Item* _LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint32 timeDiff, Field* fields);
 
+    CinematicMgr* _cinematicMgr;
+
     typedef GuidSet RefundableItemsSet;
     RefundableItemsSet m_refundableItems;
     void SendRefundInfo(Item* item);
@@ -2896,6 +2897,7 @@ private:
     uint32 m_DelayedOperations;
     bool m_bMustDelayTeleport;
     bool m_bHasDelayedTeleport;
+    bool m_canTeleport;
 
     std::unique_ptr<PetStable> m_petStable;
 
@@ -2923,14 +2925,6 @@ private:
     bool m_isInstantFlightOn;
 
     uint32 m_flightSpellActivated;
-
-    // Remote location information
-    uint32 m_cinematicDiff;
-    uint32 m_lastCinematicCheck;
-    uint32 m_activeCinematicCameraId;
-    FlyByCameraCollection* m_cinematicCamera;
-    Position m_remoteSightPosition;
-    Creature* m_CinematicObject;
 
     WorldLocation _corpseLocation;
 

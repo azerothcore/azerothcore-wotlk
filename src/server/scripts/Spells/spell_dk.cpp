@@ -461,7 +461,7 @@ class spell_dk_wandering_plague_aura : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        const SpellInfo* spellInfo = eventInfo.GetSpellInfo();
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
         if (!spellInfo || !eventInfo.GetActionTarget() || !eventInfo.GetDamageInfo() || !eventInfo.GetActor())
             return false;
 
@@ -591,7 +591,7 @@ class spell_dk_dancing_rune_weapon : public AuraScript
         if (!eventInfo.GetActor() || !eventInfo.GetActionTarget() || !eventInfo.GetActionTarget()->IsAlive() || eventInfo.GetActor()->GetTypeId() != TYPEID_PLAYER)
             return false;
 
-        const SpellInfo* spellInfo = eventInfo.GetSpellInfo();
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
         if (!spellInfo)
             return true;
 
@@ -636,7 +636,7 @@ class spell_dk_dancing_rune_weapon : public AuraScript
             return;
 
         dancingRuneWeapon->SetOrientation(dancingRuneWeapon->GetAngle(target));
-        if (const SpellInfo* procSpell = eventInfo.GetSpellInfo())
+        if (SpellInfo const* procSpell = eventInfo.GetSpellInfo())
         {
             // xinef: ugly hack
             if (!procSpell->IsAffectingArea())
@@ -1338,7 +1338,7 @@ class spell_dk_death_grip : public SpellScript
             else
             {
                 caster->CastSpell(target, 49560, true);
-                const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(1766); // Rogue kick
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(1766); // Rogue kick
                 if (!target->IsImmunedToSpellEffect(spellInfo, EFFECT_0))
                     target->InterruptNonMeleeSpells(true);
             }
@@ -1356,7 +1356,7 @@ class spell_dk_death_grip : public SpellScript
             {
                 if (target != GetCaster())
                 {
-                    const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(1766); // Rogue kick
+                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(1766); // Rogue kick
                     if (!target->IsImmunedToSpellEffect(spellInfo, EFFECT_0))
                         target->InterruptNonMeleeSpells(false, 0, false);
                 }

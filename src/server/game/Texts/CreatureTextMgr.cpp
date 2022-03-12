@@ -23,6 +23,7 @@
 #include "DatabaseEnv.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
+#include "MiscPackets.h"
 #include "ObjectMgr.h"
 
 class CreatureTextBuilder
@@ -90,7 +91,7 @@ void CreatureTextMgr::LoadCreatureTexts()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 ceature texts. DB table `creature_texts` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 ceature texts. DB table `creature_texts` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -331,12 +332,10 @@ void CreatureTextMgr::SendSound(Creature* source, uint32 sound, ChatMsg msgType,
     if (!sound || !source)
         return;
 
-    WorldPacket data(SMSG_PLAY_SOUND, 4);
-    data << uint32(sound);
-    SendNonChatPacket(source, &data, msgType, target, range, teamId, gmOnly);
+    SendNonChatPacket(source, WorldPackets::Misc::Playsound(sound).Write(), msgType, target, range, teamId, gmOnly);
 }
 
-void CreatureTextMgr::SendNonChatPacket(WorldObject* source, WorldPacket* data, ChatMsg msgType, WorldObject const* target, CreatureTextRange range, TeamId teamId, bool gmOnly) const
+void CreatureTextMgr::SendNonChatPacket(WorldObject* source, WorldPacket const* data, ChatMsg msgType, WorldObject const* target, CreatureTextRange range, TeamId teamId, bool gmOnly) const
 {
     float dist = GetRangeForChatType(msgType);
 

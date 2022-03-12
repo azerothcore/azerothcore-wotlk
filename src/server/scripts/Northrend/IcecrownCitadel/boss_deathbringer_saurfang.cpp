@@ -316,7 +316,7 @@ public:
                 creature->AI()->DoAction(ACTION_START_OUTRO);
         }
 
-        bool CanAIAttack(const Unit*  /*target*/) const override
+        bool CanAIAttack(Unit const*  /*target*/) const override
         {
             return _introDone;
         }

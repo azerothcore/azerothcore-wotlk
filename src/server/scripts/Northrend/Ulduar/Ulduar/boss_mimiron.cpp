@@ -1255,7 +1255,7 @@ public:
             return 0;
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
         {
             if( spell->Id == SPELL_SELF_REPAIR )
             {
@@ -1597,7 +1597,7 @@ public:
                 p->ToCreature()->DespawnOrUnsummon(8000);
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
         {
             if( spell->Id == SPELL_SELF_REPAIR )
             {
@@ -1926,7 +1926,7 @@ public:
             summons.Despawn(s);
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
         {
             if( spell->Id == SPELL_SELF_REPAIR )
             {
@@ -1962,9 +1962,9 @@ public:
 
         void AttackStart(Unit* /*who*/) override {}
         void MoveInLineOfSight(Unit* /*who*/) override {}
-        bool CanAIAttack(const Unit*  /*target*/) const override { return false; }
+        bool CanAIAttack(Unit const*  /*target*/) const override { return false; }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if (target && spell && target->GetTypeId() == TYPEID_PLAYER && spell->Id == SPELL_MINE_EXPLOSION)
                 if (InstanceScript* pInstance = me->GetInstanceScript())
@@ -2404,7 +2404,7 @@ public:
     {
         npc_ulduar_flames_spreadAI(Creature* pCreature) : NullCreatureAI(pCreature) {}
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
         {
             switch( spell->Id )
             {
@@ -2470,9 +2470,9 @@ public:
                     break;
                 case EVENT_EMERGENCY_BOT_CHECK:
                     events.RepeatEvent(15000); // just in case, will be rescheduled
-                    if( Creature* flame = me->FindNearestCreature(NPC_FLAMES_SPREAD, 150.0f, true) )
+                    if (Creature* flame = me->FindNearestCreature(NPC_FLAMES_SPREAD, 150.0f, true))
                     {
-                        me->m_orientation = me->GetAngle(flame->GetPositionX(), flame->GetPositionY());
+                        me->SetOrientation(me->GetAngle(flame->GetPositionX(), flame->GetPositionY()));
                         float dist = me->GetExactDist2d(flame);
                         if (dist <= 5.0f)
                             events.ScheduleEvent(EVENT_EMERGENCY_BOT_ATTACK, 0);
@@ -2503,7 +2503,7 @@ public:
     {
         npc_ulduar_rocket_strike_triggerAI(Creature* pCreature) : NullCreatureAI(pCreature) {}
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if (!target || !spell)
                 return;
