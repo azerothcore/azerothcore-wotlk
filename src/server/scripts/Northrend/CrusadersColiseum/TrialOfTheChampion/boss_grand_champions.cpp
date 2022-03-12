@@ -358,11 +358,9 @@ public:
             MountPhase = true;
             SetDespawnAtEnd(false);
             me->SetReactState(REACT_PASSIVE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             BossOrder = 0;
             NewMountGUID.Clear();
             me->CastSpell(me, SPELL_BOSS_DEFEND_PERIODIC, true);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 
             events.Reset();
             events.ScheduleEvent(EVENT_MOUNT_CHARGE, urand(2500, 4000));
