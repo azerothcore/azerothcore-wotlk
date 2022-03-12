@@ -27,8 +27,6 @@
 #include "blackwing_lair.h"
 #include "TaskScheduler.h"
 
-#include <vector>
-
 enum Events
 {
     // Victor Nefarius
@@ -216,7 +214,7 @@ public:
                 std::vector<uint32> nefarianDrakonidSpawners = { NPC_BLACK_SPAWNER, NPC_BLUE_SPAWNER, NPC_BRONZE_SPAWNER, NPC_GREEN_SPAWNER, NPC_RED_SPAWNER };
                 _nefarianRightTunnel = Acore::Containers::SelectRandomContainerElement(nefarianDrakonidSpawners);
                 // delete the previous picked one so we don't get any repeated.
-                std::erase(nefarianDrakonidSpawners, _nefarianRightTunnel);
+                nefarianDrakonidSpawners.erase(std::remove(nefarianDrakonidSpawners.begin(), nefarianDrakonidSpawners.end(), _nefarianRightTunnel), nefarianDrakonidSpawners.end());
                 // Pick another one
                 _nefarianLeftTunnel = Acore::Containers::SelectRandomContainerElement(nefarianDrakonidSpawners);
 
