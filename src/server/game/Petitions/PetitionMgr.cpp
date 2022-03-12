@@ -45,7 +45,7 @@ void PetitionMgr::LoadPetitions()
     QueryResult result = CharacterDatabase.Query("SELECT ownerguid, petitionguid, name, type FROM petition");
     if (!result)
     {
-        LOG_INFO("server.loading", ">>  Loaded 0 Petitions!");
+        LOG_WARN("server.loading", ">> Loaded 0 Petitions!");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -70,7 +70,7 @@ void PetitionMgr::LoadSignatures()
     QueryResult result = CharacterDatabase.Query("SELECT petitionguid, playerguid, player_account FROM petition_sign");
     if (!result)
     {
-        LOG_INFO("server.loading", ">>  Loaded 0 Petition signs!");
+        LOG_WARN("server.loading", ">> Loaded 0 Petition signs!");
         LOG_INFO("server.loading", " ");
         return;
     }
