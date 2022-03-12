@@ -788,7 +788,7 @@ void BattlegroundMgr::LoadBattleMastersEntry()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 battlemaster entries. DB table `battlemaster_entry` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 battlemaster entries. DB table `battlemaster_entry` is empty!");
         LOG_INFO("server.loading", " ");
         return;
     }

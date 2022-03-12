@@ -425,8 +425,14 @@ bool Creature::InitEntry(uint32 Entry, const CreatureData* data)
     SetNativeDisplayId(displayID);
 
     // Load creature equipment
-    if (!data || data->equipmentId == 0)                    // use default from the template
-        LoadEquipment(0);                                   // 0 means no equipment for creature table
+    if (!data)
+    {
+        LoadEquipment();             // use default from the template
+    }
+    else if (data->equipmentId == 0)
+    {
+        LoadEquipment(0);            // 0 means no equipment for creature table
+    }
     else
     {
         m_originalEquipmentId = data->equipmentId;

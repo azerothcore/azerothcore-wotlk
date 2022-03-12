@@ -386,12 +386,7 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     _activeCheats = CHEAT_NONE;
 
-    m_cinematicDiff = 0;
-    m_lastCinematicCheck = 0;
-    m_activeCinematicCameraId = 0;
-    m_cinematicCamera = nullptr;
-    m_remoteSightPosition = Position(0.0f, 0.0f, 0.0f);
-    m_CinematicObject = nullptr;
+    _cinematicMgr = new CinematicMgr(this);
 
     m_achievementMgr = new AchievementMgr(this);
     m_reputationMgr = new ReputationMgr(this);
@@ -5577,14 +5572,14 @@ void Player::SendDirectMessage(WorldPacket const* data) const
     m_session->SendPacket(data);
 }
 
-void Player::SendCinematicStart(uint32 CinematicSequenceId)
+void Player::SendCinematicStart(uint32 CinematicSequenceId) const
 {
     WorldPacket data(SMSG_TRIGGER_CINEMATIC, 4);
     data << uint32(CinematicSequenceId);
     SendDirectMessage(&data);
-    if (const CinematicSequencesEntry* sequence = sCinematicSequencesStore.LookupEntry(CinematicSequenceId))
+    if (CinematicSequencesEntry const* sequence = sCinematicSequencesStore.LookupEntry(CinematicSequenceId))
     {
-        SetActiveCinematicCamera(sequence->cinematicCamera);
+        _cinematicMgr->SetActiveCinematicCamera(sequence->cinematicCamera);
     }
 }
 
@@ -15583,56 +15578,6 @@ bool Player::SetFeatherFall(bool apply, bool packetOnly /*= false*/)
     BuildMovementPacket(&data);
     SendMessageToSet(&data, false);
     return true;
-}
-
-void Player::BeginCinematic()
-{
-    // Sanity check for active camera set
-    if (m_activeCinematicCameraId == 0)
-    {
-        return;
-    }
-
-    auto itr = sFlyByCameraStore.find(m_activeCinematicCameraId);
-    if (itr != sFlyByCameraStore.end())
-    {
-        // Initialize diff, and set camera
-        m_cinematicDiff = 0;
-        m_cinematicCamera = &itr->second;
-
-        auto camitr = m_cinematicCamera->begin();
-        if (camitr != m_cinematicCamera->end())
-        {
-            Position pos(camitr->locations.x, camitr->locations.y, camitr->locations.z, camitr->locations.w);
-            if (!pos.IsPositionValid())
-            {
-                return;
-            }
-
-            m_mapRef->LoadGrid(camitr->locations.x, camitr->locations.y);
-            m_CinematicObject = SummonCreature(VISUAL_WAYPOINT, pos.m_positionX, pos.m_positionY, pos.m_positionZ, 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 120000);
-            if (m_CinematicObject)
-            {
-                m_CinematicObject->setActive(true);
-                SetViewpoint(m_CinematicObject, true);
-            }
-        }
-    }
-}
-
-void Player::EndCinematic()
-{
-    m_cinematicDiff = 0;
-    m_cinematicCamera = nullptr;
-    m_activeCinematicCameraId = 0;
-    if (m_CinematicObject)
-    {
-        if (m_seer && m_seer == m_CinematicObject)
-        {
-            SetViewpoint(m_CinematicObject, false);
-        }
-        m_CinematicObject->AddObjectToRemoveList();
-    }
 }
 
 Guild* Player::GetGuild() const
