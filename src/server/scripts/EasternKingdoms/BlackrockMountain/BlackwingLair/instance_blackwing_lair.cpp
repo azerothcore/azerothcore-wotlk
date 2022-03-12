@@ -117,9 +117,13 @@ public:
             {
                 case GO_BLACK_DRAGON_EGG:
                     if (GetBossState(DATA_FIREMAW) == DONE)
+                    {
                         go->SetPhaseMask(2, true);
+                    }
                     else
+                    {
                         EggList.push_back(go->GetGUID());
+                    }
                     break;
 
                 case GO_PORTCULLIS_RAZORGORE:
@@ -200,8 +204,12 @@ public:
                     if (state == DONE)
                     {
                         for (ObjectGuid const& guid : EggList)
+                        {
                             if (GameObject* egg = instance->GetGameObject(guid))
+                            {
                                 egg->SetPhaseMask(2, true);
+                            }
+                        }
                     }
                     SetData(DATA_EGG_EVENT, NOT_STARTED);
                     break;
@@ -287,13 +295,6 @@ public:
             }
 
             return ObjectGuid::Empty;
-        }
-
-        void OnUnitDeath(Unit* unit) override
-        {
-            //! HACK, needed because of buggy CreatureAI after charm
-            if (unit->GetEntry() == NPC_RAZORGORE && GetBossState(DATA_RAZORGORE_THE_UNTAMED) != DONE)
-                SetBossState(DATA_RAZORGORE_THE_UNTAMED, DONE);
         }
 
         void Update(uint32 diff) override

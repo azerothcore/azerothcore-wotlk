@@ -83,8 +83,10 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            //_JustDied();
-            Talk(SAY_DEATH);
+            if (secondPhase)
+            {
+                instance->SetBossState(DATA_RAZORGORE_THE_UNTAMED, DONE);
+            }
         }
 
         bool CanAIAttack(Unit const* target) const override
@@ -148,11 +150,15 @@ public:
                 // This is required because he kills himself with the explosion spell, causing a loop.
                 _died = true;
 
+                Talk(SAY_DEATH);
                 DoCastAOE(SPELL_EXPLODE_ORB);
                 DoCastAOE(SPELL_EXPLOSION);
                 me->SetCorpseRemoveTime(25);
                 me->SetRespawnTime(30);
                 me->SaveRespawnTime();
+
+                // Might not be required, safe measure.
+                me->SetLootRecipient(nullptr);
             }
         }
 
