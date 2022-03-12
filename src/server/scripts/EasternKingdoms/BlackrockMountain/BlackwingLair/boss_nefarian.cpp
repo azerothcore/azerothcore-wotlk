@@ -52,7 +52,8 @@ enum Events
     EVENT_SUCCESS_2,
     EVENT_SUCCESS_3,
 
-    ACTION_RESET = 0
+    ACTION_RESET = 0,
+    ACTION_KILLED = 1
 };
 
 enum Says
@@ -200,8 +201,18 @@ public:
 
             if (me->GetMapId() == 469)
             {
-                if (!me->FindNearestCreature(NPC_NEFARIAN, 1000.0f, true))
+                if (Creature* nefarian = me->FindNearestCreature(NPC_NEFARIAN, 1000.0f, true))
+                {
+                    // Nefarian is spawned and he didn't finish his intro path yet, despawn it manually.
+                    if (nefarian->GetMotionMaster()->GetCurrentMovementGeneratorType() == MovementGeneratorType::WAYPOINT_MOTION_TYPE)
+                    {
+                        nefarian->DespawnOrUnsummon();
+                    }
+                }
+                else
+                {
                     _Reset();
+                }
 
                 me->SetVisible(true);
                 me->SetPhaseMask(1, true);
@@ -225,6 +236,17 @@ public:
                 me->RemoveAura(SPELL_ROOT_SELF);
                 summons.DespawnAll();
             }
+
+            if (action == ACTION_KILLED)
+            {
+                Unit::Kill(me, me);
+            }
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            instance->SetBossState(DATA_NEFARIAN, DONE);
+            instance->SaveToDB();
         }
 
         void BeginEvent()
@@ -461,11 +483,11 @@ struct boss_nefarian : public BossAI
         if (_introDone) // already in combat, reset properly.
         {
             _Reset();
-            if (Unit* victor = me->FindNearestCreature(NPC_VICTOR_NEFARIUS, 200.f, true))
+            if (Creature* victor = me->FindNearestCreature(NPC_VICTOR_NEFARIUS, 200.f, true))
             {
-                if (victor->ToCreature() && victor->ToCreature()->AI())
+                if (victor->AI())
                 {
-                    victor->ToCreature()->AI()->DoAction(ACTION_RESET);
+                    victor->AI()->DoAction(ACTION_RESET);
                 }
             }
             me->DespawnOrUnsummon();
@@ -478,6 +500,14 @@ struct boss_nefarian : public BossAI
     {
         _JustDied();
         Talk(SAY_DEATH);
+
+        if (Creature* victor = me->FindNearestCreature(NPC_VICTOR_NEFARIUS, 200.f, true))
+        {
+            if (victor->AI())
+            {
+                victor->AI()->DoAction(ACTION_KILLED);
+            }
+        }
     }
 
     void KilledUnit(Unit* victim) override
