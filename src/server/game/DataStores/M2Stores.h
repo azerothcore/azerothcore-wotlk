@@ -15,19 +15,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef AllPackets_h__
-#define AllPackets_h__
+#ifndef ACORE_M2STORES_H
+#define ACORE_M2STORES_H
 
-#include "LFGPackets.h"
-#include "BankPackets.h"
-#include "CharacterPackets.h"
-#include "ChatPackets.h"
-#include "PetPackets.h"
-#include "CombatLogPackets.h"
-#include "CombatPackets.h"
-#include "GuildPackets.h"
-#include "MiscPackets.h"
-#include "TotemPackets.h"
-#include "WorldStatePackets.h"
+#include "Define.h"
+#include "Position.h"
+#include <vector>
 
-#endif // AllPackets_h__
+struct FlyByCamera
+{
+    uint32 timeStamp;
+    Position locations;
+};
+
+AC_GAME_API void LoadM2Cameras(std::string const& dataPath);
+
+AC_GAME_API std::vector<FlyByCamera> const* GetFlyByCameras(uint32 cinematicCameraId);
+
+#endif

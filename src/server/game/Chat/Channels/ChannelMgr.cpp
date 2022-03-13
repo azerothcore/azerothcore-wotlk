@@ -56,7 +56,7 @@ void ChannelMgr::LoadChannels()
     QueryResult result = CharacterDatabase.Query("SELECT channelId, name, team, announce, ownership, password FROM channels ORDER BY channelId ASC");
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 channels. DB table `channels` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 channels. DB table `channels` is empty.");
         return;
     }
 
@@ -171,7 +171,7 @@ void ChannelMgr::LoadChannelRights()
     QueryResult result = CharacterDatabase.Query("SELECT name, flags, speakdelay, joinmessage, delaymessage, moderators FROM channels_rights");
     if (!result)
     {
-        LOG_INFO("server.loading", ">>  Loaded 0 Channel Rights!");
+        LOG_WARN("server.loading", ">> Loaded 0 Channel Rights!");
         LOG_INFO("server.loading", " ");
         return;
     }

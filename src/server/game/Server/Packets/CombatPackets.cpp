@@ -15,19 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef AllPackets_h__
-#define AllPackets_h__
-
-#include "LFGPackets.h"
-#include "BankPackets.h"
-#include "CharacterPackets.h"
-#include "ChatPackets.h"
-#include "PetPackets.h"
-#include "CombatLogPackets.h"
 #include "CombatPackets.h"
-#include "GuildPackets.h"
-#include "MiscPackets.h"
-#include "TotemPackets.h"
-#include "WorldStatePackets.h"
 
-#endif // AllPackets_h__
+void WorldPackets::Combat::SetSheathed::Read()
+{
+    _worldPacket >> CurrentSheathState;
+}
