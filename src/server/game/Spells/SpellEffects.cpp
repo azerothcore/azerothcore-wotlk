@@ -299,7 +299,7 @@ void Spell::EffectInstaKill(SpellEffIndex /*effIndex*/)
     m_caster->m_Events.AddEventAtOffset([this]()
     {
         Unit::DealDamage(m_caster, unitTarget, unitTarget->GetHealth(), nullptr, NODAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
-    }, 500);
+    }, 500ms);
 }
 
 void Spell::EffectEnvironmentalDMG(SpellEffIndex /*effIndex*/)
