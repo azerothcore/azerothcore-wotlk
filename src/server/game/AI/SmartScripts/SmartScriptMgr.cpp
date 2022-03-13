@@ -586,7 +586,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_FAIL_QUEST: return sizeof(SmartAction::quest);
             case SMART_ACTION_OFFER_QUEST: return sizeof(SmartAction::questOffer);
             case SMART_ACTION_SET_REACT_STATE: return sizeof(SmartAction::react);
-            case SMART_ACTION_ACTIVATE_GOBJECT: return sizeof(SmartAction::activateObject);
+            case SMART_ACTION_ACTIVATE_GOBJECT: return NO_PARAMS;
             case SMART_ACTION_RANDOM_EMOTE: return sizeof(SmartAction::randomEmote);
             case SMART_ACTION_CAST: return sizeof(SmartAction::cast);
             case SMART_ACTION_SUMMON_CREATURE: return sizeof(SmartAction::summonCreature);
@@ -614,8 +614,8 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_SET_INST_DATA: return sizeof(SmartAction::setInstanceData);
             case SMART_ACTION_SET_INST_DATA64: return sizeof(SmartAction::setInstanceData64);
             case SMART_ACTION_UPDATE_TEMPLATE: return sizeof(SmartAction::updateTemplate);
-            case SMART_ACTION_DIE: return sizeof(SmartAction::combatZone);
-            case SMART_ACTION_SET_IN_COMBAT_WITH_ZONE: return sizeof(SmartAction::combatZone);
+            case SMART_ACTION_DIE: return NO_PARAMS;
+            case SMART_ACTION_SET_IN_COMBAT_WITH_ZONE: return NO_PARAMS;
             case SMART_ACTION_CALL_FOR_HELP: return sizeof(SmartAction::callHelp);
             case SMART_ACTION_SET_SHEATH: return sizeof(SmartAction::setSheath);
             case SMART_ACTION_FORCE_DESPAWN: return sizeof(SmartAction::forceDespawn);
@@ -643,7 +643,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_SET_COUNTER: return sizeof(SmartAction::setCounter);
             case SMART_ACTION_STORE_TARGET_LIST: return sizeof(SmartAction::storeTargets);
             case SMART_ACTION_WP_RESUME: return NO_PARAMS;
-            case SMART_ACTION_SET_ORIENTATION: return sizeof(SmartAction::orientation);
+            case SMART_ACTION_SET_ORIENTATION: return NO_PARAMS;
             case SMART_ACTION_CREATE_TIMED_EVENT: return sizeof(SmartAction::timeEvent);
             case SMART_ACTION_PLAYMOVIE: return sizeof(SmartAction::movie);
             case SMART_ACTION_MOVE_TO_POS: return sizeof(SmartAction::moveToPos);
@@ -678,7 +678,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_SEND_GOSSIP_MENU: return sizeof(SmartAction::sendGossipMenu);
             case SMART_ACTION_GO_SET_LOOT_STATE: return sizeof(SmartAction::setGoLootState);
             case SMART_ACTION_SEND_TARGET_TO_TARGET: return sizeof(SmartAction::sendTargetToTarget);
-            case SMART_ACTION_SET_HOME_POS: return sizeof(SmartAction::setHomePos);
+            case SMART_ACTION_SET_HOME_POS: return NO_PARAMS;
             case SMART_ACTION_SET_HEALTH_REGEN: return sizeof(SmartAction::setHealthRegen);
             case SMART_ACTION_SET_ROOT: return sizeof(SmartAction::setRoot);
             case SMART_ACTION_SET_GO_FLAG: return sizeof(SmartAction::goFlag);
