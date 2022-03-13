@@ -6209,7 +6209,7 @@ void Player::_LoadMail(PreparedQueryResult mailsResult, PreparedQueryResult mail
 
             if (cur_time > m->expire_time)
             {
-                LOG_ERROR("entities.player", "Player::_LoadMail: Mail ({}) has expired - ignored.", m->messageID);
+                LOG_DEBUG("entities.player", "Player::_LoadMail: Mail ({}) has expired - ignored.", m->messageID);
                 continue;
             }
 
