@@ -41,6 +41,11 @@ DoorData const doorData[] =
     { 0,                            0,                           DOOR_TYPE_ROOM,    BOUNDARY_NONE}  // END
 };
 
+ObjectData const creatureData[] =
+{
+    { NPC_GRETHOK, DATA_GRETHOK }
+};
+
 Position const SummonPosition[8] =
 {
     {-7661.207520f, -1043.268188f, 407.199554f, 6.280452f},
@@ -67,7 +72,7 @@ public:
             //SetHeaders(DataHeader);
             SetBossNumber(EncounterCount);
             LoadDoorData(doorData);
-            //LoadObjectData(creatureData, gameObjectData);
+            LoadObjectData(creatureData, nullptr);
         }
 
         void Initialize() override
@@ -277,6 +282,8 @@ public:
                                 egg->Respawn();
                             }
                         }
+
+                        DoRespawnCreature(DATA_GRETHOK, true);
                         break;
                     case SPECIAL:
                         if (++EggCount >= EggList.size())

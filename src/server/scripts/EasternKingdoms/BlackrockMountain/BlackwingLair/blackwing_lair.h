@@ -39,13 +39,15 @@ enum BWLEncounter
 
     // Additional Data
     DATA_LORD_VICTOR_NEFARIUS   = 8,
+    DATA_GRETHOK                = 9,
 
     // Doors
-    DATA_GO_CHROMAGGUS_DOOR     = 9
+    DATA_GO_CHROMAGGUS_DOOR     = 10
 };
 
 enum BWLCreatureIds
 {
+    NPC_GRETHOK                 = 12557,
     NPC_RAZORGORE               = 12435,
     NPC_BLACKWING_DRAGON        = 12422,
     NPC_BLACKWING_TASKMASTER    = 12458,
