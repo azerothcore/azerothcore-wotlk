@@ -981,7 +981,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
         attacker->m_Events.AddEventAtOffset([attacker, victim, durabilityLoss, cleanDamage, spellProto]()
         {
             Unit::Kill(attacker, victim, durabilityLoss, cleanDamage ? cleanDamage->attackType : BASE_ATTACK, spellProto);
-        }, 400);
+        }, 400ms);
     }
     else
     {
