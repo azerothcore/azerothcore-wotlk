@@ -892,9 +892,16 @@ void AuraEffect::Update(uint32 diff, Unit* caster)
 {
     if (m_isPeriodic && (GetBase()->GetDuration() >= 0 || GetBase()->IsPassive() || GetBase()->IsPermanent()))
     {
+        uint32 totalTicks = GetTotalTicks();
+
         m_periodicTimer -= int32(diff);
         while (m_periodicTimer <= 0)
         {
+            if (!GetBase()->IsPermanent() && (m_tickNumber + 1) > totalTicks)
+            {
+                break;
+            }
+
             ++m_tickNumber;
 
             // update before tick (aura can be removed in TriggerSpell or PeriodicTick calls)
@@ -6992,4 +6999,20 @@ void AuraEffect::HandleRaidProcFromChargeWithValueAuraProc(AuraApplication* aurA
 
     LOG_DEBUG("spells.aura", "AuraEffect::HandleRaidProcFromChargeWithValueAuraProc: Triggering spell {} from aura {} proc", triggerSpellId, GetId());
     target->CastCustomSpell(target, triggerSpellId, &value, nullptr, nullptr, true, nullptr, this, GetCasterGUID());
+}
+
+int32 AuraEffect::GetTotalTicks() const
+{
+    uint32 totalTicks = 1;
+    if (m_amplitude)
+    {
+        totalTicks = GetBase()->GetMaxDuration() / m_amplitude;
+
+        if (m_spellInfo->HasAttribute(SPELL_ATTR5_EXTRA_INITIAL_PERIOD))
+        {
+            ++totalTicks;
+        }
+    }
+
+    return totalTicks;
 }
