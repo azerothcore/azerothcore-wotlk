@@ -846,7 +846,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if (creature->IsVendor() && (player->GetReputationRank(FACTION_CONSORTIUM) >= REP_FRIENDLY) || player->IsGameMaster())
+        if (creature->IsVendor() && ((player->GetReputationRank(FACTION_CONSORTIUM) >= REP_FRIENDLY) || player->IsGameMaster()))
         {
             AddGossipItemFor(player, GOSSIP_TEXT_BROWSE_GOODS, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
             SendGossipMenuFor(player, 9896, creature->GetGUID());
