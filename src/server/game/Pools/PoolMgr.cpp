@@ -581,7 +581,7 @@ void PoolMgr::LoadFromDB()
         if (!result)
         {
             mPoolTemplate.clear();
-            LOG_INFO("server.loading", ">> Loaded 0 object pools. DB table `pool_template` is empty.");
+            LOG_WARN("server.loading", ">> Loaded 0 object pools. DB table `pool_template` is empty.");
             LOG_INFO("server.loading", " ");
             return;
         }
@@ -614,7 +614,7 @@ void PoolMgr::LoadFromDB()
 
         if (!result)
         {
-            LOG_INFO("server.loading", ">> Loaded 0 creatures in  pools. DB table `pool_creature` is empty.");
+            LOG_WARN("server.loading", ">> Loaded 0 creatures in  pools. DB table `pool_creature` is empty.");
             LOG_INFO("server.loading", " ");
         }
         else
@@ -672,7 +672,7 @@ void PoolMgr::LoadFromDB()
 
         if (!result)
         {
-            LOG_INFO("server.loading", ">> Loaded 0 gameobjects in  pools. DB table `pool_gameobject` is empty.");
+            LOG_WARN("server.loading", ">> Loaded 0 gameobjects in  pools. DB table `pool_gameobject` is empty.");
             LOG_INFO("server.loading", " ");
         }
         else
@@ -742,7 +742,7 @@ void PoolMgr::LoadFromDB()
 
         if (!result)
         {
-            LOG_INFO("server.loading", ">> Loaded 0 pools in pools");
+            LOG_WARN("server.loading", ">> Loaded 0 pools in pools");
             LOG_INFO("server.loading", " ");
         }
         else
@@ -832,7 +832,7 @@ void PoolMgr::LoadFromDB()
 
         if (!result)
         {
-            LOG_INFO("server.loading", ">> Loaded 0 quests in pools");
+            LOG_WARN("server.loading", ">> Loaded 0 quests in pools");
             LOG_INFO("server.loading", " ");
         }
         else

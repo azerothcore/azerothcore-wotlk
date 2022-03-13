@@ -86,7 +86,7 @@ void FormationMgr::LoadCreatureFormations()
     QueryResult result = WorldDatabase.Query("SELECT leaderGUID, memberGUID, dist, angle, groupAI, point_1, point_2 FROM creature_formations ORDER BY leaderGUID");
     if (!result)
     {
-        LOG_ERROR("sql.sql", ">>  Loaded 0 creatures in formations. DB table `creature_formations` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 creatures in formations. DB table `creature_formations` is empty!");
         LOG_INFO("server.loading", " ");
         return;
     }

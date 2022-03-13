@@ -226,6 +226,7 @@ public:
         bool berserk{ false };
         bool bAchievCheese{ true };
         bool bAchievGettingCold{ true };
+        bool bAchievCacheRare{ true };
         bool bAchievCoolestFriends{ true };
         uint16 addSpawnTimer{ 0 };
 
@@ -240,6 +241,7 @@ public:
             berserk = false;
             bAchievCheese = true;
             bAchievGettingCold = true;
+            bAchievCacheRare = true;
             bAchievCoolestFriends = true;
             me->SetSheath(SHEATH_STATE_MELEE);
 
@@ -423,6 +425,7 @@ public:
                 case EVENT_HARD_MODE_MISSED:
                     {
                         Talk(TEXT_HM_MISS);
+                        bAchievCacheRare = false;
                         if (pInstance)
                         {
                             if (GameObject* go = pInstance->instance->GetGameObject(pInstance->GetGuidData(GO_HODIR_CHEST_HARD)))
@@ -591,6 +594,8 @@ public:
                     return (bAchievCheese ? 1 : 0);
                 case 2:
                     return (bAchievGettingCold ? 1 : 0);
+                case 3:
+                    return (bAchievCacheRare ? 1 : 0);
                 case 4:
                     return (bAchievCoolestFriends ? 1 : 0);
             }
