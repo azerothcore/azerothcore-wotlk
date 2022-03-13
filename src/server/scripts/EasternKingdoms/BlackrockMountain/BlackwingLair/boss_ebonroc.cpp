@@ -42,6 +42,21 @@ public:
     {
         boss_ebonrocAI(Creature* creature) : BossAI(creature, DATA_EBONROC) { }
 
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type != WAYPOINT_MOTION_TYPE || id != 12)
+            {
+                return;
+            }
+
+            me->GetMotionMaster()->MoveRandom(10.f);
+
+            me->m_Events.AddEventAtOffset([this]()
+            {
+                me->GetMotionMaster()->Initialize();
+            }, 15s);
+        }
+
         void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);

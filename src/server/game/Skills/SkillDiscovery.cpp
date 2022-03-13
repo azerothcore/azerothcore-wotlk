@@ -54,7 +54,7 @@ void LoadSkillDiscoveryTable()
 
     if (!result)
     {
-        LOG_ERROR("sql.sql", ">> Loaded 0 skill discovery definitions. DB table `skill_discovery_template` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 skill discovery definitions. DB table `skill_discovery_template` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
