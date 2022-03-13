@@ -3009,11 +3009,18 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit* victim, SpellInfo const* spellInfo
         thisLevel = std::max<int32>(thisLevel, spellInfo->SpellLevel);
     int32 levelDiff = int32(victim->getLevelForTarget(this)) - thisLevel;
 
-    int32 MISS_CHANCE_MULTIPLIER = sWorld->getRate(
+    int32 MISS_CHANCE_MULTIPLIER;
+    if (sWorld->getBoolConfig(CONFIG_MISS_CHANCE_MULTIPLIER_ONLY_FOR_PLAYERS) && GetTypeId() != TYPEID_PLAYER) // keep it as it was originally (7 and 11)
+    {
+        MISS_CHANCE_MULTIPLIER = victim->GetTypeId() == TYPEID_PLAYER ? 7 : 11;
+    }
+    else
+    {
+        MISS_CHANCE_MULTIPLIER = sWorld->getRate(
             victim->GetTypeId() == TYPEID_PLAYER
             ? RATE_MISS_CHANCE_MULTIPLIER_TARGET_PLAYER
-            : RATE_MISS_CHANCE_MULTIPLIER_TARGET_CREATURE
-    );
+            : RATE_MISS_CHANCE_MULTIPLIER_TARGET_CREATURE);
+    }
 
     // Base hit chance from attacker and victim levels
     int32 modHitChance = levelDiff < 3
@@ -3139,7 +3146,7 @@ SpellMissInfo Unit::SpellHitResult(Unit* victim, SpellInfo const* spell, bool Ca
         return SPELL_MISS_NONE;
 
     // Return evade for units in evade mode
-    if (victim->GetTypeId() == TYPEID_UNIT && victim->ToCreature()->IsEvadingAttacks() && !spell->HasAura(SPELL_AURA_CONTROL_VEHICLE))
+    if (victim->GetTypeId() == TYPEID_UNIT && victim->ToCreature()->IsEvadingAttacks() && !spell->HasAura(SPELL_AURA_CONTROL_VEHICLE) && !spell->HasAttribute(SPELL_ATTR0_CU_IGNORE_EVADE))
         return SPELL_MISS_EVADE;
 
     // Try victim reflect spell
@@ -14386,20 +14393,35 @@ void Unit::ApplyDiminishingAura(DiminishingGroup group, bool apply)
 float Unit::GetSpellMaxRangeForTarget(Unit const* target, SpellInfo const* spellInfo) const
 {
     if (!spellInfo->RangeEntry)
+    {
         return 0;
-    if (spellInfo->RangeEntry->RangeMin[1] == spellInfo->RangeEntry->RangeMin[0])
+    }
+
+    if (spellInfo->RangeEntry->RangeMax[1] == spellInfo->RangeEntry->RangeMax[0])
+    {
         return spellInfo->GetMaxRange();
-    if (target == nullptr)
+    }
+
+    if (!target)
+    {
         return spellInfo->GetMaxRange(true);
+    }
+
     return spellInfo->GetMaxRange(!IsHostileTo(target));
 }
 
 float Unit::GetSpellMinRangeForTarget(Unit const* target, SpellInfo const* spellInfo) const
 {
     if (!spellInfo->RangeEntry)
+    {
         return 0;
+    }
+
     if (spellInfo->RangeEntry->RangeMin[1] == spellInfo->RangeEntry->RangeMin[0])
+    {
         return spellInfo->GetMinRange();
+    }
+
     return spellInfo->GetMinRange(!IsHostileTo(target));
 }
 
@@ -19900,7 +19922,7 @@ bool Unit::SetWalk(bool enable)
     return true;
 }
 
-bool Unit::SetDisableGravity(bool disable, bool /*packetOnly = false*/)
+bool Unit::SetDisableGravity(bool disable, bool /*packetOnly = false*/, bool /*updateAnimationTier = true*/)
 {
     if (disable == IsLevitating())
         return false;
@@ -19999,7 +20021,7 @@ void Unit::SendMovementFeatherFall(Player* sendTo)
     sendTo->SendDirectMessage(&data);
 }
 
-bool Unit::SetHover(bool enable, bool /*packetOnly = false*/)
+bool Unit::SetHover(bool enable, bool /*packetOnly = false*/, bool /*updateAnimationTier = true*/)
 {
     if (enable == HasUnitMovementFlag(MOVEMENTFLAG_HOVER))
         return false;

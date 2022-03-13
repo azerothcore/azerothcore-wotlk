@@ -383,12 +383,7 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     _activeCheats = CHEAT_NONE;
 
-    m_cinematicDiff = 0;
-    m_lastCinematicCheck = 0;
-    m_activeCinematicCameraId = 0;
-    m_cinematicCamera = nullptr;
-    m_remoteSightPosition = Position(0.0f, 0.0f, 0.0f);
-    m_CinematicObject = nullptr;
+    _cinematicMgr = new CinematicMgr(this);
 
     m_achievementMgr = new AchievementMgr(this);
     m_reputationMgr = new ReputationMgr(this);
@@ -590,8 +585,6 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
     InitGlyphsForLevel();
     InitTalentForLevel();
     InitPrimaryProfessions();                               // to max set before any spell added
-
-    UpdatePositionData();
 
     // apply original stats mods before spell loading or item equipment that call before equip _RemoveStatsMods()
     UpdateMaxHealth();                                      // Update max Health (for add bonus from stamina)
@@ -1009,11 +1002,12 @@ void Player::SetDrunkValue(uint8 newDrunkValue, uint32 itemId /*= 0*/)
     if (newDrunkenState == oldDrunkenState)
         return;
 
-    WorldPacket data(SMSG_CROSSED_INEBRIATION_THRESHOLD, (8 + 4 + 4));
-    data << GetGUID();
-    data << uint32(newDrunkenState);
-    data << uint32(itemId);
-    SendMessageToSet(&data, true);
+    WorldPackets::Misc::CrossedInebriationThreshold data;
+    data.Guid = GetGUID();
+    data.Threshold = newDrunkenState;
+    data.ItemID = itemId;
+
+    SendMessageToSet(data.Write(), true);
 }
 
 void Player::setDeathState(DeathState s, bool /*despawn = false*/)
@@ -5575,14 +5569,14 @@ void Player::SendDirectMessage(WorldPacket const* data) const
     m_session->SendPacket(data);
 }
 
-void Player::SendCinematicStart(uint32 CinematicSequenceId)
+void Player::SendCinematicStart(uint32 CinematicSequenceId) const
 {
     WorldPacket data(SMSG_TRIGGER_CINEMATIC, 4);
     data << uint32(CinematicSequenceId);
     SendDirectMessage(&data);
-    if (const CinematicSequencesEntry* sequence = sCinematicSequencesStore.LookupEntry(CinematicSequenceId))
+    if (CinematicSequencesEntry const* sequence = sCinematicSequencesStore.LookupEntry(CinematicSequenceId))
     {
-        SetActiveCinematicCamera(sequence->cinematicCamera);
+        _cinematicMgr->SetActiveCinematicCamera(sequence->cinematicCamera);
     }
 }
 
@@ -15397,7 +15391,7 @@ bool Player::IsInWhisperWhiteList(ObjectGuid guid)
     return false;
 }
 
-bool Player::SetDisableGravity(bool disable, bool packetOnly /*= false*/)
+bool Player::SetDisableGravity(bool disable, bool packetOnly /*= false*/, bool /*updateAnimationTier = true*/)
 {
     if (!packetOnly && !Unit::SetDisableGravity(disable))
         return false;
@@ -15436,7 +15430,7 @@ bool Player::SetCanFly(bool apply, bool packetOnly /*= false*/)
     return true;
 }
 
-bool Player::SetHover(bool apply, bool packetOnly /*= false*/)
+bool Player::SetHover(bool apply, bool packetOnly /*= false*/, bool /*updateAnimationTier = true*/)
 {
     // moved inside, flag can be removed on landing and wont send appropriate packet to client when aura is removed
     if (!packetOnly /* && !Unit::SetHover(apply)*/)
@@ -15497,56 +15491,6 @@ bool Player::SetFeatherFall(bool apply, bool packetOnly /*= false*/)
     BuildMovementPacket(&data);
     SendMessageToSet(&data, false);
     return true;
-}
-
-void Player::BeginCinematic()
-{
-    // Sanity check for active camera set
-    if (m_activeCinematicCameraId == 0)
-    {
-        return;
-    }
-
-    auto itr = sFlyByCameraStore.find(m_activeCinematicCameraId);
-    if (itr != sFlyByCameraStore.end())
-    {
-        // Initialize diff, and set camera
-        m_cinematicDiff = 0;
-        m_cinematicCamera = &itr->second;
-
-        auto camitr = m_cinematicCamera->begin();
-        if (camitr != m_cinematicCamera->end())
-        {
-            Position pos(camitr->locations.x, camitr->locations.y, camitr->locations.z, camitr->locations.w);
-            if (!pos.IsPositionValid())
-            {
-                return;
-            }
-
-            m_mapRef->LoadGrid(camitr->locations.x, camitr->locations.y);
-            m_CinematicObject = SummonCreature(VISUAL_WAYPOINT, pos.m_positionX, pos.m_positionY, pos.m_positionZ, 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 120000);
-            if (m_CinematicObject)
-            {
-                m_CinematicObject->setActive(true);
-                SetViewpoint(m_CinematicObject, true);
-            }
-        }
-    }
-}
-
-void Player::EndCinematic()
-{
-    m_cinematicDiff = 0;
-    m_cinematicCamera = nullptr;
-    m_activeCinematicCameraId = 0;
-    if (m_CinematicObject)
-    {
-        if (m_seer && m_seer == m_CinematicObject)
-        {
-            SetViewpoint(m_CinematicObject, false);
-        }
-        m_CinematicObject->AddObjectToRemoveList();
-    }
 }
 
 Guild* Player::GetGuild() const
