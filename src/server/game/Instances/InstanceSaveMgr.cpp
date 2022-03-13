@@ -802,7 +802,12 @@ void InstanceSaveMgr::CopyBinds(ObjectGuid from, ObjectGuid to, Player* toPlr)
 
 void InstanceSaveMgr::UnbindAllFor(InstanceSave* save)
 {
-    GuidList& pList = save->m_playerList;
-    while (!pList.empty())
-        PlayerUnbindInstance(*(pList.begin()), save->GetMapId(), save->GetDifficulty(), true, ObjectAccessor::FindConnectedPlayer(*(pList.begin())));
+    uint32 mapId = save->GetMapId();
+    Difficulty difficulty = save->GetDifficulty();
+    GuidList players = save->m_playerList;
+
+    for (ObjectGuid const& guid : players)
+    {
+        PlayerUnbindInstance(guid, mapId, difficulty, true, ObjectAccessor::FindConnectedPlayer(guid));
+    }
 }
