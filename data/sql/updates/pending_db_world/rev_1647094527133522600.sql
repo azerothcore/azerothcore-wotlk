@@ -1,5 +1,5 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1647094527133522600');
--- Cleanup for the total mess that's in the db
+ 
+-- Due to the lack of sniffs, this is used from WoWHead
 DELETE FROM `creature_queststarter` WHERE `quest` IN (25229, 25199, 25285, 25289, 25295, 25212, 25283, 25500, 25287, 25393);
 INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
 (7937, 25229),
@@ -13,6 +13,7 @@ INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
 (39675, 25500),
 (39678, 25283);
 
+-- Due to the lack of sniffs, this is used from WoWHead
 DELETE FROM `creature_questender` WHERE `quest` IN (25229, 25199, 25285, 25289, 25295, 25212, 25283, 25500, 25287, 25393);
 INSERT INTO `creature_questender` (`id`, `quest`) VALUES
 (7937, 25393),
@@ -26,6 +27,7 @@ INSERT INTO `creature_questender` (`id`, `quest`) VALUES
 (39675, 25500),
 (39678, 25283);
 
+-- Due to the lack of sniffs, this is used from WoWHead
 DELETE FROM `quest_template_addon` WHERE `id` IN (25229, 25199, 25285, 25289, 25295, 25212, 25283, 25500, 25287, 25393);
 INSERT INTO `quest_template_addon` (`ID`, `MaxLevel`, `AllowableClasses`, `SourceSpellID`, `PrevQuestID`, `NextQuestID`, `ExclusiveGroup`, `RewardMailTemplateID`, `RewardMailDelay`, `RequiredSkillID`, `RequiredSkillPoints`, `RequiredMinRepFaction`, `RequiredMaxRepFaction`, `RequiredMinRepValue`, `RequiredMaxRepValue`, `ProvidedItemCount`, `SpecialFlags`) VALUES
 (25199, 0, 0, 0, 25229, 25285, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
@@ -37,11 +39,9 @@ INSERT INTO `quest_template_addon` (`ID`, `MaxLevel`, `AllowableClasses`, `Sourc
 (25289, 0, 0, 0, 25285, 25295, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (25295, 0, 0, 0, 25289, 0, -25295, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (25393, 0, 0, 0, 25287, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(25500, 0, 0, 0, 25283, 25287, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0);
+(25500, 0, 0, 0, 25283, 25287, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0); 
 
-UPDATE `creature_template` SET `npcflag`=2 WHERE  `entry`=39675;
-
--- FULL Gossip menu
+-- Again, data from WoWHead
 DELETE FROM `gossip_menu_option` WHERE `MenuID` = 11211;
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
 (11211, 0, 0, 'Board the Flying Machine.', 39462, 1, 1, 0, 0, 0, 0, '', 0, 0),
@@ -51,6 +51,7 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 UPDATE `creature_template` SET `ScriptName`='npc_gnome_citizen_motivated' WHERE `entry`=39466;
 UPDATE `creature_template` SET `ScriptName`='npc_gnome_citizen' WHERE `entry`=39623;
 
+-- Texts for Motivated Citizen [39466] from sniffs
 SET @MOVITVATED_CITIZEN = 39466;
 DELETE FROM `creature_text` WHERE `CreatureID`=@MOVITVATED_CITIZEN;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
@@ -76,10 +77,12 @@ INSERT INTO `npc_spellclick_spells` (`npc_entry`,`spell_id`,`cast_flags`,`user_t
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 18 AND `SourceGroup` = 39715;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,`SourceId`,`ElseGroup`,`ConditionTypeOrReference`,`ConditionTarget`,`ConditionValue1`,`ConditionValue2`,`ConditionValue3`,`NegativeCondition`,`ErrorType`,`ErrorTextId`,`ScriptName`,`Comment`) VALUES
 (18,39715,74204,0,0,9,0,25285,0,0,0,0,0,"","Spellclick 'Summon Tank' requires quest 'In and Out' active");
-UPDATE `creature_template` SET `spell1` = 74153, `spell2` = 0, `spell3` = 0, `spell4` = 0 WHERE `entry` = 39682;
 DELETE FROM `spell_script_names` WHERE `spell_id` = 74153 AND `ScriptName` = "spell_gen_eject_passenger";
 INSERT INTO `spell_script_names` (`spell_id`,`ScriptName`) VALUES
 (74153,"spell_gen_eject_passenger");
+DELETE FROM `creature_template_spell` WHERE `Spell` = 74153 AND `CreatureID` = 39682;
+INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `VerifiedBuild`) VALUES (39682, 0, 74153, 0);
+
 
 -- [Q:25289] One Step Forward
 UPDATE `creature_template` SET `npcflag` = `npcflag`|16777216 WHERE `entry` = 39716;
@@ -89,13 +92,21 @@ INSERT INTO `npc_spellclick_spells` (`npc_entry`,`spell_id`,`cast_flags`,`user_t
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 18 AND `SourceGroup` = 39716;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,`SourceId`,`ElseGroup`,`ConditionTypeOrReference`,`ConditionTarget`,`ConditionValue1`,`ConditionValue2`,`ConditionValue3`,`NegativeCondition`,`ErrorType`,`ErrorTextId`,`ScriptName`,`Comment`) VALUES
 (18,39716,74203,0,0,9,0,25289,0,0,0,0,0,"","Spellclick 'Summon Tank' requires quest 'In and Out' active");
-UPDATE `creature_template` SET `spell1` = 74157, `spell2` = 74159, `spell3` = 74160, `spell4` = 74153 WHERE `entry` = 39713;
+DELETE FROM `creature_template_spell` WHERE `CreatureID` = 39713;
+INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `VerifiedBuild`) VALUES 
+(39713, 0, 74157, 0),
+(39713, 1, 74159, 0),
+(39713, 2, 74160, 0),
+(39713, 3, 74153, 0);
 
 -- [Q:25295] Press Fire
 UPDATE `creature_template` SET `ScriptName` = 'npc_shoot_bunny' WHERE `entry` = 39711;
 DELETE FROM `spell_scripts` WHERE `id` = 74182;
 INSERT INTO `spell_scripts` (`id`, `command`, `datalong`, `datalong2`) VALUES (74182, 15, 74179, 2);
-UPDATE `creature_template` SET `spell4` = 74174, `spell6` = 74153 WHERE `entry` = 39714;
+DELETE FROM `creature_template_spell` WHERE `CreatureID` = 39714;
+INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `VerifiedBuild`) VALUES 
+(39714, 4, 74174, 0),
+(39714, 6, 74153, 0);
 UPDATE `creature_template` SET `npcflag` = `npcflag`|16777216 WHERE `entry` = 39717;
 DELETE FROM `npc_spellclick_spells` WHERE `npc_entry` = 39717;
 INSERT INTO `npc_spellclick_spells` (`npc_entry`,`spell_id`,`cast_flags`,`user_type`) VALUES (39717,74205,1,0);
@@ -117,7 +128,7 @@ UPDATE `creature_template` SET `AIName`='' WHERE `entry` IN (1268,7955,6119,3981
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (1268,7955,6119,39817);
 UPDATE `creature_template` SET `ScriptName` = 'npc_mekkatorque', `scale` = 0.6, `unit_flags` = 33554752 WHERE `entry` = 39712;
 
--- [Q:25286] Words for Delivery, we have 3, but "25286" is the correct one.
+-- [Q:25286] Words for Delivery, we have 3, but "25286" is the correct one. (sniffs)
 -- Already working, simple turn-in
 
 -- [Q:25393] Operation Gnomeregan
@@ -127,7 +138,9 @@ UPDATE `creature_template` SET `npcflag` = 0, `VehicleId` = 0, `ScriptName` = 'n
 UPDATE `creature_template` SET `faction` = 1771, `unit_flags` = 4, `ScriptName` = 'npc_og_cannon' WHERE `entry` = 39759;
 UPDATE `creature_template` SET `ScriptName` = 'npc_og_bomber' WHERE `entry` = 39735;
 UPDATE `creature_template` SET `ScriptName` = 'npc_og_infantry' WHERE `entry` = 39252;
-UPDATE `creature_template` SET `spell1` = 74764, `ScriptName` = 'npc_og_i_infantry' WHERE `entry` = 39755;
+UPDATE `creature_template` SET `ScriptName` = 'npc_og_i_infantry' WHERE `entry` = 39755;
+DELETE FROM `creature_template_spell` WHERE `Spell` = 74764 AND `CreatureID` = 39755;
+INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `VerifiedBuild`) VALUES (39755, 0, 74764, 0);
 UPDATE `creature_template` SET `ScriptName` = 'npc_og_suit' WHERE `entry` = 39902;
 UPDATE `creature_template` SET `ScriptName` = 'npc_og_trogg' WHERE `entry` IN (39826, 39799);
 UPDATE `creature_template` SET `ScriptName` = 'npc_og_boltcog' WHERE `entry` = 39837;
@@ -137,12 +150,13 @@ UPDATE `creature_template` SET `AIName` = 'AggresorAI' WHERE `entry` IN (39755, 
 UPDATE `creature_template` SET `VehicleId` = 0, `ScriptName` = 'npc_og_camera_vehicle' WHERE `entry` = 40479;
 UPDATE `creature_template` SET `mechanic_immune_mask` = 8192 WHERE `entry` IN (39860, 39826, 39799, 39819, 39273, 39910, 39837);
 
-DELETE FROM `creature` WHERE `id` IN (39273, 39910);
-INSERT INTO `creature` (`guid`,`id`,`map`,`spawnMask`,`phaseMask`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`wander_distance`,`currentwaypoint`,`curhealth`,`curmana`,`MovementType`,`npcflag`,`unit_flags`,`dynamicflags`) VALUES
-(250249, 39273, 0, 1, 256, 0, 0, -5423.01, 535.254, 386.516, 5.23555, 300, 0, 0, 630000, 0, 0, 0, 134217728, 0),
-(250248, 39910, 0, 1, 256, 0, 0, -5427.93, 532.323, 386.85, 5.27046, 300, 0, 0, 630000, 0, 0, 0, 0, 0);
-UPDATE `creature` SET `position_x` = -5424.462891, `position_y` = 531.410095, `position_z` = 386.743347, `orientation` = 5.2 WHERE `id` = 39271;
-UPDATE `creature` SET `phaseMask`= 1 WHERE `id` = 7937;
+-- GUID is randomly generated, therefore left empty
+DELETE FROM `creature` WHERE `id1` IN (39273, 39910);
+INSERT INTO `creature` (`id1`,`map`,`spawnMask`,`phaseMask`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`wander_distance`,`currentwaypoint`,`curhealth`,`curmana`,`MovementType`,`npcflag`,`unit_flags`,`dynamicflags`) VALUES
+(39273, 0, 1, 256, 0, -5423.01, 535.254, 386.516, 5.23555, 300, 0, 0, 630000, 0, 0, 0, 134217728, 0),
+(39910, 0, 1, 256, 0, -5427.93, 532.323, 386.85, 5.27046, 300, 0, 0, 630000, 0, 0, 0, 0, 0);
+UPDATE `creature` SET `position_x` = -5424.462891, `position_y` = 531.410095, `position_z` = 386.743347, `orientation` = 5.2 WHERE `id1` = 39271;
+UPDATE `creature` SET `phaseMask`= 1 WHERE `id1` = 7937;
 
 DELETE FROM `vehicle_template_accessory` WHERE `entry` = 39860;
 
@@ -157,21 +171,18 @@ UPDATE `creature_template` SET `speed_run` = 1.25, `faction` = 1771 WHERE `entry
 UPDATE `creature_template` SET `speed_run` = 1.29, `faction` = 1771 WHERE `entry` = 39910;
 
 DELETE FROM `spell_area` WHERE (`spell` = 74310) AND (`area` IN (1, 135, 721));
-INSERT INTO `spell_area` VALUES
+INSERT INTO `spell_area` (`spell`, `area`, `quest_start`, `quest_end`, `aura_spell`, `racemask`, `gender`, `autocast`, `quest_start_status`, `quest_end_status`) VALUES
 (74310, 721, 25287, 25393, 0, 0, 2, 1, 74, 11),
 (74310, 135, 25287, 25393, 0, 0, 2, 1, 74, 11);
 
 UPDATE `gameobject` SET `phaseMask` = 257 WHERE `id` = 194498;
 UPDATE `gameobject` SET `phaseMask` = 256 WHERE `id` = 202922;
-UPDATE `gameobject` SET `spawntimesecs` = -1 WHERE `guid` NOT IN (2482, 2469, 2461, 2458, 2454, 2453, 2466, 2475) and `id` = 194498;
+UPDATE `gameobject` SET `spawntimesecs` = -1 WHERE `guid` NOT IN (2482, 2469, 2461, 2458, 2454, 2453, 2466, 2475) and `id` = 194498; -- this is from existing db data
 
 DELETE FROM `spell_scripts` where `id` IN (74412, 75510) AND `command` = 6;
 INSERT INTO `spell_scripts` (`id`, `command`, `x`, `y`, `z`, `o`) VALUES
 (74412, 6, -4842.156738, -1277.52771, 501.868256, 0.84),
 (75510, 6, -5164.767578, 556.341125, 423.753784, 25.29);
-
-DELETE FROM `spell_dbc` WHERE `id` = 75517;
-INSERT INTO `spell_dbc` VALUES (75517,0,0,384,1024,4,0,0,8,0,0,0,0,0,1,0,0,0,0,0,0,0,245,1,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,'Tumultuous Earthstorm');
 
 -- Waypoints for the last battle --
 DELETE FROM `script_waypoint` WHERE `entry` IN (39271, 39273, 39910);
@@ -399,7 +410,7 @@ INSERT INTO `script_waypoint` VALUES
 SET @ENTRY := 82;
 DELETE FROM `game_event` WHERE `eventEntry`=@ENTRY;
 INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `holidayStage`, `description`, `world_event`, `announce`) VALUES
-(@ENTRY, "2010-09-07 01:00:00", "2010-10-10 01:00:00", 9999999, 47520, 0, 0, "Operation: Gnomeregan", 0, 2);
+(@ENTRY, "2010-09-07 01:00:00", "2030-12-31 12:00:00", 9999999, 47520, 0, 0, "Operation: Gnomeregan", 0, 2);
 
 DELETE FROM `game_event_creature` WHERE `eventEntry`=@ENTRY;
 INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
