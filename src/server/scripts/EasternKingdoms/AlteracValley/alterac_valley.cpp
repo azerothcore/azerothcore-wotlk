@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "BattlegroundAV.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 
@@ -75,6 +76,11 @@ SpellPair const _auraPairs[MAX_SPELL_PAIRS] =
     { NPC_WEST_FROSTWOLF_WARMASTER, SPELL_WEST_FROSTWOLF_WARMASTER },
     { NPC_TOWER_POINT_WARMASTER,    SPELL_TOWER_POINT_WARMASTER },
     { NPC_ICEBLOOD_WARMASTER,       SPELL_ICEBLOOD_WARMASTER }
+};
+
+enum Factions
+{
+    FACTION_AV_ALLIANCE = 1534
 };
 
 class npc_av_marshal_or_warmaster : public CreatureScript
