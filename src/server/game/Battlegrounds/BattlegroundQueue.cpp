@@ -269,8 +269,8 @@ void BattlegroundQueue::RemovePlayer(ObjectGuid guid, bool decreaseInvitedCount)
             playerName = player->GetName();
         }
 
-        //LOG_DEBUG("bg.battleground", "BattlegroundQueue: couldn't find player {} ({})", playerName, guid.ToString());
-        ABORT("BattlegroundQueue: couldn't find player {} ({})", playerName, guid.ToString());
+        LOG_ERROR("bg.battleground", "BattlegroundQueue: couldn't find player {} ({})", playerName, guid.ToString());
+        //ABORT("BattlegroundQueue: couldn't find player {} ({})", playerName, guid.ToString());
         return;
     }
 
@@ -292,8 +292,8 @@ void BattlegroundQueue::RemovePlayer(ObjectGuid guid, bool decreaseInvitedCount)
     // player can't be in queue without group, but just in case
     if (group_itr == m_QueuedGroups[_bracketId][_groupType].end())
     {
-        //LOG_ERROR("bg.battleground", "BattlegroundQueue: ERROR Cannot find groupinfo for {}", guid.ToString());
-        ABORT("BattlegroundQueue: ERROR Cannot find groupinfo for {}", guid.ToString());
+        LOG_ERROR("bg.battleground", "BattlegroundQueue: ERROR Cannot find groupinfo for {}", guid.ToString());
+        //ABORT("BattlegroundQueue: ERROR Cannot find groupinfo for {}", guid.ToString());
         return;
     }
 
