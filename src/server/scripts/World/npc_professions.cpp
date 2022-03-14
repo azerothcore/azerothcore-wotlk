@@ -446,10 +446,10 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (creature->IsVendor())
-            AddGossipItemFor(player, GOSSIP_TEXT_BROWSE_GOODS, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+            AddGossipItemFor(player, gossip_browse_your_goods, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
         if (creature->IsTrainer())
-            AddGossipItemFor(player, GOSSIP_TEXT_TRAIN, 3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
+            AddGossipItemFor(player, gossip_train_me, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
 
         if (player->HasSkill(SKILL_ALCHEMY) && player->GetBaseSkillValue(SKILL_ALCHEMY) >= 350 && player->getLevel() > 67)
         {
@@ -611,7 +611,7 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (creature->IsVendor())
-            AddGossipItemFor(player, GOSSIP_TEXT_BROWSE_GOODS, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+            AddGossipItemFor(player, gossip_browse_your_goods, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
         uint32 creatureId = creature->GetEntry();
         //WEAPONSMITH & ARMORSMITH
@@ -633,7 +633,7 @@ public:
                         if (player->HasSpell(S_WEAPON) || player->IsGameMaster())
                         {
                             AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_WEAPON_UNLEARN,    GOSSIP_SENDER_UNLEARN,   GOSSIP_ACTION_INFO_DEF + 3);
-                            AddGossipItemFor(player, GOSSIP_TEXT_TRAIN, 3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
+                            AddGossipItemFor(player, gossip_train_me, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
                         }
                         break;
                     case N_TRAINER_ARMOR1:                                      //Grumnus Steelshaper
@@ -641,7 +641,7 @@ public:
                         if (player->HasSpell(S_ARMOR) || player->IsGameMaster())
                         {
                             AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ARMOR_UNLEARN,     GOSSIP_SENDER_UNLEARN,   GOSSIP_ACTION_INFO_DEF + 4);
-                            AddGossipItemFor(player, GOSSIP_TEXT_TRAIN, 3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
+                            AddGossipItemFor(player, gossip_train_me, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
                         }
                         break;
                 }
@@ -658,7 +658,7 @@ public:
                     if (player->HasSpell(S_HAMMER) || player->IsGameMaster())
                     {
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_UNLEARN_HAMMER,     GOSSIP_SENDER_UNLEARN,  GOSSIP_ACTION_INFO_DEF + 8);
-                        AddGossipItemFor(player, GOSSIP_TEXT_TRAIN, 3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
+                        AddGossipItemFor(player, gossip_train_me, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
                     }
                     break;
                 case N_TRAINER_AXE:                                     //Kilram
@@ -667,7 +667,7 @@ public:
                     if (player->HasSpell(S_AXE) || player->IsGameMaster())
                     {
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_UNLEARN_AXE,        GOSSIP_SENDER_UNLEARN,  GOSSIP_ACTION_INFO_DEF + 9);
-                        AddGossipItemFor(player, GOSSIP_TEXT_TRAIN, 3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
+                        AddGossipItemFor(player, gossip_train_me, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
                     }
                     break;
                 case N_TRAINER_SWORD:                                     //Seril Scourgebane
@@ -676,7 +676,7 @@ public:
                     if (player->HasSpell(S_SWORD) || player->IsGameMaster())
                     {
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_UNLEARN_SWORD,      GOSSIP_SENDER_UNLEARN,  GOSSIP_ACTION_INFO_DEF + 10);
-                        AddGossipItemFor(player, GOSSIP_TEXT_TRAIN, 3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
+                        AddGossipItemFor(player, gossip_train_me, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
                     }
                     break;
             }
@@ -954,7 +954,7 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (creature->IsVendor())
-            AddGossipItemFor(player, GOSSIP_TEXT_BROWSE_GOODS, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+            AddGossipItemFor(player, gossip_browse_your_goods, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
         // pussywizard: NO UNLEARNING! LEATHERWORKING SPECIALTY IS A PERMANENT DECISION AND CANNOT BE CHANGED IN ANY WAY!
         // pussywizard: CAN RE-LEARN ONLY THE ONE FOR WHICH QUEST IS COMPLETED!
@@ -969,7 +969,7 @@ public:
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LEARN_DRAGON,      GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                     if (player->HasSpell(S_DRAGON) || player->IsGameMaster())
                     {
-                        AddGossipItemFor(player, GOSSIP_TEXT_TRAIN, 3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
+                        AddGossipItemFor(player, gossip_train_me, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
                     }
                     break;
                 case N_TRAINER_ELEMENTAL1:                                      //Sarah Tanner
@@ -978,7 +978,7 @@ public:
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LEARN_ELEMENTAL,   GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                     if (player->HasSpell(S_ELEMENTAL) || player->IsGameMaster())
                     {
-                        AddGossipItemFor(player, GOSSIP_TEXT_TRAIN, 3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
+                        AddGossipItemFor(player, gossip_train_me, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
                     }
                     break;
                 case N_TRAINER_TRIBAL1:                                      //Caryssia Moonhunter
@@ -987,7 +987,7 @@ public:
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LEARN_TRIBAL,      GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
                     if (player->HasSpell(S_TRIBAL) || player->IsGameMaster())
                     {
-                        AddGossipItemFor(player, GOSSIP_TEXT_TRAIN, 3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
+                        AddGossipItemFor(player, gossip_train_me, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
                     }
                     break;
             }
@@ -1053,7 +1053,7 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (creature->IsVendor())
-            AddGossipItemFor(player, GOSSIP_TEXT_BROWSE_GOODS, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+            AddGossipItemFor(player, gossip_browse_your_goods, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
         //TAILORING SPEC
         if (player->HasSkill(SKILL_TAILORING) && player->GetBaseSkillValue(SKILL_TAILORING) >= 350 && player->getLevel() > 59)
@@ -1068,7 +1068,7 @@ public:
                         if (player->HasSpell(S_SPELLFIRE) || player->IsGameMaster())
                         {
                             AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_UNLEARN_SPELLFIRE,  GOSSIP_SENDER_UNLEARN,  GOSSIP_ACTION_INFO_DEF + 4);
-                            AddGossipItemFor(player, GOSSIP_TEXT_TRAIN, 3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
+                            AddGossipItemFor(player, gossip_train_me, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
                         }
                         break;
                     case N_TRAINER_MOONCLOTH:                                 //Nasmara Moonsong
@@ -1077,7 +1077,7 @@ public:
                         if (player->HasSpell(S_MOONCLOTH) || player->IsGameMaster())
                         {
                             AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_UNLEARN_MOONCLOTH,  GOSSIP_SENDER_UNLEARN,  GOSSIP_ACTION_INFO_DEF + 5);
-                            AddGossipItemFor(player, GOSSIP_TEXT_TRAIN, 3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
+                            AddGossipItemFor(player, gossip_train_me, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
                         }
                         break;
                     case N_TRAINER_SHADOWEAVE:                                 //Andrion Darkspinner
@@ -1086,7 +1086,7 @@ public:
                         if (player->HasSpell(S_SHADOWEAVE) || player->IsGameMaster())
                         {
                             AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_UNLEARN_SHADOWEAVE, GOSSIP_SENDER_UNLEARN,  GOSSIP_ACTION_INFO_DEF + 6);
-                            AddGossipItemFor(player, GOSSIP_TEXT_TRAIN, 3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
+                            AddGossipItemFor(player, gossip_train_me, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
                         }
                         break;
                 }

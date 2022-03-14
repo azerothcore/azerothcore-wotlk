@@ -718,12 +718,12 @@ public:
 
         //Trainer Menu
         if ( creature->IsTrainer() )
-            AddGossipItemFor(player, GOSSIP_TEXT_TRAIN, 3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
+            AddGossipItemFor(player, gossip_train_me, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
 
         //Vendor Menu
         if ( creature->IsVendor() )
             if (player->HasSpell(SPELL_MECHANO_HOG) || player->HasSpell(SPELL_MEKGINEERS_CHOPPER) || player->IsGameMaster())
-                AddGossipItemFor(player, GOSSIP_TEXT_BROWSE_GOODS, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+                AddGossipItemFor(player, gossip_browse_your_goods, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         return true;
