@@ -82,6 +82,7 @@ INSERT INTO `spell_script_names` (`spell_id`,`ScriptName`) VALUES
 (74153,"spell_gen_eject_passenger");
 DELETE FROM `creature_template_spell` WHERE `Spell` = 74153 AND `CreatureID` = 39682;
 INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `VerifiedBuild`) VALUES (39682, 0, 74153, 0);
+UPDATE `creature_template` SET `ScriptName`='npc_ejectormechanotank' WHERE  `entry`=39682; -- to be removed
 
 
 -- [Q:25289] One Step Forward
@@ -91,18 +92,21 @@ INSERT INTO `npc_spellclick_spells` (`npc_entry`,`spell_id`,`cast_flags`,`user_t
 (39716,74203,1,0);
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 18 AND `SourceGroup` = 39716;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,`SourceId`,`ElseGroup`,`ConditionTypeOrReference`,`ConditionTarget`,`ConditionValue1`,`ConditionValue2`,`ConditionValue3`,`NegativeCondition`,`ErrorType`,`ErrorTextId`,`ScriptName`,`Comment`) VALUES
-(18,39716,74203,0,0,9,0,25289,0,0,0,0,0,"","Spellclick 'Summon Tank' requires quest 'In and Out' active");
+(18,39716,74203,0,0,9,0,25289,0,0,0,0,0,"","Spellclick 'Summon Tank' requires quest 'One Step Forward' active");
 DELETE FROM `creature_template_spell` WHERE `CreatureID` = 39713;
 INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `VerifiedBuild`) VALUES 
 (39713, 0, 74157, 0),
 (39713, 1, 74159, 0),
 (39713, 2, 74160, 0),
 (39713, 3, 74153, 0);
+UPDATE `creature_template` SET `VehicleId`='745' WHERE  `entry`=39682; -- for some reason it was set to 0, missing sniff?
+UPDATE `creature_template` SET `ScriptName`='npc_scuttlingmechanotank' WHERE  `entry`=39713; -- to be removed
+
 
 -- [Q:25295] Press Fire
-UPDATE `creature_template` SET `ScriptName` = 'npc_shoot_bunny' WHERE `entry` = 39711;
-DELETE FROM `spell_scripts` WHERE `id` = 74182;
-INSERT INTO `spell_scripts` (`id`, `command`, `datalong`, `datalong2`) VALUES (74182, 15, 74179, 2);
+UPDATE `creature_template` SET `ScriptName` = 'npc_shoot_bunny' WHERE `entry` = '39707';
+DELETE FROM `spell_scripts` WHERE `id` = '74182';
+INSERT INTO `spell_scripts` (`id`, `command`, `datalong`, `datalong2`) VALUES ('74182', '15', '74179', '2');
 DELETE FROM `creature_template_spell` WHERE `CreatureID` = 39714;
 INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `VerifiedBuild`) VALUES 
 (39714, 4, 74174, 0),
@@ -113,6 +117,7 @@ INSERT INTO `npc_spellclick_spells` (`npc_entry`,`spell_id`,`cast_flags`,`user_t
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 18 AND `SourceGroup` = 39717;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,`SourceId`,`ElseGroup`,`ConditionTypeOrReference`,`ConditionTarget`,`ConditionValue1`,`ConditionValue2`,`ConditionValue3`,`NegativeCondition`,`ErrorType`,`ErrorTextId`,`ScriptName`,`Comment`) VALUES
 (18,39717,74205,0,0,9,0,25295,0,0,0,0,0,"","Spellclick 'Summon Tank' requires quest 'In and Out' active");
+UPDATE `creature_template` SET `VehicleId`='745' WHERE  `entry`=39682; -- for some reason it was set to 700, missing sniff?
 
 -- [Q:25212] Vent Horizon
 UPDATE `conditions` SET `ConditionValue1` = 25212 WHERE (`SourceTypeOrReferenceId`=15) AND (`SourceGroup`=11211) AND (`SourceEntry`=0) AND (`ElseGroup`=0) AND (`ConditionTypeOrReference`=9) AND (`ConditionValue1`=25283) AND (`ConditionValue2`=0) AND (`ConditionValue3`=0);
@@ -155,8 +160,9 @@ DELETE FROM `creature` WHERE `id1` IN (39273, 39910);
 INSERT INTO `creature` (`id1`,`map`,`spawnMask`,`phaseMask`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`wander_distance`,`currentwaypoint`,`curhealth`,`curmana`,`MovementType`,`npcflag`,`unit_flags`,`dynamicflags`) VALUES
 (39273, 0, 1, 256, 0, -5423.01, 535.254, 386.516, 5.23555, 300, 0, 0, 630000, 0, 0, 0, 134217728, 0),
 (39910, 0, 1, 256, 0, -5427.93, 532.323, 386.85, 5.27046, 300, 0, 0, 630000, 0, 0, 0, 0, 0);
-UPDATE `creature` SET `position_x` = -5424.462891, `position_y` = 531.410095, `position_z` = 386.743347, `orientation` = 5.2 WHERE `id1` = 39271;
-UPDATE `creature` SET `phaseMask`= 1 WHERE `id1` = 7937;
+-- unsure?
+--UPDATE `creature` SET `position_x` = -5424.462891, `position_y` = 531.410095, `position_z` = 386.743347, `orientation` = 5.2 WHERE `id1` = 39271;
+--UPDATE `creature` SET `phaseMask`= 1 WHERE `id1` = 7937;
 
 DELETE FROM `vehicle_template_accessory` WHERE `entry` = 39860;
 

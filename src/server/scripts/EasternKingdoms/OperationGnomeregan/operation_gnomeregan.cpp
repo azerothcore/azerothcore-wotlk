@@ -2133,7 +2133,9 @@ public:
 
     struct npc_gnome_citizen_motivatedAI : public FollowerAI
     {
-        npc_gnome_citizen_motivatedAI(Creature* creature) : FollowerAI(creature) { }
+        npc_gnome_citizen_motivatedAI(Creature* creature) : FollowerAI(creature) {
+            me->SetDisplayId(2590);
+        }
 
 
         void Reset() { }
@@ -2185,7 +2187,7 @@ class npc_steamcrank : public CreatureScript
 
         struct npc_steamcrankAI : public ScriptedAI
         {
-            npc_steamcrankAI(Creature* creature) : ScriptedAI(creature) { }
+            npc_steamcrankAI(Creature* creature) : ScriptedAI(creature) { _stepTimer = 0; _step = 0; }
 
             void Reset() override { }
 
@@ -2355,8 +2357,8 @@ class npc_steamcrank : public CreatureScript
             }
 
         private:
-            uint32 _step;
-            uint32 _stepTimer;
+            uint32 _step = 0;
+            uint32 _stepTimer = 0;
         };
 
         CreatureAI* GetAI(Creature* creature) const
@@ -2542,7 +2544,123 @@ public:
     }
 };
 
+// this must be removed once we find the proper "Eject!" spell and link the credit to it
+// currently we don't know it because we have no information
+class npc_ejectormechanotank : public CreatureScript
+{
+public:
+    npc_ejectormechanotank() : CreatureScript("npc_ejectormechanotank") { }
 
+    struct npc_ejectormechanotankAI : public ScriptedAI
+    {
+        npc_ejectormechanotankAI(Creature* creature) : ScriptedAI(creature) { }
+
+        void Reset() override
+        {
+            if (TempSummon* summon = me->ToTempSummon())
+            {
+                if (Unit* vehSummoner = summon->GetSummonerUnit())
+                {  
+                    if (Player* player = vehSummoner->ToPlayer())
+                    { 
+                        if (player->HasQuest(25285))
+                        {
+                            player->CompleteQuest(25285);
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_ejectormechanotankAI(creature);
+    }
+};
+
+// this must be removed once we find the proper credit spells for left leg, right leg, evasive manueuvers
+// currently we don't know it because we have no information
+class npc_scuttlingmechanotank : public CreatureScript
+{
+public:
+    npc_scuttlingmechanotank() : CreatureScript("npc_scuttlingmechanotank") { }
+
+    struct npc_scuttlingmechanotankAI : public ScriptedAI
+    {
+        npc_scuttlingmechanotankAI(Creature* creature) : ScriptedAI(creature) { }
+
+        void Reset() override
+        {
+            if (TempSummon* summon = me->ToTempSummon())
+            {
+                if (Unit* vehSummoner = summon->GetSummonerUnit())
+                {  
+                    if (Player* player = vehSummoner->ToPlayer())
+                    { 
+                        if (player->HasQuest(25289))
+                        {
+                            player->CompleteQuest(25289);
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_scuttlingmechanotankAI(creature);
+    }
+};
+
+class spell_q25289_evasive_manueuvers : public SpellScript
+{
+    PrepareSpellScript(spell_q25289_evasive_manueuvers);
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        if (Creature* target = GetHitCreature())
+            ;// target->CastSpell(GetCaster(), SPELL_BUNNY_CREDIT_EVASIVE_MANUEVERS, false);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q25289_evasive_manueuvers::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+class spell_q25289_left_leg : public SpellScript
+{
+    PrepareSpellScript(spell_q25289_left_leg);
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        if (Creature* target = GetHitCreature())
+            ;// target->CastSpell(GetCaster(), SPELL_BUNNY_CREDIT_LEFT_LEG, false);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q25289_left_leg::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+class spell_q25289_right_leg : public SpellScript
+{
+    PrepareSpellScript(spell_q25289_right_leg);
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        if (Creature* target = GetHitCreature())
+            ;// target->CastSpell(GetCaster(), SPELL_BUNNY_CREDIT_RIGHT_LEG, false);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q25289_right_leg::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
 
 void AddSC_operation_gnomeregan()
 {
@@ -2564,4 +2682,13 @@ void AddSC_operation_gnomeregan()
     new npc_steamcrank;
     new npc_mekkatorque;
     new npc_shoot_bunny;
+
+    // those are the spellscripts, we need to add the proper credit id in them and then uncomment
+    //new spell_q25289_evasive_manueuvers;
+    //new spell_q25289_left_leg;
+    //new spell_q25289_right_leg;
+
+    // Those should be removed once we have more information about the quest credits
+    new npc_ejectormechanotank; // 39682
+    new npc_scuttlingmechanotank; // 39713
 }

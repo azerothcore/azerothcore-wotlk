@@ -407,7 +407,7 @@ enum MEK_T
 #define STEAM_3     "On the signal, show me how to greet the commander according to the regulations!"
 #define STEAM_4     "So, recruits, salute your commander!"
 #define STEAM_5     "Great job!"
-#define STEAM_6     "На поле боя важно устрашить врага бешеным боевым ревом!"
+#define STEAM_6     "On the battlefield, it is important to frighten the enemy with a frenzied battle roar!"
 #define STEAM_7     "As soon as I give the signal, show me what real madness is!"
 #define STEAM_8     "Show me real frenzy!"
 #define STEAM_9     "Wow, nice!"
