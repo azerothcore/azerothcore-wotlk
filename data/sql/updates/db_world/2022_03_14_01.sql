@@ -1,3 +1,19 @@
+-- DB update 2022_03_14_00 -> 2022_03_14_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_03_14_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_03_14_00 2022_03_14_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1646835034551886180'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1646835034551886180');
 
 REPLACE INTO `quest_template_locale` (ID, locale, Title, Details, Objectives, EndText, CompletedText, ObjectiveText1, ObjectiveText2, ObjectiveText3,  ObjectiveText4, VerifiedBuild)
@@ -271,3 +287,13 @@ VALUES
 (11517,'zhTW','向納蘇安回報','我非常高興你在這裡，$c!現在我們拿下了聖所，我們得盡快建立一座魔法傳送門，從這裡直通到外域的撒塔斯城。$B$B我可敬的主上，主教納蘇安正在指揮進攻的事宜。任何能協助取得更多能量供給傳送門的人，他都希望我能派去給他。$B$B拜託，請前往撒塔斯城和他談談，他就在聖光露臺的阿達歐的房間。','商人波塔努斯請你和主教納蘇安談談，他就在撒塔斯城的聖光露臺。','','','','','','',0),
 (11520,'zhTW','尋根','歡迎，$r。$b$b我怕這裡沒什麼能提供的，我得等我的試劑到貨。$b$b在我要求的補給中，其中有一種特別的試劑，刺棘根莖，特別難以取得。$b$b所幸，我知道一個秘密...$b$b使用刺棘撕掠者的腺體，可以控制劫毀者來挖掘那些根莖。$b$b要找到那些根莖，你要旅行到外域，從撒塔斯往東北飛，直到刺棘高地。','日境港的瑪納要你去外域的刺棘高地收集5個刺棘根莖，然後再回來找她。','','到奎爾丹納斯島的的日境港找瑪納。','','','','',0),
 (11524,'zhTW','不穩定的運轉','我們缺乏人手來佔領日境聖所，但我有個計畫能夠把局面導向我們的目標。$B$B從太陽之井散溢出來的能量造成巡邏這座島嶼的哨兵幾乎發揮不了作用。控制他們機器運轉的水晶核已經受損到無法修復。$B$B我已經造出了一些新的水晶，能夠把控制權轉到我們手上，把水晶放入那些被擊敗的哨兵體內。我們需要所有可用的支援。','破碎之日會所的復仇者薩楊希望你將調諧水晶核放入5隻被擊倒的不穩定哨兵體內，將他們轉化為友軍。','','到奎爾丹納斯島的的破碎之日會所找復仇者薩楊。','部署轉化的哨衛','','','',0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_03_14_01' WHERE sql_rev = '1646835034551886180';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
