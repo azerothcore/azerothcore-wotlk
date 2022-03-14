@@ -637,14 +637,12 @@ void BattlefieldWG::OnCreatureRemove(Creature*  /*creature*/)
                         team = TEAM_HORDE;
                     else
                         return;
-
                     m_vehicles[team].erase(creature->GetGUID());
                     if (team == TEAM_HORDE)
                         UpdateData(BATTLEFIELD_WG_DATA_VEHICLE_H, -1);
                     else
                         UpdateData(BATTLEFIELD_WG_DATA_VEHICLE_A, -1);
                     UpdateVehicleCountWG();
-
                     break;
                 }
             }
