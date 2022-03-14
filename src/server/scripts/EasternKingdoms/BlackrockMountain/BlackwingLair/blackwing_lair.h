@@ -48,6 +48,7 @@ enum BWLEncounter
 enum BWLCreatureIds
 {
     NPC_GRETHOK                 = 12557,
+    NPC_BLACKWING_GUARDSMAN     = 14456,
     NPC_RAZORGORE               = 12435,
     NPC_BLACKWING_DRAGON        = 12422,
     NPC_BLACKWING_TASKMASTER    = 12458,

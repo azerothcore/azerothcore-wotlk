@@ -103,6 +103,9 @@ public:
                         if (CreatureAI* razorAI = razor->AI())
                             razorAI->JustSummoned(creature);
                     break;
+                case NPC_BLACKWING_GUARDSMAN:
+                    guardList.push_back(creature->GetGUID());
+                    break;
                 case NPC_NEFARIAN:
                     nefarianGUID = creature->GetGUID();
                     break;
@@ -129,22 +132,6 @@ public:
                     break;
                 default:
                     break;
-            }
-        }
-
-        void OnUnitDeath(Unit* unit) override
-        {
-            //! HACK, needed because of buggy CreatureAI after charm
-            if (EggEvent == DONE)
-            {
-                if (unit->GetEntry() == NPC_RAZORGORE && GetBossState(DATA_RAZORGORE_THE_UNTAMED) != DONE)
-                {
-                    SetBossState(DATA_RAZORGORE_THE_UNTAMED, DONE);
-                }
-            }
-            else
-            {
-                _events.CancelEvent(EVENT_RAZOR_SPAWN);
             }
         }
 
@@ -308,15 +295,19 @@ public:
                         _events.CancelEvent(EVENT_RAZOR_SPAWN);
                         EggEvent = data;
                         EggCount = 0;
+
                         for (ObjectGuid const& guid : EggList)
                         {
-                            if (GameObject* egg = instance->GetGameObject(guid))
-                            {
-                                egg->Respawn();
-                            }
+                            DoRespawnGameObject(guid, 0);
                         }
 
-                        DoRespawnCreature(DATA_GRETHOK, true);
+                        DoRespawnCreature(DATA_GRETHOK);
+
+                        for (ObjectGuid const& guid : guardList)
+                        {
+                            DoRespawnCreature(guid);
+                        }
+
                         break;
                     case SPECIAL:
                         if (++EggCount >= EggList.size())
@@ -370,6 +361,20 @@ public:
         {
             switch (unit->GetEntry())
             {
+                case NPC_RAZORGORE:
+                    //! HACK, needed because of buggy CreatureAI after charm
+                    if (EggEvent == DONE)
+                    {
+                        if (unit->GetEntry() == NPC_RAZORGORE && GetBossState(DATA_RAZORGORE_THE_UNTAMED) != DONE)
+                        {
+                            SetBossState(DATA_RAZORGORE_THE_UNTAMED, DONE);
+                        }
+                    }
+                    else
+                    {
+                        _events.CancelEvent(EVENT_RAZOR_SPAWN);
+                    }
+                    break;
                 case NPC_BLACK_DRAKONID:
                 case NPC_BLUE_DRAKONID:
                 case NPC_BRONZE_DRAKONID:
@@ -498,6 +503,7 @@ public:
         uint8 EggCount;
         uint32 EggEvent;
         GuidList EggList;
+        GuidList guardList;
 
         // Nefarian
         uint32 NefarianLeftTunnel;
