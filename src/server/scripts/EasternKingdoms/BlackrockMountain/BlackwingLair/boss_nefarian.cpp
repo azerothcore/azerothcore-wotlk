@@ -30,7 +30,8 @@
 enum Events
 {
     // Victor Nefarius
-    EVENT_SPAWN_ADD = 1,
+    EVENT_SPAWN_ADDS = 1,
+    EVENT_CHECK_PHASE_2,
     EVENT_START_EVENT,
     EVENT_SHADOW_BOLT,
     EVENT_FEAR,
@@ -53,7 +54,8 @@ enum Events
     EVENT_SUCCESS_3,
 
     ACTION_RESET = 0,
-    ACTION_KILLED = 1
+    ACTION_KILLED = 1,
+    ACTION_ADD_KILLED = 2
 };
 
 enum Says
@@ -106,13 +108,6 @@ enum GameObjects
 
 enum Creatures
 {
-    NPC_BRONZE_DRAKANOID       = 14263,
-    NPC_BLUE_DRAKANOID         = 14261,
-    NPC_RED_DRAKANOID          = 14264,
-    NPC_GREEN_DRAKANOID        = 14262,
-    NPC_BLACK_DRAKANOID        = 14265,
-    NPC_CHROMATIC_DRAKANOID    = 14302,
-    NPC_BONE_CONSTRUCT         = 14605,
     NPC_TOTEM_C_FIRE_NOVA      = 14662,
     NPC_TOTEM_C_STONESKIN      = 14663,
     NPC_TOTEM_C_HEALING        = 14664,
@@ -136,6 +131,14 @@ enum Spells
     SPELL_SHADOWBLINK               = 22664,
 
     SPELL_NEFARIANS_BARRIER         = 22663,
+
+    // Drakonid Spawner
+    SPELL_SPAWN_BLACK_DRAKONID      = 22654,
+    SPELL_SPAWN_RED_DRAKONID        = 22655,
+    SPELL_SPAWN_GREEN_DRAKONID      = 22656,
+    SPELL_SPAWN_BRONZE_DRAKONID     = 22657,
+    SPELL_SPAWN_BLUE_DRAKONID       = 22658,
+    SPELL_SPAWN_CHROMATIC_DRAKONID  = 22680,
 
     // Nefarian
     SPELL_SHADOWFLAME_INITIAL       = 22992,
@@ -168,15 +171,27 @@ enum Spells
     SPELL_CORRUPTED_WINDFURY_TOTEM  = 23423
 };
 
-Position const DrakeSpawnLoc[2] = // drakonid
+enum Misc
 {
-    {-7591.151855f, -1204.051880f, 476.800476f, 3.0f},
-    {-7514.598633f, -1150.448853f, 476.796570f, 3.0f}
+    MAX_DRAKONID_KILLED = 42
+};
+
+Position const spawnerPositions[2] = // drakonid
+{
+    {-7599.32f, -1191.72f, 475.545f, 3.05f},
+    {-7526.27f, -1135.04f, 473.445f, 5.76f}
 };
 
 Position const NefarianSpawn = { -7348.849f, -1495.134f, 552.5152f, 1.798f };
 
-uint32 const Entry[5] = {NPC_BRONZE_DRAKANOID, NPC_BLUE_DRAKANOID, NPC_RED_DRAKANOID, NPC_GREEN_DRAKANOID, NPC_BLACK_DRAKANOID};
+std::unordered_map<uint32, uint32> spawnerSpells =
+{
+    { NPC_BLACK_SPAWNER,  SPELL_SPAWN_BLACK_DRAKONID },
+    { NPC_BLUE_SPAWNER,   SPELL_SPAWN_BLUE_DRAKONID },
+    { NPC_BRONZE_SPAWNER, SPELL_SPAWN_BRONZE_DRAKONID },
+    { NPC_GREEN_SPAWNER,  SPELL_SPAWN_GREEN_DRAKONID },
+    { NPC_RED_SPAWNER,    SPELL_SPAWN_RED_DRAKONID }
+};
 
 class boss_victor_nefarius : public CreatureScript
 {
@@ -188,6 +203,25 @@ public:
         boss_victor_nefariusAI(Creature* creature) : BossAI(creature, DATA_NEFARIAN)
         {
             Initialize();
+
+            _nefarianLeftTunnel = instance->GetData(DATA_NEFARIAN_LEFT_TUNNEL);
+            _nefarianRightTunnel = instance->GetData(DATA_NEFARIAN_RIGHT_TUNNEL);
+
+            if (!_nefarianLeftTunnel || !_nefarianRightTunnel)
+            {
+                // Victor Nefarius weekly mechanic drakonid spawn
+                // Pick 2 drakonids and keep them for the whole save duration (the drakonids can't be repeated).
+                std::vector<uint32> nefarianDrakonidSpawners = { NPC_BLACK_SPAWNER, NPC_BLUE_SPAWNER, NPC_BRONZE_SPAWNER, NPC_GREEN_SPAWNER, NPC_RED_SPAWNER };
+                _nefarianRightTunnel = Acore::Containers::SelectRandomContainerElement(nefarianDrakonidSpawners);
+                // delete the previous picked one so we don't get any repeated.
+                nefarianDrakonidSpawners.erase(std::remove(nefarianDrakonidSpawners.begin(), nefarianDrakonidSpawners.end(), _nefarianRightTunnel), nefarianDrakonidSpawners.end());
+                // Pick another one
+                _nefarianLeftTunnel = Acore::Containers::SelectRandomContainerElement(nefarianDrakonidSpawners);
+
+                // save it to instance
+                instance->SetData(DATA_NEFARIAN_LEFT_TUNNEL, _nefarianLeftTunnel);
+                instance->SetData(DATA_NEFARIAN_RIGHT_TUNNEL, _nefarianRightTunnel);
+            }
         }
 
         void Initialize()
@@ -237,6 +271,11 @@ public:
                 summons.DespawnAll();
             }
 
+            if (action == ACTION_ADD_KILLED)
+            {
+                KilledAdds++;
+            }
+
             if (action == ACTION_KILLED)
             {
                 Unit::Kill(me, me);
@@ -263,19 +302,8 @@ public:
             events.ScheduleEvent(EVENT_FEAR, urand(10000, 20000));
             events.ScheduleEvent(EVENT_SILENCE, urand(20000, 25000));
             events.ScheduleEvent(EVENT_MIND_CONTROL, urand(30000, 35000));
-            events.ScheduleEvent(EVENT_SPAWN_ADD, 10000);
-        }
-
-        void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
-        {
-            if (summon->GetEntry() != NPC_NEFARIAN)
-            {
-                summon->UpdateEntry(NPC_BONE_CONSTRUCT);
-                summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                summon->SetReactState(REACT_PASSIVE);
-                summon->SetStandState(UNIT_STAND_STATE_DEAD);
-                ++KilledAdds;
-            }
+            events.ScheduleEvent(EVENT_SPAWN_ADDS, 10000);
+            events.ScheduleEvent(EVENT_CHECK_PHASE_2, 10000);
         }
 
         void JustSummoned(Creature* summon) override { summons.Summon(summon); }
@@ -348,7 +376,7 @@ public:
             }
 
             // Only do this if we haven't spawned nefarian yet
-            if (UpdateVictim() && KilledAdds <= 42)
+            if (UpdateVictim() && KilledAdds <= MAX_DRAKONID_KILLED)
             {
                 events.Update(diff);
 
@@ -390,39 +418,33 @@ public:
                             DoCastSelf(SPELL_SHADOWBLINK);
                             events.ScheduleEvent(EVENT_SHADOWBLINK, urand(30000, 40000));
                             break;
-                        case EVENT_SPAWN_ADD:
-                            for (uint8 i=0; i<2; ++i)
+                        case EVENT_SPAWN_ADDS:
+                            // Spawn the spawners.
+                            me->SummonCreature(_nefarianLeftTunnel, spawnerPositions[0]);
+                            me->SummonCreature(_nefarianRightTunnel, spawnerPositions[1]);
+                            break;
+                        case EVENT_CHECK_PHASE_2:
+                            if (KilledAdds >= MAX_DRAKONID_KILLED)
                             {
-                                uint32 CreatureID;
-                                if (urand(0, 2) == 0)
-                                    CreatureID = NPC_CHROMATIC_DRAKANOID;
-                                else
-                                    CreatureID = Entry[urand(0, 4)];
-                                if (Creature* dragon = me->SummonCreature(CreatureID, DrakeSpawnLoc[i]))
+                                if (Creature* nefarian = me->SummonCreature(NPC_NEFARIAN, NefarianSpawn))
                                 {
-                                    dragon->SetFaction(FACTION_DRAGONFLIGHT_BLACK);
-                                    dragon->AI()->AttackStart(me->GetVictim());
+                                    nefarian->setActive(true);
+                                    nefarian->SetCanFly(true);
+                                    nefarian->SetDisableGravity(true);
+                                    nefarian->GetMotionMaster()->MovePath(NEFARIAN_PATH, false);
                                 }
-
-                                if (KilledAdds >= 42)
-                                {
-                                    if (Creature* nefarian = me->SummonCreature(NPC_NEFARIAN, NefarianSpawn))
-                                    {
-                                        nefarian->setActive(true);
-                                        nefarian->SetCanFly(true);
-                                        nefarian->SetDisableGravity(true);
-                                        nefarian->GetMotionMaster()->MovePath(NEFARIAN_PATH, false);
-                                    }
-                                    events.CancelEvent(EVENT_MIND_CONTROL);
-                                    events.CancelEvent(EVENT_FEAR);
-                                    events.CancelEvent(EVENT_SHADOW_BOLT);
-                                    events.CancelEvent(EVENT_SILENCE);
-                                    DoCastSelf(SPELL_ROOT_SELF, true);
-                                    me->SetVisible(false);
-                                    return;
-                                }
+                                events.CancelEvent(EVENT_MIND_CONTROL);
+                                events.CancelEvent(EVENT_FEAR);
+                                events.CancelEvent(EVENT_SHADOW_BOLT);
+                                events.CancelEvent(EVENT_SILENCE);
+                                DoCastSelf(SPELL_ROOT_SELF, true);
+                                me->SetVisible(false);
+                                // Despawn the spawners.
+                                summons.DespawnEntry(_nefarianLeftTunnel);
+                                summons.DespawnEntry(_nefarianRightTunnel);
+                                return;
                             }
-                            events.ScheduleEvent(EVENT_SPAWN_ADD, 4000);
+                            events.ScheduleEvent(EVENT_CHECK_PHASE_2, 1000);
                             break;
                     }
 
@@ -453,6 +475,8 @@ public:
 
         private:
             uint32 KilledAdds;
+            uint32 _nefarianRightTunnel;
+            uint32 _nefarianLeftTunnel;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -755,12 +779,12 @@ struct npc_corrupted_totem : public ScriptedAI
         std::vector<uint32> mobsEntries;
         mobsEntries.push_back(NPC_NEFARIAN);
         mobsEntries.push_back(NPC_BONE_CONSTRUCT);
-        mobsEntries.push_back(NPC_BRONZE_DRAKANOID);
-        mobsEntries.push_back(NPC_BLUE_DRAKANOID);
-        mobsEntries.push_back(NPC_RED_DRAKANOID);
-        mobsEntries.push_back(NPC_GREEN_DRAKANOID);
-        mobsEntries.push_back(NPC_BLACK_DRAKANOID);
-        mobsEntries.push_back(NPC_CHROMATIC_DRAKANOID);
+        mobsEntries.push_back(NPC_BRONZE_DRAKONID);
+        mobsEntries.push_back(NPC_BLUE_DRAKONID);
+        mobsEntries.push_back(NPC_RED_DRAKONID);
+        mobsEntries.push_back(NPC_GREEN_DRAKONID);
+        mobsEntries.push_back(NPC_BLACK_DRAKONID);
+        mobsEntries.push_back(NPC_CHROMATIC_DRAKONID);
 
         for (auto& entry : mobsEntries)
         {
@@ -1155,6 +1179,33 @@ class spell_shadowblink : public SpellScript
     }
 };
 
+// 22659
+class spell_spawn_drakonid : public SpellScript
+{
+    PrepareSpellScript(spell_spawn_drakonid);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SPAWN_BLACK_DRAKONID, SPELL_SPAWN_BLUE_DRAKONID, SPELL_SPAWN_BRONZE_DRAKONID, SPELL_SPAWN_GREEN_DRAKONID, SPELL_SPAWN_RED_DRAKONID });
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        Unit* caster = GetCaster();
+        if (!caster)
+        {
+            return;
+        }
+
+        caster->CastSpell(caster, spawnerSpells[caster->GetEntry()], true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_spawn_drakonid::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 void AddSC_boss_nefarian()
 {
     new boss_victor_nefarius();
@@ -1167,4 +1218,5 @@ void AddSC_boss_nefarian()
     RegisterSpellScript(aura_class_call_berserk);
     RegisterSpellScript(spell_corrupted_totems);
     RegisterSpellScript(spell_shadowblink);
+    RegisterSpellScript(spell_spawn_drakonid);
 }
