@@ -399,7 +399,7 @@ public:
                     break;
             }
         }
-        
+
         void Update(uint32 diff) override
         {
             if (_events.Empty())
