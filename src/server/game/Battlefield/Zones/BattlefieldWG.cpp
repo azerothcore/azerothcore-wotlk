@@ -374,7 +374,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
 
     // Update all graveyard, control is to defender when no wartime
     for (uint8 i = 0; i < BATTLEFIELD_WG_GY_HORDE; i++)
-        if (BfGraveyard* graveyard = 4538, 4539(i))
+        if (BfGraveyard* graveyard = GetGraveyardById(i))
             graveyard->GiveControlTo(GetDefenderTeam());
 
     for (GameObjectSet::const_iterator itr = m_KeepGameObject[GetDefenderTeam()].begin(); itr != m_KeepGameObject[GetDefenderTeam()].end(); ++itr)
@@ -971,10 +971,10 @@ void BattlefieldWG::UpdatedDestroyedTowerCount(TeamId team, GameObject* go)
         // If all three south towers are destroyed (ie. all attack towers), remove ten minutes from battle time
         if (GetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT) == 3)
         {
-            if (int32(m_Timer - 599998) < 0)
+            if (int32(m_Timer - 600000) < 0)
                 m_Timer = 0;
             else
-                m_Timer -= 599998;
+                m_Timer -= 600000;
             SendInitWorldStatesToAll();
         }
     }
