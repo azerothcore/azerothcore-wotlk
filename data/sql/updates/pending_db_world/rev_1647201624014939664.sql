@@ -1,6 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1647201624014939664');
 
-REPLACE INTO `quest_template_locale` (ID, locale, Title, Details, Objectives, EndText, CompletedText, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4, VerifiedBuild) VALUES
+REPLACE INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Objectives`, `EndText`, `CompletedText`, `ObjectiveText1`, `ObjectiveText2`, `ObjectiveText3`, `ObjectiveText4`, `VerifiedBuild`) VALUES
 (25495,'zhTW','開戰準備','沃金正在整裝，讓戰士們做好準備。他要我叫你去東邊的島上與他和凡妮拉碰面。$B$B他和他的戰士們會從那裡對札拉贊恩發動攻擊。$n，願先祖與你同在。如果不是因為你，這場戰役只會沉睡在陰影之中。和蝙蝠管理員馬恩雷克談談，他就在南邊，他會派隻蝙蝠載你去集結區域。','和蝙蝠管理員馬恩雷克交談以前往集結區域。在戰爭營地東邊的島上和沃金碰面。','','','','','','',0),
 (25480,'zhTW','眾魂之舞','是時候了，應該開始想想我們該何時採取行動。勇士烏魯辛告訴我說，他的手下準備好了。你和凡妮拉做得很好，不僅取得敵人的情報，還找來新的盟友。$B$B現在呢，我們來看看兆示，看看我們該何時發動攻擊。$B$B到儀式舞者之環找巫醫赫茲托克，你準備好之後他會儘快開始施行儀式。','當你準備好觀看兆示時，到森金村外面的儀式舞者之環找巫醫赫茲托克。','','到森金村附近找沃金。','眾魂之舞','','','',0),
 (14151,'zhTW','緋色紅寶石','緋色紅寶石是北裂境最好的寶石。它在陽光下如水晶玫瑰般閃耀。$b$b在我教你這個轉化技術之前，我要求你進行五次史詩級寶石轉化來做事前準備。你可以轉化你喜歡的寶石，或者重複轉化相同的寶石也行。$b$b當你真的準備好後回來找我。','達拉然的琳西‧黑栓要你用鍊金術成功的轉化5顆史詩級寶石。你可以轉化紫黃晶、祖爾之眼、懼石、王者琥珀和威嚴鋯石。','','到達拉然找琳西·黑栓。','史詩寶石轉化','','','',0),
