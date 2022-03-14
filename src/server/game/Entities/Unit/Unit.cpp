@@ -7233,6 +7233,12 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (!victim)
                         return false;
 
+                    // Do not proc from Glyph of Holy Light and Judgement of Light
+                    if (procSpell->Id == 20267 || procSpell->Id == 54968)
+                    {
+                        return false;
+                    }
+
                     Unit* beaconTarget = triggeredByAura->GetBase()->GetCaster();
                     if (!beaconTarget || beaconTarget == this || !beaconTarget->GetAura(53563, victim->GetGUID()))
                         return false;
