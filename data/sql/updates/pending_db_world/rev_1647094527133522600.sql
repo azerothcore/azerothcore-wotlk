@@ -1,4 +1,4 @@
- 
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1647094527133522600');
 -- Due to the lack of sniffs, this is used from WoWHead
 DELETE FROM `creature_queststarter` WHERE `quest` IN (25229, 25199, 25285, 25289, 25295, 25212, 25283, 25500, 25287, 25393);
 INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
