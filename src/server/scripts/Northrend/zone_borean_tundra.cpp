@@ -267,10 +267,10 @@ public:
 /*######
 ## npc_iruk
 ######*/
+constexpr std::pair<uint32, uint32> gossip_search_corpse = { 9280, 0 };      // <Search corpse for Issliruk's Totem.>
 
 enum Iruk
 {
-constexpr std::pair<uint32, uint32> gossip_search_corpse = { 9280, 0 };      // <Search corpse for Issliruk's Totem.>
     NPC_TEXT_THIS_YOUNG_TUSKARR             = 12585,
 
     QUEST_SPIRITS_WATCH_OVER_US             = 11961,
