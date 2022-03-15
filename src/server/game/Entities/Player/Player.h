@@ -21,6 +21,7 @@
 #include "ArenaTeam.h"
 #include "Battleground.h"
 #include "CharacterCache.h"
+#include "CinematicMgr.h"
 #include "DBCStores.h"
 #include "DatabaseEnvFwd.h"
 #include "GroupReference.h"
@@ -1036,6 +1037,7 @@ struct EntryPointData
 class Player : public Unit, public GridObject<Player>
 {
     friend class WorldSession;
+    friend class CinematicMgr;
     friend void Item::AddToUpdateQueueOf(Player* player);
     friend void Item::RemoveFromUpdateQueueOf(Player* player);
 public:
@@ -1325,6 +1327,8 @@ public:
     [[nodiscard]] Player* GetTrader() const { return m_trade ? m_trade->GetTrader() : nullptr; }
     [[nodiscard]] TradeData* GetTradeData() const { return m_trade; }
     void TradeCancel(bool sendback);
+
+    CinematicMgr* GetCinematicMgr() const { return _cinematicMgr; }
 
     void UpdateEnchantTime(uint32 time);
     void UpdateSoulboundTradeItems();
@@ -2368,7 +2372,7 @@ public:
     [[nodiscard]] bool IsPetNeedBeTemporaryUnsummoned() const { return GetSession()->PlayerLogout() || !IsInWorld() || !IsAlive() || IsMounted()/*+in flight*/ || GetVehicle() || IsBeingTeleported(); }
     bool CanResummonPet(uint32 spellid);
 
-    void SendCinematicStart(uint32 CinematicSequenceId);
+    void SendCinematicStart(uint32 CinematicSequenceId) const;
     void SendMovieStart(uint32 MovieId);
 
     uint32 DoRandomRoll(uint32 minimum, uint32 maximum);
@@ -2560,17 +2564,6 @@ public:
     void SetServerSideVisibilityDetect(ServerSideVisibilityType type, AccountTypes sec);
 
     static std::unordered_map<int, bgZoneRef> bgZoneIdToFillWorldStates; // zoneId -> FillInitialWorldStates
-
-    // Cinematic camera data and remote sight functions
-    [[nodiscard]] uint32 GetActiveCinematicCamera() const { return m_activeCinematicCameraId; }
-    void SetActiveCinematicCamera(uint32 cinematicCameraId = 0) { m_activeCinematicCameraId = cinematicCameraId; }
-    [[nodiscard]] bool IsOnCinematic() const { return (m_cinematicCamera != nullptr); }
-    void BeginCinematic();
-    void EndCinematic();
-    void UpdateCinematicLocation(uint32 diff);
-
-    std::string GetMapAreaAndZoneString();
-    std::string GetCoordsMapAreaAndZoneString();
 
     void SetFarSightDistance(float radius);
     void ResetFarSightDistance();
@@ -2866,6 +2859,8 @@ private:
     Item* _StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool update);
     Item* _LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint32 timeDiff, Field* fields);
 
+    CinematicMgr* _cinematicMgr;
+
     typedef GuidSet RefundableItemsSet;
     RefundableItemsSet m_refundableItems;
     void SendRefundInfo(Item* item);
@@ -2930,14 +2925,6 @@ private:
     bool m_isInstantFlightOn;
 
     uint32 m_flightSpellActivated;
-
-    // Remote location information
-    uint32 m_cinematicDiff;
-    uint32 m_lastCinematicCheck;
-    uint32 m_activeCinematicCameraId;
-    FlyByCameraCollection* m_cinematicCamera;
-    Position m_remoteSightPosition;
-    Creature* m_CinematicObject;
 
     WorldLocation _corpseLocation;
 

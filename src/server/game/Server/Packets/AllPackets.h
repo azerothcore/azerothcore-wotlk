@@ -24,6 +24,7 @@
 #include "ChatPackets.h"
 #include "PetPackets.h"
 #include "CombatLogPackets.h"
+#include "CombatPackets.h"
 #include "GuildPackets.h"
 #include "MiscPackets.h"
 #include "TotemPackets.h"
