@@ -489,23 +489,6 @@ enum eNPCs
     NPC_FREYA       = 32906,
 };
 
-/*bool ScriptedAI::EnterEvadeIfOutOfCombatArea()
-{
-    if (me->IsInEvadeMode() || !me->IsInCombat())
-        return false;
-
-    if (_evadeCheckCooldown == GameTime::GetGameTime().count())
-        return false;
-
-    _evadeCheckCooldown = GameTime::GetGameTime().count();
-
-    if (!CheckEvadeIfOutOfCombatArea())
-        return false;
-
-    EnterEvadeMode();
-    return true;
-}*/
-
 Player* ScriptedAI::SelectTargetFromPlayerList(float maxdist, uint32 excludeAura, bool mustBeInLOS) const
 {
     Map::PlayerList const& pList = me->GetMap()->GetPlayers();
