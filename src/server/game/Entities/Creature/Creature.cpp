@@ -587,6 +587,13 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
 
 void Creature::Update(uint32 diff)
 {
+    //mod-npc-bots
+    if (!sScriptMgr->OnBeforeCreatureUpdate(this, diff))
+    {
+        return;
+    }
+    //end mod-npc-bots
+
     if (IsAIEnabled && TriggerJustRespawned)
     {
         TriggerJustRespawned = false;

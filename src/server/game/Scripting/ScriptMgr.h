@@ -469,6 +469,11 @@ protected:
 public:
     //Called whenever a player moves
     virtual void OnPlayerMove(Player* /*player*/, MovementInfo /*movementInfo*/, uint32 /*opcode*/) { }
+
+	//mod-npc-bots
+    virtual void OnPlayerMoveWorldport(Player* /*player*/) { }
+    virtual void OnPlayerMoveTeleport(Player* /*player*/) { }
+	//end mod-npc-bots
 };
 
 class AllMapScript : public ScriptObject
@@ -541,6 +546,10 @@ protected:
     AllCreatureScript(const char* name);
 
 public:
+    //mod-npc-bots
+    virtual bool OnBeforeCreatureUpdate(Creature* /*creature*/, uint32 /*diff*/) { return true; }
+    //end mod-npc-bots
+
     // Called from End of Creature Update.
     virtual void OnAllCreatureUpdate(Creature* /*creature*/, uint32 /*diff*/) { }
 
@@ -1696,6 +1705,10 @@ public:
      * @param itemTarget Contains information about the Item
      */
     virtual void OnDummyEffect(WorldObject* /*caster*/, uint32 /*spellID*/, SpellEffIndex /*effIndex*/, Item* /*itemTarget*/) { }
+
+    //mod-npc-bots
+    virtual void OnSpellGo(Unit const* /*caster*/, Spell const* /*spell*/, bool /*ok*/) { }
+    //end mod-npc-bots
 };
 
 // this class can be used to be extended by Modules
@@ -2386,10 +2399,19 @@ public: /* UnitScript */
 public: /* MovementHandlerScript */
     void OnPlayerMove(Player* player, MovementInfo movementInfo, uint32 opcode);
 
+	//mod-npc-bots
+    void OnPlayerMoveWorldport(Player* player);
+    void OnPlayerMoveTeleport(Player* player);
+	//end mod-npc-bots
+
 public: /* AllCreatureScript */
     //listener function (OnAllCreatureUpdate) is called by OnCreatureUpdate
     //void OnAllCreatureUpdate(Creature* creature, uint32 diff);
     void Creature_SelectLevel(const CreatureTemplate* cinfo, Creature* creature);
+
+    //mod-npc-bots
+    bool OnBeforeCreatureUpdate(Creature* /*creature*/, uint32 /*diff*/);
+    //end mod-npc-bots
 
 public: /* AllMapScript */
     void OnBeforeCreateInstanceScript(InstanceMap* instanceMap, InstanceScript* instanceData, bool load, std::string data, uint32 completedEncounterMask);
@@ -2436,6 +2458,9 @@ public: /* SpellSC */
     void OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, GameObject* gameObjTarget);
     void OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, Creature* creatureTarget);
     void OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, Item* itemTarget);
+    //mod-npc-bots
+    void OnSpellGo(Unit const* caster, Spell const* spell, bool ok);
+    //end mod-npc-bots
 
 public: /* GameEventScript */
     void OnGameEventStart(uint16 EventID);
