@@ -40,6 +40,8 @@ const char*  AA_ITEM_NAME[24]  = {"Crystallized Hogsnot", "Ghoul Drool", "Trollb
                                   "Frozen Spider Ichor", "Prismatic Mojo", "Raptor Claw"
                                  };
 
+constexpr std::pair<uint32, uint32> gossip_ready_first_ingredient = { 9668, 0 };      // I'm ready to begin. What is the first ingredient you require?
+
 class npc_finklestein : public CreatureScript
 {
 public:
@@ -190,7 +192,7 @@ public:
         {
             if (creature->AI() && CAST_AI(npc_finklestein::npc_finklesteinAI, creature->AI()))
                 if (!CAST_AI(npc_finklestein::npc_finklesteinAI, creature->AI())->IsPlayerOnTask(player->GetGUID()))
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I'm ready to begin. What is the first ingredient you require?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                    AddGossipItemFor(player, gossip_ready_first_ingredient, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
             SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         }

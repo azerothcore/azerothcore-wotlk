@@ -310,9 +310,9 @@ enum ParqualFintallas
     SPELL_MARK_OF_SHAME         = 6767
 };
 
-#define GOSSIP_HPF1             "Gul'dan"
-#define GOSSIP_HPF2             "Kel'Thuzad"
-#define GOSSIP_HPF3             "Ner'zhul"
+constexpr std::pair<uint32, uint32> gossip_guldan_is_my_answer    = { 4764, 1 };      // Gul'dan is my answer.
+constexpr std::pair<uint32, uint32> gossip_kelthuzad_is_my_answer = { 4764, 0 };      // Kel'Thuzad is my answer.
+constexpr std::pair<uint32, uint32> gossip_nerzhul_is_my_answer   = { 4764, 3 };      // Ner'zhul is my answer.
 
 class npc_parqual_fintallas : public CreatureScript
 {
@@ -342,9 +342,9 @@ public:
 
         if (player->GetQuestStatus(6628) == QUEST_STATUS_INCOMPLETE && !player->HasAura(SPELL_MARK_OF_SHAME))
         {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HPF1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HPF2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HPF3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            AddGossipItemFor(player, gossip_guldan_is_my_answer, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, gossip_kelthuzad_is_my_answer, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, gossip_nerzhul_is_my_answer, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
             SendGossipMenuFor(player, 5822, creature->GetGUID());
         }
         else

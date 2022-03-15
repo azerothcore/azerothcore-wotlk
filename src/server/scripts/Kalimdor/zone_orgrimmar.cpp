@@ -158,13 +158,14 @@ enum ThrallWarchief
 
 const Position heraldOfThrallPos = { -462.404f, -2637.68f, 96.0656f, 5.8606f };
 
-#define GOSSIP_HTW "Please share your wisdom with me, Warchief."
-#define GOSSIP_STW1 "What discoveries?"
-#define GOSSIP_STW2 "Usurper?"
-#define GOSSIP_STW3 "With all due respect, Warchief - why not allow them to be destroyed? Does this not strengthen our position?"
-#define GOSSIP_STW4 "I... I did not think of it that way, Warchief."
-#define GOSSIP_STW5 "I live only to serve, Warchief! My life is empty and meaningless without your guidance."
-#define GOSSIP_STW6 "Of course, Warchief!"
+#define GOSSIP_HTW "Please share your wisdom with me, Warchief."    //gossip_menu_item 3664-0; ActionMenuID 3665 is not found
+#define GOSSIP_STW1 "What discoveries?"                             //gossip_menu_item 3665-0; ActionMenuID 3666 is not found
+#define GOSSIP_STW2 "Usurper?"                                      //gossip_menu_item 3666-0; ActionMenuID 3667 is not found
+#define GOSSIP_STW3 "With all due respect, Warchief - why not allow them to be destroyed? Does this not strengthen our position?" //3667-0; ActionMenuID 3668 is not found
+#define GOSSIP_STW4 "I... I did not think of it that way, Warchief."                                                              //3668-0; ActionMenuID 3669 is not found
+#define GOSSIP_STW5 "I live only to serve, Warchief! My life is empty and meaningless without your guidance."                     //3669-0; ActionMenuID 3670 is not found
+
+constexpr std::pair<uint32, uint32> gossip_stw6 = { 3670, 0 };      // Of course, Warchief!  =>3664
 
 /// @todo verify abilities/timers
 class npc_thrall_warchief : public CreatureScript
@@ -198,7 +199,7 @@ public:
                 SendGossipMenuFor(player, 5737, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+6:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
+                AddGossipItemFor(player, gossip_stw6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
                 SendGossipMenuFor(player, 5738, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+7:

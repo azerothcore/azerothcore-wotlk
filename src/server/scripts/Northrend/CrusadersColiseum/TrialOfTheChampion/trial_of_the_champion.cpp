@@ -21,10 +21,9 @@
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 
-#define GOSSIP_START_EVENT1a "I am ready."
-#define GOSSIP_START_EVENT1b "I am ready. However I'd like to skip the pageantry."
-#define GOSSIP_START_EVENT2  "I'm ready for the next challenge."
-#define GOSSIP_START_EVENT3  "I'm ready."
+constexpr std::pair<uint32, uint32> gossip_i_am_ready       = { 10614, 0 };     // I am ready.
+constexpr std::pair<uint32, uint32> gossip_i_am_ready_skip  = { 10614, 3 };     // I am ready.  However, I'd like to skip the pageantry.
+constexpr std::pair<uint32, uint32> gossip_i_am_ready_next  = { 10614, 1 };     // I am ready for the next challenge.
 
 class npc_announcer_toc5 : public CreatureScript
 {
@@ -54,17 +53,17 @@ public:
                 else
                 {
                     gossipTextId = 14688;
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT1a, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1338);
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT1b, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1341);
+                    AddGossipItemFor(player, gossip_i_am_ready, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1338);
+                    AddGossipItemFor(player, gossip_i_am_ready_skip, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1341);
                 }
                 break;
             case INSTANCE_PROGRESS_CHAMPIONS_DEAD:
                 gossipTextId = 14737;
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1339);
+                AddGossipItemFor(player, gossip_i_am_ready_next, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1339);
                 break;
             case INSTANCE_PROGRESS_ARGENT_CHALLENGE_DIED:
                 gossipTextId = 14738;
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1340);
+                AddGossipItemFor(player, gossip_i_am_ready, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1340);
                 break;
             default:
                 return true;

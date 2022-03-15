@@ -323,9 +323,9 @@ public:
 ## npc_elder_kuruti
 ######*/
 
-#define GOSSIP_ITEM_KUR1 "Greetings, elder. It is time for your people to end their hostility towards the draenei and their allies."
-#define GOSSIP_ITEM_KUR2 "I did not mean to deceive you, elder. The draenei of Telredor thought to approach you in a way that would seem familiar to you."
-#define GOSSIP_ITEM_KUR3 "I will tell them. Farewell, elder."
+constexpr std::pair<uint32, uint32> gossip_end_hostility = { 7582, 0 };      // Greetings, elder. It is time for your people to end their hostility ... => 7583
+constexpr std::pair<uint32, uint32> gossip_not_mean_deceive_you = { 7583, 0 };      // I did not mean to deceive you, elder. The draenei of Telredor thought ... => 7585
+constexpr std::pair<uint32, uint32> gossip_I_will_tell_them = { 7585, 0 };      // I will tell them. Farewell, elder => 7586
 
 class npc_elder_kuruti : public CreatureScript
 {
@@ -335,7 +335,7 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->GetQuestStatus(9803) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_KUR1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+            AddGossipItemFor(player, gossip_end_hostility, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
 
         SendGossipMenuFor(player, 9226, creature->GetGUID());
 
@@ -348,11 +348,11 @@ public:
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_KUR2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                AddGossipItemFor(player, gossip_not_mean_deceive_you, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                 SendGossipMenuFor(player, 9227, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 1:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_KUR3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, gossip_I_will_tell_them, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                 SendGossipMenuFor(player, 9229, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 2:
@@ -387,8 +387,8 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if (creature->IsVendor() && player->GetReputationRank(942) == REP_EXALTED)
-            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+        if (creature->IsVendor() && (player->GetReputationRank(942) == REP_EXALTED || player->IsGameMaster()))
+            AddGossipItemFor(player, gossip_browse_your_goods, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 
@@ -486,8 +486,8 @@ public:
 ## npc_timothy_daniels
 ######*/
 
-#define GOSSIP_TIMOTHY_DANIELS_ITEM1    "Specialist, eh? Just what kind of specialist are you, anyway?"
-#define GOSSIP_TEXT_BROWSE_POISONS      "Let me browse your reagents and poison supplies."
+constexpr std::pair<uint32, uint32> gossip_browse_your_reagents = { 7590, 0 };      // Let me browse your reagents and poison supplies.
+constexpr std::pair<uint32, uint32> gossip_what_kind_of_specialist = { 7590, 1 };      // Specialist, eh? Just what kind of specialist are you, anyway?  => 7591
 
 enum Timothy
 {
@@ -505,9 +505,9 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (creature->IsVendor())
-            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_POISONS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+            AddGossipItemFor(player, gossip_browse_your_reagents, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_TIMOTHY_DANIELS_ITEM1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        AddGossipItemFor(player, gossip_what_kind_of_specialist, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         return true;
     }

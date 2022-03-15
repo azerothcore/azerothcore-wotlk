@@ -1492,24 +1492,24 @@ enum Sayge
     SPELL_FORTUNE  = 23765  // faire fortune
 };
 
-#define GOSSIP_HELLO_SAYGE          "Yes"
-#define GOSSIP_SENDACTION_SAYGE1    "Slay the Man"
-#define GOSSIP_SENDACTION_SAYGE2    "Turn him over to liege"
-#define GOSSIP_SENDACTION_SAYGE3    "Confiscate the corn"
-#define GOSSIP_SENDACTION_SAYGE4    "Let him go and have the corn"
-#define GOSSIP_SENDACTION_SAYGE5    "Execute your friend painfully"
-#define GOSSIP_SENDACTION_SAYGE6    "Execute your friend painlessly"
-#define GOSSIP_SENDACTION_SAYGE7    "Let your friend go"
-#define GOSSIP_SENDACTION_SAYGE8    "Confront the diplomat"
-#define GOSSIP_SENDACTION_SAYGE9    "Show not so quiet defiance"
-#define GOSSIP_SENDACTION_SAYGE10   "Remain quiet"
-#define GOSSIP_SENDACTION_SAYGE11   "Speak against your brother openly"
-#define GOSSIP_SENDACTION_SAYGE12   "Help your brother in"
-#define GOSSIP_SENDACTION_SAYGE13   "Keep your brother out without letting him know"
-#define GOSSIP_SENDACTION_SAYGE14   "Take credit, keep gold"
-#define GOSSIP_SENDACTION_SAYGE15   "Take credit, share the gold"
-#define GOSSIP_SENDACTION_SAYGE16   "Let the knight take credit"
-#define GOSSIP_SENDACTION_SAYGE17   "Thanks"
+constexpr std::pair<uint32, uint32> gossip_hello_sayge    = { 1217, 0 };      // Yes.
+constexpr std::pair<uint32, uint32> gossip_action_sayge1  = { 6185, 0 };      // I slay the man on the spot as my liege would expect me to do, ...    => 6187
+constexpr std::pair<uint32, uint32> gossip_action_sayge2  = { 6185, 1 };      // I turn over the man to my liege for punishment, as he has broken the law ... => 6187
+constexpr std::pair<uint32, uint32> gossip_action_sayge3  = { 6185, 2 };      // I confiscate the corn he has stolen, warn him that stealing is a path towards doom ... => 6187
+constexpr std::pair<uint32, uint32> gossip_action_sayge4  = { 6185, 3 };      // I allow the man to take enough corn to feed his family for a couple of days, ... => 6187
+constexpr std::pair<uint32, uint32> gossip_action_sayge5  = { 6187, 0 };      // I execute him as per my liege's instructions, and do it in such a manner ... => 6208
+constexpr std::pair<uint32, uint32> gossip_action_sayge6  = { 6187, 1 };      // I execute him as per my liege's instructions, but doing so in as painless ... => 6208
+constexpr std::pair<uint32, uint32> gossip_action_sayge7  = { 6187, 2 };      // I risk my own life and free him so that he may prove his innocence.  ... => 6208
+constexpr std::pair<uint32, uint32> gossip_action_sayge8  = { 6208, 0 };      // I confront the ruler on his malicious behavior, ... risk of any future diplomacy. => 6209
+constexpr std::pair<uint32, uint32> gossip_action_sayge9  = { 6208, 1 };      // I not-so-quietly ignore the insult, hoping to instill a fear in the ... => 6209
+constexpr std::pair<uint32, uint32> gossip_action_sayge10 = { 6208, 2 };      // I quietly ignore the insult.  I will not tell my liege, as I am to secure ... => 6209
+constexpr std::pair<uint32, uint32> gossip_action_sayge11 = { 6209, 0 };      // I would speak against my brother joining the order, rushing a permanent breach ... => 6210
+constexpr std::pair<uint32, uint32> gossip_action_sayge12 = { 6209, 1 };      // I would speak for my brother joining the order, potentially risking the safety ... => 6210
+constexpr std::pair<uint32, uint32> gossip_action_sayge13 = { 6209, 2 };      // I would create some surreptitious means to keep my brother out of the order. ... => 6210
+constexpr std::pair<uint32, uint32> gossip_action_sayge14 = { 6210, 0 };      // I would show my liege the beast's ear and claim the beast's death as my own, ... => 6211
+constexpr std::pair<uint32, uint32> gossip_action_sayge15 = { 6210, 1 };      // I would show my liege the beast's ear and claim the beast's death as my own - ... => 6211
+constexpr std::pair<uint32, uint32> gossip_action_sayge16 = { 6210, 2 };      // I would remain silent about the kill and allow the knight to claim the reward ... => 6211
+constexpr std::pair<uint32, uint32> gossip_action_sayge17 = { 6211, 0 };      // I'd love to get one of those written fortunes you mentioned! ...
 
 class npc_sayge : public CreatureScript
 {
@@ -1532,7 +1532,7 @@ public:
             SendGossipMenuFor(player, 7393, creature->GetGUID());
         else
         {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_SAYGE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, gossip_hello_sayge, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
             SendGossipMenuFor(player, 7339, creature->GetGUID());
         }
 
@@ -1544,38 +1544,38 @@ public:
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF + 1:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_SENDACTION_SAYGE1,            GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_SENDACTION_SAYGE2,            GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_SENDACTION_SAYGE3,            GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_SENDACTION_SAYGE4,            GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+                AddGossipItemFor(player, gossip_action_sayge1,            GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, gossip_action_sayge2,            GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                AddGossipItemFor(player, gossip_action_sayge3,            GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+                AddGossipItemFor(player, gossip_action_sayge4,            GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
                 SendGossipMenuFor(player, 7340, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 2:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_SENDACTION_SAYGE5,            GOSSIP_SENDER_MAIN + 1, GOSSIP_ACTION_INFO_DEF);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_SENDACTION_SAYGE6,            GOSSIP_SENDER_MAIN + 2, GOSSIP_ACTION_INFO_DEF);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_SENDACTION_SAYGE7,            GOSSIP_SENDER_MAIN + 3, GOSSIP_ACTION_INFO_DEF);
+                AddGossipItemFor(player, gossip_action_sayge5,            GOSSIP_SENDER_MAIN + 1, GOSSIP_ACTION_INFO_DEF);
+                AddGossipItemFor(player, gossip_action_sayge6,            GOSSIP_SENDER_MAIN + 2, GOSSIP_ACTION_INFO_DEF);
+                AddGossipItemFor(player, gossip_action_sayge7,            GOSSIP_SENDER_MAIN + 3, GOSSIP_ACTION_INFO_DEF);
                 SendGossipMenuFor(player, 7341, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 3:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_SENDACTION_SAYGE8,            GOSSIP_SENDER_MAIN + 4, GOSSIP_ACTION_INFO_DEF);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_SENDACTION_SAYGE9,            GOSSIP_SENDER_MAIN + 5, GOSSIP_ACTION_INFO_DEF);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_SENDACTION_SAYGE10,           GOSSIP_SENDER_MAIN + 2, GOSSIP_ACTION_INFO_DEF);
+                AddGossipItemFor(player, gossip_action_sayge8,            GOSSIP_SENDER_MAIN + 4, GOSSIP_ACTION_INFO_DEF);
+                AddGossipItemFor(player, gossip_action_sayge9,            GOSSIP_SENDER_MAIN + 5, GOSSIP_ACTION_INFO_DEF);
+                AddGossipItemFor(player, gossip_action_sayge10,           GOSSIP_SENDER_MAIN + 2, GOSSIP_ACTION_INFO_DEF);
                 SendGossipMenuFor(player, 7361, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 4:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_SENDACTION_SAYGE11,           GOSSIP_SENDER_MAIN + 6, GOSSIP_ACTION_INFO_DEF);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_SENDACTION_SAYGE12,           GOSSIP_SENDER_MAIN + 7, GOSSIP_ACTION_INFO_DEF);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_SENDACTION_SAYGE13,           GOSSIP_SENDER_MAIN + 8, GOSSIP_ACTION_INFO_DEF);
+                AddGossipItemFor(player, gossip_action_sayge11,           GOSSIP_SENDER_MAIN + 6, GOSSIP_ACTION_INFO_DEF);
+                AddGossipItemFor(player, gossip_action_sayge12,           GOSSIP_SENDER_MAIN + 7, GOSSIP_ACTION_INFO_DEF);
+                AddGossipItemFor(player, gossip_action_sayge13,           GOSSIP_SENDER_MAIN + 8, GOSSIP_ACTION_INFO_DEF);
                 SendGossipMenuFor(player, 7362, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 5:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_SENDACTION_SAYGE14,           GOSSIP_SENDER_MAIN + 5, GOSSIP_ACTION_INFO_DEF);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_SENDACTION_SAYGE15,           GOSSIP_SENDER_MAIN + 4, GOSSIP_ACTION_INFO_DEF);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_SENDACTION_SAYGE16,           GOSSIP_SENDER_MAIN + 3, GOSSIP_ACTION_INFO_DEF);
+                AddGossipItemFor(player, gossip_action_sayge14,           GOSSIP_SENDER_MAIN + 5, GOSSIP_ACTION_INFO_DEF);
+                AddGossipItemFor(player, gossip_action_sayge15,           GOSSIP_SENDER_MAIN + 4, GOSSIP_ACTION_INFO_DEF);
+                AddGossipItemFor(player, gossip_action_sayge16,           GOSSIP_SENDER_MAIN + 3, GOSSIP_ACTION_INFO_DEF);
                 SendGossipMenuFor(player, 7363, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_SENDACTION_SAYGE17,           GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
+                AddGossipItemFor(player, gossip_action_sayge17,           GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
                 SendGossipMenuFor(player, 7364, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 6:

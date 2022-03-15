@@ -25,8 +25,7 @@ constexpr auto SPELL_TRICK = 24714;
 constexpr auto SPELL_TREAT = 24715;
 constexpr auto SPELL_TRICKED_OR_TREATED = 24755;
 constexpr auto HALLOWEEN_EVENTID = 12;
-constexpr auto GOSSIP_MENU = 9733;
-constexpr auto GOSSIP_MENU_EVENT = 342;
+constexpr std::pair<uint32, uint32> gossip_Trick_or_Treat = { 342, 0 };       // Trick or Treat!
 
 class npc_innkeeper : public CreatureScript
 {
@@ -37,7 +36,7 @@ public:
     {
         if (IsEventActive(HALLOWEEN_EVENTID) && !player->HasAura(SPELL_TRICKED_OR_TREATED))
         {
-            AddGossipItemFor(player, GOSSIP_MENU_EVENT, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + HALLOWEEN_EVENTID);
+            AddGossipItemFor(player, gossip_Trick_or_Treat, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + HALLOWEEN_EVENTID);
         }
 
         if (creature->IsQuestGiver())
@@ -47,12 +46,12 @@ public:
 
         if (creature->IsVendor())
         {
-            AddGossipItemFor(player, GOSSIP_MENU, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+            AddGossipItemFor(player, gossip_browse_your_goods, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
         }
 
         if (creature->IsInnkeeper())
         {
-            AddGossipItemFor(player, GOSSIP_MENU, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INN);
+            AddGossipItemFor(player, gossip_make_inn_your_home, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INN);
         }
 
         player->TalkedToCreature(creature->GetEntry(), creature->GetGUID());

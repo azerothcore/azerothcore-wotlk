@@ -514,6 +514,8 @@ public:
         return GetIcecrownCitadelAI<boss_deathbringer_saurfangAI>(creature);
     }
 };
+//MenuID 10953 OptionID 0; ActionMenuID 10952 is not found
+// constexpr std::pair<uint32, uint32> gossip_we_ready_lk_must_fall = { 10953, 0 };     // We are ready to go, High Overlord. The Lich King must fall!
 
 class npc_high_overlord_saurfang_icc : public CreatureScript
 {
@@ -751,6 +753,7 @@ public:
         if (instance && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != DONE && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != IN_PROGRESS)
         {
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, "We are ready to go, High Overlord. The Lich King must fall!", 631, -ACTION_START_EVENT);
+            //AddGossipItemFor(player, gossip_we_ready_lk_must_fall, 631, -ACTION_START_EVENT);
             SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
         }
 
@@ -776,6 +779,8 @@ public:
         return GetIcecrownCitadelAI<npc_high_overlord_saurfangAI>(creature);
     }
 };
+
+constexpr std::pair<uint32, uint32> gossip_let_event_begin = { 201, 1 };       // Let the event begin!
 
 class npc_muradin_bronzebeard_icc : public CreatureScript
 {
@@ -964,7 +969,7 @@ public:
         InstanceScript* instance = creature->GetInstanceScript();
         if (instance && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != DONE && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != IN_PROGRESS)
         {
-            AddGossipItemFor(player, 0, "Let it begin...", 631, -ACTION_START_EVENT + 1);
+            AddGossipItemFor(player, gossip_let_event_begin, 631, -ACTION_START_EVENT + 1);
             SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
         }
 

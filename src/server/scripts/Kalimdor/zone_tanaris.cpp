@@ -284,7 +284,7 @@ public:
 ## npc_steward_of_time
 ######*/
 
-#define GOSSIP_ITEM_FLIGHT  "Please take me to the master's lair."
+constexpr std::pair<uint32, uint32> gossip_flight = { 8072, 0 };      // Please take me to the master's lair.
 
 class npc_steward_of_time : public CreatureScript
 {
@@ -315,7 +315,7 @@ public:
 
         if (player->GetQuestStatus(10279) == QUEST_STATUS_INCOMPLETE || player->GetQuestRewardStatus(10279))
         {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_FLIGHT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, gossip_flight, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
             SendGossipMenuFor(player, 9978, creature->GetGUID());
         }
         else
@@ -329,12 +329,13 @@ public:
 ## npc_stone_watcher_of_norgannon
 ######*/
 
-#define GOSSIP_ITEM_NORGANNON_1     "What function do you serve?"
-#define GOSSIP_ITEM_NORGANNON_2     "What are the Plates of Uldum?"
-#define GOSSIP_ITEM_NORGANNON_3     "Where are the Plates of Uldum?"
-#define GOSSIP_ITEM_NORGANNON_4     "Excuse me? We've been \"reschedueled for visitations\"? What does that mean?!"
-#define GOSSIP_ITEM_NORGANNON_5     "So, what's inside Uldum?"
-#define GOSSIP_ITEM_NORGANNON_6     "I will return when i have the Plates of Uldum."
+#define GOSSIP_ITEM_NORGANNON_1     "What function do you serve?"       //MenuID 57000 OptionID 0; ActionMenuID 57001 is not found
+#define GOSSIP_ITEM_NORGANNON_2     "What are the Plates of Uldum?"     //MenuID 57001 OptionID 0; ActionMenuID 57002 is not found
+#define GOSSIP_ITEM_NORGANNON_3     "Where are the Plates of Uldum?"    //MenuID 57002 OptionID 0; ActionMenuID 57003 is not found
+#define GOSSIP_ITEM_NORGANNON_4     "Excuse me? We've been \"reschedueled for visitations\"? What does that mean?!" //MenuID 57003 OptionID 0; ActionMenuID 57004 is not found
+#define GOSSIP_ITEM_NORGANNON_5     "So, what's inside Uldum?"          //MenuID 57004 OptionID 0; ActionMenuID 57005 is not found
+
+constexpr std::pair<uint32, uint32> gossip_norgannon_6 = { 57005, 0 };     // I will return when I have the Plates of Uldum.
 
 class npc_stone_watcher_of_norgannon : public CreatureScript
 {
@@ -363,7 +364,7 @@ public:
                 SendGossipMenuFor(player, 1678, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+4:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+                AddGossipItemFor(player, gossip_norgannon_6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
                 SendGossipMenuFor(player, 1679, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+5:

@@ -73,7 +73,8 @@
 #define GO_HARPOON_GUN_4                    194543
 #define GO_BROKEN_HARPOON                   194565
 
-#define TEXT_GOSSIP_ACTION                  "We are ready to help!"
+constexpr std::pair<uint32, uint32> gossip_ready_to_help = { 10314, 0 };     // We are ready to help!
+
 #define TEXT_EE_AGGRO                       "Give us a moment to prepare to build the turrets."
 #define TEXT_EE_MOVE_OUT                    "Ready to move out, keep those dwarves off of our backs!"
 #define TEXT_EE_FIRES_OUT                   "Fires out! Let's rebuild those turrets!"
@@ -619,7 +620,7 @@ public:
         if (!razorscale || razorscale->IsInCombat())
             return true;
 
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, TEXT_GOSSIP_ACTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        AddGossipItemFor(player, gossip_ready_to_help, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         SendGossipMenuFor(player, 40100, creature);
         return true;
     }

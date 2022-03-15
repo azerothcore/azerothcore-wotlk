@@ -71,6 +71,19 @@ enum DrakeGiverTexts
 };
 
 #define HAS_ESSENCE(a) ((a)->HasItemCount(ITEM_EMERALD_ESSENCE) || (a)->HasItemCount(ITEM_AMBER_ESSENCE) || (a)->HasItemCount(ITEM_RUBY_ESSENCE))
+constexpr std::pair<uint32, uint32> gossip_what_should_we_do        = { 9573, 0 };      // What should we do next? //9574-0
+constexpr std::pair<uint32, uint32> gossip_exchange_amber_emerald   = { 9573, 2 };      // I want to exchange my Amber Essence for Emerald Essence.
+constexpr std::pair<uint32, uint32> gossip_exchange_emerald_amber   = { 9574, 2 };      // I want to exchange my Emerald Essence for Amber Essence.
+constexpr std::pair<uint32, uint32> gossip_exchange_ruby_emerald    = { 9574, 3 };      // I want to exchange my Ruby Essence for Emerald Essence.
+constexpr std::pair<uint32, uint32> gossip_exchange_amber_ruby      = { 9575, 1 };      // I want to exchange my Amber Essence for Ruby Essence.
+constexpr std::pair<uint32, uint32> gossip_exchange_emerald_ruby    = { 9575, 2 };      // I want to exchange my Emerald Essence for Ruby Essence.
+constexpr std::pair<uint32, uint32> gossip_want_fly_green_flight    = { 9573, 1 };      // I want to fly on the wings of the green flight.
+constexpr std::pair<uint32, uint32> gossip_want_fly_bronze_flight   = { 9574, 1 };      // I want to fly on the wings of the bronze flight.
+constexpr std::pair<uint32, uint32> gossip_want_fly_red_flight      = { 9575, 0 };      // I want to fly on the wings of the red flight.
+constexpr std::pair<uint32, uint32> gossip_what_abil_emerald_have   = { 9573, 4 };      // What abilities do emerald drakes have?
+constexpr std::pair<uint32, uint32> gossip_what_abil_amber_have     = { 9574, 4 };      // What abilities do amber drakes have?
+constexpr std::pair<uint32, uint32> gossip_what_abil_ruby_have      = { 9575, 3 };      // What abilities do ruby drakes have?
+constexpr std::pair<uint32, uint32> gossip_where_do_we_go           = { 9708, 0 };      // So where do we go from here?
 
 class npc_oculus_drakegiver : public CreatureScript
 {
@@ -175,20 +188,20 @@ public:
             switch (creature->GetEntry())
             {
             case NPC_VERDISA:
-                AddGossipItemFor(player, 9573, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+                AddGossipItemFor(player, gossip_what_should_we_do, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
                 if (player->HasItemCount(ITEM_AMBER_ESSENCE))
                 {
-                    AddGossipItemFor(player, 9573, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                    AddGossipItemFor(player, gossip_exchange_amber_emerald, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                 }
                 else if (player->HasItemCount(ITEM_RUBY_ESSENCE))
                 {
-                    AddGossipItemFor(player, 9573, 3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                    AddGossipItemFor(player, gossip_exchange_ruby_emerald, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                 }
                 else if (!player->HasItemCount(ITEM_EMERALD_ESSENCE))
                 {
-                    AddGossipItemFor(player, 9573, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                    AddGossipItemFor(player, gossip_want_fly_green_flight, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
                 }
-                AddGossipItemFor(player, 9573, 4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+                AddGossipItemFor(player, gossip_what_abil_emerald_have, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
                 SendGossipMenuFor(player, GOSSIP_TEXTID_VERDISA1, creature->GetGUID());
                 break;
             case NPC_BELGARISTRASZ:
@@ -199,7 +212,7 @@ public:
 
                 if (!openedMenu[player->GetGUID()])
                 {
-                    AddGossipItemFor(player, 9708, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+                    AddGossipItemFor(player, gossip_where_do_we_go, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
                     SendGossipMenuFor(player, GOSSIP_TEXTID_DRAKES, creature->GetGUID());
                 }
                 else
@@ -208,20 +221,20 @@ public:
                 }
                 break;
             case NPC_ETERNOS:
-                AddGossipItemFor(player, 9574, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+                AddGossipItemFor(player, gossip_what_should_we_do, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
                 if (player->HasItemCount(ITEM_EMERALD_ESSENCE))
                 {
-                    AddGossipItemFor(player, 9574, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                    AddGossipItemFor(player, gossip_exchange_emerald_amber, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                 }
                 else if (player->HasItemCount(ITEM_RUBY_ESSENCE))
                 {
-                    AddGossipItemFor(player, 9574, 3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                    AddGossipItemFor(player, gossip_exchange_ruby_emerald, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                 }
                 else if (!player->HasItemCount(ITEM_AMBER_ESSENCE))
                 {
-                    AddGossipItemFor(player, 9574, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                    AddGossipItemFor(player, gossip_want_fly_bronze_flight, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
                 }
-                AddGossipItemFor(player, 9574, 4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+                AddGossipItemFor(player, gossip_what_abil_amber_have, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
                 SendGossipMenuFor(player, GOSSIP_TEXTID_ETERNOS1, creature->GetGUID());
                 break;
             }
@@ -279,17 +292,17 @@ public:
                 openedMenu[player->GetGUID()] = true;
                 if (player->HasItemCount(ITEM_AMBER_ESSENCE))
                 {
-                    AddGossipItemFor(player, 9575, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                    AddGossipItemFor(player, gossip_exchange_amber_ruby, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                 }
                 else if (player->HasItemCount(ITEM_EMERALD_ESSENCE))
                 {
-                    AddGossipItemFor(player, 9575, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                    AddGossipItemFor(player, gossip_exchange_emerald_ruby, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                 }
                 else if (!player->HasItemCount(ITEM_RUBY_ESSENCE))
                 {
-                    AddGossipItemFor(player, 9575, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                    AddGossipItemFor(player, gossip_want_fly_red_flight, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
                 }
-                AddGossipItemFor(player, 9575, 3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+                AddGossipItemFor(player, gossip_what_abil_ruby_have, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
                 SendGossipMenuFor(player, GOSSIP_TEXTID_BELGARISTRASZ1, creature->GetGUID());
                 return true;
             case GOSSIP_ACTION_INFO_DEF + 4:

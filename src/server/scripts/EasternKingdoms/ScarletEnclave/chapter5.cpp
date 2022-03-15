@@ -327,6 +327,8 @@ private:
     Position _pos;
 };
 
+constexpr std::pair<uint32, uint32> gossip_i_am_ready_highlord = { 9795, 0 };      // I am ready, Highlord. Let the siege of Light's Hope begin!
+
 class npc_highlord_darion_mograine : public CreatureScript
 {
 public:
@@ -343,7 +345,7 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (player->GetQuestStatus(12801) == QUEST_STATUS_INCOMPLETE && !creature->AI()->GetData(WORLD_STATE_SOLDIERS_ENABLE))
-            AddGossipItemFor(player, 9795, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, gossip_i_am_ready_highlord, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 

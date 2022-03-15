@@ -515,6 +515,9 @@ enum LokhtosSpells
     SPELL_CREATE_THORIUM_BROTHERHOOD_CONTRACT_DND          = 23059
 };
 
+constexpr std::pair<uint32, uint32> gossip_Lokhtos_0 = { 4781, 0 };      // Show me what I have access to, Lokhtos.
+constexpr std::pair<uint32, uint32> gossip_Lokhtos_1 = { 4781, 1 };      // Get Thorium Brotherhood Contract
+
 class npc_lokhtos_darkbargainer : public CreatureScript
 {
 public:
@@ -540,13 +543,13 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (creature->IsVendor() && player->GetReputationRank(59) >= REP_FRIENDLY)
-            AddGossipItemFor(player, 4781, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+            AddGossipItemFor(player, gossip_Lokhtos_0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
         if (player->GetQuestRewardStatus(QUEST_A_BINDING_CONTRACT) != 1 &&
                 !player->HasItemCount(ITEM_THRORIUM_BROTHERHOOD_CONTRACT, 1, true) &&
                 player->HasItemCount(ITEM_SULFURON_INGOT))
         {
-            AddGossipItemFor(player, 4781, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, gossip_Lokhtos_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         }
 
         if (player->GetReputationRank(59) < REP_FRIENDLY)

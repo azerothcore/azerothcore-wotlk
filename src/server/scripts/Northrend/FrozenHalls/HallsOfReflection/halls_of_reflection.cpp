@@ -84,6 +84,10 @@ enum Events
     EVENT_INTRO_END_SET,
 };
 
+constexpr std::pair<uint32, uint32> gossip_can_you_remove_sword = { 10950, 0 };     // Can you remove the sword?
+constexpr std::pair<uint32, uint32> gossip_dark_lady_i_hear_arthas = { 10950, 1 };     // Dark Lady, I think I hear Arthas coming. Whatever you're going to do, do it quickly.
+constexpr std::pair<uint32, uint32> gossip_my_lady_i_hear_arthas = { 11031, 1 };     // My lady, I think I hear Arthas coming. Whatever you're going to do, do it quickly.
+
 class npc_hor_leader : public CreatureScript
 {
 public:
@@ -107,16 +111,16 @@ public:
         {
             QuestStatus status = player->GetQuestStatus(creature->GetEntry() == NPC_SYLVANAS_PART1 ? QUEST_DELIVRANCE_FROM_THE_PIT_H2 : QUEST_DELIVRANCE_FROM_THE_PIT_A2);
             if (status == QUEST_STATUS_COMPLETE || status == QUEST_STATUS_REWARDED)
-                AddGossipItemFor(player, 0, "Can you remove the sword?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                AddGossipItemFor(player, gossip_can_you_remove_sword, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
             // once last quest is completed, she offers this shortcut of the starting event
             status = player->GetQuestStatus(creature->GetEntry() == NPC_SYLVANAS_PART1 ? QUEST_WRATH_OF_THE_LICH_KING_H2 : QUEST_WRATH_OF_THE_LICH_KING_A2);
             if (status == QUEST_STATUS_COMPLETE || status == QUEST_STATUS_REWARDED)
             {
                 if (creature->GetEntry() == NPC_SYLVANAS_PART1)
-                    AddGossipItemFor(player, 0, "Dark Lady, I think I hear Arthas coming. Whatever you're going to do, do it quickly.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                    AddGossipItemFor(player, gossip_dark_lady_i_hear_arthas, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                 else
-                    AddGossipItemFor(player, 0, "My Lady, I think I hear Arthas coming. Whatever you're going to do, do it quickly.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                    AddGossipItemFor(player, gossip_my_lady_i_hear_arthas, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
             }
         }
 

@@ -144,6 +144,10 @@ static argentPonyBanner argentBanners[MAX_RACES] =
     {2778, 63423, "Exodar Champion's Pennant"}
 };
 
+constexpr std::pair<uint32, uint32> gossip_visit_trader  = { 10317, 1 };     // Visit a trader
+constexpr std::pair<uint32, uint32> gossip_visit_bank    = { 10317, 0 };     // Visit a bank
+constexpr std::pair<uint32, uint32> gossip_visit_mailbox = { 10317, 2 };     // Visit a mailbox
+
 struct npc_pet_gen_argent_pony_bridle : public ScriptedAI
 {
     npc_pet_gen_argent_pony_bridle(Creature* c) : ScriptedAI(c)
@@ -272,11 +276,11 @@ struct npc_pet_gen_argent_pony_bridle : public ScriptedAI
         {
             uint8 _state = creature->AI()->GetData(0 /*GET_DATA_STATE*/);
             if (_state == ARGENT_PONY_STATE_ENCH || _state == ARGENT_PONY_STATE_VENDOR)
-                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "Visit a trader.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+                AddGossipItemFor(player, gossip_visit_trader, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
             if (_state == ARGENT_PONY_STATE_ENCH || _state == ARGENT_PONY_STATE_BANK)
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, "Visit a bank.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_BANK);
+                AddGossipItemFor(player, gossip_visit_bank, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_BANK);
             if (_state == ARGENT_PONY_STATE_ENCH || _state == ARGENT_PONY_STATE_MAILBOX)
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Visit a mailbox.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_MAILBOX);
+                AddGossipItemFor(player, gossip_visit_mailbox, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_MAILBOX);
         }
 
         for (uint8 i = RACE_HUMAN; i < MAX_RACES; ++i)

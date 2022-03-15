@@ -28,17 +28,22 @@ EndScriptData
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 
-#define GOSSIP_NETHER_DRAKE     "I'm ready to fly! Take me up, dragon!"
-#define GOSSIP_IRONWING         "I'd like to take a flight around Stormwind Harbor."
+constexpr std::pair<uint32, uint32> gossip_nether_drake     = { 8229, 0 };      // I'm ready to fly! Take me up, dragon!
+constexpr std::pair<uint32, uint32> gossip_ironwing         = { 9776, 0 };      // I'd like to take a flight around Stormwind Harbor.
+constexpr std::pair<uint32, uint32> gossip_cloudbreaker1    = { 9062, 0 };      // Speaking of action, I've been ordered to undertake an air strike.
+constexpr std::pair<uint32, uint32> gossip_cloudbreaker2    = { 9062, 1 };      // I need to intercept the Dawnblade reinforcements.
+constexpr std::pair<uint32, uint32> gossip_dragonhawk       = { 9143, 0 };      // <Ride the dragonhawk to Sun's Reach.>
+constexpr std::pair<uint32, uint32> gossip_torastraza2      = { 9457, 0 };      // Yes, please, I would like to return to the ground level of the temple.
+constexpr std::pair<uint32, uint32> gossip_to_northpass     = { 7379, 0 };      // Take me to Northpass Tower.
+constexpr std::pair<uint32, uint32> gossip_to_eastwall      = { 7379, 1 };      // Take me to Eastwall Tower.
+constexpr std::pair<uint32, uint32> gossip_to_crown_guard   = { 7379, 2 };      // Take me to Crown Guard Tower.
+
 #define GOSSIP_DABIREE1         "Fly me to Murketh and Shaadraz Gateways"
 #define GOSSIP_DABIREE2         "Fly me to Shatter Point"
 #define GOSSIP_BRACK1           "Fly me to Murketh and Shaadraz Gateways"
 #define GOSSIP_BRACK2           "Fly me to The Abyssal Shelf"
 #define GOSSIP_BRACK3           "Fly me to Spinebreaker Post"
 #define GOSSIP_IRENA            "Fly me to Skettis please"
-#define GOSSIP_CLOUDBREAKER1    "Speaking of action, I've been ordered to undertake an air strike."
-#define GOSSIP_CLOUDBREAKER2    "I need to intercept the Dawnblade reinforcements."
-#define GOSSIP_DRAGONHAWK       "<Ride the dragonhawk to Sun's Reach>"
 #define GOSSIP_VERONIA          "Fly me to Manaforge Coruu please"
 #define GOSSIP_DEESAK           "Fly me to Ogri'la please"
 #define GOSSIP_AFRASASTRASZ1    "I would like to take a flight to the ground, Lord Of Afrasastrasz."
@@ -46,11 +51,7 @@ EndScriptData
 #define GOSSIP_TARIOLSTRASZ1    "My Lord, I must go to the upper floor of the temple."
 #define GOSSIP_TARIOLSTRASZ2    "Can you spare a drake to travel to Lord Of Afrasastrasz, in the middle of the temple?"
 #define GOSSIP_TORASTRASZA1     "I would like to see Lord Of Afrasastrasz, in the middle of the temple."
-#define GOSSIP_TORASTRASZA2     "Yes, Please. I would like to return to the ground floor of the temple."
 #define GOSSIP_CRIMSONWING      "<Ride the gryphons to Survey Alcaz Island>"
-#define GOSSIP_WILLIAMKEILAR1   "Take me to Northpass Tower."
-#define GOSSIP_WILLIAMKEILAR2   "Take me to Eastwall Tower."
-#define GOSSIP_WILLIAMKEILAR3   "Take me to Crown Guard Tower."
 
 class npc_taxi : public CreatureScript
 {
@@ -66,10 +67,10 @@ public:
         {
             case 20903: // Netherstorm - Protectorate Nether Drake
                 if (player->GetQuestStatus(10438) == QUEST_STATUS_INCOMPLETE && player->HasItemCount(29778))
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_NETHER_DRAKE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                    AddGossipItemFor(player, gossip_nether_drake, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                 break;
             case 29154: // Stormwind City - Thargold Ironwing
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_IRONWING, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                AddGossipItemFor(player, gossip_ironwing, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
                 break;
             case 19409: // Hellfire Peninsula - Wing Commander Dabir'ee
                 //Mission: The Murketh and Shaadraz Gateways
@@ -99,14 +100,14 @@ public:
                 break;
             case 25059: // Isle of Quel'Danas - Ayren Cloudbreaker
                 if (player->GetQuestStatus(11532) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(11533) == QUEST_STATUS_INCOMPLETE)
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_CLOUDBREAKER1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 12);
+                    AddGossipItemFor(player, gossip_cloudbreaker1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 12);
 
                 if (player->GetQuestStatus(11542) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(11543) == QUEST_STATUS_INCOMPLETE)
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_CLOUDBREAKER2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 13);
+                    AddGossipItemFor(player, gossip_cloudbreaker2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 13);
                 break;
             case 25236: // Isle of Quel'Danas - Unrestrained Dragonhawk
                 if (player->GetQuestStatus(11542) == QUEST_STATUS_COMPLETE || player->GetQuestStatus(11543) == QUEST_STATUS_COMPLETE)
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_DRAGONHAWK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 14);
+                    AddGossipItemFor(player, gossip_dragonhawk, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 14);
                 break;
             case 20162: // Netherstorm - Veronia
                 //Behind Enemy Lines
@@ -133,16 +134,16 @@ public:
                 // top -> middle
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_TORASTRASZA1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 21);
                 // top -> ground
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_TORASTRASZA2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 22);
+                AddGossipItemFor(player, gossip_torastraza2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 22);
                 break;
             case 23704: // Dustwallow Marsh - Cassa Crimsonwing
                 if (player->GetQuestStatus(11142) == QUEST_STATUS_INCOMPLETE)
                     AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_CRIMSONWING, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 25);
                 break;
             case 17209:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_WILLIAMKEILAR1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 26);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_WILLIAMKEILAR2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 27);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_WILLIAMKEILAR3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 28);
+                AddGossipItemFor(player, gossip_to_northpass, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 26);
+                AddGossipItemFor(player, gossip_to_eastwall, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 27);
+                AddGossipItemFor(player, gossip_to_crown_guard, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 28);
                 break;
         }
 

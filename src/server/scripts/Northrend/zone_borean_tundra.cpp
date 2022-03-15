@@ -270,8 +270,7 @@ public:
 
 enum Iruk
 {
-    GOSSIP_MENU_ID_NPC_IRUK                 = 9280,
-    GOSSIP_OPTION_SEARCH_CORPSE             = 0,
+constexpr std::pair<uint32, uint32> gossip_search_corpse = { 9280, 0 };      // <Search corpse for Issliruk's Totem.>
     NPC_TEXT_THIS_YOUNG_TUSKARR             = 12585,
 
     QUEST_SPIRITS_WATCH_OVER_US             = 11961,
@@ -287,7 +286,7 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->GetQuestStatus(QUEST_SPIRITS_WATCH_OVER_US) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_MENU_ID_NPC_IRUK, GOSSIP_OPTION_SEARCH_CORPSE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, gossip_search_corpse, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         SendGossipMenuFor(player, NPC_TEXT_THIS_YOUNG_TUSKARR, creature->GetGUID());
 

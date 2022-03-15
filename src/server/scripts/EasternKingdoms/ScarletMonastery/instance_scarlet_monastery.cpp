@@ -660,6 +660,9 @@ public:
     }
 };
 
+constexpr std::pair<uint32, uint32> gossip_what_do_you_mean = { 2903, 0 };      // What do you mean?
+constexpr std::pair<uint32, uint32> gossip_how_do_you_know_all = { 8280, 0 };      // How do you know all of this?
+
 class npc_fairbanks : public CreatureScript
 {
 public:
@@ -685,7 +688,7 @@ public:
                 return true;
             case 2:
                 creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, 0, "What do you mean?", GOSSIP_SENDER_MAIN, 3);
+                AddGossipItemFor(player, gossip_what_do_you_mean, GOSSIP_SENDER_MAIN, 3);
                 SendGossipMenuFor(player, 100102, creature->GetGUID());
                 return true;
             case 3:
@@ -705,7 +708,7 @@ public:
                 return true;
             case 6:
                 creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, 0, "How do you know all of this?", GOSSIP_SENDER_MAIN, 7);
+                AddGossipItemFor(player, gossip_how_do_you_know_all, GOSSIP_SENDER_MAIN, 7);
                 SendGossipMenuFor(player, 100106, creature->GetGUID());
                 return true;
             case 7:

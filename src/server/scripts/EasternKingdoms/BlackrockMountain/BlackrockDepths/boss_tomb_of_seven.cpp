@@ -44,14 +44,16 @@ enum Says
 
 enum Gossip
 {
-    GOSSIP_TEXT_CONTINUE                          = 1828, // Continue...
-    GOSSIP_GROOMREL                               = 1945, // Option 1 : Before quest(4083) accepted, option 0 after quest(4083) accepted
-    GOSSIP_DOOMREL_START_COMBAT                   = 1947, // Your bondage is at an end, Doom'rel.  I challenge you!
     SAY_DOOMREL_HELLO                             = 2601, // Our fate is the doom of all who face the Great Fire.
     SAY_QUEST_ACCEPTED                            = 2604, // You wish to learn the old craft?  You wish to smelt dark iron?$B$BAppease me, $r.  Show me a sacrifice and I will consider it!
     SAY_QUEST_COMPLETED                           = 2605, // Your will is strong, and your intent is clear.$B$BPerhaps you are worthy...
     SAY_QUEST_COMPLETED_END                       = 2606, // You have shown me your desire, and have payed with precious stone.  I will teach you...
 };
+
+constexpr std::pair<uint32, uint32> gossip_Continue   = { 1828, 1 };      // Continue...
+constexpr std::pair<uint32, uint32> gossip_Gloomrel_0 = { 1828, 0 };      // I have paid your price, Gloom'rel.  Now, teach me your secrets!
+constexpr std::pair<uint32, uint32> gossip_Gloomrel_1 = { 1828, 1 };      // Gloom'rel, tell me your secrets!
+constexpr std::pair<uint32, uint32> gossip_Doomrel_0  = { 1947, 0 };      // Your bondage is at an end, Doom'rel.  I challenge you!
 
 class boss_gloomrel : public CreatureScript
 {
@@ -64,7 +66,7 @@ public:
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF+1:
-                AddGossipItemFor(player, GOSSIP_TEXT_CONTINUE, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
+                AddGossipItemFor(player, gossip_Continue, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
                 SendGossipMenuFor(player, SAY_QUEST_COMPLETED_END, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+11:
@@ -72,7 +74,7 @@ public:
                 player->CastSpell(player, SPELL_LEARN_SMELT, false);
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
-                AddGossipItemFor(player, GOSSIP_TEXT_CONTINUE, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 22);
+                AddGossipItemFor(player, gossip_Continue, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 22);
                 SendGossipMenuFor(player, SAY_QUEST_ACCEPTED, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+22:
@@ -91,12 +93,12 @@ public:
     {
         if (player->GetQuestRewardStatus(QUEST_SPECTRAL_CHALICE) == 1 && player->GetSkillValue(SKILL_MINING) >= DATA_SKILLPOINT_MIN && !player->HasSpell(SPELL_SMELT_DARK_IRON))
         {
-            AddGossipItemFor(player, GOSSIP_GROOMREL, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, gossip_Gloomrel_0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
             SendGossipMenuFor(player, SAY_QUEST_COMPLETED, creature->GetGUID());
         }
 
         if (player->GetQuestRewardStatus(QUEST_SPECTRAL_CHALICE) == 0 && player->GetSkillValue(SKILL_MINING) >= DATA_SKILLPOINT_MIN)
-            AddGossipItemFor(player, GOSSIP_GROOMREL, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            AddGossipItemFor(player, gossip_Gloomrel_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         return true;
@@ -131,7 +133,7 @@ public:
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF+1:
-                AddGossipItemFor(player, GOSSIP_TEXT_CONTINUE, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, gossip_Continue, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                 SendGossipMenuFor(player, SAY_QUEST_COMPLETED, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
@@ -151,7 +153,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        AddGossipItemFor(player, GOSSIP_DOOMREL_START_COMBAT, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        AddGossipItemFor(player, gossip_Doomrel_0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         SendGossipMenuFor(player, SAY_DOOMREL_HELLO, creature->GetGUID());
 
         return true;

@@ -98,10 +98,6 @@ enum Misc
     TEXT_ID_SUMMON_2                        = 5011,
     TEXT_ID_SUMMON_3                        = 5012,
 
-    GOSSIP_ITEM_SUMMON_1                    = 4093,
-    GOSSIP_ITEM_SUMMON_2                    = 4109,
-    GOSSIP_ITEM_SUMMON_3                    = 4108,
-
     FACTION_MAJORDOMO_FRIENDLY              = 1080,
     SUMMON_GROUP_ADDS                       = 1,
 
@@ -129,6 +125,10 @@ struct MajordomoAddData
     MajordomoAddData() { }
     MajordomoAddData(ObjectGuid _guid, uint32 _creatureEntry, Position _spawnPos) : guid(_guid), creatureEntry(_creatureEntry), spawnPos(_spawnPos) { }
 };
+
+constexpr std::pair<uint32, uint32> gossip_tell_me_more    = { 4093, 0 };      // Tell me more.
+constexpr std::pair<uint32, uint32> gossip_what_else       = { 4109, 0 };      // What else do you have to say?
+constexpr std::pair<uint32, uint32> gossip_where_is_master = { 4108, 0 };      // You challenged us and we have come. Where is this master you speak of?
 
 class boss_majordomo : public CreatureScript
 {
@@ -527,7 +527,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        AddGossipItemFor(player, GOSSIP_ITEM_SUMMON_1, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+        AddGossipItemFor(player, gossip_tell_me_more, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
         SendGossipMenuFor(player, TEXT_ID_SUMMON_1, creature->GetGUID());
         return true;
     }
@@ -539,19 +539,19 @@ public:
         {
             case GOSSIP_ACTION_INFO_DEF:
             {
-                AddGossipItemFor(player, GOSSIP_ITEM_SUMMON_2, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                AddGossipItemFor(player, gossip_what_else, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                 SendGossipMenuFor(player, TEXT_ID_SUMMON_2, creature->GetGUID());
                 break;
             }
             case GOSSIP_ACTION_INFO_DEF+1:
             {
-                AddGossipItemFor(player, GOSSIP_ITEM_SUMMON_2, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, gossip_what_else, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                 SendGossipMenuFor(player, TEXT_ID_SUMMON_2, creature->GetGUID());
                 break;
             }
             case GOSSIP_ACTION_INFO_DEF+2:
             {
-                AddGossipItemFor(player, GOSSIP_ITEM_SUMMON_3, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                AddGossipItemFor(player, gossip_where_is_master, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
                 SendGossipMenuFor(player, TEXT_ID_SUMMON_3, creature->GetGUID());
                 break;
             }

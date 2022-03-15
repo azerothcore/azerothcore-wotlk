@@ -45,8 +45,9 @@ public:
 ** SINCLARI
 ***********/
 
-#define GOSSIP_START_EVENT  "Get your people to safety, we'll keep the Blue Dragonflight's forces at bay."
-#define GOSSIP_ITEM_1      "Activate the crystals when we get in trouble, right."
+constexpr std::pair<uint32, uint32> gossip_activate_crystal     = { 9997, 0 };      // Activate the crystals when we get in trouble, right.    => 9998
+constexpr std::pair<uint32, uint32> gossip_start_violete_event  = { 9998, 0 };      // Get your people to safety, we'll keep the Blue Dragonflight's forces at bay.
+
 #define GOSSIP_I_WANT_IN    "Sorry, I'm late! Can I get in to help my friends?"
 
 class npc_vh_sinclari : public CreatureScript
@@ -60,8 +61,8 @@ public:
             switch (pInstance->GetData(DATA_ENCOUNTER_STATUS))
             {
                 case NOT_STARTED:
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                    AddGossipItemFor(player, gossip_activate_crystal, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                    AddGossipItemFor(player, gossip_start_violete_event, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                     SendGossipMenuFor(player, 13853, creature->GetGUID());
                     break;
                 case IN_PROGRESS:

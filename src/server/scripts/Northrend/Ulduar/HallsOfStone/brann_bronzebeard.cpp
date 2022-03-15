@@ -23,10 +23,11 @@
 #include "SpellScript.h"
 #include "halls_of_stone.h"
 
-#define GOSSIP_ITEM_1       "Brann, it would be our honor!"
-#define GOSSIP_ITEM_2       "Let's move Brann, enough of the history lessons!"
-#define GOSSIP_ITEM_3       "We dont have time for this right now, we have to keep going."
-#define GOSSIP_ITEM_4       "We're with you Brann! Open it!"
+constexpr std::pair<uint32, uint32> gossip_brann_1 = { 9669, 0 };      // Brann, it would be our honor!
+constexpr std::pair<uint32, uint32> gossip_brann_2 = { 9670, 0 };      // Let's move Brann, enough of the history lesson!
+constexpr std::pair<uint32, uint32> gossip_brann_3 = { 62002, 0 };     // We dont have time for this right now, we have to keep going.
+constexpr std::pair<uint32, uint32> gossip_brann_4 = { 10012, 0 };     // We're with you Brann! Open it!
+
 #define TEXT_ID_START       13100
 
 enum NPCs
@@ -174,19 +175,19 @@ public:
             switch (brann)
             {
                 case 1:
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                    AddGossipItemFor(player, gossip_brann_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                     break;
                 case 2:
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                    AddGossipItemFor(player, gossip_brann_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                     break;
                 case 3:
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                    AddGossipItemFor(player, gossip_brann_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
                     break;
                 case 4:
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+                    AddGossipItemFor(player, gossip_brann_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
                     break;
                 case 5:
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+                    AddGossipItemFor(player, gossip_brann_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
                     break;
                 default:
                     break;

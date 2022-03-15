@@ -318,6 +318,8 @@ public:
     };
 };
 
+constexpr std::pair<uint32, uint32> gossip_summon_Lord_Ahune = { 11389, 1 };     // Disturb the stone and summon Lord Ahune.
+
 class go_ahune_ice_stone : public GameObjectScript
 {
 public:
@@ -332,7 +334,7 @@ public:
         if (go->FindNearestCreature(NPC_AHUNE, 200.0f, true))
             return true;
 
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Disturb the stone and summon Lord Ahune.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1337);
+        AddGossipItemFor(player, gossip_summon_Lord_Ahune, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1337);
         SendGossipMenuFor(player, GOSSIP_TEXT_ID, go->GetGUID());
         return true;
     }

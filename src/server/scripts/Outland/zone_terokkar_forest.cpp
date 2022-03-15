@@ -765,10 +765,10 @@ public:
 /*######
 ## go_skull_pile
 ######*/
-#define GOSSIP_S_DARKSCREECHER_AKKARAI         "Summon Darkscreecher Akkarai"
-#define GOSSIP_S_KARROG         "Summon Karrog"
-#define GOSSIP_S_GEZZARAK_THE_HUNTRESS         "Summon Gezzarak the Huntress"
-#define GOSSIP_S_VAKKIZ_THE_WINDRAGER         "Summon Vakkiz the Windrager"
+constexpr std::pair<uint32, uint32> gossip_call_Akkarai = { 8660, 1 };      // <Call forth Darkscreecher Akkarai.>
+constexpr std::pair<uint32, uint32> gossip_call_Karrog = { 8660, 2 };      // <Call forth Karrog.>
+constexpr std::pair<uint32, uint32> gossip_call_Gezzarak = { 8660, 0 };      // <Call forth Gezzarak the Huntress.>
+constexpr std::pair<uint32, uint32> gossip_call_Vakkiz = { 8660, 3 };      // <Call forth Vakkiz the Windrager.>
 
 class go_skull_pile : public GameObjectScript
 {
@@ -791,10 +791,10 @@ public:
     {
         if ((player->GetQuestStatus(11885) == QUEST_STATUS_INCOMPLETE) || player->GetQuestRewardStatus(11885))
         {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_S_DARKSCREECHER_AKKARAI, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_S_KARROG, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_S_GEZZARAK_THE_HUNTRESS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_S_VAKKIZ_THE_WINDRAGER, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+            AddGossipItemFor(player, gossip_call_Akkarai, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, gossip_call_Karrog, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            AddGossipItemFor(player, gossip_call_Gezzarak, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            AddGossipItemFor(player, gossip_call_Vakkiz, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
         }
 
         SendGossipMenuFor(player, go->GetGOInfo()->questgiver.gossipID, go->GetGUID());
@@ -846,9 +846,9 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if (creature->IsVendor() && player->GetReputationRank(FACTION_CONSORTIUM) >= REP_FRIENDLY)
+        if (creature->IsVendor() && ((player->GetReputationRank(FACTION_CONSORTIUM) >= REP_FRIENDLY) || player->IsGameMaster()))
         {
-            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+            AddGossipItemFor(player, gossip_browse_your_goods, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
             SendGossipMenuFor(player, 9896, creature->GetGUID());
         }
         else
