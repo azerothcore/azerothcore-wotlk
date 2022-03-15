@@ -60,7 +60,7 @@ void LoadSkillPerfectItemTable()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 spell perfection definitions. DB table `skill_perfect_item_template` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 spell perfection definitions. DB table `skill_perfect_item_template` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -146,7 +146,7 @@ void LoadSkillExtraItemTable()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 spell specialization definitions. DB table `skill_extra_item_template` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 spell specialization definitions. DB table `skill_extra_item_template` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
