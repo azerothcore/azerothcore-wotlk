@@ -72,13 +72,8 @@ struct LootGroupInvalidSelector : public Acore::unary_function<LootStoreItem*, b
             uint8 foundDuplicates = 0;
             for (std::vector<LootItem>::const_iterator itr = _loot.items.begin(); itr != _loot.items.end(); ++itr)
                 if (itr->itemid == item->itemid)
-                {
-                    ++foundDuplicates;
-                    if (_proto->InventoryType == 0 && foundDuplicates == 3 && _proto->ItemId != 47242 /*Trophy of the Crusade*/) // Non-equippable items are limited to 3 drops
+                    if (++foundDuplicates == _loot.maxDuplicates)
                         return true;
-                    else if (_proto->InventoryType != 0 && foundDuplicates == 1) // Equippable item are limited to 1 drop
-                        return true;
-                }
         }
 
         return false;
