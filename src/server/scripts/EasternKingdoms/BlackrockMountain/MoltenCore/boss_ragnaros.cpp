@@ -232,7 +232,7 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (!me->getThreatMgr().getThreatList().empty())
             {
@@ -245,7 +245,7 @@ public:
             }
             else
             {
-                BossAI::EnterEvadeMode();
+                BossAI::EnterEvadeMode(why);
             }
         }
 
