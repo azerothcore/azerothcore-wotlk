@@ -1,10 +1,10 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1647094527133522600');
 -- Due to the lack of sniffs, this is used from WoWHead
-DELETE FROM `creature_queststarter` WHERE `quest` IN (25229, 25199, 25285, 25289, 25295, 25212, 25283, 25500, 25287, 25393);
+DELETE FROM `creature_queststarter` WHERE `quest` IN (25229, 25199, 25285, 25289, 25295, 25212, 25283, 25500, 25286, 25287, 25393);
 INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
 (7937, 25229),
 (7937, 25393),
-(39271, 25287),
+(39675, 25287),
 (39386, 25212),
 (39675, 25199),
 (39675, 25285),
@@ -14,9 +14,10 @@ INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
 (39678, 25283);
 
 -- Due to the lack of sniffs, this is used from WoWHead
-DELETE FROM `creature_questender` WHERE `quest` IN (25229, 25199, 25285, 25289, 25295, 25212, 25283, 25500, 25287, 25393);
+DELETE FROM `creature_questender` WHERE `quest` IN (25229, 25199, 25285, 25289, 25295, 25212, 25283, 25500, 25286, 25287, 25393);
 INSERT INTO `creature_questender` (`id`, `quest`) VALUES
 (7937, 25393),
+(39675, 25286),
 (39271, 25287),
 (39386, 25212),
 (39675, 25199),
@@ -24,18 +25,18 @@ INSERT INTO `creature_questender` (`id`, `quest`) VALUES
 (39675, 25285),
 (39675, 25289),
 (39675, 25295),
-(39675, 25500),
+(39271, 25500),
 (39678, 25283);
 
 -- Due to the lack of sniffs, this is used from WoWHead
-DELETE FROM `quest_template_addon` WHERE `id` IN (25229, 25199, 25285, 25289, 25295, 25212, 25283, 25500, 25287, 25393);
+DELETE FROM `quest_template_addon` WHERE `id` IN (25229, 25199, 25285, 25289, 25295, 25212, 25283, 25500, 25286, 25287, 25393);
 INSERT INTO `quest_template_addon` (`ID`, `MaxLevel`, `AllowableClasses`, `SourceSpellID`, `PrevQuestID`, `NextQuestID`, `ExclusiveGroup`, `RewardMailTemplateID`, `RewardMailDelay`, `RequiredSkillID`, `RequiredSkillPoints`, `RequiredMinRepFaction`, `RequiredMaxRepFaction`, `RequiredMinRepValue`, `RequiredMaxRepValue`, `ProvidedItemCount`, `SpecialFlags`) VALUES
 (25199, 0, 0, 0, 25229, 25285, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (25212, 0, 0, 0, 25199, 0, -25295, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0),
 (25229, 0, 0, 0, 0, 25199, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0),
 (25283, 0, 0, 0, 25295, 25500, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0),
 (25285, 0, 0, 0, 25199, 25289, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(25287, 0, 0, 0, 25286, 25393, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0),
+(25286, 0, 0, 0, 25287, 25287, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0),
 (25289, 0, 0, 0, 25285, 25295, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (25295, 0, 0, 0, 25289, 0, -25295, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (25393, 0, 0, 0, 25287, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
@@ -45,8 +46,7 @@ INSERT INTO `quest_template_addon` (`ID`, `MaxLevel`, `AllowableClasses`, `Sourc
 DELETE FROM `gossip_menu_option` WHERE `MenuID` = 11211;
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
 (11211, 0, 0, 'Board the Flying Machine.', 39462, 1, 1, 0, 0, 0, 0, '', 0, 0),
-(11211, 1, 0, 'Take me to Mekkatorque!',       0, 1, 1, 0, 0, 0, 0, '', 0, 0);
-
+(11211, 1, 0, 'Take me to Mekkatorque!', 0, 1, 1, 0, 0, 0, 0, '', 0, 0);
 -- [Q:25229] A Few Good Gnomes
 UPDATE `creature_template` SET `ScriptName`='npc_gnome_citizen_motivated' WHERE `entry`=39466;
 UPDATE `creature_template` SET `ScriptName`='npc_gnome_citizen' WHERE `entry`=39623;
@@ -133,9 +133,6 @@ UPDATE `creature_template` SET `AIName`='' WHERE `entry` IN (1268,7955,6119,3981
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (1268,7955,6119,39817);
 UPDATE `creature_template` SET `ScriptName` = 'npc_mekkatorque', `scale` = 0.6, `unit_flags` = 33554752 WHERE `entry` = 39712;
 
--- [Q:25286] Words for Delivery, we have 3, but "25286" is the correct one. (sniffs)
--- Already working, simple turn-in
-
 -- [Q:25393] Operation Gnomeregan
 UPDATE `creature_template` SET `mechanic_immune_mask` = 12658704, `ScriptName` = 'npc_og_mekkatorque' WHERE `entry` = 39271;
 UPDATE `creature_template` SET `unit_flags` = 393220, `ScriptName` = 'npc_og_rl' WHERE `entry` = 39820;
@@ -160,9 +157,10 @@ DELETE FROM `creature` WHERE `id1` IN (39273, 39910);
 INSERT INTO `creature` (`id1`,`map`,`spawnMask`,`phaseMask`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`wander_distance`,`currentwaypoint`,`curhealth`,`curmana`,`MovementType`,`npcflag`,`unit_flags`,`dynamicflags`) VALUES
 (39273, 0, 1, 256, 0, -5423.01, 535.254, 386.516, 5.23555, 300, 0, 0, 630000, 0, 0, 0, 134217728, 0),
 (39910, 0, 1, 256, 0, -5427.93, 532.323, 386.85, 5.27046, 300, 0, 0, 630000, 0, 0, 0, 0, 0);
--- unsure?
---UPDATE `creature` SET `position_x` = -5424.462891, `position_y` = 531.410095, `position_z` = 386.743347, `orientation` = 5.2 WHERE `id1` = 39271;
---UPDATE `creature` SET `phaseMask`= 1 WHERE `id1` = 7937;
+-- unsure, do not uncomment
+-- in my opinion there should be two NPCs of the king, one in ironforge and another in the zone right before the attack at gnomeregan /the event itself/
+-- UPDATE `creature` SET `position_x` = -5424.462891, `position_y` = 531.410095, `position_z` = 386.743347, `orientation` = 5.2 WHERE `id1` = 39271;
+-- UPDATE `creature` SET `phaseMask`= 1 WHERE `id1` = 7937;
 
 DELETE FROM `vehicle_template_accessory` WHERE `entry` = 39860;
 
