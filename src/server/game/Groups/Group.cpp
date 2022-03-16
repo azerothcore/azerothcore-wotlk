@@ -2189,6 +2189,11 @@ ObjectGuid Group::GetLeaderGUID() const
     return m_leaderGuid;
 }
 
+Player* Group::GetLeader()
+{
+    return ObjectAccessor::FindConnectedPlayer(m_leaderGuid);
+}
+
 ObjectGuid Group::GetGUID() const
 {
     return m_guid;
@@ -2424,4 +2429,16 @@ void Group::SetDifficultyChangePrevention(DifficultyPreventionChangeType type)
 {
     _difficultyChangePreventionTime = GameTime::GetGameTime().count() + MINUTE;
     _difficultyChangePreventionType = type;
+}
+
+void Group::DoForAllMembers(std::function<void(Player*)> const& worker)
+{
+    for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        Player* member = itr->GetSource();
+        if (!member)
+            continue;
+
+        worker(member);
+    }
 }
