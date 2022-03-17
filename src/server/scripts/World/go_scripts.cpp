@@ -24,6 +24,7 @@ go_sacred_fire_of_life
 go_shrine_of_the_birds
 go_southfury_moonstone
 go_resonite_cask
+go_proudtusk_remains
 go_tablet_of_madness
 go_tablet_of_the_seven
 go_tele_to_dalaran_crystal
@@ -261,6 +262,31 @@ public:
         // xinef: prevent spawning hundreds of them
         if (go->GetGoType() == GAMEOBJECT_TYPE_GOOBER && !go->FindNearestCreature(NPC_GOGGEROC, 20.0f))
             go->SummonCreature(NPC_GOGGEROC, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 300000);
+
+        return false;
+    }
+};
+
+/*######
+## go_proudtusk_remains
+######*/
+
+enum ProudtuskRemains
+{
+    NPC_SHANIPROUDTASK = 9136,
+    QUEST_DREADMAULROCK = 3821
+};
+
+class go_proudtusk_remains : public GameObjectScript
+{
+public:
+    go_proudtusk_remains() : GameObjectScript("go_proudtusk_remains") { }
+
+    bool OnGossipHello(Player* player, GameObject* go) override
+    {
+        // xinef: prevent spawning hundreds of them
+        if (go->GetGoType() == GAMEOBJECT_TYPE_GOOBER && !go->FindNearestCreature(NPC_SHANIPROUDTASK, 30.0f) && player->GetQuestStatus(QUEST_DREADMAULROCK) == QUEST_STATUS_COMPLETE)
+            go->SummonCreature(NPC_SHANIPROUDTASK, -7917.38f, -2610.53f, 221.12f, 5.04f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
 
         return false;
     }
