@@ -24,7 +24,6 @@
 #include "AchievementMgr.h"
 #include "AddonMgr.h"
 #include "ArenaTeamMgr.h"
-#include "AsyncAuctionListing.h"
 #include "AuctionHouseMgr.h"
 #include "BattlefieldMgr.h"
 #include "BattlegroundMgr.h"
@@ -2305,25 +2304,11 @@ void World::Update(uint32 diff)
         ResetGuildCap();
     }
 
-    // pussywizard:
-    // acquire mutex now, this is kind of waiting for listing thread to finish it's work (since it can't process next packet)
-    // so we don't have to do it in every packet that modifies auctions
-    AsyncAuctionListingMgr::SetAuctionListingAllowed(false);
+    if (m_timers[WUPDATE_AUCTIONS].Passed())
     {
-        std::lock_guard<std::mutex> guard(AsyncAuctionListingMgr::GetLock());
+        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update expired auctions"));
 
-        // pussywizard: handle auctions when the timer has passed
-        if (m_timers[WUPDATE_AUCTIONS].Passed())
-        {
-            METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update expired auctions"));
-
-            m_timers[WUPDATE_AUCTIONS].Reset();
-
-            // pussywizard: handle expired auctions, auctions expired when realm was offline are also handled here (not during loading when many required things aren't loaded yet)
-            sAuctionMgr->Update();
-        }
-
-        AsyncAuctionListingMgr::Update(diff);
+        m_timers[WUPDATE_AUCTIONS].Reset();
 
         if (currentGameTime > mail_expire_check_timer)
         {
@@ -2331,15 +2316,14 @@ void World::Update(uint32 diff)
             mail_expire_check_timer = currentGameTime + 6h;
         }
 
-        {
-            /// <li> Handle session updates when the timer has passed
-            METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update sessions"));
-            UpdateSessions(diff);
-        }
+        sAuctionMgr->Update();
     }
 
-    // end of section with mutex
-    AsyncAuctionListingMgr::SetAuctionListingAllowed(true);
+    {
+        /// <li> Handle session updates when the timer has passed
+        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update sessions"));
+        UpdateSessions(diff);
+    }
 
     /// <li> Handle weather updates when the timer has passed
     if (m_timers[WUPDATE_WEATHERS].Passed())

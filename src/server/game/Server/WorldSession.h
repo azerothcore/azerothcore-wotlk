@@ -71,6 +71,21 @@ namespace lfg
 
 namespace WorldPackets
 {
+    namespace AuctionHouse
+    {
+        class HelloFromClient;
+        class HelloToClient;
+        class CommandResult;
+        class SellItem;
+        class PlaceBid;
+        class RemoveItem;
+        class ListBidderItems;
+        class ListOwnerItems;
+        class ListItems;
+        class ListResult;
+        class ListPendingSales;
+    }
+
     namespace LFG
     {
         class LFGJoin;
@@ -462,8 +477,8 @@ public:
             m_TutorialsChanged = true;
         }
     }
-    //auction
-    void SendAuctionHello(ObjectGuid guid, Creature* unit);
+
+    // Auction
     void SendAuctionCommandResult(uint32 auctionId, uint32 Action, uint32 ErrorCode, uint32 bidError = 0);
     void SendAuctionBidderNotification(uint32 location, uint32 auctionId, ObjectGuid bidder, uint32 bidSum, uint32 diff, uint32 item_template);
     void SendAuctionOwnerNotification(AuctionEntry* auction);
@@ -753,15 +768,14 @@ public:                                                 // opcodes handlers
     void HandleSetTradeItemOpcode(WorldPacket& recvPacket);
     void HandleUnacceptTradeOpcode(WorldPacket& recvPacket);
 
-    void HandleAuctionHelloOpcode(WorldPacket& recvPacket);
-    void HandleAuctionListItems(WorldPacket& recvData);
-    void HandleAuctionListBidderItems(WorldPacket& recvData);
-    void HandleAuctionSellItem(WorldPacket& recvData);
-    void HandleAuctionRemoveItem(WorldPacket& recvData);
-    void HandleAuctionListOwnerItems(WorldPacket& recvData);
-    void HandleAuctionListOwnerItemsEvent(ObjectGuid creatureGuid);
-    void HandleAuctionPlaceBid(WorldPacket& recvData);
-    void HandleAuctionListPendingSales(WorldPacket& recvData);
+    void HandleAuctionHelloOpcode(WorldPackets::AuctionHouse::HelloFromClient& packet);
+    void HandleAuctionListItems(WorldPackets::AuctionHouse::ListItems& packet);
+    void HandleAuctionListBidderItems(WorldPackets::AuctionHouse::ListBidderItems& packet);
+    void HandleAuctionSellItem(WorldPackets::AuctionHouse::SellItem& packet);
+    void HandleAuctionRemoveItem(WorldPackets::AuctionHouse::RemoveItem& packet);
+    void HandleAuctionListOwnerItems(WorldPackets::AuctionHouse::ListOwnerItems& packet);
+    void HandleAuctionPlaceBid(WorldPackets::AuctionHouse::PlaceBid& packet);
+    void HandleAuctionListPendingSales(WorldPackets::AuctionHouse::ListPendingSales& packet);
 
     // Bank
     void HandleBankerActivateOpcode(WorldPacket& recvData);
@@ -1055,9 +1069,6 @@ public:                                                 // opcodes handlers
     void HandleEjectPassenger(WorldPacket& data);
     void HandleEnterPlayerVehicle(WorldPacket& data);
     void HandleUpdateProjectilePosition(WorldPacket& recvPacket);
-
-    uint32 _lastAuctionListItemsMSTime;
-    uint32 _lastAuctionListOwnerItemsMSTime;
 
     void HandleTeleportTimeout(bool updateInSessions);
     bool HandleSocketClosed();

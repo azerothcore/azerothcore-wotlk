@@ -23,7 +23,6 @@
 #include "DatabaseEnv.h"
 #include "EventProcessor.h"
 #include "ObjectGuid.h"
-#include "WorldPacket.h"
 #include <unordered_map>
 
 class Item;
@@ -89,7 +88,7 @@ enum AuctionSortOrder
 
 struct AuctionSortInfo
 {
-    AuctionSortInfo()  = default;
+    AuctionSortInfo() = default;
 
     AuctionSortOrder sortOrder{AUCTION_SORT_MAX};
     bool isDesc{true};
@@ -117,7 +116,6 @@ struct AuctionEntry
     [[nodiscard]] uint8 GetHouseId() const { return houseId; }
     [[nodiscard]] uint32 GetAuctionCut() const;
     [[nodiscard]] uint32 GetAuctionOutBid() const;
-    bool BuildAuctionInfo(WorldPacket& data) const;
     void DeleteFromDB(CharacterDatabaseTransaction trans) const;
     void SaveToDB(CharacterDatabaseTransaction trans) const;
     bool LoadFromDB(Field* fields);
@@ -130,45 +128,30 @@ class AuctionHouseObject
 {
 public:
     // Initialize storage
-    AuctionHouseObject() { next = AuctionsMap.begin(); }
+    AuctionHouseObject() = default;
     ~AuctionHouseObject()
     {
-        for (auto & itr : AuctionsMap)
+        for (auto& itr : AuctionsMap)
+        {
             delete itr.second;
+        }
     }
 
-    typedef std::map<uint32, AuctionEntry*> AuctionEntryMap;
-
     [[nodiscard]] uint32 Getcount() const { return AuctionsMap.size(); }
-
-    AuctionEntryMap::iterator GetAuctionsBegin() { return AuctionsMap.begin(); }
-    AuctionEntryMap::iterator GetAuctionsEnd() { return AuctionsMap.end(); }
-    AuctionEntryMap const& GetAuctions() { return AuctionsMap; }
+    auto const& GetAuctions() { return AuctionsMap; }
 
     [[nodiscard]] AuctionEntry* GetAuction(uint32 id) const
     {
-        AuctionEntryMap::const_iterator itr = AuctionsMap.find(id);
+        auto const& itr = AuctionsMap.find(id);
         return itr != AuctionsMap.end() ? itr->second : nullptr;
     }
 
     void AddAuction(AuctionEntry* auction);
-
     bool RemoveAuction(AuctionEntry* auction);
-
     void Update();
 
-    void BuildListBidderItems(WorldPacket& data, Player* player, uint32& count, uint32& totalcount);
-    void BuildListOwnerItems(WorldPacket& data, Player* player, uint32& count, uint32& totalcount);
-    bool BuildListAuctionItems(WorldPacket& data, Player* player,
-                               std::wstring const& searchedname, uint32 listfrom, uint8 levelmin, uint8 levelmax, uint8 usable,
-                               uint32 inventoryType, uint32 itemClass, uint32 itemSubClass, uint32 quality,
-                               uint32& count, uint32& totalcount, uint8 getAll, AuctionSortOrderVector const& sortOrder);
-
 private:
-    AuctionEntryMap AuctionsMap;
-
-    // storage for "next" auction item for next Update()
-    AuctionEntryMap::const_iterator next;
+    std::map<uint32, AuctionEntry*> AuctionsMap;
 };
 
 class AuctionHouseMgr

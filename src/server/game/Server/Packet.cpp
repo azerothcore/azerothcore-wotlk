@@ -18,7 +18,8 @@
 #include "Packet.h"
 #include "Errors.h"
 
-WorldPackets::Packet::Packet(WorldPacket&& worldPacket) : _worldPacket(std::move(worldPacket))
+WorldPackets::Packet::Packet(WorldPacket&& worldPacket)
+    : _worldPacket(std::move(worldPacket))
 {
 }
 

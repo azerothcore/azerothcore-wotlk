@@ -20,6 +20,8 @@
 
 #include "WorldPacket.h"
 
+class WorldSession;
+
 namespace WorldPackets
 {
     class AC_GAME_API Packet
@@ -40,6 +42,7 @@ namespace WorldPackets
 
     protected:
         WorldPacket _worldPacket;
+        WorldSession* _session{ nullptr };
     };
 
     class AC_GAME_API ServerPacket : public Packet
