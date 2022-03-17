@@ -112,33 +112,6 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (@PATH, 40, -11704.3, -3149.17, 9.67389, 100.0, 0);
 
 
-/*  Felguard Sentry - GUID 2720  */
-
-
-SET @NPC := 2720;
-SET @PATH := @NPC * 10;
-
-UPDATE `creature` SET `position_x` = -11734.6, `position_y` = -3312.5, `position_z` = 11.035, `orientation` = 0.401556 WHERE `guid` = @NPC;
-
-DELETE FROM `creature_addon` WHERE `guid` = @NPC;
-INSERT INTO `creature_addon` (`guid`, `path_id`) VALUES (@NPC, @PATH);
-UPDATE `creature` SET `MovementType` = 2 WHERE `guid` = @NPC;
-
-DELETE FROM `waypoint_data` where `id` = @PATH;
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES
-(@PATH, 1, -11734.6, -3312.5, 11.035, 100.0, 0),
-(@PATH, 2, -11747.6, -3321.52, 10.3471, 100.0, 0),
-(@PATH, 3, -11762.8, -3325.92, 8.37903, 100.0, 0),
-(@PATH, 4, -11772.2, -3332.2, 8.18687, 100.0, 0),
-(@PATH, 5, -11792.1, -3335.64, 5.36729, 100.0, 0),
-(@PATH, 6, -11780.1, -3334.94, 7.37694, 100.0, 0),
-(@PATH, 7, -11769.5, -3329.55, 8.03481, 100.0, 0),
-(@PATH, 8, -11755.2, -3324.42, 9.66616, 100.0, 0),
-(@PATH, 9, -11741.0, -3317.41, 10.6674, 100.0, 0),
-(@PATH, 10, -11729.5, -3306.33, 10.7332, 100.0, 0),
-(@PATH, 11, -11714.4, -3294.43, 12.119, 100.0, 0),
-(@PATH, 12, -11724.2, -3301.34, 10.9771, 100.0, 0);
-
 /*  Shadowsworn Warlock - GUID 2727  */
 
 
