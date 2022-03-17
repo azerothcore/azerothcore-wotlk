@@ -695,4 +695,3 @@ bool LoadRealmInfo(Acore::Asio::IoContext& ioContext)
     realm.Build = fields[11].Get<uint32>();
     return true;
 }
-

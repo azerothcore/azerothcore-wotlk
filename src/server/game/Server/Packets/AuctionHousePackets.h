@@ -186,7 +186,7 @@ namespace WorldPackets::AuctionHouse
         uint32 Unk1{ 0 };
         uint32 SearchDelay{ 300 };
 
-        AuctionHouseObject* auctionHouse{ nullptr };        
+        AuctionHouseObject* auctionHouse{ nullptr };
     };
 
     class ListItems final : public ClientPacket
