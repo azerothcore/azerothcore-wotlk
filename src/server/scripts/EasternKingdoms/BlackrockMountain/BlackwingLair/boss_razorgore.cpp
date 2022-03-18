@@ -27,6 +27,8 @@ enum Say
     SAY_EGGS_BROKEN2        = 1,
     SAY_EGGS_BROKEN3        = 2,
     SAY_DEATH               = 3,
+
+    EMOTE_TROOPS_RETREAT    = 0
 };
 
 enum Spells
@@ -113,6 +115,11 @@ public:
             events.ScheduleEvent(EVENT_STOMP, 35000);
             events.ScheduleEvent(EVENT_FIREBALL, 7000);
             events.ScheduleEvent(EVENT_CONFLAGRATION, 12000);
+
+            if (Creature* troops = instance->GetCreature(DATA_NEFARIAN_TROOPS))
+            {
+                troops->AI()->Talk(EMOTE_TROOPS_RETREAT);
+            }
         }
 
         void SetGUID(ObjectGuid const guid, int32 /*id*/) override
@@ -209,6 +216,7 @@ public:
         bool secondPhase;
         bool _died;
         ObjectGuid _charmerGUID;
+        GuidVector _summons;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

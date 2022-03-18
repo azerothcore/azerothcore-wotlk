@@ -43,7 +43,8 @@ DoorData const doorData[] =
 
 ObjectData const creatureData[] =
 {
-    { NPC_GRETHOK, DATA_GRETHOK }
+    { NPC_GRETHOK,         DATA_GRETHOK         },
+    { NPC_NEFARIAN_TROOPS, DATA_NEFARIAN_TROOPS }
 };
 
 Position const SummonPosition[8] =
