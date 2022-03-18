@@ -310,7 +310,7 @@ public:
 
                         break;
                     case SPECIAL:
-                        if (++EggCount >= 3)
+                        if (++EggCount >= EggList.size())
                         {
                             if (Creature* razor = instance->GetCreature(razorgoreGUID))
                             {
