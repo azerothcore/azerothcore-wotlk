@@ -335,7 +335,7 @@ public:
     static void FillAISpellInfo();
 
     // Called when a summon reaches a waypoint or point movement finished.
-    virtual void SummonMovementInform(Creature* creature, uint32 motionType, uint32 point) { }
+    virtual void SummonMovementInform(Creature* /*creature*/, uint32 /*motionType*/, uint32 /*point*/) { }
 
     virtual void sGossipHello(Player* /*player*/) {}
     virtual void sGossipSelect(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/) {}
