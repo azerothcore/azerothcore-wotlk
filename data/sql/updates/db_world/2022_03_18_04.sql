@@ -1,3 +1,19 @@
+-- DB update 2022_03_18_03 -> 2022_03_18_04
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_03_18_03';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_03_18_03 2022_03_18_04 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1647383981192969219'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1647383981192969219');
 
 REPLACE INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `VerifiedBuild`) VALUES
@@ -185,3 +201,13 @@ REPLACE INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Objec
 (11649,'zhTW','狂怒微粒','雖然，他們的小爭執我們已經解決了，仍然還要幫助你和你的靈語者。$B$B如你所見，我的僕從們被火水元素的戰爭所激怒，而短時間內不會有任何的改變，但是，你可以從中取得利益。$B$B為了要幫助你，我們需要他們身上的微粒。深入廢墟裡面，從這些暴風身上取回微粒吧。','收集5個暴風雨微粒，然後把它們交給艾卓納斯遺跡的英波里安。','','到北風凍原找埃德拉納斯廢墟的因波莉安。','','','','',0),
 (11629,'zhTW','回去找靈語者','你已經做到我請求你的事情，我這就把你想要的拿給你。$B$B將元神交還給博格洛克前哨的靈語者。如果她夠睿智，她就會知道一個儀式，能讓你獲得你所尋覓的消息。','將英波里安的元神帶給博格洛克前哨的靈語者嗥牙。','','到北風凍原的博格洛克前哨找靈語者嗥牙。','','','','',0),
 (11631,'zhTW','風之幻象','拿去，$n，我將元神和你調整一致了。$B$B當我的風圖騰出現以後，放開你的靈魂迎向元神，並且全神貫注在先知厲行者的天命。$B$B風之靈無所不至;有幸你將能獲得預見的能力。','在博格洛克前哨中嗥牙的圖騰，使用英波里安的元神施展儀式，以獲得有關於先知厲行者的消息。$B$B結束以後，再向靈語者嗥牙交談。','','到北風凍原的博格洛克前哨找靈語者嗥牙。','預知先知厲行者的命運','','','',0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_03_18_04' WHERE sql_rev = '1647383981192969219';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
