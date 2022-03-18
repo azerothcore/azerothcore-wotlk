@@ -21,6 +21,7 @@
 #include "ArenaTeam.h"
 #include "Battleground.h"
 #include "CharacterCache.h"
+#include "CinematicMgr.h"
 #include "DBCStores.h"
 #include "DatabaseEnvFwd.h"
 #include "GroupReference.h"
@@ -176,7 +177,7 @@ enum TalentTree // talent tabs
 // Spell modifier (used for modify other spells)
 struct SpellModifier
 {
-    SpellModifier(Aura* _ownerAura = nullptr) : op(SPELLMOD_DAMAGE), type(SPELLMOD_FLAT), charges(0),  mask(),  ownerAura(_ownerAura) {}
+    SpellModifier(Aura* _ownerAura = nullptr) : op(SPELLMOD_DAMAGE), type(SPELLMOD_FLAT), charges(0),  mask(), ownerAura(_ownerAura) {}
     SpellModOp   op   : 8;
     SpellModType type : 8;
     int16 charges     : 16;
@@ -1036,6 +1037,7 @@ struct EntryPointData
 class Player : public Unit, public GridObject<Player>
 {
     friend class WorldSession;
+    friend class CinematicMgr;
     friend void Item::AddToUpdateQueueOf(Player* player);
     friend void Item::RemoveFromUpdateQueueOf(Player* player);
 public:
@@ -1325,6 +1327,8 @@ public:
     [[nodiscard]] Player* GetTrader() const { return m_trade ? m_trade->GetTrader() : nullptr; }
     [[nodiscard]] TradeData* GetTradeData() const { return m_trade; }
     void TradeCancel(bool sendback);
+
+    CinematicMgr* GetCinematicMgr() const { return _cinematicMgr; }
 
     void UpdateEnchantTime(uint32 time);
     void UpdateSoulboundTradeItems();
@@ -2185,59 +2189,20 @@ public:
     void SetBGData(BGData& bgdata) { m_bgData = bgdata; }
     [[nodiscard]] Battleground* GetBattleground(bool create = false) const;
 
-    [[nodiscard]] bool InBattlegroundQueue() const
-    {
-        for (auto i : m_bgBattlegroundQueueID)
-            if (i != BATTLEGROUND_QUEUE_NONE)
-                return true;
-        return false;
-    }
+    [[nodiscard]] bool InBattlegroundQueue(bool ignoreArena = false) const;
+    [[nodiscard]] bool IsDeserter() const { return HasAura(26013); }
 
-    [[nodiscard]] BattlegroundQueueTypeId GetBattlegroundQueueTypeId(uint32 index) const { return m_bgBattlegroundQueueID[index]; }
-
-    [[nodiscard]] uint32 GetBattlegroundQueueIndex(BattlegroundQueueTypeId bgQueueTypeId) const
-    {
-        for (uint8 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
-            if (m_bgBattlegroundQueueID[i] == bgQueueTypeId)
-                return i;
-        return PLAYER_MAX_BATTLEGROUND_QUEUES;
-    }
-
-    [[nodiscard]] bool InBattlegroundQueueForBattlegroundQueueType(BattlegroundQueueTypeId bgQueueTypeId) const
-    {
-        return GetBattlegroundQueueIndex(bgQueueTypeId) < PLAYER_MAX_BATTLEGROUND_QUEUES;
-    }
+    [[nodiscard]] BattlegroundQueueTypeId GetBattlegroundQueueTypeId(uint32 index) const;
+    [[nodiscard]] uint32 GetBattlegroundQueueIndex(BattlegroundQueueTypeId bgQueueTypeId) const;
+    [[nodiscard]] bool IsInvitedForBattlegroundQueueType(BattlegroundQueueTypeId bgQueueTypeId) const;
+    [[nodiscard]] bool InBattlegroundQueueForBattlegroundQueueType(BattlegroundQueueTypeId bgQueueTypeId) const;
 
     void SetBattlegroundId(uint32 id, BattlegroundTypeId bgTypeId, uint32 queueSlot, bool invited, bool isRandom, TeamId teamId);
-
-    uint32 AddBattlegroundQueueId(BattlegroundQueueTypeId val)
-    {
-        for (uint8 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
-            if (m_bgBattlegroundQueueID[i] == BATTLEGROUND_QUEUE_NONE || m_bgBattlegroundQueueID[i] == val)
-            {
-                m_bgBattlegroundQueueID[i] = val;
-                return i;
-            }
-        return PLAYER_MAX_BATTLEGROUND_QUEUES;
-    }
-
-    bool HasFreeBattlegroundQueueId()
-    {
-        for (auto & i : m_bgBattlegroundQueueID)
-            if (i == BATTLEGROUND_QUEUE_NONE)
-                return true;
-        return false;
-    }
-
-    void RemoveBattlegroundQueueId(BattlegroundQueueTypeId val)
-    {
-        for (auto & i : m_bgBattlegroundQueueID)
-            if (i == val)
-            {
-                i = BATTLEGROUND_QUEUE_NONE;
-                return;
-            }
-    }
+    uint32 AddBattlegroundQueueId(BattlegroundQueueTypeId val);
+    bool HasFreeBattlegroundQueueId() const;
+    void RemoveBattlegroundQueueId(BattlegroundQueueTypeId val);
+    void SetInviteForBattlegroundQueueType(BattlegroundQueueTypeId bgQueueTypeId, uint32 instanceId);
+    bool IsInvitedForBattlegroundInstance(uint32 instanceId) const;
 
     [[nodiscard]] TeamId GetBgTeamId() const { return m_bgData.bgTeamId != TEAM_NEUTRAL ? m_bgData.bgTeamId : GetTeamId(); }
 
@@ -2369,7 +2334,7 @@ public:
     [[nodiscard]] bool IsPetNeedBeTemporaryUnsummoned() const { return GetSession()->PlayerLogout() || !IsInWorld() || !IsAlive() || IsMounted()/*+in flight*/ || GetVehicle() || IsBeingTeleported(); }
     bool CanResummonPet(uint32 spellid);
 
-    void SendCinematicStart(uint32 CinematicSequenceId);
+    void SendCinematicStart(uint32 CinematicSequenceId) const;
     void SendMovieStart(uint32 MovieId);
 
     uint32 DoRandomRoll(uint32 minimum, uint32 maximum);
@@ -2506,11 +2471,11 @@ public:
     bool IsInWhisperWhiteList(ObjectGuid guid);
     void RemoveFromWhisperWhiteList(ObjectGuid guid) { WhisperList.remove(guid); }
 
-    bool SetDisableGravity(bool disable, bool packetOnly /* = false */) override;
+    bool SetDisableGravity(bool disable, bool packetOnly = false, bool updateAnimationTier = true) override;
     bool SetCanFly(bool apply, bool packetOnly = false) override;
     bool SetWaterWalking(bool apply, bool packetOnly = false) override;
     bool SetFeatherFall(bool apply, bool packetOnly = false) override;
-    bool SetHover(bool enable, bool packetOnly = false) override;
+    bool SetHover(bool enable, bool packetOnly = false, bool updateAnimationTier = true) override;
 
     [[nodiscard]] bool CanFly() const override { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY); }
     [[nodiscard]] bool CanEnterWater() const override { return true; }
@@ -2562,17 +2527,6 @@ public:
 
     static std::unordered_map<int, bgZoneRef> bgZoneIdToFillWorldStates; // zoneId -> FillInitialWorldStates
 
-    // Cinematic camera data and remote sight functions
-    [[nodiscard]] uint32 GetActiveCinematicCamera() const { return m_activeCinematicCameraId; }
-    void SetActiveCinematicCamera(uint32 cinematicCameraId = 0) { m_activeCinematicCameraId = cinematicCameraId; }
-    [[nodiscard]] bool IsOnCinematic() const { return (m_cinematicCamera != nullptr); }
-    void BeginCinematic();
-    void EndCinematic();
-    void UpdateCinematicLocation(uint32 diff);
-
-    std::string GetMapAreaAndZoneString();
-    std::string GetCoordsMapAreaAndZoneString();
-
     void SetFarSightDistance(float radius);
     void ResetFarSightDistance();
     [[nodiscard]] Optional<float> GetFarSightDistance() const;
@@ -2609,7 +2563,13 @@ public:
     /***               BATTLEGROUND SYSTEM                 ***/
     /*********************************************************/
 
-    BattlegroundQueueTypeId m_bgBattlegroundQueueID[PLAYER_MAX_BATTLEGROUND_QUEUES];
+    struct BgBattlegroundQueueID_Rec
+    {
+        BattlegroundQueueTypeId bgQueueTypeId;
+        uint32 invitedToInstance;
+    };
+
+    std::array<BgBattlegroundQueueID_Rec, PLAYER_MAX_BATTLEGROUND_QUEUES> _BgBattlegroundQueueID;
     BGData m_bgData;
     bool m_IsBGRandomWinner;
 
@@ -2867,6 +2827,8 @@ private:
     Item* _StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool update);
     Item* _LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint32 timeDiff, Field* fields);
 
+    CinematicMgr* _cinematicMgr;
+
     typedef GuidSet RefundableItemsSet;
     RefundableItemsSet m_refundableItems;
     void SendRefundInfo(Item* item);
@@ -2931,14 +2893,6 @@ private:
     bool m_isInstantFlightOn;
 
     uint32 m_flightSpellActivated;
-
-    // Remote location information
-    uint32 m_cinematicDiff;
-    uint32 m_lastCinematicCheck;
-    uint32 m_activeCinematicCameraId;
-    FlyByCameraCollection* m_cinematicCamera;
-    Position m_remoteSightPosition;
-    Creature* m_CinematicObject;
 
     WorldLocation _corpseLocation;
 

@@ -68,3 +68,12 @@ WorldPacket const* WorldPackets::Misc::RandomRoll::Write()
 
     return &_worldPacket;
 }
+
+WorldPacket const* WorldPackets::Misc::CrossedInebriationThreshold::Write()
+{
+    _worldPacket << Guid;
+    _worldPacket << uint32(Threshold);
+    _worldPacket << uint32(ItemID);
+
+    return &_worldPacket;
+}
