@@ -243,6 +243,8 @@ public:
     };
 };
 
+constexpr std::pair<uint32, uint32> gossip_Adyen_Lightbringer = { 61021, 0 };     // I'm ready, Adyen
+
 class adyen_the_lightbringer : public CreatureScript
 {
 public:
@@ -251,7 +253,7 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->GetQuestStatus(DEATHBLOW_TO_THE_LEGION) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, ADYEN_THE_LIGHTBRINGER, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, gossip_Adyen_Lightbringer, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 
@@ -1088,6 +1090,8 @@ enum saeed
     SPELL_DIMENSIUS_TRANSFORM       = 35939
 };
 
+constexpr std::pair<uint32, uint32> gossip_begin_battle = { 10847, 0 };     // Begin the battle.
+
 class npc_captain_saeed : public CreatureScript
 {
 public:
@@ -1308,7 +1312,7 @@ public:
             if (!creature->AI()->GetData(1))
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Let's move out.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
             else
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Let's start the battle.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, gossip_begin_battle, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
         }
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());

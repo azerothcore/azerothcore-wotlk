@@ -469,6 +469,8 @@ public:
     };
 };
 
+constexpr std::pair<uint32, uint32> gossip_start_distil = { 9713, 0 };      // I'm ready to start the distillation, uh, Tipsy
+
 class npc_mcmanus : public CreatureScript
 {
 public:
@@ -483,7 +485,7 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (player->GetQuestStatus(12644) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I'm ready to start the distillation, uh, Tipsy.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, gossip_start_distil, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         return true;
@@ -554,8 +556,8 @@ public:
 ## npc_vekjik
 ######*/
 
-#define GOSSIP_VEKJIK_ITEM1 "Shaman Vekjik, I have spoken with the big-tongues and they desire peace. I have brought this offering on their behalf."
-#define GOSSIP_VEKJIK_ITEM2 "No no... I had no intentions of betraying your people. I was only defending myself. it was all a misunderstanding."
+constexpr std::pair<uint32, uint32> gossip_Vekjik_1 = { 9678, 0 };      // Shaman Vekjik, I have spoken with the big-tongues and they desire peace. ...    => 9686
+constexpr std::pair<uint32, uint32> gossip_Vekjik_2 = { 9686, 0 };      // No no... I had no intentions of betraying your people. ...
 
 enum Vekjik
 {
@@ -581,7 +583,7 @@ public:
 
         if (player->GetQuestStatus(QUEST_MAKING_PEACE) == QUEST_STATUS_INCOMPLETE)
         {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_VEKJIK_ITEM1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, gossip_Vekjik_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
             SendGossipMenuFor(player, GOSSIP_TEXTID_VEKJIK1, creature->GetGUID());
             return true;
         }
@@ -596,7 +598,7 @@ public:
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF+1:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_VEKJIK_ITEM2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, gossip_Vekjik_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                 SendGossipMenuFor(player, GOSSIP_TEXTID_VEKJIK2, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
@@ -616,9 +618,9 @@ public:
 ## avatar_of_freya
 ######*/
 
-#define GOSSIP_ITEM_AOF1 "I want to stop the Scourge as much as you do. How can I help?"
-#define GOSSIP_ITEM_AOF2 "You can trust me. I am no friend of the Lich King."
-#define GOSSIP_ITEM_AOF3 "I will not fail."
+constexpr std::pair<uint32, uint32> gossip_avatar_of_freya_1 = { 9720, 0 };      // I want to stop the Scourge as much as you do.  How can I help?  => 9721
+constexpr std::pair<uint32, uint32> gossip_avatar_of_freya_2 = { 9721, 0 };      // You can trust me.  I am no friend of the Lich King's.   => 9722
+constexpr std::pair<uint32, uint32> gossip_avatar_of_freya_3 = { 9722, 0 };      // I will not fail.
 
 enum Freya
 {
@@ -642,7 +644,7 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (player->GetQuestStatus(QUEST_FREYA_PACT) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_AOF1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, gossip_avatar_of_freya_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         SendGossipMenuFor(player, GOSSIP_TEXTID_AVATAR1, creature);
         return true;
@@ -654,11 +656,11 @@ public:
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF+1:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_AOF2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, gossip_avatar_of_freya_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                 SendGossipMenuFor(player, GOSSIP_TEXTID_AVATAR2, creature);
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_AOF3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                AddGossipItemFor(player, gossip_avatar_of_freya_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
                 SendGossipMenuFor(player, GOSSIP_TEXTID_AVATAR3, creature);
                 break;
             case GOSSIP_ACTION_INFO_DEF+3:
@@ -1051,9 +1053,9 @@ public:
 ## npc_adventurous_dwarf
 ######*/
 
-#define GOSSIP_OPTION_ORANGE    "Can you spare an orange?"
-#define GOSSIP_OPTION_BANANAS   "Have a spare bunch of bananas?"
-#define GOSSIP_OPTION_PAPAYA    "I could really use a papaya."
+constexpr std::pair<uint32, uint32> gossip_spare_orange = { 9724, 0 };      // Can you spare an orange?
+constexpr std::pair<uint32, uint32> gossip_spare_bananas = { 9724, 1 };      // Have a spare bunch of bananas?
+constexpr std::pair<uint32, uint32> gossip_spare_papaya = { 9724, 2 };      // I could really use a papaya.
 
 enum AdventurousDwarf
 {
@@ -1097,13 +1099,13 @@ public:
             return false;
 
         if (player->GetItemCount(ITEM_ORANGE) < 1)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_OPTION_ORANGE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, gossip_spare_orange, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         if (player->GetItemCount(ITEM_BANANAS) < 2)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_OPTION_BANANAS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            AddGossipItemFor(player, gossip_spare_bananas, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
 
         if (player->GetItemCount(ITEM_PAPAYA) < 1)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_OPTION_PAPAYA, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            AddGossipItemFor(player, gossip_spare_papaya, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
 
         SendGossipMenuFor(player, GOSSIP_MENU_DWARF, creature);
         return true;

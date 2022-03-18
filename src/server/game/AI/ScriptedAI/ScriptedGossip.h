@@ -21,9 +21,9 @@
 #include "GossipDef.h"
 #include "QuestDef.h"
 
-// Gossip Item Text
-#define GOSSIP_TEXT_BROWSE_GOODS        "I'd like to browse your goods."
-#define GOSSIP_TEXT_TRAIN               "Train me!"
+constexpr std::pair<uint32, uint32> gossip_make_inn_your_home = { 9733, 1 };      // Make this inn your home.
+constexpr std::pair<uint32, uint32> gossip_browse_your_goods = { 9733, 2 };      // I'd like to browse your goods.
+constexpr std::pair<uint32, uint32> gossip_train_me = { 0, 3 };         // Train me!
 
 enum eTradeskill
 {
@@ -92,6 +92,7 @@ void AddGossipItemFor(Player* player, uint32 icon, std::string const& text, uint
 
 // Uses gossip item info from DB
 void AddGossipItemFor(Player* player, uint32 gossipMenuID, uint32 gossipMenuItemID, uint32 sender, uint32 action, uint32 boxMoney = 0);
+void AddGossipItemFor(Player* player, std::pair<uint32, uint32> gossip, uint32 sender, uint32 action, uint32 boxMoney = 0);
 
 // Send menu text
 void SendGossipMenuFor(Player* player, uint32 npcTextID, ObjectGuid const guid);

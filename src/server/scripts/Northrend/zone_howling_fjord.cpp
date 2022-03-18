@@ -310,8 +310,8 @@ public:
 ## npc_razael_and_lyana
 ######*/
 
-#define GOSSIP_RAZAEL_REPORT "High Executor Anselm wants a report on the situation."
-#define GOSSIP_LYANA_REPORT "High Executor Anselm requests your report."
+constexpr std::pair<uint32, uint32> gossip_razael_report = { 8870, 0 };      // High Executor Anselm wants a report on the situation.    => 8869
+constexpr std::pair<uint32, uint32> gossip_lyana_report  = { 8879, 0 };      // High Executor Anselm requests your report.    => 8878
 
 enum Razael
 {
@@ -340,7 +340,7 @@ public:
                 case NPC_RAZAEL:
                     if (!player->GetReqKillOrCastCurrentCount(QUEST_REPORTS_FROM_THE_FIELD, NPC_RAZAEL))
                     {
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_RAZAEL_REPORT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                        AddGossipItemFor(player, gossip_razael_report, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                         SendGossipMenuFor(player, GOSSIP_TEXTID_RAZAEL1, creature->GetGUID());
                         return true;
                     }
@@ -348,7 +348,7 @@ public:
                 case NPC_LYANA:
                     if (!player->GetReqKillOrCastCurrentCount(QUEST_REPORTS_FROM_THE_FIELD, NPC_LYANA))
                     {
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LYANA_REPORT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                        AddGossipItemFor(player, gossip_lyana_report, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                         SendGossipMenuFor(player, GOSSIP_TEXTID_LYANA1, creature->GetGUID());
                         return true;
                     }

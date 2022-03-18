@@ -42,6 +42,14 @@ void AddGossipItemFor(Player* player, uint32 gossipMenuID, uint32 gossipMenuItem
     player->PlayerTalkClass->GetGossipMenu().AddMenuItem(gossipMenuID, gossipMenuItemID, sender, action, boxMoney);
 }
 
+// Uses gossip menu and item as array (int, int) from DB
+void AddGossipItemFor(Player* player, std::pair<uint32, uint32> gossip, uint32 sender, uint32 action, uint32 boxMoney /*= 0*/)
+{
+    uint32 gossipMenuID = gossip.first;
+    uint32 gossipMenuItemID = gossip.second;
+    player->PlayerTalkClass->GetGossipMenu().AddMenuItem(gossipMenuID, gossipMenuItemID, sender, action, boxMoney);
+}
+
 void SendGossipMenuFor(Player* player, uint32 npcTextID, ObjectGuid const guid)
 {
     player->PlayerTalkClass->SendGossipMenu(npcTextID, guid);

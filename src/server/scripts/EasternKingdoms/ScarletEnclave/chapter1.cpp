@@ -180,6 +180,8 @@ enum deathsChallenge
     EVENT_DUEL_LOST             = 7, // 7 - 8
 };
 
+constexpr std::pair<uint32, uint32> gossip_challenge_dk = { 9765, 0 };      // I challenge you, death knight!
+
 class npc_death_knight_initiate : public CreatureScript
 {
 public:
@@ -218,7 +220,7 @@ public:
                 return true;
 
             if (!creature->AI()->GetGUID(player->GetGUID().GetCounter()))
-                AddGossipItemFor(player, 9765, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+                AddGossipItemFor(player, gossip_challenge_dk, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
 
             SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         }

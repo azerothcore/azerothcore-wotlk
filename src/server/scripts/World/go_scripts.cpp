@@ -1150,9 +1150,13 @@ public:
 
 #define GOSSIP_FEL_CRYSTALFORGE_TEXT 31000
 #define GOSSIP_FEL_CRYSTALFORGE_ITEM_TEXT_RETURN 31001
-#define GOSSIP_FEL_CRYSTALFORGE_ITEM_1 "Purchase 1 Unstable Flask of the Beast for the cost of 10 Apexis Shards"
-#define GOSSIP_FEL_CRYSTALFORGE_ITEM_5 "Purchase 5 Unstable Flask of the Beast for the cost of 50 Apexis Shards"
-#define GOSSIP_FEL_CRYSTALFORGE_ITEM_RETURN "Use the fel crystalforge to make another purchase."
+
+constexpr std::pair<uint32, uint32> gossip_1_Unstable_Beast_Flask = { 8672, 0 };      // Purchase 1 Unstable Flask of the Beast for the cost of 10 Apexis Shards => 8673
+constexpr std::pair<uint32, uint32> gossip_5_Unstable_Beast_Flask = { 8672, 1 };      // Purchase 5 Unstable Flasks of the Beast for the cost of 50 Apexis Shards => 8674
+constexpr std::pair<uint32, uint32> gossip_fel_another_purchase = { 8673, 0 };      // Use the fel crystalforge to make another purchase. => 8672
+constexpr std::pair<uint32, uint32> gossip_1_Unstab_Sorcerer_Flask = { 8677, 0 };      // Purchase 1 Unstable Flask of the Sorcerer for the cost of 10 Apexis Shards => 8676
+constexpr std::pair<uint32, uint32> gossip_5_Unstab_Sorcerer_Flask = { 8677, 1 };      // Purchase 5 Unstable Flasks of the Sorcerer for the cost of 50 Apexis Shards => 8675
+constexpr std::pair<uint32, uint32> gossip_Bashir_another_purchase = { 8675, 0 };      // Use the Bash'ir crystalforge to make another purchase. => 8677
 
 enum FelCrystalforge
 {
@@ -1170,8 +1174,8 @@ public:
         if (go->GetGoType() == GAMEOBJECT_TYPE_QUESTGIVER) /* != GAMEOBJECT_TYPE_QUESTGIVER) */
             player->PrepareQuestMenu(go->GetGUID()); /* return true*/
 
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_FEL_CRYSTALFORGE_ITEM_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_FEL_CRYSTALFORGE_ITEM_5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        AddGossipItemFor(player, gossip_1_Unstable_Beast_Flask, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+        AddGossipItemFor(player, gossip_5_Unstable_Beast_Flask, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         SendGossipMenuFor(player, GOSSIP_FEL_CRYSTALFORGE_TEXT, go->GetGUID());
 
@@ -1185,17 +1189,17 @@ public:
         {
             case GOSSIP_ACTION_INFO_DEF:
                 player->CastSpell(player, SPELL_CREATE_1_FLASK_OF_BEAST, false);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_FEL_CRYSTALFORGE_ITEM_RETURN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, gossip_fel_another_purchase, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                 SendGossipMenuFor(player, GOSSIP_FEL_CRYSTALFORGE_ITEM_TEXT_RETURN, go->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 1:
                 player->CastSpell(player, SPELL_CREATE_5_FLASK_OF_BEAST, false);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_FEL_CRYSTALFORGE_ITEM_RETURN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, gossip_fel_another_purchase, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                 SendGossipMenuFor(player, GOSSIP_FEL_CRYSTALFORGE_ITEM_TEXT_RETURN, go->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 2:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_FEL_CRYSTALFORGE_ITEM_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_FEL_CRYSTALFORGE_ITEM_5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                AddGossipItemFor(player, gossip_1_Unstable_Beast_Flask, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+                AddGossipItemFor(player, gossip_5_Unstable_Beast_Flask, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                 SendGossipMenuFor(player, GOSSIP_FEL_CRYSTALFORGE_TEXT, go->GetGUID());
                 break;
         }
@@ -1209,9 +1213,6 @@ public:
 
 #define GOSSIP_BASHIR_CRYSTALFORGE_TEXT 31100
 #define GOSSIP_BASHIR_CRYSTALFORGE_ITEM_TEXT_RETURN 31101
-#define GOSSIP_BASHIR_CRYSTALFORGE_ITEM_1 "Purchase 1 Unstable Flask of the Sorcerer for the cost of 10 Apexis Shards"
-#define GOSSIP_BASHIR_CRYSTALFORGE_ITEM_5 "Purchase 5 Unstable Flask of the Sorcerer for the cost of 50 Apexis Shards"
-#define GOSSIP_BASHIR_CRYSTALFORGE_ITEM_RETURN "Use the bashir crystalforge to make another purchase."
 
 enum BashirCrystalforge
 {
@@ -1229,8 +1230,8 @@ public:
         if (go->GetGoType() == GAMEOBJECT_TYPE_QUESTGIVER) /* != GAMEOBJECT_TYPE_QUESTGIVER) */
             player->PrepareQuestMenu(go->GetGUID()); /* return true*/
 
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_BASHIR_CRYSTALFORGE_ITEM_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_BASHIR_CRYSTALFORGE_ITEM_5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        AddGossipItemFor(player, gossip_1_Unstab_Sorcerer_Flask, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+        AddGossipItemFor(player, gossip_5_Unstab_Sorcerer_Flask, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         SendGossipMenuFor(player, GOSSIP_BASHIR_CRYSTALFORGE_TEXT, go->GetGUID());
 
@@ -1244,17 +1245,17 @@ public:
         {
             case GOSSIP_ACTION_INFO_DEF:
                 player->CastSpell(player, SPELL_CREATE_1_FLASK_OF_SORCERER, false);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_BASHIR_CRYSTALFORGE_ITEM_RETURN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, gossip_Bashir_another_purchase, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                 SendGossipMenuFor(player, GOSSIP_BASHIR_CRYSTALFORGE_ITEM_TEXT_RETURN, go->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 1:
                 player->CastSpell(player, SPELL_CREATE_5_FLASK_OF_SORCERER, false);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_BASHIR_CRYSTALFORGE_ITEM_RETURN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, gossip_Bashir_another_purchase, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                 SendGossipMenuFor(player, GOSSIP_BASHIR_CRYSTALFORGE_ITEM_TEXT_RETURN, go->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 2:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_BASHIR_CRYSTALFORGE_ITEM_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_BASHIR_CRYSTALFORGE_ITEM_5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                AddGossipItemFor(player, gossip_1_Unstab_Sorcerer_Flask, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+                AddGossipItemFor(player, gossip_5_Unstab_Sorcerer_Flask, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                 SendGossipMenuFor(player, GOSSIP_BASHIR_CRYSTALFORGE_TEXT, go->GetGUID());
                 break;
         }
@@ -1607,7 +1608,8 @@ public:
 ## go_amberpine_outhouse
 ######*/
 
-#define GOSSIP_USE_OUTHOUSE "Use the outhouse."
+constexpr std::pair<uint32, uint32> gossip_use_outhouse = { 9492, 0 };      // Use the outhouse.
+
 #define GO_ANDERHOLS_SLIDER_CIDER_NOT_FOUND "Quest item Anderhol's Slider Cider not found."
 
 enum AmberpineOuthouse
@@ -1632,7 +1634,7 @@ public:
         QuestStatus status = player->GetQuestStatus(QUEST_DOING_YOUR_DUTY);
         if (status == QUEST_STATUS_INCOMPLETE || status == QUEST_STATUS_COMPLETE || status == QUEST_STATUS_REWARDED)
         {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_USE_OUTHOUSE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, gossip_use_outhouse, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
             SendGossipMenuFor(player, GOSSIP_OUTHOUSE_VACANT, go->GetGUID());
         }
         else

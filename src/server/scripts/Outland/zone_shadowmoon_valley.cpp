@@ -719,8 +719,8 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if (creature->IsVendor() && player->GetReputationRank(1015) == REP_EXALTED)
-            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+        if (creature->IsVendor() && (player->GetReputationRank(1015) == REP_EXALTED || player->IsGameMaster()))
+            AddGossipItemFor(player, gossip_browse_your_goods, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 
@@ -732,8 +732,8 @@ public:
 ## npc_flanis_swiftwing_and_kagrosh
 ######*/
 
-#define GOSSIP_HSK1 "Take Flanis's Pack"
-#define GOSSIP_HSK2 "Take Kagrosh's Pack"
+constexpr std::pair<uint32, uint32> gossip_Flanis_pack  = { 8356, 0 };      // Reclaim Flanis's pack.
+constexpr std::pair<uint32, uint32> gossip_Kagrosh_pack = { 8371, 0 };      // Search the corpse for Kagrosh's pack.
 
 class npcs_flanis_swiftwing_and_kagrosh : public CreatureScript
 {
@@ -769,9 +769,9 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->GetQuestStatus(10583) == QUEST_STATUS_INCOMPLETE && !player->HasItemCount(30658, 1, true))
-            AddGossipItemFor(player, 0, GOSSIP_HSK1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, gossip_Flanis_pack, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         if (player->GetQuestStatus(10601) == QUEST_STATUS_INCOMPLETE && !player->HasItemCount(30659, 1, true))
-            AddGossipItemFor(player, 0, GOSSIP_HSK2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            AddGossipItemFor(player, gossip_Kagrosh_pack, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 

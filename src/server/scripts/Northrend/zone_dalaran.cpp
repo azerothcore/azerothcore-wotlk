@@ -133,6 +133,9 @@ enum spells
     SPELL_FROSTFIRE                 = 44614
 };
 
+constexpr std::pair<uint32, uint32> gossip_tybalin_lend_tabard = { 10854, 0 };     // Arcanist Tybalin said you might be able to lend me a certain tabard.
+constexpr std::pair<uint32, uint32> gossip_hathorel_lend_tabard = { 10854, 1 };     // Magister Hathorel said you might be able to lend me a certain tabard.
+
 class npc_shandy_dalaran : public CreatureScript
 {
 public:
@@ -246,9 +249,9 @@ public:
                 player->GetQuestStatus(QUEST_SUITABLE_DISGUISE_H) == QUEST_STATUS_INCOMPLETE)
         {
             if(player->GetTeamId() == TEAM_ALLIANCE)
-                AddGossipItemFor(player, 0, "Arcanist Tybalin said you might be able to lend me a certain tabard.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+                AddGossipItemFor(player, gossip_tybalin_lend_tabard, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
             else
-                AddGossipItemFor(player, 0, "Magister Hathorel said you might be able to lend me a certain tabard.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+                AddGossipItemFor(player, gossip_hathorel_lend_tabard, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
         }
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());

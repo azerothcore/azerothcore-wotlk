@@ -29,6 +29,8 @@ enum MenuTexts
     MSG_ANUBARAK                    = 724005,
 };
 
+constexpr std::pair<uint32, uint32> gossip_we_are_ready_lets_go = { 10860, 0 };     // We're ready! Let's go!
+
 class npc_announcer_toc10 : public CreatureScript
 {
 public:
@@ -65,7 +67,7 @@ public:
                 return true;
         }
 
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "We are ready!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1337);
+        AddGossipItemFor(player, gossip_we_are_ready_lets_go, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1337);
         SendGossipMenuFor(player, gossipTextId, creature->GetGUID());
         return true;
     }

@@ -32,9 +32,10 @@
 #include "Vehicle.h"
 #include "World.h"
 
-#define GOSSIP_HELLO_DEMO1  "Build catapult."
-#define GOSSIP_HELLO_DEMO2  "Build demolisher."
-#define GOSSIP_HELLO_DEMO3  "Build siege engine."
+constexpr std::pair<uint32, uint32> gossip_build_catapult = { 9904, 2 };      // I would like to build a catapult.
+constexpr std::pair<uint32, uint32> gossip_build_demolisher = { 9904, 1 };      // I would like to build a demolisher.
+constexpr std::pair<uint32, uint32> gossip_build_siege_engine = { 9904, 2 };      // I would like to build a siege engine.
+
 #define GOSSIP_HELLO_DEMO4  "I cannot build more!"
 
 enum eWGqueuenpctext
@@ -139,12 +140,12 @@ public:
         if (canBuild(creature))
         {
             if (player->HasAura(SPELL_CORPORAL))
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+                AddGossipItemFor(player, gossip_build_catapult, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
             else if (player->HasAura(SPELL_LIEUTENANT))
             {
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, gossip_build_catapult, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+                AddGossipItemFor(player, gossip_build_demolisher, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                AddGossipItemFor(player, gossip_build_siege_engine, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
             }
         }
         else
@@ -289,6 +290,7 @@ public:
 
         if (wintergrasp->IsWarTime())
         {
+            // MenuID 10662, 10666 OptionID 0; ActionMenuID 1048576 is not found
             AddGossipItemFor(player, GOSSIP_ICON_CHAT_19, "Queue for Wintergrasp.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
             SendGossipMenuFor(player, wintergrasp->GetDefenderTeam() ? WG_NPCQUEUE_TEXT_H_WAR : WG_NPCQUEUE_TEXT_A_WAR, creature->GetGUID());
         }
@@ -298,6 +300,7 @@ public:
             player->SendUpdateWorldState(4354, GameTime::GetGameTime().count() + timer);
             if (timer < 15 * MINUTE)
             {
+                // MenuID 10662, 10666 OptionID 0; ActionMenuID 1048576 is not found
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Queue for Wintergrasp.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
                 SendGossipMenuFor(player, wintergrasp->GetDefenderTeam() ? WG_NPCQUEUE_TEXT_H_QUEUE : WG_NPCQUEUE_TEXT_A_QUEUE, creature->GetGUID());
             }

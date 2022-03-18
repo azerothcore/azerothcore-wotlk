@@ -35,7 +35,7 @@ EndContentData */
 ## npcs_riverbreeze_and_silversky
 ######*/
 
-#define GOSSIP_ITEM_BEACON  "Please make me a Cenarion Beacon"
+constexpr std::pair<uint32, uint32> gossip_need_beacon = { 2208, 0 };      // I need a Cenarion beacon.
 
 enum RiverbreezeAndSilversky
 {
@@ -75,7 +75,7 @@ public:
         {
             if (player->GetQuestRewardStatus(QUEST_CLEASING_FELWOOD_A))
             {
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_BEACON, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                AddGossipItemFor(player, gossip_need_beacon, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                 SendGossipMenuFor(player, 2848, creature->GetGUID());
             }
             else if (player->GetTeamId() == TEAM_HORDE)
@@ -88,7 +88,7 @@ public:
         {
             if (player->GetQuestRewardStatus(QUEST_CLEASING_FELWOOD_H))
             {
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_BEACON, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                AddGossipItemFor(player, gossip_need_beacon, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                 SendGossipMenuFor(player, 2849, creature->GetGUID());
             }
             else if (player->GetTeamId() == TEAM_ALLIANCE)

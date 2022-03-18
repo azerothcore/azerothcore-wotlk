@@ -109,10 +109,10 @@ public:
 ## npc_great_bear_spirit
 ######*/
 
-#define GOSSIP_BEAR1 "What do you represent, spirit?"
-#define GOSSIP_BEAR2 "I seek to understand the importance of strength of the body."
-#define GOSSIP_BEAR3 "I seek to understand the importance of strength of the heart."
-#define GOSSIP_BEAR4 "I have heard your words, Great Bear Spirit, and I understand. I now seek your blessings to fully learn the way of the Claw."
+constexpr std::pair<uint32, uint32> gossip_bear1 = { 3882, 0 };      // What do you represent, spirit? =>3881
+constexpr std::pair<uint32, uint32> gossip_bear2 = { 3881, 0 };      // I seek to understand the importance of strength of the body =>3883
+constexpr std::pair<uint32, uint32> gossip_bear3 = { 3883, 0 };      // I seek to understand the importance of strength of the heart =>3884
+constexpr std::pair<uint32, uint32> gossip_bear4 = { 3884, 0 };      // I have heard your words, Great Bear Spirit, and I understand. ... =>3885
 
 class npc_great_bear_spirit : public CreatureScript
 {
@@ -125,15 +125,15 @@ public:
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_BEAR2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                AddGossipItemFor(player, gossip_bear2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                 SendGossipMenuFor(player, 4721, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 1:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_BEAR3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, gossip_bear3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                 SendGossipMenuFor(player, 4733, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 2:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_BEAR4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                AddGossipItemFor(player, gossip_bear4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
                 SendGossipMenuFor(player, 4734, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 3:
@@ -152,7 +152,7 @@ public:
         //ally or horde quest
         if (player->GetQuestStatus(5929) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(5930) == QUEST_STATUS_INCOMPLETE)
         {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_BEAR1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+            AddGossipItemFor(player, gossip_bear1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
             SendGossipMenuFor(player, 4719, creature->GetGUID());
         }
         else
@@ -166,8 +166,8 @@ public:
 ## npc_silva_filnaveth
 ######*/
 
-#define GOSSIP_ITEM_RUTHERAN    "I'd like to fly to Rut'theran Village."
-#define GOSSIP_ITEM_AQ_AGI      "Do you know where I can find Half Pendant of Aquatic Agility?"
+constexpr std::pair<uint32, uint32> gossip_ruttheran = { 4041, 0 };      // I'd like to fly to Rut'theran Village.
+#define GOSSIP_ITEM_AQ_AGI      "Do you know where I can find Half Pendant of Aquatic Agility?" //gossip_menu_item 4041-1 or 4041-2; ActionMenuID 4225 is not found
 
 class npc_silva_filnaveth : public CreatureScript
 {
@@ -207,7 +207,7 @@ public:
         }
         else if (player->getClass() == CLASS_DRUID && player->GetTeamId() == TEAM_ALLIANCE)
         {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_RUTHERAN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, gossip_ruttheran, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
             if (player->GetQuestStatus(QUEST_SEA_LION_ALLY) == QUEST_STATUS_INCOMPLETE)
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_AQ_AGI, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);

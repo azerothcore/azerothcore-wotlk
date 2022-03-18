@@ -224,9 +224,9 @@ public:
         if (creature->GetEntry() == 23484)
         {
             // Aldor vendor
-            if (creature->IsVendor() && (player->GetReputationRank(932) == REP_EXALTED) && (player->GetReputationRank(935) == REP_EXALTED) && (player->GetReputationRank(942) == REP_EXALTED))
+            if (creature->IsVendor() && (((player->GetReputationRank(932) == REP_EXALTED) && (player->GetReputationRank(935) == REP_EXALTED) && (player->GetReputationRank(942) == REP_EXALTED)) || player->IsGameMaster()))
             {
-                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+                AddGossipItemFor(player, gossip_browse_your_goods, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
                 SendGossipMenuFor(player, 11085, creature->GetGUID());
             }
             else
@@ -238,9 +238,9 @@ public:
         if (creature->GetEntry() == 23483)
         {
             // Scryers vendor
-            if (creature->IsVendor() && (player->GetReputationRank(934) == REP_EXALTED) && (player->GetReputationRank(935) == REP_EXALTED) && (player->GetReputationRank(942) == REP_EXALTED))
+            if (creature->IsVendor() && (((player->GetReputationRank(934) == REP_EXALTED) && (player->GetReputationRank(935) == REP_EXALTED) && (player->GetReputationRank(942) == REP_EXALTED)) || player->IsGameMaster()))
             {
-                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+                AddGossipItemFor(player, gossip_browse_your_goods, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
                 SendGossipMenuFor(player, 11085, creature->GetGUID());
             }
             else
@@ -257,7 +257,7 @@ public:
 # npc_zephyr
 ######*/
 
-#define GOSSIP_HZ "Take me to the Caverns of Time."
+constexpr std::pair<uint32, uint32> gossip_go_Caverns_of_Time = { 9205, 0 };      // Take me to the Caverns of Time.
 
 class npc_zephyr : public CreatureScript
 {
@@ -276,7 +276,7 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->GetReputationRank(989) >= REP_REVERED)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HZ, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, gossip_go_Caverns_of_Time, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 
@@ -439,8 +439,8 @@ enum Ishanah
     POWER_WORLD_SHIELD             = 22187
 };
 
-#define ISANAH_GOSSIP_1 "Who are the Sha'tar?"
-#define ISANAH_GOSSIP_2 "Isn't Shattrath a draenei city? Why do you allow others here?"
+constexpr std::pair<uint32, uint32> gossip_who_Shatar = { 7735, 0 };      // Who are the Sha'tar?    => 7736
+constexpr std::pair<uint32, uint32> gossip_why_others_here = { 7735, 1 };      // Isn't Shattrath a draenei city?  Why do you allow others here?    => 7736
 
 class npc_ishanah : public CreatureScript
 {
@@ -463,8 +463,8 @@ public:
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, ISANAH_GOSSIP_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, ISANAH_GOSSIP_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+        AddGossipItemFor(player, gossip_who_Shatar, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        AddGossipItemFor(player, gossip_why_others_here, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 

@@ -37,11 +37,11 @@ EndContentData */
 ## npc_braug_dimspirit
 ######*/
 
-#define GOSSIP_HBD1 "Ysera"
-#define GOSSIP_HBD2 "Neltharion"
 #define GOSSIP_HBD3 "Nozdormu"
 #define GOSSIP_HBD4 "Alexstrasza"
-#define GOSSIP_HBD5 "Malygos"
+constexpr std::pair<uint32, uint32> gossip_ysera = { 4763, 0 };      // Ysera is my answer.
+constexpr std::pair<uint32, uint32> gossip_neltharion = { 4763, 1 };      // Neltharion is my answer.
+constexpr std::pair<uint32, uint32> gossip_malygos = { 4763, 3 };      // Malygos is my answer.
 
 class npc_braug_dimspirit : public CreatureScript
 {
@@ -71,11 +71,11 @@ public:
 
         if (player->GetQuestStatus(6627) == QUEST_STATUS_INCOMPLETE)
         {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HBD1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HBD2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            AddGossipItemFor(player, gossip_ysera, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, gossip_neltharion, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HBD3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HBD4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HBD5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, gossip_malygos, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
             SendGossipMenuFor(player, 5820, creature->GetGUID());
         }

@@ -34,18 +34,15 @@ EndContentData */
 #include "ScriptedGossip.h"
 #include "hyjalAI.h"
 
-#define GOSSIP_ITEM_BEGIN_ALLY      "My companions and I are with you, Lady Proudmoore."
-#define GOSSIP_ITEM_ANETHERON       "We are ready for whatever Archimonde might send our way, Lady Proudmoore."
-
-#define GOSSIP_ITEM_BEGIN_HORDE     "I am with you, Thrall."
-#define GOSSIP_ITEM_AZGALOR         "We have nothing to fear."
-
 #define GOSSIP_ITEM_RETREAT         "We can't keep this up. Let's retreat!"
-
 #define GOSSIP_ITEM_TYRANDE         "Aid us in defending Nordrassil"
 #define ITEM_TEAR_OF_GODDESS        24494
-
 #define GOSSIP_ITEM_GM1             "[GM] Toggle Debug Timers"
+
+constexpr std::pair<uint32, uint32> gossip_begin_ally  = { 7552, 0 };      // My companions and I are with you, Lady Proudmoore      => 7556
+constexpr std::pair<uint32, uint32> gossip_anetheron   = { 7552, 1 };      // We are ready for whatever Archimonde might send our way, Lady Proudmoore
+constexpr std::pair<uint32, uint32> gossip_begin_horde = { 7581, 1 };      // I am with you, Thrall.
+constexpr std::pair<uint32, uint32> gossip_azgalor     = { 7581, 0 };      // We have nothing to fear.
 
 class npc_jaina_proudmoore : public CreatureScript
 {
@@ -86,9 +83,9 @@ public:
         uint32 RageEncounter = ai->GetInstanceData(DATA_RAGEWINTERCHILLEVENT);
         uint32 AnetheronEncounter = ai->GetInstanceData(DATA_ANETHERONEVENT);
         if (RageEncounter == NOT_STARTED)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_BEGIN_ALLY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, gossip_begin_ally, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         else if (RageEncounter == DONE && AnetheronEncounter == NOT_STARTED)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_ANETHERON, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            AddGossipItemFor(player, gossip_anetheron, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
         else if (RageEncounter == DONE && AnetheronEncounter == DONE)
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_RETREAT, GOSSIP_SENDER_MAIN,    GOSSIP_ACTION_INFO_DEF + 3);
 
@@ -169,9 +166,9 @@ public:
             uint32 KazrogalEvent = ai->GetInstanceData(DATA_KAZROGALEVENT);
             uint32 AzgalorEvent  = ai->GetInstanceData(DATA_AZGALOREVENT);
             if (KazrogalEvent == NOT_STARTED)
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_BEGIN_HORDE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                AddGossipItemFor(player, gossip_begin_horde, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
             else if (KazrogalEvent == DONE && AzgalorEvent == NOT_STARTED)
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_AZGALOR, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, gossip_azgalor, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
             else if (AzgalorEvent == DONE)
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_RETREAT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
         }
