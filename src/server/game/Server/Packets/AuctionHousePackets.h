@@ -21,6 +21,7 @@
 #include "ObjectGuid.h"
 #include "Packet.h"
 #include "AuctionHouseMgr.h"
+#include "Item.h"
 #include <array>
 
 class Player;
