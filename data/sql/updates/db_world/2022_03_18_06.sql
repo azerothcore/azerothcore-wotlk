@@ -1,3 +1,19 @@
+-- DB update 2022_03_18_05 -> 2022_03_18_06
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_03_18_05';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_03_18_05 2022_03_18_06 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1647384299873497497'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1647384299873497497');
 
 REPLACE INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Objectives`, `EndText`, `CompletedText`, `ObjectiveText1`, `ObjectiveText2`, `ObjectiveText3`, `ObjectiveText4`, `VerifiedBuild`) VALUES
@@ -23,3 +39,13 @@ REPLACE INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Objec
 (13088, 'zhTW', '北方廚藝', '這兒有好多的新兵，而且這些小子都餓壞啦!如果你能夠去外頭幫我弄點燉肉用的冷肉塊來，我可以教你怎麼做這道菜。', '把四塊冷肉塊交給驍勇要塞的羅利克·麥克里爾。北裂境的任何野獸身上都能取得冷肉塊。', '', '到北風凍原的驍勇要塞找羅利克·麥克里爾。', '', '', '', '', 0),
 (13089, 'zhTW', '北方廚藝', '沒有什麼比一道新鮮燉肉更能夠讓你暖暖身子的了。替我從這地方的野獸身上弄點冷肉塊來，我就教你做一道熱騰騰的燉肉。', '把四塊冷肉塊交給復仇臺地的湯瑪士‧寇里奇歐。北裂境的任何野獸身上都能找到冷肉塊。', '', '到凜風峽灣的復仇臺地找湯瑪士·寇里奇歐。', '', '', '', '', 0),
 (13090, 'zhTW', '北方廚藝', '戰歌進攻部隊的戰士們需要填飽肚子維持力量。如果你能夠從犀牛或其他野獸身上弄點冷肉塊來，我就能為他們做點燉肉。如果你想的話，我也很樂意教你食譜。', '把四塊冷肉塊交給戰歌堡的翁恩‧柔蹄。北裂境的任何野獸身上都能取得冷肉塊。', '', '到北風凍原的戰歌堡找翁恩·柔蹄。', '', '', '', '', 0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_03_18_06' WHERE sql_rev = '1647384299873497497';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
