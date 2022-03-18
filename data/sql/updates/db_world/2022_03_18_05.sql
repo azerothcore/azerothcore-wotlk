@@ -1,3 +1,19 @@
+-- DB update 2022_03_18_04 -> 2022_03_18_05
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_03_18_04';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_03_18_04 2022_03_18_05 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1647384164947318079'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1647384164947318079');
 
 REPLACE INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Objectives`, `EndText`, `CompletedText`, `ObjectiveText1`, `ObjectiveText2`, `ObjectiveText3`, `ObjectiveText4`, `VerifiedBuild`) VALUES
@@ -55,3 +71,13 @@ REPLACE INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Objec
 (13166,'zhTW','黯黑堡爭奪戰','指揮大廳的局勢已經安定下來了，但是巫妖王在亞榭洛之心留給了我們一份小禮物。七拼八湊的恐怖人物，縫補者，另外還有一幫憎惡體佔據著二樓。$B$B使用這個傳送門，到二樓去清除天譴軍團的餘孽。別單獨面對縫補者!你得和亞榭洛的死亡騎士一起對付那個怪物!$B$B去吧，$n。我會罩你的!','殺掉10個天譴軍團，並協助殺掉縫補者。事成之後，向大領主達瑞安‧莫格萊尼回報。','','到黯黑堡找大領主達瑞安·莫格萊尼。','殺害天譴軍團','殺害天譴軍團','','',0),
 (13188,'zhTW','諸王之道','你從今而後，永遠都是一名黯刃騎士，$n，但你要知道：你曾是聯盟的英雄。$B$B<達瑞安凝視著你。>$B$B我們的騎士團若要存活下去，必定得要建立盟友。你必須代表黯刃騎士團前往聯盟。$B$B在我東南方的平臺上，有個通往暴風城的傳送門。帶著這封由弗丁為你所寫的信，送到安杜因‧烏瑞恩國王手中。通過傳送門吧。','把信件送給聯盟的國王，暴風城的暴風要塞中的安杜因‧烏瑞恩。','','到暴風城找瓦里安·烏瑞恩國王。','','','','',0),
 (13189,'zhTW','薩魯法爾的祝福','你從今而後，永遠都是一名黯刃騎士，$n，但你要知道：你曾是部落的英雄。$B$B<達瑞安凝視著你。>$B$B我們的騎士團若要存活下去，必定得要建立盟友。你必須代表黯刃騎士團前往部落。$B$B在我東南方的平臺上，有個通往奧格瑪的傳送門。帶著這封由弗丁為你所寫的信，送到薩魯法爾霸王手中。通過傳送門吧。','把信件送到奧格瑪交給薩魯法爾霸王。','','到奧格瑪找索爾。','','','','',0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_03_18_05' WHERE sql_rev = '1647384164947318079';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
