@@ -1,3 +1,19 @@
+-- DB update 2022_03_18_13 -> 2022_03_18_14
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_03_18_13';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_03_18_13 2022_03_18_14 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1647385217273847981'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1647385217273847981');
 
 -- 10808 Frustra los planes del Cónclave
@@ -311,3 +327,13 @@ DELETE FROM `quest_offer_reward_locale` WHERE `id` = @ID AND `locale` IN('esES',
 INSERT INTO `quest_offer_reward_locale` (`id`, `locale`, `RewardText`, `VerifiedBuild`) VALUES
 (@ID, 'esES', 'Los Vekh\'nir son los más inferiores de nuestros adversarios.$B$BAsí que sabes cómo matar a un pájaro grande. Eso no te convierte en $gun guerrero auténtico:una guerrera auténtica;. Eso no te da una comprensión total de nuestros hábitos.$B$BPero es un comienzo.', 0),
 (@ID, 'esMX', 'Los Vekh\'nir son los más inferiores de nuestros adversarios.$B$BAsí que sabes cómo matar a un pájaro grande. Eso no te convierte en $gun guerrero auténtico:una guerrera auténtica;. Eso no te da una comprensión total de nuestros hábitos.$B$BPero es un comienzo.', 0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_03_18_14' WHERE sql_rev = '1647385217273847981';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
