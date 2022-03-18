@@ -1,3 +1,19 @@
+-- DB update 2022_03_18_02 -> 2022_03_18_03
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_03_18_02';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_03_18_02 2022_03_18_03 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1647383840526735676'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1647383840526735676');
 
 REPLACE INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `VerifiedBuild`) VALUES
@@ -298,3 +314,13 @@ REPLACE INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Objec
 (11698,'zhTW','不如徹底消滅天譴軍團','如果那些洞穴上方的教徒們可以在這場破壞中存活下來，那麼只能假定西邊那個倒坍的亡域當中仍充滿著天譴軍團。前方的池子也一定滿滿的都是天譴軍！$B$B雖然你人在塔爾拉瑪斯，$c，你覺得你可以殺光所有在那發現的巫妖王奴僕嗎？','摧毀20個位於塔爾拉瑪斯和膿瘡之池的天譴軍，不限種類。接著，回到北風凍原的垂死獸穴正南方找碧西‧扭柄。','','','摧毀塔爾拉瑪斯的天譴軍','','','',0),
 (11700,'zhTW','通知碧西','我不幸的雙胞胎現在正在不知名的某處。$B$B我很確定她沒回到簡易機場來。事實上，不管她最後到了哪，氣溫都會比這裡還冷。不過我只能偶爾「感覺」到她而已。$B$B喔好吧，我會重新裝配這東西然後盡快將自己傳送回簡易機場。在這同時，你覺得你可以到東邊去通知碧西，到時我將會跟她在那會合嗎？$B$B謝啦，$n！','與垂死獸穴南方的碧西‧扭柄談談。','','','','','','',0),
 (11701,'zhTW','回到簡易機場','好了，我想我也要開始返回簡易機場了。當然，拖著這隻受傷的腿我會移動的比較慢。$B$B唉，你覺得你可以在我抵達之前先到那裡將好消息傳給老嘶軸嗎？我敢確定一定會有獎勵等著你。$B$B謝啦，$n！','到北風凍原的嘶軸簡易機場找嘶軸‧滿閥談談。','','','','','','',0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_03_18_03' WHERE sql_rev = '1647383840526735676';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
