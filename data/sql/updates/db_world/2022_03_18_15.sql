@@ -1,3 +1,19 @@
+-- DB update 2022_03_18_14 -> 2022_03_18_15
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_03_18_14';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_03_18_14 2022_03_18_15 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1647201624014939664'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1647201624014939664');
 
 REPLACE INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Objectives`, `EndText`, `CompletedText`, `ObjectiveText1`, `ObjectiveText2`, `ObjectiveText3`, `ObjectiveText4`, `VerifiedBuild`) VALUES
@@ -190,3 +206,13 @@ REPLACE INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Objec
 (11001,'zhTW','擊敗烏鴉神','在對付烏鴉神一事上，我們已經沒有時間浪費了。你必須將精華灌注的月亮石帶到一個具有強大魔力的地方，引誘烏鴉神離開對他而言是安全的翡翠夢境。$B$B前往塞司克大廳將月亮石鑲在烏鴉之爪上。這個地點位於鷹王的大廳之前的一個密室裡。$B$B我們必須讓安祖相信他的信徒已經聚集起來準備迎接他降臨這個世界。等他現身的時候，別放過他！','殺死烏鴉神並且回到塞納里奧避難所的莫西斯·語翼那裡。$B$B此任務只能在英雄難度的地城內完成。','','到贊加沼澤的塞納里奧避難所找莫西斯·語翼。','','','','',0),
 (10999,'zhTW','見一個殺一個','我要8顆穴居怪的石牙。','我要8顆穴居怪的石牙。','','找喬·蘭姆西。','','','','',0),
 (10994,'zhTW','尋找月亮石','如果能將三種精華與某種罕見的寶石——比如南國之怒月亮石——相結合，它們所釋放的能量就應該可以引出安蘇。$B$B眼下惟一的問題是南國之怒月亮石非常稀有，據說只有在艾薩拉的懸崖邊才能找到這種寶石。去艾薩拉的懸崖瀑布附近尋找吧。$B$B昨晚，有一隊暗夜精靈在搜尋南國之怒月亮石的過程中慘遭不幸。他們的船隻仍然停泊在河岸邊，他們就是在那裡看到月亮石的。多留心一點，在艾薩拉一岸仔細尋找吧。','將一塊南國之怒月亮石交給塞納裡奧庇護所的莫希斯·輕翼。','','到贊加沼澤的塞納里奧避難所找莫西斯·語翼。','','','','',0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_03_18_15' WHERE sql_rev = '1647201624014939664';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
