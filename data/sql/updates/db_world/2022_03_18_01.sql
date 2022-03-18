@@ -1,3 +1,19 @@
+-- DB update 2022_03_18_00 -> 2022_03_18_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_03_18_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_03_18_00 2022_03_18_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1647383101536190010'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1647383101536190010');
 
 REPLACE INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Objectives`, `EndText`, `CompletedText`, `ObjectiveText1`, `ObjectiveText2`, `ObjectiveText3`, `ObjectiveText4`, `VerifiedBuild`) VALUES
@@ -689,3 +705,13 @@ REPLACE INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Objec
 (11728,'zhTW','狼便便','不管你要做什麼，千萬不要自己吃了餌食。只要把餌食放在那些沾染油污的狼附近。如果他們真的餓到吃下膠捲，他們只要一聞到餌食就會立刻跑過來。$B$B接來你只需要靜靜的等待時間處理，然後你就可以搜索那些，呃...膠捲的副產品。$B$B我應該要提供你特殊的工作用狼便便夾，但是我把它忘在簡易機場了。我怕你得...呃...用傳統一點的手法處理。','沸水之池的『尾旋』艾基‧榫栓要你收集8個微縮膠捲。','','到北風凍原的沸水之池找『尾旋』艾基·榫栓。','','','','',0),
 (11729,'zhTW','超音波式螺絲起子','你剛卸下的部分有個東西在它的機械內部。$B$B這看起蠻複雜的…簡易機場的人應該會有興趣看一看這玩意兒。譬如說卡芙緹‧顛鏈？','將超音波螺絲起子交給嘶軸簡易機場的卡芙緹‧顛鏈。','','到北風凍原的嘶軸簡易機場找卡芙緹·顛鏈。','','','','',0),
 (11730,'zhTW','主人與僕從','終極工具就是這把超音波式螺絲起子。它能夠對機械產品為所欲為!$B$B回到池子中拆解掉梅卡佐德的機器人。接著你就可以對它們的殘體使用螺絲起子，我打賭他們將會轉向我們這邊，至少短時間內會是這樣。$B$B我很確定這對機械地精一點用都沒有，所以就放過他們吧。$B$B喔，如果你想要從機器人身上拿點什麼的話，你會想要在使用螺絲起子前先下手!','使用超音波式螺絲起子重新設定15個機器人，接著回去嘶軸簡易機場找卡芙緹‧顛鏈。$B$B記得要先拾取再進行重設。','','到北風凍原的嘶軸簡易機場找卡芙緹·顛鏈。','重新設定機器人','','','',0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_03_18_01' WHERE sql_rev = '1647383101536190010';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
