@@ -1,3 +1,19 @@
+-- DB update 2022_03_16_01 -> 2022_03_18_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_03_16_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_03_16_01 2022_03_18_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1646922359631359324'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1646922359631359324');
 
 REPLACE INTO `quest_template_locale` (ID, locale, Title, Details, Objectives, EndText, CompletedText, ObjectiveText1, ObjectiveText2, ObjectiveText3,  ObjectiveText4, VerifiedBuild)
@@ -445,3 +461,13 @@ VALUES
 (24849,'zhTW','重要線索','這故事最好從頭講起。$n，我對他一見鍾情。從我見到那位哥布林的那一刻開始就愛上他了。$B$B在一起度過甜蜜的一週之後，史尼佛說他收到了一大筆錢，並且要帶我去南海度個長假!你相信嗎? $B$B總而言之，他說他去銀行、拍賣場以及美髮沙龍辦事情的時候，要我先整理行李，但是他就再也沒回來過了!我開始覺得他只是一個大騙子!','到暴風城的會計室、拍賣場以及美容沙龍，尋找史尼佛‧鏽彈的身影。','','到暴風城找瑪莉恩·蘇頓。','搜索暴風城會計室','搜索暴風城拍賣場','搜索暴風城美容沙龍','',0),
 (24850,'zhTW','史尼佛的心上人','孩子，這可不只是關於香水。箱子裡面還放著一些火箭，火箭內建了某種化學彈頭。我無法在這裡做分析，不過我會讓你省去跑一趟實驗室的麻煩。$B$B你只要去拜訪一下製作這些東西的人就好。我認得這個製造者的標誌。就是史尼佛‧鏽彈。$B$B我聽說史尼佛住在奧格瑪。還聽說他有個女朋友，是個叫做蘿卡的獸人女子。她會和他在暗巷區中的『高特雷的旅行裝備』集合，然後一起逃離這裡。','到奧格瑪暗巷區的『高特雷的旅行裝備』找蘿卡交談。','','','','','','',0),
 (24851,'zhTW','重要線索','這故事最好從頭講起。$n，我對他一見鍾情。從我見到那位哥布林的那一刻開始就愛上他了。$B$B在一起度過甜蜜的一週之後，史尼佛說他收到了一大筆錢，並且要帶我去南海度個長假！你相信嗎？ $B$B總而言之，他說他去銀行、拍賣場以及美髮沙龍辦事情的時候，要我先整理行李，但是他就再也沒回來過了！我開始覺得他只是一個大騙子！','到奧格瑪力量谷的銀行、拍賣場以及美容沙龍，尋找史尼佛‧鏽彈的身影。','','到奧格瑪的高特雷的旅行裝備找蘿卡。','搜索奧格瑪銀行','搜索奧格瑪拍賣場','搜索奧格瑪美容沙龍','',0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_03_18_00' WHERE sql_rev = '1646922359631359324';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
