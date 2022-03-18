@@ -1,3 +1,19 @@
+-- DB update 2022_03_18_01 -> 2022_03_18_02
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_03_18_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_03_18_01 2022_03_18_02 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1647383682932560234'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1647383682932560234');
 
 REPLACE INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Objectives`, `EndText`, `CompletedText`, `ObjectiveText1`, `ObjectiveText2`, `ObjectiveText3`, `ObjectiveText4`, `VerifiedBuild`) VALUES
@@ -599,3 +615,13 @@ REPLACE INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Objec
 (12702,'zhTW','雞派對!','我賭你猜不到發生什麼事了。$B$B不，當然不是茍瑞格克或是雞。$B$B好吧，我騙人的，苟瑞格克又讓雞跑出來了。笨苟瑞格克和鬼叫的肚子。$B$B如果你需要任何獵人的協助，儘管跟我說...他們就在附近某處。','給狂心之丘的長者哈爾凱克逮住12隻逃跑雞。','','到休拉薩盆地的狂心之丘找長者哈爾凱克。','','','','',0),
 (12704,'zhTW','取悅偉大雨石','自從苔行者被攻擊以來，我就擔心是我們對偉大雨石不夠好...也許我們太貪心。我們需要貢獻更多財寶!$B$B你上次很擅長找亮晶晶...也許你可以多找一點?你也許需要好雨頌者的幫忙。告訴我們需要誰就好。','雨頌者之篷的高階神諭者蘇-楔要你帶著一個同伴挖掘收集6個閃亮的財寶。$B$B記得向雨頌者之蓬的高階神諭者蘇-楔要你先前的同伴。','','到休拉薩盆地的雨頌者之蓬找高階神諭者蘇-楔。','','','','',0),
 (12804,'zhTW','適合獵人的肉排','有些時候，一個塞滿了獵人的營地是再糟不過的地方了。他們全都忙著捕殺獵物，結果我只弄得到又硬又多筋的肉。這不會是你狩獵累了一天回家想吃到的東西。$B$B不過，幸運的是，附近有地方可以取得柔軟，多汁的肉。在營地和河川的南邊有些長頸食草者。他們就是咱們飢餓獵人的最佳食物來源。幫我帶些最棒的肉塊回來，然後我們就能夠好好款待我們的同志們。','把5塊長頸食草者肉排帶回去奈辛瓦里營地給『斬擊者』寇爾格。','','到休拉薩盆地的奈辛瓦里營地找『斬擊者』寇爾格。','','','','',0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_03_18_02' WHERE sql_rev = '1647383682932560234';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
