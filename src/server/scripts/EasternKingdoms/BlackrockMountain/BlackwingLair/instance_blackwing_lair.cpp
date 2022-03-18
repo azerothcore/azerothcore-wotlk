@@ -254,7 +254,6 @@ public:
                             }
                         }
                     }
-                    SetData(DATA_EGG_EVENT, NOT_STARTED);
                     break;
                 case DATA_CHROMAGGUS:
                     if (state == DONE)
@@ -311,7 +310,7 @@ public:
 
                         break;
                     case SPECIAL:
-                        if (++EggCount >= EggList.size())
+                        if (++EggCount >= 3)
                         {
                             if (Creature* razor = instance->GetCreature(razorgoreGUID))
                             {

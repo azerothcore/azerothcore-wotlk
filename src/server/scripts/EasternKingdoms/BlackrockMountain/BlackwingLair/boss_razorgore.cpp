@@ -120,6 +120,19 @@ public:
             {
                 troops->AI()->Talk(EMOTE_TROOPS_RETREAT);
             }
+
+            for (ObjectGuid const& guid : _summonGUIDS)
+            {
+                if (Creature* creature = ObjectAccessor::GetCreature(*me, guid))
+                {
+                    if (creature->IsAlive())
+                    {
+                        creature->CombatStop(true);
+                        creature->SetReactState(REACT_PASSIVE);
+                        creature->GetMotionMaster()->MovePoint(0, Position(-7560.568848f, -1028.553345f, 408.491211f, 0.523858f));
+                    }
+                }
+            }
         }
 
         void SetGUID(ObjectGuid const guid, int32 /*id*/) override
@@ -148,6 +161,20 @@ public:
             if (action == TALK_EGG_BROKEN_RAND)
             {
                 Talk(urand(SAY_EGGS_BROKEN1, SAY_EGGS_BROKEN3));
+            }
+        }
+
+        void JustSummoned(Creature* summon) override
+        {
+            _summonGUIDS.push_back(summon->GetGUID());
+            summon->SetOwnerGUID(me->GetGUID());
+        }
+
+        void SummonMovementInform(Creature* summon, uint32 movementType, uint32 pathId) override
+        {
+            if (movementType == POINT_MOTION_TYPE)
+            {
+                summon->DespawnOrUnsummon();
             }
         }
 
@@ -216,7 +243,7 @@ public:
         bool secondPhase;
         bool _died;
         ObjectGuid _charmerGUID;
-        GuidVector _summons;
+        GuidVector _summonGUIDS;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
