@@ -1621,7 +1621,7 @@ float WorldObject::GetGridActivationRange() const
 {
     if (ToPlayer())
     {
-        if (ToPlayer()->IsOnCinematic())
+        if (ToPlayer()->GetCinematicMgr()->IsOnCinematic())
         {
             return DEFAULT_VISIBILITY_INSTANCE;
         }
@@ -1688,7 +1688,7 @@ float WorldObject::GetSightRange(WorldObject const* target) const
                     {
                         return MAX_VISIBILITY_DISTANCE;
                     }
-                    else if (ToPlayer()->IsOnCinematic())
+                    else if (ToPlayer()->GetCinematicMgr()->IsOnCinematic())
                     {
                         return DEFAULT_VISIBILITY_INSTANCE;
                     }

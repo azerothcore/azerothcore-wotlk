@@ -64,4 +64,9 @@ inline void ExecuteScript(std::function<void(ScriptName*)> executeHook)
     }
 }
 
+inline bool ReturnValidBool(Optional<bool> ret, bool need = false)
+{
+    return ret && *ret ? need : !need;
+}
+
 #endif // _SCRIPT_MGR_MACRO_H_
