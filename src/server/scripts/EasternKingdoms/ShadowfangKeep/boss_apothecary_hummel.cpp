@@ -71,7 +71,8 @@ enum ApothecaryMisc
     NPC_VIAL_BUNNY          = 36530,
     NPC_CROWN_APOTHECARY    = 36885,
     PHASE_ALL               = 0,
-    PHASE_INTRO             = 1
+    PHASE_INTRO             = 1,
+    PHASE_COMBAT            = 2
 };
 
 Position const BaxterMovePos = { -221.4115f, 2206.825f, 79.93151f, 0.0f };
@@ -108,22 +109,21 @@ public:
             _deadCount = 0;
             _isDead = false;
             _phase = PHASE_ALL;
+            summons.DespawnAll();
             me->SetFaction(FACTION_FRIENDLY);
             me->SummonCreatureGroup(1);
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
         }
 
-        void EnterEvadeMode(EvadeReason why) override
+        void JustSummoned(Creature* summon) override
         {
-            summons.DespawnAll();
-            _EnterEvadeMode(why);
+            summons.Summon(summon);
         }
 
         void DoAction(int32 action) override
         {
-            if (action == ACTION_START_EVENT && events.IsInPhase(PHASE_ALL))
+            if (action == ACTION_START_EVENT && _phase == PHASE_ALL)
             {
-                events.SetPhase(PHASE_INTRO);
                 _phase = PHASE_INTRO;
                 _scheduler.Schedule(1ms, [this](TaskContext /*context*/)
                 {
@@ -140,6 +140,7 @@ public:
                 .Schedule(12s, [this](TaskContext context)
                 {
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    _phase = PHASE_COMBAT;
                     DoZoneInCombat();
 
                     context.Schedule(6s, [this](TaskContext /*context*/) // Call Baxter

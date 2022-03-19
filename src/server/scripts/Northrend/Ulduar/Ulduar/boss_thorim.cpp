@@ -592,7 +592,10 @@ public:
                         chestId += 1; // hard mode offset
 
                     if ((go = me->SummonGameObject(chestId, 2134.73f, -286.32f, 419.51f, 0.0f, 0, 0, 0, 0, 0)))
+                    {
                         go->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
+                        go->SetLootRecipient(me->GetMap());
+                    }
 
                     // Defeat credit
                     if (m_pInstance)
