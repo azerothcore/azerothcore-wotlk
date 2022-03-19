@@ -775,7 +775,7 @@ uint32 Player::EnvironmentalDamage(EnviromentalDamage type, uint32 damage)
         case DAMAGE_LAVA:
         case DAMAGE_SLIME:
         {
-            DamageInfo dmgInfo(this, this, damage, nullptr, type == DAMAGE_LAVA ? SPELL_SCHOOL_MASK_FIRE : SPELL_SCHOOL_MASK_NATURE, DIRECT_DAMAGE);
+            DamageInfo dmgInfo(this, this, damage, nullptr, type == DAMAGE_LAVA ? SPELL_SCHOOL_MASK_FIRE : SPELL_SCHOOL_MASK_NATURE, DIRECT_DAMAGE, BASE_ATTACK);
             Unit::CalcAbsorbResist(dmgInfo);
             absorb = dmgInfo.GetAbsorb();
             resist = dmgInfo.GetResist();
@@ -7059,7 +7059,7 @@ void Player::CastItemCombatSpell(DamageInfo const& damageInfo)
 
     // Xinef: do not use disarmed weapons, special exception - shaman ghost wolf form
     // Xinef: normal forms proc on hit enchants / built in item bonuses
-    if (!CanUseAttackType(attType) || GetShapeshiftForm() == FORM_GHOSTWOLF)
+    if (!CanUseAttackType(damageInfo.GetAttackType()) || GetShapeshiftForm() == FORM_GHOSTWOLF)
         return;
 
     for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
