@@ -51,7 +51,8 @@ enum Events
 
 enum Actions
 {
-    ACTION_DISARMED   = 0
+    ACTION_DEACTIVATE = 0,
+    ACTION_DISARMED   = 1
 };
 
 class boss_broodlord : public CreatureScript
@@ -73,6 +74,16 @@ public:
             events.ScheduleEvent(EVENT_MORTALSTRIKE, 20000);
             events.ScheduleEvent(EVENT_KNOCKBACK, 30000);
             events.ScheduleEvent(EVENT_CHECK, 1000);
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            _JustDied();
+
+            std::list<GameObject*> _goList;
+            GetGameObjectListWithEntryInGrid(_goList, me, GO_SUPPRESSION_DEVICE, 200.0f);
+            for (std::list<GameObject*>::const_iterator itr = _goList.begin(); itr != _goList.end(); itr++)
+                ((*itr)->AI()->DoAction(ACTION_DEACTIVATE));
         }
 
         void UpdateAI(uint32 diff) override
@@ -134,6 +145,7 @@ class go_suppression_device : public GameObjectScript
         {
             switch (state)
             {
+
                 case GO_JUST_DEACTIVATED: // This case prevents the Gameobject despawn by Disarm Trap
                     go->SetLootState(GO_READY);
                     [[fallthrough]];
@@ -183,7 +195,12 @@ class go_suppression_device : public GameObjectScript
 
             void DoAction(int32 action) override
             {
-                if (action == ACTION_DISARMED)
+                if (action == ACTION_DEACTIVATE)
+                {
+                    Deactivate();
+                    _events.CancelEvent(EVENT_SUPPRESSION_RESET);
+                }
+                else if (action == ACTION_DISARMED)
                 {
                     Deactivate();
                     _events.CancelEvent(EVENT_SUPPRESSION_CAST);
