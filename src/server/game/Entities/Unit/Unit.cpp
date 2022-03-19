@@ -3009,11 +3009,18 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit* victim, SpellInfo const* spellInfo
         thisLevel = std::max<int32>(thisLevel, spellInfo->SpellLevel);
     int32 levelDiff = int32(victim->getLevelForTarget(this)) - thisLevel;
 
-    int32 MISS_CHANCE_MULTIPLIER = sWorld->getRate(
+    int32 MISS_CHANCE_MULTIPLIER;
+    if (sWorld->getBoolConfig(CONFIG_MISS_CHANCE_MULTIPLIER_ONLY_FOR_PLAYERS) && GetTypeId() != TYPEID_PLAYER) // keep it as it was originally (7 and 11)
+    {
+        MISS_CHANCE_MULTIPLIER = victim->GetTypeId() == TYPEID_PLAYER ? 7 : 11;
+    }
+    else
+    {
+        MISS_CHANCE_MULTIPLIER = sWorld->getRate(
             victim->GetTypeId() == TYPEID_PLAYER
             ? RATE_MISS_CHANCE_MULTIPLIER_TARGET_PLAYER
-            : RATE_MISS_CHANCE_MULTIPLIER_TARGET_CREATURE
-    );
+            : RATE_MISS_CHANCE_MULTIPLIER_TARGET_CREATURE);
+    }
 
     // Base hit chance from attacker and victim levels
     int32 modHitChance = levelDiff < 3
@@ -3139,7 +3146,7 @@ SpellMissInfo Unit::SpellHitResult(Unit* victim, SpellInfo const* spell, bool Ca
         return SPELL_MISS_NONE;
 
     // Return evade for units in evade mode
-    if (victim->GetTypeId() == TYPEID_UNIT && victim->ToCreature()->IsEvadingAttacks() && !spell->HasAura(SPELL_AURA_CONTROL_VEHICLE))
+    if (victim->GetTypeId() == TYPEID_UNIT && victim->ToCreature()->IsEvadingAttacks() && !spell->HasAura(SPELL_AURA_CONTROL_VEHICLE) && !spell->HasAttribute(SPELL_ATTR0_CU_IGNORE_EVADE))
         return SPELL_MISS_EVADE;
 
     // Try victim reflect spell
@@ -7226,6 +7233,12 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (!victim)
                         return false;
 
+                    // Do not proc from Glyph of Holy Light and Judgement of Light
+                    if (procSpell->Id == 20267 || procSpell->Id == 54968)
+                    {
+                        return false;
+                    }
+
                     Unit* beaconTarget = triggeredByAura->GetBase()->GetCaster();
                     if (!beaconTarget || beaconTarget == this || !beaconTarget->GetAura(53563, victim->GetGUID()))
                         return false;
@@ -9049,22 +9062,6 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
             ToPlayer()->RemoveCategoryCooldown(1248);
         }
     }
-    else if (auraSpellInfo->SpellFamilyName == SPELLFAMILY_DRUID)
-    {
-        // Nature's Grasp
-        if( triggerEntry->SpellIconID == 20 )
-        {
-            if (!victim)
-                return false;
-
-            if (AuraEffect* aurEff = victim->GetAuraEffect(SPELL_AURA_MOD_ROOT, SPELLFAMILY_DRUID, 20, 0))
-                if ((aurEff->GetBase()->GetMaxDuration() - aurEff->GetBase()->GetDuration()) < 1000)
-                    return false;
-
-            CastSpell(victim, trigger_spell_id, true);
-            return true;
-        }
-    }
 
     // Custom basepoints/target for exist spell
     // dummy basepoints or other customs
@@ -9140,8 +9137,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
         case 14189: // Seal Fate (Netherblade set)
         case 14157: // Ruthlessness
             {
-                if (!victim || victim == this)
-                    return false;
+                victim = nullptr;
                 // Need add combopoint AFTER finish movie (or they dropped in finish phase)
                 break;
             }
@@ -14402,20 +14398,35 @@ void Unit::ApplyDiminishingAura(DiminishingGroup group, bool apply)
 float Unit::GetSpellMaxRangeForTarget(Unit const* target, SpellInfo const* spellInfo) const
 {
     if (!spellInfo->RangeEntry)
+    {
         return 0;
-    if (spellInfo->RangeEntry->RangeMin[1] == spellInfo->RangeEntry->RangeMin[0])
+    }
+
+    if (spellInfo->RangeEntry->RangeMax[1] == spellInfo->RangeEntry->RangeMax[0])
+    {
         return spellInfo->GetMaxRange();
-    if (target == nullptr)
+    }
+
+    if (!target)
+    {
         return spellInfo->GetMaxRange(true);
+    }
+
     return spellInfo->GetMaxRange(!IsHostileTo(target));
 }
 
 float Unit::GetSpellMinRangeForTarget(Unit const* target, SpellInfo const* spellInfo) const
 {
     if (!spellInfo->RangeEntry)
+    {
         return 0;
+    }
+
     if (spellInfo->RangeEntry->RangeMin[1] == spellInfo->RangeEntry->RangeMin[0])
+    {
         return spellInfo->GetMinRange();
+    }
+
     return spellInfo->GetMinRange(!IsHostileTo(target));
 }
 
@@ -15806,7 +15817,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                     continue;
                 }
 
-                switch(triggeredByAura->GetAuraType())
+                switch (triggeredByAura->GetAuraType())
                 {
                     case SPELL_AURA_PROC_TRIGGER_SPELL:
                         {
@@ -15946,6 +15957,19 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                             break;
                         takeCharges = true;
                         break;
+                    case SPELL_AURA_ADD_FLAT_MODIFIER:
+                    case SPELL_AURA_ADD_PCT_MODIFIER:
+                    {
+                        if (SpellModifier* mod = triggeredByAura->GetSpellModifier())
+                        {
+                            if (mod->op == SPELLMOD_CASTING_TIME && procSpell && (procSpell->GetTriggeredCastFlags() & TRIGGERED_CAST_DIRECTLY) != 0)
+                            {
+                                break;
+                            }
+                        }
+                        takeCharges = true;
+                        break;
+                    }
                     default:
                         takeCharges = true;
                         break;
@@ -19916,7 +19940,7 @@ bool Unit::SetWalk(bool enable)
     return true;
 }
 
-bool Unit::SetDisableGravity(bool disable, bool /*packetOnly = false*/)
+bool Unit::SetDisableGravity(bool disable, bool /*packetOnly = false*/, bool /*updateAnimationTier = true*/)
 {
     if (disable == IsLevitating())
         return false;
@@ -20015,7 +20039,7 @@ void Unit::SendMovementFeatherFall(Player* sendTo)
     sendTo->SendDirectMessage(&data);
 }
 
-bool Unit::SetHover(bool enable, bool /*packetOnly = false*/)
+bool Unit::SetHover(bool enable, bool /*packetOnly = false*/, bool /*updateAnimationTier = true*/)
 {
     if (enable == HasUnitMovementFlag(MOVEMENTFLAG_HOVER))
         return false;

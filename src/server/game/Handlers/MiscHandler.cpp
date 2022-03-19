@@ -958,7 +958,7 @@ void WorldSession::HandleCompleteCinematic(WorldPacket& /*recv_data*/)
     LOG_DEBUG("network", "WORLD: Received CMSG_COMPLETE_CINEMATIC");
 }
     // If player has sight bound to visual waypoint NPC we should remove it
-    GetPlayer()->EndCinematic();
+    GetPlayer()->GetCinematicMgr()->EndCinematic();
 }
 
 void WorldSession::HandleNextCinematicCamera(WorldPacket& /*recv_data*/)
@@ -967,7 +967,7 @@ void WorldSession::HandleNextCinematicCamera(WorldPacket& /*recv_data*/)
     LOG_DEBUG("network", "WORLD: Received CMSG_NEXT_CINEMATIC_CAMERA");
 }
     // Sent by client when cinematic actually begun. So we begin the server side process
-    GetPlayer()->BeginCinematic();
+    GetPlayer()->GetCinematicMgr()->BeginCinematic();
 }
 
 void WorldSession::HandleFeatherFallAck(WorldPacket& recv_data)
@@ -1530,7 +1530,7 @@ void WorldSession::HandleMoveSetCanFlyAckOpcode(WorldPacket& recv_data)
     _player->m_mover->m_movementInfo.flags = movementInfo.GetMovementFlags();
 }
 
-void WorldSession::HandleRequestPetInfoOpcode(WorldPacket& /*recv_data */)
+void WorldSession::HandleRequestPetInfo(WorldPackets::Pet::RequestPetInfo& /*packet*/)
 {
     /*
         LOG_DEBUG("network.opcode", "WORLD: CMSG_REQUEST_PET_INFO");
