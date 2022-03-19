@@ -1176,7 +1176,7 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
         {
             int32 i = 0;
             flag96 _mask = 0;
-            SpellModList const& spellMods = pCurrChar->GetSpellModList(opType);
+            SpellModContainer const& spellMods = pCurrChar->GetSpellModContainer(opType);
             if (spellMods.empty())
                 continue;
 

@@ -31,12 +31,11 @@
 
 enum MageSpells
 {
-    // Ours
+    SPELL_MAGE_BLAZING_SPEED                     = 31643,
     SPELL_MAGE_BURNOUT_TRIGGER                   = 44450,
     SPELL_MAGE_IMPROVED_BLIZZARD_CHILLED         = 12486,
     SPELL_MAGE_COMBUSTION                        = 11129,
 
-    // Theirs
     SPELL_MAGE_COLD_SNAP                         = 11958,
     SPELL_MAGE_FOCUS_MAGIC_PROC                  = 54648,
     SPELL_MAGE_FROST_WARDING_R1                  = 11189,
@@ -55,6 +54,31 @@ enum MageSpells
     SPELL_MAGE_SUMMON_WATER_ELEMENTAL_PERMANENT  = 70908,
     SPELL_MAGE_SUMMON_WATER_ELEMENTAL_TEMPORARY  = 70907,
     SPELL_MAGE_GLYPH_OF_BLAST_WAVE               = 62126,
+};
+
+// -31641 - Blazing Speed
+class spell_mage_blazing_speed : public AuraScript
+{
+    PrepareAuraScript(spell_mage_blazing_speed);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_MAGE_BLAZING_SPEED });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        if (Unit* target = eventInfo.GetActionTarget())
+        {
+            target->CastSpell(target, SPELL_MAGE_BLAZING_SPEED, true, nullptr, aurEff);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_mage_blazing_speed::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
 };
 
 class spell_mage_arcane_blast : public SpellScript
@@ -99,7 +123,7 @@ class spell_mage_burning_determination : public AuraScript
             return false;
 
         // Xinef: immuned effect should just eat charge
-        if (eventInfo.GetHitMask() & PROC_EX_IMMUNE)
+        if (eventInfo.GetHitMask() & PROC_HIT_IMMUNE)
         {
             eventInfo.GetActionTarget()->RemoveAurasDueToSpell(54748);
             return false;
@@ -934,6 +958,7 @@ class spell_mage_summon_water_elemental : public SpellScript
 
 void AddSC_mage_spell_scripts()
 {
+    RegisterSpellScript(spell_mage_blazing_speed);
     RegisterSpellScript(spell_mage_arcane_blast);
     RegisterSpellScript(spell_mage_burning_determination);
     RegisterSpellScript(spell_mage_molten_armor);

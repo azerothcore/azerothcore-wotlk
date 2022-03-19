@@ -33,6 +33,13 @@
 
 enum DeathKnightSpells
 {
+    SPELL_DK_ACCLIMATION_HOLY                   = 50490,
+    SPELL_DK_ACCLIMATION_FIRE                   = 50362,
+    SPELL_DK_ACCLIMATION_FROST                  = 50485,
+    SPELL_DK_ACCLIMATION_ARCANE                 = 50486,
+    SPELL_DK_ACCLIMATION_SHADOW                 = 50489,
+    SPELL_DK_ACCLIMATION_NATURE                 = 50488,
+    SPELL_DK_ADVANTAGE_T10_4P_MELEE             = 70657,
     SPELL_DK_DEATH_AND_DECAY_TRIGGER            = 52212,
     SPELL_DK_GLYPH_OF_SCOURGE_STRIKE            = 58642,
     SPELL_DK_WANDERING_PLAGUE_TRIGGER           = 50526,
@@ -59,6 +66,7 @@ enum DeathKnightSpells
     SPELL_DK_IMPROVED_BLOOD_PRESENCE_R1         = 50365,
     SPELL_DK_IMPROVED_FROST_PRESENCE_R1         = 50384,
     SPELL_DK_IMPROVED_UNHOLY_PRESENCE_R1        = 50391,
+    SPELL_DK_IMPROVED_BLOOD_PRESENCE_HEAL       = 50475,
     SPELL_DK_IMPROVED_BLOOD_PRESENCE_TRIGGERED  = 63611,
     SPELL_DK_IMPROVED_UNHOLY_PRESENCE_TRIGGERED = 63622,
     SPELL_DK_ITEM_SIGIL_VENGEFUL_HEART          = 64962,
@@ -83,6 +91,127 @@ enum DeathKnightSpellIcons
 enum Misc
 {
     NPC_DK_GHOUL                                = 26125
+};
+
+// -49200 - Acclimation
+class spell_dk_acclimation : public AuraScript
+{
+    PrepareAuraScript(spell_dk_acclimation);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        if (!sSpellMgr->GetSpellInfo(SPELL_DK_ACCLIMATION_HOLY) ||
+            !sSpellMgr->GetSpellInfo(SPELL_DK_ACCLIMATION_FIRE) ||
+            !sSpellMgr->GetSpellInfo(SPELL_DK_ACCLIMATION_FROST) ||
+            !sSpellMgr->GetSpellInfo(SPELL_DK_ACCLIMATION_NATURE) ||
+            !sSpellMgr->GetSpellInfo(SPELL_DK_ACCLIMATION_SHADOW) ||
+            !sSpellMgr->GetSpellInfo(SPELL_DK_ACCLIMATION_ARCANE))
+            return false;
+        return true;
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        if (eventInfo.GetDamageInfo())
+        {
+            switch (GetFirstSchoolInMask(eventInfo.GetDamageInfo()->GetSchoolMask()))
+            {
+                case SPELL_SCHOOL_HOLY:
+                case SPELL_SCHOOL_FIRE:
+                case SPELL_SCHOOL_NATURE:
+                case SPELL_SCHOOL_FROST:
+                case SPELL_SCHOOL_SHADOW:
+                case SPELL_SCHOOL_ARCANE:
+                    return true;
+                default:
+                    break;
+            }
+        }
+
+        return false;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        uint32 triggerspell = 0;
+
+        switch (GetFirstSchoolInMask(eventInfo.GetDamageInfo()->GetSchoolMask()))
+        {
+            case SPELL_SCHOOL_HOLY:
+                triggerspell = SPELL_DK_ACCLIMATION_HOLY;
+                break;
+            case SPELL_SCHOOL_FIRE:
+                triggerspell = SPELL_DK_ACCLIMATION_FIRE;
+                break;
+            case SPELL_SCHOOL_NATURE:
+                triggerspell = SPELL_DK_ACCLIMATION_NATURE;
+                break;
+            case SPELL_SCHOOL_FROST:
+                triggerspell = SPELL_DK_ACCLIMATION_FROST;
+                break;
+            case SPELL_SCHOOL_SHADOW:
+                triggerspell = SPELL_DK_ACCLIMATION_SHADOW;
+                break;
+            case SPELL_SCHOOL_ARCANE:
+                triggerspell = SPELL_DK_ACCLIMATION_ARCANE;
+                break;
+            default:
+                return;
+        }
+
+        if (Unit* target = eventInfo.GetActionTarget())
+        {
+            target->CastSpell(target, triggerspell, true, nullptr, aurEff);
+        }
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_dk_acclimation::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_dk_acclimation::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+// 70656 - Advantage (T10 4P Melee Bonus)
+class spell_dk_advantage_t10_4p : public AuraScript
+{
+    PrepareAuraScript(spell_dk_advantage_t10_4p);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        if (!sSpellMgr->GetSpellInfo(SPELL_DK_ADVANTAGE_T10_4P_MELEE))
+            return false;
+        return true;
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        if (Unit* caster = eventInfo.GetActor())
+        {
+            if (caster->GetTypeId() != TYPEID_PLAYER || caster->getClass() != CLASS_DEATH_KNIGHT)
+            {
+                return false;
+            }
+
+            for (uint8 i = 0; i < MAX_RUNES; ++i)
+            {
+                if (caster->ToPlayer()->GetRuneCooldown(i) == 0)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_dk_advantage_t10_4p::CheckProc);
+    }
 };
 
 // 50526 - Wandering Plague
@@ -438,19 +567,38 @@ class spell_dk_summon_gargoyle : public SpellScript
     }
 };
 
-// 63611 - Improved Blood Presence
+// 63611 - Improved Blood Presence Triggered
 class spell_dk_improved_blood_presence_proc : public AuraScript
 {
     PrepareAuraScript(spell_dk_improved_blood_presence_proc);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        if (!sSpellMgr->GetSpellInfo(SPELL_DK_IMPROVED_BLOOD_PRESENCE_HEAL))
+            return false;
+        return true;
+    }
+
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        return eventInfo.GetDamageInfo() && eventInfo.GetDamageInfo()->GetDamage();
+        if (eventInfo.GetActor()->GetTypeId() == TYPEID_PLAYER)
+            return true;
+
+        return false;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        if (DamageInfo* dmgInfo = eventInfo.GetDamageInfo())
+            eventInfo.GetActor()->CastCustomSpell(SPELL_DK_IMPROVED_BLOOD_PRESENCE_HEAL, SPELLVALUE_BASE_POINT0, CalculatePct(int32(dmgInfo->GetDamage()), aurEff->GetAmount()),
+                                                  eventInfo.GetActor(), true, nullptr, aurEff);
     }
 
     void Register() override
     {
         DoCheckProc += AuraCheckProcFn(spell_dk_improved_blood_presence_proc::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_dk_improved_blood_presence_proc::HandleProc, EFFECT_1, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
 };
 
@@ -693,7 +841,7 @@ class spell_dk_scent_of_blood_trigger : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        return (eventInfo.GetHitMask() & (PROC_EX_DODGE | PROC_EX_PARRY)) || (eventInfo.GetDamageInfo() && eventInfo.GetDamageInfo()->GetDamage());
+        return (eventInfo.GetHitMask() & (PROC_HIT_DODGE | PROC_HIT_PARRY)) || (eventInfo.GetDamageInfo() && eventInfo.GetDamageInfo()->GetDamage());
     }
 
     void Register() override
@@ -2137,6 +2285,8 @@ class spell_dk_will_of_the_necropolis : public AuraScript
 
 void AddSC_deathknight_spell_scripts()
 {
+    RegisterSpellScript(spell_dk_acclimation);
+    RegisterSpellScript(spell_dk_advantage_t10_4p);
     RegisterSpellScript(spell_dk_wandering_plague);
     RegisterSpellScript(spell_dk_raise_ally);
     RegisterSpellScript(spell_dk_raise_ally_trigger);

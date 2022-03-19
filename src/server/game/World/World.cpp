@@ -1632,9 +1632,6 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Spell Learn Skills...");
     sSpellMgr->LoadSpellLearnSkills();                           // must be after LoadSpellRanks
 
-    LOG_INFO("server.loading", "Loading Spell Proc Event conditions...");
-    sSpellMgr->LoadSpellProcEvents();
-
     LOG_INFO("server.loading", "Loading Spell Proc conditions and data...");
     sSpellMgr->LoadSpellProcs();
 

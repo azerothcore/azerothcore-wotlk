@@ -158,9 +158,10 @@ enum ProcFlags
                                                 | PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_POS | PROC_FLAG_TAKEN_SPELL_NONE_DMG_CLASS_POS
                                                 | PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_NEG | PROC_FLAG_TAKEN_SPELL_NONE_DMG_CLASS_NEG
                                                 | PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS | PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_POS
-                                                | PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG | PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_NEG,
+                                                | PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG | PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_NEG
+                                                | PROC_FLAG_DONE_TRAP_ACTIVATION,
 
-    SPELL_CAST_PROC_FLAG_MASK                  = SPELL_PROC_FLAG_MASK | PROC_FLAG_DONE_TRAP_ACTIVATION | RANGED_PROC_FLAG_MASK,
+    SPELL_CAST_PROC_FLAG_MASK                  = SPELL_PROC_FLAG_MASK | RANGED_PROC_FLAG_MASK,
 
     PERIODIC_PROC_FLAG_MASK                    = PROC_FLAG_DONE_PERIODIC | PROC_FLAG_TAKEN_PERIODIC,
 
@@ -168,7 +169,8 @@ enum ProcFlags
                                                 | PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS | PROC_FLAG_DONE_SPELL_RANGED_DMG_CLASS
                                                 | PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_POS | PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_NEG
                                                 | PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS | PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG
-                                                | PROC_FLAG_DONE_PERIODIC | PROC_FLAG_DONE_MAINHAND_ATTACK | PROC_FLAG_DONE_OFFHAND_ATTACK,
+                                                | PROC_FLAG_DONE_PERIODIC | PROC_FLAG_DONE_TRAP_ACTIVATION
+                                                | PROC_FLAG_DONE_MAINHAND_ATTACK | PROC_FLAG_DONE_OFFHAND_ATTACK,
 
     TAKEN_HIT_PROC_FLAG_MASK                   = PROC_FLAG_TAKEN_MELEE_AUTO_ATTACK | PROC_FLAG_TAKEN_RANGED_AUTO_ATTACK
                                                 | PROC_FLAG_TAKEN_SPELL_MELEE_DMG_CLASS | PROC_FLAG_TAKEN_SPELL_RANGED_DMG_CLASS
@@ -187,46 +189,6 @@ enum ProcFlags
                                   PROC_FLAG_TAKEN_RANGED_AUTO_ATTACK    | \
                                   PROC_FLAG_DONE_SPELL_RANGED_DMG_CLASS | \
                                   PROC_FLAG_TAKEN_SPELL_RANGED_DMG_CLASS)
-
-enum ProcFlagsExLegacy
-{
-    PROC_EX_NONE                = 0x0000000,                 // If none can tigger on Hit/Crit only (passive spells MUST defined by SpellFamily flag)
-    PROC_EX_NORMAL_HIT          = 0x0000001,                 // If set only from normal hit (only damage spells)
-    PROC_EX_CRITICAL_HIT        = 0x0000002,
-    PROC_EX_MISS                = 0x0000004,
-    PROC_EX_RESIST              = 0x0000008,
-    PROC_EX_DODGE               = 0x0000010,
-    PROC_EX_PARRY               = 0x0000020,
-    PROC_EX_BLOCK               = 0x0000040,
-    PROC_EX_EVADE               = 0x0000080,
-    PROC_EX_IMMUNE              = 0x0000100,
-    PROC_EX_DEFLECT             = 0x0000200,
-    PROC_EX_ABSORB              = 0x0000400,
-    PROC_EX_REFLECT             = 0x0000800,
-    PROC_EX_INTERRUPT           = 0x0001000,                 // Melee hit result can be Interrupt (not used)
-    PROC_EX_FULL_BLOCK          = 0x0002000,                 // block all attack damage
-    PROC_EX_RESERVED2           = 0x0004000,
-    PROC_EX_NOT_ACTIVE_SPELL    = 0x0008000,                 // Spell mustn't do damage/heal to proc
-    PROC_EX_EX_TRIGGER_ALWAYS   = 0x0010000,                 // If set trigger always no matter of hit result
-    PROC_EX_EX_ONE_TIME_TRIGGER = 0x0020000,                 // If set trigger always but only one time (not implemented yet)
-    PROC_EX_ONLY_ACTIVE_SPELL   = 0x0040000,                 // Spell has to do damage/heal to proc
-    PROC_EX_NO_OVERHEAL         = 0x0080000,                 // Proc if heal did some work
-    PROC_EX_NO_AURA_REFRESH     = 0x0100000,                 // Proc if aura was not refreshed
-    PROC_EX_ONLY_FIRST_TICK     = 0x0200000,                 // Proc only on first tick (in case of periodic spells)
-
-    // Flags for internal use - do not use these in db!
-    PROC_EX_INTERNAL_CANT_PROC  = 0x0800000,
-    PROC_EX_INTERNAL_DOT        = 0x1000000,
-    PROC_EX_INTERNAL_HOT        = 0x2000000,
-    PROC_EX_INTERNAL_TRIGGERED  = 0x4000000,
-    PROC_EX_INTERNAL_REQ_FAMILY = 0x8000000
-};
-
-#define AURA_SPELL_PROC_EX_MASK \
-   (PROC_EX_NORMAL_HIT | PROC_EX_CRITICAL_HIT | PROC_EX_MISS | \
-    PROC_EX_RESIST | PROC_EX_DODGE | PROC_EX_PARRY | PROC_EX_BLOCK | \
-    PROC_EX_EVADE | PROC_EX_IMMUNE | PROC_EX_DEFLECT | \
-    PROC_EX_ABSORB | PROC_EX_REFLECT | PROC_EX_INTERRUPT)
 
 enum ProcFlagsSpellType
 {
@@ -261,45 +223,33 @@ enum ProcFlagsHit
     PROC_HIT_DEFLECT             = 0x0000200,
     PROC_HIT_ABSORB              = 0x0000400, // partial or full absorb
     PROC_HIT_REFLECT             = 0x0000800,
-    PROC_HIT_INTERRUPT           = 0x0001000, // (not used atm)
+    PROC_HIT_INTERRUPT           = 0x0001000,
     PROC_HIT_FULL_BLOCK          = 0x0002000,
-    PROC_HIT_MASK_ALL = 0x2FFF,
+    PROC_HIT_MASK_ALL            = 0x0002FFF,
 };
 
 enum ProcAttributes
 {
-    PROC_ATTR_REQ_EXP_OR_HONOR   = 0x0000010,
+    PROC_ATTR_REQ_EXP_OR_HONOR   = 0x0000001, // requires proc target to give exp or honor for aura proc
+    PROC_ATTR_TRIGGERED_CAN_PROC = 0x0000002, // aura can proc even with triggered spells
+    PROC_ATTR_REQ_MANA_COST      = 0x0000004, // requires triggering spell to have a mana cost for aura proc
+    PROC_ATTR_REQ_SPELLMOD       = 0x0000008  // requires triggering spell to be affected by proccing aura to drop charges
 };
-
-struct SpellProcEventEntry
-{
-    uint32      schoolMask;                                 // if nonzero - bit mask for matching proc condition based on spell candidate's school: Fire=2, Mask=1<<(2-1)=2
-    uint32      spellFamilyName;                            // if nonzero - for matching proc condition based on candidate spell's SpellFamilyNamer value
-    flag96      spellFamilyMask;                            // if nonzero - for matching proc condition based on candidate spell's SpellFamilyFlags  (like auras 107 and 108 do)
-    uint32      procFlags;                                  // bitmask for matching proc event
-    uint32      procEx;                                     // proc Extend info (see ProcFlagsEx)
-    uint32      procPhase;                                  // proc phase (see ProcFlagsSpellPhase)
-    float       ppmRate;                                    // for melee (ranged?) damage spells - proc rate per minute. if zero, falls back to flat chance from Spell.dbc
-    float       customChance;                               // Owerride chance (in most cases for debug only)
-    uint32      cooldown;                                   // hidden cooldown used for some spell proc events, applied to _triggered_spell_
-};
-
-typedef std::unordered_map<uint32, SpellProcEventEntry> SpellProcEventMap;
 
 struct SpellProcEntry
 {
-    uint32      schoolMask;                                 // if nonzero - bitmask for matching proc condition based on spell's school
-    uint32      spellFamilyName;                            // if nonzero - for matching proc condition based on candidate spell's SpellFamilyName
-    flag96      spellFamilyMask;                            // if nonzero - bitmask for matching proc condition based on candidate spell's SpellFamilyFlags
-    uint32      typeMask;                                   // if nonzero - owerwrite procFlags field for given Spell.dbc entry, bitmask for matching proc condition, see enum ProcFlags
-    uint32      spellTypeMask;                              // if nonzero - bitmask for matching proc condition based on candidate spell's damage/heal effects, see enum ProcFlagsSpellType
-    uint32      spellPhaseMask;                             // if nonzero - bitmask for matching phase of a spellcast on which proc occurs, see enum ProcFlagsSpellPhase
-    uint32      hitMask;                                    // if nonzero - bitmask for matching proc condition based on hit result, see enum ProcFlagsHit
-    uint32      attributesMask;                             // bitmask, see ProcAttributes
-    float       ratePerMinute;                              // if nonzero - chance to proc is equal to value * aura caster's weapon speed / 60
-    float       chance;                                     // if nonzero - owerwrite procChance field for given Spell.dbc entry, defines chance of proc to occur, not used if perMinuteRate set
-    uint32      cooldown;                                   // if nonzero - cooldown in secs for aura proc, applied to aura
-    uint32      charges;                                    // if nonzero - owerwrite procCharges field for given Spell.dbc entry, defines how many times proc can occur before aura remove, 0 - infinite
+    uint32       SchoolMask;                                 // if nonzero - bitmask for matching proc condition based on spell's school
+    uint32       SpellFamilyName;                            // if nonzero - for matching proc condition based on candidate spell's SpellFamilyName
+    flag96       SpellFamilyMask;                            // if nonzero - bitmask for matching proc condition based on candidate spell's SpellFamilyFlags
+    uint32       ProcFlags;                                  // if nonzero - owerwrite procFlags field for given Spell.dbc entry, bitmask for matching proc condition, see enum ProcFlags
+    uint32       SpellTypeMask;                              // if nonzero - bitmask for matching proc condition based on candidate spell's damage/heal effects, see enum ProcFlagsSpellType
+    uint32       SpellPhaseMask;                             // if nonzero - bitmask for matching phase of a spellcast on which proc occurs, see enum ProcFlagsSpellPhase
+    uint32       HitMask;                                    // if nonzero - bitmask for matching proc condition based on hit result, see enum ProcFlagsHit
+    uint32       AttributesMask;                             // bitmask, see ProcAttributes
+    float        ProcsPerMinute;                             // if nonzero - chance to proc is equal to value * aura caster's weapon speed / 60
+    float        Chance;                                     // if nonzero - owerwrite procChance field for given Spell.dbc entry, defines chance of proc to occur, not used if perMinuteRate set
+    Milliseconds Cooldown;                                   // if nonzero - cooldown in secs for aura proc, applied to aura
+    uint32       Charges;                                    // if nonzero - owerwrite procCharges field for given Spell.dbc entry, defines how many times proc can occur before aura remove, 0 - infinite
 };
 
 typedef std::unordered_map<uint32, SpellProcEntry> SpellProcMap;
@@ -669,10 +619,6 @@ public:
     SpellGroupStackFlags CheckSpellGroupStackRules(SpellInfo const* spellInfo1, SpellInfo const* spellInfo2, bool remove, bool areaAura) const;
     void GetSetOfSpellsInSpellGroupWithFlag(uint32 group_id, SpellGroupSpecialFlags flag, std::set<uint32>& availableElixirs) const;
 
-    // Spell proc event table
-    [[nodiscard]] SpellProcEventEntry const* GetSpellProcEvent(uint32 spellId) const;
-    bool IsSpellProcEventCanTriggeredBy(SpellInfo const* spellProto, SpellProcEventEntry const* spellProcEvent, uint32 EventProcFlag, ProcEventInfo const& eventInfo, bool active) const;
-
     // Spell proc table
     [[nodiscard]] SpellProcEntry const* GetSpellProcEntry(uint32 spellId) const;
     bool CanSpellTriggerProcOnEvent(SpellProcEntry const& procEntry, ProcEventInfo& eventInfo) const;
@@ -750,7 +696,6 @@ public:
     void LoadSpellTargetPositions();
     void LoadSpellGroups();
     void LoadSpellGroupStackRules();
-    void LoadSpellProcEvents();
     void LoadSpellProcs();
     void LoadSpellBonusess();
     void LoadSpellThreats();
@@ -779,7 +724,6 @@ private:
     SpellTargetPositionMap     mSpellTargetPositions;
     SpellGroupMap              mSpellGroupMap;
     SpellGroupStackMap         mSpellGroupStackMap;
-    SpellProcEventMap          mSpellProcEventMap;
     SpellProcMap               mSpellProcMap;
     SpellBonusMap              mSpellBonusMap;
     SpellThreatMap             mSpellThreatMap;

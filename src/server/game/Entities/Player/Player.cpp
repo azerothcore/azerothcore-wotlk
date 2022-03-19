@@ -7051,8 +7051,9 @@ void Player::ApplyEquipSpell(SpellInfo const* spellInfo, Item* item, bool apply,
     }
 }
 
-void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 procVictim, uint32 procEx)
+void Player::CastItemCombatSpell(DamageInfo const& damageInfo)
 {
+    Unit* target = damageInfo.GetVictim();
     if (!target || !target->IsAlive() || target == this)
         return;
 
@@ -7065,7 +7066,7 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
     {
         // If usable, try to cast item spell
         if (Item* item = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
-            if (!item->IsBroken())
+            if (!item->IsBroken() && CanUseAttackType(damageInfo.GetAttackType()))
                 if (ItemTemplate const* proto = item->GetTemplate())
                 {
                     // Additional check for weapons
@@ -7073,7 +7074,7 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
                     {
                         // offhand item cannot proc from main hand hit etc
                         EquipmentSlots slot;
-                        switch (attType)
+                        switch (damageInfo.GetAttackType())
                         {
                             case BASE_ATTACK:
                                 slot = EQUIPMENT_SLOT_MAINHAND;
@@ -7092,19 +7093,20 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
                             continue;
                     }
 
-                    CastItemCombatSpell(target, attType, procVictim, procEx, item, proto);
+                    CastItemCombatSpell(damageInfo, item, proto);
                 }
     }
 }
 
-void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 procVictim, uint32 procEx, Item* item, ItemTemplate const* proto)
+void Player::CastItemCombatSpell(DamageInfo const& damageInfo, Item* item, ItemTemplate const* proto)
 {
-    if (!sScriptMgr->CanCastItemCombatSpell(this, target, attType, procVictim, procEx, item, proto))
-        return;
+//    if (!sScriptMgr->CanCastItemCombatSpell(this, target, attType, procVictim, procEx, item, proto))
+//        return;
 
     // Can do effect if any damage done to target
-    if (procVictim & PROC_FLAG_TAKEN_DAMAGE)
-        //if (damageInfo->procVictim & PROC_FLAG_TAKEN_ANY_DAMAGE)
+    // for done procs allow normal + critical + absorbs by default
+    bool canTrigger = (damageInfo.GetHitMask() & (PROC_HIT_NORMAL | PROC_HIT_CRITICAL | PROC_HIT_ABSORB)) != 0;
+    if (canTrigger)
     {
         for (uint8 i = 0; i < MAX_ITEM_SPELLS; ++i)
         {
@@ -7133,7 +7135,7 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
 
             if (spellData.SpellPPMRate)
             {
-                uint32 WeaponSpeed = GetAttackTime(attType);
+                uint32 WeaponSpeed = GetAttackTime(damageInfo.GetAttackType());
                 chance = GetPPMProcChance(WeaponSpeed, spellData.SpellPPMRate, spellInfo);
             }
             else if (chance > 100.0f)
@@ -7141,8 +7143,8 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
                 chance = GetWeaponProcChance();
             }
 
-            if (roll_chance_f(chance) && sScriptMgr->OnCastItemCombatSpell(this, target, spellInfo, item))
-                CastSpell(target, spellInfo->Id, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD), item);
+            if (roll_chance_f(chance)/* && sScriptMgr->OnCastItemCombatSpell(this, target, spellInfo, item)*/)
+                CastSpell(damageInfo.GetVictim(), spellInfo->Id, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD), item);
         }
     }
 
@@ -7164,14 +7166,14 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
             if (entry && entry->procEx)
             {
                 // Check hit/crit/dodge/parry requirement
-                if ((entry->procEx & procEx) == 0)
+                if ((entry->procEx & damageInfo.GetHitMask()) == 0)
                     continue;
             }
             else
             {
                 // Can do effect if any damage done to target
-                if (!(procVictim & PROC_FLAG_TAKEN_DAMAGE))
-                    //if (!(damageInfo->procVictim & PROC_FLAG_TAKEN_ANY_DAMAGE))
+                // for done procs allow normal + critical + absorbs by default
+                if (!canTrigger)
                     continue;
             }
 
@@ -7194,7 +7196,7 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
             }
 
             // Apply spell mods
-            ApplySpellMod(pEnchant->spellid[s], SPELLMOD_CHANCE_OF_SUCCESS, chance);
+            ApplySpellMod<SPELLMOD_CHANCE_OF_SUCCESS>(pEnchant->spellid[s], chance);
 
             // Shiv has 100% chance to apply the poison
             if (FindCurrentSpellBySpellId(5938) && e_slot == TEMP_ENCHANTMENT_SLOT)
@@ -7217,7 +7219,7 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
                 if (spellInfo->IsPositive())
                     CastSpell(this, spellInfo, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD), item);
                 else
-                    CastSpell(target, spellInfo, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD), item);
+                    CastSpell(damageInfo.GetVictim(), spellInfo, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD), item);
             }
         }
     }
@@ -9558,9 +9560,11 @@ bool Player::IsAffectedBySpellmod(SpellInfo const* spellInfo, SpellModifier* mod
     if (!mod || !spellInfo)
         return false;
 
-    // Mod out of charges
-    if (spell && mod->charges == -1 && spell->m_appliedMods.find(mod->ownerAura) == spell->m_appliedMods.end())
+    // First time this aura applies a mod to us and is out of charges
+    if (spell && mod->ownerAura->IsUsingCharges() && !mod->ownerAura->GetCharges() && !spell->m_appliedMods.count(mod->ownerAura))
+    {
         return false;
+    }
 
     // +duration to infinite duration spells making them limited
     if (mod->op == SPELLMOD_DURATION && spellInfo->GetDuration() == -1)
@@ -9602,50 +9606,46 @@ void Player::AddSpellMod(SpellModifier* mod, bool apply)
     LOG_DEBUG("spells.aura", "Player::AddSpellMod {}", mod->spellId);
     uint16 Opcode = (mod->type == SPELLMOD_FLAT) ? SMSG_SET_FLAT_SPELL_MODIFIER : SMSG_SET_PCT_SPELL_MODIFIER;
 
-    int i = 0;
-    flag96 _mask = 0;
-    for (int eff = 0; eff < 96; ++eff)
+    flag96 modMask;
+    for (uint8 i = 0; i < 3; ++i)
     {
-        if (eff != 0 && eff % 32 == 0)
-            _mask[i++] = 0;
-
-        _mask[i] = uint32(1) << (eff - (32 * i));
-        if (mod->mask & _mask)
+        for (uint32 eff = 0; eff < 32; ++eff)
         {
-            int32 val = 0;
-            for (SpellModList::iterator itr = m_spellMods[mod->op].begin(); itr != m_spellMods[mod->op].end(); ++itr)
+            modMask[i] = uint32(1) << eff;
+            if ((mod->mask & modMask))
             {
-                if ((*itr)->type == mod->type && (*itr)->mask & _mask)
-                    val += (*itr)->value;
+                int32 val = 0;
+                for (SpellModifier* spellMod : m_spellMods[mod->op])
+                {
+                    if (spellMod->type == mod->type && (spellMod->mask & modMask))
+                    {
+                        val += spellMod->value;
+                    }
+                }
+                val += apply ? mod->value : -(mod->value);
+                WorldPacket data(Opcode, (1 + 1 + 4));
+                data << uint8(eff + 32 * i);
+                data << uint8(mod->op);
+                data << int32(val);
+                SendDirectMessage(&data);
             }
-            val += apply ? mod->value : -(mod->value);
-            WorldPacket data(Opcode, (1 + 1 + 4));
-            data << uint8(eff);
-            data << uint8(mod->op);
-            data << int32(val);
-            SendDirectMessage(&data);
         }
+
+        modMask[i] = 0;
     }
 
     if (apply)
     {
-        m_spellMods[mod->op].push_back(mod);
-        if (getClass() == CLASS_MAGE)
-            m_spellMods[mod->op].sort(MageSpellModPred());
-        else
-            m_spellMods[mod->op].sort(SpellModPred());
+        m_spellMods[mod->op].insert(mod);
     }
     else
     {
-        m_spellMods[mod->op].remove(mod);
-        // mods bound to aura will be removed in AuraEffect::~AuraEffect
-        if (!mod->ownerAura)
-            delete mod;
+        m_spellMods[mod->op].erase(mod);
     }
 }
 
 // Restore spellmods in case of failed cast
-void Player::RestoreSpellMods(Spell* spell, uint32 ownerAuraId, Aura* aura)
+void Player::RestoreSpellMods(Spell* spell, uint32 ownerAuraId /*= 0*/, Aura* aura /*= nullptr*/)
 {
     if (!spell || spell->m_appliedMods.empty())
         return;
@@ -9654,16 +9654,16 @@ void Player::RestoreSpellMods(Spell* spell, uint32 ownerAuraId, Aura* aura)
 
     for (uint8 i = 0; i < MAX_SPELLMOD; ++i)
     {
-        for (SpellModList::iterator itr = m_spellMods[i].begin(); itr != m_spellMods[i].end(); ++itr)
+        for (auto itr = m_spellMods[i].begin(); itr != m_spellMods[i].end(); ++itr)
         {
             SpellModifier* mod = *itr;
 
-            // Spellmods without aura set cannot be charged
-            if (!mod->ownerAura || !mod->ownerAura->IsUsingCharges())
+            // Spellmods without charged aura set cannot be charged
+            if (!mod->ownerAura->IsUsingCharges())
                 continue;
 
             // Restore only specific owner aura mods
-            if (ownerAuraId && (ownerAuraId != mod->ownerAura->GetSpellInfo()->Id))
+            if (ownerAuraId && mod->spellId  != ownerAuraId)
                 continue;
 
             if (aura && mod->ownerAura != aura)
@@ -9684,27 +9684,14 @@ void Player::RestoreSpellMods(Spell* spell, uint32 ownerAuraId, Aura* aura)
             // only see the first of its modifier restored)
             aurasQueue.push_back(mod->ownerAura);
 
-            // add mod charges back to mod
-            if (mod->charges == -1)
-                mod->charges = 1;
-            else
-                mod->charges++;
-
-            // Do not set more spellmods than available
-            if (mod->ownerAura->GetCharges() < mod->charges)
-                mod->charges = mod->ownerAura->GetCharges();
-
-            // Skip this check for now - aura charges may change due to various reason
-            /// @todo track these changes correctly
-            //ASSERT (mod->ownerAura->GetCharges() <= mod->charges);
+            // add charges back to aura
+            mod->ownerAura->ModCharges(1);
         }
     }
 
-    for (std::list<Aura*>::iterator itr = aurasQueue.begin(); itr != aurasQueue.end(); ++itr)
+    for (Aura* aura : aurasQueue)
     {
-        Spell::UsedSpellMods::iterator iterMod = spell->m_appliedMods.find(*itr);
-        if (iterMod != spell->m_appliedMods.end())
-            spell->m_appliedMods.erase(iterMod);
+        spell->m_appliedMods.erase(aura);
     }
 
     // Xinef: clear the list just do be sure
@@ -9712,77 +9699,24 @@ void Player::RestoreSpellMods(Spell* spell, uint32 ownerAuraId, Aura* aura)
         spell->m_appliedMods.clear();
 }
 
-void Player::RestoreAllSpellMods(uint32 ownerAuraId, Aura* aura)
+void Player::RestoreAllSpellMods(uint32 ownerAuraId /*= 0*/, Aura* aura /*= nullptr*/)
 {
     for (uint32 i = 0; i < CURRENT_MAX_SPELL; ++i)
-        if (m_currentSpells[i])
-            RestoreSpellMods(m_currentSpells[i], ownerAuraId, aura);
+        if (Spell* spell = m_currentSpells[i])
+            RestoreSpellMods(spell, ownerAuraId, aura);
 }
 
-void Player::RemoveSpellMods(Spell* spell)
+void Player::ApplyModToSpell(SpellModifier* mod, Spell* spell)
 {
     if (!spell)
         return;
 
-    if (spell->m_appliedMods.empty())
+    // don't do anything with no charges
+    if (mod->ownerAura->IsUsingCharges() && !mod->ownerAura->GetCharges())
         return;
 
-    SpellInfo const* const spellInfo = spell->m_spellInfo;
-
-    for (uint8 i = 0; i < MAX_SPELLMOD; ++i)
-    {
-        for (SpellModList::const_iterator itr = m_spellMods[i].begin(); itr != m_spellMods[i].end();)
-        {
-            SpellModifier* mod = *itr;
-            ++itr;
-
-            // spellmods without aura set cannot be charged
-            if (!mod->ownerAura || !mod->ownerAura->IsUsingCharges())
-                continue;
-
-            // check if mod affected this spell
-            Spell::UsedSpellMods::iterator iterMod = spell->m_appliedMods.find(mod->ownerAura);
-            if (iterMod == spell->m_appliedMods.end())
-                continue;
-
-            // remove from list
-            // leave this here, if spell have two mods it will remove 2 charges - wrong
-            spell->m_appliedMods.erase(iterMod);
-
-            // MAGE T8P4 BONUS
-            if( spellInfo->SpellFamilyName == SPELLFAMILY_MAGE )
-            {
-                SpellInfo const* sp = mod->ownerAura->GetSpellInfo();
-                // Missile Barrage, Hot Streak, Brain Freeze (trigger spell - Fireball!)
-                if( sp->SpellIconID == 3261 || sp->SpellIconID == 2999 || sp->SpellIconID == 2938 )
-                    if( AuraEffect* aurEff = GetAuraEffectDummy(64869) )
-                        if( roll_chance_i(aurEff->GetAmount()) )
-                        {
-                            mod->charges = 1;
-                            continue;
-                        }
-            }
-
-            if (mod->ownerAura->DropCharge(AURA_REMOVE_BY_EXPIRE))
-                itr = m_spellMods[i].begin();
-        }
-    }
-}
-
-void Player::DropModCharge(SpellModifier* mod, Spell* spell)
-{
-    // don't handle spells with proc_event entry defined
-    // this is a temporary workaround, because all spellmods should be handled like that
-    if (sSpellMgr->GetSpellProcEvent(mod->spellId))
-        return;
-
-    if (spell && mod->ownerAura && mod->charges > 0)
-    {
-        if (--mod->charges == 0)
-            mod->charges = -1;
-
-        spell->m_appliedMods.insert(mod->ownerAura);
-    }
+    // register inside spell, proc system uses this to drop charges
+    spell->m_appliedMods.insert(mod->ownerAura);
 }
 
 void Player::SetSpellModTakingSpell(Spell* spell, bool apply)
@@ -10653,7 +10587,7 @@ void Player::AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 ite
         if (rec > 0)
         {
             int32 oldRec = rec;
-            ApplySpellMod(spellInfo->Id, SPELLMOD_COOLDOWN, rec, spell);
+            ApplySpellMod<SPELLMOD_COOLDOWN>(spellInfo->Id, rec, spell);
             if (oldRec != rec)
             {
                 useSpellCooldown = true;
@@ -10662,7 +10596,7 @@ void Player::AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 ite
 
         if (catrec > 0 && !spellInfo->HasAttribute(SPELL_ATTR6_NO_CATEGORY_COOLDOWN_MODS))
         {
-            ApplySpellMod(spellInfo->Id, SPELLMOD_COOLDOWN, catrec, spell);
+            ApplySpellMod<SPELLMOD_COOLDOWN>(spellInfo->Id, catrec, spell);
         }
 
         if (int32 cooldownMod = GetTotalAuraModifier(SPELL_AURA_MOD_COOLDOWN))

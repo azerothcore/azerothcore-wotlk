@@ -61,9 +61,11 @@ enum HunterSpells
     SPELL_HUNTER_PET_HEART_OF_THE_PHOENIX_TRIGGERED = 54114,
     SPELL_HUNTER_PET_HEART_OF_THE_PHOENIX_DEBUFF    = 55711,
     SPELL_HUNTER_PET_CARRION_FEEDER_TRIGGERED       = 54045,
+    SPELL_HUNTER_PIERCING_SHOTS                     = 63468,
     SPELL_HUNTER_READINESS                          = 23989,
     SPELL_HUNTER_SNIPER_TRAINING_R1                 = 53302,
     SPELL_HUNTER_SNIPER_TRAINING_BUFF_R1            = 64418,
+    SPELL_HUNTER_T9_4P_GREATNESS                    = 68130,
     SPELL_HUNTER_VICIOUS_VIPER                      = 61609,
     SPELL_HUNTER_VIPER_ATTACK_SPEED                 = 60144,
     SPELL_DRAENEI_GIFT_OF_THE_NAARU                 = 59543,
@@ -800,6 +802,49 @@ class spell_hun_pet_heart_of_the_phoenix : public SpellScript
     }
 };
 
+// -53234 - Piercing Shots
+class spell_hun_piercing_shots : public AuraScript
+{
+    PrepareAuraScript(spell_hun_piercing_shots);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        if (!sSpellMgr->GetSpellInfo(SPELL_HUNTER_PIERCING_SHOTS))
+            return false;
+        return true;
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        if (eventInfo.GetActionTarget())
+            return true;
+        return false;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActor();
+        Unit* target = eventInfo.GetActionTarget();
+
+        if (DamageInfo* dmgInfo = eventInfo.GetDamageInfo())
+        {
+            SpellInfo const* piercingShots = sSpellMgr->AssertSpellInfo(SPELL_HUNTER_PIERCING_SHOTS);
+            uint32 dmg = dmgInfo->GetDamage();
+
+            uint32 bp = CalculatePct(int32(dmg), aurEff->GetAmount()) / static_cast<int32>(piercingShots->GetMaxTicks());
+
+            caster->CastCustomSpell(SPELL_HUNTER_PIERCING_SHOTS, SPELLVALUE_BASE_POINT0, bp, target, true, nullptr, aurEff);
+        }
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_hun_piercing_shots::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_hun_piercing_shots::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 // 54044 - Pet Carrion Feeder
 class spell_hun_pet_carrion_feeder : public SpellScript
 {
@@ -997,6 +1042,43 @@ class spell_hun_tame_beast : public SpellScript
     void Register() override
     {
         OnCheckCast += SpellCheckCastFn(spell_hun_tame_beast::CheckCast);
+    }
+};
+
+// 67151 - T9 4P Bonus
+class spell_hun_t9_4p_bonus : public AuraScript
+{
+    PrepareAuraScript(spell_hun_t9_4p_bonus);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        if (!sSpellMgr->GetSpellInfo(SPELL_HUNTER_T9_4P_GREATNESS))
+            return false;
+        return true;
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        if (eventInfo.GetActor()->GetTypeId() == TYPEID_PLAYER && eventInfo.GetActor()->ToPlayer()->GetPet())
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActor();
+
+        caster->CastSpell(caster->ToPlayer()->GetPet(), SPELL_HUNTER_T9_4P_GREATNESS, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_hun_t9_4p_bonus::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_hun_t9_4p_bonus::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
 };
 
@@ -1321,10 +1403,12 @@ void AddSC_hunter_spell_scripts()
     RegisterSpellScript(spell_hun_misdirection_proc);
     RegisterSpellScript(spell_hun_pet_carrion_feeder);
     RegisterSpellScript(spell_hun_pet_heart_of_the_phoenix);
+    RegisterSpellScript(spell_hun_piercing_shots);
     RegisterSpellScript(spell_hun_readiness);
     RegisterSpellScript(spell_hun_scatter_shot);
     RegisterSpellScript(spell_hun_sniper_training);
     RegisterSpellScript(spell_hun_tame_beast);
+    RegisterSpellScript(spell_hun_t9_4p_bonus);
     RegisterSpellScript(spell_hun_viper_attack_speed);
     RegisterSpellScript(spell_hun_volley_trigger);
     RegisterSpellScript(spell_hun_lock_and_load);

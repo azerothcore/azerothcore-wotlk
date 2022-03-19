@@ -171,7 +171,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         53232,  // Rapid Killing (Rank 2)
         }, [](SpellInfo* spellInfo)
     {
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_CAN_PROC_FROM_PROCS; // Entries were not updated after spell effect change, we have to do that manually
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_CAN_PROC_WITH_TRIGGERED; // Entries were not updated after spell effect change, we have to do that manually
     });
 
     ApplySpellFix({
@@ -235,25 +235,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->MaxAffectedTargets = 15;
     });
 
-    ApplySpellFix({
-        17941,  // Shadow Trance
-        22008,  // Netherwind Focus
-        31834,  // Light's Grace
-        34754,  // Clearcasting
-        34936,  // Backlash
-        48108,  // Hot Streak
-        51124,  // Killing Machine
-        54741,  // Firestarter
-        57761,  // Fireball!
-        64823,  // Item - Druid T8 Balance 4P Bonus
-        34477,  // Misdirection
-        44401,  // Missile Barrage
-        18820   // Insight
-        }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->ProcCharges = 1;
-    });
-
     // Tidal Wave
     ApplySpellFix({ 53390 }, [](SpellInfo* spellInfo)
     {
@@ -264,12 +245,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 37408 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_DOT_STACKING_RULE;
-    });
-
-    // Ascendance (Talisman of Ascendance trinket)
-    ApplySpellFix({ 28200 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->ProcCharges = 6;
     });
 
     // The Eye of Acherus (no spawn in phase 2 in db)

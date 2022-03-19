@@ -640,7 +640,7 @@ Spell::Spell(Unit* caster, SpellInfo const* info, TriggerCastFlags triggerFlags,
     m_healing = 0;
     m_procAttacker = 0;
     m_procVictim = 0;
-    m_procEx = 0;
+    m_hitMask = 0;
     focusObject = nullptr;
     m_cast_count = 0;
     m_glyphIndex = 0;
@@ -1619,7 +1619,7 @@ void Spell::SelectImplicitChainTargets(SpellEffIndex effIndex, SpellImplicitTarg
 {
     uint32 maxTargets = m_spellInfo->Effects[effIndex].ChainTarget;
     if (Player* modOwner = m_caster->GetSpellModOwner())
-        modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_JUMP_TARGETS, maxTargets, this);
+        modOwner->ApplySpellMod<SPELLMOD_JUMP_TARGETS>(m_spellInfo->Id, maxTargets, this);
 
     if (maxTargets > 1)
     {
@@ -2081,12 +2081,11 @@ void Spell::SearchChainTargets(std::list<WorldObject*>& targets, uint32 chainTar
     }
 }
 
-void Spell::prepareDataForTriggerSystem(AuraEffect const* /*triggeredByAura*/)
+void Spell::prepareDataForTriggerSystem()
 {
     //==========================================================================================
     // Now fill data for trigger system, need know:
-    // can spell trigger another or not (m_canTrigger)
-    // Create base triggers flags for Attacker and Victim (m_procAttacker, m_procVictim and m_procEx)
+    // Create base triggers flags for Attacker and Victim (m_procAttacker, m_procVictim and m_hitMask)
     //==========================================================================================
 
     m_procVictim = m_procAttacker = 0;
@@ -2125,7 +2124,7 @@ void Spell::prepareDataForTriggerSystem(AuraEffect const* /*triggeredByAura*/)
             // For other spells trigger procflags are set in Spell::DoAllEffectOnTarget
             // Because spell positivity is dependant on target
     }
-    m_procEx = PROC_EX_NONE;
+    m_hitMask = PROC_HIT_NONE;
 
     // Hunter trap spells - activation proc for Lock and Load, Entrapment and Misdirection
     if (m_spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER &&
@@ -2136,29 +2135,12 @@ void Spell::prepareDataForTriggerSystem(AuraEffect const* /*triggeredByAura*/)
         m_procAttacker |= PROC_FLAG_DONE_TRAP_ACTIVATION;
     }
 
-    /* Effects which are result of aura proc from triggered spell cannot proc
-        to prevent chain proc of these spells */
-
     // Hellfire Effect - trigger as DOT
     if (m_spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK && m_spellInfo->SpellFamilyFlags[0] & 0x00000040)
     {
         m_procAttacker = PROC_FLAG_DONE_PERIODIC;
         m_procVictim   = PROC_FLAG_TAKEN_PERIODIC;
     }
-
-    // Ranged autorepeat attack is set as triggered spell - ignore it
-    if (!(m_procAttacker & PROC_FLAG_DONE_RANGED_AUTO_ATTACK))
-    {
-        if (_triggeredCastFlags & TRIGGERED_DISALLOW_PROC_EVENTS &&
-                (m_spellInfo->HasAttribute(SPELL_ATTR2_ACTIVE_THREAT) ||
-                 m_spellInfo->HasAttribute(SPELL_ATTR3_NOT_A_PROC)))
-            m_procEx |= PROC_EX_INTERNAL_CANT_PROC;
-        else if (_triggeredCastFlags & TRIGGERED_DISALLOW_PROC_EVENTS)
-            m_procEx |= PROC_EX_INTERNAL_TRIGGERED;
-    }
-    // Totem casts require spellfamilymask defined in spell_proc_event to proc
-    if (m_originalCaster && m_caster != m_originalCaster && m_caster->GetTypeId() == TYPEID_UNIT && m_caster->ToCreature()->IsTotem() && m_caster->IsControlledByPlayer())
-        m_procEx |= PROC_EX_INTERNAL_REQ_FAMILY;
 }
 
 void Spell::CleanupTargetList()
@@ -2169,6 +2151,32 @@ void Spell::CleanupTargetList()
     m_delayMoment = 0;
     m_delayTrajectory = 0;
 }
+
+class ProcReflectDelayed : public BasicEvent
+{
+public:
+    ProcReflectDelayed(Unit* owner, ObjectGuid casterGuid) : _victim(owner), _casterGuid(casterGuid) { }
+
+    bool Execute(uint64 /*e_time*/, uint32 /*p_time*/) override
+    {
+        Unit* caster = ObjectAccessor::GetUnit(*_victim, _casterGuid);
+        if (!caster)
+            return true;
+
+        uint32 const typeMaskActor = PROC_FLAG_NONE;
+        uint32 const typeMaskActionTarget = PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_NEG | PROC_FLAG_TAKEN_SPELL_NONE_DMG_CLASS_NEG;
+        uint32 const spellTypeMask = PROC_SPELL_TYPE_DAMAGE | PROC_SPELL_TYPE_NO_DMG_HEAL;
+        uint32 const spellPhaseMask = PROC_SPELL_PHASE_NONE;
+        uint32 const hitMask = PROC_HIT_REFLECT;
+
+        caster->ProcSkillsAndAuras(_victim, typeMaskActor, typeMaskActionTarget, spellTypeMask, spellPhaseMask, hitMask, nullptr, nullptr, nullptr);
+        return true;
+    }
+
+private:
+    Unit* _victim;
+    ObjectGuid _casterGuid;
+};
 
 void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*= true*/, bool implicit /*= true*/)
 {
@@ -2256,23 +2264,22 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
         targetInfo.timeDelay = (uint64) floor(dist / m_spellInfo->Speed * 1000.0f);
 
         // Calculate minimum incoming time
-        if (m_delayMoment == 0 || m_delayMoment > targetInfo.timeDelay)
+        if (!m_delayMoment || m_delayMoment > targetInfo.timeDelay)
             m_delayMoment = targetInfo.timeDelay;
     }
     else
-        targetInfo.timeDelay = 0LL;
+        targetInfo.timeDelay = 0ULL;
 
     // If target reflect spell back to caster
     if (targetInfo.missCondition == SPELL_MISS_REFLECT)
     {
         // Calculate reflected spell result on caster
-        targetInfo.reflectResult = m_caster->SpellHitResult(m_caster, m_spellInfo, m_canReflect);
+        targetInfo.reflectResult = m_caster->SpellHitResult(m_caster, m_spellInfo, false); // can't reflect twice
 
-        if (targetInfo.reflectResult == SPELL_MISS_REFLECT)     // Impossible reflect again, so simply deflect spell
-            targetInfo.reflectResult = SPELL_MISS_PARRY;
+        // Proc spell reflect aura when missile hits the original target
+        target->m_Events.AddEvent(new ProcReflectDelayed(target, m_originalCasterGUID), target->m_Events.CalculateTime(targetInfo.timeDelay));
 
         // Increase time interval for reflected spells by 1.5
-        m_caster->m_Events.AddEvent(new ReflectEvent(m_caster, targetInfo.targetGUID, m_spellInfo), m_caster->m_Events.CalculateTime(targetInfo.timeDelay));
         targetInfo.timeDelay += targetInfo.timeDelay >> 1;
 
         m_spellFlags |= SPELL_FLAG_REFLECTED;
@@ -2353,7 +2360,7 @@ void Spell::AddGOTarget(GameObject* go, uint32 effectMask)
         if (dist < 5.0f)
             dist = 5.0f;
         target.timeDelay = uint64(floor(dist / m_spellInfo->Speed * 1000.0f));
-        if (m_delayMoment == 0 || m_delayMoment > target.timeDelay)
+        if (!m_delayMoment || m_delayMoment > target.timeDelay)
             m_delayMoment = target.timeDelay;
     }
     else
@@ -2468,8 +2475,8 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
     PrepareScriptHitHandlers();
     CallScriptBeforeHitHandlers(missInfo);
 
-    //Spells with this flag cannot trigger if effect is casted on self
-    bool canEffectTrigger = !m_spellInfo->HasAttribute(SPELL_ATTR3_SUPRESS_CASTER_PROCS) && unitTarget->CanProc() && (CanExecuteTriggersOnHit(mask) || missInfo == SPELL_MISS_IMMUNE2);
+    // Spells with this flag cannot trigger if effect is casted on self
+    bool canEffectTrigger = !m_spellInfo->HasAttribute(SPELL_ATTR3_SUPRESS_CASTER_PROCS) && (CanExecuteTriggersOnHit(mask) || missInfo == SPELL_MISS_IMMUNE2);
     bool reflectedSpell = missInfo == SPELL_MISS_REFLECT;
     Unit* spellHitTarget = nullptr;
 
@@ -2507,18 +2514,14 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
     if (missInfo != SPELL_MISS_NONE && m_needComboPoints && m_targets.GetUnitTargetGUID() == target->targetGUID)
     {
         m_needComboPoints = false;
-        // Restore spell mods for a miss/dodge/parry Cold Blood
-        // TODO: check how broad this rule should be
-        if (m_caster->GetTypeId() == TYPEID_PLAYER && (missInfo == SPELL_MISS_MISS || missInfo == SPELL_MISS_DODGE || missInfo == SPELL_MISS_PARRY))
-            m_caster->ToPlayer()->RestoreSpellMods(this, 14177);
     }
 
     // Fill base trigger info
     uint32 procAttacker = m_procAttacker;
     uint32 procVictim   = m_procVictim;
-    uint32 procEx = m_procEx;
+    uint32 hitMask = m_hitMask;
 
-    // Trigger info was not filled in spell::preparedatafortriggersystem - we do it now
+    // Trigger info was not filled in Spell::prepareDataForTriggerSystem - we do it now
     if (canEffectTrigger && !procAttacker && !procVictim)
     {
         bool positive = true;
@@ -2574,11 +2577,11 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
 
         if (crit)
         {
-            procEx |= PROC_EX_CRITICAL_HIT;
+            hitMask |= PROC_HIT_CRITICAL;
             addhealth = Unit::SpellCriticalHealingBonus(caster, m_spellInfo, addhealth, nullptr);
         }
         else
-            procEx |= PROC_EX_NORMAL_HIT;
+            hitMask |= PROC_HIT_NORMAL;
 
         HealInfo healInfo(caster, unitTarget, addhealth, m_spellInfo, m_spellInfo->GetSchoolMask());
 
@@ -2586,21 +2589,16 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         if (GetSpellValue()->ForcedCritResult)
         {
             crit = true;
-            procEx |= PROC_EX_CRITICAL_HIT;
+            hitMask |= PROC_HIT_CRITICAL;
         }
 
         int32 gain = caster->HealBySpell(healInfo, crit);
         unitTarget->getHostileRefMgr().threatAssist(caster, float(gain) * 0.5f, m_spellInfo);
         m_healing = gain;
 
-        // Xinef: if heal acutally healed something, add no overheal flag
-        if (m_healing)
-            procEx |= PROC_EX_NO_OVERHEAL;
-
-        // Do triggers for unit (reflect triggers passed on hit phase for correct drop charge)
+        // Do triggers for unit
         if (canEffectTrigger)
-            caster->ProcDamageAndSpell(unitTarget, procAttacker, procVictim, procEx, addhealth, m_attackType, m_spellInfo, m_triggeredByAuraSpell.spellInfo,
-                m_triggeredByAuraSpell.effectIndex, this, nullptr, &healInfo);
+            caster->ProcSkillsAndAuras(unitTarget, procAttacker, procVictim, PROC_SPELL_TYPE_HEAL, PROC_SPELL_PHASE_HIT, hitMask, this, nullptr, &healInfo);
     }
     // Do damage and triggers
     else if (m_damage > 0)
@@ -2664,7 +2662,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         if (reflectedSpell)
             effectUnit->SendSpellNonMeleeReflectLog(&damageInfo, effectUnit);
 
-        procEx |= createProcExtendMask(&damageInfo, missInfo);
+        hitMask |= createProcHitMask(&damageInfo, missInfo);
         procVictim |= PROC_FLAG_TAKEN_DAMAGE;
 
         caster->DealSpellDamage(&damageInfo, true, this);
@@ -2672,16 +2670,15 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         // do procs after damage, eg healing effects
         // no need to check if target is alive, done in procdamageandspell
 
-        // Do triggers for unit (reflect triggers passed on hit phase for correct drop charge)
+        // Do triggers for unit
         if (canEffectTrigger)
         {
-            DamageInfo dmgInfo(damageInfo, SPELL_DIRECT_DAMAGE);
-            caster->ProcDamageAndSpell(unitTarget, procAttacker, procVictim, procEx, damageInfo.damage, m_attackType, m_spellInfo, m_triggeredByAuraSpell.spellInfo,
-                m_triggeredByAuraSpell.effectIndex, this, &dmgInfo);
+            DamageInfo dmgInfo(damageInfo, SPELL_DIRECT_DAMAGE, m_attackType, hitMask);
+            caster->ProcSkillsAndAuras(unitTarget, procAttacker, procVictim, PROC_SPELL_TYPE_DAMAGE, PROC_SPELL_PHASE_HIT, hitMask, this, &dmgInfo, nullptr);
 
             if (caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->HasAttribute(SPELL_ATTR0_CANCELS_AUTO_ATTACK_COMBAT) == 0 &&
                     m_spellInfo->HasAttribute(SPELL_ATTR4_SUPRESS_WEAPON_PROCS) == 0 && (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE || m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED))
-                caster->ToPlayer()->CastItemCombatSpell(unitTarget, m_attackType, procVictim, procEx);
+                caster->ToPlayer()->CastItemCombatSpell(dmgInfo);
         }
 
         m_damage = damageInfo.damage;
@@ -2691,19 +2688,16 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
     {
         // Fill base damage struct (unitTarget - is real spell target)
         SpellNonMeleeDamage damageInfo(caster, unitTarget, m_spellInfo, m_spellSchoolMask);
-        procEx |= createProcExtendMask(&damageInfo, missInfo);
-        // Do triggers for unit (reflect triggers passed on hit phase for correct drop charge)
+        hitMask |= createProcHitMask(&damageInfo, missInfo);
+        // Do triggers for unit
         if (canEffectTrigger)
         {
-            DamageInfo dmgInfo(damageInfo, NODAMAGE);
-            caster->ProcDamageAndSpell(unitTarget, procAttacker, procVictim, procEx, 0, m_attackType, m_spellInfo, m_triggeredByAuraSpell.spellInfo,
-                m_triggeredByAuraSpell.effectIndex, this, &dmgInfo);
+            DamageInfo spellNoDamageInfo(damageInfo, NODAMAGE, m_attackType, hitMask);
+            caster->ProcSkillsAndAuras(unitTarget, procAttacker, procVictim, PROC_SPELL_TYPE_NO_DMG_HEAL, PROC_SPELL_PHASE_HIT, hitMask, this, &spellNoDamageInfo, nullptr);
 
-            // Xinef: eg. rogue poisons can proc off cheap shot, etc. so this block should be here also
-            // Xinef: ofc count only spells that HIT the target, little hack used to fool the system
-            if ((procEx & PROC_EX_NORMAL_HIT || procEx & PROC_EX_CRITICAL_HIT) && caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->HasAttribute(SPELL_ATTR0_CANCELS_AUTO_ATTACK_COMBAT) == 0 &&
-                    m_spellInfo->HasAttribute(SPELL_ATTR4_SUPRESS_WEAPON_PROCS) == 0 && (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE || m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED))
-                caster->ToPlayer()->CastItemCombatSpell(unitTarget, m_attackType, procVictim | PROC_FLAG_TAKEN_DAMAGE, procEx);
+            if (caster->GetTypeId() == TYPEID_PLAYER && !m_spellInfo->HasAttribute(SPELL_ATTR0_CANCELS_AUTO_ATTACK_COMBAT) &&
+                !m_spellInfo->HasAttribute(SPELL_ATTR4_SUPRESS_WEAPON_PROCS) && (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE || m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED))
+                caster->ToPlayer()->CastItemCombatSpell(spellNoDamageInfo);
         }
 
         // Failed Pickpocket, reveal rogue
@@ -2925,10 +2919,6 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
             bool refresh = false;
             m_spellAura = Aura::TryRefreshStackOrCreate(aurSpellInfo, effectMask, unit, m_originalCaster,
                           (aurSpellInfo == m_spellInfo) ? &m_spellValue->EffectBasePoints[0] : &basePoints[0], m_CastItem, ObjectGuid::Empty, &refresh, !(_triggeredCastFlags & TRIGGERED_NO_PERIODIC_RESET));
-
-            // xinef: if aura was not refreshed, add proc ex
-            if (!refresh)
-                m_procEx |= PROC_EX_NO_AURA_REFRESH;
 
             if (m_spellAura)
             {
@@ -3183,7 +3173,7 @@ bool Spell::UpdateChanneledTargetList()
                 }
 
         if (Player* modOwner = m_caster->GetSpellModOwner())
-            modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_RANGE, range, this);
+            modOwner->ApplySpellMod<SPELLMOD_RANGE>(m_spellInfo->Id, range, this);
 
         // xinef: add little tolerance level
         range += std::min(3.0f, range * 0.1f); // 10% but no more than 3yd
@@ -3346,7 +3336,7 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
     }
 
     // Prepare data for triggers
-    prepareDataForTriggerSystem(triggeredByAura);
+    prepareDataForTriggerSystem();
 
     // calculate cast time (calculated after first CheckCast check to prevent charge counting for first CheckCast fail)
     m_casttime = (_triggeredCastFlags & TRIGGERED_CAST_DIRECTLY) ? 0 : m_spellInfo->CalcCastTime(m_caster, this);
@@ -3515,10 +3505,6 @@ void Spell::cancel(bool bySelf)
 
             if (m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->ToPlayer()->NeedSendSpectatorData())
                 ArenaSpectator::SendCommand_Spell(m_caster->FindMap(), m_caster->GetGUID(), "SPE", m_spellInfo->Id, bySelf ? 99998 : 99999);
-
-            // spell is canceled-take mods and clear list
-            if (Player* player = m_caster->GetSpellModOwner())
-                player->RemoveSpellMods(this);
 
             m_appliedMods.clear();
             break;
@@ -3740,26 +3726,14 @@ void Spell::_cast(bool skipCheck)
             }
         }
 
-        uint32 procEx = PROC_EX_NORMAL_HIT;
+        uint32 hitMask = m_hitMask;
 
-        for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
+        if (!(hitMask & PROC_HIT_CRITICAL))
         {
-            if (ihit->missCondition != SPELL_MISS_NONE)
-            {
-                continue;
-            }
-
-            if (!ihit->crit)
-            {
-                continue;
-            }
-
-            procEx |= PROC_EX_CRITICAL_HIT;
-            break;
+            hitMask |= PROC_HIT_NORMAL;
         }
 
-        m_originalCaster->ProcDamageAndSpell(m_originalCaster, procAttacker, PROC_FLAG_NONE, procEx, 1, BASE_ATTACK, m_spellInfo, m_triggeredByAuraSpell.spellInfo,
-            m_triggeredByAuraSpell.effectIndex, this, nullptr, nullptr, PROC_SPELL_PHASE_CAST);
+        m_originalCaster->ProcSkillsAndAuras(m_originalCaster, procAttacker, PROC_FLAG_NONE, PROC_SPELL_TYPE_MASK_ALL, PROC_SPELL_PHASE_CAST, hitMask, this, nullptr, nullptr);
     }
 
     if (modOwner)
@@ -3779,11 +3753,6 @@ void Spell::_cast(bool skipCheck)
 
         if (m_caster->HasUnitState(UNIT_STATE_CASTING) && !m_caster->IsNonMeleeSpellCast(false, false, true))
             m_caster->ClearUnitState(UNIT_STATE_CASTING);
-
-        // remove all applied mods at this point
-        // dont allow user to use them twice in case spell did not reach current target
-        if (modOwner)
-            modOwner->RemoveSpellMods(this);
 
         // Xinef: why do we keep focus after spell is sent to air?
         // Xinef: Because of this, in the middle of some animation after setting targetguid to 0 etc
@@ -3877,7 +3846,7 @@ void Spell::handle_immediate()
             // First mod_duration then haste - see Missile Barrage
             // Apply duration mod
             if (Player* modOwner = m_caster->GetSpellModOwner())
-                modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
+                modOwner->ApplySpellMod<SPELLMOD_DURATION>(m_spellInfo->Id, duration);
 
             // Apply haste mods
             if (m_caster->HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, m_spellInfo) || m_spellInfo->HasAttribute(SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC))
@@ -4072,25 +4041,13 @@ void Spell::_handle_finish_phase()
             }
         }
 
-        uint32 procEx = PROC_EX_NORMAL_HIT;
-        for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
+        uint32 hitMask = m_hitMask;
+        if (!(hitMask & PROC_HIT_CRITICAL))
         {
-            if (ihit->missCondition != SPELL_MISS_NONE)
-            {
-                continue;
-            }
-
-            if (!ihit->crit)
-            {
-                continue;
-            }
-
-            procEx |= PROC_EX_CRITICAL_HIT;
-            break;
+            hitMask |= PROC_HIT_NORMAL;
         }
 
-        m_originalCaster->ProcDamageAndSpell(m_originalCaster, procAttacker, PROC_FLAG_NONE, procEx, 1, BASE_ATTACK, m_spellInfo, m_triggeredByAuraSpell.spellInfo,
-            m_triggeredByAuraSpell.effectIndex, this, nullptr, nullptr, PROC_SPELL_PHASE_FINISH);
+        m_originalCaster->ProcSkillsAndAuras(m_originalCaster, procAttacker, PROC_FLAG_NONE, PROC_SPELL_TYPE_MASK_ALL, PROC_SPELL_PHASE_FINISH, hitMask, this, nullptr, nullptr);
     }
 }
 
@@ -4279,11 +4236,6 @@ void Spell::finish(bool ok)
     // potions disabled by client, send event "not in combat" if need
     if (m_caster->GetTypeId() == TYPEID_PLAYER && !m_triggeredByAuraSpell)
         m_caster->ToPlayer()->UpdatePotionCooldown(this);
-
-    // Take mods after trigger spell (needed for 14177 to affect 48664)
-    // mods are taken only on succesfull cast and independantly from targets of the spell
-    if (Player* player = m_caster->GetSpellModOwner())
-        player->RemoveSpellMods(this);
 
     // xinef: clear reactive auras states after spell cast
     if (m_spellInfo->CasterAuraState == AURA_STATE_DEFENSE || m_spellInfo->CasterAuraState == AURA_STATE_HUNTER_PARRY)
@@ -5017,7 +4969,7 @@ void Spell::TakePower()
                             hit = false;
                             //lower spell cost on fail (by talent aura)
                             if (Player* modOwner = m_caster->ToPlayer()->GetSpellModOwner())
-                                modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_SPELL_COST_REFUND_ON_FAIL, m_powerCost, this);
+                                modOwner->ApplySpellMod<SPELLMOD_SPELL_COST_REFUND_ON_FAIL>(m_spellInfo->Id, m_powerCost, this);
                         }
                         break;
                     }
@@ -5116,7 +5068,7 @@ SpellCastResult Spell::CheckRuneCost(uint32 RuneCostID)
     {
         runeCost[i] = src->RuneCost[i];
         if (Player* modOwner = m_caster->GetSpellModOwner())
-            modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_COST, runeCost[i], this);
+            modOwner->ApplySpellMod<SPELLMOD_COST>(m_spellInfo->Id, runeCost[i], this);
     }
 
     runeCost[RUNE_DEATH] = MAX_RUNES;                       // calculated later
@@ -5156,7 +5108,7 @@ void Spell::TakeRunePower(bool didHit)
     {
         runeCost[i] = runeCostData->RuneCost[i];
         if (Player* modOwner = m_caster->GetSpellModOwner())
-            modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_COST, runeCost[i], this);
+            modOwner->ApplySpellMod<SPELLMOD_COST>(m_spellInfo->Id, runeCost[i], this);
     }
 
     runeCost[RUNE_DEATH] = 0;                               // calculated later
@@ -6701,7 +6653,7 @@ SpellCastResult Spell::CheckRange(bool strict)
         range_type = SPELL_RANGE_RANGED;
 
     if (Player* modOwner = m_caster->GetSpellModOwner())
-        modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_RANGE, max_range, this);
+        modOwner->ApplySpellMod<SPELLMOD_RANGE>(m_spellInfo->Id, max_range, this);
 
     // xinef: dont check max_range to strictly after cast
     if (range_type != SPELL_RANGE_MELEE && !strict)
@@ -7415,7 +7367,7 @@ void Spell::Delayed() // only called in DealDamage()
     //check pushback reduce
     int32 delaytime = 500;                                  // spellcasting delay is normally 500ms
     int32 delayReduce = 100;                                // must be initialized to 100 for percent modifiers
-    m_caster->ToPlayer()->ApplySpellMod(m_spellInfo->Id, SPELLMOD_NOT_LOSE_CASTING_TIME, delayReduce, this);
+    m_caster->ToPlayer()->ApplySpellMod<SPELLMOD_NOT_LOSE_CASTING_TIME>(m_spellInfo->Id, delayReduce, this);
     delayReduce += m_caster->GetTotalAuraModifier(SPELL_AURA_REDUCE_PUSHBACK) - 100;
     if (delayReduce >= 100)
         return;
@@ -7453,7 +7405,7 @@ void Spell::DelayedChannel()
 
     int32 delaytime = CalculatePct(duration, 25); // channeling delay is normally 25% of its time per hit
     int32 delayReduce = 100;                                    // must be initialized to 100 for percent modifiers
-    m_caster->ToPlayer()->ApplySpellMod(m_spellInfo->Id, SPELLMOD_NOT_LOSE_CASTING_TIME, delayReduce, this);
+    m_caster->ToPlayer()->ApplySpellMod<SPELLMOD_NOT_LOSE_CASTING_TIME>(m_spellInfo->Id, delayReduce, this);
     delayReduce += m_caster->GetTotalAuraModifier(SPELL_AURA_REDUCE_PUSHBACK) - 100;
     if (delayReduce >= 100)
         return;
@@ -7807,14 +7759,6 @@ void SpellEvent::Abort(uint64 /*e_time*/)
 bool SpellEvent::IsDeletable() const
 {
     return m_Spell->IsDeletable();
-}
-
-bool ReflectEvent::Execute(uint64  /*e_time*/, uint32  /*p_time*/)
-{
-    Unit* target = ObjectAccessor::GetUnit(*_caster, _targetGUID);
-    if (target && _caster->IsInMap(target))
-        _caster->ProcDamageAndSpell(target, PROC_FLAG_NONE, PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_NEG, PROC_EX_REFLECT, 1, BASE_ATTACK, _spellInfo);
-    return true;
 }
 
 bool Spell::IsValidDeadOrAliveTarget(Unit const* target) const
@@ -8494,8 +8438,8 @@ void Spell::TriggerGlobalCooldown()
     if (m_spellInfo->StartRecoveryTime >= MIN_GCD && m_spellInfo->StartRecoveryTime <= MAX_GCD)
     {
         // gcd modifier auras are applied only to own spells and only players have such mods
-        if (m_caster->GetTypeId() == TYPEID_PLAYER)
-            m_caster->ToPlayer()->ApplySpellMod(m_spellInfo->Id, SPELLMOD_GLOBAL_COOLDOWN, gcd, this);
+        if (Player* modOwner = m_caster->GetSpellModOwner())
+            modOwner->ApplySpellMod<SPELLMOD_GLOBAL_COOLDOWN>(m_spellInfo->Id, gcd, this);
 
         // Apply haste rating
         if (m_spellInfo->StartRecoveryCategory == 133 && m_spellInfo->StartRecoveryTime == 1500 && m_spellInfo->DmgClass != SPELL_DAMAGE_CLASS_MELEE &&
@@ -8504,10 +8448,7 @@ void Spell::TriggerGlobalCooldown()
             gcd = int32(float(gcd) * m_caster->GetFloatValue(UNIT_MOD_CAST_SPEED));
         }
 
-        if (gcd < MIN_GCD)
-            gcd = MIN_GCD;
-        else if (gcd > MAX_GCD)
-            gcd = MAX_GCD;
+        RoundToInterval<int32>(gcd, MIN_GCD, MAX_GCD);
     }
 
     // Only players or controlled units have global cooldown

@@ -55,9 +55,16 @@ enum DruidSpells
     SPELL_DRUID_SURVIVAL_INSTINCTS          = 50322,
     SPELL_DRUID_SAVAGE_ROAR                 = 62071,
     SPELL_DRUID_TIGER_S_FURY_ENERGIZE       = 51178,
+    SPELL_DRUID_T9_FERAL_RELIC_BEAR         = 67354,
+    SPELL_DRUID_T9_FERAL_RELIC_CAT          = 67355,
     SPELL_DRUID_ITEM_T8_BALANCE_RELIC       = 64950,
     SPELL_DRUID_BEAR_FORM_PASSIVE           = 1178,
     SPELL_DRUID_DIRE_BEAR_FORM_PASSIVE      = 9635,
+    SPELL_DRUID_FORMS_TRINKET_BEAR          = 37340,
+    SPELL_DRUID_FORMS_TRINKET_CAT           = 37341,
+    SPELL_DRUID_FORMS_TRINKET_MOONKIN       = 37343,
+    SPELL_DRUID_FORMS_TRINKET_NONE          = 37344,
+    SPELL_DRUID_FORMS_TRINKET_TREE          = 37342,
     SPELL_DRUID_ENRAGE                      = 5229,
     SPELL_DRUID_ENRAGED_DEFENSE             = 70725,
     SPELL_DRUID_ITEM_T10_FERAL_4P_BONUS     = 70726,
@@ -239,7 +246,7 @@ class spell_dru_brambles_treant : public AuraScript
         {
             int32 amount = 0;
             if (player->HasAura(SPELL_DRUID_BARKSKIN, player->GetGUID()))
-                player->ApplySpellMod(SPELL_DRUID_BARKSKIN, SPELLMOD_CHANCE_OF_SUCCESS, amount);
+                player->ApplySpellMod<SPELLMOD_CHANCE_OF_SUCCESS>(SPELL_DRUID_BARKSKIN, amount);
 
             return roll_chance_i(amount);
         }
@@ -254,7 +261,7 @@ class spell_dru_brambles_treant : public AuraScript
         if (GetUnitOwner()->IsSummon())
             if (Unit* owner = GetUnitOwner()->ToTempSummon()->GetSummonerUnit())
                 if (Player* player = owner->GetSpellModOwner())
-                    player->ApplySpellMod(SPELL_DRUID_BARKSKIN, SPELLMOD_CHANCE_OF_SUCCESS, amount);
+                    player->ApplySpellMod<SPELLMOD_CHANCE_OF_SUCCESS>(SPELL_DRUID_BARKSKIN, amount);
     }
 
     void Register() override
@@ -442,6 +449,80 @@ class spell_dru_enrage : public AuraScript
     {
         AfterEffectApply += AuraEffectApplyFn(spell_dru_enrage::HandleApply, EFFECT_0, SPELL_AURA_PERIODIC_ENERGIZE, AURA_EFFECT_HANDLE_REAL);
         AfterEffectRemove += AuraEffectRemoveFn(spell_dru_enrage::HandleRemove, EFFECT_0, SPELL_AURA_PERIODIC_ENERGIZE, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 37336 - Druid Forms Trinket
+class spell_dru_forms_trinket : public AuraScript
+{
+    PrepareAuraScript(spell_dru_forms_trinket);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        if (!sSpellMgr->GetSpellInfo(SPELL_DRUID_FORMS_TRINKET_BEAR) ||
+            !sSpellMgr->GetSpellInfo(SPELL_DRUID_FORMS_TRINKET_CAT) ||
+            !sSpellMgr->GetSpellInfo(SPELL_DRUID_FORMS_TRINKET_MOONKIN) ||
+            !sSpellMgr->GetSpellInfo(SPELL_DRUID_FORMS_TRINKET_NONE) ||
+            !sSpellMgr->GetSpellInfo(SPELL_DRUID_FORMS_TRINKET_TREE))
+            return false;
+        return true;
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        Unit* target = eventInfo.GetActor();
+
+        switch (target->GetShapeshiftForm())
+        {
+            case FORM_BEAR:
+            case FORM_DIREBEAR:
+            case FORM_CAT:
+            case FORM_MOONKIN:
+            case FORM_NONE:
+            case FORM_TREE:
+                return true;
+            default:
+                break;
+        }
+
+        return false;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* target = eventInfo.GetActor();
+        uint32 triggerspell = 0;
+
+        switch (target->GetShapeshiftForm())
+        {
+            case FORM_BEAR:
+            case FORM_DIREBEAR:
+                triggerspell = SPELL_DRUID_FORMS_TRINKET_BEAR;
+                break;
+            case FORM_CAT:
+                triggerspell = SPELL_DRUID_FORMS_TRINKET_CAT;
+                break;
+            case FORM_MOONKIN:
+                triggerspell = SPELL_DRUID_FORMS_TRINKET_MOONKIN;
+                break;
+            case FORM_NONE:
+                triggerspell = SPELL_DRUID_FORMS_TRINKET_NONE;
+                break;
+            case FORM_TREE:
+                triggerspell = SPELL_DRUID_FORMS_TRINKET_TREE;
+                break;
+            default:
+                return;
+        }
+
+        target->CastSpell(target, triggerspell, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_dru_forms_trinket::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_dru_forms_trinket::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
 };
 
@@ -1033,6 +1114,66 @@ class spell_dru_typhoon : public SpellScript
     }
 };
 
+// 67353 - T9 Feral Relic (Idol of Mutilation)
+class spell_dru_t9_feral_relic : public AuraScript
+{
+    PrepareAuraScript(spell_dru_t9_feral_relic);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        if (!sSpellMgr->GetSpellInfo(SPELL_DRUID_T9_FERAL_RELIC_BEAR) ||
+            !sSpellMgr->GetSpellInfo(SPELL_DRUID_T9_FERAL_RELIC_CAT))
+            return false;
+        return true;
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        Unit* target = eventInfo.GetActor();
+
+        switch (target->GetShapeshiftForm())
+        {
+            case FORM_BEAR:
+            case FORM_DIREBEAR:
+            case FORM_CAT:
+                return true;
+            default:
+                break;
+        }
+
+        return false;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        uint32 triggerspell = 0;
+
+        Unit* target = eventInfo.GetActor();
+
+        switch (target->GetShapeshiftForm())
+        {
+            case FORM_BEAR:
+            case FORM_DIREBEAR:
+                triggerspell = SPELL_DRUID_T9_FERAL_RELIC_BEAR;
+                break;
+            case FORM_CAT:
+                triggerspell = SPELL_DRUID_T9_FERAL_RELIC_CAT;
+                break;
+            default:
+                return;
+        }
+
+        target->CastSpell(target, triggerspell, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_dru_t9_feral_relic::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_dru_t9_feral_relic::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 // 70691 - Rejuvenation
 class spell_dru_t10_restoration_4p_bonus : public SpellScript
 {
@@ -1163,6 +1304,7 @@ void AddSC_druid_spell_scripts()
     RegisterSpellScript(spell_dru_berserk);
     RegisterSpellScript(spell_dru_dash);
     RegisterSpellScript(spell_dru_enrage);
+    RegisterSpellScript(spell_dru_forms_trinket);
     RegisterSpellScript(spell_dru_glyph_of_starfire);
     RegisterSpellScript(spell_dru_idol_lifebloom);
     RegisterSpellScript(spell_dru_innervate);
@@ -1183,6 +1325,7 @@ void AddSC_druid_spell_scripts()
     RegisterSpellScript(spell_dru_swift_flight_passive);
     RegisterSpellScript(spell_dru_tiger_s_fury);
     RegisterSpellScript(spell_dru_typhoon);
+    RegisterSpellScript(spell_dru_t9_feral_relic);
     RegisterSpellScript(spell_dru_t10_restoration_4p_bonus);
     RegisterSpellScript(spell_dru_wild_growth);
 }
