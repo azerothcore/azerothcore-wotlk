@@ -1289,7 +1289,8 @@ class spell_gen_adaptive_warding : public AuraScript
    45826 - East Frostwolf Warmaster
    45828 - Dun Baldar North Marshal
    45829 - Dun Baldar South Marshal
-   45830 - Stonehearth Marshal */
+   45830 - Stonehearth Marshal
+   45831 - Icewing Marshal */
 class spell_gen_av_drekthar_presence : public AuraScript
 {
     PrepareAuraScript(spell_gen_av_drekthar_presence);

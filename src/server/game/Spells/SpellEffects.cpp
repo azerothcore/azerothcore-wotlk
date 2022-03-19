@@ -1590,6 +1590,19 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
             addhealth = unitTarget->SpellHealingBonusTaken(caster, m_spellInfo, addhealth, HEAL);
         }
 
+        // Implemented this way as there is no other way to do it currently (that I know :P)...
+        if (caster->ToPlayer() && caster->ToPlayer()->HasAura(23401)) // Nefarian Corrupted Healing (priest)
+        {
+            if (m_spellInfo->Effects[EFFECT_0].ApplyAuraName != SPELL_AURA_PERIODIC_HEAL ||
+                m_spellInfo->Effects[EFFECT_1].ApplyAuraName != SPELL_AURA_PERIODIC_HEAL ||
+                m_spellInfo->Effects[EFFECT_2].ApplyAuraName != SPELL_AURA_PERIODIC_HEAL)
+            {
+                m_damage = 0;
+                caster->CastSpell(unitTarget, 23402, false); // Nefarian Corrupted Healing Periodic Damage effect.
+                return;
+            }
+        }
+
         m_damage -= addhealth;
     }
 }
@@ -5864,7 +5877,7 @@ void Spell::EffectKillCreditPersonal(SpellEffIndex effIndex)
     if (!unitTarget)
         return;
 
-    Player* player = unitTarget->ToPlayer();
+    Player* player = unitTarget->GetCharmerOrOwnerPlayerOrPlayerItself();
     if (!player)
     {
         return;
@@ -5881,7 +5894,7 @@ void Spell::EffectKillCredit(SpellEffIndex effIndex)
     if (!unitTarget)
         return;
 
-    Player* player = unitTarget->ToPlayer();
+    Player* player = unitTarget->GetCharmerOrOwnerPlayerOrPlayerItself();
     if (!player)
     {
         return;
