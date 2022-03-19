@@ -10906,7 +10906,7 @@ void Unit::ModSpellCastTime(SpellInfo const* spellInfo, int32& castTime, Spell* 
     // called from caster
     if (Player* modOwner = GetSpellModOwner())
         // TODO:(MadAgos) Eventually check and delete the bool argument
-        modOwner->ApplySpellMod<SPELLMOD_CASTING_TIME>(spellInfo->Id, castTime, spell, bool(modOwner != this && !IsPet()));
+        modOwner->ApplySpellMod<SPELLMOD_CASTING_TIME>(spellInfo->Id, castTime, spell);
 
     switch (spellInfo->DmgClass)
     {
