@@ -42,10 +42,10 @@ enum Gossip
 
 enum Spells
 {
-   SPELL_ESSENCEOFTHERED              = 23513,
-   SPELL_FLAMEBREATH                  = 23461,
-   SPELL_FIRENOVA                     = 23462,
-   SPELL_TAILSWIPE                    = 15847,
+   SPELL_ESSENCE_OF_THE_RED           = 23513,
+   SPELL_FLAME_BREATH                 = 23461,
+   SPELL_FIRE_NOVA                    = 23462,
+   SPELL_TAIL_SWEEP                   = 15847,
    SPELL_CLEAVE                       = 19983,   //Chain cleave is most likely named something different and contains a dummy effect
    SPELL_NEFARIUS_CORRUPTION          = 23642,
    SPELL_RED_LIGHTNING                = 19484,
@@ -64,12 +64,11 @@ enum Events
     EVENT_SPEECH_5                  = 5,
     EVENT_SPEECH_6                  = 6,
     EVENT_SPEECH_7                  = 7,
-    EVENT_ESSENCEOFTHERED           = 8,
-    EVENT_FLAMEBREATH               = 9,
-    EVENT_FIRENOVA                  = 10,
-    EVENT_TAILSWIPE                 = 11,
-    EVENT_CLEAVE                    = 12,
-    EVENT_BURNINGADRENALINE         = 13,
+    EVENT_FLAME_BREATH              = 8,
+    EVENT_FIRE_NOVA                 = 9,
+    EVENT_TAIL_SWEEP                = 10,
+    EVENT_CLEAVE                    = 11,
+    EVENT_BURNING_ADRENALINE        = 12,
 };
 
 class boss_vaelastrasz : public CreatureScript
@@ -119,15 +118,15 @@ public:
         {
             BossAI::EnterCombat(victim);
 
-            DoCast(me, SPELL_ESSENCEOFTHERED);
+            DoCastAOE(SPELL_ESSENCE_OF_THE_RED);
             // now drop damage requirement to be able to take loot
             me->ResetPlayerDamageReq();
 
             events.ScheduleEvent(EVENT_CLEAVE, 10000);
-            events.ScheduleEvent(EVENT_FLAMEBREATH, 15000);
-            events.ScheduleEvent(EVENT_FIRENOVA, 20000);
-            events.ScheduleEvent(EVENT_TAILSWIPE, 11000);
-            events.ScheduleEvent(EVENT_BURNINGADRENALINE, 15000);
+            events.ScheduleEvent(EVENT_FLAME_BREATH, 15000);
+            events.ScheduleEvent(EVENT_FIRE_NOVA, 20000);
+            events.ScheduleEvent(EVENT_TAIL_SWEEP, 11000);
+            events.ScheduleEvent(EVENT_BURNING_ADRENALINE, 15000);
         }
 
         void BeginSpeech(Unit* target)
@@ -158,6 +157,7 @@ public:
                     switch (eventId)
                     {
                         case EVENT_SPEECH_1:
+                            me->SetStandState(UNIT_STAND_STATE_STAND);
                             me->SummonCreature(NPC_VICTOR_NEFARIUS, aNefariusSpawnLoc[0], aNefariusSpawnLoc[1], aNefariusSpawnLoc[2], aNefariusSpawnLoc[3], TEMPSUMMON_TIMED_DESPAWN, 26000);
                             _eventsIntro.ScheduleEvent(EVENT_SPEECH_2, 1000);
                             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -178,7 +178,6 @@ public:
                             break;
                         case EVENT_SPEECH_4:
                             Talk(SAY_LINE1);
-                            me->SetStandState(UNIT_STAND_STATE_STAND);
                             me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                             _eventsIntro.ScheduleEvent(EVENT_SPEECH_5, 12000);
                             break;
@@ -215,23 +214,19 @@ public:
                         events.ScheduleEvent(EVENT_CLEAVE, 15000);
                         DoCastVictim(SPELL_CLEAVE);
                         break;
-                    case EVENT_FLAMEBREATH:
-                        DoCastVictim(SPELL_FLAMEBREATH);
-                        events.ScheduleEvent(EVENT_FLAMEBREATH, 8000, 14000);
+                    case EVENT_FLAME_BREATH:
+                        DoCastVictim(SPELL_FLAME_BREATH);
+                        events.ScheduleEvent(EVENT_FLAME_BREATH, 8000, 14000);
                         break;
-                    case EVENT_FIRENOVA:
-                        DoCastVictim(SPELL_FIRENOVA);
-                        events.ScheduleEvent(EVENT_FIRENOVA, 15000);
+                    case EVENT_FIRE_NOVA:
+                        DoCastVictim(SPELL_FIRE_NOVA);
+                        events.ScheduleEvent(EVENT_FIRE_NOVA, 15000);
                         break;
-                    case EVENT_TAILSWIPE:
-                        //Only cast if we are behind
-                        /*if (!me->HasInArc(M_PI, me->GetVictim()))
-                        {
-                        DoCast(me->GetVictim(), SPELL_TAILSWIPE);
-                        }*/
-                        events.ScheduleEvent(EVENT_TAILSWIPE, 15000);
+                    case EVENT_TAIL_SWEEP:
+                        DoCastAOE(SPELL_TAIL_SWEEP);
+                        events.ScheduleEvent(EVENT_TAIL_SWEEP, 15000);
                         break;
-                    case EVENT_BURNINGADRENALINE:
+                    case EVENT_BURNING_ADRENALINE:
                     {
                         if (_burningAdrenalineCast < 2) // It's better to use TaskScheduler for this, but zzz
                         {
@@ -249,7 +244,7 @@ public:
                             me->CastSpell(me->GetVictim(), SPELL_BURNING_ADRENALINE, true);
                             _burningAdrenalineCast = 0;
                         }
-                        events.ScheduleEvent(EVENT_BURNINGADRENALINE, 15000);
+                        events.ScheduleEvent(EVENT_BURNING_ADRENALINE, 15000);
                         break;
                     }
                 }
