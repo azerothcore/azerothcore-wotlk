@@ -168,35 +168,24 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
             std::string strOptionText, strBoxText;
             BroadcastText const* optionBroadcastText = sObjectMgr->GetBroadcastText(itr->second.OptionBroadcastTextID);
             BroadcastText const* boxBroadcastText = sObjectMgr->GetBroadcastText(itr->second.BoxBroadcastTextID);
+            GossipMenuItemsLocale const* gossipMenuLocale = sObjectMgr->GetGossipMenuItemsLocale(MAKE_PAIR32(menuId, itr->second.OptionID));
             LocaleConstant locale = GetSession()->GetSessionDbLocaleIndex();
 
             if (optionBroadcastText)
                 ObjectMgr::GetLocaleString(getGender() == GENDER_MALE ? optionBroadcastText->MaleText : optionBroadcastText->FemaleText, locale, strOptionText);
-            else
+            // if we have no BroadcastText ID for this text - search localized text in gossip_menu_option_locale
+            if (strOptionText.empty() && gossipMenuLocale)
+                 ObjectMgr::GetLocaleString(gossipMenuLocale->OptionText, locale, strOptionText);
+            // if gossip_menu_option_locale have no text for our locale - English text will be shown
+            if (strOptionText.empty())
                 strOptionText = itr->second.OptionText;
 
             if (boxBroadcastText)
                 ObjectMgr::GetLocaleString(getGender() == GENDER_MALE ? boxBroadcastText->MaleText : boxBroadcastText->FemaleText, locale, strBoxText);
-            else
+            if (strBoxText.empty() && gossipMenuLocale)
+                ObjectMgr::GetLocaleString(gossipMenuLocale->BoxText, locale, strBoxText);
+            if (strBoxText.empty())
                 strBoxText = itr->second.BoxText;
-
-            // if the language is not default and the texts weren't found, maybe they're in gossip_menu_option_locale table
-            if (locale != DEFAULT_LOCALE)
-            {
-                if (strOptionText.empty())
-                {
-                    /// Find localizations from database.
-                    if (GossipMenuItemsLocale const* gossipMenuLocale = sObjectMgr->GetGossipMenuItemsLocale(MAKE_PAIR32(menuId, itr->second.OptionID)))
-                        ObjectMgr::GetLocaleString(gossipMenuLocale->OptionText, locale, strOptionText);
-                }
-
-                if (strBoxText.empty())
-                {
-                    /// Find localizations from database.
-                    if (GossipMenuItemsLocale const* gossipMenuLocale = sObjectMgr->GetGossipMenuItemsLocale(MAKE_PAIR32(menuId, itr->second.OptionID)))
-                        ObjectMgr::GetLocaleString(gossipMenuLocale->BoxText, locale, strBoxText);
-                }
-            }
 
             menu->GetGossipMenu().AddMenuItem(itr->second.OptionID, itr->second.OptionIcon, strOptionText, 0, itr->second.OptionType, strBoxText, itr->second.BoxMoney, itr->second.BoxCoded);
             menu->GetGossipMenu().AddGossipMenuItemData(itr->second.OptionID, itr->second.ActionMenuID, itr->second.ActionPoiID);
