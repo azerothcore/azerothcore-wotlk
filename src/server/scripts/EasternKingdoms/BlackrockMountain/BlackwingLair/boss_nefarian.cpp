@@ -433,6 +433,7 @@ public:
                                 events.CancelEvent(EVENT_MIND_CONTROL);
                                 events.CancelEvent(EVENT_FEAR);
                                 events.CancelEvent(EVENT_SHADOW_BOLT);
+                                events.CancelEvent(EVENT_SHADOW_BOLT_VOLLEY);
                                 events.CancelEvent(EVENT_SILENCE);
                                 DoCastSelf(SPELL_ROOT_SELF, true);
                                 me->SetVisible(false);
