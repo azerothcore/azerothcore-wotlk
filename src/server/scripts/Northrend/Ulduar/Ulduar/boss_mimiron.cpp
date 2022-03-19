@@ -818,9 +818,14 @@ public:
                     me->Yell(TEXT_VOLTRON_DEATH, LANG_UNIVERSAL);
                     me->PlayDirectSound(SOUND_VOLTRON_DEATH);
                     // spawn chest
-                    if( uint32 chestId = (hardmode ? RAID_MODE(GO_MIMIRON_CHEST_HARD, GO_MIMIRON_CHEST_HERO_HARD) : RAID_MODE(GO_MIMIRON_CHEST, GO_MIMIRON_CHEST_HERO)) )
-                        if( GameObject* go = me->SummonGameObject(chestId, 2744.65f, 2569.46f, 364.397f, 0, 0, 0, 0, 0, 0) )
+                    if (uint32 chestId = (hardmode ? RAID_MODE(GO_MIMIRON_CHEST_HARD, GO_MIMIRON_CHEST_HERO_HARD) : RAID_MODE(GO_MIMIRON_CHEST, GO_MIMIRON_CHEST_HERO)))
+                    {
+                        if (GameObject* go = me->SummonGameObject(chestId, 2744.65f, 2569.46f, 364.397f, 0, 0, 0, 0, 0, 0))
+                        {
                             go->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
+                            go->SetLootRecipient(me->GetMap());
+                        }
+                    }
                     events.ScheduleEvent(EVENT_DISAPPEAR, 15000);
                     break;
                 case EVENT_DISAPPEAR:

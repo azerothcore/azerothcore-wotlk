@@ -1154,8 +1154,15 @@ public:
                                 go->SetGoState(GO_STATE_ACTIVE);
 
                             if (!me->GetMap()->GetPlayers().IsEmpty())
+                            {
                                 if (Player* player = me->GetMap()->GetPlayers().getFirst()->GetSource())
-                                    player->SummonGameObject(DUNGEON_MODE(GO_MALGANIS_CHEST_N, GO_MALGANIS_CHEST_H), 2288.35f, 1498.73f, 128.414f, -0.994837f, 0, 0, 0, 0, 0);
+                                {
+                                    if (GameObject* chest = player->SummonGameObject(DUNGEON_MODE(GO_MALGANIS_CHEST_N, GO_MALGANIS_CHEST_H), 2288.35f, 1498.73f, 128.414f, -0.994837f, 0, 0, 0, 0, 0))
+                                    {
+                                        chest->SetLootRecipient(me->GetMap());
+                                    }
+                                }
+                            }
                         }
                         ScheduleNextEvent(currentEvent, 10000);
                         break;

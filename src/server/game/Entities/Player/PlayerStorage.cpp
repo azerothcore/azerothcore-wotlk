@@ -6180,6 +6180,8 @@ Item* Player::_LoadMailedItem(ObjectGuid const& playerGuid, Player* player, uint
 
 void Player::_LoadMail(PreparedQueryResult mailsResult, PreparedQueryResult mailItemsResult)
 {
+    time_t cur_time = GameTime::GetGameTime().count();
+
     m_mail.clear();
 
     std::unordered_map<uint32, Mail*> mailById;
@@ -6204,6 +6206,12 @@ void Player::_LoadMail(PreparedQueryResult mailsResult, PreparedQueryResult mail
             m->checked        = fields[10].Get<uint8>();
             m->stationery     = fields[11].Get<uint8>();
             m->mailTemplateId = fields[12].Get<int16>();
+
+            if (cur_time > m->expire_time)
+            {
+                LOG_DEBUG("entities.player", "Player::_LoadMail: Mail ({}) has expired - ignored.", m->messageID);
+                continue;
+            }
 
             if (m->mailTemplateId && !sMailTemplateStore.LookupEntry(m->mailTemplateId))
             {

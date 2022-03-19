@@ -209,6 +209,9 @@ public:
     void FinishWeek();
     void FinishGame(int32 mod, const Map* bgMap);
 
+    void SetPreviousOpponents(uint32 arenaTeamId) { PreviousOpponents = arenaTeamId; }
+    uint32 GetPreviousOpponents() { return PreviousOpponents; }
+
     void CreateTempArenaTeam(std::vector<Player*> playerList, uint8 type, std::string const& teamName);
 
     // Containers
@@ -229,5 +232,7 @@ protected:
 
     MemberList     Members;
     ArenaTeamStats Stats;
+
+    uint32 PreviousOpponents = 0;
 };
 #endif
