@@ -100,7 +100,7 @@ float playerBaseMoveSpeed[MAX_MOVE_TYPE] =
 
 DamageInfo::DamageInfo(Unit* attacker, Unit* victim, uint32 damage, SpellInfo const* spellInfo, SpellSchoolMask schoolMask, DamageEffectType damageType, WeaponAttackType attackType, uint32 cleanDamage)
         : m_attacker(attacker), m_victim(victim), m_damage(damage), m_spellInfo(spellInfo), m_schoolMask(schoolMask),
-          m_damageType(damageType), m_attackType(attackType), m_cleanDamage(cleanDamage), m_absorb(0), m_resist(0), m_block(0), m_hitMask(0)
+          m_damageType(damageType), m_attackType(attackType), m_absorb(0), m_resist(0), m_block(0), m_hitMask(0), m_cleanDamage(cleanDamage)
 {
 }
 
