@@ -53,3 +53,12 @@ INSERT INTO `spell_script_names` (`spell_id`,`ScriptName`) VALUES
 (-30881, 'spell_sha_nature_guardian'),                  -- Shaman Nature's Guardian
 (-324, 'spell_sha_lightning_shield'),                   -- Shaman Lightning Shield
 (-30299, 'spell_warl_nether_protection');               -- Warlock Nether protection
+
+UPDATE `spell_proc` SET `SpellPhaseMask`=0x2 WHERE `SpellId` IN (
+-61846, -- Aspect of the Dragonhawk
+-13165, -- Aspect of the Hawk
+7434,   -- Fate Rune of Unsurpassed Vigor
+39958,  -- Skyfire Swiftness
+55380,  -- Skyflare Swiftness
+70727   -- Item - Hunter T10 2P Bonus
+);
