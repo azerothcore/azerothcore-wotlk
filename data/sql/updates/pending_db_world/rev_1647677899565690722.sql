@@ -62,3 +62,7 @@ UPDATE `spell_proc` SET `SpellPhaseMask`=0x2 WHERE `SpellId` IN (
 55380,  -- Skyflare Swiftness
 70727   -- Item - Hunter T10 2P Bonus
 );
+
+DELETE FROM `spell_script_names` WHERE `ScriptName`='spell_pri_pain_and_suffering_dummy';
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(-47580, 'spell_pri_pain_and_suffering_dummy');

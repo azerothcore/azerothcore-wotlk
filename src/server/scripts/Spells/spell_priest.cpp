@@ -477,6 +477,33 @@ class spell_pri_mind_sear : public SpellScript
     }
 };
 
+// -47580 - Pain and Suffering (dummy aura)
+class spell_pri_pain_and_suffering_dummy : public SpellScriptLoader
+{
+public:
+    spell_pri_pain_and_suffering_dummy() : SpellScriptLoader("spell_pri_pain_and_suffering_dummy") { }
+
+    class spell_pri_pain_and_suffering_dummy_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_pri_pain_and_suffering_dummy_AuraScript);
+
+        bool CheckDummy(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+        {
+            return false;
+        }
+
+        void Register() override
+        {
+            DoCheckEffectProc += AuraCheckEffectProcFn(spell_pri_pain_and_suffering_dummy_AuraScript::CheckDummy, EFFECT_1, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_pri_pain_and_suffering_dummy_AuraScript;
+    }
+};
+
 // 47948 - Pain and Suffering (Proc)
 class spell_pri_pain_and_suffering_proc : public SpellScript
 {
@@ -885,6 +912,7 @@ void AddSC_priest_spell_scripts()
     RegisterSpellScript(spell_pri_mana_burn);
     RegisterSpellScript(spell_pri_mana_leech);
     RegisterSpellScript(spell_pri_mind_sear);
+    new spell_pri_pain_and_suffering_dummy();
     RegisterSpellScript(spell_pri_pain_and_suffering_proc);
     RegisterSpellScript(spell_pri_penance);
     RegisterSpellAndAuraScriptPair(spell_pri_power_word_shield, spell_pri_power_word_shield_aura);
