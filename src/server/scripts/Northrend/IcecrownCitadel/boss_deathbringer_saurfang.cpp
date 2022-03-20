@@ -1404,6 +1404,41 @@ public:
     }
 };
 
+// 72176 - Blood Beast's Blood Link
+class spell_deathbringer_blood_beast_blood_link : public SpellScriptLoader
+{
+public:
+    spell_deathbringer_blood_beast_blood_link() : SpellScriptLoader("spell_deathbringer_blood_beast_blood_link") { }
+
+    class spell_deathbringer_blood_beast_blood_link_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_deathbringer_blood_beast_blood_link_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_BLOOD_LINK_DUMMY))
+                return false;
+            return true;
+        }
+
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+            eventInfo.GetProcTarget()->CastCustomSpell(SPELL_BLOOD_LINK_DUMMY, SPELLVALUE_BASE_POINT0, 3, (Unit*)nullptr, true, nullptr, aurEff);
+        }
+
+        void Register() override
+        {
+            OnEffectProc += AuraEffectProcFn(spell_deathbringer_blood_beast_blood_link_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_deathbringer_blood_beast_blood_link_AuraScript();
+    }
+};
+
 void AddSC_boss_deathbringer_saurfang()
 {
     new boss_deathbringer_saurfang();
@@ -1418,4 +1453,5 @@ void AddSC_boss_deathbringer_saurfang()
     new spell_deathbringer_boiling_blood();
     new achievement_ive_gone_and_made_a_mess();
     new npc_icc_blood_beast();
+    new spell_deathbringer_blood_beast_blood_link();
 }
