@@ -16,14 +16,11 @@ DELETE FROM `creature_text` WHERE `CreatureID`=238 AND `GroupID`=0 AND `ID`=0;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES (238, 0, 0, 'Don\'t worry, Old Blanchy, we\'ll get you something to eat soon...', 12, 7, 100, 0, 0, 0, 54, 0, 'Verna Furlbrow');
 DELETE FROM `creature_text` WHERE `CreatureID`=238 AND `GroupID`=0 AND `ID`=1;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES (238, 0, 1, 'I never thought the day would come that I\'d leave my homeland of Westfall...', 12, 7, 100, 0, 0, 0, 55, 0, 'Verna Furlbrow');
-DELETE FROM `broadcast_text` WHERE `ID`=54;
-INSERT INTO `broadcast_text` (`ID`, `LanguageID`, `MaleText`, `FemaleText`, `EmoteID1`, `EmoteID2`, `EmoteID3`, `EmoteDelay1`, `EmoteDelay2`, `EmoteDelay3`, `SoundEntriesId`, `EmotesID`, `Flags`, `VerifiedBuild`) VALUES (54, 7, '', 'Don\'t worry, Old Blanchy, we\'ll get you something to eat soon...', 0, 0, 0, 0, 0, 0, 0, 0, 1, 18019);
-DELETE FROM `broadcast_text` WHERE `ID`=55;
-INSERT INTO `broadcast_text` (`ID`, `LanguageID`, `MaleText`, `FemaleText`, `EmoteID1`, `EmoteID2`, `EmoteID3`, `EmoteDelay1`, `EmoteDelay2`, `EmoteDelay3`, `SoundEntriesId`, `EmotesID`, `Flags`, `VerifiedBuild`) VALUES (55, 7, '', 'I never thought the day would come that I\'d leave my homeland of Westfall...', 0, 0, 0, 0, 0, 0, 0, 0, 1, 18019);
-DELETE FROM `broadcast_text` WHERE `ID`=56;
-INSERT INTO `broadcast_text` (`ID`, `LanguageID`, `MaleText`, `FemaleText`, `EmoteID1`, `EmoteID2`, `EmoteID3`, `EmoteDelay1`, `EmoteDelay2`, `EmoteDelay3`, `SoundEntriesId`, `EmotesID`, `Flags`, `VerifiedBuild`) VALUES (56, 7, 'Can\'t believe the forsaken wagon broke down.  Ain\'t no luck to be had in this land...', '', 0, 0, 0, 0, 0, 0, 0, 0, 1, 18019);
-DELETE FROM `broadcast_text` WHERE `ID`=57;
-INSERT INTO `broadcast_text` (`ID`, `LanguageID`, `MaleText`, `FemaleText`, `EmoteID1`, `EmoteID2`, `EmoteID3`, `EmoteDelay1`, `EmoteDelay2`, `EmoteDelay3`, `SoundEntriesId`, `EmotesID`, `Flags`, `VerifiedBuild`) VALUES (57, 7, 'We\'ll be out of here just as soon as I get this wagon fixed...', '', 0, 0, 0, 0, 0, 0, 0, 0, 1, 18019);
+
+UPDATE `broadcast_text` SET `FemaleText`='Don\'t worry, Old Blanchy, we\'ll get you something to eat soon...' WHERE `ID` =54;
+UPDATE `broadcast_text` SET `FemaleText`='I never thought the day would come that I\'d leave my homeland of Westfall...' WHERE `ID` =55;
+UPDATE `broadcast_text` SET `MaleText`='Can\'t believe the forsaken wagon broke down.  Ain\'t no luck to be had in this land...' WHERE `ID` =56;
+UPDATE `broadcast_text` SET `MaleText`='We\'ll be out of here just as soon as I get this wagon fixed...' WHERE `ID` =57;
 
 /* SAI for text lines
 */
