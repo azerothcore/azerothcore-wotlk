@@ -66,6 +66,7 @@
 #include "SpellAuras.h"
 #include "SpellMgr.h"
 #include "Transport.h"
+#include "Unit.h"
 #include "UpdateData.h"
 #include "UpdateFieldFlags.h"
 #include "Util.h"
@@ -7141,12 +7142,12 @@ void Player::SaveToDB(CharacterDatabaseTransaction trans, bool create, bool logo
     _SaveGlyphs(trans);
     _SaveInstanceTimeRestrictions(trans);
     _SavePlayerSettings(trans);
+    _SaveCustomData(trans);  // custom_data
 
     // check if stats should only be saved on logout
     // save stats can be out of transaction
     if (m_session->isLogingOut() || !sWorld->getBoolConfig(CONFIG_STATS_SAVE_ONLY_ON_LOGOUT))
         _SaveStats(trans);
-        _SaveCustomData(trans);
 
     // save pet (hunter pet level and experience and all type pets health/mana).
     if (Pet* pet = GetPet())
@@ -7766,6 +7767,28 @@ void Player::_SaveSpells(CharacterDatabaseTransaction trans)
     }
 }
 
+
+void Player::_SaveCustomData(CharacterDatabaseTransaction trans)
+{
+    CharacterDatabasePreparedStatement* stmt = nullptr;
+
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_CUSTOM_DATA);
+    stmt->setUInt32(0, GetGUID().GetCounter());
+    trans->Append(stmt);
+
+    uint8 index = 0;
+
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_CUSTOM_DATA);
+    stmt->setUInt32(index++, GetGUID().GetCounter());
+    stmt->setUInt32(index++, GetStat(STAT_AGILITY));  //adnl_agility
+    stmt->setUInt32(index++, GetStat(STAT_STRENGTH));  //adnl_strength
+    stmt->setUInt32(index++, GetStat(STAT_STAMINA));  //adnl_stamina
+    stmt->setUInt32(index++, GetStat(STAT_INTELLECT));  //adnl_intellect
+    stmt->setUInt32(index++, GetStat(STAT_SPIRIT));  //adnl_spirit
+   
+    trans->Append(stmt);
+} 
+ 
 // save player stats -- only for external usage
 // real stats will be recalculated on player login
 void Player::_SaveStats(CharacterDatabaseTransaction trans)
@@ -7805,25 +7828,6 @@ void Player::_SaveStats(CharacterDatabaseTransaction trans)
     stmt->setUInt32(index++, GetUInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER));
     stmt->setUInt32(index++, GetBaseSpellPowerBonus());
     stmt->setUInt32(index++, GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_CRIT_TAKEN_SPELL)));
-
-    trans->Append(stmt);
-}
-
-void Player::_SaveCustomData(CharacterDatabaseTransaction trans)
-{
-    CharacterDatabasePreparedStatement* stmt = nullptr;
-
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_CUSTOM_DATA);
-    stmt->setUInt32(0, GetGUID().GetCounter());
-    trans->Append(stmt);
-
-    uint8 index = 0;
-
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_CUSTOM_DATA);
-    stmt->setUInt32(index++, GetGUID().GetCounter());
-
-    for (uint8 i = 0; i < MAX_SECSTATS; ++i)
-        stmt->setUInt32(index++, GetSecStat(SecStats(i)));
 
     trans->Append(stmt);
 }

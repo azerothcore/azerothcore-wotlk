@@ -215,11 +215,6 @@ bool LoginQueryHolder::Initialize()
     stmt->setUInt32(0, lowGuid);
     res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_PET_SLOTS, stmt);
 
-// custom table, this may send to client, when there is no corresponding query im client code client crashes. 2.26.2022
-     // stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_CUSTOM_DATA);
-     // stmt->setUInt32(0, lowGuid);
-     // res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_CUSTOM_DATA, stmt); 
-
     return res;
 }
 

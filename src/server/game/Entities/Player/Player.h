@@ -2687,7 +2687,7 @@ public:
     void _SaveGlyphs(CharacterDatabaseTransaction trans);
     void _SaveTalents(CharacterDatabaseTransaction trans);
     void _SaveStats(CharacterDatabaseTransaction trans);
-    void _SaveCustomData(CharacterDatabaseTransaction trans);
+    void _SaveCustomData(CharacterDatabaseTransaction trans);   //custom data
     void _SaveCharacter(bool create, CharacterDatabaseTransaction trans);
     void _SaveInstanceTimeRestrictions(CharacterDatabaseTransaction trans);
     void _SavePlayerSettings(CharacterDatabaseTransaction trans);

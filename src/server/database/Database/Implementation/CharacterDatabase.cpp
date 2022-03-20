@@ -599,9 +599,9 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_DEL_CHAR_SETTINGS, "DELETE FROM character_settings WHERE guid = ?", CONNECTION_ASYNC);
 
     // Character custom data test
-   // PrepareStatement(CHAR_SEL_CHAR_CUSTOM_DATA, "SELECT guid, adnl_agility, adnl_strength, adnl_stamina, adnl_intellect, adnl_spirit FROM character_custom_data WHERE guid = ?", CONNECTION_SYNCH);
-   // PrepareStatement(CHAR_DEL_CHAR_CUSTOM_DATA, "DELETE FROM character_custom_data WHERE guid = ?", CONNECTION_ASYNC);
-   // PrepareStatement(CHAR_INS_CHAR_CUSTOM_DATA, "INSERT INTO character_custom_data (guid, adnl_agility, adnl_strength, adnl_stamina, adnl_intellect, adnl_spirit) VALUES (?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_SEL_CHAR_CUSTOM_DATA, "SELECT adnl_agility, adnl_strength, adnl_stamina, adnl_intellect, adnl_spirit FROM character_custom_data WHERE guid = ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_DEL_CHAR_CUSTOM_DATA, "DELETE FROM character_custom_data WHERE guid = ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_INS_CHAR_CUSTOM_DATA, "INSERT INTO character_custom_data (guid, adnl_agility, adnl_strength, adnl_stamina, adnl_intellect, adnl_spirit) VALUES (?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
     
 }
 

@@ -80,9 +80,19 @@
         "xlocnum": "cpp",
         "xmemory": "cpp",
         "xtree": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "future": "cpp",
+        "locale": "cpp",
+        "regex": "cpp",
+        "stop_token": "cpp",
+        "xlocbuf": "cpp",
+        "xlocmes": "cpp",
+        "xloctime": "cpp",
+        "*.rh": "cpp",
+        "xlocinfo": "cpp"
     },
     "deno.enable": true,
     "deno.path": "deps/deno/bin/deno",
-    "deno.lint": true
+    "deno.lint": true,
+    "C_Cpp.dimInactiveRegions": false
 }
