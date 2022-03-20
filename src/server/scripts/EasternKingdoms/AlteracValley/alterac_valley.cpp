@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "BattlegroundAV.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 
@@ -57,11 +56,6 @@ enum Events
     EVENT_WHIRLWIND            = 4,
     EVENT_ENRAGE               = 5,
     EVENT_CHECK_RESET          = 6
-};
-
-enum Factions
-{
-    FACTION_AV_ALLIANCE = 1534
 };
 
 struct SpellPair
@@ -108,46 +102,6 @@ public:
         void JustRespawned() override
         {
             Reset();
-        }
-
-        void AttackStart(Unit* victim) override
-        {
-            ScriptedAI::AttackStart(victim);
-
-            // Boss should attack as well
-            if (BattlegroundMap* bgMap = me->GetMap()->ToBattlegroundMap())
-            {
-                if (Battleground* bg = bgMap->GetBG())
-                {
-                    if (Creature* mainBoss = bg->GetBGCreature((me->GetFaction() == FACTION_AV_ALLIANCE ? AV_CPLACE_A_BOSS : AV_CPLACE_H_BOSS)))
-                    {
-                        if (mainBoss->IsAIEnabled && !mainBoss->IsInCombat())
-                        {
-                            mainBoss->AI()->AttackStart(victim);
-                        }
-                    }
-                }
-            }
-        }
-
-        void EnterEvadeMode() override
-        {
-            ScriptedAI::EnterEvadeMode();
-
-            // Evade boss
-            if (BattlegroundMap* bgMap = me->GetMap()->ToBattlegroundMap())
-            {
-                if (Battleground* bg = bgMap->GetBG())
-                {
-                    if (Creature* mainBoss = bg->GetBGCreature((me->GetFaction() == FACTION_AV_ALLIANCE ? AV_CPLACE_A_BOSS : AV_CPLACE_H_BOSS)))
-                    {
-                        if (mainBoss->IsAIEnabled && !mainBoss->IsInEvadeMode())
-                        {
-                            mainBoss->AI()->EnterEvadeMode();
-                        }
-                    }
-                }
-            }
         }
 
         void UpdateAI(uint32 diff) override
