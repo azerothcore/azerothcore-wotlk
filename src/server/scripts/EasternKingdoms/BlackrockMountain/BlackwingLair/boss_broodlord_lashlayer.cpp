@@ -145,7 +145,6 @@ class go_suppression_device : public GameObjectScript
         {
             switch (state)
             {
-
                 case GO_JUST_DEACTIVATED: // This case prevents the Gameobject despawn by Disarm Trap
                     go->SetLootState(GO_READY);
                     [[fallthrough]];
@@ -197,14 +196,17 @@ class go_suppression_device : public GameObjectScript
             {
                 if (action == ACTION_DEACTIVATE)
                 {
-                    Deactivate();
                     _events.CancelEvent(EVENT_SUPPRESSION_RESET);
                 }
                 else if (action == ACTION_DISARMED)
                 {
                     Deactivate();
                     _events.CancelEvent(EVENT_SUPPRESSION_CAST);
-                    _events.ScheduleEvent(EVENT_SUPPRESSION_RESET, urand(30000, 120000));
+
+                    if (_instance->GetBossState(DATA_BROODLORD_LASHLAYER) != DONE)
+                    {
+                        _events.ScheduleEvent(EVENT_SUPPRESSION_RESET, urand(30000, 120000));
+                    }
                 }
             }
 
