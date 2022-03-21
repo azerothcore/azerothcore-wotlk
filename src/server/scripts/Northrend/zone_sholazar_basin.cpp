@@ -15,19 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Sholazar_Basin
-SD%Complete: 100
-SDComment: Quest support: 12570, 12573, 12621.
-SDCategory: Sholazar_Basin
-EndScriptData */
-
-/* ContentData
-npc_injured_rainspeaker_oracle
-npc_vekjik
-avatar_of_freya
-EndContentData */
-
 #include "CombatAI.h"
 #include "PassiveAI.h"
 #include "Player.h"
@@ -1505,6 +1492,34 @@ public:
     }
 };
 
+enum ReturnedSevenfold
+{
+    SPELL_FREYAS_WARD           = 51845,
+    SPELL_SEVENFOLD_RETRIBUTION = 51856,
+    SPELL_DEATHBOLT             = 51855
+};
+
+class spell_q12611_deathbolt : public SpellScript
+{
+    PrepareSpellScript(spell_q12611_deathbolt);
+
+    void HandleScriptEffect(SpellEffIndex /* effIndex */)
+    {
+        Unit* caster = GetCaster();
+        Unit* target = GetHitUnit();
+
+        if (target->HasAura(SPELL_FREYAS_WARD))
+            target->CastSpell(caster, SPELL_SEVENFOLD_RETRIBUTION, true);
+        else
+            caster->CastSpell(target, SPELL_DEATHBOLT, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q12611_deathbolt::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_sholazar_basin()
 {
     // Ours
@@ -1526,4 +1541,6 @@ void AddSC_sholazar_basin()
     new spell_q12589_shoot_rjr();
     new npc_vics_flying_machine();
     new spell_shango_tracks();
+
+    RegisterSpellScript(spell_q12611_deathbolt);
 }
