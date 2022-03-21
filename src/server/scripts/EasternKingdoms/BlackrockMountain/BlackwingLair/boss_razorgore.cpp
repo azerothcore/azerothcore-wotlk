@@ -43,7 +43,9 @@ enum Spells
     SPELL_CONFLAGRATION     = 23023,
 
     SPELL_EXPLODE_ORB       = 20037,
-    SPELL_EXPLOSION         = 20038 // Instakill everything.
+    SPELL_EXPLOSION         = 20038, // Instakill everything.
+
+    SPELL_WARMING_FLAMES    = 23040,
 };
 
 enum Summons
@@ -109,7 +111,8 @@ public:
             secondPhase = true;
             _charmerGUID.Clear();
             me->RemoveAllAuras();
-            me->SetHealth(me->GetMaxHealth());
+
+            DoCastSelf(SPELL_WARMING_FLAMES, true);
 
             events.ScheduleEvent(EVENT_CLEAVE, 15000);
             events.ScheduleEvent(EVENT_STOMP, 35000);
@@ -168,6 +171,7 @@ public:
         {
             _summonGUIDS.push_back(summon->GetGUID());
             summon->SetOwnerGUID(me->GetGUID());
+            summons.Summon(summon);
         }
 
         void SummonMovementInform(Creature* summon, uint32 movementType, uint32 pathId) override
