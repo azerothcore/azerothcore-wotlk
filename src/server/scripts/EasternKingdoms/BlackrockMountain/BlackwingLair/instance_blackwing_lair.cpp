@@ -356,7 +356,7 @@ public:
 
             return ObjectGuid::Empty;
         }
-        
+
         void OnUnitDeath(Unit* unit) override
         {
             switch (unit->GetEntry())
