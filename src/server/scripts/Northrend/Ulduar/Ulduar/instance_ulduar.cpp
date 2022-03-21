@@ -634,10 +634,18 @@ public:
                 {
                     case TYPE_HODIR:
                         if (hmHodir)
+                        {
                             if (GameObject* go = instance->GetGameObject(m_hodirHardmodeChest))
+                            {
                                 go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                                go->SetLootRecipient(instance);
+                            }
+                        }
                         if (GameObject* go = instance->GetGameObject(m_hodirNormalChest))
+                        {
                             go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                            go->SetLootRecipient(instance);
+                        }
                         break;
                 }
             }
