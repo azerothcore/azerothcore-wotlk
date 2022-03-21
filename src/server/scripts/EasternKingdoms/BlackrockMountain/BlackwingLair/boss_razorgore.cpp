@@ -103,6 +103,11 @@ public:
         {
             _EnterCombat();
 
+            events.ScheduleEvent(EVENT_CLEAVE, 15000);
+            events.ScheduleEvent(EVENT_STOMP, 35000);
+            events.ScheduleEvent(EVENT_FIREBALL, 7000);
+            events.ScheduleEvent(EVENT_CONFLAGRATION, 12000);
+
             instance->SetData(DATA_EGG_EVENT, IN_PROGRESS);
         }
 
@@ -113,11 +118,6 @@ public:
             me->RemoveAllAuras();
 
             DoCastSelf(SPELL_WARMING_FLAMES, true);
-
-            events.ScheduleEvent(EVENT_CLEAVE, 15000);
-            events.ScheduleEvent(EVENT_STOMP, 35000);
-            events.ScheduleEvent(EVENT_FIREBALL, 7000);
-            events.ScheduleEvent(EVENT_CONFLAGRATION, 12000);
 
             if (Creature* troops = instance->GetCreature(DATA_NEFARIAN_TROOPS))
             {
@@ -150,6 +150,13 @@ public:
                 if (Unit* charmer = ObjectAccessor::GetUnit(*me, _charmerGUID))
                 {
                     charmer->CastSpell(charmer, SPELL_MIND_EXHAUSTION, true);
+                }
+            }
+            else
+            {
+                if (Unit* charmer = ObjectAccessor::GetUnit(*me, _charmerGUID))
+                {
+                    me->TauntApply(charmer);
                 }
             }
         }
@@ -210,7 +217,10 @@ public:
             if (!UpdateVictim())
                 return;
 
-            events.Update(diff);
+            if (!me->IsCharmed())
+            {
+                events.Update(diff);
+            }
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -234,12 +244,13 @@ public:
                     case EVENT_CONFLAGRATION:
                         DoCastVictim(SPELL_CONFLAGRATION);
                         if (me->GetVictim() && me->GetVictim()->HasAura(SPELL_CONFLAGRATION))
-                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
                                 me->TauntApply(target);
                         events.ScheduleEvent(EVENT_CONFLAGRATION, 30000);
                         break;
                 }
             }
+
             DoMeleeAttackIfReady();
         }
 
