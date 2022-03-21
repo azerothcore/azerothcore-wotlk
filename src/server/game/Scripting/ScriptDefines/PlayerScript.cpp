@@ -305,14 +305,6 @@ void ScriptMgr::OnPlayerUpdate(Player* player, uint32 p_time)
     });
 }
 
-void ScriptMgr::OnAfterPlayerUpdate(Player* player, uint32 diff)
-{
-    ExecuteScript<PlayerScript>([&](PlayerScript* script)
-    {
-        script->OnAfterUpdate(player, diff);
-    });
-}
-
 void ScriptMgr::OnPlayerLogin(Player* player)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)

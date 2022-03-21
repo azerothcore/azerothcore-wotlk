@@ -141,7 +141,7 @@ namespace MMAP
         uint32 packedGridPos = packTileID(x, y);
         if (mmap->loadedTileRefs.find(packedGridPos) != mmap->loadedTileRefs.end())
         {
-            LOG_DEBUG("maps", "MMAP:loadMap: Asked to load already loaded navmesh tile. {:03}{:02}{:02}.mmtile", mapId, x, y);
+            LOG_ERROR("maps", "MMAP:loadMap: Asked to load already loaded navmesh tile. {:03}{:02}{:02}.mmtile", mapId, x, y);
             return false;
         }
 

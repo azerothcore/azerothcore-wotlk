@@ -721,7 +721,6 @@ enum GOState
 struct GameObjectData
 {
     explicit GameObjectData()  = default;
-    ObjectGuid::LowType spawnId{0};
     uint32 id{0};                                              // entry in gamobject_template
     uint16 mapid{0};
     uint32 phaseMask{0};

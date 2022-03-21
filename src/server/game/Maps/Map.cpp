@@ -2803,6 +2803,7 @@ InstanceMap::~InstanceMap()
 {
     delete instance_data;
     instance_data = nullptr;
+    sInstanceSaveMgr->DeleteInstanceSaveIfNeeded(GetInstanceId(), true);
 }
 
 void InstanceMap::InitVisibilityDistance()

@@ -23,6 +23,7 @@
 #include "LootMgr.h"
 #include "QueryResult.h"
 #include "SharedDefines.h"
+#include <functional>
 
 class Battlefield;
 class Battleground;
@@ -43,7 +44,7 @@ struct MapEntry;
 #define MAX_RAID_SUBGROUPS MAXRAIDSIZE/MAXGROUPSIZE
 #define TARGETICONCOUNT 8
 
-enum RollVote : uint32
+enum RollVote
 {
     PASS              = 0,
     NEED              = 1,
@@ -135,7 +136,7 @@ enum DifficultyPreventionChangeType
 
 #define GROUP_UPDATE_FLAGS_COUNT          20
 // 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19
-static const uint8 GroupUpdateLength[GROUP_UPDATE_FLAGS_COUNT] = { 0, 2, 2, 2, 1, 2, 2, 2, 2, 4, 8, 8, 1, 2, 2, 2, 1, 2, 2, 8 };
+static const uint8 GroupUpdateLength[GROUP_UPDATE_FLAGS_COUNT] = { 0, 2, 2, 2, 1, 2, 2, 2, 2, 4, 8, 8, 1, 2, 2, 2, 1, 2, 2, 8};
 
 class Roll : public LootValidatorRef
 {
@@ -214,6 +215,7 @@ public:
     bool isBGGroup()   const;
     bool IsCreated()   const;
     ObjectGuid GetLeaderGUID() const;
+    Player* GetLeader();
     ObjectGuid GetGUID() const;
     const char* GetLeaderName() const;
     LootMethod GetLootMethod() const;
@@ -250,11 +252,9 @@ public:
     GroupJoinBattlegroundResult CanJoinBattlegroundQueue(Battleground const* bgTemplate, BattlegroundQueueTypeId bgQueueTypeId, uint32 MinPlayerCount, uint32 MaxPlayerCount, bool isRated, uint32 arenaSlot);
 
     void ChangeMembersGroup(ObjectGuid guid, uint8 group);
+    void SetTargetIcon(uint8 id, ObjectGuid whoGuid, ObjectGuid targetGuid);
     void SetGroupMemberFlag(ObjectGuid guid, bool apply, GroupMemberFlags flag);
     void RemoveUniqueGroupMemberFlag(GroupMemberFlags flag);
-
-    void SetTargetIcon(uint8 id, ObjectGuid whoGuid, ObjectGuid targetGuid);
-    ObjectGuid const GetTargetIcon(uint8 id) const { return m_targetIcons[id]; }
 
     Difficulty GetDifficulty(bool isRaid) const;
     Difficulty GetDungeonDifficulty() const;
@@ -294,8 +294,6 @@ public:
     bool CountRollVote(ObjectGuid playerGUID, ObjectGuid Guid, uint8 Choise);
     void EndRoll(Loot* loot, Map* allowedMap);
 
-    Rolls GetRolls() const { return RollId; }
-
     // related to disenchant rolls
     void ResetMaxEnchantingLevel();
 
@@ -316,6 +314,8 @@ public:
     uint32 GetDifficultyChangePreventionTime() const;
     DifficultyPreventionChangeType GetDifficultyChangePreventionReason() const { return _difficultyChangePreventionType; }
     void SetDifficultyChangePrevention(DifficultyPreventionChangeType type);
+
+    void DoForAllMembers(std::function<void(Player*)> const& worker);
 
 protected:
     void _homebindIfInstance(Player* player);

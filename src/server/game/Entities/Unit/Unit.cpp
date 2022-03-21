@@ -212,7 +212,6 @@ Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
     m_vehicleKit(nullptr),
     m_unitTypeMask(UNIT_MASK_NONE),
     m_HostileRefMgr(this),
-    m_cannotReachTarget(false),
     m_comboTarget(nullptr),
     m_comboPoints(0)
 {
@@ -7234,6 +7233,12 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (!victim)
                         return false;
 
+                    // Do not proc from Glyph of Holy Light and Judgement of Light
+                    if (procSpell->Id == 20267 || procSpell->Id == 54968)
+                    {
+                        return false;
+                    }
+
                     Unit* beaconTarget = triggeredByAura->GetBase()->GetCaster();
                     if (!beaconTarget || beaconTarget == this || !beaconTarget->GetAura(53563, victim->GetGUID()))
                         return false;
@@ -9132,8 +9137,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
         case 14189: // Seal Fate (Netherblade set)
         case 14157: // Ruthlessness
             {
-                if (!victim || victim == this)
-                    return false;
+                victim = nullptr;
                 // Need add combopoint AFTER finish movie (or they dropped in finish phase)
                 break;
             }
@@ -9673,7 +9677,7 @@ ReputationRank Unit::GetFactionReactionTo(FactionTemplateEntry const* factionTem
 
     // xinef: check forced reputation for self also
     if (Player const* selfPlayerOwner = GetAffectingPlayer())
-        if (ReputationRank const* repRank = selfPlayerOwner->GetReputationMgr().GetForcedRankIfAny(targetFactionTemplateEntry))
+        if (ReputationRank const* repRank = selfPlayerOwner->GetReputationMgr().GetForcedRankIfAny(target->GetFactionTemplateEntry()))
             return *repRank;
 
     if (Player const* targetPlayerOwner = target->GetAffectingPlayer())
@@ -9700,32 +9704,15 @@ ReputationRank Unit::GetFactionReactionTo(FactionTemplateEntry const* factionTem
         }
     }
 
-    return GetFactionReactionTo(factionTemplateEntry, targetFactionTemplateEntry);
-}
-
-ReputationRank Unit::GetFactionReactionTo(FactionTemplateEntry const* factionTemplateEntry, FactionTemplateEntry const* targetFactionTemplateEntry)
-{
     // common faction based check
     if (factionTemplateEntry->IsHostileTo(*targetFactionTemplateEntry))
-    {
         return REP_HOSTILE;
-    }
-
     if (factionTemplateEntry->IsFriendlyTo(*targetFactionTemplateEntry))
-    {
         return REP_FRIENDLY;
-    }
-
     if (targetFactionTemplateEntry->IsFriendlyTo(*factionTemplateEntry))
-    {
         return REP_FRIENDLY;
-    }
-
     if (factionTemplateEntry->factionFlags & FACTION_TEMPLATE_FLAG_HATES_ALL_EXCEPT_FRIENDS)
-    {
         return REP_HOSTILE;
-    }
-
     // neutral by default
     return REP_NEUTRAL;
 }
@@ -15830,7 +15817,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                     continue;
                 }
 
-                switch(triggeredByAura->GetAuraType())
+                switch (triggeredByAura->GetAuraType())
                 {
                     case SPELL_AURA_PROC_TRIGGER_SPELL:
                         {
@@ -15970,6 +15957,19 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                             break;
                         takeCharges = true;
                         break;
+                    case SPELL_AURA_ADD_FLAT_MODIFIER:
+                    case SPELL_AURA_ADD_PCT_MODIFIER:
+                    {
+                        if (SpellModifier* mod = triggeredByAura->GetSpellModifier())
+                        {
+                            if (mod->op == SPELLMOD_CASTING_TIME && procSpell && (procSpell->GetTriggeredCastFlags() & TRIGGERED_CAST_DIRECTLY) != 0)
+                            {
+                                break;
+                            }
+                        }
+                        takeCharges = true;
+                        break;
+                    }
                     default:
                         takeCharges = true;
                         break;
@@ -18304,24 +18304,12 @@ void Unit::SendPlaySpellVisual(uint32 id)
     SendMessageToSet(&data, true);
 }
 
-void Unit::SendPlaySpellVisual(ObjectGuid guid, uint32 id)
-{
-    WorldPacket data(SMSG_PLAY_SPELL_VISUAL, 8 + 4);
-    data << guid;
-    data << uint32(id); // SpellVisualKit.dbc index
-    SendMessageToSet(&data, true);
-}
-
 void Unit::SendPlaySpellImpact(ObjectGuid guid, uint32 id)
 {
     WorldPacket data(SMSG_PLAY_SPELL_IMPACT, 8 + 4);
     data << guid;       // target
     data << uint32(id); // SpellVisualKit.dbc index
-
-    if (IsPlayer())
-        ToPlayer()->SendDirectMessage(&data);
-    else
-        SendMessageToSet(&data, true);
+    SendMessageToSet(&data, true);
 }
 
 void Unit::ApplyResilience(Unit const* victim, float* crit, int32* damage, bool isCrit, CombatRating type)
@@ -20540,16 +20528,4 @@ bool Unit::CanRestoreMana(SpellInfo const* spellInfo) const
     }
 
     return false;
-}
-
-bool Unit::SetCannotReachTarget(bool cannotReach, bool /*isChase = true*/)
-{
-    if (cannotReach == m_cannotReachTarget)
-    {
-        return false;
-    }
-
-    m_cannotReachTarget = cannotReach;
-
-    return true;
 }

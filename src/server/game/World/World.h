@@ -344,11 +344,9 @@ public:
     [[nodiscard]] char const* GetWorldDBRevision() const override { return m_WorldDBRevision.c_str(); }
     [[nodiscard]] char const* GetCharacterDBRevision() const override { return m_CharacterDBRevision.c_str(); }
     [[nodiscard]] char const* GetAuthDBRevision() const override { return m_AuthDBRevision.c_str(); }
-
 #ifdef MOD_PLAYERBOTS
     [[nodiscard]] char const* GetPlayerbotsDBRevision() const { return m_PlayerbotsDBRevision.c_str(); }
 #endif
-
     void LoadAutobroadcasts() override;
 
     void UpdateAreaDependentAuras() override;
@@ -379,9 +377,6 @@ protected:
     void ResetRandomBG();
     void CalendarDeleteOldEvents();
     void ResetGuildCap();
-
-    SQLQueryHolderCallback& AddQueryHolderCallback(SQLQueryHolderCallback&& callback) override;
-
 private:
     static std::atomic_long m_stopEvent;
     static uint8 m_ExitCode;
@@ -462,7 +457,6 @@ private:
 
     void ProcessQueryCallbacks();
     QueryCallbackProcessor _queryProcessor;
-    AsyncCallbackProcessor<SQLQueryHolderCallback> _queryHolderProcessor;
 
     /**
      * @brief Executed when a World Session is being finalized. Be it from a normal login or via queue popping.
