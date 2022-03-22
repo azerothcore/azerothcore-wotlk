@@ -3886,13 +3886,6 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                             DoCreateItem(effIndex, itemId);
                             break;
                         }
-                    case 20589: // Escape artist
-                    case 30918: // Improved Sprint
-                        {
-                            // Removes snares and roots.
-                            unitTarget->RemoveMovementImpairingAuras(true);
-                            break;
-                        }
                     // Plant Warmaul Ogre Banner
                     case 32307:
                         if (Player* caster = m_caster->ToPlayer())
