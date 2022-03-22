@@ -632,15 +632,6 @@ void BattlegroundMgr::SendToBattleground(Player* player, uint32 instanceId, Batt
 
         LOG_DEBUG("bg.battleground", "BattlegroundMgr::SendToBattleground: Sending {} to map {}, {} (bgType {})", player->GetName(), mapid, pos->ToString(), bgTypeId);
         player->TeleportTo(mapid, pos->GetPositionX(), pos->GetPositionY(), pos->GetPositionZ(), pos->GetOrientation());
-
-        for (uint8 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
-        {
-            if (BattlegroundQueueTypeId bgQueueTypeId = player->GetBattlegroundQueueTypeId(i))
-            {
-                player->RemoveBattlegroundQueueId(bgQueueTypeId);
-                sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId).RemovePlayer(player->GetGUID(), true);
-            }
-        }
     }
     else
     {
