@@ -248,7 +248,10 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     m_swingErrorMsg = 0;
 
     for (uint8 j = 0; j < PLAYER_MAX_BATTLEGROUND_QUEUES; ++j)
-        m_bgBattlegroundQueueID[j] = BATTLEGROUND_QUEUE_NONE;
+    {
+        _BgBattlegroundQueueID[j].bgQueueTypeId = BATTLEGROUND_QUEUE_NONE;
+        _BgBattlegroundQueueID[j].invitedToInstance = 0;
+    }
 
     m_logintime = GameTime::GetGameTime().count();
     m_Last_tick = m_logintime;
@@ -2423,23 +2426,23 @@ void Player::GiveLevel(uint8 level)
     PlayerClassLevelInfo classInfo;
     sObjectMgr->GetPlayerClassLevelInfo(getClass(), level, &classInfo);
 
-    // send levelup info to client
-    WorldPacket data(SMSG_LEVELUP_INFO, (4 + 4 + MAX_POWERS * 4 + MAX_STATS * 4));
-    data << uint32(level);
-    data << uint32(int32(classInfo.basehealth) - int32(GetCreateHealth()));
-    // for (int i = 0; i < MAX_POWERS; ++i)                  // Powers loop (0-6)
-    data << uint32(int32(classInfo.basemana)   - int32(GetCreateMana()));
-    data << uint32(0);
-    data << uint32(0);
-    data << uint32(0);
-    data << uint32(0);
-    data << uint32(0);
-    data << uint32(0);
-    // end for
-    for (uint8 i = STAT_STRENGTH; i < MAX_STATS; ++i)          // Stats loop (0-4)
-        data << uint32(int32(info.stats[i]) - GetCreateStat(Stats(i)));
+    WorldPackets::Misc::LevelUpInfo packet;
+    packet.Level = level;
+    packet.HealthDelta = int32(classInfo.basehealth) - int32(GetCreateHealth());
 
-    GetSession()->SendPacket(&data);
+    /// @todo find some better solution
+    // for (int i = 0; i < MAX_POWERS; ++i)
+    packet.PowerDelta[0] = int32(classInfo.basemana) - int32(GetCreateMana());
+    packet.PowerDelta[1] = 0;
+    packet.PowerDelta[2] = 0;
+    packet.PowerDelta[3] = 0;
+    packet.PowerDelta[4] = 0;
+    packet.PowerDelta[5] = 0;
+
+    for (uint8 i = STAT_STRENGTH; i < MAX_STATS; ++i)
+        packet.StatDelta[i] = int32(info.stats[i]) - GetCreateStat(Stats(i));
+
+    SendDirectMessage(packet.Write());
 
     SetUInt32Value(PLAYER_NEXT_LEVEL_XP, sObjectMgr->GetXPForLevel(level));
 
@@ -9224,7 +9227,15 @@ void Player::TextEmote(std::string_view text, WorldObject const* /*= nullptr*/, 
 
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, LANG_UNIVERSAL, this, this, _text);
-    SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), true, !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHAT));
+
+    if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_EMOTE))
+    {
+        SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), true);
+    }
+    else
+    {
+        SendMessageToSetInRange_OwnTeam(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), true);
+    }
 }
 
 void Player::TextEmote(uint32 textId, WorldObject const* target /*= nullptr*/, bool /*isBossEmote = false*/)
@@ -11025,6 +11036,8 @@ void Player::LeaveBattleground(Battleground* bg)
         sScriptMgr->OnBattlegroundDesertion(this, BG_DESERTION_TYPE_LEAVE_BG);
     }
 
+    bg->RemovePlayerAtLeave(this);
+
     // xinef: reset corpse reclaim time
     m_deathExpireTime = GameTime::GetGameTime().count();
 
@@ -11853,8 +11866,100 @@ Battleground* Player::GetBattleground(bool create) const
     if (GetBattlegroundId() == 0)
         return nullptr;
 
-    Battleground* bg = sBattlegroundMgr->GetBattleground(GetBattlegroundId());
+    Battleground* bg = sBattlegroundMgr->GetBattleground(GetBattlegroundId(), GetBattlegroundTypeId());
     return (create || (bg && bg->FindBgMap()) ? bg : nullptr);
+}
+
+bool Player::InBattlegroundQueue(bool ignoreArena) const
+{
+    for (uint8 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
+        if (_BgBattlegroundQueueID[i].bgQueueTypeId != BATTLEGROUND_QUEUE_NONE &&
+            (!ignoreArena || (_BgBattlegroundQueueID[i].bgQueueTypeId != BATTLEGROUND_QUEUE_2v2 &&
+                _BgBattlegroundQueueID[i].bgQueueTypeId != BATTLEGROUND_QUEUE_3v3 &&
+                _BgBattlegroundQueueID[i].bgQueueTypeId != BATTLEGROUND_QUEUE_5v5)))
+            return true;
+    return false;
+}
+
+BattlegroundQueueTypeId Player::GetBattlegroundQueueTypeId(uint32 index) const
+{
+    return _BgBattlegroundQueueID[index].bgQueueTypeId;
+}
+
+uint32 Player::GetBattlegroundQueueIndex(BattlegroundQueueTypeId bgQueueTypeId) const
+{
+    for (uint8 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
+        if (_BgBattlegroundQueueID[i].bgQueueTypeId == bgQueueTypeId)
+            return i;
+
+    return PLAYER_MAX_BATTLEGROUND_QUEUES;
+}
+
+bool Player::IsInvitedForBattlegroundQueueType(BattlegroundQueueTypeId bgQueueTypeId) const
+{
+    for (uint8 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
+        if (_BgBattlegroundQueueID[i].bgQueueTypeId == bgQueueTypeId)
+            return _BgBattlegroundQueueID[i].invitedToInstance != 0;
+
+    return false;
+}
+
+bool Player::InBattlegroundQueueForBattlegroundQueueType(BattlegroundQueueTypeId bgQueueTypeId) const
+{
+    return GetBattlegroundQueueIndex(bgQueueTypeId) < PLAYER_MAX_BATTLEGROUND_QUEUES;
+}
+
+uint32 Player::AddBattlegroundQueueId(BattlegroundQueueTypeId val)
+{
+    for (uint8 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
+    {
+        if (_BgBattlegroundQueueID[i].bgQueueTypeId == BATTLEGROUND_QUEUE_NONE || _BgBattlegroundQueueID[i].bgQueueTypeId == val)
+        {
+            _BgBattlegroundQueueID[i].bgQueueTypeId = val;
+            _BgBattlegroundQueueID[i].invitedToInstance = 0;
+            return i;
+        }
+    }
+
+    return PLAYER_MAX_BATTLEGROUND_QUEUES;
+}
+
+bool Player::HasFreeBattlegroundQueueId() const
+{
+    for (uint8 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
+        if (_BgBattlegroundQueueID[i].bgQueueTypeId == BATTLEGROUND_QUEUE_NONE)
+            return true;
+
+    return false;
+}
+
+void Player::RemoveBattlegroundQueueId(BattlegroundQueueTypeId val)
+{
+    for (uint8 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
+    {
+        if (_BgBattlegroundQueueID[i].bgQueueTypeId == val)
+        {
+            _BgBattlegroundQueueID[i].bgQueueTypeId = BATTLEGROUND_QUEUE_NONE;
+            _BgBattlegroundQueueID[i].invitedToInstance = 0;
+            return;
+        }
+    }
+}
+
+void Player::SetInviteForBattlegroundQueueType(BattlegroundQueueTypeId bgQueueTypeId, uint32 instanceId)
+{
+    for (uint8 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
+        if (_BgBattlegroundQueueID[i].bgQueueTypeId == bgQueueTypeId)
+            _BgBattlegroundQueueID[i].invitedToInstance = instanceId;
+}
+
+bool Player::IsInvitedForBattlegroundInstance(uint32 instanceId) const
+{
+    for (uint8 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
+        if (_BgBattlegroundQueueID[i].invitedToInstance == instanceId)
+            return true;
+
+    return false;
 }
 
 bool Player::InArena() const
@@ -11868,16 +11973,6 @@ bool Player::InArena() const
 
 void Player::SetBattlegroundId(uint32 id, BattlegroundTypeId bgTypeId, uint32 queueSlot, bool invited, bool isRandom, TeamId teamId)
 {
-    // if leaving current bg (and was invited) - decrease invited count for current one
-    if (m_bgData.bgInstanceID && m_bgData.isInvited)
-        if (Battleground* bg = sBattlegroundMgr->GetBattleground(m_bgData.bgInstanceID))
-            bg->DecreaseInvitedCount(m_bgData.bgTeamId);
-
-    // if entering new bg (and is invited) - increase invited count for new one
-    if (id && invited)
-        if (Battleground* bg = sBattlegroundMgr->GetBattleground(id))
-            bg->IncreaseInvitedCount(teamId);
-
     m_bgData.bgInstanceID = id;
     m_bgData.bgTypeID = bgTypeId;
     m_bgData.bgQueueSlot = queueSlot;

@@ -160,7 +160,17 @@ public:
                 case DATA_EREGOS:
                     m_auiEncounter[DATA_EREGOS] = data;
                     if (data == DONE)
+                    {
                         DoRespawnGameObject(EregosCacheGUID, 7 * DAY);
+
+                        if (GameObject* cache = instance->GetGameObject(EregosCacheGUID))
+                        {
+                            if (Creature* eregos = instance->GetCreature(uiEregosGUID))
+                            {
+                                cache->SetLootRecipient(eregos);
+                            }
+                        }
+                    }
                     break;
                 case DATA_CC_COUNT:
                     if( CentrifugeCount < 10 )
