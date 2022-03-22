@@ -100,7 +100,7 @@ class spell_pal_seal_of_command_aura : public AuraScript
             return false;
         }
 
-        if (const SpellInfo* procSpell = eventInfo.GetSpellInfo())
+        if (SpellInfo const* procSpell = eventInfo.GetSpellInfo())
         {
             if (procSpell->SpellIconID == 3025) // Righteous Vengeance, should not proc SoC
             {
@@ -115,7 +115,7 @@ class spell_pal_seal_of_command_aura : public AuraScript
     {
         PreventDefaultAction();
         int32 targets = 3;
-        if (const SpellInfo* procSpell = eventInfo.GetSpellInfo())
+        if (SpellInfo const* procSpell = eventInfo.GetSpellInfo())
         {
             if (procSpell->IsAffectingArea())
             {
@@ -146,7 +146,7 @@ class spell_pal_seal_of_command : public SpellScript
 
     void FilterTargets(std::list<WorldObject*>& targets)
     {
-        if (const SpellValue* spellValue = GetSpellValue())
+        if (SpellValue const* spellValue = GetSpellValue())
             if (spellValue->MaxAffectedTargets == 1)
                 targets.clear();
     }
@@ -198,7 +198,7 @@ class spell_pal_sacred_shield_base : public AuraScript
     {
         if (Unit* caster = GetCaster())
         {
-            const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell);
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell);
             amount = spellInfo->Effects[EFFECT_0].CalcValue();
 
             // +75.00% from sp bonus
@@ -238,7 +238,7 @@ class spell_pal_sacred_shield_base : public AuraScript
                 return;
             }
 
-            const SpellInfo* procSpell = damageInfo->GetSpellInfo();
+            SpellInfo const* procSpell = damageInfo->GetSpellInfo();
             if (!procSpell)
             {
                 return;

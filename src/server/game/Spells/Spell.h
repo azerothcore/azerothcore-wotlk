@@ -589,6 +589,8 @@ public:
 
     [[nodiscard]] uint32 GetTriggeredByAuraTickNumber() const { return m_triggeredByAuraSpell.tickNumber; }
 
+    [[nodiscard]] TriggerCastFlags GetTriggeredCastFlags() const { return _triggeredCastFlags; }
+
  protected:
     bool HasGlobalCooldown() const;
     void TriggerGlobalCooldown();
@@ -839,13 +841,13 @@ typedef void(Spell::*pEffect)(SpellEffIndex effIndex);
 class ReflectEvent : public BasicEvent
 {
     public:
-        ReflectEvent(Unit* caster, ObjectGuid targetGUID, const SpellInfo* spellInfo) : _caster(caster), _targetGUID(targetGUID), _spellInfo(spellInfo) { }
+        ReflectEvent(Unit* caster, ObjectGuid targetGUID, SpellInfo const* spellInfo) : _caster(caster), _targetGUID(targetGUID), _spellInfo(spellInfo) { }
         bool Execute(uint64 e_time, uint32 p_time) override;
 
     protected:
         Unit* _caster;
         ObjectGuid _targetGUID;
-        const SpellInfo* _spellInfo;
+        SpellInfo const* _spellInfo;
 };
 
 #endif

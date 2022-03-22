@@ -3407,13 +3407,20 @@ enum PvPTeamId
     PVP_TEAM_NEUTRAL     = 2  // Battleground: Neutral,  Arena: None
 };
 
+uint8 constexpr PVP_TEAMS_COUNT = 2;
+
 inline PvPTeamId GetPvPTeamId(TeamId teamId)
 {
     return teamId == TEAM_ALLIANCE ? PVP_TEAM_ALLIANCE : PVP_TEAM_HORDE;
 }
 
+inline TeamId GetTeamId(PvPTeamId teamId)
+{
+    return teamId == PVP_TEAM_ALLIANCE ? TEAM_ALLIANCE : TEAM_HORDE;
+}
+
 // indexes of BattlemasterList.dbc
-enum BattlegroundTypeId
+enum BattlegroundTypeId : uint8
 {
     BATTLEGROUND_TYPE_NONE     = 0, // None
     BATTLEGROUND_AV            = 1, // Alterac Valley
@@ -3553,7 +3560,7 @@ enum DuelCompleteType
 };
 
 // handle the queue types and bg types separately to enable joining queue for different sized arenas at the same time
-enum BattlegroundQueueTypeId
+enum BattlegroundQueueTypeId : uint8
 {
     BATTLEGROUND_QUEUE_NONE      = 0,
     BATTLEGROUND_QUEUE_AV        = 1,

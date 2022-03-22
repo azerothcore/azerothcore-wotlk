@@ -19,6 +19,7 @@
 #define MiscPackets_h__
 
 #include "Packet.h"
+#include "ObjectGuid.h"
 #include "Weather.h"
 
 enum WeatherState : uint32;
@@ -38,6 +39,91 @@ namespace WorldPackets
             bool Abrupt = false;
             float Intensity = 0.0f;
             WeatherState WeatherID = WeatherState(0);
+        };
+
+        class LevelUpInfo final : public ServerPacket
+        {
+        public:
+            LevelUpInfo() : ServerPacket(SMSG_LEVELUP_INFO, 56) { }
+
+            WorldPacket const* Write() override;
+
+            uint32 Level = 0;
+            uint32 HealthDelta = 0;
+            std::array<uint32, MAX_POWERS> PowerDelta = { };
+            std::array<uint32, MAX_STATS> StatDelta = { };
+        };
+
+        class AC_GAME_API PlayMusic final : public ServerPacket
+        {
+        public:
+            PlayMusic() : ServerPacket(SMSG_PLAY_MUSIC, 4) { }
+            PlayMusic(uint32 soundKitID) : ServerPacket(SMSG_PLAY_MUSIC, 4), SoundKitID(soundKitID) { }
+
+            WorldPacket const* Write() override;
+
+            uint32 SoundKitID = 0;
+        };
+
+        class AC_GAME_API PlayObjectSound final : public ServerPacket
+        {
+        public:
+            PlayObjectSound() : ServerPacket(SMSG_PLAY_OBJECT_SOUND, 4 + 8) { }
+            PlayObjectSound(ObjectGuid const& sourceObjectGUID, uint32 soundKitID)
+                : ServerPacket(SMSG_PLAY_OBJECT_SOUND, 4 + 8), SourceObjectGUID(sourceObjectGUID), SoundKitID(soundKitID) { }
+
+            WorldPacket const* Write() override;
+
+            ObjectGuid SourceObjectGUID;
+            uint32 SoundKitID = 0;
+
+        };
+
+        class AC_GAME_API Playsound final : public ServerPacket
+        {
+        public:
+            Playsound() : ServerPacket(SMSG_PLAY_SOUND, 4) { }
+            Playsound(uint32 soundKitID) : ServerPacket(SMSG_PLAY_SOUND, 4), SoundKitID(soundKitID) { }
+
+            WorldPacket const* Write() override;
+
+            uint32 SoundKitID = 0;
+        };
+
+        class RandomRollClient final : public ClientPacket
+        {
+        public:
+            RandomRollClient(WorldPacket&& packet) : ClientPacket(MSG_RANDOM_ROLL, std::move(packet)) { }
+
+            void Read() override;
+
+            uint32 Min = 0;
+            uint32 Max = 0;
+        };
+
+        class RandomRoll final : public ServerPacket
+        {
+        public:
+            RandomRoll() : ServerPacket(MSG_RANDOM_ROLL, 4 + 4 + 4 + 8) { }
+
+            WorldPacket const* Write() override;
+
+            uint32 Min = 0;
+            uint32 Max = 0;
+            uint32 Result = 0;
+            ObjectGuid Roller;
+        };
+
+        class CrossedInebriationThreshold final : public ServerPacket
+        {
+        public:
+            CrossedInebriationThreshold() : ServerPacket(SMSG_CROSSED_INEBRIATION_THRESHOLD, 8 + 4 + 4) { }
+
+            WorldPacket const* Write() override;
+
+            ObjectGuid Guid;
+            uint32 Threshold = 0;
+            uint32 ItemID = 0;
         };
     }
 }
