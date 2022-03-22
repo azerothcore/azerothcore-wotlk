@@ -12005,11 +12005,21 @@ bool Player::GetBGAccessByLevel(BattlegroundTypeId bgTypeId) const
 
 float Player::GetReputationPriceDiscount(Creature const* creature) const
 {
-    FactionTemplateEntry const* vendor_faction = creature->GetFactionTemplateEntry();
-    if (!vendor_faction || !vendor_faction->faction)
+    FactionTemplateEntry const* vendorFaction = creature->GetFactionTemplateEntry();
+    if (!vendorFaction)
+    {
+        return 1.0f;
+    }
+
+    return GetReputationPriceDiscount(vendorFaction);
+}
+
+float Player::GetReputationPriceDiscount(FactionTemplateEntry const* vendorFaction) const
+{
+    if (!vendorFaction->faction)
         return 1.0f;
 
-    ReputationRank rank = GetReputationRank(vendor_faction->faction);
+    ReputationRank rank = GetReputationRank(vendorFaction->faction);
     if (rank <= REP_NEUTRAL)
         return 1.0f;
 
@@ -15934,4 +15944,10 @@ uint32 Player::GetSpellCooldownDelay(uint32 spell_id) const
 {
     SpellCooldowns::const_iterator itr = m_spellCooldowns.find(spell_id);
     return uint32(itr != m_spellCooldowns.end() && itr->second.end > getMSTime() ? itr->second.end - getMSTime() : 0);
+}
+
+void Player::ResetSpeakTimers()
+{
+    m_speakTime = 0;
+    m_speakCount = 0;
 }

@@ -1009,6 +1009,7 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask, bool 
 
     // update in loaded data (changing data only in this place)
     GameObjectData& data = sObjectMgr->NewGOData(m_spawnId);
+    data.spawnId = m_spawnId;
 
     data.id = GetEntry();
     data.mapid = mapid;
