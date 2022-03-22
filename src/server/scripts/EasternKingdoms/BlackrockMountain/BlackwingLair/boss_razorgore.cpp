@@ -181,7 +181,7 @@ public:
             summons.Summon(summon);
         }
 
-        void SummonMovementInform(Creature* summon, uint32 movementType, uint32 pathId) override
+        void SummonMovementInform(Creature* summon, uint32 movementType, uint32 /*pathId*/) override
         {
             if (movementType == POINT_MOTION_TYPE)
             {
