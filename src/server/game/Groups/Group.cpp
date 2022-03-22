@@ -1698,7 +1698,7 @@ void Group::UpdatePlayerOutOfRange(Player* player)
     }
 }
 
-void Group::BroadcastPacket(WorldPacket* packet, bool ignorePlayersInBGRaid, int group, ObjectGuid ignore)
+void Group::BroadcastPacket(WorldPacket const* packet, bool ignorePlayersInBGRaid, int group, ObjectGuid ignore)
 {
     for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
     {
@@ -1711,7 +1711,7 @@ void Group::BroadcastPacket(WorldPacket* packet, bool ignorePlayersInBGRaid, int
     }
 }
 
-void Group::BroadcastReadyCheck(WorldPacket* packet)
+void Group::BroadcastReadyCheck(WorldPacket const* packet)
 {
     for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
     {
@@ -1930,8 +1930,11 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
             return ERR_GROUP_JOIN_BATTLEGROUND_DESERTERS;
 
         // check if someone in party is using dungeon system
-        if (member->isUsingLfg())
+        lfg::LfgState lfgState = sLFGMgr->GetState(member->GetGUID());
+        if (lfgState > lfg::LFG_STATE_NONE && (lfgState != lfg::LFG_STATE_QUEUED || !sWorld->getBoolConfig(CONFIG_ALLOW_JOIN_BG_AND_LFG)))
+        {
             return ERR_LFG_CANT_USE_BATTLEGROUND;
+        }
 
         // pussywizard: prevent joining when any member is in bg/arena
         if (member->InBattleground())
@@ -2029,7 +2032,7 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* leader)
                 for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end(); ++itr)
                 {
                     InstanceSave* instanceSave = itr->second.save;
-                    const MapEntry* entry = sMapStore.LookupEntry(itr->first);
+                    MapEntry const* entry = sMapStore.LookupEntry(itr->first);
                     if (!entry || entry->IsRaid() || !instanceSave->CanReset())
                         continue;
 
@@ -2053,7 +2056,7 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* leader)
                 for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end(); ++itr)
                 {
                     InstanceSave* instanceSave = itr->second.save;
-                    const MapEntry* entry = sMapStore.LookupEntry(itr->first);
+                    MapEntry const* entry = sMapStore.LookupEntry(itr->first);
                     if (!entry || entry->IsRaid() != isRaid || !instanceSave->CanReset())
                         continue;
 
@@ -2184,6 +2187,11 @@ bool Group::IsCreated() const
 ObjectGuid Group::GetLeaderGUID() const
 {
     return m_leaderGuid;
+}
+
+Player* Group::GetLeader()
+{
+    return ObjectAccessor::FindConnectedPlayer(m_leaderGuid);
 }
 
 ObjectGuid Group::GetGUID() const
@@ -2421,4 +2429,16 @@ void Group::SetDifficultyChangePrevention(DifficultyPreventionChangeType type)
 {
     _difficultyChangePreventionTime = GameTime::GetGameTime().count() + MINUTE;
     _difficultyChangePreventionType = type;
+}
+
+void Group::DoForAllMembers(std::function<void(Player*)> const& worker)
+{
+    for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        Player* member = itr->GetSource();
+        if (!member)
+            continue;
+
+        worker(member);
+    }
 }

@@ -31,7 +31,7 @@ public:
     explicit AggressorAI(Creature* c) : CreatureAI(c) {}
 
     void UpdateAI(uint32) override;
-    static int Permissible(const Creature*);
+    static int Permissible(Creature const*);
 };
 
 typedef std::vector<uint32> SpellVct;
@@ -83,7 +83,7 @@ struct TurretAI : public CreatureAI
 {
 public:
     explicit TurretAI(Creature* c);
-    bool CanAIAttack(const Unit* who) const override;
+    bool CanAIAttack(Unit const* who) const override;
     void AttackStart(Unit* who) override;
     void UpdateAI(uint32 diff) override;
 

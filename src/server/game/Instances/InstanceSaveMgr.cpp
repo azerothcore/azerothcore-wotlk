@@ -67,7 +67,7 @@ InstanceSave* InstanceSaveMgr::AddInstanceSave(uint32 mapId, uint32 instanceId, 
 {
     ASSERT(!GetInstanceSave(instanceId));
 
-    const MapEntry* entry = sMapStore.LookupEntry(mapId);
+    MapEntry const* entry = sMapStore.LookupEntry(mapId);
     if (!entry)
     {
         LOG_ERROR("instance.save", "InstanceSaveMgr::AddInstanceSave: wrong mapid = {}, instanceid = {}!", mapId, instanceId);
@@ -116,7 +116,7 @@ bool InstanceSaveMgr::DeleteInstanceSaveIfNeeded(uint32 InstanceId, bool skipMap
     return DeleteInstanceSaveIfNeeded(GetInstanceSave(InstanceId), skipMapCheck);
 }
 
-bool InstanceSaveMgr::DeleteInstanceSaveIfNeeded(InstanceSave* save, bool skipMapCheck)
+bool InstanceSaveMgr::DeleteInstanceSaveIfNeeded(InstanceSave* save, bool skipMapCheck, bool deleteSave /*= true*/)
 {
     // pussywizard: save is removed only when there are no more players bound AND the map doesn't exist
     // pussywizard: this function is called when unbinding a player and when unloading a map
@@ -136,7 +136,11 @@ bool InstanceSaveMgr::DeleteInstanceSaveIfNeeded(InstanceSave* save, bool skipMa
         // clear respawn times (if map is loaded do it just to be sure, if already unloaded it won't do it by itself)
         Map::DeleteRespawnTimesInDB(save->GetMapId(), save->GetInstanceId());
 
-        delete save;
+        if (deleteSave)
+        {
+            delete save;
+        }
+
         return true;
     }
     return false;
@@ -190,7 +194,7 @@ void InstanceSave::InsertToDB()
 time_t InstanceSave::GetResetTimeForDB()
 {
     // only save the reset time for normal instances
-    const MapEntry* entry = sMapStore.LookupEntry(GetMapId());
+    MapEntry const* entry = sMapStore.LookupEntry(GetMapId());
     if (!entry || entry->map_type == MAP_RAID || GetDifficulty() == DUNGEON_DIFFICULTY_HEROIC)
         return 0;
     else
@@ -216,11 +220,22 @@ void InstanceSave::AddPlayer(ObjectGuid guid)
 
 bool InstanceSave::RemovePlayer(ObjectGuid guid, InstanceSaveMgr* ism)
 {
-    std::lock_guard<std::mutex> guard(_lock);
-    m_playerList.remove(guid);
+    bool deleteSave = false;
+    {
+        std::lock_guard lg(_lock);
+        m_playerList.remove(guid);
 
-    // ism passed as an argument to avoid calling via singleton (might result in a deadlock)
-    return ism->DeleteInstanceSaveIfNeeded(this->GetInstanceId(), false);
+        // ism passed as an argument to avoid calling via singleton (might result in a deadlock)
+        deleteSave = ism->DeleteInstanceSaveIfNeeded(this, false, false);
+    }
+
+    // Delete save now (avoid mutex memory corruption)
+    if (deleteSave)
+    {
+        delete this;
+    }
+
+    return deleteSave;
 }
 
 void InstanceSaveMgr::LoadInstances()
@@ -787,7 +802,12 @@ void InstanceSaveMgr::CopyBinds(ObjectGuid from, ObjectGuid to, Player* toPlr)
 
 void InstanceSaveMgr::UnbindAllFor(InstanceSave* save)
 {
-    GuidList& pList = save->m_playerList;
-    while (!pList.empty())
-        PlayerUnbindInstance(*(pList.begin()), save->GetMapId(), save->GetDifficulty(), true, ObjectAccessor::FindConnectedPlayer(*(pList.begin())));
+    uint32 mapId = save->GetMapId();
+    Difficulty difficulty = save->GetDifficulty();
+    GuidList players = save->m_playerList;
+
+    for (ObjectGuid const& guid : players)
+    {
+        PlayerUnbindInstance(guid, mapId, difficulty, true, ObjectAccessor::FindConnectedPlayer(guid));
+    }
 }

@@ -450,7 +450,7 @@ public:
 #define GOSSIP_HOSTAGE1        "I am glad to help you."
 
 static uint32 HostageEntry[] = {23790, 23999, 24024, 24001};
-static uint32 ChestEntry[] = {186648, 187021, 186672, 186667};
+static uint32 ChestEntry[] = {186648, 187021, 186667, 186672};
 
 class npc_zulaman_hostage : public CreatureScript
 {
@@ -633,7 +633,7 @@ public:
             }
         }
 
-        void SpellHit(Unit*, const SpellInfo* spell) override
+        void SpellHit(Unit*, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_COSMETIC_SPEAR_THROW)
             {

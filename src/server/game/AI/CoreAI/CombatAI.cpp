@@ -26,7 +26,7 @@
 // AggressorAI
 /////////////////
 
-int AggressorAI::Permissible(const Creature* creature)
+int AggressorAI::Permissible(Creature const* creature)
 {
     // have some hostile factions, it will be selected by IsHostileTo check at MoveInLineOfSight
     if (!creature->IsCivilian() && !creature->IsNeutralToAll())
@@ -226,7 +226,7 @@ TurretAI::TurretAI(Creature* c) : CreatureAI(c)
     me->m_SightDistance = me->m_CombatDistance;
 }
 
-bool TurretAI::CanAIAttack(const Unit* /*who*/) const
+bool TurretAI::CanAIAttack(Unit const* /*who*/) const
 {
     // TODO: use one function to replace it
     if (!me->IsWithinCombatRange(me->GetVictim(), me->m_CombatDistance)

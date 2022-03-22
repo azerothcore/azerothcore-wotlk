@@ -793,7 +793,7 @@ void WorldSession::HandleSetSavedInstanceExtend(WorldPacket& recvData)
     uint8 toggleExtendOn;
     recvData >> mapId >> difficulty >> toggleExtendOn;
 
-    const MapEntry* entry = sMapStore.LookupEntry(mapId);
+    MapEntry const* entry = sMapStore.LookupEntry(mapId);
     if (!entry || !entry->IsRaid())
         return;
 

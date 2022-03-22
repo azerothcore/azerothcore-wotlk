@@ -240,7 +240,7 @@ public:
                 akama->AI()->EnterEvadeMode();
         }
 
-        bool CanAIAttack(const Unit* target) const override
+        bool CanAIAttack(Unit const* target) const override
         {
             return target->GetEntry() != NPC_AKAMA && target->GetEntry() != NPC_MAIEV_SHADOWSONG;
         }

@@ -61,19 +61,27 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
     }
     case CONDITION_ITEM:
     {
-        if (Player* player = object->ToPlayer())
+        if (Unit* unit = object->ToUnit())
         {
-            // don't allow 0 items (it's checked during table load)
-            ASSERT(ConditionValue2);
-            bool checkBank = !!ConditionValue3;
-            condMeets      = player->HasItemCount(ConditionValue1, ConditionValue2, checkBank);
+            if (Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                // don't allow 0 items (it's checked during table load)
+                ASSERT(ConditionValue2);
+                bool checkBank = !!ConditionValue3;
+                condMeets = player->HasItemCount(ConditionValue1, ConditionValue2, checkBank);
+            }
         }
         break;
     }
     case CONDITION_ITEM_EQUIPPED:
     {
-        if (Player* player = object->ToPlayer())
-            condMeets = player->HasItemOrGemWithIdEquipped(ConditionValue1, 1);
+        if (Unit* unit = object->ToUnit())
+        {
+            if (Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                condMeets = player->HasItemOrGemWithIdEquipped(ConditionValue1, 1);
+            }
+        }
         break;
     }
     case CONDITION_ZONEID:
@@ -81,26 +89,39 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
         break;
     case CONDITION_REPUTATION_RANK:
     {
-        if (Player* player = object->ToPlayer())
+        if (Unit* unit = object->ToUnit())
         {
-            if (FactionEntry const* faction = sFactionStore.LookupEntry(ConditionValue1))
-                condMeets = (ConditionValue2 & (1 << player->GetReputationMgr().GetRank(faction)));
+            if (Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                if (FactionEntry const* faction = sFactionStore.LookupEntry(ConditionValue1))
+                {
+                    condMeets = (ConditionValue2 & (1 << player->GetReputationMgr().GetRank(faction)));
+                }
+            }
         }
         break;
     }
     case CONDITION_ACHIEVEMENT:
     {
-        if (Player* player = object->ToPlayer())
-            condMeets = player->HasAchieved(ConditionValue1);
+        if (Unit* unit = object->ToUnit())
+        {
+            if (Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                condMeets = player->HasAchieved(ConditionValue1);
+            }
+        }
         break;
     }
     case CONDITION_TEAM:
     {
-        if (Player* player = object->ToPlayer())
+        if (Unit* unit = object->ToUnit())
         {
-            // Xinef: DB Data compatibility...
-            uint32 teamOld = player->GetTeamId() == TEAM_ALLIANCE ? ALLIANCE : HORDE;
-            condMeets      = teamOld == ConditionValue1;
+            if (Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                // Xinef: DB Data compatibility...
+                uint32 teamOld = player->GetTeamId() == TEAM_ALLIANCE ? ALLIANCE : HORDE;
+                condMeets = teamOld == ConditionValue1;
+            }
         }
         break;
     }
@@ -118,56 +139,83 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
     }
     case CONDITION_GENDER:
     {
-        if (Player* player = object->ToPlayer())
-            condMeets = player->getGender() == ConditionValue1;
+        if (Unit* unit = object->ToUnit())
+        {
+            if (Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                condMeets = player->getGender() == ConditionValue1;
+            }
+        }
         break;
     }
     case CONDITION_SKILL:
     {
-        if (Player* player = object->ToPlayer())
-            condMeets = player->HasSkill(ConditionValue1) && player->GetBaseSkillValue(ConditionValue1) >= ConditionValue2;
+        if (Unit* unit = object->ToUnit())
+        {
+            if (Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                condMeets = player->HasSkill(ConditionValue1) && player->GetBaseSkillValue(ConditionValue1) >= ConditionValue2;
+            }
+        }
         break;
     }
     case CONDITION_QUESTREWARDED:
     {
-        if (Player* player = object->ToPlayer())
-            condMeets = player->GetQuestRewardStatus(ConditionValue1);
+        if (Unit* unit = object->ToUnit())
+        {
+            if (Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                condMeets = player->GetQuestRewardStatus(ConditionValue1);
+            }
+        }
         break;
     }
     case CONDITION_QUESTTAKEN:
     {
-        if (Player* player = object->ToPlayer())
+        if (Unit* unit = object->ToUnit())
         {
-            QuestStatus status = player->GetQuestStatus(ConditionValue1);
-            condMeets          = (status == QUEST_STATUS_INCOMPLETE);
+            if (Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                QuestStatus status = player->GetQuestStatus(ConditionValue1);
+                condMeets = (status == QUEST_STATUS_INCOMPLETE);
+            }
         }
         break;
     }
     case CONDITION_QUEST_COMPLETE:
     {
-        if (Player* player = object->ToPlayer())
+        if (Unit* unit = object->ToUnit())
         {
-            QuestStatus status = player->GetQuestStatus(ConditionValue1);
-            condMeets          = (status == QUEST_STATUS_COMPLETE && !player->GetQuestRewardStatus(ConditionValue1));
+            if (Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                QuestStatus status = player->GetQuestStatus(ConditionValue1);
+                condMeets = (status == QUEST_STATUS_COMPLETE && !player->GetQuestRewardStatus(ConditionValue1));
+            }
         }
         break;
     }
     case CONDITION_QUEST_NONE:
     {
-        if (Player* player = object->ToPlayer())
+        if (Unit* unit = object->ToUnit())
         {
-            QuestStatus status = player->GetQuestStatus(ConditionValue1);
-            condMeets          = (status == QUEST_STATUS_NONE);
+            if (Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                QuestStatus status = player->GetQuestStatus(ConditionValue1);
+                condMeets = (status == QUEST_STATUS_NONE);
+            }
         }
         break;
     }
     case CONDITION_QUEST_SATISFY_EXCLUSIVE:
     {
-        if (Player* player = object->ToPlayer())
+        if (Unit* unit = object->ToUnit())
         {
-            // Xinef: cannot be null, checked at loading
-            const Quest* quest = sObjectMgr->GetQuestTemplate(ConditionValue1);
-            condMeets          = !player->IsQuestRewarded(ConditionValue1) && player->SatisfyQuestExclusiveGroup(quest, false);
+            if (Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                // Xinef: cannot be null, checked at loading
+                const Quest* quest = sObjectMgr->GetQuestTemplate(ConditionValue1);
+                condMeets = !player->IsQuestRewarded(ConditionValue1) && player->SatisfyQuestExclusiveGroup(quest, false);
+            }
         }
         break;
     }
@@ -183,18 +231,18 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
             {
                 switch (ConditionValue3)
                 {
-                case INSTANCE_INFO_DATA:
-                    condMeets = instance->GetData(ConditionValue1) == ConditionValue2;
-                    break;
-                case INSTANCE_INFO_GUID_DATA:
-                    condMeets = instance->GetGuidData(ConditionValue1) == ObjectGuid(uint64(ConditionValue2));
-                    break;
-                case INSTANCE_INFO_BOSS_STATE:
-                    condMeets = instance->GetBossState(ConditionValue1) == EncounterState(ConditionValue2);
-                    break;
-                case INSTANCE_INFO_DATA64:
-                    condMeets = instance->GetData64(ConditionValue1) == ConditionValue2;
-                    break;
+                    case INSTANCE_INFO_DATA:
+                        condMeets = instance->GetData(ConditionValue1) == ConditionValue2;
+                        break;
+                    case INSTANCE_INFO_GUID_DATA:
+                        condMeets = instance->GetGuidData(ConditionValue1) == ObjectGuid(uint64(ConditionValue2));
+                        break;
+                    case INSTANCE_INFO_BOSS_STATE:
+                        condMeets = instance->GetBossState(ConditionValue1) == EncounterState(ConditionValue2);
+                        break;
+                    case INSTANCE_INFO_DATA64:
+                        condMeets = instance->GetData64(ConditionValue1) == ConditionValue2;
+                        break;
                 }
             }
         }
@@ -208,8 +256,13 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
         break;
     case CONDITION_SPELL:
     {
-        if (Player* player = object->ToPlayer())
-            condMeets = player->HasSpell(ConditionValue1);
+        if (Unit* unit = object->ToUnit())
+        {
+            if (Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                condMeets = player->HasSpell(ConditionValue1);
+            }
+        }
         break;
     }
     case CONDITION_LEVEL:
@@ -220,8 +273,13 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
     }
     case CONDITION_DRUNKENSTATE:
     {
-        if (Player* player = object->ToPlayer())
-            condMeets = (uint32) Player::GetDrunkenstateByValue(player->GetDrunkValue()) >= ConditionValue1;
+        if (Unit* unit = object->ToUnit())
+        {
+            if (Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                condMeets = (uint32)Player::GetDrunkenstateByValue(player->GetDrunkValue()) >= ConditionValue1;
+            }
+        }
         break;
     }
     case CONDITION_NEAR_CREATURE:
@@ -248,14 +306,14 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
             {
                 switch (object->GetTypeId())
                 {
-                case TYPEID_UNIT:
-                    condMeets &= object->ToCreature()->GetSpawnId() == ConditionValue3;
-                    break;
-                case TYPEID_GAMEOBJECT:
-                    condMeets &= object->ToGameObject()->GetSpawnId() == ConditionValue3;
-                    break;
-                default:
-                    break;
+                    case TYPEID_UNIT:
+                        condMeets &= object->ToCreature()->GetSpawnId() == ConditionValue3;
+                        break;
+                    case TYPEID_GAMEOBJECT:
+                        condMeets &= object->ToGameObject()->GetSpawnId() == ConditionValue3;
+                        break;
+                    default:
+                        break;
                 }
             }
         }
@@ -276,24 +334,24 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
             {
                 switch (ConditionValue2)
                 {
-                case RELATION_SELF:
-                    condMeets = unit == toUnit;
-                    break;
-                case RELATION_IN_PARTY:
-                    condMeets = unit->IsInPartyWith(toUnit);
-                    break;
-                case RELATION_IN_RAID_OR_PARTY:
-                    condMeets = unit->IsInRaidWith(toUnit);
-                    break;
-                case RELATION_OWNED_BY:
-                    condMeets = unit->GetOwnerGUID() == toUnit->GetGUID();
-                    break;
-                case RELATION_PASSENGER_OF:
-                    condMeets = unit->IsOnVehicle(toUnit);
-                    break;
-                case RELATION_CREATED_BY:
-                    condMeets = unit->GetCreatorGUID() == toUnit->GetGUID();
-                    break;
+                    case RELATION_SELF:
+                        condMeets = unit == toUnit;
+                        break;
+                    case RELATION_IN_PARTY:
+                        condMeets = unit->IsInPartyWith(toUnit);
+                        break;
+                    case RELATION_IN_RAID_OR_PARTY:
+                        condMeets = unit->IsInRaidWith(toUnit);
+                        break;
+                    case RELATION_OWNED_BY:
+                        condMeets = unit->GetOwnerGUID() == toUnit->GetGUID();
+                        break;
+                    case RELATION_PASSENGER_OF:
+                        condMeets = unit->IsOnVehicle(toUnit);
+                        break;
+                    case RELATION_CREATED_BY:
+                        condMeets = unit->GetCreatorGUID() == toUnit->GetGUID();
+                        break;
                 }
             }
         }
@@ -346,8 +404,13 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
     }
     case CONDITION_TITLE:
     {
-        if (Player* player = object->ToPlayer())
-            condMeets = player->HasTitle(ConditionValue1);
+        if (Unit* unit = object->ToUnit())
+        {
+            if (Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                condMeets = player->HasTitle(ConditionValue1);
+            }
+        }
         break;
     }
     case CONDITION_SPAWNMASK:
@@ -382,35 +445,52 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
     }
     case CONDITION_QUESTSTATE:
     {
-        if (Player* player = object->ToPlayer())
+        if (Unit* unit = object->ToUnit())
         {
-            uint32 queststateConditionValue1 = player->GetQuestStatus(ConditionValue1);
-            if (((ConditionValue2 & (1 << QUEST_STATUS_NONE)) && (queststateConditionValue1 == QUEST_STATUS_NONE)) || ((ConditionValue2 & (1 << QUEST_STATUS_COMPLETE)) && (queststateConditionValue1 == QUEST_STATUS_COMPLETE)) || ((ConditionValue2 & (1 << QUEST_STATUS_INCOMPLETE)) && (queststateConditionValue1 == QUEST_STATUS_INCOMPLETE)) || ((ConditionValue2 & (1 << QUEST_STATUS_FAILED)) && (queststateConditionValue1 == QUEST_STATUS_FAILED)) ||
-                ((ConditionValue2 & (1 << QUEST_STATUS_REWARDED)) && player->GetQuestRewardStatus(ConditionValue1)))
+            if (Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself())
             {
-                condMeets = true;
+                uint32 queststateConditionValue1 = player->GetQuestStatus(ConditionValue1);
+                if (((ConditionValue2 & (1 << QUEST_STATUS_NONE)) && (queststateConditionValue1 == QUEST_STATUS_NONE)) ||
+                    ((ConditionValue2 & (1 << QUEST_STATUS_COMPLETE)) && (queststateConditionValue1 == QUEST_STATUS_COMPLETE)) ||
+                    ((ConditionValue2 & (1 << QUEST_STATUS_INCOMPLETE)) && (queststateConditionValue1 == QUEST_STATUS_INCOMPLETE)) ||
+                    ((ConditionValue2 & (1 << QUEST_STATUS_FAILED)) && (queststateConditionValue1 == QUEST_STATUS_FAILED)) ||
+                    ((ConditionValue2 & (1 << QUEST_STATUS_REWARDED)) && player->GetQuestRewardStatus(ConditionValue1)))
+                {
+                    condMeets = true;
+                }
             }
         }
         break;
     }
     case CONDITION_DAILY_QUEST_DONE:
     {
-        if (Player* player = object->ToPlayer())
+        if (Unit* unit = object->ToUnit())
         {
-            condMeets = player->IsDailyQuestDone(ConditionValue1);
+            if (Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                condMeets = player->IsDailyQuestDone(ConditionValue1);
+            }
         }
         break;
     }
     case CONDITION_QUEST_OBJECTIVE_PROGRESS:
     {
-        if (Player* player = object->ToPlayer())
+        if (Unit* unit = object->ToUnit())
         {
-            const Quest* quest    = ASSERT_NOTNULL(sObjectMgr->GetQuestTemplate(ConditionValue1));
-            uint16       log_slot = player->FindQuestSlot(quest->GetQuestId());
-            if (log_slot >= MAX_QUEST_LOG_SIZE)
-                break;
-            if (player->GetQuestSlotCounter(log_slot, ConditionValue2) == ConditionValue3)
-                condMeets = true;
+            if (Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                Quest const* quest = ASSERT_NOTNULL(sObjectMgr->GetQuestTemplate(ConditionValue1));
+                uint16 log_slot = player->FindQuestSlot(quest->GetQuestId());
+                if (log_slot >= MAX_QUEST_LOG_SIZE)
+                {
+                    break;
+                }
+
+                if (player->GetQuestSlotCounter(log_slot, ConditionValue2) == ConditionValue3)
+                {
+                    condMeets = true;
+                }
+            }
         }
         break;
     }
@@ -427,15 +507,27 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
     }
     case CONDITION_PET_TYPE:
     {
-        if (Player* player = object->ToPlayer())
-            if (Pet* pet = player->GetPet())
-                condMeets = (((1 << pet->getPetType()) & ConditionValue1) != 0);
+        if (Unit* unit = object->ToUnit())
+        {
+            if (Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                if (Pet* pet = player->GetPet())
+                {
+                    condMeets = (((1 << pet->getPetType()) & ConditionValue1) != 0);
+                }
+            }
+        }
         break;
     }
     case CONDITION_TAXI:
     {
-        if (Player* player = object->ToPlayer())
-            condMeets = player->IsInFlight();
+        if (Unit* unit = object->ToUnit())
+        {
+            if (Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                condMeets = player->IsInFlight();
+            }
+        }
         break;
     }
     case CONDITION_CHARMED:
@@ -885,7 +977,14 @@ ConditionList ConditionMgr::GetConditionsForNpcVendorEvent(uint32 creatureId, ui
         if (i != (*itr).second.end())
         {
             cond = (*i).second;
-            LOG_DEBUG("condition", "GetConditionsForNpcVendorEvent: found conditions for creature entry {} item {}", creatureId, itemId);
+            if (itemId)
+            {
+                LOG_DEBUG("condition", "GetConditionsForNpcVendorEvent: found conditions for creature entry {} item {}", creatureId, itemId);
+            }
+            else
+            {
+                LOG_DEBUG("condition", "GetConditionsForNpcVendorEvent: found conditions for creature entry {}", creatureId);
+            }
         }
     }
     return cond;
@@ -928,7 +1027,7 @@ void ConditionMgr::LoadConditions(bool isReload)
 
     if (!result)
     {
-        LOG_ERROR("server.loading", ">> Loaded 0 conditions. DB table `conditions` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 conditions. DB table `conditions` is empty!");
         return;
     }
 
@@ -1650,11 +1749,14 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
             LOG_ERROR("condition", "SourceEntry {} in `condition` table, does not exist in `creature_template`, ignoring.", cond->SourceGroup);
             return false;
         }
-        ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(cond->SourceEntry);
-        if (!itemTemplate)
+        if (cond->SourceEntry)
         {
-            LOG_ERROR("condition", "SourceEntry {} in `condition` table, does not exist in `item_template`, ignoring.", cond->SourceEntry);
-            return false;
+            ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(cond->SourceEntry);
+            if (!itemTemplate)
+            {
+                LOG_ERROR("condition", "SourceEntry {} in `condition` table, does not exist in `item_template`, ignoring.", cond->SourceEntry);
+                return false;
+            }
         }
         break;
     }
@@ -1929,8 +2031,8 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
     }
     case CONDITION_MAPID:
     {
-        MapEntry const* me = sMapStore.LookupEntry(cond->ConditionValue1);
-        if (!me)
+        MapEntry const* mapId = sMapStore.LookupEntry(cond->ConditionValue1);
+        if (!mapId)
         {
             LOG_ERROR("sql.sql", "Map condition has non existing map ({}), skipped", cond->ConditionValue1);
             return false;

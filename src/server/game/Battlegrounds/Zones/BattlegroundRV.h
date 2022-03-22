@@ -18,7 +18,7 @@
 #ifndef __BATTLEGROUNDRV_H
 #define __BATTLEGROUNDRV_H
 
-#include "Battleground.h"
+#include "Arena.h"
 
 enum BattlegroundRVObjectTypes
 {
@@ -48,7 +48,7 @@ enum BattlegroundRVObjectTypes
     BG_RV_OBJECT_MAX,
 };
 
-enum BattlegroundRVObjects
+enum BattlegroundRVGameObjects
 {
     BG_RV_OBJECT_TYPE_BUFF_1                     = 184663,
     BG_RV_OBJECT_TYPE_BUFF_2                     = 184664,
@@ -82,43 +82,33 @@ enum BattlegroundRVData
     BG_RV_WORLD_STATE                            = 0xe1a,
 };
 
-class BattlegroundRV : public Battleground
+class AC_GAME_API BattlegroundRV : public Arena
 {
 public:
     BattlegroundRV();
-    ~BattlegroundRV() override;
 
     /* inherited from BattlegroundClass */
-    void AddPlayer(Player* player) override;
-    void RemovePlayer(Player* player) override;
-    void StartingEventCloseDoors() override;
     void StartingEventOpenDoors() override;
     void Init() override;
     void FillInitialWorldStates(WorldPacket& d) override;
-    void UpdateArenaWorldState() override;
     void HandleAreaTrigger(Player* player, uint32 trigger) override;
     bool SetupBattleground() override;
-    void HandleKillPlayer(Player* player, Player* killer) override;
     bool HandlePlayerUnderMap(Player* player) override;
 
     GameObject* GetPillarAtPosition(Position* p);
 
 private:
-    Milliseconds Timer;
-    uint32 State;
-    uint16 CheckPlayersTimer;
+    Milliseconds _timer;
+    uint32 _state;
+    uint16 _checkPlayersTimer;
 
     void PostUpdateImpl(uint32 diff) override;
 
 protected:
-    Milliseconds GetTimer() { return Timer; }
-    void SetTimer(Milliseconds timer) { Timer = timer; }
-    uint32 getState() { return State; };
-    void setState(uint32 state) { State = state; }
-
     void TeleportUnitToNewZ(Unit* unit, float newZ, bool casting);
     void CheckPositionForUnit(Unit* unit);
     void UpdatePillars();
     uint32 GetPillarIdForPos(Position* p);
 };
+
 #endif

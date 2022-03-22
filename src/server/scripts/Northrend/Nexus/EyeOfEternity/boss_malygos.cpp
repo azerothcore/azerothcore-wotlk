@@ -310,7 +310,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_POWER_SPARK_MALYGOS_BUFF)
             {
@@ -487,7 +487,7 @@ public:
                         pos.m_positionX = CenterPos.GetPositionX() + cos(angle) * 40.0f;
                         pos.m_positionY = CenterPos.GetPositionY() + std::sin(angle) * 40.0f;
                         pos.m_positionZ = CenterPos.GetPositionZ() + 20.0f;
-                        pos.m_orientation = pos.GetAngle(&CenterPos);
+                        pos.SetOrientation(pos.GetAngle(&CenterPos));
 
                         if (Creature* vp = me->SummonCreature(NPC_WORLD_TRIGGER_LAOI, pos, TEMPSUMMON_TIMED_DESPAWN, 14000))
                         {
@@ -506,7 +506,7 @@ public:
                                         plrpos.m_positionX = CenterPos.GetPositionX() + cos(playerAngle) * 5.0f;
                                         plrpos.m_positionY = CenterPos.GetPositionY() + std::sin(playerAngle) * 5.0f;
                                         plrpos.m_positionZ = CenterPos.GetPositionZ() + 18.0f;
-                                        plrpos.m_orientation = plrpos.GetAngle(&CenterPos);
+                                        plrpos.SetOrientation(plrpos.GetAngle(&CenterPos));
 
                                         if (Creature* c = me->SummonCreature(NPC_VORTEX, plrpos, TEMPSUMMON_TIMED_DESPAWN, 15000))
                                         {
@@ -880,7 +880,7 @@ public:
             pos.m_positionX = CenterPos.GetPositionX() + VORTEX_RADIUS * cos(angle);
             pos.m_positionY = CenterPos.GetPositionY() + VORTEX_RADIUS * std::sin(angle);
             pos.m_positionZ = CenterPos.GetPositionZ() + h;
-            pos.m_orientation = pos.GetAngle(&CenterPos);
+            pos.SetOrientation(pos.GetAngle(&CenterPos));
             me->SetPosition(pos);
             timer = 0;
             despawnTimer = 9500;
@@ -1401,8 +1401,15 @@ public:
                     break;
                 case 1:
                     me->CastSpell(773.98f, 1285.97f, 266.254f, SPELL_ALEXSTRASZA_GIFT, true);
-                    me->SummonGameObject(ALEXSTRASZA_GIFT, 773.98f, 1285.97f, 266.254f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0);
-                    me->SummonGameObject(HEART_OF_MAGIC, 773.98f, 1275.97f, 266.254f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0);
+                    if (GameObject* chest = me->SummonGameObject(ALEXSTRASZA_GIFT, 773.98f, 1285.97f, 266.254f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0))
+                    {
+                        chest->SetLootRecipient(me->GetMap());
+                    }
+
+                    if (GameObject* heart = me->SummonGameObject(HEART_OF_MAGIC, 773.98f, 1275.97f, 266.254f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0))
+                    {
+                        heart->SetLootRecipient(me->GetMap());
+                    }
 
                     Talk(SAY_ALEXSTRASZA_ONE);
                     events.RescheduleEvent(2, 6000);

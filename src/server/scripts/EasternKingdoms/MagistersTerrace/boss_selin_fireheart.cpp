@@ -74,7 +74,7 @@ public:
         SummonList summons;
         ObjectGuid CrystalGUID;
 
-        bool CanAIAttack(const Unit* who) const override
+        bool CanAIAttack(Unit const* who) const override
         {
             return who->GetPositionX() > 216.0f;
         }

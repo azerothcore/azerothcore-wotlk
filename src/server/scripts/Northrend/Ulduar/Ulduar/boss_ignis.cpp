@@ -121,7 +121,7 @@ public:
             me->CastSpell(me, 38757, true);
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_ACTIVATE_CONSTRUCT)
             {
@@ -325,7 +325,7 @@ public:
                     Unit::Kill(*itr, *itr);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (caster && spell->Id == SPELL_GRAB_CONTROL_2)
             {

@@ -2797,6 +2797,7 @@ InstanceMap::~InstanceMap()
 {
     delete instance_data;
     instance_data = nullptr;
+    sInstanceSaveMgr->DeleteInstanceSaveIfNeeded(GetInstanceId(), true);
 }
 
 void InstanceMap::InitVisibilityDistance()
@@ -3655,11 +3656,7 @@ void Map::SendZoneDynamicInfo(Player* player)
         return;
 
     if (uint32 music = itr->second.MusicId)
-    {
-        WorldPacket data(SMSG_PLAY_MUSIC, 4);
-        data << uint32(music);
-        player->SendDirectMessage(&data);
-    }
+        player->SendDirectMessage(WorldPackets::Misc::PlayMusic(music).Write());
 
     if (WeatherState weatherId = itr->second.WeatherId)
     {
@@ -3702,13 +3699,13 @@ void Map::SetZoneMusic(uint32 zoneId, uint32 musicId)
     Map::PlayerList const& players = GetPlayers();
     if (!players.IsEmpty())
     {
-        WorldPacket data(SMSG_PLAY_MUSIC, 4);
-        data << uint32(musicId);
+        WorldPackets::Misc::PlayMusic playMusic(musicId);
+        playMusic.Write();
 
         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
             if (Player* player = itr->GetSource())
                 if (player->GetZoneId() == zoneId)
-                    player->SendDirectMessage(&data);
+                    player->SendDirectMessage(playMusic.GetRawPacket());
     }
 }
 
@@ -3774,7 +3771,7 @@ void Map::DoForAllPlayers(std::function<void(Player*)> exec)
  * overloaded method with the start coords when you need to do a quick check on small segments
  *
  */
-bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, PathGenerator *path, float &destX, float &destY, float &destZ, bool failOnCollision, bool failOnSlopes) const
+bool Map::CanReachPositionAndGetValidCoords(WorldObject const* source, PathGenerator *path, float &destX, float &destY, float &destZ, bool failOnCollision, bool failOnSlopes) const
 {
     G3D::Vector3 prevPath = path->GetStartPosition();
     for (auto & vector : path->GetPath())
@@ -3814,19 +3811,19 @@ bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, PathGener
  *
  **/
 
-bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, float& destX, float& destY, float& destZ, bool failOnCollision, bool failOnSlopes) const
+bool Map::CanReachPositionAndGetValidCoords(WorldObject const* source, float& destX, float& destY, float& destZ, bool failOnCollision, bool failOnSlopes) const
 {
     return CanReachPositionAndGetValidCoords(source, source->GetPositionX(), source->GetPositionY(), source->GetPositionZ(), destX, destY, destZ, failOnCollision, failOnSlopes);
 }
 
-bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool failOnCollision, bool failOnSlopes) const
+bool Map::CanReachPositionAndGetValidCoords(WorldObject const* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool failOnCollision, bool failOnSlopes) const
 {
     if (!CheckCollisionAndGetValidCoords(source, startX, startY, startZ, destX, destY, destZ, failOnCollision))
     {
         return false;
     }
 
-    const Unit* unit = source->ToUnit();
+    Unit const* unit = source->ToUnit();
     // if it's not an unit (Object) then we do not have to continue
     // with walkable checks
     if (!unit)
@@ -3838,7 +3835,7 @@ bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, float sta
      * Walkable checks
      */
     bool isWaterNext = HasEnoughWater(unit, destX, destY, destZ);
-    const Creature* creature = unit->ToCreature();
+    Creature const* creature = unit->ToCreature();
     bool cannotEnterWater = isWaterNext && (creature && !creature->CanEnterWater());
     bool cannotWalkOrFly = !isWaterNext && !source->ToPlayer() && !unit->CanFly() && (creature && !creature->CanWalk());
     if (cannotEnterWater || cannotWalkOrFly ||
@@ -3857,7 +3854,7 @@ bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, float sta
  * @return true if the destination is valid, false otherwise
  *
  **/
-bool Map::CheckCollisionAndGetValidCoords(const WorldObject* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool failOnCollision) const
+bool Map::CheckCollisionAndGetValidCoords(WorldObject const* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool failOnCollision) const
 {
     // Prevent invalid coordinates here, position is unchanged
     if (!Acore::IsValidMapCoord(startX, startY, startZ) || !Acore::IsValidMapCoord(destX, destY, destZ))
@@ -3874,7 +3871,7 @@ bool Map::CheckCollisionAndGetValidCoords(const WorldObject* source, float start
     path.SetUseRaycast(true);
     bool result = path.CalculatePath(startX, startY, startZ, destX, destY, destZ, false);
 
-    const Unit* unit = source->ToUnit();
+    Unit const* unit = source->ToUnit();
     bool notOnGround = path.GetPathType() & PATHFIND_NOT_USING_PATH
         || isWaterNext || (unit && unit->IsFlying());
 
