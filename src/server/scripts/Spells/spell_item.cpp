@@ -3514,6 +3514,43 @@ class spell_item_wraith_scythe_drain_life : public SpellScript
     }
 };
 
+enum MirrensDrinkingHat
+{
+    ITEM_LOCH_MODAN_LAGER       = 23584,
+    ITEM_STOUTHAMMER_LITE       = 23585,
+    ITEM_AERIE_PEAK_PALE_ALE    = 23586
+};
+
+// 29830 - Mirren's Drinking Hat
+class spell_item_mirrens_drinking_hat : public SpellScript
+{
+    PrepareSpellScript(spell_item_mirrens_drinking_hat);
+
+    void HandleScriptEffect(SpellEffIndex effIndex)
+    {
+        uint32 itemId;
+        switch (urand(1, 6))
+        {
+            case 1:
+            case 2:
+            case 3:
+                itemId = ITEM_LOCH_MODAN_LAGER; break;
+            case 4:
+            case 5:
+                itemId = ITEM_STOUTHAMMER_LITE; break;
+            case 6:
+                itemId = ITEM_AERIE_PEAK_PALE_ALE; break;
+        }
+        if (itemId)
+            CreateItem(effIndex, itemId);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_item_mirrens_drinking_hat::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     RegisterSpellScript(spell_item_massive_seaforium_charge);
@@ -3622,4 +3659,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_linken_boomerang);
     RegisterSpellScript(spell_item_recall);
     RegisterSpellScript(spell_item_wraith_scythe_drain_life);
+    RegisterSpellScript(spell_item_mirrens_drinking_hat);
 }
