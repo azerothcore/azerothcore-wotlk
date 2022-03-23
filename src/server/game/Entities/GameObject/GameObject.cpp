@@ -2539,9 +2539,9 @@ void GameObject::SaveInstanceData(uint8 state)
     uint32 guid     = GetSpawnId();
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INSERT_INSTANCE_SAVED_DATA);
-    stmt->setUInt32(0, id);
-    stmt->setUInt32(1, guid);
-    stmt->setUInt8(2, state);
+    stmt->SetData(0, id);
+    stmt->SetData(1, guid);
+    stmt->SetData(2, state);
     CharacterDatabase.Execute(stmt);
 
     sObjectMgr->NewInstanceSavedGameobjectState(id, guid, state);
@@ -2553,9 +2553,9 @@ void GameObject::UpdateInstanceData(uint8 state)
     uint32 guid     = GetSpawnId();
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPDATE_INSTANCE_SAVED_DATA);
-    stmt->setUInt8(0, state);
-    stmt->setUInt32(1, guid);
-    stmt->setUInt32(2, id);
+    stmt->SetData(0, state);
+    stmt->SetData(1, guid);
+    stmt->SetData(2, id);
     CharacterDatabase.Execute(stmt);
 
     sObjectMgr->SetInstanceSavedGameobjectState(id, guid, state);

@@ -2021,7 +2021,7 @@ void Group::ResetInstanceSavedGameobjects(uint32 instanceId)
     if (instanceId)
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DELETE_INSTANCE_SAVED_DATA);
-        stmt->setUInt32(0, instanceId);
+        stmt->SetData(0, instanceId);
         CharacterDatabase.Execute(stmt);
     }
 }
