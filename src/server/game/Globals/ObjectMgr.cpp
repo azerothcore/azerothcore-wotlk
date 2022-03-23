@@ -9781,7 +9781,7 @@ void ObjectMgr::LoadInstanceSavedGameobjectStateData()
     do
     {
         fields = result->Fetch();
-        GameobjectInstanceSavedStateList.push_back({ fields[0].GetUInt32(), fields[1].GetUInt32(), fields[2].GetUInt8() });
+        GameobjectInstanceSavedStateList.push_back({ fields[0].Get<uint32>(), fields[1].Get<uint32>(), fields[2].Get<unsigned short>() });
         count++;
     } while (result->NextRow());
 
