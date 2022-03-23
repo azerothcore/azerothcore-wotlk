@@ -20,13 +20,25 @@
 
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "CreatureAIImpl.h"
+
+#define ShadowfangKeepScriptName "instance_shadowfang_keep"
 
 enum DataTypes
 {
     TYPE_COURTYARD              = 0,
     TYPE_FENRUS_THE_DEVOURER    = 1,
     TYPE_WOLF_MASTER_NANDOS     = 2,
-    MAX_ENCOUNTERS              = 3
+    MAX_ENCOUNTERS              = 3,
+    DATA_APOTHECARY_HUMMEL      = 4,
+    DATA_SPAWN_VALENTINE_ADDS   = 5
+};
+
+enum SKCreatures
+{
+    NPC_DND_CRAZED_APOTHECARY_GENERATOR = 36212,
+    NPC_APOTHECARY_HUMMEL               = 36296,
+    NPC_CRAZED_APOTHECARY               = 36568
 };
 
 enum GameObjects
@@ -35,5 +47,13 @@ enum GameObjects
     GO_SORCERER_DOOR            = 18972,
     GO_ARUGAL_DOOR              = 18971
 };
+
+template <class AI, class T>
+inline AI* GetShadowfangKeepAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, ShadowfangKeepScriptName);
+}
+
+#define RegisterShadowfangKeepCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetShadowfangKeepAI)
 
 #endif

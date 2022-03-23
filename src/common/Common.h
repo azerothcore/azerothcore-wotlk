@@ -95,15 +95,6 @@ AC_COMMON_API extern char const* localeNames[TOTAL_LOCALES];
 AC_COMMON_API LocaleConstant GetLocaleByName(const std::string& name);
 AC_COMMON_API void CleanStringForMysqlQuery(std::string& str);
 
-// we always use stdlibc++ std::max/std::min, undefine some not C++ standard defines (Win API and some other platforms)
-#ifdef max
-#undef max
-#endif
-
-#ifdef min
-#undef min
-#endif
-
 #define MAX_QUERY_LEN 32*1024
 
 namespace Acore

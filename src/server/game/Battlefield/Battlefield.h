@@ -57,7 +57,7 @@ enum BattlefieldSounds
 
 constexpr auto BATTLEFIELD_OBJECTIVE_UPDATE_INTERVAL = 1000;
 
-const uint32 BattlefieldFactions[BG_TEAMS_COUNT] =
+const uint32 BattlefieldFactions[PVP_TEAMS_COUNT] =
 {
     1732, // Alliance
     1735  // Horde
@@ -323,8 +323,7 @@ public:
     /// Called when a player enter in battlefield zone
     virtual void OnPlayerEnterZone(Player* /*player*/) {};
 
-    void SendWarningToAllInZone(uint32 entry);
-    void SendWarningToPlayer(Player* player, uint32 entry);
+    void SendWarning(uint8 id, WorldObject const* target = nullptr);
 
     void PlayerAcceptInviteToQueue(Player* player);
     void PlayerAcceptInviteToWar(Player* player);
@@ -372,11 +371,11 @@ protected:
     BfCapturePointVector m_capturePoints;
 
     // Players info maps
-    GuidUnorderedSet m_players[BG_TEAMS_COUNT];             // Players in zone
-    GuidUnorderedSet m_PlayersInQueue[BG_TEAMS_COUNT];      // Players in the queue
-    GuidUnorderedSet m_PlayersInWar[BG_TEAMS_COUNT];        // Players in WG combat
-    PlayerTimerMap m_InvitedPlayers[BG_TEAMS_COUNT];
-    PlayerTimerMap m_PlayersWillBeKick[BG_TEAMS_COUNT];
+    GuidUnorderedSet m_players[PVP_TEAMS_COUNT];             // Players in zone
+    GuidUnorderedSet m_PlayersInQueue[PVP_TEAMS_COUNT];      // Players in the queue
+    GuidUnorderedSet m_PlayersInWar[PVP_TEAMS_COUNT];        // Players in WG combat
+    PlayerTimerMap m_InvitedPlayers[PVP_TEAMS_COUNT];
+    PlayerTimerMap m_PlayersWillBeKick[PVP_TEAMS_COUNT];
 
     // Variables that must exist for each battlefield
     uint32 m_TypeId;                                        // See enum BattlefieldTypes
@@ -403,7 +402,7 @@ protected:
     uint32 m_StartGroupingTimer;                            // Timer for invite players in area 15 minute before start battle
     bool m_StartGrouping;                                   // bool for know if all players in area has been invited
 
-    GuidUnorderedSet m_Groups[BG_TEAMS_COUNT];              // Contain different raid group
+    GuidUnorderedSet m_Groups[PVP_TEAMS_COUNT];              // Contain different raid group
 
     std::vector<uint64> m_Data64;
     std::vector<uint32> m_Data32;
@@ -414,9 +413,9 @@ protected:
     virtual void SendRemoveWorldStates(Player* /*player*/) {}
 
     // use for send a packet for all player list
-    void BroadcastPacketToZone(WorldPacket& data) const;
-    void BroadcastPacketToQueue(WorldPacket& data) const;
-    void BroadcastPacketToWar(WorldPacket& data) const;
+    void BroadcastPacketToZone(WorldPacket const* data) const;
+    void BroadcastPacketToQueue(WorldPacket const* data) const;
+    void BroadcastPacketToWar(WorldPacket const* data) const;
 
     // CapturePoint system
     void AddCapturePoint(BfCapturePoint* cp) { m_capturePoints.push_back(cp); }

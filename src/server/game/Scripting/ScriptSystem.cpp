@@ -48,7 +48,7 @@ void SystemMgr::LoadScriptWaypoints()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 Script Waypoints. DB table `script_waypoint` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 Script Waypoints. DB table `script_waypoint` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -60,13 +60,13 @@ void SystemMgr::LoadScriptWaypoints()
         Field* pFields = result->Fetch();
         ScriptPointMove temp;
 
-        temp.uiCreatureEntry   = pFields[0].GetUInt32();
+        temp.uiCreatureEntry   = pFields[0].Get<uint32>();
         uint32 uiEntry          = temp.uiCreatureEntry;
-        temp.uiPointId         = pFields[1].GetUInt32();
-        temp.fX                = pFields[2].GetFloat();
-        temp.fY                = pFields[3].GetFloat();
-        temp.fZ                = pFields[4].GetFloat();
-        temp.uiWaitTime        = pFields[5].GetUInt32();
+        temp.uiPointId         = pFields[1].Get<uint32>();
+        temp.fX                = pFields[2].Get<float>();
+        temp.fY                = pFields[3].Get<float>();
+        temp.fZ                = pFields[4].Get<float>();
+        temp.uiWaitTime        = pFields[5].Get<uint32>();
 
         CreatureTemplate const* pCInfo = sObjectMgr->GetCreatureTemplate(temp.uiCreatureEntry);
 

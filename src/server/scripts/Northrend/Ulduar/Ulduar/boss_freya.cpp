@@ -370,7 +370,10 @@ public:
 
                 me->DespawnOrUnsummon(5000);
                 if (GameObject* go = me->SummonGameObject(chestId, 2345.61f, -71.20f, 425.104f, 3.0f, 0, 0, 0, 0, 0))
+                {
                     go->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
+                    go->SetLootRecipient(me->GetMap());
+                }
 
                 // Defeat credit
                 if (m_pInstance)
@@ -560,7 +563,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_NATURE_BOMB_FLIGHT)
                 me->SummonCreature(NPC_NATURE_BOMB, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());

@@ -86,7 +86,7 @@ void FormationMgr::LoadCreatureFormations()
     QueryResult result = WorldDatabase.Query("SELECT leaderGUID, memberGUID, dist, angle, groupAI, point_1, point_2 FROM creature_formations ORDER BY leaderGUID");
     if (!result)
     {
-        LOG_ERROR("sql.sql", ">>  Loaded 0 creatures in formations. DB table `creature_formations` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 creatures in formations. DB table `creature_formations` is empty!");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -98,13 +98,13 @@ void FormationMgr::LoadCreatureFormations()
 
         //Load group member data
         FormationInfo group_member;
-        group_member.leaderGUID            = fields[0].GetUInt32();
-        ObjectGuid::LowType const memberGUID = fields[1].GetUInt32();
-        float const follow_dist             = fields[2].GetFloat();
-        float const follow_angle            = fields[3].GetFloat() * (static_cast<float>(M_PI) / 180);
-        group_member.groupAI               = fields[4].GetUInt16();
-        group_member.point_1               = fields[5].GetUInt16();
-        group_member.point_2               = fields[6].GetUInt16();
+        group_member.leaderGUID            = fields[0].Get<uint32>();
+        ObjectGuid::LowType const memberGUID = fields[1].Get<uint32>();
+        float const follow_dist             = fields[2].Get<float>();
+        float const follow_angle            = fields[3].Get<float>() * (static_cast<float>(M_PI) / 180);
+        group_member.groupAI               = fields[4].Get<uint16>();
+        group_member.point_1               = fields[5].Get<uint16>();
+        group_member.point_2               = fields[6].Get<uint16>();
 
         //If creature is group leader we may skip loading of dist/angle
         if (group_member.leaderGUID != memberGUID)

@@ -43,7 +43,7 @@ void LootItemStorage::LoadStorageFromDB()
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
     if (!result)
     {
-        LOG_INFO("server.loading", ">>  Loaded 0 stored items!");
+        LOG_WARN("server.loading", ">> Loaded 0 stored items!");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -53,9 +53,9 @@ void LootItemStorage::LoadStorageFromDB()
     {
         Field* fields = result->Fetch();
 
-        StoredLootItemList& itemList = lootItemStore[ObjectGuid::Create<HighGuid::Item>(fields[0].GetUInt32())];
-        itemList.push_back(StoredLootItem(fields[1].GetUInt32(), fields[2].GetUInt32(), fields[3].GetUInt32(), fields[4].GetInt32(), fields[5].GetUInt32(), fields[6].GetBool(),
-            fields[7].GetBool(), fields[8].GetBool(), fields[9].GetBool(), fields[10].GetBool(), fields[11].GetBool(), fields[12].GetUInt32()));
+        StoredLootItemList& itemList = lootItemStore[ObjectGuid::Create<HighGuid::Item>(fields[0].Get<uint32>())];
+        itemList.push_back(StoredLootItem(fields[1].Get<uint32>(), fields[2].Get<uint32>(), fields[3].Get<uint32>(), fields[4].Get<int32>(), fields[5].Get<uint32>(), fields[6].Get<bool>(),
+            fields[7].Get<bool>(), fields[8].Get<bool>(), fields[9].Get<bool>(), fields[10].Get<bool>(), fields[11].Get<bool>(), fields[12].Get<uint32>()));
 
         ++count;
     } while (result->NextRow());
@@ -69,10 +69,10 @@ void LootItemStorage::RemoveEntryFromDB(ObjectGuid containerGUID, uint32 itemid,
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEMCONTAINER_SINGLE_ITEM);
-    stmt->setUInt32(0, containerGUID.GetCounter());
-    stmt->setUInt32(1, itemid);
-    stmt->setUInt32(2, count);
-    stmt->setUInt32(3, itemIndex);
+    stmt->SetData(0, containerGUID.GetCounter());
+    stmt->SetData(1, itemid);
+    stmt->SetData(2, count);
+    stmt->SetData(3, itemIndex);
     trans->Append(stmt);
 
     CharacterDatabase.CommitTransaction(trans);
@@ -98,19 +98,19 @@ void LootItemStorage::AddNewStoredLoot(Loot* loot, Player* /*player*/)
 
         uint8 index = 0;
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ITEMCONTAINER_SINGLE_ITEM);
-        stmt->setUInt32(index++, loot->containerGUID.GetCounter());
-        stmt->setUInt32(index++, 0);
-        stmt->setUInt32(index++, 0);
-        stmt->setUInt32(index++, loot->gold);
-        stmt->setInt32(index++, 0);
-        stmt->setUInt32(index++, 0);
-        stmt->setBool(index++, false);
-        stmt->setBool(index++, false);
-        stmt->setBool(index++, false);
-        stmt->setBool(index++, false);
-        stmt->setBool(index++, false);
-        stmt->setBool(index++, false);
-        stmt->setUInt32(index++, 0);
+        stmt->SetData(index++, loot->containerGUID.GetCounter());
+        stmt->SetData(index++, 0);
+        stmt->SetData(index++, 0);
+        stmt->SetData(index++, loot->gold);
+        stmt->SetData(index++, 0);
+        stmt->SetData(index++, 0);
+        stmt->SetData(index++, false);
+        stmt->SetData(index++, false);
+        stmt->SetData(index++, false);
+        stmt->SetData(index++, false);
+        stmt->SetData(index++, false);
+        stmt->SetData(index++, false);
+        stmt->SetData(index++, 0);
         trans->Append(stmt);
     }
 
@@ -139,19 +139,19 @@ void LootItemStorage::AddNewStoredLoot(Loot* loot, Player* /*player*/)
 
             uint8 index = 0;
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ITEMCONTAINER_SINGLE_ITEM);
-            stmt->setUInt32(index++, loot->containerGUID.GetCounter());
-            stmt->setUInt32(index++, li->itemid);
-            stmt->setUInt32(index++, li->itemIndex);
-            stmt->setUInt32(index++, li->count);
-            stmt->setInt32 (index++, li->randomPropertyId);
-            stmt->setUInt32(index++, li->randomSuffix);
-            stmt->setBool(index++, li->follow_loot_rules);
-            stmt->setBool(index++, li->freeforall);
-            stmt->setBool(index++, li->is_blocked);
-            stmt->setBool(index++, li->is_counted);
-            stmt->setBool(index++, li->is_underthreshold);
-            stmt->setBool(index++, li->needs_quest);
-            stmt->setUInt32(index++, conditionLootId);
+            stmt->SetData(index++, loot->containerGUID.GetCounter());
+            stmt->SetData(index++, li->itemid);
+            stmt->SetData(index++, li->itemIndex);
+            stmt->SetData(index++, li->count);
+            stmt->SetData (index++, li->randomPropertyId);
+            stmt->SetData(index++, li->randomSuffix);
+            stmt->SetData(index++, li->follow_loot_rules);
+            stmt->SetData(index++, li->freeforall);
+            stmt->SetData(index++, li->is_blocked);
+            stmt->SetData(index++, li->is_counted);
+            stmt->SetData(index++, li->is_underthreshold);
+            stmt->SetData(index++, li->needs_quest);
+            stmt->SetData(index++, conditionLootId);
 
             trans->Append(stmt);
         }
@@ -279,7 +279,7 @@ void LootItemStorage::RemoveStoredLoot(ObjectGuid containerGUID)
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEMCONTAINER_CONTAINER);
-    stmt->setUInt32(0, containerGUID.GetCounter());
+    stmt->SetData(0, containerGUID.GetCounter());
     trans->Append(stmt);
 
     CharacterDatabase.CommitTransaction(trans);

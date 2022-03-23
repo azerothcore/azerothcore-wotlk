@@ -31,8 +31,8 @@ enum Says
 {
     SAY_AGGRO                   = 0,
     SAY_FLEEING                 = 1,
-    SAY_MINION_DESTROY          = 2,     // Where does it belong?
-    SAY_PROTECT_ALTAR           = 3      // Where does it belong?
+    SAY_MINION_DESTROY          = 2,
+    SAY_PROTECT_ALTAR           = 3
 };
 
 enum Spells
@@ -203,8 +203,31 @@ public:
     }
 };
 
+class at_zulgurub_temple_speech : public OnlyOnceAreaTriggerScript
+{
+public:
+    at_zulgurub_temple_speech() : OnlyOnceAreaTriggerScript("at_zulgurub_temple_speech") {}
+
+    bool _OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    {
+        if (InstanceScript* instance = player->GetInstanceScript())
+        {
+            if (Creature* hakkar = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_HAKKAR)))
+            {
+                if (hakkar->GetAI())
+                {
+                    hakkar->AI()->Talk(SAY_MINION_DESTROY);
+                }
+            }
+            return false;
+        }
+        return false;
+    }
+};
+
 void AddSC_boss_hakkar()
 {
     new boss_hakkar();
     new at_zulgurub_entrance_speech();
+    new at_zulgurub_temple_speech();
 }

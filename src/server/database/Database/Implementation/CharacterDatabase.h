@@ -137,6 +137,7 @@ enum CharacterDatabaseStatements : uint32
 
     CHAR_INS_GUILD,
     CHAR_DEL_GUILD,
+    CHAR_UPD_GUILD_NAME,
     CHAR_INS_GUILD_MEMBER,
     CHAR_DEL_GUILD_MEMBER,
     CHAR_DEL_GUILD_MEMBERS,

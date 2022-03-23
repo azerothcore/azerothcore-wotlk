@@ -45,12 +45,6 @@ public:
             LoadDoorData(doorData);
         }
 
-        bool IsEncounterInProgress() const override
-        {
-            // not active in Zul'Gurub
-            return false;
-        }
-
         void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())

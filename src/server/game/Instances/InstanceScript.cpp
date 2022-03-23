@@ -43,8 +43,8 @@ void InstanceScript::SaveToDB()
         save->SetInstanceData(data);
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_INSTANCE_SAVE_DATA);
-    stmt->setString(0, data);
-    stmt->setUInt32(1, instance->GetInstanceId());
+    stmt->SetData(0, data);
+    stmt->SetData(1, instance->GetInstanceId());
     CharacterDatabase.Execute(stmt);
 }
 
@@ -524,8 +524,8 @@ void InstanceScript::SetCompletedEncountersMask(uint32 newMask, bool save)
             iSave->SetCompletedEncounterMask(completedEncounters);
 
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_INSTANCE_SAVE_ENCOUNTERMASK);
-        stmt->setUInt32(0, completedEncounters);
-        stmt->setUInt32(1, instance->GetInstanceId());
+        stmt->SetData(0, completedEncounters);
+        stmt->SetData(1, instance->GetInstanceId());
         CharacterDatabase.Execute(stmt);
     }
 }

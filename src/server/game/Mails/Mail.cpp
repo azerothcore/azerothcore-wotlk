@@ -139,7 +139,7 @@ void MailDraft::deleteIncludedItems(CharacterDatabaseTransaction trans, bool inD
         if (inDB)
         {
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
-            stmt->setUInt32(0, item->GetGUID().GetCounter());
+            stmt->SetData(0, item->GetGUID().GetCounter());
             trans->Append(stmt);
         }
 
@@ -177,8 +177,8 @@ void MailDraft::SendReturnToSender(uint32 /*sender_acc*/, ObjectGuid::LowType se
             item->SaveToDB(trans);                      // item not in inventory and can be save standalone
             // owner in data will set at mail receive and item extracting
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ITEM_OWNER);
-            stmt->setUInt32(0, receiver_guid);
-            stmt->setUInt32(1, item->GetGUID().GetCounter());
+            stmt->SetData(0, receiver_guid);
+            stmt->SetData(1, item->GetGUID().GetCounter());
             trans->Append(stmt);
         }
     }
@@ -189,7 +189,7 @@ void MailDraft::SendReturnToSender(uint32 /*sender_acc*/, ObjectGuid::LowType se
     SendMailTo(trans, MailReceiver(receiver, receiver_guid), MailSender(MAIL_NORMAL, sender_guid), MAIL_CHECK_MASK_RETURNED, 0);
 }
 
-void MailDraft::SendMailTo(CharacterDatabaseTransaction trans, MailReceiver const& receiver, MailSender const& sender, MailCheckMask checked, uint32 deliver_delay, uint32 custom_expiration, bool deleteMailItemsFromDB, bool sendMail, int32 auctionId)
+void MailDraft::SendMailTo(CharacterDatabaseTransaction trans, MailReceiver const& receiver, MailSender const& sender, MailCheckMask checked, uint32 deliver_delay, uint32 custom_expiration, bool deleteMailItemsFromDB, bool sendMail)
 {
     sScriptMgr->OnBeforeMailDraftSendMailTo(this, receiver, sender, checked, deliver_delay, custom_expiration, deleteMailItemsFromDB, sendMail);
 
@@ -234,30 +234,29 @@ void MailDraft::SendMailTo(CharacterDatabaseTransaction trans, MailReceiver cons
     // Add to DB
     uint8 index = 0;
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_MAIL);
-    stmt->setUInt32(  index, mailId);
-    stmt->setUInt8 (++index, uint8(sender.GetMailMessageType()));
-    stmt->setInt8  (++index, int8(sender.GetStationery()));
-    stmt->setUInt16(++index, GetMailTemplateId());
-    stmt->setUInt32(++index, sender.GetSenderId());
-    stmt->setUInt32(++index, receiver.GetPlayerGUIDLow());
-    stmt->setString(++index, GetSubject());
-    stmt->setString(++index, GetBody());
-    stmt->setBool  (++index, !m_items.empty());
-    stmt->setUInt32(++index, uint32(expire_time));
-    stmt->setUInt32(++index, uint32(deliver_time));
-    stmt->setUInt32(++index, m_money);
-    stmt->setUInt32(++index, m_COD);
-    stmt->setUInt8 (++index, uint8(checked));
-    stmt->setInt32(++index, auctionId);
+    stmt->SetData(  index, mailId);
+    stmt->SetData (++index, uint8(sender.GetMailMessageType()));
+    stmt->SetData  (++index, int8(sender.GetStationery()));
+    stmt->SetData(++index, GetMailTemplateId());
+    stmt->SetData(++index, sender.GetSenderId());
+    stmt->SetData(++index, receiver.GetPlayerGUIDLow());
+    stmt->SetData(++index, GetSubject());
+    stmt->SetData(++index, GetBody());
+    stmt->SetData  (++index, !m_items.empty());
+    stmt->SetData(++index, uint32(expire_time));
+    stmt->SetData(++index, uint32(deliver_time));
+    stmt->SetData(++index, m_money);
+    stmt->SetData(++index, m_COD);
+    stmt->SetData (++index, uint8(checked));
     trans->Append(stmt);
 
     for (MailItemMap::const_iterator mailItemIter = m_items.begin(); mailItemIter != m_items.end(); ++mailItemIter)
     {
         Item* pItem = mailItemIter->second;
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_MAIL_ITEM);
-        stmt->setUInt32(0, mailId);
-        stmt->setUInt32(1, pItem->GetGUID().GetCounter());
-        stmt->setUInt32(2, receiver.GetPlayerGUIDLow());
+        stmt->SetData(0, mailId);
+        stmt->SetData(1, pItem->GetGUID().GetCounter());
+        stmt->SetData(2, receiver.GetPlayerGUIDLow());
         trans->Append(stmt);
     }
 
@@ -289,7 +288,6 @@ void MailDraft::SendMailTo(CharacterDatabaseTransaction trans, MailReceiver cons
         m->expire_time = expire_time;
         m->deliver_time = deliver_time;
         m->checked = checked;
-        m->auctionId = auctionId;
         m->state = MAIL_STATE_UNCHANGED;
 
         pReceiver->AddMail(m);                           // to insert new mail to beginning of maillist

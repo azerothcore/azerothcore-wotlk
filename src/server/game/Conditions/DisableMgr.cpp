@@ -63,7 +63,7 @@ namespace DisableMgr
 
         if (!result)
         {
-            LOG_INFO("server.loading", ">> Loaded 0 disables. DB table `disables` is empty!");
+            LOG_WARN("server.loading", ">> Loaded 0 disables. DB table `disables` is empty!");
             LOG_INFO("server.loading", " ");
             return;
         }
@@ -72,17 +72,17 @@ namespace DisableMgr
         do
         {
             fields = result->Fetch();
-            DisableType type = DisableType(fields[0].GetUInt32());
+            DisableType type = DisableType(fields[0].Get<uint32>());
             if (type >= MAX_DISABLE_TYPES)
             {
                 LOG_ERROR("sql.sql", "Invalid type {} specified in `disables` table, skipped.", type);
                 continue;
             }
 
-            uint32 entry = fields[1].GetUInt32();
-            uint8 flags = fields[2].GetUInt8();
-            std::string params_0 = fields[3].GetString();
-            std::string params_1 = fields[4].GetString();
+            uint32 entry = fields[1].Get<uint32>();
+            uint8 flags = fields[2].Get<uint8>();
+            std::string params_0 = fields[3].Get<std::string>();
+            std::string params_1 = fields[4].Get<std::string>();
 
             DisableData data;
             data.flags = flags;

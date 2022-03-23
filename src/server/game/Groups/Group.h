@@ -23,6 +23,7 @@
 #include "LootMgr.h"
 #include "QueryResult.h"
 #include "SharedDefines.h"
+#include <functional>
 
 class Battlefield;
 class Battleground;
@@ -214,6 +215,7 @@ public:
     bool isBGGroup()   const;
     bool IsCreated()   const;
     ObjectGuid GetLeaderGUID() const;
+    Player* GetLeader();
     ObjectGuid GetGUID() const;
     const char* GetLeaderName() const;
     LootMethod GetLootMethod() const;
@@ -269,8 +271,8 @@ public:
     void SendUpdateToPlayer(ObjectGuid playerGUID, MemberSlot* slot = nullptr);
     void UpdatePlayerOutOfRange(Player* player);
     // ignore: GUID of player that will be ignored
-    void BroadcastPacket(WorldPacket* packet, bool ignorePlayersInBGRaid, int group = -1, ObjectGuid ignore = ObjectGuid::Empty);
-    void BroadcastReadyCheck(WorldPacket* packet);
+    void BroadcastPacket(WorldPacket const* packet, bool ignorePlayersInBGRaid, int group = -1, ObjectGuid ignore = ObjectGuid::Empty);
+    void BroadcastReadyCheck(WorldPacket const* packet);
     void OfflineReadyCheck();
 
     /*********************************************************/
@@ -312,6 +314,8 @@ public:
     uint32 GetDifficultyChangePreventionTime() const;
     DifficultyPreventionChangeType GetDifficultyChangePreventionReason() const { return _difficultyChangePreventionType; }
     void SetDifficultyChangePrevention(DifficultyPreventionChangeType type);
+
+    void DoForAllMembers(std::function<void(Player*)> const& worker);
 
 protected:
     void _homebindIfInstance(Player* player);

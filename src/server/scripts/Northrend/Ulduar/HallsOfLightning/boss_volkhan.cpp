@@ -246,7 +246,7 @@ public:
                 events.ScheduleEvent(EVENT_MOVE_TO_ANVIL, 0, 0, 2);
         }
 
-        void SpellHitTarget(Unit* /*who*/, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit* /*who*/, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_TEMPER)
             {

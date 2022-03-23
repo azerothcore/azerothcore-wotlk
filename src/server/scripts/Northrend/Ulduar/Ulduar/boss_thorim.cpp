@@ -592,7 +592,10 @@ public:
                         chestId += 1; // hard mode offset
 
                     if ((go = me->SummonGameObject(chestId, 2134.73f, -286.32f, 419.51f, 0.0f, 0, 0, 0, 0, 0)))
+                    {
                         go->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
+                        go->SetLootRecipient(me->GetMap());
+                    }
 
                     // Defeat credit
                     if (m_pInstance)
@@ -622,7 +625,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
+        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_LIGHTNING_ORB_CHARGER)
             {
@@ -633,7 +636,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_LIGHTNING_CHARGE_DAMAGE && target->GetTypeId() == TYPEID_PLAYER)
                 _hitByLightning = true;
@@ -1093,7 +1096,7 @@ public:
             me->SetDisableGravity(true);
         }
 
-        void SpellHit(Unit*, const SpellInfo* spellInfo) override
+        void SpellHit(Unit*, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_CHARGE_ORB)
                 me->CastSpell(me, SPELL_LIGHTNING_PILLAR_P1, true);
@@ -1432,7 +1435,7 @@ public:
             _checkTarget = true;
         }
 
-        void SpellHit(Unit*, const SpellInfo* spellInfo) override
+        void SpellHit(Unit*, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_RUNIC_SMASH_LEFT || spellInfo->Id == SPELL_RUNIC_SMASH_RIGHT)
             {
@@ -1645,7 +1648,7 @@ public:
             }
         }
 
-        bool CanAIAttack(const Unit* target) const override
+        bool CanAIAttack(Unit const* target) const override
         {
             return target->GetPositionX() < 2180 && target->GetPositionZ() < 425;
         }
