@@ -3305,7 +3305,9 @@ void World::LoadDBRevision()
         m_AuthDBRevision = "Unkown Auth Database Revision";
     }
 
+#ifdef MOD_PLAYERBOTS
     sScriptMgr->OnDatabaseGetDBRevision(m_PlayerbotsDBRevision);
+#endif
 }
 
 void World::UpdateAreaDependentAuras()
