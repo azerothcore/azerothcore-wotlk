@@ -5825,14 +5825,14 @@ void ObjectMgr::LoadGossipText()
     uint32 oldMSTime = getMSTime();
 
     QueryResult result = WorldDatabase.Query("SELECT ID, "
-                         "text0_0, text0_1, BroadcastTextID0, lang0, Probability0, em0_0, em0_1, em0_2, em0_3, em0_4, em0_5, "
-                         "text1_0, text1_1, BroadcastTextID1, lang1, Probability1, em1_0, em1_1, em1_2, em1_3, em1_4, em1_5, "
-                         "text2_0, text2_1, BroadcastTextID2, lang2, Probability2, em2_0, em2_1, em2_2, em2_3, em2_4, em2_5, "
-                         "text3_0, text3_1, BroadcastTextID3, lang3, Probability3, em3_0, em3_1, em3_2, em3_3, em3_4, em3_5, "
-                         "text4_0, text4_1, BroadcastTextID4, lang4, Probability4, em4_0, em4_1, em4_2, em4_3, em4_4, em4_5, "
-                         "text5_0, text5_1, BroadcastTextID5, lang5, Probability5, em5_0, em5_1, em5_2, em5_3, em5_4, em5_5, "
-                         "text6_0, text6_1, BroadcastTextID6, lang6, Probability6, em6_0, em6_1, em6_2, em6_3, em6_4, em6_5, "
-                         "text7_0, text7_1, BroadcastTextID7, lang7, Probability7, em7_0, em7_1, em7_2, em7_3, em7_4, em7_5 "
+                         "text0_0, text0_1, BroadcastTextID0, lang0, Probability0, EmoteDelay0_0, Emote0_0, EmoteDelay0_1, Emote0_1, EmoteDelay0_2, Emote0_2, "
+                         "text1_0, text1_1, BroadcastTextID1, lang1, Probability1, EmoteDelay1_0, Emote1_0, EmoteDelay1_1, Emote1_1, EmoteDelay1_2, Emote1_2, "
+                         "text2_0, text2_1, BroadcastTextID2, lang2, Probability2, EmoteDelay2_0, Emote2_0, EmoteDelay2_1, Emote2_1, EmoteDelay2_2, Emote2_2, "
+                         "text3_0, text3_1, BroadcastTextID3, lang3, Probability3, EmoteDelay3_0, Emote3_0, EmoteDelay3_1, Emote3_1, EmoteDelay3_2, Emote3_2, "
+                         "text4_0, text4_1, BroadcastTextID4, lang4, Probability4, EmoteDelay4_0, Emote4_0, EmoteDelay4_1, Emote4_1, EmoteDelay4_2, Emote4_2, "
+                         "text5_0, text5_1, BroadcastTextID5, lang5, Probability5, EmoteDelay5_0, Emote5_0, EmoteDelay5_1, Emote5_1, EmoteDelay5_2, Emote5_2, "
+                         "text6_0, text6_1, BroadcastTextID6, lang6, Probability6, EmoteDelay6_0, Emote6_0, EmoteDelay6_1, Emote6_1, EmoteDelay6_2, Emote6_2, "
+                         "text7_0, text7_1, BroadcastTextID7, lang7, Probability7, EmoteDelay7_0, Emote7_0, EmoteDelay7_1, Emote7_1, EmoteDelay7_2, Emote7_2 "
                          "FROM npc_text");
 
     if (!result)
@@ -9154,7 +9154,7 @@ void ObjectMgr::LoadBroadcastTexts()
     _broadcastTextStore.clear(); // for reload case
 
     //                                               0   1           2         3           4         5         6         7            8            9            10              11        12
-    QueryResult result = WorldDatabase.Query("SELECT ID, LanguageID, MaleText, FemaleText, EmoteID1, EmoteID2, EmoteID3, EmoteDelay1, EmoteDelay2, EmoteDelay3, SoundEntriesID, EmotesID, Flags FROM broadcast_text");
+    QueryResult result = WorldDatabase.Query("SELECT ID, LanguageID, Text, Text1, EmoteID1, EmoteID2, EmoteID3, EmoteDelay1, EmoteDelay2, EmoteDelay3, SoundEntriesID, EmotesID, Flags FROM broadcast_text");
     if (!result)
     {
         LOG_WARN("server.loading", ">> Loaded 0 broadcast texts. DB table `broadcast_text` is empty.");
@@ -9172,24 +9172,24 @@ void ObjectMgr::LoadBroadcastTexts()
 
         bct.Id = fields[0].Get<uint32>();
         bct.LanguageID = fields[1].Get<uint32>();
-        bct.MaleText[DEFAULT_LOCALE] = fields[2].Get<std::string>();
-        bct.FemaleText[DEFAULT_LOCALE] = fields[3].Get<std::string>();
+        bct.Text[DEFAULT_LOCALE] = fields[2].Get<std::string>();
+        bct.Text1[DEFAULT_LOCALE] = fields[3].Get<std::string>();
         bct.EmoteId1 = fields[4].Get<uint32>();
         bct.EmoteId2 = fields[5].Get<uint32>();
         bct.EmoteId3 = fields[6].Get<uint32>();
         bct.EmoteDelay1 = fields[7].Get<uint32>();
         bct.EmoteDelay2 = fields[8].Get<uint32>();
         bct.EmoteDelay3 = fields[9].Get<uint32>();
-        bct.SoundEntriesId = fields[10].Get<uint32>();
+        bct.SoundEntriesID = fields[10].Get<uint32>();
         bct.EmotesID = fields[11].Get<uint32>();
         bct.Flags = fields[12].Get<uint32>();
 
-        if (bct.SoundEntriesId)
+        if (bct.SoundEntriesID)
         {
-            if (!sSoundEntriesStore.LookupEntry(bct.SoundEntriesId))
+            if (!sSoundEntriesStore.LookupEntry(bct.SoundEntriesID))
             {
-                LOG_DEBUG("misc", "BroadcastText (Id: {}) in table `broadcast_text` has SoundEntriesId {} but sound does not exist.", bct.Id, bct.SoundEntriesId);
-                bct.SoundEntriesId = 0;
+                LOG_DEBUG("misc", "BroadcastText (Id: {}) in table `broadcast_text` has SoundEntriesID {} but sound does not exist.", bct.Id, bct.SoundEntriesID);
+                bct.SoundEntriesID = 0;
             }
         }
 
@@ -9236,8 +9236,8 @@ void ObjectMgr::LoadBroadcastTextLocales()
 {
     uint32 oldMSTime = getMSTime();
 
-    //                                               0   1       2         3
-    QueryResult result = WorldDatabase.Query("SELECT ID, locale, MaleText, FemaleText FROM broadcast_text_locale");
+    //                                               0      1     2     3
+    QueryResult result = WorldDatabase.Query("SELECT ID, locale, Text, Text1 FROM broadcast_text_locale");
 
     if (!result)
     {
@@ -9264,8 +9264,8 @@ void ObjectMgr::LoadBroadcastTextLocales()
         if (locale == LOCALE_enUS)
             continue;
 
-        AddLocaleString(fields[2].Get<std::string>(), locale, bct->second.MaleText);
-        AddLocaleString(fields[3].Get<std::string>(), locale, bct->second.FemaleText);
+        AddLocaleString(fields[2].Get<std::string>(), locale, bct->second.Text);
+        AddLocaleString(fields[3].Get<std::string>(), locale, bct->second.Text1);
         locales_count++;
     } while (result->NextRow());
 

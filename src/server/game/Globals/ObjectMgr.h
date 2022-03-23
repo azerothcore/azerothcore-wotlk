@@ -435,38 +435,38 @@ struct BroadcastText
 {
     BroadcastText()
     {
-        MaleText.resize(DEFAULT_LOCALE + 1);
-        FemaleText.resize(DEFAULT_LOCALE + 1);
+        Text.resize(DEFAULT_LOCALE + 1);
+        Text1.resize(DEFAULT_LOCALE + 1);
     }
 
     uint32 Id{0};
     uint32 LanguageID{0};
-    std::vector<std::string> MaleText;
-    std::vector<std::string> FemaleText;
+    std::vector<std::string> Text;
+    std::vector<std::string> Text1;
     uint32 EmoteId1{0};
     uint32 EmoteId2{0};
     uint32 EmoteId3{0};
     uint32 EmoteDelay1{0};
     uint32 EmoteDelay2{0};
     uint32 EmoteDelay3{0};
-    uint32 SoundEntriesId{0};
+    uint32 SoundEntriesID{0};
     uint32 EmotesID{0};
     uint32 Flags{0};
     // uint32 VerifiedBuild;
 
     [[nodiscard]] std::string const& GetText(LocaleConstant locale = DEFAULT_LOCALE, uint8 gender = GENDER_MALE, bool forceGender = false) const
     {
-        if (gender == GENDER_FEMALE && (forceGender || !FemaleText[DEFAULT_LOCALE].empty()))
+        if (gender == GENDER_FEMALE && (forceGender || !Text1[DEFAULT_LOCALE].empty()))
         {
-            if (FemaleText.size() > size_t(locale) && !FemaleText[locale].empty())
-                return FemaleText[locale];
-            return FemaleText[DEFAULT_LOCALE];
+            if (Text1.size() > size_t(locale) && !Text1[locale].empty())
+                return Text1[locale];
+            return Text1[DEFAULT_LOCALE];
         }
         // else if (gender == GENDER_MALE)
         {
-            if (MaleText.size() > size_t(locale) && !MaleText[locale].empty())
-                return MaleText[locale];
-            return MaleText[DEFAULT_LOCALE];
+            if (Text.size() > size_t(locale) && !Text[locale].empty())
+                return Text[locale];
+            return Text[DEFAULT_LOCALE];
         }
     }
 };

@@ -98,13 +98,13 @@ void GossipMenu::AddMenuItem(uint32 menuId, uint32 menuItemId, uint32 sender, ui
 
         /// OptionText
         if (optionBroadcastText)
-            ObjectMgr::GetLocaleString(optionBroadcastText->MaleText, GetLocale(), strOptionText);
+            ObjectMgr::GetLocaleString(optionBroadcastText->Text, GetLocale(), strOptionText);
         else
             strOptionText = itr->second.OptionText;
 
         /// BoxText
         if (boxBroadcastText)
-            ObjectMgr::GetLocaleString(boxBroadcastText->MaleText, GetLocale(), strBoxText);
+            ObjectMgr::GetLocaleString(boxBroadcastText->Text, GetLocale(), strBoxText);
         else
             strBoxText = itr->second.BoxText;
 

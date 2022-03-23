@@ -922,7 +922,7 @@ void GameEventMgr::LoadFromDB()
         uint32 oldMSTime = getMSTime();
 
         //                                                   0         1
-        QueryResult result = WorldDatabase.Query("SELECT eventEntry, bgflag FROM game_event_battleground_holiday");
+        QueryResult result = WorldDatabase.Query("SELECT EventEntry, bgflag FROM game_event_battleground_holiday");
 
         if (!result)
         {

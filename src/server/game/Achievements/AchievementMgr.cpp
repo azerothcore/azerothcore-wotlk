@@ -2257,7 +2257,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
         if (!reward->mailTemplate)
         {
             std::string subject = reward->subject;
-            std::string text = reward->text;
+            std::string body = reward->text;
 
             LocaleConstant localeConstant = GetPlayer()->GetSession()->GetSessionDbLocaleIndex();
             if (localeConstant != LOCALE_enUS)
@@ -2265,11 +2265,11 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
                 if(AchievementRewardLocale const* loc = sAchievementMgr->GetAchievementRewardLocale(achievement))
                 {
                     ObjectMgr::GetLocaleString(loc->Subject, localeConstant, subject);
-                    ObjectMgr::GetLocaleString(loc->Text, localeConstant, text);
+                    ObjectMgr::GetLocaleString(loc->Body, localeConstant, body);
                 }
             }
 
-            draft = MailDraft(subject, text);
+            draft = MailDraft(subject, body);
         }
 
         CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
@@ -2935,7 +2935,7 @@ void AchievementGlobalMgr::LoadRewardLocales()
     m_achievementRewardLocales.clear();                       // need for reload case
 
     //                                               0   1       2        3
-    QueryResult result = WorldDatabase.Query("SELECT ID, Locale, Subject, Text FROM achievement_reward_locale");
+    QueryResult result = WorldDatabase.Query("SELECT ID, Locale, Subject, Body FROM achievement_reward_locale");
 
     if (!result)
     {
@@ -2961,7 +2961,7 @@ void AchievementGlobalMgr::LoadRewardLocales()
 
         AchievementRewardLocale& data = m_achievementRewardLocales[ID];
         ObjectMgr::AddLocaleString(fields[2].Get<std::string>(), locale, data.Subject);
-        ObjectMgr::AddLocaleString(fields[3].Get<std::string>(), locale, data.Text);
+        ObjectMgr::AddLocaleString(fields[3].Get<std::string>(), locale, data.Body);
     } while (result->NextRow());
 
     LOG_INFO("server.loading", ">> Loaded {} Achievement Reward Locale strings in {} ms", (unsigned long)m_achievementRewardLocales.size(), GetMSTimeDiffToNow(oldMSTime));

@@ -252,7 +252,7 @@ typedef std::map<uint32, AchievementReward> AchievementRewards;
 struct AchievementRewardLocale
 {
     std::vector<std::string> Subject;
-    std::vector<std::string> Text;
+    std::vector<std::string> Body;
 };
 
 typedef std::map<uint32, AchievementRewardLocale> AchievementRewardLocales;
