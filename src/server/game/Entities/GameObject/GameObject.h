@@ -982,6 +982,13 @@ public:
 
     static std::unordered_map<int, goEventFlag> gameObjectToEventFlag; // Gameobject -> event flag
 
+    void SaveInstanceData(uint8 state);
+    void UpdateInstanceData(uint8 state);
+    bool FindStateSavedOnInstance();
+    bool ValidateGameobjectType();
+    uint8 GetStateSavedOnInstance();
+    bool IsInstanceGameobject();
+    uint8 GetGameobjectStateAsShort(GOState* state);
 protected:
     bool AIM_Initialize();
     GameObjectModel* CreateModel();

@@ -1582,6 +1582,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Instance Template...");
     sObjectMgr->LoadInstanceTemplate();
 
+    LOG_INFO("server.loading", "Loading Instance Saved Gameobject State Data...");
+    sObjectMgr->LoadInstanceSavedGameobjectStateData();
+
     LOG_INFO("server.loading", "Load Character Cache...");
     sCharacterCache->LoadCharacterCacheStorage();
 

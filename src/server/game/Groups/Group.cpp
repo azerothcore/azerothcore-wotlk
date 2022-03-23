@@ -2016,6 +2016,16 @@ void Group::SetRaidDifficulty(Difficulty difficulty)
     }
 }
 
+void Group::ResetInstanceSavedGameobjects(uint32 instanceId)
+{
+    if (instanceId)
+    {
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DELETE_INSTANCE_SAVED_DATA);
+        stmt->setUInt32(0, instanceId);
+        CharacterDatabase.Execute(stmt);
+    }
+}
+
 void Group::ResetInstances(uint8 method, bool isRaid, Player* leader)
 {
     if (isBGGroup() || isBFGroup() || isLFGGroup())
@@ -2043,7 +2053,11 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* leader)
                         toUnbind.push_back(instanceSave);
                     }
                     else
+                    {
                         leader->SendResetInstanceFailed(0, instanceSave->GetMapId());
+                    }
+
+                    ResetInstanceSavedGameobjects(instanceSave->GetInstanceId());
                 }
                 for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
                     sInstanceSaveMgr->UnbindAllFor(*itr);
@@ -2067,7 +2081,11 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* leader)
                         toUnbind.push_back(instanceSave);
                     }
                     else
+                    {
                         leader->SendResetInstanceFailed(0, instanceSave->GetMapId());
+                    }
+
+                    ResetInstanceSavedGameobjects(instanceSave->GetInstanceId());
                 }
                 for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
                     sInstanceSaveMgr->UnbindAllFor(*itr);
