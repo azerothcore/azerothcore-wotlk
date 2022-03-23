@@ -321,7 +321,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 (11502, 30549, 30549, 100, 0, 1, 0, 1, 1),
 (11502, 30550, 30550, 100, 0, 1, 0, 1, 1);
 
-DELETE FROM `reference_loot_template` WHERE `Entry` IN (30171, 30484, 30485, 30547, 30549, 30550,  34011, 34012, 3013, 3014, 34015, 34026, 34028, 34029, 34030);
+DELETE FROM `reference_loot_template` WHERE `Entry` IN (30171, 30484, 30485, 30547, 30549, 30550,  34011, 34012, 34013, 34014, 34015, 34026, 34027, 34028, 34029, 34030);
 INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`) VALUES
 (30171,1203 ,0,0,0,1,1,1,1),
 (30171,1973 ,0,0,0,1,1,1,1),
