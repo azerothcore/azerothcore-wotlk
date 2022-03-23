@@ -3821,6 +3821,38 @@ class spell_item_wraith_scythe_drain_life : public SpellScript
     }
 };
 
+// Item - 12846: Argent Dawn Commission
+// Item - 13209: Seal of the Dawn
+// Item - 19812: Rune of the Dawn
+
+// 17670 - Argent Dawn Commission
+class spell_item_argent_dawn_commission : public SpellScriptLoader
+{
+public:
+    spell_item_argent_dawn_commission() : SpellScriptLoader("spell_item_argent_dawn_commission") { }
+
+    class spell_item_argent_dawn_commission_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_item_argent_dawn_commission_AuraScript);
+
+        void HandleDummy(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+        {
+            // Prevent console log
+            PreventDefaultAction();
+        }
+
+        void Register() override
+        {
+            OnEffectProc += AuraEffectProcFn(spell_item_argent_dawn_commission_AuraScript::HandleDummy, EFFECT_0, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_item_argent_dawn_commission_AuraScript();
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     RegisterSpellScript(spell_item_massive_seaforium_charge);
@@ -3937,4 +3969,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_linken_boomerang);
     RegisterSpellScript(spell_item_recall);
     RegisterSpellScript(spell_item_wraith_scythe_drain_life);
+    new spell_item_argent_dawn_commission();
 }

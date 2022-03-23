@@ -2065,6 +2065,34 @@ private:
     bool _corpse;
 };
 
+// 56817 - Rune strike proc (Serverside spell)
+class spell_dk_rune_strike_proc : public SpellScriptLoader
+{
+public:
+    spell_dk_rune_strike_proc() : SpellScriptLoader("spell_dk_rune_strike_proc") { }
+
+    class spell_dk_rune_strike_proc_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_dk_rune_strike_proc_AuraScript);
+
+        void HandleDummy(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+        {
+            // Prevent console log
+            PreventDefaultAction();
+        }
+
+        void Register() override
+        {
+            OnEffectProc += AuraEffectProcFn(spell_dk_rune_strike_proc_AuraScript::HandleDummy, EFFECT_0, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_dk_rune_strike_proc_AuraScript();
+    }
+};
+
 // 59754 - Rune Tap
 class spell_dk_rune_tap_party : public SpellScript
 {
@@ -2325,6 +2353,7 @@ void AddSC_deathknight_spell_scripts()
     RegisterSpellScript(spell_dk_pestilence);
     RegisterSpellScript(spell_dk_presence);
     RegisterSpellScript(spell_dk_raise_dead);
+    new spell_dk_rune_strike_proc();
     RegisterSpellScript(spell_dk_rune_tap_party);
     RegisterSpellScript(spell_dk_scent_of_blood);
     RegisterSpellScript(spell_dk_scourge_strike);
