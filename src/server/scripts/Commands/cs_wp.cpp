@@ -1051,7 +1051,7 @@ public:
         if (show == "off")
         {
             WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_CREATURE_BY_ID);
-            stmt->SetData(0, 1);
+            stmt->SetArguments(1, 1, 1);
 
             PreparedQueryResult result = WorldDatabase.Query(stmt);
             if (!result)
