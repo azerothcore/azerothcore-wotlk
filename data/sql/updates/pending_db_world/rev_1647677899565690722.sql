@@ -73,3 +73,6 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (32216, 'spell_warr_victorious'),
 (56817, 'spell_dk_rune_strike_proc'),
 (57627, 'spell_pet_charge');
+
+-- Item - Icecrown Reputation Ring Healer Trigger, spell should proc on cast
+UPDATE `spell_proc` SET `SpellPhaseMask`=1 WHERE `SpellId`=72419;
