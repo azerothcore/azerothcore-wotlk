@@ -9137,8 +9137,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
         case 14189: // Seal Fate (Netherblade set)
         case 14157: // Ruthlessness
             {
-                if (!victim || victim == this)
-                    return false;
+                victim = nullptr;
                 // Need add combopoint AFTER finish movie (or they dropped in finish phase)
                 break;
             }
@@ -15818,7 +15817,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                     continue;
                 }
 
-                switch(triggeredByAura->GetAuraType())
+                switch (triggeredByAura->GetAuraType())
                 {
                     case SPELL_AURA_PROC_TRIGGER_SPELL:
                         {
@@ -15958,6 +15957,19 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                             break;
                         takeCharges = true;
                         break;
+                    case SPELL_AURA_ADD_FLAT_MODIFIER:
+                    case SPELL_AURA_ADD_PCT_MODIFIER:
+                    {
+                        if (SpellModifier* mod = triggeredByAura->GetSpellModifier())
+                        {
+                            if (mod->op == SPELLMOD_CASTING_TIME && procSpell && (procSpell->GetTriggeredCastFlags() & TRIGGERED_CAST_DIRECTLY) != 0)
+                            {
+                                break;
+                            }
+                        }
+                        takeCharges = true;
+                        break;
+                    }
                     default:
                         takeCharges = true;
                         break;
@@ -17313,8 +17325,7 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
             LOG_DEBUG("entities.unit", "We are dead, losing {} percent durability", sWorld->getRate(RATE_DURABILITY_LOSS_ON_DEATH));
             plrVictim->DurabilityLossAll(sWorld->getRate(RATE_DURABILITY_LOSS_ON_DEATH), false);
             // durability lost message
-            WorldPacket data(SMSG_DURABILITY_DAMAGE_DEATH, 0);
-            plrVictim->GetSession()->SendPacket(&data);
+            plrVictim->SendDurabilityLoss();
         }
         // Call KilledUnit for creatures
         if (killer && killer->GetTypeId() == TYPEID_UNIT && killer->IsAIEnabled)

@@ -664,6 +664,14 @@ class spell_sha_earthliving_weapon : public AuraScript
             return false;
         }
 
+        if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
+        {
+            if (spellInfo->Id == SPELL_SHAMAN_EARTH_SHIELD_HEAL)
+            {
+                return false;
+            }
+        }
+
         if (AuraEffect const* aurEff = caster->GetAuraEffectOfRankedSpell(SPELL_SHAMAN_BLESSING_OF_THE_ETERNALS_R1, EFFECT_1, caster->GetGUID()))
         {
             if (eventInfo.GetProcTarget()->HasAuraState(AURA_STATE_HEALTHLESS_35_PERCENT))
