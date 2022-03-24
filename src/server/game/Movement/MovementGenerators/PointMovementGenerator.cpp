@@ -197,6 +197,14 @@ template <> void PointMovementGenerator<Creature>::MovementInform(Creature* unit
 {
     if (unit->AI())
         unit->AI()->MovementInform(POINT_MOTION_TYPE, id);
+
+    if (Unit* summoner = unit->GetCharmerOrOwner())
+    {
+        if (UnitAI* AI = summoner->GetAI())
+        {
+            AI->SummonMovementInform(unit, POINT_MOTION_TYPE, id);
+        }
+    }
 }
 
 template void PointMovementGenerator<Player>::DoInitialize(Player*);
