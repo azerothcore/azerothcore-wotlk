@@ -16,6 +16,7 @@
  */
 
 #include "GameLocale.h"
+#include "AchievementMgr.h"
 #include "AccountMgr.h"
 #include "Chat.h"
 #include "DBCStores.h"
@@ -60,7 +61,7 @@ void GameLocale::LoadAllLocales()
     LoadQuestRequestItemsLocale();
     LoadChatCommandsLocales();
     LoadAutoBroadCastLocales();
-    //LoadQuestGreetingLocales(); // not implement
+    LoadQuestGreetingLocales();
 
     // Load new strings
     LoadRaceStrings();
@@ -82,7 +83,7 @@ bool GameLocale::LoadAcoreStrings()
     QueryResult result = WorldDatabase.Query("SELECT entry, content_default, locale_koKR, locale_frFR, locale_deDE, locale_zhCN, locale_zhTW, locale_esES, locale_esMX, locale_ruRU FROM acore_string");
     if (!result)
     {
-        LOG_WARN("sql.sql", ">> Loaded 0 warhead strings. DB table `warhead_strings` is empty.");
+        LOG_WARN("sql.sql", ">> Loaded 0 acore strings. DB table `acore_string` is empty.");
         LOG_WARN("sql.sql", "");
         return false;
     }
@@ -117,7 +118,7 @@ char const* GameLocale::GetAcoreString(uint32 entry, LocaleConstant locale) cons
         return as->Content[DEFAULT_LOCALE].c_str();
     }
 
-    LOG_ERROR("sql.sql", "Warhead string entry {} not found in DB.", entry);
+    LOG_ERROR("sql.sql", "Acore string entry {} not found in DB.", entry);
 
     return "<error>";
 }
@@ -155,6 +156,13 @@ void GameLocale::LoadAchievementRewardLocales()
         LocaleConstant locale = GetLocaleByName(fields[1].Get<std::string>());
         if (locale == LOCALE_enUS)
             continue;
+
+        auto achievementReward = sAchievementMgr->GetAchievementReward(ID);
+        if (!achievementReward)
+        {
+            LOG_ERROR("sql.sql", "Table `achievement_reward_locale` (Entry: {}) has locale strings for non-existing achievement reward.", ID);
+            continue;
+        }
 
         /*if (CONF_GET_BOOL("Language.SupportOnlyDefault") && locale != GetDBCLocaleIndex())
             continue;*/
@@ -730,29 +738,44 @@ void GameLocale::LoadQuestGreetingLocales()
         uint32 id = fields[0].Get<uint32>();
         uint8 type = fields[1].Get<uint8>();
 
+        LocaleConstant locale = GetLocaleByName(fields[2].Get<std::string>());
+        if (locale == LOCALE_enUS)
+            continue;
+
         // overwrite
         switch (type)
         {
         case 0: // Creature
+        {
+            if (!sObjectMgr->GetCreatureTemplate(id))
+            {
+                LOG_ERROR("sql.sql", "Table `quest_greeting_locale`: creature template entry {} does not exist.", id);
+                continue;
+            }
+
             type = TYPEID_UNIT;
             break;
+        }
         case 1: // GameObject
+        {
+            if (!sObjectMgr->GetGameObjectTemplate(id))
+            {
+                LOG_ERROR("sql.sql", "Table `quest_greeting_locale`: gameobject template entry {} does not exist.", id);
+                continue;
+            }
+
             type = TYPEID_GAMEOBJECT;
             break;
+        }
         default:
             break;
         }
-
-        LocaleConstant locale = GetLocaleByName(fields[2].Get<std::string>());
-        if (locale == LOCALE_enUS)
-            continue;
 
         /*if (CONF_GET_BOOL("Language.SupportOnlyDefault") && locale != GetDBCLocaleIndex())
             continue;*/
 
         QuestGreetingLocale& data = _questGreetingLocaleStore[MAKE_PAIR32(id, type)];
-
-        Acore::Locale::AddLocaleString(fields[3].Get<std::string_view>(), locale, data.greeting);
+        Acore::Locale::AddLocaleString(fields[3].Get<std::string_view>(), locale, data.Greeting);
     } while (result->NextRow());
 
     LOG_INFO("server.loading", ">> Loaded {} quest greeting locale strings in {} ms", _questGreetingLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
@@ -997,10 +1020,10 @@ std::string const GameLocale::GetCreatureNamelocale(uint32 creatureEntry, int8 i
     std::string name;
 
     if (cretureLocale)
-        name = cretureLocale->Name[index_loc].c_str();
+        name = cretureLocale->Name[index_loc];
 
     if (name.empty() && creatureTemplate)
-        name = creatureTemplate->Name.c_str();
+        name = creatureTemplate->Name;
 
     if (name.empty())
         name = "Unknown creature";

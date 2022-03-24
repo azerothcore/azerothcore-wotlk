@@ -119,7 +119,7 @@ struct QuestOfferRewardLocale
 
 struct QuestGreetingLocale
 {
-    std::vector<std::string> greeting;
+    std::vector<std::string> Greeting;
 };
 
 struct BroadcastText

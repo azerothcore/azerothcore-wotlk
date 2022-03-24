@@ -5863,6 +5863,74 @@ void ObjectMgr::LoadQuestAreaTriggers()
     LOG_INFO("server.loading", " ");
 }
 
+QuestGreeting const* ObjectMgr::GetQuestGreeting(TypeID type, uint32 id) const
+{
+    if (type != TYPEID_UNIT && type != TYPEID_GAMEOBJECT)
+    {
+        LOG_INFO("sql.sql", "Incorrect type {} for quest greeting {}", type, id);
+        return nullptr;
+    }
+
+    return Acore::Containers::MapGetValuePtr(_questGreetingStore[type == TYPEID_UNIT ? 0 : 1], id);
+}
+
+void ObjectMgr::LoadQuestGreetings()
+{
+    uint32 oldMSTime = getMSTime();
+
+    for (auto& itr : _questGreetingStore)
+    {
+        itr.clear();
+    }
+
+    //                                                0   1          2                3             4
+    QueryResult result = WorldDatabase.Query("SELECT ID, Type, GreetEmoteType, GreetEmoteDelay, Greeting FROM quest_greeting");
+    if (!result)
+    {
+        LOG_INFO("server.loading", ">> Loaded 0 quest greetings. DB table `quest_greeting` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].Get<uint32>();
+        uint8 type = fields[1].Get<uint8>();
+        switch (type)
+        {
+        case 0: // Creature
+            if (!sObjectMgr->GetCreatureTemplate(id))
+            {
+                LOG_ERROR("sql.sql", "Table `quest_greeting`: creature template entry {} does not exist.", id);
+                continue;
+            }
+            break;
+        case 1: // GameObject
+            if (!sObjectMgr->GetGameObjectTemplate(id))
+            {
+                LOG_ERROR("sql.sql", "Table `quest_greeting`: gameobject template entry {} does not exist.", id);
+                continue;
+            }
+            break;
+        default:
+            continue;
+        }
+
+        uint16 greetEmoteType = fields[2].Get<uint16>();
+        uint32 greetEmoteDelay = fields[3].Get<uint32>();
+        std::string greeting = fields[4].Get<std::string>();
+
+        _questGreetingStore[type].emplace(std::piecewise_construct, std::forward_as_tuple(id), std::forward_as_tuple(greetEmoteType, greetEmoteDelay, std::move(greeting)));
+
+        ++count;
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} quest_greeting in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
 void ObjectMgr::LoadTavernAreaTriggers()
 {
     uint32 oldMSTime = getMSTime();

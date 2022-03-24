@@ -23,6 +23,8 @@
 #include "Tokenize.h"
 #include "World.h"
 #include "WorldSession.h"
+#include "GameLocale.h"
+#include "StringFormat.h"
 
 namespace
 {
@@ -41,6 +43,11 @@ namespace
     {
         SendPlayerMessage(player, CHAT_MSG_SYSTEM, message);
     }
+}
+
+std::string Acore::Text::GetLocaleMessage(uint8 localeIndex, uint32 id, auto&&... args)
+{
+    return StringFormatFmt(sGameLocale->GetAcoreString(id, LocaleConstant(localeIndex)), std::forward<decltype(args)>(args)...);
 }
 
 void Acore::Text::SendWorldTextFmt(AcoreFmtText const& msg)

@@ -18,8 +18,7 @@
 #ifndef __CHATTEXT_BUILDER_H
 #define __CHATTEXT_BUILDER_H
 
-#include "GameLocale.h"
-#include "StringFormat.h"
+#include "Define.h"
 #include <functional>
 
 class Battleground;
@@ -32,11 +31,7 @@ namespace Acore::Text
     using AcoreFmtText = std::function<std::string_view(uint8)>;
 
     // Get localized message
-    template<typename... Args>
-    inline std::string GetLocaleMessage(uint8 localeIndex, uint32 id, Args&&... args)
-    {
-        return StringFormatFmt(sGameLocale->GetAcoreString(id, LocaleConstant(localeIndex)), std::forward<Args>(args)...);
-    }
+    std::string GetLocaleMessage(uint8 localeIndex, uint32 id, auto&&... args);
 
     // Helper fmt functions
     void SendWorldTextFmt(AcoreFmtText const& msg);

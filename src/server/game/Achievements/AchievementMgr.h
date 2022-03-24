@@ -357,6 +357,12 @@ public:
         return iter != m_achievementRewards.end() ? &iter->second : nullptr;
     }
 
+    AchievementReward const* GetAchievementReward(uint32 id) const
+    {
+        AchievementRewards::const_iterator iter = m_achievementRewards.find(id);
+        return iter != m_achievementRewards.end() ? &iter->second : nullptr;
+    }
+
     AchievementCriteriaDataSet const* GetCriteriaDataSet(AchievementCriteriaEntry const* achievementCriteria) const
     {
         AchievementCriteriaDataMap::const_iterator iter = m_criteriaDataMap.find(achievementCriteria->ID);

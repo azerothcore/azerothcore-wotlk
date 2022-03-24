@@ -532,13 +532,6 @@ struct QuestGreeting
         : EmoteType(emoteType), EmoteDelay(emoteDelay), Text(std::move(text)) { }
 };
 
-struct QuestGreetingLocale
-{
-    std::vector<std::string> Greeting;
-};
-
-typedef std::unordered_map<uint32, QuestGreetingLocale> QuestGreetingLocaleContainer;
-
 struct GossipMenuItems
 {
     uint32          MenuID;
@@ -1119,6 +1112,8 @@ public:
         if (itr == _gameObjectDataStore.end()) return nullptr;
             return &itr->second;
     }
+
+    QuestGreeting const* GetQuestGreeting(TypeID type, uint32 id) const;
 
     GameObjectData& NewGOData(ObjectGuid::LowType guid) { return _gameObjectDataStore[guid]; }
     void DeleteGOData(ObjectGuid::LowType guid);
