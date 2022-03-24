@@ -106,6 +106,8 @@ WorldPacket const* WorldPackets::Misc::PauseMirrorTimer::Write()
 WorldPacket const* WorldPackets::Misc::StopMirrorTimer::Write()
 {
     _worldPacket << uint32(Timer);
+
+    return &_worldPacket;
 }
 
 WorldPacket const* WorldPackets::Misc::CrossedInebriationThreshold::Write()
