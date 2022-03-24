@@ -41,6 +41,19 @@ namespace WorldPackets
             WeatherState WeatherID = WeatherState(0);
         };
 
+        class LevelUpInfo final : public ServerPacket
+        {
+        public:
+            LevelUpInfo() : ServerPacket(SMSG_LEVELUP_INFO, 56) { }
+
+            WorldPacket const* Write() override;
+
+            uint32 Level = 0;
+            uint32 HealthDelta = 0;
+            std::array<uint32, MAX_POWERS> PowerDelta = { };
+            std::array<uint32, MAX_STATS> StatDelta = { };
+        };
+
         class AC_GAME_API PlayMusic final : public ServerPacket
         {
         public:
@@ -141,6 +154,14 @@ namespace WorldPackets
             uint32 Timer = 0;
         };
 
+        class DurabilityDamageDeath final : public ServerPacket
+        {
+        public:
+            DurabilityDamageDeath() : ServerPacket(SMSG_DURABILITY_DAMAGE_DEATH, 0) { }
+
+            WorldPacket const* Write() override { return &_worldPacket; }
+        };
+
         class CrossedInebriationThreshold final : public ServerPacket
         {
         public:
@@ -151,6 +172,7 @@ namespace WorldPackets
             ObjectGuid Guid;
             uint32 Threshold = 0;
             uint32 ItemID = 0;
+
         };
     }
 }
