@@ -11,7 +11,7 @@ DELETE FROM `creature_addon` WHERE `guid` = 86900;
 DELETE FROM `waypoint_data` WHERE `id` = 869000;
 
 -- Refurbished Steam Tank Fix -- Removing Reginald's creature table entry breaks model 25289 for the tank
-UPDATE `creature_template` SET `modelid1` = 25341, `modelid2` = 0 WHERE `entry` = 29144; 
+UPDATE `creature_template` SET `modelid1` = 25341, `modelid2` = 0 WHERE `entry` = 29144;
 
 -- ----------------------------------------End Reginald Windsor------------------------------------------------------------------
 -- ----------------------------------------Adam and Billy------------------------------------------------------------------------
