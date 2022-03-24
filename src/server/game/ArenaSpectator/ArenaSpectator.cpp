@@ -137,7 +137,7 @@ bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, std::s
 
     if (uint32 inviteInstanceId = player->GetPendingSpectatorInviteInstanceId())
     {
-        if (Battleground* tbg = sBattlegroundMgr->GetBattleground(inviteInstanceId))
+        if (Battleground* tbg = sBattlegroundMgr->GetBattleground(inviteInstanceId, BATTLEGROUND_TYPE_NONE))
             tbg->RemoveToBeTeleported(player->GetGUID());
         player->SetPendingSpectatorInviteInstanceId(0);
     }

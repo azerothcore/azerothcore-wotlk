@@ -3845,6 +3845,10 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
                     {
                         l->push_back(owner);
                     }
+                    else if (me->IsSummon() && me->ToTempSummon()->GetSummonerUnit())
+                    {
+                        l->push_back(me->ToTempSummon()->GetSummonerUnit());
+                    }
                 }
                 else if (go)
                 {

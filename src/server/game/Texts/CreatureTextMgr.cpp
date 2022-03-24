@@ -93,7 +93,7 @@ void CreatureTextMgr::LoadCreatureTexts()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 ceature texts. DB table `creature_texts` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 ceature texts. DB table `creature_texts` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }

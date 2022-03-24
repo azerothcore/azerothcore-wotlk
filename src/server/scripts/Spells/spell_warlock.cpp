@@ -660,8 +660,21 @@ class spell_warl_seed_of_corruption : public SpellScript
 
     void FilterTargets(std::list<WorldObject*>& targets)
     {
-        if (GetExplTargetUnit())
-            targets.remove(GetExplTargetUnit());
+        targets.remove_if([&](WorldObject const* target)
+        {
+            if (Unit const* unitTarget = target->ToUnit())
+            {
+                if (WorldLocation const* dest = GetExplTargetDest())
+                {
+                    if (!unitTarget->IsWithinLOS(dest->GetPositionX(), dest->GetPositionY(), dest->GetPositionZ()))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        });
     }
 
     void Register() override

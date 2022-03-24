@@ -2456,7 +2456,7 @@ void AchievementGlobalMgr::LoadAchievementCriteriaList()
 
     if (sAchievementCriteriaStore.GetNumRows() == 0)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 achievement criteria.");
+        LOG_WARN("server.loading", ">> Loaded 0 achievement criteria.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -2605,7 +2605,7 @@ void AchievementGlobalMgr::LoadAchievementReferenceList()
 
     if (sAchievementStore.GetNumRows() == 0)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 achievement references.");
+        LOG_WARN("server.loading", ">> Loaded 0 achievement references.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -2636,7 +2636,7 @@ void AchievementGlobalMgr::LoadAchievementCriteriaData()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 additional achievement criteria data. DB table `achievement_criteria_data` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 additional achievement criteria data. DB table `achievement_criteria_data` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -2777,7 +2777,7 @@ void AchievementGlobalMgr::LoadCompletedAchievements()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 completed achievements. DB table `character_achievement` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 completed achievements. DB table `character_achievement` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -2819,7 +2819,7 @@ void AchievementGlobalMgr::LoadRewards()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 achievement rewards. DB table `achievement_reward` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 achievement rewards. DB table `achievement_reward` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }

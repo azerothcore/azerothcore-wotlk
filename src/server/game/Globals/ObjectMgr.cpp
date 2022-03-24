@@ -23,6 +23,7 @@
 #include "Chat.h"
 #include "Common.h"
 #include "Config.h"
+#include "Containers.h"
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
 #include "GameEventMgr.h"
@@ -396,7 +397,7 @@ void ObjectMgr::LoadCreatureTemplates()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 creature template definitions. DB table `creature_template` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 creature template definitions. DB table `creature_template` is empty.");
         return;
     }
 
@@ -562,7 +563,7 @@ void ObjectMgr::LoadCreatureTemplateResistances()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 creature template resistance definitions. DB table `creature_template_resistance` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 creature template resistance definitions. DB table `creature_template_resistance` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -608,7 +609,7 @@ void ObjectMgr::LoadCreatureTemplateSpells()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 creature template spell definitions. DB table `creature_template_spell` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 creature template spell definitions. DB table `creature_template_spell` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -654,7 +655,7 @@ void ObjectMgr::LoadCreatureTemplateAddons()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 creature template addon definitions. DB table `creature_template_addon` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 creature template addon definitions. DB table `creature_template_addon` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -1134,7 +1135,7 @@ void ObjectMgr::LoadCreatureAddons()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 creature addon definitions. DB table `creature_addon` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 creature addon definitions. DB table `creature_addon` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -1235,7 +1236,7 @@ void ObjectMgr::LoadGameObjectAddons()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 gameobject addon definitions. DB table `gameobject_addon` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 gameobject addon definitions. DB table `gameobject_addon` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -1345,7 +1346,7 @@ void ObjectMgr::LoadEquipmentTemplates()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 creature equipment templates. DB table `creature_equip_template` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 creature equipment templates. DB table `creature_equip_template` is empty!");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -1434,7 +1435,7 @@ void ObjectMgr::LoadCreatureMovementOverrides()
                                              "LEFT JOIN creature_template_movement AS ctm ON ctm.CreatureId = c.id1");
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 creature movement overrides. DB table `creature_movement_override` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 creature movement overrides. DB table `creature_movement_override` is empty!");
         return;
     }
 
@@ -1559,7 +1560,7 @@ void ObjectMgr::LoadCreatureModelInfo()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 creature model definitions. DB table `creature_model_info` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 creature model definitions. DB table `creature_model_info` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -1617,7 +1618,7 @@ void ObjectMgr::LoadLinkedRespawn()
 
     if (!result)
     {
-        LOG_ERROR("sql.sql", ">> Loaded 0 linked respawns. DB table `linked_respawn` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 linked respawns. DB table `linked_respawn` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -1848,7 +1849,7 @@ void ObjectMgr::LoadTempSummons()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 temp summons. DB table `creature_summon_groups` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 temp summons. DB table `creature_summon_groups` is empty.");
         return;
     }
 
@@ -1941,7 +1942,7 @@ void ObjectMgr::LoadCreatures()
 
     if (!result)
     {
-        LOG_ERROR("sql.sql", ">> Loaded 0 creatures. DB table `creature` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 creatures. DB table `creature` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -2266,7 +2267,7 @@ void ObjectMgr::LoadGameobjects()
 
     if (!result)
     {
-        LOG_ERROR("sql.sql", ">> Loaded 0 gameobjects. DB table `gameobject` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 gameobjects. DB table `gameobject` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -2488,7 +2489,7 @@ void ObjectMgr::LoadItemTemplates()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 item templates. DB table `item_template` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 item templates. DB table `item_template` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -3066,7 +3067,7 @@ void ObjectMgr::LoadItemSetNames()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 item set names. DB table `item_set_names` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 item set names. DB table `item_set_names` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -3138,7 +3139,7 @@ void ObjectMgr::LoadVehicleTemplateAccessories()
 
     if (!result)
     {
-        LOG_ERROR("sql.sql", ">> Loaded 0 vehicle template accessories. DB table `vehicle_template_accessory` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 vehicle template accessories. DB table `vehicle_template_accessory` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -3194,7 +3195,7 @@ void ObjectMgr::LoadVehicleAccessories()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 Vehicle Accessories in {} ms", GetMSTimeDiffToNow(oldMSTime));
+        LOG_WARN("server.loading", ">> Loaded 0 Vehicle Accessories in {} ms", GetMSTimeDiffToNow(oldMSTime));
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -3234,7 +3235,7 @@ void ObjectMgr::LoadPetLevelInfo()
 
     if (!result)
     {
-        LOG_ERROR("sql.sql", ">> Loaded 0 level pet stats definitions. DB table `pet_levelstats` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 level pet stats definitions. DB table `pet_levelstats` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -3375,7 +3376,7 @@ void ObjectMgr::LoadPlayerInfo()
         if (!result)
         {
             LOG_INFO("server.loading", " ");
-            LOG_ERROR("sql.sql", ">> Loaded 0 player create definitions. DB table `playercreateinfo` is empty.");
+            LOG_WARN("server.loading", ">> Loaded 0 player create definitions. DB table `playercreateinfo` is empty.");
             exit(1);
         }
         else
@@ -3461,7 +3462,7 @@ void ObjectMgr::LoadPlayerInfo()
 
         if (!result)
         {
-            LOG_INFO("server.loading", ">> Loaded 0 custom player create items. DB table `playercreateinfo_item` is empty.");
+            LOG_WARN("server.loading", ">> Loaded 0 custom player create items. DB table `playercreateinfo_item` is empty.");
             LOG_INFO("server.loading", " ");
         }
         else
@@ -3532,7 +3533,7 @@ void ObjectMgr::LoadPlayerInfo()
 
         if (!result)
         {
-            LOG_ERROR("server.loading", ">> Loaded 0 player create skills. DB table `playercreateinfo_skills` is empty.");
+            LOG_WARN("server.loading", ">> Loaded 0 player create skills. DB table `playercreateinfo_skills` is empty.");
         }
         else
         {
@@ -3606,7 +3607,7 @@ void ObjectMgr::LoadPlayerInfo()
 
         if (!result)
         {
-            LOG_INFO("server.loading", ">> Loaded 0 player create spells. DB table `playercreateinfo_spell_custom` is empty.");
+            LOG_WARN("server.loading", ">> Loaded 0 player create spells. DB table `playercreateinfo_spell_custom` is empty.");
         }
         else
         {
@@ -3664,7 +3665,7 @@ void ObjectMgr::LoadPlayerInfo()
 
         if (!result)
         {
-            LOG_ERROR("server.loading", ">> Loaded 0 player create cast spells. DB table `playercreateinfo_cast_spell` is empty.");
+            LOG_WARN("server.loading", ">> Loaded 0 player create cast spells. DB table `playercreateinfo_cast_spell` is empty.");
         }
         else
         {
@@ -3722,7 +3723,7 @@ void ObjectMgr::LoadPlayerInfo()
 
         if (!result)
         {
-            LOG_ERROR("sql.sql", ">> Loaded 0 player create actions. DB table `playercreateinfo_action` is empty.");
+            LOG_WARN("server.loading", ">> Loaded 0 player create actions. DB table `playercreateinfo_action` is empty.");
             LOG_INFO("server.loading", " ");
         }
         else
@@ -3850,7 +3851,7 @@ void ObjectMgr::LoadPlayerInfo()
 
         if (!result)
         {
-            LOG_ERROR("sql.sql", ">> Loaded 0 level stats definitions. DB table `player_levelstats` is empty.");
+            LOG_WARN("server.loading", ">> Loaded 0 level stats definitions. DB table `player_levelstats` is empty.");
             LOG_INFO("server.loading", " ");
             exit(1);
         }
@@ -3963,7 +3964,7 @@ void ObjectMgr::LoadPlayerInfo()
 
         if (!result)
         {
-            LOG_ERROR("sql.sql", ">> Loaded 0 xp for level definitions. DB table `player_xp_for_level` is empty.");
+            LOG_WARN("server.loading", ">> Loaded 0 xp for level definitions. DB table `player_xp_for_level` is empty.");
             LOG_INFO("server.loading", " ");
             exit(1);
         }
@@ -4153,7 +4154,7 @@ void ObjectMgr::LoadQuests()
                          " FROM quest_template");
     if (!result)
     {
-        LOG_ERROR("sql.sql", ">> Loaded 0 quests definitions. DB table `quest_template` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 quests definitions. DB table `quest_template` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -4195,7 +4196,7 @@ void ObjectMgr::LoadQuests()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 quest details. DB table `quest_details` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 quest details. DB table `quest_details` is empty.");
     }
     else
     {
@@ -4218,7 +4219,7 @@ void ObjectMgr::LoadQuests()
 
     if (!result)
     {
-        LOG_ERROR("server.loading", ">> Loaded 0 quest request items. DB table `quest_request_items` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 quest request items. DB table `quest_request_items` is empty.");
     }
     else
     {
@@ -4241,7 +4242,7 @@ void ObjectMgr::LoadQuests()
 
     if (!result)
     {
-        LOG_ERROR("server.loading", ">> Loaded 0 quest reward emotes. DB table `quest_offer_reward` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 quest reward emotes. DB table `quest_offer_reward` is empty.");
     }
     else
     {
@@ -4266,7 +4267,7 @@ void ObjectMgr::LoadQuests()
 
     if (!result)
     {
-        LOG_ERROR("server.loading", ">> Loaded 0 quest template addons. DB table `quest_template_addon` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 quest template addons. DB table `quest_template_addon` is empty.");
     }
     else
     {
@@ -4886,7 +4887,7 @@ void ObjectMgr::LoadScripts(ScriptsType type)
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 script definitions. DB table `{}` is empty!", tableName);
+        LOG_WARN("server.loading", ">> Loaded 0 script definitions. DB table `{}` is empty!", tableName);
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -5284,7 +5285,7 @@ void ObjectMgr::LoadSpellScriptNames()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 spell script names. DB table `spell_script_names` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 spell script names. DB table `spell_script_names` is empty!");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -5413,7 +5414,7 @@ void ObjectMgr::LoadPageTexts()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 page texts. DB table `page_text` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 page texts. DB table `page_text` is empty!");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -5463,7 +5464,7 @@ void ObjectMgr::LoadInstanceTemplate()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 instance templates. DB table `page_text` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 instance templates. DB table `page_text` is empty!");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -5513,7 +5514,7 @@ void ObjectMgr::LoadInstanceEncounters()
     QueryResult result = WorldDatabase.Query("SELECT entry, creditType, creditEntry, lastEncounterDungeon FROM instance_encounters");
     if (!result)
     {
-        LOG_ERROR("sql.sql", ">> Loaded 0 instance encounters, table is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 instance encounters, table is empty!");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -5615,7 +5616,7 @@ void ObjectMgr::LoadGossipText()
 
     if (!result)
     {
-        LOG_ERROR("sql.sql", ">> Loaded 0 npc texts, table is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 npc texts, table is empty!");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -5814,7 +5815,7 @@ void ObjectMgr::LoadQuestAreaTriggers()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 quest trigger points. DB table `areatrigger_involvedrelation` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 quest trigger points. DB table `areatrigger_involvedrelation` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -5872,7 +5873,7 @@ void ObjectMgr::LoadTavernAreaTriggers()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 tavern triggers. DB table `areatrigger_tavern` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 tavern triggers. DB table `areatrigger_tavern` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -5910,7 +5911,7 @@ void ObjectMgr::LoadAreaTriggerScripts()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 areatrigger scripts. DB table `areatrigger_scripts` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 areatrigger scripts. DB table `areatrigger_scripts` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -6051,7 +6052,7 @@ void ObjectMgr::LoadAreaTriggers()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 area trigger definitions. DB table `areatrigger` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 area trigger definitions. DB table `areatrigger` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -6102,7 +6103,7 @@ void ObjectMgr::LoadAreaTriggerTeleports()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 area trigger teleport definitions. DB table `areatrigger_teleport` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 area trigger teleport definitions. DB table `areatrigger_teleport` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -6188,7 +6189,7 @@ void ObjectMgr::LoadAccessRequirements()
     QueryResult access_template_result = WorldDatabase.Query("SELECT id, map_id, difficulty, min_level, max_level, min_avg_item_level FROM dungeon_access_template");
     if (!access_template_result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 access requirement definitions. DB table `dungeon_access_template` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 access requirement definitions. DB table `dungeon_access_template` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -6545,7 +6546,7 @@ void ObjectMgr::LoadGameObjectTemplate()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 gameobject definitions. DB table `gameobject_template` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 gameobject definitions. DB table `gameobject_template` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -6725,7 +6726,7 @@ void ObjectMgr::LoadGameObjectTemplateAddons()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 gameobject template addon definitions. DB table `gameobject_template_addon` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 gameobject template addon definitions. DB table `gameobject_template_addon` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -6788,7 +6789,7 @@ void ObjectMgr::LoadExplorationBaseXP()
 
     if (!result)
     {
-        LOG_ERROR("sql.sql", ">> Loaded 0 BaseXP definitions. DB table `exploration_basexp` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 BaseXP definitions. DB table `exploration_basexp` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -6828,7 +6829,7 @@ void ObjectMgr::LoadPetNames()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 pet name parts. DB table `pet_name_generation` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 pet name parts. DB table `pet_name_generation` is empty!");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -6996,7 +6997,7 @@ void ObjectMgr::LoadReputationOnKill()
 
     if (!result)
     {
-        LOG_ERROR("sql.sql", ">> Loaded 0 creature award reputation definitions. DB table `creature_onkill_reputation` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 creature award reputation definitions. DB table `creature_onkill_reputation` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -7177,7 +7178,7 @@ void ObjectMgr::LoadPointsOfInterest()
 
     if (!result)
     {
-        LOG_ERROR("sql.sql", ">> Loaded 0 Points of Interest definitions. DB table `points_of_interest` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 Points of Interest definitions. DB table `points_of_interest` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -7225,7 +7226,7 @@ void ObjectMgr::LoadQuestPOI()
 
     if (!result)
     {
-        LOG_ERROR("sql.sql", ">> Loaded 0 quest POI definitions. DB table `quest_poi` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 quest POI definitions. DB table `quest_poi` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -7298,7 +7299,7 @@ void ObjectMgr::LoadNPCSpellClickSpells()
 
     if (!result)
     {
-        LOG_ERROR("sql.sql", ">> Loaded 0 spellclick spells. DB table `npc_spellclick_spells` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 spellclick spells. DB table `npc_spellclick_spells` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -7387,7 +7388,7 @@ void ObjectMgr::LoadQuestRelationsHelper(QuestRelations& map, std::string const&
 
     if (!result)
     {
-        LOG_ERROR("sql.sql", ">> Loaded 0 quest relations from `{}`, table is empty.", table);
+        LOG_WARN("server.loading", ">> Loaded 0 quest relations from `{}`, table is empty.", table);
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -7486,7 +7487,7 @@ void ObjectMgr::LoadReservedPlayersNames()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 reserved player names. DB table `reserved_name` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 reserved player names. DB table `reserved_name` is empty!");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -7707,7 +7708,7 @@ void ObjectMgr::LoadGameObjectForQuests()
 
     if (sObjectMgr->GetGameObjectTemplates()->empty())
     {
-        LOG_INFO("server.loading", ">> Loaded 0 GameObjects for quests");
+        LOG_WARN("server.loading", ">> Loaded 0 GameObjects for quests");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -7784,7 +7785,7 @@ void ObjectMgr::LoadFishingBaseSkillLevel()
 
     if (!result)
     {
-        LOG_ERROR("sql.sql", ">> Loaded 0 areas for fishing base skill level. DB table `skill_fishing_base_level` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 areas for fishing base skill level. DB table `skill_fishing_base_level` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -7925,7 +7926,7 @@ void ObjectMgr::LoadGameTele()
 
     if (!result)
     {
-        LOG_ERROR("sql.sql", ">> Loaded 0 GameTeleports. DB table `game_tele` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 GameTeleports. DB table `game_tele` is empty!");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -8065,7 +8066,7 @@ void ObjectMgr::LoadMailLevelRewards()
 
     if (!result)
     {
-        LOG_ERROR("sql.sql", ">> Loaded 0 level dependent mail rewards. DB table `mail_level_reward` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 level dependent mail rewards. DB table `mail_level_reward` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -8212,7 +8213,7 @@ void ObjectMgr::LoadTrainerSpell()
 
     if (!result)
     {
-        LOG_ERROR("sql.sql", ">>  Loaded 0 Trainers. DB table `npc_trainer` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 Trainers. DB table `npc_trainer` is empty!");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -8294,7 +8295,7 @@ void ObjectMgr::LoadVendors()
     if (!result)
     {
         LOG_INFO("server.loading", " ");
-        LOG_ERROR("sql.sql", ">>  Loaded 0 Vendors. DB table `npc_vendor` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 Vendors. DB table `npc_vendor` is empty!");
         return;
     }
 
@@ -8340,7 +8341,7 @@ void ObjectMgr::LoadGossipMenu()
 
     if (!result)
     {
-        LOG_ERROR("sql.sql", ">> Loaded 0 gossip_menu entries. DB table `gossip_menu` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 gossip_menu entries. DB table `gossip_menu` is empty!");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -8380,7 +8381,7 @@ void ObjectMgr::LoadGossipMenuItems()
 
     if (!result)
     {
-        LOG_ERROR("sql.sql", ">> Loaded 0 gossip_menu_option IDs. DB table `gossip_menu_option` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 gossip_menu_option IDs. DB table `gossip_menu_option` is empty!");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -8670,7 +8671,7 @@ void ObjectMgr::LoadCreatureClassLevelStats()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 creature base stats. DB table `creature_classlevelstats` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 creature base stats. DB table `creature_classlevelstats` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -8753,7 +8754,7 @@ void ObjectMgr::LoadFactionChangeAchievements()
 
     if (!result)
     {
-        LOG_ERROR("sql.sql", ">> Loaded 0 faction change achievement pairs. DB table `player_factionchange_achievement` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 faction change achievement pairs. DB table `player_factionchange_achievement` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -8789,7 +8790,7 @@ void ObjectMgr::LoadFactionChangeItems()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 faction change item pairs. DB table `player_factionchange_items` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 faction change item pairs. DB table `player_factionchange_items` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -8825,7 +8826,7 @@ void ObjectMgr::LoadFactionChangeQuests()
 
     if (!result)
     {
-        LOG_ERROR("sql.sql", ">> Loaded 0 faction change quest pairs. DB table `player_factionchange_quests` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 faction change quest pairs. DB table `player_factionchange_quests` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -8861,7 +8862,7 @@ void ObjectMgr::LoadFactionChangeReputations()
 
     if (!result)
     {
-        LOG_ERROR("sql.sql", ">> Loaded 0 faction change reputation pairs. DB table `player_factionchange_reputations` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 faction change reputation pairs. DB table `player_factionchange_reputations` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -8897,7 +8898,7 @@ void ObjectMgr::LoadFactionChangeSpells()
 
     if (!result)
     {
-        LOG_ERROR("sql.sql", ">> Loaded 0 faction change spell pairs. DB table `player_factionchange_spells` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 faction change spell pairs. DB table `player_factionchange_spells` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -8933,7 +8934,7 @@ void ObjectMgr::LoadFactionChangeTitles()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 faction change title pairs. DB table `player_factionchange_title` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 faction change title pairs. DB table `player_factionchange_title` is empty.");
         return;
     }
 
@@ -9027,7 +9028,7 @@ void ObjectMgr::LoadGameObjectQuestItems()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 gameobject quest items. DB table `gameobject_questitem` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 gameobject quest items. DB table `gameobject_questitem` is empty.");
         return;
     }
 
@@ -9057,7 +9058,7 @@ void ObjectMgr::LoadCreatureQuestItems()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 creature quest items. DB table `creature_questitem` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 creature quest items. DB table `creature_questitem` is empty.");
         return;
     }
 
@@ -9088,7 +9089,7 @@ void ObjectMgr::LoadQuestMoneyRewards()
     QueryResult result = WorldDatabase.Query("SELECT `Level`, Money0, Money1, Money2, Money3, Money4, Money5, Money6, Money7, Money8, Money9 FROM `quest_money_reward` ORDER BY `Level`");
     if (!result)
     {
-        LOG_ERROR("server.loading", ">> Loaded 0 quest money rewards. DB table `quest_money_reward` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 quest money rewards. DB table `quest_money_reward` is empty.");
         return;
     }
 

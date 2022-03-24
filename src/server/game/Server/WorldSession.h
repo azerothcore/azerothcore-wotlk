@@ -71,6 +71,12 @@ namespace lfg
 
 namespace WorldPackets
 {
+    namespace LFG
+    {
+        class LFGJoin;
+        class LFGLeave;
+    }
+
     namespace Chat
     {
         class EmoteClient;
@@ -96,6 +102,11 @@ namespace WorldPackets
         class AutoBankItem;
         class AutoStoreBankItem;
         class BuyBankSlot;
+    }
+
+    namespace Combat
+    {
+        class SetSheathed;
     }
 
     namespace Guild
@@ -785,7 +796,7 @@ public:                                                 // opcodes handlers
 
     void HandleAttackSwingOpcode(WorldPacket& recvPacket);
     void HandleAttackStopOpcode(WorldPacket& recvPacket);
-    void HandleSetSheathedOpcode(WorldPacket& recvPacket);
+    void HandleSetSheathedOpcode(WorldPackets::Combat::SetSheathed& packet);
 
     void HandleUseItemOpcode(WorldPacket& recvPacket);
     void HandleOpenItemOpcode(WorldPacket& recvPacket);
@@ -927,8 +938,8 @@ public:                                                 // opcodes handlers
     void HandleLfgSetCommentOpcode(WorldPacket& recvData);
     void HandleLfgPlayerLockInfoRequestOpcode(WorldPacket& recvData);
     void HandleLfgPartyLockInfoRequestOpcode(WorldPacket& recvData);
-    void HandleLfgJoinOpcode(WorldPacket& recvData);
-    void HandleLfgLeaveOpcode(WorldPacket& recvData);
+    void HandleLfgJoinOpcode(WorldPackets::LFG::LFGJoin& lfgJoin);
+    void HandleLfgLeaveOpcode(WorldPackets::LFG::LFGLeave& lfgleave);
     void HandleLfgSetRolesOpcode(WorldPacket& recvData);
     void HandleLfgProposalResultOpcode(WorldPacket& recvData);
     void HandleLfgSetBootVoteOpcode(WorldPacket& recvData);

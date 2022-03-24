@@ -494,7 +494,7 @@ void AuctionHouseMgr::LoadAuctionItems()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 auction items. DB table `auctionhouse` or `item_instance` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 auction items. DB table `auctionhouse` or `item_instance` is empty!");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -539,7 +539,7 @@ void AuctionHouseMgr::LoadAuctions()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 auctions. DB table `auctionhouse` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 auctions. DB table `auctionhouse` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }

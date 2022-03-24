@@ -63,7 +63,7 @@ namespace DisableMgr
 
         if (!result)
         {
-            LOG_INFO("server.loading", ">> Loaded 0 disables. DB table `disables` is empty!");
+            LOG_WARN("server.loading", ">> Loaded 0 disables. DB table `disables` is empty!");
             LOG_INFO("server.loading", " ");
             return;
         }

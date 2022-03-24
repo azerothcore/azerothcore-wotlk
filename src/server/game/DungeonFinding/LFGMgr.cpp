@@ -1709,7 +1709,7 @@ namespace lfg
                         if (bgQueueTypeId != BATTLEGROUND_QUEUE_NONE)
                         {
                             plr->RemoveBattlegroundQueueId(bgQueueTypeId);
-                            sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId).RemovePlayer(plr->GetGUID(), false, i);
+                            sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId).RemovePlayer(plr->GetGUID(), true);
                         }
                     }
                 }

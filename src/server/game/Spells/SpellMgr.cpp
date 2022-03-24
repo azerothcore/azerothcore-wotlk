@@ -1300,7 +1300,7 @@ void SpellMgr::LoadSpellRanks()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 spell rank records. DB table `spell_ranks` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 spell rank records. DB table `spell_ranks` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -1411,7 +1411,7 @@ void SpellMgr::LoadSpellRequired()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 spell required records. DB table `spell_required` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 spell required records. DB table `spell_required` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -1528,7 +1528,7 @@ void SpellMgr::LoadSpellTargetPositions()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 spell target coordinates. DB table `spell_target_position` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 spell target coordinates. DB table `spell_target_position` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -1632,7 +1632,7 @@ void SpellMgr::LoadSpellGroups()
     QueryResult result = WorldDatabase.Query("SELECT id, spell_id, special_flag FROM spell_group");
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 spell group definitions. DB table `spell_group` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 spell group definitions. DB table `spell_group` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -1692,7 +1692,7 @@ void SpellMgr::LoadSpellGroupStackRules()
     QueryResult result = WorldDatabase.Query("SELECT group_id, stack_rule FROM spell_group_stack_rules");
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 spell group stack rules. DB table `spell_group_stack_rules` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 spell group stack rules. DB table `spell_group_stack_rules` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -1743,7 +1743,7 @@ void SpellMgr::LoadSpellProcEvents()
     QueryResult result = WorldDatabase.Query("SELECT entry, SchoolMask, SpellFamilyName, SpellFamilyMask0, SpellFamilyMask1, SpellFamilyMask2, procFlags, procEx, procPhase, ppmRate, CustomChance, Cooldown FROM spell_proc_event");
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 spell proc event conditions. DB table `spell_proc_event` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 spell proc event conditions. DB table `spell_proc_event` is empty.");
         return;
     }
 
@@ -1837,7 +1837,7 @@ void SpellMgr::LoadSpellProcs()
     QueryResult result = WorldDatabase.Query("SELECT spellId, schoolMask, spellFamilyName, spellFamilyMask0, spellFamilyMask1, spellFamilyMask2, typeMask, spellTypeMask, spellPhaseMask, hitMask, attributesMask, ratePerMinute, chance, cooldown, charges FROM spell_proc");
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 spell proc conditions and data. DB table `spell_proc` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 spell proc conditions and data. DB table `spell_proc` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -1975,7 +1975,7 @@ void SpellMgr::LoadSpellBonusess()
     QueryResult result = WorldDatabase.Query("SELECT entry, direct_bonus, dot_bonus, ap_bonus, ap_dot_bonus FROM spell_bonus_data");
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 spell bonus data. DB table `spell_bonus_data` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 spell bonus data. DB table `spell_bonus_data` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -2016,7 +2016,7 @@ void SpellMgr::LoadSpellThreats()
     QueryResult result = WorldDatabase.Query("SELECT entry, flatMod, pctMod, apPctMod FROM spell_threat");
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 aggro generating spells. DB table `spell_threat` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 aggro generating spells. DB table `spell_threat` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -2057,7 +2057,7 @@ void SpellMgr::LoadSpellMixology()
     QueryResult result = WorldDatabase.Query("SELECT entry, pctMod FROM spell_mixology");
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 mixology bonuses. DB table `spell_mixology` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 mixology bonuses. DB table `spell_mixology` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -2115,7 +2115,7 @@ void SpellMgr::LoadSpellPetAuras()
     QueryResult result = WorldDatabase.Query("SELECT spell, effectId, pet, aura FROM spell_pet_auras");
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 spell pet auras. DB table `spell_pet_auras` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 spell pet auras. DB table `spell_pet_auras` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -2219,7 +2219,7 @@ void SpellMgr::LoadSpellEnchantProcData()
     QueryResult result = WorldDatabase.Query("SELECT entry, customChance, PPMChance, procEx FROM spell_enchant_proc_data");
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 spell enchant proc event conditions. DB table `spell_enchant_proc_data` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 spell enchant proc event conditions. DB table `spell_enchant_proc_data` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -2263,7 +2263,7 @@ void SpellMgr::LoadSpellLinked()
     QueryResult result = WorldDatabase.Query("SELECT spell_trigger, spell_effect, type FROM spell_linked_spell");
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 linked spells. DB table `spell_linked_spell` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 linked spells. DB table `spell_linked_spell` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -2505,7 +2505,7 @@ void SpellMgr::LoadSpellAreas()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 spell area requirements. DB table `spell_area` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 spell area requirements. DB table `spell_area` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -2776,7 +2776,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 spell custom attributes from DB. DB table `spell_custom_attr` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 spell custom attributes from DB. DB table `spell_custom_attr` is empty.");
     }
     else
     {
@@ -3399,6 +3399,9 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                 break;
             case 44535: // Spirit Heal, abilities also have no cost
                 spellInfo->Effects[EFFECT_0].MiscValue = 127;
+                break;
+            case 45537: // Cosmetic - Lightning Beam Channel
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_IGNORE_EVADE;
                 break;
         }
 
