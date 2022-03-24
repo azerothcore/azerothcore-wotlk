@@ -1,10 +1,10 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1648063145113494892');
 
-ALTER TABLE `broadcast_text` CHANGE `MaleText` `Text` LONGTEXT;
-ALTER TABLE `broadcast_text` CHANGE `FemaleText` `Text1` LONGTEXT;
+ALTER TABLE `broadcast_text` CHANGE `MaleText` `Text` LONGTEXT COMMENT 'MaleText';
+ALTER TABLE `broadcast_text` CHANGE `FemaleText` `Text1` LONGTEXT COMMENT 'FemaleText';
 ALTER TABLE `broadcast_text` CHANGE `SoundEntriesId` `SoundEntriesID` MEDIUMINT(9);
-ALTER TABLE `broadcast_text_locale` CHANGE `MaleText` `Text` LONGTEXT;
-ALTER TABLE `broadcast_text_locale` CHANGE `FemaleText` `Text1` LONGTEXT;
+ALTER TABLE `broadcast_text_locale` CHANGE `MaleText` `Text` LONGTEXT COMMENT 'MaleText';
+ALTER TABLE `broadcast_text_locale` CHANGE `FemaleText` `Text1` LONGTEXT COMMENT 'FemaleText';
 ALTER TABLE `game_event_battleground_holiday` CHANGE `eventEntry` `EventEntry` TINYINT(3);
 ALTER TABLE `npc_text` CHANGE `em0_0` `EmoteDelay0_0` SMALLINT(5) UNSIGNED;
 ALTER TABLE `npc_text` CHANGE `em0_1` `Emote0_0` SMALLINT(5) UNSIGNED;
