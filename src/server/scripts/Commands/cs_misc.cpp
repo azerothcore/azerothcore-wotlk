@@ -31,6 +31,7 @@
 #include "LFG.h"
 #include "Language.h"
 #include "MapMgr.h"
+#include "MiscPackets.h"
 #include "MovementGenerator.h"
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
@@ -411,7 +412,7 @@ public:
             return false;
         }
 
-        Battleground* bg = sBattlegroundMgr->CreateNewBattleground(randomizedArenaBgTypeId, 80, 80, ArenaType(hcnt >= 2 ? hcnt : 2), false);
+        Battleground* bg = sBattlegroundMgr->CreateNewBattleground(randomizedArenaBgTypeId, GetBattlegroundBracketById(bgt->GetMapId(), bgt->GetBracketId()), ArenaType(hcnt >= 2 ? hcnt : 2), false);
         if (!bg)
         {
             handler->PSendSysMessage("Couldn't create arena map!");
@@ -437,6 +438,9 @@ public:
             WorldPacket data;
             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_IN_PROGRESS, 0, bg->GetStartTime(), bg->GetArenaType(), teamId);
             player->GetSession()->SendPacket(&data);
+
+            // Remove from LFG queues
+            sLFGMgr->LeaveAllLfgQueues(player->GetGUID(), false);
 
             player->SetBattlegroundId(bg->GetInstanceID(), bgTypeId, queueSlot, true, false, teamId);
             sBattlegroundMgr->SendToBattleground(player, bg->GetInstanceID(), bgTypeId);
@@ -2888,9 +2892,7 @@ public:
             return false;
         }
 
-        WorldPacket data(SMSG_PLAY_SOUND, 4);
-        data << uint32(soundId);
-        sWorld->SendGlobalMessage(&data);
+        sWorld->SendGlobalMessage(WorldPackets::Misc::Playsound(soundId).Write());
 
         handler->PSendSysMessage(LANG_COMMAND_PLAYED_TO_ALL, soundId);
         return true;

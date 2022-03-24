@@ -36,6 +36,7 @@
 #include "Language.h"
 #include "Log.h"
 #include "MapMgr.h"
+#include "MiscPackets.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -1589,6 +1590,19 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
             addhealth = unitTarget->SpellHealingBonusTaken(caster, m_spellInfo, addhealth, HEAL);
         }
 
+        // Implemented this way as there is no other way to do it currently (that I know :P)...
+        if (caster->ToPlayer() && caster->ToPlayer()->HasAura(23401)) // Nefarian Corrupted Healing (priest)
+        {
+            if (m_spellInfo->Effects[EFFECT_0].ApplyAuraName != SPELL_AURA_PERIODIC_HEAL ||
+                m_spellInfo->Effects[EFFECT_1].ApplyAuraName != SPELL_AURA_PERIODIC_HEAL ||
+                m_spellInfo->Effects[EFFECT_2].ApplyAuraName != SPELL_AURA_PERIODIC_HEAL)
+            {
+                m_damage = 0;
+                caster->CastSpell(unitTarget, 23402, false); // Nefarian Corrupted Healing Periodic Damage effect.
+                return;
+            }
+        }
+
         m_damage -= addhealth;
     }
 }
@@ -2137,8 +2151,10 @@ void Spell::EffectOpenLock(SpellEffIndex effIndex)
         else if (m_spellInfo->Id == 1842 && gameObjTarget->GetGOInfo()->type == GAMEOBJECT_TYPE_TRAP)
         {
             gameObjTarget->SetLootState(GO_JUST_DEACTIVATED);
-            if (!gameObjTarget->GetOwner()) // pussywizard
+            if (gameObjTarget->getLootState() == GO_JUST_DEACTIVATED && !gameObjTarget->GetOwner()) // pussywizard
+            {
                 gameObjTarget->SetRespawnTime(gameObjTarget->GetGOInfo()->GetAutoCloseTime() / IN_MILLISECONDS/*xinef*/);
+            }
             return;
         }
         // TODO: Add script for spell 41920 - Filling, becouse server it freze when use this spell
@@ -5861,7 +5877,7 @@ void Spell::EffectKillCreditPersonal(SpellEffIndex effIndex)
     if (!unitTarget)
         return;
 
-    Player* player = unitTarget->ToPlayer();
+    Player* player = unitTarget->GetCharmerOrOwnerPlayerOrPlayerItself();
     if (!player)
     {
         return;
@@ -5878,7 +5894,7 @@ void Spell::EffectKillCredit(SpellEffIndex effIndex)
     if (!unitTarget)
         return;
 
-    Player* player = unitTarget->ToPlayer();
+    Player* player = unitTarget->GetCharmerOrOwnerPlayerOrPlayerItself();
     if (!player)
     {
         return;
@@ -6265,9 +6281,7 @@ void Spell::EffectPlayMusic(SpellEffIndex effIndex)
         return;
     }
 
-    WorldPacket data(SMSG_PLAY_MUSIC, 4);
-    data << uint32(soundid);
-    player->GetSession()->SendPacket(&data);
+    unitTarget->ToPlayer()->SendDirectMessage(WorldPackets::Misc::PlayMusic(soundid).Write());
 }
 
 void Spell::EffectSpecCount(SpellEffIndex /*effIndex*/)

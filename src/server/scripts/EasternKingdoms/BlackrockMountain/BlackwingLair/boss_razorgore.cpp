@@ -27,6 +27,8 @@ enum Say
     SAY_EGGS_BROKEN2        = 1,
     SAY_EGGS_BROKEN3        = 2,
     SAY_DEATH               = 3,
+
+    EMOTE_TROOPS_RETREAT    = 0
 };
 
 enum Spells
@@ -38,7 +40,12 @@ enum Spells
     SPELL_CLEAVE            = 19632,
     SPELL_WARSTOMP          = 24375,
     SPELL_FIREBALLVOLLEY    = 22425,
-    SPELL_CONFLAGRATION     = 23023
+    SPELL_CONFLAGRATION     = 23023,
+
+    SPELL_EXPLODE_ORB       = 20037,
+    SPELL_EXPLOSION         = 20038, // Instakill everything.
+
+    SPELL_WARMING_FLAMES    = 23040,
 };
 
 enum Summons
@@ -72,16 +79,19 @@ public:
         void Reset() override
         {
             _Reset();
-
+            _died = false;
             _charmerGUID.Clear();
             secondPhase = false;
+            summons.DespawnAll();
             instance->SetData(DATA_EGG_EVENT, NOT_STARTED);
         }
 
         void JustDied(Unit* /*killer*/) override
         {
-            _JustDied();
-            Talk(SAY_DEATH);
+            if (secondPhase)
+            {
+                _JustDied();
+            }
         }
 
         bool CanAIAttack(Unit const* target) const override
@@ -93,6 +103,11 @@ public:
         {
             _EnterCombat();
 
+            events.ScheduleEvent(EVENT_CLEAVE, 15000);
+            events.ScheduleEvent(EVENT_STOMP, 35000);
+            events.ScheduleEvent(EVENT_FIREBALL, 7000);
+            events.ScheduleEvent(EVENT_CONFLAGRATION, 12000);
+
             instance->SetData(DATA_EGG_EVENT, IN_PROGRESS);
         }
 
@@ -101,12 +116,26 @@ public:
             secondPhase = true;
             _charmerGUID.Clear();
             me->RemoveAllAuras();
-            me->SetHealth(me->GetMaxHealth());
 
-            events.ScheduleEvent(EVENT_CLEAVE, 15000);
-            events.ScheduleEvent(EVENT_STOMP, 35000);
-            events.ScheduleEvent(EVENT_FIREBALL, 7000);
-            events.ScheduleEvent(EVENT_CONFLAGRATION, 12000);
+            DoCastSelf(SPELL_WARMING_FLAMES, true);
+
+            if (Creature* troops = instance->GetCreature(DATA_NEFARIAN_TROOPS))
+            {
+                troops->AI()->Talk(EMOTE_TROOPS_RETREAT);
+            }
+
+            for (ObjectGuid const& guid : _summonGUIDS)
+            {
+                if (Creature* creature = ObjectAccessor::GetCreature(*me, guid))
+                {
+                    if (creature->IsAlive())
+                    {
+                        creature->CombatStop(true);
+                        creature->SetReactState(REACT_PASSIVE);
+                        creature->GetMotionMaster()->MovePoint(0, Position(-7560.568848f, -1028.553345f, 408.491211f, 0.523858f));
+                    }
+                }
+            }
         }
 
         void SetGUID(ObjectGuid const guid, int32 /*id*/) override
@@ -116,11 +145,18 @@ public:
 
         void OnCharmed(bool apply) override
         {
-            if (!apply)
+            if (apply)
             {
                 if (Unit* charmer = ObjectAccessor::GetUnit(*me, _charmerGUID))
                 {
                     charmer->CastSpell(charmer, SPELL_MIND_EXHAUSTION, true);
+                }
+            }
+            else
+            {
+                if (Unit* charmer = ObjectAccessor::GetUnit(*me, _charmerGUID))
+                {
+                    me->TauntApply(charmer);
                 }
             }
         }
@@ -138,12 +174,41 @@ public:
             }
         }
 
+        void JustSummoned(Creature* summon) override
+        {
+            _summonGUIDS.push_back(summon->GetGUID());
+            summon->SetOwnerGUID(me->GetGUID());
+            summons.Summon(summon);
+        }
+
+        void SummonMovementInform(Creature* summon, uint32 movementType, uint32 /*pathId*/) override
+        {
+            if (movementType == POINT_MOTION_TYPE)
+            {
+                summon->DespawnOrUnsummon();
+            }
+        }
+
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (!secondPhase && damage >= me->GetHealth())
+            if (!secondPhase && damage >= me->GetHealth() && !_died)
             {
-                damage = me->GetHealth() - 1;
-                EnterEvadeMode();
+                // This is required because he kills himself with the explosion spell, causing a loop.
+                _died = true;
+
+                Talk(SAY_DEATH);
+                DoCastAOE(SPELL_EXPLODE_ORB);
+                DoCastAOE(SPELL_EXPLOSION);
+
+                // Respawn shorty in case of failure during phase 1.
+                me->SetCorpseRemoveTime(25);
+                me->SetRespawnTime(30);
+                me->SaveRespawnTime();
+
+                // Might not be required, safe measure.
+                me->SetLootRecipient(nullptr);
+
+                instance->SetData(DATA_EGG_EVENT, FAIL);
             }
         }
 
@@ -152,7 +217,10 @@ public:
             if (!UpdateVictim())
                 return;
 
-            events.Update(diff);
+            if (!me->IsCharmed())
+            {
+                events.Update(diff);
+            }
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -176,18 +244,21 @@ public:
                     case EVENT_CONFLAGRATION:
                         DoCastVictim(SPELL_CONFLAGRATION);
                         if (me->GetVictim() && me->GetVictim()->HasAura(SPELL_CONFLAGRATION))
-                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
                                 me->TauntApply(target);
                         events.ScheduleEvent(EVENT_CONFLAGRATION, 30000);
                         break;
                 }
             }
+
             DoMeleeAttackIfReady();
         }
 
     private:
         bool secondPhase;
+        bool _died;
         ObjectGuid _charmerGUID;
+        GuidVector _summonGUIDS;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
