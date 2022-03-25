@@ -177,7 +177,7 @@ enum TalentTree // talent tabs
 // Spell modifier (used for modify other spells)
 struct SpellModifier
 {
-    SpellModifier(Aura* _ownerAura = nullptr) : op(SPELLMOD_DAMAGE), type(SPELLMOD_FLAT), charges(0),  mask(),  ownerAura(_ownerAura) {}
+    SpellModifier(Aura* _ownerAura = nullptr) : op(SPELLMOD_DAMAGE), type(SPELLMOD_FLAT), charges(0),  mask(), ownerAura(_ownerAura) {}
     SpellModOp   op   : 8;
     SpellModType type : 8;
     int16 charges     : 16;
@@ -1975,6 +1975,7 @@ public:
     void BuildPlayerRepop();
     void RepopAtGraveyard();
 
+    void SendDurabilityLoss();
     void DurabilityLossAll(double percent, bool inventory);
     void DurabilityLoss(Item* item, double percent);
     void DurabilityPointsLossAll(int32 points, bool inventory);
@@ -2188,59 +2189,20 @@ public:
     void SetBGData(BGData& bgdata) { m_bgData = bgdata; }
     [[nodiscard]] Battleground* GetBattleground(bool create = false) const;
 
-    [[nodiscard]] bool InBattlegroundQueue() const
-    {
-        for (auto i : m_bgBattlegroundQueueID)
-            if (i != BATTLEGROUND_QUEUE_NONE)
-                return true;
-        return false;
-    }
+    [[nodiscard]] bool InBattlegroundQueue(bool ignoreArena = false) const;
+    [[nodiscard]] bool IsDeserter() const { return HasAura(26013); }
 
-    [[nodiscard]] BattlegroundQueueTypeId GetBattlegroundQueueTypeId(uint32 index) const { return m_bgBattlegroundQueueID[index]; }
-
-    [[nodiscard]] uint32 GetBattlegroundQueueIndex(BattlegroundQueueTypeId bgQueueTypeId) const
-    {
-        for (uint8 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
-            if (m_bgBattlegroundQueueID[i] == bgQueueTypeId)
-                return i;
-        return PLAYER_MAX_BATTLEGROUND_QUEUES;
-    }
-
-    [[nodiscard]] bool InBattlegroundQueueForBattlegroundQueueType(BattlegroundQueueTypeId bgQueueTypeId) const
-    {
-        return GetBattlegroundQueueIndex(bgQueueTypeId) < PLAYER_MAX_BATTLEGROUND_QUEUES;
-    }
+    [[nodiscard]] BattlegroundQueueTypeId GetBattlegroundQueueTypeId(uint32 index) const;
+    [[nodiscard]] uint32 GetBattlegroundQueueIndex(BattlegroundQueueTypeId bgQueueTypeId) const;
+    [[nodiscard]] bool IsInvitedForBattlegroundQueueType(BattlegroundQueueTypeId bgQueueTypeId) const;
+    [[nodiscard]] bool InBattlegroundQueueForBattlegroundQueueType(BattlegroundQueueTypeId bgQueueTypeId) const;
 
     void SetBattlegroundId(uint32 id, BattlegroundTypeId bgTypeId, uint32 queueSlot, bool invited, bool isRandom, TeamId teamId);
-
-    uint32 AddBattlegroundQueueId(BattlegroundQueueTypeId val)
-    {
-        for (uint8 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
-            if (m_bgBattlegroundQueueID[i] == BATTLEGROUND_QUEUE_NONE || m_bgBattlegroundQueueID[i] == val)
-            {
-                m_bgBattlegroundQueueID[i] = val;
-                return i;
-            }
-        return PLAYER_MAX_BATTLEGROUND_QUEUES;
-    }
-
-    bool HasFreeBattlegroundQueueId()
-    {
-        for (auto & i : m_bgBattlegroundQueueID)
-            if (i == BATTLEGROUND_QUEUE_NONE)
-                return true;
-        return false;
-    }
-
-    void RemoveBattlegroundQueueId(BattlegroundQueueTypeId val)
-    {
-        for (auto & i : m_bgBattlegroundQueueID)
-            if (i == val)
-            {
-                i = BATTLEGROUND_QUEUE_NONE;
-                return;
-            }
-    }
+    uint32 AddBattlegroundQueueId(BattlegroundQueueTypeId val);
+    bool HasFreeBattlegroundQueueId() const;
+    void RemoveBattlegroundQueueId(BattlegroundQueueTypeId val);
+    void SetInviteForBattlegroundQueueType(BattlegroundQueueTypeId bgQueueTypeId, uint32 instanceId);
+    bool IsInvitedForBattlegroundInstance(uint32 instanceId) const;
 
     [[nodiscard]] TeamId GetBgTeamId() const { return m_bgData.bgTeamId != TEAM_NEUTRAL ? m_bgData.bgTeamId : GetTeamId(); }
 
@@ -2601,7 +2563,13 @@ public:
     /***               BATTLEGROUND SYSTEM                 ***/
     /*********************************************************/
 
-    BattlegroundQueueTypeId m_bgBattlegroundQueueID[PLAYER_MAX_BATTLEGROUND_QUEUES];
+    struct BgBattlegroundQueueID_Rec
+    {
+        BattlegroundQueueTypeId bgQueueTypeId;
+        uint32 invitedToInstance;
+    };
+
+    std::array<BgBattlegroundQueueID_Rec, PLAYER_MAX_BATTLEGROUND_QUEUES> _BgBattlegroundQueueID;
     BGData m_bgData;
     bool m_IsBGRandomWinner;
 
