@@ -20,6 +20,7 @@
 #include "DBCFileLoader.h"
 #include "DBCfmt.h"
 #include "Errors.h"
+#include "LFGMgr.h"
 #include "Log.h"
 #include "SharedDefines.h"
 #include "SpellMgr.h"
@@ -529,7 +530,7 @@ void LoadDBCStores(const std::string& dataPath)
 
     for (uint32 i = 1; i < sTaxiPathStore.GetNumRows(); ++i)
         if (TaxiPathEntry const* entry = sTaxiPathStore.LookupEntry(i))
-            sTaxiPathSetBySource[entry->from][entry->to] = TaxiPathBySourceAndDestination(entry->ID, entry->price);
+            sTaxiPathSetBySource[entry->from][entry->to] = entry;
 
     // Calculate path nodes count
     uint32 pathCount = sTaxiPathStore.GetNumRows();
@@ -578,7 +579,7 @@ void LoadDBCStores(const std::string& dataPath)
                 for (TaxiPathSetForSource::const_iterator dest_i = src_i->second.begin(); dest_i != src_i->second.end(); ++dest_i)
                 {
                     // not spell path
-                    if (dest_i->second.price || spellPaths.find(dest_i->second.ID) == spellPaths.end())
+                    if (dest_i->second->price || spellPaths.find(dest_i->second->ID) == spellPaths.end())
                     {
                         ok = true;
                         break;
@@ -867,6 +868,19 @@ LFGDungeonEntry const* GetLFGDungeon(uint32 mapId, Difficulty difficulty)
     for (LFGDungeonEntry const* dungeon : sLFGDungeonStore)
         if (dungeon->map == int32(mapId) && Difficulty(dungeon->difficulty) == difficulty)
             return dungeon;
+
+    return nullptr;
+}
+
+LFGDungeonEntry const* GetZoneLFGDungeonEntry(std::string const& zoneName, LocaleConstant locale)
+{
+    for (LFGDungeonEntry const* dungeon : sLFGDungeonStore)
+    {
+        if (dungeon->type == lfg::LFG_TYPE_ZONE && zoneName.find(dungeon->name[locale]) != std::string::npos)
+        {
+            return dungeon;
+        }
+    }
 
     return nullptr;
 }
