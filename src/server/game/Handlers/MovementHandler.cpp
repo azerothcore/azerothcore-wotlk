@@ -246,9 +246,9 @@ void WorldSession::HandleMoveWorldportAck()
     //lets process all delayed operations on successful teleport
     GetPlayer()->ProcessDelayedOperations();
 
-	//mod-npc-bots
+    //mod-npc-bots
     sScriptMgr->OnPlayerMoveWorldport(GetPlayer());
-	//end mod-npc-bots
+    //end mod-npc-bots
 }
 
 void WorldSession::HandleMoveTeleportAck(WorldPacket& recvData)

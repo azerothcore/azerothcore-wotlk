@@ -470,10 +470,10 @@ public:
     //Called whenever a player moves
     virtual void OnPlayerMove(Player* /*player*/, MovementInfo /*movementInfo*/, uint32 /*opcode*/) { }
 
-	//mod-npc-bots
+    //mod-npc-bots
     virtual void OnPlayerMoveWorldport(Player* /*player*/) { }
     virtual void OnPlayerMoveTeleport(Player* /*player*/) { }
-	//end mod-npc-bots
+    //end mod-npc-bots
 };
 
 class AllMapScript : public ScriptObject
@@ -2401,10 +2401,10 @@ public: /* UnitScript */
 public: /* MovementHandlerScript */
     void OnPlayerMove(Player* player, MovementInfo movementInfo, uint32 opcode);
 
-	//mod-npc-bots
+    //mod-npc-bots
     void OnPlayerMoveWorldport(Player* player);
     void OnPlayerMoveTeleport(Player* player);
-	//end mod-npc-bots
+    //end mod-npc-bots
 
 public: /* AllCreatureScript */
     //listener function (OnAllCreatureUpdate) is called by OnCreatureUpdate
