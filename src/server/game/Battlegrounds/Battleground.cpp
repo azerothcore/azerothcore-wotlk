@@ -48,6 +48,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldStatePackets.h"
+#include "GameLocale.h"
 
 Battleground::Battleground()
 {
@@ -591,7 +592,7 @@ void Battleground::SendChatMessage(Creature* source, uint8 textId, WorldObject* 
 
 void Battleground::SendBroadcastText(uint32 id, ChatMsg msgType, WorldObject const* target)
 {
-    if (!sObjectMgr->GetBroadcastText(id))
+    if (!sGameLocale->GetBroadcastText(id))
     {
         LOG_ERROR("bg.battleground", "Battleground::SendBroadcastText: `broadcast_text` (ID: {}) was not found", id);
         return;

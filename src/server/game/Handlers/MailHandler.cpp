@@ -31,6 +31,7 @@
 #include "ScriptMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "GameLocale.h"
 
 #define MAX_INBOX_CLIENT_CAPACITY 50
 

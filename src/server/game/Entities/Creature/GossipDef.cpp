@@ -357,7 +357,7 @@ void PlayerMenu::SendQuestGiverQuestList(QEmote const& eEmote, std::string const
 
             LocaleConstant localeConstant = _session->GetSessionDbLocaleIndex();
             if (localeConstant != LOCALE_enUS)
-                if (QuestLocale const* questTemplateLocale = sObjectMgr->GetQuestLocale(questID))
+                if (QuestLocale const* questTemplateLocale = sGameLocale->GetQuestLocale(questID))
                     GameLocale::GetLocaleString(questTemplateLocale->Title, localeConstant, title);
 
             data << uint32(questID);

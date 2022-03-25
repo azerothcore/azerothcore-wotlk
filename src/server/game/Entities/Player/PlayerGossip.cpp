@@ -24,6 +24,7 @@
 #include "Pet.h"
 #include "Player.h"
 #include "WorldSession.h"
+#include "GameLocale.h"
 
 /*********************************************************/
 /***                    GOSSIP SYSTEM                  ***/
