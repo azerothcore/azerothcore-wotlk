@@ -3710,6 +3710,15 @@ EnablePlayerSettings = 0
 JoinBGAndLFG.Enable = 0
 
 #
+#     ChangeFaction.MaxMoney
+#        Description: Maximum amount of gold allowed on the character to perform a faction change.
+#        Default:     0 - Disabled
+#                     > 0 - Enabled (money in copper)
+#        Example:     If set to 10000, the maximum amount of money allowed on the character would be 1 gold.
+
+ChangeFaction.MaxMoney = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################
