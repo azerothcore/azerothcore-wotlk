@@ -111,6 +111,10 @@ public:
                     break;
                 case EVENT_LAUNCH:
                     {
+                        if (Player* player = me->GetCharmerOrOwnerPlayerOrPlayerItself())
+                        {
+                            player->AddAura(SPELL_EYE_OF_ACHERUS_VISUAL, player);
+                        }
                         me->SetSpeed(MOVE_FLIGHT, 5.0f, true);
 
                         const Position EYE_DESTINATION_1 = { me->GetPositionX() - 40.0f, me->GetPositionY(), me->GetPositionZ() + 10.0f, 0.0f };
@@ -118,6 +122,10 @@ public:
 
                         me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_1, EYE_DESTINATION_1);
                         me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_2, EYE_DESTINATION_2);
+                        if (Player* player = me->GetCharmerOrOwnerPlayerOrPlayerItself())
+                        {
+                            player->RemoveAura(SPELL_EYE_OF_ACHERUS_VISUAL);
+                        }
                         break;
                     }
                 case EVENT_REGAIN_CONTROL:

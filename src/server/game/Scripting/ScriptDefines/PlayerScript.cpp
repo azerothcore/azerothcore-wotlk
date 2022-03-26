@@ -729,6 +729,13 @@ bool ScriptMgr::OnBeforePlayerQuestComplete(Player* player, uint32 quest_id)
 
     return true;
 }
+void ScriptMgr::OnQuestComputeXP(Player* player, Quest const* quest, uint32& xpValue)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->OnQuestComputeXP(player, quest, xpValue);
+    });
+}
 
 void ScriptMgr::OnBeforeStoreOrEquipNewItem(Player* player, uint32 vendorslot, uint32& item, uint8 count, uint8 bag, uint8 slot, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore)
 {
