@@ -99,7 +99,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (@PATH_ID,3,-7631.94,-1078.19,449.164,100,0,0,0,100,0),
 (@PATH_ID,4,-7629.75,-1102.86,449.164,100,0,0,0,100,0);
 
-SET @PATH_ID := (@CGUID+)*10;
+SET @PATH_ID := (@CGUID+10)*10;
 DELETE FROM `waypoint_data` WHERE `id`=@PATH_ID;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
 (@PATH_ID,1,-7664.98,-1005.61,440.254,100,0,0,0,100,0),
