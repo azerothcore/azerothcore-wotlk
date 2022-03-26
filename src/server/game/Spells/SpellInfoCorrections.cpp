@@ -247,6 +247,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_DOT_STACKING_RULE;
     });
 
+    // Death and Decay
+    ApplySpellFix({ 52212 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx6 |= SPELL_ATTR6_IGNORE_PHASE_SHIFT;
+    });
+
     // The Eye of Acherus (no spawn in phase 2 in db)
     ApplySpellFix({ 51852 }, [](SpellInfo* spellInfo)
     {

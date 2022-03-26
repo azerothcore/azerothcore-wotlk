@@ -2133,6 +2133,10 @@ void Spell::prepareDataForTriggerSystem()
              m_spellInfo->SpellFamilyFlags[2] & 0x00064000))          // Explosive and Immolation Trap
     {
         m_procAttacker |= PROC_FLAG_DONE_TRAP_ACTIVATION;
+
+        // also fill up other flags (DoAllEffectOnTarget only fills up flag if both are not set)
+        m_procAttacker |= PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG;
+        m_procVictim |= PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_NEG;
     }
 
     // Hellfire Effect - trigger as DOT
@@ -2191,7 +2195,7 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
     if (checkIfValid)
     {
         SpellCastResult res = m_spellInfo->CheckTarget(m_caster, target, implicit);
-        if (res != SPELL_CAST_OK)
+        if ((res || m_caster->GetEntry() == WORLD_TRIGGER) != SPELL_CAST_OK) // skip stealth checks for GO casts
             return;
     }
 
@@ -5505,7 +5509,11 @@ SpellCastResult Spell::CheckCast(bool strict)
         // Xinef: do not check explicit target for triggered spell casted on self with targetflag enemy
         if (!m_triggeredByAuraSpell || m_targets.GetUnitTarget() != m_caster || !(m_spellInfo->GetExplicitTargetMask() & TARGET_FLAG_UNIT_ENEMY))
         {
-            SpellCastResult castResult = m_spellInfo->CheckExplicitTarget((m_originalCaster && m_caster->GetEntry() != WORLD_TRIGGER) ? m_originalCaster : m_caster, m_targets.GetObjectTarget(), m_targets.GetItemTarget());
+            Unit* caster = m_caster;
+            if (m_originalCaster && m_caster->GetEntry() != WORLD_TRIGGER) // Do a simplified check for gameobject casts
+                caster = m_originalCaster;
+
+            SpellCastResult castResult = m_spellInfo->CheckExplicitTarget(caster, m_targets.GetObjectTarget(), m_targets.GetItemTarget());
             if (castResult != SPELL_CAST_OK)
                 return castResult;
         }
@@ -5513,7 +5521,7 @@ SpellCastResult Spell::CheckCast(bool strict)
 
     if (Unit* target = m_targets.GetUnitTarget())
     {
-        SpellCastResult castResult = m_spellInfo->CheckTarget(m_caster, target, false);
+        SpellCastResult castResult = m_spellInfo->CheckTarget(m_caster, target, m_caster->GetEntry() == WORLD_TRIGGER); // skip stealth checks for GO casts
         if (castResult != SPELL_CAST_OK)
             return castResult;
 
