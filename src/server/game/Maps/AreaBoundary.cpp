@@ -35,6 +35,7 @@ bool RectangleBoundary::IsWithinBoundaryArea(Position const* pos) const
 // ---== CIRCLE ==---
 CircleBoundary::CircleBoundary(Position const& center, double radius, bool isInverted) :
     AreaBoundary(isInverted), _center(center), _radiusSq(radius*radius) { }
+
 CircleBoundary::CircleBoundary(Position const& center, Position const& pointOnCircle, bool isInverted) :
     AreaBoundary(isInverted), _center(center), _radiusSq(_center.GetDoubleExactDist2dSq(pointOnCircle)) { }
 
