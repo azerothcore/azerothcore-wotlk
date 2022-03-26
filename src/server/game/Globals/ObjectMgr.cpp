@@ -2281,7 +2281,7 @@ uint32 ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, float y, float 
     // We use spawn coords to spawn
     if (!map->Instanceable() && map->IsGridLoaded(x, y))
     {
-        GameObject* go = sObjectMgr->IsGameObjectStaticTransport(data.id) ? new StaticTransport() : new GameObject();
+        GameObject* go = new GameObject;
         if (!go->LoadGameObjectFromDB(spawnId, map))
         {
             LOG_ERROR("sql.sql", "AddGOData: cannot add gameobject entry {} to map", entry);
