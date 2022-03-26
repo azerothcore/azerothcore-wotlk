@@ -818,9 +818,7 @@ public:
                 {
                     damage = me->GetHealth() - 1;
                     me->SetDisableGravity(false);
-                    me->SendMonsterMove(me->GetPositionX() + 0.25f, me->GetPositionY(), 840.86f, 300, SPLINEFLAG_FALLING);
-                    me->m_positionZ = 840.86f;
-                    me->SetOrientation(0.0f);
+                    me->GetMotionMaster()->MoveFall();
                     if (Creature* frostmourne = me->FindNearestCreature(NPC_FROSTMOURNE_TRIGGER, 50.0f))
                         frostmourne->DespawnOrUnsummon(1);
                     if (Creature* terenas = me->FindNearestCreature(NPC_TERENAS_MENETHIL_OUTRO, 50.0f))
