@@ -47,6 +47,7 @@ bool CircleBoundary::IsWithinBoundaryArea(Position const* pos) const
 // ---== ELLIPSE ==---
 EllipseBoundary::EllipseBoundary(Position const& center, double radiusX, double radiusY, bool isInverted) :
     AreaBoundary(isInverted), _center(center), _radiusYSq(radiusY*radiusY), _scaleXSq(_radiusYSq / (radiusX*radiusX)) { }
+
 bool EllipseBoundary::IsWithinBoundaryArea(Position const* pos) const
 {
     double offX = _center.GetDoublePositionX() - pos->GetPositionX();
