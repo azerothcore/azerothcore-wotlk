@@ -52,7 +52,7 @@ void OutdoorPvPMgr::InitOutdoorPvP()
 
     if (!result)
     {
-        LOG_ERROR("sql.sql", ">> Loaded 0 outdoor PvP definitions. DB table `outdoorpvp_template` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 outdoor PvP definitions. DB table `outdoorpvp_template` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }

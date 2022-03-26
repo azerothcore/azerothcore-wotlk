@@ -1,3 +1,15 @@
+## 6.0.0-dev.3 | Commit: [44b7a0666c78dc99ab0bbc94045abb6685b3ad86
+](https://github.com/azerothcore/azerothcore-wotlk/commit/44b7a0666c78dc99ab0bbc94045abb6685b3ad86
+
+
+### Added
+
+- New hook for OnQuestComputeXP(). The intended use is to change the XP values for certain quests programmatically. The hook is triggered after XP calculation and before rewarding XP or gold to the player.
+
+### How to upgrade
+
+- No special changes needed. The new hook is available for use and should not interfere with any existing hooks or logic.
+
 ## 6.0.0-dev.2 | Commit: [680e60c68b1864596bf23d427e9f4742c6437b86
 ](https://github.com/azerothcore/azerothcore-wotlk/commit/680e60c68b1864596bf23d427e9f4742c6437b86
 

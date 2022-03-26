@@ -41,6 +41,12 @@ DoorData const doorData[] =
     { 0,                            0,                           DOOR_TYPE_ROOM,    BOUNDARY_NONE}  // END
 };
 
+ObjectData const creatureData[] =
+{
+    { NPC_GRETHOK,         DATA_GRETHOK         },
+    { NPC_NEFARIAN_TROOPS, DATA_NEFARIAN_TROOPS }
+};
+
 Position const SummonPosition[8] =
 {
     {-7661.207520f, -1043.268188f, 407.199554f, 6.280452f},
@@ -67,7 +73,7 @@ public:
             //SetHeaders(DataHeader);
             SetBossNumber(EncounterCount);
             LoadDoorData(doorData);
-            //LoadObjectData(creatureData, gameObjectData);
+            LoadObjectData(creatureData, nullptr);
         }
 
         void Initialize() override
@@ -75,6 +81,8 @@ public:
             // Razorgore
             EggCount = 0;
             EggEvent = 0;
+            NefarianLeftTunnel = 0;
+            NefarianRightTunnel = 0;
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -90,19 +98,38 @@ public:
                     chromaggusGUID = creature->GetGUID();
                     break;
                 case NPC_BLACKWING_DRAGON:
-                case NPC_BLACKWING_TASKMASTER:
                 case NPC_BLACKWING_LEGIONAIRE:
-                case NPC_BLACKWING_WARLOCK:
                 case NPC_BLACKWING_MAGE:
                     if (Creature* razor = instance->GetCreature(razorgoreGUID))
                         if (CreatureAI* razorAI = razor->AI())
                             razorAI->JustSummoned(creature);
+                    break;
+                case NPC_BLACKWING_GUARDSMAN:
+                    guardList.push_back(creature->GetGUID());
                     break;
                 case NPC_NEFARIAN:
                     nefarianGUID = creature->GetGUID();
                     break;
                 case NPC_VICTOR_NEFARIUS:
                     victorNefariusGUID = creature->GetGUID();
+                    break;
+                case NPC_BLACK_DRAKONID:
+                case NPC_BLUE_DRAKONID:
+                case NPC_BRONZE_DRAKONID:
+                case NPC_CHROMATIC_DRAKONID:
+                case NPC_GREEN_DRAKONID:
+                case NPC_RED_DRAKONID:
+                    if (Creature* nefarius = instance->GetCreature(victorNefariusGUID))
+                    {
+                        if (CreatureAI* nefariusAI = nefarius->AI())
+                        {
+                            nefariusAI->JustSummoned(creature);
+                        }
+                    }
+                    if (creature->AI())
+                    {
+                        creature->AI()->DoZoneInCombat();
+                    }
                     break;
                 default:
                     break;
@@ -117,11 +144,14 @@ public:
             {
                 case GO_BLACK_DRAGON_EGG:
                     if (GetBossState(DATA_FIREMAW) == DONE)
+                    {
                         go->SetPhaseMask(2, true);
+                    }
                     else
+                    {
                         EggList.push_back(go->GetGUID());
+                    }
                     break;
-
                 case GO_PORTCULLIS_RAZORGORE:
                 case GO_PORTCULLIS_VAELASTRASZ:
                 case GO_PORTCULLIS_BROODLORD:
@@ -168,6 +198,21 @@ public:
             }
         }
 
+        uint32 GetData(uint32 data) const override
+        {
+            switch (data)
+            {
+                case DATA_NEFARIAN_LEFT_TUNNEL:
+                    return NefarianLeftTunnel;
+                case DATA_NEFARIAN_RIGHT_TUNNEL:
+                    return NefarianRightTunnel;
+                default:
+                    break;
+            }
+
+            return 0;
+        }
+
         bool CheckRequiredBosses(uint32 bossId, Player const* /* player */) const override
         {
             switch (bossId)
@@ -200,10 +245,15 @@ public:
                     if (state == DONE)
                     {
                         for (ObjectGuid const& guid : EggList)
+                        {
+                            // Eggs should be destroyed instead
+                            // @todo: after dynamic spawns
                             if (GameObject* egg = instance->GetGameObject(guid))
+                            {
                                 egg->SetPhaseMask(2, true);
+                            }
+                        }
                     }
-                    SetData(DATA_EGG_EVENT, NOT_STARTED);
                     break;
                 case DATA_CHROMAGGUS:
                     if (state == DONE)
@@ -237,7 +287,7 @@ public:
                 switch (data)
                 {
                     case IN_PROGRESS:
-                        _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 45000);
+                        _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 45 * IN_MILLISECONDS);
                         EggEvent = data;
                         EggCount = 0;
                         break;
@@ -245,13 +295,19 @@ public:
                         _events.CancelEvent(EVENT_RAZOR_SPAWN);
                         EggEvent = data;
                         EggCount = 0;
+
                         for (ObjectGuid const& guid : EggList)
                         {
-                            if (GameObject* egg = instance->GetGameObject(guid))
-                            {
-                                egg->Respawn();
-                            }
+                            DoRespawnGameObject(guid, 0);
                         }
+
+                        DoRespawnCreature(DATA_GRETHOK);
+
+                        for (ObjectGuid const& guid : guardList)
+                        {
+                            DoRespawnCreature(guid);
+                        }
+
                         break;
                     case SPECIAL:
                         if (++EggCount >= EggList.size())
@@ -270,6 +326,16 @@ public:
                         break;
                 }
             }
+
+            if (type == DATA_NEFARIAN_LEFT_TUNNEL)
+            {
+                NefarianLeftTunnel = data;
+            }
+
+            if (type == DATA_NEFARIAN_RIGHT_TUNNEL)
+            {
+                NefarianRightTunnel = data;
+            }
         }
 
         ObjectGuid GetGuidData(uint32 type) const override
@@ -278,6 +344,8 @@ public:
             {
                 case DATA_RAZORGORE_THE_UNTAMED:
                     return razorgoreGUID;
+                case DATA_LORD_VICTOR_NEFARIUS:
+                    return victorNefariusGUID;
                 case DATA_CHROMAGGUS:
                     return chromaggusGUID;
                 case DATA_GO_CHROMAGGUS_DOOR:
@@ -291,9 +359,45 @@ public:
 
         void OnUnitDeath(Unit* unit) override
         {
-            //! HACK, needed because of buggy CreatureAI after charm
-            if (unit->GetEntry() == NPC_RAZORGORE && GetBossState(DATA_RAZORGORE_THE_UNTAMED) != DONE)
-                SetBossState(DATA_RAZORGORE_THE_UNTAMED, DONE);
+            switch (unit->GetEntry())
+            {
+                case NPC_RAZORGORE:
+                    //! HACK, needed because of buggy CreatureAI after charm
+                    if (EggEvent == DONE)
+                    {
+                        if (unit->GetEntry() == NPC_RAZORGORE && GetBossState(DATA_RAZORGORE_THE_UNTAMED) != DONE)
+                        {
+                            SetBossState(DATA_RAZORGORE_THE_UNTAMED, DONE);
+                        }
+                    }
+                    else
+                    {
+                        _events.CancelEvent(EVENT_RAZOR_SPAWN);
+                    }
+                    break;
+                case NPC_BLACK_DRAKONID:
+                case NPC_BLUE_DRAKONID:
+                case NPC_BRONZE_DRAKONID:
+                case NPC_CHROMATIC_DRAKONID:
+                case NPC_GREEN_DRAKONID:
+                case NPC_RED_DRAKONID:
+                    if (Creature* summon = unit->ToCreature())
+                    {
+                        summon->UpdateEntry(NPC_BONE_CONSTRUCT);
+                        summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        summon->SetReactState(REACT_PASSIVE);
+                        summon->SetStandState(UNIT_STAND_STATE_DEAD);
+
+                        if (Creature* nefarius = instance->GetCreature(victorNefariusGUID))
+                        {
+                            if (nefarius->AI())
+                            {
+                                nefarius->AI()->DoAction(ACTION_NEFARIUS_ADD_KILLED);
+                            }
+                        }
+                    }
+                    break;
+            }
         }
 
         void Update(uint32 diff) override
@@ -308,10 +412,18 @@ public:
                 switch (eventId)
                 {
                     case EVENT_RAZOR_SPAWN:
-                        for (uint8 i = urand(2, 5); i > 0; --i)
-                            if (Creature* summon = instance->SummonCreature(Entry[urand(0, 2)], SummonPosition[urand(0, 7)]))
-                                summon->AI()->DoZoneInCombat();
-                        _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 12000, 17000);
+                        if (EggEvent == IN_PROGRESS)
+                        {
+                            for (uint8 i = urand(2, 5); i > 0; --i)
+                            {
+                                if (Creature* summon = instance->SummonCreature(Entry[urand(0, 2)], SummonPosition[urand(0, 7)]))
+                                {
+                                    summon->AI()->DoZoneInCombat();
+                                }
+                            }
+
+                            _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 12000, 17000);
+                        }
                         break;
                     case EVENT_RAZOR_PHASE_TWO:
                         _events.CancelEvent(EVENT_RAZOR_SPAWN);
@@ -331,6 +443,54 @@ public:
             }
         }
 
+        std::string GetSaveData() override
+        {
+            OUT_SAVE_INST_DATA;
+
+            std::ostringstream saveStream;
+            saveStream << "B W L " << GetBossSaveData() << NefarianLeftTunnel << ' ' << NefarianRightTunnel;
+
+            OUT_SAVE_INST_DATA_COMPLETE;
+            return saveStream.str();
+        }
+
+        void Load(char const* data) override
+        {
+            if (!data)
+            {
+                OUT_LOAD_INST_DATA_FAIL;
+                return;
+            }
+
+            OUT_LOAD_INST_DATA(data);
+
+            char dataHead1, dataHead2, dataHead3;
+
+            std::istringstream loadStream(data);
+            loadStream >> dataHead1 >> dataHead2 >> dataHead3;
+
+            if (dataHead1 == 'B' && dataHead2 == 'W' && dataHead3 == 'L')
+            {
+                for (uint32 i = 0; i < EncounterCount; ++i)
+                {
+                    uint32 tmpState;
+                    loadStream >> tmpState;
+                    if (tmpState == IN_PROGRESS || tmpState == FAIL || tmpState > SPECIAL)
+                        tmpState = NOT_STARTED;
+                    SetBossState(i, EncounterState(tmpState));
+                }
+
+                loadStream >> NefarianLeftTunnel;
+                loadStream >> NefarianRightTunnel;
+            }
+            else
+            {
+                OUT_LOAD_INST_DATA_FAIL;
+            }
+
+            OUT_LOAD_INST_DATA_COMPLETE;
+        }
+
     protected:
         ObjectGuid razorgoreGUID;
         ObjectGuid chromaggusGUID;
@@ -343,6 +503,11 @@ public:
         uint8 EggCount;
         uint32 EggEvent;
         GuidList EggList;
+        GuidList guardList;
+
+        // Nefarian
+        uint32 NefarianLeftTunnel;
+        uint32 NefarianRightTunnel;
 
         // Misc
         EventMap _events;
