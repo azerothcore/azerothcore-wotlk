@@ -3625,7 +3625,7 @@ class spell_item_mana_drain : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        ValidateSpellInfo({ SPELL_MANA_DRAIN_ENERGIZE, SPELL_MANA_DRAIN_LEECH });
+        return ValidateSpellInfo({ SPELL_MANA_DRAIN_ENERGIZE, SPELL_MANA_DRAIN_LEECH });
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
