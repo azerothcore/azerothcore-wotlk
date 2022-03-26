@@ -135,7 +135,7 @@ public:
     * .deserter bg remove
     * @endcode
     */
-    static bool HandleDeserterRemove(ChatHandler* handler, Player* targetPlayer, bool isInstance)
+    static bool HandleDeserterRemove(ChatHandler* handler, Optional<PlayerIdentifier> target, bool isInstance)
     {
         targetPlayer->RemoveAura(isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER);
         handler->PSendSysMessage("Aura was removed from the %s", targetPlayer->GetName());
