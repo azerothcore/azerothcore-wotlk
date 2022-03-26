@@ -3622,7 +3622,7 @@ void Spell::_cast(bool skipCheck)
             SendCastResult(castResult);
             SendInterrupted(0);
 
-            sScriptMgr->OnSpellGo(m_caster->ToCreature(), this, false);
+            sScriptMgr->OnSpellGo(this, false);
 
             finish(false);
             SetExecutedCurrently(false);
@@ -3834,7 +3834,7 @@ void Spell::_cast(bool skipCheck)
         }
     }
 
-    sScriptMgr->OnSpellGo(m_caster->ToCreature(), this, true);
+    sScriptMgr->OnSpellGo(this, true);
 
     CallScriptAfterCastHandlers();
 

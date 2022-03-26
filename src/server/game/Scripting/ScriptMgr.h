@@ -1709,11 +1709,10 @@ public:
     /**
      * @brief This hook Called after creature finished cast a spell.
      *
-     * @param caster Contains information about the spell caster
      * @param spell Contains information about the spell
      * @param ok Contains information about the spell cast result. true if success, otherwise false.
      */
-    virtual void OnSpellGo(Unit const* /*caster*/, Spell const* /*spell*/, bool /*ok*/) { }
+    virtual void OnSpellGo(Spell const* /*spell*/, bool /*ok*/) { }
 };
 
 // this class can be used to be extended by Modules
@@ -2457,7 +2456,7 @@ public: /* SpellSC */
     void OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, GameObject* gameObjTarget);
     void OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, Creature* creatureTarget);
     void OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, Item* itemTarget);
-    void OnSpellGo(Unit const* caster, Spell const* spell, bool ok);
+    void OnSpellGo(Spell const* spell, bool ok);
 
 public: /* GameEventScript */
     void OnGameEventStart(uint16 EventID);

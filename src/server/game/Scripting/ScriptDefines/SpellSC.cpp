@@ -157,10 +157,10 @@ void ScriptMgr::OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex
     });
 }
 
-void ScriptMgr::OnSpellGo(Unit const* caster, Spell const* spell, bool ok)
+void ScriptMgr::OnSpellGo(Spell const* spell, bool ok)
 {
     ExecuteScript<SpellSC>([&](SpellSC* script)
     {
-        script->OnSpellGo(caster, spell, ok);
+        script->OnSpellGo(spell, ok);
     });
 }
