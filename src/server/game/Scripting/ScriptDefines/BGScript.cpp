@@ -66,58 +66,41 @@ void ScriptMgr::OnBattlegroundRemovePlayerAtLeave(Battleground* bg, Player* play
     });
 }
 
-void ScriptMgr::OnAddGroup(BattlegroundQueue* queue, GroupQueueInfo* ginfo, uint32& index, Player* leader, Group* grp, PvPDifficultyEntry const* bracketEntry, bool isPremade)
+void ScriptMgr::OnAddGroup(BattlegroundQueue* queue, GroupQueueInfo* ginfo, uint32& index, Player* leader, Group* group, BattlegroundTypeId bgTypeId, PvPDifficultyEntry const* bracketEntry,
+    uint8 arenaType, bool isRated, bool isPremade, uint32 arenaRating, uint32 matchmakerRating, uint32 arenaTeamId, uint32 opponentsArenaTeamId)
 {
     ExecuteScript<BGScript>([&](BGScript* script)
     {
-        script->OnAddGroup(queue, ginfo, index, leader, grp, bracketEntry, isPremade);
+        script->OnAddGroup(queue, ginfo, index, leader, group, bgTypeId, bracketEntry,
+            arenaType, isRated, isPremade, arenaRating, matchmakerRating, arenaTeamId, opponentsArenaTeamId);
     });
 }
 
-bool ScriptMgr::CanFillPlayersToBG(BattlegroundQueue* queue, Battleground* bg, const int32 aliFree, const int32 hordeFree, BattlegroundBracketId bracket_id)
+bool ScriptMgr::CanFillPlayersToBG(BattlegroundQueue* queue, Battleground* bg, BattlegroundBracketId bracket_id)
 {
     auto ret = IsValidBoolScript<BGScript>([&](BGScript* script)
     {
-        return !script->CanFillPlayersToBG(queue, bg, aliFree, hordeFree, bracket_id);
+        return !script->CanFillPlayersToBG(queue, bg, bracket_id);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
-bool ScriptMgr::CanFillPlayersToBGWithSpecific(BattlegroundQueue* queue, Battleground* bg, const int32 aliFree, const int32 hordeFree,
-        BattlegroundBracketId thisBracketId, BattlegroundQueue* specificQueue, BattlegroundBracketId specificBracketId)
+bool ScriptMgr::IsCheckNormalMatch(BattlegroundQueue* queue, Battleground* bgTemplate, BattlegroundBracketId bracket_id, uint32 minPlayers, uint32 maxPlayers)
 {
     auto ret = IsValidBoolScript<BGScript>([&](BGScript* script)
     {
-        return !script->CanFillPlayersToBGWithSpecific(queue, bg, aliFree, hordeFree, thisBracketId, specificQueue, specificBracketId);
+        return script->IsCheckNormalMatch(queue, bgTemplate, bracket_id, minPlayers, maxPlayers);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret, true);
 }
 
-void ScriptMgr::OnCheckNormalMatch(BattlegroundQueue* queue, uint32& Coef, Battleground* bgTemplate, BattlegroundBracketId bracket_id, uint32& minPlayers, uint32& maxPlayers)
+void ScriptMgr::OnQueueUpdate(BattlegroundQueue* queue, uint32 diff, BattlegroundTypeId bgTypeId, BattlegroundBracketId bracket_id, uint8 arenaType, bool isRated, uint32 arenaRating)
 {
     ExecuteScript<BGScript>([&](BGScript* script)
     {
-        script->OnCheckNormalMatch(queue, Coef, bgTemplate, bracket_id, minPlayers, maxPlayers);
-    });
-}
-
-void ScriptMgr::OnQueueUpdate(BattlegroundQueue* queue, BattlegroundBracketId bracket_id, bool isRated, uint32 arenaRatedTeamId)
-{
-    ExecuteScript<BGScript>([&](BGScript* script)
-    {
-        script->OnQueueUpdate(queue, bracket_id, isRated, arenaRatedTeamId);
+        script->OnQueueUpdate(queue, diff, bgTypeId, bracket_id, arenaType, isRated, arenaRating);
     });
 }
 
@@ -128,12 +111,7 @@ bool ScriptMgr::CanSendMessageBGQueue(BattlegroundQueue* queue, Player* leader, 
         return !script->CanSendMessageBGQueue(queue, leader, bg, bracketEntry);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::OnBeforeSendJoinMessageArenaQueue(BattlegroundQueue* queue, Player* leader, GroupQueueInfo* ginfo, PvPDifficultyEntry const* bracketEntry, bool isRated)
@@ -143,12 +121,7 @@ bool ScriptMgr::OnBeforeSendJoinMessageArenaQueue(BattlegroundQueue* queue, Play
         return !script->OnBeforeSendJoinMessageArenaQueue(queue, leader, ginfo, bracketEntry, isRated);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::OnBeforeSendExitMessageArenaQueue(BattlegroundQueue* queue, GroupQueueInfo* ginfo)
@@ -158,12 +131,7 @@ bool ScriptMgr::OnBeforeSendExitMessageArenaQueue(BattlegroundQueue* queue, Grou
         return !script->OnBeforeSendExitMessageArenaQueue(queue, ginfo);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 void ScriptMgr::OnBattlegroundEnd(Battleground* bg, TeamId winnerTeam)

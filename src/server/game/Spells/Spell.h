@@ -589,6 +589,8 @@ public:
 
     [[nodiscard]] uint32 GetTriggeredByAuraTickNumber() const { return m_triggeredByAuraSpell.tickNumber; }
 
+    [[nodiscard]] TriggerCastFlags GetTriggeredCastFlags() const { return _triggeredCastFlags; }
+
  protected:
     bool HasGlobalCooldown() const;
     void TriggerGlobalCooldown();
