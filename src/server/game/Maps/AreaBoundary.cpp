@@ -41,7 +41,7 @@ bool CircleBoundary::IsWithinBoundaryArea(Position const* pos) const
 {
     double offX = _center.GetDoublePositionX() - pos->GetPositionX();
     double offY = _center.GetDoublePositionY() - pos->GetPositionY();
-    return offX*offX+offY*offY <= _radiusSq;
+    return offX * offX + offY * offY <= _radiusSq;
 }
 
 // ---== ELLIPSE ==---
