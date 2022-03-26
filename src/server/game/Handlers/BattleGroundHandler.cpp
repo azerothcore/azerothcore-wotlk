@@ -492,6 +492,16 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recvData)
         if (Battleground* currentBg = _player->GetBattleground())
             currentBg->RemovePlayerAtLeave(_player);
 
+        for (uint8 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
+        {
+            auto playerBgQueueTypeId = _player->GetBattlegroundQueueTypeId(i);
+            if (playerBgQueueTypeId != BATTLEGROUND_QUEUE_NONE && playerBgQueueTypeId != bgQueueTypeId)
+            {
+                _player->RemoveBattlegroundQueueId(playerBgQueueTypeId);
+                sBattlegroundMgr->GetBattlegroundQueue(playerBgQueueTypeId).RemovePlayer(_player->GetGUID(), true);
+            }
+        }
+
         // Remove from LFG queues
         sLFGMgr->LeaveAllLfgQueues(_player->GetGUID(), false);
 

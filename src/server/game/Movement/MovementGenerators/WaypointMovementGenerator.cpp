@@ -256,6 +256,14 @@ void WaypointMovementGenerator<Creature>::MovementInform(Creature* creature)
 {
     if (creature->AI())
         creature->AI()->MovementInform(WAYPOINT_MOTION_TYPE, i_currentNode);
+
+    if (Unit* owner = creature->GetCharmerOrOwner())
+    {
+        if (UnitAI* AI = owner->GetAI())
+        {
+            AI->SummonMovementInform(creature, WAYPOINT_MOTION_TYPE, i_currentNode);
+        }
+    }
 }
 
 //----------------------------------------------------//
