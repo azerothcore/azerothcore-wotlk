@@ -46,7 +46,6 @@ void ScriptMgr::Creature_SelectLevel(const CreatureTemplate* cinfo, Creature* cr
     });
 }
 
-//mod-npc-bots
 bool ScriptMgr::OnBeforeCreatureUpdate(Creature* creature, uint32 diff)
 {
     auto ret = IsValidBoolScript<AllCreatureScript>([&](AllCreatureScript* script)
@@ -61,7 +60,6 @@ bool ScriptMgr::OnBeforeCreatureUpdate(Creature* creature, uint32 diff)
 
     return true;
 }
-//end mod-npc-bots
 
 //bool ScriptMgr::CanCreatureSendListInventory(Player* player, Creature* creature, uint32 vendorEntry)
 //{

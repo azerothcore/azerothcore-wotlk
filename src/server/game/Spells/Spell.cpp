@@ -3622,9 +3622,7 @@ void Spell::_cast(bool skipCheck)
             SendCastResult(castResult);
             SendInterrupted(0);
 
-            //mod-npc-bots
             sScriptMgr->OnSpellGo(m_caster->ToCreature(), this, false);
-            //end mod-npc-bots
 
             finish(false);
             SetExecutedCurrently(false);
@@ -3836,9 +3834,7 @@ void Spell::_cast(bool skipCheck)
         }
     }
 
-    //mod-npc-bots
     sScriptMgr->OnSpellGo(m_caster->ToCreature(), this, true);
-    //end mod-npc-bots
 
     CallScriptAfterCastHandlers();
 

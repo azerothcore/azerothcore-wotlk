@@ -246,9 +246,7 @@ void WorldSession::HandleMoveWorldportAck()
     //lets process all delayed operations on successful teleport
     GetPlayer()->ProcessDelayedOperations();
 
-    //mod-npc-bots
     sScriptMgr->OnPlayerMoveWorldport(GetPlayer());
-    //end mod-npc-bots
 }
 
 void WorldSession::HandleMoveTeleportAck(WorldPacket& recvData)
@@ -318,9 +316,7 @@ void WorldSession::HandleMoveTeleportAck(WorldPacket& recvData)
     if (plMover->HasUnitState(UNIT_STATE_FLEEING | UNIT_STATE_CONFUSED) || plMover->IsCharmed()) // only in such cases SetClientControl(self, false) is sent
         plMover->SetClientControl(plMover, false, true);
 
-    //mod-npc-botsbot
     sScriptMgr->OnPlayerMoveTeleport(GetPlayer());
-    //end mod-npc-bots
 }
 
 void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)

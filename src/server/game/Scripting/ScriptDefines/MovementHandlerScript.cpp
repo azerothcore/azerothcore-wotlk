@@ -26,7 +26,6 @@ void ScriptMgr::OnPlayerMove(Player* player, MovementInfo movementInfo, uint32 o
     });
 }
 
-//mod-npc-bots
 void ScriptMgr::OnPlayerMoveWorldport(Player *player)
 {
     ExecuteScript<MovementHandlerScript>([&](MovementHandlerScript* script)
@@ -42,4 +41,3 @@ void ScriptMgr::OnPlayerMoveTeleport(Player *player)
         script->OnPlayerMoveTeleport(player);
     });
 }
-//end mod-npc-bots

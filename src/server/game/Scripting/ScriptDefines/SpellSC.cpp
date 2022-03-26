@@ -157,7 +157,6 @@ void ScriptMgr::OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex
     });
 }
 
-//mod-npc-bots
 void ScriptMgr::OnSpellGo(Unit const* caster, Spell const* spell, bool ok)
 {
     ExecuteScript<SpellSC>([&](SpellSC* script)
@@ -165,4 +164,3 @@ void ScriptMgr::OnSpellGo(Unit const* caster, Spell const* spell, bool ok)
         script->OnSpellGo(caster, spell, ok);
     });
 }
-//end mod-npc-bots
