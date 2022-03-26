@@ -92,7 +92,7 @@ public:
     * .deserter bg add 3600 (one hour)
     * @endcode
     */
-    static bool HandleDeserterAdd(ChatHandler* handler, uint32 time, Player* targetPlayer, bool isInstance)
+    static bool HandleDeserterAdd(ChatHandler* handler, uint32 time, Optional<PlayerIdentifier> target, bool isInstance)
     {
         if (!time)
         {
