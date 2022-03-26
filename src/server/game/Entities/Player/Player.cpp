@@ -13395,17 +13395,19 @@ void Player::_LoadSkills(PreparedQueryResult result)
 
 uint32 Player::GetPhaseMaskForSpawn() const
 {
-    uint32 phase = IsGameMaster() ? GetPhaseByAuras() : GetPhaseMask();
-
-    if (!phase)
-        phase = PHASEMASK_NORMAL;
+    uint32 phase = PHASEMASK_NORMAL;
+    if (!IsGameMaster())
+        phase = GetPhaseMask();
+    else
+    {
+        GetPhaseByAuras();
+    }
 
     // some aura phases include 1 normal map in addition to phase itself
-    uint32 n_phase = phase & ~PHASEMASK_NORMAL;
-    if (n_phase > 0)
+    if (uint32 n_phase = phase & ~PHASEMASK_NORMAL)
         return n_phase;
 
-    return phase;
+    return PHASEMASK_NORMAL;
 }
 
 InventoryResult Player::CanEquipUniqueItem(Item* pItem, uint8 eslot, uint32 limit_count) const
