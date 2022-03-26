@@ -6435,8 +6435,8 @@ void ObjectMgr::GetTaxiPath(uint32 source, uint32 destination, uint32& path, uin
         return;
     }
 
-    cost = dest_i->second.price;
-    path = dest_i->second.ID;
+    cost = dest_i->second->price;
+    path = dest_i->second->ID;
 }
 
 uint32 ObjectMgr::GetTaxiMountDisplayId(uint32 id, TeamId teamId, bool allowed_alt_team /* = false */)
