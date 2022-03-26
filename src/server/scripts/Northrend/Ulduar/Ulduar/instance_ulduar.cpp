@@ -328,7 +328,10 @@ public:
                     break;
                 case NPC_HODIR:
                     m_uiHodirGUID = creature->GetGUID();
-                    SpawnHodirChests(instance->GetDifficulty(), creature);
+                    if (m_auiEncounter[TYPE_HODIR] != DONE)
+                    {
+                        SpawnHodirChests(instance->GetDifficulty(), creature);
+                    }
                     break;
                 case NPC_THORIM:
                     m_uiThorimGUID = creature->GetGUID();
