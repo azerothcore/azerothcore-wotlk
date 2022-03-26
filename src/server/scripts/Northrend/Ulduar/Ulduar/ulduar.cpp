@@ -16,6 +16,7 @@
  */
 
 #include "ulduar.h"
+#include "CombatAI.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
