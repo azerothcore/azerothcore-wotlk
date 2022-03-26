@@ -248,21 +248,32 @@ public:
                     case EVENT_AFFLICTION:
                         {
                             uint32 afflictionSpellID = RAND(SPELL_BROODAF_BLUE, SPELL_BROODAF_BLACK, SPELL_BROODAF_RED, SPELL_BROODAF_BRONZE, SPELL_BROODAF_GREEN);
+                            std::vector<Player*> playerTargets;
                             Map::PlayerList const& players = me->GetMap()->GetPlayers();
                             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                             {
                                 if (Player* player = itr->GetSource()->ToPlayer())
                                 {
-                                    DoCast(player, afflictionSpellID, true);
+                                    if (!player->IsGameMaster() && !player->IsSpectator() && player->IsAlive())
+                                    {
+                                        playerTargets.push_back(player);
+                                    }
+                                }
+                            }
 
-                                        if (player->HasAura(SPELL_BROODAF_BLUE) &&
-                                            player->HasAura(SPELL_BROODAF_BLACK) &&
-                                            player->HasAura(SPELL_BROODAF_RED) &&
-                                            player->HasAura(SPELL_BROODAF_BRONZE) &&
-                                            player->HasAura(SPELL_BROODAF_GREEN))
-                                        {
-                                            DoCast(player, SPELL_CHROMATIC_MUT_1);
-                                        }
+                            if (playerTargets.size() > 15)
+                            {
+                                Acore::Containers::RandomResize(playerTargets, 15);
+                            }
+
+                            for (Player* player : playerTargets)
+                            {
+                                DoCast(player, afflictionSpellID, true);
+
+                                if (player->HasAura(SPELL_BROODAF_BLUE) && player->HasAura(SPELL_BROODAF_BLACK) && player->HasAura(SPELL_BROODAF_RED) &&
+                                    player->HasAura(SPELL_BROODAF_BRONZE) && player->HasAura(SPELL_BROODAF_GREEN))
+                                {
+                                    DoCast(player, SPELL_CHROMATIC_MUT_1);
                                 }
                             }
                         }
