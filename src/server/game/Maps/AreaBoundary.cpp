@@ -37,6 +37,7 @@ CircleBoundary::CircleBoundary(Position const& center, double radius, bool isInv
     AreaBoundary(isInverted), _center(center), _radiusSq(radius*radius) { }
 CircleBoundary::CircleBoundary(Position const& center, Position const& pointOnCircle, bool isInverted) :
     AreaBoundary(isInverted), _center(center), _radiusSq(_center.GetDoubleExactDist2dSq(pointOnCircle)) { }
+
 bool CircleBoundary::IsWithinBoundaryArea(Position const* pos) const
 {
     double offX = _center.GetDoublePositionX() - pos->GetPositionX();
