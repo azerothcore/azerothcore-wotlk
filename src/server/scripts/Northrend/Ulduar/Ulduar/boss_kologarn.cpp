@@ -310,6 +310,7 @@ public:
                 me->RemoveGameObject(go, false);
                 go->SetSpellId(1); // hack to make it despawn
                 go->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
+                go->SetLootRecipient(me);
             }
             if (Creature* arm = ObjectAccessor::GetCreature(*me, _left))
                 arm->DespawnOrUnsummon(3000); // visual
