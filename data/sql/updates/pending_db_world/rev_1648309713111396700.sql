@@ -3,6 +3,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1648309713111396700');
 SET @CGUID := 2000060;
 DELETE FROM `creature_addon` WHERE `guid` BETWEEN 84556 AND 84566;
 DELETE FROM `linked_respawn` WHERE `guid` BETWEEN 84556 AND 84566;
+DELETE FROM `linked_respawn` WHERE `guid` IN (85788,85793,85797,85798,85799,85802,85805);
 DELETE FROM `creature` WHERE `id1`=12468;
 INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`) VALUES
 (@CGUID,12468,469,1,1,1,-7655.51,-1100.16,449.243,3.54007,600,0,0,1,0,2,0,0,0,''),
