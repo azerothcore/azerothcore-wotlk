@@ -18899,6 +18899,15 @@ void Unit::JumpTo(WorldObject* obj, float speedZ)
 
 bool Unit::HandleSpellClick(Unit* clicker, int8 seatId)
 {
+    Creature* creature = ToCreature();
+    if (creature && creature->IsAIEnabled)
+    {
+        if (!creature->AI()->BeforeSpellClick(clicker))
+        {
+            return false;
+        }
+    }
+
     bool result = false;
     uint32 spellClickEntry = GetVehicleKit() ? GetVehicleKit()->GetCreatureEntry() : GetEntry();
     SpellClickInfoMapBounds clickPair = sObjectMgr->GetSpellClickInfoMapBounds(spellClickEntry);
@@ -18967,7 +18976,6 @@ bool Unit::HandleSpellClick(Unit* clicker, int8 seatId)
         result = true;
     }
 
-    Creature* creature = ToCreature();
     if (creature && creature->IsAIEnabled)
         creature->AI()->OnSpellClick(clicker, result);
 
