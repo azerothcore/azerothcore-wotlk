@@ -165,7 +165,7 @@ DamageInfo::DamageInfo(CalcDamageInfo& dmgInfo)
     }
 }
 
-DamageInfo::DamageInfo(SpellNonMeleeDamage const& spellNonMeleeDamage, DamageEffectType damageType, WeaponAttackType /*attackType*/, uint32 hitMask)
+DamageInfo::DamageInfo(SpellNonMeleeDamage const& spellNonMeleeDamage, DamageEffectType damageType, WeaponAttackType /*attackType*/, uint32 /* hitMask */)
     : m_attacker(spellNonMeleeDamage.attacker), m_victim(spellNonMeleeDamage.target), m_damage(spellNonMeleeDamage.damage),
       m_spellInfo(spellNonMeleeDamage.spellInfo), m_schoolMask(SpellSchoolMask(spellNonMeleeDamage.schoolMask)), m_damageType(damageType),
       m_absorb(spellNonMeleeDamage.absorb), m_resist(spellNonMeleeDamage.resist), m_block(spellNonMeleeDamage.blocked),
