@@ -1110,6 +1110,13 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                     case SMART_TARGET_PLAYER_RANGE:
                     case SMART_TARGET_PLAYER_DISTANCE:
                         break;
+                    case SMART_TARGET_SELF:
+                    case SMART_TARGET_ACTION_INVOKER:
+                        if (!NotNULL(e, e.event.friendlyHealthPct.radius))
+                        {
+                            return false;
+                        }
+                        break;
                     default:
                         LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses invalid target_type {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetTargetType());
                         return false;
