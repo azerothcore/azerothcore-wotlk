@@ -124,7 +124,7 @@ public:
 
             events.ScheduleEvent(EVENT_CLEAVE, 10000);
             events.ScheduleEvent(EVENT_FLAME_BREATH, 15000);
-            events.ScheduleEvent(EVENT_FIRE_NOVA, 20000);
+            events.ScheduleEvent(EVENT_FIRE_NOVA, 5000);
             events.ScheduleEvent(EVENT_TAIL_SWEEP, 11000);
             events.ScheduleEvent(EVENT_BURNING_ADRENALINE, 15000);
         }
@@ -220,7 +220,7 @@ public:
                         break;
                     case EVENT_FIRE_NOVA:
                         DoCastVictim(SPELL_FIRE_NOVA);
-                        events.ScheduleEvent(EVENT_FIRE_NOVA, 15000);
+                        events.ScheduleEvent(EVENT_FIRE_NOVA, urand(3000, 5000));
                         break;
                     case EVENT_TAIL_SWEEP:
                         DoCastAOE(SPELL_TAIL_SWEEP);
