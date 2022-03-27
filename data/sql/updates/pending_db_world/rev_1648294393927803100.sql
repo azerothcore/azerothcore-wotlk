@@ -1,7 +1,7 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1648294393927803100');
 
 DELETE FROM `linked_respawn` WHERE `guid` BETWEEN 2000009 AND 2000049;
-INSERT INTO `linked_respawn` VALUES
+INSERT INTO `linked_respawn` (`guid`, `linkedGuid`, `linkType`) VALUES
 (2000009,84387,0),
 (2000010,84387,0),
 (2000011,84387,0),
