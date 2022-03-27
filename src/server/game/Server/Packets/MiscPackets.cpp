@@ -118,3 +118,10 @@ WorldPacket const* WorldPackets::Misc::CrossedInebriationThreshold::Write()
 
     return &_worldPacket;
 }
+
+WorldPacket const* WorldPackets::Misc::UITime::Write()
+{
+    _worldPacket << uint32(Time);
+
+    return &_worldPacket;
+}
