@@ -2320,11 +2320,11 @@ GameObject* WorldObject::SummonGameObject(uint32 entry, float x, float y, float 
     GameObject* go = sObjectMgr->IsGameObjectStaticTransport(entry) ? new StaticTransport() : new GameObject();
     if (!sObjectMgr->IsGameObjectStaticTransport(entry))
     {
-        GameObject* go = new GameObject();
+        new GameObject();
     }
     else
     {
-        GameObject* go = new StaticTransport();
+        new StaticTransport();
     }
     if (!go->Create(map->GenerateLowGuid<HighGuid::GameObject>(), entry, map, GetPhaseMask(), x, y, z, ang, G3D::Quat(rotation0, rotation1, rotation2, rotation3), 100, GO_STATE_READY))
     {

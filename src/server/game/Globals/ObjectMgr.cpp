@@ -2284,11 +2284,11 @@ uint32 ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, float y, float 
         GameObject* go = sObjectMgr->IsGameObjectStaticTransport(data.id) ? new StaticTransport() : new GameObject();
         if (!sObjectMgr->IsGameObjectStaticTransport(data.id))
         {
-            GameObject* go = new GameObject();
+            new GameObject();
         }
         else
         {
-            GameObject* go = new StaticTransport();
+            new StaticTransport();
         }
         if (!go->LoadGameObjectFromDB(spawnId, map))
         {
