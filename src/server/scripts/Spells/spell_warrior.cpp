@@ -661,34 +661,6 @@ private:
     Unit* _procTarget;
 };
 
-// 32216 - Victorious
-class spell_warr_victorious : public SpellScriptLoader
-{
-public:
-    spell_warr_victorious() : SpellScriptLoader("spell_warr_victorious") { }
-
-    class spell_warr_victorious_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_warr_victorious_AuraScript);
-
-        void HandleDummy(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
-        {
-            // Prevent console log
-            PreventDefaultAction();
-        }
-
-        void Register() override
-        {
-            OnEffectProc += AuraEffectProcFn(spell_warr_victorious_AuraScript::HandleDummy, EFFECT_0, SPELL_AURA_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_warr_victorious_AuraScript();
-    }
-};
-
 // 50720 - Vigilance
 class spell_warr_vigilance : public AuraScript
 {
@@ -912,7 +884,6 @@ void AddSC_warrior_spell_scripts()
     RegisterSpellScript(spell_warr_shattering_throw);
     RegisterSpellScript(spell_warr_slam);
     RegisterSpellScript(spell_warr_sweeping_strikes);
-    new spell_warr_victorious();
     RegisterSpellScript(spell_warr_vigilance);
     RegisterSpellScript(spell_warr_vigilance_trigger);
     RegisterSpellScript(spell_warr_t3_prot_8p_bonus);
