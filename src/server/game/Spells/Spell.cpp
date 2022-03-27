@@ -4043,6 +4043,13 @@ void Spell::_handle_finish_phase()
     // Real add combo points from effects
     if (m_comboTarget && m_comboPointGain)
     {
+        // remove Premed-like effects unless they were caused by ourselves
+        // (this Aura removes the already-added CP when it expires from duration - now that we've added CP, this shouldn't happen anymore!)
+        if (!m_spellInfo->HasAura(SPELL_AURA_RETAIN_COMBO_POINTS))
+        {
+            m_caster->RemoveAurasByType(SPELL_AURA_RETAIN_COMBO_POINTS);
+        }
+
         m_caster->AddComboPoints(m_comboTarget, m_comboPointGain);
     }
 
@@ -4465,10 +4472,12 @@ void Spell::SendSpellStart()
 
     if (m_spellInfo->HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT) || m_spellInfo->HasAttribute(SPELL_ATTR0_CU_NEEDS_AMMO_DATA))
         castFlags |= CAST_FLAG_PROJECTILE;
-    if ((m_caster->GetTypeId() == TYPEID_PLAYER ||
-            (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->IsPet()))
-            && m_spellInfo->PowerType != POWER_HEALTH)
+
+    if ((m_caster->GetTypeId() == TYPEID_PLAYER || (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->IsPet()))
+        && m_spellInfo->PowerType != POWER_HEALTH && m_powerCost != 0)
+    {
         castFlags |= CAST_FLAG_POWER_LEFT_SELF;
+    }
 
     if (m_spellInfo->RuneCostID && m_spellInfo->PowerType == POWER_RUNE)
         castFlags |= CAST_FLAG_NO_GCD; // not needed, but Blizzard sends it
@@ -4522,10 +4531,11 @@ void Spell::SendSpellGo()
     if (m_spellInfo->HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT) || m_spellInfo->HasAttribute(SPELL_ATTR0_CU_NEEDS_AMMO_DATA))
         castFlags |= CAST_FLAG_PROJECTILE;                        // arrows/bullets visual
 
-    if ((m_caster->GetTypeId() == TYPEID_PLAYER ||
-            (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->IsPet()))
-            && m_spellInfo->PowerType != POWER_HEALTH)
-        castFlags |= CAST_FLAG_POWER_LEFT_SELF; // should only be sent to self, but the current messaging doesn't make that possible
+    if ((m_caster->GetTypeId() == TYPEID_PLAYER || (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->IsPet()))
+        && m_spellInfo->PowerType != POWER_HEALTH && m_powerCost != 0) // should only be sent to self, but the current messaging doesn't make that possible
+    {
+        castFlags |= CAST_FLAG_POWER_LEFT_SELF;
+    }
 
     if ((m_caster->GetTypeId() == TYPEID_PLAYER)
             && (m_caster->getClass() == CLASS_DEATH_KNIGHT)
@@ -5056,7 +5066,9 @@ void Spell::TakePower()
 
     // Set the five second timer
     if (PowerType == POWER_MANA && m_powerCost > 0)
+    {
         m_caster->SetLastManaUse(GameTime::GetGameTimeMS().count());
+    }
 }
 
 void Spell::TakeAmmo()

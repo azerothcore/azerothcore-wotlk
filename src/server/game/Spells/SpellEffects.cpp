@@ -1287,39 +1287,6 @@ void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
                 }
                 return;
             }
-        // Dimensional Ripper - Area 52
-        case 36890:
-            {
-                if (roll_chance_i(50))                        // 50% success
-                {
-                    int32 rand_eff = urand(1, 4);
-                    switch (rand_eff)
-                    {
-                        case 1:
-                            // soul split - evil
-                            m_caster->CastSpell(m_caster, 36900, true);
-                            break;
-                        case 2:
-                            // soul split - good
-                            m_caster->CastSpell(m_caster, 36901, true);
-                            break;
-                        case 3:
-                            // Increase the size
-                            m_caster->CastSpell(m_caster, 36895, true);
-                            break;
-                        case 4:
-                            // Transform
-                            {
-                                if (m_caster->ToPlayer()->GetTeamId() == TEAM_ALLIANCE)
-                                    m_caster->CastSpell(m_caster, 36897, true);
-                                else
-                                    m_caster->CastSpell(m_caster, 36899, true);
-                                break;
-                            }
-                    }
-                }
-                return;
-            }
     }
 }
 
@@ -1515,13 +1482,6 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
             }
 
             addhealth += damageAmount;
-        }
-        // Runic Healing Injector (heal increased by 25% for engineers - 3.2.0 patch change)
-        else if (m_spellInfo->Id == 67489)
-        {
-            if (Player* player = m_caster->ToPlayer())
-                if (player->HasSkill(SKILL_ENGINEERING))
-                    AddPct(addhealth, 25);
         }
         // Swiftmend - consumes Regrowth or Rejuvenation
         else if (m_spellInfo->TargetAuraState == AURA_STATE_SWIFTMEND && unitTarget->HasAuraState(AURA_STATE_SWIFTMEND, m_spellInfo, m_caster))
@@ -3822,17 +3782,6 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
             {
                 switch (m_spellInfo->Id)
                 {
-                    // Bending Shinbone
-                    case 8856:
-                        {
-                            if (!itemTarget && m_caster->GetTypeId() != TYPEID_PLAYER)
-                                return;
-
-                            uint32 spell_id = roll_chance_i(20) ? 8854 : 8855;
-
-                            m_caster->CastSpell(m_caster, spell_id, true, nullptr);
-                            return;
-                        }
                     // Brittle Armor - need remove one 24575 Brittle Armor aura
                     case 24590:
                         unitTarget->RemoveAuraFromStack(24575);
@@ -3974,84 +3923,6 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                             m_caster->TextEmote(buf);
                             break;
                         }
-                    // Death Knight Initiate Visual
-                    case 51519:
-                        {
-                            if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
-                                return;
-
-                            uint32 iTmpSpellId = 0;
-                            switch (unitTarget->GetDisplayId())
-                            {
-                                case 25369:
-                                    iTmpSpellId = 51552;
-                                    break; // bloodelf female
-                                case 25373:
-                                    iTmpSpellId = 51551;
-                                    break; // bloodelf male
-                                case 25363:
-                                    iTmpSpellId = 51542;
-                                    break; // draenei female
-                                case 25357:
-                                    iTmpSpellId = 51541;
-                                    break; // draenei male
-                                case 25361:
-                                    iTmpSpellId = 51537;
-                                    break; // dwarf female
-                                case 25356:
-                                    iTmpSpellId = 51538;
-                                    break; // dwarf male
-                                case 25372:
-                                    iTmpSpellId = 51550;
-                                    break; // forsaken female
-                                case 25367:
-                                    iTmpSpellId = 51549;
-                                    break; // forsaken male
-                                case 25362:
-                                    iTmpSpellId = 51540;
-                                    break; // gnome female
-                                case 25359:
-                                    iTmpSpellId = 51539;
-                                    break; // gnome male
-                                case 25355:
-                                    iTmpSpellId = 51534;
-                                    break; // human female
-                                case 25354:
-                                    iTmpSpellId = 51520;
-                                    break; // human male
-                                case 25360:
-                                    iTmpSpellId = 51536;
-                                    break; // nightelf female
-                                case 25358:
-                                    iTmpSpellId = 51535;
-                                    break; // nightelf male
-                                case 25368:
-                                    iTmpSpellId = 51544;
-                                    break; // orc female
-                                case 25364:
-                                    iTmpSpellId = 51543;
-                                    break; // orc male
-                                case 25371:
-                                    iTmpSpellId = 51548;
-                                    break; // tauren female
-                                case 25366:
-                                    iTmpSpellId = 51547;
-                                    break; // tauren male
-                                case 25370:
-                                    iTmpSpellId = 51545;
-                                    break; // troll female
-                                case 25365:
-                                    iTmpSpellId = 51546;
-                                    break; // troll male
-                                default:
-                                    return;
-                            }
-
-                            unitTarget->CastSpell(unitTarget, iTmpSpellId, true);
-                            Creature* npc = unitTarget->ToCreature();
-                            npc->LoadEquipment();
-                            return;
-                        }
                     // Deathbolt from Thalgran Blightbringer
                     // reflected by Freya's Ward
                     // Retribution by Sevenfold Retribution
@@ -4120,48 +3991,6 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                             // teleport atop
                             else
                                 unitTarget->CastSpell(unitTarget, 59314, true);
-
-                            return;
-                        }
-                    case 60123: // Lightwell
-                        {
-                            if (m_caster->GetTypeId() != TYPEID_UNIT || !m_caster->ToCreature()->IsSummon())
-                                return;
-
-                            uint32 spell_heal;
-
-                            switch (m_caster->GetEntry())
-                            {
-                                case 31897:
-                                    spell_heal = 7001;
-                                    break;
-                                case 31896:
-                                    spell_heal = 27873;
-                                    break;
-                                case 31895:
-                                    spell_heal = 27874;
-                                    break;
-                                case 31894:
-                                    spell_heal = 28276;
-                                    break;
-                                case 31893:
-                                    spell_heal = 48084;
-                                    break;
-                                case 31883:
-                                    spell_heal = 48085;
-                                    break;
-                                default:
-                                    LOG_ERROR("spells.effect", "Unknown Lightwell spell caster {}", m_caster->GetEntry());
-                                    return;
-                            }
-
-                            // proc a spellcast
-                            if (Aura* chargesAura = m_caster->GetAura(59907))
-                            {
-                                m_caster->CastSpell(unitTarget, spell_heal, true, nullptr, nullptr, m_caster->ToTempSummon()->GetSummonerGUID());
-                                if (chargesAura->ModCharges(-1))
-                                    m_caster->ToTempSummon()->UnSummon();
-                            }
 
                             return;
                         }
