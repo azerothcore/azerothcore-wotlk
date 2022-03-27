@@ -1,3 +1,19 @@
+-- DB update 2022_03_27_08 -> 2022_03_27_09
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_03_27_08';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_03_27_08 2022_03_27_09 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1647998826935283089'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1647998826935283089');
 
 REPLACE INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `VerifiedBuild`) VALUES
@@ -284,3 +300,13 @@ REPLACE INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `Ver
 (35550, 'ruRU', 'Выкройка: пронизанные солнцем чешуйчатые перчатки', '', 0),
 (35551, 'ruRU', 'Выкройка: повязки солнечного огня', '', 0),
 (35553, 'ruRU', 'Чертеж: кулачные перчатки из закаленного кория', '', 0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_03_27_09' WHERE sql_rev = '1647998826935283089';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
