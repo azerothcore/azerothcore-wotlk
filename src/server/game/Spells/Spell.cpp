@@ -2605,6 +2605,8 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
     // Do damage and triggers
     else if (m_damage > 0)
     {
+        caster->SetLastDamagedTargetGuid(unitTarget->GetGUID());
+
         // Fill base damage struct (unitTarget - is real spell target)
         SpellNonMeleeDamage damageInfo(caster, unitTarget, m_spellInfo, m_spellSchoolMask);
 
@@ -4042,8 +4044,10 @@ void Spell::_handle_finish_phase()
         m_caster->AddComboPoints(m_comboTarget, m_comboPointGain);
     }
 
-    if (m_caster->m_extraAttacks && GetSpellInfo()->HasEffect(SPELL_EFFECT_ADD_EXTRA_ATTACKS))
-        m_caster->HandleProcExtraAttackFor(m_caster->GetVictim());
+    if (m_spellInfo->HasEffect(SPELL_EFFECT_ADD_EXTRA_ATTACKS))
+    {
+        m_caster->SetLastExtraAttackSpell(m_spellInfo->Id);
+    }
 
     if (!IsAutoRepeat() && !IsNextMeleeSwingSpell())
         if (m_caster->GetCharmerOrOwnerPlayerOrPlayerItself())

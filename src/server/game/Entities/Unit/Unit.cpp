@@ -230,7 +230,6 @@ Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
     m_modAttackSpeedPct[OFF_ATTACK] = 1.0f;
     m_modAttackSpeedPct[RANGED_ATTACK] = 1.0f;
 
-    m_extraAttacks = 0;
     m_canDualWield = false;
 
     m_rootTimes = 0;
@@ -315,6 +314,8 @@ Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
     _lastLiquid = nullptr;
 
     _oldFactionId = 0;
+
+    _lastExtraAttackSpell = 0;
 }
 
 ////////////////////////////////////////////////////////////
@@ -427,6 +428,23 @@ void Unit::Update(uint32 p_time)
             else
                 m_CombatTimer -= p_time;
         }
+    }
+
+    _lastDamagedTargetGuid = ObjectGuid::Empty;
+    if (_lastExtraAttackSpell)
+    {
+        while (!extraAttacksTargets.empty())
+        {
+            auto itr = extraAttacksTargets.begin();
+            ObjectGuid targetGuid = itr->first;
+            uint32 count = itr->second;
+            extraAttacksTargets.erase(itr);
+            if (Unit* victim = ObjectAccessor::GetUnit(*this, targetGuid))
+            {
+                HandleProcExtraAttackFor(victim, count);
+            }
+        }
+        _lastExtraAttackSpell = 0;
     }
 
     // not implemented before 3.0.2
@@ -2285,8 +2303,15 @@ void Unit::CalcHealAbsorb(HealInfo& healInfo)
 
 void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType, bool extra)
 {
-    if (HasUnitState(UNIT_STATE_CANNOT_AUTOATTACK) || HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
+    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
+    {
         return;
+    }
+
+    if (HasUnitState(UNIT_STATE_CANNOT_AUTOATTACK) && !extra)
+    {
+        return;
+    }
 
     if (!victim->IsAlive())
         return;
@@ -2302,6 +2327,11 @@ void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType, bool extr
 
     if (attType != BASE_ATTACK && attType != OFF_ATTACK)
         return;                                             // ignore ranged case
+
+    if (!extra && _lastExtraAttackSpell)
+    {
+        _lastExtraAttackSpell = 0;
+    }
 
     bool meleeAttack = true;
 
@@ -2343,6 +2373,8 @@ void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType, bool extr
         SendAttackStateUpdate(&damageInfo);
 
         //TriggerAurasProcOnEvent(damageInfo);
+
+        _lastDamagedTargetGuid = victim->GetGUID();
 
         DealMeleeDamage(&damageInfo, true);
 
@@ -2456,13 +2488,29 @@ bool Unit::GetMeleeAttackPoint(Unit* attacker, Position& pos)
     return true;
 }
 
-void Unit::HandleProcExtraAttackFor(Unit* victim)
+void Unit::HandleProcExtraAttackFor(Unit* victim, uint32 count)
 {
-    while (m_extraAttacks)
+    while (count)
     {
+        --count;
         AttackerStateUpdate(victim, BASE_ATTACK, true);
-        --m_extraAttacks;
     }
+}
+
+void Unit::AddExtraAttacks(uint32 count)
+{
+    ObjectGuid targetGUID = _lastDamagedTargetGuid;
+    if (!targetGUID)
+    {
+        if (ObjectGuid selection = GetTarget())
+        {
+            targetGUID = selection; // Spell was cast directly (not triggered by aura)
+        }
+        else
+            return;
+    }
+
+    extraAttacksTargets[targetGUID] += count;
 }
 
 MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* victim, WeaponAttackType attType) const
@@ -8417,7 +8465,7 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 damage, Aura* triggeredByAura, Sp
     return false;
 }
 
-bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* triggeredByAura, SpellInfo const* procSpell, uint32 procFlags, uint32 procEx, uint32 cooldown, uint32 procPhase)
+bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* triggeredByAura, SpellInfo const* procSpell, uint32 procFlags, uint32 procEx, uint32 cooldown, uint32 procPhase, ProcEventInfo& eventInfo)
 {
     // Get triggered aura spell info
     SpellInfo const* auraSpellInfo = triggeredByAura->GetSpellInfo();
@@ -8903,8 +8951,23 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
     }
 
     // not allow proc extra attack spell at extra attack
-    if (m_extraAttacks && triggerEntry->HasEffect(SPELL_EFFECT_ADD_EXTRA_ATTACKS))
-        return false;
+    if (triggerEntry->HasEffect(SPELL_EFFECT_ADD_EXTRA_ATTACKS))
+    {
+        uint32 lastExtraAttackSpell = eventInfo.GetActor()->GetLastExtraAttackSpell();
+
+        // Patch 1.12.0(?) extra attack abilities can no longer chain proc themselves
+        if (lastExtraAttackSpell == trigger_spell_id)
+        {
+            return false;
+        }
+
+        // Patch 2.2.0 Sword Specialization (Warrior, Rogue) extra attack can no longer proc additional extra attacks
+        // 3.3.5 Sword Specialization (Warrior), Hack and Slash (Rogue)
+        if (lastExtraAttackSpell == 16459 || lastExtraAttackSpell == 66923)
+        {
+            return false;
+        }
+    }
 
     // Custom requirements (not listed in procEx) Warning! damage dealing after this
     // Custom triggered spells
@@ -15823,7 +15886,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                         {
                             LOG_DEBUG("spells.aura", "ProcDamageAndSpell: casting spell {} (triggered by {} aura of spell {})", spellInfo->Id, (isVictim ? "a victim's" : "an attacker's"), triggeredByAura->GetId());
                             // Don`t drop charge or add cooldown for not started trigger
-                            if (HandleProcTriggerSpell(target, damage, triggeredByAura, procSpellInfo, procFlag, procExtra, cooldown, procPhase))
+                            if (HandleProcTriggerSpell(target, damage, triggeredByAura, procSpellInfo, procFlag, procExtra, cooldown, procPhase, eventInfo))
                                 takeCharges = true;
                             break;
                         }
@@ -15882,7 +15945,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                         {
                             LOG_DEBUG("spells.aura", "ProcDamageAndSpell: casting spell {} (triggered with value by {} aura of spell {})", spellInfo->Id, (isVictim ? "a victim's" : "an attacker's"), triggeredByAura->GetId());
 
-                            if (HandleProcTriggerSpell(target, damage, triggeredByAura, procSpellInfo, procFlag, procExtra, cooldown, procPhase))
+                            if (HandleProcTriggerSpell(target, damage, triggeredByAura, procSpellInfo, procFlag, procExtra, cooldown, procPhase, eventInfo))
                                 takeCharges = true;
                             break;
                         }
