@@ -1509,9 +1509,13 @@ class spell_q12611_deathbolt : public SpellScript
         Unit* target = GetHitUnit();
 
         if (target->HasAura(SPELL_FREYAS_WARD))
+        {
             target->CastSpell(caster, SPELL_SEVENFOLD_RETRIBUTION, true);
+        }
         else
+        {
             caster->CastSpell(target, SPELL_DEATHBOLT, true);
+        }
     }
 
     void Register() override
