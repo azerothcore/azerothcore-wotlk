@@ -468,6 +468,8 @@ public:
                 me->SetUInt32Value(UNIT_NPC_FLAGS, 0);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
+                // Due to Nefarius despawning himself on Vael, we need to update the guid on instance to prevent unwanted behaviours as encounter not resetting at all.
+                instance->SetGuidData(DATA_LORD_VICTOR_NEFARIUS, me->GetGUID());
             }
         }
 

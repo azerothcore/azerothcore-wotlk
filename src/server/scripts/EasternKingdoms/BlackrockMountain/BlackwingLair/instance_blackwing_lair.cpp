@@ -357,6 +357,18 @@ public:
             return ObjectGuid::Empty;
         }
 
+        void SetGuidData(uint32 type, ObjectGuid data) override
+        {
+            switch (type)
+            {
+                case DATA_LORD_VICTOR_NEFARIUS:
+                    victorNefariusGUID = data;
+                    break;
+                default:
+                    break;
+            }
+        }
+
         void OnUnitDeath(Unit* unit) override
         {
             switch (unit->GetEntry())
