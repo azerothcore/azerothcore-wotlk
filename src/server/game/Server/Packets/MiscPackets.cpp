@@ -31,6 +31,20 @@ WorldPacket const* WorldPackets::Misc::Weather::Write()
     return &_worldPacket;
 }
 
+WorldPacket const* WorldPackets::Misc::LevelUpInfo::Write()
+{
+    _worldPacket << uint32(Level);
+    _worldPacket << uint32(HealthDelta);
+
+    for (uint32 power : PowerDelta)
+        _worldPacket << power;
+
+    for (uint32 stat : StatDelta)
+        _worldPacket << stat;
+
+    return &_worldPacket;
+}
+
 WorldPacket const* WorldPackets::Misc::PlayMusic::Write()
 {
     _worldPacket << SoundKitID;
@@ -69,11 +83,45 @@ WorldPacket const* WorldPackets::Misc::RandomRoll::Write()
     return &_worldPacket;
 }
 
+WorldPacket const* WorldPackets::Misc::StartMirrorTimer::Write()
+{
+    _worldPacket << uint32(Timer);
+    _worldPacket << uint32(Value);
+    _worldPacket << uint32(MaxValue);
+    _worldPacket << int32(Scale);
+    _worldPacket << uint8(Paused);
+    _worldPacket << uint32(SpellID);
+
+    return &_worldPacket;
+}
+
+WorldPacket const* WorldPackets::Misc::PauseMirrorTimer::Write()
+{
+    _worldPacket << uint32(Timer);
+    _worldPacket << uint8(Paused);
+
+    return &_worldPacket;
+}
+
+WorldPacket const* WorldPackets::Misc::StopMirrorTimer::Write()
+{
+    _worldPacket << uint32(Timer);
+
+    return &_worldPacket;
+}
+
 WorldPacket const* WorldPackets::Misc::CrossedInebriationThreshold::Write()
 {
     _worldPacket << Guid;
     _worldPacket << uint32(Threshold);
     _worldPacket << uint32(ItemID);
+
+    return &_worldPacket;
+}
+
+WorldPacket const* WorldPackets::Misc::UITime::Write()
+{
+    _worldPacket << uint32(Time);
 
     return &_worldPacket;
 }

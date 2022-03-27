@@ -268,6 +268,11 @@ public:
 
             BindPlayers();
             me->SetInCombatWithZone();
+
+            if (!_startTimer)
+            {
+                TurnGates(true, false);
+            }
         }
 
         void InitializeAI() override

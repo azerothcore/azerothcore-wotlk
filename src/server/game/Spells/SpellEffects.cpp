@@ -1287,39 +1287,6 @@ void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
                 }
                 return;
             }
-        // Dimensional Ripper - Area 52
-        case 36890:
-            {
-                if (roll_chance_i(50))                        // 50% success
-                {
-                    int32 rand_eff = urand(1, 4);
-                    switch (rand_eff)
-                    {
-                        case 1:
-                            // soul split - evil
-                            m_caster->CastSpell(m_caster, 36900, true);
-                            break;
-                        case 2:
-                            // soul split - good
-                            m_caster->CastSpell(m_caster, 36901, true);
-                            break;
-                        case 3:
-                            // Increase the size
-                            m_caster->CastSpell(m_caster, 36895, true);
-                            break;
-                        case 4:
-                            // Transform
-                            {
-                                if (m_caster->ToPlayer()->GetTeamId() == TEAM_ALLIANCE)
-                                    m_caster->CastSpell(m_caster, 36897, true);
-                                else
-                                    m_caster->CastSpell(m_caster, 36899, true);
-                                break;
-                            }
-                    }
-                }
-                return;
-            }
     }
 }
 
@@ -1515,13 +1482,6 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
             }
 
             addhealth += damageAmount;
-        }
-        // Runic Healing Injector (heal increased by 25% for engineers - 3.2.0 patch change)
-        else if (m_spellInfo->Id == 67489)
-        {
-            if (Player* player = m_caster->ToPlayer())
-                if (player->HasSkill(SKILL_ENGINEERING))
-                    AddPct(addhealth, 25);
         }
         // Swiftmend - consumes Regrowth or Rejuvenation
         else if (m_spellInfo->TargetAuraState == AURA_STATE_SWIFTMEND && unitTarget->HasAuraState(AURA_STATE_SWIFTMEND, m_spellInfo, m_caster))
@@ -3822,17 +3782,6 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
             {
                 switch (m_spellInfo->Id)
                 {
-                    // Bending Shinbone
-                    case 8856:
-                        {
-                            if (!itemTarget && m_caster->GetTypeId() != TYPEID_PLAYER)
-                                return;
-
-                            uint32 spell_id = roll_chance_i(20) ? 8854 : 8855;
-
-                            m_caster->CastSpell(m_caster, spell_id, true, nullptr);
-                            return;
-                        }
                     // Brittle Armor - need remove one 24575 Brittle Armor aura
                     case 24590:
                         unitTarget->RemoveAuraFromStack(24575);
@@ -4051,7 +4000,6 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                             Creature* npc = unitTarget->ToCreature();
                             npc->LoadEquipment();
                             return;
-                        }
                     case 52173: // Coyote Spirit Despawn
                     case 60243: // Blood Parrot Despawn
                         if (unitTarget->GetTypeId() == TYPEID_UNIT && unitTarget->ToCreature()->IsSummon())
@@ -4107,48 +4055,6 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                             // teleport atop
                             else
                                 unitTarget->CastSpell(unitTarget, 59314, true);
-
-                            return;
-                        }
-                    case 60123: // Lightwell
-                        {
-                            if (m_caster->GetTypeId() != TYPEID_UNIT || !m_caster->ToCreature()->IsSummon())
-                                return;
-
-                            uint32 spell_heal;
-
-                            switch (m_caster->GetEntry())
-                            {
-                                case 31897:
-                                    spell_heal = 7001;
-                                    break;
-                                case 31896:
-                                    spell_heal = 27873;
-                                    break;
-                                case 31895:
-                                    spell_heal = 27874;
-                                    break;
-                                case 31894:
-                                    spell_heal = 28276;
-                                    break;
-                                case 31893:
-                                    spell_heal = 48084;
-                                    break;
-                                case 31883:
-                                    spell_heal = 48085;
-                                    break;
-                                default:
-                                    LOG_ERROR("spells.effect", "Unknown Lightwell spell caster {}", m_caster->GetEntry());
-                                    return;
-                            }
-
-                            // proc a spellcast
-                            if (Aura* chargesAura = m_caster->GetAura(59907))
-                            {
-                                m_caster->CastSpell(unitTarget, spell_heal, true, nullptr, nullptr, m_caster->ToTempSummon()->GetSummonerGUID());
-                                if (chargesAura->ModCharges(-1))
-                                    m_caster->ToTempSummon()->UnSummon();
-                            }
 
                             return;
                         }
