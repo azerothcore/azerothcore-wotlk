@@ -3782,17 +3782,6 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
             {
                 switch (m_spellInfo->Id)
                 {
-                    // Bending Shinbone
-                    case 8856:
-                        {
-                            if (!itemTarget && m_caster->GetTypeId() != TYPEID_PLAYER)
-                                return;
-
-                            uint32 spell_id = roll_chance_i(20) ? 8854 : 8855;
-
-                            m_caster->CastSpell(m_caster, spell_id, true, nullptr);
-                            return;
-                        }
                     // Brittle Armor - need remove one 24575 Brittle Armor aura
                     case 24590:
                         unitTarget->RemoveAuraFromStack(24575);
