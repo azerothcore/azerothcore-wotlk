@@ -556,6 +556,8 @@ public:
     bool IsAutoActionResetSpell() const;
     bool IsIgnoringCooldowns() const;
 
+    bool IsTriggeredByAura(SpellInfo const* auraSpellInfo) const { return (auraSpellInfo == m_triggeredByAuraSpell); }
+
     bool IsDeletable() const { return !m_referencedFromCurrentSpell && !m_executedCurrently; }
     void SetReferencedFromCurrent(bool yes) { m_referencedFromCurrentSpell = yes; }
     bool IsInterruptable() const { return !m_executedCurrently; }
@@ -739,6 +741,9 @@ public:
 
     struct HitTriggerSpell
     {
+        HitTriggerSpell(SpellInfo const* spellInfo, SpellInfo const* auraSpellInfo, int32 procChance) :
+                triggeredSpell(spellInfo), triggeredByAura(auraSpellInfo), chance(procChance) { }
+
         SpellInfo const* triggeredSpell;
         SpellInfo const* triggeredByAura;
         // uint8 triggeredByEffIdx          This might be needed at a later stage - No need known for now
@@ -747,7 +752,7 @@ public:
 
     bool CanExecuteTriggersOnHit(uint8 effMask, SpellInfo const* triggeredByAura = nullptr) const;
     void PrepareTriggersExecutedOnHit();
-    typedef std::list<HitTriggerSpell> HitTriggerSpellList;
+    typedef std::vector<HitTriggerSpell> HitTriggerSpellList;
     HitTriggerSpellList m_hitTriggerSpells;
 
     // effect helpers

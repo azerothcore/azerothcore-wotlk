@@ -1744,7 +1744,7 @@ public:
             PreventDefaultAction();
 
             Unit* actionTarget = eventInfo.GetActionTarget();
-            actionTarget->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+            actionTarget->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true, nullptr, aurEff);
         }
 
         void Register() override

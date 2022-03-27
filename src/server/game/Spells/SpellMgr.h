@@ -622,7 +622,7 @@ public:
 
     // Spell proc table
     [[nodiscard]] SpellProcEntry const* GetSpellProcEntry(uint32 spellId) const;
-    bool CanSpellTriggerProcOnEvent(SpellProcEntry const& procEntry, ProcEventInfo& eventInfo) const;
+    static bool CanSpellTriggerProcOnEvent(SpellProcEntry const& procEntry, ProcEventInfo& eventInfo);
 
     // Spell bonus data table
     [[nodiscard]] SpellBonusEntry const* GetSpellBonusData(uint32 spellId) const;

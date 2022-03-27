@@ -43,7 +43,7 @@ class spell_mark_of_malice : public AuraScript
         if (aurEff->GetBase()->GetCharges() > 1)
             return;
 
-        GetTarget()->CastSpell(GetTarget(), SPELL_MARK_OF_MALICE_TRIGGERED, aurEff);
+        GetTarget()->CastSpell(GetTarget(), SPELL_MARK_OF_MALICE_TRIGGERED, true, nullptr, aurEff);
     }
 
     void Register() override

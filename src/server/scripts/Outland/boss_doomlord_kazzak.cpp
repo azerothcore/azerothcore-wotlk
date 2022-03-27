@@ -236,14 +236,14 @@ public:
             return true;
         }
 
-        void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
             DamageInfo* damageInfo = eventInfo.GetDamageInfo();
             if (!damageInfo || !damageInfo->GetDamage())
                 return;
 
-            eventInfo.GetActionTarget()->CastSpell(eventInfo.GetActor(), SPELL_TWISTED_REFLECTION_HEAL, true);
+            eventInfo.GetActionTarget()->CastSpell(eventInfo.GetActor(), SPELL_TWISTED_REFLECTION_HEAL, true, nullptr, aurEff);
         }
 
         void Register() override

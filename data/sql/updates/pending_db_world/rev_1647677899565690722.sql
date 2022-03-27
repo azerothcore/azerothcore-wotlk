@@ -126,3 +126,12 @@ INSERT INTO `spell_proc` (`SpellId`, `SchoolMask`, `SpellFamilyName`, `SpellFami
 
 -- Entrapment
 UPDATE `spell_proc` SET `AttributesMask`=0x2 WHERE `SpellId`=-19184;
+
+-- Infusion of Light proc
+UPDATE `spell_proc` SET `SpellFamilyMask0` = 0x00200000, `HitMask`=0x2, `AttributesMask`=0x2 WHERE `SpellId` = -53569;
+
+-- Shadow Trance aura drop
+UPDATE `spell_proc` SET `AttributesMask`=0x8 WHERE `SpellId`=17941;
+
+-- Anger Capacitor
+UPDATE `spell_proc` SET `AttributesMask`=`AttributesMask`|0x2 WHERE `SpellId` IN (71406,71545);
