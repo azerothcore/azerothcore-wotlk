@@ -216,7 +216,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
         if (!grp || grp->GetLeaderGUID() != _player->GetGUID())
             return;
 
-        grp->DoForAllMembers([bg, &err, bgQueueTypeId, bgQueueTypeIdRandom, bgTypeId](Player* member)
+        grp->DoForAllMembers([&err, bgQueueTypeId, bgQueueTypeIdRandom, bgTypeId](Player* member)
         {
             if (member->InBattlegroundQueueForBattlegroundQueueType(bgQueueTypeIdRandom)) // queued for random bg, so can't queue for anything else
             {
