@@ -34,6 +34,7 @@ enum Events
     EVENT_CHECK_PHASE_2,
     EVENT_START_EVENT,
     EVENT_SHADOW_BOLT,
+    EVENT_SHADOW_BOLT_VOLLEY,
     EVENT_FEAR,
     EVENT_SILENCE,
     EVENT_MIND_CONTROL,
@@ -298,7 +299,8 @@ public:
             SetCombatMovement(false);
             AttackStart(SelectTarget(SelectTargetMethod::Random, 0, 200.f, true));
             events.ScheduleEvent(EVENT_SHADOWBLINK, 500);
-            events.ScheduleEvent(EVENT_SHADOW_BOLT, urand(3000, 10000));
+            events.ScheduleEvent(EVENT_SHADOW_BOLT, 3000);
+            events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, urand(13000, 15000));
             events.ScheduleEvent(EVENT_FEAR, urand(10000, 20000));
             events.ScheduleEvent(EVENT_SILENCE, urand(20000, 25000));
             events.ScheduleEvent(EVENT_MIND_CONTROL, urand(30000, 35000));
@@ -388,17 +390,12 @@ public:
                     switch (eventId)
                     {
                         case EVENT_SHADOW_BOLT:
-                            switch (urand(0, 1))
-                            {
-                                case 0:
-                                    DoCastAOE(SPELL_SHADOWBOLT_VOLLEY);
-                                    break;
-                                case 1:
-                                    DoCastRandomTarget(SPELL_SHADOWBOLT, 0, 150.f);
-                                    break;
-                            }
-                            DoResetThreat();
-                            events.ScheduleEvent(EVENT_SHADOW_BOLT, urand(3000, 10000));
+                            DoCastRandomTarget(SPELL_SHADOWBOLT, 0, 150.f);
+                            events.ScheduleEvent(EVENT_SHADOW_BOLT, urand(2000, 4000));
+                            break;
+                        case EVENT_SHADOW_BOLT_VOLLEY:
+                            DoCastAOE(SPELL_SHADOWBOLT_VOLLEY);
+                            events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, 19000, 25000);
                             break;
                         case EVENT_FEAR:
                             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40, true))
@@ -412,7 +409,7 @@ public:
                         case EVENT_MIND_CONTROL:
                             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40, true))
                                 DoCast(target, SPELL_SHADOW_COMMAND);
-                            events.ScheduleEvent(EVENT_MIND_CONTROL, urand(30000, 35000));
+                            events.ScheduleEvent(EVENT_MIND_CONTROL, urand(24000, 30000));
                             break;
                         case EVENT_SHADOWBLINK:
                             DoCastSelf(SPELL_SHADOWBLINK);
@@ -436,6 +433,7 @@ public:
                                 events.CancelEvent(EVENT_MIND_CONTROL);
                                 events.CancelEvent(EVENT_FEAR);
                                 events.CancelEvent(EVENT_SHADOW_BOLT);
+                                events.CancelEvent(EVENT_SHADOW_BOLT_VOLLEY);
                                 events.CancelEvent(EVENT_SILENCE);
                                 DoCastSelf(SPELL_ROOT_SELF, true);
                                 me->SetVisible(false);
@@ -470,6 +468,8 @@ public:
                 me->SetUInt32Value(UNIT_NPC_FLAGS, 0);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
+                // Due to Nefarius despawning himself on Vael, we need to update the guid on instance to prevent unwanted behaviours as encounter not resetting at all.
+                instance->SetGuidData(DATA_LORD_VICTOR_NEFARIUS, me->GetGUID());
             }
         }
 
