@@ -2193,7 +2193,6 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
             uint32 splitted_absorb = 0;
             uint32 splitted_resist = 0;
 
-            uint32 procAttacker = 0, procVictim = 0;
             DamageInfo splittedDmgInfo(attacker, caster, splitted, spellInfo, schoolMask, dmgInfo.GetDamageType(), BASE_ATTACK);
             if (caster->IsImmunedToDamageOrSchool(schoolMask))
             {
@@ -2259,7 +2258,6 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
             uint32 splitted_absorb = 0;
             uint32 splitted_resist = 0;
 
-            uint32 procAttacker = 0, procVictim = 0;
             DamageInfo splittedDmgInfo(attacker, caster, splitted, spellInfo, splitSchoolMask, dmgInfo.GetDamageType(), BASE_ATTACK);
             if (caster->IsImmunedToDamageOrSchool(schoolMask))
             {
