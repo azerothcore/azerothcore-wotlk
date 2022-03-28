@@ -13115,7 +13115,7 @@ bool Unit::InitTamedPet(Pet* pet, uint8 level, uint32 spell_id)
     return true;
 }
 
-void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackType attackType, SpellInfo const* spellProto)
+void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackType /* attackType */, SpellInfo const* spellProto)
 {
     // Prevent killing unit twice (and giving reward from kill twice)
     if (!victim->GetHealth())
