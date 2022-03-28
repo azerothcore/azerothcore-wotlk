@@ -79,8 +79,8 @@ foreach(SOURCE_MODULE ${MODULES_MODULE_LIST})
     set(${MODULE_MODULE_VARIABLE} "static")
   endif()
 
-  # Use only static for mod-eluna-lua-engine
-  if (SOURCE_MODULE MATCHES "mod-eluna-lua-engine")
+  # Use only static for mod-eluna
+  if (SOURCE_MODULE MATCHES "mod-eluna")
     ConfigureElunaModule(${SOURCE_MODULE})
   endif()
 
