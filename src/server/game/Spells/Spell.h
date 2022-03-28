@@ -556,7 +556,7 @@ public:
     bool IsAutoActionResetSpell() const;
     bool IsIgnoringCooldowns() const;
 
-    bool IsTriggeredByAura(SpellInfo const* auraSpellInfo) const { return (auraSpellInfo == m_triggeredByAuraSpell); }
+    bool IsTriggeredByAura(SpellInfo const* auraSpellInfo) const { return (auraSpellInfo == m_triggeredByAuraSpell.spellInfo); }
 
     bool IsDeletable() const { return !m_referencedFromCurrentSpell && !m_executedCurrently; }
     void SetReferencedFromCurrent(bool yes) { m_referencedFromCurrentSpell = yes; }
