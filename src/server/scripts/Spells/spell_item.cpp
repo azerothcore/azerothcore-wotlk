@@ -2070,6 +2070,61 @@ class spell_item_scroll_of_recall : public SpellScript
     }
 };
 
+// 36890 - Dimensional Ripper - Area 52
+enum DimensionalRipperArea52
+{
+    SPELL_TRANSPORTER_MALFUNCTION    = 36895,
+    SPELL_TRANSFORM_HORDE            = 36897,
+    SPELL_TRANSFORM_ALLIANCE         = 36899,
+    SPELL_SOUL_SPLIT_EVIL            = 36900,
+    SPELL_SOUL_SPLIT_GOOD            = 36901
+};
+
+class spell_item_dimensional_ripper_area52 : public SpellScript
+{
+    PrepareSpellScript(spell_item_dimensional_ripper_area52);
+
+    bool Load() override
+    {
+        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+    }
+
+    void HandleScript(SpellEffIndex /* effIndex */)
+    {
+        if (!roll_chance_i(50)) // 50% success
+            return;
+
+        Unit* caster = GetCaster();
+
+        uint32 spellId = 0;
+        switch (urand(0, 3))
+        {
+            case 0:
+                spellId = SPELL_TRANSPORTER_MALFUNCTION;
+                break;
+            case 1:
+                spellId = SPELL_SOUL_SPLIT_EVIL;
+                break;
+            case 2:
+                spellId = SPELL_SOUL_SPLIT_GOOD;
+                break;
+            case 3:
+                if (caster->ToPlayer()->GetTeamId() == TEAM_ALLIANCE)
+                    spellId = SPELL_TRANSFORM_HORDE;
+                else
+                    spellId = SPELL_TRANSFORM_ALLIANCE;
+                break;
+        }
+
+        caster->CastSpell(caster, spellId, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_item_dimensional_ripper_area52::HandleScript, EFFECT_0, SPELL_EFFECT_TELEPORT_UNITS);
+    }
+};
+
 // 71169 - Shadow's Fate (Shadowmourne questline)
 enum ShadowsFate
 {
@@ -3153,6 +3208,28 @@ class spell_item_rocket_boots : public SpellScript
     }
 };
 
+class spell_item_runic_healing_injector : public SpellScript
+{
+    PrepareSpellScript(spell_item_runic_healing_injector);
+
+    bool Load() override
+    {
+        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+    }
+
+    void HandleHeal(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* caster = GetCaster()->ToPlayer())
+            if (caster->HasSkill(SKILL_ENGINEERING))
+                SetHitHeal(GetHitHeal() * 1.25f);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_item_runic_healing_injector::HandleHeal, EFFECT_0, SPELL_EFFECT_HEAL);
+    }
+};
+
 enum PygmyOil
 {
     SPELL_PYGMY_OIL_PYGMY_AURA      = 53806,
@@ -3895,6 +3972,7 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_piccolo_of_the_flaming_fire);
     RegisterSpellScript(spell_item_savory_deviate_delight);
     RegisterSpellScript(spell_item_scroll_of_recall);
+    RegisterSpellScript(spell_item_dimensional_ripper_area52);
     RegisterSpellScript(spell_item_unsated_craving);
     RegisterSpellScript(spell_item_shadows_fate);
     RegisterSpellScript(spell_item_shadowmourne);
@@ -3922,6 +4000,7 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_nitro_boots);
     RegisterSpellScript(spell_item_teach_language);
     RegisterSpellScript(spell_item_rocket_boots);
+    RegisterSpellScript(spell_item_runic_healing_injector);
     RegisterSpellScript(spell_item_pygmy_oil);
     RegisterSpellScript(spell_item_unusual_compass);
     RegisterSpellScript(spell_item_chicken_cover);

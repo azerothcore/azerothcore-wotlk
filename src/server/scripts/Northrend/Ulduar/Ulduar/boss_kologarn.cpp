@@ -242,17 +242,19 @@ public:
             summons.DespawnAll();
 
             if (m_pInstance)
+            {
                 m_pInstance->SetData(TYPE_KOLOGARN, NOT_STARTED);
+
+                // Open the door inside Kologarn chamber
+                if (GameObject* door = m_pInstance->instance->GetGameObject(m_pInstance->GetGuidData(GO_KOLOGARN_DOORS)))
+                    door->SetGoState(GO_STATE_ACTIVE);
+            }
 
             AttachLeftArm();
             AttachRightArm();
 
             // Reset breath on pull
             breathReady = false;
-
-            // Open the door inside Kologarn chamber
-            if (GameObject* door = me->FindNearestGameObject(GO_KOLOGARN_DOORS, 100.0f))
-                door->SetGoState(GO_STATE_ACTIVE);
         }
 
         void DoAction(int32 param) override
@@ -300,6 +302,13 @@ public:
                 m_pInstance->SetData(TYPE_KOLOGARN, DONE);
 
             Talk(SAY_DEATH);
+
+            if (m_pInstance)
+            {
+                // Open the door inside Kologarn chamber
+                if (GameObject* door = m_pInstance->instance->GetGameObject(m_pInstance->GetGuidData(GO_KOLOGARN_DOORS)))
+                    door->SetGoState(GO_STATE_ACTIVE);
+            }
 
             if (GameObject* bridge = me->FindNearestGameObject(GO_KOLOGARN_BRIDGE, 100))
                 bridge->SetGoState(GO_STATE_READY);
@@ -384,8 +393,13 @@ public:
             me->setActive(true);
 
             // Close the door inside Kologarn chamber
-            if (GameObject* door = me->FindNearestGameObject(GO_KOLOGARN_DOORS, 100.0f))
-                door->SetGoState(GO_STATE_READY);
+            if (m_pInstance)
+            {
+                if (GameObject* door = m_pInstance->instance->GetGameObject(m_pInstance->GetGuidData(GO_KOLOGARN_DOORS)))
+                {
+                    door->SetGoState(GO_STATE_READY);
+                }
+            }
         }
 
         void UpdateAI(uint32 diff) override

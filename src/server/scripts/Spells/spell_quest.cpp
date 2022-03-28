@@ -840,6 +840,33 @@ public:
     }
 };
 
+enum BendingShinbone
+{
+    SPELL_BENDING_SHINBONE1 = 8854,
+    SPELL_BENDING_SHINBONE2 = 8855
+};
+
+class spell_q1846_bending_shinbone : public SpellScript
+{
+    PrepareSpellScript(spell_q1846_bending_shinbone);
+
+    void HandleScriptEffect(SpellEffIndex /* effIndex */)
+    {
+        Item* target = GetHitItem();
+        Unit* caster = GetCaster();
+        if (!target && caster->GetTypeId() != TYPEID_PLAYER)
+            return;
+
+        uint32 const spellId = roll_chance_i(20) ? SPELL_BENDING_SHINBONE1 : SPELL_BENDING_SHINBONE2;
+        caster->CastSpell(caster, spellId, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q1846_bending_shinbone::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 // 9712 - Thaumaturgy Channel
 enum ThaumaturgyChannel
 {
@@ -2400,6 +2427,7 @@ void AddSC_quest_spell_scripts()
     RegisterSpellScript(spell_q10985_light_of_the_naaru);
     RegisterSpellScript(spell_q9718_crow_transform);
     new spell_q55_sacred_cleansing();
+    RegisterSpellScript(spell_q1846_bending_shinbone);
     RegisterSpellScript(spell_q2203_thaumaturgy_channel);
     RegisterSpellScript(spell_q5206_test_fetid_skull);
     RegisterSpellScript(spell_q6124_6129_apply_salve);

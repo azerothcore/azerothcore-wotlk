@@ -1171,6 +1171,52 @@ public:
     }
 };
 
+class spell_death_knight_initiate_visual : public SpellScript
+{
+    PrepareSpellScript(spell_death_knight_initiate_visual);
+
+    void HandleScriptEffect(SpellEffIndex /* effIndex */)
+    {
+        Creature* target = GetHitCreature();
+        if (!target)
+            return;
+
+        uint32 spellId;
+        switch (target->GetDisplayId())
+        {
+            case 25369: spellId = 51552; break; // bloodelf female
+            case 25373: spellId = 51551; break; // bloodelf male
+            case 25363: spellId = 51542; break; // draenei female
+            case 25357: spellId = 51541; break; // draenei male
+            case 25361: spellId = 51537; break; // dwarf female
+            case 25356: spellId = 51538; break; // dwarf male
+            case 25372: spellId = 51550; break; // forsaken female
+            case 25367: spellId = 51549; break; // forsaken male
+            case 25362: spellId = 51540; break; // gnome female
+            case 25359: spellId = 51539; break; // gnome male
+            case 25355: spellId = 51534; break; // human female
+            case 25354: spellId = 51520; break; // human male
+            case 25360: spellId = 51536; break; // nightelf female
+            case 25358: spellId = 51535; break; // nightelf male
+            case 25368: spellId = 51544; break; // orc female
+            case 25364: spellId = 51543; break; // orc male
+            case 25371: spellId = 51548; break; // tauren female
+            case 25366: spellId = 51547; break; // tauren male
+            case 25370: spellId = 51545; break; // troll female
+            case 25365: spellId = 51546; break; // troll male
+            default: return;
+        }
+
+        target->CastSpell(target, spellId, true);
+        target->LoadEquipment();
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_death_knight_initiate_visual::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_the_scarlet_enclave_c1()
 {
     // Ours
@@ -1191,4 +1237,6 @@ void AddSC_the_scarlet_enclave_c1()
     new npc_scarlet_miner();
     new npc_scarlet_miner_cart();
     new go_inconspicuous_mine_car();
+
+    RegisterSpellScript(spell_death_knight_initiate_visual);
 }
