@@ -41,6 +41,12 @@ DoorData const doorData[] =
     { 0,                            0,                           DOOR_TYPE_ROOM,    BOUNDARY_NONE}  // END
 };
 
+ObjectData const creatureData[] =
+{
+    { NPC_GRETHOK,         DATA_GRETHOK         },
+    { NPC_NEFARIAN_TROOPS, DATA_NEFARIAN_TROOPS }
+};
+
 Position const SummonPosition[8] =
 {
     {-7661.207520f, -1043.268188f, 407.199554f, 6.280452f},
@@ -67,7 +73,7 @@ public:
             //SetHeaders(DataHeader);
             SetBossNumber(EncounterCount);
             LoadDoorData(doorData);
-            //LoadObjectData(creatureData, gameObjectData);
+            LoadObjectData(creatureData, nullptr);
         }
 
         void Initialize() override
@@ -97,6 +103,9 @@ public:
                     if (Creature* razor = instance->GetCreature(razorgoreGUID))
                         if (CreatureAI* razorAI = razor->AI())
                             razorAI->JustSummoned(creature);
+                    break;
+                case NPC_BLACKWING_GUARDSMAN:
+                    guardList.push_back(creature->GetGUID());
                     break;
                 case NPC_NEFARIAN:
                     nefarianGUID = creature->GetGUID();
@@ -135,11 +144,14 @@ public:
             {
                 case GO_BLACK_DRAGON_EGG:
                     if (GetBossState(DATA_FIREMAW) == DONE)
+                    {
                         go->SetPhaseMask(2, true);
+                    }
                     else
+                    {
                         EggList.push_back(go->GetGUID());
+                    }
                     break;
-
                 case GO_PORTCULLIS_RAZORGORE:
                 case GO_PORTCULLIS_VAELASTRASZ:
                 case GO_PORTCULLIS_BROODLORD:
@@ -233,10 +245,15 @@ public:
                     if (state == DONE)
                     {
                         for (ObjectGuid const& guid : EggList)
+                        {
+                            // Eggs should be destroyed instead
+                            // @todo: after dynamic spawns
                             if (GameObject* egg = instance->GetGameObject(guid))
+                            {
                                 egg->SetPhaseMask(2, true);
+                            }
+                        }
                     }
-                    SetData(DATA_EGG_EVENT, NOT_STARTED);
                     break;
                 case DATA_CHROMAGGUS:
                     if (state == DONE)
@@ -270,7 +287,7 @@ public:
                 switch (data)
                 {
                     case IN_PROGRESS:
-                        _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 45000);
+                        _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 45 * IN_MILLISECONDS);
                         EggEvent = data;
                         EggCount = 0;
                         break;
@@ -278,13 +295,19 @@ public:
                         _events.CancelEvent(EVENT_RAZOR_SPAWN);
                         EggEvent = data;
                         EggCount = 0;
+
                         for (ObjectGuid const& guid : EggList)
                         {
-                            if (GameObject* egg = instance->GetGameObject(guid))
-                            {
-                                egg->Respawn();
-                            }
+                            DoRespawnGameObject(guid, 0);
                         }
+
+                        DoRespawnCreature(DATA_GRETHOK);
+
+                        for (ObjectGuid const& guid : guardList)
+                        {
+                            DoRespawnCreature(guid);
+                        }
+
                         break;
                     case SPECIAL:
                         if (++EggCount >= EggList.size())
@@ -334,14 +357,36 @@ public:
             return ObjectGuid::Empty;
         }
 
+        void SetGuidData(uint32 type, ObjectGuid data) override
+        {
+            switch (type)
+            {
+                case DATA_LORD_VICTOR_NEFARIUS:
+                    victorNefariusGUID = data;
+                    break;
+                default:
+                    break;
+            }
+        }
+
         void OnUnitDeath(Unit* unit) override
         {
-            //! HACK, needed because of buggy CreatureAI after charm
-            if (unit->GetEntry() == NPC_RAZORGORE && GetBossState(DATA_RAZORGORE_THE_UNTAMED) != DONE)
-                SetBossState(DATA_RAZORGORE_THE_UNTAMED, DONE);
-
             switch (unit->GetEntry())
             {
+                case NPC_RAZORGORE:
+                    //! HACK, needed because of buggy CreatureAI after charm
+                    if (EggEvent == DONE)
+                    {
+                        if (unit->GetEntry() == NPC_RAZORGORE && GetBossState(DATA_RAZORGORE_THE_UNTAMED) != DONE)
+                        {
+                            SetBossState(DATA_RAZORGORE_THE_UNTAMED, DONE);
+                        }
+                    }
+                    else
+                    {
+                        _events.CancelEvent(EVENT_RAZOR_SPAWN);
+                    }
+                    break;
                 case NPC_BLACK_DRAKONID:
                 case NPC_BLUE_DRAKONID:
                 case NPC_BRONZE_DRAKONID:
@@ -379,10 +424,18 @@ public:
                 switch (eventId)
                 {
                     case EVENT_RAZOR_SPAWN:
-                        for (uint8 i = urand(2, 5); i > 0; --i)
-                            if (Creature* summon = instance->SummonCreature(Entry[urand(0, 2)], SummonPosition[urand(0, 7)]))
-                                summon->AI()->DoZoneInCombat();
-                        _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 12000, 17000);
+                        if (EggEvent == IN_PROGRESS)
+                        {
+                            for (uint8 i = urand(2, 5); i > 0; --i)
+                            {
+                                if (Creature* summon = instance->SummonCreature(Entry[urand(0, 2)], SummonPosition[urand(0, 7)]))
+                                {
+                                    summon->AI()->DoZoneInCombat();
+                                }
+                            }
+
+                            _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 12000, 17000);
+                        }
                         break;
                     case EVENT_RAZOR_PHASE_TWO:
                         _events.CancelEvent(EVENT_RAZOR_SPAWN);
@@ -462,6 +515,7 @@ public:
         uint8 EggCount;
         uint32 EggEvent;
         GuidList EggList;
+        GuidList guardList;
 
         // Nefarian
         uint32 NefarianLeftTunnel;

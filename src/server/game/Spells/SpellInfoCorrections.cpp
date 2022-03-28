@@ -4168,6 +4168,11 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
+    ApplySpellFix({ 22247 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesCu |= SPELL_ATTR0_CU_DONT_BREAK_STEALTH;
+    });
+
     // Manastorm
     ApplySpellFix({ 21097 }, [](SpellInfo* spellInfo)
     {
@@ -4241,6 +4246,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->Effects[EFFECT_0].BasePoints = 4374;
         spellInfo->Effects[EFFECT_0].DieSides = 1250;
+    });
+
+    // Explosion - Razorgore
+    ApplySpellFix({ 20038 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_50000_YARDS);
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
