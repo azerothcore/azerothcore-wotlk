@@ -1432,17 +1432,17 @@ public:
     void ApplyAttackTimePercentMod(WeaponAttackType att, float val, bool apply);
     void ApplyCastTimePercentMod(float val, bool apply);
 
-    UnitFlags GetUnitFlags() const { return UnitFlags(GetUnitFlags()); }
-    bool HasUnitFlag(UnitFlags flags) const { return HasUnitFlag(flags); }
-    void SetUnitFlag(UnitFlags flags) { SetUnitFlag(flags); }
-    void RemoveUnitFlag(UnitFlags flags) { RemoveUnitFlag(flags); }
-    void ReplaceAllUnitFlags(UnitFlags flags) { ReplaceAllUnitFlags(flags); }
+    UnitFlags GetUnitFlags() const { return UnitFlags(GetUInt32Value(UNIT_FIELD_FLAGS)); }
+    bool HasUnitFlag(UnitFlags flags) const { return HasFlag(UNIT_FIELD_FLAGS, flags); }
+    void SetUnitFlag(UnitFlags flags) { SetFlag(UNIT_FIELD_FLAGS, flags); }
+    void RemoveUnitFlag(UnitFlags flags) { RemoveFlag(UNIT_FIELD_FLAGS, flags); }
+    void ReplaceAllUnitFlags(UnitFlags flags) { SetUInt32Value(UNIT_FIELD_FLAGS, flags); }
 
-    UnitFlags2 GetUnitFlags2() const { return UnitFlags2(GetUnitFlags(_2)); }
+    UnitFlags2 GetUnitFlags2() const { return UnitFlags2(GetUInt32Value(UNIT_FIELD_FLAGS_2)); }
     bool HasUnitFlag2(UnitFlags2 flags) const { return HasUnitFlag2(, flags); }
-    void SetUnitFlag2(UnitFlags2 flags) { SetUnitFlag2(flags); }
-    void RemoveUnitFlag2(UnitFlags2 flags) { RemoveUnitFlag2(flags); }
-    void ReplaceAllUnitFlags2(UnitFlags2 flags) { ReplaceAllUnitFlags2(flags); }
+    void SetUnitFlag2(UnitFlags2 flags) { SetFlag(UNIT_FIELD_FLAGS_2, flags); }
+    void RemoveUnitFlag2(UnitFlags2 flags) { RemoveFlag(UNIT_FIELD_FLAGS_2, flags); }
+    void ReplaceAllUnitFlags2(UnitFlags2 flags) { SetUInt32Value(UNIT_FIELD_FLAGS_2, flags); }
 
     [[nodiscard]] SheathState GetSheath() const { return SheathState(GetByteValue(UNIT_FIELD_BYTES_2, 0)); }
     virtual void SetSheath(SheathState sheathed) { SetByteValue(UNIT_FIELD_BYTES_2, 0, sheathed); }
