@@ -863,13 +863,13 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     {
                         if (!e.action.unitFlag.type)
                         {
-                            (*itr)->ToUnit()->SetUnitFlag(e.action.unitFlag.flag);
+                            (*itr)->ToUnit()->SetUnitFlag(UnitFlags(e.action.unitFlag.flag));
                             LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_SET_UNIT_FLAG. Unit {} added flag {} to UNIT_FIELD_FLAGS",
                             (*itr)->GetGUID().ToString(), e.action.unitFlag.flag);
                         }
                         else
                         {
-                            (*itr)->ToUnit()->SetUnitFlag2(e.action.unitFlag.flag);
+                            (*itr)->ToUnit()->SetUnitFlag2(UnitFlags2(e.action.unitFlag.flag));
                             LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_SET_UNIT_FLAG. Unit {} added flag {} to UNIT_FIELD_FLAGS_2",
                             (*itr)->GetGUID().ToString(), e.action.unitFlag.flag);
                         }
@@ -891,13 +891,13 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     {
                         if (!e.action.unitFlag.type)
                         {
-                            (*itr)->ToUnit()->RemoveUnitFlag(e.action.unitFlag.flag);
+                            (*itr)->ToUnit()->RemoveUnitFlag(UnitFlags(e.action.unitFlag.flag));
                             LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_REMOVE_UNIT_FLAG. Unit {} removed flag {} to UNIT_FIELD_FLAGS",
                             (*itr)->GetGUID().ToString(), e.action.unitFlag.flag);
                         }
                         else
                         {
-                            (*itr)->ToUnit()->RemoveUnitFlag2(e.action.unitFlag.flag);
+                            (*itr)->ToUnit()->RemoveUnitFlag2(UnitFlags2(e.action.unitFlag.flag));
                             LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_REMOVE_UNIT_FLAG. Unit {} removed flag {} to UNIT_FIELD_FLAGS_2",
                             (*itr)->GetGUID().ToString(), e.action.unitFlag.flag);
                         }

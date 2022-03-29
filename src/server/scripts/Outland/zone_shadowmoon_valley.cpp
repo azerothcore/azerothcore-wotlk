@@ -75,7 +75,7 @@ public:
                 if (cr2)
                 {
                     cr2->SetFaction(FACTION_MONSTER);
-                    cr2->ReplaceAllUnitFlags(0);
+                    cr2->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
                     GetCaster()->CastSpell(cr2, 38083, true);
                 }
 

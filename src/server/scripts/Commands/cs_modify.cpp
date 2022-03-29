@@ -273,7 +273,7 @@ public:
         }
 
         uint32 factionid = factionID.value();
-        uint32 flag;
+        UnitFlags flag;
         uint32 npcflag;
         uint32 dyflag;
 
@@ -281,7 +281,7 @@ public:
         if (!pflag)
             flag = target->GetUnitFlags();
         else
-            flag = *pflag;
+            flag = UnitFlags(*pflag);
 
         auto pnpcflag = npcFlagID;
         if (!pnpcflag)

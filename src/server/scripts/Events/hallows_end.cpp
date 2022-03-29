@@ -733,7 +733,7 @@ struct npc_hallows_end_soh : public ScriptedAI
                 }
                 case 4:
                 {
-                    me->ReplaceAllUnitFlags(0);
+                    me->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
                     me->SetReactState(REACT_AGGRESSIVE);
                     if (Unit* target = me->SelectNearestPlayer(30.0f))
                         AttackStart(target);
@@ -1038,7 +1038,7 @@ struct boss_headless_horseman : public ScriptedAI
                 me->CastSpell(me, SPELL_HEAD_VISUAL, true);
             else if (point == 11)
             {
-                me->ReplaceAllUnitFlags(0);
+                me->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
                 me->StopMoving();
 
                 me->SetInCombatWithZone();

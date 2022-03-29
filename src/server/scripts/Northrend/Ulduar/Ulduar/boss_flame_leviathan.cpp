@@ -768,7 +768,7 @@ public:
                 {
                     if (apply)
                     {
-                        turret->ReplaceAllUnitFlags(0);
+                        turret->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
                         turret->GetAI()->AttackStart(who);
                         if (Creature* leviathan = me->GetVehicleCreatureBase())
                             leviathan->AI()->Talk(FLAME_LEVIATHAN_SAY_PLAYER_RIDING);
@@ -817,7 +817,7 @@ public:
 
             if (Vehicle* vehicle = me->GetVehicle())
                 if (Unit* device = vehicle->GetPassenger(SEAT_DEVICE))
-                    device->ReplaceAllUnitFlags(0); // unselectable
+                    device->ReplaceAllUnitFlags(UNIT_FLAG_NONE); // unselectable
 
             if (Creature* leviathan = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(TYPE_LEVIATHAN)))
                 leviathan->AI()->DoAction(ACTION_DESTROYED_TURRET);

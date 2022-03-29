@@ -176,8 +176,6 @@ public:
         void Reset() override
         {
             Voidwalkers = false;
-            // Reset his gossip menu
-            me->SetUnitFlag(UNIT_NPC_FLAG_GOSSIP);
             me->SetFaction(FACTION_FRIENDLY);
 
             // was set before event start, so set again

@@ -268,7 +268,7 @@ public:
                 }
                 else if (talkTimer >= 16000)
                 {
-                    me->ReplaceAllUnitFlags(0);
+                    me->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
                     me->RemoveAurasDueToSpell(SPELL_SHADOWFORM);
                     Talk(SAY_ANZU_INTRO2);
                     talkTimer = 0;

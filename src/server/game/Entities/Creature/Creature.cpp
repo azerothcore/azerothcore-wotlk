@@ -501,8 +501,8 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
     if (IsInCombat())
         unit_flags |= UNIT_FLAG_IN_COMBAT;
 
-    ReplaceAllUnitFlags(unit_flags);
-    ReplaceAllUnitFlags2(cInfo->unit_flags2);
+    ReplaceAllUnitFlags(UnitFlags(unit_flags));
+    ReplaceAllUnitFlags2(UnitFlags2(cInfo->unit_flags2));
 
     SetUInt32Value(UNIT_DYNAMIC_FLAGS, dynamicflags);
 

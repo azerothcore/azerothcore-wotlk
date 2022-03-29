@@ -265,11 +265,7 @@ public:
                 float PosX = Spawns[index][1];
 
                 if (Creature* creature = me->SummonCreature(entry, PosX, SPAWN_Y, SPAWN_Z, SPAWN_O, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, HOUR * 2 * IN_MILLISECONDS))
-                {
-                    // In case database has bad flags
-                    creature->ReplaceAllUnitFlags(0);
                     creature->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                }
             }
 
             RaidWiped = false;

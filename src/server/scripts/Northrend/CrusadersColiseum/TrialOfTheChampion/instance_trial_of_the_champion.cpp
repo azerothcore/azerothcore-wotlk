@@ -1207,7 +1207,7 @@ public:
                         if( Creature* bk = instance->GetCreature(NPC_BlackKnightGUID) )
                         {
                             bk->SetReactState(REACT_AGGRESSIVE);
-                            bk->ReplaceAllUnitFlags(0);
+                            bk->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
                             if( Unit* target = bk->SelectNearestTarget(200.0f) )
                                 bk->AI()->AttackStart(target);
                             bk->AI()->DoZoneInCombat();
