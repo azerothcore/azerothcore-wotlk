@@ -143,7 +143,7 @@ public:
             me->SetStandState(UNIT_STAND_STATE_SLEEP);
             me->SetDisableGravity(false);
             me->SetReactState(REACT_AGGRESSIVE);
-            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE + UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
             events2.Reset();
 
             sathBanished = false;
