@@ -28,7 +28,7 @@ DELETE FROM `spell_script_names` WHERE `ScriptName` IN
 'spell_igb_battle_experience_check','spell_gen_blood_reserve','spell_item_darkmoon_card_greatness',
 'spell_item_charm_witch_doctor','spell_item_mana_drain', 'spell_item_blood_draining_enchant', 'spell_anetheron_vampiric_aura', 'spell_uk_second_wind'
 'spell_deathbringer_blood_beast_blood_link', 'spell_putricide_ooze_tank_protection', 'spell_mark_of_malice', 'spell_twisted_reflection'
-'spell_pet_guard_dog', 'spell_pet_silverback', 'spell_pet_culling_the_herd', 'spell_gen_blood_reserve');
+'spell_pet_guard_dog', 'spell_pet_silverback', 'spell_pet_culling_the_herd');
 DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_gen_proc_above_75' AND `spell_id` = 64568;
 
 INSERT INTO `spell_script_names` (`spell_id`,`ScriptName`) VALUES
@@ -36,7 +36,6 @@ INSERT INTO `spell_script_names` (`spell_id`,`ScriptName`) VALUES
 (70656, 'spell_dk_advantage_t10_4p'),                   -- DK Advantage t10 4p melee
 (37336, 'spell_dru_forms_trinket'),                     -- Druid Forms Trinket
 (67353, 'spell_dru_t9_feral_relic'),                    -- Druid T9 Feral Relic (Idol of Mutilation)
-(64568, 'spell_gen_blood_reserve'),                     -- Blood Reserve (weapon enchant proc)
 (-53234, 'spell_hun_piercing_shots'),                   -- Hunter Piercing Shots
 (-67151, 'spell_hun_t9_4p_bonus'),                      -- Hunter T9 Bonus
 (71201, 'spell_igb_battle_experience_check'),           -- Battle Experience (Gunship - ICC)
