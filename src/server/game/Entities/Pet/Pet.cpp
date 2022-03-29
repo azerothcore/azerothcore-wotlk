@@ -303,14 +303,14 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
             else
                 SetUInt32Value(UNIT_FIELD_BYTES_0, 0x800); // class = mage
 
-            SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED); // this enables popup window (pet dismiss, cancel)
+            ReplaceAllUnitFlags(UNIT_FLAG_PLAYER_CONTROLLED); // this enables popup window (pet dismiss, cancel)
             break;
         case HUNTER_PET:
             SetUInt32Value(UNIT_FIELD_BYTES_0, 0x02020100); // class = warrior, gender = none, power = focus
             SetSheath(SHEATH_STATE_MELEE);
             SetByteFlag(UNIT_FIELD_BYTES_2, 2, petInfo->WasRenamed ? UNIT_CAN_BE_ABANDONED : UNIT_CAN_BE_RENAMED | UNIT_CAN_BE_ABANDONED);
 
-            SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+            ReplaceAllUnitFlags(UNIT_FLAG_PLAYER_CONTROLLED);
                                                             // this enables popup window (pet abandon, cancel)
             SetMaxPower(POWER_HAPPINESS, GetCreatePowers(POWER_HAPPINESS));
             SetPower(POWER_HAPPINESS, petInfo->Happiness);
@@ -622,19 +622,19 @@ void Pet::setDeathState(DeathState s, bool /*despawn = false*/)                 
         {
             // pet corpse non lootable and non skinnable
             SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_NONE);
-            RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
+            RemoveUnitFlag(UNIT_FLAG_SKINNABLE);
 
             //lose happiness when died and not in BG/Arena
             MapEntry const* mapEntry = sMapStore.LookupEntry(GetMapId());
             if (!mapEntry || (mapEntry->map_type != MAP_ARENA && mapEntry->map_type != MAP_BATTLEGROUND))
                 ModifyPower(POWER_HAPPINESS, -HAPPINESS_LEVEL_SIZE);
 
-            //SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+            //SetUnitFlag(UNIT_FLAG_STUNNED);
         }
     }
     else if (getDeathState() == ALIVE)
     {
-        //RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+        //RemoveUnitFlag(UNIT_FLAG_STUNNED);
         CastPetAuras(true);
     }
 }

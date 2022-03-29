@@ -111,8 +111,8 @@ public:
                 if (Creature* RWORG = me->SummonCreature(NPC_RAVENOUS_WORG, me->GetPositionX() + 10, me->GetPositionY() + 8, me->GetPositionZ() + 2, 3.229f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000))
                 {
                     RWORG->SetReactState(REACT_PASSIVE);
-                    RWORG->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    RWORG->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+                    RWORG->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    RWORG->SetUnitFlag(UNIT_FLAG_PACIFIED);
                     _RavenousworgGUID = RWORG->GetGUID();
                 }
                 break;
@@ -145,8 +145,8 @@ public:
                     {
                         Unit::Kill(RWORG, Mrfloppy);
                         Mrfloppy->ExitVehicle();
-                        RWORG->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                        RWORG->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+                        RWORG->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                        RWORG->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
                         RWORG->AI()->AttackStart(player);
                         Talk(SAY_VICTORY2);
                     }
@@ -286,10 +286,10 @@ public:
 
         void AttackStart(Unit* who) override
         {
-            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
+            if (me->HasUnitFlag(UNIT_FLAG_PACIFIED))
                 _pacified = true;
 
-            if (_pacified && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
+            if (_pacified && !me->HasUnitFlag(UNIT_FLAG_PACIFIED))
                 _attack = true;
 
             if (_attack)
@@ -298,10 +298,10 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
+            if (me->HasUnitFlag(UNIT_FLAG_PACIFIED))
                 _pacified = true;
 
-            if (_pacified && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
+            if (_pacified && !me->HasUnitFlag(UNIT_FLAG_PACIFIED))
                 _attack = true;
 
             CombatAI::UpdateAI(diff);
@@ -416,7 +416,7 @@ public:
                 if (me->FindNearestGameObject(OBJECT_HAUNCH, 2.0f))
                 {
                     me->SetStandState(UNIT_STAND_STATE_DEAD);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                    me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                     me->SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                 }
                 _phase = 0;
@@ -545,7 +545,7 @@ public:
     void Reset() override
     {
         Initialize();
-        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
     }
 
     void EnterCombat(Unit* /*who*/) override
@@ -564,7 +564,7 @@ public:
         if (spell->Id == SPELL_RENEW_SKIRMISHER && playerCaster->GetQuestStatus(QUEST_OVERWHELMED) == QUEST_STATUS_INCOMPLETE)
         {
             me->SetFacingToObject(caster);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             Talk(SAY_RANDOM, caster);
             DoCast(caster, SPELL_KILL_CREDIT);
 
@@ -743,7 +743,7 @@ public:
         {
             _playerGUID.Clear();
 
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC);
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
@@ -793,7 +793,7 @@ public:
         {
             if (spell->Id == SPELL_SMOKE_BOMB && caster->GetTypeId() == TYPEID_PLAYER)
             {
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC);
                 me->SetReactState(REACT_PASSIVE);
                 me->CombatStop(false);
                 _playerGUID = caster->GetGUID();

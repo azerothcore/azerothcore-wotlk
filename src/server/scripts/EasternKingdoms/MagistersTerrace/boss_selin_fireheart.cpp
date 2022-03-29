@@ -167,7 +167,7 @@ public:
                 if (Unit* crystal = ObjectAccessor::GetUnit(*me, CrystalGUID))
                 {
                     Talk(EMOTE_CRYSTAL);
-                    crystal->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
+                    crystal->ReplaceAllUnitFlags(0);
                     crystal->CastSpell(me, SPELL_MANA_RAGE, true);
                     me->CastSpell(crystal, SPELL_FEL_CRYSTAL_COSMETIC, true);
                     events.SetPhase(1);

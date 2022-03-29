@@ -610,7 +610,7 @@ public:
             if (me->SummonCreature(entry, pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
                 if (TempSummon* trigger = me->SummonCreature(WORLD_TRIGGER, pos, TEMPSUMMON_TIMED_DESPAWN, 2000))
                 {
-                    trigger->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                    trigger->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                     trigger->CastSpell(trigger, SPELL_TELEPORT_VISUAL, true);
                 }
         }
@@ -747,7 +747,7 @@ public:
                     me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                     me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                     me->UpdateEntry(NPC_REANIMATED_FANATIC);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED | UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_STUNNED | UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
                     me->SetReactState(REACT_AGGRESSIVE);
                     DoZoneInCombat(me);
                     me->CastSpell(me, SPELL_FANATIC_S_DETERMINATION);
@@ -761,7 +761,7 @@ public:
                     me->CastSpell(me, SPELL_FULL_HEAL, true);
                     me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                     me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED | UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetUnitFlag(UNIT_FLAG_STUNNED | UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
                     Reset();
                     events.ScheduleEvent(EVENT_CULTIST_DARK_MARTYRDOM_REVIVE, 6000);
                     break;
@@ -868,7 +868,7 @@ public:
                     me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                     me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                     me->UpdateEntry(NPC_REANIMATED_ADHERENT);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED | UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_STUNNED | UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
                     me->SetReactState(REACT_AGGRESSIVE);
                     DoZoneInCombat(me);
                     me->CastSpell(me, SPELL_ADHERENT_S_DETERMINATION);
@@ -882,7 +882,7 @@ public:
                     me->CastSpell(me, SPELL_FULL_HEAL, true);
                     me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                     me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED | UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetUnitFlag(UNIT_FLAG_STUNNED | UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
                     Reset();
                     events.ScheduleEvent(EVENT_CULTIST_DARK_MARTYRDOM_REVIVE, 6000);
                     break;

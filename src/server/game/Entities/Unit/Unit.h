@@ -1432,13 +1432,13 @@ public:
     void ApplyAttackTimePercentMod(WeaponAttackType att, float val, bool apply);
     void ApplyCastTimePercentMod(float val, bool apply);
 
-    UnitFlags GetUnitFlags() const { return UnitFlags(GetUInt32Value(UNIT_FIELD_FLAGS)); }
-    bool HasUnitFlag(UnitFlags flags) const { return HasFlag(UNIT_FIELD_FLAGS, flags); }
-    void SetUnitFlag(UnitFlags flags) { SetFlag(UNIT_FIELD_FLAGS, flags); }
-    void RemoveUnitFlag(UnitFlags flags) { RemoveFlag(UNIT_FIELD_FLAGS, flags); }
-    void ReplaceAllUnitFlags(UnitFlags flags) { SetUInt32Value(UNIT_FIELD_FLAGS, flags); }
+    UnitFlags GetUnitFlags() const { return UnitFlags(GetUnitFlags()); }
+    bool HasUnitFlag(UnitFlags flags) const { return HasUnitFlag(flags); }
+    void SetUnitFlag(UnitFlags flags) { SetUnitFlag(flags); }
+    void RemoveUnitFlag(UnitFlags flags) { RemoveUnitFlag(flags); }
+    void ReplaceAllUnitFlags(UnitFlags flags) { ReplaceAllUnitFlags(flags); }
 
-    UnitFlags2 GetUnitFlags2() const { return UnitFlags2(GetUInt32Value(UNIT_FIELD_FLAGS_2)); }
+    UnitFlags2 GetUnitFlags2() const { return UnitFlags2(GetUnitFlags(_2)); }
     bool HasUnitFlag2(UnitFlags2 flags) const { return HasUnitFlag2(, flags); }
     void SetUnitFlag2(UnitFlags2 flags) { SetUnitFlag2(flags); }
     void RemoveUnitFlag2(UnitFlags2 flags) { RemoveUnitFlag2(flags); }
@@ -1494,7 +1494,7 @@ public:
     void  SetStandFlags(uint8 flags) { SetByteFlag(UNIT_FIELD_BYTES_1,  UNIT_BYTES_1_OFFSET_VIS_FLAG, flags); }
     void  RemoveStandFlags(uint8 flags) { RemoveByteFlag(UNIT_FIELD_BYTES_1,  UNIT_BYTES_1_OFFSET_VIS_FLAG, flags); }
 
-    [[nodiscard]] bool IsMounted() const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNT); }
+    [[nodiscard]] bool IsMounted() const { return HasUnitFlag(UNIT_FLAG_MOUNT); }
     [[nodiscard]] uint32 GetMountID() const { return GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID); }
     void Mount(uint32 mount, uint32 vehicleId = 0, uint32 creatureEntry = 0);
     void Dismount();
@@ -1562,7 +1562,7 @@ public:
         switch (attacktype)
         {
             case BASE_ATTACK:
-                return !HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED);
+                return !HasUnitFlag(UNIT_FLAG_DISARMED);
             case OFF_ATTACK:
                 return !HasUnitFlag2(, UNIT_FLAG2_DISARM_OFFHAND);
             case RANGED_ATTACK:
@@ -1622,10 +1622,10 @@ public:
 
     [[nodiscard]] bool IsInFlight()  const { return HasUnitState(UNIT_STATE_IN_FLIGHT); }
 
-    [[nodiscard]] bool IsInCombat() const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT); }
+    [[nodiscard]] bool IsInCombat() const { return HasUnitFlag(UNIT_FLAG_IN_COMBAT); }
     bool IsInCombatWith(Unit const* who) const;
 
-    [[nodiscard]] bool IsPetInCombat() const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT); }
+    [[nodiscard]] bool IsPetInCombat() const { return HasUnitFlag(UNIT_FLAG_PET_IN_COMBAT); }
     void CombatStart(Unit* target, bool initialAggro = true);
     void CombatStartOnCast(Unit* target, bool initialAggro = true, uint32 duration = 0);
     void SetInCombatState(bool PvP, Unit* enemy = nullptr, uint32 duration = 0);

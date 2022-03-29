@@ -360,8 +360,8 @@ public:
         void Reset() override
         {
             //Incase wipe during phase that mograine fake death
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
             SayAshbringer = false;
             timer = 0;
@@ -416,7 +416,7 @@ public:
                 me->ClearComboPointHolders();
                 me->RemoveAllAuras();
                 me->ClearAllReactives();
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->CastSpell(me, SPELL_PERMANENT_FEIGN_DEATH, true);
 
                 hasDied = true;
@@ -463,8 +463,8 @@ public:
                 if (Unit* Whitemane = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_WHITEMANE)))
                 {
                     //Incase wipe during phase that mograine fake death
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
                     me->CastSpell(me, SPELL_RETRIBUTION_AURA, true);
                     me->CastSpell(Whitemane, SPELL_LAY_ON_HANDS, true);

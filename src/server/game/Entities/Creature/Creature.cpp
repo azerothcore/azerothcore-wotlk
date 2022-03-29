@@ -501,7 +501,7 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
     if (IsInCombat())
         unit_flags |= UNIT_FLAG_IN_COMBAT;
 
-    SetUInt32Value(UNIT_FIELD_FLAGS, unit_flags);
+    ReplaceAllUnitFlags(unit_flags);
     ReplaceAllUnitFlags2(cInfo->unit_flags2);
 
     SetUInt32Value(UNIT_DYNAMIC_FLAGS, dynamicflags);
@@ -564,7 +564,7 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
 
     // trigger creature is always not selectable and can not be attacked
     if (IsTrigger())
-        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
     InitializeReactState();
 
@@ -1302,7 +1302,7 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
 
     uint32 displayId = GetNativeDisplayId();
     uint32 npcflag = GetUInt32Value(UNIT_NPC_FLAGS);
-    uint32 unit_flags = GetUInt32Value(UNIT_FIELD_FLAGS);
+    uint32 unit_flags = GetUnitFlags();
     uint32 dynamicflags = GetUInt32Value(UNIT_DYNAMIC_FLAGS);
 
     // check if it's a custom model and if not, use 0 for displayId
@@ -1789,14 +1789,14 @@ bool Creature::CanStartAttack(Unit const* who) const
         return false;
 
     // This set of checks is should be done only for creatures
-    if ((HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC) && who->GetTypeId() != TYPEID_PLAYER) ||      // flag is valid only for non player characters
-        (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC) && who->GetTypeId() == TYPEID_PLAYER))         // immune to PC and target is a player, return false
+    if ((HasUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC) && who->GetTypeId() != TYPEID_PLAYER) ||      // flag is valid only for non player characters
+        (HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC) && who->GetTypeId() == TYPEID_PLAYER))         // immune to PC and target is a player, return false
     {
         return false;
     }
 
     if (Unit* owner = who->GetOwner())
-        if (owner->GetTypeId() == TYPEID_PLAYER && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC))     // immune to PC and target has player owner
+        if (owner->GetTypeId() == TYPEID_PLAYER && HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC))     // immune to PC and target has player owner
             return false;
 
     // Do not attack non-combat pets
@@ -2159,9 +2159,9 @@ SpellInfo const* Creature::reachWithSpellAttack(Unit* victim)
         float dist = GetDistance(victim);
         if (dist > range || dist < minrange)
             continue;
-        if (spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED))
+        if (spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE && HasUnitFlag(UNIT_FLAG_SILENCED))
             continue;
-        if (spellInfo->PreventionType == SPELL_PREVENTION_TYPE_PACIFY && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
+        if (spellInfo->PreventionType == SPELL_PREVENTION_TYPE_PACIFY && HasUnitFlag(UNIT_FLAG_PACIFIED))
             continue;
         return spellInfo;
     }
@@ -2206,9 +2206,9 @@ SpellInfo const* Creature::reachWithSpellCure(Unit* victim)
         //    continue;
         if (dist > range || dist < minrange)
             continue;
-        if (spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED))
+        if (spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE && HasUnitFlag(UNIT_FLAG_SILENCED))
             continue;
-        if (spellInfo->PreventionType == SPELL_PREVENTION_TYPE_PACIFY && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
+        if (spellInfo->PreventionType == SPELL_PREVENTION_TYPE_PACIFY && HasUnitFlag(UNIT_FLAG_PACIFIED))
             continue;
         return spellInfo;
     }
@@ -2339,7 +2339,7 @@ bool Creature::CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction /
     if (IsCivilian())
         return false;
 
-    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_NPC))
+    if (HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_NPC))
         return false;
 
     // skip fighting creature
@@ -2785,7 +2785,7 @@ void Creature::AllLootRemovedFromCorpse()
     {
         if (LootTemplates_Skinning.HaveLootFor(GetCreatureTemplate()->SkinLootId))
         {
-            SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
+            SetUnitFlag(UNIT_FLAG_SKINNABLE);
         }
     }
 
@@ -3056,12 +3056,12 @@ bool Creature::CanEnterWater() const
 void Creature::RefreshSwimmingFlag(bool recheck)
 {
     if (!_isMissingSwimmingFlagOutOfCombat || recheck)
-        _isMissingSwimmingFlagOutOfCombat = !HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SWIMMING);
+        _isMissingSwimmingFlagOutOfCombat = !HasUnitFlag(UNIT_FLAG_SWIMMING);
 
     // Check if the creature has UNIT_FLAG_SWIMMING and add it if it's missing
     // Creatures must be able to chase a target in water if they can enter water
     if (_isMissingSwimmingFlagOutOfCombat && CanEnterWater())
-        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SWIMMING);
+        SetUnitFlag(UNIT_FLAG_SWIMMING);
 }
 
 bool Creature::SetCanFly(bool enable, bool  /*packetOnly*/ /* = false */)

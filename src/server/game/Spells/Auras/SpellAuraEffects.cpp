@@ -2479,7 +2479,7 @@ void AuraEffect::HandleFeignDeath(AuraApplication const* aurApp, uint8 mode, boo
         if (aurApp->GetRemoveMode())
             return;
         // blizz like 2.0.x
-        target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
+        target->SetUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
         // blizz like 2.0.x
         target->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
         // blizz like 2.0.x
@@ -2496,7 +2496,7 @@ void AuraEffect::HandleFeignDeath(AuraApplication const* aurApp, uint8 mode, boo
         target->SendMessageToSet(&data, true);
         */
         // blizz like 2.0.x
-        target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
+        target->RemoveUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
         // blizz like 2.0.x
         target->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
         // blizz like 2.0.x
@@ -2603,7 +2603,7 @@ void AuraEffect::HandleAuraModSilence(AuraApplication const* aurApp, uint8 mode,
 
     if (apply)
     {
-        target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED);
+        target->SetUnitFlag(UNIT_FLAG_SILENCED);
 
         // call functions which may have additional effects after chainging state of unit
         // Stop cast only spells vs PreventionType == SPELL_PREVENTION_TYPE_SILENCE
@@ -2619,7 +2619,7 @@ void AuraEffect::HandleAuraModSilence(AuraApplication const* aurApp, uint8 mode,
         if (target->HasAuraType(SPELL_AURA_MOD_SILENCE) || target->HasAuraType(SPELL_AURA_MOD_PACIFY_SILENCE))
             return;
 
-        target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED);
+        target->RemoveUnitFlag(UNIT_FLAG_SILENCED);
     }
 }
 
@@ -2632,7 +2632,7 @@ void AuraEffect::HandleAuraModPacify(AuraApplication const* aurApp, uint8 mode, 
 
     if (apply)
     {
-        target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+        target->SetUnitFlag(UNIT_FLAG_PACIFIED);
         //target->AttackStop(); // pussywizard: why having this flag prevents from being in combat? it should just prevent melee attack
     }
     else
@@ -2640,7 +2640,7 @@ void AuraEffect::HandleAuraModPacify(AuraApplication const* aurApp, uint8 mode, 
         // do not remove unit flag if there are more than this auraEffect of that kind on unit on unit
         if (target->HasAuraType(SPELL_AURA_MOD_PACIFY) || target->HasAuraType(SPELL_AURA_MOD_PACIFY_SILENCE))
             return;
-        target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+        target->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
     }
 }
 
@@ -4961,13 +4961,13 @@ void AuraEffect::HandleArenaPreparation(AuraApplication const* aurApp, uint8 mod
     Unit* target = aurApp->GetTarget();
 
     if (apply)
-        target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREPARATION);
+        target->SetUnitFlag(UNIT_FLAG_PREPARATION);
     else
     {
         // do not remove unit flag if there are more than this auraEffect of that kind on unit on unit
         if (target->HasAuraType(GetAuraType()))
             return;
-        target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREPARATION);
+        target->RemoveUnitFlag(UNIT_FLAG_PREPARATION);
     }
 }
 
@@ -5598,13 +5598,13 @@ void AuraEffect::HandleAuraModFaction(AuraApplication const* aurApp, uint8 mode,
     {
         target->SetFaction(GetMiscValue());
         if (target->GetTypeId() == TYPEID_PLAYER)
-            target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+            target->RemoveUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
     }
     else
     {
         target->RestoreFaction();
         if (target->GetTypeId() == TYPEID_PLAYER)
-            target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+            target->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
     }
 }
 
@@ -5890,7 +5890,7 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
             if (GetId() == 52179) // Astral Shift
             {
                 // Periodic need for remove visual on stun/fear/silence lost
-                if (!(target->GetUInt32Value(UNIT_FIELD_FLAGS) & (UNIT_FLAG_STUNNED | UNIT_FLAG_FLEEING | UNIT_FLAG_SILENCED)))
+                if (!(target->GetUnitFlags() & (UNIT_FLAG_STUNNED | UNIT_FLAG_FLEEING | UNIT_FLAG_SILENCED)))
                     target->RemoveAurasDueToSpell(52179);
                 break;
             }

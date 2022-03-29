@@ -84,12 +84,12 @@ public:
     void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         _modelId = GetUnitOwner()->GetDisplayId();
-        _hasFlag = GetUnitOwner()->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        _hasFlag = GetUnitOwner()->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         for (uint8 i = 0; i < 3; ++i)
             _itemId.at(i) = GetUnitOwner()->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i);
 
         GetUnitOwner()->SetDisplayId(11686);
-        GetUnitOwner()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        GetUnitOwner()->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         for (uint8 i = 0; i < 3; ++i)
             GetUnitOwner()->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i, 0);
     }
@@ -98,7 +98,7 @@ public:
     {
         GetUnitOwner()->SetDisplayId(_modelId);
         if (!_hasFlag)
-            GetUnitOwner()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            GetUnitOwner()->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         for (uint8 i = 0; i < 3; ++i)
             GetUnitOwner()->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i, _itemId.at(i));
     }
@@ -1804,7 +1804,7 @@ class spell_gen_creature_permanent_feign_death : public AuraScript
         Unit* target = GetTarget();
         target->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
         target->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
-        target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+        target->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
 
         if (target->GetTypeId() == TYPEID_UNIT)
             target->ToCreature()->SetReactState(REACT_PASSIVE);
@@ -1815,7 +1815,7 @@ class spell_gen_creature_permanent_feign_death : public AuraScript
         Unit* target = GetTarget();
         target->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
         target->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
-        target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+        target->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
 
         if (target->GetTypeId() == TYPEID_UNIT)
             target->ToCreature()->SetReactState(REACT_AGGRESSIVE);
@@ -2867,7 +2867,7 @@ class spell_gen_mounted_charge : public SpellScript
                     }
 
                     // If target isn't a training dummy there's a chance of failing the charge
-                    if (!target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE) && roll_chance_f(12.5f))
+                    if (!target->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE) && roll_chance_f(12.5f))
                         spellId = SPELL_CHARGE_MISS_EFFECT;
 
                     if (Unit* vehicle = GetCaster()->GetVehicleBase())

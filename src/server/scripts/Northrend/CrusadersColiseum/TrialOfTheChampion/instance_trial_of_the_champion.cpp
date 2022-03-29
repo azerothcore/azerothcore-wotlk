@@ -836,7 +836,7 @@ public:
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[1][i]) )
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
-                                c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                                 if( Unit* target = c->SelectNearestTarget(200.0f) )
                                     c->AI()->AttackStart(target);
                                 c->AI()->DoZoneInCombat();
@@ -862,7 +862,7 @@ public:
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[0][i]) )
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
-                                c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                                 if( Unit* target = c->SelectNearestTarget(200.0f) )
                                     c->AI()->AttackStart(target);
                                 c->AI()->DoZoneInCombat();
@@ -887,7 +887,7 @@ public:
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[2][i]) )
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
-                                c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                                 if( Unit* target = c->SelectNearestTarget(200.0f) )
                                     c->AI()->AttackStart(target);
                                 c->AI()->DoZoneInCombat();
@@ -912,7 +912,7 @@ public:
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
-                                c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                                 if( Unit* target = c->SelectNearestTarget(200.0f) )
                                     c->AI()->AttackStart(target);
                                 c->AI()->DoZoneInCombat();
@@ -949,7 +949,7 @@ public:
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
-                                c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                                 if( Unit* target = c->SelectNearestTarget(200.0f) )
                                     c->AI()->AttackStart(target);
                                 c->AI()->DoZoneInCombat();
@@ -1053,7 +1053,7 @@ public:
                                 if( Creature* c = instance->GetCreature(NPC_ArgentSoldierGUID[i][j]) )
                                 {
                                     c->SetReactState(REACT_AGGRESSIVE);
-                                    c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                    c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                                     //c->AI()->DoZoneInCombat();
                                 }
                         if( Creature* tirion = instance->GetCreature(NPC_TirionGUID) )
@@ -1074,7 +1074,7 @@ public:
                         if( Creature* boss = instance->GetCreature(NPC_ArgentChampionGUID) )
                         {
                             boss->SetReactState(REACT_AGGRESSIVE);
-                            boss->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            boss->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             if( Unit* target = boss->SelectNearestTarget(200.0f) )
                                 boss->AI()->AttackStart(target);
                             boss->AI()->DoZoneInCombat();
@@ -1161,7 +1161,7 @@ public:
                                 bk->SetHomePosition(*bk);
                                 bk->SetFacingToObject(announcer);
                                 announcer->SetFacingToObject(bk);
-                                announcer->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                announcer->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                                 bk->AddAura(68306, announcer); // spell has attribute player only
                                 if( Creature* tirion = instance->GetCreature(NPC_TirionGUID) )
                                     tirion->AI()->Talk(TEXT_BK_MEANING);
@@ -1207,7 +1207,7 @@ public:
                         if( Creature* bk = instance->GetCreature(NPC_BlackKnightGUID) )
                         {
                             bk->SetReactState(REACT_AGGRESSIVE);
-                            bk->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
+                            bk->ReplaceAllUnitFlags(0);
                             if( Unit* target = bk->SelectNearestTarget(200.0f) )
                                 bk->AI()->AttackStart(target);
                             bk->AI()->DoZoneInCombat();

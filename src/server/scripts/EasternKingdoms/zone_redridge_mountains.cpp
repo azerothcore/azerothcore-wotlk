@@ -53,7 +53,7 @@ public:
             phase = 0;
             mockingBlowTimer = 5000;
             shieldBashTimer  = 8000;
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
         }
 
         void sQuestAccept(Player* player, Quest const* quest) override
@@ -62,7 +62,7 @@ public:
             {
                 Talk(SAY_CORPORAL_1, player);
                 npc_escortAI::Start(true, false, player->GetGUID(), quest);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
                 me->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_ACTIVE);
             }
         }

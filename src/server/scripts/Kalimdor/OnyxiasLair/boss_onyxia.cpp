@@ -582,7 +582,7 @@ public:
                 events.RepeatEvent(15000);
                 break;
             case EVENT_OLG_SPELL_IGNITEWEAPON:
-                if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED))
+                if (me->HasUnitFlag(UNIT_FLAG_DISARMED))
                 {
                     events.RepeatEvent(5000);
                 }
@@ -596,7 +596,7 @@ public:
 
         if (!me->HasUnitState(UNIT_STATE_CASTING) && me->isAttackReady())
         {
-            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED))
+            if (me->HasUnitFlag(UNIT_FLAG_DISARMED))
             {
                 if (me->HasAura(SPELL_OLG_IGNITEWEAPON))
                 {

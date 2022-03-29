@@ -308,11 +308,11 @@ public:
                 if (m_pInstance->GetData(TYPE_LEVIATHAN) != SPECIAL)
                 {
                     m_pInstance->SetData(TYPE_LEVIATHAN, NOT_STARTED);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 }
                 else
                 {
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     m_pInstance->SetData(DATA_VEHICLE_SPAWN, VEHICLE_POS_LEVIATHAN);
                     _startTimer = 0;
                 }
@@ -372,7 +372,7 @@ public:
                 }
                 else if (_speakTimer > 41000 && _speakTimer < 60000)
                 {
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     TurnGates(true, false);
                     me->MonsterMoveWithSpeed(homePos.GetPositionX(), homePos.GetPositionY(), homePos.GetPositionZ(), 100.0f);
                     me->UpdatePosition(homePos);
@@ -768,14 +768,14 @@ public:
                 {
                     if (apply)
                     {
-                        turret->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
+                        turret->ReplaceAllUnitFlags(0);
                         turret->GetAI()->AttackStart(who);
                         if (Creature* leviathan = me->GetVehicleCreatureBase())
                             leviathan->AI()->Talk(FLAME_LEVIATHAN_SAY_PLAYER_RIDING);
                     }
                     else
                     {
-                        turret->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        turret->ReplaceAllUnitFlags(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                         if (turret->GetTypeId() == TYPEID_UNIT)
                             turret->ToCreature()->AI()->EnterEvadeMode();
                     }
@@ -817,7 +817,7 @@ public:
 
             if (Vehicle* vehicle = me->GetVehicle())
                 if (Unit* device = vehicle->GetPassenger(SEAT_DEVICE))
-                    device->SetUInt32Value(UNIT_FIELD_FLAGS, 0); // unselectable
+                    device->ReplaceAllUnitFlags(0); // unselectable
 
             if (Creature* leviathan = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(TYPE_LEVIATHAN)))
                 leviathan->AI()->DoAction(ACTION_DESTROYED_TURRET);
@@ -874,7 +874,7 @@ public:
             if (me->GetVehicle())
             {
                 me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
                 if (Unit* player = me->GetVehicle()->GetPassenger(SEAT_PLAYER))
                 {

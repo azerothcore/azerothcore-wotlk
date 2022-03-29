@@ -63,7 +63,7 @@ public:
             BossAI::Reset();
 
             me->SetReactState(REACT_AGGRESSIVE);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
 
             frenzy40 = false;
             frenzy15 = false;
@@ -95,7 +95,7 @@ public:
         void StartTalking(uint32 talkGroupId, uint32 timer)
         {
             me->SetReactState(REACT_PASSIVE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
             me->AttackStop();
 
             Talk(talkGroupId);
@@ -109,7 +109,7 @@ public:
             events.SetPhase(EVENT_PHASE_FIGHT);
 
             me->SetReactState(REACT_AGGRESSIVE);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
 
             DoZoneInCombat();
         }

@@ -253,7 +253,7 @@ public:
             me->SetStandState(UNIT_STAND_STATE_STAND);
 
             if (instance->GetBossState(DATA_ROTFACE) == DONE && instance->GetBossState(DATA_FESTERGUT) == DONE)
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
 
         uint32 GetData(uint32 type) const override
@@ -290,7 +290,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 BossAI::MoveInLineOfSight(who);
         }
 

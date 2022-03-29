@@ -80,7 +80,7 @@ public:
             owner->CastSpell(owner, SPELL_SUBDUED, true);
             GetCaster()->CastSpell(GetCaster(), SPELL_DRAKE_HATCHLING_SUBDUED, true);
             owner->SetFaction(FACTION_FRIENDLY);
-            owner->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            owner->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             owner->DespawnOrUnsummon(3 * MINUTE * IN_MILLISECONDS);
         }
 
@@ -179,7 +179,7 @@ public:
                         DoCast(me, SPELL_SUMMON_WORM, true);
                         if (Unit* worm = me->FindNearestCreature(NPC_SCOURGED_BURROWER, 3.0f))
                         {
-                            worm->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                            worm->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                             worm->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
                         }
                         phaseTimer = 1000;
@@ -630,7 +630,7 @@ public:
 
         void Initialize()
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             _events.ScheduleEvent(EVENT_ADD_ARCANE_CHAINS, 0);
         }
 
@@ -1505,7 +1505,7 @@ public:
 
         void Reset() override
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
             _events.ScheduleEvent(EVENT_THASSARIAN_CAST, 1000);
         }
 
@@ -1618,7 +1618,7 @@ public:
                         if (Creature* arthas = me->SummonCreature(NPC_IMAGE_LICH_KING, 3729.4614f, 3520.386f, 473.4048f, 1.361f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 120000))
                         {
                             _arthasGUID = arthas->GetGUID();
-                            arthas->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            arthas->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             arthas->SetReactState(REACT_PASSIVE);
                             arthas->SetWalk(true);
                         }
@@ -1653,7 +1653,7 @@ public:
                             talbot->UpdateEntry(NPC_PRINCE_VALANAR);
                             talbot->SetFullHealth();
                             talbot->SetFaction(FACTION_UNDEAD_SCOURGE);
-                            talbot->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            talbot->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             talbot->SetReactState(REACT_PASSIVE);
                             talbot->SetStandState(UNIT_STAND_STATE_KNEEL);
                         }
@@ -1673,7 +1673,7 @@ public:
                         {
                             _arlosGUID = arlos->GetGUID();
                             arlos->SetWalk(true);
-                            arlos->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                            arlos->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
                             arlos->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                             arlos->GetMotionMaster()->MovePath(PATH_ARLOS, false);
                         }
@@ -1681,7 +1681,7 @@ public:
                         {
                             _leryssaGUID = leryssa->GetGUID();
                             leryssa->SetWalk(true);
-                            leryssa->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                            leryssa->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
                             leryssa->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                             leryssa->GetMotionMaster()->MovePath(PATH_LERYSSA, false);
                         }
@@ -1771,12 +1771,12 @@ public:
                         break;
                     case EVENT_THASSARIAN_SCRIPT_17:
                         // Talbot say text 4 and attack
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                         if (Creature* talbot = ObjectAccessor::GetCreature(*me, _talbotGUID))
                         {
                             talbot->AI()->Talk(SAY_TALBOT_4);
                             talbot->SetFaction(FACTION_UNDEAD_SCOURGE_9);
-                            talbot->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            talbot->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             talbot->SetReactState(REACT_AGGRESSIVE);
                             talbot->Attack(me, false);
                         }
