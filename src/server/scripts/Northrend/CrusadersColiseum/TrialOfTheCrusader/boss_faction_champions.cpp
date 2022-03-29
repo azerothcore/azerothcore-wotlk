@@ -1245,7 +1245,7 @@ public:
 
         bool myCanCast()
         {
-            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_DISARM_RANGED) || IsCCed());
+            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasUnitFlag2(UNIT_FLAG2_DISARM_RANGED) || IsCCed());
         }
 
         void JustSummoned(Creature* c) override
@@ -2084,7 +2084,7 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_LAVA_LASH:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_DISARM_OFFHAND) )
+                    if( me->HasUnitFlag2(UNIT_FLAG2_DISARM_OFFHAND) )
                     {
                         events.RepeatEvent(5000);
                         break;
@@ -2099,7 +2099,7 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_STORMSTRIKE:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) && me->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_DISARM_OFFHAND) )
+                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) && me->HasUnitFlag2(UNIT_FLAG2_DISARM_OFFHAND) )
                     {
                         events.RepeatEvent(5000);
                         break;

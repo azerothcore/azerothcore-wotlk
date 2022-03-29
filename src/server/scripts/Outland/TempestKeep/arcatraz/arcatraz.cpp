@@ -367,7 +367,7 @@ public:
             me->setActive(false);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
-            me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+            me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
             me->CastSpell((Unit*)nullptr, SPELL_TARGET_OMEGA, false);
             instance->HandleGameObject(instance->GetGuidData(DATA_WARDENS_SHIELD), true);
             instance->SetBossState(DATA_WARDEN_MELLICHAR, NOT_STARTED);
@@ -559,7 +559,7 @@ public:
                 case EVENT_WARDEN_INTRO29:
                     events.Reset();
                     me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
-                    me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+                    me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                     if (Creature* creature = summons.GetCreatureWithEntry(NPC_HARBINGER_SKYRISS))
                     {
                         creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);

@@ -404,7 +404,7 @@ public:
                 case ACTION_START_INTRO:
                     {
                         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                        me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_DO_NOT_FADE_IN);
+                        me->SetUnitFlag2(UNIT_FLAG2_DO_NOT_FADE_IN);
                         me->SetDisableGravity(true);
                         me->CastSpell(me, SPELL_ARRIVAL, true);
                         me->CastSpell(me, SPELL_RIDE_THE_LIGHTNING, true);
