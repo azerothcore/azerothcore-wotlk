@@ -1439,7 +1439,7 @@ public:
     void ReplaceAllUnitFlags(UnitFlags flags) { SetUInt32Value(UNIT_FIELD_FLAGS, flags); }
 
     UnitFlags2 GetUnitFlags2() const { return UnitFlags2(GetUInt32Value(UNIT_FIELD_FLAGS_2)); }
-    bool HasUnitFlag2(UnitFlags2 flags) const { return HasUnitFlag2(, flags); }
+    bool HasUnitFlag2(UnitFlags2 flags) const { return HasFlag(UNIT_FIELD_FLAGS_2, flags); }
     void SetUnitFlag2(UnitFlags2 flags) { SetFlag(UNIT_FIELD_FLAGS_2, flags); }
     void RemoveUnitFlag2(UnitFlags2 flags) { RemoveFlag(UNIT_FIELD_FLAGS_2, flags); }
     void ReplaceAllUnitFlags2(UnitFlags2 flags) { SetUInt32Value(UNIT_FIELD_FLAGS_2, flags); }
@@ -1564,9 +1564,9 @@ public:
             case BASE_ATTACK:
                 return !HasUnitFlag(UNIT_FLAG_DISARMED);
             case OFF_ATTACK:
-                return !HasUnitFlag2(, UNIT_FLAG2_DISARM_OFFHAND);
+                return !HasUnitFlag2(UNIT_FLAG2_DISARM_OFFHAND);
             case RANGED_ATTACK:
-                return !HasUnitFlag2(, UNIT_FLAG2_DISARM_RANGED);
+                return !HasUnitFlag2(UNIT_FLAG2_DISARM_RANGED);
         }
         return true;
     }
