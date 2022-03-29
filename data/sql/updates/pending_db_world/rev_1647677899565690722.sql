@@ -143,3 +143,6 @@ UPDATE `spell_proc` SET `AttributesMask`=(`AttributesMask` | 0x20) WHERE `SpellI
 UPDATE `spell_proc` SET `AttributesMask`=(`AttributesMask` | 0x10) WHERE `SpellId`=32216;
 
 DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('spell_item_argent_dawn_commission', 'spell_dk_rune_strike_proc', 'spell_warr_victorious');
+
+-- Paladin T8 Holy 2P Bonus proc
+UPDATE `spell_proc` SET `AttributesMask`=0x2  WHERE `SpellId`=64890;
