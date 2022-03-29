@@ -17,6 +17,8 @@ ALTER TABLE `spell_proc`
     CHANGE `cooldown` `Cooldown` int(10) unsigned NOT NULL DEFAULT 0 AFTER `Chance`,
     CHANGE `charges` `Charges` tinyint(3) unsigned NOT NULL DEFAULT 0 AFTER `Cooldown`;
 
+DELETE FROM `command` WHERE `name`='reload spell_proc_event';
+
 DELETE FROM `spell_script_names` WHERE `ScriptName` IN
 ('spell_mage_blazing_speed','spell_pri_blessed_recovery','spell_dru_forms_trinket','spell_dru_t9_feral_relic',
 'spell_sha_nature_guardian','spell_warl_nether_protection','spell_hun_piercing_shots','spell_hun_t9_4p_bonus',
@@ -24,7 +26,9 @@ DELETE FROM `spell_script_names` WHERE `ScriptName` IN
 'spell_rog_t10_2p_bonus','spell_pal_illumination','spell_item_soul_preserver','spell_item_death_choice',
 'spell_item_lightning_capacitor','spell_item_thunder_capacitor','spell_item_toc25_normal_caster_trinket','spell_item_toc25_heroic_caster_trinket',
 'spell_igb_battle_experience_check','spell_gen_blood_reserve','spell_item_darkmoon_card_greatness',
-'spell_item_charm_witch_doctor','spell_item_mana_drain', 'spell_item_blood_draining_enchant');
+'spell_item_charm_witch_doctor','spell_item_mana_drain', 'spell_item_blood_draining_enchant', 'spell_anetheron_vampiric_aura', 'spell_uk_second_wind'
+'spell_deathbringer_blood_beast_blood_link', 'spell_putricide_ooze_tank_protection', 'spell_mark_of_malice', 'spell_twisted_reflection'
+'spell_pet_guard_dog', 'spell_pet_silverback', 'spell_pet_culling_the_herd', 'spell_gen_blood_reserve');
 DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_gen_proc_above_75' AND `spell_id` = 64568;
 
 INSERT INTO `spell_script_names` (`spell_id`,`ScriptName`) VALUES
@@ -52,6 +56,15 @@ INSERT INTO `spell_script_names` (`spell_id`,`ScriptName`) VALUES
 (-27811, 'spell_pri_blessed_recovery'),                 -- Priest Blessed Recovery
 (-30881, 'spell_sha_nature_guardian'),                  -- Shaman Nature's Guardian
 (-324, 'spell_sha_lightning_shield'),                   -- Shaman Lightning Shield
+(38196,  'spell_anetheron_vampiric_aura'),
+(42770,  'spell_uk_second_wind'),
+(72176,  'spell_deathbringer_blood_beast_blood_link'),
+(71770,  'spell_putricide_ooze_tank_protection'),
+(33493,  'spell_mark_of_malice'),
+(21063,  'spell_twisted_reflection'),
+(-53178, 'spell_pet_guard_dog'),
+(-62764, 'spell_pet_silverback'),
+(-61680, 'spell_pet_culling_the_herd'),
 (-30299, 'spell_warl_nether_protection');               -- Warlock Nether protection
 
 UPDATE `spell_proc` SET `SpellPhaseMask`=0x2 WHERE `SpellId` IN (
