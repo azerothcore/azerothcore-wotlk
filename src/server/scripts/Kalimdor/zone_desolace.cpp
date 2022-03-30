@@ -258,14 +258,14 @@ public:
                 {
                     summon->SetFaction(faction);
                     if (remove)
-                        summon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                        summon->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
                     else
-                        summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                        summon->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
                 }
             if (remove)
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
             else
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
             me->SetFaction(faction);
         }
 
