@@ -35,6 +35,7 @@ enum WarriorSpells
     SPELL_WARRIOR_IMPROVED_SPELL_REFLECTION_TRIGGER = 59725,
     SPELL_WARRIOR_BLOODTHIRST                       = 23885,
     SPELL_WARRIOR_BLOODTHIRST_DAMAGE                = 23881,
+    SPELL_WARRIOR_BLOODSURGE_R1                     = 29723,
     SPELL_WARRIOR_CHARGE                            = 34846,
     SPELL_WARRIOR_DAMAGE_SHIELD_DAMAGE              = 59653,
     SPELL_WARRIOR_DEEP_WOUNDS_RANK_1                = 12162,
@@ -42,6 +43,8 @@ enum WarriorSpells
     SPELL_WARRIOR_DEEP_WOUNDS_RANK_3                = 12868,
     SPELL_WARRIOR_DEEP_WOUNDS_RANK_PERIODIC         = 12721,
     SPELL_WARRIOR_EXECUTE                           = 20647,
+    SPELL_WARRIOR_EXECUTE_GCD_REDUCED               = 71069,
+    SPELL_WARRIOR_EXTRA_CHARGE                      = 70849,
     SPELL_WARRIOR_GLYPH_OF_EXECUTION                = 58367,
     SPELL_WARRIOR_GLYPH_OF_VIGILANCE                = 63326,
     SPELL_WARRIOR_JUGGERNAUT_CRIT_BONUS_BUFF        = 65156,
@@ -49,6 +52,8 @@ enum WarriorSpells
     SPELL_WARRIOR_LAST_STAND_TRIGGERED              = 12976,
     SPELL_WARRIOR_RETALIATION_DAMAGE                = 22858,
     SPELL_WARRIOR_SLAM                              = 50783,
+    SPELL_WARRIOR_SLAM_GCD_REDUCED                  = 71072,
+    SPELL_WARRIOR_SUDDEN_DEATH_R1                   = 46913,
     SPELL_WARRIOR_SUNDER_ARMOR                      = 58567,
     SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK     = 26654,
     SPELL_WARRIOR_TAUNT                             = 355,
@@ -57,7 +62,12 @@ enum WarriorSpells
     SPELL_WARRIOR_UNRELENTING_ASSAULT_TRIGGER_1     = 64849,
     SPELL_WARRIOR_UNRELENTING_ASSAULT_TRIGGER_2     = 64850,
     SPELL_WARRIOR_VIGILANCE_PROC                    = 50725,
-    SPELL_WARRIOR_VIGILANCE_REDIRECT_THREAT         = 59665
+    SPELL_WARRIOR_VIGILANCE_REDIRECT_THREAT         = 59665,
+    SPELL_WARRIOR_SECOND_WIND_TRIGGER_1             = 29841,
+    SPELL_WARRIOR_SECOND_WIND_TRIGGER_2             = 29842,
+    SPELL_WARRIOR_GLYPH_OF_BLOCKING                 = 58374,
+    SPELL_WARRIOR_STOICISM                          = 70845,
+    SPELL_WARRIOR_T10_MELEE_4P_BONUS                = 70847
 };
 
 enum WarriorSpellIcons
@@ -71,6 +81,7 @@ enum MiscSpells
     SPELL_PALADIN_GREATER_BLESSING_OF_SANCTUARY     = 25899,
     SPELL_PRIEST_RENEWED_HOPE                       = 63944,
     SPELL_GEN_DAMAGE_REDUCTION_AURA                 = 68066,
+    SPELL_CATEGORY_SHIELD_SLAM                      = 1209
 };
 
 class spell_warr_mocking_blow : public SpellScript
@@ -222,6 +233,31 @@ class spell_warr_improved_spell_reflection_trigger_aura : public AuraScript
     }
 };
 
+// 70844 - Item - Warrior T10 Protection 4P Bonus
+class spell_warr_item_t10_prot_4p_bonus : public AuraScript
+{
+    PrepareAuraScript(spell_warr_item_t10_prot_4p_bonus);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WARRIOR_STOICISM });
+    }
+
+    void HandleProc(ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* target = eventInfo.GetActionTarget();
+        int32 bp0 = CalculatePct(target->GetMaxHealth(), GetSpellInfo()->Effects[EFFECT_1].CalcValue());
+        target->CastCustomSpell(SPELL_WARRIOR_STOICISM, SPELLVALUE_BASE_POINT0, bp0, (Unit*)nullptr, true);
+    }
+
+    void Register() override
+    {
+        OnProc += AuraProcFn(spell_warr_item_t10_prot_4p_bonus::HandleProc);
+    }
+};
+
 // 12975 - Last Stand
 class spell_warr_last_stand : public SpellScript
 {
@@ -252,7 +288,13 @@ class spell_warr_deep_wounds : public SpellScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_WARRIOR_DEEP_WOUNDS_RANK_PERIODIC });
+        return ValidateSpellInfo(
+        {
+            SPELL_WARRIOR_DEEP_WOUNDS_RANK_1,
+            SPELL_WARRIOR_DEEP_WOUNDS_RANK_2,
+            SPELL_WARRIOR_DEEP_WOUNDS_RANK_3,
+            SPELL_WARRIOR_DEEP_WOUNDS_RANK_PERIODIC
+        });
     }
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -267,7 +309,7 @@ class spell_warr_deep_wounds : public SpellScript
             ApplyPct(damage, 16.0f * GetSpellInfo()->GetRank() / 6.0f);
             target->CastDelayedSpellWithPeriodicAmount(caster, SPELL_WARRIOR_DEEP_WOUNDS_RANK_PERIODIC, SPELL_AURA_PERIODIC_DAMAGE, damage, EFFECT_0);
 
-            //caster->CastCustomSpell(target, SPELL_WARRIOR_DEEP_WOUNDS_RANK_PERIODIC, &damage, nullptr, nullptr, true);
+            caster->CastCustomSpell(target, SPELL_WARRIOR_DEEP_WOUNDS_RANK_PERIODIC, &damage, nullptr, nullptr, true);
         }
     }
 
@@ -371,6 +413,47 @@ class spell_warr_damage_shield : public AuraScript
     }
 };
 
+// -12834 - Deep Wounds Aura
+class spell_warr_deep_wounds_aura : public AuraScript
+{
+    PrepareAuraScript(spell_warr_deep_wounds_aura);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo({ spellInfo->GetEffect(EFFECT_0).TriggerSpell });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo)
+            return false;
+
+        return eventInfo.GetActor()->GetTypeId() == TYPEID_PLAYER;
+    }
+
+    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* actor = eventInfo.GetActor();
+        float damage = 0.f;
+
+        if (eventInfo.GetDamageInfo()->GetAttackType() == OFF_ATTACK)
+            damage = (actor->GetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE) + actor->GetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE)) / 2.f;
+        else
+            damage = (actor->GetFloatValue(UNIT_FIELD_MINDAMAGE) + actor->GetFloatValue(UNIT_FIELD_MAXDAMAGE)) / 2.f;
+
+        actor->CastCustomSpell(GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, SPELLVALUE_BASE_POINT0, int32(damage), eventInfo.GetProcTarget(), true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_warr_deep_wounds_aura::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_warr_deep_wounds_aura::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 // -5308 - Execute
 class spell_warr_execute : public SpellScript
 {
@@ -425,6 +508,71 @@ class spell_warr_execute : public SpellScript
     {
         BeforeHit += BeforeSpellHitFn(spell_warr_execute::SendMiss);
         OnEffectHitTarget += SpellEffectFn(spell_warr_execute::HandleEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+// -29723 - Sudden Death
+// -46913 - Bloodsurge
+class spell_warr_extra_proc : public AuraScript
+{
+    PrepareAuraScript(spell_warr_extra_proc);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+        {
+            SPELL_WARRIOR_T10_MELEE_4P_BONUS,
+            SPELL_WARRIOR_EXTRA_CHARGE,
+            SPELL_WARRIOR_SLAM_GCD_REDUCED,
+            SPELL_WARRIOR_EXECUTE_GCD_REDUCED
+        });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    {
+        Unit* target = GetTarget();
+        AuraEffect const* bonusAurEff = target->GetAuraEffect(SPELL_WARRIOR_T10_MELEE_4P_BONUS, EFFECT_0);
+        if (!bonusAurEff)
+            return;
+
+        if (!roll_chance_i(bonusAurEff->GetAmount()))
+            return;
+
+        target->CastSpell((Unit*)nullptr, SPELL_WARRIOR_EXTRA_CHARGE, true, nullptr, aurEff);
+
+        SpellInfo const* auraInfo = aurEff->GetSpellInfo();
+        if (auraInfo->IsRankOf(sSpellMgr->AssertSpellInfo(SPELL_WARRIOR_BLOODSURGE_R1)))
+            target->CastSpell((Unit*)nullptr, SPELL_WARRIOR_SLAM_GCD_REDUCED, true, nullptr, aurEff);
+        else if (auraInfo->IsRankOf(sSpellMgr->AssertSpellInfo(SPELL_WARRIOR_SUDDEN_DEATH_R1)))
+            target->CastSpell((Unit*)nullptr, SPELL_WARRIOR_EXECUTE_GCD_REDUCED, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_warr_extra_proc::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+// 58375 - Glyph of Blocking
+class spell_warr_glyph_of_blocking : public AuraScript
+{
+    PrepareAuraScript(spell_warr_glyph_of_blocking);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WARRIOR_GLYPH_OF_BLOCKING });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActor();
+        caster->CastSpell(caster, SPELL_WARRIOR_GLYPH_OF_BLOCKING, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_warr_glyph_of_blocking::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
 
@@ -586,6 +734,46 @@ class spell_warr_rend : public AuraScript
     }
 };
 
+// -29834 - Second Wind
+class spell_warr_second_wind : public AuraScript
+{
+    PrepareAuraScript(spell_warr_second_wind);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+        {
+            SPELL_WARRIOR_SECOND_WIND_TRIGGER_1,
+            SPELL_WARRIOR_SECOND_WIND_TRIGGER_2
+        });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo)
+            return false;
+
+        return (spellInfo->GetAllEffectsMechanicMask() & ((1 << MECHANIC_ROOT) | (1 << MECHANIC_STUN))) != 0;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        static uint32 const triggeredSpells[2] = { SPELL_WARRIOR_SECOND_WIND_TRIGGER_1, SPELL_WARRIOR_SECOND_WIND_TRIGGER_2 };
+
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActionTarget();
+        uint32 spellId = triggeredSpells[GetSpellInfo()->GetRank() - 1];
+        caster->CastSpell(caster, spellId, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_warr_second_wind::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_warr_second_wind::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 // 64380, 65941 - Shattering Throw
 class spell_warr_shattering_throw : public SpellScript
 {
@@ -659,6 +847,30 @@ class spell_warr_sweeping_strikes : public AuraScript
 
 private:
     Unit* _procTarget;
+};
+
+// 28845 - Cheat Death
+class spell_warr_t3_prot_8p_bonus : public AuraScript
+{
+    PrepareAuraScript(spell_warr_t3_prot_8p_bonus);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        if (eventInfo.GetActionTarget()->HealthBelowPct(20))
+            return true;
+
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (damageInfo && damageInfo->GetDamage())
+            if (GetTarget()->HealthBelowPctDamaged(20, damageInfo->GetDamage()))
+                return true;
+
+        return false;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_warr_t3_prot_8p_bonus::CheckProc);
+    }
 };
 
 // 50720 - Vigilance
@@ -886,5 +1098,11 @@ void AddSC_warrior_spell_scripts()
     RegisterSpellScript(spell_warr_sweeping_strikes);
     RegisterSpellScript(spell_warr_vigilance);
     RegisterSpellScript(spell_warr_vigilance_trigger);
+    RegisterSpellScript(spell_warr_t3_prot_8p_bonus);
+    RegisterSpellScript(spell_warr_item_t10_prot_4p_bonus);
+    RegisterSpellScript(spell_warr_deep_wounds_aura);
+    RegisterSpellScript(spell_warr_extra_proc);
+    RegisterSpellScript(spell_warr_glyph_of_blocking);
+    RegisterSpellScript(spell_warr_second_wind);
     RegisterSpellScript(spell_warr_t3_prot_8p_bonus);
 }
