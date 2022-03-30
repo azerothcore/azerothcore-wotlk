@@ -482,3 +482,5 @@ INSERT INTO `reference_loot_template`(`Entry`, `Item`, `Reference`, `Chance`, `Q
 (30551, 19382, 0,  0.0, 0, 1, 1, 1,1),
 (30330, 30171, 30171, 100.0, 0, 1, 0, 1, 1),
 (30105, 30044, 30044, 100.0, 0, 1, 0, 1 ,1);
+
+DELETE FROM `reference_loot_template` WHERE `Entry` IN (34009, 34010, 34032, 34033, 34034, 34035, 34036, 34037, 34038, 34348);
