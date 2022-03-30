@@ -318,7 +318,7 @@ public:
                         if (Creature* trigger = instance->SummonCreature(WORLD_TRIGGER, Locs[LOC_CENTER], nullptr, 25000))
                         {
                             trigger->SetDisplayId(11686);
-                            trigger->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                            trigger->ReplaceAllUnitFlags(UNIT_FLAG_NOT_SELECTABLE);
                             trigger->SetFaction(FACTION_MONSTER);
                             trigger->SetInCombatWithZone();
                         }
@@ -340,7 +340,7 @@ public:
                             if (Creature* trigger = instance->SummonCreature(WORLD_TRIGGER, Locs[LOC_CENTER], nullptr, 25000))
                             {
                                 trigger->SetDisplayId(11686);
-                                trigger->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                                trigger->ReplaceAllUnitFlags(UNIT_FLAG_NOT_SELECTABLE);
                                 trigger->SetFaction(FACTION_MONSTER);
                                 trigger->SetInCombatWithZone();
                             }
@@ -656,7 +656,7 @@ public:
                         if( Creature* c = instance->GetCreature(NPC_GormokGUID) )
                         {
                             c->SetReactState(REACT_AGGRESSIVE);
-                            c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                             if( Unit* target = c->SelectNearestTarget(200.0f) )
                             {
@@ -704,7 +704,7 @@ public:
                         if( Creature* c = instance->GetCreature(NPC_DreadscaleGUID) )
                         {
                             c->SetReactState(REACT_AGGRESSIVE);
-                            c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                             if( Unit* target = c->SelectNearestTarget(200.0f) )
                             {
@@ -715,7 +715,7 @@ public:
                         if( Creature* c = instance->GetCreature(NPC_AcidmawGUID) )
                         {
                             c->SetReactState(REACT_AGGRESSIVE);
-                            c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                             if( Unit* target = c->SelectNearestTarget(200.0f) )
                             {
@@ -752,7 +752,7 @@ public:
                         if( Creature* c = instance->GetCreature(NPC_IcehowlGUID) )
                         {
                             c->SetReactState(REACT_AGGRESSIVE);
-                            c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                             if( Unit* target = c->SelectNearestTarget(200.0f) )
                             {
@@ -907,7 +907,7 @@ public:
                         if( Creature* c = instance->GetCreature(NPC_JaraxxusGUID) )
                         {
                             c->SetReactState(REACT_AGGRESSIVE);
-                            c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                             if( Unit* target = c->SelectNearestTarget(200.0f) )
                             {
@@ -1104,7 +1104,7 @@ public:
                             if (Creature* c = instance->GetCreature(guid))
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
-                                c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                                 c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                                 //if( Unit* target = c->SelectNearestTarget(200.0f) )
                                 //  c->AI()->AttackStart(target);
@@ -1171,7 +1171,7 @@ public:
                         if( Creature* c = instance->GetCreature(NPC_LightbaneGUID) )
                         {
                             c->SetReactState(REACT_AGGRESSIVE);
-                            c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             /*if( Unit* target = c->SelectNearestTarget(200.0f) )
                             {
                                 c->AI()->AttackStart(target);
@@ -1181,7 +1181,7 @@ public:
                         if( Creature* c = instance->GetCreature(NPC_DarkbaneGUID) )
                         {
                             c->SetReactState(REACT_AGGRESSIVE);
-                            c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             /*if( Unit* target = c->SelectNearestTarget(200.0f) )
                             {
                                 c->AI()->AttackStart(target);
@@ -1483,7 +1483,7 @@ public:
                         {
                             jaraxxus->CastSpell(jaraxxus, 67924, true);
                             jaraxxus->SetReactState(REACT_AGGRESSIVE);
-                            jaraxxus->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            jaraxxus->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             jaraxxus->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                         }
                     }

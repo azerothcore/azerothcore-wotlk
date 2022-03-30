@@ -67,7 +67,7 @@ public:
             me->LoadEquipment(EQUIP_SWORD);
             me->SetCanDualWield(false);
             me->SetStandState(UNIT_STAND_STATE_STAND);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+            me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
@@ -94,7 +94,7 @@ public:
                         me->GetMotionMaster()->Clear();
                         me->GetMotionMaster()->MovePoint(EQUIP_TWO_SWORDS, 1.859f, -780.72f, 9.831f);
                         Talk(SAY_SWAP1);
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+                        me->SetUnitFlag(UNIT_FLAG_PACIFIED);
                         me->SetReactState(REACT_PASSIVE);
                         health67 = true;
                         break;
@@ -109,7 +109,7 @@ public:
                         me->GetMotionMaster()->Clear();
                         me->GetMotionMaster()->MovePoint(EQUIP_MACE, 1.859f, -780.72f, 9.831f);
                         Talk(SAY_SWAP2);
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+                        me->SetUnitFlag(UNIT_FLAG_PACIFIED);
                         me->SetReactState(REACT_PASSIVE);
                         health34 = true;
                         break;
@@ -135,7 +135,7 @@ public:
                     break;
                 case EVENT_RESTORE_COMBAT:
                     me->SetReactState(REACT_AGGRESSIVE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+                    me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
                     me->SetStandState(UNIT_STAND_STATE_STAND);
                     if (me->GetVictim())
                     {
