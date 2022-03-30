@@ -66,7 +66,7 @@ public:
         {
             startFightTimer = 0;
             uiHopelessnessCount = 0;
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             me->SetControlled(false, UNIT_STATE_ROOT);
             events.Reset();
             if (pInstance)
@@ -75,7 +75,7 @@ public:
 
         void EnterCombat(Unit* /*who*/) override
         {
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
 
             events.ScheduleEvent(EVENT_QUIVERING_STRIKE, 5000);
             events.ScheduleEvent(EVENT_IMPENDING_DESPAIR, 11000);

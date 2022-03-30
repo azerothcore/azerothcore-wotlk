@@ -396,7 +396,7 @@ public:
                     if (Creature* summon = unit->ToCreature())
                     {
                         summon->UpdateEntry(NPC_BONE_CONSTRUCT);
-                        summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        summon->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         summon->SetReactState(REACT_PASSIVE);
                         summon->SetStandState(UNIT_STAND_STATE_DEAD);
 

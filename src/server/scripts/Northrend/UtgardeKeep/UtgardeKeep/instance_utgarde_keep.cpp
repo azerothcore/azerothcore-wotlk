@@ -74,7 +74,7 @@ public:
             if (Creature* c = instance->GetCreature(NPC_DarkRangerMarrahGUID))
             {
                 c->SetReactState(REACT_PASSIVE);
-                c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 if (plr && plr->GetTeamId() == TEAM_HORDE)
                 {
                     if (!c->IsVisible())

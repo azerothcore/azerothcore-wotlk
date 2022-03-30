@@ -102,12 +102,12 @@ public:
                 pInstance->SetData(DATA_VAROS, NOT_STARTED);
                 if( pInstance->GetData(DATA_CC_COUNT) < 10 )
                 {
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->CastSpell(me, 50053, true);
                 }
                 else
                 {
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->InterruptNonMeleeSpells(false);
                     me->RemoveAura(50053);
                 }

@@ -153,7 +153,7 @@ public:
 
             creature->AI()->Talk(SAY_START);
             creature->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
-            creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            creature->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
         }
         return true;
     }
