@@ -94,7 +94,7 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* unit)
     i_nextMove = urand(1, MAX_CONF_WAYPOINTS);
     DoUpdate(unit, 1);
 
-    unit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED);
+    unit->SetUnitFlag(UNIT_FLAG_CONFUSED);
     unit->AddUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_CONFUSED_MOVE);
 }
 
@@ -163,7 +163,7 @@ bool ConfusedMovementGenerator<T>::DoUpdate(T* unit, uint32 diff)
 template<>
 void ConfusedMovementGenerator<Player>::DoFinalize(Player* unit)
 {
-    unit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED);
+    unit->RemoveUnitFlag(UNIT_FLAG_CONFUSED);
     unit->ClearUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_CONFUSED_MOVE);
     unit->StopMoving();
 }
@@ -171,7 +171,7 @@ void ConfusedMovementGenerator<Player>::DoFinalize(Player* unit)
 template<>
 void ConfusedMovementGenerator<Creature>::DoFinalize(Creature* unit)
 {
-    unit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED);
+    unit->RemoveUnitFlag(UNIT_FLAG_CONFUSED);
     unit->ClearUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_CONFUSED_MOVE);
     if (unit->GetVictim())
         unit->SetTarget(unit->GetVictim()->GetGUID());

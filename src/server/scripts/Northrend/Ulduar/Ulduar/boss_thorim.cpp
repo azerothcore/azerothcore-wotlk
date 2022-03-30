@@ -352,13 +352,13 @@ public:
         {
             if (apply)
             {
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_PACIFIED);
+                me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_PACIFIED);
                 me->DisableRotate(true);
                 me->AddUnitState(UNIT_STATE_ROOT);
             }
             else
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_PACIFIED);
+                me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_PACIFIED);
                 me->DisableRotate(false);
                 me->ClearUnitState(UNIT_STATE_ROOT);
                 me->resetAttackTimer(BASE_ATTACK);
@@ -569,7 +569,7 @@ public:
                 if (!_encounterFinished)
                 {
                     _encounterFinished = true;
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->SetFaction(FACTION_FRIENDLY);
                     me->SetHealth(me->GetMaxHealth());
                     me->CombatStop();
@@ -1720,7 +1720,7 @@ public:
                     events.RepeatEvent(12000);
                     break;
                 case EVENT_DR_CHAMPION_WH:
-                    if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED))
+                    if (!me->HasUnitFlag(UNIT_FLAG_DISARMED))
                         me->CastSpell(me, SPELL_WHIRLWIND, false);
                     events.RepeatEvent(6000);
                     break;

@@ -463,7 +463,7 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPackets::Character::LogoutRequ
         }
 
         GetPlayer()->SetRooted(true);
-        GetPlayer()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+        GetPlayer()->SetUnitFlag(UNIT_FLAG_STUNNED);
     }
 
     SetLogoutStartTime(GameTime::GetGameTime().count());
@@ -485,7 +485,7 @@ void WorldSession::HandleLogoutCancelOpcode(WorldPackets::Character::LogoutCance
         GetPlayer()->SetRooted(false);
 
         GetPlayer()->SetStandState(UNIT_STAND_STATE_STAND);
-        GetPlayer()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+        GetPlayer()->RemoveUnitFlag(UNIT_FLAG_STUNNED);
     }
 }
 

@@ -114,7 +114,7 @@ public:
             _Reset();
             me->CastSpell(me, SPELL_SHADOW_CAGE, true);
             me->SetReactState(REACT_PASSIVE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
         }
 
         void KilledUnit(Unit*  /*victim*/) override
@@ -184,7 +184,7 @@ public:
                     Talk(SAY_FREE);
                     break;
                 case EVENT_ENTER_COMBAT:
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
                     me->SetReactState(REACT_AGGRESSIVE);
                     events.ScheduleEvent(EVENT_CLEAVE, 9000);
                     events.ScheduleEvent(EVENT_BLAST_NOVA, 60000);

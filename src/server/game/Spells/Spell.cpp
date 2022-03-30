@@ -2832,7 +2832,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
             if (unit->GetTypeId() == TYPEID_UNIT && unit->ToCreature()->IsInEvadeMode())
                 return SPELL_MISS_EVADE;
 
-            if (unit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) && unit->GetCharmerOrOwnerGUID() != m_caster->GetGUID())
+            if (unit->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE) && unit->GetCharmerOrOwnerGUID() != m_caster->GetGUID())
                 return SPELL_MISS_EVADE;
         }
 
@@ -5385,7 +5385,7 @@ SpellCastResult Spell::CheckCast(bool strict)
             return SPELL_FAILED_NOT_READY;
     }
 
-    if (m_spellInfo->HasAttribute(SPELL_ATTR7_DEBUG_SPELL) && !m_caster->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS))
+    if (m_spellInfo->HasAttribute(SPELL_ATTR7_DEBUG_SPELL) && !m_caster->HasUnitFlag2(UNIT_FLAG2_ALLOW_CHEAT_SPELLS))
     {
         m_customError = SPELL_CUSTOM_ERROR_GM_ONLY;
         return SPELL_FAILED_CUSTOM_ERROR;
@@ -5934,7 +5934,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (m_caster->GetTypeId() != TYPEID_PLAYER || !m_targets.GetUnitTarget() || m_targets.GetUnitTarget()->GetTypeId() != TYPEID_UNIT)
                         return SPELL_FAILED_BAD_TARGETS;
 
-                    if (!(m_targets.GetUnitTarget()->GetUInt32Value(UNIT_FIELD_FLAGS) & UNIT_FLAG_SKINNABLE))
+                    if (!(m_targets.GetUnitTarget()->GetUnitFlags() & UNIT_FLAG_SKINNABLE))
                         return SPELL_FAILED_TARGET_UNSKINNABLE;
 
                     Creature* creature = m_targets.GetUnitTarget()->ToCreature();
@@ -6532,7 +6532,7 @@ SpellCastResult Spell::CheckCasterAuras(bool preventionOnly) const
     // Check whether the cast should be prevented by any state you might have.
     SpellCastResult prevented_reason = SPELL_CAST_OK;
     // Have to check if there is a stun aura. Otherwise will have problems with ghost aura apply while logging out
-    uint32 unitflag = m_caster->GetUInt32Value(UNIT_FIELD_FLAGS);     // Get unit state
+    uint32 unitflag = m_caster->GetUnitFlags();     // Get unit state
 
     // Xinef: if spell is triggered check preventionType only
     if (!preventionOnly)
@@ -7584,7 +7584,7 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
 
     // xinef: skip los checking if spell has appropriate attribute, or target requires specific entry
     // this is only for target addition and target has to have unselectable flag, this is valid for FLAG_EXTRA_TRIGGER and quest triggers however there are some without this flag, used not_selectable
-    if (m_spellInfo->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT) || (target->GetTypeId() == TYPEID_UNIT && target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE) && (m_spellInfo->Effects[eff].TargetA.GetCheckType() == TARGET_CHECK_ENTRY || m_spellInfo->Effects[eff].TargetB.GetCheckType() == TARGET_CHECK_ENTRY)))
+    if (m_spellInfo->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT) || (target->GetTypeId() == TYPEID_UNIT && target->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) && (m_spellInfo->Effects[eff].TargetA.GetCheckType() == TARGET_CHECK_ENTRY || m_spellInfo->Effects[eff].TargetB.GetCheckType() == TARGET_CHECK_ENTRY)))
         return true;
 
      // if spell is triggered, need to check for LOS disable on the aura triggering it and inherit that behaviour
@@ -7620,7 +7620,7 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
             {
                 if (!m_targets.GetCorpseTargetGUID())
                 {
-                    if (target->IsWithinLOSInMap(m_caster, LINEOFSIGHT_ALL_CHECKS) && target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE))
+                    if (target->IsWithinLOSInMap(m_caster, LINEOFSIGHT_ALL_CHECKS) && target->HasUnitFlag(UNIT_FLAG_SKINNABLE))
                         return true;
 
                     return false;
