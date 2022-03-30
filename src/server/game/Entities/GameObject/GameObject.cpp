@@ -2457,16 +2457,16 @@ void GameObject::SetGoState(GOState state)
      * save it's state on the database to be loaded properly
      * on server restart or crash.
      */
-    if (IsInstanceGameobject())
+    if (IsInstanceGameobject() && IsAbleToSaveOnDb())
     {
         // Save the gameobject state on the Database
         if (!FindStateSavedOnInstance())
         {
-            SaveInstanceData(GetGameobjectStateAsShort(&state));
+            SaveInstanceData(GetGameobjectState(&state));
         }
         else
         {
-            UpdateInstanceData(GetGameobjectStateAsShort(&state));
+            UpdateInstanceData(GetGameobjectState(&state));
         }
     }
 }
@@ -2505,7 +2505,7 @@ bool GameObject::ValidateGameobjectType()
     }
 }
 
-uint8 GameObject::GetGameobjectStateAsShort(GOState* state)
+uint8 GameObject::GetGameobjectState(GOState* state)
 {
     uint8 m_state = 3;
 
@@ -2516,21 +2516,45 @@ uint8 GameObject::GetGameobjectStateAsShort(GOState* state)
             case GO_STATE_ACTIVE:
                 m_state = 0;
                 return m_state;
-                break;
             case GO_STATE_READY:
                 m_state = 1;
                 return m_state;
-                break;
             case GO_STATE_ACTIVE_ALTERNATIVE:
                 m_state = 2;
                 return m_state;
-                break;
         }
     }
 
     // Returning any value that is not one of the specified ones
     // Which will default into the invalid part of the switch
     return m_state;
+}
+
+bool GameObject::IsAbleToSaveOnDb()
+{
+    return m_saveStateOnDb;
+}
+
+void GameObject::UpdateSaveToDb(bool enable)
+{
+    m_saveStateOnDb = enable;
+
+    if (enable)
+    {
+        SavingStateOnDB();
+    }
+}
+
+void GameObject::SavingStateOnDB()
+{
+    if (IsInstanceGameobject())
+    {
+        GOState param = GetGoState();
+        if (!FindStateSavedOnInstance())
+        {
+            SaveInstanceData(GetGameobjectState(&param));
+        }
+    }
 }
 
 void GameObject::SaveInstanceData(uint8 state)

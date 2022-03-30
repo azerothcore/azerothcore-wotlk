@@ -988,7 +988,19 @@ public:
     bool ValidateGameobjectType();
     uint8 GetStateSavedOnInstance();
     bool IsInstanceGameobject();
-    uint8 GetGameobjectStateAsShort(GOState* state);
+    uint8 GetGameobjectState(GOState* state);
+
+    /* A check to verify if this object is available to be saved on the DB when
+     * a state change occurs
+     */
+    bool IsAbleToSaveOnDb();
+
+    /* Enable or Disable the ability to save on the database this gameobject's state
+     * whenever it changes
+     */
+    void UpdateSaveToDb(bool enable);
+
+    void SavingStateOnDB();
 protected:
     bool AIM_Initialize();
     GameObjectModel* CreateModel();
@@ -1045,5 +1057,7 @@ private:
         return IsInRange(obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), dist2compare);
     }
     GameObjectAI* m_AI;
+
+    bool m_saveStateOnDb = false;
 };
 #endif

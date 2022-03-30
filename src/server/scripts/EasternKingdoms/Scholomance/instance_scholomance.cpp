@@ -62,6 +62,9 @@ public:
                 case GO_GATE_KIRTONOS:
                     GateKirtonosGUID = go->GetGUID();
                     break;
+                case GO_DOOR_OPENED_WITH_KEY:
+                    go->UpdateSaveToDb(true);
+                    break;
                 case GO_GATE_GANDLING_DOWN_NORTH:
                     GandlingGatesGUID[0] = go->GetGUID();
                     break;
