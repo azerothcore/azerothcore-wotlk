@@ -1,46 +1,5 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1647677899565690722');
 
-DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceEntry` IN (15290, 59725);
-INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-                                                                                                                                                                                                                                                                                                  (13, 1, 15290, 0, 0, 33, 0, 1, 0, 0, 1, 0, 0, '', 'Spell Vampiric Embrace (effect 0) will hit the potential target of the spell if target is not the same as condition target.');
-DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=24 AND `SourceGroup`=0 AND `SourceEntry` IN (38164,70805);
-INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-
--- Threat of Thassarian triggered spells, for easier script access
-DELETE FROM `spell_ranks` WHERE `first_spell_id` IN (59133,66198,66196,66216,66188,66215);
-INSERT INTO `spell_ranks` (`first_spell_id`, `spell_id`, `rank`) VALUES
-(66198, 66198, 1),
-(66198, 66972, 2),
-(66198, 66973, 3),
-(66198, 66974, 4),
-
-(66196, 66196, 1),
-(66196, 66958, 2),
-(66196, 66959, 3),
-(66196, 66960, 4),
-(66196, 66961, 5),
-(66196, 66962, 6),
-
-(66216, 66216, 1),
-(66216, 66988, 2),
-(66216, 66989, 3),
-(66216, 66990, 4),
-(66216, 66991, 5),
-(66216, 66992, 6),
-
-(66188, 66188, 1),
-(66188, 66950, 2),
-(66188, 66951, 3),
-(66188, 66952, 4),
-(66188, 66953, 5),
-
-(66215, 66215, 1),
-(66215, 66975, 2),
-(66215, 66976, 3),
-(66215, 66977, 4),
-(66215, 66978, 5),
-(66215, 66979, 6);
-
 -- Earth shield heal is DAMAGE_CLASS_NONE, it won't scale
 -- Entry is unneeded
 DELETE FROM `spell_bonus_data` WHERE `entry`=379;
@@ -75,11 +34,29 @@ DELETE FROM `spell_script_names` WHERE `ScriptName` IN
 'spell_deathbringer_blood_beast_blood_link', 'spell_putricide_ooze_tank_protection', 'spell_mark_of_malice', 'spell_twisted_reflection'
 'spell_pet_guard_dog', 'spell_pet_silverback', 'spell_pet_culling_the_herd', 'spell_item_argent_dawn_commission','spell_warr_victorious','spell_dk_rune_strike_proc','spell_pet_charge',
 'spell_pri_pain_and_suffering_dummy', 'spell_warr_item_t10_prot_4p_bonus', 'spell_warr_deep_wounds_aura', 'spell_warr_extra_proc', 'spell_warr_glyph_of_blocking', 'spell_warr_second_wind'
-'spell_warr_t3_prot_8p_bonus');
+'spell_warr_t3_prot_8p_bonus', 'spell_warl_demonic_pact', 'spell_warl_decimation', 'spell_warl_seed_of_corruption_dummy',
+'spell_warl_seed_of_corruption_generic', 'spell_warl_soul_leech', 'spell_warl_t4_2p_bonus_shadow', 'spell_warl_t4_2p_bonus_fire',
+'spell_warl_glyph_of_corruption_nightfall', 'spell_warl_glyph_of_life_tap');
 
 DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_gen_proc_above_75' AND `spell_id` = 64568;
 
 INSERT INTO `spell_script_names` (`spell_id`,`ScriptName`) VALUES
+(53646,  'spell_warl_demonic_pact'),
+(54909,  'spell_warl_demonic_pact'),
+(-63156, 'spell_warl_decimation'),
+(-30293, 'spell_warl_soul_leech'),
+(37377,  'spell_warl_t4_2p_bonus_shadow'),
+(39437,  'spell_warl_t4_2p_bonus_fire'),
+(63320,  'spell_warl_glyph_of_life_tap'),
+(-27243, 'spell_warl_seed_of_corruption_dummy'),
+(32863,  'spell_warl_seed_of_corruption_generic'),
+(36123,  'spell_warl_seed_of_corruption_generic'),
+(38252,  'spell_warl_seed_of_corruption_generic'),
+(39367,  'spell_warl_seed_of_corruption_generic'),
+(44141,  'spell_warl_seed_of_corruption_generic'),
+(70388,  'spell_warl_seed_of_corruption_generic'),
+(-18094, 'spell_warl_glyph_of_corruption_nightfall'),
+(56218,  'spell_warl_glyph_of_corruption_nightfall'),
 (-49200, 'spell_dk_acclimation'),                       -- DK Acclimation
 (70656, 'spell_dk_advantage_t10_4p'),                   -- DK Advantage t10 4p melee
 (37336, 'spell_dru_forms_trinket'),                     -- Druid Forms Trinket
@@ -973,3 +950,38 @@ INSERT INTO `spell_proc` (`SpellId`, `SchoolMask`, `SpellFamilyName`, `SpellFami
 (-14143, 0, 8, 1191182854, 2097152, 0, 0, 1, 2, 0, 8, 0, 0, 0, 0, 0),
 (60617, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0),
 (40816, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 7000, 0);
+
+-- Threat of Thassarian triggered spells, for easier script access
+DELETE FROM `spell_ranks` WHERE `first_spell_id` IN (59133,66198,66196,66216,66188,66215);
+INSERT INTO `spell_ranks` (`first_spell_id`, `spell_id`, `rank`) VALUES
+(66198, 66198, 1),
+(66198, 66972, 2),
+(66198, 66973, 3),
+(66198, 66974, 4),
+
+(66196, 66196, 1),
+(66196, 66958, 2),
+(66196, 66959, 3),
+(66196, 66960, 4),
+(66196, 66961, 5),
+(66196, 66962, 6),
+
+(66216, 66216, 1),
+(66216, 66988, 2),
+(66216, 66989, 3),
+(66216, 66990, 4),
+(66216, 66991, 5),
+(66216, 66992, 6),
+
+(66188, 66188, 1),
+(66188, 66950, 2),
+(66188, 66951, 3),
+(66188, 66952, 4),
+(66188, 66953, 5),
+
+(66215, 66215, 1),
+(66215, 66975, 2),
+(66215, 66976, 3),
+(66215, 66977, 4),
+(66215, 66978, 5),
+(66215, 66979, 6);
