@@ -71,7 +71,7 @@ public:
         EventMap events2;
         void Reset() override
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             EventStage = EVENT_STAGE_NONE;
             PeonEngagedCount = 0;
             PeonKilledCount = 0;
@@ -194,7 +194,7 @@ public:
                 {
                     Talk(SAY_AGGRO);
                     EventStage = EVENT_STAGE_MAIN;
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     if (Unit* target = me->SelectNearestPlayer(50.0f))
                         AttackStart(target);
 

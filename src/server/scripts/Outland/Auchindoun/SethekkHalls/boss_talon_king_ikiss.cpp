@@ -199,7 +199,7 @@ public:
         boss_anzuAI(Creature* creature) : ScriptedAI(creature), summons(me)
         {
             talkTimer = 1;
-            me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->ReplaceAllUnitFlags(UNIT_FLAG_NON_ATTACKABLE);
             me->AddAura(SPELL_SHADOWFORM, me);
         }
 
@@ -268,7 +268,7 @@ public:
                 }
                 else if (talkTimer >= 16000)
                 {
-                    me->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
+                    me->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
                     me->RemoveAurasDueToSpell(SPELL_SHADOWFORM);
                     Talk(SAY_ANZU_INTRO2);
                     talkTimer = 0;

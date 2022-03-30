@@ -293,7 +293,7 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_IMPALE:
-                    if( !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) )
+                    if( !me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
                         if( Unit* victim = me->GetVictim() )
                             me->CastSpell(victim, SPELL_IMPALE, false);
@@ -406,7 +406,7 @@ public:
         {
             events.Reset();
             summons.DespawnAll();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             if( pInstance )
                 pInstance->SetData(TYPE_FAILED, 1);
         }
@@ -491,11 +491,11 @@ struct boss_jormungarAI : public ScriptedAI
         switch( param )
         {
             case -1:
-                if( !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) )
+                if( !me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE) )
                     events.RescheduleEvent(EVENT_SUBMERGE, 1500);
                 break;
             case -2:
-                if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) )
+                if( me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE) )
                     bIsStationary = true; // it will come out mobile soon
                 else if( me->GetDisplayId() == _MODEL_STATIONARY )
                     events.RescheduleEvent(EVENT_SUBMERGE, 1000);
@@ -568,7 +568,7 @@ struct boss_jormungarAI : public ScriptedAI
             case EVENT_SUBMERGE:
                 {
                     bIsStationary = (me->GetDisplayId() == _MODEL_STATIONARY);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                     me->CastSpell(me, SPELL_SUBMERGE_0, false);
                     Talk(EMOTE_SUBMERGE);
 
@@ -588,7 +588,7 @@ struct boss_jormungarAI : public ScriptedAI
                     {
                         c->SetSpeed(MOVE_RUN, 2.5f);
                         c->CastSpell(c, SPELL_CHURNING_GROUND, true);
-                        c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_PACIFIED);
+                        c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_PACIFIED);
                         c->GetMotionMaster()->MovePoint(0, Locs[LOC_CENTER].GetPositionX() + cos(angle)*dist, Locs[LOC_CENTER].GetPositionY() + std::sin(angle)*dist, me->GetPositionZ());
                     }
                     me->UpdatePosition(Locs[LOC_CENTER].GetPositionX() + cos(angle)*dist, Locs[LOC_CENTER].GetPositionY() + std::sin(angle)*dist, me->GetPositionZ(), me->GetOrientation(), true);
@@ -618,7 +618,7 @@ struct boss_jormungarAI : public ScriptedAI
                     me->RemoveAurasDueToSpell(SPELL_SUBMERGE_0);
                     me->CastSpell(me, SPELL_EMERGE_0, false);
                     Talk(EMOTE_EMERGE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                     ScheduleEvents();
                 }
                 break;
@@ -647,7 +647,7 @@ struct boss_jormungarAI : public ScriptedAI
                 break;
         }
 
-        if( !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) )
+        if( !me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE) )
         {
             if( me->GetDisplayId() == _MODEL_STATIONARY )
                 DoSpellAttackIfReady(_SPELL_SPIT);
@@ -670,7 +670,7 @@ struct boss_jormungarAI : public ScriptedAI
     void EnterEvadeMode() override
     {
         events.Reset();
-        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         if( pInstance )
             pInstance->SetData(TYPE_FAILED, 1);
     }
@@ -1003,7 +1003,7 @@ public:
         void EnterEvadeMode() override
         {
             events.Reset();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             if( pInstance )
                 pInstance->SetData(TYPE_FAILED, 1);
         }

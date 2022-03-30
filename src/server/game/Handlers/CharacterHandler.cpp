@@ -33,6 +33,7 @@
 #include "InstanceSaveMgr.h"
 #include "Language.h"
 #include "Log.h"
+#include "MapMgr.h"
 #include "Metric.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
@@ -1150,7 +1151,7 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
 
     // Xinef: fix possible problem with flag UNIT_FLAG_STUNNED added during logout
     if (!pCurrChar->HasUnitState(UNIT_STATE_STUNNED))
-        pCurrChar->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+        pCurrChar->RemoveUnitFlag(UNIT_FLAG_STUNNED);
 
     pCurrChar->SendInitialPacketsBeforeAddToMap();
 
@@ -2174,33 +2175,97 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
 
         if (factionChangeInfo->FactionChange)
         {
-            // Delete all Flypaths
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_TAXI_PATH);
-            stmt->SetData(0, lowGuid);
-            trans->Append(stmt);
-
-            if (level > 7)
             {
-                // Update Taxi path
-                // this doesn't seem to be 100% blizzlike... but it can't really be helped.
-                std::ostringstream taximaskstream;
-                uint32 numFullTaximasks = level / 7;
+                // Delete all Flypaths
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_TAXI_PATH);
+                stmt->SetData(0, lowGuid);
+                trans->Append(stmt);
 
-                if (numFullTaximasks > 11)
-                    numFullTaximasks = 11;
+                // Update Taxi path
+                TaxiMask newTaxiMask;
+                memset(newTaxiMask, 0, sizeof(newTaxiMask));
 
                 TaxiMask const& factionMask = newTeam == TEAM_HORDE ? sHordeTaxiNodesMask : sAllianceTaxiNodesMask;
-                for (uint8 i = 0; i < numFullTaximasks; ++i)
+                for (auto const& itr : sTaxiPathSetBySource)
                 {
-                    uint8 deathKnightExtraNode = (playerClass == CLASS_DEATH_KNIGHT) ? sDeathKnightTaxiNodesMask[i] : 0;
-                    taximaskstream << uint32(factionMask[i] | deathKnightExtraNode) << ' ';
+                    auto FillTaxiMask = [&](uint8 field, uint32 mask)
+                    {
+                        if (playerClass == CLASS_DEATH_KNIGHT)
+                        {
+                            newTaxiMask[field] |= uint32(mask | (sDeathKnightTaxiNodesMask[field] & mask));
+                        }
+                        else
+                        {
+                            newTaxiMask[field] |= mask;
+                        }
+                    };
+
+                    uint32 nodeId = itr.first;
+                    uint8 field = (uint8)((nodeId - 1) / 32);
+                    uint32 submask = 1 << ((nodeId - 1) % 32);
+
+                    if ((factionMask[field] & submask) == 0)
+                    {
+                        FillTaxiMask(field, 0);
+                        continue;
+                    }
+
+                    TaxiPathSetForSource const& taxiPaths = itr.second;
+                    if (taxiPaths.empty())
+                    {
+                        FillTaxiMask(field, 0);
+                        continue;
+                    }
+
+                    TaxiPathEntry const* taxiPath = taxiPaths.begin()->second;
+                    if (!taxiPath)
+                    {
+                        FillTaxiMask(field, 0);
+                        continue;
+                    }
+
+                    TaxiPathNodeList const& taxiNodePaths = sTaxiPathNodesByPath[taxiPath->ID];
+                    if (taxiNodePaths.empty())
+                    {
+                        FillTaxiMask(field, 0);
+                        continue;
+                    }
+
+                    TaxiPathNodeEntry const* pathNode = taxiNodePaths.front();
+                    if (!pathNode)
+                    {
+                        FillTaxiMask(field, 0);
+                        continue;
+                    }
+
+                    AreaTableEntry const* zone = sAreaTableStore.LookupEntry(sMapMgr->GetZoneId(PHASEMASK_NORMAL, pathNode->mapid, pathNode->x, pathNode->y, pathNode->z));
+                    if (!zone)
+                    {
+                        FillTaxiMask(field, 0);
+                        continue;
+                    }
+
+                    LFGDungeonEntry const* lfgDungeon = GetZoneLFGDungeonEntry(zone->area_name[GetSessionDbLocaleIndex()], GetSessionDbLocaleIndex());
+                    if (!lfgDungeon)
+                    {
+                        FillTaxiMask(field, 0);
+                        continue;
+                    }
+
+                    // Get level from LFGDungeonEntry because the one from AreaTableEntry is not valid
+                    // If area level is too big, do not add new taxi
+                    if (lfgDungeon->minlevel > level)
+                    {
+                        FillTaxiMask(field, 0);
+                        continue;
+                    }
+
+                    FillTaxiMask(field, submask);
                 }
 
-                uint32 numEmptyTaximasks = 11 - numFullTaximasks;
-                for (uint8 i = 0; i < numEmptyTaximasks; ++i)
-                    taximaskstream << "0 ";
-
-                taximaskstream << '0';
+                std::ostringstream taximaskstream;
+                for (uint8 i = 0; i < TaxiMaskSize; ++i)
+                    taximaskstream << uint32(newTaxiMask[i]) << ' ';
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_TAXIMASK);
                 stmt->SetData(0, taximaskstream.str());
