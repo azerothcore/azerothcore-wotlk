@@ -54,6 +54,21 @@ enum MageSpells
     SPELL_MAGE_SUMMON_WATER_ELEMENTAL_PERMANENT  = 70908,
     SPELL_MAGE_SUMMON_WATER_ELEMENTAL_TEMPORARY  = 70907,
     SPELL_MAGE_GLYPH_OF_BLAST_WAVE               = 62126,
+
+    SPELL_MAGE_CHILLED                           = 12484,
+    SPELL_MAGE_MANA_SURGE                        = 37445,
+    SPELL_MAGE_MAGIC_ABSORPTION_MANA             = 29442,
+    SPELL_MAGE_ARCANE_POTENCY_RANK_1             = 57529,
+    SPELL_MAGE_ARCANE_POTENCY_RANK_2             = 57531,
+    SPELL_MAGE_HOT_STREAK_PROC                   = 48108,
+    SPELL_MAGE_ARCANE_SURGE                      = 37436,
+    SPELL_MAGE_COMBUSTION_PROC                   = 28682,
+    SPELL_MAGE_EMPOWERED_FIRE_PROC               = 67545,
+    SPELL_MAGE_T10_2P_BONUS                      = 70752,
+    SPELL_MAGE_T10_2P_BONUS_EFFECT               = 70753,
+    SPELL_MAGE_T8_4P_BONUS                       = 64869,
+    SPELL_MAGE_MISSILE_BARRAGE                   = 44401,
+    SPELL_MAGE_FINGERS_OF_FROST_AURASTATE_AURA   = 44544
 };
 
 // -31641 - Blazing Speed
@@ -956,6 +971,349 @@ class spell_mage_summon_water_elemental : public SpellScript
     }
 };
 
+// -31571 - Arcane Potency
+class spell_mage_arcane_potency : public AuraScript
+{
+    PrepareAuraScript(spell_mage_arcane_potency);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+        {
+            SPELL_MAGE_ARCANE_POTENCY_RANK_1,
+            SPELL_MAGE_ARCANE_POTENCY_RANK_2
+        });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        static uint32 const triggerSpell[2] = { SPELL_MAGE_ARCANE_POTENCY_RANK_1, SPELL_MAGE_ARCANE_POTENCY_RANK_2 };
+
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActor();
+        uint32 spellId = triggerSpell[GetSpellInfo()->GetRank() - 1];
+        caster->CastSpell(caster, spellId, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_mage_arcane_potency::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 11129 - Combustion
+class spell_mage_combustion : public AuraScript
+{
+    PrepareAuraScript(spell_mage_combustion);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_MAGE_COMBUSTION_PROC });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        // Do not take charges, add a stack of crit buff
+        if (!(eventInfo.GetHitMask() & PROC_HIT_CRITICAL))
+        {
+            eventInfo.GetActor()->CastSpell((Unit*)nullptr, SPELL_MAGE_COMBUSTION_PROC, true);
+            return false;
+        }
+
+        return true;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_mage_combustion::CheckProc);
+    }
+};
+
+// -11185 - Improved Blizzard
+class spell_mage_imp_blizzard : public AuraScript
+{
+    PrepareAuraScript(spell_mage_imp_blizzard);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_MAGE_CHILLED });
+    }
+
+    void HandleChill(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        uint32 triggerSpellId = sSpellMgr->GetSpellWithRank(SPELL_MAGE_CHILLED, GetSpellInfo()->GetRank());
+        eventInfo.GetActor()->CastSpell(eventInfo.GetProcTarget(), triggerSpellId, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_mage_imp_blizzard::HandleChill, EFFECT_0, SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
+    }
+};
+
+// 37447 - Improved Mana Gems
+// 61062 - Improved Mana Gems
+class spell_mage_imp_mana_gems : public AuraScript
+{
+    PrepareAuraScript(spell_mage_imp_mana_gems);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_MAGE_MANA_SURGE });
+    }
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        eventInfo.GetActor()->CastSpell((Unit*)nullptr, SPELL_MAGE_MANA_SURGE, true);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_mage_imp_mana_gems::HandleProc, EFFECT_1, SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
+    }
+};
+
+// -31656 - Empowered Fire
+class spell_mage_empowered_fire : public AuraScript
+{
+    PrepareAuraScript(spell_mage_empowered_fire);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_MAGE_EMPOWERED_FIRE_PROC });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
+            if (spellInfo->Id == SPELL_MAGE_IGNITE)
+                return true;
+
+        return false;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+
+        Unit* target = GetTarget();
+        int32 bp0 = int32(CalculatePct(target->GetCreateMana(), aurEff->GetAmount()));
+        target->CastCustomSpell(SPELL_MAGE_EMPOWERED_FIRE_PROC, SPELLVALUE_BASE_POINT0, bp0, target, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_mage_empowered_fire::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_mage_empowered_fire::HandleProc, EFFECT_0, SPELL_AURA_ADD_FLAT_MODIFIER);
+    }
+};
+
+// 74396 - Fingers of Frost
+class spell_mage_fingers_of_frost : public AuraScript
+{
+    PrepareAuraScript(spell_mage_fingers_of_frost);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_MAGE_FINGERS_OF_FROST_AURASTATE_AURA });
+    }
+
+    void HandleDummy(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        eventInfo.GetActor()->RemoveAuraFromStack(GetId());
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->RemoveAurasDueToSpell(SPELL_MAGE_FINGERS_OF_FROST_AURASTATE_AURA);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_mage_fingers_of_frost::HandleDummy, EFFECT_0, SPELL_AURA_DUMMY);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_mage_fingers_of_frost::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 48108 - Hot Streak
+// 57761 - Fireball!
+class spell_mage_gen_extra_effects : public AuraScript
+{
+    PrepareAuraScript(spell_mage_gen_extra_effects);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+                {
+                        SPELL_MAGE_T10_2P_BONUS,
+                        SPELL_MAGE_T10_2P_BONUS_EFFECT,
+                        SPELL_MAGE_T8_4P_BONUS
+                });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        Unit* caster = eventInfo.GetActor();
+        // Prevent double proc for Arcane missiles
+        if (caster == eventInfo.GetProcTarget())
+            return false;
+
+        // Proc chance is unknown, we'll just use dummy aura amount
+        if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_MAGE_T8_4P_BONUS, EFFECT_0))
+            if (roll_chance_i(aurEff->GetAmount()))
+                return false;
+
+        return true;
+    }
+
+    void HandleProc(ProcEventInfo& eventInfo)
+    {
+        Unit* caster = eventInfo.GetActor();
+
+        if (caster->HasAura(SPELL_MAGE_T10_2P_BONUS))
+            caster->CastSpell((Unit*)nullptr, SPELL_MAGE_T10_2P_BONUS_EFFECT, true);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_mage_gen_extra_effects::CheckProc);
+        OnProc += AuraProcFn(spell_mage_gen_extra_effects::HandleProc);
+    }
+};
+
+// 56375 - Glyph of Polymorph
+class spell_mage_glyph_of_polymorph : public AuraScript
+{
+    PrepareAuraScript(spell_mage_glyph_of_polymorph);
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* target = eventInfo.GetProcTarget();
+        target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, ObjectGuid::Empty, target->GetAura(32409)); // SW:D shall not be removed.
+        target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
+        target->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_mage_glyph_of_polymorph::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 56374 - Glyph of Icy Veins
+class spell_mage_glyph_of_icy_veins : public AuraScript
+{
+    PrepareAuraScript(spell_mage_glyph_of_icy_veins);
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActor();
+        caster->RemoveAurasByType(SPELL_AURA_HASTE_SPELLS, ObjectGuid::Empty, 0, true, false);
+        caster->RemoveAurasByType(SPELL_AURA_MOD_DECREASE_SPEED);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_mage_glyph_of_icy_veins::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// -44445 - Hot Streak
+class spell_mage_hot_streak : public AuraScript
+{
+    PrepareAuraScript(spell_mage_hot_streak);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_MAGE_HOT_STREAK_PROC });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        AuraEffect* counter = GetEffect(EFFECT_1);
+        if (!counter)
+            return;
+
+        // Count spell criticals in a row in second aura
+        if (eventInfo.GetHitMask() & PROC_HIT_CRITICAL)
+        {
+            counter->SetAmount(counter->GetAmount() * 2);
+            if (counter->GetAmount() < 100) // not enough
+                return;
+
+            // roll chance
+            if (!roll_chance_i(aurEff->GetAmount()))
+                return;
+
+            Unit* caster = eventInfo.GetActor();
+            caster->CastSpell(caster, SPELL_MAGE_HOT_STREAK_PROC, aurEff);
+        }
+
+        // reset counter
+        counter->SetAmount(25);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_mage_hot_streak::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// -29441 - Magic Absorption
+class spell_mage_magic_absorption : public AuraScript
+{
+    PrepareAuraScript(spell_mage_magic_absorption);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_MAGE_MAGIC_ABSORPTION_MANA });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActionTarget();
+        int32 bp = CalculatePct(static_cast<int32>(caster->GetMaxPower(POWER_MANA)), aurEff->GetAmount());
+        caster->CastCustomSpell(SPELL_MAGE_MAGIC_ABSORPTION_MANA, SPELLVALUE_BASE_POINT0, bp, caster, true);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_mage_magic_absorption::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// -44404 - Missile Barrage
+class spell_mage_missile_barrage : public AuraScript
+{
+    PrepareAuraScript(spell_mage_missile_barrage);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo)
+            return false;
+
+        // Arcane Blast - full chance
+        if (spellInfo->SpellFamilyFlags[0] & 0x20000000)
+            return true;
+
+        // Rest of spells have half chance
+        return roll_chance_i(50);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_mage_missile_barrage::CheckProc);
+    }
+};
+
 void AddSC_mage_spell_scripts()
 {
     RegisterSpellScript(spell_mage_blazing_speed);
@@ -980,4 +1338,16 @@ void AddSC_mage_spell_scripts()
     RegisterSpellScript(spell_mage_master_of_elements);
     RegisterSpellScript(spell_mage_polymorph_cast_visual);
     RegisterSpellScript(spell_mage_summon_water_elemental);
+    RegisterSpellScript(spell_mage_arcane_potency);
+    RegisterSpellScript(spell_mage_combustion);
+    RegisterSpellScript(spell_mage_imp_blizzard);
+    RegisterSpellScript(spell_mage_imp_mana_gems);
+    RegisterSpellScript(spell_mage_empowered_fire);
+    RegisterSpellScript(spell_mage_fingers_of_frost);
+    RegisterSpellScript(spell_mage_gen_extra_effects);
+    RegisterSpellScript(spell_mage_glyph_of_polymorph);
+    RegisterSpellScript(spell_mage_glyph_of_icy_veins);
+    RegisterSpellScript(spell_mage_hot_streak);
+    RegisterSpellScript(spell_mage_magic_absorption);
+    RegisterSpellScript(spell_mage_missile_barrage);
 }

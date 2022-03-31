@@ -42,6 +42,9 @@ enum RogueSpells
     SPELL_ROGUE_SHIV_TRIGGERED                  = 5940,
     SPELL_ROGUE_TRICKS_OF_THE_TRADE_DMG_BOOST   = 57933,
     SPELL_ROGUE_TRICKS_OF_THE_TRADE_PROC        = 59628,
+    SPELL_ROGUE_GLYPH_OF_BACKSTAB_TRIGGER       = 63975,
+    SPELL_ROGUE_QUICK_RECOVERY_ENERGY           = 31663,
+    SPELL_ROGUE_CRIPPLING_POISON                = 3409
 };
 
 class spell_rog_savage_combat : public AuraScript
@@ -672,6 +675,154 @@ class spell_rog_tricks_of_the_trade_proc : public AuraScript
     }
 };
 
+// -51664 - Cut to the Chase
+class spell_rog_cut_to_the_chase : public AuraScript
+{
+    PrepareAuraScript(spell_rog_cut_to_the_chase);
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        // "refresh your Slice and Dice duration to its 5 combo point maximum"
+        Unit* caster = eventInfo.GetActor();
+        // lookup Slice and Dice
+        if (AuraEffect const* snd = caster->GetAuraEffect(SPELL_AURA_MOD_MELEE_HASTE, SPELLFAMILY_ROGUE, 0x00040000, 0x00000000, 0x00000000, caster->GetGUID()))
+        {
+            // Max 5 cp duration
+            uint32 countMax = snd->GetSpellInfo()->GetMaxDuration();
+
+            snd->GetBase()->SetDuration(countMax, true);
+            snd->GetBase()->SetMaxDuration(snd->GetBase()->GetDuration());
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_rog_cut_to_the_chase::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// -51625 - Deadly Brew
+class spell_rog_deadly_brew : public AuraScript
+{
+    PrepareAuraScript(spell_rog_deadly_brew);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_ROGUE_CRIPPLING_POISON });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        eventInfo.GetActor()->CastSpell(eventInfo.GetProcTarget(), SPELL_ROGUE_CRIPPLING_POISON, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_rog_deadly_brew::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// -31244 - Quick Recovery
+class spell_rog_quick_recovery : public AuraScript
+{
+    PrepareAuraScript(spell_rog_quick_recovery);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_ROGUE_QUICK_RECOVERY_ENERGY });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo)
+            return;
+
+        Unit* caster = eventInfo.GetActor();
+        int32 amount = CalculatePct(spellInfo->CalcPowerCost(caster, spellInfo->GetSchoolMask()), aurEff->GetAmount());
+        caster->CastCustomSpell(SPELL_ROGUE_QUICK_RECOVERY_ENERGY, SPELLVALUE_BASE_POINT0, amount, (Unit*)nullptr, true);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_rog_quick_recovery::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 56800 - Glyph of Backstab (dummy)
+class spell_rog_glyph_of_backstab : public AuraScript
+{
+    PrepareAuraScript(spell_rog_glyph_of_backstab);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_ROGUE_GLYPH_OF_BACKSTAB_TRIGGER });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        eventInfo.GetActor()->CastSpell(eventInfo.GetProcTarget(), SPELL_ROGUE_GLYPH_OF_BACKSTAB_TRIGGER, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_rog_glyph_of_backstab::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// -13983 - Setup
+class spell_rog_setup : public AuraScript
+{
+    PrepareAuraScript(spell_rog_setup);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        if (Player* target = GetTarget()->ToPlayer())
+            if (eventInfo.GetActor() == target->GetSelectedUnit())
+                return true;
+
+        return false;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_rog_setup::CheckProc);
+    }
+};
+
+// -51627 - Turn the Tables
+class spell_rog_turn_the_tables : public AuraScript
+{
+    PrepareAuraScript(spell_rog_turn_the_tables);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo({ spellInfo->GetEffect(EFFECT_0).TriggerSpell });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        Unit* target = GetTarget();
+        target->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, true, nullptr, aurEff, caster->GetGUID());
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_rog_turn_the_tables::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_rogue_spell_scripts()
 {
     RegisterSpellScript(spell_rog_savage_combat);
@@ -687,4 +838,10 @@ void AddSC_rogue_spell_scripts()
     RegisterSpellScript(spell_rog_shiv);
     RegisterSpellScript(spell_rog_tricks_of_the_trade);
     RegisterSpellScript(spell_rog_tricks_of_the_trade_proc);
+    RegisterSpellScript(spell_rog_cut_to_the_chase);
+    RegisterSpellScript(spell_rog_deadly_brew);
+    RegisterSpellScript(spell_rog_quick_recovery);
+    RegisterSpellScript(spell_rog_glyph_of_backstab);
+    RegisterSpellScript(spell_rog_setup);
+    RegisterSpellScript(spell_rog_turn_the_tables);
 }
