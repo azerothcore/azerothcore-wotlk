@@ -71,7 +71,15 @@ enum HunterSpells
     SPELL_DRAENEI_GIFT_OF_THE_NAARU                 = 59543,
     SPELL_HUNTER_GLYPH_OF_ARCANE_SHOT               = 61389,
     SPELL_LOCK_AND_LOAD_TRIGGER                     = 56453,
-    SPELL_LOCK_AND_LOAD_MARKER                      = 67544
+    SPELL_LOCK_AND_LOAD_MARKER                      = 67544,
+    SPELL_HUNTER_LOCK_AND_LOAD_TRIGGER              = 56453,
+    SPELL_HUNTER_LOCK_AND_LOAD_MARKER               = 67544,
+    SPELL_HUNTER_KILL_COMMAND_HUNTER                = 34027,
+    SPELL_HUNTER_THRILL_OF_THE_HUNT_MANA            = 34720,
+    SPELL_REPLENISHMENT                             = 57669,
+    SPELL_HUNTER_RAPID_RECUPERATION_MANA_R1         = 56654,
+    SPELL_HUNTER_RAPID_RECUPERATION_MANA_R2         = 58882,
+    SPELL_HUNTER_GLYPH_OF_MEND_PET_HAPPINESS        = 57894
 };
 
 class spell_hun_check_pet_los : public SpellScript
@@ -418,7 +426,7 @@ class spell_hun_ascpect_of_the_viper : public AuraScript
     }
 };
 
-// 53209 Chimera Shot
+// 53209 - Chimera Shot
 class spell_hun_chimera_shot : public SpellScript
 {
     PrepareSpellScript(spell_hun_chimera_shot);
@@ -435,8 +443,8 @@ class spell_hun_chimera_shot : public SpellScript
         {
             uint32 spellId = 0;
             int32 basePoint = 0;
-            Unit::AuraApplicationMap& Auras = unitTarget->GetAppliedAuras();
-            for (Unit::AuraApplicationMap::iterator i = Auras.begin(); i != Auras.end(); ++i)
+            Unit::AuraApplicationMap const& auras = unitTarget->GetAppliedAuras();
+            for (Unit::AuraApplicationMap::const_iterator i = auras.begin(); i != auras.end(); ++i)
             {
                 Aura* aura = i->second->GetBase();
                 if (aura->GetCasterGUID() != caster->GetGUID())
@@ -446,53 +454,47 @@ class spell_hun_chimera_shot : public SpellScript
                 flag96 familyFlag = aura->GetSpellInfo()->SpellFamilyFlags;
                 if (!(familyFlag[1] & 0x00000080 || familyFlag[0] & 0x0000C000))
                     continue;
-                if (AuraEffect* aurEff = aura->GetEffect(0))
+                if (AuraEffect const* aurEff = aura->GetEffect(EFFECT_0))
                 {
                     // Serpent Sting - Instantly deals 40% of the damage done by your Serpent Sting.
                     if (familyFlag[0] & 0x4000)
                     {
-                        int32 TickCount = aurEff->GetTotalTicks();
                         spellId = SPELL_HUNTER_CHIMERA_SHOT_SERPENT;
-                        basePoint = aurEff->GetAmount();
-                        ApplyPct(basePoint, TickCount * 40);
-                        basePoint = unitTarget->SpellDamageBonusTaken(caster, aura->GetSpellInfo(), basePoint, DOT, aura->GetStackAmount());
+
+                        // calculate damage of basic tick (bonuses are already factored in AuraEffect)
+                        basePoint = aurEff->GetAmount() * aurEff->GetTotalTicks();
+                        ApplyPct(basePoint, 40);
                     }
-                    // Viper Sting - Instantly restores mana to you equal to 60% of the total amount drained by your Viper Sting.
+                        // Viper Sting - Instantly restores mana to you equal to 60% of the total amount drained by your Viper Sting.
                     else if (familyFlag[1] & 0x00000080)
                     {
-                        int32 TickCount = aura->GetEffect(0)->GetTotalTicks();
                         spellId = SPELL_HUNTER_CHIMERA_SHOT_VIPER;
 
-                        // Amount of one aura tick
-                        basePoint = int32(CalculatePct(unitTarget->GetMaxPower(POWER_MANA), aurEff->GetAmount()));
-                        int32 casterBasePoint = aurEff->GetAmount() * unitTarget->GetMaxPower(POWER_MANA) / 50; // TODO: Caster uses unitTarget?
-                        if (basePoint > casterBasePoint)
-                            basePoint = casterBasePoint;
-                        ApplyPct(basePoint, TickCount * 60);
+                        // % of mana drained in max duration
+                        basePoint = aurEff->GetAmount() * aurEff->GetTotalTicks();
+
+                        // max value
+                        int32 maxManaReturn = CalculatePct(static_cast<int32>(caster->GetMaxPower(POWER_MANA)), basePoint * 2);
+                        ApplyPct(basePoint, unitTarget->GetMaxPower(POWER_MANA));
+                        if (basePoint > maxManaReturn)
+                            basePoint = maxManaReturn;
+
+                        ApplyPct(basePoint, 60);
                     }
-                    // Scorpid Sting - Attempts to Disarm the target for 10 sec. This effect cannot occur more than once per 1 minute.
+                        // Scorpid Sting - Attempts to Disarm the target for 10 sec. This effect cannot occur more than once per 1 minute.
                     else if (familyFlag[0] & 0x00008000)
-                    {
-                        if (caster->ToPlayer()) // Scorpid Sting - Add 1 minute cooldown
-                        {
-                            if (caster->ToPlayer()->HasSpellCooldown(SPELL_HUNTER_CHIMERA_SHOT_SCORPID))
-                                break;
-
-                            caster->ToPlayer()->AddSpellCooldown(SPELL_HUNTER_CHIMERA_SHOT_SCORPID, 0, 60000);
-                        }
-
                         spellId = SPELL_HUNTER_CHIMERA_SHOT_SCORPID;
-                    }
 
                     // Refresh aura duration
                     aura->RefreshDuration();
-                    aurEff->ChangeAmount(aurEff->CalculateAmount(caster), false);
                 }
                 break;
             }
 
             if (spellId)
+            {
                 caster->CastCustomSpell(unitTarget, spellId, &basePoint, 0, 0, true);
+            }
         }
     }
 
@@ -1382,6 +1384,172 @@ class spell_hun_bestial_wrath : public SpellScript
     }
 };
 
+// 57870 - Glyph of Mend Pet
+class spell_hun_glyph_of_mend_pet : public AuraScript
+{
+    PrepareAuraScript(spell_hun_glyph_of_mend_pet);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_HUNTER_GLYPH_OF_MEND_PET_HAPPINESS });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        eventInfo.GetActor()->CastSpell(eventInfo.GetProcTarget(), SPELL_HUNTER_GLYPH_OF_MEND_PET_HAPPINESS, true);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_hun_glyph_of_mend_pet::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// -53290 - Hunting Party
+class spell_hun_hunting_party : public AuraScript
+{
+    PrepareAuraScript(spell_hun_hunting_party);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_REPLENISHMENT });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        eventInfo.GetActor()->CastSpell((Unit*)nullptr, SPELL_REPLENISHMENT, true);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_hun_hunting_party::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 58914 - Kill Command
+class spell_hun_kill_command_pet : public AuraScript
+{
+    PrepareAuraScript(spell_hun_kill_command_pet);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_HUNTER_KILL_COMMAND_HUNTER });
+    }
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        // prevent charge drop (aura has both proc charge and stacks)
+        PreventDefaultAction();
+
+        if (Unit* owner = eventInfo.GetActor()->GetOwner())
+            owner->RemoveAuraFromStack(SPELL_HUNTER_KILL_COMMAND_HUNTER);
+
+        ModStackAmount(-1);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_hun_kill_command_pet::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// -53228 - Rapid Recuperation (talent aura)
+class spell_hun_rapid_recuperation_trigger : public AuraScript
+{
+    PrepareAuraScript(spell_hun_rapid_recuperation_trigger);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+        {
+            SPELL_HUNTER_RAPID_RECUPERATION_MANA_R1,
+            SPELL_HUNTER_RAPID_RECUPERATION_MANA_R2
+        });
+    }
+
+    void HandleRapidFireProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        // Proc only from Rapid Fire
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo || !(spellInfo->SpellFamilyFlags[0] & 0x00000020))
+        {
+            PreventDefaultAction();
+            return;
+        }
+    }
+
+    void HandleRapidKillingProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        static uint32 const triggerSpells[2] = { SPELL_HUNTER_RAPID_RECUPERATION_MANA_R1, SPELL_HUNTER_RAPID_RECUPERATION_MANA_R2 };
+
+        PreventDefaultAction();
+
+        // Proc only from Rapid Killing
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo || !(spellInfo->SpellFamilyFlags[1] & 0x01000000))
+            return;
+
+        uint8 rank = GetSpellInfo()->GetRank();
+        uint32 spellId = triggerSpells[rank - 1];
+        eventInfo.GetActor()->CastSpell((Unit*)nullptr, spellId, true);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_hun_rapid_recuperation_trigger::HandleRapidFireProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+        OnEffectProc += AuraEffectProcFn(spell_hun_rapid_recuperation_trigger::HandleRapidKillingProc, EFFECT_1, SPELL_AURA_DUMMY);
+    }
+};
+
+// -34497 - Thrill of the Hunt
+class spell_hun_thrill_of_the_hunt : public AuraScript
+{
+    PrepareAuraScript(spell_hun_thrill_of_the_hunt);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_HUNTER_THRILL_OF_THE_HUNT_MANA });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo)
+            return;
+
+        Unit* caster = eventInfo.GetActor();
+        int32 amount = 0;
+
+        // Explosive Shot
+        if (spellInfo->SpellFamilyFlags[2] & 0x200)
+        {
+            if (AuraEffect const* explosiveShot = eventInfo.GetProcTarget()->GetAuraEffect(SPELL_AURA_PERIODIC_DUMMY, SPELLFAMILY_HUNTER, 0x00000000, 0x80000000, 0x00000000, caster->GetGUID()))
+            {
+                // due to Lock and Load SpellInfo::CalcPowerCost might return 0, so just calculate it manually
+                amount = CalculatePct(static_cast<int32>(CalculatePct(caster->GetCreateMana(), explosiveShot->GetSpellInfo()->ManaCostPercentage)), aurEff->GetAmount());
+
+                        ASSERT(explosiveShot->GetSpellInfo()->GetMaxTicks() > 0);
+                amount /= explosiveShot->GetSpellInfo()->GetMaxTicks();
+            }
+        }
+        else
+            amount = CalculatePct(static_cast<int32>(spellInfo->CalcPowerCost(caster, spellInfo->GetSchoolMask())), aurEff->GetAmount());
+
+        if (!amount)
+            return;
+
+        caster->CastCustomSpell(SPELL_HUNTER_THRILL_OF_THE_HUNT_MANA, SPELLVALUE_BASE_POINT0, amount, (Unit*)nullptr, true);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_hun_thrill_of_the_hunt::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 void AddSC_hunter_spell_scripts()
 {
     RegisterSpellScript(spell_hun_check_pet_los);
@@ -1414,4 +1582,9 @@ void AddSC_hunter_spell_scripts()
     RegisterSpellScript(spell_hun_lock_and_load);
     RegisterSpellScript(spell_hun_intimidation);
     RegisterSpellScript(spell_hun_bestial_wrath);
+    RegisterSpellScript(spell_hun_glyph_of_mend_pet);
+    RegisterSpellScript(spell_hun_hunting_party);
+    RegisterSpellScript(spell_hun_kill_command_pet);
+    RegisterSpellScript(spell_hun_rapid_recuperation_trigger);
+    RegisterSpellScript(spell_hun_thrill_of_the_hunt);
 }
