@@ -412,6 +412,8 @@ public:
                         {
                             if (Creature* nefarius = summon->FindNearestCreature(NPC_VICTOR_NEFARIUS, 500.f, true))
                             {
+                                victorNefariusGUID = nefarius->GetGUID();
+
                                 if (nefarius->AI())
                                 {
                                     nefarius->AI()->DoAction(ACTION_NEFARIUS_ADD_KILLED);
