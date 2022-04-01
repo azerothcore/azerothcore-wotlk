@@ -417,7 +417,7 @@ public:
                 {
                     me->SetStandState(UNIT_STAND_STATE_DEAD);
                     me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
-                    me->SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                    me->ReplaceAllDynamicFlags(UNIT_DYNFLAG_DEAD);
                 }
                 _phase = 0;
             }
