@@ -4363,7 +4363,7 @@ class spell_item_healing_touch_refund : public AuraScript
         return ValidateSpellInfo({ SPELL_HEALING_TOUCH_MANA });
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* /* aurEff */, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
         eventInfo.GetActor()->CastSpell((Unit*)nullptr, SPELL_HEALING_TOUCH_MANA, true);

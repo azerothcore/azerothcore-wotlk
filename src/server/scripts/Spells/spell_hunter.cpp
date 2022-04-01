@@ -1416,7 +1416,7 @@ class spell_hun_hunting_party : public AuraScript
         return ValidateSpellInfo({ SPELL_REPLENISHMENT });
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* /* aurEff */, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
         eventInfo.GetActor()->CastSpell((Unit*)nullptr, SPELL_REPLENISHMENT, true);
