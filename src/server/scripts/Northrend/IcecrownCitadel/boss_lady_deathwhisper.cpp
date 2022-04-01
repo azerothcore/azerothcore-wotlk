@@ -744,7 +744,7 @@ public:
                     break;
                 case EVENT_CULTIST_DARK_MARTYRDOM_REVIVE:
                     me->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
-                    me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                    me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
                     me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                     me->UpdateEntry(NPC_REANIMATED_FANATIC);
                     me->RemoveUnitFlag(UNIT_FLAG_STUNNED | UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
@@ -759,7 +759,7 @@ public:
                     me->CastSpell(me, SPELL_PERMANENT_FEIGN_DEATH, true);
                     me->CastSpell(me, SPELL_CLEAR_ALL_DEBUFFS, true);
                     me->CastSpell(me, SPELL_FULL_HEAL, true);
-                    me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                    me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
                     me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                     me->SetUnitFlag(UNIT_FLAG_STUNNED | UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
                     Reset();
@@ -865,7 +865,7 @@ public:
                     break;
                 case EVENT_CULTIST_DARK_MARTYRDOM_REVIVE:
                     me->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
-                    me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                    me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
                     me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                     me->UpdateEntry(NPC_REANIMATED_ADHERENT);
                     me->RemoveUnitFlag(UNIT_FLAG_STUNNED | UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
@@ -880,7 +880,7 @@ public:
                     me->CastSpell(me, SPELL_PERMANENT_FEIGN_DEATH, true);
                     me->CastSpell(me, SPELL_CLEAR_ALL_DEBUFFS, true);
                     me->CastSpell(me, SPELL_FULL_HEAL, true);
-                    me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                    me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
                     me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                     me->SetUnitFlag(UNIT_FLAG_STUNNED | UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
                     Reset();

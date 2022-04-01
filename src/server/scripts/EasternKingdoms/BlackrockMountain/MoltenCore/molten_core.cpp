@@ -132,7 +132,7 @@ public:
             }
 
             creatureTarget->CastSpell(creatureTarget, SPELL_PLAY_DEAD_PACIFY, true);
-            creatureTarget->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+            creatureTarget->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
             creatureTarget->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
             //creatureTarget->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             creatureTarget->SetReactState(REACT_PASSIVE);
@@ -150,7 +150,7 @@ public:
             }
 
             creatureTarget->RemoveAurasDueToSpell(SPELL_PLAY_DEAD_PACIFY);
-            creatureTarget->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+            creatureTarget->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
             creatureTarget->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
             //creatureTarget->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             creatureTarget->SetControlled(false, UNIT_STATE_ROOT);
