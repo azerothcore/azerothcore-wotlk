@@ -156,7 +156,7 @@ public:
                 me->CastSpell(me, SPELL_BK_FEIGN_DEATH, true);
                 me->SetUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
                 me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
-                me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
                 me->AddUnitState(UNIT_STATE_DIED);
             }
         }
@@ -198,7 +198,7 @@ public:
 
                     me->RemoveUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
                     me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
-                    me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                    me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
                     me->ClearUnitState(UNIT_STATE_DIED);
 
                     ++Phase;

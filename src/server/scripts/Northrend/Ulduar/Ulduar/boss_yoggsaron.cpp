@@ -1733,26 +1733,42 @@ class boss_yoggsaron_descend_portal : public CreatureScript
 public:
     boss_yoggsaron_descend_portal() : CreatureScript("boss_yoggsaron_descend_portal") { }
 
-    bool OnGossipHello(Player* player, Creature* creature) override
+    struct boss_yoggsaron_descend_portalAI : public PassiveAI
     {
-        if (!creature->GetUInt32Value(UNIT_NPC_FLAGS))
-            return true;
-        switch (creature->GetArmor())
+        boss_yoggsaron_descend_portalAI(Creature* creature) : PassiveAI(creature), _instance(creature->GetInstanceScript()) {}
+
+        void OnSpellClick(Unit* clicker, bool& spellClickHandled) override
         {
-            case ACTION_ILLUSION_DRAGONS:
-                player->CastSpell(player, SPELL_TELEPORT_TO_CHAMBER, true);
-                break;
-            case ACTION_ILLUSION_ICECROWN:
-                player->CastSpell(player, SPELL_TELEPORT_TO_ICECROWN, true);
-                break;
-            case ACTION_ILLUSION_STORMWIND:
-                player->CastSpell(player, SPELL_TELEPORT_TO_STORMWIND, true);
-                break;
+            if (!spellClickHandled)
+                return;
+
+            if (!me->GetUInt32Value(UNIT_NPC_FLAGS))
+                return;
+
+            switch (me->GetArmor())
+            {
+                case ACTION_ILLUSION_DRAGONS:
+                    clicker->CastSpell(clicker, SPELL_TELEPORT_TO_CHAMBER, true);
+                    break;
+                case ACTION_ILLUSION_ICECROWN:
+                    clicker->CastSpell(clicker, SPELL_TELEPORT_TO_ICECROWN, true);
+                    break;
+                case ACTION_ILLUSION_STORMWIND:
+                    clicker->CastSpell(clicker, SPELL_TELEPORT_TO_STORMWIND, true);
+                    break;
+            }
+
+            me->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+            me->DespawnOrUnsummon(1000);
         }
 
-        creature->SetUInt32Value(UNIT_NPC_FLAGS, 0);
-        creature->DespawnOrUnsummon(1000);
-        return true;
+    private:
+        InstanceScript* _instance;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetUlduarAI<boss_yoggsaron_descend_portalAI>(creature);
     }
 };
 

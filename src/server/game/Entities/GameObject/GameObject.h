@@ -771,6 +771,9 @@ public:
     void RemoveFromWorld() override;
     void CleanupsBeforeDelete(bool finalCleanup = true) override;
 
+    uint32 GetDynamicFlags() const override { return GetUInt32Value(GAMEOBJECT_DYNAMIC); }
+    void ReplaceAllDynamicFlags(uint32 flag) override { SetUInt32Value(GAMEOBJECT_DYNAMIC, flag); }
+
     virtual bool Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0);
     void Update(uint32 p_time) override;
     [[nodiscard]] GameObjectTemplate const* GetGOInfo() const { return m_goInfo; }
