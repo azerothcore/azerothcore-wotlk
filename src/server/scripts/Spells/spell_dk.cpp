@@ -2385,7 +2385,7 @@ class spell_dk_pvp_4p_bonus : public AuraScript
         return (spellInfo->GetAllEffectsMechanicMask() & ((1 << MECHANIC_ROOT) | (1 << MECHANIC_SNARE))) != 0;
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* /* aurEff */, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
         eventInfo.GetActionTarget()->CastSpell((Unit*)nullptr, SPELL_DK_RUNIC_RETURN, true);

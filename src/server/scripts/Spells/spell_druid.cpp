@@ -1635,7 +1635,7 @@ class spell_dru_t4_2p_bonus : public AuraScript
         return ValidateSpellInfo({ SPELL_DRUID_INFUSION });
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* /* aurEff */, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
         eventInfo.GetActor()->CastSpell((Unit*)nullptr, SPELL_DRUID_INFUSION, true);
