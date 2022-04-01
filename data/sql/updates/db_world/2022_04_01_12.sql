@@ -1,3 +1,19 @@
+-- DB update 2022_04_01_11 -> 2022_04_01_12
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_04_01_11';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_04_01_11 2022_04_01_12 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1648472357238223188'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1648472357238223188');
 
 REPLACE INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `VerifiedBuild`) VALUES
@@ -360,3 +376,13 @@ REPLACE INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `Verifie
 (10992, 'ruRU', 'Теперь, когда у нас есть все сущности, Мортис Шепчущее Крыло должен найти способ объединить их в амулет, который ты сможешь использовать, чтобы бросить вызов богу-ворону, вытащив его из Изумрудного сна и победить его. Я пошлю ему свои заметки о духах в надежде, что он поймет ценность моей проницательности.$B$BКаждый из духов благословил чары, которые я приготовил для тебя.', 0), 
 (10993, 'ruRU', '<Мортис принимает посылку, открывает его, чтобы найти заметки Арторна, и перечитывает их, молча.>$B$BС одной стороны, я рад, наконец, узнать личность нашего врага, но этот Анзу обладает значительной силой. Знание природы и происхождения нашего противника жизненно важно, но мы еще не готовы встретиться с ним лицом к лицу.', 0), 
 (10994, 'ruRU', '<Мортис сразу же хочет посмеяться над вашей историей и осознает, насколько близко вы были к потере лунного камня. Он останавливается и смотрит на светящийся камень.>$B$BЯ займусь тем, что наполню его эссенциями птичьего духа. Вскоре ты будешь $Gготов:готова; бросить вызов нашему врагу.', 0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_04_01_12' WHERE sql_rev = '1648472357238223188';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
