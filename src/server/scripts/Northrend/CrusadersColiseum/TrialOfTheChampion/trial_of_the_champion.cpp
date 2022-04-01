@@ -109,7 +109,7 @@ public:
                 return;
             if( pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_ALLIANCE )
                 me->UpdateEntry(NPC_ARELAS);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE); // removed during black knight scene
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE); // removed during black knight scene
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override

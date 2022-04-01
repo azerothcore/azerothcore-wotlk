@@ -255,7 +255,7 @@ public:
                 me->SetFaction(FACTION_FRIENDLY);
                 me->SetStandState(UNIT_STAND_STATE_SIT_HIGH_CHAIR);
                 me->RemoveAura(SPELL_NEFARIANS_BARRIER);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             }
         }
 
@@ -467,7 +467,7 @@ public:
                 me->SetFaction(FACTION_DRAGONFLIGHT_BLACK);
                 me->SetUInt32Value(UNIT_NPC_FLAGS, 0);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
                 // Due to Nefarius despawning himself on Vael, we need to update the guid on instance to prevent unwanted behaviours as encounter not resetting at all.
                 instance->SetGuidData(DATA_LORD_VICTOR_NEFARIUS, me->GetGUID());
             }
@@ -501,7 +501,7 @@ struct boss_nefarian : public BossAI
     {
         Initialize();
         me->SetReactState(REACT_PASSIVE);
-        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         me->SetCanFly(true);
         me->SetDisableGravity(true);
         if (_introDone) // already in combat, reset properly.
@@ -569,7 +569,7 @@ struct boss_nefarian : public BossAI
         me->SetDisableGravity(false);
         Position land = me->GetPosition();
         me->GetMotionMaster()->MoveLand(0, land, 8.5f);
-        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         me->GetMotionMaster()->MoveIdle();
 
         me->SetReactState(REACT_AGGRESSIVE);
@@ -703,7 +703,7 @@ struct boss_nefarian : public BossAI
                 {
                     (*itr)->Respawn();
                     DoZoneInCombat((*itr));
-                    (*itr)->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    (*itr)->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     (*itr)->SetReactState(REACT_AGGRESSIVE);
                     (*itr)->SetStandState(UNIT_STAND_STATE_STAND);
                 }

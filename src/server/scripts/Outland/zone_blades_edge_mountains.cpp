@@ -149,7 +149,7 @@ public:
 
             if (Creature* Target = GetClosestCreatureWithEntry(me, NPC_DEATHS_DOOR_FEL_CANNON, 200.0f))
             {
-                Target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1); // attack the cannon
+                Target->RemoveUnitFlag(UNIT_FLAG_NOT_ATTACKABLE_1); // attack the cannon
                 summoned->AI()->AttackStart(Target);
             }
         }
@@ -197,7 +197,7 @@ public:
 
         void Reset() override
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_ATTACKABLE_1);
+            me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_ATTACKABLE_1);
         }
 
         void UpdateAI(uint32 /*diff*/) override
@@ -311,7 +311,7 @@ public:
         void MoveInLineOfSight(Unit* who) override
 
         {
-            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+            if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                 return;
 
             ScriptedAI::MoveInLineOfSight(who);
@@ -345,7 +345,7 @@ public:
                 if (me->GetEntry() == ENTRY_NIHIL)
                 {
                     Talk(SAY_NIHIL_INTERRUPT);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     IsNihil = false;
                 }
 
@@ -354,7 +354,7 @@ public:
                     if (entry_list[cid] == ENTRY_NIHIL)
                     {
                         EnterEvadeMode();
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                         IsNihil = true;
                     }
                     else
@@ -388,7 +388,7 @@ public:
                             ++NihilSpeech_Phase;
                             break;
                         case 4:
-                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                             //take off to location above
                             me->GetMotionMaster()->MovePoint(0, me->GetPositionX() + 50.0f, me->GetPositionY(), me->GetPositionZ() + 50.0f);
                             ++NihilSpeech_Phase;

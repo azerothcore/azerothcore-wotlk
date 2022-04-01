@@ -1814,7 +1814,7 @@ NpcRegenHPTimeIfTargetIsUnreachable = 10
 #                                                                                      Racial Trait Swap, NPC - All Mounts Modules
 #        Default:     ""
 
-Creatures.CustomIDs = "190010,55005,999991,25462,98888,601014"
+Creatures.CustomIDs = "190010,55005,999991,25462,98888,601014,34567,34568"
 
 #
 ###################################################################################################

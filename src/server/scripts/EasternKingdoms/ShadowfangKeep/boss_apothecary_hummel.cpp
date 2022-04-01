@@ -139,7 +139,7 @@ public:
                 })
                 .Schedule(12s, [this](TaskContext context)
                 {
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     _phase = PHASE_COMBAT;
                     DoZoneInCombat();
 
@@ -185,7 +185,7 @@ public:
                     }
                 });
 
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                 me->SetFaction(FACTION_MONSTER);
                 summons.DoAction(ACTION_START_EVENT);
             }
@@ -203,7 +203,7 @@ public:
                         _isDead = true;
                         me->RemoveAurasDueToSpell(SPELL_ALLURING_PERFUME);
                         DoCastSelf(SPELL_PERMANENT_FEIGN_DEATH, true);
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         Talk(SAY_HUMMEL_DEATH);
                     }
                 }
@@ -231,7 +231,7 @@ public:
             }
 
             _scheduler.CancelAll();
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             instance->SetBossState(DATA_APOTHECARY_HUMMEL, DONE);
 
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
@@ -293,13 +293,13 @@ struct npc_apothecary_genericAI : public ScriptedAI
     {
         if (action == ACTION_START_EVENT)
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
             me->SetFaction(FACTION_MONSTER);
             me->GetMotionMaster()->MovePoint(1, _movePos);
         }
         else if (action == ACTION_START_FIGHT)
         {
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             DoZoneInCombat();
         }
     }

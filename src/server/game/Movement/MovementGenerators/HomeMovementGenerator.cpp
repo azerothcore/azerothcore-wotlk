@@ -39,7 +39,7 @@ void HomeMovementGenerator<Creature>::DoFinalize(Creature* owner)
     }
 
     if (!owner->HasSwimmingFlagOutOfCombat())
-        owner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SWIMMING);
+        owner->RemoveUnitFlag(UNIT_FLAG_SWIMMING);
 }
 
 void HomeMovementGenerator<Creature>::DoReset(Creature*)

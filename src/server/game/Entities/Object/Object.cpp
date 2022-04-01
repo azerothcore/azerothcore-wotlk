@@ -583,7 +583,7 @@ uint32 Object::GetUpdateFieldData(Player const* target, uint32*& flags) const
                 if (ToUnit()->GetOwnerGUID() == target->GetGUID())
                     visibleFlag |= UF_FLAG_OWNER;
 
-                if (HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_SPECIALINFO))
+                if (HasDynamicFlag(UNIT_DYNFLAG_SPECIALINFO))
                     if (ToUnit()->HasAuraTypeWithCaster(SPELL_AURA_EMPATHY, target->GetGUID()))
                         visibleFlag |= UF_FLAG_SPECIAL_INFO;
 
@@ -2272,8 +2272,8 @@ void WorldObject::SetZoneScript()
 {
     if (Map* map = FindMap())
     {
-        if (map->IsDungeon())
-            m_zoneScript = (ZoneScript*)map->ToInstanceMap()->GetInstanceScript();
+        if (InstanceMap* instanceMap = map->ToInstanceMap())
+            m_zoneScript = reinterpret_cast<ZoneScript*>(instanceMap->GetInstanceScript());
         else if (!map->IsBattlegroundOrArena())
         {
             uint32 zoneId = GetZoneId();

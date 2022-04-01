@@ -1100,7 +1100,7 @@ class spell_item_draenic_pale_ale : public SpellScript
 
             summon->SetOwnerGUID(GetCaster()->GetGUID());
             summon->SetFaction(GetCaster()->GetFaction());
-            summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            summon->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             summon->SetReactState(REACT_PASSIVE);
             summon->GetMotionMaster()->MoveFollow(GetCaster(), PET_FOLLOW_DIST, GetCaster()->GetAngle(summon), MOTION_SLOT_CONTROLLED);
             GetSpell()->ExecuteLogEffectSummonObject(effIndex, summon);
@@ -1366,6 +1366,27 @@ class spell_item_valanyr_hammer_of_ancient_kings : public AuraScript
     void Register() override
     {
         DoCheckProc += AuraCheckProcFn(spell_item_valanyr_hammer_of_ancient_kings::CheckProc);
+    }
+};
+
+// 24590 - Brittle Armor
+enum BrittleArmor
+{
+    SPELL_BRITTLE_ARMOR = 24575
+};
+
+class spell_item_brittle_armor : public SpellScript
+{
+    PrepareSpellScript(spell_item_brittle_armor);
+
+    void HandleScript(SpellEffIndex /* effIndex */)
+    {
+        GetHitUnit()->RemoveAuraFromStack(SPELL_BRITTLE_ARMOR);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_item_brittle_armor::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -1809,6 +1830,27 @@ std::array<uint32, 20> const CreateFortuneSpells =
     SPELL_CREATE_FORTUNE_6, SPELL_CREATE_FORTUNE_7, SPELL_CREATE_FORTUNE_8, SPELL_CREATE_FORTUNE_9, SPELL_CREATE_FORTUNE_10,
     SPELL_CREATE_FORTUNE_11, SPELL_CREATE_FORTUNE_12, SPELL_CREATE_FORTUNE_13, SPELL_CREATE_FORTUNE_14, SPELL_CREATE_FORTUNE_15,
     SPELL_CREATE_FORTUNE_16, SPELL_CREATE_FORTUNE_17, SPELL_CREATE_FORTUNE_18, SPELL_CREATE_FORTUNE_19, SPELL_CREATE_FORTUNE_20
+};
+
+// 26465 - Mercurial Shield
+enum MercurialShield
+{
+    SPELL_MERCURIAL_SHIELD = 26464
+};
+
+class spell_item_mercurial_shield : public SpellScript
+{
+    PrepareSpellScript(spell_item_mercurial_shield);
+
+    void HandleScript(SpellEffIndex /* effIndex */)
+    {
+        GetHitUnit()->RemoveAuraFromStack(SPELL_MERCURIAL_SHIELD);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_item_mercurial_shield::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
 };
 
 // http://www.wowhead.com/item=32686 Mingo's Fortune Giblets
@@ -3642,6 +3684,7 @@ void AddSC_item_spell_scripts()
     RegisterSpellScriptWithArgs(spell_item_trigger_spell, "spell_item_mithril_mechanical_dragonling", SPELL_MITHRIL_MECHANICAL_DRAGONLING);
     RegisterSpellScript(spell_item_aegis_of_preservation);
     RegisterSpellScript(spell_item_arcane_shroud);
+    RegisterSpellScript(spell_item_brittle_armor);
     RegisterSpellScript(spell_item_blessing_of_ancient_kings);
     RegisterSpellScript(spell_item_valanyr_hammer_of_ancient_kings);
     RegisterSpellScriptWithArgs(spell_item_defibrillate, "spell_item_goblin_jumper_cables", 67, SPELL_GOBLIN_JUMPER_CABLES_FAIL);
@@ -3655,6 +3698,7 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_flask_of_the_north);
     RegisterSpellScript(spell_item_gnomish_death_ray);
     RegisterSpellScript(spell_item_make_a_wish);
+    RegisterSpellScript(spell_item_mercurial_shield);
     RegisterSpellScript(spell_item_mingos_fortune_generator);
     RegisterSpellScript(spell_item_necrotic_touch);
     RegisterSpellScript(spell_item_net_o_matic);

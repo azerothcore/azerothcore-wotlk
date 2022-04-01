@@ -717,7 +717,7 @@ class spell_q11198_take_down_tethyr : public SpellScript
     {
         PreventHitDefaultEffect(effIndex);
         if (Unit* unit = GetHitUnit())
-            if (unit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC))
+            if (unit->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC))
                 return;
         GetCaster()->CastCustomSpell(42576 /*SPELL_CANNON_BLAST*/, SPELLVALUE_BASE_POINT0, GetEffectValue(), GetCaster(), true);
     }
@@ -1002,13 +1002,13 @@ class spell_q11396_11399_force_shield_arcane_purple_x3 : public AuraScript
     void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         Unit* target = GetTarget();
-        target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+        target->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
         target->SetControlled(true, UNIT_STATE_STUNNED);
     }
 
     void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        GetTarget()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+        GetTarget()->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
     }
 
     void Register() override
@@ -1467,8 +1467,8 @@ class spell_symbol_of_life_dummy : public SpellScript
             if (target->HasAura(SPELL_PERMANENT_FEIGN_DEATH))
             {
                 target->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
-                target->SetUInt32Value(UNIT_DYNAMIC_FLAGS, 0);
-                target->SetUInt32Value(UNIT_FIELD_FLAGS_2, 0);
+                target->ReplaceAllDynamicFlags(0);
+                target->ReplaceAllUnitFlags2(UNIT_FLAG2_NONE);
                 target->SetHealth(target->GetMaxHealth() / 2);
                 target->SetPower(POWER_MANA, uint32(target->GetMaxPower(POWER_MANA) * 0.75f));
             }
