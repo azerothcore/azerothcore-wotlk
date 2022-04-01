@@ -1380,7 +1380,6 @@ class spell_dru_glyph_of_rejuvenation : public AuraScript
         return eventInfo.GetProcTarget()->HealthBelowPct(50);
     }
 
-
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();

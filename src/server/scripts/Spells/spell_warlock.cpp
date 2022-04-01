@@ -1459,7 +1459,6 @@ class spell_warl_glyph_of_life_tap : public AuraScript
     }
 };
 
-
 // 63310 - Glyph of Shadowflame
 class spell_warl_glyph_of_shadowflame : public AuraScript
 {

@@ -1530,7 +1530,6 @@ class spell_pal_sacred_shield_dummy : public AuraScript
     TimePoint _cooldownEnd = std::chrono::steady_clock::time_point::min();
 };
 
-
 // 31801 - Seal of Vengeance
 // 53736 - Seal of Corruption
 template <uint32 DoTSpellId, uint32 DamageSpellId>

@@ -3902,7 +3902,6 @@ class spell_item_wraith_scythe_drain_life : public SpellScript
 // Item - 13209: Seal of the Dawn
 // Item - 19812: Rune of the Dawn
 
-
 enum AlchemistStone
 {
     SPELL_ALCHEMISTS_STONE_EXTRA_HEAL       = 21399,
