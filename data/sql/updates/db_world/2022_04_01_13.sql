@@ -1,3 +1,19 @@
+-- DB update 2022_04_01_12 -> 2022_04_01_13
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_04_01_12';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_04_01_12 2022_04_01_13 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1648568921921532880'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1648568921921532880');
 
 REPLACE INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `VerifiedBuild`) VALUES
@@ -882,3 +898,13 @@ REPLACE INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `Verifie
 ('25247', 'ruRU', 'Можешь найти то, что ищешь, $Gбрат:сестра;.', '0'),
 ('25248', 'ruRU', 'Можешь найти то, что ищешь, $Gбрат:сестра;.', '0'),
 ('25249', 'ruRU', 'Можешь найти то, что ищешь, $Gбрат:сестра;.', '0');
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_04_01_13' WHERE sql_rev = '1648568921921532880';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

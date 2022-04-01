@@ -1,3 +1,19 @@
+-- DB update 2022_04_01_10 -> 2022_04_01_11
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_04_01_10';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_04_01_10 2022_04_01_11 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1648468519675323147'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1648468519675323147');
 
 REPLACE INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `VerifiedBuild`) VALUES
@@ -217,3 +233,13 @@ REPLACE INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `Verifie
 ('1484', 'ruRU', 'Да, я видел, что только что произошло между Муарином и повелителем демонов! Похоже, это существо, даже в видении, обладает куда большим могуществом, чем мой соратник-чернокнижник. Сумеет ли он одолеть этого монстра? Лучше бы я занялся этим сам... Но вождю я нужен здесь. Я опозорю свой клан, если оставлю свои здешние обязанности и отправлюсь добывать себе славу.', '0'),
 ('1488', 'ruRU', 'Эта победа очень важна для нас, $N. Все мы радуемся вашему успеху. Теперь я думаю, что наше будущее не так беспросветно, как мне казалось.$B$BДемоны будут повержены, Пылающий Клинок потерпит крах, и в один прекрасный день у нас снова будет свой дом!', '0'),
 ('1498', 'ruRU', 'А, вижу, тебе удалось справиться с рокочущими ящерицами, значит, ты $Gкрепкий:крепкая;. А теперь я покажу тебе, как можно сделаться почти неуязвимым для противника благодаря толстой шкуре и ловкости.$B$BУчись хорошенько, $N. Вскоре тебе предстоит новый урок.', '0');
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_04_01_11' WHERE sql_rev = '1648468519675323147';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
