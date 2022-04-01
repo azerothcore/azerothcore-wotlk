@@ -167,7 +167,7 @@ public:
             {
                 if (me->GetDistance2d(me->GetHomePosition().GetPositionX(), me->GetHomePosition().GetPositionY()) > 50)
                 {
-                    EnterEvadeMode();
+                    ScriptedAI::EnterEvadeMode();
                     Talk(YELL_EVADE);
                 }
                 ResetTimer = 5 * IN_MILLISECONDS;
