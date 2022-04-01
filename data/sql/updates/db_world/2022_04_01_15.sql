@@ -1,3 +1,19 @@
+-- DB update 2022_04_01_14 -> 2022_04_01_15
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_04_01_14';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_04_01_14 2022_04_01_15 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1648471089049913097'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1648471089049913097');
 
 REPLACE INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `VerifiedBuild`) VALUES
@@ -494,3 +510,13 @@ REPLACE INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `Verifie
 (9985, 'ruRU', 'Я могу прочитать большую часть этого, достаточно, чтобы составить общее представление. Тот, кто написал это, хвалит \'прогресс\', достигнутый Луангой, и призывает продолжать допрашивать своих \'гостей\'. $B$BМежду тем, в нем говорится, что \'приготовления в Скеттисе идут по плану\' и что они \'скоро будут готовы вернуть свои исконные земли\'. $B$BЯ не знаком с этим \'Скеттисом\', упомянутым автором, но где бы он ни находился, похоже, что араккоа собирают там армию! Об этом нужно немедленно сообщить Рокагу.', 0), 
 (9993, 'ruRU', 'Неплохо, но для того, чтобы изготовить достаточное количество масла, потребуется куда больше.', 0), 
 (10000, 'ruRU', 'Для того чтобы остановить орков Скверны, недостаточно пугать их рабочих. Я обнаружил кое-что, что объясняет их присутствие здесь, и еще больше убедился в том, что действовать надо быстро.', 0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_04_01_15' WHERE sql_rev = '1648471089049913097';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
