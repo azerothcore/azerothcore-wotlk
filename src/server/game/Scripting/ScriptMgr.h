@@ -2099,8 +2099,6 @@ public: /* CreatureScript */
     void OnCreatureUpdate(Creature* creature, uint32 diff);
     void OnCreatureAddWorld(Creature* creature);
     void OnCreatureRemoveWorld(Creature* creature);
-    
-   
 
 public: /* GameObjectScript */
     bool OnGossipHello(Player* player, GameObject* go);
@@ -2406,8 +2404,6 @@ public: /* AllCreatureScript */
     //listener function (OnAllCreatureUpdate) is called by OnCreatureUpdate
     //void OnAllCreatureUpdate(Creature* creature, uint32 diff);
     void Creature_SelectLevel(const CreatureTemplate* cinfo, Creature* creature);
-
-    // Custom Hooks
     void OnCreatureSaveToDB(Creature* creature);
 
 public: /* AllGameobjectScript */
