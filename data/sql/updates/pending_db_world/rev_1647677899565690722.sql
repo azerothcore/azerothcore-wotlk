@@ -23,86 +23,6 @@ ALTER TABLE `spell_proc`
 
 DELETE FROM `command` WHERE `name`='reload spell_proc_event';
 
-DELETE FROM `spell_script_names` WHERE `ScriptName` IN
-('spell_mage_blazing_speed','spell_pri_blessed_recovery','spell_dru_forms_trinket','spell_dru_t9_feral_relic',
-'spell_sha_nature_guardian','spell_warl_nether_protection','spell_hun_piercing_shots','spell_hun_t9_4p_bonus',
-'spell_sha_lightning_shield','spell_dk_acclimation','spell_dk_advantage_t10_4p',
-'spell_rog_t10_2p_bonus','spell_pal_illumination','spell_item_soul_preserver','spell_item_death_choice',
-'spell_item_lightning_capacitor','spell_item_thunder_capacitor','spell_item_toc25_normal_caster_trinket','spell_item_toc25_heroic_caster_trinket',
-'spell_igb_battle_experience_check','spell_gen_blood_reserve','spell_item_darkmoon_card_greatness',
-'spell_item_charm_witch_doctor','spell_item_mana_drain', 'spell_item_blood_draining_enchant', 'spell_anetheron_vampiric_aura', 'spell_uk_second_wind'
-'spell_deathbringer_blood_beast_blood_link', 'spell_putricide_ooze_tank_protection', 'spell_mark_of_malice', 'spell_twisted_reflection'
-'spell_pet_guard_dog', 'spell_pet_silverback', 'spell_pet_culling_the_herd', 'spell_item_argent_dawn_commission','spell_warr_victorious','spell_dk_rune_strike_proc','spell_pet_charge',
-'spell_pri_pain_and_suffering_dummy', 'spell_warr_item_t10_prot_4p_bonus', 'spell_warr_deep_wounds_aura', 'spell_warr_extra_proc', 'spell_warr_glyph_of_blocking', 'spell_warr_second_wind'
-'spell_warr_t3_prot_8p_bonus', 'spell_warl_demonic_pact', 'spell_warl_decimation', 'spell_warl_seed_of_corruption_dummy',
-'spell_warl_seed_of_corruption_generic', 'spell_warl_soul_leech', 'spell_warl_t4_2p_bonus_shadow', 'spell_warl_t4_2p_bonus_fire',
-'spell_warl_glyph_of_corruption_nightfall', 'spell_warl_glyph_of_life_tap');
-
-DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_gen_proc_above_75' AND `spell_id` = 64568;
-
-INSERT INTO `spell_script_names` (`spell_id`,`ScriptName`) VALUES
-(53646,  'spell_warl_demonic_pact'),
-(54909,  'spell_warl_demonic_pact'),
-(-63156, 'spell_warl_decimation'),
-(-30293, 'spell_warl_soul_leech'),
-(37377,  'spell_warl_t4_2p_bonus_shadow'),
-(39437,  'spell_warl_t4_2p_bonus_fire'),
-(63320,  'spell_warl_glyph_of_life_tap'),
-(-27243, 'spell_warl_seed_of_corruption_dummy'),
-(32863,  'spell_warl_seed_of_corruption_generic'),
-(36123,  'spell_warl_seed_of_corruption_generic'),
-(38252,  'spell_warl_seed_of_corruption_generic'),
-(39367,  'spell_warl_seed_of_corruption_generic'),
-(44141,  'spell_warl_seed_of_corruption_generic'),
-(70388,  'spell_warl_seed_of_corruption_generic'),
-(-18094, 'spell_warl_glyph_of_corruption_nightfall'),
-(56218,  'spell_warl_glyph_of_corruption_nightfall'),
-(-49200, 'spell_dk_acclimation'),                       -- DK Acclimation
-(70656, 'spell_dk_advantage_t10_4p'),                   -- DK Advantage t10 4p melee
-(37336, 'spell_dru_forms_trinket'),                     -- Druid Forms Trinket
-(67353, 'spell_dru_t9_feral_relic'),                    -- Druid T9 Feral Relic (Idol of Mutilation)
-(-53234, 'spell_hun_piercing_shots'),                   -- Hunter Piercing Shots
-(-67151, 'spell_hun_t9_4p_bonus'),                      -- Hunter T9 Bonus
-(71201, 'spell_igb_battle_experience_check'),           -- Battle Experience (Gunship - ICC)
-(60510, 'spell_item_soul_preserver'),                   -- Soul Preserver
-(67702, 'spell_item_death_choice'),                     -- Death Choice Trinket
-(67771, 'spell_item_death_choice'),                     -- Death Choice Trinket
-(37657, 'spell_item_lightning_capacitor'),              -- Lightning Capcitor
-(54841, 'spell_item_thunder_capacitor'),                -- Thunder Capacitor
-(67712, 'spell_item_toc25_normal_caster_trinket'),      -- Item - Coliseum 25 Normal Caster Trinket
-(67758, 'spell_item_toc25_heroic_caster_trinket'),      -- Item - Coliseum 25 Heroic Caster Trinket
-(57345, 'spell_item_darkmoon_card_greatness'),          -- Darkmoon Card: Greatness
-(43820, 'spell_item_charm_witch_doctor'),               -- Charm of the Witch Doctor
-(27522, 'spell_item_mana_drain'),                       -- Mana Drain
-(40336, 'spell_item_mana_drain'),                       -- Mana Drain
-(-31641, 'spell_mage_blazing_speed'),                   -- Mage Blazing Speed
-(-20210, 'spell_pal_illumination'),                     -- Paladin Illumination (for Holy Shock)
-(-27811, 'spell_pri_blessed_recovery'),                 -- Priest Blessed Recovery
-(-30881, 'spell_sha_nature_guardian'),                  -- Shaman Nature's Guardian
-(-324, 'spell_sha_lightning_shield'),                   -- Shaman Lightning Shield
-(38196,  'spell_anetheron_vampiric_aura'),
-(42770,  'spell_uk_second_wind'),
-(72176,  'spell_deathbringer_blood_beast_blood_link'),
-(71770,  'spell_putricide_ooze_tank_protection'),
-(33493,  'spell_mark_of_malice'),
-(21063,  'spell_twisted_reflection'),
-(-53178, 'spell_pet_guard_dog'),
-(-62764, 'spell_pet_silverback'),
-(-61680, 'spell_pet_culling_the_herd'),
-(17670, 'spell_item_argent_dawn_commission'),
-(32216, 'spell_warr_victorious'),
-(56817, 'spell_dk_rune_strike_proc'),
-(57627, 'spell_pet_charge'),
-(-47580, 'spell_pri_pain_and_suffering_dummy'),
-(70844,  'spell_warr_item_t10_prot_4p_bonus'),
-(-12834, 'spell_warr_deep_wounds_aura'),
-(-29723, 'spell_warr_extra_proc'),
-(-46913, 'spell_warr_extra_proc'),
-(58375,  'spell_warr_glyph_of_blocking'),
-(-29834, 'spell_warr_second_wind'),
-(28845,  'spell_warr_t3_prot_8p_bonus'),
-(-30299, 'spell_warl_nether_protection');               -- Warlock Nether protection
-
 INSERT INTO `spell_proc` (`SpellId`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMask0`, `SpellFamilyMask1`, `SpellFamilyMask2`, `ProcFlags`, `SpellTypeMask`, `SpellPhaseMask`, `HitMask`, `AttributesMask`, `DisableEffectsMask`, `ProcsPerMinute`, `Chance`, `Cooldown`, `Charges`) VALUES
 (17941, 0, 5, 1, 0, 0, 65536, 1, 1, 0, 8, 0, 0, 0, 0, 1),
 (18820, 0, 0, 0, 0, 0, 0, 7, 1, 0, 0, 0, 0, 0, 0, 1),
@@ -985,3 +905,249 @@ INSERT INTO `spell_ranks` (`first_spell_id`, `spell_id`, `rank`) VALUES
 (66215, 66977, 4),
 (66215, 66978, 5),
 (66215, 66979, 6);
+
+-- Remove renamed scripts
+DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('spell_gen_dummy_trigger','spell_pri_item_greater_heal_refund');
+
+-- Stop console spam from dummy EFFECT_2 proc
+DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_pal_seals';
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(20375, 'spell_pal_seals'), -- Seal of Command
+(21084, 'spell_pal_seals'), -- Seal of Righteousness
+(31801, 'spell_pal_seals'), -- Seal of Vengeance
+(31892, 'spell_pal_seals'), -- Seal of Blood
+(33127, 'spell_pal_seals'), -- Seal of Command
+(38008, 'spell_pal_seals'), -- Seal of Blood
+(41459, 'spell_pal_seals'), -- Seal of Blood
+(53720, 'spell_pal_seals'), -- Seal of the Martyr
+(53736, 'spell_pal_seals'); -- Seal of Corruption
+
+-- Grouped several hacks and handled with AuraScript now
+DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_mage_fingers_of_frost';
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(74396, 'spell_mage_fingers_of_frost'); -- Fingers of Frost
+
+-- Add spellscripts to spells previously on giant switches in Unit.cpp
+DELETE FROM `spell_script_names` WHERE `ScriptName`='spell_rog_t10_2p_bonus';
+DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('spell_sha_flametongue_weapon','spell_mage_imp_blizzard','spell_warr_deep_wounds_aura','spell_rog_setup','spell_pri_improved_spirit_tap','spell_sha_imp_water_shield','spell_warl_improved_drain_soul','spell_pal_improved_lay_of_hands','spell_pal_heart_of_the_crusader','spell_warl_seed_of_corruption_dummy','spell_mage_magic_absorption','spell_warr_extra_proc','spell_warr_second_wind','spell_warl_soul_leech','spell_sha_lightning_overload','spell_rog_quick_recovery','spell_mage_arcane_potency','spell_mage_empowered_fire','spell_pal_spiritual_attunement','spell_pal_divine_purpose','spell_pal_judgements_of_the_wise','spell_hun_thrill_of_the_hunt','spell_mage_missile_barrage','spell_mage_hot_streak','spell_warr_sword_and_board','spell_pri_imp_shadowform','spell_dk_butchery','spell_item_unstable_power','spell_item_restless_strength','spell_dru_leader_of_the_pack','spell_pri_aq_3p_bonus','spell_item_persistent_shield','spell_dru_revitalize','spell_dk_death_rune','spell_dk_scent_of_blood_trigger','spell_dk_vendetta','spell_dk_sudden_doom','spell_dk_blade_barrier','spell_dk_rime','spell_dk_wandering_plague','spell_sha_astral_shift_aura','spell_dk_necrosis','spell_sha_static_shock','spell_sha_maelstrom_weapon','spell_sha_ancestral_awakening','spell_rog_deadly_brew','spell_rog_turn_the_tables','spell_rog_cut_to_the_chase','spell_pet_guard_dog','spell_hun_rapid_recuperation_trigger','spell_hun_hunting_party','spell_pal_righteous_vengeance','spell_pal_sheath_of_light','spell_pal_infusion_of_light','spell_pal_judgements_of_the_just','spell_mage_burning_determination','spell_warr_improved_spell_reflection','spell_pet_culling_the_herd','spell_pet_silverback','spell_warl_decimation','spell_sha_frozen_power','spell_pri_body_and_soul','spell_dk_threat_of_thassarian','spell_warl_seduction','spell_mage_combustion','spell_pri_vampiric_embrace','spell_dru_omen_of_clarity','spell_item_alchemists_stone','spell_pal_judgement_of_light_heal','spell_pal_judgement_of_wisdom_mana','spell_twisted_reflection','spell_dru_t3_2p_bonus','spell_dru_t3_8p_bonus','spell_dru_t3_6p_bonus','spell_pal_t3_6p_bonus','spell_pri_t3_4p_bonus','spell_sha_t3_6p_bonus','spell_warr_t3_prot_8p_bonus','spell_item_healing_touch_refund','spell_item_totem_of_flowing_water','spell_item_pendant_of_the_violet_eye','spell_sha_shamanistic_rage','spell_pal_seal_of_vengeance','spell_warl_seed_of_corruption_generic','spell_mark_of_malice','spell_item_mark_of_conquest','spell_sha_windfury_weapon','spell_dru_t4_2p_bonus','spell_pri_t5_heal_2p_bonus','spell_anetheron_vampiric_aura','spell_item_frozen_shadoweave','spell_item_aura_of_madness','spell_pri_item_t6_trinket','spell_dru_item_t6_trinket','spell_sha_item_t6_trinket','spell_pal_item_t6_trinket','spell_item_crystal_spire_of_karabor','spell_item_dementia','spell_item_pet_healing','spell_warl_t4_2p_bonus_shadow','spell_warl_t4_2p_bonus_fire','spell_mage_gen_extra_effects','spell_uk_second_wind','spell_item_commendation_of_kaelthas','spell_item_sunwell_exalted_caster_neck','spell_item_sunwell_exalted_melee_neck','spell_item_sunwell_exalted_tank_neck','spell_item_sunwell_exalted_healer_neck','spell_warl_glyph_of_corruption_nightfall','spell_dk_mark_of_blood','spell_dk_dancing_rune_weapon','spell_dk_unholy_blight','spell_dk_hungering_cold','spell_item_soul_harvesters_charm','spell_rog_turn_the_tables_proc','spell_pal_sacred_shield_dummy','spell_warl_demonic_pact','spell_pal_seal_of_corruption','spell_dru_glyph_of_rejuvenation','spell_dru_glyph_of_shred','spell_dru_glyph_of_rake','spell_dru_glyph_of_innervate','spell_dru_glyph_of_starfire_dummy','spell_pal_glyph_of_holy_light_dummy','spell_pal_glyph_of_divinity','spell_sha_tidal_force_dummy','spell_sha_glyph_of_healing_wave','spell_pri_glyph_of_dispel_magic','spell_mage_glyph_of_ice_block','spell_mage_glyph_of_icy_veins','spell_mage_glyph_of_polymorph','spell_rog_glyph_of_backstab','spell_hun_glyph_of_mend_pet','spell_pri_shadowfiend_death','spell_warr_glyph_of_blocking','spell_dk_glyph_of_scourge_strike','spell_sha_spirit_hunt','spell_hun_kill_command_pet','spell_item_swift_hand_justice_dummy','spell_item_discerning_eye_beast_dummy','spell_mage_imp_mana_gems','spell_gen_vampiric_touch','spell_dk_pvp_4p_bonus','spell_dk_glyph_of_death_grip','spell_dru_savage_defense','spell_sha_glyph_of_earth_shield','spell_sha_glyph_of_totem_of_wrath','spell_warl_glyph_of_life_tap','spell_pal_t8_2p_bonus','spell_sha_t8_elemental_4p_bonus','spell_xt002_321_boombot_aura','spell_sha_t9_elemental_4p_bonus','spell_item_purified_shard_of_the_scale','spell_item_shiny_shard_of_the_scale','spell_dru_t10_balance_4p_bonus','spell_dru_t10_restoration_4p_bonus_dummy','spell_pri_t10_heal_2p_bonus','spell_sha_t10_restoration_4p_bonus','spell_sha_t10_elemental_4p_bonus','spell_warr_item_t10_prot_4p_bonus','spell_item_tiny_abomination_in_a_jar','spell_item_tiny_abomination_in_a_jar_hero','spell_item_deadly_precision_dummy','spell_item_deadly_precision','spell_item_heartpierce','spell_item_heartpierce_hero','spell_item_deathbringers_will_normal','spell_item_deathbringers_will_heroic','spell_item_corpse_tongue_coin','spell_item_corpse_tongue_coin_heroic','spell_putricide_ooze_tank_protection','spell_deathbringer_blood_beast_blood_link','spell_item_petrified_twilight_scale','spell_item_petrified_twilight_scale_heroic');
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(-10400, 'spell_sha_flametongue_weapon'),
+(-11185, 'spell_mage_imp_blizzard'),
+(-12834, 'spell_warr_deep_wounds_aura'),
+(-13983, 'spell_rog_setup'),
+(-15337, 'spell_pri_improved_spirit_tap'),
+(-16180, 'spell_sha_imp_water_shield'),
+(-18213, 'spell_warl_improved_drain_soul'),
+(-20234, 'spell_pal_improved_lay_of_hands'),
+(-20335, 'spell_pal_heart_of_the_crusader'),
+(-27243, 'spell_warl_seed_of_corruption_dummy'),
+(-29441, 'spell_mage_magic_absorption'),
+
+(-29723, 'spell_warr_extra_proc'),
+(-46913, 'spell_warr_extra_proc'),
+
+(-29834, 'spell_warr_second_wind'),
+(-30293, 'spell_warl_soul_leech'),
+(-30675, 'spell_sha_lightning_overload'),
+(-31244, 'spell_rog_quick_recovery'),
+(-31571, 'spell_mage_arcane_potency'),
+(-31656, 'spell_mage_empowered_fire'),
+(-31785, 'spell_pal_spiritual_attunement'),
+(-31871, 'spell_pal_divine_purpose'),
+(-31876, 'spell_pal_judgements_of_the_wise'),
+(-34497, 'spell_hun_thrill_of_the_hunt'),
+(-44404, 'spell_mage_missile_barrage'),
+(-44445, 'spell_mage_hot_streak'),
+(-46951, 'spell_warr_sword_and_board'),
+(-47569, 'spell_pri_imp_shadowform'),
+(-48979, 'spell_dk_butchery'),
+(-48539, 'spell_dru_revitalize'),
+
+(-49208, 'spell_dk_death_rune'),
+(-49467, 'spell_dk_death_rune'),
+(-54639, 'spell_dk_death_rune'),
+
+(-49004, 'spell_dk_scent_of_blood_trigger'),
+(-49015, 'spell_dk_vendetta'),
+(-49018, 'spell_dk_sudden_doom'),
+(-49182, 'spell_dk_blade_barrier'),
+(-49188, 'spell_dk_rime'),
+(-49217, 'spell_dk_wandering_plague'),
+(-51474, 'spell_sha_astral_shift_aura'),
+(-51459, 'spell_dk_necrosis'),
+(-51525, 'spell_sha_static_shock'),
+(-51556, 'spell_sha_ancestral_awakening'),
+(-51625, 'spell_rog_deadly_brew'),
+(-51627, 'spell_rog_turn_the_tables'),
+(-51664, 'spell_rog_cut_to_the_chase'),
+(-53178, 'spell_pet_guard_dog'),
+(-53228, 'spell_hun_rapid_recuperation_trigger'),
+(-53290, 'spell_hun_hunting_party'),
+(-53380, 'spell_pal_righteous_vengeance'),
+(-53501, 'spell_pal_sheath_of_light'),
+(-53569, 'spell_pal_infusion_of_light'),
+(-53695, 'spell_pal_judgements_of_the_just'),
+(-54747, 'spell_mage_burning_determination'),
+(-59088, 'spell_warr_improved_spell_reflection'),
+(-61680, 'spell_pet_culling_the_herd'),
+(-62764, 'spell_pet_silverback'),
+(-63156, 'spell_warl_decimation'),
+(-63373, 'spell_sha_frozen_power'),
+(-64127, 'spell_pri_body_and_soul'),
+(-65661, 'spell_dk_threat_of_thassarian'),
+(6358,   'spell_warl_seduction'),
+(11129,  'spell_mage_combustion'),
+(15286,  'spell_pri_vampiric_embrace'),
+(16864,  'spell_dru_omen_of_clarity'),
+(17619,  'spell_item_alchemists_stone'),
+(20185,  'spell_pal_judgement_of_light_heal'),
+(20186,  'spell_pal_judgement_of_wisdom_mana'),
+(21063,  'spell_twisted_reflection'),
+(24658,  'spell_item_unstable_power'),
+(24661,  'spell_item_restless_strength'),
+(24932,  'spell_dru_leader_of_the_pack'),
+(26169,  'spell_pri_aq_3p_bonus'),
+(26467,  'spell_item_persistent_shield'),
+(28716,  'spell_dru_t3_2p_bonus'),
+(28719,  'spell_dru_t3_8p_bonus'),
+(28744,  'spell_dru_t3_6p_bonus'),
+(28789,  'spell_pal_t3_6p_bonus'),
+(28809,  'spell_pri_t3_4p_bonus'),
+(28823,  'spell_sha_t3_6p_bonus'),
+(28845,  'spell_warr_t3_prot_8p_bonus'),
+(28847,  'spell_item_healing_touch_refund'),
+(28849,  'spell_item_totem_of_flowing_water'),
+(29601,  'spell_item_pendant_of_the_violet_eye'),
+(30823,  'spell_sha_shamanistic_rage'),
+(31801,  'spell_pal_seal_of_vengeance'),
+
+(32863,  'spell_warl_seed_of_corruption_generic'),
+(36123,  'spell_warl_seed_of_corruption_generic'),
+(38252,  'spell_warl_seed_of_corruption_generic'),
+(39367,  'spell_warl_seed_of_corruption_generic'),
+(44141,  'spell_warl_seed_of_corruption_generic'),
+(70388,  'spell_warl_seed_of_corruption_generic'),
+
+(33493,  'spell_mark_of_malice'),
+(33510,  'spell_item_mark_of_conquest'),
+(33757,  'spell_sha_windfury_weapon'),
+(37288,  'spell_dru_t4_2p_bonus'),
+(37295,  'spell_dru_t4_2p_bonus'),
+(37594,  'spell_pri_t5_heal_2p_bonus'),
+(38196,  'spell_anetheron_vampiric_aura'),
+(39372,  'spell_item_frozen_shadoweave'),
+(39446,  'spell_item_aura_of_madness'),
+(40438,  'spell_pri_item_t6_trinket'),
+(40442,  'spell_dru_item_t6_trinket'),
+(40463,  'spell_sha_item_t6_trinket'),
+(40470,  'spell_pal_item_t6_trinket'),
+(40971,  'spell_item_crystal_spire_of_karabor'),
+(41404,  'spell_item_dementia'),
+
+(37381,  'spell_item_pet_healing'),
+
+(37377,  'spell_warl_t4_2p_bonus_shadow'),
+(39437,  'spell_warl_t4_2p_bonus_fire'),
+
+(44401,  'spell_mage_gen_extra_effects'),
+(48108,  'spell_mage_gen_extra_effects'),
+(57761,  'spell_mage_gen_extra_effects'),
+
+(42770,  'spell_uk_second_wind'),
+(45057,  'spell_item_commendation_of_kaelthas'),
+(45481,  'spell_item_sunwell_exalted_caster_neck'),
+(45482,  'spell_item_sunwell_exalted_melee_neck'),
+(45483,  'spell_item_sunwell_exalted_tank_neck'),
+(45484,  'spell_item_sunwell_exalted_healer_neck'),
+
+(-18094, 'spell_warl_glyph_of_corruption_nightfall'),
+(56218,  'spell_warl_glyph_of_corruption_nightfall'),
+
+(49005,  'spell_dk_mark_of_blood'),
+(49028,  'spell_dk_dancing_rune_weapon'),
+(49194,  'spell_dk_unholy_blight'),
+(51209,  'spell_dk_hungering_cold'),
+(52420,  'spell_item_soul_harvesters_charm'),
+
+(52910,  'spell_rog_turn_the_tables_proc'),
+(52914,  'spell_rog_turn_the_tables_proc'),
+(52915,  'spell_rog_turn_the_tables_proc'),
+
+(53601,  'spell_pal_sacred_shield_dummy'),
+
+(53646,  'spell_warl_demonic_pact'),
+(54909,  'spell_warl_demonic_pact'),
+
+(53736,  'spell_pal_seal_of_corruption'),
+(53817,  'spell_sha_maelstrom_weapon'),
+(54748,  'spell_mage_burning_determination'),
+(54754,  'spell_dru_glyph_of_rejuvenation'),
+(54815,  'spell_dru_glyph_of_shred'),
+(54821,  'spell_dru_glyph_of_rake'),
+(54832,  'spell_dru_glyph_of_innervate'),
+(54845,  'spell_dru_glyph_of_starfire_dummy'),
+(54937,  'spell_pal_glyph_of_holy_light_dummy'),
+(54939,  'spell_pal_glyph_of_divinity'),
+(55198,  'spell_sha_tidal_force_dummy'),
+(55440,  'spell_sha_glyph_of_healing_wave'),
+(55677,  'spell_pri_glyph_of_dispel_magic'),
+(56372,  'spell_mage_glyph_of_ice_block'),
+(56374,  'spell_mage_glyph_of_icy_veins'),
+(56375,  'spell_mage_glyph_of_polymorph'),
+(56800,  'spell_rog_glyph_of_backstab'),
+(57870,  'spell_hun_glyph_of_mend_pet'),
+(57989,  'spell_pri_shadowfiend_death'),
+(58375,  'spell_warr_glyph_of_blocking'),
+(58642,  'spell_dk_glyph_of_scourge_strike'),
+(58877,  'spell_sha_spirit_hunt'),
+(58914,  'spell_hun_kill_command_pet'),
+(59906,  'spell_item_swift_hand_justice_dummy'),
+(59915,  'spell_item_discerning_eye_beast_dummy'),
+
+(37447,  'spell_mage_imp_mana_gems'),
+(61062,  'spell_mage_imp_mana_gems'),
+
+(52723,  'spell_gen_vampiric_touch'),
+(60501,  'spell_gen_vampiric_touch'),
+(61257,  'spell_dk_pvp_4p_bonus'),
+(62259,  'spell_dk_glyph_of_death_grip'),
+(62600,  'spell_dru_savage_defense'),
+(63279,  'spell_sha_glyph_of_earth_shield'),
+(63280,  'spell_sha_glyph_of_totem_of_wrath'),
+(63320,  'spell_warl_glyph_of_life_tap'),
+(64890,  'spell_pal_t8_2p_bonus'),
+(64928,  'spell_sha_t8_elemental_4p_bonus'),
+(65032,  'spell_xt002_321_boombot_aura'),
+(67228,  'spell_sha_t9_elemental_4p_bonus'),
+(69755,  'spell_item_purified_shard_of_the_scale'),
+(69739,  'spell_item_shiny_shard_of_the_scale'),
+(70723,  'spell_dru_t10_balance_4p_bonus'),
+(70664,  'spell_dru_t10_restoration_4p_bonus_dummy'),
+(70770,  'spell_pri_t10_heal_2p_bonus'),
+(70808,  'spell_sha_t10_restoration_4p_bonus'),
+(70817,  'spell_sha_t10_elemental_4p_bonus'),
+(70844,  'spell_warr_item_t10_prot_4p_bonus'),
+
+(71406,  'spell_item_tiny_abomination_in_a_jar'),
+(71545,  'spell_item_tiny_abomination_in_a_jar_hero'),
+
+(71563,  'spell_item_deadly_precision_dummy'),
+(71564,  'spell_item_deadly_precision'),
+
+(71880,  'spell_item_heartpierce'),
+(71892,  'spell_item_heartpierce_hero'),
+
+(71519,  'spell_item_deathbringers_will_normal'),
+(71562,  'spell_item_deathbringers_will_heroic'),
+
+(71634,  'spell_item_corpse_tongue_coin'),
+(71640,  'spell_item_corpse_tongue_coin_heroic'),
+
+(71770,  'spell_putricide_ooze_tank_protection'),
+(72176,  'spell_deathbringer_blood_beast_blood_link'),
+
+(75475,  'spell_item_petrified_twilight_scale'),
+(75481,  'spell_item_petrified_twilight_scale_heroic');
+
+-- Kill the damned thing already!
+DROP TABLE IF EXISTS `spell_proc_event`;
