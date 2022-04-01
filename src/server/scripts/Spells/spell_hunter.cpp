@@ -1480,7 +1480,7 @@ class spell_hun_rapid_recuperation_trigger : public AuraScript
         }
     }
 
-    void HandleRapidKillingProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleRapidKillingProc(AuraEffect const* /* aurEff */, ProcEventInfo& eventInfo)
     {
         static uint32 const triggerSpells[2] = { SPELL_HUNTER_RAPID_RECUPERATION_MANA_R1, SPELL_HUNTER_RAPID_RECUPERATION_MANA_R2 };
 
