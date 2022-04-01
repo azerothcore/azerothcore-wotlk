@@ -277,16 +277,16 @@ struct violet_hold_trashAI : public npc_escortAI
 
     void EnterCombat(Unit* who) override
     {
-        if (!who->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+        if (!who->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
         {
             me->InterruptNonMeleeSpells(false);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
         }
     }
 
     void AttackStart(Unit* who) override
     {
-        if (!who->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+        if (!who->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
             ScriptedAI::AttackStart(who);
     }
 
@@ -372,7 +372,7 @@ struct violet_hold_trashAI : public npc_escortAI
     void CreatureStartAttackDoor()
     {
         RemoveEscortState(STATE_ESCORT_ESCORTING | STATE_ESCORT_RETURNING | STATE_ESCORT_PAUSED);
-        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
         me->CastSpell((Unit*)nullptr, SPELL_DESTROY_DOOR_SEAL, true);
     }
 
@@ -380,7 +380,7 @@ struct violet_hold_trashAI : public npc_escortAI
     {
         if (!HasEscortState(STATE_ESCORT_ESCORTING))
         {
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
             me->SetHomePosition(1845.577759f + rand_norm() * 5 - 2.5f, 800.681152f + rand_norm() * 5 - 2.5f, 44.104248f, M_PI);
         }
 
@@ -1117,7 +1117,7 @@ public:
                     else
                     {
                         bOpening = false;
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         me->SetDisplayId(11686);
                         me->CastSpell(me, SPELL_TELEPORT_VISUAL, true);
                         me->DespawnOrUnsummon(1000);

@@ -489,7 +489,7 @@ public:
             events.RescheduleEvent(EVENT_START, 1000);
             me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
             me->SetWalk(true);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             me->setActive(true);
             me->SetReactState(REACT_PASSIVE);
         }
@@ -750,7 +750,7 @@ public:
             else if (summon->GetEntry() != NPC_INVOKER_BASALEPH)
             {
                 summon->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
-                summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                summon->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                 summon->GetMotionMaster()->MovePoint(4, 6135.97f, 2753.84f, 573.92f);
             }
         }
@@ -974,7 +974,7 @@ public:
                         for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                             if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
                             {
-                                summon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                                summon->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                                 if (summon->GetEntry() >= NPC_TIRION_EBON_KNIGHT && summon->GetEntry() <= NPC_TIRION_MOGRAINE)
                                 {
                                     if (summon->GetEntry() == NPC_TIRION_MOGRAINE)

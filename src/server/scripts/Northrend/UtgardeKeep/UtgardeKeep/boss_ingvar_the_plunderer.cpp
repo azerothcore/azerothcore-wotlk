@@ -131,7 +131,7 @@ public:
             me->SetDisplayId(DISPLAYID_DEFAULT);
             me->LoadEquipment(1);
             FeignDeath(false);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->DisableRotate(false);
 
@@ -146,7 +146,7 @@ public:
                 damage = 0;
                 me->InterruptNonMeleeSpells(true);
                 me->RemoveAllAuras();
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetControlled(false, UNIT_STATE_ROOT);
                 me->DisableRotate(false);
                 me->GetMotionMaster()->MovementExpired();
@@ -207,16 +207,16 @@ public:
             if (apply)
             {
                 me->SetStandState(UNIT_STAND_STATE_DEAD);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
-                me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
-                me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                me->SetUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
+                me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
+                me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
             }
             else
             {
                 me->SetStandState(UNIT_STAND_STATE_STAND);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
-                me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
-                me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                me->RemoveUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
+                me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
+                me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
             }
         }
 
@@ -296,7 +296,7 @@ public:
                         c->DespawnOrUnsummon();
                         summons.DespawnAll();
                     }
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     AttackStart(me->GetVictim());
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
                     Talk(YELL_AGGRO_2);
@@ -385,7 +385,7 @@ public:
                     break;
             }
 
-            if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 DoMeleeAttackIfReady();
         }
     };

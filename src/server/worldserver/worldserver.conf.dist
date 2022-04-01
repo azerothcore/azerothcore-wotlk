@@ -1814,7 +1814,7 @@ NpcRegenHPTimeIfTargetIsUnreachable = 10
 #                                                                                      Racial Trait Swap, NPC - All Mounts Modules
 #        Default:     ""
 
-Creatures.CustomIDs = "190010,55005,999991,25462,98888,601014"
+Creatures.CustomIDs = "190010,55005,999991,25462,98888,601014,34567,34568"
 
 #
 ###################################################################################################
@@ -2471,6 +2471,7 @@ DurabilityLoss.InPvP = 0
 #
 #    DurabilityLoss.OnDeath
 #        Description: Durability loss percentage on death.
+#        Note:        On 3.3.5 client always shows log message "Your items have lost 10% durability"
 #        Default:     10
 
 DurabilityLoss.OnDeath = 10

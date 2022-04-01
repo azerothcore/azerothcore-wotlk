@@ -94,7 +94,7 @@ void Player::Update(uint32 p_time)
 
     // Xinef: update charm AI only if we are controlled by creature or
     // non-posses player charm
-    if (IsCharmed() && !HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
+    if (IsCharmed() && !HasUnitFlag(UNIT_FLAG_POSSESSED))
     {
         m_charmUpdateTimer += p_time;
         if (m_charmUpdateTimer >= 1000)
@@ -1192,6 +1192,11 @@ void Player::UpdateArea(uint32 newArea)
 
 void Player::UpdateZone(uint32 newZone, uint32 newArea)
 {
+    if (!newZone)
+    {
+        return;
+    }
+
     if (m_zoneUpdateId != newZone)
     {
         sOutdoorPvPMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);

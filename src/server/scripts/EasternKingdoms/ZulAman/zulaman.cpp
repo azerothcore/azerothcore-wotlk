@@ -642,7 +642,7 @@ public:
                 me->SetDisplayId(MODEL_HARRISON_JONES_2);
                 me->SetTarget();
                 me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_DEAD);
-                me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
                 instance->SetData(DATA_GONGEVENT, DONE);
             }
         }
@@ -724,13 +724,13 @@ public:
                                             if (ptarget->GetPositionX() > 120)
                                             {
                                                 ptarget->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(WEAPON_SPEAR));
-                                                ptarget->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                                ptarget->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                                                 ptarget->SetReactState(REACT_PASSIVE);
                                                 ptarget->AI()->SetData(0, 1);
                                             }
                                             else
                                             {
-                                                ptarget->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                                ptarget->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                                                 ptarget->SetReactState(REACT_PASSIVE);
                                                 ptarget->AI()->SetData(0, 2);
                                             }

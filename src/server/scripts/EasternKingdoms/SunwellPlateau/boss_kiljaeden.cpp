@@ -293,7 +293,7 @@ public:
         void InitializeAI() override
         {
             ScriptedAI::InitializeAI();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
             phase = PHASE_NORMAL;
             events.Reset();
@@ -331,7 +331,7 @@ public:
                 me->RemoveAllAuras();
                 me->DeleteThreatList();
                 me->SetRegeneratingHealth(false);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->HandleEmoteCommand(EMOTE_ONESHOT_DROWN);
                 me->resetAttackTimer();
                 events.Reset();
@@ -421,7 +421,7 @@ public:
                     break;
                 case EVENT_INIT_FIGHT:
                     me->SetReactState(REACT_AGGRESSIVE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->SetInCombatWithZone();
                     return;
                 case EVENT_TEXT_SPEACH11:
@@ -478,7 +478,7 @@ public:
                     {
                         anveena->CastSpell(anveena, SPELL_SACRIFICE_OF_ANVEENA, true);
                         me->CastSpell(me, SPELL_CUSTOM_08_STATE, true);
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+                        me->SetUnitFlag(UNIT_FLAG_PACIFIED);
                         events.DelayEvents(7001);
                         events2.ScheduleEvent(EVENT_RESTORE_MELEE, 7000);
                     }
@@ -486,7 +486,7 @@ public:
                     break;
                 case EVENT_RESTORE_MELEE:
                     me->RemoveAurasDueToSpell(SPELL_CUSTOM_08_STATE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+                    me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
                     break;
             }
 

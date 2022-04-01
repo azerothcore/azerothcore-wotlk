@@ -705,7 +705,7 @@ public:
 
         void AttackStart(Unit* who) override
         {
-            if (!me->IsVisible() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (!me->IsVisible() || me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 return;
             ScriptedAI::AttackStart(who);
         }
@@ -755,7 +755,7 @@ public:
         {
             ScriptedAI::EnterEvadeMode(why);
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
         }
     };
 };
@@ -802,7 +802,7 @@ public:
 
         void AttackStart(Unit* who) override
         {
-            if (!me->IsVisible() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (!me->IsVisible() || me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 return;
             ScriptedAI::AttackStart(who);
         }
@@ -851,7 +851,7 @@ public:
         {
             ScriptedAI::EnterEvadeMode(why);
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
         }
     };
 };
@@ -945,7 +945,7 @@ public:
 
         void AttackStart(Unit* who) override
         {
-            if (!me->IsVisible() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (!me->IsVisible() || me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 return;
             ScriptedAI::AttackStart(who);
         }
@@ -994,7 +994,7 @@ public:
         {
             ScriptedAI::EnterEvadeMode(why);
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
         }
     };
 };
@@ -1039,7 +1039,7 @@ public:
 
         void AttackStart(Unit* who) override
         {
-            if (!me->IsVisible() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (!me->IsVisible() || me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 return;
             ScriptedAI::AttackStart(who);
         }
@@ -1077,7 +1077,7 @@ public:
         {
             ScriptedAI::EnterEvadeMode(why);
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
         }
     };
 };
@@ -1122,7 +1122,7 @@ public:
 
         void AttackStart(Unit* who) override
         {
-            if (!me->IsVisible() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (!me->IsVisible() || me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 return;
             ScriptedAI::AttackStart(who);
         }
@@ -1161,7 +1161,7 @@ public:
         {
             ScriptedAI::EnterEvadeMode(why);
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
         }
     };
 };

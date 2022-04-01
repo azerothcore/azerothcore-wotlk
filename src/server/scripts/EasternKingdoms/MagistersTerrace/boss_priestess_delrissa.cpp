@@ -142,7 +142,7 @@ public:
                 me->loot.clear();
                 me->loot.FillLoot(me->GetCreatureTemplate()->lootid, LootTemplates_Creature, me->GetLootRecipient(), false, false, 1, me);
                 instance->SetData(DATA_DELRISSA_EVENT, DONE);
-                me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+                me->SetDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
             }
             ++HelpersKilled;
         }

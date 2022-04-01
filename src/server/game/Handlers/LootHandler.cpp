@@ -262,7 +262,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
     player->SetLootGUID(ObjectGuid::Empty);
     player->SendLootRelease(lguid);
 
-    player->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOOTING);
+    player->RemoveUnitFlag(UNIT_FLAG_LOOTING);
 
     if (!player->IsInWorld())
         return;
@@ -380,7 +380,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
             if (!creature->IsAlive())
                 creature->AllLootRemovedFromCorpse();
 
-            creature->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+            creature->RemoveDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
             loot->clear();
         }
         else

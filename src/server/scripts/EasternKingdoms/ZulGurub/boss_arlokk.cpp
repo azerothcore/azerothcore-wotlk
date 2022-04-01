@@ -233,7 +233,7 @@ public:
                             me->AttackStop();
                             DoResetThreat();
                             me->SetReactState(REACT_PASSIVE);
-                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                             DoCast(me, SPELL_VANISH_VISUAL);
                             DoCast(me, SPELL_VANISH);
                             events.ScheduleEvent(EVENT_VANISH, 1000, 0, PHASE_ONE);
@@ -252,7 +252,7 @@ public:
                         break;
                     case EVENT_VISIBLE:
                         me->SetReactState(REACT_AGGRESSIVE);
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             AttackStart(target);
                         me->RemoveAura(SPELL_SUPER_INVIS);

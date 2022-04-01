@@ -484,7 +484,7 @@ public:
 
         void EnterEvadeMode(EvadeReason /*why*/) override
         {
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
+            me->RemoveUnitFlag(UNIT_FLAG_IN_COMBAT);
             me->ClearUnitState(UNIT_STATE_EVADE);
         }
 
@@ -1076,7 +1076,7 @@ public:
         if (!_owner->IsAlive())
             return true;
         _owner->GetMotionMaster()->MoveRandom(5.0f);
-        _owner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        _owner->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         _owner->SetReactState(REACT_AGGRESSIVE);
         _owner->CastSpell(_owner, SPELL_SAC_GHOUL_AREA_AURA, true);
         return true;
@@ -1093,7 +1093,7 @@ public:
 
     bool Execute(uint64 /*time*/, uint32 /*diff*/) override
     {
-        _owner->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        _owner->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         _owner->SetReactState(REACT_PASSIVE);
         _owner->SetDisplayId(11686);
         return true;
@@ -1140,14 +1140,14 @@ public:
 
         void AttackStart(Unit* who) override
         {
-            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 return;
             ScriptedAI::AttackStart(who);
         }
 
         bool CanAIAttack(Unit const* target) const override
         {
-            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE) || target->HasUnitState(UNIT_STATE_STUNNED) || me->GetDisplayId() == 11686)
+            if (me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) || target->HasUnitState(UNIT_STATE_STUNNED) || me->GetDisplayId() == 11686)
                 return false;
             Position homePos = me->GetHomePosition();
             return target->GetExactDistSq(&homePos) < 30.0f * 30.0f;
@@ -1162,7 +1162,7 @@ public:
 
         void Deactivate()
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetReactState(REACT_PASSIVE);
             me->SetDisplayId(11686);
         }
@@ -1273,7 +1273,7 @@ public:
         npc_q24545_vegardAI(Creature* c) : ScriptedAI(c)
         {
             me->SetReactState(REACT_PASSIVE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             events.Reset();
             events.ScheduleEvent(1, 7000);
             events.ScheduleEvent(2, urand(7000, 20000));
@@ -1311,7 +1311,7 @@ public:
                     break;
                 case 1:
                     me->SetReactState(REACT_AGGRESSIVE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     if (Unit* t = me->SelectNearestTarget(50.0f))
                         AttackStart(t);
                     break;

@@ -137,7 +137,7 @@ public:
                 extraEvents.Reset();
                 extraEvents.SetPhase(PHASE_EMERGED);
                 me->SetReactState(REACT_AGGRESSIVE);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC|UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC|UNIT_FLAG_NOT_SELECTABLE);
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
                 me->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
             }
@@ -276,7 +276,7 @@ public:
                             _isIntroDone = true;
                             extraEvents.SetPhase(PHASE_EMERGED);
                             me->RemoveAurasDueToSpell(SPELL_RAGNAROS_SUBMERGE_EFFECT);
-                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
+                            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
                             me->SetReactState(REACT_AGGRESSIVE);
                             DoZoneInCombat();
                             break;
@@ -409,7 +409,7 @@ public:
                         me->InterruptNonMeleeSpells(false);
                         me->AttackStop();
                         DoResetThreat();
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_SUBMERGED);
                         DoCastSelf(SPELL_RAGNA_SUBMERGE_VISUAL, true);
                         //me->HandleEmoteCommand(EMOTE_ONESHOT_SUBMERGE);
@@ -460,7 +460,7 @@ public:
             extraEvents.SetPhase(PHASE_EMERGED);
 
             me->SetReactState(REACT_AGGRESSIVE);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
             me->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
 

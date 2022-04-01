@@ -237,8 +237,8 @@ struct npc_amanitar_mushrooms : public ScriptedAI
         SetCombatMovement(false);
 
         //TODO: this prolly needs to be done in database
-        pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        pCreature->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        pCreature->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         pCreature->SetRegeneratingHealth(false);
     }
 

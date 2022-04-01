@@ -701,7 +701,7 @@ public:
                         {
                             deathbringerGUID[0] = c->GetGUID();
                             c->SetReactState(REACT_PASSIVE);
-                            c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             c->SetHomePosition(915.10f, 75.31f, 553.81f, 3.75f);
                             c->SetWalk(false);
                             c->GetMotionMaster()->MoveSplinePath(&path);
@@ -710,7 +710,7 @@ public:
                         {
                             deathbringerGUID[1] = c->GetGUID();
                             c->SetReactState(REACT_PASSIVE);
-                            c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             c->SetHomePosition(883.15f, 54.6254f, 528.5f, 3.75f);
                             c->SetWalk(false);
                             path.push_back(G3D::Vector3(883.15f, 54.6254f, 528.5f));
@@ -758,14 +758,14 @@ public:
                     if (Creature* c = pInstance->instance->GetCreature(deathbringerGUID[0]))
                     {
                         c->SetReactState(REACT_AGGRESSIVE);
-                        c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     }
                     break;
                 case 36:
                     if (Creature* c = pInstance->instance->GetCreature(deathbringerGUID[1]))
                     {
                         c->SetReactState(REACT_AGGRESSIVE);
-                        c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     }
                     break;
                 case 60:
@@ -930,7 +930,7 @@ public:
                 if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_GUID)))
                 {
                     c->AI()->Talk(SAY_PREFIGHT_1);
-                    c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                    c->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                     c->SetReactState(REACT_AGGRESSIVE);
                     //c->ClearUnitState(UNIT_STATE_ONVEHICLE);
                     if (Player* plr = c->SelectNearestPlayer(100.0f))
@@ -1106,7 +1106,7 @@ public:
     {
         npc_pos_freed_slaveAI(Creature* creature) : SmartAI(creature)
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+            me->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
             // immune to falling icicles
             me->ApplySpellImmune(0, IMMUNITY_ID, 69425, true);
             me->ApplySpellImmune(0, IMMUNITY_ID, 70827, true);

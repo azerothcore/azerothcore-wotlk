@@ -272,7 +272,7 @@ public:
             if (Creature* karja = creature->FindNearestCreature(ANCHORITE_KARJA, 15.0f, true))
                 karja->AI()->DoAction(EVENT_KARJA_WALK);
             if (Creature* socrethar = creature->FindNearestCreature(SOCRETHAR, 500.0f, true))
-                socrethar->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
+                socrethar->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
         }
 
         return true;
@@ -874,7 +874,7 @@ public:
                     case EVENT_FINAL_FIGHT:
                         // Prepare Socrethar for encounter
                         me->SetFaction(FACTION_DEMON);
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
                         me->SetReactState(REACT_AGGRESSIVE);
 
                         // Engage combat with Socrethar
@@ -1267,7 +1267,7 @@ public:
                     if (Creature* dimensius = me->FindNearestCreature(NPC_DIMENSIUS, 50.0f))
                     {
                         dimensius->RemoveAurasDueToSpell(SPELL_DIMENSIUS_TRANSFORM);
-                        dimensius->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                        dimensius->ReplaceAllUnitFlags(UNIT_FLAG_DISABLE_MOVE);
                         AttackStart(dimensius);
                         fight = true;
                     }
@@ -1822,7 +1822,7 @@ public:
         if (quest->GetQuestId() == Q_ALMABTRIEB)
         {
             creature->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
-            creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            creature->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             creature->AI()->Talk(SAY_BESSY_0);
             CAST_AI(npc_escortAI, (creature->AI()))->Start(true, false, player->GetGUID());
         }

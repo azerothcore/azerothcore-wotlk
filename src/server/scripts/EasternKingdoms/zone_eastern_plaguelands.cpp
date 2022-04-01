@@ -175,7 +175,7 @@ public:
                 float z = 159.65f;
                 creature->SetWalk(true);
                 creature->GetMotionMaster()->MovePoint(0, x, y, z);
-                creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+                creature->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
             }
         }
 

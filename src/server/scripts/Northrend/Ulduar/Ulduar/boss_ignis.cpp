@@ -113,7 +113,7 @@ public:
         {
             timer = 1000;
             me->SetReactState(REACT_PASSIVE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void JustReachedHome() override
@@ -126,7 +126,7 @@ public:
             if (spell->Id == SPELL_ACTIVATE_CONSTRUCT)
             {
                 me->RemoveAura(38757);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetReactState(REACT_AGGRESSIVE);
                 if (InstanceScript* instance = me->GetInstanceScript())
                     if (Creature* ignis = ObjectAccessor::GetCreature(*me, instance->GetGuidData(TYPE_IGNIS)))

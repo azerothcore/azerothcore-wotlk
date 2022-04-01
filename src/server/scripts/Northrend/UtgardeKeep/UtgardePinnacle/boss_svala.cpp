@@ -133,10 +133,10 @@ public:
             events.Reset();
             events2.Reset();
             if (!Started)
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             else
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                 me->SetHover(true);
             }
         }
@@ -152,7 +152,7 @@ public:
             if (data != 1 || param != 1 || Started || (instance && instance->GetData(DATA_SVALA_SORROWGRAVE) == DONE))
                 return;
 
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             Started = true;
             me->setActive(true);
             events2.ScheduleEvent(EVENT_SVALA_START, 5000);
@@ -247,7 +247,7 @@ public:
                         me->UpdateEntry(NPC_SVALA_SORROWGRAVE);
                         me->SetCorpseDelay(sWorld->getIntConfig(CONFIG_CORPSE_DECAY_ELITE));
                         me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 6.0f);
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                         if (Creature* Arthas = ObjectAccessor::GetCreature(*me, ArthasGUID))
                             Arthas->InterruptNonMeleeSpells(false);
                         me->RemoveAllAuras();
@@ -283,7 +283,7 @@ public:
                     break;
                 case EVENT_SVALA_TALK9:
                     me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 3.0f);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     me->LoadEquipment(1, true);
                     me->setActive(false);
                     if (Player* target = SelectTargetFromPlayerList(100.0f))
@@ -337,7 +337,7 @@ public:
                         me->SetControlled(true, UNIT_STATE_ROOT);
                         me->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
                         me->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     }
 
                     events.DelayEvents(25001); // +1 just to be sure
@@ -349,7 +349,7 @@ public:
                     me->CastSpell(me, SPELL_RITUAL_STRIKE, true);
                     return;
                 case EVENT_SORROWGRAVE_FINISH_RITUAL:
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->SetControlled(false, UNIT_STATE_ROOT);
                     AttackStart(me->GetVictim());
                     me->GetMotionMaster()->MoveFall(0, true);

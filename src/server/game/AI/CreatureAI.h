@@ -22,6 +22,7 @@
 #include "Common.h"
 #include "Creature.h"
 #include "UnitAI.h"
+#include "EventMap.h"
 
 class WorldObject;
 class Unit;
@@ -69,6 +70,8 @@ class CreatureAI : public UnitAI
 {
 protected:
     Creature* const me;
+
+    EventMap events;
 
     bool UpdateVictim();
     bool UpdateVictimWithGaze();
@@ -185,6 +188,8 @@ public:
 
     /// == Fields =======================================
     virtual void PassengerBoarded(Unit* /*passenger*/, int8 /*seatId*/, bool /*apply*/) {}
+
+    virtual bool BeforeSpellClick(Unit* /*clicker*/) { return true; }
 
     virtual void OnSpellClick(Unit* /*clicker*/, bool& /*result*/) { }
 
