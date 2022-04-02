@@ -45,13 +45,12 @@ enum Spells
     SPELL_BROODAF_BLACK                                    = 23154,   //Black affliction 23154
     SPELL_BROODAF_RED                                      = 23155,   //Red affliction 23155 (23168 on death)
     SPELL_BROODAF_BRONZE                                   = 23170,   //Bronze Affliction  23170
-    SPELL_BROODAF_BRONZE_STUN                              = 23171,
     SPELL_BROODAF_GREEN                                    = 23169,   //Brood Affliction Green 23169
     SPELL_CHROMATIC_MUT_1                                  = 23174,   //Spell cast on player if they get all 5 debuffs
 
     SPELL_ELEMENTAL_SHIELD                                 = 22276,
     SPELL_FRENZY                                           = 28371,   //The frenzy spell may be wrong
-    SPELL_ENRAGE                                           = 28747,
+    SPELL_ENRAGE                                           = 28747
 };
 
 enum Events
@@ -218,7 +217,7 @@ public:
 
         bool CanAIAttack(Unit const* victim) const override
         {
-            return !victim->HasAura(SPELL_BROODAF_BRONZE_STUN);
+            return !victim->HasAura(SPELL_TIMELAPSE);
         }
 
         void UpdateAI(uint32 diff) override
