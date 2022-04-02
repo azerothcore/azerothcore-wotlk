@@ -286,7 +286,7 @@ public:
         {
             if (param == ACTION_ENGAGE_ESSENCE)
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->SetInCombatWithZone();
             }
@@ -307,10 +307,10 @@ public:
             if (damage >= me->GetHealth())
             {
                 damage = 0;
-                if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+                if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                 {
                     me->RemoveAurasDueToSpell(SPELL_ESSENCE_OF_SUFFERING_PASSIVE); // prevent fixate from triggering
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     Talk(SUFF_SAY_RECAP);
                     me->SetReactState(REACT_PASSIVE);
                     me->GetMotionMaster()->Clear();
@@ -397,7 +397,7 @@ public:
         {
             if (param == ACTION_ENGAGE_ESSENCE)
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->SetInCombatWithZone();
             }
@@ -418,9 +418,9 @@ public:
             if (damage >= me->GetHealth())
             {
                 damage = 0;
-                if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+                if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                 {
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     Talk(DESI_SAY_RECAP);
                     me->SetReactState(REACT_PASSIVE);
                     me->GetMotionMaster()->Clear();
@@ -508,7 +508,7 @@ public:
         {
             if (param == ACTION_ENGAGE_ESSENCE)
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->SetInCombatWithZone();
             }

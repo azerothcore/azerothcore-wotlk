@@ -51,7 +51,7 @@ public:
                     break;
                 case NPC_SHADE_OF_ERANIKUS:
                     _shadeOfEranikusGUID = creature->GetGUID();
-                    creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    creature->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     break;
             }
 
@@ -66,7 +66,7 @@ public:
             if (unit->GetEntry() == NPC_JAMMAL_AN_THE_PROPHET)
             {
                 if (Creature* cr = instance->GetCreature(_shadeOfEranikusGUID))
-                    cr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    cr->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             }
 
         }

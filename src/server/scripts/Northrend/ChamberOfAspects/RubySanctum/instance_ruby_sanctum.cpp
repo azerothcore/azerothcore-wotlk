@@ -180,7 +180,7 @@ public:
                 case DATA_BALTHARUS_THE_WARBORN:
                     if (GetBossState(DATA_BALTHARUS_THE_WARBORN) == DONE && GetBossState(DATA_SAVIANA_RAGEFIRE) == DONE)
                         if (Creature* zarithrian = instance->GetCreature(GeneralZarithrianGUID))
-                            zarithrian->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
+                            zarithrian->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
                     break;
                 case DATA_GENERAL_ZARITHRIAN:
                     if (state == DONE)

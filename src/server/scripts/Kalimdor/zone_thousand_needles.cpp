@@ -337,7 +337,7 @@ public:
         {
             if (Creature* panther = go->FindNearestCreature(ENRAGED_PANTHER, 5, true))
             {
-                panther->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                panther->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 panther->SetReactState(REACT_AGGRESSIVE);
                 panther->AI()->AttackStart(player);
             }
@@ -363,7 +363,7 @@ public:
 
         void Reset() override
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             me->SetReactState(REACT_PASSIVE);
         }
 

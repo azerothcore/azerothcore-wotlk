@@ -24,18 +24,6 @@
 //**************************************************************************************
 #define WDT_MAP_SIZE 64
 
-class wdt_MWMO
-{
-    union
-    {
-        uint32 fcc;
-        char   fcc_txt[4];
-    };
-public:
-    uint32 size;
-    bool prepareLoadedData();
-};
-
 class wdt_MPHD
 {
     union
@@ -87,7 +75,6 @@ public:
 
     wdt_MPHD* mphd;
     wdt_MAIN* main;
-    wdt_MWMO* wmo;
 };
 
 #endif

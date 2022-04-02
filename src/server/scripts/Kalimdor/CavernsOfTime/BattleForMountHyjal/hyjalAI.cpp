@@ -989,7 +989,7 @@ void hyjalAI::DoOverrun(uint32 faction, const uint32 diff)
                     {
                         (*itr)->CastSpell(*itr, SPELL_TELEPORT_VISUAL, true);
                         (*itr)->SetFaction(FACTION_FRIENDLY); // make them friendly so mobs won't attack them
-                        (*itr)->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        (*itr)->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     }
                 }
                 DoCast(me, SPELL_TELEPORT_VISUAL);
