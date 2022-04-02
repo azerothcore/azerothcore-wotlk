@@ -38,6 +38,7 @@
 #include <memory>
 #include <mutex>
 #include <shared_mutex>
+#include <Collision/DynamicTree.h>
 
 class Unit;
 class WorldPacket;
