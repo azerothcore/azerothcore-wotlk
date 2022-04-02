@@ -635,6 +635,11 @@ public:
         _updateObjects.erase(obj);
     }
 
+    size_t GetActiveNonPlayersCount() const
+    {
+        return m_activeNonPlayers.size();
+    }
+
 private:
     void LoadMapAndVMap(int gx, int gy);
     void LoadVMap(int gx, int gy);

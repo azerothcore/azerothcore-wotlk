@@ -717,7 +717,7 @@ class spell_q11198_take_down_tethyr : public SpellScript
     {
         PreventHitDefaultEffect(effIndex);
         if (Unit* unit = GetHitUnit())
-            if (unit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC))
+            if (unit->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC))
                 return;
         GetCaster()->CastCustomSpell(42576 /*SPELL_CANNON_BLAST*/, SPELLVALUE_BASE_POINT0, GetEffectValue(), GetCaster(), true);
     }
@@ -837,6 +837,33 @@ public:
     SpellScript* GetSpellScript() const override
     {
         return new spell_generic_quest_update_entry_SpellScript(SPELL_EFFECT_DUMMY, EFFECT_1, NPC_MORBENT, NPC_WEAKENED_MORBENT, true);
+    }
+};
+
+enum BendingShinbone
+{
+    SPELL_BENDING_SHINBONE1 = 8854,
+    SPELL_BENDING_SHINBONE2 = 8855
+};
+
+class spell_q1846_bending_shinbone : public SpellScript
+{
+    PrepareSpellScript(spell_q1846_bending_shinbone);
+
+    void HandleScriptEffect(SpellEffIndex /* effIndex */)
+    {
+        Item* target = GetHitItem();
+        Unit* caster = GetCaster();
+        if (!target && caster->GetTypeId() != TYPEID_PLAYER)
+            return;
+
+        uint32 const spellId = roll_chance_i(20) ? SPELL_BENDING_SHINBONE1 : SPELL_BENDING_SHINBONE2;
+        caster->CastSpell(caster, spellId, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q1846_bending_shinbone::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -975,13 +1002,13 @@ class spell_q11396_11399_force_shield_arcane_purple_x3 : public AuraScript
     void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         Unit* target = GetTarget();
-        target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+        target->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
         target->SetControlled(true, UNIT_STATE_STUNNED);
     }
 
     void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        GetTarget()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+        GetTarget()->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
     }
 
     void Register() override
@@ -1440,8 +1467,8 @@ class spell_symbol_of_life_dummy : public SpellScript
             if (target->HasAura(SPELL_PERMANENT_FEIGN_DEATH))
             {
                 target->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
-                target->SetUInt32Value(UNIT_DYNAMIC_FLAGS, 0);
-                target->SetUInt32Value(UNIT_FIELD_FLAGS_2, 0);
+                target->ReplaceAllDynamicFlags(0);
+                target->ReplaceAllUnitFlags2(UNIT_FLAG2_NONE);
                 target->SetHealth(target->GetMaxHealth() / 2);
                 target->SetPower(POWER_MANA, uint32(target->GetMaxPower(POWER_MANA) * 0.75f));
             }
@@ -2400,6 +2427,7 @@ void AddSC_quest_spell_scripts()
     RegisterSpellScript(spell_q10985_light_of_the_naaru);
     RegisterSpellScript(spell_q9718_crow_transform);
     new spell_q55_sacred_cleansing();
+    RegisterSpellScript(spell_q1846_bending_shinbone);
     RegisterSpellScript(spell_q2203_thaumaturgy_channel);
     RegisterSpellScript(spell_q5206_test_fetid_skull);
     RegisterSpellScript(spell_q6124_6129_apply_salve);

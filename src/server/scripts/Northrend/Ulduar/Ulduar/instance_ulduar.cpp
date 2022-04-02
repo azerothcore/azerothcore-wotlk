@@ -185,7 +185,7 @@ public:
                 else // if (m_algalonTimer = TIMER_ALGALON_TO_SUMMON)
                 {
                     m_algalonTimer = TIMER_ALGALON_SUMMONED;
-                    algalon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                    algalon->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                 }
             }
         }
@@ -328,7 +328,10 @@ public:
                     break;
                 case NPC_HODIR:
                     m_uiHodirGUID = creature->GetGUID();
-                    SpawnHodirChests(instance->GetDifficulty(), creature);
+                    if (m_auiEncounter[TYPE_HODIR] != DONE)
+                    {
+                        SpawnHodirChests(instance->GetDifficulty(), creature);
+                    }
                     break;
                 case NPC_THORIM:
                     m_uiThorimGUID = creature->GetGUID();

@@ -128,7 +128,7 @@ namespace VMAP
         {
             return getMapFileName(mapId);
         }
-        bool existsMap(const char* basePath, unsigned int mapId, int x, int y) override;
+        LoadResult existsMap(const char* basePath, unsigned int mapId, int x, int y) override;
         void GetInstanceMapTree(InstanceTreeMap& instanceMapTree);
 
         typedef uint32(*GetLiquidFlagsFn)(uint32 liquidType);
