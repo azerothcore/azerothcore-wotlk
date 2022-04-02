@@ -1,3 +1,19 @@
+-- DB update 2022_04_02_09 -> 2022_04_02_10
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_04_02_09';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_04_02_09 2022_04_02_10 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1648455947142163675'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1648455947142163675');
 
 -- 10742 Enfrentamiento
@@ -303,3 +319,13 @@ DELETE FROM `quest_offer_reward_locale` WHERE `id` = @ID AND `locale` IN('esES',
 INSERT INTO `quest_offer_reward_locale` (`id`, `locale`, `RewardText`, `VerifiedBuild`) VALUES
 (@ID, 'esES', 'Bien, bien, bien... si es $gel:la; soldado que envié al campo. Has vuelto y estás de una pieza.$B$B<Yoregar asiente.>$B$BSabía que no me decepcionarías, soldado. Has detenido un peligroso avance Illidari y, al hacerlo, te has ganado una pequeña recompensa.', 0),
 (@ID, 'esMX', 'Bien, bien, bien... si es $gel:la; soldado que envié al campo. Has vuelto y estás de una pieza.$B$B<Yoregar asiente.>$B$BSabía que no me decepcionarías, soldado. Has detenido un peligroso avance Illidari y, al hacerlo, te has ganado una pequeña recompensa.', 0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_04_02_10' WHERE sql_rev = '1648455947142163675';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

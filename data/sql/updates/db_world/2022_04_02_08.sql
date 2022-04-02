@@ -1,3 +1,19 @@
+-- DB update 2022_04_02_07 -> 2022_04_02_08
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_04_02_07';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_04_02_07 2022_04_02_08 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1648453453046196047'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1648453453046196047');
 
 REPLACE INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES
@@ -322,3 +338,13 @@ REPLACE INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ve
 (7942, 'ruRU', '$N, ты столько для меня $Gсделал:сделала;! Я бесконечно тебе благодарен.$B$BТориевых устройств мне теперь хватит надолго, но если у тебя завалялась еще парочка-другая – приноси. Я дам тебе за них купоны ярмарки.', 0),
 (7943, 'ruRU', '$N, мой новый аттракцион будет пострашнее гномреганской катастрофы! И я не забуду о твоем вкладе в этот проект! Спасибо тебе еще раз!$B$BЭтих запасов мне хватит надолго, но если ты раздобудешь глаза злобных летучих мышей из Восточных Чумных земель, я с удовольствием обменяю их на купоны ярмарки Новолуния!', 0),
 (7946, 'ruRU', 'Какое счастье, что Жабжаб вернулась. Она обожает эль Черного Железа, и когда он у меня кончился... она сбежала!$B$BТеперь, когда Жабжаб снова со мной, мне понадобится много эля! Я не хочу, чтобы моя крошка опять потерялась!$B$BУ тебя не найдется кружечки эля Черного Железа? Я отдам тебе за нее одно из яиц Жабжаб...', 0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_04_02_08' WHERE sql_rev = '1648453453046196047';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

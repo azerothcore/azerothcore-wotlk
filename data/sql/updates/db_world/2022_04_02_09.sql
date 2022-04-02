@@ -1,3 +1,19 @@
+-- DB update 2022_04_02_08 -> 2022_04_02_09
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_04_02_08';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_04_02_08 2022_04_02_09 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1648455359822896026'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1648455359822896026');
 
 REPLACE INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES
@@ -586,3 +602,13 @@ REPLACE INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ve
 (4974, 'ruRU', '<Тралл рычит.>', 0),
 (4976, 'ruRU', 'Как идут поиски, $N?$B$BТабета более чем полезна когда речь заходит о магии. Я уверена что ей не составит труда помочь тебе, если ты конечно найдешь ее.', 0),
 (4983, 'ruRU', 'Где эта гоблинша?!', 0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_04_02_09' WHERE sql_rev = '1648455359822896026';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
