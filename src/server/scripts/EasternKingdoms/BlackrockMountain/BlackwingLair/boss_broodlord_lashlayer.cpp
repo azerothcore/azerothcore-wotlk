@@ -221,7 +221,7 @@ class go_suppression_device : public GameObjectScript
                     me->SetGoState(GO_STATE_READY);
                 me->SetLootState(GO_READY);
                 me->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-                _events.ScheduleEvent(EVENT_SUPPRESSION_CAST, 1000);
+                _events.ScheduleEvent(EVENT_SUPPRESSION_CAST, 5000);
                 me->Respawn();
             }
 
