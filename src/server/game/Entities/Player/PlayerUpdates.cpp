@@ -47,9 +47,6 @@
 // Zone Interval should be 1 second
 constexpr auto ZONE_UPDATE_INTERVAL = 1000;
 
-constexpr auto CINEMATIC_UPDATEDIFF = 500;
-constexpr auto CINEMATIC_LOOKAHEAD  = 2000;
-
 void Player::Update(uint32 p_time)
 {
     if (!IsInWorld())
@@ -70,12 +67,11 @@ void Player::Update(uint32 p_time)
 
     // Update cinematic location, if 500ms have passed and we're doing a
     // cinematic now.
-    m_cinematicDiff += p_time;
-    if (m_cinematicCamera && m_activeCinematicCameraId &&
-        GetMSTimeDiffToNow(m_lastCinematicCheck) > CINEMATIC_UPDATEDIFF)
+    _cinematicMgr->m_cinematicDiff += p_time;
+    if (_cinematicMgr->m_cinematicCamera && _cinematicMgr->m_activeCinematicCameraId && GetMSTimeDiffToNow(_cinematicMgr->m_lastCinematicCheck) > CINEMATIC_UPDATEDIFF)
     {
-        m_lastCinematicCheck = getMSTime();
-        UpdateCinematicLocation(p_time);
+        _cinematicMgr->m_lastCinematicCheck = getMSTime();
+        _cinematicMgr->UpdateCinematicLocation(p_time);
     }
 
     // used to implement delayed far teleports
@@ -98,7 +94,7 @@ void Player::Update(uint32 p_time)
 
     // Xinef: update charm AI only if we are controlled by creature or
     // non-posses player charm
-    if (IsCharmed() && !HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
+    if (IsCharmed() && !HasUnitFlag(UNIT_FLAG_POSSESSED))
     {
         m_charmUpdateTimer += p_time;
         if (m_charmUpdateTimer >= 1000)
@@ -1196,6 +1192,11 @@ void Player::UpdateArea(uint32 newArea)
 
 void Player::UpdateZone(uint32 newZone, uint32 newArea)
 {
+    if (!newZone)
+    {
+        return;
+    }
+
     if (m_zoneUpdateId != newZone)
     {
         sOutdoorPvPMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
@@ -1506,107 +1507,6 @@ void Player::UpdatePotionCooldown(Spell* spell)
     }
 
     SetLastPotionId(0);
-}
-
-void Player::UpdateCinematicLocation(uint32 /*diff*/)
-{
-    Position lastPosition;
-    uint32   lastTimestamp = 0;
-    Position nextPosition;
-    uint32   nextTimestamp = 0;
-
-    if (m_cinematicCamera->size() == 0)
-    {
-        return;
-    }
-
-    // Obtain direction of travel
-    for (FlyByCamera cam : *m_cinematicCamera)
-    {
-        if (cam.timeStamp > m_cinematicDiff)
-        {
-            nextPosition  = Position(cam.locations.x, cam.locations.y,
-                                    cam.locations.z, cam.locations.w);
-            nextTimestamp = cam.timeStamp;
-            break;
-        }
-        lastPosition  = Position(cam.locations.x, cam.locations.y,
-                                cam.locations.z, cam.locations.w);
-        lastTimestamp = cam.timeStamp;
-    }
-    float angle = lastPosition.GetAngle(&nextPosition);
-    angle -= lastPosition.GetOrientation();
-    if (angle < 0)
-    {
-        angle += 2 * float(M_PI);
-    }
-
-    // Look for position around 2 second ahead of us.
-    int32 workDiff = m_cinematicDiff;
-
-    // Modify result based on camera direction (Humans for example, have the
-    // camera point behind)
-    workDiff += static_cast<int32>(float(CINEMATIC_LOOKAHEAD) * cos(angle));
-
-    // Get an iterator to the last entry in the cameras, to make sure we don't
-    // go beyond the end
-    FlyByCameraCollection::const_reverse_iterator endItr =
-        m_cinematicCamera->rbegin();
-    if (endItr != m_cinematicCamera->rend() &&
-        workDiff > static_cast<int32>(endItr->timeStamp))
-    {
-        workDiff = endItr->timeStamp;
-    }
-
-    // Never try to go back in time before the start of cinematic!
-    if (workDiff < 0)
-    {
-        workDiff = m_cinematicDiff;
-    }
-
-    // Obtain the previous and next waypoint based on timestamp
-    for (FlyByCamera cam : *m_cinematicCamera)
-    {
-        if (static_cast<int32>(cam.timeStamp) >= workDiff)
-        {
-            nextPosition  = Position(cam.locations.x, cam.locations.y,
-                                    cam.locations.z, cam.locations.w);
-            nextTimestamp = cam.timeStamp;
-            break;
-        }
-        lastPosition  = Position(cam.locations.x, cam.locations.y,
-                                cam.locations.z, cam.locations.w);
-        lastTimestamp = cam.timeStamp;
-    }
-
-    // Never try to go beyond the end of the cinematic
-    if (workDiff > static_cast<int32>(nextTimestamp))
-    {
-        workDiff = static_cast<int32>(nextTimestamp);
-    }
-
-    // Interpolate the position for this moment in time (or the adjusted moment
-    // in time)
-    uint32   timeDiff  = nextTimestamp - lastTimestamp;
-    uint32   interDiff = workDiff - lastTimestamp;
-    float    xDiff     = nextPosition.m_positionX - lastPosition.m_positionX;
-    float    yDiff     = nextPosition.m_positionY - lastPosition.m_positionY;
-    float    zDiff     = nextPosition.m_positionZ - lastPosition.m_positionZ;
-    Position interPosition(lastPosition.m_positionX +
-                               (xDiff * (float(interDiff) / float(timeDiff))),
-                           lastPosition.m_positionY +
-                               (yDiff * (float(interDiff) / float(timeDiff))),
-                           lastPosition.m_positionZ +
-                               (zDiff * (float(interDiff) / float(timeDiff))));
-
-    // Advance (at speed) to this position. The remote sight object is used
-    // to send update information to player in cinematic
-    if (m_CinematicObject && interPosition.IsPositionValid())
-    {
-        m_CinematicObject->MonsterMoveWithSpeed(
-            interPosition.m_positionX, interPosition.m_positionY,
-            interPosition.m_positionZ, 200.0f);
-    }
 }
 
 template void Player::UpdateVisibilityOf(Player* target, UpdateData& data,

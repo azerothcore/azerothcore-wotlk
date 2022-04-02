@@ -22,6 +22,7 @@
 #include "ScriptMgr.h"
 #include "SpellScript.h"
 #include "sunken_temple.h"
+#include "Unit.h"
 
 class instance_sunken_temple : public InstanceMapScript
 {
@@ -48,6 +49,10 @@ public:
                 case NPC_JAMMAL_AN_THE_PROPHET:
                     _jammalanGUID = creature->GetGUID();
                     break;
+                case NPC_SHADE_OF_ERANIKUS:
+                    _shadeOfEranikusGUID = creature->GetGUID();
+                    creature->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    break;
             }
 
             if (creature->IsAlive() && creature->GetSpawnId() && creature->GetCreatureType() == CREATURE_TYPE_DRAGONKIN && creature->GetEntry() != NPC_SHADE_OF_ERANIKUS)
@@ -58,6 +63,12 @@ public:
         {
             if (unit->GetTypeId() == TYPEID_UNIT && unit->GetCreatureType() == CREATURE_TYPE_DRAGONKIN && unit->GetEntry() != NPC_SHADE_OF_ERANIKUS)
                 _dragonkinList.remove(unit->GetGUID());
+            if (unit->GetEntry() == NPC_JAMMAL_AN_THE_PROPHET)
+            {
+                if (Creature* cr = instance->GetCreature(_shadeOfEranikusGUID))
+                    cr->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            }
+
         }
 
         void OnGameObjectCreate(GameObject* gameobject) override
@@ -193,6 +204,7 @@ public:
 
         ObjectGuid _forcefieldGUID;
         ObjectGuid _jammalanGUID;
+        ObjectGuid _shadeOfEranikusGUID;
         GuidList _dragonkinList;
         EventMap _events;
     };

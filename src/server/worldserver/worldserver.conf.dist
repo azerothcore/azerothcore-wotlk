@@ -1814,7 +1814,7 @@ NpcRegenHPTimeIfTargetIsUnreachable = 10
 #                                                                                      Racial Trait Swap, NPC - All Mounts Modules
 #        Default:     ""
 
-Creatures.CustomIDs = "190010,55005,999991,25462,98888,601014"
+Creatures.CustomIDs = "190010,55005,999991,25462,98888,601014,34567,34568"
 
 #
 ###################################################################################################
@@ -2471,6 +2471,7 @@ DurabilityLoss.InPvP = 0
 #
 #    DurabilityLoss.OnDeath
 #        Description: Durability loss percentage on death.
+#        Note:        On 3.3.5 client always shows log message "Your items have lost 10% durability"
 #        Default:     10
 
 DurabilityLoss.OnDeath = 10
@@ -2550,6 +2551,7 @@ Die.Command.Mode = 1
 
 #    Rate.MissChanceMultiplier.Creature
 #    Rate.MissChanceMultiplier.Player
+#    Rate.MissChanceMultiplier.OnlyAffectsPlayer
 #
 #        Description: When the target is 3 or more level higher than the player,
 #                     the chance to hit is determined by the formula: 94 - (levelDiff - 2) * Rate.MissChanceMultiplier
@@ -2557,15 +2559,19 @@ Die.Command.Mode = 1
 #
 #                     Note: this does not affect when the player is less than 3 levels different than the target,
 #                     where this (linear) formula is used instead to calculate the hit chance: 96 - levelDiff.
+#                     You can set Rate.MissChanceMultiplier.OnlyAffectsPlayer to 1 if you only want to affect the MissChance
+#                     for player casters only. This way you won't be affecting creature missing chance.
 #
 #                     Example: if you want the chance to keep growing linearly, use 1.
 #
 #        Default:     Rate.MissChanceMultiplier.TargetCreature = 11
 #                     Rate.MissChanceMultiplier.TargetPlayer = 7
+#                     Rate.MissChanceMultiplier.OnlyAffectsPlayer = 0
 #
 
 Rate.MissChanceMultiplier.TargetCreature = 11
 Rate.MissChanceMultiplier.TargetPlayer = 7
+Rate.MissChanceMultiplier.OnlyAffectsPlayer = 0
 
 #
 ###################################################################################################
@@ -2917,6 +2923,14 @@ Arena.MaxRatingDifference = 150
 #                     0      - (Disabled)
 
 Arena.RatingDiscardTimer = 600000
+
+#
+#    Arena.PreviousOpponentsDiscardTimer
+#        Description: Time (in milliseconds) after which the previous opponents will be ignored.
+#        Default:     120000 - (Enabled, 2 minutes - Blizzlike)
+#                     0      - (Disabled)
+
+Arena.PreviousOpponentsDiscardTimer = 120000
 
 #
 #    Arena.AutoDistributePoints

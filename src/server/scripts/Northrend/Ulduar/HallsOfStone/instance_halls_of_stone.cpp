@@ -217,7 +217,7 @@ public:
 
                 // Make sjonnir attackable
                 if (Creature* cr = instance->GetCreature(SjonnirGUID))
-                    cr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    cr->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             }
             if (type == BOSS_TRIBUNAL_OF_AGES && data == NOT_STARTED)
             {

@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "BattlegroundAV.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 
@@ -73,6 +74,52 @@ public:
         {
             Reset();
             Talk(YELL_RESPAWN);
+        }
+
+        void AttackStart(Unit* victim) override
+        {
+            ScriptedAI::AttackStart(victim);
+
+            // Mini bosses should attack as well
+            if (BattlegroundMap* bgMap = me->GetMap()->ToBattlegroundMap())
+            {
+                if (Battleground* bg = bgMap->GetBG())
+                {
+                    for (uint8 i = AV_CPLACE_H_MARSHAL_ICE; i <= AV_CPLACE_H_MARSHAL_WTOWER; ++i)
+                    {
+                        if (Creature* marshall = bg->GetBGCreature(i))
+                        {
+                            if (marshall->IsAIEnabled && !marshall->GetVictim())
+                            {
+                                marshall->AI()->AttackStart(victim);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        void EnterEvadeMode() override
+        {
+            ScriptedAI::EnterEvadeMode();
+
+            // Evade mini bosses
+            if (BattlegroundMap* bgMap = me->GetMap()->ToBattlegroundMap())
+            {
+                if (Battleground* bg = bgMap->GetBG())
+                {
+                    for (uint8 i = AV_CPLACE_H_MARSHAL_ICE; i <= AV_CPLACE_H_MARSHAL_WTOWER; ++i)
+                    {
+                        if (Creature* marshall = bg->GetBGCreature(i))
+                        {
+                            if (marshall->IsAIEnabled && !marshall->IsInEvadeMode())
+                            {
+                                marshall->AI()->EnterEvadeMode();
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         void UpdateAI(uint32 diff) override

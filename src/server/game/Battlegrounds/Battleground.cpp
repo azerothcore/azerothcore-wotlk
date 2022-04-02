@@ -232,6 +232,9 @@ Battleground::~Battleground()
         m_Map = nullptr;
     }
 
+    // remove from bg free slot queue
+    RemoveFromBGFreeSlotQueue();
+
     for (auto const& itr : PlayerScores)
         delete itr.second;
 }
@@ -251,8 +254,21 @@ void Battleground::Update(uint32 diff)
 
     if (!GetPlayersSize())
     {
+        //BG is empty
+        // if there are no players invited, delete BG
+        // this will delete arena or bg object, where any player entered
+        // [[   but if you use battleground object again (more battles possible to be played on 1 instance)
+        //      then this condition should be removed and code:
+        //      if (!GetInvitedCount(TEAM_HORDE) && !GetInvitedCount(TEAM_ALLIANCE))
+        //          AddToFreeBGObjectsQueue(); // not yet implemented
+        //      should be used instead of current
+        // ]]
+        // Battleground Template instance cannot be updated, because it would be deleted
         if (!GetInvitedCount(TEAM_HORDE) && !GetInvitedCount(TEAM_ALLIANCE))
+        {
             m_SetDeleteThis = true;
+        }
+
         return;
     }
 
@@ -768,6 +784,7 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
     if (GetStatus() == STATUS_WAIT_LEAVE)
         return;
 
+    RemoveFromBGFreeSlotQueue();
     SetStatus(STATUS_WAIT_LEAVE);
     SetWinner(winnerTeamId);
 
@@ -956,12 +973,16 @@ void Battleground::RemovePlayerAtLeave(Player* player)
     // if the player was a match participant
     if (participant)
     {
-        WorldPacket data;
-
         player->ClearAfkReports();
 
+        WorldPacket data;
         sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, this, player->GetCurrentBattlegroundQueueSlot(), STATUS_NONE, 0, 0, 0, TEAM_NEUTRAL);
         player->GetSession()->SendPacket(&data);
+
+        BattlegroundQueueTypeId bgQueueTypeId = BattlegroundMgr::BGQueueTypeId(GetBgTypeID(), GetArenaType());
+
+        // this call is important, because player, when joins to battleground, this method is not called, so it must be called when leaving bg
+        player->RemoveBattlegroundQueueId(bgQueueTypeId);
 
         // remove from raid group if player is member
         if (Group* group = GetBgRaid(teamId))
@@ -977,6 +998,19 @@ void Battleground::RemovePlayerAtLeave(Player* player)
         if (isBattleground() && !player->IsGameMaster() && sWorld->getBoolConfig(CONFIG_BATTLEGROUND_CAST_DESERTER))
             if (status == STATUS_IN_PROGRESS || status == STATUS_WAIT_JOIN)
                 player->ScheduleDelayedOperation(DELAYED_SPELL_CAST_DESERTER);
+
+        DecreaseInvitedCount(teamId);
+
+        //we should update battleground queue, but only if bg isn't ending
+        if (isBattleground() && GetStatus() < STATUS_WAIT_LEAVE)
+        {
+            BattlegroundTypeId bgTypeId = GetBgTypeID();
+            BattlegroundQueueTypeId bgQueueTypeId = BattlegroundMgr::BGQueueTypeId(GetBgTypeID(), GetArenaType());
+
+            // a player has left the battleground, so there are free slots -> add to queue
+            AddToBGFreeSlotQueue();
+            sBattlegroundMgr->ScheduleQueueUpdate(0, 0, bgQueueTypeId, bgTypeId, GetBracketId());
+        }
     }
 
     // Remove shapeshift auras
@@ -1009,6 +1043,7 @@ void Battleground::Init()
 
     m_BgInvitedPlayers[TEAM_ALLIANCE] = 0;
     m_BgInvitedPlayers[TEAM_HORDE] = 0;
+    _InBGFreeSlotQueue = false;
 
     m_Players.clear();
 
@@ -1028,9 +1063,15 @@ void Battleground::StartBattleground()
     SetStartTime(0);
     SetLastResurrectTime(0);
 
+    // add BG to free slot queue
+    AddToBGFreeSlotQueue();
+
     // add bg to update list
     // this must be done here, because we need to have already invited some players when first Battleground::Update() method is executed
     sBattlegroundMgr->AddBattleground(this);
+
+    if (m_IsRated)
+        LOG_DEBUG("bg.arena", "Arena match type: {} for Team1Id: {} - Team2Id: {} started.", m_ArenaType, m_ArenaTeamIds[TEAM_ALLIANCE], m_ArenaTeamIds[TEAM_HORDE]);
 }
 
 void Battleground::AddPlayer(Player* player)
@@ -1126,6 +1167,26 @@ void Battleground::AddOrSetPlayerToCorrectBgGroup(Player* player, TeamId teamId)
                 group->ChangeLeader(playerGuid);
                 group->SendUpdate();
             }
+    }
+}
+
+// This method should be called only once ... it adds pointer to queue
+void Battleground::AddToBGFreeSlotQueue()
+{
+    if (!_InBGFreeSlotQueue && isBattleground())
+    {
+        sBattlegroundMgr->AddToBGFreeSlotQueue(m_RealTypeID, this);
+        _InBGFreeSlotQueue = true;
+    }
+}
+
+// This method removes this battleground from free queue - it must be called when deleting battleground
+void Battleground::RemoveFromBGFreeSlotQueue()
+{
+    if (_InBGFreeSlotQueue)
+    {
+        sBattlegroundMgr->RemoveFromBGFreeSlotQueue(m_RealTypeID, m_InstanceID);
+        _InBGFreeSlotQueue = false;
     }
 }
 
@@ -1611,6 +1672,7 @@ void Battleground::SendMessage2ToAll(uint32 entry, ChatMsg type, Player const* s
 
 void Battleground::EndNow()
 {
+    RemoveFromBGFreeSlotQueue();
     SetStatus(STATUS_WAIT_LEAVE);
     SetEndTime(0);
 }
@@ -1702,7 +1764,7 @@ void Battleground::HandleKillPlayer(Player* victim, Player* killer)
     if (!isArena())
     {
         // To be able to remove insignia -- ONLY IN Battlegrounds
-        victim->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
+        victim->SetUnitFlag(UNIT_FLAG_SKINNABLE);
         RewardXPAtKill(killer, victim);
     }
 }
@@ -1775,6 +1837,12 @@ void Battleground::SetBgRaid(TeamId teamId, Group* bg_raid)
 GraveyardStruct const* Battleground::GetClosestGraveyard(Player* player)
 {
     return sGraveyard->GetClosestGraveyard(player, player->GetBgTeamId());
+}
+
+void Battleground::SetBracket(PvPDifficultyEntry const* bracketEntry)
+{
+    m_BracketId = bracketEntry->GetBracketId();
+    SetLevelRange(bracketEntry->minLevel, bracketEntry->maxLevel);
 }
 
 void Battleground::StartTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry)

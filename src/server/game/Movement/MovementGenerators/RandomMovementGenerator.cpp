@@ -280,7 +280,7 @@ bool RandomMovementGenerator<Creature>::DoUpdate(Creature* creature, const uint3
     }
 
     // xinef: if we got disable move flag, do not remove default generator - just prevent movement
-    if (creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
+    if (creature->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
     {
         _nextMoveTime.Reset(0);  // Expire the timer
         creature->ClearUnitState(UNIT_STATE_ROAMING_MOVE);

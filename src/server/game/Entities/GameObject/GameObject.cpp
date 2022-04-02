@@ -2057,13 +2057,13 @@ void GameObject::CastSpell(Unit* target, uint32 spellId)
         // needed for GO casts for proper target validation checks
         trigger->SetOwnerGUID(owner->GetGUID());
         // xinef: fixes some duel bugs with traps]
-        if (owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
-            trigger->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+        if (owner->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
+            trigger->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
         if (owner->IsFFAPvP())
             trigger->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
 
         // xinef: Remove Immunity flags
-        trigger->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        trigger->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
         // xinef: set proper orientation, fixes cast against stealthed targets
         if (target)
             trigger->SetInFront(target);
@@ -2141,7 +2141,8 @@ void GameObject::EventInform(uint32 eventId)
 uint32 GameObject::GetScriptId() const
 {
     if (GameObjectData const* gameObjectData = GetGOData())
-        return gameObjectData->ScriptId;
+        if (uint32 scriptId = gameObjectData->ScriptId)
+            return scriptId;
 
     return GetGOInfo()->ScriptId;
 }
@@ -2546,17 +2547,32 @@ void GameObject::SetLootRecipient(Map* map)
 bool GameObject::IsLootAllowedFor(Player const* player) const
 {
     if (!m_lootRecipient && !m_lootRecipientGroup)
+    {
         return true;
+    }
 
     if (player->GetGUID() == m_lootRecipient)
+    {
         return true;
+    }
 
     if (player->HasPendingBind())
+    {
         return false;
+    }
 
+    // if we dont have a group we arent the recipient
+    // if go doesnt have group bound it means it was solo killed by someone else
     Group const* playerGroup = player->GetGroup();
-    if (!playerGroup || playerGroup != GetLootRecipientGroup()) // if we dont have a group we arent the recipient
-        return false;                                           // if go doesnt have group bound it means it was solo killed by someone else
+    if (!playerGroup || playerGroup != GetLootRecipientGroup())
+    {
+        return false;
+    }
+
+    if (!HasAllowedLooter(player->GetGUID()))
+    {
+        return false;
+    }
 
     return true;
 }

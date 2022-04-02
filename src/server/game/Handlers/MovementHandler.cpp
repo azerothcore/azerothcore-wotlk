@@ -170,7 +170,7 @@ void WorldSession::HandleMoveWorldportAck()
 
         if (uint32 inviteInstanceId = _player->GetPendingSpectatorInviteInstanceId())
         {
-            if (Battleground* tbg = sBattlegroundMgr->GetBattleground(inviteInstanceId))
+            if (Battleground* tbg = sBattlegroundMgr->GetBattleground(inviteInstanceId, BATTLEGROUND_TYPE_NONE))
                 tbg->RemoveToBeTeleported(_player->GetGUID());
             _player->SetPendingSpectatorInviteInstanceId(0);
         }
@@ -373,7 +373,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     }
 
     // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
-    if (mover->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
+    if (mover->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
     {
         // Xinef: skip moving packets
         if (movementInfo.HasMovementFlag(MOVEMENTFLAG_MASK_MOVING))
@@ -904,14 +904,14 @@ void WorldSession::ComputeNewClockDelta()
     std::vector<uint32> latencies;
     std::vector<int64> clockDeltasAfterFiltering;
 
-    for (auto pair : _timeSyncClockDeltaQueue.content())
+    for (auto& pair : _timeSyncClockDeltaQueue.content())
         latencies.push_back(pair.second);
 
     uint32 latencyMedian = median(latencies);
     uint32 latencyStandardDeviation = standard_deviation(latencies);
 
     uint32 sampleSizeAfterFiltering = 0;
-    for (auto pair : _timeSyncClockDeltaQueue.content())
+    for (auto& pair : _timeSyncClockDeltaQueue.content())
     {
         if (pair.second <= latencyMedian + latencyStandardDeviation) {
             clockDeltasAfterFiltering.push_back(pair.first);
