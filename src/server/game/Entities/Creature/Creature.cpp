@@ -2012,18 +2012,6 @@ void Creature::DespawnOnEvade()
 {
     SetVisible(false);
     AI()->SummonedCreatureDespawnAll();
-    RemoveEvadeAuras();
-
-    float x, y, z, o;
-    GetRespawnPosition(x, y, z, &o);
-    SetHomePosition(x, y, z, o);
-    SetPosition(x, y, z, o);
-
-    if (IsFalling())
-    {
-        RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING);
-    }
-    StopMoving();
 }
 
 void Creature::RespawnOnEvade()
