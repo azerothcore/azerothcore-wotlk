@@ -261,9 +261,9 @@ public:
                                 }
                             }
 
-                            if (playerTargets.size() > 15)
+                            if (playerTargets.size() > 12)
                             {
-                                Acore::Containers::RandomResize(playerTargets, 15);
+                                Acore::Containers::RandomResize(playerTargets, 12);
                             }
 
                             for (Player* player : playerTargets)
