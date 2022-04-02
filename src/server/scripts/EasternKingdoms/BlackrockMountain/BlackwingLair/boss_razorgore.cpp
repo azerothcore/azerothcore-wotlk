@@ -79,7 +79,6 @@ public:
         void Reset() override
         {
             _Reset();
-            _died = false;
             _charmerGUID.Clear();
             secondPhase = false;
             summons.DespawnAll();
@@ -91,6 +90,18 @@ public:
             if (secondPhase)
             {
                 _JustDied();
+            }
+            else
+            {
+                // Respawn shorty in case of failure during phase 1.
+                me->SetCorpseRemoveTime(25);
+                me->SetRespawnTime(30);
+                me->SaveRespawnTime();
+
+                // Might not be required, safe measure.
+                me->SetLootRecipient(nullptr);
+
+                instance->SetData(DATA_EGG_EVENT, FAIL);
             }
         }
 
@@ -191,24 +202,11 @@ public:
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (!secondPhase && damage >= me->GetHealth() && !_died)
+            if (!secondPhase && damage >= me->GetHealth())
             {
-                // This is required because he kills himself with the explosion spell, causing a loop.
-                _died = true;
-
                 Talk(SAY_DEATH);
                 DoCastAOE(SPELL_EXPLODE_ORB);
                 DoCastAOE(SPELL_EXPLOSION);
-
-                // Respawn shorty in case of failure during phase 1.
-                me->SetCorpseRemoveTime(25);
-                me->SetRespawnTime(30);
-                me->SaveRespawnTime();
-
-                // Might not be required, safe measure.
-                me->SetLootRecipient(nullptr);
-
-                instance->SetData(DATA_EGG_EVENT, FAIL);
             }
         }
 
@@ -256,7 +254,6 @@ public:
 
     private:
         bool secondPhase;
-        bool _died;
         ObjectGuid _charmerGUID;
         GuidVector _summonGUIDS;
     };
