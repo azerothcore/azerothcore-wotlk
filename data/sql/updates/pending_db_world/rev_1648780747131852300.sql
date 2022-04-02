@@ -4,6 +4,8 @@ UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_drakonid_spawn
 
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (14307, 14309, 14310, 14311, 14312) AND `source_type` = 0;
 
+UPDATE `creature` SET `spawntimesecs` = 1800 WHERE `guid` = 84627;
+
 SET @GUID := 84557;
 SET @PATH := @GUID * 10;
 UPDATE `creature` SET `position_x` = -7496.66, `position_y` = -1038.1, `position_z` = 449.242, `orientation` = 3.77, `MovementType` = 2 WHERE `guid` = @GUID;
