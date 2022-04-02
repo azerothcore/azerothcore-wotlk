@@ -2181,7 +2181,6 @@ public:
                 return;
 
             Position pos = caster->GetNearPosition(5.0f, 0.0f);
-            caster->GetPosition(&pos);
             caster->GetNearPosition(pos, 5.0f, 0.0f);
             pos.m_positionZ = caster->GetMap()->GetHeight(caster->GetPhaseMask(), pos.GetPositionX(), pos.GetPositionY(), caster->GetPositionZ(), true);
             pos.m_positionZ += 0.1f;
