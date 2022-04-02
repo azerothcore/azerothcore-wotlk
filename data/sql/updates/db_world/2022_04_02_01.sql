@@ -1,3 +1,19 @@
+-- DB update 2022_04_02_00 -> 2022_04_02_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_04_02_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_04_02_00 2022_04_02_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1648459815782916506'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1648459815782916506');
 
 REPLACE INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `VerifiedBuild`) VALUES
@@ -375,3 +391,13 @@ REPLACE INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `Verifie
 (12992, 'ruRU', '$N, ты $Gсамый:самая; $Gлучший:лучшая; |3-6($R)!', 0),
 (12995, 'ruRU', 'Отлично, $N. Теперь, увидев оскверненные тела своих павших товарищей, они трижды подумают, прежде чем на нас нападать!$B$BЕсли ты придешь завтра, я позабочусь о том, чтобы мои люди подготовили для тебя еще знамена.', 0),
 (12999, 'ruRU', '$N, ты $Gпришел:пришла;.$B$BЯ уже слышала о твоих достижениях на Диком уступе. Это хорошо. Я рада, что ты $Gсогласился:согласилась; помочь с истреблением этих врайкулов в Йотунхейме.$B$B<Губы костяной ведьмы кривятся в усмешке, но через силу, как будто она борется с волей леди Найтсвуд.>$B$BМы с тобой славно повеселимся!', 0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_04_02_01' WHERE sql_rev = '1648459815782916506';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

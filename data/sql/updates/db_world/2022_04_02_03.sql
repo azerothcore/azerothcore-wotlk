@@ -1,3 +1,19 @@
+-- DB update 2022_04_02_02 -> 2022_04_02_03
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_04_02_02';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_04_02_02 2022_04_02_03 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1648470592991765042'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1648470592991765042');
 
 REPLACE INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `VerifiedBuild`) VALUES
@@ -305,3 +321,13 @@ REPLACE INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `Verifie
 (8498, 'ruRU', 'Великолепно. Главное – опережать противника на ход. Благодаря полученным сведениям, нам известны намерения Сумеречного Молота.', 0),
 (8499, 'ruRU', 'О, спасибо тебе, $C! Огромное спасибо! Прибавилось еще двадцать, осталось собрать еще несчетное количество. Альянс пред тобой в долгу. Если раздобудешь еще двадцать слитков, обращайся ко мне.', 0),
 (8500, 'ruRU', 'Отличная работа, $C! Я прослежу, чтобы ториевые слитки были хорошо упакованы и доставлены кузнецам и инженерам, которые изготавливают для нашей армии военную технику. Спасибо тебе еще раз. Если сможешь достать еще двадцать слитков, я приму их у тебя с благодарностью.', 0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_04_02_03' WHERE sql_rev = '1648470592991765042';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
