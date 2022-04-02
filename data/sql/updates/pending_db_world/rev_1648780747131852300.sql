@@ -1,10 +1,15 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1648780747131852300');
 
+-- Drakonid spawners
 UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_drakonid_spawner' WHERE `entry` IN (14307, 14309, 14310, 14311, 14312);
 
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (14307, 14309, 14310, 14311, 14312) AND `source_type` = 0;
 
+-- Krixix respawn time
 UPDATE `creature` SET `spawntimesecs` = 1800 WHERE `guid` = 84627;
+
+-- Razorgore: Override the mechanic immune mask since they are pretty wrong.
+UPDATE `creature_template` SET `mechanic_immune_mask` = 617299803 WHERE `entry` = 12435;
 
 SET @GUID := 84557;
 SET @PATH := @GUID * 10;
