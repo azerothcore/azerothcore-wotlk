@@ -591,7 +591,7 @@ public:
     [[nodiscard]] virtual float GetStationaryO() const { return GetOrientation(); }
 
     [[nodiscard]] float GetMapWaterOrGroundLevel(float x, float y, float z, float* ground = nullptr) const;
-    [[nodiscard]] float GetMapHeight(float x, float y, float z, bool vmap = true, float distanceToSearch = 50.0f) const; // DEFAULT_HEIGHT_SEARCH in map.h
+    [[nodiscard]] float GetMapHeight(float x, float y, float z, bool vmap = true) const; // DEFAULT_HEIGHT_SEARCH in map.h
 
     [[nodiscard]] float GetFloorZ() const;
     [[nodiscard]] float GetMinHeightInWater() const;
