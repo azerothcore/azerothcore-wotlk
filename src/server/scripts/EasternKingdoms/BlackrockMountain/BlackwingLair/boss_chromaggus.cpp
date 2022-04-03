@@ -215,6 +215,11 @@ public:
             events.ScheduleEvent(EVENT_FRENZY, 15000);
         }
 
+        bool CanAIAttack(Unit const* victim) const override
+        {
+            return !victim->HasAura(SPELL_TIMELAPSE);
+        }
+
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
