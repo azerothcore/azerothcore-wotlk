@@ -96,7 +96,7 @@ public:
 
         bool CanAIAttack(Unit const* target) const override
         {
-            return !(target->GetTypeId() == TYPEID_UNIT && !secondPhase);
+            return !(target->GetTypeId() == TYPEID_UNIT && !secondPhase) && !target->HasAura(SPELL_CONFLAGRATION);
         }
 
         void EnterCombat(Unit* /*victim*/) override
