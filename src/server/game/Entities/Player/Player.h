@@ -37,6 +37,7 @@
 #include "QuestDef.h"
 #include "SpellAuras.h"
 #include "SpellMgr.h"
+#include "SpellInfo.h"
 #include "TradeData.h"
 #include "Unit.h"
 #include "WorldSession.h"
