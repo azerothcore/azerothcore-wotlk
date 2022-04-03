@@ -21,6 +21,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "blackwing_lair.h"
+#include "SpellScript.h"
 
 enum Say
 {
