@@ -324,7 +324,9 @@ int main(int argc, char** argv)
 
     _liquidTypes = LoadLiquid();
     if (_liquidTypes.empty())
+    {
         return silent ? -5 : finish("Failed to load LiquidType.dbc", -5);
+    }
 
     MapBuilder builder(maxAngle, maxAngleNotSteep, skipLiquid, skipContinents, skipJunkMaps,
                        skipBattlegrounds, debugOutput, bigBaseUnit, offMeshInputPath);
