@@ -247,8 +247,28 @@ class go_suppression_device : public GameObjectScript
         }
 };
 
+class spell_suppression_aura : public SpellScript
+{
+    PrepareSpellScript(spell_suppression_aura);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if([&](WorldObject* target) -> bool
+        {
+            Unit* unit = target->ToUnit();
+            return !unit || unit->HasAuraType(SPELL_AURA_MOD_STEALTH);
+        });
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_suppression_aura::FilterTargets, EFFECT_ALL, TARGET_UNIT_DEST_AREA_ENEMY);
+    }
+};
+
 void AddSC_boss_broodlord()
 {
     new boss_broodlord();
     new go_suppression_device();
+    RegisterSpellScript(spell_suppression_aura);
 }
