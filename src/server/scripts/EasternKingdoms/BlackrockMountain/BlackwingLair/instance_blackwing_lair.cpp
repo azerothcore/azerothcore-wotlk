@@ -27,6 +27,8 @@
 #include "TemporarySummon.h"
 #include "blackwing_lair.h"
 
+#include <array>
+
 DoorData const doorData[] =
 {
     { GO_PORTCULLIS_RAZORGORE,      DATA_RAZORGORE_THE_UNTAMED,  DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 175946 || GUID 7230
@@ -83,6 +85,7 @@ public:
             EggEvent = 0;
             NefarianLeftTunnel = 0;
             NefarianRightTunnel = 0;
+            addsCount.fill(0);
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -98,11 +101,25 @@ public:
                     chromaggusGUID = creature->GetGUID();
                     break;
                 case NPC_BLACKWING_DRAGON:
+                    ++addsCount[0];
+                    if (Creature* razor = instance->GetCreature(razorgoreGUID))
+                    {
+                        if (CreatureAI* razorAI = razor->AI())
+                        {
+                            razorAI->JustSummoned(creature);
+                        }
+                    }
+                    break;
                 case NPC_BLACKWING_LEGIONAIRE:
                 case NPC_BLACKWING_MAGE:
+                    ++addsCount[1];
                     if (Creature* razor = instance->GetCreature(razorgoreGUID))
+                    {
                         if (CreatureAI* razorAI = razor->AI())
+                        {
                             razorAI->JustSummoned(creature);
+                        }
+                    }
                     break;
                 case NPC_BLACKWING_GUARDSMAN:
                     guardList.push_back(creature->GetGUID());
@@ -290,11 +307,13 @@ public:
                         _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 45 * IN_MILLISECONDS);
                         EggEvent = data;
                         EggCount = 0;
+                        addsCount.fill(0);
                         break;
                     case NOT_STARTED:
                         _events.CancelEvent(EVENT_RAZOR_SPAWN);
                         EggEvent = data;
                         EggCount = 0;
+                        addsCount.fill(0);
 
                         for (ObjectGuid const& guid : EggList)
                         {
@@ -439,15 +458,44 @@ public:
                     case EVENT_RAZOR_SPAWN:
                         if (EggEvent == IN_PROGRESS)
                         {
+                            bool spawnMoreAdds = true;
                             for (uint8 i = urand(2, 5); i > 0; --i)
                             {
-                                if (Creature* summon = instance->SummonCreature(Entry[urand(0, 2)], SummonPosition[urand(0, 7)]))
+                                uint32 mobEntry = Entry[urand(0, 2)];
+                                uint32 dragonkinsCount = addsCount[0];
+                                uint32 orcsCount = addsCount[1];
+
+                                // If more than 12 dragonkins...
+                                if (dragonkinsCount >= 12)
+                                {
+                                    //... and more than 40 orcs - stop spawning more adds.
+                                    if (orcsCount >= 40)
+                                    {
+                                        spawnMoreAdds = false;
+                                        break;
+                                    }
+                                    //... - stop spawning them.
+                                    else if (mobEntry == NPC_BLACKWING_DRAGON)
+                                    {
+                                        continue;
+                                    }
+                                }
+                                // If more than 40 orcs - stop spawning them.
+                                else if (orcsCount >= 40 && mobEntry != NPC_BLACKWING_DRAGON)
+                                {
+                                    continue;
+                                }
+
+                                if (Creature* summon = instance->SummonCreature(mobEntry, SummonPosition[urand(0, 7)]))
                                 {
                                     summon->AI()->DoZoneInCombat();
                                 }
                             }
 
-                            _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 12000, 17000);
+                            if (spawnMoreAdds)
+                            {
+                                _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 12000, 17000);
+                            }
                         }
                         break;
                     case EVENT_RAZOR_PHASE_TWO:
@@ -529,6 +577,7 @@ public:
         uint32 EggEvent;
         GuidList EggList;
         GuidList guardList;
+        std::array<uint32, 2> addsCount;
 
         // Nefarian
         uint32 NefarianLeftTunnel;
