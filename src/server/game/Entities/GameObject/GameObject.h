@@ -988,7 +988,7 @@ public:
     bool ValidateGameobjectType();
     uint8 GetStateSavedOnInstance();
     bool IsInstanceGameobject();
-    uint8 GetGameobjectState(GOState* state);
+    uint8 GameobjectStateToInt(GOState* state);
 
     /* A check to verify if this object is available to be saved on the DB when
      * a state change occurs

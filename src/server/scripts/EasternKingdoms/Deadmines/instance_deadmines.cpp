@@ -39,22 +39,24 @@ public:
         {
             switch (gameobject->GetEntry())
             {
-            case GO_HEAVY_DOOR:
-            case GO_DOOR_LEVER_1:
-            case GO_DOOR_LEVER_2:
-            case GO_CANNON:
-                gameobject->UpdateSaveToDb(true);
-                break;
-            case GO_FACTORY_DOOR:
-                gameobject->UpdateSaveToDb(true);
-                if (_encounters[TYPE_RHAHK_ZOR] == DONE)
-                    gameobject->SetGoState(GO_STATE_ACTIVE);
-                break;
-            case GO_IRON_CLAD_DOOR:
-                gameobject->UpdateSaveToDb(true);
-                if (_encounters[TYPE_CANNON] == DONE)
-                    HandleGameObject(ObjectGuid::Empty, true, gameobject);
-                break;
+                case GO_HEAVY_DOOR:
+                case GO_DOOR_LEVER_1:
+                case GO_DOOR_LEVER_2:
+                case GO_CANNON:
+                    gameobject->UpdateSaveToDb(true);
+                    break;
+                case GO_FACTORY_DOOR:
+                    gameobject->UpdateSaveToDb(true);
+                    if (_encounters[TYPE_RHAHK_ZOR] == DONE)
+                        gameobject->SetGoState(GO_STATE_ACTIVE);
+                    break;
+                case GO_IRON_CLAD_DOOR:
+                    gameobject->UpdateSaveToDb(true);
+                    if (gameobject->GetStateSavedOnInstance() == GO_STATE_ACTIVE)
+                    {
+                        gameobject->DespawnOrUnsummon();
+                    }
+                    break;
             }
         }
 

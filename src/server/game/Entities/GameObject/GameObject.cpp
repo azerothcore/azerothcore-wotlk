@@ -2462,11 +2462,11 @@ void GameObject::SetGoState(GOState state)
         // Save the gameobject state on the Database
         if (!FindStateSavedOnInstance())
         {
-            SaveInstanceData(GetGameobjectState(&state));
+            SaveInstanceData(GameobjectStateToInt(&state));
         }
         else
         {
-            UpdateInstanceData(GetGameobjectState(&state));
+            UpdateInstanceData(GameobjectStateToInt(&state));
         }
     }
 }
@@ -2505,7 +2505,7 @@ bool GameObject::ValidateGameobjectType()
     }
 }
 
-uint8 GameObject::GetGameobjectState(GOState* state)
+uint8 GameObject::GameobjectStateToInt(GOState* state)
 {
     uint8 m_state = 3;
 
@@ -2552,7 +2552,7 @@ void GameObject::SavingStateOnDB()
         GOState param = GetGoState();
         if (!FindStateSavedOnInstance())
         {
-            SaveInstanceData(GetGameobjectState(&param));
+            SaveInstanceData(GameobjectStateToInt(&param));
         }
     }
 }
