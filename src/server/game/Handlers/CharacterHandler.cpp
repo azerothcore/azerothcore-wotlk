@@ -2009,13 +2009,8 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
         return;
     }
 
-    // xinef: check money
-    bool valid = Player::TeamIdForRace(oldRace) == Player::TeamIdForRace(factionChangeInfo->Race);
-    if ((level < 10 && money <= 0) || (level > 10 && level <= 30 && money <= 3000000) || (level > 30 && level <= 50 && money <= 10000000) ||
-        (level > 50 && level <= 70 && money <= 50000000) || (level > 70 && money <= 200000000))
-        valid = true;
-
-    if (!valid)
+    uint32 maxMoney = sWorld->getIntConfig(CONFIG_CHANGE_FACTION_MAX_MONEY);
+    if (maxMoney && money > maxMoney)
     {
         SendCharFactionChange(CHAR_CREATE_CHARACTER_GOLD_LIMIT, factionChangeInfo.get());
         return;

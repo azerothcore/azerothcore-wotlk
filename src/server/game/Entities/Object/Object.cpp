@@ -2272,8 +2272,8 @@ void WorldObject::SetZoneScript()
 {
     if (Map* map = FindMap())
     {
-        if (map->IsDungeon())
-            m_zoneScript = (ZoneScript*)map->ToInstanceMap()->GetInstanceScript();
+        if (InstanceMap* instanceMap = map->ToInstanceMap())
+            m_zoneScript = reinterpret_cast<ZoneScript*>(instanceMap->GetInstanceScript());
         else if (!map->IsBattlegroundOrArena())
         {
             uint32 zoneId = GetZoneId();

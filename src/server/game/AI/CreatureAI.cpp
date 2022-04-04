@@ -219,20 +219,18 @@ void CreatureAI::EnterEvadeMode()
         }
     }
 
+    Reset();
+    if (me->IsVehicle()) // use the same sequence of addtoworld, aireset may remove all summons!
+    {
+        me->GetVehicleKit()->Reset(true);
+    }
+
     // despawn bosses at reset - only verified tbc/woltk bosses with this reset type - add bosses in last line respectively (dungeon/raid) and increase array limit
     CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(me->GetEntry());
     if (cInfo && cInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_HARD_RESET))
     {
         me->DespawnOnEvade();
         me->m_Events.AddEvent(new PhasedRespawn(*me), me->m_Events.CalculateTime(20000));
-    }
-    else // bosses will run back to the spawnpoint at reset
-    {
-        Reset();
-        if (me->IsVehicle()) // use the same sequence of addtoworld, aireset may remove all summons!
-        {
-            me->GetVehicleKit()->Reset(true);
-        }
     }
 }
 
