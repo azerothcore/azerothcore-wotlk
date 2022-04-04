@@ -53,10 +53,14 @@ enum Events
     EVENT_SUCCESS_1,
     EVENT_SUCCESS_2,
     EVENT_SUCCESS_3,
+    // Drakonid Spawner
+    EVENT_SPAWN_CHROMATIC_DRAKONID,
+    // EVENT_SPAWN_ADDS, // placeholder, already defined above.
 
     ACTION_RESET = 0,
     ACTION_KILLED = 1,
-    ACTION_ADD_KILLED = 2
+    ACTION_ADD_KILLED = 2,
+    ACTION_SPAWNER_STOP = 3
 };
 
 enum Says
@@ -140,6 +144,7 @@ enum Spells
     SPELL_SPAWN_BRONZE_DRAKONID     = 22657,
     SPELL_SPAWN_BLUE_DRAKONID       = 22658,
     SPELL_SPAWN_CHROMATIC_DRAKONID  = 22680,
+    SPELL_SPAWN_DRAKONID_GEN        = 22653,
 
     // Nefarian
     SPELL_SHADOWFLAME_INITIAL       = 22992,
@@ -437,9 +442,11 @@ public:
                                 events.CancelEvent(EVENT_SILENCE);
                                 DoCastSelf(SPELL_ROOT_SELF, true);
                                 me->SetVisible(false);
-                                // Despawn the spawners.
-                                summons.DespawnEntry(_nefarianLeftTunnel);
-                                summons.DespawnEntry(_nefarianRightTunnel);
+                                // Stop spawning adds
+                                EntryCheckPredicate pred(_nefarianRightTunnel);
+                                summons.DoAction(ACTION_SPAWNER_STOP, pred);
+                                EntryCheckPredicate pred2(_nefarianLeftTunnel);
+                                summons.DoAction(ACTION_SPAWNER_STOP, pred2);
                                 return;
                             }
                             events.ScheduleEvent(EVENT_CHECK_PHASE_2, 1000);
@@ -624,7 +631,7 @@ struct boss_nefarian : public BossAI
                     break;
                 case EVENT_TAILLASH:
                     // Cast NYI since we need a better check for behind target
-                    DoCastVictim(SPELL_TAILLASH);
+                    DoCastAOE(SPELL_TAILLASH);
                     events.ScheduleEvent(EVENT_TAILLASH, 10000);
                     break;
                 case EVENT_CLASSCALL:
@@ -881,6 +888,37 @@ struct npc_corrupted_totem : public ScriptedAI
     protected:
         TaskScheduler _scheduler;
         bool _auraAdded;
+};
+
+struct npc_drakonid_spawner : public ScriptedAI
+{
+    npc_drakonid_spawner(Creature* creature) : ScriptedAI(creature) { }
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_SPAWNER_STOP)
+        {
+            me->RemoveAurasDueToSpell(SPELL_SPAWN_DRAKONID_GEN);
+            _scheduler.CancelAll();
+        }
+    }
+
+    void IsSummonedBy(Unit* /*summoner*/) override
+    {
+        DoCastSelf(SPELL_SPAWN_DRAKONID_GEN);
+        _scheduler.Schedule(10s, 60s, [this](TaskContext /*context*/)
+        {
+            DoCastSelf(SPELL_SPAWN_CHROMATIC_DRAKONID);
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _scheduler.Update(diff);
+    }
+
+protected:
+    TaskScheduler _scheduler;
 };
 
 std::unordered_map<uint32, uint8> const classCallSpells =
@@ -1211,6 +1249,7 @@ void AddSC_boss_nefarian()
     new boss_victor_nefarius();
     RegisterCreatureAI(boss_nefarian);
     RegisterCreatureAI(npc_corrupted_totem);
+    RegisterCreatureAI(npc_drakonid_spawner);
     RegisterSpellScript(spell_class_call_handler);
     RegisterSpellScript(aura_class_call_wild_magic);
     RegisterSpellScript(aura_class_call_siphon_blessing);
