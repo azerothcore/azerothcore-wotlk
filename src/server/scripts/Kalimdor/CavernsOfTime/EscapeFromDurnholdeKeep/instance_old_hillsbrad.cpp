@@ -116,7 +116,7 @@ public:
             {
                 case GO_BARREL:
                     if (_encounterProgress >= ENCOUNTER_PROGRESS_BARRELS)
-                        gameobject->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        gameobject->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
                 case GO_PRISON_DOOR:
                     if (_encounterProgress >= ENCOUNTER_PROGRESS_THRALL_ARMORED)

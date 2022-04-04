@@ -513,7 +513,7 @@ public:
                             {
                                 plr->RemoveGameObject(go, false);
                                 go->SetLootMode(1);
-                                go->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
+                                go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
                             }
 
                             plr->GroupEventHappens(QUEST_HALLS_OF_STONE, me);

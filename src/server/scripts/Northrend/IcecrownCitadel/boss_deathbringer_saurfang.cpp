@@ -568,7 +568,7 @@ public:
                         if (GameObject* teleporter = ObjectAccessor::GetGameObject(*me, _instance->GetGuidData(GO_SCOURGE_TRANSPORTER_SAURFANG)))
                         {
                             _instance->HandleGameObject(ObjectGuid::Empty, false, teleporter);
-                            teleporter->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
+                            teleporter->SetGameObjectFlag(GO_FLAG_IN_USE);
                         }
 
                         deathbringer->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
@@ -830,7 +830,7 @@ public:
                         if (GameObject* teleporter = ObjectAccessor::GetGameObject(*me, _instance->GetGuidData(GO_SCOURGE_TRANSPORTER_SAURFANG)))
                         {
                             _instance->HandleGameObject(ObjectGuid::Empty, false, teleporter);
-                            teleporter->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
+                            teleporter->SetGameObjectFlag(GO_FLAG_IN_USE);
                         }
 
                         deathbringer->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
