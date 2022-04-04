@@ -915,7 +915,7 @@ public:
 
                 if (Merithra)
                 {
-                    Merithra->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+                    Merithra->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
                     Merithra->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                     Merithra->SetUInt32Value(UNIT_FIELD_DISPLAYID, 15420);
                     Merithra->SetFaction(FACTION_FRIENDLY);
@@ -923,7 +923,7 @@ public:
 
                 if (Caelestrasz)
                 {
-                    Caelestrasz->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+                    Caelestrasz->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
                     Caelestrasz->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                     Caelestrasz->SetUInt32Value(UNIT_FIELD_DISPLAYID, 15419);
                     Caelestrasz->SetFaction(FACTION_FRIENDLY);
@@ -931,7 +931,7 @@ public:
 
                 if (Arygos)
                 {
-                    Arygos->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+                    Arygos->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
                     Arygos->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                     Arygos->SetUInt32Value(UNIT_FIELD_DISPLAYID, 15418);
                     Arygos->SetFaction(FACTION_FRIENDLY);

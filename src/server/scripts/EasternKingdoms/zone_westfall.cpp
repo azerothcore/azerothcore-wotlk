@@ -141,7 +141,7 @@ public:
                 case 17:
                     SetEscortPaused(true);
                     player->GroupEventHappens(QUEST_TOME_VALOR, me);
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                     me->DespawnOrUnsummon(1s, 1s);
                     break;
             }

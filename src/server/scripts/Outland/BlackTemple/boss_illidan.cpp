@@ -796,7 +796,7 @@ public:
         void Reset() override
         {
             me->SetReactState(REACT_AGGRESSIVE);
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->setActive(false);
             me->SetVisible(instance->GetBossState(DATA_ILLIDARI_COUNCIL) == DONE && instance->GetBossState(DATA_ILLIDAN_STORMRAGE) != DONE);
             events.Reset();
@@ -806,7 +806,7 @@ public:
         void sGossipSelect(Player* player, uint32 /*sender*/, uint32  /*action*/) override
         {
             CloseGossipMenuFor(player);
-            me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+            me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
             me->setActive(true);
 
             if (instance->GetBossState(DATA_AKAMA_FINISHED) != DONE)
@@ -835,7 +835,7 @@ public:
         void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
-            summon->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+            summon->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
             if (summon->GetEntry() == NPC_ILLIDARI_ELITE)
             {
                 me->AddThreat(summon, 1000000.0f);
@@ -864,7 +864,7 @@ public:
             }
             else if (pointId == POINT_ILLIDAN)
             {
-                me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP);
                 me->setActive(false);
                 me->SetReactState(REACT_AGGRESSIVE);
             }

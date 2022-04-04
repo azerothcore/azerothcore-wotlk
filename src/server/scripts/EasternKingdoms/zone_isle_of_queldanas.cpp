@@ -146,7 +146,7 @@ public:
             morlenGUID.Clear();
             summons.DespawnAll();
             if (Creature* c = me->FindNearestCreature(NPC_THALORIEN_REMAINS, 100.0f, true))
-                c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             events.Reset();
             events.ScheduleEvent(EVENT_CHECK_PLAYER, 5000);
             events.ScheduleEvent(EVENT_SUMMON_SOLDIERS, 0);

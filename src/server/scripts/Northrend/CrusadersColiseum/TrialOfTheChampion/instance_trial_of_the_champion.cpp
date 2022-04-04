@@ -316,7 +316,7 @@ public:
                             c->SetHomePosition(748.309f, 619.488f, 411.172f, 4.71239f);
                             c->SetPosition(748.309f, 619.488f, 411.172f, 4.71239f);
                             c->SetRespawnTime(3);
-                            c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                            c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         }
                         InstanceProgress = INSTANCE_PROGRESS_INITIAL;
                     }
@@ -329,7 +329,7 @@ public:
                             announcer->SetHomePosition(735.81f, 661.92f, 412.39f, 4.714f);
                             announcer->SetPosition(735.81f, 661.92f, 412.39f, 4.714f);
                             announcer->SetRespawnTime(3);
-                            announcer->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                            announcer->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
                             for( uint8 i = 0; i < 3; ++i )
                                 if( Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
@@ -387,7 +387,7 @@ public:
                             c->SetHomePosition(743.14f, 628.77f, 411.2f, 4.71239f);
                             c->SetPosition(743.14f, 628.77f, 411.2f, 4.71239f);
                             c->SetRespawnTime(3);
-                            c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                            c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         }
                         NPC_MemoryEntry = 0;
                         InstanceProgress = INSTANCE_PROGRESS_CHAMPIONS_DEAD;
@@ -411,7 +411,7 @@ public:
                             c->SetHomePosition(743.14f, 628.77f, 411.2f, 4.71239f);
                             c->SetPosition(743.14f, 628.77f, 411.2f, 4.71239f);
                             c->SetRespawnTime(3);
-                            c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                            c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         }
                         InstanceProgress = INSTANCE_PROGRESS_ARGENT_CHALLENGE_DIED;
                     }
@@ -968,7 +968,7 @@ public:
                 case EVENT_RESTORE_ANNOUNCER_GOSSIP:
                     {
                         if( Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
-                            announcer->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                            announcer->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     }
                     break;
                 case EVENT_START_ARGENT_CHALLENGE_INTRO:

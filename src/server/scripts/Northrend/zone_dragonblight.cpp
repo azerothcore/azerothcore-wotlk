@@ -1791,7 +1791,7 @@ public:
             if (!tree || !player)
                 return;
 
-            tree->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+            tree->RemoveNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
 
             if (roll == 1) // friendly version
             {

@@ -503,10 +503,10 @@ public:
         if (action == GOSSIP_ACTION_INFO_DEF + 1)
             CloseGossipMenuFor(player);
 
-        if (!creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
+        if (!creature->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
             return true;
 
-        creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+        creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
         InstanceScript* instance = creature->GetInstanceScript();
         if (instance)
@@ -626,7 +626,7 @@ public:
             {
                 CloseGossipMenuFor(player);
                 me->SetFacingToObject(player);
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 Talk(SAY_HARRISON_0);
                 _gongEvent = GONG_EVENT_1;
                 _gongTimer = 4000;
@@ -763,7 +763,7 @@ public:
                             _gongTimer = 6000;
                             break;
                         case GONG_EVENT_11:
-                            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
                             instance->SetData(DATA_GONGEVENT, NOT_STARTED);
                             _gongEvent = 0;

@@ -162,7 +162,7 @@ public:
                     }
                 case DATA_THRALL_ADD_FLAG:
                     if (Creature* thrall = instance->GetCreature(_thrallGUID))
-                        thrall->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        thrall->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     break;
             }
         }

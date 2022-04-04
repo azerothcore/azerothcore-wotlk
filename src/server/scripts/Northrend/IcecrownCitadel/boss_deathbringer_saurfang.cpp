@@ -531,7 +531,7 @@ public:
         void Reset() override
         {
             _events.Reset();
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->SetReactState(REACT_PASSIVE);
         }
 
@@ -558,7 +558,7 @@ public:
                         for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
                             (*itr)->AI()->SetData(0, x++);
 
-                        me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         Talk(SAY_INTRO_HORDE_1);
                         _events.SetPhase(PHASE_INTRO_H);
                         _events.ScheduleEvent(EVENT_INTRO_HORDE_2, 5000, 0, PHASE_INTRO_H);
@@ -792,7 +792,7 @@ public:
         void Reset() override
         {
             _events.Reset();
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->SetReactState(REACT_PASSIVE);
         }
 
@@ -819,7 +819,7 @@ public:
                         for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
                             (*itr)->AI()->SetData(0, x++);
 
-                        me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         Talk(SAY_INTRO_ALLIANCE_1);
                         _events.SetPhase(PHASE_INTRO_A);
                         _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_2, 2500, 0, PHASE_INTRO_A);

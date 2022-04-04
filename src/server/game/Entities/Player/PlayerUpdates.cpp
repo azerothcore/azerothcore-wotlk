@@ -1739,7 +1739,7 @@ void Player::UpdateForQuestWorldObjects()
                 continue;
 
             // check if this unit requires quest specific flags
-            if (!obj->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK))
+            if (!obj->HasNpcFlag(UNIT_NPC_FLAG_SPELLCLICK))
                 continue;
 
             SpellClickInfoMapBounds clickPair = sObjectMgr->GetSpellClickInfoMapBounds(obj->GetEntry());
