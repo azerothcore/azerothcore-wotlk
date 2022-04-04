@@ -1733,7 +1733,6 @@ class boss_yoggsaron_descend_portal : public CreatureScript
 public:
     boss_yoggsaron_descend_portal() : CreatureScript("boss_yoggsaron_descend_portal") { }
 
-<<<<<<< Updated upstream
     struct boss_yoggsaron_descend_portalAI : public PassiveAI
     {
         boss_yoggsaron_descend_portalAI(Creature* creature) : PassiveAI(creature), _instance(creature->GetInstanceScript()) {}
@@ -1770,28 +1769,6 @@ public:
     CreatureAI* GetAI(Creature* creature) const override
     {
         return GetUlduarAI<boss_yoggsaron_descend_portalAI>(creature);
-=======
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (!creature->GetNpcFlags())
-            return true;
-        switch (creature->GetArmor())
-        {
-            case ACTION_ILLUSION_DRAGONS:
-                player->CastSpell(player, SPELL_TELEPORT_TO_CHAMBER, true);
-                break;
-            case ACTION_ILLUSION_ICECROWN:
-                player->CastSpell(player, SPELL_TELEPORT_TO_ICECROWN, true);
-                break;
-            case ACTION_ILLUSION_STORMWIND:
-                player->CastSpell(player, SPELL_TELEPORT_TO_STORMWIND, true);
-                break;
-        }
-
-        creature->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
-        creature->DespawnOrUnsummon(1000);
-        return true;
->>>>>>> Stashed changes
     }
 };
 
