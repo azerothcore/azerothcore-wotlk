@@ -894,7 +894,7 @@ void Player::HandleDrowning(uint32 time_diff)
                     uint32 damage = GetMaxHealth() / 5 + urand(0, getLevel() - 1);
                     EnvironmentalDamage(DAMAGE_EXHAUSTED, damage);
                 }
-                else if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))       // Teleport ghost to graveyard
+                else if (HasPlayerFlag(PLAYER_FLAGS_GHOST))       // Teleport ghost to graveyard
                     RepopAtGraveyard();
             }
             else if (!(m_MirrorTimerFlagsLast & UNDERWATER_INDARKWATER))
@@ -1066,14 +1066,14 @@ void Player::SetRestState(uint32 triggerId)
 {
     _innTriggerId = triggerId;
     _restTime = GameTime::GetGameTime().count();
-    SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
+    SetPlayerFlag(PLAYER_FLAGS_RESTING);
 }
 
 void Player::RemoveRestState()
 {
     _innTriggerId = 0;
     _restTime = 0;
-    RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
+    RemovePlayerFlag(PLAYER_FLAGS_RESTING);
 }
 
 bool Player::BuildEnumData(PreparedQueryResult result, WorldPacket* data)
@@ -2172,7 +2172,7 @@ void Player::SetGameMaster(bool on)
         m_ExtraFlags |= PLAYER_EXTRA_GM_ON;
         if (AccountMgr::IsGMAccount(GetSession()->GetSecurity()))
             SetFaction(FACTION_FRIENDLY);
-        SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_GM);
+        SetPlayerFlag(PLAYER_FLAGS_GM);
         SetUnitFlag2(UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
 
         if (Pet* pet = GetPet())
@@ -2203,7 +2203,7 @@ void Player::SetGameMaster(bool on)
 
         m_ExtraFlags &= ~ PLAYER_EXTRA_GM_ON;
         SetFactionForRace(getRace(true));
-        RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_GM);
+        RemovePlayerFlag(PLAYER_FLAGS_GM);
         RemoveUnitFlag2(UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
 
         if (Pet* pet = GetPet())
@@ -2337,7 +2337,7 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate, bool isLFGReward)
         return;
     }
 
-    if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_XP_GAIN))
+    if (HasPlayerFlag(PLAYER_FLAGS_NO_XP_GAIN))
     {
         return;
     }
@@ -2654,7 +2654,7 @@ void Player::InitStatsForLevel(bool reapplyMods)
     SetUnitFlag2(UNIT_FLAG2_REGENERATE_POWER);// must be set
 
     // cleanup player flags (will be re-applied if need at aura load), to avoid have ghost flag without ghost aura, for example.
-    RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_AFK | PLAYER_FLAGS_DND | PLAYER_FLAGS_GM | PLAYER_FLAGS_GHOST | PLAYER_ALLOW_ONLY_ABILITY);
+    RemovePlayerFlag(PLAYER_FLAGS_AFK | PLAYER_FLAGS_DND | PLAYER_FLAGS_GM | PLAYER_FLAGS_GHOST | PLAYER_ALLOW_ONLY_ABILITY);
 
     RemoveStandFlags(UNIT_STAND_FLAGS_ALL);                 // one form stealth modified bytes
     RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP | UNIT_BYTE2_FLAG_SANCTUARY);
@@ -4497,9 +4497,9 @@ Corpse* Player::CreateCorpse()
     corpse->SetUInt32Value(CORPSE_FIELD_BYTES_2, _cfb2);
 
     uint32 flags = CORPSE_FLAG_UNK2;
-    if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_HELM))
+    if (HasPlayerFlag(PLAYER_FLAGS_HIDE_HELM))
         flags |= CORPSE_FLAG_HIDE_HELM;
-    if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_CLOAK))
+    if (HasPlayerFlag(PLAYER_FLAGS_HIDE_CLOAK))
         flags |= CORPSE_FLAG_HIDE_CLOAK;
 
     // Xinef: Player can loop corpses while in BG or in WG
@@ -4842,7 +4842,7 @@ void Player::RepopAtGraveyard()
     else if (GetPositionZ() < GetMap()->GetMinHeight(GetPositionX(), GetPositionY()))
         TeleportTo(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, GetOrientation());
 
-    RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_IS_OUT_OF_BOUNDS);
+    RemovePlayerFlag(PLAYER_FLAGS_IS_OUT_OF_BOUNDS);
 }
 
 bool Player::CanJoinConstantChannelInZone(ChatChannelsEntry const* channel, AreaTableEntry const* zone)
@@ -14301,7 +14301,7 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         stmt->SetData(index++, GetByteValue(PLAYER_BYTES_2, 0));
         stmt->SetData(index++, GetByteValue(PLAYER_BYTES_2, 2));
         stmt->SetData(index++, GetByteValue(PLAYER_BYTES_2, 3));
-        stmt->SetData(index++, GetUInt32Value(PLAYER_FLAGS));
+        stmt->SetData(index++, (uint32)GetPlayerFlags());
         stmt->SetData(index++, (uint16)GetMapId());
         stmt->SetData(index++, (uint32)GetInstanceId());
         stmt->SetData(index++, (uint8(GetDungeonDifficulty()) | uint8(GetRaidDifficulty()) << 4));
@@ -14332,7 +14332,7 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         stmt->SetData(index++, m_Played_time[PLAYED_TIME_LEVEL]);
         stmt->SetData(index++, finiteAlways(_restBonus));
         stmt->SetData(index++, uint32(GameTime::GetGameTime().count()));
-        stmt->SetData(index++,  (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) ? 1 : 0));
+        stmt->SetData(index++,  (HasPlayerFlag(PLAYER_FLAGS_RESTING) ? 1 : 0));
         //save, far from tavern/city
         //save, but in tavern/city
         stmt->SetData(index++, m_resetTalentsCost);
@@ -14418,7 +14418,7 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         stmt->SetData(index++, GetByteValue(PLAYER_BYTES_2, 0));
         stmt->SetData(index++, GetByteValue(PLAYER_BYTES_2, 2));
         stmt->SetData(index++, GetByteValue(PLAYER_BYTES_2, 3));
-        stmt->SetData(index++, GetUInt32Value(PLAYER_FLAGS));
+        stmt->SetData(index++, GetPlayerFlags());
 
         if (!IsBeingTeleported())
         {
@@ -14471,7 +14471,7 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         stmt->SetData(index++, m_Played_time[PLAYED_TIME_LEVEL]);
         stmt->SetData(index++, finiteAlways(_restBonus));
         stmt->SetData(index++, uint32(GameTime::GetGameTime().count()));
-        stmt->SetData(index++,  (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) ? 1 : 0));
+        stmt->SetData(index++,  (HasPlayerFlag(PLAYER_FLAGS_RESTING) ? 1 : 0));
         //save, far from tavern/city
         //save, but in tavern/city
         stmt->SetData(index++, m_resetTalentsCost);
@@ -15733,7 +15733,7 @@ void Player::SetRestFlag(RestFlag restFlag, uint32 triggerId /*= 0*/)
     if (!oldRestMask && _restFlagMask) // only set flag/time on the first rest state
     {
         _restTime = GameTime::GetGameTime().count();
-        SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
+        SetPlayerFlag(PLAYER_FLAGS_RESTING);
     }
 
     if (triggerId)
@@ -15748,7 +15748,7 @@ void Player::RemoveRestFlag(RestFlag restFlag)
     if (oldRestMask && !_restFlagMask) // only remove flag/time on the last rest state remove
     {
         _restTime = 0;
-        RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
+        RemovePlayerFlag(PLAYER_FLAGS_RESTING);
     }
 }
 

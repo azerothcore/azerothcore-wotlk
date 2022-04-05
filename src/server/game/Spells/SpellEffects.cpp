@@ -4230,7 +4230,7 @@ void Spell::EffectStuck(SpellEffIndex /*effIndex*/)
             return;
 
         // xinef: player is in corpse
-        if (!target->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
+        if (!target->HasPlayerFlag(PLAYER_FLAGS_GHOST))
             target->BuildPlayerRepop();
         target->RepopAtGraveyard();
         return;
