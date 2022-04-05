@@ -1031,7 +1031,7 @@ public:
 
         void InitializeAI() override
         {
-            me->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+            me->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
         }
 
         bool GossipHello(Player* player, bool reportUse) override
@@ -1164,7 +1164,7 @@ public:
             }
 
             me->DespawnOrUnsummon(5000ms, respawnTimer); // Despawn in 5 Seconds for respawnTimer value
-            me->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+            me->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
             CloseGossipMenuFor(player);
             return false;
         }

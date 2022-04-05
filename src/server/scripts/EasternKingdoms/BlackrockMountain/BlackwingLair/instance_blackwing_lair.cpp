@@ -169,7 +169,7 @@ public:
                 case GO_PORTCULLIS_CHROMAGGUS:
                     AddDoor(go, true);
                     chromaggusDoorGUID = go->GetGUID();
-                    go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                    go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
                 default:
                     break;

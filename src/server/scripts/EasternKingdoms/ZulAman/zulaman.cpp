@@ -671,14 +671,14 @@ public:
                             break;
                         case GONG_EVENT_3:
                             if (GameObject* gong = me->GetMap()->GetGameObject(instance->GetGuidData(GO_STRANGE_GONG)))
-                                gong->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                                gong->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                             _gongEvent = GONG_EVENT_4;
                             _gongTimer = 105000;
                             break;
                         case GONG_EVENT_4:
                             me->RemoveAura(SPELL_BANGING_THE_GONG);
                             if (GameObject* gong = me->GetMap()->GetGameObject(instance->GetGuidData(GO_STRANGE_GONG)))
-                                gong->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                                gong->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
 
                             // trigger or gong will need to be scripted to set IN_PROGRESS after enough hits.
                             // This is temp workaround.

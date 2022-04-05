@@ -230,7 +230,7 @@ public:
                             normalChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
                         {
                             m_hodirNormalChest = go->GetGUID();
-                            go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                            go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                         }
                     }
                     if (!m_hodirHardmodeChest)
@@ -243,7 +243,7 @@ public:
                             hardChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
                         {
                             m_hodirHardmodeChest = go->GetGUID();
-                            go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                            go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                             hmHodir = true;
                         }
                     }
@@ -261,7 +261,7 @@ public:
                             normalChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
                         {
                             m_hodirNormalChest = go->GetGUID();
-                            go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                            go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                         }
                     }
                     if (!m_hodirHardmodeChest)
@@ -274,7 +274,7 @@ public:
                             hardChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
                         {
                             m_hodirHardmodeChest = go->GetGUID();
-                            go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                            go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                             hmHodir = true;
                         }
                     }
@@ -543,7 +543,7 @@ public:
                     if (GetData(TYPE_MIMIRON) == DONE && GetData(TYPE_FREYA) == DONE && GetData(TYPE_HODIR) == DONE && GetData(TYPE_THORIM) == DONE)
                     {
                         instance->LoadGrid(1903.0f, 248.0f);
-                        gameObject->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+                        gameObject->RemoveGameObjectFlag(GO_FLAG_LOCKED);
                     }
 
                     m_keepersgateGUID = gameObject->GetGUID();
@@ -590,7 +590,7 @@ public:
                 case GO_CELESTIAL_PLANETARIUM_ACCESS_10:
                 case GO_CELESTIAL_PLANETARIUM_ACCESS_25:
                     if (m_algalonTimer)
-                        gameObject->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
+                        gameObject->SetGameObjectFlag(GO_FLAG_IN_USE);
                     break;
                 case GO_DOODAD_UL_SIGILDOOR_01:
                     m_algalonSigilDoorGUID[0] = gameObject->GetGUID();
@@ -640,13 +640,13 @@ public:
                         {
                             if (GameObject* go = instance->GetGameObject(m_hodirHardmodeChest))
                             {
-                                go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                                go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                                 go->SetLootRecipient(instance);
                             }
                         }
                         if (GameObject* go = instance->GetGameObject(m_hodirNormalChest))
                         {
-                            go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                            go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                             go->SetLootRecipient(instance);
                         }
                         break;
@@ -694,7 +694,7 @@ public:
                     if (GetData(TYPE_MIMIRON) == DONE && GetData(TYPE_FREYA) == DONE && GetData(TYPE_HODIR) == DONE && GetData(TYPE_THORIM) == DONE)
                     {
                         if (GameObject* go = instance->GetGameObject(m_keepersgateGUID))
-                            go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+                            go->RemoveGameObjectFlag(GO_FLAG_LOCKED);
                     }
                     if (type == TYPE_MIMIRON && data == IN_PROGRESS) // after reaching him without tram and starting the fight
                         m_mimironTramUsed = true;

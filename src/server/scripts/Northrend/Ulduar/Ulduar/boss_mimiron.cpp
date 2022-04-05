@@ -822,7 +822,7 @@ public:
                     {
                         if (GameObject* go = me->SummonGameObject(chestId, 2744.65f, 2569.46f, 364.397f, 0, 0, 0, 0, 0, 0))
                         {
-                            go->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
+                            go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
                             go->SetLootRecipient(me->GetMap());
                         }
                     }
@@ -906,7 +906,7 @@ public:
                 {
                     button->SetLootState(GO_READY);
                     button->UseDoorOrButton(0, false);
-                    button->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
+                    button->RemoveGameObjectFlag(GO_FLAG_IN_USE);
                 }
         }
 
