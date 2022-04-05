@@ -274,7 +274,10 @@ Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
     }
 
     for (uint8 i = 0; i < MAX_STATS; ++i)
+    {
+        m_createStatPoints[i] = 0.0f; 
         m_createStats[i] = 0.0f;
+    } 
 
     m_attacking = nullptr;
     m_modMeleeHitChance = 0.0f;
@@ -14525,6 +14528,17 @@ float Unit::GetTotalStatValue(Stats stat, float additionalValue) const
 
     // value = ((base_value * base_pct) + total_value) * total_pct
     float value  = m_auraModifiersGroup[unitMod][BASE_VALUE] + GetCreateStat(stat);
+    
+    if (GetTypeId() == TYPEID_PLAYER) 
+     {
+        value += GetCreateStatPoints(stat);
+        value *= m_auraModifiersGroup[unitMod][BASE_PCT];
+        value += m_auraModifiersGroup[unitMod][TOTAL_VALUE] + additionalValue;
+        value *= m_auraModifiersGroup[unitMod][TOTAL_PCT];
+
+        return value;
+     }
+    
     value *= m_auraModifiersGroup[unitMod][BASE_PCT];
     value += m_auraModifiersGroup[unitMod][TOTAL_VALUE] + additionalValue;
     value *= m_auraModifiersGroup[unitMod][TOTAL_PCT];
@@ -14849,6 +14863,16 @@ void Unit::SetMaxPower(Powers power, uint32 val)
 
     if (val < cur_power)
         SetPower(power, val);
+}
+
+uint32 Unit::GetStatPointsByStat(Stats stat) const 
+{ 
+    PlayerLevelInfo info; 
+    sObjectMgr->GetPlayerLevelInfo(getRace(true), getClass(), getLevel(), &info);
+    
+    uint8 i = (STAT_STRENGTH + stat);
+    
+    return (GetStat(stat) - info.stats[i]); 
 }
 
 uint32 Unit::GetCreatePowers(Powers power) const

@@ -1994,7 +1994,12 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 	(77844, 'spell_halion_twilight_cutter'),
 	(77845, 'spell_halion_twilight_cutter'),
 	(77846, 'spell_halion_twilight_cutter'),
-	(100101, 'spell_valkyr_ball_periodic_dummy');
+	(100101, 'spell_valkyr_ball_periodic_dummy'),
+	(200000, 'spell_gen_stat_point_spells'),
+	(200001, 'spell_gen_stat_point_spells'),
+	(200002, 'spell_gen_stat_point_spells'),
+	(200003, 'spell_gen_stat_point_spells'),
+	(200004, 'spell_gen_stat_point_spells');
 /*!40000 ALTER TABLE `spell_script_names` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

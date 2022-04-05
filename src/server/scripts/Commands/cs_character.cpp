@@ -252,6 +252,7 @@ public:
             player->GiveLevel(newLevel);
             player->InitTalentForLevel();
             player->SetUInt32Value(PLAYER_XP, 0);
+            player->InitStatPointsForLevel(); // custom data addition
 
             if (handler->needReportToTarget(player))
             {

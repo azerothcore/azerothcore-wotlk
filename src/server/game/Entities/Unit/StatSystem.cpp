@@ -113,22 +113,22 @@ uint32 Player::GetSecStat(SecStats secstat) const
     switch(secstat)
     {
         case SECSTAT_DEXTERITY:
-            secval = GetBaseStat(STAT_AGILITY) + GetBaseStat(STAT_INTELLECT) + GetAuraCount(7468) + GetAuraCount(7471); 
+            secval = GetBaseStat(STAT_AGILITY) + GetBaseStat(STAT_INTELLECT);  
             break;
         case SECSTAT_FORTITUDE:
-            secval = GetBaseStat(STAT_STRENGTH) + GetBaseStat(STAT_STAMINA) + GetAuraCount(7464) + GetAuraCount(7477);
+            secval = GetBaseStat(STAT_STRENGTH) + GetBaseStat(STAT_STAMINA);
             return secval;
             break;
         case SECSTAT_CONSTITUTION:
-            secval = GetBaseStat(STAT_SPIRIT) + GetBaseStat(STAT_STRENGTH) + GetAuraCount(7474) + GetAuraCount(7464);
+            secval = GetBaseStat(STAT_SPIRIT) + GetBaseStat(STAT_STRENGTH);
             return secval;
             break;
         case SECSTAT_WISDOM:
-            secval = GetBaseStat(STAT_INTELLECT) + GetBaseStat(STAT_SPIRIT) + GetAuraCount(7468) + GetAuraCount(7474);
+            secval = GetBaseStat(STAT_INTELLECT) + GetBaseStat(STAT_SPIRIT);
             return secval;
             break;
         case SECSTAT_VIGOR:
-            secval = GetBaseStat(STAT_STAMINA) + GetBaseStat(STAT_AGILITY) + GetAuraCount(7477) + GetAuraCount(7471);
+            secval = GetBaseStat(STAT_STAMINA) + GetBaseStat(STAT_AGILITY);
             return secval;
             break;
     }
@@ -187,7 +187,7 @@ bool Player::UpdateStats(Stats stat)
 
     // value = ((base_value * base_pct) + total_value) * total_pct
     float value  = GetTotalStatValue(stat);
-
+    
     SetStat(stat, int32(value));
     
     switch (stat)
@@ -288,6 +288,7 @@ bool Player::UpdateAllStats()
         float value = GetTotalStatValue(Stats(i));
         SetStat(Stats(i), int32(value));
     }
+
     UpdateAllSecStats();
     UpdateArmor();
     // calls UpdateAttackPowerAndDamage() in UpdateArmor for SPELL_AURA_MOD_ATTACK_POWER_OF_ARMOR

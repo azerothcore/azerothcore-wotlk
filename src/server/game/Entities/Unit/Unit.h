@@ -1385,6 +1385,7 @@ public:
 // findkeyone
     [[nodiscard]] float GetStat(Stats stat) const { return float(GetUInt32Value(static_cast<uint16>(UNIT_FIELD_STAT0) + stat)); }
     void SetStat(Stats stat, int32 val) { SetStatInt32Value(static_cast<uint16>(UNIT_FIELD_STAT0) + stat, val); }
+//  void SetStatWithPoints(Stats stat, int32 val) {SetStatInt32Value(static_cast<uint16>(UNIT_FIELD_STAT0) + stat, GetStat(stat) + val); }
     [[nodiscard]] uint32 GetArmor() const { return GetResistance(SPELL_SCHOOL_NORMAL); }
     void SetArmor(int32 val) { SetResistance(SPELL_SCHOOL_NORMAL, val); }
 
@@ -1959,6 +1960,7 @@ public:
     void ApplyStatPercentBuffMod(Stats stat, float val, bool apply);
 
     void SetCreateStat(Stats stat, float val) { m_createStats[stat] = val; }
+    void SetCreateStatPoints(Stats stat, float val) {m_createStatPoints[stat] = val; }
     void SetCreateHealth(uint32 val) { SetUInt32Value(UNIT_FIELD_BASE_HEALTH, val); }
     [[nodiscard]] uint32 GetCreateHealth() const { return GetUInt32Value(UNIT_FIELD_BASE_HEALTH); }
     void SetCreateMana(uint32 val) { SetUInt32Value(UNIT_FIELD_BASE_MANA, val); }
@@ -1966,8 +1968,10 @@ public:
     [[nodiscard]] uint32 GetCreatePowers(Powers power) const;
     [[nodiscard]] float GetPosStat(Stats stat) const { return GetFloatValue(static_cast<uint16>(UNIT_FIELD_POSSTAT0) +  stat); }
     [[nodiscard]] float GetNegStat(Stats stat) const { return GetFloatValue(static_cast<uint16>(UNIT_FIELD_NEGSTAT0) +  stat); }
-    [[nodiscard]] float GetCreateStat(Stats stat) const { return m_createStats[stat]; }
-
+    [[nodiscard]] float GetCreateStat(Stats stat) const { return m_createStats[stat]; } 
+    [[nodiscard]] float GetCreateStatPoints(Stats stat) const { return m_createStatPoints[stat]; }
+    [[nodiscard]] uint32 GetStatPointsByStat(Stats stat) const;
+    
     void SetCurrentCastedSpell(Spell* pSpell);
     virtual void ProhibitSpellSchool(SpellSchoolMask /*idSchoolMask*/, uint32 /*unTimeMs*/) { }
     void InterruptSpell(CurrentSpellTypes spellType, bool withDelayed = true, bool withInstant = true, bool bySelf = false);
@@ -2406,7 +2410,7 @@ protected:
 
     float m_createStats[MAX_STATS];
 
-    uint32 m_createSecStats[MAX_SECSTATS];
+    float m_createStatPoints[MAX_STATS];
 
     AttackerSet m_attackers;
     Unit* m_attacking;

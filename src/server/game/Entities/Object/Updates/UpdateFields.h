@@ -389,12 +389,13 @@ enum EUnitFields
     PLAYER_FIELD_GLYPHS_1                     = UNIT_END + 0x0492, // Size: 6, Type: INT, Flags: PRIVATE
     PLAYER_GLYPHS_ENABLED                     = UNIT_END + 0x0498, // Size: 1, Type: INT, Flags: PRIVATE
     PLAYER_PET_SPELL_POWER                    = UNIT_END + 0x0499, // Size: 1, Type: INT, Flags: PRIVATE
-    PLAYER_SEC_STAT_DEX                       = UNIT_END + 0x049A, // SecStats test start
-    PLAYER_SEC_STAT_FORT                      = UNIT_END + 0x049B,
-    PLAYER_SEC_STAT_CONST                     = UNIT_END + 0x049C,
-    PLAYER_SEC_STAT_WIS                       = UNIT_END + 0x049D,
-    PLAYER_SEC_STAT_VIG                       = UNIT_END + 0x049E,
-    PLAYER_END                                = UNIT_END + 0x049F,
+    PLAYER_SEC_STAT_DEX                       = UNIT_END + 0x049A, // Size: 1, Type: INT, Flags: UNSET    SecStats test start
+    PLAYER_SEC_STAT_FORT                      = UNIT_END + 0x049B, // Size: 1, Type: INT, Flags: UNSET
+    PLAYER_SEC_STAT_CONST                     = UNIT_END + 0x049C, // Size: 1, Type: INT, Flags: UNSET
+    PLAYER_SEC_STAT_WIS                       = UNIT_END + 0x049D, // Size: 1, Type: INT, Flags: UNSET
+    PLAYER_SEC_STAT_VIG                       = UNIT_END + 0x049E, // Size: 1, Type: INT, Flags: UNSET
+    PLAYER_CHARACTER_POINTS3                  = UNIT_END + 0x049F, 
+    PLAYER_END                                = UNIT_END + 0x04A0, 
 };
 
 enum EGameObjectFields

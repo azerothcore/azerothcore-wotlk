@@ -16,8 +16,8 @@
 DROP TABLE IF EXISTS `character_custom_data`;
 CREATE TABLE IF NOT EXISTS `character_custom_data` (
   `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
-  `adnl_agility` INT NOT NULL DEFAULT 0,
   `adnl_strength` INT NOT NULL DEFAULT 0,
+  `adnl_agility` INT NOT NULL DEFAULT 0,
   `adnl_stamina` INT NOT NULL DEFAULT 0,
   `adnl_intellect` INT NOT NULL DEFAULT 0,
   `adnl_spirit` INT NOT NULL DEFAULT 0,

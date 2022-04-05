@@ -878,9 +878,10 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOAD_CORPSE_LOCATION         = 35,
     PLAYER_LOGIN_QUERY_LOAD_CHARACTER_SETTINGS      = 36,
     PLAYER_LOGIN_QUERY_LOAD_PET_SLOTS               = 37,
+    PLAYER_LOGIN_QUERY_LOAD_CUSTOM_DATA             = 38,
     MAX_PLAYER_LOGIN_QUERY
 };
-//     PLAYER_LOGIN_QUERY_LOAD_CUSTOM_DATA             = 38, insert above if client communication issue figured out
+
 enum PlayerDelayedOperations
 {
     DELAYED_SAVE_PLAYER         = 0x01,
@@ -1666,6 +1667,14 @@ public:
     [[nodiscard]] bool HasTalent(uint32 spell_id, uint8 spec) const;
 
     [[nodiscard]] uint32 CalculateTalentsPoints() const;
+   
+   //Stat points system functions
+    [[nodiscard]] uint32 GetFreeStatPoints() const { return GetUInt32Value(PLAYER_CHARACTER_POINTS3); }
+    [[nodiscard]] uint32 CalculateStatPoints() const;
+    void SetFreeStatPoints(uint32 statpoints);
+    void InitStatPointsForLevel();
+    void AddStatPoint(Stats stat); 
+    void SetCreateUsedStatPoints(uint32 val) {m_usedStatPoints = val; } // secondary stats addition
 
     // Dual Spec
     void UpdateSpecCount(uint8 count);
@@ -2666,6 +2675,7 @@ public:
     void _LoadBrewOfTheMonth(PreparedQueryResult result);
     void _LoadCharacterSettings(PreparedQueryResult result);
     void _LoadPetStable(uint8 petStableSlots, PreparedQueryResult result);
+    void _LoadStatPoints(PreparedQueryResult result);  // Custom Data addition 
 
     /*********************************************************/
     /***                   SAVE SYSTEM                     ***/
@@ -2687,7 +2697,7 @@ public:
     void _SaveGlyphs(CharacterDatabaseTransaction trans);
     void _SaveTalents(CharacterDatabaseTransaction trans);
     void _SaveStats(CharacterDatabaseTransaction trans);
-    void _SaveCustomData(CharacterDatabaseTransaction trans);   //custom data
+    void _SaveStatPoints(CharacterDatabaseTransaction trans);   //custom data
     void _SaveCharacter(bool create, CharacterDatabaseTransaction trans);
     void _SaveInstanceTimeRestrictions(CharacterDatabaseTransaction trans);
     void _SavePlayerSettings(CharacterDatabaseTransaction trans);
@@ -2822,6 +2832,9 @@ public:
     uint32 m_usedTalentCount;
     uint32 m_questRewardTalentCount;
     uint32 m_extraBonusTalentCount;
+
+    // Custom_data 
+    uint32 m_usedStatPoints;
 
     // Social
     PlayerSocial* m_social;

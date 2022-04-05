@@ -5386,10 +5386,13 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     SetUInt32Value(PLAYER_DUEL_TEAM, 0);
 
     // reset stats before loading any modifiers
+     
     InitStatsForLevel();
     InitGlyphsForLevel();
     InitTaxiNodesForLevel();
     InitRunes();
+
+    _LoadStatPoints(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_CUSTOM_DATA)); // custom data load stat points
 
     sScriptMgr->OnPlayerLoadFromDB(this);
 
@@ -5457,6 +5460,9 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
 
     // after spell and quest load
     InitTalentForLevel();
+
+    // Custom_data addition
+    InitStatPointsForLevel();
 
     // must be before inventory (some items required reputation check)
     m_reputationMgr->LoadFromDB(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_REPUTATION));
@@ -7142,7 +7148,7 @@ void Player::SaveToDB(CharacterDatabaseTransaction trans, bool create, bool logo
     _SaveGlyphs(trans);
     _SaveInstanceTimeRestrictions(trans);
     _SavePlayerSettings(trans);
-    _SaveCustomData(trans);  // custom_data
+    _SaveStatPoints(trans);  // custom_data
 
     // check if stats should only be saved on logout
     // save stats can be out of transaction
@@ -7767,8 +7773,8 @@ void Player::_SaveSpells(CharacterDatabaseTransaction trans)
     }
 }
 
-
-void Player::_SaveCustomData(CharacterDatabaseTransaction trans)
+// custom data additiion
+void Player::_SaveStatPoints(CharacterDatabaseTransaction trans)
 {
     CharacterDatabasePreparedStatement* stmt = nullptr;
 
@@ -7780,11 +7786,11 @@ void Player::_SaveCustomData(CharacterDatabaseTransaction trans)
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_CUSTOM_DATA);
     stmt->setUInt32(index++, GetGUID().GetCounter());
-    stmt->setUInt32(index++, GetStat(STAT_AGILITY));  //adnl_agility
-    stmt->setUInt32(index++, GetStat(STAT_STRENGTH));  //adnl_strength
-    stmt->setUInt32(index++, GetStat(STAT_STAMINA));  //adnl_stamina
-    stmt->setUInt32(index++, GetStat(STAT_INTELLECT));  //adnl_intellect
-    stmt->setUInt32(index++, GetStat(STAT_SPIRIT));  //adnl_spirit
+    stmt->setUInt32(index++, GetStatPointsByStat(STAT_STRENGTH));  //adnl_strenght
+    stmt->setUInt32(index++, GetStatPointsByStat(STAT_AGILITY));  //adnl_agility
+    stmt->setUInt32(index++, GetStatPointsByStat(STAT_STAMINA));  //adnl_stamina
+    stmt->setUInt32(index++, GetStatPointsByStat(STAT_INTELLECT));  //adnl_intellect
+    stmt->setUInt32(index++, GetStatPointsByStat(STAT_SPIRIT));  //adnl_spirit
    
     trans->Append(stmt);
 } 

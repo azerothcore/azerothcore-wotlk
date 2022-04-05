@@ -41,6 +41,7 @@
 #include "SpellScript.h"
 #include "Unit.h"
 #include "Vehicle.h"
+#include "Player.h"
 #include <array>
 
 // TODO: this import is not necessary for compilation and marked as unused by the IDE
@@ -4411,6 +4412,55 @@ class spell_gen_arcane_charge : public SpellScript
     }
 };
 
+enum StatPointSpells
+{
+    STATSPELL_STRENGTH  = 200000,
+    STATSPELL_AGILITY   = 200001,
+    STATSPELL_STAMINA   = 200002,
+    STATSPELL_INTELLECT = 200003, 
+    STATSPELL_SPIRIT    = 200004,
+};
+
+class spell_gen_stat_point_spells : public SpellScript
+{
+    PrepareSpellScript(spell_gen_stat_point_spells);
+      
+     bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ STATSPELL_STRENGTH, STATSPELL_AGILITY, STATSPELL_STAMINA, STATSPELL_INTELLECT, STATSPELL_SPIRIT });
+    }
+ 
+    void HandleCast()
+    {
+        if (Player* caster = GetCaster()->ToPlayer()) 
+        { 
+             switch (GetSpellInfo()->Id)
+             { 
+                case STATSPELL_STRENGTH:
+                    caster->AddStatPoint(STAT_STRENGTH);
+                    break;
+                case STATSPELL_AGILITY:
+                    caster->AddStatPoint(STAT_AGILITY);
+                    break;
+                case STAT_STAMINA:
+                    caster->AddStatPoint(STAT_STAMINA);
+                    break;
+                case STATSPELL_INTELLECT:
+                    caster->AddStatPoint(STAT_INTELLECT);
+                    break;
+                case STATSPELL_SPIRIT:
+                    caster->AddStatPoint(STAT_SPIRIT);
+                    break; 
+             }
+        }
+    }
+    
+    void Register() override
+    {
+        OnCast += SpellCastFn(spell_gen_stat_point_spells::HandleCast); 
+    } 
+}; 
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -4544,4 +4594,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_contagion_of_rot);
     RegisterSpellScript(spell_gen_holiday_buff_food);
     RegisterSpellScript(spell_gen_arcane_charge);
+    RegisterSpellScript(spell_gen_stat_point_spells);
 }

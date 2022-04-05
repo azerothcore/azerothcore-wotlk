@@ -177,6 +177,8 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     m_questRewardTalentCount = 0;
     m_extraBonusTalentCount = 0;
 
+    m_usedStatPoints = 0;   // Custom_data 
+
     m_regenTimer = 0;
     m_regenTimerCount = 0;
     m_foodEmoteTimerCount = 0;
@@ -588,6 +590,8 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
     InitGlyphsForLevel();
     InitTalentForLevel();
     InitPrimaryProfessions();                               // to max set before any spell added
+
+    InitStatPointsForLevel();  // Custom_data additions
 
     UpdatePositionData();
 
@@ -2460,9 +2464,9 @@ void Player::GiveLevel(uint8 level)
     UpdateSkillsForLevel();
 
     // save base values (bonuses already included in stored stats
-    for (uint8 i = STAT_STRENGTH; i < MAX_STATS; ++i)
+    for (uint32 i = STAT_STRENGTH; i < MAX_STATS; ++i)
         SetCreateStat(Stats(i), info.stats[i]);
-
+         
     SetCreateHealth(classInfo.basehealth);
     SetCreateMana(classInfo.basemana);
 
@@ -2470,6 +2474,7 @@ void Player::GiveLevel(uint8 level)
     InitTaxiNodesForLevel();
     InitGlyphsForLevel();
 
+    InitStatPointsForLevel();  // Custom_data additions
     UpdateAllStats();
 
     if (sWorld->getBoolConfig(CONFIG_ALWAYS_MAXSKILL)) // Max weapon skill when leveling up
@@ -2532,6 +2537,14 @@ void Player::InitTalentForLevel()
         SendTalentsInfoData(false);                         // update at client
 }
 
+// Custom_data 
+void Player::InitStatPointsForLevel()
+{
+    uint32 statPointsForLevel = CalculateStatPoints();
+    uint32 FreeStatPoints = statPointsForLevel - m_usedStatPoints;
+    SetFreeStatPoints(FreeStatPoints);
+}
+
 void Player::InitStatsForLevel(bool reapplyMods)
 {
     if (reapplyMods)                                        //reapply stats values only on .reset stats (level) command
@@ -2558,12 +2571,12 @@ void Player::InitStatsForLevel(bool reapplyMods)
     SetObjectScale(1.0f);
 
     // save base values (bonuses already included in stored stats
-    for (uint8 i = STAT_STRENGTH; i < MAX_STATS; ++i)
+    for (uint32 i = STAT_STRENGTH; i < MAX_STATS; ++i)
         SetCreateStat(Stats(i), info.stats[i]);
 
-    for (uint8 i = STAT_STRENGTH; i < MAX_STATS; ++i)
+    for (uint32 i = STAT_STRENGTH; i < MAX_STATS; ++i)
         SetStat(Stats(i), info.stats[i]);
-
+    
     SetCreateHealth(classInfo.basehealth);
 
     //set create powers
@@ -3732,6 +3745,13 @@ void Player::SetFreeTalentPoints(uint32 points)
 {
     sScriptMgr->OnPlayerFreeTalentPointsChanged(this, points);
     SetUInt32Value(PLAYER_CHARACTER_POINTS1, points);
+}
+
+// custom_data addition
+
+void Player::SetFreeStatPoints(uint32 statpoints)
+{
+    SetUInt32Value(PLAYER_CHARACTER_POINTS3, statpoints); 
 }
 
 Mail* Player::GetMail(uint32 id)
@@ -13145,6 +13165,16 @@ uint32 Player::CalculateTalentsPoints() const
     return uint32(base_talent * sWorld->getRate(RATE_TALENT));
 }
 
+// custom_data Stat points per level calculation 
+
+uint32 Player::CalculateStatPoints() const
+{
+    uint32 base_points = getLevel();
+    uint32 PointsPerLevel = 2;
+
+    return base_points * PointsPerLevel;
+}
+
 bool Player::canFlyInZone(uint32 mapid, uint32 zone, SpellInfo const* bySpell) const
 {
     // continent checked in SpellInfo::CheckLocation at cast and area update
@@ -13435,6 +13465,25 @@ void Player::ResetAchievementCriteria(AchievementCriteriaCondition condition, ui
 void Player::CompletedAchievement(AchievementEntry const* entry)
 {
     m_achievementMgr->CompletedAchievement(entry);
+}
+
+void Player::AddStatPoint(Stats stat)
+{
+    uint32 CurentStatPoints = GetFreeStatPoints();
+
+    if (CurentStatPoints == 0)
+        return;
+
+    if (m_usedStatPoints == 40)
+        return;
+    
+    if (GetStat(stat) >= 20) 
+        return;
+
+    SetCreateStatPoints(stat, m_createStatPoints[stat] + 1);
+    SetCreateUsedStatPoints(m_usedStatPoints + 1); 
+    SetFreeStatPoints(GetFreeStatPoints() - 1);
+    SetStat(stat, GetStat(stat) + 1);
 }
 
 void Player::LearnTalent(uint32 talentId, uint32 talentRank)
@@ -14487,6 +14536,28 @@ void Player::_LoadTalents(PreparedQueryResult result)
                 m_usedTalentCount += talentPos->rank + 1;
         } while (result->NextRow());
     }
+}
+
+void Player::_LoadStatPoints(PreparedQueryResult result)
+{ 
+    if (!result)
+        return;   
+
+    if (HasAtLoginFlag(AT_LOGIN_FIRST))
+        return;
+    
+    uint32 usedStatPts = 0;
+    
+    do
+    { 
+        Field* fields = result->Fetch();
+        for (uint8 i = STAT_STRENGTH; i < MAX_STATS; ++i)
+        {
+            SetCreateStatPoints(static_cast<Stats>(i), fields[i].GetUInt32());
+            usedStatPts += fields[i].GetUInt32();
+            SetCreateUsedStatPoints(usedStatPts);
+        }
+    } while (result->NextRow()); 
 }
 
 void Player::_SaveTalents(CharacterDatabaseTransaction trans)
