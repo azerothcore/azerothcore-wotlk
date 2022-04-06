@@ -149,7 +149,7 @@ void Player::SendPreparedQuest(ObjectGuid guid)
             }
         }
     }
-        // multiple entries
+    // multiple entries
     else
     {
         QEmote qe;
@@ -179,8 +179,8 @@ void Player::SendPreparedQuest(ObjectGuid guid)
 
                     int loc_idx = GetSession()->GetSessionDbLocaleIndex();
                     if (loc_idx >= 0)
-                        if (NpcTextLocale const* nl = sObjectMgr->GetNpcTextLocale(textid))
-                            ObjectMgr::GetLocaleString(nl->Text_0[0], loc_idx, title);
+                        if (NpcTextLocale const* npcTextLocale = sObjectMgr->GetNpcTextLocale(textid))
+                            ObjectMgr::GetLocaleString(npcTextLocale->Text_0[0], loc_idx, title);
                 }
                 else
                 {
@@ -188,11 +188,12 @@ void Player::SendPreparedQuest(ObjectGuid guid)
 
                     int loc_idx = GetSession()->GetSessionDbLocaleIndex();
                     if (loc_idx >= 0)
-                        if (NpcTextLocale const* nl = sObjectMgr->GetNpcTextLocale(textid))
-                            ObjectMgr::GetLocaleString(nl->Text_1[0], loc_idx, title);
+                        if (NpcTextLocale const* npcTextLocale = sObjectMgr->GetNpcTextLocale(textid))
+                            ObjectMgr::GetLocaleString(npcTextLocale->Text_1[0], loc_idx, title);
                 }
             }
         }
+
         PlayerTalkClass->SendQuestGiverQuestList(qe, title, guid);
     }
 }
@@ -578,10 +579,10 @@ void Player::AddQuest(Quest const* quest, Object* questGiver)
     {
         // prepare Quest Tracker datas
         auto stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_QUEST_TRACK);
-        stmt->setUInt32(0, quest_id);
-        stmt->setUInt32(1, GetGUID().GetCounter());
-        stmt->setString(2, GitRevision::GetHash());
-        stmt->setString(3, GitRevision::GetDate());
+        stmt->SetData(0, quest_id);
+        stmt->SetData(1, GetGUID().GetCounter());
+        stmt->SetData(2, GitRevision::GetHash());
+        stmt->SetData(3, GitRevision::GetDate());
 
         // add to Quest Tracker
         CharacterDatabase.Execute(stmt);
@@ -623,8 +624,8 @@ void Player::CompleteQuest(uint32 quest_id)
     {
         // prepare Quest Tracker datas
         auto stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_QUEST_TRACK_COMPLETE_TIME);
-        stmt->setUInt32(0, quest_id);
-        stmt->setUInt32(1, GetGUID().GetCounter());
+        stmt->SetData(0, quest_id);
+        stmt->SetData(1, GetGUID().GetCounter());
 
         // add to Quest Tracker
         CharacterDatabase.Execute(stmt);
@@ -736,6 +737,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     for (Unit::AuraEffectList::const_iterator i = ModXPPctAuras.begin(); i != ModXPPctAuras.end(); ++i)
         AddPct(XP, (*i)->GetAmount());
 
+    sScriptMgr->OnQuestComputeXP(this, quest, XP);
     int32 moneyRew = 0;
     if (getLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) || sScriptMgr->ShouldBeRewardedWithMoneyInsteadOfExp(this))
     {

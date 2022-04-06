@@ -137,7 +137,7 @@ bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, std::s
 
     if (uint32 inviteInstanceId = player->GetPendingSpectatorInviteInstanceId())
     {
-        if (Battleground* tbg = sBattlegroundMgr->GetBattleground(inviteInstanceId))
+        if (Battleground* tbg = sBattlegroundMgr->GetBattleground(inviteInstanceId, BATTLEGROUND_TYPE_NONE))
             tbg->RemoveToBeTeleported(player->GetGUID());
         player->SetPendingSpectatorInviteInstanceId(0);
     }
@@ -302,7 +302,7 @@ bool ArenaSpectator::ShouldSendAura(Aura* aura, uint8 effMask, ObjectGuid target
 }
 
 template<>
-AC_GAME_API void ArenaSpectator::SendPacketTo(const Player* player, std::string&& message)
+AC_GAME_API void ArenaSpectator::SendPacketTo(Player const* player, std::string&& message)
 {
     WorldPacket data;
     CreatePacket(data, message);

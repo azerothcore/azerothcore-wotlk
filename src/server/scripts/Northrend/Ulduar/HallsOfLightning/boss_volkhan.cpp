@@ -246,7 +246,7 @@ public:
                 events.ScheduleEvent(EVENT_MOVE_TO_ANVIL, 0, 0, 2);
         }
 
-        void SpellHitTarget(Unit* /*who*/, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit* /*who*/, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_TEMPER)
             {
@@ -357,7 +357,7 @@ public:
             if (uiDamage >= me->GetHealth())
             {
                 me->UpdateEntry(NPC_BRITTLE_GOLEM, 0, false);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_DISABLE_MOVE);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_DISABLE_MOVE);
                 me->SetHealth(me->GetMaxHealth());
                 me->RemoveAllAuras();
                 me->AttackStop();
@@ -459,7 +459,7 @@ public:
         {
             _attackGUID.Clear();
             _isActive = urand(0, 1);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             me->CastSpell(me, SPELL_FREEZE_ANIM, true);
         }
 
@@ -522,7 +522,7 @@ public:
 
             if (eventId == EVENT_UNFREEZE)
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->CastSpell(me, SPELL_AWAKEN, true);
                 me->RemoveAllAuras();
                 _isActive = true;

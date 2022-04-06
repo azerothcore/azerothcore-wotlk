@@ -124,7 +124,7 @@ public:
 
             ArchimondeGUID = instance->GetGuidData(DATA_ARCHIMONDE);
 
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         }
 
         void EnterCombat(Unit* /*who*/) override { }
@@ -319,7 +319,7 @@ public:
         void DoCastProtection()
         {
             // lets get spell info
-            const SpellInfo* info = sSpellMgr->GetSpellInfo(SPELL_PROTECTION_OF_ELUNE);
+            SpellInfo const* info = sSpellMgr->GetSpellInfo(SPELL_PROTECTION_OF_ELUNE);
 
             if (!info)
                 return;
@@ -464,8 +464,8 @@ public:
             else
             {
                 summoned->SetFaction(me->GetFaction());
-                summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                summoned->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                summoned->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             }
 
             if (summoned->GetEntry() == CREATURE_DOOMFIRE_SPIRIT)
@@ -576,7 +576,7 @@ public:
 
                             if (Unit* Nordrassil = ObjectAccessor::GetUnit(*me, WorldTreeGUID))
                             {
-                                Nordrassil->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                                Nordrassil->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                                 Nordrassil->SetDisplayId(11686);
                                 DoCast(Nordrassil, SPELL_DRAIN_WORLD_TREE);
                                 IsChanneling = true;

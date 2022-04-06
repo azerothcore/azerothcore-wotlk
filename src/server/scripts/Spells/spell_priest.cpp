@@ -27,6 +27,7 @@
 #include "SpellAuraEffects.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
+#include "TemporarySummon.h"
 
 enum PriestSpells
 {
@@ -37,6 +38,7 @@ enum PriestSpells
     SPELL_PRIEST_GLYPH_OF_PRAYER_OF_HEALING_HEAL    = 56161,
     SPELL_PRIEST_GUARDIAN_SPIRIT_HEAL               = 48153,
     SPELL_PRIEST_ITEM_EFFICIENCY                    = 37595,
+    SPELL_PRIEST_LIGHTWELL_CHARGES                  = 59907,
     SPELL_PRIEST_MANA_LEECH_PROC                    = 34650,
     SPELL_PRIEST_PENANCE_R1                         = 47540,
     SPELL_PRIEST_PENANCE_R1_DAMAGE                  = 47758,
@@ -61,6 +63,16 @@ enum PriestSpellIcons
     PRIEST_ICON_ID_PAIN_AND_SUFFERING               = 2874,
 };
 
+enum Mics
+{
+    PRIEST_LIGHTWELL_NPC_1                          = 31897,
+    PRIEST_LIGHTWELL_NPC_2                          = 31896,
+    PRIEST_LIGHTWELL_NPC_3                          = 31895,
+    PRIEST_LIGHTWELL_NPC_4                          = 31894,
+    PRIEST_LIGHTWELL_NPC_5                          = 31893,
+    PRIEST_LIGHTWELL_NPC_6                          = 31883
+};
+
 class spell_pri_shadowfiend_scaling : public AuraScript
 {
     PrepareAuraScript(spell_pri_shadowfiend_scaling);
@@ -78,11 +90,11 @@ class spell_pri_shadowfiend_scaling : public AuraScript
 
     void CalculateStatAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // xinef: shadowfiend inherits 30% of intellect / stamina (guessed)
+        // xinef: shadowfiend inherits 30% of intellect and 65% of stamina (guessed)
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             Stats stat = Stats(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-            amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), 30);
+            amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), stat == STAT_STAMINA ? 65 : 30);
         }
     }
 
@@ -359,6 +371,48 @@ class spell_pri_item_greater_heal_refund : public AuraScript
     }
 };
 
+// 60123 - Lightwell
+class spell_pri_lightwell : public SpellScript
+{
+    PrepareSpellScript(spell_pri_lightwell);
+
+    bool Load() override
+    {
+        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+    }
+
+    void HandleScriptEffect(SpellEffIndex /* effIndex */)
+    {
+        Creature* caster = GetCaster()->ToCreature();
+        if (!caster || !caster->IsSummon())
+            return;
+
+        uint32 lightwellRenew = 0;
+        switch (caster->GetEntry())
+        {
+            case PRIEST_LIGHTWELL_NPC_1: lightwellRenew = 7001; break;
+            case PRIEST_LIGHTWELL_NPC_2: lightwellRenew = 27873; break;
+            case PRIEST_LIGHTWELL_NPC_3: lightwellRenew = 27874; break;
+            case PRIEST_LIGHTWELL_NPC_4: lightwellRenew = 28276; break;
+            case PRIEST_LIGHTWELL_NPC_5: lightwellRenew = 48084; break;
+            case PRIEST_LIGHTWELL_NPC_6: lightwellRenew = 48085; break;
+        }
+
+        // proc a spellcast
+        if (Aura* chargesAura = caster->GetAura(SPELL_PRIEST_LIGHTWELL_CHARGES))
+        {
+            caster->CastSpell(GetHitUnit(), lightwellRenew, caster->ToTempSummon()->GetSummonerGUID());
+            if (chargesAura->ModCharges(-1))
+                caster->ToTempSummon()->UnSummon();
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_pri_lightwell::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 // -7001 - Lightwell Renew
 class spell_pri_lightwell_renew : public AuraScript
 {
@@ -546,7 +600,7 @@ class spell_pri_penance : public SpellScript
 };
 
 // -17 - Power Word: Shield
-static int32 CalculateSpellAmount(Unit* caster, int32 amount, const SpellInfo* spellInfo, const AuraEffect* aurEff)
+static int32 CalculateSpellAmount(Unit* caster, int32 amount, SpellInfo const* spellInfo, const AuraEffect* aurEff)
 {
     // +80.68% from sp bonus
     float bonus = 0.8068f;
@@ -854,6 +908,7 @@ void AddSC_priest_spell_scripts()
     RegisterSpellScript(spell_pri_guardian_spirit);
     RegisterSpellScript(spell_pri_hymn_of_hope);
     RegisterSpellScript(spell_pri_item_greater_heal_refund);
+    RegisterSpellScript(spell_pri_lightwell);
     RegisterSpellScript(spell_pri_lightwell_renew);
     RegisterSpellScript(spell_pri_mana_burn);
     RegisterSpellScript(spell_pri_mana_leech);

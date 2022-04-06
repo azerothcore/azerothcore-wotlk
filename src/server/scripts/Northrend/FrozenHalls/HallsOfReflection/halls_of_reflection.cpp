@@ -91,7 +91,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if (!creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
+        if (!creature->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
             return true;
 
         if (creature->IsQuestGiver())
@@ -134,7 +134,7 @@ public:
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction) override
     {
-        if (!creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
+        if (!creature->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
             return true;
 
         InstanceScript* instance = creature->GetInstanceScript();
@@ -154,13 +154,13 @@ public:
                 CloseGossipMenuFor(player);
                 if (creature->AI())
                     creature->AI()->DoAction(ACTION_START_INTRO);
-                creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
                 CloseGossipMenuFor(player);
                 if (creature->AI())
                     creature->AI()->DoAction(ACTION_SKIP_INTRO);
-                creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                 break;
         }
 
@@ -233,7 +233,7 @@ public:
                     me->GetMotionMaster()->MovePoint(0, SpawnPos);
                     break;
                 case EVENT_PRE_INTRO_3:
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                     Talk(me->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_INTRO_2 : SAY_SYLVANAS_INTRO_1);
                     me->SetFacingTo(0.89f);
                     break;
@@ -705,7 +705,7 @@ public:
 
         void AttackStart(Unit* who) override
         {
-            if (!me->IsVisible() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (!me->IsVisible() || me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 return;
             ScriptedAI::AttackStart(who);
         }
@@ -755,7 +755,7 @@ public:
         {
             ScriptedAI::EnterEvadeMode();
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
         }
     };
 };
@@ -802,7 +802,7 @@ public:
 
         void AttackStart(Unit* who) override
         {
-            if (!me->IsVisible() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (!me->IsVisible() || me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 return;
             ScriptedAI::AttackStart(who);
         }
@@ -851,7 +851,7 @@ public:
         {
             ScriptedAI::EnterEvadeMode();
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
         }
     };
 };
@@ -945,7 +945,7 @@ public:
 
         void AttackStart(Unit* who) override
         {
-            if (!me->IsVisible() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (!me->IsVisible() || me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 return;
             ScriptedAI::AttackStart(who);
         }
@@ -994,7 +994,7 @@ public:
         {
             ScriptedAI::EnterEvadeMode();
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
         }
     };
 };
@@ -1039,7 +1039,7 @@ public:
 
         void AttackStart(Unit* who) override
         {
-            if (!me->IsVisible() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (!me->IsVisible() || me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 return;
             ScriptedAI::AttackStart(who);
         }
@@ -1077,7 +1077,7 @@ public:
         {
             ScriptedAI::EnterEvadeMode();
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
         }
     };
 };
@@ -1122,7 +1122,7 @@ public:
 
         void AttackStart(Unit* who) override
         {
-            if (!me->IsVisible() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (!me->IsVisible() || me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 return;
             ScriptedAI::AttackStart(who);
         }
@@ -1161,7 +1161,7 @@ public:
         {
             ScriptedAI::EnterEvadeMode();
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
         }
     };
 };
@@ -1460,7 +1460,7 @@ public:
             summons.Despawn(s);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if (target && target->IsAlive() && spell->Id == SPELL_LICH_KING_ZAP_PLAYER)
                 Unit::DealDamage(me, target, 10000);
@@ -1619,7 +1619,7 @@ public:
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32  /*uiAction*/) override
     {
-        if (!creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
+        if (!creature->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
             return true;
 
         ClearGossipMenuFor(player);
@@ -1627,7 +1627,7 @@ public:
         if (InstanceScript* pInstance = creature->GetInstanceScript())
             if (!pInstance->GetData(DATA_LICH_KING))
             {
-                creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                 creature->AI()->DoAction(ACTION_START_LK_FIGHT_REAL);
                 return true;
             }
@@ -1748,7 +1748,7 @@ public:
                 case EVENT_ADD_GOSSIP:
                     me->RemoveAura(me->GetEntry() == NPC_JAINA_PART2 ? SPELL_JAINA_ICE_BARRIER : SPELL_SYLVANAS_CLOAK_OF_DARKNESS);
                     me->SetFacingTo(LeaderEscapePos.GetOrientation());
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     break;
                 case EVENT_START_RUN:
                     {

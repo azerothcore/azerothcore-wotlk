@@ -18,6 +18,7 @@
 #include "GossipDef.h"
 #include "Formulas.h"
 #include "ObjectMgr.h"
+#include "Object.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "QuestDef.h"
@@ -73,8 +74,9 @@ void GossipMenu::AddMenuItem(int32 menuItemId, uint8 icon, std::string const& me
  * @param menuItemId Gossip menu item id.
  * @param sender Identifier of the current menu.
  * @param action Custom action given to OnGossipHello.
+ * @param boxMoney Custom price for pop-up box. If > 0, it will replace DB value.
  */
-void GossipMenu::AddMenuItem(uint32 menuId, uint32 menuItemId, uint32 sender, uint32 action)
+void GossipMenu::AddMenuItem(uint32 menuId, uint32 menuItemId, uint32 sender, uint32 action, uint32 boxMoney)
 {
     /// Find items for given menu id.
     GossipMenuItemsMapBounds bounds = sObjectMgr->GetGossipMenuItemsMapBounds(menuId);
@@ -125,7 +127,7 @@ void GossipMenu::AddMenuItem(uint32 menuId, uint32 menuItemId, uint32 sender, ui
         }
 
         /// Add menu item with existing method. Menu item id -1 is also used in ADD_GOSSIP_ITEM macro.
-        AddMenuItem(-1, itr->second.OptionIcon, strOptionText, sender, action, strBoxText, itr->second.BoxMoney, itr->second.BoxCoded);
+        AddMenuItem(-1, itr->second.OptionIcon, strOptionText, sender, action, strBoxText, boxMoney ? boxMoney : itr->second.BoxMoney, itr->second.BoxCoded);
     }
 }
 
@@ -306,44 +308,63 @@ void QuestMenu::ClearMenu()
     _questMenuItems.clear();
 }
 
-void PlayerMenu::SendQuestGiverQuestList(QEmote const& eEmote, const std::string& Title, ObjectGuid npcGUID)
+void PlayerMenu::SendQuestGiverQuestList(QEmote const& eEmote, std::string const& Title, ObjectGuid guid)
 {
-    WorldPacket data(SMSG_QUESTGIVER_QUEST_LIST, 100 + _questMenu.GetMenuItemCount() * 75);  // guess size
-    data << npcGUID;
-    data << Title;
-    data << uint32(eEmote._Delay);                         // player emote
-    data << uint32(eEmote._Emote);                         // NPC emote
+    WorldPacket data(SMSG_QUESTGIVER_QUEST_LIST, 100);  // guess size
+    data << guid;
+
+    if (QuestGreeting const* questGreeting = sObjectMgr->GetQuestGreeting(guid.GetTypeId(), guid.GetEntry()))
+    {
+        std::string strGreeting = questGreeting->Text;
+
+        LocaleConstant localeConstant = _session->GetSessionDbLocaleIndex();
+        if (localeConstant != LOCALE_enUS)
+            if (QuestGreetingLocale const* questGreetingLocale = sObjectMgr->GetQuestGreetingLocale(guid.GetTypeId(), guid.GetEntry()))
+                ObjectMgr::GetLocaleString(questGreetingLocale->Greeting, localeConstant, strGreeting);
+
+        data << strGreeting;
+        data << uint32(questGreeting->EmoteDelay);
+        data << uint32(questGreeting->EmoteType);
+    }
+    else
+    {
+        data << Title;
+        data << uint32(eEmote._Delay); // player emote
+        data << uint32(eEmote._Emote); // NPC emote
+    }
 
     size_t count_pos = data.wpos();
-    data << uint8 (_questMenu.GetMenuItemCount());
+    data << uint8(0);
     uint32 count = 0;
-    for (uint32 iI = 0; iI < _questMenu.GetMenuItemCount(); ++iI)
-    {
-        QuestMenuItem const& qmi = _questMenu.GetItem(iI);
 
-        uint32 questID = qmi.QuestId;
+    for (uint32 i = 0; i < _questMenu.GetMenuItemCount(); ++i)
+    {
+        QuestMenuItem const& questMenuItem = _questMenu.GetItem(i);
+
+        uint32 questID = questMenuItem.QuestId;
 
         if (Quest const* quest = sObjectMgr->GetQuestTemplate(questID))
         {
             ++count;
             std::string title = quest->GetTitle();
 
-            int32 locale = _session->GetSessionDbLocaleIndex();
-            if (QuestLocale const* localeData = sObjectMgr->GetQuestLocale(questID))
-                ObjectMgr::GetLocaleString(localeData->Title, locale, title);
+            LocaleConstant localeConstant = _session->GetSessionDbLocaleIndex();
+            if (localeConstant != LOCALE_enUS)
+                if (QuestLocale const* questTemplateLocale = sObjectMgr->GetQuestLocale(questID))
+                    ObjectMgr::GetLocaleString(questTemplateLocale->Title, localeConstant, title);
 
             data << uint32(questID);
-            data << uint32(qmi.QuestIcon);
+            data << uint32(questMenuItem.QuestIcon);
             data << int32(quest->GetQuestLevel());
-            data << uint32(quest->GetFlags()); // 3.3.3 quest flags
-            data << uint8(quest->IsRepeatable() && !quest->IsDailyOrWeekly() && !quest->IsMonthly()); // 3.3.3 icon changes: blue question mark or yellow exclamation mark
+            data << uint32(quest->GetFlags());                                                        // 3.3.3 quest flags
+            data << uint8(quest->IsRepeatable() && !quest->IsDailyOrWeekly() && !quest->IsMonthly()); // 3.3.3 changes icon: blue question or yellow exclamation
             data << title;
         }
     }
 
     data.put<uint8>(count_pos, count);
     _session->SendPacket(&data);
-    LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTGIVER_QUEST_LIST NPC {}", npcGUID.ToString());
+    LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTGIVER_QUEST_LIST (QuestGiver: {})", guid.ToString());
 }
 
 void PlayerMenu::SendQuestGiverStatus(uint8 questStatus, ObjectGuid npcGUID) const

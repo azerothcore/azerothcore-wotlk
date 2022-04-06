@@ -60,7 +60,7 @@ struct npc_pet_gen_soul_trader_beacon : public ScriptedAI
 
     Player* GetOwner() const { return ObjectAccessor::GetPlayer(*me, ownerGUID); }
 
-    void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+    void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_STEAL_ESSENCE_VISUAL && target == me)
         {
@@ -172,7 +172,7 @@ struct npc_pet_gen_argent_pony_bridle : public ScriptedAI
         _init = true;
         uint32 duration = 0;
         uint32 aura = 0;
-        me->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+        me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
 
         if (Unit* owner = me->GetCharmerOrOwner())
             if (Player* player = owner->ToPlayer())
@@ -182,7 +182,7 @@ struct npc_pet_gen_argent_pony_bridle : public ScriptedAI
 
                     aura = (player->GetTeamId(true) == TEAM_ALLIANCE ? SPELL_AURA_TIRED_S : SPELL_AURA_TIRED_G);
                     duration = player->GetSpellCooldownDelay(aura);
-                    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP);
 
                     for (uint8 i = 0; i < 3; ++i)
                     {
@@ -231,7 +231,7 @@ struct npc_pet_gen_argent_pony_bridle : public ScriptedAI
         {
             _mountTimer = 0;
             if (_state == ARGENT_PONY_STATE_NONE)
-                me->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+                me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
             else if (Unit* owner = me->GetCharmerOrOwner())
             {
                 if (owner->IsMounted() && !me->IsMounted())
@@ -294,20 +294,20 @@ struct npc_pet_gen_argent_pony_bridle : public ScriptedAI
         switch (action)
         {
             case GOSSIP_ACTION_TRADE:
-                creature->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_VENDOR);
+                creature->ReplaceAllNpcFlags(UNIT_NPC_FLAG_VENDOR);
                 player->GetSession()->SendListInventory(creature->GetGUID());
                 spellId = player->GetTeamId(true) ? SPELL_AURA_SHOP_G : SPELL_AURA_SHOP_S;
                 creature->AI()->DoAction(ARGENT_PONY_STATE_VENDOR);
                 break;
             case GOSSIP_ACTION_BANK:
-                creature->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_BANKER);
+                creature->ReplaceAllNpcFlags(UNIT_NPC_FLAG_BANKER);
                 player->GetSession()->SendShowBank(player->GetGUID());
                 spellId = player->GetTeamId(true) ? SPELL_AURA_BANK_G : SPELL_AURA_BANK_S;
                 creature->AI()->DoAction(ARGENT_PONY_STATE_BANK);
                 break;
             case GOSSIP_ACTION_MAILBOX:
                 {
-                    creature->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_MAILBOX);
+                    creature->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_MAILBOX);
                     player->GetSession()->SendShowMailBox(creature->GetGUID());
                     spellId = player->GetTeamId(true) ? SPELL_AURA_POSTMAN_G : SPELL_AURA_POSTMAN_S;
                     creature->AI()->DoAction(ARGENT_PONY_STATE_MAILBOX);
@@ -740,7 +740,7 @@ struct npc_pet_gen_fetch_ball : public NullCreatureAI
         me->CastSpell(me, 48649 /*SPELL_PET_TOY_FETCH_BALL_COME_HERE*/, true);
     }
 
-    void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+    void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == 48649 /*SPELL_PET_TOY_FETCH_BALL_COME_HERE*/)
         {

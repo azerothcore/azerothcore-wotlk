@@ -69,7 +69,7 @@ public:
 
         void EnterCombat(Unit* /*who*/) override { }
 
-        void SpellHit(Unit* unit, const SpellInfo* spell) override
+        void SpellHit(Unit* unit, SpellInfo const* spell) override
         {
             if (spellhit)
                 return;
@@ -355,7 +355,7 @@ public:
                 if (me->IsWithinDist(player, 10) && me->GetPositionX() > player->GetPositionX() && !Reached)
                 {
                     Talk(SAY_RIZZLE_FINAL);
-                    me->SetUInt32Value(UNIT_NPC_FLAGS, 1);
+                    me->ReplaceAllNpcFlags(NPCFlags(1));
                     me->SetFaction(FACTION_FRIENDLY);
                     me->GetMotionMaster()->MoveIdle();
                     me->RemoveAurasDueToSpell(SPELL_PERIODIC_DEPTH_CHARGE);
@@ -417,7 +417,7 @@ public:
         {
             me->SetHover(true);
             me->SetSwim(true);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             WeMustDie = false;
             WeMustDieTimer = 1000;
         }

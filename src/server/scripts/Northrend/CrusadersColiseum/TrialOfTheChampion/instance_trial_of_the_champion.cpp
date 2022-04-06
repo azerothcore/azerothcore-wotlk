@@ -316,7 +316,7 @@ public:
                             c->SetHomePosition(748.309f, 619.488f, 411.172f, 4.71239f);
                             c->SetPosition(748.309f, 619.488f, 411.172f, 4.71239f);
                             c->SetRespawnTime(3);
-                            c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                            c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         }
                         InstanceProgress = INSTANCE_PROGRESS_INITIAL;
                     }
@@ -329,7 +329,7 @@ public:
                             announcer->SetHomePosition(735.81f, 661.92f, 412.39f, 4.714f);
                             announcer->SetPosition(735.81f, 661.92f, 412.39f, 4.714f);
                             announcer->SetRespawnTime(3);
-                            announcer->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                            announcer->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
                             for( uint8 i = 0; i < 3; ++i )
                                 if( Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
@@ -387,7 +387,7 @@ public:
                             c->SetHomePosition(743.14f, 628.77f, 411.2f, 4.71239f);
                             c->SetPosition(743.14f, 628.77f, 411.2f, 4.71239f);
                             c->SetRespawnTime(3);
-                            c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                            c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         }
                         NPC_MemoryEntry = 0;
                         InstanceProgress = INSTANCE_PROGRESS_CHAMPIONS_DEAD;
@@ -411,7 +411,7 @@ public:
                             c->SetHomePosition(743.14f, 628.77f, 411.2f, 4.71239f);
                             c->SetPosition(743.14f, 628.77f, 411.2f, 4.71239f);
                             c->SetRespawnTime(3);
-                            c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                            c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         }
                         InstanceProgress = INSTANCE_PROGRESS_ARGENT_CHALLENGE_DIED;
                     }
@@ -836,7 +836,7 @@ public:
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[1][i]) )
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
-                                c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                                 if( Unit* target = c->SelectNearestTarget(200.0f) )
                                     c->AI()->AttackStart(target);
                                 c->AI()->DoZoneInCombat();
@@ -862,7 +862,7 @@ public:
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[0][i]) )
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
-                                c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                                 if( Unit* target = c->SelectNearestTarget(200.0f) )
                                     c->AI()->AttackStart(target);
                                 c->AI()->DoZoneInCombat();
@@ -887,7 +887,7 @@ public:
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[2][i]) )
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
-                                c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                                 if( Unit* target = c->SelectNearestTarget(200.0f) )
                                     c->AI()->AttackStart(target);
                                 c->AI()->DoZoneInCombat();
@@ -912,7 +912,7 @@ public:
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
-                                c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                                 if( Unit* target = c->SelectNearestTarget(200.0f) )
                                     c->AI()->AttackStart(target);
                                 c->AI()->DoZoneInCombat();
@@ -949,7 +949,7 @@ public:
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
-                                c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                                 if( Unit* target = c->SelectNearestTarget(200.0f) )
                                     c->AI()->AttackStart(target);
                                 c->AI()->DoZoneInCombat();
@@ -968,7 +968,7 @@ public:
                 case EVENT_RESTORE_ANNOUNCER_GOSSIP:
                     {
                         if( Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
-                            announcer->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                            announcer->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     }
                     break;
                 case EVENT_START_ARGENT_CHALLENGE_INTRO:
@@ -1053,7 +1053,7 @@ public:
                                 if( Creature* c = instance->GetCreature(NPC_ArgentSoldierGUID[i][j]) )
                                 {
                                     c->SetReactState(REACT_AGGRESSIVE);
-                                    c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                    c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                                     //c->AI()->DoZoneInCombat();
                                 }
                         if( Creature* tirion = instance->GetCreature(NPC_TirionGUID) )
@@ -1074,7 +1074,7 @@ public:
                         if( Creature* boss = instance->GetCreature(NPC_ArgentChampionGUID) )
                         {
                             boss->SetReactState(REACT_AGGRESSIVE);
-                            boss->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            boss->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             if( Unit* target = boss->SelectNearestTarget(200.0f) )
                                 boss->AI()->AttackStart(target);
                             boss->AI()->DoZoneInCombat();
@@ -1161,7 +1161,7 @@ public:
                                 bk->SetHomePosition(*bk);
                                 bk->SetFacingToObject(announcer);
                                 announcer->SetFacingToObject(bk);
-                                announcer->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                announcer->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                                 bk->AddAura(68306, announcer); // spell has attribute player only
                                 if( Creature* tirion = instance->GetCreature(NPC_TirionGUID) )
                                     tirion->AI()->Talk(TEXT_BK_MEANING);
@@ -1207,7 +1207,7 @@ public:
                         if( Creature* bk = instance->GetCreature(NPC_BlackKnightGUID) )
                         {
                             bk->SetReactState(REACT_AGGRESSIVE);
-                            bk->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
+                            bk->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
                             if( Unit* target = bk->SelectNearestTarget(200.0f) )
                                 bk->AI()->AttackStart(target);
                             bk->AI()->DoZoneInCombat();

@@ -176,7 +176,7 @@ public:
         void Reset() override
         {
             me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             summons.DespawnAll();
             for( uint8 i = 0; i < 10; ++i )
             {
@@ -185,7 +185,7 @@ public:
                 if( Creature* c = me->SummonCreature(NPC_SCARAB, AnubLocs[0].GetPositionX() + cos(angle) * dist, AnubLocs[0].GetPositionY() + std::sin(angle) * dist, AnubLocs[0].GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000) )
                 {
                     c->SetFaction(FACTION_PREY);
-                    c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     c->GetMotionMaster()->MoveRandom(15.0f);
                 }
             }
@@ -251,7 +251,7 @@ public:
             if( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            if( !bPhase3 && HealthBelowPct(30) && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE) && !me->HasAura(SPELL_SUBMERGE) && !me->HasAura(SPELL_EMERGE) )
+            if( !bPhase3 && HealthBelowPct(30) && !me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) && !me->HasAura(SPELL_SUBMERGE) && !me->HasAura(SPELL_EMERGE) )
             {
                 bPhase3 = true;
                 events.CancelEvent(EVENT_SUBMERGE);
@@ -313,7 +313,7 @@ public:
                     break;
                 case EVENT_SUBMERGE:
                     {
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         bool berserk = me->HasAura(SPELL_BERSERK);
                         me->RemoveAllAuras();
                         if (berserk)
@@ -348,7 +348,7 @@ public:
                 case EVENT_EMERGE_2:
                     {
                         Talk(SAY_EMERGE);
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         me->setAttackTimer(BASE_ATTACK, 3000);
                         me->RemoveAura(SPELL_SUBMERGE);
                         me->CastSpell(me, SPELL_EMERGE, false);
@@ -393,7 +393,7 @@ public:
         {
             events.Reset();
             summons.DespawnAll();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             if( pInstance )
                 pInstance->SetData(TYPE_FAILED, 1);
         }
@@ -408,7 +408,7 @@ public:
 
             if (!bIntro)
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 if( !me->IsInCombat() )
                     Talk(SAY_INTRO);
                 bIntro = true;
@@ -416,7 +416,7 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        bool CanAIAttack(const Unit* target) const override
+        bool CanAIAttack(Unit const* target) const override
         {
             return target->GetEntry() != NPC_FROST_SPHERE;
         }
@@ -505,9 +505,9 @@ public:
             me->m_Events.AddEvent(new HideNpcEvent(*me), me->m_Events.CalculateTime(5000));
         }
 
-        bool CanAIAttack(const Unit* target) const override
+        bool CanAIAttack(Unit const* target) const override
         {
-            return target->GetEntry() != NPC_FROST_SPHERE && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            return target->GetEntry() != NPC_FROST_SPHERE && !me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         }
     };
 };
@@ -559,9 +559,9 @@ public:
             if( me->GetHealth() <= damage )
             {
                 damage = 0;
-                if( !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE) )
+                if( !me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) )
                 {
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->GetMotionMaster()->MoveIdle();
                     me->GetMotionMaster()->MoveCharge(me->GetPositionX(), me->GetPositionY(), 143.0f, 20.0f);
                     permafrostTimer = 1500;
@@ -569,7 +569,7 @@ public:
             }
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
         {
             if( spell->Id == SPELL_SPIKE_FAIL )
             {
@@ -640,7 +640,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if( !target || !spell )
                 return;
@@ -682,7 +682,7 @@ public:
                     if( HealthBelowPct(80) && !me->HasAura(RAID_MODE(66193, 67855, 67856, 67857)) ) // not having permafrost - allow submerge
                     {
                         me->GetMotionMaster()->MoveIdle();
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         me->RemoveAllAuras();
                         me->CastSpell(me, SPELL_EXPOSE_WEAKNESS, true);
                         me->CastSpell(me, SPELL_SPIDER_FRENZY, true);
@@ -697,7 +697,7 @@ public:
                 case EVENT_EMERGE:
                     me->SetHealth(me->GetMaxHealth());
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->CastSpell(me, SPELL_EMERGE, false);
                     me->RemoveAura(SPELL_SUBMERGE);
 
@@ -713,7 +713,7 @@ public:
             me->m_Events.AddEvent(new HideNpcEvent(*me), me->m_Events.CalculateTime(5000));
         }
 
-        bool CanAIAttack(const Unit* target) const override
+        bool CanAIAttack(Unit const* target) const override
         {
             return target->GetEntry() != NPC_FROST_SPHERE;
         }

@@ -106,14 +106,12 @@ static sOnyxMove OnyxiaMoveData[] =
 
 enum Yells
 {
-    // Say
     SAY_AGGRO                   = 0,
     SAY_KILL                    = 1,
     SAY_PHASE_2_TRANS           = 2,
     SAY_PHASE_3_TRANS           = 3,
-
-    // Emote
-    EMOTE_BREATH                = 4
+    EMOTE_BREATH                = 4,
+    SAY_EVADE                   = 5
 };
 
 struct boss_onyxia : public BossAI
@@ -187,6 +185,8 @@ public:
         instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT); // just in case at reset some players already left the instance
         instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
         BossAI::EnterCombat(who);
+
+        me->SummonCreature(NPC_ONYXIAN_LAIR_GUARD, -167.837936f, -200.549332f, -66.343231f, 5.598287f, TEMPSUMMON_MANUAL_DESPAWN);
     }
 
     void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -204,7 +204,14 @@ public:
 
     void JustSummoned(Creature* summon) override
     {
+        summons.Summon(summon);
+
         if (summon->GetEntry() != NPC_ONYXIAN_WHELP && summon->GetEntry() != NPC_ONYXIAN_LAIR_GUARD)
+        {
+            return;
+        }
+
+        if (summon->GetEntry() == NPC_ONYXIAN_LAIR_GUARD && Phase != PHASE_LANDED)
         {
             return;
         }
@@ -287,9 +294,21 @@ public:
         }
     }
 
+    bool CheckInRoom()
+    {
+        if (me->GetDistance2d(me->GetHomePosition().GetPositionX(), me->GetHomePosition().GetPositionY()) > 95.0f)
+        {
+            Talk(SAY_EVADE);
+            EnterEvadeMode();
+            return false;
+        }
+
+        return true;
+    }
+
     void UpdateAI(uint32 diff) override
     {
-        if (!UpdateVictim())
+        if (!UpdateVictim() || !CheckInRoom())
         {
             return;
         }
@@ -510,7 +529,7 @@ public:
         }
     }
 
-    void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+    void SpellHitTarget(Unit* target, SpellInfo const* spell) override
     {
         if (target->IsPlayer() && spell->DurationEntry && spell->DurationEntry->ID == 328 && spell->Effects[EFFECT_1].TargetA.GetTarget() == 1 && (spell->Effects[EFFECT_1].Amplitude == 50 || spell->Effects[EFFECT_1].Amplitude == 215)) // Deep Breath
         {
@@ -563,7 +582,7 @@ public:
                 events.RepeatEvent(15000);
                 break;
             case EVENT_OLG_SPELL_IGNITEWEAPON:
-                if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED))
+                if (me->HasUnitFlag(UNIT_FLAG_DISARMED))
                 {
                     events.RepeatEvent(5000);
                 }
@@ -577,7 +596,7 @@ public:
 
         if (!me->HasUnitState(UNIT_STATE_CASTING) && me->isAttackReady())
         {
-            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED))
+            if (me->HasUnitFlag(UNIT_FLAG_DISARMED))
             {
                 if (me->HasAura(SPELL_OLG_IGNITEWEAPON))
                 {

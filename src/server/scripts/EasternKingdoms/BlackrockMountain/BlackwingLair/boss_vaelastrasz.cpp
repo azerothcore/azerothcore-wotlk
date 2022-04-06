@@ -42,15 +42,17 @@ enum Gossip
 
 enum Spells
 {
-   SPELL_ESSENCEOFTHERED             = 23513,
-   SPELL_FLAMEBREATH                 = 23461,
-   SPELL_FIRENOVA                    = 23462,
-   SPELL_TAILSWIPE                   = 15847,
-   SPELL_BURNINGADRENALINE           = 18173,  //Cast this one. It's what 3.3.5 DBM expects.
-   SPELL_BURNINGADRENALINE_EXPLOSION = 23478,
-   SPELL_CLEAVE                      = 19983,   //Chain cleave is most likely named something different and contains a dummy effect
-   SPELL_NEFARIUS_CORRUPTION         = 23642,
-   SPELL_RED_LIGHTNING               = 19484,
+   SPELL_ESSENCE_OF_THE_RED           = 23513,
+   SPELL_FLAME_BREATH                 = 23461,
+   SPELL_FIRE_NOVA                    = 23462,
+   SPELL_TAIL_SWEEP                   = 15847,
+   SPELL_CLEAVE                       = 19983,   //Chain cleave is most likely named something different and contains a dummy effect
+   SPELL_NEFARIUS_CORRUPTION          = 23642,
+   SPELL_RED_LIGHTNING                = 19484,
+
+   SPELL_BURNING_ADRENALINE           = 18173,
+   SPELL_BURNING_ADRENALINE_EXPLOSION = 23478, // AOE
+   SPELL_BURNING_ADRENALINE_INSTAKILL = 23644 // instakill
 };
 
 enum Events
@@ -62,13 +64,11 @@ enum Events
     EVENT_SPEECH_5                  = 5,
     EVENT_SPEECH_6                  = 6,
     EVENT_SPEECH_7                  = 7,
-    EVENT_ESSENCEOFTHERED           = 8,
-    EVENT_FLAMEBREATH               = 9,
-    EVENT_FIRENOVA                  = 10,
-    EVENT_TAILSWIPE                 = 11,
-    EVENT_CLEAVE                    = 12,
-    EVENT_BURNINGADRENALINE_CASTER  = 13,
-    EVENT_BURNINGADRENALINE_TANK    = 14,
+    EVENT_FLAME_BREATH              = 8,
+    EVENT_FIRE_NOVA                 = 9,
+    EVENT_TAIL_SWEEP                = 10,
+    EVENT_CLEAVE                    = 11,
+    EVENT_BURNING_ADRENALINE        = 12,
 };
 
 class boss_vaelastrasz : public CreatureScript
@@ -88,10 +88,11 @@ public:
             PlayerGUID.Clear();
             HasYelled = false;
             _introDone = false;
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+            _burningAdrenalineCast = 0;
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
             me->SetFaction(FACTION_FRIENDLY);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void Reset() override
@@ -109,6 +110,7 @@ public:
             else
             {
                 HasYelled = false;
+                _burningAdrenalineCast = 0;
             }
         }
 
@@ -116,22 +118,21 @@ public:
         {
             BossAI::EnterCombat(victim);
 
-            DoCast(me, SPELL_ESSENCEOFTHERED);
+            DoCastAOE(SPELL_ESSENCE_OF_THE_RED);
             // now drop damage requirement to be able to take loot
             me->ResetPlayerDamageReq();
 
             events.ScheduleEvent(EVENT_CLEAVE, 10000);
-            events.ScheduleEvent(EVENT_FLAMEBREATH, 15000);
-            events.ScheduleEvent(EVENT_FIRENOVA, 20000);
-            events.ScheduleEvent(EVENT_TAILSWIPE, 11000);
-            events.ScheduleEvent(EVENT_BURNINGADRENALINE_CASTER, 15000);
-            events.ScheduleEvent(EVENT_BURNINGADRENALINE_TANK, 45000);
+            events.ScheduleEvent(EVENT_FLAME_BREATH, 15000);
+            events.ScheduleEvent(EVENT_FIRE_NOVA, 5000);
+            events.ScheduleEvent(EVENT_TAIL_SWEEP, 11000);
+            events.ScheduleEvent(EVENT_BURNING_ADRENALINE, 15000);
         }
 
         void BeginSpeech(Unit* target)
         {
             PlayerGUID = target->GetGUID();
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             _eventsIntro.ScheduleEvent(EVENT_SPEECH_1, 1000);
         }
 
@@ -156,9 +157,10 @@ public:
                     switch (eventId)
                     {
                         case EVENT_SPEECH_1:
+                            me->SetStandState(UNIT_STAND_STATE_STAND);
                             me->SummonCreature(NPC_VICTOR_NEFARIUS, aNefariusSpawnLoc[0], aNefariusSpawnLoc[1], aNefariusSpawnLoc[2], aNefariusSpawnLoc[3], TEMPSUMMON_TIMED_DESPAWN, 26000);
                             _eventsIntro.ScheduleEvent(EVENT_SPEECH_2, 1000);
-                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                             break;
                         case EVENT_SPEECH_2:
                             if (Creature* nefarius = me->GetMap()->GetCreature(m_nefariusGuid))
@@ -176,7 +178,6 @@ public:
                             break;
                         case EVENT_SPEECH_4:
                             Talk(SAY_LINE1);
-                            me->SetStandState(UNIT_STAND_STATE_STAND);
                             me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                             _eventsIntro.ScheduleEvent(EVENT_SPEECH_5, 12000);
                             break;
@@ -189,7 +190,7 @@ public:
                             Talk(SAY_LINE3);
                             me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                             _eventsIntro.ScheduleEvent(EVENT_SPEECH_7, 17000);
-                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                             break;
                         case EVENT_SPEECH_7:
                             me->SetFaction(FACTION_DRAGONFLIGHT_BLACK);
@@ -213,39 +214,39 @@ public:
                         events.ScheduleEvent(EVENT_CLEAVE, 15000);
                         DoCastVictim(SPELL_CLEAVE);
                         break;
-                    case EVENT_FLAMEBREATH:
-                        DoCastVictim(SPELL_FLAMEBREATH);
-                        events.ScheduleEvent(EVENT_FLAMEBREATH, 8000, 14000);
+                    case EVENT_FLAME_BREATH:
+                        DoCastVictim(SPELL_FLAME_BREATH);
+                        events.ScheduleEvent(EVENT_FLAME_BREATH, 8000, 14000);
                         break;
-                    case EVENT_FIRENOVA:
-                        DoCastVictim(SPELL_FIRENOVA);
-                        events.ScheduleEvent(EVENT_FIRENOVA, 15000);
+                    case EVENT_FIRE_NOVA:
+                        DoCastVictim(SPELL_FIRE_NOVA);
+                        events.ScheduleEvent(EVENT_FIRE_NOVA, urand(3000, 5000));
                         break;
-                    case EVENT_TAILSWIPE:
-                        //Only cast if we are behind
-                        /*if (!me->HasInArc(M_PI, me->GetVictim()))
-                        {
-                        DoCast(me->GetVictim(), SPELL_TAILSWIPE);
-                        }*/
-                        events.ScheduleEvent(EVENT_TAILSWIPE, 15000);
+                    case EVENT_TAIL_SWEEP:
+                        DoCastAOE(SPELL_TAIL_SWEEP);
+                        events.ScheduleEvent(EVENT_TAIL_SWEEP, 15000);
                         break;
-                    case EVENT_BURNINGADRENALINE_CASTER:
+                    case EVENT_BURNING_ADRENALINE:
+                    {
+                        if (_burningAdrenalineCast < 2) // It's better to use TaskScheduler for this, but zzz
                         {
                             //selects a random target that isn't the current victim and is a mana user (selects mana users) but not pets
                             //it also ignores targets who have the aura. We don't want to place the debuff on the same target twice.
-                            if (Unit *target = SelectTarget(SelectTargetMethod::Random, 1, [&](Unit* u) { return u && !u->IsPet() && u->getPowerType() == POWER_MANA && !u->HasAura(SPELL_BURNINGADRENALINE); }))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [&](Unit* u) { return u && !u->IsPet() && u->getPowerType() == POWER_MANA && !u->HasAura(SPELL_BURNING_ADRENALINE) && u != me->GetVictim(); }))
                             {
-                                me->CastSpell(target, SPELL_BURNINGADRENALINE, true);
+                                me->CastSpell(target, SPELL_BURNING_ADRENALINE, true);
                             }
+
+                            _burningAdrenalineCast++;
                         }
-                        //reschedule the event
-                        events.ScheduleEvent(EVENT_BURNINGADRENALINE_CASTER, 15000);
+                        else
+                        {
+                            me->CastSpell(me->GetVictim(), SPELL_BURNING_ADRENALINE, true);
+                            _burningAdrenalineCast = 0;
+                        }
+                        events.ScheduleEvent(EVENT_BURNING_ADRENALINE, 15000);
                         break;
-                    case EVENT_BURNINGADRENALINE_TANK:
-                        //Vael has to cast it himself; contrary to the previous commit's comment. Nothing happens otherwise.
-                        me->CastSpell(me->GetVictim(), SPELL_BURNINGADRENALINE, true);
-                        events.ScheduleEvent(EVENT_BURNINGADRENALINE_TANK, 45000);
-                        break;
+                    }
                 }
             }
 
@@ -264,7 +265,7 @@ public:
             if (summoned->GetEntry() == NPC_VICTOR_NEFARIUS)
             {
                 // Set not selectable, so players won't interact with it
-                summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                summoned->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 m_nefariusGuid = summoned->GetGUID();
             }
         }
@@ -284,6 +285,7 @@ public:
             bool HasYelled;
             bool _introDone;
             EventMap _eventsIntro;
+            uint8 _burningAdrenalineCast;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -292,39 +294,36 @@ public:
     }
 };
 
-// Need to define an aurascript for EVENT_BURNINGADRENALINE's death effect.
 // 18173 - Burning Adrenaline
-class spell_vael_burning_adrenaline : public SpellScriptLoader
+class spell_vael_burning_adrenaline : public AuraScript
 {
-public:
-    spell_vael_burning_adrenaline() : SpellScriptLoader("spell_vael_burning_adrenaline") { }
+    PrepareAuraScript(spell_vael_burning_adrenaline);
 
-    class spell_vael_burning_adrenaline_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_vael_burning_adrenaline_AuraScript);
+        return ValidateSpellInfo({ SPELL_BURNING_ADRENALINE_EXPLOSION, SPELL_BURNING_ADRENALINE_INSTAKILL });
+    }
 
-        void OnAuraRemoveHandler(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (!GetTarget())
         {
-            //The tooltip says the on death the AoE occurs. According to information: http://qaliaresponse.stage.lithium.com/t5/WoW-Mayhem/Surviving-Burning-Adrenaline-For-tanks/td-p/48609
-            //Burning Adrenaline can be survived therefore Blizzard's implementation was an AoE bomb that went off if you were still alive and dealt
-            //damage to the target. You don't have to die for it to go off. It can go off whether you live or die.
-            GetTarget()->CastSpell(GetTarget(), SPELL_BURNINGADRENALINE_EXPLOSION, true);
+            return;
         }
 
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_vael_burning_adrenaline_AuraScript::OnAuraRemoveHandler, EFFECT_2, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
+        // Do the explosion, then kill the target.
+        GetTarget()->CastSpell(GetTarget(), SPELL_BURNING_ADRENALINE_EXPLOSION, true);
+        GetTarget()->CastSpell(GetTarget(), SPELL_BURNING_ADRENALINE_INSTAKILL, true);
+    }
 
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_vael_burning_adrenaline_AuraScript();
+        AfterEffectRemove += AuraEffectRemoveFn(spell_vael_burning_adrenaline::HandleRemove, EFFECT_2, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
 void AddSC_boss_vaelastrasz()
 {
     new boss_vaelastrasz();
-    new spell_vael_burning_adrenaline();
+    RegisterSpellScript(spell_vael_burning_adrenaline);
 }

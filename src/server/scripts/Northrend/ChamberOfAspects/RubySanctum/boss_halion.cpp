@@ -257,7 +257,7 @@ public:
             }
         }
 
-        bool CanAIAttack(const Unit* who) const override
+        bool CanAIAttack(Unit const* who) const override
         {
             return me->GetHomePosition().GetExactDist2d(who) < 52.0f;
         }
@@ -1155,7 +1155,7 @@ public:
 
         void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*handle*/)
         {
-            GetTarget()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            GetTarget()->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             GetTarget()->ToCreature()->SetReactState(REACT_DEFENSIVE);
             GetTarget()->GetMotionMaster()->Clear();
             GetTarget()->getThreatMgr().clearReferences();
@@ -1165,7 +1165,7 @@ public:
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*handle*/)
         {
-            GetTarget()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            GetTarget()->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             GetTarget()->ToCreature()->SetReactState(REACT_DEFENSIVE);
             GetTarget()->GetMotionMaster()->Clear();
             GetTarget()->getThreatMgr().clearReferences();

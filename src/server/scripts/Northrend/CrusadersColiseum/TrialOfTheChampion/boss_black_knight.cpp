@@ -120,7 +120,7 @@ public:
             summons.DespawnAll();
             Phase = 1;
             me->SetDisplayId(me->GetNativeDisplayId());
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             me->SetReactState(REACT_PASSIVE);
             if( pInstance )
                 pInstance->SetData(BOSS_BLACK_KNIGHT, NOT_STARTED);
@@ -136,7 +136,7 @@ public:
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+            if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
             {
                 damage = 0;
                 return;
@@ -147,16 +147,16 @@ public:
                 damage = 0;
                 me->SetHealth(me->GetMaxHealth());
                 events.Reset();
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->RemoveAllAuras();
                 me->SetControlled(true, UNIT_STATE_STUNNED);
                 me->CastSpell(me, SPELL_BK_GHOUL_EXPLODE, true);
                 summons.clear();
 
                 me->CastSpell(me, SPELL_BK_FEIGN_DEATH, true);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
-                me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
-                me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                me->SetUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
+                me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
+                me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
                 me->AddUnitState(UNIT_STATE_DIED);
             }
         }
@@ -187,18 +187,18 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit*  /*target*/, const SpellInfo* spell) override
+        void SpellHitTarget(Unit*  /*target*/, SpellInfo const* spell) override
         {
             switch( spell->Id )
             {
                 case SPELL_BLACK_KNIGHT_RES:
                     me->SetHealth(me->GetMaxHealth());
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->SetControlled(false, UNIT_STATE_STUNNED);
 
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
-                    me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                    me->RemoveUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
+                    me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
+                    me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
                     me->ClearUnitState(UNIT_STATE_DIED);
 
                     ++Phase;
@@ -410,16 +410,16 @@ public:
             events.RescheduleEvent(2, urand(3000, 4000)); // claw
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_BK_GHOUL_EXPLODE)
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+                me->RemoveUnitFlag(UNIT_FLAG_STUNNED);
                 me->CastSpell(me, SPELL_EXPLODE, false);
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             switch(spell->Id)
             {

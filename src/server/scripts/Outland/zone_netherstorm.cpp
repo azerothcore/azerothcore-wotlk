@@ -265,14 +265,14 @@ public:
         if (action == GOSSIP_ACTION_INFO_DEF + 1)
         {
             CloseGossipMenuFor(player);
-            creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             creature->AI()->DoAction(EVENT_START_PLAYER_READY);
             if (Creature* orelis = creature->FindNearestCreature(EXARCH_ORELIS, 15.0f, true))
                 orelis->AI()->DoAction(EVENT_ORELIS_WALK);
             if (Creature* karja = creature->FindNearestCreature(ANCHORITE_KARJA, 15.0f, true))
                 karja->AI()->DoAction(EVENT_KARJA_WALK);
             if (Creature* socrethar = creature->FindNearestCreature(SOCRETHAR, 500.0f, true))
-                socrethar->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
+                socrethar->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
         }
 
         return true;
@@ -397,7 +397,7 @@ public:
             if (param == EVENT_KARJA_WALK)
             {
                 me->GetMotionMaster()->MovePath(KARJA_PATH_ID, false);
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             }
             else if (param == RESET_DEATHBLOW_EVENT)
             {
@@ -470,7 +470,7 @@ public:
             if (param == EVENT_ORELIS_WALK)
             {
                 me->GetMotionMaster()->MovePath(ORELIS_PATH_ID, false);
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             }
             else if (param == RESET_DEATHBLOW_EVENT)
             {
@@ -643,7 +643,7 @@ public:
 
             if (GetCreature(ISHANAH_HIGH_PRIESTESS))
             {
-                ishanah->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                ishanah->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                 ishanah->DespawnOrUnsummon(60000);
             }
 
@@ -793,7 +793,7 @@ public:
                         if (Creature* summonIshanah = me->SummonCreature(ISHANAH_HIGH_PRIESTESS, IshanahSpawnPosition, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 180000))
                         {
                             summonIshanah->GetMotionMaster()->MovePath(ISHANAH_PATH_ID, false);
-                            summonIshanah->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                            summonIshanah->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                         }
                         break;
                     case EVENT_ISHANAH_SAY_1:
@@ -853,7 +853,7 @@ public:
                             ishanah->Respawn();
                             ishanah->setActive(true); // ensure that Ishanah disappears, even when no player is near
                             ishanah->DespawnOrUnsummon(600000); // ensure that Ishanah disappears after 10 minutes
-                            ishanah->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                            ishanah->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                         }
                         _actionEvents.ScheduleEvent(EVENT_SOCRETHAR_SAY_6, 3000);
                         break;
@@ -874,7 +874,7 @@ public:
                     case EVENT_FINAL_FIGHT:
                         // Prepare Socrethar for encounter
                         me->SetFaction(FACTION_DEMON);
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
                         me->SetReactState(REACT_AGGRESSIVE);
 
                         // Engage combat with Socrethar
@@ -1166,7 +1166,7 @@ public:
             {
                 Talk(SAY_SAEED_2);
                 SetEscortPaused(false);
-                me->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+                me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
             }
         }
 
@@ -1208,7 +1208,7 @@ public:
             {
                 case 16:
                     Talk(SAY_SAEED_1);
-                    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP);
                     SetEscortPaused(true);
                     break;
                 case 18:
@@ -1267,7 +1267,7 @@ public:
                     if (Creature* dimensius = me->FindNearestCreature(NPC_DIMENSIUS, 50.0f))
                     {
                         dimensius->RemoveAurasDueToSpell(SPELL_DIMENSIUS_TRANSFORM);
-                        dimensius->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                        dimensius->ReplaceAllUnitFlags(UNIT_FLAG_DISABLE_MOVE);
                         AttackStart(dimensius);
                         fight = true;
                     }
@@ -1728,7 +1728,7 @@ public:
                 PlayerGUID = who->GetGUID();
         }
 
-        //void SpellHit(Unit* /*caster*/, const SpellInfo* /*spell*/)
+        //void SpellHit(Unit* /*caster*/, SpellInfo const* /*spell*/)
         //{
         //    DoCast(me, SPELL_DE_MATERIALIZE);
         //}
@@ -1822,7 +1822,7 @@ public:
         if (quest->GetQuestId() == Q_ALMABTRIEB)
         {
             creature->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
-            creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            creature->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             creature->AI()->Talk(SAY_BESSY_0);
             CAST_AI(npc_escortAI, (creature->AI()))->Start(true, false, player->GetGUID());
         }

@@ -565,7 +565,7 @@ class spell_dru_lifebloom : public AuraScript
         // final heal
         int32 stack = GetStackAmount();
         int32 healAmount = aurEff->GetAmount();
-        const SpellInfo* finalHeal = sSpellMgr->GetSpellInfo(SPELL_DRUID_LIFEBLOOM_FINAL_HEAL);
+        SpellInfo const* finalHeal = sSpellMgr->GetSpellInfo(SPELL_DRUID_LIFEBLOOM_FINAL_HEAL);
 
         if (Unit* caster = GetCaster())
         {
@@ -586,7 +586,7 @@ class spell_dru_lifebloom : public AuraScript
             {
                 Unit* caster = GetCaster();
                 int32 healAmount = GetSpellInfo()->Effects[EFFECT_1].CalcValue(caster ? caster : target, 0, target) * dispelInfo->GetRemovedCharges();
-                const SpellInfo* finalHeal = sSpellMgr->GetSpellInfo(SPELL_DRUID_LIFEBLOOM_FINAL_HEAL);
+                SpellInfo const* finalHeal = sSpellMgr->GetSpellInfo(SPELL_DRUID_LIFEBLOOM_FINAL_HEAL);
                 if (caster)
                 {
                     // healing with bonus
@@ -682,7 +682,7 @@ class spell_dru_moonkin_form_passive : public AuraScript
     void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
     {
         // reduces all damage taken while Stunned in Moonkin Form
-        if (GetTarget()->GetUInt32Value(UNIT_FIELD_FLAGS) & (UNIT_FLAG_STUNNED) && GetTarget()->HasAuraWithMechanic(1 << MECHANIC_STUN))
+        if (GetTarget()->GetUnitFlags() & (UNIT_FLAG_STUNNED) && GetTarget()->HasAuraWithMechanic(1 << MECHANIC_STUN))
             absorbAmount = CalculatePct(dmgInfo.GetDamage(), absorbPct);
     }
 
@@ -749,7 +749,7 @@ class spell_dru_primal_tenacity : public AuraScript
     void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
     {
         // reduces all damage taken while Stunned in Cat Form
-        if (GetTarget()->GetShapeshiftForm() == FORM_CAT && GetTarget()->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED) && GetTarget()->HasAuraWithMechanic(1 << MECHANIC_STUN))
+        if (GetTarget()->GetShapeshiftForm() == FORM_CAT && GetTarget()->HasUnitFlag(UNIT_FLAG_STUNNED) && GetTarget()->HasAuraWithMechanic(1 << MECHANIC_STUN))
             absorbAmount = CalculatePct(dmgInfo.GetDamage(), absorbPct);
     }
 

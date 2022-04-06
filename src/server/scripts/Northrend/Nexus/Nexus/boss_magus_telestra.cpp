@@ -149,7 +149,7 @@ public:
             summon->SetInCombatWithZone();
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
+        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id >= SPELL_FIRE_MAGUS_DEATH && spellInfo->Id <= SPELL_ARCANE_MAGUS_DEATH && caster->ToCreature())
             {
@@ -248,14 +248,14 @@ public:
             GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_FROST_MAGUS_SUMMON, true);
             GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_ARCANE_MAGUS_SUMMON, true);
 
-            GetUnitOwner()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            GetUnitOwner()->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             GetUnitOwner()->SetControlled(true, UNIT_STATE_STUNNED);
             GetUnitOwner()->ToCreature()->LoadEquipment(0, true);
         }
 
         void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            GetUnitOwner()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            GetUnitOwner()->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             GetUnitOwner()->SetControlled(false, UNIT_STATE_STUNNED);
             GetUnitOwner()->ToCreature()->LoadEquipment(1, true);
         }

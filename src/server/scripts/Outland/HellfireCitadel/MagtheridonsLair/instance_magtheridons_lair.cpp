@@ -142,7 +142,7 @@ public:
                 {
                     for (ObjectGuid const& guid : _cubesSet)
                         if (GameObject* cube = instance->GetGameObject(guid))
-                            cube->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                            cube->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
 
                     if (state == NOT_STARTED)
                         SetData(DATA_COLLAPSE, GO_READY);
@@ -163,7 +163,7 @@ public:
                 case DATA_ACTIVATE_CUBES:
                     for (ObjectGuid const& guid : _cubesSet)
                         if (GameObject* cube = instance->GetGameObject(guid))
-                            cube->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                            cube->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
                 case DATA_COLLAPSE:
                     for (ObjectGuid const& guid : _columnSet)

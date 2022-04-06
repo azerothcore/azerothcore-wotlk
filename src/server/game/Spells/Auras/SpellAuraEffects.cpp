@@ -892,9 +892,16 @@ void AuraEffect::Update(uint32 diff, Unit* caster)
 {
     if (m_isPeriodic && (GetBase()->GetDuration() >= 0 || GetBase()->IsPassive() || GetBase()->IsPermanent()))
     {
+        uint32 totalTicks = GetTotalTicks();
+
         m_periodicTimer -= int32(diff);
         while (m_periodicTimer <= 0)
         {
+            if (!GetBase()->IsPermanent() && (m_tickNumber + 1) > totalTicks)
+            {
+                break;
+            }
+
             ++m_tickNumber;
 
             // update before tick (aura can be removed in TriggerSpell or PeriodicTick calls)
@@ -1757,7 +1764,7 @@ void AuraEffect::HandleAuraGhost(AuraApplication const* aurApp, uint8 mode, bool
 
     if (apply)
     {
-        target->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST);
+        target->ToPlayer()->SetPlayerFlag(PLAYER_FLAGS_GHOST);
         target->m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_GHOST);
         target->m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_GHOST);
     }
@@ -1766,7 +1773,7 @@ void AuraEffect::HandleAuraGhost(AuraApplication const* aurApp, uint8 mode, bool
         if (target->HasAuraType(SPELL_AURA_GHOST))
             return;
 
-        target->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST);
+        target->ToPlayer()->RemovePlayerFlag(PLAYER_FLAGS_GHOST);
         target->m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
         target->m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
     }
@@ -2365,12 +2372,12 @@ void AuraEffect::HandleAuraCloneCaster(AuraApplication const* aurApp, uint8 mode
 
         // What must be cloned? at least display and scale
         target->SetDisplayId(caster->GetDisplayId());
-        target->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_MIRROR_IMAGE);
+        target->SetUnitFlag2(UNIT_FLAG2_MIRROR_IMAGE);
     }
     else
     {
         target->SetDisplayId(target->GetNativeDisplayId());
-        target->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_MIRROR_IMAGE);
+        target->RemoveUnitFlag2(UNIT_FLAG2_MIRROR_IMAGE);
     }
 }
 
@@ -2415,7 +2422,7 @@ void AuraEffect::HandleFeignDeath(AuraApplication const* aurApp, uint8 mode, boo
             {
                 if ((*iter)->GetCurrentSpell(i) && (*iter)->GetCurrentSpell(i)->m_targets.GetUnitTargetGUID() == target->GetGUID())
                 {
-                    const SpellInfo* si = (*iter)->GetCurrentSpell(i)->GetSpellInfo();
+                    SpellInfo const* si = (*iter)->GetCurrentSpell(i)->GetSpellInfo();
                     if (si->HasAttribute(SPELL_ATTR6_IGNORE_PHASE_SHIFT) && (*iter)->GetTypeId() == TYPEID_UNIT)
                     {
                         Creature* c = (*iter)->ToCreature();
@@ -2472,11 +2479,11 @@ void AuraEffect::HandleFeignDeath(AuraApplication const* aurApp, uint8 mode, boo
         if (aurApp->GetRemoveMode())
             return;
         // blizz like 2.0.x
-        target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
+        target->SetUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
         // blizz like 2.0.x
-        target->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+        target->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
         // blizz like 2.0.x
-        target->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+        target->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
 
         target->AddUnitState(UNIT_STATE_DIED);
     }
@@ -2489,11 +2496,11 @@ void AuraEffect::HandleFeignDeath(AuraApplication const* aurApp, uint8 mode, boo
         target->SendMessageToSet(&data, true);
         */
         // blizz like 2.0.x
-        target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
+        target->RemoveUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
         // blizz like 2.0.x
-        target->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+        target->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
         // blizz like 2.0.x
-        target->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+        target->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
 
         target->ClearUnitState(UNIT_STATE_DIED);
     }
@@ -2596,7 +2603,7 @@ void AuraEffect::HandleAuraModSilence(AuraApplication const* aurApp, uint8 mode,
 
     if (apply)
     {
-        target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED);
+        target->SetUnitFlag(UNIT_FLAG_SILENCED);
 
         // call functions which may have additional effects after chainging state of unit
         // Stop cast only spells vs PreventionType == SPELL_PREVENTION_TYPE_SILENCE
@@ -2612,7 +2619,7 @@ void AuraEffect::HandleAuraModSilence(AuraApplication const* aurApp, uint8 mode,
         if (target->HasAuraType(SPELL_AURA_MOD_SILENCE) || target->HasAuraType(SPELL_AURA_MOD_PACIFY_SILENCE))
             return;
 
-        target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED);
+        target->RemoveUnitFlag(UNIT_FLAG_SILENCED);
     }
 }
 
@@ -2625,7 +2632,7 @@ void AuraEffect::HandleAuraModPacify(AuraApplication const* aurApp, uint8 mode, 
 
     if (apply)
     {
-        target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+        target->SetUnitFlag(UNIT_FLAG_PACIFIED);
         //target->AttackStop(); // pussywizard: why having this flag prevents from being in combat? it should just prevent melee attack
     }
     else
@@ -2633,7 +2640,7 @@ void AuraEffect::HandleAuraModPacify(AuraApplication const* aurApp, uint8 mode, 
         // do not remove unit flag if there are more than this auraEffect of that kind on unit on unit
         if (target->HasAuraType(SPELL_AURA_MOD_PACIFY) || target->HasAuraType(SPELL_AURA_MOD_PACIFY_SILENCE))
             return;
-        target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+        target->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
     }
 }
 
@@ -2664,13 +2671,13 @@ void AuraEffect::HandleAuraAllowOnlyAbility(AuraApplication const* aurApp, uint8
     if (target->GetTypeId() == TYPEID_PLAYER)
     {
         if (apply)
-            target->SetFlag(PLAYER_FLAGS, PLAYER_ALLOW_ONLY_ABILITY);
+            target->ToPlayer()->SetPlayerFlag(PLAYER_ALLOW_ONLY_ABILITY);
         else
         {
             // do not remove unit flag if there are more than this auraEffect of that kind on unit on unit
             if (target->HasAuraType(SPELL_AURA_ALLOW_ONLY_ABILITY))
                 return;
-            target->RemoveFlag(PLAYER_FLAGS, PLAYER_ALLOW_ONLY_ABILITY);
+            target->ToPlayer()->RemovePlayerFlag(PLAYER_ALLOW_ONLY_ABILITY);
         }
     }
 }
@@ -2739,12 +2746,12 @@ void AuraEffect::HandleAuraModStalked(AuraApplication const* aurApp, uint8 mode,
 
     // used by spells: Hunter's Mark, Mind Vision, Syndicate Tracker (MURP) DND
     if (apply)
-        target->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_TRACK_UNIT);
+        target->SetDynamicFlag(UNIT_DYNFLAG_TRACK_UNIT);
     else
     {
         // do not remove unit flag if there are more than this auraEffect of that kind on unit on unit
         if (!target->HasAuraType(GetAuraType()))
-            target->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_TRACK_UNIT);
+            target->RemoveDynamicFlag(UNIT_DYNFLAG_TRACK_UNIT);
     }
 
     // call functions which may have additional effects after chainging state of unit
@@ -2992,13 +2999,13 @@ void AuraEffect::HandleForceMoveForward(AuraApplication const* aurApp, uint8 mod
     Unit* target = aurApp->GetTarget();
 
     if (apply)
-        target->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FORCE_MOVEMENT);
+        target->SetUnitFlag2(UNIT_FLAG2_FORCE_MOVEMENT);
     else
     {
         // do not remove unit flag if there are more than this auraEffect of that kind on unit on unit
         if (target->HasAuraType(GetAuraType()))
             return;
-        target->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FORCE_MOVEMENT);
+        target->RemoveUnitFlag2(UNIT_FLAG2_FORCE_MOVEMENT);
     }
 }
 
@@ -3988,18 +3995,16 @@ void AuraEffect::HandleModBaseResistance(AuraApplication const* aurApp, uint8 mo
 
     Unit* target = aurApp->GetTarget();
 
-    // only players have base stats
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    // only players and pets have base stats
+    if (target->IsPlayer() || target->IsPet())
     {
-        //only pets have base stats
-        if (target->IsPet() && (GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL))
-            target->HandleStatModifier(UNIT_MOD_ARMOR, TOTAL_VALUE, float(GetAmount()), apply);
-    }
-    else
-    {
-        for (int i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; i++)
+        for (uint8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; i++)
+        {
             if (GetMiscValue() & (1 << i))
+            {
                 target->HandleStatModifier(UnitMods(UNIT_MOD_RESISTANCE_START + i), TOTAL_VALUE, float(GetAmount()), apply);
+            }
+        }
     }
 }
 
@@ -4956,13 +4961,13 @@ void AuraEffect::HandleArenaPreparation(AuraApplication const* aurApp, uint8 mod
     Unit* target = aurApp->GetTarget();
 
     if (apply)
-        target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREPARATION);
+        target->SetUnitFlag(UNIT_FLAG_PREPARATION);
     else
     {
         // do not remove unit flag if there are more than this auraEffect of that kind on unit on unit
         if (target->HasAuraType(GetAuraType()))
             return;
-        target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREPARATION);
+        target->RemoveUnitFlag(UNIT_FLAG_PREPARATION);
     }
 }
 
@@ -5593,13 +5598,13 @@ void AuraEffect::HandleAuraModFaction(AuraApplication const* aurApp, uint8 mode,
     {
         target->SetFaction(GetMiscValue());
         if (target->GetTypeId() == TYPEID_PLAYER)
-            target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+            target->RemoveUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
     }
     else
     {
         target->RestoreFaction();
         if (target->GetTypeId() == TYPEID_PLAYER)
-            target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+            target->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
     }
 }
 
@@ -5611,13 +5616,13 @@ void AuraEffect::HandleComprehendLanguage(AuraApplication const* aurApp, uint8 m
     Unit* target = aurApp->GetTarget();
 
     if (apply)
-        target->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_COMPREHEND_LANG);
+        target->SetUnitFlag2(UNIT_FLAG2_COMPREHEND_LANG);
     else
     {
         if (target->HasAuraType(GetAuraType()))
             return;
 
-        target->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_COMPREHEND_LANG);
+        target->RemoveUnitFlag2(UNIT_FLAG2_COMPREHEND_LANG);
     }
 }
 
@@ -5885,7 +5890,7 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
             if (GetId() == 52179) // Astral Shift
             {
                 // Periodic need for remove visual on stun/fear/silence lost
-                if (!(target->GetUInt32Value(UNIT_FIELD_FLAGS) & (UNIT_FLAG_STUNNED | UNIT_FLAG_FLEEING | UNIT_FLAG_SILENCED)))
+                if (!(target->GetUnitFlags() & (UNIT_FLAG_STUNNED | UNIT_FLAG_FLEEING | UNIT_FLAG_SILENCED)))
                     target->RemoveAurasDueToSpell(52179);
                 break;
             }
@@ -5943,7 +5948,11 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
                             return;
                         // Brood Affliction: Bronze
                         case 23170:
-                            triggerSpellId = 23171;
+                            // Only 10% chance of triggering spell
+                            if (roll_chance_f(10.f))
+                            {
+                                triggerSpellId = 23171;
+                            }
                             break;
                         // Restoration
                         case 24379:
@@ -6990,4 +6999,20 @@ void AuraEffect::HandleRaidProcFromChargeWithValueAuraProc(AuraApplication* aurA
 
     LOG_DEBUG("spells.aura", "AuraEffect::HandleRaidProcFromChargeWithValueAuraProc: Triggering spell {} from aura {} proc", triggerSpellId, GetId());
     target->CastCustomSpell(target, triggerSpellId, &value, nullptr, nullptr, true, nullptr, this, GetCasterGUID());
+}
+
+int32 AuraEffect::GetTotalTicks() const
+{
+    uint32 totalTicks = 1;
+    if (m_amplitude)
+    {
+        totalTicks = GetBase()->GetMaxDuration() / m_amplitude;
+
+        if (m_spellInfo->HasAttribute(SPELL_ATTR5_EXTRA_INITIAL_PERIOD))
+        {
+            ++totalTicks;
+        }
+    }
+
+    return totalTicks;
 }

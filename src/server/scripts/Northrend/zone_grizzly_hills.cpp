@@ -25,37 +25,37 @@
 #include "SpellInfo.h"
 #include "SpellScript.h"
 
-// Theirs
+ // Theirs
 
-/*######
-## Quest 12027: Mr. Floppy's Perilous Adventure
-######*/
+ /*######
+ ## Quest 12027: Mr. Floppy's Perilous Adventure
+ ######*/
 
 enum Floppy
 {
     // Creature
-    NPC_MRFLOPPY                = 26589,
-    NPC_HUNGRY_WORG             = 26586,
-    NPC_RAVENOUS_WORG           = 26590,   // RWORG
-    NPC_EMILY                   = 26588,
+    NPC_MRFLOPPY                 = 26589,
+    NPC_HUNGRY_WORG              = 26586,
+    NPC_RAVENOUS_WORG            = 26590,   // RWORG
+    NPC_EMILY                    = 26588,
     // Quest
-    QUEST_PERILOUS_ADVENTURE    = 12027,
+    QUEST_PERILOUS_ADVENTURE     = 12027,
     // Spell
-    SPELL_MRFLOPPY              = 47184,   // vehicle aura
+    SPELL_MRFLOPPY               = 47184,   // vehicle aura
     // Text
-    SAY_WORGHAGGRO1             = 0, // Um... I think one of those wolves is back...
-    SAY_WORGHAGGRO2             = 1, // He's going for Mr. Floppy!
-    SAY_WORGRAGGRO3             = 2, // Oh, no! Look, it's another wolf, and it's a biiiiiig one!
-    SAY_WORGRAGGRO4             = 3, // He's gonna eat Mr. Floppy! You gotta help Mr. Floppy! You just gotta!
-    SAY_RANDOMAGGRO             = 4, // There's a big meanie attacking Mr. Floppy! Help!
-    SAY_VICTORY1                = 5, // Let's get out of here before more wolves find us!
-    SAY_VICTORY2                = 6, // Don't go toward the light, Mr. Floppy!
-    SAY_VICTORY3                = 7, // Mr. Floppy, you're ok! Thank you so much for saving Mr. Floppy!
-    SAY_VICTORY4                = 8, // I think I see the camp! We're almost home, Mr. Floppy! Let's go!
-    TEXT_EMOTE_WP1              = 9, // Mr. Floppy revives
-    TEXT_EMOTE_AGGRO            = 10, // The Ravenous Worg chomps down on Mr. Floppy
-    SAY_QUEST_ACCEPT            = 11, // Are you ready, Mr. Floppy? Stay close to me and watch out for those wolves!
-    SAY_QUEST_COMPLETE          = 12  // Thank you for helping me get back to the camp. Go tell Walter that I'm safe now!
+    SAY_WORGHAGGRO1              = 0, // Um... I think one of those wolves is back...
+    SAY_WORGHAGGRO2              = 1, // He's going for Mr. Floppy!
+    SAY_WORGRAGGRO3              = 2, // Oh, no! Look, it's another wolf, and it's a biiiiiig one!
+    SAY_WORGRAGGRO4              = 3, // He's gonna eat Mr. Floppy! You gotta help Mr. Floppy! You just gotta!
+    SAY_RANDOMAGGRO              = 4, // There's a big meanie attacking Mr. Floppy! Help!
+    SAY_VICTORY1                 = 5, // Let's get out of here before more wolves find us!
+    SAY_VICTORY2                 = 6, // Don't go toward the light, Mr. Floppy!
+    SAY_VICTORY3                 = 7, // Mr. Floppy, you're ok! Thank you so much for saving Mr. Floppy!
+    SAY_VICTORY4                 = 8, // I think I see the camp! We're almost home, Mr. Floppy! Let's go!
+    TEXT_EMOTE_WP1               = 9, // Mr. Floppy revives
+    TEXT_EMOTE_AGGRO             = 10, // The Ravenous Worg chomps down on Mr. Floppy
+    SAY_QUEST_ACCEPT             = 11, // Are you ready, Mr. Floppy? Stay close to me and watch out for those wolves!
+    SAY_QUEST_COMPLETE           = 12  // Thank you for helping me get back to the camp. Go tell Walter that I'm safe now!
 };
 
 // emily
@@ -84,102 +84,102 @@ public:
 
             switch (waypointId)
             {
-                case 9:
-                    if (Creature* Mrfloppy = GetClosestCreatureWithEntry(me, NPC_MRFLOPPY, 100.0f))
-                        _mrfloppyGUID = Mrfloppy->GetGUID();
-                    break;
-                case 10:
-                    if (ObjectAccessor::GetCreature(*me, _mrfloppyGUID))
-                    {
-                        Talk(SAY_WORGHAGGRO1);
-                        if (Creature* worg = me->SummonCreature(NPC_HUNGRY_WORG, me->GetPositionX() + 5, me->GetPositionY() + 2, me->GetPositionZ() + 1, 3.229f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000))
-                            if (Creature* Mrfloppy = ObjectAccessor::GetCreature(*me, _mrfloppyGUID))
-                            {
-                                worg->SetReactState(REACT_AGGRESSIVE);
-                                worg->GetAI()->AttackStart(Mrfloppy);
-                            }
-                    }
-                    break;
-                case 11:
-                    if (Creature* Mrfloppy = ObjectAccessor::GetCreature(*me, _mrfloppyGUID))
-                        Mrfloppy->GetMotionMaster()->MoveFollow(me, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
-                    break;
-                case 17:
-                    if (Creature* Mrfloppy = ObjectAccessor::GetCreature(*me, _mrfloppyGUID))
-                        Mrfloppy->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
-                    Talk(SAY_WORGRAGGRO3);
-                    if (Creature* RWORG = me->SummonCreature(NPC_RAVENOUS_WORG, me->GetPositionX() + 10, me->GetPositionY() + 8, me->GetPositionZ() + 2, 3.229f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000))
-                    {
-                        RWORG->SetReactState(REACT_PASSIVE);
-                        RWORG->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                        RWORG->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
-                        _RavenousworgGUID = RWORG->GetGUID();
-                    }
-                    break;
-                case 18:
-                    if (Creature* Mrfloppy = ObjectAccessor::GetCreature(*me, _mrfloppyGUID))
-                    {
-                        if (Creature* RWORG = ObjectAccessor::GetCreature(*me, _RavenousworgGUID))
-                            RWORG->GetMotionMaster()->MovePoint(0, Mrfloppy->GetPositionX(), Mrfloppy->GetPositionY(), Mrfloppy->GetPositionZ());
-                        me->AddAura(SPELL_MRFLOPPY, Mrfloppy);
-                    }
-                    break;
-                case 19:
-                    if (Creature* Mrfloppy = ObjectAccessor::GetCreature(*me, _mrfloppyGUID))
-                    {
-                        if (Mrfloppy->HasAura(SPELL_MRFLOPPY))
+            case 9:
+                if (Creature* Mrfloppy = GetClosestCreatureWithEntry(me, NPC_MRFLOPPY, 100.0f))
+                    _mrfloppyGUID = Mrfloppy->GetGUID();
+                break;
+            case 10:
+                if (ObjectAccessor::GetCreature(*me, _mrfloppyGUID))
+                {
+                    Talk(SAY_WORGHAGGRO1);
+                    if (Creature* worg = me->SummonCreature(NPC_HUNGRY_WORG, me->GetPositionX() + 5, me->GetPositionY() + 2, me->GetPositionZ() + 1, 3.229f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000))
+                        if (Creature* Mrfloppy = ObjectAccessor::GetCreature(*me, _mrfloppyGUID))
                         {
-                            if (Creature* RWORG = ObjectAccessor::GetCreature(*me, _RavenousworgGUID))
-                                Mrfloppy->EnterVehicle(RWORG);
+                            worg->SetReactState(REACT_AGGRESSIVE);
+                            worg->GetAI()->AttackStart(Mrfloppy);
                         }
-                    }
-                    break;
-                case 20:
+                }
+                break;
+            case 11:
+                if (Creature* Mrfloppy = ObjectAccessor::GetCreature(*me, _mrfloppyGUID))
+                    Mrfloppy->GetMotionMaster()->MoveFollow(me, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+                break;
+            case 17:
+                if (Creature* Mrfloppy = ObjectAccessor::GetCreature(*me, _mrfloppyGUID))
+                    Mrfloppy->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
+                Talk(SAY_WORGRAGGRO3);
+                if (Creature* RWORG = me->SummonCreature(NPC_RAVENOUS_WORG, me->GetPositionX() + 10, me->GetPositionY() + 8, me->GetPositionZ() + 2, 3.229f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000))
+                {
+                    RWORG->SetReactState(REACT_PASSIVE);
+                    RWORG->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    RWORG->SetUnitFlag(UNIT_FLAG_PACIFIED);
+                    _RavenousworgGUID = RWORG->GetGUID();
+                }
+                break;
+            case 18:
+                if (Creature* Mrfloppy = ObjectAccessor::GetCreature(*me, _mrfloppyGUID))
+                {
                     if (Creature* RWORG = ObjectAccessor::GetCreature(*me, _RavenousworgGUID))
-                        RWORG->HandleEmoteCommand(34);
-                    break;
-                case 21:
-                    if (Creature* Mrfloppy = ObjectAccessor::GetCreature(*me, _mrfloppyGUID))
+                        RWORG->GetMotionMaster()->MovePoint(0, Mrfloppy->GetPositionX(), Mrfloppy->GetPositionY(), Mrfloppy->GetPositionZ());
+                    me->AddAura(SPELL_MRFLOPPY, Mrfloppy);
+                }
+                break;
+            case 19:
+                if (Creature* Mrfloppy = ObjectAccessor::GetCreature(*me, _mrfloppyGUID))
+                {
+                    if (Mrfloppy->HasAura(SPELL_MRFLOPPY))
                     {
                         if (Creature* RWORG = ObjectAccessor::GetCreature(*me, _RavenousworgGUID))
-                        {
-                            Unit::Kill(RWORG, Mrfloppy);
-                            Mrfloppy->ExitVehicle();
-                            RWORG->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                            RWORG->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
-                            RWORG->AI()->AttackStart(player);
-                            Talk(SAY_VICTORY2);
-                        }
+                            Mrfloppy->EnterVehicle(RWORG);
                     }
-                    break;
-                case 22:
-                    if (Creature* Mrfloppy = ObjectAccessor::GetCreature(*me, _mrfloppyGUID))
+                }
+                break;
+            case 20:
+                if (Creature* RWORG = ObjectAccessor::GetCreature(*me, _RavenousworgGUID))
+                    RWORG->HandleEmoteCommand(34);
+                break;
+            case 21:
+                if (Creature* Mrfloppy = ObjectAccessor::GetCreature(*me, _mrfloppyGUID))
+                {
+                    if (Creature* RWORG = ObjectAccessor::GetCreature(*me, _RavenousworgGUID))
                     {
-                        if (Mrfloppy->isDead())
-                        {
-                            me->GetMotionMaster()->MovePoint(0, Mrfloppy->GetPositionX(), Mrfloppy->GetPositionY(), Mrfloppy->GetPositionZ());
-                            Mrfloppy->setDeathState(ALIVE);
-                            Mrfloppy->GetMotionMaster()->MoveFollow(me, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
-                            Talk(SAY_VICTORY3);
-                        }
+                        Unit::Kill(RWORG, Mrfloppy);
+                        Mrfloppy->ExitVehicle();
+                        RWORG->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                        RWORG->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
+                        RWORG->AI()->AttackStart(player);
+                        Talk(SAY_VICTORY2);
                     }
-                    break;
-                case 24:
-                    if (player)
+                }
+                break;
+            case 22:
+                if (Creature* Mrfloppy = ObjectAccessor::GetCreature(*me, _mrfloppyGUID))
+                {
+                    if (Mrfloppy->isDead())
                     {
-                        player->GroupEventHappens(QUEST_PERILOUS_ADVENTURE, me);
-                        Talk(SAY_QUEST_COMPLETE, player);
+                        me->GetMotionMaster()->MovePoint(0, Mrfloppy->GetPositionX(), Mrfloppy->GetPositionY(), Mrfloppy->GetPositionZ());
+                        Mrfloppy->setDeathState(ALIVE);
+                        Mrfloppy->GetMotionMaster()->MoveFollow(me, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+                        Talk(SAY_VICTORY3);
                     }
-                    me->SetWalk(false);
-                    break;
-                case 25:
-                    Talk(SAY_VICTORY4);
-                    break;
-                case 27:
-                    me->DisappearAndDie();
-                    if (Creature* Mrfloppy = ObjectAccessor::GetCreature(*me, _mrfloppyGUID))
-                        Mrfloppy->DisappearAndDie();
-                    break;
+                }
+                break;
+            case 24:
+                if (player)
+                {
+                    player->GroupEventHappens(QUEST_PERILOUS_ADVENTURE, me);
+                    Talk(SAY_QUEST_COMPLETE, player);
+                }
+                me->SetWalk(false);
+                break;
+            case 25:
+                Talk(SAY_VICTORY4);
+                break;
+            case 27:
+                me->DisappearAndDie();
+                if (Creature* Mrfloppy = ObjectAccessor::GetCreature(*me, _mrfloppyGUID))
+                    Mrfloppy->DisappearAndDie();
+                break;
             }
         }
 
@@ -286,10 +286,10 @@ public:
 
         void AttackStart(Unit* who) override
         {
-            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
+            if (me->HasUnitFlag(UNIT_FLAG_PACIFIED))
                 _pacified = true;
 
-            if (_pacified && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
+            if (_pacified && !me->HasUnitFlag(UNIT_FLAG_PACIFIED))
                 _attack = true;
 
             if (_attack)
@@ -298,10 +298,10 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
+            if (me->HasUnitFlag(UNIT_FLAG_PACIFIED))
                 _pacified = true;
 
-            if (_pacified && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
+            if (_pacified && !me->HasUnitFlag(UNIT_FLAG_PACIFIED))
                 _attack = true;
 
             CombatAI::UpdateAI(diff);
@@ -354,7 +354,7 @@ public:
                 _gender = Data;
         }
 
-        void SpellHit(Unit* Caster, const SpellInfo* Spell) override
+        void SpellHit(Unit* Caster, SpellInfo const* Spell) override
         {
             if (Spell->Id == SPELL_OUTHOUSE_GROANS)
             {
@@ -416,8 +416,8 @@ public:
                 if (me->FindNearestGameObject(OBJECT_HAUNCH, 2.0f))
                 {
                     me->SetStandState(UNIT_STAND_STATE_DEAD);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                    me->SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                    me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                    me->ReplaceAllDynamicFlags(UNIT_DYNFLAG_DEAD);
                 }
                 _phase = 0;
             }
@@ -506,66 +506,204 @@ enum Skirmisher
 {
     // Quest
     QUEST_OVERWHELMED           = 12288,
+
     // Spell
     SPELL_RENEW_SKIRMISHER      = 48812,
     SPELL_KILL_CREDIT           = 48813,
+    SPELL_CLEAVE                = 15496,
+    SPELL_HAMSTRING             = 9080,
+    SPELL_MORTAL_STRIKE         = 32736,
+
     // Text
-    SAY_RANDOM                  = 0
+    SAY_RANDOM                  = 0,
+
+    // EVENT
+    EVENT_WOUNDED_MOVE          = 1,
+    EVENT_CLEAVE                = 2,
+    EVENT_HAMSTRING             = 3,
+    EVENT_MORTAL_STRIKE         = 4,
+
+    // Waypoints
+    WOUNDED_MOVE_1              = 274630,
+    WOUNDED_MOVE_2              = 274631,
+    WOUNDED_MOVE_3              = 274632
 };
 
-class npc_wounded_skirmisher : public CreatureScript
+struct npc_wounded_skirmisher : public CreatureAI
 {
 public:
-    npc_wounded_skirmisher() : CreatureScript("npc_wounded_skirmisher") { }
-
-    struct npc_wounded_skirmisherAI : public ScriptedAI
+    npc_wounded_skirmisher(Creature* creature) : CreatureAI(creature)
     {
-        npc_wounded_skirmisherAI(Creature* creature) : ScriptedAI(creature) { }
+        Initialize();
+    }
 
-        void Reset() override
-        {
-            _despawnTimer = 5000;
-            _playerGUID.Clear();
-        }
+    void Initialize()
+    {
+        me->SetReactState(REACT_DEFENSIVE);
+    }
 
-        void MovementInform(uint32, uint32 id) override
-        {
-            if (id == 1)
-                me->DespawnOrUnsummon(_despawnTimer);
-        }
+    void Reset() override
+    {
+        Initialize();
+        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+    }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell) override
+    void EnterCombat(Unit* /*who*/) override
+    {
+        events.ScheduleEvent(EVENT_CLEAVE, urand(1000, 7000));
+        events.ScheduleEvent(EVENT_HAMSTRING, urand(5000, 12000));
+        events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(5000, 10000));
+    }
+
+    void SpellHit(Unit* caster, SpellInfo const* spell) override
+    {
+        Player* playerCaster = caster->ToPlayer();
+        if (!playerCaster)
+            return;
+
+        if (spell->Id == SPELL_RENEW_SKIRMISHER && playerCaster->GetQuestStatus(QUEST_OVERWHELMED) == QUEST_STATUS_INCOMPLETE)
         {
-            if (spell->Id == SPELL_RENEW_SKIRMISHER && caster->GetTypeId() == TYPEID_PLAYER
-                    && caster->ToPlayer()->GetQuestStatus(QUEST_OVERWHELMED) == QUEST_STATUS_INCOMPLETE)
+            me->SetFacingToObject(caster);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            Talk(SAY_RANDOM, caster);
+            DoCast(caster, SPELL_KILL_CREDIT);
+
+            if (!me->IsStandState())
             {
-                DoCast(caster, SPELL_KILL_CREDIT);
-                Talk(SAY_RANDOM, caster);
-                if (me->IsStandState())
-                    me->GetMotionMaster()->MovePoint(1, me->GetPositionX() + 7, me->GetPositionY() + 7, me->GetPositionZ());
-                else
-                {
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
-                    me->DespawnOrUnsummon(_despawnTimer);
-                }
+                me->SetStandState(UNIT_STAND_STATE_STAND);
+                me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
+                events.ScheduleEvent(EVENT_WOUNDED_MOVE, 3000);
             }
         }
+    }
 
-        void UpdateAI(uint32 /*diff*/) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            DoMeleeAttackIfReady();
-        }
-    private:
-        ObjectGuid _playerGUID;
-        uint32 _despawnTimer;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void UpdateAI(uint32 diff) override
     {
-        return new npc_wounded_skirmisherAI(creature);
+        events.Update(diff);
+
+        switch (events.ExecuteEvent())
+        {
+            case EVENT_WOUNDED_MOVE:
+                if (me->GetPositionY() == -2835.11f)
+                {
+                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
+                    me->DespawnOrUnsummon(20000);
+                }
+                if (me->GetPositionY() == -2981.89f)
+                {
+                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_3, false);
+                    me->DespawnOrUnsummon(18000);
+                }
+                if (me->GetPositionY() == -2934.44f)
+                {
+                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_3, false);
+                    me->DespawnOrUnsummon(9000);
+                }
+                if (me->GetPositionY() == -3020.99f)
+                {
+                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
+                    me->DespawnOrUnsummon(22000);
+                }
+                if (me->GetPositionY() == -2964.73f)
+                {
+                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_2, false);
+                    me->DespawnOrUnsummon(15000);
+                }
+                if (me->GetPositionY() == -2940.50f)
+                {
+                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
+                    me->DespawnOrUnsummon(20000);
+                }
+                if (me->GetPositionY() == -2847.93f)
+                {
+                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
+                    me->DespawnOrUnsummon(30000);
+                }
+                if (me->GetPositionY() == -2835.31f)
+                {
+                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
+                    me->DespawnOrUnsummon(27000);
+                }
+                if (me->GetPositionY() == -2822.20f)
+                {
+                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
+                    me->DespawnOrUnsummon(25000);
+                }
+                if (me->GetPositionY() == -2846.31f)
+                {
+                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
+                    me->DespawnOrUnsummon(21000);
+                }
+                if (me->GetPositionY() == -2897.23f)
+                {
+                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_3, false);
+                    me->DespawnOrUnsummon(15000);
+                }
+                if (me->GetPositionY() == -2886.01f)
+                {
+                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_3, false);
+                    me->DespawnOrUnsummon(25000);
+                }
+                if (me->GetPositionY() == -2906.89f)
+                {
+                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_3, false);
+                    me->DespawnOrUnsummon(25000);
+                }
+                if (me->GetPositionY() == -3048.94f)
+                {
+                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_2, false);
+                    me->DespawnOrUnsummon(30000);
+                }
+                if (me->GetPositionY() == -2961.08f)
+                {
+                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_2, false);
+                    me->DespawnOrUnsummon(25000);
+                }
+                break;
+            case EVENT_CLEAVE:
+                me->CastSpell(me->GetVictim(), SPELL_CLEAVE, false);
+                events.RepeatEvent(urand(7000, 15000));
+                break;
+            case EVENT_HAMSTRING:
+                me->CastSpell(me->GetVictim(), SPELL_HAMSTRING, false);
+                events.RepeatEvent(urand(9000, 15000));
+                break;
+            case EVENT_MORTAL_STRIKE:
+                me->CastSpell(me->GetVictim(), SPELL_MORTAL_STRIKE, false);
+                events.RepeatEvent(urand(10000, 15000));
+                break;
+        }
+
+        if (!UpdateVictim())
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
+enum renewskirmisher
+{
+    NPC_WOUNDED_SKIRMISHER = 27463
+};
+
+class spell_renew_skirmisher : public SpellScript
+{
+public:
+    PrepareSpellScript(spell_renew_skirmisher);
+
+    SpellCastResult CheckRequirement()
+    {
+        if (Unit* caster = GetCaster())
+            if (Creature* wounded = caster->FindNearestCreature(NPC_WOUNDED_SKIRMISHER, 5.0f))
+                if (!wounded->IsInCombat())
+                    return SPELL_CAST_OK;
+
+        return SPELL_FAILED_CASTER_AURASTATE;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_renew_skirmisher::CheckRequirement);
     }
 };
 
@@ -605,7 +743,7 @@ public:
         {
             _playerGUID.Clear();
 
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC);
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
@@ -655,7 +793,7 @@ public:
         {
             if (spell->Id == SPELL_SMOKE_BOMB && caster->GetTypeId() == TYPEID_PLAYER)
             {
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC);
                 me->SetReactState(REACT_PASSIVE);
                 me->CombatStop(false);
                 _playerGUID = caster->GetGUID();
@@ -721,7 +859,7 @@ public:
             _following = false;
             _runningScript = false;
             if (me->GetEntry() == NPC_LAKE_FROG_QUEST)
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
         }
 
         void UpdateAI(uint32 diff) override
@@ -746,11 +884,11 @@ public:
                         _events.ScheduleEvent(EVENT_LAKEFROG_3, 3000);
                         break;
                     case EVENT_LAKEFROG_3:
-                        me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         _events.ScheduleEvent(EVENT_LAKEFROG_4, 25000);
                         break;
                     case EVENT_LAKEFROG_4:
-                        me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         _events.ScheduleEvent(EVENT_LAKEFROG_5, 2000);
                         break;
                     case EVENT_LAKEFROG_5:
@@ -1163,7 +1301,8 @@ void AddSC_grizzly_hills()
     new npc_outhouse_bunny();
     new npc_tallhorn_stag();
     new npc_amberpine_woodsman();
-    new npc_wounded_skirmisher();
+    RegisterCreatureAI(npc_wounded_skirmisher);
+    RegisterSpellScript(spell_renew_skirmisher);
     new npc_venture_co_straggler();
     new npc_lake_frog();
     new spell_shredder_delivery();

@@ -30,3 +30,98 @@ WorldPacket const* WorldPackets::Misc::Weather::Write()
 
     return &_worldPacket;
 }
+
+WorldPacket const* WorldPackets::Misc::LevelUpInfo::Write()
+{
+    _worldPacket << uint32(Level);
+    _worldPacket << uint32(HealthDelta);
+
+    for (uint32 power : PowerDelta)
+        _worldPacket << power;
+
+    for (uint32 stat : StatDelta)
+        _worldPacket << stat;
+
+    return &_worldPacket;
+}
+
+WorldPacket const* WorldPackets::Misc::PlayMusic::Write()
+{
+    _worldPacket << SoundKitID;
+
+    return &_worldPacket;
+}
+
+WorldPacket const* WorldPackets::Misc::PlayObjectSound::Write()
+{
+    _worldPacket << SoundKitID;
+    _worldPacket << SourceObjectGUID;
+
+    return &_worldPacket;
+}
+
+WorldPacket const* WorldPackets::Misc::Playsound::Write()
+{
+    _worldPacket << SoundKitID;
+
+    return &_worldPacket;
+}
+
+void WorldPackets::Misc::RandomRollClient::Read()
+{
+    _worldPacket >> Min;
+    _worldPacket >> Max;
+}
+
+WorldPacket const* WorldPackets::Misc::RandomRoll::Write()
+{
+    _worldPacket << uint32(Min);
+    _worldPacket << uint32(Max);
+    _worldPacket << uint32(Result);
+    _worldPacket << Roller;
+
+    return &_worldPacket;
+}
+
+WorldPacket const* WorldPackets::Misc::StartMirrorTimer::Write()
+{
+    _worldPacket << uint32(Timer);
+    _worldPacket << uint32(Value);
+    _worldPacket << uint32(MaxValue);
+    _worldPacket << int32(Scale);
+    _worldPacket << uint8(Paused);
+    _worldPacket << uint32(SpellID);
+
+    return &_worldPacket;
+}
+
+WorldPacket const* WorldPackets::Misc::PauseMirrorTimer::Write()
+{
+    _worldPacket << uint32(Timer);
+    _worldPacket << uint8(Paused);
+
+    return &_worldPacket;
+}
+
+WorldPacket const* WorldPackets::Misc::StopMirrorTimer::Write()
+{
+    _worldPacket << uint32(Timer);
+
+    return &_worldPacket;
+}
+
+WorldPacket const* WorldPackets::Misc::CrossedInebriationThreshold::Write()
+{
+    _worldPacket << Guid;
+    _worldPacket << uint32(Threshold);
+    _worldPacket << uint32(ItemID);
+
+    return &_worldPacket;
+}
+
+WorldPacket const* WorldPackets::Misc::UITime::Write()
+{
+    _worldPacket << uint32(Time);
+
+    return &_worldPacket;
+}

@@ -102,7 +102,7 @@ public:
                 case EVENT_REMOVE_CONTROL:
                     if (Player* player = me->GetCharmerOrOwnerPlayerOrPlayerItself())
                     {
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+                        me->SetUnitFlag(UNIT_FLAG_STUNNED);
                         SetControl(player, false);
                     }
                     break;
@@ -111,6 +111,10 @@ public:
                     break;
                 case EVENT_LAUNCH:
                     {
+                        if (Player* player = me->GetCharmerOrOwnerPlayerOrPlayerItself())
+                        {
+                            player->AddAura(SPELL_EYE_OF_ACHERUS_VISUAL, player);
+                        }
                         me->SetSpeed(MOVE_FLIGHT, 5.0f, true);
 
                         const Position EYE_DESTINATION_1 = { me->GetPositionX() - 40.0f, me->GetPositionY(), me->GetPositionZ() + 10.0f, 0.0f };
@@ -118,12 +122,16 @@ public:
 
                         me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_1, EYE_DESTINATION_1);
                         me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_2, EYE_DESTINATION_2);
+                        if (Player* player = me->GetCharmerOrOwnerPlayerOrPlayerItself())
+                        {
+                            player->RemoveAura(SPELL_EYE_OF_ACHERUS_VISUAL);
+                        }
                         break;
                     }
                 case EVENT_REGAIN_CONTROL:
                     if (Player* player = me->GetCharmerOrOwnerPlayerOrPlayerItself())
                     {
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+                        me->RemoveUnitFlag(UNIT_FLAG_STUNNED);
                         me->SetSpeed(MOVE_FLIGHT, 3.3f, true);
 
                         SetControl(player, true);
@@ -198,8 +206,8 @@ public:
             if (creature->AI()->GetData(DATA_IN_PROGRESS))
                 return true;
 
-            creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-            creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SWIMMING);
+            creature->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+            creature->RemoveUnitFlag(UNIT_FLAG_SWIMMING);
 
             player->CastSpell(creature, SPELL_DUEL, false);
             player->CastSpell(player, SPELL_DUEL_FLAG, true);
@@ -255,10 +263,10 @@ public:
             me->RestoreFaction();
             CombatAI::Reset();
 
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SWIMMING);
+            me->SetUnitFlag(UNIT_FLAG_SWIMMING);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* pSpell) override
+        void SpellHit(Unit* caster, SpellInfo const* pSpell) override
         {
             if (!_duelInProgress && pSpell->Id == SPELL_DUEL)
             {
@@ -466,7 +474,7 @@ public:
 
         void InitializeAI() override
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+            me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE);
             ScriptedAI::InitializeAI();
             me->SetReactState(REACT_PASSIVE);
 
@@ -511,7 +519,7 @@ public:
                     break;
                 case EVENT_GHOUL_RESTORE_STATE:
                     me->SetReactState(REACT_DEFENSIVE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                    me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
                     if (Player* owner = me->GetCharmerOrOwnerPlayerOrPlayerItself())
                         me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, frand(0.0f, 2 * M_PI));
                     events.ScheduleEvent(EVENT_GHOUL_CHECK_COMBAT, 1000);
@@ -563,7 +571,7 @@ public:
         {
             ScriptedAI::MoveInLineOfSight(who);
 
-            if (!who->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC) && who->GetEntry() == NPC_GHOUL && me->IsWithinDistInMap(who, 10.0f))
+            if (!who->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC) && who->GetEntry() == NPC_GHOUL && me->IsWithinDistInMap(who, 10.0f))
                 if (Unit* owner = who->GetOwner())
                     if (Player* player = owner->ToPlayer())
                     {
@@ -572,7 +580,7 @@ public:
                             creature->CastSpell(owner, 52517, true);
 
                         creature->AI()->SetGUID(me->GetGUID());
-                        creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        creature->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     }
         }
 
@@ -722,7 +730,7 @@ public:
             phase = PHASE_CHAINED;
             events.Reset();
             me->SetFaction(FACTION_CREATURE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
             me->SetUInt32Value(UNIT_FIELD_BYTES_1, 8);
             me->LoadEquipment(0, true);
         }
@@ -823,7 +831,7 @@ public:
                         else
                         {
                             me->SetFaction(FACTION_MONSTER);
-                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                             phase = PHASE_ATTACKING;
 
                             if (Player* target = ObjectAccessor::GetPlayer(*me, playerGUID))
@@ -943,7 +951,7 @@ public:
     {
         npc_scarlet_miner_cartAI(Creature* creature) : PassiveAI(creature)
         {
-            me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->ReplaceAllUnitFlags(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             me->SetFaction(FACTION_FRIENDLY);
             me->SetDisplayId(me->GetCreatureTemplate()->Modelid1); // Modelid2 is a horse.
         }
@@ -966,7 +974,7 @@ public:
                 me->SetSpeed(MOVE_RUN, 1.25f);
 
                 me->GetMotionMaster()->MoveFollow(miner, 1.0f, 0);
-                me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                me->ReplaceAllUnitFlags(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                 me->SetFaction(FACTION_FRIENDLY);
             }
         }
@@ -1076,7 +1084,7 @@ public:
                     {
                         me->SetFacingToObject(car);
                         // xinef: add some flags
-                        car->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        car->ReplaceAllUnitFlags(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                         car->SetFaction(FACTION_FRIENDLY);
                     }
                     Talk(SAY_SCARLET_MINER_0);
@@ -1163,6 +1171,52 @@ public:
     }
 };
 
+class spell_death_knight_initiate_visual : public SpellScript
+{
+    PrepareSpellScript(spell_death_knight_initiate_visual);
+
+    void HandleScriptEffect(SpellEffIndex /* effIndex */)
+    {
+        Creature* target = GetHitCreature();
+        if (!target)
+            return;
+
+        uint32 spellId;
+        switch (target->GetDisplayId())
+        {
+            case 25369: spellId = 51552; break; // bloodelf female
+            case 25373: spellId = 51551; break; // bloodelf male
+            case 25363: spellId = 51542; break; // draenei female
+            case 25357: spellId = 51541; break; // draenei male
+            case 25361: spellId = 51537; break; // dwarf female
+            case 25356: spellId = 51538; break; // dwarf male
+            case 25372: spellId = 51550; break; // forsaken female
+            case 25367: spellId = 51549; break; // forsaken male
+            case 25362: spellId = 51540; break; // gnome female
+            case 25359: spellId = 51539; break; // gnome male
+            case 25355: spellId = 51534; break; // human female
+            case 25354: spellId = 51520; break; // human male
+            case 25360: spellId = 51536; break; // nightelf female
+            case 25358: spellId = 51535; break; // nightelf male
+            case 25368: spellId = 51544; break; // orc female
+            case 25364: spellId = 51543; break; // orc male
+            case 25371: spellId = 51548; break; // tauren female
+            case 25366: spellId = 51547; break; // tauren male
+            case 25370: spellId = 51545; break; // troll female
+            case 25365: spellId = 51546; break; // troll male
+            default: return;
+        }
+
+        target->CastSpell(target, spellId, true);
+        target->LoadEquipment();
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_death_knight_initiate_visual::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_the_scarlet_enclave_c1()
 {
     // Ours
@@ -1183,4 +1237,6 @@ void AddSC_the_scarlet_enclave_c1()
     new npc_scarlet_miner();
     new npc_scarlet_miner_cart();
     new go_inconspicuous_mine_car();
+
+    RegisterSpellScript(spell_death_knight_initiate_visual);
 }

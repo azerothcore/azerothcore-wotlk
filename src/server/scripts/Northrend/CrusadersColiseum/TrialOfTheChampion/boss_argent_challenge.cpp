@@ -137,7 +137,7 @@ public:
                 pInstance->SetData(BOSS_ARGENT_CHALLENGE, IN_PROGRESS);
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == 66905 && me->GetHealth() == 1) // hammer throw back damage (15k)
                 me->CastSpell(me, 68197, true);
@@ -158,7 +158,7 @@ public:
                     me->getThreatMgr().clearReferences();
                     me->SetRegeneratingHealth(false);
                     _EnterEvadeMode();
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     if( pInstance )
                         pInstance->SetData(BOSS_ARGENT_CHALLENGE, DONE);
                 }
@@ -305,7 +305,7 @@ public:
                     me->getThreatMgr().clearReferences();
                     me->SetRegeneratingHealth(false);
                     _EnterEvadeMode();
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     if( pInstance )
                     {
                         pInstance->SetData(BOSS_ARGENT_CHALLENGE, DONE);
@@ -439,7 +439,7 @@ public:
 
                     break;
                 case EVENT_MEMORY_START_ATTACK:
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     if( Unit* target = me->SelectNearestTarget(200.0f) )
                     {
                         AttackStart(target);

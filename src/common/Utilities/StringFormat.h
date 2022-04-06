@@ -19,7 +19,7 @@
 #define _STRING_FORMAT_H_
 
 #include "Define.h"
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <fmt/printf.h>
 
 namespace Acore

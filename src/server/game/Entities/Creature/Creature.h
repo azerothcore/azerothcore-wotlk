@@ -69,6 +69,7 @@ public:
     void GetRespawnPosition(float& x, float& y, float& z, float* ori = nullptr, float* dist = nullptr) const;
 
     void SetCorpseDelay(uint32 delay) { m_corpseDelay = delay; }
+    void SetCorpseRemoveTime(uint32 delay);
     [[nodiscard]] uint32 GetCorpseDelay() const { return m_corpseDelay; }
     [[nodiscard]] bool IsRacialLeader() const { return GetCreatureTemplate()->RacialLeader; }
     [[nodiscard]] bool IsCivilian() const { return GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_CIVILIAN; }
@@ -133,12 +134,12 @@ public:
     [[nodiscard]] CreatureAI* AI() const { return (CreatureAI*)i_AI; }
 
     bool SetWalk(bool enable) override;
-    bool SetDisableGravity(bool disable, bool packetOnly = false) override;
+    bool SetDisableGravity(bool disable, bool packetOnly = false, bool updateAnimationTier = true) override;
     bool SetSwim(bool enable) override;
     bool SetCanFly(bool enable, bool packetOnly = false) override;
     bool SetWaterWalking(bool enable, bool packetOnly = false) override;
     bool SetFeatherFall(bool enable, bool packetOnly = false) override;
-    bool SetHover(bool enable, bool packetOnly = false) override;
+    bool SetHover(bool enable, bool packetOnly = false, bool updateAnimationTier = true) override;
     bool HasSpellFocus(Spell const* focusSpell = nullptr) const;
 
     struct
@@ -256,8 +257,8 @@ public:
     void SetNoCallAssistance(bool val) { m_AlreadyCallAssistance = val; }
     void SetNoSearchAssistance(bool val) { m_AlreadySearchedAssistance = val; }
     bool HasSearchedAssistance() { return m_AlreadySearchedAssistance; }
-    bool CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction = true) const;
-    bool _IsTargetAcceptable(const Unit* target) const;
+    bool CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction = true) const;
+    bool _IsTargetAcceptable(Unit const* target) const;
     [[nodiscard]] bool CanIgnoreFeignDeath() const { return (GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_IGNORE_FEIGN_DEATH) != 0; }
 
     // pussywizard: updated at faction change, disable move in line of sight if actual faction is not hostile to anyone
@@ -395,7 +396,7 @@ protected:
     ObjectGuid::LowType m_lootRecipientGroup;
 
     /// Timers
-    time_t m_corpseRemoveTime;                          // (msecs)timer for death or corpse disappearance
+    time_t m_corpseRemoveTime;                          // (secs) timer for death or corpse disappearance
     time_t m_respawnTime;                               // (secs) time of next respawn
     time_t m_respawnedTime;                             // (secs) time when creature respawned
     uint32 m_respawnDelay;                              // (secs) delay between corpse disappearance and respawning
@@ -411,8 +412,6 @@ protected:
     ObjectGuid::LowType m_spawnId;                      ///< For new or temporary creatures is 0 for saved it is lowguid
     uint8 m_equipmentId;
     int8 m_originalEquipmentId; // can be -1
-
-    uint8 m_originalAnimTier;
 
     bool m_AlreadyCallAssistance;
     bool m_AlreadySearchedAssistance;

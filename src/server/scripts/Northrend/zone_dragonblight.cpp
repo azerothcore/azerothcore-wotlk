@@ -484,7 +484,7 @@ public:
 
         void EnterEvadeMode() override
         {
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
+            me->RemoveUnitFlag(UNIT_FLAG_IN_COMBAT);
             me->ClearUnitState(UNIT_STATE_EVADE);
         }
 
@@ -533,7 +533,7 @@ public:
             me->SetCorpseDelay(1);
         }
 
-        bool CanAIAttack(const Unit* who) const override
+        bool CanAIAttack(Unit const* who) const override
         {
             return who->GetEntry() == NPC_INJURED_7TH_LEGION_SOLDER;
         }
@@ -848,7 +848,7 @@ public:
                     c->RemoveAllAuras();
                     c->CastSpell(c, SPELL_SAC_HOLY_ZONE_AURA, true);
                     if (GameObject* go = me->FindNearestGameObject(GO_SAC_LIGHTS_VENGEANCE_3, 150.0f))
-                        go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     playerGUID.Clear();
                     events.RescheduleEvent(2, 60000);
                 }
@@ -967,7 +967,7 @@ public:
                         c->CastSpell(c, SPELL_SAC_VEGARD_SUMMON_GHOULS_AURA, false);
                     }
                     if (GameObject* go = me->FindNearestGameObject(GO_SAC_LIGHTS_VENGEANCE_1, 150.0f))
-                        go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
                 case 15: // remove light
                     if (Creature* x = me->FindNearestCreature(NPC_SAC_LIGHTS_VENGEANCE_VEH_2, 150.0f, true))
@@ -1076,7 +1076,7 @@ public:
         if (!_owner->IsAlive())
             return true;
         _owner->GetMotionMaster()->MoveRandom(5.0f);
-        _owner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        _owner->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         _owner->SetReactState(REACT_AGGRESSIVE);
         _owner->CastSpell(_owner, SPELL_SAC_GHOUL_AREA_AURA, true);
         return true;
@@ -1093,7 +1093,7 @@ public:
 
     bool Execute(uint64 /*time*/, uint32 /*diff*/) override
     {
-        _owner->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        _owner->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         _owner->SetReactState(REACT_PASSIVE);
         _owner->SetDisplayId(11686);
         return true;
@@ -1140,14 +1140,14 @@ public:
 
         void AttackStart(Unit* who) override
         {
-            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 return;
             ScriptedAI::AttackStart(who);
         }
 
-        bool CanAIAttack(const Unit* target) const override
+        bool CanAIAttack(Unit const* target) const override
         {
-            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE) || target->HasUnitState(UNIT_STATE_STUNNED) || me->GetDisplayId() == 11686)
+            if (me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) || target->HasUnitState(UNIT_STATE_STUNNED) || me->GetDisplayId() == 11686)
                 return false;
             Position homePos = me->GetHomePosition();
             return target->GetExactDistSq(&homePos) < 30.0f * 30.0f;
@@ -1162,7 +1162,7 @@ public:
 
         void Deactivate()
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetReactState(REACT_PASSIVE);
             me->SetDisplayId(11686);
         }
@@ -1273,7 +1273,7 @@ public:
         npc_q24545_vegardAI(Creature* c) : ScriptedAI(c)
         {
             me->SetReactState(REACT_PASSIVE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             events.Reset();
             events.ScheduleEvent(1, 7000);
             events.ScheduleEvent(2, urand(7000, 20000));
@@ -1311,7 +1311,7 @@ public:
                     break;
                 case 1:
                     me->SetReactState(REACT_AGGRESSIVE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     if (Unit* t = me->SelectNearestTarget(50.0f))
                         AttackStart(t);
                     break;
@@ -1533,7 +1533,7 @@ public:
             {
                 if (id == 1)
                 {
-                    me->SetFacingTo(PosTalkLocations[talkWing].m_orientation);
+                    me->SetFacingTo(PosTalkLocations[talkWing].GetOrientation());
                     TurnAudience();
 
                     switch (talkWing)
@@ -1791,7 +1791,7 @@ public:
             if (!tree || !player)
                 return;
 
-            tree->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+            tree->RemoveNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
 
             if (roll == 1) // friendly version
             {
@@ -1893,7 +1893,7 @@ public:
                 Talk (SAY_AGGRO, player);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (spell->Id != SPELL_HIGH_EXECUTORS_BRANDING_IRON)
                 return;

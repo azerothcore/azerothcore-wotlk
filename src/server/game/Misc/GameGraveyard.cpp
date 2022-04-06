@@ -36,7 +36,7 @@ void Graveyard::LoadGraveyardFromDB()
     QueryResult result = WorldDatabase.Query("SELECT ID, Map, x, y, z, Comment FROM game_graveyard");
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 graveyard. Table `game_graveyard` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 graveyard. Table `game_graveyard` is empty!");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -46,15 +46,15 @@ void Graveyard::LoadGraveyardFromDB()
     do
     {
         Field* fields = result->Fetch();
-        uint32 ID = fields[0].GetUInt32();
+        uint32 ID = fields[0].Get<uint32>();
 
         GraveyardStruct Graveyard;
 
-        Graveyard.Map = fields[1].GetUInt32();
-        Graveyard.x = fields[2].GetFloat();
-        Graveyard.y = fields[3].GetFloat();
-        Graveyard.z = fields[4].GetFloat();
-        Graveyard.name = fields[5].GetString();
+        Graveyard.Map = fields[1].Get<uint32>();
+        Graveyard.x = fields[2].Get<float>();
+        Graveyard.y = fields[3].Get<float>();
+        Graveyard.z = fields[4].Get<float>();
+        Graveyard.name = fields[5].Get<std::string>();
 
         if (!Utf8toWStr(Graveyard.name, Graveyard.wnameLow))
         {
@@ -291,10 +291,10 @@ bool Graveyard::AddGraveyardLink(uint32 id, uint32 zoneId, TeamId teamId, bool p
     {
         WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_GRAVEYARD_ZONE);
 
-        stmt->setUInt32(0, id);
-        stmt->setUInt32(1, zoneId);
+        stmt->SetData(0, id);
+        stmt->SetData(1, zoneId);
         // Xinef: DB Data compatibility...
-        stmt->setUInt16(2, uint16(teamId == TEAM_NEUTRAL ? 0 : (teamId == TEAM_ALLIANCE ? ALLIANCE : HORDE)));
+        stmt->SetData(2, uint16(teamId == TEAM_NEUTRAL ? 0 : (teamId == TEAM_ALLIANCE ? ALLIANCE : HORDE)));
 
         WorldDatabase.Execute(stmt);
     }
@@ -342,10 +342,10 @@ void Graveyard::RemoveGraveyardLink(uint32 id, uint32 zoneId, TeamId teamId, boo
     {
         WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_GRAVEYARD_ZONE);
 
-        stmt->setUInt32(0, id);
-        stmt->setUInt32(1, zoneId);
+        stmt->SetData(0, id);
+        stmt->SetData(1, zoneId);
         // Xinef: DB Data compatibility...
-        stmt->setUInt16(2, uint16(teamId == TEAM_NEUTRAL ? 0 : (teamId == TEAM_ALLIANCE ? ALLIANCE : HORDE)));
+        stmt->SetData(2, uint16(teamId == TEAM_NEUTRAL ? 0 : (teamId == TEAM_ALLIANCE ? ALLIANCE : HORDE)));
 
         WorldDatabase.Execute(stmt);
     }
@@ -362,7 +362,7 @@ void Graveyard::LoadGraveyardZones()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 graveyard-zone links. DB table `graveyard_zone` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 graveyard-zone links. DB table `graveyard_zone` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -375,9 +375,9 @@ void Graveyard::LoadGraveyardZones()
 
         Field* fields = result->Fetch();
 
-        uint32 safeLocId = fields[0].GetUInt32();
-        uint32 zoneId = fields[1].GetUInt32();
-        uint32 team = fields[2].GetUInt16();
+        uint32 safeLocId = fields[0].Get<uint32>();
+        uint32 zoneId = fields[1].Get<uint32>();
+        uint32 team = fields[2].Get<uint16>();
         TeamId teamId = team == 0 ? TEAM_NEUTRAL : (team == ALLIANCE ? TEAM_ALLIANCE : TEAM_HORDE);
 
         GraveyardStruct const* entry = sGraveyard->GetGraveyard(safeLocId);

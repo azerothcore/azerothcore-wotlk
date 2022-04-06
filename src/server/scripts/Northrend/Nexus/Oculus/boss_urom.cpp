@@ -126,9 +126,9 @@ public:
             {
                 pInstance->SetData(DATA_UROM, NOT_STARTED);
                 if( pInstance->GetData(DATA_VAROS) != DONE )
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 else
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             }
 
             me->CastSpell(me, SPELL_EVOCATION, true);
@@ -232,7 +232,7 @@ public:
             Talk(SAY_PLAYER_KILL);
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             switch( spell->Id )
             {
@@ -277,7 +277,7 @@ public:
                     me->GetMotionMaster()->MoveIdle();
                     me->StopMoving();
                     me->SetControlled(true, UNIT_STATE_ROOT);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->SetCanFly(true);
                     me->SetDisableGravity(true);
                     me->NearTeleportTo(1103.69f, 1048.76f, 512.279f, 1.16f);
@@ -354,7 +354,7 @@ public:
                     me->SetDisableGravity(false);
                     me->NearTeleportTo(x, y, z, 0.0f);
                     me->SetControlled(false, UNIT_STATE_ROOT);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
                     break;
             }

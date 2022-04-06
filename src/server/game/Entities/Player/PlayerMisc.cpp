@@ -75,13 +75,13 @@ void Player::SavePositionInDB(uint32 mapid, float x, float y, float z, float o, 
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHARACTER_POSITION);
 
-    stmt->setFloat(0, x);
-    stmt->setFloat(1, y);
-    stmt->setFloat(2, z);
-    stmt->setFloat(3, o);
-    stmt->setUInt16(4, uint16(mapid));
-    stmt->setUInt16(5, uint16(zone));
-    stmt->setUInt32(6, guid.GetCounter());
+    stmt->SetData(0, x);
+    stmt->SetData(1, y);
+    stmt->SetData(2, z);
+    stmt->SetData(3, o);
+    stmt->SetData(4, uint16(mapid));
+    stmt->SetData(5, uint16(zone));
+    stmt->SetData(6, guid.GetCounter());
 
     CharacterDatabase.Execute(stmt);
 }
@@ -90,13 +90,13 @@ void Player::SavePositionInDB(WorldLocation const& loc, uint16 zoneId, ObjectGui
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHARACTER_POSITION);
 
-    stmt->setFloat(0, loc.GetPositionX());
-    stmt->setFloat(1, loc.GetPositionY());
-    stmt->setFloat(2, loc.GetPositionZ());
-    stmt->setFloat(3, loc.GetOrientation());
-    stmt->setUInt16(4, uint16(loc.GetMapId()));
-    stmt->setUInt16(5, zoneId);
-    stmt->setUInt32(6, guid.GetCounter());
+    stmt->SetData(0, loc.GetPositionX());
+    stmt->SetData(1, loc.GetPositionY());
+    stmt->SetData(2, loc.GetPositionZ());
+    stmt->SetData(3, loc.GetOrientation());
+    stmt->SetData(4, uint16(loc.GetMapId()));
+    stmt->SetData(5, zoneId);
+    stmt->SetData(6, guid.GetCounter());
 
     CharacterDatabase.ExecuteOrAppend(trans, stmt);
 }
@@ -104,13 +104,13 @@ void Player::SavePositionInDB(WorldLocation const& loc, uint16 zoneId, ObjectGui
 void Player::Customize(CharacterCustomizeInfo const* customizeInfo, CharacterDatabaseTransaction trans)
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GENDER_AND_APPEARANCE);
-    stmt->setUInt8(0, customizeInfo->Gender);
-    stmt->setUInt8(1, customizeInfo->Skin);
-    stmt->setUInt8(2, customizeInfo->Face);
-    stmt->setUInt8(3, customizeInfo->HairStyle);
-    stmt->setUInt8(4, customizeInfo->HairColor);
-    stmt->setUInt8(5, customizeInfo->FacialHair);
-    stmt->setUInt32(6, customizeInfo->Guid.GetCounter());
+    stmt->SetData(0, customizeInfo->Gender);
+    stmt->SetData(1, customizeInfo->Skin);
+    stmt->SetData(2, customizeInfo->Face);
+    stmt->SetData(3, customizeInfo->HairStyle);
+    stmt->SetData(4, customizeInfo->HairColor);
+    stmt->SetData(5, customizeInfo->FacialHair);
+    stmt->SetData(6, customizeInfo->Guid.GetCounter());
 
     CharacterDatabase.ExecuteOrAppend(trans, stmt);
 }
@@ -196,7 +196,7 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
             for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end(); ++itr)
             {
                 InstanceSave* instanceSave = itr->second.save;
-                const MapEntry* entry = sMapStore.LookupEntry(itr->first);
+                MapEntry const* entry = sMapStore.LookupEntry(itr->first);
                 if (!entry || entry->IsRaid() || !instanceSave->CanReset())
                     continue;
 
@@ -223,7 +223,7 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
             for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end(); ++itr)
             {
                 InstanceSave* instanceSave = itr->second.save;
-                const MapEntry* entry = sMapStore.LookupEntry(itr->first);
+                MapEntry const* entry = sMapStore.LookupEntry(itr->first);
                 if (!entry || entry->IsRaid() != isRaid || !instanceSave->CanReset())
                     continue;
 
@@ -353,8 +353,8 @@ void Player::UpdatePvPFlag(time_t currTime)
 
     if (currTime < (pvpInfo.EndTimer + 300 + 5))
     {
-        if (currTime > (pvpInfo.EndTimer + 4) && !HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_TIMER))
-            SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_TIMER);
+        if (currTime > (pvpInfo.EndTimer + 4) && !HasPlayerFlag(PLAYER_FLAGS_PVP_TIMER))
+            SetPlayerFlag(PLAYER_FLAGS_PVP_TIMER);
 
         return;
     }

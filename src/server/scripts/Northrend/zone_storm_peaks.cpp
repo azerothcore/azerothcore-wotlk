@@ -147,7 +147,7 @@ public:
                 me->SetControlled(true, UNIT_STATE_STUNNED);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
+        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_STORM_HAMMER)
             {
@@ -413,7 +413,7 @@ public:
                 setCharm = true;
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
+        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
         {
             if (!playerGUID && spellInfo->Id == SPELL_SPEAR_OF_HODIR)
             {
@@ -659,7 +659,7 @@ public:
             {
                 caster->CastSpell(caster, SPELL_JORMUNGAR_SUBMERGE_VISUAL, true);
                 caster->ApplySpellImmune(SPELL_COLOSSUS_GROUND_SLAM, IMMUNITY_ID, SPELL_COLOSSUS_GROUND_SLAM, true);
-                caster->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                caster->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
                 caster->SetControlled(false, UNIT_STATE_ROOT);
                 for (uint8 i = 0; i < MAX_CREATURE_SPELLS; ++i)
                     caster->m_spells[i] = 0;
@@ -670,7 +670,7 @@ public:
             {
                 caster->RemoveAurasDueToSpell(SPELL_JORMUNGAR_SUBMERGE_VISUAL);
                 caster->ApplySpellImmune(SPELL_COLOSSUS_GROUND_SLAM, IMMUNITY_ID, SPELL_COLOSSUS_GROUND_SLAM, false);
-                caster->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                caster->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE);
                 caster->SetControlled(true, UNIT_STATE_ROOT);
 
                 if (CreatureTemplate const* ct = sObjectMgr->GetCreatureTemplate(caster->GetEntry()))
@@ -789,7 +789,7 @@ public:
                 me->DespawnOrUnsummon();
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (spell->Id != SPELL_ICE_LANCE)
                 return;

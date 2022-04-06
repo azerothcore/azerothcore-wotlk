@@ -166,7 +166,7 @@ public:
             _gravityAchievement = true;
 
             me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_STAND); // emerge
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
             me->SetControlled(false, UNIT_STATE_STUNNED);
 
             if (m_pInstance)
@@ -370,7 +370,7 @@ public:
                 // Animation events
                 case EVENT_START_SECOND_PHASE:
                     me->TextEmote("XT-002 Deconstructor's heart is exposed and leaking energy.", nullptr, true);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                     if (Unit* heart = me->GetVehicleKit() ? me->GetVehicleKit()->GetPassenger(HEART_VEHICLE_SEAT) : nullptr)
                         heart->GetAI()->DoAction(ACTION_AWAKEN_HEART);
 
@@ -394,7 +394,7 @@ public:
                     events.ScheduleEvent(EVENT_REMOVE_EMOTE, 4000);
                     return;
                 case EVENT_REMOVE_EMOTE:
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                     me->SetControlled(false, UNIT_STATE_STUNNED);
 
                     RescheduleEvents();
@@ -421,7 +421,7 @@ public:
     {
         npc_xt002_heartAI(Creature* pCreature) : PassiveAI(pCreature), summons(me)
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
         }
 
         SummonList summons;
@@ -464,7 +464,7 @@ public:
                 me->SetHealth(me->GetMaxHealth());
                 me->CastSpell(me, SPELL_HEART_OVERLOAD, true);
                 me->CastSpell(me, SPELL_EXPOSED_HEART, false);    // Channeled
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
 
                 if (!summons.HasEntry(NPC_PILE_TRIGGER))
                     SummonPiles();
@@ -477,7 +477,7 @@ public:
                         pXT002->AI()->DoAction(_damageDone);
                         _damageDone = 0;
                     }
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
             }
         }
 
@@ -498,7 +498,7 @@ public:
                 me->CastSpell(pile, SPELL_ENERGY_ORB, true);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
         {
             // spawn not-so-random robots
             if (spellInfo->Id == SPELL_ENERGY_ORB_TRIGGER && target->GetEntry() == NPC_PILE_TRIGGER)
@@ -544,7 +544,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE))
+            if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE))
             {
                 _timerSpawn += diff;
                 if (_timerSpawn >= 1900)

@@ -127,7 +127,7 @@ public:
                 damage = 0;
         }
 
-        void SpellHit(Unit*, const SpellInfo* spell) override
+        void SpellHit(Unit*, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_TRANSFORM_SPLIT2)
                 EnterPhase(PHASE_HUMAN);
@@ -176,7 +176,7 @@ public:
                     if (Unit* pLynx = ObjectAccessor::GetUnit(*me, LynxGUID))
                     {
                         Talk(SAY_MERGE);
-                        pLynx->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        pLynx->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                         pLynx->GetMotionMaster()->Clear();
                         pLynx->GetMotionMaster()->MoveFollow(me, 0, 0);
                         me->GetMotionMaster()->Clear();
@@ -347,7 +347,7 @@ public:
 
         void AttackStart(Unit* who) override
         {
-            if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+            if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                 ScriptedAI::AttackStart(who);
         }
 

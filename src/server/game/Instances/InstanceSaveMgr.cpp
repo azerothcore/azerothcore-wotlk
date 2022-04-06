@@ -67,7 +67,7 @@ InstanceSave* InstanceSaveMgr::AddInstanceSave(uint32 mapId, uint32 instanceId, 
 {
     ASSERT(!GetInstanceSave(instanceId));
 
-    const MapEntry* entry = sMapStore.LookupEntry(mapId);
+    MapEntry const* entry = sMapStore.LookupEntry(mapId);
     if (!entry)
     {
         LOG_ERROR("instance.save", "InstanceSaveMgr::AddInstanceSave: wrong mapid = {}, instanceid = {}!", mapId, instanceId);
@@ -116,7 +116,7 @@ bool InstanceSaveMgr::DeleteInstanceSaveIfNeeded(uint32 InstanceId, bool skipMap
     return DeleteInstanceSaveIfNeeded(GetInstanceSave(InstanceId), skipMapCheck);
 }
 
-bool InstanceSaveMgr::DeleteInstanceSaveIfNeeded(InstanceSave* save, bool skipMapCheck)
+bool InstanceSaveMgr::DeleteInstanceSaveIfNeeded(InstanceSave* save, bool skipMapCheck, bool deleteSave /*= true*/)
 {
     // pussywizard: save is removed only when there are no more players bound AND the map doesn't exist
     // pussywizard: this function is called when unbinding a player and when unloading a map
@@ -130,13 +130,17 @@ bool InstanceSaveMgr::DeleteInstanceSaveIfNeeded(InstanceSave* save, bool skipMa
         // delete save from db:
         // character_instance is deleted when unbinding a certain player
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INSTANCE_BY_INSTANCE);
-        stmt->setUInt32(0, save->GetInstanceId());
+        stmt->SetData(0, save->GetInstanceId());
         CharacterDatabase.Execute(stmt);
 
         // clear respawn times (if map is loaded do it just to be sure, if already unloaded it won't do it by itself)
         Map::DeleteRespawnTimesInDB(save->GetMapId(), save->GetInstanceId());
 
-        delete save;
+        if (deleteSave)
+        {
+            delete save;
+        }
+
         return true;
     }
     return false;
@@ -176,12 +180,12 @@ void InstanceSave::InsertToDB()
     }
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_INSTANCE_SAVE);
-    stmt->setUInt32(0, m_instanceid);
-    stmt->setUInt16(1, GetMapId());
-    stmt->setUInt32(2, uint32(GetResetTimeForDB()));
-    stmt->setUInt8(3, uint8(GetDifficulty()));
-    stmt->setUInt32(4, completedEncounters);
-    stmt->setString(5, data);
+    stmt->SetData(0, m_instanceid);
+    stmt->SetData(1, GetMapId());
+    stmt->SetData(2, uint32(GetResetTimeForDB()));
+    stmt->SetData(3, uint8(GetDifficulty()));
+    stmt->SetData(4, completedEncounters);
+    stmt->SetData(5, data);
     CharacterDatabase.Execute(stmt);
 
     sScriptMgr->OnInstanceSave(this);
@@ -190,7 +194,7 @@ void InstanceSave::InsertToDB()
 time_t InstanceSave::GetResetTimeForDB()
 {
     // only save the reset time for normal instances
-    const MapEntry* entry = sMapStore.LookupEntry(GetMapId());
+    MapEntry const* entry = sMapStore.LookupEntry(GetMapId());
     if (!entry || entry->map_type == MAP_RAID || GetDifficulty() == DUNGEON_DIFFICULTY_HEROIC)
         return 0;
     else
@@ -216,11 +220,22 @@ void InstanceSave::AddPlayer(ObjectGuid guid)
 
 bool InstanceSave::RemovePlayer(ObjectGuid guid, InstanceSaveMgr* ism)
 {
-    std::lock_guard<std::mutex> guard(_lock);
-    m_playerList.remove(guid);
+    bool deleteSave = false;
+    {
+        std::lock_guard lg(_lock);
+        m_playerList.remove(guid);
 
-    // ism passed as an argument to avoid calling via singleton (might result in a deadlock)
-    return ism->DeleteInstanceSaveIfNeeded(this->GetInstanceId(), false);
+        // ism passed as an argument to avoid calling via singleton (might result in a deadlock)
+        deleteSave = ism->DeleteInstanceSaveIfNeeded(this, false, false);
+    }
+
+    // Delete save now (avoid mutex memory corruption)
+    if (deleteSave)
+    {
+        delete this;
+    }
+
+    return deleteSave;
 }
 
 void InstanceSaveMgr::LoadInstances()
@@ -272,15 +287,15 @@ void InstanceSaveMgr::LoadResetTimes()
         do
         {
             Field* fields = result->Fetch();
-            uint32 mapid = fields[0].GetUInt16();
-            Difficulty difficulty = Difficulty(fields[1].GetUInt8());
-            uint64 resettime = fields[2].GetUInt32();
+            uint32 mapid = fields[0].Get<uint16>();
+            Difficulty difficulty = Difficulty(fields[1].Get<uint8>());
+            uint64 resettime = fields[2].Get<uint32>();
 
             MapDifficulty const* mapDiff = GetMapDifficultyData(mapid, difficulty);
             if (!mapDiff)
             {
                 LOG_ERROR("instance.save", "InstanceSaveMgr::LoadResetTimes: invalid mapid({})/difficulty({}) pair in instance_reset!", mapid, difficulty);
-                CharacterDatabase.DirectPExecute("DELETE FROM instance_reset WHERE mapid = '%u' AND difficulty = '%u'", mapid, difficulty);
+                CharacterDatabase.DirectExecute("DELETE FROM instance_reset WHERE mapid = '{}' AND difficulty = '{}'", mapid, difficulty);
                 continue;
             }
 
@@ -310,7 +325,7 @@ void InstanceSaveMgr::LoadResetTimes()
             // initialize the reset time
             t = today + period + diff;
             SetResetTimeFor(mapid, difficulty, t);
-            CharacterDatabase.DirectPExecute("INSERT INTO instance_reset VALUES ('%u', '%u', '%u')", mapid, difficulty, (uint32)t);
+            CharacterDatabase.DirectExecute("INSERT INTO instance_reset VALUES ('{}', '{}', '{}')", mapid, difficulty, (uint32)t);
         }
 
         if (t < now)
@@ -319,7 +334,7 @@ void InstanceSaveMgr::LoadResetTimes()
             // calculate the next reset time
             t = (t * DAY) / DAY;
             t += ((today - t) / period + 1) * period + diff;
-            CharacterDatabase.DirectPExecute("UPDATE instance_reset SET resettime = '%u' WHERE mapid = '%u' AND difficulty = '%u'", (uint32)t, mapid, difficulty);
+            CharacterDatabase.DirectExecute("UPDATE instance_reset SET resettime = '{}' WHERE mapid = '{}' AND difficulty = '{}'", (uint32)t, mapid, difficulty);
         }
 
         SetExtendedResetTimeFor(mapid, difficulty, t);
@@ -343,12 +358,12 @@ void InstanceSaveMgr::LoadInstanceSaves()
         {
             Field* fields = result->Fetch();
 
-            uint32 instanceId = fields[0].GetUInt32();
-            uint32 mapId = fields[1].GetUInt16();
-            time_t resettime = time_t(fields[2].GetUInt32());
-            uint8 difficulty = fields[3].GetUInt8();
-            uint32 completedEncounters = fields[4].GetUInt32();
-            std::string instanceData = fields[5].GetString();
+            uint32 instanceId = fields[0].Get<uint32>();
+            uint32 mapId = fields[1].Get<uint16>();
+            time_t resettime = time_t(fields[2].Get<uint32>());
+            uint8 difficulty = fields[3].Get<uint8>();
+            uint32 completedEncounters = fields[4].Get<uint32>();
+            std::string instanceData = fields[5].Get<std::string>();
 
             // Mark instance id as being used
             sMapMgr->RegisterInstanceId(instanceId);
@@ -376,10 +391,10 @@ void InstanceSaveMgr::LoadCharacterBinds()
         {
             Field* fields = result->Fetch();
 
-            ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>(fields[0].GetUInt32());
-            uint32 instanceId = fields[1].GetUInt32();
-            bool perm = fields[2].GetBool();
-            bool extended = fields[3].GetBool();
+            ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>(fields[0].Get<uint32>());
+            uint32 instanceId = fields[1].Get<uint32>();
+            bool perm = fields[2].Get<bool>();
+            bool extended = fields[3].Get<bool>();
 
             if (InstanceSave* save = GetInstanceSave(instanceId))
             {
@@ -390,16 +405,16 @@ void InstanceSaveMgr::LoadCharacterBinds()
                     if (bind.perm) // already loaded perm -> delete currently checked one from db
                     {
                         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_GUID);
-                        stmt->setUInt32(0, guid.GetCounter());
-                        stmt->setUInt32(1, instanceId);
+                        stmt->SetData(0, guid.GetCounter());
+                        stmt->SetData(1, instanceId);
                         CharacterDatabase.Execute(stmt);
                         continue;
                     }
                     else // override temp bind by newest one
                     {
                         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_GUID);
-                        stmt->setUInt32(0, guid.GetCounter());
-                        stmt->setUInt32(1, bind.save->GetInstanceId());
+                        stmt->SetData(0, guid.GetCounter());
+                        stmt->SetData(1, bind.save->GetInstanceId());
                         CharacterDatabase.Execute(stmt);
                         bind.save->RemovePlayer(guid, this);
                     }
@@ -483,10 +498,10 @@ void InstanceSaveMgr::_ResetSave(InstanceSaveHashMap::iterator& itr)
     {
         // delete character_instance per id, delete instance per id
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE);
-        stmt->setUInt32(0, itr->second->GetInstanceId());
+        stmt->SetData(0, itr->second->GetInstanceId());
         CharacterDatabase.Execute(stmt);
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INSTANCE_BY_INSTANCE);
-        stmt->setUInt32(0, itr->second->GetInstanceId());
+        stmt->SetData(0, itr->second->GetInstanceId());
         CharacterDatabase.Execute(stmt);
 
         // clear respawn times if the map is already unloaded and won't do it by itself
@@ -501,10 +516,10 @@ void InstanceSaveMgr::_ResetSave(InstanceSaveHashMap::iterator& itr)
         // delete character_instance per id where extended = 0, transtaction with set extended = 0, transaction is used to avoid mysql thread races
         CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_NOT_EXTENDED);
-        stmt->setUInt32(0, itr->second->GetInstanceId());
+        stmt->SetData(0, itr->second->GetInstanceId());
         trans->Append(stmt);
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_INSTANCE_SET_NOT_EXTENDED);
-        stmt->setUInt32(0, itr->second->GetInstanceId());
+        stmt->SetData(0, itr->second->GetInstanceId());
         trans->Append(stmt);
         CharacterDatabase.CommitTransaction(trans);
 
@@ -548,9 +563,9 @@ void InstanceSaveMgr::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, bool 
 
         // update it in the DB
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GLOBAL_INSTANCE_RESETTIME);
-        stmt->setUInt32(0, next_reset);
-        stmt->setUInt16(1, uint16(mapid));
-        stmt->setUInt8(2, uint8(difficulty));
+        stmt->SetData(0, next_reset);
+        stmt->SetData(1, uint16(mapid));
+        stmt->SetData(2, uint8(difficulty));
         CharacterDatabase.Execute(stmt);
 
         // remove all binds to instances of the given map and delete from db (delete per instance id, no mass deletion!)
@@ -604,10 +619,10 @@ InstancePlayerBind* InstanceSaveMgr::PlayerBindToInstance(ObjectGuid guid, Insta
             bind.extended = false;
 
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_INSTANCE);
-            stmt->setUInt32(0, save->GetInstanceId());
-            stmt->setBool(1, permanent);
-            stmt->setUInt32(2, guid.GetCounter());
-            stmt->setUInt32(3, bind.save->GetInstanceId());
+            stmt->SetData(0, save->GetInstanceId());
+            stmt->SetData(1, permanent);
+            stmt->SetData(2, guid.GetCounter());
+            stmt->SetData(3, bind.save->GetInstanceId());
             CharacterDatabase.Execute(stmt);
         }
     }
@@ -620,21 +635,21 @@ InstancePlayerBind* InstanceSaveMgr::PlayerBindToInstance(ObjectGuid guid, Insta
         /*CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
         // ensure any for that map+difficulty is deleted!
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_GUID_MAP_DIFF); // DELETE ci FROM character_instance ci JOIN instance i ON ci.instance = i.id WHERE ci.guid = ? AND i.map = ? AND i.difficulty = ?
-        stmt->setUInt32(0, guidLow);
-        stmt->setUInt16(1, uint16(save->GetMapId()));
-        stmt->setUInt8(2, uint8(save->GetDifficulty()));
+        stmt->SetData(0, guidLow);
+        stmt->SetData(1, uint16(save->GetMapId()));
+        stmt->SetData(2, uint8(save->GetDifficulty()));
         trans->Append(stmt);
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_INSTANCE);
-        stmt->setUInt32(0, guidLow);
-        stmt->setUInt32(1, save->GetInstanceId());
-        stmt->setBool(2, permanent);
+        stmt->SetData(0, guidLow);
+        stmt->SetData(1, save->GetInstanceId());
+        stmt->SetData(2, permanent);
         trans->Append(stmt);
         CharacterDatabase.CommitTransaction(trans);*/
 
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_INSTANCE);
-        stmt->setUInt32(0, guid.GetCounter());
-        stmt->setUInt32(1, save->GetInstanceId());
-        stmt->setBool(2, permanent);
+        stmt->SetData(0, guid.GetCounter());
+        stmt->SetData(1, save->GetInstanceId());
+        stmt->SetData(2, permanent);
         CharacterDatabase.Execute(stmt);
     }
 
@@ -670,8 +685,8 @@ void InstanceSaveMgr::PlayerUnbindInstance(ObjectGuid guid, uint32 mapid, Diffic
         if (deleteFromDB)
         {
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_GUID);
-            stmt->setUInt32(0, guid.GetCounter());
-            stmt->setUInt32(1, itr->second.save->GetInstanceId());
+            stmt->SetData(0, guid.GetCounter());
+            stmt->SetData(1, itr->second.save->GetInstanceId());
             CharacterDatabase.Execute(stmt);
         }
 
@@ -787,7 +802,12 @@ void InstanceSaveMgr::CopyBinds(ObjectGuid from, ObjectGuid to, Player* toPlr)
 
 void InstanceSaveMgr::UnbindAllFor(InstanceSave* save)
 {
-    GuidList& pList = save->m_playerList;
-    while (!pList.empty())
-        PlayerUnbindInstance(*(pList.begin()), save->GetMapId(), save->GetDifficulty(), true, ObjectAccessor::FindConnectedPlayer(*(pList.begin())));
+    uint32 mapId = save->GetMapId();
+    Difficulty difficulty = save->GetDifficulty();
+    GuidList players = save->m_playerList;
+
+    for (ObjectGuid const& guid : players)
+    {
+        PlayerUnbindInstance(guid, mapId, difficulty, true, ObjectAccessor::FindConnectedPlayer(guid));
+    }
 }

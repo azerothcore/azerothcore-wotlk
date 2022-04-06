@@ -107,7 +107,7 @@ public:
             }
         }
 
-        bool IsValidDedicatedInsanityItem(const ItemTemplate* item)
+        bool IsValidDedicatedInsanityItem(ItemTemplate const* item)
         {
             if (!item) // should not happen, but checked in GetAverageItemLevel()
                 return true;
@@ -318,7 +318,7 @@ public:
                         if (Creature* trigger = instance->SummonCreature(WORLD_TRIGGER, Locs[LOC_CENTER], nullptr, 25000))
                         {
                             trigger->SetDisplayId(11686);
-                            trigger->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                            trigger->ReplaceAllUnitFlags(UNIT_FLAG_NOT_SELECTABLE);
                             trigger->SetFaction(FACTION_MONSTER);
                             trigger->SetInCombatWithZone();
                         }
@@ -340,7 +340,7 @@ public:
                             if (Creature* trigger = instance->SummonCreature(WORLD_TRIGGER, Locs[LOC_CENTER], nullptr, 25000))
                             {
                                 trigger->SetDisplayId(11686);
-                                trigger->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                                trigger->ReplaceAllUnitFlags(UNIT_FLAG_NOT_SELECTABLE);
                                 trigger->SetFaction(FACTION_MONSTER);
                                 trigger->SetInCombatWithZone();
                             }
@@ -656,7 +656,7 @@ public:
                         if( Creature* c = instance->GetCreature(NPC_GormokGUID) )
                         {
                             c->SetReactState(REACT_AGGRESSIVE);
-                            c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                             if( Unit* target = c->SelectNearestTarget(200.0f) )
                             {
@@ -704,7 +704,7 @@ public:
                         if( Creature* c = instance->GetCreature(NPC_DreadscaleGUID) )
                         {
                             c->SetReactState(REACT_AGGRESSIVE);
-                            c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                             if( Unit* target = c->SelectNearestTarget(200.0f) )
                             {
@@ -715,7 +715,7 @@ public:
                         if( Creature* c = instance->GetCreature(NPC_AcidmawGUID) )
                         {
                             c->SetReactState(REACT_AGGRESSIVE);
-                            c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                             if( Unit* target = c->SelectNearestTarget(200.0f) )
                             {
@@ -752,7 +752,7 @@ public:
                         if( Creature* c = instance->GetCreature(NPC_IcehowlGUID) )
                         {
                             c->SetReactState(REACT_AGGRESSIVE);
-                            c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                             if( Unit* target = c->SelectNearestTarget(200.0f) )
                             {
@@ -767,7 +767,7 @@ public:
                         if( Creature* c = instance->GetCreature(NPC_TirionGUID) )
                             c->AI()->Talk(SAY_STAGE_0_06);
                         if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
-                            c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                            c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         break;
                     }
                 case EVENT_SCENE_101:
@@ -907,7 +907,7 @@ public:
                         if( Creature* c = instance->GetCreature(NPC_JaraxxusGUID) )
                         {
                             c->SetReactState(REACT_AGGRESSIVE);
-                            c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                             if( Unit* target = c->SelectNearestTarget(200.0f) )
                             {
@@ -946,7 +946,7 @@ public:
                         if( Creature* c = instance->GetCreature(NPC_TirionGUID) )
                             c->AI()->Talk(SAY_STAGE_1_11);
                         if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
-                            c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                            c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         break;
                     }
                 case EVENT_SCENE_201:
@@ -1104,7 +1104,7 @@ public:
                             if (Creature* c = instance->GetCreature(guid))
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
-                                c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                                 c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                                 //if( Unit* target = c->SelectNearestTarget(200.0f) )
                                 //  c->AI()->AttackStart(target);
@@ -1120,7 +1120,7 @@ public:
                         if( Creature* c = instance->GetCreature(NPC_TirionGUID) )
                             c->AI()->Talk(SAY_STAGE_2_06);
                         if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
-                            c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                            c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         break;
                     }
                 case EVENT_SCENE_301:
@@ -1171,7 +1171,7 @@ public:
                         if( Creature* c = instance->GetCreature(NPC_LightbaneGUID) )
                         {
                             c->SetReactState(REACT_AGGRESSIVE);
-                            c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             /*if( Unit* target = c->SelectNearestTarget(200.0f) )
                             {
                                 c->AI()->AttackStart(target);
@@ -1181,7 +1181,7 @@ public:
                         if( Creature* c = instance->GetCreature(NPC_DarkbaneGUID) )
                         {
                             c->SetReactState(REACT_AGGRESSIVE);
-                            c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             /*if( Unit* target = c->SelectNearestTarget(200.0f) )
                             {
                                 c->AI()->AttackStart(target);
@@ -1435,11 +1435,11 @@ public:
             {
                 case INSTANCE_PROGRESS_INITIAL:
                     if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
-                        c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     break;
                 case INSTANCE_PROGRESS_INTRO_DONE:
                     if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
-                        c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     if( Creature* c = instance->GetCreature(NPC_GormokGUID) )
                     {
                         c->AI()->DoAction(-1); // despawn summons
@@ -1459,7 +1459,7 @@ public:
                     break;
                 case INSTANCE_PROGRESS_BEASTS_DEAD:
                     if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
-                        c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     if( Creature* c = instance->GetCreature(NPC_FizzlebangGUID) )
                         c->DespawnOrUnsummon();
                     NPC_FizzlebangGUID.Clear();
@@ -1478,19 +1478,19 @@ public:
                         c->DespawnOrUnsummon();
                     if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
                     {
-                        c->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        c->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         if( Creature* jaraxxus = c->SummonCreature(NPC_JARAXXUS, Locs[LOC_CENTER].GetPositionX(), Locs[LOC_CENTER].GetPositionY(), Locs[LOC_CENTER].GetPositionZ(), Locs[LOC_CENTER].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 630000000) )
                         {
                             jaraxxus->CastSpell(jaraxxus, 67924, true);
                             jaraxxus->SetReactState(REACT_AGGRESSIVE);
-                            jaraxxus->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            jaraxxus->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             jaraxxus->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                         }
                     }
                     break;
                 case INSTANCE_PROGRESS_JARAXXUS_DEAD:
                     if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
-                        c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     for (ObjectGuid const& guid : NPC_ChampionGUIDs)
                         if (Creature* c = instance->GetCreature(guid))
                             c->DespawnOrUnsummon();
@@ -1498,7 +1498,7 @@ public:
                     break;
                 case INSTANCE_PROGRESS_FACTION_CHAMPIONS_DEAD:
                     if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
-                        c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     if( Creature* c = instance->GetCreature(NPC_DarkbaneGUID) )
                     {
                         c->AI()->DoAction(-1);
@@ -1521,11 +1521,11 @@ public:
                         if (InstanceProgress == INSTANCE_PROGRESS_ANUB_ARAK)
                         {
                             c->SetVisible(false);
-                            c->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                            c->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         }
                         else
                         {
-                            c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                            c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                             c->SetVisible(true);
                             c->SetFacingTo(c->GetOrientation());
                         }
@@ -1550,7 +1550,7 @@ public:
                     if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
                     {
                         c->SetVisible(false);
-                        c->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        c->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     }
                     break;
             }
@@ -1566,7 +1566,7 @@ public:
 
             if( instance->IsHeroic() && AttemptsLeft == 0 )
                 if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
-                    c->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    c->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
             HandleGameObject(GO_MainGateGUID, false);
             HandleGameObject(GO_EnterGateGUID, true);

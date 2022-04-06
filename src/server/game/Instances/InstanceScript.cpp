@@ -43,8 +43,8 @@ void InstanceScript::SaveToDB()
         save->SetInstanceData(data);
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_INSTANCE_SAVE_DATA);
-    stmt->setString(0, data);
-    stmt->setUInt32(1, instance->GetInstanceId());
+    stmt->SetData(0, data);
+    stmt->SetData(1, instance->GetInstanceId());
     CharacterDatabase.Execute(stmt);
 }
 
@@ -408,6 +408,22 @@ void InstanceScript::DoRespawnGameObject(ObjectGuid uiGuid, uint32 uiTimeToDespa
     }
 }
 
+void InstanceScript::DoRespawnCreature(ObjectGuid guid, bool force)
+{
+    if (Creature* creature = instance->GetCreature(guid))
+    {
+        creature->Respawn(force);
+    }
+}
+
+void InstanceScript::DoRespawnCreature(uint32 type, bool force)
+{
+    if (Creature* creature = instance->GetCreature(GetObjectGuid(type)))
+    {
+        creature->Respawn(force);
+    }
+}
+
 void InstanceScript::DoUpdateWorldState(uint32 uiStateId, uint32 uiStateData)
 {
     Map::PlayerList const& lPlayers = instance->GetPlayers();
@@ -524,8 +540,8 @@ void InstanceScript::SetCompletedEncountersMask(uint32 newMask, bool save)
             iSave->SetCompletedEncounterMask(completedEncounters);
 
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_INSTANCE_SAVE_ENCOUNTERMASK);
-        stmt->setUInt32(0, completedEncounters);
-        stmt->setUInt32(1, instance->GetInstanceId());
+        stmt->SetData(0, completedEncounters);
+        stmt->SetData(1, instance->GetInstanceId());
         CharacterDatabase.Execute(stmt);
     }
 }

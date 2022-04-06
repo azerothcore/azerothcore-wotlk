@@ -75,7 +75,7 @@ public:
                 Talk(SAY_AGGRO);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_PERSUASIVE_STRIKE && caster->GetTypeId() == TYPEID_PLAYER && me->IsAlive() && !speechCounter)
             {
@@ -233,7 +233,7 @@ public:
                 m_uiWave = 0;
                 m_uiWave_Timer = 3000;
                 m_uiValrothGUID.Clear();
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->LoadEquipment(0, true);
                 me->RemoveAllAuras();
                 summons.DespawnAll();
@@ -255,7 +255,7 @@ public:
             else
             {
                 me->GetMotionMaster()->MoveTargetedHome();
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
                 Reset();
             }
         }
@@ -274,7 +274,7 @@ public:
             {
                 case 0:
                     Talk(SAY_BREAKOUT1);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     break;
                 case 1:
                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
@@ -313,7 +313,7 @@ public:
                 m_uiValrothGUID = summoned->GetGUID();
 
             summoned->AddThreat(me, 0.0f);
-            summoned->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            summoned->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
             summons.Summon(summoned);
         }
 
@@ -666,7 +666,7 @@ public:
             ExecuteSpeech_Counter = 0;
             PlayerGUID.Clear();
 
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
         }
 
         bool MeetQuestCondition(Player* player)
@@ -780,7 +780,7 @@ public:
                                 case 9:
                                     Talk(SAY_EXEC_TIME_6, player);
                                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                                     break;
                                 case 10:
                                     Talk(SAY_EXEC_WAITING, player);
@@ -826,7 +826,7 @@ public:
                                 case 9:
                                     Talk(SAY_EXEC_TIME_8, player);
                                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                                     break;
                                 case 10:
                                     Talk(SAY_EXEC_WAITING, player);
@@ -872,7 +872,7 @@ public:
                                 case 9:
                                     Talk(SAY_EXEC_TIME_3, player);
                                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                                     break;
                                 case 10:
                                     Talk(SAY_EXEC_WAITING, player);
@@ -918,7 +918,7 @@ public:
                                 case 9:
                                     Talk(SAY_EXEC_TIME_7, player);
                                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                                     break;
                                 case 10:
                                     Talk(SAY_EXEC_WAITING, player);
@@ -964,7 +964,7 @@ public:
                                 case 9:
                                     Talk(SAY_EXEC_TIME_4, player);
                                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                                     break;
                                 case 10:
                                     Talk(SAY_EXEC_WAITING, player);
@@ -1010,7 +1010,7 @@ public:
                                 case 9:
                                     Talk(SAY_EXEC_TIME_9, player);
                                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                                     break;
                                 case 10:
                                     Talk(SAY_EXEC_WAITING, player);
@@ -1056,7 +1056,7 @@ public:
                                 case 9:
                                     Talk(SAY_EXEC_TIME_5, player);
                                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                                     break;
                                 case 10:
                                     Talk(SAY_EXEC_WAITING, player);
@@ -1102,7 +1102,7 @@ public:
                                 case 9:
                                     Talk(SAY_EXEC_TIME_10, player);
                                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                                     break;
                                 case 10:
                                     Talk(SAY_EXEC_WAITING, player);
@@ -1146,7 +1146,7 @@ public:
                                 case 9:
                                     Talk(SAY_EXEC_TIME_1, player);
                                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                                     break;
                                 case 10:
                                     Talk(SAY_EXEC_WAITING, player);
@@ -1192,7 +1192,7 @@ public:
                                 case 9:
                                     Talk(SAY_EXEC_TIME_2, player);
                                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                                     break;
                                 case 10:
                                     Talk(SAY_EXEC_WAITING, player);

@@ -93,7 +93,7 @@ public:
                 pInstance->SetData(DATA_ICK, NOT_STARTED);
         }
 
-        bool CanAIAttack(const Unit*  /*who*/) const override
+        bool CanAIAttack(Unit const*  /*who*/) const override
         {
             return pInstance && pInstance->GetData(DATA_INSTANCE_PROGRESS) >= INSTANCE_PROGRESS_FINISHED_INTRO;
         }
@@ -113,7 +113,7 @@ public:
                 pInstance->SetData(DATA_ICK, IN_PROGRESS);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if (!target || !spell)
                 return;
@@ -418,9 +418,9 @@ public:
                             c->CastSpell(c, 69753, false);
 
                     me->SetReactState(REACT_PASSIVE);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-                    me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
-                    me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                    me->SetUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
+                    me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
                     me->AddUnitState(UNIT_STATE_DIED);
 
                     me->CastSpell(me, SPELL_KRICK_KILL_CREDIT, true);

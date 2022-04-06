@@ -39,43 +39,6 @@ EndContentData */
 #include "SpellInfo.h"
 
 /*######
-## npc_beaten_corpse
-######*/
-
-#define GOSSIP_CORPSE "Examine corpse in detail..."
-
-enum BeatenCorpse
-{
-    QUEST_LOST_IN_BATTLE    = 4921
-};
-
-class npc_beaten_corpse : public CreatureScript
-{
-public:
-    npc_beaten_corpse() : CreatureScript("npc_beaten_corpse") { }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
-        {
-            SendGossipMenuFor(player, 3558, creature->GetGUID());
-            player->TalkedToCreature(creature->GetEntry(), creature->GetGUID());
-        }
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (player->GetQuestStatus(QUEST_LOST_IN_BATTLE) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_LOST_IN_BATTLE) == QUEST_STATUS_COMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_CORPSE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-        SendGossipMenuFor(player, 3557, creature->GetGUID());
-        return true;
-    }
-};
-
-/*######
 # npc_gilthares
 ######*/
 
@@ -225,7 +188,7 @@ public:
             me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_FLARE || spell->Id == SPELL_FOLLY)
             {
@@ -408,8 +371,8 @@ public:
                             if (!creature)
                                 continue;
                             creature->SetFaction(FACTION_FRIENDLY);
-                            creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                            creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            creature->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                            creature->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             creature->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
                             AffrayChallenger[i] = creature->GetGUID();
                         }
@@ -446,8 +409,8 @@ public:
                             Creature* creature = ObjectAccessor::GetCreature(*me, AffrayChallenger[Wave]);
                             if (creature && creature->IsAlive())
                             {
-                                creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                                creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                creature->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                                creature->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                                 creature->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
                                 creature->SetFaction(FACTION_MONSTER);
                                 creature->AI()->AttackStart(pWarrior);
@@ -477,8 +440,8 @@ public:
                             }
                             else // Makes BIG WILL attackable.
                             {
-                                creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                                creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                creature->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                                creature->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                                 creature->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
                                 creature->SetFaction(FACTION_MONSTER);
                                 creature->AI()->AttackStart(pWarrior);
@@ -661,7 +624,6 @@ public:
 
 void AddSC_the_barrens()
 {
-    new npc_beaten_corpse();
     new npc_gilthares();
     new npc_taskmaster_fizzule();
     new npc_twiggy_flathead();

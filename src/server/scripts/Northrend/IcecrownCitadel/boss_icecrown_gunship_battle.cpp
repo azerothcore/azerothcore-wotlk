@@ -758,9 +758,9 @@ public:
 
         void sGossipSelect(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/) override
         {
-            if (!me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
+            if (!me->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
                 return;
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->GetTransport()->setActive(true);
             me->GetTransport()->ToMotionTransport()->EnableMovement(true);
             _events.ScheduleEvent(EVENT_INTRO_H_1, 5000);
@@ -1047,7 +1047,7 @@ public:
             }
         }
 
-        bool CanAIAttack(const Unit* target) const override
+        bool CanAIAttack(Unit const* target) const override
         {
             if (_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
                 return false;
@@ -1093,9 +1093,9 @@ public:
 
         void sGossipSelect(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/) override
         {
-            if (!me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
+            if (!me->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
                 return;
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->GetTransport()->setActive(true);
             me->GetTransport()->ToMotionTransport()->EnableMovement(true);
             _events.ScheduleEvent(EVENT_INTRO_A_1, 5000);
@@ -1386,7 +1386,7 @@ public:
             }
         }
 
-        bool CanAIAttack(const Unit* target) const override
+        bool CanAIAttack(Unit const* target) const override
         {
             if (_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
                 return false;
@@ -1445,7 +1445,7 @@ public:
     {
         npc_igb_ship_crewAI(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript()) {}
 
-        bool CanAIAttack(const Unit* target) const override
+        bool CanAIAttack(Unit const* target) const override
         {
             return _instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS && target->GetTransport() == me->GetTransport() && target->GetPositionZ() < 478.0f && (me->GetEntry() == NPC_SKYBREAKER_DECKHAND ? (target->GetPositionY() > 2042.0f) : (target->GetPositionY() < 2431.0f));
         }
@@ -1627,7 +1627,7 @@ struct npc_gunship_boarding_addAI : public ScriptedAI
             checkTimer -= diff;
     }
 
-    bool CanAIAttack(const Unit* target) const override
+    bool CanAIAttack(Unit const* target) const override
     {
         return Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS && target->GetTransport() && target->GetTransport() != me->GetTransport() && target->GetPositionZ() < 478.0f && (me->GetEntry() == NPC_SKYBREAKER_SERGEANT || me->GetEntry() == NPC_SKYBREAKER_MARINE ? (target->GetPositionY() < 2431.0f) : (target->GetPositionY() > 2042.0f));
     }
@@ -1806,7 +1806,7 @@ public:
             gunship_npc_AI::UpdateAI(diff);
         }
 
-        bool CanAIAttack(const Unit*  /*target*/) const override
+        bool CanAIAttack(Unit const*  /*target*/) const override
         {
             return Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS;
         }
@@ -1880,7 +1880,7 @@ public:
             DoSpellAttackIfReady(me->GetEntry() == NPC_SKYBREAKER_RIFLEMAN ? SPELL_SHOOT : SPELL_HURL_AXE);
         }
 
-        bool CanAIAttack(const Unit* target) const override
+        bool CanAIAttack(Unit const* target) const override
         {
             return Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS && target->GetTransport() && target->GetTransport() != me->GetTransport();
         }
@@ -1935,7 +1935,7 @@ public:
             me->_AddCreatureSpellCooldown(spellId, 0, 9000);
         }
 
-        bool CanAIAttack(const Unit*  /*target*/) const override
+        bool CanAIAttack(Unit const*  /*target*/) const override
         {
             return Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS;
         }
@@ -2426,7 +2426,7 @@ public:
         void CalculateDamage(SpellEffIndex /*effIndex*/)
         {
             PreventHitEffect(EFFECT_0);
-            const SpellInfo* si = sSpellMgr->GetSpellInfo(GetSpellInfo()->Effects[0].TriggerSpell);
+            SpellInfo const* si = sSpellMgr->GetSpellInfo(GetSpellInfo()->Effects[0].TriggerSpell);
             if (!si)
                 return;
             SpellCastTargets targets;

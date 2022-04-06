@@ -178,6 +178,7 @@ enum Misc
     ACTION_DELAY_CANNON             = 5,
     ACTION_DESTROYED_TURRET         = 6,
 };
+const Position homePos = {322.39f, -14.5f, 409.8f, 3.14f};
 
 ///////////////////////////////////////////
 //
@@ -240,7 +241,7 @@ public:
         }
 
         void SummonedCreatureDespawn(Creature* cr) override { summons.Despawn(cr); }
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override;
+        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override;
         void JustDied(Unit*) override;
         void KilledUnit(Unit* who) override;
         void SpellHitTarget(Unit* target, SpellInfo const* spell) override;
@@ -259,8 +260,7 @@ public:
             Talk(FLAME_LEVIATHAN_SAY_AGGRO);
 
             me->setActive(true);
-            me->SetHomePosition(322.4f, -14.3f, 409.8f, 3.23f);
-            TurnGates(true, false);
+            me->SetHomePosition(homePos);
             TurnHealStations(false);
             ActivateTowers();
             if (m_pInstance)
@@ -268,14 +268,19 @@ public:
 
             BindPlayers();
             me->SetInCombatWithZone();
+
+            if (!_startTimer)
+            {
+                TurnGates(true, false);
+            }
         }
 
         void InitializeAI() override
         {
             if (m_pInstance && m_pInstance->GetData(TYPE_LEVIATHAN) == SPECIAL)
             {
-                me->SetHomePosition(322.4f, -14.3f, 409.8f, 3.23f);
-                me->UpdatePosition(322.4f, -14.3f, 409.8f, 3.23f);
+                me->SetHomePosition(homePos);
+                me->UpdatePosition(homePos);
                 me->StopMovingOnCurrentPos();
             }
 
@@ -303,11 +308,11 @@ public:
                 if (m_pInstance->GetData(TYPE_LEVIATHAN) != SPECIAL)
                 {
                     m_pInstance->SetData(TYPE_LEVIATHAN, NOT_STARTED);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 }
                 else
                 {
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     m_pInstance->SetData(DATA_VEHICLE_SPAWN, VEHICLE_POS_LEVIATHAN);
                     _startTimer = 0;
                 }
@@ -367,12 +372,13 @@ public:
                 }
                 else if (_speakTimer > 41000 && _speakTimer < 60000)
                 {
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    me->SendMonsterMove(380.4f, -14.3f, 409.8f, 2000);
-                    me->UpdatePosition(380.4f, -14.3f, 409.8f, me->GetOrientation());
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    TurnGates(true, false);
+                    me->MonsterMoveWithSpeed(homePos.GetPositionX(), homePos.GetPositionY(), homePos.GetPositionZ(), 100.0f);
+                    me->UpdatePosition(homePos);
                     _speakTimer = 60000;
                 }
-                else if (_speakTimer > 61500)
+                else if (_speakTimer > 63500)
                 {
                     me->SetInCombatWithZone();
                     if (!me->GetVictim())
@@ -608,7 +614,7 @@ void boss_flame_leviathan::boss_flame_leviathanAI::ScheduleEvents()
     events.RescheduleEvent(EVENT_PURSUE, 0);
 }
 
-void boss_flame_leviathan::boss_flame_leviathanAI::SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
+void boss_flame_leviathan::boss_flame_leviathanAI::SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo)
 {
     if (spellInfo->Id == SPELL_SYSTEMS_SHUTDOWN)
     {
@@ -762,14 +768,14 @@ public:
                 {
                     if (apply)
                     {
-                        turret->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
+                        turret->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
                         turret->GetAI()->AttackStart(who);
                         if (Creature* leviathan = me->GetVehicleCreatureBase())
                             leviathan->AI()->Talk(FLAME_LEVIATHAN_SAY_PLAYER_RIDING);
                     }
                     else
                     {
-                        turret->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        turret->ReplaceAllUnitFlags(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                         if (turret->GetTypeId() == TYPEID_UNIT)
                             turret->ToCreature()->AI()->EnterEvadeMode();
                     }
@@ -811,7 +817,7 @@ public:
 
             if (Vehicle* vehicle = me->GetVehicle())
                 if (Unit* device = vehicle->GetPassenger(SEAT_DEVICE))
-                    device->SetUInt32Value(UNIT_FIELD_FLAGS, 0); // unselectable
+                    device->ReplaceAllUnitFlags(UNIT_FLAG_NONE); // unselectable
 
             if (Creature* leviathan = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(TYPE_LEVIATHAN)))
                 leviathan->AI()->DoAction(ACTION_DESTROYED_TURRET);
@@ -867,8 +873,8 @@ public:
 
             if (me->GetVehicle())
             {
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
                 if (Unit* player = me->GetVehicle()->GetPassenger(SEAT_PLAYER))
                 {
@@ -1183,7 +1189,7 @@ public:
             damage = 0;
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
         {
             if (spellInfo->SchoolMask & SPELL_SCHOOL_MASK_FIRE && !me->HasAura(SPELL_BLAZE))
                 me->CastSpell(me, SPELL_BLAZE, true);

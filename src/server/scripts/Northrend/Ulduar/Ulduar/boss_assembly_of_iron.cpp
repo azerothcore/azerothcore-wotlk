@@ -322,7 +322,7 @@ public:
                 me->CastSpell(me, SPELL_ELECTRICAL_CHARGE, true);
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_SUPERCHARGE)
                 UpdatePhase();
@@ -491,7 +491,7 @@ public:
             Talk(SAY_MOLGEIM_SLAY);
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_SUPERCHARGE)
                 UpdatePhase();
@@ -711,13 +711,13 @@ public:
             Talk(SAY_BRUNDIR_SLAY);
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_SUPERCHARGE)
                 UpdatePhase();
         }
 
-        void SpellHitTarget(Unit*  /*target*/, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit*  /*target*/, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_CHAIN_LIGHTNING || spellInfo->Id == uint32(RAID_MODE(61916, 63482))) // Lightning Whirl triggered
                 _stunnedAchievement = false;
@@ -802,7 +802,7 @@ public:
                         me->StopMoving();
                         me->SetReactState(REACT_PASSIVE);
                         me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+                        me->SetUnitFlag(UNIT_FLAG_STUNNED);
                         me->SendMonsterMove(_flyTarget->GetPositionX(), _flyTarget->GetPositionY(), _flyTarget->GetPositionZ() + 15, 1500, SPLINEFLAG_FLYING);
 
                         me->CastSpell(me, SPELL_LIGHTNING_TENDRILS, true);

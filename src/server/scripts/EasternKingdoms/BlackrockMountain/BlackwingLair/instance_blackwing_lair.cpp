@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "EventMap.h"
 #include "GameObject.h"
 #include "InstanceScript.h"
 #include "Map.h"
@@ -28,15 +29,22 @@
 
 DoorData const doorData[] =
 {
-    { GO_PORTCULLIS_RAZORGORE,    DATA_RAZORGORE_THE_UNTAMED,  DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 175946 || GUID 7230
-    { GO_PORTCULLIS_VAELASTRASZ,  DATA_VAELASTRAZ_THE_CORRUPT, DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 175185 || GUID 7229
-    { GO_PORTCULLIS_BROODLORD,    DATA_BROODLORD_LASHLAYER,    DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 179365 || GUID 75159
-    { GO_PORTCULLIS_THREEDRAGONS, DATA_FIREMAW,                DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 179115 || GUID 75165
-    { GO_PORTCULLIS_THREEDRAGONS, DATA_EBONROC,                DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 179115 || GUID 75165
-    { GO_PORTCULLIS_THREEDRAGONS, DATA_FLAMEGOR,               DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 179115 || GUID 75165
-    { GO_PORTCULLIS_CHROMAGGUS,   DATA_CHROMAGGUS,             DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 179116 || GUID 75161
-    { GO_PORTCULLIS_NEFARIAN,     DATA_NEFARIAN,               DOOR_TYPE_ROOM, BOUNDARY_NONE},    // ID 179117 || GUID 75164
-    { 0,                         0,                            DOOR_TYPE_ROOM, BOUNDARY_NONE}     // END
+    { GO_PORTCULLIS_RAZORGORE,      DATA_RAZORGORE_THE_UNTAMED,  DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 175946 || GUID 7230
+    { GO_PORTCULLIS_RAZORGORE_ROOM, DATA_RAZORGORE_THE_UNTAMED,  DOOR_TYPE_ROOM,    BOUNDARY_NONE}, // ID 176964 || GUID 75158
+    { GO_PORTCULLIS_VAELASTRASZ,    DATA_VAELASTRAZ_THE_CORRUPT, DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 175185 || GUID 7229
+    { GO_PORTCULLIS_BROODLORD,      DATA_BROODLORD_LASHLAYER,    DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 179365 || GUID 75159
+    { GO_PORTCULLIS_THREEDRAGONS,   DATA_FIREMAW,                DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 179115 || GUID 75165
+    { GO_PORTCULLIS_THREEDRAGONS,   DATA_EBONROC,                DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 179115 || GUID 75165
+    { GO_PORTCULLIS_THREEDRAGONS,   DATA_FLAMEGOR,               DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 179115 || GUID 75165
+    { GO_PORTCULLIS_CHROMAGGUS,     DATA_CHROMAGGUS,             DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 179116 || GUID 75161
+    { GO_PORTCULLIS_NEFARIAN,       DATA_NEFARIAN,               DOOR_TYPE_ROOM,    BOUNDARY_NONE}, // ID 179117 || GUID 75164
+    { 0,                            0,                           DOOR_TYPE_ROOM,    BOUNDARY_NONE}  // END
+};
+
+ObjectData const creatureData[] =
+{
+    { NPC_GRETHOK,         DATA_GRETHOK         },
+    { NPC_NEFARIAN_TROOPS, DATA_NEFARIAN_TROOPS }
 };
 
 Position const SummonPosition[8] =
@@ -51,7 +59,7 @@ Position const SummonPosition[8] =
     {-7584.175781f, -989.6691289f, 407.199585f, 4.527447f},
 };
 
-uint32 const Entry[5] = {12422, 12458, 12416, 12420, 12459};
+uint32 const Entry[3] = { 12422, 12416, 12420 };
 
 class instance_blackwing_lair : public InstanceMapScript
 {
@@ -65,7 +73,7 @@ public:
             //SetHeaders(DataHeader);
             SetBossNumber(EncounterCount);
             LoadDoorData(doorData);
-            //LoadObjectData(creatureData, gameObjectData);
+            LoadObjectData(creatureData, nullptr);
         }
 
         void Initialize() override
@@ -73,6 +81,8 @@ public:
             // Razorgore
             EggCount = 0;
             EggEvent = 0;
+            NefarianLeftTunnel = 0;
+            NefarianRightTunnel = 0;
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -88,18 +98,38 @@ public:
                     chromaggusGUID = creature->GetGUID();
                     break;
                 case NPC_BLACKWING_DRAGON:
-                case NPC_BLACKWING_TASKMASTER:
                 case NPC_BLACKWING_LEGIONAIRE:
-                case NPC_BLACKWING_WARLOCK:
+                case NPC_BLACKWING_MAGE:
                     if (Creature* razor = instance->GetCreature(razorgoreGUID))
                         if (CreatureAI* razorAI = razor->AI())
                             razorAI->JustSummoned(creature);
+                    break;
+                case NPC_BLACKWING_GUARDSMAN:
+                    guardList.push_back(creature->GetGUID());
                     break;
                 case NPC_NEFARIAN:
                     nefarianGUID = creature->GetGUID();
                     break;
                 case NPC_VICTOR_NEFARIUS:
                     victorNefariusGUID = creature->GetGUID();
+                    break;
+                case NPC_BLACK_DRAKONID:
+                case NPC_BLUE_DRAKONID:
+                case NPC_BRONZE_DRAKONID:
+                case NPC_CHROMATIC_DRAKONID:
+                case NPC_GREEN_DRAKONID:
+                case NPC_RED_DRAKONID:
+                    if (Creature* nefarius = instance->GetCreature(victorNefariusGUID))
+                    {
+                        if (CreatureAI* nefariusAI = nefarius->AI())
+                        {
+                            nefariusAI->JustSummoned(creature);
+                        }
+                    }
+                    if (creature->AI())
+                    {
+                        creature->AI()->DoZoneInCombat();
+                    }
                     break;
                 default:
                     break;
@@ -110,26 +140,36 @@ public:
         {
             InstanceScript::OnGameObjectCreate(go);
 
-            switch(go->GetEntry())
+            switch (go->GetEntry())
             {
                 case GO_BLACK_DRAGON_EGG:
                     if (GetBossState(DATA_FIREMAW) == DONE)
+                    {
                         go->SetPhaseMask(2, true);
+                    }
                     else
+                    {
                         EggList.push_back(go->GetGUID());
+                    }
                     break;
-
                 case GO_PORTCULLIS_RAZORGORE:
                 case GO_PORTCULLIS_VAELASTRASZ:
                 case GO_PORTCULLIS_BROODLORD:
                 case GO_PORTCULLIS_THREEDRAGONS:
+                    AddDoor(go, true);
+                    break;
                 case GO_PORTCULLIS_NEFARIAN:
                     AddDoor(go, true);
+                    nefarianDoorGUID = go->GetGUID();
+                    if (GetBossState(DATA_CHROMAGGUS) != DONE)
+                    {
+                        HandleGameObject(ObjectGuid::Empty, false, go);
+                    }
                     break;
                 case GO_PORTCULLIS_CHROMAGGUS:
                     AddDoor(go, true);
                     chromaggusDoorGUID = go->GetGUID();
-                    go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                    go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
                 default:
                     break;
@@ -145,17 +185,32 @@ public:
 
             switch (go->GetEntry())
             {
-            case GO_PORTCULLIS_RAZORGORE:
-            case GO_PORTCULLIS_VAELASTRASZ:
-            case GO_PORTCULLIS_BROODLORD:
-            case GO_PORTCULLIS_THREEDRAGONS:
-            case GO_PORTCULLIS_CHROMAGGUS:
-            case GO_PORTCULLIS_NEFARIAN:
-                AddDoor(go, false);
-                break;
-            default:
-                break;
+                case GO_PORTCULLIS_RAZORGORE:
+                case GO_PORTCULLIS_VAELASTRASZ:
+                case GO_PORTCULLIS_BROODLORD:
+                case GO_PORTCULLIS_THREEDRAGONS:
+                case GO_PORTCULLIS_CHROMAGGUS:
+                case GO_PORTCULLIS_NEFARIAN:
+                    AddDoor(go, false);
+                    break;
+                default:
+                    break;
             }
+        }
+
+        uint32 GetData(uint32 data) const override
+        {
+            switch (data)
+            {
+                case DATA_NEFARIAN_LEFT_TUNNEL:
+                    return NefarianLeftTunnel;
+                case DATA_NEFARIAN_RIGHT_TUNNEL:
+                    return NefarianRightTunnel;
+                default:
+                    break;
+            }
+
+            return 0;
         }
 
         bool CheckRequiredBosses(uint32 bossId, Player const* /* player */) const override
@@ -190,10 +245,21 @@ public:
                     if (state == DONE)
                     {
                         for (ObjectGuid const& guid : EggList)
+                        {
+                            // Eggs should be destroyed instead
+                            // @todo: after dynamic spawns
                             if (GameObject* egg = instance->GetGameObject(guid))
+                            {
                                 egg->SetPhaseMask(2, true);
+                            }
+                        }
                     }
-                    SetData(DATA_EGG_EVENT, NOT_STARTED);
+                    break;
+                case DATA_CHROMAGGUS:
+                    if (state == DONE)
+                    {
+                        HandleGameObject(nefarianDoorGUID, true);
+                    }
                     break;
                 case DATA_NEFARIAN:
                     switch (state)
@@ -221,7 +287,7 @@ public:
                 switch (data)
                 {
                     case IN_PROGRESS:
-                        _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 45000);
+                        _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 45 * IN_MILLISECONDS);
                         EggEvent = data;
                         EggCount = 0;
                         break;
@@ -229,15 +295,28 @@ public:
                         _events.CancelEvent(EVENT_RAZOR_SPAWN);
                         EggEvent = data;
                         EggCount = 0;
+
+                        for (ObjectGuid const& guid : EggList)
+                        {
+                            DoRespawnGameObject(guid, 0);
+                        }
+
+                        DoRespawnCreature(DATA_GRETHOK);
+
+                        for (ObjectGuid const& guid : guardList)
+                        {
+                            DoRespawnCreature(guid);
+                        }
+
                         break;
                     case SPECIAL:
-                        if (++EggCount == 15)
+                        if (++EggCount >= EggList.size())
                         {
                             if (Creature* razor = instance->GetCreature(razorgoreGUID))
                             {
                                 SetData(DATA_EGG_EVENT, DONE);
-                                razor->RemoveAurasDueToSpell(42013); // MindControl
-                                DoRemoveAurasDueToSpellOnPlayers(42013);
+                                razor->RemoveAurasDueToSpell(19832); // MindControl
+                                DoRemoveAurasDueToSpellOnPlayers(19832);
                             }
                             _events.ScheduleEvent(EVENT_RAZOR_PHASE_TWO, 1000);
                             _events.CancelEvent(EVENT_RAZOR_SPAWN);
@@ -247,6 +326,16 @@ public:
                         break;
                 }
             }
+
+            if (type == DATA_NEFARIAN_LEFT_TUNNEL)
+            {
+                NefarianLeftTunnel = data;
+            }
+
+            if (type == DATA_NEFARIAN_RIGHT_TUNNEL)
+            {
+                NefarianRightTunnel = data;
+            }
         }
 
         ObjectGuid GetGuidData(uint32 type) const override
@@ -255,6 +344,8 @@ public:
             {
                 case DATA_RAZORGORE_THE_UNTAMED:
                     return razorgoreGUID;
+                case DATA_LORD_VICTOR_NEFARIUS:
+                    return victorNefariusGUID;
                 case DATA_CHROMAGGUS:
                     return chromaggusGUID;
                 case DATA_GO_CHROMAGGUS_DOOR:
@@ -266,11 +357,72 @@ public:
             return ObjectGuid::Empty;
         }
 
+        void SetGuidData(uint32 type, ObjectGuid data) override
+        {
+            switch (type)
+            {
+                case DATA_LORD_VICTOR_NEFARIUS:
+                    victorNefariusGUID = data;
+                    break;
+                default:
+                    break;
+            }
+        }
+
         void OnUnitDeath(Unit* unit) override
         {
-            //! HACK, needed because of buggy CreatureAI after charm
-            if (unit->GetEntry() == NPC_RAZORGORE && GetBossState(DATA_RAZORGORE_THE_UNTAMED) != DONE)
-                SetBossState(DATA_RAZORGORE_THE_UNTAMED, DONE);
+            switch (unit->GetEntry())
+            {
+                case NPC_RAZORGORE:
+                    //! HACK, needed because of buggy CreatureAI after charm
+                    if (EggEvent == DONE)
+                    {
+                        if (unit->GetEntry() == NPC_RAZORGORE && GetBossState(DATA_RAZORGORE_THE_UNTAMED) != DONE)
+                        {
+                            SetBossState(DATA_RAZORGORE_THE_UNTAMED, DONE);
+                        }
+                    }
+                    else
+                    {
+                        _events.CancelEvent(EVENT_RAZOR_SPAWN);
+                    }
+                    break;
+                case NPC_BLACK_DRAKONID:
+                case NPC_BLUE_DRAKONID:
+                case NPC_BRONZE_DRAKONID:
+                case NPC_CHROMATIC_DRAKONID:
+                case NPC_GREEN_DRAKONID:
+                case NPC_RED_DRAKONID:
+                    if (Creature* summon = unit->ToTempSummon())
+                    {
+                        summon->SetCorpseDelay(DAY * IN_MILLISECONDS);
+                        summon->UpdateEntry(NPC_BONE_CONSTRUCT);
+                        summon->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                        summon->SetReactState(REACT_PASSIVE);
+                        summon->SetStandState(UNIT_STAND_STATE_DEAD);
+
+                        if (Creature* nefarius = instance->GetCreature(victorNefariusGUID))
+                        {
+                            if (nefarius->AI())
+                            {
+                                nefarius->AI()->DoAction(ACTION_NEFARIUS_ADD_KILLED);
+                            }
+                        }
+                        else // Something happened, try another way
+                        {
+                            if (Creature* nefarius = summon->FindNearestCreature(NPC_VICTOR_NEFARIUS, 500.f, true))
+                            {
+                                victorNefariusGUID = nefarius->GetGUID();
+
+                                if (nefarius->AI())
+                                {
+                                    nefarius->AI()->DoAction(ACTION_NEFARIUS_ADD_KILLED);
+                                }
+                            }
+                        }
+                    }
+                    break;
+            }
         }
 
         void Update(uint32 diff) override
@@ -285,10 +437,18 @@ public:
                 switch (eventId)
                 {
                     case EVENT_RAZOR_SPAWN:
-                        for (uint8 i = urand(2, 5); i > 0; --i)
-                            if (Creature* summon = instance->SummonCreature(Entry[urand(0, 4)], SummonPosition[urand(0, 7)]))
-                                summon->AI()->DoZoneInCombat();
-                        _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 12000, 17000);
+                        if (EggEvent == IN_PROGRESS)
+                        {
+                            for (uint8 i = urand(2, 5); i > 0; --i)
+                            {
+                                if (Creature* summon = instance->SummonCreature(Entry[urand(0, 2)], SummonPosition[urand(0, 7)]))
+                                {
+                                    summon->AI()->DoZoneInCombat();
+                                }
+                            }
+
+                            _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 12000, 17000);
+                        }
                         break;
                     case EVENT_RAZOR_PHASE_TWO:
                         _events.CancelEvent(EVENT_RAZOR_SPAWN);
@@ -308,23 +468,77 @@ public:
             }
         }
 
+        std::string GetSaveData() override
+        {
+            OUT_SAVE_INST_DATA;
+
+            std::ostringstream saveStream;
+            saveStream << "B W L " << GetBossSaveData() << NefarianLeftTunnel << ' ' << NefarianRightTunnel;
+
+            OUT_SAVE_INST_DATA_COMPLETE;
+            return saveStream.str();
+        }
+
+        void Load(char const* data) override
+        {
+            if (!data)
+            {
+                OUT_LOAD_INST_DATA_FAIL;
+                return;
+            }
+
+            OUT_LOAD_INST_DATA(data);
+
+            char dataHead1, dataHead2, dataHead3;
+
+            std::istringstream loadStream(data);
+            loadStream >> dataHead1 >> dataHead2 >> dataHead3;
+
+            if (dataHead1 == 'B' && dataHead2 == 'W' && dataHead3 == 'L')
+            {
+                for (uint32 i = 0; i < EncounterCount; ++i)
+                {
+                    uint32 tmpState;
+                    loadStream >> tmpState;
+                    if (tmpState == IN_PROGRESS || tmpState == FAIL || tmpState > SPECIAL)
+                        tmpState = NOT_STARTED;
+                    SetBossState(i, EncounterState(tmpState));
+                }
+
+                loadStream >> NefarianLeftTunnel;
+                loadStream >> NefarianRightTunnel;
+            }
+            else
+            {
+                OUT_LOAD_INST_DATA_FAIL;
+            }
+
+            OUT_LOAD_INST_DATA_COMPLETE;
+        }
+
     protected:
         ObjectGuid razorgoreGUID;
         ObjectGuid chromaggusGUID;
         ObjectGuid chromaggusDoorGUID;
         ObjectGuid nefarianGUID;
+        ObjectGuid nefarianDoorGUID;
         ObjectGuid victorNefariusGUID;
 
         // Razorgore
         uint8 EggCount;
         uint32 EggEvent;
         GuidList EggList;
+        GuidList guardList;
+
+        // Nefarian
+        uint32 NefarianLeftTunnel;
+        uint32 NefarianRightTunnel;
 
         // Misc
         EventMap _events;
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_blackwing_lair_InstanceMapScript(map);
     }
@@ -365,7 +579,7 @@ public:
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_bwl_shadowflame_SpellScript;
     }
