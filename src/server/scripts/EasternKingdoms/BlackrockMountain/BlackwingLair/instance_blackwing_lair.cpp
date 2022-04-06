@@ -169,7 +169,7 @@ public:
                 case GO_PORTCULLIS_CHROMAGGUS:
                     AddDoor(go, true);
                     chromaggusDoorGUID = go->GetGUID();
-                    go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                    go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
                 default:
                     break;
@@ -393,8 +393,9 @@ public:
                 case NPC_CHROMATIC_DRAKONID:
                 case NPC_GREEN_DRAKONID:
                 case NPC_RED_DRAKONID:
-                    if (Creature* summon = unit->ToCreature())
+                    if (Creature* summon = unit->ToTempSummon())
                     {
+                        summon->SetCorpseDelay(DAY * IN_MILLISECONDS);
                         summon->UpdateEntry(NPC_BONE_CONSTRUCT);
                         summon->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         summon->SetReactState(REACT_PASSIVE);
@@ -405,6 +406,18 @@ public:
                             if (nefarius->AI())
                             {
                                 nefarius->AI()->DoAction(ACTION_NEFARIUS_ADD_KILLED);
+                            }
+                        }
+                        else // Something happened, try another way
+                        {
+                            if (Creature* nefarius = summon->FindNearestCreature(NPC_VICTOR_NEFARIUS, 500.f, true))
+                            {
+                                victorNefariusGUID = nefarius->GetGUID();
+
+                                if (nefarius->AI())
+                                {
+                                    nefarius->AI()->DoAction(ACTION_NEFARIUS_ADD_KILLED);
+                                }
                             }
                         }
                     }

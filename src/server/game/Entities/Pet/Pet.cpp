@@ -290,7 +290,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
     SetNativeDisplayId(petInfo->DisplayId);
     UpdatePositionData();
     uint8 petlevel = petInfo->Level;
-    SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+    ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
     SetName(petInfo->Name);
 
     switch (getPetType())
@@ -621,7 +621,7 @@ void Pet::setDeathState(DeathState s, bool /*despawn = false*/)                 
         if (getPetType() == HUNTER_PET)
         {
             // pet corpse non lootable and non skinnable
-            SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_NONE);
+            ReplaceAllDynamicFlags(UNIT_DYNFLAG_NONE);
             RemoveUnitFlag(UNIT_FLAG_SKINNABLE);
 
             //lose happiness when died and not in BG/Arena
@@ -991,7 +991,7 @@ bool Pet::CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phas
     SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, 0);
     SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
     SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, uint32(sObjectMgr->GetXPForLevel(getLevel() + 1)* sWorld->getRate(RATE_XP_PET_NEXT_LEVEL)));
-    SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+    ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
 
     if (cinfo->type == CREATURE_TYPE_BEAST)
     {

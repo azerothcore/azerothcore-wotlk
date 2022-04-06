@@ -181,7 +181,7 @@ public:
             {
                 events.SetPhase(PHASE_NONE);
                 me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 me->SetFaction(FACTION_MAJORDOMO_FRIENDLY);
             }
         }
@@ -504,7 +504,7 @@ public:
         {
             if (events.IsInPhase(PHASE_DEFEAT_OUTRO) && spellInfo->Id == SPELL_TELEPORT_SELF)
             {
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 me->SetHomePosition(MajordomoRagnaros);
                 me->NearTeleportTo(MajordomoRagnaros.GetPositionX(), MajordomoRagnaros.GetPositionY(), MajordomoRagnaros.GetPositionZ(), MajordomoRagnaros.GetOrientation());
                 events.SetPhase(PHASE_NONE);
@@ -558,7 +558,7 @@ public:
             case GOSSIP_ACTION_INFO_DEF+3:
             {
                 CloseGossipMenuFor(player);
-                creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 creature->AI()->Talk(SAY_RAG_SUM_1, player);
                 creature->AI()->DoAction(ACTION_START_RAGNAROS_INTRO);
                 break;

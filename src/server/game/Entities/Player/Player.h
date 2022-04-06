@@ -24,6 +24,7 @@
 #include "CinematicMgr.h"
 #include "DBCStores.h"
 #include "DatabaseEnvFwd.h"
+#include "EnumFlag.h"
 #include "GroupReference.h"
 #include "InstanceSaveMgr.h"
 #include "Item.h"
@@ -463,7 +464,7 @@ enum DrunkenState
 
 #define MAX_DRUNKEN   4
 
-enum PlayerFlags
+enum PlayerFlags : uint32
 {
     PLAYER_FLAGS_GROUP_LEADER      = 0x00000001,
     PLAYER_FLAGS_AFK               = 0x00000002,
@@ -498,6 +499,8 @@ enum PlayerFlags
     PLAYER_FLAGS_UNK30             = 0x40000000,
     PLAYER_FLAGS_UNK31             = 0x80000000,
 };
+
+DEFINE_ENUM_FLAG(PlayerFlags);
 
 enum PlayerBytesOffsets //@todo: Implement
 {
@@ -1077,6 +1080,12 @@ public:
 
     void Update(uint32 time) override;
 
+    PlayerFlags GetPlayerFlags() const { return PlayerFlags(GetUInt32Value(PLAYER_FLAGS)); }
+    bool HasPlayerFlag(PlayerFlags flags) const { return HasFlag(PLAYER_FLAGS, flags) != 0; }
+    void SetPlayerFlag(PlayerFlags flags) { SetFlag(PLAYER_FLAGS, flags); }
+    void RemovePlayerFlag(PlayerFlags flags) { RemoveFlag(PLAYER_FLAGS, flags); }
+    void ReplaceAllPlayerFlags(PlayerFlags flags) { SetUInt32Value(PLAYER_FLAGS, flags); }
+
     static bool BuildEnumData(PreparedQueryResult result, WorldPacket* data);
 
     void SetInWater(bool apply);
@@ -1096,8 +1105,8 @@ public:
 
     void ToggleAFK();
     void ToggleDND();
-    [[nodiscard]] bool isAFK() const { return HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_AFK); }
-    [[nodiscard]] bool isDND() const { return HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_DND); }
+    [[nodiscard]] bool isAFK() const { return HasPlayerFlag(PLAYER_FLAGS_AFK); }
+    [[nodiscard]] bool isDND() const { return HasPlayerFlag(PLAYER_FLAGS_DND); }
     [[nodiscard]] uint8 GetChatTag() const;
     std::string autoReplyMsg;
 
@@ -1113,7 +1122,7 @@ public:
     void ContinueTaxiFlight();
     // mount_id can be used in scripting calls
 
-    [[nodiscard]] bool IsDeveloper() const { return HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_DEVELOPER); }
+    [[nodiscard]] bool IsDeveloper() const { return HasPlayerFlag(PLAYER_FLAGS_DEVELOPER); }
     void SetDeveloper(bool on) { ApplyModFlag(PLAYER_FLAGS, PLAYER_FLAGS_DEVELOPER, on); }
     [[nodiscard]] bool isAcceptWhispers() const { return m_ExtraFlags & PLAYER_EXTRA_ACCEPT_WHISPERS; }
     void SetAcceptWhispers(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_ACCEPT_WHISPERS; else m_ExtraFlags &= ~PLAYER_EXTRA_ACCEPT_WHISPERS; }
@@ -1801,7 +1810,7 @@ public:
     void ResetContestedPvP()
     {
         ClearUnitState(UNIT_STATE_ATTACK_PLAYER);
-        RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_CONTESTED_PVP);
+        RemovePlayerFlag(PLAYER_FLAGS_CONTESTED_PVP);
         m_contestedPvPTimer = 0;
     }
 

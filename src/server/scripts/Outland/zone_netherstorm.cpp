@@ -265,7 +265,7 @@ public:
         if (action == GOSSIP_ACTION_INFO_DEF + 1)
         {
             CloseGossipMenuFor(player);
-            creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             creature->AI()->DoAction(EVENT_START_PLAYER_READY);
             if (Creature* orelis = creature->FindNearestCreature(EXARCH_ORELIS, 15.0f, true))
                 orelis->AI()->DoAction(EVENT_ORELIS_WALK);
@@ -397,7 +397,7 @@ public:
             if (param == EVENT_KARJA_WALK)
             {
                 me->GetMotionMaster()->MovePath(KARJA_PATH_ID, false);
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             }
             else if (param == RESET_DEATHBLOW_EVENT)
             {
@@ -470,7 +470,7 @@ public:
             if (param == EVENT_ORELIS_WALK)
             {
                 me->GetMotionMaster()->MovePath(ORELIS_PATH_ID, false);
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             }
             else if (param == RESET_DEATHBLOW_EVENT)
             {
@@ -643,7 +643,7 @@ public:
 
             if (GetCreature(ISHANAH_HIGH_PRIESTESS))
             {
-                ishanah->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                ishanah->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                 ishanah->DespawnOrUnsummon(60000);
             }
 
@@ -793,7 +793,7 @@ public:
                         if (Creature* summonIshanah = me->SummonCreature(ISHANAH_HIGH_PRIESTESS, IshanahSpawnPosition, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 180000))
                         {
                             summonIshanah->GetMotionMaster()->MovePath(ISHANAH_PATH_ID, false);
-                            summonIshanah->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                            summonIshanah->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                         }
                         break;
                     case EVENT_ISHANAH_SAY_1:
@@ -853,7 +853,7 @@ public:
                             ishanah->Respawn();
                             ishanah->setActive(true); // ensure that Ishanah disappears, even when no player is near
                             ishanah->DespawnOrUnsummon(600000); // ensure that Ishanah disappears after 10 minutes
-                            ishanah->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                            ishanah->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                         }
                         _actionEvents.ScheduleEvent(EVENT_SOCRETHAR_SAY_6, 3000);
                         break;
@@ -1166,7 +1166,7 @@ public:
             {
                 Talk(SAY_SAEED_2);
                 SetEscortPaused(false);
-                me->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+                me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
             }
         }
 
@@ -1208,7 +1208,7 @@ public:
             {
                 case 16:
                     Talk(SAY_SAEED_1);
-                    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP);
                     SetEscortPaused(true);
                     break;
                 case 18:

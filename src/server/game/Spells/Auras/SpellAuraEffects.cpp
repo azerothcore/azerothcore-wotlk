@@ -1863,7 +1863,7 @@ void AuraEffect::HandleAuraGhost(AuraApplication const* aurApp, uint8 mode, bool
 
     if (apply)
     {
-        target->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST);
+        target->ToPlayer()->SetPlayerFlag(PLAYER_FLAGS_GHOST);
         target->m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_GHOST);
         target->m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_GHOST);
     }
@@ -1872,7 +1872,7 @@ void AuraEffect::HandleAuraGhost(AuraApplication const* aurApp, uint8 mode, bool
         if (target->HasAuraType(SPELL_AURA_GHOST))
             return;
 
-        target->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST);
+        target->ToPlayer()->RemovePlayerFlag(PLAYER_FLAGS_GHOST);
         target->m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
         target->m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
     }
@@ -2582,7 +2582,7 @@ void AuraEffect::HandleFeignDeath(AuraApplication const* aurApp, uint8 mode, boo
         // blizz like 2.0.x
         target->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
         // blizz like 2.0.x
-        target->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+        target->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
 
         target->AddUnitState(UNIT_STATE_DIED);
     }
@@ -2599,7 +2599,7 @@ void AuraEffect::HandleFeignDeath(AuraApplication const* aurApp, uint8 mode, boo
         // blizz like 2.0.x
         target->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
         // blizz like 2.0.x
-        target->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+        target->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
 
         target->ClearUnitState(UNIT_STATE_DIED);
     }
@@ -2770,13 +2770,13 @@ void AuraEffect::HandleAuraAllowOnlyAbility(AuraApplication const* aurApp, uint8
     if (target->GetTypeId() == TYPEID_PLAYER)
     {
         if (apply)
-            target->SetFlag(PLAYER_FLAGS, PLAYER_ALLOW_ONLY_ABILITY);
+            target->ToPlayer()->SetPlayerFlag(PLAYER_ALLOW_ONLY_ABILITY);
         else
         {
             // do not remove unit flag if there are more than this auraEffect of that kind on unit on unit
             if (target->HasAuraType(SPELL_AURA_ALLOW_ONLY_ABILITY))
                 return;
-            target->RemoveFlag(PLAYER_FLAGS, PLAYER_ALLOW_ONLY_ABILITY);
+            target->ToPlayer()->RemovePlayerFlag(PLAYER_ALLOW_ONLY_ABILITY);
         }
     }
 }
@@ -2845,12 +2845,12 @@ void AuraEffect::HandleAuraModStalked(AuraApplication const* aurApp, uint8 mode,
 
     // used by spells: Hunter's Mark, Mind Vision, Syndicate Tracker (MURP) DND
     if (apply)
-        target->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_TRACK_UNIT);
+        target->SetDynamicFlag(UNIT_DYNFLAG_TRACK_UNIT);
     else
     {
         // do not remove unit flag if there are more than this auraEffect of that kind on unit on unit
         if (!target->HasAuraType(GetAuraType()))
-            target->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_TRACK_UNIT);
+            target->RemoveDynamicFlag(UNIT_DYNFLAG_TRACK_UNIT);
     }
 
     // call functions which may have additional effects after chainging state of unit

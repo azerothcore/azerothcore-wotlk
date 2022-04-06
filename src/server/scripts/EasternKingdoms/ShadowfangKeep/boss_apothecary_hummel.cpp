@@ -97,7 +97,7 @@ public:
         {
             if (menuId == GOSSIP_MENU_HUMMEL && gossipListId == GOSSIP_OPTION_START)
             {
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 CloseGossipMenuFor(player);
                 DoAction(ACTION_START_EVENT);
             }
@@ -112,7 +112,7 @@ public:
             summons.DespawnAll();
             me->SetFaction(FACTION_FRIENDLY);
             me->SummonCreatureGroup(1);
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
         }
 
         void JustSummoned(Creature* summon) override

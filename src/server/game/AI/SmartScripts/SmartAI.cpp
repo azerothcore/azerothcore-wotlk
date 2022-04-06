@@ -199,8 +199,8 @@ void SmartAI::StartPath(bool run, uint32 path, bool repeat, Unit* invoker)
 
         if (invoker && invoker->GetTypeId() == TYPEID_PLAYER)
         {
-            mEscortNPCFlags = me->GetUInt32Value(UNIT_NPC_FLAGS);
-            me->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+            mEscortNPCFlags = me->GetNpcFlags();
+            me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
         }
 
         Movement::PointsArray pathPoints;
@@ -287,7 +287,7 @@ void SmartAI::EndPath(bool fail)
 
     if (mEscortNPCFlags)
     {
-        me->SetUInt32Value(UNIT_NPC_FLAGS, mEscortNPCFlags);
+        me->ReplaceAllNpcFlags(NPCFlags(mEscortNPCFlags));
         mEscortNPCFlags = 0;
     }
 

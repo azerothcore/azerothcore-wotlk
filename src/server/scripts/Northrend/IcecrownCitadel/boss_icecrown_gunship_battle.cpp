@@ -758,9 +758,9 @@ public:
 
         void sGossipSelect(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/) override
         {
-            if (!me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
+            if (!me->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
                 return;
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->GetTransport()->setActive(true);
             me->GetTransport()->ToMotionTransport()->EnableMovement(true);
             _events.ScheduleEvent(EVENT_INTRO_H_1, 5000);
@@ -1093,9 +1093,9 @@ public:
 
         void sGossipSelect(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/) override
         {
-            if (!me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
+            if (!me->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
                 return;
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->GetTransport()->setActive(true);
             me->GetTransport()->ToMotionTransport()->EnableMovement(true);
             _events.ScheduleEvent(EVENT_INTRO_A_1, 5000);
