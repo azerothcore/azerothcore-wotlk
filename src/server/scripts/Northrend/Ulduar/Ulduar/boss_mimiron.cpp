@@ -335,7 +335,7 @@ public:
             ResetGameObjects();
             events.Reset();
             summons.DespawnAll();
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
             if (pInstance && pInstance->GetData(TYPE_MIMIRON) != DONE)
                 pInstance->SetData(TYPE_MIMIRON, NOT_STARTED);
@@ -358,7 +358,7 @@ public:
             me->setActive(true);
             DoZoneInCombat();
             me->RemoveAllAuras();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             events.Reset();
 
             if (Creature* c = GetLMK2())
@@ -818,9 +818,14 @@ public:
                     me->Yell(TEXT_VOLTRON_DEATH, LANG_UNIVERSAL);
                     me->PlayDirectSound(SOUND_VOLTRON_DEATH);
                     // spawn chest
-                    if( uint32 chestId = (hardmode ? RAID_MODE(GO_MIMIRON_CHEST_HARD, GO_MIMIRON_CHEST_HERO_HARD) : RAID_MODE(GO_MIMIRON_CHEST, GO_MIMIRON_CHEST_HERO)) )
-                        if( GameObject* go = me->SummonGameObject(chestId, 2744.65f, 2569.46f, 364.397f, 0, 0, 0, 0, 0, 0) )
-                            go->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
+                    if (uint32 chestId = (hardmode ? RAID_MODE(GO_MIMIRON_CHEST_HARD, GO_MIMIRON_CHEST_HERO_HARD) : RAID_MODE(GO_MIMIRON_CHEST, GO_MIMIRON_CHEST_HERO)))
+                    {
+                        if (GameObject* go = me->SummonGameObject(chestId, 2744.65f, 2569.46f, 364.397f, 0, 0, 0, 0, 0, 0))
+                        {
+                            go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
+                            go->SetLootRecipient(me->GetMap());
+                        }
+                    }
                     events.ScheduleEvent(EVENT_DISAPPEAR, 15000);
                     break;
                 case EVENT_DISAPPEAR:
@@ -901,7 +906,7 @@ public:
                 {
                     button->SetLootState(GO_READY);
                     button->UseDoorOrButton(0, false);
-                    button->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
+                    button->RemoveGameObjectFlag(GO_FLAG_IN_USE);
                 }
         }
 
@@ -1025,8 +1030,8 @@ public:
                 c->ExitVehicle(); // this should never happen!
             if (Creature* c = me->SummonCreature(NPC_LEVIATHAN_MKII_CANNON, *me, TEMPSUMMON_MANUAL_DESPAWN))
                 c->EnterVehicle(me, 3);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             me->SetReactState(REACT_AGGRESSIVE);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
 
@@ -1045,7 +1050,7 @@ public:
                         break;
                     case 1:
                         Phase = 1;
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         if (Unit* target = SelectTargetFromPlayerList(75.0f))
                             AttackStart(target);
                         DoZoneInCombat();
@@ -1062,7 +1067,7 @@ public:
                         me->SetReactState(REACT_AGGRESSIVE);
                         DoResetThreat();
                         Phase = 4;
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         if (Unit* target = SelectTargetFromPlayerList(75.0f))
                             AttackStart(target);
                         DoZoneInCombat();
@@ -1084,9 +1089,9 @@ public:
                 me->SetReactState(REACT_PASSIVE);
                 if (Phase == 1)
                 {
-                    if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+                    if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                     {
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         me->GetMotionMaster()->Clear();
                         me->AttackStop();
                         me->SetReactState(REACT_PASSIVE);
@@ -1102,9 +1107,9 @@ public:
                 }
                 else if (Phase == 4)
                 {
-                    if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+                    if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                     {
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                         me->InterruptNonMeleeSpells(false);
                         me->RemoveAllAurasExceptType(SPELL_AURA_CONTROL_VEHICLE);
                         me->CastSpell(me, SPELL_SELF_REPAIR, false);
@@ -1259,7 +1264,7 @@ public:
         {
             if( spell->Id == SPELL_SELF_REPAIR )
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetReactState(REACT_AGGRESSIVE);
             }
         }
@@ -1321,7 +1326,7 @@ public:
                         Phase = 2;
                         fighting = true;
                         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_SPELL_CAST_OMNI);
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         events.Reset();
                         events.ScheduleEvent(EVENT_SPELL_HEAT_WAVE, 10000);
                         events.ScheduleEvent(EVENT_SPELL_ROCKET_STRIKE, 16000);
@@ -1338,7 +1343,7 @@ public:
                     case 4:
                         Phase = 4;
                         fighting = true;
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         events.Reset();
                         events.ScheduleEvent(EVENT_REINSTALL_ROCKETS, 3000);
                         events.ScheduleEvent(EVENT_SPELL_ROCKET_STRIKE, 16000);
@@ -1377,9 +1382,9 @@ public:
                 me->SetReactState(REACT_PASSIVE);
                 if (Phase == 2)
                 {
-                    if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+                    if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                     {
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         SetData(1, 0);
                         me->InterruptNonMeleeSpells(false);
                         me->RemoveAllAurasExceptType(SPELL_AURA_CONTROL_VEHICLE);
@@ -1392,9 +1397,9 @@ public:
                 }
                 else if (Phase == 4)
                 {
-                    if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+                    if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                     {
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                         me->InterruptNonMeleeSpells(false);
                         me->RemoveAllAurasExceptType(SPELL_AURA_CONTROL_VEHICLE);
                         me->CastSpell(me, SPELL_SELF_REPAIR, false);
@@ -1601,7 +1606,7 @@ public:
         {
             if( spell->Id == SPELL_SELF_REPAIR )
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetReactState(REACT_AGGRESSIVE);
             }
         }
@@ -1661,7 +1666,7 @@ public:
                         break;
                     case 3:
                         Phase = 3;
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         if (Unit* target = SelectTargetFromPlayerList(75.0f))
                             AttackStart(target);
                         DoZoneInCombat();
@@ -1678,7 +1683,7 @@ public:
                         me->SetReactState(REACT_AGGRESSIVE);
                         DoResetThreat();
                         Phase = 4;
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         if (Unit* target = SelectTargetFromPlayerList(75.0f))
                             AttackStart(target);
                         DoZoneInCombat();
@@ -1709,9 +1714,9 @@ public:
                 me->SetReactState(REACT_PASSIVE);
                 if (Phase == 3)
                 {
-                    if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+                    if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                     {
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         me->GetMotionMaster()->Clear();
                         me->StopMoving();
                         me->AttackStop();
@@ -1729,9 +1734,9 @@ public:
                 }
                 else if (Phase == 4)
                 {
-                    if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+                    if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                     {
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                         me->InterruptNonMeleeSpells(false);
                         me->RemoveAllAurasExceptType(SPELL_AURA_CONTROL_VEHICLE);
                         me->CastSpell(me, SPELL_SELF_REPAIR, false);
@@ -1930,7 +1935,7 @@ public:
         {
             if( spell->Id == SPELL_SELF_REPAIR )
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetReactState(REACT_AGGRESSIVE);
             }
         }

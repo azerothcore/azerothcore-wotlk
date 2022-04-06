@@ -27,6 +27,7 @@
 #include "GridNotifiers.h"
 #include "Log.h"
 #include "MapMgr.h"
+#include "MiscPackets.h"
 #include "MovementPacketBuilder.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
@@ -582,7 +583,7 @@ uint32 Object::GetUpdateFieldData(Player const* target, uint32*& flags) const
                 if (ToUnit()->GetOwnerGUID() == target->GetGUID())
                     visibleFlag |= UF_FLAG_OWNER;
 
-                if (HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_SPECIALINFO))
+                if (HasDynamicFlag(UNIT_DYNFLAG_SPECIALINFO))
                     if (ToUnit()->HasAuraTypeWithCaster(SPELL_AURA_EMPATHY, target->GetGUID()))
                         visibleFlag |= UF_FLAG_SPECIAL_INFO;
 
@@ -1044,7 +1045,7 @@ void MovementInfo::OutDebug()
 }
 
 WorldObject::WorldObject(bool isWorldObject) : WorldLocation(),
-    LastUsedScriptID(0), m_name(""), m_isActive(false), m_visibilityDistanceOverride(false), m_isWorldObject(isWorldObject), m_zoneScript(nullptr),
+    LastUsedScriptID(0), m_name(""), m_isActive(false), m_visibilityDistanceOverride(), m_isWorldObject(isWorldObject), m_zoneScript(nullptr),
     _zoneId(0), _areaId(0), _floorZ(INVALID_HEIGHT), _outdoors(false), _liquidData(), _updatePositionData(false), m_transport(nullptr),
     m_currMap(nullptr), m_InstanceId(0), m_phaseMask(PHASEMASK_NORMAL), m_useCombinedPhases(true), m_notifyflags(0), m_executed_notifies(0)
 {
@@ -1620,7 +1621,7 @@ float WorldObject::GetGridActivationRange() const
 {
     if (ToPlayer())
     {
-        if (ToPlayer()->IsOnCinematic())
+        if (ToPlayer()->GetCinematicMgr()->IsOnCinematic())
         {
             return DEFAULT_VISIBILITY_INSTANCE;
         }
@@ -1687,7 +1688,7 @@ float WorldObject::GetSightRange(WorldObject const* target) const
                     {
                         return MAX_VISIBILITY_DISTANCE;
                     }
-                    else if (ToPlayer()->IsOnCinematic())
+                    else if (ToPlayer()->GetCinematicMgr()->IsOnCinematic())
                     {
                         return DEFAULT_VISIBILITY_INSTANCE;
                     }
@@ -2271,8 +2272,8 @@ void WorldObject::SetZoneScript()
 {
     if (Map* map = FindMap())
     {
-        if (map->IsDungeon())
-            m_zoneScript = (ZoneScript*)map->ToInstanceMap()->GetInstanceScript();
+        if (InstanceMap* instanceMap = map->ToInstanceMap())
+            m_zoneScript = reinterpret_cast<ZoneScript*>(instanceMap->GetInstanceScript());
         else if (!map->IsBattlegroundOrArena())
         {
             uint32 zoneId = GetZoneId();
@@ -2809,36 +2810,29 @@ void WorldObject::SetPhaseMask(uint32 newPhaseMask, bool update)
 
 void WorldObject::PlayDistanceSound(uint32 sound_id, Player* target /*= nullptr*/)
 {
-    WorldPacket data(SMSG_PLAY_OBJECT_SOUND, 4 + 8);
-    data << uint32(sound_id);
-    data << GetGUID();
     if (target)
-        target->SendDirectMessage(&data);
+        target->SendDirectMessage(WorldPackets::Misc::PlayObjectSound(GetGUID(), sound_id).Write());
     else
-        SendMessageToSet(&data, true);
+        SendMessageToSet(WorldPackets::Misc::PlayObjectSound(GetGUID(), sound_id).Write(), true);
 }
 
 void WorldObject::PlayDirectSound(uint32 sound_id, Player* target /*= nullptr*/)
 {
-    WorldPacket data(SMSG_PLAY_SOUND, 4);
-    data << uint32(sound_id);
     if (target)
-        target->SendDirectMessage(&data);
+        target->SendDirectMessage(WorldPackets::Misc::Playsound(sound_id).Write());
     else
-        SendMessageToSet(&data, true);
+        SendMessageToSet(WorldPackets::Misc::Playsound(sound_id).Write(), true);
 }
 
 void WorldObject::PlayDirectMusic(uint32 music_id, Player* target /*= nullptr*/)
 {
-    WorldPacket data(SMSG_PLAY_MUSIC, 4);
-    data << uint32(music_id);
     if (target)
     {
-        target->SendDirectMessage(&data);
+        target->SendDirectMessage(WorldPackets::Misc::PlayMusic(music_id).Write());
     }
     else
     {
-        SendMessageToSet(&data, true);
+        SendMessageToSet(WorldPackets::Misc::PlayMusic(music_id).Write(), true);
     }
 }
 

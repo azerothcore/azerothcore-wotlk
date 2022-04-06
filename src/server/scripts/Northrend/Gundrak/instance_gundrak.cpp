@@ -176,15 +176,15 @@ public:
             {
                 case DATA_SLAD_RAN:
                     if (GameObject* altar = instance->GetGameObject(_sladRanAltarGUID))
-                        altar->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        altar->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
                 case DATA_MOORABI:
                     if (GameObject* altar = instance->GetGameObject(_moorabiAltarGUID))
-                        altar->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        altar->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
                 case DATA_DRAKKARI_COLOSSUS:
                     if (GameObject* altar = instance->GetGameObject(_drakkariAltarGUID))
-                        altar->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        altar->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
                 case DATA_ECK_THE_FEROCIOUS_INIT:
                     {

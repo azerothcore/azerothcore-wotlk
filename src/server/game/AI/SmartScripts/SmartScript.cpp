@@ -719,7 +719,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(e.action.cast.spell);
                             int32 currentPower = me->GetPower(GetCasterPowerType());
 
-                            if ((spellInfo && (currentPower < spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()) || me->IsSpellProhibited(spellInfo->GetSchoolMask()))) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED))
+                            if ((spellInfo && (currentPower < spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()) || me->IsSpellProhibited(spellInfo->GetSchoolMask()))) || me->HasUnitFlag(UNIT_FLAG_SILENCED))
                             {
                                 SetCasterActualDist(0);
                                 CAST_AI(SmartAI, me->AI())->SetForcedCombatMove(0);
@@ -897,13 +897,13 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     {
                         if (!e.action.unitFlag.type)
                         {
-                            (*itr)->ToUnit()->SetFlag(UNIT_FIELD_FLAGS, e.action.unitFlag.flag);
+                            (*itr)->ToUnit()->SetUnitFlag(UnitFlags(e.action.unitFlag.flag));
                             LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_SET_UNIT_FLAG. Unit {} added flag {} to UNIT_FIELD_FLAGS",
                             (*itr)->GetGUID().ToString(), e.action.unitFlag.flag);
                         }
                         else
                         {
-                            (*itr)->ToUnit()->SetFlag(UNIT_FIELD_FLAGS_2, e.action.unitFlag.flag);
+                            (*itr)->ToUnit()->SetUnitFlag2(UnitFlags2(e.action.unitFlag.flag));
                             LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_SET_UNIT_FLAG. Unit {} added flag {} to UNIT_FIELD_FLAGS_2",
                             (*itr)->GetGUID().ToString(), e.action.unitFlag.flag);
                         }
@@ -925,13 +925,13 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     {
                         if (!e.action.unitFlag.type)
                         {
-                            (*itr)->ToUnit()->RemoveFlag(UNIT_FIELD_FLAGS, e.action.unitFlag.flag);
+                            (*itr)->ToUnit()->RemoveUnitFlag(UnitFlags(e.action.unitFlag.flag));
                             LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_REMOVE_UNIT_FLAG. Unit {} removed flag {} to UNIT_FIELD_FLAGS",
                             (*itr)->GetGUID().ToString(), e.action.unitFlag.flag);
                         }
                         else
                         {
-                            (*itr)->ToUnit()->RemoveFlag(UNIT_FIELD_FLAGS_2, e.action.unitFlag.flag);
+                            (*itr)->ToUnit()->RemoveUnitFlag2(UnitFlags2(e.action.unitFlag.flag));
                             LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_REMOVE_UNIT_FLAG. Unit {} removed flag {} to UNIT_FIELD_FLAGS_2",
                             (*itr)->GetGUID().ToString(), e.action.unitFlag.flag);
                         }
@@ -2201,7 +2201,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                 for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
                     if (IsCreature(*itr))
-                        (*itr)->ToUnit()->SetUInt32Value(UNIT_NPC_FLAGS, e.action.flag.flag);
+                        (*itr)->ToUnit()->ReplaceAllNpcFlags(NPCFlags(e.action.flag.flag));
 
                 delete targets;
                 break;
@@ -2214,7 +2214,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                 for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
                     if (IsCreature(*itr))
-                        (*itr)->ToUnit()->SetFlag(UNIT_NPC_FLAGS, e.action.flag.flag);
+                        (*itr)->ToUnit()->SetNpcFlag(NPCFlags(e.action.flag.flag));
 
                 delete targets;
                 break;
@@ -2227,7 +2227,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                 for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
                     if (IsCreature(*itr))
-                        (*itr)->ToUnit()->RemoveFlag(UNIT_NPC_FLAGS, e.action.flag.flag);
+                        (*itr)->ToUnit()->RemoveNpcFlag(NPCFlags(e.action.flag.flag));
 
                 delete targets;
                 break;
@@ -2462,7 +2462,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                 for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
                     if (IsUnit(*itr))
-                        (*itr)->ToUnit()->SetUInt32Value(UNIT_DYNAMIC_FLAGS, e.action.flag.flag);
+                        (*itr)->ToUnit()->ReplaceAllDynamicFlags(e.action.flag.flag);
 
                 delete targets;
                 break;
@@ -2475,7 +2475,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                 for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
                     if (IsUnit(*itr))
-                        (*itr)->ToUnit()->SetFlag(UNIT_DYNAMIC_FLAGS, e.action.flag.flag);
+                        (*itr)->ToUnit()->SetDynamicFlag(e.action.flag.flag);
 
                 delete targets;
                 break;
@@ -2488,7 +2488,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                 for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
                     if (IsUnit(*itr))
-                        (*itr)->ToUnit()->RemoveFlag(UNIT_DYNAMIC_FLAGS, e.action.flag.flag);
+                        (*itr)->ToUnit()->RemoveDynamicFlag(e.action.flag.flag);
 
                 delete targets;
                 break;
@@ -2714,7 +2714,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                 for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
                     if (IsGameObject(*itr))
-                        (*itr)->ToGameObject()->SetUInt32Value(GAMEOBJECT_FLAGS, e.action.goFlag.flag);
+                        (*itr)->ToGameObject()->ReplaceAllGameObjectFlags((GameObjectFlags)e.action.goFlag.flag);
 
                 delete targets;
                 break;
@@ -2727,7 +2727,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                 for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
                     if (IsGameObject(*itr))
-                        (*itr)->ToGameObject()->SetFlag(GAMEOBJECT_FLAGS, e.action.goFlag.flag);
+                        (*itr)->ToGameObject()->SetGameObjectFlag((GameObjectFlags)e.action.goFlag.flag);
 
                 delete targets;
                 break;
@@ -2740,7 +2740,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                 for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
                     if (IsGameObject(*itr))
-                        (*itr)->ToGameObject()->RemoveFlag(GAMEOBJECT_FLAGS, e.action.goFlag.flag);
+                        (*itr)->ToGameObject()->RemoveGameObjectFlag((GameObjectFlags)e.action.goFlag.flag);
 
                 delete targets;
                 break;
@@ -3878,6 +3878,10 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
                     {
                         l->push_back(owner);
                     }
+                    else if (me->IsSummon() && me->ToTempSummon()->GetSummonerUnit())
+                    {
+                        l->push_back(me->ToTempSummon()->GetSummonerUnit());
+                    }
                 }
                 else if (go)
                 {
@@ -4430,6 +4434,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             {
                 if (e.event.quest.quest && var0 != e.event.quest.quest)
                     return;
+                RecalcTimer(e, e.event.quest.cooldownMin, e.event.quest.cooldownMax);
                 ProcessAction(e, unit, var0);
                 break;
             }

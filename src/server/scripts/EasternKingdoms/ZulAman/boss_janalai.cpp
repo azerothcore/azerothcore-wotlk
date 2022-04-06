@@ -274,9 +274,9 @@ public:
             {
                 if (Unit* FireBomb = ObjectAccessor::GetUnit(*me, FireBombGUIDs[BombCount]))
                 {
-                    FireBomb->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    FireBomb->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     DoCast(FireBomb, SPELL_FIRE_BOMB_THROW, true);
-                    FireBomb->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    FireBomb->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 }
                 ++BombCount;
                 if (BombCount == 40)

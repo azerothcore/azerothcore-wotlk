@@ -121,12 +121,20 @@ bool Map::ExistVMap(uint32 mapid, int gx, int gy)
     {
         if (vmgr->isMapLoadingEnabled())
         {
-            bool exists = vmgr->existsMap((sWorld->GetDataPath() + "vmaps").c_str(),  mapid, gx, gy);
-            if (!exists)
+            VMAP::LoadResult result = vmgr->existsMap((sWorld->GetDataPath() + "vmaps").c_str(), mapid, gx, gy);
+            std::string name = vmgr->getDirFileName(mapid, gx, gy);
+            switch (result)
             {
-                std::string name = vmgr->getDirFileName(mapid, gx, gy);
-                LOG_ERROR("maps", "VMap file '{}' is missing or points to wrong version of vmap file. Redo vmaps with latest version of vmap_assembler.exe.", (sWorld->GetDataPath() + "vmaps/" + name));
-                return false;
+                case VMAP::LoadResult::Success:
+                    break;
+                case VMAP::LoadResult::FileNotFound:
+                    LOG_ERROR("maps", "VMap file '{}' does not exist", (sWorld->GetDataPath() + "vmaps/" + name));
+                    LOG_ERROR("maps", "Please place VMAP files (*.vmtree and *.vmtile) in the vmap directory ({}), or correct the DataDir setting in your worldserver.conf file.", (sWorld->GetDataPath() + "vmaps/"));
+                    return false;
+                case VMAP::LoadResult::VersionMismatch:
+                    LOG_ERROR("maps", "VMap file '{}' couldn't be loaded", (sWorld->GetDataPath() + "vmaps/" + name));
+                    LOG_ERROR("maps", "This is because the version of the VMap file and the version of this module are different, please re-extract the maps with the tools compiled with this module.");
+                    return false;
             }
         }
     }
@@ -2797,6 +2805,7 @@ InstanceMap::~InstanceMap()
 {
     delete instance_data;
     instance_data = nullptr;
+    sInstanceSaveMgr->DeleteInstanceSaveIfNeeded(GetInstanceId(), true);
 }
 
 void InstanceMap::InitVisibilityDistance()
@@ -3655,11 +3664,7 @@ void Map::SendZoneDynamicInfo(Player* player)
         return;
 
     if (uint32 music = itr->second.MusicId)
-    {
-        WorldPacket data(SMSG_PLAY_MUSIC, 4);
-        data << uint32(music);
-        player->SendDirectMessage(&data);
-    }
+        player->SendDirectMessage(WorldPackets::Misc::PlayMusic(music).Write());
 
     if (WeatherState weatherId = itr->second.WeatherId)
     {
@@ -3702,13 +3707,13 @@ void Map::SetZoneMusic(uint32 zoneId, uint32 musicId)
     Map::PlayerList const& players = GetPlayers();
     if (!players.IsEmpty())
     {
-        WorldPacket data(SMSG_PLAY_MUSIC, 4);
-        data << uint32(musicId);
+        WorldPackets::Misc::PlayMusic playMusic(musicId);
+        playMusic.Write();
 
         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
             if (Player* player = itr->GetSource())
                 if (player->GetZoneId() == zoneId)
-                    player->SendDirectMessage(&data);
+                    player->SendDirectMessage(playMusic.GetRawPacket());
     }
 }
 

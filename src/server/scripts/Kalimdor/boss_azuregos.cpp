@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameTime.h"
 #include "Player.h"
 #include "ScriptedGossip.h"
 #include "ScriptedCreature.h"
@@ -63,7 +64,7 @@ public:
         {
             me->RemoveAurasDueToSpell(SPELL_MARK_OF_FROST_AURA);
             _scheduler.CancelAll();
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->RestoreFaction();
             me->GetMap()->DoForAllPlayers([&](Player* p)
                 {
@@ -142,6 +143,7 @@ public:
                 });
 
             me->SetRespawnTime(urand(2 * DAY, 3 * DAY));
+            me->SaveRespawnTime();
         }
 
         void UpdateAI(uint32 diff) override

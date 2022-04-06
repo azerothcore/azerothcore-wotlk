@@ -33,14 +33,14 @@ public:
         if (go->GetEntry() == GO_ACCESS_PANEL_HYDRO)
             if (instance->GetData(TYPE_HYDROMANCER_THESPIA) == DONE)
             {
-                go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                 instance->SetData(TYPE_HYDROMANCER_THESPIA, SPECIAL);
             }
 
         if (go->GetEntry() == GO_ACCESS_PANEL_MEK)
             if (instance->GetData(TYPE_MEKGINEER_STEAMRIGGER) == DONE)
             {
-                go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                 instance->SetData(TYPE_MEKGINEER_STEAMRIGGER, SPECIAL);
             }
 
@@ -105,14 +105,14 @@ public:
                 case GO_ACCESS_PANEL_HYDRO:
                     AccessPanelHydro = go->GetGUID();
                     if (GetData(TYPE_HYDROMANCER_THESPIA) == DONE)
-                        go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     else if (GetData(TYPE_HYDROMANCER_THESPIA) == SPECIAL)
                         HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
                 case GO_ACCESS_PANEL_MEK:
                     AccessPanelMek = go->GetGUID();
                     if (GetData(TYPE_MEKGINEER_STEAMRIGGER) == DONE)
-                        go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     else if (GetData(TYPE_MEKGINEER_STEAMRIGGER) == SPECIAL)
                         HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
@@ -132,7 +132,7 @@ public:
                     else if (data == DONE)
                     {
                         if (GameObject* panel = instance->GetGameObject(AccessPanelHydro))
-                            panel->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                            panel->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     }
 
                     m_auiEncounter[type] = data;
@@ -146,7 +146,7 @@ public:
                     else if (data == DONE)
                     {
                         if (GameObject* panel = instance->GetGameObject(AccessPanelMek))
-                            panel->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                            panel->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     }
 
                     m_auiEncounter[type] = data;

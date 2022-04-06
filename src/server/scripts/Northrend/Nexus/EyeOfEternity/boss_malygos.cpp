@@ -237,8 +237,8 @@ public:
             bLockHealthCheck = false;
 
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
+            me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
 
             if (pInstance)
             {
@@ -340,14 +340,14 @@ public:
             if (!victim)
                 return;
 
-            if (me->GetVictim() && me->GetVictim()->GetGUID() == victim->GetGUID() && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED))
+            if (me->GetVictim() && me->GetVictim()->GetGUID() == victim->GetGUID() && !me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED))
             {
                 if (!me->GetGuidValue(UNIT_FIELD_TARGET))
                     me->SetTarget(victim->GetGUID());
             }
             else if (me->Attack(victim, true))
             {
-                if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED))
+                if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED))
                     me->GetMotionMaster()->MoveChase(victim);
                 else
                     me->SetTarget();
@@ -356,7 +356,7 @@ public:
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (damage >= me->GetHealth() && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE)) // allow dying only in phase 3!
+            if (damage >= me->GetHealth() && !me->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE)) // allow dying only in phase 3!
             {
                 damage = 0;
                 return;
@@ -417,7 +417,7 @@ public:
                             pInstance->SetData(DATA_HIDE_IRIS_AND_PORTAL, 0);
                             pInstance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_YOU_DONT_HAVE_AN_ENTERNITY_EVENT);
                         }
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
+                        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
                         if (Unit* target = me->SelectNearestTarget(250.0f))
                         {
                             AttackStart(target);
@@ -460,7 +460,7 @@ public:
                         Talk(SAY_MAGIC_BLAST);
                         EntryCheckPredicate pred(NPC_POWER_SPARK);
                         summons.DoAction(2, pred); // stop following
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+                        me->SetUnitFlag(UNIT_FLAG_PACIFIED);
 
                         me->SendMeleeAttackStop(me->GetVictim());
                         me->SetTarget();
@@ -539,7 +539,7 @@ public:
                                             sScriptMgr->AnticheatSetSkipOnePacketForASH(pPlayer, true);
 
                                             pPlayer->SetGuidValue(PLAYER_FARSIGHT, vp->GetGUID());
-                                            c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                                            c->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                                         }
                                     }
                         }
@@ -556,7 +556,7 @@ public:
                         bLockHealthCheck = false;
                         EntryCheckPredicate pred(NPC_POWER_SPARK);
                         summons.DoAction(1, pred); // resume following
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+                        me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
                         if (Unit* target = me->GetVictim())
                         {
                             AttackStart(target);
@@ -568,7 +568,7 @@ public:
                 case EVENT_START_PHASE_2:
                     events.SetPhase(PHASE_TWO);
                     Talk(SAY_END_P1);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+                    me->SetUnitFlag(UNIT_FLAG_PACIFIED);
                     me->SendMeleeAttackStop();
                     me->SetTarget();
                     me->GetMotionMaster()->MoveIdle();
@@ -588,7 +588,7 @@ public:
                     }
                 case EVENT_START_PHASE_2_MOVE_TO_SIDE:
                     Talk(SAY_PHASE_2);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
                     me->GetMotionMaster()->MovePoint(MI_POINT_CIRCLE_OUTSIDE_PH_2, Phase2NorthPos);
                     events.RescheduleEvent(EVENT_SPELL_ARCANE_STORM, urand(12000, 15000), 1);
                     events.RescheduleEvent(EVENT_SPELL_ARCANE_OVERLOAD, 8000, 1);
@@ -742,8 +742,8 @@ public:
                 case EVENT_START_PHASE_3:
                     events.SetPhase(PHASE_THREE);
                     me->GetMap()->SetZoneOverrideLight(AREA_EYE_OF_ETERNITY, LIGHT_OBSCURE_ARCANE_RUNES, 1s);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED | UNIT_FLAG_DISABLE_MOVE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FLAG_PACIFIED | UNIT_FLAG_DISABLE_MOVE);
                     if (Unit* target = me->GetVictim())
                         AttackStart(target);
                     events.RescheduleEvent(EVENT_SPELL_ARCANE_PULSE, 0, 1);
@@ -818,7 +818,7 @@ public:
         {
             me->SetDisableGravity(true);
             me->GetMap()->SetZoneOverrideLight(AREA_EYE_OF_ETERNITY, LIGHT_GET_DEFAULT_FOR_MAP, 1s);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+            me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
             ScriptedAI::EnterEvadeMode();
         }
 
@@ -1010,14 +1010,14 @@ public:
             if (damage >= me->GetHealth())
             {
                 damage = 0;
-                if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+                if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                 {
                     MoveTimer = 0;
                     me->GetMotionMaster()->MoveIdle();
                     me->DisableSpline();
                     me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), CenterPos.GetPositionZ(), 100.0f);
                     me->SetPosition(me->GetPositionX(), me->GetPositionY(), CenterPos.GetPositionZ(), me->GetOrientation());
-                    me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
+                    me->ReplaceAllUnitFlags(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
                     me->RemoveAura(SPELL_POWER_SPARK_VISUAL);
                     me->CastSpell(me, SPELL_POWER_SPARK_GROUND_BUFF, true);
                     me->DespawnOrUnsummon(60000);
@@ -1027,7 +1027,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+            if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                 return;
 
             if (CheckTimer <= diff)
@@ -1401,8 +1401,15 @@ public:
                     break;
                 case 1:
                     me->CastSpell(773.98f, 1285.97f, 266.254f, SPELL_ALEXSTRASZA_GIFT, true);
-                    me->SummonGameObject(ALEXSTRASZA_GIFT, 773.98f, 1285.97f, 266.254f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0);
-                    me->SummonGameObject(HEART_OF_MAGIC, 773.98f, 1275.97f, 266.254f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0);
+                    if (GameObject* chest = me->SummonGameObject(ALEXSTRASZA_GIFT, 773.98f, 1285.97f, 266.254f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0))
+                    {
+                        chest->SetLootRecipient(me->GetMap());
+                    }
+
+                    if (GameObject* heart = me->SummonGameObject(HEART_OF_MAGIC, 773.98f, 1275.97f, 266.254f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0))
+                    {
+                        heart->SetLootRecipient(me->GetMap());
+                    }
 
                     Talk(SAY_ALEXSTRASZA_ONE);
                     events.RescheduleEvent(2, 6000);

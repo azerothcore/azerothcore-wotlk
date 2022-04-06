@@ -146,7 +146,7 @@ public:
             morlenGUID.Clear();
             summons.DespawnAll();
             if (Creature* c = me->FindNearestCreature(NPC_THALORIEN_REMAINS, 100.0f, true))
-                c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             events.Reset();
             events.ScheduleEvent(EVENT_CHECK_PLAYER, 5000);
             events.ScheduleEvent(EVENT_SUMMON_SOLDIERS, 0);
@@ -372,7 +372,7 @@ public:
                                 continue;
                             else
                                 c->AI()->Talk(SAY_MORLEN_4);
-                            c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                            c->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                             c->AI()->AttackStart(me);
                         }
                     break;
@@ -611,7 +611,7 @@ public:
                     if (Creature* c = me->FindNearestCreature(NPC_SUNWELL_VISUAL_BUNNY, 60.0f, true))
                         c->DespawnOrUnsummon(1);
                     if (GameObject* go = me->FindNearestGameObject(GO_QUEL_DELAR, 60.0f))
-                        go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     me->SetWalk(true);
                     if (me->GetCreatureData())
                         me->GetMotionMaster()->MovePoint(0, me->GetCreatureData()->posX, me->GetCreatureData()->posY, me->GetCreatureData()->posZ);

@@ -154,7 +154,7 @@ public:
         {
             BossAI::EnterEvadeMode();
             if (GameObject* object = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_GONG_OF_BETHEKK)))
-                object->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                object->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
             me->DespawnOrUnsummon(4000);
         }
 
@@ -233,7 +233,7 @@ public:
                             me->AttackStop();
                             DoResetThreat();
                             me->SetReactState(REACT_PASSIVE);
-                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                             DoCast(me, SPELL_VANISH_VISUAL);
                             DoCast(me, SPELL_VANISH);
                             events.ScheduleEvent(EVENT_VANISH, 1000, 0, PHASE_ONE);
@@ -252,7 +252,7 @@ public:
                         break;
                     case EVENT_VISIBLE:
                         me->SetReactState(REACT_AGGRESSIVE);
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             AttackStart(target);
                         me->RemoveAura(SPELL_SUPER_INVIS);
@@ -426,9 +426,9 @@ public:
 
     bool OnGossipHello(Player* /*player*/, GameObject* go) override
     {
-        if (go->GetInstanceScript())
+        if (go->GetInstanceScript() && !go->FindNearestCreature(NPC_ARLOKK, 25.0f))
         {
-            go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+            go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
             go->SendCustomAnim(0);
             go->SummonCreature(NPC_ARLOKK, PosSummonArlokk[0], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 600000);
         }
