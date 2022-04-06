@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "BattlegroundAV.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 
@@ -77,6 +78,11 @@ SpellPair const _auraPairs[MAX_SPELL_PAIRS] =
     { NPC_ICEBLOOD_WARMASTER,       SPELL_ICEBLOOD_WARMASTER }
 };
 
+enum Factions
+{
+    FACTION_AV_ALLIANCE = 1534
+};
+
 class npc_av_marshal_or_warmaster : public CreatureScript
 {
 public:
@@ -102,6 +108,46 @@ public:
         void JustRespawned() override
         {
             Reset();
+        }
+
+        void AttackStart(Unit* victim) override
+        {
+            ScriptedAI::AttackStart(victim);
+
+            // Boss should attack as well
+            if (BattlegroundMap* bgMap = me->GetMap()->ToBattlegroundMap())
+            {
+                if (Battleground* bg = bgMap->GetBG())
+                {
+                    if (Creature* mainBoss = bg->GetBGCreature((me->GetFaction() == FACTION_AV_ALLIANCE ? AV_CPLACE_A_BOSS : AV_CPLACE_H_BOSS)))
+                    {
+                        if (mainBoss->IsAIEnabled && !mainBoss->GetVictim())
+                        {
+                            mainBoss->AI()->AttackStart(victim);
+                        }
+                    }
+                }
+            }
+        }
+
+        void EnterEvadeMode() override
+        {
+            ScriptedAI::EnterEvadeMode();
+
+            // Evade boss
+            if (BattlegroundMap* bgMap = me->GetMap()->ToBattlegroundMap())
+            {
+                if (Battleground* bg = bgMap->GetBG())
+                {
+                    if (Creature* mainBoss = bg->GetBGCreature((me->GetFaction() == FACTION_AV_ALLIANCE ? AV_CPLACE_A_BOSS : AV_CPLACE_H_BOSS)))
+                    {
+                        if (mainBoss->IsAIEnabled && !mainBoss->IsInEvadeMode())
+                        {
+                            mainBoss->AI()->EnterEvadeMode();
+                        }
+                    }
+                }
+            }
         }
 
         void UpdateAI(uint32 diff) override

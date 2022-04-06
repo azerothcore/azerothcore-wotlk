@@ -47,7 +47,7 @@ Modules are essential to AzerothCore's success. Modules allow users to plug them
 We have a lot of modules already made, some of them are very important and will ease your work:
 
 * [Transmogrification](https://github.com/azerothcore/mod-transmog)
-* [Eluna (lua engine) support](https://github.com/azerothcore/mod-eluna-lua-engine/ "Creator of Eluna is part of our core team")
+* [Eluna (lua engine) support](https://github.com/azerothcore/mod-eluna/ "Creator of Eluna is part of our core team")
 * Full list available in the AzerothCore catalogue (link at the end)
 
 ### Configuration files

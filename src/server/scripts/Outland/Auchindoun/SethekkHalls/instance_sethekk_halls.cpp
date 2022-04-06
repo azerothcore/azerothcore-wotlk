@@ -71,7 +71,7 @@ public:
                     {
                         DoUseDoorOrButton(m_uiIkissDoorGUID, DAY * IN_MILLISECONDS);
                         if (GameObject* coffer = instance->GetGameObject(_talonKingsCofferGUID))
-                            coffer->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE | GO_FLAG_INTERACT_COND);
+                            coffer->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE | GO_FLAG_INTERACT_COND);
                     }
                     break;
                 case TYPE_ANZU_ENCOUNTER:

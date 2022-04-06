@@ -161,7 +161,7 @@ public:
                         HandleGameObject(SkadiRuthlessDoor, true);
                         // Make ymiron attackable
                         if (Creature* cr = instance->GetCreature(KingYmiron))
-                            cr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                            cr->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     }
                     Encounters[type] = data;
                     break;

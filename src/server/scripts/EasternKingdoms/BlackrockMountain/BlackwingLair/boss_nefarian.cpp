@@ -34,6 +34,7 @@ enum Events
     EVENT_CHECK_PHASE_2,
     EVENT_START_EVENT,
     EVENT_SHADOW_BOLT,
+    EVENT_SHADOW_BOLT_VOLLEY,
     EVENT_FEAR,
     EVENT_SILENCE,
     EVENT_MIND_CONTROL,
@@ -52,10 +53,14 @@ enum Events
     EVENT_SUCCESS_1,
     EVENT_SUCCESS_2,
     EVENT_SUCCESS_3,
+    // Drakonid Spawner
+    EVENT_SPAWN_CHROMATIC_DRAKONID,
+    // EVENT_SPAWN_ADDS, // placeholder, already defined above.
 
     ACTION_RESET = 0,
     ACTION_KILLED = 1,
-    ACTION_ADD_KILLED = 2
+    ACTION_ADD_KILLED = 2,
+    ACTION_SPAWNER_STOP = 3
 };
 
 enum Says
@@ -139,6 +144,7 @@ enum Spells
     SPELL_SPAWN_BRONZE_DRAKONID     = 22657,
     SPELL_SPAWN_BLUE_DRAKONID       = 22658,
     SPELL_SPAWN_CHROMATIC_DRAKONID  = 22680,
+    SPELL_SPAWN_DRAKONID_GEN        = 22653,
 
     // Nefarian
     SPELL_SHADOWFLAME_INITIAL       = 22992,
@@ -250,11 +256,11 @@ public:
 
                 me->SetVisible(true);
                 me->SetPhaseMask(1, true);
-                me->SetUInt32Value(UNIT_NPC_FLAGS, 1);
+                me->ReplaceAllNpcFlags(NPCFlags(1));
                 me->SetFaction(FACTION_FRIENDLY);
                 me->SetStandState(UNIT_STAND_STATE_SIT_HIGH_CHAIR);
                 me->RemoveAura(SPELL_NEFARIANS_BARRIER);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             }
         }
 
@@ -298,7 +304,8 @@ public:
             SetCombatMovement(false);
             AttackStart(SelectTarget(SelectTargetMethod::Random, 0, 200.f, true));
             events.ScheduleEvent(EVENT_SHADOWBLINK, 500);
-            events.ScheduleEvent(EVENT_SHADOW_BOLT, urand(3000, 10000));
+            events.ScheduleEvent(EVENT_SHADOW_BOLT, 3000);
+            events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, urand(13000, 15000));
             events.ScheduleEvent(EVENT_FEAR, urand(10000, 20000));
             events.ScheduleEvent(EVENT_SILENCE, urand(20000, 25000));
             events.ScheduleEvent(EVENT_MIND_CONTROL, urand(30000, 35000));
@@ -388,17 +395,12 @@ public:
                     switch (eventId)
                     {
                         case EVENT_SHADOW_BOLT:
-                            switch (urand(0, 1))
-                            {
-                                case 0:
-                                    DoCastAOE(SPELL_SHADOWBOLT_VOLLEY);
-                                    break;
-                                case 1:
-                                    DoCastRandomTarget(SPELL_SHADOWBOLT, 0, 150.f);
-                                    break;
-                            }
-                            DoResetThreat();
-                            events.ScheduleEvent(EVENT_SHADOW_BOLT, urand(3000, 10000));
+                            DoCastRandomTarget(SPELL_SHADOWBOLT, 0, 150.f);
+                            events.ScheduleEvent(EVENT_SHADOW_BOLT, urand(2000, 4000));
+                            break;
+                        case EVENT_SHADOW_BOLT_VOLLEY:
+                            DoCastAOE(SPELL_SHADOWBOLT_VOLLEY);
+                            events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, 19000, 25000);
                             break;
                         case EVENT_FEAR:
                             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40, true))
@@ -412,7 +414,7 @@ public:
                         case EVENT_MIND_CONTROL:
                             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40, true))
                                 DoCast(target, SPELL_SHADOW_COMMAND);
-                            events.ScheduleEvent(EVENT_MIND_CONTROL, urand(30000, 35000));
+                            events.ScheduleEvent(EVENT_MIND_CONTROL, urand(24000, 30000));
                             break;
                         case EVENT_SHADOWBLINK:
                             DoCastSelf(SPELL_SHADOWBLINK);
@@ -436,12 +438,15 @@ public:
                                 events.CancelEvent(EVENT_MIND_CONTROL);
                                 events.CancelEvent(EVENT_FEAR);
                                 events.CancelEvent(EVENT_SHADOW_BOLT);
+                                events.CancelEvent(EVENT_SHADOW_BOLT_VOLLEY);
                                 events.CancelEvent(EVENT_SILENCE);
                                 DoCastSelf(SPELL_ROOT_SELF, true);
                                 me->SetVisible(false);
-                                // Despawn the spawners.
-                                summons.DespawnEntry(_nefarianLeftTunnel);
-                                summons.DespawnEntry(_nefarianRightTunnel);
+                                // Stop spawning adds
+                                EntryCheckPredicate pred(_nefarianRightTunnel);
+                                summons.DoAction(ACTION_SPAWNER_STOP, pred);
+                                EntryCheckPredicate pred2(_nefarianLeftTunnel);
+                                summons.DoAction(ACTION_SPAWNER_STOP, pred2);
                                 return;
                             }
                             events.ScheduleEvent(EVENT_CHECK_PHASE_2, 1000);
@@ -467,9 +472,11 @@ public:
                 Talk(SAY_GAMESBEGIN_1);
                 events.ScheduleEvent(EVENT_START_EVENT, 4000);
                 me->SetFaction(FACTION_DRAGONFLIGHT_BLACK);
-                me->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+                me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
+                // Due to Nefarius despawning himself on Vael, we need to update the guid on instance to prevent unwanted behaviours as encounter not resetting at all.
+                instance->SetGuidData(DATA_LORD_VICTOR_NEFARIUS, me->GetGUID());
             }
         }
 
@@ -501,7 +508,7 @@ struct boss_nefarian : public BossAI
     {
         Initialize();
         me->SetReactState(REACT_PASSIVE);
-        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         me->SetCanFly(true);
         me->SetDisableGravity(true);
         if (_introDone) // already in combat, reset properly.
@@ -569,7 +576,7 @@ struct boss_nefarian : public BossAI
         me->SetDisableGravity(false);
         Position land = me->GetPosition();
         me->GetMotionMaster()->MoveLand(0, land, 8.5f);
-        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         me->GetMotionMaster()->MoveIdle();
 
         me->SetReactState(REACT_AGGRESSIVE);
@@ -624,7 +631,7 @@ struct boss_nefarian : public BossAI
                     break;
                 case EVENT_TAILLASH:
                     // Cast NYI since we need a better check for behind target
-                    DoCastVictim(SPELL_TAILLASH);
+                    DoCastAOE(SPELL_TAILLASH);
                     events.ScheduleEvent(EVENT_TAILLASH, 10000);
                     break;
                 case EVENT_CLASSCALL:
@@ -703,7 +710,7 @@ struct boss_nefarian : public BossAI
                 {
                     (*itr)->Respawn();
                     DoZoneInCombat((*itr));
-                    (*itr)->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    (*itr)->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     (*itr)->SetReactState(REACT_AGGRESSIVE);
                     (*itr)->SetStandState(UNIT_STAND_STATE_STAND);
                 }
@@ -881,6 +888,37 @@ struct npc_corrupted_totem : public ScriptedAI
     protected:
         TaskScheduler _scheduler;
         bool _auraAdded;
+};
+
+struct npc_drakonid_spawner : public ScriptedAI
+{
+    npc_drakonid_spawner(Creature* creature) : ScriptedAI(creature) { }
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_SPAWNER_STOP)
+        {
+            me->RemoveAurasDueToSpell(SPELL_SPAWN_DRAKONID_GEN);
+            _scheduler.CancelAll();
+        }
+    }
+
+    void IsSummonedBy(Unit* /*summoner*/) override
+    {
+        DoCastSelf(SPELL_SPAWN_DRAKONID_GEN);
+        _scheduler.Schedule(10s, 60s, [this](TaskContext /*context*/)
+        {
+            DoCastSelf(SPELL_SPAWN_CHROMATIC_DRAKONID);
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _scheduler.Update(diff);
+    }
+
+protected:
+    TaskScheduler _scheduler;
 };
 
 std::unordered_map<uint32, uint8> const classCallSpells =
@@ -1211,6 +1249,7 @@ void AddSC_boss_nefarian()
     new boss_victor_nefarius();
     RegisterCreatureAI(boss_nefarian);
     RegisterCreatureAI(npc_corrupted_totem);
+    RegisterCreatureAI(npc_drakonid_spawner);
     RegisterSpellScript(spell_class_call_handler);
     RegisterSpellScript(aura_class_call_wild_magic);
     RegisterSpellScript(aura_class_call_siphon_blessing);

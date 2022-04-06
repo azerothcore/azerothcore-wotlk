@@ -352,13 +352,13 @@ public:
         {
             if (apply)
             {
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_PACIFIED);
+                me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_PACIFIED);
                 me->DisableRotate(true);
                 me->AddUnitState(UNIT_STATE_ROOT);
             }
             else
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_PACIFIED);
+                me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_PACIFIED);
                 me->DisableRotate(false);
                 me->ClearUnitState(UNIT_STATE_ROOT);
                 me->resetAttackTimer(BASE_ATTACK);
@@ -420,7 +420,7 @@ public:
             GameObject* go;
             if ((go = GetThorimObject(DATA_THORIM_LEVER)))
             {
-                go->SetUInt32Value(GAMEOBJECT_FLAGS, 48);
+                go->ReplaceAllGameObjectFlags((GameObjectFlags)48);
                 go->SetGoState(GO_STATE_READY);
             }
             if ((go = GetThorimObject(DATA_THORIM_FIRST_DOORS)))
@@ -485,7 +485,7 @@ public:
                 if (_trashCounter >= 6)
                 {
                     if (GameObject* go = GetThorimObject(DATA_THORIM_LEVER))
-                        go->RemoveFlag(GAMEOBJECT_FLAGS, 48);
+                        go->RemoveGameObjectFlag((GameObjectFlags)48);
 
                     events.SetPhase(EVENT_PHASE_START);
                     events.ScheduleEvent(EVENT_THORIM_START_PHASE1, 20000);
@@ -569,7 +569,7 @@ public:
                 if (!_encounterFinished)
                 {
                     _encounterFinished = true;
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->SetFaction(FACTION_FRIENDLY);
                     me->SetHealth(me->GetMaxHealth());
                     me->CombatStop();
@@ -593,7 +593,7 @@ public:
 
                     if ((go = me->SummonGameObject(chestId, 2134.73f, -286.32f, 419.51f, 0.0f, 0, 0, 0, 0, 0)))
                     {
-                        go->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
+                        go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
                         go->SetLootRecipient(me->GetMap());
                     }
 
@@ -1720,7 +1720,7 @@ public:
                     events.RepeatEvent(12000);
                     break;
                 case EVENT_DR_CHAMPION_WH:
-                    if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED))
+                    if (!me->HasUnitFlag(UNIT_FLAG_DISARMED))
                         me->CastSpell(me, SPELL_WHIRLWIND, false);
                     events.RepeatEvent(6000);
                     break;

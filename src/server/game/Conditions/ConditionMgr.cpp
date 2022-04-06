@@ -295,7 +295,7 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
     case CONDITION_OBJECT_ENTRY_GUID:
     {
         if (ConditionValue3 == 1 && object->ToUnit()) // pussywizard: if == 1, ignore not attackable/selectable targets
-            if (object->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE))
+            if (object->ToUnit()->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE))
                 break;
 
         if (uint32(object->GetTypeId()) == ConditionValue1)

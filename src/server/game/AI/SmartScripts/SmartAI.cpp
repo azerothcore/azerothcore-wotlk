@@ -179,12 +179,6 @@ void SmartAI::GenerateWayPointArray(Movement::PointsArray* points)
 
 void SmartAI::StartPath(bool run, uint32 path, bool repeat, Unit* invoker)
 {
-    if (me->IsInCombat())// no wp movement in combat
-    {
-        LOG_ERROR("scripts.ai.sai", "SmartAI::StartPath: Creature entry {} wanted to start waypoint movement while in combat, ignoring.", me->GetEntry());
-        return;
-    }
-
     if (HasEscortState(SMART_ESCORT_ESCORTING))
         StopPath();
 
@@ -205,8 +199,8 @@ void SmartAI::StartPath(bool run, uint32 path, bool repeat, Unit* invoker)
 
         if (invoker && invoker->GetTypeId() == TYPEID_PLAYER)
         {
-            mEscortNPCFlags = me->GetUInt32Value(UNIT_NPC_FLAGS);
-            me->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+            mEscortNPCFlags = me->GetNpcFlags();
+            me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
         }
 
         Movement::PointsArray pathPoints;
@@ -293,7 +287,7 @@ void SmartAI::EndPath(bool fail)
 
     if (mEscortNPCFlags)
     {
-        me->SetUInt32Value(UNIT_NPC_FLAGS, mEscortNPCFlags);
+        me->ReplaceAllNpcFlags(NPCFlags(mEscortNPCFlags));
         mEscortNPCFlags = 0;
     }
 
@@ -636,7 +630,7 @@ void SmartAI::EnterEvadeMode()
         return;
     }
 
-    if (me->GetCharmerGUID().IsPlayer() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
+    if (me->GetCharmerGUID().IsPlayer() || me->HasUnitFlag(UNIT_FLAG_POSSESSED))
     {
         me->AttackStop();
         return;
@@ -808,7 +802,7 @@ void SmartAI::SummonedCreatureDies(Creature* summon, Unit* /*killer*/)
 void SmartAI::AttackStart(Unit* who)
 {
     // xinef: dont allow charmed npcs to act on their own
-    if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
+    if (me->HasUnitFlag(UNIT_FLAG_POSSESSED))
     {
         if (who && mCanAutoAttack)
             me->Attack(who, true);
