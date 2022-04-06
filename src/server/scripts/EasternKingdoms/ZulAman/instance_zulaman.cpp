@@ -194,8 +194,8 @@ public:
             {
                 if (Unit* Hostage = i_pl->SummonCreature(HostageInfo[num].npc, HostageInfo[num].x, HostageInfo[num].y, HostageInfo[num].z, HostageInfo[num].o, TEMPSUMMON_DEAD_DESPAWN, 0))
                 {
-                    Hostage->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    Hostage->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    Hostage->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    Hostage->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 }
             }
         }

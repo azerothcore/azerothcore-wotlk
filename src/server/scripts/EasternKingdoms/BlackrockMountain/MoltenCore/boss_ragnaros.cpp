@@ -78,7 +78,6 @@ enum Events
     EVENT_HAND_OF_RAGNAROS,
     EVENT_MIGHT_OF_RAGNAROS,
     EVENT_LAVA_BURST,
-    EVENT_MAGMA_BLAST_MELEE_CHECK,
     EVENT_MAGMA_BLAST,
     EVENT_SUBMERGE,
     EVENT_LAVA_BURST_TRIGGER,
@@ -122,6 +121,7 @@ public:
         boss_ragnarosAI(Creature* creature) : BossAI(creature, DATA_RAGNAROS),
             _isIntroDone(false),
             _hasYelledMagmaBurst(false),
+            _processingMagmaBurst(false),
             _hasSubmergedOnce(false),
             _isKnockbackEmoteAllowed(true)
         {
@@ -137,12 +137,13 @@ public:
                 extraEvents.Reset();
                 extraEvents.SetPhase(PHASE_EMERGED);
                 me->SetReactState(REACT_AGGRESSIVE);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC|UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC|UNIT_FLAG_NOT_SELECTABLE);
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
                 me->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
             }
 
             _hasYelledMagmaBurst = false;
+            _processingMagmaBurst = false;
             _hasSubmergedOnce = false;
             _isKnockbackEmoteAllowed = true;
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
@@ -231,6 +232,28 @@ public:
             }
         }
 
+        void EnterEvadeMode() override
+        {
+            if (!me->getThreatMgr().getThreatList().empty())
+            {
+                if (!_processingMagmaBurst)
+                {
+                    // Boss try to evade, but still got some targets on threat list - it means that none of these targets are in melee range - cast magma blast
+                    _processingMagmaBurst = true;
+                    events.ScheduleEvent(EVENT_MAGMA_BLAST, 4000, PHASE_EMERGED, PHASE_EMERGED);
+                }
+            }
+            else
+            {
+                BossAI::EnterEvadeMode();
+            }
+        }
+
+        bool CanAIAttack(Unit const* victim) const override
+        {
+            return me->IsWithinMeleeRange(victim);
+        }
+
         void UpdateAI(uint32 diff) override
         {
             if (!extraEvents.Empty())
@@ -253,7 +276,7 @@ public:
                             _isIntroDone = true;
                             extraEvents.SetPhase(PHASE_EMERGED);
                             me->RemoveAurasDueToSpell(SPELL_RAGNAROS_SUBMERGE_EFFECT);
-                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
+                            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
                             me->SetReactState(REACT_AGGRESSIVE);
                             DoZoneInCombat();
                             break;
@@ -297,7 +320,10 @@ public:
 
             if (!UpdateVictim())
             {
-                return;
+                if (!_processingMagmaBurst)
+                {
+                    return;
+                }
             }
 
             events.Update(diff);
@@ -340,38 +366,10 @@ public:
                         DoCastAOE(SPELL_LAVA_BURST);
                         break;
                     }
-                    case EVENT_MAGMA_BLAST_MELEE_CHECK:
-                    {
-                        if (Unit* target = ObjectAccessor::GetUnit(*me, me->GetTarget()))
-                        {
-                            if (!target->IsAlive())
-                            {
-                                me->SetTarget(ObjectGuid::Empty);
-                            }
-                        }
-
-                        if (!IsVictimWithinMeleeRange())
-                        {
-                            if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, [&](Unit* u) { return u && u->IsPlayer() && me->IsWithinMeleeRange(u); }))
-                            {
-                                me->AttackerStateUpdate(target);
-                                me->SetTarget(target->GetGUID());
-                                events.RepeatEvent(500);
-                            }
-                            else
-                            {
-                                events.ScheduleEvent(EVENT_MAGMA_BLAST, 4000, PHASE_EMERGED, PHASE_EMERGED);
-                            }
-                        }
-                        else
-                        {
-                            _hasYelledMagmaBurst = false;
-                            events.RepeatEvent(500);
-                        }
-                        break;
-                    }
                     case EVENT_MAGMA_BLAST:
                     {
+                        _processingMagmaBurst = false;
+
                         if (!IsVictimWithinMeleeRange())
                         {
                             DoCastRandomTarget(SPELL_MAGMA_BLAST);
@@ -383,7 +381,6 @@ public:
                             }
                         }
 
-                        events.RescheduleEvent(EVENT_MAGMA_BLAST_MELEE_CHECK, 500, PHASE_EMERGED, PHASE_EMERGED);
                         break;
                     }
                     case EVENT_MIGHT_OF_RAGNAROS:
@@ -412,7 +409,7 @@ public:
                         me->InterruptNonMeleeSpells(false);
                         me->AttackStop();
                         DoResetThreat();
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_SUBMERGED);
                         DoCastSelf(SPELL_RAGNA_SUBMERGE_VISUAL, true);
                         //me->HandleEmoteCommand(EMOTE_ONESHOT_SUBMERGE);
@@ -444,6 +441,7 @@ public:
         EventMap extraEvents;
         bool _isIntroDone;
         bool _hasYelledMagmaBurst;
+        bool _processingMagmaBurst;
         bool _hasSubmergedOnce;
         bool _isKnockbackEmoteAllowed;  // Prevents possible text overlap
 
@@ -462,7 +460,7 @@ public:
             extraEvents.SetPhase(PHASE_EMERGED);
 
             me->SetReactState(REACT_AGGRESSIVE);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
             me->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
 
@@ -480,7 +478,6 @@ public:
             events.RescheduleEvent(EVENT_WRATH_OF_RAGNAROS, 30000, PHASE_EMERGED, PHASE_EMERGED);
             events.RescheduleEvent(EVENT_HAND_OF_RAGNAROS, 25000, PHASE_EMERGED, PHASE_EMERGED);
             events.RescheduleEvent(EVENT_LAVA_BURST, 10000, PHASE_EMERGED, PHASE_EMERGED);
-            events.RescheduleEvent(EVENT_MAGMA_BLAST_MELEE_CHECK, 10000, PHASE_EMERGED, PHASE_EMERGED);
             events.RescheduleEvent(EVENT_SUBMERGE, 180000, PHASE_EMERGED, PHASE_EMERGED);
             events.RescheduleEvent(EVENT_MIGHT_OF_RAGNAROS, 11000, PHASE_EMERGED, PHASE_EMERGED);
         }

@@ -74,7 +74,7 @@ public:
             if (Creature* c = instance->GetCreature(NPC_DarkRangerMarrahGUID))
             {
                 c->SetReactState(REACT_PASSIVE);
-                c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 if (plr && plr->GetTeamId() == TEAM_HORDE)
                 {
                     if (!c->IsVisible())
@@ -220,7 +220,7 @@ public:
                 case DATA_UNLOCK_SKARVALD_LOOT:
                     if( Creature* c = instance->GetCreature(NPC_SkarvaldGUID) )
                     {
-                        c->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE | UNIT_DYNFLAG_TAPPED | UNIT_DYNFLAG_TAPPED_BY_PLAYER);
+                        c->SetDynamicFlag(UNIT_DYNFLAG_LOOTABLE | UNIT_DYNFLAG_TAPPED | UNIT_DYNFLAG_TAPPED_BY_PLAYER);
                         c->SetLootMode(1);
                         c->loot.clear();
                         if (uint32 lootid = c->GetCreatureTemplate()->lootid)
@@ -235,7 +235,7 @@ public:
                     if( Creature* c = instance->GetCreature(NPC_DalronnGUID) )
                     {
                         c->AI()->DoAction(-1);
-                        c->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE | UNIT_DYNFLAG_TAPPED | UNIT_DYNFLAG_TAPPED_BY_PLAYER);
+                        c->SetDynamicFlag(UNIT_DYNFLAG_LOOTABLE | UNIT_DYNFLAG_TAPPED | UNIT_DYNFLAG_TAPPED_BY_PLAYER);
                         c->SetLootMode(1);
                         c->loot.clear();
                         if (uint32 lootid = c->GetCreatureTemplate()->lootid)

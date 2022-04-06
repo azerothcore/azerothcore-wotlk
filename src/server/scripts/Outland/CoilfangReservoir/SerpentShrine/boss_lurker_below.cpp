@@ -79,7 +79,7 @@ public:
             me->SetReactState(REACT_PASSIVE);
             me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
             me->SetVisible(false);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
             // Reset summons
             summons.DespawnAll();
@@ -99,7 +99,7 @@ public:
                 me->setAttackTimer(BASE_ATTACK, 6000);
                 me->SetVisible(true);
                 me->UpdateObjectVisibility(true);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
                 me->SetInCombatWithZone();
             }
@@ -164,14 +164,14 @@ public:
                     events.Reset();
                     events.ScheduleEvent(EVENT_PHASE_1, 60000);
                     me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     for (uint8 i = 0; i < MAX_SUMMONS; ++i)
                         me->SummonCreature(i < 6 ? NPC_COILFANG_AMBUSHER : NPC_COILFANG_GUARDIAN, positions[i].GetPositionX(), positions[i].GetPositionY(), positions[i].GetPositionZ(), positions[i].GetAngle(me), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
                     break;
                 case EVENT_PHASE_1:
                     me->setAttackTimer(BASE_ATTACK, 6000);
                     me->SetStandState(UNIT_STAND_STATE_STAND);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
                     events.Reset();
                     events.ScheduleEvent(EVENT_SPELL_SPOUT, 10000);

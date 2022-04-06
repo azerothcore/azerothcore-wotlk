@@ -147,7 +147,7 @@ public:
             _faction = faction;
             SetEscortPaused(false);
             if (Creature* active = !headNorth ? me : ObjectAccessor::GetCreature(*me, summons[0]))
-                active->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                active->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
             events.CancelEvent(EVENT_WAIT_FOR_ASSIST);
         }
 
@@ -192,11 +192,11 @@ public:
         void SummonHelpers()
         {
             RemoveSummons();
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
 
             if (Creature* cr = me->SummonCreature(NPC_RIGGER_GIZELTON, *me))
             {
-                cr->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                cr->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                 summons[0] = cr->GetGUID();
             }
             if (Creature* cr = me->SummonCreature(NPC_CARAVAN_KODO, *me))
@@ -258,14 +258,14 @@ public:
                 {
                     summon->SetFaction(faction);
                     if (remove)
-                        summon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                        summon->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
                     else
-                        summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                        summon->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
                 }
             if (remove)
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
             else
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
             me->SetFaction(faction);
         }
 
@@ -291,7 +291,7 @@ public:
                 // North -> South - hire
                 case 77:
                     SetEscortPaused(true);
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                     Talk(SAY_CARAVAN_HIRE);
                     events.ScheduleEvent(EVENT_WAIT_FOR_ASSIST, TIME_HIRE_STOP);
                     break;
@@ -300,7 +300,7 @@ public:
                     SetEscortPaused(true);
                     if (Creature* rigger = ObjectAccessor::GetCreature(*me, summons[0]))
                     {
-                        rigger->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                        rigger->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                         rigger->AI()->Talk(SAY_CARAVAN_HIRE);
                     }
                     events.ScheduleEvent(EVENT_WAIT_FOR_ASSIST, TIME_HIRE_STOP);
@@ -403,7 +403,7 @@ public:
                 case EVENT_WAIT_FOR_ASSIST:
                     SetEscortPaused(false);
                     if (Creature* active = !headNorth ? me : ObjectAccessor::GetCreature(*me, summons[0]))
-                        active->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                        active->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                     break;
                 case EVENT_RESTART_ESCORT:
                     CheckCaravan();
@@ -484,7 +484,7 @@ public:
             }
             else if (spell->Id == SPELL_KODO_KOMBO_GOSSIP)
             {
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 me->DespawnOrUnsummon(60000);
             }
         }

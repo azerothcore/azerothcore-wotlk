@@ -56,7 +56,7 @@ AC_COMMON_API std::string GetDebugInfo();
 
 #define WPAssert(cond, ...) do { if (!(cond)) Acore::Assert(__FILE__, __LINE__, __FUNCTION__, GetDebugInfo(), #cond, ##__VA_ARGS__); } while(0)
 #define WPAssert_NODEBUGINFO(cond) do { if (!(cond)) Acore::Assert(__FILE__, __LINE__, __FUNCTION__, "", #cond); } while(0)
-#define WPFatal(cond, ...) do { if (!(cond)) Acore::Fatal(__FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); } while(0)
+#define WPFatal(cond, ...) do { if (!(cond)) Acore::Fatal(__FILE__, __LINE__, __FUNCTION__, #cond, ##__VA_ARGS__); } while(0)
 #define WPError(cond, msg) do { if (!(cond)) Acore::Error(__FILE__, __LINE__, __FUNCTION__, (msg)); } while(0)
 #define WPWarning(cond, msg) do { if (!(cond)) Acore::Warning(__FILE__, __LINE__, __FUNCTION__, (msg)); } while(0)
 #define WPAbort(...) do { Acore::Abort(__FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); } while(0)

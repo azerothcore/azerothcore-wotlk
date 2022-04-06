@@ -50,7 +50,7 @@ void WardenCheckMgr::LoadWardenChecks()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 Warden checks. DB table `warden_checks` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 Warden checks. DB table `warden_checks` is empty!");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -176,7 +176,7 @@ void WardenCheckMgr::LoadWardenOverrides()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 Warden action overrides. DB table `warden_action` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 Warden action overrides. DB table `warden_action` is empty!");
         LOG_INFO("server.loading", " ");
         return;
     }

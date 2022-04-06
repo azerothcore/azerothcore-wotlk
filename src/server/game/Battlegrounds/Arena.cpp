@@ -312,6 +312,10 @@ void Arena::EndBattleground(TeamId winnerTeamId)
             }
         }
 
+        // update previous opponents for arena queue
+        winnerArenaTeam->SetPreviousOpponents(loserArenaTeam->GetId());
+        loserArenaTeam->SetPreviousOpponents(winnerArenaTeam->GetId());
+
         // save the stat changes
         if (bValidArena)
         {

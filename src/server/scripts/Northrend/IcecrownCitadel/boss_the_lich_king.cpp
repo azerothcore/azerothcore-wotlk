@@ -631,7 +631,7 @@ public:
         boss_the_lich_kingAI(Creature* creature) : BossAI(creature, DATA_THE_LICH_KING)
         {
             me->AddAura(SPELL_EMOTE_SIT_NO_SHEATH, me);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
             me->SetReactState(REACT_PASSIVE);
         }
 
@@ -658,7 +658,7 @@ public:
             _Reset();
             DoAction(ACTION_RESTORE_LIGHT);
             SetEquipmentSlots(true);
-            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC))
+            if (me->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC))
                 me->SetStandState(UNIT_STAND_STATE_SIT);
         }
 
@@ -704,7 +704,7 @@ public:
             Cell::VisitGridObjects(me, worker, 333.0f);
 
             me->AddAura(SPELL_EMOTE_SIT_NO_SHEATH, me);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
             me->SetReactState(REACT_PASSIVE);
             me->SetStandState(UNIT_STAND_STATE_SIT);
         }
@@ -818,9 +818,7 @@ public:
                 {
                     damage = me->GetHealth() - 1;
                     me->SetDisableGravity(false);
-                    me->SendMonsterMove(me->GetPositionX() + 0.25f, me->GetPositionY(), 840.86f, 300, SPLINEFLAG_FALLING);
-                    me->m_positionZ = 840.86f;
-                    me->SetOrientation(0.0f);
+                    me->GetMotionMaster()->MoveFall();
                     if (Creature* frostmourne = me->FindNearestCreature(NPC_FROSTMOURNE_TRIGGER, 50.0f))
                         frostmourne->DespawnOrUnsummon(1);
                     if (Creature* terenas = me->FindNearestCreature(NPC_TERENAS_MENETHIL_OUTRO, 50.0f))
@@ -1209,7 +1207,7 @@ public:
                             spawner->CastSpell(spawner, SPELL_SUMMON_SPIRIT_BOMB_1, true);  // summons bombs randomly
                             spawner->CastSpell(spawner, SPELL_SUMMON_SPIRIT_BOMB_2, true);  // summons bombs on players
                             spawner->m_Events.AddEvent(new TriggerWickedSpirit(spawner), spawner->m_Events.CalculateTime(3000));
-                            terenas->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC); // to avoid being healed by player trinket procs. terenas' health doesn't matter on heroic
+                            terenas->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC); // to avoid being healed by player trinket procs. terenas' health doesn't matter on heroic
                         }
                     }
                     break;
@@ -1287,7 +1285,7 @@ public:
         {
             _events.Reset();
             if (_instance->GetBossState(DATA_THE_LICH_KING) == DONE || (me->GetMap()->IsHeroic() && !_instance->GetData(DATA_LK_HC_AVAILABLE)))
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->SetReactState(REACT_PASSIVE);
         }
 
@@ -1359,18 +1357,18 @@ public:
         {
             ScriptedAI::JustReachedHome();
             if (!(_instance->GetBossState(DATA_THE_LICH_KING) == DONE || (me->GetMap()->IsHeroic() && !_instance->GetData(DATA_LK_HC_AVAILABLE))))
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
         }
 
         void sGossipSelect(Player* /*player*/, uint32 sender, uint32 action) override
         {
             Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING));
-            if (me->GetCreatureTemplate()->GossipMenuId == sender && !action && me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP) && theLichKing && !theLichKing->IsInEvadeMode())
+            if (me->GetCreatureTemplate()->GossipMenuId == sender && !action && me->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP) && theLichKing && !theLichKing->IsInEvadeMode())
             {
                 if (me->GetMap()->IsHeroic() && !_instance->GetData(DATA_LK_HC_AVAILABLE))
                     return;
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 me->SetWalk(true);
                 me->GetMotionMaster()->MovePoint(POINT_TIRION_INTRO, TirionIntro);
             }
@@ -1456,7 +1454,7 @@ public:
                     if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                     {
                         theLichKing->SetWalk(false);
-                        theLichKing->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                        theLichKing->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                         theLichKing->SetReactState(REACT_AGGRESSIVE);
                         theLichKing->SetInCombatWithZone();
                         if (!theLichKing->IsInCombat())
@@ -1589,7 +1587,7 @@ public:
                         terenas->CastSpell((Unit*)nullptr, SPELL_MASS_RESURRECTION, false);
                         if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                         {
-                            lichKing->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                            lichKing->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
                             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                             me->RemoveAllAuras();
                             SetEquipmentSlots(true);
@@ -2265,7 +2263,7 @@ public:
             else
             {
                 Unit* target = ObjectAccessor::GetUnit(*me, targetGUID);
-                if (me->GetVictim()->GetGUID() != targetGUID || !target || !me->IsValidAttackTarget(target) || target->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH) || target->GetExactDist2dSq(&CenterPosition) > 75.0f * 75.0f || target->GetPositionZ() < 830.0f || target->GetPositionZ() > 855.0f)
+                if (me->GetVictim()->GetGUID() != targetGUID || !target || !me->IsValidAttackTarget(target) || target->HasUnitFlag2(UNIT_FLAG2_FEIGN_DEATH) || target->GetExactDist2dSq(&CenterPosition) > 75.0f * 75.0f || target->GetPositionZ() < 830.0f || target->GetPositionZ() > 855.0f)
                     SelectNewTarget();
             }
         }
@@ -2677,10 +2675,10 @@ public:
                     me->SetDisableGravity(false);
                     me->GetMotionMaster()->MovePoint(POINT_DROP_PLAYER, _destPoint, false);
                     me->SetDisableGravity(true, true);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     break;
                 case EVENT_MOVE_TO_SIPHON_POS:
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE); // just in case if passenger disappears so quickly that EVENT_MOVE_TO_DROP_POS is never executed
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE); // just in case if passenger disappears so quickly that EVENT_MOVE_TO_DROP_POS is never executed
                     { int32 bp0 = 80; me->CastCustomSpell(me, 1557, &bp0, nullptr, nullptr, true); }
                     me->SetCanFly(true);
                     me->SetDisableGravity(true);
@@ -3062,7 +3060,7 @@ public:
                 c->StopMoving();
                 c->CastSpell((Unit*)nullptr, SPELL_SPIRIT_BURST, true);
                 c->DespawnOrUnsummon(3000);
-                c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                c->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             }
         }
 
@@ -3284,7 +3282,7 @@ public:
                     }
                     break;
                 case ACTION_TELEPORT_BACK:
-                    if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+                    if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                     {
                         _events.Reset();
                         me->CastSpell((Unit*)nullptr, SPELL_RESTORE_SOUL, false);
@@ -3301,7 +3299,7 @@ public:
                 damage = me->GetHealth() - 1;
                 if (IsHeroic())
                     return;
-                if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+                if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 {
                     _events.Reset();
                     _events.ScheduleEvent(EVENT_TELEPORT_BACK, 1000);
@@ -3314,7 +3312,7 @@ public:
                     me->SetDisplayId(16946);
                     me->SetReactState(REACT_PASSIVE);
                     me->AttackStop();
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->DespawnOrUnsummon(2000);
                 }
             }
@@ -3347,7 +3345,7 @@ public:
                     me->SetDisplayId(16946);
                     me->SetReactState(REACT_PASSIVE);
                     me->AttackStop();
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     _events.Reset();
                     _events.ScheduleEvent(EVENT_TELEPORT_BACK, 1000);
                     break;
@@ -3710,7 +3708,7 @@ public:
             if (!target)
                 return;
 
-            target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            target->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             target->ForceValuesUpdateAtIndex(UNIT_FIELD_FLAGS);
             VileSpiritActivateEvent(target).Execute(0, 0);
         }

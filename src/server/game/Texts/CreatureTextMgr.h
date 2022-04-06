@@ -108,7 +108,7 @@ private:
     CreatureTextRepeatIds GetRepeatGroup(Creature* source, uint8 textGroup);
     void SetRepeatId(Creature* source, uint8 textGroup, uint8 id);
 
-    void SendNonChatPacket(WorldObject* source, WorldPacket* data, ChatMsg msgType, WorldObject const* target, CreatureTextRange range, TeamId teamId, bool gmOnly) const;
+    void SendNonChatPacket(WorldObject* source, WorldPacket const* data, ChatMsg msgType, WorldObject const* target, CreatureTextRange range, TeamId teamId, bool gmOnly) const;
     float GetRangeForChatType(ChatMsg msgType) const;
 
     CreatureTextMap mTextMap;
