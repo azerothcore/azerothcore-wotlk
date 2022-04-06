@@ -4154,6 +4154,25 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_1].SpellClassMask[1] = 0x00020000;
     });
 
+    // Nefarian: Shadowbolt, Shadow Command
+    ApplySpellFix({ 22667, 22677 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(152); // 150 yards
+    });
+
+    // Shadowbolt Volley
+    ApplySpellFix({ 22665 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(152); // 150 yards
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(41); // 150 yards
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
+    });
+
+    ApplySpellFix({ 22247 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesCu |= SPELL_ATTR0_CU_DONT_BREAK_STEALTH;
+    });
+
     // Manastorm
     ApplySpellFix({ 21097 }, [](SpellInfo* spellInfo)
     {
@@ -4180,6 +4199,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CHANGE_MAP;
     });
 
+    // Improved Blessing Protection (Nefarian Class Call)
+    ApplySpellFix({ 23415 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_TARGET_ENEMY);
+    });
+
     // Bestial Wrath
     ApplySpellFix({ 19574 }, [](SpellInfo* spellInfo)
     {
@@ -4202,6 +4227,33 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 19872 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx |= SPELL_ATTR1_EXCLUDE_CASTER;
+    });
+
+    // Suppression Aura
+    ApplySpellFix({ 22247 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
+    });
+
+    // Cosmetic - Lightning Beam Channel
+    ApplySpellFix({ 45537 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
+    });
+
+    // Burning Adrenaline
+    ApplySpellFix({ 23478 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].BasePoints = 4374;
+        spellInfo->Effects[EFFECT_0].DieSides = 1250;
+    });
+
+    // Explosion - Razorgore
+    ApplySpellFix({ 20038 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_50000_YARDS);
+        spellInfo->Attributes |= SPELL_ATTR0_NO_IMMUNITIES;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

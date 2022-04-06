@@ -692,13 +692,11 @@ struct ChrRacesEntry
 
 struct CinematicCameraEntry
 {
-    uint32      id;                                         // 0 index
-    char const*       filename;                             // 1
-    uint32      soundid;                                    // 2 in SoundEntries.dbc or 0
-    float       base_x;                                     // 3
-    float       base_y;                                     // 4
-    float       base_z;                                     // 5
-    float       base_o;                                     // 6
+    uint32 ID;                                              // 0
+    char const* Model;                                      // 1    Model filename (translate .mdx to .m2)
+    uint32 SoundID;                                         // 2    Sound ID       (voiceover for cinematic)
+    DBCPosition3D Origin;                                   // 3-5  Position in map used for basis for M2 co-ordinates
+    float OriginFacing;                                     // 6    Orientation in map used for basis for M2 co-ordinates
 };
 
 struct CinematicSequencesEntry
@@ -2161,15 +2159,7 @@ struct TalentSpellPos
 
 typedef std::map<uint32, TalentSpellPos> TalentSpellPosMap;
 
-struct TaxiPathBySourceAndDestination
-{
-    TaxiPathBySourceAndDestination()  = default;
-    TaxiPathBySourceAndDestination(uint32 _id, uint32 _price) : ID(_id), price(_price) {}
-
-    uint32    ID{0};
-    uint32    price{0};
-};
-typedef std::map<uint32, TaxiPathBySourceAndDestination> TaxiPathSetForSource;
+typedef std::map<uint32, TaxiPathEntry const*> TaxiPathSetForSource;
 typedef std::map<uint32, TaxiPathSetForSource> TaxiPathSetBySource;
 
 typedef std::vector<TaxiPathNodeEntry const*> TaxiPathNodeList;

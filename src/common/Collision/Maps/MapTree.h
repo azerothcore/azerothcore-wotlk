@@ -27,6 +27,7 @@ namespace VMAP
     class ModelInstance;
     class GroupModel;
     class VMapMgr2;
+    enum class LoadResult : uint8;
 
     struct LocationInfo
     {
@@ -63,7 +64,7 @@ namespace VMAP
         static std::string getTileFileName(uint32 mapID, uint32 tileX, uint32 tileY);
         static uint32 packTileID(uint32 tileX, uint32 tileY) { return tileX << 16 | tileY; }
         static void unpackTileID(uint32 ID, uint32& tileX, uint32& tileY) { tileX = ID >> 16; tileY = ID & 0xFF; }
-        static bool CanLoadMap(const std::string& basePath, uint32 mapID, uint32 tileX, uint32 tileY);
+        static LoadResult CanLoadMap(const std::string& basePath, uint32 mapID, uint32 tileX, uint32 tileY);
 
         StaticMapTree(uint32 mapID, const std::string& basePath);
         ~StaticMapTree();

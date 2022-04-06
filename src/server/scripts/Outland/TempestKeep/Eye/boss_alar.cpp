@@ -441,7 +441,7 @@ public:
             target->m_invisibility.AddFlag(type);
             target->m_invisibility.AddValue(type, aurEff->GetAmount());
 
-            GetUnitOwner()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            GetUnitOwner()->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             GetUnitOwner()->SetStandState(UNIT_STAND_STATE_DEAD);
             GetUnitOwner()->m_last_notify_position.Relocate(0.0f, 0.0f, 0.0f);
             GetUnitOwner()->m_delayed_unit_relocation_timer = 1000;
@@ -449,7 +449,7 @@ public:
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            GetUnitOwner()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            GetUnitOwner()->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             GetUnitOwner()->SetStandState(UNIT_STAND_STATE_STAND);
         }
 

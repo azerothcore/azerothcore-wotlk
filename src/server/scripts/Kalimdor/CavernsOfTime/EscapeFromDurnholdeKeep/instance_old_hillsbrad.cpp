@@ -116,7 +116,7 @@ public:
             {
                 case GO_BARREL:
                     if (_encounterProgress >= ENCOUNTER_PROGRESS_BARRELS)
-                        gameobject->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        gameobject->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
                 case GO_PRISON_DOOR:
                     if (_encounterProgress >= ENCOUNTER_PROGRESS_THRALL_ARMORED)
@@ -162,7 +162,7 @@ public:
                     }
                 case DATA_THRALL_ADD_FLAG:
                     if (Creature* thrall = instance->GetCreature(_thrallGUID))
-                        thrall->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        thrall->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     break;
             }
         }

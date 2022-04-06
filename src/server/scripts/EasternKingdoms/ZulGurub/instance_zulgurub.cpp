@@ -45,12 +45,6 @@ public:
             LoadDoorData(doorData);
         }
 
-        bool IsEncounterInProgress() const override
-        {
-            // not active in Zul'Gurub
-            return false;
-        }
-
         void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
@@ -89,9 +83,9 @@ public:
                 case GO_GONG_OF_BETHEKK:
                     _goGongOfBethekkGUID = go->GetGUID();
                     if (GetBossState(DATA_ARLOKK) == DONE)
-                        go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     else
-                        go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
                 default:
                     break;

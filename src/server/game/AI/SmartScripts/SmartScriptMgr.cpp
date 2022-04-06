@@ -64,7 +64,7 @@ void SmartWaypointMgr::LoadFromDB()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 SmartAI Waypoint Paths. DB table `waypoints` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 SmartAI Waypoint Paths. DB table `waypoints` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -136,7 +136,7 @@ void SmartAIMgr::LoadSmartAIFromDB()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 SmartAI scripts. DB table `smart_scripts` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 SmartAI scripts. DB table `smart_scripts` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -1009,7 +1009,14 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             case SMART_EVENT_ACCEPTED_QUEST:
             case SMART_EVENT_REWARD_QUEST:
                 if (e.event.quest.quest && !IsQuestValid(e, e.event.quest.quest))
+                {
                     return false;
+                }
+
+                if (!IsMinMaxValid(e, e.event.quest.cooldownMin, e.event.quest.cooldownMax))
+                {
+                    return false;
+                }
                 break;
             case SMART_EVENT_RECEIVE_EMOTE:
                 {

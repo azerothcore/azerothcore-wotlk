@@ -184,7 +184,7 @@ public:
         {
             for (uint8 i = 0; i < 4; ++i)
                 if (GameObject* orb = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1 + i)))
-                    orb->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                    orb->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
         }
 
         void Reset() override
@@ -293,7 +293,7 @@ public:
         void InitializeAI() override
         {
             ScriptedAI::InitializeAI();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
             phase = PHASE_NORMAL;
             events.Reset();
@@ -331,7 +331,7 @@ public:
                 me->RemoveAllAuras();
                 me->DeleteThreatList();
                 me->SetRegeneratingHealth(false);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->HandleEmoteCommand(EMOTE_ONESHOT_DROWN);
                 me->resetAttackTimer();
                 events.Reset();
@@ -421,7 +421,7 @@ public:
                     break;
                 case EVENT_INIT_FIGHT:
                     me->SetReactState(REACT_AGGRESSIVE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->SetInCombatWithZone();
                     return;
                 case EVENT_TEXT_SPEACH11:
@@ -478,7 +478,7 @@ public:
                     {
                         anveena->CastSpell(anveena, SPELL_SACRIFICE_OF_ANVEENA, true);
                         me->CastSpell(me, SPELL_CUSTOM_08_STATE, true);
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+                        me->SetUnitFlag(UNIT_FLAG_PACIFIED);
                         events.DelayEvents(7001);
                         events2.ScheduleEvent(EVENT_RESTORE_MELEE, 7000);
                     }
@@ -486,7 +486,7 @@ public:
                     break;
                 case EVENT_RESTORE_MELEE:
                     me->RemoveAurasDueToSpell(SPELL_CUSTOM_08_STATE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+                    me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
                     break;
             }
 
@@ -643,9 +643,9 @@ public:
             {
                 if (GameObject* orb = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1 + i)))
                 {
-                    if (orb->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE))
+                    if (orb->HasGameObjectFlag(GO_FLAG_NOT_SELECTABLE))
                     {
-                        orb->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        orb->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                         if (Creature* trigger = me->SummonTrigger(orb->GetPositionX(), orb->GetPositionY(), orb->GetPositionZ(), 0, 10 * MINUTE * IN_MILLISECONDS))
                         {
                             trigger->CastSpell(trigger, SPELL_RING_OF_BLUE_FLAMES, true, nullptr, nullptr, trigger->GetGUID());

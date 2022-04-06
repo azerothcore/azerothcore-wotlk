@@ -51,7 +51,7 @@ public:
 
             if (type == DATA_VAZRUDEN && state == DONE)
                 if (GameObject* chest = instance->GetGameObject(felIronChestGUID))
-                    chest->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                    chest->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
             return true;
         }
 

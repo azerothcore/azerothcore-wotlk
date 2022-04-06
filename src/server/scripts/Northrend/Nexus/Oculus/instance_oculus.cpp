@@ -148,19 +148,29 @@ public:
                         DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW, 0);
 
                         if( Creature* urom = instance->GetCreature(uiUromGUID) )
-                            urom->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            urom->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     }
                     break;
                 case DATA_UROM:
                     m_auiEncounter[DATA_UROM] = data;
                     if( data == DONE )
                         if( Creature* eregos = instance->GetCreature(uiEregosGUID) )
-                            eregos->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            eregos->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     break;
                 case DATA_EREGOS:
                     m_auiEncounter[DATA_EREGOS] = data;
                     if (data == DONE)
+                    {
                         DoRespawnGameObject(EregosCacheGUID, 7 * DAY);
+
+                        if (GameObject* cache = instance->GetGameObject(EregosCacheGUID))
+                        {
+                            if (Creature* eregos = instance->GetCreature(uiEregosGUID))
+                            {
+                                cache->SetLootRecipient(eregos);
+                            }
+                        }
+                    }
                     break;
                 case DATA_CC_COUNT:
                     if( CentrifugeCount < 10 )
@@ -171,7 +181,7 @@ public:
                     if( CentrifugeCount >= 10 )
                         if( Creature* varos = instance->GetCreature(uiVarosGUID) )
                         {
-                            varos->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            varos->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             varos->InterruptNonMeleeSpells(false);
                             varos->RemoveAura(50053);
                         }

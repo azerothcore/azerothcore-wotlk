@@ -143,7 +143,7 @@ public:
                         HandleGameObject(m_uiStageDoorLeftGUID, true);
                         HandleGameObject(m_uiStageDoorRightGUID, true);
                         if (GameObject* sideEntrance = instance->GetGameObject(m_uiSideEntranceDoor))
-                            sideEntrance->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+                            sideEntrance->RemoveGameObjectFlag(GO_FLAG_LOCKED);
                         instance->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, 16812, nullptr);
                     }
                     break;
@@ -187,9 +187,9 @@ public:
                 case GO_MASSIVE_DOOR:
                     m_uiMassiveDoor = go->GetGUID();
                     if (GetBossState(DATA_ARAN) != IN_PROGRESS)
-                        go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+                        go->SetGameObjectFlag(GO_FLAG_LOCKED);
                     else
-                        go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+                        go->RemoveGameObjectFlag(GO_FLAG_LOCKED);
                     break;
                 case GO_GAMESMAN_HALL_DOOR:
                     m_uiGamesmansDoor = go->GetGUID();
@@ -200,9 +200,9 @@ public:
                 case GO_NETHERSPACE_DOOR:
                     m_uiNetherspaceDoor = go->GetGUID();
                     if (GetBossState(DATA_PRINCE) != IN_PROGRESS)
-                        go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+                        go->SetGameObjectFlag(GO_FLAG_LOCKED);
                     else
-                        go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+                        go->RemoveGameObjectFlag(GO_FLAG_LOCKED);
                     break;
                 case GO_MASTERS_TERRACE_DOOR:
                     MastersTerraceDoor[0] = go->GetGUID();
@@ -213,9 +213,9 @@ public:
                 case GO_SIDE_ENTRANCE_DOOR:
                     m_uiSideEntranceDoor = go->GetGUID();
                     if (GetBossState(DATA_OPERA_PERFORMANCE) == DONE)
-                        go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+                        go->SetGameObjectFlag(GO_FLAG_LOCKED);
                     else
-                        go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+                        go->RemoveGameObjectFlag(GO_FLAG_LOCKED);
                     break;
                 case GO_DUST_COVERED_CHEST:
                     DustCoveredChest = go->GetGUID();
