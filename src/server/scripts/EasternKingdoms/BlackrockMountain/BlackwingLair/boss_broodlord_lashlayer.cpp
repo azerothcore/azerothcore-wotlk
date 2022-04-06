@@ -220,8 +220,8 @@ class go_suppression_device : public GameObjectScript
                 if (me->GetGoState() == GO_STATE_ACTIVE)
                     me->SetGoState(GO_STATE_READY);
                 me->SetLootState(GO_READY);
-                me->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-                _events.ScheduleEvent(EVENT_SUPPRESSION_CAST, 1000);
+                me->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                _events.ScheduleEvent(EVENT_SUPPRESSION_CAST, 5000);
                 me->Respawn();
             }
 
@@ -231,7 +231,7 @@ class go_suppression_device : public GameObjectScript
                     return;
                 _active = false;
                 me->SetGoState(GO_STATE_ACTIVE);
-                me->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                me->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                 _events.CancelEvent(EVENT_SUPPRESSION_CAST);
             }
 

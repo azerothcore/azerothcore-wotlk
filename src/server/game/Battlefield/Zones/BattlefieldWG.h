@@ -1208,7 +1208,7 @@ struct BfWGGameObjectBuilding
             case BATTLEFIELD_WG_OBJECTTYPE_DOOR_LAST:
                 m_WG->SetRelicInteractible(true);
                 if (GameObject* go = m_WG->GetRelic())
-                    go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                    go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                 else
                     LOG_ERROR("bg.battlefield", "BattlefieldWG: Relic not found.");
                 break;

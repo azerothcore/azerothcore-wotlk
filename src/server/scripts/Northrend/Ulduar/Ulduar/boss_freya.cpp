@@ -371,7 +371,7 @@ public:
                 me->DespawnOrUnsummon(5000);
                 if (GameObject* go = me->SummonGameObject(chestId, 2345.61f, -71.20f, 425.104f, 3.0f, 0, 0, 0, 0, 0))
                 {
-                    go->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
+                    go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
                     go->SetLootRecipient(me->GetMap());
                 }
 
