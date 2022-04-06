@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.battleground_deserters
+-- Дамп структуры для таблица acore_characters.battleground_deserters
 DROP TABLE IF EXISTS `battleground_deserters`;
 CREATE TABLE IF NOT EXISTS `battleground_deserters` (
   `guid` INT unsigned NOT NULL COMMENT 'characters.guid',
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `battleground_deserters` (
   `datetime` datetime NOT NULL COMMENT 'datetime of the desertion'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- Дамп данных таблицы _acore_characters.battleground_deserters: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.battleground_deserters: ~0 rows (приблизительно)
 DELETE FROM `battleground_deserters`;
 /*!40000 ALTER TABLE `battleground_deserters` DISABLE KEYS */;
 /*!40000 ALTER TABLE `battleground_deserters` ENABLE KEYS */;

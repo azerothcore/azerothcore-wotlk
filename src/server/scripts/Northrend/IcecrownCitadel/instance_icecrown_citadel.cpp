@@ -251,7 +251,7 @@ public:
                         SpellAreaForAreaMapBounds saBounds = sSpellMgr->GetSpellAreaForAreaMapBounds(4812);
                         for (SpellAreaForAreaMap::const_iterator itr = saBounds.first; itr != saBounds.second; ++itr)
                             if ((itr->second->raceMask & plr->getRaceMask()) && !creature->HasAura(itr->second->spellId))
-                                if (const SpellInfo* si = sSpellMgr->GetSpellInfo(itr->second->spellId))
+                                if (SpellInfo const* si = sSpellMgr->GetSpellInfo(itr->second->spellId))
                                     if (si->HasAura(SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT))
                                         creature->AddAura(itr->second->spellId, creature);
                     }
@@ -758,12 +758,12 @@ public:
                 case GO_GAS_RELEASE_VALVE:
                     GasReleaseValveGUID = go->GetGUID();
                     if (GetBossState(DATA_FESTERGUT) != DONE)
-                        go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE);
+                        go->SetGameObjectFlag(GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE);
                     break;
                 case GO_OOZE_RELEASE_VALVE:
                     OozeReleaseValveGUID = go->GetGUID();
                     if (GetBossState(DATA_ROTFACE) != DONE)
-                        go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE);
+                        go->SetGameObjectFlag(GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE);
                     break;
                 case GO_DRINK_ME:
                     PutricideTableGUID = go->GetGUID();
@@ -774,7 +774,7 @@ public:
                 case GO_CACHE_OF_THE_DREAMWALKER_25H:
                     if (Creature* valithria = instance->GetCreature(ValithriaDreamwalkerGUID))
                         go->SetLootRecipient(valithria);
-                    go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED | GO_FLAG_NOT_SELECTABLE | GO_FLAG_NODESPAWN);
+                    go->RemoveGameObjectFlag(GO_FLAG_LOCKED | GO_FLAG_NOT_SELECTABLE | GO_FLAG_NODESPAWN);
                     break;
                 case GO_SCOURGE_TRANSPORTER_LK:
                     TheLichKingTeleportGUID = go->GetGUID();
@@ -819,7 +819,7 @@ public:
                     AddDoor(go, true);
                     ScourgeTransporterFirstGUID = go->GetGUID();
                     if (GetBossState(DATA_LORD_MARROWGAR) == DONE)
-                        go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
                 default:
                     break;
@@ -1029,7 +1029,7 @@ public:
                         WeeklyQuestId10 = RAND(QUEST_BLOOD_QUICKENING_10, QUEST_RESIDUE_RENDEZVOUS_10, QUEST_RESPITE_FOR_A_TORMENTED_SOUL_10, QUEST_DEPROGRAMMING_10, QUEST_SECURING_THE_RAMPARTS_10);
                         SetData(DATA_WEEKLY_QUEST_ID, 0); // show required hidden npcs
                         if (GameObject* transporter = instance->GetGameObject(ScourgeTransporterFirstGUID))
-                            transporter->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                            transporter->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                         SaveToDB();
                     }
                     break;
@@ -1043,7 +1043,7 @@ public:
                         if (GameObject* loot = instance->GetGameObject(GunshipArmoryGUID))
                         {
                             loot->SetLootRecipient(instance);
-                            loot->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED | GO_FLAG_NOT_SELECTABLE | GO_FLAG_NODESPAWN);
+                            loot->RemoveGameObjectFlag(GO_FLAG_LOCKED | GO_FLAG_NOT_SELECTABLE | GO_FLAG_NODESPAWN);
                         }
                     }
                     else if (state == FAIL)
@@ -1057,14 +1057,14 @@ public:
                             {
                                 if (Creature* deathbringer = instance->GetCreature(DeathbringerSaurfangGUID))
                                     loot->SetLootRecipient(deathbringer);
-                                loot->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED | GO_FLAG_NOT_SELECTABLE | GO_FLAG_NODESPAWN);
+                                loot->RemoveGameObjectFlag(GO_FLAG_LOCKED | GO_FLAG_NOT_SELECTABLE | GO_FLAG_NODESPAWN);
                             }
                             [[fallthrough]];
                         case NOT_STARTED:
                             if (GameObject* teleporter = instance->GetGameObject(SaurfangTeleportGUID))
                             {
                                 HandleGameObject(SaurfangTeleportGUID, true, teleporter);
-                                teleporter->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
+                                teleporter->RemoveGameObjectFlag(GO_FLAG_IN_USE);
                             }
                             break;
                         default:
@@ -1075,7 +1075,7 @@ public:
                     if (state == DONE)
                     {
                         if (GameObject* go = instance->GetGameObject(GasReleaseValveGUID))
-                            go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE);
+                            go->RemoveGameObjectFlag(GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE);
                         if (GetBossState(DATA_ROTFACE) == DONE)
                             HandleDropAttempt(false);
                     }
@@ -1084,7 +1084,7 @@ public:
                     if (state == DONE)
                     {
                         if (GameObject* go = instance->GetGameObject(OozeReleaseValveGUID))
-                            go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE);
+                            go->RemoveGameObjectFlag(GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE);
                         if (GetBossState(DATA_FESTERGUT) == DONE)
                             HandleDropAttempt(false);
                     }

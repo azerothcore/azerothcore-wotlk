@@ -215,7 +215,7 @@ void npc_escortAI::EnterEvadeMode()
     {
         me->GetMotionMaster()->MoveTargetedHome();
         if (HasImmuneToNPCFlags)
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
         Reset();
     }
 }
@@ -451,13 +451,13 @@ void npc_escortAI::Start(bool isActiveAttacker /* = true*/, bool run /* = false 
 {
     if (me->GetVictim())
     {
-        LOG_ERROR("entities.unit.ai", "ERROR: EscortAI (script: %s, creature entry: %u) attempts to Start while in combat", me->GetScriptName().c_str(), me->GetEntry());
+        LOG_ERROR("entities.unit.ai", "ERROR: EscortAI (script: {}, creature entry: {}) attempts to Start while in combat", me->GetScriptName(), me->GetEntry());
         return;
     }
 
     if (HasEscortState(STATE_ESCORT_ESCORTING))
     {
-        LOG_ERROR("entities.unit.ai", "EscortAI (script: %s, creature entry: %u) attempts to Start while already escorting", me->GetScriptName().c_str(), me->GetEntry());
+        LOG_ERROR("entities.unit.ai", "EscortAI (script: {}, creature entry: {}) attempts to Start while already escorting", me->GetScriptName(), me->GetEntry());
         return;
     }
 
@@ -470,8 +470,8 @@ void npc_escortAI::Start(bool isActiveAttacker /* = true*/, bool run /* = false 
 
     if (WaypointList.empty())
     {
-        LOG_ERROR("sql.sql", "EscortAI (script: %s, creature entry: %u) starts with 0 waypoints (possible missing entry in script_waypoint. Quest: %u).",
-                         me->GetScriptName().c_str(), me->GetEntry(), quest ? quest->GetQuestId() : 0);
+        LOG_ERROR("sql.sql", "EscortAI (script: {}, creature entry: {}) starts with 0 waypoints (possible missing entry in script_waypoint. Quest: {}).",
+                         me->GetScriptName(), me->GetEntry(), quest ? quest->GetQuestId() : 0);
         return;
     }
 
@@ -496,15 +496,15 @@ void npc_escortAI::Start(bool isActiveAttacker /* = true*/, bool run /* = false 
     }
 
     //disable npcflags
-    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
-    if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
+    me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
+    if (me->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC))
     {
         HasImmuneToNPCFlags = true;
-        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
     }
 
-    LOG_DEBUG("scripts.ai", "EscortAI started with " UI64FMTD " waypoints. ActiveAttacker = %d, Run = %d, PlayerGUID = %s",
-        uint64(WaypointList.size()), m_bIsActiveAttacker, m_bIsRunning, m_uiPlayerGUID.ToString().c_str());
+    LOG_DEBUG("scripts.ai", "EscortAI started with {} waypoints. ActiveAttacker = {}, Run = {}, PlayerGUID = {}",
+        uint64(WaypointList.size()), m_bIsActiveAttacker, m_bIsRunning, m_uiPlayerGUID.ToString());
 
     CurrentWP = WaypointList.begin();
 

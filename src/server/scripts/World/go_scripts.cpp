@@ -43,6 +43,7 @@ EndContentData */
 
 #include "CellImpl.h"
 #include "GameObjectAI.h"
+#include "GameTime.h"
 #include "GridNotifiersImpl.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -894,7 +895,7 @@ public:
                 if (player->GetQuestStatus(QUEST_THE_FIRST_TRIAL) == QUEST_STATUS_INCOMPLETE)
                 {
                     _playerGUID = player->GetGUID();
-                    me->SetFlag(GAMEOBJECT_FLAGS, 1);
+                    me->SetGameObjectFlag((GameObjectFlags)1);
                     me->RemoveByteFlag(GAMEOBJECT_BYTES_1, 0, 1);
                     _events.ScheduleEvent(EVENT_STILLBLADE_SPAWN, 1000);
                 }
@@ -921,7 +922,7 @@ public:
                 }
                 case EVENT_RESET_BRAZIER:
                 {
-                    me->RemoveFlag(GAMEOBJECT_FLAGS, 1);
+                    me->RemoveGameObjectFlag((GameObjectFlags)1);
                     me->SetByteFlag(GAMEOBJECT_BYTES_1, 0, 1);
                     break;
                 }
@@ -1414,7 +1415,7 @@ class go_inconspicuous_landmark : public GameObjectScript
 public:
     go_inconspicuous_landmark() : GameObjectScript("go_inconspicuous_landmark")
     {
-        _lastUsedTime = time(nullptr);
+        _lastUsedTime = GameTime::GetGameTime().count();
     }
 
     bool OnGossipHello(Player* player, GameObject* /*go*/) override
@@ -1422,10 +1423,10 @@ public:
         if (player->HasItemCount(ITEM_CUERGOS_KEY))
             return true;
 
-        if (_lastUsedTime > time(nullptr))
+        if (_lastUsedTime > GameTime::GetGameTime().count())
             return true;
 
-        _lastUsedTime = time(nullptr) + MINUTE;
+        _lastUsedTime = GameTime::GetGameTime().count() + MINUTE;
         player->CastSpell(player, SPELL_SUMMON_PIRATES_TREASURE_AND_TRIGGER_MOB, true);
         return true;
     }
@@ -1890,11 +1891,8 @@ public:
                 {
                 case EVENT_TIME:
                 {
-                    // Get how many times it should ring
-                    time_t t = time(nullptr);
-                    tm local_tm;
                     tzset(); // set timezone for localtime_r() -> fix issues due to daylight time
-                    localtime_r(&t, &local_tm);
+                    tm local_tm = Acore::Time::TimeBreakdown();
                     uint8 _rings = (local_tm.tm_hour) % 12;
                     _rings = (_rings == 0) ? 12 : _rings; // 00:00 and 12:00
 

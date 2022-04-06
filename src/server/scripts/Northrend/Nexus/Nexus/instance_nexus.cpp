@@ -91,17 +91,17 @@ public:
             {
                 case GO_TELESTRA_SPHERE:
                     if (GetBossState(DATA_TELESTRA_ORB) != DONE && GetBossState(DATA_MAGUS_TELESTRA_EVENT) == DONE)
-                        gameObject->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        gameObject->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     AddDoor(gameObject, true);
                     break;
                 case GO_ANOMALUS_SPHERE:
                     if (GetBossState(DATA_ANOMALUS_ORB) != DONE && GetBossState(DATA_ANOMALUS_EVENT) == DONE)
-                        gameObject->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        gameObject->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     AddDoor(gameObject, true);
                     break;
                 case GO_ORMOROK_SPHERE:
                     if (GetBossState(DATA_ORMOROK_ORB) != DONE && GetBossState(DATA_ORMOROK_EVENT) == DONE)
-                        gameObject->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        gameObject->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     AddDoor(gameObject, true);
                     break;
             }
@@ -148,7 +148,7 @@ public:
 
             BossInfo const* bossInfo = GetBossInfo(id + DATA_TELESTRA_ORB);
             for (DoorSet::const_iterator i = bossInfo->door[DOOR_TYPE_PASSAGE].begin(); i != bossInfo->door[DOOR_TYPE_PASSAGE].end(); ++i)
-                (*i)->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                (*i)->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
             return true;
         }
 
@@ -217,8 +217,8 @@ public:
             restoreTimer = 0;
             abilityTimer1 = 0;
             abilityTimer2 = 30000;
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void EnterCombat(Unit*) override
@@ -244,8 +244,8 @@ public:
                     damage = 0;
 
                     me->SetReactState(REACT_PASSIVE);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->SetRegeneratingHealth(false);
                     me->CastSpell(me, SPELL_SUMMON_SEED_POD, true);
                     me->CastSpell(me, SPELL_SEED_POD, true);
@@ -266,8 +266,8 @@ public:
                     me->SetRegeneratingHealth(true);
                     restoreTimer = 0;
                     me->SetReactState(REACT_AGGRESSIVE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 }
                 return;
             }

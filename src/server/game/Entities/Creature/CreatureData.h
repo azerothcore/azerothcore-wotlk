@@ -433,7 +433,6 @@ struct CreatureAddon
     uint32 bytes1;
     uint32 bytes2;
     uint32 emote;
-    bool isLarge;
     std::vector<uint32> auras;
     VisibilityDistanceType visibilityDistanceType;
 };
@@ -485,8 +484,7 @@ struct VendorItemData
 
 struct VendorItemCount
 {
-    explicit VendorItemCount(uint32 _item, uint32 _count)
-        : itemId(_item), count(_count), lastIncrementTime(time(nullptr)) {}
+    explicit VendorItemCount(uint32 _item, uint32 _count);
 
     uint32 itemId;
     uint32 count;

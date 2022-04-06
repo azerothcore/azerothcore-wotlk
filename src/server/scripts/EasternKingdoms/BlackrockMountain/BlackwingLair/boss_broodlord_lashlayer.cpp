@@ -83,7 +83,9 @@ public:
             std::list<GameObject*> _goList;
             GetGameObjectListWithEntryInGrid(_goList, me, GO_SUPPRESSION_DEVICE, 200.0f);
             for (std::list<GameObject*>::const_iterator itr = _goList.begin(); itr != _goList.end(); itr++)
+            {
                 ((*itr)->AI()->DoAction(ACTION_DEACTIVATE));
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -103,7 +105,7 @@ public:
                         break;
                     case EVENT_BLASTWAVE:
                         DoCastVictim(SPELL_BLASTWAVE);
-                        events.ScheduleEvent(EVENT_BLASTWAVE, 8000, 16000);
+                        events.ScheduleEvent(EVENT_BLASTWAVE, 20000, 35000);
                         break;
                     case EVENT_MORTALSTRIKE:
                         DoCastVictim(SPELL_MORTALSTRIKE);
@@ -145,7 +147,6 @@ class go_suppression_device : public GameObjectScript
         {
             switch (state)
             {
-
                 case GO_JUST_DEACTIVATED: // This case prevents the Gameobject despawn by Disarm Trap
                     go->SetLootState(GO_READY);
                     [[fallthrough]];
@@ -197,14 +198,17 @@ class go_suppression_device : public GameObjectScript
             {
                 if (action == ACTION_DEACTIVATE)
                 {
-                    Deactivate();
                     _events.CancelEvent(EVENT_SUPPRESSION_RESET);
                 }
                 else if (action == ACTION_DISARMED)
                 {
                     Deactivate();
                     _events.CancelEvent(EVENT_SUPPRESSION_CAST);
-                    _events.ScheduleEvent(EVENT_SUPPRESSION_RESET, urand(30000, 120000));
+
+                    if (_instance->GetBossState(DATA_BROODLORD_LASHLAYER) != DONE)
+                    {
+                        _events.ScheduleEvent(EVENT_SUPPRESSION_RESET, urand(30000, 120000));
+                    }
                 }
             }
 
@@ -216,8 +220,8 @@ class go_suppression_device : public GameObjectScript
                 if (me->GetGoState() == GO_STATE_ACTIVE)
                     me->SetGoState(GO_STATE_READY);
                 me->SetLootState(GO_READY);
-                me->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-                _events.ScheduleEvent(EVENT_SUPPRESSION_CAST, 1000);
+                me->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                _events.ScheduleEvent(EVENT_SUPPRESSION_CAST, 5000);
                 me->Respawn();
             }
 
@@ -227,7 +231,7 @@ class go_suppression_device : public GameObjectScript
                     return;
                 _active = false;
                 me->SetGoState(GO_STATE_ACTIVE);
-                me->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                me->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                 _events.CancelEvent(EVENT_SUPPRESSION_CAST);
             }
 

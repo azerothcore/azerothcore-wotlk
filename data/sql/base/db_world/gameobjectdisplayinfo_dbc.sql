@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.gameobjectdisplayinfo_dbc
+-- Дамп структуры для таблица acore_world.gameobjectdisplayinfo_dbc
 DROP TABLE IF EXISTS `gameobjectdisplayinfo_dbc`;
 CREATE TABLE IF NOT EXISTS `gameobjectdisplayinfo_dbc` (
   `ID` INT NOT NULL DEFAULT 0,
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS `gameobjectdisplayinfo_dbc` (
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.gameobjectdisplayinfo_dbc: 0 rows
+-- Дамп данных таблицы acore_world.gameobjectdisplayinfo_dbc: 0 rows
 DELETE FROM `gameobjectdisplayinfo_dbc`;
 /*!40000 ALTER TABLE `gameobjectdisplayinfo_dbc` DISABLE KEYS */;
 /*!40000 ALTER TABLE `gameobjectdisplayinfo_dbc` ENABLE KEYS */;

@@ -146,22 +146,22 @@ public:
             summons2.DespawnAll();
             BoatNum = 0;
 
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
 
             if(pInstance)
             {
                 pInstance->SetData(DATA_KING_YMIRON, NOT_STARTED);
                 pInstance->SetData(DATA_YMIRON_ACHIEVEMENT, true);
 
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 if (pInstance->GetData(DATA_SKADI_THE_RUTHLESS) == DONE)
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             }
         }
 
         void EnterEvadeMode() override
         {
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+            me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
             ScriptedAI::EnterEvadeMode();
         }
 
@@ -172,7 +172,7 @@ public:
             {
                 pInstance->SetData(DATA_KING_YMIRON, IN_PROGRESS);
                 if (pInstance->GetData(DATA_SKADI_THE_RUTHLESS) == DONE)
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             }
 
             events.RescheduleEvent(EVENT_YMIRON_BANE, 18000);
@@ -196,7 +196,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit*, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit*, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == 59302 && pInstance) // Bane trigger
                 pInstance->SetData(DATA_YMIRON_ACHIEVEMENT, false);
@@ -218,12 +218,12 @@ public:
                         if (me->GetHealth() < std::max(0.0f, float(me->GetMaxHealth() * (1.0f - (IsHeroic() ? 0.2f : 0.334f)*float(BoatNum + 1)))))
                         {
                             events.DelayEvents(12000);
-                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             me->InterruptNonMeleeSpells(true);
                             me->CastSpell(me, SPELL_SCREAMS_OF_THE_DEAD, true);
                             me->GetMotionMaster()->Clear();
                             me->GetMotionMaster()->MovePoint(0, BoatStructure[BoatOrder[BoatNum]].MoveX, BoatStructure[BoatOrder[BoatNum]].MoveY, BoatStructure[BoatOrder[BoatNum]].MoveZ);
-                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                            me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE);
                             summons.DespawnAll();
 
                             // Spawn flames in previous boat if any
@@ -264,12 +264,12 @@ public:
                         // Spawn it!
                         if (Creature* king = me->SummonCreature(BoatStructure[BoatOrder[BoatNum - 1]].npc, BoatStructure[BoatOrder[BoatNum - 1]].SpawnX, BoatStructure[BoatOrder[BoatNum - 1]].SpawnY, BoatStructure[BoatOrder[BoatNum - 1]].SpawnZ, BoatStructure[BoatOrder[BoatNum - 1]].SpawnO, TEMPSUMMON_CORPSE_DESPAWN, 0))
                         {
-                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             king->CastSpell(me, SPELL_CHANNEL_SPIRIT_TO_YMIRON, true);
                             summons.Summon(king);
-                            king->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                            king->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                             king->SetDisableGravity(true);
-                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                            me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
                             me->GetMotionMaster()->MoveChase(me->GetVictim());
                             switch(BoatOrder[BoatNum - 1])
                             {
@@ -297,7 +297,7 @@ public:
                             summons.Summon(sf);
                             sf->SetSpeed(MOVE_RUN, 0.4f);
                             sf->AddAura(IsHeroic() ? SPELL_SPIRIT_FOUNT_H : SPELL_SPIRIT_FOUNT_N, sf);
-                            sf->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                            sf->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                             sf->GetMotionMaster()->MoveFollow(me->GetVictim(), 0, rand_norm()*M_PI * 2);
                         }
                         break;

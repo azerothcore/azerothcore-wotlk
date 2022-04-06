@@ -253,7 +253,7 @@ public:
                     break;
             }
 
-            // LOG_DEBUG("scripts", "Instance Hyjal: Instance data updated for event %u (Data=%u)", type, data);
+            // LOG_DEBUG("scripts", "Instance Hyjal: Instance data updated for event {} (Data={})", type, data);
 
             if (data == DONE)
             {

@@ -144,7 +144,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_PHANTOM_BLAST_H)
                 bAchiev = false;
@@ -165,7 +165,7 @@ public:
             }
         }
 
-        bool CanAIAttack(const Unit* target) const override { return target->GetPositionZ() > 706.5f; }
+        bool CanAIAttack(Unit const* target) const override { return target->GetPositionZ() > 706.5f; }
 
         void UpdateAI(uint32 diff) override
         {

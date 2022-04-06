@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.gossip_menu_option_locale
+-- Дамп структуры для таблица acore_world.gossip_menu_option_locale
 DROP TABLE IF EXISTS `gossip_menu_option_locale`;
 CREATE TABLE IF NOT EXISTS `gossip_menu_option_locale` (
   `MenuID` SMALLINT unsigned NOT NULL DEFAULT 0,
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `gossip_menu_option_locale` (
   PRIMARY KEY (`MenuID`,`OptionID`,`Locale`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
--- Дамп данных таблицы _acore_world.gossip_menu_option_locale: ~8 256 rows (приблизительно)
+-- Дамп данных таблицы acore_world.gossip_menu_option_locale: ~8 256 rows (приблизительно)
 DELETE FROM `gossip_menu_option_locale`;
 /*!40000 ALTER TABLE `gossip_menu_option_locale` DISABLE KEYS */;
 INSERT INTO `gossip_menu_option_locale` (`MenuID`, `OptionID`, `Locale`, `OptionText`, `BoxText`) VALUES
@@ -2991,7 +2991,7 @@ INSERT INTO `gossip_menu_option_locale` (`MenuID`, `OptionID`, `Locale`, `Option
 	(5483, 3, 'zhCN', '巴尼尔，我好像把第四章给弄丢了。', ''),
 	(5541, 0, 'deDE', 'Ich seh mich nur mal um.', ''),
 	(5542, 0, 'deDE', 'Was verkauft Ihr?', ''),
-	(5602, 0, 'deDE', 'Danke, Eisenborke. Wir Ã¶ffnen Euch die TÃ¼r.', ''),
+	(5602, 0, 'deDE', 'Danke, Eisenborke. Wir öffnen Euch die Tür.', ''),
 	(5602, 0, 'zhCN', '谢谢你，埃隆巴克。我们等着你打开大门。', ''),
 	(5665, 0, 'deDE', 'Bildet mich aus.', ''),
 	(5665, 0, 'frFR', 'Entrainez-moi.', NULL),

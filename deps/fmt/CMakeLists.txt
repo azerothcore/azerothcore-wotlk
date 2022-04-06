@@ -59,6 +59,11 @@ if (HAVE_STRTOD_L)
       FMT_LOCALE)
 endif()
 
+# Define FMT_CONSTEVAL for current using in c++20
+target_compile_definitions(fmt
+  PUBLIC
+    FMT_CONSTEVAL=)
+
 target_include_directories(fmt
   PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include)

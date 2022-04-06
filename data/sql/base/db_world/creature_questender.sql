@@ -12,15 +12,15 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.creature_questender
+-- Дамп структуры для таблица acore_world.creature_questender
 DROP TABLE IF EXISTS `creature_questender`;
 CREATE TABLE IF NOT EXISTS `creature_questender` (
-  `id` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Identifier',
-  `quest` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Quest Identifier',
+  `id` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Identifier',
+  `quest` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Quest Identifier',
   PRIMARY KEY (`id`,`quest`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Creature System';
 
--- Дамп данных таблицы _acore_world.creature_questender: 7 861 rows
+-- Дамп данных таблицы acore_world.creature_questender: 7 860 rows
 DELETE FROM `creature_questender`;
 /*!40000 ALTER TABLE `creature_questender` DISABLE KEYS */;
 INSERT INTO `creature_questender` (`id`, `quest`) VALUES
@@ -2488,7 +2488,6 @@ INSERT INTO `creature_questender` (`id`, `quest`) VALUES
 	(10837, 5096),
 	(10837, 5098),
 	(10837, 5238),
-	(10837, 5511),
 	(10837, 10374),
 	(10838, 211),
 	(10838, 5066),
@@ -2497,7 +2496,6 @@ INSERT INTO `creature_questender` (`id`, `quest`) VALUES
 	(10838, 5092),
 	(10838, 5097),
 	(10838, 5237),
-	(10838, 5505),
 	(10838, 8415),
 	(10838, 8416),
 	(10838, 8418),
@@ -2584,12 +2582,14 @@ INSERT INTO `creature_questender` (`id`, `quest`) VALUES
 	(11055, 5232),
 	(11055, 5234),
 	(11055, 5236),
+	(11056, 5505),
 	(11056, 5533),
 	(11056, 5537),
 	(11056, 5801),
 	(11056, 5803),
 	(11057, 838),
 	(11057, 964),
+	(11057, 5511),
 	(11057, 5802),
 	(11057, 5804),
 	(11063, 5168),
@@ -2839,16 +2839,16 @@ INSERT INTO `creature_questender` (`id`, `quest`) VALUES
 	(13441, 7002),
 	(13442, 6881),
 	(13442, 7386),
-	(13444, 7021),
 	(13444, 7022),
 	(13444, 7023),
-	(13444, 7024),
 	(13444, 7025),
 	(13444, 7045),
 	(13444, 8827),
 	(13445, 6961),
 	(13445, 6962),
 	(13445, 6984),
+	(13445, 7021),
+	(13445, 7024),
 	(13445, 8828),
 	(13446, 6846),
 	(13448, 7401),
@@ -6884,7 +6884,6 @@ INSERT INTO `creature_questender` (`id`, `quest`) VALUES
 	(28914, 12754),
 	(28914, 12756),
 	(28919, 12716),
-	(28919, 12717),
 	(29006, 12726),
 	(29006, 12735),
 	(29006, 12736),

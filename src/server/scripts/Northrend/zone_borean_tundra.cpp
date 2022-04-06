@@ -80,7 +80,7 @@ public:
             owner->CastSpell(owner, SPELL_SUBDUED, true);
             GetCaster()->CastSpell(GetCaster(), SPELL_DRAKE_HATCHLING_SUBDUED, true);
             owner->SetFaction(FACTION_FRIENDLY);
-            owner->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            owner->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             owner->DespawnOrUnsummon(3 * MINUTE * IN_MILLISECONDS);
         }
 
@@ -132,7 +132,7 @@ public:
             casterGuid.Clear();
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (phase || spell->Id != SPELL_SET_CART)
                 return;
@@ -179,7 +179,7 @@ public:
                         DoCast(me, SPELL_SUMMON_WORM, true);
                         if (Unit* worm = me->FindNearestCreature(NPC_SCOURGED_BURROWER, 3.0f))
                         {
-                            worm->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                            worm->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                             worm->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
                         }
                         phaseTimer = 1000;
@@ -190,7 +190,7 @@ public:
                         if (Unit* worm = me->FindNearestCreature(NPC_SCOURGED_BURROWER, 3.0f))
                         {
                             Unit::Kill(me, worm);
-                            worm->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+                            worm->RemoveDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
                         }
                         phaseTimer = 2000;
                         phase = 7;
@@ -551,7 +551,7 @@ struct npc_beryl_sorcererAI : public CreatureAI
             _events.ScheduleEvent(EVENT_FROSTBOLT, 3000, 4000);
         }
 
-        void SpellHit(Unit* unit, const SpellInfo* spell) override
+        void SpellHit(Unit* unit, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_ARCANE_CHAINS && !_chainsCast)
             {
@@ -630,7 +630,7 @@ public:
 
         void Initialize()
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             _events.ScheduleEvent(EVENT_ADD_ARCANE_CHAINS, 0);
         }
 
@@ -774,7 +774,7 @@ public:
         {
         }
 
-        void SpellHit(Unit* unit, const SpellInfo* spell) override
+        void SpellHit(Unit* unit, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_NEURAL_NEEDLE && unit->GetTypeId() == TYPEID_PLAYER)
             {
@@ -1181,7 +1181,7 @@ public:
         {
             Initialize();
             _emoteState = creature->GetUInt32Value(UNIT_NPC_EMOTESTATE);
-            _npcFlags   = creature->GetUInt32Value(UNIT_NPC_FLAGS);
+            _npcFlags   = creature->GetNpcFlags();
         }
 
         void Initialize()
@@ -1198,7 +1198,7 @@ public:
 
             if (_npcFlags)
             {
-                me->SetUInt32Value(UNIT_NPC_FLAGS, _npcFlags);
+                me->ReplaceAllNpcFlags(_npcFlags);
             }
 
             Initialize();
@@ -1209,7 +1209,7 @@ public:
         void PreScript()
         {
             me->StopMoving();
-            me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+            me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
             if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
             {
@@ -1309,7 +1309,7 @@ public:
         private:
             EventMap   _events;
             uint32     _emoteState;
-            uint32     _npcFlags;
+            NPCFlags   _npcFlags;
             ObjectGuid _playerGUID;
     };
 
@@ -1505,7 +1505,7 @@ public:
 
         void Reset() override
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
             _events.ScheduleEvent(EVENT_THASSARIAN_CAST, 1000);
         }
 
@@ -1562,8 +1562,8 @@ public:
             me->SetFaction(FACTION_VALIANCE_EXPEDITION_7);
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             Initialize();
         }
 
@@ -1618,7 +1618,7 @@ public:
                         if (Creature* arthas = me->SummonCreature(NPC_IMAGE_LICH_KING, 3729.4614f, 3520.386f, 473.4048f, 1.361f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 120000))
                         {
                             _arthasGUID = arthas->GetGUID();
-                            arthas->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            arthas->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             arthas->SetReactState(REACT_PASSIVE);
                             arthas->SetWalk(true);
                         }
@@ -1653,7 +1653,7 @@ public:
                             talbot->UpdateEntry(NPC_PRINCE_VALANAR);
                             talbot->SetFullHealth();
                             talbot->SetFaction(FACTION_UNDEAD_SCOURGE);
-                            talbot->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            talbot->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             talbot->SetReactState(REACT_PASSIVE);
                             talbot->SetStandState(UNIT_STAND_STATE_KNEEL);
                         }
@@ -1673,16 +1673,16 @@ public:
                         {
                             _arlosGUID = arlos->GetGUID();
                             arlos->SetWalk(true);
-                            arlos->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
-                            arlos->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                            arlos->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                            arlos->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                             arlos->GetMotionMaster()->MovePath(PATH_ARLOS, false);
                         }
                         if (Creature* leryssa = me->SummonCreature(NPC_LERYSSA, 3751.0986f, 3614.9219f, 473.4048f, 4.5029f, TEMPSUMMON_CORPSE_TIMED_DESPAWN))
                         {
                             _leryssaGUID = leryssa->GetGUID();
                             leryssa->SetWalk(true);
-                            leryssa->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
-                            leryssa->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                            leryssa->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                            leryssa->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                             leryssa->GetMotionMaster()->MovePath(PATH_LERYSSA, false);
                         }
                         _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_7, 7000);
@@ -1771,12 +1771,12 @@ public:
                         break;
                     case EVENT_THASSARIAN_SCRIPT_17:
                         // Talbot say text 4 and attack
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                         if (Creature* talbot = ObjectAccessor::GetCreature(*me, _talbotGUID))
                         {
                             talbot->AI()->Talk(SAY_TALBOT_4);
                             talbot->SetFaction(FACTION_UNDEAD_SCOURGE_9);
-                            talbot->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            talbot->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             talbot->SetReactState(REACT_AGGRESSIVE);
                             talbot->Attack(me, false);
                         }
@@ -1798,8 +1798,8 @@ public:
                         break;
                     case EVENT_THASSARIAN_SCRIPT_19:
                         // Leryssa set facing to me
-                        me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                        me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                        me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                        me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                         if (Creature* leryssa = me->FindNearestCreature(NPC_LERYSSA, 50.0f, true))
                         {
                             _leryssaGUID = leryssa->GetGUID();
@@ -1937,7 +1937,7 @@ public:
             {
                 _playerGUID = player->GetGUID();
                 CloseGossipMenuFor(player);
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 me->GetMotionMaster()->MovePath(PATH_THASSARIAN, false);
             }
         }

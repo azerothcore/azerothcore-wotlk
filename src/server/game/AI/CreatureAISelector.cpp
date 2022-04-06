@@ -53,7 +53,7 @@ namespace FactorySelector
                 ai_factory = ai_registry.GetRegistryItem("VehicleAI");
             else if (creature->HasUnitTypeMask(UNIT_MASK_CONTROLABLE_GUARDIAN) && ((Guardian*)creature)->GetOwner()->GetTypeId() == TYPEID_PLAYER)
                 ai_factory = ai_registry.GetRegistryItem("PetAI");
-            else if (creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK))
+            else if (creature->HasNpcFlag(UNIT_NPC_FLAG_SPELLCLICK))
                 ai_factory = ai_registry.GetRegistryItem("NullCreatureAI");
             else if (creature->IsGuard())
                 ai_factory = ai_registry.GetRegistryItem("GuardAI");
@@ -94,7 +94,7 @@ namespace FactorySelector
 
         // select NullCreatureAI if not another cases
         ainame = (ai_factory == nullptr) ? "NullCreatureAI" : ai_factory->key();
-        LOG_DEBUG("scripts.ai", "Creature %s used AI is %s.", creature->GetGUID().ToString().c_str(), ainame.c_str());
+        LOG_DEBUG("scripts.ai", "Creature {} used AI is {}.", creature->GetGUID().ToString(), ainame);
         return (ai_factory == nullptr ? new NullCreatureAI(creature) : ai_factory->Create(creature));
     }
 
@@ -139,7 +139,7 @@ namespace FactorySelector
         //future goAI types go here
 
         std::string ainame = (ai_factory == nullptr || go->GetScriptId()) ? "NullGameObjectAI" : ai_factory->key();
-        LOG_DEBUG("scripts.ai", "GameObject %s used AI is %s.", go->GetGUID().ToString().c_str(), ainame.c_str());
+        LOG_DEBUG("scripts.ai", "GameObject {} used AI is {}.", go->GetGUID().ToString(), ainame);
 
         return (ai_factory == nullptr ? new NullGameObjectAI(go) : ai_factory->Create(go));
     }

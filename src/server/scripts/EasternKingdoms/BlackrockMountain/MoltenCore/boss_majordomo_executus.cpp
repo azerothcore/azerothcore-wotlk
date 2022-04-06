@@ -73,8 +73,7 @@ enum Spells
 
 enum Events
 {
-    EVENT_MAGIC_REFLECTION                  = 1,
-    EVENT_DAMAGE_REFLECTION,
+    EVENT_SHIELD_REFLECTION                 = 1,
     EVENT_TELEPORT_RANDOM,
     EVENT_TELEPORT_TARGET,
     EVENT_AEGIS_OF_RAGNAROS,
@@ -152,7 +151,7 @@ public:
             {
                 summon->CastSpell(summon, SPELL_RAGNAROS_FADE);
                 summon->CastSpell(summon, SPELL_RAGNAROS_SUBMERGE_EFFECT, true);
-                summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
+                summon->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
                 summon->SetReactState(REACT_PASSIVE);
             }
         }
@@ -181,8 +180,8 @@ public:
             else
             {
                 events.SetPhase(PHASE_NONE);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 me->SetFaction(FACTION_MAJORDOMO_FRIENDLY);
             }
         }
@@ -247,10 +246,9 @@ public:
             Talk(SAY_AGGRO);
             DoCastSelf(SPELL_AEGIS_OF_RAGNAROS, true);
 
-            events.ScheduleEvent(EVENT_MAGIC_REFLECTION, 30000, PHASE_COMBAT, PHASE_COMBAT);
-            events.ScheduleEvent(EVENT_DAMAGE_REFLECTION, 15000, PHASE_COMBAT, PHASE_COMBAT);
-            events.ScheduleEvent(EVENT_TELEPORT_RANDOM, 15000, PHASE_COMBAT, PHASE_COMBAT);
-            events.ScheduleEvent(EVENT_TELEPORT_TARGET, 30000, PHASE_COMBAT, PHASE_COMBAT);
+            events.ScheduleEvent(EVENT_SHIELD_REFLECTION, 30000, PHASE_COMBAT, PHASE_COMBAT);
+            events.ScheduleEvent(EVENT_TELEPORT_RANDOM, 25000, PHASE_COMBAT, PHASE_COMBAT);
+            events.ScheduleEvent(EVENT_TELEPORT_TARGET, 15000, PHASE_COMBAT, PHASE_COMBAT);
 
             aliveMinionsGUIDS.clear();
             aliveMinionsGUIDS = static_minionsGUIDS;
@@ -284,7 +282,7 @@ public:
                     instance->SetBossState(DATA_MAJORDOMO_EXECUTUS, DONE);
                     events.CancelEventGroup(PHASE_COMBAT);
                     me->GetMap()->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, me->GetEntry(), me);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
                     me->SetFaction(FACTION_MAJORDOMO_FRIENDLY);
                     EnterEvadeMode();
                     Talk(SAY_DEFEAT);
@@ -336,15 +334,16 @@ public:
                     {
                         switch (eventId)
                         {
-                            case EVENT_MAGIC_REFLECTION:
+                            case EVENT_SHIELD_REFLECTION:
                             {
-                                DoCastSelf(SPELL_MAGIC_REFLECTION);
-                                events.RepeatEvent(30000);
-                                break;
-                            }
-                            case EVENT_DAMAGE_REFLECTION:
-                            {
-                                DoCastSelf(SPELL_DAMAGE_REFLECTION);
+                                if (rand_chance() <= 50.f)
+                                {
+                                    DoCastSelf(SPELL_MAGIC_REFLECTION);
+                                }
+                                else
+                                {
+                                    DoCastSelf(SPELL_DAMAGE_REFLECTION);
+                                }
                                 events.RepeatEvent(30000);
                                 break;
                             }
@@ -356,7 +355,7 @@ public:
                                     DoCast(target, SPELL_TELEPORT_RANDOM);
                                 }
 
-                                events.RepeatEvent(15000);
+                                events.RepeatEvent(30000);
                                 break;
                             }
                             case EVENT_TELEPORT_TARGET:
@@ -505,7 +504,7 @@ public:
         {
             if (events.IsInPhase(PHASE_DEFEAT_OUTRO) && spellInfo->Id == SPELL_TELEPORT_SELF)
             {
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 me->SetHomePosition(MajordomoRagnaros);
                 me->NearTeleportTo(MajordomoRagnaros.GetPositionX(), MajordomoRagnaros.GetPositionY(), MajordomoRagnaros.GetPositionZ(), MajordomoRagnaros.GetOrientation());
                 events.SetPhase(PHASE_NONE);
@@ -559,7 +558,7 @@ public:
             case GOSSIP_ACTION_INFO_DEF+3:
             {
                 CloseGossipMenuFor(player);
-                creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 creature->AI()->Talk(SAY_RAG_SUM_1, player);
                 creature->AI()->DoAction(ACTION_START_RAGNAROS_INTRO);
                 break;

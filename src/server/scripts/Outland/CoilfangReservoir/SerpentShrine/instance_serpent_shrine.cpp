@@ -56,7 +56,7 @@ public:
             if (type == DATA_LADY_VASHJ)
                 for (uint8 i = 0; i < 4; ++i)
                     if (GameObject* gobject = instance->GetGameObject(ShieldGeneratorGUID[i]))
-                        gobject->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        gobject->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
 
             return true;
         }
@@ -158,7 +158,7 @@ public:
                         for (uint8 i = 0; i < 4; ++i)
                             if (GameObject* gobject = instance->GetGameObject(ShieldGeneratorGUID[i]))
                             {
-                                gobject->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                                gobject->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                                 vashj->SummonTrigger(gobject->GetPositionX(), gobject->GetPositionY(), gobject->GetPositionZ(), 0.0f, 0);
                             }
                     break;

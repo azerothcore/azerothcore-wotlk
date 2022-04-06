@@ -16,6 +16,7 @@
  */
 
 #include "CreatureAI.h"
+#include "CombatPackets.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "ObjectDefines.h"
@@ -30,7 +31,7 @@ void WorldSession::HandleAttackSwingOpcode(WorldPacket& recvData)
     ObjectGuid guid;
     recvData >> guid;
 
-    LOG_DEBUG("network", "WORLD: Recvd CMSG_ATTACKSWING: %s", guid.ToString().c_str());
+    LOG_DEBUG("network", "WORLD: Recvd CMSG_ATTACKSWING: {}", guid.ToString());
 
     Unit* pEnemy = ObjectAccessor::GetUnit(*_player, guid);
 
@@ -70,18 +71,15 @@ void WorldSession::HandleAttackStopOpcode(WorldPacket& /*recvData*/)
     GetPlayer()->AttackStop();
 }
 
-void WorldSession::HandleSetSheathedOpcode(WorldPacket& recvData)
+void WorldSession::HandleSetSheathedOpcode(WorldPackets::Combat::SetSheathed& packet)
 {
-    uint32 sheathed;
-    recvData >> sheathed;
-
-    if (sheathed >= MAX_SHEATH_STATE)
+    if (packet.CurrentSheathState >= MAX_SHEATH_STATE)
     {
-        LOG_ERROR("network.opcode", "Unknown sheath state %u ??", sheathed);
+        LOG_ERROR("network.opcode", "Unknown sheath state {} ??", packet.CurrentSheathState);
         return;
     }
 
-    GetPlayer()->SetSheath(SheathState(sheathed));
+    _player->SetSheath(SheathState(packet.CurrentSheathState));
 }
 
 void WorldSession::SendAttackStop(Unit const* enemy)

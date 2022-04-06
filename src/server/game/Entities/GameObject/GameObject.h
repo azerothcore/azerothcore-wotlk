@@ -771,6 +771,9 @@ public:
     void RemoveFromWorld() override;
     void CleanupsBeforeDelete(bool finalCleanup = true) override;
 
+    uint32 GetDynamicFlags() const override { return GetUInt32Value(GAMEOBJECT_DYNAMIC); }
+    void ReplaceAllDynamicFlags(uint32 flag) override { SetUInt32Value(GAMEOBJECT_DYNAMIC, flag); }
+
     virtual bool Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0);
     void Update(uint32 p_time) override;
     [[nodiscard]] GameObjectTemplate const* GetGOInfo() const { return m_goInfo; }
@@ -821,14 +824,7 @@ public:
     [[nodiscard]] uint32 GetSpellId() const { return m_spellId;}
 
     [[nodiscard]] time_t GetRespawnTime() const { return m_respawnTime; }
-    [[nodiscard]] time_t GetRespawnTimeEx() const
-    {
-        time_t now = time(nullptr);
-        if (m_respawnTime > now)
-            return m_respawnTime;
-        else
-            return now;
-    }
+    [[nodiscard]] time_t GetRespawnTimeEx() const;
 
     void SetRespawnTime(int32 respawn);
     void SetRespawnDelay(int32 respawn);
@@ -859,6 +855,12 @@ public:
 
     void SetPhaseMask(uint32 newPhaseMask, bool update) override;
     void EnableCollision(bool enable);
+
+    GameObjectFlags GetGameObjectFlags() const { return GameObjectFlags(GetUInt32Value(GAMEOBJECT_FLAGS)); }
+    bool HasGameObjectFlag(GameObjectFlags flags) const { return HasFlag(GAMEOBJECT_FLAGS, flags) != 0; }
+    void SetGameObjectFlag(GameObjectFlags flags) { SetFlag(GAMEOBJECT_FLAGS, flags); }
+    void RemoveGameObjectFlag(GameObjectFlags flags) { RemoveFlag(GAMEOBJECT_FLAGS, flags); }
+    void ReplaceAllGameObjectFlags(GameObjectFlags flags) { SetUInt32Value(GAMEOBJECT_FLAGS, flags); }
 
     void Use(Unit* user);
 
@@ -895,7 +897,7 @@ public:
     [[nodiscard]] bool HasLootRecipient() const { return m_lootRecipient || m_lootRecipientGroup; }
     uint32 m_groupLootTimer;                            // (msecs)timer used for group loot
     uint32 lootingGroupLowGUID;                         // used to find group which is looting
-    void SetLootGenerationTime() { m_lootGenerationTime = time(nullptr); }
+    void SetLootGenerationTime();
     [[nodiscard]] uint32 GetLootGenerationTime() const { return m_lootGenerationTime; }
 
     [[nodiscard]] GameObject* GetLinkedTrap();
@@ -936,9 +938,9 @@ public:
     void SetDestructibleState(GameObjectDestructibleState state, Player* eventInvoker = nullptr, bool setHealth = false);
     [[nodiscard]] GameObjectDestructibleState GetDestructibleState() const
     {
-        if (HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_DESTROYED))
+        if (HasGameObjectFlag(GO_FLAG_DESTROYED))
             return GO_DESTRUCTIBLE_DESTROYED;
-        if (HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_DAMAGED))
+        if (HasGameObjectFlag(GO_FLAG_DAMAGED))
             return GO_DESTRUCTIBLE_DAMAGED;
         return GO_DESTRUCTIBLE_INTACT;
     }
@@ -1027,6 +1029,8 @@ protected:
     uint32 m_lootGenerationTime;
 
     ObjectGuid m_linkedTrap;
+
+    ObjectGuid _lootStateUnitGUID;
 
 private:
     void CheckRitualList();

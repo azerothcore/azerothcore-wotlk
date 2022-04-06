@@ -74,7 +74,7 @@ public:
         SummonList summons;
         ObjectGuid CrystalGUID;
 
-        bool CanAIAttack(const Unit* who) const override
+        bool CanAIAttack(Unit const* who) const override
         {
             return who->GetPositionX() > 216.0f;
         }
@@ -167,7 +167,7 @@ public:
                 if (Unit* crystal = ObjectAccessor::GetUnit(*me, CrystalGUID))
                 {
                     Talk(EMOTE_CRYSTAL);
-                    crystal->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
+                    crystal->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
                     crystal->CastSpell(me, SPELL_MANA_RAGE, true);
                     me->CastSpell(crystal, SPELL_FEL_CRYSTAL_COSMETIC, true);
                     events.SetPhase(1);

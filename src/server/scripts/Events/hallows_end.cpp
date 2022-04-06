@@ -494,7 +494,7 @@ struct npc_soh_fire_trigger : public NullCreatureAI
         me->SetDisableGravity(true);
     }
 
-    void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
+    void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_START_FIRE)
         {
@@ -654,7 +654,7 @@ struct npc_hallows_end_soh : public ScriptedAI
         events.ScheduleEvent(3, 63000);
 
         me->SetReactState(REACT_PASSIVE);
-        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
 
         me->SetCanFly(true);
         me->SetDisableGravity(true);
@@ -733,7 +733,7 @@ struct npc_hallows_end_soh : public ScriptedAI
                 }
                 case 4:
                 {
-                    me->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
+                    me->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
                     me->SetReactState(REACT_AGGRESSIVE);
                     if (Unit* target = me->SelectNearestPlayer(30.0f))
                         AttackStart(target);
@@ -882,7 +882,7 @@ struct npc_hallows_end_train_fire : public NullCreatureAI
                 me->CastSpell(me, SPELL_FIRE_AURA_BASE, true);
     }
 
-    void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
+    void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_WATER_SPLASH && caster->ToPlayer())
         {
@@ -998,7 +998,7 @@ struct boss_headless_horseman : public ScriptedAI
         health = param;
     }
 
-    void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+    void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_SUMMONING_RHYME_TARGET)
         {
@@ -1007,7 +1007,7 @@ struct boss_headless_horseman : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
+    void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_THROW_HEAD_BACK)
         {
@@ -1038,7 +1038,7 @@ struct boss_headless_horseman : public ScriptedAI
                 me->CastSpell(me, SPELL_HEAD_VISUAL, true);
             else if (point == 11)
             {
-                me->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
+                me->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
                 me->StopMoving();
 
                 me->SetInCombatWithZone();
@@ -1228,7 +1228,7 @@ struct boss_headless_horseman_head : public ScriptedAI
     uint32 timer;
     bool handled;
 
-    void SpellHitTarget(Unit*  /*target*/, const SpellInfo* spellInfo) override
+    void SpellHitTarget(Unit*  /*target*/, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_THROW_HEAD_BACK)
         {
@@ -1239,7 +1239,7 @@ struct boss_headless_horseman_head : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
+    void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
     {
         switch (spellInfo->Id)
         {
@@ -1255,7 +1255,7 @@ struct boss_headless_horseman_head : public ScriptedAI
                     if (Player* player = me->SelectNearestPlayer(50.0f))
                         me->GetMotionMaster()->MoveFleeing(player);
 
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     timer = 26000;
                     break;
                 }
@@ -1356,7 +1356,7 @@ struct boss_headless_horseman_pumpkin : public ScriptedAI
         me->CastSpell(me, SPELL_PUMPKIN_VISUAL, true);
     }
 
-    void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
+    void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_SPROUTING)
         {

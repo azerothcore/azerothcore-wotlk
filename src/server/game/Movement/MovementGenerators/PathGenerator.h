@@ -105,7 +105,7 @@ class PathGenerator
                 dx = _pathPoints[0].x - _startPosition.x;
                 dy = _pathPoints[0].y - _startPosition.y;
                 dz = _pathPoints[0].z - _startPosition.z;
-                len += sqrt( dx * dx + dy * dy + dz * dz );
+                len += std::sqrt( dx * dx + dy * dy + dz * dz );
             }
             else
             {
@@ -117,7 +117,7 @@ class PathGenerator
                 dx = _pathPoints[i].x - _pathPoints[i - 1].x;
                 dy = _pathPoints[i].y - _pathPoints[i - 1].y;
                 dz = _pathPoints[i].z - _pathPoints[i - 1].z;
-                len += sqrt( dx * dx + dy * dy + dz * dz );
+                len += std::sqrt( dx * dx + dy * dy + dz * dz );
             }
             return len;
         }

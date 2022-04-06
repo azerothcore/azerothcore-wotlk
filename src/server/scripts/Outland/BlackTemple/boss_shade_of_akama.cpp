@@ -114,11 +114,11 @@ public:
                     if (action == ACTION_CHANNELERS_START_CHANNEL)
                     {
                         summon->CastSpell(me, SPELL_SHADE_SOUL_CHANNEL, true);
-                        summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        summon->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     }
                     else if (action == ACTION_START_ENCOUNTER)
                     {
-                        summon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        summon->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     }
                     else if (action == ACTION_KILL_CHANNELERS)
                     {
@@ -131,7 +131,7 @@ public:
         {
             BossAI::Reset();
             me->SetReactState(REACT_PASSIVE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
             me->SetWalk(true);
         }
 
@@ -249,7 +249,7 @@ public:
                         DoResetThreat();
                         me->GetVictim()->InterruptNonMeleeSpells(false);
                         me->AddThreat(me->GetVictim(), 1000000.0f);
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+                        me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
                         summonsGenerator.DoAction(ACTION_STOP_SPAWNING);
                         break;
                     }
@@ -294,11 +294,11 @@ public:
         {
             if (instance->GetBossState(DATA_SHADE_OF_AKAMA) == DONE)
             {
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 return;
             }
 
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->CastSpell(me, SPELL_STEALTH, true);
             events.Reset();
             events2.Reset();
@@ -425,7 +425,7 @@ public:
             if (action == 0)
             {
                 CloseGossipMenuFor(player);
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 events2.ScheduleEvent(EVENT_AKAMA_START_ENCOUNTER, 0);
             }
         }
@@ -468,13 +468,13 @@ public:
                 me->GetCreaturesWithEntryInRange(channelerList, 120.0f, NPC_ASHTONGUE_CHANNELER);
                 for (std::list<Creature*>::const_iterator itr = channelerList.begin(); itr != channelerList.end(); ++itr)
                 {
-                    if ((*itr)->IsAlive() || (*itr)->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+                    if ((*itr)->IsAlive() || (*itr)->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                         continue;
 
                     summon->SetInCombatWithZone();
                     summon->SetReactState(REACT_PASSIVE);
                     summon->GetMotionMaster()->MovePoint(POINT_START, **itr);
-                    (*itr)->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    (*itr)->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     return;
                 }
             }

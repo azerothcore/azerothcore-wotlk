@@ -136,7 +136,7 @@ public:
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
                 CloseGossipMenuFor(player);
-                creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 // Start encounter
                 InstanceScript* instance = creature->GetInstanceScript();
                 if (instance)
@@ -176,20 +176,18 @@ public:
         void Reset() override
         {
             Voidwalkers = false;
-            // Reset his gossip menu
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             me->SetFaction(FACTION_FRIENDLY);
 
             // was set before event start, so set again
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
 
             if (instance->GetData(TYPE_TOMB_OF_SEVEN) == DONE) // what is this trying to do? Probably some kind of crash recovery
             {
-                me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+                me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
             }
             else
             {
-                me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP);
             }
         }
 

@@ -12,16 +12,16 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.game_event_seasonal_questrelation
+-- Дамп структуры для таблица acore_world.game_event_seasonal_questrelation
 DROP TABLE IF EXISTS `game_event_seasonal_questrelation`;
 CREATE TABLE IF NOT EXISTS `game_event_seasonal_questrelation` (
   `questId` INT unsigned NOT NULL COMMENT 'Quest Identifier',
-  `eventEntry` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Entry of the game event',
+  `eventEntry` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Entry of the game event',
   PRIMARY KEY (`questId`,`eventEntry`),
   KEY `idx_quest` (`questId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
 
--- Дамп данных таблицы _acore_world.game_event_seasonal_questrelation: 690 rows
+-- Дамп данных таблицы acore_world.game_event_seasonal_questrelation: 690 rows
 DELETE FROM `game_event_seasonal_questrelation`;
 /*!40000 ALTER TABLE `game_event_seasonal_questrelation` DISABLE KEYS */;
 INSERT INTO `game_event_seasonal_questrelation` (`questId`, `eventEntry`) VALUES

@@ -12,16 +12,16 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.character_talent
+-- Дамп структуры для таблица acore_characters.character_talent
 DROP TABLE IF EXISTS `character_talent`;
 CREATE TABLE IF NOT EXISTS `character_talent` (
   `guid` INT unsigned NOT NULL,
-  `spell` mediumint(8) unsigned NOT NULL,
+  `spell` MEDIUMINT unsigned NOT NULL,
   `specMask` TINYINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guid`,`spell`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_characters.character_talent: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.character_talent: ~0 rows (приблизительно)
 DELETE FROM `character_talent`;
 /*!40000 ALTER TABLE `character_talent` DISABLE KEYS */;
 /*!40000 ALTER TABLE `character_talent` ENABLE KEYS */;

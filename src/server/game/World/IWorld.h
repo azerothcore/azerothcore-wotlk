@@ -20,10 +20,10 @@
 
 #include "AsyncCallbackProcessor.h"
 #include "Common.h"
+#include "Duration.h"
 #include "ObjectGuid.h"
 #include "QueryResult.h"
 #include "SharedDefines.h"
-#include "Timer.h"
 #include <atomic>
 #include <list>
 #include <map>
@@ -126,7 +126,7 @@ enum WorldBoolConfigs
     CONFIG_OFFHAND_CHECK_AT_SPELL_UNLEARN,
     CONFIG_VMAP_INDOOR_CHECK,
     CONFIG_PET_LOS,
-    CONFIG_START_ALL_SPELLS,
+    CONFIG_START_CUSTOM_SPELLS,
     CONFIG_START_ALL_EXPLORED,
     CONFIG_START_ALL_REP,
     CONFIG_ALWAYS_MAXSKILL,
@@ -172,6 +172,8 @@ enum WorldBoolConfigs
     CONFIG_ALLOW_LOGGING_IP_ADDRESSES_IN_DATABASE,
     CONFIG_REALM_LOGIN_ENABLED,
     CONFIG_PLAYER_SETTINGS_ENABLED,
+    CONFIG_ALLOW_JOIN_BG_AND_LFG,
+    CONFIG_MISS_CHANCE_MULTIPLIER_ONLY_FOR_PLAYERS,
     BOOL_CONFIG_VALUE_COUNT
 };
 
@@ -227,6 +229,7 @@ enum WorldIntConfigs
     CONFIG_START_HEROIC_PLAYER_LEVEL,
     CONFIG_START_PLAYER_MONEY,
     CONFIG_MAX_HONOR_POINTS,
+    CONFIG_MAX_HONOR_POINTS_MONEY_PER_POINT,
     CONFIG_START_HONOR_POINTS,
     CONFIG_MAX_ARENA_POINTS,
     CONFIG_START_ARENA_POINTS,
@@ -304,6 +307,7 @@ enum WorldIntConfigs
     CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMIT_MIN_PLAYERS,
     CONFIG_ARENA_MAX_RATING_DIFFERENCE,
     CONFIG_ARENA_RATING_DISCARD_TIMER,
+    CONFIG_ARENA_PREV_OPPONENTS_DISCARD_TIMER,
     CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS,
     CONFIG_ARENA_GAMES_REQUIRED,
     CONFIG_ARENA_SEASON_ID,
@@ -314,8 +318,6 @@ enum WorldIntConfigs
     CONFIG_PVP_TOKEN_MAP_TYPE,
     CONFIG_PVP_TOKEN_ID,
     CONFIG_PVP_TOKEN_COUNT,
-    CONFIG_INTERVAL_LOG_UPDATE,
-    CONFIG_MIN_LOG_UPDATE,
     CONFIG_ENABLE_SINFO_LOGIN,
     CONFIG_PLAYER_ALLOW_COMMANDS,
     CONFIG_NUMTHREADS,
@@ -396,6 +398,7 @@ enum WorldIntConfigs
     CONFIG_LOOT_NEED_BEFORE_GREED_ILVL_RESTRICTION,
     CONFIG_LFG_MAX_KICK_COUNT,
     CONFIG_LFG_KICK_PREVENTION_TIMER,
+    CONFIG_CHANGE_FACTION_MAX_MONEY,
     INT_CONFIG_VALUE_COUNT
 };
 
@@ -440,7 +443,12 @@ enum Rates
     RATE_DROP_MONEY,
     RATE_REWARD_BONUS_MONEY,
     RATE_XP_KILL,
-    RATE_XP_BG_KILL,
+    RATE_XP_BG_KILL_AV,
+    RATE_XP_BG_KILL_WSG,
+    RATE_XP_BG_KILL_AB,
+    RATE_XP_BG_KILL_EOTS,
+    RATE_XP_BG_KILL_SOTA,
+    RATE_XP_BG_KILL_IC,
     RATE_XP_QUEST,
     RATE_XP_QUEST_DF,
     RATE_XP_EXPLORE,
@@ -486,6 +494,8 @@ enum Rates
     RATE_DURABILITY_LOSS_ABSORB,
     RATE_DURABILITY_LOSS_BLOCK,
     RATE_MOVESPEED,
+    RATE_MISS_CHANCE_MULTIPLIER_TARGET_CREATURE,
+    RATE_MISS_CHANCE_MULTIPLIER_TARGET_PLAYER,
     MAX_RATES
 };
 
@@ -528,14 +538,9 @@ public:
     [[nodiscard]] virtual std::string const& GetNewCharString() const = 0;
     [[nodiscard]] virtual LocaleConstant GetDefaultDbcLocale() const = 0;
     [[nodiscard]] virtual std::string const& GetDataPath() const = 0;
-    [[nodiscard]] virtual time_t const& GetStartTime() const = 0;
-    [[nodiscard]] virtual time_t const& GetGameTime() const = 0;
-    [[nodiscard]] virtual uint32 GetUptime() const = 0;
-    [[nodiscard]] virtual uint32 GetUpdateTime() const = 0;
-    virtual void SetRecordDiffInterval(int32 t)  = 0;
-    [[nodiscard]] virtual time_t GetNextDailyQuestsResetTime() const = 0;
-    [[nodiscard]] virtual time_t GetNextWeeklyQuestsResetTime() const = 0;
-    [[nodiscard]] virtual time_t GetNextRandomBGResetTime() const = 0;
+    [[nodiscard]] virtual Seconds GetNextDailyQuestsResetTime() const = 0;
+    [[nodiscard]] virtual Seconds GetNextWeeklyQuestsResetTime() const = 0;
+    [[nodiscard]] virtual Seconds GetNextRandomBGResetTime() const = 0;
     [[nodiscard]] virtual uint16 GetConfigMaxSkillValue() const = 0;
     virtual void SetInitialWorldSettings() = 0;
     virtual void LoadConfigSettings(bool reload = false) = 0;
@@ -587,8 +592,6 @@ public:
     [[nodiscard]] virtual uint32 GetCleaningFlags() const = 0;
     virtual void   SetCleaningFlags(uint32 flags) = 0;
     virtual void   ResetEventSeasonalQuests(uint16 event_id) = 0;
-    virtual time_t GetNextTimeWithDayAndHour(int8 dayOfWeek, int8 hour) = 0;
-    virtual time_t GetNextTimeWithMonthAndHour(int8 month, int8 hour) = 0;
     [[nodiscard]] virtual std::string const& GetRealmName() const = 0;
     virtual void SetRealmName(std::string name) = 0;
     virtual void RemoveOldCorpses() = 0;

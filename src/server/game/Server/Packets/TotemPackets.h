@@ -18,8 +18,8 @@
 #ifndef TotemPackets_h__
 #define TotemPackets_h__
 
-#include "Packet.h"
 #include "ObjectGuid.h"
+#include "Packet.h"
 
 namespace WorldPackets
 {

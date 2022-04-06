@@ -20,13 +20,10 @@
 #include "TemporarySummon.h"
 #include "shadowfang_keep.h"
 
-//enum Creatures
-//{
-//    NPC_ASH                 = 3850,
-//    NPC_ADA                 = 3849,
-//    NPC_ARCHMAGE_ARUGAL     = 4275,
-//    NPC_ARUGAL_VOIDWALKER   = 4627
-//};
+enum Spells
+{
+    SPELL_SUMMON_VALENTINE_ADD = 68610
+};
 
 class instance_shadowfang_keep : public InstanceMapScript
 {
@@ -47,6 +44,27 @@ public:
             memset(&_encounters, 0, sizeof(_encounters));
         }
 
+        void OnCreatureCreate(Creature* creature) override
+        {
+            switch (creature->GetEntry())
+            {
+                case NPC_DND_CRAZED_APOTHECARY_GENERATOR:
+                    _crazedApothecaryGeneratorGUIDs.push_back(creature->GetGUID());
+                    break;
+                case NPC_APOTHECARY_HUMMEL:
+                    _apothecaryHummel = creature->GetGUID();
+                    break;
+                case NPC_CRAZED_APOTHECARY:
+                    if (Creature* hummel = instance->GetCreature(_apothecaryHummel))
+                    {
+                        hummel->AI()->JustSummoned(creature);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
         void OnGameObjectCreate(GameObject* gameobject) override
         {
             switch (gameobject->GetEntry())
@@ -63,6 +81,8 @@ public:
                     if (_encounters[TYPE_WOLF_MASTER_NANDOS] == DONE)
                         HandleGameObject(ObjectGuid::Empty, true, gameobject);
                     break;
+                default:
+                    break;
             }
         }
 
@@ -74,6 +94,17 @@ public:
                 case TYPE_FENRUS_THE_DEVOURER:
                 case TYPE_WOLF_MASTER_NANDOS:
                     _encounters[type] = data;
+                    break;
+                case DATA_SPAWN_VALENTINE_ADDS:
+                    for (ObjectGuid guid : _crazedApothecaryGeneratorGUIDs)
+                    {
+                        if (Creature* generator = instance->GetCreature(guid))
+                        {
+                            generator->CastSpell(nullptr, SPELL_SUMMON_VALENTINE_ADD);
+                        }
+                    }
+                    break;
+                default:
                     break;
             }
 
@@ -109,6 +140,8 @@ public:
 
     private:
         uint32 _encounters[MAX_ENCOUNTERS];
+        GuidVector _crazedApothecaryGeneratorGUIDs;
+        ObjectGuid _apothecaryHummel;
     };
 };
 

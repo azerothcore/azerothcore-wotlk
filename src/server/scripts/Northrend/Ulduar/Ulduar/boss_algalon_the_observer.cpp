@@ -283,7 +283,7 @@ public:
         bool _fedOnTears;
         bool _heraldOfTheTitans;
 
-        bool IsValidHeraldItem(const ItemTemplate* item)
+        bool IsValidHeraldItem(ItemTemplate const* item)
         {
             if (!item) // should not happen, but checked in GetAverageItemLevel()
                 return true;
@@ -377,7 +377,7 @@ public:
             events.Reset();
             summons.DespawnAll();
             me->SetReactState(REACT_PASSIVE);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
             me->SetSheath(SHEATH_STATE_UNARMED);
             me->SetFaction(190);
             me->CastSpell(me, SPELL_DUAL_WIELD, true);
@@ -403,8 +403,8 @@ public:
             {
                 case ACTION_START_INTRO:
                     {
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                        me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_DO_NOT_FADE_IN);
+                        me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                        me->SetUnitFlag2(UNIT_FLAG2_DO_NOT_FADE_IN);
                         me->SetDisableGravity(true);
                         me->CastSpell(me, SPELL_ARRIVAL, true);
                         me->CastSpell(me, SPELL_RIDE_THE_LIGHTNING, true);
@@ -438,7 +438,7 @@ public:
                     me->SetReactState(REACT_PASSIVE);
                     me->AttackStop();
                     me->SetFaction(FACTION_FRIENDLY);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->InterruptNonMeleeSpells(false);
                     if (m_pInstance)
                         m_pInstance->SetData(TYPE_ALGALON, NOT_STARTED);
@@ -446,7 +446,7 @@ public:
                 case ACTION_INIT_ALGALON:
                     _firstPull = false;
                     _fedOnTears = false;
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                     break;
                 case ACTION_ASCEND:
                     summons.DespawnAll();
@@ -477,7 +477,7 @@ public:
             uint32 introDelay = 0;
             me->setActive(true);
             me->SetInCombatWithZone();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_NPC);
             events.Reset();
             events.SetPhase(PHASE_ROLE_PLAY);
 
@@ -603,7 +603,7 @@ public:
                 me->SetReactState(REACT_PASSIVE);
                 me->AttackStop();
                 me->SetFaction(FACTION_FRIENDLY);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 events.Reset();
                 summons.DespawnAll();
                 me->InterruptNonMeleeSpells(false);
@@ -649,7 +649,7 @@ public:
                     break;
                 case EVENT_INTRO_FINISH:
                     events.Reset();
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                     if (Creature* brann = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(NPC_BRANN_BRONZBEARD_ALG)))
                         brann->AI()->DoAction(ACTION_FINISH_INTRO);
                     break;
@@ -659,7 +659,7 @@ public:
                     break;
                 case EVENT_REMOVE_UNNATTACKABLE:
                     me->SetSheath(SHEATH_STATE_MELEE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_NPC);
                     break;
                 case EVENT_INTRO_TIMER_DONE:
                     events.SetPhase(PHASE_NORMAL);
@@ -736,21 +736,29 @@ public:
                     break;
                 case EVENT_OUTRO_1:
                     me->RemoveAllAuras();
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_RENAME);
+                    me->SetUnitFlag(UNIT_FLAG_RENAME);
                     break;
                 case EVENT_OUTRO_2:
+                {
+                    Player* lootRecipent = me->GetLootRecipient();
                     _EnterEvadeMode();
+                    // LootRecipent is cleared in _EnterEvadeMode, restore it
+                    me->SetLootRecipient(lootRecipent);
                     me->GetMotionMaster()->MovePoint(POINT_ALGALON_OUTRO, AlgalonOutroPos);
                     break;
+                }
                 case EVENT_OUTRO_3:
                     me->CastSpell((Unit*)nullptr, SPELL_KILL_CREDIT);
                     // Summon Chest
                     if (GameObject* go = me->SummonGameObject(RAID_MODE(GO_ALGALON_CHEST, GO_ALGALON_CHEST_HERO), 1632.1f, -306.561f, 417.321f, 4.69494f, 0, 0, 0, 1, 0))
-                        go->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
+                    {
+                        go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
+                        go->SetLootRecipient(me);
+                    }
                     break;
                 case EVENT_OUTRO_4:
                     me->CastSpell((Unit*)nullptr, SPELL_SUPERMASSIVE_FAIL);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     break;
                 case EVENT_OUTRO_5:
                     if (Creature* brann = me->SummonCreature(NPC_BRANN_BRONZBEARD_ALG, BrannOutroPos[0], TEMPSUMMON_TIMED_DESPAWN, 131500))
@@ -977,7 +985,7 @@ public:
             {
                 case ACTION_ACTIVATE_STAR:
                     me->SetReactState(REACT_AGGRESSIVE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     _isActive = true;
 
                     if (Player* target = SelectTargetFromPlayerList(250.0f))
@@ -1124,7 +1132,7 @@ public:
                 return false;
             _locked = true;
             // Start Algalon event
-            me->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
+            me->SetGameObjectFlag(GO_FLAG_IN_USE);
             events.ScheduleEvent(EVENT_DESPAWN_CONSOLE, 5000);
             if (Creature* brann = me->SummonCreature(NPC_BRANN_BRONZBEARD_ALG, BrannIntroSpawnPos))
                 brann->AI()->DoAction(ACTION_START_INTRO);

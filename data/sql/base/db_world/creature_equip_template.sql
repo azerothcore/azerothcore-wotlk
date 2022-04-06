@@ -12,19 +12,19 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.creature_equip_template
+-- Дамп структуры для таблица acore_world.creature_equip_template
 DROP TABLE IF EXISTS `creature_equip_template`;
 CREATE TABLE IF NOT EXISTS `creature_equip_template` (
-  `CreatureID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `CreatureID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `ID` TINYINT unsigned NOT NULL DEFAULT 1,
-  `ItemID1` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `ItemID2` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `ItemID3` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `ItemID1` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `ItemID2` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `ItemID3` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `VerifiedBuild` SMALLINT DEFAULT 0,
   PRIMARY KEY (`CreatureID`,`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.creature_equip_template: 10 747 rows
+-- Дамп данных таблицы acore_world.creature_equip_template: 10 755 rows
 DELETE FROM `creature_equip_template`;
 /*!40000 ALTER TABLE `creature_equip_template` DISABLE KEYS */;
 INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES
@@ -1658,7 +1658,7 @@ INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`,
 	(3198, 1, 2809, 0, 0, 18019),
 	(3199, 1, 1907, 0, 0, 18019),
 	(3202, 1, 2179, 1896, 0, 18019),
-	(3203, 1, 20468, 20468, 0, 18019),
+	(3203, 1, 1907, 0, 0, 18019),
 	(3204, 1, 5285, 0, 0, 18019),
 	(3205, 1, 0, 4993, 0, 18019),
 	(3206, 1, 1907, 0, 0, 18019),
@@ -2398,7 +2398,7 @@ INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`,
 	(4657, 1, 5304, 0, 0, 18019),
 	(4658, 1, 5277, 0, 0, 18019),
 	(4659, 1, 5289, 0, 0, 18019),
-	(4667, 1, 50225, 0, 0, 18019),
+	(4663, 1, 5303, 0, 0, 0),
 	(4668, 1, 1908, 0, 0, 18019),
 	(4670, 1, 37924, 37924, 0, 18019),
 	(4673, 1, 0, 0, 5258, 18019),
@@ -2607,12 +2607,12 @@ INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`,
 	(5229, 1, 2809, 0, 0, 18019),
 	(5231, 1, 3326, 0, 0, 18019),
 	(5232, 1, 5301, 0, 0, 18019),
-	(5234, 1, 3494, 11506, 0, 18019),
-	(5236, 1, 14877, 14877, 0, 18019),
+	(5240, 1, 2559, 0, 0, 0),
+	(5236, 1, 1907, 0, 0, 0),
 	(5237, 1, 5303, 0, 0, 18019),
 	(5238, 1, 5286, 1905, 0, 18019),
-	(5239, 1, 32246, 15938, 0, 18019),
-	(5240, 1, 14820, 0, 0, 18019),
+	(5234, 1, 1903, 2809, 0, 0),
+	(5239, 1, 5304, 0, 0, 0),
 	(5241, 1, 5289, 0, 0, 18019),
 	(5243, 1, 2695, 0, 0, 18019),
 	(5249, 1, 2695, 0, 0, 18019),
@@ -3368,7 +3368,7 @@ INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`,
 	(7855, 1, 2147, 0, 0, 18019),
 	(7856, 1, 1897, 0, 2552, 18019),
 	(7857, 1, 1902, 0, 0, 18019),
-	(7858, 1, 0, 2053, 0, -18019),
+	(7858, 1, 1897, 0, 0, -18019),
 	(7865, 1, 10591, 1984, 5260, 18019),
 	(7866, 1, 3433, 0, 0, 18019),
 	(7867, 1, 5289, 0, 0, 18019),
@@ -10775,7 +10775,15 @@ INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`,
 	(24484, 5, 46733, 0, 0, 0),
 	(24484, 6, 13861, 0, 0, 0),
 	(24484, 7, 2704, 0, 0, 0),
-	(24484, 8, 37059, 0, 0, 0);
+	(24484, 8, 37059, 0, 0, 0),
+	(4664, 1, 4991, 0, 0, 0),
+	(4665, 1, 2559, 0, 0, 0),
+	(4666, 1, 5285, 5281, 0, 0),
+	(4667, 1, 2177, 0, 0, 31727),
+	(16334, 2, 2901, 0, 0, 0),
+	(16335, 2, 2901, 0, 0, 0),
+	(2621, 2, 5956, 12453, 0, 0),
+	(14849, 1, 2493, 0, 0, 0);
 /*!40000 ALTER TABLE `creature_equip_template` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

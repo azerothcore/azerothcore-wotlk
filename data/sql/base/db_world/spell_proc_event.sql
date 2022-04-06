@@ -12,10 +12,10 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.spell_proc_event
+-- Дамп структуры для таблица acore_world.spell_proc_event
 DROP TABLE IF EXISTS `spell_proc_event`;
 CREATE TABLE IF NOT EXISTS `spell_proc_event` (
-  `entry` mediumint(9) NOT NULL DEFAULT 0,
+  `entry` MEDIUMINT NOT NULL DEFAULT 0,
   `SchoolMask` TINYINT NOT NULL DEFAULT 0,
   `SpellFamilyName` SMALLINT unsigned NOT NULL DEFAULT 0,
   `SpellFamilyMask0` INT unsigned NOT NULL DEFAULT 0,
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `spell_proc_event` (
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.spell_proc_event: 804 rows
+-- Дамп данных таблицы acore_world.spell_proc_event: 804 rows
 DELETE FROM `spell_proc_event`;
 /*!40000 ALTER TABLE `spell_proc_event` DISABLE KEYS */;
 INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMask0`, `SpellFamilyMask1`, `SpellFamilyMask2`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`) VALUES
@@ -230,11 +230,11 @@ INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `Spell
 	(15332, 32, 6, 0, 0, 0, 327680, 0, 0, 100, 0),
 	(15346, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0),
 	(15600, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0),
-	(16164, 0, 11, 2416967875, 266240, 0, 65536, 2097154, 0, 0, 0),
+	(16164, 0, 11, 2416967875, 266240, 0, 69968, 2097154, 0, 0, 0),
 	(16550, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0),
 	(16620, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30000),
 	(16624, 0, 0, 0, 0, 0, 0, 64, 0, 0, 0),
-	(16864, 0, 0, 0, 0, 0, 0, 2162688, 3.5, 0, 0),
+	(16864, 0, 0, 0, 0, 0, 87060, 2162688, 3.5, 0, 0),
 	(17364, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 	(17495, 0, 0, 0, 0, 0, 0, 64, 0, 0, 0),
 	(17619, 0, 13, 0, 0, 0, 34816, 3, 0, 0, 0),
@@ -275,7 +275,7 @@ INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `Spell
 	(24353, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0),
 	(24389, 0, 3, 12582935, 64, 0, 0, 0, 0, 0, 0),
 	(24658, 0, 0, 0, 0, 0, 82192, 0, 0, 0, 0),
-	(24905, 0, 0, 0, 0, 0, 0, 2, 15, 0, 0),
+	(24905, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0),
 	(24932, 0, 0, 0, 0, 0, 0, 2, 0, 0, 6000),
 	(25050, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 	(25669, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0),
@@ -587,7 +587,7 @@ INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `Spell
 	(56374, 0, 3, 0, 16384, 0, 16384, 0, 0, 0, 0),
 	(56375, 0, 3, 16777216, 0, 0, 65536, 0, 0, 0, 0),
 	(56451, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3000),
-	(56800, 0, 8, 8388612, 0, 0, 16, 0, 0, 0, 0),
+	(56800, 0, 8, 4, 0, 0, 16, 0, 0, 0, 0),
 	(56816, 0, 0, 0, 0, 0, 0, 48, 0, 0, 0),
 	(56817, 0, 15, 0, 536870912, 0, 0, 0, 0, 0, 0),
 	(56821, 0, 8, 2, 0, 0, 0, 2, 0, 0, 0),

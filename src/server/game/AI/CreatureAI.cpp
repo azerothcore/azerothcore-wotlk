@@ -51,9 +51,9 @@ void CreatureAI::OnCharmed(bool /*apply*/)
 AISpellInfoType* UnitAI::AISpellInfo;
 AISpellInfoType* GetAISpellInfo(uint32 i) { return &CreatureAI::AISpellInfo[i]; }
 
-void CreatureAI::Talk(uint8 id, WorldObject const* whisperTarget /*= nullptr*/)
+void CreatureAI::Talk(uint8 id, WorldObject const* target /*= nullptr*/)
 {
-    sCreatureTextMgr->SendChat(me, id, whisperTarget);
+    sCreatureTextMgr->SendChat(me, id, target);
 }
 
 inline bool IsValidCombatTarget(Creature* source, Player* target)
@@ -101,7 +101,7 @@ void CreatureAI::DoZoneInCombat(Creature* creature /*= nullptr*/, float maxRange
     Map* map = creature->GetMap();
     if (!map->IsDungeon())                                  //use IsDungeon instead of Instanceable, in case battlegrounds will be instantiated
     {
-        LOG_ERROR("entities.unit.ai", "DoZoneInCombat call for map that isn't an instance (creature entry = %d)", creature->GetTypeId() == TYPEID_UNIT ? creature->ToCreature()->GetEntry() : 0);
+        LOG_ERROR("entities.unit.ai", "DoZoneInCombat call for map that isn't an instance (creature entry = {})", creature->GetTypeId() == TYPEID_UNIT ? creature->ToCreature()->GetEntry() : 0);
         return;
     }
 
@@ -201,7 +201,7 @@ void CreatureAI::EnterEvadeMode()
     if (!_EnterEvadeMode())
         return;
 
-    LOG_DEBUG("entities.unit", "Creature %u enters evade mode.", me->GetEntry());
+    LOG_DEBUG("entities.unit", "Creature {} enters evade mode.", me->GetEntry());
 
     if (!me->GetVehicle()) // otherwise me will be in evade mode forever
     {
@@ -219,20 +219,18 @@ void CreatureAI::EnterEvadeMode()
         }
     }
 
+    Reset();
+    if (me->IsVehicle()) // use the same sequence of addtoworld, aireset may remove all summons!
+    {
+        me->GetVehicleKit()->Reset(true);
+    }
+
     // despawn bosses at reset - only verified tbc/woltk bosses with this reset type - add bosses in last line respectively (dungeon/raid) and increase array limit
     CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(me->GetEntry());
     if (cInfo && cInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_HARD_RESET))
     {
         me->DespawnOnEvade();
         me->m_Events.AddEvent(new PhasedRespawn(*me), me->m_Events.CalculateTime(20000));
-    }
-    else // bosses will run back to the spawnpoint at reset
-    {
-        Reset();
-        if (me->IsVehicle()) // use the same sequence of addtoworld, aireset may remove all summons!
-        {
-            me->GetVehicleKit()->Reset(true);
-        }
     }
 }
 

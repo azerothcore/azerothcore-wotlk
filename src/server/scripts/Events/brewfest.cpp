@@ -18,6 +18,7 @@
 #include "CellImpl.h"
 #include "GameEventMgr.h"
 #include "GameObjectAI.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "Group.h"
 #include "LFGMgr.h"
@@ -69,7 +70,7 @@ struct npc_brewfest_keg_thrower : public ScriptedAI
         }
     }
 
-    bool CanBeSeen(const Player* player) override
+    bool CanBeSeen(Player const* player) override
     {
         if (player->GetMountID() == RAM_DISPLAY_ID)
             return true;
@@ -99,7 +100,7 @@ struct npc_brewfest_keg_reciver : public ScriptedAI
                 {
                     if (Aura* aur = player->GetAura(SPELL_RAM_AURA))
                     {
-                        int32 diff = aur->GetApplyTime() - (time(nullptr) - (HOUR * 18) + spellCooldown);
+                        int32 diff = aur->GetApplyTime() - (GameTime::GetGameTime().count() - (HOUR * 18) + spellCooldown);
                         if (diff > 10) // aura applied later
                             return;
 
@@ -342,7 +343,7 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
     void MoveInLineOfSight(Unit*  /*who*/) override {}
     void EnterCombat(Unit*) override {}
 
-    void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
+    void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_REPORT_DEATH)
         {
@@ -532,11 +533,9 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
 
     bool AllowStart()
     {
-        time_t curtime = time(nullptr);
-        tm strDate;
-        localtime_r(&curtime, &strDate);
+        auto minutes = Acore::Time::GetMinutes();
 
-        if (strDate.tm_min == 0 || strDate.tm_min == 30)
+        if (!minutes || minutes == 30)
             return true;
 
         return false;
@@ -734,7 +733,7 @@ struct npc_dark_iron_guzzler : public ScriptedAI
         who->CastSpell(who, SPELL_REPORT_DEATH, true);
     }
 
-    void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
+    void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
     {
         if (me->IsAlive() && spellInfo->Id == SPELL_PLAYER_MUG)
         {
@@ -1558,7 +1557,7 @@ struct npc_coren_direbrew : public ScriptedAI
     {
         _events.Reset();
         _summons.DespawnAll();
-        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+        me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
         me->SetFaction(FACTION_FRIENDLY);
         _events.SetPhase(PHASE_ALL);
 
@@ -1597,7 +1596,7 @@ struct npc_coren_direbrew : public ScriptedAI
         if (action == ACTION_START_FIGHT)
         {
             _events.SetPhase(PHASE_ONE);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
             me->SetFaction(FACTION_GOBLIN_DARK_IRON_BAR_PATRON);
             DoZoneInCombat();
 
@@ -1831,7 +1830,7 @@ struct npc_direbrew_antagonist : public ScriptedAI
                 Talk(SAY_ANTAGONIST_2);
                 break;
             case ACTION_ANTAGONIST_HOSTILE:
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                 me->SetFaction(FACTION_GOBLIN_DARK_IRON_BAR_PATRON);
                 DoZoneInCombat();
                 break;

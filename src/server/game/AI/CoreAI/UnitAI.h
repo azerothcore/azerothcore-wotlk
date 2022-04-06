@@ -41,7 +41,7 @@ enum class SelectTargetMethod
 // default predicate function to select target based on distance, player and/or aura criteria
 struct DefaultTargetSelector : public Acore::unary_function<Unit*, bool>
 {
-    const Unit* me;
+    Unit const* me;
     float m_dist;
     bool m_playerOnly;
     int32 m_aura;
@@ -167,7 +167,7 @@ struct FarthestTargetSelector : public Acore::unary_function<Unit*, bool>
     }
 
 private:
-    const Unit* _me;
+    Unit const* _me;
     float _dist;
     bool _playerOnly;
     bool _inLos;
@@ -333,6 +333,9 @@ public:
 
     static AISpellInfoType* AISpellInfo;
     static void FillAISpellInfo();
+
+    // Called when a summon reaches a waypoint or point movement finished.
+    virtual void SummonMovementInform(Creature* /*creature*/, uint32 /*motionType*/, uint32 /*point*/) { }
 
     virtual void sGossipHello(Player* /*player*/) {}
     virtual void sGossipSelect(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/) {}

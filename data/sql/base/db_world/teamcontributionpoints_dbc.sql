@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.teamcontributionpoints_dbc
+-- Дамп структуры для таблица acore_world.teamcontributionpoints_dbc
 DROP TABLE IF EXISTS `teamcontributionpoints_dbc`;
 CREATE TABLE IF NOT EXISTS `teamcontributionpoints_dbc` (
   `ID` INT NOT NULL DEFAULT 0,
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `teamcontributionpoints_dbc` (
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.teamcontributionpoints_dbc: 0 rows
+-- Дамп данных таблицы acore_world.teamcontributionpoints_dbc: 0 rows
 DELETE FROM `teamcontributionpoints_dbc`;
 /*!40000 ALTER TABLE `teamcontributionpoints_dbc` DISABLE KEYS */;
 /*!40000 ALTER TABLE `teamcontributionpoints_dbc` ENABLE KEYS */;

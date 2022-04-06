@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.guild_member
+-- Дамп структуры для таблица acore_characters.guild_member
 DROP TABLE IF EXISTS `guild_member`;
 CREATE TABLE IF NOT EXISTS `guild_member` (
   `guildid` INT unsigned NOT NULL COMMENT 'Guild Identificator',
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `guild_member` (
   KEY `guildid_rank_key` (`guildid`,`rank`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Guild System';
 
--- Дамп данных таблицы _acore_characters.guild_member: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.guild_member: ~0 rows (приблизительно)
 DELETE FROM `guild_member`;
 /*!40000 ALTER TABLE `guild_member` DISABLE KEYS */;
 /*!40000 ALTER TABLE `guild_member` ENABLE KEYS */;

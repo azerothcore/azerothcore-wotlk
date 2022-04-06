@@ -75,7 +75,7 @@ public:
 
         void Reset() override
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             events.Reset();
             if (me->HasReactState(REACT_AGGRESSIVE)) // Reset() called by EnterEvadeMode()
             {
@@ -117,7 +117,7 @@ public:
 
                 // start real fight
                 me->RemoveAllAuras();
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 DoZoneInCombat();
                 me->CastSpell(me, 43979, true);
                 Talk(SAY_AGGRO);
@@ -214,7 +214,7 @@ public:
                 Talk(RAND(SAY_SLAY_1, SAY_SLAY_2));
         }
 
-        bool CanAIAttack(const Unit* who) const override
+        bool CanAIAttack(Unit const* who) const override
         {
             switch (who->GetEntry())
             {

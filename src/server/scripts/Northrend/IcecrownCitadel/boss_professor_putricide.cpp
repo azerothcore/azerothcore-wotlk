@@ -217,7 +217,7 @@ public:
         return me->IsValidAttackTarget(target);
     }
 private:
-    const Unit* me;
+    Unit const* me;
 };
 
 class boss_professor_putricide : public CreatureScript
@@ -253,7 +253,7 @@ public:
             me->SetStandState(UNIT_STAND_STATE_STAND);
 
             if (instance->GetBossState(DATA_ROTFACE) == DONE && instance->GetBossState(DATA_FESTERGUT) == DONE)
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
 
         uint32 GetData(uint32 type) const override
@@ -283,14 +283,14 @@ public:
                 BossAI::AttackStart(who);
         }
 
-        bool CanAIAttack(const Unit* target) const override
+        bool CanAIAttack(Unit const* target) const override
         {
             return me->IsVisible() && target->GetPositionZ() > 388.0f && target->GetPositionZ() < 410.0f && target->GetPositionY() > 3157.1f && target->GetExactDist2dSq(4356.0f, 3211.0f) < 80.0f * 80.0f;
         }
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 BossAI::MoveInLineOfSight(who);
         }
 
@@ -799,7 +799,7 @@ public:
             else if (targetGUID)
             {
                 Unit* target = ObjectAccessor::GetUnit(*me, targetGUID);
-                if (me->GetVictim()->GetGUID() != targetGUID || !target || !me->IsValidAttackTarget(target) || target->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH) || target->GetExactDist2dSq(4356.0f, 3211.0f) > 80.0f * 80.0f || target->GetPositionZ() < 380.0f || target->GetPositionZ() > 405.0f)
+                if (me->GetVictim()->GetGUID() != targetGUID || !target || !me->IsValidAttackTarget(target) || target->HasUnitFlag2(UNIT_FLAG2_FEIGN_DEATH) || target->GetExactDist2dSq(4356.0f, 3211.0f) > 80.0f * 80.0f || target->GetPositionZ() < 380.0f || target->GetPositionZ() > 405.0f)
                     SelectNewTarget();
             }
         }
@@ -895,8 +895,8 @@ public:
         // big hax to unlock Abomination Eat Ooze ability, requires caster aura spell from difficulty X, but unlocks clientside when got base aura
         void HandleScript(SpellEffIndex  /*effIndex*/)
         {
-            const SpellInfo* s1 = sSpellMgr->GetSpellInfo(70346);
-            const SpellInfo* s2 = sSpellMgr->GetSpellInfo(72456);
+            SpellInfo const* s1 = sSpellMgr->GetSpellInfo(70346);
+            SpellInfo const* s2 = sSpellMgr->GetSpellInfo(72456);
             if (s1 && s2)
                 if (Unit* target = GetHitUnit())
                 {

@@ -12,21 +12,21 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.game_event_npc_vendor
+-- Дамп структуры для таблица acore_world.game_event_npc_vendor
 DROP TABLE IF EXISTS `game_event_npc_vendor`;
 CREATE TABLE IF NOT EXISTS `game_event_npc_vendor` (
   `eventEntry` TINYINT NOT NULL COMMENT 'Entry of the game event.',
-  `guid` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `guid` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `slot` SMALLINT NOT NULL DEFAULT 0,
-  `item` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `maxcount` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `incrtime` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `ExtendedCost` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `item` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `maxcount` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `incrtime` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `ExtendedCost` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guid`,`item`),
   KEY `slot` (`slot`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.game_event_npc_vendor: 14 rows
+-- Дамп данных таблицы acore_world.game_event_npc_vendor: 14 rows
 DELETE FROM `game_event_npc_vendor`;
 /*!40000 ALTER TABLE `game_event_npc_vendor` DISABLE KEYS */;
 INSERT INTO `game_event_npc_vendor` (`eventEntry`, `guid`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`) VALUES

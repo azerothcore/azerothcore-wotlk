@@ -12,17 +12,17 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.pet_name_generation
+-- Дамп структуры для таблица acore_world.pet_name_generation
 DROP TABLE IF EXISTS `pet_name_generation`;
 CREATE TABLE IF NOT EXISTS `pet_name_generation` (
-  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `id` MEDIUMINT unsigned NOT NULL AUTO_INCREMENT,
   `word` tinytext NOT NULL,
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `half` TINYINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=314 DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.pet_name_generation: 313 rows
+-- Дамп данных таблицы acore_world.pet_name_generation: 313 rows
 DELETE FROM `pet_name_generation`;
 /*!40000 ALTER TABLE `pet_name_generation` DISABLE KEYS */;
 INSERT INTO `pet_name_generation` (`id`, `word`, `entry`, `half`) VALUES

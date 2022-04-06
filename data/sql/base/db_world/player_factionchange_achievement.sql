@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.player_factionchange_achievement
+-- Дамп структуры для таблица acore_world.player_factionchange_achievement
 DROP TABLE IF EXISTS `player_factionchange_achievement`;
 CREATE TABLE IF NOT EXISTS `player_factionchange_achievement` (
   `alliance_id` INT unsigned NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `player_factionchange_achievement` (
   PRIMARY KEY (`alliance_id`,`horde_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.player_factionchange_achievement: 124 rows
+-- Дамп данных таблицы acore_world.player_factionchange_achievement: 124 rows
 DELETE FROM `player_factionchange_achievement`;
 /*!40000 ALTER TABLE `player_factionchange_achievement` DISABLE KEYS */;
 INSERT INTO `player_factionchange_achievement` (`alliance_id`, `horde_id`) VALUES

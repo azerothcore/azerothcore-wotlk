@@ -293,13 +293,13 @@ void FollowerAI::StartFollow(Player* player, uint32 factionForFollower, const Qu
         LOG_DEBUG("scripts.ai", "FollowerAI start with WAYPOINT_MOTION_TYPE, set to MoveIdle.");
     }
 
-    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+    me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
 
     AddFollowState(STATE_FOLLOW_INPROGRESS);
 
     me->GetMotionMaster()->MoveFollow(player, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
 
-    LOG_DEBUG("scripts.ai", "FollowerAI start follow %s (%s)", player->GetName().c_str(), m_uiLeaderGUID.ToString().c_str());
+    LOG_DEBUG("scripts.ai", "FollowerAI start follow {} ({})", player->GetName(), m_uiLeaderGUID.ToString());
 }
 
 Player* FollowerAI::GetLeaderForFollower()
