@@ -662,7 +662,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_ADD_NPC_FLAG: return sizeof(SmartAction::flag);
             case SMART_ACTION_REMOVE_NPC_FLAG: return sizeof(SmartAction::flag);
             case SMART_ACTION_SIMPLE_TALK: return sizeof(SmartAction::simpleTalk);
-            // case SMART_ACTION_SELF_CAST: return sizeof(SmartAction::cast);
+            case SMART_ACTION_SELF_CAST: return sizeof(SmartAction::cast);
             case SMART_ACTION_CROSS_CAST: return sizeof(SmartAction::crossCast);
             case SMART_ACTION_CALL_RANDOM_TIMED_ACTIONLIST: return sizeof(SmartAction::randTimedActionList);
             case SMART_ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST: return sizeof(SmartAction::randRangeTimedActionList);
@@ -1354,7 +1354,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                 return false;
             }
         case SMART_ACTION_SELF_CAST:
-        case SMART_ACTION_ADD_AURA:
         case SMART_ACTION_CAST:
             if (!IsSpellValid(e, e.action.cast.spell))
                 return false;
