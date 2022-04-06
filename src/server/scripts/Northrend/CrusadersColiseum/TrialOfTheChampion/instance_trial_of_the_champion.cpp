@@ -156,6 +156,7 @@ public:
 
                 // Coliseum Announcer:
                 case NPC_JAEREN:
+                case NPC_ARELAS:
                     NPC_AnnouncerGUID = creature->GetGUID();
                     //if( TeamIdInInstance == TEAM_ALLIANCE )
                     //  creature->UpdateEntry(NPC_ARELAS);
@@ -731,17 +732,19 @@ public:
             if( Creature* pBoss = instance->SummonCreature(CHAMPION_TO_SUMMON, SpawnPos) )
             {
                 NPC_GrandChampionGUID[BossOrder] = pBoss->GetGUID();
-                pBoss->ToCreature()->SetHomePosition(748.309f, 619.448f, 411.3f, M_PI / 2);
                 pBoss->ToCreature()->SetReactState(REACT_PASSIVE);
+                pBoss->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_PACIFIED);
+                pBoss->ToCreature()->SetHomePosition(748.309f, 619.448f, 411.3f, M_PI / 2);
                 pBoss->AI()->SetData(BossOrder, (shortver ? 1 : 0));
 
                 for( uint8 i = 0; i < 3; ++i )
                     if( Creature* pAdd = instance->SummonCreature(MINION_TO_SUMMON, SpawnPos) )
                     {
                         NPC_GrandChampionMinionsGUID[BossOrder][i] = pAdd->GetGUID();
+                        pAdd->SetReactState(REACT_PASSIVE);
+                        pAdd->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                         pAdd->SetHomePosition(748.309f, 619.448f, 411.3f, M_PI / 2);
                         pAdd->GetMotionMaster()->MoveFollow(pBoss, 2.0f, (i + 1)*M_PI / 2);
-                        pAdd->SetReactState(REACT_PASSIVE);
                     }
             }
 
@@ -836,7 +839,7 @@ public:
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[1][i]) )
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
-                                c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                                c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                                 if( Unit* target = c->SelectNearestTarget(200.0f) )
                                     c->AI()->AttackStart(target);
                                 c->AI()->DoZoneInCombat();
@@ -862,7 +865,7 @@ public:
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[0][i]) )
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
-                                c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                                c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                                 if( Unit* target = c->SelectNearestTarget(200.0f) )
                                     c->AI()->AttackStart(target);
                                 c->AI()->DoZoneInCombat();
@@ -887,7 +890,7 @@ public:
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[2][i]) )
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
-                                c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                                c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                                 if( Unit* target = c->SelectNearestTarget(200.0f) )
                                     c->AI()->AttackStart(target);
                                 c->AI()->DoZoneInCombat();
@@ -912,7 +915,7 @@ public:
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
-                                c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                                c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                                 if( Unit* target = c->SelectNearestTarget(200.0f) )
                                     c->AI()->AttackStart(target);
                                 c->AI()->DoZoneInCombat();
@@ -949,7 +952,7 @@ public:
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
-                                c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                                c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                                 if( Unit* target = c->SelectNearestTarget(200.0f) )
                                     c->AI()->AttackStart(target);
                                 c->AI()->DoZoneInCombat();
@@ -1053,7 +1056,7 @@ public:
                                 if( Creature* c = instance->GetCreature(NPC_ArgentSoldierGUID[i][j]) )
                                 {
                                     c->SetReactState(REACT_AGGRESSIVE);
-                                    c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                                    c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                                     //c->AI()->DoZoneInCombat();
                                 }
                         if( Creature* tirion = instance->GetCreature(NPC_TirionGUID) )
@@ -1074,7 +1077,7 @@ public:
                         if( Creature* boss = instance->GetCreature(NPC_ArgentChampionGUID) )
                         {
                             boss->SetReactState(REACT_AGGRESSIVE);
-                            boss->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                            boss->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                             if( Unit* target = boss->SelectNearestTarget(200.0f) )
                                 boss->AI()->AttackStart(target);
                             boss->AI()->DoZoneInCombat();
