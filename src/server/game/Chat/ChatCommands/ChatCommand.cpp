@@ -184,7 +184,7 @@ static void LogCommandUsage(WorldSession const& session, std::string_view cmdStr
         areaId, areaName, zoneId, zoneName,
         (player->GetSelectedUnit()) ? player->GetSelectedUnit()->GetName() : "",
         targetGuid.ToString());
-    
+
     std::string currentIp = player->GetSession()->GetRemoteAddress();
     if (!sConfigMgr->GetOption<bool>("SOAP.Enabled", false) && currentIp == "127.0.0.1")
         return;
