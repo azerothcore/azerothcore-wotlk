@@ -18,6 +18,7 @@
 #include "ChatCommand.h"
 #include "AccountMgr.h"
 #include "Chat.h"
+#include "Config.h"
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
 #include "Log.h"
@@ -175,10 +176,7 @@ static void LogCommandUsage(WorldSession const& session, std::string_view cmdStr
         zoneName = zone->area_name[locale];
     }
 
-    const std::string currentIp = player->GetSession()->GetRemoteAddress();
-    std::string logMessage = "";
-    if (currentIp != "127.0.0.1")
-        logMessage = Acore::StringFormatFmt("Command: {} [Player: {} ({}) (Account: {}) X: {} Y: {} Z: {} Map: {} ({}) Area: {} ({}) Zone: {} ({}) Selected: {} ({})]",
+    std::string logMessage = Acore::StringFormatFmt("Command: {} [Player: {} ({}) (Account: {}) X: {} Y: {} Z: {} Map: {} ({}) Area: {} ({}) Zone: {} ({}) Selected: {} ({})]",
         cmdStr, player->GetName(), player->GetGUID().ToString(),
         session.GetAccountId(),
         player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(),
@@ -186,7 +184,10 @@ static void LogCommandUsage(WorldSession const& session, std::string_view cmdStr
         areaId, areaName, zoneId, zoneName,
         (player->GetSelectedUnit()) ? player->GetSelectedUnit()->GetName() : "",
         targetGuid.ToString());
-
+    
+    std::string currentIp = player->GetSession()->GetRemoteAddress();
+    if (!sConfigMgr->GetOption<bool>("SOAP.Enabled", false) && currentIp == "127.0.0.1")
+        return;
     LOG_GM(session.GetAccountId(), logMessage);
 }
 
