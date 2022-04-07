@@ -4200,7 +4200,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->InterruptFlags &= ~SPELL_INTERRUPT_FLAG_INTERRUPT;
     });
 
-
     // Improved Blessing Protection (Nefarian Class Call)
     ApplySpellFix({ 23415 }, [](SpellInfo* spellInfo)
     {
