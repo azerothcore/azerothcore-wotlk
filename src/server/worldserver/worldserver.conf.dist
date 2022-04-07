@@ -3141,6 +3141,14 @@ SOAP.IP = "127.0.0.1"
 SOAP.Port = 7878
 
 #
+#   SOAP.GM.logs
+#       Description: Disable GM-command logs in console if SOAP is off and IP = 127.0.0.1
+#       Default:     0 - (Disabled, logs for all commands will be shown)
+#                    1 - (Enabled, show GM-logs only from external IP)
+
+SOAP.GM.logs = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################
