@@ -39,9 +39,11 @@ public:
         {
             switch (gameobject->GetEntry())
             {
-                case GO_HEAVY_DOOR:
+                case GO_HEAVY_DOOR_1:
+                case GO_HEAVY_DOOR_2:
                 case GO_DOOR_LEVER_1:
                 case GO_DOOR_LEVER_2:
+                case GO_DOOR_LEVER_3:
                 case GO_CANNON:
                     gameobject->UpdateSaveToDb(true);
                     break;

@@ -335,7 +335,8 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
         switch (GetStateSavedOnInstance())
         {
             case 0:
-                SetGoState(GO_STATE_ACTIVE);
+                SetGoState(GO_STATE_READY);
+                SwitchDoorOrButton(true);
                 break;
             case 1:
                 SetGoState(GO_STATE_READY);
