@@ -175,7 +175,10 @@ static void LogCommandUsage(WorldSession const& session, std::string_view cmdStr
         zoneName = zone->area_name[locale];
     }
 
-    std::string logMessage = Acore::StringFormatFmt("Command: {} [Player: {} ({}) (Account: {}) X: {} Y: {} Z: {} Map: {} ({}) Area: {} ({}) Zone: {} ({}) Selected: {} ({})]",
+    const std::string currentIp = player->GetSession()->GetRemoteAddress();
+    std::string logMessage = "";
+    if (currentIp != "127.0.0.1")
+        logMessage = Acore::StringFormatFmt("Command: {} [Player: {} ({}) (Account: {}) X: {} Y: {} Z: {} Map: {} ({}) Area: {} ({}) Zone: {} ({}) Selected: {} ({})]",
         cmdStr, player->GetName(), player->GetGUID().ToString(),
         session.GetAccountId(),
         player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(),
