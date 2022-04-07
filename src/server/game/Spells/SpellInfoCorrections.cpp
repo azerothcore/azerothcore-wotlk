@@ -4194,7 +4194,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CHANGE_MAP;
     });
     
-    //Fireballvolley
+    // Fireballvolley
     ApplySpellFix({ 22425 }, [](SpellInfo* spellInfo)
     {
         spellInfo->InterruptFlags &= ~SPELL_INTERRUPT_FLAG_INTERRUPT;
