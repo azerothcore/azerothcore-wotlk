@@ -38,6 +38,19 @@ public:
         {
         }
 
+        void OnCreatureCreate(Creature* creature) override
+        {
+            switch (creature->GetEntry())
+            {
+                case NPC_EMI_SHORTFUSE:
+                    if (_encounters[TYPE_GRUBBIS] == DONE)
+                    {
+                        creature->DespawnOrUnsummon();
+                    }
+                    break;
+            }
+        }
+
         void OnGameObjectCreate(GameObject* gameobject) override
         {
             switch (gameobject->GetEntry())
