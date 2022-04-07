@@ -447,7 +447,7 @@ public:
                                 }
                             }
 
-                            _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 12000, 17000);
+                            _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 15000);
                         }
                         break;
                     case EVENT_RAZOR_PHASE_TWO:
