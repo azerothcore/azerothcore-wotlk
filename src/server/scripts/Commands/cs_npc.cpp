@@ -524,7 +524,7 @@ public:
             return false;
         }
 
-        creature->SetUInt32Value(UNIT_NPC_FLAGS, NPCFlags(npcFlags));
+        creature->ReplaceAllNpcFlags(NPCFlags(npcFlags));
 
         WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_NPCFLAG);
 
@@ -589,7 +589,7 @@ public:
 
         CreatureTemplate const* cInfo = target->GetCreatureTemplate();
         uint32 faction = target->GetFaction();
-        uint32 npcflags = target->GetUInt32Value(UNIT_NPC_FLAGS);
+        uint32 npcflags = target->GetNpcFlags();
         uint32 mechanicImmuneMask = cInfo->MechanicImmuneMask;
         uint32 spellSchoolImmuneMask = cInfo->SpellSchoolImmuneMask;
         uint32 displayid = target->GetDisplayId();

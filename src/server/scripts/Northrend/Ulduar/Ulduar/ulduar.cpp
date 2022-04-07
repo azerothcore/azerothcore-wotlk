@@ -39,7 +39,7 @@ public:
 
     bool OnGossipSelect(Player*  /*player*/, Creature* creature, uint32  /*uiSender*/, uint32  /*uiAction*/) override
     {
-        creature->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+        creature->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
         uint8 _keeper = 0;
         switch (creature->GetEntry())
         {
@@ -285,7 +285,7 @@ public:
                 me->SetReactState(REACT_PASSIVE);
                 me->SetRegeneratingHealth(false);
                 me->SetFaction(FACTION_PREY);
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+                me->SetNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
                 me->CastSpell(me, 64770, true);
             }
         }

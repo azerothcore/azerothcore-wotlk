@@ -942,10 +942,10 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
     }
 
     // Set FFA PvP for non GM in non-rest mode
-    if (sWorld->IsFFAPvPRealm() && !pCurrChar->IsGameMaster() && !pCurrChar->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING))
+    if (sWorld->IsFFAPvPRealm() && !pCurrChar->IsGameMaster() && !pCurrChar->HasPlayerFlag(PLAYER_FLAGS_RESTING))
         pCurrChar->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
 
-    if (pCurrChar->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_CONTESTED_PVP))
+    if (pCurrChar->HasPlayerFlag(PLAYER_FLAGS_CONTESTED_PVP))
     {
         pCurrChar->SetContestedPvP(nullptr, false);
     }
@@ -1056,8 +1056,8 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
     }
 
     // pussywizard: pvp mode
-    pCurrChar->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_TIMER);
-    if (pCurrChar->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP))
+    pCurrChar->RemovePlayerFlag(PLAYER_FLAGS_PVP_TIMER);
+    if (pCurrChar->HasPlayerFlag(PLAYER_FLAGS_IN_PVP))
         pCurrChar->UpdatePvP(true, true);
 
     // pussywizard: on login it's not possible to go back to arena as a spectator, HandleMoveWorldportAckOpcode is not sent, so call it here
@@ -1301,17 +1301,17 @@ void WorldSession::HandleSetFactionInactiveOpcode(WorldPacket& recvData)
 void WorldSession::HandleShowingHelmOpcode(WorldPackets::Character::ShowingHelm& packet)
 {
     if (packet.ShowHelm)
-        _player->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_HELM);
+        _player->RemovePlayerFlag(PLAYER_FLAGS_HIDE_HELM);
     else
-        _player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_HELM);
+        _player->SetPlayerFlag(PLAYER_FLAGS_HIDE_HELM);
 }
 
 void WorldSession::HandleShowingCloakOpcode(WorldPackets::Character::ShowingCloak& packet)
 {
     if (packet.ShowCloak)
-        _player->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_CLOAK);
+        _player->RemovePlayerFlag(PLAYER_FLAGS_HIDE_CLOAK);
     else
-        _player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_CLOAK);
+        _player->SetPlayerFlag(PLAYER_FLAGS_HIDE_CLOAK);
 }
 
 void WorldSession::HandleCharRenameOpcode(WorldPacket& recvData)

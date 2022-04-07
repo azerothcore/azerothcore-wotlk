@@ -165,7 +165,7 @@ public:
             {
                 case GO_ACTIVATION_CRYSTAL:
                     HandleGameObject(ObjectGuid::Empty, false, go); // make go not used yet
-                    go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE); // not useable at the beginning
+                    go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE); // not useable at the beginning
                     GO_ActivationCrystalGUID.push_back(go->GetGUID());
                     break;
                 case GO_MAIN_DOOR:
@@ -451,7 +451,7 @@ public:
                             if (GameObject* go = instance->GetGameObject(guid))
                             {
                                 HandleGameObject(ObjectGuid::Empty, false, go); // not used yet
-                                go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE); // make it useable
+                                go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE); // make it useable
                             }
                         events.RescheduleEvent(EVENT_SUMMON_PORTAL, 4000);
                     }
@@ -545,7 +545,7 @@ public:
                 if (GameObject* go = instance->GetGameObject(guid))
                 {
                     HandleGameObject(ObjectGuid::Empty, false, go); // not used yet
-                    go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE); // not useable at the beginning
+                    go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE); // not useable at the beginning
                 }
 
             // reset positions of Sinclari and Guards

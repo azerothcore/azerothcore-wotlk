@@ -547,7 +547,7 @@ public:
             summons.DespawnAll();
 
             me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-            me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+            me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->SetVisible(true);
             me->setActive(true);
@@ -623,7 +623,7 @@ public:
                     break;
                 case EVENT_START_COUNTDOWN_5:
                     battleStarted = ENCOUNTER_STATE_FIGHT;
-                    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+                    me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
                     Talk(SAY_LIGHT_OF_DAWN04); // Wrong order in DB!
                     SendUpdateWorldState(WORLD_STATE_COUNTDOWN_TIME, 0);
                     SendUpdateWorldState(WORLD_STATE_COUNTDOWN_ENABLE, 0);
@@ -1131,7 +1131,7 @@ public:
                                 if (i->GetSource()->IsAlive() && me->IsWithinDistInMap(i->GetSource(), 100))
                                     i->GetSource()->CastSpell(i->GetSource(), SPELL_THE_LIGHT_OF_DAWN_Q, false);
                         }
-                        me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                        me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                         break;
                     }
                 case EVENT_OUTRO_SCENE_61:

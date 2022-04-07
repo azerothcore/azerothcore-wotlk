@@ -857,6 +857,12 @@ public:
     void SetPhaseMask(uint32 newPhaseMask, bool update) override;
     void EnableCollision(bool enable);
 
+    GameObjectFlags GetGameObjectFlags() const { return GameObjectFlags(GetUInt32Value(GAMEOBJECT_FLAGS)); }
+    bool HasGameObjectFlag(GameObjectFlags flags) const { return HasFlag(GAMEOBJECT_FLAGS, flags) != 0; }
+    void SetGameObjectFlag(GameObjectFlags flags) { SetFlag(GAMEOBJECT_FLAGS, flags); }
+    void RemoveGameObjectFlag(GameObjectFlags flags) { RemoveFlag(GAMEOBJECT_FLAGS, flags); }
+    void ReplaceAllGameObjectFlags(GameObjectFlags flags) { SetUInt32Value(GAMEOBJECT_FLAGS, flags); }
+
     void Use(Unit* user);
 
     [[nodiscard]] LootState getLootState() const { return m_lootState; }
@@ -933,9 +939,9 @@ public:
     void SetDestructibleState(GameObjectDestructibleState state, Player* eventInvoker = nullptr, bool setHealth = false);
     [[nodiscard]] GameObjectDestructibleState GetDestructibleState() const
     {
-        if (HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_DESTROYED))
+        if (HasGameObjectFlag(GO_FLAG_DESTROYED))
             return GO_DESTRUCTIBLE_DESTROYED;
-        if (HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_DAMAGED))
+        if (HasGameObjectFlag(GO_FLAG_DAMAGED))
             return GO_DESTRUCTIBLE_DAMAGED;
         return GO_DESTRUCTIBLE_INTACT;
     }
