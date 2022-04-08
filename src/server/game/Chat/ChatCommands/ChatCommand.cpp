@@ -186,9 +186,8 @@ static void LogCommandUsage(WorldSession const& session, std::string_view cmdStr
         targetGuid.ToString());
 
     std::string currentIp = player->GetSession()->GetRemoteAddress();
-    if (!sConfigMgr->GetOption<bool>("SOAP.Enabled", false) && currentIp == "127.0.0.1")
-        if (sConfigMgr->GetOption<bool>("SOAP.GM.logs", false)) // if true: spam is off
-            return;
+    if (!sConfigMgr->GetOption<bool>("console.ShowGMlogs", false) && currentIp == "127.0.0.1")
+        return;
     LOG_GM(session.GetAccountId(), logMessage);
 }
 
