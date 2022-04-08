@@ -169,7 +169,7 @@ public:
                 case GO_PORTCULLIS_CHROMAGGUS:
                     AddDoor(go, true);
                     chromaggusDoorGUID = go->GetGUID();
-                    go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                    go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
                 default:
                     break;
@@ -447,7 +447,7 @@ public:
                                 }
                             }
 
-                            _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 12000, 17000);
+                            _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 15000);
                         }
                         break;
                     case EVENT_RAZOR_PHASE_TWO:

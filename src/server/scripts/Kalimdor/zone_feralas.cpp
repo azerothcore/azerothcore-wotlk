@@ -98,7 +98,7 @@ public:
 
         void InitializeAI() override
         {
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+            me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
             me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             me->RestoreFaction();
 
@@ -202,7 +202,7 @@ public:
 
                 Talk(TALK_0, player);
 
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                 me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                 me->SetFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
                 me->GetMotionMaster()->MoveFollow(player, 3.f, M_PI);

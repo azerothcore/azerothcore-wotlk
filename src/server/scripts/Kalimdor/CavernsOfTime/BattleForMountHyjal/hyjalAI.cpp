@@ -387,7 +387,7 @@ void hyjalAI::Reset()
     Debug = false;
 
     //Flags
-    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
     //Initialize spells
     memset(Spells, 0, sizeof(Spell) * HYJAL_AI_MAX_SPELLS);
@@ -587,7 +587,7 @@ void hyjalAI::StartEvent(Player* player)
     CheckTimer = 5000;
     PlayerGUID = player->GetGUID();
 
-    me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+    me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
     instance->DoUpdateWorldState(WORLD_STATE_WAVES, 0);
     instance->DoUpdateWorldState(WORLD_STATE_ENEMY, 0);
@@ -619,7 +619,7 @@ void hyjalAI::Retreat()
         Creature* JainaDummy = me->SummonCreature(JAINA, JainaDummySpawn[0][0], JainaDummySpawn[0][1], JainaDummySpawn[0][2], JainaDummySpawn[0][3], TEMPSUMMON_TIMED_DESPAWN, 60000);
         if (JainaDummy)
         {
-            JainaDummy->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            JainaDummy->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             CAST_AI(hyjalAI, JainaDummy->AI())->IsDummy = true;
             DummyGuid = JainaDummy->GetGUID();
         }
@@ -629,7 +629,7 @@ void hyjalAI::Retreat()
     }
     SpawnVeins();
     Overrun = true;
-    me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);//cant talk after overrun event started
+    me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);//cant talk after overrun event started
 }
 
 void hyjalAI::SpawnVeins()
@@ -823,7 +823,7 @@ void hyjalAI::UpdateAI(uint32 diff)
                     }
                     EventBegun = false;
                     CheckTimer = 0;
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     BossGUID[i].Clear();
                     instance->DoUpdateWorldState(WORLD_STATE_ENEMY, 0); // Reset world state for enemies to disable it
                 }
