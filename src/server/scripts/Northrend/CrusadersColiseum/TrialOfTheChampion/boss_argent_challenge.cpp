@@ -158,7 +158,7 @@ public:
                     me->getThreatMgr().clearReferences();
                     me->SetRegeneratingHealth(false);
                     _EnterEvadeMode();
-                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     if( pInstance )
                         pInstance->SetData(BOSS_ARGENT_CHALLENGE, DONE);
                 }
@@ -305,7 +305,7 @@ public:
                     me->getThreatMgr().clearReferences();
                     me->SetRegeneratingHealth(false);
                     _EnterEvadeMode();
-                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     if( pInstance )
                     {
                         pInstance->SetData(BOSS_ARGENT_CHALLENGE, DONE);
@@ -404,6 +404,7 @@ public:
             events.Reset();
             me->SetReactState(REACT_PASSIVE);
             me->SetObjectScale(0.01f);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             events.ScheduleEvent(EVENT_MEMORY_SCALE, 500);
         }
 
@@ -439,7 +440,7 @@ public:
 
                     break;
                 case EVENT_MEMORY_START_ATTACK:
-                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     if( Unit* target = me->SelectNearestTarget(200.0f) )
                     {
                         AttackStart(target);
