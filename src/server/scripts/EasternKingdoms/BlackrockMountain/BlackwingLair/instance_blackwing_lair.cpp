@@ -298,7 +298,11 @@ public:
 
                         for (ObjectGuid const& guid : EggList)
                         {
-                            DoRespawnGameObject(guid, 0);
+                            if (GameObject* egg = instance->GetGameObject(guid))
+                            {
+                                egg->SetLootState(GO_READY);
+                                egg->Respawn();
+                            }
                         }
 
                         DoRespawnCreature(DATA_GRETHOK);

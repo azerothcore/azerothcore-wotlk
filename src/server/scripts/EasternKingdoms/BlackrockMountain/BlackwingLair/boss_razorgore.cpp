@@ -305,7 +305,7 @@ public:
                 {
                     razorgore->AI()->DoAction(TALK_EGG_BROKEN_RAND);
                     egg->SetLootState(GO_READY);
-                    egg->UseDoorOrButton(WEEK * IN_MILLISECONDS);
+                    egg->UseDoorOrButton(10000);
                 }
             }
         }
