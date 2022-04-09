@@ -166,7 +166,7 @@ public:
                 // Reset statue
                 if (GameObject* statisGenerator = m_pInstance->instance->GetGameObject(m_pInstance->GetGuidData(STATIS_GENERATOR)))
                 {
-                    statisGenerator->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                    statisGenerator->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     statisGenerator->SetGoState(GO_STATE_READY);
                 }
 
@@ -802,7 +802,7 @@ public:
         if (pPalehoof && pPalehoof->IsAlive())
         {
             // maybe these are hacks :(
-            go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+            go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
             go->SetGoState(GO_STATE_ACTIVE);
 
             pPalehoof->AI()->DoAction(ACTION_START_EVENT);

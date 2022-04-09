@@ -157,7 +157,7 @@ void NPCStaveQuestAI::PrepareForEncounter()
     SetHomePosition();
 
     me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-    me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+    me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 }
 
 void NPCStaveQuestAI::ClearLootIfUnfair(Unit* killer)
@@ -233,7 +233,7 @@ void NPCStaveQuestAI::ResetState(uint32 aura = 0)
     if (InNormalForm())
     {
         me->m_Events.KillAllEvents(true);
-        me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+        me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
     }
 
     me->RemoveAura(aura);
@@ -294,7 +294,7 @@ public:
         void EnterCombat(Unit* victim) override
         {
             RevealForm();
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
             if (InNormalForm())
             {
@@ -480,7 +480,7 @@ public:
         void EnterCombat(Unit* /*victim*/) override
         {
             RevealForm();
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
         }
 
         void UpdateAI(uint32 /*diff*/) override
@@ -646,7 +646,7 @@ public:
         void EnterCombat(Unit* victim) override
         {
             RevealForm();
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
             if (!InNormalForm())
             {
@@ -878,7 +878,7 @@ public:
         void EnterCombat(Unit* victim) override
         {
             RevealForm();
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
             if (InNormalForm())
             {
@@ -1060,7 +1060,7 @@ public:
         void EnterCombat(Unit* victim) override
         {
             RevealForm();
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
             if (!InNormalForm())
             {

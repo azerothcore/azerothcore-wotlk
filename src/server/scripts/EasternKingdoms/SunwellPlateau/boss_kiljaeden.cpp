@@ -184,7 +184,7 @@ public:
         {
             for (uint8 i = 0; i < 4; ++i)
                 if (GameObject* orb = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1 + i)))
-                    orb->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                    orb->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
         }
 
         void Reset() override
@@ -643,9 +643,9 @@ public:
             {
                 if (GameObject* orb = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1 + i)))
                 {
-                    if (orb->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE))
+                    if (orb->HasGameObjectFlag(GO_FLAG_NOT_SELECTABLE))
                     {
-                        orb->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        orb->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                         if (Creature* trigger = me->SummonTrigger(orb->GetPositionX(), orb->GetPositionY(), orb->GetPositionZ(), 0, 10 * MINUTE * IN_MILLISECONDS))
                         {
                             trigger->CastSpell(trigger, SPELL_RING_OF_BLUE_FLAMES, true, nullptr, nullptr, trigger->GetGUID());

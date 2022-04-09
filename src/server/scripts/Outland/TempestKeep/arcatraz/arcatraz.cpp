@@ -347,7 +347,7 @@ public:
                 {
                     instance->DoCastSpellOnPlayers(SPELL_QID10886);
                     creature->AI()->Talk(SAY_COMPLETE);
-                    creature->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    creature->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP);
                 }
             }
         }

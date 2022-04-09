@@ -36,7 +36,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if(!creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
+        if(!creature->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
             return true;
 
         InstanceScript* pInstance = creature->GetInstanceScript();
@@ -59,7 +59,7 @@ public:
                 gossipTextId = MSG_CRUSADERS;
                 break;
             case INSTANCE_PROGRESS_DONE:
-                creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 return true;
             default:
                 return true;
@@ -72,7 +72,7 @@ public:
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 uiAction) override
     {
-        if( !creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP) )
+        if( !creature->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP) )
             return true;
 
         InstanceScript* pInstance = creature->GetInstanceScript();
@@ -82,7 +82,7 @@ public:
         if( uiAction == GOSSIP_ACTION_INFO_DEF + 1337 )
         {
             pInstance->SetData(TYPE_ANNOUNCER_GOSSIP_SELECT, 0);
-            creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
         }
 
         CloseGossipMenuFor(player);

@@ -186,7 +186,7 @@ public:
                 case GO_PORTCULLIS_CHROMAGGUS:
                     AddDoor(go, true);
                     chromaggusDoorGUID = go->GetGUID();
-                    go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                    go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
                 default:
                     break;
@@ -441,6 +441,15 @@ public:
                         }
                     }
                     break;
+                case NPC_BLACKWING_DRAGON:
+                    --addsCount[0];
+                    break;
+                case NPC_BLACKWING_LEGIONAIRE:
+                case NPC_BLACKWING_MAGE:
+                    --addsCount[1];
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -494,7 +503,7 @@ public:
 
                             if (spawnMoreAdds)
                             {
-                                _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 12000, 17000);
+                                _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 15000);
                             }
                         }
                         break;
