@@ -284,6 +284,7 @@ public:
 
             if (action == ACTION_KILLED)
             {
+                summons.DespawnAll();
                 Unit::Kill(me, me);
             }
         }
