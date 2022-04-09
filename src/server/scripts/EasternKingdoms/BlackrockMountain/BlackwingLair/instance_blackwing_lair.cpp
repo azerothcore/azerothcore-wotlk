@@ -443,10 +443,18 @@ public:
                     break;
                 case NPC_BLACKWING_DRAGON:
                     --addsCount[0];
+                    if (_events.GetTimeUntilEvent(EVENT_RAZOR_SPAWN) == Milliseconds::max())
+                    {
+                        _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 1s);
+                    }
                     break;
                 case NPC_BLACKWING_LEGIONAIRE:
                 case NPC_BLACKWING_MAGE:
                     --addsCount[1];
+                    if (_events.GetTimeUntilEvent(EVENT_RAZOR_SPAWN) == Milliseconds::max())
+                    {
+                        _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 1s);
+                    }
                     break;
                 default:
                     break;
