@@ -328,7 +328,7 @@ void FlightPathMovementGenerator::DoFinalize(Player* player)
         player->SetFallInformation(GameTime::GetGameTime().count(), player->GetPositionZ());
     }
 
-    player->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_TAXI_BENCHMARK);
+    player->RemovePlayerFlag(PLAYER_FLAGS_TAXI_BENCHMARK);
 }
 
 #define PLAYER_FLIGHT_SPEED 32.0f
