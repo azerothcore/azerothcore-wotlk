@@ -19,6 +19,7 @@
 #define _IVMAPMANAGER_H
 
 #include "Define.h"
+#include "ModelIgnoreFlags.h"
 #include "Optional.h"
 #include <string>
 
@@ -91,7 +92,7 @@ namespace VMAP
         virtual void unloadMap(unsigned int pMapId, int x, int y) = 0;
         virtual void unloadMap(unsigned int pMapId) = 0;
 
-        virtual bool isInLineOfSight(unsigned int pMapId, float x1, float y1, float z1, float x2, float y2, float z2) = 0;
+        virtual bool isInLineOfSight(unsigned int pMapId, float x1, float y1, float z1, float x2, float y2, float z2, ModelIgnoreFlags ignoreFlags) = 0;
         virtual float getHeight(unsigned int pMapId, float x, float y, float z, float maxSearchDist) = 0;
         /**
         test if we hit an object. return true if we hit one. rx, ry, rz will hold the hit position or the dest position, if no intersection was found
