@@ -27,6 +27,7 @@ enum Say
 {
     SAY_TELEPORT = 0,
     SAY_AGGRO,
+    SAY_KILL,
 };
 
 enum Spells
@@ -79,6 +80,7 @@ public:
         {
             if (victim && victim->GetTypeId() == TYPEID_PLAYER)
             {
+                Talk(SAY_KILL);
                 victim->CastSpell(victim, SPELL_MARK_OF_FROST, true);
             }
         }
