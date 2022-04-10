@@ -17896,6 +17896,8 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
     // Set charmed
     charmer->SetCharm(this, true);
 
+    StopAttackingInvalidTarget();
+
     if (GetTypeId() == TYPEID_UNIT)
     {
         if (MovementGenerator* movementGenerator = GetMotionMaster()->GetMotionSlot(MOTION_SLOT_IDLE))
@@ -18059,6 +18061,8 @@ void Unit::RemoveCharmedBy(Unit* charmer)
     ASSERT(type != CHARM_TYPE_VEHICLE || (GetTypeId() == TYPEID_UNIT && IsVehicle()));
 
     charmer->SetCharm(this, false);
+
+    StopAttackingInvalidTarget();
 
     Player* playerCharmer = charmer->ToPlayer();
     if (playerCharmer)
@@ -19589,6 +19593,37 @@ void Unit::StopAttackFaction(uint32 faction_id)
 
     for (ControlSet::const_iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
         (*itr)->StopAttackFaction(faction_id);
+}
+
+void Unit::StopAttackingInvalidTarget()
+{
+    AttackerSet const& attackers = getAttackers();
+    for (AttackerSet::const_iterator itr = attackers.begin(); itr != attackers.end();)
+    {
+        Unit* attacker = (*itr);
+        if (!attacker->IsValidAttackTarget(this))
+        {
+            attacker->AttackStop();
+            if (attacker->GetTypeId() == TYPEID_PLAYER)
+            {
+                attacker->ToPlayer()->SendAttackSwingCancelAttack();
+            }
+
+            for (Unit* controled : attacker->m_Controlled)
+            {
+                if (controled->GetVictim() == this && !controled->IsValidAttackTarget(this))
+                {
+                    controled->AttackStop();
+                }
+            }
+
+            itr = attackers.begin();
+        }
+        else
+        {
+            ++itr;
+        }
+    }
 }
 
 void Unit::OutDebugInfo() const
