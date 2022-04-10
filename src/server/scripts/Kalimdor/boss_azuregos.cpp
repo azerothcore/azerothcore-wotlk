@@ -27,7 +27,6 @@ enum Say
 {
     SAY_TELEPORT = 0,
     SAY_AGGRO,
-    SAY_KILL,
 };
 
 enum Spells
@@ -62,8 +61,6 @@ public:
 
         void Reset() override
         {
-            me->RemoveAurasDueToSpell(SPELL_MARK_OF_FROST_AURA);
-            _scheduler.CancelAll();
             me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->RestoreFaction();
             me->GetMap()->DoForAllPlayers([&](Player* p)
@@ -71,7 +68,6 @@ public:
                     if (p->GetZoneId() == me->GetZoneId())
                     {
 
-                        p->RemoveAurasDueToSpell(SPELL_MARK_OF_FROST);
                         p->RemoveAurasDueToSpell(SPELL_AURA_OF_FROST);
                         p->RemoveAurasDueToSpell(SPELL_CHILL);
                         p->RemoveAurasDueToSpell(SPELL_FROST_BREATH);
@@ -83,7 +79,6 @@ public:
         {
             if (victim && victim->GetTypeId() == TYPEID_PLAYER)
             {
-                Talk(SAY_KILL);
                 victim->CastSpell(victim, SPELL_MARK_OF_FROST, true);
             }
         }
