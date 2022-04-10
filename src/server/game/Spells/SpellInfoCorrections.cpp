@@ -4229,12 +4229,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx |= SPELL_ATTR1_EXCLUDE_CASTER;
     });
 
-    // Suppression Aura
-    ApplySpellFix({ 22247 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
-    });
-
     // Cosmetic - Lightning Beam Channel
     ApplySpellFix({ 45537 }, [](SpellInfo* spellInfo)
     {

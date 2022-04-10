@@ -1763,7 +1763,9 @@ public:
                 {
                     float destX = summoner->GetPositionX() + cos(angle + a * M_PI) * i * 10.0f;
                     float destY = summoner->GetPositionY() + std::sin(angle + a * M_PI) * i * 10.0f;
-                    if (summoner->GetMap()->isInLineOfSight(summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ() + 10.0f, destX, destY, summoner->GetPositionZ() + 10.0f, summoner->GetPhaseMask(), LINEOFSIGHT_ALL_CHECKS) && destX > 4585.0f && destY > 2716.0f && destY < 2822.0f)
+                    if (summoner->GetMap()->isInLineOfSight(summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ() + 10.0f, destX, destY,
+                        summoner->GetPositionZ() + 10.0f, summoner->GetPhaseMask(), LINEOFSIGHT_ALL_CHECKS, VMAP::ModelIgnoreFlags::Nothing) &&
+                        destX > 4585.0f && destY > 2716.0f && destY < 2822.0f)
                     {
                         float destZ = summoner->GetMapHeight(summoner->GetPhaseMask(), destX, destY, summoner->GetPositionZ());
                         if (std::fabs(destZ - summoner->GetPositionZ()) < 10.0f) // valid z found
