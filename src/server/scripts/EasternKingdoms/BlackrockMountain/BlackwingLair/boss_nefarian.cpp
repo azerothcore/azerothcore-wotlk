@@ -284,7 +284,7 @@ public:
 
             if (action == ACTION_KILLED)
             {
-                summons.DespawnAll();
+                summons.DespawnEntry(NPC_BONE_CONSTRUCT);
                 Unit::Kill(me, me);
             }
         }
