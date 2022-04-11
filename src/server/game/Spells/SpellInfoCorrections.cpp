@@ -86,11 +86,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DB);
     });
 
-    ApplySpellFix({
-        53096,  // Quetz'lun's Judgment
-        70743,  // AoD Special
-        70614   // AoD Special - Vegard
-        }, [](SpellInfo* spellInfo)
+    ApplySpellFix({ 22291 }, [](SpellInfo* spellInfo)
     {
         spellInfo->MaxAffectedTargets = 1;
     });
@@ -110,6 +106,15 @@ void SpellMgr::LoadSpellInfoCorrections()
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].Effect = 0;
+    });
+    
+    ApplySpellFix({
+        53096,  // Quetz'lun's Judgment
+        70743,  // AoD Special
+        70614   // AoD Special - Vegard
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->MaxAffectedTargets = 1;
     });
 
     ApplySpellFix({
