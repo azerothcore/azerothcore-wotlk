@@ -1693,8 +1693,7 @@ void Player::UpdateTriggerVisibility()
             // units (values dependent on GM state)
             if (!creature || (!creature->IsTrigger() &&
                               !creature->HasAuraType(SPELL_AURA_TRANSFORM) &&
-                              !creature->HasFlag(UNIT_FIELD_FLAGS,
-                                                 UNIT_FLAG_NOT_SELECTABLE)))
+                              !creature->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE)))
                 continue;
 
             creature->SetFieldNotifyFlag(UF_FLAG_PUBLIC);

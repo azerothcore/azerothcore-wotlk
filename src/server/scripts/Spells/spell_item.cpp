@@ -3493,7 +3493,8 @@ class spell_item_eggnog : public SpellScript
 
 enum GoblinBomb
 {
-    SPELL_SUMMON_GOBLIN_BOMB = 13258,
+    SPELL_SUMMON_GOBLIN_BOMB     = 13258,
+    SPELL_MALFUNCTION_EXPLOSION  = 13261
 };
 
 // 23134 - Goblin Bomb
@@ -3503,14 +3504,14 @@ class spell_item_goblin_bomb : public SpellScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_SUMMON_GOBLIN_BOMB });
+        return ValidateSpellInfo({ SPELL_SUMMON_GOBLIN_BOMB, SPELL_MALFUNCTION_EXPLOSION });
     }
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         if (Unit* caster = GetCaster())
         {
-            caster->CastSpell(caster, SPELL_SUMMON_GOBLIN_BOMB, true, GetCastItem());
+            caster->CastSpell(caster, roll_chance_i(95) ? SPELL_SUMMON_GOBLIN_BOMB : SPELL_MALFUNCTION_EXPLOSION, true, GetCastItem());
         }
     }
 

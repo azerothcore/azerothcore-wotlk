@@ -4160,14 +4160,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(152); // 150 yards
     });
 
-    // Shadowbolt Volley
-    ApplySpellFix({ 22665 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(152); // 150 yards
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(41); // 150 yards
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
-    });
-
     ApplySpellFix({ 22247 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesCu |= SPELL_ATTR0_CU_DONT_BREAK_STEALTH;
@@ -4227,12 +4219,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 19872 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx |= SPELL_ATTR1_EXCLUDE_CASTER;
-    });
-
-    // Suppression Aura
-    ApplySpellFix({ 22247 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
     // Cosmetic - Lightning Beam Channel
