@@ -306,6 +306,9 @@ public:
                     case DONE:
                         EggEvent = data;
                         break;
+                    case FAIL:
+                        _events.CancelEvent(EVENT_RAZOR_SPAWN);
+                        break;
                     case IN_PROGRESS:
                         _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 45 * IN_MILLISECONDS);
                         EggEvent = data;
