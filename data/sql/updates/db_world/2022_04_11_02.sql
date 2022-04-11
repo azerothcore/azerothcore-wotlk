@@ -1,3 +1,19 @@
+-- DB update 2022_04_11_01 -> 2022_04_11_02
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_04_11_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_04_11_01 2022_04_11_02 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1645574957481593300'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1645574957481593300');
 
 UPDATE `quest_template_locale` SET `Details`="加瑞克·帕德弗特，这个恶棍几周以来一直让我们的农民和商人心惊胆战，前几天有人在农场附近的小屋里看到了他的身影，大概在就是修道院东边过了桥以后的那片地方。提着他的头回来见我，然后领取赏金吧！$B$B不过你要小心一点，$N。加瑞克身边总是有一帮暴徒，他可不是那么容易搞定的家伙。" WHERE `ID`=6 AND `locale` = "zhCN";
@@ -1703,3 +1719,13 @@ UPDATE `quest_template_locale` SET `Title`="<UNUSED>Potion of Nature's Armor" WH
 UPDATE `quest_template_locale` SET `Title`="<UNUSED>Glorious Standard of the Alliance" WHERE `ID`=9479 AND `locale` = "zhCN";
 UPDATE `quest_template_locale` SET `Details`="被遗忘者的密探发现，最近联盟试图在东瘟疫之地利用那些废弃的哨塔建立一系列的据点。$b$b现在，情况非常急迫，我们显然不能允许他们在我们东部边界的一系列重要地点建立这样的据点，因此我们必须击退联盟的这次进犯，并把他们赶出那些已经被占据的哨塔，同时，我们还要将那些哨塔占领下来，以应对以后的进攻。" WHERE `ID`=9665 AND `locale` = "zhCN";
 UPDATE `quest_template_locale` SET `Details`="我们在萨尔玛的军队认为地狱火堡垒附近区域的邪兽人已经全部清除掉了，但是最近，在东边废墟一带，我们又发现了一些邪兽人。$B$B现在，我们必须阻止他们在那里建立新的据点。罗卡格已经派追踪者凯德去监视他们的行动了，但我们还得采取进一步的措施来阻止他们继续深入废墟。$B$B你先去废墟里清理一些他们的苦工，然后去北边的树林找里找到凯德。他会告诉你接下去做什么。" WHERE `ID`=10000 AND `locale` = "zhCN";
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_04_11_02' WHERE sql_rev = '1645574957481593300';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
