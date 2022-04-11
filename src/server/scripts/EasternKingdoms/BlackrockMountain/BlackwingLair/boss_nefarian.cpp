@@ -256,7 +256,7 @@ public:
 
                 me->SetVisible(true);
                 me->SetPhaseMask(1, true);
-                me->ReplaceAllNpcFlags(NPCFlags(1));
+                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 me->SetFaction(FACTION_FRIENDLY);
                 me->SetStandState(UNIT_STAND_STATE_SIT_HIGH_CHAIR);
                 me->RemoveAura(SPELL_NEFARIANS_BARRIER);
@@ -284,6 +284,7 @@ public:
 
             if (action == ACTION_KILLED)
             {
+                summons.DespawnEntry(NPC_BONE_CONSTRUCT);
                 Unit::Kill(me, me);
             }
         }
@@ -472,7 +473,7 @@ public:
                 Talk(SAY_GAMESBEGIN_1);
                 events.ScheduleEvent(EVENT_START_EVENT, 4000);
                 me->SetFaction(FACTION_DRAGONFLIGHT_BLACK);
-                me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
                 me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
                 // Due to Nefarius despawning himself on Vael, we need to update the guid on instance to prevent unwanted behaviours as encounter not resetting at all.

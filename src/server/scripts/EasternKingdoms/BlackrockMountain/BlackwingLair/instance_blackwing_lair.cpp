@@ -400,6 +400,7 @@ public:
                         summon->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         summon->SetReactState(REACT_PASSIVE);
                         summon->SetStandState(UNIT_STAND_STATE_DEAD);
+                        summon->SetHomePosition(summon->GetPosition());
 
                         if (Creature* nefarius = instance->GetCreature(victorNefariusGUID))
                         {
