@@ -303,6 +303,9 @@ public:
             {
                 switch (data)
                 {
+                    case DONE:
+                        EggEvent = data;
+                        break;
                     case IN_PROGRESS:
                         _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 45 * IN_MILLISECONDS);
                         EggEvent = data;
@@ -392,20 +395,6 @@ public:
         {
             switch (unit->GetEntry())
             {
-                case NPC_RAZORGORE:
-                    //! HACK, needed because of buggy CreatureAI after charm
-                    if (EggEvent == DONE)
-                    {
-                        if (unit->GetEntry() == NPC_RAZORGORE && GetBossState(DATA_RAZORGORE_THE_UNTAMED) != DONE)
-                        {
-                            SetBossState(DATA_RAZORGORE_THE_UNTAMED, DONE);
-                        }
-                    }
-                    else
-                    {
-                        _events.CancelEvent(EVENT_RAZOR_SPAWN);
-                    }
-                    break;
                 case NPC_BLACK_DRAKONID:
                 case NPC_BLUE_DRAKONID:
                 case NPC_BRONZE_DRAKONID:
