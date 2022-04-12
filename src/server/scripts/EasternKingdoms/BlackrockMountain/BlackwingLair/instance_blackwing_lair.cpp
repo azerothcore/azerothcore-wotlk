@@ -657,7 +657,7 @@ class at_orb_of_command : public AreaTriggerScript
 public:
     at_orb_of_command() : AreaTriggerScript("at_orb_of_command") { }
 
-    bool OnTrigger(Player* player, AreaTrigger const* trigger) override
+    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
         if (!player->IsAlive() && player->GetQuestRewardStatus(QUEST_BLACKHANDS_COMMAND))
         {
