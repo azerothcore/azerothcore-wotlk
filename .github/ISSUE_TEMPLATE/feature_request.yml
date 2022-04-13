@@ -32,6 +32,14 @@ body:
         Add any other context or screenshots about the feature request here.
     validations:
       required: false
+  - type: textarea
+    id: commit
+    attributes:
+      label: AC rev. hash/commit
+      description: |
+        Copy the result of the `.server debug` command (if you need to run it from the client get a prat addon)
+    validations:
+      required: true
   - type: markdown
     attributes:
       value: |
