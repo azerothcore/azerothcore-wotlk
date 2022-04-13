@@ -215,6 +215,11 @@ public:
             events.ScheduleEvent(EVENT_FRENZY, 15000);
         }
 
+        bool CanAIAttack(Unit const* victim) const override
+        {
+            return !victim->HasAura(SPELL_TIMELAPSE);
+        }
+
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
@@ -248,21 +253,32 @@ public:
                     case EVENT_AFFLICTION:
                         {
                             uint32 afflictionSpellID = RAND(SPELL_BROODAF_BLUE, SPELL_BROODAF_BLACK, SPELL_BROODAF_RED, SPELL_BROODAF_BRONZE, SPELL_BROODAF_GREEN);
+                            std::vector<Player*> playerTargets;
                             Map::PlayerList const& players = me->GetMap()->GetPlayers();
                             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                             {
                                 if (Player* player = itr->GetSource()->ToPlayer())
                                 {
-                                    DoCast(player, afflictionSpellID, true);
+                                    if (!player->IsGameMaster() && !player->IsSpectator() && player->IsAlive())
+                                    {
+                                        playerTargets.push_back(player);
+                                    }
+                                }
+                            }
 
-                                        if (player->HasAura(SPELL_BROODAF_BLUE) &&
-                                            player->HasAura(SPELL_BROODAF_BLACK) &&
-                                            player->HasAura(SPELL_BROODAF_RED) &&
-                                            player->HasAura(SPELL_BROODAF_BRONZE) &&
-                                            player->HasAura(SPELL_BROODAF_GREEN))
-                                        {
-                                            DoCast(player, SPELL_CHROMATIC_MUT_1);
-                                        }
+                            if (playerTargets.size() > 12)
+                            {
+                                Acore::Containers::RandomResize(playerTargets, 12);
+                            }
+
+                            for (Player* player : playerTargets)
+                            {
+                                DoCast(player, afflictionSpellID, true);
+
+                                if (player->HasAura(SPELL_BROODAF_BLUE) && player->HasAura(SPELL_BROODAF_BLACK) && player->HasAura(SPELL_BROODAF_RED) &&
+                                    player->HasAura(SPELL_BROODAF_BRONZE) && player->HasAura(SPELL_BROODAF_GREEN))
+                                {
+                                    DoCast(player, SPELL_CHROMATIC_MUT_1);
                                 }
                             }
                         }
@@ -327,7 +343,7 @@ class go_chromaggus_lever : public GameObjectScript
                             _instance->HandleGameObject(ObjectGuid::Empty, true, go);
                     }
 
-                    me->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE | GO_FLAG_IN_USE);
+                    me->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE | GO_FLAG_IN_USE);
                     me->SetGoState(GO_STATE_ACTIVE);
                 }
 

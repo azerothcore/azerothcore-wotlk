@@ -190,7 +190,7 @@ public:
                         if (Unit* worm = me->FindNearestCreature(NPC_SCOURGED_BURROWER, 3.0f))
                         {
                             Unit::Kill(me, worm);
-                            worm->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+                            worm->RemoveDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
                         }
                         phaseTimer = 2000;
                         phase = 7;
@@ -1181,7 +1181,7 @@ public:
         {
             Initialize();
             _emoteState = creature->GetUInt32Value(UNIT_NPC_EMOTESTATE);
-            _npcFlags   = creature->GetUInt32Value(UNIT_NPC_FLAGS);
+            _npcFlags   = creature->GetNpcFlags();
         }
 
         void Initialize()
@@ -1198,7 +1198,7 @@ public:
 
             if (_npcFlags)
             {
-                me->SetUInt32Value(UNIT_NPC_FLAGS, _npcFlags);
+                me->ReplaceAllNpcFlags(_npcFlags);
             }
 
             Initialize();
@@ -1209,7 +1209,7 @@ public:
         void PreScript()
         {
             me->StopMoving();
-            me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+            me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
             if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
             {
@@ -1309,7 +1309,7 @@ public:
         private:
             EventMap   _events;
             uint32     _emoteState;
-            uint32     _npcFlags;
+            NPCFlags   _npcFlags;
             ObjectGuid _playerGUID;
     };
 
@@ -1562,8 +1562,8 @@ public:
             me->SetFaction(FACTION_VALIANCE_EXPEDITION_7);
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             Initialize();
         }
 
@@ -1674,7 +1674,7 @@ public:
                             _arlosGUID = arlos->GetGUID();
                             arlos->SetWalk(true);
                             arlos->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
-                            arlos->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                            arlos->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                             arlos->GetMotionMaster()->MovePath(PATH_ARLOS, false);
                         }
                         if (Creature* leryssa = me->SummonCreature(NPC_LERYSSA, 3751.0986f, 3614.9219f, 473.4048f, 4.5029f, TEMPSUMMON_CORPSE_TIMED_DESPAWN))
@@ -1682,7 +1682,7 @@ public:
                             _leryssaGUID = leryssa->GetGUID();
                             leryssa->SetWalk(true);
                             leryssa->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
-                            leryssa->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                            leryssa->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                             leryssa->GetMotionMaster()->MovePath(PATH_LERYSSA, false);
                         }
                         _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_7, 7000);
@@ -1798,8 +1798,8 @@ public:
                         break;
                     case EVENT_THASSARIAN_SCRIPT_19:
                         // Leryssa set facing to me
-                        me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                        me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                        me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                        me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                         if (Creature* leryssa = me->FindNearestCreature(NPC_LERYSSA, 50.0f, true))
                         {
                             _leryssaGUID = leryssa->GetGUID();
@@ -1937,7 +1937,7 @@ public:
             {
                 _playerGUID = player->GetGUID();
                 CloseGossipMenuFor(player);
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 me->GetMotionMaster()->MovePath(PATH_THASSARIAN, false);
             }
         }

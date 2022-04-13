@@ -1077,7 +1077,7 @@ void Battleground::StartBattleground()
 void Battleground::AddPlayer(Player* player)
 {
     // remove afk from player
-    if (player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_AFK))
+    if (player->HasPlayerFlag(PLAYER_FLAGS_AFK))
         player->ToggleAFK();
 
     sScriptMgr->OnBattlegroundBeforeAddPlayer(this, player);

@@ -89,8 +89,8 @@ public:
             HasYelled = false;
             _introDone = false;
             _burningAdrenalineCast = 0;
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
             me->SetFaction(FACTION_FRIENDLY);
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
@@ -132,7 +132,7 @@ public:
         void BeginSpeech(Unit* target)
         {
             PlayerGUID = target->GetGUID();
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             _eventsIntro.ScheduleEvent(EVENT_SPEECH_1, 1000);
         }
 

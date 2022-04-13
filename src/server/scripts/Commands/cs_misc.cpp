@@ -119,6 +119,7 @@ public:
             { "setskill",          HandleSetSkillCommand,          SEC_GAMEMASTER,         Console::No  },
             { "pinfo",             HandlePInfoCommand,             SEC_GAMEMASTER,         Console::Yes },
             { "respawn",           HandleRespawnCommand,           SEC_GAMEMASTER,         Console::No  },
+            { "respawn all",       HandleRespawnAllCommand,        SEC_GAMEMASTER,         Console::No  },
             { "mute",              HandleMuteCommand,              SEC_GAMEMASTER,         Console::Yes },
             { "mutehistory",       HandleMuteInfoCommand,          SEC_GAMEMASTER,         Console::Yes },
             { "unmute",            HandleUnmuteCommand,            SEC_GAMEMASTER,         Console::Yes },
@@ -2333,7 +2334,6 @@ public:
     {
         Player* player = handler->GetSession()->GetPlayer();
 
-        // accept only explicitly selected target (not implicitly self targeting case)
         Unit* target = handler->getSelectedUnit();
         if (player->GetTarget() && target)
         {
@@ -2350,6 +2350,15 @@ public:
             }
             return true;
         }
+
+        handler->SendSysMessage(LANG_SELECT_CREATURE);
+        handler->SetSentErrorMessage(true);
+        return false;
+    }
+
+    static bool HandleRespawnAllCommand(ChatHandler* handler)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
 
         CellCoord p(Acore::ComputeCellCoord(player->GetPositionX(), player->GetPositionY()));
         Cell cell(p);

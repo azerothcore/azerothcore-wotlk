@@ -21,6 +21,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "blackwing_lair.h"
+#include "SpellScript.h"
 
 enum Say
 {
@@ -220,8 +221,8 @@ class go_suppression_device : public GameObjectScript
                 if (me->GetGoState() == GO_STATE_ACTIVE)
                     me->SetGoState(GO_STATE_READY);
                 me->SetLootState(GO_READY);
-                me->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-                _events.ScheduleEvent(EVENT_SUPPRESSION_CAST, 1000);
+                me->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                _events.ScheduleEvent(EVENT_SUPPRESSION_CAST, 5000);
                 me->Respawn();
             }
 
@@ -231,7 +232,7 @@ class go_suppression_device : public GameObjectScript
                     return;
                 _active = false;
                 me->SetGoState(GO_STATE_ACTIVE);
-                me->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                me->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                 _events.CancelEvent(EVENT_SUPPRESSION_CAST);
             }
 
@@ -247,8 +248,28 @@ class go_suppression_device : public GameObjectScript
         }
 };
 
+class spell_suppression_aura : public SpellScript
+{
+    PrepareSpellScript(spell_suppression_aura);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if([&](WorldObject* target) -> bool
+        {
+            Unit* unit = target->ToUnit();
+            return !unit || unit->HasAuraType(SPELL_AURA_MOD_STEALTH);
+        });
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_suppression_aura::FilterTargets, EFFECT_ALL, TARGET_UNIT_DEST_AREA_ENEMY);
+    }
+};
+
 void AddSC_boss_broodlord()
 {
     new boss_broodlord();
     new go_suppression_device();
+    RegisterSpellScript(spell_suppression_aura);
 }

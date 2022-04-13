@@ -347,7 +347,7 @@ public:
                 {
                     instance->DoCastSpellOnPlayers(SPELL_QID10886);
                     creature->AI()->Talk(SAY_COMPLETE);
-                    creature->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    creature->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP);
                 }
             }
         }
@@ -366,7 +366,7 @@ public:
             _Reset();
             me->setActive(false);
             me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-            me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+            me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
             me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
             me->CastSpell((Unit*)nullptr, SPELL_TARGET_OMEGA, false);
             instance->HandleGameObject(instance->GetGuidData(DATA_WARDENS_SHIELD), true);
@@ -558,7 +558,7 @@ public:
 
                 case EVENT_WARDEN_INTRO29:
                     events.Reset();
-                    me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                    me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
                     me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                     if (Creature* creature = summons.GetCreatureWithEntry(NPC_HARBINGER_SKYRISS))
                     {

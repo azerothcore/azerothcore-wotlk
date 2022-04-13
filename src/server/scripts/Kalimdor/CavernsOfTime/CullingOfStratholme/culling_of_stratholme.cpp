@@ -292,13 +292,13 @@ public:
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
-        if (creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
+        if (creature->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
         {
             switch (action)
             {
                 case GOSSIP_ACTION_INFO_DEF+1:
                     creature->AI()->DoAction(ACTION_START_CITY);
-                    creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     CloseGossipMenuFor(player);
                     break;
                 case GOSSIP_ACTION_INFO_DEF+2:
@@ -309,24 +309,24 @@ public:
                 case GOSSIP_ACTION_INFO_DEF+3:
                     // Start Town Hall part
                     creature->AI()->DoAction(ACTION_START_TOWN_HALL);
-                    creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     CloseGossipMenuFor(player);
                     break;
                 case GOSSIP_ACTION_INFO_DEF+4:
                     // After killing epoch
                     creature->AI()->DoAction(ACTION_START_SECRET_PASSAGE);
-                    creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     creature->SetTarget();
                     CloseGossipMenuFor(player);
                     break;
                 case GOSSIP_ACTION_INFO_DEF+5:
                     creature->AI()->DoAction(ACTION_START_LAST_CITY);
-                    creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     CloseGossipMenuFor(player);
                     break;
                 case GOSSIP_ACTION_INFO_DEF+6:
                     creature->AI()->DoAction(ACTION_START_MALGANIS);
-                    creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     CloseGossipMenuFor(player);
                     break;
             }
@@ -509,7 +509,7 @@ public:
             waveKillCount = 0;
             timeRiftId = 0;
 
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
             if (pInstance)
             {
@@ -543,7 +543,7 @@ public:
                     break;
                 // Reached City
                 case 8:
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     SetEscortPaused(true);
                     if (pInstance)
                         pInstance->SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_FINISHED_INTRO);
@@ -577,7 +577,7 @@ public:
                 case 20:
                     if (pInstance)
                         pInstance->SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_REACHED_TOWN_HALL);
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     SetRun(false);
                     SetEscortPaused(true);
                     break;
@@ -628,7 +628,7 @@ public:
                 // Behind secred passage
                 case 45:
                     SetRun(true);
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     SetEscortPaused(true);
                     if (pInstance)
                         pInstance->SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_LAST_CITY);
@@ -650,7 +650,7 @@ public:
                     if (pInstance)
                         pInstance->SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_BEFORE_MALGANIS);
 
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     SetEscortPaused(true);
                     break;
                 // Infront of malganis
@@ -1123,7 +1123,7 @@ public:
                         if (pInstance)
                             pInstance->SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_KILLED_EPOCH);
 
-                        me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         eventInRun = false;
                         break;
                     case EVENT_ACTION_PHASE5:
@@ -1258,7 +1258,7 @@ void npc_arthas::npc_arthasAI::ReorderInstance(uint32 data)
     {
         case COS_PROGRESS_FINISHED_INTRO:
             SetNextWaypoint(9, false);
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             break;
         case COS_PROGRESS_FINISHED_CITY_INTRO:
         case COS_PROGRESS_KILLED_MEATHOOK:
@@ -1285,19 +1285,19 @@ void npc_arthas::npc_arthasAI::ReorderInstance(uint32 data)
             break;
         case COS_PROGRESS_REACHED_TOWN_HALL:
             SetNextWaypoint(21, false);
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             break;
         case COS_PROGRESS_KILLED_EPOCH:
             SetNextWaypoint(32, false);
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             break;
         case COS_PROGRESS_LAST_CITY:
             SetNextWaypoint(46, false);
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             break;
         case COS_PROGRESS_BEFORE_MALGANIS:
             SetNextWaypoint(55, false);
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             break;
     }
 

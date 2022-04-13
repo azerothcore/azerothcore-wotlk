@@ -284,7 +284,7 @@ public:
                 me->SetStandState(UNIT_STAND_STATE_DEAD);
                 me->SetUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
                 me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
-                me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
                 events.RescheduleEvent(EVENT_RESURRECT, 12000);
             }
         }
@@ -326,7 +326,7 @@ public:
                     me->SetStandState(UNIT_STAND_STATE_STAND);
                     me->RemoveUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
                     me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
-                    me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                    me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
                     events.RescheduleEvent(EVENT_RESURRECT_2, 3000);
                     break;
                 case EVENT_RESURRECT_2:
