@@ -644,8 +644,33 @@ public:
     }
 };
 
+enum orb_of_command_misc
+{
+    QUEST_BLACKHANDS_COMMAND = 7761,
+    MAP_BWL                  = 469
+};
+
+const Position orbOfCommandTP = { -7672.46f, -1107.19f, 396.65f, 0.59f };
+
+class at_orb_of_command : public AreaTriggerScript
+{
+public:
+    at_orb_of_command() : AreaTriggerScript("at_orb_of_command") { }
+
+    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
+    {
+        if (!player->IsAlive() && player->GetQuestRewardStatus(QUEST_BLACKHANDS_COMMAND))
+        {
+            player->TeleportTo(MAP_BWL, orbOfCommandTP.m_positionX, orbOfCommandTP.m_positionY, orbOfCommandTP.m_positionZ, orbOfCommandTP.m_orientation);
+            return true;
+        }
+        return false;
+    }
+};
+
 void AddSC_instance_blackwing_lair()
 {
     new instance_blackwing_lair();
     new spell_bwl_shadowflame();
+    new at_orb_of_command();
 }
