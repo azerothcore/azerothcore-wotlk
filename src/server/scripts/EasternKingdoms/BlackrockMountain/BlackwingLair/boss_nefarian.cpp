@@ -199,6 +199,30 @@ std::unordered_map<uint32, uint32> spawnerSpells =
     { NPC_RED_SPAWNER,    SPELL_SPAWN_RED_DRAKONID }
 };
 
+struct ClassCallSelector : public Acore::unary_function<Unit*, bool>
+{
+    ClassCallSelector(Unit const* unit, uint8 targetClass) : _me(unit), _targetClass(targetClass) { }
+
+    bool operator()(Unit const* target) const
+    {
+        if (!_me || !target || target->GetTypeId() != TYPEID_PLAYER)
+        {
+            return false;
+        }
+
+        if (target->getClass() != _targetClass)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+private:
+    Unit const* _me;
+    uint8 _targetClass;
+};
+
 class boss_victor_nefarius : public CreatureScript
 {
 public:
@@ -636,7 +660,17 @@ struct boss_nefarian : public BossAI
                     events.ScheduleEvent(EVENT_TAILLASH, 10000);
                     break;
                 case EVENT_CLASSCALL:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
+                    std::set<uint8> classesPresent;
+                    for (auto& ref : me->getThreatMgr().getThreatList())
+                    {
+                        if (ref->getTarget() && ref->getTarget()->GetTypeId() == TYPEID_PLAYER)
+                        {
+                            classesPresent.insert(ref->getTarget()->getClass());
+                        }
+                    }
+                    uint8 targetClass = Acore::Containers::SelectRandomContainerElement(classesPresent);
+
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, ClassCallSelector(me, targetClass)))
                     {
                         switch (target->getClass())
                         {
@@ -997,7 +1031,7 @@ class spell_class_call_handler : public SpellScript
 
     void Register() override
     {
-        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_class_call_handler::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_class_call_handler::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
 
         if (m_scriptSpellId == SPELL_ROGUE)
         {
