@@ -19,3 +19,4 @@ UPDATE `quest_template` SET `RewardNextQuest` = 12932  WHERE `ID` = 12974;
 UPDATE `quest_template` SET `RewardNextQuest` = 0  WHERE `ID` = 13005;
 UPDATE `quest_template` SET `RewardNextQuest` = 13718  WHERE `ID` = 13593;
 UPDATE `quest_template` SET `RewardNextQuest` =  6145  WHERE `ID` = 6144;
+UPDATE `quest_template` SET `RewardMoney` = -20000  WHERE `ID` IN(3644,3645,3646,3647);
