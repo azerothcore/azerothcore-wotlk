@@ -242,11 +242,10 @@ public:
                 // Victor Nefarius weekly mechanic drakonid spawn
                 // Pick 2 drakonids and keep them for the whole save duration (the drakonids can't be repeated).
                 std::vector<uint32> nefarianDrakonidSpawners = { NPC_BLACK_SPAWNER, NPC_BLUE_SPAWNER, NPC_BRONZE_SPAWNER, NPC_GREEN_SPAWNER, NPC_RED_SPAWNER };
-                _nefarianRightTunnel = Acore::Containers::SelectRandomContainerElement(nefarianDrakonidSpawners);
-                // delete the previous picked one so we don't get any repeated.
-                nefarianDrakonidSpawners.erase(std::remove(nefarianDrakonidSpawners.begin(), nefarianDrakonidSpawners.end(), _nefarianRightTunnel), nefarianDrakonidSpawners.end());
-                // Pick another one
-                _nefarianLeftTunnel = Acore::Containers::SelectRandomContainerElement(nefarianDrakonidSpawners);
+                Acore::Containers::RandomResize(nefarianDrakonidSpawners, 2);
+
+                _nefarianRightTunnel = nefarianDrakonidSpawners[0];
+                _nefarianLeftTunnel = nefarianDrakonidSpawners[1];
 
                 // save it to instance
                 instance->SetData(DATA_NEFARIAN_LEFT_TUNNEL, _nefarianLeftTunnel);
@@ -293,6 +292,19 @@ public:
             Reset();
         }
 
+        void SummonedCreatureDies(Creature* summon, Unit* /*unit*/) override
+        {
+            if (summon->GetEntry() == NPC_NEFARIAN)
+            {
+                summons.DespawnIf([&](ObjectGuid guid) -> bool
+                {
+                    return guid.GetEntry() != NPC_NEFARIAN;
+                });
+
+                Unit::Kill(me, me);
+            }
+        }
+
         void DoAction(int32 action) override
         {
             if (action == ACTION_RESET)
@@ -324,12 +336,6 @@ public:
                     EntryCheckPredicate pred2(_nefarianLeftTunnel);
                     summons.DoAction(ACTION_SPAWNER_STOP, pred2);
                 }
-            }
-
-            if (action == ACTION_KILLED)
-            {
-                summons.DespawnEntry(NPC_BONE_CONSTRUCT);
-                Unit::Kill(me, me);
             }
         }
 
@@ -543,14 +549,6 @@ struct boss_nefarian : public BossAI
     {
         _JustDied();
         Talk(SAY_DEATH);
-
-        if (Creature* victor = me->FindNearestCreature(NPC_VICTOR_NEFARIUS, 200.f, true))
-        {
-            if (victor->AI())
-            {
-                victor->AI()->DoAction(ACTION_KILLED);
-            }
-        }
     }
 
     void KilledUnit(Unit* victim) override
@@ -605,6 +603,28 @@ struct boss_nefarian : public BossAI
         events.ScheduleEvent(EVENT_TAILLASH, 10000);
         events.ScheduleEvent(EVENT_CLASSCALL, urand(30000, 35000));
         _introDone = true;
+    }
+
+    void DamageTaken(Unit* /*unit*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    {
+        if (me->HealthBelowPctDamaged(20, damage) && !Phase3)
+        {
+            std::list<Creature*> constructList;
+            me->GetCreatureListWithEntryInGrid(constructList, NPC_BONE_CONSTRUCT, 500.0f);
+            for (Creature* const& summon : constructList)
+            {
+                if (summon && !summon->IsAlive())
+                {
+                    summon->Respawn();
+                    summon->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    summon->SetReactState(REACT_AGGRESSIVE);
+                    summon->SetStandState(UNIT_STAND_STATE_STAND);
+                }
+            }
+
+            Phase3 = true;
+            Talk(SAY_RAISE_SKELETONS);
+        }
     }
 
     void UpdateAI(uint32 diff) override
@@ -719,27 +739,6 @@ struct boss_nefarian : public BossAI
             {
                 return;
             }
-        }
-
-        // Phase3 begins when health below 20 pct
-        if (!Phase3 && HealthBelowPct(20))
-        {
-            std::list<Creature*> constructList;
-            me->GetCreatureListWithEntryInGrid(constructList, NPC_BONE_CONSTRUCT, 500.0f);
-            for (std::list<Creature*>::const_iterator itr = constructList.begin(); itr != constructList.end(); ++itr)
-            {
-                if ((*itr) && !(*itr)->IsAlive())
-                {
-                    (*itr)->Respawn();
-                    DoZoneInCombat((*itr));
-                    (*itr)->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    (*itr)->SetReactState(REACT_AGGRESSIVE);
-                    (*itr)->SetStandState(UNIT_STAND_STATE_STAND);
-                }
-            }
-
-            Phase3 = true;
-            Talk(SAY_RAISE_SKELETONS);
         }
 
         DoMeleeAttackIfReady();

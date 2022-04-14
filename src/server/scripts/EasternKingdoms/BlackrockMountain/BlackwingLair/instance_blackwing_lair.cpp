@@ -141,10 +141,6 @@ public:
                             nefariusAI->JustSummoned(creature);
                         }
                     }
-                    if (creature->AI())
-                    {
-                        creature->AI()->DoZoneInCombat();
-                    }
                     break;
                 default:
                     break;
