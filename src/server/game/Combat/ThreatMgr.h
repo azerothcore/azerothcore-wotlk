@@ -221,7 +221,7 @@ public:
 
     [[nodiscard]] Unit* GetOwner() const { return iOwner; }
 
-    Unit* getHostilTarget();
+    Unit* getHostileTarget();
 
     void tauntApply(Unit* taunter);
     void tauntFadeOut(Unit* taunter);

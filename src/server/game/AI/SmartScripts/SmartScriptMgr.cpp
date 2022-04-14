@@ -410,7 +410,7 @@ bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)
         case SMART_TARGET_HOSTILE_LAST_AGGRO:
         case SMART_TARGET_HOSTILE_RANDOM:
         case SMART_TARGET_HOSTILE_RANDOM_NOT_TOP:
-            AC_SAI_IS_BOOLEAN_VALID(e, e.target.hostilRandom.playerOnly);
+            AC_SAI_IS_BOOLEAN_VALID(e, e.target.hostileRandom.playerOnly);
             break;
         case SMART_TARGET_FARTHEST:
             AC_SAI_IS_BOOLEAN_VALID(e, e.target.farthest.playerOnly);
@@ -756,10 +756,10 @@ bool SmartAIMgr::CheckUnusedTargetParams(SmartScriptHolder const& e)
             case SMART_TARGET_NONE: return NO_PARAMS;
             case SMART_TARGET_SELF: return NO_PARAMS;
             case SMART_TARGET_VICTIM: return NO_PARAMS;
-            case SMART_TARGET_HOSTILE_SECOND_AGGRO: return sizeof(SmartTarget::hostilRandom);
-            case SMART_TARGET_HOSTILE_LAST_AGGRO: return sizeof(SmartTarget::hostilRandom);
-            case SMART_TARGET_HOSTILE_RANDOM: return sizeof(SmartTarget::hostilRandom);
-            case SMART_TARGET_HOSTILE_RANDOM_NOT_TOP: return sizeof(SmartTarget::hostilRandom);
+            case SMART_TARGET_HOSTILE_SECOND_AGGRO: return sizeof(SmartTarget::hostileRandom);
+            case SMART_TARGET_HOSTILE_LAST_AGGRO: return sizeof(SmartTarget::hostileRandom);
+            case SMART_TARGET_HOSTILE_RANDOM: return sizeof(SmartTarget::hostileRandom);
+            case SMART_TARGET_HOSTILE_RANDOM_NOT_TOP: return sizeof(SmartTarget::hostileRandom);
             case SMART_TARGET_ACTION_INVOKER: return NO_PARAMS;
             case SMART_TARGET_POSITION: return NO_PARAMS; //uses x,y,z,o
             case SMART_TARGET_CREATURE_RANGE: return sizeof(SmartTarget::unitRange);
