@@ -78,7 +78,7 @@ public:
         {
             { "setbit",         HandleDebugSet32BitCommand,            SEC_ADMINISTRATOR, Console::No },
             { "threat",         HandleDebugThreatListCommand,          SEC_ADMINISTRATOR, Console::No },
-            { "hostile",         HandleDebugHostileRefListCommand,      SEC_ADMINISTRATOR, Console::No },
+            { "hostile",           HandleDebugHostileRefListCommand,      SEC_ADMINISTRATOR, Console::No },
             { "anim",           HandleDebugAnimCommand,                SEC_ADMINISTRATOR, Console::No },
             { "arena",          HandleDebugArenaCommand,               SEC_ADMINISTRATOR, Console::No },
             { "bg",             HandleDebugBattlegroundCommand,        SEC_ADMINISTRATOR, Console::No },
