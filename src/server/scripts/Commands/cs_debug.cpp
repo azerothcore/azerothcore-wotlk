@@ -78,7 +78,7 @@ public:
         {
             { "setbit",         HandleDebugSet32BitCommand,            SEC_ADMINISTRATOR, Console::No },
             { "threat",         HandleDebugThreatListCommand,          SEC_ADMINISTRATOR, Console::No },
-            { "hostil",         HandleDebugHostileRefListCommand,      SEC_ADMINISTRATOR, Console::No },
+            { "hostile",         HandleDebugHostileRefListCommand,      SEC_ADMINISTRATOR, Console::No },
             { "anim",           HandleDebugAnimCommand,                SEC_ADMINISTRATOR, Console::No },
             { "arena",          HandleDebugArenaCommand,               SEC_ADMINISTRATOR, Console::No },
             { "bg",             HandleDebugBattlegroundCommand,        SEC_ADMINISTRATOR, Console::No },
@@ -828,7 +828,7 @@ public:
         HostileReference* ref = target->getHostileRefMgr().getFirst();
         uint32 count = 0;
 
-        handler->PSendSysMessage("Hostil reference list of %s (%s)", target->GetName().c_str(), target->GetGUID().ToString().c_str());
+        handler->PSendSysMessage("Hostile reference list of %s (%s)", target->GetName().c_str(), target->GetGUID().ToString().c_str());
 
         while (ref)
         {
@@ -845,7 +845,7 @@ public:
             ref = ref->next();
         }
 
-        handler->SendSysMessage("End of hostil reference list.");
+        handler->SendSysMessage("End of hostile reference list.");
         return true;
     }
 
