@@ -292,15 +292,19 @@ public:
             Reset();
         }
 
+        void JustSummoned(Creature* summon) override
+        {
+            if (summon->GetEntry() != NPC_NEFARIAN)
+            {
+                BossAI::JustSummoned(summon);
+            }
+        }
+
         void SummonedCreatureDies(Creature* summon, Unit* /*unit*/) override
         {
             if (summon->GetEntry() == NPC_NEFARIAN)
             {
-                summons.DespawnIf([&](ObjectGuid guid) -> bool
-                {
-                    return guid.GetEntry() != NPC_NEFARIAN;
-                });
-
+                summons.DespawnAll();
                 Unit::Kill(me, me);
             }
         }
@@ -619,6 +623,7 @@ struct boss_nefarian : public BossAI
                     summon->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     summon->SetReactState(REACT_AGGRESSIVE);
                     summon->SetStandState(UNIT_STAND_STATE_STAND);
+                    DoZoneInCombat(summon);
                 }
             }
 
