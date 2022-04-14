@@ -45,8 +45,9 @@ DoorData const doorData[] =
 
 ObjectData const creatureData[] =
 {
-    { NPC_GRETHOK,         DATA_GRETHOK         },
-    { NPC_NEFARIAN_TROOPS, DATA_NEFARIAN_TROOPS }
+    { NPC_GRETHOK,         DATA_GRETHOK              },
+    { NPC_NEFARIAN_TROOPS, DATA_NEFARIAN_TROOPS      },
+    { NPC_VICTOR_NEFARIUS, DATA_LORD_VICTOR_NEFARIUS }
 };
 
 Position const SummonPosition[8] =
@@ -127,16 +128,13 @@ public:
                 case NPC_NEFARIAN:
                     nefarianGUID = creature->GetGUID();
                     break;
-                case NPC_VICTOR_NEFARIUS:
-                    victorNefariusGUID = creature->GetGUID();
-                    break;
                 case NPC_BLACK_DRAKONID:
                 case NPC_BLUE_DRAKONID:
                 case NPC_BRONZE_DRAKONID:
                 case NPC_CHROMATIC_DRAKONID:
                 case NPC_GREEN_DRAKONID:
                 case NPC_RED_DRAKONID:
-                    if (Creature* nefarius = instance->GetCreature(victorNefariusGUID))
+                    if (Creature* nefarius = GetCreature(DATA_LORD_VICTOR_NEFARIUS))
                     {
                         if (CreatureAI* nefariusAI = nefarius->AI())
                         {
@@ -369,8 +367,6 @@ public:
             {
                 case DATA_RAZORGORE_THE_UNTAMED:
                     return razorgoreGUID;
-                case DATA_LORD_VICTOR_NEFARIUS:
-                    return victorNefariusGUID;
                 case DATA_CHROMAGGUS:
                     return chromaggusGUID;
                 case DATA_GO_CHROMAGGUS_DOOR:
@@ -380,18 +376,6 @@ public:
             }
 
             return ObjectGuid::Empty;
-        }
-
-        void SetGuidData(uint32 type, ObjectGuid data) override
-        {
-            switch (type)
-            {
-                case DATA_LORD_VICTOR_NEFARIUS:
-                    victorNefariusGUID = data;
-                    break;
-                default:
-                    break;
-            }
         }
 
         void OnUnitDeath(Unit* unit) override
@@ -413,23 +397,11 @@ public:
                         summon->SetStandState(UNIT_STAND_STATE_DEAD);
                         summon->SetHomePosition(summon->GetPosition());
 
-                        if (Creature* nefarius = instance->GetCreature(victorNefariusGUID))
+                        if (Creature* nefarius = GetCreature(DATA_LORD_VICTOR_NEFARIUS))
                         {
                             if (nefarius->AI())
                             {
                                 nefarius->AI()->DoAction(ACTION_NEFARIUS_ADD_KILLED);
-                            }
-                        }
-                        else // Something happened, try another way
-                        {
-                            if (Creature* nefarius = summon->FindNearestCreature(NPC_VICTOR_NEFARIUS, 500.f, true))
-                            {
-                                victorNefariusGUID = nefarius->GetGUID();
-
-                                if (nefarius->AI())
-                                {
-                                    nefarius->AI()->DoAction(ACTION_NEFARIUS_ADD_KILLED);
-                                }
                             }
                         }
                     }
@@ -514,7 +486,7 @@ public:
                             razor->AI()->DoAction(ACTION_PHASE_TWO);
                         break;
                     case EVENT_RESPAWN_NEFARIUS:
-                        if (Creature* nefarius = instance->GetCreature(victorNefariusGUID))
+                        if (Creature* nefarius = GetCreature(DATA_LORD_VICTOR_NEFARIUS))
                         {
                             nefarius->SetPhaseMask(1, true);
                             nefarius->setActive(true);
@@ -580,7 +552,6 @@ public:
         ObjectGuid chromaggusDoorGUID;
         ObjectGuid nefarianGUID;
         ObjectGuid nefarianDoorGUID;
-        ObjectGuid victorNefariusGUID;
 
         // Razorgore
         uint8 EggCount;
