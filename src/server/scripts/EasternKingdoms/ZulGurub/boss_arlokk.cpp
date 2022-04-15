@@ -150,9 +150,9 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
             if (GameObject* object = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_GONG_OF_BETHEKK)))
                 object->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
             me->DespawnOrUnsummon(4000);

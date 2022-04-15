@@ -107,7 +107,7 @@ namespace VMAP
         void unloadMap(unsigned int mapId, int x, int y) override;
         void unloadMap(unsigned int mapId) override;
 
-        bool isInLineOfSight(unsigned int mapId, float x1, float y1, float z1, float x2, float y2, float z2) override ;
+        bool isInLineOfSight(unsigned int mapId, float x1, float y1, float z1, float x2, float y2, float z2, ModelIgnoreFlags ignoreFlags) override ;
         /**
         fill the hit pos and return true, if an object was hit
         */
@@ -120,7 +120,7 @@ namespace VMAP
         bool GetLiquidLevel(uint32 pMapId, float x, float y, float z, uint8 reqLiquidType, float& level, float& floor, uint32& type, uint32& mogpFlags) const override;
         void GetAreaAndLiquidData(uint32 mapId, float x, float y, float z, uint8 reqLiquidType, AreaAndLiquidData& data) const override;
 
-        WorldModel* acquireModelInstance(const std::string& basepath, const std::string& filename);
+        WorldModel* acquireModelInstance(const std::string& basepath, const std::string& filename, uint32 flags);
         void releaseModelInstance(const std::string& filename);
 
         // what's the use of this? o.O

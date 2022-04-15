@@ -18,6 +18,7 @@
 #ifndef ACORE_CREATUREAI_H
 #define ACORE_CREATUREAI_H
 
+#include "AreaBoundary.h"
 #include "Common.h"
 #include "Creature.h"
 #include "UnitAI.h"
@@ -28,6 +29,8 @@ class Unit;
 class Creature;
 class Player;
 class SpellInfo;
+
+typedef std::vector<AreaBoundary const*> CreatureBoundary;
 
 #define TIME_INTERVAL_LOOK   5000
 #define VISIBILITY_RANGE    10000
@@ -78,10 +81,19 @@ protected:
     Creature* DoSummon(uint32 entry, Position const& pos, uint32 despawnTime = 30000, TempSummonType summonType = TEMPSUMMON_CORPSE_TIMED_DESPAWN);
     Creature* DoSummon(uint32 entry, WorldObject* obj, float radius = 5.0f, uint32 despawnTime = 30000, TempSummonType summonType = TEMPSUMMON_CORPSE_TIMED_DESPAWN);
     Creature* DoSummonFlyer(uint32 entry, WorldObject* obj, float flightZ, float radius = 5.0f, uint32 despawnTime = 30000, TempSummonType summonType = TEMPSUMMON_CORPSE_TIMED_DESPAWN);
-
 public:
+    // EnumUtils: DESCRIBE THIS
+    enum EvadeReason
+    {
+        EVADE_REASON_NO_HOSTILES,       // the creature's threat list is empty
+        EVADE_REASON_BOUNDARY,          // the creature has moved outside its evade boundary
+        EVADE_REASON_SEQUENCE_BREAK,    // this is a boss and the pre-requisite encounters for engaging it are not defeated yet
+        EVADE_REASON_OTHER
+    };
+
     void Talk(uint8 id, WorldObject const* whisperTarget = nullptr);
-    explicit CreatureAI(Creature* creature) : UnitAI(creature), me(creature), m_MoveInLineOfSight_locked(false) {}
+
+    explicit CreatureAI(Creature* creature) : UnitAI(creature), me(creature), _boundary(nullptr), _negateBoundary(false), m_MoveInLineOfSight_locked(false) { }
 
     ~CreatureAI() override {}
 
@@ -100,7 +112,7 @@ public:
     virtual bool CanRespawn() { return true; }
 
     // Called for reaction at stopping attack at no attackers or targets
-    virtual void EnterEvadeMode();
+    virtual void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER);
 
     // Called for reaction at enter to combat if not in combat yet (enemy can be nullptr)
     virtual void EnterCombat(Unit* /*victim*/) {}
@@ -187,10 +199,20 @@ public:
 
     virtual void PetStopAttack() { }
 
+    // boundary system methods
+    virtual bool CheckInRoom();
+    CreatureBoundary const* GetBoundary() const { return _boundary; }
+    void SetBoundary(CreatureBoundary const* boundary, bool negativeBoundaries = false);
+
+    static bool IsInBounds(CreatureBoundary const& boundary, Position const* who);
+    bool IsInBoundary(Position const* who = nullptr) const;
 protected:
     virtual void MoveInLineOfSight(Unit* /*who*/);
 
-    bool _EnterEvadeMode();
+    bool _EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER);
+
+    CreatureBoundary const* _boundary;
+    bool _negateBoundary;
 
 private:
     bool m_MoveInLineOfSight_locked;

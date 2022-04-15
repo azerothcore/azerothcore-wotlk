@@ -122,11 +122,11 @@ public:
             npc_escortAI::JustDied(killer);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             SummonsFollow();
             ImmuneFlagSet(false, 35);
-            npc_escortAI::EnterEvadeMode();
+            npc_escortAI::EnterEvadeMode(why);
         }
 
         void CheckPlayer()

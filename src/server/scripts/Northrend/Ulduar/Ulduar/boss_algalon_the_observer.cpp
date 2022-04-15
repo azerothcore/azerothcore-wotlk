@@ -350,7 +350,7 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (_fightWon)
                 return;
@@ -366,7 +366,7 @@ public:
                 return;
             }
 
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void Reset() override
@@ -470,7 +470,7 @@ public:
 
             if (!m_pInstance)
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 return;
             }
 
