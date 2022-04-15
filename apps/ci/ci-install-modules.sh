@@ -3,7 +3,7 @@
 set -e
 
 echo "install modules"
-git clone --depth=1 --branch=master --recursive https://github.com/azerothcore/mod-eluna-lua-engine.git modules/mod-eluna-lua-engine
+git clone --depth=1 --branch=master https://github.com/azerothcore/mod-eluna.git modules/mod-eluna
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-autobalance.git modules/mod-autobalance
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-ah-bot.git modules/mod-ah-bot
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-anticheat.git modules/mod-anticheat
