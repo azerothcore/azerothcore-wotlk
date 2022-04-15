@@ -4167,10 +4167,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(41); // 150 yards
         spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
-
+    
+    // Suppression Room Aura (BWL)
     ApplySpellFix({ 22247 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesCu |= SPELL_ATTR0_CU_DONT_BREAK_STEALTH;
+        spellInfo->SpellVisual[0] = 0;
     });
 
     // Manastorm
