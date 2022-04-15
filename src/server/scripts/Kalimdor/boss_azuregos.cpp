@@ -62,6 +62,7 @@ public:
 
         void Reset() override
         {
+            _scheduler.CancelAll();
             me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->RestoreFaction();
             me->GetMap()->DoForAllPlayers([&](Player* p)
