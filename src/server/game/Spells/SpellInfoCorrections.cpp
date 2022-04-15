@@ -4160,14 +4160,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(152); // 150 yards
     });
 
-    // Shadowbolt Volley
-    ApplySpellFix({ 22665 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(152); // 150 yards
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(41); // 150 yards
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
-    });
-    
     // Suppression Room Aura (BWL)
     ApplySpellFix({ 22247 }, [](SpellInfo* spellInfo)
     {
