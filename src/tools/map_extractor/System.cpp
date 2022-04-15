@@ -22,6 +22,7 @@
 #include <deque>
 #include <filesystem>
 #include <set>
+#include <unordered_map>
 
 #ifdef _WIN32
 #include "direct.h"
@@ -62,8 +63,13 @@ typedef struct
     uint32 id;
 } map_id;
 
+struct LiquidTypeEntry
+{
+    uint8 SoundBank;
+};
+
 map_id* map_ids;
-uint16* LiqType;
+std::unordered_map<uint32, LiquidTypeEntry> LiquidTypes;
 #define MAX_PATH_LENGTH 128
 char output_path[MAX_PATH_LENGTH] = ".";
 char input_path[MAX_PATH_LENGTH] = ".";
@@ -291,15 +297,13 @@ void ReadLiquidTypeTableDBC()
         exit(1);
     }
 
-    size_t liqTypeCount = dbc.getRecordCount();
-    size_t liqTypeMaxId = dbc.getMaxId();
-    LiqType = new uint16[liqTypeMaxId + 1];
-    memset(LiqType, 0xff, (liqTypeMaxId + 1) * sizeof(uint16));
+    for (uint32 x = 0; x < dbc.getRecordCount(); ++x)
+    {
+        LiquidTypeEntry& liquidType = LiquidTypes[dbc.getRecord(x).getUInt(0)];
+        liquidType.SoundBank = dbc.getRecord(x).getUInt(3);
+    }
 
-    for (uint32 x = 0; x < liqTypeCount; ++x)
-        LiqType[dbc.getRecord(x).getUInt(0)] = dbc.getRecord(x).getUInt(3);
-
-    printf("Done! (%u LiqTypes loaded)\n", (uint32)liqTypeCount);
+    printf("Done! (%lu LiquidTypes loaded)\n", LiquidTypes.size());
 }
 
 //
@@ -720,73 +724,57 @@ bool ConvertADT(std::string const& inputPath, std::string const& outputPath, int
     adt_MH2O* h2o = adt.a_grid->getMH2O();
     if (h2o)
     {
-        for (int i = 0; i < ADT_CELLS_PER_GRID; i++)
+        for (int32 i = 0; i < ADT_CELLS_PER_GRID; i++)
         {
-            for (int j = 0; j < ADT_CELLS_PER_GRID; j++)
+            for (int32 j = 0; j < ADT_CELLS_PER_GRID; j++)
             {
-                adt_liquid_header* h = h2o->getLiquidData(i, j);
+                adt_liquid_instance const* h = h2o->GetLiquidInstance(i,j);
                 if (!h)
                     continue;
 
-                int count = 0;
-                uint64 show = h2o->getLiquidShowMap(h);
-                for (int y = 0; y < h->height; y++)
+                adt_liquid_attributes attrs = h2o->GetLiquidAttributes(i, j);
+
+                int32 count = 0;
+                uint64 existsMask = h2o->GetLiquidExistsBitmap(h);
+                for (int32 y = 0; y < h->GetHeight(); y++)
                 {
-                    int cy = i * ADT_CELL_SIZE + y + h->yOffset;
-                    for (int x = 0; x < h->width; x++)
+                    int32 cy = i * ADT_CELL_SIZE + y + h->GetOffsetY();
+                    for (int32 x = 0; x < h->GetWidth(); x++)
                     {
-                        int cx = j * ADT_CELL_SIZE + x + h->xOffset;
-                        if (show & 1)
+                        int32 cx = j * ADT_CELL_SIZE + x + h->GetOffsetX();
+                        if (existsMask & 1)
                         {
                             liquid_show[cy][cx] = true;
                             ++count;
                         }
-                        show >>= 1;
+                        existsMask >>= 1;
                     }
                 }
 
-                liquid_entry[i][j] = h->liquidType;
-                switch (LiqType[h->liquidType])
+                liquid_entry[i][j] = h->LiquidType;
+                switch (LiquidTypes.at(h->LiquidType).SoundBank)
                 {
-                    case LIQUID_TYPE_WATER:
-                        liquid_flags[i][j] |= MAP_LIQUID_TYPE_WATER;
-                        break;
-                    case LIQUID_TYPE_OCEAN:
-                        liquid_flags[i][j] |= MAP_LIQUID_TYPE_OCEAN;
-                        break;
-                    case LIQUID_TYPE_MAGMA:
-                        liquid_flags[i][j] |= MAP_LIQUID_TYPE_MAGMA;
-                        break;
-                    case LIQUID_TYPE_SLIME:
-                        liquid_flags[i][j] |= MAP_LIQUID_TYPE_SLIME;
-                        break;
+                    case LIQUID_TYPE_WATER: liquid_flags[i][j] |= MAP_LIQUID_TYPE_WATER; break;
+                    case LIQUID_TYPE_OCEAN: liquid_flags[i][j] |= MAP_LIQUID_TYPE_OCEAN; if (attrs.Deep) liquid_flags[i][j] |= MAP_LIQUID_TYPE_DARK_WATER; break;
+                    case LIQUID_TYPE_MAGMA: liquid_flags[i][j] |= MAP_LIQUID_TYPE_MAGMA; break;
+                    case LIQUID_TYPE_SLIME: liquid_flags[i][j] |= MAP_LIQUID_TYPE_SLIME; break;
                     default:
-                        printf("\nCan't find Liquid type %u for map %s\nchunk %d,%d\n", h->liquidType, inputPath.c_str(), i, j);
+                        printf("\nCan't find Liquid type %u for map %s\nchunk %d,%d\n", h->LiquidType, inputPath.c_str(), i, j);
                         break;
-                }
-                // Dark water detect
-                if (LiqType[h->liquidType] == LIQUID_TYPE_OCEAN)
-                {
-                    uint8* lm = h2o->getLiquidLightMap(h);
-                    if (!lm)
-                        liquid_flags[i][j] |= MAP_LIQUID_TYPE_DARK_WATER;
                 }
 
                 if (!count && liquid_flags[i][j])
                     printf("Wrong liquid detect in MH2O chunk");
 
-                float* height = h2o->getLiquidHeightMap(h);
-                int pos = 0;
-                for (int y = 0; y <= h->height; y++)
+                int32 pos = 0;
+                for (int32 y = 0; y <= h->GetHeight(); y++)
                 {
-                    int cy = i * ADT_CELL_SIZE + y + h->yOffset;
-                    for (int x = 0; x <= h->width; x++)
+                    int cy = i * ADT_CELL_SIZE + y + h->GetOffsetY();
+                    for (int32 x = 0; x <= h->GetWidth(); x++)
                     {
-                        int cx = j * ADT_CELL_SIZE + x + h->xOffset;
-                        if (height)
-                            liquid_height[cy][cx] = height[pos];
-                        else
-                            liquid_height[cy][cx] = h->heightLevel1;
+                        int32 cx = j * ADT_CELL_SIZE + x + h->GetOffsetX();
+                        liquid_height[cy][cx] = h2o->GetLiquidHeight(h, pos);
+
                         pos++;
                     }
                 }
