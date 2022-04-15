@@ -1011,7 +1011,7 @@ public:
 
         EventMap _events;
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->DeleteThreatList();
             me->CombatStop(true);
@@ -2353,7 +2353,7 @@ public:
 
         EventMap _events;
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->RemoveAura(SPELL_HEROIC_VANGUARD);
             me->DeleteThreatList();

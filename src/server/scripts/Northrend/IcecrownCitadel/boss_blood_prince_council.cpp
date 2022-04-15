@@ -248,7 +248,7 @@ public:
                     valid = false;
             if (!valid)
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 return;
             }
 
@@ -418,7 +418,7 @@ public:
             DoSpellAttackIfReady(_isEmpowered ? SPELL_EMPOWERED_SHADOW_LANCE : SPELL_SHADOW_LANCE);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (_evading)
                 return;
@@ -430,7 +430,7 @@ public:
                 taldaram->AI()->EnterEvadeMode();
             if (Creature* valanar = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_VALANAR_GUID)))
                 valanar->AI()->EnterEvadeMode();
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
             _evading = false;
         }
     };
@@ -507,7 +507,7 @@ public:
                     valid = false;
             if (!valid)
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 return;
             }
 
@@ -702,7 +702,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (_evading)
                 return;
@@ -711,10 +711,10 @@ public:
             DoAction(ACTION_REMOVE_INVOCATION);
             _evading = true;
             if (Creature* keleseth = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_KELESETH_GUID)))
-                keleseth->AI()->EnterEvadeMode();
+                keleseth->AI()->EnterEvadeMode(why);
             if (Creature* valanar = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_VALANAR_GUID)))
-                valanar->AI()->EnterEvadeMode();
-            ScriptedAI::EnterEvadeMode();
+                valanar->AI()->EnterEvadeMode(why);
+            ScriptedAI::EnterEvadeMode(why);
             _evading = false;
         }
     };
@@ -791,7 +791,7 @@ public:
                     valid = false;
             if (!valid)
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 return;
             }
 
@@ -959,10 +959,10 @@ public:
         {
             Creature* keleseth = instance->instance->GetCreature(instance->GetGuidData(DATA_PRINCE_KELESETH_GUID));
             Creature* taldaram = instance->instance->GetCreature(instance->GetGuidData(DATA_PRINCE_TALDARAM_GUID));
-            if (keleseth && taldaram && CheckBoundary(me) && CheckBoundary(keleseth) && CheckBoundary(taldaram))
+            if (keleseth && taldaram && IsInBoundary(me) && IsInBoundary(keleseth) && IsInBoundary(taldaram))
                 return true;
 
-            EnterEvadeMode();
+            EnterEvadeMode(EVADE_REASON_OTHER);
             return false;
         }
 
@@ -999,7 +999,7 @@ public:
                         }
                         if (!visualSpellId || !current || !next || !current->IsInCombat() || !next->IsInCombat())
                         {
-                            EnterEvadeMode();
+                            EnterEvadeMode(EVADE_REASON_OTHER);
                             return;
                         }
                         next->SetHealth(current->GetHealth());
@@ -1041,7 +1041,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (_evading)
                 return;
@@ -1050,10 +1050,10 @@ public:
             DoAction(ACTION_REMOVE_INVOCATION);
             _evading = true;
             if (Creature* keleseth = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_KELESETH_GUID)))
-                keleseth->AI()->EnterEvadeMode();
+                keleseth->AI()->EnterEvadeMode(why);
             if (Creature* taldaram = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_TALDARAM_GUID)))
-                taldaram->AI()->EnterEvadeMode();
-            BossAI::EnterEvadeMode();
+                taldaram->AI()->EnterEvadeMode(why);
+            BossAI::EnterEvadeMode(why);
             _evading = false;
         }
     };

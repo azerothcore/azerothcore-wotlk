@@ -100,7 +100,7 @@ public:
             instance->SetData(DATA_KIRTONOS_THE_HERALD, DONE);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             instance->SetData(DATA_KIRTONOS_THE_HERALD, FAIL);
             me->DespawnOrUnsummon(1);

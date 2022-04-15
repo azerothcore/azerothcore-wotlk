@@ -356,7 +356,7 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID);
             if (player && player->IsInCombat() && player->getAttackerForHelper())
@@ -364,7 +364,7 @@ public:
                 AttackStart(player->getAttackerForHelper());
                 return;
             }
-            npc_escortAI::EnterEvadeMode();
+            npc_escortAI::EnterEvadeMode(why);
         }
 
         void StartEvent(Player* player)
