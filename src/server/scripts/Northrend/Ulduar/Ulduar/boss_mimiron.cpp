@@ -365,7 +365,7 @@ public:
             {
                 if (c->IsInEvadeMode())
                 {
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     return;
                 }
                 if (!c->IsAlive())
@@ -375,7 +375,7 @@ public:
             }
             else
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 return;
             }
             CloseDoorAndButton();
@@ -429,7 +429,7 @@ public:
             Position p = me->GetHomePosition();
             if (me->GetExactDist(&p) > 80.0f || !SelectTargetFromPlayerList(150.0f))
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 return;
             }
 
@@ -512,7 +512,7 @@ public:
                         events.ScheduleEvent(EVENT_SIT_LMK2_INTERVAL, 2000);
                         break;
                     }
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_SIT_LMK2_INTERVAL:
                     if (Creature* LMK2 = GetLMK2())
@@ -527,7 +527,7 @@ public:
                         LMK2->AI()->SetData(1, 1);
                         break;
                     }
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_LMK2_RETREAT_INTERVAL:
                     if (Creature* LMK2 = GetLMK2())
@@ -539,7 +539,7 @@ public:
                         events.ScheduleEvent(EVENT_ELEVATOR_INTERVAL_0, 6000);
                         break;
                     }
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_ELEVATOR_INTERVAL_0:
                     if( GameObject* elevator = me->FindNearestGameObject(GO_MIMIRON_ELEVATOR, 100.0f) )
@@ -562,7 +562,7 @@ public:
                         events.ScheduleEvent(EVENT_ELEVATOR_INTERVAL_2, 18000);
                         break;
                     }
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_ELEVATOR_INTERVAL_2:
                     if (Creature* VX001 = GetVX001())
@@ -571,7 +571,7 @@ public:
                         events.ScheduleEvent(EVENT_SITTING_ON_VX001, 4000);
                         break;
                     }
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_SITTING_ON_VX001:
                     me->Yell(TEXT_VX001_ACTIVATE, LANG_UNIVERSAL);
@@ -585,7 +585,7 @@ public:
                         events.ScheduleEvent(EVENT_EMOTE_VX001, 2000);
                         break;
                     }
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_EMOTE_VX001:
                     if( Creature* VX001 = GetVX001() )
@@ -594,7 +594,7 @@ public:
                         events.ScheduleEvent(EVENT_VX001_START_FIGHT, 1750);
                         break;
                     }
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_VX001_START_FIGHT:
                     if( Creature* VX001 = GetVX001() )
@@ -605,7 +605,7 @@ public:
                         me->SetInCombatWithZone();
                         break;
                     }
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_VX001_EMOTESTATE_DEATH:
                     if( Creature* VX001 = GetVX001() )
@@ -615,7 +615,7 @@ public:
                         events.ScheduleEvent(EVENT_GET_OUT_VX001, 2500);
                         break;
                     }
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_GET_OUT_VX001:
                     if( Creature* VX001 = GetVX001() )
@@ -628,7 +628,7 @@ public:
                             events.ScheduleEvent(EVENT_SAY_VX001_DEAD, 2000);
                             break;
                         }
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_SAY_VX001_DEAD:
                     changeAllowedFlameSpreadTime = true;
@@ -643,7 +643,7 @@ public:
                         events.ScheduleEvent(EVENT_SAY_ACU_ACTIVATE, 6000);
                         break;
                     }
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_SAY_ACU_ACTIVATE:
                     me->Yell(TEXT_ACU_ACTIVATE, LANG_UNIVERSAL);
@@ -659,7 +659,7 @@ public:
                         me->SetInCombatWithZone();
                         break;
                     }
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_SAY_ACU_DEAD:
                     me->Yell(TEXT_ACU_DEATH, LANG_UNIVERSAL);
@@ -673,7 +673,7 @@ public:
                         events.ScheduleEvent(EVENT_VX001_EMOTE_JUMP, 4000);
                         break;
                     }
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_VX001_EMOTE_JUMP:
                     {
@@ -681,7 +681,7 @@ public:
                         Creature* VX001 = GetVX001();
                         if( !VX001 || !LMK2 )
                         {
-                            EnterEvadeMode();
+                            EnterEvadeMode(EVADE_REASON_OTHER);
                             return;
                         }
 
@@ -697,7 +697,7 @@ public:
                         Creature* LMK2 = GetLMK2();
                         if( !VX001 || !LMK2 )
                         {
-                            EnterEvadeMode();
+                            EnterEvadeMode(EVADE_REASON_OTHER);
                             return;
                         }
 
@@ -714,7 +714,7 @@ public:
                         Creature* VX001 = GetVX001();
                         if( !VX001 || !ACU )
                         {
-                            EnterEvadeMode();
+                            EnterEvadeMode(EVADE_REASON_OTHER);
                             return;
                         }
 
@@ -733,7 +733,7 @@ public:
                         Creature* ACU = GetACU();
                         if( !VX001 || !LMK2 || !ACU )
                         {
-                            EnterEvadeMode();
+                            EnterEvadeMode(EVADE_REASON_OTHER);
                             return;
                         }
 
@@ -839,7 +839,7 @@ public:
 
         void MoveInLineOfSight(Unit*  /*mover*/) override {}
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (bIsEvading)
                 return;
@@ -847,16 +847,16 @@ public:
 
             if (Creature* c = GetLMK2())
             {
-                c->AI()->EnterEvadeMode();
+                c->AI()->EnterEvadeMode(why);
             }
             if (Creature* c = GetVX001())
             {
-                c->AI()->EnterEvadeMode();
+                c->AI()->EnterEvadeMode(why);
                 c->DespawnOrUnsummon();
             }
             if (Creature* c = GetACU())
             {
-                c->AI()->EnterEvadeMode();
+                c->AI()->EnterEvadeMode(why);
                 c->DespawnOrUnsummon();
             }
 
@@ -864,7 +864,7 @@ public:
 
             me->RemoveAllAuras();
             me->ExitVehicle();
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
 
             bIsEvading = false;
         }
@@ -952,7 +952,7 @@ public:
                         Creature* ACU = GetACU();
                         if (!LMK2 || !VX001 || !ACU)
                         {
-                            EnterEvadeMode();
+                            EnterEvadeMode(EVADE_REASON_OTHER);
                             return;
                         }
 
@@ -1226,7 +1226,7 @@ public:
                 }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (bIsEvading)
                 return;
@@ -1237,7 +1237,7 @@ public:
             ScriptedAI::EnterEvadeMode();
 
             if (Creature* mimiron = GetMimiron())
-                mimiron->AI()->EnterEvadeMode();
+                mimiron->AI()->EnterEvadeMode(why);
 
             bIsEvading = false;
         }
@@ -1580,7 +1580,7 @@ public:
                 }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (bIsEvading)
                 return;
@@ -1591,7 +1591,7 @@ public:
             _EnterEvadeMode();
             Reset();
             if (Creature* mimiron = GetMimiron())
-                mimiron->AI()->EnterEvadeMode();
+                mimiron->AI()->EnterEvadeMode(why);
 
             bIsEvading = false;
         }
@@ -1903,7 +1903,7 @@ public:
                 }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (bIsEvading)
                 return;
@@ -1914,7 +1914,7 @@ public:
             _EnterEvadeMode();
             Reset();
             if (Creature* mimiron = GetMimiron())
-                mimiron->AI()->EnterEvadeMode();
+                mimiron->AI()->EnterEvadeMode(why);
 
             bIsEvading = false;
         }

@@ -149,9 +149,9 @@ public:
             _events.ScheduleEvent(EVENT_FINAL_TALK, 5 * IN_MILLISECONDS);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            _EnterEvadeMode();
+            _EnterEvadeMode(why);
 
             if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
             {

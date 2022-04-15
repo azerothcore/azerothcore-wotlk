@@ -306,10 +306,10 @@ public:
 
         void EnterCombat(Unit* /*who*/) override { }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             CleanUp();
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void CleanUp()
@@ -343,7 +343,7 @@ public:
                 Player* pWarrior = ObjectAccessor::GetPlayer(*me, PlayerGUID);
                 if (!pWarrior || me->GetDistance2d(pWarrior) >= 200.0f)
                 {
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     return;
                 }
 
@@ -351,7 +351,7 @@ public:
                 {
                     Talk(SAY_TWIGGY_FLATHEAD_DOWN);
                     pWarrior->FailQuest(1719);
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     return;
                 }
 
@@ -435,7 +435,7 @@ public:
                             if (!creature || !creature->IsAlive())
                             {
                                 Talk(SAY_TWIGGY_FLATHEAD_OVER);
-                                EnterEvadeMode();
+                                EnterEvadeMode(EVADE_REASON_OTHER);
                                 return;
                             }
                             else // Makes BIG WILL attackable.

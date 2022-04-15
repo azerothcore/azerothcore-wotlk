@@ -26,7 +26,7 @@ NullCreatureAI::NullCreatureAI(Creature* c) : CreatureAI(c) { me->SetReactState(
 void PassiveAI::UpdateAI(uint32)
 {
     if (me->IsInCombat() && me->getAttackers().empty())
-        EnterEvadeMode();
+        EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
 }
 
 void PossessedAI::AttackStart(Unit* target)
@@ -66,11 +66,11 @@ void CritterAI::DamageTaken(Unit*, uint32&, DamageEffectType, SpellSchoolMask)
     _combatTimer = 1;
 }
 
-void CritterAI::EnterEvadeMode()
+void CritterAI::EnterEvadeMode(EvadeReason why)
 {
     if (me->HasUnitState(UNIT_STATE_FLEEING))
         me->SetControlled(false, UNIT_STATE_FLEEING);
-    CreatureAI::EnterEvadeMode();
+    CreatureAI::EnterEvadeMode(why);
     _combatTimer = 0;
 }
 
@@ -80,7 +80,7 @@ void CritterAI::UpdateAI(uint32 diff)
     {
         _combatTimer += diff;
         if (_combatTimer >= 5000)
-            EnterEvadeMode();
+            EnterEvadeMode(EVADE_REASON_OTHER);
     }
 }
 
