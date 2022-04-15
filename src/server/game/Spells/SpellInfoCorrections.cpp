@@ -4160,7 +4160,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(152); // 150 yards
     });
 
-    // Suppression Room Aura (BWL)
+    // Suppression Aura
     ApplySpellFix({ 22247 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesCu |= SPELL_ATTR0_CU_DONT_BREAK_STEALTH;
