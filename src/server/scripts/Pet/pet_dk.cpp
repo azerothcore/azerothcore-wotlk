@@ -322,7 +322,7 @@ class spell_pet_dk_gargoyle_strike : public SpellScript
             }
         }
 
-        SetHitDamage(damage);
+        SetEffectValue(damage);
     }
 
     void Register() override

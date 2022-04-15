@@ -211,46 +211,65 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
     else
     {
         Group* grp = _player->GetGroup();
+
         // no group or not a leader
         if (!grp || grp->GetLeaderGUID() != _player->GetGUID())
             return;
 
-        if (_player->InBattlegroundQueueForBattlegroundQueueType(bgQueueTypeIdRandom)) // queued for random bg, so can't queue for anything else
-            err = ERR_IN_RANDOM_BG;
-        else if (_player->InBattlegroundQueue() && bgTypeId == BATTLEGROUND_RB) // already in queue, so can't queue for random
-            err = ERR_IN_NON_RANDOM_BG;
-        else if (_player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_2v2) ||
-                 _player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_3v3) ||
-                 _player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_5v5)) // can't be already queued for arenas
-            err = ERR_BATTLEGROUND_QUEUED_FOR_RATED;
+        grp->DoForAllMembers([&err, bgQueueTypeId, bgQueueTypeIdRandom, bgTypeId](Player* member)
+        {
+            if (member->InBattlegroundQueueForBattlegroundQueueType(bgQueueTypeIdRandom)) // queued for random bg, so can't queue for anything else
+            {
+                err = ERR_IN_RANDOM_BG;
+            }
+            else if (member->InBattlegroundQueue() && bgTypeId == BATTLEGROUND_RB) // already in queue, so can't queue for random
+            {
+                err = ERR_IN_NON_RANDOM_BG;
+            }
+            else if (member->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_2v2) ||
+                member->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_3v3) ||
+                member->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_5v5)) // can't be already queued for arenas
+            {
+                err = ERR_BATTLEGROUND_QUEUED_FOR_RATED;
+            }
+            else if (member->InBattlegroundQueueForBattlegroundQueueType(bgQueueTypeId)) // queued for this bg
+            {
+                err = ERR_BATTLEGROUND_NONE;
+            }
 
-        if (err > 0)
-            err = grp->CanJoinBattlegroundQueue(bg, bgQueueTypeId, 0, bg->GetMaxPlayersPerTeam(), false, 0);
+            if (err < 0)
+            {
+                return;
+            }
+        });
+
+        if (err <= 0)
+        {
+            grp->DoForAllMembers([err](Player* member)
+            {
+                WorldPacket data;
+                sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, err);
+                member->GetSession()->SendPacket(&data);
+            });
+
+            return;
+        }
+
+        ASSERT(err > 0);
+        err = grp->CanJoinBattlegroundQueue(bg, bgQueueTypeId, 0, bg->GetMaxPlayersPerTeam(), false, 0);
 
         isPremade = (grp->GetMembersCount() >= bg->GetMinPlayersPerTeam() && bgTypeId != BATTLEGROUND_RB);
         uint32 avgWaitTime = 0;
 
-        if (err > 0)
-        {
-            GroupQueueInfo* ginfo = bgQueue.AddGroup(_player, grp, bgTypeId, bracketEntry, 0, false, isPremade, 0, 0);
-            avgWaitTime = bgQueue.GetAverageQueueWaitTime(ginfo);
-        }
+        GroupQueueInfo* ginfo = bgQueue.AddGroup(_player, grp, bgTypeId, bracketEntry, 0, false, isPremade, 0, 0);
+        avgWaitTime = bgQueue.GetAverageQueueWaitTime(ginfo);
 
         grp->DoForAllMembers([bg, err, bgQueueTypeId, avgWaitTime](Player* member)
         {
             WorldPacket data;
 
-            if (err <= 0)
-            {
-                sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, err);
-                member->GetSession()->SendPacket(&data);
-                return;
-            }
-
-            uint32 queueSlot = member->AddBattlegroundQueueId(bgQueueTypeId);
-
             // send status packet
-            sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_WAIT_QUEUE, avgWaitTime, 0, 0, TEAM_NEUTRAL);
+            sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, member->AddBattlegroundQueueId(bgQueueTypeId), STATUS_WAIT_QUEUE, avgWaitTime, 0, 0, TEAM_NEUTRAL);
             member->GetSession()->SendPacket(&data);
 
             sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, err);
