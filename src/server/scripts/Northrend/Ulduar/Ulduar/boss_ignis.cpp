@@ -113,7 +113,7 @@ public:
         {
             timer = 1000;
             me->SetReactState(REACT_PASSIVE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void JustReachedHome() override
@@ -126,7 +126,7 @@ public:
             if (spell->Id == SPELL_ACTIVATE_CONSTRUCT)
             {
                 me->RemoveAura(38757);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetReactState(REACT_AGGRESSIVE);
                 if (InstanceScript* instance = me->GetInstanceScript())
                     if (Creature* ignis = ObjectAccessor::GetCreature(*me, instance->GetGuidData(TYPE_IGNIS)))
@@ -343,7 +343,7 @@ public:
 
             if( me->GetPositionX() < 490.0f || me->GetPositionX() > 690.0f || me->GetPositionY() < 130.0f || me->GetPositionY() > 410.0f )
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 return;
             }
 
@@ -444,11 +444,11 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->DisableRotate(false);
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
     };
 };

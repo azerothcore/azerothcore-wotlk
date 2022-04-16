@@ -124,7 +124,7 @@ public:
 
             killCount = 0;
             me->RemoveAurasDueToSpell(SPELL_FRENZY);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             summons.DespawnAll();
             instance->SetBossState(DATA_OHGAN, NOT_STARTED);
             me->Mount(MODEL_OHGAN_MOUNT);
@@ -214,7 +214,7 @@ public:
                                     events.ScheduleEvent(EVENT_CHECK_START, 1000);
                                 break;
                             case EVENT_STARTED:
-                                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                                 break;
                             default:
                                 break;

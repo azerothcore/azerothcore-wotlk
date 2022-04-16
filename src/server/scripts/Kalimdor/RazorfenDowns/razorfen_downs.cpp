@@ -90,7 +90,7 @@ public:
                 channeling = false;
                 eventProgress = 0;
                 spawnerCount  = 0;
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                 me->SetReactState(REACT_AGGRESSIVE);
             }
         }
@@ -119,7 +119,7 @@ public:
             {
                 eventInProgress = true;
                 Talk(SAY_QUEST_ACCEPTED);
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                 me->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_ACTIVE);
                 me->GetMotionMaster()->MovePath(PATH_ESCORT, false);
             }

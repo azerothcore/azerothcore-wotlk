@@ -566,7 +566,7 @@ public:
         void MoveInLineOfSight(Unit*) override {}
         void AttackStart(Unit*) override {}
         void UpdateAI(uint32) override {}
-        void EnterEvadeMode() override {}
+        void EnterEvadeMode(EvadeReason /* why */) override {}
         void OnCharmed(bool /*apply*/) override {}
 
         bool _boomed;
@@ -802,7 +802,7 @@ public:
                         me->StopMoving();
                         me->SetReactState(REACT_PASSIVE);
                         me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+                        me->SetUnitFlag(UNIT_FLAG_STUNNED);
                         me->SendMonsterMove(_flyTarget->GetPositionX(), _flyTarget->GetPositionY(), _flyTarget->GetPositionZ() + 15, 1500, SPLINEFLAG_FLYING);
 
                         me->CastSpell(me, SPELL_LIGHTNING_TENDRILS, true);

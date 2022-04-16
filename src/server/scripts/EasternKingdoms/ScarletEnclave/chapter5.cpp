@@ -465,7 +465,7 @@ public:
             if (battleStarted == ENCOUNTER_STATE_OUTRO && cr->GetEntry() == NPC_DEFENDER_OF_THE_LIGHT)
             {
                 cr->SetReactState(REACT_PASSIVE);
-                cr->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                cr->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                 cr->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
                 cr->HandleEmoteCommand(EMOTE_STATE_READY1H);
             }
@@ -546,8 +546,8 @@ public:
             events.Reset();
             summons.DespawnAll();
 
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-            me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->SetVisible(true);
             me->setActive(true);
@@ -623,7 +623,7 @@ public:
                     break;
                 case EVENT_START_COUNTDOWN_5:
                     battleStarted = ENCOUNTER_STATE_FIGHT;
-                    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+                    me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
                     Talk(SAY_LIGHT_OF_DAWN04); // Wrong order in DB!
                     SendUpdateWorldState(WORLD_STATE_COUNTDOWN_TIME, 0);
                     SendUpdateWorldState(WORLD_STATE_COUNTDOWN_ENABLE, 0);
@@ -670,7 +670,7 @@ public:
                         break;
                     }
                 case EVENT_START_COUNTDOWN_14:
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     me->SummonCreatureGroup(5);
                     return;
                 case EVENT_FINISH_FIGHT_1:
@@ -698,13 +698,13 @@ public:
                             {
                                 summon->CombatStop(true);
                                 summon->DeleteThreatList();
-                                summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                                summon->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                                 summon->SetReactState(REACT_PASSIVE);
                                 summon->GetMotionMaster()->Clear(false);
                             }
                         me->CombatStop(true);
                         me->DeleteThreatList();
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                         me->SetReactState(REACT_PASSIVE);
                         me->GetMotionMaster()->Clear(false);
 
@@ -769,7 +769,7 @@ public:
                 case EVENT_OUTRO_SCENE_6:
                     if (Creature* alex = me->SummonCreature(NPC_HIGHLORD_ALEXANDROS_MOGRAINE, LightOfDawnPos[7].GetPositionX(), LightOfDawnPos[7].GetPositionY(), LightOfDawnPos[7].GetPositionZ(), LightOfDawnPos[7].GetOrientation(), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 300000))
                     {
-                        alex->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        alex->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         alex->GetMotionMaster()->MovePoint(0, LightOfDawnPos[8].GetPositionX(), LightOfDawnPos[8].GetPositionY(), LightOfDawnPos[8].GetPositionZ());
                         alex->CastSpell(alex, SPELL_ALEXANDROS_MOGRAINE_SPAWN, true);
                         //alex->AI()->Talk(EMOTE_LIGHT_OF_DAWN06);
@@ -778,7 +778,7 @@ public:
                 case EVENT_OUTRO_SCENE_7:
                     if (Creature* alex = GetEntryFromSummons(NPC_HIGHLORD_ALEXANDROS_MOGRAINE))
                     {
-                        alex->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        alex->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         alex->AI()->Talk(SAY_LIGHT_OF_DAWN32);
                         me->SetFacingToObject(alex);
                     }
@@ -1027,7 +1027,7 @@ public:
                     {
                         tirion->CastSpell(tirion, SPELL_TIRION_CHARGE, true);
                         tirion->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
-                        tirion->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        tirion->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     }
                     break;
                 case EVENT_OUTRO_SCENE_44:
@@ -1131,7 +1131,7 @@ public:
                                 if (i->GetSource()->IsAlive() && me->IsWithinDistInMap(i->GetSource(), 100))
                                     i->GetSource()->CastSpell(i->GetSource(), SPELL_THE_LIGHT_OF_DAWN_Q, false);
                         }
-                        me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                        me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                         break;
                     }
                 case EVENT_OUTRO_SCENE_61:

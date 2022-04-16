@@ -24,6 +24,7 @@
 #include "GridDefines.h"
 #include "GridReference.h"
 #include "Map.h"
+#include "ModelIgnoreFlags.h"
 #include "ObjectDefines.h"
 #include "ObjectGuid.h"
 #include "Optional.h"
@@ -104,6 +105,12 @@ public:
 
     [[nodiscard]] float GetObjectScale() const { return GetFloatValue(OBJECT_FIELD_SCALE_X); }
     virtual void SetObjectScale(float scale) { SetFloatValue(OBJECT_FIELD_SCALE_X, scale); }
+
+    virtual uint32 GetDynamicFlags() const { return 0; }
+    bool HasDynamicFlag(uint32 flag) const { return (GetDynamicFlags() & flag) != 0; }
+    virtual void SetDynamicFlag(uint32 flag) { ReplaceAllDynamicFlags(GetDynamicFlags() | flag); }
+    virtual void RemoveDynamicFlag(uint32 flag) { ReplaceAllDynamicFlags(GetDynamicFlags() & ~flag); }
+    virtual void ReplaceAllDynamicFlags([[maybe_unused]] uint32 flag) { }
 
     [[nodiscard]] TypeID GetTypeId() const { return m_objectTypeId; }
     [[nodiscard]] bool isType(uint16 mask) const { return (mask & m_objectType); }
@@ -449,8 +456,8 @@ public:
     // use only if you will sure about placing both object at same map
     bool IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D = true, bool useBoundingRadius = true) const;
     bool IsWithinDistInMap(WorldObject const* obj, float dist2compare, bool is3D = true, bool useBoundingRadius = true) const;
-    [[nodiscard]] bool IsWithinLOS(float x, float y, float z, LineOfSightChecks checks = LINEOFSIGHT_ALL_CHECKS) const;
-    bool IsWithinLOSInMap(WorldObject const* obj, LineOfSightChecks checks = LINEOFSIGHT_ALL_CHECKS) const;
+    [[nodiscard]] bool IsWithinLOS(float x, float y, float z, VMAP::ModelIgnoreFlags ignoreFlags = VMAP::ModelIgnoreFlags::Nothing, LineOfSightChecks checks = LINEOFSIGHT_ALL_CHECKS) const;
+    [[nodiscard]] bool IsWithinLOSInMap(WorldObject const* obj, VMAP::ModelIgnoreFlags ignoreFlags = VMAP::ModelIgnoreFlags::Nothing, LineOfSightChecks checks = LINEOFSIGHT_ALL_CHECKS) const;
     [[nodiscard]] Position GetHitSpherePointFor(Position const& dest) const;
     void GetHitSpherePointFor(Position const& dest, float& x, float& y, float& z) const;
     bool GetDistanceOrder(WorldObject const* obj1, WorldObject const* obj2, bool is3D = true) const;

@@ -150,7 +150,7 @@ void FollowerAI::JustRespawned()
     Reset();
 }
 
-void FollowerAI::EnterEvadeMode()
+void FollowerAI::EnterEvadeMode(EvadeReason /*why*/)
 {
     me->RemoveAllAuras();
     me->DeleteThreatList();
@@ -293,7 +293,7 @@ void FollowerAI::StartFollow(Player* player, uint32 factionForFollower, const Qu
         LOG_DEBUG("scripts.ai", "FollowerAI start with WAYPOINT_MOTION_TYPE, set to MoveIdle.");
     }
 
-    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+    me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
 
     AddFollowState(STATE_FOLLOW_INPROGRESS);
 

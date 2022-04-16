@@ -81,7 +81,7 @@ public:
 
         void Reset() override
         {
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+            me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
             me->CastSpell(me, SPELL_SOULSTORM_CHANNEL_OOC, true);
             events.Reset();
             summons.DespawnAll();
@@ -106,9 +106,9 @@ public:
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE) && me->HealthBelowPctDamaged(35, damage))
+            if (!me->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE) && me->HealthBelowPctDamaged(35, damage))
             {
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE);
                 me->GetMotionMaster()->Clear();
                 me->GetMotionMaster()->MoveIdle();
                 me->CastSpell(me, SPELL_TELEPORT, false);
@@ -137,7 +137,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
+            if (me->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
                 if (me->isAttackReady())
                     me->SetFacingToObject(me->GetVictim());
 
@@ -198,10 +198,10 @@ public:
             summon->SetReactState(REACT_PASSIVE);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-            ScriptedAI::EnterEvadeMode();
+            me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
+            ScriptedAI::EnterEvadeMode(why);
         }
     };
 
