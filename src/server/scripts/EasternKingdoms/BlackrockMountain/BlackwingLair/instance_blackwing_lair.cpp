@@ -91,6 +91,12 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
+            // This is required because the tempspawn at Vael overwrites his GUID.
+            if (creature->GetEntry() == NPC_VICTOR_NEFARIUS && creature->ToTempSummon())
+            {
+                return;
+            }
+
             InstanceScript::OnCreatureCreate(creature);
 
             switch (creature->GetEntry())
@@ -275,13 +281,12 @@ public:
                 case DATA_NEFARIAN:
                     switch (state)
                     {
+                        case FAIL:
+                            _events.ScheduleEvent(EVENT_RESPAWN_NEFARIUS, 15 * 60 * IN_MILLISECONDS); //15min
+                            [[fallthrough]];
                         case NOT_STARTED:
                             if (Creature* nefarian = instance->GetCreature(nefarianGUID))
                                 nefarian->DespawnOrUnsummon();
-                            break;
-                        case FAIL:
-                            _events.ScheduleEvent(EVENT_RESPAWN_NEFARIUS, 15 * 60 * IN_MILLISECONDS); //15min
-                            SetBossState(DATA_NEFARIAN, NOT_STARTED);
                             break;
                         default:
                             break;
@@ -378,30 +383,6 @@ public:
         {
             switch (unit->GetEntry())
             {
-                case NPC_BLACK_DRAKONID:
-                case NPC_BLUE_DRAKONID:
-                case NPC_BRONZE_DRAKONID:
-                case NPC_CHROMATIC_DRAKONID:
-                case NPC_GREEN_DRAKONID:
-                case NPC_RED_DRAKONID:
-                    if (Creature* summon = unit->ToTempSummon())
-                    {
-                        summon->SetCorpseDelay(DAY * IN_MILLISECONDS);
-                        summon->UpdateEntry(NPC_BONE_CONSTRUCT);
-                        summon->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                        summon->SetReactState(REACT_PASSIVE);
-                        summon->SetStandState(UNIT_STAND_STATE_DEAD);
-                        summon->SetHomePosition(summon->GetPosition());
-
-                        if (Creature* nefarius = GetCreature(DATA_LORD_VICTOR_NEFARIUS))
-                        {
-                            if (nefarius->AI())
-                            {
-                                nefarius->AI()->DoAction(ACTION_NEFARIUS_ADD_KILLED);
-                            }
-                        }
-                    }
-                    break;
                 case NPC_BLACKWING_DRAGON:
                     --addsCount[0];
                     if (EggEvent != DONE && _events.GetTimeUntilEvent(EVENT_RAZOR_SPAWN) == Milliseconds::max())
