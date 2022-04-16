@@ -847,7 +847,7 @@ bool AuthSession::VerifyVersion(uint8 const* a, int32 aLength, Acore::Crypto::SH
     if (!sConfigMgr->GetOption<bool>("StrictVersionCheck", false))
         return true;
 
-    Acore::Crypto::SHA1::Digest zeros;
+    Acore::Crypto::SHA1::Digest zeros = { };
     Acore::Crypto::SHA1::Digest const* versionHash = nullptr;
 
     if (!isReconnect)
