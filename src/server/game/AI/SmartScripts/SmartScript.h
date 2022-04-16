@@ -258,26 +258,10 @@ public:
     void SetPhaseReset(bool allow) { _allowPhaseReset = allow; }
 
 private:
-    void IncPhase(uint32 p)
-    {
-        // Xinef: protect phase from overflowing
-        mEventPhase = std::min<uint32>(SMART_EVENT_PHASE_12, mEventPhase + p);
-    }
-
-    void DecPhase(uint32 p)
-    {
-        if (p >= mEventPhase)
-            mEventPhase = 0;
-        else
-            mEventPhase -= p;
-    }
-    bool IsInPhase(uint32 p) const
-    {
-        if (mEventPhase == 0)
-            return false;
-        return (1 << (mEventPhase - 1)) & p;
-    }
-    void SetPhase(uint32 p = 0) { mEventPhase = p; }
+    void IncPhase(uint32 p);
+    void DecPhase(uint32 p);
+    void SetPhase(uint32 p);
+    bool IsInPhase(uint32 p) const;
 
     SmartAIEventList mEvents;
     SmartAIEventList mInstallEvents;
