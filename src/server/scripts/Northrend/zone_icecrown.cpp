@@ -1586,9 +1586,9 @@ public:
             events.ScheduleEvent(EVENT_DUMMY_RECAST_DEFEND, 5000);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            if (!_EnterEvadeMode())
+            if (!_EnterEvadeMode(why))
                 return;
 
             Reset();
@@ -1659,7 +1659,7 @@ public:
                 case EVENT_DUMMY_RESET:
                     if (UpdateVictim())
                     {
-                        EnterEvadeMode();
+                        EnterEvadeMode(EVADE_REASON_OTHER);
                         events.ScheduleEvent(EVENT_DUMMY_RESET, 10000);
                     }
                     break;

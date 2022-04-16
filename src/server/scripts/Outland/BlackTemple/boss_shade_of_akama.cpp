@@ -135,9 +135,9 @@ public:
             me->SetWalk(true);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
             summonsGenerator.DoAction(ACTION_DESPAWN_ALL);
             events2.ScheduleEvent(EVENT_SHADE_RESET_ENCOUNTER, 20000);
             me->SetVisible(false);
@@ -172,7 +172,7 @@ public:
             }
             else if (param == ACTION_AKAMA_DIED)
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
             }
         }
 
@@ -258,7 +258,6 @@ public:
             }
 
             DoMeleeAttackIfReady();
-            EnterEvadeIfOutOfCombatArea();
         }
 
         bool CheckEvadeIfOutOfCombatArea() const override

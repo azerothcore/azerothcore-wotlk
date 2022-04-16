@@ -130,9 +130,9 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
 
             // Evade boss
             if (BattlegroundMap* bgMap = me->GetMap()->ToBattlegroundMap())
@@ -199,7 +199,7 @@ public:
                             Position const& _homePosition = me->GetHomePosition();
                             if (me->GetDistance2d(_homePosition.GetPositionX(), _homePosition.GetPositionY()) > 50.0f)
                             {
-                                EnterEvadeMode();
+                                ScriptedAI::EnterEvadeMode();
                                 return;
                             }
                             events.ScheduleEvent(EVENT_CHECK_RESET, 5000);

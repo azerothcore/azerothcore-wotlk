@@ -185,7 +185,6 @@ public:
 
             if (me->IsVisible())
                 DoMeleeAttackIfReady();
-            EnterEvadeIfOutOfCombatArea();
         }
 
         bool CheckEvadeIfOutOfCombatArea() const override

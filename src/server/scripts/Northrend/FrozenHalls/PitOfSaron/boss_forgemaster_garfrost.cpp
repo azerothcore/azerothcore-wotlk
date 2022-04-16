@@ -219,7 +219,7 @@ public:
                 if (x < 600.0f || x > 770.0f || y < -270.0f || y > -137.0f || z < 514.0f || z > 550.0f)
                 {
                     me->SetHealth(me->GetMaxHealth());
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     if (CreatureGroup* f = me->GetFormation())
                     {
                         const CreatureGroup::CreatureGroupMemberType& m = f->GetMembers();
@@ -289,11 +289,11 @@ public:
                 Talk(SAY_SLAY_1);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->DisableRotate(false);
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
     };
 

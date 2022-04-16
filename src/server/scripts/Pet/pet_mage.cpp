@@ -133,7 +133,7 @@ struct npc_pet_mage_mirror_image : CasterAI
     }
 
     // Do not reload Creature templates on evade mode enter - prevent visual lost
-    void EnterEvadeMode() override
+    void EnterEvadeMode(EvadeReason /*why*/) override
     {
         if (me->IsInEvadeMode() || !me->IsAlive())
             return;
@@ -172,7 +172,7 @@ struct npc_pet_mage_mirror_image : CasterAI
             }
 
             if (!owner->IsInCombat() && !me->GetVictim())
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
         }
     }
 
