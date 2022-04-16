@@ -1525,7 +1525,7 @@ class spell_sha_item_t6_trinket : public AuraScript
         });
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* /* aurEff */, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
         SpellInfo const* spellInfo = eventInfo.GetSpellInfo();

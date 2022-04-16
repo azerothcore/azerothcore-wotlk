@@ -4318,32 +4318,32 @@ public:
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             static std::vector<uint32> const triggeredSpells[MAX_CLASSES] =
-                    {
-                            //CLASS_NONE
-                            { },
-                            //CLASS_WARRIOR
-                            { Strength, Critical, Haste },
-                            //CLASS_PALADIN
-                            { Strength, Critical, Haste },
-                            //CLASS_HUNTER
-                            { Agility, Critical, AttackPower },
-                            //CLASS_ROGUE
-                            { Agility, Haste, AttackPower },
-                            //CLASS_PRIEST
-                            { },
-                            //CLASS_DEATH_KNIGHT
-                            { Strength, Critical, Haste },
-                            //CLASS_SHAMAN
-                            { Agility, Haste, AttackPower },
-                            //CLASS_MAGE
-                            { },
-                            //CLASS_WARLOCK
-                            { },
-                            //CLASS_UNK
-                            { },
-                            //CLASS_DRUID
-                            { Strength, Agility, Haste }
-                    };
+            {
+                //CLASS_NONE
+                { },
+                //CLASS_WARRIOR
+                { Strength, Critical, Haste },
+                //CLASS_PALADIN
+                { Strength, Critical, Haste },
+                //CLASS_HUNTER
+                { Agility, Critical, AttackPower },
+                //CLASS_ROGUE
+                { Agility, Haste, AttackPower },
+                //CLASS_PRIEST
+                { },
+                //CLASS_DEATH_KNIGHT
+                { Strength, Critical, Haste },
+                //CLASS_SHAMAN
+                { Agility, Haste, AttackPower },
+                //CLASS_MAGE
+                { },
+                //CLASS_WARLOCK
+                { },
+                //CLASS_UNK
+                { },
+                //CLASS_DRUID
+                { Strength, Agility, Haste }
+            };
 
             PreventDefaultAction();
             Unit* caster = eventInfo.GetActor();
@@ -4488,12 +4488,12 @@ public:
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
             return ValidateSpellInfo(
-                    {
-                            Energy,
-                            Mana,
-                            Rage,
-                            RunicPower
-                    });
+            {
+                Energy,
+                Mana,
+                Rage,
+                RunicPower
+            });
         }
 
         void HandleProc(AuraEffect const* /* aurEff */, ProcEventInfo& eventInfo)
@@ -4575,7 +4575,7 @@ class spell_item_mark_of_conquest : public AuraScript
         return ValidateSpellInfo({ SPELL_MARK_OF_CONQUEST_ENERGIZE });
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* /* aurEff */, ProcEventInfo& eventInfo)
     {
         if (eventInfo.GetTypeMask() & (PROC_FLAG_DONE_RANGED_AUTO_ATTACK | PROC_FLAG_DONE_SPELL_RANGED_DMG_CLASS))
         {
@@ -4714,7 +4714,7 @@ class spell_item_totem_of_flowing_water : public AuraScript
         return ValidateSpellInfo({ SPELL_LESSER_HEALING_WAVE_MANA });
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* /* aurEff */, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
         eventInfo.GetActor()->CastSpell((Unit*)nullptr, SPELL_LESSER_HEALING_WAVE_MANA, true);
@@ -4754,10 +4754,10 @@ public:
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
             return ValidateSpellInfo(
-                    {
-                            HealProc,
-                            DamageProc
-                    });
+        {
+                HealProc,
+                DamageProc
+            });
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
