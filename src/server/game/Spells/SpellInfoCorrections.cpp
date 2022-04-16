@@ -244,7 +244,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         48108,  // Hot Streak
         51124,  // Killing Machine
         54741,  // Firestarter
-        57761,  // Fireball!
         64823,  // Item - Druid T8 Balance 4P Bonus
         34477,  // Misdirection
         44401,  // Missile Barrage
@@ -252,6 +251,13 @@ void SpellMgr::LoadSpellInfoCorrections()
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->ProcCharges = 1;
+    });
+
+    // Fireball
+    ApplySpellFix({ 57761 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ProcCharges = 1;
+        spellInfo->SpellPriority = 50;
     });
 
     // Tidal Wave
