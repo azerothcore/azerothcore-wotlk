@@ -111,15 +111,15 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
             if (Creature* alythess = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_GRAND_WARLOCK_ALYTHESS)))
             {
                 if (!alythess->IsAlive())
                     alythess->Respawn(true);
                 else if (!alythess->IsInEvadeMode())
-                    alythess->AI()->EnterEvadeMode();
+                    alythess->AI()->EnterEvadeMode(why);
             }
         }
 
@@ -259,15 +259,15 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
             if (Creature* scorlash = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_LADY_SACROLASH)))
             {
                 if (!scorlash->IsAlive())
                     scorlash->Respawn(true);
                 else if (!scorlash->IsInEvadeMode())
-                    scorlash->AI()->EnterEvadeMode();
+                    scorlash->AI()->EnterEvadeMode(why);
             }
         }
 

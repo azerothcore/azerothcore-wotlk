@@ -120,7 +120,7 @@ public:
             summons.DespawnAll();
             Phase = 1;
             me->SetDisplayId(me->GetNativeDisplayId());
-            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             me->SetReactState(REACT_PASSIVE);
             if( pInstance )
                 pInstance->SetData(BOSS_BLACK_KNIGHT, NOT_STARTED);
@@ -128,10 +128,10 @@ public:
             //me->SetLootMode(0); // [LOOT]
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             me->DespawnOrUnsummon(1);
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -193,7 +193,7 @@ public:
             {
                 case SPELL_BLACK_KNIGHT_RES:
                     me->SetHealth(me->GetMaxHealth());
-                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     me->SetControlled(false, UNIT_STATE_STUNNED);
 
                     me->RemoveUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
@@ -225,7 +225,7 @@ public:
                             events.ScheduleEvent(EVENT_SPELL_MARKED_DEATH, 1000);
                             break;
                         default:
-                            EnterEvadeMode();
+                            EnterEvadeMode(EVADE_REASON_OTHER);
                             break;
                     }
                     break;
@@ -342,6 +342,7 @@ public:
         {
             Start(false, true, ObjectGuid::Empty, nullptr);
             SetDespawnAtEnd(true);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
         }
 
         void DoAction(int32 param) override

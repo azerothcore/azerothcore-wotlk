@@ -176,12 +176,12 @@ public:
             me->SetReactState(REACT_PASSIVE);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (InstanceScript* instance = me->GetInstanceScript())
                 if (Creature* muru = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_MURU)))
                     if (!muru->IsInEvadeMode())
-                        muru->AI()->EnterEvadeMode();
+                        muru->AI()->EnterEvadeMode(why);
 
             me->DespawnOrUnsummon();
         }

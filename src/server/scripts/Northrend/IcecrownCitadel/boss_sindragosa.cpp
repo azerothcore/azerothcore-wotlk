@@ -324,7 +324,7 @@ public:
         {
             if (!instance->CheckRequiredBosses(DATA_SINDRAGOSA, victim->ToPlayer()) || !me->IsVisible())
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 instance->DoCastSpellOnPlayers(LIGHT_S_HAMMER_TELEPORT);
                 return;
             }
@@ -369,7 +369,7 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE)) // this flag is removed after she lands and can be engaged
             {
@@ -381,7 +381,7 @@ public:
             }
             me->DisableRotate(false);
             me->SetControlled(false, UNIT_STATE_ROOT);
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
         }
 
         void KilledUnit(Unit* victim) override
@@ -1285,7 +1285,7 @@ public:
         float ox, oy, oz;
         _caster->GetPosition(ox, oy, oz);
         DynamicMapTree const& dTree = unit->GetMap()->GetDynamicMapTree();
-        return !dTree.isInLineOfSight(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ() + 2.f, ox, oy, oz + 2.f, unit->GetPhaseMask());
+        return !dTree.isInLineOfSight(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ() + 2.f, ox, oy, oz + 2.f, unit->GetPhaseMask(), VMAP::ModelIgnoreFlags::Nothing);
     }
 
 private:

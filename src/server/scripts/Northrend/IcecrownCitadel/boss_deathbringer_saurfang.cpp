@@ -283,7 +283,7 @@ public:
 
             if (!instance->CheckRequiredBosses(DATA_DEATHBRINGER_SAURFANG, who->ToPlayer()))
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 instance->DoCastSpellOnPlayers(LIGHT_S_HAMMER_TELEPORT);
                 return;
             }
@@ -405,7 +405,7 @@ public:
                     if (Player* p = itr->GetSource())
                         if (p->GetTransport())
                         {
-                            EnterEvadeMode();
+                            EnterEvadeMode(EVADE_REASON_OTHER);
                             return;
                         }
             }
@@ -495,9 +495,9 @@ public:
             return 0;
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
             if (Creature* creature = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SAURFANG_EVENT_NPC)))
                 creature->AI()->DoAction(ACTION_EVADE);
         }

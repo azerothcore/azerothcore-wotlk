@@ -566,7 +566,7 @@ public:
         void MoveInLineOfSight(Unit*) override {}
         void AttackStart(Unit*) override {}
         void UpdateAI(uint32) override {}
-        void EnterEvadeMode() override {}
+        void EnterEvadeMode(EvadeReason /* why */) override {}
         void OnCharmed(bool /*apply*/) override {}
 
         bool _boomed;

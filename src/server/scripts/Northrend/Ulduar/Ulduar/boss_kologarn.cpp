@@ -185,9 +185,9 @@ public:
                 ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            if (!_EnterEvadeMode())
+            if (!_EnterEvadeMode(why))
                 return;
             Reset();
             me->setActive(false);
@@ -406,7 +406,7 @@ public:
         {
             if (!UpdateVictim())
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 return;
             }
 
@@ -524,7 +524,7 @@ public:
         int32 _damageDone;
         bool _combatStarted;
 
-        void EnterEvadeMode() override {}
+        void EnterEvadeMode(EvadeReason /*why*/ = EVADE_REASON_OTHER) override {}
         void MoveInLineOfSight(Unit*) override {}
         void AttackStart(Unit*) override {}
         void UpdateAI(uint32  /*diff*/) override {}

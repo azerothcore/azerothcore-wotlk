@@ -45,7 +45,7 @@ public:
 
         void AttackStart(Unit* /*who*/) override {}
         void EnterCombat(Unit* /*who*/) override {}
-        void EnterEvadeMode() override {}
+        void EnterEvadeMode(EvadeReason /* why */) override {}
 
         void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
         {
@@ -348,11 +348,11 @@ public:
         bool switching;
         bool startPath;
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (switching || me->HasAuraType(SPELL_AURA_CONTROL_VEHICLE))
                 return;
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void Reset() override
@@ -492,7 +492,7 @@ public:
                 else
                 {
                     me->RemoveAllAuras();
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                 }
                 return;
             }
@@ -521,7 +521,7 @@ public:
                         else
                         {
                             me->RemoveAllAuras();
-                            EnterEvadeMode();
+                            EnterEvadeMode(EVADE_REASON_OTHER);
                             return;
                         }
                     }
@@ -546,7 +546,7 @@ public:
                     if (!player)
                     {
                         me->RemoveAllAuras();
-                        EnterEvadeMode();
+                        EnterEvadeMode(EVADE_REASON_OTHER);
                     }
                 }
                 return;
@@ -573,7 +573,7 @@ public:
                     else
                     {
                         me->RemoveAllAuras();
-                        EnterEvadeMode();
+                        EnterEvadeMode(EVADE_REASON_OTHER);
                     }
                 }
             }
@@ -923,7 +923,7 @@ public:
 
         void AttackStart(Unit* /*who*/) override { }
         void EnterCombat(Unit* /*who*/) override { }
-        void EnterEvadeMode() override { }
+        void EnterEvadeMode(EvadeReason /*why*/) override { }
 
         void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
         {

@@ -158,11 +158,11 @@ public:
             Talk(SAY_SLAY);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             Cleanup();
             summons.DespawnAll();
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
         }
 
         void JustDied(Unit* /*killer*/) override
