@@ -1251,9 +1251,9 @@ public:
         return (me->GetPositionY() > 2660.0f) == (target->GetPositionY() > 2660.0f) && (target->GetTypeId() == TYPEID_PLAYER || target->IsInCombat());
     }
 
-    void EnterEvadeMode() override
+    void EnterEvadeMode(EvadeReason why) override
     {
-        if (!_EnterEvadeMode())
+        if (!_EnterEvadeMode(why))
             return;
 
         me->GetMotionMaster()->Clear(false);
