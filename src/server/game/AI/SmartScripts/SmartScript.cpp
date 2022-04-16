@@ -3561,48 +3561,48 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
         case SMART_TARGET_HOSTILE_SECOND_AGGRO:
             if (me)
             {
-                if (e.target.hostilRandom.powerType)
+                if (e.target.hostileRandom.powerType)
                 {
-                    if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::MaxThreat, 1, PowerUsersSelector(me, Powers(e.target.hostilRandom.powerType - 1), (float)e.target.hostilRandom.maxDist, e.target.hostilRandom.playerOnly)))
+                    if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::MaxThreat, 1, PowerUsersSelector(me, Powers(e.target.hostileRandom.powerType - 1), (float)e.target.hostileRandom.maxDist, e.target.hostileRandom.playerOnly)))
                         l->push_back(u);
                 }
-                else if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::MaxThreat, 1, (float)e.target.hostilRandom.maxDist, e.target.hostilRandom.playerOnly))
+                else if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::MaxThreat, 1, (float)e.target.hostileRandom.maxDist, e.target.hostileRandom.playerOnly))
                     l->push_back(u);
             }
             break;
         case SMART_TARGET_HOSTILE_LAST_AGGRO:
             if (me)
             {
-                if (e.target.hostilRandom.powerType)
+                if (e.target.hostileRandom.powerType)
                 {
-                    if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::MinThreat, 0, PowerUsersSelector(me, Powers(e.target.hostilRandom.powerType - 1), (float)e.target.hostilRandom.maxDist, e.target.hostilRandom.playerOnly)))
+                    if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::MinThreat, 0, PowerUsersSelector(me, Powers(e.target.hostileRandom.powerType - 1), (float)e.target.hostileRandom.maxDist, e.target.hostileRandom.playerOnly)))
                         l->push_back(u);
                 }
-                else if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::MinThreat, 0, (float)e.target.hostilRandom.maxDist, e.target.hostilRandom.playerOnly))
+                else if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::MinThreat, 0, (float)e.target.hostileRandom.maxDist, e.target.hostileRandom.playerOnly))
                     l->push_back(u);
             }
             break;
         case SMART_TARGET_HOSTILE_RANDOM:
             if (me)
             {
-                if (e.target.hostilRandom.powerType)
+                if (e.target.hostileRandom.powerType)
                 {
-                    if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, Powers(e.target.hostilRandom.powerType - 1), (float)e.target.hostilRandom.maxDist, e.target.hostilRandom.playerOnly)))
+                    if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, Powers(e.target.hostileRandom.powerType - 1), (float)e.target.hostileRandom.maxDist, e.target.hostileRandom.playerOnly)))
                         l->push_back(u);
                 }
-                else if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::Random, 0, (float)e.target.hostilRandom.maxDist, e.target.hostilRandom.playerOnly))
+                else if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::Random, 0, (float)e.target.hostileRandom.maxDist, e.target.hostileRandom.playerOnly))
                     l->push_back(u);
             }
             break;
         case SMART_TARGET_HOSTILE_RANDOM_NOT_TOP:
             if (me)
             {
-                if (e.target.hostilRandom.powerType)
+                if (e.target.hostileRandom.powerType)
                 {
-                    if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::Random, 1, PowerUsersSelector(me, Powers(e.target.hostilRandom.powerType - 1), (float)e.target.hostilRandom.maxDist, e.target.hostilRandom.playerOnly)))
+                    if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::Random, 1, PowerUsersSelector(me, Powers(e.target.hostileRandom.powerType - 1), (float)e.target.hostileRandom.maxDist, e.target.hostileRandom.playerOnly)))
                         l->push_back(u);
                 }
-                else if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::Random, 1, (float)e.target.hostilRandom.maxDist, e.target.hostilRandom.playerOnly))
+                else if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::Random, 1, (float)e.target.hostileRandom.maxDist, e.target.hostileRandom.playerOnly))
                     l->push_back(u);
             }
             break;
