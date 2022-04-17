@@ -230,7 +230,7 @@ httplib::Result HttpManager::DoRequest(httplib::Client& client, HttpWorkItem* re
     case HttpMethod::Options:
         return client.Options(path, req->headers);
     default:
-        LOG_ERROR("server", "[HttpManager] HTTP request error: invalid HTTP method %d", req->method);
+        LOG_ERROR("server", "[HttpManager] HTTP request error: invalid HTTP method {}", req->method);
         break;
     }
 
