@@ -179,7 +179,7 @@ void HttpManager::HttpWorkerThread()
             httplib::Error err = res.error();
             if (err != httplib::Error::Success)
             {
-                LOG_ERROR("server", "[HttpManager] HTTP request error: %s", httplib::to_string(err).c_str());
+                LOG_ERROR("server", "[HttpManager] HTTP request error: {}", httplib::to_string(err));
                 continue;
             }
 
