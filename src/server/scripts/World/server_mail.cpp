@@ -29,10 +29,19 @@ public:
     {
         for (auto const& servMail : sObjectMgr->GetAllServerMailStore())
         {
-            if (CharacterDatabase.Query("SELECT mailId from mail_server_character where guid = {} and mailId = {}", player->GetGUID().GetCounter(), servMail.second.id))
-                continue;
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAIL_SERVER_CHARACTER);
+            stmt->SetData(0, player->GetGUID().GetCounter());
+            stmt->SerData(1, servMail.second.id);
 
-            sObjectMgr->SendServerMail(player, servMail.second.id, servMail.second.reqLevel, servMail.second.reqPlayTime, servMail.second.moneyA, servMail.second.moneyH, servMail.second.itemA, servMail.second.itemCountA, servMail.second.itemH, servMail.second.itemCountH, servMail.second.subject, servMail.second.body, servMail.second.active);
+            PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+            if (result)
+            {
+                do
+                {
+                    sObjectMgr->SendServerMail(player, servMail.second.id, servMail.second.reqLevel, servMail.second.reqPlayTime, servMail.second.moneyA, servMail.second.moneyH, servMail.second.itemA, servMail.second.itemCountA, servMail.second.itemH, servMail.second.itemCountH, servMail.second.subject, servMail.second.body, servMail.second.active);
+                } while (result->NextRow());
+            }
         }
     }
 };
