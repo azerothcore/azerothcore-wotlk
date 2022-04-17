@@ -9659,7 +9659,10 @@ void ObjectMgr::SendServerMail(Player* player, uint32 id, uint32 reqLevel, uint3
         draft.SendMailTo(trans, MailReceiver(player), sender);
         CharacterDatabase.CommitTransaction(trans);
 
-        CharacterDatabase.Execute("REPLACE INTO mail_server_character (guid, mailId) values ({}, {}) ", player->GetGUID().GetCounter(), id);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_MAIL_SERVER_CHARACTER);
+        stmt->SetData(0, player->GetGUID().GetCounter());
+        stmt->SetData(1, id);
+        CharacterDatabase.Execute(stmt);
     }
 }
 
