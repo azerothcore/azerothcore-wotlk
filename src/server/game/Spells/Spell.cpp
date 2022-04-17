@@ -1702,13 +1702,13 @@ void Spell::SelectImplicitTrajTargets(SpellEffIndex effIndex, SpellImplicitTarge
         const float objDist2d = std::fabs(m_targets.GetSrcPos()->GetExactDist2d(*itr) * cos(m_targets.GetSrcPos()->GetRelativeAngle(*itr)));
         const float dz = std::fabs((*itr)->GetPositionZ() - m_targets.GetSrcPos()->m_positionZ);
 
-        LOG_ERROR("spells", "Spell::SelectTrajTargets: check {}, dist between {} {}, height between {} {}.",
+        LOG_DEBUG("spells", "Spell::SelectTrajTargets: check {}, dist between {} {}, height between {} {}.",
             (*itr)->GetEntry(), objDist2d - size, objDist2d + size, dz - size, dz + size);
 
         float dist = objDist2d - size;
         float height = dist * (a * dist + b);
 
-        LOG_ERROR("spells", "Spell::SelectTrajTargets: dist {}, height {}.", dist, height);
+        LOG_DEBUG("spells", "Spell::SelectTrajTargets: dist {}, height {}.", dist, height);
 
         if (dist < bestDist && height < dz + size && height > dz - size)
         {
@@ -1717,7 +1717,7 @@ void Spell::SelectImplicitTrajTargets(SpellEffIndex effIndex, SpellImplicitTarge
         }
 
 #define CHECK_DIST {\
-            LOG_ERROR("spells", "Spell::SelectTrajTargets: dist {}, height {}.", dist, height);\
+            LOG_DEBUG("spells", "Spell::SelectTrajTargets: dist {}, height {}.", dist, height);\
             if (dist > bestDist)\
                 continue;\
             if (dist < objDist2d + size && dist > objDist2d - size)\
@@ -1793,7 +1793,7 @@ void Spell::SelectImplicitTrajTargets(SpellEffIndex effIndex, SpellImplicitTarge
             float distSq = (*itr)->GetExactDistSq(x, y, z);
             float sizeSq = (*itr)->GetObjectSize();
             sizeSq *= sizeSq;
-            LOG_ERROR("spells", "Initial {} {} {} {} {}", x, y, z, distSq, sizeSq);
+            LOG_DEBUG("spells", "Spell::SelectTrajTargets: Initial {} {} {} {} {}", x, y, z, distSq, sizeSq);
             if (distSq > sizeSq)
             {
                 float factor = 1 - std::sqrt(sizeSq / distSq);
@@ -1802,7 +1802,7 @@ void Spell::SelectImplicitTrajTargets(SpellEffIndex effIndex, SpellImplicitTarge
                 z += factor * ((*itr)->GetPositionZ() - z);
 
                 distSq = (*itr)->GetExactDistSq(x, y, z);
-                LOG_ERROR("spells", "Initial {} {} {} {} {}", x, y, z, distSq, sizeSq);
+                LOG_DEBUG("spells", "Spell::SelectTrajTargets: Initial {} {} {} {} {}", x, y, z, distSq, sizeSq);
             }
         }
 
@@ -2049,7 +2049,7 @@ void Spell::SearchChainTargets(std::list<WorldObject*>& targets, uint32 chainTar
                 if (Unit* unit = (*itr)->ToUnit())
                 {
                     uint32 deficit = unit->GetMaxHealth() - unit->GetHealth();
-                    if ((deficit > maxHPDeficit || foundItr == tempTargets.end()) && target->IsWithinDist(unit, jumpRadius) && target->IsWithinLOSInMap(unit, LINEOFSIGHT_ALL_CHECKS))
+                    if ((deficit > maxHPDeficit || foundItr == tempTargets.end()) && target->IsWithinDist(unit, jumpRadius) && target->IsWithinLOSInMap(unit, VMAP::ModelIgnoreFlags::M2))
                     {
                         foundItr = itr;
                         maxHPDeficit = deficit;
@@ -2064,10 +2064,10 @@ void Spell::SearchChainTargets(std::list<WorldObject*>& targets, uint32 chainTar
             {
                 if (foundItr == tempTargets.end())
                 {
-                    if ((!isBouncingFar || target->IsWithinDist(*itr, jumpRadius)) && target->IsWithinLOSInMap(*itr, LINEOFSIGHT_ALL_CHECKS))
+                    if ((!isBouncingFar || target->IsWithinDist(*itr, jumpRadius)) && target->IsWithinLOSInMap(*itr, VMAP::ModelIgnoreFlags::M2))
                         foundItr = itr;
                 }
-                else if (target->GetDistanceOrder(*itr, *foundItr) && target->IsWithinLOSInMap(*itr, LINEOFSIGHT_ALL_CHECKS))
+                else if (target->GetDistanceOrder(*itr, *foundItr) && target->IsWithinLOSInMap(*itr, VMAP::ModelIgnoreFlags::M2))
                     foundItr = itr;
             }
         }
@@ -2605,6 +2605,8 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
     // Do damage and triggers
     else if (m_damage > 0)
     {
+        caster->SetLastDamagedTargetGuid(unitTarget->GetGUID());
+
         // Fill base damage struct (unitTarget - is real spell target)
         SpellNonMeleeDamage damageInfo(caster, unitTarget, m_spellInfo, m_spellSchoolMask);
 
@@ -2830,7 +2832,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
             if (unit->GetTypeId() == TYPEID_UNIT && unit->ToCreature()->IsInEvadeMode())
                 return SPELL_MISS_EVADE;
 
-            if (unit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) && unit->GetCharmerOrOwnerGUID() != m_caster->GetGUID())
+            if (unit->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE) && unit->GetCharmerOrOwnerGUID() != m_caster->GetGUID())
                 return SPELL_MISS_EVADE;
         }
 
@@ -2923,8 +2925,9 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
         if (m_originalCaster)
         {
             bool refresh = false;
+            bool refreshPeriodic = m_spellInfo->StackAmount < 2 && !(_triggeredCastFlags & TRIGGERED_NO_PERIODIC_RESET);
             m_spellAura = Aura::TryRefreshStackOrCreate(aurSpellInfo, effectMask, unit, m_originalCaster,
-                          (aurSpellInfo == m_spellInfo) ? &m_spellValue->EffectBasePoints[0] : &basePoints[0], m_CastItem, ObjectGuid::Empty, &refresh, !(_triggeredCastFlags & TRIGGERED_NO_PERIODIC_RESET));
+                          (aurSpellInfo == m_spellInfo) ? &m_spellValue->EffectBasePoints[0] : &basePoints[0], m_CastItem, ObjectGuid::Empty, &refresh, refreshPeriodic);
 
             // xinef: if aura was not refreshed, add proc ex
             if (!refresh)
@@ -4039,11 +4042,20 @@ void Spell::_handle_finish_phase()
     // Real add combo points from effects
     if (m_comboTarget && m_comboPointGain)
     {
+        // remove Premed-like effects unless they were caused by ourselves
+        // (this Aura removes the already-added CP when it expires from duration - now that we've added CP, this shouldn't happen anymore!)
+        if (!m_spellInfo->HasAura(SPELL_AURA_RETAIN_COMBO_POINTS))
+        {
+            m_caster->RemoveAurasByType(SPELL_AURA_RETAIN_COMBO_POINTS);
+        }
+
         m_caster->AddComboPoints(m_comboTarget, m_comboPointGain);
     }
 
-    if (m_caster->m_extraAttacks && GetSpellInfo()->HasEffect(SPELL_EFFECT_ADD_EXTRA_ATTACKS))
-        m_caster->HandleProcExtraAttackFor(m_caster->GetVictim());
+    if (m_spellInfo->HasEffect(SPELL_EFFECT_ADD_EXTRA_ATTACKS))
+    {
+        m_caster->SetLastExtraAttackSpell(m_spellInfo->Id);
+    }
 
     if (!IsAutoRepeat() && !IsNextMeleeSwingSpell())
         if (m_caster->GetCharmerOrOwnerPlayerOrPlayerItself())
@@ -4461,21 +4473,47 @@ void Spell::SendSpellStart()
 
     if (m_spellInfo->HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT) || m_spellInfo->HasAttribute(SPELL_ATTR0_CU_NEEDS_AMMO_DATA))
         castFlags |= CAST_FLAG_PROJECTILE;
-    if ((m_caster->GetTypeId() == TYPEID_PLAYER ||
-            (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->IsPet()))
-            && m_spellInfo->PowerType != POWER_HEALTH)
-        castFlags |= CAST_FLAG_POWER_LEFT_SELF;
+
+    if (m_caster->GetTypeId() == TYPEID_PLAYER || m_caster->IsPet())
+    {
+        switch (m_spellInfo->PowerType)
+        {
+            case POWER_HEALTH:
+                break;
+            case POWER_RUNE:
+                castFlags |= CAST_FLAG_POWER_LEFT_SELF;
+                break;
+            default:
+                if (m_powerCost != 0)
+                {
+                    castFlags |= CAST_FLAG_POWER_LEFT_SELF;
+                }
+                break;
+        }
+    }
 
     if (m_spellInfo->RuneCostID && m_spellInfo->PowerType == POWER_RUNE)
         castFlags |= CAST_FLAG_NO_GCD; // not needed, but Blizzard sends it
+
+    PackedGuid realCasterGUID = m_caster->GetPackGUID();
+    if (TempSummon const* tempSummon = m_caster->ToTempSummon())
+    {
+        if (tempSummon->GetEntry() == WORLD_TRIGGER)
+        {
+            if (GameObject* casterGameobject = tempSummon->GetSummonerGameObject())
+            {
+                realCasterGUID = casterGameobject->GetPackGUID();
+            }
+        }
+    }
 
     WorldPacket data(SMSG_SPELL_START, (8 + 8 + 4 + 4 + 2));
     if (m_CastItem)
         data << m_CastItem->GetPackGUID();
     else
-        data << m_caster->GetPackGUID();
+        data << realCasterGUID;
 
-    data << m_caster->GetPackGUID();
+    data << realCasterGUID;
     data << uint8(m_cast_count);                            // pending spell cast?
     data << uint32(m_spellInfo->Id);                        // spellId
     data << uint32(castFlags);                              // cast flags
@@ -4518,10 +4556,24 @@ void Spell::SendSpellGo()
     if (m_spellInfo->HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT) || m_spellInfo->HasAttribute(SPELL_ATTR0_CU_NEEDS_AMMO_DATA))
         castFlags |= CAST_FLAG_PROJECTILE;                        // arrows/bullets visual
 
-    if ((m_caster->GetTypeId() == TYPEID_PLAYER ||
-            (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->IsPet()))
-            && m_spellInfo->PowerType != POWER_HEALTH)
-        castFlags |= CAST_FLAG_POWER_LEFT_SELF; // should only be sent to self, but the current messaging doesn't make that possible
+    // should only be sent to self, but the current messaging doesn't make that possible
+    if (m_caster->GetTypeId() == TYPEID_PLAYER || m_caster->IsPet())
+    {
+        switch (m_spellInfo->PowerType)
+        {
+            case POWER_HEALTH:
+                break;
+            case POWER_RUNE:
+                castFlags |= CAST_FLAG_POWER_LEFT_SELF;
+                break;
+            default:
+                if (m_powerCost != 0)
+                {
+                    castFlags |= CAST_FLAG_POWER_LEFT_SELF;
+                }
+                break;
+        }
+    }
 
     if ((m_caster->GetTypeId() == TYPEID_PLAYER)
             && (m_caster->getClass() == CLASS_DEATH_KNIGHT)
@@ -4541,14 +4593,26 @@ void Spell::SendSpellGo()
     if (!m_spellInfo->StartRecoveryTime)
         castFlags |= CAST_FLAG_NO_GCD;
 
+    PackedGuid realCasterGUID = m_caster->GetPackGUID();
+    if (TempSummon const* tempSummon = m_caster->ToTempSummon())
+    {
+        if (tempSummon->GetEntry() == WORLD_TRIGGER)
+        {
+            if (GameObject* casterGameobject = tempSummon->GetSummonerGameObject())
+            {
+                realCasterGUID = casterGameobject->GetPackGUID();
+            }
+        }
+    }
+
     WorldPacket data(SMSG_SPELL_GO, 150);                    // guess size
 
     if (m_CastItem)
         data << m_CastItem->GetPackGUID();
     else
-        data << m_caster->GetPackGUID();
+        data << realCasterGUID;
 
-    data << m_caster->GetPackGUID();
+    data << realCasterGUID;
     data << uint8(m_cast_count);                            // pending spell cast?
     data << uint32(m_spellInfo->Id);                        // spellId
     data << uint32(castFlags);                              // cast flags
@@ -5052,7 +5116,9 @@ void Spell::TakePower()
 
     // Set the five second timer
     if (PowerType == POWER_MANA && m_powerCost > 0)
+    {
         m_caster->SetLastManaUse(GameTime::GetGameTimeMS().count());
+    }
 }
 
 void Spell::TakeAmmo()
@@ -5350,7 +5416,7 @@ SpellCastResult Spell::CheckCast(bool strict)
         if (m_caster->GetTypeId() == TYPEID_PLAYER)
         {
             //can cast triggered (by aura only?) spells while have this flag
-            if (!(_triggeredCastFlags & TRIGGERED_IGNORE_CASTER_AURASTATE) && m_caster->ToPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_ALLOW_ONLY_ABILITY))
+            if (!(_triggeredCastFlags & TRIGGERED_IGNORE_CASTER_AURASTATE) && m_caster->ToPlayer()->HasPlayerFlag(PLAYER_ALLOW_ONLY_ABILITY))
                 return SPELL_FAILED_SPELL_IN_PROGRESS;
 
             if (!(_triggeredCastFlags & TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD) && m_caster->ToPlayer()->HasSpellCooldown(m_spellInfo->Id))
@@ -5369,7 +5435,7 @@ SpellCastResult Spell::CheckCast(bool strict)
             return SPELL_FAILED_NOT_READY;
     }
 
-    if (m_spellInfo->HasAttribute(SPELL_ATTR7_DEBUG_SPELL) && !m_caster->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS))
+    if (m_spellInfo->HasAttribute(SPELL_ATTR7_DEBUG_SPELL) && !m_caster->HasUnitFlag2(UNIT_FLAG2_ALLOW_CHEAT_SPELLS))
     {
         m_customError = SPELL_CUSTOM_ERROR_GM_ONLY;
         return SPELL_FAILED_CUSTOM_ERROR;
@@ -5575,9 +5641,38 @@ SpellCastResult Spell::CheckCast(bool strict)
             if (m_spellInfo->HasAttribute(SPELL_ATTR0_CU_REQ_TARGET_FACING_CASTER) && !target->HasInArc(static_cast<float>(M_PI), m_caster))
                 return SPELL_FAILED_NOT_INFRONT;
 
-            if (m_caster->GetEntry() != WORLD_TRIGGER) // Ignore LOS for gameobjects casts (wrongly casted by a trigger)
-                if ((!m_caster->IsTotem() || !m_spellInfo->IsPositive()) && !m_spellInfo->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT) && !m_spellInfo->HasAttribute(SPELL_ATTR5_ALWAYS_AOE_LINE_OF_SIGHT) && !m_caster->IsWithinLOSInMap(target, LINEOFSIGHT_ALL_CHECKS) && !(m_spellFlags & SPELL_FLAG_REDIRECTED))
+            if ((!m_caster->IsTotem() || !m_spellInfo->IsPositive()) && !m_spellInfo->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT) &&
+                !m_spellInfo->HasAttribute(SPELL_ATTR5_ALWAYS_AOE_LINE_OF_SIGHT) && !(m_spellFlags & SPELL_FLAG_REDIRECTED))
+            {
+                WorldObject* losCenter = nullptr;
+                uint32 losChecks = LINEOFSIGHT_ALL_CHECKS;
+                if (m_originalCasterGUID.IsGameObject())
+                {
+                    losCenter = m_caster->GetMap()->GetGameObject(m_originalCasterGUID);
+                }
+                else if (m_caster->GetEntry() == WORLD_TRIGGER)
+                {
+                    if (TempSummon* tempSummon = m_caster->ToTempSummon())
+                    {
+                        losCenter = tempSummon->GetSummonerGameObject();
+                    }
+                }
+
+                if (losCenter)
+                {
+                    // If spell casted by gameobject then ignore M2 models
+                    losChecks &= ~LINEOFSIGHT_CHECK_GOBJECT_M2;
+                }
+                else
+                {
+                    losCenter = m_caster;
+                }
+
+                if (!losCenter->IsWithinLOSInMap(target, VMAP::ModelIgnoreFlags::M2, LineOfSightChecks(losChecks)))
+                {
                     return SPELL_FAILED_LINE_OF_SIGHT;
+                }
+            }
         }
     }
 
@@ -5587,8 +5682,38 @@ SpellCastResult Spell::CheckCast(bool strict)
         float x, y, z;
         m_targets.GetDstPos()->GetPosition(x, y, z);
 
-        if ((!m_caster->IsTotem() || !m_spellInfo->IsPositive()) && !m_spellInfo->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT) && !m_spellInfo->HasAttribute(SPELL_ATTR5_ALWAYS_AOE_LINE_OF_SIGHT) && !m_caster->IsWithinLOS(x, y, z, LINEOFSIGHT_ALL_CHECKS))
-            return SPELL_FAILED_LINE_OF_SIGHT;
+        if ((!m_caster->IsTotem() || !m_spellInfo->IsPositive()) && !m_spellInfo->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT) &&
+            !m_spellInfo->HasAttribute(SPELL_ATTR5_ALWAYS_AOE_LINE_OF_SIGHT))
+        {
+            WorldObject* losCenter = nullptr;
+            uint32 losChecks = LINEOFSIGHT_ALL_CHECKS;
+            if (m_originalCasterGUID.IsGameObject())
+            {
+                losCenter = m_caster->GetMap()->GetGameObject(m_originalCasterGUID);
+            }
+            else if (m_caster->GetEntry() == WORLD_TRIGGER)
+            {
+                if (TempSummon* tempSummon = m_caster->ToTempSummon())
+                {
+                    losCenter = tempSummon->GetSummonerGameObject();
+                }
+            }
+
+            if (losCenter)
+            {
+                // If spell casted by gameobject then ignore M2 models
+                losChecks &= ~LINEOFSIGHT_CHECK_GOBJECT_M2;
+            }
+            else
+            {
+                losCenter = m_caster;
+            }
+
+            if (!losCenter->IsWithinLOS(x, y, z, VMAP::ModelIgnoreFlags::M2, LineOfSightChecks((losChecks))))
+            {
+                return SPELL_FAILED_LINE_OF_SIGHT;
+            }
+        }
     }
 
     // check pet presence
@@ -5918,7 +6043,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (m_caster->GetTypeId() != TYPEID_PLAYER || !m_targets.GetUnitTarget() || m_targets.GetUnitTarget()->GetTypeId() != TYPEID_UNIT)
                         return SPELL_FAILED_BAD_TARGETS;
 
-                    if (!(m_targets.GetUnitTarget()->GetUInt32Value(UNIT_FIELD_FLAGS) & UNIT_FLAG_SKINNABLE))
+                    if (!(m_targets.GetUnitTarget()->GetUnitFlags() & UNIT_FLAG_SKINNABLE))
                         return SPELL_FAILED_TARGET_UNSKINNABLE;
 
                     Creature* creature = m_targets.GetUnitTarget()->ToCreature();
@@ -6377,6 +6502,14 @@ SpellCastResult Spell::CheckCast(bool strict)
                     }
                     break;
                 }
+            case SPELL_AURA_MOD_SHAPESHIFT:
+                {
+                    if (m_caster && m_caster->HasAura(23397)) // Nefarian Class Call (Warrior): Berserk -- Nefertum: I don't really like this but I didn't find another way.
+                    {
+                        return SPELL_FAILED_NOT_SHAPESHIFT;
+                    }
+                    break;
+                }
             default:
                 break;
         }
@@ -6508,7 +6641,7 @@ SpellCastResult Spell::CheckCasterAuras(bool preventionOnly) const
     // Check whether the cast should be prevented by any state you might have.
     SpellCastResult prevented_reason = SPELL_CAST_OK;
     // Have to check if there is a stun aura. Otherwise will have problems with ghost aura apply while logging out
-    uint32 unitflag = m_caster->GetUInt32Value(UNIT_FIELD_FLAGS);     // Get unit state
+    uint32 unitflag = m_caster->GetUnitFlags();     // Get unit state
 
     // Xinef: if spell is triggered check preventionType only
     if (!preventionOnly)
@@ -7560,7 +7693,7 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
 
     // xinef: skip los checking if spell has appropriate attribute, or target requires specific entry
     // this is only for target addition and target has to have unselectable flag, this is valid for FLAG_EXTRA_TRIGGER and quest triggers however there are some without this flag, used not_selectable
-    if (m_spellInfo->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT) || (target->GetTypeId() == TYPEID_UNIT && target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE) && (m_spellInfo->Effects[eff].TargetA.GetCheckType() == TARGET_CHECK_ENTRY || m_spellInfo->Effects[eff].TargetB.GetCheckType() == TARGET_CHECK_ENTRY)))
+    if (m_spellInfo->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT) || (target->GetTypeId() == TYPEID_UNIT && target->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) && (m_spellInfo->Effects[eff].TargetA.GetCheckType() == TARGET_CHECK_ENTRY || m_spellInfo->Effects[eff].TargetB.GetCheckType() == TARGET_CHECK_ENTRY)))
         return true;
 
      // if spell is triggered, need to check for LOS disable on the aura triggering it and inherit that behaviour
@@ -7576,7 +7709,7 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
     {
         case SPELL_EFFECT_RESURRECT_NEW:
             // player far away, maybe his corpse near?
-            if (target != m_caster && !target->IsWithinLOSInMap(m_caster, LINEOFSIGHT_ALL_CHECKS))
+            if (target != m_caster && !target->IsWithinLOSInMap(m_caster))
             {
                 if (!m_targets.GetCorpseTargetGUID())
                     return false;
@@ -7588,7 +7721,7 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
                 if (target->GetGUID() != corpse->GetOwnerGUID())
                     return false;
 
-                if (!corpse->IsWithinLOSInMap(m_caster, LINEOFSIGHT_ALL_CHECKS) && !(m_spellFlags & SPELL_FLAG_REDIRECTED))
+                if (!corpse->IsWithinLOSInMap(m_caster) && !(m_spellFlags & SPELL_FLAG_REDIRECTED))
                     return false;
             }
             break;
@@ -7596,7 +7729,7 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
             {
                 if (!m_targets.GetCorpseTargetGUID())
                 {
-                    if (target->IsWithinLOSInMap(m_caster, LINEOFSIGHT_ALL_CHECKS) && target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE))
+                    if (target->IsWithinLOSInMap(m_caster, VMAP::ModelIgnoreFlags::M2) && target->HasUnitFlag(UNIT_FLAG_SKINNABLE))
                         return true;
 
                     return false;
@@ -7612,7 +7745,7 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
                 if (!corpse->HasFlag(CORPSE_FIELD_FLAGS, CORPSE_FLAG_LOOTABLE))
                     return false;
 
-                if (!corpse->IsWithinLOSInMap(m_caster, LINEOFSIGHT_ALL_CHECKS))
+                if (!corpse->IsWithinLOSInMap(m_caster, VMAP::ModelIgnoreFlags::M2))
                     return false;
             }
             break;
@@ -7626,14 +7759,40 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
             if (target->ToPlayer()->getLevel() >= sWorld->getIntConfig(CONFIG_MAX_RECRUIT_A_FRIEND_BONUS_PLAYER_LEVEL))
                 return false;
             break;
-
-        default:                                            // normal case
-            // Get GO cast coordinates if original caster -> GO
-            WorldObject* caster = nullptr;
+        default: // normal case
+        {
+            uint32 losChecks = LINEOFSIGHT_ALL_CHECKS;
+            GameObject* gobCaster = nullptr;
             if (m_originalCasterGUID.IsGameObject())
-                caster = m_caster->GetMap()->GetGameObject(m_originalCasterGUID);
-            if (!caster)
+            {
+                gobCaster = m_caster->GetMap()->GetGameObject(m_originalCasterGUID);
+            }
+            else if (m_caster->GetEntry() == WORLD_TRIGGER)
+            {
+                if (TempSummon* tempSummon = m_caster->ToTempSummon())
+                {
+                    gobCaster = tempSummon->GetSummonerGameObject();
+                }
+            }
+
+            WorldObject* caster = nullptr;
+            if (gobCaster)
+            {
+                if (gobCaster->GetGOInfo()->IsIgnoringLOSChecks())
+                {
+                    return true;
+                }
+
+                caster = gobCaster;
+
+                // If spell casted by gameobject then ignore M2 models
+                losChecks &= ~LINEOFSIGHT_CHECK_GOBJECT_M2;
+            }
+            else
+            {
                 caster = m_caster;
+            }
+
             if (target != m_caster)
             {
                 if (m_targets.HasDst())
@@ -7642,13 +7801,18 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
                     float y = m_targets.GetDstPos()->GetPositionY();
                     float z = m_targets.GetDstPos()->GetPositionZ();
 
-                    if (!target->IsWithinLOS(x, y, z, LINEOFSIGHT_ALL_CHECKS))
+                    if (!target->IsWithinLOS(x, y, z, VMAP::ModelIgnoreFlags::M2, LineOfSightChecks(losChecks)))
+                    {
                         return false;
+                    }
                 }
-                else if (!target->IsWithinLOSInMap(caster, LINEOFSIGHT_ALL_CHECKS))
+                else if (!target->IsWithinLOSInMap(caster, VMAP::ModelIgnoreFlags::M2, LineOfSightChecks(losChecks)))
+                {
                     return false;
+                }
             }
             break;
+        }
     }
 
     return true;

@@ -25,6 +25,7 @@
 #include "InstanceScript.h"
 #include "Log.h"
 #include "ObjectMgr.h"
+#include "PetPackets.h"
 #include "Player.h"
 #include "QueryHolder.h"
 #include "ScriptMgr.h"
@@ -289,7 +290,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
     SetNativeDisplayId(petInfo->DisplayId);
     UpdatePositionData();
     uint8 petlevel = petInfo->Level;
-    SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+    ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
     SetName(petInfo->Name);
 
     switch (getPetType())
@@ -302,14 +303,14 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
             else
                 SetUInt32Value(UNIT_FIELD_BYTES_0, 0x800); // class = mage
 
-            SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED); // this enables popup window (pet dismiss, cancel)
+            ReplaceAllUnitFlags(UNIT_FLAG_PLAYER_CONTROLLED); // this enables popup window (pet dismiss, cancel)
             break;
         case HUNTER_PET:
             SetUInt32Value(UNIT_FIELD_BYTES_0, 0x02020100); // class = warrior, gender = none, power = focus
             SetSheath(SHEATH_STATE_MELEE);
             SetByteFlag(UNIT_FIELD_BYTES_2, 2, petInfo->WasRenamed ? UNIT_CAN_BE_ABANDONED : UNIT_CAN_BE_RENAMED | UNIT_CAN_BE_ABANDONED);
 
-            SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+            ReplaceAllUnitFlags(UNIT_FLAG_PLAYER_CONTROLLED);
                                                             // this enables popup window (pet abandon, cancel)
             SetMaxPower(POWER_HAPPINESS, GetCreatePowers(POWER_HAPPINESS));
             SetPower(POWER_HAPPINESS, petInfo->Happiness);
@@ -620,20 +621,20 @@ void Pet::setDeathState(DeathState s, bool /*despawn = false*/)                 
         if (getPetType() == HUNTER_PET)
         {
             // pet corpse non lootable and non skinnable
-            SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_NONE);
-            RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
+            ReplaceAllDynamicFlags(UNIT_DYNFLAG_NONE);
+            RemoveUnitFlag(UNIT_FLAG_SKINNABLE);
 
             //lose happiness when died and not in BG/Arena
             MapEntry const* mapEntry = sMapStore.LookupEntry(GetMapId());
             if (!mapEntry || (mapEntry->map_type != MAP_ARENA && mapEntry->map_type != MAP_BATTLEGROUND))
                 ModifyPower(POWER_HAPPINESS, -HAPPINESS_LEVEL_SIZE);
 
-            //SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+            //SetUnitFlag(UNIT_FLAG_STUNNED);
         }
     }
     else if (getDeathState() == ALIVE)
     {
-        //RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+        //RemoveUnitFlag(UNIT_FLAG_STUNNED);
         CastPetAuras(true);
     }
 }
@@ -990,7 +991,7 @@ bool Pet::CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phas
     SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, 0);
     SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
     SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, uint32(sObjectMgr->GetXPForLevel(getLevel() + 1)* sWorld->getRate(RATE_XP_PET_NEXT_LEVEL)));
-    SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+    ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
 
     if (cinfo->type == CREATURE_TYPE_BEAST)
     {
@@ -1863,10 +1864,10 @@ bool Pet::learnSpell(uint32 spell_id)
 
     if (!m_loading)
     {
-        WorldPacket data(SMSG_PET_LEARNED_SPELL, 4);
-        data << uint32(spell_id);
-        GetOwner()->GetSession()->SendPacket(&data);
-        GetOwner()->PetSpellInitialize();
+        WorldPackets::Pet::PetLearnedSpell packet;
+        packet.SpellID = spell_id;
+        m_owner->SendDirectMessage(packet.Write());
+        m_owner->PetSpellInitialize();
     }
 
     return true;
@@ -1917,9 +1918,9 @@ bool Pet::unlearnSpell(uint32 spell_id, bool learn_prev, bool clear_ab)
     {
         if (!m_loading)
         {
-            WorldPacket data(SMSG_PET_REMOVED_SPELL, 4);
-            data << uint32(spell_id);
-            GetOwner()->GetSession()->SendPacket(&data);
+            WorldPackets::Pet::PetUnlearnedSpell packet;
+            packet.SpellID = spell_id;
+            m_owner->SendDirectMessage(packet.Write());
         }
 
         return true;
@@ -2179,25 +2180,22 @@ uint8 Pet::GetMaxTalentPointsForLevel(uint8 level)
 
 void Pet::ToggleAutocast(SpellInfo const* spellInfo, bool apply)
 {
+    ASSERT(spellInfo);
+
     if (!spellInfo->IsAutocastable())
         return;
 
-    uint32 spellid = spellInfo->Id;
-
-    PetSpellMap::iterator itr = m_spells.find(spellid);
+    PetSpellMap::iterator itr = m_spells.find(spellInfo->Id);
     if (itr == m_spells.end())
         return;
 
-    uint32 i;
+    auto autospellItr = std::find(m_autospells.begin(), m_autospells.end(), spellInfo->Id);
 
     if (apply)
     {
-        for (i = 0; i < m_autospells.size() && m_autospells[i] != spellid; ++i)
-            ;                                               // just search
-
-        if (i == m_autospells.size())
+        if (autospellItr == m_autospells.end())
         {
-            m_autospells.push_back(spellid);
+            m_autospells.push_back(spellInfo->Id);
 
             if (itr->second.active != ACT_ENABLED)
             {
@@ -2209,13 +2207,9 @@ void Pet::ToggleAutocast(SpellInfo const* spellInfo, bool apply)
     }
     else
     {
-        AutoSpellList::iterator itr2 = m_autospells.begin();
-        for (i = 0; i < m_autospells.size() && m_autospells[i] != spellid; ++i, ++itr2)
-            ;                                               // just search
-
-        if (i < m_autospells.size())
+        if (autospellItr != m_autospells.end())
         {
-            m_autospells.erase(itr2);
+            m_autospells.erase(autospellItr);
             if (itr->second.active != ACT_DISABLED)
             {
                 itr->second.active = ACT_DISABLED;
@@ -2265,7 +2259,7 @@ bool Pet::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32
         return false;
 
     // Force regen flag for player pets, just like we do for players themselves
-    SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_REGENERATE_POWER);
+    SetUnitFlag2(UNIT_FLAG2_REGENERATE_POWER);
     SetSheath(SHEATH_STATE_MELEE);
 
     return true;

@@ -184,7 +184,7 @@ enum SpellCustomAttributes
     SPELL_ATTR0_CU_DIRECT_DAMAGE                 = 0x00000100,
     SPELL_ATTR0_CU_CHARGE                        = 0x00000200,
     SPELL_ATTR0_CU_PICKPOCKET                    = 0x00000400,
-    SPELL_ATTR0_CU_NONE4                         = 0x00000800,   // UNUSED
+    SPELL_ATTR0_CU_IGNORE_EVADE                  = 0x00000800,
     SPELL_ATTR0_CU_NEGATIVE_EFF0                 = 0x00001000,
     SPELL_ATTR0_CU_NEGATIVE_EFF1                 = 0x00002000,
     SPELL_ATTR0_CU_NEGATIVE_EFF2                 = 0x00004000,
@@ -377,6 +377,7 @@ public:
     std::array<uint32, 2> SpellVisual;
     uint32 SpellIconID;
     uint32 ActiveIconID;
+    uint32 SpellPriority;
     std::array<char const*, 16> SpellName;
     std::array<char const*, 16> Rank;
     uint32 MaxTargetLevel;

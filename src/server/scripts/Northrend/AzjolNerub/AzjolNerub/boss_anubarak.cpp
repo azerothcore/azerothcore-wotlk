@@ -83,10 +83,10 @@ class boss_anub_arak : public CreatureScript
 
             bool intro;
 
-            void EnterEvadeMode() override
+            void EnterEvadeMode(EvadeReason why) override
             {
                 me->DisableRotate(false);
-                BossAI::EnterEvadeMode();
+                BossAI::EnterEvadeMode(why);
             }
 
             void MoveInLineOfSight(Unit* who) override
@@ -124,7 +124,7 @@ class boss_anub_arak : public CreatureScript
             void Reset() override
             {
                 BossAI::Reset();
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
                 instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
             }
 
@@ -194,7 +194,7 @@ class boss_anub_arak : public CreatureScript
                             Talk(SAY_SUBMERGE);
                             me->CastSpell(me, SPELL_IMPALE_PERIODIC, true);
                             me->CastSpell(me, SPELL_SUBMERGE, false);
-                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
+                            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
 
                             events.DelayEvents(46000, 0);
                             events.ScheduleEvent(EVENT_EMERGE, 45000);
@@ -212,7 +212,7 @@ class boss_anub_arak : public CreatureScript
                         me->CastSpell(me, SPELL_EMERGE, true);
                         me->RemoveAura(SPELL_SUBMERGE);
                         me->RemoveAura(SPELL_IMPALE_PERIODIC);
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
                         break;
                     case EVENT_SUMMON_ASSASSINS:
                         SummonHelpers(509.32f, 247.42f, 239.48f, SPELL_SUMMON_ASSASSIN);
@@ -230,7 +230,7 @@ class boss_anub_arak : public CreatureScript
                         break;
                 }
 
-                if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+                if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                     DoMeleeAttackIfReady();
             }
         };

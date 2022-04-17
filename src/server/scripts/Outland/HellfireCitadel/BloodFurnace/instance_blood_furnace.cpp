@@ -240,7 +240,7 @@ public:
         {
             if (!prisoner->IsAlive())
                 prisoner->Respawn(true);
-            prisoner->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
+            prisoner->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
         }
 
         void StorePrisoner(Creature* creature)
@@ -316,7 +316,7 @@ public:
             for (ObjectGuid const& guid : prisoners)
                 if (Creature* prisoner = instance->GetCreature(guid))
                 {
-                    prisoner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
+                    prisoner->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
                     prisoner->SetInCombatWithZone();
                 }
         }

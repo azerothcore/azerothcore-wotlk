@@ -72,17 +72,17 @@ public:
                 case GO_FIRE_OF_AKU_MAI_4:
                     if (_encounters[TYPE_AKU_MAI_EVENT] == DONE)
                     {
-                        gameobject->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
+                        gameobject->SetGameObjectFlag(GO_FLAG_IN_USE);
                         gameobject->SetGoState(GO_STATE_ACTIVE);
                     }
                     break;
                 case GO_SHRINE_OF_GELIHAST:
                     if (_encounters[TYPE_GELIHAST] == DONE)
-                        gameobject->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        gameobject->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
                 case GO_ALTAR_OF_THE_DEEPS:
                     if (_encounters[TYPE_AKU_MAI] == DONE)
-                        gameobject->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        gameobject->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
                 case GO_AKU_MAI_DOOR:
                     if (IsFireEventDone() && _encounters[TYPE_AKU_MAI_EVENT] == DONE)

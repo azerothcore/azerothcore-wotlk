@@ -225,7 +225,7 @@ public:
             me->GetMotionMaster()->MoveFollow(summoner, 0.f, 0.f);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             if (Creature* flamelasher = ObjectAccessor::GetCreature(*me, _flamelasherGUID))
             {

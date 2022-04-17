@@ -82,7 +82,7 @@ public:
         {
             BossAI::Reset();
             me->SetReactState(REACT_AGGRESSIVE);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetVisible(true);
         }
 
@@ -102,9 +102,9 @@ public:
             if (damage >= me->GetHealth())
             {
                 damage = 0;
-                if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+                if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 {
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->RemoveAllAuras();
                     me->CastSpell(me, SPELL_OPEN_ALL_PORTALS, true);
                     events.ScheduleEvent(EVENT_SUMMON_ENTROPIUS, 7000);
@@ -176,12 +176,12 @@ public:
             me->SetReactState(REACT_PASSIVE);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (InstanceScript* instance = me->GetInstanceScript())
                 if (Creature* muru = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_MURU)))
                     if (!muru->IsInEvadeMode())
-                        muru->AI()->EnterEvadeMode();
+                        muru->AI()->EnterEvadeMode(why);
 
             me->DespawnOrUnsummon();
         }

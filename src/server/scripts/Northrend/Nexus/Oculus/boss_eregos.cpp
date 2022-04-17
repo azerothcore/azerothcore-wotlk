@@ -93,9 +93,9 @@ public:
             {
                 pInstance->SetData(DATA_EREGOS, NOT_STARTED);
                 if( pInstance->GetData(DATA_UROM) != DONE )
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 else
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             }
 
             events.Reset();

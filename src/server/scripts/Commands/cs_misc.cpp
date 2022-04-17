@@ -31,6 +31,7 @@
 #include "LFG.h"
 #include "Language.h"
 #include "MapMgr.h"
+#include "MiscPackets.h"
 #include "MovementGenerator.h"
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
@@ -118,6 +119,7 @@ public:
             { "setskill",          HandleSetSkillCommand,          SEC_GAMEMASTER,         Console::No  },
             { "pinfo",             HandlePInfoCommand,             SEC_GAMEMASTER,         Console::Yes },
             { "respawn",           HandleRespawnCommand,           SEC_GAMEMASTER,         Console::No  },
+            { "respawn all",       HandleRespawnAllCommand,        SEC_GAMEMASTER,         Console::No  },
             { "mute",              HandleMuteCommand,              SEC_GAMEMASTER,         Console::Yes },
             { "mutehistory",       HandleMuteInfoCommand,          SEC_GAMEMASTER,         Console::Yes },
             { "unmute",            HandleUnmuteCommand,            SEC_GAMEMASTER,         Console::Yes },
@@ -411,7 +413,7 @@ public:
             return false;
         }
 
-        Battleground* bg = sBattlegroundMgr->CreateNewBattleground(randomizedArenaBgTypeId, 80, 80, ArenaType(hcnt >= 2 ? hcnt : 2), false);
+        Battleground* bg = sBattlegroundMgr->CreateNewBattleground(randomizedArenaBgTypeId, GetBattlegroundBracketById(bgt->GetMapId(), bgt->GetBracketId()), ArenaType(hcnt >= 2 ? hcnt : 2), false);
         if (!bg)
         {
             handler->PSendSysMessage("Couldn't create arena map!");
@@ -437,6 +439,9 @@ public:
             WorldPacket data;
             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_IN_PROGRESS, 0, bg->GetStartTime(), bg->GetArenaType(), teamId);
             player->GetSession()->SendPacket(&data);
+
+            // Remove from LFG queues
+            sLFGMgr->LeaveAllLfgQueues(player->GetGUID(), false);
 
             player->SetBattlegroundId(bg->GetInstanceID(), bgTypeId, queueSlot, true, false, teamId);
             sBattlegroundMgr->SendToBattleground(player, bg->GetInstanceID(), bgTypeId);
@@ -2329,7 +2334,6 @@ public:
     {
         Player* player = handler->GetSession()->GetPlayer();
 
-        // accept only explicitly selected target (not implicitly self targeting case)
         Unit* target = handler->getSelectedUnit();
         if (player->GetTarget() && target)
         {
@@ -2346,6 +2350,15 @@ public:
             }
             return true;
         }
+
+        handler->SendSysMessage(LANG_SELECT_CREATURE);
+        handler->SetSentErrorMessage(true);
+        return false;
+    }
+
+    static bool HandleRespawnAllCommand(ChatHandler* handler)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
 
         CellCoord p(Acore::ComputeCellCoord(player->GetPositionX(), player->GetPositionY()));
         Cell cell(p);
@@ -2888,9 +2901,7 @@ public:
             return false;
         }
 
-        WorldPacket data(SMSG_PLAY_SOUND, 4);
-        data << uint32(soundId);
-        sWorld->SendGlobalMessage(&data);
+        sWorld->SendGlobalMessage(WorldPackets::Misc::Playsound(soundId).Write());
 
         handler->PSendSysMessage(LANG_COMMAND_PLAYED_TO_ALL, soundId);
         return true;

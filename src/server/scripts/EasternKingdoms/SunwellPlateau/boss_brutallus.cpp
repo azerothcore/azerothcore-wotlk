@@ -217,7 +217,7 @@ public:
             bool appear = instance->GetBossState(DATA_BRUTALLUS) != DONE && instance->GetBossState(DATA_MADRIGOSA) == DONE;
             creature->SetVisible(appear);
             creature->SetStandState(UNIT_STAND_STATE_DEAD);
-            creature->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+            creature->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
         }
 
         EventMap events;
@@ -229,7 +229,7 @@ public:
             {
                 me->SetDisableGravity(true);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
-                me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
                 me->NearTeleportTo(1570.97f, 725.51f, 79.77f, 3.82f);
                 events.ScheduleEvent(EVENT_MAD_1, 2000);
             }
@@ -361,7 +361,7 @@ public:
                     break;
                 case EVENT_MAD_18:
                     Talk(SAY_MAD_5);
-                    me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                    me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
                     me->SetStandState(UNIT_STAND_STATE_DEAD);
                     events.ScheduleEvent(EVENT_MAD_19, 6000);
                     break;
@@ -371,7 +371,7 @@ public:
                     events.ScheduleEvent(EVENT_MAD_20, 7000);
                     break;
                 case EVENT_MAD_20:
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->SetFaction(FACTION_FRIENDLY);
                     if (Creature* brutallus = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BRUTALLUS)))
                     {
