@@ -203,7 +203,7 @@ void HttpManager::HttpWorkerThread()
         }
         catch (const std::exception& ex)
         {
-            LOG_ERROR("server", "[HttpManager] HTTP request error: %s", ex.what());
+            LOG_ERROR("server", "[HttpManager] HTTP request error: {}", ex.what());
         }
 
         delete req;
