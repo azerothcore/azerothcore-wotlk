@@ -106,3 +106,13 @@ UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Azaloth liberado' WHERE `
 UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Escuchar los planes de los ogros Machacasangre' WHERE `ID` = 10714 AND `locale` IN ('esES','esMX');
 UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Envenenar el barril de grog de punto verde' WHERE `ID` = 10720 AND `locale` IN ('esES','esMX');
 UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Coloca Tótems repelentes' WHERE `ID` = 10723 AND `locale` IN ('esES','esMX');
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Filo de las Sombras alimentado con almas' WHERE `ID` = 24547 AND `locale` IN ('esES','esMX');
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Captura La Dominancia' WHERE `ID` = 13411 AND `locale` IN ('esES','esMX');
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Captura La Dominancia' WHERE `ID` = 13410 AND `locale` IN ('esES','esMX');
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Captura La Dominancia' WHERE `ID` = 13409 AND `locale` IN ('esES','esMX');
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Captura La Dominancia' WHERE `ID` = 13408 AND `locale` IN ('esES','esMX');
+UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Cruzado Escarlata asesinada' WHERE `ID` = 12678 AND `locale` IN ('esES','esMX');
+
+
+
+
