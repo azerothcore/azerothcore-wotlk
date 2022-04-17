@@ -149,6 +149,7 @@ void HttpManager::HttpWorkerThread()
         {
             break;
         }
+
         if (!workQueue.Peek())
         {
             continue;
