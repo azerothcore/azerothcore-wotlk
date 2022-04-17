@@ -31,7 +31,7 @@ public:
         {
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAIL_SERVER_CHARACTER);
             stmt->SetData(0, player->GetGUID().GetCounter());
-            stmt->SerData(1, servMail.second.id);
+            stmt->SetData(1, servMail.second.id);
 
             PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
