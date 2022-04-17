@@ -308,11 +308,11 @@ public:
             events.Reset();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (me->GetReactState() == REACT_PASSIVE)
                 return;
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void AttackStart(Unit* who) override

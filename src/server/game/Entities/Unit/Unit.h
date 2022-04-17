@@ -1360,6 +1360,7 @@ public:
     void CombatStop(bool includingCast = false);
     void CombatStopWithPets(bool includingCast = false);
     void StopAttackFaction(uint32 faction_id);
+    void StopAttackingInvalidTarget();
     Unit* SelectNearbyTarget(Unit* exclude = nullptr, float dist = NOMINAL_MELEE_RANGE) const;
     Unit* SelectNearbyNoTotemTarget(Unit* exclude = nullptr, float dist = NOMINAL_MELEE_RANGE) const;
     void SendMeleeAttackStop(Unit* victim = nullptr);

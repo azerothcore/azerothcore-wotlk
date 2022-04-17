@@ -4495,13 +4495,25 @@ void Spell::SendSpellStart()
     if (m_spellInfo->RuneCostID && m_spellInfo->PowerType == POWER_RUNE)
         castFlags |= CAST_FLAG_NO_GCD; // not needed, but Blizzard sends it
 
+    PackedGuid realCasterGUID = m_caster->GetPackGUID();
+    if (TempSummon const* tempSummon = m_caster->ToTempSummon())
+    {
+        if (tempSummon->GetEntry() == WORLD_TRIGGER)
+        {
+            if (GameObject* casterGameobject = tempSummon->GetSummonerGameObject())
+            {
+                realCasterGUID = casterGameobject->GetPackGUID();
+            }
+        }
+    }
+
     WorldPacket data(SMSG_SPELL_START, (8 + 8 + 4 + 4 + 2));
     if (m_CastItem)
         data << m_CastItem->GetPackGUID();
     else
-        data << m_caster->GetPackGUID();
+        data << realCasterGUID;
 
-    data << m_caster->GetPackGUID();
+    data << realCasterGUID;
     data << uint8(m_cast_count);                            // pending spell cast?
     data << uint32(m_spellInfo->Id);                        // spellId
     data << uint32(castFlags);                              // cast flags
@@ -4581,14 +4593,26 @@ void Spell::SendSpellGo()
     if (!m_spellInfo->StartRecoveryTime)
         castFlags |= CAST_FLAG_NO_GCD;
 
+    PackedGuid realCasterGUID = m_caster->GetPackGUID();
+    if (TempSummon const* tempSummon = m_caster->ToTempSummon())
+    {
+        if (tempSummon->GetEntry() == WORLD_TRIGGER)
+        {
+            if (GameObject* casterGameobject = tempSummon->GetSummonerGameObject())
+            {
+                realCasterGUID = casterGameobject->GetPackGUID();
+            }
+        }
+    }
+
     WorldPacket data(SMSG_SPELL_GO, 150);                    // guess size
 
     if (m_CastItem)
         data << m_CastItem->GetPackGUID();
     else
-        data << m_caster->GetPackGUID();
+        data << realCasterGUID;
 
-    data << m_caster->GetPackGUID();
+    data << realCasterGUID;
     data << uint8(m_cast_count);                            // pending spell cast?
     data << uint32(m_spellInfo->Id);                        // spellId
     data << uint32(castFlags);                              // cast flags

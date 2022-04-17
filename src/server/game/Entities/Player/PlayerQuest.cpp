@@ -1616,24 +1616,24 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
             continue;
 
         QuestStatus status = GetQuestStatus(questId);
-        if ((status == QUEST_STATUS_COMPLETE && !GetQuestRewardStatus(questId)) || (quest->IsAutoComplete() && CanTakeQuest(quest, false)))
+        if (status == QUEST_STATUS_COMPLETE && !GetQuestRewardStatus(questId))
         {
-            if (quest->IsRepeatable() || quest->IsDailyOrWeekly())
-            {
-                 result2 = DIALOG_STATUS_REWARD_REP;
-            }
-            else
-            {
-                result2 = DIALOG_STATUS_REWARD;
-            }
+            result2 = DIALOG_STATUS_REWARD;
         }
         else if (status == QUEST_STATUS_INCOMPLETE)
         {
             result2 = DIALOG_STATUS_INCOMPLETE;
         }
 
+        if (quest->IsAutoComplete() && CanTakeQuest(quest, false) && quest->IsRepeatable() && !quest->IsDailyOrWeekly())
+        {
+            result2 = DIALOG_STATUS_REWARD_REP;
+        }
+
         if (result2 > result)
+        {
             result = result2;
+        }
     }
 
     for (QuestRelations::const_iterator i = qr.first; i != qr.second; ++i)

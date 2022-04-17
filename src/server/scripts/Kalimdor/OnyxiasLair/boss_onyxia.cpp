@@ -294,7 +294,7 @@ public:
         }
     }
 
-    bool CheckInRoom()
+    bool CheckInRoom() override
     {
         if (me->GetDistance2d(me->GetHomePosition().GetPositionX(), me->GetHomePosition().GetPositionY()) > 95.0f)
         {
