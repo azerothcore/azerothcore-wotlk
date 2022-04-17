@@ -20,6 +20,7 @@
 
 #include "Define.h"
 #include "DetourNavMesh.h"
+#include "EnumFlag.h"
 #include <cassert>
 
 float const GROUND_HEIGHT_TOLERANCE = 0.05f; // Extra tolerance to z position to check if it is in air or on ground.
@@ -1570,7 +1571,7 @@ enum GameobjectTypes
 #define MAX_GAMEOBJECT_TYPE                  36             // sending to client this or greater value can crash client.
 #define MAX_GAMEOBJECT_DATA                  24             // Max number of uint32 vars in gameobject_template data field
 
-enum GameObjectFlags
+enum GameObjectFlags : uint32
 {
     GO_FLAG_IN_USE          = 0x00000001,                   // disables interaction while animated
     GO_FLAG_LOCKED          = 0x00000002,                   // require key, spell, event, etc to be opened. Makes "Locked" appear in tooltip
@@ -1582,6 +1583,8 @@ enum GameObjectFlags
     GO_FLAG_DAMAGED         = 0x00000200,
     GO_FLAG_DESTROYED       = 0x00000400,
 };
+
+DEFINE_ENUM_FLAG(GameObjectFlags);
 
 enum GameObjectDynamicLowFlags
 {
@@ -3407,13 +3410,20 @@ enum PvPTeamId
     PVP_TEAM_NEUTRAL     = 2  // Battleground: Neutral,  Arena: None
 };
 
+uint8 constexpr PVP_TEAMS_COUNT = 2;
+
 inline PvPTeamId GetPvPTeamId(TeamId teamId)
 {
     return teamId == TEAM_ALLIANCE ? PVP_TEAM_ALLIANCE : PVP_TEAM_HORDE;
 }
 
+inline TeamId GetTeamId(PvPTeamId teamId)
+{
+    return teamId == PVP_TEAM_ALLIANCE ? TEAM_ALLIANCE : TEAM_HORDE;
+}
+
 // indexes of BattlemasterList.dbc
-enum BattlegroundTypeId
+enum BattlegroundTypeId : uint8
 {
     BATTLEGROUND_TYPE_NONE     = 0, // None
     BATTLEGROUND_AV            = 1, // Alterac Valley
@@ -3553,7 +3563,7 @@ enum DuelCompleteType
 };
 
 // handle the queue types and bg types separately to enable joining queue for different sized arenas at the same time
-enum BattlegroundQueueTypeId
+enum BattlegroundQueueTypeId : uint8
 {
     BATTLEGROUND_QUEUE_NONE      = 0,
     BATTLEGROUND_QUEUE_AV        = 1,

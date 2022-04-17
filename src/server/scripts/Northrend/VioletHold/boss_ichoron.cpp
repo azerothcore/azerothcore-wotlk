@@ -101,7 +101,7 @@ public:
             bIsFrenzy = false;
             uiDrainedTimer = 15000;
             uiWaterBoltVolleyTimer = urand(7000, 12000);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetDisplayId(me->GetNativeDisplayId());
         }
 
@@ -138,7 +138,7 @@ public:
                 me->CastSpell(me, SPELL_PROTECTIVE_BUBBLE, true);
             }
 
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetDisplayId(me->GetNativeDisplayId());
         }
 
@@ -191,7 +191,7 @@ public:
                         me->CastSpell(me, SPELL_DRAINED, true);
                         bIsExploded = true;
                         uiDrainedTimer = 15000;
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         me->SetDisplayId(11686);
                         for (uint8 i = 0; i < MAX_SPAWN_LOC; ++i)
                         {
@@ -273,7 +273,7 @@ public:
         {
             Talk(SAY_DEATH);
             bIsExploded = false;
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetDisplayId(me->GetNativeDisplayId());
             globules.DespawnAll();
             if (pInstance)
@@ -289,10 +289,11 @@ public:
 
         void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            ScriptedAI::EnterEvadeMode();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            ScriptedAI::EnterEvadeMode(why);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+
             if (pInstance)
                 pInstance->SetData(DATA_FAILED, 1);
         }

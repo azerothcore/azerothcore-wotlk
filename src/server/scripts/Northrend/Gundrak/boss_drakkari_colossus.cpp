@@ -124,8 +124,8 @@ public:
             for (uint8 i = 0; i < 5; i++)
                 me->SummonCreature(NPC_LIVING_MOJO, mojoPosition[i].GetPositionX(), mojoPosition[i].GetPositionY(), mojoPosition[i].GetPositionZ(), 0, TEMPSUMMON_MANUAL_DESPAWN, 0);
 
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void InitializeAI() override
@@ -178,7 +178,7 @@ public:
             summons.Despawn(summon);
             if (summon->GetEntry() == NPC_DRAKKARI_ELEMENTAL)
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->RemoveAurasDueToSpell(SPELL_FREEZE_ANIM);
                 if (me->GetVictim())
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
@@ -196,7 +196,7 @@ public:
             if (!UpdateVictim())
                 return;
 
-            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 return;
 
             events.Update(diff);
@@ -204,7 +204,7 @@ public:
             {
                 case EVENT_COLOSSUS_START_FIGHT:
                     me->RemoveAurasDueToSpell(SPELL_FREEZE_ANIM);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     break;
                 case EVENT_COLOSSUS_MIGHTY_BLOW:
                     me->CastSpell(me->GetVictim(), SPELL_MIGHTY_BLOW, false);
@@ -215,7 +215,7 @@ public:
                     {
                         me->CastSpell(me, SPELL_EMERGE, false);
                         me->CastSpell(me, SPELL_EMERGE_SUMMON, true);
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         me->GetMotionMaster()->Clear();
                         break;
                     }
@@ -226,7 +226,7 @@ public:
                     {
                         me->CastSpell(me, SPELL_EMERGE, false);
                         me->CastSpell(me, SPELL_EMERGE_SUMMON, true);
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         me->GetMotionMaster()->Clear();
                         break;
                     }

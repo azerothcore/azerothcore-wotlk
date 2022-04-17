@@ -73,7 +73,7 @@ void LoadRandomEnchantmentsTable()
     }
     else
     {
-        LOG_ERROR("sql.sql", ">> Loaded 0 Item Enchantment definitions. DB table `item_enchantment_template` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 Item Enchantment definitions. DB table `item_enchantment_template` is empty.");
         LOG_INFO("server.loading", " ");
     }
 }

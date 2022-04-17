@@ -269,8 +269,8 @@ public:
                 if (creature)
                 {
                     creature->CastSpell(creature, SPELL_SPIRIT_AURA, true);
-                    creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    creature->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    creature->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     SpiritGUID[i] = creature->GetGUID();
                 }
             }
@@ -336,7 +336,7 @@ public:
                             {
                                 Vortex->CastSpell(Vortex, SPELL_CYCLONE_PASSIVE, true);
                                 Vortex->CastSpell(Vortex, SPELL_CYCLONE_VISUAL, true);
-                                Vortex->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                                Vortex->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                                 Vortex->SetSpeed(MOVE_RUN, 1.0f);
                                 Vortex->AI()->AttackStart(SelectTarget(SelectTargetMethod::Random, 0));
                                 DoZoneInCombat(Vortex);

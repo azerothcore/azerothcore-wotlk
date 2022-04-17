@@ -222,7 +222,7 @@ public:
                     break;
                 case EVENT_OUTRO_DH:
                     me->GetMotionMaster()->MoveTargetedHome();
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     _events.Reset();
                     break;
             }
@@ -261,7 +261,7 @@ public:
         {
             case GOSSIP_ACTION_INFO_DEF:
                 CloseGossipMenuFor(player);
-                creature->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+                creature->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
                 creature->AI()->SetData(ACTION_SHANDY_INTRO, 0);
                 break;
         }
@@ -433,7 +433,7 @@ public:
     {
         npc_mageguard_dalaranAI(Creature* creature) : ScriptedAI(creature)
         {
-            creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            creature->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_NORMAL, true);
             creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_MAGIC, true);
         }

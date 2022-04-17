@@ -229,7 +229,7 @@ public:
         CloseGossipMenuFor(player);
 
         creature->AI()->DoAction(instance->GetData(DATA_ESCORT_PROGRESS));
-        creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+        creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
         return true;
     }
 
@@ -365,7 +365,7 @@ public:
 
                     SetEscortPaused(true);
                     SetRun(true);
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     break;
                 case 64:
                     SetRun(false);
@@ -413,7 +413,7 @@ public:
                     break;
                 case 103:
                     if (Creature* erozion = summons.GetCreatureWithEntry(NPC_EROZION))
-                        erozion->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                        erozion->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                     instance->SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_FINISHED);
                     me->SetVisible(false);
                     break;
@@ -468,7 +468,7 @@ public:
             combatEvents.Reset();
             summons.DespawnAll();
 
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
             instance->SetData(DATA_THRALL_REPOSITION, 1);
 
             uint32 data = instance->GetData(DATA_ESCORT_PROGRESS);
@@ -615,12 +615,12 @@ public:
                     break;
                 case EVENT_THRALL_TALK:
                     Talk(SAY_MEET_TARETHA);
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     break;
                 case EVENT_SUMMON_CHRONO:
                     if (Creature* epoch = me->SummonCreature(NPC_EPOCH_HUNTER, 2640.49f, 696.15f, 64.31f, 4.51f, TEMPSUMMON_MANUAL_DESPAWN))
                     {
-                        epoch->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        epoch->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                         epoch->AI()->Talk(SAY_EPOCH_ENTER1);
                     }
                     break;
@@ -703,7 +703,7 @@ public:
                 case EVENT_CALL_EPOCH:
                     if (Creature* epoch = summons.GetCreatureWithEntry(NPC_EPOCH_HUNTER))
                     {
-                        epoch->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        epoch->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                         epoch->GetMotionMaster()->MovePoint(0, *me, false, true);
                     }
                     break;
@@ -730,7 +730,7 @@ public:
                     break;
                 case EVENT_SUMMON_EROZION:
                     if (Creature* erozion = me->SummonCreature(NPC_EROZION, 2646.31f, 680.01f, 55.36f, 3.76f, TEMPSUMMON_MANUAL_DESPAWN))
-                        erozion->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+                        erozion->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
                     break;
                 case EVENT_EROZION_TALK_1:
                     if (Creature* erozion = summons.GetCreatureWithEntry(NPC_EROZION))
@@ -759,7 +759,7 @@ public:
                     Talk(SAY_EVENT_COMPLETE);
                     break;
                 case EVENT_THRALL_RUN_AWAY:
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     me->SetReactState(REACT_PASSIVE);
                     SetEscortPaused(false);
                     break;
@@ -808,7 +808,7 @@ public:
             SetEscortPaused(true);
             SetDespawnAtEnd(false);
 
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
 
             if (data < ENCOUNTER_PROGRESS_THRALL_ARMORED)
             {
@@ -903,7 +903,7 @@ public:
 
         void Reset() override
         {
-            me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+            me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
             me->CastSpell(me, SPELL_SHADOW_PRISON, true);
         }
 

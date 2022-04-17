@@ -70,7 +70,7 @@ public:
             BossAI::InitializeAI();
             if (instance)
                 if (Creature* executioner = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_EXECUTIONER)))
-                    executioner->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    executioner->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -80,7 +80,7 @@ public:
 
             if (instance)
                 if (Creature* executioner = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_EXECUTIONER)))
-                    executioner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    executioner->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         }
 
         void EnterCombat(Unit*  /*who*/) override

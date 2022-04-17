@@ -48,7 +48,7 @@ void SystemMgr::LoadScriptWaypoints()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 Script Waypoints. DB table `script_waypoint` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 Script Waypoints. DB table `script_waypoint` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }

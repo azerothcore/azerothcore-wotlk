@@ -16,6 +16,7 @@
  */
 
 #include "BattlegroundRV.h"
+#include "ArenaScore.h"
 #include "Battleground.h"
 #include "GameObject.h"
 #include "Language.h"
@@ -35,24 +36,16 @@ BattlegroundRV::BattlegroundRV()
 {
     BgObjects.resize(BG_RV_OBJECT_MAX);
 
-    StartDelayTimes[BG_STARTING_EVENT_FIRST]  = BG_START_DELAY_1M;
-    StartDelayTimes[BG_STARTING_EVENT_SECOND] = BG_START_DELAY_30S;
-    StartDelayTimes[BG_STARTING_EVENT_THIRD]  = BG_START_DELAY_15S;
-    StartDelayTimes[BG_STARTING_EVENT_FOURTH] = BG_START_DELAY_NONE;
-    StartMessageIds[BG_STARTING_EVENT_FIRST]  = LANG_ARENA_ONE_MINUTE;
-    StartMessageIds[BG_STARTING_EVENT_SECOND] = LANG_ARENA_THIRTY_SECONDS;
-    StartMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_ARENA_FIFTEEN_SECONDS;
-    StartMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_ARENA_HAS_BEGUN;
-
-    CheckPlayersTimer = 0;
+    _checkPlayersTimer = 0;
+    _timer = 0s;
+    _state = 0;
 }
-
-BattlegroundRV::~BattlegroundRV() { }
 
 void BattlegroundRV::TeleportUnitToNewZ(Unit* unit, float newZ, bool casting)
 {
     if (!unit->IsAlive())
         return;
+
     unit->NearTeleportTo(unit->GetPositionX(), unit->GetPositionY(), newZ, unit->GetOrientation(), casting);
     unit->m_positionZ = newZ;
 }
@@ -64,6 +57,7 @@ void BattlegroundRV::CheckPositionForUnit(Unit* unit)
     {
         float groundZ_vmap = unit->GetMap()->GetHeight(unit->GetPositionX(), unit->GetPositionY(), 37.0f, true, 50.0f);
         float groundZ_dyntree = unit->GetMap()->GetDynamicMapTree().getHeight(unit->GetPositionX(), unit->GetPositionY(), 37.0f, 50.0f, unit->GetPhaseMask());
+
         if ((groundZ_vmap > 28.0f && groundZ_vmap < 29.0f) || (groundZ_dyntree > 28.0f && groundZ_dyntree < 37.0f))
         {
             float groundZ = std::max<float>(groundZ_vmap, groundZ_dyntree);
@@ -78,97 +72,99 @@ void BattlegroundRV::PostUpdateImpl(uint32 diff)
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
 
-    if (GetTimer() < Milliseconds(diff))
+    if (_timer < Milliseconds(diff))
     {
-        switch (getState())
+        switch (_state)
         {
             case BG_RV_STATE_OPEN_FENCES:
+            {
                 for (uint8 i = BG_RV_OBJECT_FIRE_1; i <= BG_RV_OBJECT_FIREDOOR_2; ++i)
                     DoorOpen(i);
-                SetTimer(BG_RV_CLOSE_FIRE_TIMER);
-                setState(BG_RV_STATE_CLOSE_FIRE);
 
-                for (auto itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-                    if (Player* player = itr->second)
+                _timer = BG_RV_CLOSE_FIRE_TIMER;
+                _state = BG_RV_STATE_CLOSE_FIRE;
+
+                for (auto const& [playerGuid, player] : m_Players)
+                {
+                    if (!player)
+                        continue;
+
+                    // Demonic Circle Summon
+                    if (GameObject* gObj = player->GetGameObject(48018))
                     {
-                        // Demonic Circle Summon
-                        if (GameObject* gObj = player->GetGameObject(48018))
-                        {
-                            gObj->Relocate(gObj->GetPositionX(), gObj->GetPositionY(), 28.28f);
-                            gObj->UpdateObjectVisibility(true);
-                        }
-
-                        if (player->GetPositionZ() < 27.0f)
-                            TeleportUnitToNewZ(player, 28.28f, true);
-
-                        for (uint8 i = SUMMON_SLOT_TOTEM; i < MAX_TOTEM_SLOT; ++i)
-                            if (player->m_SummonSlot[i])
-                                if (Creature* totem = GetBgMap()->GetCreature(player->m_SummonSlot[i]))
-                                    if (totem->GetPositionZ() < 28.0f)
-                                        TeleportUnitToNewZ(totem, 28.28f, true);
-
-                        for (auto itr2 = player->m_Controlled.begin(); itr2 != player->m_Controlled.end(); ++itr2)
-                        {
-                            if ((*itr2)->GetPositionZ() < 28.0f)
-                                TeleportUnitToNewZ((*itr2), 28.28f, true);
-
-                            // Xinef: override stay position
-                            if (CharmInfo* charmInfo = (*itr2)->GetCharmInfo())
-                                if (charmInfo->IsAtStay())
-                                {
-                                    (*itr2)->StopMovingOnCurrentPos();
-                                    charmInfo->SaveStayPosition(false);
-                                }
-                        }
+                        gObj->Relocate(gObj->GetPositionX(), gObj->GetPositionY(), 28.28f);
+                        gObj->UpdateObjectVisibility(true);
                     }
+
+                    if (player->GetPositionZ() < 27.0f)
+                        TeleportUnitToNewZ(player, 28.28f, true);
+
+                    for (uint8 i = SUMMON_SLOT_TOTEM; i < MAX_TOTEM_SLOT; ++i)
+                        if (player->m_SummonSlot[i])
+                            if (Creature* totem = GetBgMap()->GetCreature(player->m_SummonSlot[i]))
+                                if (totem->GetPositionZ() < 28.0f)
+                                    TeleportUnitToNewZ(totem, 28.28f, true);
+
+                    for (auto itr2 = player->m_Controlled.begin(); itr2 != player->m_Controlled.end(); ++itr2)
+                    {
+                        if ((*itr2)->GetPositionZ() < 28.0f)
+                            TeleportUnitToNewZ((*itr2), 28.28f, true);
+
+                        // Xinef: override stay position
+                        if (CharmInfo* charmInfo = (*itr2)->GetCharmInfo())
+                            if (charmInfo->IsAtStay())
+                            {
+                                (*itr2)->StopMovingOnCurrentPos();
+                                charmInfo->SaveStayPosition(false);
+                            }
+                    }
+                }
 
                 // fix ground on elevators (so aoe spells can be casted there)
                 {
-                    uint32 objects[2] = {BG_RV_OBJECT_ELEVATOR_1, BG_RV_OBJECT_ELEVATOR_2};
+                    uint32 objects[2] = { BG_RV_OBJECT_ELEVATOR_1, BG_RV_OBJECT_ELEVATOR_2 };
                     for (uint8 i = 0; i < 2; ++i)
                         if (GameObject* go = GetBGObject(objects[i]))
-                            go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_TRANSPORT);
+                            go->RemoveGameObjectFlag(GO_FLAG_TRANSPORT);
                 }
                 break;
+            }
             case BG_RV_STATE_CLOSE_FIRE:
                 for (uint8 i = BG_RV_OBJECT_FIRE_1; i <= BG_RV_OBJECT_FIREDOOR_2; ++i)
                     DoorClose(i);
                 // Fire got closed after five seconds, leaves twenty seconds before toggling pillars
-                SetTimer(BG_RV_FIRE_TO_PILLAR_TIMER);
-                setState(BG_RV_STATE_SWITCH_PILLARS);
+                _timer = BG_RV_FIRE_TO_PILLAR_TIMER;
+                _state = BG_RV_STATE_SWITCH_PILLARS;
                 break;
             case BG_RV_STATE_SWITCH_PILLARS:
                 UpdatePillars();
-                SetTimer(BG_RV_PILLAR_SWITCH_TIMER);
+                _timer = BG_RV_PILLAR_SWITCH_TIMER;
                 break;
         }
     }
     else
-        SetTimer(GetTimer() - Milliseconds(diff));
+        _timer -= Milliseconds(diff);
 
-    if (getState() == BG_RV_STATE_OPEN_FENCES)
+    if (_state == BG_RV_STATE_OPEN_FENCES)
         return;
 
-    if (CheckPlayersTimer <= diff)
+    if (_checkPlayersTimer <= diff)
     {
-        CheckPlayersTimer = 0;
-        for (BattlegroundPlayerMap::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-            CheckPositionForUnit(itr->second);
+        _checkPlayersTimer = 0;
+
+        for (auto const& itr : m_Players)
+            CheckPositionForUnit(itr.second);
 
         // maybe for pets and m_Controlled also, but not really necessary
     }
     else
-        CheckPlayersTimer -= diff;
-}
-
-void BattlegroundRV::StartingEventCloseDoors()
-{
+        _checkPlayersTimer -= diff;
 }
 
 void BattlegroundRV::StartingEventOpenDoors()
 {
-    for (BattlegroundPlayerMap::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-        itr->second->SetPhaseMask(1, true);
+    for (auto const& itr : m_Players)
+        itr.second->SetPhaseMask(1, true);
 
     // Buff respawn
     SpawnBGObject(BG_RV_OBJECT_BUFF_1, 90);
@@ -178,44 +174,8 @@ void BattlegroundRV::StartingEventOpenDoors()
     DoorOpen(BG_RV_OBJECT_ELEVATOR_1);
     DoorOpen(BG_RV_OBJECT_ELEVATOR_2);
 
-    setState(BG_RV_STATE_OPEN_FENCES);
-    SetTimer(BG_RV_FIRST_TIMER);
-}
-
-void BattlegroundRV::AddPlayer(Player* player)
-{
-    if (GetStatus() == STATUS_WAIT_JOIN && player->GetBgTeamId() == TEAM_HORDE)
-        player->SetPhaseMask(2, true);
-
-    Battleground::AddPlayer(player);
-    PlayerScores[player->GetGUID()] = new BattlegroundScore(player);
-    BattlegroundRV::UpdateArenaWorldState();
-}
-
-void BattlegroundRV::RemovePlayer(Player* player)
-{
-    if (GetStatus() == STATUS_WAIT_LEAVE)
-        return;
-
-    if (GetStatus() == STATUS_WAIT_JOIN)
-        player->SetPhaseMask(1, true);
-
-    BattlegroundRV::UpdateArenaWorldState();
-    CheckArenaWinConditions();
-}
-
-void BattlegroundRV::HandleKillPlayer(Player* player, Player* killer)
-{
-    if (GetStatus() != STATUS_IN_PROGRESS)
-        return;
-
-    if (!killer)
-        return;
-
-    Battleground::HandleKillPlayer(player, killer);
-    BattlegroundRV::UpdateArenaWorldState();
-
-    CheckArenaWinConditions();
+    _state = BG_RV_STATE_OPEN_FENCES;
+    _timer = BG_RV_FIRST_TIMER;
 }
 
 bool BattlegroundRV::HandlePlayerUnderMap(Player* player)
@@ -226,7 +186,7 @@ bool BattlegroundRV::HandlePlayerUnderMap(Player* player)
 
 void BattlegroundRV::HandleAreaTrigger(Player* player, uint32 trigger)
 {
-    if (GetStatus() != STATUS_IN_PROGRESS || getState() == BG_RV_STATE_OPEN_FENCES /*during elevator rising it's possible to jump and cause areatrigger*/)
+    if (GetStatus() != STATUS_IN_PROGRESS || _state == BG_RV_STATE_OPEN_FENCES /*during elevator rising it's possible to jump and cause areatrigger*/)
         return;
 
     switch (trigger)
@@ -251,13 +211,7 @@ void BattlegroundRV::HandleAreaTrigger(Player* player, uint32 trigger)
 void BattlegroundRV::FillInitialWorldStates(WorldPacket& data)
 {
     data << uint32(BG_RV_WORLD_STATE) << uint32(1);
-    BattlegroundRV::UpdateArenaWorldState();
-}
-
-void BattlegroundRV::UpdateArenaWorldState()
-{
-    UpdateWorldState(BG_RV_WORLD_STATE_A, GetAlivePlayersCountByTeam(TEAM_ALLIANCE));
-    UpdateWorldState(BG_RV_WORLD_STATE_H, GetAlivePlayersCountByTeam(TEAM_HORDE));
+    Arena::FillInitialWorldStates(data);
 }
 
 void BattlegroundRV::Init()
@@ -352,5 +306,6 @@ GameObject* BattlegroundRV::GetPillarAtPosition(Position* p)
     uint32 pillar = GetPillarIdForPos(p);
     if (!pillar)
         return nullptr;
+
     return GetBgMap()->GetGameObject(BgObjects[pillar]);
 }
