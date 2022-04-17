@@ -191,7 +191,7 @@ void HttpManager::HttpWorkerThread()
 
                 if (!ParseUrl(location, host, path))
                 {
-                    LOG_ERROR("server", "[HttpManager] Could not parse URL after redirect: %s", location.c_str());
+                    LOG_ERROR("server", "[HttpManager] Could not parse URL after redirect: {}", location);
                     continue;
                 }
                 httplib::Client cli2(host);
