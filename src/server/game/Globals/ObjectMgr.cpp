@@ -9663,6 +9663,8 @@ void ObjectMgr::SendServerMail(Player* player, uint32 id, uint32 reqLevel, uint3
         stmt->SetData(0, player->GetGUID().GetCounter());
         stmt->SetData(1, id);
         CharacterDatabase.Execute(stmt);
+
+        LOG_DEBUG("entities.player", "ObjectMgr::SendServerMail() Sent mail id {} to {}", id, player->GetGUID().GetCounter());
     }
 }
 
