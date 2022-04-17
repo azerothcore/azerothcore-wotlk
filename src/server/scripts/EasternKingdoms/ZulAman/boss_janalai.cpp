@@ -402,8 +402,6 @@ public:
                 else HatcherTimer -= diff;
             }
 
-            EnterEvadeIfOutOfCombatArea();
-
             DoMeleeAttackIfReady();
 
             if (FireBreathTimer <= diff)

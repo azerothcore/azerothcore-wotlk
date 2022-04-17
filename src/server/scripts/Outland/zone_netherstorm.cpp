@@ -1170,13 +1170,13 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (fight)
                 SetEscortPaused(false);
 
             SummonsAction(nullptr);
-            npc_escortAI::EnterEvadeMode();
+            npc_escortAI::EnterEvadeMode(why);
         }
 
         void SummonsAction(Unit* who)

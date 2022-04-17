@@ -837,7 +837,8 @@ public:
         }
 
         void MoveInLineOfSight(Unit*  /*who*/) override {}
-        void EnterEvadeMode() override {}
+
+        void EnterEvadeMode(EvadeReason /*why*/) override {}
         bool CanAIAttack(Unit const* t) const override { return t->GetEntry() == NPC_HODIR; }
 
         void JustDied(Unit* /*killer*/) override
@@ -934,7 +935,8 @@ public:
         }
 
         void MoveInLineOfSight(Unit*  /*who*/) override {}
-        void EnterEvadeMode() override {}
+
+        void EnterEvadeMode(EvadeReason /*why*/) override {}
         bool CanAIAttack(Unit const* t) const override { return t->GetEntry() == NPC_HODIR; }
 
         void JustDied(Unit* /*killer*/) override
@@ -1034,7 +1036,8 @@ public:
         }
 
         void MoveInLineOfSight(Unit*  /*who*/) override {}
-        void EnterEvadeMode() override {}
+
+        void EnterEvadeMode(EvadeReason /*why*/) override {}
         bool CanAIAttack(Unit const* t) const override { return t->GetEntry() == NPC_HODIR; }
 
         void JustDied(Unit* /*killer*/) override
@@ -1149,7 +1152,8 @@ public:
         }
 
         void MoveInLineOfSight(Unit*  /*who*/) override {}
-        void EnterEvadeMode() override {}
+
+        void EnterEvadeMode(EvadeReason /*why*/) override {}
         bool CanAIAttack(Unit const* t) const override { return t->GetEntry() == NPC_HODIR; }
 
         void JustDied(Unit* /*killer*/) override

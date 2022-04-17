@@ -592,11 +592,11 @@ struct npc_twilight_volunteer : public ScriptedAI
         }
     }
 
-    void EnterEvadeMode() override
+    void EnterEvadeMode(EvadeReason why) override
     {
         if (!isSacraficeTarget)
         {
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
     }
 

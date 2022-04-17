@@ -415,7 +415,7 @@ public:
         void CastSpellOnBug(Creature* target) override
         {
             target->SetFaction(FACTION_MONSTER);
-            target->AI()->AttackStart(me->getThreatMgr().getHostilTarget());
+            target->AI()->AttackStart(me->getThreatMgr().getHostileTarget());
             target->AddAura(SPELL_MUTATE_BUG, target);
             target->SetFullHealth();
         }

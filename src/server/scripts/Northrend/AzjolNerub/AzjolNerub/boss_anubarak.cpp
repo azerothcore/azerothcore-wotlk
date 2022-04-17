@@ -83,10 +83,10 @@ class boss_anub_arak : public CreatureScript
 
             bool intro;
 
-            void EnterEvadeMode() override
+            void EnterEvadeMode(EvadeReason why) override
             {
                 me->DisableRotate(false);
-                BossAI::EnterEvadeMode();
+                BossAI::EnterEvadeMode(why);
             }
 
             void MoveInLineOfSight(Unit* who) override

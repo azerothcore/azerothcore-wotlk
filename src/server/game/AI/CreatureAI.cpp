@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaBoundary.h"
 #include "CreatureAI.h"
 #include "Creature.h"
 #include "CreatureAIImpl.h"
@@ -24,6 +25,7 @@
 #include "MapReference.h"
 #include "Player.h"
 #include "Vehicle.h"
+#include "Language.h"
 
 class PhasedRespawn : public BasicEvent
 {
@@ -196,9 +198,9 @@ void CreatureAI::TriggerAlert(Unit const* who) const
     me->GetMotionMaster()->MoveDistract(5 * IN_MILLISECONDS);
 }
 
-void CreatureAI::EnterEvadeMode()
+void CreatureAI::EnterEvadeMode(EvadeReason why)
 {
-    if (!_EnterEvadeMode())
+    if (!_EnterEvadeMode(why))
         return;
 
     LOG_DEBUG("entities.unit", "Creature {} enters evade mode.", me->GetEntry());
@@ -290,7 +292,7 @@ bool CreatureAI::UpdateVictim()
     return true;
 }
 
-bool CreatureAI::_EnterEvadeMode()
+bool CreatureAI::_EnterEvadeMode(EvadeReason /*why*/)
 {
     if (!me->IsAlive())
     {
@@ -355,6 +357,44 @@ void CreatureAI::MoveBackwardsChecks() {
     float moveDist = me->GetMeleeRange(victim) / 2;
 
     me->GetMotionMaster()->MoveBackwards(victim, moveDist);
+}
+
+bool CreatureAI::IsInBoundary(Position const* who) const
+{
+    if (!_boundary)
+        return true;
+
+    if (!who)
+        who = me;
+
+    return (CreatureAI::IsInBounds(*_boundary, who) != _negateBoundary);
+}
+
+bool CreatureAI::IsInBounds(CreatureBoundary const& boundary, Position const* pos)
+{
+    for (AreaBoundary const* areaBoundary : boundary)
+        if (!areaBoundary->IsWithinBoundary(pos))
+            return false;
+
+    return true;
+}
+
+bool CreatureAI::CheckInRoom()
+{
+    if (IsInBoundary())
+        return true;
+    else
+    {
+        EnterEvadeMode(EVADE_REASON_BOUNDARY);
+        return false;
+    }
+}
+
+void CreatureAI::SetBoundary(CreatureBoundary const* boundary, bool negateBoundaries /*= false*/)
+{
+    _boundary = boundary;
+    _negateBoundary = negateBoundaries;
+    me->DoImmediateBoundaryCheck();
 }
 
 Creature* CreatureAI::DoSummon(uint32 entry, const Position& pos, uint32 despawnTime, TempSummonType summonType)

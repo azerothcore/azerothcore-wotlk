@@ -232,12 +232,12 @@ public:
             beamPosId = urand(0, 3);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
 
             if (Creature* akama = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_AKAMA)))
-                akama->AI()->EnterEvadeMode();
+                akama->AI()->EnterEvadeMode(why);
         }
 
         bool CanAIAttack(Unit const* target) const override
@@ -461,8 +461,6 @@ public:
                     Unit::Kill(nullptr, me);
                     break;
             }
-
-            EnterEvadeIfOutOfCombatArea();
 
             if (!UpdateVictim())
                 return;
