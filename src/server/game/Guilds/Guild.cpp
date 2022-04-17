@@ -1191,8 +1191,8 @@ bool Guild::SetName(std::string_view const& name)
 
     m_name = name;
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_NAME);
-    stmt->setString(0, m_name);
-    stmt->setUInt32(1, GetId());
+    stmt->SetData(0, m_name);
+    stmt->SetData(1, GetId());
     CharacterDatabase.Execute(stmt);
     return true;
 }

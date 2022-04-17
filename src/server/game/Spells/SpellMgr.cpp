@@ -3401,6 +3401,23 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                 spellInfo->Effects[EFFECT_0].MiscValue = 127;
                 break;
         }
+
+        if (spellInfo->Speed > 0.0f)
+        {
+            if (SpellVisualEntry const* spellVisual = sSpellVisualStore.LookupEntry(spellInfo->SpellVisual[0]))
+            {
+                if (spellVisual->HasMissile)
+                {
+                    if (spellVisual->MissileModel == -4 || spellVisual->MissileModel == -5)
+                    {
+                        spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEEDS_AMMO_DATA;
+                    }
+                }
+            }
+        }
+       spellInfo->_InitializeExplicitTargetMask();
+
+       sScriptMgr->OnLoadSpellCustomAttr(spellInfo);
     }
 
     // Xinef: addition for binary spells, ommit spells triggering other spells
