@@ -168,7 +168,7 @@ void HttpManager::HttpWorkerThread()
 
             if (!ParseUrl(req->url, host, path))
             {
-                LOG_ERROR("server", "[HttpManager] Could not parse URL %s", req->url.c_str());
+                LOG_ERROR("server", "[HttpManager] Could not parse URL {}", req->url.c_str());
                 continue;
             }
 
