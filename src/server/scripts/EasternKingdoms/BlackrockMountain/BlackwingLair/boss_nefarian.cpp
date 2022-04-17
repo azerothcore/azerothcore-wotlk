@@ -958,7 +958,6 @@ struct npc_drakonid_spawner : public ScriptedAI
 
             ObjectGuid summonGuid = summon->GetGUID();
 
-            summon->SetCorpseDelay(DAY * IN_MILLISECONDS);
             summon->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             summon->SetHomePosition(summon->GetPosition());
 
@@ -976,6 +975,7 @@ struct npc_drakonid_spawner : public ScriptedAI
                     construct->SetReactState(REACT_PASSIVE);
                     construct->SetStandState(UNIT_STAND_STATE_DEAD);
                     construct->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    construct->SetCorpseRemoveTime(DAY * IN_MILLISECONDS);
                     construct->SetVisible(true);
                 }
             });
