@@ -18,6 +18,7 @@
 #include "Mail.h"
 #include "ObjectMgr.h"
 #include "QueryResult.h"
+#include "Player.h"
 
 class ServerMailReward : public PlayerScript
 {
@@ -33,12 +34,18 @@ public:
             stmt->SetData(0, player->GetGUID().GetCounter());
             stmt->SetData(1, servMail.second.id);
 
-            PreparedQueryResult result = CharacterDatabase.Query(stmt);
+            WorldSession* mySess = player->GetSession();
+            mySess->GetQueryProcessor().AddCallback(CharacterDatabase.AsyncQuery(stmt)
+                .WithPreparedCallback([mySess](PreparedQueryResult result) mutable
+                    {
+                        for (auto const& servMail : sObjectMgr->GetAllServerMailStore())
+                        {
+                            if (result)
+                                continue;
 
-            if (result)
-                continue;
-
-            sObjectMgr->SendServerMail(player, servMail.second.id, servMail.second.reqLevel, servMail.second.reqPlayTime, servMail.second.moneyA, servMail.second.moneyH, servMail.second.itemA, servMail.second.itemCountA, servMail.second.itemH, servMail.second.itemCountH, servMail.second.subject, servMail.second.body, servMail.second.active);
+                            sObjectMgr->SendServerMail(mySess->GetPlayer(), servMail.second.id, servMail.second.reqLevel, servMail.second.reqPlayTime, servMail.second.moneyA, servMail.second.moneyH, servMail.second.itemA, servMail.second.itemCountA, servMail.second.itemH, servMail.second.itemCountH, servMail.second.subject, servMail.second.body, servMail.second.active);
+                        }
+                    }));
         }
     }
 };
