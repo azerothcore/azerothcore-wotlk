@@ -36,12 +36,9 @@ public:
             PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
             if (result)
-            {
-                do
-                {
-                    sObjectMgr->SendServerMail(player, servMail.second.id, servMail.second.reqLevel, servMail.second.reqPlayTime, servMail.second.moneyA, servMail.second.moneyH, servMail.second.itemA, servMail.second.itemCountA, servMail.second.itemH, servMail.second.itemCountH, servMail.second.subject, servMail.second.body, servMail.second.active);
-                } while (result->NextRow());
-            }
+                continue;
+
+            sObjectMgr->SendServerMail(player, servMail.second.id, servMail.second.reqLevel, servMail.second.reqPlayTime, servMail.second.moneyA, servMail.second.moneyH, servMail.second.itemA, servMail.second.itemCountA, servMail.second.itemH, servMail.second.itemCountH, servMail.second.subject, servMail.second.body, servMail.second.active);
         }
     }
 };
