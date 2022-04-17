@@ -37,7 +37,7 @@ public:
 
             WorldSession* mySess = player->GetSession();
             mySess->GetQueryProcessor().AddCallback(CharacterDatabase.AsyncQuery(stmt)
-                .WithPreparedCallback([mySess](PreparedQueryResult result) mutable
+                .WithPreparedCallback([mySess](PreparedQueryResult result)
                     {
                         for (auto const& servMail : sObjectMgr->GetAllServerMailStore())
                         {
