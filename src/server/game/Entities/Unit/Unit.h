@@ -1382,10 +1382,10 @@ public:
     [[nodiscard]] uint8 getClass() const { return GetByteValue(UNIT_FIELD_BYTES_0, 1); }
     [[nodiscard]] uint32 getClassMask() const { return 1 << (getClass() - 1); }
     [[nodiscard]] uint8 getGender() const { return GetByteValue(UNIT_FIELD_BYTES_0, 2); }
-// findkeyone
     [[nodiscard]] float GetStat(Stats stat) const { return float(GetUInt32Value(static_cast<uint16>(UNIT_FIELD_STAT0) + stat)); }
+    
     void SetStat(Stats stat, int32 val) { SetStatInt32Value(static_cast<uint16>(UNIT_FIELD_STAT0) + stat, val); }
-//  void SetStatWithPoints(Stats stat, int32 val) {SetStatInt32Value(static_cast<uint16>(UNIT_FIELD_STAT0) + stat, GetStat(stat) + val); }
+
     [[nodiscard]] uint32 GetArmor() const { return GetResistance(SPELL_SCHOOL_NORMAL); }
     void SetArmor(int32 val) { SetResistance(SPELL_SCHOOL_NORMAL, val); }
 
@@ -1394,7 +1394,7 @@ public:
 
     float BaseValue = 0.0f;
     float BonusValue = 0.0f; 
-  // findspot banana
+
     [[nodiscard]] uint32 GetResistance(SpellSchools school) const { return GetUInt32Value(static_cast<uint16>(UNIT_FIELD_RESISTANCES) + school); }
     [[nodiscard]] uint32 GetResistance(SpellSchoolMask mask) const;
     void SetResistance(SpellSchools school, int32 val) { SetStatInt32Value(static_cast<uint16>(UNIT_FIELD_RESISTANCES) + school, val); }
@@ -2176,10 +2176,14 @@ public:
     static void CalcHealAbsorb(HealInfo& healInfo);
 
     void  UpdateSpeed(UnitMoveType mtype, bool forced);
-    [[nodiscard]] float GetSpeed(UnitMoveType mtype) const;
+    float GetSpeed(UnitMoveType mtype) const; //[[nodiscard]]
     [[nodiscard]] float GetSpeedRate(UnitMoveType mtype) const { return m_speed_rate[mtype]; }
     void SetSpeed(UnitMoveType mtype, float rate, bool forced = false);
     void SetSpeedRate(UnitMoveType mtype, float rate) { m_speed_rate[mtype] = rate; }
+
+    void CalcPlayerSpeedMod();
+    void SetPlayerSpeedMod(float val) { m_player_speed_mod = val; }
+    [[nodiscard]] float GetPlayerSpeedMod() const { return m_player_speed_mod; }
 
     float ApplyEffectModifiers(SpellInfo const* spellProto, uint8 effect_index, float value) const;
     int32 CalculateSpellDamage(Unit const* target, SpellInfo const* spellProto, uint8 effect_index, int32 const* basePoints = nullptr) const;
@@ -2446,6 +2450,7 @@ protected:
     VisibleAuraMap m_visibleAuras;
 
     float m_speed_rate[MAX_MOVE_TYPE];
+    float m_player_speed_mod;
 
     CharmInfo* m_charmInfo;
     SharedVisionList m_sharedVision;

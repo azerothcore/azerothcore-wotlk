@@ -4442,7 +4442,7 @@ class spell_gen_stat_point_spells : public SpellScript
                 case STATSPELL_AGILITY:
                     caster->AddStatPoint(STAT_AGILITY);
                     break;
-                case STAT_STAMINA:
+                case STATSPELL_STAMINA:
                     caster->AddStatPoint(STAT_STAMINA);
                     break;
                 case STATSPELL_INTELLECT:

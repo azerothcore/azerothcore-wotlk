@@ -713,7 +713,7 @@ struct ItemTemplate
                ItemId != 6948; /*Hearthstone*/
     }
 
-    [[nodiscard]] bool CanChangeEquipStateInCombat() const
+    [[nodiscard]] bool CanChangeEquipStateInCombat() const // here for change equip in combat changes
     {
         switch (InventoryType)
         {

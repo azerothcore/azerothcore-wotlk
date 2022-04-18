@@ -34,6 +34,7 @@
 #include "PlayerSettings.h"
 #include "PlayerTaxi.h"
 #include "QuestDef.h"
+#include "SharedDefines.h" // custom addition 
 #include "SpellMgr.h"
 #include "TradeData.h"
 #include "Unit.h"
@@ -1268,6 +1269,16 @@ public:
     void UpdateLootAchievements(LootItem* item, Loot* loot);
     void UpdateTitansGrip();
 
+    //speed change 
+   void CalcSpeedReductionMod();
+   void CalcSpeedIncreaseMod();
+   void SetSpeedUpMod(float val) { m_speed_mod_up = val; }
+   void SetSpeedDownMod(float val) { m_speed_mod_down = val; }
+   [[nodiscard]] float GetSpeedModUp() const { return m_speed_mod_up; }
+   [[nodiscard]] float GetSpeedModDown() const { return m_speed_mod_down; }
+   float GetFortSpeedMod() const; 
+   float GetAgiSpeedMod() const; 
+
     InventoryResult CanTakeMoreSimilarItems(uint32 entry, uint32 count, Item* pItem, uint32* no_space_count = nullptr) const;
     InventoryResult CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, uint32 entry, uint32 count, Item* pItem = nullptr, bool swap = false, uint32* no_space_count = nullptr) const;
 
@@ -2387,6 +2398,7 @@ public:
     void SendMovieStart(uint32 MovieId);
 
     [[nodiscard]] uint16 GetMaxSkillValueForLevel() const;
+    [[nodiscard]] uint32 GetMaxSkillValueForSecStat(uint16 skillId) const;
     bool IsFFAPvP();
     bool IsPvP();
 
@@ -2835,6 +2847,9 @@ public:
 
     // Custom_data 
     uint32 m_usedStatPoints;
+    uint32 m_speed_mod_up;
+    uint32 m_speed_mod_down;
+
 
     // Social
     PlayerSocial* m_social;

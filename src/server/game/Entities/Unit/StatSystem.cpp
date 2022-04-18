@@ -95,8 +95,10 @@ void Unit::UpdateDamagePhysical(WeaponAttackType attType)
 
 float Unit::GetBaseStat(Stats stat) const
 {
-   float BaseValue = GetCreateStat(stat) * m_auraModifiersGroup[UNIT_MOD_STAT_START + static_cast<uint16>(stat)][BASE_PCT];
-   
+    float BaseValue = GetCreateStat(stat);
+    float StatPointsValue = GetCreateStatPoints(stat);
+    BaseValue += StatPointsValue;
+
    return BaseValue;
 }
 
@@ -113,22 +115,23 @@ uint32 Player::GetSecStat(SecStats secstat) const
     switch(secstat)
     {
         case SECSTAT_DEXTERITY:
-            secval = GetBaseStat(STAT_AGILITY) + GetBaseStat(STAT_INTELLECT);  
+            secval = ((GetBaseStat(STAT_AGILITY) + GetBaseStat(STAT_INTELLECT))/2);  
+            return secval;
             break;
         case SECSTAT_FORTITUDE:
-            secval = GetBaseStat(STAT_STRENGTH) + GetBaseStat(STAT_STAMINA);
+            secval = ((GetBaseStat(STAT_STRENGTH) + GetBaseStat(STAT_STAMINA))/2);
             return secval;
             break;
         case SECSTAT_CONSTITUTION:
-            secval = GetBaseStat(STAT_SPIRIT) + GetBaseStat(STAT_STRENGTH);
+            secval = ((GetBaseStat(STAT_SPIRIT) + GetBaseStat(STAT_STRENGTH))/2);
             return secval;
             break;
         case SECSTAT_WISDOM:
-            secval = GetBaseStat(STAT_INTELLECT) + GetBaseStat(STAT_SPIRIT);
+            secval = ((GetBaseStat(STAT_INTELLECT) + GetBaseStat(STAT_SPIRIT))/2);
             return secval;
             break;
         case SECSTAT_VIGOR:
-            secval = GetBaseStat(STAT_STAMINA) + GetBaseStat(STAT_AGILITY);
+            secval = ((GetBaseStat(STAT_SPIRIT) + GetBaseStat(STAT_AGILITY))/2);
             return secval;
             break;
     }
@@ -310,7 +313,7 @@ bool Player::UpdateAllStats()
     RecalculateRating(CR_ARMOR_PENETRATION);
     UpdateAllResistances();
 
-    return true;
+    return true; 
 }
 
 void Player::ApplySpellPenetrationBonus(int32 amount, bool apply)

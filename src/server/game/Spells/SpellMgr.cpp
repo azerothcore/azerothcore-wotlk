@@ -1492,9 +1492,9 @@ void SpellMgr::LoadSpellLearnSkills()
                     }
                     else
                     {
-                        dbc_node.value = dbc_node.step * 75;
+                        dbc_node.value = dbc_node.step;
                     }
-                    dbc_node.maxvalue = dbc_node.step * 75;
+                    dbc_node.maxvalue = dbc_node.step;
                     break;
                 case SPELL_EFFECT_DUAL_WIELD:
                     dbc_node.skill = SKILL_DUAL_WIELD;

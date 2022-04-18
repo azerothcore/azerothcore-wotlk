@@ -139,11 +139,13 @@ uint8 Player::FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool swap) c
 {
     uint8 playerClass = getClass();
 
-    uint8 slots[4];
+    uint8 slots[6];
     slots[0] = NULL_SLOT;
     slots[1] = NULL_SLOT;
     slots[2] = NULL_SLOT;
     slots[3] = NULL_SLOT;
+    slots[4] = NULL_SLOT;
+    slots[5] = NULL_SLOT;
     switch (proto->InventoryType)
     {
         case INVTYPE_HEAD:
@@ -184,6 +186,10 @@ uint8 Player::FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool swap) c
         case INVTYPE_TRINKET:
             slots[0] = EQUIPMENT_SLOT_TRINKET1;
             slots[1] = EQUIPMENT_SLOT_TRINKET2;
+            slots[2] = INVENTORY_SLOT_BAG_START + 0;
+            slots[3] = INVENTORY_SLOT_BAG_START + 1;
+            slots[4] = INVENTORY_SLOT_BAG_START + 2;
+            slots[5] = INVENTORY_SLOT_BAG_START + 3;
             break;
         case INVTYPE_CLOAK:
             slots[0] = EQUIPMENT_SLOT_BACK;
@@ -205,6 +211,8 @@ uint8 Player::FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool swap) c
             break;
         case INVTYPE_RANGED:
         case INVTYPE_RANGEDRIGHT:
+            slots[0] = EQUIPMENT_SLOT_RANGED;
+            break;
         case INVTYPE_THROWN:
             slots[0] = EQUIPMENT_SLOT_RANGED;
             break;
@@ -244,6 +252,7 @@ uint8 Player::FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool swap) c
             slots[1] = INVENTORY_SLOT_BAG_START + 1;
             slots[2] = INVENTORY_SLOT_BAG_START + 2;
             slots[3] = INVENTORY_SLOT_BAG_START + 3;
+            slots[4] = EQUIPMENT_SLOT_BACK;
             break;
         case INVTYPE_RELIC:
             slots[0] = EQUIPMENT_SLOT_RANGED;
@@ -255,21 +264,21 @@ uint8 Player::FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool swap) c
     if (slot != NULL_SLOT)
     {
         if (swap || !GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
-            for (uint8 i = 0; i < 4; ++i)
+            for (uint8 i = 0; i < 6; ++i)
                 if (slots[i] == slot)
                     return slot;
     }
     else
     {
         // search free slot at first
-        for (uint8 i = 0; i < 4; ++i)
+        for (uint8 i = 0; i < 6; ++i)
             if (slots[i] != NULL_SLOT && !GetItemByPos(INVENTORY_SLOT_BAG_0, slots[i]))
                 // in case 2hand equipped weapon (without titan grip) offhand slot empty but not free
                 if (slots[i] != EQUIPMENT_SLOT_OFFHAND || !IsTwoHandUsed())
                     return slots[i];
 
         // if not found free and can swap return first appropriate from used
-        for (uint8 i = 0; i < 4; ++i)
+        for (uint8 i = 0; i < 6; ++i)
             if (slots[i] != NULL_SLOT && swap)
                 return slots[i];
     }
@@ -2571,6 +2580,7 @@ Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update
             CharacterDatabase.Execute(stmt);
         }
     }
+    CalcSpeedReductionMod();
     return pItem;
 }
 
@@ -2604,7 +2614,8 @@ Item* Player::StoreItem(ItemPosCountVec const& dest, Item* pItem, bool update)
             if (proto->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_NO_DELAY_USE && proto->Spells[i].SpellId > 0) // On obtain trigger
                 if (!HasAura(proto->Spells[i].SpellId))
                     CastSpell(this, proto->Spells[i].SpellId, true, lastItem);
-
+    
+    CalcSpeedReductionMod();
     return lastItem;
 }
 
@@ -2702,7 +2713,7 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
         AddEnchantmentDurations(pItem2);
 
         pItem2->SetState(ITEM_CHANGED, this);
-
+        CalcSpeedReductionMod();
         return pItem2;
     }
 }
@@ -2723,7 +2734,7 @@ Item* Player::EquipNewItem(uint16 pos, uint32 item, bool update)
         ItemAddedQuestCheck(item, 1);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_RECEIVE_EPIC_ITEM, item, 1);
     }
-
+    CalcSpeedReductionMod();
     return EquipItem(pos, _item, update);
 }
 
@@ -2808,7 +2819,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
         if (IsInWorld() && update)
         {
             pItem->RemoveFromWorld();
-            pItem->DestroyForPlayer(this);
+            pItem->DestroyForPlayer(this);   
         }
 
         RemoveEnchantmentDurations(pItem);
@@ -2823,6 +2834,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
 
         ApplyEquipCooldown(pItem2);
         sScriptMgr->OnEquip(this, pItem2, bag, slot, update);
+        CalcSpeedReductionMod();
         return pItem2;
     }
 
@@ -2832,6 +2844,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
 
     sScriptMgr->OnEquip(this, pItem, bag, slot, update);
     UpdateForQuestWorldObjects();
+    CalcSpeedReductionMod();
     return pItem;
 }
 
@@ -2855,7 +2868,9 @@ void Player::QuickEquipItem(uint16 pos, Item* pItem)
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM, pItem->GetEntry(), slot);
 
         sScriptMgr->OnEquip(this, pItem, (pos >> 8), slot, true);
-    }
+        CalcSpeedReductionMod();
+    } 
+      
 }
 
 void Player::SetVisibleItemSlot(uint8 slot, Item* pItem)
@@ -2968,12 +2983,15 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update, bool swap)
         }
         else if (Bag* pBag = GetBagByPos(bag))
             pBag->RemoveItem(slot, update);
+            
 
         pItem->SetGuidValue(ITEM_FIELD_CONTAINED, ObjectGuid::Empty);
         // pItem->SetGuidValue(ITEM_FIELD_OWNER, ObjectGuid::Empty); not clear owner at remove (it will be set at store). This used in mail and auction code
         pItem->SetSlot(NULL_SLOT);
         if (IsInWorld() && update)
             pItem->SendUpdateToPlayer(this);
+    
+    CalcSpeedReductionMod();      
     }
 }
 
@@ -2994,6 +3012,8 @@ void Player::MoveItemFromInventory(uint8 bag, uint8 slot, bool update)
         }
 
         sScriptMgr->OnAfterPlayerMoveItemFromInventory(this, it, bag, slot, update);
+    
+    CalcSpeedReductionMod();  
     }
 }
 
@@ -3019,8 +3039,10 @@ void Player::MoveItemToInventory(ItemPosCountVec const& dest, Item* pItem, bool 
         pLastItem->SetState(in_characterInventoryDB ? ITEM_CHANGED : ITEM_NEW, this);
 
         if (pLastItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE))
-            AddTradeableItem(pLastItem);
+            AddTradeableItem(pLastItem);     
     }
+    
+    CalcSpeedReductionMod();
 }
 
 void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
@@ -3102,23 +3124,24 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
             m_items[slot] = nullptr;
         }
         else if (Bag* pBag = GetBagByPos(bag))
-            pBag->RemoveItem(slot, update);
+            pBag->RemoveItem(slot, update);      
 
         // Xinef: item is removed, remove loot from storage if any
         if (proto->Flags & ITEM_FLAG_HAS_LOOT)
-            sLootItemStorage->RemoveStoredLoot(pItem->GetGUID());
+            sLootItemStorage->RemoveStoredLoot(pItem->GetGUID());          
 
         if (IsInWorld() && update)
         {
             pItem->RemoveFromWorld();
-            pItem->DestroyForPlayer(this);
+            pItem->DestroyForPlayer(this);            
         }
 
         //pItem->SetOwnerGUID(0);
         pItem->SetGuidValue(ITEM_FIELD_CONTAINED, ObjectGuid::Empty);
         pItem->SetSlot(NULL_SLOT);
-        pItem->SetState(ITEM_REMOVED, this);
+        pItem->SetState(ITEM_REMOVED, this);       
     }
+    CalcSpeedReductionMod();
 }
 
 void Player::DestroyItemCount(uint32 itemEntry, uint32 count, bool update, bool unequip_check)
@@ -3138,7 +3161,7 @@ void Player::DestroyItemCount(uint32 itemEntry, uint32 count, bool update, bool 
                     // all items in inventory can unequipped
                     remcount += item->GetCount();
                     DestroyItem(INVENTORY_SLOT_BAG_0, i, update);
-
+                    CalcSpeedReductionMod();
                     if (remcount >= count)
                         return;
                 }
@@ -3149,6 +3172,7 @@ void Player::DestroyItemCount(uint32 itemEntry, uint32 count, bool update, bool 
                     if (IsInWorld() && update)
                         item->SendUpdateToPlayer(this);
                     item->SetState(ITEM_CHANGED, this);
+                    CalcSpeedReductionMod();
                     return;
                 }
             }
@@ -3168,6 +3192,7 @@ void Player::DestroyItemCount(uint32 itemEntry, uint32 count, bool update, bool 
                     DestroyItem(INVENTORY_SLOT_BAG_0, i, update);
 
                     if (remcount >= count)
+                    
                         return;
                 }
                 else
@@ -3177,6 +3202,7 @@ void Player::DestroyItemCount(uint32 itemEntry, uint32 count, bool update, bool 
                     if (IsInWorld() && update)
                         item->SendUpdateToPlayer(this);
                     item->SetState(ITEM_CHANGED, this);
+                    
                     return;
                 }
             }
@@ -3419,6 +3445,7 @@ void Player::DestroyItemCount(Item* pItem, uint32& count, bool update)
             pItem->SendUpdateToPlayer(this);
         pItem->SetState(ITEM_CHANGED, this);
     }
+    CalcSpeedReductionMod();
 }
 
 void Player::SplitItem(uint16 src, uint16 dst, uint32 count)
@@ -4767,6 +4794,8 @@ void Player::SendNewItem(Item* item, uint32 count, bool received, bool created, 
         GetGroup()->BroadcastPacket(&data, true);
     else
         GetSession()->SendPacket(&data);
+    
+    CalcSpeedReductionMod();
 }
 
 /*********************************************************/
@@ -5393,7 +5422,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     InitRunes();
 
     _LoadStatPoints(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_CUSTOM_DATA)); // custom data load stat points
-
+    
     sScriptMgr->OnPlayerLoadFromDB(this);
 
     // make sure the unit is considered out of combat for proper loading
@@ -5423,7 +5452,6 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
 
     // load skills after InitStatsForLevel because it triggering aura apply also
     _LoadSkills(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_SKILLS));
-    UpdateSkillsForLevel(); //update skills after load, to make sure they are correctly update at player load
 
     // apply original stats mods before spell loading or item equipment that call before equip _RemoveStatsMods()
 
@@ -5431,6 +5459,8 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     m_activeSpec = fields[65].GetUInt8();
 
     LearnDefaultSkills();
+    UpdateSkillsForLevel(); //update skills after load, to make sure they are correctly update at player load
+
     LearnCustomSpells();
 
     _LoadSpells(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_SPELLS));

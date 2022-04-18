@@ -8270,23 +8270,43 @@ SkillRangeType GetSkillRangeType(SkillRaceClassInfoEntry const* rcEntry)
     {
         return SKILL_RANGE_NONE;
     }
-
-    if (sSkillTiersStore.LookupEntry(rcEntry->SkillTierID))
-    {
-        return SKILL_RANGE_RANK;
-    }
-
-    if (rcEntry->SkillID == SKILL_RUNEFORGING)
-    {
-        return SKILL_RANGE_MONO;
-    }
-
     switch (skill->categoryId)
     {
         case SKILL_CATEGORY_ARMOR:
-            return SKILL_RANGE_MONO;
+            return SKILL_RANGE_LEVEL;
+
         case SKILL_CATEGORY_LANGUAGES:
             return SKILL_RANGE_LANGUAGE;
+
+        case SKILL_CATEGORY_WEAPON:
+            return SKILL_RANGE_LEVEL;
+
+        case SKILL_CATEGORY_CLASS:
+            return SKILL_RANGE_MONO;
+
+        case SKILL_CATEGORY_PROFESSION:
+            return SKILL_RANGE_LEVEL;
+
+        case SKILL_CATEGORY_SECONDARY:
+            return SKILL_RANGE_LEVEL;
+
+        case SKILL_CATEGORY_ATTRIBUTES:
+            return SKILL_RANGE_LEVEL;
+
+        /*case SKILL_CATEGORY_SCHOOL:
+            return SKILL_RANGE_RANK;
+
+        case SKILL_CATEGORY_MAGIC_SOURCE:
+            return SKILL_RANGE_RANK;
+
+        case SKILL_CATEGORY_PROFICENCY:
+            return SKILL_RANGE_RANK;
+
+        case SKILL_CATEGORY_MAGIC_CONNECTION:
+            return SKILL_RANGE_MONO;*/
+
+        case SKILL_CATEGORY_GENERIC:
+            return SKILL_RANGE_LEVEL;
     }
 
     return SKILL_RANGE_LEVEL;

@@ -69,6 +69,7 @@
 #include "Realm.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
+#include "SharedDefines.h" // custom addition
 #include "SocialMgr.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
@@ -178,6 +179,7 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     m_extraBonusTalentCount = 0;
 
     m_usedStatPoints = 0;   // Custom_data 
+
 
     m_regenTimer = 0;
     m_regenTimerCount = 0;
@@ -319,6 +321,9 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     m_baseManaRegen = 0;
     m_baseHealthRegen = 0;
     m_spellPenetrationItemMod = 0;
+
+    //for(uint8 i = 0; i < MAX_SECSTATS; i++)
+    //    m_createSecStats[i] = 0;
 
     // Honor System
     m_lastHonorUpdateTime = GameTime::GetGameTime().count();
@@ -2466,6 +2471,7 @@ void Player::GiveLevel(uint8 level)
     // save base values (bonuses already included in stored stats
     for (uint32 i = STAT_STRENGTH; i < MAX_STATS; ++i)
         SetCreateStat(Stats(i), info.stats[i]);
+        CalcSpeedIncreaseMod();
          
     SetCreateHealth(classInfo.basehealth);
     SetCreateMana(classInfo.basemana);
@@ -2543,6 +2549,7 @@ void Player::InitStatPointsForLevel()
     uint32 statPointsForLevel = CalculateStatPoints();
     uint32 FreeStatPoints = statPointsForLevel - m_usedStatPoints;
     SetFreeStatPoints(FreeStatPoints);
+    CalcSpeedIncreaseMod();
 }
 
 void Player::InitStatsForLevel(bool reapplyMods)
@@ -2573,6 +2580,7 @@ void Player::InitStatsForLevel(bool reapplyMods)
     // save base values (bonuses already included in stored stats
     for (uint32 i = STAT_STRENGTH; i < MAX_STATS; ++i)
         SetCreateStat(Stats(i), info.stats[i]);
+        CalcSpeedIncreaseMod();
 
     for (uint32 i = STAT_STRENGTH; i < MAX_STATS; ++i)
         SetStat(Stats(i), info.stats[i]);
@@ -3162,22 +3170,23 @@ bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool l
             SetFreePrimaryProfessions(freeProfs - 1);
     }
 
-    uint16 maxskill = GetMaxSkillValueForLevel();
     SpellLearnSkillNode const* spellLearnSkill = sSpellMgr->GetSpellLearnSkill(spellId);
     SkillLineAbilityMapBounds skill_bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellId);
     // xinef: set appropriate skill value
     if (spellLearnSkill)
     {
+        uint16 maxskill = GetMaxSkillValueForSecStat(spellLearnSkill->skill);
+        uint16 rank = GetSkillStep(spellLearnSkill->skill);
         uint32 skill_value = GetPureSkillValue(spellLearnSkill->skill);
         uint32 skill_max_value = GetPureMaxSkillValue(spellLearnSkill->skill);
-        uint32 new_skill_max_value = spellLearnSkill->maxvalue == 0 ? maxskill : spellLearnSkill->maxvalue;
+        //uint32 new_skill_max_value = spellLearnSkill->maxvalue == 0 ? maxskill : spellLearnSkill->maxvalue;
 
         if (skill_value < spellLearnSkill->value)
             skill_value = spellLearnSkill->value;
-        if (skill_max_value < new_skill_max_value)
-            skill_max_value = new_skill_max_value;
+       // if (skill_max_value < new_skill_max_value)
+        //    skill_max_value = new_skill_max_value;
 
-        SetSkill(spellLearnSkill->skill, spellLearnSkill->step, skill_value, skill_max_value);
+        SetSkill(spellLearnSkill->skill, spellLearnSkill->step, skill_value, maxskill);
     }
     else
     {
@@ -3220,7 +3229,8 @@ bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool l
         }
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL, spellId);
     }
-
+    
+    UpdateSkillsForLevel();
     return true;
 }
 
@@ -3380,7 +3390,7 @@ void Player::removeSpell(uint32 spell_id, uint8 removeSpecMask, bool onlyTempora
             {
                 uint32 skill_value = GetPureSkillValue(prevSkill->skill);
                 uint32 skill_max_value = GetPureMaxSkillValue(prevSkill->skill);
-                uint32 new_skill_max_value = prevSkill->maxvalue == 0 ? GetMaxSkillValueForLevel() : prevSkill->maxvalue;
+                uint32 new_skill_max_value = prevSkill->maxvalue == 0 ? (GetMaxSkillValueForSecStat(prevSkill->skill) * (GetSkillStep(prevSkill->skill) - 1)) : prevSkill->maxvalue;
 
                 if (skill_value > prevSkill->value)
                     skill_value = prevSkill->value;
@@ -4234,6 +4244,10 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SETTINGS);
+                stmt->setUInt32(0, lowGuid);
+                trans->Append(stmt);
+
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_CUSTOM_DATA);
                 stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
@@ -5325,6 +5339,7 @@ void Player::SetSkill(uint16 id, uint16 step, uint16 newVal, uint16 maxVal)
                 learnSkillRewardedSpells(id, newVal);
                 UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, id);
                 UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL, id);
+                UpdateSkillsForLevel();
                 return;
             }
     }
@@ -11420,6 +11435,64 @@ void Player::SendInstanceResetWarning(uint32 mapid, Difficulty difficulty, uint3
     GetSession()->SendPacket(&data);
 }
 
+void Player::CalcSpeedIncreaseMod()
+{
+    uint32 fort = GetSecStat(SECSTAT_FORTITUDE);
+    uint32 agi = GetBaseStat(STAT_AGILITY);
+   if (fort >= 10)
+        fort -= 10;
+    else 
+        fort = 0;
+    
+    if (agi >= 10)
+        agi -= 10;
+    else 
+        agi = 0;
+    
+    float increase = (fort * .125) + (agi * .25);
+    
+    SetSpeedUpMod(increase);
+    CalcPlayerSpeedMod();
+    UpdateSpeed(MOVE_RUN, false);
+}
+
+void Player::CalcSpeedReductionMod()
+{
+    float modspeed = 0.0f;
+    
+    for (uint8 i = EQUIPMENT_SLOT_START; i < INVENTORY_SLOT_BAG_END; ++i)
+    {
+        if (Item const* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {  
+            if (!pItem)
+                continue;
+            
+            if (ItemTemplate const* pProto = pItem->GetTemplate())
+            {
+                if (pProto->Class == ITEM_CLASS_ARMOR && (pProto->SubClass == ITEM_SUBCLASS_ARMOR_PLATE || pProto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD) && (pProto->InventoryType == INVTYPE_SHOULDERS || pProto->InventoryType == INVTYPE_CHEST || pProto->InventoryType == INVTYPE_LEGS || pProto->InventoryType == INVTYPE_FEET))
+                    {
+                    modspeed += .5;
+                    continue;
+                    }
+                if (pProto->Class == ITEM_CLASS_ARMOR && pProto->SubClass == ITEM_SUBCLASS_ARMOR_MAIL && (pProto->InventoryType == INVTYPE_SHOULDERS || pProto->InventoryType == INVTYPE_CHEST || pProto->InventoryType == INVTYPE_LEGS || pProto->InventoryType == INVTYPE_FEET))
+                    {
+                    modspeed += .3;
+                    continue;
+                    }
+                if (pProto->Class == ITEM_CLASS_WEAPON && pProto->InventoryType == INVTYPE_2HWEAPON)
+                    {
+                    modspeed += .6;
+                    continue;
+                    }
+            }
+        }
+    }
+    
+    SetSpeedDownMod(modspeed);
+    CalcPlayerSpeedMod();
+    UpdateSpeed(MOVE_RUN, true);
+}
+
 void Player::ApplyEquipCooldown(Item* pItem)
 {
     if (pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_NO_EQUIP_COOLDOWN))
@@ -11536,12 +11609,12 @@ void Player::LearnDefaultSkill(uint32 skillId, uint16 rank)
     switch (GetSkillRangeType(rcInfo))
     {
         case SKILL_RANGE_LANGUAGE:
-            SetSkill(skillId, 0, 300, 300);
+            SetSkill(skillId, 0, 100, 100);
             break;
         case SKILL_RANGE_LEVEL:
         {
             uint16 skillValue = 1;
-            uint16 maxValue = GetMaxSkillValueForLevel();
+            uint16 maxValue = GetMaxSkillValueForSecStat(skillId);
             if (sWorld->getBoolConfig(CONFIG_ALWAYS_MAXSKILL) && !IsProfessionOrRidingSkill(skillId))
             {
                 skillValue = maxValue;
@@ -11549,10 +11622,6 @@ void Player::LearnDefaultSkill(uint32 skillId, uint16 rank)
             else if (rcInfo->Flags & SKILL_FLAG_ALWAYS_MAX_VALUE)
             {
                 skillValue = maxValue;
-            }
-            else if (getClass() == CLASS_DEATH_KNIGHT)
-            {
-                skillValue = std::min(std::max<uint16>({ 1, uint16((getLevel() - 1) * 5) }), maxValue);
             }
             else if (skillId == SKILL_FIST_WEAPONS)
             {
@@ -11570,30 +11639,28 @@ void Player::LearnDefaultSkill(uint32 skillId, uint16 rank)
             SetSkill(skillId, 0, 1, 1);
             break;
         case SKILL_RANGE_RANK:
-        {
-            if (!rank)
-            {
-                break;
-            }
-
+        {   
             SkillTiersEntry const* tier = sSkillTiersStore.LookupEntry(rcInfo->SkillTierID);
-            uint16 maxValue = tier->Value[std::max<int32>(rank - 1, 0)];
+           // uint16 maxRankValue = tier->Value[std::max<int32>(rank, 0)];
+            uint16 maxStatValue = GetMaxSkillValueForSecStat(skillId) * GetSkillStep(skillId);
             uint16 skillValue = 1;
+            
             if (rcInfo->Flags & SKILL_FLAG_ALWAYS_MAX_VALUE)
             {
-                skillValue = maxValue;
+                skillValue = maxStatValue;
             }
-            else if (getClass() == CLASS_DEATH_KNIGHT)
+            /*else if (getClass() == CLASS_DEATH_KNIGHT)
             {
                 skillValue = std::min(std::max<uint16>({ uint16(1), uint16((getLevel() - 1) * 5) }), maxValue);
-            }
+            }*/
 
-            SetSkill(skillId, rank, skillValue, maxValue);
+            SetSkill(skillId, rank, skillValue, maxStatValue);
             break;
         }
         default:
             break;
     }
+    UpdateSkillsForLevel();
 }
 
 void Player::learnQuestRewardedSpells(Quest const* quest)
@@ -13225,13 +13292,15 @@ void Player::_LoadSkills(PreparedQueryResult result)
             switch (GetSkillRangeType(rcEntry))
             {
                 case SKILL_RANGE_LANGUAGE:                      // 300..300
-                    value = max = 300;
+                    value = max = 300; // GetSkillLanguageForRace(uint16 skill, getRace, getClass); - needs impliment
                     break;
                 case SKILL_RANGE_MONO:                          // 1..1, grey monolite bar
                     value = max = 1;
                     break;
                 case SKILL_RANGE_LEVEL:
-                    max = GetMaxSkillValueForLevel();
+                    max = GetMaxSkillValueForSecStat(skill);
+                case SKILL_RANGE_RANK:
+                    max = GetMaxSkillValueForSecStat(skill);
                 default:
                     break;
             }
@@ -13261,6 +13330,8 @@ void Player::_LoadSkills(PreparedQueryResult result)
                         break;
                     }
                 }
+                if (!skillStep)
+                    SetSkill(skill, 0, 0, 0);
             }
 
             SetUInt32Value(PLAYER_SKILL_INDEX(count), MAKE_PAIR32(skill, skillStep));
@@ -13477,13 +13548,15 @@ void Player::AddStatPoint(Stats stat)
     if (m_usedStatPoints == 40)
         return;
     
-    if (GetStat(stat) >= 20) 
+    if (GetBaseStat(stat) >= 20) 
         return;
 
     SetCreateStatPoints(stat, m_createStatPoints[stat] + 1);
     SetCreateUsedStatPoints(m_usedStatPoints + 1); 
     SetFreeStatPoints(GetFreeStatPoints() - 1);
     SetStat(stat, GetStat(stat) + 1);
+    UpdateSkillsForLevel();
+    CalcSpeedIncreaseMod();
 }
 
 void Player::LearnTalent(uint32 talentId, uint32 talentRank)
@@ -14557,7 +14630,8 @@ void Player::_LoadStatPoints(PreparedQueryResult result)
             usedStatPts += fields[i].GetUInt32();
             SetCreateUsedStatPoints(usedStatPts);
         }
-    } while (result->NextRow()); 
+    } while (result->NextRow());
+    CalcSpeedIncreaseMod();
 }
 
 void Player::_SaveTalents(CharacterDatabaseTransaction trans)
@@ -15104,6 +15178,8 @@ bool Player::AddItem(uint32 itemId, uint32 count)
         SendNewItem(item, count, true, false);
     else
         return false;
+    
+    CalcSpeedReductionMod();
     return true;
 }
 
@@ -15796,6 +15872,28 @@ uint16 Player::GetMaxSkillValueForLevel() const
     sScriptMgr->OnGetMaxSkillValueForLevel(const_cast<Player*>(this), result);
 
     return result;
+}
+
+uint32 Player::GetMaxSkillValueForSecStat(uint16 skillId) const
+{  
+    if (skillId)
+    { 
+        if (skillId == SKILL_DAGGERS || skillId == SKILL_BOWS) 
+            return GetSecStat(SECSTAT_DEXTERITY);
+
+        if (skillId == SKILL_2H_MACES || skillId == SKILL_2H_AXES || skillId == SKILL_2H_SWORDS)
+            return GetSecStat(SECSTAT_FORTITUDE);
+
+        if (skillId == SKILL_DEFENSE  || skillId == SKILL_FIRST_AID  || skillId == SKILL_SHIELD || skillId == SKILL_MACES)
+            return GetSecStat(SECSTAT_CONSTITUTION);
+
+        if (skillId == SKILL_ALCHEMY || skillId == SKILL_WANDS || skillId == SKILL_HERBALISM)
+            return GetSecStat(SECSTAT_WISDOM);
+
+        if (skillId == SKILL_SWORDS || skillId == SKILL_AXES || skillId == SKILL_DUAL_WIELD || skillId == SKILL_FIST_WEAPONS || skillId == SKILL_UNARMED || skillId == SKILL_GUNS)
+            return GetSecStat(SECSTAT_VIGOR);
+    } 
+    return GetMaxSkillValueForLevel();
 }
 
 float Player::GetQuestRate(bool isDFQuest)

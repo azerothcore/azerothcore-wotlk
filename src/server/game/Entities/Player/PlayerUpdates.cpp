@@ -30,6 +30,7 @@
 #include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"
+#include "SharedDefines.h"
 #include "SkillDiscovery.h"
 #include "SpellAuraEffects.h"
 #include "SpellMgr.h"
@@ -691,7 +692,7 @@ bool Player::UpdateSkill(uint32 skill_id, uint32 step)
         return false;
 
     if (value < max)
-    {
+    { 
         uint32 new_value = value + step;
         if (new_value > max)
             new_value = max;
@@ -705,7 +706,6 @@ bool Player::UpdateSkill(uint32 skill_id, uint32 step)
                                   skill_id);
         return true;
     }
-
     return false;
 }
 
@@ -722,15 +722,13 @@ inline int SkillGainChance(uint32 SkillValue, uint32 GrayLevel,
     return sWorld->getIntConfig(CONFIG_SKILL_CHANCE_ORANGE) * 10;
 }
 
-bool Player::UpdateGatherSkill(uint32 SkillId, uint32 SkillValue,
-                               uint32 RedLevel, uint32 Multiplicator)
+bool Player::UpdateGatherSkill(uint32 SkillId, uint32 SkillValue, uint32 RedLevel, uint32 Multiplicator)
 {
     LOG_DEBUG("entities.player.skills",
               "UpdateGatherSkill(SkillId %d SkillLevel %d RedLevel %d)",
               SkillId, SkillValue, RedLevel);
 
-    uint32 gathering_skill_gain =
-        sWorld->getIntConfig(CONFIG_SKILL_GAIN_GATHERING);
+    uint32 gathering_skill_gain = sWorld->getIntConfig(CONFIG_SKILL_GAIN_GATHERING);
 
     // For skinning and Mining chance decrease with level. 1-74 - no decrease,
     // 75-149 - 2 times, 225-299 - 8 times
@@ -789,35 +787,23 @@ bool Player::UpdateCraftSkill(uint32 spellid)
 
     SkillLineAbilityMapBounds bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellid);
 
-    for (SkillLineAbilityMap::const_iterator _spell_idx = bounds.first;
-         _spell_idx != bounds.second; ++_spell_idx)
+    for (SkillLineAbilityMap::const_iterator _spell_idx = bounds.first; _spell_idx != bounds.second; ++_spell_idx)
     {
         if (_spell_idx->second->SkillLine)
         {
-            uint32 SkillValue =
-                GetPureSkillValue(_spell_idx->second->SkillLine);
+            uint32 SkillValue = GetPureSkillValue(_spell_idx->second->SkillLine);
 
             // Alchemy Discoveries here
             SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(spellid);
             if (spellEntry && spellEntry->Mechanic == MECHANIC_DISCOVERY)
             {
-                if (uint32 discoveredSpell = GetSkillDiscoverySpell(
-                        _spell_idx->second->SkillLine, spellid, this))
-                    learnSpell(discoveredSpell);
+                if (uint32 discoveredSpell = GetSkillDiscoverySpell(_spell_idx->second->SkillLine, spellid, this)) 
+                learnSpell(discoveredSpell);
             }
 
-            uint32 craft_skill_gain =
-                sWorld->getIntConfig(CONFIG_SKILL_GAIN_CRAFTING);
+            uint32 craft_skill_gain = sWorld->getIntConfig(CONFIG_SKILL_GAIN_CRAFTING);
 
-            return UpdateSkillPro(
-                _spell_idx->second->SkillLine,
-                SkillGainChance(SkillValue,
-                                _spell_idx->second->TrivialSkillLineRankHigh,
-                                (_spell_idx->second->TrivialSkillLineRankHigh +
-                                 _spell_idx->second->TrivialSkillLineRankLow) /
-                                    2,
-                                _spell_idx->second->TrivialSkillLineRankLow),
-                craft_skill_gain);
+            return UpdateSkillPro(_spell_idx->second->SkillLine, SkillGainChance(SkillValue, _spell_idx->second->TrivialSkillLineRankHigh, (_spell_idx->second->TrivialSkillLineRankHigh + _spell_idx->second->TrivialSkillLineRankLow) /2, _spell_idx->second->TrivialSkillLineRankLow), craft_skill_gain);
         }
     }
     return false;
@@ -867,9 +853,8 @@ bool Player::UpdateFishingSkill()
 // levels sync. with spell requirement for skill levels to learn
 // bonus abilities in sSkillLineAbilityStore
 // Used only to avoid scan DBC at each skill grow
-static uint32       bonusSkillLevels[] = {75, 150, 225, 300, 375, 450};
-static const size_t bonusSkillLevelsSize =
-    sizeof(bonusSkillLevels) / sizeof(uint32);
+static uint32       bonusSkillLevels[] = {1, 2, 3, 4, 5, 6, 7, 8}; 
+static const size_t bonusSkillLevelsSize = sizeof(bonusSkillLevels) / sizeof(uint32);
 
 bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
 {
@@ -1024,45 +1009,62 @@ void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool def
 void Player::UpdateSkillsForLevel()
 {
     uint16 maxconfskill = sWorld->GetConfigMaxSkillValue();
-    uint32 maxSkill     = GetMaxSkillValueForLevel();
+    bool alwaysMaxSkill = sWorld->getBoolConfig(CONFIG_ALWAYS_MAX_SKILL_FOR_LEVEL);
 
-    bool alwaysMaxSkill =
-        sWorld->getBoolConfig(CONFIG_ALWAYS_MAX_SKILL_FOR_LEVEL);
-
-    for (SkillStatusMap::iterator itr = mSkillStatus.begin();
-         itr != mSkillStatus.end(); ++itr)
+    for (SkillStatusMap::iterator itr = mSkillStatus.begin(); itr != mSkillStatus.end(); ++itr)
     {
         if (itr->second.uState == SKILL_DELETED)
             continue;
 
-        uint32                         pskill = itr->first;
-        SkillRaceClassInfoEntry const* rcEntry =
-            GetSkillRaceClassInfo(pskill, getRace(), getClass());
-        if (!rcEntry)
-            continue;
-
-        if (GetSkillRangeType(rcEntry) != SKILL_RANGE_LEVEL)
-            continue;
-
+        uint32 pskill = itr->first; 
+        SkillRaceClassInfoEntry const* rcEntry = GetSkillRaceClassInfo(pskill, getRace(), getClass());
         uint32 valueIndex = PLAYER_SKILL_VALUE_INDEX(itr->second.pos);
         uint32 data       = GetUInt32Value(valueIndex);
         uint32 max        = SKILL_MAX(data);
         uint32 val        = SKILL_VALUE(data);
-
-        /// update only level dependent max skill values
-        if (max != 1)
-        {
-            /// maximize skill always
-            if (alwaysMaxSkill ||
-                (rcEntry->Flags & SKILL_FLAG_ALWAYS_MAX_VALUE))
+        
+        if (!rcEntry)
+            continue;
+        
+        if (GetSkillRangeType(rcEntry) == SKILL_RANGE_RANK || GetSkillRangeType(rcEntry) == SKILL_RANGE_LEVEL)
+        {   
+            uint32 skillrank = GetSkillStep(pskill);
+            
+            if (skillrank == 0)
+                skillrank = 1;
+            
+            uint32 maxSkill  = GetMaxSkillValueForSecStat(pskill) * skillrank;
+            
+            if (alwaysMaxSkill || (rcEntry->Flags & SKILL_FLAG_ALWAYS_MAX_VALUE))
             {
-                SetUInt32Value(valueIndex,
-                               MAKE_SKILL_VALUE(maxSkill, maxSkill));
+                SetUInt32Value(valueIndex, MAKE_SKILL_VALUE(maxSkill, maxSkill));
                 if (itr->second.uState != SKILL_NEW)
                     itr->second.uState = SKILL_CHANGED;
             }
-            else if (max != maxconfskill) /// update max skill value if current
-                                          /// max skill not maximized
+            
+            else if (max != maxconfskill)
+            {
+                SetUInt32Value(valueIndex, MAKE_SKILL_VALUE(val, maxSkill));
+                if (itr->second.uState != SKILL_NEW)
+                    itr->second.uState = SKILL_CHANGED;
+
+            continue;
+            }
+        }
+        
+        /// update only level dependent max skill values
+        if (GetSkillRangeType(rcEntry) == SKILL_RANGE_LANGUAGE || GetSkillRangeType(rcEntry) == SKILL_RANGE_MONO)
+        {
+            uint32 maxSkill = max;
+            /// maximize skill always
+            if (alwaysMaxSkill || (rcEntry->Flags & SKILL_FLAG_ALWAYS_MAX_VALUE))
+            {
+                SetUInt32Value(valueIndex, MAKE_SKILL_VALUE(maxSkill, maxSkill));
+                if (itr->second.uState != SKILL_NEW)
+                    itr->second.uState = SKILL_CHANGED;
+            }
+            /// update max skill value if current max skill not maximized
+            else if (max != maxconfskill)
             {
                 SetUInt32Value(valueIndex, MAKE_SKILL_VALUE(val, maxSkill));
                 if (itr->second.uState != SKILL_NEW)

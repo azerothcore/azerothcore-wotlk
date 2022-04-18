@@ -293,6 +293,8 @@ Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
 
     for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i)
         m_speed_rate[i] = 1.0f;
+    
+    m_player_speed_mod = 0.0f;
 
     m_charmInfo = nullptr;
 
@@ -13502,6 +13504,22 @@ void Unit::SetModelVisible(bool on)
         CastSpell(this, 24401, true);
 }
 
+//calcspeedhere
+void Unit::CalcPlayerSpeedMod()
+{
+    if (GetTypeId() != TYPEID_PLAYER)
+        return;
+    
+    Player* player = ToPlayer();
+    if (!player)
+        return;
+    
+    float speedmod = player->GetSpeedModUp();
+    speedmod -= player->GetSpeedModDown();
+
+    SetPlayerSpeedMod(speedmod);  
+}
+
 void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
 {
     int32 main_speed_mod  = 0;
@@ -13665,7 +13683,19 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
 
 float Unit::GetSpeed(UnitMoveType mtype) const
 {
-    return m_speed_rate[mtype] * (IsControlledByPlayer() ? playerBaseMoveSpeed[mtype] : baseMoveSpeed[mtype]);
+    if (GetTypeId() == TYPEID_PLAYER)
+        const_cast<Unit*>(this)->CalcPlayerSpeedMod();
+
+    if (IsControlledByPlayer())
+        if (mtype == MOVE_RUN && m_speed_rate[mtype] > 0)
+            return  ((m_speed_rate[mtype] * playerBaseMoveSpeed[mtype]) + m_player_speed_mod);
+        else 
+            return (m_speed_rate[mtype] * playerBaseMoveSpeed[mtype]);
+    else
+        if (mtype == MOVE_RUN && m_speed_rate[mtype] > 0)
+            return ((m_speed_rate[mtype] *  baseMoveSpeed[mtype]) + m_player_speed_mod);
+        else 
+            return (m_speed_rate[mtype] *  baseMoveSpeed[mtype]);
 }
 
 void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
@@ -13674,8 +13704,8 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
         rate = 0.0f;
 
     // Update speed only on change
-    if (m_speed_rate[mtype] == rate)
-        return;
+    //if (m_speed_rate[mtype] == rate)
+        //return;
 
     m_speed_rate[mtype] = rate;
 
@@ -14867,12 +14897,9 @@ void Unit::SetMaxPower(Powers power, uint32 val)
 
 uint32 Unit::GetStatPointsByStat(Stats stat) const 
 { 
-    PlayerLevelInfo info; 
-    sObjectMgr->GetPlayerLevelInfo(getRace(true), getClass(), getLevel(), &info);
-    
-    uint8 i = (STAT_STRENGTH + stat);
-    
-    return (GetStat(stat) - info.stats[i]); 
+    uint32 statPoints = m_createStatPoints[stat];
+   
+    return statPoints; 
 }
 
 uint32 Unit::GetCreatePowers(Powers power) const
