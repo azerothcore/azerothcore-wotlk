@@ -49,7 +49,7 @@ enum Spells
     SPELL_CHROMATIC_MUT_1                                  = 23174,   //Spell cast on player if they get all 5 debuffs
 
     SPELL_ELEMENTAL_SHIELD                                 = 22276,
-    SPELL_FRENZY                                           = 23128,   
+    SPELL_FRENZY                                           = 23128,
     SPELL_ENRAGE                                           = 23537
 };
 
