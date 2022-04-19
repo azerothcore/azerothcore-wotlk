@@ -49,8 +49,8 @@ enum Spells
     SPELL_CHROMATIC_MUT_1                                  = 23174,   //Spell cast on player if they get all 5 debuffs
 
     SPELL_ELEMENTAL_SHIELD                                 = 22276,
-    SPELL_FRENZY                                           = 28371,   //The frenzy spell may be wrong
-    SPELL_ENRAGE                                           = 28747
+    SPELL_FRENZY                                           = 23128,
+    SPELL_ENRAGE                                           = 23537
 };
 
 enum Events
@@ -239,7 +239,7 @@ public:
                             // Cast new random vulnerabilty on self
                             DoCast(me, SPELL_ELEMENTAL_SHIELD);
                             Talk(EMOTE_SHIMMER);
-                            events.ScheduleEvent(EVENT_SHIMMER, 45000);
+                            events.ScheduleEvent(EVENT_SHIMMER, urand(17000, 25000));
                             break;
                         }
                     case EVENT_BREATH_1:
