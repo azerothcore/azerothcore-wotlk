@@ -46,7 +46,7 @@ public:
         {
             BossAI::EnterCombat(who);
 
-            events.ScheduleEvent(EVENT_SHADOWFLAME, 10000, 20000);
+            events.ScheduleEvent(EVENT_SHADOWFLAME, 18000);
             events.ScheduleEvent(EVENT_WINGBUFFET, 30000);
             events.ScheduleEvent(EVENT_FLAMEBUFFET, 5000);
         }
