@@ -239,7 +239,7 @@ public:
                             // Cast new random vulnerabilty on self
                             DoCast(me, SPELL_ELEMENTAL_SHIELD);
                             Talk(EMOTE_SHIMMER);
-                            events.ScheduleEvent(EVENT_SHIMMER, 17000, 25000);
+                            events.ScheduleEvent(EVENT_SHIMMER, urand(17000, 25000));
                             break;
                         }
                     case EVENT_BREATH_1:
