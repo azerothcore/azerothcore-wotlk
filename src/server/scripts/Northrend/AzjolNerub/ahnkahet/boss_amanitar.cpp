@@ -140,10 +140,10 @@ struct boss_amanitar : public BossAI
         BossAI::SummonedCreatureDies(summon, killer);
     }
 
-    void EnterEvadeMode() override
+    void EnterEvadeMode(EvadeReason why) override
     {
         instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_MINI);
-        BossAI::EnterEvadeMode();
+        BossAI::EnterEvadeMode(why);
     }
 
     void ExecuteEvent(uint32 eventId) override
@@ -245,7 +245,7 @@ struct npc_amanitar_mushrooms : public ScriptedAI
     // Disabled events
     void EnterCombat(Unit* /*who*/) override {}
     void AttackStart(Unit* /*victim*/) override {}
-    void EnterEvadeMode() override {}
+    void EnterEvadeMode(EvadeReason /*why*/) override {}
 
     void Reset() override
     {

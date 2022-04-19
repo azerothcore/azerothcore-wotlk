@@ -145,11 +145,11 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->DisableRotate(false);
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void MoveInLineOfSight(Unit*  /*who*/) override {}

@@ -151,7 +151,7 @@ public:
         {
             if (!instance->CheckRequiredBosses(DATA_ROTFACE, who->ToPlayer()))
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 instance->DoCastSpellOnPlayers(LIGHT_S_HAMMER_TELEPORT);
                 return;
             }
@@ -219,13 +219,13 @@ public:
                 Talk(SAY_KILL);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->DisableRotate(false);
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
             if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
-                professor->AI()->EnterEvadeMode();
+                professor->AI()->EnterEvadeMode(why);
         }
 
         void SpellHitTarget(Unit* target, SpellInfo const* spell) override
@@ -407,7 +407,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->SetInCombatWithZone();
         }
@@ -492,7 +492,7 @@ public:
                 DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->SetInCombatWithZone();
         }

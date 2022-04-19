@@ -279,7 +279,7 @@ public:
             summons.Summon(summon);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             events.Reset();
             summons.DespawnAll();
@@ -355,7 +355,7 @@ public:
             me->DespawnOrUnsummon(10000);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->DespawnOrUnsummon();
         }
@@ -436,7 +436,7 @@ public:
             me->DespawnOrUnsummon(10000);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->DespawnOrUnsummon();
         }

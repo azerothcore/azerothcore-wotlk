@@ -70,9 +70,9 @@ public:
         {
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
 
             for (ObjectGuid const& guid : Eggs)
                 if (Creature* egg = me->GetMap()->GetCreature(guid))
