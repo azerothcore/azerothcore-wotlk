@@ -4514,6 +4514,8 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                     case SMART_TARGET_PLAYER_DISTANCE:
                     {
                         ObjectList* targets = GetTargets(e);
+                        if (!targets)
+                            return;
                         for (WorldObject* target : *targets)
                         {
                             if (IsUnit(target) && me->IsFriendlyTo(target->ToUnit()) && target->ToUnit()->IsAlive() && target->ToUnit()->IsInCombat())
