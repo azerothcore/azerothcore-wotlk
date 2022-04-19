@@ -39,7 +39,6 @@ public:
             mySess->GetQueryProcessor().AddCallback(CharacterDatabase.AsyncQuery(stmt)
                 .WithPreparedCallback([mySess](PreparedQueryResult result)
                     {
-                        for (auto const& servMail : sObjectMgr->GetAllServerMailStore())
                         {
                             if (result)
                                 continue;
