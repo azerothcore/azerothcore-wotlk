@@ -112,6 +112,8 @@ UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Captura La Dominancia' WH
 UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Captura La Dominancia' WHERE `ID` = 13409 AND `locale` IN ('esES','esMX');
 UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Captura La Dominancia' WHERE `ID` = 13408 AND `locale` IN ('esES','esMX');
 UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Cruzado Escarlata asesinada' WHERE `ID` = 12678 AND `locale` IN ('esES','esMX');
+UPDATE `quest_template_locale` SET `Objectives` = '' WHERE `ID` = 2868 AND `locale` = 'esES';
+UPDATE `quest_template_locale` SET `Objectives` = '' WHERE `ID` = 5421 AND `locale` IN ('esES','esMX');
 
 
 
