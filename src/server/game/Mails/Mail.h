@@ -223,8 +223,8 @@ struct ServerMail
     uint32 itemCountA{ 0 };
     uint32 itemH{ 0 };
     uint32 itemCountH{ 0 };
-    std::string subject{ "" };
-    std::string body{ "" };
+    std::string subject;
+    std::string body;
     uint8 active{ 0 };
 };
 
