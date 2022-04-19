@@ -70,7 +70,7 @@ enum CreatureFlagsExtra : uint32
     CREATURE_FLAG_EXTRA_NO_PLAYER_DAMAGE_REQ            = 0x00200000,   // creature does not need to take player damage for kill credit
     CREATURE_FLAG_EXTRA_AVOID_AOE                       = 0x00400000,   // pussywizard: ignored by aoe attacks (for icc blood prince council npc - Dark Nucleus)
     CREATURE_FLAG_EXTRA_NO_DODGE                        = 0x00800000,   // xinef: target cannot dodge
-    CREATURE_FLAG_EXTRA_UNUSED_25                       = 0x01000000,
+    CREATURE_FLAG_EXTRA_MODULE.                         = 0x01000000,
     CREATURE_FLAG_EXTRA_UNUSED_26                       = 0x02000000,
     CREATURE_FLAG_EXTRA_UNUSED_27                       = 0x04000000,
     CREATURE_FLAG_EXTRA_UNUSED_28                       = 0x08000000,
@@ -78,7 +78,6 @@ enum CreatureFlagsExtra : uint32
     CREATURE_FLAG_EXTRA_IGNORE_PATHFINDING              = 0x20000000,   // creature ignore pathfinding
     CREATURE_FLAG_EXTRA_IMMUNITY_KNOCKBACK              = 0x40000000,   // creature is immune to knockback effects
     CREATURE_FLAG_EXTRA_HARD_RESET                      = 0x80000000,
-    CREATURE_FLAG_EXTRA_MODULE                          = 0x100000000,
 
     // Masks
     CREATURE_FLAG_EXTRA_UNUSED                          = (CREATURE_FLAG_EXTRA_UNUSED_12 | CREATURE_FLAG_EXTRA_UNUSED_25 | CREATURE_FLAG_EXTRA_UNUSED_26 |
