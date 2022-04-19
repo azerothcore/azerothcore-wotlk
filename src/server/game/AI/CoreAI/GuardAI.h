@@ -30,7 +30,7 @@ public:
     static int Permissible(Creature const* creature);
 
     void Reset() override;
-    void EnterEvadeMode() override;
+    void EnterEvadeMode(EvadeReason /*why*/) override;
     void JustDied(Unit* killer) override;
 };
 #endif

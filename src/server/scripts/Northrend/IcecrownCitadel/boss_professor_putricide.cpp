@@ -253,7 +253,7 @@ public:
             me->SetStandState(UNIT_STAND_STATE_STAND);
 
             if (instance->GetBossState(DATA_ROTFACE) == DONE && instance->GetBossState(DATA_FESTERGUT) == DONE)
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
 
         uint32 GetData(uint32 type) const override
@@ -290,7 +290,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 BossAI::MoveInLineOfSight(who);
         }
 
@@ -501,7 +501,7 @@ public:
                 {
                     sayFestergutDeathTimer = 0;
                     Talk(SAY_FESTERGUT_DEATH);
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                 }
                 else
                     sayFestergutDeathTimer -= diff;
@@ -512,7 +512,7 @@ public:
                 {
                     sayRotfaceDeathTimer = 0;
                     Talk(SAY_ROTFACE_DEATH);
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                 }
                 else
                     sayRotfaceDeathTimer -= diff;
@@ -520,7 +520,7 @@ public:
             else if (bCallEvade)
             {
                 bCallEvade = false;
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 return;
             }
 
@@ -665,12 +665,12 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             Position p = me->GetHomePosition();
             if (!me->IsInCombat() && me->GetExactDist2d(&p) > 10.0f)
                 me->GetMotionMaster()->MoveCharge(tablePos.GetPositionX(), tablePos.GetPositionY(), tablePos.GetPositionZ(), 15.0f, POINT_TABLE);
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
         }
 
         void ChangePhase()
@@ -799,7 +799,7 @@ public:
             else if (targetGUID)
             {
                 Unit* target = ObjectAccessor::GetUnit(*me, targetGUID);
-                if (me->GetVictim()->GetGUID() != targetGUID || !target || !me->IsValidAttackTarget(target) || target->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH) || target->GetExactDist2dSq(4356.0f, 3211.0f) > 80.0f * 80.0f || target->GetPositionZ() < 380.0f || target->GetPositionZ() > 405.0f)
+                if (me->GetVictim()->GetGUID() != targetGUID || !target || !me->IsValidAttackTarget(target) || target->HasUnitFlag2(UNIT_FLAG2_FEIGN_DEATH) || target->GetExactDist2dSq(4356.0f, 3211.0f) > 80.0f * 80.0f || target->GetPositionZ() < 380.0f || target->GetPositionZ() > 405.0f)
                     SelectNewTarget();
             }
         }

@@ -68,7 +68,7 @@ public:
                 break;
             case 8:
                 _owner.SetReactState(REACT_AGGRESSIVE);
-                _owner.RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                _owner.RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                 if (InstanceScript* instance = _owner.GetInstanceScript())
                     instance->SetData(DATA_BATTERED_HILT, 8);
                 break;
@@ -96,7 +96,7 @@ public:
                 {
                     Position homePos = _owner.GetHomePosition();
                     _owner.SetReactState(REACT_PASSIVE);
-                    _owner.SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    _owner.SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     _owner.SetVisible(false);
                     _owner.UpdatePosition(homePos.GetPositionX(), homePos.GetPositionY(), homePos.GetPositionZ(), homePos.GetOrientation(), true);
                     _owner.StopMovingOnCurrentPos();
@@ -221,7 +221,7 @@ public:
                     NPC_LeaderIntroGUID = creature->GetGUID();
                     if (TeamIdInInstance == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_JAINA_PART1);
-                    creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                    creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                     creature->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                     break;
                 case NPC_DARK_RANGER_LORALEN:
@@ -313,7 +313,7 @@ public:
                     if (!(EncounterMask & (1 << DATA_LK_INTRO)))
                     {
                         creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, TeamIdInInstance == TEAM_ALLIANCE ? EMOTE_ONESHOT_ATTACK2HTIGHT : EMOTE_ONESHOT_ATTACK1H);
-                        creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                        creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                         creature->CastSpell(creature, TeamIdInInstance == TEAM_ALLIANCE ? SPELL_JAINA_ICE_BARRIER : SPELL_SYLVANAS_CLOAK_OF_DARKNESS, true);
                         if (TeamIdInInstance != TEAM_ALLIANCE)
                         {
@@ -323,8 +323,8 @@ public:
                     }
                     else if (!(EncounterMask & (1 << DATA_LICH_KING)))
                     {
-                        creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                        creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        creature->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
+                        creature->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         creature->UpdatePosition(LeaderEscapePos, true);
                         creature->StopMovingOnCurrentPos();
                     }
@@ -530,8 +530,8 @@ public:
                         c->GetMotionMaster()->MoveIdle();
                         c->UpdatePosition(LeaderEscapePos, true);
                         c->StopMovingOnCurrentPos();
-                        c->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                        c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        c->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
+                        c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         c->SetHealth(c->GetMaxHealth() / 20);
                         c->AI()->Reset();
                         c->setActive(false);
@@ -629,7 +629,7 @@ public:
                                 if (Creature* c = instance->GetCreature(NPC_QuelDelarGUID))
                                 {
                                     c->SetReactState(REACT_AGGRESSIVE);
-                                    c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                                    c->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                                     c->RemoveAurasDueToSpell(70300);
                                 }
                                 break;
@@ -889,7 +889,7 @@ public:
                                 if (c->GetEntry() == entry)
                                 {
                                     TrashActive[j] = true;
-                                    c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+                                    c->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
                                     c->AI()->DoAction(1);
                                     break;
                                 }
@@ -918,7 +918,7 @@ public:
                         c->DeleteThreatList();
                         c->CombatStop(true);
                         c->InterruptNonMeleeSpells(true);
-                        c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+                        c->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
                         c->Respawn(true);
                         c->UpdatePosition(c->GetHomePosition(), true);
                         c->StopMovingOnCurrentPos();
@@ -1153,7 +1153,7 @@ public:
                                 for (uint8 i = 0; i < 3; ++i)
                                     if (StairsPos[index][i].GetPositionX())
                                         if (GameObject* go = leader->SummonGameObject(TeamIdInInstance == TEAM_ALLIANCE ? GO_STAIRS_ALLIANCE : GO_STAIRS_HORDE, StairsPos[index][i].GetPositionX(), StairsPos[index][i].GetPositionY(), StairsPos[index][i].GetPositionZ(), StairsPos[index][i].GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 86400, false))
-                                            go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE);
+                                            go->SetGameObjectFlag(GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE);
 
                                 //Position pos = TeamIdInInstance == TEAM_ALLIANCE ? AllyPortalPos : HordePortalPos;
                                 //leader->SummonGameObject(GO_PORTAL_TO_DALARAN, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 86400);
@@ -1196,7 +1196,7 @@ public:
                             break;
                         case 11:
                             if (Creature* c = instance->GetCreature(NPC_LeaderGUID))
-                                c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                                c->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                             ++outroStep;
                             outroTimer = 300 * 1000;
                             break;

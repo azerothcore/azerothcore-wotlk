@@ -63,6 +63,11 @@ class PathGenerator;
 
 enum WeatherState : uint32;
 
+namespace VMAP
+{
+    enum class ModelIgnoreFlags : uint32;
+}
+
 namespace Acore
 {
     struct ObjectUpdater;
@@ -183,10 +188,13 @@ struct PositionFullTerrainStatus
 
 enum LineOfSightChecks
 {
-    LINEOFSIGHT_CHECK_VMAP      = 0x1, // check static floor layout data
-    LINEOFSIGHT_CHECK_GOBJECT   = 0x2, // check dynamic game object data
+    LINEOFSIGHT_CHECK_VMAP          = 0x1, // check static floor layout data
+    LINEOFSIGHT_CHECK_GOBJECT_WMO   = 0x2, // check dynamic game object data (wmo models)
+    LINEOFSIGHT_CHECK_GOBJECT_M2    = 0x4, // check dynamic game object data (m2 models)
 
-    LINEOFSIGHT_ALL_CHECKS      = (LINEOFSIGHT_CHECK_VMAP | LINEOFSIGHT_CHECK_GOBJECT)
+    LINEOFSIGHT_CHECK_GOBJECT_ALL   = LINEOFSIGHT_CHECK_GOBJECT_WMO | LINEOFSIGHT_CHECK_GOBJECT_M2,
+
+    LINEOFSIGHT_ALL_CHECKS          = LINEOFSIGHT_CHECK_VMAP | LINEOFSIGHT_CHECK_GOBJECT_ALL
 };
 
 class GridMap
@@ -539,7 +547,7 @@ public:
 
     float GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, float* ground = nullptr, bool swim = false, float collisionHeight = DEFAULT_COLLISION_HEIGHT) const;
     [[nodiscard]] float GetHeight(uint32 phasemask, float x, float y, float z, bool vmap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
-    [[nodiscard]] bool isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, LineOfSightChecks checks) const;
+    [[nodiscard]] bool isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, LineOfSightChecks checks, VMAP::ModelIgnoreFlags ignoreFlags) const;
     bool CanReachPositionAndGetValidCoords(WorldObject const* source, PathGenerator *path, float &destX, float &destY, float &destZ, bool failOnCollision = true, bool failOnSlopes = true) const;
     bool CanReachPositionAndGetValidCoords(WorldObject const* source, float &destX, float &destY, float &destZ, bool failOnCollision = true, bool failOnSlopes = true) const;
     bool CanReachPositionAndGetValidCoords(WorldObject const* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool failOnCollision = true, bool failOnSlopes = true) const;
@@ -633,6 +641,11 @@ public:
     void RemoveUpdateObject(Object* obj)
     {
         _updateObjects.erase(obj);
+    }
+
+    size_t GetActiveNonPlayersCount() const
+    {
+        return m_activeNonPlayers.size();
     }
 
 private:

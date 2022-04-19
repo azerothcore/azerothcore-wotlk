@@ -23,48 +23,49 @@
 
 enum Say
 {
-    SAY_EGGS_BROKEN1        = 0,
-    SAY_EGGS_BROKEN2        = 1,
-    SAY_EGGS_BROKEN3        = 2,
-    SAY_DEATH               = 3,
+    SAY_EGGS_BROKEN1            = 0,
+    SAY_EGGS_BROKEN2            = 1,
+    SAY_EGGS_BROKEN3            = 2,
+    SAY_DEATH                   = 3,
 
-    EMOTE_TROOPS_RETREAT    = 0
+    EMOTE_TROOPS_RETREAT        = 0
 };
 
 enum Spells
 {
-    SPELL_MINDCONTROL       = 19832,
-    SPELL_EGG_DESTROY       = 19873,
-    SPELL_MIND_EXHAUSTION   = 23958,
+    SPELL_MINDCONTROL           = 19832,
+    SPELL_MINDCONTROL_VISUAL    = 45537,
+    SPELL_EGG_DESTROY           = 19873,
+    SPELL_MIND_EXHAUSTION       = 23958,
 
-    SPELL_CLEAVE            = 19632,
-    SPELL_WARSTOMP          = 24375,
-    SPELL_FIREBALLVOLLEY    = 22425,
-    SPELL_CONFLAGRATION     = 23023,
+    SPELL_CLEAVE                = 19632,
+    SPELL_WARSTOMP              = 24375,
+    SPELL_FIREBALLVOLLEY        = 22425,
+    SPELL_CONFLAGRATION         = 23023,
 
-    SPELL_EXPLODE_ORB       = 20037,
-    SPELL_EXPLOSION         = 20038, // Instakill everything.
+    SPELL_EXPLODE_ORB           = 20037,
+    SPELL_EXPLOSION             = 20038, // Instakill everything.
 
-    SPELL_WARMING_FLAMES    = 23040,
+    SPELL_WARMING_FLAMES        = 23040,
 };
 
 enum Summons
 {
-    NPC_ELITE_DRACHKIN      = 12422,
-    NPC_ELITE_WARRIOR       = 12458,
-    NPC_WARRIOR             = 12416,
-    NPC_MAGE                = 12420,
-    NPC_WARLOCK             = 12459,
+    NPC_ELITE_DRACHKIN          = 12422,
+    NPC_ELITE_WARRIOR           = 12458,
+    NPC_WARRIOR                 = 12416,
+    NPC_MAGE                    = 12420,
+    NPC_WARLOCK                 = 12459,
 
-    GO_EGG                  = 177807
+    GO_EGG                      = 177807
 };
 
 enum EVENTS
 {
-    EVENT_CLEAVE            = 1,
-    EVENT_STOMP             = 2,
-    EVENT_FIREBALL          = 3,
-    EVENT_CONFLAGRATION     = 4
+    EVENT_CLEAVE                = 1,
+    EVENT_STOMP                 = 2,
+    EVENT_FIREBALL              = 3,
+    EVENT_CONFLAGRATION         = 4
 };
 
 class boss_razorgore : public CreatureScript
@@ -79,7 +80,6 @@ public:
         void Reset() override
         {
             _Reset();
-            _died = false;
             _charmerGUID.Clear();
             secondPhase = false;
             summons.DespawnAll();
@@ -92,11 +92,23 @@ public:
             {
                 _JustDied();
             }
+            else
+            {
+                // Respawn shorty in case of failure during phase 1.
+                me->SetCorpseRemoveTime(25);
+                me->SetRespawnTime(30);
+                me->SaveRespawnTime();
+
+                // Might not be required, safe measure.
+                me->SetLootRecipient(nullptr);
+
+                instance->SetData(DATA_EGG_EVENT, FAIL);
+            }
         }
 
         bool CanAIAttack(Unit const* target) const override
         {
-            return !(target->GetTypeId() == TYPEID_UNIT && !secondPhase);
+            return !(target->GetTypeId() == TYPEID_UNIT && !secondPhase) && !target->HasAura(SPELL_CONFLAGRATION);
         }
 
         void EnterCombat(Unit* /*victim*/) override
@@ -150,12 +162,14 @@ public:
                 if (Unit* charmer = ObjectAccessor::GetUnit(*me, _charmerGUID))
                 {
                     charmer->CastSpell(charmer, SPELL_MIND_EXHAUSTION, true);
+                    charmer->CastSpell(me, SPELL_MINDCONTROL_VISUAL, false);
                 }
             }
             else
             {
                 if (Unit* charmer = ObjectAccessor::GetUnit(*me, _charmerGUID))
                 {
+                    charmer->RemoveAurasDueToSpell(SPELL_MINDCONTROL_VISUAL);
                     me->TauntApply(charmer);
                 }
             }
@@ -191,24 +205,11 @@ public:
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (!secondPhase && damage >= me->GetHealth() && !_died)
+            if (!secondPhase && damage >= me->GetHealth())
             {
-                // This is required because he kills himself with the explosion spell, causing a loop.
-                _died = true;
-
                 Talk(SAY_DEATH);
                 DoCastAOE(SPELL_EXPLODE_ORB);
                 DoCastAOE(SPELL_EXPLOSION);
-
-                // Respawn shorty in case of failure during phase 1.
-                me->SetCorpseRemoveTime(25);
-                me->SetRespawnTime(30);
-                me->SaveRespawnTime();
-
-                // Might not be required, safe measure.
-                me->SetLootRecipient(nullptr);
-
-                instance->SetData(DATA_EGG_EVENT, FAIL);
             }
         }
 
@@ -256,7 +257,6 @@ public:
 
     private:
         bool secondPhase;
-        bool _died;
         ObjectGuid _charmerGUID;
         GuidVector _summonGUIDS;
     };
@@ -309,6 +309,7 @@ public:
                     razorgore->AI()->DoAction(TALK_EGG_BROKEN_RAND);
                     egg->SetLootState(GO_READY);
                     egg->UseDoorOrButton(10000);
+                    egg->SetRespawnTime(WEEK);
                 }
             }
         }

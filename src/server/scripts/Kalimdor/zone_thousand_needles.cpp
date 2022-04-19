@@ -263,8 +263,8 @@ public:
             if (me->GetFaction() != NormFaction)
                 me->SetFaction(NormFaction);
 
-            if (me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            if (me->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
             DoCast(me, SPELL_PLUCKY_CHICKEN, false);
         }
@@ -276,19 +276,19 @@ public:
                 if (TextEmote == TEXT_EMOTE_BECKON)
                 {
                     me->SetFaction(FACTION_FRIENDLY);
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     DoCast(me, SPELL_PLUCKY_HUMAN, false);
                 }
             }
 
             if (TextEmote == TEXT_EMOTE_CHICKEN)
             {
-                if (me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
+                if (me->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
                     return;
                 else
                 {
                     me->SetFaction(FACTION_FRIENDLY);
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     DoCast(me, SPELL_PLUCKY_HUMAN, false);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
                 }
@@ -297,14 +297,14 @@ public:
 
         void UpdateAI(uint32 Diff) override
         {
-            if (me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
+            if (me->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
             {
                 if (ResetTimer <= Diff)
                 {
                     if (!me->GetVictim())
                         EnterEvadeMode();
                     else
-                        me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
                     return;
                 }
@@ -337,7 +337,7 @@ public:
         {
             if (Creature* panther = go->FindNearestCreature(ENRAGED_PANTHER, 5, true))
             {
-                panther->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                panther->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 panther->SetReactState(REACT_AGGRESSIVE);
                 panther->AI()->AttackStart(player);
             }
@@ -363,7 +363,7 @@ public:
 
         void Reset() override
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             me->SetReactState(REACT_PASSIVE);
         }
 

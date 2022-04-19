@@ -103,6 +103,7 @@ namespace MMAP
                    bool skipBattlegrounds   = false,
                    bool debugOutput         = false,
                    bool bigBaseUnit         = false,
+                   int mapid                = -1,
                    const char* offMeshFilePath = nullptr);
 
         ~MapBuilder();
@@ -148,7 +149,6 @@ namespace MMAP
 
         rcConfig GetMapSpecificConfig(uint32 mapID, float bmin[3], float bmax[3], const TileConfig &tileConfig);
 
-        // percentageDone - method to calculate percentage
         uint32 percentageDone(uint32 totalTiles, uint32 totalTilesDone);
 
         TerrainBuilder* m_terrainBuilder{nullptr};
@@ -163,9 +163,10 @@ namespace MMAP
 
         float m_maxWalkableAngle;
         bool m_bigBaseUnit;
-        // percentageDone - variables to calculate percentage
+        int32 m_mapid;
+
         std::atomic<uint32> m_totalTiles;
-        std::atomic<uint32> m_totalTilesBuilt;
+        std::atomic<uint32> m_totalTilesProcessed;
 
         // build performance - not really used for now
         rcContext* m_rcContext{nullptr};

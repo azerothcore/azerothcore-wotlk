@@ -787,6 +787,30 @@ namespace Acore
         uint32 i_hp;
     };
 
+    class MostHPPercentMissingInRange
+    {
+    public:
+        MostHPPercentMissingInRange(Unit const* obj, float range, uint32 minHpPct, uint32 maxHpPct) :
+            i_obj(obj), i_range(range), i_minHpPct(minHpPct), i_maxHpPct(maxHpPct), i_hpPct(101.f) { }
+
+        bool operator()(Unit* u)
+        {
+            if (u->IsAlive() && u->IsInCombat() && !i_obj->IsHostileTo(u) && i_obj->IsWithinDistInMap(u, i_range) &&
+                i_minHpPct <= u->GetHealthPct() && u->GetHealthPct() <= i_maxHpPct && u->GetHealthPct() < i_hpPct)
+            {
+                i_hpPct = u->GetHealthPct();
+                return true;
+            }
+
+            return false;
+        }
+
+    private:
+        Unit const* i_obj;
+        float i_range;
+        float i_minHpPct, i_maxHpPct, i_hpPct;
+    };
+
     class FriendlyCCedInRange
     {
     public:
@@ -1037,7 +1061,7 @@ namespace Acore
         {}
         bool operator()(Unit* u)
         {
-            if (!u->IsAlive() || u->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE) || (u->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC) && !u->IsInCombat()))
+            if (!u->IsAlive() || u->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE) || (u->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC) && !u->IsInCombat()))
                 return false;
             if (u->GetGUID() == i_funit->GetGUID())
                 return false;

@@ -114,11 +114,11 @@ public:
 
             if (instance->GetBossState(DATA_GYTH) == IN_PROGRESS)
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_PREPARATION);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_PREPARATION);
                 return;
             }
 
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_PREPARATION);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_PREPARATION);
             gythEvent = false;
             victorGUID.Clear();
             waveDoorGUID.Clear();
@@ -164,11 +164,11 @@ public:
             events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(17000, 19000));
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             instance->SetBossState(DATA_WARCHIEF_REND_BLACKHAND, FAIL);
             instance->SetBossState(DATA_GYTH, FAIL);
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
             me->DespawnOrUnsummon();
         }
 

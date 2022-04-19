@@ -69,9 +69,9 @@ public:
         void DoAction(int32 a) override
         {
             if (a == 1)
-                if (me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
+                if (me->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
                 {
-                    me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     events.Reset();
                     events.ScheduleEvent(1, 1000);
                 }
@@ -190,7 +190,7 @@ public:
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
-        if (creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
+        if (creature->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
         {
             if (creature->GetEntry() == NPC_JAINA_PART1)
                 AddGossipItemFor(player, GOSSIP_JAINA_INTRO, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
@@ -232,14 +232,14 @@ public:
     {
         npc_fos_leader_secondAI(Creature* creature) : ScriptedAI(creature)
         {
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
         }
 
         void MovementInform(uint32 type, uint32 id) override
         {
             if (type == POINT_MOTION_TYPE && id == 1)
             {
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                 if (me->GetEntry() == NPC_JAINA_PART1)
                     Talk(SAY_JAINA_OUTRO);
                 else

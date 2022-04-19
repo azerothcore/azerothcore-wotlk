@@ -400,7 +400,7 @@ void hyjal_trashAI::JustDied(Unit* /*killer*/)
         instance->SetData(DATA_TRASH, 0);//signal trash is dead
 
     if ((instance->GetData(DATA_RAIDDAMAGE) < MINRAIDDAMAGE && !me->isWorldBoss()) || (damageTaken < me->GetMaxHealth() / 4 && me->isWorldBoss()))
-        me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);//no loot
+        me->RemoveDynamicFlag(UNIT_DYNFLAG_LOOTABLE);//no loot
 }
 
 class npc_giant_infernal : public CreatureScript
@@ -416,8 +416,8 @@ public:
             meteor = false;//call once!
             CanMove = false;
             Delay = rand() % 30000;
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetDisplayId(MODEL_INVIS);
             go = false;
             Reset();
@@ -482,8 +482,8 @@ public:
             {
                 if (spawnTimer <= diff)
                 {
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->SetDisplayId(me->GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID));
                     CanMove = true;
                     if (instance->GetData(DATA_ALLIANCE_RETREAT) && !instance->GetData(DATA_HORDE_RETREAT))

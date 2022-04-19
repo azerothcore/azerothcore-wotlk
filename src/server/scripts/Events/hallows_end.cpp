@@ -654,13 +654,13 @@ struct npc_hallows_end_soh : public ScriptedAI
         events.ScheduleEvent(3, 63000);
 
         me->SetReactState(REACT_PASSIVE);
-        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
 
         me->SetCanFly(true);
         me->SetDisableGravity(true);
     }
 
-    void EnterEvadeMode() override
+    void EnterEvadeMode(EvadeReason /* why */) override
     {
         me->DespawnOrUnsummon(1);
     }
@@ -733,7 +733,7 @@ struct npc_hallows_end_soh : public ScriptedAI
                 }
                 case 4:
                 {
-                    me->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
+                    me->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
                     me->SetReactState(REACT_AGGRESSIVE);
                     if (Unit* target = me->SelectNearestPlayer(30.0f))
                         AttackStart(target);
@@ -1038,7 +1038,7 @@ struct boss_headless_horseman : public ScriptedAI
                 me->CastSpell(me, SPELL_HEAD_VISUAL, true);
             else if (point == 11)
             {
-                me->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
+                me->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
                 me->StopMoving();
 
                 me->SetInCombatWithZone();
@@ -1255,7 +1255,7 @@ struct boss_headless_horseman_head : public ScriptedAI
                     if (Player* player = me->SelectNearestPlayer(50.0f))
                         me->GetMotionMaster()->MoveFleeing(player);
 
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     timer = 26000;
                     break;
                 }
