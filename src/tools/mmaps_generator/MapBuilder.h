@@ -84,6 +84,7 @@ namespace MMAP
                    bool skipBattlegrounds   = false,
                    bool debugOutput         = false,
                    bool bigBaseUnit         = false,
+                   int mapid                = -1,
                    const char* offMeshFilePath = nullptr);
 
         ~MapBuilder();
@@ -126,7 +127,7 @@ namespace MMAP
         bool shouldSkipMap(uint32 mapID);
         bool isTransportMap(uint32 mapID);
         bool shouldSkipTile(uint32 mapID, uint32 tileX, uint32 tileY);
-        // percentageDone - method to calculate percentage
+
         uint32 percentageDone(uint32 totalTiles, uint32 totalTilesDone);
 
         TerrainBuilder* m_terrainBuilder{nullptr};
@@ -142,9 +143,10 @@ namespace MMAP
         Optional<float> m_maxWalkableAngle;
         Optional<float> m_maxWalkableAngleNotSteep;
         bool m_bigBaseUnit;
-        // percentageDone - variables to calculate percentage
+        int32 m_mapid;
+
         std::atomic<uint32> m_totalTiles;
-        std::atomic<uint32> m_totalTilesBuilt;
+        std::atomic<uint32> m_totalTilesProcessed;
 
         // build performance - not really used for now
         rcContext* m_rcContext{nullptr};

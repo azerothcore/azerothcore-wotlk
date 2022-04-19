@@ -61,7 +61,7 @@ protected:
     {
         RatingChange = ratingChange;
         MatchmakerRating = matchMakerRating;
-        TeamName = teamName;
+        TeamName = std::string(teamName);
     }
 
     void BuildRatingInfoBlock(WorldPacket& data);

@@ -84,7 +84,7 @@ public:
     void UpdatePeriodic(Unit* caster);
 
     uint32 GetTickNumber() const { return m_tickNumber; }
-    int32 GetTotalTicks() const { return m_amplitude ? (GetBase()->GetMaxDuration() / m_amplitude) : 1;}
+    int32 GetTotalTicks() const;
     void ResetPeriodic(bool resetPeriodicTimer = false) { if (resetPeriodicTimer) m_periodicTimer = m_amplitude; m_tickNumber = 0;}
     void ResetTicks() { m_tickNumber = 0; }
 

@@ -101,7 +101,7 @@ public:
             envelopingWinds_Timer = 9000;
             shock_Timer = 5000;
 
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
             me->SetFaction(FACTION_FRIENDLY);
 
             Talk(SAY_SUMMON);
@@ -125,7 +125,7 @@ public:
             if (HealthBelowPct(30))
             {
                 me->SetFaction(FACTION_FRIENDLY);
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                 me->RemoveAllAuras();
                 me->DeleteThreatList();
                 me->CombatStop(true);

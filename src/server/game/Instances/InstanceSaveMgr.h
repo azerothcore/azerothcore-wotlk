@@ -166,7 +166,7 @@ public:
 
     InstanceSave* AddInstanceSave(uint32 mapId, uint32 instanceId, Difficulty difficulty, bool startup = false);
     bool DeleteInstanceSaveIfNeeded(uint32 InstanceId, bool skipMapCheck);
-    bool DeleteInstanceSaveIfNeeded(InstanceSave* save, bool skipMapCheck);
+    bool DeleteInstanceSaveIfNeeded(InstanceSave* save, bool skipMapCheck, bool deleteSave = true);
 
     InstanceSave* GetInstanceSave(uint32 InstanceId);
 

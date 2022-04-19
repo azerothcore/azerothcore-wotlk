@@ -41,7 +41,7 @@ public:
     void MoveInLineOfSight(Unit*) override {}
     void AttackStart(Unit* target) override;
     void UpdateAI(uint32) override;
-    void EnterEvadeMode() override {}
+    void EnterEvadeMode(EvadeReason /*why*/) override {}
 
     void JustDied(Unit*) override;
     void KilledUnit(Unit* victim) override;
@@ -57,7 +57,7 @@ public:
     void MoveInLineOfSight(Unit*) override {}
     void AttackStart(Unit*) override {}
     void UpdateAI(uint32) override {}
-    void EnterEvadeMode() override {}
+    void EnterEvadeMode(EvadeReason /*why*/) override {}
     void OnCharmed(bool /*apply*/) override {}
 
     static int Permissible(Creature const*) { return PERMIT_BASE_IDLE;  }
@@ -69,7 +69,7 @@ public:
     explicit CritterAI(Creature* c) : PassiveAI(c) { _combatTimer = 0; }
 
     void DamageTaken(Unit* /*done_by*/, uint32& /*damage*/, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask) override;
-    void EnterEvadeMode() override;
+    void EnterEvadeMode(EvadeReason why) override;
     void UpdateAI(uint32) override;
 
     // Xinef: Added
