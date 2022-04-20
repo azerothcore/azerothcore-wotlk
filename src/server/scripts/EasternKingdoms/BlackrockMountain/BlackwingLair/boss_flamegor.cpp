@@ -72,7 +72,7 @@ public:
                 {
                     case EVENT_SHADOWFLAME:
                         DoCastVictim(SPELL_SHADOWFLAME);
-                        events.ScheduleEvent(EVENT_SHADOWFLAME, 10000, 20000);
+                        events.ScheduleEvent(EVENT_SHADOWFLAME, 15000, 25000);
                         break;
                     case EVENT_WINGBUFFET:
                         DoCastVictim(SPELL_WINGBUFFET);
