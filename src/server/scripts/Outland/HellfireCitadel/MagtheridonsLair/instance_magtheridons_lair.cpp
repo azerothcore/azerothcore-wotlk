@@ -19,10 +19,15 @@
 #include "ScriptMgr.h"
 #include "magtheridons_lair.h"
 
+BossBoundaryData const boundaries =
+{
+    { TYPE_MAGTHERIDON, new CircleBoundary(Position(-18.70f, 2.24f), 52.30) }
+};
+
 DoorData const doorData[] =
 {
-    { GO_MAGTHERIDON_DOORS,  TYPE_MAGTHERIDON,   DOOR_TYPE_ROOM,  BOUNDARY_S },
-    { 0,                0,              DOOR_TYPE_ROOM,     BOUNDARY_NONE } // END
+    { GO_MAGTHERIDON_DOORS,     TYPE_MAGTHERIDON,           DOOR_TYPE_ROOM },
+    { 0,                        0,                          DOOR_TYPE_ROOM } // END
 };
 
 MinionData const minionData[] =
@@ -42,6 +47,7 @@ public:
             SetBossNumber(MAX_ENCOUNTER);
             LoadDoorData(doorData);
             LoadMinionData(minionData);
+            LoadBossBoundaries(boundaries);
         }
 
         void Initialize() override

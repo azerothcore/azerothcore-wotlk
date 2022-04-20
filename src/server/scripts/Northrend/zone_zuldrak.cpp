@@ -388,7 +388,7 @@ public:
         ObjectGuid playerGUID;
         ObjectGuid lichGUID;
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (playerGUID)
                 if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
@@ -396,7 +396,7 @@ public:
                         return;
             me->SetFaction(FACTION_UNDEAD_SCOURGE);
             me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void Reset() override
@@ -423,7 +423,7 @@ public:
                             who->ToPlayer()->NearTeleportTo(6143.76f, -1969.7f, 417.57f, 2.08f);
                         else
                         {
-                            EnterEvadeMode();
+                            EnterEvadeMode(EVADE_REASON_OTHER);
                             return;
                         }
                     }
@@ -573,7 +573,7 @@ public:
                     break;
                 case EVENT_BETRAYAL_14:
                     playerGUID.Clear();
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
             }
 

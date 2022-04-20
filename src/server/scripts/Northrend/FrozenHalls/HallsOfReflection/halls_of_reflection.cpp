@@ -751,9 +751,9 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
                 me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
         }
@@ -847,9 +847,9 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
                 me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
         }
@@ -892,12 +892,12 @@ public:
             npc_phantom_mageAI::UpdateAI(diff);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (numOfUpd)
                 return;
 
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
             if (me->IsSummon())
                 me->ToTempSummon()->DespawnOrUnsummon(1);
         }
@@ -990,9 +990,9 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
                 me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
         }
@@ -1073,9 +1073,9 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
                 me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
         }
@@ -1157,9 +1157,9 @@ public:
             DoSpellAttackIfReady(SPELL_SHOOT);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
                 me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
         }
@@ -1202,7 +1202,7 @@ public:
             Position p = me->GetHomePosition();
             if (me->GetExactDist(&p) > 30.0f)
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 return;
             }
 
@@ -1234,10 +1234,10 @@ public:
                 pInstance->SetData(DATA_FROSTSWORN_GENERAL, DONE);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             pInstance->SetData(ACTION_SPIRITUAL_REFLECTIONS_HIDE, 1);
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
     };
 
@@ -1296,10 +1296,10 @@ public:
             me->CastSpell((Unit*)nullptr, SPELL_SPIRIT_BURST, false);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             me->UpdatePosition(me->GetHomePosition(), true);
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
             me->SetVisible(false);
         }
     };

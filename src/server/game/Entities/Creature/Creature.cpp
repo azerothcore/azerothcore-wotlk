@@ -202,7 +202,7 @@ bool ForcedDespawnDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 }
 
 Creature::Creature(bool isWorldObject): Unit(isWorldObject), MovableMapObject(), m_groupLootTimer(0), lootingGroupLowGUID(0), m_PlayerDamageReq(0), m_lootRecipientGroup(0),
-    m_corpseRemoveTime(0), m_respawnTime(0), m_respawnDelay(300), m_corpseDelay(60), m_wanderDistance(0.0f),
+    m_corpseRemoveTime(0), m_respawnTime(0), m_respawnDelay(300), m_corpseDelay(60), m_wanderDistance(0.0f), m_boundaryCheckTime(2500),
     m_transportCheckTimer(1000), lootPickPocketRestoreTime(0),  m_reactState(REACT_AGGRESSIVE), m_defaultMovementType(IDLE_MOTION_TYPE),
     m_spawnId(0), m_equipmentId(0), m_originalEquipmentId(0), m_AlreadyCallAssistance(false),
     m_AlreadySearchedAssistance(false), m_regenHealth(true), m_AI_locked(false), m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), m_moveInLineOfSightDisabled(false), m_moveInLineOfSightStrictlyDisabled(false),
@@ -687,6 +687,17 @@ void Creature::Update(uint32 diff)
 
                     // xinef: update combat state, if npc is not in combat - return to spawn correctly by calling EnterEvadeMode
                     SelectVictim();
+                }
+
+                // periodic check to see if the creature has passed an evade boundary
+                if (IsAIEnabled && !IsInEvadeMode() && IsInCombat())
+                {
+                    if (diff >= m_boundaryCheckTime)
+                    {
+                        AI()->CheckInRoom();
+                        m_boundaryCheckTime = 2500;
+                    } else
+                        m_boundaryCheckTime -= diff;
                 }
 
                 Unit* owner = GetCharmerOrOwner();
@@ -3024,7 +3035,7 @@ bool Creature::SetSwim(bool enable)
  */
 bool Creature::CanSwim() const
 {
-    if (Unit::CanSwim() || (!Unit::CanSwim() && !CanFly()))
+    if (Unit::CanSwim())
         return true;
 
     if (IsPet())

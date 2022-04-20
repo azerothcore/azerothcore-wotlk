@@ -724,7 +724,7 @@ public:
         Vehicle* vehicle;
         uint32 _despawnTimer;
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             vehicle->InstallAllAccessories(false);
         }

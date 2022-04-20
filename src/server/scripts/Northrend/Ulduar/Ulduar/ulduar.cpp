@@ -297,10 +297,10 @@ public:
                 ScriptedAI::AttackStart(who);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (me->GetFaction() == FACTION_MONSTER_2)
-                ScriptedAI::EnterEvadeMode();
+                ScriptedAI::EnterEvadeMode(why);
         }
 
         void OnCharmed(bool  /*apply*/) override {}

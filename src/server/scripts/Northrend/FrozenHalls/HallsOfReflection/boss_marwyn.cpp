@@ -153,9 +153,9 @@ public:
                 Talk(RAND(SAY_SLAY_1, SAY_SLAY_2));
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
             if (startFightTimer)
                 Reset();
         }

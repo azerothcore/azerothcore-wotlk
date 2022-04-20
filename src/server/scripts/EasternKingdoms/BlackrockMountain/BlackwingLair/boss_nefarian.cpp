@@ -931,13 +931,15 @@ struct npc_drakonid_spawner : public ScriptedAI
         }
     }
 
-    void IsSummonedBy(Unit* /*summoner*/) override
+    void IsSummonedBy(Unit* summoner) override
     {
         DoCastSelf(SPELL_SPAWN_DRAKONID_GEN);
         _scheduler.Schedule(10s, 60s, [this](TaskContext /*context*/)
         {
             DoCastSelf(SPELL_SPAWN_CHROMATIC_DRAKONID);
         });
+
+        _owner = summoner->GetGUID();
     }
 
     void UpdateAI(uint32 diff) override
@@ -945,8 +947,44 @@ struct npc_drakonid_spawner : public ScriptedAI
         _scheduler.Update(diff);
     }
 
+    void SummonedCreatureDies(Creature* summon, Unit* /*unit*/) override
+    {
+        if (summon->GetEntry() != NPC_BONE_CONSTRUCT)
+        {
+            if (Creature* victor = ObjectAccessor::GetCreature(*me, _owner))
+            {
+                victor->AI()->DoAction(ACTION_NEFARIUS_ADD_KILLED);
+            }
+
+            ObjectGuid summonGuid = summon->GetGUID();
+
+            summon->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            summon->SetHomePosition(summon->GetPosition());
+
+            _scheduler.Schedule(1s, [this, summonGuid](TaskContext /*context*/)
+            {
+                if (Creature* construct = ObjectAccessor::GetCreature(*me, summonGuid))
+                {
+                    construct->SetVisible(false);
+                }
+            }).Schedule(2s, [this, summonGuid](TaskContext /*context*/)
+            {
+                if (Creature* construct = ObjectAccessor::GetCreature(*me, summonGuid))
+                {
+                    construct->UpdateEntry(NPC_BONE_CONSTRUCT);
+                    construct->SetReactState(REACT_PASSIVE);
+                    construct->SetStandState(UNIT_STAND_STATE_DEAD);
+                    construct->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    construct->SetCorpseRemoveTime(DAY * IN_MILLISECONDS);
+                    construct->SetVisible(true);
+                }
+            });
+        }
+    }
+
 protected:
     TaskScheduler _scheduler;
+    ObjectGuid _owner;
 };
 
 std::unordered_map<uint32, uint8> const classCallSpells =
