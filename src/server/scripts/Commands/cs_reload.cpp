@@ -1155,6 +1155,8 @@ public:
         LOG_INFO("server.loading", "Re-Loading `server_mail_template` table");
         sObjectMgr->LoadMailServerTemplates();
         handler->SendGlobalGMSysMessage("DB table `server_mail_template` reloaded.");
+        sObjectMgr->LoadMailServerItems();
+        handler->SendGlobalGMSysMessage("DB table `server_mail_item` reloaded.");
         return true;
     }
 

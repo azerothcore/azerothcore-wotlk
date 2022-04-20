@@ -219,13 +219,20 @@ struct ServerMail
     uint32 reqPlayTime{ 0 };
     uint32 moneyA{ 0 };
     uint32 moneyH{ 0 };
+    std::string subject;
+    std::string body;
+    uint8 active{ 0 };
+};
+
+struct ServerMailItem
+{
+    ServerMailItem() = default;
+    uint16 idx{ 0 };
+    uint32 mailId{ 0 };
     uint32 itemA{ 0 };
     uint32 itemCountA{ 0 };
     uint32 itemH{ 0 };
     uint32 itemCountH{ 0 };
-    std::string subject;
-    std::string body;
-    uint8 active{ 0 };
 };
 
 #endif

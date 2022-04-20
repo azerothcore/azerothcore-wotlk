@@ -667,7 +667,9 @@ typedef std::array<std::unordered_map<uint32, QuestGreeting>, 2> QuestGreetingCo
 
 typedef std::unordered_map<uint32, VendorItemData> CacheVendorItemContainer;
 typedef std::unordered_map<uint32, TrainerSpellData> CacheTrainerSpellContainer;
+
 typedef std::unordered_map<uint32, ServerMail> ServerMailContainer;
+typedef std::unordered_map<uint32, ServerMailItem> ServerMailItemContainer;
 
 enum SkillRangeType
 {
@@ -1041,9 +1043,11 @@ public:
     void LoadInstanceTemplate();
     void LoadInstanceEncounters();
     void LoadMailLevelRewards();
-    void LoadMailServerTemplates();
     void LoadVehicleTemplateAccessories();
     void LoadVehicleAccessories();
+
+    void LoadMailServerTemplates();
+    void LoadMailServerItems();
 
     void LoadGossipText();
 
@@ -1172,6 +1176,7 @@ public:
     }
 
     [[nodiscard]] ServerMailContainer const& GetAllServerMailStore() const { return _serverMailStore; }
+    [[nodiscard]] ServerMailItemContainer const& GetAllServerMailItemStores() const { return _serverMailItemStore; }
 
     [[nodiscard]] BroadcastText const* GetBroadcastText(uint32 id) const
     {
@@ -1408,7 +1413,7 @@ public:
     [[nodiscard]] bool IsTransportMap(uint32 mapId) const { return _transportMaps.count(mapId) != 0; }
 
     [[nodiscard]] uint32 GetQuestMoneyReward(uint8 level, uint32 questMoneyDifficulty) const;
-    void SendServerMail(Player* player, uint32 id, uint32 reqLevel, uint32 reqPlayTime, uint32 rewardMoneyA, uint32 rewardMoneyH, uint32 rewardItemA, uint32 rewardItemCountA, uint32 rewardItemH, uint32 rewardItemCountH, std::string subject, std::string body, uint8 active) const;
+    void SendServerMail(Player* player, uint32 id, uint32 reqLevel, uint32 reqPlayTime, uint32 rewardMoneyA, uint32 rewardMoneyH, std::string subject, std::string body, uint8 active) const;
 
 private:
     // first free id for selected id type
@@ -1564,6 +1569,7 @@ private:
     CacheTrainerSpellContainer _cacheTrainerSpellStore;
 
     ServerMailContainer _serverMailStore;
+    ServerMailItemContainer _serverMailItemStore;
 
     std::set<uint32> _difficultyEntries[MAX_DIFFICULTY - 1]; // already loaded difficulty 1 value in creatures, used in CheckCreatureTemplate
     std::set<uint32> _hasDifficultyEntries[MAX_DIFFICULTY - 1]; // already loaded creatures with difficulty 1 values, used in CheckCreatureTemplate

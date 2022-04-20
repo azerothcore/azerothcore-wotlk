@@ -1836,6 +1836,9 @@ void World::SetInitialWorldSettings()
 
     LOG_INFO("server.loading", "Load Mail Server Template...");
     sObjectMgr->LoadMailServerTemplates();
+    LOG_INFO("server.loading", "Loading Mail Server Item...");
+    sObjectMgr->LoadMailServerItems();
+    LOG_INFO("server.loading", " ");
 
     // Loot tables
     LoadLootTables();
