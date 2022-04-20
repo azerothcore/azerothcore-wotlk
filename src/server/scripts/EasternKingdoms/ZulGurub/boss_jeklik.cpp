@@ -22,8 +22,10 @@
 enum Says
 {
     SAY_AGGRO                   = 0,
-    SAY_RAIN_FIRE               = 1,
-    SAY_DEATH                   = 2
+    SAY_CALL_RIDERS             = 1, //Unused for the moment
+    SAY_DEATH                   = 2,
+    EMOTE_SUMMON_BATS           = 3,
+    EMOTE_GREAT_HEAL            = 4
 };
 
 enum Spells
@@ -190,19 +192,13 @@ public:
                         events.ScheduleEvent(EVENT_SWOOP, urand(10000, 20000), 0, PHASE_ONE);
                         break;
                     case EVENT_SUMMON_BATS:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                            for (uint8 i = 0; i < 6; ++i)
-                                if (Creature* bat = me->SummonCreature(NPC_BLOODSEEKER_BAT, SpawnBat[i], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
-                                    bat->AI()->AttackStart(target);
+                        Talk(EMOTE_SUMMON_BATS);
+                        DoCastSelf(SPELL_SUMMON_BATS);
                         events.ScheduleEvent(EVENT_SUMMON_BATS, 60000, 0, PHASE_ONE);
                         break;
                     //Phase two
                     case EVENT_CURSE_OF_BLOOD:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        {
-                            DoCast(target, SPELL_CURSE_OF_BLOOD);
-                            AttackStart(target);
-                        }
+                        DoCast(me, SPELL_CURSE_OF_BLOOD);
                         events.ScheduleEvent(EVENT_CURSE_OF_BLOOD, urand(20000, 30000), 0, PHASE_TWO);
                         break;
                     case EVENT_PSYCHIC_SCREAM:
@@ -219,6 +215,7 @@ public:
                         events.ScheduleEvent(EVENT_MIND_FLAY, 16000, 0, PHASE_TWO);
                         break;
                     case EVENT_GREATER_HEAL:
+                        Talk(EMOTE_GREAT_HEAL);
                         me->InterruptNonMeleeSpells(false);
                         DoCast(me, SPELL_GREATER_HEAL);
                         events.ScheduleEvent(EVENT_GREATER_HEAL, urand(25000, 35000), 0, PHASE_TWO);
