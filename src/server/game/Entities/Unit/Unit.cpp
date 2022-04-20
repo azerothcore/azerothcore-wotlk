@@ -19153,6 +19153,7 @@ void Unit::ExitVehicle(Position const* /*exitPosition*/)
         return;
 
     GetVehicleBase()->RemoveAurasByType(SPELL_AURA_CONTROL_VEHICLE, GetGUID());
+    ToPlayer()->SetCanTeleport(true);
     //! The following call would not even be executed successfully as the
     //! SPELL_AURA_CONTROL_VEHICLE unapply handler already calls _ExitVehicle without
     //! specifying an exitposition. The subsequent call below would return on if (!m_vehicle).
