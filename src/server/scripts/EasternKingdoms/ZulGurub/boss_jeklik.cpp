@@ -48,7 +48,7 @@ enum Spells
     SPELL_GREATER_HEAL          = 23954,
 
     // Batriders Spell
-    SPELL_BOMB                  = 40332
+    SPELL_BOMB                  = 40332 // Wrong ID but Magmadars bomb is not working...
 };
 
 enum BatIds
