@@ -31,19 +31,22 @@ enum Spells
     // Intro
     SPELL_GREEN_CHANNELING      = 13540,
     SPELL_BAT_FORM              = 23966,
-    //Phase one
+
+    // Phase one
     SPELL_PIERCE_ARMOR          = 12097,
     SPELL_BLOOD_LEECH           = 22644,
     SPELL_CHARGE                = 22911,
     SPELL_SONIC_BURST           = 23918,
     SPELL_SWOOP                 = 23919,
     SPELL_SUMMON_BATS           = 23974,
-    //Phase two
+
+    // Phase two
     SPELL_CURSE_OF_BLOOD        = 16098,
     SPELL_PSYCHIC_SCREAM        = 22884,
     SPELL_SHADOW_WORD_PAIN      = 23952,
     SPELL_MIND_FLAY             = 23953,
-    SPELL_GREAT_HEAL            = 23954,
+    SPELL_GREATER_HEAL          = 23954,
+
     // Batriders Spell
     SPELL_BOMB                  = 40332
 };
@@ -56,13 +59,15 @@ enum BatIds
 
 enum Events
 {
-    EVENT_PIERCE_ARMOR = 1,
+    // Phase one
+    EVENT_CHARGE_JEKLIK         = 1,
+    EVENT_PIERCE_ARMOR,
     EVENT_BLOOD_LEECH,
-    EVENT_CHARGE,
     EVENT_SONIC_BURST,
     EVENT_SWOOP,
     EVENT_SUMMON_BATS,
 
+    // Phase two
     EVENT_CURSE_OF_BLOOD,
     EVENT_PSYCHIC_SCREAM,
     EVENT_SHADOW_WORD_PAIN,
@@ -98,7 +103,7 @@ public:
 
         void Reset() override
         {
-            DoCastSelf(SPELL_GREEN_CHANNELING);
+            DoCast(me, SPELL_GREEN_CHANNELING);
             _Reset();
         }
 
@@ -114,14 +119,14 @@ public:
             Talk(SAY_AGGRO);
             events.SetPhase(PHASE_ONE);
 
-            events.ScheduleEvent(EVENT_PIERCE_ARMOR, urand(10000, 20000), 0, PHASE_ONE);
-            events.ScheduleEvent(EVENT_BLOOD_LEECH, urand(10000, 20000), 0, PHASE_ONE);
-            events.ScheduleEvent(EVENT_CHARGE, 20000, 0, PHASE_ONE);
-            events.ScheduleEvent(EVENT_SONIC_BURST, 8000, 0, PHASE_ONE);
-            events.ScheduleEvent(EVENT_SWOOP, urand(10000, 15000), 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_CHARGE_JEKLIK, urand(15000, 25000), 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_PIERCE_ARMOR, urand(5000, 15000), 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_BLOOD_LEECH, urand(10000, 20000), 0, PHASE_ONE);            
+            events.ScheduleEvent(EVENT_SONIC_BURST, urand(10000, 20000), 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_SWOOP, urand(10000, 20000), 0, PHASE_ONE);
             events.ScheduleEvent(EVENT_SUMMON_BATS, 60000, 0, PHASE_ONE);
 
-            me->SetCanFly(true);
+            me->SetDisableGravity(true);
             me->RemoveAurasDueToSpell(SPELL_GREEN_CHANNELING);
             DoCast(me, SPELL_BAT_FORM);
         }
@@ -131,15 +136,17 @@ public:
             if (events.IsInPhase(PHASE_ONE) && !HealthAbovePct(50))
             {
                 me->RemoveAurasDueToSpell(SPELL_BAT_FORM);
-                me->SetCanFly(false);
+                me->SetDisableGravity(false);
                 DoResetThreat();
                 events.SetPhase(PHASE_TWO);
-                events.ScheduleEvent(EVENT_CURSE_OF_BLOOD, 6000, 0, PHASE_TWO);
+
+                events.ScheduleEvent(EVENT_CURSE_OF_BLOOD, urand(5000, 10000), 0, PHASE_TWO);
                 events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, 6000, 0, PHASE_TWO);
-                events.ScheduleEvent(EVENT_PSYCHIC_SCREAM, 6000, 0, PHASE_TWO);
+                events.ScheduleEvent(EVENT_PSYCHIC_SCREAM, urand(10000, 30000), 0, PHASE_TWO);
                 events.ScheduleEvent(EVENT_MIND_FLAY, 11000, 0, PHASE_TWO);
-                events.ScheduleEvent(EVENT_GREATER_HEAL, 50000, 0, PHASE_TWO);
+                events.ScheduleEvent(EVENT_GREATER_HEAL, 25000, 0, PHASE_TWO);
                 events.ScheduleEvent(EVENT_SPAWN_FLYING_BATS, 10000, 0, PHASE_TWO);
+
                 return;
             }
         }
@@ -158,29 +165,29 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_PIERCE_ARMOR:
-                        DoCastVictim(SPELL_PIERCE_ARMOR);
-                        events.ScheduleEvent(EVENT_PIERCE_ARMOR, urand(8000, 13000), 0, PHASE_ONE);
-                        break;
-                    case EVENT_BLOOD_LEECH:
-                        DoCastVictim(SPELL_BLOOD_LEECH);
-                        events.ScheduleEvent(EVENT_BLOOD_LEECH, urand(8000, 13000), 0, PHASE_ONE);
-                        break;
-                    case EVENT_CHARGE:
+                    case EVENT_CHARGE_JEKLIK:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         {
                             DoCast(target, SPELL_CHARGE);
                             AttackStart(target);
                         }
-                        events.ScheduleEvent(EVENT_CHARGE, urand(15000, 30000), 0, PHASE_ONE);
+                        events.ScheduleEvent(EVENT_CHARGE_JEKLIK, urand(15000, 25000), 0, PHASE_ONE);
+                        break;
+                    case EVENT_PIERCE_ARMOR:
+                        DoCastVictim(SPELL_PIERCE_ARMOR);
+                        events.ScheduleEvent(EVENT_PIERCE_ARMOR, urand(20000, 40000), 0, PHASE_ONE);
+                        break;
+                    case EVENT_BLOOD_LEECH:
+                        DoCastVictim(SPELL_BLOOD_LEECH);
+                        events.ScheduleEvent(EVENT_BLOOD_LEECH, urand(10000, 20000), 0, PHASE_ONE);
                         break;
                     case EVENT_SONIC_BURST:
                         DoCastVictim(SPELL_SONIC_BURST);
-                        events.ScheduleEvent(EVENT_SONIC_BURST, urand(8000, 13000), 0, PHASE_ONE);
+                        events.ScheduleEvent(EVENT_SONIC_BURST, urand(20000, 40000), 0, PHASE_ONE);
                         break;
                     case EVENT_SWOOP:
                         DoCastVictim(SPELL_SWOOP);
-                        events.ScheduleEvent(EVENT_SWOOP, urand(8000, 13000), 0, PHASE_ONE);
+                        events.ScheduleEvent(EVENT_SWOOP, urand(10000, 20000), 0, PHASE_ONE);
                         break;
                     case EVENT_SUMMON_BATS:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
@@ -189,13 +196,18 @@ public:
                                     bat->AI()->AttackStart(target);
                         events.ScheduleEvent(EVENT_SUMMON_BATS, 60000, 0, PHASE_ONE);
                         break;
+                    //Phase two
                     case EVENT_CURSE_OF_BLOOD:
-                        DoCastVictim(SPELL_CURSE_OF_BLOOD);
-                        events.ScheduleEvent(EVENT_CURSE_OF_BLOOD, urand(8000, 13000), 0, PHASE_TWO);
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                        {
+                            DoCast(target, SPELL_CURSE_OF_BLOOD);
+                            AttackStart(target);
+                        }
+                        events.ScheduleEvent(EVENT_CURSE_OF_BLOOD, urand(20000, 30000), 0, PHASE_TWO);
                         break;
                     case EVENT_PSYCHIC_SCREAM:
                         DoCastVictim(SPELL_PSYCHIC_SCREAM);
-                        events.ScheduleEvent(EVENT_PSYCHIC_SCREAM, urand(18000, 26000), 0, PHASE_TWO);
+                        events.ScheduleEvent(EVENT_PSYCHIC_SCREAM, urand(35000, 40000), 0, PHASE_TWO);
                         break;                   
                     case EVENT_SHADOW_WORD_PAIN:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
@@ -208,7 +220,7 @@ public:
                         break;
                     case EVENT_GREATER_HEAL:
                         me->InterruptNonMeleeSpells(false);
-                        DoCastSelf(SPELL_GREAT_HEAL);
+                        DoCastSelf(SPELL_GREATER_HEAL);
                         events.ScheduleEvent(EVENT_GREATER_HEAL, urand(25000, 35000), 0, PHASE_TWO);
                         break;
                     case EVENT_SPAWN_FLYING_BATS:
