@@ -220,7 +220,7 @@ public:
                         break;
                     case EVENT_GREATER_HEAL:
                         me->InterruptNonMeleeSpells(false);
-                        DoCastSelf(SPELL_GREATER_HEAL);
+                        DoCast(me, SPELL_GREATER_HEAL);
                         events.ScheduleEvent(EVENT_GREATER_HEAL, urand(25000, 35000), 0, PHASE_TWO);
                         break;
                     case EVENT_SPAWN_FLYING_BATS:
