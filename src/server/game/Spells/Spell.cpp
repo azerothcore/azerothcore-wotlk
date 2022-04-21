@@ -1683,7 +1683,7 @@ void Spell::SelectImplicitTrajTargets(SpellEffIndex effIndex, SpellImplicitTarge
     if (a > -0.0001f)
         a = 0;
 
-    LOG_ERROR("spells", "Spell::SelectTrajTargets: a {} b {}", a, b);
+    LOG_DEBUG("spells", "Spell::SelectTrajTargets: a {} b {}", a, b);
 
     // Xinef: hack for distance, many trajectory spells have RangeEntry 1 (self)
     float bestDist = m_spellInfo->GetMaxRange(false) * 2;
