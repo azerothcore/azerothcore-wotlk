@@ -113,7 +113,7 @@ public:
 
             events.ScheduleEvent(EVENT_CHARGE_JEKLIK, urand(15000, 25000), 0, PHASE_ONE);
             events.ScheduleEvent(EVENT_PIERCE_ARMOR, urand(5000, 15000), 0, PHASE_ONE);
-            events.ScheduleEvent(EVENT_BLOOD_LEECH, urand(10000, 20000), 0, PHASE_ONE);            
+            events.ScheduleEvent(EVENT_BLOOD_LEECH, urand(10000, 20000), 0, PHASE_ONE);
             events.ScheduleEvent(EVENT_SONIC_BURST, urand(10000, 20000), 0, PHASE_ONE);
             events.ScheduleEvent(EVENT_SWOOP, urand(10000, 20000), 0, PHASE_ONE);
             events.ScheduleEvent(EVENT_SUMMON_BATS, 60000, 0, PHASE_ONE);
@@ -194,7 +194,7 @@ public:
                     case EVENT_PSYCHIC_SCREAM:
                         DoCastVictim(SPELL_PSYCHIC_SCREAM);
                         events.ScheduleEvent(EVENT_PSYCHIC_SCREAM, urand(35000, 40000), 0, PHASE_TWO);
-                        break;                   
+                        break;
                     case EVENT_SHADOW_WORD_PAIN:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             DoCast(target, SPELL_SHADOW_WORD_PAIN);
