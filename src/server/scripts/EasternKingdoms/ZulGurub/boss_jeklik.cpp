@@ -22,7 +22,7 @@
 enum Says
 {
     SAY_AGGRO                   = 0,
-    SAY_CALL_RIDERS             = 1, //Unused for the moment
+    SAY_CALL_RIDERS             = 1,
     SAY_DEATH                   = 2,
     EMOTE_SUMMON_BATS           = 3,
     EMOTE_GREAT_HEAL            = 4
@@ -82,16 +82,6 @@ enum Phase
 {
     PHASE_ONE                   = 1,
     PHASE_TWO                   = 2
-};
-
-Position const SpawnBat[6] =
-{
-    { -12291.6220f, -1380.2640f, 144.8304f, 5.483f },
-    { -12289.6220f, -1380.2640f, 144.8304f, 5.483f },
-    { -12293.6220f, -1380.2640f, 144.8304f, 5.483f },
-    { -12291.6220f, -1380.2640f, 144.8304f, 5.483f },
-    { -12289.6220f, -1380.2640f, 144.8304f, 5.483f },
-    { -12293.6220f, -1380.2640f, 144.8304f, 5.483f }
 };
 
 class boss_jeklik : public CreatureScript
@@ -221,6 +211,7 @@ public:
                         events.ScheduleEvent(EVENT_GREATER_HEAL, urand(25000, 35000), 0, PHASE_TWO);
                         break;
                     case EVENT_SPAWN_FLYING_BATS:
+                        Talk(SAY_CALL_RIDERS);
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             if (Creature* flyingBat = me->SummonCreature(NPC_FRENZIED_BAT, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + 15.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
                                 flyingBat->AI()->AttackStart(target);
