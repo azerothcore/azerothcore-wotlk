@@ -744,6 +744,8 @@ void Group::Disband(bool hideDestroy /* = false */)
     sScriptMgr->OnGroupDisband(this);
 
     Player* player;
+    uint32 instanceId = 0;
+
     for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
     {
         if (!isBGGroup() && !isBFGroup())
@@ -752,6 +754,11 @@ void Group::Disband(bool hideDestroy /* = false */)
         }
 
         player = ObjectAccessor::FindConnectedPlayer(citr->guid);
+
+        if (player != nullptr && !instanceId && !isBGGroup && !isBFGroup)
+        {
+            instanceId = player->GetInstanceId();
+        }
 
         _homebindIfInstance(player);
         if (!isBGGroup() && !isBFGroup())
@@ -822,7 +829,7 @@ void Group::Disband(bool hideDestroy /* = false */)
     }
 
     // Cleaning up instance saved data for gameobjects when a group is disbanded
-    if (uint32 instanceId = player->GetInstanceId())
+    if (instanceId)
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DELETE_INSTANCE_SAVED_DATA);
         stmt->SetData(0, instanceId);
