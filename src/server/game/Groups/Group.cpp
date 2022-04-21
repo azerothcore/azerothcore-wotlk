@@ -828,7 +828,6 @@ void Group::Disband(bool hideDestroy /* = false */)
         stmt->SetData(0, instanceId);
         CharacterDatabase.Execute(stmt);
     }
-    
 
     sGroupMgr->RemoveGroup(this);
     delete this;
