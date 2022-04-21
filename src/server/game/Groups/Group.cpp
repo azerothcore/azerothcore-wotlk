@@ -755,7 +755,7 @@ void Group::Disband(bool hideDestroy /* = false */)
 
         player = ObjectAccessor::FindConnectedPlayer(citr->guid);
 
-        if (player != nullptr && !instanceId && !isBGGroup && !isBFGroup)
+        if (player && !instanceId && !isBGGroup() && !isBFGroup())
         {
             instanceId = player->GetInstanceId();
         }
