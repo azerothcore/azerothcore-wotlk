@@ -14076,7 +14076,7 @@ Unit* Creature::SelectVictim()
     if (CanHaveThreatList())
     {
         if (!target && !m_ThreatMgr.isThreatListEmpty())
-            target = m_ThreatMgr.getHostilTarget();
+            target = m_ThreatMgr.getHostileTarget();
     }
     else if (!HasReactState(REACT_PASSIVE))
     {
@@ -17896,6 +17896,8 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
     // Set charmed
     charmer->SetCharm(this, true);
 
+    StopAttackingInvalidTarget();
+
     if (GetTypeId() == TYPEID_UNIT)
     {
         if (MovementGenerator* movementGenerator = GetMotionMaster()->GetMotionSlot(MOTION_SLOT_IDLE))
@@ -18059,6 +18061,8 @@ void Unit::RemoveCharmedBy(Unit* charmer)
     ASSERT(type != CHARM_TYPE_VEHICLE || (GetTypeId() == TYPEID_UNIT && IsVehicle()));
 
     charmer->SetCharm(this, false);
+
+    StopAttackingInvalidTarget();
 
     Player* playerCharmer = charmer->ToPlayer();
     if (playerCharmer)
@@ -19149,6 +19153,7 @@ void Unit::ExitVehicle(Position const* /*exitPosition*/)
         return;
 
     GetVehicleBase()->RemoveAurasByType(SPELL_AURA_CONTROL_VEHICLE, GetGUID());
+    ToPlayer()->SetCanTeleport(true);
     //! The following call would not even be executed successfully as the
     //! SPELL_AURA_CONTROL_VEHICLE unapply handler already calls _ExitVehicle without
     //! specifying an exitposition. The subsequent call below would return on if (!m_vehicle).
@@ -19589,6 +19594,37 @@ void Unit::StopAttackFaction(uint32 faction_id)
 
     for (ControlSet::const_iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
         (*itr)->StopAttackFaction(faction_id);
+}
+
+void Unit::StopAttackingInvalidTarget()
+{
+    AttackerSet const& attackers = getAttackers();
+    for (AttackerSet::const_iterator itr = attackers.begin(); itr != attackers.end();)
+    {
+        Unit* attacker = (*itr);
+        if (!attacker->IsValidAttackTarget(this))
+        {
+            attacker->AttackStop();
+            if (attacker->GetTypeId() == TYPEID_PLAYER)
+            {
+                attacker->ToPlayer()->SendAttackSwingCancelAttack();
+            }
+
+            for (Unit* controled : attacker->m_Controlled)
+            {
+                if (controled->GetVictim() == this && !controled->IsValidAttackTarget(this))
+                {
+                    controled->AttackStop();
+                }
+            }
+
+            itr = attackers.begin();
+        }
+        else
+        {
+            ++itr;
+        }
+    }
 }
 
 void Unit::OutDebugInfo() const
