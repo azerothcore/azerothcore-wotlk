@@ -821,6 +821,15 @@ void Group::Disband(bool hideDestroy /* = false */)
         CharacterDatabase.Execute(stmt);
     }
 
+    // Cleaning up instance saved data for gameobjects when a group is disbanded
+    if (uint32 instanceId = player->GetInstanceId())
+    {
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DELETE_INSTANCE_SAVED_DATA);
+        stmt->SetData(0, instanceId);
+        CharacterDatabase.Execute(stmt);
+    }
+    
+
     sGroupMgr->RemoveGroup(this);
     delete this;
 }

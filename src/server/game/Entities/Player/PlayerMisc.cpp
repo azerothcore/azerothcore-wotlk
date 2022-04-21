@@ -314,8 +314,6 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
                     }
                     //else
                     //  p->SendResetInstanceFailed(0, instanceSave->GetMapId());
-
-                    DeleteInstanceSavedData(instanceSave->GetInstanceId());
                 }
                 for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
                     sInstanceSaveMgr->PlayerUnbindInstance(guid, (*itr)->GetMapId(), (*itr)->GetDifficulty(), true, p);
