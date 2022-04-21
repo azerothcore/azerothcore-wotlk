@@ -9762,7 +9762,6 @@ uint32 ObjectMgr::GetQuestMoneyReward(uint8 level, uint32 questMoneyDifficulty) 
     return 0;
 }
 
-<<<<<<< HEAD
 void ObjectMgr::LoadInstanceSavedGameobjectStateData()
 {
     uint32 oldMSTime = getMSTime();
