@@ -257,7 +257,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 57761 }, [](SpellInfo* spellInfo)
     {
         spellInfo->ProcCharges = 1;
-        spellInfo->SpellPriority = 50;
+        spellInfo->Priority = 50;
     });
 
     // Tidal Wave
