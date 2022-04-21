@@ -40,7 +40,6 @@ enum Spells
     SPELL_CHARGE                = 22911,
     SPELL_SONIC_BURST           = 23918,
     SPELL_SWOOP                 = 23919,
-    SPELL_SUMMON_BATS           = 23974,
 
     // Phase two
     SPELL_CURSE_OF_BLOOD        = 16098,
@@ -67,7 +66,7 @@ enum Events
     EVENT_BLOOD_LEECH,
     EVENT_SONIC_BURST,
     EVENT_SWOOP,
-    EVENT_SUMMON_BATS,
+    EVENT_SPAWN_BATS,
 
     // Phase two
     EVENT_CURSE_OF_BLOOD,
@@ -82,6 +81,16 @@ enum Phase
 {
     PHASE_ONE                   = 1,
     PHASE_TWO                   = 2
+};
+
+Position const SpawnBat[6] =
+{
+    { -12291.6220f, -1380.2640f, 144.8304f, 5.483f },
+    { -12289.6220f, -1380.2640f, 144.8304f, 5.483f },
+    { -12293.6220f, -1380.2640f, 144.8304f, 5.483f },
+    { -12291.6220f, -1380.2640f, 144.8304f, 5.483f },
+    { -12289.6220f, -1380.2640f, 144.8304f, 5.483f },
+    { -12293.6220f, -1380.2640f, 144.8304f, 5.483f }
 };
 
 class boss_jeklik : public CreatureScript
@@ -116,7 +125,7 @@ public:
             events.ScheduleEvent(EVENT_BLOOD_LEECH, urand(10000, 20000), 0, PHASE_ONE);
             events.ScheduleEvent(EVENT_SONIC_BURST, urand(10000, 20000), 0, PHASE_ONE);
             events.ScheduleEvent(EVENT_SWOOP, urand(10000, 20000), 0, PHASE_ONE);
-            events.ScheduleEvent(EVENT_SUMMON_BATS, 60000, 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_SPAWN_BATS, 60000, 0, PHASE_ONE);
 
             me->SetDisableGravity(true);
             me->RemoveAurasDueToSpell(SPELL_GREEN_CHANNELING);
@@ -181,11 +190,12 @@ public:
                         DoCastVictim(SPELL_SWOOP);
                         events.ScheduleEvent(EVENT_SWOOP, urand(10000, 20000), 0, PHASE_ONE);
                         break;
-                    case EVENT_SUMMON_BATS:
-                        Talk(EMOTE_SUMMON_BATS);
-                        DoCastSelf(SPELL_SUMMON_BATS);
-                        events.ScheduleEvent(EVENT_SUMMON_BATS, 60000, 0, PHASE_ONE);
-                        break;
+                    case EVENT_SPAWN_BATS:
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                            for (uint8 i = 0; i < 6; ++i)
+                                if (Creature* bat = me->SummonCreature(NPC_BLOODSEEKER_BAT, SpawnBat[i], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
+                                    bat->AI()->AttackStart(target);
+                        events.ScheduleEvent(EVENT_SPAWN_BATS, 60000, 0, PHASE_ONE);
                     //Phase two
                     case EVENT_CURSE_OF_BLOOD:
                         DoCast(me, SPELL_CURSE_OF_BLOOD);
