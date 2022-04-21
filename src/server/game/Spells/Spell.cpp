@@ -1619,7 +1619,7 @@ void Spell::SelectImplicitChainTargets(SpellEffIndex effIndex, SpellImplicitTarg
 {
     uint32 maxTargets = m_spellInfo->Effects[effIndex].ChainTarget;
     if (Player* modOwner = m_caster->GetSpellModOwner())
-        modOwner->ApplySpellMod<SPELLMOD_JUMP_TARGETS>(m_spellInfo->Id, maxTargets, this);
+        modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_JUMP_TARGETS, maxTargets, this);
 
     if (maxTargets > 1)
     {
@@ -3175,7 +3175,7 @@ bool Spell::UpdateChanneledTargetList()
                 }
 
         if (Player* modOwner = m_caster->GetSpellModOwner())
-            modOwner->ApplySpellMod<SPELLMOD_RANGE>(m_spellInfo->Id, range, this);
+            modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_RANGE, range, this);
 
         // xinef: add little tolerance level
         range += std::min(3.0f, range * 0.1f); // 10% but no more than 3yd
@@ -3848,7 +3848,7 @@ void Spell::handle_immediate()
             // First mod_duration then haste - see Missile Barrage
             // Apply duration mod
             if (Player* modOwner = m_caster->GetSpellModOwner())
-                modOwner->ApplySpellMod<SPELLMOD_DURATION>(m_spellInfo->Id, duration);
+                modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
 
             // Apply haste mods
             if (m_caster->HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, m_spellInfo) || m_spellInfo->HasAttribute(SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC))
@@ -5030,7 +5030,7 @@ void Spell::TakePower()
                             hit = false;
                             //lower spell cost on fail (by talent aura)
                             if (Player* modOwner = m_caster->ToPlayer()->GetSpellModOwner())
-                                modOwner->ApplySpellMod<SPELLMOD_SPELL_COST_REFUND_ON_FAIL>(m_spellInfo->Id, m_powerCost, this);
+                                modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_SPELL_COST_REFUND_ON_FAIL, m_powerCost, this);
                         }
                         break;
                     }
@@ -5131,7 +5131,7 @@ SpellCastResult Spell::CheckRuneCost(uint32 RuneCostID)
     {
         runeCost[i] = src->RuneCost[i];
         if (Player* modOwner = m_caster->GetSpellModOwner())
-            modOwner->ApplySpellMod<SPELLMOD_COST>(m_spellInfo->Id, runeCost[i], this);
+            modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_COST, runeCost[i], this);
     }
 
     runeCost[RUNE_DEATH] = MAX_RUNES;                       // calculated later
@@ -5171,7 +5171,7 @@ void Spell::TakeRunePower(bool didHit)
     {
         runeCost[i] = runeCostData->RuneCost[i];
         if (Player* modOwner = m_caster->GetSpellModOwner())
-            modOwner->ApplySpellMod<SPELLMOD_COST>(m_spellInfo->Id, runeCost[i], this);
+            modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_COST, runeCost[i], this);
     }
 
     runeCost[RUNE_DEATH] = 0;                               // calculated later
@@ -6779,7 +6779,7 @@ SpellCastResult Spell::CheckRange(bool strict)
         range_type = SPELL_RANGE_RANGED;
 
     if (Player* modOwner = m_caster->GetSpellModOwner())
-        modOwner->ApplySpellMod<SPELLMOD_RANGE>(m_spellInfo->Id, max_range, this);
+        modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_RANGE, max_range, this);
 
     // xinef: dont check max_range to strictly after cast
     if (range_type != SPELL_RANGE_MELEE && !strict)
@@ -7493,7 +7493,7 @@ void Spell::Delayed() // only called in DealDamage()
     //check pushback reduce
     int32 delaytime = 500;                                  // spellcasting delay is normally 500ms
     int32 delayReduce = 100;                                // must be initialized to 100 for percent modifiers
-    m_caster->ToPlayer()->ApplySpellMod<SPELLMOD_NOT_LOSE_CASTING_TIME>(m_spellInfo->Id, delayReduce, this);
+    m_caster->ToPlayer()->ApplySpellMod(m_spellInfo->Id, SPELLMOD_NOT_LOSE_CASTING_TIME, delayReduce, this);
     delayReduce += m_caster->GetTotalAuraModifier(SPELL_AURA_REDUCE_PUSHBACK) - 100;
     if (delayReduce >= 100)
         return;
@@ -7531,7 +7531,7 @@ void Spell::DelayedChannel()
 
     int32 delaytime = CalculatePct(duration, 25); // channeling delay is normally 25% of its time per hit
     int32 delayReduce = 100;                                    // must be initialized to 100 for percent modifiers
-    m_caster->ToPlayer()->ApplySpellMod<SPELLMOD_NOT_LOSE_CASTING_TIME>(m_spellInfo->Id, delayReduce, this);
+    m_caster->ToPlayer()->ApplySpellMod(m_spellInfo->Id, SPELLMOD_NOT_LOSE_CASTING_TIME, delayReduce, this);
     delayReduce += m_caster->GetTotalAuraModifier(SPELL_AURA_REDUCE_PUSHBACK) - 100;
     if (delayReduce >= 100)
         return;
@@ -8595,7 +8595,7 @@ void Spell::TriggerGlobalCooldown()
     {
         // gcd modifier auras are applied only to own spells and only players have such mods
         if (Player* modOwner = m_caster->GetSpellModOwner())
-            modOwner->ApplySpellMod<SPELLMOD_GLOBAL_COOLDOWN>(m_spellInfo->Id, gcd, this);
+            modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_GLOBAL_COOLDOWN, gcd, this);
 
         // Apply haste rating
         if (m_spellInfo->StartRecoveryCategory == 133 && m_spellInfo->StartRecoveryTime == 1500 && m_spellInfo->DmgClass != SPELL_DAMAGE_CLASS_MELEE &&

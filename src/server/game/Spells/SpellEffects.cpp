@@ -2327,7 +2327,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
 
     int32 duration = m_spellInfo->GetDuration();
     if (Player* modOwner = m_originalCaster->GetSpellModOwner())
-        modOwner->ApplySpellMod<SPELLMOD_DURATION>(m_spellInfo->Id, duration);
+        modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
 
     TempSummon* summon = nullptr;
 
@@ -3130,7 +3130,7 @@ void Spell::EffectSummonPet(SpellEffIndex effIndex)
     int32 duration = m_spellInfo->GetDuration();
 
     if(Player* modOwner = m_originalCaster->GetSpellModOwner())
-        modOwner->ApplySpellMod<SPELLMOD_DURATION>(m_spellInfo->Id, duration);
+        modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
 
     Player* owner = m_originalCaster->ToPlayer();
     if (!owner && m_originalCaster->ToCreature()->IsTotem())
@@ -5945,7 +5945,7 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
     int32 duration = m_spellInfo->GetDuration();
 
     if (Player* modOwner = m_originalCaster->GetSpellModOwner())
-        modOwner->ApplySpellMod<SPELLMOD_DURATION>(m_spellInfo->Id, duration);
+        modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
 
     //TempSummonType summonType = (duration == 0) ? TEMPSUMMON_DEAD_DESPAWN : TEMPSUMMON_TIMED_DESPAWN;
     Map* map = caster->GetMap();

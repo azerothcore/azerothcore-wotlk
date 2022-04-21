@@ -272,7 +272,7 @@ class spell_dru_brambles_treant : public AuraScript
         {
             int32 amount = 0;
             if (player->HasAura(SPELL_DRUID_BARKSKIN, player->GetGUID()))
-                player->ApplySpellMod<SPELLMOD_CHANCE_OF_SUCCESS>(SPELL_DRUID_BARKSKIN, amount);
+                player->ApplySpellMod(SPELL_DRUID_BARKSKIN, SPELLMOD_CHANCE_OF_SUCCESS, amount);
 
             return roll_chance_i(amount);
         }
@@ -287,7 +287,7 @@ class spell_dru_brambles_treant : public AuraScript
         if (GetUnitOwner()->IsSummon())
             if (Unit* owner = GetUnitOwner()->ToTempSummon()->GetSummonerUnit())
                 if (Player* player = owner->GetSpellModOwner())
-                    player->ApplySpellMod<SPELLMOD_CHANCE_OF_SUCCESS>(SPELL_DRUID_BARKSKIN, amount);
+                    player->ApplySpellMod(SPELL_DRUID_BARKSKIN, SPELLMOD_CHANCE_OF_SUCCESS, amount);
     }
 
     void Register() override

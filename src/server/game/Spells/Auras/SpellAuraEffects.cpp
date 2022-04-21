@@ -631,7 +631,7 @@ void AuraEffect::CalculatePeriodic(Unit* caster, bool create, bool load)
     {
         // Apply periodic time mod
         if (modOwner)
-            modOwner->ApplySpellMod<SPELLMOD_ACTIVATION_TIME>(GetId(), m_amplitude);
+            modOwner->ApplySpellMod(GetId(), SPELLMOD_ACTIVATION_TIME, m_amplitude);
 
         if (caster)
         {

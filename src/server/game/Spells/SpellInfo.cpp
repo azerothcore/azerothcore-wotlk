@@ -524,7 +524,7 @@ float SpellEffectInfo::CalcValueMultiplier(Unit* caster, Spell* spell) const
 {
     float multiplier = ValueMultiplier;
     if (Player* modOwner = (caster ? caster->GetSpellModOwner() : nullptr))
-        modOwner->ApplySpellMod<SPELLMOD_VALUE_MULTIPLIER>(_spellInfo->Id, multiplier, spell);
+        modOwner->ApplySpellMod(_spellInfo->Id, SPELLMOD_VALUE_MULTIPLIER, multiplier, spell);
     return multiplier;
 }
 
@@ -532,7 +532,7 @@ float SpellEffectInfo::CalcDamageMultiplier(Unit* caster, Spell* spell) const
 {
     float multiplier = DamageMultiplier;
     if (Player* modOwner = (caster ? caster->GetSpellModOwner() : nullptr))
-        modOwner->ApplySpellMod<SPELLMOD_DAMAGE_MULTIPLIER>(_spellInfo->Id, multiplier, spell);
+        modOwner->ApplySpellMod(_spellInfo->Id, SPELLMOD_DAMAGE_MULTIPLIER, multiplier, spell);
     return multiplier;
 }
 
@@ -552,7 +552,7 @@ float SpellEffectInfo::CalcRadius(Unit* caster, Spell* spell) const
         radius += RadiusEntry->RadiusPerLevel * caster->getLevel();
         radius = std::min(radius, RadiusEntry->RadiusMax);
         if (Player* modOwner = caster->GetSpellModOwner())
-            modOwner->ApplySpellMod<SPELLMOD_RADIUS>(_spellInfo->Id, radius, spell);
+            modOwner->ApplySpellMod(_spellInfo->Id, SPELLMOD_RADIUS, radius, spell);
     }
 
     return radius;
@@ -831,6 +831,7 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
     SpellVisual = spellEntry->SpellVisual;
     SpellIconID = spellEntry->SpellIconID;
     ActiveIconID = spellEntry->ActiveIconID;
+    Priority = spellEntry->SpellPriority;
     SpellName = spellEntry->SpellName;
     Rank = spellEntry->Rank;
     MaxTargetLevel = spellEntry->MaxTargetLevel;
@@ -2302,7 +2303,7 @@ float SpellInfo::GetMaxRange(bool positive, Unit* caster, Spell* spell) const
         range = RangeEntry->RangeMax[0];
     if (caster)
         if (Player* modOwner = caster->GetSpellModOwner())
-            modOwner->ApplySpellMod<SPELLMOD_RANGE>(Id, range, spell);
+            modOwner->ApplySpellMod(Id, SPELLMOD_RANGE, range, spell);
     return range;
 }
 
@@ -2437,7 +2438,7 @@ int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask, S
 
     // Apply cost mod by spell
     if (Player* modOwner = caster->GetSpellModOwner())
-        modOwner->ApplySpellMod<SPELLMOD_COST>(Id, powerCost, spell);
+        modOwner->ApplySpellMod(Id, SPELLMOD_COST, powerCost, spell);
 
     if (!caster->IsControlledByPlayer())
     {
