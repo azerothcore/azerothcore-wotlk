@@ -99,7 +99,7 @@ AC_API_EXPORT CreatureFlagsExtra EnumUtils<CreatureFlagsExtra>::FromIndex(size_t
         case 21: return CREATURE_FLAG_EXTRA_NO_PLAYER_DAMAGE_REQ;
         case 22: return CREATURE_FLAG_EXTRA_AVOID_AOE;
         case 23: return CREATURE_FLAG_EXTRA_NO_DODGE;
-        case 24: return CREATURE_FLAG_EXTRA_UNUSED_25;
+        case 24: return CREATURE_FLAG_EXTRA_MODULE;
         case 25: return CREATURE_FLAG_EXTRA_UNUSED_26;
         case 26: return CREATURE_FLAG_EXTRA_UNUSED_27;
         case 27: return CREATURE_FLAG_EXTRA_UNUSED_28;
