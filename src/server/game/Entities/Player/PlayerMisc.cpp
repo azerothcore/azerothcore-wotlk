@@ -379,8 +379,8 @@ void Player::UpdatePvPFlag(time_t currTime)
 
     if (currTime < (pvpInfo.EndTimer + 300 + 5))
     {
-        if (currTime > (pvpInfo.EndTimer + 4) && !HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_TIMER))
-            SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_TIMER);
+        if (currTime > (pvpInfo.EndTimer + 4) && !HasPlayerFlag(PLAYER_FLAGS_PVP_TIMER))
+            SetPlayerFlag(PLAYER_FLAGS_PVP_TIMER);
 
         return;
     }

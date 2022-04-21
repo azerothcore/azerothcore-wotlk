@@ -587,9 +587,9 @@ void PetAI::DoAttack(Unit* target, bool chase)
     {
         // xinef: properly fix fake combat after pet is sent to attack
         if (Unit* owner = me->GetOwner())
-            owner->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT);
+            owner->SetUnitFlag(UNIT_FLAG_PET_IN_COMBAT);
 
-        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT);
+        me->SetUnitFlag(UNIT_FLAG_PET_IN_COMBAT);
 
         // Play sound to let the player know the pet is attacking something it picked on its own
         if (me->HasReactState(REACT_AGGRESSIVE) && !me->GetCharmInfo()->IsCommandAttack())
@@ -676,7 +676,7 @@ bool PetAI::CanAttack(Unit* target, SpellInfo const* spellInfo)
         return false;
 
     // xinef: pets of mounted players have stunned flag only, check this also
-    if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED))
+    if (me->HasUnitFlag(UNIT_FLAG_STUNNED))
         return false;
 
     // pussywizard: TEMP!

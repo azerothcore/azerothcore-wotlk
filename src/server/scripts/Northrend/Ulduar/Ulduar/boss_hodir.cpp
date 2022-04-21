@@ -338,7 +338,7 @@ public:
             {
                 damage = 0;
                 me->SetReactState(REACT_PASSIVE);
-                if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+                if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                 {
                     if (pInstance)
                     {
@@ -346,7 +346,7 @@ public:
                         me->CastSpell(me, 64899, true); // credit
                     }
 
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->SetFaction(FACTION_FRIENDLY);
                     me->GetMotionMaster()->Clear();
                     me->AttackStop();
@@ -837,7 +837,8 @@ public:
         }
 
         void MoveInLineOfSight(Unit*  /*who*/) override {}
-        void EnterEvadeMode() override {}
+
+        void EnterEvadeMode(EvadeReason /*why*/) override {}
         bool CanAIAttack(Unit const* t) const override { return t->GetEntry() == NPC_HODIR; }
 
         void JustDied(Unit* /*killer*/) override
@@ -934,7 +935,8 @@ public:
         }
 
         void MoveInLineOfSight(Unit*  /*who*/) override {}
-        void EnterEvadeMode() override {}
+
+        void EnterEvadeMode(EvadeReason /*why*/) override {}
         bool CanAIAttack(Unit const* t) const override { return t->GetEntry() == NPC_HODIR; }
 
         void JustDied(Unit* /*killer*/) override
@@ -1034,7 +1036,8 @@ public:
         }
 
         void MoveInLineOfSight(Unit*  /*who*/) override {}
-        void EnterEvadeMode() override {}
+
+        void EnterEvadeMode(EvadeReason /*why*/) override {}
         bool CanAIAttack(Unit const* t) const override { return t->GetEntry() == NPC_HODIR; }
 
         void JustDied(Unit* /*killer*/) override
@@ -1149,7 +1152,8 @@ public:
         }
 
         void MoveInLineOfSight(Unit*  /*who*/) override {}
-        void EnterEvadeMode() override {}
+
+        void EnterEvadeMode(EvadeReason /*why*/) override {}
         bool CanAIAttack(Unit const* t) const override { return t->GetEntry() == NPC_HODIR; }
 
         void JustDied(Unit* /*killer*/) override

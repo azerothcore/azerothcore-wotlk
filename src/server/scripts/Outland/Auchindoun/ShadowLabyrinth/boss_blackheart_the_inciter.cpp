@@ -94,11 +94,11 @@ public:
                 instance->SetData(DATA_BLACKHEARTTHEINCITEREVENT, IN_PROGRESS);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (InciteChaos && SelectTargetFromPlayerList(100.0f))
                 return;
-            CreatureAI::EnterEvadeMode();
+            CreatureAI::EnterEvadeMode(why);
         }
 
         void UpdateAI(uint32 diff) override

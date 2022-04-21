@@ -1637,7 +1637,7 @@ struct SpellEntry
     std::array<uint32, 2> SpellVisual;                              // 131-132  m_spellVisualID
     uint32    SpellIconID;                                          // 133      m_spellIconID
     uint32    ActiveIconID;                                         // 134      m_activeIconID
-    //uint32    SpellPriority;                                      // 135 not used
+    uint32    SpellPriority;                                        // 135 not used
     std::array<char const*, 16> SpellName;                          // 136-151  m_name_lang
     //uint32    SpellNameFlag;                                      // 152 not used
     std::array<char const*, 16> Rank;                               // 153-168  m_nameSubtext_lang
@@ -2159,15 +2159,7 @@ struct TalentSpellPos
 
 typedef std::map<uint32, TalentSpellPos> TalentSpellPosMap;
 
-struct TaxiPathBySourceAndDestination
-{
-    TaxiPathBySourceAndDestination()  = default;
-    TaxiPathBySourceAndDestination(uint32 _id, uint32 _price) : ID(_id), price(_price) {}
-
-    uint32    ID{0};
-    uint32    price{0};
-};
-typedef std::map<uint32, TaxiPathBySourceAndDestination> TaxiPathSetForSource;
+typedef std::map<uint32, TaxiPathEntry const*> TaxiPathSetForSource;
 typedef std::map<uint32, TaxiPathSetForSource> TaxiPathSetBySource;
 
 typedef std::vector<TaxiPathNodeEntry const*> TaxiPathNodeList;

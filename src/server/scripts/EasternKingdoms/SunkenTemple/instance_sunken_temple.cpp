@@ -51,7 +51,7 @@ public:
                     break;
                 case NPC_SHADE_OF_ERANIKUS:
                     _shadeOfEranikusGUID = creature->GetGUID();
-                    creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    creature->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     break;
             }
 
@@ -66,7 +66,7 @@ public:
             if (unit->GetEntry() == NPC_JAMMAL_AN_THE_PROPHET)
             {
                 if (Creature* cr = instance->GetCreature(_shadeOfEranikusGUID))
-                    cr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    cr->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             }
 
         }
@@ -84,7 +84,7 @@ public:
                     if (gameobject->GetEntry() < GO_ATALAI_STATUE1 + _statuePhase)
                     {
                         instance->SummonGameObject(GO_ATALAI_LIGHT2, gameobject->GetPositionX(), gameobject->GetPositionY(), gameobject->GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-                        gameobject->SetUInt32Value(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        gameobject->ReplaceAllGameObjectFlags(GO_FLAG_NOT_SELECTABLE);
                     }
                     break;
                 case GO_ATALAI_IDOL:
@@ -93,7 +93,7 @@ public:
                     break;
                 case GO_IDOL_OF_HAKKAR:
                     if (_encounters[TYPE_ATAL_ALARION] == DONE)
-                        gameobject->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        gameobject->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
                 case GO_FORCEFIELD:
                     _forcefieldGUID = gameobject->GetGUID();
