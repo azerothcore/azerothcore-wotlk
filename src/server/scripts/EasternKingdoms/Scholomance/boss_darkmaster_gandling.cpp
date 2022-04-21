@@ -174,7 +174,7 @@ public:
             {
                 for (uint8 i = 0; i < 3; i++)
                 {
-                    if (Guardians[room][i] == nullptr)
+                    if (!Guardians[room][i])
                     {
                         Guardians[room][i] = cr;
                         break;

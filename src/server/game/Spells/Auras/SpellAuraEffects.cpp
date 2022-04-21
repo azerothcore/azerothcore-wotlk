@@ -5932,7 +5932,7 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
     uint32 auraId = auraSpellInfo->Id;
 
     // specific code for cases with no trigger spell provided in field
-    if (triggeredSpellInfo == nullptr)
+    if (!triggeredSpellInfo)
     {
         switch (auraSpellInfo->SpellFamilyName)
         {
