@@ -1515,7 +1515,7 @@ struct gunship_npc_AI : public ScriptedAI
         {
             me->SetFacingTo(Slot->TargetPosition.GetOrientation());
             me->m_Events.AddEvent(new BattleExperienceEvent(me), me->m_Events.CalculateTime(BattleExperienceEvent::ExperiencedTimes[0]));
-            me->CastSpell(me, SPELL_BATTLE_EXPERIENCE, true);
+            me->CastSpell(me, SPELL_BATTLE_EXPERIENCE, false);
             me->SetReactState(REACT_AGGRESSIVE);
         }
     }
@@ -1579,7 +1579,7 @@ struct npc_gunship_boarding_addAI : public ScriptedAI
         {
             me->SetFacingTo(Slot->TargetPosition.GetOrientation());
             me->m_Events.AddEvent(new BattleExperienceEvent(me), me->m_Events.CalculateTime(BattleExperienceEvent::ExperiencedTimes[0]));
-            me->CastSpell(me, SPELL_BATTLE_EXPERIENCE, true);
+            me->CastSpell(me, SPELL_BATTLE_EXPERIENCE, false);
             me->SetReactState(REACT_AGGRESSIVE);
 
             Position const& otherTransportPos = Instance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? OrgrimsHammerTeleportExit : SkybreakerTeleportExit;
