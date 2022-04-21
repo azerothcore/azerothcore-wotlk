@@ -55,7 +55,7 @@ AC_API_EXPORT EnumText EnumUtils<CreatureFlagsExtra>::ToString(CreatureFlagsExtr
         case CREATURE_FLAG_EXTRA_NO_PLAYER_DAMAGE_REQ: return { "CREATURE_FLAG_EXTRA_NO_PLAYER_DAMAGE_REQ", "CREATURE_FLAG_EXTRA_NO_PLAYER_DAMAGE_REQ", "creature does not need to take player damage for kill credit" };
         case CREATURE_FLAG_EXTRA_AVOID_AOE: return { "CREATURE_FLAG_EXTRA_AVOID_AOE", "CREATURE_FLAG_EXTRA_AVOID_AOE", "pussywizard: ignored by aoe attacks (for icc blood prince council npc - Dark Nucleus)" };
         case CREATURE_FLAG_EXTRA_NO_DODGE: return { "CREATURE_FLAG_EXTRA_NO_DODGE", "CREATURE_FLAG_EXTRA_NO_DODGE", "xinef: target cannot dodge" };
-        case CREATURE_FLAG_EXTRA_UNUSED_25: return { "CREATURE_FLAG_EXTRA_UNUSED_25", "CREATURE_FLAG_EXTRA_UNUSED_25", "" };
+        case CREATURE_FLAG_EXTRA_MODULE: return { "CREATURE_FLAG_EXTRA_MODULE", "CREATURE_FLAG_EXTRA_MODULE", "Used by module creatures to avoid blizzlike checks." };
         case CREATURE_FLAG_EXTRA_UNUSED_26: return { "CREATURE_FLAG_EXTRA_UNUSED_26", "CREATURE_FLAG_EXTRA_UNUSED_26", "" };
         case CREATURE_FLAG_EXTRA_UNUSED_27: return { "CREATURE_FLAG_EXTRA_UNUSED_27", "CREATURE_FLAG_EXTRA_UNUSED_27", "" };
         case CREATURE_FLAG_EXTRA_UNUSED_28: return { "CREATURE_FLAG_EXTRA_UNUSED_28", "CREATURE_FLAG_EXTRA_UNUSED_28", "" };
