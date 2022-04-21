@@ -235,6 +235,31 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->MaxAffectedTargets = 15;
     });
 
+    ApplySpellFix({
+        17941,  // Shadow Trance
+        22008,  // Netherwind Focus
+        31834,  // Light's Grace
+        34754,  // Clearcasting
+        34936,  // Backlash
+        48108,  // Hot Streak
+        51124,  // Killing Machine
+        54741,  // Firestarter
+        64823,  // Item - Druid T8 Balance 4P Bonus
+        34477,  // Misdirection
+        44401,  // Missile Barrage
+        18820   // Insight
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ProcCharges = 1;
+    });
+
+    // Fireball
+    ApplySpellFix({ 57761 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ProcCharges = 1;
+        spellInfo->SpellPriority = 50;
+    });
+  
     // Tidal Wave
     ApplySpellFix({ 53390 }, [](SpellInfo* spellInfo)
     {

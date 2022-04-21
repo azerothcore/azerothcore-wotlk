@@ -472,7 +472,7 @@ void ThreatMgr::modifyThreatPercent(Unit* victim, int32 percent)
 
 //============================================================
 
-Unit* ThreatMgr::getHostilTarget()
+Unit* ThreatMgr::getHostileTarget()
 {
     iThreatContainer.update();
     HostileReference* nextVictim = iThreatContainer.selectNextVictim(GetOwner()->ToCreature(), getCurrentVictim());
@@ -546,49 +546,49 @@ void ThreatMgr::processThreatEvent(ThreatRefStatusChangeEvent* threatRefStatusCh
 {
     threatRefStatusChangeEvent->setThreatMgr(this);     // now we can set the threat manager
 
-    HostileReference* hostilRef = threatRefStatusChangeEvent->getReference();
+    HostileReference* hostileRef = threatRefStatusChangeEvent->getReference();
 
     switch (threatRefStatusChangeEvent->getType())
     {
         case UEV_THREAT_REF_THREAT_CHANGE:
-            if ((getCurrentVictim() == hostilRef && threatRefStatusChangeEvent->getFValue() < 0.0f) ||
-                    (getCurrentVictim() != hostilRef && threatRefStatusChangeEvent->getFValue() > 0.0f))
+            if ((getCurrentVictim() == hostileRef && threatRefStatusChangeEvent->getFValue() < 0.0f) ||
+                    (getCurrentVictim() != hostileRef && threatRefStatusChangeEvent->getFValue() > 0.0f))
                 setDirty(true);                             // the order in the threat list might have changed
             break;
         case UEV_THREAT_REF_ONLINE_STATUS:
-            if (!hostilRef->isOnline())
+            if (!hostileRef->isOnline())
             {
-                if (hostilRef == getCurrentVictim())
+                if (hostileRef == getCurrentVictim())
                 {
                     setCurrentVictim(nullptr);
                     setDirty(true);
                 }
                 if (GetOwner() && GetOwner()->IsInWorld())
-                    if (Unit* target = ObjectAccessor::GetUnit(*GetOwner(), hostilRef->getUnitGuid()))
+                    if (Unit* target = ObjectAccessor::GetUnit(*GetOwner(), hostileRef->getUnitGuid()))
                         if (GetOwner()->IsInMap(target))
-                            GetOwner()->SendRemoveFromThreatListOpcode(hostilRef);
-                iThreatContainer.remove(hostilRef);
-                iThreatOfflineContainer.addReference(hostilRef);
+                            GetOwner()->SendRemoveFromThreatListOpcode(hostileRef);
+                iThreatContainer.remove(hostileRef);
+                iThreatOfflineContainer.addReference(hostileRef);
             }
             else
             {
-                if (getCurrentVictim() && hostilRef->getThreat() > (1.1f * getCurrentVictim()->getThreat()))
+                if (getCurrentVictim() && hostileRef->getThreat() > (1.1f * getCurrentVictim()->getThreat()))
                     setDirty(true);
-                iThreatContainer.addReference(hostilRef);
-                iThreatOfflineContainer.remove(hostilRef);
+                iThreatContainer.addReference(hostileRef);
+                iThreatOfflineContainer.remove(hostileRef);
             }
             break;
         case UEV_THREAT_REF_REMOVE_FROM_LIST:
-            if (hostilRef == getCurrentVictim())
+            if (hostileRef == getCurrentVictim())
             {
                 setCurrentVictim(nullptr);
                 setDirty(true);
             }
-            iOwner->SendRemoveFromThreatListOpcode(hostilRef);
-            if (hostilRef->isOnline())
-                iThreatContainer.remove(hostilRef);
+            iOwner->SendRemoveFromThreatListOpcode(hostileRef);
+            if (hostileRef->isOnline())
+                iThreatContainer.remove(hostileRef);
             else
-                iThreatOfflineContainer.remove(hostilRef);
+                iThreatOfflineContainer.remove(hostileRef);
             break;
     }
 }
