@@ -80,7 +80,7 @@ struct map_liquidHeader
 namespace MMAP
 {
 
-    uint32 const MAP_VERSION_MAGIC = 10;
+    uint32 const MAP_VERSION_MAGIC = 9;
 
     TerrainBuilder::TerrainBuilder(bool skipLiquid) : m_skipLiquid (skipLiquid) { }
     TerrainBuilder::~TerrainBuilder() = default;
