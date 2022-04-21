@@ -6036,6 +6036,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                         if (m_pathFinder->GetPathType() & (PATHFIND_NOPATH | PATHFIND_INCOMPLETE) || target->GetExactDistSq(endPos.x, endPos.y, endPos.z) > maxdist * maxdist || m_pathFinder->getPathLength() > (40.0f + (m_caster->HasAura(58097) ? 5.0f : 0.0f)))
                             return SPELL_FAILED_NOPATH;
                     }
+                    m_caster->ToPlayer()->SetCanTeleport(true);
                     break;
                 }
             case SPELL_EFFECT_SKINNING:
