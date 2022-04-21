@@ -44,7 +44,7 @@ template <class T>
 class HashMapHolder
 {
     //Non instanceable only static
-    HashMapHolder() { }
+    HashMapHolder() = default;
 
 public:
 

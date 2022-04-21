@@ -12,17 +12,17 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.item_set_names
+-- Дамп структуры для таблица acore_world.item_set_names
 DROP TABLE IF EXISTS `item_set_names`;
 CREATE TABLE IF NOT EXISTS `item_set_names` (
-  `entry` mediumint(8) unsigned NOT NULL,
+  `entry` MEDIUMINT unsigned NOT NULL,
   `name` varchar(255) NOT NULL DEFAULT '',
   `InventoryType` TINYINT unsigned NOT NULL DEFAULT 0,
   `VerifiedBuild` SMALLINT DEFAULT 0,
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.item_set_names: 2 481 rows
+-- Дамп данных таблицы acore_world.item_set_names: 2 481 rows
 DELETE FROM `item_set_names`;
 /*!40000 ALTER TABLE `item_set_names` DISABLE KEYS */;
 INSERT INTO `item_set_names` (`entry`, `name`, `InventoryType`, `VerifiedBuild`) VALUES

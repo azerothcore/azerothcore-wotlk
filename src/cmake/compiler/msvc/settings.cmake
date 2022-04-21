@@ -101,61 +101,59 @@ target_compile_definitions(acore-compile-option-interface
     -D__STDC_LIMIT_MACROS)
 message(STATUS "MSVC: Disabled INTMAX_MAX warnings")
 
-# disable warnings in Visual Studio 8 and above if not wanted
-if(NOT WITH_WARNINGS)
-  if(MSVC AND NOT CMAKE_GENERATOR MATCHES "Visual Studio 7")
-  target_compile_options(acore-warning-interface
-    INTERFACE
-      /wd4996
-      /wd4355
-      /wd4244
-      /wd4985
-      /wd4267
-      /wd4619
-      # /wd4512
-      )
-    message(STATUS "MSVC: Disabled generic compiletime warnings")
-  endif()
-endif()
-
 # Ignore specific warnings
-# C4351: new behavior: elements of array 'x' will be default initialized
-# C4091: 'typedef ': ignored on left of '' when no variable is declared
 target_compile_options(acore-compile-option-interface
   INTERFACE
-    /wd4351
-    /wd4091)
+    /wd4351  # C4351: new behavior: elements of array 'x' will be default initialized
+    /wd4091) # C4091: 'typedef ': ignored on left of '' when no variable is declared
 
-# Specify the maximum PreCompiled Header memory allocation limit
-# Fixes a compiler-problem when using PCH - the /Ym flag is adjusted by the compiler in MSVC2012, hence we need to set an upper limit with /Zm to avoid discrepancies)
-# (And yes, this is a verified , unresolved bug with MSVC... *sigh*)
-string(REGEX REPLACE "/Zm[0-9]+ *" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zm500")
-
-# Enable and treat as errors the following warnings to easily detect virtual function signature failures:
-# 'function' : member function does not override any base class virtual member function
-# 'virtual_function' : no override available for virtual member function from base 'class'; function is hidden
-target_compile_options(acore-warning-interface
+# Define NOMINMAX
+target_compile_definitions(acore-compile-option-interface
   INTERFACE
-    /we4263
-    /we4264)
+    -DNOMINMAX)
+message(STATUS "MSVC: Enable NOMINMAX")
+
+if(NOT WITH_WARNINGS)
+  target_compile_options(acore-warning-interface
+    INTERFACE
+      /wd4996  # C4996 deprecation
+      /wd4985  # C4985 'symbol-name': attributes not present on previous declaration.
+      /wd4244  # C4244 'argument' : conversion from 'type1' to 'type2', possible loss of data
+      /wd4267  # C4267 'var' : conversion from 'size_t' to 'type', possible loss of data
+      /wd4619  # C4619 #pragma warning : there is no warning number 'number'
+      /wd4512) # C4512 'class' : assignment operator could not be generated
+
+  message(STATUS "MSVC: Disabled generic compiletime warnings")
+endif()
+
+# Move some warnings that are enabled for other compilers from level 4 to level 3
+target_compile_options(acore-compile-option-interface
+  INTERFACE
+    /w34100  # C4100 'identifier' : unreferenced formal parameter
+    /w34101  # C4101: 'identifier' : unreferenced local variable
+    /w34189  # C4189: 'identifier' : local variable is initialized but not referenced
+    /w34389) # C4189: 'equality-operator' : signed/unsigned mismatch
 
 if(BUILD_SHARED_LIBS)
-  # C4251: needs to have dll-interface to be used by clients of class '...'
-  # C4275: non dll-interface class ...' used as base for dll-interface class '...'
   target_compile_options(acore-compile-option-interface
     INTERFACE
-      /wd4251
-      /wd4275)
+      /wd4251  # C4251: needs to have dll-interface to be used by clients of class '...'
+      /wd4275) # C4275: non dll-interface class ...' used as base for dll-interface class '...'
 
   message(STATUS "MSVC: Enabled shared linking")
 endif()
 
+# Enable and treat as errors the following warnings to easily detect virtual function signature failures:
+target_compile_options(acore-warning-interface
+  INTERFACE
+    /we4263  # 'function' : member function does not override any base class virtual member function
+    /we4264) # 'virtual_function' : no override available for virtual member function from base 'class'; function is hidden
+
 # Disable incremental linking in debug builds.
 # To prevent linking getting stuck (which might be fixed in a later VS version).
 macro(DisableIncrementalLinking variable)
-string(REGEX REPLACE "/INCREMENTAL *" "" ${variable} "${${variable}}")
-set(${variable} "${${variable}} /INCREMENTAL:NO")
+  string(REGEX REPLACE "/INCREMENTAL *" "" ${variable} "${${variable}}")
+  set(${variable} "${${variable}} /INCREMENTAL:NO")
 endmacro()
 
 DisableIncrementalLinking(CMAKE_EXE_LINKER_FLAGS_DEBUG)

@@ -36,6 +36,7 @@
 #include "QuestDef.h"
 #include "TemporarySummon.h"
 #include "VehicleDefines.h"
+#include "GossipDef.h"
 #include <functional>
 #include <limits>
 #include <map>
@@ -179,7 +180,7 @@ enum eScriptFlags
     SF_CASTSPELL_SEARCH_CREATURE  = 4,
     SF_CASTSPELL_TRIGGERED      = 0x1,
 
-    // PlaySound flags
+    // Playsound flags
     SF_PLAYSOUND_TARGET_PLAYER  = 0x1,
     SF_PLAYSOUND_DISTANCE_SOUND = 0x2,
 
@@ -309,7 +310,7 @@ struct ScriptInfo
         {
             uint32 SoundID;         // datalong
             uint32 Flags;           // datalong2
-        } PlaySound;
+        } Playsound;
 
         struct                      // SCRIPT_COMMAND_CREATE_ITEM (17)
         {
@@ -442,15 +443,15 @@ struct BroadcastText
     uint32 LanguageID{0};
     std::vector<std::string> MaleText;
     std::vector<std::string> FemaleText;
-    uint32 EmoteId0{0};
     uint32 EmoteId1{0};
     uint32 EmoteId2{0};
-    uint32 EmoteDelay0{0};
+    uint32 EmoteId3{0};
     uint32 EmoteDelay1{0};
     uint32 EmoteDelay2{0};
-    uint32 SoundId{0};
-    uint32 Unk1{0};
-    uint32 Unk2{0};
+    uint32 EmoteDelay3{0};
+    uint32 SoundEntriesId{0};
+    uint32 EmotesID{0};
+    uint32 Flags{0};
     // uint32 VerifiedBuild;
 
     [[nodiscard]] std::string const& GetText(LocaleConstant locale = DEFAULT_LOCALE, uint8 gender = GENDER_MALE, bool forceGender = false) const
@@ -531,7 +532,7 @@ struct PetLevelInfo
 
 struct MailLevelReward
 {
-    MailLevelReward()  {}
+    MailLevelReward()  = default;
     MailLevelReward(uint32 _raceMask, uint32 _mailTemplateId, uint32 _senderEntry) : raceMask(_raceMask), mailTemplateId(_mailTemplateId), senderEntry(_senderEntry) {}
 
     uint32 raceMask{0};
@@ -585,6 +586,24 @@ struct PointOfInterest
     std::string Name;
 };
 
+struct QuestGreeting
+{
+    uint16 EmoteType;
+    uint32 EmoteDelay;
+    std::string Text;
+
+    QuestGreeting() : EmoteType(0), EmoteDelay(0) { }
+    QuestGreeting(uint16 emoteType, uint32 emoteDelay, std::string text)
+        : EmoteType(emoteType), EmoteDelay(emoteDelay), Text(std::move(text)) { }
+};
+
+struct QuestGreetingLocale
+{
+    std::vector<std::string> Greeting;
+};
+
+typedef std::unordered_map<uint32, QuestGreetingLocale> QuestGreetingLocaleContainer;
+
 struct GossipMenuItems
 {
     uint32          MenuID;
@@ -622,7 +641,7 @@ struct QuestPOIPoint
     int32 x{0};
     int32 y{0};
 
-    QuestPOIPoint()  {}
+    QuestPOIPoint()  = default;
     QuestPOIPoint(int32 _x, int32 _y) : x(_x), y(_y) {}
 };
 
@@ -637,15 +656,18 @@ struct QuestPOI
     uint32 Unk4{0};
     std::vector<QuestPOIPoint> points;
 
-    QuestPOI()  {}
+    QuestPOI()  = default;
     QuestPOI(uint32 id, int32 objIndex, uint32 mapId, uint32 areaId, uint32 floorId, uint32 unk3, uint32 unk4) : Id(id), ObjectiveIndex(objIndex), MapId(mapId), AreaId(areaId), FloorId(floorId), Unk3(unk3), Unk4(unk4) {}
 };
 
 typedef std::vector<QuestPOI> QuestPOIVector;
 typedef std::unordered_map<uint32, QuestPOIVector> QuestPOIContainer;
 
+typedef std::array<std::unordered_map<uint32, QuestGreeting>, 2> QuestGreetingContainer;
+
 typedef std::unordered_map<uint32, VendorItemData> CacheVendorItemContainer;
 typedef std::unordered_map<uint32, TrainerSpellData> CacheTrainerSpellContainer;
+typedef std::unordered_map<uint32, ServerMail> ServerMailContainer;
 
 enum SkillRangeType
 {
@@ -740,7 +762,7 @@ public:
 
     CreatureTemplate const* GetCreatureTemplate(uint32 entry);
     [[nodiscard]] CreatureTemplateContainer const* GetCreatureTemplates() const { return &_creatureTemplateStore; }
-    CreatureModelInfo const* GetCreatureModelInfo(uint32 modelId);
+    CreatureModelInfo const* GetCreatureModelInfo(uint32 modelId) const;
     CreatureModelInfo const* GetCreatureModelRandomGender(uint32* displayID);
     static uint32 ChooseDisplayId(CreatureTemplate const* cinfo, CreatureData const* data = nullptr);
     static void ChooseCreatureFlags(CreatureTemplate const* cinfo, uint32& npcflag, uint32& unit_flags, uint32& dynamicflags, CreatureData const* data = nullptr);
@@ -749,6 +771,7 @@ public:
     GameObjectAddon const* GetGameObjectAddon(ObjectGuid::LowType lowguid);
     [[nodiscard]] GameObjectTemplateAddon const* GetGameObjectTemplateAddon(uint32 entry) const;
     CreatureAddon const* GetCreatureTemplateAddon(uint32 entry);
+    CreatureMovementData const* GetCreatureMovementOverride(ObjectGuid::LowType spawnId) const;
     ItemTemplate const* GetItemTemplate(uint32 entry);
     [[nodiscard]] ItemTemplateContainer const* GetItemTemplateStore() const { return &_itemTemplateStore; }
     [[nodiscard]] std::vector<ItemTemplate*> const* GetItemTemplateStoreFast() const { return &_itemTemplateStoreFast; }
@@ -989,6 +1012,7 @@ public:
     void LoadCreatureTemplateResistances();
     void LoadCreatureTemplateSpells();
     void CheckCreatureTemplate(CreatureTemplate const* cInfo);
+    void CheckCreatureMovement(char const* table, uint64 id, CreatureMovementData& creatureMovement);
     void LoadGameObjectQuestItems();
     void LoadCreatureQuestItems();
     void LoadTempSummons();
@@ -999,6 +1023,7 @@ public:
     void LoadGameObjectAddons();
     void LoadCreatureModelInfo();
     void LoadEquipmentTemplates();
+    void LoadCreatureMovementOverrides();
     void LoadGameObjectLocales();
     void LoadGameobjects();
     void LoadItemTemplates();
@@ -1012,9 +1037,11 @@ public:
     void LoadPageTextLocales();
     void LoadGossipMenuItemsLocales();
     void LoadPointOfInterestLocales();
+    void LoadQuestGreetingsLocales();
     void LoadInstanceTemplate();
     void LoadInstanceEncounters();
     void LoadMailLevelRewards();
+    void LoadMailServerTemplates();
     void LoadVehicleTemplateAccessories();
     void LoadVehicleAccessories();
 
@@ -1024,6 +1051,7 @@ public:
     void LoadAreaTriggerTeleports();
     void LoadAccessRequirements();
     void LoadQuestAreaTriggers();
+    void LoadQuestGreetings();
     void LoadAreaTriggerScripts();
     void LoadTavernAreaTriggers();
     void LoadGameObjectForQuests();
@@ -1055,7 +1083,7 @@ public:
 
     void LoadVendors();
     void LoadTrainerSpell();
-    void AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, uint32 reqSkill, uint32 reqSkillValue, uint32 reqLevel);
+    void AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, uint32 reqSkill, uint32 reqSkillValue, uint32 reqLevel, uint32 reqSpell);
 
     std::string GeneratePetName(uint32 entry);
     uint32 GetBaseXP(uint8 level);
@@ -1143,6 +1171,8 @@ public:
         return nullptr;
     }
 
+    [[nodiscard]] ServerMailContainer const& GetAllServerMailStore() const { return _serverMailStore; }
+
     [[nodiscard]] BroadcastText const* GetBroadcastText(uint32 id) const
     {
         BroadcastTextContainer::const_iterator itr = _broadcastTextStore.find(id);
@@ -1150,7 +1180,7 @@ public:
             return &itr->second;
         return nullptr;
     }
-    CreatureDataContainer const& GetAllCreatureData() const { return _creatureDataStore; }
+    [[nodiscard]] CreatureDataContainer const& GetAllCreatureData() const { return _creatureDataStore; }
     [[nodiscard]] CreatureData const* GetCreatureData(ObjectGuid::LowType spawnId) const
     {
         CreatureDataContainer::const_iterator itr = _creatureDataStore.find(spawnId);
@@ -1167,7 +1197,7 @@ public:
         return itr->second;
     }
 
-    GameObjectDataContainer const& GetAllGOData() const { return _gameObjectDataStore; }
+    [[nodiscard]] GameObjectDataContainer const& GetAllGOData() const { return _gameObjectDataStore; }
     [[nodiscard]] GameObjectData const* GetGOData(ObjectGuid::LowType spawnId) const
     {
         GameObjectDataContainer::const_iterator itr = _gameObjectDataStore.find(spawnId);
@@ -1222,6 +1252,12 @@ public:
         if (itr == _pointOfInterestLocaleStore.end()) return nullptr;
         return &itr->second;
     }
+    [[nodiscard]] QuestGreetingLocale const* GetQuestGreetingLocale(TypeID type, uint32 id) const
+    {
+        QuestGreetingLocaleContainer::const_iterator itr = _questGreetingLocaleStore.find(MAKE_PAIR32(type, id));
+        if (itr == _questGreetingLocaleStore.end()) return nullptr;
+        return &itr->second;
+    }
     [[nodiscard]] QuestOfferRewardLocale const* GetQuestOfferRewardLocale(uint32 entry) const
     {
         auto itr = _questOfferRewardLocaleStore.find(entry);
@@ -1240,6 +1276,8 @@ public:
         if (itr == _npcTextLocaleStore.end()) return nullptr;
         return &itr->second;
     }
+    QuestGreeting const* GetQuestGreeting(TypeID type, uint32 id) const;
+
     GameObjectData& NewGOData(ObjectGuid::LowType guid) { return _gameObjectDataStore[guid]; }
     void DeleteGOData(ObjectGuid::LowType guid);
 
@@ -1266,13 +1304,13 @@ public:
 
     // reserved names
     void LoadReservedPlayersNames();
-    [[nodiscard]] bool IsReservedName(std::string const& name) const;
+    [[nodiscard]] bool IsReservedName(std::string_view name) const;
     void AddReservedPlayerName(std::string const& name);
 
     // name with valid structure and symbols
-    static uint8 CheckPlayerName(std::string const& name, bool create = false);
-    static PetNameInvalidReason CheckPetName(std::string const& name);
-    static bool IsValidCharterName(std::string const& name);
+    static uint8 CheckPlayerName(std::string_view name, bool create = false);
+    static PetNameInvalidReason CheckPetName(std::string_view name);
+    static bool IsValidCharterName(std::string_view name);
     static bool IsValidChannelName(std::string const& name);
 
     static bool CheckDeclinedNames(std::wstring w_ownname, DeclinedName const& names);
@@ -1370,6 +1408,7 @@ public:
     [[nodiscard]] bool IsTransportMap(uint32 mapId) const { return _transportMaps.count(mapId) != 0; }
 
     [[nodiscard]] uint32 GetQuestMoneyReward(uint8 level, uint32 questMoneyDifficulty) const;
+    void SendServerMail(Player* player, uint32 id, uint32 reqLevel, uint32 reqPlayTime, uint32 rewardMoneyA, uint32 rewardMoneyH, uint32 rewardItemA, uint32 rewardItemCountA, uint32 rewardItemH, uint32 rewardItemCountH, std::string subject, std::string body, uint8 active) const;
 
 private:
     // first free id for selected id type
@@ -1406,6 +1445,7 @@ private:
     QuestAreaTriggerContainer _questAreaTriggerStore;
     TavernAreaTriggerContainer _tavernAreaTriggerStore;
     GossipTextContainer _gossipTextStore;
+    QuestGreetingContainer _questGreetingStore;
     AreaTriggerContainer _areaTriggerStore;
     AreaTriggerTeleportContainer _areaTriggerTeleportStore;
     AreaTriggerScriptContainer _areaTriggerScriptStore;
@@ -1491,6 +1531,7 @@ private:
     CreatureModelContainer _creatureModelStore;
     CreatureAddonContainer _creatureAddonStore;
     CreatureAddonContainer _creatureTemplateAddonStore;
+    std::unordered_map<ObjectGuid::LowType, CreatureMovementData> _creatureMovementOverrides;
     GameObjectAddonContainer _gameObjectAddonStore;
     GameObjectQuestItemMap _gameObjectQuestItemStore;
     CreatureQuestItemMap _creatureQuestItemStore;
@@ -1517,9 +1558,12 @@ private:
     AcoreStringContainer _acoreStringStore;
     GossipMenuItemsLocaleContainer _gossipMenuItemsLocaleStore;
     PointOfInterestLocaleContainer _pointOfInterestLocaleStore;
+    QuestGreetingLocaleContainer _questGreetingLocaleStore;
 
     CacheVendorItemContainer _cacheVendorItemStore;
     CacheTrainerSpellContainer _cacheTrainerSpellStore;
+
+    ServerMailContainer _serverMailStore;
 
     std::set<uint32> _difficultyEntries[MAX_DIFFICULTY - 1]; // already loaded difficulty 1 value in creatures, used in CheckCreatureTemplate
     std::set<uint32> _hasDifficultyEntries[MAX_DIFFICULTY - 1]; // already loaded creatures with difficulty 1 values, used in CheckCreatureTemplate

@@ -35,8 +35,8 @@ namespace WorldPackets
         virtual WorldPacket const* Write() = 0;
         virtual void Read() = 0;
 
-        WorldPacket const* GetRawPacket() const { return &_worldPacket; }
-        size_t GetSize() const { return _worldPacket.size(); }
+        [[nodiscard]] WorldPacket const* GetRawPacket() const { return &_worldPacket; }
+        [[nodiscard]] size_t GetSize() const { return _worldPacket.size(); }
 
     protected:
         WorldPacket _worldPacket;
@@ -53,7 +53,7 @@ namespace WorldPackets
         WorldPacket&& Move() { return std::move(_worldPacket); }
         void ShrinkToFit() { _worldPacket.shrink_to_fit(); }
 
-        OpcodeServer GetOpcode() const { return OpcodeServer(_worldPacket.GetOpcode()); }
+        [[nodiscard]] OpcodeServer GetOpcode() const { return OpcodeServer(_worldPacket.GetOpcode()); }
     };
 
     class AC_GAME_API ClientPacket : public Packet
@@ -64,7 +64,7 @@ namespace WorldPackets
 
         WorldPacket const* Write() final;
 
-        OpcodeClient GetOpcode() const { return OpcodeClient(_worldPacket.GetOpcode()); }
+        [[nodiscard]] OpcodeClient GetOpcode() const { return OpcodeClient(_worldPacket.GetOpcode()); }
     };
 }
 

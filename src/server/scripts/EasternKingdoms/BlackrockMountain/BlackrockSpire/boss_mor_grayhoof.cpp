@@ -17,8 +17,8 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "blackrock_spire.h"
 #include "TaskScheduler.h"
+#include "blackrock_spire.h"
 
 enum Texts
 {
@@ -116,7 +116,7 @@ struct boss_mor_grayhoof : public BossAI
                 spell = Acore::Containers::SelectRandomContainerElement(faerieSpells);
                 if (spell == SPELL_SLEEP)
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.f, true))
                     {
                         me->CastSpell(target, SPELL_SLEEP);
 

@@ -27,7 +27,7 @@ class MessageBuffer
     using size_type = std::vector<uint8>::size_type;
 
 public:
-    MessageBuffer() : _wpos(0), _rpos(0), _storage()
+    MessageBuffer() :  _storage()
     {
         _storage.resize(4096);
     }
@@ -132,8 +132,8 @@ public:
     }
 
 private:
-    size_type _wpos;
-    size_type _rpos;
+    size_type _wpos{0};
+    size_type _rpos{0};
     std::vector<uint8> _storage;
 };
 

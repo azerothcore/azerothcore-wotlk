@@ -87,7 +87,7 @@ public:
                     events.ScheduleEvent(EVENT_STREAM_OF_MACHINE_FLUID, urand(12000, 14000));
                     break;
                 case EVENT_SAW_BLADE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f))
                         me->CastSpell(target, SPELL_SAW_BLADE, false);
                     Talk(SAY_SAW_BLADE);
                     events.ScheduleEvent(EVENT_SAW_BLADE, 25000);

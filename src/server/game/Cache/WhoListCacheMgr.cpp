@@ -18,9 +18,7 @@
 #include "WhoListCacheMgr.h"
 #include "GuildMgr.h"
 #include "ObjectAccessor.h"
-#include "Player.h"
 #include "World.h"
-#include "WorldSession.h"
 
 WhoListCacheMgr* WhoListCacheMgr::instance()
 {

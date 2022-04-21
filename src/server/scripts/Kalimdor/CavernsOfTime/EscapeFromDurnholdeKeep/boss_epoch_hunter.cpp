@@ -75,7 +75,7 @@ public:
 
         void JustDied(Unit* killer) override
         {
-            if (killer == me)
+            if (killer && killer == me)
                 return;
             Talk(SAY_DEATH);
             me->GetInstanceScript()->SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_EPOCH_KILLED);

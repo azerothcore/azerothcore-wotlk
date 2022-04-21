@@ -29,6 +29,7 @@
 #include "Cell.h"
 #include "CellImpl.h"
 #include "Chat.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "Group.h"
 #include "InstanceScript.h"
@@ -45,6 +46,7 @@
 // TODO: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
 
 // 46642 - 5,000 Gold
@@ -82,12 +84,12 @@ public:
     void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         _modelId = GetUnitOwner()->GetDisplayId();
-        _hasFlag = GetUnitOwner()->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        _hasFlag = GetUnitOwner()->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         for (uint8 i = 0; i < 3; ++i)
             _itemId.at(i) = GetUnitOwner()->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i);
 
         GetUnitOwner()->SetDisplayId(11686);
-        GetUnitOwner()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        GetUnitOwner()->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         for (uint8 i = 0; i < 3; ++i)
             GetUnitOwner()->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i, 0);
     }
@@ -96,7 +98,7 @@ public:
     {
         GetUnitOwner()->SetDisplayId(_modelId);
         if (!_hasFlag)
-            GetUnitOwner()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            GetUnitOwner()->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         for (uint8 i = 0; i < 3; ++i)
             GetUnitOwner()->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i, _itemId.at(i));
     }
@@ -1287,7 +1289,8 @@ class spell_gen_adaptive_warding : public AuraScript
    45826 - East Frostwolf Warmaster
    45828 - Dun Baldar North Marshal
    45829 - Dun Baldar South Marshal
-   45830 - Stonehearth Marshal */
+   45830 - Stonehearth Marshal
+   45831 - Icewing Marshal */
 class spell_gen_av_drekthar_presence : public AuraScript
 {
     PrepareAuraScript(spell_gen_av_drekthar_presence);
@@ -1678,7 +1681,26 @@ class spell_gen_pet_summoned : public SpellScript
     {
         Player* player = GetCaster()->ToPlayer();
         if (player->GetLastPetNumber() && player->CanResummonPet(player->GetLastPetSpell()))
-            Pet::LoadPetFromDB(player, PET_LOAD_BG_RESURRECT, 0, player->GetLastPetNumber(), true);
+        {
+            PetType newPetType = (player->getClass() == CLASS_HUNTER) ? HUNTER_PET : SUMMON_PET;
+            Pet* newPet = new Pet(player, newPetType);
+            if (newPet->LoadPetFromDB(player, 0, player->GetLastPetNumber(), true, 100))
+            {
+                newPet->SetPower(newPet->getPowerType(), newPet->GetMaxPower(newPet->getPowerType()));
+
+                switch (newPet->GetEntry())
+                {
+                    case NPC_DOOMGUARD:
+                    case NPC_INFERNAL:
+                        newPet->SetEntry(NPC_IMP);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else
+                delete newPet;
+        }
     }
 
     void Register() override
@@ -1780,9 +1802,9 @@ class spell_gen_creature_permanent_feign_death : public AuraScript
     void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         Unit* target = GetTarget();
-        target->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
-        target->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
-        target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+        target->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
+        target->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
+        target->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
 
         if (target->GetTypeId() == TYPEID_UNIT)
             target->ToCreature()->SetReactState(REACT_PASSIVE);
@@ -1791,9 +1813,9 @@ class spell_gen_creature_permanent_feign_death : public AuraScript
     void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         Unit* target = GetTarget();
-        target->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
-        target->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
-        target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+        target->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
+        target->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
+        target->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
 
         if (target->GetTypeId() == TYPEID_UNIT)
             target->ToCreature()->SetReactState(REACT_AGGRESSIVE);
@@ -1803,6 +1825,38 @@ class spell_gen_creature_permanent_feign_death : public AuraScript
     {
         OnEffectApply += AuraEffectApplyFn(spell_gen_creature_permanent_feign_death::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         OnEffectRemove += AuraEffectApplyFn(spell_gen_creature_permanent_feign_death::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+enum Teleporting
+{
+    AREA_VIOLET_CITADEL_SPIRE   = 4637,
+
+    SPELL_TELEPORT_SPIRE_DOWN   = 59316,
+    SPELL_TELEPORT_SPIRE_UP     = 59314
+};
+
+class spell_gen_teleporting : public SpellScript
+{
+    PrepareSpellScript(spell_gen_teleporting);
+
+    void HandleScript(SpellEffIndex /* effIndex */)
+    {
+        Unit* target = GetHitUnit();
+        if (target->GetTypeId() != TYPEID_PLAYER)
+            return;
+
+        // return from top
+        if (target->ToPlayer()->GetAreaId() == AREA_VIOLET_CITADEL_SPIRE)
+            target->CastSpell(target, SPELL_TELEPORT_SPIRE_DOWN, true);
+            // teleport atop
+        else
+            target->CastSpell(target, SPELL_TELEPORT_SPIRE_UP, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_gen_teleporting::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -2106,7 +2160,7 @@ class spell_gen_clone_weapon_aura : public AuraScript
             case SPELL_COPY_OFFHAND_AURA:
             case SPELL_COPY_OFFHAND_2_AURA:
                 {
-                    prevItem = target->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID) + 1;
+                    prevItem = target->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1);
 
                     if (Player* player = caster->ToPlayer())
                     {
@@ -2119,7 +2173,7 @@ class spell_gen_clone_weapon_aura : public AuraScript
                 }
             case SPELL_COPY_RANGED_AURA:
                 {
-                    prevItem = target->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID) + 2;
+                    prevItem = target->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2);
 
                     if (Player* player = caster->ToPlayer())
                     {
@@ -2225,12 +2279,12 @@ class spell_gen_turkey_marker : public AuraScript
     {
         if (GetStackAmount() > stackAmount)
         {
-            _applyTimes.push_back(World::GetGameTimeMS());
+            _applyTimes.push_back(GameTime::GetGameTimeMS().count());
             stackAmount++;
         }
 
         // pop stack if it expired for us
-        if (_applyTimes.front() + GetMaxDuration() < World::GetGameTimeMS())
+        if (_applyTimes.front() + GetMaxDuration() < GameTime::GetGameTimeMS().count())
         {
             stackAmount--;
             ModStackAmount(-1, AURA_REMOVE_BY_EXPIRE);
@@ -2267,56 +2321,6 @@ class spell_gen_lifeblood : public AuraScript
     void Register() override
     {
         DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_gen_lifeblood::CalculateAmount, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
-    }
-};
-
-enum MagicRoosterSpells
-{
-    SPELL_MAGIC_ROOSTER_NORMAL          = 66122,
-    SPELL_MAGIC_ROOSTER_DRAENEI_MALE    = 66123,
-    SPELL_MAGIC_ROOSTER_TAUREN_MALE     = 66124
-};
-
-// 65917 - Magic Rooster
-class spell_gen_magic_rooster : public SpellScript
-{
-    PrepareSpellScript(spell_gen_magic_rooster);
-
-    void HandleScript(SpellEffIndex effIndex)
-    {
-        PreventHitDefaultEffect(effIndex);
-        if (Player* target = GetHitPlayer())
-        {
-            uint32 petNumber = target->GetTemporaryUnsummonedPetNumber();
-            target->SetTemporaryUnsummonedPetNumber(0);
-
-            // prevent client crashes from stacking mounts
-            target->RemoveAurasByType(SPELL_AURA_MOUNTED);
-
-            uint32 spellId = SPELL_MAGIC_ROOSTER_NORMAL;
-            switch (target->getRace())
-            {
-                case RACE_DRAENEI:
-                    if (target->getGender() == GENDER_MALE)
-                        spellId = SPELL_MAGIC_ROOSTER_DRAENEI_MALE;
-                    break;
-                case RACE_TAUREN:
-                    if (target->getGender() == GENDER_MALE)
-                        spellId = SPELL_MAGIC_ROOSTER_TAUREN_MALE;
-                    break;
-                default:
-                    break;
-            }
-
-            target->CastSpell(target, spellId, true);
-            if (petNumber)
-                target->SetTemporaryUnsummonedPetNumber(petNumber);
-        }
-    }
-
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_gen_magic_rooster::HandleScript, EFFECT_2, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -2437,7 +2441,7 @@ class spell_gen_oracle_wolvar_reputation : public SpellScript
         // Set rep to baserep + basepoints (expecting spillover for oposite faction -> become hated)
         // Not when player already has equal or higher rep with this faction
         if (player->GetReputationMgr().GetReputation(factionEntry) <= repChange)
-            player->GetReputationMgr().SetReputation(factionEntry, repChange);
+            player->GetReputationMgr().SetReputation(factionEntry, static_cast<float>(repChange));
 
         // EFFECT_INDEX_2 most likely update at war state, we already handle this in SetReputation
     }
@@ -2895,7 +2899,7 @@ class spell_gen_mounted_charge : public SpellScript
                     }
 
                     // If target isn't a training dummy there's a chance of failing the charge
-                    if (!target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE) && roll_chance_f(12.5f))
+                    if (!target->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE) && roll_chance_f(12.5f))
                         spellId = SPELL_CHARGE_MISS_EFFECT;
 
                     if (Unit* vehicle = GetCaster()->GetVehicleBase())
@@ -3855,7 +3859,7 @@ public:
             AreaTableEntry const* area = sAreaTableStore.LookupEntry(target->GetAreaId());
             // Xinef: add battlefield check
             Battlefield* Bf = sBattlefieldMgr->GetBattlefieldToZoneId(target->GetZoneId());
-            if (!area || (canFly && ((area->flags & AREA_FLAG_NO_FLY_ZONE) || (Bf && !Bf->CanFlyIn()))))
+            if ((area && canFly && (area->flags & AREA_FLAG_NO_FLY_ZONE)) || (Bf && !Bf->CanFlyIn()))
                 canFly = false;
 
             uint32 mount = 0;
@@ -4362,6 +4366,46 @@ class spell_gen_holiday_buff_food : public AuraScript
     }
 };
 
+class spell_gen_arcane_charge : public SpellScript
+{
+    PrepareSpellScript(spell_gen_arcane_charge);
+
+    SpellCastResult CheckRequirement()
+    {
+        if (Unit* target = GetExplTargetUnit())
+        {
+            if (target->GetCreatureType() != CREATURE_TYPE_DEMON && target->GetCreatureType() != CREATURE_TYPE_UNDEAD)
+            {
+                return SPELL_FAILED_DONT_REPORT;
+            }
+        }
+
+        return SPELL_CAST_OK;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_gen_arcane_charge::CheckRequirement);
+    }
+};
+
+// 20589 - Escape artist
+// 30918 - Improved Sprint
+class spell_gen_remove_impairing_auras : public SpellScript
+{
+    PrepareSpellScript(spell_gen_remove_impairing_auras);
+
+    void HandleScriptEffect(SpellEffIndex /* effIndex */)
+    {
+        GetHitUnit()->RemoveMovementImpairingAuras(true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_gen_remove_impairing_auras::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -4435,7 +4479,6 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_seaforium_blast);
     RegisterSpellScript(spell_gen_turkey_marker);
     RegisterSpellScript(spell_gen_lifeblood);
-    RegisterSpellScript(spell_gen_magic_rooster);
     RegisterSpellScript(spell_gen_allow_cast_from_item_only);
     RegisterSpellAndAuraScriptPair(spell_gen_vehicle_scaling, spell_gen_vehicle_scaling_aura);
     RegisterSpellScript(spell_gen_oracle_wolvar_reputation);
@@ -4458,6 +4501,7 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_throw_shield);
     RegisterSpellScript(spell_gen_on_tournament_mount);
     RegisterSpellScript(spell_gen_tournament_pennant);
+    RegisterSpellScript(spell_gen_teleporting);
     RegisterSpellScript(spell_gen_ds_flush_knockback);
     RegisterSpellScriptWithArgs(spell_gen_count_pct_from_max_hp, "spell_gen_default_count_pct_from_max_hp");
     RegisterSpellScriptWithArgs(spell_gen_count_pct_from_max_hp, "spell_gen_50pct_count_pct_from_max_hp", 50);
@@ -4494,4 +4538,6 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_charmed_unit_spell_cooldown);
     RegisterSpellScript(spell_contagion_of_rot);
     RegisterSpellScript(spell_gen_holiday_buff_food);
+    RegisterSpellScript(spell_gen_arcane_charge);
+    RegisterSpellScript(spell_gen_remove_impairing_auras);
 }

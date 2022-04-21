@@ -12,15 +12,15 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.battlemaster_entry
+-- Дамп структуры для таблица acore_world.battlemaster_entry
 DROP TABLE IF EXISTS `battlemaster_entry`;
 CREATE TABLE IF NOT EXISTS `battlemaster_entry` (
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Entry of a creature',
-  `bg_template` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Battleground template id',
+  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Entry of a creature',
+  `bg_template` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Battleground template id',
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.battlemaster_entry: 146 rows
+-- Дамп данных таблицы acore_world.battlemaster_entry: 146 rows
 DELETE FROM `battlemaster_entry`;
 /*!40000 ALTER TABLE `battlemaster_entry` DISABLE KEYS */;
 INSERT INTO `battlemaster_entry` (`entry`, `bg_template`) VALUES

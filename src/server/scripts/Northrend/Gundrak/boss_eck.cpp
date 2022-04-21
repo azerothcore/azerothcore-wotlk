@@ -123,7 +123,7 @@ public:
                     events.ScheduleEvent(EVENT_ECK_SPIT, 10000);
                     break;
                 case EVENT_ECK_SPRING:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 30.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 30.0f, true))
                     {
                         me->getThreatMgr().resetAllAggro();
                         me->AddThreat(target, 500.0f);

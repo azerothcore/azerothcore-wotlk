@@ -58,7 +58,7 @@ public:
             events.Reset();
 
             me->SetReactState(REACT_PASSIVE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
             canAttack = false;
 
             if (instance)
@@ -73,8 +73,8 @@ public:
         void JustSummoned(Creature* summoned) override
         {
             summoned->SetFaction(FACTION_MONSTER_2);
-            summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            summoned->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            summoned->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             summoned->CastSpell(summoned, SPELL_POISON, false, 0, 0, me->GetGUID());
         }
 
@@ -94,7 +94,7 @@ public:
                     events.RepeatEvent(urand(7000, 12000));
                     break;
                 case EVENT_SPELL_BOLT:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_POISON_BOLT, false);
                     events.RepeatEvent(urand(6000, 11000));
                     break;
@@ -130,7 +130,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_BOLT, 7000);
 
                     me->SetReactState(REACT_AGGRESSIVE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
                     canAttack = true;
                     break;
             }

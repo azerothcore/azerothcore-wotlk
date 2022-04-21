@@ -141,10 +141,10 @@ public:
                 pInstance->SetData(BOSS_SJONNIR, NOT_STARTED);
                 pInstance->SetData(DATA_SJONNIR_ACHIEVEMENT, false);
 
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 if (pInstance->GetData(BOSS_TRIBUNAL_OF_AGES) == DONE)
                 {
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     if (GameObject* doors = me->GetMap()->GetGameObject(pInstance->GetGuidData(GO_SJONNIR_DOOR)))
                         doors->SetGoState(GO_STATE_ACTIVE);
 
@@ -251,7 +251,7 @@ public:
                     }
                 case EVENT_CHAIN_LIGHTNING:
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, 0))
                             me->CastSpell(target, DUNGEON_MODE(SPELL_CHAIN_LIGHTNING, SPELL_CHAIN_LIGHTNING_H), false);
 
                         events.RepeatEvent(6000 + rand() % 6000);
@@ -259,7 +259,7 @@ public:
                     }
                 case EVENT_STATIC_CHARGE:
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, 0))
                             me->CastSpell(target, DUNGEON_MODE(SPELL_STATIC_CHARGE, SPELL_STATIC_CHARGE_H), false);
 
                         events.RepeatEvent(20000);

@@ -585,7 +585,7 @@ class spell_warl_create_healthstone : public SpellScript
                         rank = 2;
                         break;
                     default:
-                        LOG_ERROR("spells", "Unknown rank of Improved Healthstone id: %d", aurEff->GetId());
+                        LOG_ERROR("spells", "Unknown rank of Improved Healthstone id: {}", aurEff->GetId());
                         break;
                 }
             }
@@ -625,7 +625,7 @@ class spell_warl_everlasting_affliction : public SpellScript
             // Refresh corruption on target
             if (AuraEffect* aur = unitTarget->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_WARLOCK, 0x2, 0, 0, GetCaster()->GetGUID()))
             {
-                aur->GetBase()->RefreshTimers();
+                aur->GetBase()->RefreshTimersWithMods();
                 aur->ChangeAmount(aur->CalculateAmount(aur->GetCaster()), false);
             }
     }
@@ -660,8 +660,21 @@ class spell_warl_seed_of_corruption : public SpellScript
 
     void FilterTargets(std::list<WorldObject*>& targets)
     {
-        if (GetExplTargetUnit())
-            targets.remove(GetExplTargetUnit());
+        targets.remove_if([&](WorldObject const* target)
+        {
+            if (Unit const* unitTarget = target->ToUnit())
+            {
+                if (WorldLocation const* dest = GetExplTargetDest())
+                {
+                    if (!unitTarget->IsWithinLOS(dest->GetPositionX(), dest->GetPositionY(), dest->GetPositionZ()))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        });
     }
 
     void Register() override

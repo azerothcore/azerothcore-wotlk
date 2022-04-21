@@ -53,7 +53,7 @@ public:
         if (quest->GetQuestId() == QUEST_590)
         {
             creature->SetFaction(FACTION_ENEMY);
-            creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            creature->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
             CAST_AI(npc_calvin_montague::npc_calvin_montagueAI, creature->AI())->AttackStart(player);
         }
         return true;
@@ -80,8 +80,8 @@ public:
 
             me->RestoreFaction();
 
-            if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC))
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            if (!me->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC))
+                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
         }
 
         void EnterCombat(Unit* /*who*/) override { }
@@ -104,13 +104,26 @@ public:
                 uiDamage = 0;
 
                 me->RestoreFaction();
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                 me->CombatStop(true);
 
                 m_uiPhase = 1;
 
                 if (pDoneBy->GetTypeId() == TYPEID_PLAYER)
+                {
                     m_uiPlayerGUID = pDoneBy->GetGUID();
+                }
+                else if (pDoneBy->IsPet())
+                {
+                    if (Unit* owner = pDoneBy->GetOwner())
+                    {
+                        // not sure if this is needed.
+                        if (owner->GetTypeId() == TYPEID_PLAYER)
+                        {
+                            m_uiPlayerGUID = owner->GetGUID();
+                        }
+                    }
+                }
             }
         }
 

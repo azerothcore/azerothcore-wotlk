@@ -22,7 +22,6 @@
 #include "CreatureAI.h"
 #include "DynamicObject.h"
 #include "GameObject.h"
-#include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Transport.h"
 #include "Vehicle.h"
@@ -194,13 +193,13 @@ void ObjectGridLoader::LoadN(void)
             }
         }
     }
-    LOG_DEBUG("maps", "%u GameObjects, %u Creatures, and %u Corpses/Bones loaded for grid %u on map %u", i_gameObjects, i_creatures, i_corpses, i_grid.GetGridId(), i_map->GetId());
+    LOG_DEBUG("maps", "{} GameObjects, {} Creatures, and {} Corpses/Bones loaded for grid {} on map {}", i_gameObjects, i_creatures, i_corpses, i_grid.GetGridId(), i_map->GetId());
 }
 
 template<class T>
 void ObjectGridUnloader::Visit(GridRefMgr<T>& m)
 {
-    while (!m.isEmpty())
+    while (!m.IsEmpty())
     {
         T* obj = m.getFirst()->GetSource();
         // if option set then object already saved at this moment

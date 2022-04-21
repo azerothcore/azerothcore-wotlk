@@ -18,6 +18,7 @@
 #include "Cell.h"
 #include "CellImpl.h"
 #include "CreatureTextMgr.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "ObjectMgr.h"
@@ -363,7 +364,7 @@ void SendPacketToPlayers(WorldPacket const* data, Unit* source)
 {
     // Send packet to all players in The Frozen Throne
     Map::PlayerList const& players = source->GetMap()->GetPlayers();
-    if (!players.isEmpty())
+    if (!players.IsEmpty())
         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
             if (Player* player = itr->GetSource())
                 if (player->GetAreaId() == AREA_THE_FROZEN_THRONE)
@@ -502,7 +503,7 @@ public:
             if (Unit* target = _owner->SelectVictim())
                 _owner->AI()->AttackStart(target);
         if (!_owner->GetVictim())
-            if (Unit* target = _summoner->AI()->SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankLKTargetSelector(_summoner)))
+            if (Unit* target = _summoner->AI()->SelectTarget(SelectTargetMethod::Random, 0, NonTankLKTargetSelector(_summoner)))
                 _owner->AI()->AttackStart(target);
         _owner->AI()->DoZoneInCombat();
         return true;
@@ -630,7 +631,7 @@ public:
         boss_the_lich_kingAI(Creature* creature) : BossAI(creature, DATA_THE_LICH_KING)
         {
             me->AddAura(SPELL_EMOTE_SIT_NO_SHEATH, me);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
             me->SetReactState(REACT_PASSIVE);
         }
 
@@ -657,7 +658,7 @@ public:
             _Reset();
             DoAction(ACTION_RESTORE_LIGHT);
             SetEquipmentSlots(true);
-            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC))
+            if (me->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC))
                 me->SetStandState(UNIT_STAND_STATE_SIT);
         }
 
@@ -672,7 +673,7 @@ public:
         {
             if (!instance->CheckRequiredBosses(DATA_THE_LICH_KING, target->ToPlayer()) || !me->IsVisible())
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 instance->DoCastSpellOnPlayers(LIGHT_S_HAMMER_TELEPORT);
                 return;
             }
@@ -703,7 +704,7 @@ public:
             Cell::VisitGridObjects(me, worker, 333.0f);
 
             me->AddAura(SPELL_EMOTE_SIT_NO_SHEATH, me);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
             me->SetReactState(REACT_PASSIVE);
             me->SetStandState(UNIT_STAND_STATE_SIT);
         }
@@ -720,9 +721,9 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER && !me->IsInEvadeMode() && _phase != PHASE_OUTRO && _lastTalkTimeKill + 5 < time(nullptr))
+            if (victim->GetTypeId() == TYPEID_PLAYER && !me->IsInEvadeMode() && _phase != PHASE_OUTRO && _lastTalkTimeKill + 5 < GameTime::GetGameTime().count())
             {
-                _lastTalkTimeKill = time(nullptr);
+                _lastTalkTimeKill = GameTime::GetGameTime().count();
                 Talk(SAY_LK_KILL);
             }
         }
@@ -751,7 +752,7 @@ public:
                             events.RescheduleEvent(EVENT_START_ATTACK, 1000);
                         EntryCheckPredicate pred(NPC_STRANGULATE_VEHICLE);
                         summons.DoAction(ACTION_TELEPORT_BACK, pred);
-                        if (!IsHeroic() && _phase != PHASE_OUTRO && me->IsInCombat() && _lastTalkTimeBuff + 5 <= time(nullptr))
+                        if (!IsHeroic() && _phase != PHASE_OUTRO && me->IsInCombat() && _lastTalkTimeBuff + 5 <= GameTime::GetGameTime().count())
                             Talk(SAY_LK_FROSTMOURNE_ESCAPE);
                     }
                     break;
@@ -817,9 +818,7 @@ public:
                 {
                     damage = me->GetHealth() - 1;
                     me->SetDisableGravity(false);
-                    me->SendMonsterMove(me->GetPositionX() + 0.25f, me->GetPositionY(), 840.86f, 300, SPLINEFLAG_FALLING);
-                    me->m_positionZ = 840.86f;
-                    me->SetOrientation(0.0f);
+                    me->GetMotionMaster()->MoveFall();
                     if (Creature* frostmourne = me->FindNearestCreature(NPC_FROSTMOURNE_TRIGGER, 50.0f))
                         frostmourne->DespawnOrUnsummon(1);
                     if (Creature* terenas = me->FindNearestCreature(NPC_TERENAS_MENETHIL_OUTRO, 50.0f))
@@ -906,9 +905,9 @@ public:
 
         void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
-            if (spell->Id == HARVESTED_SOUL_BUFF && me->IsInCombat() && !IsHeroic() && _phase != PHASE_OUTRO && _lastTalkTimeBuff + 5 <= time(nullptr))
+            if (spell->Id == HARVESTED_SOUL_BUFF && me->IsInCombat() && !IsHeroic() && _phase != PHASE_OUTRO && _lastTalkTimeBuff + 5 <= GameTime::GetGameTime().count())
             {
-                _lastTalkTimeBuff = time(nullptr);
+                _lastTalkTimeBuff = GameTime::GetGameTime().count();
                 Talk(SAY_LK_FROSTMOURNE_KILL);
             }
         }
@@ -973,7 +972,7 @@ public:
             {
                 _positionCheckTimer = 5000;
                 Map::PlayerList const& players = me->GetMap()->GetPlayers();
-                if (!players.isEmpty())
+                if (!players.IsEmpty())
                     for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                         if (Player* player = itr->GetSource())
                             if (player->GetPositionZ() < 700.0f)
@@ -1055,7 +1054,7 @@ public:
                     events.ScheduleEvent(EVENT_INFEST, 22500, EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_NECROTIC_PLAGUE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NecroticPlagueTargetCheck(me, NECROTIC_PLAGUE_LK, NECROTIC_PLAGUE_PLR)))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, NecroticPlagueTargetCheck(me, NECROTIC_PLAGUE_LK, NECROTIC_PLAGUE_PLR)))
                     {
                         Talk(EMOTE_NECROTIC_PLAGUE_WARNING, target);
                         me->CastSpell(target, SPELL_NECROTIC_PLAGUE, false);
@@ -1065,12 +1064,12 @@ public:
                         events.ScheduleEvent(EVENT_NECROTIC_PLAGUE, 5000, EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_SHADOW_TRAP:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, ShadowTrapLKTargetSelector(me, true, true, 100.0f)))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, ShadowTrapLKTargetSelector(me, true, true, 100.0f)))
                         me->CastSpell(target, SPELL_SHADOW_TRAP, false);
                     events.ScheduleEvent(EVENT_SHADOW_TRAP, 15500, EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_PAIN_AND_SUFFERING:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                     {
                         //events.DelayEventsToMax(500, EVENT_GROUP_ABILITIES);
                         me->SetFacingTo(me->GetAngle(target));
@@ -1083,7 +1082,7 @@ public:
                     events.ScheduleEvent(EVENT_SUMMON_ICE_SPHERE, 7500, EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_SUMMON_RAGING_SPIRIT:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                         me->CastSpell(target, SPELL_RAGING_SPIRIT, false);
                     events.ScheduleEvent(EVENT_SUMMON_RAGING_SPIRIT, (!HealthAbovePct(40) ? 15000 : 20000), EVENT_GROUP_ABILITIES);
                     break;
@@ -1108,7 +1107,7 @@ public:
                             events.RescheduleEvent(EVENT_SUMMON_VALKYR, 5000, EVENT_GROUP_ABILITIES);
                         }
 
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, DefileTargetSelector(me)))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, DefileTargetSelector(me)))
                         {
                             Talk(EMOTE_DEFILE_WARNING);
                             me->CastSpell(target, SPELL_DEFILE, false);
@@ -1155,7 +1154,7 @@ public:
                     events.ScheduleEvent(EVENT_VILE_SPIRITS, 30000, EVENT_GROUP_VILE_SPIRITS);
                     break;
                 case EVENT_HARVEST_SOUL:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankLKTargetSelector(me, true, true, 55.0f)))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, NonTankLKTargetSelector(me, true, true, 55.0f)))
                     {
                         Talk(SAY_LK_HARVEST_SOUL);
                         me->CastSpell(target, SPELL_HARVEST_SOUL, false);
@@ -1208,7 +1207,7 @@ public:
                             spawner->CastSpell(spawner, SPELL_SUMMON_SPIRIT_BOMB_1, true);  // summons bombs randomly
                             spawner->CastSpell(spawner, SPELL_SUMMON_SPIRIT_BOMB_2, true);  // summons bombs on players
                             spawner->m_Events.AddEvent(new TriggerWickedSpirit(spawner), spawner->m_Events.CalculateTime(3000));
-                            terenas->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC); // to avoid being healed by player trinket procs. terenas' health doesn't matter on heroic
+                            terenas->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC); // to avoid being healed by player trinket procs. terenas' health doesn't matter on heroic
                         }
                     }
                     break;
@@ -1253,13 +1252,13 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             EntryCheckPredicate pred(NPC_STRANGULATE_VEHICLE);
             summons.DoAction(ACTION_TELEPORT_BACK, pred);
             instance->SetBossState(DATA_THE_LICH_KING, FAIL);
             me->CastSpell((Unit*)nullptr, SPELL_KILL_FROSTMOURNE_PLAYERS, true);
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
             me->SetReactState(REACT_AGGRESSIVE);
 
             if (Creature* tirion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_HIGHLORD_TIRION_FORDRING)))
@@ -1286,7 +1285,7 @@ public:
         {
             _events.Reset();
             if (_instance->GetBossState(DATA_THE_LICH_KING) == DONE || (me->GetMap()->IsHeroic() && !_instance->GetData(DATA_LK_HC_AVAILABLE)))
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->SetReactState(REACT_PASSIVE);
         }
 
@@ -1358,18 +1357,18 @@ public:
         {
             ScriptedAI::JustReachedHome();
             if (!(_instance->GetBossState(DATA_THE_LICH_KING) == DONE || (me->GetMap()->IsHeroic() && !_instance->GetData(DATA_LK_HC_AVAILABLE))))
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
         }
 
         void sGossipSelect(Player* /*player*/, uint32 sender, uint32 action) override
         {
             Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING));
-            if (me->GetCreatureTemplate()->GossipMenuId == sender && !action && me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP) && theLichKing && !theLichKing->IsInEvadeMode())
+            if (me->GetCreatureTemplate()->GossipMenuId == sender && !action && me->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP) && theLichKing && !theLichKing->IsInEvadeMode())
             {
                 if (me->GetMap()->IsHeroic() && !_instance->GetData(DATA_LK_HC_AVAILABLE))
                     return;
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 me->SetWalk(true);
                 me->GetMotionMaster()->MovePoint(POINT_TIRION_INTRO, TirionIntro);
             }
@@ -1455,7 +1454,7 @@ public:
                     if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                     {
                         theLichKing->SetWalk(false);
-                        theLichKing->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                        theLichKing->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                         theLichKing->SetReactState(REACT_AGGRESSIVE);
                         theLichKing->SetInCombatWithZone();
                         if (!theLichKing->IsInCombat())
@@ -1588,7 +1587,7 @@ public:
                         terenas->CastSpell((Unit*)nullptr, SPELL_MASS_RESURRECTION, false);
                         if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                         {
-                            lichKing->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                            lichKing->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
                             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                             me->RemoveAllAuras();
                             SetEquipmentSlots(true);
@@ -1636,7 +1635,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (!me->IsAlive())
                 return;
@@ -1644,7 +1643,7 @@ public:
             if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                 if (theLichKing->IsInEvadeMode())
                 {
-                    ScriptedAI::EnterEvadeMode();
+                    ScriptedAI::EnterEvadeMode(why);
                     return;
                 }
 
@@ -2264,7 +2263,7 @@ public:
             else
             {
                 Unit* target = ObjectAccessor::GetUnit(*me, targetGUID);
-                if (me->GetVictim()->GetGUID() != targetGUID || !target || !me->IsValidAttackTarget(target) || target->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH) || target->GetExactDist2dSq(&CenterPosition) > 75.0f * 75.0f || target->GetPositionZ() < 830.0f || target->GetPositionZ() > 855.0f)
+                if (me->GetVictim()->GetGUID() != targetGUID || !target || !me->IsValidAttackTarget(target) || target->HasUnitFlag2(UNIT_FLAG2_FEIGN_DEATH) || target->GetExactDist2dSq(&CenterPosition) > 75.0f * 75.0f || target->GetPositionZ() < 830.0f || target->GetPositionZ() > 855.0f)
                     SelectNewTarget();
             }
         }
@@ -2541,7 +2540,7 @@ public:
             me->CastSpell((Unit*)nullptr, SPELL_EJECT_ALL_PASSENGERS, false);
             float dist = rand_norm() * 10.0f + 5.0f;
             float angle = CenterPosition.GetAngle(me);
-            _destPoint.Relocate(CenterPosition.GetPositionX() + dist * cos(angle), CenterPosition.GetPositionY() + dist * sin(angle), 855.0f + frand(0.0f, 4.0f), 0.0f);
+            _destPoint.Relocate(CenterPosition.GetPositionX() + dist * cos(angle), CenterPosition.GetPositionY() + dist * std::sin(angle), 855.0f + frand(0.0f, 4.0f), 0.0f);
             me->SetHomePosition(_destPoint);
             _events.Reset();
             _events.ScheduleEvent(EVENT_MOVE_TO_SIPHON_POS, 0);
@@ -2676,10 +2675,10 @@ public:
                     me->SetDisableGravity(false);
                     me->GetMotionMaster()->MovePoint(POINT_DROP_PLAYER, _destPoint, false);
                     me->SetDisableGravity(true, true);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     break;
                 case EVENT_MOVE_TO_SIPHON_POS:
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE); // just in case if passenger disappears so quickly that EVENT_MOVE_TO_DROP_POS is never executed
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE); // just in case if passenger disappears so quickly that EVENT_MOVE_TO_DROP_POS is never executed
                     { int32 bp0 = 80; me->CastCustomSpell(me, 1557, &bp0, nullptr, nullptr, true); }
                     me->SetCanFly(true);
                     me->SetDisableGravity(true);
@@ -2700,7 +2699,7 @@ public:
                                     }
                         if (!target)
                             if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
-                                target = lichKing->AI()->SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankLKTargetSelector(lichKing, true, false, 100.0f));
+                                target = lichKing->AI()->SelectTarget(SelectTargetMethod::Random, 0, NonTankLKTargetSelector(lichKing, true, false, 100.0f));
                         if (target)
                             me->CastSpell(target, SPELL_LIFE_SIPHON, false);
                         _events.ScheduleEvent(EVENT_LIFE_SIPHON, 2500);
@@ -2773,7 +2772,7 @@ public:
         {
             float dist = 2.0f + rand_norm() * 18.0f;
             float angle = rand_norm() * 2 * M_PI;
-            Position const offset = {dist * cos(angle), dist * sin(angle), 0.0f, 0.0f};
+            Position const offset = {dist * cos(angle), dist * std::sin(angle), 0.0f, 0.0f};
             WorldLocation* dest = const_cast<WorldLocation*>(GetExplTargetDest());
             dest->RelocateOffset(offset);
             GetHitDest()->RelocateOffset(offset);
@@ -3061,7 +3060,7 @@ public:
                 c->StopMoving();
                 c->CastSpell((Unit*)nullptr, SPELL_SPIRIT_BURST, true);
                 c->DespawnOrUnsummon(3000);
-                c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                c->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             }
         }
 
@@ -3232,7 +3231,7 @@ public:
                             float angle = lichKing->GetAngle(me);
                             Movement::PointsArray path;
                             path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-                            path.push_back(G3D::Vector3(lichKing->GetPositionX() + dist * cos(angle), lichKing->GetPositionY() + dist * sin(angle), 843.0f));
+                            path.push_back(G3D::Vector3(lichKing->GetPositionX() + dist * cos(angle), lichKing->GetPositionY() + dist * std::sin(angle), 843.0f));
                             me->GetMotionMaster()->MoveSplinePath(&path);
                         }
                     break;
@@ -3283,7 +3282,7 @@ public:
                     }
                     break;
                 case ACTION_TELEPORT_BACK:
-                    if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+                    if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                     {
                         _events.Reset();
                         me->CastSpell((Unit*)nullptr, SPELL_RESTORE_SOUL, false);
@@ -3300,7 +3299,7 @@ public:
                 damage = me->GetHealth() - 1;
                 if (IsHeroic())
                     return;
-                if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+                if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 {
                     _events.Reset();
                     _events.ScheduleEvent(EVENT_TELEPORT_BACK, 1000);
@@ -3313,7 +3312,7 @@ public:
                     me->SetDisplayId(16946);
                     me->SetReactState(REACT_PASSIVE);
                     me->AttackStop();
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->DespawnOrUnsummon(2000);
                 }
             }
@@ -3346,7 +3345,7 @@ public:
                     me->SetDisplayId(16946);
                     me->SetReactState(REACT_PASSIVE);
                     me->AttackStop();
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     _events.Reset();
                     _events.ScheduleEvent(EVENT_TELEPORT_BACK, 1000);
                     break;
@@ -3366,7 +3365,7 @@ public:
             return target->GetEntry() != NPC_THE_LICH_KING;
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             if (!me->IsAlive())
                 return;
@@ -3709,7 +3708,7 @@ public:
             if (!target)
                 return;
 
-            target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            target->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             target->ForceValuesUpdateAtIndex(UNIT_FIELD_FLAGS);
             VileSpiritActivateEvent(target).Execute(0, 0);
         }

@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "EventMap.h"
 #include "InstanceScript.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "old_hillsbrad.h"
 
 const Position instancePositions[INSTANCE_POSITIONS_COUNT] =
@@ -116,7 +116,7 @@ public:
             {
                 case GO_BARREL:
                     if (_encounterProgress >= ENCOUNTER_PROGRESS_BARRELS)
-                        gameobject->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        gameobject->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
                 case GO_PRISON_DOOR:
                     if (_encounterProgress >= ENCOUNTER_PROGRESS_THRALL_ARMORED)
@@ -162,7 +162,7 @@ public:
                     }
                 case DATA_THRALL_ADD_FLAG:
                     if (Creature* thrall = instance->GetCreature(_thrallGUID))
-                        thrall->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        thrall->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     break;
             }
         }
@@ -222,7 +222,7 @@ public:
                         if (_encounterProgress == ENCOUNTER_PROGRESS_NONE)
                         {
                             Map::PlayerList const& players = instance->GetPlayers();
-                            if (!players.isEmpty())
+                            if (!players.IsEmpty())
                                 for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                                     if (Player* player = itr->GetSource())
                                         player->KilledMonsterCredit(NPC_LODGE_QUEST_TRIGGER);

@@ -17,8 +17,6 @@
 
 #include "ObjectDataHandler.h"
 #include "ADT.h"
-#include "Chunk.h"
-#include "ChunkedData.h"
 
 void ObjectDataHandler::ProcessMapChunk( MapChunk* chunk )
 {

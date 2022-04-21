@@ -93,7 +93,7 @@ public:
             ApplyImmunities(true);
             SummonChannelers();
             me->SetReactState(REACT_PASSIVE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
             if (instance)
                 instance->SetData(DATA_KELIDAN, NOT_STARTED);
         }
@@ -143,7 +143,7 @@ public:
                         return;
                 }
                 me->SetReactState(REACT_AGGRESSIVE);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
                 if (Unit* target = me->SelectNearestPlayer(100.0f))
                     AttackStart(target);
             }
@@ -336,7 +336,7 @@ public:
                     events.RepeatEvent(urand(6000, 7500));
                     break;
                 case EVENT_SPELL_MARK:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_MARK_OF_SHADOW, false);
                     events.RepeatEvent(urand(16000, 17500));
                     break;

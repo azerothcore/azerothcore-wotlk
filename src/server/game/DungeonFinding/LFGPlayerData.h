@@ -47,19 +47,19 @@ namespace lfg
         void SetSelectedDungeons(const LfgDungeonSet& dungeons);
 
         // General
-        LfgState GetState() const;
-        LfgState GetOldState() const;
-        LfgLockMap const& GetLockedDungeons() const;
-        TeamId GetTeam() const;
-        ObjectGuid GetGroup() const;
-        uint8 GetRandomPlayersCount() const;
+        [[nodiscard]] LfgState GetState() const;
+        [[nodiscard]] LfgState GetOldState() const;
+        [[nodiscard]] LfgLockMap const& GetLockedDungeons() const;
+        [[nodiscard]] TeamId GetTeam() const;
+        [[nodiscard]] ObjectGuid GetGroup() const;
+        [[nodiscard]] uint8 GetRandomPlayersCount() const;
         void SetCanOverrideRBState(bool val) { m_canOverrideRBState = val; }
-        bool CanOverrideRBState() const { return m_canOverrideRBState; }
+        [[nodiscard]] bool CanOverrideRBState() const { return m_canOverrideRBState; }
 
         // Queue
-        uint8 GetRoles() const;
-        std::string const& GetComment() const;
-        LfgDungeonSet const& GetSelectedDungeons() const;
+        [[nodiscard]] uint8 GetRoles() const;
+        [[nodiscard]] std::string const& GetComment() const;
+        [[nodiscard]] LfgDungeonSet const& GetSelectedDungeons() const;
 
     private:
         // General

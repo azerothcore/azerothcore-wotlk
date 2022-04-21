@@ -37,8 +37,8 @@ enum Secrets : uint32
 class AC_SHARED_API SecretMgr
 {
 private:
-    SecretMgr() {}
-    ~SecretMgr() {}
+    SecretMgr() = default;
+    ~SecretMgr() = default;
 
 public:
     SecretMgr(SecretMgr const&) = delete;
@@ -50,7 +50,7 @@ public:
             explicit operator bool() const { return (state == PRESENT); }
             BigNumber const& operator*() const { return value; }
             BigNumber const* operator->() const { return &value; }
-            bool IsAvailable() const { return (state != NOT_LOADED_YET) && (state != LOAD_FAILED); }
+            [[nodiscard]] bool IsAvailable() const { return (state != NOT_LOADED_YET) && (state != LOAD_FAILED); }
 
         private:
             std::mutex lock;
@@ -65,7 +65,7 @@ public:
 
 private:
     void AttemptLoad(Secrets i, LogLevel errorLevel, std::unique_lock<std::mutex> const&);
-    Optional<std::string> AttemptTransition(Secrets i, Optional<BigNumber> const& newSecret, Optional<BigNumber> const& oldSecret, bool hadOldSecret) const;
+    [[nodiscard]] Optional<std::string> AttemptTransition(Secrets i, Optional<BigNumber> const& newSecret, Optional<BigNumber> const& oldSecret, bool hadOldSecret) const;
 
     std::array<Secret, NUM_SECRETS> _secrets;
 };

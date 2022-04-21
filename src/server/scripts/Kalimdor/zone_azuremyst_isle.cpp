@@ -82,7 +82,7 @@ public:
             DoCast(me, SPELL_IRRIDATION, true);
 
             me->SetPvP(true);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
+            me->SetUnitFlag(UNIT_FLAG_IN_COMBAT);
             me->SetHealth(me->CountPctFromMaxHealth(10));
             me->SetStandState(UNIT_STAND_STATE_SLEEP);
         }
@@ -101,11 +101,11 @@ public:
             }
         }
 
-        void SpellHit(Unit* Caster, const SpellInfo* Spell) override
+        void SpellHit(Unit* Caster, SpellInfo const* Spell) override
         {
             if (Spell->SpellFamilyFlags[2] & 0x080000000)
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+                me->RemoveUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
 
                 DoCast(me, SPELL_STUNNED, true);
@@ -182,7 +182,7 @@ public:
 
         void Reset() override
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
+            me->SetUnitFlag(UNIT_FLAG_IN_COMBAT);
             me->SetHealth(me->CountPctFromMaxHealth(15));
             switch (urand(0, 1))
             {
@@ -359,7 +359,7 @@ public:
         {
             if (Creature* ravager = go->FindNearestCreature(NPC_DEATH_RAVAGER, 5.0f, true))
             {
-                ravager->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                ravager->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 ravager->SetReactState(REACT_AGGRESSIVE);
                 ravager->AI()->AttackStart(player);
             }
@@ -385,7 +385,7 @@ public:
             RendTimer = 30000;
             EnragingBiteTimer = 20000;
 
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             me->SetReactState(REACT_PASSIVE);
         }
 

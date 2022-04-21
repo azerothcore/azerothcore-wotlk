@@ -115,7 +115,7 @@ struct boss_twinemperorsAI : public ScriptedAI
             if (ohealth <= 0)
             {
                 pOtherBoss->setDeathState(JUST_DIED);
-                pOtherBoss->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+                pOtherBoss->SetDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
             }
         }
     }
@@ -127,7 +127,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         {
             pOtherBoss->SetHealth(0);
             pOtherBoss->setDeathState(JUST_DIED);
-            pOtherBoss->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+            pOtherBoss->SetDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
             CAST_AI(boss_twinemperorsAI, pOtherBoss->AI())->DontYellWhenDead = true;
         }
         if (!DontYellWhenDead)                              // I hope AI is not threaded
@@ -157,7 +157,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit* caster, const SpellInfo* entry) override
+    void SpellHit(Unit* caster, SpellInfo const* entry) override
     {
         if (caster == me)
             return;
@@ -415,7 +415,7 @@ public:
         void CastSpellOnBug(Creature* target) override
         {
             target->SetFaction(FACTION_MONSTER);
-            target->AI()->AttackStart(me->getThreatMgr().getHostilTarget());
+            target->AI()->AttackStart(me->getThreatMgr().getHostileTarget());
             target->AddAura(SPELL_MUTATE_BUG, target);
             target->SetFullHealth();
         }
@@ -439,7 +439,7 @@ public:
 
             if (UpperCut_Timer <= diff)
             {
-                Unit* randomMelee = SelectTarget(SELECT_TARGET_RANDOM, 0, NOMINAL_MELEE_RANGE, true);
+                Unit* randomMelee = SelectTarget(SelectTargetMethod::Random, 0, NOMINAL_MELEE_RANGE, true);
                 if (randomMelee)
                     DoCast(randomMelee, SPELL_UPPERCUT);
                 UpperCut_Timer = 15000 + rand() % 15000;
@@ -536,7 +536,7 @@ public:
             //Blizzard_Timer
             if (Blizzard_Timer <= diff)
             {
-                Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 45, true);
+                Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 45, true);
                 if (target)
                 {
                     DoCast(target, SPELL_BLIZZARD);
@@ -548,7 +548,7 @@ public:
             if (ArcaneBurst_Timer <= diff)
             {
                 Unit* mvic;
-                if ((mvic = SelectTarget(SELECT_TARGET_NEAREST, 0, NOMINAL_MELEE_RANGE, true)) != nullptr)
+                if ((mvic = SelectTarget(SelectTargetMethod::MaxDistance, 0, NOMINAL_MELEE_RANGE, true)) != nullptr)
                 {
                     DoCast(mvic, SPELL_ARCANEBURST);
                     ArcaneBurst_Timer = 5000;

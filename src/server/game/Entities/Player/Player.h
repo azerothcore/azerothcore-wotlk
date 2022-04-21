@@ -21,8 +21,10 @@
 #include "ArenaTeam.h"
 #include "Battleground.h"
 #include "CharacterCache.h"
-#include "DatabaseEnvFwd.h"
+#include "CinematicMgr.h"
 #include "DBCStores.h"
+#include "DatabaseEnvFwd.h"
+#include "EnumFlag.h"
 #include "GroupReference.h"
 #include "InstanceSaveMgr.h"
 #include "Item.h"
@@ -31,9 +33,12 @@
 #include "ObjectMgr.h"
 #include "Optional.h"
 #include "PetDefines.h"
+#include "PlayerSettings.h"
 #include "PlayerTaxi.h"
 #include "QuestDef.h"
+#include "SpellAuras.h"
 #include "SpellMgr.h"
+#include "SpellInfo.h"
 #include "TradeData.h"
 #include "Unit.h"
 #include "WorldSession.h"
@@ -175,7 +180,7 @@ enum TalentTree // talent tabs
 // Spell modifier (used for modify other spells)
 struct SpellModifier
 {
-    SpellModifier(Aura* _ownerAura = nullptr) : op(SPELLMOD_DAMAGE), type(SPELLMOD_FLAT), charges(0),  mask(),  ownerAura(_ownerAura) {}
+    SpellModifier(Aura* _ownerAura = nullptr) : op(SPELLMOD_DAMAGE), type(SPELLMOD_FLAT), charges(0),  mask(), ownerAura(_ownerAura) {}
     SpellModOp   op   : 8;
     SpellModType type : 8;
     int16 charges     : 16;
@@ -247,7 +252,7 @@ enum ReputationSource
 
 struct ActionButton
 {
-    ActionButton()  {}
+    ActionButton()  = default;
 
     uint32 packedData{0};
     ActionButtonUpdateState uState{ACTIONBUTTON_NEW};
@@ -283,14 +288,14 @@ typedef std::list<PlayerCreateInfoItem> PlayerCreateInfoItems;
 
 struct PlayerClassLevelInfo
 {
-    PlayerClassLevelInfo()  {}
+    PlayerClassLevelInfo()  = default;
     uint16 basehealth{0};
     uint16 basemana{0};
 };
 
 struct PlayerClassInfo
 {
-    PlayerClassInfo()  { }
+    PlayerClassInfo()  = default;
 
     PlayerClassLevelInfo* levelInfo{nullptr};                        //[level-1] 0..MaxPlayerLevel-1
 };
@@ -306,7 +311,7 @@ typedef std::list<uint32> PlayerCreateInfoSpells;
 
 struct PlayerCreateInfoAction
 {
-    PlayerCreateInfoAction()  {}
+    PlayerCreateInfoAction()  = default;
     PlayerCreateInfoAction(uint8 _button, uint32 _action, uint8 _type) : button(_button), type(_type), action(_action) {}
 
     uint8 button{0};
@@ -327,7 +332,7 @@ typedef std::list<PlayerCreateInfoSkill> PlayerCreateInfoSkills;
 struct PlayerInfo
 {
     // existence checked by displayId != 0
-    PlayerInfo()  { }
+    PlayerInfo()  = default;
 
     uint32 mapId{0};
     uint32 areaId{0};
@@ -348,7 +353,7 @@ struct PlayerInfo
 
 struct PvPInfo
 {
-    PvPInfo()  {}
+    PvPInfo()  = default;
 
     bool IsHostile{false};
     bool IsInHostileArea{false};               ///> Marks if player is in an area which forces PvP flag
@@ -432,7 +437,7 @@ struct Runes
 
 struct EnchantDuration
 {
-    EnchantDuration()  {};
+    EnchantDuration()  = default;;
     EnchantDuration(Item* _item, EnchantmentSlot _slot, uint32 _leftduration) : item(_item), slot(_slot),
         leftduration(_leftduration) { ASSERT(item); };
 
@@ -462,7 +467,7 @@ enum DrunkenState
 
 #define MAX_DRUNKEN   4
 
-enum PlayerFlags
+enum PlayerFlags : uint32
 {
     PLAYER_FLAGS_GROUP_LEADER      = 0x00000001,
     PLAYER_FLAGS_AFK               = 0x00000002,
@@ -497,6 +502,8 @@ enum PlayerFlags
     PLAYER_FLAGS_UNK30             = 0x40000000,
     PLAYER_FLAGS_UNK31             = 0x80000000,
 };
+
+DEFINE_ENUM_FLAG(PlayerFlags);
 
 enum PlayerBytesOffsets //@todo: Implement
 {
@@ -738,7 +745,7 @@ enum EquipmentSetUpdateState
 
 struct EquipmentSet
 {
-    EquipmentSet() { }
+    EquipmentSet() = default;
 
     uint64 Guid;
     std::string Name;
@@ -875,6 +882,8 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOAD_MONTHLY_QUEST_STATUS    = 32,
     PLAYER_LOGIN_QUERY_LOAD_BREW_OF_THE_MONTH       = 34,
     PLAYER_LOGIN_QUERY_LOAD_CORPSE_LOCATION         = 35,
+    PLAYER_LOGIN_QUERY_LOAD_CHARACTER_SETTINGS      = 36,
+    PLAYER_LOGIN_QUERY_LOAD_PET_SLOTS               = 37,
     MAX_PLAYER_LOGIN_QUERY
 };
 
@@ -1000,7 +1009,7 @@ class Player;
 // holder for Battleground data (pussywizard: not stored in db)
 struct BGData
 {
-    BGData()  {}
+    BGData()  = default;
 
     uint32 bgInstanceID{0};
     BattlegroundTypeId bgTypeID{BATTLEGROUND_TYPE_NONE};
@@ -1033,6 +1042,7 @@ struct EntryPointData
 class Player : public Unit, public GridObject<Player>
 {
     friend class WorldSession;
+    friend class CinematicMgr;
     friend void Item::AddToUpdateQueueOf(Player* player);
     friend void Item::RemoveFromUpdateQueueOf(Player* player);
 public:
@@ -1063,16 +1073,8 @@ public:
     }
     bool TeleportToEntryPoint();
 
-    void SetSummonPoint(uint32 mapid, float x, float y, float z, uint32 delay = 0, bool asSpectator = false)
-    {
-        m_summon_expire = time(nullptr) + (delay ? delay : MAX_PLAYER_SUMMON_DELAY);
-        m_summon_mapid = mapid;
-        m_summon_x = x;
-        m_summon_y = y;
-        m_summon_z = z;
-        m_summon_asSpectator = asSpectator;
-    }
-    [[nodiscard]] bool IsSummonAsSpectator() const { return m_summon_asSpectator && m_summon_expire >= time(nullptr); }
+    void SetSummonPoint(uint32 mapid, float x, float y, float z, uint32 delay = 0, bool asSpectator = false);
+    [[nodiscard]] bool IsSummonAsSpectator() const;
     void SetSummonAsSpectator(bool on) { m_summon_asSpectator = on; }
     void SummonIfPossible(bool agree, ObjectGuid summoner_guid);
     [[nodiscard]] time_t GetSummonExpireTimer() const { return m_summon_expire; }
@@ -1080,6 +1082,12 @@ public:
     bool Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo);
 
     void Update(uint32 time) override;
+
+    PlayerFlags GetPlayerFlags() const { return PlayerFlags(GetUInt32Value(PLAYER_FLAGS)); }
+    bool HasPlayerFlag(PlayerFlags flags) const { return HasFlag(PLAYER_FLAGS, flags) != 0; }
+    void SetPlayerFlag(PlayerFlags flags) { SetFlag(PLAYER_FLAGS, flags); }
+    void RemovePlayerFlag(PlayerFlags flags) { RemoveFlag(PLAYER_FLAGS, flags); }
+    void ReplaceAllPlayerFlags(PlayerFlags flags) { SetUInt32Value(PLAYER_FLAGS, flags); }
 
     static bool BuildEnumData(PreparedQueryResult result, WorldPacket* data);
 
@@ -1100,8 +1108,8 @@ public:
 
     void ToggleAFK();
     void ToggleDND();
-    [[nodiscard]] bool isAFK() const { return HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_AFK); }
-    [[nodiscard]] bool isDND() const { return HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_DND); }
+    [[nodiscard]] bool isAFK() const { return HasPlayerFlag(PLAYER_FLAGS_AFK); }
+    [[nodiscard]] bool isDND() const { return HasPlayerFlag(PLAYER_FLAGS_DND); }
     [[nodiscard]] uint8 GetChatTag() const;
     std::string autoReplyMsg;
 
@@ -1117,7 +1125,7 @@ public:
     void ContinueTaxiFlight();
     // mount_id can be used in scripting calls
 
-    [[nodiscard]] bool IsDeveloper() const { return HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_DEVELOPER); }
+    [[nodiscard]] bool IsDeveloper() const { return HasPlayerFlag(PLAYER_FLAGS_DEVELOPER); }
     void SetDeveloper(bool on) { ApplyModFlag(PLAYER_FLAGS, PLAYER_FLAGS_DEVELOPER, on); }
     [[nodiscard]] bool isAcceptWhispers() const { return m_ExtraFlags & PLAYER_EXTRA_ACCEPT_WHISPERS; }
     void SetAcceptWhispers(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_ACCEPT_WHISPERS; else m_ExtraFlags &= ~PLAYER_EXTRA_ACCEPT_WHISPERS; }
@@ -1158,15 +1166,23 @@ public:
     [[nodiscard]] float GetRestBonus() const { return _restBonus; }
     void SetRestBonus(float rest_bonus_new);
 
-    bool HasRestFlag(RestFlag restFlag) const { return (_restFlagMask & restFlag) != 0; }
+    [[nodiscard]] bool HasRestFlag(RestFlag restFlag) const { return (_restFlagMask & restFlag) != 0; }
     void SetRestFlag(RestFlag restFlag, uint32 triggerId = 0);
     void RemoveRestFlag(RestFlag restFlag);
     [[nodiscard]] uint32 GetInnTriggerId() const { return _innTriggerId; }
 
+    PetStable* GetPetStable() { return m_petStable.get(); }
+    PetStable& GetOrInitPetStable();
+    [[nodiscard]] PetStable const* GetPetStable() const { return m_petStable.get(); }
+
     [[nodiscard]] Pet* GetPet() const;
-    bool IsPetDismissed();
-    void SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, uint32 despwtime, uint32 createdBySpell, ObjectGuid casterGUID, uint8 asynchLoadType);
+    Pet* SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, Milliseconds duration = 0s, uint32 healthPct = 0);
     void RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent = false);
+    bool CanPetResurrect();
+    bool IsExistPet();
+    Pet* CreatePet(Creature* creatureTarget, uint32 spellID = 0);
+    Pet* CreatePet(uint32 creatureEntry, uint32 spellID = 0);
+
     [[nodiscard]] uint32 GetPhaseMaskForSpawn() const;                // used for proper set phase for DB at GM-mode creature/GO spawn
 
     /// Handles said message in regular chat based on declared language and in config pre-defined Range.
@@ -1247,7 +1263,7 @@ public:
     InventoryResult CanBankItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, Item* pItem, bool swap, bool not_loading = true) const;
     InventoryResult CanUseItem(Item* pItem, bool not_loading = true) const;
     [[nodiscard]] bool HasItemTotemCategory(uint32 TotemCategory) const;
-    bool IsTotemCategoryCompatiableWith(const ItemTemplate* pProto, uint32 requiredTotemCategoryId) const;
+    bool IsTotemCategoryCompatiableWith(ItemTemplate const* pProto, uint32 requiredTotemCategoryId) const;
     InventoryResult CanUseItem(ItemTemplate const* pItem) const;
     [[nodiscard]] InventoryResult CanUseAmmo(uint32 item) const;
     InventoryResult CanRollForItemInLFG(ItemTemplate const* item, WorldObject const* lootedObject) const;
@@ -1274,7 +1290,7 @@ public:
     void SetAmmo(uint32 item);
     void RemoveAmmo();
     [[nodiscard]] float GetAmmoDPS() const { return m_ammoDPS; }
-    bool CheckAmmoCompatibility(const ItemTemplate* ammo_proto) const;
+    bool CheckAmmoCompatibility(ItemTemplate const* ammo_proto) const;
     void QuickEquipItem(uint16 pos, Item* pItem);
     void VisualizeItem(uint8 slot, Item* pItem);
     void SetVisibleItemSlot(uint8 slot, Item* pItem);
@@ -1323,6 +1339,8 @@ public:
     [[nodiscard]] TradeData* GetTradeData() const { return m_trade; }
     void TradeCancel(bool sendback);
 
+    CinematicMgr* GetCinematicMgr() const { return _cinematicMgr; }
+
     void UpdateEnchantTime(uint32 time);
     void UpdateSoulboundTradeItems();
     void AddTradeableItem(Item* item);
@@ -1345,8 +1363,6 @@ public:
     void LoadPet();
 
     bool AddItem(uint32 itemId, uint32 count);
-
-    uint32 m_stableSlots;
 
     /*********************************************************/
     /***                    GOSSIP SYSTEM                  ***/
@@ -1412,7 +1428,7 @@ public:
     void RemoveRewardedQuest(uint32 questId, bool update = true);
     void SendQuestUpdate(uint32 questId);
     QuestGiverStatus GetQuestDialogStatus(Object* questGiver);
-    float GetQuestRate();
+    float GetQuestRate(bool isDFQuest = false);
     void SetDailyQuestStatus(uint32 quest_id);
     bool IsDailyQuestDone(uint32 quest_id);
     void SetWeeklyQuestStatus(uint32 quest_id);
@@ -1464,7 +1480,8 @@ public:
     void ItemRemovedQuestCheck(uint32 entry, uint32 count);
     void KilledMonster(CreatureTemplate const* cInfo, ObjectGuid guid);
     void KilledMonsterCredit(uint32 entry, ObjectGuid guid = ObjectGuid::Empty);
-    void KilledPlayerCredit();
+    void KilledPlayerCredit(uint16 count = 1);
+    void KilledPlayerCreditForQuest(uint16 count, Quest const* quest);
     void KillCreditGO(uint32 entry, ObjectGuid guid = ObjectGuid::Empty);
     void TalkedToCreature(uint32 entry, ObjectGuid guid);
     void MoneyChanged(uint32 value);
@@ -1507,8 +1524,6 @@ public:
     [[nodiscard]] bool isBeingLoaded() const override;
 
     void Initialize(ObjectGuid::LowType guid);
-    static uint32 GetUInt32ValueFromArray(Tokenizer const& data, uint16 index);
-    static float  GetFloatValueFromArray(Tokenizer const& data, uint16 index);
     static uint32 GetZoneIdFromDB(ObjectGuid guid);
     static bool   LoadPositionFromDB(uint32& mapid, float& x, float& y, float& z, float& o, bool& in_flight, ObjectGuid::LowType guid);
 
@@ -1523,8 +1538,6 @@ public:
     void SaveInventoryAndGoldToDB(CharacterDatabaseTransaction trans);                    // fast save function for item/money cheating preventing
     void SaveGoldToDB(CharacterDatabaseTransaction trans);
 
-    static void SetUInt32ValueInArray(Tokenizer& data, uint16 index, uint32 value);
-    static void SetFloatValueInArray(Tokenizer& data, uint16 index, float value);
     static void Customize(CharacterCustomizeInfo const* customizeInfo, CharacterDatabaseTransaction trans);
     static void SavePositionInDB(uint32 mapid, float x, float y, float z, float o, uint32 zone, ObjectGuid guid);
     static void SavePositionInDB(WorldLocation const& loc, uint16 zoneId, ObjectGuid guid, CharacterDatabaseTransaction trans);
@@ -1578,13 +1591,6 @@ public:
     void SetTarget(ObjectGuid /*guid*/ = ObjectGuid::Empty) override { } /// Used for serverside target changes, does not apply to players
     void SetSelection(ObjectGuid guid);
 
-    [[nodiscard]] uint8 GetComboPoints() const { return m_comboPoints; }
-    [[nodiscard]] ObjectGuid GetComboTarget() const { return m_comboTarget; }
-
-    void AddComboPoints(Unit* target, int8 count);
-    void ClearComboPoints();
-    void SendComboPoints();
-
     void SendMailResult(uint32 mailId, MailResponseType mailAction, MailResponseResult mailError, uint32 equipError = 0, ObjectGuid::LowType item_guid = 0, uint32 item_count = 0);
     void SendNewMail();
     void UpdateNextMailTimeAndUnreads();
@@ -1596,7 +1602,7 @@ public:
     uint32 GetMailSize() { return m_mail.size();}
     Mail* GetMail(uint32 id);
 
-    PlayerMails const& GetMails() const { return m_mail; }
+    [[nodiscard]] PlayerMails const& GetMails() const { return m_mail; }
     void SendItemRetrievalMail(uint32 itemEntry, uint32 count); // Item retrieval mails sent by The Postmaster (34337)
     void SendItemRetrievalMail(std::vector<std::pair<uint32, uint32>> mailItems); // Item retrieval mails sent by The Postmaster (34337)
 
@@ -1654,7 +1660,7 @@ public:
     void learnQuestRewardedSpells();
     void learnQuestRewardedSpells(Quest const* quest);
     void learnSpellHighRank(uint32 spellid);
-    void SetReputation(uint32 factionentry, uint32 value);
+    void SetReputation(uint32 factionentry, float value);
     [[nodiscard]] uint32 GetReputation(uint32 factionentry) const;
     std::string const& GetGuildName();
     [[nodiscard]] uint32 GetFreeTalentPoints() const { return GetUInt32Value(PLAYER_CHARACTER_POINTS1); }
@@ -1727,21 +1733,9 @@ public:
     void DropModCharge(SpellModifier* mod, Spell* spell);
     void SetSpellModTakingSpell(Spell* spell, bool apply);
 
-    [[nodiscard]] bool HasSpellCooldown(uint32 spell_id) const override
-    {
-        SpellCooldowns::const_iterator itr = m_spellCooldowns.find(spell_id);
-        return itr != m_spellCooldowns.end() && itr->second.end > World::GetGameTimeMS();
-    }
-    [[nodiscard]] bool HasSpellItemCooldown(uint32 spell_id, uint32 itemid) const override
-    {
-        SpellCooldowns::const_iterator itr = m_spellCooldowns.find(spell_id);
-        return itr != m_spellCooldowns.end() && itr->second.end > World::GetGameTimeMS() && itr->second.itemid == itemid;
-    }
-    [[nodiscard]] uint32 GetSpellCooldownDelay(uint32 spell_id) const
-    {
-        SpellCooldowns::const_iterator itr = m_spellCooldowns.find(spell_id);
-        return uint32(itr != m_spellCooldowns.end() && itr->second.end > World::GetGameTimeMS() ? itr->second.end - World::GetGameTimeMS() : 0);
-    }
+    [[nodiscard]] bool HasSpellCooldown(uint32 spell_id) const override;
+    [[nodiscard]] bool HasSpellItemCooldown(uint32 spell_id, uint32 itemid) const override;
+    [[nodiscard]] uint32 GetSpellCooldownDelay(uint32 spell_id) const;
     void AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 itemId, Spell* spell = nullptr, bool infinityCooldown = false);
     void AddSpellCooldown(uint32 spell_id, uint32 itemid, uint32 end_time, bool needSendToClient = false, bool forceSendToSpectator = false) override;
     void _AddSpellCooldown(uint32 spell_id, uint16 categoryId, uint32 itemid, uint32 end_time, bool needSendToClient = false, bool forceSendToSpectator = false);
@@ -1806,6 +1800,7 @@ public:
     void UpdatePvP(bool state, bool _override = false);
     void UpdateZone(uint32 newZone, uint32 newArea);
     void UpdateArea(uint32 newArea);
+    void SetNeedZoneUpdate(bool needUpdate) { m_needZoneUpdate = needUpdate; }
 
     void UpdateZoneDependentAuras(uint32 zone_id);    // zones
     void UpdateAreaDependentAuras(uint32 area_id);    // subzones
@@ -1818,7 +1813,7 @@ public:
     void ResetContestedPvP()
     {
         ClearUnitState(UNIT_STATE_ATTACK_PLAYER);
-        RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_CONTESTED_PVP);
+        RemovePlayerFlag(PLAYER_FLAGS_CONTESTED_PVP);
         m_contestedPvPTimer = 0;
     }
 
@@ -1858,7 +1853,7 @@ public:
         SetArenaTeamInfoField(slot, ARENA_TEAM_TYPE, type);
     }
     void SetArenaTeamInfoField(uint8 slot, ArenaTeamInfoType type, uint32 value);
-    uint32 GetArenaPersonalRating(uint8 slot) const;
+    [[nodiscard]] uint32 GetArenaPersonalRating(uint8 slot) const;
     static uint32 GetArenaTeamIdFromDB(ObjectGuid guid, uint8 slot);
     static void LeaveAllArenaTeams(ObjectGuid guid);
     [[nodiscard]] uint32 GetArenaTeamId(uint8 slot) const;
@@ -1971,10 +1966,10 @@ public:
 
     void ProcessTerrainStatusUpdate() override;
 
-    void SendMessageToSet(WorldPacket* data, bool self) override { SendMessageToSetInRange(data, GetVisibilityRange(), self, true); } // pussywizard!
-    void SendMessageToSetInRange(WorldPacket* data, float dist, bool self, bool includeMargin = false, Player const* skipped_rcvr = nullptr) override; // pussywizard!
-    void SendMessageToSetInRange_OwnTeam(WorldPacket* data, float dist, bool self); // pussywizard! param includeMargin not needed here
-    void SendMessageToSet(WorldPacket* data, Player const* skipped_rcvr) override { SendMessageToSetInRange(data, GetVisibilityRange(), skipped_rcvr != this, true, skipped_rcvr); } // pussywizard!
+    void SendMessageToSet(WorldPacket const* data, bool self) const override { SendMessageToSetInRange(data, GetVisibilityRange(), self, true); } // pussywizard!
+    void SendMessageToSetInRange(WorldPacket const* data, float dist, bool self, bool includeMargin = false, Player const* skipped_rcvr = nullptr) const override; // pussywizard!
+    void SendMessageToSetInRange_OwnTeam(WorldPacket const* data, float dist, bool self) const; // pussywizard! param includeMargin not needed here
+    void SendMessageToSet(WorldPacket const* data, Player const* skipped_rcvr) const override { SendMessageToSetInRange(data, GetVisibilityRange(), skipped_rcvr != this, true, skipped_rcvr); } // pussywizard!
 
     void SendTeleportAckPacket();
 
@@ -1984,13 +1979,14 @@ public:
     void RemoveCorpse();
     void KillPlayer();
     static void OfflineResurrect(ObjectGuid const guid, CharacterDatabaseTransaction trans);
-    bool HasCorpse() const { return _corpseLocation.GetMapId() != MAPID_INVALID; }
-    WorldLocation GetCorpseLocation() const { return _corpseLocation; }
+    [[nodiscard]] bool HasCorpse() const { return _corpseLocation.GetMapId() != MAPID_INVALID; }
+    [[nodiscard]] WorldLocation GetCorpseLocation() const { return _corpseLocation; }
     uint32 GetResurrectionSpellId();
     void ResurrectPlayer(float restore_percent, bool applySickness = false);
     void BuildPlayerRepop();
     void RepopAtGraveyard();
 
+    void SendDurabilityLoss();
     void DurabilityLossAll(double percent, bool inventory);
     void DurabilityLoss(Item* item, double percent);
     void DurabilityPointsLossAll(int32 points, bool inventory);
@@ -2076,7 +2072,7 @@ public:
     void RewardReputation(Unit* victim, float rate);
     void RewardReputation(Quest const* quest);
 
-    int32 CalculateReputationGain(ReputationSource source, uint32 creatureOrQuestLevel, int32 rep, int32 faction, bool noQuestBonus = false);
+    float CalculateReputationGain(ReputationSource source, uint32 creatureOrQuestLevel, float rep, int32 faction, bool noQuestBonus = false);
 
     void UpdateSkillsForLevel();
     void UpdateSkillsToMaxSkillsForLevel();             // for .levelup
@@ -2173,8 +2169,8 @@ public:
     void DeleteEquipmentSet(uint64 setGuid);
 
     void SendInitWorldStates(uint32 zone, uint32 area);
-    void SendUpdateWorldState(uint32 Field, uint32 Value);
-    void SendDirectMessage(WorldPacket* data);
+    void SendUpdateWorldState(uint32 variable, uint32 value) const;
+    void SendDirectMessage(WorldPacket const* data) const;
     void SendBGWeekendWorldStates();
     void SendBattlefieldWorldStates();
 
@@ -2204,59 +2200,20 @@ public:
     void SetBGData(BGData& bgdata) { m_bgData = bgdata; }
     [[nodiscard]] Battleground* GetBattleground(bool create = false) const;
 
-    [[nodiscard]] bool InBattlegroundQueue() const
-    {
-        for (auto i : m_bgBattlegroundQueueID)
-            if (i != BATTLEGROUND_QUEUE_NONE)
-                return true;
-        return false;
-    }
+    [[nodiscard]] bool InBattlegroundQueue(bool ignoreArena = false) const;
+    [[nodiscard]] bool IsDeserter() const { return HasAura(26013); }
 
-    [[nodiscard]] BattlegroundQueueTypeId GetBattlegroundQueueTypeId(uint32 index) const { return m_bgBattlegroundQueueID[index]; }
-
-    [[nodiscard]] uint32 GetBattlegroundQueueIndex(BattlegroundQueueTypeId bgQueueTypeId) const
-    {
-        for (uint8 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
-            if (m_bgBattlegroundQueueID[i] == bgQueueTypeId)
-                return i;
-        return PLAYER_MAX_BATTLEGROUND_QUEUES;
-    }
-
-    [[nodiscard]] bool InBattlegroundQueueForBattlegroundQueueType(BattlegroundQueueTypeId bgQueueTypeId) const
-    {
-        return GetBattlegroundQueueIndex(bgQueueTypeId) < PLAYER_MAX_BATTLEGROUND_QUEUES;
-    }
+    [[nodiscard]] BattlegroundQueueTypeId GetBattlegroundQueueTypeId(uint32 index) const;
+    [[nodiscard]] uint32 GetBattlegroundQueueIndex(BattlegroundQueueTypeId bgQueueTypeId) const;
+    [[nodiscard]] bool IsInvitedForBattlegroundQueueType(BattlegroundQueueTypeId bgQueueTypeId) const;
+    [[nodiscard]] bool InBattlegroundQueueForBattlegroundQueueType(BattlegroundQueueTypeId bgQueueTypeId) const;
 
     void SetBattlegroundId(uint32 id, BattlegroundTypeId bgTypeId, uint32 queueSlot, bool invited, bool isRandom, TeamId teamId);
-
-    uint32 AddBattlegroundQueueId(BattlegroundQueueTypeId val)
-    {
-        for (uint8 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
-            if (m_bgBattlegroundQueueID[i] == BATTLEGROUND_QUEUE_NONE || m_bgBattlegroundQueueID[i] == val)
-            {
-                m_bgBattlegroundQueueID[i] = val;
-                return i;
-            }
-        return PLAYER_MAX_BATTLEGROUND_QUEUES;
-    }
-
-    bool HasFreeBattlegroundQueueId()
-    {
-        for (auto & i : m_bgBattlegroundQueueID)
-            if (i == BATTLEGROUND_QUEUE_NONE)
-                return true;
-        return false;
-    }
-
-    void RemoveBattlegroundQueueId(BattlegroundQueueTypeId val)
-    {
-        for (auto & i : m_bgBattlegroundQueueID)
-            if (i == val)
-            {
-                i = BATTLEGROUND_QUEUE_NONE;
-                return;
-            }
-    }
+    uint32 AddBattlegroundQueueId(BattlegroundQueueTypeId val);
+    bool HasFreeBattlegroundQueueId() const;
+    void RemoveBattlegroundQueueId(BattlegroundQueueTypeId val);
+    void SetInviteForBattlegroundQueueType(BattlegroundQueueTypeId bgQueueTypeId, uint32 instanceId);
+    bool IsInvitedForBattlegroundInstance(uint32 instanceId) const;
 
     [[nodiscard]] TeamId GetBgTeamId() const { return m_bgData.bgTeamId != TEAM_NEUTRAL ? m_bgData.bgTeamId : GetTeamId(); }
 
@@ -2388,10 +2345,12 @@ public:
     [[nodiscard]] bool IsPetNeedBeTemporaryUnsummoned() const { return GetSession()->PlayerLogout() || !IsInWorld() || !IsAlive() || IsMounted()/*+in flight*/ || GetVehicle() || IsBeingTeleported(); }
     bool CanResummonPet(uint32 spellid);
 
-    void SendCinematicStart(uint32 CinematicSequenceId);
+    void SendCinematicStart(uint32 CinematicSequenceId) const;
     void SendMovieStart(uint32 MovieId);
 
-    uint16 GetMaxSkillValueForLevel() const;
+    uint32 DoRandomRoll(uint32 minimum, uint32 maximum);
+
+    [[nodiscard]] uint16 GetMaxSkillValueForLevel() const;
     bool IsFFAPvP();
     bool IsPvP();
 
@@ -2463,7 +2422,10 @@ public:
     void SetMap(Map* map) override;
     void ResetMap() override;
 
-    bool isAllowedToLoot(const Creature* creature);
+    bool CanTeleport() { return m_canTeleport; }
+    void SetCanTeleport(bool value) { m_canTeleport = value; }
+
+    bool isAllowedToLoot(Creature const* creature);
 
     [[nodiscard]] DeclinedName const* GetDeclinedNames() const { return m_declinedname; }
     [[nodiscard]] uint8 GetRunesState() const { return m_runes->runeState; }
@@ -2505,6 +2467,7 @@ public:
 
     //bool isActiveObject() const { return true; }
     bool CanSeeSpellClickOn(Creature const* creature) const;
+    [[nodiscard]] bool CanSeeVendor(Creature const* creature) const;
 
     [[nodiscard]] uint32 GetChampioningFaction() const { return m_ChampioningFaction; }
     void SetChampioningFaction(uint32 faction) { m_ChampioningFaction = faction; }
@@ -2519,11 +2482,11 @@ public:
     bool IsInWhisperWhiteList(ObjectGuid guid);
     void RemoveFromWhisperWhiteList(ObjectGuid guid) { WhisperList.remove(guid); }
 
-    bool SetDisableGravity(bool disable, bool packetOnly /* = false */) override;
+    bool SetDisableGravity(bool disable, bool packetOnly = false, bool updateAnimationTier = true) override;
     bool SetCanFly(bool apply, bool packetOnly = false) override;
     bool SetWaterWalking(bool apply, bool packetOnly = false) override;
     bool SetFeatherFall(bool apply, bool packetOnly = false) override;
-    bool SetHover(bool enable, bool packetOnly = false) override;
+    bool SetHover(bool enable, bool packetOnly = false, bool updateAnimationTier = true) override;
 
     [[nodiscard]] bool CanFly() const override { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY); }
     [[nodiscard]] bool CanEnterWater() const override { return true; }
@@ -2557,9 +2520,6 @@ public:
     void PrepareCharmAISpells();
     uint32 m_charmUpdateTimer;
 
-    int8 GetComboPointGain() { return m_comboPointGain; }
-    void SetComboPointGain(int8 combo) { m_comboPointGain = combo; }
-
     bool NeedToSaveGlyphs() { return m_NeedToSaveGlyphs; }
     void SetNeedToSaveGlyphs(bool val) { m_NeedToSaveGlyphs = val; }
 
@@ -2578,31 +2538,22 @@ public:
 
     static std::unordered_map<int, bgZoneRef> bgZoneIdToFillWorldStates; // zoneId -> FillInitialWorldStates
 
-    // Cinematic camera data and remote sight functions
-    [[nodiscard]] uint32 GetActiveCinematicCamera() const { return m_activeCinematicCameraId; }
-    void SetActiveCinematicCamera(uint32 cinematicCameraId = 0) { m_activeCinematicCameraId = cinematicCameraId; }
-    [[nodiscard]] bool IsOnCinematic() const { return (m_cinematicCamera != nullptr); }
-    void BeginCinematic();
-    void EndCinematic();
-    void UpdateCinematicLocation(uint32 diff);
-
-    std::string GetMapAreaAndZoneString();
-    std::string GetCoordsMapAreaAndZoneString();
-
     void SetFarSightDistance(float radius);
     void ResetFarSightDistance();
-    Optional<float> GetFarSightDistance() const;
+    [[nodiscard]] Optional<float> GetFarSightDistance() const;
 
-    float GetSightRange(const WorldObject* target = nullptr) const override;
+    float GetSightRange(WorldObject const* target = nullptr) const override;
 
     std::string GetPlayerName();
+
+    // Settings
+    [[nodiscard]] PlayerSetting GetPlayerSetting(std::string source, uint8 index);
+    void UpdatePlayerSetting(std::string source, uint8 index, uint32 value);
 
  protected:
     // Gamemaster whisper whitelist
     WhisperListContainer WhisperList;
 
-    // Combo Points
-    int8 m_comboPointGain;
     // Performance Varibales
     bool m_NeedToSaveGlyphs;
     // Mount block bug
@@ -2623,7 +2574,13 @@ public:
     /***               BATTLEGROUND SYSTEM                 ***/
     /*********************************************************/
 
-    BattlegroundQueueTypeId m_bgBattlegroundQueueID[PLAYER_MAX_BATTLEGROUND_QUEUES];
+    struct BgBattlegroundQueueID_Rec
+    {
+        BattlegroundQueueTypeId bgQueueTypeId;
+        uint32 invitedToInstance;
+    };
+
+    std::array<BgBattlegroundQueueID_Rec, PLAYER_MAX_BATTLEGROUND_QUEUES> _BgBattlegroundQueueID;
     BGData m_bgData;
     bool m_IsBGRandomWinner;
 
@@ -2679,6 +2636,8 @@ public:
     void _LoadTalents(PreparedQueryResult result);
     void _LoadInstanceTimeRestrictions(PreparedQueryResult result);
     void _LoadBrewOfTheMonth(PreparedQueryResult result);
+    void _LoadCharacterSettings(PreparedQueryResult result);
+    void _LoadPetStable(uint8 petStableSlots, PreparedQueryResult result);
 
     /*********************************************************/
     /***                   SAVE SYSTEM                     ***/
@@ -2702,6 +2661,7 @@ public:
     void _SaveStats(CharacterDatabaseTransaction trans);
     void _SaveCharacter(bool create, CharacterDatabaseTransaction trans);
     void _SaveInstanceTimeRestrictions(CharacterDatabaseTransaction trans);
+    void _SavePlayerSettings(CharacterDatabaseTransaction trans);
 
     /*********************************************************/
     /***              ENVIRONMENTAL SYSTEM                 ***/
@@ -2740,9 +2700,6 @@ public:
     bool m_itemUpdateQueueBlocked;
 
     uint32 m_ExtraFlags;
-
-    ObjectGuid m_comboTarget;
-    int8 m_comboPoints;
 
     QuestStatusMap m_QuestStatus;
     QuestStatusSaveMap m_QuestStatusSave;
@@ -2869,6 +2826,8 @@ public:
 
     uint8 m_grantableLevels;
 
+    bool m_needZoneUpdate;
+
     [[nodiscard]] AchievementMgr* GetAchievementMgr() const { return m_achievementMgr; }
 
 private:
@@ -2878,6 +2837,8 @@ private:
     InventoryResult CanStoreItem_InInventorySlots(uint8 slot_begin, uint8 slot_end, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool merge, Item* pSrcItem, uint8 skip_bag, uint8 skip_slot) const;
     Item* _StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool update);
     Item* _LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint32 timeDiff, Field* fields);
+
+    CinematicMgr* _cinematicMgr;
 
     typedef GuidSet RefundableItemsSet;
     RefundableItemsSet m_refundableItems;
@@ -2915,6 +2876,9 @@ private:
     uint32 m_DelayedOperations;
     bool m_bMustDelayTeleport;
     bool m_bHasDelayedTeleport;
+    bool m_canTeleport;
+
+    std::unique_ptr<PetStable> m_petStable;
 
     // Temporary removed pet cache
     uint32 m_temporaryUnsummonedPetNumber;
@@ -2941,17 +2905,13 @@ private:
 
     uint32 m_flightSpellActivated;
 
-    // Remote location information
-    uint32 m_cinematicDiff;
-    uint32 m_lastCinematicCheck;
-    uint32 m_activeCinematicCameraId;
-    FlyByCameraCollection* m_cinematicCamera;
-    Position m_remoteSightPosition;
-    Creature* m_CinematicObject;
-
     WorldLocation _corpseLocation;
 
     Optional<float> _farSightDistance = { };
+
+    bool _wasOutdoor;
+
+    PlayerSettingMap m_charSettingsMap;
 };
 
 void AddItemsSetItem(Player* player, Item* item);
@@ -2962,32 +2922,28 @@ template <class T> T Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& bas
 {
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
+    {
         return 0;
+    }
+
     float totalmul = 1.0f;
     int32 totalflat = 0;
 
-    // Drop charges for triggering spells instead of triggered ones
-    if (m_spellModTakingSpell)
-        spell = m_spellModTakingSpell;
-
-    for (auto mod : m_spellMods[op])
+    auto calculateSpellMod = [&](SpellModifier* mod)
     {
-        // Charges can be set only for mods with auras
-        if (!mod->ownerAura)
-            ASSERT(mod->charges == 0);
-
-        if (!IsAffectedBySpellmod(spellInfo, mod, spell))
-            continue;
-
         // xinef: temporary pets cannot use charged mods of owner, needed for mirror image QQ they should use their own auras
         if (temporaryPet && mod->charges != 0)
-            continue;
+        {
+            return;
+        }
 
         if (mod->type == SPELLMOD_FLAT)
         {
             // xinef: do not allow to consume more than one 100% crit increasing spell
             if (mod->op == SPELLMOD_CRITICAL_CHANCE && totalflat >= 100)
-                continue;
+            {
+                return;
+            }
 
             totalflat += mod->value;
         }
@@ -2995,32 +2951,88 @@ template <class T> T Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& bas
         {
             // skip percent mods for null basevalue (most important for spell mods with charges)
             if (basevalue == T(0) || totalmul == 0.0f)
-                continue;
+            {
+                return;
+            }
 
             // special case (skip > 10sec spell casts for instant cast setting)
             if (mod->op == SPELLMOD_CASTING_TIME && basevalue >= T(10000) && mod->value <= -100)
-                continue;
+            {
+                return;
+            }
             // xinef: special exception for surge of light, dont affect crit chance if previous mods were not applied
             else if (mod->op == SPELLMOD_CRITICAL_CHANCE && spell && !HasSpellMod(mod, spell))
-                continue;
+            {
+                return;
+            }
             // xinef: special case for backdraft gcd reduce with backlast time reduction, dont affect gcd if cast time was not applied
             else if (mod->op == SPELLMOD_GLOBAL_COOLDOWN && spell && !HasSpellMod(mod, spell))
-                continue;
+            {
+                return;
+            }
 
             // xinef: those two mods should be multiplicative (Glyph of Renew)
             if (mod->op == SPELLMOD_DAMAGE || mod->op == SPELLMOD_DOT)
+            {
                 totalmul *= CalculatePct(1.0f, 100.0f + mod->value);
+            }
             else
+            {
                 totalmul += CalculatePct(1.0f, mod->value);
+            }
         }
 
         DropModCharge(mod, spell);
+    };
+
+    // Drop charges for triggering spells instead of triggered ones
+    if (m_spellModTakingSpell)
+    {
+        spell = m_spellModTakingSpell;
     }
+
+    SpellModifier* chargedMod = nullptr;
+    for (auto mod : m_spellMods[op])
+    {
+        // Charges can be set only for mods with auras
+        if (!mod->ownerAura)
+        {
+            ASSERT(!mod->charges);
+        }
+
+        if (!IsAffectedBySpellmod(spellInfo, mod, spell))
+        {
+            continue;
+        }
+
+        if (mod->ownerAura->IsUsingCharges())
+        {
+            if (!chargedMod || (chargedMod->ownerAura->GetSpellInfo()->SpellPriority < mod->ownerAura->GetSpellInfo()->SpellPriority))
+            {
+                chargedMod = mod;
+            }
+
+            continue;
+        }
+
+        calculateSpellMod(mod);
+    }
+
+    if (chargedMod)
+    {
+        calculateSpellMod(chargedMod);
+    }
+
     float diff = 0.0f;
     if (op == SPELLMOD_CASTING_TIME || op == SPELLMOD_DURATION)
+    {
         diff = ((float)basevalue + totalflat) * (totalmul - 1.0f) + (float)totalflat;
+    }
     else
+    {
         diff = (float)basevalue * (totalmul - 1.0f) + (float)totalflat;
+    }
+
     basevalue = T((float)basevalue + diff);
     return T(diff);
 }

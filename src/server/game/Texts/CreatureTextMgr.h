@@ -94,21 +94,21 @@ public:
     void LoadCreatureTextLocales();
     CreatureTextMap  const& GetTextMap() const { return mTextMap; }
 
-    void SendSound(Creature* source, uint32 sound, ChatMsg msgType, WorldObject const* whisperTarget, CreatureTextRange range, TeamId teamId, bool gmOnly);
+    void SendSound(Creature* source, uint32 sound, ChatMsg msgType, WorldObject const* target, CreatureTextRange range, TeamId teamId, bool gmOnly);
     void SendEmote(Unit* source, uint32 emote);
 
     //if sent, returns the 'duration' of the text else 0 if error
-    uint32 SendChat(Creature* source, uint8 textGroup, WorldObject const* whisperTarget = nullptr, ChatMsg msgType = CHAT_MSG_ADDON, Language language = LANG_ADDON, CreatureTextRange range = TEXT_RANGE_NORMAL, uint32 sound = 0, TeamId teamId = TEAM_NEUTRAL, bool gmOnly = false, Player* srcPlr = nullptr);
+    uint32 SendChat(Creature* source, uint8 textGroup, WorldObject const* target = nullptr, ChatMsg msgType = CHAT_MSG_ADDON, Language language = LANG_ADDON, CreatureTextRange range = TEXT_RANGE_NORMAL, uint32 sound = 0, TeamId teamId = TEAM_NEUTRAL, bool gmOnly = false, Player* srcPlr = nullptr);
     bool TextExist(uint32 sourceEntry, uint8 textGroup);
     std::string GetLocalizedChatString(uint32 entry, uint8 gender, uint8 textGroup, uint32 id, LocaleConstant locale) const;
 
-    template<class Builder> void SendChatPacket(WorldObject* source, Builder const& builder, ChatMsg msgType, WorldObject const* whisperTarget = nullptr, CreatureTextRange range = TEXT_RANGE_NORMAL, TeamId teamId = TEAM_NEUTRAL, bool gmOnly = false) const;
+    template<class Builder> void SendChatPacket(WorldObject* source, Builder const& builder, ChatMsg msgType, WorldObject const* target = nullptr, CreatureTextRange range = TEXT_RANGE_NORMAL, TeamId teamId = TEAM_NEUTRAL, bool gmOnly = false) const;
 
 private:
     CreatureTextRepeatIds GetRepeatGroup(Creature* source, uint8 textGroup);
     void SetRepeatId(Creature* source, uint8 textGroup, uint8 id);
 
-    void SendNonChatPacket(WorldObject* source, WorldPacket* data, ChatMsg msgType, WorldObject const* whisperTarget, CreatureTextRange range, TeamId teamId, bool gmOnly) const;
+    void SendNonChatPacket(WorldObject* source, WorldPacket const* data, ChatMsg msgType, WorldObject const* target, CreatureTextRange range, TeamId teamId, bool gmOnly) const;
     float GetRangeForChatType(ChatMsg msgType) const;
 
     CreatureTextMap mTextMap;
@@ -177,7 +177,7 @@ private:
 };
 
 template<class Builder>
-void CreatureTextMgr::SendChatPacket(WorldObject* source, Builder const& builder, ChatMsg msgType, WorldObject const* whisperTarget /*= nullptr*/, CreatureTextRange range /*= TEXT_RANGE_NORMAL*/, TeamId teamId /*= TEAM_NEUTRAL*/, bool gmOnly /*= false*/) const
+void CreatureTextMgr::SendChatPacket(WorldObject* source, Builder const& builder, ChatMsg msgType, WorldObject const* target /*= nullptr*/, CreatureTextRange range /*= TEXT_RANGE_NORMAL*/, TeamId teamId /*= TEAM_NEUTRAL*/, bool gmOnly /*= false*/) const
 {
     if (!source)
         return;
@@ -191,10 +191,10 @@ void CreatureTextMgr::SendChatPacket(WorldObject* source, Builder const& builder
             {
                 if (range == TEXT_RANGE_NORMAL) //ignores team and gmOnly
                 {
-                    if (!whisperTarget || whisperTarget->GetTypeId() != TYPEID_PLAYER)
+                    if (!target || target->GetTypeId() != TYPEID_PLAYER)
                         return;
 
-                    localizer(const_cast<Player*>(whisperTarget->ToPlayer()));
+                    localizer(const_cast<Player*>(target->ToPlayer()));
                     return;
                 }
                 break;

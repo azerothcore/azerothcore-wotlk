@@ -106,7 +106,7 @@ struct boss_volazj : public BossAI
         insanityTimes = 0;
         insanityPhase = false;
 
-        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         me->SetControlled(false, UNIT_STATE_STUNNED);
         ResetPlayersPhaseMask();
         instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_QUICK_DEMISE_START_EVENT);
@@ -127,7 +127,7 @@ struct boss_volazj : public BossAI
     void JustDied(Unit* /*killer*/) override
     {
         _JustDied();
-        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         me->SetControlled(false, UNIT_STATE_STUNNED);
         ResetPlayersPhaseMask();
 
@@ -223,7 +223,7 @@ struct boss_volazj : public BossAI
             }
 
             insanityPhase = false;
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetControlled(false, UNIT_STATE_STUNNED);
             me->RemoveAurasDueToSpell(INSANITY_VISUAL);
         }
@@ -252,7 +252,7 @@ struct boss_volazj : public BossAI
                 }
                 case EVENT_HERALD_SHIVER:
                 {
-                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                    if (Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                     {
                         DoCast(pTarget, SPELL_SHIVER, false);
                     }
@@ -376,7 +376,7 @@ class spell_herald_volzaj_insanity : public SpellScript
         caster->CastSpell(caster, SPELL_WHISPER_INSANITY, true);
         caster->RemoveAllAuras();
         caster->CastSpell(caster, INSANITY_VISUAL, true);
-        caster->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        caster->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         caster->SetControlled(true, UNIT_STATE_STUNNED);
 
         // Handle phase effect

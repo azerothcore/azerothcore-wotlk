@@ -83,7 +83,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_VOID_ZONE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 60.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
                         me->CastSpell(target, SPELL_VOID_ZONE, false);
                     events.ScheduleEvent(EVENT_VOID_ZONE, 15000);
                     break;
@@ -94,7 +94,7 @@ public:
                     events.ScheduleEvent(EVENT_SHADOW_NOVA, 12000);
                     break;
                 case EVENT_SEED_OF_CORRUPTION:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
                         me->CastSpell(target, SPELL_SEED_OF_CORRUPTION, false);
                     events.ScheduleEvent(EVENT_SEED_OF_CORRUPTION, 16000);
                     break;

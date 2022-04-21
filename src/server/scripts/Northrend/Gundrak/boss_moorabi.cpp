@@ -93,7 +93,7 @@ public:
             events.ScheduleEvent(EVENT_TRANSFORMATION, 12000);
         }
 
-        void SpellHitTarget(Unit*  /*caster*/, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit*  /*caster*/, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_TRANSFORMATION)
             {

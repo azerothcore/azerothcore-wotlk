@@ -71,7 +71,7 @@ public:
                 }
                 case EVENT_SHAZZRAH_CURSE:
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true, -SPELL_SHAZZRAH_CURSE))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_SHAZZRAH_CURSE))
                     {
                         DoCast(target, SPELL_SHAZZRAH_CURSE);
                     }

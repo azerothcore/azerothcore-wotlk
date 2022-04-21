@@ -135,7 +135,7 @@ public:
         instance->SetBossState(DATA_LORD_MARROWGAR, IN_PROGRESS);
     }
 
-    void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+    void SpellHitTarget(Unit* target, SpellInfo const* spell) override
     {
         if (target && (spell->Id == 69055 || spell->Id == 70814)) // Bone Slice (Saber Lash)
             for (uint8 i = 0; i < 3; ++i)
@@ -216,10 +216,10 @@ public:
                         break;
                     }
                     events.RepeatEvent(5000);
-                    Unit* unit = SelectTarget(SELECT_TARGET_RANDOM, 0, BoneStormMoveTargetSelector(me));
+                    Unit* unit = SelectTarget(SelectTargetMethod::Random, 0, BoneStormMoveTargetSelector(me));
                     if (!unit)
                     {
-                        if ((unit = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 175.0f, true)))
+                        if ((unit = SelectTarget(SelectTargetMethod::MaxThreat, 0, 175.0f, true)))
                             if (unit->GetPositionX() > -337.0f)
                             {
                                 EnterEvadeMode();
@@ -339,7 +339,7 @@ public:
                         me->DisableSpline();
                         me->CastSpell(me, SPELL_COLDFLAME_SUMMON, true);
                         float nx = me->GetPositionX() + 5.0f * cos(me->GetOrientation());
-                        float ny = me->GetPositionY() + 5.0f * sin(me->GetOrientation());
+                        float ny = me->GetPositionY() + 5.0f * std::sin(me->GetOrientation());
                         if (!me->IsWithinLOS(nx, ny, 42.5f))
                         {
                             break;
@@ -479,9 +479,9 @@ public:
         void SelectTarget(std::list<WorldObject*>& targets)
         {
             targets.clear();
-            Unit* target = GetCaster()->GetAI()->SelectTarget(SELECT_TARGET_RANDOM, 1, -1.0f, true, -SPELL_IMPALED); // -1.0f as it takes into account object size
+            Unit* target = GetCaster()->GetAI()->SelectTarget(SelectTargetMethod::Random, 1, -1.0f, true, -SPELL_IMPALED); // -1.0f as it takes into account object size
             if (!target)
-                target = GetCaster()->GetAI()->SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true); // if only tank or noone outside of boss' model
+                target = GetCaster()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true); // if only tank or noone outside of boss' model
             if (!target)
                 return;
 
@@ -495,17 +495,17 @@ public:
             float dist = caster->GetObjectSize() / 2.0f;
             float z = caster->GetPositionZ() + 2.5f;
             float nx = caster->GetPositionX() + dist * cos(angle);
-            float ny = caster->GetPositionY() + dist * sin(angle);
+            float ny = caster->GetPositionY() + dist * std::sin(angle);
 
             if (!caster->IsWithinLOS(nx, ny, z))
             {
                 nx = caster->GetPositionX() + 0.5f * cos(angle);
-                ny = caster->GetPositionY() + 0.5f * sin(angle);
+                ny = caster->GetPositionY() + 0.5f * std::sin(angle);
             }
 
             if (caster->IsWithinLOS(nx, ny, z))
             {
-                caster->m_orientation = angle;
+                caster->SetOrientation(angle);
                 caster->CastSpell(nx, ny, z, uint32(GetEffectValue()), true);
             }
         }
@@ -599,10 +599,10 @@ public:
             for (uint8 i = 0; i < 4; ++i)
             {
                 float nx = x + 2.5f * cos((M_PI / 4) + (i * (M_PI / 2)));
-                float ny = y + 2.5f * sin((M_PI / 4) + (i * (M_PI / 2)));
+                float ny = y + 2.5f * std::sin((M_PI / 4) + (i * (M_PI / 2)));
                 if (caster->IsWithinLOS(nx, ny, z))
                 {
-                    caster->m_orientation = (M_PI / 4) + (i * (M_PI / 2));
+                    caster->SetOrientation((M_PI / 4) + (i * (M_PI / 2)));
                     caster->CastSpell(nx, ny, z, uint32(GetEffectValue() + i), true);
                 }
             }

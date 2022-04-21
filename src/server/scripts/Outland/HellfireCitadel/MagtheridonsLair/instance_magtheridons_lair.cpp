@@ -17,13 +17,17 @@
 
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "magtheridons_lair.h"
+
+BossBoundaryData const boundaries =
+{
+    { TYPE_MAGTHERIDON, new CircleBoundary(Position(-18.70f, 2.24f), 52.30) }
+};
 
 DoorData const doorData[] =
 {
-    { GO_MAGTHERIDON_DOORS,  TYPE_MAGTHERIDON,   DOOR_TYPE_ROOM,  BOUNDARY_S },
-    { 0,                0,              DOOR_TYPE_ROOM,     BOUNDARY_NONE } // END
+    { GO_MAGTHERIDON_DOORS,     TYPE_MAGTHERIDON,           DOOR_TYPE_ROOM },
+    { 0,                        0,                          DOOR_TYPE_ROOM } // END
 };
 
 MinionData const minionData[] =
@@ -43,6 +47,7 @@ public:
             SetBossNumber(MAX_ENCOUNTER);
             LoadDoorData(doorData);
             LoadMinionData(minionData);
+            LoadBossBoundaries(boundaries);
         }
 
         void Initialize() override
@@ -143,7 +148,7 @@ public:
                 {
                     for (ObjectGuid const& guid : _cubesSet)
                         if (GameObject* cube = instance->GetGameObject(guid))
-                            cube->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                            cube->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
 
                     if (state == NOT_STARTED)
                         SetData(DATA_COLLAPSE, GO_READY);
@@ -164,7 +169,7 @@ public:
                 case DATA_ACTIVATE_CUBES:
                     for (ObjectGuid const& guid : _cubesSet)
                         if (GameObject* cube = instance->GetGameObject(guid))
-                            cube->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                            cube->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
                 case DATA_COLLAPSE:
                     for (ObjectGuid const& guid : _columnSet)

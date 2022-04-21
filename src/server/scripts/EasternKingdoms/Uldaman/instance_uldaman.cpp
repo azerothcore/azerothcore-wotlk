@@ -55,7 +55,7 @@ public:
                     if (_encounters[DATA_IRONAYA_DOORS] == DONE)
                     {
                         HandleGameObject(ObjectGuid::Empty, true, gameobject);
-                        gameobject->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        gameobject->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     }
                     break;
                 case GO_TEMPLE_DOOR:
@@ -201,14 +201,14 @@ public:
         {
             Creature* target = GetUnitOwner()->ToCreature();
             target->SetReactState(REACT_PASSIVE);
-            target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            target->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
         }
 
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             Creature* target = GetUnitOwner()->ToCreature();
             target->SetReactState(REACT_AGGRESSIVE);
-            target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            target->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
         }
 
         void Register() override

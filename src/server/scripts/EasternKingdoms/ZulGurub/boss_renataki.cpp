@@ -91,7 +91,7 @@ public:
                 SetEquipmentSlots(false, EQUIP_UNEQUIP, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
                 me->SetDisplayId(11686);
 
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 Invisible = true;
 
                 Invisible_Timer = urand(15000, 30000);
@@ -102,7 +102,7 @@ public:
             {
                 if (Ambush_Timer <= diff)
                 {
-                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0);
+                    Unit* target = SelectTarget(SelectTargetMethod::Random, 0);
                     if (target)
                     {
                         me->NearTeleportTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), me->GetOrientation());
@@ -124,7 +124,7 @@ public:
                     me->SetDisplayId(15268);
                     SetEquipmentSlots(false, EQUIP_ID_MAIN_HAND, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
 
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     Invisible = false;
 
                     Visible_Timer = 4000;
@@ -137,7 +137,7 @@ public:
             {
                 if (Aggro_Timer <= diff)
                 {
-                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1);
+                    Unit* target = SelectTarget(SelectTargetMethod::Random, 1);
 
                     if (DoGetThreat(me->GetVictim()))
                     {

@@ -263,12 +263,12 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_MELT_ARMOR, 60000);
                     break;
                 case EVENT_SPELL_CHARGE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                         me->CastSpell(target, SPELL_CHARGE, false);
                     events.ScheduleEvent(EVENT_SPELL_CHARGE, 30000);
                     break;
                 case EVENT_SPELL_FLAME_PATCH:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                         me->SummonCreature(NPC_FLAME_PATCH, *target, TEMPSUMMON_TIMED_DESPAWN, 2 * MINUTE * IN_MILLISECONDS);
                     events.ScheduleEvent(EVENT_SPELL_FLAME_PATCH, 30000);
                     break;
@@ -285,7 +285,7 @@ public:
                     events.ScheduleEvent(EVENT_SUMMON_DIVE_PHOENIX, 2000);
                     events.ScheduleEvent(EVENT_REBIRTH_DIVE, 6000);
                     events.ScheduleEvent(EVENT_FINISH_DIVE, 10000);
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 90.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 90.0f, true))
                     {
                         me->CastSpell(target, SPELL_DIVE_BOMB, false);
                         me->SetPosition(*target);
@@ -296,7 +296,7 @@ public:
                     break;
                 case EVENT_SUMMON_DIVE_PHOENIX:
                     {
-                        Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 10.0f, true);
+                        Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 10.0f, true);
                         me->SummonCreature(NPC_EMBER_OF_ALAR, target ? *target : *me, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
                         me->SummonCreature(NPC_EMBER_OF_ALAR, target ? *target : *me, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
                         break;
@@ -441,7 +441,7 @@ public:
             target->m_invisibility.AddFlag(type);
             target->m_invisibility.AddValue(type, aurEff->GetAmount());
 
-            GetUnitOwner()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            GetUnitOwner()->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             GetUnitOwner()->SetStandState(UNIT_STAND_STATE_DEAD);
             GetUnitOwner()->m_last_notify_position.Relocate(0.0f, 0.0f, 0.0f);
             GetUnitOwner()->m_delayed_unit_relocation_timer = 1000;
@@ -449,7 +449,7 @@ public:
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            GetUnitOwner()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            GetUnitOwner()->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             GetUnitOwner()->SetStandState(UNIT_STAND_STATE_STAND);
         }
 

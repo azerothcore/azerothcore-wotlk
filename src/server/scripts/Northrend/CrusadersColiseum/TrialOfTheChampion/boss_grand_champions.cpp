@@ -169,13 +169,13 @@ public:
 
             if( apply )
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetSpeed(MOVE_RUN, 2.0f, false);
                 me->CastSpell(me, SPELL_TRAMPLE_AURA, true);
             }
             else
             {
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->StopMoving();
                 me->RemoveAura(SPELL_TRAMPLE_AURA);
             }
@@ -361,7 +361,6 @@ public:
             BossOrder = 0;
             NewMountGUID.Clear();
             me->CastSpell(me, SPELL_BOSS_DEFEND_PERIODIC, true);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 
             events.Reset();
             events.ScheduleEvent(EVENT_MOUNT_CHARGE, urand(2500, 4000));
@@ -401,7 +400,7 @@ public:
             {
                 DoAction(1);
                 DoAction(2);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                 me->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, 0);
                 me->SetReactState(REACT_AGGRESSIVE);
             }
@@ -487,9 +486,9 @@ public:
                 NewMountGUID.Clear();
                 me->SetHealth(me->GetMaxHealth());
                 me->SetRegeneratingHealth(true);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+                me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
                 me->SetSpeed(MOVE_RUN, 1.0f, false);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                 me->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                 me->RemoveAllAuras();
                 AddCreatureAddonAuras();
@@ -557,7 +556,7 @@ public:
                     me->StopMoving();
                     me->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, 0);
                     me->SetRegeneratingHealth(false);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     me->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
                     if( pInstance )
                     {
@@ -575,6 +574,7 @@ public:
             {
                 if( damage >= me->GetHealth() )
                 {
+                    MountPhase = true;
                     events.Reset();
                     damage = me->GetHealth() - 1;
                     me->SetReactState(REACT_PASSIVE);
@@ -584,14 +584,14 @@ public:
                     me->CombatStop(true);
                     me->GetMotionMaster()->Clear();
                     me->SetRegeneratingHealth(false);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     if( pInstance )
                         pInstance->SetData(DATA_GRAND_CHAMPION_DIED, BossOrder);
                 }
             }
         }
 
-        void EnterEvadeMode() override {}
+        void EnterEvadeMode(EvadeReason /*why*/) override {}
 
         void WaypointReached(uint32 i) override
         {
@@ -627,7 +627,7 @@ public:
                             events.ScheduleEvent(EVENT_SHIELD_BREAKER, urand(5000, 8000));
                             events.ScheduleEvent(EVENT_THRUST, urand(3000, 5000));
                             me->SetReactState(REACT_AGGRESSIVE);
-                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                             if( Unit* target = me->SelectNearestTarget(200.0f) )
                                 AttackStart(target);
                             DoZoneInCombat();
@@ -642,7 +642,7 @@ public:
             }
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
         {
             switch( spell->Id )
             {
@@ -720,7 +720,7 @@ public:
                         {
                             me->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
                             NewMountGUID = mount->GetGUID();
-                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                             me->GetMotionMaster()->MovePoint(7, *mount);
                             events.RepeatEvent(200);
                             break;
@@ -802,7 +802,7 @@ public:
                     events.RepeatEvent(22000);
                     break;
                 case EVEMT_MAGE_SPELL_POLYMORPH:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true) )
                         me->CastSpell(target, SPELL_POLYMORPH, false);
                     events.RepeatEvent(8000);
                     break;
@@ -810,7 +810,7 @@ public:
 
                 /****************** SHAMAN ******************/
                 case EVENT_SHAMAN_SPELL_CHAIN_LIGHTNING:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true) )
                         me->CastSpell(target, SPELL_CHAIN_LIGHTNING, false);
                     events.RepeatEvent(16000);
                     break;
@@ -852,7 +852,7 @@ public:
                     {
                         if( !UnitTargetGUID )
                         {
-                            if( Unit* target = SelectTarget(SELECT_TARGET_FARTHEST, 0, 30.0f, true) )
+                            if( Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, 30.0f, true) )
                             {
                                 me->CastSpell(target, SPELL_SHOOT, false);
                                 UnitTargetGUID = target->GetGUID();
@@ -896,7 +896,7 @@ public:
                     events.RepeatEvent(14000);
                     break;
                 case EVENT_ROGUE_SPELL_POISON_BOTTLE:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true) )
                         me->CastSpell(target, SPELL_POISON_BOTTLE, false);
                     events.RepeatEvent(19000);
                     break;

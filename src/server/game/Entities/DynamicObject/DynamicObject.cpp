@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "ObjectAccessor.h"
@@ -102,7 +103,7 @@ bool DynamicObject::CreateDynamicObject(ObjectGuid::LowType guidlow, Unit* caste
     Relocate(pos);
     if (!IsPositionValid())
     {
-        LOG_ERROR("dyobject", "DynamicObject (spell %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)", spellId, GetPositionX(), GetPositionY());
+        LOG_ERROR("dyobject", "DynamicObject (spell {}) not created. Suggested coordinates isn't valid (X: {} Y: {})", spellId, GetPositionX(), GetPositionY());
         return false;
     }
 
@@ -122,7 +123,7 @@ bool DynamicObject::CreateDynamicObject(ObjectGuid::LowType guidlow, Unit* caste
     SetByteValue(DYNAMICOBJECT_BYTES, 0, type);
     SetUInt32Value(DYNAMICOBJECT_SPELLID, spellId);
     SetFloatValue(DYNAMICOBJECT_RADIUS, radius);
-    SetUInt32Value(DYNAMICOBJECT_CASTTIME, World::GetGameTimeMS());
+    SetUInt32Value(DYNAMICOBJECT_CASTTIME, GameTime::GetGameTimeMS().count());
 
     if (IsWorldObject())
         setActive(true);    //must before add to map to be put in world container

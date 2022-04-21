@@ -112,7 +112,7 @@ public:
     //- Constructors for sync and async connections
     WorldDatabaseConnection(MySQLConnectionInfo& connInfo);
     WorldDatabaseConnection(ProducerConsumerQueue<SQLOperation*>* q, MySQLConnectionInfo& connInfo);
-    ~WorldDatabaseConnection();
+    ~WorldDatabaseConnection() override;
 
     //- Loads database type specific prepared statements
     void DoPrepareStatements() override;

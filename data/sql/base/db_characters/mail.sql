@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.mail
+-- Дамп структуры для таблица acore_characters.mail
 DROP TABLE IF EXISTS `mail`;
 CREATE TABLE IF NOT EXISTS `mail` (
   `id` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Identifier',
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `mail` (
   KEY `idx_receiver` (`receiver`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Mail System';
 
--- Дамп данных таблицы _acore_characters.mail: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.mail: ~0 rows (приблизительно)
 DELETE FROM `mail`;
 /*!40000 ALTER TABLE `mail` DISABLE KEYS */;
 /*!40000 ALTER TABLE `mail` ENABLE KEYS */;

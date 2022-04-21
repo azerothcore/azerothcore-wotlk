@@ -25,9 +25,9 @@ namespace Movement
 {
     struct Location : public Vector3
     {
-        Location()  {}
+        Location()  = default;
         Location(float x, float y, float z, float o) : Vector3(x, y, z), orientation(o) {}
-        Location(const Vector3& v) : Vector3(v), orientation(0) {}
+        Location(const Vector3& v) : Vector3(v) {}
         Location(const Vector3& v, float o) : Vector3(v), orientation(o) {}
 
         float orientation{0};

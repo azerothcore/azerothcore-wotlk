@@ -226,6 +226,7 @@ public:
         bool berserk{ false };
         bool bAchievCheese{ true };
         bool bAchievGettingCold{ true };
+        bool bAchievCacheRare{ true };
         bool bAchievCoolestFriends{ true };
         uint16 addSpawnTimer{ 0 };
 
@@ -240,6 +241,7 @@ public:
             berserk = false;
             bAchievCheese = true;
             bAchievGettingCold = true;
+            bAchievCacheRare = true;
             bAchievCoolestFriends = true;
             me->SetSheath(SHEATH_STATE_MELEE);
 
@@ -255,11 +257,6 @@ public:
             if (GameObject* go = me->FindNearestGameObject(GO_HODIR_FRONTDOOR, 900.0f))
             {
                 go->SetGoState(GO_STATE_ACTIVE);
-            }
-
-            if (pInstance && pInstance->GetData(TYPE_HODIR) != DONE)
-            {
-                pInstance->SetData(TYPE_SPAWN_HODIR_CACHE, 0);
             }
 
             // Reset helpers
@@ -296,10 +293,13 @@ public:
                 switch (action)
                 {
                     case EVENT_FAIL_HM:
-                        if (GameObject* go = me->FindNearestGameObject(GO_HODIR_CHEST_HARD, 500.0f))
+                        if (pInstance)
                         {
-                            go->SetGoState(GO_STATE_ACTIVE);
-                            events.ScheduleEvent(EVENT_DESPAWN_CHEST, 3000);
+                            if (GameObject* go = pInstance->instance->GetGameObject(pInstance->GetGuidData(GO_HODIR_CHEST_HARD)))
+                            {
+                                go->SetGoState(GO_STATE_ACTIVE);
+                                events.ScheduleEvent(EVENT_DESPAWN_CHEST, 3000);
+                            }
                         }
                         break;
                 }
@@ -314,7 +314,7 @@ public:
                 me->RemoveAura(SPELL_ICICLE_BOSS_AURA);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             switch( spell->Id )
             {
@@ -338,7 +338,7 @@ public:
             {
                 damage = 0;
                 me->SetReactState(REACT_PASSIVE);
-                if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+                if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                 {
                     if (pInstance)
                     {
@@ -346,7 +346,7 @@ public:
                         me->CastSpell(me, 64899, true); // credit
                     }
 
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->SetFaction(FACTION_FRIENDLY);
                     me->GetMotionMaster()->Clear();
                     me->AttackStop();
@@ -425,7 +425,14 @@ public:
                 case EVENT_HARD_MODE_MISSED:
                     {
                         Talk(TEXT_HM_MISS);
-                        me->CastSpell(me->FindNearestGameObject(GO_HODIR_CHEST_HARD, 400.0f), SPELL_SHATTER_CHEST, false);
+                        bAchievCacheRare = false;
+                        if (pInstance)
+                        {
+                            if (GameObject* go = pInstance->instance->GetGameObject(pInstance->GetGuidData(GO_HODIR_CHEST_HARD)))
+                            {
+                                me->CastSpell(go, SPELL_SHATTER_CHEST, false);
+                            }
+                        }
                     }
                     break;
                 case EVENT_DESPAWN_CHEST:
@@ -477,7 +484,7 @@ public:
                     {
                         me->CastSpell(plr, SPELL_FREEZE, false);
                     }
-                    else if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
+                    else if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                     {
                         me->CastSpell(target, SPELL_FREEZE, false);
                     }
@@ -552,7 +559,7 @@ public:
             summons.Despawn(s);
         }
 
-        bool CanAIAttack(const Unit* t) const override
+        bool CanAIAttack(Unit const* t) const override
         {
             if (t->GetTypeId() == TYPEID_PLAYER)
                 return !t->HasAura(SPELL_FLASH_FREEZE_TRAPPED_PLAYER);
@@ -587,6 +594,8 @@ public:
                     return (bAchievCheese ? 1 : 0);
                 case 2:
                     return (bAchievGettingCold ? 1 : 0);
+                case 3:
+                    return (bAchievCacheRare ? 1 : 0);
                 case 4:
                     return (bAchievCoolestFriends ? 1 : 0);
             }
@@ -730,7 +739,7 @@ public:
             }
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
         {
             switch( spell->Id )
             {
@@ -777,7 +786,7 @@ public:
             events.ScheduleEvent(EVENT_PRIEST_SMITE, 2100);
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if(spell->Id == SPELL_FLASH_FREEZE_TRAPPED_NPC)
             {
@@ -828,8 +837,9 @@ public:
         }
 
         void MoveInLineOfSight(Unit*  /*who*/) override {}
-        void EnterEvadeMode() override {}
-        bool CanAIAttack(const Unit* t) const override { return t->GetEntry() == NPC_HODIR; }
+
+        void EnterEvadeMode(EvadeReason /*why*/) override {}
+        bool CanAIAttack(Unit const* t) const override { return t->GetEntry() == NPC_HODIR; }
 
         void JustDied(Unit* /*killer*/) override
         {
@@ -873,7 +883,7 @@ public:
             events.ScheduleEvent(EVENT_DRUID_STARLIGHT, 10000);
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if(spell->Id == SPELL_FLASH_FREEZE_TRAPPED_NPC)
             {
@@ -925,8 +935,9 @@ public:
         }
 
         void MoveInLineOfSight(Unit*  /*who*/) override {}
-        void EnterEvadeMode() override {}
-        bool CanAIAttack(const Unit* t) const override { return t->GetEntry() == NPC_HODIR; }
+
+        void EnterEvadeMode(EvadeReason /*why*/) override {}
+        bool CanAIAttack(Unit const* t) const override { return t->GetEntry() == NPC_HODIR; }
 
         void JustDied(Unit* /*killer*/) override
         {
@@ -970,7 +981,7 @@ public:
             events.ScheduleEvent(EVENT_SHAMAN_STORM_CLOUD, 10000);
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if(spell->Id == SPELL_FLASH_FREEZE_TRAPPED_NPC)
             {
@@ -979,7 +990,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if (target && spell->Id == SPELL_SHAMAN_STORM_CLOUD)
                 if (Aura* a = target->GetAura(SPELL_SHAMAN_STORM_CLOUD, me->GetGUID()))
@@ -1025,8 +1036,9 @@ public:
         }
 
         void MoveInLineOfSight(Unit*  /*who*/) override {}
-        void EnterEvadeMode() override {}
-        bool CanAIAttack(const Unit* t) const override { return t->GetEntry() == NPC_HODIR; }
+
+        void EnterEvadeMode(EvadeReason /*why*/) override {}
+        bool CanAIAttack(Unit const* t) const override { return t->GetEntry() == NPC_HODIR; }
 
         void JustDied(Unit* /*killer*/) override
         {
@@ -1071,7 +1083,7 @@ public:
             events.ScheduleEvent(EVENT_MAGE_MELT_ICE, 1000);
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if(spell->Id == SPELL_FLASH_FREEZE_TRAPPED_NPC)
             {
@@ -1140,8 +1152,9 @@ public:
         }
 
         void MoveInLineOfSight(Unit*  /*who*/) override {}
-        void EnterEvadeMode() override {}
-        bool CanAIAttack(const Unit* t) const override { return t->GetEntry() == NPC_HODIR; }
+
+        void EnterEvadeMode(EvadeReason /*why*/) override {}
+        bool CanAIAttack(Unit const* t) const override { return t->GetEntry() == NPC_HODIR; }
 
         void JustDied(Unit* /*killer*/) override
         {
@@ -1161,15 +1174,17 @@ public:
     {
         PrepareSpellScript(spell_hodir_shatter_chestSpellScript)
 
-        void destroyWinterCache()
+        void destroyWinterCache(SpellEffIndex effIndex)
         {
+            PreventHitDefaultEffect(effIndex);
+
             if (Unit* hodir = GetCaster())
                 hodir->GetAI()->DoAction(EVENT_FAIL_HM);
         }
 
         void Register() override
         {
-            AfterHit += SpellHitFn(spell_hodir_shatter_chestSpellScript::destroyWinterCache);
+            OnEffectHit += SpellEffectFn(spell_hodir_shatter_chestSpellScript::destroyWinterCache, EFFECT_0, SPELL_EFFECT_TRIGGER_MISSILE);
         };
     };
 

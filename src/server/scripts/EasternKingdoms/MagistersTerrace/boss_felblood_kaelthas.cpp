@@ -106,7 +106,7 @@ public:
             summons.DespawnAll();
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
             instance->SetData(DATA_KAELTHAS_EVENT, NOT_STARTED);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
         }
 
         void JustSummoned(Creature* summon) override
@@ -120,7 +120,7 @@ public:
         void InitializeAI() override
         {
             ScriptedAI::InitializeAI();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
         }
 
         void JustDied(Unit*) override
@@ -162,7 +162,7 @@ public:
                 if (me->isRegeneratingHealth())
                 {
                     me->SetRegeneratingHealth(false);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     me->CombatStop();
                     me->SetReactState(REACT_PASSIVE);
                     LapseAction(ACTION_REMOVE_FLY);
@@ -200,7 +200,7 @@ public:
             switch (events2.ExecuteEvent())
             {
                 case EVENT_INIT_COMBAT:
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     if (Unit* target = SelectTargetFromPlayerList(50.0f))
                         AttackStart(target);
                     return;
@@ -223,7 +223,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_FIREBALL, urand(3000, 4500));
                     break;
                 case EVENT_SPELL_FLAMESTRIKE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                     {
                         me->CastSpell(target, SPELL_FLAMESTRIKE_SUMMON, true);
                         Talk(SAY_FLAMESTRIKE);

@@ -31,7 +31,7 @@ public:
 
     Guild* GetGuildByLeader(ObjectGuid guid) const;
     Guild* GetGuildById(uint32 guildId) const;
-    Guild* GetGuildByName(std::string const& guildName) const;
+    Guild* GetGuildByName(std::string_view guildName) const;
     std::string GetGuildNameById(uint32 guildId) const;
 
     void LoadGuilds();

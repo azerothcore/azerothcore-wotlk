@@ -141,7 +141,7 @@ public:
             Talk(SAY_SLAY);
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_DISPERSE)
                 Split();
@@ -159,7 +159,7 @@ public:
                     summons.Summon(spark);
                     spark->CastSpell(spark, me->GetMap()->IsHeroic() ? SPELL_SPARK_VISUAL_TRIGGER_H : SPELL_SPARK_VISUAL_TRIGGER_N, true);
                     spark->CastSpell(spark, SPELL_RANDOM_LIGHTNING, true);
-                    spark->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                    spark->SetUnitFlag(UNIT_FLAG_PACIFIED | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                     spark->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0);
 
                     if (Player* tgt = SelectTargetFromPlayerList(100))
@@ -187,13 +187,13 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_BALL_LIGHTNING:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                         me->CastSpell(target, me->GetMap()->IsHeroic() ? SPELL_BALL_LIGHTNING_H : SPELL_BALL_LIGHTNING_N, false);
 
                     events.RepeatEvent(10000 + rand() % 1000);
                     break;
                 case EVENT_STATIC_OVERLOAD:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                         me->CastSpell(target, me->GetMap()->IsHeroic() ? SPELL_STATIC_OVERLOAD_H : SPELL_STATIC_OVERLOAD_N, false);
 
                     events.RepeatEvent(5000 + rand() % 1000);

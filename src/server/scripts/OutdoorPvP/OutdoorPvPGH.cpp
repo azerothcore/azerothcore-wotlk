@@ -21,7 +21,6 @@
 #include "OutdoorPvPMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "World.h"
 #include "WorldPacket.h"
 
 OutdoorPvPGH::OutdoorPvPGH()

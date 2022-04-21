@@ -20,7 +20,6 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "WorldSession.h"
 
 constexpr auto SPELL_TRICK = 24714;
 constexpr auto SPELL_TREAT = 24715;

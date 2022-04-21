@@ -95,9 +95,9 @@ public:
             _summonTargetLeftGUID.Clear();
             _stage = 0;
 
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
             _achievement = true;
         }
@@ -151,8 +151,8 @@ public:
 
             me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
             me->RemoveAllAuras();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void JustDied(Unit* killer) override
@@ -174,7 +174,7 @@ public:
         void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
-            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE) && summon->GetEntry() != NPC_CRYSTAL_CHANNEL_TARGET && summon->GetEntry() != NPC_CRYSTAL_HANDLER)
+            if (me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) && summon->GetEntry() != NPC_CRYSTAL_CHANNEL_TARGET && summon->GetEntry() != NPC_CRYSTAL_HANDLER)
                 summon->SetReactState(REACT_DEFENSIVE);
             else if (summon->GetEntry() != NPC_CRYSTAL_CHANNEL_TARGET)
                 summon->SetInCombatWithZone();
@@ -223,13 +223,13 @@ public:
                     events.Reset();
                     events.ScheduleEvent(EVENT_CAST_OFFENSIVE_SPELL, 3000);
                     events.ScheduleEvent(EVENT_SPELL_SUMMON_MINIONS, 10000);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->InterruptNonMeleeSpells(false);
                     break;
                 case EVENT_CAST_OFFENSIVE_SPELL:
                     if (!me->HasUnitState(UNIT_STATE_CASTING))
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                             me->CastSpell(target, RAND(SPELL_BLIZZARD, SPELL_FROSTBOLT, SPELL_TOUCH_OF_MISERY), false);
 
                     events.ScheduleEvent(EVENT_CAST_OFFENSIVE_SPELL, 500);
@@ -244,8 +244,6 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_SUMMON_MINIONS, 500);
                     break;
             }
-
-            EnterEvadeIfOutOfCombatArea();
         }
 
         bool CheckEvadeIfOutOfCombatArea() const override

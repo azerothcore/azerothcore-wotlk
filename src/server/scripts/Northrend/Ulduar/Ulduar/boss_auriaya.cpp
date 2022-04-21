@@ -208,7 +208,7 @@ public:
             }
         }
 
-        void JustDied(Unit* /*victim*/) override
+        void JustDied(Unit* /*killer*/) override
         {
             if (m_pInstance)
                 m_pInstance->SetData(TYPE_AURIAYA, DONE);

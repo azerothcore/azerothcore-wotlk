@@ -77,11 +77,11 @@ public:
                     if (teldaramSpheres.at(pGo->GetEntry() == GO_TELDARAM_SPHERE1 ? 0 : 1) == DONE || GetBossState(DATA_PRINCE_TALDARAM) == DONE)
                     {
                         pGo->SetGoState(GO_STATE_ACTIVE);
-                        pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        pGo->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     }
                     else
                     {
-                        pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        pGo->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     }
 
                     break;

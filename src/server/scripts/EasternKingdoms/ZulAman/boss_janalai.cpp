@@ -237,7 +237,7 @@ public:
             Acore::CreatureListSearcher<Acore::AllCreaturesOfEntryInRange> searcher(me, templist, check);
             Cell::VisitGridObjects(me, searcher, me->GetGridActivationRange());
 
-            //TC_LOG_ERROR("scripts", "Eggs %d at middle", templist.size());
+            //LOG_ERROR("scripts", "Eggs {} at middle", templist.size());
             if (templist.empty())
                 return false;
 
@@ -274,9 +274,9 @@ public:
             {
                 if (Unit* FireBomb = ObjectAccessor::GetUnit(*me, FireBombGUIDs[BombCount]))
                 {
-                    FireBomb->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    FireBomb->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     DoCast(FireBomb, SPELL_FIRE_BOMB_THROW, true);
-                    FireBomb->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    FireBomb->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 }
                 ++BombCount;
                 if (BombCount == 40)
@@ -402,13 +402,11 @@ public:
                 else HatcherTimer -= diff;
             }
 
-            EnterEvadeIfOutOfCombatArea();
-
             DoMeleeAttackIfReady();
 
             if (FireBreathTimer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                 {
                     me->AttackStop();
                     me->GetMotionMaster()->Clear();
@@ -447,7 +445,7 @@ public:
 
         void Reset() override { }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_FIRE_BOMB_THROW)
                 DoCast(me, SPELL_FIRE_BOMB_DUMMY, true);
@@ -514,7 +512,7 @@ public:
             Acore::CreatureListSearcher<Acore::AllCreaturesOfEntryInRange> searcher(me, templist, check);
             Cell::VisitGridObjects(me, searcher, me->GetGridActivationRange());
 
-            //TC_LOG_ERROR("scripts", "Eggs %d at %d", templist.size(), side);
+            //LOG_ERROR("scripts", "Eggs {} at {}", templist.size(), side);
 
             for (std::list<Creature*>::const_iterator i = templist.begin(); i != templist.end() && num > 0; ++i)
                 if ((*i)->GetDisplayId() != 11686)
@@ -668,7 +666,7 @@ public:
 
         void UpdateAI(uint32 /*diff*/) override { }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_HATCH_EGG)
             {

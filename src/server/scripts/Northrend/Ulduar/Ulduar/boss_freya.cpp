@@ -343,7 +343,7 @@ public:
                 me->PlayDirectSound(SOUND_DEATH);
 
                 damage = 0;
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetFaction(FACTION_FRIENDLY);
                 me->SetHealth(me->GetMaxHealth());
                 me->CombatStop();
@@ -370,7 +370,10 @@ public:
 
                 me->DespawnOrUnsummon(5000);
                 if (GameObject* go = me->SummonGameObject(chestId, 2345.61f, -71.20f, 425.104f, 3.0f, 0, 0, 0, 0, 0))
-                    go->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
+                {
+                    go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
+                    go->SetLootRecipient(me->GetMap());
+                }
 
                 // Defeat credit
                 if (m_pInstance)
@@ -560,7 +563,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_NATURE_BOMB_FLIGHT)
                 me->SummonCreature(NPC_NATURE_BOMB, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
@@ -610,7 +613,7 @@ public:
                         break;
                     }
                 case EVENT_FREYA_SUNBEAM:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                         me->CastSpell(target, SPELL_SUNBEAM, false);
                     events.RepeatEvent(15000 + urand(0, 5000));
                     break;
@@ -664,7 +667,6 @@ public:
             }
 
             DoMeleeAttackIfReady();
-            EnterEvadeIfOutOfCombatArea();
         }
 
         bool CheckEvadeIfOutOfCombatArea() const override
@@ -718,7 +720,7 @@ public:
 
         void JustDied(Unit* killer) override
         {
-            if (me->GetEntry() == killer->GetEntry())
+            if (killer && me->GetEntry() == killer->GetEntry())
                 return;
             me->Yell("Matron, flee! They are ruthless....", LANG_UNIVERSAL);
             me->PlayDirectSound(SOUND_STONEBARK_DEATH);
@@ -824,7 +826,7 @@ public:
 
         void JustDied(Unit* killer) override
         {
-            if (me->GetEntry() == killer->GetEntry())
+            if (killer && me->GetEntry() == killer->GetEntry())
                 return;
             me->Yell("Matron, one has fallen!", LANG_UNIVERSAL);
             me->PlayDirectSound(SOUND_BRIGHTLEAF_DEATH);
@@ -945,7 +947,7 @@ public:
 
         void JustDied(Unit* killer) override
         {
-            if (me->GetEntry() == killer->GetEntry())
+            if (killer && me->GetEntry() == killer->GetEntry())
                 return;
             me->Yell("Freya! They come for you.", LANG_UNIVERSAL);
             me->PlayDirectSound(SOUND_IRONBRANCH_DEATH);
@@ -986,7 +988,7 @@ public:
                     events.RepeatEvent(20000);
                     break;
                 case EVENT_IRONBRANCH_THORN_SWARM:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), SPELL_THORN_SWARM, false);
                     events.RepeatEvent(14000);
                     break;
@@ -1011,7 +1013,7 @@ public:
     {
         boss_freya_iron_rootAI(Creature* pCreature) : NullCreatureAI(pCreature) { }
 
-        void JustDied(Unit*) override
+        void JustDied(Unit* /*killer*/) override
         {
             if (!me->IsSummon())
                 return;
@@ -1139,7 +1141,7 @@ public:
                 AttackStart(target);
         }
 
-        void JustDied(Unit*) override
+        void JustDied(Unit* /*killer*/) override
         {
             if (Creature* freya = ObjectAccessor::GetCreature(*me, _freyaGUID))
             {
@@ -1225,7 +1227,7 @@ public:
                     me->CastSpell(me, SPELL_TIDAL_WAVE_DAMAGE, false);
                     break;
                 case EVENT_STORM_LASHER_LIGHTNING_LASH:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_LIGHTNING_LASH, false);
                     events.RepeatEvent(10000);
                     break;

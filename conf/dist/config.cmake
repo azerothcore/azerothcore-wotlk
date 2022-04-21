@@ -87,5 +87,5 @@ endif()
 set(WITH_SOURCE_TREE       "hierarchical" CACHE STRING "Build the source tree for IDE's.")
 set_property(CACHE WITH_SOURCE_TREE PROPERTY STRINGS no flat hierarchical)
 
-# If disable - use c++17
-option(USE_CPP_20 "Enable c++20 standard" 0)
+# Config abort
+option(CONFIG_ABORT_INCORRECT_OPTIONS "Enable abort if core found incorrect option in config files" 0)

@@ -73,8 +73,7 @@ enum Spells
 
 enum Events
 {
-    EVENT_MAGIC_REFLECTION                  = 1,
-    EVENT_DAMAGE_REFLECTION,
+    EVENT_SHIELD_REFLECTION                 = 1,
     EVENT_TELEPORT_RANDOM,
     EVENT_TELEPORT_TARGET,
     EVENT_AEGIS_OF_RAGNAROS,
@@ -121,6 +120,16 @@ Position const MajordomoSummonPos = {759.542f, -1173.43f, -118.974f, 3.3048f };
 Position const MajordomoMoveRagPos = { 830.9636f, -814.7055f, -228.9733f, 0.0f };   // Position used at Ragnaros summoning event
 Position const RagnarosSummonPos = { 838.3082f, -831.4665f, -232.1853f, 2.199115f };
 
+struct MajordomoAddData
+{
+    ObjectGuid guid;
+    uint32 creatureEntry;
+    Position spawnPos;
+
+    MajordomoAddData() { }
+    MajordomoAddData(ObjectGuid _guid, uint32 _creatureEntry, Position _spawnPos) : guid(_guid), creatureEntry(_creatureEntry), spawnPos(_spawnPos) { }
+};
+
 class boss_majordomo : public CreatureScript
 {
 public:
@@ -142,7 +151,7 @@ public:
             {
                 summon->CastSpell(summon, SPELL_RAGNAROS_FADE);
                 summon->CastSpell(summon, SPELL_RAGNAROS_SUBMERGE_EFFECT, true);
-                summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
+                summon->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
                 summon->SetReactState(REACT_PASSIVE);
             }
         }
@@ -163,6 +172,7 @@ public:
                         if (summon)
                         {
                             static_minionsGUIDS.insert(summon->GetGUID());
+                            majordomoSummonsData[summon->GetGUID().GetCounter()] = MajordomoAddData(summon->GetGUID(), summon->GetEntry(), summon->GetPosition());
                         }
                     }
                 }
@@ -170,8 +180,8 @@ public:
             else
             {
                 events.SetPhase(PHASE_NONE);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 me->SetFaction(FACTION_MAJORDOMO_FRIENDLY);
             }
         }
@@ -186,10 +196,27 @@ public:
             {
                 events.SetPhase(PHASE_COMBAT);
                 instance->SetBossState(DATA_MAJORDOMO_EXECUTUS, NOT_STARTED);
+
+                for (auto const& summon : majordomoSummonsData)
+                {
+                    if (ObjectAccessor::GetCreature(*me, summon.second.guid))
+                    {
+                        continue;
+                    }
+
+                    if (Creature* spawn = me->SummonCreature(summon.second.creatureEntry, summon.second.spawnPos))
+                    {
+                        static_minionsGUIDS.erase(summon.second.guid); // Erase the guid from the previous, no longer existing, spawn.
+                        static_minionsGUIDS.insert(spawn->GetGUID());
+                        majordomoSummonsData.erase(summon.second.guid.GetCounter());
+                        majordomoSummonsData[spawn->GetGUID().GetCounter()] = MajordomoAddData(spawn->GetGUID(), spawn->GetEntry(), spawn->GetPosition());
+                    }
+                }
             }
             else
             {
                 static_minionsGUIDS.clear();
+                majordomoSummonsData.clear();
                 summons.DespawnAll();
             }
         }
@@ -219,10 +246,9 @@ public:
             Talk(SAY_AGGRO);
             DoCastSelf(SPELL_AEGIS_OF_RAGNAROS, true);
 
-            events.ScheduleEvent(EVENT_MAGIC_REFLECTION, 30000, PHASE_COMBAT, PHASE_COMBAT);
-            events.ScheduleEvent(EVENT_DAMAGE_REFLECTION, 15000, PHASE_COMBAT, PHASE_COMBAT);
-            events.ScheduleEvent(EVENT_TELEPORT_RANDOM, 15000, PHASE_COMBAT, PHASE_COMBAT);
-            events.ScheduleEvent(EVENT_TELEPORT_TARGET, 30000, PHASE_COMBAT, PHASE_COMBAT);
+            events.ScheduleEvent(EVENT_SHIELD_REFLECTION, 30000, PHASE_COMBAT, PHASE_COMBAT);
+            events.ScheduleEvent(EVENT_TELEPORT_RANDOM, 25000, PHASE_COMBAT, PHASE_COMBAT);
+            events.ScheduleEvent(EVENT_TELEPORT_TARGET, 15000, PHASE_COMBAT, PHASE_COMBAT);
 
             aliveMinionsGUIDS.clear();
             aliveMinionsGUIDS = static_minionsGUIDS;
@@ -256,7 +282,7 @@ public:
                     instance->SetBossState(DATA_MAJORDOMO_EXECUTUS, DONE);
                     events.CancelEventGroup(PHASE_COMBAT);
                     me->GetMap()->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, me->GetEntry(), me);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
                     me->SetFaction(FACTION_MAJORDOMO_FRIENDLY);
                     EnterEvadeMode();
                     Talk(SAY_DEFEAT);
@@ -308,27 +334,28 @@ public:
                     {
                         switch (eventId)
                         {
-                            case EVENT_MAGIC_REFLECTION:
+                            case EVENT_SHIELD_REFLECTION:
                             {
-                                DoCastSelf(SPELL_MAGIC_REFLECTION);
-                                events.RepeatEvent(30000);
-                                break;
-                            }
-                            case EVENT_DAMAGE_REFLECTION:
-                            {
-                                DoCastSelf(SPELL_DAMAGE_REFLECTION);
+                                if (rand_chance() <= 50.f)
+                                {
+                                    DoCastSelf(SPELL_MAGIC_REFLECTION);
+                                }
+                                else
+                                {
+                                    DoCastSelf(SPELL_DAMAGE_REFLECTION);
+                                }
                                 events.RepeatEvent(30000);
                                 break;
                             }
                             case EVENT_TELEPORT_RANDOM:
                             {
-                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true))
+                                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true))
                                 {
                                     DoCastSelf(SPELL_HATE_TO_ZERO, true);
                                     DoCast(target, SPELL_TELEPORT_RANDOM);
                                 }
 
-                                events.RepeatEvent(15000);
+                                events.RepeatEvent(30000);
                                 break;
                             }
                             case EVENT_TELEPORT_TARGET:
@@ -477,7 +504,7 @@ public:
         {
             if (events.IsInPhase(PHASE_DEFEAT_OUTRO) && spellInfo->Id == SPELL_TELEPORT_SELF)
             {
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 me->SetHomePosition(MajordomoRagnaros);
                 me->NearTeleportTo(MajordomoRagnaros.GetPositionX(), MajordomoRagnaros.GetPositionY(), MajordomoRagnaros.GetPositionZ(), MajordomoRagnaros.GetOrientation());
                 events.SetPhase(PHASE_NONE);
@@ -495,6 +522,7 @@ public:
     private:
         GuidSet static_minionsGUIDS;    // contained data should be changed on encounter completion
         GuidSet aliveMinionsGUIDS;      // used for calculations
+        std::unordered_map<uint32, MajordomoAddData> majordomoSummonsData;
     };
 
     bool OnGossipHello(Player* player, Creature* creature) override
@@ -530,7 +558,7 @@ public:
             case GOSSIP_ACTION_INFO_DEF+3:
             {
                 CloseGossipMenuFor(player);
-                creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 creature->AI()->Talk(SAY_RAG_SUM_1, player);
                 creature->AI()->DoAction(ACTION_START_RAGNAROS_INTRO);
                 break;

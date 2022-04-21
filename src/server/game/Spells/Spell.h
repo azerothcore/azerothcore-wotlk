@@ -172,7 +172,7 @@ public:
 
     float GetDist2d() const { return m_src._position.GetExactDist2d(&m_dst._position); }
     float GetSpeedXY() const { return m_speed * cos(m_elevation); }
-    float GetSpeedZ() const { return m_speed * sin(m_elevation); }
+    float GetSpeedZ() const { return m_speed * std::sin(m_elevation); }
 
     void Update(Unit* caster);
     void OutDebug() const;
@@ -517,7 +517,7 @@ public:
     void HandleEffects(Unit* pUnitTarget, Item* pItemTarget, GameObject* pGOTarget, uint32 i, SpellEffectHandleMode mode);
     void HandleThreatSpells();
 
-    SpellInfo const* m_spellInfo;
+    SpellInfo const* const m_spellInfo;
     Item* m_CastItem;
     Item* m_weaponItem;
     ObjectGuid m_castItemGUID;
@@ -526,6 +526,21 @@ public:
     uint32 m_preCastSpell;
     SpellCastTargets m_targets;
     SpellCustomErrors m_customError;
+
+    void AddComboPointGain(Unit* target, int8 amount)
+    {
+        if (target != m_comboTarget)
+        {
+            m_comboTarget = target;
+            m_comboPointGain = amount;
+        }
+        else
+        {
+            m_comboPointGain += amount;
+        }
+    }
+    Unit* m_comboTarget;
+    int8 m_comboPointGain;
 
     UsedSpellMods m_appliedMods;
 
@@ -559,7 +574,6 @@ public:
     Unit* GetCaster() const { return m_caster; }
     Unit* GetOriginalCaster() const { return m_originalCaster; }
     SpellInfo const* GetSpellInfo() const { return m_spellInfo; }
-    void SetSpellInfo(SpellInfo const* info) { m_spellInfo = info; }
     int32 GetPowerCost() const { return m_powerCost; }
 
     bool UpdatePointers();                              // must be used at call Spell code after time delay (non triggered spell cast/update spell call/etc)
@@ -574,6 +588,8 @@ public:
     std::list<TargetInfo>* GetUniqueTargetInfo() { return &m_UniqueTargetInfo; }
 
     [[nodiscard]] uint32 GetTriggeredByAuraTickNumber() const { return m_triggeredByAuraSpell.tickNumber; }
+
+    [[nodiscard]] TriggerCastFlags GetTriggeredCastFlags() const { return _triggeredCastFlags; }
 
  protected:
     bool HasGlobalCooldown() const;
@@ -825,13 +841,13 @@ typedef void(Spell::*pEffect)(SpellEffIndex effIndex);
 class ReflectEvent : public BasicEvent
 {
     public:
-        ReflectEvent(Unit* caster, ObjectGuid targetGUID, const SpellInfo* spellInfo) : _caster(caster), _targetGUID(targetGUID), _spellInfo(spellInfo) { }
+        ReflectEvent(Unit* caster, ObjectGuid targetGUID, SpellInfo const* spellInfo) : _caster(caster), _targetGUID(targetGUID), _spellInfo(spellInfo) { }
         bool Execute(uint64 e_time, uint32 p_time) override;
 
     protected:
         Unit* _caster;
         ObjectGuid _targetGUID;
-        const SpellInfo* _spellInfo;
+        SpellInfo const* _spellInfo;
 };
 
 #endif

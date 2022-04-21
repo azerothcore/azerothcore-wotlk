@@ -12,13 +12,13 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.character_aura
+-- Дамп структуры для таблица acore_characters.character_aura
 DROP TABLE IF EXISTS `character_aura`;
 CREATE TABLE IF NOT EXISTS `character_aura` (
   `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
   `casterGuid` BIGINT unsigned NOT NULL DEFAULT 0 COMMENT 'Full Global Unique Identifier',
   `itemGuid` BIGINT unsigned NOT NULL DEFAULT 0,
-  `spell` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `spell` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `effectMask` TINYINT unsigned NOT NULL DEFAULT 0,
   `recalculateMask` TINYINT unsigned NOT NULL DEFAULT 0,
   `stackCount` TINYINT unsigned NOT NULL DEFAULT 1,
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `character_aura` (
   PRIMARY KEY (`guid`,`casterGuid`,`itemGuid`,`spell`,`effectMask`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
 
--- Дамп данных таблицы _acore_characters.character_aura: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.character_aura: ~0 rows (приблизительно)
 DELETE FROM `character_aura`;
 /*!40000 ALTER TABLE `character_aura` DISABLE KEYS */;
 /*!40000 ALTER TABLE `character_aura` ENABLE KEYS */;

@@ -15,9 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaBoundary.h"
 #include "ScriptedCreature.h"
 #include "Cell.h"
 #include "CellImpl.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "ObjectMgr.h"
@@ -170,7 +172,6 @@ bool SummonList::IsAnyCreatureInCombat() const
 ScriptedAI::ScriptedAI(Creature* creature) : CreatureAI(creature),
     me(creature),
     IsFleeing(false),
-    _evadeCheckCooldown(2500),
     _isCombatMovementAllowed(true)
 {
     _isHeroic = me->GetMap()->IsHeroic();
@@ -239,7 +240,7 @@ void ScriptedAI::DoPlaySoundToSet(WorldObject* source, uint32 soundId)
 
     if (!sSoundEntriesStore.LookupEntry(soundId))
     {
-        LOG_ERROR("entities.unit.ai", "Invalid soundId %u used in DoPlaySoundToSet (Source: %s)", soundId, source->GetGUID().ToString().c_str());
+        LOG_ERROR("entities.unit.ai", "Invalid soundId {} used in DoPlaySoundToSet (Source: {})", soundId, source->GetGUID().ToString());
         return;
     }
 
@@ -255,7 +256,7 @@ void ScriptedAI::DoPlayMusic(uint32 soundId, bool zone)
         Map::PlayerList const& players = me->GetMap()->GetPlayers();
         targets = new ObjectList();
 
-        if (!players.isEmpty())
+        if (!players.IsEmpty())
         {
             for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
                 if (Player* player = i->GetSource())
@@ -297,7 +298,7 @@ SpellInfo const* ScriptedAI::SelectSpell(Unit* target, uint32 school, uint32 mec
         return nullptr;
 
     //Silenced so we can't cast
-    if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED))
+    if (me->HasUnitFlag(UNIT_FLAG_SILENCED))
         return nullptr;
 
     //Using the extended script system we first create a list of viable spells
@@ -371,7 +372,7 @@ void ScriptedAI::DoResetThreat()
 {
     if (!me->CanHaveThreatList() || me->getThreatMgr().isThreatListEmpty())
     {
-        LOG_ERROR("entities.unit.ai", "DoResetThreat called for creature that either cannot have threat list or has empty threat list (me entry = %d)", me->GetEntry());
+        LOG_ERROR("entities.unit.ai", "DoResetThreat called for creature that either cannot have threat list or has empty threat list (me entry = {})", me->GetEntry());
         return;
     }
 
@@ -400,8 +401,8 @@ void ScriptedAI::DoTeleportPlayer(Unit* unit, float x, float y, float z, float o
     if (Player* player = unit->ToPlayer())
         player->TeleportTo(unit->GetMapId(), x, y, z, o, TELE_TO_NOT_LEAVE_COMBAT);
     else
-        LOG_ERROR("entities.unit.ai", "Creature %s Tried to teleport non-player unit %s to x: %f y:%f z: %f o: %f. Aborted.",
-            me->GetGUID().ToString().c_str(), unit->GetGUID().ToString().c_str(), x, y, z, o);
+        LOG_ERROR("entities.unit.ai", "Creature {} Tried to teleport non-player unit {} to x: {} y:{} z: {} o: {}. Aborted.",
+            me->GetGUID().ToString(), unit->GetGUID().ToString(), x, y, z, o);
 }
 
 void ScriptedAI::DoTeleportAll(float x, float y, float z, float o)
@@ -488,22 +489,6 @@ enum eNPCs
     NPC_FREYA       = 32906,
 };
 
-bool ScriptedAI::EnterEvadeIfOutOfCombatArea()
-{
-    if (me->IsInEvadeMode() || !me->IsInCombat())
-        return false;
-
-    if (_evadeCheckCooldown == time(nullptr))
-        return false;
-    _evadeCheckCooldown = time(nullptr);
-
-    if (!CheckEvadeIfOutOfCombatArea())
-        return false;
-
-    EnterEvadeMode();
-    return true;
-}
-
 Player* ScriptedAI::SelectTargetFromPlayerList(float maxdist, uint32 excludeAura, bool mustBeInLOS) const
 {
     Map::PlayerList const& pList = me->GetMap()->GetPlayers();
@@ -529,9 +514,10 @@ Player* ScriptedAI::SelectTargetFromPlayerList(float maxdist, uint32 excludeAura
 BossAI::BossAI(Creature* creature, uint32 bossId) : ScriptedAI(creature),
     instance(creature->GetInstanceScript()),
     summons(creature),
-    _boundary(instance ? instance->GetBossBoundary(bossId) : nullptr),
     _bossId(bossId)
 {
+    if (instance)
+        SetBoundary(instance->GetBossBoundary(bossId));
 }
 
 void BossAI::_Reset()
@@ -581,57 +567,8 @@ void BossAI::TeleportCheaters()
     ThreatContainer::StorageType threatList = me->getThreatMgr().getThreatList();
     for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
         if (Unit* target = (*itr)->getTarget())
-            if (target->GetTypeId() == TYPEID_PLAYER && !CheckBoundary(target))
+            if (target->GetTypeId() == TYPEID_PLAYER && !IsInBoundary(target))
                 target->NearTeleportTo(x, y, z, 0);
-}
-
-bool BossAI::CheckBoundary(Unit* who)
-{
-    if (!GetBoundary() || !who)
-        return true;
-
-    for (BossBoundaryMap::const_iterator itr = GetBoundary()->begin(); itr != GetBoundary()->end(); ++itr)
-    {
-        switch (itr->first)
-        {
-            case BOUNDARY_N:
-                if (who->GetPositionX() > itr->second)
-                    return false;
-                break;
-            case BOUNDARY_S:
-                if (who->GetPositionX() < itr->second)
-                    return false;
-                break;
-            case BOUNDARY_E:
-                if (who->GetPositionY() < itr->second)
-                    return false;
-                break;
-            case BOUNDARY_W:
-                if (who->GetPositionY() > itr->second)
-                    return false;
-                break;
-            case BOUNDARY_NW:
-                if (who->GetPositionX() + who->GetPositionY() > itr->second)
-                    return false;
-                break;
-            case BOUNDARY_SE:
-                if (who->GetPositionX() + who->GetPositionY() < itr->second)
-                    return false;
-                break;
-            case BOUNDARY_NE:
-                if (who->GetPositionX() - who->GetPositionY() > itr->second)
-                    return false;
-                break;
-            case BOUNDARY_SW:
-                if (who->GetPositionX() - who->GetPositionY() < itr->second)
-                    return false;
-                break;
-            default:
-                break;
-        }
-    }
-
-    return true;
 }
 
 void BossAI::JustSummoned(Creature* summon)
@@ -702,7 +639,7 @@ void WorldBossAI::_JustDied()
 
 void WorldBossAI::_EnterCombat()
 {
-    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true);
+    Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true);
     if (target)
         AttackStart(target);
 }
@@ -710,7 +647,7 @@ void WorldBossAI::_EnterCombat()
 void WorldBossAI::JustSummoned(Creature* summon)
 {
     summons.Summon(summon);
-    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true);
+    Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true);
     if (target)
         summon->AI()->AttackStart(target);
 }

@@ -124,7 +124,7 @@ public:
 
             ArchimondeGUID = instance->GetGuidData(DATA_ARCHIMONDE);
 
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         }
 
         void EnterCombat(Unit* /*who*/) override { }
@@ -319,7 +319,7 @@ public:
         void DoCastProtection()
         {
             // lets get spell info
-            const SpellInfo* info = sSpellMgr->GetSpellInfo(SPELL_PROTECTION_OF_ELUNE);
+            SpellInfo const* info = sSpellMgr->GetSpellInfo(SPELL_PROTECTION_OF_ELUNE);
 
             if (!info)
                 return;
@@ -464,8 +464,8 @@ public:
             else
             {
                 summoned->SetFaction(me->GetFaction());
-                summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                summoned->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                summoned->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             }
 
             if (summoned->GetEntry() == CREATURE_DOOMFIRE_SPIRIT)
@@ -490,7 +490,7 @@ public:
         {
             // Three doomfire can be up at the same time
             Talk(SAY_DOOMFIRE);
-            Unit* temp = SelectTarget(SELECT_TARGET_RANDOM, 1);
+            Unit* temp = SelectTarget(SelectTargetMethod::Random, 1);
             if (!temp)
                 temp = me->GetVictim();
 
@@ -576,7 +576,7 @@ public:
 
                             if (Unit* Nordrassil = ObjectAccessor::GetUnit(*me, WorldTreeGUID))
                             {
-                                Nordrassil->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                                Nordrassil->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                                 Nordrassil->SetDisplayId(11686);
                                 DoCast(Nordrassil, SPELL_DRAIN_WORLD_TREE);
                                 IsChanneling = true;
@@ -647,19 +647,19 @@ public:
                 case EVENT_SPELL_FINGER_OF_DEATH:
                     if (CanUseFingerOfDeath())
                     {
-                        Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0);
+                        Unit* target = SelectTarget(SelectTargetMethod::Random, 0);
                         DoCast(target, SPELL_FINGER_OF_DEATH);
                         DoCastVictim(SPELL_RED_SKY_EFFECT);
                     }
                     events.ScheduleEvent(EVENT_SPELL_FINGER_OF_DEATH, 3500);
                     break;
                 case EVENT_SPELL_GRIP_OF_THE_LEGION:
-                    DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0), SPELL_GRIP_OF_THE_LEGION);
+                    DoCast(SelectTarget(SelectTargetMethod::Random, 0), SPELL_GRIP_OF_THE_LEGION);
                     events.ScheduleEvent(EVENT_SPELL_GRIP_OF_THE_LEGION, urand(5000, 25000));
                     break;
                 case EVENT_SPELL_AIR_BURST:
                     Talk(SAY_AIR_BURST);
-                    DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0), SPELL_AIR_BURST);
+                    DoCast(SelectTarget(SelectTargetMethod::Random, 0), SPELL_AIR_BURST);
                     events.ScheduleEvent(EVENT_SPELL_AIR_BURST, urand(25000, 40000));
                     break;
                 case EVENT_SPELL_FEAR:

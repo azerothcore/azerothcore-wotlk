@@ -152,7 +152,7 @@ bool FleeingMovementGenerator<T>::_getPoint(T* owner, float& x, float& y, float&
         }
 
         temp_x = x + distance * cos(angle);
-        temp_y = y + distance * sin(angle);
+        temp_y = y + distance * std::sin(angle);
         float temp_z = z;
 
         if (!_map->CanReachPositionAndGetValidCoords(owner, temp_x, temp_y, temp_z, true, true))
@@ -160,11 +160,11 @@ bool FleeingMovementGenerator<T>::_getPoint(T* owner, float& x, float& y, float&
             break;
         }
 
-        if (!(temp_z - z) || distance / fabs(temp_z - z) > 1.0f)
+        if (!(temp_z - z) || distance / std::fabs(temp_z - z) > 1.0f)
         {
-            float temp_z_left = _map->GetHeight(owner->GetPhaseMask(), temp_x + 1.0f * cos(angle + static_cast<float>(M_PI / 2)), temp_y + 1.0f * sin(angle + static_cast<float>(M_PI / 2)), z, true);
-            float temp_z_right = _map->GetHeight(owner->GetPhaseMask(), temp_x + 1.0f * cos(angle - static_cast<float>(M_PI / 2)), temp_y + 1.0f * sin(angle - static_cast<float>(M_PI / 2)), z, true);
-            if (fabs(temp_z_left - temp_z) < 1.2f && fabs(temp_z_right - temp_z) < 1.2f)
+            float temp_z_left = _map->GetHeight(owner->GetPhaseMask(), temp_x + 1.0f * cos(angle + static_cast<float>(M_PI / 2)), temp_y + 1.0f * std::sin(angle + static_cast<float>(M_PI / 2)), z, true);
+            float temp_z_right = _map->GetHeight(owner->GetPhaseMask(), temp_x + 1.0f * cos(angle - static_cast<float>(M_PI / 2)), temp_y + 1.0f * std::sin(angle - static_cast<float>(M_PI / 2)), z, true);
+            if (std::fabs(temp_z_left - temp_z) < 1.2f && std::fabs(temp_z_right - temp_z) < 1.2f)
             {
                 // use new values
                 x = temp_x;
@@ -277,7 +277,7 @@ void FleeingMovementGenerator<T>::DoInitialize(T* owner)
     if (!owner)
         return;
 
-    owner->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING);
+    owner->SetUnitFlag(UNIT_FLAG_FLEEING);
     owner->AddUnitState(UNIT_STATE_FLEEING | UNIT_STATE_FLEEING_MOVE);
 
     _Init(owner);
@@ -323,14 +323,14 @@ void FleeingMovementGenerator<Player>::_Init(Player* )
 template<>
 void FleeingMovementGenerator<Player>::DoFinalize(Player* owner)
 {
-    owner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING);
+    owner->RemoveUnitFlag(UNIT_FLAG_FLEEING);
     owner->ClearUnitState(UNIT_STATE_FLEEING | UNIT_STATE_FLEEING_MOVE);
 }
 
 template<>
 void FleeingMovementGenerator<Creature>::DoFinalize(Creature* owner)
 {
-    owner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING);
+    owner->RemoveUnitFlag(UNIT_FLAG_FLEEING);
     owner->ClearUnitState(UNIT_STATE_FLEEING | UNIT_STATE_FLEEING_MOVE);
     if (owner->GetVictim())
         owner->SetTarget(owner->GetVictim()->GetGUID());
@@ -376,7 +376,7 @@ template bool FleeingMovementGenerator<Creature>::DoUpdate(Creature*, uint32);
 
 void TimedFleeingMovementGenerator::Finalize(Unit* owner)
 {
-    owner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING);
+    owner->RemoveUnitFlag(UNIT_FLAG_FLEEING);
     owner->ClearUnitState(UNIT_STATE_FLEEING | UNIT_STATE_FLEEING_MOVE);
     if (owner->GetVictim())
         owner->SetTarget(owner->GetVictim()->GetGUID());

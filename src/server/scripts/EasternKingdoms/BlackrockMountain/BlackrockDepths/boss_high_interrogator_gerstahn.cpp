@@ -65,7 +65,7 @@ public:
             //ShadowWordPain_Timer
             if (ShadowWordPain_Timer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                     DoCast(target, SPELL_SHADOWWORDPAIN);
                 ShadowWordPain_Timer = 7000;
             }
@@ -74,7 +74,7 @@ public:
             //ManaBurn_Timer
             if (ManaBurn_Timer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                     DoCast(target, SPELL_MANABURN);
                 ManaBurn_Timer = 10000;
             }

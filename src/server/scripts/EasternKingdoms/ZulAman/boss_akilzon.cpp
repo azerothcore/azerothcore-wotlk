@@ -189,7 +189,7 @@ public:
                         trigger->SetFaction(FACTION_FRIENDLY);
                         trigger->SetMaxHealth(100000);
                         trigger->SetHealth(100000);
-                        trigger->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        trigger->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         if (Cloud)
                             Cloud->CastCustomSpell(trigger, /*43661*/SPELL_ZAP, &bp0, nullptr, nullptr, true, 0, 0, Cloud->GetGUID());
                     }
@@ -225,7 +225,7 @@ public:
                 {
                     case EVENT_STATIC_DISRUPTION:
                         {
-                            Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1);
+                            Unit* target = SelectTarget(SelectTargetMethod::Random, 1);
                             if (!target)
                                 target = me->GetVictim();
                             if (target)
@@ -241,7 +241,7 @@ public:
                         }
                     case EVENT_GUST_OF_WIND:
                         {
-                            Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1);
+                            Unit* target = SelectTarget(SelectTargetMethod::Random, 1);
                             if (!target)
                                 target = me->GetVictim();
                             if (target)
@@ -255,7 +255,7 @@ public:
                         break;
                     case EVENT_ELECTRICAL_STORM:
                         {
-                            Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50, true);
+                            Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50, true);
                             if (!target)
                             {
                                 EnterEvadeMode();
@@ -284,7 +284,7 @@ public:
                                 Cloud->SetFaction(FACTION_FRIENDLY);
                                 Cloud->SetMaxHealth(9999999);
                                 Cloud->SetHealth(9999999);
-                                Cloud->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                                Cloud->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                             }
                             StormCount = 1;
                             events.ScheduleEvent(EVENT_ELECTRICAL_STORM, 60000); // 60 seconds(bosskillers)
@@ -324,7 +324,7 @@ public:
                             Unit* bird = ObjectAccessor::GetUnit(*me, BirdGUIDs[i]);
                             if (!bird) //they despawned on die
                             {
-                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                                 {
                                     x = target->GetPositionX() + irand(-10, 10);
                                     y = target->GetPositionY() + irand(-10, 10);
@@ -420,7 +420,7 @@ public:
 
             if (arrived)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                 {
                     float x, y, z;
                     if (EagleSwoop_Timer)

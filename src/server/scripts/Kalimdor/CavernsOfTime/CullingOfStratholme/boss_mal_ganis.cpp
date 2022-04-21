@@ -112,8 +112,8 @@ public:
                 damage = 0;
                 finished = true;
                 me->SetRegeneratingHealth(false);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetReactState(REACT_PASSIVE);
                 if (InstanceScript* pInstance = me->GetInstanceScript())
                 {
@@ -149,13 +149,13 @@ public:
                     events.RepeatEvent(7000);
                     break;
                 case EVENT_SPELL_MIND_BLAST:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                         me->CastSpell(target, DUNGEON_MODE(SPELL_MIND_BLAST_N, SPELL_MIND_BLAST_H), false);
                     events.RepeatEvent(6000);
                     break;
                 case EVENT_SPELL_SLEEP:
                     Talk(SAY_SLEEP);
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                         me->CastSpell(target, DUNGEON_MODE(SPELL_SLEEP_N, SPELL_SLEEP_H), false);
                     events.RepeatEvent(17000);
                     break;

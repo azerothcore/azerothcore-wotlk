@@ -105,7 +105,7 @@ public:
                     events.RepeatEvent(urand(15000, 20000));
                     break;
                 case EVENT_SPELL_IMPALE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 10.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 10.0f, true))
                         me->CastSpell(target, SPELL_IMPALE, false);
                     events.RepeatEvent(urand(7500, 12500));
                     break;
@@ -148,8 +148,8 @@ public:
         void Reset() override
         {
             spellTimer = 0;
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         }
 
         void DoAction(int32 param) override
@@ -157,8 +157,8 @@ public:
             if (param != 1)
                 return;
 
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             me->CastSpell(me, SPELL_WARLORDS_RAGE_NAGA, true);
             spellTimer = 1;
         }

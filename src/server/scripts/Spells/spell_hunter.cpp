@@ -34,6 +34,7 @@
 // TODO: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
 
 enum HunterSpells
@@ -276,6 +277,17 @@ class spell_hun_taming_the_beast : public AuraScript
 {
     PrepareAuraScript(spell_hun_taming_the_beast);
 
+    void HandleOnEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* target = GetTarget())
+        {
+            if (Creature* creature = target->ToCreature())
+            {
+                creature->DeleteThreatList();
+            }
+        }
+    }
+
     void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Unit* target = GetTarget())
@@ -285,6 +297,7 @@ class spell_hun_taming_the_beast : public AuraScript
 
     void Register() override
     {
+        OnEffectApply += AuraEffectApplyFn(spell_hun_taming_the_beast::HandleOnEffectApply, EFFECT_0, SPELL_AURA_MOD_CHARM, AURA_EFFECT_HANDLE_REAL);
         OnEffectRemove += AuraEffectRemoveFn(spell_hun_taming_the_beast::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_MOD_CHARM, AURA_EFFECT_HANDLE_REAL);
     }
 };
@@ -397,7 +410,7 @@ class spell_hun_ascpect_of_the_viper : public AuraScript
     void Register() override
     {
         DoCheckProc += AuraCheckProcFn(spell_hun_ascpect_of_the_viper::CheckProc);
-        OnEffectProc += AuraEffectProcFn(spell_hun_ascpect_of_the_viper::HandleProc, EFFECT_0, SPELL_AURA_OBS_MOD_POWER);
+        OnEffectProc += AuraEffectProcFn(spell_hun_ascpect_of_the_viper::HandleProc, EFFECT_2, SPELL_AURA_DUMMY);
         AfterEffectApply += AuraEffectApplyFn(spell_hun_ascpect_of_the_viper::OnApply, EFFECT_0, SPELL_AURA_OBS_MOD_POWER, AURA_EFFECT_HANDLE_REAL);
         AfterEffectRemove += AuraEffectRemoveFn(spell_hun_ascpect_of_the_viper::OnRemove, EFFECT_0, SPELL_AURA_OBS_MOD_POWER, AURA_EFFECT_HANDLE_REAL);
     }
@@ -580,7 +593,7 @@ class spell_hun_masters_call : public SpellScript
 
         // Do a mini Spell::CheckCasterAuras on the pet, no other way of doing this
         SpellCastResult result = SPELL_CAST_OK;
-        uint32 const unitflag = pet->GetUInt32Value(UNIT_FIELD_FLAGS);
+        uint32 const unitflag = pet->GetUnitFlags();
         if (pet->GetCharmerGUID())
             result = SPELL_FAILED_CHARMED;
         else if (unitflag & UNIT_FLAG_STUNNED)
@@ -947,7 +960,20 @@ class spell_hun_tame_beast : public SpellScript
                 return SPELL_FAILED_DONT_REPORT;
             }
 
-            if (caster->GetPetGUID() || player->GetTemporaryUnsummonedPetNumber() || player->IsPetDismissed() || player->GetCharmGUID())
+            PetStable const* petStable = player->GetPetStable();
+            if (petStable)
+            {
+                if (petStable->CurrentPet)
+                    return SPELL_FAILED_ALREADY_HAVE_SUMMON;
+
+                if (petStable->GetUnslottedHunterPet())
+                {
+                    caster->SendTameFailure(PET_TAME_TOO_MANY);
+                    return SPELL_FAILED_DONT_REPORT;
+                }
+            }
+
+            if (player->GetCharmGUID())
             {
                 player->SendTameFailure(PET_TAME_ANOTHER_SUMMON_ACTIVE);
                 return SPELL_FAILED_DONT_REPORT;
@@ -1240,6 +1266,40 @@ class spell_hun_intimidation : public AuraScript
     }
 };
 
+// 19574 - Bestial Wrath
+class spell_hun_bestial_wrath : public SpellScript
+{
+    PrepareSpellScript(spell_hun_bestial_wrath);
+
+    SpellCastResult CheckCast()
+    {
+        Unit* caster = GetCaster();
+        if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
+        {
+            return SPELL_FAILED_NO_VALID_TARGETS;
+        }
+
+        Pet* pet = caster->ToPlayer()->GetPet();
+        if (!pet)
+        {
+            return SPELL_FAILED_NO_PET;
+        }
+
+        if (!pet->IsAlive())
+        {
+            SetCustomCastResultMessage(SPELL_CUSTOM_ERROR_PET_IS_DEAD);
+            return SPELL_FAILED_CUSTOM_ERROR;
+        }
+
+        return SPELL_CAST_OK;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_hun_bestial_wrath::CheckCast);
+    }
+};
+
 void AddSC_hunter_spell_scripts()
 {
     RegisterSpellScript(spell_hun_check_pet_los);
@@ -1269,4 +1329,5 @@ void AddSC_hunter_spell_scripts()
     RegisterSpellScript(spell_hun_volley_trigger);
     RegisterSpellScript(spell_hun_lock_and_load);
     RegisterSpellScript(spell_hun_intimidation);
+    RegisterSpellScript(spell_hun_bestial_wrath);
 }

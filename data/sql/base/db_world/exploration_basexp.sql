@@ -12,15 +12,15 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.exploration_basexp
+-- Дамп структуры для таблица acore_world.exploration_basexp
 DROP TABLE IF EXISTS `exploration_basexp`;
 CREATE TABLE IF NOT EXISTS `exploration_basexp` (
   `level` TINYINT unsigned NOT NULL DEFAULT 0,
-  `basexp` mediumint(9) NOT NULL DEFAULT 0,
+  `basexp` MEDIUMINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Exploration System';
 
--- Дамп данных таблицы _acore_world.exploration_basexp: 80 rows
+-- Дамп данных таблицы acore_world.exploration_basexp: 80 rows
 DELETE FROM `exploration_basexp`;
 /*!40000 ALTER TABLE `exploration_basexp` DISABLE KEYS */;
 INSERT INTO `exploration_basexp` (`level`, `basexp`) VALUES

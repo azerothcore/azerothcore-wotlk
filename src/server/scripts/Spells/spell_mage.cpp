@@ -85,25 +85,6 @@ private:
     uint32 _triggerSpellId;
 };
 
-class spell_mage_deep_freeze : public SpellScript
-{
-    PrepareSpellScript(spell_mage_deep_freeze)
-
-    void HandleOnHit()
-    {
-        if (Unit* caster = GetCaster())
-            if (Unit* target = (caster->ToPlayer() ? caster->ToPlayer()->GetSelectedUnit() : nullptr))
-                if (Creature* cTarget = target->ToCreature())
-                    if (cTarget->HasMechanicTemplateImmunity(1 << (MECHANIC_STUN - 1)))
-                        caster->CastSpell(cTarget, 71757, true);
-    }
-
-    void Register() override
-    {
-        OnHit += SpellHitFn(spell_mage_deep_freeze::HandleOnHit);
-    }
-};
-
 class spell_mage_burning_determination : public AuraScript
 {
     PrepareAuraScript(spell_mage_burning_determination);
@@ -152,7 +133,7 @@ class spell_mage_molten_armor : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        const SpellInfo* spellInfo = eventInfo.GetSpellInfo();
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
         if (!spellInfo || (eventInfo.GetTypeMask() & PROC_FLAG_TAKEN_MELEE_AUTO_ATTACK))
             return true;
 
@@ -364,7 +345,7 @@ class spell_mage_brain_freeze : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        const SpellInfo* spellInfo = eventInfo.GetSpellInfo();
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
         if (!spellInfo)
             return false;
 
@@ -610,7 +591,7 @@ class spell_mage_ice_barrier_aura : public spell_mage_incanters_absorbtion_base_
     PrepareAuraScript(spell_mage_ice_barrier_aura);
 
     // TODO: Rework
-    static int32 CalculateSpellAmount(Unit* caster, int32 amount, const SpellInfo* spellInfo, const AuraEffect* aurEff)
+    static int32 CalculateSpellAmount(Unit* caster, int32 amount, SpellInfo const* spellInfo, const AuraEffect* aurEff)
     {
         // +80.68% from sp bonus
         float bonus = 0.8068f;
@@ -646,7 +627,7 @@ class spell_mage_ice_barrier : public SpellScript
     PrepareSpellScript(spell_mage_ice_barrier);
 
     // TODO: Rework
-    static int32 CalculateSpellAmount(Unit* caster, int32 amount, const SpellInfo* spellInfo, const AuraEffect* aurEff)
+    static int32 CalculateSpellAmount(Unit* caster, int32 amount, SpellInfo const* spellInfo, const AuraEffect* aurEff)
     {
         // +80.68% from sp bonus
         float bonus = 0.8068f;
@@ -938,7 +919,7 @@ class spell_mage_summon_water_elemental : public SpellScript
             if (pet->GetCharmInfo() && caster->ToPlayer())
             {
                 pet->m_CreatureSpellCooldowns.clear();
-                const SpellInfo* spellEntry = sSpellMgr->GetSpellInfo(31707);
+                SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(31707);
                 pet->GetCharmInfo()->ToggleCreatureAutocast(spellEntry, true);
                 pet->GetCharmInfo()->SetSpellAutocast(spellEntry, true);
                 caster->ToPlayer()->CharmSpellInitialize();
@@ -954,7 +935,6 @@ class spell_mage_summon_water_elemental : public SpellScript
 void AddSC_mage_spell_scripts()
 {
     RegisterSpellScript(spell_mage_arcane_blast);
-    RegisterSpellScript(spell_mage_deep_freeze);
     RegisterSpellScript(spell_mage_burning_determination);
     RegisterSpellScript(spell_mage_molten_armor);
     RegisterSpellScript(spell_mage_mirror_image);

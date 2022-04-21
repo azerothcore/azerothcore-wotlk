@@ -95,7 +95,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_VOID_BLAST:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                     {
                         DoCast(target, SPELL_VOID_BLAST);
                         ++VoidBlastCounter;

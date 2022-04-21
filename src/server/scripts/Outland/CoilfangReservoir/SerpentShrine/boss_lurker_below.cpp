@@ -79,7 +79,7 @@ public:
             me->SetReactState(REACT_PASSIVE);
             me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
             me->SetVisible(false);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
             // Reset summons
             summons.DespawnAll();
@@ -99,7 +99,7 @@ public:
                 me->setAttackTimer(BASE_ATTACK, 6000);
                 me->SetVisible(true);
                 me->UpdateObjectVisibility(true);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
                 me->SetInCombatWithZone();
             }
@@ -141,7 +141,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_WHIRL, 18000);
                     break;
                 case EVENT_SPELL_GEYSER:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_GEYSER, false);
                     events.ScheduleEvent(EVENT_SPELL_GEYSER, 10000);
                     break;
@@ -164,14 +164,14 @@ public:
                     events.Reset();
                     events.ScheduleEvent(EVENT_PHASE_1, 60000);
                     me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     for (uint8 i = 0; i < MAX_SUMMONS; ++i)
                         me->SummonCreature(i < 6 ? NPC_COILFANG_AMBUSHER : NPC_COILFANG_GUARDIAN, positions[i].GetPositionX(), positions[i].GetPositionY(), positions[i].GetPositionZ(), positions[i].GetAngle(me), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
                     break;
                 case EVENT_PHASE_1:
                     me->setAttackTimer(BASE_ATTACK, 6000);
                     me->SetStandState(UNIT_STAND_STATE_STAND);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
                     events.Reset();
                     events.ScheduleEvent(EVENT_SPELL_SPOUT, 10000);
@@ -199,7 +199,7 @@ public:
 
             if (target)
                 me->AttackerStateUpdate(target);
-            else if ((target = SelectTarget(SELECT_TARGET_RANDOM, 0)))
+            else if ((target = SelectTarget(SelectTargetMethod::Random, 0)))
                 me->CastSpell(target, SPELL_WATER_BOLT, false);
 
             me->resetAttackTimer();

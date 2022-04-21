@@ -18,7 +18,6 @@
 #include "InstanceScript.h"
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "TemporarySummon.h"
 #include "molten_core.h"
 
@@ -208,6 +207,14 @@ public:
                 case GO_LAVA_SPLASH:
                 {
                     _lavaSplashGUID = go->GetGUID();
+                    break;
+                }
+                case GO_LAVA_BURST:
+                {
+                    if (Creature* ragnaros = instance->GetCreature(_ragnarosGUID))
+                    {
+                        ragnaros->AI()->SetGUID(go->GetGUID(), GO_LAVA_BURST);
+                    }
                     break;
                 }
             }

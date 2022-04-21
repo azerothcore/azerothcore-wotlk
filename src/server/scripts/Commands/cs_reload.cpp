@@ -89,7 +89,8 @@ public:
             { "creature_questender",           HandleReloadCreatureQuestEnderCommand,         SEC_ADMINISTRATOR, Console::Yes },
             { "creature_linked_respawn",       HandleReloadLinkedRespawnCommand,              SEC_ADMINISTRATOR, Console::Yes },
             { "creature_loot_template",        HandleReloadLootTemplatesCreatureCommand,      SEC_ADMINISTRATOR, Console::Yes },
-            { "creature_onkill_reputation",    HandleReloadOnKillReputationCommand,           SEC_ADMINISTRATOR, Console::Yes },
+            { "creature_movement_override",     HandleReloadCreatureMovementOverrideCommand,    SEC_ADMINISTRATOR, Console::Yes},
+            { "creature_onkill_reputation",     HandleReloadOnKillReputationCommand,           SEC_ADMINISTRATOR, Console::Yes },
             { "creature_queststarter",         HandleReloadCreatureQuestStarterCommand,       SEC_ADMINISTRATOR, Console::Yes },
             { "creature_template",             HandleReloadCreatureTemplateCommand,           SEC_ADMINISTRATOR, Console::Yes },
             { "disables",                      HandleReloadDisablesCommand,                   SEC_ADMINISTRATOR, Console::Yes },
@@ -124,6 +125,7 @@ public:
             { "quest_request_item_locale",     HandleReloadLocalesQuestRequestItemsCommand,   SEC_ADMINISTRATOR, Console::Yes },
             { "mail_level_reward",             HandleReloadMailLevelRewardCommand,            SEC_ADMINISTRATOR, Console::Yes },
             { "mail_loot_template",            HandleReloadLootTemplatesMailCommand,          SEC_ADMINISTRATOR, Console::Yes },
+            { "mail_server_template",          HandleReloadMailServerTemplateCommand,         SEC_ADMINISTRATOR, Console::Yes },
             { "milling_loot_template",         HandleReloadLootTemplatesMillingCommand,       SEC_ADMINISTRATOR, Console::Yes },
             { "npc_spellclick_spells",         HandleReloadSpellClickSpellsCommand,           SEC_ADMINISTRATOR, Console::Yes },
             { "npc_trainer",                   HandleReloadNpcTrainerCommand,                 SEC_ADMINISTRATOR, Console::Yes },
@@ -132,6 +134,8 @@ public:
             { "pickpocketing_loot_template",   HandleReloadLootTemplatesPickpocketingCommand, SEC_ADMINISTRATOR, Console::Yes },
             { "points_of_interest",            HandleReloadPointsOfInterestCommand,           SEC_ADMINISTRATOR, Console::Yes },
             { "prospecting_loot_template",     HandleReloadLootTemplatesProspectingCommand,   SEC_ADMINISTRATOR, Console::Yes },
+            { "quest_greeting",                HandleReloadQuestGreetingCommand,              SEC_ADMINISTRATOR, Console::Yes },
+            { "quest_greeting_locale",         HandleReloadLocalesQuestGreetingCommand,       SEC_ADMINISTRATOR, Console::Yes },
             { "quest_poi",                     HandleReloadQuestPOICommand,                   SEC_ADMINISTRATOR, Console::Yes },
             { "quest_template",                HandleReloadQuestTemplateCommand,              SEC_ADMINISTRATOR, Console::Yes },
             { "reference_loot_template",       HandleReloadLootTemplatesReferenceCommand,     SEC_ADMINISTRATOR, Console::Yes },
@@ -194,10 +198,12 @@ public:
 
         HandleReloadDungeonAccessCommand(handler);
         HandleReloadMailLevelRewardCommand(handler);
+        HandleReloadMailServerTemplateCommand(handler);
         HandleReloadCommandCommand(handler);
         HandleReloadReservedNameCommand(handler);
         HandleReloadAcoreStringCommand(handler);
         HandleReloadGameTeleCommand(handler);
+        HandleReloadCreatureMovementOverrideCommand(handler);
 
         HandleReloadVehicleAccessoryCommand(handler);
         HandleReloadVehicleTemplateAccessoryCommand(handler);
@@ -211,7 +217,7 @@ public:
     static bool HandleReloadBattlegroundTemplate(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Battleground Templates...");
-        sBattlegroundMgr->CreateInitialBattlegrounds();
+        sBattlegroundMgr->LoadBattlegroundTemplates();
         handler->SendGlobalGMSysMessage("DB table `battleground_template` reloaded.");
         return true;
     }
@@ -252,9 +258,11 @@ public:
 
     static bool HandleReloadAllQuestCommand(ChatHandler* handler)
     {
+        HandleReloadQuestGreetingCommand(handler);
         HandleReloadQuestAreaTriggersCommand(handler);
         HandleReloadQuestPOICommand(handler);
         HandleReloadQuestTemplateCommand(handler);
+        HandleReloadLocalesQuestGreetingCommand(handler);
 
         LOG_INFO("server.loading", "Re-Loading Quests Relations...");
         sObjectMgr->LoadQuestStartersAndEnders();
@@ -433,7 +441,7 @@ public:
             uint32 entry = Acore::StringTo<uint32>(entryStr).value_or(0);
 
             WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_CREATURE_TEMPLATE);
-            stmt->setUInt32(0, entry);
+            stmt->SetData(0, entry);
             PreparedQueryResult result = WorldDatabase.Query(stmt);
 
             if (!result)
@@ -449,7 +457,7 @@ public:
                 continue;
             }
 
-            LOG_INFO("server.loading", "Reloading creature template entry %u", entry);
+            LOG_INFO("server.loading", "Reloading creature template entry {}", entry);
 
             Field* fields = result->Fetch();
 
@@ -527,6 +535,22 @@ public:
         return true;
     }
 
+    static bool HandleReloadQuestGreetingCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Re-Loading Quest Greeting ...");
+        sObjectMgr->LoadQuestGreetings();
+        handler->SendGlobalGMSysMessage("DB table `quest_greeting` reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadLocalesQuestGreetingCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Re-Loading Quest Greeting locales...");
+        sObjectMgr->LoadQuestGreetingsLocales();
+        handler->SendGlobalGMSysMessage("DB table `quest_greeting_locale` reloaded.");
+        return true;
+    }
+
     static bool HandleReloadQuestTemplateCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Quest Templates...");
@@ -547,6 +571,14 @@ public:
         LootTemplates_Creature.CheckLootRefs();
         handler->SendGlobalGMSysMessage("DB table `creature_loot_template` reloaded.");
         sConditionMgr->LoadConditions(true);
+        return true;
+    }
+
+    static bool HandleReloadCreatureMovementOverrideCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Re-Loading Creature movement overrides...");
+        sObjectMgr->LoadCreatureMovementOverrides();
+        handler->SendGlobalGMSysMessage("DB table `creature_movement_override` reloaded.");
         return true;
     }
 
@@ -1115,6 +1147,14 @@ public:
         LOG_INFO("server.loading", "Re-Loading Player level dependent mail rewards...");
         sObjectMgr->LoadMailLevelRewards();
         handler->SendGlobalGMSysMessage("DB table `mail_level_reward` reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadMailServerTemplateCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Re-Loading `server_mail_template` table");
+        sObjectMgr->LoadMailServerTemplates();
+        handler->SendGlobalGMSysMessage("DB table `server_mail_template` reloaded.");
         return true;
     }
 

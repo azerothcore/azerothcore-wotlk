@@ -163,7 +163,7 @@ public:
             events.Reset();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->DespawnOrUnsummon(1);
         }
@@ -217,7 +217,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_FIREBALL:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_FIREBALL, false);
                     events.ScheduleEvent(EVENT_SPELL_FIREBALL, urand(4000, 6000));
                     break;
@@ -267,7 +267,7 @@ public:
             events.Reset();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             Talk(SAY_WIPE);
             me->DespawnOrUnsummon(1);

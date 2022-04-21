@@ -360,8 +360,8 @@ public:
         void Reset() override
         {
             //Incase wipe during phase that mograine fake death
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
             SayAshbringer = false;
             timer = 0;
@@ -416,7 +416,7 @@ public:
                 me->ClearComboPointHolders();
                 me->RemoveAllAuras();
                 me->ClearAllReactives();
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->CastSpell(me, SPELL_PERMANENT_FEIGN_DEATH, true);
 
                 hasDied = true;
@@ -431,7 +431,7 @@ public:
             Talk(SAY_MO_KILL);
         }
 
-        void SpellHit(Unit* /*who*/, const SpellInfo* spell) override
+        void SpellHit(Unit* /*who*/, SpellInfo const* spell) override
         {
             //When hit with resurrection say text
             if (spell->Id == SPELL_SCARLET_RESURRECTION)
@@ -463,8 +463,8 @@ public:
                 if (Unit* Whitemane = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_WHITEMANE)))
                 {
                     //Incase wipe during phase that mograine fake death
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
                     me->CastSpell(me, SPELL_RETRIBUTION_AURA, true);
                     me->CastSpell(Whitemane, SPELL_LAY_ON_HANDS, true);
@@ -781,7 +781,7 @@ public:
                     if (player->HasAura(AURA_ASHBRINGER) && !SayAshbringer)
                     {
                         me->SetFaction(FACTION_FRIENDLY);
-                        me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         me->SetSheath(SHEATH_STATE_UNARMED);
                         me->CastSpell(me, 57767, true);
                         me->SetDisplayId(16179);

@@ -45,7 +45,7 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
 
     if (source->GetTypeId() == TYPEID_UNIT)
     {
-        npcflags = source->GetUInt32Value(UNIT_NPC_FLAGS);
+        npcflags = source->ToUnit()->GetNpcFlags();
         if (showQuests && npcflags & UNIT_NPC_FLAG_QUESTGIVER)
             PrepareQuestMenu(source->GetGUID());
     }
@@ -80,7 +80,7 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
                         VendorItemData const* vendorItems = itr->second.ActionMenuID ? sObjectMgr->GetNpcVendorItemList(itr->second.ActionMenuID) : creature->GetVendorItems();
                         if (!vendorItems || vendorItems->Empty())
                         {
-                            LOG_ERROR("sql.sql", "Creature %s have UNIT_NPC_FLAG_VENDOR but have empty trading item list.", creature->GetGUID().ToString().c_str());
+                            LOG_ERROR("sql.sql", "Creature {} have UNIT_NPC_FLAG_VENDOR but have empty trading item list.", creature->GetGUID().ToString());
                             canTalk = false;
                         }
                         break;
@@ -143,7 +143,7 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
                         canTalk = false;
                     break;
                 default:
-                    LOG_ERROR("sql.sql", "Creature entry %u has unknown gossip option %u for menu %u", creature->GetEntry(), itr->second.OptionType, itr->second.MenuID);
+                    LOG_ERROR("sql.sql", "Creature entry {} has unknown OptionType {} for menu {}", creature->GetEntry(), itr->second.OptionType, itr->second.MenuID);
                     canTalk = false;
                     break;
             }
@@ -215,7 +215,7 @@ void Player::SendPreparedGossip(WorldObject* source)
     if (source->GetTypeId() == TYPEID_UNIT)
     {
         // in case no gossip flag and quest menu not empty, open quest menu (client expect gossip menu with this flag)
-        if (!source->ToCreature()->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP) && !PlayerTalkClass->GetQuestMenu().Empty())
+        if (!source->ToCreature()->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP) && !PlayerTalkClass->GetQuestMenu().Empty())
         {
             SendPreparedQuest(source->GetGUID());
             return;
@@ -259,7 +259,7 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
 
     if (sWorld->getIntConfig(CONFIG_INSTANT_TAXI) == 2 && source->GetTypeId() == TYPEID_UNIT)
     {
-        if (gossipOptionId == GOSSIP_ACTION_TOGGLE_INSTANT_FLIGHT && source->GetUInt32Value(UNIT_NPC_FLAGS) & UNIT_NPC_FLAG_FLIGHTMASTER)
+        if (gossipOptionId == GOSSIP_ACTION_TOGGLE_INSTANT_FLIGHT && source->ToUnit()->GetNpcFlags() & UNIT_NPC_FLAG_FLIGHTMASTER)
         {
             ToggleInstantFlight();
 
@@ -277,7 +277,7 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
     {
         if (gossipOptionId > GOSSIP_OPTION_QUESTGIVER)
         {
-            LOG_ERROR("entities.player", "Player guid %s request invalid gossip option for GameObject entry %u", GetGUID().ToString().c_str(), source->GetEntry());
+            LOG_ERROR("entities.player", "Player guid {} request invalid gossip option for GameObject entry {}", GetGUID().ToString(), source->GetEntry());
             return;
         }
     }
@@ -382,7 +382,7 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
 
             if (bgTypeId == BATTLEGROUND_TYPE_NONE)
             {
-                LOG_ERROR("entities.player", "A user (%s) requested battlegroundlist from a npc who is no battlemaster", GetGUID().ToString().c_str());
+                LOG_ERROR("entities.player", "A user ({}) requested battlegroundlist from a npc who is no battlemaster", GetGUID().ToString());
                 return;
             }
 

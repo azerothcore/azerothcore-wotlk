@@ -307,12 +307,12 @@ public:
 
 enum ParqualFintallas
 {
-    SPELL_MARK_OF_SHAME         = 6767
+    SPELL_MARK_OF_SHAME             = 6767,
+    QUEST_ID_TEST_OF_LORE           = 6628,
+    GOSSIP_MENU_ID_TEST_OF_LORE     = 4764,
+    GOSSIP_TEXTID_PARQUAL_FINTALLAS = 5821,
+    GOSSIP_TEXTID_TEST_OF_LORE      = 5822,
 };
-
-#define GOSSIP_HPF1             "Gul'dan"
-#define GOSSIP_HPF2             "Kel'Thuzad"
-#define GOSSIP_HPF3             "Ner'zhul"
 
 class npc_parqual_fintallas : public CreatureScript
 {
@@ -338,17 +338,21 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (player->GetQuestStatus(6628) == QUEST_STATUS_INCOMPLETE && !player->HasAura(SPELL_MARK_OF_SHAME))
         {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HPF1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HPF2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HPF3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-            SendGossipMenuFor(player, 5822, creature->GetGUID());
+            player->PrepareQuestMenu(creature->GetGUID());
+        }
+
+        if (player->GetQuestStatus(QUEST_ID_TEST_OF_LORE) == QUEST_STATUS_INCOMPLETE && !player->HasAura(SPELL_MARK_OF_SHAME))
+        {
+            AddGossipItemFor(player, GOSSIP_MENU_ID_TEST_OF_LORE, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_MENU_ID_TEST_OF_LORE, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_MENU_ID_TEST_OF_LORE, 3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            SendGossipMenuFor(player, GOSSIP_TEXTID_TEST_OF_LORE, creature->GetGUID());
         }
         else
-            SendGossipMenuFor(player, 5821, creature->GetGUID());
+        {
+            SendGossipMenuFor(player, GOSSIP_TEXTID_PARQUAL_FINTALLAS, creature->GetGUID());
+        }
 
         return true;
     }
@@ -1007,7 +1011,7 @@ public:
 
         EventMap _events;
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->DeleteThreatList();
             me->CombatStop(true);
@@ -1031,7 +1035,7 @@ public:
             {
                 me->SetCorpseDelay(1);
                 me->SetRespawnTime(1);
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
                 bStepping = false;
                 step = 0;
@@ -1113,7 +1117,7 @@ public:
             switch (summonedCreature->GetEntry())
             {
                 case NPC_GENERATOR:
-                    summonedCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    summonedCreature->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     summonedCreature->ApplySpellImmune(0, IMMUNITY_ID, SPELL_WRYNN_BUFF, true);
                     summonedCreature->ApplySpellImmune(0, IMMUNITY_ID, SPELL_THRALL_BUFF, true);
                     summonedCreature->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
@@ -1146,7 +1150,7 @@ public:
         {
             Map::PlayerList const& players = map->GetPlayers();
 
-            if (!players.isEmpty())
+            if (!players.IsEmpty())
             {
                 for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                 {
@@ -1416,8 +1420,8 @@ public:
                     {
                         thrallGUID = temp->GetGUID();
                         temp->SetReactState(REACT_PASSIVE);
-                        temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                        temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                        temp->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+                        temp->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                         temp->CastSpell(temp, SPELL_THRALL_BUFF);
                         temp->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
                     }
@@ -1425,8 +1429,8 @@ public:
                     {
                         sylvanasGUID = temp->GetGUID();
                         temp->SetReactState(REACT_PASSIVE);
-                        temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                        temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                        temp->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+                        temp->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                         temp->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
                     }
                     for (uint8 i = 0; i < HORDE_FORCE_MAXCOUNT; ++i)
@@ -1435,8 +1439,8 @@ public:
                         {
                             hordeForcesGUID[i] = temp->GetGUID();
                             temp->SetReactState(REACT_PASSIVE);
-                            temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                            temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                            temp->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+                            temp->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                             temp->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
                         }
                     }
@@ -1447,8 +1451,8 @@ public:
                         if (Unit* temp = me->SummonCreature(NPC_SW_SOLDIER, AllianceSpawn[i + 25].x, AllianceSpawn[i + 25].y, AllianceSpawn[i + 25].z, AllianceSpawn[i + 25].o, TEMPSUMMON_MANUAL_DESPAWN))
                         {
                             allianceForcesGUID[i] = temp->GetGUID();
-                            temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                            temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                            temp->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+                            temp->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                             temp->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
                         }
                     }
@@ -1472,7 +1476,7 @@ public:
                     if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
                     {
                         jaina->GetMotionMaster()->Clear();
-                        jaina->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                        jaina->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
                         jaina->SetReactState(REACT_AGGRESSIVE);
                     }
                     SetHoldState(true);
@@ -1816,8 +1820,8 @@ public:
                         case 53:
                             if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
                             {
-                                putress->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                                putress->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                putress->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+                                putress->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                                 putress->AddThreat(me, 100.0f);
                                 me->AddThreat(putress, 100.0f);
                                 putress->RemoveAura(SPELL_PUTRESS_CASTING_STATE);
@@ -1890,7 +1894,7 @@ public:
                         case 66:
                             if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
                                 jaina->AI()->Talk(JAINA_SAY_THRONE_1);
-                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
                             bStepping = false;
                             JumpToNextStep(0);
                             break;
@@ -1903,8 +1907,8 @@ public:
                             if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
                             {
                                 jaina->GetMotionMaster()->MovePoint(0, AllianceWP[8].x, AllianceWP[8].y, AllianceWP[8].z);
-                                jaina->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                                jaina->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                jaina->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+                                jaina->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                             }
                             SetEscortPaused(false);
                             bStepping = false;
@@ -1929,12 +1933,12 @@ public:
                             break;
                         case 73:
                             Talk(WRYNN_SAY_THRONE_9);
-                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
                             if (Creature* thrall = ObjectAccessor::GetCreature(*me, thrallGUID))
                             {
                                 thrall->SetReactState(REACT_AGGRESSIVE);
-                                thrall->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                                thrall->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                thrall->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+                                thrall->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                                 thrall->AddThreat(me, 100.0f);
                                 me->AddThreat(thrall, 100.0f);
                                 thrall->AI()->AttackStart(me);
@@ -1942,8 +1946,8 @@ public:
                             if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasGUID))
                             {
                                 sylvanas->SetReactState(REACT_AGGRESSIVE);
-                                sylvanas->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                                sylvanas->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                sylvanas->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+                                sylvanas->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                                 sylvanas->AddThreat(me, 100.0f);
                                 sylvanas->AI()->AttackStart(me);
                                 me->AddThreat(sylvanas, 100.0f);
@@ -1953,8 +1957,8 @@ public:
                                 if (Creature* temp = ObjectAccessor::GetCreature(*me, hordeForcesGUID[i]))
                                 {
                                     temp->SetReactState(REACT_AGGRESSIVE);
-                                    temp->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                                    temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                    temp->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+                                    temp->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                                 }
                             }
                             for (uint8 i = 0; i < ALLIANCE_FORCE_MAXCOUNT; ++i)
@@ -1965,8 +1969,8 @@ public:
                                     {
                                         temp->SetReactState(REACT_AGGRESSIVE);
                                         temp2->SetReactState(REACT_AGGRESSIVE);
-                                        temp->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
-                                        temp2->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                                        temp->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                                        temp2->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
                                         temp->AddThreat(temp2, 100.0f);
                                         temp->AI()->AttackStart(temp2);
                                         temp2->AddThreat(temp, 100.0f);
@@ -2123,7 +2127,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_FIREBALL:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             DoCast(target, SPELL_FIREBALL);
                         _events.ScheduleEvent(EVENT_FIREBALL, 3 * IN_MILLISECONDS);
                         break;
@@ -2194,7 +2198,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_INFEST:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0, true))
                             DoCast(target, SPELL_INGEST);
                         _events.ScheduleEvent(EVENT_INFEST, 20 * IN_MILLISECONDS);
                         break;
@@ -2349,7 +2353,7 @@ public:
 
         EventMap _events;
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->RemoveAura(SPELL_HEROIC_VANGUARD);
             me->DeleteThreatList();
@@ -2376,7 +2380,7 @@ public:
                 me->Mount(MODEL_WHITE_WULF);
                 me->SetCorpseDelay(1);
                 me->SetRespawnTime(1);
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 me->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
 
                 bStepping = false;
@@ -2440,12 +2444,12 @@ public:
                     summoned->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
                     break;
                 case NPC_VARIMATHRAS_PORTAL:
-                    summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    summoned->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_THRALL_BUFF, true);
                     summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
                     break;
                 case NPC_CAVE_DUMMY:
-                    summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    summoned->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_THRALL_BUFF, true);
                     summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
                     summoned->AddAura(SPELL_CYCLONE_FALL, summoned);
@@ -2534,7 +2538,7 @@ public:
         {
             Map::PlayerList const& players = map->GetPlayers();
 
-            if (!players.isEmpty())
+            if (!players.IsEmpty())
             {
                 for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                 {
@@ -2560,7 +2564,7 @@ public:
             if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
             {
                 sylvanas->GetMotionMaster()->Clear();
-                sylvanas->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                sylvanas->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
                 sylvanas->SetReactState(REACT_AGGRESSIVE);
                 sylvanas->SetFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
                 sylvanas->GetMotionMaster()->MoveFollow(me, 1, M_PI * 0.1f);
@@ -2602,7 +2606,7 @@ public:
                     if (Unit* temp = me->SummonCreature(NPC_VARIMATHRAS, ThrallSpawn[23].x, ThrallSpawn[23].y, ThrallSpawn[23].z, ThrallSpawn[23].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 900 * IN_MILLISECONDS))
                     {
                         ValimathrasGUID = temp->GetGUID();
-                        temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                        temp->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
                     }
                     break;
                 case 3:
@@ -2725,7 +2729,7 @@ public:
                     if (Unit* temp = me->SummonCreature(NPC_VARIMATHRAS, ThrallSpawn[63].x, ThrallSpawn[63].y, ThrallSpawn[63].z, ThrallSpawn[63].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS))
                     {
                         ValimathrasGUID = temp->GetGUID();
-                        temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                        temp->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
                     }
                     break;
                 case 13:
@@ -2816,7 +2820,7 @@ public:
                     if (Creature* temp = me->SummonCreature(NPC_VARIMATHRAS, ThrallSpawn[73].x, ThrallSpawn[73].y, ThrallSpawn[73].z, ThrallSpawn[73].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1200 * IN_MILLISECONDS))
                     {
                         ValimathrasGUID = temp->GetGUID();
-                        temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                        temp->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
                         temp->CastSpell(me, SPELL_AURA_OF_VARIMATHRAS);
                         temp->CastSpell(me, SPELL_OPENING_LEGION_PORTALS);
                         temp->AI()->Talk(SAY_CLOSE_DOOR);
@@ -3667,7 +3671,7 @@ public:
                         case 137:
                             if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
                             {
-                                valimathras->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                                valimathras->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
                                 valimathras->RemoveAura(SPELL_AURA_OF_VARIMATHRAS);
                                 valimathras->RemoveAura(SPELL_OPENING_LEGION_PORTALS);
                                 valimathras->AI()->Talk(SAY_VALIMATHRAS_ATTACK);
@@ -3736,8 +3740,8 @@ public:
                                 if (Creature* temp = me->SummonCreature(NPC_SW_SOLDIER, AllianceSpawn[i + 25].x, AllianceSpawn[i + 25].y, AllianceSpawn[i + 25].z, AllianceSpawn[i + 25].o, TEMPSUMMON_MANUAL_DESPAWN))
                                 {
                                     allianceForcesGUID[i] = temp->GetGUID();
-                                    temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                                    temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                    temp->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+                                    temp->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                                     temp->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
                                     temp->SetReactState(REACT_PASSIVE);
                                     temp->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
@@ -3746,8 +3750,8 @@ public:
                             if (Creature* wrynn = me->SummonCreature(NPC_WRYNN, 1308.862f, 381.809f, -66.044243f, TEMPSUMMON_MANUAL_DESPAWN))
                             {
                                 WrynnGUID = wrynn->GetGUID();
-                                wrynn->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                                wrynn->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                wrynn->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+                                wrynn->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                                 wrynn->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
                                 wrynn->SetReactState(REACT_PASSIVE);
                                 wrynn->GetMotionMaster()->MovePoint(0, 1302.543f, 359.472f, -67.295f, true);
@@ -3755,8 +3759,8 @@ public:
                             if (Creature* jaina = me->SummonCreature(NPC_JAINA, 1308.862f, 381.809f, -66.044243f, TEMPSUMMON_MANUAL_DESPAWN))
                             {
                                 JainaGUID = jaina->GetGUID();
-                                jaina->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                                jaina->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                jaina->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+                                jaina->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                                 jaina->SetReactState(REACT_PASSIVE);
                             }
                             JumpToNextStep(6 * IN_MILLISECONDS);
@@ -3784,11 +3788,11 @@ public:
                             break;
                         // Wrynn Fight
                         case 152:
-                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
                             if (Creature* wrynn = ObjectAccessor::GetCreature(*me, WrynnGUID))
                             {
-                                wrynn->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                                wrynn->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                wrynn->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+                                wrynn->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                                 wrynn->SetReactState(REACT_AGGRESSIVE);
                                 wrynn->AddThreat(me, 100.0f);
                                 me->AddThreat(wrynn, 100.0f);
@@ -3799,7 +3803,7 @@ public:
                             {
                                 if (Creature* temp = ObjectAccessor::GetCreature(*me, allianceForcesGUID[i]))
                                 {
-                                    temp->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                                    temp->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
                                     temp->SetReactState(REACT_AGGRESSIVE);
                                     temp->AddThreat(me, 100.0f);
                                     temp->AI()->AttackStart(me);
@@ -3899,8 +3903,8 @@ public:
                             JumpToNextStep(5 * IN_MILLISECONDS);
                             break;
                         case 163:
-                            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                            me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                             Talk(THRALL_SAY_THRONE_11);
                             UpdateWorldState(me->GetMap(), WORLD_STATE_ROYAL_QUARTER_FIGHT_H, 0);
                             UpdateWorldState(me->GetMap(), WORLD_STATE_INNER_SANKTUM_FIGHT_H, 0);

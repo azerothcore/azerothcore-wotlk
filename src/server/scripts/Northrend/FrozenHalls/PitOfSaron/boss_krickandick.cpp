@@ -93,7 +93,7 @@ public:
                 pInstance->SetData(DATA_ICK, NOT_STARTED);
         }
 
-        bool CanAIAttack(const Unit*  /*who*/) const override
+        bool CanAIAttack(Unit const*  /*who*/) const override
         {
             return pInstance && pInstance->GetData(DATA_INSTANCE_PROGRESS) >= INSTANCE_PROGRESS_FINISHED_INTRO;
         }
@@ -113,7 +113,7 @@ public:
                 pInstance->SetData(DATA_ICK, IN_PROGRESS);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if (!target || !spell)
                 return;
@@ -148,7 +148,7 @@ public:
                     Position myPos(*me), exitPos;
                     float ang = me->GetOrientation() + 3 * M_PI / 2;
                     float dist = 3.0f;
-                    exitPos.Relocate(myPos.GetPositionX() + dist * cos(ang), myPos.GetPositionY() + dist * sin(ang), 515.0f, M_PI);
+                    exitPos.Relocate(myPos.GetPositionX() + dist * cos(ang), myPos.GetPositionY() + dist * std::sin(ang), 515.0f, M_PI);
                     exitPos.m_positionZ = me->GetMap()->GetHeight(exitPos.GetPositionX(), exitPos.GetPositionY(), exitPos.GetPositionZ());
 
                     if (exitPos.GetPositionZ() < 505.0f || exitPos.GetPositionZ() > 512.0f || !me->IsWithinLOS(exitPos.GetPositionX(), exitPos.GetPositionY(), exitPos.GetPositionZ()))
@@ -188,7 +188,7 @@ public:
                 case EVENT_SPELL_TOXIC_WASTE:
                     if (Creature* k = GetKrick())
                         if (!k->HasUnitState(UNIT_STATE_CASTING))
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
                             {
                                 k->CastSpell(target, SPELL_TOXIC_WASTE);
                                 events.RepeatEvent(urand(7000, 10000));
@@ -203,7 +203,7 @@ public:
                 case EVENT_SPELL_SHADOW_BOLT:
                     if (Creature* k = GetKrick())
                         if (!k->HasUnitState(UNIT_STATE_CASTING))
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 35.0f, true))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 35.0f, true))
                             {
                                 k->CastSpell(target, SPELL_SHADOW_BOLT);
                                 events.RepeatEvent(14000);
@@ -223,7 +223,7 @@ public:
                         case 0: // Pursuit
                             if (Creature* k = GetKrick())
                                 k->AI()->Talk(RAND(SAY_TARGET_1, SAY_TARGET_2, SAY_TARGET_3));
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 70.0f, true))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 70.0f, true))
                                 me->CastSpell(target, SPELL_PURSUIT, false);
                             break;
                         case 1: // Poison Nova
@@ -340,7 +340,7 @@ public:
                             float angle = me->GetAngle(c);
                             me->SetFacingTo(angle);
                             float x = me->GetPositionX() + cos(angle) * 7.0f;
-                            float y = me->GetPositionY() + sin(angle) * 7.0f;
+                            float y = me->GetPositionY() + std::sin(angle) * 7.0f;
                             c->GetMotionMaster()->MovePoint(0, x, y, me->GetPositionZ());
                         }
 
@@ -418,9 +418,9 @@ public:
                             c->CastSpell(c, 69753, false);
 
                     me->SetReactState(REACT_PASSIVE);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-                    me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
-                    me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                    me->SetUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
+                    me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
                     me->AddUnitState(UNIT_STATE_DIED);
 
                     me->CastSpell(me, SPELL_KRICK_KILL_CREDIT, true);

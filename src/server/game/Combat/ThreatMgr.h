@@ -139,7 +139,7 @@ class ThreatContainer
 public:
     typedef std::list<HostileReference*> StorageType;
 
-    ThreatContainer() { }
+    ThreatContainer() = default;
 
     ~ThreatContainer() { clearReferences(); }
 
@@ -221,7 +221,7 @@ public:
 
     [[nodiscard]] Unit* GetOwner() const { return iOwner; }
 
-    Unit* getHostilTarget();
+    Unit* getHostileTarget();
 
     void tauntApply(Unit* taunter);
     void tauntFadeOut(Unit* taunter);

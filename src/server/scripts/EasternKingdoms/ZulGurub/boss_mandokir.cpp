@@ -124,7 +124,7 @@ public:
 
             killCount = 0;
             me->RemoveAurasDueToSpell(SPELL_FRENZY);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             summons.DespawnAll();
             instance->SetBossState(DATA_OHGAN, NOT_STARTED);
             me->Mount(MODEL_OHGAN_MOUNT);
@@ -214,7 +214,7 @@ public:
                                     events.ScheduleEvent(EVENT_CHECK_START, 1000);
                                 break;
                             case EVENT_STARTED:
-                                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                                 break;
                             default:
                                 break;
@@ -254,7 +254,7 @@ public:
                             events.ScheduleEvent(EVENT_CHECK_OHGAN, 1000);
                         break;
                     case EVENT_WATCH_PLAYER:
-                        if (Unit* player = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                        if (Unit* player = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                         {
                             DoCast(player, SPELL_WATCH);
                             Talk(SAY_WATCH, player);
@@ -262,7 +262,7 @@ public:
                         events.ScheduleEvent(EVENT_WATCH_PLAYER, urand(12000, 15000));
                         break;
                     case EVENT_CHARGE_PLAYER:
-                        DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0, 40, true), SPELL_CHARGE);
+                        DoCast(SelectTarget(SelectTargetMethod::Random, 0, 40, true), SPELL_CHARGE);
                         events.ScheduleEvent(EVENT_CHARGE_PLAYER, urand(22000, 30000));
                         break;
                     default:

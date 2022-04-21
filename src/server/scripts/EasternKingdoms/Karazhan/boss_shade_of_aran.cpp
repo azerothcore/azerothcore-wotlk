@@ -286,7 +286,7 @@ public:
             {
                 if (!me->IsNonMeleeSpellCast(false))
                 {
-                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true);
+                    Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true);
                     if (!target)
                         return;
 
@@ -330,7 +330,7 @@ public:
                         DoCast(me, SPELL_AOE_CS);
                         break;
                     case 1:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                             DoCast(target, SPELL_CHAINSOFICE);
                         break;
                 }
@@ -412,7 +412,7 @@ public:
 
                 if (ElementalOne)
                 {
-                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
+                    Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true);
                     if (!target)
                         return;
 
@@ -426,7 +426,7 @@ public:
 
                 if (ElementalTwo)
                 {
-                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
+                    Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true);
                     if (!target)
                         return;
 
@@ -440,7 +440,7 @@ public:
 
                 if (ElementalThree)
                 {
-                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
+                    Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true);
                     if (!target)
                         return;
 
@@ -454,7 +454,7 @@ public:
 
                 if (ElementalFour)
                 {
-                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
+                    Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true);
                     if (!target)
                         return;
 
@@ -526,7 +526,7 @@ public:
                 DrinkInturrupted = true;
         }
 
-        void SpellHit(Unit* /*pAttacker*/, const SpellInfo* Spell) override
+        void SpellHit(Unit* /*pAttacker*/, SpellInfo const* Spell) override
         {
             //We only care about interrupt effects and only if they are durring a spell currently being cast
             if ((Spell->Effects[0].Effect != SPELL_EFFECT_INTERRUPT_CAST &&

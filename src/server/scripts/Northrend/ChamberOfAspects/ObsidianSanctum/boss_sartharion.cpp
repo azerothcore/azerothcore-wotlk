@@ -310,7 +310,7 @@ public:
                     continue;
                 }
 
-                dragon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                dragon->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
                 dragon->SetFullHealth();
 
                 ++dragonsCount;
@@ -347,7 +347,7 @@ public:
             me->CallForHelp(500.0f);
         }
 
-        void JustDied(Unit*  /*pKiller*/) override
+        void JustDied(Unit* /*killer*/) override
         {
             RespawnDragons(true);
             _JustDied();
@@ -729,7 +729,7 @@ struct boss_sartharion_dragonAI : public BossAI
         events.Reset();
         ClearInstance();
 
-        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
         me->SetSpeed(MOVE_FLIGHT, 1.0f);
         me->SetCanFly(false);
         me->ResetLootMode();
@@ -790,7 +790,7 @@ struct boss_sartharion_dragonAI : public BossAI
             }
         }
 
-        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
         me->SetInCombatWithZone();
     }
 
@@ -849,7 +849,7 @@ struct boss_sartharion_dragonAI : public BossAI
 
         if (isCalledBySartharion)
         {
-            if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 500, true))
+            if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 500, true))
             {
                 AttackStart(target);
             }
@@ -1088,7 +1088,7 @@ public:
                 }
                 case EVENT_MINIBOSS_SHADOW_FISSURE:
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                     {
                         DoCast(target, SPELL_SHADOW_FISSURE, false);
                     }
@@ -1272,7 +1272,7 @@ public:
                 }
                 case EVENT_MINIBOSS_SHADOW_FISSURE:
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                     {
                         DoCast(target, SPELL_SHADOW_FISSURE, false);
                     }
@@ -1388,7 +1388,7 @@ public:
                 }
                 case EVENT_MINIBOSS_SHADOW_FISSURE:
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                     {
                         DoCast(target, SPELL_SHADOW_FISSURE, false);
                     }

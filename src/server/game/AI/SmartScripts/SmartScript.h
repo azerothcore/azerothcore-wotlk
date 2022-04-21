@@ -36,14 +36,14 @@ public:
     void GetScript();
     void FillScript(SmartAIEventList e, WorldObject* obj, AreaTrigger const* at);
 
-    void ProcessEventsFor(SMART_EVENT e, Unit* unit = nullptr, uint32 var0 = 0, uint32 var1 = 0, bool bvar = false, const SpellInfo* spell = nullptr, GameObject* gob = nullptr);
-    void ProcessEvent(SmartScriptHolder& e, Unit* unit = nullptr, uint32 var0 = 0, uint32 var1 = 0, bool bvar = false, const SpellInfo* spell = nullptr, GameObject* gob = nullptr);
+    void ProcessEventsFor(SMART_EVENT e, Unit* unit = nullptr, uint32 var0 = 0, uint32 var1 = 0, bool bvar = false, SpellInfo const* spell = nullptr, GameObject* gob = nullptr);
+    void ProcessEvent(SmartScriptHolder& e, Unit* unit = nullptr, uint32 var0 = 0, uint32 var1 = 0, bool bvar = false, SpellInfo const* spell = nullptr, GameObject* gob = nullptr);
     bool CheckTimer(SmartScriptHolder const& e) const;
     void RecalcTimer(SmartScriptHolder& e, uint32 min, uint32 max);
     void UpdateTimer(SmartScriptHolder& e, uint32 const diff);
     void InitTimer(SmartScriptHolder& e);
-    void ProcessAction(SmartScriptHolder& e, Unit* unit = nullptr, uint32 var0 = 0, uint32 var1 = 0, bool bvar = false, const SpellInfo* spell = nullptr, GameObject* gob = nullptr);
-    void ProcessTimedAction(SmartScriptHolder& e, uint32 const& min, uint32 const& max, Unit* unit = nullptr, uint32 var0 = 0, uint32 var1 = 0, bool bvar = false, const SpellInfo* spell = nullptr, GameObject* gob = nullptr);
+    void ProcessAction(SmartScriptHolder& e, Unit* unit = nullptr, uint32 var0 = 0, uint32 var1 = 0, bool bvar = false, SpellInfo const* spell = nullptr, GameObject* gob = nullptr);
+    void ProcessTimedAction(SmartScriptHolder& e, uint32 const& min, uint32 const& max, Unit* unit = nullptr, uint32 var0 = 0, uint32 var1 = 0, bool bvar = false, SpellInfo const* spell = nullptr, GameObject* gob = nullptr);
     ObjectList* GetTargets(SmartScriptHolder const& e, Unit* invoker = nullptr);
     ObjectList* GetWorldObjectsInDist(float dist);
     void InstallTemplate(SmartScriptHolder const& e);
@@ -85,6 +85,7 @@ public:
     void OnMoveInLineOfSight(Unit* who);
 
     Unit* DoSelectLowestHpFriendly(float range, uint32 MinHPDiff);
+    Unit* DoSelectLowestHpPercentFriendly(float range, uint32 minHpPct, uint32 maxHpPct) const;
     void DoFindFriendlyCC(std::list<Creature*>& _list, float range);
     void DoFindFriendlyMissingBuff(std::list<Creature*>& list, float range, uint32 spellid);
     Unit* DoFindClosestFriendlyInRange(float range, bool playerOnly);
@@ -116,7 +117,7 @@ public:
             smart = false;
 
         if (!smart)
-            LOG_ERROR("sql.sql", "SmartScript: Action target Creature(entry: %u) is not using SmartAI, action skipped to prevent crash.", c ? c->GetEntry() : (me ? me->GetEntry() : 0));
+            LOG_ERROR("sql.sql", "SmartScript: Action target Creature(entry: {}) is not using SmartAI, action skipped to prevent crash.", c ? c->GetEntry() : (me ? me->GetEntry() : 0));
 
         return smart;
     }
@@ -130,7 +131,7 @@ public:
         if (!go || go->GetAIName() != "SmartGameObjectAI")
             smart = false;
         if (!smart)
-            LOG_ERROR("sql.sql", "SmartScript: Action target GameObject(entry: %u) is not using SmartGameObjectAI, action skipped to prevent crash.", g ? g->GetEntry() : (go ? go->GetEntry() : 0));
+            LOG_ERROR("sql.sql", "SmartScript: Action target GameObject(entry: {}) is not using SmartGameObjectAI, action skipped to prevent crash.", g ? g->GetEntry() : (go ? go->GetEntry() : 0));
 
         return smart;
     }
@@ -143,18 +144,28 @@ public:
         return nullptr;
     }
 
-    void StoreCounter(uint32 id, uint32 value, uint32 reset)
+    void StoreCounter(uint32 id, uint32 value, uint32 reset, uint32 subtract)
     {
         CounterMap::iterator itr = mCounterList.find(id);
         if (itr != mCounterList.end())
         {
-            if (reset == 0)
+            if (!reset && !subtract)
+            {
                 itr->second += value;
+            }
+            else if (subtract)
+            {
+                itr->second -= value;
+            }
             else
+            {
                 itr->second = value;
+            }
         }
         else
+        {
             mCounterList.insert(std::make_pair(id, value));
+        }
 
         ProcessEventsFor(SMART_EVENT_COUNTER_SET, nullptr, id);
     }
@@ -248,26 +259,10 @@ public:
     void SetPhaseReset(bool allow) { _allowPhaseReset = allow; }
 
 private:
-    void IncPhase(uint32 p)
-    {
-        // Xinef: protect phase from overflowing
-        mEventPhase = std::min<uint32>(SMART_EVENT_PHASE_12, mEventPhase + p);
-    }
-
-    void DecPhase(uint32 p)
-    {
-        if (p >= mEventPhase)
-            mEventPhase = 0;
-        else
-            mEventPhase -= p;
-    }
-    bool IsInPhase(uint32 p) const
-    {
-        if (mEventPhase == 0)
-            return false;
-        return (1 << (mEventPhase - 1)) & p;
-    }
-    void SetPhase(uint32 p = 0) { mEventPhase = p; }
+    void IncPhase(uint32 p);
+    void DecPhase(uint32 p);
+    void SetPhase(uint32 p);
+    bool IsInPhase(uint32 p) const;
 
     SmartAIEventList mEvents;
     SmartAIEventList mInstallEvents;

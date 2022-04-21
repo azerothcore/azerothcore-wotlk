@@ -111,12 +111,12 @@ public:
             if (dist(xn, yn, xh, yh) >= dist(xn, yn, xp, yp) || dist(xp, yp, xh, yh) >= dist(xn, yn, xp, yp))
                 return false;
             // check  distance from the beam
-            return (abs((xn - xp) * yh + (yp - yn) * xh - xn * yp + xp * yn) / dist(xn, yn, xp, yp) < 1.5f);
+            return (std::abs((xn - xp) * yh + (yp - yn) * xh - xn * yp + xp * yn) / dist(xn, yn, xp, yp) < 1.5f);
         }
 
         float dist(float xa, float ya, float xb, float yb) // auxiliary method for distance
         {
-            return sqrt((xa - xb) * (xa - xb) + (ya - yb) * (ya - yb));
+            return std::sqrt((xa - xb) * (xa - xb) + (ya - yb) * (ya - yb));
         }
 
         void Reset() override
@@ -270,7 +270,7 @@ public:
             // Void Zone
             if (VoidZoneTimer <= diff)
             {
-                DoCast(SelectTarget(SELECT_TARGET_RANDOM, 1, 45, true), SPELL_VOIDZONE, true);
+                DoCast(SelectTarget(SelectTargetMethod::Random, 1, 45, true), SPELL_VOIDZONE, true);
                 VoidZoneTimer = 15000;
             }
             else
@@ -323,7 +323,7 @@ public:
                 // Netherbreath
                 if (NetherbreathTimer <= diff)
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40, true))
                         DoCast(target, SPELL_NETHERBREATH);
                     NetherbreathTimer = urand(5000, 7000);
                 }

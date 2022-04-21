@@ -113,7 +113,7 @@ public:
                     events.RepeatEvent(20000);
                     break;
                 case EVENT_SPELL_VOID_SHIFT:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 60.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
                     {
                         me->CastSpell(target, SPELL_VOID_SHIFT, false);
                         me->Whisper("Gaze... into the void.", LANG_UNIVERSAL, target->ToPlayer());
@@ -170,11 +170,11 @@ public:
 
         void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
             events.Reset();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             if (pInstance)
                 pInstance->SetData(DATA_FAILED, 1);
         }

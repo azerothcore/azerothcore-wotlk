@@ -106,7 +106,7 @@ public:
         {
             me->SummonGameObject(GO_SAPPHIRON_BIRTH, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, 0, 0, 0, 0, 0);
             me->SetVisible(false);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             me->SetReactState(REACT_PASSIVE);
             ScriptedAI::InitializeAI();
         }
@@ -138,7 +138,7 @@ public:
         void EnterCombatSelfFunction()
         {
             Map::PlayerList const& PlList = me->GetMap()->GetPlayers();
-            if (PlList.isEmpty())
+            if (PlList.IsEmpty())
                 return;
 
             for (const auto& i : PlList)
@@ -194,7 +194,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_ICEBOLT_CAST)
             {
@@ -234,7 +234,7 @@ public:
                 if (spawnTimer >= 21500)
                 {
                     me->SetVisible(true);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->SetReactState(REACT_AGGRESSIVE);
                     spawnTimer = 0;
                 }
@@ -272,7 +272,7 @@ public:
                 case EVENT_BLIZZARD:
                     {
                         Creature* cr;
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
                         {
                             cr = me->SummonCreature(NPC_BLIZZARD, *target, TEMPSUMMON_TIMED_DESPAWN, 16000);
                         }

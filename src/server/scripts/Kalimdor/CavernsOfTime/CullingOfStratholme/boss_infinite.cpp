@@ -149,7 +149,7 @@ public:
                     events.RepeatEvent(8000);
                     break;
                 case EVENT_SPELL_CORRUPTING_BLIGHT:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                         me->CastSpell(target, SPELL_CORRUPTING_BLIGHT, false);
                     events.RepeatEvent(12000);
                     break;

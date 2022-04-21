@@ -82,7 +82,7 @@ public:
         i_timer[3].Reset();
     }
 
-    //void LoadGrid(int mapid, int instId, float x, float y, const WorldObject* obj, bool no_unload = false);
+    //void LoadGrid(int mapid, int instId, float x, float y, WorldObject const* obj, bool no_unload = false);
     void UnloadAll();
 
     static bool ExistMapAndVMap(uint32 mapid, float x, float y);
@@ -121,11 +121,11 @@ public:
         if (o < 0)
         {
             float mod = o * -1;
-            mod = fmod(mod, 2.0f * static_cast<float>(M_PI));
+            mod = std::fmod(mod, 2.0f * static_cast<float>(M_PI));
             mod = -mod + 2.0f * static_cast<float>(M_PI);
             return mod;
         }
-        return fmod(o, 2.0f * static_cast<float>(M_PI));
+        return std::fmod(o, 2.0f * static_cast<float>(M_PI));
     }
 
     void DoDelayedMovesAndRemoves();

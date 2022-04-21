@@ -93,7 +93,7 @@ public:
         {
             SetCombatMovement(false);
             SetEquipmentSlots(false, 54806, EQUIP_UNEQUIP, EQUIP_UNEQUIP);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             InvokerGUID.Clear();
             events.Reset();
             events.RescheduleEvent(EVENT_EMERGE, 12000);
@@ -134,7 +134,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim() && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+            if (!UpdateVictim() && !me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                 return;
 
             events.Update(diff);
@@ -179,11 +179,11 @@ public:
                     me->SetInCombatWithZone();
                     if (!me->IsInCombat())
                     {
-                        EnterEvadeMode();
+                        EnterEvadeMode(EVADE_REASON_OTHER);
                         return;
                     }
                     else
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     break;
                 case EVENT_TOTEMS_ATTACK:
                     for (uint8 i = 0; i < 3; ++i)
@@ -193,7 +193,7 @@ public:
                     break;
                 case EVENT_SUBMERGE:
                     me->TextEmote(TEXT_RETREAT, nullptr, true);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->CastSpell(me, SPELL_SUBMERGE_0, true);
                     me->CastSpell(me, SPELL_SELF_STUN, true);
                     if (Creature* c = DoSummon(NPC_FROZEN_CORE, *me, 24000, TEMPSUMMON_TIMED_DESPAWN))
@@ -208,7 +208,7 @@ public:
                     me->TextEmote(TEXT_RESURFACE, nullptr, true);
                     break;
                 case EVENT_COMBAT_EMERGE:
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->RemoveAura(SPELL_SELF_STUN);
                     me->CastSpell(me, SPELL_EMERGE_0, false);
                     // me->CastSpell(me, SPELL_AHUNE_RESURFACES, true); // done in SummonedCreatureDespawn
@@ -217,7 +217,7 @@ public:
                     break;
 
                 case EVENT_SPELL_COLD_SLAP:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_NEAREST, 0, 5.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 5.0f, true))
                         if (target->GetPositionZ() < me->GetPositionZ() + 6.0f)
                         {
                             int32 dmg = urand(5500, 6000);
@@ -232,7 +232,7 @@ public:
                     {
                         float dist = (float)urand(3, 10);
                         float angle = rand_norm() * 2 * M_PI;
-                        me->CastSpell(MinionSummonPos.GetPositionX() + cos(angle)*dist, MinionSummonPos.GetPositionY() + sin(angle)*dist, MinionSummonPos.GetPositionZ(), SPELL_SUMMON_HAILSTONE, false);
+                        me->CastSpell(MinionSummonPos.GetPositionX() + cos(angle)*dist, MinionSummonPos.GetPositionY() + std::sin(angle)*dist, MinionSummonPos.GetPositionZ(), SPELL_SUMMON_HAILSTONE, false);
                         events.RepeatEvent(30000);
                     }
                     break;
@@ -241,12 +241,12 @@ public:
                     {
                         float dist = (float)urand(3, 10);
                         float angle = rand_norm() * 2 * M_PI;
-                        me->CastSpell(MinionSummonPos.GetPositionX() + cos(angle)*dist, MinionSummonPos.GetPositionY() + sin(angle)*dist, MinionSummonPos.GetPositionZ(), SPELL_SUMMON_COLDWAVE, false);
+                        me->CastSpell(MinionSummonPos.GetPositionX() + cos(angle)*dist, MinionSummonPos.GetPositionY() + std::sin(angle)*dist, MinionSummonPos.GetPositionZ(), SPELL_SUMMON_COLDWAVE, false);
                     }
                     {
                         float dist = (float)urand(3, 10);
                         float angle = rand_norm() * 2 * M_PI;
-                        me->CastSpell(MinionSummonPos.GetPositionX() + cos(angle)*dist, MinionSummonPos.GetPositionY() + sin(angle)*dist, MinionSummonPos.GetPositionZ(), SPELL_SUMMON_FROSTWIND, false);
+                        me->CastSpell(MinionSummonPos.GetPositionX() + cos(angle)*dist, MinionSummonPos.GetPositionY() + std::sin(angle)*dist, MinionSummonPos.GetPositionZ(), SPELL_SUMMON_FROSTWIND, false);
                     }
                     events.RepeatEvent(6000);
                     break;
@@ -260,14 +260,14 @@ public:
 
         void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             events.Reset();
             summons.DespawnAll();
             me->DespawnOrUnsummon(1);
 
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void JustSummoned(Creature* summon) override
@@ -302,7 +302,7 @@ public:
 
             bool finished = false;
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
-            if (!players.isEmpty())
+            if (!players.IsEmpty())
                 for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
                     if (Player* player = i->GetSource())
                     {

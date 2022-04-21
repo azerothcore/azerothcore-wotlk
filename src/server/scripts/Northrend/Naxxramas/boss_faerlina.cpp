@@ -203,7 +203,7 @@ public:
                     events.RepeatEvent(urand(7000, 15000));
                     break;
                 case EVENT_RAIN_OF_FIRE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                     {
                         me->CastSpell(target, RAID_MODE(SPELL_RAIN_OF_FIRE_10, SPELL_RAIN_OF_FIRE_25), false);
                     }
@@ -226,7 +226,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (spell->Id == RAID_MODE(SPELL_WIDOWS_EMBRACE, SPELL_MINION_WIDOWS_EMBRACE))
             {

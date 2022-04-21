@@ -450,7 +450,7 @@ public:
 #define GOSSIP_HOSTAGE1        "I am glad to help you."
 
 static uint32 HostageEntry[] = {23790, 23999, 24024, 24001};
-static uint32 ChestEntry[] = {186648, 187021, 186672, 186667};
+static uint32 ChestEntry[] = {186648, 187021, 186667, 186672};
 
 class npc_zulaman_hostage : public CreatureScript
 {
@@ -503,10 +503,10 @@ public:
         if (action == GOSSIP_ACTION_INFO_DEF + 1)
             CloseGossipMenuFor(player);
 
-        if (!creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
+        if (!creature->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
             return true;
 
-        creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+        creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
         InstanceScript* instance = creature->GetInstanceScript();
         if (instance)
@@ -626,14 +626,14 @@ public:
             {
                 CloseGossipMenuFor(player);
                 me->SetFacingToObject(player);
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 Talk(SAY_HARRISON_0);
                 _gongEvent = GONG_EVENT_1;
                 _gongTimer = 4000;
             }
         }
 
-        void SpellHit(Unit*, const SpellInfo* spell) override
+        void SpellHit(Unit*, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_COSMETIC_SPEAR_THROW)
             {
@@ -642,7 +642,7 @@ public:
                 me->SetDisplayId(MODEL_HARRISON_JONES_2);
                 me->SetTarget();
                 me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_DEAD);
-                me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
                 instance->SetData(DATA_GONGEVENT, DONE);
             }
         }
@@ -671,14 +671,14 @@ public:
                             break;
                         case GONG_EVENT_3:
                             if (GameObject* gong = me->GetMap()->GetGameObject(instance->GetGuidData(GO_STRANGE_GONG)))
-                                gong->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                                gong->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                             _gongEvent = GONG_EVENT_4;
                             _gongTimer = 105000;
                             break;
                         case GONG_EVENT_4:
                             me->RemoveAura(SPELL_BANGING_THE_GONG);
                             if (GameObject* gong = me->GetMap()->GetGameObject(instance->GetGuidData(GO_STRANGE_GONG)))
-                                gong->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                                gong->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
 
                             // trigger or gong will need to be scripted to set IN_PROGRESS after enough hits.
                             // This is temp workaround.
@@ -724,13 +724,13 @@ public:
                                             if (ptarget->GetPositionX() > 120)
                                             {
                                                 ptarget->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(WEAPON_SPEAR));
-                                                ptarget->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                                ptarget->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                                                 ptarget->SetReactState(REACT_PASSIVE);
                                                 ptarget->AI()->SetData(0, 1);
                                             }
                                             else
                                             {
-                                                ptarget->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                                ptarget->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                                                 ptarget->SetReactState(REACT_PASSIVE);
                                                 ptarget->AI()->SetData(0, 2);
                                             }
@@ -763,7 +763,7 @@ public:
                             _gongTimer = 6000;
                             break;
                         case GONG_EVENT_11:
-                            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
                             instance->SetData(DATA_GONGEVENT, NOT_STARTED);
                             _gongEvent = 0;

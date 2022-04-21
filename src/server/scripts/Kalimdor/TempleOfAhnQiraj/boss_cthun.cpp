@@ -199,7 +199,7 @@ public:
             //Reset flags
             me->RemoveAurasDueToSpell(SPELL_RED_COLORATION);
             me->RemoveAurasDueToSpell(SPELL_FREEZE_ANIM);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
             me->SetVisible(true);
 
             //Reset Phase
@@ -220,7 +220,7 @@ public:
         void SpawnEyeTentacle(float x, float y)
         {
             if (Creature* Spawned = DoSpawnCreature(NPC_EYE_TENTACLE, x, y, 0, 0, TEMPSUMMON_CORPSE_DESPAWN, 500))
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                     if (Spawned->AI())
                         Spawned->AI()->AttackStart(target);
         }
@@ -260,7 +260,7 @@ public:
                     if (BeamTimer <= diff)
                     {
                         //SPELL_GREEN_BEAM
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         {
                             me->InterruptNonMeleeSpells(false);
                             DoCast(target, SPELL_GREEN_BEAM);
@@ -277,7 +277,7 @@ public:
                     //ClawTentacleTimer
                     if (ClawTentacleTimer <= diff)
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         {
                             //Spawn claw tentacle on the random target
                             Creature* spawned = me->SummonCreature(NPC_CLAW_TENTACLE, *target, TEMPSUMMON_CORPSE_DESPAWN, 500);
@@ -306,7 +306,7 @@ public:
                         me->SetTarget();
 
                         //Select random target for dark beam to start on
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         {
                             //Face our target
                             DarkGlareAngle = me->GetAngle(target);
@@ -423,7 +423,7 @@ public:
                     me->RemoveAurasDueToSpell(SPELL_RED_COLORATION);
 
                     //Reset to normal emote state and prevent select and attack
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
 
                     //Remove Target field
                     me->SetTarget();
@@ -522,7 +522,7 @@ public:
 
             //Reset flags
             me->RemoveAurasDueToSpell(SPELL_TRANSFORM);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
             me->SetVisible(false);
 
             instance->SetData(DATA_CTHUN_PHASE, PHASE_NOT_STARTED);
@@ -593,7 +593,7 @@ public:
                     //Play random sound to the zone
                     Map::PlayerList const& PlayerList = map->GetPlayers();
 
-                    if (!PlayerList.isEmpty())
+                    if (!PlayerList.IsEmpty())
                     {
                         for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
                         {
@@ -650,7 +650,7 @@ public:
                         me->SetFullHealth();
 
                         me->SetVisible(true);
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
 
                         //Emerging phase
                         //AttackStart(ObjectAccessor::GetUnit(*me, HoldpPlayer));
@@ -967,7 +967,7 @@ public:
             //MindflayTimer
             if (MindflayTimer <= diff)
             {
-                Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0);
+                Unit* target = SelectTarget(SelectTargetMethod::Random, 0);
                 if (target && !target->HasAura(SPELL_DIGESTIVE_ACID))
                     DoCast(target, SPELL_MIND_FLAY);
 
@@ -1043,7 +1043,7 @@ public:
                     //Dissapear and reappear at new position
                     me->SetVisible(false);
 
-                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0);
+                    Unit* target = SelectTarget(SelectTargetMethod::Random, 0);
                     if (!target)
                     {
                         Unit::Kill(me, me);
@@ -1157,7 +1157,7 @@ public:
                     //Dissapear and reappear at new position
                     me->SetVisible(false);
 
-                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0);
+                    Unit* target = SelectTarget(SelectTargetMethod::Random, 0);
                     if (!target)
                     {
                         Unit::Kill(me, me);
@@ -1265,7 +1265,7 @@ public:
             //BeamTimer
             if (BeamTimer <= diff)
             {
-                Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0);
+                Unit* target = SelectTarget(SelectTargetMethod::Random, 0);
                 if (target && !target->HasAura(SPELL_DIGESTIVE_ACID))
                     DoCast(target, SPELL_GREEN_BEAM);
 
