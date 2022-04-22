@@ -118,6 +118,9 @@ public:
         {
             _EnterCombat();
             Talk(SAY_AGGRO);
+            me->RemoveAurasDueToSpell(SPELL_GREEN_CHANNELING);
+            me->SetDisableGravity(true);
+            DoCast(me, SPELL_BAT_FORM);
             events.SetPhase(PHASE_ONE);
 
             events.ScheduleEvent(EVENT_CHARGE_JEKLIK, urand(10000, 20000), PHASE_ONE);
@@ -125,11 +128,7 @@ public:
             events.ScheduleEvent(EVENT_BLOOD_LEECH, urand(5000, 15000), PHASE_ONE);
             events.ScheduleEvent(EVENT_SONIC_BURST, urand(5000, 15000), PHASE_ONE);
             events.ScheduleEvent(EVENT_SWOOP, 20000, PHASE_ONE);
-            events.ScheduleEvent(EVENT_SPAWN_BATS, 30000, PHASE_ONE);
-
-            me->SetDisableGravity(true);
-            me->RemoveAurasDueToSpell(SPELL_GREEN_CHANNELING);
-            DoCast(me, SPELL_BAT_FORM);
+            events.ScheduleEvent(EVENT_SPAWN_BATS, 30000, PHASE_ONE); 
         }
 
         void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
@@ -166,6 +165,7 @@ public:
             {
                 switch (eventId)
                 {
+                    // Phase one
                     case EVENT_CHARGE_JEKLIK:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         {
