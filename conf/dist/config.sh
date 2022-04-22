@@ -215,7 +215,7 @@ DB_WORLD_CUSTOM_PATHS=(
     "$SRCPATH/data/sql/custom/db_world/"
 )
 
-################################################
+##############################################
 #
 #  DB EXPORTER/IMPORTER CONFIGURATIONS
 #
