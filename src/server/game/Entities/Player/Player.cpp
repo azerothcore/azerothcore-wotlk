@@ -2266,7 +2266,7 @@ bool Player::IsGroupVisibleFor(Player const* p) const
 
 bool Player::IsInSameGroupWith(Player const* p) const
 {
-    return p == this || (GetGroup() != nullptr &&
+    return p == this || (GetGroup() &&
                          GetGroup() == p->GetGroup() &&
                          GetGroup()->SameSubGroup(this, p));
 }
@@ -3741,7 +3741,7 @@ void Player::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) c
     {
         for (uint8 i = 0; i < EQUIPMENT_SLOT_END; ++i)
         {
-            if (m_items[i] == nullptr)
+            if (!m_items[i])
                 continue;
 
             m_items[i]->BuildCreateUpdateBlockForPlayer(data, target);
@@ -3749,14 +3749,14 @@ void Player::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) c
 
         for (uint8 i = INVENTORY_SLOT_BAG_START; i < BANK_SLOT_BAG_END; ++i)
         {
-            if (m_items[i] == nullptr)
+            if (!m_items[i])
                 continue;
 
             m_items[i]->BuildCreateUpdateBlockForPlayer(data, target);
         }
         for (uint8 i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; ++i)
         {
-            if (m_items[i] == nullptr)
+            if (!m_items[i])
                 continue;
 
             m_items[i]->BuildCreateUpdateBlockForPlayer(data, target);
@@ -3772,7 +3772,7 @@ void Player::DestroyForPlayer(Player* target, bool onDeath) const
 
     for (uint8 i = 0; i < EQUIPMENT_SLOT_END; ++i) // xinef: previously INVENTORY_SLOT_BAG_END
     {
-        if (m_items[i] == nullptr)
+        if (!m_items[i])
             continue;
 
         m_items[i]->DestroyForPlayer(target);
@@ -3782,14 +3782,14 @@ void Player::DestroyForPlayer(Player* target, bool onDeath) const
     {
         for (uint8 i = INVENTORY_SLOT_BAG_START; i < BANK_SLOT_BAG_END; ++i)
         {
-            if (m_items[i] == nullptr)
+            if (!m_items[i])
                 continue;
 
             m_items[i]->DestroyForPlayer(target);
         }
         for (uint8 i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; ++i)
         {
-            if (m_items[i] == nullptr)
+            if (!m_items[i])
                 continue;
 
             m_items[i]->DestroyForPlayer(target);
@@ -4978,7 +4978,7 @@ float Player::GetMeleeCritFromAgility()
 
     GtChanceToMeleeCritBaseEntry const* critBase  = sGtChanceToMeleeCritBaseStore.LookupEntry(pclass - 1);
     GtChanceToMeleeCritEntry     const* critRatio = sGtChanceToMeleeCritStore.LookupEntry((pclass - 1) * GT_MAX_LEVEL + level - 1);
-    if (critBase == nullptr || critRatio == nullptr)
+    if (!critBase || !critRatio)
         return 0.0f;
 
     float crit = critBase->base + GetStat(STAT_AGILITY) * critRatio->ratio;
@@ -5026,7 +5026,7 @@ void Player::GetDodgeFromAgility(float& diminishing, float& nondiminishing)
 
     // Dodge per agility is proportional to crit per agility, which is available from DBC files
     GtChanceToMeleeCritEntry  const* dodgeRatio = sGtChanceToMeleeCritStore.LookupEntry((pclass - 1) * GT_MAX_LEVEL + level - 1);
-    if (dodgeRatio == nullptr || pclass > MAX_CLASSES)
+    if (!dodgeRatio || pclass > MAX_CLASSES)
         return;
 
     // TODO: research if talents/effects that increase total agility by x% should increase non-diminishing part
@@ -5048,7 +5048,7 @@ float Player::GetSpellCritFromIntellect()
 
     GtChanceToSpellCritBaseEntry const* critBase  = sGtChanceToSpellCritBaseStore.LookupEntry(pclass - 1);
     GtChanceToSpellCritEntry     const* critRatio = sGtChanceToSpellCritStore.LookupEntry((pclass - 1) * GT_MAX_LEVEL + level - 1);
-    if (critBase == nullptr || critRatio == nullptr)
+    if (!critBase || !critRatio)
         return 0.0f;
 
     float crit = critBase->base + GetStat(STAT_INTELLECT) * critRatio->ratio;
@@ -5100,7 +5100,7 @@ float Player::OCTRegenHPPerSpirit()
 
     GtOCTRegenHPEntry     const* baseRatio = sGtOCTRegenHPStore.LookupEntry((pclass - 1) * GT_MAX_LEVEL + level - 1);
     GtRegenHPPerSptEntry  const* moreRatio = sGtRegenHPPerSptStore.LookupEntry((pclass - 1) * GT_MAX_LEVEL + level - 1);
-    if (baseRatio == nullptr || moreRatio == nullptr)
+    if (!baseRatio || !moreRatio)
         return 0.0f;
 
     // Formula from PaperDollFrame script
@@ -5123,7 +5123,7 @@ float Player::OCTRegenMPPerSpirit()
 
     //    GtOCTRegenMPEntry     const* baseRatio = sGtOCTRegenMPStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + level-1);
     GtRegenMPPerSptEntry  const* moreRatio = sGtRegenMPPerSptStore.LookupEntry((pclass - 1) * GT_MAX_LEVEL + level - 1);
-    if (moreRatio == nullptr)
+    if (!moreRatio)
         return 0.0f;
 
     // Formula get from PaperDollFrame script
@@ -6045,7 +6045,7 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
         }
     }
 
-    if (uVictim != nullptr)
+    if (uVictim)
     {
         if (groupsize > 1)
             honor_f /= groupsize;
@@ -9781,7 +9781,7 @@ void Player::DropModCharge(SpellModifier* mod, Spell* spell)
 
 void Player::SetSpellModTakingSpell(Spell* spell, bool apply)
 {
-    if (apply && m_spellModTakingSpell != nullptr)
+    if (apply && m_spellModTakingSpell)
     {
         LOG_INFO("misc", "Player::SetSpellModTakingSpell (A1) - {}, {}", spell->m_spellInfo->Id, m_spellModTakingSpell->m_spellInfo->Id);
         return;
@@ -11218,7 +11218,7 @@ void Player::SetSelection(ObjectGuid guid)
 
 void Player::SetGroup(Group* group, int8 subgroup)
 {
-    if (group == nullptr)
+    if (!group)
         m_group.unlink();
     else
     {
@@ -12762,7 +12762,7 @@ void Player::RemoveFromBattlegroundOrBattlefieldRaid()
 
 void Player::SetOriginalGroup(Group* group, int8 subgroup)
 {
-    if (group == nullptr)
+    if (!group)
         m_originalGroup.unlink();
     else
     {
@@ -13176,7 +13176,7 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
     // Xinef: exploit protection, dont allow to loot normal items if player is not master loot and not below loot threshold
     // Xinef: only quest, ffa and conditioned items
     if (!item->is_underthreshold && loot->roundRobinPlayer && !GetLootGUID().IsItem() && GetGroup() && GetGroup()->GetLootMethod() == MASTER_LOOT && GetGUID() != GetGroup()->GetMasterLooterGuid())
-        if (qitem == nullptr && ffaitem == nullptr && conditem == nullptr)
+        if (!qitem && !ffaitem && !conditem)
         {
             SendLootRelease(GetLootGUID());
             return;

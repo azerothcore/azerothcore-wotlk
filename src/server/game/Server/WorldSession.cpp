@@ -183,7 +183,7 @@ WorldSession::~WorldSession()
 
 std::string const& WorldSession::GetPlayerName() const
 {
-    return _player != nullptr ? _player->GetName() : DefaultPlayerName;
+    return _player ? _player->GetName() : DefaultPlayerName;
 }
 
 std::string WorldSession::GetPlayerInfo() const

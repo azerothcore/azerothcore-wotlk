@@ -905,7 +905,7 @@ namespace MMAP
     void TerrainBuilder::loadOffMeshConnections(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData, const char* offMeshFilePath)
     {
         // no meshfile input given?
-        if (offMeshFilePath == nullptr)
+        if (!offMeshFilePath)
             return;
 
         FILE* fp = fopen(offMeshFilePath, "rb");
