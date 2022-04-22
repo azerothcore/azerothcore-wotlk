@@ -32,11 +32,6 @@
 #include "Vehicle.h"
 #include "World.h"
 
-#define GOSSIP_HELLO_DEMO1  "Build catapult."
-#define GOSSIP_HELLO_DEMO2  "Build demolisher."
-#define GOSSIP_HELLO_DEMO3  "Build siege engine."
-#define GOSSIP_HELLO_DEMO4  "I cannot build more!"
-
 enum eWGqueuenpctext
 {
     WG_NPCQUEUE_TEXT_H_NOWAR            = 14775,
@@ -134,21 +129,20 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (canBuild(creature))
         {
-            if (player->HasAura(SPELL_CORPORAL))
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-            else if (player->HasAura(SPELL_LIEUTENANT))
-            {
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-            }
+            player->PrepareQuestMenu(creature->GetGUID());
         }
-        else
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
+
+        if (player->HasAura(SPELL_CORPORAL))
+        {
+            AddGossipItemFor(player, 9923, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+        }
+        else if (player->HasAura(SPELL_LIEUTENANT))
+        {
+            AddGossipItemFor(player, 9923, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+            AddGossipItemFor(player, 9923, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, 9923, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+        }
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         return true;
@@ -158,21 +152,33 @@ public:
     {
         CloseGossipMenuFor(player);
 
+        uint32 spellId = 0;
+        switch (action - GOSSIP_ACTION_INFO_DEF)
+        {
+        case 0:
+            spellId = SPELL_BUILD_CATAPULT_FORCE;
+            break;
+        case 1:
+            spellId = SPELL_BUILD_DEMOLISHER_FORCE;
+            break;
+        case 2:
+            spellId = player->GetTeamId() == TEAM_ALLIANCE ? SPELL_BUILD_SIEGE_VEHICLE_FORCE_ALLIANCE : SPELL_BUILD_SIEGE_VEHICLE_FORCE_HORDE;
+            break;
+        }
+
         if (canBuild(creature))
         {
-            switch (action - GOSSIP_ACTION_INFO_DEF)
-            {
-                case 0:
-                    creature->CastSpell(player, SPELL_BUILD_CATAPULT_FORCE, true);
-                    break;
-                case 1:
-                    creature->CastSpell(player, SPELL_BUILD_DEMOLISHER_FORCE, true);
-                    break;
-                case 2:
-                    creature->CastSpell(player, player->GetTeamId() == TEAM_ALLIANCE ? SPELL_BUILD_SIEGE_VEHICLE_FORCE_ALLIANCE : SPELL_BUILD_SIEGE_VEHICLE_FORCE_HORDE, true);
-                    break;
-            }
+            creature->CastSpell(player, spellId, true);
             creature->CastSpell(creature, SPELL_ACTIVATE_CONTROL_ARMS, true);
+        }
+        else
+        {
+            WorldPacket data(SMSG_CAST_FAILED, 1 + 4 + 1 + 4);
+            data << uint8(0);
+            data << spellId;
+            data << uint8(SPELL_FAILED_CUSTOM_ERROR);
+            data << uint32(SPELL_CUSTOM_ERROR_CANT_BUILD_MORE_VEHICLES);
+            player->GetSession()->SendPacket(&data);
         }
         return true;
     }

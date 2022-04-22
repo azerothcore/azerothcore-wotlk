@@ -307,7 +307,7 @@ public:
                             for (ObjectGuid const& guid : summons)
                                 if (Creature* sv = ObjectAccessor::GetCreature(*me, guid))
                                 {
-                                    sv->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                    sv->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                                     sv->GetMotionMaster()->MoveIdle();
                                     sv->GetMotionMaster()->MoveCharge(1852.78f, 81.38f, 342.461f, 28.0f);
                                 }

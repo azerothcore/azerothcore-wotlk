@@ -21,8 +21,10 @@
 #include "ArenaTeam.h"
 #include "Battleground.h"
 #include "CharacterCache.h"
+#include "CinematicMgr.h"
 #include "DBCStores.h"
 #include "DatabaseEnvFwd.h"
+#include "EnumFlag.h"
 #include "GroupReference.h"
 #include "InstanceSaveMgr.h"
 #include "Item.h"
@@ -34,7 +36,9 @@
 #include "PlayerSettings.h"
 #include "PlayerTaxi.h"
 #include "QuestDef.h"
+#include "SpellAuras.h"
 #include "SpellMgr.h"
+#include "SpellInfo.h"
 #include "TradeData.h"
 #include "Unit.h"
 #include "WorldSession.h"
@@ -176,7 +180,7 @@ enum TalentTree // talent tabs
 // Spell modifier (used for modify other spells)
 struct SpellModifier
 {
-    SpellModifier(Aura* _ownerAura = nullptr) : op(SPELLMOD_DAMAGE), type(SPELLMOD_FLAT), charges(0),  mask(),  ownerAura(_ownerAura) {}
+    SpellModifier(Aura* _ownerAura = nullptr) : op(SPELLMOD_DAMAGE), type(SPELLMOD_FLAT), charges(0),  mask(), ownerAura(_ownerAura) {}
     SpellModOp   op   : 8;
     SpellModType type : 8;
     int16 charges     : 16;
@@ -463,7 +467,7 @@ enum DrunkenState
 
 #define MAX_DRUNKEN   4
 
-enum PlayerFlags
+enum PlayerFlags : uint32
 {
     PLAYER_FLAGS_GROUP_LEADER      = 0x00000001,
     PLAYER_FLAGS_AFK               = 0x00000002,
@@ -498,6 +502,8 @@ enum PlayerFlags
     PLAYER_FLAGS_UNK30             = 0x40000000,
     PLAYER_FLAGS_UNK31             = 0x80000000,
 };
+
+DEFINE_ENUM_FLAG(PlayerFlags);
 
 enum PlayerBytesOffsets //@todo: Implement
 {
@@ -1036,6 +1042,7 @@ struct EntryPointData
 class Player : public Unit, public GridObject<Player>
 {
     friend class WorldSession;
+    friend class CinematicMgr;
     friend void Item::AddToUpdateQueueOf(Player* player);
     friend void Item::RemoveFromUpdateQueueOf(Player* player);
 public:
@@ -1076,6 +1083,12 @@ public:
 
     void Update(uint32 time) override;
 
+    PlayerFlags GetPlayerFlags() const { return PlayerFlags(GetUInt32Value(PLAYER_FLAGS)); }
+    bool HasPlayerFlag(PlayerFlags flags) const { return HasFlag(PLAYER_FLAGS, flags) != 0; }
+    void SetPlayerFlag(PlayerFlags flags) { SetFlag(PLAYER_FLAGS, flags); }
+    void RemovePlayerFlag(PlayerFlags flags) { RemoveFlag(PLAYER_FLAGS, flags); }
+    void ReplaceAllPlayerFlags(PlayerFlags flags) { SetUInt32Value(PLAYER_FLAGS, flags); }
+
     static bool BuildEnumData(PreparedQueryResult result, WorldPacket* data);
 
     void SetInWater(bool apply);
@@ -1095,8 +1108,8 @@ public:
 
     void ToggleAFK();
     void ToggleDND();
-    [[nodiscard]] bool isAFK() const { return HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_AFK); }
-    [[nodiscard]] bool isDND() const { return HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_DND); }
+    [[nodiscard]] bool isAFK() const { return HasPlayerFlag(PLAYER_FLAGS_AFK); }
+    [[nodiscard]] bool isDND() const { return HasPlayerFlag(PLAYER_FLAGS_DND); }
     [[nodiscard]] uint8 GetChatTag() const;
     std::string autoReplyMsg;
 
@@ -1112,7 +1125,7 @@ public:
     void ContinueTaxiFlight();
     // mount_id can be used in scripting calls
 
-    [[nodiscard]] bool IsDeveloper() const { return HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_DEVELOPER); }
+    [[nodiscard]] bool IsDeveloper() const { return HasPlayerFlag(PLAYER_FLAGS_DEVELOPER); }
     void SetDeveloper(bool on) { ApplyModFlag(PLAYER_FLAGS, PLAYER_FLAGS_DEVELOPER, on); }
     [[nodiscard]] bool isAcceptWhispers() const { return m_ExtraFlags & PLAYER_EXTRA_ACCEPT_WHISPERS; }
     void SetAcceptWhispers(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_ACCEPT_WHISPERS; else m_ExtraFlags &= ~PLAYER_EXTRA_ACCEPT_WHISPERS; }
@@ -1325,6 +1338,8 @@ public:
     [[nodiscard]] Player* GetTrader() const { return m_trade ? m_trade->GetTrader() : nullptr; }
     [[nodiscard]] TradeData* GetTradeData() const { return m_trade; }
     void TradeCancel(bool sendback);
+
+    CinematicMgr* GetCinematicMgr() const { return _cinematicMgr; }
 
     void UpdateEnchantTime(uint32 time);
     void UpdateSoulboundTradeItems();
@@ -1798,7 +1813,7 @@ public:
     void ResetContestedPvP()
     {
         ClearUnitState(UNIT_STATE_ATTACK_PLAYER);
-        RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_CONTESTED_PVP);
+        RemovePlayerFlag(PLAYER_FLAGS_CONTESTED_PVP);
         m_contestedPvPTimer = 0;
     }
 
@@ -1971,6 +1986,7 @@ public:
     void BuildPlayerRepop();
     void RepopAtGraveyard();
 
+    void SendDurabilityLoss();
     void DurabilityLossAll(double percent, bool inventory);
     void DurabilityLoss(Item* item, double percent);
     void DurabilityPointsLossAll(int32 points, bool inventory);
@@ -2184,59 +2200,20 @@ public:
     void SetBGData(BGData& bgdata) { m_bgData = bgdata; }
     [[nodiscard]] Battleground* GetBattleground(bool create = false) const;
 
-    [[nodiscard]] bool InBattlegroundQueue() const
-    {
-        for (auto i : m_bgBattlegroundQueueID)
-            if (i != BATTLEGROUND_QUEUE_NONE)
-                return true;
-        return false;
-    }
+    [[nodiscard]] bool InBattlegroundQueue(bool ignoreArena = false) const;
+    [[nodiscard]] bool IsDeserter() const { return HasAura(26013); }
 
-    [[nodiscard]] BattlegroundQueueTypeId GetBattlegroundQueueTypeId(uint32 index) const { return m_bgBattlegroundQueueID[index]; }
-
-    [[nodiscard]] uint32 GetBattlegroundQueueIndex(BattlegroundQueueTypeId bgQueueTypeId) const
-    {
-        for (uint8 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
-            if (m_bgBattlegroundQueueID[i] == bgQueueTypeId)
-                return i;
-        return PLAYER_MAX_BATTLEGROUND_QUEUES;
-    }
-
-    [[nodiscard]] bool InBattlegroundQueueForBattlegroundQueueType(BattlegroundQueueTypeId bgQueueTypeId) const
-    {
-        return GetBattlegroundQueueIndex(bgQueueTypeId) < PLAYER_MAX_BATTLEGROUND_QUEUES;
-    }
+    [[nodiscard]] BattlegroundQueueTypeId GetBattlegroundQueueTypeId(uint32 index) const;
+    [[nodiscard]] uint32 GetBattlegroundQueueIndex(BattlegroundQueueTypeId bgQueueTypeId) const;
+    [[nodiscard]] bool IsInvitedForBattlegroundQueueType(BattlegroundQueueTypeId bgQueueTypeId) const;
+    [[nodiscard]] bool InBattlegroundQueueForBattlegroundQueueType(BattlegroundQueueTypeId bgQueueTypeId) const;
 
     void SetBattlegroundId(uint32 id, BattlegroundTypeId bgTypeId, uint32 queueSlot, bool invited, bool isRandom, TeamId teamId);
-
-    uint32 AddBattlegroundQueueId(BattlegroundQueueTypeId val)
-    {
-        for (uint8 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
-            if (m_bgBattlegroundQueueID[i] == BATTLEGROUND_QUEUE_NONE || m_bgBattlegroundQueueID[i] == val)
-            {
-                m_bgBattlegroundQueueID[i] = val;
-                return i;
-            }
-        return PLAYER_MAX_BATTLEGROUND_QUEUES;
-    }
-
-    bool HasFreeBattlegroundQueueId()
-    {
-        for (auto & i : m_bgBattlegroundQueueID)
-            if (i == BATTLEGROUND_QUEUE_NONE)
-                return true;
-        return false;
-    }
-
-    void RemoveBattlegroundQueueId(BattlegroundQueueTypeId val)
-    {
-        for (auto & i : m_bgBattlegroundQueueID)
-            if (i == val)
-            {
-                i = BATTLEGROUND_QUEUE_NONE;
-                return;
-            }
-    }
+    uint32 AddBattlegroundQueueId(BattlegroundQueueTypeId val);
+    bool HasFreeBattlegroundQueueId() const;
+    void RemoveBattlegroundQueueId(BattlegroundQueueTypeId val);
+    void SetInviteForBattlegroundQueueType(BattlegroundQueueTypeId bgQueueTypeId, uint32 instanceId);
+    bool IsInvitedForBattlegroundInstance(uint32 instanceId) const;
 
     [[nodiscard]] TeamId GetBgTeamId() const { return m_bgData.bgTeamId != TEAM_NEUTRAL ? m_bgData.bgTeamId : GetTeamId(); }
 
@@ -2368,7 +2345,7 @@ public:
     [[nodiscard]] bool IsPetNeedBeTemporaryUnsummoned() const { return GetSession()->PlayerLogout() || !IsInWorld() || !IsAlive() || IsMounted()/*+in flight*/ || GetVehicle() || IsBeingTeleported(); }
     bool CanResummonPet(uint32 spellid);
 
-    void SendCinematicStart(uint32 CinematicSequenceId);
+    void SendCinematicStart(uint32 CinematicSequenceId) const;
     void SendMovieStart(uint32 MovieId);
 
     uint32 DoRandomRoll(uint32 minimum, uint32 maximum);
@@ -2505,11 +2482,11 @@ public:
     bool IsInWhisperWhiteList(ObjectGuid guid);
     void RemoveFromWhisperWhiteList(ObjectGuid guid) { WhisperList.remove(guid); }
 
-    bool SetDisableGravity(bool disable, bool packetOnly /* = false */) override;
+    bool SetDisableGravity(bool disable, bool packetOnly = false, bool updateAnimationTier = true) override;
     bool SetCanFly(bool apply, bool packetOnly = false) override;
     bool SetWaterWalking(bool apply, bool packetOnly = false) override;
     bool SetFeatherFall(bool apply, bool packetOnly = false) override;
-    bool SetHover(bool enable, bool packetOnly = false) override;
+    bool SetHover(bool enable, bool packetOnly = false, bool updateAnimationTier = true) override;
 
     [[nodiscard]] bool CanFly() const override { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY); }
     [[nodiscard]] bool CanEnterWater() const override { return true; }
@@ -2561,17 +2538,6 @@ public:
 
     static std::unordered_map<int, bgZoneRef> bgZoneIdToFillWorldStates; // zoneId -> FillInitialWorldStates
 
-    // Cinematic camera data and remote sight functions
-    [[nodiscard]] uint32 GetActiveCinematicCamera() const { return m_activeCinematicCameraId; }
-    void SetActiveCinematicCamera(uint32 cinematicCameraId = 0) { m_activeCinematicCameraId = cinematicCameraId; }
-    [[nodiscard]] bool IsOnCinematic() const { return (m_cinematicCamera != nullptr); }
-    void BeginCinematic();
-    void EndCinematic();
-    void UpdateCinematicLocation(uint32 diff);
-
-    std::string GetMapAreaAndZoneString();
-    std::string GetCoordsMapAreaAndZoneString();
-
     void SetFarSightDistance(float radius);
     void ResetFarSightDistance();
     [[nodiscard]] Optional<float> GetFarSightDistance() const;
@@ -2608,7 +2574,13 @@ public:
     /***               BATTLEGROUND SYSTEM                 ***/
     /*********************************************************/
 
-    BattlegroundQueueTypeId m_bgBattlegroundQueueID[PLAYER_MAX_BATTLEGROUND_QUEUES];
+    struct BgBattlegroundQueueID_Rec
+    {
+        BattlegroundQueueTypeId bgQueueTypeId;
+        uint32 invitedToInstance;
+    };
+
+    std::array<BgBattlegroundQueueID_Rec, PLAYER_MAX_BATTLEGROUND_QUEUES> _BgBattlegroundQueueID;
     BGData m_bgData;
     bool m_IsBGRandomWinner;
 
@@ -2866,6 +2838,8 @@ private:
     Item* _StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool update);
     Item* _LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint32 timeDiff, Field* fields);
 
+    CinematicMgr* _cinematicMgr;
+
     typedef GuidSet RefundableItemsSet;
     RefundableItemsSet m_refundableItems;
     void SendRefundInfo(Item* item);
@@ -2931,14 +2905,6 @@ private:
 
     uint32 m_flightSpellActivated;
 
-    // Remote location information
-    uint32 m_cinematicDiff;
-    uint32 m_lastCinematicCheck;
-    uint32 m_activeCinematicCameraId;
-    FlyByCameraCollection* m_cinematicCamera;
-    Position m_remoteSightPosition;
-    Creature* m_CinematicObject;
-
     WorldLocation _corpseLocation;
 
     Optional<float> _farSightDistance = { };
@@ -2956,32 +2922,28 @@ template <class T> T Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& bas
 {
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
+    {
         return 0;
+    }
+
     float totalmul = 1.0f;
     int32 totalflat = 0;
 
-    // Drop charges for triggering spells instead of triggered ones
-    if (m_spellModTakingSpell)
-        spell = m_spellModTakingSpell;
-
-    for (auto mod : m_spellMods[op])
+    auto calculateSpellMod = [&](SpellModifier* mod)
     {
-        // Charges can be set only for mods with auras
-        if (!mod->ownerAura)
-            ASSERT(mod->charges == 0);
-
-        if (!IsAffectedBySpellmod(spellInfo, mod, spell))
-            continue;
-
         // xinef: temporary pets cannot use charged mods of owner, needed for mirror image QQ they should use their own auras
         if (temporaryPet && mod->charges != 0)
-            continue;
+        {
+            return;
+        }
 
         if (mod->type == SPELLMOD_FLAT)
         {
             // xinef: do not allow to consume more than one 100% crit increasing spell
             if (mod->op == SPELLMOD_CRITICAL_CHANCE && totalflat >= 100)
-                continue;
+            {
+                return;
+            }
 
             totalflat += mod->value;
         }
@@ -2989,32 +2951,88 @@ template <class T> T Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& bas
         {
             // skip percent mods for null basevalue (most important for spell mods with charges)
             if (basevalue == T(0) || totalmul == 0.0f)
-                continue;
+            {
+                return;
+            }
 
             // special case (skip > 10sec spell casts for instant cast setting)
             if (mod->op == SPELLMOD_CASTING_TIME && basevalue >= T(10000) && mod->value <= -100)
-                continue;
+            {
+                return;
+            }
             // xinef: special exception for surge of light, dont affect crit chance if previous mods were not applied
             else if (mod->op == SPELLMOD_CRITICAL_CHANCE && spell && !HasSpellMod(mod, spell))
-                continue;
+            {
+                return;
+            }
             // xinef: special case for backdraft gcd reduce with backlast time reduction, dont affect gcd if cast time was not applied
             else if (mod->op == SPELLMOD_GLOBAL_COOLDOWN && spell && !HasSpellMod(mod, spell))
-                continue;
+            {
+                return;
+            }
 
             // xinef: those two mods should be multiplicative (Glyph of Renew)
             if (mod->op == SPELLMOD_DAMAGE || mod->op == SPELLMOD_DOT)
+            {
                 totalmul *= CalculatePct(1.0f, 100.0f + mod->value);
+            }
             else
+            {
                 totalmul += CalculatePct(1.0f, mod->value);
+            }
         }
 
         DropModCharge(mod, spell);
+    };
+
+    // Drop charges for triggering spells instead of triggered ones
+    if (m_spellModTakingSpell)
+    {
+        spell = m_spellModTakingSpell;
     }
+
+    SpellModifier* chargedMod = nullptr;
+    for (auto mod : m_spellMods[op])
+    {
+        // Charges can be set only for mods with auras
+        if (!mod->ownerAura)
+        {
+            ASSERT(!mod->charges);
+        }
+
+        if (!IsAffectedBySpellmod(spellInfo, mod, spell))
+        {
+            continue;
+        }
+
+        if (mod->ownerAura->IsUsingCharges())
+        {
+            if (!chargedMod || (chargedMod->ownerAura->GetSpellInfo()->SpellPriority < mod->ownerAura->GetSpellInfo()->SpellPriority))
+            {
+                chargedMod = mod;
+            }
+
+            continue;
+        }
+
+        calculateSpellMod(mod);
+    }
+
+    if (chargedMod)
+    {
+        calculateSpellMod(chargedMod);
+    }
+
     float diff = 0.0f;
     if (op == SPELLMOD_CASTING_TIME || op == SPELLMOD_DURATION)
+    {
         diff = ((float)basevalue + totalflat) * (totalmul - 1.0f) + (float)totalflat;
+    }
     else
+    {
         diff = (float)basevalue * (totalmul - 1.0f) + (float)totalflat;
+    }
+
     basevalue = T((float)basevalue + diff);
     return T(diff);
 }

@@ -227,7 +227,7 @@ void WorldSession::HandleActivateTaxiOpcode(WorldPacket& recvData)
     ObjectGuid guid;
     std::vector<uint32> nodes;
     nodes.resize(2);
-
+    GetPlayer()->SetCanTeleport(true);
     recvData >> guid >> nodes[0] >> nodes[1];
     LOG_DEBUG("network", "WORLD: Received CMSG_ACTIVATETAXI from {} to {}", nodes[0], nodes[1]);
     Creature* npc = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_FLIGHTMASTER);
@@ -251,6 +251,7 @@ void WorldSession::HandleActivateTaxiOpcode(WorldPacket& recvData)
 
 void WorldSession::SendActivateTaxiReply(ActivateTaxiReply reply)
 {
+    GetPlayer()->SetCanTeleport(true);
     WorldPacket data(SMSG_ACTIVATETAXIREPLY, 4);
     data << uint32(reply);
     SendPacket(&data);

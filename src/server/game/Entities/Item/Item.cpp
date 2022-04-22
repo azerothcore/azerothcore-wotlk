@@ -728,7 +728,7 @@ void Item::AddToUpdateQueueOf(Player* player)
     if (IsInUpdateQueue())
         return;
 
-    ASSERT(player != nullptr);
+    ASSERT(player);
 
     if (player->GetGUID() != GetOwnerGUID())
     {
@@ -748,7 +748,7 @@ void Item::RemoveFromUpdateQueueOf(Player* player)
     if (!IsInUpdateQueue())
         return;
 
-    ASSERT(player != nullptr);
+    ASSERT(player);
 
     if (player->GetGUID() != GetOwnerGUID())
     {

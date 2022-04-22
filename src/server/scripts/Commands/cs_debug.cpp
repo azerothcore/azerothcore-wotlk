@@ -33,6 +33,7 @@
 #include "Language.h"
 #include "Log.h"
 #include "MapMgr.h"
+#include "M2Stores.h"
 #include "ObjectMgr.h"
 #include "PoolMgr.h"
 #include "ScriptMgr.h"
@@ -77,7 +78,7 @@ public:
         {
             { "setbit",         HandleDebugSet32BitCommand,            SEC_ADMINISTRATOR, Console::No },
             { "threat",         HandleDebugThreatListCommand,          SEC_ADMINISTRATOR, Console::No },
-            { "hostil",         HandleDebugHostileRefListCommand,      SEC_ADMINISTRATOR, Console::No },
+            { "hostile",        HandleDebugHostileRefListCommand,      SEC_ADMINISTRATOR, Console::No },
             { "anim",           HandleDebugAnimCommand,                SEC_ADMINISTRATOR, Console::No },
             { "arena",          HandleDebugArenaCommand,               SEC_ADMINISTRATOR, Console::No },
             { "bg",             HandleDebugBattlegroundCommand,        SEC_ADMINISTRATOR, Console::No },
@@ -102,6 +103,7 @@ public:
             { "los",            HandleDebugLoSCommand,                 SEC_ADMINISTRATOR, Console::No },
             { "moveflags",      HandleDebugMoveflagsCommand,           SEC_ADMINISTRATOR, Console::No },
             { "unitstate",      HandleDebugUnitStateCommand,           SEC_ADMINISTRATOR, Console::No },
+            { "objectcount",    HandleDebugObjectCountCommand,         SEC_ADMINISTRATOR, Console::Yes},
             { "dummy",          HandleDebugDummyCommand,               SEC_ADMINISTRATOR, Console::No }
         };
         static ChatCommandTable commandTable =
@@ -115,7 +117,8 @@ public:
     // cinematicId - ID from CinematicSequences.dbc
     static bool HandleDebugPlayCinematicCommand(ChatHandler* handler, uint32 cinematicId)
     {
-        if (!sCinematicSequencesStore.LookupEntry(cinematicId))
+        CinematicSequencesEntry const* cineSeq = sCinematicSequencesStore.LookupEntry(cinematicId);
+        if (!cineSeq)
         {
             handler->PSendSysMessage(LANG_CINEMATIC_NOT_EXIST, cinematicId);
             handler->SetSentErrorMessage(true);
@@ -123,23 +126,19 @@ public:
         }
 
         // Dump camera locations
-        if (CinematicSequencesEntry const* cineSeq = sCinematicSequencesStore.LookupEntry(cinematicId))
+        if (std::vector<FlyByCamera> const* flyByCameras = GetFlyByCameras(cineSeq->cinematicCamera))
         {
-            auto const& itr = sFlyByCameraStore.find(cineSeq->cinematicCamera);
-            if (itr != sFlyByCameraStore.end())
+            handler->PSendSysMessage("Waypoints for sequence %u, camera %u", cinematicId, cineSeq->cinematicCamera);
+            uint32 count = 1;
+            for (FlyByCamera const& cam : *flyByCameras)
             {
-                handler->PSendSysMessage("Waypoints for sequence %u, camera %u", cinematicId, cineSeq->cinematicCamera);
-                uint32 count = 1;
-                for (FlyByCamera cam : itr->second)
-                {
-                    handler->PSendSysMessage("%02u - %7ums [%f, %f, %f] Facing %f (%f degrees)", count, cam.timeStamp, cam.locations.x, cam.locations.y, cam.locations.z, cam.locations.w, cam.locations.w * (180 / M_PI));
-                    count++;
-                }
-                handler->PSendSysMessage("%lu waypoints dumped", itr->second.size());
+                handler->PSendSysMessage("%02u - %7ums [%s (%f degrees)]", count, cam.timeStamp, cam.locations.ToString().c_str(), cam.locations.GetOrientation() * (180 / M_PI));
+                ++count;
             }
+            handler->PSendSysMessage("%u waypoints dumped", flyByCameras->size());
         }
 
-        handler->GetSession()->GetPlayer()->SendCinematicStart(cinematicId);
+        handler->GetPlayer()->SendCinematicStart(cinematicId);
         return true;
     }
 
@@ -621,7 +620,7 @@ public:
                         continue;
                     }
 
-                    if (updateQueue[qp] == nullptr)
+                    if (!updateQueue[qp])
                     {
                         handler->PSendSysMessage("The item with slot %d and guid %d has its queuepos (%d) pointing to NULL in the queue!", item->GetSlot(), item->GetGUID().GetCounter(), qp);
                         error = true;
@@ -689,7 +688,7 @@ public:
                                 continue;
                             }
 
-                            if (updateQueue[qp] == nullptr)
+                            if (!updateQueue[qp])
                             {
                                 handler->PSendSysMessage("The item in bag %d at slot %d having guid %d has a queuepos (%d) that points to NULL in the queue!", bag->GetSlot(), item2->GetSlot(), item2->GetGUID().GetCounter(), qp);
                                 error = true;
@@ -738,7 +737,7 @@ public:
 
                 Item* test = player->GetItemByPos(item->GetBagSlot(), item->GetSlot());
 
-                if (test == nullptr)
+                if (!test)
                 {
                     handler->SendSysMessage(Acore::StringFormatFmt("queue({}): The bag({}) and slot({}) values for {} are incorrect, the player doesn't have any item at that position!", index, item->GetBagSlot(), item->GetSlot(), item->GetGUID().ToString()));
                     error = true;
@@ -829,7 +828,7 @@ public:
         HostileReference* ref = target->getHostileRefMgr().getFirst();
         uint32 count = 0;
 
-        handler->PSendSysMessage("Hostil reference list of %s (%s)", target->GetName().c_str(), target->GetGUID().ToString().c_str());
+        handler->PSendSysMessage("Hostile reference list of %s (%s)", target->GetName().c_str(), target->GetGUID().ToString().c_str());
 
         while (ref)
         {
@@ -846,7 +845,7 @@ public:
             ref = ref->next();
         }
 
-        handler->SendSysMessage("End of hostil reference list.");
+        handler->SendSysMessage("End of hostile reference list.");
         return true;
     }
 
@@ -1001,8 +1000,8 @@ public:
         {
             Player* player = handler->GetSession()->GetPlayer();
             handler->PSendSysMessage("Checking LoS %s -> %s:", player->GetName().c_str(), unit->GetName().c_str());
-            handler->PSendSysMessage("    VMAP LoS: %s", player->IsWithinLOSInMap(unit, LINEOFSIGHT_CHECK_VMAP) ? "clear" : "obstructed");
-            handler->PSendSysMessage("    GObj LoS: %s", player->IsWithinLOSInMap(unit, LINEOFSIGHT_CHECK_GOBJECT) ? "clear" : "obstructed");
+            handler->PSendSysMessage("    VMAP LoS: %s", player->IsWithinLOSInMap(unit, VMAP::ModelIgnoreFlags::Nothing, LINEOFSIGHT_CHECK_VMAP) ? "clear" : "obstructed");
+            handler->PSendSysMessage("    GObj LoS: %s", player->IsWithinLOSInMap(unit, VMAP::ModelIgnoreFlags::Nothing, LINEOFSIGHT_CHECK_GOBJECT_ALL) ? "clear" : "obstructed");
             handler->PSendSysMessage("%s is %sin line of sight of %s.", unit->GetName().c_str(), (player->IsWithinLOSInMap(unit) ? "" : "not "), player->GetName().c_str());
             return true;
         }
@@ -1244,6 +1243,84 @@ public:
 
         handler->PSendSysMessage("Waypoint SQL written to SQL Developer log");
         return true;
+    }
+
+    static bool HandleDebugObjectCountCommand(ChatHandler* handler, Optional<uint32> mapId)
+    {
+        if (mapId)
+        {
+            sMapMgr->DoForAllMapsWithMapId(mapId.value(),
+               [handler](Map* map) -> void
+                {
+                   HandleDebugObjectCountMap(handler, map);
+                }
+            );
+        }
+        else
+        {
+            sMapMgr->DoForAllMaps(
+                [handler](Map* map) -> void
+                {
+                    HandleDebugObjectCountMap(handler, map);
+                }
+            );
+        }
+
+        return true;
+    }
+
+    class CreatureCountWorker
+    {
+    public:
+        CreatureCountWorker() { }
+
+        void Visit(std::unordered_map<ObjectGuid, Creature*>& creatureMap)
+        {
+            for (auto const& p : creatureMap)
+            {
+                uint32& count = creatureIds[p.second->GetEntry()];
+                ++count;
+            }
+        }
+
+        template<class T>
+        void Visit(std::unordered_map<ObjectGuid, T*>&) { }
+
+        std::vector<std::pair<uint32, uint32>> GetTopCreatureCount(uint32 count)
+        {
+            auto comp = [](std::pair<uint32, uint32> const& a, std::pair<uint32, uint32> const& b)
+            {
+                return a.second > b.second;
+            };
+            std::set<std::pair<uint32, uint32>, decltype(comp)> set(creatureIds.begin(), creatureIds.end(), comp);
+
+            count = std::min(count, uint32(set.size()));
+            std::vector<std::pair<uint32, uint32>> result(count);
+            std::copy_n(set.begin(), count, result.begin());
+
+            return result;
+        }
+
+    private:
+        std::unordered_map<uint32, uint32> creatureIds;
+    };
+
+    static void HandleDebugObjectCountMap(ChatHandler* handler, Map* map)
+    {
+        handler->PSendSysMessage("Map Id: %u Name: '%s' Instance Id: %u Creatures: %u GameObjects: %u SetActive Objects: %u",
+                map->GetId(), map->GetMapName(), map->GetInstanceId(),
+                uint64(map->GetObjectsStore().Size<Creature>()),
+                uint64(map->GetObjectsStore().Size<GameObject>()),
+                uint64(map->GetActiveNonPlayersCount()));
+
+        CreatureCountWorker worker;
+        TypeContainerVisitor<CreatureCountWorker, MapStoredObjectTypesContainer> visitor(worker);
+        visitor.Visit(map->GetObjectsStore());
+
+        handler->PSendSysMessage("Top Creatures count:");
+
+        for (auto&& p : worker.GetTopCreatureCount(5))
+            handler->PSendSysMessage("Entry: %u Count: %u", p.first, p.second);
     }
 
     static bool HandleDebugDummyCommand(ChatHandler* handler)

@@ -403,7 +403,7 @@ public:
                     if (GetBossState(BOSS_LOATHEB) == DONE)
                     {
                         pGo->SetGoState(GO_STATE_ACTIVE);
-                        pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        pGo->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     }
                     break;
                 case GO_THADDIUS_PORTAL:
@@ -411,7 +411,7 @@ public:
                     if (GetBossState(BOSS_THADDIUS) == DONE)
                     {
                         pGo->SetGoState(GO_STATE_ACTIVE);
-                        pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        pGo->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     }
                     break;
                 case GO_MAEXXNA_PORTAL:
@@ -419,7 +419,7 @@ public:
                     if (GetBossState(BOSS_MAEXXNA) == DONE)
                     {
                         pGo->SetGoState(GO_STATE_ACTIVE);
-                        pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        pGo->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     }
                     break;
                 case GO_HORSEMAN_PORTAL:
@@ -427,7 +427,7 @@ public:
                     if (GetBossState(BOSS_HORSEMAN) == DONE)
                     {
                         pGo->SetGoState(GO_STATE_ACTIVE);
-                        pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        pGo->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     }
                     break;
 
@@ -844,7 +844,7 @@ public:
                         if (GameObject* go = instance->GetGameObject(_loathebPortalGUID))
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
-                            go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                            go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                         }
                         if (GameObject* go = instance->GetGameObject(_plagueEyePortalGUID))
                         {
@@ -884,7 +884,7 @@ public:
                         if (GameObject* go = instance->GetGameObject(_maexxnaPortalGUID))
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
-                            go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                            go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                         }
                         if (GameObject* go = instance->GetGameObject(_spiderEyePortalGUID))
                         {
@@ -917,7 +917,7 @@ public:
                         if (GameObject* go = instance->GetGameObject(_thaddiusPortalGUID))
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
-                            go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                            go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                         }
                         if (GameObject* go = instance->GetGameObject(_abomEyePortalGUID))
                         {
@@ -933,7 +933,7 @@ public:
                         if (GameObject* go = instance->GetGameObject(_horsemanPortalGUID))
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
-                            go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                            go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                         }
                         if (GameObject* go = instance->GetGameObject(_deathknightEyePortalGUID))
                         {

@@ -42,7 +42,7 @@ namespace AddonMgr
         QueryResult result = CharacterDatabase.Query("SELECT name, crc FROM addons");
         if (!result)
         {
-            LOG_INFO("server.loading", ">> Loaded 0 known addons. DB table `addons` is empty!");
+            LOG_WARN("server.loading", ">> Loaded 0 known addons. DB table `addons` is empty!");
             LOG_INFO("server.loading", " ");
             return;
         }
