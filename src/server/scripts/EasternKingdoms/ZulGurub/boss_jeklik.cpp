@@ -128,7 +128,7 @@ public:
             events.ScheduleEvent(EVENT_BLOOD_LEECH, urand(5000, 15000), PHASE_ONE);
             events.ScheduleEvent(EVENT_SONIC_BURST, urand(5000, 15000), PHASE_ONE);
             events.ScheduleEvent(EVENT_SWOOP, 20000, PHASE_ONE);
-            events.ScheduleEvent(EVENT_SPAWN_BATS, 30000, PHASE_ONE); 
+            events.ScheduleEvent(EVENT_SPAWN_BATS, 30000, PHASE_ONE);
         }
 
         void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
