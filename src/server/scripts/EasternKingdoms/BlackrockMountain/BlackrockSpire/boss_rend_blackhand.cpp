@@ -164,11 +164,11 @@ public:
             events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(17000, 19000));
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             instance->SetBossState(DATA_WARCHIEF_REND_BLACKHAND, FAIL);
             instance->SetBossState(DATA_GYTH, FAIL);
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
             me->DespawnOrUnsummon();
         }
 

@@ -560,37 +560,32 @@ public:
             switch (CreatureID)
             {
                 case ADYEN_THE_LIGHTBRINGER:
-                    adyen = nullptr;
                     adyen = me->FindNearestCreature(ADYEN_THE_LIGHTBRINGER, 100.0f, true);
-                    if (adyen != nullptr)
+                    if (adyen)
                         return true;
                     break;
                 case EXARCH_ORELIS:
-                    orelis = nullptr;
                     orelis = me->FindNearestCreature(EXARCH_ORELIS, 100.0f, true);
-                    if (orelis != nullptr)
+                    if (orelis)
                         return true;
                     break;
                 case ANCHORITE_KARJA:
-                    karja = nullptr;
                     karja = me->FindNearestCreature(ANCHORITE_KARJA, 100.0f, true);
-                    if (karja != nullptr)
+                    if (karja)
                         return true;
                     break;
                 case KAYLAAN_THE_LOST:
-                    kaylaan = nullptr;
                     kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 100.0f, true);
-                    if (kaylaan != nullptr)
+                    if (kaylaan)
                         return true;
                     break;
                 case ISHANAH_HIGH_PRIESTESS:
-                    ishanah = nullptr;
                     ishanah = me->FindNearestCreature(ISHANAH_HIGH_PRIESTESS, 100.0f, true);
-                    if (ishanah == nullptr)
+                    if (!ishanah)
                     {
                         // Ishanah may be dead; in this case we also need a reference to the creature for the respawn
                         ishanah = me->FindNearestCreature(ISHANAH_HIGH_PRIESTESS, 100.0f, false);
-                        if (ishanah != nullptr)
+                        if (ishanah)
                             return true;
                     }
                     else
@@ -604,10 +599,6 @@ public:
         {
             me->SetReactState(REACT_PASSIVE);
             me->SetFaction(FACTION_DEMON);
-            adyen   = nullptr;
-            orelis  = nullptr;
-            karja   = nullptr;
-            ishanah = nullptr;
         }
 
         void DoAction(int32 param) override
@@ -1170,13 +1161,13 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (fight)
                 SetEscortPaused(false);
 
             SummonsAction(nullptr);
-            npc_escortAI::EnterEvadeMode();
+            npc_escortAI::EnterEvadeMode(why);
         }
 
         void SummonsAction(Unit* who)
@@ -1185,7 +1176,7 @@ public:
             for (GuidList::iterator itr = summons.begin(); itr != summons.end(); ++itr, i += 1.0f)
                 if (Creature* cr = ObjectAccessor::GetCreature(*me, *itr))
                 {
-                    if (who == nullptr)
+                    if (!who)
                     {
                         cr->GetMotionMaster()->Clear(false);
                         cr->GetMotionMaster()->MoveFollow(me, 2.0f, M_PI / 2.0f + (i / summons.size() * M_PI));

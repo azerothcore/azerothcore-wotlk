@@ -34,10 +34,10 @@ namespace VMAP
     class MapRayCallback
     {
     public:
-        MapRayCallback(ModelInstance* val): prims(val), hit(false) {}
+        MapRayCallback(ModelInstance* val, ModelIgnoreFlags ignoreFlags): prims(val), flags(ignoreFlags), hit(false) { }
         bool operator()(const G3D::Ray& ray, uint32 entry, float& distance, bool StopAtFirstHit)
         {
-            bool result = prims[entry].intersectRay(ray, distance, StopAtFirstHit);
+            bool result = prims[entry].intersectRay(ray, distance, StopAtFirstHit, flags);
             if (result)
             {
                 hit = true;
@@ -47,6 +47,7 @@ namespace VMAP
         bool didHit() { return hit; }
     protected:
         ModelInstance* prims;
+        ModelIgnoreFlags flags;
         bool hit;
     };
 
@@ -143,10 +144,10 @@ namespace VMAP
     Else, pMaxDist is not modified and returns false;
     */
 
-    bool StaticMapTree::GetIntersectionTime(const G3D::Ray& pRay, float& pMaxDist, bool StopAtFirstHit) const
+    bool StaticMapTree::GetIntersectionTime(const G3D::Ray& pRay, float& pMaxDist, bool StopAtFirstHit, ModelIgnoreFlags ignoreFlags) const
     {
         float distance = pMaxDist;
-        MapRayCallback intersectionCallBack(iTreeValues);
+        MapRayCallback intersectionCallBack(iTreeValues, ignoreFlags);
         iTree.intersectRay(pRay, intersectionCallBack, distance, StopAtFirstHit);
         if (intersectionCallBack.didHit())
         {
@@ -156,7 +157,7 @@ namespace VMAP
     }
     //=========================================================
 
-    bool StaticMapTree::isInLineOfSight(const Vector3& pos1, const Vector3& pos2) const
+    bool StaticMapTree::isInLineOfSight(const Vector3& pos1, const Vector3& pos2, ModelIgnoreFlags ignoreFlags) const
     {
         float maxDist = (pos2 - pos1).magnitude();
         // return false if distance is over max float, in case of cheater teleporting to the end of the universe
@@ -175,7 +176,7 @@ namespace VMAP
         // direction with length of 1
         G3D::Ray ray = G3D::Ray::fromOriginAndDirection(pos1, (pos2 - pos1) / maxDist);
 
-        if (GetIntersectionTime(ray, maxDist, true))
+        if (GetIntersectionTime(ray, maxDist, true, ignoreFlags))
         {
 
             return false;
@@ -204,7 +205,7 @@ namespace VMAP
         Vector3 dir = (pPos2 - pPos1) / maxDist;            // direction with length of 1
         G3D::Ray ray(pPos1, dir);
         float dist = maxDist;
-        if (GetIntersectionTime(ray, dist, false))
+        if (GetIntersectionTime(ray, dist, false, ModelIgnoreFlags::Nothing))
         {
             pResultHitPos = pPos1 + dir * dist;
             if (pModifyDist < 0)
@@ -240,7 +241,7 @@ namespace VMAP
         Vector3 dir = Vector3(0, 0, -1);
         G3D::Ray ray(pPos, dir);   // direction with length of 1
         float maxDist = maxSearchDist;
-        if (GetIntersectionTime(ray, maxDist, false))
+        if (GetIntersectionTime(ray, maxDist, false, ModelIgnoreFlags::Nothing))
         {
             height = pPos.z - maxDist;
         }
@@ -328,7 +329,7 @@ namespace VMAP
 #endif
         if (!iIsTiled && ModelSpawn::readFromFile(rf, spawn))
         {
-            WorldModel* model = vm->acquireModelInstance(iBasePath, spawn.name);
+            WorldModel* model = vm->acquireModelInstance(iBasePath, spawn.name, spawn.flags);
             //VMAP_DEBUG_LOG(LOG_FILTER_MAPS, "StaticMapTree::InitMap() : loading {}", spawn.name);
             if (model)
             {
@@ -404,7 +405,7 @@ namespace VMAP
                 if (result)
                 {
                     // acquire model instance
-                    WorldModel* model = vm->acquireModelInstance(iBasePath, spawn.name);
+                    WorldModel* model = vm->acquireModelInstance(iBasePath, spawn.name, spawn.flags);
                     if (!model)
                     {
                         LOG_ERROR("maps", "StaticMapTree::LoadMapTile() : could not acquire WorldModel pointer [{}, {}]", tileX, tileY);

@@ -1551,11 +1551,9 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
         }
 
         // Implemented this way as there is no other way to do it currently (that I know :P)...
-        if (caster->ToPlayer() && caster->ToPlayer()->HasAura(23401)) // Nefarian Corrupted Healing (priest)
+        if (caster->ToPlayer() && caster->HasAura(23401)) // Nefarian Corrupted Healing (priest)
         {
-            if (m_spellInfo->Effects[EFFECT_0].ApplyAuraName != SPELL_AURA_PERIODIC_HEAL ||
-                m_spellInfo->Effects[EFFECT_1].ApplyAuraName != SPELL_AURA_PERIODIC_HEAL ||
-                m_spellInfo->Effects[EFFECT_2].ApplyAuraName != SPELL_AURA_PERIODIC_HEAL)
+            if (!m_spellInfo->HasAura(SPELL_AURA_PERIODIC_HEAL) && (m_spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_HOLY))
             {
                 m_damage = 0;
                 caster->CastSpell(unitTarget, 23402, false); // Nefarian Corrupted Healing Periodic Damage effect.
@@ -3807,32 +3805,6 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                             // Shadow Flame
                             m_caster->CastSpell(unitTarget, 22682, true);
                             return;
-                        }
-                    // Mirren's Drinking Hat
-                    case 29830:
-                        {
-                            uint32 itemId = 23586;  // Aerie Peak Pale Ale
-                            switch (urand(0, 5))
-                            {
-                                case 0:
-                                case 1:
-                                case 2:
-                                    itemId = 23584;
-                                    break;            // Loch Modan Lager
-                                case 3:
-                                case 4:
-                                    itemId = 23585;
-                                    break;            // Stouthammer Lite
-                            }
-                            DoCreateItem(effIndex, itemId);
-                            break;
-                        }
-                    case 20589: // Escape artist
-                    case 30918: // Improved Sprint
-                        {
-                            // Removes snares and roots.
-                            unitTarget->RemoveMovementImpairingAuras(true);
-                            break;
                         }
                     // Plant Warmaul Ogre Banner
                     case 32307:

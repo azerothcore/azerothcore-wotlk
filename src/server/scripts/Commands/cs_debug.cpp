@@ -78,7 +78,7 @@ public:
         {
             { "setbit",         HandleDebugSet32BitCommand,            SEC_ADMINISTRATOR, Console::No },
             { "threat",         HandleDebugThreatListCommand,          SEC_ADMINISTRATOR, Console::No },
-            { "hostil",         HandleDebugHostileRefListCommand,      SEC_ADMINISTRATOR, Console::No },
+            { "hostile",        HandleDebugHostileRefListCommand,      SEC_ADMINISTRATOR, Console::No },
             { "anim",           HandleDebugAnimCommand,                SEC_ADMINISTRATOR, Console::No },
             { "arena",          HandleDebugArenaCommand,               SEC_ADMINISTRATOR, Console::No },
             { "bg",             HandleDebugBattlegroundCommand,        SEC_ADMINISTRATOR, Console::No },
@@ -620,7 +620,7 @@ public:
                         continue;
                     }
 
-                    if (updateQueue[qp] == nullptr)
+                    if (!updateQueue[qp])
                     {
                         handler->PSendSysMessage("The item with slot %d and guid %d has its queuepos (%d) pointing to NULL in the queue!", item->GetSlot(), item->GetGUID().GetCounter(), qp);
                         error = true;
@@ -688,7 +688,7 @@ public:
                                 continue;
                             }
 
-                            if (updateQueue[qp] == nullptr)
+                            if (!updateQueue[qp])
                             {
                                 handler->PSendSysMessage("The item in bag %d at slot %d having guid %d has a queuepos (%d) that points to NULL in the queue!", bag->GetSlot(), item2->GetSlot(), item2->GetGUID().GetCounter(), qp);
                                 error = true;
@@ -737,7 +737,7 @@ public:
 
                 Item* test = player->GetItemByPos(item->GetBagSlot(), item->GetSlot());
 
-                if (test == nullptr)
+                if (!test)
                 {
                     handler->SendSysMessage(Acore::StringFormatFmt("queue({}): The bag({}) and slot({}) values for {} are incorrect, the player doesn't have any item at that position!", index, item->GetBagSlot(), item->GetSlot(), item->GetGUID().ToString()));
                     error = true;
@@ -828,7 +828,7 @@ public:
         HostileReference* ref = target->getHostileRefMgr().getFirst();
         uint32 count = 0;
 
-        handler->PSendSysMessage("Hostil reference list of %s (%s)", target->GetName().c_str(), target->GetGUID().ToString().c_str());
+        handler->PSendSysMessage("Hostile reference list of %s (%s)", target->GetName().c_str(), target->GetGUID().ToString().c_str());
 
         while (ref)
         {
@@ -845,7 +845,7 @@ public:
             ref = ref->next();
         }
 
-        handler->SendSysMessage("End of hostil reference list.");
+        handler->SendSysMessage("End of hostile reference list.");
         return true;
     }
 
@@ -1000,8 +1000,8 @@ public:
         {
             Player* player = handler->GetSession()->GetPlayer();
             handler->PSendSysMessage("Checking LoS %s -> %s:", player->GetName().c_str(), unit->GetName().c_str());
-            handler->PSendSysMessage("    VMAP LoS: %s", player->IsWithinLOSInMap(unit, LINEOFSIGHT_CHECK_VMAP) ? "clear" : "obstructed");
-            handler->PSendSysMessage("    GObj LoS: %s", player->IsWithinLOSInMap(unit, LINEOFSIGHT_CHECK_GOBJECT) ? "clear" : "obstructed");
+            handler->PSendSysMessage("    VMAP LoS: %s", player->IsWithinLOSInMap(unit, VMAP::ModelIgnoreFlags::Nothing, LINEOFSIGHT_CHECK_VMAP) ? "clear" : "obstructed");
+            handler->PSendSysMessage("    GObj LoS: %s", player->IsWithinLOSInMap(unit, VMAP::ModelIgnoreFlags::Nothing, LINEOFSIGHT_CHECK_GOBJECT_ALL) ? "clear" : "obstructed");
             handler->PSendSysMessage("%s is %sin line of sight of %s.", unit->GetName().c_str(), (player->IsWithinLOSInMap(unit) ? "" : "not "), player->GetName().c_str());
             return true;
         }

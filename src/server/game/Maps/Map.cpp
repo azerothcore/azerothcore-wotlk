@@ -359,7 +359,7 @@ void Map::SwitchGridContainers(Creature* obj, bool on)
 
     LOG_DEBUG("maps", "Switch object {} from grid[{}, {}] {}", obj->GetGUID().ToString(), cell.GridX(), cell.GridY(), on);
     NGridType* ngrid = getNGrid(cell.GridX(), cell.GridY());
-    ASSERT(ngrid != nullptr);
+    ASSERT(ngrid);
 
     GridType& grid = ngrid->GetGridType(cell.CellX(), cell.CellY());
 
@@ -397,7 +397,7 @@ void Map::SwitchGridContainers(GameObject* obj, bool on)
 
     //LOG_DEBUG(LOG_FILTER_MAPS, "Switch object {} from grid[{}, {}] {}", obj->GetGUID().ToString(), cell.data.Part.grid_x, cell.data.Part.grid_y, on);
     NGridType* ngrid = getNGrid(cell.GridX(), cell.GridY());
-    ASSERT(ngrid != nullptr);
+    ASSERT(ngrid);
 
     GridType& grid = ngrid->GetGridType(cell.CellX(), cell.CellY());
 
@@ -471,7 +471,7 @@ bool Map::EnsureGridLoaded(const Cell& cell)
     EnsureGridCreated(GridCoord(cell.GridX(), cell.GridY()));
     NGridType* grid = getNGrid(cell.GridX(), cell.GridY());
 
-    ASSERT(grid != nullptr);
+    ASSERT(grid);
     if (!isGridObjectDataLoaded(cell.GridX(), cell.GridY()))
     {
         //if (!isGridObjectDataLoaded(cell.GridX(), cell.GridY()))
@@ -1965,9 +1965,9 @@ inline LiquidData const GridMap::GetLiquidData(float x, float y, float z, float 
 
                     if (delta > collisionHeight)
                         liquidData.Status = LIQUID_MAP_UNDER_WATER;
-                    else if (delta > 0.2f)
+                    else if (delta > 0.0f)
                         liquidData.Status = LIQUID_MAP_IN_WATER;
-                    else if (delta > -0.2f)
+                    else if (delta > -0.1f)
                         liquidData.Status = LIQUID_MAP_WATER_WALK;
                     else
                         liquidData.Status = LIQUID_MAP_ABOVE_WATER;
@@ -2023,7 +2023,7 @@ Transport* Map::GetTransportForPos(uint32 phase, float x, float y, float z, Worl
         if ((*itr)->IsInWorld() && (*itr)->GetExactDistSq(x, y, z) < 75.0f * 75.0f && (*itr)->m_model)
         {
             float dist = 30.0f;
-            bool hit = (*itr)->m_model->intersectRay(r, dist, false, phase);
+            bool hit = (*itr)->m_model->intersectRay(r, dist, false, phase, VMAP::ModelIgnoreFlags::Nothing);
             if (hit)
                 return *itr;
         }
@@ -2033,7 +2033,7 @@ Transport* Map::GetTransportForPos(uint32 phase, float x, float y, float z, Worl
             if (staticTrans->m_model)
             {
                 float dist = 10.0f;
-                bool hit = staticTrans->m_model->intersectRay(r, dist, false, phase);
+                bool hit = staticTrans->m_model->intersectRay(r, dist, false, phase, VMAP::ModelIgnoreFlags::Nothing);
                 if (hit)
                     if (GetHeight(phase, x, y, z, true, 30.0f) < (v.z - dist + 1.0f))
                         return staticTrans->ToTransport();
@@ -2440,14 +2440,27 @@ float Map::GetWaterLevel(float x, float y) const
         return 0;
 }
 
-bool Map::isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, LineOfSightChecks checks) const
+bool Map::isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, LineOfSightChecks checks, VMAP::ModelIgnoreFlags ignoreFlags) const
 {
-    if ((checks & LINEOFSIGHT_CHECK_VMAP) && !VMAP::VMapFactory::createOrGetVMapMgr()->isInLineOfSight(GetId(), x1, y1, z1, x2, y2, z2))
+    if ((checks & LINEOFSIGHT_CHECK_VMAP) && !VMAP::VMapFactory::createOrGetVMapMgr()->isInLineOfSight(GetId(), x1, y1, z1, x2, y2, z2, ignoreFlags))
+    {
         return false;
+    }
 
-    if (sWorld->getBoolConfig(CONFIG_CHECK_GOBJECT_LOS) && (checks & LINEOFSIGHT_CHECK_GOBJECT)
-            && !_dynamicTree.isInLineOfSight(x1, y1, z1, x2, y2, z2, phasemask))
-        return false;
+    if (sWorld->getBoolConfig(CONFIG_CHECK_GOBJECT_LOS) && (checks & LINEOFSIGHT_CHECK_GOBJECT_ALL))
+    {
+        ignoreFlags = VMAP::ModelIgnoreFlags::Nothing;
+        if (!(checks & LINEOFSIGHT_CHECK_GOBJECT_M2))
+        {
+            ignoreFlags = VMAP::ModelIgnoreFlags::M2;
+        }
+
+        if (!_dynamicTree.isInLineOfSight(x1, y1, z1, x2, y2, z2, phasemask, ignoreFlags))
+        {
+            return false;
+        }
+    }
+
     return true;
 }
 

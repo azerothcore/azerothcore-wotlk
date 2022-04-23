@@ -93,9 +93,9 @@ namespace FactorySelector
         }
 
         // select NullCreatureAI if not another cases
-        ainame = (ai_factory == nullptr) ? "NullCreatureAI" : ai_factory->key();
+        ainame = (!ai_factory) ? "NullCreatureAI" : ai_factory->key();
         LOG_DEBUG("scripts.ai", "Creature {} used AI is {}.", creature->GetGUID().ToString(), ainame);
-        return (ai_factory == nullptr ? new NullCreatureAI(creature) : ai_factory->Create(creature));
+        return (!ai_factory ? new NullCreatureAI(creature) : ai_factory->Create(creature));
     }
 
     MovementGenerator* selectMovementGenerator(Creature* creature)
@@ -123,7 +123,7 @@ namespace FactorySelector
             }
         }*/
 
-        return (mv_factory == nullptr ? nullptr : mv_factory->Create(creature));
+        return (!mv_factory ? nullptr : mv_factory->Create(creature));
     }
 
     GameObjectAI* SelectGameObjectAI(GameObject* go)
@@ -138,9 +138,9 @@ namespace FactorySelector
 
         //future goAI types go here
 
-        std::string ainame = (ai_factory == nullptr || go->GetScriptId()) ? "NullGameObjectAI" : ai_factory->key();
+        std::string ainame = (!ai_factory || go->GetScriptId()) ? "NullGameObjectAI" : ai_factory->key();
         LOG_DEBUG("scripts.ai", "GameObject {} used AI is {}.", go->GetGUID().ToString(), ainame);
 
-        return (ai_factory == nullptr ? new NullGameObjectAI(go) : ai_factory->Create(go));
+        return (!ai_factory ? new NullGameObjectAI(go) : ai_factory->Create(go));
     }
 }

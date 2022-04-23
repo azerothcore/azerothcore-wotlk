@@ -285,6 +285,8 @@ public:
     [[nodiscard]] float GetWanderDistance() const { return m_wanderDistance; }
     void SetWanderDistance(float dist) { m_wanderDistance = dist; }
 
+    void DoImmediateBoundaryCheck() { m_boundaryCheckTime = 0; }
+
     uint32 m_groupLootTimer;                            // (msecs)timer used for group loot
     uint32 lootingGroupLowGUID;                         // used to find group which is looting corpse
 
@@ -402,6 +404,7 @@ protected:
     uint32 m_respawnDelay;                              // (secs) delay between corpse disappearance and respawning
     uint32 m_corpseDelay;                               // (secs) delay between death and corpse disappearance
     float m_wanderDistance;
+    uint32 m_boundaryCheckTime;                         // (msecs) remaining time for next evade boundary check
     uint16 m_transportCheckTimer;
     uint32 lootPickPocketRestoreTime;
 
