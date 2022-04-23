@@ -61,7 +61,7 @@ public:
         {
             BossAI::EnterCombat(who);
 
-            events.ScheduleEvent(EVENT_SHADOWFLAME, 10000, 20000);
+            events.ScheduleEvent(EVENT_SHADOWFLAME, 18000);
             events.ScheduleEvent(EVENT_WINGBUFFET, 30000);
             events.ScheduleEvent(EVENT_SHADOWOFEBONROC, 8000, 10000);
         }
@@ -82,7 +82,7 @@ public:
                 {
                     case EVENT_SHADOWFLAME:
                         DoCastVictim(SPELL_SHADOWFLAME);
-                        events.ScheduleEvent(EVENT_SHADOWFLAME, 10000, 20000);
+                        events.ScheduleEvent(EVENT_SHADOWFLAME, urand(15000, 25000));
                         break;
                     case EVENT_WINGBUFFET:
                         DoCastVictim(SPELL_WINGBUFFET);

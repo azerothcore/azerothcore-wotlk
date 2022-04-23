@@ -125,6 +125,7 @@ public:
             { "quest_request_item_locale",     HandleReloadLocalesQuestRequestItemsCommand,   SEC_ADMINISTRATOR, Console::Yes },
             { "mail_level_reward",             HandleReloadMailLevelRewardCommand,            SEC_ADMINISTRATOR, Console::Yes },
             { "mail_loot_template",            HandleReloadLootTemplatesMailCommand,          SEC_ADMINISTRATOR, Console::Yes },
+            { "mail_server_template",          HandleReloadMailServerTemplateCommand,         SEC_ADMINISTRATOR, Console::Yes },
             { "milling_loot_template",         HandleReloadLootTemplatesMillingCommand,       SEC_ADMINISTRATOR, Console::Yes },
             { "npc_spellclick_spells",         HandleReloadSpellClickSpellsCommand,           SEC_ADMINISTRATOR, Console::Yes },
             { "npc_trainer",                   HandleReloadNpcTrainerCommand,                 SEC_ADMINISTRATOR, Console::Yes },
@@ -197,6 +198,7 @@ public:
 
         HandleReloadDungeonAccessCommand(handler);
         HandleReloadMailLevelRewardCommand(handler);
+        HandleReloadMailServerTemplateCommand(handler);
         HandleReloadCommandCommand(handler);
         HandleReloadReservedNameCommand(handler);
         HandleReloadAcoreStringCommand(handler);
@@ -1145,6 +1147,14 @@ public:
         LOG_INFO("server.loading", "Re-Loading Player level dependent mail rewards...");
         sObjectMgr->LoadMailLevelRewards();
         handler->SendGlobalGMSysMessage("DB table `mail_level_reward` reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadMailServerTemplateCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Re-Loading `server_mail_template` table");
+        sObjectMgr->LoadMailServerTemplates();
+        handler->SendGlobalGMSysMessage("DB table `server_mail_template` reloaded.");
         return true;
     }
 
