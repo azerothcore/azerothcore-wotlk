@@ -3715,8 +3715,6 @@ JoinBGAndLFG.Enable = 0
 #                     (It does not affect raids or dungeon finder groups)
 #
 #        Default:     1 - (Enabled)
-#
-#
 
 LeaveGroupOnLogout.Enabled = 1
 
