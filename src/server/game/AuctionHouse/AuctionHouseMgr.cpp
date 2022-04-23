@@ -731,6 +731,9 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
 {
     uint32 itrcounter = 0;
 
+    // Ensures that listfrom is not greater that auctions count
+    listfrom = std::min(listfrom, static_cast<uint32>(GetAuctions().size()));
+
     std::vector<AuctionEntry*> auctionShortlist;
 
     // pussywizard: optimization, this is a simplified case
@@ -880,8 +883,13 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
         }
     }
 
+    if (auctionShortlist.empty())
+    {
+        return true;
+    }
+
     // Check if sort enabled, and first sort column is valid, if not don't sort
-    if (sortOrder.size() > 0)
+    if (!sortOrder.empty())
     {
         AuctionSortInfo const& sortInfo = *sortOrder.begin();
         if (sortInfo.sortOrder >= AUCTION_SORT_MINLEVEL && sortInfo.sortOrder < AUCTION_SORT_MAX && sortInfo.sortOrder != AUCTION_SORT_UNK4)
