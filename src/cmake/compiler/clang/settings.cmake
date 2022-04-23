@@ -56,12 +56,6 @@ if(WITH_WARNINGS)
       -Wfatal-errors
       -Wno-mismatched-tags
       -Woverloaded-virtual)
-
-  if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13)
-    target_compile_options(warhead-warning-interface
-      INTERFACE
-        -Wno-deprecated-copy) # warning in g3d
-  endif()
   message(STATUS "Clang: All warnings enabled")
 endif()
 
