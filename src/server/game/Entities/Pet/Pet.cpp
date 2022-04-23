@@ -1831,16 +1831,16 @@ bool Pet::addSpell(uint32 spellId, ActiveStates active /*= ACT_DECIDE*/, PetSpel
         m_charmInfo->AddSpellToActionBar(spellInfo);
 
     // unapply aura stats if dont meet requirements
-    // handle only if player is not loaded, loading is handled in loadfromdb
-    if (!m_loading)
-        if (Aura* aura = GetAura(spellId))
-        {
-            if (aura->GetSpellInfo()->CasterAuraState == AURA_STATE_HEALTHLESS_35_PERCENT ||
-                    aura->GetSpellInfo()->CasterAuraState == AURA_STATE_HEALTH_ABOVE_75_PERCENT ||
-                    aura->GetSpellInfo()->CasterAuraState == AURA_STATE_HEALTHLESS_20_PERCENT )
-                if (!HasAuraState((AuraStateType)aura->GetSpellInfo()->CasterAuraState))
-                    aura->HandleAllEffects(aura->GetApplicationOfTarget(GetGUID()), AURA_EFFECT_HANDLE_REAL, false);
-        }
+    if (Aura* aura = GetAura(spellId))
+    {
+        if (aura->GetSpellInfo()->CasterAuraState == AURA_STATE_HEALTHLESS_35_PERCENT ||
+                aura->GetSpellInfo()->CasterAuraState == AURA_STATE_HEALTH_ABOVE_75_PERCENT ||
+                aura->GetSpellInfo()->CasterAuraState == AURA_STATE_HEALTHLESS_20_PERCENT )
+            if (!HasAuraState((AuraStateType)aura->GetSpellInfo()->CasterAuraState))
+            {
+                aura->HandleAllEffects(aura->GetApplicationOfTarget(GetGUID()), AURA_EFFECT_HANDLE_REAL, false);
+            }
+    }
 
     ToggleAutocast(spellInfo, (newspell.active == ACT_ENABLED));
 
