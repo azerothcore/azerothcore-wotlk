@@ -1,3 +1,19 @@
+-- DB update 2022_04_23_01 -> 2022_04_23_02
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_04_23_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_04_23_01 2022_04_23_02 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1642750721076432402'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1642750721076432402');
 
 -- set "execute event while charmed" flag on all events except:
@@ -50,3 +66,13 @@ UPDATE `smart_scripts` `ss` LEFT JOIN `smart_scripts` `ssl` ON `ss`.`entryorguid
 
 -- Vehicles
 UPDATE `smart_scripts` SET `event_flags`=`event_flags`|0x200 WHERE `source_type` = 0 AND `entryorguid` IN (SELECT `entry` FROM `creature_template` WHERE `AIName` = "SmartAI" AND `VehicleId` != 0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_04_23_02' WHERE sql_rev = '1642750721076432402';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
