@@ -126,7 +126,9 @@ UPDATE `quest_template_locale` SET `CompletedText` = 'Vuelve con Tharnariun Espi
 UPDATE `quest_template_locale` SET `CompletedText` = 'Vuelve con Thundris Tejevientos en Auberdine en Costa Oscura.' WHERE `ID` IN (958,4762,4763)  AND `locale` IN ('esES','esMX');
 UPDATE `quest_template_locale` SET `CompletedText` = 'Regresa con Kreldig Ungor en Punta Nijel en Desolace.' WHERE `ID` IN (1456,1458,1459,1466)  AND `locale` IN ('esES','esMX');
 UPDATE `quest_template_locale` SET `CompletedText` = 'Regresa con Maniveo Zumbang en Auberdine en Costa Oscura.' WHERE `ID` IN (1579,1580)  AND `locale` IN ('esES','esMX');
-
-
+UPDATE `quest_template_locale` SET `CompletedText` = 'Vuelve con Gretta la Mediadora en el Poblado de Brunnhildar en Las Cumbres Tormentosas.' WHERE `ID` IN (13423,13424)  AND `locale` IN ('esES','esMX');
+UPDATE `quest_template_locale` SET `CompletedText` = 'Vuelve con Montaraz Muroplof en el Valle de los Reyes en Dun Morogh.' WHERE `ID` = 263 AND `locale` IN ('esES','esMX');
+UPDATE `quest_template_locale` SET `CompletedText` = 'Vuelve a el Capitán Rugelfuss en el Paso de la Puerta Norte en Dun Morogh.' WHERE `ID` = 267 AND `locale` IN ('esES','esMX');
+UPDATE `quest_template_locale` SET `CompletedText` = 'Vuelve con el Ingeniero jefe Hinderweir VII en la Presa de las Tres Cabezas en Loch Modan.' WHERE `ID` = 278 AND `locale` IN ('esES','esMX');
 
 
