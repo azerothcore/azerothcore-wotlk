@@ -115,6 +115,5 @@ UPDATE `quest_template_locale` SET `ObjectiveText1` = 'Cruzado Escarlata asesina
 UPDATE `quest_template_locale` SET `Objectives` = '' WHERE `ID` = 2868 AND `locale` = 'esES';
 UPDATE `quest_template_locale` SET `Objectives` = '' WHERE `ID` = 5421 AND `locale` IN ('esES','esMX');
 UPDATE `quest_template_locale` SET `Details` = '' WHERE `ID` = 5421 AND `locale` IN ('esES','esMX');
-
 UPDATE `quest_template_locale` SET `CompletedText` = '' WHERE `ID` IN (894,902,1046,3301,3921,6134,6361,6362,6363,6364,6365,6384,6385,6386,9645,10068,10069,10070,10071,10072,10073,10198,11196,25055,25092)  AND `locale` IN ('esES','esMX');
-
+UPDATE `quest_template_locale` SET `CompletedText` = 'Vuelve con Montaraz Pedernal en el Paso de la Puerta Norte en Dun Morogh.' WHERE `ID` = 224 AND `locale` IN ('esES','esMX');
