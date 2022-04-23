@@ -120,3 +120,12 @@ UPDATE `quest_template_locale` SET `CompletedText` = 'Vuelve con Montaraz Pedern
 UPDATE `quest_template_locale` SET `CompletedText` = 'Vuelve con Magistrado Narizroma en Loch Modan.' WHERE `ID` = 255 AND `locale` IN ('esES','esMX');
 UPDATE `quest_template_locale` SET `CompletedText` = 'Vuelve con Daryl el Jovenzuelo en la Cabaña del Errante en Loch Modan.' WHERE `ID` IN (257,258,271)  AND `locale` IN ('esES','esMX');
 UPDATE `quest_template_locale` SET `CompletedText` = 'Vuelve con Asterion en el Cabo de la Niebla en Costa Oscura.' WHERE `ID` IN (955,956,957)  AND `locale` IN ('esES','esMX');
+UPDATE `quest_template_locale` SET `CompletedText` = 'Vuelve con Terenthis en Auberdine en Costa Oscura.' WHERE `ID` IN (984,985,986,994,995)  AND `locale` IN ('esES','esMX');
+UPDATE `quest_template_locale` SET `CompletedText` = 'Vuelve con Smeed Mezclatornillos en el Campamento de los Mezclatornillos en Desolace.' WHERE `ID` IN (5561,5581,5821)  AND `locale` IN ('esES','esMX');
+
+
+
+
+
+
+
