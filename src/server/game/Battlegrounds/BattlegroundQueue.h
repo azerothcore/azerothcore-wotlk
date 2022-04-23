@@ -135,7 +135,7 @@ private:
     // Event handler
     EventProcessor m_events;
 
-    std::array<int32, BG_BRACKET_ID_LAST> _queueAnnouncementTimer;
+    std::array<int32, MAX_BATTLEGROUND_BRACKETS> _queueAnnouncementTimer;
     bool _queueAnnouncementCrossfactioned;
 };
 
