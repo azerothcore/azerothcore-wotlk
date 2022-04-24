@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.creature_equip_template
+-- Dumpar struktur för tabell acore_world.creature_equip_template
 DROP TABLE IF EXISTS `creature_equip_template`;
 CREATE TABLE IF NOT EXISTS `creature_equip_template` (
   `CreatureID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `creature_equip_template` (
   PRIMARY KEY (`CreatureID`,`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_world.creature_equip_template: 10 755 rows
+-- Dumpar data för tabell acore_world.creature_equip_template: 10 758 rows
 DELETE FROM `creature_equip_template`;
 /*!40000 ALTER TABLE `creature_equip_template` DISABLE KEYS */;
 INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES
@@ -10783,7 +10783,10 @@ INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`,
 	(16334, 2, 2901, 0, 0, 0),
 	(16335, 2, 2901, 0, 0, 0),
 	(2621, 2, 5956, 12453, 0, 0),
-	(14849, 1, 2493, 0, 0, 0);
+	(14849, 1, 2493, 0, 0, 0),
+	(18488, 2, 27850, 27850, 0, 0),
+	(18488, 3, 27850, 27851, 0, 0),
+	(18488, 4, 27852, 0, 0, 0);
 /*!40000 ALTER TABLE `creature_equip_template` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

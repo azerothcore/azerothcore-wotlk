@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.page_text
+-- Dumpar struktur för tabell acore_world.page_text
 DROP TABLE IF EXISTS `page_text`;
 CREATE TABLE IF NOT EXISTS `page_text` (
   `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `page_text` (
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Item System';
 
--- Дамп данных таблицы acore_world.page_text: 1 946 rows
+-- Dumpar data för tabell acore_world.page_text: 1 946 rows
 DELETE FROM `page_text`;
 /*!40000 ALTER TABLE `page_text` DISABLE KEYS */;
 INSERT INTO `page_text` (`ID`, `Text`, `NextPageID`, `VerifiedBuild`) VALUES
@@ -1174,7 +1174,7 @@ INSERT INTO `page_text` (`ID`, `Text`, `NextPageID`, `VerifiedBuild`) VALUES
 	(2510, 'Grish-$B$BYour request for some time off has been accepted. I am sending a reserve Tauren warrior to watch your post while you take time off to spend with your family. Report back in one week!$B$B-Maggran Earthbinder ', 0, 1),
 	(2511, 'Dear Zargh,$B$BThe steaks you sent are fine.  Well marbled, thickly sliced and packed in boar fat.  They\'re just how I like them.  When I eat them later, I will think of you as I gnaw on the last bits of bone and grisle.  I will close my eyes and see your strong, scarred hands chopping and cutting...$B$BHah!  That reminds me of when you had your accident and lost a finger... Oh, Zargh!  Thinking of that day makes me giggle like a little girl.$B$BYou\'re so cute when you\'re bleeding!$B$B-Gryshka ', 0, 12340),
 	(2512, 'Osric, Please find below the list of armor of which we are in need: 10 Mail shirts 20 Helms 30 Armor Patches 15 Mail Boots We are, as always, in your debt.  And should Westfall ever be free of the thieves who threaten it, it would ease the guilt in my heart if I could invite you to my family\'s home, for a fine meal cooked from the bounty this land was once so well known. -Lewis Quartermaster, Sentinel Hill ', 0, 1),
-	(2513, 'Nessa, It is good to hear from you. The collection of bones and scales  you sent me was incredible.  Never have I seen fish of that size off the mainland.  the fishers of Rut\'theran must pull in easily a ton of fish each day! I envy the size of their bounty, but I am a small bit troubled as well.  Could our new world tree make the fish grow to such a size?  If that is so, what other effects might it have? Questions to ponder, -Laird ', 0, 1),
+	(2513, 'Nessa,$B$BIt is good to hear from you.$B$BThe collection of bones and scales  you sent me was incredible. Never have I seen fish of that size off the mainland.  the fishers of Rut\'theran must pull in easily a ton of fish each day!$B$BI envy the size of their bounty, but I am a small bit troubled as well. Could our new world tree make the fish grow to such a size? If that is so, what other effects might it have?$B$BQuestions to ponder,$B-Laird', 0, 1),
 	(2514, 'Below is the list of students who obtained a Platinum Star grade at Brock\'s School of Mining and Surveying, earning them an Honorary Miner\'s Pick:$b$bMelia Stoneshaker$bBardin Ironband$bUmi Togglevolt$bRumi Togglevolt$bVorel Steelspire', 0, 1),
 	(2515, 'By order of High Executor Hadrec, below are the items deemed necessary in order to maintain the stock of the Sepulcher:\n\r\n\r12 Long swords\n\r9 Dagggers\n\r8 Round Shields\n\r15 Axes\n\r1000 Arrows\n\r\n\rFulfillment of this order is to be considered a direct command of the Dark Lady, and those responsible will be brought to Her attention, as will any who oppose or otherwise hamper Her wishes.', 0, 1),
 	(2530, 'By order of High Executor Hadrec, below are the items deemed necessary in order to maintain the stock of the Sepulcher: 12 Long swords 9 Dagggers 8 Round Shields 15 Axes 1000 Arrows Fulfillment of this order is to be considered a direct command of the Dark Lady, and those responsible will be brought to Her attention, as will any who oppose or otherwise hamper Her wishes. ', 0, 1),

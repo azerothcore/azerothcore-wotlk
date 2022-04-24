@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.creature_classlevelstats
+-- Dumpar struktur för tabell acore_world.creature_classlevelstats
 DROP TABLE IF EXISTS `creature_classlevelstats`;
 CREATE TABLE IF NOT EXISTS `creature_classlevelstats` (
   `level` TINYINT unsigned NOT NULL,
@@ -27,11 +27,11 @@ CREATE TABLE IF NOT EXISTS `creature_classlevelstats` (
   `damage_base` float NOT NULL DEFAULT 0,
   `damage_exp1` float NOT NULL DEFAULT 0,
   `damage_exp2` float NOT NULL DEFAULT 0,
-  `comment` text DEFAULT NULL,
+  `comment` text,
   PRIMARY KEY (`level`,`class`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_world.creature_classlevelstats: 400 rows
+-- Dumpar data för tabell acore_world.creature_classlevelstats: 400 rows
 DELETE FROM `creature_classlevelstats`;
 /*!40000 ALTER TABLE `creature_classlevelstats` DISABLE KEYS */;
 INSERT INTO `creature_classlevelstats` (`level`, `class`, `basehp0`, `basehp1`, `basehp2`, `basemana`, `basearmor`, `attackpower`, `rangedattackpower`, `damage_base`, `damage_exp1`, `damage_exp2`, `comment`) VALUES

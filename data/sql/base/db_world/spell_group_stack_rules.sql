@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,16 +12,16 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.spell_group_stack_rules
+-- Dumpar struktur för tabell acore_world.spell_group_stack_rules
 DROP TABLE IF EXISTS `spell_group_stack_rules`;
 CREATE TABLE IF NOT EXISTS `spell_group_stack_rules` (
   `group_id` INT unsigned NOT NULL DEFAULT 0,
   `stack_rule` TINYINT NOT NULL DEFAULT 0,
-  `description` varchar(150) NOT NULL DEFAULT '',
+  `description` VARCHAR(150) NOT NULL DEFAULT '',
   PRIMARY KEY (`group_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_world.spell_group_stack_rules: 37 rows
+-- Dumpar data för tabell acore_world.spell_group_stack_rules: 37 rows
 DELETE FROM `spell_group_stack_rules`;
 /*!40000 ALTER TABLE `spell_group_stack_rules` DISABLE KEYS */;
 INSERT INTO `spell_group_stack_rules` (`group_id`, `stack_rule`, `description`) VALUES

@@ -13,7 +13,7 @@ function import() {
     folder="db_"$db
     pendingPath="$AC_PATH_ROOT/data/sql/updates/pending_$folder"
     updPath="$UPDATES_PATH/$folder"
-    archivedPath="$AC_PATH_ROOT/data/sql/archive/$folder/5.x"
+    archivedPath="$AC_PATH_ROOT/data/sql/archive/$folder/6.x"
 
     latestUpd=$(ls -1 $updPath/ | tail -n 1)
 

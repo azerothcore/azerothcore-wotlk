@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,11 +12,11 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.areatrigger_teleport
+-- Dumpar struktur för tabell acore_world.areatrigger_teleport
 DROP TABLE IF EXISTS `areatrigger_teleport`;
 CREATE TABLE IF NOT EXISTS `areatrigger_teleport` (
   `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `Name` text DEFAULT NULL,
+  `Name` text,
   `target_map` SMALLINT unsigned NOT NULL DEFAULT 0,
   `target_position_x` float NOT NULL DEFAULT 0,
   `target_position_y` float NOT NULL DEFAULT 0,
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `areatrigger_teleport` (
   FULLTEXT KEY `name` (`Name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Trigger System';
 
--- Дамп данных таблицы acore_world.areatrigger_teleport: 274 rows
+-- Dumpar data för tabell acore_world.areatrigger_teleport: 274 rows
 DELETE FROM `areatrigger_teleport`;
 /*!40000 ALTER TABLE `areatrigger_teleport` DISABLE KEYS */;
 INSERT INTO `areatrigger_teleport` (`ID`, `Name`, `target_map`, `target_position_x`, `target_position_y`, `target_position_z`, `target_orientation`) VALUES

@@ -56,19 +56,17 @@ enum Spells
 enum Events
 {
     EVENT_SHIMMER       = 1,
-    EVENT_BREATH_1      = 2,
-    EVENT_BREATH_2      = 3,
-    EVENT_AFFLICTION    = 4,
-    EVENT_FRENZY        = 5
+    EVENT_BREATH        = 2,
+    EVENT_AFFLICTION    = 3,
+    EVENT_FRENZY        = 4
 };
 
 enum Misc
 {
-    DATA_LEVER_USED = 0
+    GUID_LEVER_USER = 0
 };
 
-// not sniffed yet.
-Position const homePos = { -7487.577148f, -1074.366943f, 476.555023f, 5.325001f };
+Position const homePos = { -7491.1587f, -1069.718f, 476.59094, 476.59094f };
 
 class boss_chromaggus : public CreatureScript
 {
@@ -81,120 +79,15 @@ public:
         {
             Initialize();
 
-            Breath1_Spell = 0;
-            Breath2_Spell = 0;
+            // Select the 2 breaths that we are going to use until despawned so we don't end up casting 2 of the same breath.
+            _breathSpells = { SPELL_INCINERATE, SPELL_TIMELAPSE,  SPELL_CORROSIVEACID, SPELL_IGNITEFLESH, SPELL_FROSTBURN };
 
-            // Select the 2 breaths that we are going to use until despawned
-            // 5 possiblities for the first breath, 4 for the second, 20 total possiblites
-            // This way we don't end up casting 2 of the same breath
-            // TL TL would be stupid
-            switch (urand(0, 19))
-            {
-                // B1 - Incin
-                case 0:
-                    Breath1_Spell = SPELL_INCINERATE;
-                    Breath2_Spell = SPELL_TIMELAPSE;
-                    break;
-                case 1:
-                    Breath1_Spell = SPELL_INCINERATE;
-                    Breath2_Spell = SPELL_CORROSIVEACID;
-                    break;
-                case 2:
-                    Breath1_Spell = SPELL_INCINERATE;
-                    Breath2_Spell = SPELL_IGNITEFLESH;
-                    break;
-                case 3:
-                    Breath1_Spell = SPELL_INCINERATE;
-                    Breath2_Spell = SPELL_FROSTBURN;
-                    break;
-
-                    // B1 - TL
-                case 4:
-                    Breath1_Spell = SPELL_TIMELAPSE;
-                    Breath2_Spell = SPELL_INCINERATE;
-                    break;
-                case 5:
-                    Breath1_Spell = SPELL_TIMELAPSE;
-                    Breath2_Spell = SPELL_CORROSIVEACID;
-                    break;
-                case 6:
-                    Breath1_Spell = SPELL_TIMELAPSE;
-                    Breath2_Spell = SPELL_IGNITEFLESH;
-                    break;
-                case 7:
-                    Breath1_Spell = SPELL_TIMELAPSE;
-                    Breath2_Spell = SPELL_FROSTBURN;
-                    break;
-
-                    //B1 - Acid
-                case 8:
-                    Breath1_Spell = SPELL_CORROSIVEACID;
-                    Breath2_Spell = SPELL_INCINERATE;
-                    break;
-                case 9:
-                    Breath1_Spell = SPELL_CORROSIVEACID;
-                    Breath2_Spell = SPELL_TIMELAPSE;
-                    break;
-                case 10:
-                    Breath1_Spell = SPELL_CORROSIVEACID;
-                    Breath2_Spell = SPELL_IGNITEFLESH;
-                    break;
-                case 11:
-                    Breath1_Spell = SPELL_CORROSIVEACID;
-                    Breath2_Spell = SPELL_FROSTBURN;
-                    break;
-
-                    //B1 - Ignite
-                case 12:
-                    Breath1_Spell = SPELL_IGNITEFLESH;
-                    Breath2_Spell = SPELL_INCINERATE;
-                    break;
-                case 13:
-                    Breath1_Spell = SPELL_IGNITEFLESH;
-                    Breath2_Spell = SPELL_CORROSIVEACID;
-                    break;
-                case 14:
-                    Breath1_Spell = SPELL_IGNITEFLESH;
-                    Breath2_Spell = SPELL_TIMELAPSE;
-                    break;
-                case 15:
-                    Breath1_Spell = SPELL_IGNITEFLESH;
-                    Breath2_Spell = SPELL_FROSTBURN;
-                    break;
-
-                    //B1 - Frost
-                case 16:
-                    Breath1_Spell = SPELL_FROSTBURN;
-                    Breath2_Spell = SPELL_INCINERATE;
-                    break;
-                case 17:
-                    Breath1_Spell = SPELL_FROSTBURN;
-                    Breath2_Spell = SPELL_TIMELAPSE;
-                    break;
-                case 18:
-                    Breath1_Spell = SPELL_FROSTBURN;
-                    Breath2_Spell = SPELL_CORROSIVEACID;
-                    break;
-                case 19:
-                    Breath1_Spell = SPELL_FROSTBURN;
-                    Breath2_Spell = SPELL_IGNITEFLESH;
-                    break;
-            };
-
-            EnterEvadeMode();
+            Acore::Containers::RandomResize(_breathSpells, 2);
         }
 
         void Initialize()
         {
             Enraged = false;
-        }
-
-        void SetData(uint32 id, uint32 /*data*/) override
-        {
-            if (id == DATA_LEVER_USED)
-            {
-                me->SetHomePosition(homePos);
-            }
         }
 
         void Reset() override
@@ -209,8 +102,8 @@ public:
             BossAI::EnterCombat(victim);
 
             events.ScheduleEvent(EVENT_SHIMMER, 1000);
-            events.ScheduleEvent(EVENT_BREATH_1, 30000);
-            events.ScheduleEvent(EVENT_BREATH_2, 60000);
+            events.ScheduleEvent(EVENT_BREATH, 30000);
+            events.ScheduleEvent(EVENT_BREATH, 60000);
             events.ScheduleEvent(EVENT_AFFLICTION, 10000);
             events.ScheduleEvent(EVENT_FRENZY, 15000);
         }
@@ -218,6 +111,22 @@ public:
         bool CanAIAttack(Unit const* victim) const override
         {
             return !victim->HasAura(SPELL_TIMELAPSE);
+        }
+
+        void SetGUID(ObjectGuid guid, int32 id) override
+        {
+            if (id == GUID_LEVER_USER)
+            {
+                _playerGUID = guid;
+            }
+        }
+
+        void PathEndReached(uint32 /*pathId*/) override
+        {
+            if (Unit* player = ObjectAccessor::GetUnit(*me, _playerGUID))
+            {
+                me->SetInCombatWith(player);
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -242,14 +151,11 @@ public:
                             events.ScheduleEvent(EVENT_SHIMMER, urand(17000, 25000));
                             break;
                         }
-                    case EVENT_BREATH_1:
-                            DoCastVictim(Breath1_Spell);
-                            events.ScheduleEvent(EVENT_BREATH_1, 60000);
-                            break;
-                    case EVENT_BREATH_2:
-                            DoCastVictim(Breath2_Spell);
-                            events.ScheduleEvent(EVENT_BREATH_2, 60000);
-                            break;
+                    case EVENT_BREATH:
+                        DoCastVictim(_breathSpells.front());
+                        _breathSpells.reverse();
+                        events.ScheduleEvent(EVENT_BREATH, 60000);
+                        break;
                     case EVENT_AFFLICTION:
                         {
                             uint32 afflictionSpellID = RAND(SPELL_BROODAF_BLUE, SPELL_BROODAF_BLACK, SPELL_BROODAF_RED, SPELL_BROODAF_BRONZE, SPELL_BROODAF_GREEN);
@@ -305,9 +211,9 @@ public:
         }
 
     private:
-        uint32 Breath1_Spell;
-        uint32 Breath2_Spell;
+        std::list<uint32> _breathSpells;
         bool Enraged;
+        ObjectGuid _playerGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -331,12 +237,11 @@ class go_chromaggus_lever : public GameObjectScript
                 {
                     if (_instance->GetBossState(DATA_CHROMAGGUS) != DONE && _instance->GetBossState(DATA_CHROMAGGUS) != IN_PROGRESS)
                     {
-                        _instance->SetBossState(DATA_CHROMAGGUS, IN_PROGRESS);
-
                         if (Creature* creature = _instance->instance->GetCreature(_instance->GetGuidData(DATA_CHROMAGGUS)))
                         {
-                            creature->AI()->AttackStart(player);
-                            creature->AI()->SetData(DATA_LEVER_USED, 1);
+                            creature->SetHomePosition(homePos);
+                            creature->GetMotionMaster()->MovePath(creature->GetEntry() * 10, false);
+                            creature->AI()->SetGUID(player->GetGUID(), GUID_LEVER_USER);
                         }
 
                         if (GameObject* go = _instance->instance->GetGameObject(_instance->GetGuidData(DATA_GO_CHROMAGGUS_DOOR)))
