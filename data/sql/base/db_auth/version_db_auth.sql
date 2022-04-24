@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,19 +12,19 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_auth.version_db_auth
+-- Dumpar struktur för tabell acore_auth.version_db_auth
 DROP TABLE IF EXISTS `version_db_auth`;
 CREATE TABLE IF NOT EXISTS `version_db_auth` (
-  `sql_rev` varchar(100) NOT NULL,
-  `required_rev` varchar(100) DEFAULT NULL,
-  `date` varchar(50) DEFAULT NULL,
+  `sql_rev` VARCHAR(100) NOT NULL,
+  `required_rev` VARCHAR(100) DEFAULT NULL,
+  `date` VARCHAR(50) DEFAULT NULL,
   `2021_11_06_00` bit(1) DEFAULT NULL,
   PRIMARY KEY (`sql_rev`),
   KEY `required` (`required_rev`),
   CONSTRAINT `required` FOREIGN KEY (`required_rev`) REFERENCES `version_db_auth` (`sql_rev`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='Last applied sql update to DB';
 
--- Дамп данных таблицы acore_auth.version_db_auth: ~10 rows (приблизительно)
+-- Dumpar data för tabell acore_auth.version_db_auth: ~10 rows (ungefär)
 DELETE FROM `version_db_auth`;
 /*!40000 ALTER TABLE `version_db_auth` DISABLE KEYS */;
 INSERT INTO `version_db_auth` (`sql_rev`, `required_rev`, `date`, `2021_11_06_00`) VALUES

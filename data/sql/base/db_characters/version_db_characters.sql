@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,22 +12,22 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_characters.version_db_characters
+-- Dumpar struktur för tabell acore_characters.version_db_characters
 DROP TABLE IF EXISTS `version_db_characters`;
 CREATE TABLE IF NOT EXISTS `version_db_characters` (
-  `sql_rev` varchar(100) NOT NULL,
-  `required_rev` varchar(100) DEFAULT NULL,
-  `date` varchar(50) DEFAULT NULL,
-  `2021_12_26_01` bit(1) DEFAULT NULL,
+  `sql_rev` VARCHAR(100) NOT NULL,
+  `required_rev` VARCHAR(100) DEFAULT NULL,
+  `date` VARCHAR(50) DEFAULT NULL,
+  `2022_04_19_00` bit(1) DEFAULT NULL,
   PRIMARY KEY (`sql_rev`),
   KEY `required` (`required_rev`),
   CONSTRAINT `required` FOREIGN KEY (`required_rev`) REFERENCES `version_db_characters` (`sql_rev`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='Last applied sql update to DB';
 
--- Дамп данных таблицы acore_characters.version_db_characters: ~23 rows (приблизительно)
+-- Dumpar data för tabell acore_characters.version_db_characters: ~30 rows (ungefär)
 DELETE FROM `version_db_characters`;
 /*!40000 ALTER TABLE `version_db_characters` DISABLE KEYS */;
-INSERT INTO `version_db_characters` (`sql_rev`, `required_rev`, `date`, `2021_12_26_01`) VALUES
+INSERT INTO `version_db_characters` (`sql_rev`, `required_rev`, `date`, `2022_04_19_00`) VALUES
 	('1557226918417685700', NULL, NULL, NULL),
 	('1557608218190967100', NULL, NULL, NULL),
 	('1572030074009407852', NULL, NULL, NULL),
@@ -52,7 +52,12 @@ INSERT INTO `version_db_characters` (`sql_rev`, `required_rev`, `date`, `2021_12
 	('1634163696773334100', NULL, '2021_10_14_00', NULL),
 	('1635587652443122100', NULL, '2021_11_06_00', NULL),
 	('1638643807174948000', NULL, '2021_12_26_00', NULL),
-	('1640532476858588300', NULL, '2021_12_26_01', NULL);
+	('1640532476858588300', NULL, '2021_12_26_01', NULL),
+	('1642821969869259834', NULL, '2022_01_25_00', NULL),
+	('1642926800068632800', NULL, '2022_01_29_00', NULL),
+	('1644159033376794200', NULL, '2022_03_01_00', NULL),
+	('1644531230030579700', NULL, '2022_04_19_00', NULL),
+	('1644943100668922283', NULL, '2022_02_16_00', NULL);
 /*!40000 ALTER TABLE `version_db_characters` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

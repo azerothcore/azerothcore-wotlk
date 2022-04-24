@@ -304,7 +304,8 @@ public:
         {
             if (summon->GetEntry() == NPC_NEFARIAN)
             {
-                summons.DespawnAll();
+                summons.DespawnEntry(_nefarianLeftTunnel);
+                summons.DespawnEntry(_nefarianRightTunnel);
                 Unit::Kill(me, me);
             }
         }
@@ -1014,49 +1015,42 @@ class spell_class_call_handler : public SpellScript
         if (SpellInfo const* spellInfo = GetSpellInfo())
         {
             targets.remove_if([spellInfo](WorldObject const* target) -> bool
+            {
+                Player const* player = target->ToPlayer();
+                if (!player || player->getClass() == CLASS_DEATH_KNIGHT) // ignore all death knights from whatever spell, for some reason the condition below is not working x.x
                 {
-                    Player const* player = target->ToPlayer();
-                    if (!player || player->getClass() == CLASS_DEATH_KNIGHT) // ignore all death knights from whatever spell, for some reason the condition below is not working x.x
-                    {
-                        return true;
-                    }
+                    return true;
+                }
 
-                    auto it = classCallSpells.find(spellInfo->Id);
-                    if (it != classCallSpells.end()) // should never happen but only to be sure.
-                    {
-                        return target->ToPlayer()->getClass() != it->second;
-                    }
+                auto it = classCallSpells.find(spellInfo->Id);
+                if (it != classCallSpells.end()) // should never happen but only to be sure.
+                {
+                    return target->ToPlayer()->getClass() != it->second;
+                }
 
-                    return false;
-                });
+                return false;
+            });
         }
     }
 
-    void HandleOnHitRogue()
+    void HandleOnHitRogue(SpellEffIndex /*effIndex*/)
     {
         Unit* caster = GetCaster();
         Unit* target = GetHitUnit();
-
         if (!caster || !target)
         {
             return;
         }
 
-        float angle = rand_norm() * 2 * M_PI;
-        Position tp = caster->GetPosition();
-        tp.m_positionX += std::cos(angle) * 5.f;
-        tp.m_positionY += std::sin(angle) * 5.f;
-        float z = tp.m_positionZ + 0.5f;
-        caster->UpdateAllowedPositionZ(tp.GetPositionX(), tp.GetPositionY(), z);
-        target->NearTeleportTo(tp.GetPositionX(), tp.GetPositionY(), z, angle - M_PI);
-        target->UpdatePositionData();
+        Position tp = caster->GetFirstCollisionPosition(5.f, 0.f);
+        target->NearTeleportTo(tp.GetPositionX(), tp.GetPositionY(), tp.GetPositionZ(), tp.GetOrientation());
     }
 
     void HandleOnHitWarlock()
     {
-        if (GetHitUnit())
+        if (Unit* target = GetHitUnit())
         {
-            GetHitUnit()->CastSpell(GetHitUnit(), SPELL_SUMMON_INFERNALS, true);
+            target->CastSpell(target, SPELL_SUMMON_INFERNALS, true);
         }
     }
 
@@ -1066,7 +1060,7 @@ class spell_class_call_handler : public SpellScript
 
         if (m_scriptSpellId == SPELL_ROGUE)
         {
-            OnHit += SpellHitFn(spell_class_call_handler::HandleOnHitRogue);
+            OnEffectLaunchTarget += SpellEffectFn(spell_class_call_handler::HandleOnHitRogue, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
         }
         else if (m_scriptSpellId == SPELL_WARLOCK)
         {

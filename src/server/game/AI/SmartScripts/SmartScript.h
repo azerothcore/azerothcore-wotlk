@@ -61,25 +61,11 @@ public:
         return obj;
     }
 
-    bool IsUnit(WorldObject* obj)
-    {
-        return obj && obj->IsInWorld() && (obj->GetTypeId() == TYPEID_UNIT || obj->GetTypeId() == TYPEID_PLAYER);
-    }
-
-    bool IsPlayer(WorldObject* obj)
-    {
-        return obj && obj->IsInWorld() && obj->GetTypeId() == TYPEID_PLAYER;
-    }
-
-    bool IsCreature(WorldObject* obj)
-    {
-        return obj && obj->IsInWorld() && obj->GetTypeId() == TYPEID_UNIT;
-    }
-
-    bool IsGameObject(WorldObject* obj)
-    {
-        return obj && obj->IsInWorld() && obj->GetTypeId() == TYPEID_GAMEOBJECT;
-    }
+    static bool IsUnit(WorldObject* obj);
+    static bool IsPlayer(WorldObject* obj);
+    static bool IsCreature(WorldObject* obj);
+    static bool IsCharmedCreature(WorldObject* obj);
+    static bool IsGameObject(WorldObject* obj);
 
     void OnUpdate(const uint32 diff);
     void OnMoveInLineOfSight(Unit* who);

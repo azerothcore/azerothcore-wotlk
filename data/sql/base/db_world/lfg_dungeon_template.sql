@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,11 +12,11 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.lfg_dungeon_template
+-- Dumpar struktur för tabell acore_world.lfg_dungeon_template
 DROP TABLE IF EXISTS `lfg_dungeon_template`;
 CREATE TABLE IF NOT EXISTS `lfg_dungeon_template` (
   `dungeonId` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Unique id from LFGDungeons.dbc',
-  `name` varchar(255) CHARACTER SET latin1 DEFAULT NULL,
+  `name` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
   `position_x` float NOT NULL DEFAULT 0,
   `position_y` float NOT NULL DEFAULT 0,
   `position_z` float NOT NULL DEFAULT 0,
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `lfg_dungeon_template` (
   PRIMARY KEY (`dungeonId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_world.lfg_dungeon_template: 21 rows
+-- Dumpar data för tabell acore_world.lfg_dungeon_template: 21 rows
 DELETE FROM `lfg_dungeon_template`;
 /*!40000 ALTER TABLE `lfg_dungeon_template` DISABLE KEYS */;
 INSERT INTO `lfg_dungeon_template` (`dungeonId`, `name`, `position_x`, `position_y`, `position_z`, `orientation`, `VerifiedBuild`) VALUES

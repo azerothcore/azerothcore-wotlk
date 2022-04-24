@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,27 +12,27 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.game_weather
+-- Dumpar struktur för tabell acore_world.game_weather
 DROP TABLE IF EXISTS `game_weather`;
 CREATE TABLE IF NOT EXISTS `game_weather` (
   `zone` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `spring_rain_chance` TINYINT unsigned NOT NULL DEFAULT 25,
-  `spring_snow_chance` TINYINT unsigned NOT NULL DEFAULT 25,
-  `spring_storm_chance` TINYINT unsigned NOT NULL DEFAULT 25,
-  `summer_rain_chance` TINYINT unsigned NOT NULL DEFAULT 25,
-  `summer_snow_chance` TINYINT unsigned NOT NULL DEFAULT 25,
-  `summer_storm_chance` TINYINT unsigned NOT NULL DEFAULT 25,
-  `fall_rain_chance` TINYINT unsigned NOT NULL DEFAULT 25,
-  `fall_snow_chance` TINYINT unsigned NOT NULL DEFAULT 25,
-  `fall_storm_chance` TINYINT unsigned NOT NULL DEFAULT 25,
-  `winter_rain_chance` TINYINT unsigned NOT NULL DEFAULT 25,
-  `winter_snow_chance` TINYINT unsigned NOT NULL DEFAULT 25,
-  `winter_storm_chance` TINYINT unsigned NOT NULL DEFAULT 25,
+  `spring_rain_chance` TINYINT unsigned NOT NULL DEFAULT '25',
+  `spring_snow_chance` TINYINT unsigned NOT NULL DEFAULT '25',
+  `spring_storm_chance` TINYINT unsigned NOT NULL DEFAULT '25',
+  `summer_rain_chance` TINYINT unsigned NOT NULL DEFAULT '25',
+  `summer_snow_chance` TINYINT unsigned NOT NULL DEFAULT '25',
+  `summer_storm_chance` TINYINT unsigned NOT NULL DEFAULT '25',
+  `fall_rain_chance` TINYINT unsigned NOT NULL DEFAULT '25',
+  `fall_snow_chance` TINYINT unsigned NOT NULL DEFAULT '25',
+  `fall_storm_chance` TINYINT unsigned NOT NULL DEFAULT '25',
+  `winter_rain_chance` TINYINT unsigned NOT NULL DEFAULT '25',
+  `winter_snow_chance` TINYINT unsigned NOT NULL DEFAULT '25',
+  `winter_storm_chance` TINYINT unsigned NOT NULL DEFAULT '25',
   `ScriptName` char(64) NOT NULL DEFAULT '',
   PRIMARY KEY (`zone`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Weather System';
 
--- Дамп данных таблицы acore_world.game_weather: 35 rows
+-- Dumpar data för tabell acore_world.game_weather: 35 rows
 DELETE FROM `game_weather`;
 /*!40000 ALTER TABLE `game_weather` DISABLE KEYS */;
 INSERT INTO `game_weather` (`zone`, `spring_rain_chance`, `spring_snow_chance`, `spring_storm_chance`, `summer_rain_chance`, `summer_snow_chance`, `summer_storm_chance`, `fall_rain_chance`, `fall_snow_chance`, `fall_storm_chance`, `winter_rain_chance`, `winter_snow_chance`, `winter_storm_chance`, `ScriptName`) VALUES

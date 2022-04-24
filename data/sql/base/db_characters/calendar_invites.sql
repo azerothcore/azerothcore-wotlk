@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_characters.calendar_invites
+-- Dumpar struktur för tabell acore_characters.calendar_invites
 DROP TABLE IF EXISTS `calendar_invites`;
 CREATE TABLE IF NOT EXISTS `calendar_invites` (
   `id` BIGINT unsigned NOT NULL DEFAULT 0,
@@ -22,11 +22,11 @@ CREATE TABLE IF NOT EXISTS `calendar_invites` (
   `status` TINYINT unsigned NOT NULL DEFAULT 0,
   `statustime` INT unsigned NOT NULL DEFAULT 0,
   `rank` TINYINT unsigned NOT NULL DEFAULT 0,
-  `text` varchar(255) NOT NULL DEFAULT '',
+  `text` VARCHAR(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_characters.calendar_invites: ~0 rows (приблизительно)
+-- Dumpar data för tabell acore_characters.calendar_invites: ~0 rows (ungefär)
 DELETE FROM `calendar_invites`;
 /*!40000 ALTER TABLE `calendar_invites` DISABLE KEYS */;
 /*!40000 ALTER TABLE `calendar_invites` ENABLE KEYS */;
