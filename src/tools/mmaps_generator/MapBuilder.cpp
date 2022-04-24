@@ -990,7 +990,7 @@ namespace MMAP
         return true;
     }
 
-    rcConfig MapBuilder::GetMapSpecificConfig(uint32 mapID, float bmin[3], float bmax[3], const TileConfig &tileConfig) const
+    rcConfig MapBuilder::GetMapSpecificConfig(uint32 mapID, float bmin[3], float bmax[3], const TileConfig &tileConfig)
     {
         rcConfig config;
         memset(&config, 0, sizeof(rcConfig));
