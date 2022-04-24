@@ -63,9 +63,7 @@ enum Events
 
 enum Misc
 {
-    GUID_LEVER_USER = 0,
-
-    PATH_FINAL_DESTINATION = 4
+    GUID_LEVER_USER = 0
 };
 
 Position const homePos = { -7491.1587f, -1069.718f, 476.59094, 476.59094f };
