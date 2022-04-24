@@ -61,30 +61,17 @@ public:
         return obj;
     }
 
-    bool IsUnit(WorldObject* obj)
-    {
-        return obj && obj->IsInWorld() && (obj->GetTypeId() == TYPEID_UNIT || obj->GetTypeId() == TYPEID_PLAYER);
-    }
-
-    bool IsPlayer(WorldObject* obj)
-    {
-        return obj && obj->IsInWorld() && obj->GetTypeId() == TYPEID_PLAYER;
-    }
-
-    bool IsCreature(WorldObject* obj)
-    {
-        return obj && obj->IsInWorld() && obj->GetTypeId() == TYPEID_UNIT;
-    }
-
-    bool IsGameObject(WorldObject* obj)
-    {
-        return obj && obj->IsInWorld() && obj->GetTypeId() == TYPEID_GAMEOBJECT;
-    }
+    static bool IsUnit(WorldObject* obj);
+    static bool IsPlayer(WorldObject* obj);
+    static bool IsCreature(WorldObject* obj);
+    static bool IsCharmedCreature(WorldObject* obj);
+    static bool IsGameObject(WorldObject* obj);
 
     void OnUpdate(const uint32 diff);
     void OnMoveInLineOfSight(Unit* who);
 
     Unit* DoSelectLowestHpFriendly(float range, uint32 MinHPDiff);
+    Unit* DoSelectLowestHpPercentFriendly(float range, uint32 minHpPct, uint32 maxHpPct) const;
     void DoFindFriendlyCC(std::list<Creature*>& _list, float range);
     void DoFindFriendlyMissingBuff(std::list<Creature*>& list, float range, uint32 spellid);
     Unit* DoFindClosestFriendlyInRange(float range, bool playerOnly);
