@@ -191,6 +191,7 @@ public:
                         events.ScheduleEvent(EVENT_SWOOP, urand(20000, 30000), PHASE_ONE);
                         break;
                     case EVENT_SPAWN_BATS:
+                        Talk(EMOTE_SUMMON_BATS);
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             for (uint8 i = 0; i < 6; ++i)
                                 if (Creature* bat = me->SummonCreature(NPC_BLOODSEEKER_BAT, SpawnBat[i], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
