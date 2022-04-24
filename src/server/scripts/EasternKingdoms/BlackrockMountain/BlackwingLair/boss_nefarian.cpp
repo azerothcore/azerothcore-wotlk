@@ -304,7 +304,8 @@ public:
         {
             if (summon->GetEntry() == NPC_NEFARIAN)
             {
-                summons.DespawnAll();
+                summons.DespawnEntry(_nefarianLeftTunnel);
+                summons.DespawnEntry(_nefarianRightTunnel);
                 Unit::Kill(me, me);
             }
         }
