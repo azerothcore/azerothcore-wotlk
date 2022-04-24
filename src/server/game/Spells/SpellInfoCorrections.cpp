@@ -4243,10 +4243,10 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
-    // Brood Power Bronze
-    ApplySpellFix({ 22291 }, [](SpellInfo* spellInfo)
+    // Brood Power : Bronze
+    ApplySpellFix({ 22311 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->MaxAffectedTargets = 1;
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_CASTER_PROCS;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
