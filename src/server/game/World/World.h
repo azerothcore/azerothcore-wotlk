@@ -339,7 +339,6 @@ public:
 
     // used World DB version
     void LoadDBVersion() override;
-    void LoadDBRevision() override;
     [[nodiscard]] char const* GetDBVersion() const override { return m_DBVersion.c_str(); }
     [[nodiscard]] char const* GetWorldDBRevision() const override { return m_WorldDBRevision.c_str(); }
     [[nodiscard]] char const* GetCharacterDBRevision() const override { return m_CharacterDBRevision.c_str(); }
