@@ -6352,15 +6352,20 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
         damage = target->CalculateAOEDamageReduction(damage, GetSpellInfo()->SchoolMask, caster);
     }
 
+    int32 dmg = damage;
+    int32 mitigatedDamage = cleanDamage.mitigated_damage;
     if (CanApplyResilience())
     {
-        int32 resilienceReduction = damage;
+        int32 resilienceReduction = dmg;
         Unit::ApplyResilience(target, nullptr, &resilienceReduction, crit, CR_CRIT_TAKEN_SPELL);
 
-        resilienceReduction = damage - resilienceReduction;
-        damage -= resilienceReduction;
-        cleanDamage.mitigated_damage += resilienceReduction;
+        resilienceReduction = dmg - resilienceReduction;
+        dmg -= resilienceReduction;
+        mitigatedDamage += resilienceReduction;
     }
+
+    damage = std::max(0, dmg);
+    cleanDamage.mitigated_damage = std::max(0, mitigatedDamage);
 
     DamageInfo dmgInfo(caster, target, damage, GetSpellInfo(), GetSpellInfo()->GetSchoolMask(), DOT, cleanDamage.mitigated_damage);
     Unit::CalcAbsorbResist(dmgInfo);
@@ -6433,15 +6438,20 @@ void AuraEffect::HandlePeriodicHealthLeechAuraTick(Unit* target, Unit* caster) c
         damage = damageReductedArmor;
     }
 
+    int32 dmg = damage;
+    int32 cleanDamageAmount = cleanDamage.mitigated_damage;
     if (CanApplyResilience())
     {
-        int32 resilienceReduction = damage;
+        int32 resilienceReduction = dmg;
         Unit::ApplyResilience(target, nullptr, &resilienceReduction, crit, CR_CRIT_TAKEN_SPELL);
 
-        resilienceReduction = damage - resilienceReduction;
-        damage -= resilienceReduction;
-        cleanDamage.mitigated_damage += resilienceReduction;
+        resilienceReduction = dmg - resilienceReduction;
+        dmg -= resilienceReduction;
+        cleanDamageAmount += resilienceReduction;
     }
+
+    damage = std::max(0, dmg);
+    cleanDamage.mitigated_damage = std::max(0, cleanDamageAmount);
 
     DamageInfo dmgInfo(caster, target, damage, GetSpellInfo(), GetSpellInfo()->GetSchoolMask(), DOT, cleanDamage.mitigated_damage);
     Unit::CalcAbsorbResist(dmgInfo);
