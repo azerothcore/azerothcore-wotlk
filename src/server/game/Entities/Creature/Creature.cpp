@@ -205,12 +205,10 @@ bool TemporaryThreatModifierEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 {
     if (Unit* victim = ObjectAccessor::GetUnit(m_owner, m_threatVictimGUID))
     {
-        m_owner.getThreatMgr().modifyThreatPercent(victim, m_threatPercent);
-
-        if (m_resetTimer > Milliseconds::zero())
+        if (m_owner.IsInCombatWith(victim))
         {
-            TemporaryThreatModifierEvent* pEvent = new TemporaryThreatModifierEvent(m_owner, victim->GetGUID(), m_threatPercent, 0ms);
-            m_owner.m_Events.AddEvent(pEvent, m_owner.m_Events.CalculateTime(m_resetTimer.count()));
+            m_owner.getThreatMgr().modifyThreatPercent(victim, -100); // Reset threat to zero.
+            m_owner.getThreatMgr().addThreat(victim, m_threatValue);  // Set to the previous value it had, first before modification.
         }
     }
 
@@ -3547,6 +3545,16 @@ void Creature::SetCorpseRemoveTime(uint32 delay)
 
 void Creature::ModifyThreatPercentTemp(Unit* victim, int32 percent, Milliseconds duration)
 {
-    TemporaryThreatModifierEvent* pEvent = new TemporaryThreatModifierEvent(*this, victim->GetGUID(), percent, duration);
-    m_Events.AddEvent(pEvent, m_Events.CalculateTime(duration.count()));
+    if (victim)
+    {
+        float currentThreat = getThreatMgr().getThreat(victim);
+
+        if (percent != 0.0f)
+        {
+            getThreatMgr().modifyThreatPercent(victim, percent);
+        }
+
+        TemporaryThreatModifierEvent* pEvent = new TemporaryThreatModifierEvent(*this, victim->GetGUID(), currentThreat, duration);
+        m_Events.AddEvent(pEvent, m_Events.CalculateTime(duration.count()));
+    }
 }
