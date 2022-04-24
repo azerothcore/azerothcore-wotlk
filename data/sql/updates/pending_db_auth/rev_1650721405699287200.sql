@@ -1,3 +1,3 @@
 --
 
-DROP TABLE `version_db_auth`;
+DROP TABLE IF EXISTS `version_db_auth`;

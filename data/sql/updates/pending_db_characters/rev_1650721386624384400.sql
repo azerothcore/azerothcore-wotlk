@@ -1,3 +1,3 @@
 --
 
-DROP TABLE `version_db_characters`;
+DROP TABLE IF EXISTS `version_db_characters`;
