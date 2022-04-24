@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "IntermediateValues.h"
+#include "Optional.h"
 #include "TerrainBuilder.h"
 
 #include "DetourNavMesh.h"
@@ -96,7 +97,8 @@ namespace MMAP
     class MapBuilder
     {
     public:
-        MapBuilder(float maxWalkableAngle   = 60.f,
+        MapBuilder(Optional<float> maxWalkableAngle,
+                   Optional<float> maxWalkableAngleNotSteep,
                    bool skipLiquid          = false,
                    bool skipContinents      = false,
                    bool skipJunkMaps        = true,
@@ -161,7 +163,8 @@ namespace MMAP
         bool m_skipJunkMaps;
         bool m_skipBattlegrounds;
 
-        float m_maxWalkableAngle;
+        Optional<float> m_maxWalkableAngle;
+        Optional<float> m_maxWalkableAngleNotSteep;
         bool m_bigBaseUnit;
         int32 m_mapid;
 
