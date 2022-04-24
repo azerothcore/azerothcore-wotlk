@@ -125,7 +125,7 @@ public:
 
         void PathEndReached(uint32 /*pathId*/) override
         {
-            if (Player* player = ObjectAccessor::FindConnectedPlayer(_playerGUID))
+            if (Unit* player = ObjectAccessor::GetUnit(*me, _playerGUID))
             {
                 me->SetInCombatWith(player);
             }
