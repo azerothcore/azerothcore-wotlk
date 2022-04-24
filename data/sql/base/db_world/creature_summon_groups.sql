@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.creature_summon_groups
+-- Dumpar struktur för tabell acore_world.creature_summon_groups
 DROP TABLE IF EXISTS `creature_summon_groups`;
 CREATE TABLE IF NOT EXISTS `creature_summon_groups` (
   `summonerId` MEDIUMINT unsigned NOT NULL DEFAULT 0,
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `creature_summon_groups` (
   `summonTime` INT unsigned NOT NULL DEFAULT 0
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_world.creature_summon_groups: 549 rows
+-- Dumpar data för tabell acore_world.creature_summon_groups: 551 rows
 DELETE FROM `creature_summon_groups`;
 /*!40000 ALTER TABLE `creature_summon_groups` DISABLE KEYS */;
 INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`) VALUES
@@ -579,7 +579,9 @@ INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `
 	(10429, 0, 5, 10447, 213.712, -429.81, 110.989, 0, 4, 30000),
 	(10429, 0, 5, 10447, 213.716, -424.427, 111.009, 0, 4, 30000),
 	(10429, 0, 5, 10442, 210.893, -423.913, 111.012, 0, 4, 30000),
-	(10429, 0, 5, 10442, 212.264, -430.765, 110.981, 0, 4, 30000);
+	(10429, 0, 5, 10442, 212.264, -430.765, 110.981, 0, 4, 30000),
+	(36296, 0, 1, 36565, -210.359, 2214.61, 79.8476, 1.0472, 8, 0),
+	(36296, 0, 1, 36272, -205.196, 2214.55, 79.8469, 2.40855, 8, 0);
 /*!40000 ALTER TABLE `creature_summon_groups` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

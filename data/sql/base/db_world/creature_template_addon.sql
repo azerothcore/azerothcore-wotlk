@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.creature_template_addon
+-- Dumpar struktur för tabell acore_world.creature_template_addon
 DROP TABLE IF EXISTS `creature_template_addon`;
 CREATE TABLE IF NOT EXISTS `creature_template_addon` (
   `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
@@ -22,11 +22,11 @@ CREATE TABLE IF NOT EXISTS `creature_template_addon` (
   `bytes2` INT unsigned NOT NULL DEFAULT 0,
   `emote` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `visibilityDistanceType` TINYINT unsigned NOT NULL DEFAULT 0,
-  `auras` text DEFAULT NULL,
+  `auras` text,
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_world.creature_template_addon: 11 766 rows
+-- Dumpar data för tabell acore_world.creature_template_addon: 11 769 rows
 DELETE FROM `creature_template_addon`;
 /*!40000 ALTER TABLE `creature_template_addon` DISABLE KEYS */;
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
@@ -2578,7 +2578,7 @@ INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `b
 	(10660, 0, 0, 0, 4097, 0, 0, ''),
 	(10661, 0, 0, 0, 4097, 0, 0, ''),
 	(10668, 0, 0, 7, 4097, 0, 0, NULL),
-	(10676, 0, 207, 0, 0, 0, 0, NULL),
+	(10676, 0, 207, 0, 1, 0, 0, NULL),
 	(10678, 0, 0, 0, 4097, 0, 0, ''),
 	(10685, 0, 0, 0, 4097, 0, 0, ''),
 	(10698, 0, 0, 0, 4097, 0, 0, ''),
@@ -2852,8 +2852,8 @@ INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `b
 	(12457, 0, 0, 0, 0, 0, 3, NULL),
 	(12458, 0, 0, 0, 0, 0, 3, NULL),
 	(12459, 0, 0, 0, 0, 0, 3, NULL),
-	(12460, 0, 0, 0, 0, 0, 3, NULL),
-	(12461, 0, 0, 0, 0, 0, 3, NULL),
+	(12460, 0, 0, 0, 0, 0, 3, '19818'),
+	(12461, 0, 0, 0, 0, 0, 3, ''),
 	(12463, 0, 0, 0, 0, 0, 3, NULL),
 	(12464, 0, 0, 0, 0, 0, 3, NULL),
 	(12465, 0, 0, 0, 0, 0, 3, NULL),
@@ -2944,7 +2944,7 @@ INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `b
 	(13839, 0, 0, 0, 4097, 0, 0, ''),
 	(13843, 0, 0, 0, 4097, 0, 0, NULL),
 	(13976, 0, 0, 0, 0, 0, 3, NULL),
-	(13996, 0, 0, 0, 0, 0, 3, NULL),
+	(13996, 0, 0, 0, 0, 133, 3, NULL),
 	(14020, 0, 0, 0, 0, 0, 3, NULL),
 	(14123, 0, 0, 0, 4097, 0, 0, ''),
 	(14183, 0, 0, 0, 4097, 0, 0, NULL),
@@ -4236,7 +4236,7 @@ INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `b
 	(17536, 0, 0, 0, 0, 0, 3, NULL),
 	(17537, 0, 0, 0, 0, 0, 3, NULL),
 	(17539, 0, 0, 0, 257, 0, 0, NULL),
-	(17542, 0, 0, 0, 1, 0, 0, '29266'),
+	(17542, 0, 0, 7, 1, 0, 0, ''),
 	(17543, 0, 0, 0, 4097, 0, 3, NULL),
 	(17544, 0, 0, 0, 4097, 0, 0, NULL),
 	(17545, 0, 0, 0, 4097, 0, 0, NULL),
@@ -4925,7 +4925,7 @@ INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `b
 	(18817, 0, 0, 0, 4097, 0, 0, NULL),
 	(18818, 0, 0, 0, 4097, 0, 0, NULL),
 	(18822, 0, 0, 0, 4097, 0, 0, NULL),
-	(18827, 0, 0, 0, 4097, 233, 0, NULL),
+	(18827, 0, 0, 0, 1, 233, 0, NULL),
 	(18828, 0, 0, 0, 4097, 0, 0, NULL),
 	(18829, 0, 0, 0, 0, 0, 3, NULL),
 	(18830, 0, 0, 8, 4097, 0, 0, ''),
@@ -5038,9 +5038,9 @@ INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `b
 	(18971, 0, 0, 0, 4097, 0, 0, NULL),
 	(18972, 0, 0, 0, 4097, 333, 0, ''),
 	(18973, 0, 0, 0, 4097, 0, 0, NULL),
-	(18974, 0, 0, 0, 4097, 0, 0, NULL),
+	(18974, 0, 0, 0, 1, 0, 0, NULL),
 	(18975, 0, 0, 0, 4097, 0, 0, ''),
-	(18976, 0, 0, 0, 4097, 0, 0, NULL),
+	(18976, 0, 0, 0, 1, 0, 0, NULL),
 	(18977, 0, 0, 0, 4097, 0, 0, NULL),
 	(18978, 0, 0, 0, 4097, 0, 0, NULL),
 	(18981, 0, 0, 0, 4097, 0, 0, NULL),
@@ -5312,7 +5312,7 @@ INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `b
 	(19400, 0, 0, 0, 4097, 0, 3, NULL),
 	(19401, 0, 0, 0, 4097, 0, 0, NULL),
 	(19402, 0, 0, 0, 4097, 0, 0, NULL),
-	(19408, 0, 0, 0, 4097, 0, 0, NULL),
+	(19408, 0, 0, 0, 1, 0, 0, NULL),
 	(19409, 0, 0, 0, 4097, 0, 0, NULL),
 	(19410, 0, 0, 0, 4097, 0, 0, NULL),
 	(19411, 0, 0, 0, 4097, 0, 0, NULL),
@@ -10901,8 +10901,7 @@ INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `b
 	(36189, 0, 0, 0, 0, 0, 3, NULL),
 	(36213, 0, 0, 0, 257, 0, 0, NULL),
 	(36217, 0, 0, 0, 257, 0, 0, ''),
-	(36272, 0, 0, 0, 0, 0, 3, NULL),
-	(36296, 0, 0, 0, 1, 0, 3, '68589'),
+	(36272, 0, 0, 0, 1, 0, 3, '68704'),
 	(36355, 0, 0, 0, 257, 0, 4, NULL),
 	(36356, 0, 0, 0, 0, 0, 4, NULL),
 	(36357, 0, 0, 0, 0, 0, 4, NULL),
@@ -10924,7 +10923,7 @@ INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `b
 	(36538, 0, 0, 3, 1, 0, 3, ''),
 	(36544, 0, 6080, 0, 0, 0, 0, NULL),
 	(36561, 0, 0, 0, 0, 0, 3, NULL),
-	(36565, 0, 0, 0, 1, 0, 3, '68946'),
+	(36565, 0, 0, 0, 1, 0, 3, '68946 71869'),
 	(36566, 0, 0, 0, 0, 0, 3, NULL),
 	(36571, 0, 0, 0, 0, 0, 3, NULL),
 	(36572, 0, 0, 0, 0, 0, 3, NULL),
@@ -11796,7 +11795,11 @@ INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `b
 	(14880, 0, 0, 0, 0, 0, 0, '11838'),
 	(9680, 0, 0, 0, 0, 0, 0, '13767 3417'),
 	(14306, 0, 0, 0, 0, 0, 0, '22650'),
-	(17108, 0, 0, 0, 1, 0, 0, '6718 8601');
+	(17108, 0, 0, 0, 1, 0, 0, '6718 8601'),
+	(36296, 0, 0, 0, 1, 0, 3, '68589 71856'),
+	(36710, 0, 0, 0, 1, 0, 3, '69216'),
+	(10682, 0, 2328, 0, 1, 0, 0, NULL),
+	(8937, 0, 0, 0, 1, 0, 0, '13260 8327');
 /*!40000 ALTER TABLE `creature_template_addon` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

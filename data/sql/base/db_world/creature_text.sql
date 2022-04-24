@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,13 +12,13 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.creature_text
+-- Dumpar struktur för tabell acore_world.creature_text
 DROP TABLE IF EXISTS `creature_text`;
 CREATE TABLE IF NOT EXISTS `creature_text` (
   `CreatureID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `GroupID` TINYINT unsigned NOT NULL DEFAULT 0,
   `ID` TINYINT unsigned NOT NULL DEFAULT 0,
-  `Text` longtext DEFAULT NULL,
+  `Text` longtext,
   `Type` TINYINT unsigned NOT NULL DEFAULT 0,
   `Language` TINYINT NOT NULL DEFAULT 0,
   `Probability` float NOT NULL DEFAULT 0,
@@ -27,12 +27,12 @@ CREATE TABLE IF NOT EXISTS `creature_text` (
   `Sound` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `BroadcastTextId` MEDIUMINT NOT NULL DEFAULT 0,
   `TextRange` TINYINT unsigned NOT NULL DEFAULT 0,
-  `comment` varchar(255) DEFAULT '',
+  `comment` VARCHAR(255) DEFAULT '',
   PRIMARY KEY (`CreatureID`,`GroupID`,`ID`),
-  CHECK (`Probability` >= 0)
+  CONSTRAINT `creature_text_chk_1` CHECK ((`Probability` >= 0))
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_world.creature_text: 17 955 rows
+-- Dumpar data för tabell acore_world.creature_text: 18 061 rows
 DELETE FROM `creature_text`;
 /*!40000 ALTER TABLE `creature_text` DISABLE KEYS */;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
@@ -1642,14 +1642,12 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 	(3502, 0, 6, 'Believe me when I tell you this: You\'re gonna wish you weren\'t born, sissy!', 12, 0, 100, 0, 0, 0, 10954, 0, 'Ratchet Bruiser - On Aggro'),
 	(3502, 0, 7, 'Your actions shame us all, $c. I hurt inside as I beat you senseless.', 12, 0, 100, 0, 0, 0, 10955, 0, 'Ratchet Bruiser - On Aggro'),
 	(3503, 0, 0, '%s digs its way out of the sand to protect its eggs.', 16, 0, 100, 0, 0, 0, 1080, 0, 'Silithid Protector'),
-	(3504, 0, 0, 'Is it true? Are there really crocolisks in the canals?', 12, 7, 100, 0, 0, 0, 1098, 0, 'Gil'),
-	(3504, 0, 1, 'My feet hurt.', 12, 7, 100, 0, 0, 0, 1099, 0, 'Gil'),
-	(3504, 0, 2, 'Are we there yet?', 12, 0, 100, 0, 0, 0, 2223, 0, 'Gil'),
+	(3504, 0, 5, 'Where we goin\'?', 12, 7, 100, 0, 0, 0, 1094, 0, 'Gil'),
+	(3504, 0, 4, 'I wanna see the Mage Tower.', 12, 7, 100, 0, 0, 0, 1097, 0, 'Gil'),
 	(3504, 0, 3, 'Why are we goin\' this way?', 12, 0, 100, 0, 0, 0, 1093, 0, 'Gil'),
-	(3504, 1, 0, 'I wanna see the Mage Tower.', 12, 7, 100, 0, 0, 0, 1097, 0, 'Gil'),
-	(3504, 1, 1, 'Where we goin\'?', 12, 7, 100, 0, 0, 0, 1094, 0, 'Gil'),
-	(3504, 1, 2, 'Why do we always go the same way?', 12, 7, 100, 0, 0, 0, 1100, 0, 'Gil'),
-	(3504, 1, 3, 'I need to pee.', 12, 0, 100, 0, 0, 0, 1095, 0, 'Gil'),
+	(3504, 0, 2, 'Are we there yet?', 12, 0, 100, 0, 0, 0, 2223, 0, 'Gil'),
+	(3504, 0, 1, 'My feet hurt.', 12, 7, 100, 0, 0, 0, 1099, 0, 'Gil'),
+	(3504, 0, 0, 'Is it true? Are there really crocolisks in the canals?', 12, 7, 100, 0, 0, 0, 1098, 0, 'Gil'),
 	(3518, 0, 0, 'Freshly baked bread for sale!', 12, 7, 100, 0, 0, 0, 1104, 0, 'Thomas Miller'),
 	(3518, 0, 1, 'Fresh bread for sale!', 12, 7, 100, 0, 0, 0, 1101, 0, 'Thomas Miller'),
 	(3518, 0, 2, 'Warm, wholesome bread!', 12, 0, 100, 0, 0, 0, 1102, 0, 'Thomas Miller'),
@@ -2571,7 +2569,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 	(6026, 0, 0, 'Guards!', 14, 1, 100, 0, 0, 0, 4561, 0, 'Breyk'),
 	(6031, 0, 0, '%s begins to work...', 16, 0, 100, 0, 0, 0, 2303, 0, 'Tormus Deepforge'),
 	(6031, 1, 0, '$n!  I\'m finished!', 12, 7, 100, 1, 0, 0, 2304, 0, 'Tormus Deepforge'),
-	(6109, 0, 0, 'Come, little ones. Face me!', 14, 0, 100, 0, 0, 0, 9071, 0, 'azuregos SAY_TELEPORT'),
+	(6109, 0, 0, 'Come, little ones. Face me!', 14, 0, 100, 0, 0, 0, 9071, 2, 'Azuregos - On Teleport'),
 	(6114, 0, 0, 'Farewell, $n.  And remember, a warrior never shows his back to his foe!', 12, 0, 100, 66, 0, 0, 2302, 0, 'Muren Stormpike'),
 	(6119, 0, 0, 'Horrible! Well, all right, maybe it just needs a little cleaning up?', 12, 0, 100, 0, 0, 0, 39713, 0, 'Tog Rustsprocket reply'),
 	(6123, 0, 0, 'Never cross a Dark Iron, $C.', 12, 0, 100, 0, 0, 0, 1934, 0, 'Dark Iron Spy'),
@@ -7282,7 +7280,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 	(19173, 0, 4, 'Legend says that the great beast Omen sleeps in the waters of Lake Elune\'ara in Moonglade, only to appear once a year. But that\'s just a legend.', 12, 7, 100, 0, 0, 0, 24349, 0, 'Night Elf Commoner to Night Elf Commoner'),
 	(19173, 6, 0, 'Next year, I\'m dressing up as either a corsair or an assassin.', 12, 7, 100, 1, 0, 0, 24338, 0, 'Night Elf Commoner to Night Elf Commoner'),
 	(19173, 6, 1, 'Happy Hallow\'s End!', 12, 7, 100, 0, 0, 0, 24346, 0, 'Night Elf Commoner to Night Elf Commoner'),
-	(19173, 6, 2, 'We should go trick or treating later.', 12, 7, 100, 0, 0, 0, 0, 0, 'Night Elf Commoner to Night Elf Commoner'),
+	(19173, 6, 2, 'We should go trick or treating later.', 12, 7, 100, 0, 0, 0, 24348, 0, 'Night Elf Commoner to Night Elf Commoner'),
 	(19173, 6, 3, 'For the Horde!', 12, 7, 100, 4, 0, 0, 23357, 0, 'Night Elf Commoner to Night Elf Commoner'),
 	(19173, 6, 4, 'Curse this twisting of the night. The candy\'s good, though.', 12, 7, 100, 0, 0, 0, 23294, 0, 'Night Elf Commoner to Night Elf Commoner'),
 	(19173, 6, 5, 'You know... why DO we celebrate this holiday?', 12, 7, 100, 0, 0, 0, 23287, 0, 'Night Elf Commoner to Night Elf Commoner'),
@@ -7683,10 +7681,10 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 	(19610, 3, 0, 'Let me outta here! Guys... guys?', 12, 0, 100, 0, 0, 0, 17874, 0, 'Irradiated Worker'),
 	(19610, 4, 0, 'Oh man, he got you good!', 12, 0, 100, 0, 0, 0, 17875, 0, 'Irradiated Worker'),
 	(19610, 5, 0, 'Remember how you\'re always telling us to chill?', 12, 0, 100, 11, 0, 0, 17876, 0, 'Irradiated Worker'),
-	(19610, 6, 0, 'That was the best trick ever! Ok, boys, let\'s go get a drink.', 12, 0, 100, 4, 0, 0, 17853, 0, 'Irradiated Worker');
-INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+	(19610, 6, 0, 'That was the best trick ever! Ok, boys, let\'s go get a drink.', 12, 0, 100, 4, 0, 0, 17853, 0, 'Irradiated Worker'),
 	(19610, 7, 0, 'My eyebrows! You singed my eyebrows!', 12, 0, 100, 22, 0, 0, 20285, 0, 'Irradiated Worker'),
-	(19610, 8, 0, 'Don\'t worry. It\'s an improvement!', 12, 0, 100, 11, 0, 0, 20286, 0, 'Irradiated Worker'),
+	(19610, 8, 0, 'Don\'t worry. It\'s an improvement!', 12, 0, 100, 11, 0, 0, 20286, 0, 'Irradiated Worker');
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
 	(19616, 0, 0, '%s howls in response to Malukaz\'s call.', 16, 0, 100, 0, 0, 0, 17051, 0, 'Terokkar Wolf Spirit'),
 	(19616, 1, 0, '%s expresses its approval.', 16, 0, 100, 0, 0, 0, 17086, 0, 'Terokkar Wolf Spirit'),
 	(19622, 0, 0, 'Energy. Power. My people are addicted to it... a dependence made manifest after the Sunwell was destroyed. Welcome to the future. A pity you are too late to stop it. No one can stop me now! Selama ashal\'anore!', 14, 0, 100, 0, 0, 11256, 20195, 0, 'kaelthas SAY_INTRO'),
@@ -14491,10 +14489,10 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 	(30199, 0, 5, 'Where\'s my damned helmet? Well, at least they left my sword here. Idiots.', 12, 0, 100, 0, 0, 0, 0, 0, 'Ebon Blade Prisoner'),
 	(30199, 0, 6, 'Kill!', 12, 0, 100, 0, 0, 0, 0, 0, 'Ebon Blade Prisoner'),
 	(30200, 0, 0, 'Thanks. How can I help?', 12, 0, 100, 0, 0, 0, 0, 0, 'Ebon Blade Prisoner'),
-	(30200, 0, 1, 'I can fight by your side for a few minutes before I need to return to The Shadow Vault.', 12, 0, 100, 0, 0, 0, 0, 0, 'Ebon Blade Prisoner');
-INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+	(30200, 0, 1, 'I can fight by your side for a few minutes before I need to return to The Shadow Vault.', 12, 0, 100, 0, 0, 0, 0, 0, 'Ebon Blade Prisoner'),
 	(30200, 0, 2, 'Thank you, $c. I owe you.', 12, 0, 100, 0, 0, 0, 0, 0, 'Ebon Blade Prisoner'),
-	(30200, 0, 3, 'Excellent. Let\'s kill some vrykul!', 12, 0, 100, 0, 0, 0, 0, 0, 'Ebon Blade Prisoner'),
+	(30200, 0, 3, 'Excellent. Let\'s kill some vrykul!', 12, 0, 100, 0, 0, 0, 0, 0, 'Ebon Blade Prisoner');
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
 	(30200, 0, 4, 'It\'s time for revenge!', 12, 0, 100, 0, 0, 0, 0, 0, 'Ebon Blade Prisoner'),
 	(30200, 0, 5, 'Where\'s my damned helmet? Well, at least they left my sword here. Idiots.', 12, 0, 100, 0, 0, 0, 0, 0, 'Ebon Blade Prisoner'),
 	(30200, 0, 6, 'Kill!', 12, 0, 100, 0, 0, 0, 0, 0, 'Ebon Blade Prisoner'),
@@ -17559,7 +17557,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 	(38113, 63, 0, 'Yes... Run... Run to meet your destiny... Its bitter, cold embrace, awaits you.', 14, 0, 100, 0, 0, 16737, 0, 0, 'Marwyn SAY_DEATH'),
 	(38113, 64, 0, 'Your flesh has decayed before your very eyes!', 14, 0, 100, 0, 0, 16739, 0, 0, 'Marwyn SAY_CORRUPTED_FLESH_1'),
 	(38113, 65, 0, 'Waste away into nothingness!', 14, 0, 100, 0, 0, 16740, 0, 0, 'Marwyn SAY_CORRUPTED_FLESH_2'),
-	(38153, 0, 0, 'Intruders have breached the inner sanctum. Hasten the destruction of the green dragon! Leave only bones and sinew for the reanimation!', 14, 0, 100, 0, 0, 17251, 0, 0, 'Lich King for Valithria Dreamwalker - AGGRO'),
+	(38153, 0, 0, 'Intruders have breached the inner sanctum. Hasten the destruction of the green dragon! Leave only bones and sinew for the reanimation!', 14, 0, 100, 0, 0, 17251, 38682, 0, 'Lich King for Valithria Dreamwalker - AGGRO'),
 	(38160, 0, 0, 'Excellent work, champions! We shall set up our base camp in these chambers. My magi will get the Scourge transport device working shortly. Step inside it when you are ready for your next mission. I will meet you on the other side.', 14, 0, 100, 0, 0, 16625, 37369, 0, 'jaina SAY_JAINA_OUTRO'),
 	(38161, 0, 0, 'Excellent work, champions! We shall set up our base camp in these chambers. My magi will get the Scourge transport device working shortly. Step inside when you are ready for your next mission. I will meet you on the other side.', 14, 0, 100, 0, 0, 17044, 37387, 0, 'sylvanas SAY_SYLVANAS_OUTRO'),
 	(38188, 63, 0, 'Heroes, to me!', 14, 0, 100, 0, 0, 16614, 0, 0, 'jaina SAY_JAINA_OUTRO_1'),
@@ -17992,7 +17990,115 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 	(3695, 3, 0, '%s roars in acknowledgement at Terenthis.', 16, 0, 100, 0, 0, 473, 1233, 0, 'Grimclaw'),
 	(3695, 4, 0, '%s growls in your direction before taking time to sniff you.', 16, 7, 100, 0, 0, 0, 1234, 0, 'Grimclaw'),
 	(3695, 5, 0, '%s faces southeast and whimpers before looking back at you.', 16, 7, 100, 0, 0, 0, 1225, 0, 'Grimclaw'),
-	(3695, 6, 0, '%s roars in excitement as he rushes Volcor. When he reaches his master, Grimclaw licks his face.', 16, 7, 100, 0, 0, 0, 1241, 0, 'Grimclaw');
+	(3695, 6, 0, '%s roars in excitement as he rushes Volcor. When he reaches his master, Grimclaw licks his face.', 16, 7, 100, 0, 0, 0, 1241, 0, 'Grimclaw'),
+	(6109, 1, 0, 'This place is under my protection. The mysteries of the arcane shall remain inviolate.', 14, 0, 100, 0, 0, 0, 9072, 2, 'Azuregos - On Aggro'),
+	(6109, 2, 0, 'Such is the price of curiosity.', 14, 0, 100, 0, 0, 0, 9073, 2, 'Azuregos - On Unit Killed'),
+	(4949, 0, 0, 'Honor your heroes! On this day, they have dealt a great blow against one of our most hated enemies! The false Warchief, Rend Blackhand, has fallen!', 14, 0, 100, 22, 0, 0, 6013, 2, 'For The Horde! quest completion'),
+	(4949, 1, 0, 'Be bathed in my power! Drink in my might! Battle for the glory of the Horde!', 14, 0, 100, 22, 0, 0, 6014, 2, 'For The Horde! quest completion'),
+	(10719, 0, 0, 'Honor your heroes! On this day, they have dealt a great blow against one of our most hated enemies! The false Warchief, Rend Blackhand, has fallen!', 14, 0, 100, 22, 0, 0, 6013, 2, 'For The Horde! quest completion'),
+	(10719, 1, 0, 'Be bathed in the power of the Warchief! Drink in his might! Battle for the glory of the Horde!', 14, 0, 100, 22, 0, 0, 6015, 2, 'For The Horde! quest completion'),
+	(10676, 0, 0, '%s and Raider Kerr let their wolves rest a bit and drink...', 16, 0, 100, 0, 0, 0, 5986, 0, 'Raider Jhash'),
+	(10676, 1, 0, '%s and Raider Kerr charge into battle...', 16, 0, 100, 0, 0, 0, 5987, 0, 'Raider Jhash'),
+	(18408, 0, 0, 'New posting going up! Adventurers and heroes, gather round the bulletin board!', 12, 7, 100, 0, 0, 0, 15373, 0, 'Warden Moi\'bff Jill'),
+	(18408, 1, 0, 'That should get Telaar the assistance it needs!', 12, 7, 100, 5, 0, 0, 15374, 0, 'Warden Moi\'bff Jill'),
+	(18976, 0, 0, 'Work harder!', 12, 0, 100, 0, 0, 0, 19592, 0, 'Urga\'zz say at waypoint'),
+	(18976, 1, 0, 'Mine rock!  Crack stone!  Faster!  Faster!', 12, 0, 100, 0, 0, 0, 19593, 0, 'Urga\'zz say at waypoint'),
+	(19255, 0, 4, 'The warchief\'s put a price on Arazzius\'s head! As of right now, that no-good piece of demon refuse is enemy number one.', 12, 1, 100, 1, 0, 0, 16391, 0, 'General Krakork'),
+	(10184, 5, 0, 'You seek to lure me from my clutch? You shall pay for your insolence!', 14, 0, 100, 0, 0, 0, 8570, 0, 'Onyxia - Boundary Evade'),
+	(14459, 0, 0, '%s flee as the controlling power of the orb is drained.', 16, 0, 100, 0, 0, 0, 9592, 3, ''),
+	(1367, 0, 0, 'I heard that there are these huge fish that can walk on land to hunt, and eat people!', 12, 7, 100, 1, 0, 0, 139, 0, 'Billy - Talk'),
+	(1367, 0, 1, 'My daddy says that in the ocean, there are fish so big they could swallow a whole ship.', 12, 7, 100, 1, 0, 0, 133, 0, 'Billy - Talk'),
+	(1367, 0, 2, 'I heard a story about this golden fish, and if you caught it you would get three wishes!', 12, 7, 100, 1, 0, 0, 141, 0, 'Billy - Talk'),
+	(1367, 0, 3, 'And one time, at camp, I caught a fish that was bigger than I am!!', 12, 7, 100, 1, 0, 0, 140, 0, 'Billy - Talk'),
+	(1367, 0, 4, 'I caught a big one last week, it had three eyes!', 12, 7, 100, 1, 0, 0, 132, 0, 'Billy - Talk'),
+	(1367, 0, 5, 'My daddy can catch more fish than your daddy!', 12, 7, 100, 1, 0, 0, 134, 0, 'Billy - Talk'),
+	(1367, 1, 0, 'Think there are any fish in here?', 12, 7, 100, 1, 0, 0, 131, 0, 'Billy - Talk'),
+	(1367, 2, 0, 'Look! Look! I caught something! Aww....it\'s just a stinky ol\' boot.', 12, 7, 100, 1, 0, 0, 135, 0, 'Billy - Talk'),
+	(1366, 0, 0, 'You\'re making that up.', 12, 7, 100, 1, 0, 0, 144, 0, 'Adam - Talk'),
+	(1366, 0, 1, 'Shhh! You\'re scaring the fish away.', 12, 7, 100, 1, 0, 0, 143, 0, 'Adam - Talk'),
+	(1366, 0, 2, 'Really?', 12, 7, 100, 1, 0, 0, 147, 0, 'Adam - Talk'),
+	(1366, 0, 3, 'Nuh uh.', 12, 7, 100, 1, 0, 0, 136, 0, 'Adam - Talk'),
+	(1366, 0, 4, 'Maybe we should go to the bridge and fish.', 12, 7, 100, 1, 0, 0, 146, 0, 'Adam - Talk'),
+	(1366, 0, 5, 'Liar!', 12, 7, 100, 1, 0, 0, 138, 0, 'Adam - Talk'),
+	(1366, 0, 6, 'If you fished as well as you talked the ocean wouldn\'t have any fish left.', 12, 7, 100, 1, 0, 0, 142, 0, 'Adam - Talk'),
+	(1366, 0, 7, 'If you could catch a fish big enough for your mouth we\'d never be hungry again.', 12, 7, 100, 1, 0, 0, 145, 0, 'Adam - Talk'),
+	(1366, 1, 0, 'C\'mon, let\'s try somewhere else.', 12, 7, 100, 1, 0, 0, 1086, 0, 'Adam - Talk'),
+	(1368, 0, 0, 'And so the knights stood before the charging Horde and held their ground as a thousand berserk orcs came through the valley.', 12, 7, 100, 1, 0, 0, 150, 0, 'Justin - Talk'),
+	(1368, 0, 1, 'And that\'s how Lothar killed thirty six orcs with his bare hands!', 12, 7, 100, 1, 0, 0, 149, 0, 'Justin - Talk'),
+	(1368, 0, 2, 'And then the rabbit just bit his head off... I swear.', 12, 7, 100, 1, 0, 0, 155, 0, 'Justin - Talk'),
+	(1368, 0, 3, 'They say he can turn into a raven sometimes.', 12, 7, 100, 1, 0, 0, 151, 0, 'Justin - Talk'),
+	(1368, 0, 4, 'You know there are crocolisks in the Canals. They were brought from the swamp as pets, but got thrown in the canals.', 12, 7, 100, 1, 0, 0, 156, 0, 'Justin - Talk'),
+	(1368, 0, 5, 'You know why orc eyes glow red? It\'s because they drink blood!', 12, 7, 100, 1, 0, 0, 152, 0, 'Justin - Talk'),
+	(1368, 0, 6, 'I swear, people have actually seen them. Pandaren really do exist!', 12, 7, 100, 1, 0, 0, 154, 0, 'Justin - Talk'),
+	(1368, 0, 7, 'There is no spoon.', 12, 7, 100, 1, 0, 0, 153, 0, 'Justin - Talk'),
+	(1370, 0, 0, 'My father says that\'s just a story.', 12, 7, 100, 1, 0, 0, 168, 0, 'Brandon - Talk'),
+	(1370, 0, 1, 'Can you imagine?', 12, 7, 100, 1, 0, 0, 169, 0, 'Brandon - Talk'),
+	(1370, 0, 2, 'Oh c\'mon, that\'s not true.', 12, 7, 100, 1, 0, 0, 166, 0, 'Brandon - Talk'),
+	(1370, 0, 3, 'Oh yeah, I heard about that.', 12, 7, 100, 1, 0, 0, 158, 0, 'Brandon - Talk'),
+	(1370, 0, 4, 'Really?', 12, 7, 100, 1, 0, 0, 147, 0, 'Brandon - Talk'),
+	(1370, 0, 5, 'Sounds kinda like one of Billy\'s fish stories to me.', 12, 7, 100, 1, 0, 0, 170, 0, 'Brandon - Talk'),
+	(1370, 0, 6, 'That\'s neat.', 12, 7, 100, 1, 0, 0, 167, 0, 'Brandon - Talk'),
+	(1370, 0, 7, 'Wow.', 12, 7, 100, 1, 0, 0, 157, 0, 'Brandon - Talk'),
+	(1371, 0, 0, 'Eww... that\'s not a fish!', 12, 7, 100, 1, 0, 0, 173, 0, 'Roman - Talk'),
+	(1371, 0, 1, 'I don\'t think there\'s any fish in these canals.', 12, 7, 100, 1, 0, 0, 177, 0, 'Roman - Talk'),
+	(1371, 0, 2, 'I got worm guts on my shoes.', 12, 7, 100, 1, 0, 0, 174, 0, 'Roman - Talk'),
+	(1371, 0, 3, 'I hope that was a fish!', 12, 7, 100, 1, 0, 0, 176, 0, 'Roman - Talk'),
+	(1371, 0, 4, 'I think I see something.', 12, 7, 100, 1, 0, 0, 172, 0, 'Roman - Talk'),
+	(1371, 0, 5, 'Something smells funny.', 12, 7, 100, 1, 0, 0, 175, 0, 'Roman - Talk'),
+	(1371, 0, 6, 'Worm goes on the hook, hook goes in the water. Fish is in the water, our fish.', 12, 7, 100, 1, 0, 0, 178, 0, 'Roman - Talk'),
+	(1371, 0, 7, 'I thought I heard something.', 12, 7, 100, 1, 0, 0, 171, 0, 'Roman - Talk'),
+	(3511, 0, 0, 'Why do we have to learn this stuff anyway?', 12, 7, 100, 1, 0, 0, 1130, 0, 'Steven - Talk'),
+	(3511, 0, 1, 'It\'s better than the drawings in the history tomes.', 12, 7, 100, 1, 0, 0, 1131, 0, 'Steven - Talk'),
+	(3511, 0, 2, 'Teacher, when are we gonna see the sparkly Mage Tower?', 12, 7, 100, 1, 0, 0, 1133, 0, 'Steven - Talk'),
+	(3511, 0, 3, 'Teacher, I have to pee!', 12, 7, 100, 1, 0, 0, 1136, 0, 'Steven - Talk'),
+	(3511, 0, 4, 'Teacher are there night elves in Stormwind? I\'ve never seen a night elf before.', 12, 7, 100, 1, 0, 0, 1138, 0, 'Steven - Talk'),
+	(3511, 0, 5, 'Teacher, he keeps poking me!', 12, 7, 100, 1, 0, 0, 1139, 0, 'Steven - Talk'),
+	(3511, 0, 6, 'I heard there are still orcs buried underneath it.', 12, 7, 100, 1, 0, 0, 1134, 0, 'Steven - Talk'),
+	(3511, 0, 7, 'I wanna see the dragon skeleton in the great library.', 12, 7, 100, 1, 0, 0, 1132, 0, 'Steven - Talk'),
+	(3512, 0, 0, 'Is it true that the paladins train here?', 12, 7, 100, 1, 0, 0, 1153, 0, 'Jimmy - Talk'),
+	(3513, 0, 0, 'Here we have the Cathedral of Light, the center of spiritual enlightenment here in Stormwind.', 12, 7, 100, 1, 0, 0, 1129, 0, 'Miss Danna - Talk'),
+	(3513, 1, 0, 'Here we have Stormwind Keep. Built upon the ruins of Stormwind Castle, which was destroyed by the Horde in the first Great War.', 12, 7, 100, 1, 0, 0, 1140, 0, 'Miss Danna - Talk'),
+	(3513, 2, 0, 'Yes, that is true. Paladins and priests alike train their skills and research great truths behind the walls of the Cathedral.', 12, 7, 100, 1, 0, 0, 1154, 0, 'Miss Danna - Talk'),
+	(3513, 3, 0, 'Children if you would please follow me, we will now be going to see the keep where King Varian Wrynn himself sits on his throne.', 12, 7, 100, 1, 0, 0, 1155, 0, 'Miss Danna - Talk'),
+	(3513, 4, 0, 'When the Horde was shattered, men returned here and began to rebuild the once great city as a testament to our own survival.', 12, 7, 100, 1, 0, 0, 1161, 0, 'Miss Danna - Talk'),
+	(3513, 5, 0, 'Yes, well...let\'s head on to the monument dedicated to the heroes of the two Great Wars, the Valley of Heroes. Follow me.', 12, 7, 100, 1, 0, 0, 1162, 0, 'Miss Danna - Talk'),
+	(3513, 6, 0, 'Isn\'t it amazing, children? All who enter the city must walk beneath the watchful eyes of the greatest heroes of our lands.', 12, 7, 100, 1, 0, 0, 1163, 0, 'Miss Danna - Talk'),
+	(3513, 7, 0, 'Breathtaking. Children, when we return to the school, you will each give an oral report on one of these legendary people.', 12, 7, 100, 1, 0, 0, 1165, 0, 'Miss Danna - Talk'),
+	(3513, 8, 0, 'Now, take another long look before we make our way to the Holy District and the great Cathedral of Light.', 12, 7, 100, 1, 0, 0, 1166, 0, 'Miss Danna - Talk'),
+	(1413, 0, 0, 'If we reverse the Essence flows perhaps we can alter the polarity.', 12, 7, 100, 1, 0, 0, 201, 0, 'Janey Anship - Talk'),
+	(1413, 0, 1, 'So then the array of magics would cascade into a chain reaction of positively charged energies.', 12, 7, 100, 1, 0, 0, 203, 0, 'Janey Anship - Talk'),
+	(1413, 0, 2, 'The portal will shift slightly, at this point if you cast a binding cantrip you will solidify it in place.', 12, 7, 100, 1, 0, 0, 204, 0, 'Janey Anship - Talk'),
+	(1413, 0, 3, 'When the positively aligned energies collide with the negatively charged energies, they don\'t negate one another.', 12, 7, 100, 1, 0, 0, 205, 0, 'Janey Anship - Talk'),
+	(1413, 0, 4, 'Maginor says that twisting alternating flows of positive energy actually creates a much more stable flow.', 12, 7, 100, 1, 0, 0, 206, 0, 'Janey Anship - Talk'),
+	(1413, 0, 5, 'The magical wards at that point should be supported enough by the energy flux to contain the entity.', 12, 7, 100, 1, 0, 0, 207, 0, 'Janey Anship - Talk'),
+	(1413, 0, 6, 'Why can\'t we just shift the array to compensate for the variance in the flux?', 12, 7, 100, 1, 0, 0, 208, 0, 'Janey Anship - Talk'),
+	(1413, 0, 7, 'Putting in twelve centers of focus might allow the magical energies to form more solidly, adding the necessary stability.', 12, 7, 100, 1, 0, 0, 209, 0, 'Janey Anship - Talk'),
+	(1414, 0, 0, 'But what if the resulting frequency shift were to send magical feedback up the flows?', 12, 7, 100, 1, 0, 0, 210, 0, 'Lisan Pierce - Talk'),
+	(1414, 0, 1, 'Wouldn\'t that cause the weave to unravel if not properly anchored before starting the casting?', 12, 7, 100, 1, 0, 0, 211, 0, 'Lisan Pierce - Talk'),
+	(1414, 0, 2, 'But wouldn\'t that mean crossing the streams? Isn\'t that really bad?', 12, 7, 100, 1, 0, 0, 212, 0, 'Lisan Pierce - Talk'),
+	(1414, 0, 3, 'The resultant energies could collapse though, and that could cause an energy flux that would give you a migraine for weeks.', 12, 7, 100, 1, 0, 0, 213, 0, 'Lisan Pierce - Talk'),
+	(1414, 0, 4, 'But isn\'t that what caused the initial problems with Adept Syleria\'s magical formulae?', 12, 7, 100, 1, 0, 0, 214, 0, 'Lisan Pierce - Talk'),
+	(1414, 0, 5, 'I think not, I don\'t need to be blown up again.', 12, 7, 100, 1, 0, 0, 215, 0, 'Lisan Pierce - Talk'),
+	(1414, 0, 6, 'That will unbalance the magical focus, though, and cause a reverse vibration in the ether.', 12, 7, 100, 1, 0, 0, 216, 0, 'Lisan Pierce - Talk'),
+	(1414, 0, 7, 'I suppose that could work, if we had twenty people to cast it with.', 12, 7, 100, 1, 0, 0, 217, 0, 'Lisan Pierce - Talk'),
+	(1415, 0, 0, 'What if we used three focuses in Tyrean pattern? That should solve it.', 12, 7, 100, 1, 0, 0, 218, 0, 'Suzanne - Talk'),
+	(1415, 0, 1, 'But if we stabilize it with an anchor thread at the appropriate energy crux then it should work.', 12, 7, 100, 1, 0, 0, 219, 0, 'Suzanne - Talk'),
+	(1415, 0, 2, 'Always so negative. The chances of that happening are between zero and none.', 12, 7, 100, 1, 0, 0, 220, 0, 'Suzanne - Talk'),
+	(1415, 0, 3, 'If we use the appropriate sequence we should be ok. Will just take some serious studying before we start.', 12, 7, 100, 1, 0, 0, 221, 0, 'Suzanne - Talk'),
+	(1415, 0, 4, 'Wow, all of this for a love potion. Hope he\'s worth it.', 12, 7, 100, 1, 0, 0, 222, 0, 'Suzanne - Talk'),
+	(1415, 0, 5, 'If we use the Surian theory, then yes, but not if we go with the Y\'serian approach.', 12, 7, 100, 1, 0, 0, 223, 0, 'Suzanne - Talk'),
+	(1415, 0, 6, 'At least we wouldn\'t be around to have to clean it up.', 12, 7, 100, 1, 0, 0, 224, 0, 'Suzanne - Talk'),
+	(1415, 0, 7, 'Only if we didn\'t follow the proper initialization procedures.', 12, 7, 100, 1, 0, 0, 225, 0, 'Suzanne - Talk'),
+	(3504, 0, 6, 'Why do we always go the same way?', 12, 7, 100, 0, 0, 0, 1100, 0, 'Gil'),
+	(3504, 0, 7, 'I need to pee.', 12, 0, 100, 0, 0, 0, 1095, 0, 'Gil'),
+	(3504, 1, 0, 'Billy says Fizzles used to be a great wizard. But he got turned into a rabbit when one of his spells went bad.', 12, 0, 100, 0, 0, 0, 1091, 0, 'Gil'),
+	(2330, 0, 0, 'Hello, Charys. I have my list, could you get me all of that, especially the last ingredient.', 12, 7, 100, 0, 0, 0, 587, 0, 'Karlee Chaddis'),
+	(2330, 1, 0, 'Sure, Paige. Just be gentle.', 12, 7, 100, 0, 0, 0, 589, 0, 'Karlee Chaddis'),
+	(2330, 2, 0, 'Thanks, Charys. C\'mon Paige, sweetie.', 12, 0, 100, 0, 0, 0, 590, 0, 'Karlee Chaddis'),
+	(2331, 0, 0, 'Mommy? Can I pet Fizzles?', 12, 0, 100, 0, 0, 0, 588, 0, 'Paige Chaddis'),
+	(14101, 0, 0, '%s goes into a frenzy!', 16, 0, 100, 0, 0, 0, 1191, 0, 'Enraged Felguard - Frenzy (30% health)'),
+	(17542, 0, 0, '%s stares at you in sheer wonderment.', 16, 0, 100, 0, 0, 0, 14109, 0, 'Young Furbolg Shaman'),
+	(17542, 1, 0, 'I run now!', 12, 0, 100, 0, 0, 0, 14110, 0, 'Young Furbolg Shaman');
 /*!40000 ALTER TABLE `creature_text` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

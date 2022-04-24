@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.creature_queststarter
+-- Dumpar struktur för tabell acore_world.creature_queststarter
 DROP TABLE IF EXISTS `creature_queststarter`;
 CREATE TABLE IF NOT EXISTS `creature_queststarter` (
   `id` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Identifier',
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `creature_queststarter` (
   PRIMARY KEY (`id`,`quest`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Creature System';
 
--- Дамп данных таблицы acore_world.creature_queststarter: 7 457 rows
+-- Dumpar data för tabell acore_world.creature_queststarter: 7 457 rows
 DELETE FROM `creature_queststarter`;
 /*!40000 ALTER TABLE `creature_queststarter` DISABLE KEYS */;
 INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
@@ -897,8 +897,8 @@ INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
 	(3034, 9063),
 	(3038, 6066),
 	(3038, 6068),
-	(3038, 8151),
 	(3038, 9617),
+	(3039, 8151),
 	(3041, 1718),
 	(3041, 8417),
 	(3045, 8254),
@@ -1022,6 +1022,7 @@ INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
 	(3341, 846),
 	(3341, 849),
 	(3344, 8410),
+	(3352, 8151),
 	(3354, 1505),
 	(3354, 1718),
 	(3354, 1823),
@@ -1056,7 +1057,6 @@ INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
 	(3401, 2479),
 	(3402, 2382),
 	(3403, 8410),
-	(3406, 8151),
 	(3407, 6067),
 	(3407, 6070),
 	(3407, 9617),
@@ -3032,12 +3032,12 @@ INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
 	(14832, 7891),
 	(14832, 7892),
 	(14832, 7893),
+	(14832, 7939),
 	(14833, 7881),
 	(14833, 7882),
 	(14833, 7883),
 	(14833, 7884),
 	(14833, 7885),
-	(14833, 7939),
 	(14833, 7941),
 	(14841, 7894),
 	(14841, 7895),
