@@ -6,4 +6,4 @@ INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, 
 
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=4 AND `SourceGroup`=13574;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(4, 13574, 12812, 0, 0, 7, 0, 164, 225, 0, 0, 0, 0, '', 'Unfired Plate Gauntlets while having Blacksmithing skill 225'),
+(4, 13574, 12812, 0, 0, 7, 0, 164, 225, 0, 0, 0, 0, '', 'Unfired Plate Gauntlets while having Blacksmithing skill 225');
