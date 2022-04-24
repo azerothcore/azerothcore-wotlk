@@ -385,6 +385,8 @@ public:
 
     void SetAssistanceTimer(uint32 value) { m_assistanceTimer = value; }
 
+    void ModifyThreatPercentTemp(Unit* victim, int32 percent, Milliseconds duration);
+
 protected:
     bool CreateFromProto(ObjectGuid::LowType guidlow, uint32 Entry, uint32 vehId, const CreatureData* data = nullptr);
     bool InitEntry(uint32 entry, const CreatureData* data = nullptr);
@@ -492,6 +494,19 @@ public:
 private:
     Creature& m_owner;
     Seconds const m_respawnTimer;
+};
+
+class TemporaryThreatModifierEvent : public BasicEvent
+{
+public:
+    TemporaryThreatModifierEvent(Creature& owner, ObjectGuid threatVictimGUID, float threatPercent, Milliseconds resetTimer) : BasicEvent(), m_owner(owner), m_threatVictimGUID(threatVictimGUID), m_threatPercent(threatPercent), m_resetTimer(resetTimer) { }
+    bool Execute(uint64 e_time, uint32 p_time) override;
+
+private:
+    Creature& m_owner;
+    ObjectGuid m_threatVictimGUID;
+    int m_threatPercent;
+    Milliseconds const m_resetTimer;
 };
 
 #endif
