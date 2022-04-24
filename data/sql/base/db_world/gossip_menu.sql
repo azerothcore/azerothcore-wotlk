@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.gossip_menu
+-- Dumpar struktur för tabell acore_world.gossip_menu
 DROP TABLE IF EXISTS `gossip_menu`;
 CREATE TABLE IF NOT EXISTS `gossip_menu` (
   `MenuID` SMALLINT unsigned NOT NULL DEFAULT 0,
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `gossip_menu` (
   PRIMARY KEY (`MenuID`,`TextID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_world.gossip_menu: 5 894 rows
+-- Dumpar data för tabell acore_world.gossip_menu: 5 922 rows
 DELETE FROM `gossip_menu`;
 /*!40000 ALTER TABLE `gossip_menu` DISABLE KEYS */;
 INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
@@ -426,6 +426,7 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(1981, 2653),
 	(2021, 2676),
 	(2061, 2713),
+	(2062, 3496),
 	(2063, 2726),
 	(2063, 2809),
 	(2075, 2728),
@@ -616,6 +617,8 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(2851, 3545),
 	(2852, 3546),
 	(2861, 3553),
+	(2871, 3557),
+	(2872, 3558),
 	(2883, 3559),
 	(2890, 3566),
 	(2901, 3573),
@@ -680,9 +683,15 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(3065, 3799),
 	(3066, 3798),
 	(3067, 3801),
+	(3068, 3802),
+	(3069, 3803),
 	(3070, 3804),
 	(3072, 3805),
+	(3073, 3806),
 	(3074, 3807),
+	(3075, 10304),
+	(3076, 10302),
+	(3077, 10303),
 	(3081, 3813),
 	(3082, 3814),
 	(3083, 3815),
@@ -990,6 +999,7 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(4011, 4998),
 	(4012, 4868),
 	(4012, 4998),
+	(4013, 4870),
 	(4013, 5004),
 	(4014, 4871),
 	(4014, 5858),
@@ -1015,6 +1025,8 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(4041, 4914),
 	(4041, 4915),
 	(4042, 4916),
+	(4042, 4917),
+	(4042, 4918),
 	(4043, 4933),
 	(4044, 4934),
 	(4045, 4935),
@@ -1526,15 +1538,19 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(4801, 4437),
 	(4801, 4438),
 	(4821, 5873),
+	(4821, 5874),
 	(4822, 5875),
 	(4822, 5876),
 	(4823, 5877),
 	(4823, 5878),
 	(4824, 5879),
+	(4824, 5880),
 	(4825, 5881),
+	(4825, 5882),
 	(4826, 5883),
 	(4826, 5884),
 	(4827, 5885),
+	(4827, 5886),
 	(4841, 5894),
 	(4842, 5335),
 	(4843, 5918),
@@ -1848,7 +1864,7 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(6443, 7635),
 	(6443, 7636),
 	(6445, 7638),
-	(6445, 7640),
+	(6445, 7639),
 	(6447, 7641),
 	(6448, 7669),
 	(6449, 7670),
@@ -2001,8 +2017,8 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(6646, 7902),
 	(6647, 7904),
 	(6647, 9193),
-	(6648, 9190),
 	(6648, 9191),
+	(6648, 9192),
 	(6649, 9007),
 	(6649, 9186),
 	(6650, 9187),
@@ -2411,6 +2427,7 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(7387, 8848),
 	(7388, 8849),
 	(7389, 8850),
+	(7389, 8893),
 	(7390, 8851),
 	(7391, 8852),
 	(7392, 8853),
@@ -2420,11 +2437,15 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(7397, 8860),
 	(7398, 8861),
 	(7398, 8862),
+	(7398, 8863),
+	(7398, 8893),
 	(7399, 8864),
 	(7399, 8865),
+	(7399, 8892),
 	(7399, 9038),
 	(7400, 8867),
 	(7400, 8868),
+	(7400, 8892),
 	(7401, 8872),
 	(7402, 8871),
 	(7403, 8869),
@@ -3785,7 +3806,7 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(8878, 11588),
 	(8879, 11586),
 	(8880, 11590),
-	(8881, 11596),
+	(8881, 11602),
 	(8884, 11607),
 	(8885, 11614),
 	(8886, 11622),
@@ -4452,6 +4473,7 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(9673, 13118),
 	(9674, 13120),
 	(9675, 13121),
+	(9676, 13287),
 	(9677, 13124),
 	(9678, 13136),
 	(9678, 13137),
@@ -4626,6 +4648,7 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(9853, 13642),
 	(9854, 13646),
 	(9855, 13647),
+	(9856, 10887),
 	(9857, 13651),
 	(9858, 13654),
 	(9859, 13650),
@@ -5563,9 +5586,10 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(12663, 17805),
 	(12670, 12549),
 	(12707, 17838),
-	(12726, 17861),
+	(12726, 3218),
 	(12741, 17880),
 	(12846, 18070),
+	(15000, 7880),
 	(21002, 7933),
 	(21003, 7956),
 	(21004, 7956),
@@ -5904,8 +5928,8 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(57020, 50016),
 	(57021, 50017),
 	(57022, 50018),
-	(57023, 50019),
-	(57024, 50020),
+	(57023, 7640),
+	(57024, 7645),
 	(57025, 50021),
 	(57026, 50023),
 	(57027, 50024),
@@ -5917,7 +5941,11 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(61021, 10210),
 	(61023, 15296),
 	(61023, 50031),
-	(61025, 10041);
+	(61025, 10041),
+	(61026, 50032),
+	(61028, 50034),
+	(61029, 50020),
+	(61030, 50019);
 /*!40000 ALTER TABLE `gossip_menu` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

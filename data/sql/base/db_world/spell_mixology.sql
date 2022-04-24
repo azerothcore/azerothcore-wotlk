@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,15 +12,15 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.spell_mixology
+-- Dumpar struktur för tabell acore_world.spell_mixology
 DROP TABLE IF EXISTS `spell_mixology`;
 CREATE TABLE IF NOT EXISTS `spell_mixology` (
   `entry` MEDIUMINT unsigned NOT NULL,
-  `pctMod` float NOT NULL DEFAULT 30 COMMENT 'bonus multiplier',
+  `pctMod` float NOT NULL DEFAULT '30' COMMENT 'bonus multiplier',
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED;
 
--- Дамп данных таблицы acore_world.spell_mixology: 21 rows
+-- Dumpar data för tabell acore_world.spell_mixology: 21 rows
 DELETE FROM `spell_mixology`;
 /*!40000 ALTER TABLE `spell_mixology` DISABLE KEYS */;
 INSERT INTO `spell_mixology` (`entry`, `pctMod`) VALUES

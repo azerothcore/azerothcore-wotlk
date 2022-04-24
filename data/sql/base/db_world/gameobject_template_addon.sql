@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.gameobject_template_addon
+-- Dumpar struktur för tabell acore_world.gameobject_template_addon
 DROP TABLE IF EXISTS `gameobject_template_addon`;
 CREATE TABLE IF NOT EXISTS `gameobject_template_addon` (
   `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `gameobject_template_addon` (
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_world.gameobject_template_addon: 21 493 rows
+-- Dumpar data för tabell acore_world.gameobject_template_addon: 21 493 rows
 DELETE FROM `gameobject_template_addon`;
 /*!40000 ALTER TABLE `gameobject_template_addon` DISABLE KEYS */;
 INSERT INTO `gameobject_template_addon` (`entry`, `faction`, `flags`, `mingold`, `maxgold`) VALUES
@@ -813,9 +813,9 @@ INSERT INTO `gameobject_template_addon` (`entry`, `faction`, `flags`, `mingold`,
 	(3085, 0, 0, 0, 0),
 	(3089, 0, 0, 0, 0),
 	(3187, 0, 0, 0, 0),
-	(3189, 0, 0, 0, 0),
-	(3190, 0, 0, 0, 0),
-	(3192, 0, 0, 0, 0),
+	(3189, 0, 4, 0, 0),
+	(3190, 0, 4, 0, 0),
+	(3192, 0, 4, 0, 0),
 	(3194, 0, 0, 0, 0),
 	(3195, 0, 0, 0, 0),
 	(3196, 0, 0, 0, 0),
@@ -8723,7 +8723,7 @@ INSERT INTO `gameobject_template_addon` (`entry`, `faction`, `flags`, `mingold`,
 	(176959, 0, 0, 0, 0),
 	(176960, 0, 0, 0, 0),
 	(176961, 0, 0, 0, 0),
-	(176964, 0, 0, 0, 0),
+	(176964, 114, 32, 0, 0),
 	(176965, 0, 0, 0, 0),
 	(176966, 0, 0, 0, 0),
 	(176967, 0, 0, 0, 0),
@@ -9393,9 +9393,9 @@ INSERT INTO `gameobject_template_addon` (`entry`, `faction`, `flags`, `mingold`,
 	(179112, 0, 0, 0, 0),
 	(179113, 0, 0, 0, 0),
 	(179114, 0, 0, 0, 0),
-	(179115, 0, 0, 0, 0),
+	(179115, 0, 4, 0, 0),
 	(179116, 0, 0, 0, 0),
-	(179117, 0, 0, 0, 0),
+	(179117, 114, 32, 0, 0),
 	(179118, 0, 0, 0, 0),
 	(179119, 0, 0, 0, 0),
 	(179120, 0, 0, 0, 0),
@@ -9481,7 +9481,7 @@ INSERT INTO `gameobject_template_addon` (`entry`, `faction`, `flags`, `mingold`,
 	(179344, 0, 0, 0, 0),
 	(179345, 94, 0, 0, 0),
 	(179364, 0, 0, 0, 0),
-	(179365, 0, 0, 0, 0),
+	(179365, 114, 32, 0, 0),
 	(179384, 0, 0, 0, 0),
 	(179385, 0, 0, 0, 0),
 	(179386, 0, 0, 0, 0),
