@@ -664,8 +664,12 @@ public:
                     {
                         Map::PlayerList const& pList = instance->GetPlayers();
                         for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
-                            if (Vehicle* veh = itr->GetSource()->GetVehicle())
-                                veh->Dismiss();
+                        {
+                            if (Creature* vehicleCreature = itr->GetSource()->GetVehicleCreatureBase())
+                            {
+                                vehicleCreature->DespawnOrUnsummon();
+                            }
+                        }
                     }
                     break;
                 case TYPE_IGNIS:
@@ -837,8 +841,12 @@ public:
             {
                 Map::PlayerList const& pList = instance->GetPlayers();
                 for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
-                    if (Vehicle* veh = itr->GetSource()->GetVehicle())
-                        veh->Dismiss();
+                {
+                    if (Creature* vehicleCreature = itr->GetSource()->GetVehicleCreatureBase())
+                    {
+                        vehicleCreature->DespawnOrUnsummon();
+                    }
+                }
             }
         }
 
@@ -1239,9 +1247,12 @@ void instance_ulduar::instance_ulduar_InstanceMapScript::SpawnLeviathanEncounter
     if (!_leviathanVehicles.empty())
     {
         for (ObjectGuid const& guid : _leviathanVehicles)
+        {
             if (Creature* cr = instance->GetCreature(guid))
-                if (Vehicle* veh = cr->GetVehicleKit())
-                    veh->Dismiss();
+            {
+                cr->DespawnOrUnsummon();
+            }
+        }
 
         _leviathanVehicles.clear();
     }

@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.game_event_model_equip
+-- Dumpar struktur för tabell acore_world.game_event_model_equip
 DROP TABLE IF EXISTS `game_event_model_equip`;
 CREATE TABLE IF NOT EXISTS `game_event_model_equip` (
   `eventEntry` TINYINT NOT NULL COMMENT 'Entry of the game event.',
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `game_event_model_equip` (
   PRIMARY KEY (`guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_world.game_event_model_equip: 0 rows
+-- Dumpar data för tabell acore_world.game_event_model_equip: 0 rows
 DELETE FROM `game_event_model_equip`;
 /*!40000 ALTER TABLE `game_event_model_equip` DISABLE KEYS */;
 /*!40000 ALTER TABLE `game_event_model_equip` ENABLE KEYS */;

@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,12 +12,12 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_characters.characters
+-- Dumpar struktur för tabell acore_characters.characters
 DROP TABLE IF EXISTS `characters`;
 CREATE TABLE IF NOT EXISTS `characters` (
   `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
   `account` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Account Identifier',
-  `name` varchar(12) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `name` VARCHAR(12) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `race` TINYINT unsigned NOT NULL DEFAULT 0,
   `class` TINYINT unsigned NOT NULL DEFAULT 0,
   `gender` TINYINT unsigned NOT NULL DEFAULT 0,
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS `characters` (
   `at_login` SMALLINT unsigned NOT NULL DEFAULT 0,
   `zone` SMALLINT unsigned NOT NULL DEFAULT 0,
   `death_expire_time` INT unsigned NOT NULL DEFAULT 0,
-  `taxi_path` text DEFAULT NULL,
+  `taxi_path` text,
   `arenaPoints` INT unsigned NOT NULL DEFAULT 0,
   `totalHonorPoints` INT unsigned NOT NULL DEFAULT 0,
   `todayHonorPoints` INT unsigned NOT NULL DEFAULT 0,
@@ -82,16 +82,16 @@ CREATE TABLE IF NOT EXISTS `characters` (
   `latency` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `talentGroupsCount` TINYINT unsigned NOT NULL DEFAULT 1,
   `activeTalentGroup` TINYINT unsigned NOT NULL DEFAULT 0,
-  `exploredZones` longtext DEFAULT NULL,
-  `equipmentCache` longtext DEFAULT NULL,
+  `exploredZones` longtext,
+  `equipmentCache` longtext,
   `ammoId` INT unsigned NOT NULL DEFAULT 0,
-  `knownTitles` longtext DEFAULT NULL,
+  `knownTitles` longtext,
   `actionBars` TINYINT unsigned NOT NULL DEFAULT 0,
   `grantableLevels` TINYINT unsigned NOT NULL DEFAULT 0,
   `order` TINYINT DEFAULT NULL,
-  `creation_date` timestamp NOT NULL DEFAULT current_timestamp(),
+  `creation_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `deleteInfos_Account` INT unsigned DEFAULT NULL,
-  `deleteInfos_Name` varchar(12) DEFAULT NULL,
+  `deleteInfos_Name` VARCHAR(12) DEFAULT NULL,
   `deleteDate` INT unsigned DEFAULT NULL,
   `innTriggerId` INT unsigned NOT NULL,
   PRIMARY KEY (`guid`),
@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS `characters` (
   KEY `idx_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
 
--- Дамп данных таблицы acore_characters.characters: ~0 rows (приблизительно)
+-- Dumpar data för tabell acore_characters.characters: ~0 rows (ungefär)
 DELETE FROM `characters`;
 /*!40000 ALTER TABLE `characters` DISABLE KEYS */;
 /*!40000 ALTER TABLE `characters` ENABLE KEYS */;

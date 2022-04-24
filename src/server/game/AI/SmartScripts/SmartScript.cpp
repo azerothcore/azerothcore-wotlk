@@ -121,7 +121,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
     //calc random
     if (e.GetEventType() != SMART_EVENT_LINK && e.event.event_chance < 100 && e.event.event_chance)
     {
-        uint32 rnd = urand(0, 100);
+        uint32 rnd = urand(1, 100);
         if (e.event.event_chance <= rnd)
             return;
     }
@@ -4031,6 +4031,9 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
     if ((e.event.event_phase_mask && !IsInPhase(e.event.event_phase_mask)) || ((e.event.event_flags & SMART_EVENT_FLAG_NOT_REPEATABLE) && e.runOnce))
         return;
 
+    if (!(e.event.event_flags & SMART_EVENT_FLAG_WHILE_CHARMED) && IsCharmedCreature(me))
+        return;
+
     switch (e.GetEventType())
     {
         case SMART_EVENT_LINK://special handling
@@ -4180,12 +4183,17 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                 ProcessTimedAction(e, e.event.aura.repeatMin, e.event.aura.repeatMax, me->GetVictim());
                 break;
             }
+        case SMART_EVENT_CHARMED:
+            {
+                if (bvar == (e.event.charm.onRemove != 1))
+                    ProcessAction(e, unit, var0, var1, bvar, spell, gob);
+                break;
+            }
         //no params
         case SMART_EVENT_AGGRO:
         case SMART_EVENT_DEATH:
         case SMART_EVENT_EVADE:
         case SMART_EVENT_REACHED_HOME:
-        case SMART_EVENT_CHARMED:
         case SMART_EVENT_CHARMED_TARGET:
         case SMART_EVENT_CORPSE_REMOVED:
         case SMART_EVENT_AI_INIT:
@@ -4502,8 +4510,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                 if (!me || !me->IsInCombat())
                     return;
 
-                ObjectList* _targets = nullptr;
-
+                Unit* target = nullptr;
                 switch (e.GetTargetType())
                 {
                     case SMART_TARGET_CREATURE_RANGE:
@@ -4513,32 +4520,35 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                     case SMART_TARGET_CLOSEST_PLAYER:
                     case SMART_TARGET_PLAYER_RANGE:
                     case SMART_TARGET_PLAYER_DISTANCE:
-                        _targets = GetTargets(e);
+                    {
+                        ObjectList* targets = GetTargets(e);
+                        if (!targets)
+                            return;
+                        for (WorldObject* target : *targets)
+                        {
+                            if (IsUnit(target) && me->IsFriendlyTo(target->ToUnit()) && target->ToUnit()->IsAlive() && target->ToUnit()->IsInCombat())
+                            {
+                                uint32 healthPct = uint32(target->ToUnit()->GetHealthPct());
+                                if (healthPct > e.event.friendlyHealthPct.maxHpPct || healthPct < e.event.friendlyHealthPct.minHpPct)
+                                {
+                                    continue;
+                                }
+
+                                target = target->ToUnit();
+                                break;
+                            }
+                        }
+
+                        delete targets;
+                        break;
+                    }
+                    case SMART_TARGET_SELF:
+                    case SMART_TARGET_ACTION_INVOKER:
+                        target = DoSelectLowestHpPercentFriendly((float)e.event.friendlyHealthPct.radius, e.event.friendlyHealthPct.minHpPct, e.event.friendlyHealthPct.maxHpPct);
                         break;
                     default:
                         return;
                 }
-
-                if (!_targets)
-                    return;
-
-                Unit* target = nullptr;
-
-                for (ObjectList::const_iterator itr = _targets->begin(); itr != _targets->end(); ++itr)
-                {
-                    if (IsUnit(*itr) && me->IsFriendlyTo((*itr)->ToUnit()) && (*itr)->ToUnit()->IsAlive() && (*itr)->ToUnit()->IsInCombat())
-                    {
-                        uint32 healthPct = uint32((*itr)->ToUnit()->GetHealthPct());
-
-                        if (healthPct > e.event.friendlyHealthPct.maxHpPct || healthPct < e.event.friendlyHealthPct.minHpPct)
-                            continue;
-
-                        target = (*itr)->ToUnit();
-                        break;
-                    }
-                }
-
-                delete _targets;
 
                 if (!target)
                     return;
@@ -5033,6 +5043,20 @@ Unit* SmartScript::DoSelectLowestHpFriendly(float range, uint32 MinHPDiff)
     return unit;
 }
 
+Unit* SmartScript::DoSelectLowestHpPercentFriendly(float range, uint32 minHpPct, uint32 maxHpPct) const
+{
+    if (!me)
+    {
+        return nullptr;
+    }
+
+    Unit* unit = nullptr;
+    Acore::MostHPPercentMissingInRange u_check(me, range, minHpPct, maxHpPct);
+    Acore::UnitLastSearcher<Acore::MostHPPercentMissingInRange> searcher(me, unit, u_check);
+    Cell::VisitGridObjects(me, searcher, range);
+    return unit;
+}
+
 void SmartScript::DoFindFriendlyCC(std::list<Creature*>& _list, float range)
 {
     if (!me)
@@ -5109,6 +5133,37 @@ Unit* SmartScript::GetLastInvoker(Unit* invoker)
     else if (invoker)
         return ObjectAccessor::GetUnit(*invoker, mLastInvoker);
     return nullptr;
+}
+
+bool SmartScript::IsUnit(WorldObject* obj)
+{
+    return obj && (obj->GetTypeId() == TYPEID_UNIT || obj->GetTypeId() == TYPEID_PLAYER);
+}
+
+bool SmartScript::IsPlayer(WorldObject* obj)
+{
+    return obj && obj->GetTypeId() == TYPEID_PLAYER;
+}
+
+bool SmartScript::IsCreature(WorldObject* obj)
+{
+    return obj && obj->GetTypeId() == TYPEID_UNIT;
+}
+
+bool SmartScript::IsCharmedCreature(WorldObject* obj)
+{
+    if (!obj)
+        return false;
+
+    if (Creature* creatureObj = obj->ToCreature())
+        return creatureObj->IsCharmed();
+
+    return false;
+}
+
+bool SmartScript::IsGameObject(WorldObject* obj)
+{
+    return obj && obj->GetTypeId() == TYPEID_GAMEOBJECT;
 }
 
 void SmartScript::IncPhase(uint32 p)

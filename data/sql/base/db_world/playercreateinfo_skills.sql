@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,18 +12,18 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.playercreateinfo_skills
+-- Dumpar struktur för tabell acore_world.playercreateinfo_skills
 DROP TABLE IF EXISTS `playercreateinfo_skills`;
 CREATE TABLE IF NOT EXISTS `playercreateinfo_skills` (
   `raceMask` INT unsigned NOT NULL,
   `classMask` INT unsigned NOT NULL,
   `skill` SMALLINT unsigned NOT NULL,
   `rank` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `comment` varchar(255) DEFAULT NULL,
+  `comment` VARCHAR(255) DEFAULT NULL,
   PRIMARY KEY (`raceMask`,`classMask`,`skill`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_world.playercreateinfo_skills: ~77 rows (приблизительно)
+-- Dumpar data för tabell acore_world.playercreateinfo_skills: ~77 rows (ungefär)
 DELETE FROM `playercreateinfo_skills`;
 /*!40000 ALTER TABLE `playercreateinfo_skills` DISABLE KEYS */;
 INSERT INTO `playercreateinfo_skills` (`raceMask`, `classMask`, `skill`, `rank`, `comment`) VALUES
@@ -44,8 +44,8 @@ INSERT INTO `playercreateinfo_skills` (`raceMask`, `classMask`, `skill`, `rank`,
 	(0, 4, 163, 0, 'Hunter - Marksmanship'),
 	(0, 8, 38, 0, 'Rogue - Combat'),
 	(0, 8, 39, 0, 'Rogue - Subtlety'),
-	(0, 8, 176, 0, 'Thrown'),
 	(0, 8, 253, 0, 'Rogue - Assassination'),
+	(0, 9, 176, 0, 'Thrown'),
 	(0, 16, 56, 0, 'Priest - Holy'),
 	(0, 16, 78, 0, 'Priest - Shadow'),
 	(0, 16, 613, 0, 'Priest - Discipline'),

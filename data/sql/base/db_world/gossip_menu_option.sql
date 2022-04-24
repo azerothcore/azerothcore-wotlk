@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,13 +12,13 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.gossip_menu_option
+-- Dumpar struktur för tabell acore_world.gossip_menu_option
 DROP TABLE IF EXISTS `gossip_menu_option`;
 CREATE TABLE IF NOT EXISTS `gossip_menu_option` (
   `MenuID` SMALLINT unsigned NOT NULL DEFAULT 0,
   `OptionID` SMALLINT unsigned NOT NULL DEFAULT 0,
   `OptionIcon` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `OptionText` text DEFAULT NULL,
+  `OptionText` text,
   `OptionBroadcastTextID` MEDIUMINT NOT NULL DEFAULT 0,
   `OptionType` TINYINT unsigned NOT NULL DEFAULT 0,
   `OptionNpcFlag` INT unsigned NOT NULL DEFAULT 0,
@@ -26,13 +26,13 @@ CREATE TABLE IF NOT EXISTS `gossip_menu_option` (
   `ActionPoiID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `BoxCoded` TINYINT unsigned NOT NULL DEFAULT 0,
   `BoxMoney` INT unsigned NOT NULL DEFAULT 0,
-  `BoxText` text DEFAULT NULL,
+  `BoxText` text,
   `BoxBroadcastTextID` MEDIUMINT NOT NULL DEFAULT 0,
   `VerifiedBuild` SMALLINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`MenuID`,`OptionID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_world.gossip_menu_option: 4 449 rows
+-- Dumpar data för tabell acore_world.gossip_menu_option: 4 475 rows
 DELETE FROM `gossip_menu_option`;
 /*!40000 ALTER TABLE `gossip_menu_option` DISABLE KEYS */;
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
@@ -601,8 +601,8 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 	(3064, 0, 0, 'Absolutely.', 6281, 1, 1, 0, 0, 0, 0, '', 0, 0),
 	(3065, 0, 0, 'Horrifying.', 6279, 1, 1, 3064, 0, 0, 0, '', 0, 0),
 	(3066, 0, 0, 'Continue please...', 6277, 1, 1, 3065, 0, 0, 0, '', 0, 0),
-	(3068, 0, 3, 'I would like to train.', 5597, 5, 16, 0, 0, 0, 0, '', 0, 0),
-	(3069, 0, 3, 'I would like to train.', 5597, 5, 16, 0, 0, 0, 0, '', 0, 0),
+	(3067, 1, 0, 'I wish to unlearn dragonscale leatherworking!', 18977, 1, 1, 3075, 0, 0, 0, '', 0, 0),
+	(3067, 0, 3, 'I would like to train.', 5597, 5, 16, 0, 0, 0, 0, '', 0, 0),
 	(3130, 0, 1, 'I would like to buy from you.', 2583, 3, 128, 0, 0, 0, 0, '', 0, 0),
 	(3142, 0, 0, 'I lost the Flute of the Ancients and require a replacement, Eridan.', 25677, 1, 1, 0, 0, 0, 0, '', 0, 0),
 	(3161, 0, 1, 'I would like to buy from you.', 14967, 3, 128, 0, 0, 0, 0, '', 0, 0),
@@ -1048,7 +1048,7 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 	(4505, 0, 3, 'I am interested in warlock training.', 2544, 5, 16, 0, 0, 0, 0, '', 0, 0),
 	(4505, 1, 0, 'I wish to unlearn my talents.', 62295, 16, 16, 4461, 0, 0, 0, '', 0, 0),
 	(4505, 2, 0, 'Learn about Dual Talent Specialization.', 33762, 20, 1, 10371, 0, 0, 0, '', 0, 0),
-	(4506, 0, 3, 'I wish to train.', 7556, 5, 16, 0, 0, 0, 0, '', 0, 0),
+	(4506, 0, 3, 'I seek training in the ways of the Hunter.', 7643, 5, 16, 0, 0, 0, 0, '', 0, 0),
 	(4506, 1, 0, 'I wish to unlearn my talents.', 62295, 16, 16, 4461, 0, 0, 0, '', 0, 0),
 	(4506, 2, 0, 'I wish to know about Dual Talent Specialization.', 33762, 20, 1, 10371, 0, 0, 0, '', 0, 0),
 	(4507, 0, 3, 'I seek training as a druid.', 7452, 5, 16, 0, 0, 0, 0, '', 0, 0),
@@ -1858,7 +1858,7 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 	(7127, 0, 0, 'Is there anything else?', 12039, 1, 1, 7126, 0, 0, 0, '', 0, 0),
 	(7128, 0, 0, 'Please, tell me more.', 12037, 1, 1, 7127, 0, 0, 0, '', 0, 0),
 	(7129, 0, 0, 'This is disturbing. Please continue.', 12035, 1, 1, 7128, 0, 0, 0, '', 0, 0),
-	(7130, 0, 0, 'What?', 72224, 1, 1, 7129, 0, 0, 0, '', 0, 0),
+	(7130, 0, 0, 'What?', 12033, 1, 1, 7129, 0, 0, 0, '', 0, 0),
 	(7131, 0, 0, 'Please continue.', 12031, 1, 1, 7130, 0, 0, 0, '', 0, 0),
 	(7132, 0, 0, 'Please continue.', 12031, 1, 1, 7131, 0, 0, 0, '', 0, 0),
 	(7133, 0, 0, 'What corruption?', 12027, 1, 1, 7132, 0, 0, 0, '', 0, 0),
@@ -2685,7 +2685,7 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 	(8833, 2, 1, 'What do you have to eat, Celeste?', 22465, 3, 128, 0, 0, 0, 0, '', 0, 0),
 	(8837, 0, 0, 'I don\'t have the Repaired Diving Gear anymore. Do you have a spare?', 22482, 1, 1, 0, 0, 0, 0, '', 0, 0),
 	(8846, 0, 0, 'Can you send me to Theramore? I have an urgent message for Lady Jaina from King Wrynn.', 22524, 1, 1, 0, 0, 0, 0, '', 0, 0),
-	(8851, 0, 0, 'You look like an intelligent person. Why don\'t you read one of these leaflets and give it some thought?', 22549, 1, 1, 21084, 0, 0, 0, NULL, 0, 0),
+	(8851, 0, 0, 'You look like an intelligent person. Why don\'t you read one of these leaflets and give it some thought?', 22549, 1, 1, 0, 0, 0, 0, NULL, 0, 0),
 	(8852, 0, 0, 'Captain, I\'ve somehow lost my command insignia.', 22809, 1, 1, 0, 0, 0, 0, '', 0, 0),
 	(8866, 0, 3, 'Train me.', 3266, 5, 16, 0, 0, 0, 0, '', 0, 0),
 	(8867, 0, 3, 'Train me.', 3266, 5, 16, 0, 0, 0, 0, '', 0, 0),
@@ -4484,7 +4484,33 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 	(2985, 4, 0, 'Chapter on Skin of Shadow.', 6161, 1, 1, 2990, 0, 0, 0, '', 0, 0),
 	(57015, 0, 0, 'Yes I checked, I\'m missing the top piece!', 11778, 1, 1, 57016, 0, 0, 0, NULL, 0, 0),
 	(57015, 1, 0, 'Yes I checked, I\'m missing the left piece!', 11780, 1, 1, 57017, 0, 0, 0, NULL, 0, 0),
-	(57018, 0, 0, 'Yes, please summon it back!', 11786, 1, 1, 57019, 0, 0, 0, NULL, 0, 0);
+	(57018, 0, 0, 'Yes, please summon it back!', 11786, 1, 1, 57019, 0, 0, 0, NULL, 0, 0),
+	(3801, 1, 0, 'Myranda, do you have enough eyeballs to make another amulet? I have lost the old one.', 8324, 1, 3, 0, 0, 0, 0, '', 0, 0),
+	(15000, 0, 0, 'I am a treasure hunter in search of powerful artifacts. Give them to me and you will not be harmed.', 11016, 1, 1, 0, 0, 0, 0, '', 0, 12340),
+	(6445, 0, 0, 'I want to catch Gahz\'ranka!  Tell me how!', 10490, 1, 1, 57023, 0, 0, 0, '', 0, 0),
+	(57023, 0, 1, 'Nat, I want to buy your mudskunk lures!', 10492, 3, 128, 0, 0, 0, 0, '', 0, 0),
+	(57023, 1, 0, 'How do I catch the mudskunks for your lure?', 10500, 1, 1, 57024, 0, 0, 0, '', 0, 0),
+	(4013, 0, 3, 'I\'d like to train.', 7149, 5, 16, 0, 0, 0, 0, '', 0, 0),
+	(4013, 1, 0, 'I wish to unlearn my talents.', 8271, 16, 16, 4461, 0, 0, 0, '', 0, 0),
+	(4013, 2, 0, 'I wish to know about Dual Talent Specialization.', 33762, 20, 1, 10371, 0, 0, 0, '', 0, 0),
+	(10631, 0, 0, 'I lost my totems. Can you help?', 35455, 1, 1, 0, 0, 0, 0, NULL, 0, 0),
+	(10630, 0, 0, 'I lost my totems. Can you help?', 35455, 1, 1, 0, 0, 0, 0, NULL, 0, 0),
+	(3068, 0, 3, 'I would like to train.', 5597, 5, 16, 0, 0, 0, 0, '', 0, 0),
+	(3068, 1, 0, 'I wish to unlearn dragonscale leatherworking!', 18977, 1, 1, 3075, 0, 0, 0, '', 0, 0),
+	(3069, 0, 3, 'I would like to train.', 5597, 5, 16, 0, 0, 0, 0, '', 0, 0),
+	(3069, 1, 0, 'I wish to unlearn elemental leatherworking!', 18917, 1, 1, 3076, 0, 0, 0, '', 0, 0),
+	(3070, 0, 3, 'I would like to train.', 5597, 5, 16, 0, 0, 0, 0, '', 0, 0),
+	(3070, 1, 0, 'I wish to unlearn elemental leatherworking!', 18917, 1, 1, 3076, 0, 0, 0, '', 0, 0),
+	(3072, 0, 3, 'I would like to train.', 5597, 5, 16, 0, 0, 0, 0, '', 0, 0),
+	(3072, 1, 0, 'I wish to unlearn tribal leatherworking!', 18975, 1, 1, 3077, 0, 0, 0, '', 0, 0),
+	(3073, 0, 3, 'I would like to train.', 5597, 5, 16, 0, 0, 0, 0, '', 0, 0),
+	(3073, 1, 0, 'I wish to unlearn tribal leatherworking!', 18975, 1, 1, 3077, 0, 0, 0, '', 0, 0),
+	(3075, 1, 0, 'I wish to unlearn dragonscale leatherworking!', 18977, 1, 1, 0, 0, 0, 0, 'Do you really want to unlearn your leatherworking specialty and lose all associated recipes?', 18969, 0),
+	(3076, 1, 0, 'I wish to unlearn elemental leatherworking!', 18917, 1, 1, 0, 0, 0, 0, 'Do you really want to unlearn your leatherworking specialty and lose all associated recipes?', 18969, 0),
+	(3077, 1, 0, 'I wish to unlearn tribal leatherworking!', 18975, 1, 1, 0, 0, 0, 0, 'Do you really want to unlearn your leatherworking specialty and lose all associated recipes?', 18969, 0),
+	(5481, 0, 0, 'Rokaro, I have lost the Drakefire Amulet. Could another be created?', 9014, 1, 1, 0, 0, 0, 0, '', 0, 0),
+	(5482, 0, 0, 'Haleh, I have lost the Drakefire Amulet. Could you fashion another?', 9016, 1, 1, 0, 0, 0, 0, '', 0, 0),
+	(9676, 0, 0, 'I\'m ready to battle the dreadlord, sire.', 28508, 1, 1, 0, 0, 0, 0, '', 0, 0);
 /*!40000 ALTER TABLE `gossip_menu_option` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

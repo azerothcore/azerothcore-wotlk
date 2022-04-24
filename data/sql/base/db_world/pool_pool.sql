@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,17 +12,17 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.pool_pool
+-- Dumpar struktur för tabell acore_world.pool_pool
 DROP TABLE IF EXISTS `pool_pool`;
 CREATE TABLE IF NOT EXISTS `pool_pool` (
   `pool_id` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `mother_pool` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `chance` float NOT NULL DEFAULT 0,
-  `description` varchar(255) DEFAULT NULL,
+  `description` VARCHAR(255) DEFAULT NULL,
   PRIMARY KEY (`pool_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_world.pool_pool: 2 293 rows
+-- Dumpar data för tabell acore_world.pool_pool: 2 293 rows
 DELETE FROM `pool_pool`;
 /*!40000 ALTER TABLE `pool_pool` DISABLE KEYS */;
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES

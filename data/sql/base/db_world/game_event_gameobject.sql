@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.game_event_gameobject
+-- Dumpar struktur för tabell acore_world.game_event_gameobject
 DROP TABLE IF EXISTS `game_event_gameobject`;
 CREATE TABLE IF NOT EXISTS `game_event_gameobject` (
   `eventEntry` TINYINT NOT NULL COMMENT 'Entry of the game event. Put negative entry to remove during event.',
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `game_event_gameobject` (
   PRIMARY KEY (`guid`,`eventEntry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_world.game_event_gameobject: 21 593 rows
+-- Dumpar data för tabell acore_world.game_event_gameobject: 21 608 rows
 DELETE FROM `game_event_gameobject`;
 /*!40000 ALTER TABLE `game_event_gameobject` DISABLE KEYS */;
 INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
@@ -194,6 +194,21 @@ INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 	(7, 7268),
 	(73, 9104),
 	(73, 9114),
+	(8, 9743),
+	(8, 9744),
+	(8, 9745),
+	(8, 9746),
+	(8, 9747),
+	(8, 9748),
+	(8, 9749),
+	(8, 9750),
+	(8, 9751),
+	(8, 9752),
+	(8, 9753),
+	(8, 9754),
+	(8, 9755),
+	(8, 9756),
+	(8, 9757),
 	(15, 11012),
 	(15, 11453),
 	(15, 11480),
@@ -10008,7 +10023,8 @@ INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 	(31, 47147),
 	(31, 47148),
 	(31, 47149),
-	(31, 47150),
+	(31, 47150);
+INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 	(31, 47151),
 	(31, 47152),
 	(31, 47153),
@@ -10023,8 +10039,7 @@ INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 	(31, 47162),
 	(31, 47163),
 	(31, 47164),
-	(31, 47165);
-INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
+	(31, 47165),
 	(31, 47166),
 	(31, 47167),
 	(31, 47168),
@@ -20009,7 +20024,8 @@ INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 	(26, 240806),
 	(26, 240807),
 	(26, 240808),
-	(26, 240809),
+	(26, 240809);
+INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 	(26, 240810),
 	(26, 240811),
 	(26, 240812),
@@ -20024,8 +20040,7 @@ INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 	(26, 240821),
 	(26, 240822),
 	(26, 240823),
-	(26, 240824);
-INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
+	(26, 240824),
 	(26, 240825),
 	(26, 240826),
 	(26, 240827),
