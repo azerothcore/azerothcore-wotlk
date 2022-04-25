@@ -432,14 +432,6 @@ namespace MMAP
                     {
                         useLiquid = false;
                     }
-                    else if ((liquidType & (MAP_LIQUID_TYPE_WATER | MAP_LIQUID_TYPE_OCEAN)) != 0)
-                        liquidType = NAV_WATER;
-                    else if (liquidType & MAP_LIQUID_TYPE_MAGMA)
-                        liquidType = NAV_MAGMA;
-                    else if (liquidType & MAP_LIQUID_TYPE_SLIME)
-                        liquidType = NAV_SLIME;
-                    else
-                        useLiquid = false;
                 }
 
                 // if there is no terrain, don't use terrain
