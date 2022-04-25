@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,29 +12,28 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_characters.mail
+-- Dumpar struktur för tabell acore_characters.mail
 DROP TABLE IF EXISTS `mail`;
 CREATE TABLE IF NOT EXISTS `mail` (
   `id` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Identifier',
   `messageType` TINYINT unsigned NOT NULL DEFAULT 0,
-  `stationery` TINYINT NOT NULL DEFAULT 41,
+  `stationery` TINYINT NOT NULL DEFAULT '41',
   `mailTemplateId` SMALLINT unsigned NOT NULL DEFAULT 0,
   `sender` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Character Global Unique Identifier',
   `receiver` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Character Global Unique Identifier',
-  `subject` longtext DEFAULT NULL,
-  `body` longtext DEFAULT NULL,
+  `subject` longtext,
+  `body` longtext,
   `has_items` TINYINT unsigned NOT NULL DEFAULT 0,
   `expire_time` INT unsigned NOT NULL DEFAULT 0,
   `deliver_time` INT unsigned NOT NULL DEFAULT 0,
   `money` INT unsigned NOT NULL DEFAULT 0,
   `cod` INT unsigned NOT NULL DEFAULT 0,
   `checked` TINYINT unsigned NOT NULL DEFAULT 0,
-  `auctionId` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `idx_receiver` (`receiver`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Mail System';
 
--- Дамп данных таблицы acore_characters.mail: ~0 rows (приблизительно)
+-- Dumpar data för tabell acore_characters.mail: ~0 rows (ungefär)
 DELETE FROM `mail`;
 /*!40000 ALTER TABLE `mail` DISABLE KEYS */;
 /*!40000 ALTER TABLE `mail` ENABLE KEYS */;

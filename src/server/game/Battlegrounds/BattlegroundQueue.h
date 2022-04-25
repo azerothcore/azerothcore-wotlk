@@ -67,6 +67,7 @@ public:
     ~BattlegroundQueue();
 
     void BattlegroundQueueUpdate(uint32 diff, BattlegroundTypeId bgTypeId, BattlegroundBracketId bracket_id, uint8 arenaType, bool isRated, uint32 arenaRating);
+    void BattlegroundQueueAnnouncerUpdate(uint32 diff, BattlegroundQueueTypeId bgQueueTypeId, BattlegroundBracketId bracket_id);
     void UpdateEvents(uint32 diff);
 
     void FillPlayersToBG(Battleground* bg, BattlegroundBracketId bracket_id);
@@ -134,7 +135,7 @@ private:
     // Event handler
     EventProcessor m_events;
 
-    std::array<int32, BG_BRACKET_ID_LAST> _queueAnnouncementTimer;
+    std::array<int32, MAX_BATTLEGROUND_BRACKETS> _queueAnnouncementTimer;
     bool _queueAnnouncementCrossfactioned;
 };
 

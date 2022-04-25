@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.npc_spellclick_spells
+-- Dumpar struktur för tabell acore_world.npc_spellclick_spells
 DROP TABLE IF EXISTS `npc_spellclick_spells`;
 CREATE TABLE IF NOT EXISTS `npc_spellclick_spells` (
   `npc_entry` INT unsigned NOT NULL COMMENT 'reference to creature_template',
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `npc_spellclick_spells` (
   PRIMARY KEY (`npc_entry`,`spell_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_world.npc_spellclick_spells: 333 rows
+-- Dumpar data för tabell acore_world.npc_spellclick_spells: 331 rows
 DELETE FROM `npc_spellclick_spells`;
 /*!40000 ALTER TABLE `npc_spellclick_spells` DISABLE KEYS */;
 INSERT INTO `npc_spellclick_spells` (`npc_entry`, `spell_id`, `cast_flags`, `user_type`) VALUES
@@ -266,9 +266,7 @@ INSERT INTO `npc_spellclick_spells` (`npc_entry`, `spell_id`, `cast_flags`, `use
 	(33845, 63151, 1, 0),
 	(33870, 63663, 1, 0),
 	(34045, 65030, 1, 0),
-	(34072, 63989, 2, 0),
-	(34072, 63997, 2, 0),
-	(34072, 63998, 2, 0),
+	(34072, 51347, 3, 0),
 	(34106, 67830, 1, 1),
 	(34108, 67830, 1, 1),
 	(34109, 67830, 1, 1),

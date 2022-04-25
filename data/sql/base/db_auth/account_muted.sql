@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,18 +12,18 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_auth.account_muted
+-- Dumpar struktur för tabell acore_auth.account_muted
 DROP TABLE IF EXISTS `account_muted`;
 CREATE TABLE IF NOT EXISTS `account_muted` (
   `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
   `mutedate` INT unsigned NOT NULL DEFAULT 0,
   `mutetime` INT unsigned NOT NULL DEFAULT 0,
-  `mutedby` varchar(50) NOT NULL,
-  `mutereason` varchar(255) NOT NULL,
+  `mutedby` VARCHAR(50) NOT NULL,
+  `mutereason` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`guid`,`mutedate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='mute List';
 
--- Дамп данных таблицы acore_auth.account_muted: ~0 rows (приблизительно)
+-- Dumpar data för tabell acore_auth.account_muted: ~0 rows (ungefär)
 DELETE FROM `account_muted`;
 /*!40000 ALTER TABLE `account_muted` DISABLE KEYS */;
 /*!40000 ALTER TABLE `account_muted` ENABLE KEYS */;

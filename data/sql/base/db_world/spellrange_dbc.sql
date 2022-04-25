@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.spellrange_dbc
+-- Dumpar struktur för tabell acore_world.spellrange_dbc
 DROP TABLE IF EXISTS `spellrange_dbc`;
 CREATE TABLE IF NOT EXISTS `spellrange_dbc` (
   `ID` INT NOT NULL DEFAULT 0,
@@ -21,44 +21,44 @@ CREATE TABLE IF NOT EXISTS `spellrange_dbc` (
   `RangeMax_1` float NOT NULL DEFAULT 0,
   `RangeMax_2` float NOT NULL DEFAULT 0,
   `Flags` INT NOT NULL DEFAULT 0,
-  `DisplayName_Lang_enUS` text DEFAULT NULL,
-  `DisplayName_Lang_enGB` text DEFAULT NULL,
-  `DisplayName_Lang_koKR` text DEFAULT NULL,
-  `DisplayName_Lang_frFR` text DEFAULT NULL,
-  `DisplayName_Lang_deDE` text DEFAULT NULL,
-  `DisplayName_Lang_enCN` text DEFAULT NULL,
-  `DisplayName_Lang_zhCN` text DEFAULT NULL,
-  `DisplayName_Lang_enTW` text DEFAULT NULL,
-  `DisplayName_Lang_zhTW` text DEFAULT NULL,
-  `DisplayName_Lang_esES` text DEFAULT NULL,
-  `DisplayName_Lang_esMX` text DEFAULT NULL,
-  `DisplayName_Lang_ruRU` text DEFAULT NULL,
-  `DisplayName_Lang_ptPT` text DEFAULT NULL,
-  `DisplayName_Lang_ptBR` text DEFAULT NULL,
-  `DisplayName_Lang_itIT` text DEFAULT NULL,
-  `DisplayName_Lang_Unk` text DEFAULT NULL,
+  `DisplayName_Lang_enUS` text,
+  `DisplayName_Lang_enGB` text,
+  `DisplayName_Lang_koKR` text,
+  `DisplayName_Lang_frFR` text,
+  `DisplayName_Lang_deDE` text,
+  `DisplayName_Lang_enCN` text,
+  `DisplayName_Lang_zhCN` text,
+  `DisplayName_Lang_enTW` text,
+  `DisplayName_Lang_zhTW` text,
+  `DisplayName_Lang_esES` text,
+  `DisplayName_Lang_esMX` text,
+  `DisplayName_Lang_ruRU` text,
+  `DisplayName_Lang_ptPT` text,
+  `DisplayName_Lang_ptBR` text,
+  `DisplayName_Lang_itIT` text,
+  `DisplayName_Lang_Unk` text,
   `DisplayName_Lang_Mask` INT unsigned NOT NULL DEFAULT 0,
-  `DisplayNameShort_Lang_enUS` text DEFAULT NULL,
-  `DisplayNameShort_Lang_enGB` text DEFAULT NULL,
-  `DisplayNameShort_Lang_koKR` text DEFAULT NULL,
-  `DisplayNameShort_Lang_frFR` text DEFAULT NULL,
-  `DisplayNameShort_Lang_deDE` text DEFAULT NULL,
-  `DisplayNameShort_Lang_enCN` text DEFAULT NULL,
-  `DisplayNameShort_Lang_zhCN` text DEFAULT NULL,
-  `DisplayNameShort_Lang_enTW` text DEFAULT NULL,
-  `DisplayNameShort_Lang_zhTW` text DEFAULT NULL,
-  `DisplayNameShort_Lang_esES` text DEFAULT NULL,
-  `DisplayNameShort_Lang_esMX` text DEFAULT NULL,
-  `DisplayNameShort_Lang_ruRU` text DEFAULT NULL,
-  `DisplayNameShort_Lang_ptPT` text DEFAULT NULL,
-  `DisplayNameShort_Lang_ptBR` text DEFAULT NULL,
-  `DisplayNameShort_Lang_itIT` text DEFAULT NULL,
-  `DisplayNameShort_Lang_Unk` text DEFAULT NULL,
+  `DisplayNameShort_Lang_enUS` text,
+  `DisplayNameShort_Lang_enGB` text,
+  `DisplayNameShort_Lang_koKR` text,
+  `DisplayNameShort_Lang_frFR` text,
+  `DisplayNameShort_Lang_deDE` text,
+  `DisplayNameShort_Lang_enCN` text,
+  `DisplayNameShort_Lang_zhCN` text,
+  `DisplayNameShort_Lang_enTW` text,
+  `DisplayNameShort_Lang_zhTW` text,
+  `DisplayNameShort_Lang_esES` text,
+  `DisplayNameShort_Lang_esMX` text,
+  `DisplayNameShort_Lang_ruRU` text,
+  `DisplayNameShort_Lang_ptPT` text,
+  `DisplayNameShort_Lang_ptBR` text,
+  `DisplayNameShort_Lang_itIT` text,
+  `DisplayNameShort_Lang_Unk` text,
   `DisplayNameShort_Lang_Mask` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_world.spellrange_dbc: 0 rows
+-- Dumpar data för tabell acore_world.spellrange_dbc: 0 rows
 DELETE FROM `spellrange_dbc`;
 /*!40000 ALTER TABLE `spellrange_dbc` DISABLE KEYS */;
 /*!40000 ALTER TABLE `spellrange_dbc` ENABLE KEYS */;

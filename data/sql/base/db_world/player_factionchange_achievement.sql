@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.player_factionchange_achievement
+-- Dumpar struktur för tabell acore_world.player_factionchange_achievement
 DROP TABLE IF EXISTS `player_factionchange_achievement`;
 CREATE TABLE IF NOT EXISTS `player_factionchange_achievement` (
   `alliance_id` INT unsigned NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `player_factionchange_achievement` (
   PRIMARY KEY (`alliance_id`,`horde_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_world.player_factionchange_achievement: 124 rows
+-- Dumpar data för tabell acore_world.player_factionchange_achievement: 124 rows
 DELETE FROM `player_factionchange_achievement`;
 /*!40000 ALTER TABLE `player_factionchange_achievement` DISABLE KEYS */;
 INSERT INTO `player_factionchange_achievement` (`alliance_id`, `horde_id`) VALUES

@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.script_waypoint
+-- Dumpar struktur för tabell acore_world.script_waypoint
 DROP TABLE IF EXISTS `script_waypoint`;
 CREATE TABLE IF NOT EXISTS `script_waypoint` (
   `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'creature_template entry',
@@ -21,11 +21,11 @@ CREATE TABLE IF NOT EXISTS `script_waypoint` (
   `location_y` float NOT NULL DEFAULT 0,
   `location_z` float NOT NULL DEFAULT 0,
   `waittime` INT unsigned NOT NULL DEFAULT 0 COMMENT 'waittime in millisecs',
-  `point_comment` text DEFAULT NULL,
+  `point_comment` text,
   PRIMARY KEY (`entry`,`pointid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Script Creature waypoints';
 
--- Дамп данных таблицы acore_world.script_waypoint: 2 373 rows
+-- Dumpar data för tabell acore_world.script_waypoint: 2 373 rows
 DELETE FROM `script_waypoint`;
 /*!40000 ALTER TABLE `script_waypoint` DISABLE KEYS */;
 INSERT INTO `script_waypoint` (`entry`, `pointid`, `location_x`, `location_y`, `location_z`, `waittime`, `point_comment`) VALUES
