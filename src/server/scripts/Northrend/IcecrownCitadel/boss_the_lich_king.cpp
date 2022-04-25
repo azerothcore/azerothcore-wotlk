@@ -660,6 +660,11 @@ public:
             SetEquipmentSlots(true);
             if (me->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC))
                 me->SetStandState(UNIT_STAND_STATE_SIT);
+
+            if (IsHeroic())
+            {
+                me->SetControlled(false, UNIT_STATE_ROOT);
+            }
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -690,7 +695,10 @@ public:
             events.ScheduleEvent(EVENT_INFEST, 5000, EVENT_GROUP_ABILITIES);
             events.ScheduleEvent(EVENT_NECROTIC_PLAGUE, urand(30000, 31000), EVENT_GROUP_ABILITIES);
             if (IsHeroic())
+            {
+                me->SetControlled(false, UNIT_STATE_ROOT);
                 events.ScheduleEvent(EVENT_SHADOW_TRAP, 15500, EVENT_GROUP_ABILITIES);
+            }
         }
 
         void JustReachedHome() override
@@ -994,6 +1002,10 @@ public:
                     me->CastSpell(me, SPELL_BERSERK2, true);
                     break;
                 case EVENT_START_ATTACK:
+                    if (IsHeroic())
+                    {
+                        me->SetControlled(false, UNIT_STATE_ROOT);
+                    }
                     me->SetReactState(REACT_AGGRESSIVE);
                     if (_phase == PHASE_FROSTMOURNE)
                     {
@@ -1167,6 +1179,7 @@ public:
                     Talk(SAY_LK_HARVEST_SOUL);
                     me->CastSpell((Unit*)nullptr, SPELL_HARVEST_SOULS, false);
                     _phase = PHASE_FROSTMOURNE;
+                    me->SetControlled(true, UNIT_STATE_ROOT);
                     me->SetReactState(REACT_PASSIVE);
                     me->AttackStop();
                     events.ScheduleEvent(EVENT_START_ATTACK, 55000);
