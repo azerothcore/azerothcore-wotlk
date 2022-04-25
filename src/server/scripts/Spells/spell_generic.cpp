@@ -4389,6 +4389,23 @@ class spell_gen_arcane_charge : public SpellScript
     }
 };
 
+// 20589 - Escape artist
+// 30918 - Improved Sprint
+class spell_gen_remove_impairing_auras : public SpellScript
+{
+    PrepareSpellScript(spell_gen_remove_impairing_auras);
+
+    void HandleScriptEffect(SpellEffIndex /* effIndex */)
+    {
+        GetHitUnit()->RemoveMovementImpairingAuras(true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_gen_remove_impairing_auras::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -4522,4 +4539,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_contagion_of_rot);
     RegisterSpellScript(spell_gen_holiday_buff_food);
     RegisterSpellScript(spell_gen_arcane_charge);
+    RegisterSpellScript(spell_gen_remove_impairing_auras);
 }

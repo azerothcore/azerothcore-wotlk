@@ -179,7 +179,7 @@ public:
                     me->SetInCombatWithZone();
                     if (!me->IsInCombat())
                     {
-                        EnterEvadeMode();
+                        EnterEvadeMode(EVADE_REASON_OTHER);
                         return;
                     }
                     else
@@ -260,14 +260,14 @@ public:
 
         void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             events.Reset();
             summons.DespawnAll();
             me->DespawnOrUnsummon(1);
 
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void JustSummoned(Creature* summon) override

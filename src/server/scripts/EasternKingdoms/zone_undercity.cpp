@@ -307,12 +307,12 @@ public:
 
 enum ParqualFintallas
 {
-    SPELL_MARK_OF_SHAME         = 6767
+    SPELL_MARK_OF_SHAME             = 6767,
+    QUEST_ID_TEST_OF_LORE           = 6628,
+    GOSSIP_MENU_ID_TEST_OF_LORE     = 4764,
+    GOSSIP_TEXTID_PARQUAL_FINTALLAS = 5821,
+    GOSSIP_TEXTID_TEST_OF_LORE      = 5822,
 };
-
-#define GOSSIP_HPF1             "Gul'dan"
-#define GOSSIP_HPF2             "Kel'Thuzad"
-#define GOSSIP_HPF3             "Ner'zhul"
 
 class npc_parqual_fintallas : public CreatureScript
 {
@@ -338,17 +338,21 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (player->GetQuestStatus(6628) == QUEST_STATUS_INCOMPLETE && !player->HasAura(SPELL_MARK_OF_SHAME))
         {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HPF1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HPF2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HPF3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-            SendGossipMenuFor(player, 5822, creature->GetGUID());
+            player->PrepareQuestMenu(creature->GetGUID());
+        }
+
+        if (player->GetQuestStatus(QUEST_ID_TEST_OF_LORE) == QUEST_STATUS_INCOMPLETE && !player->HasAura(SPELL_MARK_OF_SHAME))
+        {
+            AddGossipItemFor(player, GOSSIP_MENU_ID_TEST_OF_LORE, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_MENU_ID_TEST_OF_LORE, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_MENU_ID_TEST_OF_LORE, 3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            SendGossipMenuFor(player, GOSSIP_TEXTID_TEST_OF_LORE, creature->GetGUID());
         }
         else
-            SendGossipMenuFor(player, 5821, creature->GetGUID());
+        {
+            SendGossipMenuFor(player, GOSSIP_TEXTID_PARQUAL_FINTALLAS, creature->GetGUID());
+        }
 
         return true;
     }
@@ -1007,7 +1011,7 @@ public:
 
         EventMap _events;
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->DeleteThreatList();
             me->CombatStop(true);
@@ -1031,7 +1035,7 @@ public:
             {
                 me->SetCorpseDelay(1);
                 me->SetRespawnTime(1);
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
                 bStepping = false;
                 step = 0;
@@ -2349,7 +2353,7 @@ public:
 
         EventMap _events;
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->RemoveAura(SPELL_HEROIC_VANGUARD);
             me->DeleteThreatList();
@@ -2376,7 +2380,7 @@ public:
                 me->Mount(MODEL_WHITE_WULF);
                 me->SetCorpseDelay(1);
                 me->SetRespawnTime(1);
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 me->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
 
                 bStepping = false;
@@ -3899,8 +3903,8 @@ public:
                             JumpToNextStep(5 * IN_MILLISECONDS);
                             break;
                         case 163:
-                            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                            me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                             Talk(THRALL_SAY_THRONE_11);
                             UpdateWorldState(me->GetMap(), WORLD_STATE_ROYAL_QUARTER_FIGHT_H, 0);
                             UpdateWorldState(me->GetMap(), WORLD_STATE_INNER_SANKTUM_FIGHT_H, 0);

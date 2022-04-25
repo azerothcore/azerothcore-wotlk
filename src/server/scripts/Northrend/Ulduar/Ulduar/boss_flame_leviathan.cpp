@@ -724,7 +724,7 @@ public:
         Vehicle* vehicle;
         uint32 _despawnTimer;
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             vehicle->InstallAllAccessories(false);
         }
@@ -873,7 +873,7 @@ public:
 
             if (me->GetVehicle())
             {
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
                 me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
                 if (Unit* player = me->GetVehicle()->GetPassenger(SEAT_PLAYER))

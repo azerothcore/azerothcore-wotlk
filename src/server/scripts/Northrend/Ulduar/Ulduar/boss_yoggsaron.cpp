@@ -399,9 +399,9 @@ public:
             me->SummonCreature(NPC_SANITY_WELL, 1899.94f, 0.330621f, 332.296f, 0.0f);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            if (!_EnterEvadeMode())
+            if (!_EnterEvadeMode(why))
                 return;
 
             Position pos;
@@ -736,7 +736,7 @@ public:
             if (!SelectTargetFromPlayerList(90, SPELL_INSANE1))
             {
                 m_pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_INSANE1);
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 return;
             }
 
@@ -795,7 +795,7 @@ public:
                 case EVENT_SARA_P1_SPELLS:
                     {
                         uint32 spell = RAND(SPELL_SARAS_ANGER_TARGET_SELECTOR, SPELL_SARAS_BLESSING_TARGET_SELECTOR, SPELL_SARAS_FAVOR_TARGET_SELECTOR);
-                        me->CastSpell(me, spell, false);
+                        me->CastCustomSpell(spell, SPELLVALUE_MAX_TARGETS, 1, nullptr, false);
                         SpellSounds();
                         events.RepeatEvent(me->GetMap()->Is25ManRaid() ? urand(0, 3000) : 4000 + urand(0, 2000));
                         break;

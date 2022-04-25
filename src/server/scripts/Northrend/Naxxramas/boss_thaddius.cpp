@@ -408,10 +408,10 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             me->SetControlled(false, UNIT_STATE_STUNNED);
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void EnterCombat(Unit* pWho) override
@@ -736,7 +736,7 @@ public:
     {
     public:
         npc_teslaAI(Creature* creature) : ScriptedAI(creature) { }
-        void EnterEvadeMode() override { } // never stop casting due to evade
+        void EnterEvadeMode(EvadeReason /*why*/) override { } // never stop casting due to evade
         void UpdateAI(uint32 /*diff*/) override { } // never do anything unless told
         void EnterCombat(Unit* /*who*/) override { }
         void DamageTaken(Unit* /*who*/, uint32& damage, DamageEffectType, SpellSchoolMask) override { damage = 0; } // no, you can't kill it

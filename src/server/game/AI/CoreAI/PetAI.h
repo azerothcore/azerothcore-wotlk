@@ -64,7 +64,8 @@ public:
     //
     void MoveInLineOfSight(Unit* /*who*/) override {} // CreatureAI interferes with returning pets
     void MoveInLineOfSight_Safe(Unit* /*who*/) {} // CreatureAI interferes with returning pets
-    void EnterEvadeMode() override {} // For fleeing, pets don't use this type of Evade mechanic
+
+    void EnterEvadeMode(EvadeReason /*why*/) override {} // For fleeing, pets don't use this type of Evade mechanic
     void SpellHit(Unit* caster, SpellInfo const* spellInfo) override;
 
     void PetStopAttack() override;

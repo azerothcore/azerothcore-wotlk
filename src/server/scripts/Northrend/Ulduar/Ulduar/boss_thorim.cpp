@@ -420,7 +420,7 @@ public:
             GameObject* go;
             if ((go = GetThorimObject(DATA_THORIM_LEVER)))
             {
-                go->SetUInt32Value(GAMEOBJECT_FLAGS, 48);
+                go->ReplaceAllGameObjectFlags((GameObjectFlags)48);
                 go->SetGoState(GO_STATE_READY);
             }
             if ((go = GetThorimObject(DATA_THORIM_FIRST_DOORS)))
@@ -433,10 +433,10 @@ public:
                 go->SetGoState(GO_STATE_ACTIVE);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             DisableThorim(false);
-            CreatureAI::EnterEvadeMode();
+            CreatureAI::EnterEvadeMode(why);
         }
 
         void Reset() override
@@ -485,7 +485,7 @@ public:
                 if (_trashCounter >= 6)
                 {
                     if (GameObject* go = GetThorimObject(DATA_THORIM_LEVER))
-                        go->RemoveFlag(GAMEOBJECT_FLAGS, 48);
+                        go->RemoveGameObjectFlag((GameObjectFlags)48);
 
                     events.SetPhase(EVENT_PHASE_START);
                     events.ScheduleEvent(EVENT_THORIM_START_PHASE1, 20000);
@@ -593,7 +593,7 @@ public:
 
                     if ((go = me->SummonGameObject(chestId, 2134.73f, -286.32f, 419.51f, 0.0f, 0, 0, 0, 0, 0)))
                     {
-                        go->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
+                        go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
                         go->SetLootRecipient(me->GetMap());
                     }
 
@@ -959,7 +959,7 @@ public:
 
         uint32 Timer;
 
-        void EnterEvadeMode() override {}
+        void EnterEvadeMode(EvadeReason /*why*/) override {}
         void MoveInLineOfSight(Unit*) override {}
         void AttackStart(Unit*) override {}
 

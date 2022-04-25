@@ -410,7 +410,7 @@ bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)
         case SMART_TARGET_HOSTILE_LAST_AGGRO:
         case SMART_TARGET_HOSTILE_RANDOM:
         case SMART_TARGET_HOSTILE_RANDOM_NOT_TOP:
-            AC_SAI_IS_BOOLEAN_VALID(e, e.target.hostilRandom.playerOnly);
+            AC_SAI_IS_BOOLEAN_VALID(e, e.target.hostileRandom.playerOnly);
             break;
         case SMART_TARGET_FARTHEST:
             AC_SAI_IS_BOOLEAN_VALID(e, e.target.farthest.playerOnly);
@@ -528,7 +528,7 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
             case SMART_EVENT_JUST_CREATED: return NO_PARAMS;
             case SMART_EVENT_GOSSIP_HELLO: return sizeof(SmartEvent::gossipHello);
             case SMART_EVENT_FOLLOW_COMPLETED: return NO_PARAMS;
-            // case SMART_EVENT_EVENT_PHASE_CHANGE: return sizeof(SmartEvent::eventPhaseChange);
+            case SMART_EVENT_EVENT_PHASE_CHANGE: return sizeof(SmartEvent::eventPhaseChange);
             case SMART_EVENT_IS_BEHIND_TARGET: return sizeof(SmartEvent::behindTarget);
             case SMART_EVENT_GAME_EVENT_START: return sizeof(SmartEvent::gameEvent);
             case SMART_EVENT_GAME_EVENT_END: return sizeof(SmartEvent::gameEvent);
@@ -756,10 +756,10 @@ bool SmartAIMgr::CheckUnusedTargetParams(SmartScriptHolder const& e)
             case SMART_TARGET_NONE: return NO_PARAMS;
             case SMART_TARGET_SELF: return NO_PARAMS;
             case SMART_TARGET_VICTIM: return NO_PARAMS;
-            case SMART_TARGET_HOSTILE_SECOND_AGGRO: return sizeof(SmartTarget::hostilRandom);
-            case SMART_TARGET_HOSTILE_LAST_AGGRO: return sizeof(SmartTarget::hostilRandom);
-            case SMART_TARGET_HOSTILE_RANDOM: return sizeof(SmartTarget::hostilRandom);
-            case SMART_TARGET_HOSTILE_RANDOM_NOT_TOP: return sizeof(SmartTarget::hostilRandom);
+            case SMART_TARGET_HOSTILE_SECOND_AGGRO: return sizeof(SmartTarget::hostileRandom);
+            case SMART_TARGET_HOSTILE_LAST_AGGRO: return sizeof(SmartTarget::hostileRandom);
+            case SMART_TARGET_HOSTILE_RANDOM: return sizeof(SmartTarget::hostileRandom);
+            case SMART_TARGET_HOSTILE_RANDOM_NOT_TOP: return sizeof(SmartTarget::hostileRandom);
             case SMART_TARGET_ACTION_INVOKER: return NO_PARAMS;
             case SMART_TARGET_POSITION: return NO_PARAMS; //uses x,y,z,o
             case SMART_TARGET_CREATURE_RANGE: return sizeof(SmartTarget::unitRange);
@@ -1076,6 +1076,27 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                     }
                     break;
                 }
+            case SMART_EVENT_EVENT_PHASE_CHANGE:
+                {
+                    if (!e.event.eventPhaseChange.phasemask)
+                    {
+                        LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has no param set, event won't be executed!.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
+                        return false;
+                    }
+
+                    if (e.event.eventPhaseChange.phasemask > SMART_EVENT_PHASE_ALL)
+                    {
+                        LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses invalid phasemask {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.event.eventPhaseChange.phasemask);
+                        return false;
+                    }
+
+                    if (e.event.event_phase_mask && !(e.event.event_phase_mask & e.event.eventPhaseChange.phasemask))
+                    {
+                        LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses event phasemask {} and incompatible event_param1 {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.event.event_phase_mask, e.event.eventPhaseChange.phasemask);
+                        return false;
+                    }
+                    break;
+                }
             case SMART_EVENT_IS_BEHIND_TARGET:
                 if (!IsMinMaxValid(e, e.event.behindTarget.cooldownMin, e.event.behindTarget.cooldownMax))
                     return false;
@@ -1116,6 +1137,13 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                     case SMART_TARGET_CLOSEST_PLAYER:
                     case SMART_TARGET_PLAYER_RANGE:
                     case SMART_TARGET_PLAYER_DISTANCE:
+                        break;
+                    case SMART_TARGET_SELF:
+                    case SMART_TARGET_ACTION_INVOKER:
+                        if (!NotNULL(e, e.event.friendlyHealthPct.radius))
+                        {
+                            return false;
+                        }
                         break;
                     default:
                         LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses invalid target_type {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetTargetType());

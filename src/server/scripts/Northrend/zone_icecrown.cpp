@@ -135,7 +135,7 @@ public:
             summons.DespawnAll();
             playerGUID.Clear();
             currentQuest = 0;
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+            me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
         }
 
         void JustSummoned(Creature* creature) override
@@ -340,7 +340,7 @@ public:
         npc_battle_at_valhalasAI* vAI = CAST_AI(npc_battle_at_valhalas::npc_battle_at_valhalasAI, creature->AI());
         vAI->ResetData();
 
-        creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+        creature->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
         if (vAI)
             vAI->StartBattle(player->GetGUID(), quest->GetQuestId());
 
@@ -487,7 +487,7 @@ public:
 
             events.Reset();
             events.RescheduleEvent(EVENT_START, 1000);
-            me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+            me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
             me->SetWalk(true);
             me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             me->setActive(true);
@@ -595,7 +595,7 @@ public:
                     events.ScheduleEvent(EVENT_SCENE_10, 3000);
                     break;
                 case EVENT_SCENE_10:
-                    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                    me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_QUESTGIVER);
                     Talk(SAY_ARETE_6);
                     me->DespawnOrUnsummon(60000);
                     break;
@@ -1586,9 +1586,9 @@ public:
             events.ScheduleEvent(EVENT_DUMMY_RECAST_DEFEND, 5000);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            if (!_EnterEvadeMode())
+            if (!_EnterEvadeMode(why))
                 return;
 
             Reset();
@@ -1659,7 +1659,7 @@ public:
                 case EVENT_DUMMY_RESET:
                     if (UpdateVictim())
                     {
-                        EnterEvadeMode();
+                        EnterEvadeMode(EVADE_REASON_OTHER);
                         events.ScheduleEvent(EVENT_DUMMY_RESET, 10000);
                     }
                     break;

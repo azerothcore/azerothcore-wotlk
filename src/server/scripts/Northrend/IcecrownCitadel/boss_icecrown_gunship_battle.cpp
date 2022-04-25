@@ -758,9 +758,9 @@ public:
 
         void sGossipSelect(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/) override
         {
-            if (!me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
+            if (!me->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
                 return;
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->GetTransport()->setActive(true);
             me->GetTransport()->ToMotionTransport()->EnableMovement(true);
             _events.ScheduleEvent(EVENT_INTRO_H_1, 5000);
@@ -780,7 +780,7 @@ public:
             _events.ScheduleEvent(EVENT_CLEAVE, urand(3000, 6000));
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             if (!me->IsAlive())
                 return;
@@ -1093,9 +1093,9 @@ public:
 
         void sGossipSelect(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/) override
         {
-            if (!me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
+            if (!me->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
                 return;
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->GetTransport()->setActive(true);
             me->GetTransport()->ToMotionTransport()->EnableMovement(true);
             _events.ScheduleEvent(EVENT_INTRO_A_1, 5000);
@@ -1116,7 +1116,7 @@ public:
             _events.ScheduleEvent(EVENT_CLEAVE, urand(3000, 6000));
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             if (!me->IsAlive())
                 return;
@@ -1492,7 +1492,7 @@ struct gunship_npc_AI : public ScriptedAI
         }
     }
 
-    void EnterEvadeMode() override
+    void EnterEvadeMode(EvadeReason /*why*/) override
     {
         if (!me->IsAlive() || !me->IsInCombat())
             return;
@@ -1553,7 +1553,7 @@ struct npc_gunship_boarding_addAI : public ScriptedAI
         }
     }
 
-    void EnterEvadeMode() override
+    void EnterEvadeMode(EvadeReason /*why*/) override
     {
         if (!me->IsAlive() || !me->IsInCombat())
             return;
@@ -2719,6 +2719,22 @@ public:
     }
 };
 
+// 71201 - Battle Experience - proc should never happen, handled in script
+class spell_igb_battle_experience_check : public AuraScript
+{
+    PrepareAuraScript(spell_igb_battle_experience_check);
+
+    bool CheckProc(ProcEventInfo& /*eventInfo*/)
+    {
+        return false;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_igb_battle_experience_check::CheckProc);
+    }
+};
+
 void AddSC_boss_icecrown_gunship_battle()
 {
     new npc_gunship();
@@ -2750,4 +2766,5 @@ void AddSC_boss_icecrown_gunship_battle()
     new spell_igb_below_zero();
     new spell_igb_on_gunship_deck();
     new achievement_im_on_a_boat();
+    RegisterSpellScript(spell_igb_battle_experience_check);
 }

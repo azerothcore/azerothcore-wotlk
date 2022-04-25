@@ -150,11 +150,11 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
             if (GameObject* object = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_GONG_OF_BETHEKK)))
-                object->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                object->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
             me->DespawnOrUnsummon(4000);
         }
 
@@ -428,7 +428,7 @@ public:
     {
         if (go->GetInstanceScript() && !go->FindNearestCreature(NPC_ARLOKK, 25.0f))
         {
-            go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+            go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
             go->SendCustomAnim(0);
             go->SummonCreature(NPC_ARLOKK, PosSummonArlokk[0], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 600000);
         }

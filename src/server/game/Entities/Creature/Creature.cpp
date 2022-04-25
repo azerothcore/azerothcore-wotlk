@@ -201,8 +201,22 @@ bool ForcedDespawnDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
     return true;
 }
 
+bool TemporaryThreatModifierEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
+{
+    if (Unit* victim = ObjectAccessor::GetUnit(m_owner, m_threatVictimGUID))
+    {
+        if (m_owner.IsInCombatWith(victim))
+        {
+            m_owner.getThreatMgr().modifyThreatPercent(victim, -100); // Reset threat to zero.
+            m_owner.getThreatMgr().addThreat(victim, m_threatValue);  // Set to the previous value it had, first before modification.
+        }
+    }
+
+    return true;
+}
+
 Creature::Creature(bool isWorldObject): Unit(isWorldObject), MovableMapObject(), m_groupLootTimer(0), lootingGroupLowGUID(0), m_PlayerDamageReq(0), m_lootRecipientGroup(0),
-    m_corpseRemoveTime(0), m_respawnTime(0), m_respawnDelay(300), m_corpseDelay(60), m_wanderDistance(0.0f),
+    m_corpseRemoveTime(0), m_respawnTime(0), m_respawnDelay(300), m_corpseDelay(60), m_wanderDistance(0.0f), m_boundaryCheckTime(2500),
     m_transportCheckTimer(1000), lootPickPocketRestoreTime(0),  m_reactState(REACT_AGGRESSIVE), m_defaultMovementType(IDLE_MOTION_TYPE),
     m_spawnId(0), m_equipmentId(0), m_originalEquipmentId(0), m_AlreadyCallAssistance(false),
     m_AlreadySearchedAssistance(false), m_regenHealth(true), m_AI_locked(false), m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), m_moveInLineOfSightDisabled(false), m_moveInLineOfSightStrictlyDisabled(false),
@@ -492,9 +506,9 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
     ObjectMgr::ChooseCreatureFlags(cInfo, npcflag, unit_flags, dynamicflags, data);
 
     if (cInfo->flags_extra & CREATURE_FLAG_EXTRA_WORLDEVENT)
-        SetUInt32Value(UNIT_NPC_FLAGS, npcflag | sGameEventMgr->GetNPCFlag(this));
+        ReplaceAllNpcFlags(NPCFlags(npcflag | sGameEventMgr->GetNPCFlag(this)));
     else
-        SetUInt32Value(UNIT_NPC_FLAGS, npcflag);
+        ReplaceAllNpcFlags(NPCFlags(npcflag));
 
     // Xinef: NPC is in combat, keep this flag!
     unit_flags &= ~UNIT_FLAG_IN_COMBAT;
@@ -687,6 +701,17 @@ void Creature::Update(uint32 diff)
 
                     // xinef: update combat state, if npc is not in combat - return to spawn correctly by calling EnterEvadeMode
                     SelectVictim();
+                }
+
+                // periodic check to see if the creature has passed an evade boundary
+                if (IsAIEnabled && !IsInEvadeMode() && IsInCombat())
+                {
+                    if (diff >= m_boundaryCheckTime)
+                    {
+                        AI()->CheckInRoom();
+                        m_boundaryCheckTime = 2500;
+                    } else
+                        m_boundaryCheckTime -= diff;
                 }
 
                 Unit* owner = GetCharmerOrOwner();
@@ -1301,7 +1326,7 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     CreatureData& data = sObjectMgr->NewOrExistCreatureData(m_spawnId);
 
     uint32 displayId = GetNativeDisplayId();
-    uint32 npcflag = GetUInt32Value(UNIT_NPC_FLAGS);
+    uint32 npcflag = GetNpcFlags();
     uint32 unit_flags = GetUnitFlags();
     uint32 dynamicflags = GetDynamicFlags();
 
@@ -1846,7 +1871,7 @@ void Creature::setDeathState(DeathState s, bool despawn)
             SaveRespawnTime();
 
         SetTarget();                // remove target selection in any cases (can be set at aura remove in Unit::setDeathState)
-        SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+        ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
 
         Dismount(); // if creature is mounted on a virtual mount, remove it at death
 
@@ -1888,7 +1913,7 @@ void Creature::setDeathState(DeathState s, bool despawn)
 
         UpdateMovementFlags();
 
-        SetUInt32Value(UNIT_NPC_FLAGS, cinfo->npcflag);
+        ReplaceAllNpcFlags(NPCFlags(cinfo->npcflag));
         ClearUnitState(uint32(UNIT_STATE_ALL_STATE & ~(UNIT_STATE_IGNORE_PATHFINDING | UNIT_STATE_NO_ENVIRONMENT_UPD)));
         SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
 
@@ -2012,18 +2037,6 @@ void Creature::DespawnOnEvade()
 {
     SetVisible(false);
     AI()->SummonedCreatureDespawnAll();
-    RemoveEvadeAuras();
-
-    float x, y, z, o;
-    GetRespawnPosition(x, y, z, &o);
-    SetHomePosition(x, y, z, o);
-    SetPosition(x, y, z, o);
-
-    if (IsFalling())
-    {
-        RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING);
-    }
-    StopMoving();
 }
 
 void Creature::RespawnOnEvade()
@@ -3528,4 +3541,20 @@ void Creature::SetRespawnTime(uint32 respawn)
 void Creature::SetCorpseRemoveTime(uint32 delay)
 {
     m_corpseRemoveTime = GameTime::GetGameTime().count() + delay;
+}
+
+void Creature::ModifyThreatPercentTemp(Unit* victim, int32 percent, Milliseconds duration)
+{
+    if (victim)
+    {
+        float currentThreat = getThreatMgr().getThreat(victim);
+
+        if (percent != 0.0f)
+        {
+            getThreatMgr().modifyThreatPercent(victim, percent);
+        }
+
+        TemporaryThreatModifierEvent* pEvent = new TemporaryThreatModifierEvent(*this, victim->GetGUID(), currentThreat);
+        m_Events.AddEvent(pEvent, m_Events.CalculateTime(duration.count()));
+    }
 }

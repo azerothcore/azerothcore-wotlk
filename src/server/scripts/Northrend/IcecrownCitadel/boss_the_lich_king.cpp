@@ -673,7 +673,7 @@ public:
         {
             if (!instance->CheckRequiredBosses(DATA_THE_LICH_KING, target->ToPlayer()) || !me->IsVisible())
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 instance->DoCastSpellOnPlayers(LIGHT_S_HAMMER_TELEPORT);
                 return;
             }
@@ -1252,13 +1252,13 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             EntryCheckPredicate pred(NPC_STRANGULATE_VEHICLE);
             summons.DoAction(ACTION_TELEPORT_BACK, pred);
             instance->SetBossState(DATA_THE_LICH_KING, FAIL);
             me->CastSpell((Unit*)nullptr, SPELL_KILL_FROSTMOURNE_PLAYERS, true);
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
             me->SetReactState(REACT_AGGRESSIVE);
 
             if (Creature* tirion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_HIGHLORD_TIRION_FORDRING)))
@@ -1285,7 +1285,7 @@ public:
         {
             _events.Reset();
             if (_instance->GetBossState(DATA_THE_LICH_KING) == DONE || (me->GetMap()->IsHeroic() && !_instance->GetData(DATA_LK_HC_AVAILABLE)))
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->SetReactState(REACT_PASSIVE);
         }
 
@@ -1357,18 +1357,18 @@ public:
         {
             ScriptedAI::JustReachedHome();
             if (!(_instance->GetBossState(DATA_THE_LICH_KING) == DONE || (me->GetMap()->IsHeroic() && !_instance->GetData(DATA_LK_HC_AVAILABLE))))
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
         }
 
         void sGossipSelect(Player* /*player*/, uint32 sender, uint32 action) override
         {
             Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING));
-            if (me->GetCreatureTemplate()->GossipMenuId == sender && !action && me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP) && theLichKing && !theLichKing->IsInEvadeMode())
+            if (me->GetCreatureTemplate()->GossipMenuId == sender && !action && me->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP) && theLichKing && !theLichKing->IsInEvadeMode())
             {
                 if (me->GetMap()->IsHeroic() && !_instance->GetData(DATA_LK_HC_AVAILABLE))
                     return;
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 me->SetWalk(true);
                 me->GetMotionMaster()->MovePoint(POINT_TIRION_INTRO, TirionIntro);
             }
@@ -1635,7 +1635,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (!me->IsAlive())
                 return;
@@ -1643,7 +1643,7 @@ public:
             if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                 if (theLichKing->IsInEvadeMode())
                 {
-                    ScriptedAI::EnterEvadeMode();
+                    ScriptedAI::EnterEvadeMode(why);
                     return;
                 }
 
@@ -3365,7 +3365,7 @@ public:
             return target->GetEntry() != NPC_THE_LICH_KING;
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             if (!me->IsAlive())
                 return;

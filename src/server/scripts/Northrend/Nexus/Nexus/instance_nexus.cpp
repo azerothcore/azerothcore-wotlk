@@ -21,10 +21,10 @@
 
 DoorData const doorData[] =
 {
-    { GO_TELESTRA_SPHERE,   DATA_TELESTRA_ORB,  DOOR_TYPE_PASSAGE,  BOUNDARY_NONE },
-    { GO_ANOMALUS_SPHERE,   DATA_ANOMALUS_ORB,  DOOR_TYPE_PASSAGE,  BOUNDARY_NONE },
-    { GO_ORMOROK_SPHERE,    DATA_ORMOROK_ORB,   DOOR_TYPE_PASSAGE,  BOUNDARY_NONE },
-    { 0,                    0,                  DOOR_TYPE_ROOM,     BOUNDARY_NONE }
+    { GO_TELESTRA_SPHERE,   DATA_TELESTRA_ORB,  DOOR_TYPE_PASSAGE },
+    { GO_ANOMALUS_SPHERE,   DATA_ANOMALUS_ORB,  DOOR_TYPE_PASSAGE },
+    { GO_ORMOROK_SPHERE,    DATA_ORMOROK_ORB,   DOOR_TYPE_PASSAGE },
+    { 0,                    0,                  DOOR_TYPE_ROOM    }
 };
 
 class instance_nexus : public InstanceMapScript
@@ -91,17 +91,17 @@ public:
             {
                 case GO_TELESTRA_SPHERE:
                     if (GetBossState(DATA_TELESTRA_ORB) != DONE && GetBossState(DATA_MAGUS_TELESTRA_EVENT) == DONE)
-                        gameObject->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        gameObject->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     AddDoor(gameObject, true);
                     break;
                 case GO_ANOMALUS_SPHERE:
                     if (GetBossState(DATA_ANOMALUS_ORB) != DONE && GetBossState(DATA_ANOMALUS_EVENT) == DONE)
-                        gameObject->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        gameObject->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     AddDoor(gameObject, true);
                     break;
                 case GO_ORMOROK_SPHERE:
                     if (GetBossState(DATA_ORMOROK_ORB) != DONE && GetBossState(DATA_ORMOROK_EVENT) == DONE)
-                        gameObject->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        gameObject->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     AddDoor(gameObject, true);
                     break;
             }
@@ -148,7 +148,7 @@ public:
 
             BossInfo const* bossInfo = GetBossInfo(id + DATA_TELESTRA_ORB);
             for (DoorSet::const_iterator i = bossInfo->door[DOOR_TYPE_PASSAGE].begin(); i != bossInfo->door[DOOR_TYPE_PASSAGE].end(); ++i)
-                (*i)->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                (*i)->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
             return true;
         }
 
@@ -226,10 +226,10 @@ public:
             _allowDeath = me->GetInstanceScript()->GetBossState(DATA_ORMOROK_EVENT) == DONE;
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (me->isRegeneratingHealth())
-                ScriptedAI::EnterEvadeMode();
+                ScriptedAI::EnterEvadeMode(why);
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override

@@ -831,6 +831,7 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
     SpellVisual = spellEntry->SpellVisual;
     SpellIconID = spellEntry->SpellIconID;
     ActiveIconID = spellEntry->ActiveIconID;
+    SpellPriority = spellEntry->SpellPriority;
     SpellName = spellEntry->SpellName;
     Rank = spellEntry->Rank;
     MaxTargetLevel = spellEntry->MaxTargetLevel;

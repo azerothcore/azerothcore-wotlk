@@ -64,6 +64,11 @@ class PathGenerator;
 
 enum WeatherState : uint32;
 
+namespace VMAP
+{
+    enum class ModelIgnoreFlags : uint32;
+}
+
 namespace Acore
 {
     struct ObjectUpdater;
@@ -184,10 +189,13 @@ struct PositionFullTerrainStatus
 
 enum LineOfSightChecks
 {
-    LINEOFSIGHT_CHECK_VMAP      = 0x1, // check static floor layout data
-    LINEOFSIGHT_CHECK_GOBJECT   = 0x2, // check dynamic game object data
+    LINEOFSIGHT_CHECK_VMAP          = 0x1, // check static floor layout data
+    LINEOFSIGHT_CHECK_GOBJECT_WMO   = 0x2, // check dynamic game object data (wmo models)
+    LINEOFSIGHT_CHECK_GOBJECT_M2    = 0x4, // check dynamic game object data (m2 models)
 
-    LINEOFSIGHT_ALL_CHECKS      = (LINEOFSIGHT_CHECK_VMAP | LINEOFSIGHT_CHECK_GOBJECT)
+    LINEOFSIGHT_CHECK_GOBJECT_ALL   = LINEOFSIGHT_CHECK_GOBJECT_WMO | LINEOFSIGHT_CHECK_GOBJECT_M2,
+
+    LINEOFSIGHT_ALL_CHECKS          = LINEOFSIGHT_CHECK_VMAP | LINEOFSIGHT_CHECK_GOBJECT_ALL
 };
 
 class GridMap

@@ -1263,6 +1263,10 @@ void World::LoadConfigSettings(bool reload)
 
     m_bool_configs[CONFIG_ALLOW_JOIN_BG_AND_LFG] = sConfigMgr->GetOption<bool>("JoinBGAndLFG.Enable", false);
 
+    m_bool_configs[CONFIG_LEAVE_GROUP_ON_LOGOUT] = sConfigMgr->GetOption<bool>("LeaveGroupOnLogout.Enabled", true);
+
+    m_int_configs[CONFIG_CHANGE_FACTION_MAX_MONEY] = sConfigMgr->GetOption<uint32>("ChangeFaction.MaxMoney", 0);
+
     ///- Read the "Data" directory from the config file
     std::string dataPath = sConfigMgr->GetOption<std::string>("DataDir", "./");
     if (dataPath.empty() || (dataPath.at(dataPath.length() - 1) != '/' && dataPath.at(dataPath.length() - 1) != '\\'))
@@ -1831,6 +1835,9 @@ void World::SetInitialWorldSettings()
 
     LOG_INFO("server.loading", "Loading Player level dependent mail rewards...");
     sObjectMgr->LoadMailLevelRewards();
+
+    LOG_INFO("server.loading", "Load Mail Server Template...");
+    sObjectMgr->LoadMailServerTemplates();
 
     // Loot tables
     LoadLootTables();

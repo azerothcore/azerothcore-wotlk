@@ -39,7 +39,7 @@ public:
 
     bool OnGossipSelect(Player*  /*player*/, Creature* creature, uint32  /*uiSender*/, uint32  /*uiAction*/) override
     {
-        creature->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+        creature->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
         uint8 _keeper = 0;
         switch (creature->GetEntry())
         {
@@ -125,7 +125,8 @@ public:
         void MoveInLineOfSight(Unit* who) override
         {
             if (!activated && who->GetTypeId() == TYPEID_PLAYER)
-                if (me->GetExactDist2d(who) <= 25.0f && me->GetMap()->isInLineOfSight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 5.0f, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ() + 5.0f, 2, LINEOFSIGHT_ALL_CHECKS))
+                if (me->GetExactDist2d(who) <= 25.0f && me->GetMap()->isInLineOfSight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 5.0f,
+                    who->GetPositionX(), who->GetPositionY(), who->GetPositionZ() + 5.0f, 2, LINEOFSIGHT_ALL_CHECKS, VMAP::ModelIgnoreFlags::Nothing))
                 {
                     activated = true;
                     me->RemoveAura(64615);
@@ -285,7 +286,7 @@ public:
                 me->SetReactState(REACT_PASSIVE);
                 me->SetRegeneratingHealth(false);
                 me->SetFaction(FACTION_PREY);
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+                me->SetNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
                 me->CastSpell(me, 64770, true);
             }
         }
@@ -296,10 +297,10 @@ public:
                 ScriptedAI::AttackStart(who);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (me->GetFaction() == FACTION_MONSTER_2)
-                ScriptedAI::EnterEvadeMode();
+                ScriptedAI::EnterEvadeMode(why);
         }
 
         void OnCharmed(bool  /*apply*/) override {}

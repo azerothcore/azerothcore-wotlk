@@ -84,7 +84,7 @@ bool MotionTransport::CreateMoTrans(ObjectGuid::LowType guidlow, uint32 entry, u
     if (GameObjectTemplateAddon const* addon = GetTemplateAddon())
     {
         SetUInt32Value(GAMEOBJECT_FACTION, addon->faction);
-        SetUInt32Value(GAMEOBJECT_FLAGS, addon->flags);
+        ReplaceAllGameObjectFlags((GameObjectFlags)addon->flags);
     }
 
     SetObjectScale(goinfo->size);
@@ -727,7 +727,7 @@ bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* m
     if (GameObjectTemplateAddon const* addon = GetTemplateAddon())
     {
         SetUInt32Value(GAMEOBJECT_FACTION, addon->faction);
-        SetUInt32Value(GAMEOBJECT_FLAGS, addon->flags);
+        ReplaceAllGameObjectFlags((GameObjectFlags)addon->flags);
     }
 
     SetEntry(goinfo->entry);

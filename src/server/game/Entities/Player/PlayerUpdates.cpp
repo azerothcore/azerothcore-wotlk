@@ -232,7 +232,7 @@ void Player::Update(uint32 p_time)
         }
     }
 
-    if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING))
+    if (HasPlayerFlag(PLAYER_FLAGS_RESTING))
     {
         if (now > lastTick && _restTime > 0) // freeze update
         {
@@ -1384,7 +1384,7 @@ void Player::UpdatePvPState()
     }
     else // in friendly area
     {
-        if (IsPvP() && !HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP) &&
+        if (IsPvP() && !HasPlayerFlag(PLAYER_FLAGS_IN_PVP) &&
             pvpInfo.EndTimer == 0)
             pvpInfo.EndTimer = GameTime::GetGameTime().count(); // start toggle-off
     }
@@ -1472,7 +1472,7 @@ void Player::UpdatePvP(bool state, bool _override)
         SetPvP(state);
     }
 
-    RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_TIMER);
+    RemovePlayerFlag(PLAYER_FLAGS_PVP_TIMER);
     sScriptMgr->OnPlayerPVPFlagChange(this, state);
 }
 
@@ -1691,8 +1691,7 @@ void Player::UpdateTriggerVisibility()
             // units (values dependent on GM state)
             if (!creature || (!creature->IsTrigger() &&
                               !creature->HasAuraType(SPELL_AURA_TRANSFORM) &&
-                              !creature->HasFlag(UNIT_FIELD_FLAGS,
-                                                 UNIT_FLAG_NOT_SELECTABLE)))
+                              !creature->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE)))
                 continue;
 
             creature->SetFieldNotifyFlag(UF_FLAG_PUBLIC);
@@ -1739,7 +1738,7 @@ void Player::UpdateForQuestWorldObjects()
                 continue;
 
             // check if this unit requires quest specific flags
-            if (!obj->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK))
+            if (!obj->HasNpcFlag(UNIT_NPC_FLAG_SPELLCLICK))
                 continue;
 
             SpellClickInfoMapBounds clickPair = sObjectMgr->GetSpellClickInfoMapBounds(obj->GetEntry());

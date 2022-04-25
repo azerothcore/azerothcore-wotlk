@@ -1117,7 +1117,7 @@ public:
             return who->GetEntry() == NPC_FALLEN_WARRIOR;
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /* why */) override
         {
             if (!me->IsAlive() || me->IsInEvadeMode())
                 return;
@@ -1150,7 +1150,7 @@ public:
             pInstance = me->GetInstanceScript();
             barrierGUID.Clear();
             events.Reset();
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
 
             if (pInstance)
             {
@@ -1206,7 +1206,7 @@ public:
                         Talk(SAY_JAINA_OUTRO_3);
                     break;
                 case 6:
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                     if (GameObject* g = me->FindNearestGameObject(GO_HOR_PORTCULLIS, 50.0f))
                         g->SetGoState(GO_STATE_ACTIVE);
                     break;

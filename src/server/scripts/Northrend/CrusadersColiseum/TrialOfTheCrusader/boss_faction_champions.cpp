@@ -134,7 +134,7 @@ struct boss_faction_championsAI : public ScriptedAI
             pInstance->SetData(TYPE_FACTION_CHAMPIONS_PLAYER_DIED, 1);
     }
 
-    void EnterEvadeMode() override
+    void EnterEvadeMode(EvadeReason /* why */) override
     {
         if( pInstance )
             pInstance->SetData(TYPE_FAILED, 0);
@@ -2368,7 +2368,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /* why */) override
         {
             me->DespawnOrUnsummon();
         }
@@ -2435,7 +2435,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /* why */) override
         {
             me->DespawnOrUnsummon();
         }

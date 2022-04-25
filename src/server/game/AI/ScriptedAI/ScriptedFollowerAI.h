@@ -46,7 +46,7 @@ public:
 
     void MoveInLineOfSight(Unit*) override;
 
-    void EnterEvadeMode() override;
+    void EnterEvadeMode(EvadeReason /*why*/ = EVADE_REASON_OTHER) override;
 
     void JustDied(Unit*) override;
 
@@ -69,7 +69,7 @@ private:
     void AddFollowState(uint32 uiFollowState) { m_uiFollowState |= uiFollowState; }
     void RemoveFollowState(uint32 uiFollowState) { m_uiFollowState &= ~uiFollowState; }
 
-    bool AssistPlayerInCombat(Unit* who);
+    bool AssistPlayerInCombatAgainst(Unit* who);
 
     ObjectGuid m_uiLeaderGUID;
     uint32 m_uiUpdateFollowTimer;

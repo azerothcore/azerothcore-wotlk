@@ -136,7 +136,7 @@ public:
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
                 CloseGossipMenuFor(player);
-                creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 // Start encounter
                 InstanceScript* instance = creature->GetInstanceScript();
                 if (instance)
@@ -183,11 +183,11 @@ public:
 
             if (instance->GetData(TYPE_TOMB_OF_SEVEN) == DONE) // what is this trying to do? Probably some kind of crash recovery
             {
-                me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+                me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
             }
             else
             {
-                me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP);
             }
         }
 
@@ -200,7 +200,7 @@ public:
             _events.ScheduleEvent(EVENT_SPELL_SUMMON_VOIDWALKERS, 1000);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->RemoveAllAuras();
             me->DeleteThreatList();

@@ -135,9 +135,9 @@ public:
             me->SetWalk(true);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
             summonsGenerator.DoAction(ACTION_DESPAWN_ALL);
             events2.ScheduleEvent(EVENT_SHADE_RESET_ENCOUNTER, 20000);
             me->SetVisible(false);
@@ -172,7 +172,7 @@ public:
             }
             else if (param == ACTION_AKAMA_DIED)
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
             }
         }
 
@@ -258,7 +258,6 @@ public:
             }
 
             DoMeleeAttackIfReady();
-            EnterEvadeIfOutOfCombatArea();
         }
 
         bool CheckEvadeIfOutOfCombatArea() const override
@@ -294,11 +293,11 @@ public:
         {
             if (instance->GetBossState(DATA_SHADE_OF_AKAMA) == DONE)
             {
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 return;
             }
 
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->CastSpell(me, SPELL_STEALTH, true);
             events.Reset();
             events2.Reset();
@@ -425,7 +424,7 @@ public:
             if (action == 0)
             {
                 CloseGossipMenuFor(player);
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 events2.ScheduleEvent(EVENT_AKAMA_START_ENCOUNTER, 0);
             }
         }

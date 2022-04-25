@@ -26,9 +26,9 @@
 
 namespace MMAP
 {
-    MapBuilder::MapBuilder(float maxWalkableAngle, bool skipLiquid,
+    MapBuilder::MapBuilder(Optional<float> maxWalkableAngle, Optional<float> maxWalkableAngleNotSteep, bool skipLiquid,
                            bool skipContinents, bool skipJunkMaps, bool skipBattlegrounds,
-                           bool debugOutput, bool bigBaseUnit, const char* offMeshFilePath) :
+                           bool debugOutput, bool bigBaseUnit, int mapid, const char* offMeshFilePath) :
 
         m_debugOutput        (debugOutput),
         m_offMeshFilePath    (offMeshFilePath),
@@ -36,17 +36,17 @@ namespace MMAP
         m_skipJunkMaps       (skipJunkMaps),
         m_skipBattlegrounds  (skipBattlegrounds),
         m_maxWalkableAngle   (maxWalkableAngle),
+        m_maxWalkableAngleNotSteep (maxWalkableAngleNotSteep),
         m_bigBaseUnit        (bigBaseUnit),
+        m_mapid              (mapid),
+        m_totalTiles         (0u),
+        m_totalTilesProcessed(0u),
 
         _cancelationToken    (false)
     {
         m_terrainBuilder = new TerrainBuilder(skipLiquid);
 
         m_rcContext = new rcContext(false);
-
-        // percentageDone - Initializing
-        m_totalTiles = 0;
-        m_totalTilesBuilt = 0;
 
         discoverTiles();
     }
@@ -376,19 +376,6 @@ namespace MMAP
     {
         std::set<uint32>* tiles = getTileList(mapID);
 
-        // make sure we process maps which don't have tiles
-        if (!tiles->size())
-        {
-            // convert coord bounds to grid bounds
-            uint32 minX, minY, maxX, maxY;
-            getGridBounds(mapID, minX, minY, maxX, maxY);
-
-            // add all tiles within bounds to tile list.
-            for (uint32 i = minX; i <= maxX; ++i)
-                for (uint32 j = minY; j <= maxY; ++j)
-                    tiles->insert(StaticMapTree::packTileID(i, j));
-        }
-
         if (!tiles->empty())
         {
             // build navMesh
@@ -397,6 +384,7 @@ namespace MMAP
             if (!navMesh)
             {
                 printf("[Map %03i] Failed creating navmesh!\n", mapID);
+                m_totalTilesProcessed += tiles->size();
                 return;
             }
 
@@ -404,17 +392,15 @@ namespace MMAP
             printf("[Map %03i] We have %u tiles.                          \n", mapID, (unsigned int)tiles->size());
             for (unsigned int tile : *tiles)
             {
-                // percentageDone - increment tiles built
-                m_totalTilesBuilt++;
                 uint32 tileX, tileY;
 
                 // unpack tile coords
                 StaticMapTree::unpackTileID(tile, tileX, tileY);
 
-                if (shouldSkipTile(mapID, tileX, tileY))
-                    continue;
+                if (!shouldSkipTile(mapID, tileX, tileY))
+                    buildTile(mapID, tileX, tileY, navMesh);
 
-                buildTile(mapID, tileX, tileY, navMesh);
+                ++m_totalTilesProcessed;
             }
 
             dtFreeNavMesh(navMesh);
@@ -426,8 +412,7 @@ namespace MMAP
     /**************************************************************************/
     void MapBuilder::buildTile(uint32 mapID, uint32 tileX, uint32 tileY, dtNavMesh* navMesh)
     {
-        // percentageDone - added, now it will show addional reference percentage done of the overall process
-        printf("%u%% [Map %03i] Building tile [%02u,%02u]\n", percentageDone(m_totalTiles, m_totalTilesBuilt), mapID, tileX, tileY);
+        printf("%u%% [Map %03i] Building tile [%02u,%02u]\n", percentageDone(m_totalTiles, m_totalTilesProcessed), mapID, tileX, tileY);
 
         MeshData meshData;
 
@@ -561,40 +546,10 @@ namespace MMAP
         int lTriCount = meshData.liquidTris.size() / 3;
         uint8* lTriFlags = meshData.liquidType.getCArray();
 
-        // these are WORLD UNIT based metrics
-        // this are basic unit dimentions
-        // value have to divide GRID_SIZE(533.3333f) ( aka: 0.5333, 0.2666, 0.3333, 0.1333, etc )
-        const static float BASE_UNIT_DIM = m_bigBaseUnit ? 0.5333333f : 0.2666666f;
-
-        // All are in UNIT metrics!
-        const static int VERTEX_PER_MAP = int(GRID_SIZE / BASE_UNIT_DIM + 0.5f);
-        const static int VERTEX_PER_TILE = m_bigBaseUnit ? 40 : 80; // must divide VERTEX_PER_MAP
-        const static int TILES_PER_MAP = VERTEX_PER_MAP / VERTEX_PER_TILE;
-
-        rcConfig config;
-        memset(&config, 0, sizeof(rcConfig));
-
-        rcVcopy(config.bmin, bmin);
-        rcVcopy(config.bmax, bmax);
-
-        config.maxVertsPerPoly = DT_VERTS_PER_POLYGON;
-        config.cs = BASE_UNIT_DIM;
-        config.ch = BASE_UNIT_DIM;
-        config.walkableSlopeAngle = m_maxWalkableAngle;
-        config.tileSize = VERTEX_PER_TILE;
-        config.walkableRadius = m_bigBaseUnit ? 1 : 2;
-        config.borderSize = config.walkableRadius + 3;
-        config.maxEdgeLen = VERTEX_PER_TILE + 1;        // anything bigger than tileSize
-        // a value >= 3|6 allows npcs to walk over some fences
-        // a value >= 4|8 allows npcs to walk over all fences
-        // we prefer 3 and 6 for both Height/Climb as it's closer to be like retail
-        config.walkableHeight = m_bigBaseUnit ? 3 : 6;
-        config.walkableClimb = m_bigBaseUnit ? 3 : 6;
-        config.minRegionArea = rcSqr(60);
-        config.mergeRegionArea = rcSqr(50);
-        config.maxSimplificationError = 1.8f;           // eliminates most jagged edges (tiny polygons)
-        config.detailSampleDist = config.cs * 16;
-        config.detailSampleMaxError = config.ch * 1;
+        const TileConfig tileConfig = TileConfig(m_bigBaseUnit);
+        int TILES_PER_MAP = tileConfig.TILES_PER_MAP;
+        float BASE_UNIT_DIM = tileConfig.BASE_UNIT_DIM;
+        rcConfig config = GetMapSpecificConfig(mapID, bmin, bmax, tileConfig);
 
         // this sets the dimensions of the heightfield - should maybe happen before border padding
         rcCalcGridSize(config.bmin, config.bmax, config.cs, &config.width, &config.height);
@@ -633,9 +588,17 @@ namespace MMAP
                 }
 
                 // mark all walkable tiles, both liquids and solids
+
+                /* we want to have triangles with slope less than walkableSlopeAngleNotSteep (<= 55) to have NAV_AREA_GROUND
+                 * and with slope between walkableSlopeAngleNotSteep and walkableSlopeAngle (55 < .. <= 70) to have NAV_AREA_GROUND_STEEP.
+                 * we achieve this using recast API: memset everything to NAV_AREA_GROUND_STEEP, call rcClearUnwalkableTriangles with 70 so
+                 * any area above that will get RC_NULL_AREA (unwalkable), then call rcMarkWalkableTriangles with 55 to set NAV_AREA_GROUND
+                 * on anything below 55 . Players and idle Creatures can use NAV_AREA_GROUND, while Creatures in combat can use NAV_AREA_GROUND_STEEP.
+                 */
                 unsigned char* triFlags = new unsigned char[tTriCount];
-                memset(triFlags, NAV_GROUND, tTriCount * sizeof(unsigned char));
+                memset(triFlags, NAV_AREA_GROUND_STEEP, tTriCount * sizeof(unsigned char));
                 rcClearUnwalkableTriangles(m_rcContext, tileCfg.walkableSlopeAngle, tVerts, tVertCount, tTris, tTriCount, triFlags);
+                rcMarkWalkableTriangles(m_rcContext, tileCfg.walkableSlopeAngleNotSteep, tVerts, tVertCount, tTris, tTriCount, triFlags, NAV_AREA_GROUND);
                 rcRasterizeTriangles(m_rcContext, tVerts, tVertCount, tTris, triFlags, tTriCount, *tile.solid, config.walkableClimb);
                 delete[] triFlags;
 
@@ -643,6 +606,7 @@ namespace MMAP
                 rcFilterLedgeSpans(m_rcContext, tileCfg.walkableHeight, tileCfg.walkableClimb, *tile.solid);
                 rcFilterWalkableLowHeightSpans(m_rcContext, tileCfg.walkableHeight, *tile.solid);
 
+                // add liquid triangles
                 rcRasterizeTriangles(m_rcContext, lVerts, lVertCount, lTris, lTriFlags, lTriCount, *tile.solid, config.walkableClimb);
 
                 // compact heightfield spans
@@ -740,8 +704,15 @@ namespace MMAP
         // set polygons as walkable
         // TODO: special flags for DYNAMIC polygons, ie surfaces that can be turned on and off
         for (int i = 0; i < iv.polyMesh->npolys; ++i)
-            if (iv.polyMesh->areas[i] & RC_WALKABLE_AREA)
-                iv.polyMesh->flags[i] = iv.polyMesh->areas[i];
+        {
+            if (uint8 area = iv.polyMesh->areas[i] & NAV_AREA_ALL_MASK)
+            {
+                if (area >= NAV_AREA_MIN_VALUE)
+                    iv.polyMesh->flags[i] = 1 << (NAV_AREA_MAX_VALUE - area);
+                else
+                    iv.polyMesh->flags[i] = NAV_GROUND; // TODO: these will be dynamic in future
+            }
+        }
 
         // setup mesh parameters
         dtNavMeshCreateParams params;
@@ -902,6 +873,9 @@ namespace MMAP
     /**************************************************************************/
     bool MapBuilder::shouldSkipMap(uint32 mapID)
     {
+        if (m_mapid >= 0)
+            return static_cast<uint32>(m_mapid) != mapID;
+
         if (m_skipContinents)
             switch (mapID)
             {
@@ -1014,6 +988,54 @@ namespace MMAP
             return false;
 
         return true;
+    }
+
+    rcConfig MapBuilder::GetMapSpecificConfig(uint32 mapID, float bmin[3], float bmax[3], const TileConfig &tileConfig)
+    {
+        rcConfig config;
+        memset(&config, 0, sizeof(rcConfig));
+
+        rcVcopy(config.bmin, bmin);
+        rcVcopy(config.bmax, bmax);
+
+        config.maxVertsPerPoly = DT_VERTS_PER_POLYGON;
+        config.cs = tileConfig.BASE_UNIT_DIM;
+        config.ch = tileConfig.BASE_UNIT_DIM;
+        // Keeping these 2 slope angles the same reduces a lot the number of polys.
+        // 55 should be the minimum, maybe 70 is ok (keep in mind blink uses mmaps), 85 is too much for players
+        config.walkableSlopeAngle = m_maxWalkableAngle ? *m_maxWalkableAngle : 55;
+        config.walkableSlopeAngleNotSteep = m_maxWalkableAngleNotSteep ? *m_maxWalkableAngleNotSteep : 55;
+        config.tileSize = tileConfig.VERTEX_PER_TILE;
+        config.walkableRadius = m_bigBaseUnit ? 1 : 2;
+        config.borderSize = config.walkableRadius + 3;
+        config.maxEdgeLen = tileConfig.VERTEX_PER_TILE + 1;        // anything bigger than tileSize
+        config.walkableHeight = m_bigBaseUnit ? 3 : 6;
+        // a value >= 3|6 allows npcs to walk over some fences
+        // a value >= 4|8 allows npcs to walk over all fences
+        config.walkableClimb = m_bigBaseUnit ? 3 : 6;
+        config.minRegionArea = rcSqr(60);
+        config.mergeRegionArea = rcSqr(50);
+        config.maxSimplificationError = 1.8f;           // eliminates most jagged edges (tiny polygons)
+        config.detailSampleDist = config.cs * 16;
+        config.detailSampleMaxError = config.ch * 1;
+
+        switch (mapID)
+        {
+            // Blade's Edge Arena
+            case 562:
+                // This allows to walk on the ropes to the pillars
+                config.walkableRadius = 0;
+                break;
+            // Blackfathom Deeps
+            case 48:
+                // Reduce the chance to have underground levels
+                config.ch *= 2;
+                break;
+            default:
+                break;
+        }
+
+        return config;
     }
 
     /**************************************************************************/

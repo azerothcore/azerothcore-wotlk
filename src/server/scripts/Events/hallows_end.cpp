@@ -660,7 +660,7 @@ struct npc_hallows_end_soh : public ScriptedAI
         me->SetDisableGravity(true);
     }
 
-    void EnterEvadeMode() override
+    void EnterEvadeMode(EvadeReason /* why */) override
     {
         me->DespawnOrUnsummon(1);
     }

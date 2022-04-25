@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.charstartoutfit_dbc
+-- Dumpar struktur för tabell acore_world.charstartoutfit_dbc
 DROP TABLE IF EXISTS `charstartoutfit_dbc`;
 CREATE TABLE IF NOT EXISTS `charstartoutfit_dbc` (
   `ID` INT NOT NULL DEFAULT 0,
@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS `charstartoutfit_dbc` (
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_world.charstartoutfit_dbc: 0 rows
+-- Dumpar data för tabell acore_world.charstartoutfit_dbc: 0 rows
 DELETE FROM `charstartoutfit_dbc`;
 /*!40000 ALTER TABLE `charstartoutfit_dbc` DISABLE KEYS */;
 /*!40000 ALTER TABLE `charstartoutfit_dbc` ENABLE KEYS */;

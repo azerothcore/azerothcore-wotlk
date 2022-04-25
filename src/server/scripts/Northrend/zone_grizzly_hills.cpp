@@ -249,7 +249,7 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             if (Creature* Emily = GetClosestCreatureWithEntry(me, NPC_EMILY, 50.0f))
                 me->GetMotionMaster()->MoveFollow(Emily, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
@@ -859,7 +859,7 @@ public:
             _following = false;
             _runningScript = false;
             if (me->GetEntry() == NPC_LAKE_FROG_QUEST)
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
         }
 
         void UpdateAI(uint32 diff) override
@@ -884,11 +884,11 @@ public:
                         _events.ScheduleEvent(EVENT_LAKEFROG_3, 3000);
                         break;
                     case EVENT_LAKEFROG_3:
-                        me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         _events.ScheduleEvent(EVENT_LAKEFROG_4, 25000);
                         break;
                     case EVENT_LAKEFROG_4:
-                        me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         _events.ScheduleEvent(EVENT_LAKEFROG_5, 2000);
                         break;
                     case EVENT_LAKEFROG_5:
