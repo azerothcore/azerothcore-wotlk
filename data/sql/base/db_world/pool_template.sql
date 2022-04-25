@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,16 +12,16 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.pool_template
+-- Dumpar struktur för tabell acore_world.pool_template
 DROP TABLE IF EXISTS `pool_template`;
 CREATE TABLE IF NOT EXISTS `pool_template` (
   `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Pool entry',
   `max_limit` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Max number of objects (0) is no limit',
-  `description` varchar(255) DEFAULT NULL,
+  `description` VARCHAR(255) DEFAULT NULL,
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_world.pool_template: 3 186 rows
+-- Dumpar data för tabell acore_world.pool_template: 3 186 rows
 DELETE FROM `pool_template`;
 /*!40000 ALTER TABLE `pool_template` DISABLE KEYS */;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
@@ -495,7 +495,6 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 	(1001, 1, 'Gruff Swiftbite (100)'),
 	(1002, 1, ' Thuros Lightfingers (61)'),
 	(1003, 1, 'Or\'Kalar (2773)'),
-	(1004, 1, 'Leprithus (572)'),
 	(1005, 1, 'Vultros (462)'),
 	(1006, 1, 'Foe Reaper 4000 (573)'),
 	(1007, 1, 'Commander Felstrom (771)'),
@@ -3210,7 +3209,8 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 	(429, 9, 'Teldrassil Earthroot Pool 1 of 4--9 spawns active'),
 	(430, 4, 'Teldrassil Earthroot Pool 2 of 4--4 spawns active'),
 	(431, 3, 'Teldrassil Earthroot Pool 3 of 4--3 spawns active'),
-	(432, 4, 'Teldrassil Earthroot Pool 4 of 4--4 spawns active');
+	(432, 4, 'Teldrassil Earthroot Pool 4 of 4--4 spawns active'),
+	(86300, 1, 'Sewer Beast Pool');
 /*!40000 ALTER TABLE `pool_template` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,23 +12,23 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.gameobject_loot_template
+-- Dumpar struktur för tabell acore_world.gameobject_loot_template
 DROP TABLE IF EXISTS `gameobject_loot_template`;
 CREATE TABLE IF NOT EXISTS `gameobject_loot_template` (
   `Entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `Item` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `Reference` MEDIUMINT NOT NULL DEFAULT 0,
-  `Chance` float NOT NULL DEFAULT 100,
+  `Chance` float NOT NULL DEFAULT '100',
   `QuestRequired` TINYINT NOT NULL DEFAULT 0,
   `LootMode` SMALLINT unsigned NOT NULL DEFAULT 1,
   `GroupId` TINYINT unsigned NOT NULL DEFAULT 0,
   `MinCount` TINYINT unsigned NOT NULL DEFAULT 1,
   `MaxCount` TINYINT unsigned NOT NULL DEFAULT 1,
-  `Comment` varchar(255) DEFAULT NULL,
+  `Comment` VARCHAR(255) DEFAULT NULL,
   PRIMARY KEY (`Entry`,`Item`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Loot System';
 
--- Дамп данных таблицы acore_world.gameobject_loot_template: 17 990 rows
+-- Dumpar data för tabell acore_world.gameobject_loot_template: 17 991 rows
 DELETE FROM `gameobject_loot_template`;
 /*!40000 ALTER TABLE `gameobject_loot_template` DISABLE KEYS */;
 INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
@@ -10606,10 +10606,10 @@ INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, 
 	(9677, 4602, 0, 17.7, 0, 1, 0, 1, 1, 'Kim\'jael\'s Equipment - Moon Harvest Pumpkin'),
 	(9677, 4608, 0, 15.8, 0, 1, 0, 1, 1, 'Kim\'jael\'s Equipment - Raw Black Truffle'),
 	(9677, 6149, 0, 1.2, 0, 1, 0, 1, 1, 'Kim\'jael\'s Equipment - Greater Mana Potion'),
-	(9677, 10715, 0, 100, 1, 1, 0, 1, 1, 'Kim\'jael\'s Equipment - Kim\'Jael\'s Scope'),
-	(9677, 10717, 0, 100, 1, 1, 0, 1, 1, 'Kim\'jael\'s Equipment - Kim\'Jael\'s Compass'),
-	(9677, 10718, 0, 100, 1, 1, 0, 1, 1, 'Kim\'jael\'s Equipment - Kim\'Jael\'s Wizzlegoober'),
-	(9677, 10722, 0, 100, 1, 1, 0, 1, 1, 'Kim\'jael\'s Equipment - Kim\'Jael\'s Stuffed Chicken'),
+	(9677, 10715, 0, 25, 1, 1, 0, 1, 1, 'Kim\'jael\'s Equipment - Kim\'Jael\'s Scope'),
+	(9677, 10717, 0, 25, 1, 1, 0, 1, 1, 'Kim\'jael\'s Equipment - Kim\'Jael\'s Compass'),
+	(9677, 10718, 0, 25, 1, 1, 0, 1, 1, 'Kim\'jael\'s Equipment - Kim\'Jael\'s Wizzlegoober'),
+	(9677, 10722, 0, 25, 1, 1, 0, 1, 1, 'Kim\'jael\'s Equipment - Kim\'Jael\'s Stuffed Chicken'),
 	(9799, 10819, 0, 100, 1, 1, 0, 1, 1, 'Wildkin Feather - Wildkin Feather'),
 	(9819, 10714, 0, 100, 1, 1, 0, 1, 1, 'Azsharite Formation - Crystallized Azsharite'),
 	(9819, 10839, 0, 5.5, 0, 1, 0, 1, 1, 'Azsharite Formation - Crystallized Note'),
@@ -14340,7 +14340,7 @@ INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, 
 	(9957, 8953, 0, 0, 0, 1, 4, 2, 4, 'Food Crate - Deep Fried Plantains'),
 	(9957, 8957, 0, 0, 0, 1, 4, 2, 4, 'Food Crate - Spinefin Halibut'),
 	(9999, 10958, 0, 100, 1, 1, 0, 1, 1, 'Glinting Mud - Hilary\'s Necklace'),
-	(10039, 11018, 0, 100, 0, 1, 0, 1, 1, 'Un\'Goro Dirt Pile - Un\'Goro Soil'),
+	(10039, 11018, 0, 100, 0, 1, 0, 1, 4, 'Un\'Goro Dirt Pile - Un\'Goro Soil'),
 	(10100, 11110, 0, 100, 0, 1, 0, 1, 1, 'Farm Chicken Egg - Chicken Egg'),
 	(10101, 11112, 0, 100, 1, 1, 0, 1, 1, 'Research Equipment - Research Equipment'),
 	(10102, 11113, 0, 100, 1, 1, 0, 1, 1, 'Crate of Foodstuffs - Crate of Foodstuffs'),
@@ -14552,8 +14552,8 @@ INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, 
 	(11282, 11444, 0, 100, 0, 1, 0, 1, 1, 'Grim Guzzler Boar - Grim Guzzler Boar'),
 	(11460, 11504, 0, 100, 1, 1, 0, 1, 1, 'Fresh Threshadon Carcass - Piece of Threshadon Carcass'),
 	(11500, 11583, 0, 100, 1, 1, 0, 1, 1, 'Cactus Apple - Cactus Apple'),
-	(11524, 11614, 0, 38.7, 0, 1, 0, 1, 1, 'Blacksmithing Plans - Plans: Dark Iron Mail'),
-	(11525, 11615, 0, 18.3, 0, 1, 0, 1, 1, 'Blacksmithing Plans - Plans: Dark Iron Shoulders'),
+	(11524, 11614, 0, 100, 0, 1, 0, 1, 1, 'Blacksmithing Plans - Plans: Dark Iron Mail'),
+	(11525, 11615, 0, 100, 0, 1, 0, 1, 1, 'Blacksmithing Plans - Plans: Dark Iron Shoulders'),
 	(11582, 11727, 0, 100, 1, 1, 0, 1, 1, 'Goodsteel Ledger - Goodsteel Ledger'),
 	(11626, 11724, 0, 100, 1, 1, 0, 1, 1, 'Damaged Crate - Overdue Package'),
 	(12260, 12005, 12005, 100, 0, 1, 1, 1, 2, 'Chest of The Seven - (ReferenceTable)'),
@@ -14590,7 +14590,7 @@ INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, 
 	(13366, 12740, 0, 100, 1, 1, 0, 1, 1, 'Fifth Mosh\'aru Tablet - Fifth Mosh\'aru Tablet'),
 	(13367, 12741, 0, 100, 1, 1, 0, 1, 1, 'Sixth Mosh\'aru Tablet - Sixth Mosh\'aru Tablet'),
 	(13380, 12753, 0, 100, 1, 1, 0, 1, 1, 'Skin of Shadow - Skin of Shadow'),
-	(13381, 12736, 0, 100, 1, 1, 0, 1, 1, 'Frostwhisper\'s Embalming Fluid - Frostwhisper\'s Embalming Fluid'),
+	(13381, 12736, 0, 100, 0, 1, 0, 1, 1, 'Frostwhisper\'s Embalming Fluid - Frostwhisper\'s Embalming Fluid'),
 	(13382, 12734, 0, 100, 1, 1, 0, 1, 1, 'Enchanted Scarlet Thread - Enchanted Scarlet Thread'),
 	(13400, 12765, 0, 100, 1, 1, 0, 1, 1, 'Document Chest #1 - Secret Note #1'),
 	(13572, 12806, 0, 100, 1, 1, 0, 1, 1, 'Unforged Runic Breastplate - Unforged Rune Covered Breastplate'),
@@ -14695,8 +14695,8 @@ INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, 
 	(13646, 15276, 0, 0.1, 0, 1, 0, 1, 1, 'Supply Crate - Magus Long Staff'),
 	(13646, 15324, 0, 0.1, 0, 1, 0, 1, 1, 'Supply Crate - Burnside Rifle'),
 	(13662, 13176, 0, 100, 1, 1, 0, 1, 1, 'Scourge Data - Scourge Data'),
-	(13721, 12827, 0, 31.9, 0, 1, 0, 1, 1, 'Blacksmithing Plans - Plans: Serenity'),
-	(13722, 12830, 0, 11, 0, 1, 0, 1, 1, 'Blacksmithing Plans - Plans: Corruption'),
+	(13721, 12827, 0, 100, 0, 1, 0, 1, 1, 'Blacksmithing Plans - Plans: Serenity'),
+	(13722, 12830, 0, 100, 0, 1, 0, 1, 1, 'Blacksmithing Plans - Plans: Corruption'),
 	(13740, 13362, 0, 48, 0, 1, 0, 1, 1, 'Postbox Parcel - Letter from the Front'),
 	(13740, 13363, 0, 50.7, 0, 1, 0, 1, 1, 'Postbox Parcel - Municipal Proclamation'),
 	(13740, 13364, 0, 28.5, 0, 1, 0, 1, 1, 'Postbox Parcel - Fras Siabi\'s Advertisement'),
@@ -15105,9 +15105,9 @@ INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, 
 	(16718, 18711, 0, 6.6, 0, 1, 0, 1, 1, 'Arena Treasure Chest - Arena Bands'),
 	(16718, 18712, 0, 7.1, 0, 1, 0, 1, 1, 'Arena Treasure Chest - Arena Vambraces'),
 	(16718, 21949, 0, 0.8, 0, 1, 0, 1, 1, 'Arena Treasure Chest - Design: Ruby Serpent'),
-	(16719, 12000, 12000, 100, 0, 1, 0, 1, 2, 'Cache of the Firelord - (ReferenceTable)'),
-	(16719, 18646, 0, 50, 0, 1, 1, 1, 1, 'Cache of the Firelord - The Eye of Divinity'),
-	(16719, 18703, 0, 50, 0, 1, 1, 1, 1, 'Cache of the Firelord - Ancient Petrified Leaf'),
+	(16719, 18703, 0, 50, 0, 1, 1, 1, 1, NULL),
+	(16719, 18646, 0, 50, 0, 1, 1, 1, 1, NULL),
+	(16719, 12000, 12000, 100, 0, 1, 0, 1, 1, NULL),
 	(16799, 18922, 0, 100, 1, 1, 0, 1, 1, 'Secret Plans: Fiery Flux - Secret Plans: Fiery Flux'),
 	(16820, 18943, 0, 100, 1, 1, 0, 1, 1, 'Dark Iron Pillow - Dark Iron Pillow'),
 	(16841, 18950, 0, 100, 1, 1, 0, 1, 1, 'Pillaclencher\'s Ornate Pillow - Chambermaid Pillaclencher\'s Pillow'),
@@ -17967,8 +17967,8 @@ INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, 
 	(28096, 49426, 0, 100, 0, 1, 0, 2, 2, 'Cache of the Dreamwalker - Emblem of Frost'),
 	(28096, 49908, 0, 20, 0, 1, 0, 1, 1, 'Cache of the Dreamwalker - Primordial Saronite'),
 	(28096, 50274, 0, 68, 1, 1, 0, 1, 1, 'Cache of the Dreamwalker - Shadowfrost Shard'),
-	(28677, 49352, 0, 100, 1, 1, 0, 1, 1, 'Cologne Neutralizer - Cologne Neutralizer'),
-	(28678, 49351, 0, 100, 1, 1, 0, 1, 1, 'Perfume Neutralizer - Perfume Neutralizer'),
+	(28677, 49352, 0, 100, 0, 1, 0, 1, 1, 'Cologne Neutralizer - Cologne Neutralizer'),
+	(28678, 49351, 0, 100, 0, 1, 0, 1, 1, 'Perfume Neutralizer - Perfume Neutralizer'),
 	(28682, 35498, 0, 3, 0, 1, 0, 1, 1, 'Ice Chest - Formula: Enchant Weapon - Deathfrost'),
 	(28682, 35557, 0, 100, 0, 1, 0, 2, 2, 'Ice Chest - Huge Snowball'),
 	(28682, 35720, 0, 3, 0, 1, 0, 6, 6, 'Ice Chest - Lord of Frost\'s Private Label'),
@@ -18022,7 +18022,8 @@ INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, 
 	(27240, 43852, 0, 14, 0, 1, 2, 1, 1, NULL),
 	(27240, 46368, 0, 47, 0, 1, 1, 1, 1, NULL),
 	(27240, 46369, 0, 52, 0, 1, 1, 1, 1, NULL),
-	(11103, 11753, 0, 39, 0, 1, 0, 1, 1, 'Dark Coffer - Eye of Kajal');
+	(11103, 11753, 0, 39, 0, 1, 0, 1, 1, 'Dark Coffer - Eye of Kajal'),
+	(16719, 20951, 0, 1, 1, 1, 0, 1, 1, NULL);
 /*!40000 ALTER TABLE `gameobject_loot_template` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

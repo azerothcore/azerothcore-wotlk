@@ -2719,6 +2719,22 @@ public:
     }
 };
 
+// 71201 - Battle Experience - proc should never happen, handled in script
+class spell_igb_battle_experience_check : public AuraScript
+{
+    PrepareAuraScript(spell_igb_battle_experience_check);
+
+    bool CheckProc(ProcEventInfo& /*eventInfo*/)
+    {
+        return false;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_igb_battle_experience_check::CheckProc);
+    }
+};
+
 void AddSC_boss_icecrown_gunship_battle()
 {
     new npc_gunship();
@@ -2750,4 +2766,5 @@ void AddSC_boss_icecrown_gunship_battle()
     new spell_igb_below_zero();
     new spell_igb_on_gunship_deck();
     new achievement_im_on_a_boat();
+    RegisterSpellScript(spell_igb_battle_experience_check);
 }

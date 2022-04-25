@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,23 +12,23 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.skinning_loot_template
+-- Dumpar struktur för tabell acore_world.skinning_loot_template
 DROP TABLE IF EXISTS `skinning_loot_template`;
 CREATE TABLE IF NOT EXISTS `skinning_loot_template` (
   `Entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `Item` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `Reference` MEDIUMINT NOT NULL DEFAULT 0,
-  `Chance` float NOT NULL DEFAULT 100,
+  `Chance` float NOT NULL DEFAULT '100',
   `QuestRequired` TINYINT NOT NULL DEFAULT 0,
   `LootMode` SMALLINT unsigned NOT NULL DEFAULT 1,
   `GroupId` TINYINT unsigned NOT NULL DEFAULT 0,
   `MinCount` TINYINT unsigned NOT NULL DEFAULT 1,
   `MaxCount` TINYINT unsigned NOT NULL DEFAULT 1,
-  `Comment` varchar(255) DEFAULT NULL,
+  `Comment` VARCHAR(255) DEFAULT NULL,
   PRIMARY KEY (`Entry`,`Item`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Loot System';
 
--- Дамп данных таблицы acore_world.skinning_loot_template: 1 869 rows
+-- Dumpar data för tabell acore_world.skinning_loot_template: 1 871 rows
 DELETE FROM `skinning_loot_template`;
 /*!40000 ALTER TABLE `skinning_loot_template` DISABLE KEYS */;
 INSERT INTO `skinning_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
@@ -1900,7 +1900,9 @@ INSERT INTO `skinning_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 	(100014, 4234, 0, 45, 0, 1, 1, 1, 1, NULL),
 	(100014, 4235, 0, 2, 0, 1, 1, 1, 1, NULL),
 	(100014, 4304, 0, 50, 0, 1, 1, 1, 1, NULL),
-	(100014, 8169, 0, 3, 0, 1, 1, 1, 1, NULL);
+	(100014, 8169, 0, 3, 0, 1, 1, 1, 1, NULL),
+	(3124, 2318, 0, 10, 0, 1, 1, 1, 1, 'Light Leather'),
+	(3124, 2934, 0, 88, 0, 1, 1, 1, 1, 'Ruined Leather Scraps');
 /*!40000 ALTER TABLE `skinning_loot_template` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

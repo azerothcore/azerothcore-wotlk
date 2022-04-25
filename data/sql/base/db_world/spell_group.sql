@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.spell_group
+-- Dumpar struktur för tabell acore_world.spell_group
 DROP TABLE IF EXISTS `spell_group`;
 CREATE TABLE IF NOT EXISTS `spell_group` (
   `id` INT unsigned NOT NULL DEFAULT 0,
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `spell_group` (
   PRIMARY KEY (`id`,`spell_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Spell System';
 
--- Дамп данных таблицы acore_world.spell_group: 347 rows
+-- Dumpar data för tabell acore_world.spell_group: 354 rows
 DELETE FROM `spell_group`;
 /*!40000 ALTER TABLE `spell_group` DISABLE KEYS */;
 INSERT INTO `spell_group` (`id`, `spell_id`, `special_flag`) VALUES
@@ -281,7 +281,7 @@ INSERT INTO `spell_group` (`id`, `spell_id`, `special_flag`) VALUES
 	(1009, 51466, 0),
 	(1010, 12579, 0),
 	(1010, 22959, 0),
-	(1011, 48090, 33),
+	(1011, 48090, 8192),
 	(1011, 52109, 0),
 	(1011, 57658, 0),
 	(1012, 31579, 0),
@@ -335,8 +335,8 @@ INSERT INTO `spell_group` (`id`, `spell_id`, `special_flag`) VALUES
 	(1025, 27683, 0),
 	(1026, 348, 0),
 	(1026, 30108, 0),
-	(1027, 604, 0),
-	(1027, 1008, 0),
+	(1027, 604, 32),
+	(1027, 1008, 32),
 	(1028, 1490, 0),
 	(1028, 51726, 32),
 	(1028, 60431, 0),
@@ -371,7 +371,14 @@ INSERT INTO `spell_group` (`id`, `spell_id`, `special_flag`) VALUES
 	(1023, 24752, 0),
 	(1023, 39233, 0),
 	(1024, 23947, 0),
-	(1024, 23948, 0);
+	(1024, 23948, 0),
+	(1001, 22730, 0),
+	(1001, 18191, 0),
+	(1001, 18192, 0),
+	(1001, 18193, 0),
+	(1001, 18194, 0),
+	(1001, 18222, 0),
+	(1001, 15852, 0);
 /*!40000 ALTER TABLE `spell_group` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

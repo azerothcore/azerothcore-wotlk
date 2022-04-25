@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,23 +12,23 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.game_event
+-- Dumpar struktur för tabell acore_world.game_event
 DROP TABLE IF EXISTS `game_event`;
 CREATE TABLE IF NOT EXISTS `game_event` (
   `eventEntry` TINYINT unsigned NOT NULL COMMENT 'Entry of the game event',
   `start_time` timestamp NULL DEFAULT '2000-01-01 14:00:00' COMMENT 'Absolute start date, the event will never start before',
   `end_time` timestamp NULL DEFAULT '2000-01-01 14:00:00' COMMENT 'Absolute end date, the event will never start after',
-  `occurence` BIGINT unsigned NOT NULL DEFAULT 5184000 COMMENT 'Delay in minutes between occurences of the event',
-  `length` BIGINT unsigned NOT NULL DEFAULT 2592000 COMMENT 'Length in minutes of the event',
+  `occurence` BIGINT unsigned NOT NULL DEFAULT '5184000' COMMENT 'Delay in minutes between occurences of the event',
+  `length` BIGINT unsigned NOT NULL DEFAULT '2592000' COMMENT 'Length in minutes of the event',
   `holiday` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Client side holiday id',
   `holidayStage` TINYINT unsigned NOT NULL DEFAULT 0,
-  `description` varchar(255) DEFAULT NULL COMMENT 'Description of the event displayed in console',
+  `description` VARCHAR(255) DEFAULT NULL COMMENT 'Description of the event displayed in console',
   `world_event` TINYINT unsigned NOT NULL DEFAULT 0 COMMENT '0 if normal event, 1 if world event',
-  `announce` TINYINT unsigned NOT NULL DEFAULT 2 COMMENT '0 dont announce, 1 announce, 2 value from config',
+  `announce` TINYINT unsigned NOT NULL DEFAULT '2' COMMENT '0 dont announce, 1 announce, 2 value from config',
   PRIMARY KEY (`eventEntry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_world.game_event: 78 rows
+-- Dumpar data för tabell acore_world.game_event: 80 rows
 DELETE FROM `game_event`;
 /*!40000 ALTER TABLE `game_event` DISABLE KEYS */;
 INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `holidayStage`, `description`, `world_event`, `announce`) VALUES
@@ -56,7 +56,7 @@ INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `
 	(22, '2000-01-01 14:00:00', '2000-01-01 14:00:00', 525600, 1, 0, 0, 'AQ War Effort', 0, 2),
 	(23, '2014-09-04 06:01:00', '2030-12-31 12:00:00', 131040, 4320, 374, 1, 'Darkmoon Faire Building (Elwynn Forest)', 0, 2),
 	(24, '2021-09-20 01:01:00', '2030-12-31 13:00:00', 525600, 21600, 372, 2, 'Brewfest', 0, 2),
-	(25, '2015-07-30 02:00:00', '2030-12-31 12:00:00', 1440, 480, 0, 0, 'Pyrewood Village', 0, 2),
+	(25, '2015-07-29 21:00:00', '2030-12-31 12:00:00', 1440, 540, 0, 0, 'Pyrewood Village', 0, 2),
 	(26, '2021-11-23 01:00:00', '2030-12-31 12:00:00', 525600, 10080, 404, 1, 'Pilgrim\'s Bounty', 0, 2),
 	(27, '2008-03-24 12:00:00', '2030-12-31 12:00:00', 86400, 21600, 0, 0, 'Edge of Madness, Gri\'lek', 0, 2),
 	(28, '2008-04-07 12:00:00', '2030-12-31 12:00:00', 86400, 21600, 0, 0, 'Edge of Madness, Hazza\'rah', 0, 2),
@@ -109,7 +109,9 @@ INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `
 	(79, '2018-10-28 12:00:00', '2030-12-31 18:00:00', 1440, 360, 0, 0, 'Diurnal fishing event', 0, 2),
 	(80, '2018-10-28 00:00:00', '2030-12-31 06:00:00', 1440, 360, 0, 0, 'Nocturnal fishing event', 0, 2),
 	(74, '2022-01-01 07:00:00', '2030-01-01 08:00:00', 1440, 60, 0, 0, 'Children of Goldshire', 0, 2),
-	(77, '2016-11-06 02:01:00', '2030-12-31 07:00:00', 131040, 4320, 376, 1, 'Darkmoon Faire Building (Terokkar Forest)', 0, 2);
+	(77, '2016-11-06 02:01:00', '2030-12-31 07:00:00', 131040, 4320, 376, 1, 'Darkmoon Faire Building (Terokkar Forest)', 0, 2),
+	(88, '2016-10-28 18:00:00', '2030-12-30 23:00:00', 1440, 720, 0, 0, 'Evening', 0, 2),
+	(89, '2016-10-28 20:00:00', '2030-12-30 23:00:00', 1440, 600, 0, 0, 'Leprithus', 0, 2);
 /*!40000 ALTER TABLE `game_event` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

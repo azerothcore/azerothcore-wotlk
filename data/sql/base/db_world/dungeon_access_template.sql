@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.dungeon_access_template
+-- Dumpar struktur för tabell acore_world.dungeon_access_template
 DROP TABLE IF EXISTS `dungeon_access_template`;
 CREATE TABLE IF NOT EXISTS `dungeon_access_template` (
   `id` TINYINT unsigned NOT NULL AUTO_INCREMENT COMMENT 'The dungeon template ID',
@@ -21,12 +21,12 @@ CREATE TABLE IF NOT EXISTS `dungeon_access_template` (
   `min_level` TINYINT unsigned DEFAULT NULL,
   `max_level` TINYINT unsigned DEFAULT NULL,
   `min_avg_item_level` SMALLINT unsigned DEFAULT NULL COMMENT 'Min average ilvl required to enter',
-  `comment` varchar(255) DEFAULT NULL COMMENT 'Dungeon Name 5/10/25/40 man - Normal/Heroic',
+  `comment` VARCHAR(255) DEFAULT NULL COMMENT 'Dungeon Name 5/10/25/40 man - Normal/Heroic',
   PRIMARY KEY (`id`),
   KEY `FK_dungeon_access_template__instance_template` (`map_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=122 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='Dungeon/raid access template and single requirements';
 
--- Дамп данных таблицы acore_world.dungeon_access_template: 121 rows
+-- Dumpar data för tabell acore_world.dungeon_access_template: 121 rows
 DELETE FROM `dungeon_access_template`;
 /*!40000 ALTER TABLE `dungeon_access_template` DISABLE KEYS */;
 INSERT INTO `dungeon_access_template` (`id`, `map_id`, `difficulty`, `min_level`, `max_level`, `min_avg_item_level`, `comment`) VALUES

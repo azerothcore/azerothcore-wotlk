@@ -71,12 +71,12 @@ Map* MapMgr::CreateBaseMap(uint32 id)
 {
     Map* map = FindBaseMap(id);
 
-    if (map == nullptr)
+    if (!map)
     {
         std::lock_guard<std::mutex> guard(Lock);
 
         map = FindBaseMap(id);
-        if (map == nullptr) // pussywizard: check again after acquiring mutex
+        if (!map) // pussywizard: check again after acquiring mutex
         {
             MapEntry const* entry = sMapStore.LookupEntry(id);
             ASSERT(entry);

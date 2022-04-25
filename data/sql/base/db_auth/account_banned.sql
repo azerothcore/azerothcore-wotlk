@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,19 +12,19 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_auth.account_banned
+-- Dumpar struktur för tabell acore_auth.account_banned
 DROP TABLE IF EXISTS `account_banned`;
 CREATE TABLE IF NOT EXISTS `account_banned` (
   `id` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Account id',
   `bandate` INT unsigned NOT NULL DEFAULT 0,
   `unbandate` INT unsigned NOT NULL DEFAULT 0,
-  `bannedby` varchar(50) NOT NULL,
-  `banreason` varchar(255) NOT NULL,
+  `bannedby` VARCHAR(50) NOT NULL,
+  `banreason` VARCHAR(255) NOT NULL,
   `active` TINYINT unsigned NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`,`bandate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Ban List';
 
--- Дамп данных таблицы acore_auth.account_banned: ~0 rows (приблизительно)
+-- Dumpar data för tabell acore_auth.account_banned: ~0 rows (ungefär)
 DELETE FROM `account_banned`;
 /*!40000 ALTER TABLE `account_banned` DISABLE KEYS */;
 /*!40000 ALTER TABLE `account_banned` ENABLE KEYS */;
