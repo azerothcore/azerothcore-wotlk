@@ -452,10 +452,8 @@ Player::~Player()
 
     if (!m_isInSharedVisionOf.empty())
     {
-        LOG_INFO("misc", "Player::~Player (A1)");
         do
         {
-            LOG_INFO("misc", "Player::~Player (A2)");
             Unit* u = *(m_isInSharedVisionOf.begin());
             u->RemovePlayerFromVision(this);
         } while (!m_isInSharedVisionOf.empty());
