@@ -359,6 +359,17 @@ Unit::~Unit()
     ASSERT(!m_attacking);
     ASSERT(m_attackers.empty());
 
+    // pussywizard: clear m_sharedVision along with back references
+    if (!m_sharedVision.empty())
+    {
+        do
+        {
+            Player* p = *(m_sharedVision.begin());
+            p->m_isInSharedVisionOf.erase(this);
+            m_sharedVision.remove(p);
+        } while (!m_sharedVision.empty());
+    }
+
     ASSERT(m_Controlled.empty());
     ASSERT(m_appliedAuras.empty());
     ASSERT(m_ownedAuras.empty());
@@ -1255,13 +1266,13 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
      // Script Hook For CalculateSpellDamageTaken -- Allow scripts to change the Damage post class mitigation calculations
     sScriptMgr->ModifySpellDamageTaken(damageInfo->target, damageInfo->attacker, damage);
 
+    int32 cleanDamage = 0;
     if (Unit::IsDamageReducedByArmor(damageSchoolMask, spellInfo))
     {
-        damageInfo->damage = Unit::CalcArmorReducedDamage(this, victim, damage, spellInfo, 0, attackType);
-        damageInfo->cleanDamage += damage - damageInfo->damage;
+        int32 oldDamage = damage;
+        damage = Unit::CalcArmorReducedDamage(this, victim, damage, spellInfo, 0, attackType);
+        cleanDamage = oldDamage - damage;
     }
-    else
-        damageInfo->damage = damage;
 
     bool blocked = false;
     // Per-school calc
@@ -1283,11 +1294,11 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
                     damageInfo->HitInfo |= SPELL_HIT_TYPE_CRIT;
 
                     // Calculate crit bonus
-                    uint32 crit_bonus = damageInfo->damage;
+                    uint32 crit_bonus = damage;
                     // Apply crit_damage bonus for melee spells
                     if (Player* modOwner = GetSpellModOwner())
                         modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_CRIT_DAMAGE_BONUS, crit_bonus);
-                    damageInfo->damage += crit_bonus;
+                    damage += crit_bonus;
 
                     // Apply SPELL_AURA_MOD_ATTACKER_RANGED_CRIT_DAMAGE or SPELL_AURA_MOD_ATTACKER_MELEE_CRIT_DAMAGE
                     float critPctDamageMod = 0.0f;
@@ -1303,7 +1314,7 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
                     critPctDamageMod += GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_CRIT_PERCENT_VERSUS, crTypeMask);
 
                     if (critPctDamageMod != 0)
-                        AddPct(damageInfo->damage, critPctDamageMod);
+                        AddPct(damage, critPctDamageMod);
                 }
 
                 // Spell weapon based damage CAN BE crit & blocked at same time
@@ -1316,22 +1327,26 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
                     if (damage < int32(damageInfo->blocked))
                         damageInfo->blocked = uint32(damage);
 
-                    damageInfo->damage -= damageInfo->blocked;
-                    damageInfo->cleanDamage += damageInfo->blocked;
+                    damage -= damageInfo->blocked;
+                    cleanDamage += damageInfo->blocked;
                 }
 
-                int32 resilienceReduction = damageInfo->damage;
+                int32 resilienceReduction = damage;
                 if (CanApplyResilience())
                 {
                     if (attackType != RANGED_ATTACK)
+                    {
                         Unit::ApplyResilience(victim, nullptr, &resilienceReduction, crit, CR_CRIT_TAKEN_MELEE);
+                    }
                     else
+                    {
                         Unit::ApplyResilience(victim, nullptr, &resilienceReduction, crit, CR_CRIT_TAKEN_RANGED);
+                    }
                 }
 
-                resilienceReduction = damageInfo->damage - resilienceReduction;
-                damageInfo->damage -= resilienceReduction;
-                damageInfo->cleanDamage += resilienceReduction;
+                resilienceReduction = damage - resilienceReduction;
+                damage -= resilienceReduction;
+                cleanDamage += resilienceReduction;
                 break;
             }
         // Magical Attacks
@@ -1342,24 +1357,29 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
                 if (crit)
                 {
                     damageInfo->HitInfo |= SPELL_HIT_TYPE_CRIT;
-                    damageInfo->damage = Unit::SpellCriticalDamageBonus(this, spellInfo, damageInfo->damage, victim);
+                    damage = Unit::SpellCriticalDamageBonus(this, spellInfo, damage, victim);
                 }
 
-                int32 resilienceReduction = damageInfo->damage;
+                int32 resilienceReduction = damage;
                 if (CanApplyResilience())
+                {
                     Unit::ApplyResilience(victim, nullptr, &resilienceReduction, crit, CR_CRIT_TAKEN_SPELL);
+                }
 
-                resilienceReduction = damageInfo->damage - resilienceReduction;
-                damageInfo->damage -= resilienceReduction;
-                damageInfo->cleanDamage += resilienceReduction;
+                resilienceReduction = damage - resilienceReduction;
+                damage -= resilienceReduction;
+                cleanDamage += resilienceReduction;
                 break;
             }
         default:
             break;
     }
 
+    damageInfo->cleanDamage = std::max(0, cleanDamage);
+    damageInfo->damage = std::max(0, damage);
+
     // Calculate absorb resist
-    if (int32(damageInfo->damage) > 0)
+    if (damageInfo->damage > 0)
     {
         DamageInfo dmgInfo(*damageInfo, SPELL_DIRECT_DAMAGE);
         Unit::CalcAbsorbResist(dmgInfo);
@@ -1367,8 +1387,6 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
         damageInfo->resist = dmgInfo.GetResist();
         damageInfo->damage = dmgInfo.GetDamage();
     }
-    else
-        damageInfo->damage = 0;
 }
 
 void Unit::DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabilityLoss, Spell const* spell /*= nullptr*/)
@@ -1579,18 +1597,24 @@ void Unit::CalculateMeleeDamage(Unit* victim, uint32 damage, CalcDamageInfo* dam
     if (!(damageInfo->HitInfo & HITINFO_MISS))
         damageInfo->HitInfo |= HITINFO_AFFECTS_VICTIM;
 
-    int32 resilienceReduction = damageInfo->damage;
-
     // attackType is checked already for BASE_ATTACK or OFF_ATTACK so it can't be RANGED_ATTACK here
+    int32 dmg = damageInfo->damage;
+    int32 cleanDamage = damageInfo->cleanDamage;
     if (CanApplyResilience())
+    {
+        int32 resilienceReduction = dmg;
         Unit::ApplyResilience(victim, nullptr, &resilienceReduction, (damageInfo->hitOutCome == MELEE_HIT_CRIT), CR_CRIT_TAKEN_MELEE);
 
-    resilienceReduction = damageInfo->damage - resilienceReduction;
-    damageInfo->damage      -= resilienceReduction;
-    damageInfo->cleanDamage += resilienceReduction;
+        resilienceReduction = dmg - resilienceReduction;
+        dmg -= resilienceReduction;
+        cleanDamage += resilienceReduction;
+    }
+
+    damageInfo->damage = std::max(0, dmg);
+    damageInfo->cleanDamage = std::max(0, cleanDamage);
 
     // Calculate absorb resist
-    if (int32(damageInfo->damage) > 0)
+    if (damageInfo->damage > 0)
     {
         damageInfo->procVictim |= PROC_FLAG_TAKEN_DAMAGE;
         // Calculate absorb & resists
@@ -1611,8 +1635,6 @@ void Unit::CalculateMeleeDamage(Unit* victim, uint32 damage, CalcDamageInfo* dam
 
         damageInfo->damage = dmgInfo.GetDamage();
     }
-    else // Impossible get negative result but....
-        damageInfo->damage = 0;
 }
 
 void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
@@ -5011,7 +5033,8 @@ void Unit::RemoveEvadeAuras()
     for (AuraApplicationMap::iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end();)
     {
         Aura const* aura = iter->second->GetBase();
-        if (aura->GetSpellInfo()->HasAura(SPELL_AURA_CONTROL_VEHICLE) || aura->GetSpellInfo()->HasAura(SPELL_AURA_CLONE_CASTER) || (aura->IsPassive() && GetOwnerGUID().IsPlayer()))
+        SpellInfo const* spellInfo = aura->GetSpellInfo();
+        if (spellInfo->HasAttribute(SPELL_ATTR0_CU_IGNORE_EVADE) || spellInfo->HasAura(SPELL_AURA_CONTROL_VEHICLE) || spellInfo->HasAura(SPELL_AURA_CLONE_CASTER) || (aura->IsPassive() && GetOwnerGUID().IsPlayer()))
             ++iter;
         else
             _UnapplyAura(iter, AURA_REMOVE_BY_DEFAULT);
@@ -5020,7 +5043,8 @@ void Unit::RemoveEvadeAuras()
     for (AuraMap::iterator iter = m_ownedAuras.begin(); iter != m_ownedAuras.end();)
     {
         Aura* aura = iter->second;
-        if (aura->GetSpellInfo()->HasAura(SPELL_AURA_CONTROL_VEHICLE) || aura->GetSpellInfo()->HasAura(SPELL_AURA_CLONE_CASTER) || (aura->IsPassive() && GetOwnerGUID().IsPlayer()))
+        SpellInfo const* spellInfo = aura->GetSpellInfo();
+        if (spellInfo->HasAttribute(SPELL_ATTR0_CU_IGNORE_EVADE) || spellInfo->HasAura(SPELL_AURA_CONTROL_VEHICLE) || spellInfo->HasAura(SPELL_AURA_CLONE_CASTER) || (aura->IsPassive() && GetOwnerGUID().IsPlayer()))
             ++iter;
         else
             RemoveOwnedAura(iter, AURA_REMOVE_BY_DEFAULT);
@@ -10715,12 +10739,14 @@ void Unit::AddPlayerToVision(Player* player)
         SetWorldObject(true);
     }
     m_sharedVision.push_back(player);
+    player->m_isInSharedVisionOf.insert(this);
 }
 
 // only called in Player::SetSeer
 void Unit::RemovePlayerFromVision(Player* player)
 {
     m_sharedVision.remove(player);
+    player->m_isInSharedVisionOf.erase(this);
     if (m_sharedVision.empty())
     {
         setActive(false);

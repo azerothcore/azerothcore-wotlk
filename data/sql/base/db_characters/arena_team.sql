@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,11 +12,11 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_characters.arena_team
+-- Dumpar struktur för tabell acore_characters.arena_team
 DROP TABLE IF EXISTS `arena_team`;
 CREATE TABLE IF NOT EXISTS `arena_team` (
   `arenaTeamId` INT unsigned NOT NULL DEFAULT 0,
-  `name` varchar(24) NOT NULL,
+  `name` VARCHAR(24) NOT NULL,
   `captainGuid` INT unsigned NOT NULL DEFAULT 0,
   `type` TINYINT unsigned NOT NULL DEFAULT 0,
   `rating` SMALLINT unsigned NOT NULL DEFAULT 0,
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `arena_team` (
   PRIMARY KEY (`arenaTeamId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_characters.arena_team: ~0 rows (приблизительно)
+-- Dumpar data för tabell acore_characters.arena_team: ~0 rows (ungefär)
 DELETE FROM `arena_team`;
 /*!40000 ALTER TABLE `arena_team` DISABLE KEYS */;
 /*!40000 ALTER TABLE `arena_team` ENABLE KEYS */;

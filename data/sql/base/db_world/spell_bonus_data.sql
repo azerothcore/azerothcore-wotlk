@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.spell_bonus_data
+-- Dumpar struktur för tabell acore_world.spell_bonus_data
 DROP TABLE IF EXISTS `spell_bonus_data`;
 CREATE TABLE IF NOT EXISTS `spell_bonus_data` (
   `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
@@ -20,11 +20,11 @@ CREATE TABLE IF NOT EXISTS `spell_bonus_data` (
   `dot_bonus` float NOT NULL DEFAULT 0,
   `ap_bonus` float NOT NULL DEFAULT 0,
   `ap_dot_bonus` float NOT NULL DEFAULT 0,
-  `comments` varchar(255) DEFAULT NULL,
+  `comments` VARCHAR(255) DEFAULT NULL,
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_world.spell_bonus_data: 1 268 rows
+-- Dumpar data för tabell acore_world.spell_bonus_data: 1 269 rows
 DELETE FROM `spell_bonus_data`;
 /*!40000 ALTER TABLE `spell_bonus_data` DISABLE KEYS */;
 INSERT INTO `spell_bonus_data` (`entry`, `direct_bonus`, `dot_bonus`, `ap_bonus`, `ap_dot_bonus`, `comments`) VALUES
@@ -1295,7 +1295,8 @@ INSERT INTO `spell_bonus_data` (`entry`, `direct_bonus`, `dot_bonus`, `ap_bonus`
 	(72789, 1, 0, 0, 0, 'Blood Prince Council Ball of Falmes Explosion'),
 	(72790, 1, 0, 0, 0, 'Blood Prince Council Ball of Falmes Explosion'),
 	(72791, 1, 0, 0, 0, 'Blood Prince Council Ball of Falmes Explosion'),
-	(72898, 0.83, 0, 0, 0, 'Pet Mage - Water Elemental Frostbolt');
+	(72898, 0.83, 0, 0, 0, 'Pet Mage - Water Elemental Frostbolt'),
+	(18817, 1, 0, 0, 0, 'Skullflame Shield - Drain Life');
 /*!40000 ALTER TABLE `spell_bonus_data` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

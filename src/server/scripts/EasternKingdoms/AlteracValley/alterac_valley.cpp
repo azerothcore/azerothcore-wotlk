@@ -103,6 +103,7 @@ public:
             events.ScheduleEvent(EVENT_CHECK_RESET, 5000);
 
             _hasAura = false;
+            _attacked = false;
         }
 
         void JustRespawned() override
@@ -114,16 +115,21 @@ public:
         {
             ScriptedAI::AttackStart(victim);
 
-            // Boss should attack as well
-            if (BattlegroundMap* bgMap = me->GetMap()->ToBattlegroundMap())
+            if (!_attacked)
             {
-                if (Battleground* bg = bgMap->GetBG())
+                _attacked = true;
+
+                // Boss should attack as well
+                if (BattlegroundMap* bgMap = me->GetMap()->ToBattlegroundMap())
                 {
-                    if (Creature* mainBoss = bg->GetBGCreature((me->GetFaction() == FACTION_AV_ALLIANCE ? AV_CPLACE_A_BOSS : AV_CPLACE_H_BOSS)))
+                    if (Battleground* bg = bgMap->GetBG())
                     {
-                        if (mainBoss->IsAIEnabled && !mainBoss->GetVictim())
+                        if (Creature* mainBoss = bg->GetBGCreature((me->GetFaction() == FACTION_AV_ALLIANCE ? AV_CPLACE_A_BOSS : AV_CPLACE_H_BOSS)))
                         {
-                            mainBoss->AI()->AttackStart(victim);
+                            if (mainBoss->IsAIEnabled && !mainBoss->GetVictim())
+                            {
+                                mainBoss->AI()->AttackStart(victim);
+                            }
                         }
                     }
                 }
@@ -134,16 +140,21 @@ public:
         {
             ScriptedAI::EnterEvadeMode(why);
 
-            // Evade boss
-            if (BattlegroundMap* bgMap = me->GetMap()->ToBattlegroundMap())
+            if (_attacked)
             {
-                if (Battleground* bg = bgMap->GetBG())
+                _attacked = false;
+
+                // Evade boss
+                if (BattlegroundMap* bgMap = me->GetMap()->ToBattlegroundMap())
                 {
-                    if (Creature* mainBoss = bg->GetBGCreature((me->GetFaction() == FACTION_AV_ALLIANCE ? AV_CPLACE_A_BOSS : AV_CPLACE_H_BOSS)))
+                    if (Battleground* bg = bgMap->GetBG())
                     {
-                        if (mainBoss->IsAIEnabled && !mainBoss->IsInEvadeMode())
+                        if (Creature* mainBoss = bg->GetBGCreature((me->GetFaction() == FACTION_AV_ALLIANCE ? AV_CPLACE_A_BOSS : AV_CPLACE_H_BOSS)))
                         {
-                            mainBoss->AI()->EnterEvadeMode();
+                            if (mainBoss->IsAIEnabled && !mainBoss->IsInEvadeMode())
+                            {
+                                mainBoss->AI()->EnterEvadeMode();
+                            }
                         }
                     }
                 }
@@ -214,6 +225,7 @@ public:
     private:
         EventMap events;
         bool _hasAura;
+        bool _attacked;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

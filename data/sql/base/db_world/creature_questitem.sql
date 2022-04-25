@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.creature_questitem
+-- Dumpar struktur för tabell acore_world.creature_questitem
 DROP TABLE IF EXISTS `creature_questitem`;
 CREATE TABLE IF NOT EXISTS `creature_questitem` (
   `CreatureEntry` INT unsigned NOT NULL DEFAULT 0,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `creature_questitem` (
   PRIMARY KEY (`CreatureEntry`,`Idx`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_world.creature_questitem: 4 405 rows
+-- Dumpar data för tabell acore_world.creature_questitem: 4 416 rows
 DELETE FROM `creature_questitem`;
 /*!40000 ALTER TABLE `creature_questitem` DISABLE KEYS */;
 INSERT INTO `creature_questitem` (`CreatureEntry`, `Idx`, `ItemId`, `VerifiedBuild`) VALUES
@@ -2773,7 +2773,7 @@ INSERT INTO `creature_questitem` (`CreatureEntry`, `Idx`, `ItemId`, `VerifiedBui
 	(17196, 0, 23685, 0),
 	(17198, 0, 23845, 0),
 	(17199, 0, 23845, 0),
-	(17201, 0, 23677, 0),
+	(17200, 0, 23676, 0),
 	(17206, 0, 23688, 0),
 	(17207, 0, 23681, 0),
 	(17216, 0, 23757, 0),
@@ -4430,7 +4430,18 @@ INSERT INTO `creature_questitem` (`CreatureEntry`, `Idx`, `ItemId`, `VerifiedBui
 	(39755, 1, 3084, 0),
 	(39819, 0, 3083, 0),
 	(39819, 1, 3084, 0),
-	(6141, 0, 5808, 0);
+	(6141, 0, 5808, 0),
+	(17201, 0, 23676, 0),
+	(17201, 1, 23677, 0),
+	(16350, 2, 22644, 0),
+	(16351, 2, 22644, 0),
+	(16352, 2, 22644, 0),
+	(16303, 0, 22642, 0),
+	(16305, 0, 22642, 0),
+	(16307, 0, 22642, 0),
+	(16308, 0, 22642, 0),
+	(16301, 0, 22641, 0),
+	(16302, 0, 22641, 0);
 /*!40000 ALTER TABLE `creature_questitem` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

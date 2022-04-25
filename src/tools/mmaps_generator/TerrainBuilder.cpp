@@ -77,10 +77,12 @@ struct map_liquidHeader
 #define MAP_LIQUID_TYPE_DARK_WATER  0x10
 #define MAP_LIQUID_TYPE_WMO_WATER   0x20
 
+uint32 GetLiquidFlags(uint32 liquidId);
+
 namespace MMAP
 {
 
-    uint32 const MAP_VERSION_MAGIC = 8;
+    uint32 const MAP_VERSION_MAGIC = 9;
 
     TerrainBuilder::TerrainBuilder(bool skipLiquid) : m_skipLiquid (skipLiquid) { }
     TerrainBuilder::~TerrainBuilder() = default;
@@ -392,31 +394,29 @@ namespace MMAP
 
                 // if there is no liquid, don't use liquid
                 if (!meshData.liquidVerts.size() || !ltriangles.size())
+                {
                     useLiquid = false;
+                }
                 else
                 {
                     liquidType = getLiquidType(i, liquid_type);
-                    switch (liquidType)
+                    if (liquidType & MAP_LIQUID_TYPE_DARK_WATER)
                     {
-                        default:
-                            useLiquid = false;
-                            break;
-                        case MAP_LIQUID_TYPE_WATER:
-                        case MAP_LIQUID_TYPE_OCEAN:
-                            // merge different types of water
-                            liquidType = NAV_WATER;
-                            break;
-                        case MAP_LIQUID_TYPE_MAGMA:
-                            liquidType = NAV_MAGMA;
-                            break;
-                        case MAP_LIQUID_TYPE_SLIME:
-                            liquidType = NAV_SLIME;
-                            break;
-                        case MAP_LIQUID_TYPE_DARK_WATER:
-                            // players should not be here, so logically neither should creatures
-                            useTerrain = false;
-                            useLiquid = false;
-                            break;
+                        // players should not be here, so logically neither should creatures
+                        useTerrain = false;
+                        useLiquid = false;
+                    }
+                    else if ((liquidType & (MAP_LIQUID_TYPE_WATER | MAP_LIQUID_TYPE_OCEAN)) != 0)
+                    {
+                        liquidType = NAV_AREA_WATER;
+                    }
+                    else if ((liquidType & (MAP_LIQUID_TYPE_MAGMA | MAP_LIQUID_TYPE_SLIME)) != 0)
+                    {
+                        liquidType = NAV_AREA_MAGMA_SLIME;
+                    }
+                    else
+                    {
+                        useLiquid = false;
                     }
                 }
 
@@ -719,21 +719,17 @@ namespace MMAP
                         vertsY = tilesY + 1;
                         uint8* flags = liquid->GetFlagsStorage();
                         float* data = liquid->GetHeightStorage();
-                        uint8 type = NAV_EMPTY;
+                        uint8 type = NAV_AREA_EMPTY;
 
                         // convert liquid type to NavTerrain
-                        switch (liquid->GetType() & 3)
+                        uint32 liquidFlags = GetLiquidFlags(liquid->GetType());
+                        if ((liquidFlags & (MAP_LIQUID_TYPE_WATER | MAP_LIQUID_TYPE_OCEAN)) != 0)
                         {
-                            case 0:
-                            case 1:
-                                type = NAV_WATER;
-                                break;
-                            case 2:
-                                type = NAV_MAGMA;
-                                break;
-                            case 3:
-                                type = NAV_SLIME;
-                                break;
+                            type = NAV_AREA_WATER;
+                        }
+                        else if ((liquidFlags & (MAP_LIQUID_TYPE_MAGMA | MAP_LIQUID_TYPE_SLIME)) != 0)
+                        {
+                            type = NAV_AREA_MAGMA_SLIME;
                         }
 
                         // indexing is weird...

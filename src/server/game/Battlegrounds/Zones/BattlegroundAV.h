@@ -661,7 +661,7 @@ enum BG_AV_CreaturePlace
     AV_CPLACE_MAX             = 321,
 
     AV_CPLACE_A_BOSS          = 381,
-    AV_CPLACE_H_BOSS          = 445
+    AV_CPLACE_H_BOSS          = 443
 };
 
 //x, y, z, o

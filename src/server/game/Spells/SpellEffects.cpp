@@ -1125,6 +1125,11 @@ void Spell::EffectJumpDest(SpellEffIndex effIndex)
         speedXY = pow(speedZ * 10, 8);
         m_caster->GetMotionMaster()->MoveJump(x, y, z, speedXY, speedZ, 0, ObjectAccessor::GetUnit(*m_caster, m_caster->GetGuidValue(UNIT_FIELD_TARGET)));
 
+        if (Player* player = m_caster->ToPlayer())
+        {
+            player->SetCanTeleport(true);
+        }
+
         if (m_caster->GetTypeId() == TYPEID_PLAYER)
         {
             sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
@@ -1143,6 +1148,10 @@ void Spell::EffectJumpDest(SpellEffIndex effIndex)
     if (speedXY < 1.0f)
         speedXY = 1.0f;
 
+    if (Player* player = m_caster->ToPlayer())
+    {
+        player->SetCanTeleport(true);
+    }
     m_caster->GetMotionMaster()->MoveJump(x, y, z, speedXY, speedZ);
 
     if (m_caster->GetTypeId() == TYPEID_PLAYER)

@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,22 +12,22 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.soundentries_dbc
+-- Dumpar struktur för tabell acore_world.soundentries_dbc
 DROP TABLE IF EXISTS `soundentries_dbc`;
 CREATE TABLE IF NOT EXISTS `soundentries_dbc` (
   `ID` INT NOT NULL DEFAULT 0,
   `SoundType` INT NOT NULL DEFAULT 0,
-  `Name` varchar(100) DEFAULT NULL,
-  `File_1` varchar(100) DEFAULT NULL,
-  `File_2` varchar(100) DEFAULT NULL,
-  `File_3` varchar(100) DEFAULT NULL,
-  `File_4` varchar(100) DEFAULT NULL,
-  `File_5` varchar(100) DEFAULT NULL,
-  `File_6` varchar(100) DEFAULT NULL,
-  `File_7` varchar(100) DEFAULT NULL,
-  `File_8` varchar(100) DEFAULT NULL,
-  `File_9` varchar(100) DEFAULT NULL,
-  `File_10` varchar(100) DEFAULT NULL,
+  `Name` VARCHAR(100) DEFAULT NULL,
+  `File_1` VARCHAR(100) DEFAULT NULL,
+  `File_2` VARCHAR(100) DEFAULT NULL,
+  `File_3` VARCHAR(100) DEFAULT NULL,
+  `File_4` VARCHAR(100) DEFAULT NULL,
+  `File_5` VARCHAR(100) DEFAULT NULL,
+  `File_6` VARCHAR(100) DEFAULT NULL,
+  `File_7` VARCHAR(100) DEFAULT NULL,
+  `File_8` VARCHAR(100) DEFAULT NULL,
+  `File_9` VARCHAR(100) DEFAULT NULL,
+  `File_10` VARCHAR(100) DEFAULT NULL,
   `Freq_1` INT NOT NULL DEFAULT 0,
   `Freq_2` INT NOT NULL DEFAULT 0,
   `Freq_3` INT NOT NULL DEFAULT 0,
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS `soundentries_dbc` (
   `Freq_8` INT NOT NULL DEFAULT 0,
   `Freq_9` INT NOT NULL DEFAULT 0,
   `Freq_10` INT NOT NULL DEFAULT 0,
-  `DirectoryBase` varchar(100) DEFAULT NULL,
+  `DirectoryBase` VARCHAR(100) DEFAULT NULL,
   `Volumefloat` float NOT NULL DEFAULT 0,
   `Flags` INT NOT NULL DEFAULT 0,
   `MinDistance` float NOT NULL DEFAULT 0,
@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS `soundentries_dbc` (
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_world.soundentries_dbc: 0 rows
+-- Dumpar data för tabell acore_world.soundentries_dbc: 0 rows
 DELETE FROM `soundentries_dbc`;
 /*!40000 ALTER TABLE `soundentries_dbc` DISABLE KEYS */;
 /*!40000 ALTER TABLE `soundentries_dbc` ENABLE KEYS */;

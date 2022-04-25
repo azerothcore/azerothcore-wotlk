@@ -452,10 +452,8 @@ Player::~Player()
 
     if (!m_isInSharedVisionOf.empty())
     {
-        LOG_INFO("misc", "Player::~Player (A1)");
         do
         {
-            LOG_INFO("misc", "Player::~Player (A2)");
             Unit* u = *(m_isInSharedVisionOf.begin());
             u->RemovePlayerFromVision(this);
         } while (!m_isInSharedVisionOf.empty());
@@ -8953,56 +8951,58 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
 
         return;
     }
-
-    pet->CombatStop();
-
-    if (returnreagent)
+    else
     {
-        switch (pet->GetEntry())
+        pet->CombatStop();
+
+        if (returnreagent)
         {
-            //warlock pets except imp are removed(?) when logging out
-            case 1860:
-            case 1863:
-            case 417:
-            case 17252:
-                mode = PET_SAVE_NOT_IN_SLOT;
-                break;
+            switch (pet->GetEntry())
+            {
+                //warlock pets except imp are removed(?) when logging out
+                case 1860:
+                case 1863:
+                case 417:
+                case 17252:
+                    mode = PET_SAVE_NOT_IN_SLOT;
+                    break;
+            }
         }
-    }
 
-    // only if current pet in slot
-    pet->SavePetToDB(mode);
+        // only if current pet in slot
+        pet->SavePetToDB(mode);
 
-    ASSERT(m_petStable->CurrentPet && m_petStable->CurrentPet->PetNumber == pet->GetCharmInfo()->GetPetNumber());
-    if (mode == PET_SAVE_NOT_IN_SLOT)
-    {
-        m_petStable->UnslottedPets.push_back(std::move(*m_petStable->CurrentPet));
-        m_petStable->CurrentPet.reset();
-    }
-    else if (mode == PET_SAVE_AS_DELETED)
-        m_petStable->CurrentPet.reset();
-    // else if (stable slots) handled in opcode handlers due to required swaps
-    // else (current pet) doesnt need to do anything
+        ASSERT(m_petStable->CurrentPet && m_petStable->CurrentPet->PetNumber == pet->GetCharmInfo()->GetPetNumber());
+        if (mode == PET_SAVE_NOT_IN_SLOT)
+        {
+            m_petStable->UnslottedPets.push_back(std::move(*m_petStable->CurrentPet));
+            m_petStable->CurrentPet.reset();
+        }
+        else if (mode == PET_SAVE_AS_DELETED)
+            m_petStable->CurrentPet.reset();
+        // else if (stable slots) handled in opcode handlers due to required swaps
+        // else (current pet) doesnt need to do anything
 
-    SetMinion(pet, false);
+        SetMinion(pet, false);
 
-    pet->AddObjectToRemoveList();
-    pet->m_removed = true;
+        pet->AddObjectToRemoveList();
+        pet->m_removed = true;
 
-    if (pet->isControlled())
-    {
-        WorldPacket data(SMSG_PET_SPELLS, 8);
-        data << uint64(0);
-        GetSession()->SendPacket(&data);
+        if (pet->isControlled())
+        {
+            WorldPacket data(SMSG_PET_SPELLS, 8);
+            data << uint64(0);
+            GetSession()->SendPacket(&data);
 
-        if (GetGroup())
-            SetGroupUpdateFlag(GROUP_UPDATE_PET);
-    }
+            if (GetGroup())
+                SetGroupUpdateFlag(GROUP_UPDATE_PET);
+        }
 
-    if (NeedSendSpectatorData() && pet->GetCreatureTemplate()->family)
-    {
-        ArenaSpectator::SendCommand_UInt32Value(FindMap(), GetGUID(), "PHP", 0);
-        ArenaSpectator::SendCommand_UInt32Value(FindMap(), GetGUID(), "PET", 0);
+        if (NeedSendSpectatorData() && pet->GetCreatureTemplate()->family)
+        {
+            ArenaSpectator::SendCommand_UInt32Value(FindMap(), GetGUID(), "PHP", 0);
+            ArenaSpectator::SendCommand_UInt32Value(FindMap(), GetGUID(), "PET", 0);
+        }
     }
 }
 

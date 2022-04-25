@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_characters.item_refund_instance
+-- Dumpar struktur för tabell acore_characters.item_refund_instance
 DROP TABLE IF EXISTS `item_refund_instance`;
 CREATE TABLE IF NOT EXISTS `item_refund_instance` (
   `item_guid` INT unsigned NOT NULL COMMENT 'Item GUID',
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `item_refund_instance` (
   PRIMARY KEY (`item_guid`,`player_guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Item Refund System';
 
--- Дамп данных таблицы acore_characters.item_refund_instance: ~0 rows (приблизительно)
+-- Dumpar data för tabell acore_characters.item_refund_instance: ~0 rows (ungefär)
 DELETE FROM `item_refund_instance`;
 /*!40000 ALTER TABLE `item_refund_instance` DISABLE KEYS */;
 /*!40000 ALTER TABLE `item_refund_instance` ENABLE KEYS */;
