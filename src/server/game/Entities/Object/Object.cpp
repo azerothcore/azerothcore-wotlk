@@ -3017,7 +3017,7 @@ float WorldObject::GetMapHeight(float x, float y, float z, bool vmap/* = true*/,
     if (z != MAX_HEIGHT)
         z += std::max(GetCollisionHeight(), Z_OFFSET_FIND_HEIGHT);
 
-    return GetMap()->GetHeight(GetPhaseMask(), x, y, z, vmap);
+    return GetMap()->GetHeight(GetPhaseMask(), x, y, z, vmap, distanceToSearch);
 }
 
 float WorldObject::GetMapWaterOrGroundLevel(float x, float y, float z, float* ground/* = nullptr*/) const

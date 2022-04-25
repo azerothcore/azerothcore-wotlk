@@ -2003,7 +2003,7 @@ float Map::GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, fl
     if (const_cast<Map*>(this)->GetGrid(x, y))
     {
         // we need ground level (including grid height version) for proper return water level in point
-        float ground_z = GetHeight(phasemask, x, y, z, true);
+        float ground_z = GetHeight(phasemask, x, y, z + Z_OFFSET_FIND_HEIGHT, true, 50.0f);
         if (ground)
             *ground = ground_z;
 
@@ -2042,7 +2042,7 @@ Transport* Map::GetTransportForPos(uint32 phase, float x, float y, float z, Worl
                 float dist = 10.0f;
                 bool hit = staticTrans->m_model->intersectRay(r, dist, false, phase, VMAP::ModelIgnoreFlags::Nothing);
                 if (hit)
-                    if (GetHeight(phase, x, y, z, true) )
+                    if (GetHeight(phase, x, y, z, true, 30.0f) < (v.z - dist + 1.0f))
                         return staticTrans->ToTransport();
             }
 
@@ -2485,8 +2485,9 @@ bool Map::GetObjectHitPos(uint32 phasemask, float x1, float y1, float z1, float 
     return result;
 }
 
-float Map::GetHeight(uint32 phasemask, float x, float y, float z, bool vmap /*= true*/, float maxSearchDist /*= DEFAULT_HEIGHT_SEARCH*/, DynamicTreeCallback* dCallback /*= nullptr*/) const
+float Map::GetHeight(uint32 phasemask, float x, float y, float z, bool vmap /*= true*/, float maxSearchDist /*= DEFAULT_HEIGHT_SEARCH*/) const
 {
+    DynamicTreeCallback* dCallback = nullptr;
     if (!this)
     {
         return VMAP_INVALID_HEIGHT_VALUE;
