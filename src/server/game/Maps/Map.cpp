@@ -359,7 +359,7 @@ void Map::SwitchGridContainers(Creature* obj, bool on)
 
     LOG_DEBUG("maps", "Switch object {} from grid[{}, {}] {}", obj->GetGUID().ToString(), cell.GridX(), cell.GridY(), on);
     NGridType* ngrid = getNGrid(cell.GridX(), cell.GridY());
-    ASSERT(ngrid != nullptr);
+    ASSERT(ngrid);
 
     GridType& grid = ngrid->GetGridType(cell.CellX(), cell.CellY());
 
@@ -397,7 +397,7 @@ void Map::SwitchGridContainers(GameObject* obj, bool on)
 
     //LOG_DEBUG(LOG_FILTER_MAPS, "Switch object {} from grid[{}, {}] {}", obj->GetGUID().ToString(), cell.data.Part.grid_x, cell.data.Part.grid_y, on);
     NGridType* ngrid = getNGrid(cell.GridX(), cell.GridY());
-    ASSERT(ngrid != nullptr);
+    ASSERT(ngrid);
 
     GridType& grid = ngrid->GetGridType(cell.CellX(), cell.CellY());
 
@@ -471,7 +471,7 @@ bool Map::EnsureGridLoaded(const Cell& cell)
     EnsureGridCreated(GridCoord(cell.GridX(), cell.GridY()));
     NGridType* grid = getNGrid(cell.GridX(), cell.GridY());
 
-    ASSERT(grid != nullptr);
+    ASSERT(grid);
     if (!isGridObjectDataLoaded(cell.GridX(), cell.GridY()))
     {
         //if (!isGridObjectDataLoaded(cell.GridX(), cell.GridY()))
@@ -2257,9 +2257,9 @@ LiquidData const Map::GetLiquidData(uint32 phaseMask, float x, float y, float z,
         // Get position delta
         if (delta > collisionHeight)
             liquidData.Status = LIQUID_MAP_UNDER_WATER;
-        if (delta > 0.2f)
+        if (delta > 0.0f)
             liquidData.Status = LIQUID_MAP_IN_WATER;
-        if (delta > -0.2f)
+        if (delta > -0.1f)
             liquidData.Status = LIQUID_MAP_WATER_WALK;
         else
             liquidData.Status = LIQUID_MAP_ABOVE_WATER;
@@ -2406,9 +2406,9 @@ void Map::GetFullTerrainStatusForPosition(uint32 /*phaseMask*/, float x, float y
 
         if (delta > collisionHeight)
             data.liquidInfo.Status = LIQUID_MAP_UNDER_WATER;
-        else if (delta > 0.2f)
+        else if (delta > 0.0f)
             data.liquidInfo.Status = LIQUID_MAP_IN_WATER;
-        else if (delta > -0.2f)
+        else if (delta > -0.1f)
             data.liquidInfo.Status = LIQUID_MAP_WATER_WALK;
         else
             data.liquidInfo.Status = LIQUID_MAP_ABOVE_WATER;

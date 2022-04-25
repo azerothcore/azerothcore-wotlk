@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.spell_ranks
+-- Dumpar struktur för tabell acore_world.spell_ranks
 DROP TABLE IF EXISTS `spell_ranks`;
 CREATE TABLE IF NOT EXISTS `spell_ranks` (
   `first_spell_id` INT unsigned NOT NULL DEFAULT 0,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `spell_ranks` (
   UNIQUE KEY `spell_id` (`spell_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Spell Rank Data';
 
--- Дамп данных таблицы acore_world.spell_ranks: 3 502 rows
+-- Dumpar data för tabell acore_world.spell_ranks: 3 502 rows
 DELETE FROM `spell_ranks`;
 /*!40000 ALTER TABLE `spell_ranks` DISABLE KEYS */;
 INSERT INTO `spell_ranks` (`first_spell_id`, `spell_id`, `rank`) VALUES

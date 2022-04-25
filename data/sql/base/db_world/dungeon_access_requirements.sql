@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,21 +12,21 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.dungeon_access_requirements
+-- Dumpar struktur för tabell acore_world.dungeon_access_requirements
 DROP TABLE IF EXISTS `dungeon_access_requirements`;
 CREATE TABLE IF NOT EXISTS `dungeon_access_requirements` (
   `dungeon_access_id` TINYINT unsigned NOT NULL COMMENT 'ID from dungeon_access_template',
   `requirement_type` TINYINT unsigned NOT NULL COMMENT '0 = achiev, 1 = quest, 2 = item',
   `requirement_id` MEDIUMINT unsigned NOT NULL COMMENT 'Achiev/quest/item ID',
-  `requirement_note` varchar(255) DEFAULT NULL COMMENT 'Optional msg shown ingame to player if he cannot enter. You can add extra info',
-  `faction` TINYINT unsigned NOT NULL DEFAULT 2 COMMENT '0 = Alliance, 1 = Horde, 2 = Both factions',
+  `requirement_note` VARCHAR(255) DEFAULT NULL COMMENT 'Optional msg shown ingame to player if he cannot enter. You can add extra info',
+  `faction` TINYINT unsigned NOT NULL DEFAULT '2' COMMENT '0 = Alliance, 1 = Horde, 2 = Both factions',
   `priority` TINYINT unsigned DEFAULT NULL COMMENT 'Priority order for the requirement, sorted by type. 0 is the highest priority',
   `leader_only` TINYINT NOT NULL DEFAULT 0 COMMENT '0 = check the requirement for the player trying to enter, 1 = check the requirement for the party leader',
-  `comment` varchar(255) DEFAULT NULL,
+  `comment` VARCHAR(255) DEFAULT NULL,
   PRIMARY KEY (`dungeon_access_id`,`requirement_type`,`requirement_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Add (multiple) requirements before being able to enter a dungeon/raid';
 
--- Дамп данных таблицы acore_world.dungeon_access_requirements: 33 rows
+-- Dumpar data för tabell acore_world.dungeon_access_requirements: 33 rows
 DELETE FROM `dungeon_access_requirements`;
 /*!40000 ALTER TABLE `dungeon_access_requirements` DISABLE KEYS */;
 INSERT INTO `dungeon_access_requirements` (`dungeon_access_id`, `requirement_type`, `requirement_id`, `requirement_note`, `faction`, `priority`, `leader_only`, `comment`) VALUES
