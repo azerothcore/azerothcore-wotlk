@@ -2488,16 +2488,16 @@ bool Map::GetObjectHitPos(uint32 phasemask, float x1, float y1, float z1, float 
 float Map::GetHeight(uint32 phasemask, float x, float y, float z, bool vmap /*= true*/, float maxSearchDist /*= DEFAULT_HEIGHT_SEARCH*/) const
 {
     DynamicTreeCallback* dCallback = nullptr;
-    if (!this)
-    {
-        return VMAP_INVALID_HEIGHT_VALUE;
-    }
     float vmapZ = GetHeight(x, y, z, vmap, maxSearchDist);
     float goZ   = _dynamicTree.getHeight(x, y, z, maxSearchDist, phasemask, dCallback);
     if (vmapZ > goZ && dCallback)
     {
         dCallback->go = nullptr;
         return std::max<float>(vmapZ, goZ);
+    }
+    else
+    {
+        return VMAP_INVALID_HEIGHT_VALUE;
     }
 }
 
