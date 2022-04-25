@@ -3554,7 +3554,7 @@ void Creature::ModifyThreatPercentTemp(Unit* victim, int32 percent, Milliseconds
             getThreatMgr().modifyThreatPercent(victim, percent);
         }
 
-        TemporaryThreatModifierEvent* pEvent = new TemporaryThreatModifierEvent(*this, victim->GetGUID(), currentThreat, duration);
+        TemporaryThreatModifierEvent* pEvent = new TemporaryThreatModifierEvent(*this, victim->GetGUID(), currentThreat);
         m_Events.AddEvent(pEvent, m_Events.CalculateTime(duration.count()));
     }
 }

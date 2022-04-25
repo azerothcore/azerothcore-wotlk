@@ -499,14 +499,13 @@ private:
 class TemporaryThreatModifierEvent : public BasicEvent
 {
 public:
-    TemporaryThreatModifierEvent(Creature& owner, ObjectGuid threatVictimGUID, float threatValue, Milliseconds resetTimer) : BasicEvent(), m_owner(owner), m_threatVictimGUID(threatVictimGUID), m_threatValue(threatValue), m_resetTimer(resetTimer) { }
+    TemporaryThreatModifierEvent(Creature& owner, ObjectGuid threatVictimGUID, float threatValue) : BasicEvent(), m_owner(owner), m_threatVictimGUID(threatVictimGUID), m_threatValue(threatValue) { }
     bool Execute(uint64 e_time, uint32 p_time) override;
 
 private:
     Creature& m_owner;
     ObjectGuid m_threatVictimGUID;
     float m_threatValue;
-    Milliseconds const m_resetTimer;
 };
 
 #endif
