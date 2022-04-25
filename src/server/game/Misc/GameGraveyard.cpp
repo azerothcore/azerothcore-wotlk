@@ -36,7 +36,7 @@ void Graveyard::LoadGraveyardFromDB()
     QueryResult result = WorldDatabase.Query("SELECT ID, Map, x, y, z, Comment FROM game_graveyard");
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 graveyard. Table `game_graveyard` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 graveyard. Table `game_graveyard` is empty!");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -362,7 +362,7 @@ void Graveyard::LoadGraveyardZones()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 graveyard-zone links. DB table `graveyard_zone` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 graveyard-zone links. DB table `graveyard_zone` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -424,7 +424,7 @@ GraveyardStruct const* Graveyard::GetGraveyard(const std::string& name) const
     {
         if (itr->second.wnameLow == wname)
             return &itr->second;
-        else if (alt == nullptr && itr->second.wnameLow.find(wname) != std::wstring::npos)
+        else if (!alt && itr->second.wnameLow.find(wname) != std::wstring::npos)
             alt = &itr->second;
     }
 

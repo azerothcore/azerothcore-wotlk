@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,18 +12,18 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_characters.updates
+-- Dumpar struktur för tabell acore_characters.updates
 DROP TABLE IF EXISTS `updates`;
 CREATE TABLE IF NOT EXISTS `updates` (
-  `name` varchar(200) NOT NULL COMMENT 'filename with extension of the update.',
+  `name` VARCHAR(200) NOT NULL COMMENT 'filename with extension of the update.',
   `hash` char(40) DEFAULT '' COMMENT 'sha1 hash of the sql file.',
   `state` enum('RELEASED','CUSTOM','MODULE','ARCHIVED') NOT NULL DEFAULT 'RELEASED' COMMENT 'defines if an update is released or archived.',
-  `timestamp` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'timestamp when the query was applied.',
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'timestamp when the query was applied.',
   `speed` INT unsigned NOT NULL DEFAULT 0 COMMENT 'time the query takes to apply in ms.',
   PRIMARY KEY (`name`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='List of all applied updates in this database.';
 
--- Дамп данных таблицы acore_characters.updates: 44 rows
+-- Dumpar data för tabell acore_characters.updates: 49 rows
 DELETE FROM `updates`;
 /*!40000 ALTER TABLE `updates` DISABLE KEYS */;
 INSERT INTO `updates` (`name`, `hash`, `state`, `timestamp`, `speed`) VALUES
@@ -70,7 +70,12 @@ INSERT INTO `updates` (`name`, `hash`, `state`, `timestamp`, `speed`) VALUES
 	('2021_10_14_01_characters.sql', 'D34A3947055382A390A134D91DD68903CA5FA7C4', 'ARCHIVED', '2022-01-21 23:39:14', 21),
 	('2021_11_06_00.sql', 'B36ED498D42A54BC818B6027AB1F92A7ACD0DA25', 'ARCHIVED', '2022-01-21 23:39:14', 70),
 	('2021_12_26_00.sql', '089B77AAA7C676D7850070C1C05644CC50EC7F36', 'ARCHIVED', '2022-01-21 23:39:14', 46),
-	('2021_12_26_01.sql', '22C450827DB8E89AF4B0F6B23B3D829B96F69B6A', 'ARCHIVED', '2022-01-21 23:39:14', 54);
+	('2021_12_26_01.sql', '22C450827DB8E89AF4B0F6B23B3D829B96F69B6A', 'ARCHIVED', '2022-01-21 23:39:14', 54),
+	('2022_01_25_00.sql', '784BA8C193B91B471A6E6B8C4D5BCA5850AB883A', 'ARCHIVED', '2022-04-24 15:20:00', 51),
+	('2022_01_29_00.sql', '1EADA7852AC70F49E8EA0030CC5FA087075F9DD4', 'ARCHIVED', '2022-04-24 15:20:00', 40),
+	('2022_02_16_00.sql', '60440F15D2DD99B7327FD5BB77E03B44B29768EE', 'ARCHIVED', '2022-04-24 15:20:00', 33),
+	('2022_03_01_00.sql', 'CB1DF259CAF17989F36DC7E24DFA7B08F86AE6FD', 'ARCHIVED', '2022-04-24 15:20:00', 61),
+	('2022_04_19_00.sql', '5D7010FF56BC3BDFF19BEEDCE394471F768763FE', 'ARCHIVED', '2022-04-24 15:20:00', 62);
 /*!40000 ALTER TABLE `updates` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

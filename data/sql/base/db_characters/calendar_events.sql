@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,22 +12,22 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_characters.calendar_events
+-- Dumpar struktur för tabell acore_characters.calendar_events
 DROP TABLE IF EXISTS `calendar_events`;
 CREATE TABLE IF NOT EXISTS `calendar_events` (
   `id` BIGINT unsigned NOT NULL DEFAULT 0,
   `creator` INT unsigned NOT NULL DEFAULT 0,
-  `title` varchar(255) NOT NULL DEFAULT '',
-  `description` varchar(255) NOT NULL DEFAULT '',
-  `type` TINYINT unsigned NOT NULL DEFAULT 4,
-  `dungeon` INT NOT NULL DEFAULT -1,
+  `title` VARCHAR(255) NOT NULL DEFAULT '',
+  `description` VARCHAR(255) NOT NULL DEFAULT '',
+  `type` TINYINT unsigned NOT NULL DEFAULT '4',
+  `dungeon` INT NOT NULL DEFAULT '-1',
   `eventtime` INT unsigned NOT NULL DEFAULT 0,
   `flags` INT unsigned NOT NULL DEFAULT 0,
   `time2` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_characters.calendar_events: ~0 rows (приблизительно)
+-- Dumpar data för tabell acore_characters.calendar_events: ~0 rows (ungefär)
 DELETE FROM `calendar_events`;
 /*!40000 ALTER TABLE `calendar_events` DISABLE KEYS */;
 /*!40000 ALTER TABLE `calendar_events` ENABLE KEYS */;

@@ -76,10 +76,10 @@ public:
             events.ScheduleEvent(EVENT_KNOCK_AWAY, urand(12000, 18000));
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             instance->SetBossState(DATA_WARCHIEF_REND_BLACKHAND, FAIL);
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
         }
 
         void IsSummonedBy(Unit* /*summoner*/) override

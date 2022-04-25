@@ -55,7 +55,7 @@ void TransportMgr::LoadTransportTemplates()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 transport templates. DB table `gameobject_template` has no transports!");
+        LOG_WARN("server.loading", ">> Loaded 0 transport templates. DB table `gameobject_template` has no transports!");
         return;
     }
 
@@ -66,7 +66,7 @@ void TransportMgr::LoadTransportTemplates()
         Field* fields = result->Fetch();
         uint32 entry = fields[0].Get<uint32>();
         GameObjectTemplate const* goInfo = sObjectMgr->GetGameObjectTemplate(entry);
-        if (goInfo == nullptr)
+        if (!goInfo)
         {
             LOG_ERROR("entities.transport", "Transport {} has no associated GameObjectTemplate from `gameobject_template` , skipped.", entry);
             continue;

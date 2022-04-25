@@ -1,0 +1,32 @@
+-- DB update 2022_02_04_07 -> 2022_02_04_08
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_02_04_07';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_02_04_07 2022_02_04_08 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1643467900848391119'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1643467900848391119');
+
+-- missed dialogue page text for npc Old Orok "How can I help you, $c?"
+DELETE FROM `gossip_menu` WHERE `MenuID` = 9856 AND `TextID` = 10887;
+INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
+(9856, 10887);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_02_04_08' WHERE sql_rev = '1643467900848391119';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

@@ -100,7 +100,7 @@ public:
             instance->SetData(DATA_KIRTONOS_THE_HERALD, DONE);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             instance->SetData(DATA_KIRTONOS_THE_HERALD, FAIL);
             me->DespawnOrUnsummon(1);
@@ -112,9 +112,9 @@ public:
             events2.ScheduleEvent(INTRO_1, 1000);
             me->SetDisableGravity(true);
             me->SetReactState(REACT_PASSIVE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC); // for some reason he aggroes if we don't have this.
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC); // might not be needed, but guardians and stuff like that could mess up.
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC); // for some reason he aggroes if we don't have this.
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC); // might not be needed, but guardians and stuff like that could mess up.
         }
 
         void MovementInform(uint32 type, uint32 id) override
@@ -153,9 +153,9 @@ public:
                 case INTRO_5:
                     me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
                     me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(WEAPON_KIRTONOS_STAFF));
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
                     me->SetReactState(REACT_AGGRESSIVE);
                     break;
                 case INTRO_6:

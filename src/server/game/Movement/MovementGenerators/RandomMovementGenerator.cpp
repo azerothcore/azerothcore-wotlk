@@ -165,7 +165,8 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
                         return;
                     }
 
-                    if (!map->isInLineOfSight((*itr).x, (*itr).y, (*itr).z + 2.f, (*itrNext).x, (*itrNext).y, (*itrNext).z + 2.f, creature->GetPhaseMask(), LINEOFSIGHT_ALL_CHECKS))
+                    if (!map->isInLineOfSight((*itr).x, (*itr).y, (*itr).z + 2.f, (*itrNext).x, (*itrNext).y, (*itrNext).z + 2.f, creature->GetPhaseMask(),
+                        LINEOFSIGHT_ALL_CHECKS, VMAP::ModelIgnoreFlags::Nothing))
                     {
                         _validPointsVector[_currentPoint].erase(randomIter);
                         _preComputedPaths.erase(pathIdx);
@@ -280,7 +281,7 @@ bool RandomMovementGenerator<Creature>::DoUpdate(Creature* creature, const uint3
     }
 
     // xinef: if we got disable move flag, do not remove default generator - just prevent movement
-    if (creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
+    if (creature->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
     {
         _nextMoveTime.Reset(0);  // Expire the timer
         creature->ClearUnitState(UNIT_STATE_ROAMING_MOVE);

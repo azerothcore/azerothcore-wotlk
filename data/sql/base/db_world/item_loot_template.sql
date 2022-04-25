@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,23 +12,23 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.item_loot_template
+-- Dumpar struktur för tabell acore_world.item_loot_template
 DROP TABLE IF EXISTS `item_loot_template`;
 CREATE TABLE IF NOT EXISTS `item_loot_template` (
   `Entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `Item` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `Reference` MEDIUMINT NOT NULL DEFAULT 0,
-  `Chance` float NOT NULL DEFAULT 100,
+  `Chance` float NOT NULL DEFAULT '100',
   `QuestRequired` TINYINT NOT NULL DEFAULT 0,
   `LootMode` SMALLINT unsigned NOT NULL DEFAULT 1,
   `GroupId` TINYINT unsigned NOT NULL DEFAULT 0,
   `MinCount` TINYINT unsigned NOT NULL DEFAULT 1,
   `MaxCount` TINYINT unsigned NOT NULL DEFAULT 1,
-  `Comment` varchar(255) DEFAULT NULL,
+  `Comment` VARCHAR(255) DEFAULT NULL,
   PRIMARY KEY (`Entry`,`Item`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Loot System';
 
--- Дамп данных таблицы acore_world.item_loot_template: 4 983 rows
+-- Dumpar data för tabell acore_world.item_loot_template: 4 986 rows
 DELETE FROM `item_loot_template`;
 /*!40000 ALTER TABLE `item_loot_template` DISABLE KEYS */;
 INSERT INTO `item_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
@@ -4974,10 +4974,10 @@ INSERT INTO `item_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Quest
 	(54536, 49426, 0, 100, 0, 1, 0, 2, 2, 'Satchel of Chilled Goods - Emblem of Frost'),
 	(54536, 53641, 0, 3, 0, 1, 1, 1, 1, 'Satchel of Chilled Goods - Ice Chip'),
 	(54536, 54806, 0, 1.4, 0, 1, 0, 1, 1, 'Satchel of Chilled Goods - Frostscythe of Lord Ahune'),
-	(54537, 1, 50011, 15, 0, 1, 0, 1, 1, 'Heart-Shaped Box - (ReferenceTable)'),
-	(54537, 49426, 0, 100, 0, 1, 0, 2, 2, 'Heart-Shaped Box - Emblem of Frost'),
-	(54537, 49927, 0, 100, 0, 1, 0, 5, 10, 'Heart-Shaped Box - Love Token'),
-	(54537, 50250, 0, 0.1, 0, 1, 0, 1, 1, 'Heart-Shaped Box - Big Love Rocket'),
+	(54537, 50446, 0, 6, 0, 1, 0, 1, 1, 'Toxic Wasteling'),
+	(54537, 49715, 0, 6, 0, 1, 0, 1, 1, 'Forever-Lovely Rose'),
+	(54537, 49927, 0, 100, 0, 1, 0, 5, 10, 'Love Token'),
+	(54537, 1, 50010, 20, 0, 1, 0, 1, 1, 'Necklaces'),
 	(20766, 3608, 0, 0.24, 0, 1, 4, 1, 1, 'Slimy Bag - Plans: Mighty Iron Hammer'),
 	(20766, 5774, 0, 0.24, 0, 1, 4, 1, 1, 'Slimy Bag - Pattern: Green Silk Pack'),
 	(20766, 11167, 0, 0.24, 0, 1, 4, 1, 1, 'Slimy Bag - Formula: Enchant Boots - Lesser Spirit'),
@@ -5014,7 +5014,10 @@ INSERT INTO `item_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Quest
 	(20768, 14484, 0, 0.07, 0, 1, 4, 1, 1, 'Oozing Bag - Pattern: Brightcloth Cloak'),
 	(20768, 14494, 0, 0.07, 0, 1, 4, 1, 1, 'Oozing Bag - Pattern: Brightcloth Pants'),
 	(20768, 14508, 0, 0.07, 0, 1, 4, 1, 1, 'Oozing Bag - Pattern: Felcloth Shoulders'),
-	(9265, 9361, 0, 8, 0, 1, 0, 1, 1, 'Cuergo\'s Hidden Treasure - Cuergo\'s Gold with worm');
+	(9265, 9361, 0, 8, 0, 1, 0, 1, 1, 'Cuergo\'s Hidden Treasure - Cuergo\'s Gold with worm'),
+	(54537, 50741, 0, 6, 0, 1, 0, 1, 1, 'Vile Fumigator\'s Mask'),
+	(54537, 50471, 0, 1.1, 0, 1, 0, 1, 1, 'The Heartbreaker'),
+	(54537, 50250, 0, 0.03, 0, 1, 0, 1, 1, 'Big Love Rocket');
 /*!40000 ALTER TABLE `item_loot_template` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

@@ -308,7 +308,7 @@ void ReadLiquidTypeTableDBC()
 
 // Map file format data
 static char const* MAP_MAGIC         = "MAPS";
-static uint32 const MAP_VERSION_MAGIC = 8;
+static uint32 const MAP_VERSION_MAGIC = 9;
 static char const* MAP_AREA_MAGIC    = "AREA";
 static char const* MAP_HEIGHT_MAGIC  = "MHGT";
 static char const* MAP_LIQUID_MAGIC  = "MLIQ";
@@ -841,7 +841,14 @@ bool ConvertADT(std::string const& inputPath, std::string const& outputPath, int
                     if (minHeight > h) minHeight = h;
                 }
                 else
+                {
                     liquid_height[y][x] = CONF_use_minHeight;
+
+                    if (minHeight > CONF_use_minHeight)
+                    {
+                        minHeight = CONF_use_minHeight;
+                    }
+                }
             }
         }
         map.liquidMapOffset = map.heightMapOffset + map.heightMapSize;
@@ -1097,7 +1104,7 @@ void ExtractCameraFiles(int locale, bool basicLocale)
     std::vector<std::string> camerafiles;
     size_t cam_count = camdbc.getRecordCount();
 
-    for (uint32 i = 0; i < cam_count; ++i)
+    for (size_t i = 0; i < cam_count; ++i)
     {
         std::string camFile(camdbc.getRecord(i).getString(1));
         size_t loc = camFile.find(".mdx");

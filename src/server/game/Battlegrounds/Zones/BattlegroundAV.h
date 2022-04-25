@@ -21,10 +21,6 @@
 #include "Battleground.h"
 #include "BattlegroundScore.h"
 
-#define LANG_BG_AV_A_CAPTAIN_BUFF       "Begone. Uncouth scum! The Alliance shall prevail in Alterac Valley!"
-#define LANG_BG_AV_H_CAPTAIN_BUFF       "Now is the time to attack! For the Horde!"
-#define LANG_BG_AV_S_MINE_BOSS_CLAIMS   "Snivvle is here! Snivvle claims the Coldtooth Mine!"
-
 #define BG_AV_CAPTIME                    240000  //4:00
 #define BG_AV_SNOWFALL_FIRSTCAP          300000  //5:00 but i also have seen 4:05
 
@@ -662,7 +658,10 @@ enum BG_AV_CreaturePlace
     AV_CPLACE_TRIGGER18       = 319,
     AV_CPLACE_TRIGGER19       = 320,
 
-    AV_CPLACE_MAX = 321
+    AV_CPLACE_MAX             = 321,
+
+    AV_CPLACE_A_BOSS          = 381,
+    AV_CPLACE_H_BOSS          = 443
 };
 
 //x, y, z, o

@@ -125,7 +125,7 @@ void BattlegroundRV::PostUpdateImpl(uint32 diff)
                     uint32 objects[2] = { BG_RV_OBJECT_ELEVATOR_1, BG_RV_OBJECT_ELEVATOR_2 };
                     for (uint8 i = 0; i < 2; ++i)
                         if (GameObject* go = GetBGObject(objects[i]))
-                            go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_TRANSPORT);
+                            go->RemoveGameObjectFlag(GO_FLAG_TRANSPORT);
                 }
                 break;
             }
