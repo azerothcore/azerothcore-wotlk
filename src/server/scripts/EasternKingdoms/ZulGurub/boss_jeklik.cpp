@@ -120,7 +120,7 @@ public:
             Talk(SAY_AGGRO);
             me->RemoveAurasDueToSpell(SPELL_GREEN_CHANNELING);
             me->SetDisableGravity(true);
-            DoCast(me, SPELL_BAT_FORM);
+            DoCastSelf(SPELL_BAT_FORM);
             events.SetPhase(PHASE_ONE);
 
             events.ScheduleEvent(EVENT_CHARGE_JEKLIK, urand(10000, 20000), PHASE_ONE);
@@ -200,7 +200,7 @@ public:
                         break;
                     //Phase two
                     case EVENT_CURSE_OF_BLOOD:
-                        DoCast(me, SPELL_CURSE_OF_BLOOD);
+                        DoCastSelf(SPELL_CURSE_OF_BLOOD);
                         events.ScheduleEvent(EVENT_CURSE_OF_BLOOD, urand(25000, 30000), PHASE_TWO);
                         break;
                     case EVENT_PSYCHIC_SCREAM:
@@ -208,8 +208,7 @@ public:
                         events.ScheduleEvent(EVENT_PSYCHIC_SCREAM, urand(35000, 45000), PHASE_TWO);
                         break;
                     case EVENT_SHADOW_WORD_PAIN:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                            DoCast(target, SPELL_SHADOW_WORD_PAIN);
+                        DoCastRandomTarget(SPELL_SHADOW_WORD_PAIN, 0, true);
                         events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, urand(12000, 18000), PHASE_TWO);
                         break;
                     case EVENT_MIND_FLAY:
@@ -219,7 +218,7 @@ public:
                     case EVENT_GREATER_HEAL:
                         Talk(EMOTE_GREAT_HEAL);
                         me->InterruptNonMeleeSpells(false);
-                        DoCast(me, SPELL_GREATER_HEAL);
+                        DoCastSelf(SPELL_GREATER_HEAL);
                         events.ScheduleEvent(EVENT_GREATER_HEAL, 25000, PHASE_TWO);
                         break;
                     case EVENT_SPAWN_FLYING_BATS:
