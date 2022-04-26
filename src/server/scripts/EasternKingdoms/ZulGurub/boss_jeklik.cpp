@@ -104,7 +104,7 @@ public:
 
         void Reset() override
         {
-            DoCast(me, SPELL_GREEN_CHANNELING);
+            DoCastSelf(SPELL_GREEN_CHANNELING);
             _Reset();
         }
 
