@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,16 +12,16 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.gameobject_template
+-- Dumpar struktur för tabell acore_world.gameobject_template
 DROP TABLE IF EXISTS `gameobject_template`;
 CREATE TABLE IF NOT EXISTS `gameobject_template` (
   `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `type` TINYINT unsigned NOT NULL DEFAULT 0,
   `displayId` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `name` varchar(100) NOT NULL DEFAULT '',
-  `IconName` varchar(100) NOT NULL DEFAULT '',
-  `castBarCaption` varchar(100) NOT NULL DEFAULT '',
-  `unk1` varchar(100) NOT NULL DEFAULT '',
+  `name` VARCHAR(100) NOT NULL DEFAULT '',
+  `IconName` VARCHAR(100) NOT NULL DEFAULT '',
+  `castBarCaption` VARCHAR(100) NOT NULL DEFAULT '',
+  `unk1` VARCHAR(100) NOT NULL DEFAULT '',
   `size` float NOT NULL DEFAULT 1,
   `Data0` INT unsigned NOT NULL DEFAULT 0,
   `Data1` INT NOT NULL DEFAULT 0,
@@ -48,13 +48,13 @@ CREATE TABLE IF NOT EXISTS `gameobject_template` (
   `Data22` INT unsigned NOT NULL DEFAULT 0,
   `Data23` INT unsigned NOT NULL DEFAULT 0,
   `AIName` char(64) NOT NULL DEFAULT '',
-  `ScriptName` varchar(64) NOT NULL DEFAULT '',
+  `ScriptName` VARCHAR(64) NOT NULL DEFAULT '',
   `VerifiedBuild` SMALLINT DEFAULT 0,
   PRIMARY KEY (`entry`),
   KEY `idx_name` (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Gameobject System';
 
--- Дамп данных таблицы acore_world.gameobject_template: 21 579 rows
+-- Dumpar data för tabell acore_world.gameobject_template: 21 579 rows
 DELETE FROM `gameobject_template`;
 /*!40000 ALTER TABLE `gameobject_template` DISABLE KEYS */;
 INSERT INTO `gameobject_template` (`entry`, `type`, `displayId`, `name`, `IconName`, `castBarCaption`, `unk1`, `size`, `Data0`, `Data1`, `Data2`, `Data3`, `Data4`, `Data5`, `Data6`, `Data7`, `Data8`, `Data9`, `Data10`, `Data11`, `Data12`, `Data13`, `Data14`, `Data15`, `Data16`, `Data17`, `Data18`, `Data19`, `Data20`, `Data21`, `Data22`, `Data23`, `AIName`, `ScriptName`, `VerifiedBuild`) VALUES
@@ -1993,7 +1993,7 @@ INSERT INTO `gameobject_template` (`entry`, `type`, `displayId`, `name`, `IconNa
 	(19548, 13, 621, 'Eye of Azora', '', '', '', 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 12340),
 	(19549, 8, 367, 'Shadowglen Moonwell', '', '', '', 2.49, 11, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 11723),
 	(19550, 8, 433, 'Starbreeze Moonwell', '', '', '', 1.76, 12, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 12340),
-	(19551, 8, 434, 'Pools of Arlithrien Moonwell', '', '', '', 1.55, 13, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 12340),
+	(19551, 8, 434, 'Pools of Arlithrien Moonwell', '', '', '', 1.55, 13, 13, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 12340),
 	(19552, 8, 435, 'Oracle Glade Moonwell', '', '', '', 1.67, 14, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 11723),
 	(19553, 5, 22, 'Greatwood Vale', '', '', '', 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 12340),
 	(19554, 5, 22, 'Stonetalon Peak', '', '', '', 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 12340),
@@ -3271,7 +3271,7 @@ INSERT INTO `gameobject_template` (`entry`, `type`, `displayId`, `name`, `IconNa
 	(31409, 8, 200, 'Raging Bonfire', '', '', '', 1.04, 4, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 'go_heat', 12340),
 	(31410, 8, 200, 'Bonfire', '', '', '', 1.18, 4, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 'go_heat', 12340),
 	(31411, 8, 200, 'Raging Bonfire', '', '', '', 1.02, 4, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 'go_heat', 12340),
-	(31442, 6, 299, 'Basic Campfire', '', '', '', 1, 0, 0, 10, 7353, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 11723),
+	(31442, 6, 299, 'Basic Campfire', '', '', '', 1, 0, 0, 10, 7353, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 11723),
 	(31504, 7, 39, 'Wooden Chair', '', '', '', 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 12340),
 	(31505, 7, 39, 'Wooden Chair', '', '', '', 1, 1, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', -18019),
 	(31506, 7, 39, 'Wooden Chair', '', '', '', 1, 1, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', -18019),
@@ -9615,10 +9615,10 @@ INSERT INTO `gameobject_template` (`entry`, `type`, `displayId`, `name`, `IconNa
 	(179516, 3, 41, 'Fengus\'s Chest', '', '', '', 2, 43, 16523, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 11723),
 	(179517, 2, 1387, 'Treasure of the Shen\'dralar', '', '', '', 1, 43, 6418, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 11723),
 	(179524, 5, 327, 'Generic Target', '', '', '', 1, 0, 1, 1, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', -18019),
-	(179526, 3, 391, 'Warpwood Pod', '', '', '', 1, 0, 0, 0, 1, 0, 0, 0, 179527, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'SmartGameObjectAI', '', 12340),
+	(179526, 3, 391, 'Warpwood Pod', '', '', '', 1, 0, 0, 0, 1, 0, 0, 0, 179527, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 12340),
 	(179528, 3, 391, 'Warpwood Pod', '', '', '', 1, 57, 16548, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 12340),
-	(179532, 3, 391, 'Warpwood Pod', '', '', '', 1, 0, 0, 0, 1, 0, 0, 0, 179530, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'SmartGameObjectAI', '', 12340),
-	(179533, 3, 391, 'Warpwood Pod', '', '', '', 1, 0, 0, 0, 1, 0, 0, 0, 179531, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'SmartGameObjectAI', '', 12340),
+	(179532, 3, 391, 'Warpwood Pod', '', '', '', 1, 0, 0, 0, 1, 0, 0, 0, 179530, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 12340),
+	(179533, 3, 391, 'Warpwood Pod', '', '', '', 1, 0, 0, 0, 1, 0, 0, 0, 179531, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 12340),
 	(179544, 2, 5733, 'Skeletal Remains of Kariel Winthalus', '', '', '', 1.5, 0, 0, 0, 5743, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'SmartGameObjectAI', '', 11723),
 	(179545, 3, 10, 'The Prince\'s Chest', '', '', '', 1, 43, 16569, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'SmartGameObjectAI', '', 12340),
 	(179547, 3, 4431, 'A Dusty Tome', '', '', '', 1.5, 93, 16563, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 11403),
@@ -10461,7 +10461,7 @@ INSERT INTO `gameobject_template` (`entry`, `type`, `displayId`, `name`, `IconNa
 	(181080, 7, 39, 'Angela\'s Chair', '', '', '', 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 12340),
 	(181081, 5, 222, 'Map of the Eastern Plaguelands', '', '', '', 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 12340),
 	(181082, 5, 240, 'Candelabra', '', '', '', 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 12340),
-	(181083, 3, 10, 'Sothos and Jarien\'s Heirlooms', '', '', '', 1, 57, 17919, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 1),
+	(181083, 3, 10, 'Sothos and Jarien\'s Heirlooms', '', '', '', 1, 57, 17919, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 1),
 	(181085, 3, 6448, 'Stratholme Supply Crate', '', '', '', 1, 93, 17899, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 12340),
 	(181086, 5, 6655, 'Valentine Arch', '', '', '', 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 1),
 	(181087, 5, 6642, 'Plant', '', '', '', 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 1),
@@ -21472,8 +21472,8 @@ INSERT INTO `gameobject_template` (`entry`, `type`, `displayId`, `name`, `IconNa
 	(202931, 5, 9463, 'Serpent Offering', '', '', '', 0.17, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 12340),
 	(202932, 5, 7954, 'Totem Offering', '', '', '', 0.07, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 12340),
 	(202933, 5, 2570, 'Sacred Fire Offering', '', '', '', 0.2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 12340),
-	(202947, 3, 9467, 'Cologne Neutralizer', '', '', '', 1, 93, 28677, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 15211),
-	(202948, 3, 9468, 'Perfume Neutralizer', '', '', '', 1, 93, 28678, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 15211),
+	(202947, 3, 9467, 'Cologne Neutralizer', '', '', '', 2, 93, 28677, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 15211),
+	(202948, 3, 9468, 'Perfume Neutralizer', '', '', '', 2, 93, 28678, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 15211),
 	(203003, 10, 7398, 'Red Dragon Egg', '', '', '', 1.5, 0, 0, 0, 3000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 12340),
 	(203004, 10, 9483, 'Broken Red Dragon Egg', '', '', '', 1.5, 0, 0, 0, 3000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 12340),
 	(203005, 0, 9484, 'Fire Field', '', '', '', 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 12340),
@@ -21575,9 +21575,9 @@ INSERT INTO `gameobject_template` (`entry`, `type`, `displayId`, `name`, `IconNa
 	(178644, 6, 0, 'Ryson\'s All Seeing Eye Trap', '', '', '', 1, 95, 200, 0, 21546, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', -18019),
 	(178673, 6, 5752, 'Consuming Flames Trap', '', '', '', 1.2, 95, 60, 20, 21650, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', -18019),
 	(178963, 6, 2770, 'Incantion of Celebras Trap', '', '', '', 1, 0, 0, 0, 21917, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', -18019),
-	(179527, 6, 391, 'Warpwood Pod - Root', '', '', '', 0.75, 0, 0, 10, 22800, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', -18019),
-	(179530, 6, 391, 'Warpwood Pod - Spore', '', '', '', 0.75, 0, 0, 10, 22821, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', -18019),
-	(179531, 6, 391, 'Warpwood Pod - Summon', '', '', '', 0.75, 0, 0, 10, 22803, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', -18019),
+	(179527, 6, 391, 'Warpwood Pod - Root', '', '', '', 0.75, 0, 0, 10, 22800, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'SmartGameObjectAI', '', -18019),
+	(179530, 6, 391, 'Warpwood Pod - Spore', '', '', '', 0.75, 0, 0, 10, 22821, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'SmartGameObjectAI', '', -18019),
+	(179531, 6, 391, 'Warpwood Pod - Summon', '', '', '', 0.75, 0, 0, 10, 22803, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'SmartGameObjectAI', '', -18019),
 	(180525, 6, 6424, 'Tonk Control Console Trap', '', '', '', 1, 0, 0, 0, 24935, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', -18019),
 	(181214, 6, 327, 'Necropolis critter spawner', '', '', '', 1, 0, 0, 0, 27866, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', -18019),
 	(181290, 6, 0, 'Midsummer Bonfire Spawn Trap', '', '', '', 1, 0, 0, 0, 28784, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0),

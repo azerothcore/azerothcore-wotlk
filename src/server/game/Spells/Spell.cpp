@@ -1683,7 +1683,7 @@ void Spell::SelectImplicitTrajTargets(SpellEffIndex effIndex, SpellImplicitTarge
     if (a > -0.0001f)
         a = 0;
 
-    LOG_ERROR("spells", "Spell::SelectTrajTargets: a {} b {}", a, b);
+    LOG_DEBUG("spells", "Spell::SelectTrajTargets: a {} b {}", a, b);
 
     // Xinef: hack for distance, many trajectory spells have RangeEntry 1 (self)
     float bestDist = m_spellInfo->GetMaxRange(false) * 2;
@@ -6036,6 +6036,8 @@ SpellCastResult Spell::CheckCast(bool strict)
                         if (m_pathFinder->GetPathType() & (PATHFIND_NOPATH | PATHFIND_INCOMPLETE) || target->GetExactDistSq(endPos.x, endPos.y, endPos.z) > maxdist * maxdist || m_pathFinder->getPathLength() > (40.0f + (m_caster->HasAura(58097) ? 5.0f : 0.0f)))
                             return SPELL_FAILED_NOPATH;
                     }
+                    if (Player* player = m_caster->ToPlayer())
+                        player->SetCanTeleport(true);
                     break;
                 }
             case SPELL_EFFECT_SKINNING:

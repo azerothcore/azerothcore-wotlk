@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.spell_linked_spell
+-- Dumpar struktur för tabell acore_world.spell_linked_spell
 DROP TABLE IF EXISTS `spell_linked_spell`;
 CREATE TABLE IF NOT EXISTS `spell_linked_spell` (
   `spell_trigger` MEDIUMINT NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `spell_linked_spell` (
   UNIQUE KEY `trigger_effect_type` (`spell_trigger`,`spell_effect`,`type`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Spell System';
 
--- Дамп данных таблицы acore_world.spell_linked_spell: 569 rows
+-- Dumpar data för tabell acore_world.spell_linked_spell: 573 rows
 DELETE FROM `spell_linked_spell`;
 /*!40000 ALTER TABLE `spell_linked_spell` DISABLE KEYS */;
 INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comment`) VALUES
@@ -594,7 +594,11 @@ INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comm
 	(17500, 17499, 0, 'Malown\'s Slam - trigger Surge of Strenght'),
 	(58984, 59646, 0, 'Shadowmeld: Sanctuary'),
 	(58984, 62196, 0, 'Shadowmeld: Force deselect'),
-	(20482, 20483, 1, 'Firesworn Eruption Trigger - On Hit - Trigger Massive Eruption');
+	(20482, 20483, 1, 'Firesworn Eruption Trigger - On Hit - Trigger Massive Eruption'),
+	(65917, 66122, 0, 'Magic Rooster'),
+	(23414, -1856, 2, 'Nefarian Rogue class call - Vanish'),
+	(23414, -1857, 2, 'Nefarian Rogue class call - Vanish'),
+	(23414, -26889, 2, 'Nefarian Rogue class call - Vanish');
 /*!40000 ALTER TABLE `spell_linked_spell` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

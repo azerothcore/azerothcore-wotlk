@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,17 +12,17 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.graveyard_zone
+-- Dumpar struktur för tabell acore_world.graveyard_zone
 DROP TABLE IF EXISTS `graveyard_zone`;
 CREATE TABLE IF NOT EXISTS `graveyard_zone` (
   `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `GhostZone` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `Faction` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `Comment` text DEFAULT NULL,
+  `Comment` text,
   PRIMARY KEY (`ID`,`GhostZone`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Trigger System';
 
--- Дамп данных таблицы acore_world.graveyard_zone: 704 rows
+-- Dumpar data för tabell acore_world.graveyard_zone: 704 rows
 DELETE FROM `graveyard_zone`;
 /*!40000 ALTER TABLE `graveyard_zone` DISABLE KEYS */;
 INSERT INTO `graveyard_zone` (`ID`, `GhostZone`, `Faction`, `Comment`) VALUES

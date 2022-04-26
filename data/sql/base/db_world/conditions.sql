@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.conditions
+-- Dumpar struktur för tabell acore_world.conditions
 DROP TABLE IF EXISTS `conditions`;
 CREATE TABLE IF NOT EXISTS `conditions` (
   `SourceTypeOrReferenceId` MEDIUMINT NOT NULL DEFAULT 0,
@@ -29,11 +29,11 @@ CREATE TABLE IF NOT EXISTS `conditions` (
   `ErrorType` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `ErrorTextId` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `ScriptName` char(64) NOT NULL DEFAULT '',
-  `Comment` varchar(255) DEFAULT NULL,
+  `Comment` VARCHAR(255) DEFAULT NULL,
   PRIMARY KEY (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,`SourceId`,`ElseGroup`,`ConditionTypeOrReference`,`ConditionTarget`,`ConditionValue1`,`ConditionValue2`,`ConditionValue3`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Condition System';
 
--- Дамп данных таблицы acore_world.conditions: 14 591 rows
+-- Dumpar data för tabell acore_world.conditions: 14 672 rows
 DELETE FROM `conditions`;
 /*!40000 ALTER TABLE `conditions` DISABLE KEYS */;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
@@ -7656,7 +7656,7 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 	(14, 4801, 4438, 0, 0, 15, 0, 16, 0, 0, 0, 0, 0, '', 'Show gossip text if player is a Priest'),
 	(14, 4823, 5877, 0, 0, 15, 0, 1407, 0, 0, 0, 0, 0, '', 'Show gossip text if player is not a Mage'),
 	(14, 4823, 5878, 0, 0, 15, 0, 128, 0, 0, 0, 0, 0, '', 'Show gossip text if player is a Mage'),
-	(14, 4825, 5881, 0, 0, 15, 0, 128, 0, 0, 0, 0, 0, '', 'Show gossip text if player is a Mage'),
+	(14, 4821, 5873, 0, 0, 15, 0, 128, 0, 0, 1, 0, 0, '', 'Portal Trainer - Show gossip menu if player is not a mage'),
 	(14, 4826, 5883, 0, 0, 15, 0, 128, 0, 0, 1, 0, 0, '', 'Show gossip text if player is not a Mage'),
 	(14, 4826, 5884, 0, 0, 15, 0, 128, 0, 0, 0, 0, 0, '', 'Show gossip text if player is a Mage'),
 	(14, 5061, 4835, 0, 0, 15, 0, 8, 0, 0, 0, 0, 0, '', 'Show gossip text if player is a Rogue'),
@@ -7684,7 +7684,7 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 	(14, 5749, 6931, 0, 0, 25, 0, 4036, 0, 0, 0, 0, 0, '', 'Show gossip menu if player is an Engineer'),
 	(14, 5749, 6932, 0, 0, 25, 0, 22704, 0, 0, 0, 0, 0, '', 'Show gossip menu if player learned the spell'),
 	(14, 5853, 7021, 0, 0, 7, 0, 185, 1, 0, 0, 0, 0, '', 'Show different gossip if player has cooking profession'),
-	(14, 5962, 7115, 0, 0, 28, 0, 7722, 0, 0, 0, 0, 0, '', 'Show Gossip Menu - If Quest: What the Flux? is Completed'),
+	(14, 5962, 7115, 0, 0, 8, 0, 7722, 0, 0, 0, 0, 0, '', 'Show Gossip Menu - If Quest: What the Flux? is Rewarded'),
 	(14, 5962, 7115, 0, 1, 5, 0, 59, 128, 0, 0, 0, 0, '', 'Show Gossip Menu - If player is exalted with Thorium Brotherhood (59)'),
 	(14, 6024, 6935, 0, 0, 8, 0, 7783, 0, 0, 1, 0, 0, '', 'Show gossip text if te quest The Lord of Blackrock is not rewarded'),
 	(14, 6024, 7176, 0, 0, 8, 0, 7783, 0, 0, 0, 0, 0, '', 'Show gossip text if player get the quest The Lord of Blackrockreward'),
@@ -7696,7 +7696,7 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 	(14, 6628, 7903, 0, 0, 15, 0, 1279, 0, 0, 0, 0, 0, '', 'Show gossip text if player is not a Warlock'),
 	(14, 6647, 7904, 0, 0, 15, 0, 2, 0, 0, 0, 0, 0, '', 'Show gossip text if player is a Paladin'),
 	(14, 6647, 9193, 0, 0, 15, 0, 1533, 0, 0, 0, 0, 0, '', 'Show gossip text if player is not a Paladin'),
-	(14, 6648, 9190, 0, 0, 15, 0, 128, 0, 0, 0, 0, 0, '', 'Show gossip text if player is a mage'),
+	(14, 6648, 9192, 0, 0, 15, 0, 128, 0, 0, 0, 0, 0, '', 'Show gossip text if player is a mage'),
 	(14, 6648, 9191, 0, 0, 15, 0, 1407, 0, 0, 0, 0, 0, '', 'Show gossip text if player is not a mage'),
 	(14, 6649, 9007, 0, 0, 15, 0, 16, 0, 0, 0, 0, 0, '', 'Show gossip text if player is a Priest'),
 	(14, 6649, 9186, 0, 0, 15, 0, 1519, 0, 0, 0, 0, 0, '', 'Show gossip text if player is not a Priest'),
@@ -9617,8 +9617,7 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 	(15, 9253, 1, 0, 0, 2, 0, 35671, 1, 0, 1, 0, 0, '', 'Must not have item 35671'),
 	(15, 9253, 1, 0, 0, 8, 0, 11943, 0, 0, 0, 0, 0, '', 'Must reward 11943 before this option is visible'),
 	(15, 9253, 1, 0, 0, 8, 0, 11967, 0, 0, 1, 0, 0, '', 'Gossip Option requires Mustering the Reds not rewarded'),
-	(15, 9262, 0, 0, 0, 9, 0, 11957, 0, 0, 0, 0, 0, '', 'Only show gossip if player has quest 11957'),
-	(15, 9262, 1, 0, 0, 2, 0, 35709, 1, 0, 0, 0, 0, '', 'Only show gossip if player has item 35709'),
+	(14, 9262, 12577, 0, 0, 8, 0, 11946, 0, 0, 1, 0, 0, '', 'Show gossip text if quest \'Keristrasza\' is not rewarded'),
 	(15, 9301, 0, 0, 0, 9, 0, 11984, 0, 0, 0, 0, 0, '', 'Budd - Show gossip option if player has taken quest 11984'),
 	(15, 9302, 0, 0, 0, 2, 0, 35784, 1, 0, 0, 0, 0, '', 'show gossip option if player has Item: Blood Oath of the Horde'),
 	(15, 9302, 0, 0, 0, 9, 0, 11983, 0, 0, 0, 0, 0, '', 'show gossip option if player has quest 11983 taken'),
@@ -10036,9 +10035,9 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 	(15, 9865, 0, 0, 1, 9, 0, 13423, 0, 0, 0, 0, 0, '', 'Show gossip option 0 if player has quest Defending Your Title'),
 	(15, 9871, 0, 0, 0, 9, 0, 12957, 0, 0, 0, 0, 0, '', 'Show gossip only if Slaves of the Stormforged quest taken'),
 	(15, 9874, 0, 0, 0, 28, 0, 12969, 0, 0, 1, 0, 0, '', 'Agnetta Tyrsdottar - Show gossip option only if quest is not complete'),
-	(15, 9880, 0, 0, 0, 9, 0, 12980, 0, 0, 0, 0, 0, '', 'The Armor\'s Secrets');
+	(15, 9880, 0, 0, 0, 9, 0, 12980, 0, 0, 0, 0, 0, '', 'The Armor\'s Secrets'),
+	(15, 9891, 0, 0, 0, 9, 0, 12874, 0, 0, 0, 0, 0, '', 'Show gossip only if Fervor of the Frostborn quest taken');
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-	(15, 9891, 0, 0, 0, 9, 0, 12874, 0, 0, 0, 0, 0, '', 'Show gossip only if Fervor of the Frostborn quest taken'),
 	(15, 9900, 0, 0, 0, 9, 0, 13010, 0, 0, 0, 0, 0, '', 'Requires Quest 13010 active'),
 	(15, 9904, 0, 0, 0, 1, 0, 33280, 0, 0, 0, 0, 0, '', NULL),
 	(15, 9904, 0, 0, 1, 1, 0, 55629, 0, 0, 0, 0, 0, '', NULL),
@@ -14433,7 +14432,7 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 	(10, 11008, 13759, 0, 0, 12, 0, 79, 0, 0, 1, 0, 0, '', 'Raw Nightfin Snapper only when Diurnal fishing event is off'),
 	(19, 0, 1643, 0, 0, 47, 0, 1642, 64, 0, 0, 0, 0, '', 'Quest The Tome of Divinity (Human) available if quest The Tome of Divinity (book) has been rewarded.'),
 	(19, 0, 1641, 0, 0, 47, 0, 1642, 1, 0, 0, 0, 0, '', 'Quest The Tome of Divinity (Human, offer book) available if quest The Tome of Divinity (Human, book) has not been taken.'),
-	(19, 0, 1645, 0, 0, 47, 0, 1646, 1, 0, 0, 0, 0, '', 'Quest The Tome of Divinity (Dwarf, offer book) available if quest The Tome of Divinity (Dwarf, book) has not been taken.'),
+	(19, 0, 1645, 0, 1, 8, 0, 2997, 0, 0, 0, 0, 0, '', 'Quest \'Tome of Divinity (1645)\' can only be taken if quest \'Tome of Divinity (2997)\' is not taken'),
 	(13, 1, 21075, 0, 1, 31, 0, 3, 11664, 0, 0, 0, 0, '', 'Damage Shield  targets Flamewaker Elite'),
 	(22, 5, 181045, 1, 0, 29, 1, 16048, 30, 0, 0, 0, 0, '', 'Brazier of Beckoning only run SAI if Lord Vathalak Trigger is near'),
 	(22, 2, 181045, 1, 0, 23, 1, 2057, 0, 0, 0, 0, 0, '', 'Brazier of Beckoning only run SAI in Scholomance'),
@@ -14628,7 +14627,89 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 	(14, 3692, 3214, 0, 1, 47, 0, 995, 64, 0, 1, 0, 0, '', 'When player has not finished quest \'Escape Through Stealth\''),
 	(19, 0, 3375, 0, 0, 2, 0, 7667, 1, 0, 1, 0, 0, '', 'Display quest \'Replacement Vial\' if player lost item (Not in inventory)'),
 	(19, 0, 3375, 0, 0, 2, 0, 7667, 1, 1, 1, 0, 0, '', 'Display quest \'Replacement Vial\' if player lost item (Not in bank)'),
-	(19, 0, 3375, 0, 0, 47, 0, 2200, 74, 0, 0, 0, 0, '', 'Quest \'Back to Uldaman\' is Complete/Rewarded.');
+	(19, 0, 3375, 0, 0, 47, 0, 2200, 74, 0, 0, 0, 0, '', 'Quest \'Back to Uldaman\' is Complete/Rewarded.'),
+	(15, 3801, 1, 0, 1, 8, 0, 6570, 0, 0, 0, 0, 0, '', 'Myranda the Hag - Show gossip option 1 if player has completed \'Emberstrife\''),
+	(15, 3801, 1, 0, 1, 2, 0, 16787, 1, 0, 1, 0, 0, '', 'Myranda the Hag - Show gossip option 1 if player doesn\'t have item \'16787\' in bag'),
+	(15, 3801, 1, 0, 1, 2, 0, 16787, 1, 1, 1, 0, 0, '', 'Myranda the Hag - Show gossip option 1 if player doesn\'t have item \'16787\' in bank'),
+	(14, 4821, 5874, 0, 0, 15, 0, 128, 0, 0, 0, 0, 0, '', 'Portal Trainer - Show gossip menu if player is a mage'),
+	(14, 4822, 5875, 0, 0, 15, 0, 128, 0, 0, 1, 0, 0, '', 'Portal Trainer - Show gossip menu if player is not a mage'),
+	(14, 4822, 5876, 0, 0, 15, 0, 128, 0, 0, 0, 0, 0, '', 'Portal Trainer - Show gossip menu if player is a mage'),
+	(14, 4824, 5879, 0, 0, 15, 0, 128, 0, 0, 1, 0, 0, '', 'Portal Trainer - Show gossip menu if player is not a mage'),
+	(14, 4824, 5880, 0, 0, 15, 0, 128, 0, 0, 0, 0, 0, '', 'Portal Trainer - Show gossip menu if player is a mage'),
+	(14, 4825, 5881, 0, 0, 15, 0, 128, 0, 0, 0, 0, 0, '', 'Portal Trainer - Show gossip menu if player is a mage'),
+	(14, 4825, 5882, 0, 0, 15, 0, 128, 0, 0, 1, 0, 0, '', 'Portal Trainer - Show gossip menu if player is not a mage'),
+	(14, 4827, 5885, 0, 0, 15, 0, 128, 0, 0, 1, 0, 0, '', 'Portal Trainer - Show gossip menu if player is not a mage'),
+	(14, 4827, 5886, 0, 0, 15, 0, 128, 0, 0, 0, 0, 0, '', 'Portal Trainer - Show gossip menu if player is a mage'),
+	(4, 13722, 12830, 0, 0, 7, 0, 164, 285, 0, 0, 0, 0, '', 'Blacksmithing Plans - Plans Coruption while having Black Smith skill 285'),
+	(4, 13721, 12827, 0, 0, 7, 0, 164, 285, 0, 0, 0, 0, '', 'Blacksmithing Plans - Plans Serenity while having Black Smith skill 285'),
+	(4, 11524, 11614, 0, 0, 7, 0, 164, 285, 0, 0, 0, 0, '', 'Blacksmithing Plans - Plans Dark Iron Mail while having Black Smith skill 285'),
+	(4, 11525, 11615, 0, 0, 7, 0, 164, 285, 0, 0, 0, 0, '', 'Blacksmithing Plans - Plans Dark Iron Shoulder while having Black Smith skill 285'),
+	(15, 2871, 0, 0, 0, 9, 0, 4921, 0, 0, 0, 0, 0, '', 'Show gossip option 2871 if quest 4921 is taken.'),
+	(15, 11361, 0, 0, 1, 8, 0, 7003, 0, 0, 0, 0, 0, '', 'Show gossip option if Quests Zapped Giants and  Fuel for the Zapping are rewarded'),
+	(15, 11361, 0, 0, 1, 8, 0, 7721, 0, 0, 0, 0, 0, '', 'Show gossip option if Quests Zapped Giants and  Fuel for the Zapping are rewarded'),
+	(14, 3184, 4039, 0, 0, 8, 0, 5217, 0, 0, 0, 0, 0, '', 'Only show TextID 4039 if player completed the quest \'Return to Chillwind Camp\''),
+	(15, 3184, 0, 0, 0, 8, 0, 5217, 0, 0, 0, 0, 0, '', 'Show gossip option if player has completed quest \'Return to Chillwind Camp\''),
+	(14, 3183, 4040, 0, 0, 8, 0, 5230, 0, 0, 0, 0, 0, '', 'Only show TextID 4040 if player completed the quest \'Return to the Bulwark\''),
+	(15, 3183, 0, 0, 0, 8, 0, 5230, 0, 0, 0, 0, 0, '', 'Show gossip option if player has completed quest \'Return to the Bulwark\''),
+	(13, 1, 68644, 0, 0, 31, 0, 3, 36530, 0, 0, 0, 0, '', 'Spell [DND] Valentine Boss Validate Area targets [DND] Valentine Boss - Vial Bunny'),
+	(13, 1, 68614, 0, 0, 31, 0, 3, 36530, 0, 0, 0, 0, '', 'Spell Concentrated Irresistible Cologne Spill targets [DND] Valentine Boss - Vial Bunny'),
+	(13, 1, 68798, 0, 0, 31, 0, 3, 36530, 0, 0, 0, 0, '', 'Spell Concentrated Alluring Perfume Spill targets [DND] Valentine Boss - Vial Bunny'),
+	(13, 5, 19832, 0, 0, 31, 0, 3, 12435, 0, 0, 0, 0, '', 'Possess targets Razorgore the Untamed'),
+	(13, 1, 19873, 0, 0, 31, 0, 5, 177807, 0, 0, 0, 0, '', 'Destroy Egg targets Razorgore\'s Egg'),
+	(17, 0, 23642, 0, 0, 31, 1, 3, 13020, 0, 0, 0, 0, '', 'Nefarius Corruption only affects Vaelastrasz'),
+	(14, 6445, 7638, 0, 0, 8, 0, 8227, 0, 0, 1, 0, 0, '', 'Group 0: Show gossip text 7638 if quest \'Nat\'s Measuring Tape\' is not rewarded'),
+	(14, 6445, 7639, 0, 0, 8, 0, 8227, 0, 0, 0, 0, 0, '', 'Group 0: Show gossip text 7639 if quest \'Nat\'s Measuring Tape\' is rewarded'),
+	(15, 6445, 0, 0, 0, 8, 0, 8227, 0, 0, 0, 0, 0, '', 'Group 0: Show Gossip Option 0 if quest \'Nat\'s Measuring Tape\' is rewarded'),
+	(23, 12919, 0, 0, 0, 8, 0, 8227, 0, 0, 0, 0, 0, '', 'Show vendor npc flag if quest \'Nat\'s Measuring Tape\' is rewarded'),
+	(13, 1, 34086, 0, 1, 31, 0, 3, 18827, 0, 0, 0, 0, '', 'Spell Whipped Frenzy (effect 0) will hit the potential target of the spell if target is unit Gan\'arg Sapper.'),
+	(13, 1, 34086, 0, 2, 31, 0, 3, 18974, 0, 0, 0, 0, '', 'Spell Whipped Frenzy (effect 0) will hit the potential target of the spell if target is unit Z\'kral.'),
+	(13, 1, 34086, 0, 3, 31, 0, 3, 18976, 0, 0, 0, 0, '', 'Spell Whipped Frenzy (effect 0) will hit the potential target of the spell if target is unit Urga\'zz.'),
+	(14, 4013, 4870, 0, 0, 15, 0, 4, 0, 0, 0, 0, 0, '', 'Show gossip text if player is a Hunter'),
+	(14, 4013, 5004, 0, 0, 15, 0, 4, 0, 0, 1, 0, 0, '', 'Show gossip text if player is not a Hunter'),
+	(15, 4013, 0, 0, 0, 15, 0, 4, 0, 0, 0, 0, 0, '', 'Show gossip option if player is a Hunter'),
+	(15, 4013, 1, 0, 0, 15, 0, 4, 0, 0, 0, 0, 0, '', 'Show gossip option if player is a Hunter'),
+	(15, 4013, 2, 0, 0, 15, 0, 4, 0, 0, 0, 0, 0, '', 'Show gossip option if player is a Hunter'),
+	(19, 0, 1645, 0, 3, 8, 0, 3000, 0, 0, 0, 0, 0, '', 'Quest \'Tome of Divinity (1645)\' can only be taken if quest \'Tome of Divinity (3000)\' is not taken'),
+	(19, 0, 1645, 0, 2, 8, 0, 2999, 0, 0, 0, 0, 0, '', 'Quest \'Tome of Divinity (1645)\' can only be taken if quest \'Tome of Divinity (2999)\' is not taken'),
+	(14, 5855, 7026, 0, 0, 7, 0, 129, 225, 0, 0, 0, 0, '', 'Show gossip menu 5855 text id 7026 if player must have reached 225 on skill First Aid.'),
+	(14, 5855, 7027, 0, 0, 7, 0, 129, 150, 0, 0, 0, 0, '', 'Show gossip menu 5855 text id 7027 if player must have reached 150 on skill First Aid.'),
+	(14, 5855, 7028, 0, 0, 7, 0, 129, 150, 0, 1, 0, 0, '', 'Show gossip menu 5855 text id 7028 if player must not have reached 150 on skill First Aid.'),
+	(1, 8716, 21104, 0, 0, 9, 0, 8620, 0, 0, 0, 0, 0, '', 'Draconic for Dummies Chapter II will drop only when a player have The Only Prescription (8620) in their quest log'),
+	(1, 8717, 21104, 0, 0, 9, 0, 8620, 0, 0, 0, 0, 0, '', 'Draconic for Dummies Chapter II will drop only when a player have The Only Prescription (8620) in their quest log'),
+	(1, 12396, 21104, 0, 0, 9, 0, 8620, 0, 0, 0, 0, 0, '', 'Draconic for Dummies Chapter II will drop only when a player have The Only Prescription (8620) in their quest log'),
+	(1, 7463, 21105, 0, 0, 9, 0, 8620, 0, 0, 0, 0, 0, '', 'Draconic for Dummies Chapter III will drop only when a player have The Only Prescription (8620) in their quest log'),
+	(1, 7461, 21105, 0, 0, 9, 0, 8620, 0, 0, 0, 0, 0, '', 'Draconic for Dummies Chapter III will drop only when a player have The Only Prescription (8620) in their quest log'),
+	(14, 9262, 12576, 0, 0, 8, 0, 11946, 0, 0, 0, 0, 0, '', 'Show gossip text if quest \'Keristrasza\' is rewarded'),
+	(15, 9262, 0, 0, 0, 47, 0, 11957, 10, 0, 0, 0, 0, '', 'Show gossip option if player has quest \'Saragosa\'s End\' in progress or completed'),
+	(15, 9262, 1, 0, 0, 47, 0, 11967, 10, 0, 0, 0, 0, '', 'Show gossip option if player has quest \'Mustering the Reds\' in progress or completed'),
+	(14, 7398, 8862, 0, 0, 8, 0, 9506, 0, 0, 0, 0, 0, '', 'Show gossip text 8862 if quest A Small Start is rewarded'),
+	(14, 7398, 8862, 0, 0, 8, 0, 9537, 0, 0, 1, 0, 0, '', 'Show gossip text 8862 if quest Show Gnomercy is not rewarded'),
+	(14, 7398, 8862, 0, 0, 16, 0, 1024, 0, 0, 0, 0, 0, '', 'Show gossip text 8862 if player is Draenei'),
+	(14, 7398, 8863, 0, 0, 8, 0, 9506, 0, 0, 0, 0, 0, '', 'Show gossip text 8862 if quest A Small Start is rewarded'),
+	(14, 7398, 8863, 0, 0, 8, 0, 9537, 0, 0, 1, 0, 0, '', 'Show gossip text 8862 if quest Show Gnomercy is not rewarded'),
+	(14, 7398, 8863, 0, 0, 16, 0, 1024, 0, 0, 1, 0, 0, '', 'Show gossip text 8862 if player is not Draenei'),
+	(14, 7398, 8893, 0, 0, 8, 0, 9537, 0, 0, 0, 0, 0, '', 'Show gossip text 8893 if quest Show Gnomercy is rewarded'),
+	(14, 7399, 8865, 0, 0, 8, 0, 9506, 0, 0, 0, 0, 0, '', 'Show gossip text 8865 if quest A Small Start is rewarded'),
+	(14, 7399, 8865, 0, 0, 8, 0, 9537, 0, 0, 1, 0, 0, '', 'Show gossip text 8865 if quest Show Gnomercy is not rewarded'),
+	(14, 7399, 8892, 0, 0, 8, 0, 9537, 0, 0, 0, 0, 0, '', 'Show gossip text 8892 if quest Show Gnomercy is rewarded'),
+	(14, 7400, 8868, 0, 0, 8, 0, 9506, 0, 0, 0, 0, 0, '', 'Show gossip text 8868 if quest A Small Start is rewarded'),
+	(14, 7400, 8868, 0, 0, 8, 0, 9537, 0, 0, 1, 0, 0, '', 'Show gossip text 8868 if quest Show Gnomercy is not rewarded'),
+	(14, 7400, 8892, 0, 0, 8, 0, 9537, 0, 0, 0, 0, 0, '', 'Show gossip text 8892 if quest Show Gnomercy is rewarded'),
+	(14, 7389, 8893, 0, 0, 8, 0, 9537, 0, 0, 0, 0, 0, '', 'Show gossip text 8893 if quest Show Gnomercy is rewarded'),
+	(15, 10631, 0, 0, 0, 8, 0, 14111, 0, 0, 0, 0, 0, '', 'Requires Quest Completed'),
+	(15, 10631, 0, 0, 0, 2, 0, 46978, 1, 0, 1, 0, 0, '', 'Requires Missing Item'),
+	(15, 10630, 0, 0, 0, 8, 0, 14100, 0, 0, 0, 0, 0, '', 'Requires Quest Completed'),
+	(15, 10630, 0, 0, 0, 2, 0, 46978, 1, 0, 1, 0, 0, '', 'Requires Missing Item'),
+	(17, 0, 48812, 0, 0, 31, 1, 3, 27463, 0, 0, 0, 0, '', 'Heals a wounded skirmisher at Blue Sky Logging Ground.'),
+	(15, 5481, 0, 0, 0, 2, 0, 16309, 1, 0, 1, 0, 0, '', 'Rokaro - Restore Drakefire Amulet - Must not have item Drakefire Amulet (16309)'),
+	(15, 5481, 0, 0, 0, 8, 0, 6502, 0, 0, 0, 0, 0, '', 'Rokaro - Restore Drakefire Amulet - Require quest Drakefire Amulet (6502) rewarded'),
+	(15, 5482, 0, 0, 0, 2, 0, 16309, 1, 0, 1, 0, 0, '', 'Haleh - Restore Drakefire Amulet - Must not have item Drakefire Amulet (16309)'),
+	(15, 5482, 0, 0, 0, 8, 0, 6602, 0, 0, 0, 0, 0, '', 'Haleh - Restore Drakefire Amulet - Require quest Drakefire Amulet (6502) rewarded'),
+	(14, 643, 1203, 0, 0, 7, 0, 182, 1, 0, 0, 0, 0, '', 'Show gossip text if player is a Herbalist'),
+	(13, 1, 20038, 0, 0, 31, 0, 4, 0, 0, 0, 0, 0, '', 'Explosion targets players'),
+	(15, 8837, 0, 0, 0, 9, 0, 11140, 0, 0, 0, 0, 0, '', 'Requires Quest Taken'),
+	(15, 8837, 0, 0, 0, 2, 0, 33040, 1, 0, 1, 0, 0, '', 'Requires Missing Item'),
+	(14, 5962, 7121, 0, 0, 5, 0, 59, 96, 0, 0, 0, 0, '', 'Show Gossip Menu - If player is HonoredRevered with Thorium Brotherhood (59)');
 /*!40000 ALTER TABLE `conditions` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

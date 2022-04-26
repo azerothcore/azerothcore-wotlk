@@ -1189,11 +1189,11 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
             return;
     }
 
-    if (cInfo->GossipMenuId && !(cInfo->npcflag & UNIT_NPC_FLAG_GOSSIP))
+    if ((cInfo->GossipMenuId && !(cInfo->npcflag & UNIT_NPC_FLAG_GOSSIP)) && !(cInfo->flags_extra & CREATURE_FLAG_EXTRA_MODULE))
     {
         LOG_ERROR("sql.sql", "Creature (Entry: {}) has assigned gossip menu {}, but npcflag does not include UNIT_NPC_FLAG_GOSSIP (1).", cInfo->Entry, cInfo->GossipMenuId);
     }
-    else if (!cInfo->GossipMenuId && (cInfo->npcflag & UNIT_NPC_FLAG_GOSSIP))
+    else if ((!cInfo->GossipMenuId && (cInfo->npcflag & UNIT_NPC_FLAG_GOSSIP)) && !(cInfo->flags_extra & CREATURE_FLAG_EXTRA_MODULE))
     {
         LOG_ERROR("sql.sql", "Creature (Entry: {}) has npcflag UNIT_NPC_FLAG_GOSSIP (1), but gossip menu is unassigned.", cInfo->Entry);
     }
@@ -3429,7 +3429,7 @@ void ObjectMgr::LoadPetLevelInfo()
 
         PetLevelInfo*& pInfoMapEntry = _petInfoStore[creature_id];
 
-        if (pInfoMapEntry == nullptr)
+        if (!pInfoMapEntry)
             pInfoMapEntry = new PetLevelInfo[sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)];
 
         // data for level 1 stored in [0] array element, ...
@@ -8497,7 +8497,7 @@ GameTele const* ObjectMgr::GetGameTele(std::string_view name) const
     {
         if (itr->second.wnameLow == wname)
             return &itr->second;
-        else if (alt == nullptr && itr->second.wnameLow.find(wname) != std::wstring::npos)
+        else if (!alt && itr->second.wnameLow.find(wname) != std::wstring::npos)
             alt = &itr->second;
     }
 

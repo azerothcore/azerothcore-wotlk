@@ -35,9 +35,6 @@ DoorData const doorData[] =
     { GO_PORTCULLIS_RAZORGORE_ROOM, DATA_RAZORGORE_THE_UNTAMED,  DOOR_TYPE_ROOM,   }, // ID 176964 || GUID 75158
     { GO_PORTCULLIS_VAELASTRASZ,    DATA_VAELASTRAZ_THE_CORRUPT, DOOR_TYPE_PASSAGE }, // ID 175185 || GUID 7229
     { GO_PORTCULLIS_BROODLORD,      DATA_BROODLORD_LASHLAYER,    DOOR_TYPE_PASSAGE }, // ID 179365 || GUID 75159
-    { GO_PORTCULLIS_THREEDRAGONS,   DATA_FIREMAW,                DOOR_TYPE_PASSAGE }, // ID 179115 || GUID 75165
-    { GO_PORTCULLIS_THREEDRAGONS,   DATA_EBONROC,                DOOR_TYPE_PASSAGE }, // ID 179115 || GUID 75165
-    { GO_PORTCULLIS_THREEDRAGONS,   DATA_FLAMEGOR,               DOOR_TYPE_PASSAGE }, // ID 179115 || GUID 75165
     { GO_PORTCULLIS_CHROMAGGUS,     DATA_CHROMAGGUS,             DOOR_TYPE_PASSAGE }, // ID 179116 || GUID 75161
     { GO_PORTCULLIS_NEFARIAN,       DATA_NEFARIAN,               DOOR_TYPE_ROOM    }, // ID 179117 || GUID 75164
     { 0,                            0,                           DOOR_TYPE_ROOM    }  // END
@@ -169,12 +166,6 @@ public:
                         EggList.push_back(go->GetGUID());
                     }
                     break;
-                case GO_PORTCULLIS_RAZORGORE:
-                case GO_PORTCULLIS_VAELASTRASZ:
-                case GO_PORTCULLIS_BROODLORD:
-                case GO_PORTCULLIS_THREEDRAGONS:
-                    AddDoor(go, true);
-                    break;
                 case GO_PORTCULLIS_NEFARIAN:
                     AddDoor(go, true);
                     nefarianDoorGUID = go->GetGUID();
@@ -199,20 +190,6 @@ public:
 
             if (go->GetEntry() == GO_BLACK_DRAGON_EGG)
                 EggList.remove(go->GetGUID());
-
-            switch (go->GetEntry())
-            {
-                case GO_PORTCULLIS_RAZORGORE:
-                case GO_PORTCULLIS_VAELASTRASZ:
-                case GO_PORTCULLIS_BROODLORD:
-                case GO_PORTCULLIS_THREEDRAGONS:
-                case GO_PORTCULLIS_CHROMAGGUS:
-                case GO_PORTCULLIS_NEFARIAN:
-                    AddDoor(go, false);
-                    break;
-                default:
-                    break;
-            }
         }
 
         uint32 GetData(uint32 data) const override
@@ -236,12 +213,6 @@ public:
             {
                 case DATA_BROODLORD_LASHLAYER:
                     if (GetBossState(DATA_VAELASTRAZ_THE_CORRUPT) != DONE)
-                        return false;
-                    break;
-                case DATA_CHROMAGGUS:
-                    if (GetBossState(DATA_FIREMAW) != DONE
-                        || GetBossState(DATA_EBONROC) != DONE
-                        || GetBossState(DATA_FLAMEGOR) != DONE)
                         return false;
                     break;
                 default:

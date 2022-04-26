@@ -229,7 +229,7 @@ void CreatureGroup::MemberAttackStart(Creature* member, Unit* target)
 void CreatureGroup::MemberEvaded(Creature* member)
 {
     uint8 const groupAI = sFormationMgr->CreatureGroupMap[member->GetSpawnId()].groupAI;
-    if (!(groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_EVADE_TOGETHER)))
+    if (!(groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_EVADE_MASK)))
     {
         return;
     }
@@ -243,18 +243,34 @@ void CreatureGroup::MemberEvaded(Creature* member)
             continue;
         }
 
-        if (pMember == member || pMember->isDead() || pMember->IsInEvadeMode() || !pMember->IsInCombat() ||
-                !itr.second.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_EVADE_TOGETHER)))
+        if (pMember == member || pMember->IsInEvadeMode() || !itr.second.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_EVADE_MASK)))
         {
             continue;
         }
 
-        if (pMember->IsAIEnabled)
+        if (itr.second.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_EVADE_TOGETHER)))
         {
-            if (CreatureAI* pMemberAI = pMember->AI())
+            if (!pMember->IsAlive() || !pMember->IsInCombat())
             {
-                pMemberAI->EnterEvadeMode();
+                continue;
             }
+
+            if (pMember->IsAIEnabled)
+            {
+                if (CreatureAI* pMemberAI = pMember->AI())
+                {
+                    pMemberAI->EnterEvadeMode();
+                }
+            }
+        }
+        else
+        {
+            if (pMember->IsAlive())
+            {
+                continue;
+            }
+
+            pMember->Respawn();
         }
     }
 }
