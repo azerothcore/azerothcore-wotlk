@@ -52,25 +52,15 @@ public:
 
     // -- compatibility layer for combat rewrite (PR #19930)
     Unit* GetOwner() const;
-
     Unit* GetVictim() const { return getTarget(); }
-
     void AddThreat(float amt) { addThreat(amt); }
-
     void SetThreat(float amt) { setThreat(amt); }
-
     void ModifyThreatByPercent(int32 pct) { addThreatPercent(pct); }
-
     void ScaleThreat(float factor) { setThreat(iThreat * factor); }
-
     bool IsOnline() const { return iOnline; }
-
     bool IsAvailable() const { return iOnline; }
-
     bool IsOffline() const { return !iOnline; }
-
     float GetThreat() const { return getThreat(); }
-
     void ClearThreat() { removeReference(); }
 
     //=================================================
