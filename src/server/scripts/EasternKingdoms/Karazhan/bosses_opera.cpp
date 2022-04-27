@@ -917,7 +917,7 @@ public:
                         if (TempThreat)
                             ModifyThreatByPercent(target, -100);
                         HoodGUID = target->GetGUID();
-                        me->GetThreatMgr().AddThreat(target, 1000000.0f);
+                        AddThreat(target, 1000000.0f);
                         ChaseTimer = 20000;
                         IsChasing = true;
                     }
@@ -931,7 +931,7 @@ public:
                         HoodGUID.Clear();
                         if (GetThreat(target))
                             ModifyThreatByPercent(target, -100);
-                        me->GetThreatMgr().AddThreat(target, TempThreat);
+                        AddThreat(target, TempThreat);
                         TempThreat = 0;
                     }
 
@@ -1272,7 +1272,7 @@ public:
                 Creature* Julianne = ObjectAccessor::GetCreature(*me, JulianneGUID);
                 if (Julianne && Julianne->GetVictim())
                 {
-                    me->GetThreatMgr().AddThreat(Julianne->GetVictim(), 1.0f);
+                    AddThreat(Julianne->GetVictim(), 1.0f);
                     AttackStart(Julianne->GetVictim());
                 }
             }
