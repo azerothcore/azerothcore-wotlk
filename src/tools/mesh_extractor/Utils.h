@@ -18,21 +18,18 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include "Constants.h"
+#include "Define.h"
+#include "DetourNavMesh.h"
+#include "MapDefines.h"
+#include "G3D/Matrix4.h"
 #include <cstdio>
 #include <sstream>
 #include <string>
 
-#include "DetourNavMesh.h"
-#include "G3D/Matrix4.h"
-
-#include "Constants.h"
-#include "Define.h"
-
 struct WorldModelDefinition;
 class DoodadDefinition;
 class DoodadInstance;
-
-#define ASSERT(assertion) { if (!(assertion)) {fprintf(stderr, "\n%s:%i in %s ASSERTION FAILED:\n  %s\n%s\n", __FILE__, __LINE__, __FUNCTION__, #assertion, st.c_str()); *((volatile int*)nullptr) = 0; } }
 
 struct Vector3
 {
@@ -349,18 +346,6 @@ public:
     virtual float Scale() const { return 1.0f; };
 };
 
-struct MmapTileHeader
-{
-    uint32 mmapMagic;
-    uint32 dtVersion;
-    uint32 mmapVersion;
-    uint32 size;
-    bool usesLiquids;
-
-    MmapTileHeader() : mmapMagic(MMAP_MAGIC), dtVersion(DT_NAVMESH_VERSION),
-        mmapVersion(MMAP_VERSION), size(0), usesLiquids(true) {}
-};
-
 class Utils
 {
 public:
@@ -396,7 +381,7 @@ public:
     static Vector3 ToWoWCoords(const Vector3& vec );
     static std::string GetExtension( std::string path );
     static char* GetPlainName(const char* FileName);
-    static Vector3 TransformDoodadVertex(const IDefinition& def, Vector3& vec, bool translate = true);
+    static Vector3 TransformDoodadVertex(const IDefinition& def, Vector3 vec, bool translate = true);
     static Vector3 VectorTransform(const Vector3& vec, const G3D::Matrix4& matrix, bool normal = false );
     static Vector3 TransformWmoDoodad(const DoodadInstance& inst, const WorldModelDefinition& root, Vector3& vec, bool translate = true );
 };

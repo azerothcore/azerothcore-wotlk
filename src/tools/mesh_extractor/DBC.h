@@ -61,7 +61,7 @@ public:
         return *(T*)(&Values[index]);
     }
 
-    std::string Get<std::string>(int index)
+    std::string GetString(int index)
     {
         return Source->GetStringByOffset(Values[index]);
     }

@@ -191,7 +191,7 @@ void ContinentBuilder::Build()
                     if ((*_th)->Free)
                     {
                         (*_th)->SetData(itr->X, itr->Y, MapId, Continent);
-                        (*_th)->activate();
+                        // (*_th)->activate(); // Not defined. Leftover from ACE remove?
                         next = true;
                         break;
                     }
@@ -207,7 +207,7 @@ void ContinentBuilder::Build()
     // Free memory
     for (std::vector<BuilderThread*>::iterator _th = Threads.begin(); _th != Threads.end(); ++_th)
     {
-        (*_th)->wait();
+        // (*_th)->wait(); // Not defined. Leftover from ACE remove?
         delete *_th;
     }
 }

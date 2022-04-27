@@ -17,6 +17,7 @@
 
 #include "WorldModelRoot.h"
 #include "ChunkedData.h"
+#include "Errors.h"
 #include "Utils.h"
 
 WorldModelRoot::WorldModelRoot( std::string path )
