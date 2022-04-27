@@ -134,6 +134,7 @@ namespace Acore::Containers
     template<class C>
     inline auto SelectRandomContainerElement(C const& container) -> typename std::add_const<decltype(*std::begin(container))>::type&
     {
+        ASSERT(Size(container));
         auto it = std::begin(container);
         std::advance(it, urand(0, uint32(std::size(container)) - 1));
         return *it;
