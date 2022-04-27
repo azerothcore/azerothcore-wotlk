@@ -2728,6 +2728,8 @@ void Spell::EffectAddFarsight(SpellEffIndex effIndex)
 
     dynObj->SetDuration(duration);
     dynObj->SetCasterViewpoint();
+
+    m_caster->ToPlayer()->UpdateVisibilityForPlayer();
 }
 
 void Spell::EffectUntrainTalents(SpellEffIndex /*effIndex*/)
