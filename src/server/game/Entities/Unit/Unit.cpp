@@ -422,7 +422,7 @@ void Unit::Update(uint32 p_time)
 
     _UpdateSpells( p_time );
 
-    if (CanHaveThreatList() && getThreatMgr().isNeedUpdateToClient(p_time))
+    if (CanHaveThreatList() && GetThreatMgr().isNeedUpdateToClient(p_time))
         SendThreatListUpdate();
 
     // update combat timer only for players and pets (only pets with PetAI)
@@ -1027,7 +1027,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
                 victim->ToCreature()->SetLastDamagedTime(GameTime::GetGameTime().count() + MAX_AGGRO_RESET_TIME);
 
             if (attacker)
-                victim->AddThreat(attacker, float(damage), damageSchoolMask, spellProto);
+                victim->GetThreatMgr().AddThreat(attacker, float(damage), spellProto);
         }
         else                                                // victim is a player
         {
@@ -8261,7 +8261,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             triggered_spell_id = 54445;
                             target = this;
                             float addThreat = float(CalculatePct(procSpell->Effects[0].CalcValue(this), triggerAmount));
-                            victim->AddThreat(this, addThreat);
+                            victim->GetThreatMgr().AddThreat(this, addThreat);
                             break;
                         }
                     // Silverback
@@ -8910,7 +8910,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                             return false;
 
                         if (victim && victim->IsAlive())
-                            victim->getThreatMgr().modifyThreatPercent(this, -10);
+                            victim->GetThreatMgr().ModifyThreatByPercent(this, -10);
 
                         basepoints0 = int32(CountPctFromMaxHealth(triggerAmount));
                         trigger_spell_id = 31616;
@@ -9943,7 +9943,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
         SetInCombatWith(victim);
         if (victim->GetTypeId() == TYPEID_PLAYER)
             victim->SetInCombatWith(this);
-        AddThreat(victim, 0.0f);
+        GetThreatMgr().AddThreat(victim, 0.0f);
 
         creature->SendAIReaction(AI_REACTION_HOSTILE);
         creature->CallAssistance();
@@ -13087,13 +13087,14 @@ void Unit::CombatStartOnCast(Unit* target, bool initialAggro, uint32 duration)
         // Xinef: If pet started combat - put owner in combat
         if (Unit* owner = GetOwner())
             owner->SetInCombatWith(target, duration);
-    }
-
-    Unit* who = target->GetCharmerOrOwnerOrSelf();
-    if (who->GetTypeId() == TYPEID_PLAYER)
-        SetContestedPvP(who->ToPlayer());
+    } 
 
     Player* player = GetCharmerOrOwnerPlayerOrPlayerItself();
+
+    Unit* who = target->GetCharmerOrOwnerOrSelf();
+    if (player && who->GetTypeId() == TYPEID_PLAYER)
+        SetContestedPvP(who->ToPlayer());
+
     if (player && who->IsPvP() && (who->GetTypeId() != TYPEID_PLAYER || !player->duel || player->duel->Opponent != who))
     {
         player->UpdatePvP(true);
@@ -13138,7 +13139,7 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
                 creature->AI()->EnterCombat(enemy);
 
             if (creature->GetFormation())
-                creature->GetFormation()->MemberAttackStart(creature, enemy);
+                creature->GetFormation()->MemberEngagingTarget(creature, enemy);
         }
 
         creature->RefreshSwimmingFlag();
@@ -13905,7 +13906,7 @@ void Unit::setDeathState(DeathState s, bool despawn)
     if (s != ALIVE && s != JUST_RESPAWNED)
     {
         CombatStop();
-        DeleteThreatList();
+        GetThreatMgr().ClearAllThreat();
         getHostileRefMgr().deleteReferences();
         ClearComboPointHolders();                           // any combo points pointed to unit lost at it death
 
@@ -13975,7 +13976,7 @@ bool Unit::CanHaveThreatList() const
         return false;
 
     // summons can not have a threat list, unless they are controlled by a creature
-    if (HasUnitTypeMask(UNIT_MASK_MINION | UNIT_MASK_GUARDIAN | UNIT_MASK_CONTROLABLE_GUARDIAN) && ((Pet*)this)->GetOwnerGUID().IsPlayer())
+    if (HasUnitTypeMask(UNIT_MASK_MINION | UNIT_MASK_GUARDIAN | UNIT_MASK_CONTROLABLE_GUARDIAN) && GetOwnerGUID().IsPlayer())
         return false;
 
     return true;
@@ -13991,26 +13992,6 @@ float Unit::ApplyTotalThreatModifier(float fThreat, SpellSchoolMask schoolMask)
     SpellSchools school = GetFirstSchoolInMask(schoolMask);
 
     return fThreat * m_threatModifier[school];
-}
-
-//======================================================================
-
-void Unit::AddThreat(Unit* victim, float fThreat, SpellSchoolMask schoolMask, SpellInfo const* threatSpell)
-{
-    // Only mobs can manage threat lists
-    if (CanHaveThreatList() && !HasUnitState(UNIT_STATE_EVADE))
-    {
-        m_ThreatMgr.addThreat(victim, fThreat, schoolMask, threatSpell);
-    }
-}
-
-//======================================================================
-
-void Unit::DeleteThreatList()
-{
-    if (CanHaveThreatList() && !m_ThreatMgr.isThreatListEmpty())
-        SendClearThreatListOpcode();
-    m_ThreatMgr.clearReferences();
 }
 
 //======================================================================
@@ -15085,7 +15066,7 @@ void Unit::CleanupBeforeRemoveFromMap(bool finalCleanup)
     CombatStop();
     ClearComboPoints();
     ClearComboPointHolders();
-    DeleteThreatList();
+    GetThreatMgr().ClearAllThreat();
     getHostileRefMgr().deleteReferences();
     GetMotionMaster()->Clear(false);                    // remove different non-standard movement generators.
 }
@@ -16161,8 +16142,7 @@ Player* Unit::GetSpellModOwner() const
         return player;
 
     if (Unit* owner = GetOwner())
-        if (Player* player = owner->ToPlayer())
-            return player;
+        return owner->ToPlayer();
 
     return nullptr;
 }
@@ -16777,44 +16757,6 @@ float Unit::GetAPMultiplier(WeaponAttackType attType, bool normalized)
 bool Unit::IsUnderLastManaUseEffect() const
 {
     return  getMSTimeDiff(m_lastManaUse, GameTime::GetGameTimeMS().count()) < 5000;
-}
-
-void Unit::SetContestedPvP(Player* attackedPlayer, bool lookForNearContestedGuards)
-{
-    Player* player = GetCharmerOrOwnerPlayerOrPlayerItself();
-
-    if (!player || ((attackedPlayer && (attackedPlayer == player || (player->duel && player->duel->Opponent == attackedPlayer))) || player->InBattleground()))
-        return;
-
-    // check if there any guards that should care about the contested flag on player
-    if (lookForNearContestedGuards)
-    {
-        std::list<Unit*> targets;
-        Acore::NearestVisibleDetectableContestedGuardUnitCheck u_check(this);
-        Acore::UnitListSearcher<Acore::NearestVisibleDetectableContestedGuardUnitCheck> searcher(this, targets, u_check);
-        Cell::VisitAllObjects(this, searcher, MAX_AGGRO_RADIUS);
-
-        // return if there are no contested guards found
-        if (!targets.size())
-        {
-            return;
-        }
-    }
-
-    player->SetContestedPvPTimer(30000);
-    if (!player->HasUnitState(UNIT_STATE_ATTACK_PLAYER))
-    {
-        player->AddUnitState(UNIT_STATE_ATTACK_PLAYER);
-        player->SetPlayerFlag(PLAYER_FLAGS_CONTESTED_PVP);
-        // call MoveInLineOfSight for nearby contested guards
-        AddToNotify(NOTIFY_AI_RELOCATION);
-    }
-    if (!HasUnitState(UNIT_STATE_ATTACK_PLAYER))
-    {
-        AddUnitState(UNIT_STATE_ATTACK_PLAYER);
-        // call MoveInLineOfSight for nearby contested guards
-        AddToNotify(NOTIFY_AI_RELOCATION);
-    }
 }
 
 void Unit::AddPetAura(PetAura const* petSpell)
@@ -17434,7 +17376,7 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
 
         if (!creature->IsPet() && creature->GetLootMode() > 0)
         {
-            creature->DeleteThreatList();
+            creature->GetThreatMgr().ClearAllThreat();
 
             // must be after setDeathState which resets dynamic flags
             if (!creature->loot.isLooted())
@@ -17886,7 +17828,7 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
 
     // Xinef: dont reset threat and combat, put them on offline list, moved down after faction changes
     //  CombatStop(); // TODO: CombatStop(true) may cause crash (interrupt spells)
-    //  DeleteThreatList();
+    //  GetThreatMgr().ClearAllThreat();
 
     Player* playerCharmer = charmer->ToPlayer();
 
@@ -18139,7 +18081,7 @@ void Unit::RemoveCharmedBy(Unit* charmer)
     {
         if (Unit* target = ObjectAccessor::GetUnit(*this, itr->first))
             if (!IsFriendlyTo(target))
-                AddThreat(target, itr->second);
+                GetThreatMgr().AddThreat(target, itr->second);
     }
 
     _charmThreatInfo.clear();
@@ -18553,8 +18495,8 @@ void Unit::SetPhaseMask(uint32 newPhaseMask, bool update)
             // modify threat lists for new phasemask
             if (GetTypeId() != TYPEID_PLAYER)
             {
-                ThreatContainer::StorageType threatList = getThreatMgr().getThreatList();
-                ThreatContainer::StorageType offlineThreatList = getThreatMgr().getOfflineThreatList();
+                ThreatContainer::StorageType threatList = GetThreatMgr().getThreatList();
+                ThreatContainer::StorageType offlineThreatList = GetThreatMgr().getOfflineThreatList();
 
                 // merge expects sorted lists
                 threatList.sort();
@@ -19505,15 +19447,15 @@ void Unit::UpdateHeight(float newZ)
 
 void Unit::SendThreatListUpdate()
 {
-    if (!getThreatMgr().isThreatListEmpty())
+    if (!GetThreatMgr().isThreatListEmpty())
     {
-        uint32 count = getThreatMgr().getThreatList().size();
+        uint32 count = GetThreatMgr().getThreatList().size();
 
         //LOG_DEBUG("entities.unit", "WORLD: Send SMSG_THREAT_UPDATE Message");
         WorldPacket data(SMSG_THREAT_UPDATE, 8 + count * 8);
         data << GetPackGUID();
         data << uint32(count);
-        ThreatContainer::StorageType const& tlist = getThreatMgr().getThreatList();
+        ThreatContainer::StorageType const& tlist = GetThreatMgr().getThreatList();
         for (ThreatContainer::StorageType::const_iterator itr = tlist.begin(); itr != tlist.end(); ++itr)
         {
             data << (*itr)->getUnitGuid().WriteAsPacked();
@@ -19525,16 +19467,16 @@ void Unit::SendThreatListUpdate()
 
 void Unit::SendChangeCurrentVictimOpcode(HostileReference* pHostileReference)
 {
-    if (!getThreatMgr().isThreatListEmpty())
+    if (!GetThreatMgr().isThreatListEmpty())
     {
-        uint32 count = getThreatMgr().getThreatList().size();
+        uint32 count = GetThreatMgr().getThreatList().size();
 
         LOG_DEBUG("entities.unit", "WORLD: Send SMSG_HIGHEST_THREAT_UPDATE Message");
         WorldPacket data(SMSG_HIGHEST_THREAT_UPDATE, 8 + 8 + count * 8);
         data << GetPackGUID();
         data << pHostileReference->getUnitGuid().WriteAsPacked();
         data << uint32(count);
-        ThreatContainer::StorageType const& tlist = getThreatMgr().getThreatList();
+        ThreatContainer::StorageType const& tlist = GetThreatMgr().getThreatList();
         for (ThreatContainer::StorageType::const_iterator itr = tlist.begin(); itr != tlist.end(); ++itr)
         {
             data << (*itr)->getUnitGuid().WriteAsPacked();
