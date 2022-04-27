@@ -674,7 +674,7 @@ struct boss_nefarian : public BossAI
                     break;
                 case EVENT_CLASSCALL:
                     std::set<uint8> classesPresent;
-                    for (auto& ref : me->getThreatMgr().getThreatList())
+                    for (auto& ref : me->GetThreatMgr().getThreatList())
                     {
                         if (ref->getTarget() && ref->getTarget()->GetTypeId() == TYPEID_PLAYER)
                         {

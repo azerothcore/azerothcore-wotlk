@@ -114,8 +114,8 @@ public:
                         break;
                     case EVENT_KNOCKBACK:
                         DoCastVictim(SPELL_KNOCKBACK);
-                        if (DoGetThreat(me->GetVictim()))
-                            DoModifyThreatPercent(me->GetVictim(), -50);
+                        if (GetThreat(me->GetVictim()))
+                            ModifyThreatByPercent(me->GetVictim(), -50);
                         events.ScheduleEvent(EVENT_KNOCKBACK, 15000, 30000);
                         break;
                     case EVENT_CHECK:

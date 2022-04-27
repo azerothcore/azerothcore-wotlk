@@ -91,8 +91,8 @@ public:
                         if (Unit* target = me->GetVictim())
                         {
                             _conflagrateTarget = me->GetVictim()->GetGUID();
-                            _conflagrateThreat = me->getThreatMgr().getThreat(me->GetVictim());
-                            me->getThreatMgr().modifyThreatPercent(target, -100);
+                            _conflagrateThreat = me->GetThreatMgr().getThreat(me->GetVictim());
+                            me->GetThreatMgr().ModifyThreatByPercent(target, -100);
                         }
                         events.ScheduleEvent(EVENT_CONFLAGRATION, urand(10000, 13000));
                         events.ScheduleEvent(EVENT_CHECK_CONFLAGRATION_TARGET, 10000);

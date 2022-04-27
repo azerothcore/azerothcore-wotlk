@@ -251,7 +251,7 @@ public:
             if (!info)
                 return;
 
-            ThreatContainer::StorageType const& t_list = me->getThreatMgr().getThreatList();
+            ThreatContainer::StorageType const& t_list = me->GetThreatMgr().getThreatList();
             std::vector<Unit*> targets;
 
             if (t_list.empty())
@@ -496,10 +496,10 @@ public:
             {
                 if (me->GetVictim())
                 {
-                    DoModifyThreatPercent(me->GetVictim(), -100);
+                    ModifyThreatByPercent(me->GetVictim(), -100);
                 }
 
-                me->AddThreat(target, 1000000.0f);
+                me->GetThreatMgr().AddThreat(target, 1000000.0f);
             }
         }
 
