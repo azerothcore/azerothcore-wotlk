@@ -179,9 +179,7 @@ bool AssistDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
             if (assistant && assistant->CanAssistTo(m_owner, victim))
             {
                 assistant->SetNoCallAssistance(true);
-                assistant->CombatStart(victim);
-                if (assistant->IsAIEnabled)
-                    assistant->AI()->AttackStart(victim);
+                assistant->EngageWithTarget(victim);
 
                 assistant->SetLastDamagedTimePtr(m_owner->GetLastDamagedTimePtr());
             }
@@ -207,8 +205,8 @@ bool TemporaryThreatModifierEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
     {
         if (m_owner.IsInCombatWith(victim))
         {
-            m_owner.getThreatMgr().modifyThreatPercent(victim, -100); // Reset threat to zero.
-            m_owner.getThreatMgr().addThreat(victim, m_threatValue);  // Set to the previous value it had, first before modification.
+            m_owner.GetThreatMgr().ModifyThreatByPercent(victim, -100); // Reset threat to zero.
+            m_owner.GetThreatMgr().addThreat(victim, m_threatValue);  // Set to the previous value it had, first before modification.
         }
     }
 
@@ -704,7 +702,7 @@ void Creature::Update(uint32 diff)
                 }
 
                 // periodic check to see if the creature has passed an evade boundary
-                if (IsAIEnabled && !IsInEvadeMode() && IsInCombat())
+                if (IsAIEnabled && !IsInEvadeMode() && IsEngaged())
                 {
                     if (diff >= m_boundaryCheckTime)
                     {
@@ -1837,7 +1835,7 @@ bool Creature::CanStartAttack(Unit const* who) const
     // pussywizard: at this point we are either hostile to who or friendly to who->getAttackerForHelper()
     // pussywizard: if who is in combat and has an attacker, help him if the distance is right (help because who is hostile or help because attacker is friendly)
     bool assist = false;
-    if (who->IsInCombat() && IsWithinDist(who, ATTACK_DISTANCE))
+    if (who->IsEngaged() && IsWithinDist(who, ATTACK_DISTANCE))
         if (Unit* victim = who->getAttackerForHelper())
             if (IsWithinDistInMap(victim, sWorld->getFloatConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_RADIUS)))
                 assist = true;
@@ -2356,7 +2354,7 @@ bool Creature::CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction /
         return false;
 
     // skip fighting creature
-    if (IsInCombat())
+    if (IsEngaged())
         return false;
 
     // only free creature
@@ -2411,7 +2409,7 @@ bool Creature::_IsTargetAcceptable(Unit const* target) const
     Unit const* targetVictim = target->getAttackerForHelper();
 
     // if I'm already fighting target, or I'm hostile towards the target, the target is acceptable
-    if (myVictim == target || targetVictim == this || IsHostileTo(target))
+    if (IsEngagedBy(target) || IsHostileTo(target))
         return true;
 
     // if the target's victim is friendly, and the target is neutral, the target is acceptable
@@ -3547,11 +3545,11 @@ void Creature::ModifyThreatPercentTemp(Unit* victim, int32 percent, Milliseconds
 {
     if (victim)
     {
-        float currentThreat = getThreatMgr().getThreat(victim);
+        float currentThreat = GetThreatMgr().getThreat(victim);
 
         if (percent != 0.0f)
         {
-            getThreatMgr().modifyThreatPercent(victim, percent);
+            GetThreatMgr().ModifyThreatByPercent(victim, percent);
         }
 
         TemporaryThreatModifierEvent* pEvent = new TemporaryThreatModifierEvent(*this, victim->GetGUID(), currentThreat);

@@ -190,7 +190,7 @@ void CreatureGroup::RemoveMember(Creature* member)
     member->SetFormation(nullptr);
 }
 
-void CreatureGroup::MemberAttackStart(Creature* member, Unit* target)
+void CreatureGroup::MemberEngagingTarget(Creature* member, Unit* target)
 {
     uint8 const groupAI = sFormationMgr->CreatureGroupMap[member->GetSpawnId()].groupAI;
     if (member == m_leader)
@@ -208,8 +208,6 @@ void CreatureGroup::MemberAttackStart(Creature* member, Unit* target)
     for (auto const& itr : m_members)
     {
         Creature* pMember = itr.first;
-        if (m_leader) // avoid crash if leader was killed and reset.
-            LOG_DEBUG("entities.unit", "GROUP ATTACK: group instance id {} calls member instid {}", m_leader->GetInstanceId(), member->GetInstanceId());
 
         //Skip one check
         if (pMember == member)
@@ -218,11 +216,8 @@ void CreatureGroup::MemberAttackStart(Creature* member, Unit* target)
         if (!pMember->IsAlive())
             continue;
 
-        if (pMember->GetVictim())
-            continue;
-
         if (pMember->IsValidAttackTarget(target) && pMember->AI())
-            pMember->AI()->AttackStart(target);
+            pMember->EngageWithTarget(target);
     }
 }
 
