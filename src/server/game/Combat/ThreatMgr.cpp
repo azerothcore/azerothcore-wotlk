@@ -131,6 +131,9 @@ void HostileReference::fireStatusChanged(ThreatRefStatusChangeEvent& threatRefSt
         GetSource()->processThreatEvent(&threatRefStatusChangeEvent);
 }
 
+// -- compatibility layer for combat rewrite (PR #19930)
+Unit* HostileReference::GetOwner() const { return GetSource()->GetOwner(); }
+
 //============================================================
 
 void HostileReference::addThreat(float modThreat)
@@ -256,7 +259,7 @@ void ThreatContainer::clearReferences()
 
 //============================================================
 // Return the HostileReference of nullptr, if not found
-HostileReference* ThreatContainer::getReferenceByTarget(Unit* victim) const
+HostileReference* ThreatContainer::getReferenceByTarget(Unit const* victim) const
 {
     if (!victim)
         return nullptr;
@@ -285,7 +288,7 @@ HostileReference* ThreatContainer::addThreat(Unit* victim, float threat)
 
 //============================================================
 
-void ThreatContainer::modifyThreatPercent(Unit* victim, int32 percent)
+void ThreatContainer::ModifyThreatByPercent(Unit* victim, int32 percent)
 {
     if (HostileReference* ref = getReferenceByTarget(victim))
         ref->addThreatPercent(percent);
@@ -406,6 +409,30 @@ ThreatMgr::ThreatMgr(Unit* owner) : iCurrentVictim(nullptr), iOwner(owner), iUpd
 {
 }
 
+// -- compatibility layer for combat rewrite (PR #19930)
+void ThreatMgr::ForwardThreatForAssistingMe(Unit* victim, float amount, SpellInfo const* spell, bool ignoreModifiers, bool ignoreRedirection)
+{
+    (void)ignoreModifiers; (void)ignoreRedirection;
+    GetOwner()->getHostileRefMgr().threatAssist(victim, amount, spell);
+}
+
+void ThreatMgr::AddThreat(Unit* victim, float amount, SpellInfo const* spell, bool ignoreModifiers, bool ignoreRedirection)
+{
+    (void)ignoreModifiers; (void)ignoreRedirection;
+    if (!iOwner->CanHaveThreatList() || iOwner->HasUnitState(UNIT_STATE_EVADE))
+        return;
+    iOwner->SetInCombatWith(victim);
+    victim->SetInCombatWith(iOwner);
+    addThreat(victim, amount, spell ? spell->GetSchoolMask() : victim->GetMeleeDamageSchoolMask(), spell);
+}
+
+void ThreatMgr::ClearAllThreat()
+{
+    if (iOwner->CanHaveThreatList() && !isThreatListEmpty())
+        iOwner->SendClearThreatListOpcode();
+    clearReferences();
+}
+
 //============================================================
 
 void ThreatMgr::clearReferences()
@@ -465,9 +492,9 @@ void ThreatMgr::_addThreat(Unit* victim, float threat)
 
 //============================================================
 
-void ThreatMgr::modifyThreatPercent(Unit* victim, int32 percent)
+void ThreatMgr::ModifyThreatByPercent(Unit* victim, int32 percent)
 {
-    iThreatContainer.modifyThreatPercent(victim, percent);
+    iThreatContainer.ModifyThreatByPercent(victim, percent);
 }
 
 //============================================================

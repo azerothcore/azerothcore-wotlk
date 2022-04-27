@@ -1326,6 +1326,7 @@ public:
     bool IsWithinCombatRange(Unit const* obj, float dist2compare) const;
     bool IsWithinMeleeRange(Unit const* obj, float dist = 0.f) const;
     float GetMeleeRange(Unit const* target) const;
+    virtual SpellSchoolMask GetMeleeDamageSchoolMask() const;
     bool GetRandomContactPoint(Unit const* target, float& x, float& y, float& z, bool force = false) const;
     uint32 m_extraAttacks;
     bool m_canDualWield;
@@ -1643,6 +1644,12 @@ public:
 
     [[nodiscard]] bool IsInFlight()  const { return HasUnitState(UNIT_STATE_IN_FLIGHT); }
 
+    bool IsEngaged() const { return IsInCombat(); }
+    bool IsEngagedBy(Unit const* who) const { return IsInCombatWith(who); }
+    void EngageWithTarget(Unit* who) { SetInCombatWith(who); who->SetInCombatWith(this); GetThreatMgr().AddThreat(who, 0.0f); }
+    bool IsThreatened() const { return CanHaveThreatList() && !GetThreatMgr().IsThreatListEmpty(); }
+    bool IsThreatenedBy(Unit const* who) const { return who && CanHaveThreatList() && GetThreatMgr().IsThreatenedBy(who); }
+
     [[nodiscard]] bool IsInCombat() const { return HasUnitFlag(UNIT_FLAG_IN_COMBAT); }
     bool IsInCombatWith(Unit const* who) const;
 
@@ -1683,8 +1690,9 @@ public:
 
     void SendHealSpellLog(Unit* victim, uint32 SpellID, uint32 Damage, uint32 OverHeal, uint32 Absorb, bool critical = false);
     int32 HealBySpell(HealInfo& healInfo, bool critical = false);
-    void SendEnergizeSpellLog(Unit* victim, uint32 SpellID, uint32 Damage, Powers powertype);
-    void EnergizeBySpell(Unit* victim, uint32 SpellID, uint32 Damage, Powers powertype);
+    void SendEnergizeSpellLog(Unit* victim, uint32 spellId, int32 damage, Powers powerType);
+    void EnergizeBySpell(Unit* victim, uint32 spellId, int32 damage, Powers powerType);
+    void EnergizeBySpell(Unit* victim, SpellInfo const* spellInfo, int32 damage, Powers powerType);
 
     SpellCastResult CastSpell(SpellCastTargets const& targets, SpellInfo const* spellInfo, CustomSpellValues const* value, TriggerCastFlags triggerFlags = TRIGGERED_NONE, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
     SpellCastResult CastSpell(Unit* victim, uint32 spellId, bool triggered, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
@@ -2103,12 +2111,11 @@ public:
 
     // Threat related methods
     [[nodiscard]] bool CanHaveThreatList() const;
-    void AddThreat(Unit* victim, float fThreat, SpellSchoolMask schoolMask = SPELL_SCHOOL_MASK_NORMAL, SpellInfo const* threatSpell = nullptr);
     float ApplyTotalThreatModifier(float fThreat, SpellSchoolMask schoolMask = SPELL_SCHOOL_MASK_NORMAL);
-    void DeleteThreatList();
     void TauntApply(Unit* victim);
     void TauntFadeOut(Unit* taunter);
-    ThreatMgr& getThreatMgr() { return m_ThreatMgr; }
+    ThreatMgr& GetThreatMgr() { return m_ThreatMgr; }
+    ThreatMgr const& GetThreatMgr() const { return m_ThreatMgr; }
     void addHatedBy(HostileReference* pHostileReference) { m_HostileRefMgr.insertFirst(pHostileReference); };
     void removeHatedBy(HostileReference* /*pHostileReference*/) { /* nothing to do yet */ }
     HostileRefMgr& getHostileRefMgr() { return m_HostileRefMgr; }
@@ -2478,8 +2485,6 @@ protected:
 
     CharmInfo* m_charmInfo;
     SharedVisionList m_sharedVision;
-
-    [[nodiscard]] virtual SpellSchoolMask GetMeleeDamageSchoolMask() const;
 
     MotionMaster* i_motionMaster;
 
