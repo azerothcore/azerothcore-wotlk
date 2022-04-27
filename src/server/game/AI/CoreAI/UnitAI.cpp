@@ -116,7 +116,10 @@ SpellCastResult UnitAI::DoAddAuraToAllHostilePlayers(uint32 spellid)
             if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
             {
                 if (unit->GetTypeId() == TYPEID_PLAYER)
-                    return me->AddAura(spellid, unit);
+                {
+                    me->AddAura(spellid, unit);
+                    return SPELL_CAST_OK;
+                }
             }
             else
                 return SPELL_FAILED_BAD_TARGETS;
