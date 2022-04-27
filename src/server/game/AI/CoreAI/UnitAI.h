@@ -320,7 +320,7 @@ public:
     SpellCastResult DoAddAuraToAllHostilePlayers(uint32 spellid);
     SpellCastResult DoCast(uint32 spellId);
     SpellCastResult DoCast(Unit* victim, uint32 spellId, bool triggered = false);
-    inline void DoCastSelf(uint32 spellId, bool triggered = false) { DoCast(me, spellId, triggered); }
+    SpellCastResult DoCastSelf(uint32 spellId, bool triggered = false) { return DoCast(me, spellId, triggered); }
     SpellCastResult DoCastToAllHostilePlayers(uint32 spellid, bool triggered = false);
     SpellCastResult DoCastVictim(uint32 spellId, bool triggered = false);
     SpellCastResult DoCastAOE(uint32 spellId, bool triggered = false);
