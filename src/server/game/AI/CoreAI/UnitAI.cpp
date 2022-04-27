@@ -232,7 +232,7 @@ SpellCastResult UnitAI::DoCastRandomTarget(uint32 spellId, uint32 threatTablePos
 {
     if (Unit* target = SelectTarget(SelectTargetMethod::Random, threatTablePosition, dist, playerOnly))
     {
-        DoCast(target, spellId, triggered);
+        return DoCast(target, spellId, triggered);
     }
 
     return SPELL_FAILED_BAD_TARGETS;
