@@ -114,7 +114,7 @@ SpellCastResult UnitAI::DoAddAuraToAllHostilePlayers(uint32 spellid)
         for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
         {
             if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
-            }
+            {
                 if (unit->GetTypeId() == TYPEID_PLAYER)
                     return me->AddAura(spellid, unit);
             }
