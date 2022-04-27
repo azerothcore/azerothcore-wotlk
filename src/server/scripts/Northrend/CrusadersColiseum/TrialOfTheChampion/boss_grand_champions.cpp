@@ -296,8 +296,8 @@ public:
                             uint8 rnd = LIST.size() > 1 ? urand(0, LIST.size() - 1) : 0;
                             if( Unit* target = ObjectAccessor::GetUnit(*me, LIST.at(rnd)) )
                             {
-                                me->getThreatMgr().resetAllAggro();
-                                me->AddThreat(target, 10000.0f);
+                                me->GetThreatMgr().resetAllAggro();
+                                me->GetThreatMgr().AddThreat(target, 10000.0f);
                                 AttackStart(target);
                                 me->CastSpell(target, SPELL_MINIONS_CHARGE, false);
                             }
@@ -550,7 +550,7 @@ public:
                     me->SetReactState(REACT_PASSIVE);
                     me->RemoveAllAuras();
                     AddCreatureAddonAuras();
-                    me->DeleteThreatList();
+                    me->GetThreatMgr().ClearAllThreat();
                     me->CombatStop(true);
                     me->GetMotionMaster()->Clear();
                     me->StopMoving();
@@ -580,7 +580,7 @@ public:
                     me->SetReactState(REACT_PASSIVE);
                     me->RemoveAllAuras();
                     AddCreatureAddonAuras();
-                    me->DeleteThreatList();
+                    me->GetThreatMgr().ClearAllThreat();
                     me->CombatStop(true);
                     me->GetMotionMaster()->Clear();
                     me->SetRegeneratingHealth(false);
@@ -749,8 +749,8 @@ public:
                             uint8 rnd = LIST.size() > 1 ? urand(0, LIST.size() - 1) : 0;
                             if( Unit* target = ObjectAccessor::GetUnit(*me, LIST.at(rnd)) )
                             {
-                                me->getThreatMgr().resetAllAggro();
-                                me->AddThreat(target, 10000.0f);
+                                me->GetThreatMgr().resetAllAggro();
+                                me->GetThreatMgr().AddThreat(target, 10000.0f);
                                 AttackStart(target);
                                 me->CastSpell(target, SPELL_MINIONS_CHARGE, false);
                             }
@@ -921,8 +921,8 @@ public:
                             Player* player = itr->GetSource();
                             if( player && me->IsInRange(player, 8.0f, 25.0f, false) )
                             {
-                                DoResetThreat();
-                                me->AddThreat(player, 5.0f);
+                                ResetThreatList();
+                                me->GetThreatMgr().AddThreat(player, 5.0f);
                                 me->CastSpell(player, SPELL_INTERCEPT, false);
                                 break;
                             }

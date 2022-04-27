@@ -438,7 +438,7 @@ public:
                 case EVENT_DETONATE_MANA:
                     {
                         std::vector<Unit*> unitList;
-                        ThreatContainer::StorageType const& threatList = me->getThreatMgr().getThreatList();
+                        ThreatContainer::StorageType const& threatList = me->GetThreatMgr().getThreatList();
                         for (auto itr : threatList)
                         {
                             if (itr->getTarget()->GetTypeId() == TYPEID_PLAYER
@@ -597,7 +597,7 @@ public:
 
             if (me->GetEntry() != NPC_UNSTOPPABLE_ABOMINATION && me->GetEntry() != NPC_GUARDIAN_OF_ICECROWN)
             {
-                me->AddThreat(who, 1000000.0f);
+                me->GetThreatMgr().AddThreat(who, 1000000.0f);
             }
         }
 

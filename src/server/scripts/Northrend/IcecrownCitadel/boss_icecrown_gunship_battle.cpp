@@ -784,7 +784,7 @@ public:
         {
             if (!me->IsAlive())
                 return;
-            me->DeleteThreatList();
+            me->GetThreatMgr().ClearAllThreat();
             me->CombatStop(true);
             me->GetMotionMaster()->MoveTargetedHome();
             Reset();
@@ -905,7 +905,7 @@ public:
                             {
                                 me->SetInCombatWith(p);
                                 p->SetInCombatWith(me);
-                                me->AddThreat(p, 0.0f);
+                                me->GetThreatMgr().AddThreat(p, 0.0f);
                             }
                 }
                 else
@@ -1120,7 +1120,7 @@ public:
         {
             if (!me->IsAlive())
                 return;
-            me->DeleteThreatList();
+            me->GetThreatMgr().ClearAllThreat();
             me->CombatStop(true);
             me->GetMotionMaster()->MoveTargetedHome();
             Reset();
@@ -1241,7 +1241,7 @@ public:
                             {
                                 me->SetInCombatWith(p);
                                 p->SetInCombatWith(me);
-                                me->AddThreat(p, 0.0f);
+                                me->GetThreatMgr().AddThreat(p, 0.0f);
                             }
                 }
                 else
@@ -1496,7 +1496,7 @@ struct gunship_npc_AI : public ScriptedAI
     {
         if (!me->IsAlive() || !me->IsInCombat())
             return;
-        me->DeleteThreatList();
+        me->GetThreatMgr().ClearAllThreat();
         me->CombatStop(true);
         me->GetMotionMaster()->MoveTargetedHome();
         Reset();
@@ -1557,7 +1557,7 @@ struct npc_gunship_boarding_addAI : public ScriptedAI
     {
         if (!me->IsAlive() || !me->IsInCombat())
             return;
-        me->DeleteThreatList();
+        me->GetThreatMgr().ClearAllThreat();
         me->CombatStop(true);
         me->GetMotionMaster()->MoveTargetedHome();
         Reset();
@@ -1620,7 +1620,7 @@ struct npc_gunship_boarding_addAI : public ScriptedAI
                         anyValid = true;
                         me->SetInCombatWith(p);
                         p->SetInCombatWith(me);
-                        me->AddThreat(p, 0.0f);
+                        me->GetThreatMgr().AddThreat(p, 0.0f);
                     }
         }
         else
@@ -1781,7 +1781,7 @@ public:
                         if (Player* player = me->SelectNearestPlayer(50.0f))
                         {
                             me->SetInCombatWithZone();
-                            me->AddThreat(player, 1.0f);
+                            me->GetThreatMgr().AddThreat(player, 1.0f);
                         }
                         me->CastSpell((Unit*)nullptr, SPELL_BELOW_ZERO, false);
                         break;
@@ -1862,7 +1862,7 @@ public:
                             anyValid = true;
                             me->SetInCombatWith(p);
                             p->SetInCombatWith(me);
-                            me->AddThreat(p, 0.0f);
+                            me->GetThreatMgr().AddThreat(p, 0.0f);
                         }
             }
             else

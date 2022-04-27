@@ -217,7 +217,7 @@ public:
                         if( Creature* c = me->SummonCreature(NPC_SKELETON, 156.2f + cos(angle) * dist, 259.1f + std::sin(angle) * dist, 42.9f, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000) )
                             if( Unit* target = c->SelectNearestTarget(250.0f) )
                             {
-                                c->AddThreat(target, 5.0f);
+                                c->GetThreatMgr().AddThreat(target, 5.0f);
                                 DoZoneInCombat(c);
                             }
                     }

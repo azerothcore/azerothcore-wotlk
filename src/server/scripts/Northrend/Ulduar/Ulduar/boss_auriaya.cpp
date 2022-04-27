@@ -424,7 +424,7 @@ public:
 
             if (_feralRushTimer >= 6000)
             {
-                DoResetThreat();
+                ResetThreatList();
                 if (!UpdateVictim())
                     return;
 

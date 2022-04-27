@@ -288,7 +288,7 @@ public:
             if (summon->GetEntry() == 36595)
                 if (Player* plr = summon->SelectNearestPlayer(100.0f))
                 {
-                    summon->AddThreat(plr, 100000.0f);
+                    summon->GetThreatMgr().AddThreat(plr, 100000.0f);
                     summon->AI()->AttackStart(plr);
                 }
         }

@@ -1674,9 +1674,9 @@ public:
             if (!target || !caster)
                 return;
 
-            caster->getThreatMgr().resetAllAggro();
+            caster->GetThreatMgr().resetAllAggro();
             caster->GetAI()->AttackStart(target);    // Chase target
-            caster->AddThreat(target, 10000000.0f);
+            caster->GetThreatMgr().AddThreat(target, 10000000.0f);
         }
 
         void Register() override

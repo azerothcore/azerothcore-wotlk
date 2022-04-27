@@ -133,7 +133,7 @@ public:
             {
                 t->RemoveAura(SPELL_CHANGE_VEHICLE);
                 me->RemoveAllAuras();
-                me->DeleteThreatList();
+                me->GetThreatMgr().ClearAllThreat();
                 me->CombatStop(true);
                 me->SetHealth(me->GetMaxHealth());
                 if( pInstance )
@@ -593,7 +593,7 @@ struct boss_jormungarAI : public ScriptedAI
                     }
                     me->UpdatePosition(Locs[LOC_CENTER].GetPositionX() + cos(angle)*dist, Locs[LOC_CENTER].GetPositionY() + std::sin(angle)*dist, me->GetPositionZ(), me->GetOrientation(), true);
                     me->StopMovingOnCurrentPos();
-                    DoResetThreat();
+                    ResetThreatList();
 
                     events.RescheduleEvent(EVENT_EMERGE, 6000);
                 }

@@ -965,8 +965,8 @@ public:
                 case EVENT_SHADOW_STEP:
                     if (Unit* target = SelectTargetFromPlayerList(100.0f, 0, true))
                     {
-                        DoResetThreat();
-                        me->AddThreat(target, 5000.0f);
+                        ResetThreatList();
+                        me->GetThreatMgr().AddThreat(target, 5000.0f);
                         AttackStart(target);
                         me->CastSpell(target, SPELL_SHADOW_STEP, false);
                     }
@@ -1449,7 +1449,7 @@ public:
             s->SetInCombatWithZone();
             if (Unit* target = s->SelectNearestPlayer(350.0f))
             {
-                s->AddThreat(target, 1000.0f);
+                s->GetThreatMgr().AddThreat(target, 1000.0f);
                 s->AI()->AttackStart(target);
             }
             s->SetHomePosition(PathWaypoints[WP_STOP[currentWall + 1]]);

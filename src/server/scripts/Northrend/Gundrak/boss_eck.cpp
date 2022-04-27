@@ -125,8 +125,8 @@ public:
                 case EVENT_ECK_SPRING:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 30.0f, true))
                     {
-                        me->getThreatMgr().resetAllAggro();
-                        me->AddThreat(target, 500.0f);
+                        me->GetThreatMgr().resetAllAggro();
+                        me->GetThreatMgr().AddThreat(target, 500.0f);
                         me->CastSpell(target, SPELL_ECK_SPRING, false);
                     }
 

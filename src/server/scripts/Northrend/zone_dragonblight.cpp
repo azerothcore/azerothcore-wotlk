@@ -384,7 +384,7 @@ public:
                                 {
                                     cr->CastSpell(cr, SPELL_TELEPORT_EFFECT, true);
                                     cr->AI()->AttackStart(me);
-                                    cr->AddThreat(me, 100.0f);
+                                    cr->GetThreatMgr().AddThreat(me, 100.0f);
                                 }
                             }
                         }

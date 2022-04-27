@@ -459,7 +459,7 @@ public:
                     DoZoneInCombat();
                     if( Unit* t = SelectTarget(SelectTargetMethod::Random, 0, 250.0f, true) )
                     {
-                        me->AddThreat(t, 20000.0f);
+                        me->GetThreatMgr().AddThreat(t, 20000.0f);
                         AttackStart(t);
                     }
                 }
@@ -767,7 +767,7 @@ public:
                 me->RemoveAllAuras();
             }
             DoZoneInCombat();
-            DoResetThreat();
+            ResetThreatList();
             if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 250.0f, true) )
             {
                 if (!next)

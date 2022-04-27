@@ -829,7 +829,7 @@ public:
                     _flyTarget = nullptr;
                     me->RemoveAura(SPELL_LIGHTNING_TENDRILS);
                     me->RemoveAura(61883);
-                    DoResetThreat();
+                    ResetThreatList();
                     break;
                 case EVENT_ENRAGE:
                     Talk(SAY_BRUNDIR_BERSERK);

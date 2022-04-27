@@ -487,7 +487,7 @@ public:
                     {
                         me->SetControlled(false, UNIT_STATE_ROOT);
                         me->DisableRotate(false);
-                        DoResetThreat();
+                        ResetThreatList();
                         Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 0.0, true);
                         if (!target)
                             target = me->SelectNearestPlayer(200.0f);
