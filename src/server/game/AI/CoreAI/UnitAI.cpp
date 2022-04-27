@@ -203,7 +203,10 @@ SpellCastResult UnitAI::DoCast(uint32 spellId)
 
 SpellCastResult UnitAI::DoCast(Unit* victim, uint32 spellId, bool triggered)
 {
-    if (!victim || (me->HasUnitState(UNIT_STATE_CASTING) && !triggered))
+    if (!victim)
+        return SPELL_FAILED_BAD_TARGETS;
+
+    if (me->HasUnitState(UNIT_STATE_CASTING) && !triggered)
         return SPELL_FAILED_SPELL_IN_PROGRESS;
 
     return me->CastSpell(victim, spellId, triggered);
