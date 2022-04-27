@@ -110,7 +110,7 @@ public:
                     //Attack random Gamers
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
                     {
-                        me->AddThreat(target, 1.0f);
+                        me->GetThreatMgr().AddThreat(target, 1.0f);
                         me->TauntApply(target);
                         AttackStart(target);
                     }
@@ -141,7 +141,7 @@ public:
                     //Attack random Gamers
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
                     {
-                        me->AddThreat(target, 1.0f);
+                        me->GetThreatMgr().AddThreat(target, 1.0f);
                         me->TauntApply(target);
                         AttackStart(target);
                     }
@@ -251,7 +251,7 @@ public:
                     //Attack random Gamers
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
                     {
-                        me->AddThreat(target, 1.0f);
+                        me->GetThreatMgr().AddThreat(target, 1.0f);
                         me->TauntApply(target);
                         AttackStart(target);
                     }
@@ -274,7 +274,7 @@ public:
                     //Attack random Gamers
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
                     {
-                        me->AddThreat(target, 1.0f);
+                        me->GetThreatMgr().AddThreat(target, 1.0f);
                         me->TauntApply(target);
                         AttackStart(target);
                     }
