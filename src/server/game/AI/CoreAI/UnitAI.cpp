@@ -230,7 +230,6 @@ SpellCastResult UnitAI::DoCastAOE(uint32 spellId, bool triggered)
 
 SpellCastResult UnitAI::DoCastRandomTarget(uint32 spellId, uint32 threatTablePosition, float dist, bool playerOnly, bool triggered)
 {
-    if (!triggered && me->HasUnitState(UNIT_STATE_CASTING))
     {
         return SPELL_FAILED_SPELL_IN_PROGRESS;
     }
