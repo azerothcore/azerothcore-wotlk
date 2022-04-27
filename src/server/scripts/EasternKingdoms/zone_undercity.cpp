@@ -1013,7 +1013,7 @@ public:
 
         void EnterEvadeMode(EvadeReason /*why*/) override
         {
-            me->DeleteThreatList();
+            me->GetThreatMgr().ClearAllThreat();
             me->CombatStop(true);
             me->SetLootRecipient(nullptr);
 
@@ -1289,12 +1289,12 @@ public:
                     if (Unit* temp = me->SummonCreature(NPC_BLIGHTWORM, AllianceSpawn[7].x, AllianceSpawn[7].y, AllianceSpawn[7].z, TEMPSUMMON_MANUAL_DESPAWN))
                     {
                         blightWormGUID = temp->GetGUID();
-                        temp->AddThreat(me, 100.0f);
-                        me->AddThreat(temp, 100.0f);
+                        temp->GetThreatMgr().AddThreat(me, 100.0f);
+                        me->GetThreatMgr().AddThreat(temp, 100.0f);
                         if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
                         {
-                            temp->AddThreat(jaina, 100.0f);
-                            jaina->AddThreat(temp, 100.0f);
+                            temp->GetThreatMgr().AddThreat(jaina, 100.0f);
+                            jaina->GetThreatMgr().AddThreat(temp, 100.0f);
                         }
                     }
                     if (Unit* temp = me->SummonCreature(NPC_KHANOK, HordeSpawn[0].x, HordeSpawn[0].y, HordeSpawn[0].z, TEMPSUMMON_MANUAL_DESPAWN))
@@ -1822,8 +1822,8 @@ public:
                             {
                                 putress->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
                                 putress->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
-                                putress->AddThreat(me, 100.0f);
-                                me->AddThreat(putress, 100.0f);
+                                putress->GetThreatMgr().AddThreat(me, 100.0f);
+                                me->GetThreatMgr().AddThreat(putress, 100.0f);
                                 putress->RemoveAura(SPELL_PUTRESS_CASTING_STATE);
                             }
                             bStepping = false;
@@ -1939,8 +1939,8 @@ public:
                                 thrall->SetReactState(REACT_AGGRESSIVE);
                                 thrall->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
                                 thrall->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
-                                thrall->AddThreat(me, 100.0f);
-                                me->AddThreat(thrall, 100.0f);
+                                thrall->GetThreatMgr().AddThreat(me, 100.0f);
+                                me->GetThreatMgr().AddThreat(thrall, 100.0f);
                                 thrall->AI()->AttackStart(me);
                             }
                             if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasGUID))
@@ -1948,9 +1948,9 @@ public:
                                 sylvanas->SetReactState(REACT_AGGRESSIVE);
                                 sylvanas->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
                                 sylvanas->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
-                                sylvanas->AddThreat(me, 100.0f);
+                                sylvanas->GetThreatMgr().AddThreat(me, 100.0f);
                                 sylvanas->AI()->AttackStart(me);
-                                me->AddThreat(sylvanas, 100.0f);
+                                me->GetThreatMgr().AddThreat(sylvanas, 100.0f);
                             }
                             for (uint8 i = 0; i < HORDE_FORCE_MAXCOUNT; ++i)
                             {
@@ -1971,9 +1971,9 @@ public:
                                         temp2->SetReactState(REACT_AGGRESSIVE);
                                         temp->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
                                         temp2->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
-                                        temp->AddThreat(temp2, 100.0f);
+                                        temp->GetThreatMgr().AddThreat(temp2, 100.0f);
                                         temp->AI()->AttackStart(temp2);
-                                        temp2->AddThreat(temp, 100.0f);
+                                        temp2->GetThreatMgr().AddThreat(temp, 100.0f);
                                     }
                                 }
                             }
@@ -2356,7 +2356,7 @@ public:
         void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->RemoveAura(SPELL_HEROIC_VANGUARD);
-            me->DeleteThreatList();
+            me->GetThreatMgr().ClearAllThreat();
             me->CombatStop(true);
             me->SetLootRecipient(nullptr);
 
@@ -2463,8 +2463,8 @@ public:
                     summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
                     if (!EnableAttack)
                         summoned->SetFaction(FACTION_FRIENDLY);
-                    summoned->AddThreat(me, 100.0f);
-                    me->AddThreat(summoned, 100.0f);
+                    summoned->GetThreatMgr().AddThreat(me, 100.0f);
+                    me->GetThreatMgr().AddThreat(summoned, 100.0f);
                     summoned->AI()->AttackStart(me);
                     break;
                 case NPC_LEGION_INVADER:
@@ -2475,8 +2475,8 @@ public:
                 case NPC_FELBEAST_H:
                     summoned->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
                     summoned->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK_DEST, true);
-                    summoned->AddThreat(me, 100.0f);
-                    me->AddThreat(summoned, 100.0f);
+                    summoned->GetThreatMgr().AddThreat(me, 100.0f);
+                    me->GetThreatMgr().AddThreat(summoned, 100.0f);
                     summoned->AI()->AttackStart(me);
                     break;
                 default:
@@ -2636,8 +2636,8 @@ public:
                     if (Creature* temp = me->SummonCreature(NPC_BLIGHT_ABBERATION, ThrallSpawn[28].x, ThrallSpawn[28].y, ThrallSpawn[28].z, ThrallSpawn[28].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 900 * IN_MILLISECONDS))
                     {
                         temp->GetMotionMaster()->MoveJump(ThrallSpawn[62].x, ThrallSpawn[62].y, ThrallSpawn[62].z, 10.0f, 20.0f, 0);
-                        temp->AddThreat(me, 100.0f);
-                        me->AddThreat(temp, 100.0f);
+                        temp->GetThreatMgr().AddThreat(me, 100.0f);
+                        me->GetThreatMgr().AddThreat(temp, 100.0f);
                         temp->AI()->AttackStart(me);
                     }
                     break;
@@ -3675,8 +3675,8 @@ public:
                                 valimathras->RemoveAura(SPELL_AURA_OF_VARIMATHRAS);
                                 valimathras->RemoveAura(SPELL_OPENING_LEGION_PORTALS);
                                 valimathras->AI()->Talk(SAY_VALIMATHRAS_ATTACK);
-                                valimathras->AddThreat(me, 100.0f);
-                                me->AddThreat(valimathras, 100.0f);
+                                valimathras->GetThreatMgr().AddThreat(me, 100.0f);
+                                me->GetThreatMgr().AddThreat(valimathras, 100.0f);
                                 valimathras->AI()->AttackStart(me);
                             }
                             bStepping = false;
@@ -3794,8 +3794,8 @@ public:
                                 wrynn->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
                                 wrynn->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                                 wrynn->SetReactState(REACT_AGGRESSIVE);
-                                wrynn->AddThreat(me, 100.0f);
-                                me->AddThreat(wrynn, 100.0f);
+                                wrynn->GetThreatMgr().AddThreat(me, 100.0f);
+                                me->GetThreatMgr().AddThreat(wrynn, 100.0f);
                                 wrynn->AI()->AttackStart(me);
                             }
 
@@ -3805,7 +3805,7 @@ public:
                                 {
                                     temp->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
                                     temp->SetReactState(REACT_AGGRESSIVE);
-                                    temp->AddThreat(me, 100.0f);
+                                    temp->GetThreatMgr().AddThreat(me, 100.0f);
                                     temp->AI()->AttackStart(me);
                                 }
                             }

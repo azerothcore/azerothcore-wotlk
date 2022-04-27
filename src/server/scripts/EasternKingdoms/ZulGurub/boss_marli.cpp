@@ -160,8 +160,8 @@ public:
                             */
                             me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, true); // hack
                             DoCastVictim(SPELL_ENVOLWINGWEB);
-                            if (DoGetThreat(me->GetVictim()))
-                                DoModifyThreatPercent(me->GetVictim(), -100);
+                            if (GetThreat(me->GetVictim()))
+                                ModifyThreatByPercent(me->GetVictim(), -100);
                             events.ScheduleEvent(EVENT_CHARGE_PLAYER, 1500, 0, PHASE_THREE);
                             events.ScheduleEvent(EVENT_TRANSFORM_BACK, 25000, 0, PHASE_THREE);
                             events.SetPhase(PHASE_THREE);

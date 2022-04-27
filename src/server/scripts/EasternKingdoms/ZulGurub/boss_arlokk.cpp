@@ -231,7 +231,7 @@ public:
                             me->UpdateDamagePhysical(BASE_ATTACK);
                             */
                             me->AttackStop();
-                            DoResetThreat();
+                            ResetThreatList();
                             me->SetReactState(REACT_PASSIVE);
                             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                             DoCast(me, SPELL_VANISH_VISUAL);

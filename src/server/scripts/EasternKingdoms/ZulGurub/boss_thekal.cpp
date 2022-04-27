@@ -154,7 +154,7 @@ public:
                             me->UpdateDamagePhysical(BASE_ATTACK);
                             */
                             me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 40.0f, true); // hack
-                            DoResetThreat();
+                            ResetThreatList();
                             events.ScheduleEvent(EVENT_FRENZY, 30000, 0, PHASE_TWO);          // Phase 2
                             events.ScheduleEvent(EVENT_FORCEPUNCH, 4000, 0, PHASE_TWO);       // Phase 2
                             events.ScheduleEvent(EVENT_SPELL_CHARGE, 12000, 0, PHASE_TWO);    // Phase 2
@@ -208,7 +208,7 @@ public:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         {
                             DoCast(target, SPELL_CHARGE);
-                            DoResetThreat();
+                            ResetThreatList();
                             AttackStart(target);
                         }
                         events.ScheduleEvent(EVENT_CHARGE, urand(15000, 22000), 0, PHASE_TWO);

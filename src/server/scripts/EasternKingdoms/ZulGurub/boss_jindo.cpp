@@ -113,8 +113,8 @@ public:
                         if (Unit* target = me->GetVictim())
                         {
                             DoCast(target, SPELL_HEX, true);
-                            if (DoGetThreat(target))
-                                DoModifyThreatPercent(target, -80);
+                            if (GetThreat(target))
+                                ModifyThreatByPercent(target, -80);
                         }
                         events.ScheduleEvent(EVENT_HEX, urand(12000, 20000));
                         break;
@@ -134,8 +134,8 @@ public:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         {
                             DoTeleportPlayer(target, TeleportLoc.m_positionX, TeleportLoc.m_positionY, TeleportLoc.m_positionZ, TeleportLoc.GetOrientation());
-                            if (DoGetThreat(me->GetVictim()))
-                                DoModifyThreatPercent(target, -100);
+                            if (GetThreat(me->GetVictim()))
+                                ModifyThreatByPercent(target, -100);
                             Creature* SacrificedTroll;
                             SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, target->GetPositionX() + 2, target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
                             if (SacrificedTroll)

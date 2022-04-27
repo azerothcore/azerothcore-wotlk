@@ -335,7 +335,7 @@ public:
                                 Creature* creature = me->SummonCreature(NPC_SOARING_EAGLE, x, y, z, 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
                                 if (creature)
                                 {
-                                    creature->AddThreat(me->GetVictim(), 1.0f);
+                                    creature->GetThreatMgr().AddThreat(me->GetVictim(), 1.0f);
                                     creature->AI()->AttackStart(me->GetVictim());
                                     BirdGUIDs[i] = creature->GetGUID();
                                 }
