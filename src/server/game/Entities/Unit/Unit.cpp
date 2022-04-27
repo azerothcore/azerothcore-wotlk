@@ -13029,7 +13029,7 @@ void Unit::CombatStart(Unit* victim, bool initialAggro)
                 {
                     victimControlledUnit->SetInCombatWith(this);
                     SetInCombatWith(victimControlledUnit);
-                    victimControlledUnit->AddThreat(this, 0.0f);
+                    victimControlledUnit->GetThreatMgr().AddThreat(this, 0.0f);
                 }
             }
 
@@ -13046,7 +13046,7 @@ void Unit::CombatStart(Unit* victim, bool initialAggro)
                     }
                     victimOwner->SetInCombatWith(this);
                     SetInCombatWith(victimOwner);
-                    victimOwner->AddThreat(this, 0.0f);
+                    victimOwner->GetThreatMgr().AddThreat(this, 0.0f);
                 }
             }
         }
