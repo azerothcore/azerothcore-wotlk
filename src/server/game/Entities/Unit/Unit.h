@@ -1690,8 +1690,8 @@ public:
 
     void SendHealSpellLog(Unit* victim, uint32 SpellID, uint32 Damage, uint32 OverHeal, uint32 Absorb, bool critical = false);
     int32 HealBySpell(HealInfo& healInfo, bool critical = false);
-    void SendEnergizeSpellLog(Unit* victim, uint32 spellId, int32 damage, Powers powerType);
-    void EnergizeBySpell(Unit* victim, uint32 spellId, int32 damage, Powers powerType);
+    void SendEnergizeSpellLog(Unit* victim, uint32 spellID, int32 damage, Powers powerType);
+    void EnergizeBySpell(Unit* victim, uint32 spellID, int32 damage, Powers powerType);
     void EnergizeBySpell(Unit* victim, SpellInfo const* spellInfo, int32 damage, Powers powerType);
 
     SpellCastResult CastSpell(SpellCastTargets const& targets, SpellInfo const* spellInfo, CustomSpellValues const* value, TriggerCastFlags triggerFlags = TRIGGERED_NONE, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
