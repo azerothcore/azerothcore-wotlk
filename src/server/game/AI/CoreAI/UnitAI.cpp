@@ -122,6 +122,8 @@ SpellCastResult UnitAI::DoAddAuraToAllHostilePlayers(uint32 spellid)
                 return SPELL_FAILED_BAD_TARGETS;
         }
     }
+
+    return SPELL_FAILED_CUSTOM_ERROR;
 }
 
 SpellCastResult UnitAI::DoCastToAllHostilePlayers(uint32 spellid, bool triggered)
@@ -140,6 +142,8 @@ SpellCastResult UnitAI::DoCastToAllHostilePlayers(uint32 spellid, bool triggered
                 return SPELL_FAILED_BAD_TARGETS;
         }
     }
+
+    return SPELL_FAILED_CUSTOM_ERROR;
 }
 
 SpellCastResult UnitAI::DoCast(uint32 spellId)
