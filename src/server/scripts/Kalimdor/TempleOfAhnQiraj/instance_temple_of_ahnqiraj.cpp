@@ -47,6 +47,7 @@ public:
         ObjectGuid SkeramGUID;
         ObjectGuid VemGUID;
         ObjectGuid KriGUID;
+        ObjectGuid YaujGUID;
         ObjectGuid VeklorGUID;
         ObjectGuid VeknilashGUID;
         ObjectGuid ViscidusGUID;
@@ -78,6 +79,9 @@ public:
                     break;
                 case NPC_KRI:
                     KriGUID = creature->GetGUID();
+                    break;
+                case NPC_YAUJ:
+                    YaujGUID = creature->GetGUID();
                     break;
                 case NPC_VEKLOR:
                     VeklorGUID = creature->GetGUID();
@@ -135,6 +139,8 @@ public:
                     return VemGUID;
                 case DATA_KRI:
                     return KriGUID;
+                case DATA_YAUJ:
+                    return YaujGUID;
                 case DATA_VEKLOR:
                     return VeklorGUID;
                 case DATA_VEKNILASH:
