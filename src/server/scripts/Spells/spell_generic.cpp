@@ -222,7 +222,7 @@ enum MineSweeper
 {
     SPELL_LAND_MINE_KNOCKBACK = 54402,
     SPELL_LANDMINE_KNOCKBACK_ACHIEVEMENT = 57064,
-}
+};
 
 /* 54355 - Detonation
    57099 - Landmine Knockback Achievement Aura */
