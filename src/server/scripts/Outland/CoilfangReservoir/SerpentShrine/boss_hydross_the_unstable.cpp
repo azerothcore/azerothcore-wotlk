@@ -120,7 +120,7 @@ public:
         void SetForm(bool corrupt, bool initial)
         {
             events.CancelEventGroup(GROUP_ABILITIES);
-            DoResetThreat();
+            ResetThreatList();
 
             if (corrupt)
             {

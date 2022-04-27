@@ -112,7 +112,7 @@ public:
             for (std::list<Creature*>::const_iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
             {
                 (*itr)->TauntApply(GetUnitOwner());
-                (*itr)->AddThreat(GetUnitOwner(), 10000000.0f);
+                (*itr)->GetThreatMgr().AddThreat(GetUnitOwner(), 10000000.0f);
                 _falconSet.insert((*itr)->GetGUID());
             }
         }
@@ -123,7 +123,7 @@ public:
                 if (Creature* falcon = ObjectAccessor::GetCreature(*GetUnitOwner(), guid))
                 {
                     falcon->TauntFadeOut(GetUnitOwner());
-                    falcon->AddThreat(GetUnitOwner(), -10000000.0f);
+                    falcon->GetThreatMgr().AddThreat(GetUnitOwner(), -10000000.0f);
                 }
         }
 

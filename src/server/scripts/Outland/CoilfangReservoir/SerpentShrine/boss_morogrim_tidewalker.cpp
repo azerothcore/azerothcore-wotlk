@@ -221,12 +221,12 @@ public:
 
             // Xinef: if we have target we currently follow, return
             if (Unit* target = GetCaster()->GetVictim())
-                if (GetCaster()->getThreatMgr().getThreat(target) >= 100000.0f)
+                if (GetCaster()->GetThreatMgr().getThreat(target) >= 100000.0f)
                     return;
 
             // Xinef: acquire new target
             if (Unit* target = GetHitUnit())
-                GetCaster()->AddThreat(target, 1000000.0f);
+                GetCaster()->GetThreatMgr().AddThreat(target, 1000000.0f);
         }
 
         void Register() override

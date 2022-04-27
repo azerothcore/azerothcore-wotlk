@@ -201,8 +201,8 @@ public:
                             head->AI()->Talk(threatYell - 1);
                         events.ScheduleEvent(threatYell, 3000);
 
-                        DoResetThreat();
-                        me->AddThreat(target, 10.0f);
+                        ResetThreatList();
+                        me->GetThreatMgr().AddThreat(target, 10.0f);
                     }
                     events.ScheduleEvent(EVENT_RESET_THREAT, 30000);
                     break;

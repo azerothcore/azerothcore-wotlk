@@ -203,7 +203,7 @@ public:
                     {
                         if (me->GetDisplayId() != me->GetNativeDisplayId())
                         {
-                            DoResetThreat();
+                            ResetThreatList();
                             me->LoadEquipment();
                             me->RemoveAurasDueToSpell(SPELL_METAMORPHOSIS);
                             events.ScheduleEvent(EVENT_SPELL_WHIRLWIND, 10000);
@@ -223,7 +223,7 @@ public:
                     events.ScheduleEvent(EVENT_HEALTH_CHECK, 1000);
                     break;
                 case EVENT_SWITCH_TO_DEMON:
-                    DoResetThreat();
+                    ResetThreatList();
                     Talk(SAY_SWITCH_TO_DEMON);
                     me->LoadEquipment(0, true);
                     me->GetMotionMaster()->MoveChase(me->GetVictim(), 25.0f);
@@ -234,7 +234,7 @@ public:
                     events.ScheduleEvent(EVENT_SWITCH_TO_ELF, 60000);
                     break;
                 case EVENT_SWITCH_TO_ELF:
-                    DoResetThreat();
+                    ResetThreatList();
                     me->LoadEquipment();
                     me->GetMotionMaster()->MoveChase(me->GetVictim(), 0.0f);
                     me->RemoveAurasDueToSpell(SPELL_METAMORPHOSIS);
@@ -355,7 +355,7 @@ public:
         void HandleScriptEffect(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
-            GetCaster()->getThreatMgr().resetAllAggro();
+            GetCaster()->GetThreatMgr().resetAllAggro();
 
             if (roll_chance_i(33))
                 if (Unit* target = GetCaster()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
