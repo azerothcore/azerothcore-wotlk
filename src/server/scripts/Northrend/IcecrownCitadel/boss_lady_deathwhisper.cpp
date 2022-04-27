@@ -445,7 +445,7 @@ public:
                             count = 3;
 
                         std::list<Unit*> targets;
-                        SelectTargetList(targets, NonTankTargetSelector(me, true), count, SelectTargetMethod::Random);
+                        SelectTargetList(targets, count, SelectTargetMethod::Random, 0, NonTankTargetSelector(me, true));
                         if (!targets.empty())
                             for (std::list<Unit*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
                                 me->CastSpell(*itr, SPELL_SUMMON_SHADE, true);

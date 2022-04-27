@@ -634,7 +634,7 @@ public:
                     if (Is25ManRaid())
                     {
                         std::list<Unit*> targets;
-                        SelectTargetList(targets, MalleableGooSelector(me), (IsHeroic() ? 3 : 2), SelectTargetMethod::Random);
+                        SelectTargetList(targets, (IsHeroic() ? 3 : 2), SelectTargetMethod::Random, 0, MalleableGooSelector(me));
 
                         if (!targets.empty())
                         {
