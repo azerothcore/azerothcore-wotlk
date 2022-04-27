@@ -21,6 +21,7 @@
 #include "Containers.h"
 #include "Define.h"
 #include "Unit.h"
+#include "ThreatMgr.h"
 #include <list>
 
 class Player;
@@ -44,13 +45,15 @@ struct DefaultTargetSelector : public Acore::unary_function<Unit*, bool>
     Unit const* me;
     float m_dist;
     bool m_playerOnly;
+    Unit const* except;
     int32 m_aura;
 
     // unit: the reference unit
     // dist: if 0: ignored, if > 0: maximum distance to the reference unit, if < 0: minimum distance to the reference unit
     // playerOnly: self explaining
+    // withMainTank: allow current tank to be selected
     // aura: if 0: ignored, if > 0: the target shall have the aura, if < 0, the target shall NOT have the aura
-    DefaultTargetSelector(Unit const* unit, float dist, bool playerOnly, int32 aura) : me(unit), m_dist(dist), m_playerOnly(playerOnly), m_aura(aura) {}
+    DefaultTargetSelector(Unit const* unit, float dist, bool playerOnly, bool withMainTank, int32 aura) : me(unit), m_dist(dist), m_playerOnly(playerOnly), except(withMainTank ? me->GetThreatMgr().GetCurrentVictim() : nullptr), m_aura(aura) {}
 
     bool operator()(Unit const* target) const
     {
@@ -200,7 +203,7 @@ public:
     virtual ObjectGuid GetGUID(int32 /*id*/ = 0) const { return ObjectGuid::Empty; }
 
     // Select the best target (in <targetType> order) from the threat list that fulfill the following:
-    // - Not among the first <offset> entries in <targetType> order (or SelectTargetMethod::MaxThreat order,
+    // - Not among the first <offset> entries in <targetType> order (or SelectTargetMethod::MaxThreat order)
     //   if <targetType> is SelectTargetMethod::Random).
     // - Within at most <dist> yards (if dist > 0.0f)
     // - At least -<dist> yards away (if dist < 0.0f)
@@ -208,60 +211,97 @@ public:
     // - Not the current tank (if withTank = false)
     // - Has aura with ID <aura> (if aura > 0)
     // - Does not have aura with ID -<aura> (if aura < 0)
-    Unit* SelectTarget(SelectTargetMethod targetType, uint32 position = 0, float dist = 0.0f, bool playerOnly = false, int32 aura = 0);
+    Unit* SelectTarget(SelectTargetMethod targetType, uint32 offset = 0, float dist = 0.0f, bool playerOnly = false, bool withTank = true, int32 aura = 0);
 
     // Select the best target (in <targetType> order) satisfying <predicate> from the threat list.
-    // If <offset> is nonzero, the first <offset> entries in <targetType> order (or SelectTargetMethod::MaxThreat
+    // If <offset> is nonzero, the first <offset> entries in <targetType> order (or SelectTargetMethod::MaxThreat)
     // order, if <targetType> is SelectTargetMethod::Random) are skipped.
     template <class PREDICATE>
-    Unit* SelectTarget(SelectTargetMethod targetType, uint32 position, PREDICATE const& predicate)
+    Unit* SelectTarget(SelectTargetMethod targetType, uint32 offset, PREDICATE const& predicate)
     {
-        ThreatContainer::StorageType const& threatlist = me->getThreatMgr().getThreatList();
-        if (position >= threatlist.size())
+        ThreatMgr& mgr = GetThreatMgr();
+        // shortcut: if we ignore the first <offset> elements, and there are at most <offset> elements, then we ignore ALL elements
+        if (mgr.GetThreatListSize() <= offset)
             return nullptr;
 
         std::list<Unit*> targetList;
-        for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
+        // Old code --> Difference ??
+        /*for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
             if (predicate((*itr)->getTarget()))
                 targetList.push_back((*itr)->getTarget());
-
-        if (position >= targetList.size())
-            return nullptr;
+        */
 
         if (targetType == SelectTargetMethod::MaxDistance || targetType == SelectTargetMethod::MinDistance)
-            targetList.sort(Acore::ObjectDistanceOrderPred(me));
+        {
+            for (ThreatReference* ref : mgr.GetUnsortedThreatList())
+            {
+                if (ref->IsOffline())
+                    continue;
+                targetList.push_back(ref->GetVictim());
+            }
+        }
+        else
+        {
+            Unit* currentVictim = mgr.GetCurrentVictim();
+            if (currentVictim)
+                targetList.push_back(currentVictim);
+
+            for (ThreatReference* ref : mgr.GetSortedThreatList())
+            {
+                if (ref->IsOffline())
+                    continue;
+
+                Unit* thisTarget = ref->GetVictim();
+                if (thisTarget != currentVictim)
+                    targetList.push_back(thisTarget);
+            }
+        }
+
+        // filter by predicate
+        targetList.remove_if([&predicate](Unit* target) { return !predicate(target); });
+
+        // shortcut: the list certainly isn't gonna get any larger after this point
+        if (targetList.size() <= offset)
+            return nullptr;
+
+        // right now, list is unsorted for DISTANCE types - re-sort by MAXDISTANCE
+        if (targetType == SelectTargetMethod::MaxDistance || targetType == SelectTargetMethod::MinDistance)
+            SortByDistance(targetList, targetType == SelectTargetMethod::MinDistance);
+
+        // then reverse the sorting for MIN sortings
+        if (targetType == SelectTargetMethod::MinThreat)
+            targetList.reverse();
+        // now pop the first <offset> elements
+        while (offset)
+        {
+            targetList.pop_front();
+            --offset;
+        }
+        // maybe nothing fulfills the predicate
+        if (targetList.empty())
+            return nullptr;
 
         switch (targetType)
         {
-            case SelectTargetMethod::MaxDistance:
+            
             case SelectTargetMethod::MaxThreat:
-                {
-                    std::list<Unit*>::iterator itr = targetList.begin();
-                    std::advance(itr, position);
-                    return *itr;
-                }
-            case SelectTargetMethod::MinDistance:
             case SelectTargetMethod::MinThreat:
-                {
-                    std::list<Unit*>::reverse_iterator ritr = targetList.rbegin();
-                    std::advance(ritr, position);
-                    return *ritr;
-                }
+            case SelectTargetMethod::MaxDistance:
+            case SelectTargetMethod::MinDistance:
+                return targetList.front();
             case SelectTargetMethod::Random:
                 {
                     std::list<Unit*>::iterator itr = targetList.begin();
-                    std::advance(itr, urand(position, targetList.size() - 1));
+                    std::advance(itr, urand(offset, targetList.size() - 1));
                     return *itr;
                 }
             default:
-                break;
+                return nullptr;
         }
-
-        return nullptr;
     }
 
     // Select the best (up to) <num> targets (in <targetType> order) from the threat list that fulfill the following:
-    // - Not among the first <offset> entries in <targetType> order (or SelectTargetMethod::MaxThreat order,
+    // - Not among the first <offset> entries in <targetType> order (or SelectTargetMethod::MaxThreat order)
     //   if <targetType> is SelectTargetMethod::Random).
     // - Within at most <dist> yards (if dist > 0.0f)
     // - At least -<dist> yards away (if dist < 0.0f)
@@ -270,35 +310,77 @@ public:
     // - Has aura with ID <aura> (if aura > 0)
     // - Does not have aura with ID -<aura> (if aura < 0)
     // The resulting targets are stored in <targetList> (which is cleared first).
-    void SelectTargetList(std::list<Unit*>& targetList, uint32 num, SelectTargetMethod targetType, float dist = 0.0f, bool playerOnly = false, int32 aura = 0);
+    void SelectTargetList(std::list<Unit*>& targetList, uint32 num, SelectTargetMethod targetType, uint32 offset = 0, float dist = 0.0f, bool playerOnly = false, bool withTank = true, int32 aura = 0);
 
     // Select the best (up to) <num> targets (in <targetType> order) satisfying <predicate> from the threat list and stores them in <targetList> (which is cleared first).
-    // If <offset> is nonzero, the first <offset> entries in <targetType> order (or SelectTargetMethod::MaxThreat
+    // If <offset> is nonzero, the first <offset> entries in <targetType> order (or SelectTargetMethod::MaxThreat)
     // order, if <targetType> is SelectTargetMethod::Random) are skipped.
     template <class PREDICATE>
-    void SelectTargetList(std::list<Unit*>& targetList, PREDICATE const& predicate, uint32 maxTargets, SelectTargetMethod targetType)
+    void SelectTargetList(std::list<Unit*>& targetList, uint32 num, SelectTargetMethod targetType, uint32 offset, PREDICATE const& predicate)
     {
-        ThreatContainer::StorageType const& threatlist = me->getThreatMgr().getThreatList();
-        if (threatlist.empty())
+        targetList.clear();
+        ThreatMgr& mgr = GetThreatMgr();
+        // shortcut: we're gonna ignore the first <offset> elements, and there's at most <offset> elements, so we ignore them all - nothing to do here
+        if (mgr.GetThreatListSize() <= offset)
             return;
-
-        for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
-            if (predicate((*itr)->getTarget()))
-                targetList.push_back((*itr)->getTarget());
-
-        if (targetList.size() < maxTargets)
-            return;
-
         if (targetType == SelectTargetMethod::MaxDistance || targetType == SelectTargetMethod::MinDistance)
-            targetList.sort(Acore::ObjectDistanceOrderPred(me));
+        {
+            for (ThreatReference* ref : mgr.GetUnsortedThreatList())
+            {
+                if (ref->IsOffline())
+                    continue;
 
-        if (targetType == SelectTargetMethod::MinDistance || targetType == SelectTargetMethod::MinThreat)
+                targetList.push_back(ref->GetVictim());
+            }
+        }
+        else
+        {
+            Unit* currentVictim = mgr.GetCurrentVictim();
+            if (currentVictim)
+                targetList.push_back(currentVictim);
+
+            for (ThreatReference* ref : mgr.GetSortedThreatList())
+            {
+                if (ref->IsOffline())
+                    continue;
+
+                Unit* thisTarget = ref->GetVictim();
+                if (thisTarget != currentVictim)
+                    targetList.push_back(thisTarget);
+            }
+        }
+
+        // filter by predicate
+        targetList.remove_if([&predicate](Unit* target) { return !predicate(target); });
+
+        // shortcut: the list isn't gonna get any larger
+        if (targetList.size() <= offset)
+        {
+            targetList.clear();
+            return;
+        }
+
+        // right now, list is unsorted for DISTANCE types - re-sort by MAXDISTANCE
+        if (targetType == SelectTargetMethod::MaxDistance || targetType == SelectTargetMethod::MinDistance)
+            SortByDistance(targetList, targetType == SelectTargetMethod::MinDistance);
+
+        // now the list is MAX sorted, reverse for MIN types
+        if (targetType == SelectTargetMethod::MinThreat)
             targetList.reverse();
+        // ignore the first <offset> elements
+        while (offset)
+        {
+            targetList.pop_front();
+            --offset;
+        }
+
+        if (targetList.size() <= num)
+            return;
 
         if (targetType == SelectTargetMethod::Random)
-            Acore::Containers::RandomResize(targetList, maxTargets);
+            Acore::Containers::RandomResize(targetList, num);
         else
-            targetList.resize(maxTargets);
+            targetList.resize(num);
     }
 
     // Called at any Damage to any victim (before damage apply)
@@ -345,6 +427,11 @@ public:
     virtual void sQuestComplete(Player* /*player*/, Quest const* /*quest*/) {}
     virtual void sQuestReward(Player* /*player*/, Quest const* /*quest*/, uint32 /*opt*/) {}
     virtual void sOnGameEvent(bool /*start*/, uint16 /*eventId*/) {}
+
+private:
+
+    ThreatMgr& GetThreatMgr();
+    void SortByDistance(std::list<Unit*> list, bool ascending = true);
 };
 
 class PlayerAI : public UnitAI
