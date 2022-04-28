@@ -399,7 +399,7 @@ public:
                     events.ScheduleEvent(EVENT_METEOR_STRIKE, 40000);
                     break;
                 case EVENT_FIERY_COMBUSTION:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true, -SPELL_TWILIGHT_REALM))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true, true, -SPELL_TWILIGHT_REALM))
                         me->CastSpell(target, SPELL_FIERY_COMBUSTION, false);
                     events.ScheduleEvent(EVENT_FIERY_COMBUSTION, 25000);
                     break;
@@ -542,7 +542,7 @@ public:
                     _events.ScheduleEvent(EVENT_BREATH, urand(10000, 12000));
                     break;
                 case EVENT_SOUL_CONSUMPTION:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true, SPELL_TWILIGHT_REALM))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true,true, SPELL_TWILIGHT_REALM))
                         me->CastSpell(target, SPELL_SOUL_CONSUMPTION, false);
                     _events.ScheduleEvent(EVENT_SOUL_CONSUMPTION, 20000);
                     break;

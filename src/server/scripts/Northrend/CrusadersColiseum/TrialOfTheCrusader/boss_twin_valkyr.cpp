@@ -383,7 +383,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                     }
 
                     /*
-                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, essenceId) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true, essenceId) )
                         me->CastSpell(target, me->GetEntry()==NPC_LIGHTBANE ? SPELL_LIGHT_TOUCH : SPELL_DARK_TOUCH, false);
                     events.RepeatEvent(urand(45000,50000));
                     */

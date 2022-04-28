@@ -339,7 +339,7 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
     void EnterCombat(Unit* who) override
     {
         if (Creature* delrissa = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_DELRISSA)))
-            if (delrissa->IsAlive() && !delrissa->IsInCombat())
+            if (delrissa->IsAlive() && !delrissa->IsEngaged())
                 delrissa->AI()->AttackStart(who);
 
         events.ScheduleEvent(EVENT_SPELL_HELPER_HEALING_POTION, 1000);
