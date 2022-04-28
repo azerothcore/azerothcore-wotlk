@@ -358,6 +358,17 @@ Unit::~Unit()
     ASSERT(!m_attacking);
     ASSERT(m_attackers.empty());
 
+    // pussywizard: clear m_sharedVision along with back references
+    if (!m_sharedVision.empty())
+    {
+        do
+        {
+            Player* p = *(m_sharedVision.begin());
+            p->m_isInSharedVisionOf.erase(this);
+            m_sharedVision.remove(p);
+        } while (!m_sharedVision.empty());
+    }
+
     ASSERT(m_Controlled.empty());
     ASSERT(m_appliedAuras.empty());
     ASSERT(m_ownedAuras.empty());
@@ -10710,12 +10721,14 @@ void Unit::AddPlayerToVision(Player* player)
         SetWorldObject(true);
     }
     m_sharedVision.push_back(player);
+    player->m_isInSharedVisionOf.insert(this);
 }
 
 // only called in Player::SetSeer
 void Unit::RemovePlayerFromVision(Player* player)
 {
     m_sharedVision.remove(player);
+    player->m_isInSharedVisionOf.erase(this);
     if (m_sharedVision.empty())
     {
         setActive(false);
