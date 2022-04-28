@@ -23,6 +23,7 @@
 #include <iomanip>
 #include <set>
 #include <sstream>
+#include <boost/filesystem.hpp>
 
 using G3D::Vector3;
 using G3D::AABox;
@@ -54,7 +55,7 @@ namespace VMAP
     TileAssembler::TileAssembler(const std::string& pSrcDirName, const std::string& pDestDirName)
         : iDestDir(pDestDirName), iSrcDir(pSrcDirName)
     {
-        //mkdir(iDestDir);
+        boost::filesystem::create_directory(iDestDir);
         //init();
     }
 
