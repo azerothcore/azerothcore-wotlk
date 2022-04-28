@@ -17,6 +17,7 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "temple_of_ahnqiraj.h"
 #include "TaskScheduler.h"
 
