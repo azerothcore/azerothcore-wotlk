@@ -85,6 +85,24 @@ void PlayerbotsDatabaseConnection::DoPrepareStatements()
     PrepareStatement(PLAYERBOTS_DEL_TRAVELNODE_PATH, "DELETE FROM playerbots_travelnode_path", CONNECTION_ASYNC);
 
     PrepareStatement(PLAYERBOTS_SEL_TEXT, "SELECT `key`,`text` FROM playerbots_text", CONNECTION_SYNCH);
+    PrepareStatement(
+        PLAYERBOTS_SEL_DUNGEON_SUGGESTION,
+        "SELECT"
+        "   d.`name`, "
+        "   d.`difficulty`, "
+        "   d.`min_level`, "
+        "   d.`max_level`, "
+        "   a.`abbrevation`, "
+        "   s.`strategy` "
+        "FROM playerbots_dungeon_suggestion_definition d "
+        "LEFT OUTER JOIN playerbots_dungeon_suggestion_abbrevation a "
+        "   ON d.slug = a.definition_slug "
+        "LEFT OUTER JOIN playerbots_dungeon_suggestion_strategy s "
+        "   ON d.slug = s.definition_slug "
+        "   AND d.difficulty = s.difficulty "
+        "WHERE d.expansion <= ?;",
+        CONNECTION_SYNCH
+    );
 
     PrepareStatement(PLAYERBOTS_SEL_WEIGHTSCALES, "SELECT id, name, class FROM playerbots_weightscales", CONNECTION_SYNCH);
     PrepareStatement(PLAYERBOTS_SEL_WEIGHTSCALE_DATA, "SELECT id, field, val FROM playerbots_weightscale_data", CONNECTION_SYNCH);
