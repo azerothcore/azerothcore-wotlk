@@ -403,11 +403,20 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (creature->IsQuestGiver())
+        {
             player->PrepareQuestMenu(creature->GetGUID());
+        }
+
+        if (creature->IsVendor())
+        {
+            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+        }
 
         Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
         if (!wintergrasp)
+        {
             return true;
+        }
 
         if (creature->IsQuestGiver())
         {
@@ -583,6 +592,8 @@ public:
         QuestRelationBounds qir = sObjectMgr->GetCreatureQuestInvolvedRelationBounds(creature->GetEntry());
         QuestGiverStatus result = DIALOG_STATUS_NONE;
 
+        Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
+
         for (QuestRelations::const_iterator i = qir.first; i != qir.second; ++i)
         {
             QuestGiverStatus result2 = DIALOG_STATUS_NONE;
@@ -659,6 +670,73 @@ public:
                     break;
             }
 
+            if (wintergrasp)
+            {
+                // Certain quests are only available when attacking / defending
+                bool hasCorrectZoneControl = false;
+                switch (questId)
+                {
+                    // Horde attacker
+                    case QUEST_BONES_AND_ARROWS_HORDE_ATT:
+                    case QUEST_JINXING_THE_WALLS_HORDE_ATT:
+                    case QUEST_SLAY_THEM_ALL_HORDE_ATT:
+                    case QUEST_FUELING_THE_DEMOLISHERS_HORDE_ATT:
+                    case QUEST_HEALING_WITH_ROSES_HORDE_ATT:
+                    case QUEST_DEFEND_THE_SIEGE_HORDE_ATT:
+                        if (wintergrasp->GetAttackerTeam() == TEAM_HORDE)
+                        {
+                            hasCorrectZoneControl = true;
+                        }
+                        break;
+                    // Horde defender
+                    case QUEST_BONES_AND_ARROWS_HORDE_DEF:
+                    case QUEST_WARDING_THE_WALLS_HORDE_DEF:
+                    case QUEST_SLAY_THEM_ALL_HORDE_DEF:
+                    case QUEST_FUELING_THE_DEMOLISHERS_HORDE_DEF:
+                    case QUEST_HEALING_WITH_ROSES_HORDE_DEF:
+                    case QUEST_TOPPLING_THE_TOWERS_HORDE_DEF:
+                    case QUEST_STOP_THE_SIEGE_HORDE_DEF:
+                        if (wintergrasp->GetDefenderTeam() == TEAM_HORDE)
+                        {
+                            hasCorrectZoneControl = true;
+                        }
+                        break;
+                    // Alliance attacker
+                    case QUEST_BONES_AND_ARROWS_ALLIANCE_ATT:
+                    case QUEST_WARDING_THE_WARRIORS_ALLIANCE_ATT:
+                    case QUEST_NO_MERCY_FOR_THE_MERCILESS_ALLIANCE_ATT:
+                    case QUEST_DEFEND_THE_SIEGE_ALLIANCE_ATT:
+                    case QUEST_A_RARE_HERB_ALLIANCE_ATT:
+                    case QUEST_FUELING_THE_DEMOLISHERS_ALLIANCE_ATT:
+                        if (wintergrasp->GetAttackerTeam() == TEAM_ALLIANCE)
+                        {
+                            hasCorrectZoneControl = true;
+                        }
+                        break;
+                    // Alliance defender
+                    case QUEST_BONES_AND_ARROWS_ALLIANCE_DEF:
+                    case QUEST_WARDING_THE_WARRIORS_ALLIANCE_DEF:
+                    case QUEST_NO_MERCY_FOR_THE_MERCILESS_ALLIANCE_DEF:
+                    case QUEST_SHOUTHERN_SABOTAGE_ALLIANCE_DEF:
+                    case QUEST_STOP_THE_SIEGE_ALLIANCE_DEF:
+                    case QUEST_A_RARE_HERB_ALLIANCE_DEF:
+                    case QUEST_FUELING_THE_DEMOLISHERS_ALLIANCE_DEF:
+                        if (wintergrasp->GetDefenderTeam() == TEAM_ALLIANCE)
+                        {
+                            hasCorrectZoneControl = true;
+                        }
+                        break;
+                    default:
+                        hasCorrectZoneControl = true;
+                        break;
+                }
+
+                if (!hasCorrectZoneControl)
+                {
+                    continue;
+                }
+            }
+
             QuestStatus status = player->GetQuestStatus(questId);
             if (status == QUEST_STATUS_NONE)
             {
@@ -688,6 +766,19 @@ public:
         }
 
         return result;
+    }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
+    {
+        ClearGossipMenuFor(player);
+        switch (action)
+        {
+            case GOSSIP_ACTION_TRADE:
+                player->GetSession()->SendListInventory(creature->GetGUID());
+                break;
+        }
+
+        return true;
     }
 };
 
