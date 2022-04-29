@@ -1,5 +1,3 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1650887143894550200');
-
 -- Insert missing Bear Flank drop rate for Rabid Shardtooth
 DELETE FROM `creature_loot_template` WHERE `Entry` = 7446 AND `Item` = 35562;
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Chance`, `Comment`) VALUES (7446, 35562, 65, 'Rabid Shardtooth - Bear Flank');
