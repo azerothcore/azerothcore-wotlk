@@ -1341,6 +1341,9 @@ public:
     }
     [[nodiscard]] Unit* getAttackerForHelper() const                 // If someone wants to help, who to give them
     {
+        if (!IsEngaged())
+            return nullptr;
+
         if (GetVictim() != nullptr)
             return GetVictim();
 

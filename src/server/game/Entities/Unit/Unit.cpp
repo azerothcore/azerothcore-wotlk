@@ -13087,11 +13087,11 @@ void Unit::CombatStartOnCast(Unit* target, bool initialAggro, uint32 duration)
         // Xinef: If pet started combat - put owner in combat
         if (Unit* owner = GetOwner())
             owner->SetInCombatWith(target, duration);
-    } 
+    }
 
     Player* player = GetCharmerOrOwnerPlayerOrPlayerItself();
-
     Unit* who = target->GetCharmerOrOwnerOrSelf();
+
     if (player && who->GetTypeId() == TYPEID_PLAYER)
         SetContestedPvP(who->ToPlayer());
 
