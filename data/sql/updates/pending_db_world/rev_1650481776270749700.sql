@@ -1,5 +1,3 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1650481776270749700');
-
 -- Fix for the levitate issue
 UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 2.14286, `flags_extra` = `flags_extra`|512 WHERE `entry` = 14517;
 UPDATE `creature_template_movement` SET `Flight` = 0 WHERE `CreatureId` = 14517;
