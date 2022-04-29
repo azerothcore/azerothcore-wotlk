@@ -101,7 +101,7 @@ struct npc_pet_mage_mirror_image : CasterAI
         while (ref)
         {
             if (Unit* unit = ref->GetSource()->GetOwner())
-                unit->AddThreat(me, ref->getThreat() - ref->getTempThreatModifier());
+                unit->GetThreatMgr().AddThreat(me, ref->getThreat() - ref->getTempThreatModifier());
             ref = ref->next();
         }
 
@@ -164,8 +164,8 @@ struct npc_pet_mage_mirror_image : CasterAI
 
             if (selection)
             {
-                me->getThreatMgr().resetAllAggro();
-                me->AddThreat(selection, 1000000.0f);
+                me->GetThreatMgr().resetAllAggro();
+                me->GetThreatMgr().AddThreat(selection, 1000000.0f);
 
                 if (owner->IsInCombat())
                     AttackStart(selection);

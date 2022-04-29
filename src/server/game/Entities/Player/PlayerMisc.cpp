@@ -17,7 +17,6 @@
 
 #include "AccountMgr.h"
 #include "GameTime.h"
-#include "GridNotifiers.h"
 #include "MapMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -329,31 +328,6 @@ void Player::UpdateAfkReport(time_t currTime)
     {
         m_bgData.bgAfkReportedCount = 0;
         m_bgData.bgAfkReportedTimer = currTime + 5 * MINUTE;
-    }
-}
-
-void Player::SetContestedPvP(Player* attackedPlayer)
-{
-    if (attackedPlayer && (attackedPlayer == this || (duel && duel->Opponent == attackedPlayer)))
-        return;
-
-    SetContestedPvPTimer(30000);
-    if (!HasUnitState(UNIT_STATE_ATTACK_PLAYER))
-    {
-        AddUnitState(UNIT_STATE_ATTACK_PLAYER);
-        SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_CONTESTED_PVP);
-        // call MoveInLineOfSight for nearby contested guards
-        Acore::AIRelocationNotifier notifier(*this);
-        Cell::VisitWorldObjects(this, notifier, GetVisibilityRange());
-    }
-    for (Unit* unit : m_Controlled)
-    {
-        if (!unit->HasUnitState(UNIT_STATE_ATTACK_PLAYER))
-        {
-            unit->AddUnitState(UNIT_STATE_ATTACK_PLAYER);
-            Acore::AIRelocationNotifier notifier(*unit);
-            Cell::VisitWorldObjects(this, notifier, GetVisibilityRange());
-        }
     }
 }
 

@@ -1140,7 +1140,7 @@ public:
                     if (Player* AggroTarget = ObjectAccessor::GetPlayer(*me, AggroTargetGUID))
                     {
                         me->SetTarget(AggroTarget->GetGUID());
-                        me->AddThreat(AggroTarget, 1);
+                        me->GetThreatMgr().AddThreat(AggroTarget, 1);
                         me->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
                     }
                     break;

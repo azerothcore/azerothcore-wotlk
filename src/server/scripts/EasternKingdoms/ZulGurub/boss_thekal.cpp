@@ -481,8 +481,8 @@ public:
             {
                 DoCastVictim(SPELL_GOUGE);
 
-                if (DoGetThreat(me->GetVictim()))
-                    DoModifyThreatPercent(me->GetVictim(), -100);
+                if (GetThreat(me->GetVictim()))
+                    ModifyThreatByPercent(me->GetVictim(), -100);
 
                 Gouge_Timer = 17000 + rand() % 10000;
             }

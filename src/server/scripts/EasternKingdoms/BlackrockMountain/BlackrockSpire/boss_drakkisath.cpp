@@ -112,7 +112,7 @@ public:
                     case EVENT_CHECK_CONFLAGRATION_TARGET:
                         if (Unit* target = ObjectAccessor::GetUnit(*me, _conflagrateTarget))
                         {
-                            me->getThreatMgr().addThreat(target, _conflagrateThreat);
+                            me->GetThreatMgr().addThreat(target, _conflagrateThreat);
                         }
                         break;
                 }

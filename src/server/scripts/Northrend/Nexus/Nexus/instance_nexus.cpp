@@ -239,7 +239,7 @@ public:
                 if (!_allowDeath)
                 {
                     me->RemoveAllAuras();
-                    me->GetThreatMgr().ClearAllThreat()
+                    me->GetThreatMgr().ClearAllThreat();
                     me->CombatStop(true);
                     damage = 0;
 
