@@ -203,7 +203,7 @@ public:
     virtual ObjectGuid GetGUID(int32 /*id*/ = 0) const { return ObjectGuid::Empty; }
 
     // Select the best target (in <targetType> order) from the threat list that fulfill the following:
-    // - Not among the first <offset> entries in <targetType> order (or SelectTargetMethod::MaxThreat order)
+    // - Not among the first <offset> entries in <targetType> order (or SelectTargetMethod::MaxThreat order,
     //   if <targetType> is SelectTargetMethod::Random).
     // - Within at most <dist> yards (if dist > 0.0f)
     // - At least -<dist> yards away (if dist < 0.0f)
@@ -225,11 +225,6 @@ public:
             return nullptr;
 
         std::list<Unit*> targetList;
-        // Old code --> Difference ??
-        /*for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
-            if (predicate((*itr)->getTarget()))
-                targetList.push_back((*itr)->getTarget());
-        */
 
         if (targetType == SelectTargetMethod::MaxDistance || targetType == SelectTargetMethod::MinDistance)
         {
@@ -301,7 +296,7 @@ public:
     }
 
     // Select the best (up to) <num> targets (in <targetType> order) from the threat list that fulfill the following:
-    // - Not among the first <offset> entries in <targetType> order (or SelectTargetMethod::MaxThreat order)
+    // - Not among the first <offset> entries in <targetType> order (or SelectTargetMethod::MaxThreat order,
     //   if <targetType> is SelectTargetMethod::Random).
     // - Within at most <dist> yards (if dist > 0.0f)
     // - At least -<dist> yards away (if dist < 0.0f)
@@ -323,6 +318,7 @@ public:
         // shortcut: we're gonna ignore the first <offset> elements, and there's at most <offset> elements, so we ignore them all - nothing to do here
         if (mgr.GetThreatListSize() <= offset)
             return;
+
         if (targetType == SelectTargetMethod::MaxDistance || targetType == SelectTargetMethod::MinDistance)
         {
             for (ThreatReference* ref : mgr.GetUnsortedThreatList())
@@ -429,7 +425,6 @@ public:
     virtual void sOnGameEvent(bool /*start*/, uint16 /*eventId*/) {}
 
 private:
-
     ThreatMgr& GetThreatMgr();
     void SortByDistance(std::list<Unit*> list, bool ascending = true);
 };

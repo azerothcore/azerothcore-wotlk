@@ -1808,6 +1808,7 @@ public:
     void UpdateAfkReport(time_t currTime);
     void UpdatePvPFlag(time_t currTime);
     void UpdateFFAPvPFlag(time_t currTime);
+    void SetContestedPvP(Player* attackedPlayer = nullptr);
     void UpdateContestedPvP(uint32 currTime);
     void SetContestedPvPTimer(uint32 newTime) {m_contestedPvPTimer = newTime;}
     void ResetContestedPvP()

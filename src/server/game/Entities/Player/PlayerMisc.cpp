@@ -17,6 +17,7 @@
 
 #include "AccountMgr.h"
 #include "GameTime.h"
+#include "GridNotifiers.h"
 #include "MapMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -329,6 +330,48 @@ void Player::UpdateAfkReport(time_t currTime)
         m_bgData.bgAfkReportedCount = 0;
         m_bgData.bgAfkReportedTimer = currTime + 5 * MINUTE;
     }
+}
+
+void Unit::SetContestedPvP(Player* attackedPlayer, bool lookForNearContestedGuards)
+{
+    Player* player = GetCharmerOrOwnerPlayerOrPlayerItself();
+
+    if (!player || ((attackedPlayer && (attackedPlayer == player || (player->duel && player->duel->Opponent == attackedPlayer))) || player->InBattleground()))
+        return;
+
+    // check if there any guards that should care about the contested flag on player
+    if (lookForNearContestedGuards)
+    {
+        std::list<Unit*> targets;
+        Acore::NearestVisibleDetectableContestedGuardUnitCheck u_check(this);
+        Acore::UnitListSearcher<Acore::NearestVisibleDetectableContestedGuardUnitCheck> searcher(this, targets, u_check);
+        Cell::VisitAllObjects(this, searcher, MAX_AGGRO_RADIUS);
+
+        // return if there are no contested guards found
+        if (!targets.size())
+        {
+            return;
+        }
+    }
+
+    player->SetContestedPvPTimer(30000);
+    if (!player->HasUnitState(UNIT_STATE_ATTACK_PLAYER))
+    {
+        player->AddUnitState(UNIT_STATE_ATTACK_PLAYER);
+        player->SetPlayerFlag(PLAYER_FLAGS_CONTESTED_PVP);
+        // call MoveInLineOfSight for nearby contested guards
+        AddToNotify(NOTIFY_AI_RELOCATION);
+    }
+    for (Unit* unit : m_Controlled)
+    {
+        if (!HasUnitState(UNIT_STATE_ATTACK_PLAYER))
+        {
+            AddUnitState(UNIT_STATE_ATTACK_PLAYER);
+            // call MoveInLineOfSight for nearby contested guards
+            AddToNotify(NOTIFY_AI_RELOCATION);
+        }
+    }
+    
 }
 
 void Player::UpdateContestedPvP(uint32 diff)
