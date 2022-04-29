@@ -3299,8 +3299,7 @@ void Spell::EffectTaunt(SpellEffIndex /*effIndex*/)
             unitTarget->GetThreatMgr().doAddThreat(m_caster, topThreat - myThreat);
 
         //Set aggro victim to caster
-        if (HostileReference* forcedVictim = unitTarget->GetThreatMgr().getOnlineContainer().getReferenceByTarget(m_caster))
-            unitTarget->GetThreatMgr().setCurrentVictim(forcedVictim);
+        unitTarget->GetThreatMgr().ClearThreat(m_caster);
     }
 
     if (unitTarget->ToCreature()->IsAIEnabled && !unitTarget->ToCreature()->HasReactState(REACT_PASSIVE))

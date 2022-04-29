@@ -307,8 +307,7 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
             {
                 float threatMod = GetThreatMod(me->GetDistance2d(pUnit), (float)pUnit->GetArmor(), pUnit->GetHealth(), pUnit->GetMaxHealth(), pUnit);
                 me->GetThreatMgr().ModifyThreatByPercent(pUnit, -100);
-                if (HostileReference* ref = me->GetThreatMgr().getOnlineContainer().getReferenceByTarget(pUnit))
-                    ref->addThreat(10000000.0f * threatMod);
+                me->GetThreatMgr().ClearThreat(pUnit);
             }
         }
     }
