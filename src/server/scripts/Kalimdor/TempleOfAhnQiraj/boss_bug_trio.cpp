@@ -58,10 +58,23 @@ enum Misc
     VEM_WAYPOINT_PATH    = 876030
 };
 
+const Position resetPoint = { -8582.0f, 2047.0f, -1.62f }; // Taken from CMangos
+
 struct boss_bug_trio : public BossAI
 {
 public:
     boss_bug_trio(Creature* creature) : BossAI(creature, DATA_BUG_TRIO) { Reset(); }
+
+    bool CheckInRoom() override
+    {
+        if (me->GetExactDist2d(resetPoint) <= 10.f)
+        {
+            EnterEvadeMode(EVADE_REASON_BOUNDARY);
+            return false;
+        }
+
+        return true;
+    }
 
     void EnterCombatWithTrio(Unit* who)
     {
@@ -171,7 +184,7 @@ public:
 
     void UpdateAI(uint32 diff) override
     {
-        if (!UpdateVictim() || isEating)
+        if (!UpdateVictim() || isEating || !CheckInRoom())
             return;
 
         _scheduler.Update(diff, [this]
