@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.spell_area
+-- Dumpar struktur för tabell acore_world.spell_area
 DROP TABLE IF EXISTS `spell_area`;
 CREATE TABLE IF NOT EXISTS `spell_area` (
   `spell` MEDIUMINT unsigned NOT NULL DEFAULT 0,
@@ -21,14 +21,14 @@ CREATE TABLE IF NOT EXISTS `spell_area` (
   `quest_end` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `aura_spell` MEDIUMINT NOT NULL DEFAULT 0,
   `racemask` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `gender` TINYINT unsigned NOT NULL DEFAULT 2,
+  `gender` TINYINT unsigned NOT NULL DEFAULT '2',
   `autocast` TINYINT unsigned NOT NULL DEFAULT 0,
-  `quest_start_status` INT NOT NULL DEFAULT 64,
-  `quest_end_status` INT NOT NULL DEFAULT 11,
+  `quest_start_status` INT NOT NULL DEFAULT '64',
+  `quest_end_status` INT NOT NULL DEFAULT '11',
   PRIMARY KEY (`spell`,`area`,`quest_start`,`aura_spell`,`racemask`,`gender`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_world.spell_area: 697 rows
+-- Dumpar data för tabell acore_world.spell_area: 697 rows
 DELETE FROM `spell_area`;
 /*!40000 ALTER TABLE `spell_area` DISABLE KEYS */;
 INSERT INTO `spell_area` (`spell`, `area`, `quest_start`, `quest_end`, `aura_spell`, `racemask`, `gender`, `autocast`, `quest_start_status`, `quest_end_status`) VALUES

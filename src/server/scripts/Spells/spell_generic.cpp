@@ -218,11 +218,22 @@ class spell_gen_have_item_auras : public AuraScript
     }
 };
 
+enum MineSweeper
+{
+    SPELL_LAND_MINE_KNOCKBACK = 54402,
+    SPELL_LANDMINE_KNOCKBACK_ACHIEVEMENT = 57064,
+};
+
 /* 54355 - Detonation
    57099 - Landmine Knockback Achievement Aura */
 class spell_gen_mine_sweeper : public SpellScript
 {
     PrepareSpellScript(spell_gen_mine_sweeper);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_LAND_MINE_KNOCKBACK, SPELL_LANDMINE_KNOCKBACK_ACHIEVEMENT});
+    }
 
     void HandleSchoolDMG(SpellEffIndex  /*effIndex*/)
     {
@@ -232,7 +243,7 @@ class spell_gen_mine_sweeper : public SpellScript
             return;
 
         target->RemoveAurasByType(SPELL_AURA_MOUNTED);
-        caster->CastSpell(target, 54402, true);
+        caster->CastSpell(target, SPELL_LAND_MINE_KNOCKBACK, true);
     }
 
     void HandleScriptEffect(SpellEffIndex  /*effIndex*/)
@@ -240,7 +251,7 @@ class spell_gen_mine_sweeper : public SpellScript
         if (Unit* target = GetHitPlayer())
             if (Aura* aur = target->GetAura(GetSpellInfo()->Id))
                 if (aur->GetStackAmount() >= 10)
-                    target->CastSpell(target, 57064, true);
+                    target->CastSpell(target, SPELL_LANDMINE_KNOCKBACK_ACHIEVEMENT, true);
     }
 
     void Register() override
@@ -1840,6 +1851,11 @@ class spell_gen_teleporting : public SpellScript
 {
     PrepareSpellScript(spell_gen_teleporting);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_TELEPORT_SPIRE_UP, SPELL_TELEPORT_SPIRE_DOWN });
+    }
+
     void HandleScript(SpellEffIndex /* effIndex */)
     {
         Unit* target = GetHitUnit();
@@ -2268,6 +2284,11 @@ class spell_gen_turkey_marker : public AuraScript
 {
     PrepareAuraScript(spell_gen_turkey_marker);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_TURKEY_VENGEANCE });
+    }
+
     bool Load() override
     {
         _applyTimes.clear();
@@ -2470,7 +2491,14 @@ class spell_gen_damage_reduction_aura : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_DAMAGE_REDUCTION_AURA });
+        return ValidateSpellInfo(
+            {
+                SPELL_DAMAGE_REDUCTION_AURA,
+                SPELL_BLESSING_OF_SANCTUARY,
+                SPELL_GREATER_BLESSING_OF_SANCTUARY,
+                SPELL_RENEWED_HOPE,
+                SPELL_VIGILANCE
+            });
     }
 
     void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -2665,26 +2693,17 @@ class spell_gen_dalaran_disguise : public SpellScript
 {
     PrepareSpellScript(spell_gen_dalaran_disguise);
 
-    bool Validate(SpellInfo const* spellInfo) override
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        switch (spellInfo->Id)
-        {
-            case SPELL_SUNREAVER_DISGUISE_TRIGGER:
-                return ValidateSpellInfo(
-                    {
-                        SPELL_SUNREAVER_DISGUISE_FEMALE,
-                        SPELL_SUNREAVER_DISGUISE_MALE
-                    });
-            case SPELL_SILVER_COVENANT_DISGUISE_TRIGGER:
-                return ValidateSpellInfo(
-                    {
-                        SPELL_SILVER_COVENANT_DISGUISE_FEMALE,
-                        SPELL_SILVER_COVENANT_DISGUISE_MALE
-                    });
-            default:
-                break;
-        }
-        return false;
+        return ValidateSpellInfo(
+            {
+                SPELL_SUNREAVER_DISGUISE_TRIGGER,
+                SPELL_SUNREAVER_DISGUISE_FEMALE,
+                SPELL_SUNREAVER_DISGUISE_MALE,
+                SPELL_SILVER_COVENANT_DISGUISE_TRIGGER,
+                SPELL_SILVER_COVENANT_DISGUISE_FEMALE,
+                SPELL_SILVER_COVENANT_DISGUISE_MALE
+            });
     }
 
     void HandleScript(SpellEffIndex /*effIndex*/)
@@ -2758,6 +2777,19 @@ enum BreakShieldSpells
 class spell_gen_break_shield : public SpellScript
 {
     PrepareSpellScript(spell_gen_break_shield)
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+            {
+                SPELL_BREAK_SHIELD_DAMAGE_2K,
+                SPELL_BREAK_SHIELD_DAMAGE_10K,
+                SPELL_BREAK_SHIELD_TRIGGER_FACTION_MOUNTS,
+                SPELL_BREAK_SHIELD_TRIGGER_CAMPAING_WARHORSE,
+                SPELL_BREAK_SHIELD_TRIGGER_UNK,
+                SPELL_BREAK_SHIELD_TRIGGER_SUNDERING_THURST
+            });
+    }
 
     void HandleScriptEffect(SpellEffIndex effIndex)
     {
@@ -2875,6 +2907,24 @@ enum ChargeSpells
 class spell_gen_mounted_charge : public SpellScript
 {
     PrepareSpellScript(spell_gen_mounted_charge)
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+            {
+                SPELL_CHARGE_DAMAGE_8K5,
+                SPELL_CHARGE_DAMAGE_20K,
+                SPELL_CHARGE_DAMAGE_45K,
+                SPELL_CHARGE_CHARGING_EFFECT_8K5,
+                SPELL_CHARGE_CHARGING_EFFECT_20K_1,
+                SPELL_CHARGE_CHARGING_EFFECT_20K_2,
+                SPELL_CHARGE_CHARGING_EFFECT_45K_1,
+                SPELL_CHARGE_CHARGING_EFFECT_45K_2,
+                SPELL_CHARGE_TRIGGER_FACTION_MOUNTS,
+                SPELL_CHARGE_TRIGGER_TRIAL_CHAMPION,
+                SPELL_CHARGE_MISS_EFFECT
+            });
+    }
 
     void HandleScriptEffect(SpellEffIndex effIndex)
     {
@@ -3249,6 +3299,49 @@ enum TournamentQuestsAchievements
 class spell_gen_on_tournament_mount : public AuraScript
 {
     PrepareAuraScript(spell_gen_on_tournament_mount);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+            {
+                SPELL_PENNANT_STORMWIND_ASPIRANT,
+                SPELL_PENNANT_STORMWIND_VALIANT,
+                SPELL_PENNANT_STORMWIND_CHAMPION,
+                SPELL_PENNANT_GNOMEREGAN_ASPIRANT,
+                SPELL_PENNANT_GNOMEREGAN_VALIANT,
+                SPELL_PENNANT_GNOMEREGAN_CHAMPION,
+                SPELL_PENNANT_SEN_JIN_ASPIRANT,
+                SPELL_PENNANT_SEN_JIN_VALIANT,
+                SPELL_PENNANT_SEN_JIN_CHAMPION,
+                SPELL_PENNANT_SILVERMOON_ASPIRANT,
+                SPELL_PENNANT_SILVERMOON_VALIANT,
+                SPELL_PENNANT_SILVERMOON_CHAMPION,
+                SPELL_PENNANT_DARNASSUS_ASPIRANT,
+                SPELL_PENNANT_DARNASSUS_VALIANT,
+                SPELL_PENNANT_DARNASSUS_CHAMPION,
+                SPELL_PENNANT_EXODAR_ASPIRANT,
+                SPELL_PENNANT_EXODAR_VALIANT,
+                SPELL_PENNANT_EXODAR_CHAMPION,
+                SPELL_PENNANT_IRONFORGE_ASPIRANT,
+                SPELL_PENNANT_IRONFORGE_VALIANT,
+                SPELL_PENNANT_IRONFORGE_CHAMPION,
+                SPELL_PENNANT_UNDERCITY_ASPIRANT,
+                SPELL_PENNANT_UNDERCITY_VALIANT,
+                SPELL_PENNANT_UNDERCITY_CHAMPION,
+                SPELL_PENNANT_ORGRIMMAR_ASPIRANT,
+                SPELL_PENNANT_ORGRIMMAR_VALIANT,
+                SPELL_PENNANT_ORGRIMMAR_CHAMPION,
+                SPELL_PENNANT_THUNDER_BLUFF_ASPIRANT,
+                SPELL_PENNANT_THUNDER_BLUFF_VALIANT,
+                SPELL_PENNANT_THUNDER_BLUFF_CHAMPION,
+                SPELL_PENNANT_ARGENT_CRUSADE_ASPIRANT,
+                SPELL_PENNANT_ARGENT_CRUSADE_VALIANT,
+                SPELL_PENNANT_ARGENT_CRUSADE_CHAMPION,
+                SPELL_PENNANT_EBON_BLADE_ASPIRANT,
+                SPELL_PENNANT_EBON_BLADE_VALIANT,
+                SPELL_PENNANT_EBON_BLADE_CHAMPION
+            });
+    }
 
     uint32 _pennantSpellId;
 
@@ -3968,6 +4061,11 @@ class spell_gen_bonked : public SpellScript
 {
     PrepareSpellScript(spell_gen_bonked);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_BONKED, SPELL_FOAM_SWORD_DEFEAT, SPELL_ON_GUARD });
+    }
+
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
         if (Player* target = GetHitPlayer())
@@ -4050,6 +4148,11 @@ enum Replenishment
 class spell_gen_replenishment : public SpellScript
 {
     PrepareSpellScript(spell_gen_replenishment);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_REPLENISHMENT, SPELL_INFINITE_REPLENISHMENT });
+    }
 
     void RemoveInvalidTargets(std::list<WorldObject*>& targets)
     {
@@ -4351,6 +4454,11 @@ enum HolidayFoodBuffEnum
 class spell_gen_holiday_buff_food : public AuraScript
 {
     PrepareAuraScript(spell_gen_holiday_buff_food);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WELL_FED });
+    }
 
     void TriggerFoodBuff(AuraEffect* aurEff)
     {

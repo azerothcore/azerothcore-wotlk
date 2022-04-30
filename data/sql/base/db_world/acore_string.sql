@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,23 +12,23 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.acore_string
+-- Dumpar struktur för tabell acore_world.acore_string
 DROP TABLE IF EXISTS `acore_string`;
 CREATE TABLE IF NOT EXISTS `acore_string` (
   `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `content_default` text NOT NULL,
-  `locale_koKR` text DEFAULT NULL,
-  `locale_frFR` text DEFAULT NULL,
-  `locale_deDE` text DEFAULT NULL,
-  `locale_zhCN` text DEFAULT NULL,
-  `locale_zhTW` text DEFAULT NULL,
-  `locale_esES` text DEFAULT NULL,
-  `locale_esMX` text DEFAULT NULL,
-  `locale_ruRU` text DEFAULT NULL,
+  `locale_koKR` text,
+  `locale_frFR` text,
+  `locale_deDE` text,
+  `locale_zhCN` text,
+  `locale_zhTW` text,
+  `locale_esES` text,
+  `locale_esMX` text,
+  `locale_ruRU` text,
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_world.acore_string: 1 245 rows
+-- Dumpar data för tabell acore_world.acore_string: 1 151 rows
 DELETE FROM `acore_string`;
 /*!40000 ALTER TABLE `acore_string` DISABLE KEYS */;
 INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_frFR`, `locale_deDE`, `locale_zhCN`, `locale_zhTW`, `locale_esES`, `locale_esMX`, `locale_ruRU`) VALUES
@@ -569,68 +569,6 @@ INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_f
 	(597, 'Current gamemasters:', NULL, NULL, 'Aktuelle Gamemaster:', '目前服务器GM:', NULL, NULL, NULL, NULL),
 	(598, '|    Account    |  GM  |', NULL, NULL, '|    Account    |  GM  |', '|    账号    |  管理员  |', NULL, NULL, NULL, NULL),
 	(599, 'No gamemasters.', NULL, NULL, 'Keine Gamemaster vorhanden.', '没有游戏管理员。', NULL, NULL, NULL, NULL),
-	(600, 'The Alliance wins!', NULL, NULL, 'Die Allianz gewinnt!', '联盟获得了胜利！', NULL, NULL, NULL, NULL),
-	(601, 'The Horde wins!', NULL, NULL, 'Die Horde gewinnt!', '部落获得了胜利！', NULL, NULL, NULL, NULL),
-	(602, 'The battle for Warsong Gulch begins in 1 minute.', NULL, NULL, 'Die Schlacht der Kriegshymnenschlucht beginnt in 1 Minute.', '战场战歌峡谷争夺1分钟倒计时中……', NULL, NULL, NULL, NULL),
-	(603, 'The battle for Warsong Gulch begins in 30 seconds. Prepare yourselves!', NULL, NULL, 'Die Schlacht der Kriegshymnenschlucht beginnt in 30 Sekunden. Bereitet Euch vor!', '战场战歌峡谷争夺，在30秒后开始。大家做好准备！', NULL, NULL, NULL, NULL),
-	(604, 'Let the battle for Warsong Gulch begin!', NULL, NULL, 'Lasst die Schlacht der Kriegshymnenschlucht beginnen!', '战场战歌峡谷争夺正式开始！', NULL, NULL, NULL, NULL),
-	(605, '$n captured the Horde flag!', NULL, NULL, '$n erobert die Flagge der Horde!', '$n 夺取了部落旗子！', NULL, NULL, NULL, NULL),
-	(606, '$n captured the Alliance flag!', NULL, NULL, '$n erobert die Flagge der Allianz!', '$n 夺取了联盟旗子！', NULL, NULL, NULL, NULL),
-	(607, 'The Horde flag was dropped by $n!', NULL, NULL, 'Die Flagge der Horde wurde von $n fallen gelassen!', '部落旗子被 $n 降下！', NULL, NULL, NULL, NULL),
-	(608, 'The Alliance Flag was dropped by $n!', NULL, NULL, 'Die Flagge der Allianz wurde von $n fallen gelassen!', '联盟旗子被 $n 降下！', NULL, NULL, NULL, NULL),
-	(609, 'The Alliance Flag was returned to its base by $n!', NULL, NULL, 'Die Flagge der Allianz wurde zurück zur Basis gebracht von $n!', '联盟旗子被 $n 返回了到它的基地！', NULL, NULL, NULL, NULL),
-	(610, 'The Horde flag was returned to its base by $n!', NULL, NULL, 'Die Flagge der Horde wurde zurück zur Basis gebracht von $n!', '部落旗子被 $n 返回了到它的基地！', NULL, NULL, NULL, NULL),
-	(611, 'The Horde flag was picked up by $n!', NULL, NULL, 'Die Flagge der Horde wurde von $n aufgenommen!', '部落旗子被 $n 拾起！', NULL, NULL, NULL, NULL),
-	(612, 'The Alliance Flag was picked up by $n!', NULL, NULL, 'Die Flagge der Allianz wurde von $n aufgenommen!', '魔兽世界：联盟旗子被 $n 拾起！', NULL, NULL, NULL, NULL),
-	(613, 'The flags are now placed at their bases.', NULL, NULL, 'Die Flaggen sind jetzt an ihren Basen.', '旗子现在被安置在他们的基地。', NULL, NULL, NULL, NULL),
-	(614, 'The Alliance flag is now placed at its base.', NULL, NULL, 'Die Flagge der Allianz ist an ihrer Basis!', '联盟旗帜已经被重置！', NULL, NULL, NULL, NULL),
-	(615, 'The Horde flag is now placed at its base.', NULL, NULL, 'Die Flagge der Horde ist an ihrer Basis!', '联盟旗帜已经被重置！', NULL, NULL, NULL, NULL),
-	(636, 'The Battle for Eye of the Storm begins in 1 minute.', NULL, NULL, 'Der Kampf im Auge des Sturms beginnt in 1 Minute.', '战场暴风之眼争夺1分钟倒计时中……', NULL, NULL, NULL, NULL),
-	(637, 'The Battle for Eye of the Storm begins in 30 seconds.', NULL, NULL, 'Der Kampf im Auge des Sturms beginnt in 30 Sekunden.', '战场暴风之眼争夺，在30秒后开始。大家做好准备！', NULL, NULL, NULL, NULL),
-	(638, 'The Battle for Eye of the Storm has begun!', NULL, NULL, 'Der Kampf im Auge des Sturms hat begonnen!', '战场暴风之眼争夺正式开始！！', NULL, NULL, NULL, NULL),
-	(650, 'Alliance', '', '', '', '联盟', '', '', '', ''),
-	(651, 'Horde', '', '', '', '部落', '', '', '', ''),
-	(652, 'Stables', '', '', '', '兽栏', '', '', '', ''),
-	(653, 'Blacksmith', '', '', '', '铁匠铺', '', '', '', ''),
-	(654, 'Farm', '', '', '', '农场', '', '', '', ''),
-	(655, 'Lumber Mill', '', '', '', '伐木场', '', '', '', ''),
-	(656, 'mine', '', '', '', '矿洞', '', '', '', ''),
-	(657, 'The %s has taken the %s!', '', '', '', '自 %s 夺取了 %s', '', '', '', ''),
-	(658, '$n has defended the %s!', '', '', '', '$n 保卫了 %s', '', '', '', ''),
-	(659, '$n has assaulted the %s!', '', '', '', '$n 突袭了 %s', '', '', '', ''),
-	(660, '$n claims the %s! If left unchallenged, the %s will control it in 1 minute!', NULL, NULL, '$n nimmt %s ein! Falls es nicht verteidigt wird, wird die %s es in 1 Minute kontrollieren!', '$n 占领了 %s！ 请守护好阵地，%s如果在1分钟内没有被玩家攻击，你将占领这个阵地。', NULL, NULL, NULL, NULL),
-	(661, 'The Battle for Arathi Basin begins in 1 minute.', NULL, NULL, 'Die Schlacht des Arathibecken beginnt in 1 Minute.', '战场阿拉西盆地争夺1分钟倒计时中……', NULL, NULL, NULL, NULL),
-	(662, 'The Battle for Arathi Basin begins in 30 seconds. Prepare yourselves!', NULL, NULL, 'Die Schlacht des Arathibecken beginnt in 30 Sekunden. Bereitet Euch vor!', '战场阿拉西盆地争夺，在30秒后开始。大家做好准备！', NULL, NULL, NULL, NULL),
-	(663, 'The Battle for Arathi Basin has begun!', NULL, NULL, 'Die Schlacht des Arathibecken hat begonnen', '战场阿拉西盆地争夺正式开始！', NULL, NULL, NULL, NULL),
-	(664, 'The Alliance has gathered $1776W resources, and is near victory!', NULL, NULL, 'Die Allianz hat $1776W an Ressourcen gesammelt und steht kurz vor dem Sieg!', '联盟已收集到$1776W资源, 并已接近胜利！', NULL, NULL, NULL, NULL),
-	(665, 'The Horde has gathered $1777W resources, and is near victory!', NULL, NULL, 'Die Horde hat $1777W an Ressourcen gesammelt und steht kurz vor dem Sieg!', '部落已收集到$1777W资源, 并已接近胜利！', NULL, NULL, NULL, NULL),
-	(666, 'After your recent battle in %s our best attempts to award you a Mark of Honor failed. Enclosed you will find the Mark of Honor we were not able to deliver to you at the time. Thanks for fighting in %s!', NULL, NULL, 'Nach deiner letzten Schlacht in %s schlug der Versuch Euch ein Ehrenabzeichen als Belohnung auszuhändigen fehl. Beiliegend findet Ihr das Ehrenabzeichen, welches wir Euch zu dieser Zeit nicht zukommen lassen konnten. Vielen Dank für den Kampf in %s!', '你在最近的 %s 战斗之后，我们努力想为你颁发一个荣誉标志却没有成功，结束后你会发现这个荣誉标志的，但不是此刻，感谢你在 %s 的战斗。', NULL, NULL, NULL, NULL),
-	(667, 'The Alliance has taken control of the Mage Tower!', NULL, NULL, 'Die Allianz hat die Kontrolle über den Magierturm übernommen!', '联盟已经控制了法师塔！', NULL, NULL, NULL, NULL),
-	(668, 'The Horde has taken control of the Mage Tower!', NULL, NULL, 'Die Horde hat die Kontrolle über den Magierturm übernommen!', '部落已经控制了法师塔！', NULL, NULL, NULL, NULL),
-	(669, 'The Alliance has taken control of the Draenei Ruins!', NULL, NULL, 'Die Allianz hat die Kontrolle über die Draeneiruinen übernommen!', '联盟已经控制了德莱尼废墟！', NULL, NULL, NULL, NULL),
-	(670, 'The Horde has taken control of the Draenei Ruins!', NULL, NULL, 'Die Horde hat die Kontrolle über die Draeneiruinen übernommen!', '部落已经控制了德莱尼废墟！', NULL, NULL, NULL, NULL),
-	(671, 'The Alliance has taken control of the Blood Elf Tower!', NULL, NULL, 'Die Allianz hat die Kontrolle über den Blutelfenturm übernommen!', '联盟已经控制了血精灵塔！', NULL, NULL, NULL, NULL),
-	(672, 'The Horde has taken control of the Blood Elf Tower!', NULL, NULL, 'Die Horde hat die Kontrolle über den Blutelfenturm übernommen!', '部落已经控制了血精灵塔！', NULL, NULL, NULL, NULL),
-	(673, 'The Alliance has taken control of the Fel Reaver Ruins!', NULL, NULL, 'Die Allianz hat die Kontrolle über die Teufelshäscherruinen übernommen!', '联盟已经控制了魔能机甲废墟！', NULL, NULL, NULL, NULL),
-	(674, 'The Horde has taken control of the Fel Reaver Ruins!', NULL, NULL, 'Die Horde hat die Kontrolle über die Teufelshäscherruinen übernommen!', '部落已经控制了魔能机甲废墟！', NULL, NULL, NULL, NULL),
-	(675, 'The Alliance has lost control of the Mage Tower!', NULL, NULL, 'Die Allianz hat die Kontrolle über den Magierturm verloren!', '联盟已经控制了法师塔！', NULL, NULL, NULL, NULL),
-	(676, 'The Horde has lost control of the Mage Tower!', NULL, NULL, 'Die Horde hat die Kontrolle über den Magierturm verloren!', '部落已经控制了法师塔！', NULL, NULL, NULL, NULL),
-	(677, 'The Alliance has lost control of the Draenei Ruins!', NULL, NULL, 'Die Allianz hat die Kontrolle über die Draeneiruinen verloren!', '联盟已经控制了德莱尼废墟！', NULL, NULL, NULL, NULL),
-	(678, 'The Horde has lost control of the Draenei Ruins!', NULL, NULL, 'Die Horde hat die Kontrolle über die Draeneiruinen verloren!', '部落已经控制了德莱尼废墟！', NULL, NULL, NULL, NULL),
-	(679, 'The Alliance has lost control of the Blood Elf Tower!', NULL, NULL, 'Die Allianz hat die Kontrolle über den Blutelfenturm verloren!', '联盟已经控制了血精灵塔！', NULL, NULL, NULL, NULL),
-	(680, 'The Horde has lost control of the Blood Elf Tower!', NULL, NULL, 'Die Horde hat die Kontrolle über den Blutelfenturm verloren!', '部落已经控制了血精灵塔！', NULL, NULL, NULL, NULL),
-	(681, 'The Alliance has lost control of the Fel Reaver Ruins!', NULL, NULL, 'Die Allianz hat die Kontrolle über die Teufelshäscherruinen verloren!', '联盟已经控制了魔能机甲废墟！', NULL, NULL, NULL, NULL),
-	(682, 'The Horde has lost control of the Fel Reaver Ruins!', NULL, NULL, 'Die Horde hat die Kontrolle über die Teufelshäscherruinen verloren!', '部落已经控制了魔能机甲废墟！', NULL, NULL, NULL, NULL),
-	(683, '%s has taken the flag!', NULL, NULL, '%s hat die Flagge aufgenommen!', '%s 得到了旗帜！', NULL, NULL, NULL, NULL),
-	(684, 'The Alliance have captured the flag!', NULL, NULL, 'Die Allianz hat die Flagge erobert!', '该联盟已得到旗帜！', NULL, NULL, NULL, NULL),
-	(685, 'The Horde have captured the flag!', NULL, NULL, 'Die Horde hat die Flagge erobert!', '该部落已得到旗帜！', NULL, NULL, NULL, NULL),
-	(686, 'The flag has been dropped.', NULL, NULL, 'Die Flagge wurde fallengelassen.', '旗子已经被降下！', NULL, NULL, NULL, NULL),
-	(687, 'The flag has been reset.', NULL, NULL, 'Die Flagge wurde zurückgesetzt.', '旗帜已经被重置', NULL, NULL, NULL, NULL),
-	(700, 'You must be level %u to form an arena team', NULL, NULL, 'Ihr müsst mindestens Level %u haben um ein Arenateam zu gründen', '你必须达到等级  %u 才能进入竞技场.', NULL, NULL, NULL, NULL),
-	(701, 'One minute until the Arena battle begins!', NULL, NULL, 'Eine Minute, bis die Arenaschlacht beginnt!', '一分钟后竞技场争斗开始！', NULL, NULL, NULL, NULL),
-	(702, 'Thirty seconds until the Arena battle begins!', NULL, NULL, '30 Sekunden, bis die Arenaschlacht beginnt!', '三十秒后竞技场争斗开始！', NULL, NULL, NULL, NULL),
-	(703, 'Fifteen seconds until the Arena battle begins!', NULL, NULL, '15 Sekunden, bis die Arenaschlacht beginnt!', '十五秒后竞技场争斗开始！', NULL, NULL, NULL, NULL),
-	(704, 'The Arena battle has begun!', NULL, NULL, 'Die Arenaschlacht hat begonnen!', '竞技场争斗开始了！', NULL, NULL, NULL, NULL),
 	(705, 'You must wait %s before speaking again.', NULL, NULL, 'Ihr müsst %s warten bevor Ihr wieder sprechen könnt', '你必须等待 %s 才能继续喊话。', NULL, NULL, NULL, NULL),
 	(706, 'This item(s) have problems with equipping/storing in inventory.', NULL, NULL, 'Diese(s) Item(s) hat/haben Probleme mit dem ausrüsten/lagern im Inventar', '这些道具在装备/存放中出现一个问题。', NULL, NULL, NULL, NULL),
 	(707, '%s does not wish to be disturbed: %s', NULL, NULL, '%s möchte nicht gestört werden und kann keine Flüsternachrichten erhalten: %s ', '%s 免打扰状态下无法收到悄悄话: %s', NULL, NULL, NULL, NULL),
@@ -649,9 +587,6 @@ INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_f
 	(721, 'Your group is too large for this arena. Please regroup to join.', NULL, NULL, 'Eure Gruppe ist zu groß für diese Arena. Bitte macht eine neue Gruppe um beizutreten.', '你的队伍有太多玩家，请重新组队已参与竞技场。', NULL, NULL, NULL, NULL),
 	(722, 'Your group has members not in your arena team. Please regroup to join.', NULL, NULL, 'In eurer Gruppe befinden sich Mitglieder die nicht zu eurem Arena-Team gehören. Bitte macht eine neue Gruppe um beizutreten.', '你的队友不在你的竞技场队伍中，请重新组队。', NULL, NULL, NULL, NULL),
 	(723, 'Your group does not have enough players to join this match.', NULL, NULL, 'Eure Gruppe hat nicht genug Spieler um der Schlacht beitreten zu können.', '你的队伍没有足够玩家来参与比赛。', NULL, NULL, NULL, NULL),
-	(724, 'The Gold Team wins!', NULL, NULL, 'Das goldene Team gewinnt!', '金色队伍胜利！', NULL, NULL, NULL, NULL),
-	(725, 'The Green Team wins!', NULL, NULL, 'Das grüne Team gewinnt!', '绿色队伍胜利！', NULL, NULL, NULL, NULL),
-	(726, '|cffff0000[Arena Queue]:|r %s (skirmish %s) -- [%u-%u] [%u/%u]|r', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 	(6617, 'No acore_string for id: %i found.', NULL, NULL, 'Es wurde kein acore_string mit der id: %i gefunden.', NULL, NULL, NULL, NULL, NULL),
 	(727, 'Your group has an offline member. Please remove him before joining.', NULL, NULL, 'Eure Gruppe hat ein Mitglied das offline ist. Bitte entfernt ihn bevor ihr beitretet.', '你的队伍有离线玩家，请在加入前移除他们。', NULL, NULL, NULL, NULL),
 	(728, 'Your group has players from the opposing faction. You can\'t join the battleground as a group.', NULL, NULL, 'Eure Gruppe hat einen Spieler von der andere Fraktion. Ihr könnt nicht als eine Gruppe das Schlachtfeld betreten.', '你的队伍又对立阵营玩家，不能作为一个队伍加入战场。', NULL, NULL, NULL, NULL),
@@ -679,9 +614,6 @@ INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_f
 	(750, 'Not enough players. This game will close in %u mins.', NULL, NULL, 'Nicht genug Spieler. Das Spiel wird in %u Minuten geschlossen.', '没有足够玩家，游戏 %u 分钟后被关闭.', NULL, NULL, NULL, NULL),
 	(751, 'Not enough players. This game will close in %u seconds.', NULL, NULL, 'Nicht genug Spieler. Das Spiel wird in %u Sekunden geschlossen.', '没有足够玩家，游戏 %u 秒后被关闭.', NULL, NULL, NULL, NULL),
 	(752, '¦ Last IP: %s (Locked: %s)', NULL, NULL, '¦ Letzte IP: %s (Gesperrt: %s)', '¦ 最后 IP: %s (锁定: %s)', NULL, NULL, NULL, NULL),
-	(753, 'The battle for Warsong Gulch begins in 2 minutes.', NULL, NULL, 'Die Schlacht der Kriegshymnenschlucht beginnt in 2 Minuten.', '战歌峡谷战场2分钟后开始.', NULL, NULL, NULL, NULL),
-	(754, 'The battle for Arathi Basin begins in 2 minutes.', NULL, NULL, 'Die Schlacht des Arathibecken beginnt in 2 Minuten.', '阿拉希盆地战场2分钟后开始.', NULL, NULL, NULL, NULL),
-	(755, 'The battle for Eye of the Storm begins in 2 minutes.', NULL, NULL, 'Der Kampf im Auge des Sturms beginnt in 2 Minuten.', '风暴之眼战场2分钟后开始.', NULL, NULL, NULL, NULL),
 	(785, 'Arena testing turned %s', NULL, NULL, 'Arena Prüfung auf %s geschaltet.', '竞技场测试赛开启 %s', NULL, NULL, NULL, NULL),
 	(786, '|cffff0000[Automatic]:|r', NULL, NULL, '|cffff0000[Automatisch]:|r', '|cffff0000[自动公告]:|r', NULL, NULL, NULL, NULL),
 	(787, '|cffffff00[|c1f40af20Announce by|r |cffff0000%s|cffffff00]:|r %s|r', NULL, NULL, '|cffffff00[|c1f40af20Angekündigt von|r |cffff0000%s|cffffff00]:|r %s|r', '|cffffff00[|c1f40af20公告|r |cffff0000%s|cffffff00]:|r %s|r', NULL, NULL, NULL, NULL),
@@ -885,28 +817,6 @@ INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_f
 	(1202, 'Areatrigger debugging turned on.', NULL, NULL, 'Areatrigger debugging eingeschaltet.', '区域触发调试：开启。', NULL, NULL, NULL, NULL),
 	(1203, 'Areatrigger debugging turned off.', NULL, NULL, 'Areatrigger debugging abgeschaltet.', '区域触发调试：关闭。', NULL, NULL, NULL, NULL),
 	(1204, 'You have reached areatrigger %u.', NULL, NULL, 'Ihr seid bei Areatrigger %u.', '你已经达到了剧情出发条件 %u。', NULL, NULL, NULL, NULL),
-	(1205, 'The battle will begin in two minutes.', NULL, NULL, NULL, '本次战斗将在2分钟内开始。', NULL, NULL, NULL, NULL),
-	(1206, 'The battle will begin in 1 minute.', NULL, NULL, NULL, '本次战斗将在1分钟内开始。', NULL, NULL, NULL, NULL),
-	(1207, 'The battle will begin in 30 seconds!', NULL, NULL, NULL, '本次战斗将在30秒内开始！', NULL, NULL, NULL, NULL),
-	(1208, 'The battle has begun!', NULL, NULL, NULL, '战斗开始了！', NULL, NULL, NULL, NULL),
-	(1209, 'the alliance keep', NULL, NULL, NULL, '已被联盟占领', NULL, NULL, NULL, NULL),
-	(1210, 'the horde keep', NULL, NULL, NULL, '已被部落占领', NULL, NULL, NULL, NULL),
-	(1211, '%s wins!', NULL, NULL, NULL, '%s 赢得了胜利！', NULL, NULL, NULL, NULL),
-	(1212, 'The west gate of %s is destroyed!', NULL, NULL, NULL, '西大门 %s 被破坏！', NULL, NULL, NULL, NULL),
-	(1213, 'The east gate of %s is destroyed!', NULL, NULL, NULL, '东部大门 %s 被摧毁了！', NULL, NULL, NULL, NULL),
-	(1214, 'The south gate of %s is destroyed!', NULL, NULL, NULL, '南部大门 %s 被摧毁了！', NULL, NULL, NULL, NULL),
-	(1215, 'The north gate of %s is destroyed!', NULL, NULL, NULL, '北部大门 %s 被摧毁了！', NULL, NULL, NULL, NULL),
-	(1216, '$n has assaulted the %s', NULL, NULL, NULL, '$n 袭击了 %s', NULL, NULL, NULL, NULL),
-	(1217, '$n has defended the %s', NULL, NULL, NULL, '$n 保卫了 %s', NULL, NULL, NULL, NULL),
-	(1218, '$n claims the %s! If left unchallenged, the %s will control it in 1 minute!', NULL, NULL, NULL, '$n夺取了 %s 的旗帜! 如果不采取措施,那么 %s 将在1分钟之后占领它。', NULL, NULL, NULL, NULL),
-	(1219, 'The %s has taken the %s', NULL, NULL, NULL, '%s占领了 %s！！！', NULL, NULL, NULL, NULL),
-	(1220, 'Workshop', NULL, NULL, NULL, '车间', NULL, NULL, NULL, NULL),
-	(1221, 'Docks', NULL, NULL, NULL, '码头', NULL, NULL, NULL, NULL),
-	(1222, 'Refinery', NULL, NULL, NULL, '精炼厂', NULL, NULL, NULL, NULL),
-	(1223, 'Quarry', NULL, NULL, NULL, '矿洞', NULL, NULL, NULL, NULL),
-	(1224, 'Hangar', NULL, NULL, NULL, '机场', NULL, NULL, NULL, NULL),
-	(1225, 'Alliance', '', '', '', '联盟', '', '', '', ''),
-	(1226, 'Horde', '', '', '', '部落', '', '', '', ''),
 	(1300, 'Alliance', NULL, NULL, 'Allianz', '联盟', NULL, NULL, NULL, NULL),
 	(1301, 'Horde', NULL, NULL, 'Horde', '部落', NULL, NULL, NULL, NULL),
 	(1302, '%s was destroyed by the %s!', NULL, NULL, '%s wurde von der %s zerstört!', '%s被%s破坏！', NULL, NULL, NULL, NULL),
@@ -933,14 +843,9 @@ INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_f
 	(1323, 'East Frostwolf Tower', NULL, NULL, 'Der östliche Frostwolfturm', '东部霜狼哨塔', NULL, NULL, NULL, NULL),
 	(1324, 'West Frostwolf Tower', NULL, NULL, 'Der westliche Frostwolfturm', '西部霜狼哨塔', NULL, NULL, NULL, NULL),
 	(1325, 'Frostwolf Relief Hut', NULL, NULL, 'Die Heilerhütte der Frostwölfe', '霜狼救助站', NULL, NULL, NULL, NULL),
-	(1326, 'The Battle for Alterac Valley begins in 1 minute.', NULL, NULL, 'Der Kampf um das Alteractal beginnt in 1 Minute.', '奥特兰克山谷的战斗将在1分钟后开始。', NULL, NULL, NULL, NULL),
-	(1327, 'The Battle for Alterac Valley begins in 30 seconds. Prepare yourselves!', NULL, NULL, 'Der Kampf um das Alteractal beginnt in 30 Sekunden.', '奥特兰克山谷的战斗将在30秒后开始。请大家准备好！', NULL, NULL, NULL, NULL),
-	(1328, 'The Battle for Alterac Valley has begun!', NULL, NULL, 'Der Kampf um das Alteractal hat begonnen!', '奥特兰克山谷的战斗开始了！', NULL, NULL, NULL, NULL),
-	(1329, 'The Alliance Team is running out of reinforcements!', NULL, NULL, 'Die Allianz hat nurnoch wenige Verstärkungspunkte', '联盟正在开始增援！', NULL, NULL, NULL, NULL),
-	(1330, 'The Horde Team is running out of reinforcements!', NULL, NULL, 'Die Horde hat nurnoch wenige Verstärkungspunkte', '部落正在开始增援！', NULL, NULL, NULL, NULL),
 	(1331, 'The Frostwolf General is Dead!', NULL, NULL, 'Der General der Frostwölfe ist tot!', '霜狼上将死亡', NULL, NULL, NULL, NULL),
 	(1332, 'The Stormpike General is Dead!', NULL, NULL, 'Der General der Sturmlanzen ist tot!', '雷矛上将死亡', NULL, NULL, NULL, NULL),
-	(1333, 'The Battle for Alterac Valley begins in 2 minutes.', NULL, NULL, 'Der Kampf um das Alteractal beginnt in 2 Minuten.', '奥特兰克山谷的战斗将在2分钟后开始。', NULL, NULL, NULL, NULL),
+	(726, '|cffff0000[Arena Queue]:|r %s (skirmish %s) -- [%u-%u] [%u/%u]|r', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 	(1334, 'Your ticket has been closed.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 	(1335, 'You received a ticket response.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 	(2000, '|cff00ff00New ticket from|r|cffff00ff %s.|r |cff00ff00Ticket entry:|r|cffff00ff %d.|r', NULL, NULL, '|cff00ff00Neues Ticket von|r|cffff00ff %s.|r |cff00ff00Ticket entry:|r|cffff00ff %d.|r', '|cff00ff00新加入|r|cffff00ff %s.|r |cff00ff00进入:|r|cffff00ff %d.|r', NULL, NULL, NULL, NULL),
@@ -1276,7 +1181,8 @@ INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_f
 	(5078, 'Item not found in the character\'s inventory (bank included)', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 	(5079, 'You must be at least level %u to disable autobroadcast messages.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 	(5080, 'You are now receiving global %s messages.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-	(5081, 'You will no longer receive global %s messages.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+	(5081, 'You will no longer receive global %s messages.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(5082, 'Incorrect syntax. Specify either \'starter\' or \'ender\'.', NULL, NULL, 'Falsche syntax. Entweder \'starter\' oder \'ender\' angeben.', NULL, NULL, NULL, NULL, NULL);
 /*!40000 ALTER TABLE `acore_string` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
