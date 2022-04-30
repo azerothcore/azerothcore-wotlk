@@ -339,15 +339,15 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                         QueuePacket(packet);
                     }*/
                 }
-                else if (_player->IsInWorld() && AntiDOS.EvaluateOpcode(*packet, currentTime))
+                else if (_player->IsInWorld())
                 {
-                    if (!sScriptMgr->CanPacketReceive(this, *packet))
+                    if (AntiDOS.EvaluateOpcode(*packet, currentTime))
                     {
-                        break;
+                        opHandle->Call(this, *packet);
+                        LogUnprocessedTail(packet);
                     }
-
-                    opHandle->Call(this, *packet);
-                    LogUnprocessedTail(packet);
+                    else
+                        processedPackets = MAX_PROCESSED_PACKETS_IN_SAME_WORLDSESSION_UPDATE;   // break out of packet processing loop
                 }
                 break;
             case STATUS_TRANSFER:
