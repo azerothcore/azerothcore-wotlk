@@ -278,7 +278,6 @@ public:
 
         switch (targetType)
         {
-            
             case SelectTargetMethod::MaxThreat:
             case SelectTargetMethod::MinThreat:
             case SelectTargetMethod::MaxDistance:

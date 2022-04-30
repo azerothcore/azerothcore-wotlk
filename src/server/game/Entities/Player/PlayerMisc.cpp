@@ -371,7 +371,6 @@ void Unit::SetContestedPvP(Player* attackedPlayer, bool lookForNearContestedGuar
             AddToNotify(NOTIFY_AI_RELOCATION);
         }
     }
-    
 }
 
 void Player::UpdateContestedPvP(uint32 diff)
