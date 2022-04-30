@@ -105,11 +105,6 @@ public:
         {
             switch (type)
             {
-                case DATA_VEMISDEAD:
-                    if (IsBossDied[0])
-                        return 1;
-                    break;
-
                 case DATA_VEKLORISDEAD:
                     if (IsBossDied[1])
                         return 1;
@@ -156,12 +151,11 @@ public:
         {
             switch (type)
             {
-                case DATA_VEM_DEATH:
-                    IsBossDied[0] = true;
-                    break;
-
                 case DATA_BUG_TRIO_DEATH:
-                    ++BugTrioDeathCount;
+                    if (data != 0)
+                        ++BugTrioDeathCount;
+                    else
+                        BugTrioDeathCount = 0;
                     break;
 
                 case DATA_VEKLOR_DEATH:
