@@ -36,7 +36,7 @@ void FleeingMovementGenerator<T>::DoInitialize(T* owner)
     }
 
     _path = nullptr;
-    owner->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING);
+    owner->SetUnitFlag(UNIT_FLAG_FLEEING);
     owner->AddUnitState(UNIT_STATE_FLEEING);
     SetTargetLocation(owner);
 }
@@ -49,7 +49,7 @@ void FleeingMovementGenerator<T>::DoFinalize(T*)
 template<>
 void FleeingMovementGenerator<Player>::DoFinalize(Player* owner)
 {
-    owner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING);
+    owner->RemoveUnitFlag(UNIT_FLAG_FLEEING);
     owner->ClearUnitState(UNIT_STATE_FLEEING);
     owner->StopMoving();
 }
@@ -57,7 +57,7 @@ void FleeingMovementGenerator<Player>::DoFinalize(Player* owner)
 template<>
 void FleeingMovementGenerator<Creature>::DoFinalize(Creature* owner)
 {
-    owner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING);
+    owner->RemoveUnitFlag(UNIT_FLAG_FLEEING);
     owner->ClearUnitState(UNIT_STATE_FLEEING | UNIT_STATE_FLEEING_MOVE);
 
     if (Unit* victim = owner->GetVictim())
