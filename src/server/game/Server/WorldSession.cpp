@@ -52,6 +52,8 @@
 #include "WorldSocket.h"
 #include <zlib.h>
 
+#define MAX_PROCESSED_PACKETS_IN_SAME_WORLDSESSION_UPDATE 150
+
 namespace
 {
     std::string const DefaultPlayerName = "<none>";
@@ -427,7 +429,6 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
         deletePacket = true;
 
-#define MAX_PROCESSED_PACKETS_IN_SAME_WORLDSESSION_UPDATE 150
         processedPackets++;
 
         //process only a max amout of packets in 1 Update() call.
