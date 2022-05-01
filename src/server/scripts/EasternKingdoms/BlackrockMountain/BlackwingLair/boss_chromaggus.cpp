@@ -121,7 +121,7 @@ public:
             if (id == GUID_LEVER_USER)
             {
                 _playerGUID = guid;
-                // This is here to prevent him from being pulled from the floor underneath, remove it once maps are fixed.
+                // Hack fix: This is here to prevent him from being pulled from the floor underneath, remove it once maps are fixed.
                 me->SetReactState(REACT_AGGRESSIVE);
             }
         }
