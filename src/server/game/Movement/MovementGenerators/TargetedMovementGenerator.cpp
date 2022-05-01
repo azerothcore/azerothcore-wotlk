@@ -453,11 +453,10 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         else
             i_path->Clear();
 
-        float distance = _range - target->GetCombatReach();
+        target->MovePositionToFirstCollision(targetPosition, owner->GetCombatReach() + _range, target->ToAbsoluteAngle(_angle.RelativeAngle) - target->GetOrientation());
 
-        float relAngle = _angle.RelativeAngle;
         float x, y, z;
-        target->GetNearPoint(owner, x, y, z, owner->GetCombatReach(), distance, target->ToAbsoluteAngle(relAngle), 0.f, &targetPosition);
+        targetPosition.GetPosition(x, y, z);
 
         if (owner->IsHovering())
             owner->UpdateAllowedPositionZ(x, y, z);
