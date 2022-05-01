@@ -330,7 +330,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if ((!UpdateVictim() && !(events.GetPhaseMask() & PHASE_INTRO_MASK)) || !CheckInRoom())
+            if (!UpdateVictim() && !(events.GetPhaseMask() & PHASE_INTRO_MASK))
                 return;
 
             events.Update(diff);

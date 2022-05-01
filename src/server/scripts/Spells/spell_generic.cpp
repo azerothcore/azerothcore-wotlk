@@ -1725,11 +1725,6 @@ class spell_gen_remove_flight_auras : public SpellScript
 {
     PrepareSpellScript(spell_gen_remove_flight_auras);
 
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_AURA_FLY, SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED });
-    }
-
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
         if (Unit* target = GetHitUnit())

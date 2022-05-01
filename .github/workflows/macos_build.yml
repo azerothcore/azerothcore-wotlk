@@ -18,6 +18,7 @@ jobs:
         os:
           - macos-10.15
           - macos-11
+          - macos-12
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}
     if: github.repository == 'azerothcore/azerothcore-wotlk' && (github.ref == 'refs/heads/master' || contains(github.event.pull_request.labels.*.name, 'run-build') || github.event.label.name == 'run-build')
