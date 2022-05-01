@@ -84,7 +84,7 @@ public:
 
             Acore::Containers::RandomResize(_breathSpells, 2);
 
-            // This is here to prevent him from being pulled from the floor underneath, remove it once maps are fixed.
+            // Hack fix: This is here to prevent him from being pulled from the floor underneath, remove it once maps are fixed.
             creature->SetReactState(REACT_PASSIVE);
         }
 
