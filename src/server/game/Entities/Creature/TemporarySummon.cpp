@@ -334,11 +334,12 @@ void Minion::InitStats(uint32 duration)
 
     SetReactState(REACT_PASSIVE);
 
-    Unit* owner = GetOwner();
-    SetCreatorGUID(owner->GetGUID());
-    SetFaction(owner->GetFaction());
-
-    owner->SetMinion(this, true);
+    if (Unit* owner = GetOwner())
+    {
+        SetCreatorGUID(owner->GetGUID());
+        SetFaction(owner->GetFaction());
+        owner->SetMinion(this, true);
+    }
 }
 
 void Minion::RemoveFromWorld()
