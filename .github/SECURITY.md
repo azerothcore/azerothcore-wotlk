@@ -61,6 +61,7 @@ Versions of macOS:
 
 | macOS Version | Supported          |
 | ------------- | ------------------ |
+| 12            | :white_check_mark: |
 | 11            | :white_check_mark: |
 | 10.15         | :white_check_mark: |
 
