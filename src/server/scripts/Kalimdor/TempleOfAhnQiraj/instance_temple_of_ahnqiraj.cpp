@@ -23,6 +23,7 @@ SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
 #include "InstanceScript.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "temple_of_ahnqiraj.h"
 
