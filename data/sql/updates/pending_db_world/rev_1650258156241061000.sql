@@ -1,5 +1,3 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1650258156241061000');
-
 /* 
 Darnassus Temple of the Moon Moonwell spell focus objects
 */
