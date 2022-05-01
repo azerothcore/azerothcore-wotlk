@@ -498,7 +498,7 @@ public:
                     ModifyThreatByPercent(me->GetVictim(), -100);
                 }
 
-                AddThreat(target, 10000000.0f, me);
+                me->GetThreatMgr().AddThreat(target, 1000000.0f);
             }
         }
 
