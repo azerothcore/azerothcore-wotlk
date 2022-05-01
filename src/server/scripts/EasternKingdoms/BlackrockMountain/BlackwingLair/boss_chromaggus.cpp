@@ -83,6 +83,9 @@ public:
             _breathSpells = { SPELL_INCINERATE, SPELL_TIMELAPSE,  SPELL_CORROSIVEACID, SPELL_IGNITEFLESH, SPELL_FROSTBURN };
 
             Acore::Containers::RandomResize(_breathSpells, 2);
+
+            // This is here to prevent him from being pulled from the floor underneath, remove it once maps are fixed.
+            creature->SetReactState(REACT_PASSIVE);
         }
 
         void Initialize()
@@ -118,6 +121,8 @@ public:
             if (id == GUID_LEVER_USER)
             {
                 _playerGUID = guid;
+                // This is here to prevent him from being pulled from the floor underneath, remove it once maps are fixed.
+                me->SetReactState(REACT_AGGRESSIVE);
             }
         }
 
