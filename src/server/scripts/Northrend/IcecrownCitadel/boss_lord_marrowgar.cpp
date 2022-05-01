@@ -479,7 +479,7 @@ public:
         void SelectTarget(std::list<WorldObject*>& targets)
         {
             targets.clear();
-            Unit* target = GetCaster()->GetAI()->SelectTarget(SelectTargetMethod::Random, 1, -1.0f, true, -SPELL_IMPALED); // -1.0f as it takes into account object size
+            Unit* target = GetCaster()->GetAI()->SelectTarget(SelectTargetMethod::Random, 1, -1.0f, true, true, -SPELL_IMPALED); // -1.0f as it takes into account object size
             if (!target)
                 target = GetCaster()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true); // if only tank or noone outside of boss' model
             if (!target)
