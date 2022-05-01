@@ -305,7 +305,6 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
             Unit* pUnit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
             if( pUnit && pUnit->GetTypeId() == TYPEID_PLAYER && me->GetThreatMgr().getThreat(pUnit) )
             {
-                float threatMod = GetThreatMod(me->GetDistance2d(pUnit), (float)pUnit->GetArmor(), pUnit->GetHealth(), pUnit->GetMaxHealth(), pUnit);
                 me->GetThreatMgr().ModifyThreatByPercent(pUnit, -100);
                 me->GetThreatMgr().ClearThreat(pUnit);
             }
