@@ -90,9 +90,9 @@ bool UnitAI::DoSpellAttackIfReady(uint32 spell)
     return false;
 }
 
-Unit* UnitAI::SelectTarget(SelectTargetMethod targetType, uint32 position, float dist, bool playerOnly, bool withTank, int32 aura)
+Unit* UnitAI::SelectTarget(SelectTargetMethod targetType, uint32 offset, float dist, bool playerOnly, bool withTank, int32 aura)
 {
-    return SelectTarget(targetType, position, DefaultTargetSelector(me, dist, playerOnly, withTank, aura));
+    return SelectTarget(targetType, offset, DefaultTargetSelector(me, dist, playerOnly, withTank, aura));
 }
 
 void UnitAI::SelectTargetList(std::list<Unit*>& targetList, uint32 num, SelectTargetMethod targetType, uint32 offset, float dist, bool playerOnly, bool withTank, int32 aura)
@@ -271,7 +271,7 @@ void UnitAI::FillAISpellInfo()
     }
 }
 
-ThreatMgr& UnitAI::GetThreatMgr()   // Needed ?? Not present before this PR
+ThreatMgr& UnitAI::GetThreatMgr()
 {
     return me->GetThreatMgr();
 }
@@ -361,7 +361,7 @@ bool NonTankTargetSelector::operator()(Unit const* target) const
     if (_playerOnly && target->GetTypeId() != TYPEID_PLAYER)
         return false;
 
-    if (Unit* currentVictim = _source->GetThreatMgr().GetCurrentVictim())  // Needed ?? Old condition removed before this PR
+    if (Unit* currentVictim = _source->GetThreatMgr().GetCurrentVictim())
         return target != currentVictim;
 
     return target != _source->GetVictim();

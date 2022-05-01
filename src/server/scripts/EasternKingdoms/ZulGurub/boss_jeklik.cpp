@@ -234,7 +234,7 @@ public:
             if (Bomb_Timer <= diff)
             {
                 std::list<Unit*> targets;
-                SelectTargetList(targets, 1, SelectTargetMethod::Random, 500.0f, true);
+                SelectTargetList(targets, 1, SelectTargetMethod::Random, 0, 500.0f, true);
                 if (!targets.empty())
                 {
                     if (targets.size() > 1)

@@ -214,8 +214,7 @@ public:
     Unit* SelectTarget(SelectTargetMethod targetType, uint32 offset = 0, float dist = 0.0f, bool playerOnly = false, bool withTank = true, int32 aura = 0);
 
     // Select the best target (in <targetType> order) satisfying <predicate> from the threat list.
-    // If <offset> is nonzero, the first <offset> entries in <targetType> order (or SelectTargetMethod::MaxThreat)
-    // order, if <targetType> is SelectTargetMethod::Random) are skipped.
+    // If <offset> is nonzero, the first <offset> entries in <targetType> order (or SelectTargetMethod::MaxThreat order, if <targetType> is SelectTargetMethod::Random) are skipped.
     template <class PREDICATE>
     Unit* SelectTarget(SelectTargetMethod targetType, uint32 offset, PREDICATE const& predicate)
     {
@@ -225,72 +224,23 @@ public:
             return nullptr;
 
         std::list<Unit*> targetList;
+        SelectTargetList(targetList, mgr.GetThreatListSize(), targetType, offset, predicate);
 
-        if (targetType == SelectTargetMethod::MaxDistance || targetType == SelectTargetMethod::MinDistance)
-        {
-            for (ThreatReference* ref : mgr.GetUnsortedThreatList())
-            {
-                if (ref->IsOffline())
-                    continue;
-                targetList.push_back(ref->GetVictim());
-            }
-        }
-        else
-        {
-            Unit* currentVictim = mgr.GetCurrentVictim();
-            if (currentVictim)
-                targetList.push_back(currentVictim);
-
-            for (ThreatReference* ref : mgr.GetSortedThreatList())
-            {
-                if (ref->IsOffline())
-                    continue;
-
-                Unit* thisTarget = ref->GetVictim();
-                if (thisTarget != currentVictim)
-                    targetList.push_back(thisTarget);
-            }
-        }
-
-        // filter by predicate
-        targetList.remove_if([&predicate](Unit* target) { return !predicate(target); });
-
-        // shortcut: the list certainly isn't gonna get any larger after this point
-        if (targetList.size() <= offset)
-            return nullptr;
-
-        // right now, list is unsorted for DISTANCE types - re-sort by MAXDISTANCE
-        if (targetType == SelectTargetMethod::MaxDistance || targetType == SelectTargetMethod::MinDistance)
-            SortByDistance(targetList, targetType == SelectTargetMethod::MinDistance);
-
-        // then reverse the sorting for MIN sortings
-        if (targetType == SelectTargetMethod::MinThreat)
-            targetList.reverse();
-        // now pop the first <offset> elements
-        while (offset)
-        {
-            targetList.pop_front();
-            --offset;
-        }
         // maybe nothing fulfills the predicate
         if (targetList.empty())
             return nullptr;
 
         switch (targetType)
         {
-            case SelectTargetMethod::MaxThreat:
-            case SelectTargetMethod::MinThreat:
-            case SelectTargetMethod::MaxDistance:
-            case SelectTargetMethod::MinDistance:
-                return targetList.front();
-            case SelectTargetMethod::Random:
-                {
-                    std::list<Unit*>::iterator itr = targetList.begin();
-                    std::advance(itr, urand(offset, targetList.size() - 1));
-                    return *itr;
-                }
-            default:
-                return nullptr;
+        case SelectTargetMethod::MaxThreat:
+        case SelectTargetMethod::MinThreat:
+        case SelectTargetMethod::MaxDistance:
+        case SelectTargetMethod::MinDistance:
+            return targetList.front();
+        case SelectTargetMethod::Random:
+            return Acore::Containers::SelectRandomContainerElement(targetList);
+        default:
+            return nullptr;
         }
     }
 
@@ -307,8 +257,7 @@ public:
     void SelectTargetList(std::list<Unit*>& targetList, uint32 num, SelectTargetMethod targetType, uint32 offset = 0, float dist = 0.0f, bool playerOnly = false, bool withTank = true, int32 aura = 0);
 
     // Select the best (up to) <num> targets (in <targetType> order) satisfying <predicate> from the threat list and stores them in <targetList> (which is cleared first).
-    // If <offset> is nonzero, the first <offset> entries in <targetType> order (or SelectTargetMethod::MaxThreat)
-    // order, if <targetType> is SelectTargetMethod::Random) are skipped.
+    // If <offset> is nonzero, the first <offset> entries in <targetType> order (or SelectTargetMethod::MaxThreat order, if <targetType> is SelectTargetMethod::Random) are skipped.
     template <class PREDICATE>
     void SelectTargetList(std::list<Unit*>& targetList, uint32 num, SelectTargetMethod targetType, uint32 offset, PREDICATE const& predicate)
     {
@@ -320,7 +269,7 @@ public:
 
         if (targetType == SelectTargetMethod::MaxDistance || targetType == SelectTargetMethod::MinDistance)
         {
-            for (ThreatReference* ref : mgr.GetUnsortedThreatList())
+            for (ThreatReference const* ref : mgr.GetUnsortedThreatList())
             {
                 if (ref->IsOffline())
                     continue;
@@ -334,7 +283,7 @@ public:
             if (currentVictim)
                 targetList.push_back(currentVictim);
 
-            for (ThreatReference* ref : mgr.GetSortedThreatList())
+            for (ThreatReference const* ref : mgr.GetSortedThreatList())
             {
                 if (ref->IsOffline())
                     continue;
@@ -345,9 +294,6 @@ public:
             }
         }
 
-        // filter by predicate
-        targetList.remove_if([&predicate](Unit* target) { return !predicate(target); });
-
         // shortcut: the list isn't gonna get any larger
         if (targetList.size() <= offset)
         {
@@ -355,19 +301,23 @@ public:
             return;
         }
 
-        // right now, list is unsorted for DISTANCE types - re-sort by MAXDISTANCE
+        // right now, list is unsorted for DISTANCE types - re-sort by SelectTargetMethod::MaxDistance
         if (targetType == SelectTargetMethod::MaxDistance || targetType == SelectTargetMethod::MinDistance)
             SortByDistance(targetList, targetType == SelectTargetMethod::MinDistance);
 
         // now the list is MAX sorted, reverse for MIN types
         if (targetType == SelectTargetMethod::MinThreat)
             targetList.reverse();
+
         // ignore the first <offset> elements
         while (offset)
         {
             targetList.pop_front();
             --offset;
         }
+
+        // then finally filter by predicate
+        targetList.remove_if([&predicate](Unit* target) { return !predicate(target); });
 
         if (targetList.size() <= num)
             return;

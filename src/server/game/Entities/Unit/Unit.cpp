@@ -16759,6 +16759,44 @@ bool Unit::IsUnderLastManaUseEffect() const
     return  getMSTimeDiff(m_lastManaUse, GameTime::GetGameTimeMS().count()) < 5000;
 }
 
+void Unit::SetContestedPvP(Player* attackedPlayer, bool lookForNearContestedGuards)
+{
+    Player* player = GetCharmerOrOwnerPlayerOrPlayerItself();
+
+    if (!player || ((attackedPlayer && (attackedPlayer == player || (player->duel && player->duel->Opponent == attackedPlayer))) || player->InBattleground()))
+        return;
+
+    // check if there any guards that should care about the contested flag on player
+    if (lookForNearContestedGuards)
+    {
+        std::list<Unit*> targets;
+        Acore::NearestVisibleDetectableContestedGuardUnitCheck u_check(this);
+        Acore::UnitListSearcher<Acore::NearestVisibleDetectableContestedGuardUnitCheck> searcher(this, targets, u_check);
+        Cell::VisitAllObjects(this, searcher, MAX_AGGRO_RADIUS);
+
+        // return if there are no contested guards found
+        if (!targets.size())
+        {
+            return;
+        }
+    }
+
+    player->SetContestedPvPTimer(30000);
+    if (!player->HasUnitState(UNIT_STATE_ATTACK_PLAYER))
+    {
+        player->AddUnitState(UNIT_STATE_ATTACK_PLAYER);
+        player->SetPlayerFlag(PLAYER_FLAGS_CONTESTED_PVP);
+        // call MoveInLineOfSight for nearby contested guards
+        AddToNotify(NOTIFY_AI_RELOCATION);
+    }
+    if (!HasUnitState(UNIT_STATE_ATTACK_PLAYER))
+    {
+        AddUnitState(UNIT_STATE_ATTACK_PLAYER);
+        // call MoveInLineOfSight for nearby contested guards
+        AddToNotify(NOTIFY_AI_RELOCATION);
+    }
+}
+
 void Unit::AddPetAura(PetAura const* petSpell)
 {
     if (GetTypeId() != TYPEID_PLAYER)
