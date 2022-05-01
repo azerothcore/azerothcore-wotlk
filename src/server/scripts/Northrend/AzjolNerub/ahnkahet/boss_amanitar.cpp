@@ -204,7 +204,7 @@ struct boss_amanitar : public BossAI
                     }
                 }
 
-                if (SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_MINI))
+                if (SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true, -SPELL_MINI))
                 {
                     DoCastSelf(SPELL_REMOVE_MUSHROOM_POWER, true);
                     DoCastAOE(SPELL_MINI);
