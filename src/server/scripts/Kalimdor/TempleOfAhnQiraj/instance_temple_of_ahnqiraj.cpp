@@ -26,6 +26,11 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "temple_of_ahnqiraj.h"
 
+ObjectData const creatureData[] =
+{
+    { NPC_SARTURA, DATA_SARTURA },
+};
+
 class instance_temple_of_ahnqiraj : public InstanceMapScript
 {
 public:
@@ -38,7 +43,10 @@ public:
 
     struct instance_temple_of_ahnqiraj_InstanceMapScript : public InstanceScript
     {
-        instance_temple_of_ahnqiraj_InstanceMapScript(Map* map) : InstanceScript(map) { }
+        instance_temple_of_ahnqiraj_InstanceMapScript(Map* map) : InstanceScript(map)
+        {
+            LoadObjectData(creatureData, nullptr);
+        }
 
         //If Vem is dead...
         bool IsBossDied[3];
@@ -89,12 +97,8 @@ public:
                     ViscidusGUID = creature->GetGUID();
                     break;
             }
-        }
 
-        bool IsEncounterInProgress() const override
-        {
-            //not active in AQ40
-            return false;
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         uint32 GetData(uint32 type) const override
@@ -174,7 +178,31 @@ public:
     };
 };
 
+// 4052, At Battleguard Sartura
+class at_battleguard_sartura : public AreaTriggerScript
+{
+public:
+    at_battleguard_sartura() : AreaTriggerScript("at_battleguard_sartura") { }
+
+    bool OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    {
+        if (InstanceScript* instance = player->GetInstanceScript())
+        {
+            if (Creature* sartura = instance->GetCreature(DATA_SARTURA))
+            {
+                if (sartura->IsAlive())
+                {
+                    sartura->SetInCombatWith(player);
+                }
+            }
+        }
+
+        return true;
+    }
+};
+
 void AddSC_instance_temple_of_ahnqiraj()
 {
     new instance_temple_of_ahnqiraj();
+    new at_battleguard_sartura();
 }
