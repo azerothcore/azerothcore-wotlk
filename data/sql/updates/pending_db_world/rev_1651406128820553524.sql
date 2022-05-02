@@ -38,7 +38,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (14392, 0, 0, 1, 20, 0, 100, 512, 7491, 0, 0, 0, 0, 80, 1439200, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - On Quest \'For All To See\' Finished - Run Script'),
 (14392, 0, 1, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - On Quest \'For All To See\' Finished - Store Targetlist'),
 (14392, 0, 2, 3, 20, 0, 100, 512, 7784, 0, 0, 0, 0, 80, 1439201, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - On Quest \'The Lord of Blackrock\' Finished - Run Script'),
-(14392, 0, 3, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - On Quest \'The Lord of Blackrock\' Finished - Store Targetlist');
+(14392, 0, 3, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 64, 2, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - On Quest \'The Lord of Blackrock\' Finished - Store Targetlist');
 
 -- add overlord runthak actionlist for onyxia
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 1439200);
@@ -59,8 +59,8 @@ DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 1439201
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (1439201, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 48, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Set Active On'),
 (1439201, 9, 1, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 83, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Remove Npc Flags Questgiver'),
-(1439201, 9, 2, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 1, 2, 8000, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Say Line 2'),
-(1439201, 9, 3, 0, 0, 0, 100, 0, 8000, 8000, 0, 0, 0, 1, 3, 10000, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Say Line 3'),
+(1439201, 9, 2, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 1, 2, 8000, 0, 0, 0, 0, 12, 2, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Say Line 2'),
+(1439201, 9, 3, 0, 0, 0, 100, 0, 8000, 8000, 0, 0, 0, 1, 3, 10000, 0, 0, 0, 0, 12, 2, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Say Line 3'),
 (1439201, 9, 4, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 50, 179881, 7200, 1, 0, 0, 0, 8, 0, 0, 0, 0, 1536.94, -4421.62, 7.55304, -1.15192, 'Overlord Runthak - Actionlist - Summon Gameobject \'The Severed Head of Nefarian\''),
 (1439201, 9, 5, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 20, 179881, 100, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Activate Gameobject'),
 (1439201, 9, 6, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 11, 22888, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Cast \'Rallying Cry of the Dragonslayer\''),
