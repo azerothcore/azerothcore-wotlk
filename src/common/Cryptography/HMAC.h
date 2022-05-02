@@ -47,6 +47,9 @@ namespace Acore::Impl
             HMAC_CTX_cleanup(ctx);
             delete ctx;
         }
+#elif defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER >= 0x30000000L
+        static HMAC_CTX* MakeCTX() { return EVP_MAC_CTX_new(); }
+        static void DestroyCTX(HMAC_CTX* ctx) { EVP_MAC_CTX_free(ctx); }
 #else
         static HMAC_CTX* MakeCTX() { return HMAC_CTX_new(); }
         static void DestroyCTX(HMAC_CTX* ctx) { HMAC_CTX_free(ctx); }
@@ -80,6 +83,9 @@ namespace Acore::Impl
 
         GenericHMAC(uint8 const* seed, size_t len) : _ctx(HMACImpl::MakeCTX())
         {
+#elif defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER >= 0x30000000L
+            int result = EVP_MAC_init(_ctx, seed, len, HashCreator(), nullptr);
+#else
             int result = HMAC_Init_ex(_ctx, seed, len, HashCreator(), nullptr);
             ASSERT(result == 1);
         }
@@ -97,6 +103,9 @@ namespace Acore::Impl
 
         void UpdateData(uint8 const* data, size_t len)
         {
+#elif defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER >= 0x30000000L
+            int result = EVP_MAC_update(_ctx, data, len);
+#else
             int result = HMAC_Update(_ctx, data, len);
             ASSERT(result == 1);
         }
@@ -109,6 +118,9 @@ namespace Acore::Impl
         void Finalize()
         {
             uint32 length = 0;
+#elif defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER >= 0x30000000L
+            int result = EVP_MAC_final(_ctx, _digest.data(), &length);
+#else
             int result = HMAC_Final(_ctx, _digest.data(), &length);
             ASSERT(result == 1);
             ASSERT(length == DIGEST_LENGTH);
