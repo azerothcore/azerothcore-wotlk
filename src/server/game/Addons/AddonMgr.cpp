@@ -22,6 +22,10 @@
 #include <list>
 #include <openssl/md5.h>
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations" // In current OpenSSL 3.x MD5 is still a thing, so we use this to pass mac CI.
+#endif
+
 namespace AddonMgr
 {
     // Anonymous namespace ensures file scope of all the stuff inside it, even

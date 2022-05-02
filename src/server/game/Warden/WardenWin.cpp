@@ -33,6 +33,10 @@
 #include "WorldSession.h"
 #include <openssl/md5.h>
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations" // In current OpenSSL 3.x MD5 is still a thing, so we use this to pass mac CI.
+#endif
+
 // GUILD is the shortest string that has no client validation (RAID only sends if in a raid group)
 static constexpr char _luaEvalPrefix[] = "local S,T,R=SendAddonMessage,function()";
 static constexpr char _luaEvalMidfix[] = " end R=S and T()if R then S('_TW',";

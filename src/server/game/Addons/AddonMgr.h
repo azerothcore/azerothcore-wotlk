@@ -23,6 +23,10 @@
 #include <string>
 #include <utility>
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations" // In current OpenSSL 3.x MD5 is still a thing, so we use this to pass mac CI.
+#endif
+
 struct AddonInfo
 {
     AddonInfo(std::string  name, uint8 enabled, uint32 crc, uint8 state, bool crcOrPubKey)
