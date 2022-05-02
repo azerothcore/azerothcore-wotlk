@@ -7,9 +7,9 @@ if ! command -v cmake &>/dev/null ; then
 fi
 ##########################################
 
-brew install openssl@3.0 readline boost bash-completion curl unzip mysql ccache
+brew install openssl@3 readline boost bash-completion curl unzip mysql ccache
 
 ##########################################
 ## workaround to fix openssl in ci until https://github.com/actions/virtual-environments/pull/4206 is merged
-ln -sf $(brew --cellar openssl@3.0)/3.0.0* /usr/local/opt/openssl
+ln -sf $(brew --cellar openssl@3)/3* /usr/local/opt/openssl
 ##########################################
