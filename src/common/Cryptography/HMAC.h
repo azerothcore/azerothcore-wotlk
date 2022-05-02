@@ -26,6 +26,10 @@
 #include <string>
 #include <string_view>
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations" // In current OpenSSL 3.x HMAC is still a thing, so we use this to pass mac CI.
+#endif
+
 class BigNumber;
 
 namespace Acore::Impl
