@@ -583,11 +583,7 @@ public:
     virtual void UpdateRealmCharCount(uint32 accid) = 0;
     [[nodiscard]] virtual LocaleConstant GetAvailableDbcLocale(LocaleConstant locale) const = 0;
     virtual void LoadDBVersion() = 0;
-    virtual void LoadDBRevision() = 0;
     [[nodiscard]] virtual char const* GetDBVersion() const = 0;
-    [[nodiscard]] virtual char const* GetWorldDBRevision() const = 0;
-    [[nodiscard]] virtual char const* GetCharacterDBRevision() const = 0;
-    [[nodiscard]] virtual char const* GetAuthDBRevision() const = 0;
 #ifdef MOD_PLAYERBOTS
     [[nodiscard]] virtual char const* GetPlayerbotsDBRevision() const = 0;
 #endif

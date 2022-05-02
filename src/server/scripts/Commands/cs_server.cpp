@@ -213,9 +213,6 @@ public:
         handler->PSendSysMessage("Using %s DBC Locale as default. All available DBC locales: %s", localeNames[defaultLocale], availableLocales.c_str());
 
         handler->PSendSysMessage("Using World DB: %s", sWorld->GetDBVersion());
-        handler->PSendSysMessage("Using World DB Revision: %s", sWorld->GetWorldDBRevision());
-        handler->PSendSysMessage("Using Character DB Revision: %s", sWorld->GetCharacterDBRevision());
-        handler->PSendSysMessage("Using Auth DB Revision: %s", sWorld->GetAuthDBRevision());
 #ifdef MOD_PLAYERBOTS
         handler->PSendSysMessage("Using Playerbots DB Revision: %s", sWorld->GetPlayerbotsDBRevision());
 #endif
