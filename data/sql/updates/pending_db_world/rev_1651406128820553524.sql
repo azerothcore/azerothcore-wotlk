@@ -35,13 +35,13 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 14392;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 14392);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(14392, 0, 0, 1, 20, 0, 100, 512, 7491, 0, 0, 0, 0, 80, 1439200, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - On Quest \'For All To See\' Finished - Run Script'),
-(14392, 0, 1, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - On Quest \'For All To See\' Finished - Store Targetlist'),
-(14392, 0, 2, 3, 20, 0, 100, 512, 7784, 0, 0, 0, 0, 80, 1439201, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - On Quest \'The Lord of Blackrock\' Finished - Run Script'),
-(14392, 0, 3, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 64, 2, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - On Quest \'The Lord of Blackrock\' Finished - Store Targetlist');
+(14392, 0, 0, 2, 20, 0, 100, 512, 7491, 0, 0, 0, 0, 80, 1439200, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - On Quest \'For All To See\' Finished - Run Script'),
+(14392, 0, 2, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - On Quest \'For All To See\' Finished - Store Targetlist'),
+(14392, 0, 3, 5, 20, 0, 100, 512, 7784, 0, 0, 0, 0, 80, 1439201, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - On Quest \'The Lord of Blackrock\' Finished - Run Script'),
+(14392, 0, 5, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 64, 2, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - On Quest \'The Lord of Blackrock\' Finished - Store Targetlist');
 
--- add overlord runthak actionlist for onyxia
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 1439200);
+-- add overlord runthak actionlist for Onyxia
+-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 1439200);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (1439200, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 48, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Set Active On'),
 (1439200, 9, 1, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 83, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Remove Npc Flags Questgiver'),
@@ -51,7 +51,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1439200, 9, 5, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 20, 179556, 100, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Activate Gameobject'),
 (1439200, 9, 6, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 11, 22888, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Cast \'Rallying Cry of the Dragonslayer\''),
 (1439200, 9, 7, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 82, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Add Npc Flags Questgiver'),
-(1439200, 9, 8, 0, 0, 0, 100, 0, 7200000, 7200000, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 14, 0, 179556, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Despawn Instant'),
+(1439200, 9, 8, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 41, 7200000, 0, 0, 0, 0, 0, 14, 0, 179556, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Despawn Instant'),
 (1439200, 9, 9, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 48, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Set Active Off');
 
 -- add overlord runthak actionlist for nefarian
@@ -65,5 +65,14 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1439201, 9, 5, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 20, 179881, 100, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Activate Gameobject'),
 (1439201, 9, 6, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 11, 22888, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Cast \'Rallying Cry of the Dragonslayer\''),
 (1439201, 9, 7, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 82, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Add Npc Flags Questgiver'),
-(1439201, 9, 8, 0, 0, 0, 100, 0, 7200000, 7200000, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 14, 0, 179881, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Despawn Instant'),
+(1439201, 9, 8, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 41, 7200000, 0, 0, 0, 0, 0, 14, 0, 179881, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Despawn Instant'),
 (1439201, 9, 9, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 48, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Set Active Off');
+
+-- add conditions so the timed action does not happen if the gameobject is there. 
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 1) AND (`SourceEntry` = 14392) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 30) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 179556) AND (`ConditionValue2` = 120) AND (`ConditionValue3` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(22, 1, 14392, 0, 0, 30, 0, 179556, 120, 0, 1, 0, 0, '', '');
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 4) AND (`SourceEntry` = 14392) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 30) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 179881) AND (`ConditionValue2` = 120) AND (`ConditionValue3` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(22, 4, 14392, 0, 0, 30, 0, 179881, 120, 0, 1, 0, 0, '', '');
+
