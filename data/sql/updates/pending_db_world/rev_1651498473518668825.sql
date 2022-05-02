@@ -6,7 +6,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (11359, 0, 1, 0, 0, 0, 100, 0, 10000, 14000, 20000, 22000, 0, 11, 24619, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Soulflayer - In Combat - Cast \'Soul Tap\''),
 (11359, 0, 3, 0, 2, 0, 100, 1, 0, 30, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Soulflayer - Between 0-30% Health - Say Line 0 (No Repeat)');
 
-
 -- Gurubashi Berserker
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 11352;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 11352);
@@ -16,7 +15,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (11352, 0, 2, 0, 0, 0, 100, 0, 3000, 3000, 13000, 18000, 0, 11, 15588, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Gurubashi Berserker - In Combat - Cast \'Thunderclap\''),
 (11352, 0, 3, 0, 2, 0, 100, 1, 0, 30, 0, 0, 0, 11, 8269, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Gurubashi Berserker - Between 0-30% Health - Cast \'Frenzy\' (No Repeat)'),
 (11352, 0, 4, 0, 2, 0, 100, 1, 0, 30, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Gurubashi Berserker - Between 0-30% Health - Say Line 0 (No Repeat)');
-
 
 -- Gurubashi Axe Thrower
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 11350;
@@ -33,8 +31,3 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (11371, 0, 0, 0, 0, 0, 100, 0, 7000, 9000, 12000, 15000, 0, 11, 20539, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Razzashi Serpent - In Combat - Cast \'Fatal Bite\''),
 (11371, 0, 1, 0, 0, 0, 100, 0, 9000, 11000, 14000, 17000, 0, 11, 24002, 1, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Razzashi Serpent - In Combat - Cast \'Tranquilizing Poison\''),
 (11371, 0, 2, 0, 0, 0, 100, 0, 3000, 5000, 11000, 11000, 0, 11, 12097, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Razzashi Serpent - In Combat - Cast \'Pierce Armor\'');
-
-
-
-
-
