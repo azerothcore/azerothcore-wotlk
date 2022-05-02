@@ -33,8 +33,8 @@ enum Sartura
     SAY_DEATH           = 2,
 
     SPELL_WHIRLWIND     = 26083,
-    SPELL_ENRAGE        = 28747,            //Not sure if right ID.
-    SPELL_ENRAGEHARD    = 28798,
+    SPELL_ENRAGE        = 8269,
+    SPELL_BERSERK       = 27680,
 
     //Guard Spell
     SPELL_WHIRLWINDADD  = 26038,
@@ -166,7 +166,7 @@ public:
                 {
                     if (!HealthAbovePct(20) && !me->IsNonMeleeSpellCast(false))
                     {
-                        DoCast(me, SPELL_ENRAGE);
+                        DoCast(me, SPELL_ENRAGE, true);
                         Enraged = true;
                     }
                 }
@@ -176,7 +176,7 @@ public:
                 {
                     if (EnrageHard_Timer <= diff)
                     {
-                        DoCast(me, SPELL_ENRAGEHARD);
+                        DoCast(me, SPELL_BERSERK, true);
                         EnragedHard = true;
                     }
                     else EnrageHard_Timer -= diff;
