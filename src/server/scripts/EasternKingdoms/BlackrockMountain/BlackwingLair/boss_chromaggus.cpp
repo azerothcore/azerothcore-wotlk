@@ -242,14 +242,14 @@ class go_chromaggus_lever : public GameObjectScript
                 {
                     if (_instance->GetBossState(DATA_CHROMAGGUS) != DONE && _instance->GetBossState(DATA_CHROMAGGUS) != IN_PROGRESS)
                     {
-                        if (Creature* creature = _instance->instance->GetCreature(_instance->GetGuidData(DATA_CHROMAGGUS)))
+                        if (Creature* creature = _instance->GetCreature(DATA_CHROMAGGUS))
                         {
                             creature->SetHomePosition(homePos);
                             creature->GetMotionMaster()->MovePath(creature->GetEntry() * 10, false);
                             creature->AI()->SetGUID(player->GetGUID(), GUID_LEVER_USER);
                         }
 
-                        if (GameObject* go = _instance->instance->GetGameObject(_instance->GetGuidData(DATA_GO_CHROMAGGUS_DOOR)))
+                        if (GameObject* go = _instance->GetGameObject(DATA_GO_CHROMAGGUS_DOOR))
                             _instance->HandleGameObject(ObjectGuid::Empty, true, go);
                     }
 
