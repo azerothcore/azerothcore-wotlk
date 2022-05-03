@@ -1,3 +1,4 @@
+-- DB update 2022_05_01_01 -> 2022_05_03_00
 -- Fix for the levitate issue
 UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 2.14286, `flags_extra` = `flags_extra`|512 WHERE `entry` = 14517;
 UPDATE `creature_template_movement` SET `Flight` = 0 WHERE `CreatureId` = 14517;
