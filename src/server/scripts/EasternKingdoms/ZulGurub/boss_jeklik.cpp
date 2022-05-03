@@ -53,7 +53,7 @@ enum Spells
 
     // Batriders Spell
     SPELL_BOMB                  = 23970,
-    SPELL_SPAWN_FLAMES          = 23971 // Wrong one, but 23971 doesn't want to work...
+    SPELL_SPAWN_FLAMES          = 23971
 };
 
 enum BatIds
