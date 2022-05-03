@@ -200,6 +200,8 @@ public:
                     return NefarianLeftTunnel;
                 case DATA_NEFARIAN_RIGHT_TUNNEL:
                     return NefarianRightTunnel;
+                case DATA_EGG_EVENT:
+                    return EggEvent;
                 default:
                     break;
             }
