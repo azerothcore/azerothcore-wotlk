@@ -535,18 +535,23 @@ public:
                             uint32 entries[4] = { 15423, 15424, 15414, 15422 };
                             for (uint8 i = 0; i < 4; ++i)
                             {
-                                Unit* mob = player->FindNearestCreature(entries[i], 50, me);
+                                Creature* mob = Fandral->FindNearestCreature(entries[i], 50.0f);
                                 while (mob)
                                 {
-                                    mob->RemoveFromWorld();
-                                    mob = player->FindNearestCreature(15423, 50, me);
+                                    if (mob->IsInWorld())
+                                    {
+                                        Map* map = mob->GetMap();
+                                        map->RemoveFromMap(mob, false);
+                                    }
+
+                                    mob = Fandral->FindNearestCreature(entries[i], 50.0f);
                                 }
                             }
                             break;
                         }
                     case 52:
                         Fandral->GetMotionMaster()->MoveCharge(-8028.75f, 1538.795f, 2.61f, 4);
-                        Fandral->AI()->Talk(ANACHRONOS_SAY_9, me);
+                        Talk(ANACHRONOS_SAY_9);
                         break;
                     case 53:
                         Fandral->AI()->Talk(FANDRAL_SAY_6);
@@ -555,7 +560,8 @@ public:
                         Talk(ANACHRONOS_EMOTE_2);
                         break;
                     case 55:
-                        Fandral->SetVisible(false);
+                        //Fandral should not dispear atm.
+                        //Fandral->SetVisible(false);
                         break;
                     case 56:
                         Talk(ANACHRONOS_EMOTE_3);
