@@ -1,3 +1,4 @@
+-- DB update 2022_05_04_00 -> 2022_05_04_01
 -- Fix scripted npcs at Falconwing Square
 
 -- Novice Ranger scripting missing
