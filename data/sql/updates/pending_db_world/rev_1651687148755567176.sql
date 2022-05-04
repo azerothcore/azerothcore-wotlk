@@ -73,6 +73,7 @@ UPDATE `creature_text` SET `Emote`=22 WHERE `CreatureID`=18926 AND `GroupID`=0;
 UPDATE `creature_text` SET `Emote`=274 WHERE `CreatureID`=18926 AND `GroupID`=2;
 
 -- Remove Sleyin path
+UPDATE `creature` SET `MovementType`=0 WHERE `guid` IN (67954);
 UPDATE `creature_addon` SET `path_id`=0,`bytes2`=1 WHERE `guid` IN (67954);
 DELETE FROM `waypoint_data` WHERE `id`=679540;
 DELETE FROM `waypoint_scripts` WHERE `id`=160;
