@@ -145,7 +145,7 @@ foreach(APPLICATION_NAME ${APPLICATIONS_BUILD_LIST})
 
   target_link_libraries(${APP_PROJECT_NAME}
     PRIVATE
-      warhead-core-interface)
+      acore-core-interface)
 
   if (${APP_PROJECT_NAME} MATCHES "authserver")
     target_link_libraries(${APP_PROJECT_NAME}
