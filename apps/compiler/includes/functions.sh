@@ -70,26 +70,24 @@ function comp_configure() {
 
   comp_ccacheEnable
 
-  cmake $SRCPATH -DCMAKE_INSTALL_PREFIX=$BINPATH $DCONF -DSERVERS=$CSERVERS \
+  cmake $SRCPATH -DCMAKE_INSTALL_PREFIX=$BINPATH $DCONF \
+  -DAPPS_BUILD=$CAPPS_BUILD \
   -DSCRIPTS=$CSCRIPTS \
-  -DUSE_CPP_20=$CUSE_CPP_20 \
+  -DMODULES=$CMODULES \
   -DBUILD_TESTING=$CBUILD_TESTING \
   -DTOOLS=$CTOOLS \
   -DUSE_SCRIPTPCH=$CSCRIPTPCH \
   -DUSE_COREPCH=$CCOREPCH \
-  -DWITH_COREDEBUG=$CDEBUG  \
   -DCMAKE_BUILD_TYPE=$CTYPE \
   -DWITH_WARNINGS=$CWARNINGS \
   -DCMAKE_C_COMPILER=$CCOMPILERC \
   -DCMAKE_CXX_COMPILER=$CCOMPILERCXX \
-  "-DDISABLED_AC_MODULES=$CDISABLED_AC_MODULES" \
-  $CCUSTOMOPTIONS
+  $CBUILD_APPS_LIST $CCUSTOMOPTIONS
 
   cd $CWD
 
   runHooks "ON_AFTER_CONFIG"
 }
-
 
 function comp_compile() {
   [ $MTHREADS == 0 ] && MTHREADS=$(grep -c ^processor /proc/cpuinfo) && MTHREADS=$(($MTHREADS + 2))
@@ -117,9 +115,9 @@ function comp_compile() {
 
   runHooks "ON_AFTER_BUILD"
 
-  # set worldserver SUID bit
-  sudo chown root:root "$AC_BINPATH_FULL/worldserver"
-  sudo chmod u+s "$AC_BINPATH_FULL/worldserver"
+  # set all aplications SUID bit
+  sudo chown -R root:root "$AC_BINPATH_FULL"
+  sudo chmod -R u+s "$AC_BINPATH_FULL"
 }
 
 function comp_build() {

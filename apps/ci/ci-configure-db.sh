@@ -4,7 +4,7 @@ set -e
 
 cat >>conf/config.sh <<CONFIG_SH
 MTHREADS=$(($(grep -c ^processor /proc/cpuinfo) + 2))
-CTYPE=RelWithDebInfo
+CTYPE=Release
 CCOREPCH=OFF
 CSCRIPTPCH=OFF
 CAPPS_BUILD=dbimport-only
