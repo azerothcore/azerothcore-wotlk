@@ -1,0 +1,352 @@
+##################################################
+# WarheadCore Database Import configuration file #
+##################################################
+
+###################################################################################################
+# SECTION INDEX
+#
+#    EXAMPLE CONFIG
+#    DB IMPORT CONFIG
+#    MYSQL SETTINGS
+#    UPDATE SETTINGS
+#    LOGGING SYSTEM SETTINGS
+#
+###################################################################################################
+
+###################################################################################################
+# EXAMPLE CONFIG
+#
+#    Variable
+#        Description: Brief description what the variable is doing.
+#        Important:   Annotation for important things about this variable.
+#        Example:     "Example, i.e. if the value is a string"
+#        Default:     10 - (Enabled|Comment|Variable name in case of grouped config options)
+#                     0  - (Disabled|Comment|Variable name in case of grouped config options)
+#
+# Note to developers:
+# - Copy this example to keep the formatting.
+# - Line breaks should be at column 100.
+###################################################################################################
+
+###################################################################################################
+# DB IMPORT CONFIG
+#
+#    LogsDir
+#        Description: Logs directory setting.
+#        Important:   LogsDir needs to be quoted, as the string might contain space characters.
+#                     Logs directory must exists, or log file creation will be disabled.
+#        Example:     "/home/youruser/warheadcore/logs"
+#        Default:     "" - (Log files will be stored in the current path)
+
+LogsDir = ""
+
+#
+#    SourceDirectory
+#        Description: The path to your WarheadCore source directory.
+#                     If the path is left empty, the built-in CMAKE_SOURCE_DIR is used.
+#        Example:     "../WarheadCore"
+#        Default:     ""
+#
+
+SourceDirectory = ""
+
+#
+#    MySQLExecutable
+#        Description: The path to your MySQL CLI binary.
+#                     If the path is left empty, built-in path from cmake is used.
+#        Example:     "C:/Program Files/MariaDB 10.8/bin/mysql.exe"
+#                     "mysql.exe"
+#                     "/usr/bin/mysql"
+#        Default:     ""
+#
+
+MySQLExecutable = ""
+###################################################################################################
+
+###################################################################################################
+# MYSQL SETTINGS
+#
+#    LoginDatabaseInfo
+#    WorldDatabaseInfo
+#    CharacterDatabaseInfo
+#        Description: Database connection settings for the world server.
+#        Example:     "hostname;port;username;password;database"
+#                     ".;somenumber;username;password;database" - (Use named pipes on Windows
+#                                                                 "enable-named-pipe" to [mysqld]
+#                                                                 section my.ini)
+#                     ".;/path/to/unix_socket;username;password;database;ssl" - (use Unix sockets on
+#                                                                           Unix/Linux)
+#        Default:     "127.0.0.1;3306;warhead;warhead;warhead_auth"       - (LoginDatabaseInfo)
+#                     "127.0.0.1;3306;warhead;warhead;warhead_world"      - (WorldDatabaseInfo)
+#                     "127.0.0.1;3306;warhead;warhead;warhead_characters" - (CharacterDatabaseInfo)
+#
+#    The SSL option will enable TLS when connecting to the specified database. If not provided or
+#    any value other than 'ssl' is set, TLS will not be used.
+#
+
+LoginDatabaseInfo     = "127.0.0.1;3306;warhead;warhead;warhead_auth"
+WorldDatabaseInfo     = "127.0.0.1;3306;warhead;warhead;warhead_world"
+CharacterDatabaseInfo = "127.0.0.1;3306;warhead;warhead;warhead_characters"
+
+#
+#    Database.Reconnect.Seconds
+#    Database.Reconnect.Attempts
+#
+#        Description: How many seconds between every reconnection attempt
+#                     and how many attempts will be performed in total
+#        Default:     20 attempts every 15 seconds
+#
+
+Database.Reconnect.Seconds = 15
+Database.Reconnect.Attempts = 20
+
+#
+#    LoginDatabase.WorkerThreads
+#    WorldDatabase.WorkerThreads
+#    CharacterDatabase.WorkerThreads
+#        Description: The amount of worker threads spawned to handle asynchronous (delayed) MySQL
+#                     statements. Each worker thread is mirrored with its own connection to the
+#                     MySQL server and their own thread on the MySQL server.
+#        Default:     1 - (LoginDatabase.WorkerThreads)
+#                     1 - (WorldDatabase.WorkerThreads)
+#                     1 - (CharacterDatabase.WorkerThreads)
+#
+
+LoginDatabase.WorkerThreads     = 1
+WorldDatabase.WorkerThreads     = 1
+CharacterDatabase.WorkerThreads = 1
+
+#
+#    LoginDatabase.SynchThreads
+#    WorldDatabase.SynchThreads
+#    CharacterDatabase.SynchThreads
+#        Description: The amount of MySQL connections spawned to handle.
+#        Default:     1 - (LoginDatabase.WorkerThreads)
+#                     1 - (WorldDatabase.WorkerThreads)
+#                     1 - (CharacterDatabase.WorkerThreads)
+#
+
+LoginDatabase.SynchThreads     = 1
+WorldDatabase.SynchThreads     = 1
+CharacterDatabase.SynchThreads = 1
+###################################################################################################
+
+###################################################################################################
+# UPDATE SETTINGS
+#
+#    Updates.EnableDatabases
+#        Description: A mask that describes which databases shall be updated.
+#
+#        Following flags are available
+#           DATABASE_LOGIN     = 1, // Auth database
+#           DATABASE_CHARACTER = 2, // Character database
+#           DATABASE_WORLD     = 4, // World database
+#
+#        Default:     7  - (All enabled)
+#                     4  - (Enable world only)
+#                     0  - (All disabled)
+
+Updates.EnableDatabases = 7
+
+#
+#    Updates.AutoSetup
+#        Description: Auto populate empty databases.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Updates.AutoSetup = 1
+
+#
+#    Updates.Redundancy
+#        Description: Perform data redundancy checks through hashing
+#                     to detect changes on sql updates and reapply it.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Updates.Redundancy = 1
+
+#
+#    Updates.ArchivedRedundancy
+#        Description: Check hashes of archived updates (slows down startup).
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+Updates.ArchivedRedundancy = 0
+
+#
+#    Updates.AllowRehash
+#        Description: Inserts the current file hash in the database if it is left empty.
+#                     Useful if you want to mark a file as applied but you don't know its hash.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Updates.AllowRehash = 1
+
+#
+#    Updates.CleanDeadRefMaxCount
+#        Description: Cleans dead/ orphaned references that occur if an update was removed or renamed and edited in one step.
+#                     It only starts the clean up if the count of the missing updates is below or equal the Updates.CleanDeadRefMaxCount value.
+#                     This way prevents erasing of the update history due to wrong source directory state (maybe wrong branch or bad revision).
+#                     Disable this if you want to know if the database is in a possible "dirty state".
+#        Default:     3 - (Enabled)
+#                     0 - (Disabled)
+#                    -1 - (Enabled - unlimited)
+
+Updates.CleanDeadRefMaxCount = 3
+
+#
+###################################################################################################
+
+###################################################################################################
+#
+#  LOGGING SYSTEM SETTINGS
+#
+#  Log channel config values: Given an channel "name"
+#    Log.Channel.name
+#        Description: Defines 'where to log'
+#        Format:      Type,Times,Pattern,Optional1,Optional2,Optional3,Optional4,Optional5
+#
+#                     Type
+#                       1 - (Console)
+#                       2 - (File)
+#
+#                    Times (all types)
+#                       utc: Rotation strategy is based on UTC time (default).
+#                       local: Rotation strategy is based on local time.
+#
+#                    Pattern (all type)
+#                       %s - message source
+#                       %t - message text
+#                       %l - message priority level (1 .. 7)
+#                       %p - message priority (Fatal, Critical, Error, Warning, Notice, Information, Debug, Trace)
+#                       %q - abbreviated message priority (F, C, E, W, N, I, D, T)
+#                       %P - message process identifier
+#                       %T - message thread name
+#                       %I - message thread identifier (numeric)
+#                       %O - message thread OS identifier (numeric)
+#                       %N - node or host name
+#                       %U - message source file path (empty string if not set)
+#                       %u - message source line number (0 if not set)
+#                       %w - message date/time abbreviated weekday (Mon, Tue, ...)
+#                       %W - message date/time full weekday (Monday, Tuesday, ...)
+#                       %b - message date/time abbreviated month (Jan, Feb, ...)
+#                       %B - message date/time full month (January, February, ...)
+#                       %d - message date/time zero-padded day of month (01 .. 31)
+#                       %e - message date/time day of month (1 .. 31)
+#                       %f - message date/time space-padded day of month ( 1 .. 31)
+#                       %m - message date/time zero-padded month (01 .. 12)
+#                       %n - message date/time month (1 .. 12)
+#                       %o - message date/time space-padded month ( 1 .. 12)
+#                       %y - message date/time year without century (70)
+#                       %Y - message date/time year with century (1970)
+#                       %H - message date/time hour (00 .. 23)
+#                       %h - message date/time hour (00 .. 12)
+#                       %a - message date/time am/pm
+#                       %A - message date/time AM/PM
+#                       %M - message date/time minute (00 .. 59)
+#                       %S - message date/time second (00 .. 59)
+#                       %i - message date/time millisecond (000 .. 999)
+#                       %c - message date/time centisecond (0 .. 9)
+#                       %F - message date/time fractional seconds/microseconds (000000 - 999999)
+#                       %z - time zone differential in ISO 8601 format (Z or +NN.NN)
+#                       %Z - time zone differential in RFC format (GMT or +NNNN)
+#                       %L - convert time to local time (must be specified before any date/time specifier; does not itself output anything)
+#                       %E - epoch time (UTC, seconds since midnight, January 1, 1970)
+#                       %v[width] - the message source (%s) but text length is padded/cropped to 'width'
+#                       %[name] - the value of the message parameter with the given name
+#                       %% - percent sign
+#                           Example for file "%Y-%m-%d %H:%M:%S %t"
+#                           Example for console "%H:%M:%S %t"
+#
+#                    Optional1 - Colors (is type Console)
+#                       Format: "fatal critical error warning notice info debug trace"
+#                       black
+#                       red
+#                       green
+#                       brown
+#                       blue
+#                       magenta
+#                       cyan
+#                       gray
+#                       darkGray
+#                       lightRed
+#                       lightGreen
+#                       yellow
+#                       lightBlue
+#                       lightMagenta
+#                       lightCyan
+#                       white
+#                         Example: "lightRed lightRed red brown magenta cyan lightMagenta green"
+#
+#                     Optional1 - File name (is type file)
+#                       Example: "Auth.log"
+#
+#                     Optional2 - Rotate on open (is type File)
+#                       true: The log file is rotated (and archived) when the channel is opened.
+#                       false: Log messages will be appended to an existing log file, if it exists (unless other conditions for a rotation are met). This is the default.
+#
+#                     Optional3 - Rotation (is type File)
+#                       never: no log rotation
+#                       [day,][hh]:mm: the file is rotated on specified day/time day - day is specified as long or short day name (Monday|Mon, Tuesday|Tue, ... ); day can be omitted, in which case log is rotated every day hh - valid hour range is 00-23; hour can be omitted, in which case log is rotated every hour mm - valid minute range is 00-59; minute must be specified
+#                       daily: the file is rotated daily
+#                       weekly: the file is rotated every seven days
+#                       monthly: the file is rotated every 30 days
+#                       <n> minutes: the file is rotated every <n> minutes, where <n> is an integer greater than zero.
+#                       <n> hours: the file is rotated every <n> hours, where <n> is an integer greater than zero.
+#                       <n> days: the file is rotated every <n> days, where <n> is an integer greater than zero.
+#                       <n> weeks: the file is rotated every <n> weeks, where <n> is an integer greater than zero.
+#                       <n> months: the file is rotated every <n> months, where <n> is an integer greater than zero and a month has 30 days.
+#                       <n>: the file is rotated when its size exceeds <n> bytes.
+#                       <n> K: the file is rotated when its size exceeds <n> Kilobytes.
+#                       <n> M: the file is rotated when its size exceeds <n> Megabytes.
+#                           Example: "daily"
+#
+#                     Optional4 - Flush (is type File)
+#                       true: Every essages is immediately flushed to the log file.
+#                       false: Messages are not immediately flushed to the log file (default).
+#
+#                     Optional5 - PurgeAge (is type File)
+#                       <n> [seconds]: the maximum age is <n> seconds.
+#                       <n> minutes: the maximum age is <n> minutes.
+#                       <n> hours: the maximum age is <n> hours.
+#                       <n> days: the maximum age is <n> days.
+#                       <n> weeks: the maximum age is <n> weeks.
+#                       <n> months: the maximum age is <n> months, where a month has 30 days.
+#                           Example: "30 days"
+#
+#                     Optional6 - Archive (is type File)
+#                       number: A number, starting with 0, is appended to the name of archived log files.
+#                               The newest archived log file always has the number 0.
+#                               For example, if the log file is named "access.log", and it fulfils the criteria for rotation, the file is renamed to "access.log.0".
+#                               If a file named "access.log.0" already exists, it is renamed to "access.log.1", and so on. This is the default.
+#                       timestamp: A timestamp is appended to the log file name.
+#                                  For example, if the log file is named "access.log", and it fulfils the criteria for rotation, the file is renamed to "access.log.20050802110300".
+#
+#
+
+LogChannel.Console = "1","local","%H:%M:%S %t","lightRed lightRed red brown magenta cyan lightMagenta green"
+LogChannel.DBImport = "2","local","%Y-%m-%d %H:%M:%S %t","DBImport.log","false","never","false","30 days","number"
+
+#
+#  Logger config values: Given a logger "name"
+#    Logger.name
+#        Description: Defines 'What to log'
+#        Format:      LogLevel,AppenderList
+#
+#                     LogLevel
+#                         0 - (Disabled)
+#                         1 - (Fatal)
+#                         2 - (Critical)
+#                         3 - (Error)
+#                         4 - (Warning)
+#                         5 - (Notice)
+#                         6 - (Info)
+#                         7 - (Debug)
+#                         8 - (Trace)
+#
+#                     File channel: file channel linked to logger
+#                     (Using spaces as separator).
+#
+
+Logger.root = 6,Console DBImport
+###################################################################################################

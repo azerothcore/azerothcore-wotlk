@@ -19,7 +19,4 @@ if(CMAKE_COMPILER_IS_GNUCXX AND NOT MINGW)
 endif()
 
 add_subdirectory(genrev)
-
-if( SERVERS )
-  add_subdirectory(server)
-endif()
+add_subdirectory(server)

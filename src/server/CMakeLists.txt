@@ -10,22 +10,18 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
 
-# Specified files for Windows
-if (WIN32)
-# Crash logs
-set(winDebugging
-  ${CMAKE_SOURCE_DIR}/src/common/Debugging/WheatyExceptionReport.cpp
-  ${CMAKE_SOURCE_DIR}/src/common/Debugging/WheatyExceptionReport.h)
+add_subdirectory(apps)
 
-# Service
-set(winService
-  ${CMAKE_SOURCE_DIR}/src/common/Platform/ServiceWin32.cpp
-  ${CMAKE_SOURCE_DIR}/src/common/Platform/ServiceWin32.h)
+if (APPS_BUILD AND NOT APPS_BUILD STREQUAL "none")
+  add_subdirectory(database)
 endif()
 
-add_subdirectory(authserver)
-add_subdirectory(database)
-add_subdirectory(game)
-add_subdirectory(shared)
-add_subdirectory(scripts)
-add_subdirectory(worldserver)
+if (BUILD_APPLICATION_AUTHSERVER OR BUILD_APPLICATION_WORLDSERVER)
+  add_subdirectory(shared)
+endif()
+
+if (BUILD_APPLICATION_WORLDSERVER)
+  add_subdirectory(game)
+  add_subdirectory(scripts)
+endif()
+

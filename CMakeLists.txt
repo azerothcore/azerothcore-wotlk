@@ -41,6 +41,7 @@ include(CheckCXXSourceRuns)
 include(CheckIncludeFiles)
 include(ConfigureScripts)
 include(ConfigureModules)
+include(ConfigureApplications)
 
 # some utils for cmake
 include(deps/acore/cmake-utils/utils.cmake)
@@ -121,13 +122,10 @@ include(src/cmake/showoptions.cmake)
 #
 
 add_subdirectory(deps)
-
-if (SERVERS OR TOOLS)
-    add_subdirectory(src/common)
-endif()
+add_subdirectory(src/common)
 
 if (TOOLS)
-    add_subdirectory(src/tools)
+  add_subdirectory(src/tools)
 endif()
 
 #
@@ -139,8 +137,10 @@ CU_RUN_HOOK("BEFORE_SRC_LOAD")
 # add core sources
 add_subdirectory(src)
 
-# add modules sources
-add_subdirectory(modules)
+if (BUILD_APPLICATION_WORLDSERVER)
+  # add modules sources
+  add_subdirectory(modules)
+endif()
 
 CU_RUN_HOOK("AFTER_SRC_LOAD")
 

@@ -11,15 +11,16 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
 
-option(SERVERS             "Build worldserver and authserver"                            1)
-
 set(SCRIPTS_AVAILABLE_OPTIONS none static dynamic minimal-static minimal-dynamic)
 set(MODULES_AVAILABLE_OPTIONS none static dynamic)
+set(BUILD_APPS_AVAILABLE_OPTIONS none all servers-only dbimport-only)
 
 set(SCRIPTS "static" CACHE STRING "Build core with scripts")
 set(MODULES "static" CACHE STRING "Build core with modules")
+set(APPS_BUILD "servers-only" CACHE STRING "Build list for applications")
 set_property(CACHE SCRIPTS PROPERTY STRINGS ${SCRIPTS_AVAILABLE_OPTIONS})
 set_property(CACHE MODULES PROPERTY STRINGS ${MODULES_AVAILABLE_OPTIONS})
+set_property(CACHE APPS_BUILD PROPERTY STRINGS ${BUILD_APPS_AVAILABLE_OPTIONS})
 
 # Log a error when the value of the SCRIPTS variable isn't a valid option.
 if(SCRIPTS)
@@ -30,12 +31,21 @@ if(SCRIPTS)
   endif()
 endif()
 
-# Log a error when the value of the SCRIPTS variable isn't a valid option.
+# Log a error when the value of the MODULES variable isn't a valid option.
 if(MODULES)
   list(FIND MODULES_AVAILABLE_OPTIONS "${MODULES}" MODULES_INDEX)
   if(${MODULES_INDEX} EQUAL -1)
     message(FATAL_ERROR "The value (${MODULES}) of your MODULES variable is invalid! "
             "Allowed values are: ${MODULES_AVAILABLE_OPTIONS}. Set static")
+  endif()
+endif()
+
+# Log a fatal error when the value of the APPS_BUILD variable isn't a valid option.
+if(APPS_BUILD)
+  list(FIND BUILD_APPS_AVAILABLE_OPTIONS "${APPS_BUILD}" BUILD_APPS_INDEX)
+  if(${BUILD_APPS_INDEX} EQUAL -1)
+    message(FATAL_ERROR "The value (${APPS_BUILD}) of your APPS_BUILD variable is invalid! "
+                        "Allowed values are: ${BUILD_APPS_AVAILABLE_OPTIONS}. Set default")
   endif()
 endif()
 
@@ -47,12 +57,20 @@ foreach(SCRIPT_MODULE ${SCRIPT_MODULE_LIST})
   set_property(CACHE ${SCRIPT_MODULE_VARIABLE} PROPERTY STRINGS default disabled static dynamic)
 endforeach()
 
-# Build a list of all modules script when -DSCRIPT="custom" is selected
+# Build a list of all modules script when -DMODULE="custom" is selected
 GetModuleSourceList(SCRIPT_MODULE_LIST)
 foreach(SCRIPT_MODULE ${SCRIPT_MODULE_LIST})
   ModuleNameToVariable(${SCRIPT_MODULE} SCRIPT_MODULE_VARIABLE)
   set(${SCRIPT_MODULE_VARIABLE} "default" CACHE STRING "Build type of the ${SCRIPT_MODULE} module.")
   set_property(CACHE ${SCRIPT_MODULE_VARIABLE} PROPERTY STRINGS default disabled static dynamic)
+endforeach()
+
+# Build a list of all applications when -DBUILD_APPS="custom" is selected
+GetApplicationsList(APPLICATIONS_BUILD_LIST)
+foreach(APPLICATION_BUILD_NAME ${APPLICATIONS_BUILD_LIST})
+  ApplicationNameToVariable(${APPLICATION_BUILD_NAME} APPLICATION_BUILD_VARIABLE)
+  set(${APPLICATION_BUILD_VARIABLE} "default" CACHE STRING "Enable build the ${APPLICATION_BUILD_NAME} application.")
+  set_property(CACHE ${APPLICATION_BUILD_VARIABLE} PROPERTY STRINGS default enabled disabled)
 endforeach()
 
 option(BUILD_TESTING       "Build unit tests"                                            0)
@@ -69,6 +87,7 @@ option(WITH_STRICT_DATABASE_TYPE_CHECKS "Enable strict checking of database fiel
 option(WITHOUT_METRICS     "Disable metrics reporting (i.e. InfluxDB and Grafana)"       0)
 option(WITH_DETAILED_METRICS  "Enable detailed metrics reporting (i.e. time each session takes to update)" 0)
 
+CheckApplicationsBuildList()
 IsDynamicLinkingRequired(WITH_DYNAMIC_LINKING_FORCED)
 IsDynamicLinkingModulesRequired(WITH_DYNAMIC_LINKING_FORCED)
 

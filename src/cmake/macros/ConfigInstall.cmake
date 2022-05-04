@@ -12,32 +12,34 @@
 
 #
 # Use it like:
-# CopyDefaultConfig(worldserver)
+# CopyDefaultConfig(${APP_PROJECT_NAME} ${APPLICATION_NAME})
 #
 
-function(CopyDefaultConfig servertype)
+function(CopyDefaultConfig projectName appName)
+  GetPathToApplication(${appName} SOURCE_APP_PATH)
+
   if(WIN32)
     if("${CMAKE_MAKE_PROGRAM}" MATCHES "MSBuild")
-      add_custom_command(TARGET ${servertype}
+      add_custom_command(TARGET ${projectName}
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/configs")
-      add_custom_command(TARGET ${servertype}
+      add_custom_command(TARGET ${projectName}
         POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${servertype}.conf.dist" "${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/configs")
+        COMMAND ${CMAKE_COMMAND} -E copy "${SOURCE_APP_PATH}/${appName}.conf.dist" "${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/configs")
     elseif(MINGW)
       add_custom_command(TARGET ${servertype}
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/bin/configs")
       add_custom_command(TARGET ${servertype}
         POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${servertype}.conf.dist ${CMAKE_BINARY_DIR}/bin/configs")
+        COMMAND ${CMAKE_COMMAND} -E copy "${SOURCE_APP_PATH}/${appName}.conf.dist ${CMAKE_BINARY_DIR}/bin/configs")
     endif()
   endif()
 
   if(UNIX)
-    install(FILES "${servertype}.conf.dist" DESTINATION "${CONF_DIR}")
+    install(FILES "${SOURCE_APP_PATH}/${appName}.conf.dist" DESTINATION "${CONF_DIR}")
   elseif(WIN32)
-    install(FILES "${servertype}.conf.dist" DESTINATION "${CMAKE_INSTALL_PREFIX}/configs")
+    install(FILES "${SOURCE_APP_PATH}/${appName}.conf.dist" DESTINATION "${CMAKE_INSTALL_PREFIX}/configs")
   endif()
 endfunction()
 
