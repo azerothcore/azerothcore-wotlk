@@ -48,7 +48,7 @@ jobs:
       - name: Build
         run: source ./apps/ci/ci-compile.sh
       - name: Dry run
-        run: source ./apps/ci/ci-worldserver-dry-run.sh
+        run: source ./apps/ci/ci-dry-run.sh worldserver
       - name: Check startup errors
         run: source ./apps/ci/ci-error-check.sh
       - name: Run unit tests
