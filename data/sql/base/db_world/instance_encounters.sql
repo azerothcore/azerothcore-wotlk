@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,18 +12,18 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.instance_encounters
+-- Dumpar struktur för tabell acore_world.instance_encounters
 DROP TABLE IF EXISTS `instance_encounters`;
 CREATE TABLE IF NOT EXISTS `instance_encounters` (
   `entry` INT unsigned NOT NULL COMMENT 'Unique entry from DungeonEncounter.dbc',
   `creditType` TINYINT unsigned NOT NULL DEFAULT 0,
   `creditEntry` INT unsigned NOT NULL DEFAULT 0,
   `lastEncounterDungeon` SMALLINT unsigned NOT NULL DEFAULT 0 COMMENT 'If not 0, LfgDungeon.dbc entry for the instance it is last encounter in',
-  `comment` varchar(255) NOT NULL DEFAULT '',
+  `comment` VARCHAR(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_world.instance_encounters: 612 rows
+-- Dumpar data för tabell acore_world.instance_encounters: 612 rows
 DELETE FROM `instance_encounters`;
 /*!40000 ALTER TABLE `instance_encounters` DISABLE KEYS */;
 INSERT INTO `instance_encounters` (`entry`, `creditType`, `creditEntry`, `lastEncounterDungeon`, `comment`) VALUES

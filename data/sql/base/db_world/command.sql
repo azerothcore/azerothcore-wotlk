@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,16 +12,16 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.command
+-- Dumpar struktur för tabell acore_world.command
 DROP TABLE IF EXISTS `command`;
 CREATE TABLE IF NOT EXISTS `command` (
-  `name` varchar(50) NOT NULL DEFAULT '',
+  `name` VARCHAR(50) NOT NULL DEFAULT '',
   `security` TINYINT unsigned NOT NULL DEFAULT 0,
-  `help` longtext DEFAULT NULL,
+  `help` longtext,
   PRIMARY KEY (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Chat System';
 
--- Дамп данных таблицы acore_world.command: 572 rows
+-- Dumpar data för tabell acore_world.command: 579 rows
 DELETE FROM `command`;
 /*!40000 ALTER TABLE `command` DISABLE KEYS */;
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
@@ -115,7 +115,7 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 	('debug getitemstate', 3, 'Syntax: '),
 	('debug getitemvalue', 3, 'Syntax: '),
 	('debug getvalue', 3, 'Syntax: '),
-	('debug hostil', 1, 'Syntax: '),
+	('debug hostile', 1, 'Syntax: '),
 	('debug itemexpire', 3, 'Syntax: '),
 	('debug lootrecipient', 3, 'Syntax: '),
 	('debug los', 3, 'Syntax: '),
@@ -483,7 +483,7 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 	('reset spells', 3, 'Syntax: .reset spells [Playername]\r\n  Removes all non-original spells from spellbook.\r\n. Playername can be name of offline character.'),
 	('reset stats', 3, 'Syntax: .reset stats [Playername]\r\n  Resets(recalculate) all stats of the targeted player to their original VALUESat current level.'),
 	('reset talents', 3, 'Syntax: .reset talents [Playername]\r\n  Removes all talents of the targeted player or pet or named player. Playername can be name of offline character. With player talents also will be reset talents for all character\'s pets if any.'),
-	('respawn', 2, 'Syntax: .respawn\r\n\r\nRespawn all nearest creatures and GO without waiting respawn time expiration.'),
+	('respawn', 2, 'Syntax: .respawn\nRespawn the selected unit without waiting respawn time expiration.'),
 	('revive', 2, 'Syntax: .revive\r\n\r\nRevive the selected player. If no player is selected, it will revive you.'),
 	('save', 0, 'Syntax: .save\r\n\r\nSaves your character.'),
 	('saveall', 2, 'Syntax: .saveall\r\n\r\nSave all characters in game.'),
@@ -596,7 +596,14 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 	('item refund', 3, 'Syntax: .item refund <name> <item> <extendedCost> \nRemoves the item and restores honor/arena/items according to extended cost.'),
 	('settings', 1, 'Syntax: .settings $subcommand\nType .setting to see the list of all available commands.'),
 	('settings announcer', 1, 'Syntax: .settings announcer <type> <on/off>.\nDisables receiving announcements. Valid announcement types are: \'autobroadcast\', \'arena\' and \'bg\''),
-	('reload creature_movement_override', 3, 'Syntax: .reload creature_movement_override\nReload creature_movement_override table.');
+	('reload creature_movement_override', 3, 'Syntax: .reload creature_movement_override\nReload creature_movement_override table.'),
+	('go quest', 1, 'Syntax: .go quest <starter/ender> <quest>.\nTeleports you to the quest starter/ender creature or object.'),
+	('guild rename', 3, 'Syntax: .guild rename "$GuildName" "$NewGuildName" \n\n Rename a guild named $GuildName with $NewGuildName. Guild name and new guild name must in quotes.'),
+	('reload quest_greeting', 3, 'Syntax: .reload quest_greeting\nReload quest_greeting table.'),
+	('reload quest_greeting_locale', 3, 'Syntax: .reload quest_greeting_locale\nReload quest_greeting_locale table.'),
+	('debug objectcount', 3, 'Syntax: .debug objectcount <optional map id> Shows the number of Creatures and GameObjects for the specified map id or for all maps if none is specified'),
+	('respawn all', 2, 'Syntax: .respawn all\nRespawn all nearest creatures and GO without waiting respawn time expiration.'),
+	('reload mail_server_template', 3, 'Syntax: .reload mail_server_template\nReload server_mail_template table.');
 /*!40000 ALTER TABLE `command` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

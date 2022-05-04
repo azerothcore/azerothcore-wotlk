@@ -22,15 +22,6 @@ for i in `find data/sql/updates/pending* -name "*.sql" -type f`; do
     fi
 done
 
-for i in `find data/sql/updates/pending* -name "*.sql" -type f`; do
-    if $(cat "$i"|sed "s/'.*'\(.*\)/\1/g"|grep -q -i -E "version_db_"); then
-        echo "> version_db check - OK"
-    else
-        echo "> version_db check - Failed"
-        exit 1
-    fi
-done
-
 for i in `find data/sql/updates/pending* -name "*sql" -type f`; do
     if $(cat "$i"|sed "s/'.*'\(.*\)/\1/g"|grep -q -i -E "broadcast_text"); then
         echo "> broadcast_text check - Failed"
