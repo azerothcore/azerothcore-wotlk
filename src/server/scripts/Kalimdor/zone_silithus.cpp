@@ -532,21 +532,21 @@ public:
                         break;
                     case 51:
                         {
-                            uint32 entries[4] = { 15423, 15424, 15414, 15422 };
-                            for (uint8 i = 0; i < 4; ++i)
-                            {
-                                Creature* mob = Fandral->FindNearestCreature(entries[i], 50.0f);
-                                while (mob)
-                                {
-                                    if (mob->IsInWorld())
-                                    {
-                                        Map* map = mob->GetMap();
-                                        map->RemoveFromMap(mob, false);
-                                    }
+                            std::list<Creature*> constructList;
 
-                                    mob = Fandral->FindNearestCreature(entries[i], 50.0f);
+                            me->GetCreatureListWithEntryInGrid(constructList, 15423, 100.0f);
+                            me->GetCreatureListWithEntryInGrid(constructList, 15424, 100.0f);
+                            me->GetCreatureListWithEntryInGrid(constructList, 15414, 100.0f);
+                            me->GetCreatureListWithEntryInGrid(constructList, 15422, 100.0f);
+
+                            if (!constructList.empty())
+                            {
+                                for (std::list<Creature*>::const_iterator itr = constructList.begin(); itr != constructList.end(); ++itr)
+                                {
+                                    (*itr)->RemoveFromWorld();
                                 }
                             }
+
                             break;
                         }
                     case 52:
