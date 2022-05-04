@@ -96,6 +96,7 @@ static Position SkadiPosition[] =
 };
 
 #define EMOTE_IN_RANGE   "Skadi the Ruthless is within range of the harpoon launchers"
+#define EMOTE_DRAKE_BREATH "Grauf takes a deep breath"
 
 enum phase
 {
@@ -466,6 +467,7 @@ public:
                         me->GetMotionMaster()->MovePoint(targetPoint, SkadiPosition[targetPoint].GetPositionX(), SkadiPosition[targetPoint].GetPositionY(), SkadiPosition[targetPoint].GetPositionZ());
                         if (targetPoint <= 1)
                         {
+                            me->TextEmote(EMOTE_DRAKE_BREATH, nullptr, true);
                             SpawnFlameTriggers(targetPoint);
                             me->CastSpell(me, SPELL_FLAME_VISUAL, false);
                         }
