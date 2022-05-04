@@ -41,9 +41,9 @@ enum Misc
     SPELL_WHIRLWIND_N                   = 50228,
     SPELL_WHIRLWIND_H                   = 50228,
 
-    SPELL_FLAME_VISUAL                  = 47592,
-    SPELL_FLAME_BREATH_N                = 47579,
-    SPELL_FLAME_BREATH_H                = 60020,
+    SPELL_FREEZING_CLOUD_VISUAL         = 47592,
+    SPELL_FREEZING_CLOUD_N              = 47579,
+    SPELL_FREEZING_CLOUD_H              = 60020,
 
     SPELL_LAUNCH_HARPOON                = 48642,
 
@@ -324,8 +324,8 @@ public:
 
         void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
         {
-            if (spellInfo->Id == 47593) // SPELL_FLAME_VISUAL trigger
-                target->CastSpell(target, me->GetMap()->IsHeroic() ? SPELL_FLAME_BREATH_H : SPELL_FLAME_BREATH_N, true);
+            if (spellInfo->Id == 47593) // SPELL_FREEZING_CLOUD_VISUAL trigger
+                target->CastSpell(target, me->GetMap()->IsHeroic() ? SPELL_FREEZING_CLOUD_H : SPELL_FREEZING_CLOUD_N, true);
         }
 
         void SpawnFlameTriggers(uint8 point)
@@ -342,13 +342,13 @@ public:
             {
                 Creature* cr;
                 if ((cr = me->SummonCreature(NPC_BREATH_TRIGGER, 483, -484.9f, 105, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000)))
-                    cr->CastSpell(cr, cr->GetMap()->IsHeroic() ? SPELL_FLAME_BREATH_H : SPELL_FLAME_BREATH_N, true);
+                    cr->CastSpell(cr, cr->GetMap()->IsHeroic() ? SPELL_FREEZING_CLOUD_H : SPELL_FREEZING_CLOUD_N, true);
                 if ((cr = me->SummonCreature(NPC_BREATH_TRIGGER, 471.0f, -484.7f, 105, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000)))
-                    cr->CastSpell(cr, cr->GetMap()->IsHeroic() ? SPELL_FLAME_BREATH_H : SPELL_FLAME_BREATH_N, true);
+                    cr->CastSpell(cr, cr->GetMap()->IsHeroic() ? SPELL_FREEZING_CLOUD_H : SPELL_FREEZING_CLOUD_N, true);
 
                 for (uint8 j = 0; j < 7; j++)
                     if ((cr = me->SummonCreature(NPC_BREATH_TRIGGER, 477.0f, -507.0f + (j * 3), 105.0f, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000)))
-                        cr->CastSpell(cr, cr->GetMap()->IsHeroic() ? SPELL_FLAME_BREATH_H : SPELL_FLAME_BREATH_N, true);
+                        cr->CastSpell(cr, cr->GetMap()->IsHeroic() ? SPELL_FREEZING_CLOUD_H : SPELL_FREEZING_CLOUD_N, true);
             }
         }
 
@@ -358,7 +358,7 @@ public:
             {
                 case 0:
                 case 1:
-                    me->RemoveAurasDueToSpell(SPELL_FLAME_VISUAL);
+                    me->RemoveAurasDueToSpell(SPELL_FREEZING_CLOUD_VISUAL);
                     me->SetFacingTo(M_PI * 2);
                     break;
                 case 2:
@@ -469,7 +469,7 @@ public:
                         {
                             me->TextEmote(EMOTE_DRAKE_BREATH, nullptr, true);
                             SpawnFlameTriggers(targetPoint);
-                            me->CastSpell(me, SPELL_FLAME_VISUAL, false);
+                            me->CastSpell(me, SPELL_FREEZING_CLOUD_VISUAL, false);
                         }
 
                         if (m_pInstance)
