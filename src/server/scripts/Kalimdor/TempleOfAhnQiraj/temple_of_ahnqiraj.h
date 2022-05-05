@@ -38,6 +38,7 @@ enum DataTypes
     DATA_BUG_TRIO_DEATH     = 14,
     DATA_CTHUN_PHASE        = 20,
     DATA_VISCIDUS           = 21,
+    DATA_SARTURA            = 22
 };
 
 enum Creatures
@@ -62,7 +63,8 @@ enum Creatures
     NPC_YAUJ                = 15543,
     NPC_VEKLOR              = 15276,
     NPC_VEKNILASH           = 15275,
-    NPC_OURO                = 15517
+    NPC_OURO                = 15517,
+    NPC_SARTURA             = 15516
 };
 
 template <class AI, class T>

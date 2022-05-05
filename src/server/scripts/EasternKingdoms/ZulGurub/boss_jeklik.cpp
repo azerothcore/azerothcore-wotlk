@@ -22,20 +22,31 @@
 enum Says
 {
     SAY_AGGRO                   = 0,
-    SAY_RAIN_FIRE               = 1,
-    SAY_DEATH                   = 2
+    SAY_CALL_RIDERS             = 1,
+    SAY_DEATH                   = 2,
+    EMOTE_SUMMON_BATS           = 3,
+    EMOTE_GREAT_HEAL            = 4
 };
 
 enum Spells
 {
+    // Intro
+    SPELL_GREEN_CHANNELING      = 13540,
+    SPELL_BAT_FORM              = 23966,
+
+    // Phase one
+    SPELL_PIERCE_ARMOR          = 12097,
+    SPELL_BLOOD_LEECH           = 22644,
     SPELL_CHARGE                = 22911,
-    SPELL_SONICBURST            = 23918,
-    SPELL_SCREECH               = 6605,
+    SPELL_SONIC_BURST           = 23918,
+    SPELL_SWOOP                 = 23919,
+
+    // Phase two
+    SPELL_CURSE_OF_BLOOD        = 16098,
+    SPELL_PSYCHIC_SCREAM        = 22884,
     SPELL_SHADOW_WORD_PAIN      = 23952,
     SPELL_MIND_FLAY             = 23953,
-    SPELL_CHAIN_MIND_FLAY       = 26044, // Right ID unknown. So disabled
-    SPELL_GREATERHEAL           = 23954,
-    SPELL_BAT_FORM              = 23966,
+    SPELL_GREATER_HEAL          = 23954,
 
     // Batriders Spell
     SPELL_BOMB                  = 40332 // Wrong ID but Magmadars bomb is not working...
@@ -49,13 +60,19 @@ enum BatIds
 
 enum Events
 {
+    // Phase one
     EVENT_CHARGE_JEKLIK         = 1,
+    EVENT_PIERCE_ARMOR,
+    EVENT_BLOOD_LEECH,
     EVENT_SONIC_BURST,
-    EVENT_SCREECH,
+    EVENT_SWOOP,
     EVENT_SPAWN_BATS,
+
+    // Phase two
+    EVENT_CURSE_OF_BLOOD,
+    EVENT_PSYCHIC_SCREAM,
     EVENT_SHADOW_WORD_PAIN,
     EVENT_MIND_FLAY,
-    EVENT_CHAIN_MIND_FLAY,
     EVENT_GREATER_HEAL,
     EVENT_SPAWN_FLYING_BATS
 };
@@ -87,6 +104,7 @@ public:
 
         void Reset() override
         {
+            DoCastSelf(SPELL_GREEN_CHANNELING);
             _Reset();
         }
 
@@ -100,15 +118,17 @@ public:
         {
             _EnterCombat();
             Talk(SAY_AGGRO);
+            me->RemoveAurasDueToSpell(SPELL_GREEN_CHANNELING);
+            me->SetDisableGravity(true);
+            DoCastSelf(SPELL_BAT_FORM);
             events.SetPhase(PHASE_ONE);
 
-            events.ScheduleEvent(EVENT_CHARGE_JEKLIK, 20000, 0, PHASE_ONE);
-            events.ScheduleEvent(EVENT_SONIC_BURST, 8000, 0, PHASE_ONE);
-            events.ScheduleEvent(EVENT_SCREECH, 13000, 0, PHASE_ONE);
-            events.ScheduleEvent(EVENT_SPAWN_BATS, 60000, 0, PHASE_ONE);
-
-            me->SetCanFly(true);
-            DoCast(me, SPELL_BAT_FORM);
+            events.ScheduleEvent(EVENT_CHARGE_JEKLIK, urand(10000, 20000), PHASE_ONE);
+            events.ScheduleEvent(EVENT_PIERCE_ARMOR, urand(5000, 15000), PHASE_ONE);
+            events.ScheduleEvent(EVENT_BLOOD_LEECH, urand(5000, 15000), PHASE_ONE);
+            events.ScheduleEvent(EVENT_SONIC_BURST, urand(5000, 15000), PHASE_ONE);
+            events.ScheduleEvent(EVENT_SWOOP, 20000, PHASE_ONE);
+            events.ScheduleEvent(EVENT_SPAWN_BATS, 30000, PHASE_ONE);
         }
 
         void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
@@ -116,14 +136,17 @@ public:
             if (events.IsInPhase(PHASE_ONE) && !HealthAbovePct(50))
             {
                 me->RemoveAurasDueToSpell(SPELL_BAT_FORM);
-                me->SetCanFly(false);
+                me->SetDisableGravity(false);
                 DoResetThreat();
                 events.SetPhase(PHASE_TWO);
-                events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, 6000, 0, PHASE_TWO);
-                events.ScheduleEvent(EVENT_MIND_FLAY, 11000, 0, PHASE_TWO);
-                events.ScheduleEvent(EVENT_CHAIN_MIND_FLAY, 26000, 0, PHASE_TWO);
-                events.ScheduleEvent(EVENT_GREATER_HEAL, 50000, 0, PHASE_TWO);
-                events.ScheduleEvent(EVENT_SPAWN_FLYING_BATS, 10000, 0, PHASE_TWO);
+
+                events.ScheduleEvent(EVENT_CURSE_OF_BLOOD, urand(5000, 15000), PHASE_TWO);
+                events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, urand(10000, 15000), PHASE_TWO);
+                events.ScheduleEvent(EVENT_PSYCHIC_SCREAM, urand(25000, 35000), PHASE_TWO);
+                events.ScheduleEvent(EVENT_MIND_FLAY, urand(10000, 30000), PHASE_TWO);
+                events.ScheduleEvent(EVENT_GREATER_HEAL, 25000, PHASE_TWO);
+                events.ScheduleEvent(EVENT_SPAWN_FLYING_BATS, 10000, PHASE_TWO);
+
                 return;
             }
         }
@@ -142,53 +165,68 @@ public:
             {
                 switch (eventId)
                 {
+                    // Phase one
                     case EVENT_CHARGE_JEKLIK:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         {
                             DoCast(target, SPELL_CHARGE);
                             AttackStart(target);
                         }
-                        events.ScheduleEvent(EVENT_CHARGE_JEKLIK, urand(15000, 30000), 0, PHASE_ONE);
+                        events.ScheduleEvent(EVENT_CHARGE_JEKLIK, urand(15000, 30000), PHASE_ONE);
+                        break;
+                    case EVENT_PIERCE_ARMOR:
+                        DoCastVictim(SPELL_PIERCE_ARMOR);
+                        events.ScheduleEvent(EVENT_PIERCE_ARMOR, urand(20000, 30000), PHASE_ONE);
+                        break;
+                    case EVENT_BLOOD_LEECH:
+                        DoCastVictim(SPELL_BLOOD_LEECH);
+                        events.ScheduleEvent(EVENT_BLOOD_LEECH, urand(10000, 20000), PHASE_ONE);
                         break;
                     case EVENT_SONIC_BURST:
-                        DoCastVictim(SPELL_SONICBURST);
-                        events.ScheduleEvent(EVENT_SONIC_BURST, urand(8000, 13000), 0, PHASE_ONE);
+                        DoCastVictim(SPELL_SONIC_BURST);
+                        events.ScheduleEvent(EVENT_SONIC_BURST, urand(20000, 30000), PHASE_ONE);
                         break;
-                    case EVENT_SCREECH:
-                        DoCastVictim(SPELL_SCREECH);
-                        events.ScheduleEvent(EVENT_SCREECH, urand(18000, 26000), 0, PHASE_ONE);
+                    case EVENT_SWOOP:
+                        DoCastVictim(SPELL_SWOOP);
+                        events.ScheduleEvent(EVENT_SWOOP, urand(20000, 30000), PHASE_ONE);
                         break;
                     case EVENT_SPAWN_BATS:
+                        Talk(EMOTE_SUMMON_BATS);
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             for (uint8 i = 0; i < 6; ++i)
                                 if (Creature* bat = me->SummonCreature(NPC_BLOODSEEKER_BAT, SpawnBat[i], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
                                     bat->AI()->AttackStart(target);
-                        events.ScheduleEvent(EVENT_SPAWN_BATS, 60000, 0, PHASE_ONE);
+                        events.ScheduleEvent(EVENT_SPAWN_BATS, 30000, PHASE_ONE);
+                        break;
+                    //Phase two
+                    case EVENT_CURSE_OF_BLOOD:
+                        DoCastSelf(SPELL_CURSE_OF_BLOOD);
+                        events.ScheduleEvent(EVENT_CURSE_OF_BLOOD, urand(25000, 30000), PHASE_TWO);
+                        break;
+                    case EVENT_PSYCHIC_SCREAM:
+                        DoCastVictim(SPELL_PSYCHIC_SCREAM);
+                        events.ScheduleEvent(EVENT_PSYCHIC_SCREAM, urand(35000, 45000), PHASE_TWO);
                         break;
                     case EVENT_SHADOW_WORD_PAIN:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                            DoCast(target, SPELL_SHADOW_WORD_PAIN);
-                        events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, urand(12000, 18000), 0, PHASE_TWO);
+                        DoCastRandomTarget(SPELL_SHADOW_WORD_PAIN, 0, true);
+                        events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, urand(12000, 18000), PHASE_TWO);
                         break;
                     case EVENT_MIND_FLAY:
                         DoCastVictim(SPELL_MIND_FLAY);
-                        events.ScheduleEvent(EVENT_MIND_FLAY, 16000, 0, PHASE_TWO);
-                        break;
-                    case EVENT_CHAIN_MIND_FLAY:
-                        me->InterruptNonMeleeSpells(false);
-                        DoCastVictim(SPELL_CHAIN_MIND_FLAY);
-                        events.ScheduleEvent(EVENT_CHAIN_MIND_FLAY, urand(15000, 30000), 0, PHASE_TWO);
+                        events.ScheduleEvent(EVENT_MIND_FLAY, urand(20000, 40000), PHASE_TWO);
                         break;
                     case EVENT_GREATER_HEAL:
+                        Talk(EMOTE_GREAT_HEAL);
                         me->InterruptNonMeleeSpells(false);
-                        DoCast(me, SPELL_GREATERHEAL);
-                        events.ScheduleEvent(EVENT_GREATER_HEAL, urand(25000, 35000), 0, PHASE_TWO);
+                        DoCastSelf(SPELL_GREATER_HEAL);
+                        events.ScheduleEvent(EVENT_GREATER_HEAL, 25000, PHASE_TWO);
                         break;
                     case EVENT_SPAWN_FLYING_BATS:
+                        Talk(SAY_CALL_RIDERS);
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             if (Creature* flyingBat = me->SummonCreature(NPC_FRENZIED_BAT, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + 15.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
                                 flyingBat->AI()->AttackStart(target);
-                        events.ScheduleEvent(EVENT_SPAWN_FLYING_BATS, urand(10000, 15000), 0, PHASE_TWO);
+                        events.ScheduleEvent(EVENT_SPAWN_FLYING_BATS, urand(10000, 15000), PHASE_TWO);
                         break;
                     default:
                         break;

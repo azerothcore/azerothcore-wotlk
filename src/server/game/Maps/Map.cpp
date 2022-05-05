@@ -1952,7 +1952,7 @@ inline LiquidData const GridMap::GetLiquidData(float x, float y, float z, float 
                 float ground_level = getHeight(x, y);
 
                 // Check water level and ground level
-                if (liquid_level >= ground_level && z >= ground_level - 2)
+                if (liquid_level >= ground_level && z >= ground_level)
                 {
                     // All ok in water -> store data
                     liquidData.Entry  = entry;
