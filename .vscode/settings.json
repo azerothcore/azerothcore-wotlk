@@ -117,5 +117,6 @@
     },
     "deno.enable": true,
     "deno.path": "deps/deno/bin/deno",
-    "deno.lint": true
+    "deno.lint": true,
+    "cmake.configureOnOpen": false
 }
