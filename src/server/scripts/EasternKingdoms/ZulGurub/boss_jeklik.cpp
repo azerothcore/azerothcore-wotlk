@@ -150,6 +150,7 @@ struct boss_jeklik : public BossAI
             me->SetDisableGravity(false);
             DoResetThreat();
             events.SetPhase(PHASE_TWO);
+            events.CancelEventGroup(PHASE_ONE);
 
             events.ScheduleEvent(EVENT_CURSE_OF_BLOOD, urand(5000, 15000), PHASE_TWO);
             events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, urand(10000, 15000), PHASE_TWO);
