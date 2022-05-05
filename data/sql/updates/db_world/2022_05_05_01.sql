@@ -1,3 +1,4 @@
+-- DB update 2022_05_05_00 -> 2022_05_05_01
 -- Fix gossip for Captured Arko'narin
 UPDATE `creature_template` SET `gossip_menu_id`=3129 WHERE `entry`=11016;
 DELETE FROM `gossip_menu` WHERE `MenuID`=30229;
