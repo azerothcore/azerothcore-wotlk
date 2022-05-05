@@ -1,3 +1,4 @@
+-- DB update 2022_05_04_01 -> 2022_05_05_00
 UPDATE `quest_greeting` SET `Greeting`='Hello, citizen.  You look like a $g man : woman; with a purpose - do you have business with the Stormwind Army?' WHERE `ID`=261;
 UPDATE `quest_greeting` SET `Greeting`='Hello, hello!  Welcome to my kitchen, $g sir : m''lady;!  This is where all of the Scarlet Raven Tavern''s finest delicacies are made.  Ah, just smell the wonderful aroma!' WHERE `ID`=272;
 UPDATE `quest_greeting` SET `Greeting`='Hey $Gbuddy:ma''am;, do you think you could give me a hand with something?  I''m really IN dire straits here...' WHERE `ID`=415;
