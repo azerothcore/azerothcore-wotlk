@@ -53,7 +53,7 @@ enum Spells
 
     // Batriders Spell
     SPELL_THROW_LIQUID_FIRE = 23970,
-    SPELL_SPAWN_FLAMES          = 23971
+    SPELL_SUMMON_LIQUID_FIRE = 23971
 };
 
 enum BatIds
