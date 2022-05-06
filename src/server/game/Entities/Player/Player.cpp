@@ -8942,7 +8942,7 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
 
         return;
     }
-    
+
     pet->CombatStop();
 
     if (returnreagent)
