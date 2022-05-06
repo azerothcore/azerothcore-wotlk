@@ -57,7 +57,7 @@
 #define NPC_SCORCHED_GROUND             33123
 #define NPC_WATER_TRIGGER               22515
 
-enum IgnisText
+enum Texts
 {
     SAY_AGGRO       = 0,
     SAY_SUMMON      = 1,
@@ -66,7 +66,7 @@ enum IgnisText
     SAY_SLAY        = 4,
     SAY_BERSERK     = 5,
     SAY_DEATH       = 6,
-    SAY_EMOTE_JETS  = 7,
+    EMOTE_JETS      = 7,
 };
 
 #define ACHIEV_STOKIN_THE_FURNACE_EVENT 20951
@@ -362,7 +362,7 @@ public:
                     me->DisableRotate(false);
                     break;
                 case EVENT_SPELL_FLAME_JETS:
-                    Talk(SAY_EMOTE_JETS);
+                    Talk(EMOTE_JETS);
                     me->CastSpell(me->GetVictim(), S_FLAME_JETS, false);
                     events.RepeatEvent(25000);
                     break;
