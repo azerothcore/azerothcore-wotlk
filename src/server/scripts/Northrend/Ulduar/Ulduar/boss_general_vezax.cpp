@@ -88,7 +88,7 @@ enum VezaxEvents
     EVENT_RESTORE_TARGET                        = 11,
 };
 
-enum VezaxText 
+enum VezaxText
 {
     SAY_AGGRO                            = 0,
     SAY_SLAY                             = 1,
@@ -99,7 +99,6 @@ enum VezaxText
     SAY_EMOTE_ANIMUS                     = 6,
     SAY_EMOTE_BARRIER                    = 7,
     SAY_EMOTE_SURGE_OF_DARKNESS          = 8,
-
 };
 
 enum VaporsText
