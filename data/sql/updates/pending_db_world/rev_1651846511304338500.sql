@@ -1,4 +1,3 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1651846511304338500');
 
 -- Quest You'll Need a Gryphon
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 29403;
