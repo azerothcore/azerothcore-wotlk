@@ -32,6 +32,11 @@ DoorData const doorData[] =
     { 0,             0,           DOOR_TYPE_ROOM } // END
 };
 
+ObjectData const creatureData[] =
+{
+    { NPC_PRIESTESS_MARLI, DATA_MARLI }
+};
+
 class instance_zulgurub : public InstanceMapScript
 {
 public:
@@ -42,6 +47,7 @@ public:
         instance_zulgurub_InstanceMapScript(Map* map) : InstanceScript(map)
         {
             SetBossNumber(EncounterCount);
+            LoadObjectData(creatureData, nullptr);
             LoadDoorData(doorData);
         }
 
@@ -71,6 +77,8 @@ public:
                     _hakkarGUID = creature->GetGUID();
                     break;
             }
+
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         void OnGameObjectCreate(GameObject* go) override
