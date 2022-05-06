@@ -449,6 +449,7 @@ protected:
     void _EnterCombat();
     void _JustDied();
     void _JustReachedHome() { me->setActive(false); }
+    void _DespawnAtEvade(Seconds delayToRespawn = 30s,  Creature* who = nullptr);
 
     void TeleportCheaters();
 

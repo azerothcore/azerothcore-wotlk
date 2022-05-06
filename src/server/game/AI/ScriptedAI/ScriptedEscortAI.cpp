@@ -258,13 +258,17 @@ void npc_escortAI::UpdateAI(uint32 diff)
                         return;
                     }
 
-                    if (m_bCanInstantRespawn)
+                    if (m_bCanInstantRespawn && !sWorld->getBoolConfig(CONFIG_RESPAWN_DYNAMIC_ESCORTNPC))
                     {
                         me->setDeathState(JUST_DIED);
                         me->Respawn();
                     }
                     else
+                    {
+                        if (sWorld->getBoolConfig(CONFIG_RESPAWN_DYNAMIC_ESCORTNPC))
+                            me->GetMap()->RemoveRespawnTime(SPAWN_TYPE_CREATURE, me->GetSpawnId(), true);
                         me->DespawnOrUnsummon();
+                    }
                 }
 
                 // xinef: remove escort state, escort was finished (lack of this line resulted in skipping UpdateEscortAI calls after finished escort)
@@ -298,11 +302,17 @@ void npc_escortAI::UpdateAI(uint32 diff)
         {
             if (DespawnAtFar && !IsPlayerOrGroupInRange())
             {
-                if (m_bCanInstantRespawn)
+                bool isEscort = false;
+                if (CreatureData const* cdata = me->GetCreatureData())
+                    isEscort = (sWorld->getBoolConfig(CONFIG_RESPAWN_DYNAMIC_ESCORTNPC) && (cdata->spawnGroupData->flags & SPAWNGROUP_FLAG_ESCORTQUESTNPC));
+
+                if (m_bCanInstantRespawn && !isEscort)
                 {
                     me->setDeathState(JUST_DIED);
                     me->Respawn();
                 }
+                else if (m_bCanInstantRespawn && isEscort)
+                    me->GetMap()->RemoveRespawnTime(SPAWN_TYPE_CREATURE, me->GetSpawnId(), true);
                 else
                     me->DespawnOrUnsummon();
 
@@ -449,6 +459,22 @@ void npc_escortAI::SetRun(bool on)
 //TODO: get rid of this many variables passed in function.
 void npc_escortAI::Start(bool isActiveAttacker /* = true*/, bool run /* = false */, ObjectGuid playerGUID /* = ObjectGuid::Empty */, Quest const* quest /* = nullptr */, bool instantRespawn /* = false */, bool canLoopPath /* = false */, bool resetWaypoints /* = true */)
 {
+    // Queue respawn from the point it starts
+    if (Map* map = me->GetMap())
+    {
+        if (CreatureData const* cdata = me->GetCreatureData())
+        {
+            if (SpawnGroupTemplateData const* groupdata = cdata->spawnGroupData)
+            {
+                if (sWorld->getBoolConfig(CONFIG_RESPAWN_DYNAMIC_ESCORTNPC) && (groupdata->flags & SPAWNGROUP_FLAG_ESCORTQUESTNPC) && !map->GetCreatureRespawnTime(me->GetSpawnId()))
+                {
+                    me->SetRespawnTime(me->GetRespawnDelay());
+                    me->SaveRespawnTime();
+                }
+            }
+        }
+    }
+
     if (me->GetVictim())
     {
         LOG_ERROR("entities.unit.ai", "ERROR: EscortAI (script: {}, creature entry: {}) attempts to Start while in combat", me->GetScriptName(), me->GetEntry());
@@ -635,4 +661,15 @@ void npc_escortAI::GenerateWaypointArray(Movement::PointsArray* points)
             break;
         }
     }
+}
+
+bool npc_escortAI::IsEscortNPC(bool onlyIfActive) const
+{
+    if (!onlyIfActive)
+        return true;
+
+    if (GetEventStarterGUID())
+        return true;
+
+    return false;
 }

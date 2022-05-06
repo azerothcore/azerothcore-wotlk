@@ -356,33 +356,19 @@ typedef std::unordered_map<uint8, EquipmentInfo> EquipmentInfoContainerInternal;
 typedef std::unordered_map<uint32, EquipmentInfoContainerInternal> EquipmentInfoContainer;
 
 // from `creature` table
-struct CreatureData
+struct CreatureData : public SpawnData
 {
-    CreatureData() = default;
-    uint32 id1{0};                                             // entry in creature_template
-    uint32 id2{0};                                             // entry in creature_template
-    uint32 id3{0};                                             // entry in creature_template
-    uint16 mapid{0};
-    uint32 phaseMask{0};
-    uint32 displayid{0};
-    int8 equipmentId{0};
-    float posX{0.0f};
-    float posY{0.0f};
-    float posZ{0.0f};
-    float orientation{0.0f};
-    uint32 spawntimesecs{0};
-    float wander_distance{0.0f};
-    uint32 currentwaypoint{0};
-    uint32 curhealth{0};
-    uint32 curmana{0};
-    uint8 movementType{0};
-    uint8 spawnMask{0};
-    uint32 npcflag{0};
-    uint32 unit_flags{0};                                      // enum UnitFlags mask values
-    uint32 dynamicflags{0};
-    uint32 ScriptId;
-    bool dbData{true};
-    bool overwrittenZ{false};
+    CreatureData() : SpawnData(SPAWN_TYPE_CREATURE) { }
+    uint32 displayid = 0;
+    int8 equipmentId = 0;
+    float spawndist = 0.0f;
+    uint32 currentwaypoint = 0;
+    uint32 curhealth = 0;
+    uint32 curmana = 0;
+    uint8 movementType = 0;
+    uint32 npcflag = 0;
+    uint32 unit_flags = 0;
+    uint32 dynamicflags = 0;
 };
 
 struct CreatureModelInfo

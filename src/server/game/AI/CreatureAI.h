@@ -199,6 +199,10 @@ public:
 
     virtual void PetStopAttack() { }
 
+    // Should return true if the NPC is target of an escort quest
+    // If onlyIfActive is set, should return true only if the escort quest is currently active
+    virtual bool IsEscortNPC(bool /*onlyIfActive*/) const { return false; }
+
     // boundary system methods
     virtual bool CheckInRoom();
     CreatureBoundary const* GetBoundary() const { return _boundary; }

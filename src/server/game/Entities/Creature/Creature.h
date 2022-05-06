@@ -58,7 +58,7 @@ public:
 
     [[nodiscard]] bool isVendorWithIconSpeak() const;
 
-    bool Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, float x, float y, float z, float ang, const CreatureData* data = nullptr);
+    bool Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, Position const& pos, const CreatureData* data = nullptr);
     bool LoadCreaturesAddon(bool reload = false);
     void SelectLevel(bool changelevel = true);
     void LoadEquipment(int8 id = 1, bool force = false);
@@ -67,6 +67,7 @@ public:
 
     void Update(uint32 time) override;                         // overwrited Unit::Update
     void GetRespawnPosition(float& x, float& y, float& z, float* ori = nullptr, float* dist = nullptr) const;
+    bool IsSpawnedOnTransport() const { return m_creatureData && m_creatureData->mapid != GetMapId(); }
 
     void SetCorpseDelay(uint32 delay) { m_corpseDelay = delay; }
     void SetCorpseRemoveTime(uint32 delay);
@@ -206,8 +207,7 @@ public:
 
     void setDeathState(DeathState s, bool despawn = false) override;                   // override virtual Unit::setDeathState
 
-    bool LoadFromDB(ObjectGuid::LowType guid, Map* map, bool allowDuplicate = false) { return LoadCreatureFromDB(guid, map, false, true, allowDuplicate); }
-    bool LoadCreatureFromDB(ObjectGuid::LowType guid, Map* map, bool addToMap = true, bool gridLoad = false, bool allowDuplicate = false);
+    bool LoadFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap, bool allowDuplicate);
     void SaveToDB();
     // overriden in Pet
     virtual void SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask);
@@ -277,7 +277,7 @@ public:
     [[nodiscard]] time_t GetRespawnTimeEx() const;
     void SetRespawnTime(uint32 respawn);
     void Respawn(bool force = false);
-    void SaveRespawnTime() override;
+    void SaveRespawnTime(uint32 forceDelay = 0) override;
 
     [[nodiscard]] uint32 GetRespawnDelay() const { return m_respawnDelay; }
     void SetRespawnDelay(uint32 delay) { m_respawnDelay = delay; }
@@ -353,6 +353,10 @@ public:
     [[nodiscard]] uint32 GetOriginalEntry() const { return m_originalEntry; }
     void SetOriginalEntry(uint32 entry) { m_originalEntry = entry; }
 
+    // There's many places not ready for dynamic spawns. This allows them to live on for now.
+    void SetRespawnCompatibilityMode(bool mode = true) { m_respawnCompatibilityMode = mode; }
+    bool GetRespawnCompatibilityMode() { return m_respawnCompatibilityMode; }
+
     static float _GetDamageMod(int32 Rank);
 
     float m_SightDistance, m_CombatDistance;
@@ -387,6 +391,7 @@ public:
 
     void ModifyThreatPercentTemp(Unit* victim, int32 percent, Milliseconds duration);
 
+    bool IsEscorted() const;
 protected:
     bool CreateFromProto(ObjectGuid::LowType guidlow, uint32 Entry, uint32 vehId, const CreatureData* data = nullptr);
     bool InitEntry(uint32 entry, const CreatureData* data = nullptr);
@@ -455,6 +460,7 @@ private:
     //Formation var
     CreatureGroup* m_formation;
     bool TriggerJustRespawned;
+    bool m_respawnCompatibilityMode;
 
     mutable std::shared_ptr<time_t> _lastDamagedTime; // Part of Evade mechanics
 
