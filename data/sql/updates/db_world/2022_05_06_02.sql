@@ -1,3 +1,4 @@
+-- DB update 2022_05_06_01 -> 2022_05_06_02
 -- Quest 1452 "Rhapsody's Kalimdor Kocktail" turn in script
 
 -- Rhapsody Shindigger SAI
