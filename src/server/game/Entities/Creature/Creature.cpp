@@ -1417,6 +1417,7 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     trans->Append(stmt);
 
     WorldDatabase.CommitTransaction(trans);
+    sScriptMgr->OnCreatureSaveToDB(this);
 }
 
 void Creature::SelectLevel(bool changelevel)

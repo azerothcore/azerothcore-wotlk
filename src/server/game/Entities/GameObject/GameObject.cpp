@@ -1062,6 +1062,7 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask, bool 
     }
 
     WorldDatabase.CommitTransaction(trans);
+    sScriptMgr->OnGameObjectSaveToDB(this);
 }
 
 bool GameObject::LoadGameObjectFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap)
