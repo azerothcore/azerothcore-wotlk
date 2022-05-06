@@ -80,7 +80,7 @@ BossBoundaryData const boundaries =
 
     { DATA_SISTER_SVALNA, new RectangleBoundary(4291.0f, 4423.0f, 2438.0f, 2653.0f) },
     { DATA_VALITHRIA_DREAMWALKER, new RectangleBoundary(4112.5f, 4293.5f, 2385.0f, 2585.0f) },
-    { DATA_SINDRAGOSA, new EllipseBoundary(Position(4408.6f, 2484.0f), 100.0, 75.0) }
+    { DATA_SINDRAGOSA, new EllipseBoundary(Position(4418.6f, 2484.0f), 110.0, 75.0) }
 };
 
 DoorData const doorData[] =
