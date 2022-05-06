@@ -1,3 +1,4 @@
+-- DB update 2022_05_05_01 -> 2022_05_06_00
 -- Gravis Slipknot
 
 -- Waypoint and equipment taken from cmangos/tbc-db@ea2fab0 cmangos/tbc-db@381c515
