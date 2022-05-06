@@ -344,14 +344,14 @@ public:
 
     void AttackStartCaster(Unit* victim, float dist);
 
-    void DoAddAuraToAllHostilePlayers(uint32 spellid);
-    void DoCast(uint32 spellId);
-    void DoCast(Unit* victim, uint32 spellId, bool triggered = false);
-    inline void DoCastSelf(uint32 spellId, bool triggered = false) { DoCast(me, spellId, triggered); }
-    void DoCastToAllHostilePlayers(uint32 spellid, bool triggered = false);
-    void DoCastVictim(uint32 spellId, bool triggered = false);
-    void DoCastAOE(uint32 spellId, bool triggered = false);
-    void DoCastRandomTarget(uint32 spellId, uint32 threatTablePosition = 0, float dist = 0.0f, bool playerOnly = true, bool triggered = false);
+    SpellCastResult DoAddAuraToAllHostilePlayers(uint32 spellid);
+    SpellCastResult DoCast(uint32 spellId);
+    SpellCastResult DoCast(Unit* victim, uint32 spellId, bool triggered = false);
+    SpellCastResult DoCastSelf(uint32 spellId, bool triggered = false) { return DoCast(me, spellId, triggered); }
+    SpellCastResult DoCastToAllHostilePlayers(uint32 spellid, bool triggered = false);
+    SpellCastResult DoCastVictim(uint32 spellId, bool triggered = false);
+    SpellCastResult DoCastAOE(uint32 spellId, bool triggered = false);
+    SpellCastResult DoCastRandomTarget(uint32 spellId, uint32 threatTablePosition = 0, float dist = 0.0f, bool playerOnly = true, bool triggered = false);
 
     float DoGetSpellMaxRange(uint32 spellId, bool positive = false);
 
