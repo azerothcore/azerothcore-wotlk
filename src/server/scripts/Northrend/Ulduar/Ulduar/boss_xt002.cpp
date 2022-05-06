@@ -91,7 +91,7 @@ enum NPCs
     NPC_PILE_TRIGGER            = 33337,
 };
 
-enum XT002Text
+enum Texts
 {
     SAY_AGGRO                   = 0,
     SAY_HEART_OPENED            = 1,
@@ -101,10 +101,10 @@ enum XT002Text
     SAY_BERSERK                 = 5,
     SAY_DEATH                   = 6,
     SAY_SUMMON                  = 7,
-    SAY_EMOTE_HEART_OPENED      = 8,
-    SAY_EMOTE_HEART_CLOSED      = 9,
-    SAY_EMOTE_TYMPANIC_TANTRUM  = 10,
-    SAY_EMOTE_SCRAPBOT          = 11,
+    EMOTE_HEART_OPENED          = 8,
+    EMOTE_HEART_CLOSED          = 9,
+    EMOTE_TYMPANIC_TANTRUM      = 10,
+    EMOTE_SCRAPBOT              = 11,
 };
 
 enum Misc
@@ -271,7 +271,7 @@ public:
 
                 me->CastSpell(me, SPELL_HEARTBREAK, true);
 
-                Talk(SAY_EMOTE_HEART_CLOSED);
+                Talk(EMOTE_HEART_CLOSED);
                 events.ScheduleEvent(EVENT_REMOVE_EMOTE, 4000);
                 return;
             }
@@ -346,7 +346,7 @@ public:
                     events.ScheduleEvent(EVENT_GRAVITY_BOMB, 10000, 1);
                     break;
                 case EVENT_TYMPANIC_TANTARUM:
-                    Talk(SAY_EMOTE_TYMPANIC_TANTRUM);
+                    Talk(EMOTE_TYMPANIC_TANTRUM);
                     Talk(SAY_TYMPANIC_TANTRUM);
                     me->CastSpell(me, SPELL_TYMPANIC_TANTARUM, true);
                     events.RepeatEvent(60000);
@@ -358,7 +358,7 @@ public:
 
                 // Animation events
                 case EVENT_START_SECOND_PHASE:
-                    Talk(SAY_EMOTE_HEART_OPENED);
+                    Talk(EMOTE_HEART_OPENED);
                     me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                     if (Unit* heart = me->GetVehicleKit() ? me->GetVehicleKit()->GetPassenger(HEART_VEHICLE_SEAT) : nullptr)
                         heart->GetAI()->DoAction(ACTION_AWAKEN_HEART);
@@ -607,7 +607,7 @@ public:
                     }
 
                     if (!urand(0, 2))
-                        pXT002->AI()->Talk(SAY_EMOTE_SCRAPBOT);
+                        pXT002->AI()->Talk(EMOTE_SCRAPBOT);
 
                     me->DespawnOrUnsummon(1);
                 }
