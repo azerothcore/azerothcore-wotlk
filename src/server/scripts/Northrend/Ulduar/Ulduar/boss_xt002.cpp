@@ -104,7 +104,7 @@ enum XT002Text
     SAY_EMOTE_HEART_OPENED      = 8,
     SAY_EMOTE_HEART_CLOSED      = 9,
     SAY_EMOTE_TYMPANIC_TANTRUM  = 10,
-    SAY_EMOTE_SCRAPBOT          = 11, 
+    SAY_EMOTE_SCRAPBOT          = 11,
 };
 
 enum Misc
