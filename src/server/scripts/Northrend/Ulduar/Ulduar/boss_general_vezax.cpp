@@ -411,6 +411,7 @@ public:
                 if( Creature* vezax = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_VEZAX)) )
                     vezax->AI()->DoAction(1);
         }
+        
         void IsSummonedBy(Unit* /*summoner*/) override
         {
             Talk(SAY_EMOTE_VAPORS);
