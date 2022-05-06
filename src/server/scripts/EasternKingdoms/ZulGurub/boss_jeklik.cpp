@@ -52,8 +52,8 @@ enum Spells
     SPELL_GREATER_HEAL          = 23954,
 
     // Batriders Spell
-    SPELL_THROW_LIQUID_FIRE = 23970,
-    SPELL_SUMMON_LIQUID_FIRE = 23971
+    SPELL_THROW_LIQUID_FIRE     = 23970,
+    SPELL_SUMMON_LIQUID_FIRE    = 23971
 };
 
 enum BatIds
