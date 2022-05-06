@@ -91,7 +91,7 @@ enum NPCs
     NPC_PILE_TRIGGER            = 33337,
 };
 
-enum XT002Text 
+enum XT002Text
 {
     SAY_AGGRO                   = 0,
     SAY_HEART_OPENED            = 1,
