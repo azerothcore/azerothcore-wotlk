@@ -286,9 +286,9 @@ public:
             me->setActive(false);
         }
 
-        void KilledUnit(Unit* who) override
+        void KilledUnit(Unit* victim) override
         {
-            if (who->GetTypeId() == TYPEID_PLAYER)
+            if (victim->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_SLAY);
         }
 
