@@ -301,6 +301,11 @@ class spell_warr_charge : public SpellScript
         // Juggernaut crit bonus
         if (caster->HasAura(SPELL_WARRIOR_JUGGERNAUT_CRIT_BONUS_TALENT))
             caster->CastSpell(caster, SPELL_WARRIOR_JUGGERNAUT_CRIT_BONUS_BUFF, true);
+
+        if (Unit* victim = GetExplTargetUnit())
+        {
+            caster->Attack(victim, true);
+        }
     }
 
     void Register() override
