@@ -3673,7 +3673,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     });
 
     // Krolmir, Hammer of Storms (13010)
-    ApplySpellFix({ 56606, 56541 }, [](SpellInfo* spellInfo)
+    ApplySpellFix({ 56606 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].BasePoints = 1;
     });
