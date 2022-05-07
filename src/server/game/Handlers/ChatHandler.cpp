@@ -194,7 +194,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 return;
         }
     }
-    // LANG_ADDON should not be changed nor be affected by flood control
     else
     {
         uint32 specialMessageLimit = 0;
@@ -242,7 +241,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         }
 
         if (type != CHAT_MSG_AFK && type != CHAT_MSG_DND)
-            sender->UpdateSpeakTime(specialMessageLimit);
+            sender->UpdateSpeakTime(lang == LANG_ADDON ? Player::ChatFloodThrottle::ADDON : Player::ChatFloodThrottle::REGULAR);
     }
 
     std::string to, channel, msg;
@@ -342,6 +341,10 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         {
             return;
         }
+    }
+    else
+    {
+        ++_addonMessageCount;
     }
 
     sScriptMgr->OnBeforeSendChatMessage(_player, type, lang, msg);
@@ -726,7 +729,7 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
     if (!GetPlayer()->IsAlive())
         return;
 
-    GetPlayer()->UpdateSpeakTime();
+    GetPlayer()->UpdateSpeakTime(Player::ChatFloodThrottle::REGULAR);
 
     if (!GetPlayer()->CanSpeak())
     {
