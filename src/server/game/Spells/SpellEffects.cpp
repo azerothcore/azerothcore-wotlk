@@ -3348,13 +3348,6 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                             AddPct(totalDamagePercentMod, unitTarget->GetDiseasesByCaster(m_caster->GetGUID(), 1) * 30.0f);
                             break;
                         }
-                    // sweeping strikes
-                    case 26654:
-                        {
-                            this->damage = 0;
-                            m_damage = m_spellValue->EffectBasePoints[effIndex];
-                            return;
-                        }
                 }
                 break;
             }
