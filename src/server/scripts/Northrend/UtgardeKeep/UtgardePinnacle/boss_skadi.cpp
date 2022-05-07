@@ -28,10 +28,13 @@ enum Misc
     // TEXTS
     SAY_AGGRO                           = 0,
     SAY_KILL                            = 1,
-    EMOTE_RANGE                         = 2,
     SAY_DEATH                           = 3,
     SAY_DRAKE_DEATH                     = 5,
     SAY_DRAKE_BREATH                    = 6,
+
+    // EMOTES
+    EMOTE_DEEP_BREATH                   = 0,
+    EMOTE_RANGE                         = 1,
 
     // SPELLS
     SPELL_CRUSH_N                       = 50234,
@@ -94,9 +97,6 @@ static Position SkadiPosition[] =
     {490.096f, -510.86f, 123.368f, 0.0f},
     {490.76f, -517.389f, 123.368f, 0.0f}
 };
-
-#define EMOTE_IN_RANGE   "Skadi the Ruthless is within range of the harpoon launchers"
-#define EMOTE_DRAKE_BREATH "Grauf takes a deep breath"
 
 enum phase
 {
@@ -365,8 +365,7 @@ public:
                 case 3:
                     if (m_pInstance)
                         m_pInstance->SetData(SKADI_IN_RANGE, 1);
-
-                    me->TextEmote(EMOTE_IN_RANGE, nullptr, true);
+                    Talk(EMOTE_RANGE);
                     me->SetFacingTo(M_PI);
                     break;
             }
@@ -467,7 +466,7 @@ public:
                         me->GetMotionMaster()->MovePoint(targetPoint, SkadiPosition[targetPoint].GetPositionX(), SkadiPosition[targetPoint].GetPositionY(), SkadiPosition[targetPoint].GetPositionZ());
                         if (targetPoint <= 1)
                         {
-                            me->TextEmote(EMOTE_DRAKE_BREATH, nullptr, true);
+                            Talk(EMOTE_DEEP_BREATH);
                             SpawnFlameTriggers(targetPoint);
                             me->CastSpell(me, SPELL_FREEZING_CLOUD_VISUAL, false);
                         }
