@@ -1423,6 +1423,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
 
                 ground = map->GetHeight(phasemask, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
 
+                bool isCasterInWater = m_caster->IsInWater();
                 if (!m_caster->HasUnitMovementFlag(MOVEMENTFLAG_FALLING) || (pos.GetPositionZ() - ground < distance))
                 {
                     float tstX, tstY, tstZ, prevX, prevY, prevZ;
@@ -1457,7 +1458,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                         tstZ = map->GetHeight(phasemask, tstX, tstY, prevZ + maxtravelDistZ, true);
                         ground = tstZ;
 
-                        if (!map->IsInWater(phasemask, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), collisionHeight))
+                        if (!isCasterInWater)
                         {
                             if (map->IsInWater(phasemask, tstX, tstY, tstZ, collisionHeight))
                             {
