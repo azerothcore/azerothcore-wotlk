@@ -386,7 +386,7 @@ vmap.enableHeight = 1
 vmap.petLOS = 1
 
 #    vmap.BlizzlikePvPLOS
-#        Description: Check line of sight for battleground and arena gameobjects and dooddads (such as WSG treestumps).
+#        Description: Check line of sight for battleground and arena gameobjects and doodads (such as WSG treestumps).
 #                     (Disable this to allow casting spells through WSG treestumps).
 #        Default:     1 - (Enabled, players will be able to fire spells through treestumps and other objects).
 #                     0 - (Disabled, players will NOT be able to fire spells through treestumps and other objects).
