@@ -3599,8 +3599,10 @@ void Unit::SetCurrentCastedSpell(Spell* pSpell)
     if (pSpell == m_currentSpells[CSpellType])             // avoid breaking self
         return;
 
+    bool bySelf = m_currentSpells[CSpellType] && m_currentSpells[CSpellType]->m_spellInfo->Id == pSpell->m_spellInfo->Id;
+
     // break same type spell if it is not delayed
-    InterruptSpell(CSpellType, false);
+    InterruptSpell(CSpellType, false, true, bySelf);
 
     // special breakage effects:
     switch (CSpellType)
@@ -3629,7 +3631,7 @@ void Unit::SetCurrentCastedSpell(Spell* pSpell)
             {
                 // channel spells always break generic non-delayed and any channeled spells
                 InterruptSpell(CURRENT_GENERIC_SPELL, false);
-                InterruptSpell(CURRENT_CHANNELED_SPELL);
+                InterruptSpell(CURRENT_CHANNELED_SPELL, true, true, bySelf);
 
                 // it also does break autorepeat if not Auto Shot
                 if (m_currentSpells[CURRENT_AUTOREPEAT_SPELL] &&
@@ -9917,7 +9919,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
         }
 
         // switch target
-        InterruptSpell(CURRENT_MELEE_SPELL);
+        InterruptSpell(CURRENT_MELEE_SPELL, true, true, true);
         if (!meleeAttack)
             ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
     }

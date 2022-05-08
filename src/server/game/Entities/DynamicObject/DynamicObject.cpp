@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "SpellAuraEffects.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
@@ -125,13 +126,15 @@ bool DynamicObject::CreateDynamicObject(ObjectGuid::LowType guidlow, Unit* caste
     SetFloatValue(DYNAMICOBJECT_RADIUS, radius);
     SetUInt32Value(DYNAMICOBJECT_CASTTIME, GameTime::GetGameTimeMS().count());
 
-    if (IsWorldObject())
-        setActive(true);    //must before add to map to be put in world container
-
     if (!GetMap()->AddToMap(this, true))
     {
         // Returning false will cause the object to be deleted - remove from transport
         return false;
+    }
+
+    if (IsWorldObject())
+    {
+        setActive(true);
     }
 
     return true;
@@ -218,6 +221,13 @@ void DynamicObject::SetCasterViewpoint()
 {
     if (Player* caster = _caster->ToPlayer())
     {
+        // Remove old farsight viewpoint
+        if (Unit* farsightObject = ObjectAccessor::GetUnit(*caster, caster->GetGuidValue(PLAYER_FARSIGHT)))
+        {
+            _oldFarsightGUID = caster->GetGuidValue(PLAYER_FARSIGHT);
+            caster->SetViewpoint(farsightObject, false);
+        }
+
         caster->SetViewpoint(this, true);
         _isViewpoint = true;
     }
@@ -229,6 +239,13 @@ void DynamicObject::RemoveCasterViewpoint()
     {
         caster->SetViewpoint(this, false);
         _isViewpoint = false;
+
+        // Restore prev farsight viewpoint
+        if (Unit* farsightObject = ObjectAccessor::GetUnit(*caster, _oldFarsightGUID))
+        {
+            caster->SetViewpoint(farsightObject, true);
+        }
+        _oldFarsightGUID.Clear();
     }
 }
 

@@ -66,5 +66,6 @@ protected:
     Unit* _caster;
     int32 _duration; // for non-aura dynobjects
     bool _isViewpoint;
+    ObjectGuid _oldFarsightGUID;
 };
 #endif
