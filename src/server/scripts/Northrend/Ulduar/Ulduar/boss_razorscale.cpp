@@ -136,7 +136,7 @@ enum Misc
 
     // Expedition Commander Gossip
     GOSSIP_MENU_START_ENCOUNTER             = 10314,
-    NPC_TEXT_COMMANDER                      = 40100, 
+    NPC_TEXT_COMMANDER                      = 40100,
 };
 
 const Position CORDS_GROUND                 = {588.0f, -166.0f, 391.1f};
@@ -669,7 +669,7 @@ public:
             if (razorscale && !razorscale->IsInCombat())
             {
                 // Do not show gossip icon if encounter is in progress
-                creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP); 
+                creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
                 // reset npcs NPC_HARPOON_FIRE_STATE
                 for (uint8 i = 0; i < 4; ++i)
