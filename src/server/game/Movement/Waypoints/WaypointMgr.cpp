@@ -70,7 +70,9 @@ void WaypointMgr::Load()
         float x = fields[2].Get<float>();
         float y = fields[3].Get<float>();
         float z = fields[4].Get<float>();
-        float o = fields[5].Get<float>();
+        Optional<float> o;
+        if (!fields[5].IsNull())
+            o = fields[5].Get<float>();
 
         Acore::NormalizeMapCoord(x);
         Acore::NormalizeMapCoord(y);
@@ -131,7 +133,9 @@ void WaypointMgr::ReloadPath(uint32 id)
         float x = fields[1].Get<float>();
         float y = fields[2].Get<float>();
         float z = fields[3].Get<float>();
-        float o = fields[4].Get<float>();
+        Optional<float> o;
+        if (!fields[4].IsNull())
+            o = fields[4].Get<float>();
 
         Acore::NormalizeMapCoord(x);
         Acore::NormalizeMapCoord(y);
