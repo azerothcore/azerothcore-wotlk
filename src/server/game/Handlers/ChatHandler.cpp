@@ -338,7 +338,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     }
     else
     {
-        ++_addonMessageCount;
+        ++_addonMessageReceiveCount;
     }
 
     sScriptMgr->OnBeforeSendChatMessage(_player, type, lang, msg);

@@ -441,7 +441,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
     METRIC_VALUE("processed_packets", processedPackets);
     METRIC_VALUE("addon_messages", _addonMessageReceiveCount.load());
-    _addonMessageCount = 0;
+    _addonMessageReceiveCount = 0;
 
     if (!updater.ProcessUnsafe()) // <=> updater is of type MapSessionFilter
     {
