@@ -51,10 +51,6 @@ void Player::UpdateSpeakTime(ChatFloodThrottle::Index index)
     time_t current = GameTime::GetGameTime().count();
     if (m_chatFloodData[index].Time > current)
     {
-        uint32 max_count = specialMessageLimit ? specialMessageLimit : sWorld->getIntConfig(CONFIG_CHATFLOOD_MESSAGE_COUNT);
-        if (!max_count)
-            return;
-
         ++m_chatFloodData[index].Count;
         if (m_chatFloodData[index].Count >= limit)
         {
