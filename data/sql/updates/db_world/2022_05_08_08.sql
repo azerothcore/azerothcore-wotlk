@@ -1,3 +1,4 @@
+-- DB update 2022_05_08_07 -> 2022_05_08_08
 -- Soulflayer
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 11359;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 11359) AND (`source_type` = 0) AND (`id` IN (0, 1, 3));
