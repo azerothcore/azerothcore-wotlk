@@ -17936,7 +17936,18 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
 
         StopMoving();
 
-        ToCreature()->AI()->OnCharmed(true);
+        if (charmer->GetTypeId() == TYPEID_PLAYER &&
+            charmer->getClass() == CLASS_WARLOCK)
+        {
+            // Disable CreatureAI/SmartAI and switch to CharmAI when charmed by warlock
+            Creature* charmed = ToCreature();
+            charmed->NeedChangeAI = true;
+            charmed->IsAIEnabled = false;
+        }
+        else
+        {
+            ToCreature()->AI()->OnCharmed(true);
+        }
 
         // Xinef: If creature can fly, add normal player flying flag (fixes speed)
         if (charmer->GetTypeId() == TYPEID_PLAYER && ToCreature()->CanFly())
