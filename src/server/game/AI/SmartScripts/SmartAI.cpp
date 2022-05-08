@@ -260,7 +260,7 @@ void SmartAI::PausePath(uint32 delay, bool forced)
         Optional<float> orientation = waypoint->second->o;
         if (orientation)
         {
-            me->SetFacingTo(static_cast<float>orientation);
+            me->SetFacingTo(static_cast<float>(orientation));
         }
     }
     GetScript()->ProcessEventsFor(SMART_EVENT_WAYPOINT_PAUSED, nullptr, mCurrentWPID, GetScript()->GetPathId());
