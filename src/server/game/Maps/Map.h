@@ -128,8 +128,7 @@ struct map_heightHeader
 struct map_liquidHeader
 {
     uint32 fourcc;
-    uint8 flags;
-    uint8 liquidFlags;
+    uint16 flags;
     uint16 liquidType;
     uint8  offsetX;
     uint8  offsetY;
@@ -159,6 +158,7 @@ enum LiquidStatus
 #define MAP_ALL_LIQUIDS   (MAP_LIQUID_TYPE_WATER | MAP_LIQUID_TYPE_OCEAN | MAP_LIQUID_TYPE_MAGMA | MAP_LIQUID_TYPE_SLIME)
 
 #define MAP_LIQUID_TYPE_DARK_WATER  0x10
+#define MAP_LIQUID_TYPE_WMO_WATER   0x20
 
 #define MAX_HEIGHT            100000.0f                     // can be use for find ground height at surface
 #define INVALID_HEIGHT       -100000.0f                     // for check, must be equal to VMAP_INVALID_HEIGHT, real value for unknown height is VMAP_INVALID_HEIGHT_VALUE
@@ -227,8 +227,7 @@ class GridMap
     uint8* _liquidFlags;
     float* _liquidMap;
     uint16 _gridArea;
-    uint16 _liquidGlobalEntry;
-    uint8 _liquidGlobalFlags;
+    uint16 _liquidType;
     uint8 _liquidOffX;
     uint8 _liquidOffY;
     uint8 _liquidWidth;
