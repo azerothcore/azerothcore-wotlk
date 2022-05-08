@@ -1,3 +1,4 @@
+-- DB update 2022_05_08_06 -> 2022_05_08_07
 
 -- Quest You'll Need a Gryphon
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 29403;
