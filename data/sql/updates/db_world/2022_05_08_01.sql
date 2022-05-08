@@ -1,3 +1,4 @@
+-- DB update 2022_05_08_00 -> 2022_05_08_01
 --
 DELETE FROM `creature_text` WHERE `CreatureID` = 25740 AND `GroupID` IN (0, 1);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES 

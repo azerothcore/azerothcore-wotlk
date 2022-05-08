@@ -1,3 +1,4 @@
+-- DB update 2022_05_07_01 -> 2022_05_08_00
 --
 UPDATE `smart_scripts` SET `action_type`=85 WHERE `entryorguid`=30105 AND `source_type`=0 AND `id`=1;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=30331 AND `source_type`=0;
