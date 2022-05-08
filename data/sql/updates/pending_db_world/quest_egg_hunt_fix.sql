@@ -1,8 +1,6 @@
 -- Remove Questitem from NPC's
 
-DELETE FROM `creature_loot_template` WHERE (`Entry` = 3250) AND (`Item` IN (5058));
-DELETE FROM `creature_loot_template` WHERE (`Entry` = 3503) AND (`Item` IN (5058));
-DELETE FROM `creature_loot_template` WHERE (`Entry` = 3251) AND (`Item` IN (5058));
+DELETE FROM `creature_loot_template` WHERE (`Entry` IN (3250, 3503, 3251)) AND (`Item` IN (5058));
 
 -- Gameobject Loot Fix
 
