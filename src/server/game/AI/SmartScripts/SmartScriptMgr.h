@@ -30,7 +30,7 @@ typedef uint32 SAIBool;
 
 struct WayPoint
 {
-    WayPoint(uint32 _id, float _x, float _y, float _z, float _o, uint32 _delay)
+    WayPoint(uint32 _id, float _x, float _y, float _z, Optional<float> _o, uint32 _delay)
     {
         id = _id;
         x = _x;
@@ -44,7 +44,7 @@ struct WayPoint
     float x;
     float y;
     float z;
-    float  o;
+    Optional<float> o;
     uint32 delay;
 };
 
