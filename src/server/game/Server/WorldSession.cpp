@@ -309,6 +309,8 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     uint32 processedPackets = 0;
     time_t currentTime = GameTime::GetGameTime().count();
 
+    constexpr uint32 MAX_PROCESSED_PACKETS_IN_SAME_WORLDSESSION_UPDATE = 100;
+
     while (m_Socket && _recvQueue.next(packet, updater))
     {
         OpcodeClient opcode = static_cast<OpcodeClient>(packet->GetOpcode());
@@ -349,6 +351,8 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                     opHandle->Call(this, *packet);
                     LogUnprocessedTail(packet);
                 }
+                else
+                    processedPackets = MAX_PROCESSED_PACKETS_IN_SAME_WORLDSESSION_UPDATE;   // break out of packet processing loop
                 break;
             case STATUS_TRANSFER:
                 if (_player && !_player->IsInWorld() && AntiDOS.EvaluateOpcode(*packet, currentTime))
@@ -361,6 +365,8 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                     opHandle->Call(this, *packet);
                     LogUnprocessedTail(packet);
                 }
+                else
+                    processedPackets = MAX_PROCESSED_PACKETS_IN_SAME_WORLDSESSION_UPDATE;   // break out of packet processing loop
                 break;
             case STATUS_AUTHED:
                 if (m_inQueue) // prevent cheating
@@ -376,6 +382,8 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                     opHandle->Call(this, *packet);
                     LogUnprocessedTail(packet);
                 }
+                else
+                    processedPackets = MAX_PROCESSED_PACKETS_IN_SAME_WORLDSESSION_UPDATE;   // break out of packet processing loop
                 break;
             case STATUS_NEVER:
                 LOG_ERROR("network.opcode", "Received not allowed opcode {} from {}",
