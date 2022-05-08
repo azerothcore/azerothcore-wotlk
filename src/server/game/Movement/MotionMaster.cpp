@@ -608,7 +608,7 @@ void MotionMaster::MoveCharge(float x, float y, float z, float speed, uint32 id,
     }
 }
 
-void MotionMaster::MoveCharge(PathGenerator const& path, float speed /*= SPEED_CHARGE*/, ObjectGuid targetGUID /*= 0*/)
+void MotionMaster::MoveCharge(PathGenerator const& path, float speed /*= SPEED_CHARGE*/, ObjectGuid targetGUID /*= ObjectGuid::Empty*/)
 {
     G3D::Vector3 dest = path.GetActualEndPosition();
 
