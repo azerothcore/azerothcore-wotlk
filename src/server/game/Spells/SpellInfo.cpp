@@ -1360,14 +1360,6 @@ bool SpellInfo::IsSingleTarget() const
     if (AttributesEx5 & SPELL_ATTR5_LIMIT_N)
         return true;
 
-    switch (GetSpellSpecific())
-    {
-        case SPELL_SPECIFIC_JUDGEMENT:
-            return true;
-        default:
-            break;
-    }
-
     return false;
 }
 
