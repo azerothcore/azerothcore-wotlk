@@ -69,8 +69,6 @@ enum Spells
 #define SPELL_CHAINLIGHTNING                RAID_MODE(SPELL_CHAINLIGHTNING_10, SPELL_CHAINLIGHTNING_25)
 #define REQ_CHAIN_COUNT                     RAID_MODE(2, 4)
 
-#define TEXT_TURRET_READY                   "Harpoon Turret is ready for use!" // Should be said by NPC_RAZORSCALE_CONTROLLER
-
 enum NPCs
 {
     NPC_DARK_RUNE_SENTINEL                  = 33846,
@@ -78,7 +76,7 @@ enum NPCs
     NPC_DARK_RUNE_WATCHER                   = 33453,
     NPC_EXPEDITION_ENGINEER                 = 33287,
     NPC_EXPEDITION_COMMANDER                = 33210,
-    // NPC_RAZORSCALE_CONTROLLER            = 33233, // (Trigger Creature), has the TEXT_TURRET_READY text in creature_text DB
+    NPC_RAZORSCALE_CONTROLLER               = 33233, // Trigger Creature
 };
 
 enum GOs
@@ -121,12 +119,15 @@ enum Texts
     // Expedition Commander
     SAY_COMMANDER_AGGRO                     = 0,
     SAY_COMMANDER_GROUND_PHASE              = 1,
-    SAY_COMMANDER_ENGINEERS_DEAD            = 2, // Called when all engineers are dead, currently unused
+    SAY_COMMANDER_ENGINEERS_DEAD            = 2, // Should be called when all engineers are dead, currently unused
 
     // Expedition Engineer
     SAY_EE_AGGRO                            = 0,
     SAY_EE_START_REPAIR                     = 1,
     SAY_EE_REBUILD_TURRETS                  = 2,
+
+    // Harpoon
+    EMOTE_HARPOON                           = 0,
 };
 
 enum Misc
@@ -791,7 +792,8 @@ public:
                             if( GameObject* wh = me->SummonGameObject(GetHarpoonGunIdForThisHFS(), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 3 * M_PI / 2, 0.0f, 0.0f, 0.0f, 0.0f, 0) )
                             {
                                 me->RemoveGameObject(wh, false);
-                                me->TextEmote(TEXT_TURRET_READY, nullptr, true);
+                                if (Creature* cr = me->SummonCreature(NPC_RAZORSCALE_CONTROLLER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 5000))
+                                    cr->AI()->Talk(EMOTE_HARPOON);
                             }
                         }
                     }
