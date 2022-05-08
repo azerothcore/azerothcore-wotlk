@@ -6005,7 +6005,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                         if (!target->IsWithinLOSInMap(m_caster)) //Do full LoS/Path check. Don't exclude m2
                             return SPELL_FAILED_LINE_OF_SIGHT;
 
-                        float objSize = m_caster->GetCombatReach() + target->GetCombatReach();
+                        float objSize = target->GetCombatReach();
                         float range = m_spellInfo->GetMaxRange(true, m_caster, this) * 1.5f + objSize; // can't be overly strict
 
                         m_preGeneratedPath = std::make_unique<PathGenerator>(m_caster);
