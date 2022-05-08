@@ -1,3 +1,4 @@
+-- DB update 2022_05_08_02 -> 2022_05_08_03
 --
 DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('spell_vem_knockback', 'spell_vem_vengeance');
 DELETE FROM `spell_script_names` WHERE `spell_id` = 18670; -- Delete the current script to prevent stacking.
