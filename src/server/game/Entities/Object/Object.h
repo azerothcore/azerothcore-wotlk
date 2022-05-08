@@ -351,7 +351,6 @@ public:
 
     [[nodiscard]] T_FLAGS GetFlags() const { return m_flags; }
     [[nodiscard]] bool HasFlag(FLAG_TYPE flag) const { return m_flags & (1 << flag); }
-    bool HasFlag(FLAG_TYPE flag) const { return m_flags & (1 << flag); }
     void AddFlag(FLAG_TYPE flag) { m_flags |= (1 << flag); }
     void DelFlag(FLAG_TYPE flag) { m_flags &= ~(1 << flag); }
 
