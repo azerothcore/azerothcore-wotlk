@@ -1,3 +1,4 @@
+-- DB update 2022_05_08_09 -> 2022_05_09_00
 -- Clear Auriaya's creature_text (duplicate and EMOTE_DEATH missing), CN locale is also wrong
 DELETE FROM `creature_text` WHERE `CreatureID`=33515;
 
