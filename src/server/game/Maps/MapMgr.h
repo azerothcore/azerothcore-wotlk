@@ -69,6 +69,8 @@ public:
         Map const* m = const_cast<MapMgr*>(this)->CreateBaseMap(mapid);
         m->GetZoneAndAreaId(phaseMask, zoneid, areaid, x, y, z);
     }
+    void GetZoneAndAreaId(uint32& zoneid, uint32& areaid, uint32 mapid, Position const& pos) const { GetZoneAndAreaId(zoneid, areaid, mapid, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ()); }
+    void GetZoneAndAreaId(uint32& zoneid, uint32& areaid, WorldLocation const& loc) const { GetZoneAndAreaId(zoneid, areaid, loc.GetMapId(), loc); }
 
     void Initialize(void);
     void Update(uint32);
