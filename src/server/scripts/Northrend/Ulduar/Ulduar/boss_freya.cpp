@@ -232,7 +232,6 @@ enum Misc
     ACTION_REMOVE_2_STACK                       = 2,
     ACTION_RESPAWN_TRIO                         = 1,
     ACTION_LUMBERJACKED                         = -1,
-    ACTION_ELDER_FREYA_KILLED                   = 1,
 
     EVENT_PHASE_ADDS                            = 1,
     EVENT_PHASE_FINAL                           = 2,
@@ -337,7 +336,7 @@ public:
                         continue;
 
                     if (Creature* e = ObjectAccessor::GetCreature(*me, _elderGUID[i]))
-                        e->AI()->DoAction(ACTION_ELDER_FREYA_KILLED);
+                        e->DespawnOrUnsummon();
 
                     ++_elderCount;
                 }
@@ -744,16 +743,6 @@ public:
 
             DoMeleeAttackIfReady();
         }
-
-        void DoAction(int32 action) override
-        {
-            switch (action)
-            {
-            case ACTION_ELDER_FREYA_KILLED:
-                me->DespawnOrUnsummon();
-                break;
-            }
-        }
     };
 };
 
@@ -867,16 +856,6 @@ public:
 
             DoMeleeAttackIfReady();
         }
-
-        void DoAction(int32 action) override
-        {
-            switch (action)
-            {
-            case ACTION_ELDER_FREYA_KILLED:
-                me->DespawnOrUnsummon();
-                break;
-            }
-        }
     };
 };
 
@@ -960,16 +939,6 @@ public:
             }
 
             DoMeleeAttackIfReady();
-        }
-
-        void DoAction(int32 action) override
-        {
-            switch (action)
-            {
-            case ACTION_ELDER_FREYA_KILLED:
-                me->DespawnOrUnsummon();
-                break;
-            }
         }
     };
 };
