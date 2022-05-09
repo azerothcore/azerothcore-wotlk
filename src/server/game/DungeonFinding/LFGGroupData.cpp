@@ -15,14 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "LFG.h"
 #include "LFGGroupData.h"
+#include "LFG.h"
 #include "World.h"
 
 namespace lfg
 {
     LfgGroupData::LfgGroupData(): m_State(LFG_STATE_NONE), m_OldState(LFG_STATE_NONE),
-        m_Dungeon(0), m_KicksLeft(sWorld->getIntConfig(CONFIG_LFG_MAX_KICK_COUNT))
+        m_Dungeon(0), _isLFGGroup(false), m_KicksLeft(sWorld->getIntConfig(CONFIG_LFG_MAX_KICK_COUNT))
     { }
 
     LfgGroupData::~LfgGroupData()
@@ -30,11 +30,23 @@ namespace lfg
 
     bool LfgGroupData::IsLfgGroup()
     {
-        return m_OldState != LFG_STATE_NONE;
+        return _isLFGGroup;
     }
 
     void LfgGroupData::SetState(LfgState state)
     {
+        switch (state)
+        {
+            case LFG_STATE_DUNGEON:
+                _isLFGGroup = true;
+                break;
+            case LFG_STATE_FINISHED_DUNGEON:
+                _isLFGGroup = false;
+                break;
+            default:
+                break;
+        }
+
         switch (state)
         {
             case LFG_STATE_NONE:

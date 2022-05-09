@@ -16,8 +16,8 @@
  */
 
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "sunwell_plateau.h"
 
@@ -82,7 +82,7 @@ public:
         {
             BossAI::Reset();
             me->SetReactState(REACT_AGGRESSIVE);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetVisible(true);
         }
 
@@ -102,9 +102,9 @@ public:
             if (damage >= me->GetHealth())
             {
                 damage = 0;
-                if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+                if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 {
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->RemoveAllAuras();
                     me->CastSpell(me, SPELL_OPEN_ALL_PORTALS, true);
                     events.ScheduleEvent(EVENT_SUMMON_ENTROPIUS, 7000);
@@ -176,12 +176,12 @@ public:
             me->SetReactState(REACT_PASSIVE);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (InstanceScript* instance = me->GetInstanceScript())
                 if (Creature* muru = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_MURU)))
                     if (!muru->IsInEvadeMode())
-                        muru->AI()->EnterEvadeMode();
+                        muru->AI()->EnterEvadeMode(why);
 
             me->DespawnOrUnsummon();
         }
@@ -244,12 +244,12 @@ public:
                     me->CastSpell(me, SPELL_ENRAGE, true);
                     break;
                 case EVENT_SPAWN_DARKNESS:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                         me->CastSpell(target, SPELL_DARKNESS, true);
                     events.ScheduleEvent(EVENT_SPAWN_DARKNESS, 15000);
                     break;
                 case EVENT_SPAWN_BLACK_HOLE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                         me->CastSpell(target, SPELL_BLACK_HOLE, true);
                     events.ScheduleEvent(EVENT_SPAWN_BLACK_HOLE, 15000);
                     break;
@@ -482,7 +482,7 @@ public:
             if (target->GetDistance(GetCaster()) < 5.0f)
             {
                 float o = frand(0, 2 * M_PI);
-                pos.Relocate(GetCaster()->GetPositionX() + 4.0f * cos(o), GetCaster()->GetPositionY() + 4.0f * sin(o), GetCaster()->GetPositionZ() + frand(10.0f, 15.0f));
+                pos.Relocate(GetCaster()->GetPositionX() + 4.0f * cos(o), GetCaster()->GetPositionY() + 4.0f * std::sin(o), GetCaster()->GetPositionZ() + frand(10.0f, 15.0f));
             }
             else
                 pos.Relocate(GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ() + 1.0f);

@@ -29,197 +29,11 @@ go_elune_fire
 EndContentData */
 
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "WorldSession.h"
-
-// Ours
-enum eStaveQuest
-{
-    QUEST_STAVE_OF_THE_ANCIENTS             = 7636,
-
-    NPC_SIMONE_NORMAL                       = 14527,
-    NPC_FRANKLIN_NORMAL                     = 14529,
-    NPC_ARTORIUS_NORMAL                     = 14531,
-    NPC_NELSON_NORMAL                       = 14536,
-    NPC_PRECIOUS                            = 14528,
-
-    NPC_SIMONE_EVIL                         = 14533,
-    NPC_FRANKLIN_EVIL                       = 14534,
-    NPC_ARTORIUS_EVIL                       = 14535,
-    NPC_NELSON_EVIL                         = 14530,
-    NPC_PRECIOUS_EVIL                       = 14538,
-
-    EVENT_CHECK_PLAYER                      = 1,
-    EVENT_SPELL_CHAIN_LIGHTNING             = 23206,
-    EVENT_SPELL_TEMPTRESS_KISS              = 23205,
-    EVENT_SPELL_DEMONIC_ENRAGE              = 23257,
-    EVENT_SPELL_ENTROPIC_STING              = 23260,
-    EVENT_SPELL_DEMONIC_DOOM                = 23298,
-    EVENT_SPELL_STINGING_TRAUMA             = 23299,
-    EVENT_SPELL_DREADFUL_FRIGHT             = 23275,
-
-    SPELL_FOOLS_PLIGHT                      = 23504,
-    SPELL_SOUL_FLAME                        = 23272,
-};
-
-class npc_stave_of_the_ancients : public CreatureScript
-{
-public:
-    npc_stave_of_the_ancients() : CreatureScript("npc_stave_of_the_ancients") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_stave_of_the_ancientsAI(creature);
-    }
-
-    struct npc_stave_of_the_ancientsAI : public ScriptedAI
-    {
-        npc_stave_of_the_ancientsAI(Creature* creature) : ScriptedAI(creature)
-        {
-            changeEntry = me->GetEntry();
-            switch (me->GetEntry())
-            {
-                case NPC_SIMONE_NORMAL:
-                    changeEntry = NPC_SIMONE_EVIL;
-                    break;
-                case NPC_FRANKLIN_NORMAL:
-                    changeEntry = NPC_FRANKLIN_EVIL;
-                    break;
-                case NPC_ARTORIUS_NORMAL:
-                    changeEntry = NPC_ARTORIUS_EVIL;
-                    break;
-                case NPC_NELSON_NORMAL:
-                    changeEntry = NPC_NELSON_EVIL;
-                    break;
-                case NPC_PRECIOUS:
-                    changeEntry = NPC_PRECIOUS_EVIL;
-                    break;
-            }
-        }
-
-        ObjectGuid playerGUID;
-        EventMap events;
-        uint32 changeEntry;
-        bool damaged;
-
-        void Reset() override
-        {
-            if (me->GetOriginalEntry() != me->GetEntry())
-                me->UpdateEntry(me->GetOriginalEntry());
-
-            events.Reset();
-            playerGUID.Clear();
-            damaged = false;
-        }
-
-        void DamageTaken(Unit* who, uint32&, DamageEffectType, SpellSchoolMask) override
-        {
-            if (!damaged)
-            {
-                if (who && who->GetGUID() != playerGUID && (who->GetTypeId() == TYPEID_PLAYER || who->GetOwnerGUID().IsPlayer()))
-                {
-                    damaged = true;
-                    me->CastSpell(who, SPELL_FOOLS_PLIGHT, true);
-                }
-            }
-            else
-                damaged = false;
-        }
-
-        void EnterCombat(Unit*) override
-        {
-            switch (changeEntry)
-            {
-                case NPC_SIMONE_EVIL:
-                    events.ScheduleEvent(EVENT_SPELL_CHAIN_LIGHTNING, 3000);
-                    events.ScheduleEvent(EVENT_SPELL_TEMPTRESS_KISS, 1000);
-                    break;
-                case NPC_FRANKLIN_EVIL:
-                    events.ScheduleEvent(EVENT_SPELL_DEMONIC_ENRAGE, 3000);
-                    events.ScheduleEvent(EVENT_SPELL_ENTROPIC_STING, 5000);
-                    break;
-                case NPC_ARTORIUS_EVIL:
-                    events.ScheduleEvent(EVENT_SPELL_DEMONIC_DOOM, 3000);
-                    events.ScheduleEvent(EVENT_SPELL_STINGING_TRAUMA, 5000);
-                    break;
-                case NPC_NELSON_EVIL:
-                    me->CastSpell(me, SPELL_SOUL_FLAME, true);
-                    events.ScheduleEvent(EVENT_SPELL_DREADFUL_FRIGHT, 5000);
-                    break;
-            }
-        }
-
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (me->GetEntry() != changeEntry && who->GetTypeId() == TYPEID_PLAYER && who->ToPlayer()->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE)
-            {
-                playerGUID = who->GetGUID();
-                me->UpdateEntry(changeEntry);
-                events.ScheduleEvent(EVENT_CHECK_PLAYER, 5000);
-                return;
-            }
-            ScriptedAI::MoveInLineOfSight(who);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            events.Update(diff);
-            uint32 eventId = events.ExecuteEvent();
-            if (eventId == EVENT_CHECK_PLAYER)
-            {
-                Player* player = ObjectAccessor::GetPlayer(*me, playerGUID);
-                if (!player || !player->IsWithinDist2d(me, 60.0f))
-                    EnterEvadeMode();
-                else
-                    events.RepeatEvent(5000);
-                return;
-            }
-
-            if (!UpdateVictim())
-                return;
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (eventId)
-            {
-                case EVENT_SPELL_CHAIN_LIGHTNING:
-                    me->CastSpell(me->GetVictim(), eventId, false);
-                    events.RepeatEvent(7000);
-                    break;
-                case EVENT_SPELL_TEMPTRESS_KISS:
-                    me->CastSpell(me->GetVictim(), eventId, false);
-                    events.RepeatEvent(45000);
-                    break;
-                case EVENT_SPELL_DEMONIC_ENRAGE:
-                    me->CastSpell(me, eventId, false);
-                    events.RepeatEvent(20000);
-                    break;
-                case EVENT_SPELL_ENTROPIC_STING:
-                    me->CastSpell(me->GetVictim(), eventId, false);
-                    events.RepeatEvent(20000);
-                    break;
-                case EVENT_SPELL_DEMONIC_DOOM:
-                    me->CastSpell(me->GetVictim(), eventId, false);
-                    events.RepeatEvent(50000);
-                    break;
-                case EVENT_SPELL_STINGING_TRAUMA:
-                    me->CastSpell(me->GetVictim(), eventId, false);
-                    events.RepeatEvent(20000);
-                    break;
-                case EVENT_SPELL_DREADFUL_FRIGHT:
-                    me->CastSpell(me->GetVictim(), eventId, false);
-                    events.RepeatEvent(15000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-};
 
 // Theirs
 /*######
@@ -483,7 +297,7 @@ public:
         if (quest->GetQuestId() == QUEST_GUARDIANS_ALTAR)
         {
             creature->AI()->Talk(SAY_QUEST_START);
-            creature->setFaction(FACTION_ESCORT_A_NEUTRAL_PASSIVE);
+            creature->SetFaction(FACTION_ESCORT_A_NEUTRAL_PASSIVE);
 
             if (npc_ranshallaAI* escortAI = dynamic_cast<npc_ranshallaAI*>(creature->AI()))
                 escortAI->Start(false, false, player->GetGUID(), quest);
@@ -540,13 +354,13 @@ public:
             {
                 if (GameObject* go = GetClosestGameObjectWithEntry(me, GO_ELUNE_ALTAR, 10.0f))
                 {
-                    go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                    go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     me->SetFacingToObject(go);
                     _altarGUID = go->GetGUID();
                 }
             }
             else if (GameObject* go = GetClosestGameObjectWithEntry(me, GO_ELUNE_FIRE, 10.0f))
-                go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
 
             // Yell and set escort to pause
             Talk(SAY_REACH_TORCH);
@@ -558,12 +372,12 @@ public:
         void DoSummonPriestess()
         {
             // Summon 2 Elune priestess and make each of them move to a different spot
-            if (Creature* priestess = me->SummonCreature(NPC_PRIESTESS_ELUNE, wingThicketLocations[0].m_positionX, wingThicketLocations[0].m_positionY, wingThicketLocations[0].m_positionZ, wingThicketLocations[0].m_orientation, TEMPSUMMON_CORPSE_DESPAWN, 0))
+            if (Creature* priestess = me->SummonCreature(NPC_PRIESTESS_ELUNE, wingThicketLocations[0].m_positionX, wingThicketLocations[0].m_positionY, wingThicketLocations[0].m_positionZ, wingThicketLocations[0].GetOrientation(), TEMPSUMMON_CORPSE_DESPAWN, 0))
             {
                 priestess->GetMotionMaster()->MovePoint(0, wingThicketLocations[3].m_positionX, wingThicketLocations[3].m_positionY, wingThicketLocations[3].m_positionZ);
                 _firstPriestessGUID = priestess->GetGUID();
             }
-            if (Creature* priestess = me->SummonCreature(NPC_PRIESTESS_ELUNE, wingThicketLocations[1].m_positionX, wingThicketLocations[1].m_positionY, wingThicketLocations[1].m_positionZ, wingThicketLocations[1].m_orientation, TEMPSUMMON_CORPSE_DESPAWN, 0))
+            if (Creature* priestess = me->SummonCreature(NPC_PRIESTESS_ELUNE, wingThicketLocations[1].m_positionX, wingThicketLocations[1].m_positionY, wingThicketLocations[1].m_positionZ, wingThicketLocations[1].GetOrientation(), TEMPSUMMON_CORPSE_DESPAWN, 0))
             {
                 // Left priestess should have a distinct move point because she is the one who starts the dialogue at point reach
                 priestess->GetMotionMaster()->MovePoint(1, wingThicketLocations[4].m_positionX, wingThicketLocations[4].m_positionY, wingThicketLocations[4].m_positionZ);
@@ -661,7 +475,7 @@ public:
                     break;
                 case SAY_PRIESTESS_ALTAR_13:
                     // summon the Guardian of Elune
-                    if (Creature* guard = me->SummonCreature(NPC_GUARDIAN_ELUNE, wingThicketLocations[2].m_positionX, wingThicketLocations[2].m_positionY, wingThicketLocations[2].m_positionZ, wingThicketLocations[2].m_orientation, TEMPSUMMON_CORPSE_DESPAWN, 0))
+                    if (Creature* guard = me->SummonCreature(NPC_GUARDIAN_ELUNE, wingThicketLocations[2].m_positionX, wingThicketLocations[2].m_positionY, wingThicketLocations[2].m_positionZ, wingThicketLocations[2].GetOrientation(), TEMPSUMMON_CORPSE_DESPAWN, 0))
                     {
                         guard->GetMotionMaster()->MovePoint(0, wingThicketLocations[5].m_positionX, wingThicketLocations[5].m_positionY, wingThicketLocations[5].m_positionZ);
                         _guardEluneGUID = guard->GetGUID();
@@ -796,7 +610,7 @@ public:
                 escortAI->DoContinueEscort(isAltar);
         }
 
-        go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+        go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
 
         return false;
     }
@@ -804,9 +618,6 @@ public:
 
 void AddSC_winterspring()
 {
-    // Ours
-    new npc_stave_of_the_ancients();
-
     // Theirs
     new npc_rivern_frostwind();
     new npc_ranshalla();

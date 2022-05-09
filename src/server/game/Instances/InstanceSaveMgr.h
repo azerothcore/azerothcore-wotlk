@@ -18,8 +18,8 @@
 #ifndef _INSTANCESAVEMGR_H
 #define _INSTANCESAVEMGR_H
 
-#include "DatabaseEnv.h"
 #include "DBCEnums.h"
+#include "DatabaseEnv.h"
 #include "Define.h"
 #include "ObjectDefines.h"
 #include "ObjectGuid.h"
@@ -108,7 +108,7 @@ class InstanceSaveMgr
     friend class InstanceSave;
 
 private:
-    InstanceSaveMgr()  {};
+    InstanceSaveMgr()  = default;;
     ~InstanceSaveMgr();
 
 public:
@@ -166,7 +166,7 @@ public:
 
     InstanceSave* AddInstanceSave(uint32 mapId, uint32 instanceId, Difficulty difficulty, bool startup = false);
     bool DeleteInstanceSaveIfNeeded(uint32 InstanceId, bool skipMapCheck);
-    bool DeleteInstanceSaveIfNeeded(InstanceSave* save, bool skipMapCheck);
+    bool DeleteInstanceSaveIfNeeded(InstanceSave* save, bool skipMapCheck, bool deleteSave = true);
 
     InstanceSave* GetInstanceSave(uint32 InstanceId);
 

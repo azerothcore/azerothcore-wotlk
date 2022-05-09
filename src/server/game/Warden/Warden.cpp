@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Warden.h"
 #include "AccountMgr.h"
 #include "BanMgr.h"
 #include "ByteBuffer.h"
@@ -24,7 +25,6 @@
 #include "Player.h"
 #include "SharedDefines.h"
 #include "Util.h"
-#include "Warden.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
@@ -276,7 +276,7 @@ void Warden::ApplyPenalty(uint16 checkId, std::string const& reason)
     }
 
     reportMsg = "Warden: " + reportMsg;
-    LOG_INFO("warden", "> Warden: %s", reportMsg.c_str());
+    LOG_INFO("warden", "> Warden: {}", reportMsg);
 }
 
 bool Warden::ProcessLuaCheckResponse(std::string const& msg)
@@ -323,7 +323,7 @@ void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)
     _warden->DecryptData(recvData.contents(), recvData.size());
     uint8 opcode;
     recvData >> opcode;
-    LOG_DEBUG("warden", "Got packet, opcode %02X, size %u", opcode, uint32(recvData.size()));
+    LOG_DEBUG("warden", "Got packet, opcode {:02X}, size {}", opcode, uint32(recvData.size()));
     recvData.hexlike();
 
     switch (opcode)
@@ -348,7 +348,7 @@ void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)
             LOG_DEBUG("warden", "NYI WARDEN_CMSG_MODULE_FAILED received!");
             break;
         default:
-            LOG_DEBUG("warden", "Got unknown warden opcode %02X of size %u.", opcode, uint32(recvData.size() - 1));
+            LOG_DEBUG("warden", "Got unknown warden opcode {:02X} of size {}.", opcode, uint32(recvData.size() - 1));
             break;
     }
 }

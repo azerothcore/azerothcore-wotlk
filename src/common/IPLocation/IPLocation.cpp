@@ -22,8 +22,6 @@
 #include "Log.h"
 #include "StringConvert.h"
 #include <fstream>
-#include <iostream>
-
 IpLocationStore::IpLocationStore()
 {
 }
@@ -48,13 +46,13 @@ void IpLocationStore::Load()
     std::ifstream databaseFile(databaseFilePath);
     if (!databaseFile)
     {
-        LOG_ERROR("server.loading", "IPLocation: No ip database file exists (%s).", databaseFilePath.c_str());
+        LOG_ERROR("server.loading", "IPLocation: No ip database file exists ({}).", databaseFilePath);
         return;
     }
 
     if (!databaseFile.is_open())
     {
-        LOG_ERROR("server.loading", "IPLocation: Ip database file (%s) can not be opened.", databaseFilePath.c_str());
+        LOG_ERROR("server.loading", "IPLocation: Ip database file ({}) can not be opened.", databaseFilePath);
         return;
     }
 
@@ -103,7 +101,7 @@ void IpLocationStore::Load()
 
     databaseFile.close();
 
-    LOG_INFO("server.loading", ">> Loaded %u ip location entries.", static_cast<uint32>(_ipLocationStore.size()));
+    LOG_INFO("server.loading", ">> Loaded {} ip location entries.", static_cast<uint32>(_ipLocationStore.size()));
     LOG_INFO("server.loading", " ");
 }
 

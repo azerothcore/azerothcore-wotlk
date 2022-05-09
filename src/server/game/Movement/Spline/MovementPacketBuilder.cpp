@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ByteBuffer.h"
 #include "MovementPacketBuilder.h"
+#include "ByteBuffer.h"
 #include "MoveSpline.h"
 
 namespace Movement

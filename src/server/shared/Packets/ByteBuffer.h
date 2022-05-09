@@ -18,12 +18,12 @@
 #ifndef _BYTEBUFFER_H
 #define _BYTEBUFFER_H
 
-#include "Define.h"
 #include "ByteConverter.h"
+#include "Define.h"
 #include <array>
+#include <cstring>
 #include <string>
 #include <vector>
-#include <cstring>
 
 class MessageBuffer;
 
@@ -31,9 +31,9 @@ class MessageBuffer;
 class AC_SHARED_API ByteBufferException : public std::exception
 {
 public:
-    ~ByteBufferException() noexcept = default;
+    ~ByteBufferException() noexcept override = default;
 
-    char const* what() const noexcept override { return msg_.c_str(); }
+    [[nodiscard]] char const* what() const noexcept override { return msg_.c_str(); }
 
 protected:
     std::string & message() noexcept { return msg_; }
@@ -47,7 +47,7 @@ class AC_SHARED_API ByteBufferPositionException : public ByteBufferException
 public:
     ByteBufferPositionException(bool add, size_t pos, size_t size, size_t valueSize);
 
-    ~ByteBufferPositionException() noexcept = default;
+    ~ByteBufferPositionException() noexcept override = default;
 };
 
 class AC_SHARED_API ByteBufferSourceException : public ByteBufferException
@@ -55,7 +55,7 @@ class AC_SHARED_API ByteBufferSourceException : public ByteBufferException
 public:
     ByteBufferSourceException(size_t pos, size_t size, size_t valueSize);
 
-    ~ByteBufferSourceException() noexcept = default;
+    ~ByteBufferSourceException() noexcept override = default;
 };
 
 class AC_SHARED_API ByteBufferInvalidValueException : public ByteBufferException
@@ -63,7 +63,7 @@ class AC_SHARED_API ByteBufferInvalidValueException : public ByteBufferException
 public:
     ByteBufferInvalidValueException(char const* type, char const* value);
 
-    ~ByteBufferInvalidValueException() noexcept = default;
+    ~ByteBufferInvalidValueException() noexcept override = default;
 };
 
 class AC_SHARED_API ByteBuffer
@@ -72,7 +72,7 @@ public:
     constexpr static size_t DEFAULT_SIZE = 0x1000;
 
     // constructor
-    ByteBuffer() : _rpos(0), _wpos(0)
+    ByteBuffer()
     {
         _storage.reserve(DEFAULT_SIZE);
     }
@@ -355,7 +355,7 @@ public:
         return r;
     }
 
-    template <typename T> T read(size_t pos) const
+    template <typename T> [[nodiscard]] T read(size_t pos) const
     {
         if (pos + sizeof(T) > size())
         {
@@ -528,7 +528,7 @@ public:
     void hexlike() const;
 
 protected:
-    size_t _rpos, _wpos;
+    size_t _rpos{0}, _wpos{0};
     std::vector<uint8> _storage;
 };
 

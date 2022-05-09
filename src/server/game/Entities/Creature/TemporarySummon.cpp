@@ -15,13 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "TemporarySummon.h"
 #include "CreatureAI.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "TemporarySummon.h"
 
 TempSummon::TempSummon(SummonPropertiesEntry const* properties, ObjectGuid owner, bool isWorldObject) :
     Creature(isWorldObject), m_Properties(properties), m_type(TEMPSUMMON_MANUAL_DESPAWN),
@@ -104,7 +104,23 @@ void TempSummon::Update(uint32 diff)
 
                 break;
             }
+        case TEMPSUMMON_TIMED_DESPAWN_OOC_ALIVE:
+            {
+                if (!IsInCombat() && m_deathState != CORPSE)
+                {
+                    if (m_timer <= diff)
+                    {
+                        UnSummon();
+                        return;
+                    }
 
+                    m_timer -= diff;
+                }
+                else if (m_timer != m_lifetime)
+                    m_timer = m_lifetime;
+
+                break;
+            }
         case TEMPSUMMON_CORPSE_TIMED_DESPAWN:
             {
                 if (m_deathState == CORPSE)
@@ -175,7 +191,7 @@ void TempSummon::Update(uint32 diff)
             }
         default:
             UnSummon();
-            LOG_ERROR("entities.unit", "Temporary summoned creature (entry: %u) have unknown type %u of ", GetEntry(), m_type);
+            LOG_ERROR("entities.unit", "Temporary summoned creature (entry: {}) have unknown type {} of ", GetEntry(), m_type);
             break;
     }
 }
@@ -199,7 +215,7 @@ void TempSummon::InitStats(uint32 duration)
     {
         if (IsTrigger() && m_spells[0])
         {
-            setFaction(owner->getFaction());
+            SetFaction(owner->GetFaction());
             SetLevel(owner->getLevel());
             if (owner->GetTypeId() == TYPEID_PLAYER)
                 m_ControlledByPlayer = true;
@@ -227,9 +243,9 @@ void TempSummon::InitStats(uint32 duration)
     }
 
     if (m_Properties->Faction)
-        setFaction(m_Properties->Faction);
+        SetFaction(m_Properties->Faction);
     else if (IsVehicle() && owner) // properties should be vehicle
-        setFaction(owner->getFaction());
+        SetFaction(owner->GetFaction());
 }
 
 void TempSummon::InitSummon()
@@ -269,7 +285,7 @@ void TempSummon::UnSummon(uint32 msTime)
     //ASSERT(!IsPet());
     if (IsPet())
     {
-        ((Pet*)this)->Remove(PET_SAVE_NOT_IN_SLOT);
+        ToPet()->Remove(PET_SAVE_NOT_IN_SLOT);
         ASSERT(!IsInWorld());
         return;
     }
@@ -299,7 +315,7 @@ void TempSummon::RemoveFromWorld()
                     owner->m_SummonSlot[slot].Clear();
 
     //if (GetOwnerGUID())
-    //    LOG_ERROR("entities.unit", "Unit %u has owner guid when removed from world", GetEntry());
+    //    LOG_ERROR("entities.unit", "Unit {} has owner guid when removed from world", GetEntry());
 
     Creature::RemoveFromWorld();
 }
@@ -318,11 +334,12 @@ void Minion::InitStats(uint32 duration)
 
     SetReactState(REACT_PASSIVE);
 
-    Unit* owner = GetOwner();
-    SetCreatorGUID(owner->GetGUID());
-    setFaction(owner->getFaction());
-
-    owner->SetMinion(this, true);
+    if (Unit* owner = GetOwner())
+    {
+        SetCreatorGUID(owner->GetGUID());
+        SetFaction(owner->GetFaction());
+        owner->SetMinion(this, true);
+    }
 }
 
 void Minion::RemoveFromWorld()
@@ -375,11 +392,13 @@ void Guardian::InitStats(uint32 duration)
 {
     Minion::InitStats(duration);
 
-    Unit* m_owner = GetOwner();
-    InitStatsForLevel(m_owner->getLevel());
+    if (Unit* m_owner = GetOwner())
+    {
+        InitStatsForLevel(m_owner->getLevel());
 
-    if (m_owner->GetTypeId() == TYPEID_PLAYER && HasUnitTypeMask(UNIT_MASK_CONTROLABLE_GUARDIAN))
-        m_charmInfo->InitCharmCreateSpells();
+        if (m_owner->GetTypeId() == TYPEID_PLAYER && HasUnitTypeMask(UNIT_MASK_CONTROLABLE_GUARDIAN))
+            m_charmInfo->InitCharmCreateSpells();
+    }
 
     SetReactState(REACT_AGGRESSIVE);
 }
@@ -414,11 +433,11 @@ void Puppet::InitSummon()
     if (!SetCharmedBy(GetOwner(), CHARM_TYPE_POSSESS))
     {
         if (Player* p = GetOwner())
-            LOG_INFO("misc", "Puppet::InitSummon (A1) - %s, %u, %u, %u, %u, %u, %u, %u", p->GetGUID().ToString().c_str(), p->GetMapId(), p->GetInstanceId(), p->FindMap()->GetId(), p->IsInWorld() ? 1 : 0, p->IsDuringRemoveFromWorld() ? 1 : 0, p->IsBeingTeleported() ? 1 : 0, p->isBeingLoaded() ? 1 : 0);
+            LOG_INFO("misc", "Puppet::InitSummon (A1) - {}, {}, {}, {}, {}, {}, {}, {}", p->GetGUID().ToString(), p->GetMapId(), p->GetInstanceId(), p->FindMap()->GetId(), p->IsInWorld() ? 1 : 0, p->IsDuringRemoveFromWorld() ? 1 : 0, p->IsBeingTeleported() ? 1 : 0, p->isBeingLoaded() ? 1 : 0);
         else
         {
             LOG_INFO("misc", "Puppet::InitSummon (B1)");
-            //ABORT(); // ZOMG!
+            //ABORT();
         }
     }
 }

@@ -24,13 +24,9 @@ EndScriptData */
 
 #include "Chat.h"
 #include "Language.h"
-#include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-
-#if AC_COMPILER == AC_COMPILER_GNU
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
+#include "WorldSession.h"
 
 using namespace Acore::ChatCommands;
 
@@ -43,28 +39,25 @@ public:
     {
         static ChatCommandTable honorAddCommandTable =
         {
-            { "kill",           SEC_GAMEMASTER,     false, &HandleHonorAddKillCommand,         "" },
-            { "",               SEC_GAMEMASTER,     false, &HandleHonorAddCommand,             "" }
+            { "kill", HandleHonorAddKillCommand, SEC_GAMEMASTER, Console::No },
+            { "",     HandleHonorAddCommand,     SEC_GAMEMASTER, Console::No }
         };
 
         static ChatCommandTable honorCommandTable =
         {
-            { "add",            SEC_GAMEMASTER,     false, nullptr,                            "", honorAddCommandTable },
-            { "update",         SEC_GAMEMASTER,     false, &HandleHonorUpdateCommand,          "" }
+            { "add",    honorAddCommandTable },
+            { "update", HandleHonorUpdateCommand, SEC_GAMEMASTER, Console::No }
         };
 
         static ChatCommandTable commandTable =
         {
-            { "honor",          SEC_GAMEMASTER,     false, nullptr,                            "", honorCommandTable }
+            { "honor", honorCommandTable }
         };
         return commandTable;
     }
 
-    static bool HandleHonorAddCommand(ChatHandler* handler, char const* args)
+    static bool HandleHonorAddCommand(ChatHandler* handler, uint32 amount)
     {
-        if (!*args)
-            return false;
-
         Player* target = handler->getSelectedPlayer();
         if (!target)
         {
@@ -74,15 +67,14 @@ public:
         }
 
         // check online security
-        if (handler->HasLowerSecurity(target))
+        if (handler->HasLowerSecurity(target, ObjectGuid::Empty))
             return false;
 
-        uint32 amount = (uint32)atoi(args);
         target->RewardHonor(nullptr, 1, amount);
         return true;
     }
 
-    static bool HandleHonorAddKillCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleHonorAddKillCommand(ChatHandler* handler)
     {
         Unit* target = handler->getSelectedUnit();
         if (!target)
@@ -93,14 +85,15 @@ public:
         }
 
         // check online security
-        if (target->GetTypeId() == TYPEID_PLAYER && handler->HasLowerSecurity(target->ToPlayer()))
-            return false;
+        if (Player* player = target->ToPlayer())
+            if (handler->HasLowerSecurity(player, ObjectGuid::Empty))
+                return false;
 
         handler->GetSession()->GetPlayer()->RewardHonor(target, 1);
         return true;
     }
 
-    static bool HandleHonorUpdateCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleHonorUpdateCommand(ChatHandler* handler)
     {
         Player* target = handler->getSelectedPlayer();
         if (!target)
@@ -111,7 +104,7 @@ public:
         }
 
         // check online security
-        if (handler->HasLowerSecurity(target))
+        if (handler->HasLowerSecurity(target, ObjectGuid::Empty))
             return false;
 
         target->UpdateHonorFields();

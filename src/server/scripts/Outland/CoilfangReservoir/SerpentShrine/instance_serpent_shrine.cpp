@@ -18,15 +18,15 @@
 #include "InstanceScript.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "serpent_shrine.h"
 #include "TemporarySummon.h"
+#include "serpent_shrine.h"
 
 DoorData const doorData[] =
 {
-    { GO_LADY_VASHJ_BRIDGE_CONSOLE, DATA_BRIDGE_EMERGED, DOOR_TYPE_PASSAGE, BOUNDARY_NONE },
-    { GO_COILFANG_BRIDGE1,          DATA_BRIDGE_EMERGED, DOOR_TYPE_PASSAGE, BOUNDARY_NONE },
-    { GO_COILFANG_BRIDGE2,          DATA_BRIDGE_EMERGED, DOOR_TYPE_PASSAGE, BOUNDARY_NONE },
-    { GO_COILFANG_BRIDGE3,          DATA_BRIDGE_EMERGED, DOOR_TYPE_PASSAGE, BOUNDARY_NONE }
+    { GO_LADY_VASHJ_BRIDGE_CONSOLE, DATA_BRIDGE_EMERGED, DOOR_TYPE_PASSAGE },
+    { GO_COILFANG_BRIDGE1,          DATA_BRIDGE_EMERGED, DOOR_TYPE_PASSAGE },
+    { GO_COILFANG_BRIDGE2,          DATA_BRIDGE_EMERGED, DOOR_TYPE_PASSAGE },
+    { GO_COILFANG_BRIDGE3,          DATA_BRIDGE_EMERGED, DOOR_TYPE_PASSAGE }
 };
 
 class instance_serpent_shrine : public InstanceMapScript
@@ -56,7 +56,7 @@ public:
             if (type == DATA_LADY_VASHJ)
                 for (uint8 i = 0; i < 4; ++i)
                     if (GameObject* gobject = instance->GetGameObject(ShieldGeneratorGUID[i]))
-                        gobject->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        gobject->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
 
             return true;
         }
@@ -100,7 +100,7 @@ public:
                 case NPC_COILFANG_SHATTERER:
                 case NPC_COILFANG_PRIESTESS:
                     if (creature->GetPositionX() > -110.0f && creature->GetPositionX() < 155.0f && creature->GetPositionY() > -610.0f && creature->GetPositionY() < -280.0f)
-                        AliveKeepersCount += creature->IsAlive() ? 0 : -1; // retarded SmartAI calls JUST_RESPAWNED in AIInit...
+                        AliveKeepersCount += creature->IsAlive() ? 0 : -1; // SmartAI calls JUST_RESPAWNED in AIInit...
                     break;
                 case NPC_THE_LURKER_BELOW:
                     LurkerBelowGUID = creature->GetGUID();
@@ -158,7 +158,7 @@ public:
                         for (uint8 i = 0; i < 4; ++i)
                             if (GameObject* gobject = instance->GetGameObject(ShieldGeneratorGUID[i]))
                             {
-                                gobject->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                                gobject->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                                 vashj->SummonTrigger(gobject->GetPositionX(), gobject->GetPositionY(), gobject->GetPositionZ(), 0.0f, 0);
                             }
                     break;

@@ -16,12 +16,12 @@
  */
 
 #include "Group.h"
-#include "icecrown_citadel.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "icecrown_citadel.h"
 #include <random>
 
 enum ScriptTexts
@@ -330,7 +330,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if ((!UpdateVictim() && !(events.GetPhaseMask() & PHASE_INTRO_MASK)) || !CheckInRoom())
+            if (!UpdateVictim() && !(events.GetPhaseMask() & PHASE_INTRO_MASK))
                 return;
 
             events.Update(diff);
@@ -365,7 +365,7 @@ public:
                     Talk(SAY_BERSERK);
                     break;
                 case EVENT_SPELL_DEATH_AND_DECAY:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                         me->CastSpell(target, SPELL_DEATH_AND_DECAY, false);
                     events.RepeatEvent(urand(22000, 30000));
                     break;
@@ -408,7 +408,7 @@ public:
                     }
                     break;
                 case EVENT_SPELL_SHADOW_BOLT:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                         me->CastSpell(target, SPELL_SHADOW_BOLT, false);
                     events.RepeatEvent(2100);
                     break;
@@ -445,7 +445,7 @@ public:
                             count = 3;
 
                         std::list<Unit*> targets;
-                        SelectTargetList(targets, NonTankTargetSelector(me, true), count, SELECT_TARGET_RANDOM);
+                        SelectTargetList(targets, NonTankTargetSelector(me, true), count, SelectTargetMethod::Random);
                         if (!targets.empty())
                             for (std::list<Unit*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
                                 me->CastSpell(*itr, SPELL_SUMMON_SHADE, true);
@@ -474,7 +474,7 @@ public:
                 Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                 for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                     if (Player* p = itr->GetSource())
-                        if (p != me->GetVictim() && summon->GetExactDist(p) < minrange && me->CanCreatureAttack(p) && me->_CanDetectFeignDeathOf(p))
+                        if (p != me->GetVictim() && summon->GetExactDist(p) < minrange && me->CanCreatureAttack(p))
                         {
                             target = p;
                             minrange = summon->GetExactDist(p);
@@ -484,7 +484,7 @@ public:
             }
             else
             {
-                target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true);
+                target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true);
             }
 
             summon->AI()->AttackStart(target);
@@ -514,7 +514,7 @@ public:
                 if (darnavan->IsAlive())
                 {
                     darnavan->RemoveAllAuras();
-                    darnavan->setFaction(35);
+                    darnavan->SetFaction(FACTION_FRIENDLY);
                     darnavan->DeleteThreatList();
                     darnavan->CombatStop(true);
                     darnavan->GetMotionMaster()->MoveIdle();
@@ -610,7 +610,7 @@ public:
             if (me->SummonCreature(entry, pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
                 if (TempSummon* trigger = me->SummonCreature(WORLD_TRIGGER, pos, TEMPSUMMON_TIMED_DESPAWN, 2000))
                 {
-                    trigger->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                    trigger->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                     trigger->CastSpell(trigger, SPELL_TELEPORT_VISUAL, true);
                 }
         }
@@ -744,10 +744,10 @@ public:
                     break;
                 case EVENT_CULTIST_DARK_MARTYRDOM_REVIVE:
                     me->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
-                    me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+                    me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
+                    me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                     me->UpdateEntry(NPC_REANIMATED_FANATIC);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED | UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_STUNNED | UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
                     me->SetReactState(REACT_AGGRESSIVE);
                     DoZoneInCombat(me);
                     me->CastSpell(me, SPELL_FANATIC_S_DETERMINATION);
@@ -759,9 +759,9 @@ public:
                     me->CastSpell(me, SPELL_PERMANENT_FEIGN_DEATH, true);
                     me->CastSpell(me, SPELL_CLEAR_ALL_DEBUFFS, true);
                     me->CastSpell(me, SPELL_FULL_HEAL, true);
-                    me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
-                    me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED | UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
+                    me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
+                    me->SetUnitFlag(UNIT_FLAG_STUNNED | UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
                     Reset();
                     events.ScheduleEvent(EVENT_CULTIST_DARK_MARTYRDOM_REVIVE, 6000);
                     break;
@@ -855,7 +855,7 @@ public:
                     events.RepeatEvent(urand(9000, 13000));
                     break;
                 case EVENT_SPELL_ADHERENT_CURSE_OF_TORPOR:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
                         me->CastSpell(target, SPELL_CURSE_OF_TORPOR, false);
                     events.RepeatEvent(urand(9000, 13000));
                     break;
@@ -865,10 +865,10 @@ public:
                     break;
                 case EVENT_CULTIST_DARK_MARTYRDOM_REVIVE:
                     me->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
-                    me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+                    me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
+                    me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                     me->UpdateEntry(NPC_REANIMATED_ADHERENT);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED | UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_STUNNED | UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
                     me->SetReactState(REACT_AGGRESSIVE);
                     DoZoneInCombat(me);
                     me->CastSpell(me, SPELL_ADHERENT_S_DETERMINATION);
@@ -880,9 +880,9 @@ public:
                     me->CastSpell(me, SPELL_PERMANENT_FEIGN_DEATH, true);
                     me->CastSpell(me, SPELL_CLEAR_ALL_DEBUFFS, true);
                     me->CastSpell(me, SPELL_FULL_HEAL, true);
-                    me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
-                    me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED | UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
+                    me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
+                    me->SetUnitFlag(UNIT_FLAG_STUNNED | UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
                     Reset();
                     events.ScheduleEvent(EVENT_CULTIST_DARK_MARTYRDOM_REVIVE, 6000);
                     break;
@@ -983,7 +983,7 @@ public:
         }
 
         void MoveInLineOfSight(Unit*  /*who*/) override {}
-        void EnterEvadeMode() override {}
+        void EnterEvadeMode(EvadeReason /*why*/ = EVADE_REASON_OTHER) override {}
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -1143,6 +1143,32 @@ public:
     }
 };
 
+// 69483 - Dark Reckoning
+class spell_deathwhisper_dark_reckoning : public AuraScript
+{
+    PrepareAuraScript(spell_deathwhisper_dark_reckoning);
+
+    bool Validate(SpellInfo const* spell) override
+    {
+        return ValidateSpellInfo({ spell->Effects[EFFECT_0].TriggerSpell });
+    }
+
+    void OnPeriodic(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        if (Unit* caster = GetCaster())
+        {
+            uint32 spellId = GetSpellInfo()->Effects[EFFECT_0].TriggerSpell;
+            caster->CastSpell(GetTarget(), spellId, aurEff);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_deathwhisper_dark_reckoning::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+    }
+};
+
 class at_lady_deathwhisper_entrance : public AreaTriggerScript
 {
 public:
@@ -1161,11 +1187,17 @@ public:
 
 void AddSC_boss_lady_deathwhisper()
 {
+    // Creatures
     new boss_lady_deathwhisper();
     new npc_cult_fanatic();
     new npc_cult_adherent();
     new npc_vengeful_shade();
     new npc_darnavan();
+
+    // Spells
     new spell_deathwhisper_mana_barrier();
+    RegisterSpellScript(spell_deathwhisper_dark_reckoning);
+
+    // AreaTriggers
     new at_lady_deathwhisper_entrance();
 }

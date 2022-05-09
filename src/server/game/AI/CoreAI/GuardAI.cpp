@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureAIImpl.h"
 #include "GuardAI.h"
+#include "CreatureAIImpl.h"
 #include "Player.h"
 
 int GuardAI::Permissible(Creature const* creature)
@@ -37,7 +37,7 @@ void GuardAI::Reset()
     me->CastSpell(me, 18950 /*SPELL_INVISIBILITY_AND_STEALTH_DETECTION*/, true);
 }
 
-void GuardAI::EnterEvadeMode()
+void GuardAI::EnterEvadeMode(EvadeReason /*why*/)
 {
     if (!me->IsAlive())
     {
@@ -47,7 +47,7 @@ void GuardAI::EnterEvadeMode()
         return;
     }
 
-    LOG_DEBUG("entities.unit", "Guard entry: %u enters evade mode.", me->GetEntry());
+    LOG_DEBUG("entities.unit", "Guard entry: {} enters evade mode.", me->GetEntry());
 
     me->RemoveAllAuras();
     me->DeleteThreatList();

@@ -15,13 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Language.h"
 #include "LFG.h"
+#include "Language.h"
 #include "ObjectMgr.h"
 
 namespace lfg
 {
-
     std::string ConcatenateDungeons(LfgDungeonSet const& dungeons)
     {
         std::string dungeonstr = "";

@@ -15,13 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "OutdoorPvPGH.h"
 #include "GameEventMgr.h"
 #include "MapMgr.h"
-#include "OutdoorPvPGH.h"
 #include "OutdoorPvPMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "World.h"
 #include "WorldPacket.h"
 
 OutdoorPvPGH::OutdoorPvPGH()

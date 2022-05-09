@@ -18,6 +18,7 @@
 #ifndef _TICKETMGR_H
 #define _TICKETMGR_H
 
+#include "CharacterCache.h"
 #include "ObjectMgr.h"
 #include <string>
 
@@ -108,7 +109,9 @@ public:
         std::string name;
         // save queries if ticket is not assigned
         if (_assignedTo)
-            sObjectMgr->GetPlayerNameByGUID(_assignedTo.GetCounter(), name);
+        {
+            sCharacterCache->GetCharacterNameByGuid(_assignedTo, name);
+        }
 
         return name;
     }
@@ -127,11 +130,7 @@ public:
     void SetClosedBy(ObjectGuid value) { _closedBy = value; _type = TICKET_TYPE_CLOSED; }
     void SetResolvedBy(ObjectGuid value) { _resolvedBy = value; }
     void SetCompleted() { _completed = true; }
-    void SetMessage(std::string const& message)
-    {
-        _message = message;
-        _lastModifiedTime = uint64(time(nullptr));
-    }
+    void SetMessage(std::string const& message);
     void SetComment(std::string const& comment) { _comment = comment; }
     void SetViewed() { _viewed = true; }
     void SetUnassigned();
@@ -229,7 +228,7 @@ public:
     void SetStatus(bool status) { _status = status; }
 
     uint64 GetLastChange() const { return _lastChange; }
-    void UpdateLastChange() { _lastChange = uint64(time(nullptr)); }
+    void UpdateLastChange();
 
     uint32 GenerateTicketId() { return ++_lastTicketId; }
     uint32 GetOpenTicketCount() const { return _openTicketCount; }

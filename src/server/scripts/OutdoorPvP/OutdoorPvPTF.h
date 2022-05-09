@@ -32,10 +32,10 @@ const uint32 OutdoorPvPTFBuffZones[OutdoorPvPTFBuffZonesNum] =
 };
 
 // locked for 6 hours after capture
-const uint32 TF_LOCK_TIME = 3600 * 6 * 1000;
+const uint32 TF_LOCK_TIME = 6 * HOUR * IN_MILLISECONDS;
 
 // update lock timer every 1/4 minute (overkill, but this way it's sure the timer won't "jump" 2 minutes at once.)
-const uint32 TF_LOCK_TIME_UPDATE = 15000;
+const uint32 TF_LOCK_TIME_UPDATE = 15 * IN_MILLISECONDS;
 
 // blessing of auchindoun
 #define TF_CAPTURE_BUFF 33377
@@ -138,6 +138,8 @@ public:
     bool HandlePlayerEnter(Player* player) override;
     void HandlePlayerLeave(Player* player) override;
 
+    void ResetToTeamControlled(TeamId team);
+
     void UpdateTowerState();
 
 protected:
@@ -162,6 +164,19 @@ public:
 
     void SendRemoveWorldStates(Player* player) override;
 
+    void SaveRequiredWorldStates() const;
+
+    void ResetZoneToTeamControlled(TeamId team);
+
+    void RecalculateClientUILockTime()
+    {
+        uint32 minutes_left = m_LockTimer / 60000;
+        hours_left = minutes_left / 60;
+        minutes_left -= hours_left * 60;
+        second_digit = minutes_left % 10;
+        first_digit = minutes_left / 10;
+    }
+
     uint32 GetAllianceTowersControlled() const;
     void SetAllianceTowersControlled(uint32 count);
 
@@ -172,6 +187,7 @@ public:
 
 private:
     bool m_IsLocked;
+    bool m_JustLocked;
     uint32 m_LockTimer;
     uint32 m_LockTimerUpdate;
 

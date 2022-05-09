@@ -18,10 +18,8 @@
 #ifndef __ASYNCAUCTIONLISTING_H
 #define __ASYNCAUCTIONLISTING_H
 
-#include "Common.h"
-#include "EventProcessor.h"
-#include "WorldPacket.h"
-#include "ObjectGuid.h"
+#include "AuctionHouseMgr.h"
+
 #include <mutex>
 
 class AuctionListOwnerItemsDelayEvent : public BasicEvent
@@ -43,8 +41,10 @@ private:
 class AuctionListItemsDelayEvent
 {
 public:
-    AuctionListItemsDelayEvent(uint32 msTimer, ObjectGuid playerguid, ObjectGuid creatureguid, std::string searchedname, uint32 listfrom, uint8 levelmin, uint8 levelmax, uint8 usable, uint32 auctionSlotID, uint32 auctionMainCategory, uint32 auctionSubCategory, uint32 quality, uint8 getAll) :
-        _msTimer(msTimer), _playerguid(playerguid), _creatureguid(creatureguid), _searchedname(searchedname), _listfrom(listfrom), _levelmin(levelmin), _levelmax(levelmax), _usable(usable), _auctionSlotID(auctionSlotID), _auctionMainCategory(auctionMainCategory), _auctionSubCategory(auctionSubCategory), _quality(quality), _getAll(getAll) { }
+    AuctionListItemsDelayEvent(uint32 msTimer, ObjectGuid playerguid, ObjectGuid creatureguid, std::string searchedname, uint32 listfrom, uint8 levelmin, uint8 levelmax,
+        uint8 usable, uint32 auctionSlotID, uint32 auctionMainCategory, uint32 auctionSubCategory, uint32 quality, uint8 getAll, AuctionSortOrderVector sortOrder) :
+        _msTimer(msTimer), _playerguid(playerguid), _creatureguid(creatureguid), _searchedname(searchedname), _listfrom(listfrom), _levelmin(levelmin), _levelmax(levelmax),_usable(usable),
+        _auctionSlotID(auctionSlotID), _auctionMainCategory(auctionMainCategory), _auctionSubCategory(auctionSubCategory), _quality(quality), _getAll(getAll), _sortOrder(sortOrder) { }
 
     bool Execute();
 
@@ -61,6 +61,7 @@ public:
     uint32 _auctionSubCategory;
     uint32 _quality;
     uint8 _getAll;
+    AuctionSortOrderVector _sortOrder;
 };
 
 class AsyncAuctionListingMgr

@@ -16,7 +16,6 @@
  */
 
 #include "AddonHandler.h"
-#include "DatabaseEnv.h"
 #include "Log.h"
 #include "Opcodes.h"
 #include "zlib.h"
@@ -83,7 +82,7 @@ bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
 
             AddOnPacked >> enabled >> crc >> unk2;
 
-            LOG_DEBUG("network", "ADDON: Name: %s, Enabled: 0x%x, CRC: 0x%x, Unknown2: 0x%x", addonName.c_str(), enabled, crc, unk2);
+            LOG_DEBUG("network", "ADDON: Name: {}, Enabled: 0x{:x}, CRC: 0x{:x}, Unknown2: 0x{:x}", addonName, enabled, crc, unk2);
 
             uint8 state = (enabled ? 2 : 1);
             *Target << uint8(state);

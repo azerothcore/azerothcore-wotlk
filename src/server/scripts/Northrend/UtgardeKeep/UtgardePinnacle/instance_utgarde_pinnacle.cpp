@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "utgarde_pinnacle.h"
 
 class instance_utgarde_pinnacle : public InstanceMapScript
@@ -161,7 +161,7 @@ public:
                         HandleGameObject(SkadiRuthlessDoor, true);
                         // Make ymiron attackable
                         if (Creature* cr = instance->GetCreature(KingYmiron))
-                            cr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                            cr->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     }
                     Encounters[type] = data;
                     break;

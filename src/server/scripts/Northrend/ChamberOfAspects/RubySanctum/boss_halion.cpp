@@ -18,13 +18,14 @@
 #include "GameObjectAI.h"
 #include "MapMgr.h"
 #include "Player.h"
-#include "ruby_sanctum.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
+#include "WorldSession.h"
+#include "ruby_sanctum.h"
 
 enum Texts
 {
@@ -256,7 +257,7 @@ public:
             }
         }
 
-        bool CanAIAttack(const Unit* who) const override
+        bool CanAIAttack(Unit const* who) const override
         {
             return me->GetHomePosition().GetExactDist2d(who) < 52.0f;
         }
@@ -271,12 +272,12 @@ public:
             return false;
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (IsAnyPlayerValid())
                 return;
 
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
         }
 
         void AttackStart(Unit* who) override
@@ -398,7 +399,7 @@ public:
                     events.ScheduleEvent(EVENT_METEOR_STRIKE, 40000);
                     break;
                 case EVENT_FIERY_COMBUSTION:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100.0f, true, -SPELL_TWILIGHT_REALM))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true, -SPELL_TWILIGHT_REALM))
                         me->CastSpell(target, SPELL_FIERY_COMBUSTION, false);
                     events.ScheduleEvent(EVENT_FIERY_COMBUSTION, 25000);
                     break;
@@ -472,7 +473,7 @@ public:
             me->SetInCombatWithZone();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
         }
 
@@ -493,7 +494,7 @@ public:
                 if (me->IsDamageEnoughForLootingAndReward())
                     halion->LowerPlayerDamageReq(halion->GetMaxHealth());
 
-                if (halion->IsAlive())
+                if (killer && halion->IsAlive())
                     Unit::Kill(killer, halion);
             }
 
@@ -541,7 +542,7 @@ public:
                     _events.ScheduleEvent(EVENT_BREATH, urand(10000, 12000));
                     break;
                 case EVENT_SOUL_CONSUMPTION:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100.0f, true, SPELL_TWILIGHT_REALM))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true, SPELL_TWILIGHT_REALM))
                         me->CastSpell(target, SPELL_SOUL_CONSUMPTION, false);
                     _events.ScheduleEvent(EVENT_SOUL_CONSUMPTION, 20000);
                     break;
@@ -1045,8 +1046,7 @@ public:
             SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(uint32(GetSpellInfo()->Effects[effIndex].MiscValueB));
             uint32 duration = uint32(GetSpellInfo()->GetDuration());
 
-            Position pos;
-            caster->GetPosition(&pos);
+            Position pos = caster->GetPosition();
             if (Creature* summon = caster->GetMap()->SummonCreature(entry, pos, properties, duration, caster, GetSpellInfo()->Id))
             {
                 bool heroic = summon->GetMap()->IsHeroic();
@@ -1155,7 +1155,7 @@ public:
 
         void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*handle*/)
         {
-            GetTarget()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            GetTarget()->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             GetTarget()->ToCreature()->SetReactState(REACT_DEFENSIVE);
             GetTarget()->GetMotionMaster()->Clear();
             GetTarget()->getThreatMgr().clearReferences();
@@ -1165,7 +1165,7 @@ public:
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*handle*/)
         {
-            GetTarget()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            GetTarget()->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             GetTarget()->ToCreature()->SetReactState(REACT_DEFENSIVE);
             GetTarget()->GetMotionMaster()->Clear();
             GetTarget()->getThreatMgr().clearReferences();

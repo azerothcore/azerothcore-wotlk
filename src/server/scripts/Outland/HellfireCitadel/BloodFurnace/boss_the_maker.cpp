@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "blood_furnace.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "blood_furnace.h"
 
 enum eEnums
 {
@@ -112,12 +112,12 @@ public:
                     events.RepeatEvent(urand(15000, 23000));
                     break;
                 case EVENT_SPELL_EXPLODING:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_EXPLODING_BREAKER, false);
                     events.RepeatEvent(urand(7000, 11000));
                     break;
                 case EVENT_SPELL_DOMINATION:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_DOMINATION, false);
                     events.RepeatEvent(120000);
                     break;

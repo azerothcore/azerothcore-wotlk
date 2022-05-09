@@ -15,12 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "OutdoorPvPNA.h"
 #include "GameGraveyard.h"
-#include "MapMgr.h"
 #include "Language.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
-#include "OutdoorPvPNA.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "World.h"
@@ -345,7 +345,7 @@ bool OPvPCapturePointNA::HandleCustomSpell(Player* player, uint32 spellId, GameO
             nodes[0] = FlightPathStartNodes[NA_ROOST_N];
             nodes[1] = FlightPathEndNodes[NA_ROOST_N];
             player->ActivateTaxiPathTo(nodes);
-            player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP);
+            player->SetPlayerFlag(PLAYER_FLAGS_IN_PVP);
             player->UpdatePvP(true, true);
             retval = true;
             break;
@@ -353,7 +353,7 @@ bool OPvPCapturePointNA::HandleCustomSpell(Player* player, uint32 spellId, GameO
             nodes[0] = FlightPathStartNodes[NA_ROOST_S];
             nodes[1] = FlightPathEndNodes[NA_ROOST_S];
             player->ActivateTaxiPathTo(nodes);
-            player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP);
+            player->SetPlayerFlag(PLAYER_FLAGS_IN_PVP);
             player->UpdatePvP(true, true);
             retval = true;
             break;
@@ -361,7 +361,7 @@ bool OPvPCapturePointNA::HandleCustomSpell(Player* player, uint32 spellId, GameO
             nodes[0] = FlightPathStartNodes[NA_ROOST_W];
             nodes[1] = FlightPathEndNodes[NA_ROOST_W];
             player->ActivateTaxiPathTo(nodes);
-            player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP);
+            player->SetPlayerFlag(PLAYER_FLAGS_IN_PVP);
             player->UpdatePvP(true, true);
             retval = true;
             break;
@@ -369,7 +369,7 @@ bool OPvPCapturePointNA::HandleCustomSpell(Player* player, uint32 spellId, GameO
             nodes[0] = FlightPathStartNodes[NA_ROOST_E];
             nodes[1] = FlightPathEndNodes[NA_ROOST_E];
             player->ActivateTaxiPathTo(nodes);
-            player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP);
+            player->SetPlayerFlag(PLAYER_FLAGS_IN_PVP);
             player->UpdatePvP(true, true);
             retval = true;
             break;

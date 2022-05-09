@@ -15,7 +15,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-class KillRewarder
+#ifndef __KILL_REWARDER_H__
+#define __KILL_REWARDER_H__
+
+#include "Define.h"
+
+class Group;
+class Player;
+class Unit;
+
+class AC_GAME_API KillRewarder
 {
 public:
     KillRewarder(Player* killer, Unit* victim, bool isBattleGround);
@@ -47,3 +56,5 @@ private:
     bool _isBattleGround;
     bool _isPvP;
 };
+
+#endif

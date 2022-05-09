@@ -15,17 +15,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "azjol_nerub.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "azjol_nerub.h"
 
 DoorData const doorData[] =
 {
-    { GO_KRIKTHIR_DOORS,    DATA_KRIKTHIR_THE_GATEWATCHER_EVENT,    DOOR_TYPE_PASSAGE,      BOUNDARY_NONE },
-    { GO_ANUBARAK_DOORS1,   DATA_ANUBARAK_EVENT,    DOOR_TYPE_ROOM,     BOUNDARY_NONE },
-    { GO_ANUBARAK_DOORS2,   DATA_ANUBARAK_EVENT,    DOOR_TYPE_ROOM,     BOUNDARY_NONE },
-    { GO_ANUBARAK_DOORS3,   DATA_ANUBARAK_EVENT,    DOOR_TYPE_ROOM,     BOUNDARY_NONE },
-    { 0,                    0,                      DOOR_TYPE_ROOM,     BOUNDARY_NONE }
+    { GO_KRIKTHIR_DOORS,    DATA_KRIKTHIR_THE_GATEWATCHER_EVENT,    DOOR_TYPE_PASSAGE },
+    { GO_ANUBARAK_DOORS1,   DATA_ANUBARAK_EVENT,    DOOR_TYPE_ROOM },
+    { GO_ANUBARAK_DOORS2,   DATA_ANUBARAK_EVENT,    DOOR_TYPE_ROOM },
+    { GO_ANUBARAK_DOORS3,   DATA_ANUBARAK_EVENT,    DOOR_TYPE_ROOM },
+    { 0,                    0,                      DOOR_TYPE_ROOM }
+};
+
+ObjectData const creatureData[] =
+{
+    { NPC_KRIKTHIR_THE_GATEWATCHER, DATA_KRIKTHIR_THE_GATEWATCHER_EVENT },
+    { NPC_HADRONOX,                 DATA_HADRONOX_EVENT                 }
 };
 
 class instance_azjol_nerub : public InstanceMapScript
@@ -39,30 +45,27 @@ public:
         {
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
+            LoadObjectData(creatureData, nullptr);
         };
 
         void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
-                case NPC_KRIKTHIR_THE_GATEWATCHER:
-                    _krikthirGUID = creature->GetGUID();
-                    break;
-                case NPC_HADRONOX:
-                    _hadronoxGUID = creature->GetGUID();
-                    break;
                 case NPC_SKITTERING_SWARMER:
                 case NPC_SKITTERING_INFECTIOR:
-                    if (Creature* krikthir = instance->GetCreature(_krikthirGUID))
+                    if (Creature* krikthir = GetCreature((DATA_KRIKTHIR_THE_GATEWATCHER_EVENT)))
                         krikthir->AI()->JustSummoned(creature);
                     break;
                 case NPC_ANUB_AR_CHAMPION:
                 case NPC_ANUB_AR_NECROMANCER:
                 case NPC_ANUB_AR_CRYPTFIEND:
-                    if (Creature* hadronox = instance->GetCreature(_hadronoxGUID))
+                    if (Creature* hadronox = GetCreature(DATA_HADRONOX_EVENT))
                         hadronox->AI()->JustSummoned(creature);
                     break;
             }
+
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         void OnGameObjectCreate(GameObject* go) override
@@ -123,10 +126,6 @@ public:
                 }
             }
         }
-
-    private:
-        ObjectGuid _krikthirGUID;
-        ObjectGuid _hadronoxGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

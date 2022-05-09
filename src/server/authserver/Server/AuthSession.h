@@ -24,11 +24,11 @@
 #include "Common.h"
 #include "CryptoHash.h"
 #include "Optional.h"
-#include "Socket.h"
-#include "SRP6.h"
 #include "QueryResult.h"
-#include <memory>
+#include "SRP6.h"
+#include "Socket.h"
 #include <boost/asio/ip/tcp.hpp>
+#include <memory>
 
 using boost::asio::ip::tcp;
 

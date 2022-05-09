@@ -21,9 +21,9 @@
 
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
 #include "trial_of_the_crusader.h"
@@ -246,7 +246,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
         if (!victim || !victim->IsInWorld())
             return;
 
-        float allowedDist = sqrt(MELEE_RANGE * MELEE_RANGE + 6.0f * 6.0f);
+        float allowedDist = std::sqrt(MELEE_RANGE * MELEE_RANGE + 6.0f * 6.0f);
         if (!me->IsWithinMeleeRange(victim, allowedDist))
             return;
 
@@ -319,7 +319,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                     for( uint8 i = 0; i < count; ++i )
                     {
                         float angle = rand_norm() * 2 * M_PI;
-                        if( Creature* ball = me->SummonCreature((i % 2) ? NPC_CONCENTRATED_DARK : NPC_CONCENTRATED_LIGHT, Locs[LOC_CENTER].GetPositionX() + cos(angle) * 47.0f, Locs[LOC_CENTER].GetPositionY() + sin(angle) * 47.0f, Locs[LOC_CENTER].GetPositionZ() + 1.5f, 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1500) )
+                        if( Creature* ball = me->SummonCreature((i % 2) ? NPC_CONCENTRATED_DARK : NPC_CONCENTRATED_LIGHT, Locs[LOC_CENTER].GetPositionX() + cos(angle) * 47.0f, Locs[LOC_CENTER].GetPositionY() + std::sin(angle) * 47.0f, Locs[LOC_CENTER].GetPositionZ() + 1.5f, 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1500) )
                             boss_twin_valkyrAI::JustSummoned(ball);
                     }
 
@@ -383,7 +383,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                     }
 
                     /*
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true, essenceId) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, essenceId) )
                         me->CastSpell(target, me->GetEntry()==NPC_LIGHTBANE ? SPELL_LIGHT_TOUCH : SPELL_DARK_TOUCH, false);
                     events.RepeatEvent(urand(45000,50000));
                     */
@@ -509,7 +509,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
         }
     }
 
-    void EnterEvadeMode() override
+    void EnterEvadeMode(EvadeReason /* why */) override
     {
         if( pInstance )
             pInstance->SetData(TYPE_FAILED, 0);
@@ -718,7 +718,7 @@ public:
         void MoveToNextPoint()
         {
             float angle = rand_norm() * 2 * M_PI;
-            me->GetMotionMaster()->MovePoint(0, Locs[LOC_CENTER].GetPositionX() + cos(angle) * 47.0f, Locs[LOC_CENTER].GetPositionY() + sin(angle) * 47.0f, me->GetPositionZ());
+            me->GetMotionMaster()->MovePoint(0, Locs[LOC_CENTER].GetPositionX() + cos(angle) * 47.0f, Locs[LOC_CENTER].GetPositionY() + std::sin(angle) * 47.0f, me->GetPositionZ());
         }
 
         void UpdateAI(uint32  /*diff*/) override
@@ -747,7 +747,7 @@ public:
             if( !count || !GetOwner() )
                 return;
 
-            if( const SpellInfo* se = GetAura()->GetSpellInfo() )
+            if( SpellInfo const* se = GetAura()->GetSpellInfo() )
                 if( Unit* owner = GetOwner()->ToUnit() )
                 {
                     uint32 auraId = 0;
@@ -895,15 +895,15 @@ public:
         {
             if (Unit* target = GetTarget())
                 if (target->GetDisplayId() != 11686)
-                    if (Creature* me = target->ToCreature())
-                        if (Player* p = me->SelectNearestPlayer(2.75f))
-                            if (me->GetExactDist2d(p) <= 2.75f)
+                    if (Creature* creature = target->ToCreature())
+                        if (Player* player = creature->SelectNearestPlayer(2.75f))
+                            if (creature->GetExactDist2d(player) <= 2.75f)
                             {
-                                me->AI()->DoAction(1); // despawning = true;
-                                me->GetMotionMaster()->MoveIdle();
-                                me->CastSpell((Unit*)nullptr, me->GetEntry() == NPC_CONCENTRATED_LIGHT ? SPELL_UNLEASHED_LIGHT : SPELL_UNLEASHED_DARK, false);
-                                me->SetDisplayId(11686);
-                                me->DespawnOrUnsummon(1500);
+                                creature->AI()->DoAction(1); // despawning = true;
+                                creature->GetMotionMaster()->MoveIdle();
+                                creature->CastSpell((Unit*)nullptr, creature->GetEntry() == NPC_CONCENTRATED_LIGHT ? SPELL_UNLEASHED_LIGHT : SPELL_UNLEASHED_DARK, false);
+                                creature->SetDisplayId(11686);
+                                creature->DespawnOrUnsummon(1500);
                             }
         }
 

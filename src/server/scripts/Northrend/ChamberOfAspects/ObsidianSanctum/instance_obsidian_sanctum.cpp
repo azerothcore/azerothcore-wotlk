@@ -16,10 +16,10 @@
  */
 
 #include "CreatureAIImpl.h"
-#include "obsidian_sanctum.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "obsidian_sanctum.h"
 
 class instance_obsidian_sanctum : public InstanceMapScript
 {

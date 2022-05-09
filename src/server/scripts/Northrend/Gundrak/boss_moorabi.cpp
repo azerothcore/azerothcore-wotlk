@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "gundrak.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "gundrak.h"
 
 enum eSpells
 {
@@ -93,7 +93,7 @@ public:
             events.ScheduleEvent(EVENT_TRANSFORMATION, 12000);
         }
 
-        void SpellHitTarget(Unit*  /*caster*/, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit*  /*caster*/, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_TRANSFORMATION)
             {

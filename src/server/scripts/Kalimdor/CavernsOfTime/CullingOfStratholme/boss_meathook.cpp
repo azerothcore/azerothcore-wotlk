@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "culling_of_stratholme.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "culling_of_stratholme.h"
 
 enum Spells
 {
@@ -105,7 +105,7 @@ public:
                     events.RepeatEvent(20000);
                     break;
                 case EVENT_SPELL_CONSTRICTING_CHAINS:
-                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_BOTTOMAGGRO, 0, 50.0f, true))
+                    if (Unit* pTarget = SelectTarget(SelectTargetMethod::MinThreat, 0, 50.0f, true))
                         me->CastSpell(pTarget, DUNGEON_MODE(SPELL_CONSTRICTING_CHAINS_N, SPELL_CONSTRICTING_CHAINS_H), false);
                     events.RepeatEvent(14000);
                     break;

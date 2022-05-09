@@ -15,14 +15,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-class PlayerTaxi
+#ifndef __PLAYER_TAXI_H__
+#define __PLAYER_TAXI_H__
+
+#include "DBCStructure.h"
+#include <vector>
+
+class ByteBuffer;
+
+class AC_GAME_API PlayerTaxi
 {
 public:
     PlayerTaxi();
     ~PlayerTaxi() = default;
+
     // Nodes
     void InitTaxiNodesForLevel(uint32 race, uint32 chrClass, uint8 level);
-    void LoadTaxiMask(std::string const& data);
+    bool LoadTaxiMask(std::string_view data);
 
     [[nodiscard]] bool IsTaximaskNodeKnown(uint32 nodeidx) const
     {
@@ -30,6 +39,7 @@ public:
         uint32 submask = 1 << ((nodeidx - 1) % 32);
         return (m_taximask[field] & submask) == submask;
     }
+
     bool SetTaximaskNode(uint32 nodeidx)
     {
         uint8  field   = uint8((nodeidx - 1) / 32);
@@ -42,6 +52,7 @@ public:
         else
             return false;
     }
+
     void AppendTaximaskTo(ByteBuffer& data, bool all);
 
     // Destinations
@@ -72,3 +83,5 @@ private:
     std::vector<uint32> m_TaxiDestinations;
     uint32 _taxiSegment;
 };
+
+#endif

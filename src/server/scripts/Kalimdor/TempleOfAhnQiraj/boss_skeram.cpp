@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "temple_of_ahnqiraj.h"
 
@@ -68,9 +68,9 @@ public:
             Talk(SAY_SLAY);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
             if (me->IsSummon())
                 ((TempSummon*)me)->UnSummon();
         }
@@ -96,7 +96,7 @@ public:
             if (_flag & (1 << 7))
                 _flag = 0;
 
-            if (Unit* Target = SelectTarget(SELECT_TARGET_RANDOM))
+            if (Unit* Target = SelectTarget(SelectTargetMethod::Random))
                 creature->AI()->AttackStart(Target);
 
             float ImageHealthPct;
@@ -151,7 +151,7 @@ public:
                     case EVENT_FULLFILMENT:
                         /// @todo For some weird reason boss does not cast this
                         // Spell actually works, tested in duel
-                        DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true), SPELL_TRUE_FULFILLMENT, true);
+                        DoCast(SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true), SPELL_TRUE_FULFILLMENT, true);
                         events.ScheduleEvent(EVENT_FULLFILMENT, urand(20000, 30000));
                         break;
                     case EVENT_BLINK:

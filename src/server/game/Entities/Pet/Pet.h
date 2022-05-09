@@ -21,29 +21,14 @@
 #include "PetDefines.h"
 #include "TemporarySummon.h"
 
-#define PET_FOCUS_REGEN_INTERVAL    4 * IN_MILLISECONDS
-#define PET_LOSE_HAPPINES_INTERVAL  7500
-#define HAPPINESS_LEVEL_SIZE        333000
+constexpr auto PET_LOSE_HAPPINES_INTERVAL = 7500;
+constexpr auto HAPPINESS_LEVEL_SIZE = 333000;
 
 struct PetSpell
 {
     ActiveStates active;
     PetSpellState state;
     PetSpellType type;
-};
-
-class AsynchPetSummon
-{
-public:
-    AsynchPetSummon(uint32 entry, Position position, PetType petType, uint32 duration, uint32 createdBySpell, ObjectGuid casterGUID) :
-        m_entry(entry), pos(position), m_petType(petType),
-        m_duration(duration), m_createdBySpell(createdBySpell), m_casterGUID(casterGUID) { }
-
-    uint32 m_entry;
-    Position pos;
-    PetType m_petType;
-    uint32 m_duration, m_createdBySpell;
-    ObjectGuid m_casterGUID;
 };
 
 typedef std::unordered_map<uint32, PetSpell> PetSpellMap;
@@ -55,7 +40,7 @@ class Pet : public Guardian
 {
 public:
     explicit Pet(Player* owner, PetType type = MAX_PET_TYPE);
-    ~Pet() override;
+    ~Pet() override = default;
 
     void AddToWorld() override;
     void RemoveFromWorld() override;
@@ -65,7 +50,7 @@ public:
     PetType getPetType() const { return m_petType; }
     void setPetType(PetType type) { m_petType = type; }
     bool isControlled() const { return getPetType() == SUMMON_PET || getPetType() == HUNTER_PET; }
-    bool isTemporarySummoned() const { return m_duration > 0; }
+    bool isTemporarySummoned() const { return m_duration > 0s; }
 
     bool IsPermanentPetFor(Player* owner) const;              // pet have tab in character windows and set UNIT_FIELD_PETNUMBER
 
@@ -73,10 +58,11 @@ public:
     bool CreateBaseAtCreature(Creature* creature);
     bool CreateBaseAtCreatureInfo(CreatureTemplate const* cinfo, Unit* owner);
     bool CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phaseMask);
-    static SpellCastResult TryLoadFromDB(Player* owner, bool current = false, PetType mandatoryPetType = MAX_PET_TYPE, bool checkDead = false);
-    static bool LoadPetFromDB(Player* owner, uint8 asynchLoadType, uint32 petentry = 0, uint32 petnumber = 0, bool current = false, AsynchPetSummon* info = nullptr);
-    bool isBeingLoaded() const override { return m_loading;}
-    void SavePetToDB(PetSaveMode mode, bool logout);
+    static std::pair<PetStable::PetInfo const*, PetSaveMode> GetLoadPetInfo(PetStable const& stable, uint32 petEntry, uint32 petnumber, bool current);
+    bool LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool current, uint32 healthPct = 0);
+    bool isBeingLoaded() const override { return m_loading; }
+    void SavePetToDB(PetSaveMode mode);
+    void FillPetInfo(PetStable::PetInfo* petInfo) const;
     void Remove(PetSaveMode mode, bool returnreagent = false);
     static void DeleteFromDB(ObjectGuid::LowType guidlow);
 
@@ -99,19 +85,8 @@ public:
     void SynchronizeLevelWithOwner();
     bool HaveInDiet(ItemTemplate const* item) const;
     uint32 GetCurrentFoodBenefitLevel(uint32 itemlevel) const;
-    void SetDuration(int32 dur) { m_duration = dur; }
-    int32 GetDuration() const { return m_duration; }
-
-    /*
-    bool UpdateStats(Stats stat);
-    bool UpdateAllStats();
-    void UpdateResistances(uint32 school);
-    void UpdateArmor();
-    void UpdateMaxHealth();
-    void UpdateMaxPower(Powers power);
-    void UpdateAttackPowerAndDamage(bool ranged = false);
-    void UpdateDamagePhysical(WeaponAttackType attType);
-    */
+    void SetDuration(Milliseconds dur) { m_duration = dur; }
+    Milliseconds GetDuration() const { return m_duration; }
 
     void ToggleAutocast(SpellInfo const* spellInfo, bool apply);
 
@@ -124,8 +99,8 @@ public:
     void ClearCastWhenWillAvailable();
     void RemoveSpellCooldown(uint32 spell_id, bool update /* = false */);
 
-    void _SaveSpellCooldowns(CharacterDatabaseTransaction trans, bool logout);
-    void _SaveAuras(CharacterDatabaseTransaction trans, bool logout);
+    void _SaveSpellCooldowns(CharacterDatabaseTransaction trans);
+    void _SaveAuras(CharacterDatabaseTransaction trans);
     void _SaveSpells(CharacterDatabaseTransaction trans);
 
     void _LoadSpellCooldowns(PreparedQueryResult result);
@@ -139,6 +114,7 @@ public:
     bool unlearnSpell(uint32 spell_id, bool learn_prev, bool clear_ab = true);
     bool removeSpell(uint32 spell_id, bool learn_prev, bool clear_ab = true);
     void CleanupActionBar();
+    std::string GenerateActionBarData() const;
 
     PetSpellMap     m_spells;
     AutoSpellList   m_autospells;
@@ -159,33 +135,29 @@ public:
     void SetAuraUpdateMaskForRaid(uint8 slot) { m_auraRaidUpdateMask |= (uint64(1) << slot); }
     void ResetAuraUpdateMaskForRaid() { m_auraRaidUpdateMask = 0; }
 
-    DeclinedName const* GetDeclinedNames() const { return m_declinedname; }
+    DeclinedName const* GetDeclinedNames() const { return m_declinedname.get(); }
 
-    bool    m_removed;                                  // prevent overwrite pet state in DB at next Pet::Update if pet already removed(saved)
+    bool m_removed; // prevent overwrite pet state in DB at next Pet::Update if pet already removed(saved)
 
-    Player* GetOwner() const { return m_owner; }
+    Player* GetOwner() const;
     void SetLoading(bool load) { m_loading = load; }
-    void HandleAsynchLoadSucceed();
-    static void HandleAsynchLoadFailed(AsynchPetSummon* info, Player* player, uint8 asynchLoadType, uint8 loadResult);
-    uint8 GetAsynchLoadType() const { return asynchLoadType; }
-    void SetAsynchLoadType(uint8 type) { asynchLoadType = type; }
+
+    [[nodiscard]] bool HasTempSpell() const { return m_tempspell != 0; }
 protected:
     Player* m_owner;
     int32   m_happinessTimer;
     PetType m_petType;
-    int32   m_duration;                                 // time until unsummon (used mostly for summoned guardians and not used for controlled pets)
+    Milliseconds m_duration; // time until unsummon (used mostly for summoned guardians and not used for controlled pets)
     uint64  m_auraRaidUpdateMask;
     bool    m_loading;
-    int32   m_petRegenTimer;                            // xinef: used for focus regeneration
+    Milliseconds m_petRegenTimer; // xinef: used for focus regeneration
 
-    DeclinedName* m_declinedname;
+    std::unique_ptr<DeclinedName> m_declinedname;
 
     Unit*   m_tempspellTarget;
     Unit*   m_tempoldTarget;
     bool    m_tempspellIsPositive;
     uint32  m_tempspell;
-
-    uint8 asynchLoadType;
 
 private:
     void SaveToDB(uint32, uint8, uint32) override                // override of Creature::SaveToDB     - must not be called

@@ -18,8 +18,8 @@
 #ifndef TRINITYSERVER_SPLINE_H
 #define TRINITYSERVER_SPLINE_H
 
-#include "MovementTypedefs.h"
 #include "Errors.h"
+#include "MovementTypedefs.h"
 #include <G3D/Vector3.h>
 #include <limits>
 
@@ -89,7 +89,7 @@ namespace Movement
         void UninitializedSplineInitMethod(Vector3 const*, index_type, bool, index_type) { ABORT(); }
 
     public:
-        explicit SplineBase()  {}
+        explicit SplineBase()  = default;
 
         /** Caclulates the position for given segment Idx, and percent of segment length t
             @param t - percent of segment length, assumes that t in range [0, 1]

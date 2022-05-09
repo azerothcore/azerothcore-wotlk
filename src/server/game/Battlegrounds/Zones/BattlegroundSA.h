@@ -19,17 +19,7 @@
 #define __BATTLEGROUNDSA_H
 
 #include "Battleground.h"
-
-struct BattlegroundSAScore : public BattlegroundScore
-{
-    BattlegroundSAScore(Player* player) : BattlegroundScore(player), demolishers_destroyed(0), gates_destroyed(0) { }
-    ~BattlegroundSAScore() override { }
-    uint8 demolishers_destroyed;
-    uint8 gates_destroyed;
-
-    uint32 GetAttr1() const final { return demolishers_destroyed; }
-    uint32 GetAttr2() const final { return gates_destroyed; }
-};
+#include "BattlegroundScore.h"
 
 #define BG_SA_FLAG_AMOUNT           3
 #define BG_SA_DEMOLISHER_AMOUNT     4
@@ -50,13 +40,6 @@ enum BG_SA_GateState
     BG_SA_GATE_OK           = 1,
     BG_SA_GATE_DAMAGED      = 2,
     BG_SA_GATE_DESTROYED    = 3
-};
-
-enum BG_SA_Timers
-{
-    BG_SA_BOAT_START    =  60 * IN_MILLISECONDS,
-    BG_SA_WARMUPLENGTH  = 120 * IN_MILLISECONDS,
-    BG_SA_ROUNDLENGTH   = 600 * IN_MILLISECONDS
 };
 
 enum BG_SA_WorldStates
@@ -412,10 +395,19 @@ float const BG_SA_GYOrientation[BG_SA_MAX_GY] =
     6.148f, // defender last GY
 };
 
+enum BG_SA_BroadcastTexts
+{
+    BG_SA_TEXT_ALLIANCE_CAPTURED_TITAN_PORTAL = 28944,
+    BG_SA_TEXT_HORDE_CAPTURED_TITAN_PORTAL = 28945,
+
+    BG_SA_TEXT_ROUND_TWO_START_ONE_MINUTE = 29448,
+    BG_SA_TEXT_ROUND_TWO_START_HALF_MINUTE = 29449
+};
+
 struct BG_SA_RoundScore
 {
     TeamId winner;
-    uint32 time;
+    Milliseconds time;
 };
 
 const float SOTADefPortalDest[5][4] =
@@ -427,8 +419,40 @@ const float SOTADefPortalDest[5][4] =
     { 1193.857f, 69.9f, 58.046f, 5.7245f },
 };
 
+struct BattlegroundSAScore final : public BattlegroundScore
+{
+    friend class BattlegroundSA;
+
+protected:
+    BattlegroundSAScore(ObjectGuid playerGuid) : BattlegroundScore(playerGuid) { }
+
+    void UpdateScore(uint32 type, uint32 value) override
+    {
+        switch (type)
+        {
+        case SCORE_DESTROYED_DEMOLISHER:
+            DemolishersDestroyed += value;
+            break;
+        case SCORE_DESTROYED_WALL:
+            GatesDestroyed += value;
+            break;
+        default:
+            BattlegroundScore::UpdateScore(type, value);
+            break;
+        }
+    }
+
+    void BuildObjectivesBlock(WorldPacket& data) final;
+
+    uint32 GetAttr1() const override { return DemolishersDestroyed; }
+    uint32 GetAttr2() const override { return GatesDestroyed; }
+
+    uint32 DemolishersDestroyed = 0;
+    uint32 GatesDestroyed = 0;
+};
+
 /// Class for manage Strand of Ancient battleground
-class BattlegroundSA : public Battleground
+class AC_GAME_API BattlegroundSA : public Battleground
 {
 public:
     BattlegroundSA();
@@ -497,10 +521,6 @@ public:
     /// CAlled when a player leave battleground
     void RemovePlayer(Player* player) override;
     void HandleAreaTrigger(Player* player, uint32 trigger) override;
-
-    /* Scorekeeping */
-    /// Update score board
-    void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
 
     // Teleporters
     void DefendersPortalTeleport(GameObject* portal, Player* plr);
@@ -598,9 +618,9 @@ private:
     /// Id of attacker team
     TeamId Attackers;
     /// Totale elapsed time of current round
-    uint32 TotalTime;
+    Milliseconds TotalTime;
     /// Max time of round
-    uint32 EndRoundTimer;
+    Milliseconds EndRoundTimer;
     /// For know if boats has start moving or not yet
     bool ShipsStarted;
     /// Status of each gate (Destroy/Damage/Intact)
@@ -627,6 +647,6 @@ private:
     bool _relicClicked;
 
     // Achievement: Not Even a Scratch
-    bool _notEvenAScratch[BG_TEAMS_COUNT];
+    bool _notEvenAScratch[PVP_TEAMS_COUNT];
 };
 #endif

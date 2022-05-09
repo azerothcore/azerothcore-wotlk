@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Creature.h"
 #include "PassiveAI.h"
+#include "Creature.h"
 #include "TemporarySummon.h"
 
 PassiveAI::PassiveAI(Creature* c) : CreatureAI(c) { me->SetReactState(REACT_PASSIVE); }
@@ -26,7 +26,7 @@ NullCreatureAI::NullCreatureAI(Creature* c) : CreatureAI(c) { me->SetReactState(
 void PassiveAI::UpdateAI(uint32)
 {
     if (me->IsInCombat() && me->getAttackers().empty())
-        EnterEvadeMode();
+        EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
 }
 
 void PossessedAI::AttackStart(Unit* target)
@@ -48,14 +48,14 @@ void PossessedAI::UpdateAI(uint32 /*diff*/)
 void PossessedAI::JustDied(Unit* /*u*/)
 {
     // We died while possessed, disable our loot
-    me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+    me->RemoveDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
 }
 
 void PossessedAI::KilledUnit(Unit*  /*victim*/)
 {
     // We killed a creature, disable victim's loot
     //if (victim->GetTypeId() == TYPEID_UNIT)
-    //    victim->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+    //    victim->RemoveDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
 }
 
 void CritterAI::DamageTaken(Unit*, uint32&, DamageEffectType, SpellSchoolMask)
@@ -66,11 +66,11 @@ void CritterAI::DamageTaken(Unit*, uint32&, DamageEffectType, SpellSchoolMask)
     _combatTimer = 1;
 }
 
-void CritterAI::EnterEvadeMode()
+void CritterAI::EnterEvadeMode(EvadeReason why)
 {
     if (me->HasUnitState(UNIT_STATE_FLEEING))
         me->SetControlled(false, UNIT_STATE_FLEEING);
-    CreatureAI::EnterEvadeMode();
+    CreatureAI::EnterEvadeMode(why);
     _combatTimer = 0;
 }
 
@@ -80,7 +80,7 @@ void CritterAI::UpdateAI(uint32 diff)
     {
         _combatTimer += diff;
         if (_combatTimer >= 5000)
-            EnterEvadeMode();
+            EnterEvadeMode(EVADE_REASON_OTHER);
     }
 }
 

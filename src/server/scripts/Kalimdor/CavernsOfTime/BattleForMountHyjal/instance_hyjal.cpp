@@ -23,11 +23,11 @@ SDCategory: Caverns of Time, Mount Hyjal
 EndScriptData */
 
 #include "Chat.h"
-#include "hyjal_trash.h"
 #include "InstanceScript.h"
 #include "Opcodes.h"
 #include "ScriptMgr.h"
 #include "WorldPacket.h"
+#include "hyjal_trash.h"
 
 /* Battle of Mount Hyjal encounters:
 0 - Rage Winterchill event
@@ -189,7 +189,7 @@ public:
                                 {
                                     unit->SetVisible(false);
                                     Map::PlayerList const& PlayerList = map->GetPlayers();
-                                    if (PlayerList.isEmpty())
+                                    if (PlayerList.IsEmpty())
                                         return;
 
                                     for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
@@ -253,7 +253,7 @@ public:
                     break;
             }
 
-            // TC_LOG_DEBUG("scripts", "Instance Hyjal: Instance data updated for event %u (Data=%u)", type, data);
+            // LOG_DEBUG("scripts", "Instance Hyjal: Instance data updated for event {} (Data={})", type, data);
 
             if (data == DONE)
             {

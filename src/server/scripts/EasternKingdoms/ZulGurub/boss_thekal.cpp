@@ -22,8 +22,8 @@ SDComment: Almost finished.
 SDCategory: Zul'Gurub
 EndScriptData */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "zulgurub.h"
 
 enum Says
@@ -146,7 +146,7 @@ public:
                             DoCast(me, SPELL_TIGER_FORM); // SPELL_AURA_TRANSFORM
                             me->SetObjectScale(2.00f);
                             me->SetStandState(UNIT_STAND_STATE_STAND);
-                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                             /*
                             const CreatureTemplate* cinfo = me->GetCreatureTemplate();
                             me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, (cinfo->mindmg +((cinfo->mindmg/100) * 40)));
@@ -174,8 +174,8 @@ public:
                                 if (Unit* pLorKhan = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_LORKHAN)))
                                 {
                                     pLorKhan->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-                                    pLorKhan->setFaction(14);
-                                    pLorKhan->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                                    pLorKhan->SetFaction(FACTION_MONSTER);
+                                    pLorKhan->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                                     pLorKhan->SetFullHealth();
                                     instance->SetData(DATA_LORKHAN, DONE);
                                 }
@@ -187,8 +187,8 @@ public:
                                 if (Unit* pZath = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_ZATH)))
                                 {
                                     pZath->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-                                    pZath->setFaction(14);
-                                    pZath->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                                    pZath->SetFaction(FACTION_MONSTER);
+                                    pZath->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                                     pZath->SetFullHealth();
                                     instance->SetBossState(DATA_ZATH, DONE);
                                 }
@@ -205,7 +205,7 @@ public:
                         events.ScheduleEvent(EVENT_FORCEPUNCH, urand(16000, 21000), 0, PHASE_TWO);
                         break;
                     case EVENT_CHARGE:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         {
                             DoCast(target, SPELL_CHARGE);
                             DoResetThreat();
@@ -237,7 +237,7 @@ public:
                     me->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
                     me->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
                     me->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->SetStandState(UNIT_STAND_STATE_SLEEP);
                     me->AttackStop();
                     instance->SetBossState(DATA_THEKAL, SPECIAL);
@@ -290,7 +290,7 @@ public:
             instance->SetBossState(DATA_LORKHAN, NOT_STARTED);
 
             me->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -360,8 +360,8 @@ public:
                     if (Unit* pThekal = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_THEKAL)))
                     {
                         pThekal->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-                        pThekal->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        pThekal->setFaction(14);
+                        pThekal->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                        pThekal->SetFaction(FACTION_MONSTER);
                         pThekal->SetFullHealth();
                     }
                 }
@@ -372,8 +372,8 @@ public:
                     if (Unit* pZath = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_ZATH)))
                     {
                         pZath->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-                        pZath->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        pZath->setFaction(14);
+                        pZath->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                        pZath->SetFaction(FACTION_MONSTER);
                         pZath->SetFullHealth();
                     }
                 }
@@ -387,9 +387,9 @@ public:
                 me->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
                 me->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
                 me->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetStandState(UNIT_STAND_STATE_SLEEP);
-                me->setFaction(35);
+                me->SetFaction(FACTION_FRIENDLY);
                 me->AttackStop();
 
                 instance->SetBossState(DATA_LORKHAN, SPECIAL);
@@ -448,7 +448,7 @@ public:
             instance->SetBossState(DATA_ZATH, NOT_STARTED);
 
             me->SetStandState(UNIT_STAND_STATE_STAND);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -513,8 +513,8 @@ public:
                     if (Unit* pLorKhan = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_LORKHAN)))
                     {
                         pLorKhan->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-                        pLorKhan->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        pLorKhan->setFaction(14);
+                        pLorKhan->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                        pLorKhan->SetFaction(FACTION_MONSTER);
                         pLorKhan->SetFullHealth();
                     }
                 }
@@ -525,8 +525,8 @@ public:
                     if (Unit* pThekal = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_THEKAL)))
                     {
                         pThekal->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-                        pThekal->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        pThekal->setFaction(14);
+                        pThekal->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                        pThekal->SetFaction(FACTION_MONSTER);
                         pThekal->SetFullHealth();
                     }
                 }
@@ -540,9 +540,9 @@ public:
                 me->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
                 me->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
                 me->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetStandState(UNIT_STAND_STATE_SLEEP);
-                me->setFaction(35);
+                me->SetFaction(FACTION_FRIENDLY);
                 me->AttackStop();
 
                 instance->SetBossState(DATA_ZATH, SPECIAL);

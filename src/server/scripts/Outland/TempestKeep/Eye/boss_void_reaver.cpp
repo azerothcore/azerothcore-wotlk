@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "the_eye.h"
 
 enum voidReaver
@@ -102,9 +102,9 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_POUNDING, 15000);
                     break;
                 case EVENT_SPELL_ARCANEORB:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, -18.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, -18.0f, true))
                         me->CastSpell(target, SPELL_ARCANE_ORB, false);
-                    else if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 20.0f, true))
+                    else if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 20.0f, true))
                         me->CastSpell(target, SPELL_ARCANE_ORB, false);
                     events.ScheduleEvent(EVENT_SPELL_ARCANEORB, 4000);
                     break;
@@ -115,7 +115,6 @@ public:
             }
 
             DoMeleeAttackIfReady();
-            EnterEvadeIfOutOfCombatArea();
         }
 
         bool CheckEvadeIfOutOfCombatArea() const override

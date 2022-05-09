@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,15 +12,15 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.areatrigger_scripts
+-- Dumpar struktur för tabell acore_world.areatrigger_scripts
 DROP TABLE IF EXISTS `areatrigger_scripts`;
 CREATE TABLE IF NOT EXISTS `areatrigger_scripts` (
-  `entry` mediumint(9) NOT NULL,
+  `entry` MEDIUMINT NOT NULL,
   `ScriptName` char(64) NOT NULL,
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.areatrigger_scripts: 122 rows
+-- Dumpar data för tabell acore_world.areatrigger_scripts: 127 rows
 DELETE FROM `areatrigger_scripts`;
 /*!40000 ALTER TABLE `areatrigger_scripts` DISABLE KEYS */;
 INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES
@@ -145,7 +145,12 @@ INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES
 	(5718, 'at_frozen_throne_teleport'),
 	(5729, 'at_icc_start_blood_quickening'),
 	(5867, 'at_baltharus_plateau'),
-	(3626, 'SmartTrigger');
+	(3626, 'SmartTrigger'),
+	(3957, 'at_zulgurub_entrance_speech'),
+	(2066, 'at_trigger_the_beast_movement'),
+	(2067, 'at_the_beast_room'),
+	(3960, 'at_zulgurub_temple_speech'),
+	(3847, 'at_orb_of_command');
 /*!40000 ALTER TABLE `areatrigger_scripts` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

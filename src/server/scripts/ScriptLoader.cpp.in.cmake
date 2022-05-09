@@ -24,10 +24,6 @@
 #include <vector>
 #include <string>
 
-// Add deprecated api loaders include
-@AC_SCRIPTS_INCLUDES@
-// Add module scripts define
-@AC_MODULE_LIST@
 // Add default scripts include
 @ACORE_SCRIPTS_FORWARD_DECL@
 #ifdef ACORE_IS_DYNAMIC_SCRIPTLOADER
@@ -56,10 +52,8 @@ AC_SCRIPT_API char const* GetScriptModule()
 /// Exposed in script modules to register all scripts to the ScriptMgr.
 AC_SCRIPT_API void AddScripts()
 {
-    // Default scripts and modules
-@ACORE_SCRIPTS_INVOKE@
-    // Deprecated api modules
-@AC_SCRIPTS_LIST@}
+    // Default scripts
+@ACORE_SCRIPTS_INVOKE@}
 
 /// Exposed in script modules to get the build directive of the module.
 AC_SCRIPT_API char const* GetBuildDirective()

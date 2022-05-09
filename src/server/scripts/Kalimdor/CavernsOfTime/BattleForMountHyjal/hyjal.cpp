@@ -28,11 +28,11 @@ npc_thrall
 npc_tyrande_whisperwind
 EndContentData */
 
-#include "hyjalAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
+#include "hyjalAI.h"
 
 #define GOSSIP_ITEM_BEGIN_ALLY      "My companions and I are with you, Lady Proudmoore."
 #define GOSSIP_ITEM_ANETHERON       "We are ready for whatever Archimonde might send our way, Lady Proudmoore."
@@ -71,7 +71,7 @@ public:
                 break;
             case GOSSIP_ACTION_INFO_DEF:
                 ai->Debug = !ai->Debug;
-                //TC_LOG_DEBUG("scripts", "HyjalAI - Debug mode has been toggled");
+                //LOG_DEBUG("scripts", "HyjalAI - Debug mode has been toggled");
                 break;
         }
         return true;
@@ -150,7 +150,7 @@ public:
                 break;
             case GOSSIP_ACTION_INFO_DEF:
                 ai->Debug = !ai->Debug;
-                //TC_LOG_DEBUG("scripts", "HyjalAI - Debug mode has been toggled");
+                //LOG_DEBUG("scripts", "HyjalAI - Debug mode has been toggled");
                 break;
         }
         return true;

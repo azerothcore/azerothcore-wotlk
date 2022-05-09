@@ -28,8 +28,8 @@ EndScriptData */
 
 DoorData const doorData[] =
 {
-    { GO_FORCEFIELD, DATA_ARLOKK, DOOR_TYPE_ROOM, BOUNDARY_NONE },
-    { 0,             0,           DOOR_TYPE_ROOM, BOUNDARY_NONE } // END
+    { GO_FORCEFIELD, DATA_ARLOKK, DOOR_TYPE_ROOM },
+    { 0,             0,           DOOR_TYPE_ROOM } // END
 };
 
 class instance_zulgurub : public InstanceMapScript
@@ -43,12 +43,6 @@ public:
         {
             SetBossNumber(EncounterCount);
             LoadDoorData(doorData);
-        }
-
-        bool IsEncounterInProgress() const override
-        {
-            // not active in Zul'Gurub
-            return false;
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -73,6 +67,9 @@ public:
                 case NPC_ARLOKK:
                     _arlokkGUID = creature->GetGUID();
                     break;
+                case NPC_HAKKAR:
+                    _hakkarGUID = creature->GetGUID();
+                    break;
             }
         }
 
@@ -86,9 +83,9 @@ public:
                 case GO_GONG_OF_BETHEKK:
                     _goGongOfBethekkGUID = go->GetGUID();
                     if (GetBossState(DATA_ARLOKK) == DONE)
-                        go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     else
-                        go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
                 default:
                     break;
@@ -123,6 +120,8 @@ public:
                     return _arlokkGUID;
                 case GO_GONG_OF_BETHEKK:
                     return _goGongOfBethekkGUID;
+                case DATA_HAKKAR:
+                    return _hakkarGUID;
             }
 
             return ObjectGuid::Empty;
@@ -181,6 +180,7 @@ public:
         ObjectGuid _vilebranchSpeakerGUID;
         ObjectGuid _arlokkGUID;
         ObjectGuid _goGongOfBethekkGUID;
+        ObjectGuid _hakkarGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

@@ -17,8 +17,8 @@
 
 #include "InstanceScript.h"
 #include "ObjectMgr.h"
-#include "razorfen_downs.h"
 #include "ScriptMgr.h"
+#include "razorfen_downs.h"
 
 class instance_razorfen_downs : public InstanceMapScript
 {
@@ -49,7 +49,7 @@ public:
                     break;
                 case GO_GONG:
                     if (_gongPhase == DONE)
-                        gameobject->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        gameobject->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
             }
         }

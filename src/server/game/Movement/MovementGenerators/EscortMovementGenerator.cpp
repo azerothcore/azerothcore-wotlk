@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "EscortMovementGenerator.h"
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "Errors.h"
-#include "EscortMovementGenerator.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "Player.h"
@@ -50,7 +50,7 @@ bool EscortMovementGenerator<T>::DoUpdate(T* unit, uint32  /*diff*/)
     if (!unit)
         return false;
 
-    if (unit->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED))
+    if (unit->HasUnitState(UNIT_STATE_NOT_MOVE) || unit->IsMovementPreventedByCasting())
     {
         unit->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
         return true;

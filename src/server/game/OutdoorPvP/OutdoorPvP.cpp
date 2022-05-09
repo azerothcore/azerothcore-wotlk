@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "OutdoorPvP.h"
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
@@ -23,7 +24,6 @@
 #include "MapMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
-#include "OutdoorPvP.h"
 #include "OutdoorPvPMgr.h"
 #include "WorldPacket.h"
 
@@ -84,7 +84,7 @@ void OPvPCapturePoint::AddCre(uint32 type, ObjectGuid::LowType guid, uint32 entr
         const CreatureData* data = sObjectMgr->GetCreatureData(guid);
         if (!data)
             return;
-        entry = data->id;
+        entry = data->id1;
     }
     m_Creatures[type] = guid;
     m_CreatureTypes[m_Creatures[type]] = type;
@@ -114,13 +114,13 @@ bool OPvPCapturePoint::AddCreature(uint32 type, uint32 entry, uint32 map, float 
 
 bool OPvPCapturePoint::SetCapturePointData(uint32 entry, uint32 map, float x, float y, float z, float o, float rotation0, float rotation1, float rotation2, float rotation3)
 {
-    LOG_DEBUG("outdoorpvp", "Creating capture point %u", entry);
+    LOG_DEBUG("outdoorpvp", "Creating capture point {}", entry);
 
     // check info existence
     GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(entry);
     if (!goinfo || goinfo->type != GAMEOBJECT_TYPE_CAPTURE_POINT)
     {
-        LOG_ERROR("outdoorpvp", "OutdoorPvP: GO %u is not capture point!", entry);
+        LOG_ERROR("outdoorpvp", "OutdoorPvP: GO {} is not capture point!", entry);
         return false;
     }
 
@@ -141,7 +141,7 @@ bool OPvPCapturePoint::DelCreature(uint32 type)
     ObjectGuid::LowType spawnId = m_Creatures[type];
     if (!spawnId)
     {
-        LOG_DEBUG("outdoorpvp", "opvp creature type %u was already deleted", type);
+        LOG_DEBUG("outdoorpvp", "opvp creature type {} was already deleted", type);
         return false;
     }
 
@@ -156,7 +156,7 @@ bool OPvPCapturePoint::DelCreature(uint32 type)
         c->RemoveCorpse();
         c->AddObjectToRemoveList();
     }
-    LOG_DEBUG("outdoorpvp", "deleting opvp creature type %u", type);
+    LOG_DEBUG("outdoorpvp", "deleting opvp creature type {}", type);
     // explicit removal from map
     // beats me why this is needed, but with the recent removal "cleanup" some creatures stay in the map if "properly" deleted
     // so this is a big fat workaround, if AddObjectToRemoveList and DoDelayedMovesAndRemoves worked correctly, this wouldn't be needed
@@ -164,9 +164,9 @@ bool OPvPCapturePoint::DelCreature(uint32 type)
     //    map->Remove(cr, false);
     // delete respawn time for this creature
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CREATURE_RESPAWN);
-    stmt->setUInt32(0, spawnId);
-    stmt->setUInt16(1, m_PvP->GetMap()->GetId());
-    stmt->setUInt32(2, 0);  // instance id, always 0 for world maps
+    stmt->SetData(0, spawnId);
+    stmt->SetData(1, m_PvP->GetMap()->GetId());
+    stmt->SetData(2, 0);  // instance id, always 0 for world maps
     CharacterDatabase.Execute(stmt);
 
     sObjectMgr->DeleteCreatureData(spawnId);
@@ -266,7 +266,7 @@ void OutdoorPvP::HandlePlayerLeaveZone(Player* player, uint32 /*zone*/)
     if (!player->GetSession()->PlayerLogout())
         SendRemoveWorldStates(player);
     m_players[player->GetTeamId()].erase(player->GetGUID());
-    LOG_DEBUG("outdoorpvp", "Player %s left an outdoorpvp zone", player->GetName().c_str());
+    LOG_DEBUG("outdoorpvp", "Player {} left an outdoorpvp zone", player->GetName());
 }
 
 void OutdoorPvP::HandlePlayerResurrects(Player* /*player*/, uint32 /*zone*/)

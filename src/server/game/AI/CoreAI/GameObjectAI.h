@@ -25,12 +25,17 @@
 #include "QuestDef.h"
 #include <list>
 
-class GameObjectAI
+class GameObject;
+class Unit;
+class SpellInfo;
+
+class AC_GAME_API GameObjectAI
 {
 protected:
-    GameObject* const go;
+    GameObject* const me;
+
 public:
-    explicit GameObjectAI(GameObject* g) : go(g) {}
+    explicit GameObjectAI(GameObject* go) : me(go) {}
     virtual ~GameObjectAI() {}
 
     virtual void UpdateAI(uint32 /*diff*/) {}
@@ -58,14 +63,16 @@ public:
     virtual void OnGameEvent(bool /*start*/, uint16 /*eventId*/) {}
     virtual void OnStateChanged(uint32 /*state*/, Unit* /*unit*/) {}
     virtual void EventInform(uint32 /*eventId*/) {}
-    virtual void SpellHit(Unit* /*unit*/, const SpellInfo* /*spellInfo*/) {}
+    virtual void SpellHit(Unit* /*unit*/, SpellInfo const* /*spellInfo*/) {}
     virtual bool CanBeSeen(Player const* /*seer*/) { return true; }
+
+    virtual void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) { }
 };
 
 class NullGameObjectAI : public GameObjectAI
 {
 public:
-    explicit NullGameObjectAI(GameObject* g);
+    explicit NullGameObjectAI(GameObject* go);
 
     void UpdateAI(uint32 /*diff*/) override {}
 

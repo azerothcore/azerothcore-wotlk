@@ -19,7 +19,6 @@
 #include "AccountMgr.h"
 #include "CellImpl.h"
 #include "Common.h"
-#include "DatabaseEnv.h"
 #include "GridNotifiersImpl.h"
 #include "Language.h"
 #include "Log.h"
@@ -35,10 +34,6 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
-
 Player* ChatHandler::GetPlayer() const
 {
     return m_session ? m_session->GetPlayer() : nullptr;
@@ -52,7 +47,7 @@ char const* ChatHandler::GetAcoreString(uint32 entry) const
 bool ChatHandler::IsAvailable(uint32 securityLevel) const
 {
     // check security level only for simple  command (without child commands)
-    return m_session->GetSecurity() >= AccountTypes(securityLevel);
+    return IsConsole() ? true : m_session->GetSecurity() >= AccountTypes(securityLevel);
 }
 
 bool ChatHandler::HasLowerSecurity(Player* target, ObjectGuid guid, bool strong)
@@ -63,7 +58,7 @@ bool ChatHandler::HasLowerSecurity(Player* target, ObjectGuid guid, bool strong)
     if (target)
         target_session = target->GetSession();
     else if (guid)
-        target_account = sObjectMgr->GetPlayerAccountIdByGUID(guid.GetCounter());
+        target_account = sCharacterCache->GetCharacterAccountIdByGuid(guid);
 
     if (!target_session && !target_account)
     {
@@ -303,7 +298,7 @@ size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Languag
     return BuildChatPacket(data, chatType, language, senderGUID, receiverGUID, message, chatTag, senderName, receiverName, achievementId, gmMessage, channelName);
 }
 
-Player* ChatHandler::getSelectedPlayer()
+Player* ChatHandler::getSelectedPlayer() const
 {
     if (!m_session)
         return nullptr;
@@ -315,7 +310,7 @@ Player* ChatHandler::getSelectedPlayer()
     return ObjectAccessor::FindConnectedPlayer(selected);
 }
 
-Unit* ChatHandler::getSelectedUnit()
+Unit* ChatHandler::getSelectedUnit() const
 {
     if (!m_session)
         return nullptr;
@@ -326,7 +321,7 @@ Unit* ChatHandler::getSelectedUnit()
     return m_session->GetPlayer();
 }
 
-WorldObject* ChatHandler::getSelectedObject()
+WorldObject* ChatHandler::getSelectedObject() const
 {
     if (!m_session)
         return nullptr;
@@ -339,7 +334,7 @@ WorldObject* ChatHandler::getSelectedObject()
     return ObjectAccessor::GetUnit(*m_session->GetPlayer(), guid);
 }
 
-Creature* ChatHandler::getSelectedCreature()
+Creature* ChatHandler::getSelectedCreature() const
 {
     if (!m_session)
         return nullptr;
@@ -347,7 +342,7 @@ Creature* ChatHandler::getSelectedCreature()
     return ObjectAccessor::GetCreatureOrPetOrVehicle(*m_session->GetPlayer(), m_session->GetPlayer()->GetTarget());
 }
 
-Player* ChatHandler::getSelectedPlayerOrSelf()
+Player* ChatHandler::getSelectedPlayerOrSelf() const
 {
     if (!m_session)
         return nullptr;
@@ -477,7 +472,7 @@ char* ChatHandler::extractKeyFromLink(char* text, char const* const* linkTypes, 
     return nullptr;
 }
 
-GameObject* ChatHandler::GetNearbyGameObject()
+GameObject* ChatHandler::GetNearbyGameObject() const
 {
     if (!m_session)
         return nullptr;
@@ -633,7 +628,7 @@ ObjectGuid::LowType ChatHandler::extractLowGuidFromLink(char* text, HighGuid& gu
                 if (Player* player = ObjectAccessor::FindPlayerByName(name, false))
                     return player->GetGUID().GetCounter();
 
-                if (ObjectGuid guid = sObjectMgr->GetPlayerGUIDByName(name))
+                if (ObjectGuid guid = sCharacterCache->GetCharacterGuidByName(name))
                     return guid.GetCounter();
 
                 return 0;
@@ -699,7 +694,7 @@ bool ChatHandler::extractPlayerTarget(char* args, Player** player, ObjectGuid* p
             *player = pl;
 
         // if need guid value from DB (in name case for check player existence)
-        ObjectGuid guid = !pl && (player_guid || player_name) ? sObjectMgr->GetPlayerGUIDByName(name) : ObjectGuid::Empty;
+        ObjectGuid guid = !pl && (player_guid || player_name) ? sCharacterCache->GetCharacterGuidByName(name) : ObjectGuid::Empty;
 
         // if allowed player guid (if no then only online players allowed)
         if (player_guid)
@@ -851,7 +846,9 @@ bool ChatHandler::GetPlayerGroupAndGUIDByName(const char* cname, Player*& player
 
             player = ObjectAccessor::FindPlayerByName(name, false);
             if (offline)
-                guid = sObjectMgr->GetPlayerGUIDByName(name.c_str());
+            {
+                guid = sCharacterCache->GetCharacterGuidByName(name);
+            }
         }
     }
 

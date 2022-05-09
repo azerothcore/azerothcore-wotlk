@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "gruuls_lair.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "gruuls_lair.h"
 
 enum Yells
 {
@@ -114,7 +114,7 @@ public:
                     events.ScheduleEvent(EVENT_GROWTH, 30000);
                     break;
                 case EVENT_CAVE_IN:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_CAVE_IN, false);
                     if (_caveInTimer >= 4000)
                         _caveInTimer -= 1500;
@@ -125,7 +125,7 @@ public:
                     events.ScheduleEvent(EVENT_REVERBERATION, 22000);
                     break;
                 case EVENT_HURTFUL_STRIKE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 5.0f))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 5.0f))
                     {
                         me->CastSpell(target, SPELL_HURTFUL_STRIKE, false);
                     }

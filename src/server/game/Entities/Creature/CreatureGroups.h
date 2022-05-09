@@ -30,17 +30,19 @@ enum class GroupAIFlags : uint16
 {
     GROUP_AI_FLAG_MEMBER_ASSIST_LEADER  = 0x001,
     GROUP_AI_FLAG_LEADER_ASSIST_MEMBER  = 0x002,
-    //GROUP_AI_FLAG_UNK1                  = 0x004,
-    //GROUP_AI_FLAG_UNK2                  = 0x008,
-    //GROUP_AI_FLAG_UNK3                  = 0x010,
-    //GROUP_AI_FLAG_UNK4                  = 0x020,
-    //GROUP_AI_FLAG_UNK5                  = 0x040,
-    //GROUP_AI_FLAG_UNK6                  = 0x080,
-    //GROUP_AI_FLAG_UNK7                  = 0x100,
+    GROUP_AI_FLAG_EVADE_TOGETHER        = 0x004,
+    GROUP_AI_FLAG_RESPAWN_ON_EVADE      = 0x008,
+    //GROUP_AI_FLAG_UNK3                = 0x010,
+    //GROUP_AI_FLAG_UNK4                = 0x020,
+    //GROUP_AI_FLAG_UNK5                = 0x040,
+    //GROUP_AI_FLAG_UNK6                = 0x080,
+    //GROUP_AI_FLAG_UNK7                = 0x100,
     GROUP_AI_FLAG_FOLLOW_LEADER         = 0x200,
 
+    GROUP_AI_FLAG_EVADE_MASK = GROUP_AI_FLAG_EVADE_TOGETHER | GROUP_AI_FLAG_RESPAWN_ON_EVADE,
+
     // Used to verify valid and usable flags
-    GROUP_AI_FLAG_SUPPORTED = GROUP_AI_FLAG_MEMBER_ASSIST_LEADER | GROUP_AI_FLAG_LEADER_ASSIST_MEMBER | GROUP_AI_FLAG_FOLLOW_LEADER
+    GROUP_AI_FLAG_SUPPORTED = GROUP_AI_FLAG_MEMBER_ASSIST_LEADER | GROUP_AI_FLAG_LEADER_ASSIST_MEMBER | GROUP_AI_FLAG_EVADE_MASK | GROUP_AI_FLAG_FOLLOW_LEADER
 };
 
 struct FormationInfo
@@ -91,10 +93,12 @@ public:
     explicit CreatureGroup(uint32 id) : m_leader(nullptr), m_groupID(id), m_Formed(false) {}
     ~CreatureGroup() {}
 
-    Creature* getLeader() const { return m_leader; }
+    Creature* GetLeader() const { return m_leader; }
     uint32 GetId() const { return m_groupID; }
-    bool isEmpty() const { return m_members.empty(); }
-    bool isFormed() const { return m_Formed; }
+
+    bool IsEmpty() const { return m_members.empty(); }
+    bool IsFormed() const { return m_Formed; }
+
     const CreatureGroupMemberType& GetMembers() const { return m_members; }
 
     void AddMember(Creature* member);
@@ -103,6 +107,7 @@ public:
 
     void LeaderMoveTo(float x, float y, float z, bool run);
     void MemberAttackStart(Creature* member, Unit* target);
+    void MemberEvaded(Creature* member);
 
 private:
     Creature* m_leader; //Important do not forget sometimes to work with pointers instead synonims :D:D

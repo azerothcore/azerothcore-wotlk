@@ -18,8 +18,8 @@
 #include "ObjectGuid.h"
 #include "Log.h"
 #include "World.h"
-#include <sstream>
 #include <iomanip>
+#include <sstream>
 
 ObjectGuid const ObjectGuid::Empty = ObjectGuid();
 
@@ -92,7 +92,7 @@ ByteBuffer& operator>>(ByteBuffer& buf, PackedGuidReader const& guid)
 
 void ObjectGuidGeneratorBase::HandleCounterOverflow(HighGuid high)
 {
-    LOG_ERROR("entities.object", "%s guid overflow!! Can't continue, shutting down server. ", ObjectGuid::GetTypeName(high));
+    LOG_ERROR("entities.object", "{} guid overflow!! Can't continue, shutting down server. ", ObjectGuid::GetTypeName(high));
     World::StopNow(ERROR_EXIT_CODE);
 }
 

@@ -28,9 +28,9 @@ pyrewood_ambush
 EndContentData */
 
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "ScriptMgr.h"
 
 /*######
 ## npc_deathstalker_erland
@@ -240,7 +240,7 @@ public:
                 if (!target)
                     target = me;
 
-                summoned->setFaction(123);
+                summoned->SetFaction(FACTION_STORMWIND);
                 summoned->AddThreat(target, 32.0f);
                 summoned->AI()->AttackStart(target);
             }
@@ -256,7 +256,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            //TC_LOG_INFO("scripts", "DEBUG: p(%i) k(%i) d(%u) W(%i)", Phase, KillCount, diff, WaitTimer);
+            //LOG_INFO("scripts", "DEBUG: p({}) k({}) d({}) W({})", Phase, KillCount, diff, WaitTimer);
 
             if (!QuestInProgress)
                 return;

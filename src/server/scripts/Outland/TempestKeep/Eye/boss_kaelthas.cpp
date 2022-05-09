@@ -16,10 +16,10 @@
  */
 
 #include "Opcodes.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
-#include "the_eye.h"
+#include "ScriptedCreature.h"
 #include "WorldPacket.h"
+#include "the_eye.h"
 
 enum Yells
 {
@@ -199,7 +199,7 @@ public:
                 {
                     advisor->Respawn(true);
                     advisor->StopMovingOnCurrentPos();
-                    advisor->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    advisor->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     advisor->SetReactState(REACT_PASSIVE);
                     summons.Summon(advisor);
                 }
@@ -215,7 +215,7 @@ public:
                         {
                             summon->SetReactState(REACT_PASSIVE);
                             summon->setDeathState(JUST_RESPAWNED);
-                            summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                            summon->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         }
             }
         }
@@ -238,8 +238,8 @@ public:
             phase = PHASE_NONE;
 
             me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_HOVER, true);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
             SetRoomState(GO_STATE_READY);
             me->SetDisableGravity(false);
             me->SetWalk(false);
@@ -321,7 +321,7 @@ public:
 
         void JustDied(Unit* killer) override
         {
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
 
             Talk(SAY_DEATH);
             BossAI::JustDied(killer);
@@ -357,7 +357,7 @@ public:
                 me->SetWalk(false);
                 me->RemoveAurasDueToSpell(SPELL_KAEL_FULL_POWER);
                 me->SetReactState(REACT_AGGRESSIVE);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                 events.SetTimer(60000);
                 events.ScheduleEvent(EVENT_SPELL_FIREBALL, 0);
                 events.ScheduleEvent(EVENT_SPELL_FLAMESTRIKE, 10000);
@@ -373,7 +373,6 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (EnterEvadeIfOutOfCombatArea())
                 return;
 
             events2.Update(diff);
@@ -389,8 +388,8 @@ public:
                     if (Creature* advisor = summons.GetCreatureWithEntry(NPC_THALADRED))
                     {
                         advisor->SetReactState(REACT_AGGRESSIVE);
-                        advisor->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        advisor->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             advisor->AI()->AttackStart(target);
                         advisor->SetInCombatWithZone();
                         advisor->AI()->Talk(SAY_THALADRED_AGGRO);
@@ -403,8 +402,8 @@ public:
                     if (Creature* advisor = summons.GetCreatureWithEntry(NPC_LORD_SANGUINAR))
                     {
                         advisor->SetReactState(REACT_AGGRESSIVE);
-                        advisor->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        advisor->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             advisor->AI()->AttackStart(target);
                         advisor->SetInCombatWithZone();
                         advisor->AI()->Talk(SAY_SANGUINAR_AGGRO);
@@ -417,8 +416,8 @@ public:
                     if (Creature* advisor = summons.GetCreatureWithEntry(NPC_CAPERNIAN))
                     {
                         advisor->SetReactState(REACT_AGGRESSIVE);
-                        advisor->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        advisor->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             advisor->AI()->AttackStart(target);
                         advisor->SetInCombatWithZone();
                         advisor->AI()->Talk(SAY_CAPERNIAN_AGGRO);
@@ -431,8 +430,8 @@ public:
                     if (Creature* advisor = summons.GetCreatureWithEntry(NPC_TELONICUS))
                     {
                         advisor->SetReactState(REACT_AGGRESSIVE);
-                        advisor->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        advisor->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             advisor->AI()->AttackStart(target);
                         advisor->SetInCombatWithZone();
                         advisor->AI()->Talk(SAY_TELONICUS_AGGRO);
@@ -449,9 +448,9 @@ public:
                         if (Creature* summon = ObjectAccessor::GetCreature(*me, *i))
                             if (!summon->GetSpawnId())
                             {
-                                summon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                                summon->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                                 summon->SetInCombatWithZone();
-                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                                     summon->AI()->AttackStart(target);
                             }
                     }
@@ -472,9 +471,9 @@ public:
                             if (summon->GetSpawnId())
                             {
                                 summon->SetReactState(REACT_AGGRESSIVE);
-                                summon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                                summon->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                                 summon->SetInCombatWithZone();
-                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                                     summon->AI()->AttackStart(target);
                             }
                     events2.ScheduleEvent(EVENT_PREFIGHT_PHASE71, 3 * MINUTE * IN_MILLISECONDS);
@@ -484,8 +483,8 @@ public:
                     Talk(SAY_PHASE4_INTRO2);
                     phase = PHASE_FINAL;
                     DoResetThreat();
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         AttackStart(target);
 
                     events2.Reset();
@@ -556,7 +555,7 @@ public:
                     //me->CastSpell(me, SPELL_KEAL_STUNNED, true);
                     break;
                 case EVENT_SCENE_9:
-                    me->CastSpell(me, 52241, true); // WRONG VISUAL, ZOMG!
+                    me->CastSpell(me, 52241, true); // WRONG VISUAL
                     me->CastSpell(me, 34807, true);
                     me->SummonCreature(NPC_WORLD_TRIGGER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 15.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000);
                     if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, me->GetPositionX() + 5, me->GetPositionY(), me->GetPositionZ() + 15.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000))
@@ -601,7 +600,7 @@ public:
                     break;
                 case EVENT_SCENE_16:
                     summons.DespawnEntry(WORLD_TRIGGER);
-                    me->RemoveAurasDueToSpell(52241); // WRONG VISUAL, ZOMG!
+                    me->RemoveAurasDueToSpell(52241); // WRONG VISUAL
                     me->GetMotionMaster()->MovePoint(POINT_START_LAST_PHASE, me->GetHomePosition(), false, true);
                     break;
             }
@@ -648,7 +647,7 @@ public:
                     me->CastSpell(me->GetVictim(), SPELL_PYROBLAST, false);
                     break;
                 case EVENT_SPELL_FLAMESTRIKE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                         me->CastSpell(target, SPELL_FLAME_STRIKE, false);
                     events.ScheduleEvent(EVENT_SPELL_FLAMESTRIKE, 20000);
                     break;
@@ -669,7 +668,7 @@ public:
                     if (me->HealthBelowPct(51))
                     {
                         events.Reset();
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                         me->SetReactState(REACT_PASSIVE);
                         me->GetMotionMaster()->MovePoint(POINT_MIDDLE, me->GetHomePosition(), true, true);
                         me->ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
@@ -1036,7 +1035,7 @@ public:
         {
             PreventHitEffect(effIndex);
             for (uint32 i = 0; i < 5; ++i)
-                GetCaster()->SummonCreature(NPC_NETHER_VAPOR, GetCaster()->GetPositionX() + 6 * cos(i / 5.0f * 2 * M_PI), GetCaster()->GetPositionY() + 6 * sin(i / 5.0f * 2 * M_PI), GetCaster()->GetPositionZ() + 7.0f + i, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 30000);
+                GetCaster()->SummonCreature(NPC_NETHER_VAPOR, GetCaster()->GetPositionX() + 6 * cos(i / 5.0f * 2 * M_PI), GetCaster()->GetPositionY() + 6 * std::sin(i / 5.0f * 2 * M_PI), GetCaster()->GetPositionZ() + 7.0f + i, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 30000);
         }
 
         void Register() override

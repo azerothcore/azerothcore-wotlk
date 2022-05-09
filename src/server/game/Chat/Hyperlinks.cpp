@@ -16,15 +16,14 @@
  */
 
 #include "Hyperlinks.h"
-#include "advstd.h"
 #include "Common.h"
 #include "DBCStores.h"
 #include "Errors.h"
 #include "ObjectMgr.h"
+#include "QuestDef.h"
 #include "SharedDefines.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
-#include "QuestDef.h"
 
 using namespace Acore::Hyperlinks;
 

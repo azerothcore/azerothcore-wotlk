@@ -624,9 +624,47 @@ struct GameObjectTemplate
         }
     }
 
+    [[nodiscard]] bool IsInfiniteGameObject() const
+    {
+        switch (type)
+        {
+            case GAMEOBJECT_TYPE_DOOR:
+                return true;
+            case GAMEOBJECT_TYPE_FLAGSTAND:
+                return true;
+            case GAMEOBJECT_TYPE_FLAGDROP:
+                return true;
+            case GAMEOBJECT_TYPE_DUNGEON_DIFFICULTY:
+                return true;
+            case GAMEOBJECT_TYPE_TRAPDOOR:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     [[nodiscard]] bool IsGameObjectForQuests() const
     {
         return IsForQuests;
+    }
+
+    [[nodiscard]] bool IsIgnoringLOSChecks() const
+    {
+        switch (type)
+        {
+            case GAMEOBJECT_TYPE_BUTTON:
+                return button.losOK == 0;
+            case GAMEOBJECT_TYPE_QUESTGIVER:
+                return questgiver.losOK == 0;
+            case GAMEOBJECT_TYPE_CHEST:
+                return chest.losOK == 0;
+            case GAMEOBJECT_TYPE_GOOBER:
+                return goober.losOK == 0;
+            case GAMEOBJECT_TYPE_FLAGSTAND:
+                return flagstand.losOK == 0;
+            default:
+                return false;
+        }
     }
 };
 
@@ -701,7 +739,7 @@ enum GOState
 // from `gameobject`
 struct GameObjectData
 {
-    explicit GameObjectData()  { }
+    explicit GameObjectData()  = default;
     uint32 id{0};                                              // entry in gamobject_template
     uint16 mapid{0};
     uint32 phaseMask{0};
@@ -751,6 +789,9 @@ public:
     void AddToWorld() override;
     void RemoveFromWorld() override;
     void CleanupsBeforeDelete(bool finalCleanup = true) override;
+
+    uint32 GetDynamicFlags() const override { return GetUInt32Value(GAMEOBJECT_DYNAMIC); }
+    void ReplaceAllDynamicFlags(uint32 flag) override { SetUInt32Value(GAMEOBJECT_DYNAMIC, flag); }
 
     virtual bool Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0);
     void Update(uint32 p_time) override;
@@ -802,14 +843,7 @@ public:
     [[nodiscard]] uint32 GetSpellId() const { return m_spellId;}
 
     [[nodiscard]] time_t GetRespawnTime() const { return m_respawnTime; }
-    [[nodiscard]] time_t GetRespawnTimeEx() const
-    {
-        time_t now = time(nullptr);
-        if (m_respawnTime > now)
-            return m_respawnTime;
-        else
-            return now;
-    }
+    [[nodiscard]] time_t GetRespawnTimeEx() const;
 
     void SetRespawnTime(int32 respawn);
     void SetRespawnDelay(int32 respawn);
@@ -841,6 +875,12 @@ public:
     void SetPhaseMask(uint32 newPhaseMask, bool update) override;
     void EnableCollision(bool enable);
 
+    GameObjectFlags GetGameObjectFlags() const { return GameObjectFlags(GetUInt32Value(GAMEOBJECT_FLAGS)); }
+    bool HasGameObjectFlag(GameObjectFlags flags) const { return HasFlag(GAMEOBJECT_FLAGS, flags) != 0; }
+    void SetGameObjectFlag(GameObjectFlags flags) { SetFlag(GAMEOBJECT_FLAGS, flags); }
+    void RemoveGameObjectFlag(GameObjectFlags flags) { RemoveFlag(GAMEOBJECT_FLAGS, flags); }
+    void ReplaceAllGameObjectFlags(GameObjectFlags flags) { SetUInt32Value(GAMEOBJECT_FLAGS, flags); }
+
     void Use(Unit* user);
 
     [[nodiscard]] LootState getLootState() const { return m_lootState; }
@@ -854,16 +894,8 @@ public:
     void RemoveLootMode(uint16 lootMode) { m_LootMode &= ~lootMode; }
     void ResetLootMode() { m_LootMode = LOOT_MODE_DEFAULT; }
 
-    void AddToSkillupList(ObjectGuid playerGuid) { m_SkillupList.push_back(playerGuid); }
-    [[nodiscard]] bool IsInSkillupList(ObjectGuid playerGuid) const
-    {
-        for (ObjectGuid const& guid : m_SkillupList)
-            if (guid == playerGuid)
-                return true;
-
-        return false;
-    }
-    void ClearSkillupList() { m_SkillupList.clear(); }
+    void AddToSkillupList(ObjectGuid playerGuid);
+    [[nodiscard]] bool IsInSkillupList(ObjectGuid playerGuid) const;
 
     void AddUniqueUse(Player* player);
     void AddUse() { ++m_usetimes; }
@@ -884,7 +916,7 @@ public:
     [[nodiscard]] bool HasLootRecipient() const { return m_lootRecipient || m_lootRecipientGroup; }
     uint32 m_groupLootTimer;                            // (msecs)timer used for group loot
     uint32 lootingGroupLowGUID;                         // used to find group which is looting
-    void SetLootGenerationTime() { m_lootGenerationTime = time(nullptr); }
+    void SetLootGenerationTime();
     [[nodiscard]] uint32 GetLootGenerationTime() const { return m_lootGenerationTime; }
 
     [[nodiscard]] GameObject* GetLinkedTrap();
@@ -917,7 +949,7 @@ public:
     void SendCustomAnim(uint32 anim);
     [[nodiscard]] bool IsInRange(float x, float y, float z, float radius) const;
 
-    void SendMessageToSetInRange(WorldPacket* data, float dist, bool /*self*/, bool includeMargin = false, Player const* skipped_rcvr = nullptr) override; // pussywizard!
+    void SendMessageToSetInRange(WorldPacket const* data, float dist, bool /*self*/, bool includeMargin = false, Player const* skipped_rcvr = nullptr) const override; // pussywizard!
 
     void ModifyHealth(int32 change, Unit* attackerOrHealer = nullptr, uint32 spellId = 0);
     void SetDestructibleBuildingModifyState(bool allow) { m_allowModifyDestructibleBuilding = allow; }
@@ -925,9 +957,9 @@ public:
     void SetDestructibleState(GameObjectDestructibleState state, Player* eventInvoker = nullptr, bool setHealth = false);
     [[nodiscard]] GameObjectDestructibleState GetDestructibleState() const
     {
-        if (HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_DESTROYED))
+        if (HasGameObjectFlag(GO_FLAG_DESTROYED))
             return GO_DESTRUCTIBLE_DESTROYED;
-        if (HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_DAMAGED))
+        if (HasGameObjectFlag(GO_FLAG_DAMAGED))
             return GO_DESTRUCTIBLE_DAMAGED;
         return GO_DESTRUCTIBLE_INTACT;
     }
@@ -991,7 +1023,7 @@ protected:
     bool        m_spawnedByDefault;
     uint32       m_cooldownTime;                         // used as internal reaction delay time store (not state change reaction).
     // For traps this: spell casting cooldown, for doors/buttons: reset time.
-    GuidList m_SkillupList;
+    std::unordered_map<ObjectGuid, int32> m_SkillupList;
 
     ObjectGuid m_ritualOwnerGUID;                       // used for GAMEOBJECT_TYPE_SUMMONING_RITUAL where GO is not summoned (no owner)
     GuidSet m_unique_users;
@@ -1016,6 +1048,8 @@ protected:
     uint32 m_lootGenerationTime;
 
     ObjectGuid m_linkedTrap;
+
+    ObjectGuid _lootStateUnitGUID;
 
 private:
     void CheckRitualList();

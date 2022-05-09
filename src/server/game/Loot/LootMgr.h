@@ -188,7 +188,7 @@ struct QuestItem
     bool    is_looted{false};
 
     QuestItem()
-         {}
+         = default;
 
     QuestItem(uint8 _index, bool _islooted = false)
         : index(_index), is_looted(_islooted) {}
@@ -380,7 +380,7 @@ struct Loot
 
     LootItem* LootItemInSlot(uint32 lootslot, Player* player, QuestItem** qitem = nullptr, QuestItem** ffaitem = nullptr, QuestItem** conditem = nullptr);
     uint32 GetMaxSlotInLootFor(Player* player) const;
-    bool hasItemForAll() const;
+    [[nodiscard]] bool hasItemForAll() const;
     bool hasItemFor(Player* player) const;
     [[nodiscard]] bool hasOverThresholdItem() const;
     void FillNotNormalLootFor(Player* player);
@@ -421,6 +421,7 @@ extern LootStore LootTemplates_Skinning;
 extern LootStore LootTemplates_Disenchant;
 extern LootStore LootTemplates_Prospecting;
 extern LootStore LootTemplates_Spell;
+extern LootStore LootTemplates_Player;
 
 void LoadLootTemplates_Creature();
 void LoadLootTemplates_Fishing();
@@ -435,6 +436,8 @@ void LoadLootTemplates_Prospecting();
 
 void LoadLootTemplates_Spell();
 void LoadLootTemplates_Reference();
+
+void LoadLootTemplates_Player();
 
 inline void LoadLootTables()
 {
@@ -451,6 +454,8 @@ inline void LoadLootTables()
     LoadLootTemplates_Spell();
 
     LoadLootTemplates_Reference();
+
+    LoadLootTemplates_Player();
 }
 
 #endif

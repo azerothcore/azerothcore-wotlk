@@ -19,7 +19,8 @@
 #define _THREATMANAGER
 
 #include "Common.h"
-#include "LinkedReference/Reference.h"
+#include "ObjectGuid.h"
+#include "Reference.h"
 #include "SharedDefines.h"
 #include "UnitEvents.h"
 #include <list>
@@ -138,7 +139,7 @@ class ThreatContainer
 public:
     typedef std::list<HostileReference*> StorageType;
 
-    ThreatContainer() { }
+    ThreatContainer() = default;
 
     ~ThreatContainer() { clearReferences(); }
 
@@ -220,7 +221,7 @@ public:
 
     [[nodiscard]] Unit* GetOwner() const { return iOwner; }
 
-    Unit* getHostilTarget();
+    Unit* getHostileTarget();
 
     void tauntApply(Unit* taunter);
     void tauntFadeOut(Unit* taunter);

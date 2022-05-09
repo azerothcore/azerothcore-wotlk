@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "the_botanica.h"
 
 enum Says
@@ -111,7 +111,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_SACRIFICE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true))
                     {
                         Talk(SAY_CAST_SACRIFICE);
                         me->CastSpell(target, SPELL_SACRIFICE, false);

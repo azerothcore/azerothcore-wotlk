@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "KillRewarder.h"
 #include "Formulas.h"
 #include "Group.h"
 #include "Pet.h"
@@ -77,7 +78,7 @@ KillRewarder::KillRewarder(Player* killer, Unit* victim, bool isBattleGround) :
     _InitGroupData();
 }
 
-inline void KillRewarder::_InitGroupData()
+void KillRewarder::_InitGroupData()
 {
     if (_group)
     {
@@ -117,7 +118,7 @@ inline void KillRewarder::_InitGroupData()
         _count = 1;
 }
 
-inline void KillRewarder::_InitXP(Player* player)
+void KillRewarder::_InitXP(Player* player)
 {
     // Get initial value of XP for kill.
     // XP is given:
@@ -134,14 +135,14 @@ inline void KillRewarder::_InitXP(Player* player)
                     _xp = uint32(_xp * ct->ModHealth);
 }
 
-inline void KillRewarder::_RewardHonor(Player* player)
+void KillRewarder::_RewardHonor(Player* player)
 {
     // Rewarded player must be alive.
     if (player->IsAlive())
         player->RewardHonor(_victim, _count, -1);
 }
 
-inline void KillRewarder::_RewardXP(Player* player, float rate)
+void KillRewarder::_RewardXP(Player* player, float rate)
 {
     uint32 xp(_xp);
     if (_group)
@@ -172,14 +173,14 @@ inline void KillRewarder::_RewardXP(Player* player, float rate)
     }
 }
 
-inline void KillRewarder::_RewardReputation(Player* player, float rate)
+void KillRewarder::_RewardReputation(Player* player, float rate)
 {
     // 4.3. Give reputation (player must not be on BG).
     // Even dead players and corpses are rewarded.
     player->RewardReputation(_victim, rate);
 }
 
-inline void KillRewarder::_RewardKillCredit(Player* player)
+void KillRewarder::_RewardKillCredit(Player* player)
 {
     // 4.4. Give kill credit (player must not be in group, or he must be alive or without corpse).
     if (!_group || player->IsAlive() || !player->GetCorpse())

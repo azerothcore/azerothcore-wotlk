@@ -22,6 +22,7 @@
 #include "CreatureAI.h"
 #include "CreatureAIImpl.h"
 #include "InstanceScript.h"
+#include "EventMap.h"
 
 #define CAST_AI(a, b)   (dynamic_cast<a*>(b))
 
@@ -89,6 +90,8 @@ public:
     void Despawn(Creature const* summon) { storage_.remove(summon->GetGUID()); }
     void DespawnEntry(uint32 entry);
     void DespawnAll();
+    bool IsAnyCreatureAlive() const;
+    bool IsAnyCreatureInCombat() const;
 
     template <typename T>
     void DespawnIf(T const& predicate)
@@ -341,7 +344,6 @@ struct ScriptedAI : public CreatureAI
     void SetCombatMovement(bool allowMovement);
     bool IsCombatMovementAllowed() const { return _isCombatMovementAllowed; }
 
-    bool EnterEvadeIfOutOfCombatArea();
     virtual bool CheckEvadeIfOutOfCombatArea() const { return false; }
 
     // return true for heroic mode. i.e.
@@ -413,7 +415,6 @@ struct ScriptedAI : public CreatureAI
 
 private:
     Difficulty _difficulty;
-    uint32 _evadeCheckCooldown;
     bool _isCombatMovementAllowed;
     bool _isHeroic;
 };
@@ -425,7 +426,6 @@ public:
     ~BossAI() override {}
 
     InstanceScript* const instance;
-    BossBoundaryMap const* GetBoundary() const { return _boundary; }
 
     void JustSummoned(Creature* summon) override;
     void SummonedCreatureDespawn(Creature* summon) override;
@@ -450,23 +450,12 @@ protected:
     void _JustDied();
     void _JustReachedHome() { me->setActive(false); }
 
-    bool CheckInRoom()
-    {
-        if (CheckBoundary(me))
-            return true;
-
-        EnterEvadeMode();
-        return false;
-    }
-
-    bool CheckBoundary(Unit* who);
     void TeleportCheaters();
 
     EventMap events;
     SummonList summons;
 
 private:
-    BossBoundaryMap const* const _boundary;
     uint32 const _bossId;
 };
 
@@ -502,7 +491,7 @@ protected:
 
 // SD2 grid searchers.
 Creature* GetClosestCreatureWithEntry(WorldObject* source, uint32 entry, float maxSearchRange, bool alive = true);
-GameObject* GetClosestGameObjectWithEntry(WorldObject* source, uint32 entry, float maxSearchRange);
+GameObject* GetClosestGameObjectWithEntry(WorldObject* source, uint32 entry, float maxSearchRange, bool onlySpawned = false);
 void GetCreatureListWithEntryInGrid(std::list<Creature*>& list, WorldObject* source, uint32 entry, float maxSearchRange);
 void GetGameObjectListWithEntryInGrid(std::list<GameObject*>& list, WorldObject* source, uint32 entry, float maxSearchRange);
 void GetDeadCreatureListInGrid(std::list<Creature*>& list, WorldObject* source, float maxSearchRange, bool alive = false);

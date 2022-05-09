@@ -15,11 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ReactorAI.h"
 #include "CreatureAIImpl.h"
 #include "Errors.h"
-#include "ReactorAI.h"
 
-int ReactorAI::Permissible(const Creature* creature)
+int ReactorAI::Permissible(Creature const* creature)
 {
     if (creature->IsCivilian() || creature->IsNeutralToAll())
         return PERMIT_BASE_REACTIVE;

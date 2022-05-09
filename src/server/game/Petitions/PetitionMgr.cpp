@@ -15,9 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "PetitionMgr.h"
 #include "DatabaseEnv.h"
 #include "Log.h"
-#include "PetitionMgr.h"
+#include "ObjectAccessor.h"
 #include "Player.h"
 #include "QueryResult.h"
 #include "Timer.h"
@@ -44,7 +45,7 @@ void PetitionMgr::LoadPetitions()
     QueryResult result = CharacterDatabase.Query("SELECT ownerguid, petitionguid, name, type FROM petition");
     if (!result)
     {
-        LOG_INFO("server.loading", ">>  Loaded 0 Petitions!");
+        LOG_WARN("server.loading", ">> Loaded 0 Petitions!");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -53,11 +54,11 @@ void PetitionMgr::LoadPetitions()
     do
     {
         Field* fields = result->Fetch();
-        AddPetition(ObjectGuid::Create<HighGuid::Item>(fields[1].GetUInt32()), ObjectGuid::Create<HighGuid::Player>(fields[0].GetUInt32()), fields[2].GetString(), fields[3].GetUInt8());
+        AddPetition(ObjectGuid::Create<HighGuid::Item>(fields[1].Get<uint32>()), ObjectGuid::Create<HighGuid::Player>(fields[0].Get<uint32>()), fields[2].Get<std::string>(), fields[3].Get<uint8>());
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server.loading", ">> Loaded %d Petitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} Petitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
@@ -69,7 +70,7 @@ void PetitionMgr::LoadSignatures()
     QueryResult result = CharacterDatabase.Query("SELECT petitionguid, playerguid, player_account FROM petition_sign");
     if (!result)
     {
-        LOG_INFO("server.loading", ">>  Loaded 0 Petition signs!");
+        LOG_WARN("server.loading", ">> Loaded 0 Petition signs!");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -78,11 +79,11 @@ void PetitionMgr::LoadSignatures()
     do
     {
         Field* fields = result->Fetch();
-        AddSignature(ObjectGuid::Create<HighGuid::Item>(fields[0].GetUInt32()), fields[2].GetUInt32(), ObjectGuid::Create<HighGuid::Player>(fields[1].GetUInt32()));
+        AddSignature(ObjectGuid::Create<HighGuid::Item>(fields[0].Get<uint32>()), fields[2].Get<uint32>(), ObjectGuid::Create<HighGuid::Player>(fields[1].Get<uint32>()));
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server.loading", ">> Loaded %d Petition signs in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} Petition signs in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 

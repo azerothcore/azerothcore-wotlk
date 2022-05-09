@@ -626,4 +626,6 @@ inline AI* GetIcecrownCitadelAI(T* obj)
     return GetInstanceAI<AI>(obj, ICCScriptName);
 }
 
+#define RegisterIcecrownCitadelCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetIcecrownCitadelAI)
+
 #endif // ICECROWN_CITADEL_H_

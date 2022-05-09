@@ -16,11 +16,13 @@
  */
 
 #include "CreatureAI.h"
+#include "EventMap.h"
 #include "InstanceScript.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "SpellScript.h"
 #include "sunken_temple.h"
+#include "Unit.h"
 
 class instance_sunken_temple : public InstanceMapScript
 {
@@ -47,6 +49,10 @@ public:
                 case NPC_JAMMAL_AN_THE_PROPHET:
                     _jammalanGUID = creature->GetGUID();
                     break;
+                case NPC_SHADE_OF_ERANIKUS:
+                    _shadeOfEranikusGUID = creature->GetGUID();
+                    creature->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    break;
             }
 
             if (creature->IsAlive() && creature->GetSpawnId() && creature->GetCreatureType() == CREATURE_TYPE_DRAGONKIN && creature->GetEntry() != NPC_SHADE_OF_ERANIKUS)
@@ -57,6 +63,12 @@ public:
         {
             if (unit->GetTypeId() == TYPEID_UNIT && unit->GetCreatureType() == CREATURE_TYPE_DRAGONKIN && unit->GetEntry() != NPC_SHADE_OF_ERANIKUS)
                 _dragonkinList.remove(unit->GetGUID());
+            if (unit->GetEntry() == NPC_JAMMAL_AN_THE_PROPHET)
+            {
+                if (Creature* cr = instance->GetCreature(_shadeOfEranikusGUID))
+                    cr->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            }
+
         }
 
         void OnGameObjectCreate(GameObject* gameobject) override
@@ -72,7 +84,7 @@ public:
                     if (gameobject->GetEntry() < GO_ATALAI_STATUE1 + _statuePhase)
                     {
                         instance->SummonGameObject(GO_ATALAI_LIGHT2, gameobject->GetPositionX(), gameobject->GetPositionY(), gameobject->GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-                        gameobject->SetUInt32Value(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        gameobject->ReplaceAllGameObjectFlags(GO_FLAG_NOT_SELECTABLE);
                     }
                     break;
                 case GO_ATALAI_IDOL:
@@ -81,7 +93,7 @@ public:
                     break;
                 case GO_IDOL_OF_HAKKAR:
                     if (_encounters[TYPE_ATAL_ALARION] == DONE)
-                        gameobject->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        gameobject->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
                 case GO_FORCEFIELD:
                     _forcefieldGUID = gameobject->GetGUID();
@@ -192,6 +204,7 @@ public:
 
         ObjectGuid _forcefieldGUID;
         ObjectGuid _jammalanGUID;
+        ObjectGuid _shadeOfEranikusGUID;
         GuidList _dragonkinList;
         EventMap _events;
     };

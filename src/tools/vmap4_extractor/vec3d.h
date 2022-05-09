@@ -18,8 +18,8 @@
 #ifndef VEC3D_H
 #define VEC3D_H
 
-#include <iostream>
 #include <cmath>
+#include <iostream>
 
 class Vec3D
 {
@@ -103,7 +103,7 @@ public:
 
     [[nodiscard]] float length() const
     {
-        return sqrt(x * x + y * y + z * z);
+        return std::sqrt(x * x + y * y + z * z);
     }
 
     Vec3D& normalize()
@@ -216,7 +216,7 @@ public:
 
     [[nodiscard]] float length() const
     {
-        return sqrt(x * x + y * y);
+        return std::sqrt(x * x + y * y);
     }
 
     Vec2D& normalize()

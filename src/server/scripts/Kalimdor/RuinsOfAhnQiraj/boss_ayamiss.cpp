@@ -16,9 +16,9 @@
  */
 
 #include "Player.h"
-#include "ruins_of_ahnqiraj.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "ruins_of_ahnqiraj.h"
 
 enum Spells
 {
@@ -100,7 +100,7 @@ public:
                     who->GetMotionMaster()->MovePoint(POINT_PARALYZE, AltarPos);
                     break;
                 case NPC_HORNET:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                         who->AI()->AttackStart(target);
                     break;
             }
@@ -122,10 +122,10 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             me->ClearUnitState(UNIT_STATE_ROOT);
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
         }
 
         void EnterCombat(Unit* attacker) override
@@ -155,8 +155,7 @@ public:
                 _phase = PHASE_GROUND;
                 SetCombatMovement(true);
                 me->SetCanFly(false);
-                Position VictimPos;
-                me->GetVictim()->GetPosition(&VictimPos);
+                Position VictimPos = me->GetVictim()->GetPosition();
                 me->GetMotionMaster()->MovePoint(POINT_GROUND, VictimPos);
                 DoResetThreat();
                 events.ScheduleEvent(EVENT_LASH, urand(5000, 8000));
@@ -188,7 +187,7 @@ public:
                         events.ScheduleEvent(EVENT_POISON_STINGER, urand(2000, 3000));
                         break;
                     case EVENT_PARALYZE:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0, true))
                         {
                             DoCast(target, SPELL_PARALYZE);
                             instance->SetGuidData(DATA_PARALYZED, target->GetGUID());
@@ -200,7 +199,7 @@ public:
                     case EVENT_SWARMER_ATTACK:
                         for (ObjectGuid const& guid : _swarmers)
                             if (Creature* swarmer = me->GetMap()->GetCreature(guid))
-                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                                if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                                     swarmer->AI()->AttackStart(target);
 
                         _swarmers.clear();
@@ -208,8 +207,7 @@ public:
                         break;
                     case EVENT_SUMMON_SWARMER:
                         {
-                            Position Pos;
-                            me->GetRandomPoint(SwarmerPos, 80.0f, Pos);
+                            Position Pos = me->GetRandomPoint(SwarmerPos, 80.0f);
                             me->SummonCreature(NPC_SWARMER, Pos);
                             events.ScheduleEvent(EVENT_SUMMON_SWARMER, 5000);
                             break;

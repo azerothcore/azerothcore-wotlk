@@ -95,15 +95,9 @@
 #  define AC_GAME_API AC_API_IMPORT
 #endif
 
-#define UI64FMTD "%" PRIu64
 #define UI64LIT(N) UINT64_C(N)
-
-#define SI64FMTD "%" PRId64
 #define SI64LIT(N) INT64_C(N)
 
-#define SZFMTD "%" PRIuPTR
-
-#define STRING_VIEW_FMT "%.*s"
 #define STRING_VIEW_FMT_ARG(str) static_cast<int>((str).length()), (str).data()
 
 typedef std::int64_t int64;

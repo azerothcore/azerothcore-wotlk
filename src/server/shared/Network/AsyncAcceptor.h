@@ -21,9 +21,9 @@
 #include "IoContext.h"
 #include "IpAddress.h"
 #include "Log.h"
+#include <atomic>
 #include <boost/asio/ip/tcp.hpp>
 #include <functional>
-#include <atomic>
 
 using boost::asio::ip::tcp;
 
@@ -65,7 +65,7 @@ public:
                 }
                 catch (boost::system::system_error const& err)
                 {
-                    LOG_INFO("network", "Failed to initialize client's socket %s", err.what());
+                    LOG_INFO("network", "Failed to initialize client's socket {}", err.what());
                 }
             }
 
@@ -80,7 +80,7 @@ public:
         _acceptor.open(_endpoint.protocol(), errorCode);
         if (errorCode)
         {
-            LOG_INFO("network", "Failed to open acceptor %s", errorCode.message().c_str());
+            LOG_INFO("network", "Failed to open acceptor {}", errorCode.message());
             return false;
         }
 
@@ -88,7 +88,7 @@ public:
         _acceptor.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true), errorCode);
         if (errorCode)
         {
-            LOG_INFO("network", "Failed to set reuse_address option on acceptor %s", errorCode.message().c_str());
+            LOG_INFO("network", "Failed to set reuse_address option on acceptor {}", errorCode.message());
             return false;
         }
 #endif
@@ -96,14 +96,14 @@ public:
         _acceptor.bind(_endpoint, errorCode);
         if (errorCode)
         {
-            LOG_INFO("network", "Could not bind to %s:%u %s", _endpoint.address().to_string().c_str(), _endpoint.port(), errorCode.message().c_str());
+            LOG_INFO("network", "Could not bind to {}:{} {}", _endpoint.address().to_string(), _endpoint.port(), errorCode.message());
             return false;
         }
 
         _acceptor.listen(ACORE_MAX_LISTEN_CONNECTIONS, errorCode);
         if (errorCode)
         {
-            LOG_INFO("network", "Failed to start listening on %s:%u %s", _endpoint.address().to_string().c_str(), _endpoint.port(), errorCode.message().c_str());
+            LOG_INFO("network", "Failed to start listening on {}:{} {}", _endpoint.address().to_string(), _endpoint.port(), errorCode.message());
             return false;
         }
 
@@ -145,7 +145,7 @@ void AsyncAcceptor::AsyncAccept()
             }
             catch (boost::system::system_error const& err)
             {
-                LOG_INFO("network", "Failed to retrieve client's remote address %s", err.what());
+                LOG_INFO("network", "Failed to retrieve client's remote address {}", err.what());
             }
         }
 

@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "karazhan.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "karazhan.h"
 
 enum Yells
 {
@@ -218,7 +218,7 @@ public:
                     me->CastSpell(me, SPELL_BERSERK, true);
                     break;
                 case EVENT_SPELL_BLIND:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 10.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 10.0f, true))
                         me->CastSpell(target, SPELL_BLIND, false);
                     events.ScheduleEvent(EVENT_SPELL_BLIND, urand(25000, 40000));
                     break;
@@ -235,7 +235,7 @@ public:
                     return;
                 case EVENT_SPELL_GARROTE:
                     Talk(SAY_SPECIAL);
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                         target->CastSpell(target, SPELL_GARROTE, true);
                     me->CastSpell(me, SPELL_VANISH_TELEPORT, false);
                     events.SetPhase(0);
@@ -272,8 +272,7 @@ public:
             PreventHitDefaultEffect(effIndex);
             if (Unit* target = GetHitUnit())
             {
-                Position pos;
-                target->GetFirstCollisionPosition(pos, 5.0f, M_PI);
+                Position pos = target->GetFirstCollisionPosition(5.0f, M_PI);
                 GetCaster()->CastSpell(target, SPELL_GARROTE_DUMMY, true);
                 GetCaster()->RemoveAurasDueToSpell(SPELL_VANISH);
                 GetCaster()->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), target->GetOrientation());

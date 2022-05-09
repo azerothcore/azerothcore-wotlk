@@ -15,14 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "PathGenerator.h"
 #include "Creature.h"
 #include "DetourCommon.h"
 #include "Geometry.h"
 #include "Log.h"
-#include "Map.h"
 #include "MMapFactory.h"
 #include "MMapMgr.h"
-#include "PathGenerator.h"
+#include "Map.h"
+#include "Metric.h"
 
  ////////////////// PathGenerator //////////////////
 PathGenerator::PathGenerator(WorldObject const* owner) :
@@ -60,6 +61,8 @@ bool PathGenerator::CalculatePath(float x, float y, float z, float destX, float 
 {
     if (!Acore::IsValidMapCoord(destX, destY, destZ) || !Acore::IsValidMapCoord(x, y, z))
         return false;
+
+    METRIC_DETAILED_EVENT("mmap_events", "CalculatePath", "");
 
     G3D::Vector3 dest(destX, destY, destZ);
     SetEndPosition(dest);
@@ -379,7 +382,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
             // this is probably an error state, but we'll leave it
             // and hopefully recover on the next Update
             // we still need to copy our preffix
-            LOG_ERROR("movement", "PathGenerator::BuildPolyPath: Path Build failed %s", _source->GetGUID().ToString().c_str());
+            LOG_ERROR("movement", "PathGenerator::BuildPolyPath: Path Build failed {}", _source->GetGUID().ToString());
         }
 
         // new path = prefix + suffix - overlap
@@ -480,7 +483,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
         if (!_polyLength || dtStatusFailed(dtResult))
         {
             // only happens if we passed bad data to findPath(), or navmesh is messed up
-            LOG_ERROR("movement", "PathGenerator::BuildPolyPath: %s Path Build failed: 0 length path", _source->GetGUID().ToString().c_str());
+            LOG_ERROR("movement", "PathGenerator::BuildPolyPath: {} Path Build failed: 0 length path", _source->GetGUID().ToString());
             BuildShortcut();
             _type = PATHFIND_NOPATH;
             return;
@@ -489,7 +492,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
 
     if (!_polyLength)
     {
-        LOG_ERROR("movement", "PathGenerator::BuildPolyPath: %s Path Build failed: 0 length path", _source->GetGUID().ToString().c_str());
+        LOG_ERROR("movement", "PathGenerator::BuildPolyPath: {} Path Build failed: 0 length path", _source->GetGUID().ToString());
         BuildShortcut();
         _type = PATHFIND_NOPATH;
         return;
@@ -519,7 +522,7 @@ void PathGenerator::BuildPointPath(const float* startPoint, const float* endPoin
     if (_useRaycast)
     {
         // _straightLine uses raycast and it currently doesn't support building a point path, only a 2-point path with start and hitpoint/end is returned
-        LOG_ERROR("movement", "PathGenerator::BuildPointPath() called with _useRaycast for unit %s", _source->GetGUID().ToString().c_str());
+        LOG_ERROR("movement", "PathGenerator::BuildPointPath() called with _useRaycast for unit {}", _source->GetGUID().ToString());
         BuildShortcut();
         _type = PATHFIND_NOPATH;
         return;
@@ -573,46 +576,13 @@ void PathGenerator::BuildPointPath(const float* startPoint, const float* endPoin
     }
 
     _pathPoints.resize(pointCount);
-    uint32 newPointCount = 0;
-    for (uint32 i = 0; i < pointCount; ++i) {
-        G3D::Vector3 vector = G3D::Vector3(pathPoints[i * VERTEX_SIZE + 2], pathPoints[i * VERTEX_SIZE], pathPoints[i * VERTEX_SIZE + 1]);
-        LiquidData const& liquidData = _source->GetMap()->GetLiquidData(_source->GetPhaseMask(), vector.x, vector.y, vector.z, _source->GetCollisionHeight(), MAP_ALL_LIQUIDS);
-        // One of the points is not in the water
-        if (liquidData.Status == LIQUID_MAP_UNDER_WATER)
-        {
-            // if the first point is under water
-            // then set a proper z for it
-            if (i == 0)
-            {
-                vector.z = std::fmaxf(vector.z, _source->GetPositionZ());
-                _pathPoints[newPointCount] = vector;
-            }
-            // if the last point is under water
-            // then set the desired end position instead
-            else if (i == pointCount - 1)
-            {
-                _pathPoints[newPointCount] = GetActualEndPosition();
-            }
-            // if one of the mid-points of the path is underwater
-            // then we can create a shortcut between the previous one
-            // and the next one by not including it inside the list
-            else
-                continue;
-        }
-        else
-        {
-            _pathPoints[newPointCount] = vector;
-        }
-
-        newPointCount++;
-    }
-
-    _pathPoints.resize(newPointCount);
+    for (uint32 i = 0; i < pointCount; ++i)
+        _pathPoints[i] = G3D::Vector3(pathPoints[i * VERTEX_SIZE + 2], pathPoints[i * VERTEX_SIZE], pathPoints[i * VERTEX_SIZE + 1]);
 
     NormalizePath();
 
     // first point is always our current location - we need the next one
-    SetActualEndPosition(_pathPoints[newPointCount - 1]);
+    SetActualEndPosition(_pathPoints[pointCount - 1]);
 
     // force the given destination, if needed
     if (_forceDestination &&
@@ -671,12 +641,12 @@ void PathGenerator::CreateFilter()
 
         // creatures don't take environmental damage
         if (creature->CanEnterWater())
-            includeFlags |= (NAV_WATER | NAV_MAGMA);
+            includeFlags |= (NAV_WATER | NAV_MAGMA_SLIME);
     }
     else // assume Player
     {
         // perfect support not possible, just stay 'safe'
-        includeFlags |= (NAV_GROUND | NAV_WATER | NAV_MAGMA);
+        includeFlags |= (NAV_GROUND | NAV_WATER | NAV_MAGMA_SLIME);
     }
 
     _filter.setIncludeFlags(includeFlags);
@@ -701,13 +671,17 @@ void PathGenerator::UpdateFilter()
             _filter.setIncludeFlags(includedFlags);
         }
 
-        /*if (Creature const* _sourceCreature = _source->ToCreature())
+        if (Creature const* _sourceCreature = _source->ToCreature())
+        {
             if (_sourceCreature->IsInCombat() || _sourceCreature->IsInEvadeMode())
-                _filter.setIncludeFlags(_filter.getIncludeFlags() | NAV_GROUND_STEEP);*/
+            {
+                _filter.setIncludeFlags(_filter.getIncludeFlags() | NAV_GROUND_STEEP);
+            }
+        }
     }
 }
 
-NavTerrain PathGenerator::GetNavTerrain(float x, float y, float z) const
+NavTerrainFlag PathGenerator::GetNavTerrain(float x, float y, float z) const
 {
     LiquidData data;
     LiquidData const& liquidData = _source->GetMap()->GetLiquidData(_source->GetPhaseMask(), x, y, z, _source->GetCollisionHeight(), MAP_ALL_LIQUIDS);
@@ -721,7 +695,7 @@ NavTerrain PathGenerator::GetNavTerrain(float x, float y, float z) const
             return NAV_WATER;
         case MAP_LIQUID_TYPE_MAGMA:
         case MAP_LIQUID_TYPE_SLIME:
-            return NAV_MAGMA;
+            return NAV_MAGMA_SLIME;
         default:
             return NAV_GROUND;
     }
@@ -903,8 +877,8 @@ dtStatus PathGenerator::FindSmoothPath(float const* startPos, float const* endPo
         npolys = FixupCorridor(polys, npolys, MAX_PATH_LENGTH, visited, nvisited);
 
         if (dtStatusFailed(_navMeshQuery->getPolyHeight(polys[0], result, &result[1])))
-            LOG_DEBUG("maps", "PathGenerator::FindSmoothPath: Cannot find height at position X: %f Y: %f Z: %f for %s",
-                result[2], result[0], result[1], _source->GetGUID().ToString().c_str());
+            LOG_DEBUG("maps", "PathGenerator::FindSmoothPath: Cannot find height at position X: {} Y: {} Z: {} for {}",
+                result[2], result[0], result[1], _source->GetGUID().ToString());
         result[1] += 0.5f;
         dtVcopy(iterPos, result);
 
@@ -1001,7 +975,7 @@ bool PathGenerator::IsWalkableClimb(float x, float y, float z, float destX, floa
  */
 bool PathGenerator::IsWalkableClimb(float x, float y, float z, float destX, float destY, float destZ, float sourceHeight)
 {
-    float diffHeight = abs(destZ - z);
+    float diffHeight = std::abs(destZ - z);
     float reqHeight = GetRequiredHeightToClimb(x, y, z, destX, destY, destZ, sourceHeight);
     // check walkable slopes, based on unit height
     return diffHeight <= reqHeight;
@@ -1082,12 +1056,10 @@ void PathGenerator::ShortenPathUntilDist(G3D::Vector3 const& target, float dist)
 
         // check if the shortened path is still in LoS with the target and it is walkable
         _source->GetHitSpherePointFor({ _pathPoints[i - 1].x, _pathPoints[i - 1].y, _pathPoints[i - 1].z + collisionHeight }, x, y, z);
-        if (!_source->GetMap()->isInLineOfSight(x, y, z, _pathPoints[i - 1].x, _pathPoints[i - 1].y, _pathPoints[i - 1].z + collisionHeight, _source->GetPhaseMask(), LINEOFSIGHT_ALL_CHECKS)
-            || (canCheckSlope
-                && !IsSwimmableSegment(_source->GetPositionX(), _source->GetPositionY(), _source->GetPositionZ(), _pathPoints[i - 1].x, _pathPoints[i - 1].y, _pathPoints[i - 1].z)
-                && !IsWalkableClimb(_source->GetPositionX(), _source->GetPositionY(), _source->GetPositionZ(), _pathPoints[i - 1].x, _pathPoints[i - 1].y, _pathPoints[i - 1].z)
-                )
-            )
+        if (!_source->GetMap()->isInLineOfSight(x, y, z, _pathPoints[i - 1].x, _pathPoints[i - 1].y, _pathPoints[i - 1].z + collisionHeight,
+            _source->GetPhaseMask(), LINEOFSIGHT_ALL_CHECKS, VMAP::ModelIgnoreFlags::Nothing) || (canCheckSlope &&
+                !IsSwimmableSegment(_source->GetPositionX(), _source->GetPositionY(), _source->GetPositionZ(), _pathPoints[i - 1].x, _pathPoints[i - 1].y, _pathPoints[i - 1].z) &&
+                !IsWalkableClimb(_source->GetPositionX(), _source->GetPositionY(), _source->GetPositionZ(), _pathPoints[i - 1].x, _pathPoints[i - 1].y, _pathPoints[i - 1].z)))
         {
             // whenver we find a point that is not valid anymore, simply use last valid path
             _pathPoints.resize(i + 1);
@@ -1171,9 +1143,9 @@ bool PathGenerator::IsWaterPath(Movement::PointsArray pathPoints) const
     // Check both start and end points, if they're both in water, then we can *safely* let the creature move
     for (uint32 i = 0; i < pathPoints.size(); ++i)
     {
-        NavTerrain terrain = GetNavTerrain(pathPoints[i].x, pathPoints[i].y, pathPoints[i].z);
+        NavTerrainFlag terrain = GetNavTerrain(pathPoints[i].x, pathPoints[i].y, pathPoints[i].z);
         // One of the points is not in the water
-        if (terrain != NAV_MAGMA && terrain != NAV_WATER)
+        if (terrain != NAV_MAGMA_SLIME && terrain != NAV_WATER)
         {
             waterPath = false;
             break;

@@ -16,17 +16,17 @@
  */
 
 #include "CombatAI.h"
-#include "eye_of_eternity.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "Opcodes.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
 #include "WorldSession.h"
+#include "eye_of_eternity.h"
 
 enum MovementInformPoints
 {
@@ -237,8 +237,8 @@ public:
             bLockHealthCheck = false;
 
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
+            me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
 
             if (pInstance)
             {
@@ -260,7 +260,7 @@ public:
                         {
                             float angle = me->GetOrientation();
                             float dist = 75.0f;
-                            if (Creature* c = me->SummonCreature(NPC_PORTAL, me->GetPositionX() + cos(angle) * dist, me->GetPositionY() + sin(angle) * dist, me->GetPositionZ(), FourSidesPos[id].GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 13000))
+                            if (Creature* c = me->SummonCreature(NPC_PORTAL, me->GetPositionX() + cos(angle) * dist, me->GetPositionY() + std::sin(angle) * dist, me->GetPositionZ(), FourSidesPos[id].GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 13000))
                                 me->CastSpell(c, SPELL_PORTAL_BEAM, false);
                             timer2 = INTRO_MOVEMENT_INTERVAL - 10000;
                         }
@@ -310,7 +310,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_POWER_SPARK_MALYGOS_BUFF)
             {
@@ -340,14 +340,14 @@ public:
             if (!victim)
                 return;
 
-            if (me->GetVictim() && me->GetVictim()->GetGUID() == victim->GetGUID() && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED))
+            if (me->GetVictim() && me->GetVictim()->GetGUID() == victim->GetGUID() && !me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED))
             {
                 if (!me->GetGuidValue(UNIT_FIELD_TARGET))
                     me->SetTarget(victim->GetGUID());
             }
             else if (me->Attack(victim, true))
             {
-                if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED))
+                if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED))
                     me->GetMotionMaster()->MoveChase(victim);
                 else
                     me->SetTarget();
@@ -356,7 +356,7 @@ public:
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (damage >= me->GetHealth() && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE)) // allow dying only in phase 3!
+            if (damage >= me->GetHealth() && !me->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE)) // allow dying only in phase 3!
             {
                 damage = 0;
                 return;
@@ -399,7 +399,7 @@ public:
                         me->RemoveAllAuras();
                         float angle = CenterPos.GetAngle(me);
                         float x = CenterPos.GetPositionX() + cos(angle) * 35.0f;
-                        float y = CenterPos.GetPositionY() + sin(angle) * 35.0f;
+                        float y = CenterPos.GetPositionY() + std::sin(angle) * 35.0f;
                         float z = FourSidesPos[0].GetPositionZ();
                         me->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                         me->GetMotionMaster()->MovePoint(MI_POINT_INTRO_CENTER_AIR, x, y, z);
@@ -417,7 +417,7 @@ public:
                             pInstance->SetData(DATA_HIDE_IRIS_AND_PORTAL, 0);
                             pInstance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_YOU_DONT_HAVE_AN_ENTERNITY_EVENT);
                         }
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
+                        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
                         if (Unit* target = me->SelectNearestTarget(250.0f))
                         {
                             AttackStart(target);
@@ -460,7 +460,7 @@ public:
                         Talk(SAY_MAGIC_BLAST);
                         EntryCheckPredicate pred(NPC_POWER_SPARK);
                         summons.DoAction(2, pred); // stop following
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+                        me->SetUnitFlag(UNIT_FLAG_PACIFIED);
 
                         me->SendMeleeAttackStop(me->GetVictim());
                         me->SetTarget();
@@ -485,16 +485,16 @@ public:
                         Position pos;
                         float angle = (me->GetOrientation() >= M_PI / 4 ? me->GetOrientation() - M_PI / 4 : 7 * M_PI / 4 + me->GetOrientation());
                         pos.m_positionX = CenterPos.GetPositionX() + cos(angle) * 40.0f;
-                        pos.m_positionY = CenterPos.GetPositionY() + sin(angle) * 40.0f;
+                        pos.m_positionY = CenterPos.GetPositionY() + std::sin(angle) * 40.0f;
                         pos.m_positionZ = CenterPos.GetPositionZ() + 20.0f;
-                        pos.m_orientation = pos.GetAngle(&CenterPos);
+                        pos.SetOrientation(pos.GetAngle(&CenterPos));
 
                         if (Creature* vp = me->SummonCreature(NPC_WORLD_TRIGGER_LAOI, pos, TEMPSUMMON_TIMED_DESPAWN, 14000))
                         {
                             vp->SetDisableGravity(true);
 
                             Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
-                            if (!PlayerList.isEmpty())
+                            if (!PlayerList.IsEmpty())
                                 for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                     if (Player* pPlayer = i->GetSource())
                                     {
@@ -504,9 +504,9 @@ public:
                                         Position plrpos;
                                         float playerAngle = CenterPos.GetAngle(pPlayer);
                                         plrpos.m_positionX = CenterPos.GetPositionX() + cos(playerAngle) * 5.0f;
-                                        plrpos.m_positionY = CenterPos.GetPositionY() + sin(playerAngle) * 5.0f;
+                                        plrpos.m_positionY = CenterPos.GetPositionY() + std::sin(playerAngle) * 5.0f;
                                         plrpos.m_positionZ = CenterPos.GetPositionZ() + 18.0f;
-                                        plrpos.m_orientation = plrpos.GetAngle(&CenterPos);
+                                        plrpos.SetOrientation(plrpos.GetAngle(&CenterPos));
 
                                         if (Creature* c = me->SummonCreature(NPC_VORTEX, plrpos, TEMPSUMMON_TIMED_DESPAWN, 15000))
                                         {
@@ -539,7 +539,7 @@ public:
                                             sScriptMgr->AnticheatSetSkipOnePacketForASH(pPlayer, true);
 
                                             pPlayer->SetGuidValue(PLAYER_FARSIGHT, vp->GetGUID());
-                                            c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                                            c->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                                         }
                                     }
                         }
@@ -556,7 +556,7 @@ public:
                         bLockHealthCheck = false;
                         EntryCheckPredicate pred(NPC_POWER_SPARK);
                         summons.DoAction(1, pred); // resume following
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+                        me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
                         if (Unit* target = me->GetVictim())
                         {
                             AttackStart(target);
@@ -568,7 +568,7 @@ public:
                 case EVENT_START_PHASE_2:
                     events.SetPhase(PHASE_TWO);
                     Talk(SAY_END_P1);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+                    me->SetUnitFlag(UNIT_FLAG_PACIFIED);
                     me->SendMeleeAttackStop();
                     me->SetTarget();
                     me->GetMotionMaster()->MoveIdle();
@@ -588,7 +588,7 @@ public:
                     }
                 case EVENT_START_PHASE_2_MOVE_TO_SIDE:
                     Talk(SAY_PHASE_2);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
                     me->GetMotionMaster()->MovePoint(MI_POINT_CIRCLE_OUTSIDE_PH_2, Phase2NorthPos);
                     events.RescheduleEvent(EVENT_SPELL_ARCANE_STORM, urand(12000, 15000), 1);
                     events.RescheduleEvent(EVENT_SPELL_ARCANE_OVERLOAD, 8000, 1);
@@ -599,7 +599,7 @@ public:
                     {
                         float dist = 22.0f;
                         float angle = M_PI / 2 + ((float)i / MAX_NEXUS_LORDS) * 2 * M_PI;
-                        if (Creature* disk = me->SummonCreature(NPC_HOVER_DISK, CenterPos.GetPositionX() + cos(angle) * dist, CenterPos.GetPositionY() + sin(angle) * dist, CenterPos.GetPositionZ() + 30.0f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0))
+                        if (Creature* disk = me->SummonCreature(NPC_HOVER_DISK, CenterPos.GetPositionX() + cos(angle) * dist, CenterPos.GetPositionY() + std::sin(angle) * dist, CenterPos.GetPositionZ() + 30.0f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0))
                             if (Creature* c = me->SummonCreature(NPC_NEXUS_LORD, *disk, TEMPSUMMON_MANUAL_DESPAWN, 0))
                             {
                                 c->EnterVehicle(disk, 0);
@@ -610,7 +610,7 @@ public:
                     {
                         float dist = 30.0f;
                         float angle = 0.0f + ((float)i / MAX_SCIONS_OF_ETERNITY) * 2 * M_PI;
-                        if (Creature* disk = me->SummonCreature(NPC_HOVER_DISK, CenterPos.GetPositionX() + cos(angle) * dist, CenterPos.GetPositionY() + sin(angle) * dist, CenterPos.GetPositionZ() + 30.0f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0))
+                        if (Creature* disk = me->SummonCreature(NPC_HOVER_DISK, CenterPos.GetPositionX() + cos(angle) * dist, CenterPos.GetPositionY() + std::sin(angle) * dist, CenterPos.GetPositionZ() + 30.0f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0))
                             if (Creature* c = me->SummonCreature(NPC_SCION_OF_ETERNITY, *disk, TEMPSUMMON_MANUAL_DESPAWN, 0))
                             {
                                 c->EnterVehicle(disk, 0);
@@ -626,7 +626,7 @@ public:
                         float dist = urand(5, 30);
                         float angle = rand_norm() * 2 * M_PI;
                         float posx = CenterPos.GetPositionX() + cos(angle) * dist;
-                        float posy = CenterPos.GetPositionY() + sin(angle) * dist;
+                        float posy = CenterPos.GetPositionY() + std::sin(angle) * dist;
                         me->SetFacingTo(me->GetAngle(posx, posy));
                         me->CastSpell(posx, posy, CenterPos.GetPositionZ() + 1.5f, SPELL_ARCANE_OVERLOAD, true);
                         events.RepeatEvent(15000);
@@ -639,7 +639,7 @@ public:
                         float dist = Phase2NorthPos.GetExactDist2d(&CenterPos);
                         float newangle = angle + 0.5f;
                         if (newangle >= 2 * M_PI) newangle -= 2 * M_PI;
-                        me->GetMotionMaster()->MovePoint(MI_POINT_CIRCLE_OUTSIDE_PH_2, CenterPos.GetPositionX() + cos(newangle)*dist, CenterPos.GetPositionY() + sin(newangle)*dist, Phase2NorthPos.GetPositionZ());
+                        me->GetMotionMaster()->MovePoint(MI_POINT_CIRCLE_OUTSIDE_PH_2, CenterPos.GetPositionX() + cos(newangle)*dist, CenterPos.GetPositionY() + std::sin(newangle)*dist, Phase2NorthPos.GetPositionZ());
                     }
                     break;
                 case EVENT_MOVE_TO_SURGE_OF_POWER:
@@ -648,7 +648,7 @@ public:
                         float angle = CenterPos.GetAngle(me);
                         me->GetMotionMaster()->MoveIdle();
                         me->StopMoving();
-                        me->GetMotionMaster()->MovePoint(MI_POINT_SURGE_OF_POWER_CENTER, CenterPos.GetPositionX() + cos(angle) * 10.0f, CenterPos.GetPositionY() + sin(angle) * 10.0f, Phase2NorthPos.GetPositionZ());
+                        me->GetMotionMaster()->MovePoint(MI_POINT_SURGE_OF_POWER_CENTER, CenterPos.GetPositionX() + cos(angle) * 10.0f, CenterPos.GetPositionY() + std::sin(angle) * 10.0f, Phase2NorthPos.GetPositionZ());
                         events.CancelEventGroup(1); // everything beside berserk
                     }
                     break;
@@ -698,7 +698,7 @@ public:
                 case EVENT_DESTROY_PLATFORM_0:
                     if (Creature* c = me->SummonCreature(NPC_WORLD_TRIGGER_LAOI, CenterPos, TEMPSUMMON_TIMED_DESPAWN, 3000))
                     {
-                        c->setFaction(me->getFaction());
+                        c->SetFaction(me->GetFaction());
                         c->CastSpell(c, SPELL_DESTROY_PLATFORM_VISUAL, true);
                         c->CastSpell(c, SPELL_DESTROY_PLATFORM_EFFECT, false);
                     }
@@ -714,7 +714,7 @@ public:
 
                         // mount players:
                         Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
-                        if (!PlayerList.isEmpty())
+                        if (!PlayerList.IsEmpty())
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                 if (Player* pPlayer = i->GetSource())
                                 {
@@ -726,7 +726,7 @@ public:
 
                                     if (Creature* c = me->SummonCreature(NPC_WYRMREST_SKYTALON, pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ() - 20.0f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0))
                                     {
-                                        c->setFaction(pPlayer->getFaction());
+                                        c->SetFaction(pPlayer->GetFaction());
                                         //pPlayer->CastCustomSpell(60683, SPELLVALUE_BASE_POINT0, 1, c, true);
                                         c->m_Events.AddEvent(new EoEDrakeEnterVehicleEvent(*c, pPlayer->GetGUID()), c->m_Events.CalculateTime(500));
                                         AttackStart(c);
@@ -742,8 +742,8 @@ public:
                 case EVENT_START_PHASE_3:
                     events.SetPhase(PHASE_THREE);
                     me->GetMap()->SetZoneOverrideLight(AREA_EYE_OF_ETERNITY, LIGHT_OBSCURE_ARCANE_RUNES, 1s);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED | UNIT_FLAG_DISABLE_MOVE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FLAG_PACIFIED | UNIT_FLAG_DISABLE_MOVE);
                     if (Unit* target = me->GetVictim())
                         AttackStart(target);
                     events.RescheduleEvent(EVENT_SPELL_ARCANE_PULSE, 0, 1);
@@ -756,7 +756,7 @@ public:
                     events.RepeatEvent(3000);
                     break;
                 case EVENT_SPELL_STATIC_FIELD:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, false))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200.0f, false))
                     {
                         me->SetFacingToObject(target);
                         me->CastSpell(target, SPELL_STATIC_FIELD_MAIN, true);
@@ -814,12 +814,13 @@ public:
 
         void MoveInLineOfSight(Unit*  /*who*/) override {}
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             me->SetDisableGravity(true);
             me->GetMap()->SetZoneOverrideLight(AREA_EYE_OF_ETERNITY, LIGHT_GET_DEFAULT_FOR_MAP, 1s);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-            ScriptedAI::EnterEvadeMode();
+
+            me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void HandleIntroSpeech(const uint32 diff)
@@ -878,9 +879,9 @@ public:
             float angle = CenterPos.GetAngle(me);
             Position pos;
             pos.m_positionX = CenterPos.GetPositionX() + VORTEX_RADIUS * cos(angle);
-            pos.m_positionY = CenterPos.GetPositionY() + VORTEX_RADIUS * sin(angle);
+            pos.m_positionY = CenterPos.GetPositionY() + VORTEX_RADIUS * std::sin(angle);
             pos.m_positionZ = CenterPos.GetPositionZ() + h;
-            pos.m_orientation = pos.GetAngle(&CenterPos);
+            pos.SetOrientation(pos.GetAngle(&CenterPos));
             me->SetPosition(pos);
             timer = 0;
             despawnTimer = 9500;
@@ -934,7 +935,7 @@ public:
                 if (newangle >= 2 * M_PI)
                     newangle -= 2 * M_PI;
                 float newx = CenterPos.GetPositionX() + VORTEX_RADIUS * cos(newangle);
-                float newy = CenterPos.GetPositionY() + VORTEX_RADIUS * sin(newangle);
+                float newy = CenterPos.GetPositionY() + VORTEX_RADIUS * std::sin(newangle);
                 float arcangle = me->GetAngle(newx, newy);
                 float dist = 2 * me->GetDistance2d(newx, newy);
                 if (me->GetVehicleKit()) if (Unit* pass = me->GetVehicleKit()->GetPassenger(0)) if (Player* plr = pass->ToPlayer())
@@ -949,7 +950,7 @@ public:
                                 sScriptMgr->AnticheatSetUnderACKmount(plr);
                             }
 
-                            plr->SendMonsterMove(me->GetPositionX() + dist * cos(arcangle), me->GetPositionY() + dist * sin(arcangle), me->GetPositionZ(), VORTEX_DEFAULT_DIFF * 2, SPLINEFLAG_FLYING);
+                            plr->SendMonsterMove(me->GetPositionX() + dist * cos(arcangle), me->GetPositionY() + dist * std::sin(arcangle), me->GetPositionZ(), VORTEX_DEFAULT_DIFF * 2, SPLINEFLAG_FLYING);
                             me->Relocate(newx, newy);
                         }
 
@@ -1010,14 +1011,14 @@ public:
             if (damage >= me->GetHealth())
             {
                 damage = 0;
-                if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+                if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                 {
                     MoveTimer = 0;
                     me->GetMotionMaster()->MoveIdle();
                     me->DisableSpline();
                     me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), CenterPos.GetPositionZ(), 100.0f);
                     me->SetPosition(me->GetPositionX(), me->GetPositionY(), CenterPos.GetPositionZ(), me->GetOrientation());
-                    me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
+                    me->ReplaceAllUnitFlags(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
                     me->RemoveAura(SPELL_POWER_SPARK_VISUAL);
                     me->CastSpell(me, SPELL_POWER_SPARK_GROUND_BUFF, true);
                     me->DespawnOrUnsummon(60000);
@@ -1027,7 +1028,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+            if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                 return;
 
             if (CheckTimer <= diff)
@@ -1196,7 +1197,7 @@ public:
                     {
                         GuidVector guids;
                         Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
-                        if (!PlayerList.isEmpty())
+                        if (!PlayerList.IsEmpty())
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                 if (Player* pPlayer = i->GetSource())
                                 {
@@ -1333,7 +1334,7 @@ public:
                                         if (newangle < 0.0f) newangle += 2 * M_PI;
                                         float newz = me->GetPositionZ() - 4.0f;
                                         if (newz < CenterPos.GetPositionZ()) newz = CenterPos.GetPositionZ();
-                                        me->GetMotionMaster()->MovePoint(MI_POINT_NEXUS_LORD, CenterPos.GetPositionX() + cos(newangle) * 22.0f, CenterPos.GetPositionY() + sin(newangle) * 22.0f, newz);
+                                        me->GetMotionMaster()->MovePoint(MI_POINT_NEXUS_LORD, CenterPos.GetPositionX() + cos(newangle) * 22.0f, CenterPos.GetPositionY() + std::sin(newangle) * 22.0f, newz);
                                     }
                                     break;
                                 case NPC_SCION_OF_ETERNITY:
@@ -1343,7 +1344,7 @@ public:
                                         if (newangle < 0.0f) newangle += 2 * M_PI;
                                         float newz = me->GetPositionZ() - 2.0f;
                                         if (newz < CenterPos.GetPositionZ() + 20.0f) newz = CenterPos.GetPositionZ() + 20.0f;
-                                        me->GetMotionMaster()->MovePoint(MI_POINT_SCION, CenterPos.GetPositionX() + cos(newangle) * 30.0f, CenterPos.GetPositionY() + sin(newangle) * 30.0f, newz);
+                                        me->GetMotionMaster()->MovePoint(MI_POINT_SCION, CenterPos.GetPositionX() + cos(newangle) * 30.0f, CenterPos.GetPositionY() + std::sin(newangle) * 30.0f, newz);
                                     }
                                     break;
                             }
@@ -1401,8 +1402,15 @@ public:
                     break;
                 case 1:
                     me->CastSpell(773.98f, 1285.97f, 266.254f, SPELL_ALEXSTRASZA_GIFT, true);
-                    me->SummonGameObject(ALEXSTRASZA_GIFT, 773.98f, 1285.97f, 266.254f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0);
-                    me->SummonGameObject(HEART_OF_MAGIC, 773.98f, 1275.97f, 266.254f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0);
+                    if (GameObject* chest = me->SummonGameObject(ALEXSTRASZA_GIFT, 773.98f, 1285.97f, 266.254f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0))
+                    {
+                        chest->SetLootRecipient(me->GetMap());
+                    }
+
+                    if (GameObject* heart = me->SummonGameObject(HEART_OF_MAGIC, 773.98f, 1275.97f, 266.254f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0))
+                    {
+                        heart->SetLootRecipient(me->GetMap());
+                    }
 
                     Talk(SAY_ALEXSTRASZA_ONE);
                     events.RescheduleEvent(2, 6000);
@@ -1497,7 +1505,7 @@ public:
                 {
                     uint8 i = 0;
                     std::list<Unit*> drakes;
-                    c->AI()->SelectTargetList(drakes, (c->GetMap()->GetSpawnMode() == 0 ? 1 : 3), SELECT_TARGET_RANDOM, 0.0f, false, 57403 /*only drakes have this aura*/);
+                    c->AI()->SelectTargetList(drakes, (c->GetMap()->GetSpawnMode() == 0 ? 1 : 3), SelectTargetMethod::Random, 0.0f, false, 57403 /*only drakes have this aura*/);
                     for (std::list<Unit*>::iterator itr = drakes.begin(); itr != drakes.end() && i < 3; ++itr)
                     {
                         DrakeGUID[i++] = (*itr)->GetGUID();

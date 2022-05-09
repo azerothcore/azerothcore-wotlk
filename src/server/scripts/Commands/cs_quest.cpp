@@ -23,14 +23,11 @@ Category: commandscripts
 EndScriptData */
 
 #include "Chat.h"
+#include "GameTime.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
-
-#if AC_COMPILER == AC_COMPILER_GNU
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
 
 using namespace Acore::ChatCommands;
 
@@ -43,50 +40,33 @@ public:
     {
         static ChatCommandTable questCommandTable =
         {
-            { "add",            SEC_GAMEMASTER,  false, &HandleQuestAdd,                    "" },
-            { "complete",       SEC_GAMEMASTER,  false, &HandleQuestComplete,               "" },
-            { "remove",         SEC_GAMEMASTER,  false, &HandleQuestRemove,                 "" },
-            { "reward",         SEC_GAMEMASTER,  false, &HandleQuestReward,                 "" },
+            { "add",      HandleQuestAdd,      SEC_GAMEMASTER, Console::Yes },
+            { "complete", HandleQuestComplete, SEC_GAMEMASTER, Console::Yes },
+            { "remove",   HandleQuestRemove,   SEC_GAMEMASTER, Console::Yes },
+            { "reward",   HandleQuestReward,   SEC_GAMEMASTER, Console::Yes },
         };
         static ChatCommandTable commandTable =
         {
-            { "quest",          SEC_GAMEMASTER,  false, nullptr, "", questCommandTable },
+            { "quest", questCommandTable },
         };
         return commandTable;
     }
 
-    static bool HandleQuestAdd(ChatHandler* handler, const char* args)
+    static bool HandleQuestAdd(ChatHandler* handler, Quest const* quest, Optional<PlayerIdentifier> playerTarget)
     {
-        Player* player = handler->getSelectedPlayer();
-        if (!player)
+        if (!playerTarget)
         {
-            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
+            playerTarget = PlayerIdentifier::FromTargetOrSelf(handler);
+        }
+
+        if (!playerTarget)
+        {
+            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        // .addquest #entry'
-        // number or [name] Shift-click form |color|Hquest:quest_id:quest_level|h[name]|h|r
-        char* cId = handler->extractKeyFromLink((char*)args, "Hquest");
-        if (!cId)
-            return false;
-
-        uint32 entry = atol(cId);
-
-        Quest const* quest = sObjectMgr->GetQuestTemplate(entry);
-
-        if (!quest)
-        {
-            handler->PSendSysMessage(LANG_COMMAND_QUEST_NOTFOUND, entry);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        if (player->IsActiveQuest(entry))
-        {
-            handler->PSendSysMessage("This quest is already active!");
-            return false;
-        }
+        uint32 entry = quest->GetQuestId();
 
         // check item starting quest (it can work incorrectly if added without item in inventory)
         ItemTemplateContainer const* itc = sObjectMgr->GetItemTemplateStore();
@@ -99,32 +79,77 @@ public:
             return false;
         }
 
-        // ok, normal (creature/GO starting) quest
-        if (player->CanAddQuest(quest, true))
-            player->AddQuestAndCheckCompletion(quest, nullptr);
+        if (Player* player = playerTarget->GetConnectedPlayer())
+        {
+            if (player->IsActiveQuest(entry))
+            {
+                handler->PSendSysMessage(LANG_COMMAND_QUEST_ACTIVE, quest->GetTitle().c_str(), entry);
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
 
+            // ok, normal (creature/GO starting) quest
+            if (player->CanAddQuest(quest, true))
+            {
+                player->AddQuestAndCheckCompletion(quest, nullptr);
+            }
+        }
+        else
+        {
+            ObjectGuid::LowType guid = playerTarget->GetGUID().GetCounter();
+            QueryResult result = CharacterDatabase.Query("SELECT 1 FROM character_queststatus WHERE guid = {} AND quest = {}", guid, entry);
+
+            if (result)
+            {
+                handler->PSendSysMessage(LANG_COMMAND_QUEST_ACTIVE, quest->GetTitle().c_str(), entry);
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
+
+            uint8 index = 0;
+
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHAR_QUESTSTATUS);
+            stmt->SetData(index++, guid);
+            stmt->SetData(index++, entry);
+            stmt->SetData(index++, 1);
+            stmt->SetData(index++, false);
+            stmt->SetData(index++, 0);
+
+            for (uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; i++)
+            {
+                stmt->SetData(index++, 0);
+            }
+
+            for (uint8 i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; i++)
+            {
+                stmt->SetData(index++, 0);
+            }
+
+            stmt->SetData(index, 0);
+
+            CharacterDatabase.Execute(stmt);
+        }
+
+        handler->PSendSysMessage(LANG_COMMAND_QUEST_ADD, quest->GetTitle().c_str(), entry);
+        handler->SetSentErrorMessage(false);
         return true;
     }
 
-    static bool HandleQuestRemove(ChatHandler* handler, const char* args)
+    static bool HandleQuestRemove(ChatHandler* handler, Quest const* quest, Optional<PlayerIdentifier> playerTarget)
     {
-        Player* player = handler->getSelectedPlayer();
-        if (!player)
+        if (!playerTarget)
         {
-            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
+            playerTarget = PlayerIdentifier::FromTargetOrSelf(handler);
+        }
+
+        if (!playerTarget)
+        {
+            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        // .removequest #entry'
-        // number or [name] Shift-click form |color|Hquest:quest_id:quest_level|h[name]|h|r
-        char* cId = handler->extractKeyFromLink((char*)args, "Hquest");
-        if (!cId)
-            return false;
-
-        uint32 entry = atol(cId);
-
-        Quest const* quest = sObjectMgr->GetQuestTemplate(entry);
+        uint32 entry = quest->GetQuestId();
 
         if (!quest)
         {
@@ -133,166 +158,589 @@ public:
             return false;
         }
 
-        // remove all quest entries for 'entry' from quest log
-        for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
+        if (Player* player = playerTarget->GetConnectedPlayer())
         {
-            uint32 logQuest = player->GetQuestSlotQuestId(slot);
-            if (logQuest == entry)
+            // remove all quest entries for 'entry' from quest log
+            for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
             {
-                player->SetQuestSlot(slot, 0);
-
-                // we ignore unequippable quest items in this case, its' still be equipped
-                player->TakeQuestSourceItem(logQuest, false);
-
-                if (quest->HasFlag(QUEST_FLAGS_FLAGS_PVP))
+                uint32 logQuest = player->GetQuestSlotQuestId(slot);
+                if (logQuest == entry)
                 {
-                    player->pvpInfo.IsHostile = player->pvpInfo.IsInHostileArea || player->HasPvPForcingQuest();
-                    player->UpdatePvPState();
+                    player->SetQuestSlot(slot, 0);
+
+                    // we ignore unequippable quest items in this case, its' still be equipped
+                    player->TakeQuestSourceItem(logQuest, false);
+
+                    if (quest->HasFlag(QUEST_FLAGS_FLAGS_PVP))
+                    {
+                        player->pvpInfo.IsHostile = player->pvpInfo.IsInHostileArea || player->HasPvPForcingQuest();
+                        player->UpdatePvPState();
+                    }
                 }
             }
+
+            player->RemoveRewardedQuest(entry);
+            player->RemoveActiveQuest(entry, false);
+        }
+        else
+        {
+            ObjectGuid::LowType guid = playerTarget->GetGUID().GetCounter();
+            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_QUESTSTATUS_REWARDED_BY_QUEST);
+            stmt->SetData(0, guid);
+            stmt->SetData(1, entry);
+            trans->Append(stmt);
+
+            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_QUESTSTATUS_BY_QUEST);
+            stmt->SetData(0, guid);
+            stmt->SetData(1, entry);
+            trans->Append(stmt);
+
+            for (uint32 const& requiredItem : quest->RequiredItemId)
+            {
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_INVENTORY_ITEM_BY_ENTRY_AND_OWNER);
+                stmt->SetData(0, requiredItem);
+                stmt->SetData(1, guid);
+
+                PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+                if (result)
+                {
+                    Field* fields = result->Fetch();
+
+                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INVENTORY_BY_ITEM);
+                    stmt->SetData(0, fields[0].Get<uint32>());
+                    trans->Append(stmt);
+
+                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
+                    stmt->SetData(0, fields[0].Get<uint32>());
+                    trans->Append(stmt);
+                }
+            }
+
+            CharacterDatabase.CommitTransaction(trans);
         }
 
-        player->RemoveRewardedQuest(entry);
-        player->RemoveActiveQuest(entry, false);
-
-        handler->SendSysMessage(LANG_COMMAND_QUEST_REMOVED);
+        handler->PSendSysMessage(LANG_COMMAND_QUEST_REMOVED, quest->GetTitle().c_str(), entry);
+        handler->SetSentErrorMessage(false);
         return true;
     }
 
-    static bool HandleQuestComplete(ChatHandler* handler, const char* args)
+    static bool HandleQuestComplete(ChatHandler* handler, Quest const* quest, Optional<PlayerIdentifier> playerTarget)
     {
-        Player* player = handler->getSelectedPlayer();
-        if (!player)
+        if (!playerTarget)
         {
-            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
+            playerTarget = PlayerIdentifier::FromTargetOrSelf(handler);
+        }
+
+        if (!playerTarget)
+        {
+            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        // .quest complete #entry
-        // number or [name] Shift-click form |color|Hquest:quest_id:quest_level|h[name]|h|r
-        char* cId = handler->extractKeyFromLink((char*)args, "Hquest");
-        if (!cId)
-            return false;
+        uint32 entry = quest->GetQuestId();
 
-        uint32 entry = atol(cId);
-
-        Quest const* quest = sObjectMgr->GetQuestTemplate(entry);
-
-        // If player doesn't have the quest
-        if (!quest || player->GetQuestStatus(entry) == QUEST_STATUS_NONE)
+        if (Player* player = playerTarget->GetConnectedPlayer())
         {
-            handler->PSendSysMessage(LANG_COMMAND_QUEST_NOTFOUND, entry);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        // Add quest items for quests that require items
-        for (uint8 x = 0; x < QUEST_ITEM_OBJECTIVES_COUNT; ++x)
-        {
-            uint32 id = quest->RequiredItemId[x];
-            uint32 count = quest->RequiredItemCount[x];
-            if (!id || !count)
-                continue;
-
-            uint32 curItemCount = player->GetItemCount(id, true);
-
-            ItemPosCountVec dest;
-            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, id, count - curItemCount);
-            if (msg == EQUIP_ERR_OK)
+            // If player doesn't have the quest
+            if (player->GetQuestStatus(entry) == QUEST_STATUS_NONE)
             {
-                Item* item = player->StoreNewItem(dest, id, true);
-                player->SendNewItem(item, count - curItemCount, true, false);
+                handler->PSendSysMessage(LANG_COMMAND_QUEST_NOTFOUND, entry);
+                handler->SetSentErrorMessage(true);
+                return false;
             }
-        }
 
-        // All creature/GO slain/casted (not required, but otherwise it will display "Creature slain 0/10")
-        for (uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
-        {
-            int32 creature = quest->RequiredNpcOrGo[i];
-            uint32 creatureCount = quest->RequiredNpcOrGoCount[i];
-
-            if (creature > 0)
+            // Add quest items for quests that require items
+            for (uint8 x = 0; x < QUEST_ITEM_OBJECTIVES_COUNT; ++x)
             {
-                if (CreatureTemplate const* creatureInfo = sObjectMgr->GetCreatureTemplate(creature))
+                uint32 id    = quest->RequiredItemId[x];
+                uint32 count = quest->RequiredItemCount[x];
+                if (!id || !count)
+                {
+                    continue;
+                }
+
+                uint32 curItemCount = player->GetItemCount(id, true);
+
+                ItemPosCountVec dest;
+                uint8           msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, id, count - curItemCount);
+                if (msg == EQUIP_ERR_OK)
+                {
+                    Item* item = player->StoreNewItem(dest, id, true);
+                    player->SendNewItem(item, count - curItemCount, true, false);
+                }
+            }
+
+            // All creature/GO slain/casted (not required, but otherwise it will display "Creature slain 0/10")
+            for (uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
+            {
+                int32  creature      = quest->RequiredNpcOrGo[i];
+                uint32 creatureCount = quest->RequiredNpcOrGoCount[i];
+
+                if (creature > 0)
+                {
+                    if (CreatureTemplate const* creatureInfo = sObjectMgr->GetCreatureTemplate(creature))
+                    {
+                        for (uint16 z = 0; z < creatureCount; ++z)
+                        {
+                            player->KilledMonster(creatureInfo, ObjectGuid::Empty);
+                        }
+                    }
+                }
+                else if (creature < 0)
+                {
                     for (uint16 z = 0; z < creatureCount; ++z)
-                        player->KilledMonster(creatureInfo, ObjectGuid::Empty);
+                    {
+                        player->KillCreditGO(creature);
+                    }
+                }
             }
-            else if (creature < 0)
-                for (uint16 z = 0; z < creatureCount; ++z)
-                    player->KillCreditGO(creature);
-        }
 
-        // If the quest requires reputation to complete
-        if (uint32 repFaction = quest->GetRepObjectiveFaction())
+            // player kills
+            if (quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_PLAYER_KILL))
+            {
+                if (uint32 reqPlayers = quest->GetPlayersSlain())
+                {
+                    player->KilledPlayerCreditForQuest(reqPlayers, quest);
+                }
+            }
+
+            // If the quest requires reputation to complete
+            if (uint32 repFaction = quest->GetRepObjectiveFaction())
+            {
+                uint32 repValue = quest->GetRepObjectiveValue();
+                uint32 curRep   = player->GetReputationMgr().GetReputation(repFaction);
+                if (curRep < repValue)
+                {
+                    if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(repFaction))
+                    {
+                        player->GetReputationMgr().SetReputation(factionEntry, static_cast<float>(repValue));
+                    }
+                }
+            }
+
+            // If the quest requires a SECOND reputation to complete
+            if (uint32 repFaction = quest->GetRepObjectiveFaction2())
+            {
+                uint32 repValue2 = quest->GetRepObjectiveValue2();
+                uint32 curRep    = player->GetReputationMgr().GetReputation(repFaction);
+                if (curRep < repValue2)
+                {
+                    if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(repFaction))
+                    {
+                        player->GetReputationMgr().SetReputation(factionEntry, static_cast<float>(repValue2));
+                    }
+                }
+            }
+
+            // If the quest requires money
+            int32 ReqOrRewMoney = quest->GetRewOrReqMoney(player->getLevel());
+            if (ReqOrRewMoney < 0)
+            {
+                player->ModifyMoney(-ReqOrRewMoney);
+            }
+
+            player->CompleteQuest(entry);
+        }
+        else
         {
-            uint32 repValue = quest->GetRepObjectiveValue();
-            uint32 curRep = player->GetReputationMgr().GetReputation(repFaction);
-            if (curRep < repValue)
-                if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(repFaction))
-                    player->GetReputationMgr().SetReputation(factionEntry, repValue);
-        }
+            ObjectGuid::LowType guid = playerTarget->GetGUID().GetCounter();
+            QueryResult result = CharacterDatabase.Query("SELECT 1 FROM character_queststatus WHERE guid = {} AND quest = {}", guid, entry);
 
-        // If the quest requires a SECOND reputation to complete
-        if (uint32 repFaction = quest->GetRepObjectiveFaction2())
-        {
-            uint32 repValue2 = quest->GetRepObjectiveValue2();
-            uint32 curRep = player->GetReputationMgr().GetReputation(repFaction);
-            if (curRep < repValue2)
-                if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(repFaction))
-                    player->GetReputationMgr().SetReputation(factionEntry, repValue2);
-        }
+            if (!result)
+            {
+                handler->PSendSysMessage(LANG_COMMAND_QUEST_NOT_FOUND_IN_LOG, quest->GetTitle(), entry);
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
 
-        // If the quest requires money
-        int32 ReqOrRewMoney = quest->GetRewOrReqMoney(player);
-        if (ReqOrRewMoney < 0)
-            player->ModifyMoney(-ReqOrRewMoney);
+            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+
+            typedef std::pair<uint32, uint32> items;
+            std::vector<items> questItems;
+
+            for (uint8 x = 0; x < QUEST_ITEM_OBJECTIVES_COUNT; ++x)
+            {
+                uint32 id    = quest->RequiredItemId[x];
+                uint32 count = quest->RequiredItemCount[x];
+                if (!id || !count)
+                {
+                    continue;
+                }
+
+                questItems.push_back(std::pair(id, count));
+            }
+
+            if (!questItems.empty())
+            {
+                MailSender sender(MAIL_NORMAL, guid, MAIL_STATIONERY_GM);
+                // fill mail
+                MailDraft draft(quest->GetTitle(), std::string());
+
+                for (auto const& itr : questItems)
+                {
+                    if (Item* item = Item::CreateItem(itr.first, itr.second))
+                    {
+                        item->SaveToDB(trans);
+                        draft.AddItem(item);
+                    }
+                }
+
+                draft.SendMailTo(trans, MailReceiver(nullptr, guid), sender);
+            }
+
+            uint8 index = 0;
+
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHAR_QUESTSTATUS);
+            stmt->SetData(index++, guid);
+            stmt->SetData(index++, entry);
+            stmt->SetData(index++, 1);
+            stmt->SetData(index++, quest->HasFlag(QUEST_FLAGS_EXPLORATION));
+            stmt->SetData(index++, 0);
+
+            for (uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; i++)
+            {
+                stmt->SetData(index++, quest->RequiredNpcOrGoCount[i]);
+            }
+
+            for (uint8 i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; i++)
+            {
+                // Will be updated once they loot the items from the mailbox.
+                stmt->SetData(index++, 0);
+            }
+
+            stmt->SetData(index, 0);
+
+            trans->Append(stmt);
+
+            // If the quest requires reputation to complete, set the player rep to the required amount.
+            if (uint32 repFaction = quest->GetRepObjectiveFaction())
+            {
+                uint32 repValue = quest->GetRepObjectiveValue();
+
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_REP_BY_FACTION);
+                stmt->SetData(0, repFaction);
+                stmt->SetData(1, guid);
+                PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+                if (result)
+                {
+                    Field* fields = result->Fetch();
+                    uint32 curRep = fields[0].Get<uint32>();
+
+                    if (curRep < repValue)
+                    {
+                        if (sFactionStore.LookupEntry(repFaction))
+                        {
+                            stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_REP_FACTION_CHANGE);
+                            stmt->SetData(0, repFaction);
+                            stmt->SetData(1, repValue);
+                            stmt->SetData(2, repFaction);
+                            stmt->SetData(3, guid);
+                            trans->Append(stmt);
+                        }
+                    }
+                }
+            }
+
+            // If the quest requires reputation to complete, set the player rep to the required amount.
+            if (uint32 repFaction = quest->GetRepObjectiveFaction2())
+            {
+                uint32 repValue = quest->GetRepObjectiveValue();
+
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_REP_BY_FACTION);
+                stmt->SetData(0, repFaction);
+                stmt->SetData(1, guid);
+                PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+                if (result)
+                {
+                    Field* fields = result->Fetch();
+                    uint32 curRep = fields[0].Get<uint32>();
+
+                    if (curRep < repValue)
+                    {
+                        if (sFactionStore.LookupEntry(repFaction))
+                        {
+                            stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_REP_FACTION_CHANGE);
+                            stmt->SetData(0, repFaction);
+                            stmt->SetData(1, repValue);
+                            stmt->SetData(2, repFaction);
+                            stmt->SetData(3, guid);
+                            trans->Append(stmt);
+                        }
+                    }
+                }
+            }
+
+            CharacterDatabase.CommitTransaction(trans);
+        }
 
         // check if Quest Tracker is enabled
         if (sWorld->getBoolConfig(CONFIG_QUEST_ENABLE_QUEST_TRACKER))
         {
             // prepare Quest Tracker datas
             auto stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_QUEST_TRACK_GM_COMPLETE);
-            stmt->setUInt32(0, quest->GetQuestId());
-            stmt->setUInt32(1, player->GetGUID().GetCounter());
+            stmt->SetData(0, entry);
+            stmt->SetData(1, playerTarget->GetGUID().GetCounter());
 
             // add to Quest Tracker
             CharacterDatabase.Execute(stmt);
         }
 
-        player->CompleteQuest(entry);
+        handler->PSendSysMessage(LANG_COMMAND_QUEST_COMPLETE, quest->GetTitle().c_str(), entry);
+        handler->SetSentErrorMessage(false);
         return true;
     }
 
-    static bool HandleQuestReward(ChatHandler* handler, char const* args)
+    static bool HandleQuestReward(ChatHandler* handler, Quest const* quest, Optional<PlayerIdentifier> playerTarget)
     {
-        Player* player = handler->getSelectedPlayer();
-        if (!player)
+        if (!playerTarget)
         {
-            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
+            playerTarget = PlayerIdentifier::FromTargetOrSelf(handler);
+        }
+
+        if (!playerTarget)
+        {
+            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        // .quest reward #entry
-        // number or [name] Shift-click form |color|Hquest:quest_id:quest_level|h[name]|h|r
-        char* cId = handler->extractKeyFromLink((char*)args, "Hquest");
-        if (!cId)
-            return false;
+        uint32 entry = quest->GetQuestId();
 
-        uint32 entry = atol(cId);
-
-        Quest const* quest = sObjectMgr->GetQuestTemplate(entry);
-
-        // If player doesn't have the quest
-        if (!quest || player->GetQuestStatus(entry) != QUEST_STATUS_COMPLETE)
+        if (Player* player = playerTarget->GetConnectedPlayer())
         {
-            handler->PSendSysMessage(LANG_COMMAND_QUEST_NOTFOUND, entry);
-            handler->SetSentErrorMessage(true);
-            return false;
+            // If player doesn't have the quest
+            if (player->GetQuestStatus(entry) != QUEST_STATUS_COMPLETE)
+            {
+                handler->PSendSysMessage(LANG_COMMAND_QUEST_NOTFOUND, entry);
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
+
+            player->RewardQuest(quest, 0, player);
+        }
+        else
+        {
+            // Achievement criteria updates correctly the next time a quest is rewarded.
+            // Titles are already awarded correctly the next time they login (only one quest awards title - 11549).
+            // Rewarded talent points (Death Knights) and spells (e.g Druid forms) are also granted on login.
+            // No reputation gains - too troublesome to calculate them when the player is offline.
+
+            ObjectGuid::LowType guid = playerTarget->GetGUID().GetCounter();
+            uint8 charLevel = sCharacterCache->GetCharacterLevelByGuid(ObjectGuid(HighGuid::Player, guid));
+            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+            CharacterDatabasePreparedStatement* stmt;
+
+            QueryResult result = CharacterDatabase.Query("SELECT 1 FROM character_queststatus WHERE guid = {} AND quest = {} AND status = 1", guid, entry);
+
+            if (!result)
+            {
+                handler->SendSysMessage(LANG_COMMAND_QUEST_NOT_COMPLETE);
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
+
+            for (uint32 const& requiredItem : quest->RequiredItemId)
+            {
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_INVENTORY_ITEM_BY_ENTRY_AND_OWNER);
+                stmt->SetData(0, requiredItem);
+                stmt->SetData(1, guid);
+
+                PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+                if (result)
+                {
+                    Field* fields = result->Fetch();
+
+                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INVENTORY_BY_ITEM);
+                    stmt->SetData(0, fields[0].Get<uint32>());
+                    trans->Append(stmt);
+
+                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
+                    stmt->SetData(0, fields[0].Get<uint32>());
+                    trans->Append(stmt);
+                }
+            }
+
+            for (uint32 const& sourceItem : quest->ItemDrop)
+            {
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_INVENTORY_ITEM_BY_ENTRY_AND_OWNER);
+                stmt->SetData(0, sourceItem);
+                stmt->SetData(1, guid);
+
+                PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+                if (result)
+                {
+                    Field* fields = result->Fetch();
+
+                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INVENTORY_BY_ITEM);
+                    stmt->SetData(0, fields[0].Get<uint32>());
+                    trans->Append(stmt);
+
+                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
+                    stmt->SetData(0, fields[0].Get<uint32>());
+                    trans->Append(stmt);
+                }
+            }
+
+            typedef std::pair<uint32, uint32> items;
+            std::vector<items> questRewardItems;
+
+            if (quest->GetRewChoiceItemsCount())
+            {
+                for (uint32 const& itemId : quest->RewardChoiceItemId)
+                {
+                    uint8 index = 0;
+                    questRewardItems.push_back(std::pair(itemId, quest->RewardChoiceItemCount[index++]));
+                }
+            }
+
+            if (quest->GetRewItemsCount())
+            {
+                for (uint32 const& itemId : quest->RewardItemId)
+                {
+                    uint8 index = 0;
+                    questRewardItems.push_back(std::pair(itemId, quest->RewardItemIdCount[index++]));
+                }
+            }
+
+            if (!questRewardItems.empty())
+            {
+                MailSender sender(MAIL_NORMAL, guid, MAIL_STATIONERY_GM);
+                // fill mail
+                MailDraft draft(quest->GetTitle(), "This quest has been manually rewarded to you. This mail contains your quest rewards.");
+
+                for (auto const& itr : questRewardItems)
+                {
+                    if (!itr.first || !itr.second)
+                    {
+                        continue;
+                    }
+
+                    // Skip invalid items.
+                    if (!sObjectMgr->GetItemTemplate(itr.first))
+                    {
+                        continue;
+                    }
+
+                    if (Item* item = Item::CreateItem(itr.first, itr.second))
+                    {
+                        item->SaveToDB(trans);
+                        draft.AddItem(item);
+                    }
+                }
+
+                draft.SendMailTo(trans, MailReceiver(nullptr, guid), sender);
+            }
+
+            // Send quest giver mail, if any.
+            if (uint32 mail_template_id = quest->GetRewMailTemplateId())
+            {
+                if (quest->GetRewMailSenderEntry() != 0)
+                {
+                    MailDraft(mail_template_id).SendMailTo(trans, MailReceiver(nullptr, guid), quest->GetRewMailSenderEntry(), MAIL_CHECK_MASK_HAS_BODY, quest->GetRewMailDelaySecs());
+                }
+            }
+
+            if (quest->IsDaily() || quest->IsDFQuest())
+            {
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_DAILYQUESTSTATUS);
+                stmt->SetData(0, guid);
+                stmt->SetData(1, entry);
+                stmt->SetData(2, GameTime::GetGameTime().count());
+                trans->Append(stmt);
+            }
+            else if (quest->IsWeekly())
+            {
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_WEEKLYQUESTSTATUS);
+                stmt->SetData(0, guid);
+                stmt->SetData(1, entry);
+                trans->Append(stmt);
+            }
+            else if (quest->IsMonthly())
+            {
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_MONTHLYQUESTSTATUS);
+                stmt->SetData(0, guid);
+                stmt->SetData(1, entry);
+                trans->Append(stmt);
+            }
+            else if (quest->IsSeasonal())
+            {
+                // We can't know which event is the quest linked to, so we can't do anything about this.
+                /* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_SEASONALQUESTSTATUS);
+                stmt->SetData(0, guid);
+                stmt->SetData(1, entry);
+                stmt->SetData(2, event_id);
+                trans->Append(stmt);*/
+            }
+
+            if (uint32 honor = quest->CalculateHonorGain(charLevel))
+            {
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_HONOR_POINTS_ACCUMULATIVE);
+                stmt->SetData(0, honor);
+                stmt->SetData(1, guid);
+                trans->Append(stmt);
+            }
+
+            if (quest->GetRewArenaPoints())
+            {
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_ARENA_POINTS_ACCUMULATIVE);
+                stmt->SetData(0, quest->GetRewArenaPoints());
+                stmt->SetData(1, guid);
+                trans->Append(stmt);
+            }
+
+            int32 rewMoney = 0;
+
+            if (charLevel >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+            {
+                rewMoney = quest->GetRewMoneyMaxLevel();
+            }
+            else
+            {
+                // Some experience might get lost on level up.
+                uint32 xp = uint32(quest->XPValue(charLevel) * sWorld->getRate(RATE_XP_QUEST));
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_XP_ACCUMULATIVE);
+                stmt->SetData(0, xp);
+                stmt->SetData(1, guid);
+                trans->Append(stmt);
+            }
+
+            if (int32 rewOrReqMoney = quest->GetRewOrReqMoney(charLevel))
+            {
+                rewMoney += rewOrReqMoney;
+            }
+
+            // Only reward money, don't subtract, let's not cause an overflow...
+            if (rewMoney > 0)
+            {
+                CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_MONEY_ACCUMULATIVE);
+                stmt->SetData(0, rewMoney);
+                stmt->SetData(1, guid);
+                trans->Append(stmt);
+            }
+
+            stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_QUESTSTATUS_REWARDED);
+            stmt->SetData(0, guid);
+            stmt->SetData(1, entry);
+            trans->Append(stmt);
+
+            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_QUESTSTATUS_BY_QUEST);
+            stmt->SetData(0, guid);
+            stmt->SetData(1, entry);
+            trans->Append(stmt);
+
+            CharacterDatabase.CommitTransaction(trans);
         }
 
-        player->RewardQuest(quest, 0, player);
+        handler->PSendSysMessage(LANG_COMMAND_QUEST_REWARDED, quest->GetTitle().c_str(), entry);
+        handler->SetSentErrorMessage(false);
         return true;
     }
 };

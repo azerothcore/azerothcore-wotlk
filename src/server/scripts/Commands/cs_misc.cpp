@@ -19,17 +19,19 @@
 #include "ArenaTeamMgr.h"
 #include "BattlegroundMgr.h"
 #include "CellImpl.h"
+#include "CharacterCache.h"
 #include "Chat.h"
 #include "GameGraveyard.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "Group.h"
-#include "GroupMgr.h"
 #include "GuildMgr.h"
-#include "InstanceSaveMgr.h"
 #include "IPLocation.h"
-#include "Language.h"
+#include "InstanceSaveMgr.h"
 #include "LFG.h"
+#include "Language.h"
 #include "MapMgr.h"
+#include "MiscPackets.h"
 #include "MovementGenerator.h"
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
@@ -39,11 +41,41 @@
 #include "ScriptMgr.h"
 #include "SpellAuras.h"
 #include "TargetedMovementGenerator.h"
+#include "Tokenize.h"
 #include "WeatherMgr.h"
 
-#if AC_COMPILER == AC_COMPILER_GNU
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
+// TODO: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+//  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
+#include "GridNotifiersImpl.h"
+
+constexpr auto SPELL_STUCK = 7355;
+constexpr auto SPELL_FREEZE = 9454;
+
+std::string const GetLocalizeCreatureName(Creature* creature, LocaleConstant locale)
+{
+    auto creatureTemplate = sObjectMgr->GetCreatureTemplate(creature->GetEntry());
+    auto cretureLocale = sObjectMgr->GetCreatureLocale(creature->GetEntry());
+    std::string name;
+
+    if (cretureLocale)
+    {
+        name = cretureLocale->Name[locale];
+    }
+
+    if (name.empty() && creatureTemplate)
+    {
+        name = creatureTemplate->Name;
+    }
+
+    if (name.empty())
+    {
+        name = "Unknown creature";
+    }
+
+    return name;
+}
 
 using namespace Acore::ChatCommands;
 
@@ -54,115 +86,85 @@ public:
 
     ChatCommandTable GetCommands() const override
     {
-        static ChatCommandTable groupCommandTable =
-        {
-            { "leader",         SEC_GAMEMASTER,             false,  &HandleGroupLeaderCommand,          "" },
-            { "disband",        SEC_GAMEMASTER,             false,  &HandleGroupDisbandCommand,         "" },
-            { "remove",         SEC_GAMEMASTER,             false,  &HandleGroupRemoveCommand,          "" },
-            { "join",           SEC_GAMEMASTER,             false,  &HandleGroupJoinCommand,            "" },
-            { "list",           SEC_GAMEMASTER,             false,  &HandleGroupListCommand,            "" }
-        };
-        static ChatCommandTable petCommandTable =
-        {
-            { "create",             SEC_GAMEMASTER,         false, &HandleCreatePetCommand,             "" },
-            { "learn",              SEC_GAMEMASTER,         false, &HandlePetLearnCommand,              "" },
-            { "unlearn",            SEC_GAMEMASTER,         false, &HandlePetUnlearnCommand,            "" }
-        };
-        static ChatCommandTable sendCommandTable =
-        {
-            { "items",              SEC_GAMEMASTER,         true,  &HandleSendItemsCommand,             "" },
-            { "mail",               SEC_GAMEMASTER,         true,  &HandleSendMailCommand,              "" },
-            { "message",            SEC_ADMINISTRATOR,      true,  &HandleSendMessageCommand,           "" },
-            { "money",              SEC_GAMEMASTER,         true,  &HandleSendMoneyCommand,             "" }
-        };
-        static ChatCommandTable gearCommandTable =
-        {
-            { "repair",             SEC_GAMEMASTER,         false,  &HandleGearRepairCommand,              "" },
-            { "stats",              SEC_PLAYER,             false,  &HandleGearStatsCommand,               "" }
-        };
         static ChatCommandTable commandTable =
         {
-            { "dev",                SEC_ADMINISTRATOR,      false, &HandleDevCommand,                   "" },
-            { "gps",                SEC_MODERATOR,          false, &HandleGPSCommand,                   "" },
-            { "aura",               SEC_GAMEMASTER,         false, &HandleAuraCommand,                  "" },
-            { "unaura",             SEC_GAMEMASTER,         false, &HandleUnAuraCommand,                "" },
-            { "appear",             SEC_MODERATOR,          false, &HandleAppearCommand,                "" },
-            { "summon",             SEC_GAMEMASTER,         false, &HandleSummonCommand,                "" },
-            { "groupsummon",        SEC_GAMEMASTER,         false, &HandleGroupSummonCommand,           "" },
-            { "commands",           SEC_PLAYER,             true,  &HandleCommandsCommand,              "" },
-            { "die",                SEC_GAMEMASTER,         false, &HandleDieCommand,                   "" },
-            { "revive",             SEC_GAMEMASTER,         true,  &HandleReviveCommand,                "" },
-            { "dismount",           SEC_PLAYER,             false, &HandleDismountCommand,              "" },
-            { "guid",               SEC_GAMEMASTER,         false, &HandleGUIDCommand,                  "" },
-            { "help",               SEC_PLAYER,             true,  &HandleHelpCommand,                  "" },
-            { "itemmove",           SEC_GAMEMASTER,         false, &HandleItemMoveCommand,              "" },
-            { "cooldown",           SEC_GAMEMASTER,         false, &HandleCooldownCommand,              "" },
-            { "distance",           SEC_ADMINISTRATOR,      false, &HandleGetDistanceCommand,           "" },
-            { "recall",             SEC_GAMEMASTER,         false, &HandleRecallCommand,                "" },
-            { "save",               SEC_PLAYER,             false, &HandleSaveCommand,                  "" },
-            { "saveall",            SEC_GAMEMASTER,         true,  &HandleSaveAllCommand,               "" },
-            { "kick",               SEC_GAMEMASTER,         true,  &HandleKickPlayerCommand,            "" },
-            { "unstuck",            SEC_GAMEMASTER,         true,  &HandleUnstuckCommand,               "" },
-            { "linkgrave",          SEC_ADMINISTRATOR,      false, &HandleLinkGraveCommand,             "" },
-            { "neargrave",          SEC_GAMEMASTER,         false, &HandleNearGraveCommand,             "" },
-            { "showarea",           SEC_GAMEMASTER,         false, &HandleShowAreaCommand,              "" },
-            { "hidearea",           SEC_ADMINISTRATOR,      false, &HandleHideAreaCommand,              "" },
-            { "additem",            SEC_GAMEMASTER,         false, &HandleAddItemCommand,               "" },
-            { "additemset",         SEC_GAMEMASTER,         false, &HandleAddItemSetCommand,            "" },
-            { "wchange",            SEC_ADMINISTRATOR,      false, &HandleChangeWeather,                "" },
-            { "maxskill",           SEC_GAMEMASTER,         false, &HandleMaxSkillCommand,              "" },
-            { "setskill",           SEC_GAMEMASTER,         false, &HandleSetSkillCommand,              "" },
-            { "pinfo",              SEC_GAMEMASTER,         true,  &HandlePInfoCommand,                 "" },
-            { "respawn",            SEC_GAMEMASTER,         false, &HandleRespawnCommand,               "" },
-            { "send",               SEC_GAMEMASTER,         true,  nullptr,                             "", sendCommandTable },
-            { "pet",                SEC_GAMEMASTER,         false, nullptr,                             "", petCommandTable },
-            { "mute",               SEC_GAMEMASTER,         true,  &HandleMuteCommand,                  "" },
-            { "mutehistory",        SEC_GAMEMASTER,         true,  &HandleMuteInfoCommand,              "" },
-            { "unmute",             SEC_GAMEMASTER,         true,  &HandleUnmuteCommand,                "" },
-            { "movegens",           SEC_ADMINISTRATOR,      false, &HandleMovegensCommand,              "" },
-            { "cometome",           SEC_ADMINISTRATOR,      false, &HandleComeToMeCommand,              "" },
-            { "damage",             SEC_GAMEMASTER,         false, &HandleDamageCommand,                "" },
-            { "combatstop",         SEC_GAMEMASTER,         true,  &HandleCombatStopCommand,            "" },
-            { "flusharenapoints",   SEC_ADMINISTRATOR,      false, &HandleFlushArenaPointsCommand,      "" },
-            { "freeze",             SEC_GAMEMASTER,         false, &HandleFreezeCommand,                "" },
-            { "unfreeze",           SEC_GAMEMASTER,         false, &HandleUnFreezeCommand,              "" },
-            { "group",              SEC_GAMEMASTER,         false, nullptr,                             "", groupCommandTable },
-            { "gear",               SEC_PLAYER,             false, nullptr,                             "", gearCommandTable },
-            { "possess",            SEC_GAMEMASTER,         false, HandlePossessCommand,                "" },
-            { "unpossess",          SEC_GAMEMASTER,         false, HandleUnPossessCommand,              "" },
-            { "bindsight",          SEC_ADMINISTRATOR,      false, HandleBindSightCommand,              "" },
-            { "unbindsight",        SEC_ADMINISTRATOR,      false, HandleUnbindSightCommand,            "" },
-            { "playall",            SEC_GAMEMASTER,         false, HandlePlayAllCommand,                "" },
-            { "skirmish",           SEC_ADMINISTRATOR,      false, HandleSkirmishCommand,               "" },
-            { "mailbox",            SEC_MODERATOR,          false, &HandleMailBoxCommand,               "" },
-            { "string",             SEC_GAMEMASTER,         false, &HandleStringCommand,                "" }
+            { "dev",               HandleDevCommand,               SEC_ADMINISTRATOR,      Console::No  },
+            { "gps",               HandleGPSCommand,               SEC_MODERATOR,          Console::No  },
+            { "aura",              HandleAuraCommand,              SEC_GAMEMASTER,         Console::No  },
+            { "unaura",            HandleUnAuraCommand,            SEC_GAMEMASTER,         Console::No  },
+            { "appear",            HandleAppearCommand,            SEC_MODERATOR,          Console::No  },
+            { "summon",            HandleSummonCommand,            SEC_GAMEMASTER,         Console::No  },
+            { "groupsummon",       HandleGroupSummonCommand,       SEC_GAMEMASTER,         Console::No  },
+            { "commands",          HandleCommandsCommand,          SEC_PLAYER,             Console::Yes },
+            { "die",               HandleDieCommand,               SEC_GAMEMASTER,         Console::No  },
+            { "revive",            HandleReviveCommand,            SEC_GAMEMASTER,         Console::Yes },
+            { "dismount",          HandleDismountCommand,          SEC_PLAYER,             Console::No  },
+            { "guid",              HandleGUIDCommand,              SEC_GAMEMASTER,         Console::No  },
+            { "help",              HandleHelpCommand,              SEC_PLAYER,             Console::Yes },
+            { "cooldown",          HandleCooldownCommand,          SEC_GAMEMASTER,         Console::No  },
+            { "distance",          HandleGetDistanceCommand,       SEC_ADMINISTRATOR,      Console::No  },
+            { "recall",            HandleRecallCommand,            SEC_GAMEMASTER,         Console::No  },
+            { "save",              HandleSaveCommand,              SEC_PLAYER,             Console::No  },
+            { "saveall",           HandleSaveAllCommand,           SEC_GAMEMASTER,         Console::Yes },
+            { "kick",              HandleKickPlayerCommand,        SEC_GAMEMASTER,         Console::Yes },
+            { "unstuck",           HandleUnstuckCommand,           SEC_GAMEMASTER,         Console::Yes },
+            { "linkgrave",         HandleLinkGraveCommand,         SEC_ADMINISTRATOR,      Console::No  },
+            { "neargrave",         HandleNearGraveCommand,         SEC_GAMEMASTER,         Console::No  },
+            { "showarea",          HandleShowAreaCommand,          SEC_GAMEMASTER,         Console::No  },
+            { "hidearea",          HandleHideAreaCommand,          SEC_ADMINISTRATOR,      Console::No  },
+            { "additem",           HandleAddItemCommand,           SEC_GAMEMASTER,         Console::No  },
+            { "additem set",       HandleAddItemSetCommand,        SEC_GAMEMASTER,         Console::No  },
+            { "wchange",           HandleChangeWeather,            SEC_ADMINISTRATOR,      Console::No  },
+            { "maxskill",          HandleMaxSkillCommand,          SEC_GAMEMASTER,         Console::No  },
+            { "setskill",          HandleSetSkillCommand,          SEC_GAMEMASTER,         Console::No  },
+            { "pinfo",             HandlePInfoCommand,             SEC_GAMEMASTER,         Console::Yes },
+            { "respawn",           HandleRespawnCommand,           SEC_GAMEMASTER,         Console::No  },
+            { "respawn all",       HandleRespawnAllCommand,        SEC_GAMEMASTER,         Console::No  },
+            { "mute",              HandleMuteCommand,              SEC_GAMEMASTER,         Console::Yes },
+            { "mutehistory",       HandleMuteInfoCommand,          SEC_GAMEMASTER,         Console::Yes },
+            { "unmute",            HandleUnmuteCommand,            SEC_GAMEMASTER,         Console::Yes },
+            { "movegens",          HandleMovegensCommand,          SEC_ADMINISTRATOR,      Console::No  },
+            { "cometome",          HandleComeToMeCommand,          SEC_ADMINISTRATOR,      Console::No  },
+            { "damage",            HandleDamageCommand,            SEC_GAMEMASTER,         Console::No  },
+            { "combatstop",        HandleCombatStopCommand,        SEC_GAMEMASTER,         Console::Yes },
+            { "flusharenapoints",  HandleFlushArenaPointsCommand,  SEC_ADMINISTRATOR,      Console::No  },
+            { "freeze",            HandleFreezeCommand,            SEC_GAMEMASTER,         Console::No  },
+            { "unfreeze",          HandleUnFreezeCommand,          SEC_GAMEMASTER,         Console::No  },
+            { "possess",           HandlePossessCommand,           SEC_GAMEMASTER,         Console::No  },
+            { "unpossess",         HandleUnPossessCommand,         SEC_GAMEMASTER,         Console::No  },
+            { "bindsight",         HandleBindSightCommand,         SEC_ADMINISTRATOR,      Console::No  },
+            { "unbindsight",       HandleUnbindSightCommand,       SEC_ADMINISTRATOR,      Console::No  },
+            { "playall",           HandlePlayAllCommand,           SEC_GAMEMASTER,         Console::No  },
+            { "skirmish",          HandleSkirmishCommand,          SEC_ADMINISTRATOR,      Console::No  },
+            { "mailbox",           HandleMailBoxCommand,           SEC_MODERATOR,          Console::No  },
+            { "string",            HandleStringCommand,            SEC_GAMEMASTER,         Console::No  }
         };
+
         return commandTable;
     }
 
-    static bool HandleSkirmishCommand(ChatHandler* handler, char const* args)
+    static bool HandleSkirmishCommand(ChatHandler* handler, std::string_view args)
     {
-        Tokenizer tokens(args, ' ');
+        auto tokens = Acore::Tokenize(args, ' ', true);
 
-        if (!*args || !tokens.size())
+        if (args.empty() || !tokens.size())
         {
             handler->PSendSysMessage("Usage: .skirmish [arena] [XvX] [Nick1] [Nick2] ... [NickN]");
-            handler->PSendSysMessage("[arena] can be \"all\" or comma-separated list of possible arenas (NA,BE,RL,DS,RV).");
+            handler->PSendSysMessage("[arena] can be \"all\" or comma-separated list of possible arenas (NA, BE, RL, DS, RV).");
             handler->PSendSysMessage("[XvX] can be 1v1, 2v2, 3v3, 5v5. After [XvX] specify enough nicknames for that mode.");
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        Tokenizer::const_iterator tokensItr = tokens.begin();
+        auto tokensItr = tokens.begin();
 
-        std::set<BattlegroundTypeId> allowedArenas;
-        std::string arenasStr = *(tokensItr++);
-        std::string tmpStr;
-        Tokenizer arenaTokens(arenasStr, ',');
-        for (Tokenizer::const_iterator itr = arenaTokens.begin(); itr != arenaTokens.end(); ++itr)
+        std::vector<BattlegroundTypeId> allowedArenas;
+        std::string_view arenasStr = *(tokensItr++);
+
+        auto arenaTokens = Acore::Tokenize(arenasStr, ',', false);
+        for (auto const& arenaName : arenaTokens)
         {
-            tmpStr = std::string(*itr);
-            if (tmpStr == "all")
+            if (arenaName == "all")
             {
                 if (arenaTokens.size() > 1)
                 {
@@ -170,22 +172,33 @@ public:
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
-                allowedArenas.insert(BATTLEGROUND_NA);
-                allowedArenas.insert(BATTLEGROUND_BE);
-                allowedArenas.insert(BATTLEGROUND_RL);
-                allowedArenas.insert(BATTLEGROUND_DS);
-                allowedArenas.insert(BATTLEGROUND_RV);
+
+                allowedArenas.emplace_back(BATTLEGROUND_NA);
+                allowedArenas.emplace_back(BATTLEGROUND_BE);
+                allowedArenas.emplace_back(BATTLEGROUND_RL);
+                allowedArenas.emplace_back(BATTLEGROUND_DS);
+                allowedArenas.emplace_back(BATTLEGROUND_RV);
             }
-            else if (tmpStr == "NA")
-                allowedArenas.insert(BATTLEGROUND_NA);
-            else if (tmpStr == "BE")
-                allowedArenas.insert(BATTLEGROUND_BE);
-            else if (tmpStr == "RL")
-                allowedArenas.insert(BATTLEGROUND_RL);
-            else if (tmpStr == "DS")
-                allowedArenas.insert(BATTLEGROUND_DS);
-            else if (tmpStr == "RV")
-                allowedArenas.insert(BATTLEGROUND_RV);
+            else if (arenaName == "NA")
+            {
+                allowedArenas.emplace_back(BATTLEGROUND_NA);
+            }
+            else if (arenaName == "BE")
+            {
+                allowedArenas.emplace_back(BATTLEGROUND_BE);
+            }
+            else if (arenaName == "RL")
+            {
+                allowedArenas.emplace_back(BATTLEGROUND_RL);
+            }
+            else if (arenaName == "DS")
+            {
+                allowedArenas.emplace_back(BATTLEGROUND_DS);
+            }
+            else if (arenaName == "RV")
+            {
+                allowedArenas.emplace_back(BATTLEGROUND_RV);
+            }
             else
             {
                 handler->PSendSysMessage("Invalid [arena] specified.");
@@ -193,17 +206,31 @@ public:
                 return false;
             }
         }
+
         ASSERT(!allowedArenas.empty());
         BattlegroundTypeId randomizedArenaBgTypeId = Acore::Containers::SelectRandomContainerElement(allowedArenas);
 
         uint8 count = 0;
         if (tokensItr != tokens.end())
         {
-            std::string mode = *(tokensItr++);
-            if (mode == "1v1") count = 2;
-            else if (mode == "2v2") count = 4;
-            else if (mode == "3v3") count = 6;
-            else if (mode == "5v5") count = 10;
+            std::string_view mode = *(tokensItr++);
+
+            if (mode == "1v1")
+            {
+                count = 2;
+            }
+            else if (mode == "2v2")
+            {
+                count = 4;
+            }
+            else if (mode == "3v3")
+            {
+                count = 6;
+            }
+            else if (mode == "5v5")
+            {
+                count = 10;
+            }
         }
 
         if (!count)
@@ -224,34 +251,95 @@ public:
         uint8 error = 0;
         std::string last_name;
         Player* plr = nullptr;
-        Player* players[10] = {nullptr};
+        std::array<Player*, 10> players = {};
         uint8 cnt = 0;
+
         for (; tokensItr != tokens.end(); ++tokensItr)
         {
             last_name = std::string(*tokensItr);
             plr = ObjectAccessor::FindPlayerByName(last_name, false);
-            if (!plr) { error = 1; break; }
-            if (!plr->IsInWorld() || !plr->FindMap() || plr->IsBeingTeleported()) { error = 2; break; }
-            if (plr->GetMap()->GetEntry()->Instanceable()) { error = 3; break; }
-            if (plr->isUsingLfg()) { error = 4; break; }
-            if (plr->InBattlegroundQueue()) { error = 5; break; }
-            if (plr->IsInFlight()) { error = 10; break; }
-            if (!plr->IsAlive()) { error = 11; break; }
+
+            if (!plr)
+            {
+                error = 1;
+                break;
+            }
+
+            if (!plr->IsInWorld() || !plr->FindMap() || plr->IsBeingTeleported())
+            {
+                error = 2;
+                break;
+            }
+
+            if (plr->GetMap()->GetEntry()->Instanceable())
+            {
+                error = 3;
+                break;
+            }
+
+            if (plr->isUsingLfg())
+            {
+                error = 4;
+                break;
+            }
+
+            if (plr->InBattlegroundQueue())
+            {
+                error = 5;
+                break;
+            }
+
+            if (plr->IsInFlight())
+            {
+                error = 10;
+                break;
+            }
+
+            if (!plr->IsAlive())
+            {
+                error = 11;
+                break;
+            }
+
             const Group* g = plr->GetGroup();
+
             if (hcnt > 1)
             {
-                if (!g) { error = 6; break; }
-                if (g->isRaidGroup() || g->isBGGroup() || g->isBFGroup() || g->isLFGGroup()) { error = 7; break; }
-                if (g->GetMembersCount() != hcnt) { error = 8; break; }
+                if (!g)
+                {
+                    error = 6;
+                    break;
+                }
+
+                if (g->isRaidGroup() || g->isBGGroup() || g->isBFGroup() || g->isLFGGroup())
+                {
+                    error = 7;
+                    break;
+                }
+
+                if (g->GetMembersCount() != hcnt)
+                {
+                    error = 8;
+                    break;
+                }
 
                 uint8 sti = (cnt < hcnt ? 0 : hcnt);
-                if (sti != cnt)
-                    if (players[sti]->GetGroup() != plr->GetGroup()) { error = 9; last_name += " and " + players[sti]->GetName(); break; }
+                if (sti != cnt && players[sti]->GetGroup() != plr->GetGroup())
+                {
+                    error = 9;
+                    last_name += " and " + players[sti]->GetName();
+                    break;
+                }
             }
             else // 1v1
             {
-                if (g) { error = 12; break; }
+                if (g)
+                {
+                    error = 12;
+                    break;
+                }
             }
+
             players[cnt++] = plr;
         }
 
@@ -325,7 +413,7 @@ public:
             return false;
         }
 
-        Battleground* bg = sBattlegroundMgr->CreateNewBattleground(randomizedArenaBgTypeId, 80, 80, ArenaType(hcnt >= 2 ? hcnt : 2), false);
+        Battleground* bg = sBattlegroundMgr->CreateNewBattleground(randomizedArenaBgTypeId, GetBattlegroundBracketById(bgt->GetMapId(), bgt->GetBracketId()), ArenaType(hcnt >= 2 ? hcnt : 2), false);
         if (!bg)
         {
             handler->PSendSysMessage("Couldn't create arena map!");
@@ -339,6 +427,7 @@ public:
 
         TeamId teamId1 = Player::TeamIdForRace(players[0]->getRace());
         TeamId teamId2 = (teamId1 == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE);
+
         for (uint8 i = 0; i < cnt; ++i)
         {
             Player* player = players[i];
@@ -351,6 +440,9 @@ public:
             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_IN_PROGRESS, 0, bg->GetStartTime(), bg->GetArenaType(), teamId);
             player->GetSession()->SendPacket(&data);
 
+            // Remove from LFG queues
+            sLFGMgr->LeaveAllLfgQueues(player->GetGUID(), false);
+
             player->SetBattlegroundId(bg->GetInstanceID(), bgTypeId, queueSlot, true, false, teamId);
             sBattlegroundMgr->SendToBattleground(player, bg->GetInstanceID(), bgTypeId);
         }
@@ -359,31 +451,48 @@ public:
         return true;
     }
 
-    static bool HandleDevCommand(ChatHandler* handler, char const* enable)
+    static bool HandleDevCommand(ChatHandler* handler, Optional<bool> enableArg)
     {
-        Player* player = handler->GetSession()->GetPlayer();
+        WorldSession* session = handler->GetSession();
 
-        if (!*enable)
+        if (!session)
         {
-            handler->GetSession()->SendNotification(player->IsDeveloper() ? LANG_DEV_ON : LANG_DEV_OFF);
-            return true;
+            return false;
         }
 
-        std::string enablestr = (char*)enable;
+        auto SetDevMod = [&](bool enable)
+        {
+            session->SendNotification(enable ? LANG_DEV_ON : LANG_DEV_OFF);
+            session->GetPlayer()->SetDeveloper(enable);
+            sScriptMgr->OnHandleDevCommand(handler->GetSession()->GetPlayer(), enable);
+        };
 
-        if (enablestr == "on")
+        if (WorldSession* session = handler->GetSession())
         {
-            player->SetDeveloper(true);
-            handler->GetSession()->SendNotification(LANG_DEV_ON);
-            sScriptMgr->OnHandleDevCommand(handler->GetSession()->GetPlayer(), enablestr);
-            return true;
-        }
-        else if (enablestr == "off")
-        {
-            player->SetDeveloper(false);
-            handler->GetSession()->SendNotification(LANG_DEV_OFF);
-            sScriptMgr->OnHandleDevCommand(handler->GetSession()->GetPlayer(), enablestr);
-            return true;
+            if (!enableArg)
+            {
+                if (!AccountMgr::IsPlayerAccount(session->GetSecurity()) && session->GetPlayer()->IsDeveloper())
+                {
+                    SetDevMod(true);
+                }
+                else
+                {
+                    SetDevMod(false);
+                }
+
+                return true;
+            }
+
+            if (*enableArg)
+            {
+                SetDevMod(true);
+                return true;
+            }
+            else
+            {
+                SetDevMod(false);
+                return true;
+            }
         }
 
         handler->SendSysMessage(LANG_USE_BOL);
@@ -391,68 +500,31 @@ public:
         return false;
     }
 
-    static bool HandleGPSCommand(ChatHandler* handler, char const* args)
+    static bool HandleGPSCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
     {
-        WorldObject* object = nullptr;
-        if (*args)
+        if (!target)
         {
-            HighGuid guidHigh;
-            ObjectGuid::LowType guidLow = handler->extractLowGuidFromLink((char*)args, guidHigh);
-            if (!guidLow)
-                return false;
-
-            switch (guidHigh)
-            {
-                case HighGuid::Player:
-                {
-                    object = ObjectAccessor::FindPlayerByLowGUID(guidLow);
-                    if (!object)
-                    {
-                        handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-                        handler->SetSentErrorMessage(true);
-                    }
-                    break;
-                }
-                case HighGuid::Unit:
-                {
-                    object = handler->GetCreatureFromPlayerMapByDbGuid(guidLow);
-                    if (!object)
-                    {
-                        handler->SendSysMessage(LANG_COMMAND_NOCREATUREFOUND);
-                        handler->SetSentErrorMessage(true);
-                    }
-                    break;
-                }
-                case HighGuid::GameObject:
-                {
-                    object = handler->GetObjectFromPlayerMapByDbGuid(guidLow);
-                    if (!object)
-                    {
-                        handler->SendSysMessage(LANG_COMMAND_NOGAMEOBJECTFOUND);
-                        handler->SetSentErrorMessage(true);
-                    }
-                    break;
-                }
-                default:
-                    return false;
-            }
-            if (!object)
-                return false;
-        }
-        else
-        {
-            object = handler->getSelectedUnit();
-
-            if (!object)
-            {
-                handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-                handler->SetSentErrorMessage(true);
-                return false;
-            }
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
         }
 
-        CellCoord cellCoord = Acore::ComputeCellCoord(object->GetPositionX(), object->GetPositionY());
-        Cell cell(cellCoord);
+        WorldObject* object = handler->getSelectedUnit();
+
+        if (!object && !target)
+        {
+            return false;
+        }
+
+        if (!object && target && target->IsConnected())
+        {
+            object = target->GetConnectedPlayer();
+        }
+
+        if (!object)
+        {
+            return false;
+        }
+
+        Cell cell(Acore::ComputeCellCoord(object->GetPositionX(), object->GetPositionY()));
 
         uint32 zoneId, areaId;
         object->GetZoneAndAreaId(zoneId, areaId);
@@ -477,16 +549,23 @@ public:
 
         uint32 haveMap = Map::ExistMap(object->GetMapId(), gridX, gridY) ? 1 : 0;
         uint32 haveVMap = Map::ExistVMap(object->GetMapId(), gridX, gridY) ? 1 : 0;
+        uint32 haveMMAP = MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMesh(handler->GetSession()->GetPlayer()->GetMapId()) ? 1 : 0;
 
         if (haveVMap)
         {
             if (object->IsOutdoors())
+            {
                 handler->PSendSysMessage("You are outdoors");
+            }
             else
+            {
                 handler->PSendSysMessage("You are indoors");
+            }
         }
         else
+        {
             handler->PSendSysMessage("no VMAP available for area info");
+        }
 
         handler->PSendSysMessage(LANG_MAP_POSITION,
                                  object->GetMapId(), (mapEntry ? mapEntry->name[handler->GetSessionDbcLocale()] : "<unknown>"),
@@ -495,55 +574,53 @@ public:
                                  object->GetPhaseMask(),
                                  object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), object->GetOrientation(),
                                  cell.GridX(), cell.GridY(), cell.CellX(), cell.CellY(), object->GetInstanceId(),
-                                 zoneX, zoneY, groundZ, floorZ, haveMap, haveVMap);
+                                 zoneX, zoneY, groundZ, floorZ, haveMap, haveVMap, haveMMAP);
 
         LiquidData const& liquidData = object->GetLiquidData();
 
         if (liquidData.Status)
+        {
             handler->PSendSysMessage(LANG_LIQUID_STATUS, liquidData.Level, liquidData.DepthLevel, liquidData.Entry, liquidData.Flags, liquidData.Status);
+        }
 
         if (object->GetTransport())
+        {
             handler->PSendSysMessage("Transport offset: %.2f, %.2f, %.2f, %.2f", object->m_movementInfo.transport.pos.GetPositionX(), object->m_movementInfo.transport.pos.GetPositionY(), object->m_movementInfo.transport.pos.GetPositionZ(), object->m_movementInfo.transport.pos.GetOrientation());
+        }
 
         return true;
     }
 
-    static bool HandleAuraCommand(ChatHandler* handler, char const* args)
+    static bool HandleAuraCommand(ChatHandler* handler, SpellInfo const* spell)
     {
-        Unit* target = handler->getSelectedUnit();
-        if (!target)
-        {
-            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r or Htalent form
-        uint32 spellId = handler->extractSpellIdFromLink((char*)args);
-        if (!spellId)
-            return false;
-
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-        if (!spellInfo)
+        if (!spell)
         {
             handler->PSendSysMessage(LANG_COMMAND_NOSPELLFOUND);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        if (!SpellMgr::IsSpellValid(spellInfo))
+        if (!SpellMgr::IsSpellValid(spell))
         {
-            handler->PSendSysMessage(LANG_COMMAND_SPELL_BROKEN, spellId);
+            handler->PSendSysMessage(LANG_COMMAND_SPELL_BROKEN, spell->Id);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        Aura::TryRefreshStackOrCreate(spellInfo, MAX_EFFECT_MASK, target, target);
+        Unit* target = handler->getSelectedUnit();
+        if (!target)
+        {
+            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        Aura::TryRefreshStackOrCreate(spell, MAX_EFFECT_MASK, target, target);
 
         return true;
     }
 
-    static bool HandleUnAuraCommand(ChatHandler* handler, char const* args)
+    static bool HandleUnAuraCommand(ChatHandler* handler, Variant<SpellInfo const*, std::string_view> spells)
     {
         Unit* target = handler->getSelectedUnit();
         if (!target)
@@ -553,62 +630,82 @@ public:
             return false;
         }
 
-        std::string argstr = args;
-        if (argstr == "all")
+        if (spells.holds_alternative<std::string_view>() && spells.get<std::string_view>() == "all")
         {
             target->RemoveAllAuras();
             return true;
         }
 
-        // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r or Htalent form
-        uint32 spellId = handler->extractSpellIdFromLink((char*)args);
-        if (!spellId)
+        if (!spells.holds_alternative<SpellInfo const*>())
+        {
+            handler->PSendSysMessage(LANG_COMMAND_NOSPELLFOUND);
+            handler->SetSentErrorMessage(true);
             return false;
+        }
 
-        target->RemoveAurasDueToSpell(spellId);
+        auto spell = spells.get<SpellInfo const*>();
+
+        if (!SpellMgr::IsSpellValid(spell))
+        {
+            handler->PSendSysMessage(LANG_COMMAND_SPELL_BROKEN, spell->Id);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        target->RemoveAurasDueToSpell(spell->Id);
 
         return true;
     }
     // Teleport to Player
-    static bool HandleAppearCommand(ChatHandler* handler, char const* args)
+    static bool HandleAppearCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
     {
-        Player* target;
-        ObjectGuid targetGuid;
-        std::string targetName;
-        if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
+        if (!target)
+        {
+            target = PlayerIdentifier::FromTarget(handler);
+        }
+
+        if (!target)
+        {
             return false;
+        }
 
         Player* _player = handler->GetSession()->GetPlayer();
-        if (target == _player || targetGuid == _player->GetGUID())
+        if (target->GetGUID() == _player->GetGUID())
         {
             handler->SendSysMessage(LANG_CANT_TELEPORT_SELF);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        if (target)
+        std::string nameLink = handler->playerLink(target->GetName());
+
+        if (target->IsConnected())
         {
+            auto targetPlayer = target->GetConnectedPlayer();
+
             // check online security
-            if (handler->HasLowerSecurity(target))
+            if (handler->HasLowerSecurity(targetPlayer))
+            {
                 return false;
+            }
 
-            std::string chrNameLink = handler->playerLink(targetName);
-
-            Map* map = target->GetMap();
+            Map* map = targetPlayer->GetMap();
             if (map->IsBattlegroundOrArena())
             {
                 // only allow if gm mode is on
                 if (!_player->IsGameMaster())
                 {
-                    handler->PSendSysMessage(LANG_CANNOT_GO_TO_BG_GM, chrNameLink.c_str());
+                    handler->PSendSysMessage(LANG_CANNOT_GO_TO_BG_GM, nameLink.c_str());
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
 
                 if (!_player->GetMap()->IsBattlegroundOrArena())
+                {
                     _player->SetEntryPoint();
+                }
 
-                _player->SetBattlegroundId(target->GetBattlegroundId(), target->GetBattlegroundTypeId(), PLAYER_MAX_BATTLEGROUND_QUEUES, false, false, TEAM_NEUTRAL);
+                _player->SetBattlegroundId(targetPlayer->GetBattlegroundId(), targetPlayer->GetBattlegroundTypeId(), PLAYER_MAX_BATTLEGROUND_QUEUES, false, false, TEAM_NEUTRAL);
             }
             else if (map->IsDungeon())
             {
@@ -618,9 +715,9 @@ public:
                 if (_player->GetGroup())
                 {
                     // we are in group, we can go only if we are in the player group
-                    if (_player->GetGroup() != target->GetGroup())
+                    if (_player->GetGroup() != targetPlayer->GetGroup())
                     {
-                        handler->PSendSysMessage(LANG_CANNOT_GO_TO_INST_PARTY, chrNameLink.c_str());
+                        handler->PSendSysMessage(LANG_CANNOT_GO_TO_INST_PARTY, nameLink.c_str());
                         handler->SetSentErrorMessage(true);
                         return false;
                     }
@@ -630,25 +727,33 @@ public:
                     // we are not in group, let's verify our GM mode
                     if (!_player->IsGameMaster())
                     {
-                        handler->PSendSysMessage(LANG_CANNOT_GO_TO_INST_GM, chrNameLink.c_str());
+                        handler->PSendSysMessage(LANG_CANNOT_GO_TO_INST_GM, nameLink.c_str());
                         handler->SetSentErrorMessage(true);
                         return false;
                     }
                 }
 
                 // if the GM is bound to another instance, he will not be bound to another one
-                InstancePlayerBind* bind = sInstanceSaveMgr->PlayerGetBoundInstance(_player->GetGUID(), target->GetMapId(), target->GetDifficulty(map->IsRaid()));
+                InstancePlayerBind* bind = sInstanceSaveMgr->PlayerGetBoundInstance(_player->GetGUID(), targetPlayer->GetMapId(), targetPlayer->GetDifficulty(map->IsRaid()));
                 if (!bind)
-                    if (InstanceSave* save = sInstanceSaveMgr->GetInstanceSave(target->GetInstanceId()))
+                {
+                    if (InstanceSave* save = sInstanceSaveMgr->GetInstanceSave(target->GetConnectedPlayer()->GetInstanceId()))
+                    {
                         sInstanceSaveMgr->PlayerBindToInstance(_player->GetGUID(), save, !save->CanReset(), _player);
+                    }
+                }
 
                 if (map->IsRaid())
-                    _player->SetRaidDifficulty(target->GetRaidDifficulty());
+                {
+                    _player->SetRaidDifficulty(targetPlayer->GetRaidDifficulty());
+                }
                 else
-                    _player->SetDungeonDifficulty(target->GetDungeonDifficulty());
+                {
+                    _player->SetDungeonDifficulty(targetPlayer->GetDungeonDifficulty());
+                }
             }
 
-            handler->PSendSysMessage(LANG_APPEARING_AT, chrNameLink.c_str());
+            handler->PSendSysMessage(LANG_APPEARING_AT, nameLink.c_str());
 
             // stop flight if need
             if (_player->IsInFlight())
@@ -656,20 +761,23 @@ public:
                 _player->GetMotionMaster()->MovementExpired();
                 _player->CleanupAfterTaxiFlight();
             }
-            // save only in non-flight case
-            else
+            else // save only in non-flight case
+            {
                 _player->SaveRecallPosition();
+            }
 
-            if (_player->TeleportTo(target->GetMapId(), target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + 0.25f, _player->GetOrientation(), TELE_TO_GM_MODE, target))
-                _player->SetPhaseMask(target->GetPhaseMask() | 1, false);
+            if (_player->TeleportTo(targetPlayer->GetMapId(), targetPlayer->GetPositionX(), targetPlayer->GetPositionY(), targetPlayer->GetPositionZ() + 0.25f, _player->GetOrientation(), TELE_TO_GM_MODE, targetPlayer))
+            {
+                _player->SetPhaseMask(targetPlayer->GetPhaseMask() | 1, false);
+            }
         }
         else
         {
             // check offline security
-            if (handler->HasLowerSecurity(nullptr, targetGuid))
+            if (handler->HasLowerSecurity(nullptr, target->GetGUID()))
+            {
                 return false;
-
-            std::string nameLink = handler->playerLink(targetName);
+            }
 
             handler->PSendSysMessage(LANG_APPEARING_AT, nameLink.c_str());
 
@@ -677,8 +785,11 @@ public:
             float x, y, z, o;
             uint32 map;
             bool in_flight;
-            if (!Player::LoadPositionFromDB(map, x, y, z, o, in_flight, targetGuid.GetCounter()))
+
+            if (!Player::LoadPositionFromDB(map, x, y, z, o, in_flight, target->GetGUID().GetCounter()))
+            {
                 return false;
+            }
 
             // stop flight if need
             if (_player->IsInFlight())
@@ -688,38 +799,50 @@ public:
             }
             // save only in non-flight case
             else
+            {
                 _player->SaveRecallPosition();
+            }
 
             _player->TeleportTo(map, x, y, z, _player->GetOrientation());
         }
 
         return true;
     }
+
     // Summon Player
-    static bool HandleSummonCommand(ChatHandler* handler, char const* args)
+    static bool HandleSummonCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
     {
-        Player* target;
-        ObjectGuid targetGuid;
-        std::string targetName;
-        if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
+        if (!target)
+        {
+            target = PlayerIdentifier::FromTarget(handler);
+        }
+
+        if (!target)
+        {
             return false;
+        }
 
         Player* _player = handler->GetSession()->GetPlayer();
-        if (target == _player || targetGuid == _player->GetGUID())
+        if (target->GetGUID() == _player->GetGUID())
         {
             handler->PSendSysMessage(LANG_CANT_TELEPORT_SELF);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        if (target)
-        {
-            std::string nameLink = handler->playerLink(targetName);
-            // check online security
-            if (handler->HasLowerSecurity(target))
-                return false;
+        std::string nameLink = handler->playerLink(target->GetName());
 
-            if (target->IsBeingTeleported())
+        if (target->IsConnected())
+        {
+            auto targetPlayer = target->GetConnectedPlayer();
+
+            // check online security
+            if (handler->HasLowerSecurity(targetPlayer))
+            {
+                return false;
+            }
+
+            if (targetPlayer->IsBeingTeleported())
             {
                 handler->PSendSysMessage(LANG_IS_TELEPORTED, nameLink.c_str());
                 handler->SetSentErrorMessage(true);
@@ -740,7 +863,7 @@ public:
                 if (!sWorld->getBoolConfig(CONFIG_INSTANCE_GMSUMMON_PLAYER))
                 {
                     // pussywizard: prevent unbinding normal player's perm bind by just summoning him >_>
-                    if (!target->GetSession()->GetSecurity())
+                    if (!targetPlayer->GetSession()->GetSecurity())
                     {
                         handler->PSendSysMessage("Only GMs can be summoned to an instance!");
                         handler->SetSentErrorMessage(true);
@@ -748,14 +871,16 @@ public:
                     }
                 }
 
-                Map* destMap = target->GetMap();
+                Map* destMap = targetPlayer->GetMap();
 
                 if (destMap->Instanceable() && destMap->GetInstanceId() != map->GetInstanceId())
-                    sInstanceSaveMgr->PlayerUnbindInstance(target->GetGUID(), map->GetInstanceId(), target->GetDungeonDifficulty(), true, target);
+                {
+                    sInstanceSaveMgr->PlayerUnbindInstance(target->GetGUID(), map->GetInstanceId(), targetPlayer->GetDungeonDifficulty(), true, targetPlayer);
+                }
 
                 // we are in an instance, and can only summon players in our group with us as leader
-                if (!handler->GetSession()->GetPlayer()->GetGroup() || !target->GetGroup() ||
-                        (target->GetGroup()->GetLeaderGUID() != handler->GetSession()->GetPlayer()->GetGUID()) ||
+                if (!handler->GetSession()->GetPlayer()->GetGroup() || !targetPlayer->GetGroup() ||
+                        (targetPlayer->GetGroup()->GetLeaderGUID() != handler->GetSession()->GetPlayer()->GetGUID()) ||
                         (handler->GetSession()->GetPlayer()->GetGroup()->GetLeaderGUID() != handler->GetSession()->GetPlayer()->GetGUID()))
                     // the last check is a bit excessive, but let it be, just in case
                 {
@@ -766,31 +891,35 @@ public:
             }
 
             handler->PSendSysMessage(LANG_SUMMONING, nameLink.c_str(), "");
-            if (handler->needReportToTarget(target))
-                ChatHandler(target->GetSession()).PSendSysMessage(LANG_SUMMONED_BY, handler->playerLink(_player->GetName()).c_str());
+            if (handler->needReportToTarget(targetPlayer))
+            {
+                ChatHandler(targetPlayer->GetSession()).PSendSysMessage(LANG_SUMMONED_BY, handler->playerLink(_player->GetName()).c_str());
+            }
 
             // stop flight if need
-            if (target->IsInFlight())
+            if (targetPlayer->IsInFlight())
             {
-                target->GetMotionMaster()->MovementExpired();
-                target->CleanupAfterTaxiFlight();
+                targetPlayer->GetMotionMaster()->MovementExpired();
+                targetPlayer->CleanupAfterTaxiFlight();
             }
             // save only in non-flight case
             else
-                target->SaveRecallPosition();
+            {
+                targetPlayer->SaveRecallPosition();
+            }
 
             // before GM
             float x, y, z;
-            handler->GetSession()->GetPlayer()->GetClosePoint(x, y, z, target->GetObjectSize());
-            target->TeleportTo(handler->GetSession()->GetPlayer()->GetMapId(), x, y, z, target->GetOrientation(), 0, handler->GetSession()->GetPlayer());
+            handler->GetSession()->GetPlayer()->GetClosePoint(x, y, z, targetPlayer->GetObjectSize());
+            targetPlayer->TeleportTo(handler->GetSession()->GetPlayer()->GetMapId(), x, y, z, targetPlayer->GetOrientation(), 0, handler->GetSession()->GetPlayer());
         }
         else
         {
             // check offline security
-            if (handler->HasLowerSecurity(nullptr, targetGuid))
+            if (handler->HasLowerSecurity(nullptr, target->GetGUID()))
+            {
                 return false;
-
-            std::string nameLink = handler->playerLink(targetName);
+            }
 
             handler->PSendSysMessage(LANG_SUMMONING, nameLink.c_str(), handler->GetAcoreString(LANG_OFFLINE));
 
@@ -801,25 +930,36 @@ public:
                                      handler->GetSession()->GetPlayer()->GetPositionZ(),
                                      handler->GetSession()->GetPlayer()->GetOrientation(),
                                      handler->GetSession()->GetPlayer()->GetZoneId(),
-                                     targetGuid);
+                                     target->GetGUID());
         }
 
         return true;
     }
+
     // Summon group of player
-    static bool HandleGroupSummonCommand(ChatHandler* handler, char const* args)
+    static bool HandleGroupSummonCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
     {
-        Player* target;
-        if (!handler->extractPlayerTarget((char*)args, &target))
+        if (!target)
+        {
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+        }
+
+        if (!target || !target->IsConnected())
+        {
             return false;
+        }
 
         // check online security
-        if (handler->HasLowerSecurity(target))
+        if (handler->HasLowerSecurity(target->GetConnectedPlayer()))
+        {
             return false;
+        }
 
-        Group* group = target->GetGroup();
+        auto targetPlayer = target->GetConnectedPlayer();
 
-        std::string nameLink = handler->GetNameLink(target);
+        Group* group = targetPlayer->GetGroup();
+
+        std::string nameLink = handler->playerLink(target->GetName());
 
         if (!group)
         {
@@ -847,11 +987,15 @@ public:
             Player* player = itr->GetSource();
 
             if (!player || player == handler->GetSession()->GetPlayer() || !player->GetSession())
+            {
                 continue;
+            }
 
             // check online security
             if (handler->HasLowerSecurity(player))
+            {
                 return false;
+            }
 
             std::string plNameLink = handler->GetNameLink(player);
 
@@ -877,7 +1021,9 @@ public:
 
             handler->PSendSysMessage(LANG_SUMMONING, plNameLink.c_str(), "");
             if (handler->needReportToTarget(player))
+            {
                 ChatHandler(player->GetSession()).PSendSysMessage(LANG_SUMMONED_BY, handler->GetNameLink().c_str());
+            }
 
             // stop flight if need
             if (player->IsInFlight())
@@ -887,7 +1033,9 @@ public:
             }
             // save only in non-flight case
             else
+            {
                 player->SaveRecallPosition();
+            }
 
             // before GM
             float x, y, z;
@@ -898,13 +1046,13 @@ public:
         return true;
     }
 
-    static bool HandleCommandsCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleCommandsCommand(ChatHandler* handler)
     {
         SendCommandHelpFor(*handler, "");
         return true;
     }
 
-    static bool HandleDieCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleDieCommand(ChatHandler* handler)
     {
         Unit* target = handler->getSelectedUnit();
 
@@ -918,7 +1066,9 @@ public:
         if (target->GetTypeId() == TYPEID_PLAYER)
         {
             if (handler->HasLowerSecurity(target->ToPlayer()))
+            {
                 return false;
+            }
         }
 
         if (target->IsAlive())
@@ -926,39 +1076,50 @@ public:
             if (sWorld->getBoolConfig(CONFIG_DIE_COMMAND_MODE))
             {
                 if (target->GetTypeId() == TYPEID_UNIT && handler->GetSession()->GetSecurity() == SEC_CONSOLE) // pussywizard
+                {
                     target->ToCreature()->LowerPlayerDamageReq(target->GetMaxHealth());
+                }
                 Unit::Kill(handler->GetSession()->GetPlayer(), target);
             }
             else
+            {
                 Unit::DealDamage(handler->GetSession()->GetPlayer(), target, target->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, true);
+            }
         }
 
         return true;
     }
 
-    static bool HandleReviveCommand(ChatHandler* handler, char const* args)
+    static bool HandleReviveCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
     {
-        Player* target;
-        ObjectGuid targetGuid;
-        if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid))
-            return false;
-
-        if (target)
+        if (!target)
         {
-            target->ResurrectPlayer(!AccountMgr::IsPlayerAccount(target->GetSession()->GetSecurity()) ? 1.0f : 0.5f);
-            target->SpawnCorpseBones();
-            target->SaveToDB(false, false);
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+        }
+
+        if (!target)
+        {
+            return false;
+        }
+
+        if (target->IsConnected())
+        {
+            auto targetPlayer = target->GetConnectedPlayer();
+
+            targetPlayer->ResurrectPlayer(!AccountMgr::IsPlayerAccount(targetPlayer->GetSession()->GetSecurity()) ? 1.0f : 0.5f);
+            targetPlayer->SpawnCorpseBones();
+            targetPlayer->SaveToDB(false, false);
         }
         else
         {
             CharacterDatabaseTransaction trans(nullptr);
-            Player::OfflineResurrect(targetGuid, trans);
+            Player::OfflineResurrect(target->GetGUID(), trans);
         }
 
         return true;
     }
 
-    static bool HandleDismountCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleDismountCommand(ChatHandler* handler)
     {
         Player* player = handler->GetSession()->GetPlayer();
 
@@ -984,7 +1145,7 @@ public:
         return true;
     }
 
-    static bool HandleGUIDCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleGUIDCommand(ChatHandler* handler)
     {
         ObjectGuid guid = handler->GetSession()->GetPlayer()->GetTarget();
 
@@ -1004,45 +1165,14 @@ public:
         Acore::ChatCommands::SendCommandHelpFor(*handler, cmd);
 
         if (cmd.empty())
+        {
             Acore::ChatCommands::SendCommandHelpFor(*handler, "help");
-
-        return true;
-    }
-    // move item to other slot
-    static bool HandleItemMoveCommand(ChatHandler* handler, char const* args)
-    {
-        if (!*args)
-            return false;
-
-        char const* param1 = strtok((char*)args, " ");
-        if (!param1)
-            return false;
-
-        char const* param2 = strtok(nullptr, " ");
-        if (!param2)
-            return false;
-
-        uint8 srcSlot = uint8(atoi(param1));
-        uint8 dstSlot = uint8(atoi(param2));
-
-        if (srcSlot == dstSlot)
-            return true;
-
-        if (!handler->GetSession()->GetPlayer()->IsValidPos(INVENTORY_SLOT_BAG_0, srcSlot, true))
-            return false;
-
-        if (!handler->GetSession()->GetPlayer()->IsValidPos(INVENTORY_SLOT_BAG_0, dstSlot, false))
-            return false;
-
-        uint16 src = ((INVENTORY_SLOT_BAG_0 << 8) | srcSlot);
-        uint16 dst = ((INVENTORY_SLOT_BAG_0 << 8) | dstSlot);
-
-        handler->GetSession()->GetPlayer()->SwapItem(src, dst);
+        }
 
         return true;
     }
 
-    static bool HandleCooldownCommand(ChatHandler* handler, char const* args)
+    static bool HandleCooldownCommand(ChatHandler* handler, Optional<SpellInfo const*> spell)
     {
         Player* target = handler->getSelectedPlayer();
         if (!target)
@@ -1054,124 +1184,93 @@ public:
 
         std::string nameLink = handler->GetNameLink(target);
 
-        if (!*args)
+        if (!spell)
         {
             target->RemoveAllSpellCooldown();
             handler->PSendSysMessage(LANG_REMOVEALL_COOLDOWN, nameLink.c_str());
         }
         else
         {
-            // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r or Htalent form
-            uint32 spellIid = handler->extractSpellIdFromLink((char*)args);
-            if (!spellIid)
-                return false;
-
-            if (!sSpellMgr->GetSpellInfo(spellIid))
+            if (!SpellMgr::IsSpellValid(*spell))
             {
-                handler->PSendSysMessage(LANG_UNKNOWN_SPELL, target == handler->GetSession()->GetPlayer() ? handler->GetAcoreString(LANG_YOU) : nameLink.c_str());
+                handler->PSendSysMessage(LANG_COMMAND_SPELL_BROKEN, spell.value()->Id);
                 handler->SetSentErrorMessage(true);
                 return false;
             }
 
-            target->RemoveSpellCooldown(spellIid, true);
-            handler->PSendSysMessage(LANG_REMOVE_COOLDOWN, spellIid, target == handler->GetSession()->GetPlayer() ? handler->GetAcoreString(LANG_YOU) : nameLink.c_str());
+            target->RemoveSpellCooldown(spell.value()->Id, true);
+            handler->PSendSysMessage(LANG_REMOVE_COOLDOWN, spell.value()->Id, target == handler->GetSession()->GetPlayer() ? handler->GetAcoreString(LANG_YOU) : nameLink.c_str());
         }
         return true;
     }
 
-    static bool HandleGetDistanceCommand(ChatHandler* handler, char const* args)
+    static bool HandleGetDistanceCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
     {
-        WorldObject* obj = nullptr;
-        if (*args)
+        if (!target)
         {
-            HighGuid guidHigh;
-            ObjectGuid::LowType guidLow = handler->extractLowGuidFromLink((char*)args, guidHigh);
-            if (!guidLow)
-                return false;
-
-            switch (guidHigh)
-            {
-                case HighGuid::Player:
-                {
-                    obj = ObjectAccessor::FindPlayerByLowGUID(guidLow);
-                    if (!obj)
-                    {
-                        handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-                        handler->SetSentErrorMessage(true);
-                    }
-                    break;
-                }
-                case HighGuid::Unit:
-                {
-                    obj = handler->GetCreatureFromPlayerMapByDbGuid(guidLow);
-                    if (!obj)
-                    {
-                        handler->SendSysMessage(LANG_COMMAND_NOCREATUREFOUND);
-                        handler->SetSentErrorMessage(true);
-                    }
-                    break;
-                }
-                case HighGuid::GameObject:
-                {
-                    obj = handler->GetObjectFromPlayerMapByDbGuid(guidLow);
-                    if (!obj)
-                    {
-                        handler->SendSysMessage(LANG_COMMAND_NOGAMEOBJECTFOUND);
-                        handler->SetSentErrorMessage(true);
-                    }
-                    break;
-                }
-                default:
-                    return false;
-            }
-            if (!obj)
-                return false;
-        }
-        else
-        {
-            obj = handler->getSelectedUnit();
-
-            if (!obj)
-            {
-                handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-                handler->SetSentErrorMessage(true);
-                return false;
-            }
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
         }
 
-        handler->PSendSysMessage(LANG_DISTANCE, handler->GetSession()->GetPlayer()->GetDistance(obj), handler->GetSession()->GetPlayer()->GetDistance2d(obj), handler->GetSession()->GetPlayer()->GetExactDist(obj), handler->GetSession()->GetPlayer()->GetExactDist2d(obj));
+        WorldObject* object = handler->getSelectedUnit();
+
+        if (!object && !target)
+        {
+            return false;
+        }
+
+        if (!object && target && target->IsConnected())
+        {
+            object = target->GetConnectedPlayer();
+        }
+
+        if (!object)
+        {
+            return false;
+        }
+
+        handler->PSendSysMessage(LANG_DISTANCE, handler->GetSession()->GetPlayer()->GetDistance(object), handler->GetSession()->GetPlayer()->GetDistance2d(object), handler->GetSession()->GetPlayer()->GetExactDist(object), handler->GetSession()->GetPlayer()->GetExactDist2d(object));
         return true;
     }
     // Teleport player to last position
-    static bool HandleRecallCommand(ChatHandler* handler, char const* args)
+    static bool HandleRecallCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
     {
-        Player* target;
-        if (!handler->extractPlayerTarget((char*)args, &target))
+        if (!target)
+        {
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+        }
+
+        if (!target || !target->IsConnected())
+        {
             return false;
+        }
+
+        auto targetPlayer = target->GetConnectedPlayer();
 
         // check online security
-        if (handler->HasLowerSecurity(target))
-            return false;
-
-        if (target->IsBeingTeleported())
+        if (handler->HasLowerSecurity(targetPlayer))
         {
-            handler->PSendSysMessage(LANG_IS_TELEPORTED, handler->GetNameLink(target).c_str());
+            return false;
+        }
+
+        if (targetPlayer->IsBeingTeleported())
+        {
+            handler->PSendSysMessage(LANG_IS_TELEPORTED, handler->playerLink(target->GetName()).c_str());
             handler->SetSentErrorMessage(true);
             return false;
         }
 
         // stop flight if need
-        if (target->IsInFlight())
+        if (targetPlayer->IsInFlight())
         {
-            target->GetMotionMaster()->MovementExpired();
-            target->CleanupAfterTaxiFlight();
+            targetPlayer->GetMotionMaster()->MovementExpired();
+            targetPlayer->CleanupAfterTaxiFlight();
         }
 
-        target->TeleportTo(target->m_recallMap, target->m_recallX, target->m_recallY, target->m_recallZ, target->m_recallO);
+        targetPlayer->TeleportTo(targetPlayer->m_recallMap, targetPlayer->m_recallX, targetPlayer->m_recallY, targetPlayer->m_recallZ, targetPlayer->m_recallO);
         return true;
     }
 
-    static bool HandleSaveCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleSaveCommand(ChatHandler* handler)
     {
         Player* player = handler->GetSession()->GetPlayer();
 
@@ -1186,6 +1285,7 @@ public:
             {
                 player->SaveToDB(false, false);
             }
+
             handler->SendSysMessage(LANG_PLAYER_SAVED);
             return true;
         }
@@ -1201,7 +1301,7 @@ public:
     }
 
     // Save all players in the world
-    static bool HandleSaveAllCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleSaveAllCommand(ChatHandler* handler)
     {
         ObjectAccessor::SaveAllPlayers();
         handler->SendSysMessage(LANG_PLAYERS_SAVED);
@@ -1209,14 +1309,21 @@ public:
     }
 
     // kick player
-    static bool HandleKickPlayerCommand(ChatHandler* handler, char const* args)
+    static bool HandleKickPlayerCommand(ChatHandler* handler, Optional<PlayerIdentifier> target, Optional<std::string_view> reason)
     {
-        Player* target = nullptr;
-        std::string playerName;
-        if (!handler->extractPlayerTarget((char*)args, &target, nullptr, &playerName))
-            return false;
+        if (!target)
+        {
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+        }
 
-        if (handler->GetSession() && target == handler->GetSession()->GetPlayer())
+        if (!target || !target->IsConnected())
+        {
+            return false;
+        }
+
+        auto targetPlayer = target->GetConnectedPlayer();
+
+        if (handler->GetSession() && target->GetGUID() == handler->GetSession()->GetPlayer()->GetGUID())
         {
             handler->SendSysMessage(LANG_COMMAND_KICKSELF);
             handler->SetSentErrorMessage(true);
@@ -1224,78 +1331,85 @@ public:
         }
 
         // check online security
-        if (handler->HasLowerSecurity(target))
+        if (handler->HasLowerSecurity(targetPlayer))
+        {
             return false;
+        }
 
         std::string kickReasonStr = handler->GetAcoreString(LANG_NO_REASON);
-        if (*args != '\0')
+        if (reason && !reason->empty())
         {
-            char const* kickReason = strtok(nullptr, "\r");
-            if (kickReason != nullptr)
-                kickReasonStr = kickReason;
+            kickReasonStr = std::string{ *reason };
         }
 
         if (sWorld->getBoolConfig(CONFIG_SHOW_KICK_IN_WORLD))
-            sWorld->SendWorldText(LANG_COMMAND_KICKMESSAGE_WORLD, (handler->GetSession() ? handler->GetSession()->GetPlayerName().c_str() : "Server"), playerName.c_str(), kickReasonStr.c_str());
+        {
+            sWorld->SendWorldText(LANG_COMMAND_KICKMESSAGE_WORLD, (handler->GetSession() ? handler->GetSession()->GetPlayerName().c_str() : "Server"), target->GetName().c_str(), kickReasonStr.c_str());
+        }
         else
-            handler->PSendSysMessage(LANG_COMMAND_KICKMESSAGE, playerName.c_str());
+        {
+            handler->PSendSysMessage(LANG_COMMAND_KICKMESSAGE, target->GetName().c_str());
+        }
 
-        target->GetSession()->KickPlayer("HandleKickPlayerCommand");
+        targetPlayer->GetSession()->KickPlayer("HandleKickPlayerCommand");
 
         return true;
     }
 
-    static bool HandleUnstuckCommand(ChatHandler* handler, char const* args)
+    static bool HandleUnstuckCommand(ChatHandler* handler, Optional<PlayerIdentifier> target, Optional<std::string_view> location)
     {
-        //No args required for players
+        // No args required for players
         if (handler->GetSession() && AccountMgr::IsPlayerAccount(handler->GetSession()->GetSecurity()))
         {
-            // 7355: "Stuck"
             if (Player* player = handler->GetSession()->GetPlayer())
-                player->CastSpell(player, 7355, false);
+            {
+                player->CastSpell(player, SPELL_STUCK, false);
+            }
+
             return true;
         }
 
-        if (!*args)
-            return false;
+        if (!target)
+        {
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+        }
 
-        char* player_str = strtok((char*)args, " ");
-        if (!player_str)
+        if (!target || !target->IsConnected())
+        {
             return false;
+        }
 
-        std::string location_str = "inn";
-        if (char const* loc = strtok(nullptr, " "))
-            location_str = loc;
-
-        Player* player = nullptr;
-        if (!handler->extractPlayerTarget(player_str, &player))
-            return false;
+        Player* player = target->GetConnectedPlayer();
 
         if (player->IsInFlight() || player->IsInCombat())
         {
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(7355);
             if (!spellInfo)
+            {
                 return false;
+            }
 
             if (Player* caster = handler->GetSession()->GetPlayer())
+            {
                 Spell::SendCastResult(caster, spellInfo, 0, SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW);
+            }
 
             return false;
         }
 
-        if (location_str == "inn")
+        if (location->empty() || *location == "inn")
         {
             player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->GetOrientation());
             return true;
         }
 
-        if (location_str == "graveyard")
+        if (*location == "graveyard")
         {
             player->RepopAtGraveyard();
             return true;
         }
 
-        if (location_str == "startzone")
+        if (*location == "startzone")
         {
             player->TeleportTo(player->GetStartPosition());
             return true;
@@ -1305,29 +1419,26 @@ public:
         return false;
     }
 
-    static bool HandleLinkGraveCommand(ChatHandler* handler, char const* args)
+    static bool HandleLinkGraveCommand(ChatHandler* handler, uint32 graveyardId, Optional<std::string_view> team)
     {
-        if (!*args)
-            return false;
-
-        char* px = strtok((char*)args, " ");
-        if (!px)
-            return false;
-
-        uint32 graveyardId = uint32(atoi(px));
-
         TeamId teamId;
 
-        char* px2 = strtok(nullptr, " ");
-
-        if (!px2)
+        if (!team)
+        {
             teamId = TEAM_NEUTRAL;
-        else if (strncmp(px2, "horde", 6) == 0)
+        }
+        else if (StringEqualI(team->substr(0, 6), "horde"))
+        {
             teamId = TEAM_HORDE;
-        else if (strncmp(px2, "alliance", 9) == 0)
+        }
+        else if (StringEqualI(team->substr(0, 9), "alliance"))
+        {
             teamId = TEAM_ALLIANCE;
+        }
         else
+        {
             return false;
+        }
 
         GraveyardStruct const* graveyard = sGraveyard->GetGraveyard(graveyardId);
 
@@ -1339,7 +1450,6 @@ public:
         }
 
         Player* player = handler->GetSession()->GetPlayer();
-
         uint32 zoneId = player->GetZoneId();
 
         AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(zoneId);
@@ -1351,27 +1461,37 @@ public:
         }
 
         if (sGraveyard->AddGraveyardLink(graveyardId, zoneId, teamId))
+        {
             handler->PSendSysMessage(LANG_COMMAND_GRAVEYARDLINKED, graveyardId, zoneId);
+        }
         else
+        {
             handler->PSendSysMessage(LANG_COMMAND_GRAVEYARDALRLINKED, graveyardId, zoneId);
+        }
 
         return true;
     }
 
-    static bool HandleNearGraveCommand(ChatHandler* handler, char const* args)
+    static bool HandleNearGraveCommand(ChatHandler* handler, Optional<std::string_view> team)
     {
         TeamId teamId;
 
-        size_t argStr = strlen(args);
-
-        if (!*args)
+        if (!team)
+        {
             teamId = TEAM_NEUTRAL;
-        else if (strncmp((char*)args, "horde", argStr) == 0)
+        }
+        else if (StringEqualI(team->substr(0, 6), "horde"))
+        {
             teamId = TEAM_HORDE;
-        else if (strncmp((char*)args, "alliance", argStr) == 0)
+        }
+        else if (StringEqualI(team->substr(0, 9), "alliance"))
+        {
             teamId = TEAM_ALLIANCE;
+        }
         else
+        {
             return false;
+        }
 
         Player* player = handler->GetSession()->GetPlayer();
         uint32 zone_id = player->GetZoneId();
@@ -1393,11 +1513,17 @@ public:
             std::string team_name = handler->GetAcoreString(LANG_COMMAND_GRAVEYARD_NOTEAM);
 
             if (data->teamId == TEAM_NEUTRAL)
+            {
                 team_name = handler->GetAcoreString(LANG_COMMAND_GRAVEYARD_ANY);
+            }
             else if (data->teamId == TEAM_HORDE)
+            {
                 team_name = handler->GetAcoreString(LANG_COMMAND_GRAVEYARD_HORDE);
+            }
             else if (data->teamId == TEAM_ALLIANCE)
+            {
                 team_name = handler->GetAcoreString(LANG_COMMAND_GRAVEYARD_ALLIANCE);
+            }
 
             handler->PSendSysMessage(LANG_COMMAND_GRAVEYARDNEAREST, graveyardId, team_name.c_str(), zone_id);
         }
@@ -1406,26 +1532,26 @@ public:
             std::string team_name;
 
             if (teamId == TEAM_NEUTRAL)
+            {
                 team_name = handler->GetAcoreString(LANG_COMMAND_GRAVEYARD_ANY);
+            }
             else if (teamId == TEAM_HORDE)
+            {
                 team_name = handler->GetAcoreString(LANG_COMMAND_GRAVEYARD_HORDE);
+            }
             else if (teamId == TEAM_ALLIANCE)
+            {
                 team_name = handler->GetAcoreString(LANG_COMMAND_GRAVEYARD_ALLIANCE);
+            }
 
-            //if (team == ~uint32(0))
-            //    handler->PSendSysMessage(LANG_COMMAND_ZONENOGRAVEYARDS, zone_id);
-            //else
             handler->PSendSysMessage(LANG_COMMAND_ZONENOGRAFACTION, zone_id, team_name.c_str());
         }
 
         return true;
     }
 
-    static bool HandleShowAreaCommand(ChatHandler* handler, char const* args)
+    static bool HandleShowAreaCommand(ChatHandler* handler, uint32 areaID)
     {
-        if (!*args)
-            return false;
-
         Player* playerTarget = handler->getSelectedPlayer();
         if (!playerTarget)
         {
@@ -1434,7 +1560,7 @@ public:
             return false;
         }
 
-        AreaTableEntry const* area = sAreaTableStore.LookupEntry(atoi(args));
+        AreaTableEntry const* area = sAreaTableStore.LookupEntry(areaID);
         if (!area)
         {
             handler->SendSysMessage(LANG_BAD_VALUE);
@@ -1458,11 +1584,8 @@ public:
         return true;
     }
 
-    static bool HandleHideAreaCommand(ChatHandler* handler, char const* args)
+    static bool HandleHideAreaCommand(ChatHandler* handler, uint32 areaID)
     {
-        if (!*args)
-            return false;
-
         Player* playerTarget = handler->getSelectedPlayer();
         if (!playerTarget)
         {
@@ -1471,7 +1594,7 @@ public:
             return false;
         }
 
-        AreaTableEntry const* area = sAreaTableStore.LookupEntry(atoi(args));
+        AreaTableEntry const* area = sAreaTableStore.LookupEntry(areaID);
         if (!area)
         {
             handler->SendSysMessage(LANG_BAD_VALUE);
@@ -1495,67 +1618,34 @@ public:
         return true;
     }
 
-    static bool HandleAddItemCommand(ChatHandler* handler, char const* args)
+    static bool HandleAddItemCommand(ChatHandler* handler, ItemTemplate const* itemTemplate, Optional<int32> _count)
     {
-        if (!*args)
+        if (!sObjectMgr->GetItemTemplate(itemTemplate->ItemId))
+        {
+            handler->PSendSysMessage(LANG_COMMAND_ITEMIDINVALID, itemTemplate->ItemId);
+            handler->SetSentErrorMessage(true);
             return false;
-
-        uint32 itemId = 0;
-
-        if (args[0] == '[')                                        // [name] manual form
-        {
-            char const* itemNameStr = strtok((char*)args, "]");
-
-            if (itemNameStr && itemNameStr[0])
-            {
-                std::string itemName = itemNameStr + 1;
-
-                WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_ITEM_TEMPLATE_BY_NAME);
-                stmt->setString(0, itemName);
-                PreparedQueryResult result = WorldDatabase.Query(stmt);
-
-                if (!result)
-                {
-                    handler->PSendSysMessage(LANG_COMMAND_COULDNOTFIND, itemNameStr + 1);
-                    handler->SetSentErrorMessage(true);
-                    return false;
-                }
-                itemId = result->Fetch()->GetUInt32();
-            }
-            else
-                return false;
-        }
-        else                                                    // item_id or [name] Shift-click form |color|Hitem:item_id:0:0:0|h[name]|h|r
-        {
-            char const* id = handler->extractKeyFromLink((char*)args, "Hitem");
-            if (!id)
-                return false;
-            itemId = uint32(atol(id));
         }
 
-        char const* ccount = strtok(nullptr, " ");
-
+        uint32 itemId = itemTemplate->ItemId;
         int32 count = 1;
 
-        if (ccount)
-            count = strtol(ccount, nullptr, 10);
+        if (_count)
+        {
+            count = *_count;
+        }
 
-        if (count == 0)
+        if (!count)
+        {
             count = 1;
+        }
 
         Player* player = handler->GetSession()->GetPlayer();
         Player* playerTarget = handler->getSelectedPlayer();
+
         if (!playerTarget)
-            playerTarget = player;
-
-        LOG_DEBUG("misc", handler->GetAcoreString(LANG_ADDITEM), itemId, count);
-
-        ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemId);
-        if (!itemTemplate)
         {
-            handler->PSendSysMessage(LANG_COMMAND_ITEMIDINVALID, itemId);
-            handler->SetSentErrorMessage(true);
-            return false;
+            playerTarget = player;
         }
 
         // Subtract
@@ -1568,20 +1658,22 @@ public:
                 {
                     // output that player don't have any items to destroy
                     handler->PSendSysMessage(LANG_REMOVEITEM_FAILURE, handler->GetNameLink(playerTarget).c_str(), itemId);
+                    handler->SetSentErrorMessage(true);
+                    return false;
                 }
-                else if (!playerTarget->HasItemCount(itemId, -count))
+
+                if (!playerTarget->HasItemCount(itemId, -count))
                 {
                     // output that player don't have as many items that you want to destroy
                     handler->PSendSysMessage(LANG_REMOVEITEM_ERROR, handler->GetNameLink(playerTarget).c_str(), itemId);
+                    handler->SetSentErrorMessage(true);
+                    return false;
                 }
             }
-            else
-            {
-                // output successful amount of destroyed items
-                playerTarget->DestroyItemCount(itemId, -count, true, false);
-                handler->PSendSysMessage(LANG_REMOVEITEM, itemId, -count, handler->GetNameLink(playerTarget).c_str());
-            }
 
+            // output successful amount of destroyed items
+            playerTarget->DestroyItemCount(itemId, -count, true, false);
+            handler->PSendSysMessage(LANG_REMOVEITEM, itemId, -count, handler->GetNameLink(playerTarget).c_str());
             return true;
         }
 
@@ -1591,10 +1683,13 @@ public:
         // check space and find places
         ItemPosCountVec dest;
         InventoryResult msg = playerTarget->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, count, &noSpaceForCount);
-        if (msg != EQUIP_ERR_OK)                               // convert to possible store amount
-            count -= noSpaceForCount;
 
-        if (count == 0 || dest.empty())                         // can't add any
+        if (msg != EQUIP_ERR_OK) // convert to possible store amount
+        {
+            count -= noSpaceForCount;
+        }
+
+        if (!count || dest.empty()) // can't add any
         {
             handler->PSendSysMessage(LANG_ITEM_CANNOT_CREATE, itemId, noSpaceForCount);
             handler->SetSentErrorMessage(true);
@@ -1605,81 +1700,90 @@ public:
 
         // remove binding (let GM give it to another player later)
         if (player == playerTarget)
-            for (ItemPosCountVec::const_iterator itr = dest.begin(); itr != dest.end(); ++itr)
-                if (Item* item1 = player->GetItemByPos(itr->pos))
-                    item1->SetBinding(false);
-
-        if (count > 0 && item)
         {
-            player->SendNewItem(item, count, false, true);
-            if (player != playerTarget)
-                playerTarget->SendNewItem(item, count, true, false);
+            for (auto const& itemPos : dest)
+            {
+                if (Item* item1 = player->GetItemByPos(itemPos.pos))
+                {
+                    item1->SetBinding(false);
+                }
+            }
         }
 
-        if (noSpaceForCount > 0)
+        if (count && item)
+        {
+            player->SendNewItem(item, count, false, true);
+
+            if (player != playerTarget)
+            {
+                playerTarget->SendNewItem(item, count, true, false);
+            }
+        }
+
+        if (noSpaceForCount)
+        {
             handler->PSendSysMessage(LANG_ITEM_CANNOT_CREATE, itemId, noSpaceForCount);
+        }
 
         return true;
     }
 
-    static bool HandleAddItemSetCommand(ChatHandler* handler, char const* args)
+    static bool HandleAddItemSetCommand(ChatHandler* handler, Variant<Hyperlink<itemset>, uint32> itemSetId)
     {
-        if (!*args)
-            return false;
-
-        char const* id = handler->extractKeyFromLink((char*)args, "Hitemset"); // number or [name] Shift-click form |color|Hitemset:itemset_id|h[name]|h|r
-        if (!id)
-            return false;
-
-        uint32 itemSetId = atol(id);
-
         // prevent generation all items with itemset field value '0'
-        if (itemSetId == 0)
+        if (!*itemSetId)
         {
-            handler->PSendSysMessage(LANG_NO_ITEMS_FROM_ITEMSET_FOUND, itemSetId);
+            handler->PSendSysMessage(LANG_NO_ITEMS_FROM_ITEMSET_FOUND, uint32(itemSetId));
             handler->SetSentErrorMessage(true);
             return false;
         }
 
         Player* player = handler->GetSession()->GetPlayer();
         Player* playerTarget = handler->getSelectedPlayer();
-        if (!playerTarget)
-            playerTarget = player;
 
-        LOG_DEBUG("misc", handler->GetAcoreString(LANG_ADDITEMSET), itemSetId);
+        if (!playerTarget)
+        {
+            playerTarget = player;
+        }
 
         bool found = false;
-        ItemTemplateContainer const* its = sObjectMgr->GetItemTemplateStore();
-        for (ItemTemplateContainer::const_iterator itr = its->begin(); itr != its->end(); ++itr)
+
+        for (auto const& [itemid, itemTemplate] : *sObjectMgr->GetItemTemplateStore())
         {
-            if (itr->second.ItemSet == itemSetId)
+            if (itemTemplate.ItemSet == uint32(itemSetId))
             {
                 found = true;
                 ItemPosCountVec dest;
-                InventoryResult msg = playerTarget->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itr->second.ItemId, 1);
+                InventoryResult msg = playerTarget->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemTemplate.ItemId, 1);
+
                 if (msg == EQUIP_ERR_OK)
                 {
-                    Item* item = playerTarget->StoreNewItem(dest, itr->second.ItemId, true);
+                    Item* item = playerTarget->StoreNewItem(dest, itemTemplate.ItemId, true);
 
                     // remove binding (let GM give it to another player later)
                     if (player == playerTarget)
+                    {
                         item->SetBinding(false);
+                    }
 
                     player->SendNewItem(item, 1, false, true);
+
                     if (player != playerTarget)
+                    {
                         playerTarget->SendNewItem(item, 1, true, false);
+                    }
                 }
                 else
                 {
-                    player->SendEquipError(msg, nullptr, nullptr, itr->second.ItemId);
-                    handler->PSendSysMessage(LANG_ITEM_CANNOT_CREATE, itr->second.ItemId, 1);
+                    player->SendEquipError(msg, nullptr, nullptr, itemTemplate.ItemId);
+                    handler->PSendSysMessage(LANG_ITEM_CANNOT_CREATE, itemTemplate.ItemId, 1);
                 }
             }
         }
 
         if (!found)
         {
-            handler->PSendSysMessage(LANG_NO_ITEMS_FROM_ITEMSET_FOUND, itemSetId);
+            handler->PSendSysMessage(LANG_NO_ITEMS_FROM_ITEMSET_FOUND, uint32(itemSetId));
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -1687,11 +1791,8 @@ public:
         return true;
     }
 
-    static bool HandleChangeWeather(ChatHandler* handler, char const* args)
+    static bool HandleChangeWeather(ChatHandler* handler, uint32 type, float grade)
     {
-        if (!*args)
-            return false;
-
         // Weather is OFF
         if (!sWorld->getBoolConfig(CONFIG_WEATHER))
         {
@@ -1700,23 +1801,16 @@ public:
             return false;
         }
 
-        // *Change the weather of a cell
-        char const* px = strtok((char*)args, " ");
-        char const* py = strtok(nullptr, " ");
-
-        if (!px || !py)
-            return false;
-
-        uint32 type = uint32(atoi(px));                         //0 to 3, 0: fine, 1: rain, 2: snow, 3: sand
-        float grade = float(atof(py));                          //0 to 1, sending -1 is instand good weather
-
         Player* player = handler->GetSession()->GetPlayer();
         uint32 zoneid = player->GetZoneId();
 
         Weather* weather = WeatherMgr::FindWeather(zoneid);
 
         if (!weather)
+        {
             weather = WeatherMgr::AddWeather(zoneid);
+        }
+
         if (!weather)
         {
             handler->SendSysMessage(LANG_NO_WEATHER);
@@ -1729,7 +1823,7 @@ public:
         return true;
     }
 
-    static bool HandleMaxSkillCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleMaxSkillCommand(ChatHandler* handler)
     {
         Player* SelectedPlayer = handler->getSelectedPlayer();
         if (!SelectedPlayer)
@@ -1744,28 +1838,16 @@ public:
         return true;
     }
 
-    static bool HandleSetSkillCommand(ChatHandler* handler, char const* args)
+    static bool HandleSetSkillCommand(ChatHandler* handler, Variant<Hyperlink<skill>, uint32> skillId, int32 level, Optional<uint16> maxPureSkill)
     {
-        // number or [name] Shift-click form |color|Hskill:skill_id|h[name]|h|r
-        char const* skillStr = handler->extractKeyFromLink((char*)args, "Hskill");
-        if (!skillStr)
-            return false;
+        uint32 skillID = uint32(skillId);
 
-        char const* levelStr = strtok(nullptr, " ");
-        if (!levelStr)
-            return false;
-
-        char const* maxPureSkill = strtok(nullptr, " ");
-
-        int32 skill = atoi(skillStr);
-        if (skill <= 0)
+        if (skillID <= 0)
         {
-            handler->PSendSysMessage(LANG_INVALID_SKILL_ID, skill);
+            handler->PSendSysMessage(LANG_INVALID_SKILL_ID, skillID);
             handler->SetSentErrorMessage(true);
             return false;
         }
-
-        int32 level = uint32(atol(levelStr));
 
         Player* target = handler->getSelectedPlayer();
         if (!target)
@@ -1775,53 +1857,54 @@ public:
             return false;
         }
 
-        SkillLineEntry const* skillLine = sSkillLineStore.LookupEntry(skill);
+        SkillLineEntry const* skillLine = sSkillLineStore.LookupEntry(skillID);
         if (!skillLine)
         {
-            handler->PSendSysMessage(LANG_INVALID_SKILL_ID, skill);
+            handler->PSendSysMessage(LANG_INVALID_SKILL_ID, uint32(skillID));
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        bool targetHasSkill = target->GetSkillValue(skill);
+        bool targetHasSkill = target->GetSkillValue(skillID);
 
         // If our target does not yet have the skill they are trying to add to them, the chosen level also becomes
         // the max level of the new profession.
-        uint16 max = maxPureSkill ? atol (maxPureSkill) : targetHasSkill ? target->GetPureMaxSkillValue(skill) : uint16(level);
+        uint16 max = maxPureSkill ? *maxPureSkill : targetHasSkill ? target->GetPureMaxSkillValue(skillID) : uint16(level);
 
         if (level <= 0 || level > max || max <= 0)
+        {
             return false;
+        }
 
         // If the player has the skill, we get the current skill step. If they don't have the skill, we
         // add the skill to the player's book with step 1 (which is the first rank, in most cases something
         // like 'Apprentice <skill>'.
-        target->SetSkill(skill, targetHasSkill ? target->GetSkillStep(skill) : 1, level, max);
-        handler->PSendSysMessage(LANG_SET_SKILL, skill, skillLine->name[handler->GetSessionDbcLocale()], handler->GetNameLink(target).c_str(), level, max);
+        target->SetSkill(skillID, targetHasSkill ? target->GetSkillStep(skillID) : 1, level, max);
+        handler->PSendSysMessage(LANG_SET_SKILL, skillID, skillLine->name[handler->GetSessionDbcLocale()], handler->GetNameLink(target).c_str(), level, max);
         return true;
     }
 
     // show info of player
-    static bool HandlePInfoCommand(ChatHandler* handler, char const* args)
+    static bool HandlePInfoCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
     {
-        Player* target;
-        ObjectGuid targetGuid;
-        std::string targetName;
+        if (!target)
+        {
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+        }
+
+        if (!target)
+        {
+            return false;
+        }
+
+        Player* playerTarget = target->GetConnectedPlayer();
+
         CharacterDatabasePreparedStatement* stmt = nullptr;
         LoginDatabasePreparedStatement* loginStmt = nullptr;
 
-        ObjectGuid parseGUID = ObjectGuid::Create<HighGuid::Player>(atol((char*)args));
-
-        if (sObjectMgr->GetPlayerNameByGUID(parseGUID.GetCounter(), targetName))
-        {
-            target = ObjectAccessor::FindConnectedPlayer(parseGUID);
-            targetGuid = parseGUID;
-        }
-        else if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
-            return false;
-
         // Account data print variables
         std::string userName          = handler->GetAcoreString(LANG_ERROR);
-        ObjectGuid::LowType lowguid   = targetGuid.GetCounter();
+        ObjectGuid::LowType lowguid   = target->GetGUID().GetCounter();
         uint32 accId                  = 0;
         std::string eMail             = handler->GetAcoreString(LANG_ERROR);
         std::string regMail           = handler->GetAcoreString(LANG_ERROR);
@@ -1872,79 +1955,89 @@ public:
         std::string officeNote;
 
         // get additional information from Player object
-        if (target)
+        if (playerTarget)
         {
             // check online security
-            if (handler->HasLowerSecurity(target))
+            if (handler->HasLowerSecurity(playerTarget))
+            {
                 return false;
+            }
 
-            accId             = target->GetSession()->GetAccountId();
-            money             = target->GetMoney();
-            totalPlayerTime   = target->GetTotalPlayedTime();
-            level             = target->getLevel();
-            latency           = target->GetSession()->GetLatency();
-            raceid            = target->getRace();
-            classid           = target->getClass();
-            muteTime          = target->GetSession()->m_muteTime;
-            mapId             = target->GetMapId();
-            areaId            = target->GetAreaId();
-            alive             = target->IsAlive() ? handler->GetAcoreString(LANG_YES) : handler->GetAcoreString(LANG_NO);
-            gender            = target->getGender();
-            phase             = target->GetPhaseMask();
+            accId             = playerTarget->GetSession()->GetAccountId();
+            money             = playerTarget->GetMoney();
+            totalPlayerTime   = playerTarget->GetTotalPlayedTime();
+            level             = playerTarget->getLevel();
+            latency           = playerTarget->GetSession()->GetLatency();
+            raceid            = playerTarget->getRace();
+            classid           = playerTarget->getClass();
+            muteTime          = playerTarget->GetSession()->m_muteTime;
+            mapId             = playerTarget->GetMapId();
+            areaId            = playerTarget->GetAreaId();
+            alive             = playerTarget->IsAlive() ? handler->GetAcoreString(LANG_YES) : handler->GetAcoreString(LANG_NO);
+            gender            = playerTarget->getGender();
+            phase             = playerTarget->GetPhaseMask();
         }
         // get additional information from DB
         else
         {
             // check offline security
-            if (handler->HasLowerSecurity(nullptr, targetGuid))
+            if (handler->HasLowerSecurity(nullptr, target->GetGUID()))
+            {
                 return false;
+            }
 
             // Query informations from the DB
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PINFO);
-            stmt->setUInt32(0, lowguid);
+            stmt->SetData(0, lowguid);
             PreparedQueryResult charInfoResult = CharacterDatabase.Query(stmt);
 
             if (!charInfoResult)
+            {
                 return false;
+            }
 
             Field* fields      = charInfoResult->Fetch();
-            totalPlayerTime    = fields[0].GetUInt32();
-            level              = fields[1].GetUInt8();
-            money              = fields[2].GetUInt32();
-            accId              = fields[3].GetUInt32();
-            raceid             = fields[4].GetUInt8();
-            classid            = fields[5].GetUInt8();
-            mapId              = fields[6].GetUInt16();
-            areaId             = fields[7].GetUInt16();
-            gender             = fields[8].GetUInt8();
-            uint32 health      = fields[9].GetUInt32();
-            uint32 playerFlags = fields[10].GetUInt32();
+            totalPlayerTime    = fields[0].Get<uint32>();
+            level              = fields[1].Get<uint8>();
+            money              = fields[2].Get<uint32>();
+            accId              = fields[3].Get<uint32>();
+            raceid             = fields[4].Get<uint8>();
+            classid            = fields[5].Get<uint8>();
+            mapId              = fields[6].Get<uint16>();
+            areaId             = fields[7].Get<uint16>();
+            gender             = fields[8].Get<uint8>();
+            uint32 health      = fields[9].Get<uint32>();
+            uint32 playerFlags = fields[10].Get<uint32>();
 
             if (!health || playerFlags & PLAYER_FLAGS_GHOST)
+            {
                 alive = handler->GetAcoreString(LANG_NO);
+            }
             else
+            {
                 alive = handler->GetAcoreString(LANG_YES);
+            }
         }
 
         // Query the prepared statement for login data
         loginStmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_PINFO);
-        loginStmt->setInt32(0, int32(realm.Id.Realm));
-        loginStmt->setUInt32(1, accId);
+        loginStmt->SetData(0, int32(realm.Id.Realm));
+        loginStmt->SetData(1, accId);
 
         PreparedQueryResult accInfoResult = LoginDatabase.Query(loginStmt);
         if (accInfoResult)
         {
             Field* fields = accInfoResult->Fetch();
-            userName      = fields[0].GetString();
-            security      = fields[1].GetUInt8();
+            userName      = fields[0].Get<std::string>();
+            security      = fields[1].Get<uint8>();
 
             // Only fetch these fields if commander has sufficient rights)
             if (!handler->GetSession() || handler->GetSession()->GetSecurity() >= AccountTypes(security))
             {
-                eMail     = fields[2].GetString();
-                regMail   = fields[3].GetString();
-                lastIp    = fields[4].GetString();
-                lastLogin = fields[5].GetString();
+                eMail     = fields[2].Get<std::string>();
+                regMail   = fields[3].Get<std::string>();
+                lastIp    = fields[4].Get<std::string>();
+                lastLogin = fields[5].Get<std::string>();
 
                 if (IpLocationRecord const* location = sIPLocation->GetLocationRecord(lastIp))
                 {
@@ -1960,93 +2053,100 @@ public:
                 lastIp    = handler->GetAcoreString(LANG_UNAUTHORIZED);
                 lastLogin = handler->GetAcoreString(LANG_UNAUTHORIZED);
             }
-            muteTime      = fields[6].GetUInt64();
-            muteReason    = fields[7].GetString();
-            muteBy        = fields[8].GetString();
-            failedLogins  = fields[9].GetUInt32();
-            locked        = fields[10].GetUInt8();
-            OS            = fields[11].GetString();
+
+            muteTime      = fields[6].Get<uint64>();
+            muteReason    = fields[7].Get<std::string>();
+            muteBy        = fields[8].Get<std::string>();
+            failedLogins  = fields[9].Get<uint32>();
+            locked        = fields[10].Get<uint8>();
+            OS            = fields[11].Get<std::string>();
         }
 
         // Creates a chat link to the character. Returns nameLink
-        std::string nameLink = handler->playerLink(targetName);
+        std::string nameLink = handler->playerLink(target->GetName());
 
         // Returns banType, banTime, bannedBy, banreason
         LoginDatabasePreparedStatement* banQuery = LoginDatabase.GetPreparedStatement(LOGIN_SEL_PINFO_BANS);
-        banQuery->setUInt32(0, accId);
+        banQuery->SetData(0, accId);
 
         PreparedQueryResult accBannedResult = LoginDatabase.Query(banQuery);
         if (!accBannedResult)
         {
             banType = handler->GetAcoreString(LANG_CHARACTER);
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PINFO_BANS);
-            stmt->setUInt32(0, lowguid);
+            stmt->SetData(0, lowguid);
             accBannedResult = CharacterDatabase.Query(stmt);
         }
 
         if (accBannedResult)
         {
             Field* fields = accBannedResult->Fetch();
-            banTime       = int64(fields[1].GetUInt64() ? 0 : fields[0].GetUInt32());
-            bannedBy      = fields[2].GetString();
-            banReason     = fields[3].GetString();
+            banTime       = int64(fields[1].Get<uint64>() ? 0 : fields[0].Get<uint32>());
+            bannedBy      = fields[2].Get<std::string>();
+            banReason     = fields[3].Get<std::string>();
         }
 
         // Can be used to query data from World database
         WorldDatabasePreparedStatement* xpQuery = WorldDatabase.GetPreparedStatement(WORLD_SEL_REQ_XP);
-        xpQuery->setUInt8(0, level);
+        xpQuery->SetData(0, level);
 
         PreparedQueryResult xpResult = WorldDatabase.Query(xpQuery);
         if (xpResult)
         {
             Field* fields = xpResult->Fetch();
-            xptotal       = fields[0].GetUInt32();
+            xptotal       = fields[0].Get<uint32>();
         }
 
         // Can be used to query data from Characters database
         CharacterDatabasePreparedStatement* charXpQuery = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PINFO_XP);
-        charXpQuery->setUInt32(0, lowguid);
+        charXpQuery->SetData(0, lowguid);
 
         PreparedQueryResult charXpResult = CharacterDatabase.Query(charXpQuery);
         if (charXpResult)
         {
             Field* fields = charXpResult->Fetch();
-            xp = fields[0].GetUInt32();
-            ObjectGuid::LowType gguid = fields[1].GetUInt32();
+            xp = fields[0].Get<uint32>();
+            ObjectGuid::LowType gguid = fields[1].Get<uint32>();
 
             if (gguid != 0)
             {
                 CharacterDatabasePreparedStatement* guildQuery = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GUILD_MEMBER_EXTENDED);
-                guildQuery->setUInt32(0, lowguid);
+                guildQuery->SetData(0, lowguid);
 
                 PreparedQueryResult guildInfoResult = CharacterDatabase.Query(guildQuery);
                 if (guildInfoResult)
                 {
                     Field* guildInfoFields  = guildInfoResult->Fetch();
-                    guildId        = guildInfoFields[0].GetUInt32();
-                    guildName      = guildInfoFields[1].GetString();
-                    guildRank      = guildInfoFields[2].GetString();
-                    note           = guildInfoFields[3].GetString();
-                    officeNote     = guildInfoFields[4].GetString();
+                    guildId        = guildInfoFields[0].Get<uint32>();
+                    guildName      = guildInfoFields[1].Get<std::string>();
+                    guildRank      = guildInfoFields[2].Get<std::string>();
+                    note           = guildInfoFields[3].Get<std::string>();
+                    officeNote     = guildInfoFields[4].Get<std::string>();
                 }
             }
         }
 
         // Initiate output
         // Output I. LANG_PINFO_PLAYER
-        handler->PSendSysMessage(LANG_PINFO_PLAYER, target ? "" : handler->GetAcoreString(LANG_OFFLINE), nameLink.c_str(), targetGuid.GetCounter());
+        handler->PSendSysMessage(LANG_PINFO_PLAYER, playerTarget ? "" : handler->GetAcoreString(LANG_OFFLINE), nameLink.c_str(), target->GetGUID().GetCounter());
 
         // Output II. LANG_PINFO_GM_ACTIVE if character is gamemaster
-        if (target && target->IsGameMaster())
+        if (playerTarget && playerTarget->IsGameMaster())
+        {
             handler->PSendSysMessage(LANG_PINFO_GM_ACTIVE);
+        }
 
         // Output III. LANG_PINFO_BANNED if ban exists and is applied
         if (banTime >= 0)
-            handler->PSendSysMessage(LANG_PINFO_BANNED, banType.c_str(), banReason.c_str(), banTime > 0 ? secsToTimeString(banTime - time(nullptr), true).c_str() : handler->GetAcoreString(LANG_PERMANENTLY), bannedBy.c_str());
+        {
+            handler->PSendSysMessage(LANG_PINFO_BANNED, banType.c_str(), banReason.c_str(), banTime > 0 ? secsToTimeString(banTime - GameTime::GetGameTime().count(), true).c_str() : handler->GetAcoreString(LANG_PERMANENTLY), bannedBy.c_str());
+        }
 
         // Output IV. LANG_PINFO_MUTED if mute is applied
         if (muteTime > 0)
-            handler->PSendSysMessage(LANG_PINFO_MUTED, muteReason.c_str(), secsToTimeString(muteTime - time(nullptr), true).c_str(), muteBy.c_str());
+        {
+            handler->PSendSysMessage(LANG_PINFO_MUTED, muteReason.c_str(), secsToTimeString(muteTime - GameTime::GetGameTime().count(), true).c_str(), muteBy.c_str());
+        }
 
         // Output V. LANG_PINFO_ACC_ACCOUNT
         handler->PSendSysMessage(LANG_PINFO_ACC_ACCOUNT, userName.c_str(), accId, security);
@@ -2065,9 +2165,13 @@ public:
 
         // Output X. LANG_PINFO_CHR_LEVEL
         if (level != sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+        {
             handler->PSendSysMessage(LANG_PINFO_CHR_LEVEL_LOW, level, xp, xptotal, (xptotal - xp));
+        }
         else
+        {
             handler->PSendSysMessage(LANG_PINFO_CHR_LEVEL_HIGH, level);
+        }
 
         // Output XI. LANG_PINFO_CHR_RACE
         switch (raceid)
@@ -2144,18 +2248,22 @@ public:
         handler->PSendSysMessage(LANG_PINFO_CHR_ALIVE, alive.c_str());
 
         // Output XIII. LANG_PINFO_CHR_PHASE if player is not in GM mode (GM is in every phase)
-        if (target && !target->IsGameMaster())                            // IsInWorld() returns false on loadingscreen, so it's more
-            handler->PSendSysMessage(LANG_PINFO_CHR_PHASE, phase);        // precise than just target (safer ?).
+        if (playerTarget && !playerTarget->IsGameMaster()) // IsInWorld() returns false on loadingscreen, so it's more
+        {
+            handler->PSendSysMessage(LANG_PINFO_CHR_PHASE, phase);    // precise than just target (safer ?).
+        }
+
         // However, as we usually just require a target here, we use target instead.
         // Output XIV. LANG_PINFO_CHR_MONEY
-        uint32 gold                   = money / GOLD;
-        uint32 silv                   = (money % GOLD) / SILVER;
-        uint32 copp                   = (money % GOLD) % SILVER;
+        uint32 gold = money / GOLD;
+        uint32 silv = (money % GOLD) / SILVER;
+        uint32 copp = (money % GOLD) % SILVER;
         handler->PSendSysMessage(LANG_PINFO_CHR_MONEY, gold, silv, copp);
 
         // Position data
         MapEntry const* map = sMapStore.LookupEntry(mapId);
         AreaTableEntry const* area = sAreaTableStore.LookupEntry(areaId);
+
         if (area)
         {
             zoneName = area->area_name[locale];
@@ -2169,22 +2277,34 @@ public:
         }
 
         if (!zoneName)
+        {
             zoneName = handler->GetAcoreString(LANG_UNKNOWN);
+        }
 
         if (areaName)
+        {
             handler->PSendSysMessage(LANG_PINFO_CHR_MAP_WITH_AREA, map->name[locale], zoneName, areaName);
+        }
         else
+        {
             handler->PSendSysMessage(LANG_PINFO_CHR_MAP, map->name[locale], zoneName);
+        }
 
         // Output XVII. - XVIX. if they are not empty
         if (!guildName.empty())
         {
             handler->PSendSysMessage(LANG_PINFO_CHR_GUILD, guildName.c_str(), guildId);
             handler->PSendSysMessage(LANG_PINFO_CHR_GUILD_RANK, guildRank.c_str(), uint32(guildRankId));
+
             if (!note.empty())
+            {
                 handler->PSendSysMessage(LANG_PINFO_CHR_GUILD_NOTE, note.c_str());
+            }
+
             if (!officeNote.empty())
+            {
                 handler->PSendSysMessage(LANG_PINFO_CHR_GUILD_ONOTE, officeNote.c_str());
+            }
         }
 
         // Output XX. LANG_PINFO_CHR_PLAYEDTIME
@@ -2193,28 +2313,29 @@ public:
         // Mail Data - an own query, because it may or may not be useful.
         // SQL: "SELECT SUM(CASE WHEN (checked & 1) THEN 1 ELSE 0 END) AS 'readmail', COUNT(*) AS 'totalmail' FROM mail WHERE `receiver` = ?"
         CharacterDatabasePreparedStatement* mailQuery = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PINFO_MAILS);
-        mailQuery->setUInt32(0, lowguid);
+        mailQuery->SetData(0, lowguid);
 
         PreparedQueryResult mailInfoResult = CharacterDatabase.Query(mailQuery);
         if (mailInfoResult)
         {
             Field* fields         = mailInfoResult->Fetch();
-            uint32 readmail       = uint32(fields[0].GetDouble());
-            uint32 totalmail      = uint32(fields[1].GetUInt64());
+            uint32 readmail       = uint32(fields[0].Get<double>());
+            uint32 totalmail      = uint32(fields[1].Get<uint64>());
 
             // Output XXI. LANG_INFO_CHR_MAILS if at least one mail is given
             if (totalmail >= 1)
+            {
                 handler->PSendSysMessage(LANG_PINFO_CHR_MAILS, readmail, totalmail);
+            }
         }
 
         return true;
     }
 
-    static bool HandleRespawnCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleRespawnCommand(ChatHandler* handler)
     {
         Player* player = handler->GetSession()->GetPlayer();
 
-        // accept only explicitly selected target (not implicitly self targeting case)
         Unit* target = handler->getSelectedUnit();
         if (player->GetTarget() && target)
         {
@@ -2226,9 +2347,20 @@ public:
             }
 
             if (target->isDead())
+            {
                 target->ToCreature()->Respawn();
+            }
             return true;
         }
+
+        handler->SendSysMessage(LANG_SELECT_CREATURE);
+        handler->SetSentErrorMessage(true);
+        return false;
+    }
+
+    static bool HandleRespawnAllCommand(ChatHandler* handler)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
 
         CellCoord p(Acore::ComputeCellCoord(player->GetPositionX(), player->GetPositionY()));
         Cell cell(p);
@@ -2240,16 +2372,21 @@ public:
 
         return true;
     }
+
     // mute player for some times
     static bool HandleMuteCommand(ChatHandler* handler, Optional<PlayerIdentifier> player, uint32 notSpeakTime, Tail muteReason)
     {
         std::string muteReasonStr{ muteReason };
 
         if (muteReason.empty())
+        {
             muteReasonStr = handler->GetAcoreString(LANG_NO_REASON);
+        }
 
         if (!player)
+        {
             player = PlayerIdentifier::FromTarget(handler);
+        }
 
         if (!player)
         {
@@ -2259,59 +2396,71 @@ public:
         }
 
         Player* target = player->GetConnectedPlayer();
-        uint32 accountId = target ? target->GetSession()->GetAccountId() : sObjectMgr->GetPlayerAccountIdByGUID(player->GetGUID().GetCounter());
+        uint32 accountId = target ? target->GetSession()->GetAccountId() : sCharacterCache->GetCharacterAccountIdByGuid(player->GetGUID());
 
         // find only player from same account if any
         if (!target)
             if (WorldSession* session = sWorld->FindSession(accountId))
+            {
                 target = session->GetPlayer();
+            }
 
         // must have strong lesser security level
         if (handler->HasLowerSecurity(target, player->GetGUID(), true))
+        {
             return false;
+        }
 
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
         std::string muteBy = "";
         if (handler->GetSession())
+        {
             muteBy = handler->GetSession()->GetPlayerName();
+        }
         else
+        {
             muteBy = handler->GetAcoreString(LANG_CONSOLE);
+        }
 
         if (target)
         {
             // Target is online, mute will be in effect right away.
-            int64 muteTime = time(nullptr) + notSpeakTime * MINUTE;
+            int64 muteTime = GameTime::GetGameTime().count() + notSpeakTime * MINUTE;
             target->GetSession()->m_muteTime = muteTime;
-            stmt->setInt64(0, muteTime);
+            stmt->SetData(0, muteTime);
             std::string nameLink = handler->playerLink(player->GetName());
 
             if (sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD))
+            {
                 sWorld->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy.c_str(), nameLink.c_str(), notSpeakTime, muteReasonStr.c_str());
+            }
 
             ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOUR_CHAT_DISABLED, notSpeakTime, muteBy.c_str(), muteReasonStr.c_str());
         }
         else
         {
             // Target is offline, mute will be in effect starting from the next login.
-            stmt->setInt32(0, -int32(notSpeakTime * MINUTE));
+            stmt->SetData(0, -int32(notSpeakTime * MINUTE));
         }
 
-        stmt->setString(1, muteReasonStr);
-        stmt->setString(2, muteBy);
-        stmt->setUInt32(3, accountId);
+        stmt->SetData(1, muteReasonStr);
+        stmt->SetData(2, muteBy);
+        stmt->SetData(3, accountId);
         LoginDatabase.Execute(stmt);
 
         stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT_MUTE);
-        stmt->setUInt32(0, accountId);
-        stmt->setUInt32(1, notSpeakTime);
-        stmt->setString(2, muteBy);
-        stmt->setString(3, muteReasonStr);
+        stmt->SetData(0, accountId);
+        stmt->SetData(1, notSpeakTime);
+        stmt->SetData(2, muteBy);
+        stmt->SetData(3, muteReasonStr);
         LoginDatabase.Execute(stmt);
 
         std::string nameLink = handler->playerLink(player->GetName());
 
         if (sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD) && !target)
+        {
             sWorld->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy.c_str(), nameLink.c_str(), notSpeakTime, muteReasonStr.c_str());
+        }
         else
         {
             // pussywizard: notify all online GMs
@@ -2320,72 +2469,75 @@ public:
             for (HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
                 if (itr->second->GetSession()->GetSecurity())
                     ChatHandler(itr->second->GetSession()).PSendSysMessage(target ? LANG_YOU_DISABLE_CHAT : LANG_COMMAND_DISABLE_CHAT_DELAYED,
-                        (handler->GetSession() ? handler->GetSession()->GetPlayerName().c_str() : handler->GetAcoreString(LANG_CONSOLE)), nameLink.c_str(), notSpeakTime, muteReasonStr.c_str());
+                            (handler->GetSession() ? handler->GetSession()->GetPlayerName().c_str() : handler->GetAcoreString(LANG_CONSOLE)), nameLink.c_str(), notSpeakTime, muteReasonStr.c_str());
         }
 
         return true;
     }
 
     // unmute player
-    static bool HandleUnmuteCommand(ChatHandler* handler, char const* args)
+    static bool HandleUnmuteCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
     {
-        Player* target;
-        ObjectGuid targetGuid;
-        std::string targetName;
-        if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
-            return false;
+        if (!target)
+        {
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+        }
 
-        uint32 accountId = target ? target->GetSession()->GetAccountId() : sObjectMgr->GetPlayerAccountIdByGUID(targetGuid.GetCounter());
+        if (!target)
+        {
+            return false;
+        }
+
+        Player* playerTarget = target->GetConnectedPlayer();
+        uint32 accountId = playerTarget ? playerTarget->GetSession()->GetAccountId() : sCharacterCache->GetCharacterAccountIdByGuid(target->GetGUID());
 
         // find only player from same account if any
-        if (!target)
+        if (!playerTarget)
+        {
             if (WorldSession* session = sWorld->FindSession(accountId))
-                target = session->GetPlayer();
+            {
+                playerTarget = session->GetPlayer();
+            }
+        }
 
         // must have strong lesser security level
-        if (handler->HasLowerSecurity (target, targetGuid, true))
-            return false;
-
-        if (target)
+        if (handler->HasLowerSecurity(playerTarget, target->GetGUID(), true))
         {
-            if (target->CanSpeak())
+            return false;
+        }
+
+        if (playerTarget)
+        {
+            if (playerTarget->CanSpeak())
             {
                 handler->SendSysMessage(LANG_CHAT_ALREADY_ENABLED);
                 handler->SetSentErrorMessage(true);
                 return false;
             }
 
-            target->GetSession()->m_muteTime = 0;
+            playerTarget->GetSession()->m_muteTime = 0;
         }
 
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
-        stmt->setInt64(0, 0);
-        stmt->setString(1, "");
-        stmt->setString(2, "");
-        stmt->setUInt32(3, accountId);
+        stmt->SetData(0, 0);
+        stmt->SetData(1, "");
+        stmt->SetData(2, "");
+        stmt->SetData(3, accountId);
         LoginDatabase.Execute(stmt);
 
-        if (target)
-            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOUR_CHAT_ENABLED);
+        if (playerTarget)
+        {
+            ChatHandler(playerTarget->GetSession()).PSendSysMessage(LANG_YOUR_CHAT_ENABLED);
+        }
 
-        std::string nameLink = handler->playerLink(targetName);
-
-        handler->PSendSysMessage(LANG_YOU_ENABLE_CHAT, nameLink.c_str());
+        handler->PSendSysMessage(LANG_YOU_ENABLE_CHAT, handler->playerLink(target->GetName().c_str()));
 
         return true;
     }
 
     // mutehistory command
-    static bool HandleMuteInfoCommand(ChatHandler* handler, char const* args)
+    static bool HandleMuteInfoCommand(ChatHandler* handler, std::string accountName)
     {
-        if (!*args)
-            return false;
-
-        char* nameStr = strtok((char*)args, "");
-        if (!nameStr)
-            return false;
-
-        std::string accountName = nameStr;
         if (!Utf8ToUpperOnlyLatin(accountName))
         {
             handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
@@ -2400,14 +2552,14 @@ public:
             return false;
         }
 
-        return HandleMuteInfoHelper(accountId, accountName.c_str(), handler);
+        return HandleMuteInfoHelper(handler, accountId, accountName.c_str());
     }
 
     // helper for mutehistory
-    static bool HandleMuteInfoHelper(uint32 accountId, char const* accountName, ChatHandler* handler)
+    static bool HandleMuteInfoHelper(ChatHandler* handler, uint32 accountId, char const* accountName)
     {
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_MUTE_INFO);
-        stmt->setUInt16(0, accountId);
+        stmt->SetData(0, accountId);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
 
         if (!result)
@@ -2420,22 +2572,13 @@ public:
         do
         {
             Field* fields = result->Fetch();
-
-            // we have to manually set the string for mutedate
-            time_t sqlTime = fields[0].GetUInt32();
-            tm timeInfo;
-            char buffer[80];
-
-            // set it to string
-            localtime_r(&sqlTime, &timeInfo);
-            strftime(buffer, sizeof(buffer), "%Y-%m-%d %I:%M%p", &timeInfo);
-
-            handler->PSendSysMessage(LANG_COMMAND_MUTEHISTORY_OUTPUT, buffer, fields[1].GetUInt32(), fields[2].GetCString(), fields[3].GetCString());
+            handler->PSendSysMessage(LANG_COMMAND_MUTEHISTORY_OUTPUT, Acore::Time::TimeToHumanReadable(Seconds(fields[0].Get<uint32>())).c_str(), fields[1].Get<uint32>(), fields[2].Get<std::string>().c_str(), fields[3].Get<std::string>().c_str());
         } while (result->NextRow());
+
         return true;
     }
 
-    static bool HandleMovegensCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleMovegensCommand(ChatHandler* handler)
     {
         Unit* unit = handler->getSelectedUnit();
         if (!unit)
@@ -2478,53 +2621,77 @@ public:
                     handler->SendSysMessage(LANG_MOVEGENS_CONFUSED);
                     break;
                 case CHASE_MOTION_TYPE:
+                {
+                    Unit* target = nullptr;
+                    if (unit->GetTypeId() == TYPEID_PLAYER)
                     {
-                        Unit* target = nullptr;
-                        if (unit->GetTypeId() == TYPEID_PLAYER)
-                            target = static_cast<ChaseMovementGenerator<Player> const*>(movementGenerator)->GetTarget();
-                        else
-                            target = static_cast<ChaseMovementGenerator<Creature> const*>(movementGenerator)->GetTarget();
-
-                        if (!target)
-                            handler->SendSysMessage(LANG_MOVEGENS_CHASE_NULL);
-                        else if (target->GetTypeId() == TYPEID_PLAYER)
-                            handler->PSendSysMessage(LANG_MOVEGENS_CHASE_PLAYER, target->GetName().c_str(), target->GetGUID().GetCounter());
-                        else
-                            handler->PSendSysMessage(LANG_MOVEGENS_CHASE_CREATURE, target->GetName().c_str(), target->GetGUID().GetCounter());
-                        break;
+                        target = static_cast<ChaseMovementGenerator<Player> const*>(movementGenerator)->GetTarget();
                     }
+                    else
+                    {
+                        target = static_cast<ChaseMovementGenerator<Creature> const*>(movementGenerator)->GetTarget();
+                    }
+
+                    if (!target)
+                    {
+                        handler->SendSysMessage(LANG_MOVEGENS_CHASE_NULL);
+                    }
+                    else if (target->GetTypeId() == TYPEID_PLAYER)
+                    {
+                        handler->PSendSysMessage(LANG_MOVEGENS_CHASE_PLAYER, target->GetName().c_str(), target->GetGUID().GetCounter());
+                    }
+                    else
+                    {
+                        handler->PSendSysMessage(LANG_MOVEGENS_CHASE_CREATURE, target->GetName().c_str(), target->GetGUID().GetCounter());
+                    }
+                    break;
+                }
                 case FOLLOW_MOTION_TYPE:
+                {
+                    Unit* target = nullptr;
+                    if (unit->GetTypeId() == TYPEID_PLAYER)
                     {
-                        Unit* target = nullptr;
-                        if (unit->GetTypeId() == TYPEID_PLAYER)
-                            target = static_cast<FollowMovementGenerator<Player> const*>(movementGenerator)->GetTarget();
-                        else
-                            target = static_cast<FollowMovementGenerator<Creature> const*>(movementGenerator)->GetTarget();
+                        target = static_cast<FollowMovementGenerator<Player> const*>(movementGenerator)->GetTarget();
+                    }
+                    else
+                    {
+                        target = static_cast<FollowMovementGenerator<Creature> const*>(movementGenerator)->GetTarget();
+                    }
 
-                        if (!target)
-                            handler->SendSysMessage(LANG_MOVEGENS_FOLLOW_NULL);
-                        else if (target->GetTypeId() == TYPEID_PLAYER)
-                            handler->PSendSysMessage(LANG_MOVEGENS_FOLLOW_PLAYER, target->GetName().c_str(), target->GetGUID().GetCounter());
-                        else
-                            handler->PSendSysMessage(LANG_MOVEGENS_FOLLOW_CREATURE, target->GetName().c_str(), target->GetGUID().GetCounter());
-                        break;
-                    }
-                case HOME_MOTION_TYPE:
+                    if (!target)
                     {
-                        if (unit->GetTypeId() == TYPEID_UNIT)
-                            handler->PSendSysMessage(LANG_MOVEGENS_HOME_CREATURE, x, y, z);
-                        else
-                            handler->SendSysMessage(LANG_MOVEGENS_HOME_PLAYER);
-                        break;
+                        handler->SendSysMessage(LANG_MOVEGENS_FOLLOW_NULL);
                     }
+                    else if (target->GetTypeId() == TYPEID_PLAYER)
+                    {
+                        handler->PSendSysMessage(LANG_MOVEGENS_FOLLOW_PLAYER, target->GetName().c_str(), target->GetGUID().GetCounter());
+                    }
+                    else
+                    {
+                        handler->PSendSysMessage(LANG_MOVEGENS_FOLLOW_CREATURE, target->GetName().c_str(), target->GetGUID().GetCounter());
+                    }
+                    break;
+                }
+                case HOME_MOTION_TYPE:
+                {
+                    if (unit->GetTypeId() == TYPEID_UNIT)
+                    {
+                        handler->PSendSysMessage(LANG_MOVEGENS_HOME_CREATURE, x, y, z);
+                    }
+                    else
+                    {
+                        handler->SendSysMessage(LANG_MOVEGENS_HOME_PLAYER);
+                    }
+                    break;
+                }
                 case FLIGHT_MOTION_TYPE:
                     handler->SendSysMessage(LANG_MOVEGENS_FLIGHT);
                     break;
                 case POINT_MOTION_TYPE:
-                    {
-                        handler->PSendSysMessage(LANG_MOVEGENS_POINT, x, y, z);
-                        break;
-                    }
+                {
+                    handler->PSendSysMessage(LANG_MOVEGENS_POINT, x, y, z);
+                    break;
+                }
                 case FLEEING_MOTION_TYPE:
                     handler->SendSysMessage(LANG_MOVEGENS_FEAR);
                     break;
@@ -2546,12 +2713,8 @@ public:
     Without this function 3rd party scripting library will get linking errors (unresolved external)
     when attempting to use the PointMovementGenerator
     */
-    static bool HandleComeToMeCommand(ChatHandler* handler, char const* args)
+    static bool HandleComeToMeCommand(ChatHandler* handler)
     {
-        char const* newFlagStr = strtok((char*)args, " ");
-        if (!newFlagStr)
-            return false;
-
         Creature* caster = handler->getSelectedCreature();
         if (!caster)
         {
@@ -2567,11 +2730,8 @@ public:
         return true;
     }
 
-    static bool HandleDamageCommand(ChatHandler* handler, char const* args)
+    static bool HandleDamageCommand(ChatHandler* handler, uint32 damage)
     {
-        if (!*args)
-            return false;
-
         Unit* target = handler->getSelectedUnit();
         if (!target || !handler->GetSession()->GetPlayer()->GetTarget())
         {
@@ -2583,745 +2743,159 @@ public:
         if (target->GetTypeId() == TYPEID_PLAYER)
         {
             if (handler->HasLowerSecurity(target->ToPlayer()))
-                return false;
-        }
-
-        if (!target->IsAlive())
-            return true;
-
-        int32 damage_int = atoi(args);
-        if (damage_int <= 0)
-            return true;
-
-        uint32 damage = damage_int;
-
-        if (target->GetTypeId() == TYPEID_UNIT && handler->GetSession()->GetSecurity() == SEC_CONSOLE) // pussywizard
-            target->ToCreature()->LowerPlayerDamageReq(target->GetMaxHealth());
-        Unit::DealDamage(handler->GetSession()->GetPlayer(), target, damage, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, true);
-        if (target != handler->GetSession()->GetPlayer())
-            handler->GetSession()->GetPlayer()->SendAttackStateUpdate (HITINFO_AFFECTS_VICTIM, target, 1, SPELL_SCHOOL_MASK_NORMAL, damage, 0, 0, VICTIMSTATE_HIT, 0);
-        return true;
-    }
-
-    static bool HandleCombatStopCommand(ChatHandler* handler, char const* args)
-    {
-        Player* target = nullptr;
-
-        if (args && strlen(args) > 0)
-        {
-            target = ObjectAccessor::FindPlayerByName(args);
-            if (!target)
             {
-                handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-                handler->SetSentErrorMessage(true);
                 return false;
             }
         }
 
-        if (!target)
+        if (!target->IsAlive())
         {
-            if (!handler->extractPlayerTarget((char*)args, &target))
-                return false;
+            return true;
         }
 
-        // check online security
-        if (handler->HasLowerSecurity(target))
-            return false;
+        if (!damage)
+        {
+            return true;
+        }
 
-        target->CombatStop();
-        target->getHostileRefMgr().deleteReferences();
+        if (target->GetTypeId() == TYPEID_UNIT && handler->GetSession()->GetSecurity() == SEC_CONSOLE) // pussywizard
+        {
+            target->ToCreature()->LowerPlayerDamageReq(target->GetMaxHealth());
+        }
+
+        Unit::DealDamage(handler->GetSession()->GetPlayer(), target, damage, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, true);
+
+        if (target != handler->GetSession()->GetPlayer())
+        {
+            handler->GetSession()->GetPlayer()->SendAttackStateUpdate(HITINFO_AFFECTS_VICTIM, target, 1, SPELL_SCHOOL_MASK_NORMAL, damage, 0, 0, VICTIMSTATE_HIT, 0);
+        }
+
         return true;
     }
 
-    static bool HandleFlushArenaPointsCommand(ChatHandler* /*handler*/, char const* /*args*/)
+    static bool HandleCombatStopCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
+    {
+        if (!target)
+        {
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+        }
+
+        if (!target || !target->IsConnected())
+        {
+            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        Player* playerTarget = target->GetConnectedPlayer();
+
+        // check online security
+        if (handler->HasLowerSecurity(playerTarget))
+        {
+            return false;
+        }
+
+        playerTarget->CombatStop();
+        playerTarget->getHostileRefMgr().deleteReferences();
+        return true;
+    }
+
+    static bool HandleFlushArenaPointsCommand(ChatHandler* /*handler*/)
     {
         sArenaTeamMgr->DistributeArenaPoints();
         return true;
     }
 
-    static bool HandleGearRepairCommand(ChatHandler* handler, char const* args)
+    static bool HandleFreezeCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
     {
-        Player* target;
-        if (!handler->extractPlayerTarget((char*)args, &target))
-            return false;
-
-        // check online security
-        if (handler->HasLowerSecurity(target))
-            return false;
-
-        // Repair items
-        target->DurabilityRepairAll(false, 0, false);
-
-        handler->PSendSysMessage(LANG_YOU_REPAIR_ITEMS, handler->GetNameLink(target).c_str());
-        if (handler->needReportToTarget(target))
-            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOUR_ITEMS_REPAIRED, handler->GetNameLink().c_str());
-
-        return true;
-    }
-
-    // Send mail by command
-    static bool HandleSendMailCommand(ChatHandler* handler, char const* args)
-    {
-        // format: name "subject text" "mail text"
-        Player* target;
-        ObjectGuid targetGuid;
-        std::string targetName;
-        if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
-            return false;
-
-        char* tail1 = strtok(nullptr, "");
-        if (!tail1)
-            return false;
-
-        char const* msgSubject = handler->extractQuotedArg(tail1);
-        if (!msgSubject)
-            return false;
-
-        char* tail2 = strtok(nullptr, "");
-        if (!tail2)
-            return false;
-
-        char const* msgText = handler->extractQuotedArg(tail2);
-        if (!msgText)
-            return false;
-
-        // msgSubject, msgText isn't NUL after prev. check
-        std::string subject = msgSubject;
-        std::string text    = msgText;
-
-        ObjectGuid::LowType senderGuid;
-        // If the message is sent from console, set it as sent by the target itself, like the other Customer Support mails.
-        senderGuid = handler->GetSession() ? handler->GetSession()->GetPlayer()->GetGUID().GetCounter() : targetGuid.GetCounter();
-        MailSender sender(MAIL_NORMAL, senderGuid, MAIL_STATIONERY_GM);
-
-        //- TODO: Fix poor design
-        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-        MailDraft(subject, text)
-        .SendMailTo(trans, MailReceiver(target, targetGuid.GetCounter()), sender);
-
-        CharacterDatabase.CommitTransaction(trans);
-
-        std::string nameLink = handler->playerLink(targetName);
-        handler->PSendSysMessage(LANG_MAIL_SENT, nameLink.c_str());
-        return true;
-    }
-    // Send items by mail
-    static bool HandleSendItemsCommand(ChatHandler* handler, char const* args)
-    {
-        // format: name "subject text" "mail text" item1[:count1] item2[:count2] ... item12[:count12]
-        Player* receiver;
-        ObjectGuid receiverGuid;
-        std::string receiverName;
-        if (!handler->extractPlayerTarget((char*)args, &receiver, &receiverGuid, &receiverName))
-            return false;
-
-        char* tail1 = strtok(nullptr, "");
-        if (!tail1)
-            return false;
-
-        char const* msgSubject = handler->extractQuotedArg(tail1);
-        if (!msgSubject)
-            return false;
-
-        char* tail2 = strtok(nullptr, "");
-        if (!tail2)
-            return false;
-
-        char const* msgText = handler->extractQuotedArg(tail2);
-        if (!msgText)
-            return false;
-
-        // msgSubject, msgText isn't NUL after prev. check
-        std::string subject = msgSubject;
-        std::string text    = msgText;
-
-        // extract items
-        typedef std::pair<uint32, uint32> ItemPair;
-        typedef std::list< ItemPair > ItemPairs;
-        ItemPairs items;
-
-        // get all tail string
-        char* tail = strtok(nullptr, "");
-
-        // get from tail next item str
-        while (char* itemStr = strtok(tail, " "))
-        {
-            // and get new tail
-            tail = strtok(nullptr, "");
-
-            // parse item str
-            char const* itemIdStr = strtok(itemStr, ":");
-            char const* itemCountStr = strtok(nullptr, " ");
-
-            uint32 itemId = atoi(itemIdStr);
-            if (!itemId)
-                return false;
-
-            ItemTemplate const* item_proto = sObjectMgr->GetItemTemplate(itemId);
-            if (!item_proto)
-            {
-                handler->PSendSysMessage(LANG_COMMAND_ITEMIDINVALID, itemId);
-                handler->SetSentErrorMessage(true);
-                return false;
-            }
-
-            uint32 itemCount = itemCountStr ? atoi(itemCountStr) : 1;
-            if (itemCount < 1 || (item_proto->MaxCount > 0 && itemCount > uint32(item_proto->MaxCount)))
-            {
-                handler->PSendSysMessage(LANG_COMMAND_INVALID_ITEM_COUNT, itemCount, itemId);
-                handler->SetSentErrorMessage(true);
-                return false;
-            }
-
-            while (itemCount > item_proto->GetMaxStackSize())
-            {
-                items.push_back(ItemPair(itemId, item_proto->GetMaxStackSize()));
-                itemCount -= item_proto->GetMaxStackSize();
-            }
-
-            items.push_back(ItemPair(itemId, itemCount));
-
-            if (items.size() > MAX_MAIL_ITEMS)
-            {
-                handler->PSendSysMessage(LANG_COMMAND_MAIL_ITEMS_LIMIT, MAX_MAIL_ITEMS);
-                handler->SetSentErrorMessage(true);
-                return false;
-            }
-        }
-
-        ObjectGuid::LowType senderGuid;
-        // If the message is sent from console, set it as sent by the target itself, like the other Customer Support mails.
-        senderGuid = handler->GetSession() ? handler->GetSession()->GetPlayer()->GetGUID().GetCounter() : receiverGuid.GetCounter();
-        MailSender sender(MAIL_NORMAL, senderGuid, MAIL_STATIONERY_GM);
-
-        // fill mail
-        MailDraft draft(subject, text);
-
-        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-
-        for (ItemPairs::const_iterator itr = items.begin(); itr != items.end(); ++itr)
-        {
-            if (Item* item = Item::CreateItem(itr->first, itr->second, handler->GetSession() ? handler->GetSession()->GetPlayer() : 0))
-            {
-                item->SaveToDB(trans);                               // save for prevent lost at next mail load, if send fail then item will deleted
-                draft.AddItem(item);
-            }
-        }
-
-        draft.SendMailTo(trans, MailReceiver(receiver, receiverGuid.GetCounter()), sender);
-        CharacterDatabase.CommitTransaction(trans);
-
-        std::string nameLink = handler->playerLink(receiverName);
-        handler->PSendSysMessage(LANG_MAIL_SENT, nameLink.c_str());
-        return true;
-    }
-    /// Send money by mail
-    static bool HandleSendMoneyCommand(ChatHandler* handler, char const* args)
-    {
-        /// format: name "subject text" "mail text" money
-
-        Player* receiver;
-        ObjectGuid receiverGuid;
-        std::string receiverName;
-        if (!handler->extractPlayerTarget((char*)args, &receiver, &receiverGuid, &receiverName))
-            return false;
-
-        char* tail1 = strtok(nullptr, "");
-        if (!tail1)
-            return false;
-
-        char* msgSubject = handler->extractQuotedArg(tail1);
-        if (!msgSubject)
-            return false;
-
-        char* tail2 = strtok(nullptr, "");
-        if (!tail2)
-            return false;
-
-        char* msgText = handler->extractQuotedArg(tail2);
-        if (!msgText)
-            return false;
-
-        char* moneyStr = strtok(nullptr, "");
-        int32 money = moneyStr ? atoi(moneyStr) : 0;
-        if (money <= 0)
-            return false;
-
-        // msgSubject, msgText isn't NUL after prev. check
-        std::string subject = msgSubject;
-        std::string text    = msgText;
-
-        // from console show not existed sender
-        MailSender sender(MAIL_NORMAL, handler->GetSession() ? handler->GetSession()->GetPlayer()->GetGUID().GetCounter() : 0, MAIL_STATIONERY_GM);
-
-        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-
-        MailDraft(subject, text)
-        .AddMoney(money)
-        .SendMailTo(trans, MailReceiver(receiver, receiverGuid.GetCounter()), sender);
-
-        CharacterDatabase.CommitTransaction(trans);
-
-        std::string nameLink = handler->playerLink(receiverName);
-        handler->PSendSysMessage(LANG_MAIL_SENT, nameLink.c_str());
-        return true;
-    }
-    /// Send a message to a player in game
-    static bool HandleSendMessageCommand(ChatHandler* handler, char const* args)
-    {
-        /// - Find the player
-        Player* player = nullptr;
-        if (!handler->extractPlayerTarget((char*)args, &player))
-            return false;
-
-        if (!player)
-            return false;
-
-        char* msgStr = strtok(nullptr, "");
-        if (!msgStr)
-            return false;
-
-        /// - Send the message
-        // Use SendAreaTriggerMessage for fastest delivery.
-        player->GetSession()->SendAreaTriggerMessage("%s", msgStr);
-        player->GetSession()->SendAreaTriggerMessage("|cffff0000[Message from administrator]:|r");
-
-        // Confirmation message
-        std::string nameLink = handler->GetNameLink(player);
-        handler->PSendSysMessage(LANG_SENDMESSAGE, nameLink.c_str(), msgStr);
-
-        return true;
-    }
-
-    static bool HandleCreatePetCommand(ChatHandler* handler, char const* /*args*/)
-    {
-        Player* player = handler->GetSession()->GetPlayer();
         Creature* creatureTarget = handler->getSelectedCreature();
 
-        if (!creatureTarget || creatureTarget->IsPet() || creatureTarget->GetTypeId() == TYPEID_PLAYER)
+        if (!target && !creatureTarget)
         {
-            handler->PSendSysMessage(LANG_SELECT_CREATURE);
-            handler->SetSentErrorMessage(true);
-            return false;
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
         }
 
-        CreatureTemplate const* creatrueTemplate = sObjectMgr->GetCreatureTemplate(creatureTarget->GetEntry());
-        // Creatures with family 0 crashes the server
-        if (!creatrueTemplate->family)
-        {
-            handler->PSendSysMessage("This creature cannot be tamed. (family id: 0).");
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        if (player->GetPetGUID())
-        {
-            handler->PSendSysMessage("You already have a pet");
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        // Everything looks OK, create new pet
-        Pet* pet = new Pet(player, HUNTER_PET);
-        if (!pet->CreateBaseAtCreature(creatureTarget))
-        {
-            delete pet;
-            handler->PSendSysMessage("Error 1");
-            return false;
-        }
-
-        creatureTarget->setDeathState(JUST_DIED);
-        creatureTarget->RemoveCorpse();
-        creatureTarget->SetHealth(0); // just for nice GM-mode view
-
-        pet->SetGuidValue(UNIT_FIELD_CREATEDBY, player->GetGUID());
-        pet->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, player->getFaction());
-
-        if (!pet->InitStatsForLevel(creatureTarget->getLevel()))
-        {
-            LOG_ERROR("misc", "InitStatsForLevel() in EffectTameCreature failed! Pet deleted.");
-            handler->PSendSysMessage("Error 2");
-            delete pet;
-            return false;
-        }
-
-        // prepare visual effect for levelup
-        pet->SetUInt32Value(UNIT_FIELD_LEVEL, creatureTarget->getLevel() - 1);
-
-        pet->GetCharmInfo()->SetPetNumber(sObjectMgr->GeneratePetNumber(), true);
-        // this enables pet details window (Shift+P)
-        pet->InitPetCreateSpells();
-        pet->SetFullHealth();
-
-        pet->GetMap()->AddToMap(pet->ToCreature());
-
-        // visual effect for levelup
-        pet->SetUInt32Value(UNIT_FIELD_LEVEL, creatureTarget->getLevel());
-
-        player->SetMinion(pet, true);
-        pet->SavePetToDB(PET_SAVE_AS_CURRENT, false);
-        player->PetSpellInitialize();
-
-        return true;
-    }
-
-    static bool HandlePetLearnCommand(ChatHandler* handler, char const* args)
-    {
-        if (!*args)
-            return false;
-
-        Player* player = handler->GetSession()->GetPlayer();
-        Pet* pet = player->GetPet();
-
-        if (!pet)
-        {
-            handler->PSendSysMessage("You have no pet");
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        uint32 spellId = handler->extractSpellIdFromLink((char*)args);
-        if (!spellId)
-            return false;
-
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-        if (!spellInfo)
-        {
-            handler->PSendSysMessage(LANG_COMMAND_NOSPELLFOUND);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        if (!SpellMgr::IsSpellValid(spellInfo))
-        {
-            handler->PSendSysMessage(LANG_COMMAND_SPELL_BROKEN, spellId);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        SpellScriptsBounds bounds = sObjectMgr->GetSpellScriptsBounds(spellId);
-        uint32 spellDifficultyId = sSpellMgr->GetSpellDifficultyId(spellId);
-        if (bounds.first != bounds.second || spellDifficultyId)
-        {
-            handler->PSendSysMessage("Spell %u cannot be learnt using a command!", spellId);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        // Check if pet already has it
-        if (pet->HasSpell(spellId))
-        {
-            handler->PSendSysMessage("Pet already has spell: %u", spellId);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        pet->learnSpell(spellId);
-
-        handler->PSendSysMessage("Pet has learned spell %u", spellId);
-        return true;
-    }
-
-    static bool HandlePetUnlearnCommand(ChatHandler* handler, char const* args)
-    {
-        if (!*args)
-            return false;
-
-        Player* player = handler->GetSession()->GetPlayer();
-        Pet* pet = player->GetPet();
-        if (!pet)
-        {
-            handler->PSendSysMessage("You have no pet");
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        uint32 spellId = handler->extractSpellIdFromLink((char*)args);
-
-        if (pet->HasSpell(spellId))
-            pet->removeSpell(spellId, false);
-        else
-            handler->PSendSysMessage("Pet doesn't have that spell");
-
-        return true;
-    }
-
-    static bool HandleFreezeCommand(ChatHandler* handler, char const* args)
-    {
-        std::string name;
-        Unit* target = handler->getSelectedUnit();
-        Player* player;
-        constexpr int Freeze = 9454;
-        char const* TargetName = strtok((char*)args, " "); // get entered name
-        if (!TargetName) // if no name entered use target
-        {
-            player = handler->getSelectedPlayer();
-            if (player) //prevent crash with creature as target
-            {
-                name = player->GetName();
-                normalizePlayerName(name);
-            }
-        }
-        else // if name entered
-        {
-            name = TargetName;
-            normalizePlayerName(name);
-            player = ObjectAccessor::FindPlayerByName(name);
-        }
-
-        if (player == handler->GetSession()->GetPlayer())
-        {
-            handler->SendSysMessage(LANG_COMMAND_FREEZE_ERROR);
-            return true;
-        }
-
-        if (player && (player != handler->GetSession()->GetPlayer()))
-        {
-            handler->PSendSysMessage(LANG_COMMAND_FREEZE, name.c_str());
-            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(Freeze))
-                Aura::TryRefreshStackOrCreate(spellInfo, MAX_EFFECT_MASK, player, player);
-        }
-
-        if (!target || !handler->GetSession()->GetPlayer()->GetTarget())
+        if (!target && !creatureTarget)
         {
             handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        if (target->IsAlive())
+        Player* playerTarget = target->GetConnectedPlayer();
+        if (playerTarget && !creatureTarget)
         {
-            handler->PSendSysMessage(LANG_COMMAND_FREEZE, name.c_str());
-            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(Freeze))
-                Aura::TryRefreshStackOrCreate(spellInfo, MAX_EFFECT_MASK, target, target);
+            handler->PSendSysMessage(LANG_COMMAND_FREEZE, target->GetName().c_str());
+
+            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_FREEZE))
+            {
+                Aura::TryRefreshStackOrCreate(spellInfo, MAX_EFFECT_MASK, playerTarget, playerTarget);
+            }
+
+            return true;
+        }
+        else if (creatureTarget && creatureTarget->IsAlive())
+        {
+            handler->PSendSysMessage(LANG_COMMAND_FREEZE, GetLocalizeCreatureName(creatureTarget, handler->GetSessionDbcLocale()).c_str());
+
+            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_FREEZE))
+            {
+                Aura::TryRefreshStackOrCreate(spellInfo, MAX_EFFECT_MASK, creatureTarget, creatureTarget);
+            }
+
+            return true;
         }
 
-        return true;
+        handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        handler->SetSentErrorMessage(true);
+        return false;
     }
 
-    static bool HandleUnFreezeCommand(ChatHandler* handler, char const* args)
+    static bool HandleUnFreezeCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
     {
-        std::string name;
-        Unit* target = handler->getSelectedUnit();
-        Player* player;
-        constexpr int Freeze = 9454;
-        char* targetName = strtok((char*)args, " "); // Get entered name
+        Creature* creatureTarget = handler->getSelectedCreature();
 
-        if (target->HasAura(Freeze))
+        if (!target && !creatureTarget)
         {
-            handler->PSendSysMessage(LANG_COMMAND_UNFREEZE, name.c_str());
-            target->RemoveAurasDueToSpell(Freeze);
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+        }
+
+        if (!target && !creatureTarget)
+        {
+            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        Player* playerTarget = target->GetConnectedPlayer();
+
+        if (!creatureTarget && playerTarget && playerTarget->HasAura(SPELL_FREEZE))
+        {
+            handler->PSendSysMessage(LANG_COMMAND_UNFREEZE, target->GetName().c_str());
+            playerTarget->RemoveAurasDueToSpell(SPELL_FREEZE);
             return true;
         }
-
-        if (targetName)
+        else if (creatureTarget && creatureTarget->HasAura(SPELL_FREEZE))
         {
-            name = targetName;
-            normalizePlayerName(name);
-            player = ObjectAccessor::FindPlayerByName(name);
-        }
-        else // If no name was entered - use target
-        {
-            player = handler->getSelectedPlayer();
-            if (player)
-                name = player->GetName();
-        }
-
-        if (player)
-        {
-            handler->PSendSysMessage(LANG_COMMAND_UNFREEZE, name.c_str());
-            player->RemoveAurasDueToSpell(9454);
+            handler->PSendSysMessage(LANG_COMMAND_UNFREEZE, GetLocalizeCreatureName(creatureTarget, handler->GetSessionDbcLocale()).c_str());
+            creatureTarget->RemoveAurasDueToSpell(SPELL_FREEZE);
             return true;
         }
-        else if (targetName)
+        else if (!creatureTarget && target && !target->IsConnected())
         {
-            if (ObjectGuid playerGUID = sWorld->GetGlobalPlayerGUID(name))
-            {
-                CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_AURA_FROZEN);
-                stmt->setUInt32(0, playerGUID.GetCounter());
-                CharacterDatabase.Execute(stmt);
-                handler->PSendSysMessage(LANG_COMMAND_UNFREEZE, name.c_str());
-                return true;
-            }
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_AURA_FROZEN);
+            stmt->SetData(0, target->GetGUID().GetCounter());
+            CharacterDatabase.Execute(stmt);
+            handler->PSendSysMessage(LANG_COMMAND_UNFREEZE, target->GetName().c_str());
+            return true;
         }
 
         handler->SendSysMessage(LANG_COMMAND_FREEZE_WRONG);
         return true;
     }
 
-    static bool HandleGroupLeaderCommand(ChatHandler* handler, char const* args)
+    static bool HandlePlayAllCommand(ChatHandler* handler, uint32 soundId)
     {
-        Player* player = nullptr;
-        Group* group = nullptr;
-        ObjectGuid guid;
-        char* nameStr = strtok((char*)args, " ");
-
-        if (handler->GetPlayerGroupAndGUIDByName(nameStr, player, group, guid))
-            if (group && group->GetLeaderGUID() != guid)
-            {
-                group->ChangeLeader(guid);
-                group->SendUpdate();
-            }
-
-        return true;
-    }
-
-    static bool HandleGroupDisbandCommand(ChatHandler* handler, char const* args)
-    {
-        Player* player = nullptr;
-        Group* group = nullptr;
-        ObjectGuid guid;
-        char* nameStr = strtok((char*)args, " ");
-
-        if (handler->GetPlayerGroupAndGUIDByName(nameStr, player, group, guid))
-            if (group)
-                group->Disband();
-
-        return true;
-    }
-
-    static bool HandleGroupRemoveCommand(ChatHandler* handler, char const* args)
-    {
-        Player* player = nullptr;
-        Group* group = nullptr;
-        ObjectGuid guid;
-        char* nameStr = strtok((char*)args, " ");
-
-        if (handler->GetPlayerGroupAndGUIDByName(nameStr, player, group, guid, true))
-            if (group)
-                group->RemoveMember(guid);
-
-        return true;
-    }
-
-    static bool HandleGroupJoinCommand(ChatHandler* handler, char const* args)
-    {
-        if (!*args)
-            return false;
-
-        Player* playerSource = nullptr;
-        Group* groupSource = nullptr;
-        ObjectGuid guidSource;
-        ObjectGuid guidTarget;
-        char* nameplgrStr = strtok((char*)args, " ");
-        char* nameplStr = strtok(nullptr, " ");
-
-        if (handler->GetPlayerGroupAndGUIDByName(nameplgrStr, playerSource, groupSource, guidSource, true))
-        {
-            if (groupSource)
-            {
-                Group* groupTarget = nullptr;
-                Player* playerTarget = nullptr;
-                if (handler->GetPlayerGroupAndGUIDByName(nameplStr, playerTarget, groupTarget, guidTarget, true))
-                {
-                    if (!groupTarget && playerTarget->GetGroup() != groupSource)
-                    {
-                        if (!groupSource->IsFull())
-                        {
-                            groupSource->AddMember(playerTarget);
-                            groupSource->BroadcastGroupUpdate();
-                            handler->PSendSysMessage(LANG_GROUP_PLAYER_JOINED, playerTarget->GetName().c_str(), playerSource->GetName().c_str());
-                            return true;
-                        }
-                        else
-                        {
-                            // group is full
-                            handler->PSendSysMessage(LANG_GROUP_FULL);
-                            return true;
-                        }
-                    }
-                    else
-                    {
-                        // group is full or target player already in a group
-                        handler->PSendSysMessage(LANG_GROUP_ALREADY_IN_GROUP, playerTarget->GetName().c_str());
-                        return true;
-                    }
-                }
-            }
-            else
-            {
-                // specified source player is not in a group
-                handler->PSendSysMessage(LANG_GROUP_NOT_IN_GROUP, playerSource->GetName().c_str());
-                return true;
-            }
-        }
-
-        return true;
-    }
-
-    static bool HandleGroupListCommand(ChatHandler* handler, char const* args)
-    {
-        Player* playerTarget;
-        ObjectGuid guidTarget;
-        std::string nameTarget;
-
-        ObjectGuid parseGUID = ObjectGuid::Create<HighGuid::Player>(atol((char*)args));
-
-        if (sObjectMgr->GetPlayerNameByGUID(parseGUID.GetCounter(), nameTarget))
-        {
-            playerTarget = ObjectAccessor::FindConnectedPlayer(parseGUID);
-            guidTarget = parseGUID;
-        }
-        else if (!handler->extractPlayerTarget((char*)args, &playerTarget, &guidTarget, &nameTarget))
-            return false;
-
-        Group* groupTarget = nullptr;
-        if (playerTarget)
-            groupTarget = playerTarget->GetGroup();
-
-        if (!groupTarget && guidTarget)
-            if (uint32 groupGUID = Player::GetGroupIdFromStorage(guidTarget.GetCounter()))
-                groupTarget = sGroupMgr->GetGroupByGUID(groupGUID);
-
-        if (groupTarget)
-        {
-            handler->PSendSysMessage(LANG_GROUP_TYPE, (groupTarget->isRaidGroup() ? "raid" : "party"));
-            Group::MemberSlotList const& members = groupTarget->GetMemberSlots();
-            for (Group::MemberSlotList::const_iterator itr = members.begin(); itr != members.end(); ++itr)
-            {
-                Group::MemberSlot const& slot = *itr;
-
-                std::string flags;
-                if (slot.flags & MEMBER_FLAG_ASSISTANT)
-                    flags = "Assistant";
-
-                if (slot.flags & MEMBER_FLAG_MAINTANK)
-                {
-                    if (!flags.empty())
-                        flags.append(", ");
-                    flags.append("MainTank");
-                }
-
-                if (slot.flags & MEMBER_FLAG_MAINASSIST)
-                {
-                    if (!flags.empty())
-                        flags.append(", ");
-                    flags.append("MainAssist");
-                }
-
-                if (flags.empty())
-                    flags = "None";
-
-                /*Player* p = ObjectAccessor::FindConnectedPlayer((*itr).guid);
-                const char* onlineState = p ? "online" : "offline";
-
-                handler->PSendSysMessage(LANG_GROUP_PLAYER_NAME_GUID, slot.name.c_str(), onlineState,
-                    slot.guid.GetCounter(), flags.c_str(), lfg::GetRolesString(slot.roles).c_str());*/
-            }
-        }
-        else
-            handler->PSendSysMessage(LANG_GROUP_NOT_IN_GROUP, nameTarget.c_str());
-
-        return true;
-    }
-
-    static bool HandlePlayAllCommand(ChatHandler* handler, char const* args)
-    {
-        if (!*args)
-            return false;
-
-        uint32 soundId = atoi((char*)args);
-
         if (!sSoundEntriesStore.LookupEntry(soundId))
         {
             handler->PSendSysMessage(LANG_SOUND_NOT_EXIST, soundId);
@@ -3329,89 +2903,79 @@ public:
             return false;
         }
 
-        WorldPacket data(SMSG_PLAY_SOUND, 4);
-        data << uint32(soundId);
-        sWorld->SendGlobalMessage(&data);
+        sWorld->SendGlobalMessage(WorldPackets::Misc::Playsound(soundId).Write());
 
         handler->PSendSysMessage(LANG_COMMAND_PLAYED_TO_ALL, soundId);
         return true;
     }
 
-    static bool HandlePossessCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandlePossessCommand(ChatHandler* handler)
     {
         Unit* unit = handler->getSelectedUnit();
         if (!unit)
+        {
             return false;
+        }
 
         handler->GetSession()->GetPlayer()->CastSpell(unit, 530, true);
         return true;
     }
 
-    static bool HandleUnPossessCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleUnPossessCommand(ChatHandler* handler)
     {
         Unit* unit = handler->getSelectedUnit();
         if (!unit)
+        {
             unit = handler->GetSession()->GetPlayer();
+        }
 
         unit->RemoveCharmAuras();
-
         return true;
     }
 
-    static bool HandleBindSightCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleBindSightCommand(ChatHandler* handler)
     {
         Unit* unit = handler->getSelectedUnit();
         if (!unit)
+        {
             return false;
+        }
 
         handler->GetSession()->GetPlayer()->CastSpell(unit, 6277, true);
         return true;
     }
 
-    static bool HandleUnbindSightCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleUnbindSightCommand(ChatHandler* handler)
     {
         Player* player = handler->GetSession()->GetPlayer();
 
         if (player->isPossessing())
+        {
             return false;
+        }
 
         player->StopCastingBindSight();
         return true;
     }
 
-    static bool HandleMailBoxCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleMailBoxCommand(ChatHandler* handler)
     {
         Player* player = handler->GetSession()->GetPlayer();
-
         handler->GetSession()->SendShowMailBox(player->GetGUID());
         return true;
     }
 
-    static bool HandleStringCommand(ChatHandler *handler, char const *args)
+    static bool HandleStringCommand(ChatHandler* handler, uint32 id, Optional<uint8> locale)
     {
-        if (!*args)
+        if (!id)
         {
             handler->SendSysMessage(LANG_CMD_SYNTAX);
             return false;
         }
 
-        uint32 id = atoi(strtok((char*)args, " "));
-        if (id == 0)
-        {
-            handler->SendSysMessage(LANG_CMD_SYNTAX);
-            return false;
-        }
+        const char* str = sObjectMgr->GetAcoreString(id, locale ? static_cast<LocaleConstant>(*locale) : DEFAULT_LOCALE);
 
-        uint32 locale = 0;
-        char* localeString = strtok(nullptr, " ");
-        if (localeString != nullptr)
-        {
-            locale = atoi(localeString);
-        }
-
-        const char* str = sObjectMgr->GetAcoreString(id, static_cast<LocaleConstant>(locale));
-
-        if (strcmp(str, "<error>") == 0)
+        if (!strcmp(str, "<error>"))
         {
             handler->PSendSysMessage(LANG_NO_ACORE_STRING_FOUND, id);
             return true;
@@ -3421,49 +2985,6 @@ public:
             handler->SendSysMessage(str);
             return true;
         }
-    }
-
-    static bool HandleGearStatsCommand(ChatHandler* handler, char const* /*args*/)
-    {
-        Player* player = handler->getSelectedPlayerOrSelf();
-
-        if (!player)
-        {
-            return false;
-        }
-
-        handler->PSendSysMessage("Character: %s", player->GetPlayerName().c_str());
-        handler->PSendSysMessage("Current equipment average item level: |cff00ffff%u|r", (int16)player->GetAverageItemLevel());
-
-        if (sWorld->getIntConfig(CONFIG_MIN_LEVEL_STAT_SAVE))
-        {
-            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_STATS);
-            stmt->setUInt32(0, player->GetGUID().GetCounter());
-            PreparedQueryResult result = CharacterDatabase.Query(stmt);
-
-            if (result)
-            {
-                Field* fields = result->Fetch();
-                uint32 MaxHealth = fields[0].GetUInt32();
-                uint32 Strength = fields[1].GetUInt32();
-                uint32 Agility = fields[2].GetUInt32();
-                uint32 Stamina = fields[3].GetUInt32();
-                uint32 Intellect = fields[4].GetUInt32();
-                uint32 Spirit = fields[5].GetUInt32();
-                uint32 Armor = fields[6].GetUInt32();
-                uint32 AttackPower = fields[7].GetUInt32();
-                uint32 SpellPower = fields[8].GetUInt32();
-                uint32 Resilience = fields[9].GetUInt32();
-
-                handler->PSendSysMessage("Health: |cff00ffff%u|r - Stamina: |cff00ffff%u|r", MaxHealth, Stamina);
-                handler->PSendSysMessage("Strength: |cff00ffff%u|r - Agility: |cff00ffff%u|r", Strength, Agility);
-                handler->PSendSysMessage("Intellect: |cff00ffff%u|r - Spirit: |cff00ffff%u|r", Intellect, Spirit);
-                handler->PSendSysMessage("AttackPower: |cff00ffff%u|r - SpellPower: |cff00ffff%u|r", AttackPower, SpellPower);
-                handler->PSendSysMessage("Armor: |cff00ffff%u|r - Resilience: |cff00ffff%u|r", Armor, Resilience);
-            }
-        }
-
-        return true;
     }
 };
 

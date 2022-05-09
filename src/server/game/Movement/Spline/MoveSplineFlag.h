@@ -79,12 +79,9 @@ namespace Movement
         MoveSplineFlag() { raw() = 0; }
         MoveSplineFlag(uint32 f) { raw() = f; }
         MoveSplineFlag(const MoveSplineFlag& f) { raw() = f.raw(); }
-        /* requried as of C++ 11 */
-#if __cplusplus >= 201103L
         MoveSplineFlag(MoveSplineFlag&&) = default;
         MoveSplineFlag& operator=(const MoveSplineFlag&) = default;
         MoveSplineFlag& operator=(MoveSplineFlag&&) = default;
-#endif
 
         // Constant interface
 

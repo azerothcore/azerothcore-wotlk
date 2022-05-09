@@ -17,8 +17,8 @@
 
 #include "InstanceScript.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "stratholme.h"
 
 const Position BlackGuardPos[10] =
@@ -159,6 +159,10 @@ public:
                         ProcessSlaughterEvent();
                         SaveToDB();
                     }
+                    break;
+                case NPC_BARON_RIVENDARE:
+                    events.CancelEvent(EVENT_BARON_TIME);
+                    DoRemoveAurasDueToSpellOnPlayers(SPELL_BARON_ULTIMATUM);
                     break;
             }
         }
@@ -508,7 +512,7 @@ public:
                 case EVENT_FORCE_SLAUGHTER_EVENT:
                     {
                         Map::PlayerList const& PlayerList = instance->GetPlayers();
-                        if (!PlayerList.isEmpty())
+                        if (!PlayerList.IsEmpty())
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                 if (Player* player = i->GetSource())
                                     if (player->GetDistance2d(4034.97f, -3402.13f) < 50.0f)

@@ -19,7 +19,7 @@
 #include "Log.h"
 #include "LogMessage.h"
 #include "StringConvert.h"
-#include "Util.h"
+#include "Timer.h"
 #include <algorithm>
 
 AppenderFile::AppenderFile(uint8 id, std::string const& name, LogLevel level, AppenderFlags flags, std::vector<std::string_view> const& args) :
@@ -31,7 +31,7 @@ AppenderFile::AppenderFile(uint8 id, std::string const& name, LogLevel level, Ap
 {
     if (args.size() < 4)
     {
-        throw InvalidAppenderArgsException(Acore::StringFormat("Log::CreateAppenderFromConfig: Missing file name for appender %s", name.c_str()));
+        throw InvalidAppenderArgsException(Acore::StringFormatFmt("Log::CreateAppenderFromConfig: Missing file name for appender {}", name));
     }
 
     _fileName.assign(args[3]);
@@ -63,7 +63,7 @@ AppenderFile::AppenderFile(uint8 id, std::string const& name, LogLevel level, Ap
         }
         else
         {
-            throw InvalidAppenderArgsException(Acore::StringFormat("Log::CreateAppenderFromConfig: Invalid size '%s' for appender %s", std::string(args[5]).c_str(), name.c_str()));
+            throw InvalidAppenderArgsException(Acore::StringFormatFmt("Log::CreateAppenderFromConfig: Invalid size '{}' for appender {}", args[5], name));
         }
     }
 
@@ -127,7 +127,7 @@ FILE* AppenderFile::OpenFile(std::string const& filename, std::string const& mod
         CloseFile();
         std::string newName(fullName);
         newName.push_back('.');
-        newName.append(LogMessage::getTimeStr(time(nullptr)));
+        newName.append(LogMessage::getTimeStr(GetEpochTime()));
         std::replace(newName.begin(), newName.end(), ':', '-');
         rename(fullName.c_str(), newName.c_str()); // no error handling... if we couldn't make a backup, just ignore
     }

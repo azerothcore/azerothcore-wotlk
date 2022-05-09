@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "MovementPacketBuilder.h"
-#include "MoveSpline.h"
 #include "MoveSplineInit.h"
+#include "MoveSpline.h"
+#include "MovementPacketBuilder.h"
 #include "Opcodes.h"
 #include "Transport.h"
 #include "Unit.h"
@@ -115,9 +115,6 @@ namespace Movement
                 moveFlagsForSpeed &= ~MOVEMENTFLAG_WALKING;
 
             args.velocity = unit->GetSpeed(SelectSpeedType(moveFlagsForSpeed));
-            if (Creature* creature = unit->ToCreature())
-                if (creature->HasSearchedAssistance())
-                    args.velocity *= 0.66f;
         }
 
         // limit the speed in the same way the client does
@@ -202,7 +199,7 @@ namespace Movement
         args.flags.flying = unit->m_movementInfo.HasMovementFlag((MovementFlags)(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_DISABLE_GRAVITY));
     }
 
-    void MoveSplineInit::SetFacing(const Unit* target)
+    void MoveSplineInit::SetFacing(Unit const* target)
     {
         args.flags.EnableFacingTarget();
         args.facing.target = target->GetGUID().GetRawValue();

@@ -15,11 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "azjol_nerub.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
-#include "ScriptedEscortAI.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "azjol_nerub.h"
 
 enum Spells
 {
@@ -150,7 +149,7 @@ public:
         {
             Map::PlayerList const& playerList = me->GetMap()->GetPlayers();
             for(Map::PlayerList::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
-                if (me->GetDistance(itr->GetSource()) < 130.0f && itr->GetSource()->IsAlive() && !itr->GetSource()->IsGameMaster() && me->CanCreatureAttack(itr->GetSource()) && me->_CanDetectFeignDeathOf(itr->GetSource()))
+                if (me->GetDistance(itr->GetSource()) < 130.0f && itr->GetSource()->IsAlive() && !itr->GetSource()->IsGameMaster() && me->CanCreatureAttack(itr->GetSource()))
                     return true;
 
             return false;
@@ -172,7 +171,7 @@ public:
                     events.ScheduleEvent(EVENT_HADRONOX_PIERCE, 8000);
                     break;
                 case EVENT_HADRONOX_ACID:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, false))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, false))
                         me->CastSpell(target, SPELL_ACID_CLOUD, false);
                     events.ScheduleEvent(EVENT_HADRONOX_ACID, 25000);
                     break;
@@ -196,7 +195,6 @@ public:
             }
 
             DoMeleeAttackIfReady();
-            EnterEvadeIfOutOfCombatArea();
         }
 
         bool CheckEvadeIfOutOfCombatArea() const override

@@ -15,15 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "gruuls_lair.h"
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
+#include "gruuls_lair.h"
 
 DoorData const doorData[] =
 {
-    { GO_MAULGAR_DOOR,  DATA_MAULGAR,   DOOR_TYPE_PASSAGE,  BOUNDARY_NONE },
-    { GO_GRUUL_DOOR,    DATA_GRUUL,     DOOR_TYPE_ROOM,     BOUNDARY_NONE },
-    { 0,                0,              DOOR_TYPE_ROOM,     BOUNDARY_NONE } // END
+    { GO_MAULGAR_DOOR,  DATA_MAULGAR,   DOOR_TYPE_PASSAGE },
+    { GO_GRUUL_DOOR,    DATA_GRUUL,     DOOR_TYPE_ROOM    },
+    { 0,                0,              DOOR_TYPE_ROOM    } // END
 };
 
 MinionData const minionData[] =

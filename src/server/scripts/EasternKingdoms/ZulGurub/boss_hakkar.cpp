@@ -22,16 +22,17 @@ Comment: Blood siphon spell buggy cause of Core Issue.
 Category: Zul'Gurub
 */
 
-#include "ScriptedCreature.h"
+#include "Player.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "zulgurub.h"
 
 enum Says
 {
     SAY_AGGRO                   = 0,
     SAY_FLEEING                 = 1,
-    SAY_MINION_DESTROY          = 2,     // Where does it belong?
-    SAY_PROTECT_ALTAR           = 3      // Where does it belong?
+    SAY_MINION_DESTROY          = 2,
+    SAY_PROTECT_ALTAR           = 3
 };
 
 enum Spells
@@ -127,12 +128,12 @@ public:
                         events.ScheduleEvent(EVENT_CORRUPTED_BLOOD, urand(30000, 45000));
                         break;
                     case EVENT_CAUSE_INSANITY:
-                        // DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true), SPELL_CAUSE_INSANITY);
+                        // DoCast(SelectTarget(SelectTargetMethod::Random, 0, 100, true), SPELL_CAUSE_INSANITY);
                         // events.ScheduleEvent(EVENT_CAUSE_INSANITY, urand(35000, 45000));
                         break;
                     case EVENT_WILL_OF_HAKKAR:
                         // Xinef: Skip Tank
-                        DoCast(SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true), SPELL_WILL_OF_HAKKAR);
+                        DoCast(SelectTarget(SelectTargetMethod::Random, 1, 100, true), SPELL_WILL_OF_HAKKAR);
                         events.ScheduleEvent(EVENT_WILL_OF_HAKKAR, urand(25000, 35000));
                         break;
                     case EVENT_ENRAGE:
@@ -175,7 +176,58 @@ public:
     }
 };
 
+class at_zulgurub_entrance_speech : public OnlyOnceAreaTriggerScript
+{
+public:
+    at_zulgurub_entrance_speech() : OnlyOnceAreaTriggerScript("at_zulgurub_entrance_speech") {}
+
+    bool _OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    {
+        if (InstanceScript* instance = player->GetInstanceScript())
+        {
+            // Instance map's enormous, Hakkar's GRID is not loaded by the time players enter.
+            // Without this, the creature never says anything, because it doesn't load in time.
+            player->GetMap()->LoadGrid(-11783.99f, -1655.27f);
+
+            if (Creature* hakkar = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_HAKKAR)))
+            {
+                hakkar->setActive(true);
+                if (hakkar->GetAI())
+                {
+                    hakkar->AI()->Talk(SAY_PROTECT_ALTAR);
+                }
+            }
+            return false;
+        }
+        return false;
+    }
+};
+
+class at_zulgurub_temple_speech : public OnlyOnceAreaTriggerScript
+{
+public:
+    at_zulgurub_temple_speech() : OnlyOnceAreaTriggerScript("at_zulgurub_temple_speech") {}
+
+    bool _OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    {
+        if (InstanceScript* instance = player->GetInstanceScript())
+        {
+            if (Creature* hakkar = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_HAKKAR)))
+            {
+                if (hakkar->GetAI())
+                {
+                    hakkar->AI()->Talk(SAY_MINION_DESTROY);
+                }
+            }
+            return false;
+        }
+        return false;
+    }
+};
+
 void AddSC_boss_hakkar()
 {
     new boss_hakkar();
+    new at_zulgurub_entrance_speech();
+    new at_zulgurub_temple_speech();
 }

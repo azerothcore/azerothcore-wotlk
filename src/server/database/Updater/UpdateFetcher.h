@@ -20,11 +20,11 @@
 
 #include "DatabaseEnv.h"
 #include "Define.h"
+#include <filesystem>
 #include <set>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <filesystem>
 
 struct AC_DATABASE_API UpdateResult
 {
@@ -47,7 +47,15 @@ public:
     UpdateFetcher(Path const& updateDirectory,
                   std::function<void(std::string const&)> const& apply,
                   std::function<void(Path const& path)> const& applyFile,
-                  std::function<QueryResult(std::string const&)> const& retrieve, std::string const& dbModuleName);
+                  std::function<QueryResult(std::string const&)> const& retrieve, std::string const& dbModuleName, std::vector<std::string> const* setDirectories = nullptr);
+
+    UpdateFetcher(Path const& updateDirectory,
+        std::function<void(std::string const&)> const& apply,
+        std::function<void(Path const& path)> const& applyFile,
+        std::function<QueryResult(std::string const&)> const& retrieve,
+        std::string const& dbModuleName,
+        std::string_view modulesList = {});
+
     ~UpdateFetcher();
 
     UpdateResult Update(bool const redundancyChecks, bool const allowRehash,
@@ -64,6 +72,7 @@ private:
     {
         RELEASED,
         CUSTOM,
+        MODULE,
         ARCHIVED
     };
 
@@ -83,6 +92,8 @@ private:
                 return RELEASED;
             else if (state == "CUSTOM")
                 return CUSTOM;
+            else if (state == "MODULE")
+                return MODULE;
 
             return ARCHIVED;
         }
@@ -91,14 +102,16 @@ private:
         {
             switch (state)
             {
-            case RELEASED:
-                return "RELEASED";
-            case CUSTOM:
-                return "CUSTOM";
-            case ARCHIVED:
-                return "ARCHIVED";
-            default:
-                return "";
+                case RELEASED:
+                    return "RELEASED";
+                case CUSTOM:
+                    return "CUSTOM";
+                case MODULE:
+                    return "MODULE";
+                case ARCHIVED:
+                    return "ARCHIVED";
+                default:
+                    return "";
             }
         }
 
@@ -147,6 +160,8 @@ private:
 
     // modules
     std::string const _dbModuleName;
+    std::vector<std::string> const* _setDirectories;
+    std::string_view _modulesList = {};
 };
 
 #endif // UpdateFetcher_h__

@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hellfire_ramparts.h"
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
+#include "hellfire_ramparts.h"
 
 class instance_hellfire_ramparts : public InstanceMapScript
 {
@@ -51,7 +51,7 @@ public:
 
             if (type == DATA_VAZRUDEN && state == DONE)
                 if (GameObject* chest = instance->GetGameObject(felIronChestGUID))
-                    chest->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                    chest->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
             return true;
         }
 

@@ -18,8 +18,8 @@
 #ifndef DEF_RAMPARTS_H
 #define DEF_RAMPARTS_H
 
-#include "SpellScript.h"
 #include "CreatureAIImpl.h"
+#include "SpellScript.h"
 
 #define HellfireRampartsScriptName "instance_hellfire_ramparts"
 

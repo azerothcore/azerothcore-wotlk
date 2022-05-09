@@ -15,14 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "blackwing_lair.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
 #include "InstanceScript.h"
 #include "Map.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "SpellScript.h"
+#include "blackwing_lair.h"
 
 enum Emotes
 {
@@ -32,14 +33,6 @@ enum Emotes
 
 enum Spells
 {
-    // These spells are actually called elemental shield
-    // What they do is decrease all damage by 75% then they increase
-    // One school of damage by 1100%
-    SPELL_FIRE_VULNERABILITY                               = 22277,
-    SPELL_FROST_VULNERABILITY                              = 22278,
-    SPELL_SHADOW_VULNERABILITY                             = 22279,
-    SPELL_NATURE_VULNERABILITY                             = 22280,
-    SPELL_ARCANE_VULNERABILITY                             = 22281,
     // Other spells
     SPELL_INCINERATE                                       = 23308,   //Incinerate 23308, 23309
     SPELL_TIMELAPSE                                        = 23310,   //Time lapse 23310, 23311(old threat mod that was removed in 2.01)
@@ -54,18 +47,26 @@ enum Spells
     SPELL_BROODAF_BRONZE                                   = 23170,   //Bronze Affliction  23170
     SPELL_BROODAF_GREEN                                    = 23169,   //Brood Affliction Green 23169
     SPELL_CHROMATIC_MUT_1                                  = 23174,   //Spell cast on player if they get all 5 debuffs
-    SPELL_FRENZY                                           = 28371,   //The frenzy spell may be wrong
-    SPELL_ENRAGE                                           = 28747
+
+    SPELL_ELEMENTAL_SHIELD                                 = 22276,
+    SPELL_FRENZY                                           = 23128,
+    SPELL_ENRAGE                                           = 23537
 };
 
 enum Events
 {
     EVENT_SHIMMER       = 1,
-    EVENT_BREATH_1      = 2,
-    EVENT_BREATH_2      = 3,
-    EVENT_AFFLICTION    = 4,
-    EVENT_FRENZY        = 5
+    EVENT_BREATH        = 2,
+    EVENT_AFFLICTION    = 3,
+    EVENT_FRENZY        = 4
 };
+
+enum Misc
+{
+    GUID_LEVER_USER = 0
+};
+
+Position const homePos = { -7491.1587f, -1069.718f, 476.59094, 476.59094f };
 
 class boss_chromaggus : public CreatureScript
 {
@@ -78,112 +79,17 @@ public:
         {
             Initialize();
 
-            Breath1_Spell = 0;
-            Breath2_Spell = 0;
+            // Select the 2 breaths that we are going to use until despawned so we don't end up casting 2 of the same breath.
+            _breathSpells = { SPELL_INCINERATE, SPELL_TIMELAPSE,  SPELL_CORROSIVEACID, SPELL_IGNITEFLESH, SPELL_FROSTBURN };
 
-            // Select the 2 breaths that we are going to use until despawned
-            // 5 possiblities for the first breath, 4 for the second, 20 total possiblites
-            // This way we don't end up casting 2 of the same breath
-            // TL TL would be stupid
-            switch (urand(0, 19))
-            {
-                // B1 - Incin
-                case 0:
-                    Breath1_Spell = SPELL_INCINERATE;
-                    Breath2_Spell = SPELL_TIMELAPSE;
-                    break;
-                case 1:
-                    Breath1_Spell = SPELL_INCINERATE;
-                    Breath2_Spell = SPELL_CORROSIVEACID;
-                    break;
-                case 2:
-                    Breath1_Spell = SPELL_INCINERATE;
-                    Breath2_Spell = SPELL_IGNITEFLESH;
-                    break;
-                case 3:
-                    Breath1_Spell = SPELL_INCINERATE;
-                    Breath2_Spell = SPELL_FROSTBURN;
-                    break;
+            Acore::Containers::RandomResize(_breathSpells, 2);
 
-                    // B1 - TL
-                case 4:
-                    Breath1_Spell = SPELL_TIMELAPSE;
-                    Breath2_Spell = SPELL_INCINERATE;
-                    break;
-                case 5:
-                    Breath1_Spell = SPELL_TIMELAPSE;
-                    Breath2_Spell = SPELL_CORROSIVEACID;
-                    break;
-                case 6:
-                    Breath1_Spell = SPELL_TIMELAPSE;
-                    Breath2_Spell = SPELL_IGNITEFLESH;
-                    break;
-                case 7:
-                    Breath1_Spell = SPELL_TIMELAPSE;
-                    Breath2_Spell = SPELL_FROSTBURN;
-                    break;
-
-                    //B1 - Acid
-                case 8:
-                    Breath1_Spell = SPELL_CORROSIVEACID;
-                    Breath2_Spell = SPELL_INCINERATE;
-                    break;
-                case 9:
-                    Breath1_Spell = SPELL_CORROSIVEACID;
-                    Breath2_Spell = SPELL_TIMELAPSE;
-                    break;
-                case 10:
-                    Breath1_Spell = SPELL_CORROSIVEACID;
-                    Breath2_Spell = SPELL_IGNITEFLESH;
-                    break;
-                case 11:
-                    Breath1_Spell = SPELL_CORROSIVEACID;
-                    Breath2_Spell = SPELL_FROSTBURN;
-                    break;
-
-                    //B1 - Ignite
-                case 12:
-                    Breath1_Spell = SPELL_IGNITEFLESH;
-                    Breath2_Spell = SPELL_INCINERATE;
-                    break;
-                case 13:
-                    Breath1_Spell = SPELL_IGNITEFLESH;
-                    Breath2_Spell = SPELL_CORROSIVEACID;
-                    break;
-                case 14:
-                    Breath1_Spell = SPELL_IGNITEFLESH;
-                    Breath2_Spell = SPELL_TIMELAPSE;
-                    break;
-                case 15:
-                    Breath1_Spell = SPELL_IGNITEFLESH;
-                    Breath2_Spell = SPELL_FROSTBURN;
-                    break;
-
-                    //B1 - Frost
-                case 16:
-                    Breath1_Spell = SPELL_FROSTBURN;
-                    Breath2_Spell = SPELL_INCINERATE;
-                    break;
-                case 17:
-                    Breath1_Spell = SPELL_FROSTBURN;
-                    Breath2_Spell = SPELL_TIMELAPSE;
-                    break;
-                case 18:
-                    Breath1_Spell = SPELL_FROSTBURN;
-                    Breath2_Spell = SPELL_CORROSIVEACID;
-                    break;
-                case 19:
-                    Breath1_Spell = SPELL_FROSTBURN;
-                    Breath2_Spell = SPELL_IGNITEFLESH;
-                    break;
-            };
-
-            EnterEvadeMode();
+            // Hack fix: This is here to prevent him from being pulled from the floor underneath, remove it once maps are fixed.
+            creature->SetReactState(REACT_PASSIVE);
         }
 
         void Initialize()
         {
-            CurrentVurln_Spell = 0;     // We use this to store our last vulnerabilty spell so we can remove it later
             Enraged = false;
         }
 
@@ -199,10 +105,33 @@ public:
             BossAI::EnterCombat(victim);
 
             events.ScheduleEvent(EVENT_SHIMMER, 1000);
-            events.ScheduleEvent(EVENT_BREATH_1, 30000);
-            events.ScheduleEvent(EVENT_BREATH_2, 60000);
+            events.ScheduleEvent(EVENT_BREATH, 30000);
+            events.ScheduleEvent(EVENT_BREATH, 60000);
             events.ScheduleEvent(EVENT_AFFLICTION, 10000);
             events.ScheduleEvent(EVENT_FRENZY, 15000);
+        }
+
+        bool CanAIAttack(Unit const* victim) const override
+        {
+            return !victim->HasAura(SPELL_TIMELAPSE);
+        }
+
+        void SetGUID(ObjectGuid guid, int32 id) override
+        {
+            if (id == GUID_LEVER_USER)
+            {
+                _playerGUID = guid;
+                // Hack fix: This is here to prevent him from being pulled from the floor underneath, remove it once maps are fixed.
+                me->SetReactState(REACT_AGGRESSIVE);
+            }
+        }
+
+        void PathEndReached(uint32 /*pathId*/) override
+        {
+            if (Unit* player = ObjectAccessor::GetUnit(*me, _playerGUID))
+            {
+                me->SetInCombatWith(player);
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -221,43 +150,46 @@ public:
                 {
                     case EVENT_SHIMMER:
                         {
-                            // Remove old vulnerabilty spell
-                            if (CurrentVurln_Spell)
-                                me->RemoveAurasDueToSpell(CurrentVurln_Spell);
-
                             // Cast new random vulnerabilty on self
-                            uint32 spell = RAND(SPELL_FIRE_VULNERABILITY, SPELL_FROST_VULNERABILITY, SPELL_SHADOW_VULNERABILITY, SPELL_NATURE_VULNERABILITY, SPELL_ARCANE_VULNERABILITY);
-                            DoCast(me, spell);
-                            CurrentVurln_Spell = spell;
+                            DoCast(me, SPELL_ELEMENTAL_SHIELD);
                             Talk(EMOTE_SHIMMER);
-                            events.ScheduleEvent(EVENT_SHIMMER, 45000);
+                            events.ScheduleEvent(EVENT_SHIMMER, urand(17000, 25000));
                             break;
                         }
-                    case EVENT_BREATH_1:
-                            DoCastVictim(Breath1_Spell);
-                            events.ScheduleEvent(EVENT_BREATH_1, 60000);
-                            break;
-                    case EVENT_BREATH_2:
-                            DoCastVictim(Breath2_Spell);
-                            events.ScheduleEvent(EVENT_BREATH_2, 60000);
-                            break;
+                    case EVENT_BREATH:
+                        DoCastVictim(_breathSpells.front());
+                        _breathSpells.reverse();
+                        events.ScheduleEvent(EVENT_BREATH, 60000);
+                        break;
                     case EVENT_AFFLICTION:
                         {
+                            uint32 afflictionSpellID = RAND(SPELL_BROODAF_BLUE, SPELL_BROODAF_BLACK, SPELL_BROODAF_RED, SPELL_BROODAF_BRONZE, SPELL_BROODAF_GREEN);
+                            std::vector<Player*> playerTargets;
                             Map::PlayerList const& players = me->GetMap()->GetPlayers();
                             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                             {
                                 if (Player* player = itr->GetSource()->ToPlayer())
                                 {
-                                    DoCast(player, RAND(SPELL_BROODAF_BLUE, SPELL_BROODAF_BLACK, SPELL_BROODAF_RED, SPELL_BROODAF_BRONZE, SPELL_BROODAF_GREEN), true);
+                                    if (!player->IsGameMaster() && !player->IsSpectator() && player->IsAlive())
+                                    {
+                                        playerTargets.push_back(player);
+                                    }
+                                }
+                            }
 
-                                        if (player->HasAura(SPELL_BROODAF_BLUE) &&
-                                            player->HasAura(SPELL_BROODAF_BLACK) &&
-                                            player->HasAura(SPELL_BROODAF_RED) &&
-                                            player->HasAura(SPELL_BROODAF_BRONZE) &&
-                                            player->HasAura(SPELL_BROODAF_GREEN))
-                                        {
-                                            DoCast(player, SPELL_CHROMATIC_MUT_1);
-                                        }
+                            if (playerTargets.size() > 12)
+                            {
+                                Acore::Containers::RandomResize(playerTargets, 12);
+                            }
+
+                            for (Player* player : playerTargets)
+                            {
+                                DoCast(player, afflictionSpellID, true);
+
+                                if (player->HasAura(SPELL_BROODAF_BLUE) && player->HasAura(SPELL_BROODAF_BLACK) && player->HasAura(SPELL_BROODAF_RED) &&
+                                    player->HasAura(SPELL_BROODAF_BRONZE) && player->HasAura(SPELL_BROODAF_GREEN))
+                                {
+                                    DoCast(player, SPELL_CHROMATIC_MUT_1);
                                 }
                             }
                         }
@@ -284,10 +216,9 @@ public:
         }
 
     private:
-        uint32 Breath1_Spell;
-        uint32 Breath2_Spell;
-        uint32 CurrentVurln_Spell;
+        std::list<uint32> _breathSpells;
         bool Enraged;
+        ObjectGuid _playerGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -305,21 +236,26 @@ class go_chromaggus_lever : public GameObjectScript
         {
             go_chromaggus_leverAI(GameObject* go) : GameObjectAI(go), _instance(go->GetInstanceScript()) { }
 
-            bool OnGossipHello(Player* player)
+            bool GossipHello(Player* player, bool reportUse) override
             {
-                if (_instance->GetBossState(DATA_CHROMAGGUS) != DONE && _instance->GetBossState(DATA_CHROMAGGUS) != IN_PROGRESS)
+                if (reportUse)
                 {
-                    _instance->SetBossState(DATA_CHROMAGGUS, IN_PROGRESS);
+                    if (_instance->GetBossState(DATA_CHROMAGGUS) != DONE && _instance->GetBossState(DATA_CHROMAGGUS) != IN_PROGRESS)
+                    {
+                        if (Creature* creature = _instance->GetCreature(DATA_CHROMAGGUS))
+                        {
+                            creature->SetHomePosition(homePos);
+                            creature->GetMotionMaster()->MovePath(creature->GetEntry() * 10, false);
+                            creature->AI()->SetGUID(player->GetGUID(), GUID_LEVER_USER);
+                        }
 
-                    if (Creature* creature = _instance->instance->GetCreature(_instance->GetGuidData(DATA_CHROMAGGUS)))
-                        creature->AI()->AttackStart(player);
+                        if (GameObject* go = _instance->GetGameObject(DATA_GO_CHROMAGGUS_DOOR))
+                            _instance->HandleGameObject(ObjectGuid::Empty, true, go);
+                    }
 
-                    if (GameObject* go = _instance->instance->GetGameObject(_instance->GetGuidData(DATA_GO_CHROMAGGUS_DOOR)))
-                        _instance->HandleGameObject(ObjectGuid::Empty, true, go);
+                    me->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE | GO_FLAG_IN_USE);
+                    me->SetGoState(GO_STATE_ACTIVE);
                 }
-
-                go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE | GO_FLAG_IN_USE);
-                go->SetGoState(GO_STATE_ACTIVE);
 
                 return true;
             }
@@ -334,8 +270,96 @@ class go_chromaggus_lever : public GameObjectScript
         }
 };
 
+enum ElementalShieldSpells
+{
+    SPELL_FIRE_ELEMENTAL_SHIELD     = 22277,
+    SPELL_FROST_ELEMENTAL_SHIELD    = 22278,
+    SPELL_SHADOW_ELEMENTAL_SHIELD   = 22279,
+    SPELL_NATURE_ELEMENTAL_SHIELD   = 22280,
+    SPELL_ARCANE_ELEMENTAL_SHIELD   = 22281,
+
+    SPELL_RED_BROOD_POWER           = 22283,
+    SPELL_BLUE_BROOD_POWER          = 22285,
+    SPELL_BRONZE_BROOD_POWER        = 22286,
+    SPELL_BLACK_BROOD_POWER         = 22287,
+    SPELL_GREEN_BROOD_POWER         = 22288
+
+};
+
+class spell_gen_elemental_shield : public SpellScript
+{
+    PrepareSpellScript(spell_gen_elemental_shield);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+            {
+                SPELL_FIRE_ELEMENTAL_SHIELD,
+                SPELL_FROST_ELEMENTAL_SHIELD,
+                SPELL_SHADOW_ELEMENTAL_SHIELD,
+                SPELL_NATURE_ELEMENTAL_SHIELD,
+                SPELL_ARCANE_ELEMENTAL_SHIELD
+            });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            for (uint32 spell = SPELL_FIRE_ELEMENTAL_SHIELD; spell <= SPELL_ARCANE_ELEMENTAL_SHIELD; ++spell)
+            {
+                caster->RemoveAurasDueToSpell(spell);
+            }
+
+            caster->CastSpell(caster, SPELL_FIRE_ELEMENTAL_SHIELD + urand(0, 4), true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_gen_elemental_shield::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+class spell_gen_brood_power : public SpellScript
+{
+    PrepareSpellScript(spell_gen_brood_power);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+            {
+                SPELL_RED_BROOD_POWER,
+                SPELL_BLUE_BROOD_POWER,
+                SPELL_BRONZE_BROOD_POWER,
+                SPELL_BLACK_BROOD_POWER,
+                SPELL_GREEN_BROOD_POWER
+            });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            for (uint32 spell = SPELL_RED_BROOD_POWER; spell <= SPELL_GREEN_BROOD_POWER; ++spell)
+            {
+                caster->RemoveAurasDueToSpell(spell);
+            }
+
+            caster->CastSpell(caster, RAND(SPELL_RED_BROOD_POWER, SPELL_BLUE_BROOD_POWER, SPELL_BRONZE_BROOD_POWER, SPELL_BLACK_BROOD_POWER, SPELL_GREEN_BROOD_POWER), true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_gen_brood_power::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 void AddSC_boss_chromaggus()
 {
     new boss_chromaggus();
     new go_chromaggus_lever();
+    RegisterSpellScript(spell_gen_elemental_shield);
+    RegisterSpellScript(spell_gen_brood_power);
 }

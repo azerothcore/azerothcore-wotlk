@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "GameObjectAI.h"
-#include "ScriptedCreature.h"
-#include "ScriptMgr.h"
 #include "utgarde_keep.h"
+#include "GameObjectAI.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Vehicle.h"
 
 class npc_dragonflayer_forge_master : public CreatureScript
@@ -142,7 +142,7 @@ public:
                 me->SetCanFly(false);
                 me->SetDisableGravity(false);
                 me->SetFacingTo(0.25f);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             }
         }
 

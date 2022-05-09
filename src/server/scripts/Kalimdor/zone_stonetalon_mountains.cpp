@@ -28,10 +28,10 @@ npc_kaya_flathoof
 EndContentData */
 
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 
 /*######
 ## npc_braug_dimspirit
@@ -152,8 +152,8 @@ public:
                 pEscortAI->Start(true, false, player->GetGUID());
 
             creature->AI()->Talk(SAY_START);
-            creature->setFaction(113);
-            creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            creature->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
+            creature->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
         }
         return true;
     }

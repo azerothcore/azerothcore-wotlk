@@ -1,4 +1,4 @@
-﻿/*
+/*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -27,9 +27,9 @@ npc_daphne_stilwell
 EndContentData */
 
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "ScriptMgr.h"
 
 /*######
 ## npc_daphne_stilwell
@@ -141,8 +141,8 @@ public:
                 case 17:
                     SetEscortPaused(true);
                     player->GroupEventHappens(QUEST_TOME_VALOR, me);
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                    me->DespawnOrUnsummon(60000);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
+                    me->DespawnOrUnsummon(1s, 1s);
                     break;
             }
         }

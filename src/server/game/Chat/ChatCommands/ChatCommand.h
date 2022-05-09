@@ -18,7 +18,6 @@
 #ifndef _CHATCOMMAND_H
 #define _CHATCOMMAND_H
 
-#include "advstd.h"
 #include "ChatCommandArgs.h"
 #include "ChatCommandTags.h"
 #include "Define.h"
@@ -28,11 +27,12 @@
 #include "Optional.h"
 #include "StringFormat.h"
 #include "Util.h"
+#include "advstd.h"
 #include <cstddef>
 #include <map>
-#include <utility>
 #include <tuple>
 #include <type_traits>
+#include <utility>
 #include <variant>
 #include <vector>
 
@@ -92,9 +92,9 @@ namespace Acore::Impl::ChatCommands
                 return result2;
             if (result1.HasErrorMessage() && result2.HasErrorMessage())
             {
-                return Acore::StringFormat("%s \"%s\"\n%s \"%s\"",
-                    GetAcoreString(handler, LANG_CMDPARSER_EITHER), result2.GetErrorMessage().c_str(),
-                    GetAcoreString(handler, LANG_CMDPARSER_OR), result1.GetErrorMessage().c_str());
+                return Acore::StringFormatFmt("{} \"{}\"\n{} \"{}\"",
+                    GetAcoreString(handler, LANG_CMDPARSER_EITHER), result2.GetErrorMessage(),
+                    GetAcoreString(handler, LANG_CMDPARSER_OR), result1.GetErrorMessage());
             }
             else if (result1.HasErrorMessage())
                 return result1;

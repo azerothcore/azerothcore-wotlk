@@ -15,13 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ulduar.h"
+#include "CombatAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
-#include "ulduar.h"
+#include "Vehicle.h"
 
 class npc_ulduar_keeper : public CreatureScript
 {
@@ -37,7 +39,7 @@ public:
 
     bool OnGossipSelect(Player*  /*player*/, Creature* creature, uint32  /*uiSender*/, uint32  /*uiAction*/) override
     {
-        creature->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+        creature->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
         uint8 _keeper = 0;
         switch (creature->GetEntry())
         {
@@ -123,7 +125,8 @@ public:
         void MoveInLineOfSight(Unit* who) override
         {
             if (!activated && who->GetTypeId() == TYPEID_PLAYER)
-                if (me->GetExactDist2d(who) <= 25.0f && me->GetMap()->isInLineOfSight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 5.0f, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ() + 5.0f, 2, LINEOFSIGHT_ALL_CHECKS))
+                if (me->GetExactDist2d(who) <= 25.0f && me->GetMap()->isInLineOfSight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 5.0f,
+                    who->GetPositionX(), who->GetPositionY(), who->GetPositionZ() + 5.0f, 2, LINEOFSIGHT_ALL_CHECKS, VMAP::ModelIgnoreFlags::Nothing))
                 {
                     activated = true;
                     me->RemoveAura(64615);
@@ -137,7 +140,7 @@ public:
                     {
                         float a = rand_norm() * 2 * M_PI;
                         float d = rand_norm() * 4.0f;
-                        if (Creature* c = me->SummonCreature(34137, me->GetPositionX() + cos(a) * d, me->GetPositionY() + sin(a) * d, me->GetPositionZ() + 1.0f, 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 300000))
+                        if (Creature* c = me->SummonCreature(34137, me->GetPositionX() + cos(a) * d, me->GetPositionY() + std::sin(a) * d, me->GetPositionZ() + 1.0f, 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 300000))
                             c->AI()->AttackStart(who);
                     }
                 }
@@ -267,7 +270,7 @@ public:
 
         void PassengerBoarded(Unit* p, int8  /*seat*/, bool  /*apply*/) override
         {
-            me->setFaction(p->getFaction());
+            me->SetFaction(p->GetFaction());
             me->SetReactState(REACT_PASSIVE);
         }
 
@@ -282,29 +285,29 @@ public:
                 me->CombatStop(true);
                 me->SetReactState(REACT_PASSIVE);
                 me->SetRegeneratingHealth(false);
-                me->setFaction(31);
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+                me->SetFaction(FACTION_PREY);
+                me->SetNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
                 me->CastSpell(me, 64770, true);
             }
         }
 
         void AttackStart(Unit* who) override
         {
-            if (me->getFaction() == 16)
+            if (me->GetFaction() == FACTION_MONSTER_2)
                 ScriptedAI::AttackStart(who);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            if (me->getFaction() == 16)
-                ScriptedAI::EnterEvadeMode();
+            if (me->GetFaction() == FACTION_MONSTER_2)
+                ScriptedAI::EnterEvadeMode(why);
         }
 
         void OnCharmed(bool  /*apply*/) override {}
 
         void UpdateAI(uint32 diff) override
         {
-            if (me->getFaction() != 16)
+            if (me->GetFaction() != FACTION_MONSTER_2)
             {
                 if (me->IsAlive() && (me->GetExactDist2dSq(2058.0f, 42.0f) < 25.0f * 25.0f || me->GetExactDist2dSq(2203.0f, 292.0f) < 25.0f * 25.0f || me->GetExactDist2dSq(2125.0f, 170.0f) > 160.0f * 160.0f))
                     Unit::Kill(me, me, false);
@@ -423,6 +426,31 @@ public:
     }
 };
 
+struct npc_salvaged_siege_engine : public VehicleAI
+{
+    npc_salvaged_siege_engine(Creature* creature) : VehicleAI(creature) { }
+
+    bool BeforeSpellClick(Unit* clicker) override
+    {
+        if (Vehicle* vehicle = me->GetVehicleKit())
+        {
+            if (vehicle->IsVehicleInUse())
+            {
+                if (Unit* turret = vehicle->GetPassenger(7))
+                {
+                    if (!turret->GetVehicleKit()->IsVehicleInUse())
+                    {
+                        turret->HandleSpellClick(clicker);
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+};
+
 void AddSC_ulduar()
 {
     new npc_ulduar_keeper();
@@ -435,4 +463,6 @@ void AddSC_ulduar()
 
     new AreaTrigger_at_celestial_planetarium_enterance();
     new go_call_tram();
+
+    RegisterCreatureAI(npc_salvaged_siege_engine);
 }

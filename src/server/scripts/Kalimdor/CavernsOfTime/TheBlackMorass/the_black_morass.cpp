@@ -15,11 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "the_black_morass.h"
 #include "MoveSplineInit.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
-#include "the_black_morass.h"
 
 enum medivhSays
 {
@@ -108,12 +108,12 @@ public:
             groundArray.push_back(G3D::Vector3(creature->GetPositionX() + 8.0f, creature->GetPositionY(), creature->GetPositionZ()));
             airArray.push_back(G3D::Vector3(creature->GetPositionX(), creature->GetPositionY(), creature->GetPositionZ()));
             for (uint8 i = 0; i < 10; ++i)
-                groundArray.push_back(G3D::Vector3(creature->GetPositionX() + 8.0f * cos(2.0f * M_PI * i / 10.0f), creature->GetPositionY() + 8.0f * sin(2.0f * M_PI * i / 10.0f), creature->GetPositionZ()));
+                groundArray.push_back(G3D::Vector3(creature->GetPositionX() + 8.0f * cos(2.0f * M_PI * i / 10.0f), creature->GetPositionY() + 8.0f * std::sin(2.0f * M_PI * i / 10.0f), creature->GetPositionZ()));
 
             for (uint8 i = 0; i < 40; ++i)
-                airArray.push_back(G3D::Vector3(creature->GetPositionX() + i * 0.25f * cos(2.0f * M_PI * i / 10.0f), creature->GetPositionY() + i * 0.25f * sin(2.0f * M_PI * i / 10.0f), creature->GetPositionZ() + i / 4.0f));
+                airArray.push_back(G3D::Vector3(creature->GetPositionX() + i * 0.25f * cos(2.0f * M_PI * i / 10.0f), creature->GetPositionY() + i * 0.25f * std::sin(2.0f * M_PI * i / 10.0f), creature->GetPositionZ() + i / 4.0f));
             for (uint8 i = 40; i < 80; ++i)
-                airArray.push_back(G3D::Vector3(creature->GetPositionX() + 10.0f * cos(2.0f * M_PI * i / 10.0f), creature->GetPositionY() + 10.0f * sin(2.0f * M_PI * i / 10.0f), creature->GetPositionZ() + i / 4.0f));
+                airArray.push_back(G3D::Vector3(creature->GetPositionX() + 10.0f * cos(2.0f * M_PI * i / 10.0f), creature->GetPositionY() + 10.0f * std::sin(2.0f * M_PI * i / 10.0f), creature->GetPositionZ() + i / 4.0f));
         }
 
         InstanceScript* instance;
@@ -194,7 +194,7 @@ public:
             }
         }
 
-        void JustDied(Unit* ) override
+        void JustDied(Unit* /*killer*/) override
         {
             me->SetRespawnTime(DAY);
             events.Reset();
@@ -323,8 +323,7 @@ public:
 
         void DoSummonAtRift(uint32 entry)
         {
-            Position pos;
-            me->GetNearPosition(pos, 10.0f, 2 * M_PI * rand_norm());
+            Position pos = me->GetNearPosition(10.0f, 2 * M_PI * rand_norm());
 
             if (Creature* summon = me->SummonCreature(entry, pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 150000))
                 if (instance)
@@ -332,7 +331,7 @@ public:
                     if (Unit* medivh = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_MEDIVH)))
                     {
                         float o = medivh->GetAngle(summon) + frand(-1.0f, 1.0f);
-                        summon->SetHomePosition(medivh->GetPositionX() + 14.0f * cos(o), medivh->GetPositionY() + 14.0f * sin(o), medivh->GetPositionZ(), summon->GetAngle(medivh));
+                        summon->SetHomePosition(medivh->GetPositionX() + 14.0f * cos(o), medivh->GetPositionY() + 14.0f * std::sin(o), medivh->GetPositionZ(), summon->GetAngle(medivh));
                         summon->GetMotionMaster()->MoveTargetedHome();
                         summon->SetReactState(REACT_DEFENSIVE);
                     }

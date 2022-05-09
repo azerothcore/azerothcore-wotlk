@@ -17,9 +17,9 @@
 
 #include "GameEventMgr.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 
 constexpr auto SPELL_TRICK = 24714;
 constexpr auto SPELL_TREAT = 24715;

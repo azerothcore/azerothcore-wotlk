@@ -15,6 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameTime.h"
+#include "Log.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "UpdateData.h"
@@ -23,48 +25,48 @@
 
 void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
 {
-    ObjectGuid guid;
-    Player* player;
-    Player* plTarget;
+    Player* player = GetPlayer();
+    if (!player->duel || player == player->duel->Initiator || player->duel->State != DUEL_STATE_CHALLENGED)
+        return;
 
+    ObjectGuid guid;
     recvPacket >> guid;
 
-    if (!GetPlayer()->duel)                                  // ignore accept from duel-sender
+    Player* target = player->duel->Opponent;
+    if (target->GetGuidValue(PLAYER_DUEL_ARBITER) != guid)
         return;
 
-    player       = GetPlayer();
-    plTarget = player->duel->opponent;
+    LOG_DEBUG("network.opcode", "Player 1 is: {} ({})", player->GetGUID().ToString(), player->GetName());
+    LOG_DEBUG("network.opcode", "Player 2 is: {} ({})", target->GetGUID().ToString(), target->GetName());
 
-    if (player == player->duel->initiator || !plTarget || player == plTarget || player->duel->startTime != 0 || plTarget->duel->startTime != 0)
-        return;
+    time_t now = GameTime::GetGameTime().count();
+    player->duel->StartTime = now + 3;
+    target->duel->StartTime = now + 3;
 
-    LOG_DEBUG("network.opcode", "Player 1 is: %s (%s)", player->GetGUID().ToString().c_str(), player->GetName().c_str());
-    LOG_DEBUG("network.opcode", "Player 2 is: %s (%s)", plTarget->GetGUID().ToString().c_str(), plTarget->GetName().c_str());
-
-    time_t now = time(nullptr);
-    player->duel->startTimer = now;
-    plTarget->duel->startTimer = now;
+    player->duel->State = DUEL_STATE_COUNTDOWN;
+    target->duel->State = DUEL_STATE_COUNTDOWN;
 
     player->SendDuelCountdown(3000);
-    plTarget->SendDuelCountdown(3000);
+    target->SendDuelCountdown(3000);
 }
 
 void WorldSession::HandleDuelCancelledOpcode(WorldPacket& recvPacket)
 {
     LOG_DEBUG("network", "WORLD: Received CMSG_DUEL_CANCELLED");
+    Player* player = GetPlayer();
+
     ObjectGuid guid;
     recvPacket >> guid;
 
     // no duel requested
-    if (!GetPlayer()->duel)
+    if (!player->duel || player->duel->State == DUEL_STATE_COMPLETED)
         return;
 
     // player surrendered in a duel using /forfeit
-    if (GetPlayer()->duel->startTime != 0)
+    if (GetPlayer()->duel->State == DUEL_STATE_IN_PROGRESS)
     {
         GetPlayer()->CombatStopWithPets(true);
-        if (GetPlayer()->duel->opponent)
-            GetPlayer()->duel->opponent->CombatStopWithPets(true);
+        GetPlayer()->duel->Opponent->CombatStopWithPets(true);
 
         GetPlayer()->CastSpell(GetPlayer(), 7267, true);    // beg
         GetPlayer()->DuelComplete(DUEL_WON);

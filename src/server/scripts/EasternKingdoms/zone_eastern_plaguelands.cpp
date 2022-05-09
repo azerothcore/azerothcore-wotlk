@@ -31,9 +31,9 @@ EndContentData */
 
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "WorldSession.h"
 
@@ -72,7 +72,7 @@ public:
     {
         if (quest->GetQuestId() == QUEST_BALANCE_OF_LIGHT_AND_SHADOW)
         {
-            creature->AI()->SetData(player->getFaction(), 0);
+            creature->AI()->SetData(player->GetFaction(), 0);
             creature->AI()->SetGUID(player->GetGUID());
         }
 
@@ -102,7 +102,7 @@ public:
             _playerGUID.Clear();
             events.Reset();
             summons.DespawnAll();
-            me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+            me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
         }
 
         void SetData(uint32 faction, uint32) override
@@ -113,7 +113,7 @@ public:
         void SetGUID(ObjectGuid guid, int32) override
         {
             _playerGUID = guid;
-            me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+            me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
             events.Reset();
             summons.DespawnAll();
 
@@ -160,7 +160,7 @@ public:
             summons.Summon(creature);
             if (creature->GetEntry() == NPC_INJURED_PEASANT || creature->GetEntry() == NPC_PLAGUED_PEASANT)
             {
-                creature->setFaction(_faction);
+                creature->SetFaction(_faction);
                 if (!_spoken)
                 {
                     _spoken = true;
@@ -175,7 +175,7 @@ public:
                 float z = 159.65f;
                 creature->SetWalk(true);
                 creature->GetMotionMaster()->MovePoint(0, x, y, z);
-                creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+                creature->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
             }
         }
 
@@ -264,7 +264,7 @@ public:
         uint32 timer;
         ObjectGuid _targetGUID;
 
-        void SpellHit(Unit*, const SpellInfo* spellInfo) override
+        void SpellHit(Unit*, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_SHOOT && roll_chance_i(7))
                 me->CastSpell(me, SPELL_DEATHS_DOOR, true);

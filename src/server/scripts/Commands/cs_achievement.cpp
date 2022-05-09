@@ -22,14 +22,11 @@ Comment: All achievement related commands
 Category: commandscripts
 EndScriptData */
 
+#include "AchievementMgr.h"
 #include "Chat.h"
 #include "Language.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-
-#if AC_COMPILER == AC_COMPILER_GNU
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
 
 using namespace Acore::ChatCommands;
 
@@ -42,30 +39,18 @@ public:
     {
         static ChatCommandTable achievementCommandTable =
         {
-            { "add",            SEC_GAMEMASTER,     false,  &HandleAchievementAddCommand,      "" },
-            { "checkall",       SEC_ADMINISTRATOR,  false,  &HandleAchievementCheckAllCommand, "" }
+            { "add",      HandleAchievementAddCommand,      SEC_GAMEMASTER,    Console::No },
+            { "checkall", HandleAchievementCheckAllCommand, SEC_ADMINISTRATOR, Console::No }
         };
         static ChatCommandTable commandTable =
         {
-            { "achievement",    SEC_GAMEMASTER,  false, nullptr,            "", achievementCommandTable }
+            { "achievement", achievementCommandTable }
         };
         return commandTable;
     }
 
-    static bool HandleAchievementAddCommand(ChatHandler* handler, char const* args)
+    static bool HandleAchievementAddCommand(ChatHandler* handler, AchievementEntry const* achievementEntry)
     {
-        if (!*args)
-            return false;
-
-        uint32 achievementId = atoi((char*)args);
-        if (!achievementId)
-        {
-            if (char* id = handler->extractKeyFromLink((char*)args, "Hachievement"))
-                achievementId = atoi(id);
-            if (!achievementId)
-                return false;
-        }
-
         Player* target = handler->getSelectedPlayer();
         if (!target)
         {
@@ -73,14 +58,12 @@ public:
             handler->SetSentErrorMessage(true);
             return false;
         }
-
-        if (AchievementEntry const* achievementEntry = sAchievementStore.LookupEntry(achievementId))
-            target->CompletedAchievement(achievementEntry);
+        target->CompletedAchievement(achievementEntry);
 
         return true;
     }
 
-    static bool HandleAchievementCheckAllCommand(ChatHandler* handler, char const*  /*args*/)
+    static bool HandleAchievementCheckAllCommand(ChatHandler* handler)
     {
         Player* target = handler->getSelectedPlayer();
         if (!target)

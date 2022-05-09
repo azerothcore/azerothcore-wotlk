@@ -28,6 +28,13 @@ class SpellInfo;
 
 typedef void(AuraEffect::*pAuraEffectHandler)(AuraApplication const* aurApp, uint8 mode, bool apply) const;
 
+enum BrewfestEntries
+{
+    BREWFEST_KODO = 30507,
+    GREAT_BREWFEST_KODO = 27707,
+    FRESH_BREWFEST_HOPS = 66052
+};
+
 class AuraEffect
 {
     friend void Aura::_InitEffects(uint8 effMask, Unit* caster, int32* baseAmount);
@@ -77,7 +84,7 @@ public:
     void UpdatePeriodic(Unit* caster);
 
     uint32 GetTickNumber() const { return m_tickNumber; }
-    int32 GetTotalTicks() const { return m_amplitude ? (GetBase()->GetMaxDuration() / m_amplitude) : 1;}
+    int32 GetTotalTicks() const;
     void ResetPeriodic(bool resetPeriodicTimer = false) { if (resetPeriodicTimer) m_periodicTimer = m_amplitude; m_tickNumber = 0;}
     void ResetTicks() { m_tickNumber = 0; }
 

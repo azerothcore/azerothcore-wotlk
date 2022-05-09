@@ -22,10 +22,10 @@ SDComment: This AI is under development
 SDCategory: Npc
 EndScriptData */
 
+#include "ScriptedFollowerAI.h"
 #include "Group.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
-#include "ScriptedFollowerAI.h"
 
 const float MAX_PLAYER_DISTANCE = 100.0f;
 
@@ -63,7 +63,7 @@ void FollowerAI::AttackStart(Unit* who)
 //This part provides assistance to a player that are attacked by who, even if out of normal aggro range
 //It will cause me to attack who that are attacking _any_ player (which has been confirmed may happen also on offi)
 //The flag (type_flag) is unconfirmed, but used here for further research and is a good candidate.
-bool FollowerAI::AssistPlayerInCombat(Unit* who)
+bool FollowerAI::AssistPlayerInCombatAgainst(Unit* who)
 {
     if (!who || !who->GetVictim())
         return false;
@@ -96,7 +96,7 @@ void FollowerAI::MoveInLineOfSight(Unit* who)
         return;
 
     if (!me->HasUnitState(UNIT_STATE_STUNNED) && who->isTargetableForAttack(true, me) && who->isInAccessiblePlaceFor(me))
-        if (HasFollowState(STATE_FOLLOW_INPROGRESS) && AssistPlayerInCombat(who))
+        if (HasFollowState(STATE_FOLLOW_INPROGRESS) && AssistPlayerInCombatAgainst(who))
             return;
 
     if (me->CanStartAttack(who))
@@ -144,13 +144,13 @@ void FollowerAI::JustRespawned()
     if (!IsCombatMovementAllowed())
         SetCombatMovement(true);
 
-    if (me->getFaction() != me->GetCreatureTemplate()->faction)
-        me->setFaction(me->GetCreatureTemplate()->faction);
+    if (me->GetFaction() != me->GetCreatureTemplate()->faction)
+        me->SetFaction(me->GetCreatureTemplate()->faction);
 
     Reset();
 }
 
-void FollowerAI::EnterEvadeMode()
+void FollowerAI::EnterEvadeMode(EvadeReason /*why*/)
 {
     me->RemoveAllAuras();
     me->DeleteThreatList();
@@ -282,7 +282,7 @@ void FollowerAI::StartFollow(Player* player, uint32 factionForFollower, const Qu
     m_uiLeaderGUID = player->GetGUID();
 
     if (factionForFollower)
-        me->setFaction(factionForFollower);
+        me->SetFaction(factionForFollower);
 
     m_pQuestForFollow = quest;
 
@@ -293,13 +293,13 @@ void FollowerAI::StartFollow(Player* player, uint32 factionForFollower, const Qu
         LOG_DEBUG("scripts.ai", "FollowerAI start with WAYPOINT_MOTION_TYPE, set to MoveIdle.");
     }
 
-    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+    me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
 
     AddFollowState(STATE_FOLLOW_INPROGRESS);
 
     me->GetMotionMaster()->MoveFollow(player, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
 
-    LOG_DEBUG("scripts.ai", "FollowerAI start follow %s (%s)", player->GetName().c_str(), m_uiLeaderGUID.ToString().c_str());
+    LOG_DEBUG("scripts.ai", "FollowerAI start follow {} ({})", player->GetName(), m_uiLeaderGUID.ToString());
 }
 
 Player* FollowerAI::GetLeaderForFollower()

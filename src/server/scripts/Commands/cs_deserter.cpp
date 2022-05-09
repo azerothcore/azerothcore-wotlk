@@ -15,12 +15,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+* @file cs_deserter.cpp
+* @brief .deserter related commands
+*
+* This file contains the CommandScripts for all deserter sub-commands
+*/
+
 #include "Chat.h"
 #include "Language.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "SpellAuraEffects.h"
 #include "SpellAuras.h"
+
+using namespace Acore::ChatCommands;
 
 enum Spells
 {
@@ -28,65 +36,69 @@ enum Spells
     BG_SPELL_DESERTER = 26013
 };
 
-#if AC_COMPILER == AC_COMPILER_GNU
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-
-using namespace Acore::ChatCommands;
-
 class deserter_commandscript : public CommandScript
 {
 public:
     deserter_commandscript() : CommandScript("deserter_commandscript") { }
 
+    /**
+    * @brief Returns the command structure for the system.
+    */
+
     ChatCommandTable GetCommands() const override
     {
-        static ChatCommandTable deserterinstanceCommandTable =
+        static ChatCommandTable deserterInstanceCommandTable =
         {
-            { "add",            SEC_ADMINISTRATOR, false, &HandleDeserterInstanceAdd,          "" },
-            { "remove",         SEC_ADMINISTRATOR, false, &HandleDeserterInstanceRemove,       "" }
+            { "add",      HandleDeserterInstanceAdd,    SEC_ADMINISTRATOR,    Console::No },
+            { "remove",   HandleDeserterInstanceRemove, SEC_ADMINISTRATOR, Console::No }
         };
-
         static ChatCommandTable deserterBGCommandTable =
         {
-            { "add",            SEC_ADMINISTRATOR, false, &HandleDeserterBGAdd,                "" },
-            { "remove",         SEC_ADMINISTRATOR, false, &HandleDeserterBGRemove,             "" }
+            { "add",      HandleDeserterBGAdd,    SEC_ADMINISTRATOR, Console::No },
+            { "remove",   HandleDeserterBGRemove, SEC_ADMINISTRATOR, Console::No }
         };
 
         static ChatCommandTable deserterCommandTable =
         {
-            { "instance",       SEC_ADMINISTRATOR,  false, nullptr,  "", deserterinstanceCommandTable },
-            { "bg",             SEC_ADMINISTRATOR,  false, nullptr,  "", deserterBGCommandTable }
+            { "instance", deserterInstanceCommandTable },
+            { "bg",       deserterBGCommandTable }
         };
-
         static ChatCommandTable commandTable =
         {
-            { "deserter",       SEC_ADMINISTRATOR,  false, nullptr,               "", deserterCommandTable }
+            { "deserter", deserterCommandTable }
         };
-
         return commandTable;
     }
 
-    static bool HandleDeserterAdd(ChatHandler* handler, char const* args, bool isInstance)
+    /**
+    * @brief Applies the Deserter Debuff to a player
+    *
+    * This function applies a Deserter Debuff of the given type (Instance or BG) to the
+    * selected player, with the provided duration in seconds.
+    *
+    * @param handler The ChatHandler, passed by the system.
+    * @param time The provided duration in seconds.
+    * @param isInstance provided by the relaying functions, so we don't have
+    * to write that much code :)
+    *
+    * @return true if everything was correct, false if an error occured.
+    *
+    * Example Usage:
+    * @code
+    * .deserter instance add 3600 (one hour)
+    * -or-
+    * .deserter bg add 3600 (one hour)
+    * @endcode
+    */
+    static bool HandleDeserterAdd(ChatHandler* handler, uint32 time, bool isInstance)
     {
-        if (!*args)
-            return false;
-
-        Player* targetPlayer = handler->getSelectedPlayer();
-        if (!targetPlayer)
+        Player* player = handler->getSelectedPlayer();
+        if (!player)
         {
             handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
             handler->SetSentErrorMessage(true);
             return false;
         }
-        char* timeStr = strtok((char*)args, " ");
-        if (!timeStr)
-        {
-            handler->SendSysMessage(LANG_BAD_VALUE);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-        uint32 time = atoi(timeStr);
 
         if (!time)
         {
@@ -95,7 +107,7 @@ public:
             return false;
         }
 
-        Aura* aura = targetPlayer->AddAura(isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER, targetPlayer);
+        Aura* aura = player->AddAura(isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER, player);
 
         if (!aura)
         {
@@ -108,39 +120,62 @@ public:
         return true;
     }
 
-    static bool HandleDeserterRemove(ChatHandler* handler, char const* /*args*/, bool isInstance)
+    /**
+    * @brief Removes the Deserter Debuff from a player
+    *
+    * This function removes a Deserter Debuff of the given type (Instance or BG) from the
+    * selected player.
+    *
+    * @param handler The ChatHandler, passed by the system.
+    * @param isInstance provided by the relaying functions, so we don't have
+    * to write that much code :)
+    *
+    * @return true if everything was correct, false if an error occured.
+    *
+    * Example Usage:
+    * @code
+    * .deserter instance remove
+    * -or-
+    * .deserter bg remove
+    * @endcode
+    */
+    static bool HandleDeserterRemove(ChatHandler* handler, bool isInstance)
     {
-        Player* targetPlayer = handler->getSelectedPlayer();
-        if (!targetPlayer)
+        Player* player = handler->getSelectedPlayer();
+        if (!player)
         {
             handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        targetPlayer->RemoveAura(isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER);
+        player->RemoveAura(isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER);
 
         return true;
     }
 
-    static bool HandleDeserterInstanceAdd(ChatHandler* handler, char const* args)
+    /// @sa HandleDeserterAdd()
+    static bool HandleDeserterInstanceAdd(ChatHandler* handler, uint32 time)
     {
-        return HandleDeserterAdd(handler, args, true);
+        return HandleDeserterAdd(handler, time, true);
     }
 
-    static bool HandleDeserterBGAdd(ChatHandler* handler, char const* args)
+    /// @sa HandleDeserterAdd()
+    static bool HandleDeserterBGAdd(ChatHandler* handler, uint32 time)
     {
-        return HandleDeserterAdd(handler, args, false);
+        return HandleDeserterAdd(handler, time, false);
     }
 
-    static bool HandleDeserterInstanceRemove(ChatHandler* handler, char const* args)
+    /// @sa HandleDeserterRemove()
+    static bool HandleDeserterInstanceRemove(ChatHandler* handler)
     {
-        return HandleDeserterRemove(handler, args, true);
+        return HandleDeserterRemove(handler, true);
     }
 
-    static bool HandleDeserterBGRemove(ChatHandler* handler, char const* args)
+    /// @sa HandleDeserterRemove()
+    static bool HandleDeserterBGRemove(ChatHandler* handler)
     {
-        return HandleDeserterRemove(handler, args, false);
+        return HandleDeserterRemove(handler, false);
     }
 };
 

@@ -15,6 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef __TRADE_DATA_H__
+#define __TRADE_DATA_H__
+
+#include "Define.h"
+
+class Item;
+class ObjectGuid;
+class Player;
+
 enum TradeSlots
 {
     TRADE_SLOT_COUNT            = 7,
@@ -23,12 +32,11 @@ enum TradeSlots
     TRADE_SLOT_INVALID          = -1,
 };
 
-class TradeData
+class AC_GAME_API TradeData
 {
 public:                                                 // constructors
-    TradeData(Player* player, Player* trader) : m_player(player),  m_trader(trader), m_accepted(false), m_acceptProccess(false), m_money(0), m_spell(0)
-    {
-    }
+    TradeData(Player* player, Player* trader) :
+        m_player(player),  m_trader(trader), m_accepted(false), m_acceptProccess(false), m_money(0), m_spell(0) { }
 
     [[nodiscard]] Player* GetTrader() const { return m_trader; }
     [[nodiscard]] TradeData* GetTraderData() const;
@@ -70,3 +78,5 @@ private:                                                // fields
 
     ObjectGuid m_items[TRADE_SLOT_COUNT];               // traded itmes from m_player side including non-traded slot
 };
+
+#endif

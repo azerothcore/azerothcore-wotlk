@@ -18,12 +18,12 @@
 #ifndef ACORE_DBCSTRUCTURE_H
 #define ACORE_DBCSTRUCTURE_H
 
-#include "Define.h"
 #include "DBCEnums.h"
+#include "Define.h"
 #include "SharedDefines.h"
 #include "Util.h"
-#include <set>
 #include <map>
+#include <set>
 #include <unordered_map>
 
 // Structures using to access raw DBC data and required packing to portability
@@ -692,13 +692,11 @@ struct ChrRacesEntry
 
 struct CinematicCameraEntry
 {
-    uint32      id;                                         // 0 index
-    char const*       filename;                             // 1
-    uint32      soundid;                                    // 2 in SoundEntries.dbc or 0
-    float       base_x;                                     // 3
-    float       base_y;                                     // 4
-    float       base_z;                                     // 5
-    float       base_o;                                     // 6
+    uint32 ID;                                              // 0
+    char const* Model;                                      // 1    Model filename (translate .mdx to .m2)
+    uint32 SoundID;                                         // 2    Sound ID       (voiceover for cinematic)
+    DBCPosition3D Origin;                                   // 3-5  Position in map used for basis for M2 co-ordinates
+    float OriginFacing;                                     // 6    Orientation in map used for basis for M2 co-ordinates
 };
 
 struct CinematicSequencesEntry
@@ -1639,7 +1637,7 @@ struct SpellEntry
     std::array<uint32, 2> SpellVisual;                              // 131-132  m_spellVisualID
     uint32    SpellIconID;                                          // 133      m_spellIconID
     uint32    ActiveIconID;                                         // 134      m_activeIconID
-    //uint32    SpellPriority;                                      // 135 not used
+    uint32    SpellPriority;                                        // 135 not used
     std::array<char const*, 16> SpellName;                          // 136-151  m_name_lang
     //uint32    SpellNameFlag;                                      // 152 not used
     std::array<char const*, 16> Rank;                               // 153-168  m_nameSubtext_lang
@@ -1715,16 +1713,14 @@ struct SpellRadiusEntry
 
 struct SpellRangeEntry
 {
-    uint32    ID;
-    float     minRangeHostile;
-    float     minRangeFriend;
-    float     maxRangeHostile;
-    float     maxRangeFriend;
-    uint32    type;
-    //char const*     Name[16];                                   // 7-23 unused
-    // 24 string flags, unused
-    //char const*     Name2[16];                                  // 25-40 unused
-    // 41 string flags, unused
+    uint32 ID;          // 0
+    float  RangeMin[2]; // 1-2 [0] Hostile [1] Friendly
+    float  RangeMax[2]; // 3-4 [0] Hostile [1] Friendly
+    uint32 Flags;       // 5
+    // char const* DisplayName[16];                          // 6-21
+    // uint32 DisplayName_lang_mask;                         // 22
+    // char const* DisplayNameShort[16];                     // 23-38
+    // uint32 DisplayNameShort_lang_mask;                    // 39
 };
 
 struct SpellRuneCostEntry
@@ -2144,7 +2140,7 @@ struct WorldStateUI
 // Structures not used for casting to loaded DBC data and not required then packing
 struct MapDifficulty
 {
-    MapDifficulty()  {}
+    MapDifficulty()  = default;
     MapDifficulty(uint32 _resetTime, uint32 _maxPlayers, bool _hasErrorMessage) : resetTime(_resetTime), maxPlayers(_maxPlayers), hasErrorMessage(_hasErrorMessage) {}
 
     uint32 resetTime{0};
@@ -2154,7 +2150,7 @@ struct MapDifficulty
 
 struct TalentSpellPos
 {
-    TalentSpellPos()  {}
+    TalentSpellPos()  = default;
     TalentSpellPos(uint16 _talent_id, uint8 _rank) : talent_id(_talent_id), rank(_rank) {}
 
     uint16 talent_id{0};
@@ -2163,15 +2159,7 @@ struct TalentSpellPos
 
 typedef std::map<uint32, TalentSpellPos> TalentSpellPosMap;
 
-struct TaxiPathBySourceAndDestination
-{
-    TaxiPathBySourceAndDestination()  {}
-    TaxiPathBySourceAndDestination(uint32 _id, uint32 _price) : ID(_id), price(_price) {}
-
-    uint32    ID{0};
-    uint32    price{0};
-};
-typedef std::map<uint32, TaxiPathBySourceAndDestination> TaxiPathSetForSource;
+typedef std::map<uint32, TaxiPathEntry const*> TaxiPathSetForSource;
 typedef std::map<uint32, TaxiPathSetForSource> TaxiPathSetBySource;
 
 typedef std::vector<TaxiPathNodeEntry const*> TaxiPathNodeList;

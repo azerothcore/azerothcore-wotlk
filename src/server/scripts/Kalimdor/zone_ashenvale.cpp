@@ -23,13 +23,12 @@ SDCategory: Ashenvale Forest
 EndScriptData */
 
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "ScriptMgr.h"
 
 enum Muglash
 {
-    FACTION_QUEST           = 113,
     SAY_MUG_START1          = 0,
     SAY_MUG_START2          = 1,
     SAY_MUG_BRAZIER         = 2,
@@ -117,7 +116,7 @@ public:
             if (quest->GetQuestId() == QUEST_VORSHA)
             {
                 Talk(SAY_MUG_START1);
-                me->setFaction(FACTION_QUEST);
+                me->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
                 npc_escortAI::Start(true, false, player->GetGUID());
             }
         }
@@ -136,7 +135,7 @@ public:
 
                         if (GameObject* go = GetClosestGameObjectWithEntry(me, GO_NAGA_BRAZIER, INTERACTION_DISTANCE * 2))
                         {
-                            go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                            go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                             SetEscortPaused(true);
                         }
                         break;

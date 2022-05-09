@@ -16,12 +16,12 @@
  */
 
 #include "CreatureTextMgr.h"
-#include "culling_of_stratholme.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "TemporarySummon.h"
+#include "culling_of_stratholme.h"
 
 class instance_culling_of_stratholme : public InstanceMapScript
 {
@@ -140,7 +140,7 @@ public:
                     if (_crateCount == 5)
                     {
                         Map::PlayerList const& PlayerList = instance->GetPlayers();
-                        if (!PlayerList.isEmpty())
+                        if (!PlayerList.IsEmpty())
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                 i->GetSource()->KilledMonsterCredit(NPC_GRAIN_CREATE_TRIGGER);
 
@@ -298,11 +298,10 @@ public:
 
         void ChromieWhisper(uint8 textId)
         {
-            if (!instance->GetPlayers().isEmpty())
+            if (!instance->GetPlayers().IsEmpty())
                 if (Player* player = instance->GetPlayers().getFirst()->GetSource())
                 {
-                    Position pos;
-                    player->GetPosition(&pos);
+                    Position pos = player->GetPosition();
                     if (Creature* cr = instance->SummonCreature(NPC_CHROMIE_MIDDLE, pos))
                     {
                         cr->SetVisible(false);

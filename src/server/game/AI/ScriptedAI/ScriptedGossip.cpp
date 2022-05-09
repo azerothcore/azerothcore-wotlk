@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ScriptedGossip.h"
 #include "Creature.h"
 #include "Player.h"
-#include "ScriptedGossip.h"
 
 void ClearGossipMenuFor(Player* player)
 {
@@ -37,9 +37,9 @@ void AddGossipItemFor(Player* player, uint32 icon, std::string const& text, uint
 }
 
 // Uses gossip item info from DB
-void AddGossipItemFor(Player* player, uint32 gossipMenuID, uint32 gossipMenuItemID, uint32 sender, uint32 action)
+void AddGossipItemFor(Player* player, uint32 gossipMenuID, uint32 gossipMenuItemID, uint32 sender, uint32 action, uint32 boxMoney /*= 0*/)
 {
-    player->PlayerTalkClass->GetGossipMenu().AddMenuItem(gossipMenuID, gossipMenuItemID, sender, action);
+    player->PlayerTalkClass->GetGossipMenu().AddMenuItem(gossipMenuID, gossipMenuItemID, sender, action, boxMoney);
 }
 
 void SendGossipMenuFor(Player* player, uint32 npcTextID, ObjectGuid const guid)

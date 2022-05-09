@@ -15,18 +15,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "gundrak.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "gundrak.h"
 
 DoorData const doorData[] =
 {
-    { GO_ECK_DOORS,             DATA_MOORABI,           DOOR_TYPE_PASSAGE,  BOUNDARY_NONE },
-    { GO_ECK_UNDERWATER_GATE,   DATA_ECK_THE_FEROCIOUS, DOOR_TYPE_PASSAGE,  BOUNDARY_NONE },
-    { GO_GAL_DARAH_DOORS0,      DATA_GAL_DARAH,         DOOR_TYPE_ROOM,     BOUNDARY_NONE },
-    { GO_GAL_DARAH_DOORS1,      DATA_GAL_DARAH,         DOOR_TYPE_PASSAGE,  BOUNDARY_NONE },
-    { GO_GAL_DARAH_DOORS2,      DATA_GAL_DARAH,         DOOR_TYPE_PASSAGE,  BOUNDARY_NONE },
-    { 0,                        0,                      DOOR_TYPE_ROOM,     BOUNDARY_NONE }
+    { GO_ECK_DOORS,             DATA_MOORABI,           DOOR_TYPE_PASSAGE },
+    { GO_ECK_UNDERWATER_GATE,   DATA_ECK_THE_FEROCIOUS, DOOR_TYPE_PASSAGE },
+    { GO_GAL_DARAH_DOORS0,      DATA_GAL_DARAH,         DOOR_TYPE_ROOM    },
+    { GO_GAL_DARAH_DOORS1,      DATA_GAL_DARAH,         DOOR_TYPE_PASSAGE },
+    { GO_GAL_DARAH_DOORS2,      DATA_GAL_DARAH,         DOOR_TYPE_PASSAGE },
+    { 0,                        0,                      DOOR_TYPE_ROOM    }
 };
 
 class instance_gundrak : public InstanceMapScript
@@ -176,15 +176,15 @@ public:
             {
                 case DATA_SLAD_RAN:
                     if (GameObject* altar = instance->GetGameObject(_sladRanAltarGUID))
-                        altar->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        altar->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
                 case DATA_MOORABI:
                     if (GameObject* altar = instance->GetGameObject(_moorabiAltarGUID))
-                        altar->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        altar->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
                 case DATA_DRAKKARI_COLOSSUS:
                     if (GameObject* altar = instance->GetGameObject(_drakkariAltarGUID))
-                        altar->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        altar->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
                 case DATA_ECK_THE_FEROCIOUS_INIT:
                     {

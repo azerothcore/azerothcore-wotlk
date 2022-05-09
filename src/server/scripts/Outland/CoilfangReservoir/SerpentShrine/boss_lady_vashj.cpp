@@ -16,11 +16,11 @@
  */
 
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
-#include "serpent_shrine.h"
+#include "ScriptedCreature.h"
 #include "Spell.h"
 #include "WorldSession.h"
+#include "serpent_shrine.h"
 
 enum Says
 {
@@ -195,7 +195,6 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            EnterEvadeIfOutOfCombatArea();
             if (!UpdateVictim())
                 return;
 
@@ -210,7 +209,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_SHOCK_BLAST, urand(10000, 20000));
                     break;
                 case EVENT_SPELL_STATIC_CHARGE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f))
                         me->CastSpell(target, SPELL_STATIC_CHARGE, false);
                     events.ScheduleEvent(EVENT_SPELL_STATIC_CHARGE, 20000);
                     break;
@@ -229,7 +228,7 @@ public:
                     events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
                     break;
                 case EVENT_SPELL_FORKED_LIGHTNING:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 60.0f))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 60.0f))
                         me->CastSpell(target, SPELL_FORKED_LIGHTNING, false);
                     events.ScheduleEvent(EVENT_SPELL_FORKED_LIGHTNING, urand(2500, 5000));
                     break;
@@ -326,7 +325,7 @@ public:
         void Reset()
         {
             me->SetDisableGravity(true);
-            me->setFaction(14);
+            me->SetFaction(FACTION_MONSTER);
             MovementTimer = 0;
             ToxicSporeTimer = 5000;
             BoltTimer = 5500;
@@ -360,11 +359,11 @@ public:
             // toxic spores
             if (BoltTimer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                 {
                     if (Creature* trig = me->SummonCreature(TOXIC_SPORES_TRIGGER, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 30000))
                     {
-                        trig->setFaction(14);
+                        trig->SetFaction(FACTION_MONSTER);
                         trig->CastSpell(trig, SPELL_TOXIC_SPORES, true);
                     }
                 }
@@ -382,7 +381,7 @@ public:
                     // remove
                     me->setDeathState(DEAD);
                     me->RemoveCorpse();
-                    me->setFaction(35);
+                    me->SetFaction(FACTION_FRIENDLY);
                 }
 
                 CheckTimer = 1000;

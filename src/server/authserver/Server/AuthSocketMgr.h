@@ -18,8 +18,8 @@
 #ifndef AuthSocketMgr_h__
 #define AuthSocketMgr_h__
 
-#include "SocketMgr.h"
 #include "AuthSession.h"
+#include "SocketMgr.h"
 
 class AuthSocketMgr : public SocketMgr<AuthSession>
 {

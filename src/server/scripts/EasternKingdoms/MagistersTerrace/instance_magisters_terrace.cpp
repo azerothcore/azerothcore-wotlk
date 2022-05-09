@@ -16,8 +16,8 @@
  */
 
 #include "InstanceScript.h"
-#include "magisters_terrace.h"
 #include "ScriptMgr.h"
+#include "magisters_terrace.h"
 
 class instance_magisters_terrace : public InstanceMapScript
 {
@@ -89,7 +89,7 @@ public:
                     HandleGameObject(KaelDoorGUID, data != IN_PROGRESS);
                     if (data == DONE)
                         if (GameObject* escapeOrb = instance->GetGameObject(EscapeOrbGUID))
-                            escapeOrb->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                            escapeOrb->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     Encounter[identifier] = data;
                     break;
             }
@@ -144,7 +144,7 @@ public:
                     break;
                 case GO_ESCAPE_ORB:
                     if (GetData(DATA_KAELTHAS_EVENT) == DONE)
-                        go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     EscapeOrbGUID = go->GetGUID();
                     break;
             }

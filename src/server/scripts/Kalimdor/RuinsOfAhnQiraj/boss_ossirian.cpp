@@ -15,13 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "MiscPackets.h"
 #include "Opcodes.h"
 #include "Player.h"
-#include "ruins_of_ahnqiraj.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
-#include "WorldPacket.h"
+#include "ruins_of_ahnqiraj.h"
 
 enum Texts
 {
@@ -140,14 +140,12 @@ public:
             if (!map->IsDungeon())
                 return;
 
-            WorldPacket data(SMSG_WEATHER, (4 + 4 + 4));
-            data << uint32(WEATHER_STATE_HEAVY_SANDSTORM) << float(1) << uint8(0);
-            map->SendToPlayers(&data);
+            WorldPackets::Misc::Weather weather(WEATHER_STATE_HEAVY_SANDSTORM, 1.0f);
+            map->SendToPlayers(weather.Write());
 
             for (uint8 i = 0; i < NUM_TORNADOS; ++i)
             {
-                Position Point;
-                me->GetRandomPoint(RoomCenter, RoomRadius, Point);
+                Position Point = me->GetRandomPoint(RoomCenter, RoomRadius);
                 if (Creature* Tornado = me->GetMap()->SummonCreature(NPC_SAND_VORTEX, Point))
                     Tornado->CastSpell(Tornado, SPELL_SAND_STORM, true);
             }
@@ -160,11 +158,11 @@ public:
             Talk(SAY_SLAY);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             Cleanup();
             summons.DespawnAll();
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
         }
 
         void JustDied(Unit* /*killer*/) override

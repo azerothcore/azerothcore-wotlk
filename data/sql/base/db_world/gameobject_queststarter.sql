@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,15 +12,15 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.gameobject_queststarter
+-- Dumpar struktur för tabell acore_world.gameobject_queststarter
 DROP TABLE IF EXISTS `gameobject_queststarter`;
 CREATE TABLE IF NOT EXISTS `gameobject_queststarter` (
-  `id` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `quest` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Quest Identifier',
+  `id` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `quest` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Quest Identifier',
   PRIMARY KEY (`id`,`quest`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.gameobject_queststarter: 447 rows
+-- Dumpar data för tabell acore_world.gameobject_queststarter: 447 rows
 DELETE FROM `gameobject_queststarter`;
 /*!40000 ALTER TABLE `gameobject_queststarter` DISABLE KEYS */;
 INSERT INTO `gameobject_queststarter` (`id`, `quest`) VALUES
@@ -193,10 +193,10 @@ INSERT INTO `gameobject_queststarter` (`id`, `quest`) VALUES
 	(175085, 4602),
 	(175085, 4604),
 	(175085, 4606),
-	(175226, 4723),
-	(175227, 4725),
-	(175230, 4730),
-	(175233, 4731),
+	(175226, 4728),
+	(175227, 4730),
+	(175230, 4733),
+	(175233, 4723),
 	(175265, 4561),
 	(175320, 4740),
 	(175524, 4813),
@@ -215,12 +215,12 @@ INSERT INTO `gameobject_queststarter` (`id`, `quest`) VALUES
 	(176091, 5085),
 	(176115, 5147),
 	(176190, 4722),
-	(176191, 4728),
+	(176191, 4732),
 	(176192, 5166),
 	(176192, 5167),
-	(176196, 4733),
-	(176197, 4732),
-	(176198, 4727),
+	(176196, 4727),
+	(176197, 4725),
+	(176198, 4731),
 	(176361, 5217),
 	(176361, 5218),
 	(176361, 5230),

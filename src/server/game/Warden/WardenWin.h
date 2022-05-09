@@ -22,7 +22,7 @@
 #include "Cryptography/ARC4.h"
 #include "Cryptography/BigNumber.h"
 #include "Warden.h"
-#include <map>
+#include <list>
 
 #if defined(__GNUC__)
 #pragma pack(1)

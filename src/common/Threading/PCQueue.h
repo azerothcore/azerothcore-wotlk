@@ -51,6 +51,11 @@ public:
         return _queue.empty();
     }
 
+    [[nodiscard]] size_t Size() const
+    {
+        return _queue.size();
+    }
+
     bool Pop(T& value)
     {
         std::lock_guard<std::mutex> lock(_queueLock);

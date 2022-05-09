@@ -27,8 +27,8 @@ npc_yenniku
 EndContentData */
 
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
 
 /*######
@@ -61,7 +61,7 @@ public:
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (bReset || spell->Id != 3607)
                 return;
@@ -73,7 +73,7 @@ public:
                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_STUN);
                     me->CombatStop();                   //stop combat
                     me->DeleteThreatList();             //unsure of this
-                    me->setFaction(83);                 //horde generic
+                    me->SetFaction(FACTION_HORDE_GENERIC);
 
                     bReset = true;
                     Reset_Timer = 60000;
@@ -91,7 +91,7 @@ public:
                 {
                     EnterEvadeMode();
                     bReset = false;
-                    me->setFaction(28);                     //troll, bloodscalp
+                    me->SetFaction(FACTION_TROLL_BLOODSCALP);
                     return;
                 }
 

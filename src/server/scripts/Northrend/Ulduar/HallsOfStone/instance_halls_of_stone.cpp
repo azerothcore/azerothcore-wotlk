@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "halls_of_stone.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "halls_of_stone.h"
 
 class instance_halls_of_stone : public InstanceMapScript
 {
@@ -217,7 +217,7 @@ public:
 
                 // Make sjonnir attackable
                 if (Creature* cr = instance->GetCreature(SjonnirGUID))
-                    cr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    cr->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             }
             if (type == BOSS_TRIBUNAL_OF_AGES && data == NOT_STARTED)
             {
