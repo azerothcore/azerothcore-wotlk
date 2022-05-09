@@ -25,72 +25,68 @@
 #include "WaypointMgr.h"
 #include "ulduar.h"
 
-#define SPELL_FLAMEBUFFET_10                64016
-#define SPELL_FLAMEBUFFET_25                64023
-#define S_FLAMEBUFFET                       RAID_MODE(SPELL_FLAMEBUFFET_10, SPELL_FLAMEBUFFET_25)
-#define SPELL_FIREBALL                      63815
-#define SPELL_WINGBUFFET                    62666
-#define SPELL_FLAMEBREATH_10                63317
-#define SPELL_FLAMEBREATH_25                64021
-#define S_FLAMEBREATH                       RAID_MODE(SPELL_FLAMEBREATH_10, SPELL_FLAMEBREATH_25)
-#define SPELL_FUSEARMOR                     64771
-#define SPELL_DEVOURINGFLAME                63236
-#define SPELL_BERSERK                       47008
+enum Spells
+{
+    // Razorscale
+    SPELL_FLAMEBUFFET_10                    = 64016,
+    SPELL_FLAMEBUFFET_25                    = 64023,
+    SPELL_FIREBALL                          = 63815,
+    SPELL_WINGBUFFET                        = 62666,
+    SPELL_FLAMEBREATH_10                    = 63317,
+    SPELL_FLAMEBREATH_25                    = 64021,
+    SPELL_FUSEARMOR                         = 64771,
+    SPELL_FUSED_ARMOR                       = 64774, // Applied on 5th stack of SPELL_FUSEARMOR
+    SPELL_DEVOURINGFLAME                    = 63236,
+    SPELL_BERSERK                           = 47008,
 
-#define SPELL_CHAIN_1                       49679
-#define SPELL_CHAIN_2                       49682
-#define SPELL_CHAIN_3                       49683
-#define SPELL_CHAIN_4                       49684
-#define SPELL_LAUNCH_CHAIN                  62505
-//#define SPELL_HARPOON_SHOT_BUFF             62509
-//#define SPELL_HARPOON_FIRE_STATE            62696
+    // Haproons
+    SPELL_CHAIN_1                           = 49679,
+    SPELL_CHAIN_2                           = 49682,
+    SPELL_CHAIN_3                           = 49683,
+    SPELL_CHAIN_4                           = 49684,
+    SPELL_LAUNCH_CHAIN                      = 62505,
+
+    // Dark Rune Sentinel
+    SPELL_WHIRLWIND                         = 63808,
+    SPELL_BATTLE_SHOUT_10                   = 46763,
+    SPELL_BATTLE_SHOUT_25                   = 64062,
+
+    // Dark Rune Guardian
+    SPELL_STORMSTRIKE_DMG                   = 65971,
+    SPELL_STORMSTRIKE_DEBUFF                = 64757,
+
+    // Dark Rune Watcher
+    SPELL_LIGHTINGBOLT_10                   = 63809,
+    SPELL_LIGHTINGBOLT_25                   = 64696,
+    SPELL_CHAINLIGHTNING_10                 = 64758,
+    SPELL_CHAINLIGHTNING_25                 = 64759,
+};
+
+#define SPELL_FLAMEBUFFET                   RAID_MODE(SPELL_FLAMEBUFFET_10, SPELL_FLAMEBUFFET_25)
+#define SPELL_FLAMEBREATH                   RAID_MODE(SPELL_FLAMEBREATH_10, SPELL_FLAMEBREATH_25)
+#define SPELL_BATTLE_SHOUT                  RAID_MODE(SPELL_BATTLE_SHOUT_10, SPELL_BATTLE_SHOUT_25)
+#define SPELL_LIGHTINGBOLT                  RAID_MODE(SPELL_LIGHTINGBOLT_10, SPELL_LIGHTINGBOLT_25)
+#define SPELL_CHAINLIGHTNING                RAID_MODE(SPELL_CHAINLIGHTNING_10, SPELL_CHAINLIGHTNING_25)
 #define REQ_CHAIN_COUNT                     RAID_MODE(2, 4)
 
-#define SPELL_DEVOURINGFLAME_SUMMON         63308
-//#define SPELL_DEVOURINGFLAME_GROUNDAURA_10  64709
-//#define SPELL_DEVOURINGFLAME_GROUNDAURA_25  64734
-//#define S_DEVOURINGFLAME_GROUNDAURA         RAID_MODE(SPELL_DEVOURINGFLAME_GROUNDAURA_10, SPELL_DEVOURINGFLAME_GROUNDAURA_25)
-//#define NPC_DEVOURINGFLAME                  34188
-#define SPELL_STORMSTRIKE                   51876
-#define SPELL_WHIRLWIND                     63808
-#define SPELL_LIGHTINGBOLT                  63809
-#define SPELL_CHAINLIGHTNING                64758
-
-#define NPC_DARK_RUNE_SENTINEL              33846
-#define NPC_DARK_RUNE_GUARDIAN              33388
-#define NPC_DARK_RUNE_WATCHER               33453
-#define NPC_EXPEDITION_ENGINEER             33287
-#define NPC_EXPEDITION_COMMANDER            33210
-//#define NPC_EXPEDITION_DEFENDER             33816
-//#define NPC_EXPEDITION_TRAPPER              33259
-#define NPC_RAZORSCALE                      33186
-//#define NPC_HARPOON_FIRE_STATE              33282
-
-#define GO_DRILL                            195305
-#define GO_HARPOON_GUN_1                    194519
-#define GO_HARPOON_GUN_2                    194541
-#define GO_HARPOON_GUN_3                    194542
-#define GO_HARPOON_GUN_4                    194543
-#define GO_BROKEN_HARPOON                   194565
-
-#define TEXT_GOSSIP_ACTION                  "We are ready to help!"
-#define TEXT_EE_AGGRO                       "Give us a moment to prepare to build the turrets."
-#define TEXT_EE_MOVE_OUT                    "Ready to move out, keep those dwarves off of our backs!"
-#define TEXT_EE_FIRES_OUT                   "Fires out! Let's rebuild those turrets!"
-
-#define TEXT_TURRET_READY                   "Harpoon Turret is ready for use!"
-#define TEXT_DEEP_BREATH                    "Razorscale takes a deep breath..."
-#define TEXT_GROUNDED_PERMANENTLY           "Razorscale grounded permanently!"
-
-#define CORDS_GROUND                        588.0f, -166.0f, 391.1f
-#define CORDS_AIR                           588.0f, -178.0f, 490.0f
-#define REPAIR_POINTS                       25
-
-enum eSay
+enum NPCs
 {
-    SAY_COMMANDER_INTRO             = 0,
-    SAY_COMMANDER_GROUND            = 1,
-    SAY_COMMANDER_AGGRO             = 2
+    NPC_DARK_RUNE_SENTINEL                  = 33846,
+    NPC_DARK_RUNE_GUARDIAN                  = 33388,
+    NPC_DARK_RUNE_WATCHER                   = 33453,
+    NPC_EXPEDITION_ENGINEER                 = 33287,
+    NPC_EXPEDITION_COMMANDER                = 33210,
+    NPC_RAZORSCALE_CONTROLLER               = 33233, // Trigger Creature
+};
+
+enum GOs
+{
+    GO_DRILL                                = 195305,
+    GO_HARPOON_GUN_1                        = 194519,
+    GO_HARPOON_GUN_2                        = 194541,
+    GO_HARPOON_GUN_3                        = 194542,
+    GO_HARPOON_GUN_4                        = 194543,
+    GO_BROKEN_HARPOON                       = 194565,
 };
 
 enum eEvents
@@ -113,10 +109,39 @@ enum eEvents
     EVENT_SPELL_FLAME_BUFFET,
 };
 
-enum eMisc
+enum Texts
 {
-    POINT_RAZORSCALE_INIT           = 1
+    // Razorscale
+    EMOTE_PERMA_GROUND                      = 0,
+    EMOTE_BREATH                            = 1,
+    EMOTE_BERSERK                           = 2,
+
+    // Expedition Commander
+    SAY_COMMANDER_AGGRO                     = 0,
+    SAY_COMMANDER_GROUND_PHASE              = 1,
+    SAY_COMMANDER_ENGINEERS_DEAD            = 2, // Should be called when all engineers are dead, currently unused
+
+    // Expedition Engineer
+    SAY_EE_AGGRO                            = 0,
+    SAY_EE_START_REPAIR                     = 1,
+    SAY_EE_REBUILD_TURRETS                  = 2,
+
+    // Harpoon
+    EMOTE_HARPOON                           = 0,
 };
+
+enum Misc
+{
+    POINT_RAZORSCALE_INIT                   = 1,
+    REPAIR_POINTS                           = 25,
+
+    // Expedition Commander Gossip
+    GOSSIP_MENU_START_ENCOUNTER             = 10314,
+    NPC_TEXT_COMMANDER                      = 40100,
+};
+
+const Position CORDS_GROUND                 = {588.0f, -166.0f, 391.1f};
+const Position CORDS_AIR                    = {588.0f, -178.0f, 490.0f};
 
 class boss_razorscale : public CreatureScript
 {
@@ -161,6 +186,11 @@ public:
             for (uint8 i = 0; i < 3; ++i)
                 ExpeditionEngineerGUIDs[i].Clear();
 
+            // Show gossip icon if previously hidden
+            if (Creature* commander = ObjectAccessor::GetCreature(*me, CommanderGUID))
+                if (!commander->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
+                    commander->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+
             CommanderGUID.Clear();
             bGroundPhase = false;
             flyTimes = 0;
@@ -195,7 +225,7 @@ public:
                     break;
                 ExpeditionEngineerGUIDs[i] = (*itr)->GetGUID();
                 if (!i)
-                    (*itr)->Yell(TEXT_EE_AGGRO, LANG_UNIVERSAL);
+                    (*itr)->AI()->Talk(SAY_EE_AGGRO);
                 ++i;
             }
             if (Creature* c = me->FindNearestCreature(NPC_EXPEDITION_COMMANDER, 300.0f, true))
@@ -260,7 +290,7 @@ public:
                         if( count >= REQ_CHAIN_COUNT )
                         {
                             if (Creature* commander = ObjectAccessor::GetCreature(*me, CommanderGUID))
-                                commander->AI()->Talk(SAY_COMMANDER_GROUND);
+                                commander->AI()->Talk(SAY_COMMANDER_GROUND_PHASE);
 
                             me->InterruptNonMeleeSpells(true);
                             events.CancelEvent(EVENT_SPELL_FIREBALL);
@@ -348,8 +378,8 @@ public:
                 case 0:
                     break;
                 case EVENT_ENRAGE:
+                    Talk(EMOTE_BERSERK);
                     me->CastSpell(me, SPELL_BERSERK, true);
-                    events.RepeatEvent(600000);
                     break;
                 case EVENT_COMMANDER_SAY_AGGRO:
                     if (Creature* commander = ObjectAccessor::GetCreature(*me, CommanderGUID))
@@ -360,7 +390,7 @@ public:
                         if (Creature* c = ObjectAccessor::GetCreature(*me, ExpeditionEngineerGUIDs[i]))
                         {
                             if (!i)
-                                c->Yell(TEXT_EE_MOVE_OUT, LANG_UNIVERSAL);
+                                c->AI()->Talk(SAY_EE_START_REPAIR);
                             c->AI()->SetData(1, 0); // start repairing
                         }
                     break;
@@ -454,12 +484,12 @@ public:
                     }
                     break;
                 case EVENT_WARN_DEEP_BREATH:
-                    me->TextEmote(TEXT_DEEP_BREATH, nullptr, true);
+                    Talk(EMOTE_BREATH);
                     me->RemoveAura(62794);
                     events.ScheduleEvent(EVENT_PHASE2_FLAME_BREATH, 2500);
                     break;
                 case EVENT_PHASE2_FLAME_BREATH:
-                    me->CastSpell(me, S_FLAMEBREATH, true);
+                    me->CastSpell(me, SPELL_FLAMEBREATH, true);
                     events.ScheduleEvent(EVENT_FLY_UP, 2000);
                     break;
                 case EVENT_FLY_UP:
@@ -485,6 +515,7 @@ public:
 
                     if( (me->GetHealth() * 100) / me->GetMaxHealth() < 50 ) // start phase 3
                     {
+                        Talk(EMOTE_PERMA_GROUND);
                         me->SetControlled(false, UNIT_STATE_ROOT);
                         me->DisableRotate(false);
                         DoResetThreat();
@@ -527,12 +558,12 @@ public:
                         if (Creature* c = ObjectAccessor::GetCreature(*me, ExpeditionEngineerGUIDs[i]))
                         {
                             if (!i)
-                                c->Yell(TEXT_EE_FIRES_OUT, LANG_UNIVERSAL);
+                                c->AI()->Talk(SAY_EE_REBUILD_TURRETS);
                             c->AI()->SetData(1, 0); // start repairing
                         }
                     break;
                 case EVENT_SPELL_FLAME_BREATH:
-                    me->CastSpell(me->GetVictim(), S_FLAMEBREATH, false);
+                    me->CastSpell(me->GetVictim(), SPELL_FLAMEBREATH, false);
                     events.RepeatEvent(20000);
                     break;
                 case EVENT_SPELL_DEVOURING_FLAME_GROUND:
@@ -546,14 +577,14 @@ public:
                             me->CastSpell(victim, SPELL_FUSEARMOR, false);
                             if (Aura* aur = victim->GetAura(SPELL_FUSEARMOR))
                                 if (aur->GetStackAmount() == 5)
-                                    victim->CastSpell(victim, 64774, true);
+                                    victim->CastSpell(victim, SPELL_FUSED_ARMOR, true);
                             events.RepeatEvent(10000);
                             break;
                         }
                     events.RepeatEvent(2000);
                     break;
                 case EVENT_SPELL_FLAME_BUFFET:
-                    me->CastSpell(me->GetVictim(), S_FLAMEBUFFET, false);
+                    me->CastSpell(me->GetVictim(), SPELL_FLAMEBUFFET, false);
                     events.RepeatEvent(7000);
                     break;
             }
@@ -619,8 +650,8 @@ public:
         if (!razorscale || razorscale->IsInCombat())
             return true;
 
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, TEXT_GOSSIP_ACTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        SendGossipMenuFor(player, 40100, creature);
+        AddGossipItemFor(player, GOSSIP_MENU_START_ENCOUNTER, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        SendGossipMenuFor(player, NPC_TEXT_COMMANDER, creature);
         return true;
     }
 
@@ -638,6 +669,9 @@ public:
             Creature* razorscale = ObjectAccessor::GetCreature(*creature, instance->GetGuidData(TYPE_RAZORSCALE));
             if (razorscale && !razorscale->IsInCombat())
             {
+                // Do not show gossip icon if encounter is in progress
+                creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+
                 // reset npcs NPC_HARPOON_FIRE_STATE
                 for (uint8 i = 0; i < 4; ++i)
                     if (Creature* hfs = ObjectAccessor::GetCreature(*creature, instance->GetGuidData(DATA_HARPOON_FIRE_STATE_1 + i)))
@@ -679,7 +713,7 @@ public:
                 return;
 
             _introSpoken = true;
-            Talk(SAY_COMMANDER_INTRO);
+           //Talk(SAY_COMMANDER_INTRO); // No source leads to showing any text messages, perhaps only SOUND ID 15647 is played?
         }
 
     private:
@@ -758,7 +792,8 @@ public:
                             if( GameObject* wh = me->SummonGameObject(GetHarpoonGunIdForThisHFS(), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 3 * M_PI / 2, 0.0f, 0.0f, 0.0f, 0.0f, 0) )
                             {
                                 me->RemoveGameObject(wh, false);
-                                me->TextEmote(TEXT_TURRET_READY, nullptr, true);
+                                if (Creature* cr = me->SummonCreature(NPC_RAZORSCALE_CONTROLLER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 5000))
+                                    cr->AI()->Talk(EMOTE_HARPOON);
                             }
                         }
                     }
@@ -987,9 +1022,9 @@ public:
             else timer2 -= diff;
             if (timer2 == 0 && me->GetVictim() && me->IsWithinMeleeRange(me->GetVictim()))
             {
-                me->CastSpell(me->GetVictim(), 65971, true);
-                me->CastSpell(me->GetVictim(), 65971, true); // me->CastSpell(me->GetVictim(), 65972, true); // cast the same twice cus second one requires setting offhand damage
-                me->CastSpell(me->GetVictim(), 64757, true);
+                me->CastSpell(me->GetVictim(), SPELL_STORMSTRIKE_DMG, true);
+                me->CastSpell(me->GetVictim(), SPELL_STORMSTRIKE_DMG, true); // cast the same twice cus second one requires setting offhand damage
+                me->CastSpell(me->GetVictim(), SPELL_STORMSTRIKE_DEBUFF, true);
                 timer2 = urand(8000, 10000);
                 return;
             }
@@ -1034,7 +1069,7 @@ public:
 
             if( timer1 <= diff )
             {
-                me->CastSpell(me->GetVictim(), RAID_MODE(64758, 64759), false);
+                me->CastSpell(me->GetVictim(), SPELL_CHAINLIGHTNING, false);
                 timer1 = urand(10000, 12000);
                 return;
             }
@@ -1043,7 +1078,7 @@ public:
 
             if (timer2 <= diff)
             {
-                me->CastSpell(me->GetVictim(), RAID_MODE(63809, 64696), false);
+                me->CastSpell(me->GetVictim(), SPELL_LIGHTINGBOLT, false);
                 timer2 = 4000;
                 return;
             }
@@ -1090,7 +1125,7 @@ public:
 
             if( timer1 <= diff )
             {
-                me->CastSpell(me, RAID_MODE(46763, 64062), false);
+                me->CastSpell(me, SPELL_BATTLE_SHOUT, false);
                 timer1 = urand(15000, 20000);
             }
             else
@@ -1100,7 +1135,7 @@ public:
             else timer2 -= diff;
             if (timer2 == 0 && me->GetVictim() && me->IsWithinMeleeRange(me->GetVictim()))
             {
-                me->CastSpell(me, 63808, false);
+                me->CastSpell(me, SPELL_WHIRLWIND, false);
                 timer2 = urand(10000, 12000);
             }
 
