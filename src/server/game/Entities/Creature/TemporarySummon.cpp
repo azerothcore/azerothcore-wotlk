@@ -392,11 +392,13 @@ void Guardian::InitStats(uint32 duration)
 {
     Minion::InitStats(duration);
 
-    Unit* m_owner = GetOwner();
-    InitStatsForLevel(m_owner->getLevel());
+    if (Unit* m_owner = GetOwner())
+    {
+        InitStatsForLevel(m_owner->getLevel());
 
-    if (m_owner->GetTypeId() == TYPEID_PLAYER && HasUnitTypeMask(UNIT_MASK_CONTROLABLE_GUARDIAN))
-        m_charmInfo->InitCharmCreateSpells();
+        if (m_owner->GetTypeId() == TYPEID_PLAYER && HasUnitTypeMask(UNIT_MASK_CONTROLABLE_GUARDIAN))
+            m_charmInfo->InitCharmCreateSpells();
+    }
 
     SetReactState(REACT_AGGRESSIVE);
 }
