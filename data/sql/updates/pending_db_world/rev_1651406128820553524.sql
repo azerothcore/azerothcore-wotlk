@@ -8,8 +8,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (14392, 2, 0, 'NEFARIAN IS SLAIN! People of Orgrimmar, bow down before the might of $n and $g his:her; allies for they have laid a blow against the Black Dragonflight that is sure to stir the Aspects from their malaise! This defeat shall surely be felt by the father of the Black Flight: Deathwing reels in pain and anguish this day!', 14, 0, 100, 0, 0, 0, 9867, 0, 'overlord runthak'),
 (14392, 3, 0, 'Be lifted by $n\'s accomplishment! Revel in $g his:her; rallying cry!', 14, 0, 100, 0, 0, 0, 9868, 0, 'overlord runthak');
 -- Add major mattingly and rhuntak smartai
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 14394;
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 14392;
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` in (14394, 14392);
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (14394, 14392) OR `source_type` = 9 AND `entryorguid` IN (1439400, 1439200, 1439201); 
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (14394, 0, 0, 1, 20, 0, 100, 512, 7496, 0, 0, 0, 0, 80, 1439400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Major Mattingly - On Quest Celebrating Good Times Finished - Run Script'),
