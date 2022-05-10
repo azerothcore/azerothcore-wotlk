@@ -51,5 +51,5 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 -- add conditions so the timed action does not happen if the gameobject is there. 
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 1) AND (`SourceEntry` = 14392) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 30) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 179556) AND (`ConditionValue2` = 120) AND (`ConditionValue3` = 0) OR (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 4) AND (`SourceEntry` = 14392) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 30) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 179881) AND (`ConditionValue2` = 120) AND (`ConditionValue3` = 0);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(22, 1, 14392, 0, 0, 30, 0, 179556, 120, 0, 1, 0, 0, '', '');
+(22, 1, 14392, 0, 0, 30, 0, 179556, 120, 0, 1, 0, 0, '', ''),
 (22, 4, 14392, 0, 0, 30, 0, 179881, 120, 0, 1, 0, 0, '', '');
