@@ -494,12 +494,11 @@ public:
                     if (GameObject* go = GetThorimObject(DATA_THORIM_LEVER))
                         go->RemoveGameObjectFlag((GameObjectFlags)48);
 
+                    events.ScheduleEvent(EVENT_THORIM_AGGRO, 0);
                     events.SetPhase(EVENT_PHASE_START);
                     events.ScheduleEvent(EVENT_THORIM_START_PHASE1, 20000);
                     _trashCounter = 0;
                 }
-                else if (_trashCounter == 5)
-                    events.ScheduleEvent(EVENT_THORIM_AGGRO, 0);
             }
             else if (param == ACTION_ALLOW_HIT)
                 _isHitAllowed = true;
@@ -638,14 +637,6 @@ public:
                 _hitByLightning = true;
         }
 
-        void PlaySpecial()
-        {
-            if (urand(0, 9))
-                return;
-
-            Talk(SAY_SPECIAL_2);
-        }
-
         Player* GetArenaPlayer()
         {
             Map::PlayerList const& pList = me->GetMap()->GetPlayers();
@@ -698,12 +689,10 @@ public:
                 case EVENT_THORIM_STORMHAMMER:
                     me->CastCustomSpell(SPELL_STORMHAMMER, SPELLVALUE_MAX_TARGETS, 1, me->GetVictim(), false);
                     events.RepeatEvent(16000);
-                    PlaySpecial();
                     break;
                 case EVENT_THORIM_CHARGE_ORB:
                     me->CastCustomSpell(SPELL_CHARGE_ORB, SPELLVALUE_MAX_TARGETS, 1, me, false);
                     events.RepeatEvent(16000);
-                    PlaySpecial();
                     break;
                 case EVENT_THORIM_LIGHTNING_ORB:
                     {
@@ -731,7 +720,6 @@ public:
                 case EVENT_THORIM_FILL_ARENA:
                     SpawnArenaNPCs();
                     events.RepeatEvent(10000);
-                    PlaySpecial();
                     break;
                 case EVENT_THORIM_UNBALANCING_STRIKE:
                     me->CastSpell(me->GetVictim(), SPELL_UNBALANCING_STRIKE, false);
@@ -1391,6 +1379,10 @@ public:
             if (me->GetInstanceScript())
                 if (GameObject* go = ObjectAccessor::GetGameObject(*me, me->GetInstanceScript()->GetGuidData(DATA_THORIM_FIRST_DOORS)))
                     go->SetGoState(GO_STATE_ACTIVE);
+
+            if (me->GetInstanceScript())
+                if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_THORIM)))
+                    cr->AI()->Talk(SAY_SPECIAL_2);
         }
 
         void EnterCombat(Unit*) override
