@@ -1,8 +1,8 @@
 -- Add major mattingly and overlord rhuntak creature_text
-DELETE FROM `creature_text` where `CreatureID` IN (14394, 14392)
+DELETE FROM `creature_text` where `CreatureID` IN (14394, 14392);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES 
 (14394, 0, 0, 'Citizens and allies of Stormwind, on this day, history has been made. $n has laid waste to that which had attempted to usurp the rule of the kingdom. Gather round and join me in honoring our heroes.', 14, 0, 100, 0, 0, 0, 9495, 0, 'Major Mattingly'),
- (14394, 1, 0, 'Behold the might of the Alliance! The dread lady, Onyxia, hangs from the arches! Let the rallying cry of the dragon slayer lift your spirits!', 14, 0, 100, 0, 0, 0, 9496, 0, 'Major Mattingly'),
+(14394, 1, 0, 'Behold the might of the Alliance! The dread lady, Onyxia, hangs from the arches! Let the rallying cry of the dragon slayer lift your spirits!', 14, 0, 100, 0, 0, 0, 9496, 0, 'Major Mattingly'),
 (14392, 0, 0, 'People of the Horde, citizens of Orgrimmar, come, gather round and celebrate a hero of the Horde. On this day, $n, under the auspices of our glorious Warchief, laid a mortal blow against the Black Dragonflight. The brood mother, Onyxia, has been slain!', 14, 0, 100, 0, 0, 0, 9491, 0, 'overlord runthak'),
 (14392, 1, 0, 'Bear witness to the undeniable power of your Warchief! Be lifted by the rallying cry of your dragon slayers!', 14, 0, 100, 0, 0, 0, 9492, 0, 'overlord runthak'),
 (14392, 2, 0, 'NEFARIAN IS SLAIN! People of Orgrimmar, bow down before the might of $n and $g his:her; allies for they have laid a blow against the Black Dragonflight that is sure to stir the Aspects from their malaise! This defeat shall surely be felt by the father of the Black Flight: Deathwing reels in pain and anguish this day!', 14, 0, 100, 0, 0, 0, 9867, 0, 'overlord runthak'),
@@ -10,10 +10,10 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 -- Add major mattingly and rhuntak smartai
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 14394;
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 14392;
-DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 14394) OR (`source_type` = 0 AND `entryorguid` = 14392) OR ('source_type' = 9 AND 'entryorguid' = 1439400) OR ('source_type' = 9 AND 'entryorguid' = 1439200) OR (`source_type` = 9 AND `entryorguid` = 1439201);
+DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (14394, 14392) OR `source_type` = 9 AND `entryorguid` IN (1439400, 1439200, 1439201); 
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (14394, 0, 0, 1, 20, 0, 100, 512, 7496, 0, 0, 0, 0, 80, 1439400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Major Mattingly - On Quest Celebrating Good Times Finished - Run Script'),
-(14394, 0, 1, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Major Mattingly - On Quest Celebrating Good Times Finished - Store Targetlist');
+(14394, 0, 1, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Major Mattingly - On Quest Celebrating Good Times Finished - Store Targetlist'),
 (1439400, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 48, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Major Mattingly - Actionlist - Set Active On'),
 (1439400, 9, 1, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 83, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Major Mattingly - Actionlist - Remove Npc Flags Questgiver'),
 (1439400, 9, 2, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 1, 0, 8000, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Major Mattingly - Actionlist - Say Line 0'),
