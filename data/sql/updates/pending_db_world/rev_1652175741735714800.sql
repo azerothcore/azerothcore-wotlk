@@ -1,7 +1,7 @@
 -- Ulduar / Thorim
 DELETE FROM `creature_text` WHERE `CreatureID`=32865;
 
--- SPECIAL 1 and 2 have no BroadcastTextId
+-- Thorim - SPECIAL 1 and 3 have no BroadcastTextId
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES 
 (32865, 0,0,'Interlopers! You mortals who dare to interfere with my sport will pay... Wait--you...',14,0,100,0,0,15733,33145,0,'Thorim SAY_AGGRO_1'),
 (32865, 1,0,'I remember you... In the mountains... But you... what is this? Where am--',14,0,100,0,0,15734,33270,0,'Thorim SAY_AGGRO_2'),
