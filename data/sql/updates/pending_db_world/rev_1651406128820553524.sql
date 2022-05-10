@@ -23,11 +23,11 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1439400, 9, 6, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 11, 22888, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Major Mattingly - Actionlist - Cast \'Rallying Cry of the Dragonslayer\''),
 (1439400, 9, 7, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 82, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Major Mattingly - Actionlist - Add Npc Flags Questgiver'),
 (1439400, 9, 8, 0, 0, 0, 100, 0, 7200000, 7200000, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 14, 0, 179558, 0, 0, 0, 0, 0, 0, 'Major Mattingly - Actionlist - Despawn Instant'),
-(1439400, 9, 9, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 48, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Major Mattingly - Actionlist - Set Active Off');
+(1439400, 9, 9, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 48, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Major Mattingly - Actionlist - Set Active Off'),
 (14392, 0, 0, 2, 20, 0, 100, 512, 7491, 0, 0, 0, 0, 80, 1439200, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - On Quest \'For All To See\' Finished - Run Script'),
 (14392, 0, 2, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - On Quest \'For All To See\' Finished - Store Targetlist'),
 (14392, 0, 3, 5, 20, 0, 100, 512, 7784, 0, 0, 0, 0, 80, 1439201, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - On Quest \'The Lord of Blackrock\' Finished - Run Script'),
-(14392, 0, 5, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 64, 2, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - On Quest \'The Lord of Blackrock\' Finished - Store Targetlist');
+(14392, 0, 5, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 64, 2, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - On Quest \'The Lord of Blackrock\' Finished - Store Targetlist'),
 (1439200, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 48, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Set Active On'),
 (1439200, 9, 1, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 83, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Remove Npc Flags Questgiver'),
 (1439200, 9, 2, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 1, 0, 8000, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Say Line 0'),
@@ -37,7 +37,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1439200, 9, 6, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 11, 22888, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Cast \'Rallying Cry of the Dragonslayer\''),
 (1439200, 9, 7, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 82, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Add Npc Flags Questgiver'),
 (1439200, 9, 8, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 41, 7200000, 0, 0, 0, 0, 0, 14, 0, 179556, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Despawn In 7200000 ms'),
-(1439200, 9, 9, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 48, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Set Active Off');
+(1439200, 9, 9, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 48, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Set Active Off'),
 (1439201, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 48, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Set Active On'),
 (1439201, 9, 1, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 83, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Remove Npc Flags Questgiver'),
 (1439201, 9, 2, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 1, 2, 8000, 0, 0, 0, 0, 12, 2, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Actionlist - Say Line 2'),
