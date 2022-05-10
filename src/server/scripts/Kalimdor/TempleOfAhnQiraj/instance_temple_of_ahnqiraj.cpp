@@ -56,6 +56,7 @@ public:
         ObjectGuid SkeramGUID;
         ObjectGuid VemGUID;
         ObjectGuid KriGUID;
+        ObjectGuid YaujGUID;
         ObjectGuid VeklorGUID;
         ObjectGuid VeknilashGUID;
         ObjectGuid ViscidusGUID;
@@ -88,6 +89,9 @@ public:
                 case NPC_KRI:
                     KriGUID = creature->GetGUID();
                     break;
+                case NPC_YAUJ:
+                    YaujGUID = creature->GetGUID();
+                    break;
                 case NPC_VEKLOR:
                     VeklorGUID = creature->GetGUID();
                     break;
@@ -106,11 +110,6 @@ public:
         {
             switch (type)
             {
-                case DATA_VEMISDEAD:
-                    if (IsBossDied[0])
-                        return 1;
-                    break;
-
                 case DATA_VEKLORISDEAD:
                     if (IsBossDied[1])
                         return 1;
@@ -140,6 +139,8 @@ public:
                     return VemGUID;
                 case DATA_KRI:
                     return KriGUID;
+                case DATA_YAUJ:
+                    return YaujGUID;
                 case DATA_VEKLOR:
                     return VeklorGUID;
                 case DATA_VEKNILASH:
@@ -155,12 +156,11 @@ public:
         {
             switch (type)
             {
-                case DATA_VEM_DEATH:
-                    IsBossDied[0] = true;
-                    break;
-
                 case DATA_BUG_TRIO_DEATH:
-                    ++BugTrioDeathCount;
+                    if (data != 0)
+                        ++BugTrioDeathCount;
+                    else
+                        BugTrioDeathCount = 0;
                     break;
 
                 case DATA_VEKLOR_DEATH:
