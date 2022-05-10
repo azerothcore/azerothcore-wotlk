@@ -2257,9 +2257,9 @@ LiquidData const Map::GetLiquidData(uint32 phaseMask, float x, float y, float z,
         // Get position delta
         if (delta > collisionHeight)
             liquidData.Status = LIQUID_MAP_UNDER_WATER;
-        if (delta > 0.0f)
+        else if (delta > 0.0f)
             liquidData.Status = LIQUID_MAP_IN_WATER;
-        if (delta > -0.1f)
+        else if (delta > -0.1f)
             liquidData.Status = LIQUID_MAP_WATER_WALK;
         else
             liquidData.Status = LIQUID_MAP_ABOVE_WATER;
