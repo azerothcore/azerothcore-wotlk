@@ -867,7 +867,7 @@ public:
                     me->DespawnOrUnsummon(5000);
                     break;
                 case EVENT_SIF_START_TALK:
-                    Talk(SAY_SIF_AGGRO)
+                    Talk(SAY_SIF_AGGRO);
                     break;
                 case EVENT_SIF_JOIN_TALK:
                     Talk(SAY_SIF_HM_REACHED);
