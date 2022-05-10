@@ -20,3 +20,6 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (32865,13,0,'You! Fiend! You are not my beloved! Be gone!',14,0,100,0,0,15747,33952,0,'Thorim SAY_END_HARD_1'),
 (32865,14,0,'Behold the hand behind all the evil that has befallen Ulduar, left my kingdom in ruins, corrupted my brother, and slain my wife.',14,0,100,0,0,15748,33953,0,'Thorim SAY_END_HARD_2'),
 (32865,15,0,'And now it falls to you, champions, to avenge us all. The task before you is great, but I will lend you my aid as I am able. You must prevail.',14,0,100,0,0,15749,33954,0,'Thorim SAY_END_HARD_3');
+
+-- Set Thorim's traps trigger creature(s) flag
+UPDATE `creature_template` SET `flags_extra` = `flags_extra` | 128 WHERE `entry` IN (33054,33725);
