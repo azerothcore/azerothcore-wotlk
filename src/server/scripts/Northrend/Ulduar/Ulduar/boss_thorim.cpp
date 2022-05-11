@@ -1375,12 +1375,13 @@ public:
         void JustDied(Unit*) override
         {
             if (me->GetInstanceScript())
+            {
                 if (GameObject* go = ObjectAccessor::GetGameObject(*me, me->GetInstanceScript()->GetGuidData(DATA_THORIM_FIRST_DOORS)))
                     go->SetGoState(GO_STATE_ACTIVE);
 
-            if (me->GetInstanceScript())
                 if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_THORIM)))
                     cr->AI()->Talk(SAY_SPECIAL_2);
+            }
         }
 
         void EnterCombat(Unit*) override
