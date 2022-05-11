@@ -13,4 +13,4 @@ INSERT INTO `gameobject_template_locale` (`entry`, `locale`, `name`, `castBarCap
 
 -- add an item's Chinese translation
 DELETE from `item_template_locale` where `ID` = 27808 AND `locale` = 'zhCN';
-INSERT INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `VerifiedBuild`) VALUES ( 27808, 'zhCN', '超级蹦床4000型的钥匙', '钥匙上刻有一行小字：瓦萨特不对使用超级蹦床4000型所造成的任何后果负责。', '-12340');
+INSERT INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `VerifiedBuild`) VALUES ( 27808, 'zhCN', '超级蹦床4000型的钥匙', '钥匙上刻有一行小字：瓦萨特不对使用超级蹦床4000型所造成的任何后果负责。', -12340);
