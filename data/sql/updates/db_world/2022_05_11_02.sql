@@ -1,3 +1,4 @@
+-- DB update 2022_05_11_01 -> 2022_05_11_02
 -- update Wintergrasp battle announce Chinese translation
 UPDATE `acore_string` SET `locale_zhCN` = '|cffff0000[冬拥湖]:|r 战斗开始了！|r' WHERE `entry` = 20078; 
 
