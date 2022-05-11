@@ -4262,7 +4262,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->SchoolMask = SPELL_SCHOOL_MASK_SHADOW;
     });
-  
+
     // Flametongue Weapon (Passive) (Rank 6)
     ApplySpellFix({ 16312 }, [](SpellInfo* spellInfo)
     {
