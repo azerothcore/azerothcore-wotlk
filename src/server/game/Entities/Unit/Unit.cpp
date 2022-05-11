@@ -9875,7 +9875,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
         return false;
     }
 
-    if (creature && (IsHunterPet() || IsPet() || IsSummon()) && IsControlledByPlayer())
+    if (creature /*&& (IsHunterPet() || IsPet() || IsSummon()) && IsControlledByPlayer()*/)
     {
         if (victim->GetTypeId() == TYPEID_UNIT && victim->ToCreature()->IsTrigger())
         {
