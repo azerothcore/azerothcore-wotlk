@@ -4,12 +4,12 @@ UPDATE `acore_string` SET `locale_zhCN` = '|cffff0000[冬拥湖]:|r 战斗开始
 -- add object's Chinese translation
 DELETE from `gameobject_template_locale` where `entry` IN (175226,175230,175233,176191,176197,176198) AND `locale` = 'zhCN';
 INSERT INTO `gameobject_template_locale` (`entry`, `locale`, `name`, `castBarCaption`, `VerifiedBuild`) VALUES 
-(175226, 'zhCN', '搁浅的海洋生物', '', '0'),
-(175230, 'zhCN', '搁浅的海洋生物', '', '0'),
-(175233, 'zhCN', '搁浅的海洋生物', '', '0'),
-(176191, 'zhCN', '搁浅的海龟', '', '0'),
-(176197, 'zhCN', '搁浅的海龟', '', '0'),
-(176198, 'zhCN', '搁浅的海龟', '', '0');
+(175226, 'zhCN', '搁浅的海洋生物', '', 0),
+(175230, 'zhCN', '搁浅的海洋生物', '', 0),
+(175233, 'zhCN', '搁浅的海洋生物', '', 0),
+(176191, 'zhCN', '搁浅的海龟', '', 0),
+(176197, 'zhCN', '搁浅的海龟', '', 0),
+(176198, 'zhCN', '搁浅的海龟', '', 0);
 
 -- add an item's Chinese translation
 DELETE from `item_template_locale` where `ID` = 27808 AND `locale` = 'zhCN';
