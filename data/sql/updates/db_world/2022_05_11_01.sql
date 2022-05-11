@@ -1,3 +1,4 @@
+-- DB update 2022_05_11_00 -> 2022_05_11_01
 -- Add major mattingly and overlord rhuntak creature_text
 DELETE FROM `creature_text` WHERE `CreatureID` IN (14394, 14392);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES 
