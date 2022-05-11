@@ -1,3 +1,9 @@
 -- fixed quest 12924 spell area
-UPDATE `spell_area` SET `quest_start` = 12956 WHERE `spell` = 55858 AND `area` IN (4437,4438,4440,4455) AND `quest_start` = 12924;
-UPDATE `spell_area` SET `quest_start` = 12958 WHERE `spell` = 56780 AND `area` = 4439 AND `quest_start` = 12956;
+UPDATE `spell_area` SET `quest_start` = 12956 WHERE `spell` = 55858;
+
+-- (Quests) Forging an Alliance require A Spark of Hope + Mending Fences
+DELETE FROM `conditions` WHERE `SourceEntry`=12924;
+
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES 
+(19, 0, 12924, 0, 0, 8, 0, 12956, 0, 0, 0, 0, 0, '', 'Forging an Alliance - Requires quest rewarded'),
+(19, 0, 12924, 0, 0, 8, 0, 12915, 0, 0, 0, 0, 0, '', 'Forging an Alliance - Requires quest rewarded');
