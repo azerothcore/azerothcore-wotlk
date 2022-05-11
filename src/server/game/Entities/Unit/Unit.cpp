@@ -9875,6 +9875,18 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
         return false;
     }
 
+    if (creature && (IsHunterPet() || IsPet() || IsSummon()) && IsControlledByPlayer())
+    {
+        if (victim->GetTypeId() == TYPEID_UNIT && victim->ToCreature()->IsTrigger())
+        {
+            return false;
+        }
+        if (victim->IsPlayer() && ToPet() && ToPet()->GetOwner() == victim->ToPlayer())
+        {
+            return false;
+        }
+    }
+
     //if (HasUnitFlag(UNIT_FLAG_PACIFIED)) // pussywizard: why having this flag prevents from entering combat? it should just prevent melee attack
     //    return false;
 
