@@ -3672,8 +3672,8 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].BasePoints = 0;
     });
 
-    // Krolmir, Hammer of Storms (13010)
-    ApplySpellFix({ 56606, 56541 }, [](SpellInfo* spellInfo)
+    // Riding Jokkum
+    ApplySpellFix({ 56606 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].BasePoints = 1;
     });
@@ -4261,6 +4261,13 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 47422 }, [](SpellInfo* spellInfo)
     {
         spellInfo->SchoolMask = SPELL_SCHOOL_MASK_SHADOW;
+    });
+  
+    // Flametongue Weapon (Passive) (Rank 6)
+    ApplySpellFix({ 16312 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;
+        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21);
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
