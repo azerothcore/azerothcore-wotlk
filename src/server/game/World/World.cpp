@@ -138,6 +138,11 @@ World::World()
     memset(m_int_configs, 0, sizeof(m_int_configs));
     memset(m_bool_configs, 0, sizeof(m_bool_configs));
     memset(m_float_configs, 0, sizeof(m_float_configs));
+
+    _guidWarn = false;
+    _guidAlert = false;
+    _warnDiff = 0;
+    _warnShutdownTime = GameTime::GetGameTime().count();
 }
 
 /// World destructor
@@ -204,6 +209,59 @@ void World::SetClosed(bool val)
 
     // Invert the value, for simplicity for scripters.
     sScriptMgr->OnOpenStateChange(!val);
+}
+
+void World::TriggerGuidWarning()
+{
+    // Lock this only to prevent multiple maps triggering at the same time
+    std::lock_guard<std::mutex> lock(_guidAlertLock);
+
+    time_t gameTime = GameTime::GetGameTime().count();
+    time_t today = (gameTime / DAY) * DAY;
+
+    // Check if our window to restart today has passed. 5 mins until quiet time
+    while (gameTime >= (today + (getIntConfig(CONFIG_RESPAWN_RESTARTQUIETTIME) * HOUR) - 1810))
+        today += DAY;
+
+    // Schedule restart for 30 minutes before quiet time, or as long as we have
+    _warnShutdownTime = today + (getIntConfig(CONFIG_RESPAWN_RESTARTQUIETTIME) * HOUR) - 1800;
+
+    _guidWarn = true;
+    SendGuidWarning();
+}
+
+void World::TriggerGuidAlert()
+{
+    // Lock this only to prevent multiple maps triggering at the same time
+    std::lock_guard<std::mutex> lock(_guidAlertLock);
+
+    DoGuidAlertRestart();
+    _guidAlert = true;
+    _guidWarn = false;
+}
+
+void World::DoGuidWarningRestart()
+{
+    if (m_ShutdownTimer)
+        return;
+
+    ShutdownServ(1800, SHUTDOWN_MASK_RESTART, RESTART_EXIT_CODE);
+    _warnShutdownTime += HOUR;
+}
+
+void World::DoGuidAlertRestart()
+{
+    if (m_ShutdownTimer)
+        return;
+
+    ShutdownServ(300, SHUTDOWN_MASK_RESTART, RESTART_EXIT_CODE, _alertRestartReason);
+}
+
+void World::SendGuidWarning()
+{
+    if (!m_ShutdownTimer && _guidWarn && getIntConfig(CONFIG_RESPAWN_GUIDWARNING_FREQUENCY) > 0)
+        SendServerMessage(SERVER_MSG_STRING, _guidWarningMsg.c_str());
+    _warnDiff = 0;
 }
 
 /// Find a session by its id
@@ -1267,6 +1325,51 @@ void World::LoadConfigSettings(bool reload)
 
     m_int_configs[CONFIG_CHANGE_FACTION_MAX_MONEY] = sConfigMgr->GetOption<uint32>("ChangeFaction.MaxMoney", 0);
 
+    // Respawn Settings
+    m_int_configs[CONFIG_RESPAWN_MINCHECKINTERVALMS] = sConfigMgr->GetOption<int32>("Respawn.MinCheckIntervalMS", 5000);
+    m_int_configs[CONFIG_RESPAWN_DYNAMICMODE] = sConfigMgr->GetOption<int32>("Respawn.DynamicMode", 0);
+    if (m_int_configs[CONFIG_RESPAWN_DYNAMICMODE] > 1)
+    {
+        LOG_ERROR("server.loading", "Invalid value for Respawn.DynamicMode (%u). Set to 0.", m_int_configs[CONFIG_RESPAWN_DYNAMICMODE]);
+        m_int_configs[CONFIG_RESPAWN_DYNAMICMODE] = 0;
+    }
+    m_bool_configs[CONFIG_RESPAWN_DYNAMIC_ESCORTNPC] = sConfigMgr->GetOption<bool>("Respawn.DynamicEscortNPC", true);
+    m_int_configs[CONFIG_RESPAWN_GUIDWARNLEVEL] = sConfigMgr->GetOption<int32>("Respawn.GuidWarnLevel", 12000000);
+    if (m_int_configs[CONFIG_RESPAWN_GUIDWARNLEVEL] > 16777215)
+    {
+        LOG_ERROR("server.loading", "Respawn.GuidWarnLevel (%u) cannot be greater than maximum GUID (16777215). Set to 12000000.", m_int_configs[CONFIG_RESPAWN_GUIDWARNLEVEL]);
+        m_int_configs[CONFIG_RESPAWN_GUIDWARNLEVEL] = 12000000;
+    }
+    m_int_configs[CONFIG_RESPAWN_GUIDALERTLEVEL] = sConfigMgr->GetOption<int32>("Respawn.GuidAlertLevel", 16000000);
+    if (m_int_configs[CONFIG_RESPAWN_GUIDALERTLEVEL] > 16777215)
+    {
+        LOG_ERROR("server.loading", "Respawn.GuidWarnLevel (%u) cannot be greater than maximum GUID (16777215). Set to 16000000.", m_int_configs[CONFIG_RESPAWN_GUIDALERTLEVEL]);
+        m_int_configs[CONFIG_RESPAWN_GUIDALERTLEVEL] = 16000000;
+    }
+    m_int_configs[CONFIG_RESPAWN_RESTARTQUIETTIME] = sConfigMgr->GetOption<int32>("Respawn.RestartQuietTime", 3);
+    if (m_int_configs[CONFIG_RESPAWN_RESTARTQUIETTIME] > 23)
+    {
+        LOG_ERROR("server.loading", "Respawn.RestartQuietTime (%u) must be an hour, between 0 and 23. Set to 3.", m_int_configs[CONFIG_RESPAWN_RESTARTQUIETTIME]);
+        m_int_configs[CONFIG_RESPAWN_RESTARTQUIETTIME] = 3;
+    }
+    m_float_configs[CONFIG_RESPAWN_DYNAMICRATE_CREATURE] = sConfigMgr->GetOption<float>("Respawn.DynamicRateCreature", 10.0f);
+    if (m_float_configs[CONFIG_RESPAWN_DYNAMICRATE_CREATURE] < 0.0f)
+    {
+        LOG_ERROR("server.loading", "Respawn.DynamicRateCreature (%f) must be positive. Set to 10.", m_float_configs[CONFIG_RESPAWN_DYNAMICRATE_CREATURE]);
+        m_float_configs[CONFIG_RESPAWN_DYNAMICRATE_CREATURE] = 10.0f;
+    }
+    m_int_configs[CONFIG_RESPAWN_DYNAMICMINIMUM_CREATURE] = sConfigMgr->GetOption<int32>("Respawn.DynamicMinimumCreature", 10);
+    m_float_configs[CONFIG_RESPAWN_DYNAMICRATE_GAMEOBJECT] = sConfigMgr->GetOption<float>("Respawn.DynamicRateGameObject", 10.0f);
+    if (m_float_configs[CONFIG_RESPAWN_DYNAMICRATE_GAMEOBJECT] < 0.0f)
+    {
+        LOG_ERROR("server.loading", "Respawn.DynamicRateGameObject (%f) must be positive. Set to 10.", m_float_configs[CONFIG_RESPAWN_DYNAMICRATE_GAMEOBJECT]);
+        m_float_configs[CONFIG_RESPAWN_DYNAMICRATE_GAMEOBJECT] = 10.0f;
+    }
+    m_int_configs[CONFIG_RESPAWN_DYNAMICMINIMUM_GAMEOBJECT] = sConfigMgr->GetOption<int32>("Respawn.DynamicMinimumGameObject", 10);
+    _guidWarningMsg = sConfigMgr->GetOption<std::string>("Respawn.WarningMessage", "There will be an unscheduled server restart at 03:00. The server will be available again shortly after.");
+    _alertRestartReason = sConfigMgr->GetOption<std::string>("Respawn.AlertRestartReason", "Urgent Maintenance");
+    m_int_configs[CONFIG_RESPAWN_GUIDWARNING_FREQUENCY] = sConfigMgr->GetOption<int32>("Respawn.WarningFrequency", 1800);
+
     ///- Read the "Data" directory from the config file
     std::string dataPath = sConfigMgr->GetOption<std::string>("DataDir", "./");
     if (dataPath.empty() || (dataPath.at(dataPath.length() - 1) != '/' && dataPath.at(dataPath.length() - 1) != '\\'))
@@ -1699,6 +1802,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Creature Base Stats...");
     sObjectMgr->LoadCreatureClassLevelStats();
 
+    LOG_INFO("server.loading", "Loading Spawn Group Templates...");
+    sObjectMgr->LoadSpawnGroupTemplates();
+
     LOG_INFO("server.loading", "Loading Creature Data...");
     sObjectMgr->LoadCreatures();
 
@@ -1718,10 +1824,13 @@ void World::SetInitialWorldSettings()
     sObjectMgr->LoadCreatureMovementOverrides(); // must be after LoadCreatures()
 
     LOG_INFO("server.loading", "Loading Gameobject Data...");
-    sObjectMgr->LoadGameobjects();
+    sObjectMgr->LoadGameObjects();
+
+    LOG_INFO("server.loading", "Loading Spawn Group Data...");
+    sObjectMgr->LoadSpawnGroups();
 
     LOG_INFO("server.loading", "Loading GameObject Addon Data...");
-    sObjectMgr->LoadGameObjectAddons();                          // must be after LoadGameObjectTemplate() and LoadGameobjects()
+    sObjectMgr->LoadGameObjectAddons();                          // must be after LoadGameObjectTemplate() and LoadGameObjects()
 
     LOG_INFO("server.loading", "Loading GameObject Quest Items...");
     sObjectMgr->LoadGameObjectQuestItems();
@@ -2470,6 +2579,16 @@ void World::Update(uint32 diff)
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update instance reset times"));
         // update the instance reset times
         sInstanceSaveMgr->Update();
+
+        // Check for shutdown warning
+        if (_guidWarn && !_guidAlert)
+        {
+            _warnDiff += diff;
+            if (GameTime::GetGameTime().count() >= _warnShutdownTime)
+                DoGuidWarningRestart();
+            else if (_warnDiff > GetOption<int32>(CONFIG_RESPAWN_GUIDWARNING_FREQUENCY) * IN_MILLISECONDS)
+                SendGuidWarning();
+        }
     }
 
     {

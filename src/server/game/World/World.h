@@ -353,6 +353,10 @@ public:
     void SetRealmName(std::string name) override { _realmName = name; } // pussywizard
 
     void RemoveOldCorpses() override;
+    void TriggerGuidWarning();
+    void TriggerGuidAlert();
+    bool IsGuidWarning() { return _guidWarn; }
+    bool IsGuidAlert() { return _guidAlert; }
 
 protected:
     void _UpdateGameTime();
@@ -444,7 +448,21 @@ private:
     AutobroadcastsWeightMap m_AutobroadcastsWeights;
 
     void ProcessQueryCallbacks();
+
+    void SendGuidWarning();
+    void DoGuidWarningRestart();
+    void DoGuidAlertRestart();
     QueryCallbackProcessor _queryProcessor;
+
+    std::string _guidWarningMsg;
+    std::string _alertRestartReason;
+
+    std::mutex _guidAlertLock;
+
+    bool _guidWarn;
+    bool _guidAlert;
+    uint32 _warnDiff;
+    time_t _warnShutdownTime;
 
     /**
      * @brief Executed when a World Session is being finalized. Be it from a normal login or via queue popping.

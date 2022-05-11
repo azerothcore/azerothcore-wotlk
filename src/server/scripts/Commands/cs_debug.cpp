@@ -910,7 +910,7 @@ public:
 
         Map* map = handler->GetPlayer()->GetMap();
 
-        if (!v->Create(map->GenerateLowGuid<HighGuid::Vehicle>(), map, handler->GetSession()->GetPlayer()->GetPhaseMask(), entry, *id, x, y, z, o))
+        if (!v->Create(map->GenerateLowGuid<HighGuid::Vehicle>(), map, handler->GetSession()->GetPlayer()->GetPhaseMask(), entry, *id, { x, y, z, o }))
         {
             delete v;
             return false;

@@ -40,6 +40,10 @@ using namespace Acore::ChatCommands;
 using GameObjectSpawnId = Variant<Hyperlink<gameobject>, ObjectGuid::LowType>;
 using GameObjectEntry = Variant<Hyperlink<gameobject_entry>, uint32>;
 
+// definitions are over in cs_npc.cpp
+bool HandleNpcSpawnGroup(ChatHandler* handler, std::vector<Variant<uint32, EXACT_SEQUENCE("force"), EXACT_SEQUENCE("ignorerespawn")>> const& opts);
+bool HandleNpcDespawnGroup(ChatHandler* handler, std::vector<Variant<uint32, EXACT_SEQUENCE("removerespawntime")>> const& opts);
+
 class gobject_commandscript : public CommandScript
 {
 public:
@@ -56,6 +60,8 @@ public:
             { "near",      HandleGameObjectNearCommand,     SEC_MODERATOR,     Console::No },
             { "target",    HandleGameObjectTargetCommand,   SEC_MODERATOR,     Console::No },
             { "turn",      HandleGameObjectTurnCommand,     SEC_ADMINISTRATOR, Console::No },
+            { "spawngroup",HandleNpcSpawnGroup,                         SEC_ADMINISTRATOR,            Console::No },
+            { "despawngroup", HandleNpcDespawnGroup,            SEC_ADMINISTRATOR,   Console::No },
             { "add temp",  HandleGameObjectAddTempCommand,  SEC_GAMEMASTER,    Console::No },
             { "add",       HandleGameObjectAddCommand,      SEC_ADMINISTRATOR, Console::No },
             { "set phase", HandleGameObjectSetPhaseCommand, SEC_ADMINISTRATOR, Console::No },
@@ -141,14 +147,14 @@ public:
 
         object = sObjectMgr->IsGameObjectStaticTransport(objectInfo->entry) ? new StaticTransport() : new GameObject();
         // this will generate a new guid if the object is in an instance
-        if (!object->LoadGameObjectFromDB(guidLow, map, true))
+        if (!object->LoadFromDB(guidLow, map, true))
         {
             delete object;
             return false;
         }
 
         /// @todo is it really necessary to add both the real and DB table guid here ?
-        sObjectMgr->AddGameobjectToGrid(guidLow, sObjectMgr->GetGOData(guidLow));
+        sObjectMgr->AddGameobjectToGrid(guidLow, sObjectMgr->GetGameObjectData(guidLow));
 
         handler->PSendSysMessage(LANG_GAMEOBJECT_ADD, uint32(objectId), objectInfo->name.c_str(), guidLow, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
         return true;
@@ -356,7 +362,7 @@ public:
         object->Delete();
 
         object = new GameObject();
-        if (!object->LoadGameObjectFromDB(guidLow, map, true))
+        if (!object->LoadFromDB(guidLow, map, true))
         {
             delete object;
             return false;
@@ -402,9 +408,9 @@ public:
         object->Relocate(pos);
 
         // update which cell has this gameobject registered for loading
-        sObjectMgr->RemoveGameobjectFromGrid(guidLow, object->GetGOData());
+        sObjectMgr->RemoveGameobjectFromGrid(guidLow, object->GetGameObjectData());
         object->SaveToDB();
-        sObjectMgr->AddGameobjectToGrid(guidLow, object->GetGOData());
+        sObjectMgr->AddGameobjectToGrid(guidLow, object->GetGameObjectData());
 
         // Generate a completely new spawn with new guid
         // 3.3.5a client caches recently deleted objects and brings them back to life
@@ -413,7 +419,7 @@ public:
         object->Delete();
 
         object = new GameObject();
-        if (!object->LoadGameObjectFromDB(guidLow, map, true))
+        if (!object->LoadFromDB(guidLow, map, true))
         {
             delete object;
             return false;
@@ -496,26 +502,35 @@ public:
     }
 
     //show info of gameobject
-    static bool HandleGameObjectInfoCommand(ChatHandler* handler, Optional<Variant<GameObjectEntry, std::string_view>> objectId)
+    static bool HandleGameObjectInfoCommand(ChatHandler* handler, Optional<EXACT_SEQUENCE("guid")> isGuid, Variant<Hyperlink<gameobject_entry>, Hyperlink<gameobject>, uint32> data)
     {
         uint32 entry = 0;
         uint32 type = 0;
         uint32 displayId = 0;
         std::string name;
         uint32 lootId = 0;
-        GameObject* gameObject = nullptr;
 
-        if (!objectId)
+        GameObject* thisGO = nullptr;
+        GameObjectData const* spawnData = nullptr;
+
+        ObjectGuid::LowType spawnId = 0;
+        if (isGuid || data.holds_alternative<Hyperlink<gameobject>>())
         {
-            if (WorldObject* object = handler->getSelectedObject())
+            spawnId = *data;
+            spawnData = sObjectMgr->GetGameObjectData(spawnId);
+            if (!spawnData)
             {
-                entry = object->GetEntry();
-                if (object->GetTypeId() == TYPEID_GAMEOBJECT)
-                    gameObject = object->ToGameObject();
+                handler->PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, spawnId);
+                handler->SetSentErrorMessage(true);
+                return false;
             }
+            entry = spawnData->id;
+            thisGO = handler->GetObjectFromPlayerMapByDbGuid(spawnId);
         }
         else
-            entry = static_cast<uint32>(objectId->get<GameObjectEntry>());
+        {
+            entry = *data;
+        }
 
         GameObjectTemplate const* gameObjectInfo = sObjectMgr->GetGameObjectTemplate(entry);
         if (!gameObjectInfo)
@@ -533,21 +548,45 @@ public:
         else if (type == GAMEOBJECT_TYPE_FISHINGHOLE)
             lootId = gameObjectInfo->fishinghole.lootId;
 
+        // If we have a real object, send some info about it
+        if (thisGO)
+        {
+            handler->PSendSysMessage(LANG_SPAWNINFO_GUIDINFO, thisGO->GetGUID().ToString().c_str());
+            handler->PSendSysMessage(LANG_SPAWNINFO_COMPATIBILITY_MODE, thisGO->GetRespawnCompatibilityMode());
+
+            if (thisGO->GetGameObjectData() && thisGO->GetGameObjectData()->spawnGroupData->groupId)
+            {
+                SpawnGroupTemplateData const* groupData = thisGO->GetGameObjectData()->spawnGroupData;
+                handler->PSendSysMessage(LANG_SPAWNINFO_GROUP_ID, groupData->name.c_str(), groupData->groupId, groupData->flags, thisGO->GetMap()->IsSpawnGroupActive(groupData->groupId));
+            }
+
+            GameObjectOverride const* goOverride = sObjectMgr->GetGameObjectOverride(spawnId);
+            if (!goOverride)
+                goOverride = sObjectMgr->GetGameObjectTemplateAddon(entry);
+            if (goOverride)
+                handler->PSendSysMessage(LANG_GOINFO_ADDON, goOverride->Faction, goOverride->Flags);
+        }
+
+        if (spawnData)
+        {
+            float yaw, pitch, roll;
+            spawnData->rotation.toEulerAnglesZYX(yaw, pitch, roll);
+            handler->PSendSysMessage(LANG_SPAWNINFO_SPAWNID_LOCATION, spawnData->spawnId, spawnData->spawnPoint.GetPositionX(), spawnData->spawnPoint.GetPositionY(), spawnData->spawnPoint.GetPositionZ());
+            handler->PSendSysMessage(LANG_SPAWNINFO_ROTATION, yaw, pitch, roll);
+        }
+
         handler->PSendSysMessage(LANG_GOINFO_ENTRY, entry);
         handler->PSendSysMessage(LANG_GOINFO_TYPE, type);
         handler->PSendSysMessage(LANG_GOINFO_LOOTID, lootId);
         handler->PSendSysMessage(LANG_GOINFO_DISPLAYID, displayId);
-        if (gameObject)
-        {
-            handler->PSendSysMessage("LootMode: %u", gameObject->GetLootMode());
-            handler->PSendSysMessage("LootState: %u", gameObject->getLootState());
-            handler->PSendSysMessage("GOState: %u", gameObject->GetGoState());
-            handler->PSendSysMessage("PhaseMask: %u", gameObject->GetPhaseMask());
-            handler->PSendSysMessage("IsLootEmpty: %u", gameObject->loot.empty());
-            handler->PSendSysMessage("IsLootLooted: %u", gameObject->loot.isLooted());
-        }
-
         handler->PSendSysMessage(LANG_GOINFO_NAME, name.c_str());
+        handler->PSendSysMessage(LANG_GOINFO_SIZE, gameObjectInfo->size);
+        handler->PSendSysMessage(LANG_OBJECTINFO_AIINFO, gameObjectInfo->AIName.c_str(), sObjectMgr->GetScriptName(gameObjectInfo->ScriptId).c_str());
+        if (GameObjectAI const* ai = thisGO ? thisGO->AI() : nullptr)
+            handler->PSendSysMessage(LANG_OBJECTINFO_AITYPE, GetTypeName(*ai).c_str());
+
+        if (GameObjectDisplayInfoEntry const* modelInfo = sGameObjectDisplayInfoStore.LookupEntry(displayId))
+            handler->PSendSysMessage(LANG_GOINFO_MODEL, modelInfo->GeoBoxMax.X, modelInfo->GeoBoxMax.Y, modelInfo->GeoBoxMax.Z, modelInfo->GeoBoxMin.X, modelInfo->GeoBoxMin.Y, modelInfo->GeoBoxMin.Z);
 
         return true;
     }
