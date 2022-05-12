@@ -1412,7 +1412,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                 uint32 mapid = m_caster->GetMapId();
                 uint32 phasemask = m_caster->GetPhaseMask();
                 float collisionHeight = m_caster->GetCollisionHeight();
-                float destx, desty, destz, ground, startx, starty, startz, starto;
+                float destx, desty, destz = 0.0f, ground, startx, starty, startz, starto;
 
                 Position pos;
                 Position lastpos;
