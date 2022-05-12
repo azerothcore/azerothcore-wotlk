@@ -45,7 +45,7 @@ struct WayPoint
     float x;
     float y;
     float z;
-    Optional<float> o;
+    std::optional<float> o;
     uint32 delay;
 };
 

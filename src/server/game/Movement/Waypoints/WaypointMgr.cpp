@@ -70,7 +70,7 @@ void WaypointMgr::Load()
         float x = fields[2].Get<float>();
         float y = fields[3].Get<float>();
         float z = fields[4].Get<float>();
-        Optional<float> o;
+        std::optional<float > o;
         if (!fields[5].IsNull())
             o = fields[5].Get<float>();
 
@@ -133,7 +133,7 @@ void WaypointMgr::ReloadPath(uint32 id)
         float x = fields[1].Get<float>();
         float y = fields[2].Get<float>();
         float z = fields[3].Get<float>();
-        Optional<float> o;
+        std::optional<float> o;
         if (!fields[4].IsNull())
             o = fields[4].Get<float>();
 
