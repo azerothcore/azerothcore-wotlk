@@ -608,11 +608,11 @@ void MotionMaster::MoveCharge(float x, float y, float z, float speed, uint32 id,
     }
 }
 
-void MotionMaster::MoveCharge(PathGenerator const& path, float speed /*= SPEED_CHARGE*/)
+void MotionMaster::MoveCharge(PathGenerator const& path, float speed /*= SPEED_CHARGE*/, ObjectGuid targetGUID /*= ObjectGuid::Empty*/)
 {
     G3D::Vector3 dest = path.GetActualEndPosition();
 
-    MoveCharge(dest.x, dest.y, dest.z, speed, EVENT_CHARGE_PREPATH);
+    MoveCharge(dest.x, dest.y, dest.z, speed, EVENT_CHARGE_PREPATH, nullptr, false, 0.0f, targetGUID);
 
     // Charge movement is not started when using EVENT_CHARGE_PREPATH
     Movement::MoveSplineInit init(_owner);
