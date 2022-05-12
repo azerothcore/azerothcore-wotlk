@@ -1160,18 +1160,16 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if( who->GetTypeId() == TYPEID_PLAYER )
+            if (who->GetTypeId() == TYPEID_PLAYER)
                 if (Creature* c = GetMimiron())
                 {
-                    if( Phase == 1 )
+                    if (Phase == 1)
                     {
-                        if (Creature* c = GetMimiron())
-                            c->AI()->Talk(SAY_MKII_SLAY);
+                        c->AI()->Talk(SAY_MKII_SLAY);
                     }
                     else
                     {
-                        if (Creature* c = GetMimiron())
-                            c->AI()->Talk(SAY_V07TRON_SLAY);
+                        c->AI()->Talk(SAY_V07TRON_SLAY);
                     }
                 }
         }
@@ -1498,18 +1496,16 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if( who->GetTypeId() == TYPEID_PLAYER )
-                if( Creature* c = GetMimiron() )
+            if (who->GetTypeId() == TYPEID_PLAYER)
+                if (Creature* c = GetMimiron())
                 {
-                    if( Phase == 2 )
+                    if (Phase == 2)
                     {
-                        if (Creature* c = GetMimiron())
-                            c->AI()->Talk(SAY_VX001_SLAY);
+                        c->AI()->Talk(SAY_VX001_SLAY);
                     }
                     else
                     {
-                        if (Creature* c = GetMimiron())
-                            c->AI()->Talk(SAY_V07TRON_SLAY);
+                        c->AI()->Talk(SAY_V07TRON_SLAY);
                     }
                 }
         }
@@ -1805,18 +1801,16 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if( who->GetTypeId() == TYPEID_PLAYER )
-                if( Creature* c = GetMimiron() )
+            if (who->GetTypeId() == TYPEID_PLAYER)
+                if (Creature* c = GetMimiron())
                 {
-                    if( Phase == 3 )
+                    if (Phase == 3)
                     {
-                        if (Creature* c = GetMimiron())
-                            c->AI()->Talk(SAY_AERIAL_SLAY);
+                        c->AI()->Talk(SAY_AERIAL_SLAY);
                     }
                     else
                     {
-                        if (Creature* c = GetMimiron())
-                            c->AI()->Talk(SAY_V07TRON_SLAY);
+                        c->AI()->Talk(SAY_V07TRON_SLAY);
                     }
                 }
         }
