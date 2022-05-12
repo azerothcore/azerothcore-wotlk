@@ -1893,6 +1893,7 @@ float GridMap::getLiquidLevel(float x, float y) const
 inline LiquidData const GridMap::GetLiquidData(float x, float y, float z, float collisionHeight, uint8 ReqLiquidType) const
 {
     LiquidData liquidData;
+    liquidData.Status = LIQUID_MAP_NO_WATER;
 
     // Check water type (if no water return)
     if (_liquidGlobalFlags || _liquidFlags)
@@ -2203,7 +2204,8 @@ void Map::GetZoneAndAreaId(uint32 phaseMask, uint32& zoneid, uint32& areaid, flo
 
 LiquidData const Map::GetLiquidData(uint32 phaseMask, float x, float y, float z, float collisionHeight, uint8 ReqLiquidType)
 {
-   LiquidData liquidData;
+    LiquidData liquidData;
+    liquidData.Status = LIQUID_MAP_NO_WATER;
 
     VMAP::IVMapMgr* vmgr = VMAP::VMapFactory::createOrGetVMapMgr();
     float liquid_level = INVALID_HEIGHT;
@@ -2369,6 +2371,7 @@ void Map::GetFullTerrainStatusForPosition(uint32 /*phaseMask*/, float x, float y
     AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(data.areaId);
 
     // liquid processing
+    data.liquidInfo.Status = LIQUID_MAP_NO_WATER;
     if (wmoData && wmoData->liquidInfo && wmoData->liquidInfo->level > wmoData->floorZ)
     {
         uint32 liquidType = wmoData->liquidInfo->type;
