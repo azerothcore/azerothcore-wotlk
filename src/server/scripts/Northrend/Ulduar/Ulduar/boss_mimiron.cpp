@@ -240,7 +240,7 @@ enum Texts
     SAY_V07TRON_SLAY                                = 12,
     SAY_V07TRON_DEATH                               = 13,
     SAY_BERSERK                                     = 14,
-    
+
     // MK II
     EMOTE_PLASMA_BLAST                              = 0,
 
