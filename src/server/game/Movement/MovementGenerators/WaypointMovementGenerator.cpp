@@ -175,8 +175,8 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
     //! but formationDest contains global coordinates
     init.MoveTo(node->x, node->y, z, true, true);
 
-    if (node.orientation.has_value() && node.delay > 0)
-        init.SetFacing(*node.orientation);
+    if (node->orientation.has_value() && node->delay > 0)
+        init.SetFacing(*node->orientation);
 
     switch (node->move_type)
     {
