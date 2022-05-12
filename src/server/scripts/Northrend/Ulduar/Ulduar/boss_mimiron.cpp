@@ -224,6 +224,7 @@ enum EVENTS
 
 enum Texts
 {
+    // Mimiron
     SAY_AGGRO                                       = 0, // Unused
     SAY_HARDMODE_ON                                 = 1,
     SAY_MKII_ACTIVATE                               = 2,
@@ -239,23 +240,24 @@ enum Texts
     SAY_V07TRON_SLAY                                = 12,
     SAY_V07TRON_DEATH                               = 13,
     SAY_BERSERK                                     = 14,
-};
+    
+    // MK II
+    EMOTE_PLASMA_BLAST                              = 0,
 
-enum ComputerTalks
-{
-    TALK_COMPUTER_INITIATED = 0,
-    TALK_COMPUTER_TERMINATED = 1,
-    TALK_COMPUTER_TEN = 2,
-    TALK_COMPUTER_NINE = 3,
-    TALK_COMPUTER_EIGHT = 4,
-    TALK_COMPUTER_SEVEN = 5,
-    TALK_COMPUTER_SIX = 6,
-    TALK_COMPUTER_FIVE = 7,
-    TALK_COMPUTER_FOUR = 8,
-    TALK_COMPUTER_THREE = 9,
-    TALK_COMPUTER_TWO = 10,
-    TALK_COMPUTER_ONE = 11,
-    TALK_COMPUTER_ZERO = 12,
+    // Computer (Hardmode countdown)
+    TALK_COMPUTER_INITIATED                         = 0,
+    TALK_COMPUTER_TERMINATED                        = 1,
+    TALK_COMPUTER_TEN                               = 2,
+    TALK_COMPUTER_NINE                              = 3,
+    TALK_COMPUTER_EIGHT                             = 4,
+    TALK_COMPUTER_SEVEN                             = 5,
+    TALK_COMPUTER_SIX                               = 6,
+    TALK_COMPUTER_FIVE                              = 7,
+    TALK_COMPUTER_FOUR                              = 8,
+    TALK_COMPUTER_THREE                             = 9,
+    TALK_COMPUTER_TWO                               = 10,
+    TALK_COMPUTER_ONE                               = 11,
+    TALK_COMPUTER_ZERO                              = 12,
 };
 
 #define GetMimiron() ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_MIMIRON))
@@ -1134,7 +1136,7 @@ public:
                 case EVENT_SPELL_PLASMA_BLAST:
                     if (Unit* victim = me->GetVictim())
                     {
-                        me->TextEmote("Leviathan Mk II begins to cast Plasma Blast!", nullptr, true);
+                        Talk(EMOTE_PLASMA_BLAST);
                         cannon->CastSpell(victim, SPELL_PLASMA_BLAST, false);
                     }
                     events.RepeatEvent(22000);
