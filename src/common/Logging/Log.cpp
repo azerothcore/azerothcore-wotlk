@@ -40,6 +40,7 @@ Log::Log() : AppenderId(0), highestLogLevel(LOG_LEVEL_FATAL)
 
 Log::~Log()
 {
+    delete _strand;
     Close();
 }
 
@@ -373,6 +374,13 @@ void Log::Initialize(Acore::Asio::IoContext* ioContext)
     }
 
     LoadFromConfig();
+}
+
+void Log::SetSynchronous()
+{
+    delete _strand;
+    _strand = nullptr;
+    _ioContext = nullptr;
 }
 
 void Log::LoadFromConfig()

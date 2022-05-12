@@ -422,6 +422,8 @@ int main(int argc, char** argv)
     // Shutdown starts here
     threadPool.reset();
 
+    sLog->SetSynchronous();
+
     sScriptMgr->OnShutdown();
 
     // set server offline

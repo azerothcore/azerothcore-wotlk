@@ -61,6 +61,7 @@ public:
     static Log* instance();
 
     void Initialize(Acore::Asio::IoContext* ioContext);
+    void SetSynchronous();  // Not threadsafe - should only be called from main() after all threads are joined
     void LoadFromConfig();
     void Close();
     [[nodiscard]] bool ShouldLog(std::string const& type, LogLevel level) const;
