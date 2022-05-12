@@ -80,14 +80,14 @@ enum AuriayaEvents
     EVENT_ENRAGE                        = 10,
 };
 
-enum AuriayaSounds
+enum Texts
 {
-    SOUND_AGGRO                         = 15473,
-    SOUND_SLAY1                         = 15474,
-    SOUND_SLAY2                         = 15475,
-    SOUND_DEATH                         = 15476,
-    SOUND_BERSERK                       = 15477,
-    SOUND_WOUND                         = 15478,
+    SAY_AGGRO       = 0,
+    SAY_SLAY        = 1,
+    SAY_BERSERK     = 2,
+    EMOTE_DEATH     = 3,
+    EMOTE_FEAR      = 4,
+    EMOTE_DEFFENDER = 5,
 };
 
 enum Misc
@@ -186,26 +186,16 @@ public:
 
             summons.DoZoneInCombat(NPC_SANCTUM_SENTRY);
 
-            me->Yell("Some things are better left alone!", LANG_UNIVERSAL);
-            me->PlayDirectSound(SOUND_AGGRO);
+            Talk(SAY_AGGRO);
             me->setActive(true);
         }
 
-        void KilledUnit(Unit*  /*victim*/) override
+        void KilledUnit(Unit* victim) override
         {
-            if (urand(0, 2))
+            if (victim->GetTypeId() != TYPEID_PLAYER || urand(0, 2))
                 return;
 
-            if (urand(0, 1))
-            {
-                me->Yell("The secret dies with you!", LANG_UNIVERSAL);
-                me->PlayDirectSound(SOUND_SLAY1);
-            }
-            else
-            {
-                me->Yell("There is no escape!", LANG_UNIVERSAL);
-                me->PlayDirectSound(SOUND_SLAY2);
-            }
+            Talk(SAY_SLAY);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -216,8 +206,7 @@ public:
             EntryCheckPredicate pred(NPC_FERAL_DEFENDER);
             summons.DoAction(ACTION_DESPAWN_ADDS, pred);
             summons.DespawnAll();
-            me->TextEmote("Auriaya screams in agony.", nullptr, true);
-            me->PlayDirectSound(SOUND_DEATH);
+            Talk(EMOTE_DEATH);
         }
 
         void DoAction(int32 param) override
@@ -240,7 +229,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_SUMMON_FERAL_DEFENDER:
-                    me->TextEmote("Auriaya begins to activate Feral Defender.", nullptr, true);
+                    Talk(EMOTE_DEFFENDER);
                     me->CastSpell(me, SPELL_ACTIVATE_FERAL_DEFENDER, true);
                     me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, true);
                     events.ScheduleEvent(EVENT_REMOVE_IMMUNE, 3000);
@@ -249,7 +238,7 @@ public:
                     me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
                     break;
                 case EVENT_TERRIFYING_SCREECH:
-                    me->TextEmote("Auriaya begins to cast Terrifying Screech.", nullptr, true);
+                    Talk(EMOTE_FEAR);
                     me->CastSpell(me, SPELL_TERRIFYING_SCREECH, false);
                     events.RepeatEvent(35000);
                     break;
@@ -273,8 +262,7 @@ public:
                         break;
                     }
                 case EVENT_ENRAGE:
-                    me->TextEmote("You waste my time!", nullptr, true);
-                    me->PlayDirectSound(SOUND_BERSERK);
+                    Talk(SAY_BERSERK);
                     me->CastSpell(me, SPELL_ENRAGE, true);
                     break;
             }
