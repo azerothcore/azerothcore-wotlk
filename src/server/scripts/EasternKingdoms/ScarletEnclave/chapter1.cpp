@@ -69,7 +69,7 @@ struct npc_eye_of_acherus : public ScriptedAI
     {
         DoCastSelf(SPELL_ROOT_SELF);
         DoCastSelf(SPELL_EYE_OF_ACHERUS_VISUAL);
-        _events.ScheduleEvent(EVENT_ANNOUNCE_LAUNCH_TO_DESTINATION, 7s);
+        _events.ScheduleEvent(EVENT_ANNOUNCE_LAUNCH_TO_DESTINATION, 400ms);
     }
 
     void OnCharmed(bool apply) override
@@ -94,7 +94,7 @@ struct npc_eye_of_acherus : public ScriptedAI
                 {
                     Talk(SAY_LAUNCH_TOWARDS_DESTINATION, owner);
                 }
-                _events.ScheduleEvent(EVENT_UNROOT, 1s + 200ms);
+                _events.ScheduleEvent(EVENT_UNROOT, 400ms);
                 break;
             case EVENT_UNROOT:
                 me->RemoveAurasDueToSpell(SPELL_ROOT_SELF);
@@ -119,7 +119,7 @@ struct npc_eye_of_acherus : public ScriptedAI
                 me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_1, EYE_DESTINATION_2);
                 me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_2, EYE_DESTINATION_3);
                 me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_3, EYE_DESTINATION_4);
-                _events.ScheduleEvent(EVENT_GRANT_CONTROL, 24s + 500ms);
+                _events.ScheduleEvent(EVENT_GRANT_CONTROL, 22s);
                 break;
             }
             case EVENT_GRANT_CONTROL:
