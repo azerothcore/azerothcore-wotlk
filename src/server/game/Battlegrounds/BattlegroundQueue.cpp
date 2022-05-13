@@ -175,16 +175,20 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player* leader, Group* group, Battle
     {
         group->DoForAllMembers([this, ginfo](Player* member)
         {
-            ASSERT(m_QueuedPlayers.count(member->GetGUID()) == 0);
-            m_QueuedPlayers[member->GetGUID()] = ginfo;
-            ginfo->Players.emplace(member->GetGUID());
+            if (m_QueuedPlayers.count(member->GetGUID()) == 0)
+            {
+                m_QueuedPlayers[member->GetGUID()] = ginfo;
+                ginfo->Players.emplace(member->GetGUID());
+            }
         });
     }
     else
     {
-        ASSERT(m_QueuedPlayers.count(leader->GetGUID()) == 0);
-        m_QueuedPlayers[leader->GetGUID()] = ginfo;
-        ginfo->Players.emplace(leader->GetGUID());
+        if (m_QueuedPlayers.count(leader->GetGUID()) == 0)
+        {
+            m_QueuedPlayers[leader->GetGUID()] = ginfo;
+            ginfo->Players.emplace(leader->GetGUID());
+        }
     }
 
     //add GroupInfo to m_QueuedGroups
