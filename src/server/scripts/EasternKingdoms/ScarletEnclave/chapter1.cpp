@@ -103,10 +103,10 @@ struct npc_eye_of_acherus : public ScriptedAI
                 break;
             case EVENT_LAUNCH_TOWARDS_DESTINATION:
             {
-                const Position EYE_DESTINATION_1 = { 2361.21f,  -5660.45f,  496.744f, 0.0f };
-                const Position EYE_DESTINATION_2 = { 2341.571f, -5672.797f, 538.3942f, 0.0f };
-                const Position EYE_DESTINATION_3 = { 1957.4f,   -5844.1f,   273.867f, 0.0f };
-                const Position EYE_DESTINATION_4 = { 1758.01f,  -5876.79f,  166.867f, 0.0f };
+                Position const EYE_DESTINATION_1 = { 2361.21f,  -5660.45f,  496.744f, 0.0f };
+                Position const EYE_DESTINATION_2 = { 2341.571f, -5672.797f, 538.3942f, 0.0f };
+                Position const EYE_DESTINATION_3 = { 1957.4f,   -5844.1f,   273.867f, 0.0f };
+                Position const EYE_DESTINATION_4 = { 1758.01f,  -5876.79f,  166.867f, 0.0f };
 
                 Movement::MoveSplineInit init(me);
                 init.SetFly();
