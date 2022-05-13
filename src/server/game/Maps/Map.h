@@ -638,8 +638,8 @@ public:
 
     void UpdatePlayerZoneStats(uint32 oldZone, uint32 newZone);
 
-    void SaveRespawnTime(SpawnObjectType type, ObjectGuid::LowType spawnId, uint32 entry, time_t respawnTime, uint32 zoneId, uint32 gridId = 0, bool writeDB = true, bool replace = false, SQLTransaction dbTrans = nullptr);
-    void SaveRespawnTimeDB(SpawnObjectType type, ObjectGuid::LowType spawnId, time_t respawnTime, SQLTransaction dbTrans = nullptr);
+    void SaveRespawnTime(SpawnObjectType type, ObjectGuid::LowType spawnId, uint32 entry, time_t respawnTime, uint32 zoneId, uint32 gridId = 0, bool writeDB = true, bool replace = false, CharacterDatabaseTransaction dbTrans = nullptr);
+    void SaveRespawnTimeDB(SpawnObjectType type, ObjectGuid::LowType spawnId, time_t respawnTime, CharacterDatabaseTransaction dbTrans = nullptr);
     void LoadRespawnTimes();
     void DeleteRespawnTimes() { DeleteRespawnInfo(); DeleteRespawnTimesInDB(GetId(), GetInstanceId()); }
     [[nodiscard]] time_t GetInstanceResetPeriod() const { return _instanceResetPeriod; }
@@ -803,8 +803,8 @@ private:
         // if return value is false and info->respawnTime is nonzero, it is guaranteed to be greater than time(NULL)
         bool CheckRespawn(RespawnInfo* info);
         void DoRespawn(SpawnObjectType type, ObjectGuid::LowType spawnId, uint32 gridId);
-        void Respawn(RespawnInfo* info, bool force = false, SQLTransaction dbTrans = nullptr);
-        void Respawn(RespawnVector& respawnData, bool force = false, SQLTransaction dbTrans = nullptr);
+        void Respawn(RespawnInfo* info, bool force = false, CharacterDatabaseTransaction dbTrans = nullptr);
+        void Respawn(RespawnVector& respawnData, bool force = false, CharacterDatabaseTransaction dbTrans = nullptr);
         void AddRespawnInfo(RespawnInfo& info, bool replace = false);
         void DeleteRespawnInfo();
         void DeleteRespawnInfo(RespawnInfo* info);
@@ -830,16 +830,16 @@ private:
     public:
         void GetRespawnInfo(RespawnVector& respawnData, SpawnObjectTypeMask types, uint32 zoneId = 0) const;
         RespawnInfo* GetRespawnInfo(SpawnObjectType type, ObjectGuid::LowType spawnId) const;
-        void RemoveRespawnTime(RespawnInfo* info, bool doRespawn = false, SQLTransaction dbTrans = nullptr);
-        void RemoveRespawnTime(RespawnVector& respawnData, bool doRespawn = false, SQLTransaction dbTrans = nullptr);
-        void RemoveRespawnTime(SpawnObjectTypeMask types = SPAWN_TYPEMASK_ALL, uint32 zoneId = 0, bool doRespawn = false, SQLTransaction dbTrans = nullptr)
+        void RemoveRespawnTime(RespawnInfo* info, bool doRespawn = false, CharacterDatabaseTransaction dbTrans = nullptr);
+        void RemoveRespawnTime(RespawnVector& respawnData, bool doRespawn = false, CharacterDatabaseTransaction dbTrans = nullptr);
+        void RemoveRespawnTime(SpawnObjectTypeMask types = SPAWN_TYPEMASK_ALL, uint32 zoneId = 0, bool doRespawn = false, CharacterDatabaseTransaction dbTrans = nullptr)
         {
             RespawnVector v;
             GetRespawnInfo(v, types, zoneId);
             if (!v.empty())
                 RemoveRespawnTime(v, doRespawn, dbTrans);
         }
-        void RemoveRespawnTime(SpawnObjectType type, ObjectGuid::LowType spawnId, bool doRespawn = false, SQLTransaction dbTrans = nullptr)
+        void RemoveRespawnTime(SpawnObjectType type, ObjectGuid::LowType spawnId, bool doRespawn = false, CharacterDatabaseTransaction dbTrans = nullptr)
         {
             if (RespawnInfo* info = GetRespawnInfo(type, spawnId))
                 RemoveRespawnTime(info, doRespawn, dbTrans);
