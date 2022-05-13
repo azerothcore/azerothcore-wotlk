@@ -91,7 +91,9 @@ struct npc_eye_of_acherus : public ScriptedAI
             {
             case EVENT_ANNOUNCE_LAUNCH_TO_DESTINATION:
                 if (Unit* owner = me->GetCharmerOrOwner())
+                {
                     Talk(SAY_LAUNCH_TOWARDS_DESTINATION, owner);
+                }
                 _events.ScheduleEvent(EVENT_UNROOT, 1s + 200ms);
                 break;
             case EVENT_UNROOT:
@@ -106,23 +108,28 @@ struct npc_eye_of_acherus : public ScriptedAI
                 const Position EYE_DESTINATION_3 = { 1957.4f,   -5844.1f,   273.867f, 0.0f };
                 const Position EYE_DESTINATION_4 = { 1758.01f,  -5876.79f,  166.867f, 0.0f };
 
-                    Movement::MoveSplineInit init(me);
-                    init.SetFly();
-                    if (Unit* owner = me->GetCharmerOrOwner())
-                        init.SetVelocity(owner->GetSpeed(MOVE_RUN));
+                Movement::MoveSplineInit init(me);
+                init.SetFly();
+                if (Unit* owner = me->GetCharmerOrOwner())
+                {
+                    init.SetVelocity(owner->GetSpeed(MOVE_RUN));
+                }
 
                 me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_0, EYE_DESTINATION_1);
                 me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_1, EYE_DESTINATION_2);
                 me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_2, EYE_DESTINATION_3);
                 me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_3, EYE_DESTINATION_4);
+                _events.ScheduleEvent(EVENT_GRANT_CONTROL, 24s + 500ms);
                 break;
             }
             case EVENT_GRANT_CONTROL:
+                if (Unit* owner = me->GetCharmerOrOwner())
+                {
+                    Talk(SAY_EYE_UNDER_CONTROL, owner);
+                }
                 me->RemoveAurasDueToSpell(SPELL_ROOT_SELF);
                 DoCastSelf(SPELL_EYE_OF_ACHERUS_FLIGHT);
                 me->RemoveAurasDueToSpell(SPELL_EYE_OF_ACHERUS_FLIGHT_BOOST);
-                if (Unit* owner = me->GetCharmerOrOwner())
-                    Talk(SAY_EYE_UNDER_CONTROL, owner);
                 break;
             default:
                 break;
@@ -139,7 +146,6 @@ struct npc_eye_of_acherus : public ScriptedAI
         {
         case POINT_NEW_AVALON:
             DoCastSelf(SPELL_ROOT_SELF);
-            _events.ScheduleEvent(EVENT_GRANT_CONTROL, 2s + 500ms);
             break;
         default:
             break;
