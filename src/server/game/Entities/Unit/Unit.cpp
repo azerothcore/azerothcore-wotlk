@@ -5730,10 +5730,12 @@ DynamicObject* Unit::GetDynObject(uint32 spellId)
     return nullptr;
 }
 
-void Unit::RemoveDynObject(uint32 spellId)
+bool Unit::RemoveDynObject(uint32 spellId)
 {
     if (m_dynObj.empty())
-        return;
+        return false;
+
+    bool result = false;
     for (DynObjectList::iterator i = m_dynObj.begin(); i != m_dynObj.end();)
     {
         DynamicObject* dynObj = *i;
@@ -5741,10 +5743,13 @@ void Unit::RemoveDynObject(uint32 spellId)
         {
             dynObj->Remove();
             i = m_dynObj.begin();
+            result = true;
         }
         else
             ++i;
     }
+
+    return result;
 }
 
 void Unit::RemoveAllDynObjects()

@@ -27,7 +27,7 @@
 #include "World.h"
 
 DynamicObject::DynamicObject(bool isWorldObject) : WorldObject(isWorldObject), MovableMapObject(),
-    _aura(nullptr), _removedAura(nullptr), _caster(nullptr), _duration(0), _isViewpoint(false)
+    _aura(nullptr), _removedAura(nullptr), _caster(nullptr), _duration(0), _isViewpoint(false), _updateViewerVisibilityTimer(0)
 {
     m_objectType |= TYPEMASK_DYNAMICOBJECT;
     m_objectTypeId = TYPEID_DYNAMICOBJECT;
@@ -168,7 +168,22 @@ void DynamicObject::Update(uint32 p_time)
     if (expired)
         Remove();
     else
+    {
+        if (_updateViewerVisibilityTimer)
+        {
+            if (_updateViewerVisibilityTimer <= p_time)
+            {
+                _updateViewerVisibilityTimer = 0;
+
+                if (Player* playerCaster = _caster->ToPlayer())
+                    playerCaster->UpdateVisibilityForPlayer();
+            }
+            else
+                _updateViewerVisibilityTimer -= p_time;
+        }
+
         sScriptMgr->OnDynamicObjectUpdate(this, p_time);
+    }
 }
 
 void DynamicObject::Remove()
@@ -217,7 +232,7 @@ void DynamicObject::RemoveAura()
         _removedAura->_Remove(AURA_REMOVE_BY_DEFAULT);
 }
 
-void DynamicObject::SetCasterViewpoint()
+void DynamicObject::SetCasterViewpoint(bool updateViewerVisibility)
 {
     if (Player* caster = _caster->ToPlayer())
     {
@@ -231,6 +246,8 @@ void DynamicObject::SetCasterViewpoint()
         caster->SetViewpoint(this, true);
         _isViewpoint = true;
     }
+
+    _updateViewerVisibilityTimer = updateViewerVisibility ? 100 : 0;
 }
 
 void DynamicObject::RemoveCasterViewpoint()
