@@ -60,6 +60,8 @@ public:
     [[nodiscard]] float GetRadius() const { return GetFloatValue(DYNAMICOBJECT_RADIUS); }
     [[nodiscard]] bool IsViewpoint() const { return _isViewpoint; }
 
+    ObjectGuid const& GetOldFarsightGUID() const { return _oldFarsightGUID; }
+
 protected:
     Aura* _aura;
     Aura* _removedAura;

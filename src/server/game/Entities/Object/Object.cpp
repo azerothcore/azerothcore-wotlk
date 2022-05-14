@@ -65,7 +65,7 @@ constexpr float VisibilityDistances[AsUnderlyingType(VisibilityDistanceType::Max
     VISIBILITY_DISTANCE_SMALL,
     VISIBILITY_DISTANCE_LARGE,
     VISIBILITY_DISTANCE_GIGANTIC,
-    MAX_VISIBILITY_DISTANCE
+    VISIBILITY_DISTANCE_INFINITE
 };
 
 Object::Object() : m_PackGUID(sizeof(uint64) + 1)
@@ -1643,7 +1643,7 @@ float WorldObject::GetVisibilityRange() const
 {
     if (IsVisibilityOverridden() && GetTypeId() == TYPEID_UNIT)
     {
-        return MAX_VISIBILITY_DISTANCE;
+        return *m_visibilityDistanceOverride;
     }
     else if (GetTypeId() == TYPEID_GAMEOBJECT)
     {
@@ -1654,7 +1654,7 @@ float WorldObject::GetVisibilityRange() const
             }
             else if (IsVisibilityOverridden())
             {
-                return MAX_VISIBILITY_DISTANCE;
+                return *m_visibilityDistanceOverride;
             }
             else
             {
@@ -1676,7 +1676,7 @@ float WorldObject::GetSightRange(WorldObject const* target) const
             {
                 if (target->IsVisibilityOverridden() && target->GetTypeId() == TYPEID_UNIT)
                 {
-                    return MAX_VISIBILITY_DISTANCE;
+                    return *target->m_visibilityDistanceOverride;
                 }
                 else if (target->GetTypeId() == TYPEID_GAMEOBJECT)
                 {
@@ -1686,7 +1686,7 @@ float WorldObject::GetSightRange(WorldObject const* target) const
                     }
                     else if (target->IsVisibilityOverridden())
                     {
-                        return MAX_VISIBILITY_DISTANCE;
+                        return *target->m_visibilityDistanceOverride;
                     }
                     else if (ToPlayer()->GetCinematicMgr()->IsOnCinematic())
                     {
