@@ -4325,7 +4325,7 @@ void Spell::EffectActivateObject(SpellEffIndex effIndex)
             uint32 artKitIndex = uint32(action) - uint32(GameObjectActions::UseArtKit0);
 
             uint32 artKitValue = 0;
-            if (templateAddon != nullptr)
+            if (templateAddon)
                 artKitValue = templateAddon->artKits[artKitIndex];
 
             if (artKitValue == 0)

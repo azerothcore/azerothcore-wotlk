@@ -21,7 +21,7 @@ CREATE TABLE `gameobjectartkit_dbc`
 ) ENGINE=MYISAM DEFAULT CHARSET=utf8mb4;
 
 -- Note: All of these should be targetable by spells 46904 and 46903, but conditions are only set for Stormwind (damn Horde fanatics)
-UPDATE gameobject_template_addon SET artkit0 = 121, artkit1 = 122 WHERE entry IN (
+UPDATE `gameobject_template_addon` SET `artkit0` = 121, `artkit1` = 122 WHERE `entry` IN (
 	188352, -- Flame of Shattrath
 	188129, -- Flame of Silvermoon
 	188128, -- Flame of the Exodar
