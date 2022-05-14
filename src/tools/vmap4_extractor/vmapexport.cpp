@@ -163,7 +163,7 @@ bool ExtractSingleWmo(std::string& fname)
 
             string s = groupFileName;
             WMOGroup fgroup(s);
-            if (!fgroup.open())
+            if (!fgroup.open(&froot))
             {
                 printf("Could not open all Group file for: %s\n", plain_name);
                 file_ok = false;
