@@ -2034,18 +2034,13 @@ public:
         SetByteValue(UNIT_FIELD_BYTES_2, 3, form);
     }
 
-    [[nodiscard]] inline bool IsInFeralForm() const
+    [[nodiscard]] bool IsInFeralForm() const
     {
         ShapeshiftForm form = GetShapeshiftForm();
         return form == FORM_CAT || form == FORM_BEAR || form == FORM_DIREBEAR || form == FORM_GHOSTWOLF; // Xinef: added shamans Ghost Wolf, should behave exactly like druid forms
     }
 
-    [[nodiscard]] inline bool IsInDisallowedMountForm() const
-    {
-        ShapeshiftForm form = GetShapeshiftForm();
-        return form != FORM_NONE && form != FORM_BATTLESTANCE && form != FORM_BERSERKERSTANCE && form != FORM_DEFENSIVESTANCE &&
-               form != FORM_SHADOW && form != FORM_STEALTH && form != FORM_UNDEAD;
-    }
+    [[nodiscard]] bool IsInDisallowedMountForm() const;
 
     float m_modMeleeHitChance;
     float m_modRangedHitChance;
@@ -2128,7 +2123,7 @@ public:
     void AddInterruptMask(uint32 mask) { m_interruptMask |= mask; }
     void UpdateInterruptMask();
 
-    uint32 GetDisplayId() { return GetUInt32Value(UNIT_FIELD_DISPLAYID); }
+    [[nodiscard]] uint32 GetDisplayId() const { return GetUInt32Value(UNIT_FIELD_DISPLAYID); }
     virtual void SetDisplayId(uint32 modelId);
     [[nodiscard]] uint32 GetNativeDisplayId() const { return GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID); }
     void RestoreDisplayId();
