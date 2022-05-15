@@ -368,7 +368,7 @@ public:
 
         Unit* SelectUnitCasting()
         {
-          ThreatContainer::StorageType threatlist = me->getThreatMgr().getThreatList();
+          ThreatContainer::StorageType threatlist = me->GetThreatMgr().getThreatList();
           for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
           {
               if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
