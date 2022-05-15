@@ -1125,8 +1125,6 @@ public:
 
     bool SpawnGroupSpawn(uint32 groupId, Map* map, bool ignoreRespawn = false, bool force = false, std::vector<WorldObject*>* spawnedObjects = nullptr);
     bool SpawnGroupDespawn(uint32 groupId, Map* map, bool deleteRespawnTimes = false);
-    void SetSpawnGroupActive(uint32 groupId, bool state) { auto it = _spawnGroupDataStore.find(groupId); if (it != _spawnGroupDataStore.end()) it->second.isActive = state; }
-    bool IsSpawnGroupActive(uint32 groupId) const { auto it = _spawnGroupDataStore.find(groupId); return (it != _spawnGroupDataStore.end()) && it->second.isActive; }
     SpawnGroupTemplateData const* GetDefaultSpawnGroup() const { return &_spawnGroupDataStore.at(0); }
     SpawnGroupTemplateData const* GetLegacySpawnGroup() const { return &_spawnGroupDataStore.at(1); }
     Acore::IteratorPair<SpawnGroupLinkContainer::const_iterator> GetSpawnDataForGroup(uint32 groupId) const { return Acore::Containers::MapEqualRange(_spawnGroupMapStore, groupId); }
@@ -1196,15 +1194,21 @@ public:
             return &itr->second;
         return nullptr;
     }
-    SpawnData const* GetSpawnData(SpawnObjectType type, ObjectGuid::LowType guid)
+    SpawnData const* GetSpawnData(SpawnObjectType type, ObjectGuid::LowType spawnId) const
     {
-        if (type == SPAWN_TYPE_CREATURE)
-            return GetCreatureData(guid);
-        else if (type == SPAWN_TYPE_GAMEOBJECT)
-            return GetGameObjectData(guid);
-        else
-                    ASSERT(false, "Invalid spawn object type %u", uint32(type));
-        return nullptr;
+        if (!SpawnData::TypeHasData(type))
+            return nullptr;
+        switch (type)
+        {
+            case SPAWN_TYPE_CREATURE:
+                return GetCreatureData(spawnId);
+            case SPAWN_TYPE_GAMEOBJECT:
+                return reinterpret_cast<const SpawnData *>(GetGameObjectData(
+                        spawnId));
+            default:
+                ASSERT(false, "Invalid spawn object type %u", uint32(type));
+                return nullptr;
+        }
     }
     void OnDeleteSpawnData(SpawnData const* data);
     [[nodiscard]] CreatureDataContainer const& GetAllCreatureData() const { return _creatureDataStore; }
@@ -1224,12 +1228,12 @@ public:
         return itr->second;
     }
 
-    [[nodiscard]] GameObjectDataContainer const& GetAllGOData() const { return _gameObjectDataStore; }
-    [[nodiscard]] GameObjectData const* GetGameObjectData(ObjectGuid::LowType spawnId) const
+    GameObjectDataContainer const& GetAllGameObjectData() const { return _gameObjectDataStore; }
+    GameObjectData const* GetGameObjectData(ObjectGuid::LowType spawnId) const
     {
         GameObjectDataContainer::const_iterator itr = _gameObjectDataStore.find(spawnId);
         if (itr == _gameObjectDataStore.end()) return nullptr;
-            return &itr->second;
+        return &itr->second;
     }
     GameObjectData& NewOrExistGameObjectData(ObjectGuid::LowType guid) { return _gameObjectDataStore[guid]; }
     void DeleteGameObjectData(ObjectGuid::LowType guid);
@@ -1306,9 +1310,6 @@ public:
         return &itr->second;
     }
     QuestGreeting const* GetQuestGreeting(TypeID type, uint32 id) const;
-
-    GameObjectData& NewGOData(ObjectGuid::LowType guid) { return _gameObjectDataStore[guid]; }
-    void DeleteGOData(ObjectGuid::LowType guid);
 
     [[nodiscard]] AcoreString const* GetAcoreString(uint32 entry) const
     {
