@@ -359,7 +359,7 @@ public:
                     return 0;
             }
         }
-        
+
         void PullCathedral() // CallForHelp will ignore any npcs without LOS
         {
             std::list<Creature*> creatureList;
