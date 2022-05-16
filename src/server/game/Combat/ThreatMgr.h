@@ -233,7 +233,7 @@ public:
     // Reset all aggro without modifying the threadlist.
     void resetAllAggro();
 
-    // -- compatibility layer for combat rewrite (PR #19930)
+    // -- compatibility layer for combat rewrite
     void ResetAllThreat() { resetAllAggro(); }
 
     // Reset all aggro of unit in threadlist satisfying the predicate.
