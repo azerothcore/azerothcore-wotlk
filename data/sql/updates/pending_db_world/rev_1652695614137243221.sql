@@ -6,3 +6,7 @@ DELETE FROM `conditions` WHERE `SourceEntry`=12924;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES 
 (19, 0, 12924, 0, 0, 8, 0, 12956, 0, 0, 0, 0, 0, '', 'Forging an Alliance - Requires quest rewarded'),
 (19, 0, 12924, 0, 0, 8, 0, 12915, 0, 0, 0, 0, 0, '', 'Forging an Alliance - Requires quest rewarded');
+
+
+
+
