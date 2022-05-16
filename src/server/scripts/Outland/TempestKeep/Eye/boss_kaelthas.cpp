@@ -373,8 +373,6 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-                return;
-
             events2.Update(diff);
             switch (events2.ExecuteEvent())
             {

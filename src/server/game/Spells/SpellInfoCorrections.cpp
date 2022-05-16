@@ -4257,6 +4257,19 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
     });
 
+    // Everlasting Affliction
+    ApplySpellFix({ 47422 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->SchoolMask = SPELL_SCHOOL_MASK_SHADOW;
+    });
+
+    // Flametongue Weapon (Passive) (Rank 6)
+    ApplySpellFix({ 16312 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;
+        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21);
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
