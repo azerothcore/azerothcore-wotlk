@@ -341,7 +341,7 @@ public:
     void LoadDBVersion() override;
     [[nodiscard]] char const* GetDBVersion() const override { return m_DBVersion.c_str(); }
 #ifdef MOD_PLAYERBOTS
-    [[nodiscard]] char const* GetPlayerbotsDBRevision() const { return m_PlayerbotsDBRevision.c_str(); }
+    [[nodiscard]] char const* GetPlayerbotsDBRevision() const override { return m_PlayerbotsDBRevision.c_str(); }
 #endif
     void LoadAutobroadcasts() override;
 
