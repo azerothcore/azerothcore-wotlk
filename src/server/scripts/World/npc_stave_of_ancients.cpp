@@ -358,7 +358,7 @@ public:
                     events.RepeatEvent(urand(3000, 6000));
                     break;
                 case EVENT_RANGE_CHECK:
-                    if (!me->GetVictim()->IsWithinDist2d(me, 60.0f))
+                    if (!me->GetVictim() || !me->GetVictim()->IsWithinDist2d(me, 60.0f))
                     {
                         EnterEvadeMode();
                     }
