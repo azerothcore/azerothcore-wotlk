@@ -82,18 +82,31 @@ public:
 
     struct boss_thekalAI : public BossAI
     {
-        boss_thekalAI(Creature* creature) : BossAI(creature, DATA_THEKAL) { }
+        boss_thekalAI(Creature* creature) : BossAI(creature, DATA_THEKAL)
+        {
+            Initialize();
+        }
 
         bool Enraged;
         bool WasDead;
+
+        void Initialize()
+        {
+            Enraged = false;
+            WasDead = false;
+        }
 
         void Reset() override
         {
             if (events.IsInPhase(PHASE_TWO))
                 me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, false); // hack
             _Reset();
-            Enraged = false;
-            WasDead = false;
+            Initialize();
+            me->SetObjectScale(1.0f);
+            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->SetReactState(REACT_AGGRESSIVE);
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -109,6 +122,7 @@ public:
             events.ScheduleEvent(EVENT_SILENCE, 9000, 0, PHASE_ONE);          // Phase 1
             events.ScheduleEvent(EVENT_CHECK_TIMER, 10000, 0, PHASE_ONE);     // Phase 1
             events.ScheduleEvent(EVENT_RESURRECT_TIMER, 10000, 0, PHASE_ONE); // Phase 1
+            events.SetPhase(PHASE_ONE);
             Talk(SAY_AGGRO);
         }
 
@@ -117,9 +131,23 @@ public:
             instance->SetBossState(DATA_THEKAL, NOT_STARTED);
         }
 
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
+        {
+            if ((events.IsInPhase(PHASE_ONE)) && !WasDead && (me->HealthBelowPctDamaged(5, damage) || (damage >= me->GetHealth())))
+            {
+                damage = 0;
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->SetReactState(REACT_PASSIVE);
+                me->SetStandState(UNIT_STAND_STATE_SLEEP);
+                me->AttackStop();
+                instance->SetBossState(DATA_THEKAL, SPECIAL);
+                WasDead = true;
+            }
+        }
+
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim())
+            if (!UpdateVictim() && instance->GetBossState(DATA_THEKAL) != SPECIAL)
                 return;
 
             events.Update(diff);
@@ -146,6 +174,7 @@ public:
                             DoCast(me, SPELL_TIGER_FORM); // SPELL_AURA_TRANSFORM
                             me->SetObjectScale(2.00f);
                             me->SetStandState(UNIT_STAND_STATE_STAND);
+                            me->SetReactState(REACT_AGGRESSIVE);
                             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                             /*
                             const CreatureTemplate* cinfo = me->GetCreatureTemplate();
@@ -231,18 +260,6 @@ public:
 
                 if (me->IsFullHealth() && WasDead)
                     WasDead = false;
-
-                if ((events.IsInPhase(PHASE_ONE)) && !WasDead && !HealthAbovePct(5))
-                {
-                    me->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
-                    me->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
-                    me->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
-                    me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    me->SetStandState(UNIT_STAND_STATE_SLEEP);
-                    me->AttackStop();
-                    instance->SetBossState(DATA_THEKAL, SPECIAL);
-                    WasDead = true;
-                }
             }
             DoMeleeAttackIfReady();
         }
