@@ -1,3 +1,4 @@
+-- DB update 2022_05_12_00 -> 2022_05_16_00
 -- fixed quest 12924 spell area
 UPDATE `spell_area` SET `quest_start` = 12956 WHERE `spell` = 55858;
 
