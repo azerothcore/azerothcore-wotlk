@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef ACORE_GAMEOBJECTAIFACTORY_H
 #define ACORE_GAMEOBJECTAIFACTORY_H
 
