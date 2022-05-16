@@ -44,7 +44,7 @@ struct npc_partygoer_pather : public ScriptedAI
         _events.ScheduleEvent(EVENT_RANDOM_ACTION_PATHER, urand(11000, 14000));
     }
 
-    void PathEndReached(uint32 pathId) override
+    void PathEndReached(uint32 /*pathId*/) override
     {
         ++_path;
         if (_path > 594444)
