@@ -2257,9 +2257,9 @@ LiquidData const Map::GetLiquidData(uint32 phaseMask, float x, float y, float z,
         // Get position delta
         if (delta > collisionHeight)
             liquidData.Status = LIQUID_MAP_UNDER_WATER;
-        if (delta > 0.0f)
+        else if (delta > 0.0f)
             liquidData.Status = LIQUID_MAP_IN_WATER;
-        if (delta > -0.1f)
+        else if (delta > -0.1f)
             liquidData.Status = LIQUID_MAP_WATER_WALK;
         else
             liquidData.Status = LIQUID_MAP_ABOVE_WATER;
@@ -2440,6 +2440,14 @@ float Map::GetWaterLevel(float x, float y) const
 
 bool Map::isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, LineOfSightChecks checks, VMAP::ModelIgnoreFlags ignoreFlags) const
 {
+    if (!sWorld->getBoolConfig(CONFIG_VMAP_BLIZZLIKE_PVP_LOS))
+    {
+        if (IsBattlegroundOrArena())
+        {
+            ignoreFlags = VMAP::ModelIgnoreFlags::Nothing;
+        }
+    }
+
     if ((checks & LINEOFSIGHT_CHECK_VMAP) && !VMAP::VMapFactory::createOrGetVMapMgr()->isInLineOfSight(GetId(), x1, y1, z1, x2, y2, z2, ignoreFlags))
     {
         return false;
