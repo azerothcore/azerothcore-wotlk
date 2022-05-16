@@ -930,7 +930,7 @@ public:
             ScriptedAI::AttackStart(who);
             if (!targetGUID)
             {
-                me->getThreatMgr().resetAllAggro();
+                me->getThreatMgr().ResetAllThreat();
                 me->AddThreat(who, 1000000.0f);
                 targetGUID = who->GetGUID();
             }
