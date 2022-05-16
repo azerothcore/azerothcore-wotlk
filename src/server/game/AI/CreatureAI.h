@@ -218,7 +218,7 @@ private:
     bool m_MoveInLineOfSight_locked;
 };
 
-enum Permitions
+enum Permitions : int32
 {
     PERMIT_BASE_NO                 = -1,
     PERMIT_BASE_IDLE               = 1,
