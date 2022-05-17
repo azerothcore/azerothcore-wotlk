@@ -52,6 +52,7 @@ enum Spells
     SPELL_MANA_DETONATION_DAMAGE            = 27820,
     SPELL_FROST_BLAST                       = 27808,
     SPELL_CHAINS_OF_KELTHUZAD               = 28410, // 28408 script effect
+    SPELL_CHAINS_OF_KELTHUZAD_SCALE         = 28409,
     SPELL_BERSERK                           = 28498,
     SPELL_KELTHUZAD_CHANNEL                 = 29423,
 
@@ -743,10 +744,33 @@ public:
     }
 };
 
+// 28410 - Chains of Kel'Thuzad
+class spell_chains_of_kelthuzad : public AuraScript
+{
+    PrepareAuraScript(spell_chains_of_kelthuzad);
+
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo({ SPELL_CHAINS_OF_KELTHUZAD_SCALE });
+    }
+
+    void HandleApply(AuraEffect const* /*eff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* target = GetTarget();
+        target->CastSpell(target, SPELL_CHAINS_OF_KELTHUZAD_SCALE, true);
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_chains_of_kelthuzad::HandleApply, EFFECT_0, SPELL_AURA_AOE_CHARM, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_boss_kelthuzad()
 {
     new boss_kelthuzad();
     new boss_kelthuzad_minion();
     new spell_kelthuzad_frost_blast();
     new spell_kelthuzad_detonate_mana();
+    RegisterSpellScript(spell_chains_of_kelthuzad);
 }
