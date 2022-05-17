@@ -170,7 +170,7 @@ public:
 
                 if (Creature* creatureCaster = caster->ToCreature())
                 {
-                    creatureCaster->getThreatMgr().resetAllAggro();
+                    creatureCaster->getThreatMgr().ResetAllThreat();
                     creatureCaster->getThreatMgr().addThreat(target, 1);
                     creatureCaster->AI()->AttackStart(target); // Attack the target which caster will teleport to.
                 }

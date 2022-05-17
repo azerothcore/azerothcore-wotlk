@@ -1158,7 +1158,7 @@ public:
                         }
                     }
                 _playerAttack = true;
-                me->getThreatMgr().resetAllAggro();
+                me->getThreatMgr().ResetAllThreat();
                 me->CallForHelp(40.0f);
                 AttackStart(who);
             }
