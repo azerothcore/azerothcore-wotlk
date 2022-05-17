@@ -38,6 +38,16 @@ void ScriptMgr::OnCreatureRemoveWorld(Creature* creature)
     });
 }
 
+void ScriptMgr::OnCreatureSaveToDB(Creature* creature)
+{
+    ASSERT(creature);
+
+    ExecuteScript<AllCreatureScript>([&](AllCreatureScript* script)
+    {
+        script->OnCreatureSaveToDB(creature);
+    });
+}
+
 void ScriptMgr::Creature_SelectLevel(const CreatureTemplate* cinfo, Creature* creature)
 {
     ExecuteScript<AllCreatureScript>([&](AllCreatureScript* script)

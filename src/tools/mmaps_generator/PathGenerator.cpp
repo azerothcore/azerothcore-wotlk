@@ -20,6 +20,7 @@
 #include "Timer.h"
 #include "DBCFileLoader.h"
 #include "PathCommon.h"
+#include "Util.h"
 #include <boost/filesystem.hpp>
 #include <unordered_map>
 
@@ -56,8 +57,7 @@ bool checkDirectories(bool debugOutput)
     dirFiles.clear();
     if (getDirContents(dirFiles, "mmaps") == LISTFILE_DIRECTORY_NOT_FOUND)
     {
-        printf("'mmaps' directory does not exist\n");
-        return false;
+        return boost::filesystem::create_directory("mmaps");
     }
 
     dirFiles.clear();
@@ -329,7 +329,7 @@ int main(int argc, char** argv)
     }
 
     MapBuilder builder(maxAngle, maxAngleNotSteep, skipLiquid, skipContinents, skipJunkMaps,
-                       skipBattlegrounds, debugOutput, bigBaseUnit, mapnum, offMeshInputPath);
+                       skipBattlegrounds, debugOutput, bigBaseUnit, mapnum, offMeshInputPath, threads);
 
     uint32 start = getMSTime();
     if (file)
@@ -337,11 +337,11 @@ int main(int argc, char** argv)
     else if (tileX > -1 && tileY > -1 && mapnum >= 0)
         builder.buildSingleTile(mapnum, tileX, tileY);
     else if (mapnum >= 0)
-        builder.buildMap(uint32(mapnum));
+        builder.buildMaps(uint32(mapnum));
     else
-        builder.buildAllMaps(threads);
+        builder.buildMaps({});
 
     if (!silent)
-        printf("Finished. MMAPS were built in %u ms!\n", GetMSTimeDiffToNow(start));
+        printf("Finished. MMAPS were built in %s\n", secsToTimeString(GetMSTimeDiffToNow(start) / 1000).c_str());
     return 0;
 }

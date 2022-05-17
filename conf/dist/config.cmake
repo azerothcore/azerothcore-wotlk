@@ -62,7 +62,6 @@ option(USE_COREPCH         "Use precompiled headers when compiling servers"     
 option(WITH_WARNINGS       "Show all warnings during compile"                            0)
 option(WITH_COREDEBUG      "Include additional debug-code in core"                       0)
 option(WITH_PERFTOOLS      "Enable compilation with gperftools libraries included"       0)
-option(WITH_MESHEXTRACTOR  "Build meshextractor (alpha)"                                 0)
 option(WITHOUT_GIT         "Disable the GIT testing routines"                            0)
 option(ENABLE_VMAP_CHECKS  "Enable Checks relative to DisableMgr system on vmap"         1)
 option(WITH_DYNAMIC_LINKING "Enable dynamic library linking."                            0)

@@ -330,7 +330,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if ((!UpdateVictim() && !(events.GetPhaseMask() & PHASE_INTRO_MASK)) || !CheckInRoom())
+            if (!UpdateVictim() && !(events.GetPhaseMask() & PHASE_INTRO_MASK))
                 return;
 
             events.Update(diff);
@@ -930,7 +930,7 @@ public:
             ScriptedAI::AttackStart(who);
             if (!targetGUID)
             {
-                me->getThreatMgr().resetAllAggro();
+                me->getThreatMgr().ResetAllThreat();
                 me->AddThreat(who, 1000000.0f);
                 targetGUID = who->GetGUID();
             }

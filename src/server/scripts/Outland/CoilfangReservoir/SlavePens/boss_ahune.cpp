@@ -28,12 +28,16 @@
 #define QUEST_SUMMON_AHUNE      11691
 #define ITEM_MAGMA_TOTEM        34953
 #define AHUNE_DEFAULT_MODEL     23344
-#define TEXT_RETREAT            "Ahune Retreats. His defenses diminish."
-#define TEXT_RESURFACE          "Ahune will soon resurface."
 
 const Position AhuneSummonPos = {-97.3473f, -233.139f, -1.27587f, M_PI / 2};
 const Position TotemPos[3] = { {-115.141f, -143.317f, -2.09467f, 4.92772f}, {-120.178f, -144.398f, -2.23786f, 4.92379f}, {-125.277f, -145.463f, -1.95209f, 4.97877f} };
 const Position MinionSummonPos = {-97.154404f, -204.382675f, -1.19f, M_PI / 2};
+
+enum Text
+{
+    EMOTE_RETREAT               = 0,
+    EMOTE_RESURFACE             = 1,
+};
 
 enum EventSpells
 {
@@ -192,7 +196,7 @@ public:
                     events.RescheduleEvent(EVENT_SUBMERGE, 10000);
                     break;
                 case EVENT_SUBMERGE:
-                    me->TextEmote(TEXT_RETREAT, nullptr, true);
+                    Talk(EMOTE_RETREAT);
                     me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->CastSpell(me, SPELL_SUBMERGE_0, true);
                     me->CastSpell(me, SPELL_SELF_STUN, true);
@@ -205,7 +209,7 @@ public:
                     events.RescheduleEvent(EVENT_EMERGE_WARNING, 20000);
                     break;
                 case EVENT_EMERGE_WARNING:
-                    me->TextEmote(TEXT_RESURFACE, nullptr, true);
+                    Talk(EMOTE_RESURFACE);
                     break;
                 case EVENT_COMBAT_EMERGE:
                     me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);

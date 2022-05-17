@@ -175,6 +175,7 @@ enum WorldBoolConfigs
     CONFIG_ALLOW_JOIN_BG_AND_LFG,
     CONFIG_MISS_CHANCE_MULTIPLIER_ONLY_FOR_PLAYERS,
     CONFIG_LEAVE_GROUP_ON_LOGOUT,
+    CONFIG_VMAP_BLIZZLIKE_PVP_LOS,
     BOOL_CONFIG_VALUE_COUNT
 };
 
@@ -583,11 +584,7 @@ public:
     virtual void UpdateRealmCharCount(uint32 accid) = 0;
     [[nodiscard]] virtual LocaleConstant GetAvailableDbcLocale(LocaleConstant locale) const = 0;
     virtual void LoadDBVersion() = 0;
-    virtual void LoadDBRevision() = 0;
     [[nodiscard]] virtual char const* GetDBVersion() const = 0;
-    [[nodiscard]] virtual char const* GetWorldDBRevision() const = 0;
-    [[nodiscard]] virtual char const* GetCharacterDBRevision() const = 0;
-    [[nodiscard]] virtual char const* GetAuthDBRevision() const = 0;
     virtual void LoadAutobroadcasts() = 0;
     virtual void UpdateAreaDependentAuras() = 0;
     [[nodiscard]] virtual uint32 GetCleaningFlags() const = 0;

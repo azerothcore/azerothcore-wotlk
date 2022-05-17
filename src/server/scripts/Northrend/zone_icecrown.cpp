@@ -1472,6 +1472,48 @@ public:
     }
 };
 
+enum OnslaughtGryphon
+{
+    SPELL_DELIVER_GRYPHON            = 54420,
+    SPELL_ONSLAUGHT_GRYPHON          = 49641,
+
+    NPC_CAPTURED_ONSLAUGHT_GRYPHON   = 29415,
+
+    SEAT_PLAYER                      = 0
+};
+
+class spell_deliver_gryphon : public SpellScript
+{
+    PrepareSpellScript(spell_deliver_gryphon);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DELIVER_GRYPHON, SPELL_ONSLAUGHT_GRYPHON });
+    }
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            if (Vehicle* gryphon = caster->GetVehicleKit())
+            {
+                if (Unit* player = gryphon->GetPassenger(SEAT_PLAYER))
+                {
+                    player->ExitVehicle();
+                    player->RemoveAurasDueToSpell(VEHICLE_SPELL_PARACHUTE);
+                    player->RemoveAurasDueToSpell(SPELL_ONSLAUGHT_GRYPHON);
+                    player->SummonCreature(NPC_CAPTURED_ONSLAUGHT_GRYPHON, 7434.7f, 4213.3f, 316.52f, 3.88f, TEMPSUMMON_TIMED_DESPAWN, 1 * MINUTE * IN_MILLISECONDS);
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_deliver_gryphon::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 // Theirs
 /*######
 ## npc_guardian_pavilion
@@ -2159,6 +2201,7 @@ void AddSC_icecrown()
     new spell_anti_air_rocket_bomber();
     new npc_infra_green_bomber_generic();
     new spell_onslaught_or_call_bone_gryphon();
+    RegisterSpellScript(spell_deliver_gryphon);
 
     // Theirs
     new npc_guardian_pavilion();

@@ -11033,6 +11033,11 @@ void Player::LeaveBattleground(Battleground* bg)
     // xinef: reset corpse reclaim time
     m_deathExpireTime = GameTime::GetGameTime().count();
 
+    // Remove all dots
+    RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
+    RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
+    RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
+
     // pussywizard: clear movement, because after porting player will move to arena cords
     GetMotionMaster()->MovementExpired();
     StopMoving();

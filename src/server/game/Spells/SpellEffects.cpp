@@ -2728,6 +2728,8 @@ void Spell::EffectAddFarsight(SpellEffIndex effIndex)
 
     dynObj->SetDuration(duration);
     dynObj->SetCasterViewpoint();
+
+    m_caster->ToPlayer()->UpdateVisibilityForPlayer();
 }
 
 void Spell::EffectUntrainTalents(SpellEffIndex /*effIndex*/)
@@ -4868,10 +4870,12 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
             targetGUID = unitTarget->GetGUID();
         }
 
-        if (m_pathFinder)
+        float speed = G3D::fuzzyGt(m_spellInfo->Speed, 0.0f) ? m_spellInfo->Speed : SPEED_CHARGE;
+        // Spell is not using explicit target - no generated path
+        if (!m_preGeneratedPath)
         {
-            m_caster->GetMotionMaster()->MoveCharge(m_pathFinder->GetEndPosition().x, m_pathFinder->GetEndPosition().y, m_pathFinder->GetEndPosition().z,
-                42.0f, EVENT_CHARGE, &m_pathFinder->GetPath(), false, 0.f, targetGUID);
+            Position pos = unitTarget->GetFirstCollisionPosition(unitTarget->GetCombatReach(), unitTarget->GetRelativeAngle(m_caster));
+            m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ, speed, EVENT_CHARGE, nullptr, false, 0.0f, targetGUID);
 
             if (m_caster->GetTypeId() == TYPEID_PLAYER)
             {
@@ -4880,10 +4884,7 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
         }
         else
         {
-            Position pos = unitTarget->GetFirstCollisionPosition(unitTarget->GetObjectSize(), unitTarget->GetRelativeAngle(m_caster));
-
-            m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ + Z_OFFSET_FIND_HEIGHT, SPEED_CHARGE, EVENT_CHARGE,
-                nullptr, false, 0.f, targetGUID);
+            m_caster->GetMotionMaster()->MoveCharge(*m_preGeneratedPath, speed, targetGUID);
 
             if (m_caster->GetTypeId() == TYPEID_PLAYER)
             {
