@@ -257,7 +257,7 @@ public:
         boss_freyaAI(Creature* pCreature) : ScriptedAI(pCreature), summons(me)
         {
             m_pInstance = pCreature->GetInstanceScript();
-            if ((_encounterFinished = (!me->IsAlive())))
+            if (!me->IsAlive())
                 if (m_pInstance)
                     m_pInstance->SetData(TYPE_FREYA, DONE);
         }
@@ -279,7 +279,7 @@ public:
 
         void Reset() override
         {
-            if (m_pInstance && !_encounterFinished)
+            if (m_pInstance && m_pInstance->GetData(TYPE_FREYA) != DONE)
                 m_pInstance->SetData(TYPE_FREYA, NOT_STARTED);
 
             events.Reset();
@@ -302,6 +302,7 @@ public:
             _waveNumber = urand(1, 3);
             _respawningTrio = false;
             _backToNature = true;
+            _encounterFinished = false;
             _deforestation = 0;
         }
 
@@ -494,7 +495,7 @@ public:
             if( !m_pInstance )
                 return;
 
-            if (m_pInstance && !_encounterFinished)
+            if (m_pInstance->GetData(TYPE_FREYA) != DONE)
                 m_pInstance->SetData(TYPE_FREYA, IN_PROGRESS);
 
             // HARD MODE CHECKS
