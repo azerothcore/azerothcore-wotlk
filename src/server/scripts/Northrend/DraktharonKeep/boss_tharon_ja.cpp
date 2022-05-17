@@ -161,9 +161,7 @@ public:
                     if (me->HealthBelowPct(50))
                     {
                         Talk(SAY_FLESH);
-
                         me->GetThreatMgr().ResetAllThreat();
-
                         me->CastSpell((Unit*)nullptr, SPELL_TURN_FLESH, false);
 
                         events.Reset();
