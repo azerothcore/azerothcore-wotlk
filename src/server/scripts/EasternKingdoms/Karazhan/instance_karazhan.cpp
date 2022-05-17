@@ -393,7 +393,6 @@ public:
         void HandleDummy(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
-
             GetCaster()->GetThreatMgr().ResetAllThreat();
             
             if (Unit* target = GetHitUnit())
