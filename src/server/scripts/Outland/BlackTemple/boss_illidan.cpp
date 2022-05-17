@@ -343,8 +343,7 @@ public:
         {
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
             summons.DespawnEntry(NPC_PARASITIC_SHADOWFIEND);
-            instance->SetBossState(DATA_ILLIDAN_STORMRAGE, DONE);
-            instance->SaveToDB();
+            _JustDied();
         }
 
         void KilledUnit(Unit*  /*victim*/) override
