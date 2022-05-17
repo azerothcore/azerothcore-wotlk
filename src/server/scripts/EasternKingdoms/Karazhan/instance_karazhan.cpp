@@ -394,7 +394,6 @@ public:
         {
             PreventHitDefaultEffect(effIndex);
             GetCaster()->GetThreatMgr().ResetAllThreat();
-            
             if (Unit* target = GetHitUnit())
                 GetCaster()->CastSpell(target, SPELL_BLINK, true);
         }
