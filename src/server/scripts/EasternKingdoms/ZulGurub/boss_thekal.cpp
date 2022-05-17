@@ -34,15 +34,16 @@ enum Says
 
 enum Spells
 {
-    SPELL_MORTALCLEAVE        = 22859, // Phase 1
-    SPELL_SILENCE             = 22666, // Phase 1
-    SPELL_TIGER_FORM          = 24169, // Phase 1
-    SPELL_RESURRECT           = 24173, // Phase 1    // Not used in script.
-    SPELL_FRENZY              = 8269,  // Phase 2
-    SPELL_FORCEPUNCH          = 24189, // Phase 2
-    SPELL_CHARGE              = 24193, // Phase 2
-    SPELL_ENRAGE              = 8269,  // Phase 2
-    SPELL_SUMMONTIGERS        = 24183, // Phase 2
+    SPELL_MORTALCLEAVE        = 22859,
+    SPELL_SILENCE             = 22666,
+    SPELL_TIGER_FORM          = 24169,
+    SPELL_RESURRECT           = 24173,
+    SPELL_FRENZY              = 8269,
+    SPELL_FORCEPUNCH          = 24189,
+    SPELL_CHARGE              = 24193,
+    SPELL_ENRAGE              = 8269,
+    SPELL_SUMMONTIGERS        = 24183,
+
     // Zealot Lor'Khan Spells
     SPELL_SHIELD              = 20545,
     SPELL_BLOODLUST           = 24185,
@@ -58,15 +59,15 @@ enum Spells
 
 enum Events
 {
-    EVENT_MORTALCLEAVE        = 1, // Phase 1
-    EVENT_SILENCE             = 2, // Phase 1
-    EVENT_CHECK_TIMER         = 3, // Phase 1
-    EVENT_RESURRECT_TIMER     = 4, // Phase 1
-    EVENT_FRENZY              = 5, // Phase 2
-    EVENT_FORCEPUNCH          = 6, // Phase 2
-    EVENT_SPELL_CHARGE        = 7, // Phase 2
-    EVENT_ENRAGE              = 8, // Phase 2
-    EVENT_SUMMONTIGERS        = 9  // Phase 2
+    EVENT_MORTALCLEAVE        = 1,
+    EVENT_SILENCE             = 2,
+    EVENT_CHECK_TIMER         = 3,
+    EVENT_RESURRECT_TIMER     = 4,
+    EVENT_FRENZY              = 5,
+    EVENT_FORCEPUNCH          = 6,
+    EVENT_SPELL_CHARGE        = 7,
+    EVENT_ENRAGE              = 8,
+    EVENT_SUMMONTIGERS        = 9
 };
 
 enum Phases
@@ -118,10 +119,10 @@ public:
         void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
-            events.ScheduleEvent(EVENT_MORTALCLEAVE, 4000, 0, PHASE_ONE);     // Phase 1
-            events.ScheduleEvent(EVENT_SILENCE, 9000, 0, PHASE_ONE);          // Phase 1
-            events.ScheduleEvent(EVENT_CHECK_TIMER, 10000, 0, PHASE_ONE);     // Phase 1
-            events.ScheduleEvent(EVENT_RESURRECT_TIMER, 10000, 0, PHASE_ONE); // Phase 1
+            events.ScheduleEvent(EVENT_MORTALCLEAVE, 4000, 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_SILENCE, 9000, 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_CHECK_TIMER, 10000, 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_RESURRECT_TIMER, 10000, 0, PHASE_ONE);
             events.SetPhase(PHASE_ONE);
             Talk(SAY_AGGRO);
         }
@@ -176,12 +177,6 @@ public:
                             me->SetStandState(UNIT_STAND_STATE_STAND);
                             me->SetReactState(REACT_AGGRESSIVE);
                             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                            /*
-                            const CreatureTemplate* cinfo = me->GetCreatureTemplate();
-                            me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, (cinfo->mindmg +((cinfo->mindmg/100) * 40)));
-                            me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, (cinfo->maxdmg +((cinfo->maxdmg/100) * 40)));
-                            me->UpdateDamagePhysical(BASE_ATTACK);
-                            */
                             me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 40.0f, true); // hack
                             DoResetThreat();
                             events.ScheduleEvent(EVENT_FRENZY, 30000, 0, PHASE_TWO);          // Phase 2
