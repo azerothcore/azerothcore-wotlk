@@ -319,6 +319,7 @@ public:
                 Talk(SAY_DEATH);
 
                 damage = 0;
+                me->SetHealth(me->GetMaxHealth());
                 me->SetReactState(REACT_PASSIVE);
                 me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetFaction(FACTION_FRIENDLY);
