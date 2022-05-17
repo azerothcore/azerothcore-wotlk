@@ -1,3 +1,4 @@
+-- DB update 2022_05_17_04 -> 2022_05_17_05
 -- Gossips where already on the database, just not linked to each other
 DELETE FROM `gossip_menu` WHERE `MenuID` IN (5812, 5813, 5814, 5815, 5816);
 INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES 
