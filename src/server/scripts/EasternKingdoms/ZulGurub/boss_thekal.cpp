@@ -179,11 +179,11 @@ public:
                             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                             me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 40.0f, true); // hack
                             DoResetThreat();
-                            events.ScheduleEvent(EVENT_FRENZY, 30000, 0, PHASE_TWO);          // Phase 2
-                            events.ScheduleEvent(EVENT_FORCEPUNCH, 4000, 0, PHASE_TWO);       // Phase 2
-                            events.ScheduleEvent(EVENT_SPELL_CHARGE, 12000, 0, PHASE_TWO);    // Phase 2
-                            events.ScheduleEvent(EVENT_ENRAGE, 32000, 0, PHASE_TWO);          // Phase 2
-                            events.ScheduleEvent(EVENT_SUMMONTIGERS, 25000, 0, PHASE_TWO);    // Phase 2
+                            events.ScheduleEvent(EVENT_FRENZY, 30000, 0, PHASE_TWO);
+                            events.ScheduleEvent(EVENT_FORCEPUNCH, 4000, 0, PHASE_TWO);
+                            events.ScheduleEvent(EVENT_SPELL_CHARGE, 12000, 0, PHASE_TWO);
+                            events.ScheduleEvent(EVENT_ENRAGE, 32000, 0, PHASE_TWO);
+                            events.ScheduleEvent(EVENT_SUMMONTIGERS, 25000, 0, PHASE_TWO);
                             events.SetPhase(PHASE_TWO);
                         }
                         events.ScheduleEvent(EVENT_RESURRECT_TIMER, 10000, 0, PHASE_ONE);
@@ -369,11 +369,12 @@ public:
                 if (instance->GetBossState(DATA_THEKAL) == SPECIAL)
                 {
                     //Resurrect Thekal
-                    if (Unit* pThekal = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_THEKAL)))
+                    if (Creature* pThekal = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_THEKAL)))
                     {
                         pThekal->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                         pThekal->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         pThekal->SetFaction(FACTION_MONSTER);
+                        pThekal->SetReactState(REACT_AGGRESSIVE);
                         pThekal->SetFullHealth();
                     }
                 }
@@ -534,11 +535,12 @@ public:
                 if (instance->GetBossState(DATA_THEKAL) == SPECIAL)
                 {
                     //Resurrect Thekal
-                    if (Unit* pThekal = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_THEKAL)))
+                    if (Creature* pThekal = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_THEKAL)))
                     {
                         pThekal->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                         pThekal->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         pThekal->SetFaction(FACTION_MONSTER);
+                        pThekal->SetReactState(REACT_AGGRESSIVE);
                         pThekal->SetFullHealth();
                     }
                 }

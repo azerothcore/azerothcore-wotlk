@@ -29,7 +29,13 @@ EndScriptData */
 DoorData const doorData[] =
 {
     { GO_FORCEFIELD, DATA_ARLOKK, DOOR_TYPE_ROOM },
-    { 0,             0,           DOOR_TYPE_ROOM } // END
+    { 0,             0,           DOOR_TYPE_ROOM }
+};
+
+MinionData const minionData[] =
+{
+    { NPC_ZEALOT_LORKHAN, NPC_HIGH_PRIEST_THEKAL },
+    { NPC_ZEALOT_ZATH,    NPC_HIGH_PRIEST_THEKAL }
 };
 
 class instance_zulgurub : public InstanceMapScript
@@ -43,10 +49,13 @@ public:
         {
             SetBossNumber(EncounterCount);
             LoadDoorData(doorData);
+            LoadMinionData(minionData);
         }
 
         void OnCreatureCreate(Creature* creature) override
         {
+            InstanceScript::OnCreatureCreate(creature);
+
             switch (creature->GetEntry())
             {
                 case NPC_ZEALOT_LORKHAN:
@@ -75,29 +84,16 @@ public:
 
         void OnGameObjectCreate(GameObject* go) override
         {
+            InstanceScript::OnGameObjectCreate(go);
+
             switch (go->GetEntry())
             {
-                case GO_FORCEFIELD:
-                    AddDoor(go, true);
-                    break;
                 case GO_GONG_OF_BETHEKK:
                     _goGongOfBethekkGUID = go->GetGUID();
                     if (GetBossState(DATA_ARLOKK) == DONE)
                         go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     else
                         go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        void OnGameObjectRemove(GameObject* go) override
-        {
-            switch (go->GetEntry())
-            {
-                case GO_FORCEFIELD:
-                    AddDoor(go, false);
                     break;
                 default:
                     break;
