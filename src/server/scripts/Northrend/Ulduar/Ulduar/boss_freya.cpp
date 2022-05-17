@@ -272,7 +272,6 @@ public:
         uint8 _lumberjacked;
         bool _respawningTrio;
         bool _backToNature;
-        bool _encounterFinished;
         uint8 _deforestation;
 
         ObjectGuid _elderGUID[3];
@@ -302,7 +301,6 @@ public:
             _waveNumber = urand(1, 3);
             _respawningTrio = false;
             _backToNature = true;
-            _encounterFinished = false;
             _deforestation = 0;
         }
 
@@ -316,53 +314,49 @@ public:
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (damage >= me->GetHealth())
+            if (damage >= me->GetHealth() && _instance->GetData(TYPE_FREYA) != DONE)
             {
+                Talk(SAY_DEATH);
+
                 damage = 0;
-                if (!_encounterFinished)
+                me->SetHealth(me->GetMaxHealth());
+                me->SetReactState(REACT_PASSIVE);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetFaction(FACTION_FRIENDLY);
+                me->RemoveAllAuras();
+                me->AttackStop();
+                events.Reset();
+
+                summons.DespawnAll();
+                events.Reset();
+
+                uint8 _elderCount = 0;
+                for (uint8 i = 0; i < 3; ++i)
                 {
-                    _encounterFinished = true;
+                    if (!_elderGUID[i])
+                        continue;
 
-                    Talk(SAY_DEATH);
-                    me->SetHealth(me->GetMaxHealth());
-                    me->SetReactState(REACT_PASSIVE);
-                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    me->SetFaction(FACTION_FRIENDLY);
-                    me->RemoveAllAuras();
-                    me->AttackStop();
-                    events.Reset();
+                    if (Creature* e = ObjectAccessor::GetCreature(*me, _elderGUID[i]))
+                        e->DespawnOrUnsummon();
 
-                    summons.DespawnAll();
-                    events.Reset();
+                    ++_elderCount;
+                }
 
-                    uint8 _elderCount = 0;
-                    for (uint8 i = 0; i < 3; ++i)
-                    {
-                        if (!_elderGUID[i])
-                            continue;
+                uint32 chestId = RAID_MODE(GO_FREYA_CHEST, GO_FREYA_CHEST_HERO);
+                chestId -= 2 * _elderCount; // offset
 
-                        if (Creature* e = ObjectAccessor::GetCreature(*me, _elderGUID[i]))
-                            e->DespawnOrUnsummon();
+                me->DespawnOrUnsummon(5000);
+                if (GameObject* go = me->SummonGameObject(chestId, 2345.61f, -71.20f, 425.104f, 3.0f, 0, 0, 0, 0, 0))
+                {
+                    go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
+                    go->SetLootRecipient(me->GetMap());
+                }
 
-                        ++_elderCount;
-                    }
-
-                    uint32 chestId = RAID_MODE(GO_FREYA_CHEST, GO_FREYA_CHEST_HERO);
-                    chestId -= 2 * _elderCount; // offset
-
-                    me->DespawnOrUnsummon(5000);
-                    if (GameObject* go = me->SummonGameObject(chestId, 2345.61f, -71.20f, 425.104f, 3.0f, 0, 0, 0, 0, 0))
-                    {
-                        go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
-                        go->SetLootRecipient(me->GetMap());
-                    }
-
-                    // Defeat credit
-                    if (m_pInstance)
-                    {
-                        me->CastSpell(me, 65074, true); // credit
-                        m_pInstance->SetData(TYPE_FREYA, DONE);
-                    }
+                // Defeat credit
+                if (m_pInstance)
+                {
+                    me->CastSpell(me, 65074, true); // credit
+                    m_pInstance->SetData(TYPE_FREYA, DONE);
                 }
             }
         }
@@ -550,7 +544,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!_encounterFinished && !UpdateVictim())
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
@@ -647,8 +641,7 @@ public:
                     break;
             }
 
-            if (!_encounterFinished)
-                DoMeleeAttackIfReady();
+            DoMeleeAttackIfReady();
         }
 
         bool CheckEvadeIfOutOfCombatArea() const override
