@@ -407,11 +407,13 @@ void Guardian::InitSummon()
 {
     TempSummon::InitSummon();
 
-    Unit* m_owner = GetOwner();
-    if (m_owner->GetTypeId() == TYPEID_PLAYER
-            && m_owner->GetMinionGUID() == GetGUID()
-            && !m_owner->GetCharmGUID())
-        m_owner->ToPlayer()->CharmSpellInitialize();
+    if (Unit* m_owner = GetOwner())
+    {
+        if (m_owner->GetTypeId() == TYPEID_PLAYER && m_owner->GetMinionGUID() == GetGUID() && !m_owner->GetCharmGUID())
+        {
+            m_owner->ToPlayer()->CharmSpellInitialize();
+        }
+    }
 }
 
 Puppet::Puppet(SummonPropertiesEntry const* properties, ObjectGuid owner) : Minion(properties, owner, false), m_owner(owner) //maybe true?

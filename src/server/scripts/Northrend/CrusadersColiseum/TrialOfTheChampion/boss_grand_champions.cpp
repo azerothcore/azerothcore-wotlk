@@ -296,7 +296,7 @@ public:
                             uint8 rnd = LIST.size() > 1 ? urand(0, LIST.size() - 1) : 0;
                             if( Unit* target = ObjectAccessor::GetUnit(*me, LIST.at(rnd)) )
                             {
-                                me->GetThreatMgr().resetAllAggro();
+                                me->GetThreatMgr().ResetAllThreat();
                                 me->AddThreat(target, 10000.0f);
                                 AttackStart(target);
                                 me->CastSpell(target, SPELL_MINIONS_CHARGE, false);
@@ -749,7 +749,7 @@ public:
                             uint8 rnd = LIST.size() > 1 ? urand(0, LIST.size() - 1) : 0;
                             if( Unit* target = ObjectAccessor::GetUnit(*me, LIST.at(rnd)) )
                             {
-                                me->GetThreatMgr().resetAllAggro();
+                                me->GetThreatMgr().ResetAllThreat();
                                 me->AddThreat(target, 10000.0f);
                                 AttackStart(target);
                                 me->CastSpell(target, SPELL_MINIONS_CHARGE, false);

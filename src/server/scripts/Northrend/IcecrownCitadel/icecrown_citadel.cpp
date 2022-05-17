@@ -1779,7 +1779,8 @@ public:
                 for (ThreatContainer::StorageType::const_iterator iter = target_tl.begin(); iter != target_tl.end(); ++iter)
                     me->GetThreatMgr().addThreat((*iter)->getTarget(), (*iter)->getThreat());
 
-                c->GetThreatMgr().resetAllAggro();
+                c->GetThreatMgr().ResetAllThreat();
+                
                 for (ThreatContainer::StorageType::const_iterator iter = me_tl.begin(); iter != me_tl.end(); ++iter)
                     c->GetThreatMgr().addThreat((*iter)->getTarget(), (*iter)->getThreat());
             }

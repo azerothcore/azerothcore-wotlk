@@ -376,7 +376,7 @@ void ScriptedAI::DoResetThreat()
         return;
     }
 
-    me->GetThreatMgr().resetAllAggro();
+    me->GetThreatMgr().ResetAllThreat();
 }
 
 float ScriptedAI::DoGetThreat(Unit* unit)

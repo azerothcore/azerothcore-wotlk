@@ -191,7 +191,9 @@ public:
             if (switchTimer >= 10000)
             {
                 switchTimer = 0;
-                me->GetThreatMgr().resetAllAggro();
+
+                me->GetThreatMgr().ResetAllThreat();
+                
                 if (Player* player = SelectTargetFromPlayerList(100.0f))
                     me->AddThreat(player, 100000.0f);
             }
