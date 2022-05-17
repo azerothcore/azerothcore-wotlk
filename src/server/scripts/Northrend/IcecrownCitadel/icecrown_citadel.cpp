@@ -1780,7 +1780,6 @@ public:
                     me->GetThreatMgr().addThreat((*iter)->getTarget(), (*iter)->getThreat());
 
                 c->GetThreatMgr().ResetAllThreat();
-                
                 for (ThreatContainer::StorageType::const_iterator iter = me_tl.begin(); iter != me_tl.end(); ++iter)
                     c->GetThreatMgr().addThreat((*iter)->getTarget(), (*iter)->getThreat());
             }
