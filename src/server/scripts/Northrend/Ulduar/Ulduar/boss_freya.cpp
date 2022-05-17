@@ -314,7 +314,7 @@ public:
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (damage >= me->GetHealth() && _instance->GetData(TYPE_FREYA) != DONE)
+            if (damage >= me->GetHealth() && m_pInstance->GetData(TYPE_FREYA) != DONE)
             {
                 Talk(SAY_DEATH);
 
