@@ -257,7 +257,7 @@ public:
         boss_freyaAI(Creature* pCreature) : ScriptedAI(pCreature), summons(me)
         {
             m_pInstance = pCreature->GetInstanceScript();
-            if (!me->IsAlive())
+            if ((_encounterFinished = (!me->IsAlive())))
                 if (m_pInstance)
                     m_pInstance->SetData(TYPE_FREYA, DONE);
         }
@@ -272,13 +272,14 @@ public:
         uint8 _lumberjacked;
         bool _respawningTrio;
         bool _backToNature;
+        bool _encounterFinished;
         uint8 _deforestation;
 
         ObjectGuid _elderGUID[3];
 
         void Reset() override
         {
-            if (m_pInstance && m_pInstance->GetData(TYPE_FREYA) != DONE)
+            if (m_pInstance && !_encounterFinished)
                 m_pInstance->SetData(TYPE_FREYA, NOT_STARTED);
 
             events.Reset();
@@ -316,47 +317,51 @@ public:
         {
             if (damage >= me->GetHealth())
             {
-                Talk(SAY_DEATH);
-
                 damage = 0;
-                me->SetHealth(me->GetMaxHealth());
-                me->SetReactState(REACT_PASSIVE);
-                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                me->SetFaction(FACTION_FRIENDLY);
-                me->RemoveAllAuras();
-                me->AttackStop();
-                events.Reset();
-
-                summons.DespawnAll();
-                events.Reset();
-
-                uint8 _elderCount = 0;
-                for (uint8 i = 0; i < 3; ++i)
+                if (!_encounterFinished)
                 {
-                    if (!_elderGUID[i])
-                        continue;
+                    _encounterFinished = true;
 
-                    if (Creature* e = ObjectAccessor::GetCreature(*me, _elderGUID[i]))
-                        e->DespawnOrUnsummon();
+                    Talk(SAY_DEATH);
+                    me->SetHealth(me->GetMaxHealth());
+                    me->SetReactState(REACT_PASSIVE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetFaction(FACTION_FRIENDLY);
+                    me->RemoveAllAuras();
+                    me->AttackStop();
+                    events.Reset();
 
-                    ++_elderCount;
-                }
+                    summons.DespawnAll();
+                    events.Reset();
 
-                uint32 chestId = RAID_MODE(GO_FREYA_CHEST, GO_FREYA_CHEST_HERO);
-                chestId -= 2 * _elderCount; // offset
+                    uint8 _elderCount = 0;
+                    for (uint8 i = 0; i < 3; ++i)
+                    {
+                        if (!_elderGUID[i])
+                            continue;
 
-                me->DespawnOrUnsummon(5000);
-                if (GameObject* go = me->SummonGameObject(chestId, 2345.61f, -71.20f, 425.104f, 3.0f, 0, 0, 0, 0, 0))
-                {
-                    go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
-                    go->SetLootRecipient(me->GetMap());
-                }
+                        if (Creature* e = ObjectAccessor::GetCreature(*me, _elderGUID[i]))
+                            e->DespawnOrUnsummon();
 
-                // Defeat credit
-                if (m_pInstance)
-                {
-                    me->CastSpell(me, 65074, true); // credit
-                    m_pInstance->SetData(TYPE_FREYA, DONE);
+                        ++_elderCount;
+                    }
+
+                    uint32 chestId = RAID_MODE(GO_FREYA_CHEST, GO_FREYA_CHEST_HERO);
+                    chestId -= 2 * _elderCount; // offset
+
+                    me->DespawnOrUnsummon(5000);
+                    if (GameObject* go = me->SummonGameObject(chestId, 2345.61f, -71.20f, 425.104f, 3.0f, 0, 0, 0, 0, 0))
+                    {
+                        go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
+                        go->SetLootRecipient(me->GetMap());
+                    }
+
+                    // Defeat credit
+                    if (m_pInstance)
+                    {
+                        me->CastSpell(me, 65074, true); // credit
+                        m_pInstance->SetData(TYPE_FREYA, DONE);
+                    }
                 }
             }
         }
@@ -489,7 +494,7 @@ public:
             if( !m_pInstance )
                 return;
 
-            if (m_pInstance->GetData(TYPE_FREYA) != DONE)
+            if (m_pInstance && !_encounterFinished)
                 m_pInstance->SetData(TYPE_FREYA, IN_PROGRESS);
 
             // HARD MODE CHECKS
@@ -544,7 +549,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim())
+            if (!_encounterFinished && !UpdateVictim())
                 return;
 
             events.Update(diff);
@@ -641,7 +646,8 @@ public:
                     break;
             }
 
-            DoMeleeAttackIfReady();
+            if (!_encounterFinished)
+                DoMeleeAttackIfReady();
         }
 
         bool CheckEvadeIfOutOfCombatArea() const override
