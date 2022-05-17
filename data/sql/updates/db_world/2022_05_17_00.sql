@@ -1,3 +1,4 @@
+-- DB update 2022_05_16_01 -> 2022_05_17_00
 -- Add Missing gossip text
 DELETE FROM `gossip_menu` WHERE `MenuID`=7346 AND `TextID`=8760;
 INSERT INTO `gossip_menu` (`MenuID`,`TextID`) VALUES (7346,8760);
