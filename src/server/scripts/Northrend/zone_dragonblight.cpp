@@ -114,7 +114,7 @@ public:
             if (running)
             {
                 if (Player* p = GetPlayer())
-                    if (p->GetPositionZ() < 1.0f && !secondpart)  // Player has jumped into
+                    if (p->GetPositionZ() < 1.0f && !secondpart)  // Player is in the water
                     {
                         if (p->HasAura(DEEPDIVING_PEARL_BUFF) && canjump)
                         {
