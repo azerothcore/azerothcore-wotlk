@@ -4283,7 +4283,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->Effects[0].SpellClassMask = flag96(0x0603E000, 0x00200100);
     });
-  
+
     // Jokkum Summon
     ApplySpellFix({ 56541 }, [](SpellInfo* spellInfo)
     {
