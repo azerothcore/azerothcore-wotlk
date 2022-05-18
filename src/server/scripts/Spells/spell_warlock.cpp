@@ -698,7 +698,7 @@ class spell_warl_soulshatter : public SpellScript
         Unit* caster = GetCaster();
         if (Unit* target = GetHitUnit())
         {
-            if (target->CanHaveThreatList() && target->getThreatMgr().getThreat(caster) > 0.0f)
+            if (target->CanHaveThreatList() && target->GetThreatMgr().getThreat(caster) > 0.0f)
                 caster->CastSpell(target, SPELL_WARLOCK_SOULSHATTER, true);
         }
     }
