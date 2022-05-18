@@ -1,3 +1,4 @@
-DELETE FROM `spell_script_names` WHERE `spell_id`=28410 AND `ScriptName`='spell_chains_of_kelthuzad';
+DELETE FROM `spell_script_names` WHERE `ScriptName`='spell_gen_mind_control';
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
-(28410, 'spell_chains_of_kelthuzad');
+(28410, 'spell_gen_mind_control'), -- Chains of Kel'Thuzad
+(71289, 'spell_gen_mind_control'); -- Dominate Mind

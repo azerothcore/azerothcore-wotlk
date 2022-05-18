@@ -4514,6 +4514,29 @@ class spell_gen_remove_impairing_auras : public SpellScript
     }
 };
 
+// 28410 - Chains of Kel'Thuzad
+// 71289 - Dominate Mind
+class spell_gen_mind_control : public AuraScript
+{
+    PrepareAuraScript(spell_gen_mind_control);
+
+    void HandleApply(AuraEffect const* aurEff, AuraEffectHandleModes mode)
+    {
+        aurEff->HandleAuraModScale(GetTargetApplication(), mode, true);
+    }
+
+    void HandleRemove(AuraEffect const* aurEff, AuraEffectHandleModes mode)
+    {
+        aurEff->HandleAuraModScale(GetTargetApplication(), mode, false);
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_gen_mind_control::HandleApply, EFFECT_1, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectApplyFn(spell_gen_mind_control::HandleRemove, EFFECT_1, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -4648,4 +4671,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_holiday_buff_food);
     RegisterSpellScript(spell_gen_arcane_charge);
     RegisterSpellScript(spell_gen_remove_impairing_auras);
+    RegisterSpellScript(spell_gen_mind_control);
 }

@@ -644,15 +644,6 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
-        {
-            if (spell->Id == SPELL_DOMINATE_MIND_25)
-            {
-                const int32 val = 100;
-                target->CastCustomSpell(target, 73261, &val, nullptr, nullptr, true); // scale aura, +100% size
-            }
-        }
-
     private:
         bool _introDone;
         ObjectGuid _darnavanGUID;
