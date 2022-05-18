@@ -597,7 +597,7 @@ public:
             {
                 if (Creature* creatureCaster = caster->ToCreature())
                 {
-                    creatureCaster->getThreatMgr().ResetAllThreat();
+                    creatureCaster->GetThreatMgr().ResetAllThreat();
                 }
             }
         }
