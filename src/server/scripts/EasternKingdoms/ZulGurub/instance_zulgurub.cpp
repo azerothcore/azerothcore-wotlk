@@ -34,8 +34,8 @@ DoorData const doorData[] =
 
 MinionData const minionData[] =
 {
-    { NPC_ZEALOT_LORKHAN, NPC_HIGH_PRIEST_THEKAL },
-    { NPC_ZEALOT_ZATH,    NPC_HIGH_PRIEST_THEKAL }
+    { NPC_ZEALOT_LORKHAN, DATA_THEKAL },
+    { NPC_ZEALOT_ZATH,    DATA_THEKAL }
 };
 
 class instance_zulgurub : public InstanceMapScript
