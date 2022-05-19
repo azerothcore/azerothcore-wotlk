@@ -284,7 +284,9 @@ enum hourglass
     NPC_INFINITE_CHRONO_MAGUS               = 27898,
     NPC_INFINITE_DESTROYER                  = 27897,
     NPC_INFINITE_TIMERENDER                 = 27900,
+    NPC_NOZDORMU                            = 27925,
 
+    SPELL_NOZDORMU_INVIS                    = 50013,
     SPELL_CLONE_CASTER                      = 49889,
     SPELL_TELEPORT_EFFECT                   = 52096,
 
@@ -377,6 +379,18 @@ public:
             return NPC_INFINITE_ASSAILANT + urand(0, 2);
         }
 
+        void ShowNozdormu()
+        {
+            if (Creature* cr = me->FindNearestCreature(NPC_NOZDORMU, 100.0f, true))
+                cr->RemoveAura(SPELL_NOZDORMU_INVIS);
+        }
+
+        void HideNozdormu()
+        {
+            if (Creature* cr = me->FindNearestCreature(NPC_NOZDORMU, 100.0f, true))
+                cr->AddAura(SPELL_NOZDORMU_INVIS, cr);
+        }
+
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
@@ -437,16 +451,21 @@ public:
                             return;
                         }
 
+                        ShowNozdormu(); 
                         if (Player* player = GetPlayer())
                             player->GroupEventHappens(IsFuture() ? QUEST_MYSTERY_OF_THE_INFINITE : QUEST_MYSTERY_OF_THE_INFINITE_REDUX, me);
 
                         if (Creature* cr = GetCopy())
+                        {
+                            cr->SetFacingToObject(me->FindNearestCreature(NPC_NOZDORMU, 100.0f, true));
                             cr->AI()->Talk(SAY_HOURGLASS_END_1, GetPlayer());
+                        }
                         events.ScheduleEvent(EVENT_FINISH_EVENT, 6000);
                         break;
                     }
                 case EVENT_FINISH_EVENT:
                     {
+                        HideNozdormu();
                         if (Creature* cr = GetCopy())
                             cr->AI()->Talk(SAY_HOURGLASS_END_2, GetPlayer());
                         me->DespawnOrUnsummon(500);
