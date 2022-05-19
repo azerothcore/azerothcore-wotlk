@@ -194,28 +194,12 @@ public:
                         {
                             if (instance->GetBossState(DATA_LORKHAN) == SPECIAL)
                             {
-                                //Resurrect LorKhan
-                                if (Unit* pLorKhan = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_LORKHAN)))
-                                {
-                                    pLorKhan->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-                                    pLorKhan->SetFaction(FACTION_MONSTER);
-                                    pLorKhan->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                                    pLorKhan->SetFullHealth();
-                                    instance->SetData(DATA_LORKHAN, DONE);
-                                }
+                                ReviveZealot(DATA_LORKHAN);
                             }
 
                             if (instance->GetBossState(DATA_ZATH) == SPECIAL)
                             {
-                                //Resurrect Zath
-                                if (Unit* pZath = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_ZATH)))
-                                {
-                                    pZath->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-                                    pZath->SetFaction(FACTION_MONSTER);
-                                    pZath->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                                    pZath->SetFullHealth();
-                                    instance->SetBossState(DATA_ZATH, DONE);
-                                }
+                                ReviveZealot(DATA_ZATH);
                             }
                         }
                         events.ScheduleEvent(EVENT_CHECK_TIMER, 5000, 0, PHASE_ONE);
@@ -257,6 +241,18 @@ public:
                     WasDead = false;
             }
             DoMeleeAttackIfReady();
+        }
+
+        void ReviveZealot(uint32 zealotData)
+        {
+            if (Unit* zealot = ObjectAccessor::GetUnit(*me, instance->GetGuidData(zealotData)))
+            {
+                zealot->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
+                zealot->SetFaction(FACTION_MONSTER);
+                zealot->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                zealot->SetFullHealth();
+                instance->SetData(zealotData, DONE);
+            }
         }
     };
 
