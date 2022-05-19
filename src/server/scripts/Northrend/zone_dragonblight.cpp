@@ -300,7 +300,7 @@ enum hourglass
 
 enum hourglassText
 {
-    // Both NPC_PAST_YOU and NPC_FUTURE_YOU share the same creature_text GroupIDs
+    // (All are whispers) Both NPC_PAST_YOU and NPC_FUTURE_YOU share the same creature_text GroupIDs
     // Start
     SAY_HOURGLASS_START_1                 = 1,
     SAY_HOURGLASS_START_2                 = 2,
@@ -437,7 +437,7 @@ public:
                             return;
                         }
 
-                        if (Player* player = GetPlayer)
+                        if (Player* player = GetPlayer())
                             player->GroupEventHappens(IsFuture() ? QUEST_MYSTERY_OF_THE_INFINITE : QUEST_MYSTERY_OF_THE_INFINITE_REDUX, me);
 
                         if (Creature* cr = GetCopy())
@@ -457,14 +457,19 @@ public:
             }
         }
 
-        void randomWhisper()
+        void randomWhisper() // Do not repeat the same line
         {
             randomTalk = urand(SAY_HOURGLASS_RANDOM_1, SAY_HOURGLASS_RANDOM_8); // 3 to 10
-            if (randomTalk == lastRandomTalk ? randomWhisper() : continue;) // Do not send 2 of the same "random whisper" one after another
-
-            if (Creature* cr = GetCopy())
-                cr->AI()->Talk(randomTalk, GetPlayer);
-            lastRandomTalk = randomTalk;
+            if (randomTalk == lastRandomTalk)
+            {
+                randomWhisper();
+            }
+            else
+            {
+                if (Creature* cr = GetCopy())
+                    cr->AI()->Talk(randomTalk, GetPlayer());
+                lastRandomTalk = randomTalk;
+            }
         }
     };
 };
@@ -497,7 +502,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (!me->GetVictim() && who->GetEntry() >= NPC_INFINITE_ASSAILANT && who->GetEntry() <= NPC_INFINITE_TIMERENDER)
+            if (!me->GetVictim() && !who->IsFlying() && who->GetEntry() >= NPC_INFINITE_ASSAILANT && who->GetEntry() <= NPC_INFINITE_TIMERENDER)
                 AttackStart(who);
         }
 
