@@ -27,8 +27,8 @@ enum DataTypes
     DATA_SKERAM             = 1,
     DATA_KRI                = 2,
     DATA_VEM                = 3,
-    DATA_VEMISDEAD          = 4,
-    DATA_VEM_DEATH          = 5,
+    DATA_YAUJ               = 4,
+    DATA_BUG_TRIO           = 5,
     DATA_VEKLOR             = 6,
     DATA_VEKLORISDEAD       = 7,
     DATA_VEKLOR_DEATH       = 8,
@@ -37,7 +37,8 @@ enum DataTypes
     DATA_VEKNILASH_DEATH    = 11,
     DATA_BUG_TRIO_DEATH     = 14,
     DATA_CTHUN_PHASE        = 20,
-    DATA_VISCIDUS           = 21
+    DATA_VISCIDUS           = 21,
+    DATA_SARTURA            = 22
 };
 
 enum Creatures
@@ -59,9 +60,11 @@ enum Creatures
     NPC_SKERAM              = 15263,
     NPC_VEM                 = 15544,
     NPC_KRI                 = 15511,
+    NPC_YAUJ                = 15543,
     NPC_VEKLOR              = 15276,
     NPC_VEKNILASH           = 15275,
-    NPC_OURO                = 15517
+    NPC_OURO                = 15517,
+    NPC_SARTURA             = 15516
 };
 
 template <class AI, class T>

@@ -234,7 +234,7 @@ public:
 
         void EnterEvadeMode(EvadeReason why) override
         {
-            if (!me->getThreatMgr().getThreatList().empty())
+            if (!me->GetThreatMgr().getThreatList().empty())
             {
                 if (!_processingMagmaBurst)
                 {
