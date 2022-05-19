@@ -229,6 +229,7 @@ struct boss_illidari_council_memberAI : public ScriptedAI
     boss_illidari_council_memberAI(Creature* creature) : ScriptedAI(creature)
     {
         instance = creature->GetInstanceScript();
+        SetBoundary(instance->GetBossBoundary(DATA_ILLIDARI_COUNCIL));
     }
 
     InstanceScript* instance;

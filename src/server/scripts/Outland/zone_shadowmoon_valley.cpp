@@ -488,7 +488,7 @@ public:
                     AttackStart(Dragonmaw);
                 }
 
-                HostileReference* ref = me->getThreatMgr().getOnlineContainer().getReferenceByTarget(caster);
+                HostileReference* ref = me->GetThreatMgr().getOnlineContainer().getReferenceByTarget(caster);
                 if (ref)
                     ref->removeReference();
             }
