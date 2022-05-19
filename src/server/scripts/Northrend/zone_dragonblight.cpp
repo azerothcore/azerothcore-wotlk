@@ -274,50 +274,50 @@ public:
 
 enum hourglass
 {
-    NPC_FUTURE_HOURGLASS                = 27840,
-    NPC_FUTURE_YOU                      = 27899,
+    NPC_FUTURE_HOURGLASS                    = 27840,
+    NPC_FUTURE_YOU                          = 27899,
 
-    NPC_PAST_HOURGLASS                  = 32327,
-    NPC_PAST_YOU                        = 32331,
+    NPC_PAST_HOURGLASS                      = 32327,
+    NPC_PAST_YOU                            = 32331,
 
-    NPC_INFINITE_ASSAILANT              = 27896,
-    NPC_INFINITE_CHRONO_MAGUS           = 27898,
-    NPC_INFINITE_DESTROYER              = 27897,
-    NPC_INFINITE_TIMERENDER             = 27900,
+    NPC_INFINITE_ASSAILANT                  = 27896,
+    NPC_INFINITE_CHRONO_MAGUS               = 27898,
+    NPC_INFINITE_DESTROYER                  = 27897,
+    NPC_INFINITE_TIMERENDER                 = 27900,
 
-    SPELL_CLONE_CASTER                  = 49889,
-    SPELL_TELEPORT_EFFECT               = 52096,
+    SPELL_CLONE_CASTER                      = 49889,
+    SPELL_TELEPORT_EFFECT                   = 52096,
 
-    EVENT_START_EVENT                   = 1,
-    EVENT_FIGHT_1                       = 2,
-    EVENT_FIGHT_2                       = 3,
-    EVENT_CHECK_FINISH                  = 4,
-    EVENT_FINISH_EVENT                  = 5,
+    EVENT_START_EVENT                       = 1,
+    EVENT_FIGHT_1                           = 2,
+    EVENT_FIGHT_2                           = 3,
+    EVENT_CHECK_FINISH                      = 4,
+    EVENT_FINISH_EVENT                      = 5,
 
-    QUEST_MYSTERY_OF_THE_INFINITE       = 12470,
-    QUEST_MYSTERY_OF_THE_INFINITE_REDUX = 13343,
+    QUEST_MYSTERY_OF_THE_INFINITE           = 12470,
+    QUEST_MYSTERY_OF_THE_INFINITE_REDUX     = 13343,
 };
 
 enum hourglassText
 {
     // (All are whispers) Both NPC_PAST_YOU and NPC_FUTURE_YOU share the same creature_text GroupIDs
     // Start
-    SAY_HOURGLASS_START_1                 = 1,
-    SAY_HOURGLASS_START_2                 = 2,
+    SAY_HOURGLASS_START_1                   = 1,
+    SAY_HOURGLASS_START_2                   = 2,
 
     // Random whispers during the fight
-    SAY_HOURGLASS_RANDOM_1                = 3,
-    SAY_HOURGLASS_RANDOM_2                = 4,
-    SAY_HOURGLASS_RANDOM_3                = 5,
-    SAY_HOURGLASS_RANDOM_4                = 6,
-    SAY_HOURGLASS_RANDOM_5                = 7,
-    SAY_HOURGLASS_RANDOM_6                = 8,
-    SAY_HOURGLASS_RANDOM_7                = 9,
-    SAY_HOURGLASS_RANDOM_8                = 10,
+    SAY_HOURGLASS_RANDOM_1                  = 3,
+    SAY_HOURGLASS_RANDOM_2                  = 4,
+    SAY_HOURGLASS_RANDOM_3                  = 5,
+    SAY_HOURGLASS_RANDOM_4                  = 6,
+    SAY_HOURGLASS_RANDOM_5                  = 7,
+    SAY_HOURGLASS_RANDOM_6                  = 8,
+    SAY_HOURGLASS_RANDOM_7                  = 9,
+    SAY_HOURGLASS_RANDOM_8                  = 10,
 
     // End
-    SAY_HOURGLASS_END_1                   = 11,
-    SAY_HOURGLASS_END_2                   = 12,
+    SAY_HOURGLASS_END_1                     = 11,
+    SAY_HOURGLASS_END_2                     = 12,
 };
 
 class npc_hourglass_of_eternity : public CreatureScript
