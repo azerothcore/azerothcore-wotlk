@@ -451,7 +451,7 @@ public:
                             return;
                         }
 
-                        ShowNozdormu(); 
+                        ShowNozdormu();
                         if (Player* player = GetPlayer())
                             player->GroupEventHappens(IsFuture() ? QUEST_MYSTERY_OF_THE_INFINITE : QUEST_MYSTERY_OF_THE_INFINITE_REDUX, me);
 
