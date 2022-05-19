@@ -127,11 +127,6 @@ public:
             Talk(SAY_AGGRO);
         }
 
-        void JustReachedHome() override
-        {
-            instance->SetBossState(DATA_THEKAL, NOT_STARTED);
-        }
-
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if ((events.IsInPhase(PHASE_ONE)) && !WasDead && (me->HealthBelowPctDamaged(5, damage) || (damage >= me->GetHealth())))
