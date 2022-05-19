@@ -8,4 +8,4 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (@LEADERGUID, 84541, 0, 0, 3),
 (@LEADERGUID, 84543, 0, 0, 3),
 (@LEADERGUID, 84188, 0, 0, 3),
-(@LEADERGUID, 84186, 0, 0, 3),
+(@LEADERGUID, 84186, 0, 0, 3);
