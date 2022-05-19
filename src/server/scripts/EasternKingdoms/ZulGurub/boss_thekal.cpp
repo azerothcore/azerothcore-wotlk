@@ -205,7 +205,7 @@ public:
                         events.ScheduleEvent(EVENT_CHECK_TIMER, 5000, 0, PHASE_ONE);
                         break;
                     case EVENT_FRENZY:
-                        DoCast(me, SPELL_FRENZY);
+                        DoCastSelf(SPELL_FRENZY);
                         events.ScheduleEvent(EVENT_FRENZY, 30000, 0, PHASE_TWO);
                         break;
                     case EVENT_FORCEPUNCH:
@@ -245,7 +245,7 @@ public:
 
         void ReviveZealot(uint32 zealotData)
         {
-            if (Unit* zealot = ObjectAccessor::GetUnit(*me, instance->GetGuidData(zealotData)))
+            if (Creature* zealot = instance->GetCreature(zealotData))
             {
                 zealot->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                 zealot->SetFaction(FACTION_MONSTER);
@@ -329,8 +329,8 @@ public:
             //Casting Greaterheal to Thekal or Zath if they are in meele range.
             if (GreaterHeal_Timer <= diff)
             {
-                Unit* pThekal = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_THEKAL));
-                Unit* pZath = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_ZATH));
+                Unit* pThekal = instance->GetCreature(DATA_THEKAL);
+                Unit* pZath = instance->GetCreature(DATA_ZATH);
 
                 if (!pThekal || !pZath)
                     return;
@@ -365,7 +365,7 @@ public:
                 if (instance->GetBossState(DATA_THEKAL) == SPECIAL)
                 {
                     //Resurrect Thekal
-                    if (Creature* pThekal = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_THEKAL)))
+                    if (Creature* pThekal = instance->GetCreature(DATA_THEKAL))
                     {
                         pThekal->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                         pThekal->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
@@ -378,7 +378,7 @@ public:
                 if (instance->GetBossState(DATA_ZATH) == SPECIAL)
                 {
                     //Resurrect Zath
-                    if (Unit* pZath = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_ZATH)))
+                    if (Creature* pZath = instance->GetCreature(DATA_ZATH))
                     {
                         pZath->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                         pZath->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
@@ -519,7 +519,7 @@ public:
                 if (instance->GetBossState(DATA_LORKHAN) == SPECIAL)
                 {
                     //Resurrect LorKhan
-                    if (Unit* pLorKhan = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_LORKHAN)))
+                    if (Creature* pLorKhan = instance->GetCreature(DATA_LORKHAN))
                     {
                         pLorKhan->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                         pLorKhan->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
@@ -531,7 +531,7 @@ public:
                 if (instance->GetBossState(DATA_THEKAL) == SPECIAL)
                 {
                     //Resurrect Thekal
-                    if (Creature* pThekal = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_THEKAL)))
+                    if (Creature* pThekal = instance->GetCreature(DATA_THEKAL))
                     {
                         pThekal->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                         pThekal->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);

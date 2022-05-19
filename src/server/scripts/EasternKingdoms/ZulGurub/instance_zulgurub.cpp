@@ -32,6 +32,13 @@ DoorData const doorData[] =
     { 0,             0,           DOOR_TYPE_ROOM }
 };
 
+ObjectData const creatureData[] =
+{
+    { NPC_ZEALOT_LORKHAN,     DATA_LORKHAN },
+    { NPC_ZEALOT_ZATH,        DATA_ZATH    },
+    { NPC_HIGH_PRIEST_THEKAL, DATA_THEKAL  }
+};
+
 MinionData const minionData[] =
 {
     { NPC_ZEALOT_LORKHAN, DATA_THEKAL },
@@ -50,6 +57,7 @@ public:
             SetBossNumber(EncounterCount);
             LoadDoorData(doorData);
             LoadMinionData(minionData);
+            LoadObjectData(creatureData, nullptr);
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -58,15 +66,6 @@ public:
 
             switch (creature->GetEntry())
             {
-                case NPC_ZEALOT_LORKHAN:
-                    _zealotLorkhanGUID = creature->GetGUID();
-                    break;
-                case NPC_ZEALOT_ZATH:
-                    _zealotZathGUID = creature->GetGUID();
-                    break;
-                case NPC_HIGH_PRIEST_THEKAL:
-                    _highPriestTekalGUID = creature->GetGUID();
-                    break;
                 case NPC_JINDO_THE_HEXXER:
                     _jindoTheHexxerGUID = creature->GetGUID();
                     break;
@@ -104,12 +103,6 @@ public:
         {
             switch (uiData)
             {
-                case DATA_LORKHAN:
-                    return _zealotLorkhanGUID;
-                case DATA_ZATH:
-                    return _zealotZathGUID;
-                case DATA_THEKAL:
-                    return _highPriestTekalGUID;
                 case DATA_JINDO:
                     return _jindoTheHexxerGUID;
                 case NPC_ARLOKK:
@@ -166,12 +159,9 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
     private:
-        //If all High Priest bosses were killed. Lorkhan, Zath and Ohgan are added too.
-        //Storing Lorkhan, Zath and Thekal because we need to cast on them later. Jindo is needed for healfunction too.
+        // If all High Priest bosses were killed. Ohgan is added too.
+        // Jindo is needed for healfunction.
 
-        ObjectGuid _zealotLorkhanGUID;
-        ObjectGuid _zealotZathGUID;
-        ObjectGuid _highPriestTekalGUID;
         ObjectGuid _jindoTheHexxerGUID;
         ObjectGuid _vilebranchSpeakerGUID;
         ObjectGuid _arlokkGUID;
