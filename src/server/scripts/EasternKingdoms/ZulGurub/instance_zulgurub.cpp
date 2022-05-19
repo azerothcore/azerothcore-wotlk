@@ -76,6 +76,12 @@ public:
                 case NPC_HAKKAR:
                     _hakkarGUID = creature->GetGUID();
                     break;
+                case NPC_SPAWN_OF_MARLI:
+                    if (Creature* marli = GetCreature(DATA_MARLI))
+                    {
+                        marli->AI()->JustSummoned(creature);
+                    }
+                    break;
             }
 
             InstanceScript::OnCreatureCreate(creature);
