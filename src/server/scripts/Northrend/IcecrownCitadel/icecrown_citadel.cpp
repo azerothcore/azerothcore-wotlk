@@ -1773,15 +1773,15 @@ public:
                 Position myPos = me->GetPosition();
                 me->NearTeleportTo(c->GetPositionX(), c->GetPositionY(), c->GetPositionZ(), c->GetOrientation());
                 c->NearTeleportTo(myPos.GetPositionX(), myPos.GetPositionY(), myPos.GetPositionZ(), myPos.GetOrientation());
-                const ThreatContainer::StorageType me_tl = me->getThreatMgr().getThreatList();
-                const ThreatContainer::StorageType target_tl = c->getThreatMgr().getThreatList();
+                const ThreatContainer::StorageType me_tl = me->GetThreatMgr().getThreatList();
+                const ThreatContainer::StorageType target_tl = c->GetThreatMgr().getThreatList();
                 DoResetThreat();
                 for (ThreatContainer::StorageType::const_iterator iter = target_tl.begin(); iter != target_tl.end(); ++iter)
-                    me->getThreatMgr().addThreat((*iter)->getTarget(), (*iter)->getThreat());
+                    me->GetThreatMgr().addThreat((*iter)->getTarget(), (*iter)->getThreat());
 
-                c->getThreatMgr().ResetAllThreat();
+                c->GetThreatMgr().ResetAllThreat();
                 for (ThreatContainer::StorageType::const_iterator iter = me_tl.begin(); iter != me_tl.end(); ++iter)
-                    c->getThreatMgr().addThreat((*iter)->getTarget(), (*iter)->getThreat());
+                    c->GetThreatMgr().addThreat((*iter)->getTarget(), (*iter)->getThreat());
             }
         }
 

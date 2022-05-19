@@ -553,17 +553,17 @@ public:
                             if (!feugen->IsAlive() || !feugen->GetVictim() || !me->GetVictim())
                                 return;
 
-                            float threatFeugen = feugen->getThreatMgr().getThreat(feugen->GetVictim());
-                            float threatStalagg = me->getThreatMgr().getThreat(me->GetVictim());
+                            float threatFeugen = feugen->GetThreatMgr().getThreat(feugen->GetVictim());
+                            float threatStalagg = me->GetThreatMgr().getThreat(me->GetVictim());
                             Unit* tankFeugen = feugen->GetVictim();
                             Unit* tankStalagg = me->GetVictim();
 
-                            feugen->getThreatMgr().modifyThreatPercent(tankFeugen, -100);
+                            feugen->GetThreatMgr().modifyThreatPercent(tankFeugen, -100);
                             feugen->AddThreat(tankStalagg, threatFeugen);
                             feugen->CastSpell(tankStalagg, SPELL_MAGNETIC_PULL, true);
                             feugen->AI()->DoAction(ACTION_MAGNETIC_PULL);
 
-                            me->getThreatMgr().modifyThreatPercent(tankStalagg, -100);
+                            me->GetThreatMgr().modifyThreatPercent(tankStalagg, -100);
                             me->AddThreat(tankFeugen, threatStalagg);
                             me->CastSpell(tankFeugen, SPELL_MAGNETIC_PULL, true);
                             DoAction(ACTION_MAGNETIC_PULL);
