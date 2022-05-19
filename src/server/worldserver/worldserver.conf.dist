@@ -3914,6 +3914,16 @@ Logger.module=4,Console Server
 #Logger.vehicles=4,Console Server
 #Logger.warden=4,Console Server
 #Logger.weather=4,Console Server
+
+#
+#    Log.Async.Enable
+#        Description: Enables asynchronous message logging.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+Log.Async.Enable = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################
