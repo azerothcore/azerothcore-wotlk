@@ -296,10 +296,6 @@ public:
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        void EnterCombat(Unit* /*who*/) override
-        {
-        }
-
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
@@ -415,10 +411,7 @@ public:
 class npc_zealot_zath : public CreatureScript
 {
 public:
-    npc_zealot_zath()
-        : CreatureScript("npc_zealot_zath")
-    {
-    }
+    npc_zealot_zath() : CreatureScript("npc_zealot_zath") { }
 
     struct npc_zealot_zathAI : public ScriptedAI
     {
@@ -453,10 +446,6 @@ public:
 
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-        }
-
-        void EnterCombat(Unit* /*who*/) override
-        {
         }
 
         void UpdateAI(uint32 diff) override
