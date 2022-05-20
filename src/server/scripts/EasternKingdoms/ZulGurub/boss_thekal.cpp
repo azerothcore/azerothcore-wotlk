@@ -296,6 +296,24 @@ public:
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
 
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
+        {
+            if (me->HealthBelowPctDamaged(5, damage) && !FakeDeath)
+            {
+                me->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
+                me->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
+                me->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetStandState(UNIT_STAND_STATE_SLEEP);
+                me->SetFaction(FACTION_FRIENDLY);
+                me->AttackStop();
+
+                instance->SetBossState(DATA_LORKHAN, SPECIAL);
+
+                FakeDeath = true;
+            }
+        }
+
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
@@ -382,21 +400,6 @@ public:
             }
             else Check_Timer -= diff;
 
-            if (!HealthAbovePct(5))
-            {
-                me->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
-                me->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
-                me->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
-                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                me->SetStandState(UNIT_STAND_STATE_SLEEP);
-                me->SetFaction(FACTION_FRIENDLY);
-                me->AttackStop();
-
-                instance->SetBossState(DATA_LORKHAN, SPECIAL);
-
-                FakeDeath = true;
-            }
-
             DoMeleeAttackIfReady();
         }
     };
@@ -446,6 +449,24 @@ public:
 
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        }
+
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
+        {
+            if (me->HealthBelowPctDamaged(5, damage) && !FakeDeath)
+            {
+                me->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
+                me->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
+                me->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetStandState(UNIT_STAND_STATE_SLEEP);
+                me->SetFaction(FACTION_FRIENDLY);
+                me->AttackStop();
+
+                instance->SetBossState(DATA_ZATH, SPECIAL);
+
+                FakeDeath = true;
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -528,21 +549,6 @@ public:
                 Check_Timer = 5000;
             }
             else Check_Timer -= diff;
-
-            if (!HealthAbovePct(5))
-            {
-                me->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
-                me->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
-                me->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
-                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                me->SetStandState(UNIT_STAND_STATE_SLEEP);
-                me->SetFaction(FACTION_FRIENDLY);
-                me->AttackStop();
-
-                instance->SetBossState(DATA_ZATH, SPECIAL);
-
-                FakeDeath = true;
-            }
 
             DoMeleeAttackIfReady();
         }
