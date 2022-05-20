@@ -76,6 +76,11 @@ enum Phases
     PHASE_TWO                 = 2
 };
 
+enum Actions
+{
+    ACTION_RESSURRECT         = 1
+};
+
 class boss_thekal : public CreatureScript
 {
 public:
@@ -108,6 +113,22 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
+            if (Creature* zealot = instance->GetCreature(DATA_LORKHAN))
+                zealot->AI()->Reset();
+
+            if (Creature* zealot = instance->GetCreature(DATA_ZATH))
+                zealot->AI()->Reset();
+
+            std::list<Creature*> creatureList;
+            GetCreatureListWithEntryInGrid(creatureList, me, NPC_ZULGURUB_TIGER, 15.0f);
+
+            for (Creature* creature : creatureList)
+            {
+                if (!creature->IsAlive())
+                {
+                    creature->Respawn(true);
+                }
+            }
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -138,6 +159,18 @@ public:
                 me->AttackStop();
                 instance->SetBossState(DATA_THEKAL, SPECIAL);
                 WasDead = true;
+            }
+        }
+
+        void DoAction(int32 action) override
+        {
+            if (action == ACTION_RESSURRECT)
+            {
+                me->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetFaction(FACTION_MONSTER);
+                me->SetReactState(REACT_AGGRESSIVE);
+                me->SetFullHealth();
             }
         }
 
@@ -373,14 +406,9 @@ public:
             {
                 if (instance->GetBossState(DATA_THEKAL) == SPECIAL)
                 {
-                    //Resurrect Thekal
-                    if (Creature* pThekal = instance->GetCreature(DATA_THEKAL))
+                    if (Creature* thekal = instance->GetCreature(DATA_THEKAL))
                     {
-                        pThekal->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-                        pThekal->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                        pThekal->SetFaction(FACTION_MONSTER);
-                        pThekal->SetReactState(REACT_AGGRESSIVE);
-                        pThekal->SetFullHealth();
+                        thekal->AI()->DoAction(ACTION_RESSURRECT);
                     }
                 }
 
@@ -535,14 +563,9 @@ public:
 
                 if (instance->GetBossState(DATA_THEKAL) == SPECIAL)
                 {
-                    //Resurrect Thekal
-                    if (Creature* pThekal = instance->GetCreature(DATA_THEKAL))
+                    if (Creature* thekal = instance->GetCreature(DATA_THEKAL))
                     {
-                        pThekal->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-                        pThekal->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                        pThekal->SetFaction(FACTION_MONSTER);
-                        pThekal->SetReactState(REACT_AGGRESSIVE);
-                        pThekal->SetFullHealth();
+                        thekal->AI()->DoAction(ACTION_RESSURRECT);
                     }
                 }
 
