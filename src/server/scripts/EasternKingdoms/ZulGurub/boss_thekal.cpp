@@ -168,7 +168,7 @@ public:
             {
                 me->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                me->SetFaction(FACTION_MONSTER);
+                me->ResetFaction();
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->SetFullHealth();
             }
@@ -327,6 +327,11 @@ public:
 
             me->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+
+            if (instance->GetBossState(DATA_THEKAL) == NOT_STARTED)
+            {
+                me->ResetFaction();
+            }
         }
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -343,6 +348,7 @@ public:
 
                 instance->SetBossState(DATA_LORKHAN, SPECIAL);
 
+                damage = 0;
                 FakeDeath = true;
             }
         }
@@ -419,7 +425,7 @@ public:
                     {
                         pZath->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                         pZath->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                        pZath->SetFaction(FACTION_MONSTER);
+                        pZath->ResetFaction();
                         pZath->SetFullHealth();
                     }
                 }
@@ -477,6 +483,11 @@ public:
 
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+
+            if (instance->GetBossState(DATA_THEKAL) == NOT_STARTED)
+            {
+                me->ResetFaction();
+            }
         }
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -494,6 +505,7 @@ public:
                 instance->SetBossState(DATA_ZATH, SPECIAL);
 
                 FakeDeath = true;
+                damage = 0;
             }
         }
 
@@ -556,7 +568,7 @@ public:
                     {
                         pLorKhan->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                         pLorKhan->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                        pLorKhan->SetFaction(FACTION_MONSTER);
+                        pLorKhan->ResetFaction();
                         pLorKhan->SetFullHealth();
                     }
                 }
