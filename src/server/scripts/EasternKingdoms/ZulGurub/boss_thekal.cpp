@@ -114,10 +114,16 @@ public:
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
             if (Creature* zealot = instance->GetCreature(DATA_LORKHAN))
+            {
                 zealot->AI()->Reset();
+                zealot->ResetFaction();
+            }
 
             if (Creature* zealot = instance->GetCreature(DATA_ZATH))
+            {
                 zealot->AI()->Reset();
+                zealot->ResetFaction();
+            }
 
             std::list<Creature*> creatureList;
             GetCreatureListWithEntryInGrid(creatureList, me, NPC_ZULGURUB_TIGER, 15.0f);
@@ -327,11 +333,6 @@ public:
 
             me->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-
-            if (instance->GetBossState(DATA_THEKAL) == NOT_STARTED)
-            {
-                me->ResetFaction();
-            }
         }
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -483,11 +484,6 @@ public:
 
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-
-            if (instance->GetBossState(DATA_THEKAL) == NOT_STARTED)
-            {
-                me->ResetFaction();
-            }
         }
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
