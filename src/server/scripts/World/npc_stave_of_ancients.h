@@ -138,7 +138,7 @@ struct NPCStaveQuestAI : public ScriptedAI
     ObjectGuid gossipPlayerGUID;
     ObjectGuid playerGUID;
     bool encounterStarted;
-    ThreatContainer::StorageType const& threatList = me->getThreatMgr().getThreatList();
+    ThreatContainer::StorageType const& threatList = me->GetThreatMgr().getThreatList();
 
     std::map<int, int> entryKeys = {
         { ARTORIUS_NORMAL_ENTRY, 1 },
