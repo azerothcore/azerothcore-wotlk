@@ -20,9 +20,11 @@
 #include "AppenderFile.h"
 #include "Config.h"
 #include "Errors.h"
+#include "IoContext.h"
 #include "LogMessage.h"
 #include "LogOperation.h"
 #include "Logger.h"
+#include "Strand.h"
 #include "StringConvert.h"
 #include "Timer.h"
 #include "Tokenize.h"
@@ -38,6 +40,7 @@ Log::Log() : AppenderId(0), highestLogLevel(LOG_LEVEL_FATAL)
 
 Log::~Log()
 {
+    delete _strand;
     Close();
 }
 
@@ -240,7 +243,13 @@ void Log::write(std::unique_ptr<LogMessage>&& msg) const
 {
     Logger const* logger = GetLoggerByType(msg->type);
 
-    logger->write(msg.get());
+    if (_ioContext)
+    {
+        std::shared_ptr<LogOperation> logOperation = std::make_shared<LogOperation>(logger, std::move(msg));
+        Acore::Asio::post(*_ioContext, Acore::Asio::bind_executor(*_strand, [logOperation]() { logOperation->call(); }));
+    }
+    else
+        logger->write(msg.get());
 }
 
 Logger const* Log::GetLoggerByType(std::string const& type) const
@@ -356,9 +365,22 @@ Log* Log::instance()
     return &instance;
 }
 
-void Log::Initialize()
+void Log::Initialize(Acore::Asio::IoContext* ioContext)
 {
+    if (ioContext)
+    {
+        _ioContext = ioContext;
+        _strand = new Acore::Asio::Strand(*ioContext);
+    }
+
     LoadFromConfig();
+}
+
+void Log::SetSynchronous()
+{
+    delete _strand;
+    _strand = nullptr;
+    _ioContext = nullptr;
 }
 
 void Log::LoadFromConfig()
