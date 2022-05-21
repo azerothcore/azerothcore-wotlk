@@ -236,6 +236,8 @@ public:
     // -- compatibility layer for combat rewrite
     void ResetAllThreat() { resetAllAggro(); }
 
+    void ClearAllThreat();
+
     // Reset all aggro of unit in threadlist satisfying the predicate.
     template<class PREDICATE> void resetAggro(PREDICATE predicate)
     {
