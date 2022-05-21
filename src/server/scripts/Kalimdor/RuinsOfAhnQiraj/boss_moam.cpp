@@ -142,7 +142,7 @@ public:
                         {
                             std::list<Unit*> targetList;
                             {
-                                const std::list<HostileReference*>& threatlist = me->getThreatMgr().getThreatList();
+                                const std::list<HostileReference*>& threatlist = me->GetThreatMgr().getThreatList();
                                 for (std::list<HostileReference*>::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
                                     if ((*itr)->getTarget()->GetTypeId() == TYPEID_PLAYER && (*itr)->getTarget()->getPowerType() == POWER_MANA)
                                         targetList.push_back((*itr)->getTarget());

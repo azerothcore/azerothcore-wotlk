@@ -23,34 +23,24 @@
 template<class T>
 class FleeingMovementGenerator : public MovementGeneratorMedium< T, FleeingMovementGenerator<T> >
 {
-public:
-    FleeingMovementGenerator(ObjectGuid fright) : i_frightGUID(fright), i_nextCheckTime(0) {}
+    public:
+        explicit FleeingMovementGenerator(ObjectGuid fleeTargetGUID) : _path(nullptr), _fleeTargetGUID(fleeTargetGUID), _timer(0), _interrupt(false) {}
 
-    void DoInitialize(T*);
-    void DoFinalize(T*);
-    void DoReset(T*);
-    bool DoUpdate(T*, uint32);
+        MovementGeneratorType GetMovementGeneratorType() override { return FLEEING_MOTION_TYPE; }
 
-    MovementGeneratorType GetMovementGeneratorType() { return FLEEING_MOTION_TYPE; }
+        void DoInitialize(T*);
+        void DoFinalize(T*);
+        void DoReset(T*);
+        bool DoUpdate(T*, uint32);
 
-private:
-    void _setTargetLocation(T*);
-    bool _getPoint(T*, float& x, float& y, float& z);
-    bool _setMoveData(T* owner);
-    void _Init(T* );
+    private:
+        void SetTargetLocation(T*);
+        void GetPoint(T*, Position& position);
 
-    bool is_water_ok   : 1;
-    bool is_land_ok    : 1;
-    bool i_only_forward: 1;
-
-    float i_caster_x;
-    float i_caster_y;
-    float i_caster_z;
-    float i_last_distance_from_caster;
-    float i_to_distance_from_caster;
-    float i_cur_angle;
-    ObjectGuid i_frightGUID;
-    TimeTracker i_nextCheckTime;
+        std::unique_ptr<PathGenerator> _path;
+        ObjectGuid _fleeTargetGUID;
+        TimeTracker _timer;
+        bool _interrupt;
 };
 
 class TimedFleeingMovementGenerator : public FleeingMovementGenerator<Creature>
