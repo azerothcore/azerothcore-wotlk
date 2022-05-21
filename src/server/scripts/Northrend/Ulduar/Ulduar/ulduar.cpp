@@ -39,11 +39,11 @@ enum Texts
     GOSSIP_MENU_MIMIRON   = 10336,
     NPC_TEXT_MIMIRON      = 14334,
 
-    // Thorim 
+    // Thorim
     GOSSIP_MENU_THORIM    = 10337,
     NPC_TEXT_THORIM       = 14333,
 
-    // Confirm assistance 
+    // Confirm assistance
     GOSSIP_MENU_CONFIRM   = 10333,
     NPC_TEXT_CONFIRM      = 14325,
 
