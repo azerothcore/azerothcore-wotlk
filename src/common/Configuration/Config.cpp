@@ -239,12 +239,7 @@ ConfigMgr* ConfigMgr::instance()
 
 bool ConfigMgr::Reload()
 {
-    if (!LoadAppConfigs(true))
-    {
-        return false;
-    }
-
-    return LoadModulesConfigs(true, false);
+    return LoadAppConfigs(true) && LoadModulesConfigs(true);
 }
 
 template<class T>
@@ -389,21 +384,15 @@ bool ConfigMgr::LoadAppConfigs(bool isReload /*= false*/)
         _usingDistConfig = true;
     }
 
-    return true;
+    return LoadModulesConfigs(isReload);
 }
 
-bool ConfigMgr::LoadModulesConfigs(bool isReload /*= false*/, bool isNeedPrintInfo /*= true*/)
+bool ConfigMgr::LoadModulesConfigs(bool isReload /*= false*/)
 {
     if (_additonalFiles.empty())
     {
         // Send successful load if no found files
         return true;
-    }
-
-    if (isNeedPrintInfo)
-    {
-        LOG_INFO("server.loading", " ");
-        LOG_INFO("server.loading", "Loading modules configuration...");
     }
 
     // Start loading module configs
@@ -425,8 +414,7 @@ bool ConfigMgr::LoadModulesConfigs(bool isReload /*= false*/, bool isNeedPrintIn
 
         if (!isReload && !isExistDistConfig)
         {
-            LOG_FATAL("server.loading", "> ConfigMgr::LoadModulesConfigs: Not found original config '{}'. Stop loading", distFileName);
-            ABORT();
+            ABORT("> ConfigMgr::LoadModulesConfigs: Not found original config '{}'. Stop loading", distFileName);
         }
 
         // Load .conf config
@@ -442,31 +430,28 @@ bool ConfigMgr::LoadModulesConfigs(bool isReload /*= false*/, bool isNeedPrintIn
         }
     }
 
-    if (isNeedPrintInfo)
-    {
-        if (!_moduleConfigFiles.empty())
-        {
-            // Print modules configurations
-            LOG_INFO("server.loading", " ");
-            LOG_INFO("server.loading", "Using modules configuration:");
-
-            for (auto const& itr : _moduleConfigFiles)
-            {
-                LOG_INFO("server.loading", "> {}", itr);
-            }
-        }
-        else
-        {
-            LOG_INFO("server.loading", "> Not found modules config files");
-        }
-    }
-
-    if (isNeedPrintInfo)
-    {
-        LOG_INFO("server.loading", " ");
-    }
-
     return true;
+}
+
+void ConfigMgr::ShowModulesConfigs()
+{
+    if (!_moduleConfigFiles.empty())
+    {
+        // Print modules configurations
+        LOG_INFO("server.loading", "");
+        LOG_INFO("server.loading", "Using modules configuration:");
+
+        for (auto const& configName : _moduleConfigFiles)
+        {
+            LOG_INFO("server.loading", "> {}", configName);
+        }
+    }
+    else
+    {
+        LOG_INFO("server.loading", "> Not found modules config files");
+    }
+
+    LOG_INFO("server.loading", "");
 }
 
 // @deprecated DO NOT USE - use GetOption<std::string> instead.

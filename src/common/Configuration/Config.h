@@ -32,7 +32,8 @@ class ConfigMgr
 
 public:
     bool LoadAppConfigs(bool isReload = false);
-    bool LoadModulesConfigs(bool isReload = false, bool isNeedPrintInfo = true);
+    bool LoadModulesConfigs(bool isReload = false);
+    void ShowModulesConfigs();
     void Configure(std::string const& initFileName, std::vector<std::string> args, std::string_view modulesConfigList = {});
 
     static ConfigMgr* instance();
