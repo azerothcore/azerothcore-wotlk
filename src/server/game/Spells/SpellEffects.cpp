@@ -2213,6 +2213,9 @@ void Spell::EffectSummonChangeItem(SpellEffIndex effIndex)
     if (!pNewItem)
         return;
 
+    // Client-side enchantment durations update
+    player->UpdateEnchantmentDurations();
+
     for (uint8 j = PERM_ENCHANTMENT_SLOT; j <= TEMP_ENCHANTMENT_SLOT; ++j)
         if (m_CastItem->GetEnchantmentId(EnchantmentSlot(j)))
             pNewItem->SetEnchantment(EnchantmentSlot(j), m_CastItem->GetEnchantmentId(EnchantmentSlot(j)), m_CastItem->GetEnchantmentDuration(EnchantmentSlot(j)), m_CastItem->GetEnchantmentCharges(EnchantmentSlot(j)));
