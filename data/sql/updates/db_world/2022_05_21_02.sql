@@ -1,3 +1,4 @@
+-- DB update 2022_05_21_01 -> 2022_05_21_02
 -- Horde Scout, fix wrong broadcastTextId(previously 1934, now 1935)
 DELETE FROM `creature_text` WHERE `CreatureID` = 11680;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES

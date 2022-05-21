@@ -1,3 +1,4 @@
+-- DB update 2022_05_21_02 -> 2022_05_21_03
 -- Dungeon/BRD Link mobs in the 2 rooms before High Interrogator Gerstahn (no previous creature_formations for the listed GUIDs)
 -- Left room
 DELETE FROM `creature_formations` WHERE `memberguid` IN (90695,91054,91082,90850);
