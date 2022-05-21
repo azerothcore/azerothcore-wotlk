@@ -1,3 +1,4 @@
+-- DB update 2022_05_18_01 -> 2022_05_21_00
 -- Ulduar / Thorim
 DELETE FROM `creature_text` WHERE `CreatureID`=32865;
 

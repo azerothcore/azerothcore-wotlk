@@ -1,3 +1,4 @@
+-- DB update 2022_05_21_00 -> 2022_05_21_01
 -- Ulduar/Mimiron, set Computer model to be female
 UPDATE `creature_template` SET `modelid1` = 29101 WHERE `entry` = 34143;
 
