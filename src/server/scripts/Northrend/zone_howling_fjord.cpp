@@ -115,7 +115,7 @@ public:
                 setphase(phase);
                 timer = 0;
             }
-            
+
             timer += diff;
 
             DoMeleeAttackIfReady();
