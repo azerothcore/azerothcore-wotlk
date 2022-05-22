@@ -289,7 +289,7 @@ bool WMOGroup::open(WMORoot* rootWMO)
     return true;
 }
 
-int WMOGroup::ConvertToVMAPGroupWmo(FILE* output, [[maybe_unused]] WMORoot* rootWMO, bool preciseVectorData)
+int WMOGroup::ConvertToVMAPGroupWmo(FILE* output, bool preciseVectorData)
 {
     fwrite(&mogpFlags, sizeof(uint32), 1, output);
     fwrite(&groupWMOID, sizeof(uint32), 1, output);
