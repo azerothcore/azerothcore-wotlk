@@ -112,9 +112,10 @@ foreach(TOOL_NAME ${TOOLS_BUILD_LIST})
 
   add_dependencies(${TOOL_PROJECT_NAME} revision.h)
 
-  target_link_libraries(${TOOL_PROJECT_NAME}
-    PRIVATE
-      acore-core-interface)
+  # Need fix errors
+  # target_link_libraries(${TOOL_PROJECT_NAME}
+  #   PRIVATE
+  #     acore-core-interface)
 
   # if (${TOOL_PROJECT_NAME} MATCHES "dbimport")
   #   target_link_libraries(${TOOL_PROJECT_NAME}
