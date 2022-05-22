@@ -58,7 +58,8 @@ enum CreatureIds
     NPC_OHGAN               = 14988, // Mandokir Event
     NPC_VILEBRANCH_SPEAKER  = 11391, // Mandokir Event
     NPC_CHAINED_SPIRT       = 15117,  // Mandokir Event
-    NPC_HAKKAR              = 14834
+    NPC_HAKKAR              = 14834,
+    NPC_BRAIN_WASH_TOTEM    = 15112
 };
 
 enum GameobjectIds
