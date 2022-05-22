@@ -86,7 +86,7 @@ foreach(APPLICATION_BUILD_NAME ${APPLICATIONS_BUILD_LIST})
   set_property(CACHE ${APPLICATION_BUILD_VARIABLE} PROPERTY STRINGS default enabled disabled)
 endforeach()
 
-# Build a list of all applications when -DBUILD_APPS="custom" is selected
+# Build a list of all applications when -DBUILD_TOOLS="custom" is selected
 GetToolsList(TOOLS_BUILD_LIST)
 foreach(TOOL_BUILD_NAME ${TOOLS_BUILD_LIST})
   ToolNameToVariable(${TOOL_BUILD_NAME} TOOL_BUILD_VARIABLE)

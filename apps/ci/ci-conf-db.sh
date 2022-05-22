@@ -4,10 +4,13 @@ set -e
 
 cat >>conf/config.sh <<CONFIG_SH
 MTHREADS=$(($(grep -c ^processor /proc/cpuinfo) + 2))
+CWARNINGS=ON
+CDEBUG=OFF
 CTYPE=Release
-CCOREPCH=OFF
+CAPPS_BUILD=none
+CTOOLS_BUILD=db-only
 CSCRIPTPCH=OFF
-CAPPS_BUILD=dbimport-only
+CCOREPCH=OFF
 CCUSTOMOPTIONS='-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_FLAGS="-Werror" -DCMAKE_CXX_FLAGS="-Werror"'
 DB_CHARACTERS_CONF="MYSQL_USER='root'; MYSQL_PASS='root'; MYSQL_HOST='localhost';"
 DB_AUTH_CONF="MYSQL_USER='root'; MYSQL_PASS='root'; MYSQL_HOST='localhost';"

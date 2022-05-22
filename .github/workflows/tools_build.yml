@@ -1,8 +1,8 @@
-name: build-db
+name: tools
 on:
   push:
     branches:
-      - 'master'  # only default branch
+      - 'master'
   pull_request:
 
 concurrency:
@@ -14,19 +14,20 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # the result of the matrix will be the combination of all attributes, so we get os*compiler*modules builds
-        os: [ubuntu-latest]
-        compiler: [clang12]
+        # the result of the matrix will be the combination of all attributes, so we get os*compiler builds
+        os: [ubuntu-20.04]
+        compiler: [clang]
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.compiler }}
+    name: ${{ matrix.os }}-${{ matrix.compiler }}
     env:
       COMPILER: ${{ matrix.compiler }}
+    if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v2
       - name: Cache
         uses: actions/cache@v3
         env:
-          cache-name: cache-db
+          cache-name: cache-tools
         with:
           path: var/ccache
           key: ${{ env.cache-name }}-${{ matrix.os }}-${{ matrix.compiler }}-${{ github.ref }}-${{ github.sha }}
@@ -39,8 +40,7 @@ jobs:
         env:
           CONTINUOUS_INTEGRATION: true
       - name: Create conf/config.sh
-        run: source ./apps/ci/ci-conf-db.sh
+        run: source ./apps/ci/ci-conf-tools.sh
       - name: Build
         run: source ./apps/ci/ci-compile.sh
-      - name: Dry run
-        run: source ./apps/ci/ci-dry-run.sh dbimport
+
