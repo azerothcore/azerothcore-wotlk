@@ -34,15 +34,15 @@ DoorData const doorData[] =
 
 ObjectData const creatureData[] =
 {
+    { NPC_HIGH_PRIEST_THEKAL, DATA_THEKAL  },
     { NPC_ZEALOT_LORKHAN,     DATA_LORKHAN },
-    { NPC_ZEALOT_ZATH,        DATA_ZATH    },
-    { NPC_HIGH_PRIEST_THEKAL, DATA_THEKAL  }
+    { NPC_ZEALOT_ZATH,        DATA_ZATH    }
 };
 
 MinionData const minionData[] =
 {
-    { NPC_ZEALOT_LORKHAN, DATA_THEKAL },
-    { NPC_ZEALOT_ZATH,    DATA_THEKAL }
+   { NPC_ZEALOT_LORKHAN, DATA_THEKAL },
+   { NPC_ZEALOT_ZATH,    DATA_THEKAL }
 };
 
 class instance_zulgurub : public InstanceMapScript
@@ -56,8 +56,8 @@ public:
         {
             SetBossNumber(EncounterCount);
             LoadDoorData(doorData);
-            LoadMinionData(minionData);
             LoadObjectData(creatureData, nullptr);
+            LoadMinionData(minionData);
         }
 
         void OnCreatureCreate(Creature* creature) override
