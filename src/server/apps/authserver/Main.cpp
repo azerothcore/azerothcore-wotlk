@@ -86,7 +86,7 @@ int main(int argc, char** argv)
 
     // Init logging
     sLog->RegisterAppender<AppenderDB>();
-    sLog->Initialize();
+    sLog->Initialize(nullptr);
 
     Acore::Banner::Show("authserver",
         [](std::string_view text)
