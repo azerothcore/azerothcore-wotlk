@@ -37,12 +37,12 @@ enum Spells
     SPELL_POWERFULLHEALINGWARD      = 24309, // HACKED Totem summoned by script because the spell totems will not cast.
     SPELL_HEX                       = 24053,
     SPELL_DELUSIONSOFJINDO          = 24306,
-    SPELL_SHADEOFJINDO              = 24308, // HACKED
     //Healing Ward Spell
     SPELL_HEAL                      = 38588, // HACKED Totems are not working right. Right heal spell ID is 24311 but this spell is not casting...
     //Shade of Jindo Spell
-    SPELL_SHADOWSHOCK               = 19460,
-    SPELL_INVISIBLE                 = 24699
+    SPELL_SHADEOFJINDO_PASSIVE      = 24307,
+    SPELL_SHADEOFJINDO_VISUAL       = 24313,
+    SPELL_SHADOWSHOCK               = 19460
 };
 
 enum Events
@@ -251,7 +251,8 @@ public:
         void Reset() override
         {
             ShadowShock_Timer = 1000;
-            DoCast(me, SPELL_INVISIBLE, true);
+            DoCastSelf(SPELL_SHADEOFJINDO_PASSIVE, true);
+            DoCastSelf(SPELL_SHADEOFJINDO_VISUAL, true);
         }
 
         void EnterCombat(Unit* /*who*/) override { }
