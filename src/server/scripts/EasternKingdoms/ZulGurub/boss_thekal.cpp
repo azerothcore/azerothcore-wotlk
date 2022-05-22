@@ -24,6 +24,7 @@ EndScriptData */
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "TaskScheduler.h"
 #include "zulgurub.h"
 
 enum Says
@@ -149,14 +150,15 @@ public:
             events.ScheduleEvent(EVENT_MORTALCLEAVE, 4000, 0, PHASE_ONE);
             events.ScheduleEvent(EVENT_SILENCE, 9000, 0, PHASE_ONE);
             events.ScheduleEvent(EVENT_CHECK_TIMER, 10000, 0, PHASE_ONE);
-            events.ScheduleEvent(EVENT_RESURRECT_TIMER, 10000, 0, PHASE_ONE);
             events.SetPhase(PHASE_ONE);
             Talk(SAY_AGGRO);
+
+            
         }
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if ((events.IsInPhase(PHASE_ONE)) && !WasDead && (me->HealthBelowPctDamaged(5, damage) || (damage >= me->GetHealth())))
+            if (events.IsInPhase(PHASE_ONE) && !WasDead && (me->HealthBelowPctDamaged(5, damage)))
             {
                 damage = 0;
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -165,6 +167,13 @@ public:
                 me->AttackStop();
                 instance->SetBossState(DATA_THEKAL, SPECIAL);
                 WasDead = true;
+                events.ScheduleEvent(EVENT_RESURRECT_TIMER, 10000, 0, PHASE_ONE);
+            }
+
+            if (!Enraged && WasDead && me->HealthBelowPctDamaged(20, damage))
+            {
+                DoCastSelf(SPELL_ENRAGE);
+                Enraged = true;
             }
         }
 
@@ -216,7 +225,6 @@ public:
                             events.ScheduleEvent(EVENT_FRENZY, 30000, 0, PHASE_TWO);
                             events.ScheduleEvent(EVENT_FORCEPUNCH, 4000, 0, PHASE_TWO);
                             events.ScheduleEvent(EVENT_SPELL_CHARGE, 12000, 0, PHASE_TWO);
-                            events.ScheduleEvent(EVENT_ENRAGE, 32000, 0, PHASE_TWO);
                             events.ScheduleEvent(EVENT_SUMMONTIGERS, 25000, 0, PHASE_TWO);
                             events.SetPhase(PHASE_TWO);
                         }
@@ -255,14 +263,6 @@ public:
                         }
                         events.ScheduleEvent(EVENT_CHARGE, urand(15000, 22000), 0, PHASE_TWO);
                         break;
-                    case EVENT_ENRAGE:
-                        if (HealthBelowPct(11) && !Enraged)
-                        {
-                            DoCast(me, SPELL_ENRAGE);
-                            Enraged = true;
-                        }
-                        events.ScheduleEvent(EVENT_ENRAGE, 30000);
-                        break;
                     case EVENT_SUMMONTIGERS:
                         DoCastVictim(SPELL_SUMMONTIGERS, true);
                         events.ScheduleEvent(EVENT_SUMMONTIGERS, urand(10000, 14000), 0, PHASE_TWO);
@@ -288,6 +288,9 @@ public:
                 instance->SetData(zealotData, DONE);
             }
         }
+
+        private:
+            TaskScheduler _scheduler;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
