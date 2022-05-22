@@ -9,19 +9,6 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-# Specified files for Windows
-if (WIN32)
-# Crash logs
-set(winDebugging
-  ${CMAKE_SOURCE_DIR}/src/common/Debugging/WheatyExceptionReport.cpp
-  ${CMAKE_SOURCE_DIR}/src/common/Debugging/WheatyExceptionReport.h)
-
-# Service
-set(winService
-  ${CMAKE_SOURCE_DIR}/src/common/Platform/ServiceWin32.cpp
-  ${CMAKE_SOURCE_DIR}/src/common/Platform/ServiceWin32.h)
-endif()
-
 # Make the script module list available in the current scope
 GetApplicationsList(APPLICATIONS_BUILD_LIST)
 
@@ -36,12 +23,12 @@ endif()
 if (APPS_BUILD MATCHES "-only")
   set(BUILD_APPS_USE_WHITELIST ON)
 
-  if (APPS_BUILD STREQUAL "servers-only")
-    list(APPEND BUILD_APPS_WHITELIST authserver worldserver)
+  if (APPS_BUILD STREQUAL "auth-only")
+    list(APPEND BUILD_APPS_WHITELIST authserver)
   endif()
 
-  if (APPS_BUILD STREQUAL "dbimport-only")
-    list(APPEND BUILD_APPS_WHITELIST dbimport)
+  if (APPS_BUILD STREQUAL "world-only")
+    list(APPEND BUILD_APPS_WHITELIST worldserver)
   endif()
 endif()
 
@@ -73,8 +60,6 @@ foreach(BUILD_APP ${APPLICATIONS_BUILD_LIST})
       set (BUILD_APPLICATION_AUTHSERVER 1)
     elseif(${BUILD_APP} MATCHES "worldserver")
       set (BUILD_APPLICATION_WORLDSERVER 1)
-    elseif(${BUILD_APP} MATCHES "dbimport")
-      set (BUILD_APPLICATION_DBIMPORT 1)
     endif()
   else()
     list(APPEND BUILD_APP_GRAPH_KEYS disabled)
@@ -171,15 +156,7 @@ foreach(APPLICATION_NAME ${APPLICATIONS_BUILD_LIST})
     if (WORLDSERVER_DYNAMIC_SCRIPT_MODULES_DEPENDENCIES)
       add_dependencies(${APP_PROJECT_NAME} ${WORLDSERVER_DYNAMIC_SCRIPT_MODULES_DEPENDENCIES})
     endif()
-  elseif(${APP_PROJECT_NAME} MATCHES "dbimport")
-    target_link_libraries(${APP_PROJECT_NAME}
-      PUBLIC
-        database)
-  else()
-    target_link_libraries(${APP_PROJECT_NAME}
-      PUBLIC
-        common)
-  endif()
+   endif()
 
   unset(APP_PUBLIC_INCLUDES)
   CollectIncludeDirectories(
@@ -204,7 +181,7 @@ foreach(APPLICATION_NAME ${APPLICATIONS_BUILD_LIST})
         "server")
 
   # Install config
-  CopyDefaultConfig(${APP_PROJECT_NAME} ${APPLICATION_NAME})
+  CopyApplicationConfig(${APP_PROJECT_NAME} ${APPLICATION_NAME})
 
   if (UNIX)
     install(TARGETS ${APP_PROJECT_NAME} DESTINATION bin)

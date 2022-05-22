@@ -42,6 +42,7 @@ include(CheckIncludeFiles)
 include(ConfigureScripts)
 include(ConfigureModules)
 include(ConfigureApplications)
+include(ConfigureTools)
 
 # some utils for cmake
 include(deps/acore/cmake-utils/utils.cmake)
@@ -97,9 +98,6 @@ include(ConfigInstall)
 
 CU_RUN_HOOK("AFTER_LOAD_CMAKE_MODULES")
 
-# basic packagesearching and setup (further support will be needed, this is a preliminary release!)
-set(ACE_EXPECTED_VERSION 6.0.3)
-
 find_package(PCHSupport)
 find_package(MySQL REQUIRED)
 
@@ -123,10 +121,6 @@ include(src/cmake/showoptions.cmake)
 
 add_subdirectory(deps)
 add_subdirectory(src/common)
-
-if (TOOLS)
-  add_subdirectory(src/tools)
-endif()
 
 #
 # Loading application sources

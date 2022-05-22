@@ -20,7 +20,7 @@ CollectSourceFiles(
   ${CMAKE_CURRENT_SOURCE_DIR}/Navigation
   ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders)
 
-if (BUILD_APPLICATION_WORLDSERVER OR TOOLS)
+if (BUILD_APPLICATION_WORLDSERVER OR BUILD_TOOLS_MAPS)
   unset(PRIVATE_SOURCES)
   CollectSourceFiles(
     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -76,7 +76,7 @@ target_link_libraries(common
     stdfs
     fmt)
 
-if (BUILD_APPLICATION_WORLDSERVER OR TOOLS)
+if (BUILD_APPLICATION_WORLDSERVER OR BUILD_TOOLS_MAPS)
   target_link_libraries(common
     PUBLIC
       g3dlib

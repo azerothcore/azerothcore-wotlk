@@ -75,7 +75,7 @@ if(WORLDSERVER_DYNAMIC_SCRIPT_MODULES_DEPENDENCIES)
 endif()
 
 # Install config
-CopyDefaultConfig(worldserver)
+CopyApplicationConfig(worldserver)
 
 if( UNIX )
   install(TARGETS worldserver DESTINATION bin)
