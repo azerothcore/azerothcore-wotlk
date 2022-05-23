@@ -82,11 +82,11 @@ public:
                 switch (eventId)
                 {
                     case EVENT_FROSTBREATH:
-                        DoCastVictim(SPELL_FROSTBREATH, false);
+                        DoCastVictim(SPELL_FROSTBREATH);
                         events.ScheduleEvent(EVENT_FROSTBREATH, urand(10000, 22000));
                         break;
                     case EVENT_MASSIVEGEYSER:
-                        DoCastVictim(SPELL_MASSIVEGEYSER, false);
+                        DoCastVictim(SPELL_MASSIVEGEYSER);
                         events.ScheduleEvent(EVENT_MASSIVEGEYSER, urand(12000, 22000));
                         break;
                     case EVENT_SLAM:
