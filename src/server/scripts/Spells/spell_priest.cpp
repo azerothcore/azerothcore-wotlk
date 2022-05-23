@@ -841,7 +841,23 @@ class spell_pri_vampiric_touch : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        return eventInfo.GetActionTarget() && eventInfo.GetActionTarget()->IsAlive() && GetOwner()->GetGUID() == eventInfo.GetActionTarget()->GetGUID();
+        if (!eventInfo.GetActionTarget() || GetOwner()->GetGUID() != eventInfo.GetActionTarget()->GetGUID())
+            return false;
+
+        if (eventInfo.GetTypeMask() & PROC_FLAG_KILLED)
+        {
+            if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
+            {
+                if (spellInfo->SpellFamilyName == SPELLFAMILY_PRIEST && (spellInfo->SpellFamilyFlags[0] & 0x00002000))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        return eventInfo.GetActionTarget()->IsAlive();
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
