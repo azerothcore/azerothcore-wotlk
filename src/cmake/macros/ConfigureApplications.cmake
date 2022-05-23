@@ -12,7 +12,6 @@
 
 set(BUILD_APPLICATION_AUTHSERVER 0)
 set(BUILD_APPLICATION_WORLDSERVER 0)
-set(BUILD_APPLICATION_DBIMPORT 0)
 
 # Returns the base path to the apps directory in the source directory
 function(GetApplicationsBasePath variable)
@@ -81,8 +80,6 @@ function(CheckApplicationsBuildList)
     endif()
   endif()
 
-  # Set the SCRIPTS_${APPLICATION_BUILD_NAME} variables from the
-  # variables set above
   foreach(APPLICATION_BUILD_NAME ${APPLICATIONS_BUILD_LIST})
     ApplicationNameToVariable(${APPLICATION_BUILD_NAME} APPLICATION_BUILD_VARIABLE)
 
@@ -105,8 +102,6 @@ function(CheckApplicationsBuildList)
         set (BUILD_APPLICATION_AUTHSERVER 1 PARENT_SCOPE)
       elseif(${APPLICATION_BUILD_NAME} MATCHES "worldserver")
         set (BUILD_APPLICATION_WORLDSERVER 1 PARENT_SCOPE)
-      elseif(${APPLICATION_BUILD_NAME} MATCHES "dbimport")
-        set (BUILD_APPLICATION_DBIMPORT 1 PARENT_SCOPE)
       endif()
     endif()
   endforeach()
