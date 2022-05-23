@@ -1,3 +1,4 @@
+-- DB update 2022_05_23_03 -> 2022_05_23_04
 SET @LEADERGUID := 84542;
 DELETE FROM `creature_formations` WHERE `memberGUID` IN (@LEADERGUID, 84190, 84194, 84192, 84541, 84543, 84186, 84188);
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`) VALUES
