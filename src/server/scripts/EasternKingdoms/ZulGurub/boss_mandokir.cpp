@@ -339,6 +339,7 @@ public:
 
     private:
         uint32 SunderArmor_Timer;
+        uint32 Thrash_Timer;
         InstanceScript* instance;
     };
 
