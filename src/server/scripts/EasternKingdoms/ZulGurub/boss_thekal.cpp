@@ -92,6 +92,8 @@ public:
         {
             Enraged = false;
             WasDead = false;
+            _lorkhanDied = false;
+            _zathDied = false;
         }
 
         void Reset() override
@@ -127,6 +129,11 @@ public:
                     creature->Respawn(true);
                 }
             }
+
+            _scheduler.SetValidator([this]
+            {
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -140,6 +147,7 @@ public:
             _EnterCombat();
             Talk(SAY_AGGRO);
 
+            _scheduler.CancelAll();
             _scheduler.Schedule(4s, [this](TaskContext context) {
                 DoCastVictim(SPELL_MORTALCLEAVE);
                 context.Repeat(15s, 20s);
@@ -152,12 +160,10 @@ public:
         void SetData(uint32 /*type*/, uint32 data) override
         {
             UpdateZealotStatus(data, true);
-            LOG_ERROR("sql.sql", "Set data........................");
+
             _scheduler.Schedule(10s, [this, data](TaskContext /*context*/) {
-                LOG_ERROR("sql.sql", "happening");
                 if (!_lorkhanDied || !_zathDied)
                 {
-                    LOG_ERROR("sql.sql", "happening 2");
                     ReviveZealot(data);
                 }
             });
@@ -185,11 +191,29 @@ public:
                         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 40.0f, true); // hack
                         DoResetThreat();
-                        events.ScheduleEvent(EVENT_FRENZY, 30000, 0, PHASE_TWO);
                         events.ScheduleEvent(EVENT_FORCEPUNCH, 4000, 0, PHASE_TWO);
                         events.ScheduleEvent(EVENT_SPELL_CHARGE, 12000, 0, PHASE_TWO);
                         events.ScheduleEvent(EVENT_SUMMONTIGERS, 25000, 0, PHASE_TWO);
                         events.SetPhase(PHASE_TWO);
+
+                        _scheduler.Schedule(30s, [this](TaskContext context) {
+                            DoCastSelf(SPELL_FRENZY);
+                            context.Repeat();
+                        }).Schedule(4s, [this](TaskContext context) {
+                            DoCastVictim(SPELL_FORCEPUNCH);
+                            context.Repeat(16s, 21s);
+                        }).Schedule(12s, [this](TaskContext context) {
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                            {
+                                DoCast(target, SPELL_CHARGE);
+                                DoResetThreat();
+                                AttackStart(target);
+                            }
+                            context.Repeat(15s, 22s);
+                        }).Schedule(25s, [this](TaskContext context) {
+                            DoCastVictim(SPELL_SUMMONTIGERS, true);
+                            context.Repeat(10s, 14s);
+                        });
                     }
                     else
                     {
@@ -220,46 +244,14 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim() && instance->GetBossState(DATA_THEKAL) != SPECIAL)
-                return;
-
-            events.Update(diff);
-            _scheduler.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            while (uint32 eventId = events.ExecuteEvent())
+            if (me->GetReactState() == REACT_AGGRESSIVE)
             {
-                switch (eventId)
-                {
-                    case EVENT_FRENZY:
-                        DoCastSelf(SPELL_FRENZY);
-                        events.ScheduleEvent(EVENT_FRENZY, 30000, 0, PHASE_TWO);
-                        break;
-                    case EVENT_FORCEPUNCH:
-                        DoCastVictim(SPELL_FORCEPUNCH, true);
-                        events.ScheduleEvent(EVENT_FORCEPUNCH, urand(16000, 21000), 0, PHASE_TWO);
-                        break;
-                    case EVENT_CHARGE:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        {
-                            DoCast(target, SPELL_CHARGE);
-                            DoResetThreat();
-                            AttackStart(target);
-                        }
-                        events.ScheduleEvent(EVENT_CHARGE, urand(15000, 22000), 0, PHASE_TWO);
-                        break;
-                    case EVENT_SUMMONTIGERS:
-                        DoCastVictim(SPELL_SUMMONTIGERS, true);
-                        events.ScheduleEvent(EVENT_SUMMONTIGERS, urand(10000, 14000), 0, PHASE_TWO);
-                        break;
-                    default:
-                        break;
-                }
-            }
+                if (!UpdateVictim())
+                    return;
 
-            DoMeleeAttackIfReady();
+                _scheduler.Update(diff,
+                    std::bind(&BossAI::DoMeleeAttackIfReady, this));
+            }
         }
 
         void ReviveZealot(uint32 zealotData)
@@ -271,7 +263,6 @@ public:
                 zealot->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 zealot->SetReactState(REACT_AGGRESSIVE);
                 zealot->SetFullHealth();
-                instance->SetData(zealotData, DONE);
                 UpdateZealotStatus(zealotData, false);
             }
         }
@@ -312,48 +303,69 @@ public:
             instance = creature->GetInstanceScript();
         }
 
-        uint32 Shield_Timer;
-        uint32 BloodLust_Timer;
-        uint32 GreaterHeal_Timer;
-        uint32 Disarm_Timer;
-        uint32 Check_Timer;
-
-        bool FakeDeath;
-
         InstanceScript* instance;
 
         void Reset() override
         {
-            Shield_Timer = 1000;
-            BloodLust_Timer = 16000;
-            GreaterHeal_Timer = 32000;
-            Disarm_Timer = 6000;
-            Check_Timer = 10000;
-
-            FakeDeath = false;
-
             me->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            me->SetReactState(REACT_AGGRESSIVE);
+
+            _scheduler.SetValidator([this]
+            {
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
+        }
+
+        void EnterCombat(Unit* /*who*/) override
+        {
+            _scheduler.CancelAll();
+            _scheduler.Schedule(1s, [this](TaskContext context) {
+                DoCastSelf(SPELL_SHIELD);
+                context.Repeat(1min);
+            }).Schedule(16s, [this](TaskContext context) {
+                DoCastSelf(SPELL_BLOODLUST);
+                context.Repeat(20s, 28s);
+            }).Schedule(32s, [this](TaskContext context) {
+                Unit* thekal = instance->GetCreature(DATA_THEKAL);
+                Unit* zath = instance->GetCreature(DATA_ZATH);
+
+                if (!thekal || !zath)
+                    return;
+
+                switch (urand(0, 1))
+                {
+                    case 0:
+                        if (me->IsWithinMeleeRange(thekal))
+                            DoCast(thekal, SPELL_GREATERHEAL);
+                        break;
+                    case 1:
+                        if (me->IsWithinMeleeRange(zath))
+                            DoCast(zath, SPELL_GREATERHEAL);
+                        break;
+                }
+                context.Repeat(15s, 20s);
+            }).Schedule(6s, [this](TaskContext context) {
+                DoCastVictim(SPELL_DISARM);
+                context.Repeat(15s, 25s);
+            });
         }
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (damage >= me->GetHealth() && !FakeDeath)
+            if (damage >= me->GetHealth() && me->GetReactState() == REACT_AGGRESSIVE)
             {
-                me->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
-                me->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
-                me->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
+                me->RemoveAllAuras();
                 me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetStandState(UNIT_STAND_STATE_SLEEP);
                 me->SetReactState(REACT_PASSIVE);
+                me->InterruptNonMeleeSpells(false);
                 me->AttackStop();
 
                 damage = 0;
-                FakeDeath = true;
 
                 if (Creature* thekal = instance->GetCreature(DATA_THEKAL))
                 {
-                    LOG_ERROR("sql.sql", "here");
                     thekal->AI()->SetData(ACTION_RESSURRECT, DATA_LORKHAN);
                 }
             }
@@ -361,63 +373,18 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!FakeDeath)
+            if (me->GetReactState() == REACT_AGGRESSIVE)
             {
                 if (!UpdateVictim())
                     return;
+
+                _scheduler.Update(diff,
+                    std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
             }
-
-            //Shield_Timer
-            if (Shield_Timer <= diff)
-            {
-                DoCast(me, SPELL_SHIELD);
-                Shield_Timer = 61000;
-            }
-            else Shield_Timer -= diff;
-
-            //BloodLust_Timer
-            if (BloodLust_Timer <= diff)
-            {
-                DoCast(me, SPELL_BLOODLUST);
-                BloodLust_Timer = 20000 + rand() % 8000;
-            }
-            else BloodLust_Timer -= diff;
-
-            //Casting Greaterheal to Thekal or Zath if they are in meele range.
-            if (GreaterHeal_Timer <= diff)
-            {
-                Unit* pThekal = instance->GetCreature(DATA_THEKAL);
-                Unit* pZath = instance->GetCreature(DATA_ZATH);
-
-                if (!pThekal || !pZath)
-                    return;
-
-                switch (urand(0, 1))
-                {
-                    case 0:
-                        if (me->IsWithinMeleeRange(pThekal))
-                            DoCast(pThekal, SPELL_GREATERHEAL);
-                        break;
-                    case 1:
-                        if (me->IsWithinMeleeRange(pZath))
-                            DoCast(pZath, SPELL_GREATERHEAL);
-                        break;
-                }
-
-                GreaterHeal_Timer = 15000 + rand() % 5000;
-            }
-            else GreaterHeal_Timer -= diff;
-
-            //Disarm_Timer
-            if (Disarm_Timer <= diff)
-            {
-                DoCastVictim(SPELL_DISARM);
-                Disarm_Timer = 15000 + rand() % 10000;
-            }
-            else Disarm_Timer -= diff;
-
-            DoMeleeAttackIfReady();
         }
+
+        private:
+            TaskScheduler _scheduler;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -438,35 +405,48 @@ public:
             instance = creature->GetInstanceScript();
         }
 
-        uint32 SweepingStrikes_Timer;
-        uint32 SinisterStrike_Timer;
-        uint32 Gouge_Timer;
-        uint32 Kick_Timer;
-        uint32 Blind_Timer;
-        uint32 Check_Timer;
-
-        bool FakeDeath;
-
         InstanceScript* instance;
 
         void Reset() override
         {
-            SweepingStrikes_Timer = 13000;
-            SinisterStrike_Timer = 8000;
-            Gouge_Timer = 25000;
-            Kick_Timer = 18000;
-            Blind_Timer = 5000;
-            Check_Timer = 10000;
-
-            FakeDeath = false;
-
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            me->SetReactState(REACT_AGGRESSIVE);
         }
 
+        void EnterCombat(Unit* /*who*/) override
+        {
+            _scheduler.CancelAll();
+
+            _scheduler.Schedule(13s, [this](TaskContext context) {
+                DoCastSelf(SPELL_SWEEPINGSTRIKES);
+                context.Repeat(1min);
+            }).Schedule(16s, [this](TaskContext context) {
+                DoCastSelf(SPELL_BLOODLUST);
+                context.Repeat(22s, 26s);
+            }).Schedule(8s, [this](TaskContext context) {
+                DoCastVictim(SPELL_SINISTERSTRIKE);
+                context.Repeat(8s, 16s);
+            }).Schedule(25s, [this](TaskContext context) {
+                DoCastVictim(SPELL_GOUGE);
+
+                if (DoGetThreat(me->GetVictim()))
+                {
+                    DoModifyThreatPercent(me->GetVictim(), -100);
+                }
+
+                context.Repeat(17s, 27s);
+            }).Schedule(18s, [this](TaskContext context) {
+                DoCastVictim(SPELL_KICK);
+                context.Repeat(15s, 25s);
+            }).Schedule(5s, [this](TaskContext context) {
+                DoCastVictim(SPELL_BLIND);
+                context.Repeat(10s, 20s);
+            });
+        }
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (damage >= me->GetHealth() && !FakeDeath)
+            if (damage >= me->GetHealth() && me->GetReactState() == REACT_AGGRESSIVE)
             {
                 me->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
                 me->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
@@ -476,7 +456,6 @@ public:
                 me->SetReactState(REACT_PASSIVE);
                 me->AttackStop();
 
-                FakeDeath = true;
                 damage = 0;
 
                 if (Creature* thekal = instance->GetCreature(DATA_THEKAL))
@@ -488,58 +467,18 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!FakeDeath)
+            if (me->GetReactState() == REACT_AGGRESSIVE)
             {
                 if (!UpdateVictim())
                     return;
+
+                _scheduler.Update(diff,
+                    std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
             }
-
-            //SweepingStrikes_Timer
-            if (SweepingStrikes_Timer <= diff)
-            {
-                DoCastVictim(SPELL_SWEEPINGSTRIKES);
-                SweepingStrikes_Timer = 22000 + rand() % 4000;
-            }
-            else SweepingStrikes_Timer -= diff;
-
-            //SinisterStrike_Timer
-            if (SinisterStrike_Timer <= diff)
-            {
-                DoCastVictim(SPELL_SINISTERSTRIKE);
-                SinisterStrike_Timer = 8000 + rand() % 8000;
-            }
-            else SinisterStrike_Timer -= diff;
-
-            //Gouge_Timer
-            if (Gouge_Timer <= diff)
-            {
-                DoCastVictim(SPELL_GOUGE);
-
-                if (DoGetThreat(me->GetVictim()))
-                    DoModifyThreatPercent(me->GetVictim(), -100);
-
-                Gouge_Timer = 17000 + rand() % 10000;
-            }
-            else Gouge_Timer -= diff;
-
-            //Kick_Timer
-            if (Kick_Timer <= diff)
-            {
-                DoCastVictim(SPELL_KICK);
-                Kick_Timer = 15000 + rand() % 10000;
-            }
-            else Kick_Timer -= diff;
-
-            //Blind_Timer
-            if (Blind_Timer <= diff)
-            {
-                DoCastVictim(SPELL_BLIND);
-                Blind_Timer = 10000 + rand() % 10000;
-            }
-            else Blind_Timer -= diff;
-
-            DoMeleeAttackIfReady();
         }
+
+        private:
+            TaskScheduler _scheduler;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

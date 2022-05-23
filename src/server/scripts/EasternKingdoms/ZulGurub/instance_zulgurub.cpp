@@ -39,12 +39,6 @@ ObjectData const creatureData[] =
     { NPC_ZEALOT_ZATH,        DATA_ZATH    }
 };
 
-MinionData const minionData[] =
-{
-   { NPC_ZEALOT_LORKHAN, DATA_THEKAL },
-   { NPC_ZEALOT_ZATH,    DATA_THEKAL }
-};
-
 class instance_zulgurub : public InstanceMapScript
 {
 public:
@@ -57,7 +51,6 @@ public:
             SetBossNumber(EncounterCount);
             LoadDoorData(doorData);
             LoadObjectData(creatureData, nullptr);
-            LoadMinionData(minionData);
         }
 
         void OnCreatureCreate(Creature* creature) override
