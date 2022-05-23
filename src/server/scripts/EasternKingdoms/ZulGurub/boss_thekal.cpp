@@ -140,6 +140,16 @@ public:
         {
             _JustDied();
             Talk(SAY_DEATH);
+
+            if (Creature* zealot = instance->GetCreature(DATA_LORKHAN))
+            {
+                zealot->Kill(zealot, zealot);
+            }
+
+            if (Creature* zealot = instance->GetCreature(DATA_ZATH))
+            {
+                zealot->Kill(zealot, zealot);
+            }
         }
 
         void EnterCombat(Unit* /*who*/) override
