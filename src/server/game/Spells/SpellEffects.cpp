@@ -2719,6 +2719,9 @@ void Spell::EffectAddFarsight(SpellEffIndex effIndex)
     if (!m_caster->IsInWorld())
         return;
 
+    // Remove old farsight if exist
+    bool updateViewerVisibility = m_caster->RemoveDynObject(m_spellInfo->Id);
+
     DynamicObject* dynObj = new DynamicObject(true);
     if (!dynObj->CreateDynamicObject(m_caster->GetMap()->GenerateLowGuid<HighGuid::DynamicObject>(), m_caster, m_spellInfo->Id, *destTarget, radius, DYNAMIC_OBJECT_FARSIGHT_FOCUS))
     {
@@ -2727,9 +2730,7 @@ void Spell::EffectAddFarsight(SpellEffIndex effIndex)
     }
 
     dynObj->SetDuration(duration);
-    dynObj->SetCasterViewpoint();
-
-    m_caster->ToPlayer()->UpdateVisibilityForPlayer();
+    dynObj->SetCasterViewpoint(updateViewerVisibility);
 }
 
 void Spell::EffectUntrainTalents(SpellEffIndex /*effIndex*/)

@@ -3639,8 +3639,15 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
         // skip triggered spell (item equip spell casting and other not explicit character casts/item uses)
         if (!(_triggeredCastFlags & TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS) && m_spellInfo->IsBreakingStealth())
         {
-            m_caster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CAST, 0, m_spellInfo->Id == 75);
-            m_caster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_SPELL_ATTACK, 0, m_spellInfo->Id == 75);
+            // Farsight spells exception
+            uint32 exceptSpellId = 0;
+            if (m_spellInfo->HasEffect(SPELL_EFFECT_ADD_FARSIGHT))
+            {
+                exceptSpellId = m_spellInfo->Id;
+            }
+
+            m_caster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CAST, exceptSpellId, m_spellInfo->Id == 75);
+            m_caster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_SPELL_ATTACK, exceptSpellId, m_spellInfo->Id == 75);
         }
 
         m_caster->SetCurrentCastedSpell(this);
@@ -3700,14 +3707,17 @@ void Spell::cancel(bool bySelf)
             break;
 
         case SPELL_STATE_CASTING:
-            for (std::list<TargetInfo>::const_iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
-                if ((*ihit).missCondition == SPELL_MISS_NONE)
-                    if (Unit* unit = m_caster->GetGUID() == ihit->targetGUID ? m_caster : ObjectAccessor::GetUnit(*m_caster, ihit->targetGUID))
-                        unit->RemoveOwnedAura(m_spellInfo->Id, m_originalCasterGUID, 0, AURA_REMOVE_BY_CANCEL);
+            if (!bySelf)
+            {
+                for (std::list<TargetInfo>::const_iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
+                    if ((*ihit).missCondition == SPELL_MISS_NONE)
+                        if (Unit* unit = m_caster->GetGUID() == ihit->targetGUID ? m_caster : ObjectAccessor::GetUnit(*m_caster, ihit->targetGUID))
+                            unit->RemoveOwnedAura(m_spellInfo->Id, m_originalCasterGUID, 0, AURA_REMOVE_BY_CANCEL);
 
-            SendChannelUpdate(0);
-            SendInterrupted(0);
-            SendCastResult(SPELL_FAILED_INTERRUPTED);
+                SendChannelUpdate(0);
+                SendInterrupted(0);
+                SendCastResult(SPELL_FAILED_INTERRUPTED);
+            }
 
             if (m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->ToPlayer()->NeedSendSpectatorData())
                 ArenaSpectator::SendCommand_Spell(m_caster->FindMap(), m_caster->GetGUID(), "SPE", m_spellInfo->Id, bySelf ? 99998 : 99999);
@@ -3718,7 +3728,6 @@ void Spell::cancel(bool bySelf)
 
             m_appliedMods.clear();
             break;
-
         default:
             break;
     }
@@ -3727,7 +3736,12 @@ void Spell::cancel(bool bySelf)
     if (m_selfContainer && *m_selfContainer == this)
         *m_selfContainer = nullptr;
 
-    m_caster->RemoveDynObject(m_spellInfo->Id);
+    // Do not remove current far sight object (already done in Spell::EffectAddFarsight) to prevent from reset viewpoint to player
+    if (!(bySelf && m_spellInfo->HasEffect(SPELL_EFFECT_ADD_FARSIGHT)))
+    {
+        m_caster->RemoveDynObject(m_spellInfo->Id);
+    }
+
     if (m_spellInfo->IsChanneled()) // if not channeled then the object for the current cast wasn't summoned yet
         m_caster->RemoveGameObject(m_spellInfo->Id, true);
 
