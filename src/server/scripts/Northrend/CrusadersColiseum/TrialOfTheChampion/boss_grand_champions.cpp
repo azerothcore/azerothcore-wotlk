@@ -550,7 +550,7 @@ public:
                     me->SetReactState(REACT_PASSIVE);
                     me->RemoveAllAuras();
                     AddCreatureAddonAuras();
-                    me->DeleteThreatList();
+                    me->GetThreatMgr().ClearAllThreat();
                     me->CombatStop(true);
                     me->GetMotionMaster()->Clear();
                     me->StopMoving();
@@ -580,7 +580,7 @@ public:
                     me->SetReactState(REACT_PASSIVE);
                     me->RemoveAllAuras();
                     AddCreatureAddonAuras();
-                    me->DeleteThreatList();
+                    me->GetThreatMgr().ClearAllThreat();
                     me->CombatStop(true);
                     me->GetMotionMaster()->Clear();
                     me->SetRegeneratingHealth(false);
