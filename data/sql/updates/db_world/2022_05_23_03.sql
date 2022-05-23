@@ -1,3 +1,4 @@
+-- DB update 2022_05_23_02 -> 2022_05_23_03
 -- Flamebringer fix flying animation while on ground
 UPDATE `creature_template_movement` SET `Flight` = 0 WHERE `CreatureId` = 27292;
 
