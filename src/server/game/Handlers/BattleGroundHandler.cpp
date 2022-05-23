@@ -243,6 +243,11 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
             }
         });
 
+        if (err)
+        {
+            err = grp->CanJoinBattlegroundQueue(bg, bgQueueTypeId, 0, bg->GetMaxPlayersPerTeam(), false, 0);
+        }
+
         if (err <= 0)
         {
             grp->DoForAllMembers([err](Player* member)
@@ -254,9 +259,6 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
 
             return;
         }
-
-        ASSERT(err > 0);
-        err = grp->CanJoinBattlegroundQueue(bg, bgQueueTypeId, 0, bg->GetMaxPlayersPerTeam(), false, 0);
 
         isPremade = (grp->GetMembersCount() >= bg->GetMinPlayersPerTeam() && bgTypeId != BATTLEGROUND_RB);
         uint32 avgWaitTime = 0;

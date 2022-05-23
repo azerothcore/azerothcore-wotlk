@@ -137,31 +137,31 @@ public:
                             if (DoGetThreat(me->GetVictim()))
                                 DoModifyThreatPercent(target, -100);
                             Creature* SacrificedTroll;
-                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, target->GetPositionX() + 2, target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
+                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, TeleportLoc.m_positionX + 2, TeleportLoc.m_positionY, TeleportLoc.m_positionZ, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
                             if (SacrificedTroll)
                                 SacrificedTroll->AI()->AttackStart(target);
-                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, target->GetPositionX() - 2, target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
+                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, TeleportLoc.m_positionX - 2, TeleportLoc.m_positionY, TeleportLoc.m_positionZ, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
                             if (SacrificedTroll)
                                 SacrificedTroll->AI()->AttackStart(target);
-                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, target->GetPositionX() + 4, target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
+                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, TeleportLoc.m_positionX + 4, TeleportLoc.m_positionY, TeleportLoc.m_positionZ, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
                             if (SacrificedTroll)
                                 SacrificedTroll->AI()->AttackStart(target);
-                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, target->GetPositionX() - 4, target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
+                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, TeleportLoc.m_positionX - 4, TeleportLoc.m_positionY, TeleportLoc.m_positionZ, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
                             if (SacrificedTroll)
                                 SacrificedTroll->AI()->AttackStart(target);
-                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, target->GetPositionX(), target->GetPositionY() + 2, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
+                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, TeleportLoc.m_positionX, TeleportLoc.m_positionY + 2, TeleportLoc.m_positionZ, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
                             if (SacrificedTroll)
                                 SacrificedTroll->AI()->AttackStart(target);
-                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, target->GetPositionX(), target->GetPositionY() - 2, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
+                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, TeleportLoc.m_positionX, TeleportLoc.m_positionY - 2, TeleportLoc.m_positionZ, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
                             if (SacrificedTroll)
                                 SacrificedTroll->AI()->AttackStart(target);
-                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, target->GetPositionX(), target->GetPositionY() + 4, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
+                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, TeleportLoc.m_positionX, TeleportLoc.m_positionY + 4, TeleportLoc.m_positionZ, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
                             if (SacrificedTroll)
                                 SacrificedTroll->AI()->AttackStart(target);
-                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, target->GetPositionX(), target->GetPositionY() - 4, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
+                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, TeleportLoc.m_positionX, TeleportLoc.m_positionY - 4, TeleportLoc.m_positionZ, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
                             if (SacrificedTroll)
                                 SacrificedTroll->AI()->AttackStart(target);
-                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, target->GetPositionX() + 3, target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
+                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, TeleportLoc.m_positionX + 3, TeleportLoc.m_positionY, TeleportLoc.m_positionZ, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
                             if (SacrificedTroll)
                                 SacrificedTroll->AI()->AttackStart(target);
                         }
