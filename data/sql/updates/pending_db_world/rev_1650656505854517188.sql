@@ -1,4 +1,3 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1650656505854517188');
 
 DELETE FROM `spell_proc_event` WHERE `entry` = '71602';
 DELETE FROM `spell_proc_event` WHERE `entry` = '75465';
