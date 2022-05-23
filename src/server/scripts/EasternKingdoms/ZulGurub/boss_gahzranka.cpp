@@ -62,8 +62,8 @@ public:
         void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
-            events.ScheduleEvent(EVENT_FROSTBREATH, 8000);
-            events.ScheduleEvent(EVENT_MASSIVEGEYSER, 25000);
+            events.ScheduleEvent(EVENT_FROSTBREATH, 10000);
+            events.ScheduleEvent(EVENT_MASSIVEGEYSER, 15000);
             events.ScheduleEvent(EVENT_SLAM, 17000);
         }
 
@@ -82,12 +82,12 @@ public:
                 switch (eventId)
                 {
                     case EVENT_FROSTBREATH:
-                        DoCastVictim(SPELL_FROSTBREATH, true);
-                        events.ScheduleEvent(EVENT_FROSTBREATH, urand(7000, 11000));
+                        DoCastVictim(SPELL_FROSTBREATH, false);
+                        events.ScheduleEvent(EVENT_FROSTBREATH, urand(10000, 22000));
                         break;
                     case EVENT_MASSIVEGEYSER:
-                        DoCastVictim(SPELL_MASSIVEGEYSER, true);
-                        events.ScheduleEvent(EVENT_MASSIVEGEYSER, urand(22000, 32000));
+                        DoCastVictim(SPELL_MASSIVEGEYSER, false);
+                        events.ScheduleEvent(EVENT_MASSIVEGEYSER, urand(12000, 22000));
                         break;
                     case EVENT_SLAM:
                         DoCastVictim(SPELL_SLAM, true);
