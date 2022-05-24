@@ -304,7 +304,8 @@ public:
         {
             if (summon->GetEntry() == NPC_NEFARIAN)
             {
-                summons.DespawnAll();
+                summons.DespawnEntry(_nefarianLeftTunnel);
+                summons.DespawnEntry(_nefarianRightTunnel);
                 Unit::Kill(me, me);
             }
         }
@@ -673,7 +674,7 @@ struct boss_nefarian : public BossAI
                     break;
                 case EVENT_CLASSCALL:
                     std::set<uint8> classesPresent;
-                    for (auto& ref : me->getThreatMgr().getThreatList())
+                    for (auto& ref : me->GetThreatMgr().getThreatList())
                     {
                         if (ref->getTarget() && ref->getTarget()->GetTypeId() == TYPEID_PLAYER)
                         {
@@ -1014,49 +1015,42 @@ class spell_class_call_handler : public SpellScript
         if (SpellInfo const* spellInfo = GetSpellInfo())
         {
             targets.remove_if([spellInfo](WorldObject const* target) -> bool
+            {
+                Player const* player = target->ToPlayer();
+                if (!player || player->getClass() == CLASS_DEATH_KNIGHT) // ignore all death knights from whatever spell, for some reason the condition below is not working x.x
                 {
-                    Player const* player = target->ToPlayer();
-                    if (!player || player->getClass() == CLASS_DEATH_KNIGHT) // ignore all death knights from whatever spell, for some reason the condition below is not working x.x
-                    {
-                        return true;
-                    }
+                    return true;
+                }
 
-                    auto it = classCallSpells.find(spellInfo->Id);
-                    if (it != classCallSpells.end()) // should never happen but only to be sure.
-                    {
-                        return target->ToPlayer()->getClass() != it->second;
-                    }
+                auto it = classCallSpells.find(spellInfo->Id);
+                if (it != classCallSpells.end()) // should never happen but only to be sure.
+                {
+                    return target->ToPlayer()->getClass() != it->second;
+                }
 
-                    return false;
-                });
+                return false;
+            });
         }
     }
 
-    void HandleOnHitRogue()
+    void HandleOnHitRogue(SpellEffIndex /*effIndex*/)
     {
         Unit* caster = GetCaster();
         Unit* target = GetHitUnit();
-
         if (!caster || !target)
         {
             return;
         }
 
-        float angle = rand_norm() * 2 * M_PI;
-        Position tp = caster->GetPosition();
-        tp.m_positionX += std::cos(angle) * 5.f;
-        tp.m_positionY += std::sin(angle) * 5.f;
-        float z = tp.m_positionZ + 0.5f;
-        caster->UpdateAllowedPositionZ(tp.GetPositionX(), tp.GetPositionY(), z);
-        target->NearTeleportTo(tp.GetPositionX(), tp.GetPositionY(), z, angle - M_PI);
-        target->UpdatePositionData();
+        Position tp = caster->GetFirstCollisionPosition(5.f, 0.f);
+        target->NearTeleportTo(tp.GetPositionX(), tp.GetPositionY(), tp.GetPositionZ(), tp.GetOrientation());
     }
 
     void HandleOnHitWarlock()
     {
-        if (GetHitUnit())
+        if (Unit* target = GetHitUnit())
         {
-            GetHitUnit()->CastSpell(GetHitUnit(), SPELL_SUMMON_INFERNALS, true);
+            target->CastSpell(target, SPELL_SUMMON_INFERNALS, true);
         }
     }
 
@@ -1066,7 +1060,7 @@ class spell_class_call_handler : public SpellScript
 
         if (m_scriptSpellId == SPELL_ROGUE)
         {
-            OnHit += SpellHitFn(spell_class_call_handler::HandleOnHitRogue);
+            OnEffectLaunchTarget += SpellEffectFn(spell_class_call_handler::HandleOnHitRogue, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
         }
         else if (m_scriptSpellId == SPELL_WARLOCK)
         {
@@ -1160,29 +1154,6 @@ class spell_class_call_polymorph : public SpellScript
         OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_class_call_polymorph::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
         OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_class_call_polymorph::FilterTargetsEff, EFFECT_1, TARGET_UNIT_SRC_AREA_ALLY);
         OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_class_call_polymorph::FilterTargetsEff, EFFECT_2, TARGET_UNIT_SRC_AREA_ALLY);
-    }
-};
-
-class aura_class_call_berserk : public AuraScript
-{
-    PrepareAuraScript(aura_class_call_berserk);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_WARRIOR_BERSERK });
-    }
-
-    void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        if (Unit* target = GetTarget())
-        {
-            target->CastSpell(target, SPELL_WARRIOR_BERSERK);
-        }
-    }
-
-    void Register() override
-    {
-        OnEffectRemove += AuraEffectRemoveFn(aura_class_call_berserk::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_MOD_SHAPESHIFT, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1320,7 +1291,6 @@ void AddSC_boss_nefarian()
     RegisterSpellScript(aura_class_call_wild_magic);
     RegisterSpellScript(aura_class_call_siphon_blessing);
     RegisterSpellScript(spell_class_call_polymorph);
-    RegisterSpellScript(aura_class_call_berserk);
     RegisterSpellScript(spell_corrupted_totems);
     RegisterSpellScript(spell_shadowblink);
     RegisterSpellScript(spell_spawn_drakonid);

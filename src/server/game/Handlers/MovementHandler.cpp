@@ -321,7 +321,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
     Unit* mover = _player->m_mover;
 
-    ASSERT(mover != nullptr);                      // there must always be a mover
+    ASSERT(mover);                      // there must always be a mover
 
     Player* plrMover = mover->ToPlayer();
 
@@ -764,7 +764,7 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket& recvData)
     WorldPacket data(MSG_MOVE_KNOCK_BACK, 66);
     data << guid.WriteAsPacked();
     _player->m_mover->BuildMovementPacket(&data);
-
+    _player->SetCanTeleport(true);
     // knockback specific info
     data << movementInfo.jump.sinAngle;
     data << movementInfo.jump.cosAngle;

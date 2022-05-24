@@ -1125,6 +1125,11 @@ void Spell::EffectJumpDest(SpellEffIndex effIndex)
         speedXY = pow(speedZ * 10, 8);
         m_caster->GetMotionMaster()->MoveJump(x, y, z, speedXY, speedZ, 0, ObjectAccessor::GetUnit(*m_caster, m_caster->GetGuidValue(UNIT_FIELD_TARGET)));
 
+        if (Player* player = m_caster->ToPlayer())
+        {
+            player->SetCanTeleport(true);
+        }
+
         if (m_caster->GetTypeId() == TYPEID_PLAYER)
         {
             sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
@@ -1143,6 +1148,10 @@ void Spell::EffectJumpDest(SpellEffIndex effIndex)
     if (speedXY < 1.0f)
         speedXY = 1.0f;
 
+    if (Player* player = m_caster->ToPlayer())
+    {
+        player->SetCanTeleport(true);
+    }
     m_caster->GetMotionMaster()->MoveJump(x, y, z, speedXY, speedZ);
 
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
@@ -1551,11 +1560,9 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
         }
 
         // Implemented this way as there is no other way to do it currently (that I know :P)...
-        if (caster->ToPlayer() && caster->ToPlayer()->HasAura(23401)) // Nefarian Corrupted Healing (priest)
+        if (caster->ToPlayer() && caster->HasAura(23401)) // Nefarian Corrupted Healing (priest)
         {
-            if (m_spellInfo->Effects[EFFECT_0].ApplyAuraName != SPELL_AURA_PERIODIC_HEAL ||
-                m_spellInfo->Effects[EFFECT_1].ApplyAuraName != SPELL_AURA_PERIODIC_HEAL ||
-                m_spellInfo->Effects[EFFECT_2].ApplyAuraName != SPELL_AURA_PERIODIC_HEAL)
+            if (!m_spellInfo->HasAura(SPELL_AURA_PERIODIC_HEAL) && (m_spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_HOLY))
             {
                 m_damage = 0;
                 caster->CastSpell(unitTarget, 23402, false); // Nefarian Corrupted Healing Periodic Damage effect.
@@ -2206,6 +2213,9 @@ void Spell::EffectSummonChangeItem(SpellEffIndex effIndex)
     if (!pNewItem)
         return;
 
+    // Client-side enchantment durations update
+    player->UpdateEnchantmentDurations();
+
     for (uint8 j = PERM_ENCHANTMENT_SLOT; j <= TEMP_ENCHANTMENT_SLOT; ++j)
         if (m_CastItem->GetEnchantmentId(EnchantmentSlot(j)))
             pNewItem->SetEnchantment(EnchantmentSlot(j), m_CastItem->GetEnchantmentId(EnchantmentSlot(j)), m_CastItem->GetEnchantmentDuration(EnchantmentSlot(j)), m_CastItem->GetEnchantmentCharges(EnchantmentSlot(j)));
@@ -2712,6 +2722,9 @@ void Spell::EffectAddFarsight(SpellEffIndex effIndex)
     if (!m_caster->IsInWorld())
         return;
 
+    // Remove old farsight if exist
+    bool updateViewerVisibility = m_caster->RemoveDynObject(m_spellInfo->Id);
+
     DynamicObject* dynObj = new DynamicObject(true);
     if (!dynObj->CreateDynamicObject(m_caster->GetMap()->GenerateLowGuid<HighGuid::DynamicObject>(), m_caster, m_spellInfo->Id, *destTarget, radius, DYNAMIC_OBJECT_FARSIGHT_FOCUS))
     {
@@ -2720,7 +2733,7 @@ void Spell::EffectAddFarsight(SpellEffIndex effIndex)
     }
 
     dynObj->SetDuration(duration);
-    dynObj->SetCasterViewpoint();
+    dynObj->SetCasterViewpoint(updateViewerVisibility);
 }
 
 void Spell::EffectUntrainTalents(SpellEffIndex /*effIndex*/)
@@ -3281,17 +3294,17 @@ void Spell::EffectTaunt(SpellEffIndex /*effIndex*/)
         return;
     }
 
-    if (!unitTarget->getThreatMgr().getOnlineContainer().empty())
+    if (!unitTarget->GetThreatMgr().getOnlineContainer().empty())
     {
         // Also use this effect to set the taunter's threat to the taunted creature's highest value
-        float myThreat = unitTarget->getThreatMgr().getThreat(m_caster);
-        float topThreat = unitTarget->getThreatMgr().getOnlineContainer().getMostHated()->getThreat();
+        float myThreat = unitTarget->GetThreatMgr().getThreat(m_caster);
+        float topThreat = unitTarget->GetThreatMgr().getOnlineContainer().getMostHated()->getThreat();
         if (topThreat > myThreat)
-            unitTarget->getThreatMgr().doAddThreat(m_caster, topThreat - myThreat);
+            unitTarget->GetThreatMgr().doAddThreat(m_caster, topThreat - myThreat);
 
         //Set aggro victim to caster
-        if (HostileReference* forcedVictim = unitTarget->getThreatMgr().getOnlineContainer().getReferenceByTarget(m_caster))
-            unitTarget->getThreatMgr().setCurrentVictim(forcedVictim);
+        if (HostileReference* forcedVictim = unitTarget->GetThreatMgr().getOnlineContainer().getReferenceByTarget(m_caster))
+            unitTarget->GetThreatMgr().setCurrentVictim(forcedVictim);
     }
 
     if (unitTarget->ToCreature()->IsAIEnabled && !unitTarget->ToCreature()->HasReactState(REACT_PASSIVE))
@@ -3338,13 +3351,6 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                         {
                             AddPct(totalDamagePercentMod, unitTarget->GetDiseasesByCaster(m_caster->GetGUID(), 1) * 30.0f);
                             break;
-                        }
-                    // sweeping strikes
-                    case 26654:
-                        {
-                            this->damage = 0;
-                            m_damage = m_spellValue->EffectBasePoints[effIndex];
-                            return;
                         }
                 }
                 break;
@@ -4861,10 +4867,12 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
             targetGUID = unitTarget->GetGUID();
         }
 
-        if (m_pathFinder)
+        float speed = G3D::fuzzyGt(m_spellInfo->Speed, 0.0f) ? m_spellInfo->Speed : SPEED_CHARGE;
+        // Spell is not using explicit target - no generated path
+        if (!m_preGeneratedPath)
         {
-            m_caster->GetMotionMaster()->MoveCharge(m_pathFinder->GetEndPosition().x, m_pathFinder->GetEndPosition().y, m_pathFinder->GetEndPosition().z,
-                42.0f, EVENT_CHARGE, &m_pathFinder->GetPath(), false, 0.f, targetGUID);
+            Position pos = unitTarget->GetFirstCollisionPosition(unitTarget->GetCombatReach(), unitTarget->GetRelativeAngle(m_caster));
+            m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ, speed, EVENT_CHARGE, nullptr, false, 0.0f, targetGUID);
 
             if (m_caster->GetTypeId() == TYPEID_PLAYER)
             {
@@ -4873,10 +4881,7 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
         }
         else
         {
-            Position pos = unitTarget->GetFirstCollisionPosition(unitTarget->GetObjectSize(), unitTarget->GetRelativeAngle(m_caster));
-
-            m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ + Z_OFFSET_FIND_HEIGHT, SPEED_CHARGE, EVENT_CHARGE,
-                nullptr, false, 0.f, targetGUID);
+            m_caster->GetMotionMaster()->MoveCharge(*m_preGeneratedPath, speed, targetGUID);
 
             if (m_caster->GetTypeId() == TYPEID_PLAYER)
             {
@@ -5302,7 +5307,7 @@ void Spell::EffectModifyThreatPercent(SpellEffIndex /*effIndex*/)
     if (!unitTarget)
         return;
 
-    unitTarget->getThreatMgr().modifyThreatPercent(m_caster, damage);
+    unitTarget->GetThreatMgr().modifyThreatPercent(m_caster, damage);
 }
 
 void Spell::EffectTransmitted(SpellEffIndex effIndex)

@@ -112,7 +112,7 @@ public:
 
     void setThreatMgr(ThreatMgr* pThreatMgr) { iThreatMgr = pThreatMgr; }
 
-    [[nodiscard]] ThreatMgr* getThreatMgr() const { return iThreatMgr; }
+    [[nodiscard]] ThreatMgr* GetThreatMgr() const { return iThreatMgr; }
 };
 
 //==============================================================

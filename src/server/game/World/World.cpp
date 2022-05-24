@@ -1263,6 +1263,8 @@ void World::LoadConfigSettings(bool reload)
 
     m_bool_configs[CONFIG_ALLOW_JOIN_BG_AND_LFG] = sConfigMgr->GetOption<bool>("JoinBGAndLFG.Enable", false);
 
+    m_bool_configs[CONFIG_LEAVE_GROUP_ON_LOGOUT] = sConfigMgr->GetOption<bool>("LeaveGroupOnLogout.Enabled", true);
+
     m_int_configs[CONFIG_CHANGE_FACTION_MAX_MONEY] = sConfigMgr->GetOption<uint32>("ChangeFaction.MaxMoney", 0);
 
     ///- Read the "Data" directory from the config file
@@ -1295,6 +1297,7 @@ void World::LoadConfigSettings(bool reload)
     bool enableLOS = sConfigMgr->GetOption<bool>("vmap.enableLOS", true);
     bool enableHeight = sConfigMgr->GetOption<bool>("vmap.enableHeight", true);
     bool enablePetLOS = sConfigMgr->GetOption<bool>("vmap.petLOS", true);
+    m_bool_configs[CONFIG_VMAP_BLIZZLIKE_PVP_LOS] = sConfigMgr->GetOption<bool>("vmap.BlizzlikePvPLOS", true);
 
     if (!enableHeight)
         LOG_ERROR("server.loading", "VMap height checking disabled! Creatures movements and other various things WILL be broken! Expect no support.");
@@ -3267,45 +3270,6 @@ void World::LoadDBVersion()
 
     if (m_DBVersion.empty())
         m_DBVersion = "Unknown world database.";
-}
-
-void World::LoadDBRevision()
-{
-    QueryResult resultWorld     = WorldDatabase.Query("SELECT date FROM version_db_world ORDER BY date DESC LIMIT 1");
-    QueryResult resultCharacter = CharacterDatabase.Query("SELECT date FROM version_db_characters ORDER BY date DESC LIMIT 1");
-    QueryResult resultAuth      = LoginDatabase.Query("SELECT date FROM version_db_auth ORDER BY date DESC LIMIT 1");
-
-    if (resultWorld)
-    {
-        Field* fields = resultWorld->Fetch();
-
-        m_WorldDBRevision = fields[0].Get<std::string>();
-    }
-    if (resultCharacter)
-    {
-        Field* fields = resultCharacter->Fetch();
-
-        m_CharacterDBRevision = fields[0].Get<std::string>();
-    }
-    if (resultAuth)
-    {
-        Field* fields = resultAuth->Fetch();
-
-        m_AuthDBRevision = fields[0].Get<std::string>();
-    }
-
-    if (m_WorldDBRevision.empty())
-    {
-        m_WorldDBRevision = "Unkown World Database Revision";
-    }
-    if (m_CharacterDBRevision.empty())
-    {
-        m_CharacterDBRevision = "Unkown Character Database Revision";
-    }
-    if (m_AuthDBRevision.empty())
-    {
-        m_AuthDBRevision = "Unkown Auth Database Revision";
-    }
 }
 
 void World::UpdateAreaDependentAuras()

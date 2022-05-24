@@ -59,13 +59,13 @@ float rcSqrt(float x)
 /// @class rcContext
 /// @par
 ///
-/// This class does not provide logging or timer functionality on its 
-/// own.  Both must be provided by a concrete implementation 
-/// by overriding the protected member functions.  Also, this class does not 
-/// provide an interface for extracting log messages. (Only adding them.) 
+/// This class does not provide logging or timer functionality on its
+/// own.  Both must be provided by a concrete implementation
+/// by overriding the protected member functions.  Also, this class does not
+/// provide an interface for extracting log messages. (Only adding them.)
 /// So concrete implementations must provide one.
 ///
-/// If no logging or timers are required, just pass an instance of this 
+/// If no logging or timers are required, just pass an instance of this
 /// class through the Recast build process.
 ///
 
@@ -293,14 +293,14 @@ void rcCalcGridSize(const float* bmin, const float* bmax, float cs, int* w, int*
 /// @par
 ///
 /// See the #rcConfig documentation for more information on the configuration parameters.
-/// 
-/// @see rcAllocHeightfield, rcHeightfield 
+///
+/// @see rcAllocHeightfield, rcHeightfield
 bool rcCreateHeightfield(rcContext* ctx, rcHeightfield& hf, int width, int height,
 						 const float* bmin, const float* bmax,
 						 float cs, float ch)
 {
 	rcIgnoreUnused(ctx);
-	
+
 	hf.width = width;
 	hf.height = height;
 	rcVcopy(hf.bmin, bmin);
@@ -327,29 +327,29 @@ static void calcTriNormal(const float* v0, const float* v1, const float* v2, flo
 ///
 /// Only sets the area id's for the walkable triangles.  Does not alter the
 /// area id's for unwalkable triangles.
-/// 
+///
 /// See the #rcConfig documentation for more information on the configuration parameters.
-/// 
+///
 /// @see rcHeightfield, rcClearUnwalkableTriangles, rcRasterizeTriangles
 void rcMarkWalkableTriangles(rcContext* ctx, const float walkableSlopeAngle,
 							 const float* verts, int nv,
 							 const int* tris, int nt,
-							 unsigned char* areas)
+                             unsigned char* areas, unsigned char areaType)
 {
 	rcIgnoreUnused(ctx);
 	rcIgnoreUnused(nv);
-	
+
 	const float walkableThr = cosf(walkableSlopeAngle/180.0f*RC_PI);
 
 	float norm[3];
-	
+
 	for (int i = 0; i < nt; ++i)
 	{
 		const int* tri = &tris[i*3];
 		calcTriNormal(&verts[tri[0]*3], &verts[tri[1]*3], &verts[tri[2]*3], norm);
 		// Check if the face is walkable.
 		if (norm[1] > walkableThr)
-			areas[i] = RC_WALKABLE_AREA;
+            areas[i] = areaType;
 	}
 }
 
@@ -357,9 +357,9 @@ void rcMarkWalkableTriangles(rcContext* ctx, const float walkableSlopeAngle,
 ///
 /// Only sets the area id's for the unwalkable triangles.  Does not alter the
 /// area id's for walkable triangles.
-/// 
+///
 /// See the #rcConfig documentation for more information on the configuration parameters.
-/// 
+///
 /// @see rcHeightfield, rcClearUnwalkableTriangles, rcRasterizeTriangles
 void rcClearUnwalkableTriangles(rcContext* ctx, const float walkableSlopeAngle,
 								const float* verts, int /*nv*/,
@@ -367,11 +367,11 @@ void rcClearUnwalkableTriangles(rcContext* ctx, const float walkableSlopeAngle,
 								unsigned char* areas)
 {
 	rcIgnoreUnused(ctx);
-	
+
 	const float walkableThr = cosf(walkableSlopeAngle/180.0f*RC_PI);
-	
+
 	float norm[3];
-	
+
 	for (int i = 0; i < nt; ++i)
 	{
 		const int* tri = &tris[i*3];
@@ -385,7 +385,7 @@ void rcClearUnwalkableTriangles(rcContext* ctx, const float walkableSlopeAngle,
 int rcGetHeightFieldSpanCount(rcContext* ctx, rcHeightfield& hf)
 {
 	rcIgnoreUnused(ctx);
-	
+
 	const int w = hf.width;
 	const int h = hf.height;
 	int spanCount = 0;
@@ -416,9 +416,9 @@ bool rcBuildCompactHeightfield(rcContext* ctx, const int walkableHeight, const i
 							   rcHeightfield& hf, rcCompactHeightfield& chf)
 {
 	rcAssert(ctx);
-	
+
 	rcScopedTimer timer(ctx, RC_TIMER_BUILD_COMPACTHEIGHTFIELD);
-	
+
 	const int w = hf.width;
 	const int h = hf.height;
 	const int spanCount = rcGetHeightFieldSpanCount(ctx, hf);
@@ -456,9 +456,9 @@ bool rcBuildCompactHeightfield(rcContext* ctx, const int walkableHeight, const i
 		return false;
 	}
 	memset(chf.areas, RC_NULL_AREA, sizeof(unsigned char)*spanCount);
-	
+
 	const int MAX_HEIGHT = 0xffff;
-	
+
 	// Fill in cells and spans.
 	int idx = 0;
 	for (int y = 0; y < h; ++y)
@@ -499,7 +499,7 @@ bool rcBuildCompactHeightfield(rcContext* ctx, const int walkableHeight, const i
 			for (int i = (int)c.index, ni = (int)(c.index+c.count); i < ni; ++i)
 			{
 				rcCompactSpan& s = chf.spans[i];
-				
+
 				for (int dir = 0; dir < 4; ++dir)
 				{
 					rcSetCon(s, dir, RC_NOT_CONNECTED);
@@ -508,7 +508,7 @@ bool rcBuildCompactHeightfield(rcContext* ctx, const int walkableHeight, const i
 					// First check that the neighbour cell is in bounds.
 					if (nx < 0 || ny < 0 || nx >= w || ny >= h)
 						continue;
-						
+
 					// Iterate over all neighbour spans and check if any of the is
 					// accessible from current cell.
 					const rcCompactCell& nc = chf.cells[nx+ny*w];
@@ -533,18 +533,18 @@ bool rcBuildCompactHeightfield(rcContext* ctx, const int walkableHeight, const i
 							break;
 						}
 					}
-					
+
 				}
 			}
 		}
 	}
-	
+
 	if (tooHighNeighbour > MAX_LAYERS)
 	{
 		ctx->log(RC_LOG_ERROR, "rcBuildCompactHeightfield: Heightfield has too many layers %d (max: %d)",
 				 tooHighNeighbour, MAX_LAYERS);
 	}
-	
+
 	return true;
 }
 
@@ -554,7 +554,7 @@ static int getHeightfieldMemoryUsage(const rcHeightfield& hf)
 	int size = 0;
 	size += sizeof(hf);
 	size += hf.width * hf.height * sizeof(rcSpan*);
-	
+
 	rcSpanPool* pool = hf.pools;
 	while (pool)
 	{

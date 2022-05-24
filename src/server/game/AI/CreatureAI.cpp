@@ -103,7 +103,7 @@ void CreatureAI::DoZoneInCombat(Creature* creature /*= nullptr*/, float maxRange
     Map* map = creature->GetMap();
     if (!map->IsDungeon())                                  //use IsDungeon instead of Instanceable, in case battlegrounds will be instantiated
     {
-        LOG_ERROR("entities.unit.ai", "DoZoneInCombat call for map that isn't an instance (creature entry = {})", creature->GetTypeId() == TYPEID_UNIT ? creature->ToCreature()->GetEntry() : 0);
+        LOG_ERROR("entities.unit.ai", "DoZoneInCombat call for map {} that isn't a dungeon (creature entry = {})", map->GetId(), creature->GetTypeId() == TYPEID_UNIT ? creature->ToCreature()->GetEntry() : 0);
         return;
     }
 
@@ -283,7 +283,7 @@ bool CreatureAI::UpdateVictim()
     // xinef: if we have any victim, just return true
     else if (me->GetVictim() && me->GetExactDist(me->GetVictim()) < 30.0f)
         return true;
-    else if (me->getThreatMgr().isThreatListEmpty())
+    else if (me->GetThreatMgr().isThreatListEmpty())
     {
         EnterEvadeMode();
         return false;
@@ -305,7 +305,7 @@ bool CreatureAI::_EnterEvadeMode(EvadeReason /*why*/)
 
     me->ClearComboPointHolders(); // Remove all combo points targeting this unit
     // sometimes bosses stuck in combat?
-    me->DeleteThreatList();
+    me->GetThreatMgr().ClearAllThreat();
     me->CombatStop(true);
     me->LoadCreaturesAddon(true);
     me->SetLootRecipient(nullptr);

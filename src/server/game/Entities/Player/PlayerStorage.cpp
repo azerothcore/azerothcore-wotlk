@@ -4758,6 +4758,14 @@ void Player::SendEnchantmentDurations()
     }
 }
 
+void Player::UpdateEnchantmentDurations()
+{
+    for (EnchantDurationList::iterator itr = m_enchantDuration.begin(); itr != m_enchantDuration.end(); ++itr)
+    {
+        itr->item->SetEnchantmentDuration(itr->slot, itr->leftduration, this);
+    }
+}
+
 void Player::SendItemDurations()
 {
     for (ItemDurationList::const_iterator itr = m_itemDuration.begin(); itr != m_itemDuration.end(); ++itr)
@@ -7331,7 +7339,7 @@ void Player::_SaveInventory(CharacterDatabaseTransaction trans)
         if (item->GetState() != ITEM_REMOVED)
         {
             Item* test = GetItemByPos(item->GetBagSlot(), item->GetSlot());
-            if (test == nullptr)
+            if (!test)
             {
                 ObjectGuid::LowType bagTestGUID = 0;
                 if (Item* test2 = GetItemByPos(INVENTORY_SLOT_BAG_0, item->GetBagSlot()))

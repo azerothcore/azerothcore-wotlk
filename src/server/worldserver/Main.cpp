@@ -199,7 +199,8 @@ int main(int argc, char** argv)
 
     // Init all logs
     sLog->RegisterAppender<AppenderDB>();
-    sLog->Initialize();
+    // If logs are supposed to be handled async then we need to pass the IoContext into the Log singleton
+    sLog->Initialize(sConfigMgr->GetOption<bool>("Log.Async.Enable", false) ? ioContext.get() : nullptr);
 
     Acore::Banner::Show("worldserver-daemon",
         [](std::string_view text)
@@ -421,6 +422,8 @@ int main(int argc, char** argv)
     // Shutdown starts here
     threadPool.reset();
 
+    sLog->SetSynchronous();
+
     sScriptMgr->OnShutdown();
 
     // set server offline
@@ -478,7 +481,6 @@ bool StartDB()
     WorldDatabase.Execute("UPDATE version SET core_version = '{}', core_revision = '{}'", GitRevision::GetFullVersion(), GitRevision::GetHash());        // One-time query
 
     sWorld->LoadDBVersion();
-    sWorld->LoadDBRevision();
 
     LOG_INFO("server.loading", "> Version DB world:     {}", sWorld->GetDBVersion());
 
@@ -509,7 +511,7 @@ void ClearOnlineAccounts()
 
 void ShutdownCLIThread(std::thread* cliThread)
 {
-    if (cliThread != nullptr)
+    if (cliThread)
     {
 #ifdef _WIN32
         // First try to cancel any I/O in the CLI thread
@@ -760,7 +762,7 @@ void AuctionListingRunnable()
 
 void ShutdownAuctionListingThread(std::thread* thread)
 {
-    if (thread != nullptr)
+    if (thread)
     {
         thread->join();
         delete thread;

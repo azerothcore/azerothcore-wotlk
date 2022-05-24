@@ -54,15 +54,17 @@ public:
         uint32 FrenzyTimer;
         uint32 YellTimer;
         uint32 ResetTimer;
+        bool Attacked;
 
         void Reset() override
         {
-            WhirlwindTimer    = urand(1 * IN_MILLISECONDS, 20 * IN_MILLISECONDS);
-            Whirlwind2Timer   = urand(1 * IN_MILLISECONDS, 20 * IN_MILLISECONDS);
-            KnockdownTimer    = 12 * IN_MILLISECONDS;
-            FrenzyTimer       = 6 * IN_MILLISECONDS;
-            ResetTimer        = 5 * IN_MILLISECONDS;
-            YellTimer         = urand(20 * IN_MILLISECONDS, 30 * IN_MILLISECONDS); //20 to 30 seconds
+            WhirlwindTimer = urand(1 * IN_MILLISECONDS, 20 * IN_MILLISECONDS);
+            Whirlwind2Timer = urand(1 * IN_MILLISECONDS, 20 * IN_MILLISECONDS);
+            KnockdownTimer = 12 * IN_MILLISECONDS;
+            FrenzyTimer = 6 * IN_MILLISECONDS;
+            ResetTimer = 5 * IN_MILLISECONDS;
+            YellTimer = urand(20 * IN_MILLISECONDS, 30 * IN_MILLISECONDS); //20 to 30 seconds
+            Attacked = false;
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -80,18 +82,23 @@ public:
         {
             ScriptedAI::AttackStart(victim);
 
-            // Mini bosses should attack as well
-            if (BattlegroundMap* bgMap = me->GetMap()->ToBattlegroundMap())
+            if (!Attacked)
             {
-                if (Battleground* bg = bgMap->GetBG())
+                Attacked = true;
+
+                // Mini bosses should attack as well
+                if (BattlegroundMap* bgMap = me->GetMap()->ToBattlegroundMap())
                 {
-                    for (uint8 i = AV_CPLACE_H_MARSHAL_ICE; i <= AV_CPLACE_H_MARSHAL_WTOWER; ++i)
+                    if (Battleground* bg = bgMap->GetBG())
                     {
-                        if (Creature* marshall = bg->GetBGCreature(i))
+                        for (uint8 i = AV_CPLACE_H_MARSHAL_ICE; i <= AV_CPLACE_H_MARSHAL_WTOWER; ++i)
                         {
-                            if (marshall->IsAIEnabled && !marshall->GetVictim())
+                            if (Creature* marshall = bg->GetBGCreature(i))
                             {
-                                marshall->AI()->AttackStart(victim);
+                                if (marshall->IsAIEnabled && !marshall->GetVictim())
+                                {
+                                    marshall->AI()->AttackStart(victim);
+                                }
                             }
                         }
                     }
@@ -103,18 +110,23 @@ public:
         {
             ScriptedAI::EnterEvadeMode(why);
 
-            // Evade mini bosses
-            if (BattlegroundMap* bgMap = me->GetMap()->ToBattlegroundMap())
+            if (Attacked)
             {
-                if (Battleground* bg = bgMap->GetBG())
+                Attacked = false;
+
+                // Evade mini bosses
+                if (BattlegroundMap* bgMap = me->GetMap()->ToBattlegroundMap())
                 {
-                    for (uint8 i = AV_CPLACE_H_MARSHAL_ICE; i <= AV_CPLACE_H_MARSHAL_WTOWER; ++i)
+                    if (Battleground* bg = bgMap->GetBG())
                     {
-                        if (Creature* marshall = bg->GetBGCreature(i))
+                        for (uint8 i = AV_CPLACE_H_MARSHAL_ICE; i <= AV_CPLACE_H_MARSHAL_WTOWER; ++i)
                         {
-                            if (marshall->IsAIEnabled && !marshall->IsInEvadeMode())
+                            if (Creature* marshall = bg->GetBGCreature(i))
                             {
-                                marshall->AI()->EnterEvadeMode();
+                                if (marshall->IsAIEnabled && !marshall->IsInEvadeMode())
+                                {
+                                    marshall->AI()->EnterEvadeMode();
+                                }
                             }
                         }
                     }

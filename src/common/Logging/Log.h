@@ -29,6 +29,12 @@ class Appender;
 class Logger;
 struct LogMessage;
 
+namespace Acore::Asio
+{
+    class IoContext;
+    class Strand;
+}
+
 #define LOGGER_ROOT "root"
 
 typedef Appender*(*AppenderCreatorFn)(uint8 id, std::string const& name, LogLevel level, AppenderFlags flags, std::vector<std::string_view> const& extraArgs);
@@ -54,7 +60,8 @@ private:
 public:
     static Log* instance();
 
-    void Initialize();
+    void Initialize(Acore::Asio::IoContext* ioContext);
+    void SetSynchronous();  // Not threadsafe - should only be called from main() after all threads are joined
     void LoadFromConfig();
     void Close();
     [[nodiscard]] bool ShouldLog(std::string const& type, LogLevel level) const;
@@ -112,6 +119,8 @@ private:
     std::string m_logsDir;
     std::string m_logsTimestamp;
 
+    Acore::Asio::IoContext* _ioContext;
+    Acore::Asio::Strand* _strand;
     // Deprecated debug filter logs
     DebugLogFilters _debugLogMask;
 };

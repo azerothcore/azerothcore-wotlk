@@ -524,7 +524,7 @@ public:
                 return;
             }
 
-            if (!UpdateVictim() || !CheckInRoom())
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
@@ -1139,7 +1139,7 @@ public:
         void StartAttack()
         {
             GetCaster()->ClearUnitState(UNIT_STATE_CASTING);
-            GetCaster()->DeleteThreatList();
+            GetCaster()->GetThreatMgr().ClearAllThreat();
             GetCaster()->ToCreature()->SetInCombatWithZone();
             GetCaster()->ToCreature()->AI()->AttackStart(GetHitUnit());
             GetCaster()->AddThreat(GetHitUnit(), 500000000.0f);    // value seen in sniff

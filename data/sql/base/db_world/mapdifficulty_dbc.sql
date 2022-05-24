@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,36 +12,36 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.mapdifficulty_dbc
+-- Dumpar struktur för tabell acore_world.mapdifficulty_dbc
 DROP TABLE IF EXISTS `mapdifficulty_dbc`;
 CREATE TABLE IF NOT EXISTS `mapdifficulty_dbc` (
   `ID` INT NOT NULL DEFAULT 0,
   `MapID` INT NOT NULL DEFAULT 0,
   `Difficulty` INT NOT NULL DEFAULT 0,
-  `Message_Lang_enUS` varchar(200) DEFAULT NULL,
-  `Message_Lang_enGB` varchar(200) DEFAULT NULL,
-  `Message_Lang_koKR` varchar(200) DEFAULT NULL,
-  `Message_Lang_frFR` varchar(200) DEFAULT NULL,
-  `Message_Lang_deDE` varchar(200) DEFAULT NULL,
-  `Message_Lang_enCN` varchar(200) DEFAULT NULL,
-  `Message_Lang_zhCN` varchar(200) DEFAULT NULL,
-  `Message_Lang_enTW` varchar(200) DEFAULT NULL,
-  `Message_Lang_zhTW` varchar(200) DEFAULT NULL,
-  `Message_Lang_esES` varchar(200) DEFAULT NULL,
-  `Message_Lang_esMX` varchar(200) DEFAULT NULL,
-  `Message_Lang_ruRU` varchar(200) DEFAULT NULL,
-  `Message_Lang_ptPT` varchar(200) DEFAULT NULL,
-  `Message_Lang_ptBR` varchar(200) DEFAULT NULL,
-  `Message_Lang_itIT` varchar(200) DEFAULT NULL,
-  `Message_Lang_Unk` varchar(100) DEFAULT NULL,
+  `Message_Lang_enUS` VARCHAR(200) DEFAULT NULL,
+  `Message_Lang_enGB` VARCHAR(200) DEFAULT NULL,
+  `Message_Lang_koKR` VARCHAR(200) DEFAULT NULL,
+  `Message_Lang_frFR` VARCHAR(200) DEFAULT NULL,
+  `Message_Lang_deDE` VARCHAR(200) DEFAULT NULL,
+  `Message_Lang_enCN` VARCHAR(200) DEFAULT NULL,
+  `Message_Lang_zhCN` VARCHAR(200) DEFAULT NULL,
+  `Message_Lang_enTW` VARCHAR(200) DEFAULT NULL,
+  `Message_Lang_zhTW` VARCHAR(200) DEFAULT NULL,
+  `Message_Lang_esES` VARCHAR(200) DEFAULT NULL,
+  `Message_Lang_esMX` VARCHAR(200) DEFAULT NULL,
+  `Message_Lang_ruRU` VARCHAR(200) DEFAULT NULL,
+  `Message_Lang_ptPT` VARCHAR(200) DEFAULT NULL,
+  `Message_Lang_ptBR` VARCHAR(200) DEFAULT NULL,
+  `Message_Lang_itIT` VARCHAR(200) DEFAULT NULL,
+  `Message_Lang_Unk` VARCHAR(100) DEFAULT NULL,
   `Message_Lang_Mask` INT unsigned NOT NULL DEFAULT 0,
   `RaidDuration` INT NOT NULL DEFAULT 0,
   `MaxPlayers` INT NOT NULL DEFAULT 0,
-  `Difficultystring` varchar(100) DEFAULT NULL,
+  `Difficultystring` VARCHAR(100) DEFAULT NULL,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_world.mapdifficulty_dbc: 0 rows
+-- Dumpar data för tabell acore_world.mapdifficulty_dbc: 0 rows
 DELETE FROM `mapdifficulty_dbc`;
 /*!40000 ALTER TABLE `mapdifficulty_dbc` DISABLE KEYS */;
 /*!40000 ALTER TABLE `mapdifficulty_dbc` ENABLE KEYS */;

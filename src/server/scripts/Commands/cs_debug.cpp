@@ -620,7 +620,7 @@ public:
                         continue;
                     }
 
-                    if (updateQueue[qp] == nullptr)
+                    if (!updateQueue[qp])
                     {
                         handler->PSendSysMessage("The item with slot %d and guid %d has its queuepos (%d) pointing to NULL in the queue!", item->GetSlot(), item->GetGUID().GetCounter(), qp);
                         error = true;
@@ -688,7 +688,7 @@ public:
                                 continue;
                             }
 
-                            if (updateQueue[qp] == nullptr)
+                            if (!updateQueue[qp])
                             {
                                 handler->PSendSysMessage("The item in bag %d at slot %d having guid %d has a queuepos (%d) that points to NULL in the queue!", bag->GetSlot(), item2->GetSlot(), item2->GetGUID().GetCounter(), qp);
                                 error = true;
@@ -737,7 +737,7 @@ public:
 
                 Item* test = player->GetItemByPos(item->GetBagSlot(), item->GetSlot());
 
-                if (test == nullptr)
+                if (!test)
                 {
                     handler->SendSysMessage(Acore::StringFormatFmt("queue({}): The bag({}) and slot({}) values for {} are incorrect, the player doesn't have any item at that position!", index, item->GetBagSlot(), item->GetSlot(), item->GetGUID().ToString()));
                     error = true;
@@ -783,7 +783,7 @@ public:
         if (!target || target->IsTotem() || target->IsPet())
             return false;
 
-        auto const& threatList = target->getThreatMgr().getThreatList();
+        auto const& threatList = target->GetThreatMgr().getThreatList();
         ThreatContainer::StorageType::const_iterator itr;
         uint32 count = 0;
 
@@ -801,7 +801,7 @@ public:
             handler->PSendSysMessage("   %u.   %s   (%s)  - threat %f", ++count, unit->GetName().c_str(), unit->GetGUID().ToString().c_str(), (*itr)->getThreat());
         }
 
-        auto const& threatList2 = target->getThreatMgr().getOfflineThreatList();
+        auto const& threatList2 = target->GetThreatMgr().getOfflineThreatList();
         for (itr = threatList2.begin(); itr != threatList2.end(); ++itr)
         {
             Unit* unit = (*itr)->getTarget();

@@ -164,7 +164,7 @@ public:
                     break;
             }
 
-            if (!UpdateVictim() || !CheckInRoom())
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);

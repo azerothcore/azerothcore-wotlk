@@ -150,7 +150,7 @@ public:
 
             if (!me->IsWithinMeleeRange(me->GetVictim()))
             {
-                ThreatContainer::StorageType threatlist = me->getThreatMgr().getThreatList();
+                ThreatContainer::StorageType threatlist = me->GetThreatMgr().getThreatList();
                 for (ThreatContainer::StorageType::const_iterator i = threatlist.begin(); i != threatlist.end(); ++i)
                     if (Unit* target = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
                         if (target->IsAlive() && me->IsWithinMeleeRange(target))

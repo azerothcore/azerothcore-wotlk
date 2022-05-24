@@ -121,7 +121,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
     //calc random
     if (e.GetEventType() != SMART_EVENT_LINK && e.event.event_chance < 100 && e.event.event_chance)
     {
-        uint32 rnd = urand(0, 100);
+        uint32 rnd = urand(1, 100);
         if (e.event.event_chance <= rnd)
             return;
     }
@@ -616,12 +616,12 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 if (!me)
                     break;
 
-                ThreatContainer::StorageType threatList = me->getThreatMgr().getThreatList();
+                ThreatContainer::StorageType threatList = me->GetThreatMgr().getThreatList();
                 for (ThreatContainer::StorageType::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
                 {
                     if (Unit* target = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
                     {
-                        me->getThreatMgr().modifyThreatPercent(target, e.action.threatPCT.threatINC ? (int32)e.action.threatPCT.threatINC : -(int32)e.action.threatPCT.threatDEC);
+                        me->GetThreatMgr().modifyThreatPercent(target, e.action.threatPCT.threatINC ? (int32)e.action.threatPCT.threatINC : -(int32)e.action.threatPCT.threatDEC);
                         LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_THREAT_ALL_PCT: Creature {} modify threat for unit {}, value {}",
                                        me->GetGUID().ToString(), target->GetGUID().ToString(), e.action.threatPCT.threatINC ? (int32)e.action.threatPCT.threatINC : -(int32)e.action.threatPCT.threatDEC);
                     }
@@ -641,7 +641,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 {
                     if (IsUnit(*itr))
                     {
-                        me->getThreatMgr().modifyThreatPercent((*itr)->ToUnit(), e.action.threatPCT.threatINC ? (int32)e.action.threatPCT.threatINC : -(int32)e.action.threatPCT.threatDEC);
+                        me->GetThreatMgr().modifyThreatPercent((*itr)->ToUnit(), e.action.threatPCT.threatINC ? (int32)e.action.threatPCT.threatINC : -(int32)e.action.threatPCT.threatDEC);
                         LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_THREAT_SINGLE_PCT: Creature {} modify threat for unit {}, value {}",
                                        me->GetGUID().ToString(), (*itr)->GetGUID().ToString(), e.action.threatPCT.threatINC ? (int32)e.action.threatPCT.threatINC : -(int32)e.action.threatPCT.threatDEC);
                     }
@@ -3878,7 +3878,7 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
             {
                 if (me)
                 {
-                    ThreatContainer::StorageType threatList = me->getThreatMgr().getThreatList();
+                    ThreatContainer::StorageType threatList = me->GetThreatMgr().getThreatList();
                     for (ThreatContainer::StorageType::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
                         if (Unit* temp = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
                             // Xinef: added distance check
@@ -4031,6 +4031,9 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
     if ((e.event.event_phase_mask && !IsInPhase(e.event.event_phase_mask)) || ((e.event.event_flags & SMART_EVENT_FLAG_NOT_REPEATABLE) && e.runOnce))
         return;
 
+    if (!(e.event.event_flags & SMART_EVENT_FLAG_WHILE_CHARMED) && IsCharmedCreature(me))
+        return;
+
     switch (e.GetEventType())
     {
         case SMART_EVENT_LINK://special handling
@@ -4180,12 +4183,17 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                 ProcessTimedAction(e, e.event.aura.repeatMin, e.event.aura.repeatMax, me->GetVictim());
                 break;
             }
+        case SMART_EVENT_CHARMED:
+            {
+                if (bvar == (e.event.charm.onRemove != 1))
+                    ProcessAction(e, unit, var0, var1, bvar, spell, gob);
+                break;
+            }
         //no params
         case SMART_EVENT_AGGRO:
         case SMART_EVENT_DEATH:
         case SMART_EVENT_EVADE:
         case SMART_EVENT_REACHED_HOME:
-        case SMART_EVENT_CHARMED:
         case SMART_EVENT_CHARMED_TARGET:
         case SMART_EVENT_CORPSE_REMOVED:
         case SMART_EVENT_AI_INIT:
@@ -5125,6 +5133,37 @@ Unit* SmartScript::GetLastInvoker(Unit* invoker)
     else if (invoker)
         return ObjectAccessor::GetUnit(*invoker, mLastInvoker);
     return nullptr;
+}
+
+bool SmartScript::IsUnit(WorldObject* obj)
+{
+    return obj && (obj->GetTypeId() == TYPEID_UNIT || obj->GetTypeId() == TYPEID_PLAYER);
+}
+
+bool SmartScript::IsPlayer(WorldObject* obj)
+{
+    return obj && obj->GetTypeId() == TYPEID_PLAYER;
+}
+
+bool SmartScript::IsCreature(WorldObject* obj)
+{
+    return obj && obj->GetTypeId() == TYPEID_UNIT;
+}
+
+bool SmartScript::IsCharmedCreature(WorldObject* obj)
+{
+    if (!obj)
+        return false;
+
+    if (Creature* creatureObj = obj->ToCreature())
+        return creatureObj->IsCharmed();
+
+    return false;
+}
+
+bool SmartScript::IsGameObject(WorldObject* obj)
+{
+    return obj && obj->GetTypeId() == TYPEID_GAMEOBJECT;
 }
 
 void SmartScript::IncPhase(uint32 p)

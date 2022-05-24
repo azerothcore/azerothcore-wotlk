@@ -339,11 +339,7 @@ public:
 
     // used World DB version
     void LoadDBVersion() override;
-    void LoadDBRevision() override;
     [[nodiscard]] char const* GetDBVersion() const override { return m_DBVersion.c_str(); }
-    [[nodiscard]] char const* GetWorldDBRevision() const override { return m_WorldDBRevision.c_str(); }
-    [[nodiscard]] char const* GetCharacterDBRevision() const override { return m_CharacterDBRevision.c_str(); }
-    [[nodiscard]] char const* GetAuthDBRevision() const override { return m_AuthDBRevision.c_str(); }
 
     void LoadAutobroadcasts() override;
 
@@ -440,9 +436,6 @@ private:
 
     // used versions
     std::string m_DBVersion;
-    std::string m_WorldDBRevision;
-    std::string m_CharacterDBRevision;
-    std::string m_AuthDBRevision;
 
     typedef std::map<uint8, std::string> AutobroadcastsMap;
     AutobroadcastsMap m_Autobroadcasts;

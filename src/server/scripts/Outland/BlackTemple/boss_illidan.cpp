@@ -343,8 +343,7 @@ public:
         {
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
             summons.DespawnEntry(NPC_PARASITIC_SHADOWFIEND);
-            instance->SetBossState(DATA_ILLIDAN_STORMRAGE, DONE);
-            instance->SaveToDB();
+            _JustDied();
         }
 
         void KilledUnit(Unit*  /*victim*/) override
@@ -619,7 +618,7 @@ public:
                     me->SetDisableGravity(false);
                     break;
                 case EVENT_START_PHASE_3_LAND:
-                    me->getThreatMgr().resetAllAggro();
+                    me->GetThreatMgr().ResetAllThreat();
                     me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->SetTarget(me->GetVictim()->GetGUID());
                     AttackStart(me->GetVictim());
@@ -632,7 +631,7 @@ public:
                 // ///////////////////////////
                 case EVENT_PHASE_4_START:
                     me->CastSpell(me, SPELL_DEMON_TRANSFORM_1, true);
-                    me->getThreatMgr().resetAllAggro();
+                    me->GetThreatMgr().ResetAllThreat();
                     me->GetMotionMaster()->MoveChase(me->GetVictim(), 35.0f);
                     events.Reset();
                     events.ScheduleEvent(EVENT_SPELL_SHADOW_BLAST, 11000);
@@ -655,7 +654,7 @@ public:
                     break;
                 case EVENT_REMOVE_DEMON_FORM:
                     me->CastSpell(me, SPELL_DEMON_TRANSFORM_1, true);
-                    me->getThreatMgr().resetAllAggro();
+                    me->GetThreatMgr().ResetAllThreat();
                     events.Reset();
                     if (summons.HasEntry(NPC_MAIEV_SHADOWSONG))
                     {
