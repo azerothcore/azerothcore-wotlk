@@ -97,6 +97,10 @@ void Totem::InitSummon()
     {
         SetReactState(REACT_AGGRESSIVE);
         GetOwner()->CastSpell(this, 6277, true);
+
+        // Farsight objects should be active
+        setActive(true);
+        SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
     }
 
     if (!IsInWater())

@@ -164,7 +164,7 @@ struct npc_pet_mage_mirror_image : CasterAI
 
             if (selection)
             {
-                me->getThreatMgr().resetAllAggro();
+                me->GetThreatMgr().ResetAllThreat();
                 me->AddThreat(selection, 1000000.0f);
 
                 if (owner->IsInCombat())

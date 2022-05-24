@@ -13,7 +13,7 @@
 #define SIZE_OF_GRIDS            533.3333f
 
 #define MMAP_MAGIC 0x4d4d4150   // 'MMAP'
-#define MMAP_VERSION 13
+#define MMAP_VERSION 14
 
 struct MmapTileHeader
 {
@@ -41,11 +41,11 @@ enum NavArea
     NAV_AREA_EMPTY          = 0,
     // areas 1-60 will be used for destructible areas (currently skipped in vmaps, WMO with flag 1)
     // ground is the highest value to make recast choose ground over water when merging surfaces very close to each other (shallow water would be walkable)
-    NAV_AREA_GROUND_STEEP   = 11,
-    NAV_AREA_GROUND         = 10,
+    NAV_AREA_GROUND         = 11,
+    NAV_AREA_GROUND_STEEP   = 10,
     NAV_AREA_WATER          = 9,
     NAV_AREA_MAGMA_SLIME    = 8, // don't need to differentiate between them
-    NAV_AREA_MAX_VALUE      = NAV_AREA_GROUND_STEEP,
+    NAV_AREA_MAX_VALUE      = NAV_AREA_GROUND,
     NAV_AREA_MIN_VALUE      = NAV_AREA_MAGMA_SLIME,
     NAV_AREA_ALL_MASK       = 0x3F // max allowed value
 };
@@ -53,10 +53,10 @@ enum NavArea
 enum NavTerrainFlag
 {
     NAV_EMPTY        = 0x00,
-    NAV_GROUND_STEEP = 1 << (NAV_AREA_MAX_VALUE - NAV_AREA_GROUND_STEEP),
     NAV_GROUND       = 1 << (NAV_AREA_MAX_VALUE - NAV_AREA_GROUND),
+    NAV_GROUND_STEEP = 1 << (NAV_AREA_MAX_VALUE - NAV_AREA_GROUND_STEEP),
     NAV_WATER        = 1 << (NAV_AREA_MAX_VALUE - NAV_AREA_WATER),
     NAV_MAGMA_SLIME  = 1 << (NAV_AREA_MAX_VALUE - NAV_AREA_MAGMA_SLIME)
 };
 
-#endif
+#endif /* _MAPDEFINES_H */
