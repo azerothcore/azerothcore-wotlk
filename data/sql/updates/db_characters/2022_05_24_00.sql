@@ -1,3 +1,4 @@
+-- DB update 2022_04_28_00 -> 2022_05_24_00
 
 DROP TABLE IF EXISTS `instance_saved_go_state_data`;
 CREATE TABLE IF NOT EXISTS `instance_saved_go_state_data` (
