@@ -288,7 +288,7 @@ public:
 enum OhganSpells
 {
     SPELL_SUNDERARMOR         = 24317,
-    SPELL_THRASH              = 3391
+    SPELL_THRASH              = 3417 // Triggers 3391
 };
 
 class npc_ohgan : public CreatureScript
@@ -304,6 +304,7 @@ public:
         {
             SunderArmor_Timer = urand(6000, 12000);
             Thrash_Timer = urand(14000, 22000);
+            me->AddAura(SPELL_THRASH, me);
         }
 
         void EnterCombat(Unit* /*who*/) override { }
@@ -326,19 +327,11 @@ public:
             }
             else SunderArmor_Timer -= diff;
 
-            if (Thrash_Timer <= diff)
-            {
-                DoCastSelf(SPELL_THRASH);
-                Thrash_Timer = urand(14000, 22000);
-            }
-            else Thrash_Timer -= diff;
-
             DoMeleeAttackIfReady();
         }
 
     private:
         uint32 SunderArmor_Timer;
-        uint32 Thrash_Timer;
         InstanceScript* instance;
     };
 
