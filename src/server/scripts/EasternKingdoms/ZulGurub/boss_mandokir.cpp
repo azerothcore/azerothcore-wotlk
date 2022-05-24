@@ -303,7 +303,6 @@ public:
         void Reset() override
         {
             SunderArmor_Timer = urand(6000, 12000);
-            Thrash_Timer = urand(14000, 22000);
             me->AddAura(SPELL_THRASH, me);
         }
 
