@@ -49,7 +49,7 @@ enum Spells
     SPELL_FRENZY              = 24318, // seen
     SPELL_WATCH               = 24314, // seen 24315, 24316
     SPELL_WATCH_CHARGE        = 24315, // Triggers 24316
-    SPELL_LEVEL_UP            = 24312  //
+    SPELL_LEVEL_UP            = 24312
 };
 
 enum Events
@@ -143,8 +143,8 @@ public:
         void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
-            events.ScheduleEvent(EVENT_OVERPOWER, urand(7000, 9000));
-            events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(12000, 18000));
+            events.ScheduleEvent(EVENT_OVERPOWER, urand(6000, 8000));
+            events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(14000, 28000));
             events.ScheduleEvent(EVENT_WHIRLWIND, urand(24000, 30000));
             events.ScheduleEvent(EVENT_CHECK_OHGAN, 1000);
             events.ScheduleEvent(EVENT_WATCH_PLAYER, urand(13000, 15000));
@@ -232,13 +232,12 @@ public:
                 switch (eventId)
                 {
                     case EVENT_OVERPOWER:
-                        DoCastVictim(SPELL_OVERPOWER, true);
-                        events.ScheduleEvent(EVENT_OVERPOWER, urand(6000, 12000));
+                        DoCastVictim(SPELL_OVERPOWER);
+                        events.ScheduleEvent(EVENT_OVERPOWER, urand(6000, 8000));
                         break;
                     case EVENT_MORTAL_STRIKE:
-                        if (me->GetVictim() && me->GetVictim()->HealthBelowPct(50))
-                            DoCastVictim(SPELL_MORTAL_STRIKE, true);
-                        events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(12000, 18000));
+                        DoCastVictim(SPELL_MORTAL_STRIKE);
+                        events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(14000, 28000));
                         break;
                     case EVENT_WHIRLWIND:
                         DoCast(me, SPELL_WHIRLWIND);
