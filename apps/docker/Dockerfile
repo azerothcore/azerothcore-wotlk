@@ -189,7 +189,8 @@ ENV AC_CCACHE=true
 ENV CCACHE_CPP2=true
 ENV CSCRIPTPCH=OFF
 ENV CCOREPCH=OFF
-ENV CTOOLS=ON
+# ENV CTOOLS_BUILD=all
+ENV CTOOLS_BUILD=maps-only
 ENV CSCRIPTS=static
 RUN bash apps/docker/docker-build-prod.sh
 
