@@ -2063,7 +2063,7 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* leader)
                         leader->SendResetInstanceFailed(0, instanceSave->GetMapId());
                     }
 
-                    instanceSave->DeleteInstanceSavedData(instanceSave->GetInstanceId());
+                    sInstanceSaveMgr->DeleteInstanceSavedData(instanceSave->GetInstanceId());
                 }
                 for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
                     sInstanceSaveMgr->UnbindAllFor(*itr);
@@ -2091,7 +2091,7 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* leader)
                         leader->SendResetInstanceFailed(0, instanceSave->GetMapId());
                     }
 
-                    instanceSave->DeleteInstanceSavedData(instanceSave->GetInstanceId());
+                    sInstanceSaveMgr->DeleteInstanceSavedData(instanceSave->GetInstanceId());
                 }
                 for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
                     sInstanceSaveMgr->UnbindAllFor(*itr);
