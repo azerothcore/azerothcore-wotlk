@@ -43,13 +43,14 @@ enum Spells
 {
     SPELL_CHARGE              = 24408, // seen
     SPELL_OVERPOWER           = 24407, // Seen
-    SPELL_FEAR                = 29321,
+    SPELL_FRIGHTENING_SHOUT   = 19134,
     SPELL_WHIRLWIND           = 13736, // Triggers 15589
     SPELL_MORTAL_STRIKE       = 16856, // Seen
     SPELL_FRENZY              = 24318, // seen
     SPELL_WATCH               = 24314, // seen 24315, 24316
     SPELL_WATCH_CHARGE        = 24315, // Triggers 24316
-    SPELL_LEVEL_UP            = 24312
+    SPELL_LEVEL_UP            = 24312,
+    SPELL_EXECUTE             = 7160
 };
 
 enum Events
@@ -62,7 +63,9 @@ enum Events
     EVENT_WHIRLWIND           = 6,
     EVENT_CHECK_OHGAN         = 7,
     EVENT_WATCH_PLAYER        = 8,
-    EVENT_CHARGE_PLAYER       = 9
+    EVENT_CHARGE_PLAYER       = 9,
+    EVENT_EXECUTE             = 10,
+    EVENT_FRIGHTENING_SHOUT   = 11
 };
 
 enum Misc
@@ -149,6 +152,8 @@ public:
             events.ScheduleEvent(EVENT_CHECK_OHGAN, 1000);
             events.ScheduleEvent(EVENT_WATCH_PLAYER, urand(13000, 15000));
             events.ScheduleEvent(EVENT_CHARGE_PLAYER, urand(33000, 38000));
+            events.ScheduleEvent(EVENT_EXECUTE, urand(7000, 14000));
+            events.ScheduleEvent(EVENT_FRIGHTENING_SHOUT, urand(12000, 22000));
             me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
             Talk(SAY_AGGRO);
             me->Dismount();
@@ -172,8 +177,12 @@ public:
             {
                 Talk(SAY_DING_KILL);
                 if (Creature* jindo = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_JINDO)))
+                {
                     if (jindo->IsAlive())
+                    {
                         jindo->AI()->Talk(SAY_GRATS_JINDO);
+                    }
+                }
                 DoCast(me, SPELL_LEVEL_UP, true);
                 killCount = 0;
             }
@@ -211,7 +220,9 @@ public:
                                     events.ScheduleEvent(EVENT_STARTED, 6000);
                                 }
                                 else
+                                {
                                     events.ScheduleEvent(EVENT_CHECK_START, 1000);
+                                }
                                 break;
                             case EVENT_STARTED:
                                 me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
@@ -250,7 +261,9 @@ public:
                             Talk(SAY_OHGAN_DEAD);
                         }
                         else
+                        {
                             events.ScheduleEvent(EVENT_CHECK_OHGAN, 1000);
+                        }
                         break;
                     case EVENT_WATCH_PLAYER:
                         if (Unit* player = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
@@ -264,6 +277,17 @@ public:
                         DoCast(SelectTarget(SelectTargetMethod::Random, 0, 40, true), SPELL_CHARGE);
                         DoResetThreat();
                         events.ScheduleEvent(EVENT_CHARGE_PLAYER, urand(22000, 30000));
+                        break;
+                    case EVENT_EXECUTE:
+                        if (me->GetVictim() && me->GetVictim()->HealthBelowPct(20))
+                        {
+                            DoCastVictim(SPELL_EXECUTE, true);
+                        }
+                        events.ScheduleEvent(EVENT_EXECUTE, urand(7000, 14000));
+                        break;
+                    case EVENT_FRIGHTENING_SHOUT:
+                        DoCastAOE(SPELL_FRIGHTENING_SHOUT);
+                        events.ScheduleEvent(EVENT_FRIGHTENING_SHOUT, urand(12000, 22000));
                         break;
                     default:
                         break;
