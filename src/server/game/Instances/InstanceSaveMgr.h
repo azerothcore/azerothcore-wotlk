@@ -86,6 +86,8 @@ public:
 
     void AddPlayer(ObjectGuid guid);
     bool RemovePlayer(ObjectGuid guid, InstanceSaveMgr* ism);
+    
+    void DeleteInstanceSavedData(uint32 instanceId);
 
 private:
     GuidList m_playerList;
@@ -183,7 +185,6 @@ public:
     void UnbindAllFor(InstanceSave* save);
 
     void SanitizeInstanceSavedData();
-    void DeleteInstanceSavedData(uint32 instanceId);
 protected:
     static uint16 ResetTimeDelay[];
     static PlayerBindStorage playerBindStorage;
