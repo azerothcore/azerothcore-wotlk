@@ -262,6 +262,7 @@ public:
                         break;
                     case EVENT_CHARGE_PLAYER:
                         DoCast(SelectTarget(SelectTargetMethod::Random, 0, 40, true), SPELL_CHARGE);
+                        DoResetThreat();
                         events.ScheduleEvent(EVENT_CHARGE_PLAYER, urand(22000, 30000));
                         break;
                     default:
