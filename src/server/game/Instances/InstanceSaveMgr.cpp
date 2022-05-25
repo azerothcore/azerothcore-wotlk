@@ -249,7 +249,7 @@ void InstanceSaveMgr::DeleteInstanceSavedData(uint32 instanceId)
 {
     if (instanceId)
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DELETE_INSTANCE_SAVED_DATA);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DELETE_INSTANCE_SAVED_DATA);
         stmt->SetData(0, instanceId);
         CharacterDatabase.Execute(stmt);
     }
