@@ -31,15 +31,14 @@ enum Spells
     SPELL_FROSTBREATH               = 16099,
     SPELL_MASSIVEGEYSER             = 22421, // Not working. (summon)
     SPELL_SLAM                      = 24326,
-    SPELL_THRASH                    = 3391
+    SPELL_THRASH                    = 3417 // Triggers 3391
 };
 
 enum Events
 {
     EVENT_FROSTBREATH               = 1,
     EVENT_MASSIVEGEYSER             = 2,
-    EVENT_SLAM                      = 3,
-    EVENT_THRASH                    = 4
+    EVENT_SLAM                      = 3
 };
 
 class boss_gahzranka : public CreatureScript
@@ -64,10 +63,10 @@ public:
         void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
+            me->AddAura(SPELL_THRASH, me);
             events.ScheduleEvent(EVENT_FROSTBREATH, 10000);
             events.ScheduleEvent(EVENT_MASSIVEGEYSER, 15000);
             events.ScheduleEvent(EVENT_SLAM, 17000);
-            events.ScheduleEvent(EVENT_THRASH, urand(10000, 20000));
         }
 
         void UpdateAI(uint32 diff) override
@@ -95,10 +94,6 @@ public:
                     case EVENT_SLAM:
                         DoCastVictim(SPELL_SLAM, true);
                         events.ScheduleEvent(EVENT_SLAM, urand(12000, 20000));
-                        break;
-                    case EVENT_THRASH:
-                        DoCastSelf(SPELL_THRASH);
-                        events.ScheduleEvent(EVENT_THRASH, urand(10000, 20000));
                         break;
                     default:
                         break;
