@@ -23,4 +23,4 @@ CREATE TABLE `creaturedisplayinfoextra_dbc`
 `Flags` INT UNSIGNED NOT NULL DEFAULT '0',
 `BakeName` VARCHAR(100) NOT NULL,
 PRIMARY KEY (`ID`) )
-ENGINE=MYISAM CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci; 
+ENGINE=MYISAM CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci; 
