@@ -119,6 +119,14 @@ public:
                 zealot->ResetFaction();
             }
 
+            _scheduler.SetValidator([this]
+            {
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
+        }
+
+        void JustReachedHome() override
+        {
             std::list<Creature*> creatureList;
             GetCreatureListWithEntryInGrid(creatureList, me, NPC_ZULGURUB_TIGER, 15.0f);
 
@@ -129,11 +137,6 @@ public:
                     creature->Respawn(true);
                 }
             }
-
-            _scheduler.SetValidator([this]
-            {
-                return !me->HasUnitState(UNIT_STATE_CASTING);
-            });
         }
 
         void JustDied(Unit* /*killer*/) override
