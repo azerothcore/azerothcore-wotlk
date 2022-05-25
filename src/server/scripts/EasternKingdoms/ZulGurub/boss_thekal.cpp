@@ -343,17 +343,15 @@ public:
                 if (!thekal || !zath)
                     return;
 
-                switch (urand(0, 1))
+                if (zath->GetHealthPct() <= thekal->GetHealthPct())
                 {
-                    case 0:
-                        if (me->IsWithinMeleeRange(thekal))
-                            DoCast(thekal, SPELL_GREATERHEAL);
-                        break;
-                    case 1:
-                        if (me->IsWithinMeleeRange(zath))
-                            DoCast(zath, SPELL_GREATERHEAL);
-                        break;
+                    DoCast(zath, SPELL_GREATERHEAL);
                 }
+                else
+                {
+                    DoCast(thekal, SPELL_GREATERHEAL);
+                }
+
                 context.Repeat(15s, 20s);
             }).Schedule(6s, [this](TaskContext context) {
                 DoCastVictim(SPELL_DISARM);
