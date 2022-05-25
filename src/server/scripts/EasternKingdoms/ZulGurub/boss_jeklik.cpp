@@ -52,8 +52,8 @@ enum Spells
     SPELL_GREATER_HEAL          = 23954,
 
     // Batriders Spell
-    SPELL_BOMB                  = 23970,
-    SPELL_SPAWN_FLAMES          = 23971
+    SPELL_THROW_LIQUID_FIRE     = 23970,
+    SPELL_SUMMON_LIQUID_FIRE    = 23971
 };
 
 enum BatIds
@@ -273,7 +273,7 @@ struct npc_batrider : public ScriptedAI
     {
         _scheduler.Schedule(2s, [this](TaskContext context)
         {
-            DoCastRandomTarget(SPELL_BOMB);
+            DoCastRandomTarget(SPELL_THROW_LIQUID_FIRE);
             context.Repeat(7s);
         });
     }
@@ -296,7 +296,7 @@ class spell_batrider_bomb : public SpellScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_SPAWN_FLAMES });
+        return ValidateSpellInfo({ SPELL_SUMMON_LIQUID_FIRE });
     }
 
     void HandleScriptEffect(SpellEffIndex effIndex)
@@ -305,7 +305,7 @@ class spell_batrider_bomb : public SpellScript
 
         if (Unit* target = GetHitUnit())
         {
-            target->CastSpell(target, SPELL_SPAWN_FLAMES, true);
+            target->CastSpell(target, SPELL_SUMMON_LIQUID_FIRE, true);
         }
     }
 
