@@ -1,3 +1,4 @@
+-- DB update 2022_05_25_01 -> 2022_05_25_02
 --
 DROP TABLE IF EXISTS `creaturedisplayinfoextra_dbc`;
 CREATE TABLE `creaturedisplayinfoextra_dbc`
