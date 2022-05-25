@@ -86,7 +86,7 @@ public:
 
     void AddPlayer(ObjectGuid guid);
     bool RemovePlayer(ObjectGuid guid, InstanceSaveMgr* ism);
-    
+
     void DeleteInstanceSavedData(uint32 instanceId);
 
 private:
