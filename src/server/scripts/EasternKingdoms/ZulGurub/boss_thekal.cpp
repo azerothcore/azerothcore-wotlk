@@ -254,14 +254,11 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (me->GetReactState() == REACT_AGGRESSIVE)
-            {
-                if (!UpdateVictim())
-                    return;
+            if (me->GetReactState() != REACT_PASSIVE && !UpdateVictim())
+                return;
 
-                _scheduler.Update(diff,
-                    std::bind(&BossAI::DoMeleeAttackIfReady, this));
-            }
+            _scheduler.Update(diff,
+                std::bind(&BossAI::DoMeleeAttackIfReady, this));
         }
 
         void ReviveZealot(uint32 zealotData)
@@ -383,14 +380,11 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (me->GetReactState() == REACT_AGGRESSIVE)
-            {
-                if (!UpdateVictim())
-                    return;
+            if (me->GetReactState() != REACT_PASSIVE && !UpdateVictim())
+                return;
 
-                _scheduler.Update(diff,
-                    std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
-            }
+            _scheduler.Update(diff,
+                std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
         }
 
         private:
@@ -477,14 +471,11 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (me->GetReactState() == REACT_AGGRESSIVE)
-            {
-                if (!UpdateVictim())
-                    return;
+            if (me->GetReactState() != REACT_PASSIVE && !UpdateVictim())
+                return;
 
-                _scheduler.Update(diff,
-                    std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
-            }
+            _scheduler.Update(diff,
+                std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
         }
 
         private:
