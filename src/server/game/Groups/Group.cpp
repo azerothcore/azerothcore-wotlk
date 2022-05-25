@@ -835,6 +835,16 @@ void Group::Disband(bool hideDestroy /* = false */)
     delete this;
 }
 
+void Group::ResetInstanceSavedGameobjects(uint32 instanceId)
+{
+    if (instanceId)
+    {
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DELETE_INSTANCE_SAVED_DATA);
+        stmt->SetData(0, instanceId);
+        CharacterDatabase.Execute(stmt);
+    }
+}
+
 /*********************************************************/
 /***                   LOOT SYSTEM                     ***/
 /*********************************************************/
@@ -2029,16 +2039,6 @@ void Group::SetRaidDifficulty(Difficulty difficulty)
         Player* player = itr->GetSource();
         player->SetRaidDifficulty(difficulty);
         player->SendRaidDifficulty(true);
-    }
-}
-
-void Group::ResetInstanceSavedGameobjects(uint32 instanceId)
-{
-    if (instanceId)
-    {
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DELETE_INSTANCE_SAVED_DATA);
-        stmt->SetData(0, instanceId);
-        CharacterDatabase.Execute(stmt);
     }
 }
 
