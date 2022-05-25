@@ -23,8 +23,14 @@ SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
 #include "InstanceScript.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "temple_of_ahnqiraj.h"
+
+ObjectData const creatureData[] =
+{
+    { NPC_SARTURA, DATA_SARTURA },
+};
 
 class instance_temple_of_ahnqiraj : public InstanceMapScript
 {
@@ -38,7 +44,10 @@ public:
 
     struct instance_temple_of_ahnqiraj_InstanceMapScript : public InstanceScript
     {
-        instance_temple_of_ahnqiraj_InstanceMapScript(Map* map) : InstanceScript(map) { }
+        instance_temple_of_ahnqiraj_InstanceMapScript(Map* map) : InstanceScript(map)
+        {
+            LoadObjectData(creatureData, nullptr);
+        }
 
         //If Vem is dead...
         bool IsBossDied[3];
@@ -47,6 +56,7 @@ public:
         ObjectGuid SkeramGUID;
         ObjectGuid VemGUID;
         ObjectGuid KriGUID;
+        ObjectGuid YaujGUID;
         ObjectGuid VeklorGUID;
         ObjectGuid VeknilashGUID;
         ObjectGuid ViscidusGUID;
@@ -79,6 +89,9 @@ public:
                 case NPC_KRI:
                     KriGUID = creature->GetGUID();
                     break;
+                case NPC_YAUJ:
+                    YaujGUID = creature->GetGUID();
+                    break;
                 case NPC_VEKLOR:
                     VeklorGUID = creature->GetGUID();
                     break;
@@ -89,23 +102,14 @@ public:
                     ViscidusGUID = creature->GetGUID();
                     break;
             }
-        }
 
-        bool IsEncounterInProgress() const override
-        {
-            //not active in AQ40
-            return false;
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         uint32 GetData(uint32 type) const override
         {
             switch (type)
             {
-                case DATA_VEMISDEAD:
-                    if (IsBossDied[0])
-                        return 1;
-                    break;
-
                 case DATA_VEKLORISDEAD:
                     if (IsBossDied[1])
                         return 1;
@@ -135,6 +139,8 @@ public:
                     return VemGUID;
                 case DATA_KRI:
                     return KriGUID;
+                case DATA_YAUJ:
+                    return YaujGUID;
                 case DATA_VEKLOR:
                     return VeklorGUID;
                 case DATA_VEKNILASH:
@@ -150,12 +156,11 @@ public:
         {
             switch (type)
             {
-                case DATA_VEM_DEATH:
-                    IsBossDied[0] = true;
-                    break;
-
                 case DATA_BUG_TRIO_DEATH:
-                    ++BugTrioDeathCount;
+                    if (data != 0)
+                        ++BugTrioDeathCount;
+                    else
+                        BugTrioDeathCount = 0;
                     break;
 
                 case DATA_VEKLOR_DEATH:
@@ -174,7 +179,31 @@ public:
     };
 };
 
+// 4052, At Battleguard Sartura
+class at_battleguard_sartura : public AreaTriggerScript
+{
+public:
+    at_battleguard_sartura() : AreaTriggerScript("at_battleguard_sartura") { }
+
+    bool OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    {
+        if (InstanceScript* instance = player->GetInstanceScript())
+        {
+            if (Creature* sartura = instance->GetCreature(DATA_SARTURA))
+            {
+                if (sartura->IsAlive())
+                {
+                    sartura->SetInCombatWith(player);
+                }
+            }
+        }
+
+        return true;
+    }
+};
+
 void AddSC_instance_temple_of_ahnqiraj()
 {
     new instance_temple_of_ahnqiraj();
+    new at_battleguard_sartura();
 }

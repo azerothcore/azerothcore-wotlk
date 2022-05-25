@@ -171,55 +171,74 @@ public:
         {
             switch (go->GetEntry())
             {
+                case GO_CRUSADER_SQUARE_DOOR:
+                case GO_HOARD_DOOR:
+                case GO_HALL_OF_HIGH_COMMAND:
+                case GO_GAUNTLET_DOOR_1:
+                case GO_GAUNTLET_DOOR_2:
+                    go->UpdateSaveToDb(true);
+                    break;
                 case GO_ZIGGURAT_DOORS1:
+                    go->UpdateSaveToDb(true);
                     _zigguratDoorsGUID1 = go->GetGUID();
                     if (GetData(TYPE_ZIGGURAT1) >= 1)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_ZIGGURAT_DOORS2:
+                    go->UpdateSaveToDb(true);
                     _zigguratDoorsGUID2 = go->GetGUID();
                     if (GetData(TYPE_ZIGGURAT2) >= 1)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_ZIGGURAT_DOORS3:
+                    go->UpdateSaveToDb(true);
                     _zigguratDoorsGUID3 = go->GetGUID();
                     if (GetData(TYPE_ZIGGURAT3) >= 1)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_GAUNTLET_GATE:
+                    go->UpdateSaveToDb(true);
                     _gauntletGateGUID = go->GetGUID();
                     if (_zigguratState1 == 2 && _zigguratState2 == 2 && _zigguratState3 == 2)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_SLAUGTHER_GATE:
+                    go->UpdateSaveToDb(true);
                     _slaughterGateGUID = go->GetGUID();
                     if (_zigguratState1 == 2 && _zigguratState2 == 2 && _zigguratState3 == 2)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_ZIGGURAT_DOORS4:
+                    go->UpdateSaveToDb(true);
                     _zigguratDoorsGUID4 = go->GetGUID();
                     if (_slaughterProgress == 4)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_ZIGGURAT_DOORS5:
+                    go->UpdateSaveToDb(true);
                     _zigguratDoorsGUID5 = go->GetGUID();
                     if (_slaughterProgress == 4)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_SLAUGHTER_GATE_SIDE:
+                    go->UpdateSaveToDb(true);
                     if (_slaughterProgress >= 2)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_PORT_TRAP_GATE_1:
+                    go->UpdateSaveToDb(true);
                     _trapGatesGUIDs[0] = go->GetGUID();
                     break;
                 case GO_PORT_TRAP_GATE_2:
+                    go->UpdateSaveToDb(true);
                     _trapGatesGUIDs[1] = go->GetGUID();
                     break;
                 case GO_PORT_TRAP_GATE_3:
+                    go->UpdateSaveToDb(true);
                     _trapGatesGUIDs[2] = go->GetGUID();
                     break;
                 case GO_PORT_TRAP_GATE_4:
+                    go->UpdateSaveToDb(true);
                     _trapGatesGUIDs[3] = go->GetGUID();
                     break;
             }

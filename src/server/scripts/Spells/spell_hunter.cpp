@@ -283,7 +283,7 @@ class spell_hun_taming_the_beast : public AuraScript
         {
             if (Creature* creature = target->ToCreature())
             {
-                creature->DeleteThreatList();
+                creature->GetThreatMgr().ClearAllThreat();
             }
         }
     }

@@ -373,8 +373,6 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-                return;
-
             events2.Update(diff);
             switch (events2.ExecuteEvent())
             {
@@ -996,7 +994,7 @@ public:
         {
             PreventHitEffect(effIndex);
 
-            ThreatContainer::StorageType const& ThreatList = GetCaster()-> getThreatMgr().getThreatList();
+            ThreatContainer::StorageType const& ThreatList = GetCaster()-> GetThreatMgr().getThreatList();
             std::list<Unit*> targetList;
             for (ThreatContainer::StorageType::const_iterator itr = ThreatList.begin(); itr != ThreatList.end(); ++itr)
             {

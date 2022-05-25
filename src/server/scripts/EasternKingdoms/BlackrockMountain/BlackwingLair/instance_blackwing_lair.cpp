@@ -35,7 +35,7 @@ DoorData const doorData[] =
     { GO_PORTCULLIS_RAZORGORE_ROOM, DATA_RAZORGORE_THE_UNTAMED,  DOOR_TYPE_ROOM,   }, // ID 176964 || GUID 75158
     { GO_PORTCULLIS_VAELASTRASZ,    DATA_VAELASTRAZ_THE_CORRUPT, DOOR_TYPE_PASSAGE }, // ID 175185 || GUID 7229
     { GO_PORTCULLIS_BROODLORD,      DATA_BROODLORD_LASHLAYER,    DOOR_TYPE_PASSAGE }, // ID 179365 || GUID 75159
-    { GO_PORTCULLIS_CHROMAGGUS,     DATA_CHROMAGGUS,             DOOR_TYPE_PASSAGE }, // ID 179116 || GUID 75161
+    { GO_PORTCULLIS_NEFARIAN,       DATA_CHROMAGGUS,             DOOR_TYPE_PASSAGE }, // ID 179116 || GUID 75161
     { GO_PORTCULLIS_NEFARIAN,       DATA_NEFARIAN,               DOOR_TYPE_ROOM    }, // ID 179117 || GUID 75164
     { 0,                            0,                           DOOR_TYPE_ROOM    }  // END
 };
@@ -44,7 +44,13 @@ ObjectData const creatureData[] =
 {
     { NPC_GRETHOK,         DATA_GRETHOK              },
     { NPC_NEFARIAN_TROOPS, DATA_NEFARIAN_TROOPS      },
-    { NPC_VICTOR_NEFARIUS, DATA_LORD_VICTOR_NEFARIUS }
+    { NPC_VICTOR_NEFARIUS, DATA_LORD_VICTOR_NEFARIUS },
+    { NPC_CHROMAGGUS,      DATA_CHROMAGGUS           }
+};
+
+ObjectData const objectData[] =
+{
+    { GO_PORTCULLIS_CHROMAGGUS, DATA_GO_CHROMAGGUS_DOOR }
 };
 
 Position const SummonPosition[8] =
@@ -73,7 +79,7 @@ public:
             //SetHeaders(DataHeader);
             SetBossNumber(EncounterCount);
             LoadDoorData(doorData);
-            LoadObjectData(creatureData, nullptr);
+            LoadObjectData(creatureData, objectData);
         }
 
         void Initialize() override
@@ -100,9 +106,6 @@ public:
             {
                 case NPC_RAZORGORE:
                     razorgoreGUID = creature->GetGUID();
-                    break;
-                case NPC_CHROMAGGUS:
-                    chromaggusGUID = creature->GetGUID();
                     break;
                 case NPC_BLACKWING_DRAGON:
                     ++addsCount[0];
@@ -165,19 +168,6 @@ public:
                     {
                         EggList.push_back(go->GetGUID());
                     }
-                    break;
-                case GO_PORTCULLIS_NEFARIAN:
-                    AddDoor(go, true);
-                    nefarianDoorGUID = go->GetGUID();
-                    if (GetBossState(DATA_CHROMAGGUS) != DONE)
-                    {
-                        HandleGameObject(ObjectGuid::Empty, false, go);
-                    }
-                    break;
-                case GO_PORTCULLIS_CHROMAGGUS:
-                    AddDoor(go, true);
-                    chromaggusDoorGUID = go->GetGUID();
-                    go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
                 default:
                     break;
@@ -245,12 +235,6 @@ public:
                         }
                     }
                     break;
-                case DATA_CHROMAGGUS:
-                    if (state == DONE)
-                    {
-                        HandleGameObject(nefarianDoorGUID, true);
-                    }
-                    break;
                 case DATA_NEFARIAN:
                     switch (state)
                     {
@@ -259,7 +243,9 @@ public:
                             [[fallthrough]];
                         case NOT_STARTED:
                             if (Creature* nefarian = instance->GetCreature(nefarianGUID))
+                            {
                                 nefarian->DespawnOrUnsummon();
+                            }
                             break;
                         default:
                             break;
@@ -341,10 +327,6 @@ public:
             {
                 case DATA_RAZORGORE_THE_UNTAMED:
                     return razorgoreGUID;
-                case DATA_CHROMAGGUS:
-                    return chromaggusGUID;
-                case DATA_GO_CHROMAGGUS_DOOR:
-                    return chromaggusDoorGUID;
                 default:
                     break;
             }
@@ -498,8 +480,6 @@ public:
 
     protected:
         ObjectGuid razorgoreGUID;
-        ObjectGuid chromaggusGUID;
-        ObjectGuid chromaggusDoorGUID;
         ObjectGuid nefarianGUID;
         ObjectGuid nefarianDoorGUID;
 
