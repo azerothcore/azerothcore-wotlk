@@ -183,7 +183,7 @@ public:
     void UnbindAllFor(InstanceSave* save);
 
     void SanitizeInstanceSavedData();
-    void ResetInstanceSavedGameobjects(uint32 instanceId);
+    void DeleteInstanceSavedData(uint32 instanceId);
 protected:
     static uint16 ResetTimeDelay[];
     static PlayerBindStorage playerBindStorage;
