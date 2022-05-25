@@ -1,3 +1,4 @@
+-- DB update 2022_05_25_00 -> 2022_05_25_01
 -- Commander Felstrom, set unlootable if resurrection goes through and despawn body after
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 771;
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 771;
