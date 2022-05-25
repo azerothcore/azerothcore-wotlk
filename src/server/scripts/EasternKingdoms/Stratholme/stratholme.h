@@ -57,6 +57,11 @@ enum CreatureIds
 
 enum GameobjectIds
 {
+    GO_CRUSADER_SQUARE_DOOR             = 175967,
+    GO_HOARD_DOOR                       = 175968,
+    GO_HALL_OF_HIGH_COMMAND             = 176194,
+    GO_GAUNTLET_DOOR_1                  = 175357,
+    GO_GAUNTLET_DOOR_2                  = 175356,
     GO_ZIGGURAT_DOORS1                  = 175380,  // baroness
     GO_ZIGGURAT_DOORS2                  = 175379,  // nerub'enkan
     GO_ZIGGURAT_DOORS3                  = 175381,  // maleki

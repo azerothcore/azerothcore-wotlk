@@ -1225,14 +1225,37 @@ void WorldSession::HandleFarSightOpcode(WorldPacket& recvData)
         if (WorldObject* target = _player->GetViewpoint())
             _player->SetSeer(target);
         else
-        {
             LOG_DEBUG("network.opcode", "Player {} requests non-existing seer {}", _player->GetName(), _player->GetGuidValue(PLAYER_FARSIGHT).ToString());
-        }
     }
     else
     {
-        LOG_DEBUG("network", "Player {} set vision to self", _player->GetGUID().ToString());
-        _player->SetSeer(_player);
+        WorldObject* newFarsightobject = nullptr;
+        if (WorldObject* viewpoint = _player->GetViewpoint())
+        {
+            if (DynamicObject* viewpointDynamicObject = viewpoint->ToDynObject())
+            {
+                newFarsightobject = ObjectAccessor::GetUnit(*viewpointDynamicObject, viewpointDynamicObject->GetOldFarsightGUID());
+            }
+            else if (DynamicObject* viewpointDynamicObject = _player->GetDynObject(_player->GetUInt32Value(UNIT_CHANNEL_SPELL)))
+            {
+                if (viewpointDynamicObject->IsViewpoint() && viewpointDynamicObject->GetCasterGUID() == _player->GetGUID())
+                {
+                    newFarsightobject = viewpointDynamicObject;
+                }
+            }
+        }
+
+        if (newFarsightobject)
+        {
+            LOG_DEBUG("network", "Player {} set vision to old farsight {}", _player->GetGUID().ToString(), newFarsightobject->GetGUID().ToString());
+            _player->SetViewpoint(_player->GetViewpoint(), false);
+            _player->SetViewpoint(newFarsightobject, true);
+        }
+        else
+        {
+            LOG_DEBUG("network", "Player {} set vision to self", _player->GetGUID().ToString());
+            _player->SetSeer(_player);
+        }
     }
 
     GetPlayer()->UpdateVisibilityForPlayer();

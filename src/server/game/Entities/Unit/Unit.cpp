@@ -422,7 +422,7 @@ void Unit::Update(uint32 p_time)
 
     _UpdateSpells( p_time );
 
-    if (CanHaveThreatList() && getThreatMgr().isNeedUpdateToClient(p_time))
+    if (CanHaveThreatList() && GetThreatMgr().isNeedUpdateToClient(p_time))
         SendThreatListUpdate();
 
     // update combat timer only for players and pets (only pets with PetAI)
@@ -892,7 +892,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             if (attacker && shareDamageTarget->GetTypeId() == TYPEID_PLAYER)
                 attacker->SendSpellNonMeleeDamageLog(shareDamageTarget, spell, shareDamage, damageSchoolMask, shareAbsorb, shareResist, damagetype == DIRECT_DAMAGE, 0, false);
 
-            Unit::DealDamage(attacker, shareDamageTarget, shareDamage, cleanDamage, NODAMAGE, damageSchoolMask, spellProto, false);
+            Unit::DealDamage(attacker, shareDamageTarget, shareDamage, cleanDamage, NODAMAGE, damageSchoolMask, spellProto, false, false, damageSpell);
         }
     }
 
@@ -1006,7 +1006,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
 
         //if (attacker && victim->GetTypeId() == TYPEID_PLAYER && victim != attacker)
         //victim->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_TOTAL_DAMAGE_RECEIVED, health); // pussywizard: optimization
-        Unit::Kill(attacker, victim, durabilityLoss, cleanDamage ? cleanDamage->attackType : BASE_ATTACK, spellProto);
+        Unit::Kill(attacker, victim, durabilityLoss, cleanDamage ? cleanDamage->attackType : BASE_ATTACK, spellProto, damageSpell);
     }
     else
     {
@@ -3604,8 +3604,10 @@ void Unit::SetCurrentCastedSpell(Spell* pSpell)
     if (pSpell == m_currentSpells[CSpellType])             // avoid breaking self
         return;
 
+    bool bySelf = m_currentSpells[CSpellType] && m_currentSpells[CSpellType]->m_spellInfo->Id == pSpell->m_spellInfo->Id;
+
     // break same type spell if it is not delayed
-    InterruptSpell(CSpellType, false);
+    InterruptSpell(CSpellType, false, true, bySelf);
 
     // special breakage effects:
     switch (CSpellType)
@@ -3634,7 +3636,7 @@ void Unit::SetCurrentCastedSpell(Spell* pSpell)
             {
                 // channel spells always break generic non-delayed and any channeled spells
                 InterruptSpell(CURRENT_GENERIC_SPELL, false);
-                InterruptSpell(CURRENT_CHANNELED_SPELL);
+                InterruptSpell(CURRENT_CHANNELED_SPELL, true, true, bySelf);
 
                 // it also does break autorepeat if not Auto Shot
                 if (m_currentSpells[CURRENT_AUTOREPEAT_SPELL] &&
@@ -5728,10 +5730,12 @@ DynamicObject* Unit::GetDynObject(uint32 spellId)
     return nullptr;
 }
 
-void Unit::RemoveDynObject(uint32 spellId)
+bool Unit::RemoveDynObject(uint32 spellId)
 {
     if (m_dynObj.empty())
-        return;
+        return false;
+
+    bool result = false;
     for (DynObjectList::iterator i = m_dynObj.begin(); i != m_dynObj.end();)
     {
         DynamicObject* dynObj = *i;
@@ -5739,10 +5743,13 @@ void Unit::RemoveDynObject(uint32 spellId)
         {
             dynObj->Remove();
             i = m_dynObj.begin();
+            result = true;
         }
         else
             ++i;
     }
+
+    return result;
 }
 
 void Unit::RemoveAllDynObjects()
@@ -8915,7 +8922,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                             return false;
 
                         if (victim && victim->IsAlive())
-                            victim->getThreatMgr().modifyThreatPercent(this, -10);
+                            victim->GetThreatMgr().modifyThreatPercent(this, -10);
 
                         basepoints0 = int32(CountPctFromMaxHealth(triggerAmount));
                         trigger_spell_id = 31616;
@@ -9922,7 +9929,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
         }
 
         // switch target
-        InterruptSpell(CURRENT_MELEE_SPELL);
+        InterruptSpell(CURRENT_MELEE_SPELL, true, true, true);
         if (!meleeAttack)
             ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
     }
@@ -13910,7 +13917,7 @@ void Unit::setDeathState(DeathState s, bool despawn)
     if (s != ALIVE && s != JUST_RESPAWNED)
     {
         CombatStop();
-        DeleteThreatList();
+        GetThreatMgr().ClearAllThreat();
         getHostileRefMgr().deleteReferences();
         ClearComboPointHolders();                           // any combo points pointed to unit lost at it death
 
@@ -14007,15 +14014,6 @@ void Unit::AddThreat(Unit* victim, float fThreat, SpellSchoolMask schoolMask, Sp
     {
         m_ThreatMgr.addThreat(victim, fThreat, schoolMask, threatSpell);
     }
-}
-
-//======================================================================
-
-void Unit::DeleteThreatList()
-{
-    if (CanHaveThreatList() && !m_ThreatMgr.isThreatListEmpty())
-        SendClearThreatListOpcode();
-    m_ThreatMgr.clearReferences();
 }
 
 //======================================================================
@@ -15090,7 +15088,7 @@ void Unit::CleanupBeforeRemoveFromMap(bool finalCleanup)
     CombatStop();
     ClearComboPoints();
     ClearComboPointHolders();
-    DeleteThreatList();
+    GetThreatMgr().ClearAllThreat();
     getHostileRefMgr().deleteReferences();
     GetMotionMaster()->Clear(false);                    // remove different non-standard movement generators.
 }
@@ -17215,7 +17213,7 @@ bool Unit::HandleAuraRaidProcFromCharge(AuraEffect* triggeredByAura)
     return true;
 }
 
-void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackType attackType, SpellInfo const* spellProto)
+void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackType attackType, SpellInfo const* spellProto, Spell const* spell /*= nullptr*/)
 {
     // Prevent killing unit twice (and giving reward from kill twice)
     if (!victim->GetHealth())
@@ -17332,15 +17330,15 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
     if (killer && (killer->IsPet() || killer->IsTotem()))
         if (Unit* owner = killer->GetOwner())
         {
-            owner->ProcDamageAndSpell(victim, PROC_FLAG_KILL, PROC_FLAG_NONE, PROC_EX_NONE, 0, attackType, spellProto);
+            owner->ProcDamageAndSpell(victim, PROC_FLAG_KILL, PROC_FLAG_NONE, PROC_EX_NONE, 0, attackType, spellProto, nullptr, -1, spell);
             sScriptMgr->OnCreatureKilledByPet( killer->GetCharmerOrOwnerPlayerOrPlayerItself(), victim->ToCreature());
         }
 
     if (killer != victim && !victim->IsCritter())
-        killer->ProcDamageAndSpell(victim, killer ? PROC_FLAG_KILL : 0, PROC_FLAG_KILLED, PROC_EX_NONE, 0, attackType, spellProto);
+        killer->ProcDamageAndSpell(victim, killer ? PROC_FLAG_KILL : 0, PROC_FLAG_KILLED, PROC_EX_NONE, 0, attackType, spellProto, nullptr, -1, spell);
 
     // Proc auras on death - must be before aura/combat remove
-    victim->ProcDamageAndSpell(nullptr, PROC_FLAG_DEATH, PROC_FLAG_NONE, PROC_EX_NONE, 0, attackType, spellProto);
+    victim->ProcDamageAndSpell(nullptr, PROC_FLAG_DEATH, PROC_FLAG_NONE, PROC_EX_NONE, 0, attackType, spellProto, nullptr, -1, spell);
 
     // update get killing blow achievements, must be done before setDeathState to be able to require auras on target
     // and before Spirit of Redemption as it also removes auras
@@ -17351,7 +17349,7 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
     // Spirit of Redemption
     // if talent known but not triggered (check priest class for speedup check)
     bool spiritOfRedemption = false;
-    if (victim->GetTypeId() == TYPEID_PLAYER && victim->getClass() == CLASS_PRIEST)
+    if (victim->GetTypeId() == TYPEID_PLAYER && victim->getClass() == CLASS_PRIEST && !victim->ToPlayer()->HasPlayerFlag(PLAYER_FLAGS_IS_OUT_OF_BOUNDS))
     {
         if (AuraEffect* aurEff = victim->GetAuraEffectDummy(20711))
         {
@@ -17439,7 +17437,7 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
 
         if (!creature->IsPet() && creature->GetLootMode() > 0)
         {
-            creature->DeleteThreatList();
+            creature->GetThreatMgr().ClearAllThreat();
 
             // must be after setDeathState which resets dynamic flags
             if (!creature->loot.isLooted())
@@ -17932,16 +17930,20 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
 
     if (GetTypeId() == TYPEID_UNIT)
     {
-        if (MovementGenerator* movementGenerator = GetMotionMaster()->GetMotionSlot(MOTION_SLOT_IDLE))
+        GetMotionMaster()->MoveIdle();
+
+        if (charmer->GetTypeId() == TYPEID_PLAYER &&
+            charmer->getClass() == CLASS_WARLOCK)
         {
-            movementGenerator->Pause(0);
+            // Disable CreatureAI/SmartAI and switch to CharmAI when charmed by warlock
+            Creature* charmed = ToCreature();
+            charmed->NeedChangeAI = true;
+            charmed->IsAIEnabled = false;
         }
-
-        GetMotionMaster()->Clear(MOTION_SLOT_ACTIVE);
-
-        StopMoving();
-
-        ToCreature()->AI()->OnCharmed(true);
+        else
+        {
+            ToCreature()->AI()->OnCharmed(true);
+        }
 
         // Xinef: If creature can fly, add normal player flying flag (fixes speed)
         if (charmer->GetTypeId() == TYPEID_PLAYER && ToCreature()->CanFly())
@@ -18558,8 +18560,8 @@ void Unit::SetPhaseMask(uint32 newPhaseMask, bool update)
             // modify threat lists for new phasemask
             if (GetTypeId() != TYPEID_PLAYER)
             {
-                ThreatContainer::StorageType threatList = getThreatMgr().getThreatList();
-                ThreatContainer::StorageType offlineThreatList = getThreatMgr().getOfflineThreatList();
+                ThreatContainer::StorageType threatList = GetThreatMgr().getThreatList();
+                ThreatContainer::StorageType offlineThreatList = GetThreatMgr().getOfflineThreatList();
 
                 // merge expects sorted lists
                 threatList.sort();
@@ -19510,15 +19512,15 @@ void Unit::UpdateHeight(float newZ)
 
 void Unit::SendThreatListUpdate()
 {
-    if (!getThreatMgr().isThreatListEmpty())
+    if (!GetThreatMgr().isThreatListEmpty())
     {
-        uint32 count = getThreatMgr().getThreatList().size();
+        uint32 count = GetThreatMgr().getThreatList().size();
 
         //LOG_DEBUG("entities.unit", "WORLD: Send SMSG_THREAT_UPDATE Message");
         WorldPacket data(SMSG_THREAT_UPDATE, 8 + count * 8);
         data << GetPackGUID();
         data << uint32(count);
-        ThreatContainer::StorageType const& tlist = getThreatMgr().getThreatList();
+        ThreatContainer::StorageType const& tlist = GetThreatMgr().getThreatList();
         for (ThreatContainer::StorageType::const_iterator itr = tlist.begin(); itr != tlist.end(); ++itr)
         {
             data << (*itr)->getUnitGuid().WriteAsPacked();
@@ -19530,16 +19532,16 @@ void Unit::SendThreatListUpdate()
 
 void Unit::SendChangeCurrentVictimOpcode(HostileReference* pHostileReference)
 {
-    if (!getThreatMgr().isThreatListEmpty())
+    if (!GetThreatMgr().isThreatListEmpty())
     {
-        uint32 count = getThreatMgr().getThreatList().size();
+        uint32 count = GetThreatMgr().getThreatList().size();
 
         LOG_DEBUG("entities.unit", "WORLD: Send SMSG_HIGHEST_THREAT_UPDATE Message");
         WorldPacket data(SMSG_HIGHEST_THREAT_UPDATE, 8 + 8 + count * 8);
         data << GetPackGUID();
         data << pHostileReference->getUnitGuid().WriteAsPacked();
         data << uint32(count);
-        ThreatContainer::StorageType const& tlist = getThreatMgr().getThreatList();
+        ThreatContainer::StorageType const& tlist = GetThreatMgr().getThreatList();
         for (ThreatContainer::StorageType::const_iterator itr = tlist.begin(); itr != tlist.end(); ++itr)
         {
             data << (*itr)->getUnitGuid().WriteAsPacked();
