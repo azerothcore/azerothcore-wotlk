@@ -304,7 +304,7 @@ public:
                                 {
                                     meleeRangeTargets.push_back(target);
                                 }
-                                if (meleeRangeTargets.size() = 2) // test "= 2" / prod ">= 5"
+                                if (meleeRangeTargets.size() == 2) // test "== 2" / prod ">= 5"
                                 {
                                     DoCast(me, SPELL_CLEAVE);
                                 }
