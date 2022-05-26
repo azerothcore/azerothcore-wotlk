@@ -274,8 +274,16 @@ public:
                         break;
                     case EVENT_CHARGE_PLAYER:
                         DoCast(SelectTarget(SelectTargetMethod::Random, 0, 40, true), SPELL_CHARGE);
-                        DoResetThreat();
                         events.ScheduleEvent(EVENT_FRIGHTENING_SHOUT, 1500);
+                        if (Unit* mainTarget = SelectTarget(SelectTargetMethod::MaxThreat, 0, 100.0f))
+                        {
+                            if (Unit* newTarget = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f))
+                            {
+                                mainTarget->setThreat(0);
+                                me->AddThreat(newTarget, 100000);
+                                AttackStart(newTarget);
+                            }
+                        }
                         events.ScheduleEvent(EVENT_CHARGE_PLAYER, urand(30000, 40000));
                         break;
                     case EVENT_EXECUTE:
