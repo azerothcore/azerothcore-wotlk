@@ -279,7 +279,7 @@ public:
                         {
                             if (Unit* newTarget = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f))
                             {
-                                mainTarget->setThreat(0);
+                                me->GetThreatMgr().modifyThreatPercent(mainTarget, -100);
                                 me->AddThreat(newTarget, 100000);
                                 AttackStart(newTarget);
                             }
