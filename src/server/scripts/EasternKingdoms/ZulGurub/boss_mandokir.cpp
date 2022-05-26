@@ -166,7 +166,7 @@ public:
             // Summon Chained Spirits
             for (int i = 0; i < CHAINED_SPIRT_COUNT; ++i)
             {
-                Creature* chainedSpirt = me->SummonCreature(NPC_CHAINED_SPIRT, PosSummonChainedSpirits[i], TEMPSUMMON_CORPSE_DESPAWN);
+                Creature* chainedSpirt = me->SummonCreature(NPC_CHAINED_SPIRIT, PosSummonChainedSpirits[i], TEMPSUMMON_CORPSE_DESPAWN);
                 chainedSpirtGUIDs[i] = chainedSpirt->GetGUID();
             }
             DoZoneInCombat();
