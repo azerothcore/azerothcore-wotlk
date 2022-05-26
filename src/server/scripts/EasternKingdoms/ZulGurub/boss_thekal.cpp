@@ -194,44 +194,42 @@ public:
                 instance->SetBossState(DATA_THEKAL, SPECIAL);
                 WasDead = true;
 
-                _scheduler.Schedule(10s, [this](TaskContext /*context*/) {
-                    if (_lorkhanDied && _zathDied)
-                    {
-                        DoCastSelf(SPELL_TIGER_FORM);
-                        me->SetStandState(UNIT_STAND_STATE_STAND);
-                        me->SetReactState(REACT_AGGRESSIVE);
-                        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                        me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 40.0f, true); // hack
-                        DoResetThreat();
-                        events.ScheduleEvent(EVENT_FORCEPUNCH, 4000, 0, PHASE_TWO);
-                        events.ScheduleEvent(EVENT_SPELL_CHARGE, 12000, 0, PHASE_TWO);
-                        events.ScheduleEvent(EVENT_SUMMONTIGERS, 25000, 0, PHASE_TWO);
-                        events.SetPhase(PHASE_TWO);
+                if (_lorkhanDied && _zathDied)
+                {
+                    DoCastSelf(SPELL_TIGER_FORM);
+                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 40.0f, true); // hack
+                    DoResetThreat();
+                    events.ScheduleEvent(EVENT_FORCEPUNCH, 4000, 0, PHASE_TWO);
+                    events.ScheduleEvent(EVENT_SPELL_CHARGE, 12000, 0, PHASE_TWO);
+                    events.ScheduleEvent(EVENT_SUMMONTIGERS, 25000, 0, PHASE_TWO);
+                    events.SetPhase(PHASE_TWO);
 
-                        _scheduler.Schedule(30s, [this](TaskContext context) {
-                            DoCastSelf(SPELL_FRENZY);
-                            context.Repeat();
-                        }).Schedule(4s, [this](TaskContext context) {
-                            DoCastVictim(SPELL_FORCEPUNCH);
-                            context.Repeat(16s, 21s);
-                        }).Schedule(12s, [this](TaskContext context) {
-                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                            {
-                                DoCast(target, SPELL_CHARGE);
-                                DoResetThreat();
-                                AttackStart(target);
-                            }
-                            context.Repeat(15s, 22s);
-                        }).Schedule(25s, [this](TaskContext context) {
-                            DoCastVictim(SPELL_SUMMONTIGERS, true);
-                            context.Repeat(10s, 14s);
-                        });
-                    }
-                    else
-                    {
-                        DoAction(ACTION_RESSURRECT);
-                    }
-                });
+                    _scheduler.Schedule(30s, [this](TaskContext context) {
+                        DoCastSelf(SPELL_FRENZY);
+                        context.Repeat();
+                    }).Schedule(4s, [this](TaskContext context) {
+                        DoCastVictim(SPELL_FORCEPUNCH);
+                        context.Repeat(16s, 21s);
+                    }).Schedule(12s, [this](TaskContext context) {
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                        {
+                            DoCast(target, SPELL_CHARGE);
+                            DoResetThreat();
+                            AttackStart(target);
+                        }
+                        context.Repeat(15s, 22s);
+                    }).Schedule(25s, [this](TaskContext context) {
+                        DoCastVictim(SPELL_SUMMONTIGERS, true);
+                        context.Repeat(10s, 14s);
+                    });
+                }
+                else
+                {
+                    DoAction(ACTION_RESSURRECT);
+                }
             }
 
             if (!Enraged && WasDead && me->HealthBelowPctDamaged(20, damage))
