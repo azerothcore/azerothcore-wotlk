@@ -150,7 +150,7 @@ public:
             events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(14000, 28000));
             events.ScheduleEvent(EVENT_WHIRLWIND, urand(24000, 30000));
             events.ScheduleEvent(EVENT_CHECK_OHGAN, 1000);
-            events.ScheduleEvent(EVENT_WATCH_PLAYER, urand(13000, 15000));
+            events.ScheduleEvent(EVENT_WATCH_PLAYER, urand(12000, 28000));
             events.ScheduleEvent(EVENT_CHARGE_PLAYER, urand(33000, 38000));
             events.ScheduleEvent(EVENT_EXECUTE, urand(7000, 14000));
             me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
@@ -270,7 +270,7 @@ public:
                             DoCast(player, SPELL_WATCH);
                             Talk(SAY_WATCH, player);
                         }
-                        events.ScheduleEvent(EVENT_WATCH_PLAYER, urand(12000, 15000));
+                        events.ScheduleEvent(EVENT_WATCH_PLAYER, urand(12000, 28000));
                         break;
                     case EVENT_CHARGE_PLAYER:
                         DoCast(SelectTarget(SelectTargetMethod::Random, 0, 40, true), SPELL_CHARGE);
