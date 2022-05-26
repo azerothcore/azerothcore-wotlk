@@ -5,8 +5,7 @@ INSERT INTO `spell_dbc` (`ID`, `Category`, `DispelType`, `Mechanic`, `Attributes
 
 DELETE FROM `spell_script_names` WHERE `spell_id` IN (24083, 24110);
 INSERT INTO `spell_script_names` VALUES
-(24083, 'spell_hatch_eggs'),
-(24110, 'spell_enveloping_webs');
+(24083, 'spell_hatch_eggs');
 
 DELETE FROM `creature_text` WHERE `CreatureID` = 15041;
 DELETE FROM `creature_text` WHERE `CreatureID` = 14510 AND `GroupID` = 4;

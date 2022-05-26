@@ -128,6 +128,11 @@ struct boss_marli : public BossAI
         Talk(SAY_AGGRO);
     }
 
+    bool CanAIAttack(Unit const* target) const override
+    {
+        return !target->HasAura(SPELL_ENVELOPING_WEB);
+    }
+
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
@@ -300,31 +305,9 @@ class spell_hatch_eggs : public SpellScript
     }
 };
 
-// 24110 - Enveloping Webs
-class spell_enveloping_webs : public SpellScript
-{
-    PrepareSpellScript(spell_enveloping_webs);
-
-    void HandleOnHit()
-    {
-        Unit* caster = GetCaster();
-        Unit* hitUnit = GetHitUnit();
-        if (caster && hitUnit && hitUnit->GetTypeId() == TYPEID_PLAYER)
-        {
-            caster->GetThreatMgr().modifyThreatPercent(hitUnit, -100);
-        }
-    }
-
-    void Register() override
-    {
-        OnHit += SpellHitFn(spell_enveloping_webs::HandleOnHit);
-    }
-};
-
 void AddSC_boss_marli()
 {
     RegisterCreatureAI(boss_marli);
     RegisterCreatureAI(npc_spawn_of_marli);
     RegisterSpellScript(spell_hatch_eggs);
-    RegisterSpellScript(spell_enveloping_webs);
 }
