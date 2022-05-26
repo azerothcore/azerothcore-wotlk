@@ -302,18 +302,21 @@ public:
                     case EVENT_CLEAVE:
                         {
                             std::list<Unit*> meleeRangeTargets;
-                            uint8 counter = 0;
                             auto i = me->GetThreatMgr().getThreatList().begin();
-                            for (; i != me->GetThreatMgr().getThreatList().end(); ++i, ++counter)
+                            for (; i != me->GetThreatMgr().getThreatList().end(); ++i)
                             {
                                 Unit* target = (*i)->getTarget();
                                 if (me->IsWithinMeleeRange(target))
                                 {
                                     meleeRangeTargets.push_back(target);
                                 }
-                                if (meleeRangeTargets.size() == 2) // test "== 2" / prod ">= 5"
+                            }
+                            std::list<Unit*, std::allocator<Unit*>>::iterator itr;
+                            for (itr = meleeRangeTargets.begin(); itr != meleeRangeTargets.end(); ++itr)
+                            {
+                                if (meleeRangeTargets.size() == 2) // testing "== 2" / live ">= 5"
                                 {
-                                    DoCast(me, SPELL_MANDOKIR_CLEAVE);
+                                    DoCastVictim(SPELL_MANDOKIR_CLEAVE, true);
                                 }
                             }
                             events.ScheduleEvent(EVENT_CLEAVE, urand(7000, 14000));
