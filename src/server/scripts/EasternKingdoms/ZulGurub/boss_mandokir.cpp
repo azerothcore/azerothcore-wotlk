@@ -153,7 +153,6 @@ public:
             events.ScheduleEvent(EVENT_WATCH_PLAYER, urand(13000, 15000));
             events.ScheduleEvent(EVENT_CHARGE_PLAYER, urand(33000, 38000));
             events.ScheduleEvent(EVENT_EXECUTE, urand(7000, 14000));
-            events.ScheduleEvent(EVENT_FRIGHTENING_SHOUT, urand(22000, 34000));
             me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
             Talk(SAY_AGGRO);
             me->Dismount();
@@ -276,6 +275,7 @@ public:
                     case EVENT_CHARGE_PLAYER:
                         DoCast(SelectTarget(SelectTargetMethod::Random, 0, 40, true), SPELL_CHARGE);
                         DoResetThreat();
+                        events.ScheduleEvent(EVENT_FRIGHTENING_SHOUT, 1500);
                         events.ScheduleEvent(EVENT_CHARGE_PLAYER, urand(22000, 30000));
                         break;
                     case EVENT_EXECUTE:
@@ -287,7 +287,6 @@ public:
                         break;
                     case EVENT_FRIGHTENING_SHOUT:
                         DoCastAOE(SPELL_FRIGHTENING_SHOUT);
-                        events.ScheduleEvent(EVENT_FRIGHTENING_SHOUT, urand(22000, 34000));
                         break;
                     default:
                         break;
