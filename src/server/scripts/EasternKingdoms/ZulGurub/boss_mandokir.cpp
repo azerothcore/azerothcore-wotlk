@@ -284,7 +284,7 @@ public:
                             if (Unit* newTarget = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f))
                             {
                                 me->GetThreatMgr().modifyThreatPercent(mainTarget, -100);
-                                me->AddThreat(newTarget, 10000);
+                                me->AddThreat(newTarget, 10.0f);
                                 AttackStart(newTarget);
                             }
                         }
@@ -445,7 +445,7 @@ public:
                 Position pos;
                 if (Player* target = ObjectAccessor::GetPlayer(*me, _revivePlayerGUID))
                 {
-                    target->GetNearPoint(me, pos.m_positionX, pos.m_positionY, pos.m_positionZ, 5.0f, 0, target->GetAbsoluteAngle(*me));
+                    target->GetNearPoint(me, pos.m_positionX, pos.m_positionY, pos.m_positionZ, 5.0f, 0, target->GetAbsoluteAngle(me));
                     me->GetMotionMaster()->MovePoint(POINT_START_REVIVE, pos);
                 }
             }
