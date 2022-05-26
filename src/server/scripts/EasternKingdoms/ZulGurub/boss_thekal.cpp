@@ -102,7 +102,7 @@ public:
                 me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, false); // hack
             _Reset();
             Initialize();
-            me->SetObjectScale(1.0f);
+
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->SetReactState(REACT_AGGRESSIVE);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -198,7 +198,6 @@ public:
                     if (_lorkhanDied && _zathDied)
                     {
                         DoCastSelf(SPELL_TIGER_FORM);
-                        me->SetObjectScale(2.00f);
                         me->SetStandState(UNIT_STAND_STATE_STAND);
                         me->SetReactState(REACT_AGGRESSIVE);
                         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
