@@ -220,10 +220,11 @@ struct boss_marli : public BossAI
                     DoCastSelf(SPELL_TRANSFORM_BACK, true);
                     Talk(SAY_TRANSFORM_BACK);
                     me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, false); // hack
-                    events.ScheduleEvent(EVENT_TRANSFORM, 45000, 0, PHASE_TWO);
-                    events.ScheduleEvent(EVENT_POISON_VOLLEY, 15000);
-                    events.ScheduleEvent(EVENT_HATCH_SPIDER_EGG, 30000);
-                    events.ScheduleEvent(EVENT_TRANSFORM, urand(35000, 60000), 0, PHASE_TWO);
+                    events.ScheduleEvent(EVENT_TRANSFORM, 60000, 0, PHASE_TWO);
+                    events.ScheduleEvent(EVENT_POISON_VOLLEY, 15000, 0, PHASE_TWO);
+                    events.ScheduleEvent(EVENT_HATCH_SPIDER_EGG, 30000, 0, PHASE_TWO);
+                    events.ScheduleEvent(EVENT_DRAIN_LIFE, 30000, 0, PHASE_TWO);
+                    events.ScheduleEvent(EVENT_ENLARGE, urand(10000, 20000), 0, PHASE_TWO);
                     events.SetPhase(PHASE_TWO);
                     break;
                 case EVENT_THRASH:
