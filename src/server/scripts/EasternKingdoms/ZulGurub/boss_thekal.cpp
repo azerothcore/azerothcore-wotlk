@@ -340,7 +340,11 @@ public:
                 if (!thekal || !zath)
                     return;
 
-                if (zath->GetHealthPct() <= thekal->GetHealthPct())
+                if ((me->GetHealthPct() <= thekal->GetHealthPct()) || (me->GetHealthPct() <= zath->GetHealthPct()))
+                {
+                    DoCastSelf(SPELL_GREATERHEAL);
+                }
+                else if (zath->GetHealthPct() <= thekal->GetHealthPct())
                 {
                     DoCast(zath, SPELL_GREATERHEAL);
                 }
