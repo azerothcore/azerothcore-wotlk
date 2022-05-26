@@ -1,3 +1,4 @@
+-- DB update 2022_05_26_00 -> 2022_05_26_01
 
 -- Change text and remove 10601 as the BroadcastTextId 'till sniff data
 DELETE FROM `creature_text` WHERE `CreatureID`= 11380 AND `GroupID`=0 AND `ID`=0;
