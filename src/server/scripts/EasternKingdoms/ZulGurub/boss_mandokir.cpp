@@ -448,7 +448,7 @@ public:
                 Position pos;
                 if (Player* target = ObjectAccessor::GetPlayer(*me, _revivePlayerGUID))
                 {
-                    target->GetNearPoint(me, pos.m_positionX, pos.m_positionY, pos.m_positionZ, 5.0f, 0, target->GetAbsoluteAngle(me));
+                    target->GetNearPoint(me, pos.m_positionX, pos.m_positionY, pos.m_positionZ, 5.0f, 0, target->GetAngle(me));
                     me->GetMotionMaster()->MovePoint(POINT_START_REVIVE, pos);
                 }
             }
