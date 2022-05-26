@@ -112,6 +112,10 @@ public:
 
         void Reset() override
         {
+            BossAI::Reset();
+            events.Reset();
+            summons.DespawnAll();
+            killCount = 0;
             if (me->GetPositionZ() > 140.0f)
             {
                 events.ScheduleEvent(EVENT_CHECK_START, 1000);
@@ -123,10 +127,8 @@ public:
                     }
                 }
             }
-            killCount = 0;
             me->RemoveAurasDueToSpell(SPELL_FRENZY);
             me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-            summons.DespawnAll();
             instance->SetBossState(DATA_OHGAN, NOT_STARTED);
             me->Mount(MODEL_OHGAN_MOUNT);
         }
