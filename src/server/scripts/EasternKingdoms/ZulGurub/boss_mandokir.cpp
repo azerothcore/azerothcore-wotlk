@@ -44,7 +44,7 @@ enum Spells
     SPELL_WATCH_CHARGE        = 24315, // triggers 24316
     SPELL_LEVEL_UP            = 24312, // seen
     SPELL_EXECUTE             = 7160, // seen
-    SPELL_CLEAVE              = 20691 // seen
+    SPELL_MANDOKIR_CLEAVE     = 20691 // seen
 };
 
 enum Events
@@ -116,10 +116,13 @@ public:
             {
                 events.ScheduleEvent(EVENT_CHECK_START, 1000);
                 if (Creature* speaker = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_VILEBRANCH_SPEAKER)))
+                {
                     if (!speaker->IsAlive())
+                    {
                         speaker->Respawn(true);
+                    }
+                }
             }
-
             killCount = 0;
             me->RemoveAurasDueToSpell(SPELL_FRENZY);
             me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
@@ -132,8 +135,12 @@ public:
         {
             // Do not want to unsummon Ohgan
             for (int i = 0; i < CHAINED_SPIRT_COUNT; ++i)
+            {
                 if (Creature* unsummon = ObjectAccessor::GetCreature(*me, chainedSpirtGUIDs[i]))
+                {
                     unsummon->DespawnOrUnsummon();
+                }
+            }
             instance->SetBossState(DATA_MANDOKIR, DONE);
             instance->SaveToDB();
         }
@@ -306,7 +313,7 @@ public:
                                 }
                                 if (meleeRangeTargets.size() == 2) // test "== 2" / prod ">= 5"
                                 {
-                                    DoCast(me, SPELL_CLEAVE);
+                                    DoCast(me, SPELL_MANDOKIR_CLEAVE);
                                 }
                             }
                             events.ScheduleEvent(EVENT_CLEAVE, urand(7000, 14000));
