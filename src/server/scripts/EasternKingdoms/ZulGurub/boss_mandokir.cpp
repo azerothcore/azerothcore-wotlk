@@ -35,15 +35,16 @@ enum Says
 enum Spells
 {
     SPELL_CHARGE              = 24408, // seen
-    SPELL_OVERPOWER           = 24407, // Seen
-    SPELL_FRIGHTENING_SHOUT   = 19134,
-    SPELL_WHIRLWIND           = 13736, // Triggers 15589
-    SPELL_MORTAL_STRIKE       = 16856, // Seen
+    SPELL_OVERPOWER           = 24407, // seen
+    SPELL_FRIGHTENING_SHOUT   = 19134, // seen
+    SPELL_WHIRLWIND           = 13736, // triggers 15589
+    SPELL_MORTAL_STRIKE       = 16856, // seen
     SPELL_FRENZY              = 24318, // seen
     SPELL_WATCH               = 24314, // seen 24315, 24316
-    SPELL_WATCH_CHARGE        = 24315, // Triggers 24316
-    SPELL_LEVEL_UP            = 24312,
-    SPELL_EXECUTE             = 7160
+    SPELL_WATCH_CHARGE        = 24315, // triggers 24316
+    SPELL_LEVEL_UP            = 24312, // seen
+    SPELL_EXECUTE             = 7160, // seen
+    SPELL_CLEAVE              = 20691 // seen
 };
 
 enum Events
@@ -58,7 +59,8 @@ enum Events
     EVENT_WATCH_PLAYER        = 8,
     EVENT_CHARGE_PLAYER       = 9,
     EVENT_EXECUTE             = 10,
-    EVENT_FRIGHTENING_SHOUT   = 11
+    EVENT_FRIGHTENING_SHOUT   = 11,
+    EVENT_CLEAVE              = 12
 };
 
 enum Misc
@@ -146,6 +148,7 @@ public:
             events.ScheduleEvent(EVENT_WATCH_PLAYER, urand(12000, 28000));
             events.ScheduleEvent(EVENT_CHARGE_PLAYER, urand(30000, 40000));
             events.ScheduleEvent(EVENT_EXECUTE, urand(7000, 14000));
+            events.ScheduleEvent(EVENT_CLEAVE, urand(7000, 14000));
             me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
             Talk(SAY_AGGRO);
             me->Dismount();
@@ -289,6 +292,26 @@ public:
                     case EVENT_FRIGHTENING_SHOUT:
                         DoCastAOE(SPELL_FRIGHTENING_SHOUT);
                         break;
+                    case EVENT_CLEAVE:
+                        {
+                            std::list<Unit*> meleeRangeTargets;
+                            uint8 counter = 0;
+                            auto i = me->GetThreatMgr().getThreatList().begin();
+                            for (; i != me->GetThreatMgr().getThreatList().end(); ++i, ++counter)
+                            {
+                                Unit* target = (*i)->getTarget();
+                                if (me->IsWithinMeleeRange(target))
+                                {
+                                    meleeRangeTargets.push_back(target);
+                                }
+                                if (meleeRangeTargets.size() = 2) // test "= 2" / prod ">= 5"
+                                {
+                                    DoCast(me, SPELL_CLEAVE);
+                                }
+                            }
+                            events.ScheduleEvent(EVENT_CLEAVE, urand(7000, 14000));
+                            break;
+                        }
                     default:
                         break;
                 }
