@@ -68,10 +68,10 @@ enum Misc
     MODEL_OHGAN_MOUNT         = 15271,
     PATH_MANDOKIR             = 492861,
     POINT_MANDOKIR_END        = 24,
-    CHAINED_SPIRT_COUNT       = 20
+    CHAINED_SPIRIT_COUNT      = 20
 };
 
-Position const PosSummonChainedSpirits[CHAINED_SPIRT_COUNT] =
+Position const PosSummonChainedSpirits[CHAINED_SPIRIT_COUNT] =
 {
     { -12167.17f, -1979.330f, 133.0992f, 2.268928f },
     { -12262.74f, -1953.394f, 133.5496f, 0.593412f },
@@ -136,9 +136,9 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             // Do not want to unsummon Ohgan
-            for (int i = 0; i < CHAINED_SPIRT_COUNT; ++i)
+            for (int i = 0; i < CHAINED_SPIRIT_COUNT; ++i)
             {
-                if (Creature* unsummon = ObjectAccessor::GetCreature(*me, chainedSpirtGUIDs[i]))
+                if (Creature* unsummon = ObjectAccessor::GetCreature(*me, chainedSpiritGUIDs[i]))
                 {
                     unsummon->DespawnOrUnsummon();
                 }
@@ -163,11 +163,10 @@ public:
             me->Dismount();
             // Summon Ohgan (Spell missing) TEMP HACK
             me->SummonCreature(NPC_OHGAN, me->GetPositionX() - 3, me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 35000);
-            // Summon Chained Spirits
-            for (int i = 0; i < CHAINED_SPIRT_COUNT; ++i)
+            for (int i = 0; i < CHAINED_SPIRIT_COUNT; ++i)
             {
-                Creature* chainedSpirt = me->SummonCreature(NPC_CHAINED_SPIRIT, PosSummonChainedSpirits[i], TEMPSUMMON_CORPSE_DESPAWN);
-                chainedSpirtGUIDs[i] = chainedSpirt->GetGUID();
+                Creature* chainedSpirit = me->SummonCreature(NPC_CHAINED_SPIRIT, PosSummonChainedSpirits[i], TEMPSUMMON_CORPSE_DESPAWN);
+                chainedSpiritGUIDs[i] = chainedSpirit->GetGUID();
             }
             DoZoneInCombat();
         }
@@ -333,7 +332,7 @@ public:
 
     private:
         uint8 killCount;
-        ObjectGuid chainedSpirtGUIDs[CHAINED_SPIRT_COUNT];
+        ObjectGuid chainedSpiritGUIDs[CHAINED_SPIRIT_COUNT];
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -396,6 +395,101 @@ public:
     CreatureAI* GetAI(Creature* creature) const override
     {
         return GetZulGurubAI<npc_ohganAI>(creature);
+    }
+};
+
+enum spiritSpell
+{
+    SPELL_REVIVE = 24341 // seen
+};
+
+enum Action
+{
+    ACTION_START_REVIVE = 1,
+    ACTION_REVIVE       = 2
+};
+
+enum spiritMisc
+{
+    POINT_START_REVIVE = 1
+};
+
+class npc_chained_spirit : public CreatureScript
+{
+public:
+    npc_chained_spirit() : CreatureScript("npc_chained_spirit") { }
+
+    struct npc_chained_spiritAI : public ScriptedAI
+    {
+        npc_chained_spiritAI(Creature* creature) : ScriptedAI(creature)
+        {
+            _instance = me->GetInstanceScript();
+            me->AddUnitMovementFlag(MOVEMENTFLAG_HOVER);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        }
+
+        void Reset() override
+        {
+            _revivePlayerGUID.Clear();
+        }
+
+        void SetGUID(ObjectGuid const guid, int32 /*id*/) override
+        {
+            _revivePlayerGUID = guid;
+        }
+
+        void DoAction(int32 action) override
+        {
+            if (action == ACTION_REVIVE)
+            {
+                Position pos;
+                if (Player* target = ObjectAccessor::GetPlayer(*me, _revivePlayerGUID))
+                {
+                    target->GetNearPoint(me, pos.m_positionX, pos.m_positionY, pos.m_positionZ, 5.0f, 0, target->GetAbsoluteAngle(me));
+                    me->GetMotionMaster()->MovePoint(POINT_START_REVIVE, pos);
+                }
+            }
+        }
+
+        void MovementInform(uint32 type, uint32 pointId) override
+        {
+            if (type != POINT_MOTION_TYPE || !_revivePlayerGUID)
+                return;
+
+            if (pointId == POINT_START_REVIVE)
+            {
+                if (Player* target = ObjectAccessor::GetPlayer(*me, _revivePlayerGUID))
+                {
+                    DoCast(target, SPELL_REVIVE);
+                }
+                me->DespawnOrUnsummon(2000);
+            }
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            Player* target = ObjectAccessor::GetPlayer(*me, _revivePlayerGUID);
+            if (!target || target->IsAlive())
+                return;
+
+            if (Creature* mandokir = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_MANDOKIR)))
+            {
+                mandokir->GetAI()->SetGUID(target->GetGUID());
+                mandokir->GetAI()->DoAction(ACTION_START_REVIVE);
+            }
+            me->DespawnOrUnsummon();
+        }
+
+        void UpdateAI(uint32 /*diff*/) override { }
+
+    private:
+        InstanceScript* _instance;
+        ObjectGuid _revivePlayerGUID;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetZulGurubAI<npc_chained_spiritAI>(creature);
     }
 };
 
