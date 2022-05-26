@@ -1,3 +1,4 @@
+-- DB update 2022_05_25_04 -> 2022_05_26_00
 --
 
 -- Content info for Durotar Shaman Quest [Rune-Inscribed Parchment]
