@@ -151,7 +151,7 @@ public:
             events.ScheduleEvent(EVENT_WHIRLWIND, urand(24000, 30000));
             events.ScheduleEvent(EVENT_CHECK_OHGAN, 1000);
             events.ScheduleEvent(EVENT_WATCH_PLAYER, urand(12000, 28000));
-            events.ScheduleEvent(EVENT_CHARGE_PLAYER, urand(33000, 38000));
+            events.ScheduleEvent(EVENT_CHARGE_PLAYER, urand(30000, 40000));
             events.ScheduleEvent(EVENT_EXECUTE, urand(7000, 14000));
             me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
             Talk(SAY_AGGRO);
@@ -276,7 +276,7 @@ public:
                         DoCast(SelectTarget(SelectTargetMethod::Random, 0, 40, true), SPELL_CHARGE);
                         DoResetThreat();
                         events.ScheduleEvent(EVENT_FRIGHTENING_SHOUT, 1500);
-                        events.ScheduleEvent(EVENT_CHARGE_PLAYER, urand(22000, 30000));
+                        events.ScheduleEvent(EVENT_CHARGE_PLAYER, urand(30000, 40000));
                         break;
                     case EVENT_EXECUTE:
                         if (me->GetVictim() && me->GetVictim()->HealthBelowPct(20))
@@ -292,7 +292,6 @@ public:
                         break;
                 }
             }
-
             DoMeleeAttackIfReady();
         }
 
