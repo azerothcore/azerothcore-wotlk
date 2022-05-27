@@ -424,21 +424,21 @@ public:
 
     struct npc_chained_spiritAI : public ScriptedAI
     {
-        npc_chained_spiritAI(Creature* creature) : ScriptedAI(creature)
+        npc_chained_spiritAI(Creature* creature) : ScriptedAI(creature), instance(creature->GetInstanceScript())
         {
-            _instance = me->GetInstanceScript();
+            instance = me->GetInstanceScript();
             me->AddUnitMovementFlag(MOVEMENTFLAG_HOVER);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void Reset() override
         {
-            _revivePlayerGUID.Clear();
+            revivePlayerGUID.Clear();
         }
 
         void SetGUID(ObjectGuid const guid, int32 /*id*/) override
         {
-            _revivePlayerGUID = guid;
+            revivePlayerGUID = guid;
         }
 
         void DoAction(int32 action) override
@@ -446,7 +446,7 @@ public:
             if (action == ACTION_REVIVE)
             {
                 Position pos;
-                if (Unit* target = ObjectAccessor::GetPlayer(*me, _revivePlayerGUID))
+                if (Unit* target = ObjectAccessor::GetPlayer(*me, revivePlayerGUID))
                 {
                     target->GetNearPoint(me, pos.m_positionX, pos.m_positionY, pos.m_positionZ, 5.0f, 0.0f, target->GetAbsoluteAngle(me));
                     me->GetMotionMaster()->MovePoint(POINT_START_REVIVE, pos);
@@ -456,12 +456,12 @@ public:
 
         void MovementInform(uint32 type, uint32 pointId) override
         {
-            if (type != POINT_MOTION_TYPE || !_revivePlayerGUID)
+            if (type != POINT_MOTION_TYPE || !revivePlayerGUID)
                 return;
 
             if (pointId == POINT_START_REVIVE)
             {
-                if (Player* target = ObjectAccessor::GetPlayer(*me, _revivePlayerGUID))
+                if (Player* target = ObjectAccessor::GetPlayer(*me, revivePlayerGUID))
                 {
                     DoCast(target, SPELL_REVIVE);
                 }
@@ -471,11 +471,11 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            Player* target = ObjectAccessor::GetPlayer(*me, _revivePlayerGUID);
+            Player* target = ObjectAccessor::GetPlayer(*me, revivePlayerGUID);
             if (!target || target->IsAlive())
                 return;
 
-            if (Creature* mandokir = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_MANDOKIR)))
+            if (Creature* mandokir = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_MANDOKIR)))
             {
                 mandokir->GetAI()->SetGUID(target->GetGUID());
                 mandokir->GetAI()->DoAction(ACTION_START_REVIVE);
@@ -486,8 +486,8 @@ public:
         void UpdateAI(uint32 /*diff*/) override { }
 
     private:
-        InstanceScript* _instance;
-        ObjectGuid _revivePlayerGUID;
+        InstanceScript* instance;
+        ObjectGuid revivePlayerGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -592,6 +592,7 @@ void AddSC_boss_mandokir()
 {
     new boss_mandokir();
     new npc_ohgan();
+    new npc_chained_spirit();
     new npc_vilebranch_speaker();
     new spell_threatening_gaze();
 }
