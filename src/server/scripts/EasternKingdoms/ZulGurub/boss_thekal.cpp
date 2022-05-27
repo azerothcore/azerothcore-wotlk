@@ -119,24 +119,39 @@ public:
                 zealot->ResetFaction();
             }
 
+            // TODO: do this in formations, once a flag is added to prevent leaders from respawning as well.
+            std::list<Creature*> creatureList;
+            GetCreatureListWithEntryInGrid(creatureList, me, NPC_ZULGURUB_TIGER, 15.0f);
+
+            if (_catGuids.empty())
+            {
+                for (Creature* creature : creatureList)
+                {
+                    _catGuids.push_back(creature->GetGUID());
+                    if (!creature->IsAlive())
+                    {
+                        creature->Respawn(true);
+                    }
+                }
+            }
+            else
+            {
+                for (ObjectGuid guid : _catGuids)
+                {
+                    if (Creature* creature = ObjectAccessor::GetCreature(*me, guid))
+                    {
+                        if (!creature->IsAlive())
+                        {
+                            creature->Respawn(true);
+                        }
+                    }
+                }
+            }
+
             _scheduler.SetValidator([this]
             {
                 return !me->HasUnitState(UNIT_STATE_CASTING);
             });
-        }
-
-        void JustReachedHome() override
-        {
-            std::list<Creature*> creatureList;
-            GetCreatureListWithEntryInGrid(creatureList, me, NPC_ZULGURUB_TIGER, 15.0f);
-
-            for (Creature* creature : creatureList)
-            {
-                if (!creature->IsAlive())
-                {
-                    creature->Respawn(true);
-                }
-            }
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -158,7 +173,6 @@ public:
         void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
-            Talk(SAY_AGGRO);
 
             _scheduler.CancelAll();
             _scheduler.Schedule(4s, [this](TaskContext context) {
@@ -193,43 +207,7 @@ public:
                 me->AttackStop();
                 instance->SetBossState(DATA_THEKAL, SPECIAL);
                 WasDead = true;
-
-                if (_lorkhanDied && _zathDied)
-                {
-                    DoCastSelf(SPELL_TIGER_FORM);
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 40.0f, true); // hack
-                    DoResetThreat();
-                    events.ScheduleEvent(EVENT_FORCEPUNCH, 4000, 0, PHASE_TWO);
-                    events.ScheduleEvent(EVENT_SPELL_CHARGE, 12000, 0, PHASE_TWO);
-                    events.ScheduleEvent(EVENT_SUMMONTIGERS, 25000, 0, PHASE_TWO);
-                    events.SetPhase(PHASE_TWO);
-
-                    _scheduler.Schedule(30s, [this](TaskContext context) {
-                        DoCastSelf(SPELL_FRENZY);
-                        context.Repeat();
-                    }).Schedule(4s, [this](TaskContext context) {
-                        DoCastVictim(SPELL_FORCEPUNCH);
-                        context.Repeat(16s, 21s);
-                    }).Schedule(12s, [this](TaskContext context) {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        {
-                            DoCast(target, SPELL_CHARGE);
-                            DoResetThreat();
-                            AttackStart(target);
-                        }
-                        context.Repeat(15s, 22s);
-                    }).Schedule(25s, [this](TaskContext context) {
-                        DoCastVictim(SPELL_SUMMONTIGERS, true);
-                        context.Repeat(10s, 14s);
-                    });
-                }
-                else
-                {
-                    DoAction(ACTION_RESSURRECT);
-                }
+                CheckPhaseTransition();
             }
 
             if (!Enraged && WasDead && me->HealthBelowPctDamaged(20, damage))
@@ -284,10 +262,57 @@ public:
             {
                 _zathDied = dead ? true : false;
             }
+
+            CheckPhaseTransition();
+        }
+
+        void CheckPhaseTransition()
+        {
+            if (WasDead && _lorkhanDied && _zathDied)
+            {
+                Talk(SAY_AGGRO);
+                DoCastSelf(SPELL_TIGER_FORM);
+                me->SetStandState(UNIT_STAND_STATE_STAND);
+                me->SetReactState(REACT_AGGRESSIVE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 40.0f, true); // hack
+                me->SetCurrentEquipmentId(0);
+                DoResetThreat();
+                events.ScheduleEvent(EVENT_FORCEPUNCH, 4000, 0, PHASE_TWO);
+                events.ScheduleEvent(EVENT_SPELL_CHARGE, 12000, 0, PHASE_TWO);
+                events.ScheduleEvent(EVENT_SUMMONTIGERS, 25000, 0, PHASE_TWO);
+                events.SetPhase(PHASE_TWO);
+
+                _scheduler.Schedule(30s, [this](TaskContext context) {
+                    DoCastSelf(SPELL_FRENZY);
+                    context.Repeat();
+                }).Schedule(4s, [this](TaskContext context) {
+                    DoCastVictim(SPELL_FORCEPUNCH);
+                    context.Repeat(16s, 21s);
+                }).Schedule(12s, [this](TaskContext context) {
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                    {
+                        DoCast(target, SPELL_CHARGE);
+                        DoResetThreat();
+                        AttackStart(target);
+                    }
+                    context.Repeat(15s, 22s);
+                }).Schedule(25s, [this](TaskContext context) {
+                    DoCastVictim(SPELL_SUMMONTIGERS, true);
+                    context.Repeat(10s, 14s);
+                });
+            }
+            else
+            {
+                _scheduler.Schedule(10s, [this](TaskContext /*context*/) {
+                    DoAction(ACTION_RESSURRECT);
+                });
+            }
         }
 
         private:
             TaskScheduler _scheduler;
+            GuidVector _catGuids;
             bool _lorkhanDied;
             bool _zathDied;
     };
@@ -320,13 +345,12 @@ public:
 
             _scheduler.SetValidator([this]
             {
-                return !me->HasUnitState(UNIT_STATE_CASTING);
+                return !me->HasUnitState(UNIT_STATE_CASTING) && !me->HasReactState(REACT_PASSIVE);
             });
         }
 
         void EnterCombat(Unit* /*who*/) override
         {
-            _scheduler.CancelAll();
             _scheduler.Schedule(1s, [this](TaskContext context) {
                 DoCastSelf(SPELL_SHIELD);
                 context.Repeat(1min);
@@ -362,7 +386,7 @@ public:
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (damage >= me->GetHealth() && me->GetReactState() == REACT_AGGRESSIVE)
+            if (damage >= me->GetHealth() && me->HasReactState(REACT_AGGRESSIVE))
             {
                 me->RemoveAllAuras();
                 me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
@@ -418,12 +442,15 @@ public:
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetReactState(REACT_AGGRESSIVE);
+
+            _scheduler.SetValidator([this]
+            {
+                return !me->HasUnitState(UNIT_STATE_CASTING) && !me->HasReactState(REACT_PASSIVE);
+            });
         }
 
         void EnterCombat(Unit* /*who*/) override
         {
-            _scheduler.CancelAll();
-
             _scheduler.Schedule(13s, [this](TaskContext context) {
                 DoCastSelf(SPELL_SWEEPINGSTRIKES);
                 context.Repeat(1min);
@@ -450,13 +477,12 @@ public:
                 context.Repeat(10s, 20s);
             });
         }
+
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (damage >= me->GetHealth() && me->GetReactState() == REACT_AGGRESSIVE)
+            if (damage >= me->GetHealth() && me->HasReactState(REACT_AGGRESSIVE))
             {
-                me->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
-                me->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
-                me->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
+                me->RemoveAllAuras();
                 me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetStandState(UNIT_STAND_STATE_SLEEP);
                 me->SetReactState(REACT_PASSIVE);
@@ -468,6 +494,8 @@ public:
                 {
                     thekal->AI()->SetData(ACTION_RESSURRECT, DATA_ZATH);
                 }
+
+                _scheduler.CancelAll();
             }
         }
 
