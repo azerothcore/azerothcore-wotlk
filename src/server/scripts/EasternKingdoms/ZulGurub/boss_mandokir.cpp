@@ -44,7 +44,9 @@ enum Spells
     SPELL_WATCH_CHARGE        = 24315, // triggers 24316
     SPELL_LEVEL_UP            = 24312, // seen
     SPELL_EXECUTE             = 7160, // seen
-    SPELL_MANDOKIR_CLEAVE     = 20691 // seen
+    SPELL_MANDOKIR_CLEAVE     = 20691, // seen
+
+    SPELL_REVIVE              = 24341 // chained spirit - seen
 };
 
 enum Events
@@ -63,8 +65,16 @@ enum Events
     EVENT_CLEAVE              = 12
 };
 
+enum Action
+{
+    ACTION_START_REVIVE = 1, // broodlord mandokir
+    ACTION_REVIVE = 2 // chained spirit
+};
+
 enum Misc
 {
+    POINT_START_REVIVE        = 1, // chained spirit
+
     MODEL_OHGAN_MOUNT         = 15271,
     PATH_MANDOKIR             = 492861,
     POINT_MANDOKIR_END        = 24,
@@ -131,6 +141,7 @@ public:
             me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             instance->SetBossState(DATA_OHGAN, NOT_STARTED);
             me->Mount(MODEL_OHGAN_MOUNT);
+            reviveGUID.Clear();
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -176,6 +187,8 @@ public:
             if (victim->GetTypeId() != TYPEID_PLAYER)
                 return;
 
+            reviveGUID = victim->GetGUID();
+            DoAction(ACTION_START_REVIVE);
             if (++killCount == 3)
             {
                 Talk(SAY_DING_KILL);
@@ -189,6 +202,32 @@ public:
                 DoCast(me, SPELL_LEVEL_UP, true);
                 killCount = 0;
             }
+        }
+
+        void DoAction(int32 action) override
+        {
+            if (action == ACTION_START_REVIVE)
+            {
+                std::list<Creature*> creatures;
+                GetCreatureListWithEntryInGrid(creatures, me, NPC_CHAINED_SPIRIT, 200.0f);
+                if (creatures.empty())
+                    return;
+
+                for (std::list<Creature*>::iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
+                {
+                    if (Creature* chainedSpirit = ObjectAccessor::GetCreature(*me, (*itr)->GetGUID()))
+                    {
+                        chainedSpirit->AI()->SetGUID(reviveGUID);
+                        chainedSpirit->AI()->DoAction(ACTION_REVIVE);
+                        reviveGUID.Clear();
+                    }
+                }
+            }
+        }
+
+        void SetGUID(ObjectGuid const guid, int32 /*type = 0 */) override
+        {
+            reviveGUID = guid;
         }
 
         void MovementInform(uint32 type, uint32 id) override
@@ -336,6 +375,7 @@ public:
     private:
         uint8 killCount;
         ObjectGuid chainedSpiritGUIDs[CHAINED_SPIRIT_COUNT];
+        ObjectGuid reviveGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -399,22 +439,6 @@ public:
     {
         return GetZulGurubAI<npc_ohganAI>(creature);
     }
-};
-
-enum spiritSpell
-{
-    SPELL_REVIVE = 24341 // seen
-};
-
-enum Action
-{
-    ACTION_START_REVIVE = 1,
-    ACTION_REVIVE       = 2
-};
-
-enum spiritMisc
-{
-    POINT_START_REVIVE = 1
 };
 
 class npc_chained_spirit : public CreatureScript
