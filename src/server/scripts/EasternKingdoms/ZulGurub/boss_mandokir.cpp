@@ -168,7 +168,7 @@ public:
             events.ScheduleEvent(EVENT_WATCH_PLAYER, urand(12000, 28000));
             events.ScheduleEvent(EVENT_CHARGE_PLAYER, urand(30000, 40000));
             events.ScheduleEvent(EVENT_EXECUTE, urand(7000, 14000));
-            events.ScheduleEvent(EVENT_CLEAVE, urand(7000, 14000));
+            events.ScheduleEvent(EVENT_CLEAVE, urand(10000, 20000));
             me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
             Talk(SAY_AGGRO);
             me->Dismount();
@@ -329,7 +329,7 @@ public:
                         events.ScheduleEvent(EVENT_EXECUTE, urand(7000, 14000));
                         break;
                     case EVENT_FRIGHTENING_SHOUT:
-                        DoCastAOE(SPELL_FRIGHTENING_SHOUT);
+                        DoCastAOE(SPELL_FRIGHTENING_SHOUT, true);
                         break;
                     case EVENT_CLEAVE:
                         {
@@ -346,7 +346,7 @@ public:
                             std::list<Unit*, std::allocator<Unit*>>::iterator itr;
                             for (itr = meleeRangeTargets.begin(); itr != meleeRangeTargets.end(); ++itr)
                             {
-                                if (meleeRangeTargets.size() == 2) // testing "== 2" / live ">= 5"
+                                if (meleeRangeTargets.size() >= 5)
                                 {
                                     if (Unit* currentTarget = me->GetVictim())
                                     {
@@ -354,7 +354,7 @@ public:
                                     }
                                 }
                             }
-                            events.ScheduleEvent(EVENT_CLEAVE, urand(7000, 14000));
+                            events.ScheduleEvent(EVENT_CLEAVE, urand(10000, 20000));
                             break;
                         }
                     default:
