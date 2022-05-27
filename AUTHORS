@@ -2,8 +2,8 @@
 
 ## Warning
 The code of AzerothCore is shipped as it is without any form of warranty,
-and - except for third party libraries licensed under the AGPL 3,
-which you can read from the file "LICENSE-AGPL3".
+and - except for third party libraries licensed under the GPLv2 or later,
+which you can read from the file "LICENSE".
 
 ## Point of current development
 The project is currently hosted at https://www.azerothcore.org/ and developed under https://github.com/azerothcore
