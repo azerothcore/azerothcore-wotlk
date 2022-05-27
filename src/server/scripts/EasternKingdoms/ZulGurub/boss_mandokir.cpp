@@ -68,8 +68,8 @@ enum Events
 
 enum Action
 {
-    ACTION_START_REVIVE = 1, // broodlord mandokir
-    ACTION_REVIVE = 2 // chained spirit
+    ACTION_START_REVIVE       = 1, // broodlord mandokir
+    ACTION_REVIVE             = 2 // chained spirit
 };
 
 enum Misc
