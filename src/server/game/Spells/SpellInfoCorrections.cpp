@@ -1373,7 +1373,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Threatening Gaze
     ApplySpellFix({ 24314 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->AuraInterruptFlags = AURA_INTERRUPT_FLAG_CAST;
+        spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CAST;
     });
 
     // Isle of Conquest
