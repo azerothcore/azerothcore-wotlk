@@ -1370,6 +1370,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].Amplitude = 15000;
     });
 
+    // Threatening Gaze
+    ApplySpellFix({ 24314 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CAST | AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_JUMP | AURA_INTERRUPT_FLAG_TURNING;
+    });
+
     // Isle of Conquest
     ApplySpellFix({ 66551 }, [](SpellInfo* spellInfo)
     {
