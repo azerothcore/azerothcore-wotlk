@@ -166,7 +166,7 @@ public:
             events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(14000, 28000));
             events.ScheduleEvent(EVENT_WHIRLWIND, urand(24000, 30000));
             events.ScheduleEvent(EVENT_CHECK_OHGAN, 1000);
-            events.ScheduleEvent(EVENT_WATCH_PLAYER, urand(12000, 28000));
+            events.ScheduleEvent(EVENT_WATCH_PLAYER, urand(12000, 24000));
             events.ScheduleEvent(EVENT_CHARGE_PLAYER, urand(30000, 40000));
             events.ScheduleEvent(EVENT_EXECUTE, urand(7000, 14000));
             events.ScheduleEvent(EVENT_CLEAVE, urand(10000, 20000));
@@ -314,12 +314,15 @@ public:
                             DoCast(player, SPELL_WATCH);
                             Talk(SAY_WATCH, player);
                         }
-                        events.ScheduleEvent(EVENT_WATCH_PLAYER, urand(12000, 28000));
+                        events.ScheduleEvent(EVENT_WATCH_PLAYER, urand(12000, 24000));
                         break;
                     case EVENT_CHARGE_PLAYER:
                         DoCast(SelectTarget(SelectTargetMethod::Random, 0, 40, true), SPELL_CHARGE);
                         events.ScheduleEvent(EVENT_FRIGHTENING_SHOUT, 1500);
-                        DoResetThreat();
+                        if (Unit* mainTarget = SelectTarget(SelectTargetMethod::MaxThreat, 0, 100.0f))
+                        {
+                            me->GetThreatMgr().modifyThreatPercent(mainTarget, -100);
+                        }
                         events.ScheduleEvent(EVENT_CHARGE_PLAYER, urand(30000, 40000));
                         break;
                     case EVENT_EXECUTE:
@@ -330,7 +333,7 @@ public:
                         events.ScheduleEvent(EVENT_EXECUTE, urand(7000, 14000));
                         break;
                     case EVENT_FRIGHTENING_SHOUT:
-                        DoCastAOE(SPELL_FRIGHTENING_SHOUT, true);
+                        DoCastAOE(SPELL_FRIGHTENING_SHOUT);
                         break;
                     case EVENT_CLEAVE:
                         {
