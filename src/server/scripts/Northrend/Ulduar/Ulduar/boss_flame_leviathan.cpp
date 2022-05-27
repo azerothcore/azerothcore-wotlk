@@ -150,8 +150,7 @@ enum Texts
     BRANN_RADIO_SAY_TOWER_HODIR         = 6,
     BRANN_RADIO_SAY_TOWER_FREYA         = 7,
     BRANN_RADIO_SAY_TOWER_MIMIRON       = 8,
-    
-    
+
     // Vehicle Repair - Said by a spell, BroadcastTextID, same as FLAME_LEVIATHAN_EMOTE_REPAIR
     VEHICLE_EMOTE_REPAIR                = 33538,
 };
