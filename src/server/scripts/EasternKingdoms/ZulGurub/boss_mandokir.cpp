@@ -401,7 +401,7 @@ public:
         }
 
         void EnterCombat(Unit* /*who*/) override { }
-        
+
         void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() != TYPEID_PLAYER)
