@@ -405,9 +405,45 @@ public:
         {
             SunderArmor_Timer = urand(6000, 12000);
             me->AddAura(SPELL_THRASH, me);
+            reviveGUID.Clear();
         }
 
         void EnterCombat(Unit* /*who*/) override { }
+        
+        void KilledUnit(Unit* victim) override
+        {
+            if (victim->GetTypeId() != TYPEID_PLAYER)
+                return;
+
+            reviveGUID = victim->GetGUID();
+            DoAction(ACTION_START_REVIVE);
+        }
+
+        void DoAction(int32 action) override
+        {
+            if (action == ACTION_START_REVIVE)
+            {
+                std::list<Creature*> creatures;
+                GetCreatureListWithEntryInGrid(creatures, me, NPC_CHAINED_SPIRIT, 200.0f);
+                if (creatures.empty())
+                    return;
+
+                for (std::list<Creature*>::iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
+                {
+                    if (Creature* chainedSpirit = ObjectAccessor::GetCreature(*me, (*itr)->GetGUID()))
+                    {
+                        chainedSpirit->AI()->SetGUID(reviveGUID);
+                        chainedSpirit->AI()->DoAction(ACTION_REVIVE);
+                        reviveGUID.Clear();
+                    }
+                }
+            }
+        }
+
+        void SetGUID(ObjectGuid const guid, int32 /*type = 0 */) override
+        {
+            reviveGUID = guid;
+        }
 
         void JustDied(Unit* /*killer*/) override
         {
@@ -433,6 +469,7 @@ public:
     private:
         uint32 SunderArmor_Timer;
         InstanceScript* instance;
+        ObjectGuid reviveGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
