@@ -21,6 +21,7 @@
 #include "SpellAuras.h"
 #include "SpellScript.h"
 #include "zulgurub.h"
+#include "Player.h"
 
 enum Says
 {
