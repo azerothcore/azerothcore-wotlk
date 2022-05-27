@@ -1218,13 +1218,6 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
-        void Say(const char* text)
-        {
-            WorldPacket data;
-            ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, me, nullptr, text);
-            me->SendMessageToSetInRange(&data, 100.0f, true);
-        }
-
         void MoveInLineOfSight(Unit* who) override
         {
             if (!_lock)
