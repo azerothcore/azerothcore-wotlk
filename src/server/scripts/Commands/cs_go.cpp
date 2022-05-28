@@ -101,7 +101,7 @@ public:
             return false;
         }
 
-        return DoTeleport(handler, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, spawnpoint->mapid);
+        return DoTeleport(handler, spawnpoint->spawnPoint, spawnpoint->mapId);
     }
 
     static bool HandleGoCreatureSpawnIdCommand(ChatHandler* handler, Variant<Hyperlink<creature>, ObjectGuid::LowType> spawnId)
@@ -114,12 +114,12 @@ public:
             return false;
         }
 
-        return DoTeleport(handler, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, spawnpoint->mapid);
+        return DoTeleport(handler, spawnpoint->spawnPoint, spawnpoint->mapId);
     }
 
     static bool HandleGoGameObjectSpawnIdCommand(ChatHandler* handler, uint32 spawnId)
     {
-        GameObjectData const* spawnpoint = sObjectMgr->GetGOData(spawnId);
+        GameObjectData const* spawnpoint = sObjectMgr->GetGameObjectData(spawnId);
         if (!spawnpoint)
         {
             handler->SendSysMessage(LANG_COMMAND_GOOBJNOTFOUND);
@@ -127,7 +127,7 @@ public:
             return false;
         }
 
-        return DoTeleport(handler, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, spawnpoint->mapid);
+        return DoTeleport(handler, spawnpoint->spawnMask, spawnpoint->mapid);
     }
 
     static bool HandleGoGameObjectGOIdCommand(ChatHandler* handler, uint32 goId)
@@ -141,7 +141,7 @@ public:
             return false;
         }
 
-        return DoTeleport(handler, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, spawnpoint->mapid);
+        return DoTeleport(handler, spawnpoint->spawnPoint, spawnpoint->mapId);
     }
 
     static bool HandleGoGraveyardCommand(ChatHandler* handler, uint32 gyId)
@@ -364,7 +364,7 @@ public:
                     }
 
                     // We've found a creature, teleport to it.
-                    return DoTeleport(handler, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, spawnpoint->mapid);
+                    return DoTeleport(handler, spawnpoint->spawnPoint, spawnpoint->mapId);
                 }
             }
 
@@ -382,7 +382,7 @@ public:
                         return false;
                     }
 
-                    return DoTeleport(handler, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, spawnpoint->mapid);
+                    return DoTeleport(handler, spawnpoint->spawnPoint, spawnpoint->mapId);
                 }
             }
         }
@@ -403,7 +403,7 @@ public:
                     }
 
                     // We've found a creature, teleport to it.
-                    return DoTeleport(handler, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, spawnpoint->mapid);
+                    return DoTeleport(handler, spawnpoint->spawnPoint, spawnpoint->mapId);
                 }
             }
 
@@ -421,7 +421,7 @@ public:
                         return false;
                     }
 
-                    return DoTeleport(handler, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, spawnpoint->mapid);
+                    return DoTeleport(handler, spawnpoint->spawnPoint, spawnpoint->mapid);
                 }
             }
         }
@@ -462,7 +462,7 @@ public:
     static GameObjectData const* GetGameObjectData(ChatHandler* handler, uint32 entry)
     {
         GameObjectData const* spawnpoint = nullptr;
-        for (auto const& pair : sObjectMgr->GetAllGOData())
+        for (auto const& pair : sObjectMgr->GetAllGameObjectData())
         {
             if (pair.second.id != entry)
             {
