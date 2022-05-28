@@ -24,7 +24,7 @@ ExternalProject_Add(
         GIT_REPOSITORY
         git clone https://github.com/Helias/googletest/
         GIT_TAG
-        fix-warning-useless-param
+        main
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ""
         INSTALL_COMMAND ""
