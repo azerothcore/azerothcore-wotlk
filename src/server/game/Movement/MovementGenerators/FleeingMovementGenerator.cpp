@@ -26,6 +26,7 @@
 
 #define MIN_QUIET_DISTANCE 28.0f
 #define MAX_QUIET_DISTANCE 43.0f
+#define MIN_PATH_LENGTH 2.0f
 
 template<class T>
 void FleeingMovementGenerator<T>::DoInitialize(T* owner)
@@ -139,6 +140,13 @@ void FleeingMovementGenerator<T>::SetTargetLocation(T* owner)
     _path->SetPathLengthLimit(30.0f);
     bool result = _path->CalculatePath(destination.GetPositionX(), destination.GetPositionY(), destination.GetPositionZ());
     if (!result || (_path->GetPathType() & PathType(PATHFIND_NOPATH | PATHFIND_SHORTCUT | PATHFIND_FARFROMPOLY)))
+    {
+        _timer.Reset(100);
+        return;
+    }
+
+    // Same position - recheck
+    if (_path->getPathLength() < MIN_PATH_LENGTH)
     {
         _timer.Reset(100);
         return;
