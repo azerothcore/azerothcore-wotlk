@@ -106,7 +106,7 @@ public:
     void FormationReset(bool dismiss, bool initMotionMaster);
 
     void LeaderMoveTo(float x, float y, float z, bool run);
-    void MemberAttackStart(Creature* member, Unit* target);
+    void MemberEngagingTarget(Creature* member, Unit* target);
     void MemberEvaded(Creature* member);
 
 private:
