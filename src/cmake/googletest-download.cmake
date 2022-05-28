@@ -22,7 +22,7 @@ ExternalProject_Add(
         SOURCE_DIR "@GOOGLETEST_DOWNLOAD_ROOT@/googletest-src"
         BINARY_DIR "@GOOGLETEST_DOWNLOAD_ROOT@/googletest-build"
         GIT_REPOSITORY
-        git clone https://github.com/Helias/googletest.git
+        https://github.com/Helias/googletest.git
         GIT_TAG
         main
         CONFIGURE_COMMAND ""
