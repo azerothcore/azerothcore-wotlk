@@ -27,120 +27,133 @@
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
+#include "MoveSplineInit.h"
 
-// Ours
-enum eyeOfAcherus
+ /*######
+ ## npc_eye_of_acherus
+ ######*/
+
+enum EyeOfAcherusMisc
 {
-    EVENT_REMOVE_CONTROL            = 1,
-    EVENT_SPEAK_1                   = 2,
-    EVENT_LAUNCH                    = 3,
-    EVENT_REGAIN_CONTROL            = 4,
+    SPELL_THE_EYE_OF_ACHERUS = 51852,
+    SPELL_EYE_OF_ACHERUS_VISUAL = 51892,
+    SPELL_EYE_OF_ACHERUS_FLIGHT_BOOST = 51923,
+    SPELL_EYE_OF_ACHERUS_FLIGHT = 51890,
+    SPELL_ROOT_SELF = 51860,
 
-    EYE_TEXT_LAUNCH                 = 0,
-    EYE_TEXT_CONTROL                = 1,
+    EVENT_ANNOUNCE_LAUNCH_TO_DESTINATION = 1,
+    EVENT_UNROOT = 2,
+    EVENT_LAUNCH_TOWARDS_DESTINATION = 3,
+    EVENT_GRANT_CONTROL = 4,
 
-    EYE_POINT_DESTINATION_1         = 0,
-    EYE_POINT_DESTINATION_2         = 1,
+    SAY_LAUNCH_TOWARDS_DESTINATION = 0,
+    SAY_EYE_UNDER_CONTROL = 1,
 
-    SPELL_EYE_OF_ACHERUS_VISUAL     = 51892,
+    POINT_NEW_AVALON = 1,
+
+    EYE_POINT_DESTINATION_0 = 0,
+    EYE_POINT_DESTINATION_1 = 1,
+    EYE_POINT_DESTINATION_2 = 2,
+    EYE_POINT_DESTINATION_3 = 3
 };
 
-class npc_eye_of_acherus : public CreatureScript
+struct npc_eye_of_acherus : public ScriptedAI
 {
-public:
-    npc_eye_of_acherus() : CreatureScript("npc_eye_of_acherus") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
+    npc_eye_of_acherus(Creature* creature) : ScriptedAI(creature)
     {
-        return new npc_eye_of_acherusAI(creature);
+        creature->SetDisplayId(creature->GetCreatureTemplate()->Modelid1);
+        creature->SetReactState(REACT_PASSIVE);
     }
 
-    struct npc_eye_of_acherusAI : public NullCreatureAI
+    void InitializeAI() override
     {
-        npc_eye_of_acherusAI(Creature* creature) : NullCreatureAI(creature) { }
+        DoCastSelf(SPELL_ROOT_SELF);
+        DoCastSelf(SPELL_EYE_OF_ACHERUS_VISUAL);
+        _events.ScheduleEvent(EVENT_ANNOUNCE_LAUNCH_TO_DESTINATION, 400ms);
+    }
 
-        EventMap events;
-
-        void InitializeAI() override
+    void OnCharmed(bool apply) override
+    {
+        if (!apply)
         {
-            events.Reset();
-
-            events.ScheduleEvent(EVENT_REMOVE_CONTROL, 500);
-            events.ScheduleEvent(EVENT_SPEAK_1, 4000);
-            events.ScheduleEvent(EVENT_LAUNCH, 7000);
-
-            me->CastSpell(me, SPELL_EYE_OF_ACHERUS_VISUAL, true);
+            me->GetCharmerOrOwner()->RemoveAurasDueToSpell(SPELL_THE_EYE_OF_ACHERUS);
+            me->GetCharmerOrOwner()->RemoveAurasDueToSpell(SPELL_EYE_OF_ACHERUS_FLIGHT_BOOST);
         }
+    }
 
-        void MovementInform(uint32 type, uint32 point) override
+    void UpdateAI(uint32 diff) override
+    {
+        _events.Update(diff);
+
+        while (uint32 eventId = _events.ExecuteEvent())
         {
-            if (type == POINT_MOTION_TYPE && point == EYE_POINT_DESTINATION_2)
+            switch (eventId)
             {
-                events.ScheduleEvent(EVENT_REGAIN_CONTROL, 1000);
+            case EVENT_ANNOUNCE_LAUNCH_TO_DESTINATION:
+                if (Unit* owner = me->GetCharmerOrOwner())
+                {
+                    Talk(SAY_LAUNCH_TOWARDS_DESTINATION, owner);
+                }
+                _events.ScheduleEvent(EVENT_UNROOT, 400ms);
+                break;
+            case EVENT_UNROOT:
+                me->RemoveAurasDueToSpell(SPELL_ROOT_SELF);
+                DoCastSelf(SPELL_EYE_OF_ACHERUS_FLIGHT_BOOST);
+                _events.ScheduleEvent(EVENT_LAUNCH_TOWARDS_DESTINATION, 1s + 200ms);
+                break;
+            case EVENT_LAUNCH_TOWARDS_DESTINATION:
+            {
+                Position const EYE_DESTINATION_1 = { 2361.21f,  -5660.45f,  496.744f, 0.0f };
+                Position const EYE_DESTINATION_2 = { 2341.571f, -5672.797f, 538.3942f, 0.0f };
+                Position const EYE_DESTINATION_3 = { 1957.4f,   -5844.1f,   273.867f, 0.0f };
+                Position const EYE_DESTINATION_4 = { 1758.01f,  -5876.79f,  166.867f, 0.0f };
+
+                Movement::MoveSplineInit init(me);
+                init.SetFly();
+                if (Unit* owner = me->GetCharmerOrOwner())
+                {
+                    init.SetVelocity(owner->GetSpeed(MOVE_RUN));
+                }
+
+                me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_0, EYE_DESTINATION_1);
+                me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_1, EYE_DESTINATION_2);
+                me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_2, EYE_DESTINATION_3);
+                me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_3, EYE_DESTINATION_4);
+                _events.ScheduleEvent(EVENT_GRANT_CONTROL, 22s);
+                break;
+            }
+            case EVENT_GRANT_CONTROL:
+                if (Unit* owner = me->GetCharmerOrOwner())
+                {
+                    Talk(SAY_EYE_UNDER_CONTROL, owner);
+                }
+                me->RemoveAurasDueToSpell(SPELL_ROOT_SELF);
+                DoCastSelf(SPELL_EYE_OF_ACHERUS_FLIGHT);
+                me->RemoveAurasDueToSpell(SPELL_EYE_OF_ACHERUS_FLIGHT_BOOST);
+                break;
+            default:
+                break;
             }
         }
+    }
 
-        void SetControl(Player* player, bool on)
+    void MovementInform(uint32 movementType, uint32 pointId) override
+    {
+        if (movementType != POINT_MOTION_TYPE)
+            return;
+
+        switch (pointId)
         {
-            WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, me->GetPackGUID().size() + 1);
-            data << me->GetPackGUID();
-            data << uint8(on ? 1 : 0);
-            player->GetSession()->SendPacket(&data);
+        case POINT_NEW_AVALON:
+            DoCastSelf(SPELL_ROOT_SELF);
+            break;
+        default:
+            break;
         }
+    }
 
-        void JustSummoned(Creature* creature) override
-        {
-            if (Unit* target = creature->SelectNearbyTarget())
-                creature->AI()->AttackStart(target);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            events.Update(diff);
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_REMOVE_CONTROL:
-                    if (Player* player = me->GetCharmerOrOwnerPlayerOrPlayerItself())
-                    {
-                        me->SetUnitFlag(UNIT_FLAG_STUNNED);
-                        SetControl(player, false);
-                    }
-                    break;
-                case EVENT_SPEAK_1:
-                    Talk(EYE_TEXT_LAUNCH, me->GetCharmerOrOwnerPlayerOrPlayerItself());
-                    break;
-                case EVENT_LAUNCH:
-                    {
-                        if (Player* player = me->GetCharmerOrOwnerPlayerOrPlayerItself())
-                        {
-                            player->AddAura(SPELL_EYE_OF_ACHERUS_VISUAL, player);
-                        }
-                        me->SetSpeed(MOVE_FLIGHT, 5.0f, true);
-
-                        const Position EYE_DESTINATION_1 = { me->GetPositionX() - 40.0f, me->GetPositionY(), me->GetPositionZ() + 10.0f, 0.0f };
-                        const Position EYE_DESTINATION_2 = { 1768.0f, -5876.0f, 153.0f, 0.0f };
-
-                        me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_1, EYE_DESTINATION_1);
-                        me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_2, EYE_DESTINATION_2);
-                        if (Player* player = me->GetCharmerOrOwnerPlayerOrPlayerItself())
-                        {
-                            player->RemoveAura(SPELL_EYE_OF_ACHERUS_VISUAL);
-                        }
-                        break;
-                    }
-                case EVENT_REGAIN_CONTROL:
-                    if (Player* player = me->GetCharmerOrOwnerPlayerOrPlayerItself())
-                    {
-                        me->RemoveUnitFlag(UNIT_FLAG_STUNNED);
-                        me->SetSpeed(MOVE_FLIGHT, 3.3f, true);
-
-                        SetControl(player, true);
-                        Talk(EYE_TEXT_CONTROL, player);
-                    }
-                    break;
-            }
-        }
-    };
+private:
+    EventMap _events;
 };
 
 class spell_q12641_death_comes_from_on_high_summon_ghouls : public SpellScriptLoader
@@ -1220,7 +1233,7 @@ class spell_death_knight_initiate_visual : public SpellScript
 void AddSC_the_scarlet_enclave_c1()
 {
     // Ours
-    new npc_eye_of_acherus();
+    RegisterCreatureAI(npc_eye_of_acherus);
     new spell_q12641_death_comes_from_on_high_summon_ghouls();
     new npc_death_knight_initiate();
     new spell_item_gift_of_the_harvester();

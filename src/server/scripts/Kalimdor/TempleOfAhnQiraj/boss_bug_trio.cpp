@@ -421,7 +421,7 @@ class spell_vem_knockback : public SpellScript
         {
             if (Creature* cCaster = GetCaster()->ToCreature())
             {
-                cCaster->getThreatMgr().modifyThreatPercent(target, -80);
+                cCaster->GetThreatMgr().modifyThreatPercent(target, -80);
             }
         }
     }

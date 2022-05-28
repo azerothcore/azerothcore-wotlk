@@ -126,7 +126,7 @@ public:
         Unit* FindHatefulStrikeTarget()
         {
             Unit* target = nullptr;
-            ThreatContainer::StorageType const& threatlist = me->getThreatMgr().getThreatList();
+            ThreatContainer::StorageType const& threatlist = me->GetThreatMgr().getThreatList();
             for (ThreatContainer::StorageType::const_iterator i = threatlist.begin(); i != threatlist.end(); ++i)
             {
                 Unit* unit = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid());
