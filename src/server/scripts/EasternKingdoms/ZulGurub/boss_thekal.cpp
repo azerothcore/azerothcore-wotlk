@@ -250,15 +250,14 @@ public:
             if (WasDead && _lorkhanDied && _zathDied)
             {
                 Talk(SAY_AGGRO);
-                DoCastSelf(SPELL_RESURRECT);
                 DoCastSelf(SPELL_TIGER_FORM);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
+                DoResetThreat();
 
                 _scheduler.Schedule(3s, [this](TaskContext /*context*/) {
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->SetCurrentEquipmentId(0);
-                    DoResetThreat();
 
                     _scheduler.Schedule(30s, [this](TaskContext context) {
                         DoCastSelf(SPELL_FRENZY);
@@ -320,6 +319,8 @@ public:
             me->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetReactState(REACT_AGGRESSIVE);
+
+            _scheduler.CancelAll();
 
             _scheduler.SetValidator([this]
             {
@@ -421,6 +422,8 @@ public:
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetReactState(REACT_AGGRESSIVE);
 
+            _scheduler.CancelAll();
+
             _scheduler.SetValidator([this]
             {
                 return !me->HasUnitState(UNIT_STATE_CASTING) && !me->HasReactState(REACT_PASSIVE);
@@ -472,8 +475,6 @@ public:
                 {
                     thekal->AI()->SetData(ACTION_RESSURRECT, DATA_ZATH);
                 }
-
-                _scheduler.CancelAll();
             }
         }
 
