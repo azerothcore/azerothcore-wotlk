@@ -335,11 +335,10 @@ public:
                     case EVENT_CLEAVE:
                         {
                             std::list<Unit*> meleeRangeTargets;
-                            auto i = me->GetThreatMgr().getThreatList().begin();
-                            for (; i != me->GetThreatMgr().getThreatList().end(); ++i)
+                            for (auto& ref : me->GetThreatMgr().getThreatList())
                             {
-                                Unit* target = (*i)->getTarget();
-                                if (me->IsWithinMeleeRange(target))
+                                Unit* target = ref->getTarget();
+                                if (target && me->IsWithinMeleeRange(target))
                                 {
                                     meleeRangeTargets.push_back(target);
                                 }
