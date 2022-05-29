@@ -85,7 +85,7 @@ public:
                 {
                     case EVENT_FROSTBREATH:
                         DoCastVictim(SPELL_FROSTBREATH);
-                        events.ScheduleEvent(EVENT_FROSTBREATH, urand(7000, 11000));
+                        events.ScheduleEvent(EVENT_FROSTBREATH, urand(8000, 20000));
                         break;
                     case EVENT_MASSIVEGEYSER:
                         DoCastVictim(SPELL_MASSIVEGEYSER);
