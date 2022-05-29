@@ -418,14 +418,11 @@ public:
                 if (creatures.empty())
                     return;
 
-                for (std::list<Creature*>::iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
+                for (Creature* chainedSpirit : creatures)
                 {
-                    if (Creature* chainedSpirit = ObjectAccessor::GetCreature(*me, (*itr)->GetGUID()))
-                    {
-                        chainedSpirit->AI()->SetGUID(reviveGUID);
-                        chainedSpirit->AI()->DoAction(ACTION_REVIVE);
-                        reviveGUID.Clear();
-                    }
+                    chainedSpirit->AI()->SetGUID(reviveGUID);
+                    chainedSpirit->AI()->DoAction(ACTION_REVIVE);
+                    reviveGUID.Clear();
                 }
             }
         }
