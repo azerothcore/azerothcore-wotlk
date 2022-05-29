@@ -17932,6 +17932,7 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
     {
         GetMotionMaster()->Clear(false);
         GetMotionMaster()->MoveIdle();
+        StopMoving();
 
         if (charmer->GetTypeId() == TYPEID_PLAYER &&
             charmer->getClass() == CLASS_WARLOCK)
