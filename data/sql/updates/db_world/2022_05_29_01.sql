@@ -1,3 +1,4 @@
+-- DB update 2022_05_29_00 -> 2022_05_29_01
 -- Quest 8891 "Abandoned Investigations" turn in script
 
 -- Magister Duskwither SAI
