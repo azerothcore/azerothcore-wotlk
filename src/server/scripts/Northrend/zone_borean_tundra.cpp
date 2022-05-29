@@ -74,7 +74,7 @@ public:
             Creature* owner = GetOwner()->ToCreature();
             owner->RemoveAllAurasExceptType(SPELL_AURA_DUMMY);
             owner->CombatStop(true);
-            owner->DeleteThreatList();
+            owner->GetThreatMgr().ClearAllThreat();
             owner->GetMotionMaster()->Clear(false);
             owner->GetMotionMaster()->MoveFollow(GetCaster(), 4.0f, M_PI, MOTION_SLOT_ACTIVE);
             owner->CastSpell(owner, SPELL_SUBDUED, true);

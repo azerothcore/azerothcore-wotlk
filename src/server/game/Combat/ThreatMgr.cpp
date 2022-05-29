@@ -406,6 +406,13 @@ ThreatMgr::ThreatMgr(Unit* owner) : iCurrentVictim(nullptr), iOwner(owner), iUpd
 {
 }
 
+void ThreatMgr::ClearAllThreat()
+{
+    if (iOwner->CanHaveThreatList() && !isThreatListEmpty())
+        iOwner->SendClearThreatListOpcode();
+    clearReferences();
+}
+
 //============================================================
 
 void ThreatMgr::clearReferences()

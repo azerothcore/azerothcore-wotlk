@@ -199,7 +199,8 @@ int main(int argc, char** argv)
 
     // Init all logs
     sLog->RegisterAppender<AppenderDB>();
-    sLog->Initialize();
+    // If logs are supposed to be handled async then we need to pass the IoContext into the Log singleton
+    sLog->Initialize(sConfigMgr->GetOption<bool>("Log.Async.Enable", false) ? ioContext.get() : nullptr);
 
     Acore::Banner::Show("worldserver-daemon",
         [](std::string_view text)
@@ -420,6 +421,8 @@ int main(int argc, char** argv)
 
     // Shutdown starts here
     threadPool.reset();
+
+    sLog->SetSynchronous();
 
     sScriptMgr->OnShutdown();
 
