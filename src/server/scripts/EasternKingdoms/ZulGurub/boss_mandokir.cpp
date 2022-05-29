@@ -528,7 +528,7 @@ public:
             if (!target || target->IsAlive())
                 return;
 
-            if (Creature* mandokir = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_MANDOKIR)))
+            if (Creature* mandokir = instance->GetCreature(DATA_MANDOKIR))
             {
                 mandokir->GetAI()->SetGUID(target->GetGUID());
                 mandokir->GetAI()->DoAction(ACTION_START_REVIVE);
