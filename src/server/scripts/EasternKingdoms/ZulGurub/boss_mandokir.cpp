@@ -35,19 +35,19 @@ enum Says
 
 enum Spells
 {
-    SPELL_CHARGE              = 24408, // seen
-    SPELL_OVERPOWER           = 24407, // seen
-    SPELL_FRIGHTENING_SHOUT   = 19134, // seen
+    SPELL_CHARGE              = 24408,
+    SPELL_OVERPOWER           = 24407,
+    SPELL_FRIGHTENING_SHOUT   = 19134,
     SPELL_WHIRLWIND           = 13736, // triggers 15589
-    SPELL_MORTAL_STRIKE       = 16856, // seen
-    SPELL_FRENZY              = 24318, // seen
-    SPELL_WATCH               = 24314, // seen 24315, 24316
+    SPELL_MORTAL_STRIKE       = 16856,
+    SPELL_FRENZY              = 24318,
+    SPELL_WATCH               = 24314, // triggers 24315 and 24316
     SPELL_WATCH_CHARGE        = 24315, // triggers 24316
-    SPELL_LEVEL_UP            = 24312, // seen
-    SPELL_EXECUTE             = 7160, // seen
-    SPELL_MANDOKIR_CLEAVE     = 20691, // seen
+    SPELL_LEVEL_UP            = 24312,
+    SPELL_EXECUTE             = 7160,
+    SPELL_MANDOKIR_CLEAVE     = 20691,
 
-    SPELL_REVIVE              = 24341 // chained spirit - seen
+    SPELL_REVIVE              = 24341 // chained spirit
 };
 
 enum Events
@@ -124,8 +124,6 @@ public:
         void Reset() override
         {
             BossAI::Reset();
-            events.Reset();
-            summons.DespawnAll();
             killCount = 0;
             if (me->GetPositionZ() > 140.0f)
             {
@@ -214,11 +212,14 @@ public:
                 if (creatures.empty())
                     return;
 
-                for (Creature* chainedSpirit : creatures)
+                for (std::list<Creature*>::iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
                 {
-                    chainedSpirit->AI()->SetGUID(reviveGUID);
-                    chainedSpirit->AI()->DoAction(ACTION_REVIVE);
-                    reviveGUID.Clear();
+                    if (Creature* chainedSpirit = ObjectAccessor::GetCreature(*me, (*itr)->GetGUID()))
+                    {
+                        chainedSpirit->AI()->SetGUID(reviveGUID);
+                        chainedSpirit->AI()->DoAction(ACTION_REVIVE);
+                        reviveGUID.Clear();
+                    }
                 }
             }
         }
@@ -283,7 +284,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_OVERPOWER:
-                        DoCastVictim(SPELL_OVERPOWER);
+                        DoCastVictim(SPELL_OVERPOWER, false);
                         events.ScheduleEvent(EVENT_OVERPOWER, urand(6000, 8000));
                         break;
                     case EVENT_MORTAL_STRIKE:
@@ -335,23 +336,20 @@ public:
                     case EVENT_CLEAVE:
                         {
                             std::list<Unit*> meleeRangeTargets;
-                            for (auto& ref : me->GetThreatMgr().getThreatList())
+                            auto i = me->GetThreatMgr().getThreatList().begin();
+                            for (; i != me->GetThreatMgr().getThreatList().end(); ++i)
                             {
-                                Unit* target = ref->getTarget();
-                                if (target && me->IsWithinMeleeRange(target))
+                                Unit* target = (*i)->getTarget();
+                                if (me->IsWithinMeleeRange(target))
                                 {
                                     meleeRangeTargets.push_back(target);
                                 }
                             }
-                            std::list<Unit*, std::allocator<Unit*>>::iterator itr;
-                            for (itr = meleeRangeTargets.begin(); itr != meleeRangeTargets.end(); ++itr)
+                            if (meleeRangeTargets.size() >= 5)
                             {
-                                if (meleeRangeTargets.size() >= 5)
+                                if (Unit* currentTarget = me->GetVictim())
                                 {
-                                    if (Unit* currentTarget = me->GetVictim())
-                                    {
-                                        me->CastSpell(currentTarget, SPELL_MANDOKIR_CLEAVE, false);
-                                    }
+                                    me->CastSpell(currentTarget, SPELL_MANDOKIR_CLEAVE, false);
                                 }
                             }
                             events.ScheduleEvent(EVENT_CLEAVE, urand(10000, 20000));
@@ -528,7 +526,7 @@ public:
             if (!target || target->IsAlive())
                 return;
 
-            if (Creature* mandokir = instance->GetCreature(DATA_MANDOKIR))
+            if (Creature* mandokir = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_MANDOKIR)))
             {
                 mandokir->GetAI()->SetGUID(target->GetGUID());
                 mandokir->GetAI()->DoAction(ACTION_START_REVIVE);
