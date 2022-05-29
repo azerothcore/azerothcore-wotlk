@@ -108,7 +108,44 @@ public:
     }
 };
 
+class spell_gahzranka_slam : public SpellScript
+{
+    PrepareSpellScript(spell_gahzranka_slam);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            _wipeThreat = targets.size() < caster->GetThreatMgr().getThreatList().size();
+        }
+    }
+
+    void HandleWipeThreat(SpellEffIndex effIndex)
+    {
+        if (_wipeThreat)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                if (Unit* target = GetHitUnit())
+                {
+                    caster->GetThreatMgr().modifyThreatPercent(target, -100);
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_gahzranka_slam::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_gahzranka_slam::HandleWipeThreat, EFFECT_1, SPELL_EFFECT_KNOCK_BACK);
+    }
+
+private:
+    bool _wipeThreat = false;
+};
+
 void AddSC_boss_gahzranka()
 {
     new boss_gahzranka();
+    RegisterSpellScript(spell_gahzranka_slam);
 }
