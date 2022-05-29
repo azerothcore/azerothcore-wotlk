@@ -283,7 +283,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_OVERPOWER:
-                        DoCastVictim(SPELL_OVERPOWER, false);
+                        DoCastVictim(SPELL_OVERPOWER);
                         events.ScheduleEvent(EVENT_OVERPOWER, urand(6000, 8000));
                         break;
                     case EVENT_MORTAL_STRIKE:
