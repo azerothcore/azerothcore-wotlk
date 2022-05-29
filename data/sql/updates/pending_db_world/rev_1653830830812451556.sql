@@ -19,7 +19,7 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (159510,9,10,0,0,0,100,0,6000,6000,0,0,0,66,0,0,0,0,0,0,8,0,0,0,0,0,0,0,5.1487212,'Magister Duskwither - Script - Set facing'),
 (159510,9,11,0,0,0,100,0,2000,2000,0,0,0,81,3,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Magister Duskwither - Script - Set npc flags');
 
--- Add Missing meat equipment
+-- Add Missing book equipment
 DELETE FROM `creature_equip_template` WHERE `CreatureID`=15951 AND `ID`=2;
 INSERT INTO `creature_equip_template` (`CreatureID`,`ID`,`ItemID1`,`ItemID2`,`ItemID3`,`VerifiedBuild`) VALUES (15951,2,12751,0,0,0);
 
