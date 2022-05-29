@@ -70,6 +70,11 @@ public:
                 case NPC_HAKKAR:
                     _hakkarGUID = creature->GetGUID();
                     break;
+                case NPC_GAHZRANKA:
+                    _gahzrankaGUID = creature->GetGUID();
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -127,6 +132,16 @@ public:
             return ObjectGuid::Empty;
         }
 
+        uint32 GetData(uint32 type) const override
+        {
+            if (type == DATA_GAHZRANKA)
+            {
+                return _gahzrankaGUID || GetBossState(DATA_GAHZRANKA) == DONE;
+            }
+
+            return 0;
+        }
+
         std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
@@ -181,6 +196,7 @@ public:
         ObjectGuid _arlokkGUID;
         ObjectGuid _goGongOfBethekkGUID;
         ObjectGuid _hakkarGUID;
+        ObjectGuid _gahzrankaGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
