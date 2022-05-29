@@ -51,23 +51,6 @@ enum Spells
     SPELL_BLIND               = 21060
 };
 
-enum Events
-{
-    EVENT_CHECK_TIMER         = 3,
-    EVENT_RESURRECT_TIMER     = 4,
-    EVENT_FRENZY              = 5,
-    EVENT_FORCEPUNCH          = 6,
-    EVENT_SPELL_CHARGE        = 7,
-    EVENT_ENRAGE              = 8,
-    EVENT_SUMMONTIGERS        = 9
-};
-
-enum Phases
-{
-    PHASE_ONE                 = 1,
-    PHASE_TWO                 = 2
-};
-
 enum Actions
 {
     ACTION_RESSURRECT         = 1
@@ -98,8 +81,6 @@ public:
 
         void Reset() override
         {
-            if (events.IsInPhase(PHASE_TWO))
-                me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, false); // hack
             _Reset();
             Initialize();
 
@@ -187,6 +168,7 @@ public:
         void SetData(uint32 /*type*/, uint32 data) override
         {
             UpdateZealotStatus(data, true);
+            CheckPhaseTransition();
 
             _scheduler.Schedule(10s, [this, data](TaskContext /*context*/) {
                 if (!_lorkhanDied || !_zathDied)
@@ -205,7 +187,6 @@ public:
                 me->SetReactState(REACT_PASSIVE);
                 me->SetStandState(UNIT_STAND_STATE_SLEEP);
                 me->AttackStop();
-                instance->SetBossState(DATA_THEKAL, SPECIAL);
                 WasDead = true;
                 CheckPhaseTransition();
             }
@@ -262,8 +243,6 @@ public:
             {
                 _zathDied = dead ? true : false;
             }
-
-            CheckPhaseTransition();
         }
 
         void CheckPhaseTransition()
@@ -271,35 +250,34 @@ public:
             if (WasDead && _lorkhanDied && _zathDied)
             {
                 Talk(SAY_AGGRO);
+                DoCastSelf(SPELL_RESURRECT);
                 DoCastSelf(SPELL_TIGER_FORM);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
-                me->SetReactState(REACT_AGGRESSIVE);
-                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 40.0f, true); // hack
-                me->SetCurrentEquipmentId(0);
-                DoResetThreat();
-                events.ScheduleEvent(EVENT_FORCEPUNCH, 4000, 0, PHASE_TWO);
-                events.ScheduleEvent(EVENT_SPELL_CHARGE, 12000, 0, PHASE_TWO);
-                events.ScheduleEvent(EVENT_SUMMONTIGERS, 25000, 0, PHASE_TWO);
-                events.SetPhase(PHASE_TWO);
 
-                _scheduler.Schedule(30s, [this](TaskContext context) {
-                    DoCastSelf(SPELL_FRENZY);
-                    context.Repeat();
-                }).Schedule(4s, [this](TaskContext context) {
-                    DoCastVictim(SPELL_FORCEPUNCH);
-                    context.Repeat(16s, 21s);
-                }).Schedule(12s, [this](TaskContext context) {
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                    {
-                        DoCast(target, SPELL_CHARGE);
-                        DoResetThreat();
-                        AttackStart(target);
-                    }
-                    context.Repeat(15s, 22s);
-                }).Schedule(25s, [this](TaskContext context) {
-                    DoCastVictim(SPELL_SUMMONTIGERS, true);
-                    context.Repeat(10s, 14s);
+                _scheduler.Schedule(3s, [this](TaskContext /*context*/) {
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetCurrentEquipmentId(0);
+                    DoResetThreat();
+
+                    _scheduler.Schedule(30s, [this](TaskContext context) {
+                        DoCastSelf(SPELL_FRENZY);
+                        context.Repeat();
+                    }).Schedule(4s, [this](TaskContext context) {
+                        DoCastVictim(SPELL_FORCEPUNCH);
+                        context.Repeat(16s, 21s);
+                    }).Schedule(12s, [this](TaskContext context) {
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                        {
+                            DoCast(target, SPELL_CHARGE);
+                            DoResetThreat();
+                            AttackStart(target);
+                        }
+                        context.Repeat(15s, 22s);
+                    }).Schedule(25s, [this](TaskContext context) {
+                        DoCastVictim(SPELL_SUMMONTIGERS, true);
+                        context.Repeat(10s, 14s);
+                    });
                 });
             }
             else
