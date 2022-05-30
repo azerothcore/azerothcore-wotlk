@@ -31,6 +31,7 @@
 #define MAX_VISIBILITY_DISTANCE      250.0f // max distance for visible objects, experimental
 #define SIGHT_RANGE_UNIT             50.0f
 #define MAX_SEARCHER_DISTANCE        150.0f // pussywizard: replace the use of MAX_VISIBILITY_DISTANCE in searchers, because MAX_VISIBILITY_DISTANCE is quite too big for this purpose
+#define VISIBILITY_DISTANCE_INFINITE 533.0f
 #define VISIBILITY_DISTANCE_GIGANTIC 400.0f
 #define VISIBILITY_DISTANCE_LARGE    200.0f
 #define VISIBILITY_DISTANCE_NORMAL   100.0f

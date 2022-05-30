@@ -532,21 +532,26 @@ public:
                         break;
                     case 51:
                         {
-                            uint32 entries[4] = { 15423, 15424, 15414, 15422 };
-                            for (uint8 i = 0; i < 4; ++i)
+                            std::list<Creature*> constructList;
+
+                            me->GetCreatureListWithEntryInGrid(constructList, 15423, 100.0f);
+                            me->GetCreatureListWithEntryInGrid(constructList, 15424, 100.0f);
+                            me->GetCreatureListWithEntryInGrid(constructList, 15414, 100.0f);
+                            me->GetCreatureListWithEntryInGrid(constructList, 15422, 100.0f);
+
+                            if (!constructList.empty())
                             {
-                                Unit* mob = player->FindNearestCreature(entries[i], 50, me);
-                                while (mob)
+                                for (std::list<Creature*>::const_iterator itr = constructList.begin(); itr != constructList.end(); ++itr)
                                 {
-                                    mob->RemoveFromWorld();
-                                    mob = player->FindNearestCreature(15423, 50, me);
+                                    (*itr)->RemoveFromWorld();
                                 }
                             }
+
                             break;
                         }
                     case 52:
                         Fandral->GetMotionMaster()->MoveCharge(-8028.75f, 1538.795f, 2.61f, 4);
-                        Fandral->AI()->Talk(ANACHRONOS_SAY_9, me);
+                        Talk(ANACHRONOS_SAY_9);
                         break;
                     case 53:
                         Fandral->AI()->Talk(FANDRAL_SAY_6);
@@ -555,7 +560,8 @@ public:
                         Talk(ANACHRONOS_EMOTE_2);
                         break;
                     case 55:
-                        Fandral->SetVisible(false);
+                        //Fandral should not dispear atm.
+                        //Fandral->SetVisible(false);
                         break;
                     case 56:
                         Talk(ANACHRONOS_EMOTE_3);

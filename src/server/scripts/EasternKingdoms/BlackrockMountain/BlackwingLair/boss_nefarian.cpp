@@ -674,7 +674,7 @@ struct boss_nefarian : public BossAI
                     break;
                 case EVENT_CLASSCALL:
                     std::set<uint8> classesPresent;
-                    for (auto& ref : me->getThreatMgr().getThreatList())
+                    for (auto& ref : me->GetThreatMgr().getThreatList())
                     {
                         if (ref->getTarget() && ref->getTarget()->GetTypeId() == TYPEID_PLAYER)
                         {
@@ -1157,29 +1157,6 @@ class spell_class_call_polymorph : public SpellScript
     }
 };
 
-class aura_class_call_berserk : public AuraScript
-{
-    PrepareAuraScript(aura_class_call_berserk);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_WARRIOR_BERSERK });
-    }
-
-    void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        if (Unit* target = GetTarget())
-        {
-            target->CastSpell(target, SPELL_WARRIOR_BERSERK);
-        }
-    }
-
-    void Register() override
-    {
-        OnEffectRemove += AuraEffectRemoveFn(aura_class_call_berserk::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_MOD_SHAPESHIFT, AURA_EFFECT_HANDLE_REAL);
-    }
-};
-
 class spell_corrupted_totems : public SpellScript
 {
     PrepareSpellScript(spell_corrupted_totems);
@@ -1314,7 +1291,6 @@ void AddSC_boss_nefarian()
     RegisterSpellScript(aura_class_call_wild_magic);
     RegisterSpellScript(aura_class_call_siphon_blessing);
     RegisterSpellScript(spell_class_call_polymorph);
-    RegisterSpellScript(aura_class_call_berserk);
     RegisterSpellScript(spell_corrupted_totems);
     RegisterSpellScript(spell_shadowblink);
     RegisterSpellScript(spell_spawn_drakonid);

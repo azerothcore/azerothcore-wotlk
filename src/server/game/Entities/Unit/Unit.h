@@ -1517,7 +1517,7 @@ public:
     uint16 GetMaxSkillValueForLevel(Unit const* target = nullptr) const { return (target ? getLevelForTarget(target) : getLevel()) * 5; }
     static void DealDamageMods(Unit const* victim, uint32& damage, uint32* absorb);
     static uint32 DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage const* cleanDamage = nullptr, DamageEffectType damagetype = DIRECT_DAMAGE, SpellSchoolMask damageSchoolMask = SPELL_SCHOOL_MASK_NORMAL, SpellInfo const* spellProto = nullptr, bool durabilityLoss = true, bool allowGM = false, Spell const* spell = nullptr);
-    static void Kill(Unit* killer, Unit* victim, bool durabilityLoss = true, WeaponAttackType attackType = BASE_ATTACK, SpellInfo const* spellProto = nullptr);
+    static void Kill(Unit* killer, Unit* victim, bool durabilityLoss = true, WeaponAttackType attackType = BASE_ATTACK, SpellInfo const* spellProto = nullptr, Spell const* spell = nullptr);
     static int32 DealHeal(Unit* healer, Unit* victim, uint32 addhealth);
 
     void ProcDamageAndSpell(Unit* victim, uint32 procAttacker, uint32 procVictim, uint32 procEx, uint32 amount, WeaponAttackType attType = BASE_ATTACK, SpellInfo const* procSpellInfo = nullptr, SpellInfo const* procAura = nullptr, int8 procAuraEffectIndex = -1, Spell const* procSpell = nullptr, DamageInfo* damageInfo = nullptr, HealInfo* healInfo = nullptr, uint32 procPhase = 2 /*PROC_SPELL_PHASE_HIT*/);
@@ -2034,18 +2034,13 @@ public:
         SetByteValue(UNIT_FIELD_BYTES_2, 3, form);
     }
 
-    [[nodiscard]] inline bool IsInFeralForm() const
+    [[nodiscard]] bool IsInFeralForm() const
     {
         ShapeshiftForm form = GetShapeshiftForm();
         return form == FORM_CAT || form == FORM_BEAR || form == FORM_DIREBEAR || form == FORM_GHOSTWOLF; // Xinef: added shamans Ghost Wolf, should behave exactly like druid forms
     }
 
-    [[nodiscard]] inline bool IsInDisallowedMountForm() const
-    {
-        ShapeshiftForm form = GetShapeshiftForm();
-        return form != FORM_NONE && form != FORM_BATTLESTANCE && form != FORM_BERSERKERSTANCE && form != FORM_DEFENSIVESTANCE &&
-               form != FORM_SHADOW && form != FORM_STEALTH && form != FORM_UNDEAD;
-    }
+    [[nodiscard]] bool IsInDisallowedMountForm() const;
 
     float m_modMeleeHitChance;
     float m_modRangedHitChance;
@@ -2105,10 +2100,9 @@ public:
     [[nodiscard]] bool CanHaveThreatList() const;
     void AddThreat(Unit* victim, float fThreat, SpellSchoolMask schoolMask = SPELL_SCHOOL_MASK_NORMAL, SpellInfo const* threatSpell = nullptr);
     float ApplyTotalThreatModifier(float fThreat, SpellSchoolMask schoolMask = SPELL_SCHOOL_MASK_NORMAL);
-    void DeleteThreatList();
     void TauntApply(Unit* victim);
     void TauntFadeOut(Unit* taunter);
-    ThreatMgr& getThreatMgr() { return m_ThreatMgr; }
+    ThreatMgr& GetThreatMgr() { return m_ThreatMgr; }
     void addHatedBy(HostileReference* pHostileReference) { m_HostileRefMgr.insertFirst(pHostileReference); };
     void removeHatedBy(HostileReference* /*pHostileReference*/) { /* nothing to do yet */ }
     HostileRefMgr& getHostileRefMgr() { return m_HostileRefMgr; }
@@ -2128,7 +2122,7 @@ public:
     void AddInterruptMask(uint32 mask) { m_interruptMask |= mask; }
     void UpdateInterruptMask();
 
-    uint32 GetDisplayId() { return GetUInt32Value(UNIT_FIELD_DISPLAYID); }
+    [[nodiscard]] uint32 GetDisplayId() const { return GetUInt32Value(UNIT_FIELD_DISPLAYID); }
     virtual void SetDisplayId(uint32 modelId);
     [[nodiscard]] uint32 GetNativeDisplayId() const { return GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID); }
     void RestoreDisplayId();
@@ -2140,7 +2134,7 @@ public:
     void _RegisterDynObject(DynamicObject* dynObj);
     void _UnregisterDynObject(DynamicObject* dynObj);
     DynamicObject* GetDynObject(uint32 spellId);
-    void RemoveDynObject(uint32 spellId);
+    bool RemoveDynObject(uint32 spellId);
     void RemoveAllDynObjects();
 
     [[nodiscard]] GameObject* GetGameObject(uint32 spellId) const;
