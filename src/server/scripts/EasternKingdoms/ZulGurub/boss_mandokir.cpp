@@ -414,7 +414,7 @@ public:
             _scheduler.Schedule(6s, 12s, [this](TaskContext context)
             {
             DoCastVictim(SPELL_SUNDERARMOR);
-            context.Repeat(6s, 12s,);
+            context.Repeat(6s, 12s);
             });
         }
 
