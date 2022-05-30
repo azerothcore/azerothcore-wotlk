@@ -22,6 +22,7 @@
 #include "SpellScript.h"
 #include "zulgurub.h"
 #include "Player.h"
+#include "TaskScheduler.h"
 
 enum Says
 {
@@ -393,12 +394,29 @@ public:
 
         void Reset() override
         {
-            SunderArmor_Timer = urand(6000, 12000);
             me->AddAura(SPELL_THRASH, me);
+            _scheduler.CancelAll();
+            _scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+
             reviveGUID.Clear();
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void EnterCombat(Unit* /*who*/) override
+        {
+            if (victim->GetTypeId() != TYPEID_PLAYER)
+                return;
+
+            reviveGUID = victim->GetGUID();
+            DoAction(ACTION_START_REVIVE);
+            _scheduler.Schedule(6s, 12s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_SUNDERARMOR);
+            context.Repeat(6s, 12s,);
+        });
+        }
 
         void KilledUnit(Unit* victim) override
         {
@@ -439,24 +457,20 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            // Return since we have no target
-            if (!UpdateVictim())
-                return;
+            _scheduler.Update(diff);
 
-            if (SunderArmor_Timer <= diff)
+            if (!UpdateVictim())
             {
-                DoCastVictim(SPELL_SUNDERARMOR);
-                SunderArmor_Timer = urand(6000, 12000);
+                return;
             }
-            else SunderArmor_Timer -= diff;
 
             DoMeleeAttackIfReady();
         }
 
     private:
-        uint32 SunderArmor_Timer;
         InstanceScript* instance;
         ObjectGuid reviveGUID;
+        TaskScheduler _scheduler;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
