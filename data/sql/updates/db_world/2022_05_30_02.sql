@@ -1,3 +1,4 @@
+-- DB update 2022_05_30_01 -> 2022_05_30_02
 DELETE FROM `creature_loot_template` WHERE (`Entry` IN (14507, 14509, 14510, 14515, 14517) AND `Item` IN (22711, 22712, 22713, 22714, 22715, 22716, 22718, 22720, 22721, 22722, 30546)) OR (`Entry` = 14834) AND (`Item` IN (34090, 30398)) OR (`Entry` IN (15084, 15082, 15085, 15083));
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 
