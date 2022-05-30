@@ -114,15 +114,41 @@ public:
         }
 
         Player* target = player->GetConnectedPlayer();
-        Aura* aura = target->AddAura(isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER, target);
 
-        if (!aura)
+        if (target)
         {
-            handler->SendSysMessage(LANG_BAD_VALUE);
-            handler->SetSentErrorMessage(true);
-            return false;
+            Aura* aura = target->AddAura(isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER, target);
+
+            if (!aura)
+            {
+                handler->SendSysMessage(LANG_BAD_VALUE);
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
+            aura->SetDuration(time * IN_MILLISECONDS);
+
+            return true;
         }
-        aura->SetDuration(time * IN_MILLISECONDS);
+
+        uint8 index = 0;
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_AURA);
+        stmt->SetData(index++, player->GetGUID().GetCounter());
+        stmt->SetData(index++, player->GetGUID().GetCounter());
+        stmt->SetData(index++, 0);
+        stmt->SetData(index++, isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER);
+        stmt->SetData(index++, 1);
+        stmt->SetData(index++, 1);
+        stmt->SetData(index++, 1);
+        stmt->SetData(index++, 0);
+        stmt->SetData(index++, 0);
+        stmt->SetData(index++, 0);
+        stmt->SetData(index++, 0);
+        stmt->SetData(index++, 0);
+        stmt->SetData(index++, 0);
+        stmt->SetData(index++, isInstance ? 1800000 : 900000);
+        stmt->SetData(index++, time * 1000);
+        stmt->SetData(index, 0);
+        CharacterDatabase.Execute(stmt);
 
         return true;
     }
