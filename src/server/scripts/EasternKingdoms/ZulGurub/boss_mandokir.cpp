@@ -412,10 +412,10 @@ public:
             reviveGUID = victim->GetGUID();
             DoAction(ACTION_START_REVIVE);
             _scheduler.Schedule(6s, 12s, [this](TaskContext context)
-        {
+            {
             DoCastVictim(SPELL_SUNDERARMOR);
             context.Repeat(6s, 12s,);
-        });
+            });
         }
 
         void KilledUnit(Unit* victim) override
