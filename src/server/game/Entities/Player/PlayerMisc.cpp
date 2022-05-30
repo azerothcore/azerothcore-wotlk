@@ -181,6 +181,16 @@ void Player::SendResetFailedNotify(uint32 mapid)
     GetSession()->SendPacket(&data);
 }
 
+void DeleteInstanceSavedData(uint32 instanceId)
+{
+    if (instanceId)
+    {
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DELETE_INSTANCE_SAVED_DATA);
+        stmt->SetData(0, instanceId);
+        CharacterDatabase.Execute(stmt);
+    }
+}
+
 /// Reset all solo instances and optionally send a message on success for each
 void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
 {
@@ -198,7 +208,9 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
                 InstanceSave* instanceSave = itr->second.save;
                 MapEntry const* entry = sMapStore.LookupEntry(itr->first);
                 if (!entry || entry->IsRaid() || !instanceSave->CanReset())
+                {
                     continue;
+                }
 
                 Map* map = sMapMgr->FindMap(instanceSave->GetMapId(), instanceSave->GetInstanceId());
                 if (!map || map->ToInstanceMap()->Reset(method))
@@ -207,10 +219,16 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
                     toUnbind.push_back(instanceSave);
                 }
                 else
+                {
                     p->SendResetInstanceFailed(0, instanceSave->GetMapId());
+                }
+
+                DeleteInstanceSavedData(instanceSave->GetInstanceId());
             }
             for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
+            {
                 sInstanceSaveMgr->UnbindAllFor(*itr);
+            }
         }
             break;
         case INSTANCE_RESET_CHANGE_DIFFICULTY:
@@ -225,7 +243,9 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
                 InstanceSave* instanceSave = itr->second.save;
                 MapEntry const* entry = sMapStore.LookupEntry(itr->first);
                 if (!entry || entry->IsRaid() != isRaid || !instanceSave->CanReset())
+                {
                     continue;
+                }
 
                 Map* map = sMapMgr->FindMap(instanceSave->GetMapId(), instanceSave->GetInstanceId());
                 if (!map || map->ToInstanceMap()->Reset(method))
@@ -234,7 +254,11 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
                     toUnbind.push_back(instanceSave);
                 }
                 else
+                {
                     p->SendResetInstanceFailed(0, instanceSave->GetMapId());
+                }
+
+                DeleteInstanceSavedData(instanceSave->GetInstanceId());
             }
             for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
                 sInstanceSaveMgr->UnbindAllFor(*itr);
@@ -262,6 +286,8 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
                     }
                     //else
                     //  p->SendResetInstanceFailed(0, instanceSave->GetMapId());
+
+                    DeleteInstanceSavedData(instanceSave->GetInstanceId());
                 }
                 for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
                     sInstanceSaveMgr->PlayerUnbindInstance(p->GetGUID(), (*itr)->GetMapId(), (*itr)->GetDifficulty(), true, p);
