@@ -1,3 +1,4 @@
+-- DB update 2022_05_29_01 -> 2022_05_30_00
 --
 UPDATE `smart_scripts` SET `event_type`=60 WHERE `entryorguid`=14122 AND `source_type`=0 AND `id`=0;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=14122 AND `source_type`=0 AND `id`=1;
