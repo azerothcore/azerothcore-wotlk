@@ -182,7 +182,7 @@ public:
         {
             if (!WasDead && damage >= me->GetHealth())
             {
-                damage = 0;
+                damage = me->GetHealth() - 1;
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetReactState(REACT_PASSIVE);
                 me->SetStandState(UNIT_STAND_STATE_SLEEP);
@@ -250,14 +250,13 @@ public:
             if (WasDead && _lorkhanDied && _zathDied)
             {
                 Talk(SAY_AGGRO);
-                DoCastSelf(SPELL_TIGER_FORM);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 DoResetThreat();
 
                 _scheduler.Schedule(3s, [this](TaskContext /*context*/) {
+                    DoCastSelf(SPELL_TIGER_FORM);
                     me->SetReactState(REACT_AGGRESSIVE);
-                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    me->SetCurrentEquipmentId(0);
 
                     _scheduler.Schedule(30s, [this](TaskContext context) {
                         DoCastSelf(SPELL_FRENZY);
