@@ -404,7 +404,7 @@ public:
             reviveGUID.Clear();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* victim) override
         {
             if (victim->GetTypeId() != TYPEID_PLAYER)
                 return;
