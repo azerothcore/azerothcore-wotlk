@@ -138,7 +138,7 @@ endif()
 
 CU_RUN_HOOK("AFTER_SRC_LOAD")
 
-if( BUILD_TESTING )
+if (BUILD_TESTING AND BUILD_APPLICATION_WORLDSERVER)
     # we use these flags to get code coverage
     set(UNIT_TEST_CXX_FLAGS "-fprofile-arcs -ftest-coverage -fno-inline")
 

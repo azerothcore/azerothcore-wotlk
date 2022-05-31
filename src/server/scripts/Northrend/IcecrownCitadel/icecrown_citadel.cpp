@@ -766,7 +766,7 @@ public:
                 _handledWP4 = false;
 
                 me->CombatStop();
-                me->DeleteThreatList();
+                me->GetThreatMgr().ClearAllThreat();
             }
         }
 

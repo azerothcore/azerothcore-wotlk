@@ -50,7 +50,7 @@ public:
     void Delay(int32 delaytime);
     void SetAura(Aura* aura);
     void RemoveAura();
-    void SetCasterViewpoint();
+    void SetCasterViewpoint(bool updateViewerVisibility);
     void RemoveCasterViewpoint();
     [[nodiscard]] Unit* GetCaster() const { return _caster; }
     void BindToCaster();
@@ -60,11 +60,15 @@ public:
     [[nodiscard]] float GetRadius() const { return GetFloatValue(DYNAMICOBJECT_RADIUS); }
     [[nodiscard]] bool IsViewpoint() const { return _isViewpoint; }
 
+    ObjectGuid const& GetOldFarsightGUID() const { return _oldFarsightGUID; }
+
 protected:
     Aura* _aura;
     Aura* _removedAura;
     Unit* _caster;
     int32 _duration; // for non-aura dynobjects
     bool _isViewpoint;
+    uint32 _updateViewerVisibilityTimer;
+    ObjectGuid _oldFarsightGUID;
 };
 #endif

@@ -12,7 +12,8 @@
 
 add_subdirectory(apps)
 
-if ((APPS_BUILD AND NOT APPS_BUILD STREQUAL "none") OR BUILD_TOOLS_DB_IMPORT)
+# if ((APPS_BUILD AND NOT APPS_BUILD STREQUAL "none") OR BUILD_TOOLS_DB_IMPORT) # DB import PR
+if ((APPS_BUILD AND NOT APPS_BUILD STREQUAL "none"))
   add_subdirectory(database)
 endif()
 
