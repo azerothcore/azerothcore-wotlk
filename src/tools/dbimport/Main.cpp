@@ -1,5 +1,5 @@
 /*
- * This file is part of the WarheadCore Project. See AUTHORS file for Copyright information
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Affero General Public License as published by the
@@ -43,14 +43,7 @@ bool StartDB();
 void StopDB();
 variables_map GetConsoleArguments(int argc, char** argv, fs::path& configFile);
 
-/// Print out the usage string for this program on the console.
-void usage(const char* prog)
-{
-    LOG_INFO("server.authserver", "Usage: \n {} [<options>]\n"
-        "    -c config_file           use config_file as configuration file\n\r", prog);
-}
-
-/// Launch the auth server
+/// Launch the db import server
 int main(int argc, char** argv)
 {
     signal(SIGABRT, &Acore::AbortHandler);
@@ -59,7 +52,7 @@ int main(int argc, char** argv)
     auto configFile = fs::path(sConfigMgr->GetConfigPath() + std::string(_ACORE_DB_IMPORT_CONFIG));
     auto vm = GetConsoleArguments(argc, argv, configFile);
 
-    // exit if help or version is enabled
+    // exit if help is enabled
     if (vm.count("help"))
         return 0;
 

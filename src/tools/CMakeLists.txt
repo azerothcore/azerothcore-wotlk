@@ -27,9 +27,9 @@ if (TOOLS_BUILD MATCHES "-only")
     list(APPEND BUILD_TOOLS_WHITELIST map_extractor mmaps_generator vmap4_assembler vmap4_extractor)
   endif()
 
-  # if (TOOLS_BUILD STREQUAL "db-only")
-  #   list(APPEND BUILD_TOOLS_WHITELIST dbimport)
-  # endif()
+  if (TOOLS_BUILD STREQUAL "db-only")
+    list(APPEND BUILD_TOOLS_WHITELIST dbimport)
+  endif()
 endif()
 
 # Set the TOOL_${TOOL_BUILD_NAME} variables from the
@@ -66,7 +66,7 @@ list(SORT TOOL_BUILD_GRAPH_KEYS)
 list(REMOVE_DUPLICATES TOOL_BUILD_GRAPH_KEYS)
 
 # Display the graphs
-# message("")
+message("")
 message("* Tools build list (${TOOLS_BUILD}):")
 message("  |")
 
@@ -112,19 +112,21 @@ foreach(TOOL_NAME ${TOOLS_BUILD_LIST})
 
   add_dependencies(${TOOL_PROJECT_NAME} revision.h)
 
-  # Need fix errors
+  # Need fix errors in maps tools
   # target_link_libraries(${TOOL_PROJECT_NAME}
   #   PRIVATE
   #     acore-core-interface)
 
-  # if (${TOOL_PROJECT_NAME} MATCHES "dbimport")
-  #   target_link_libraries(${TOOL_PROJECT_NAME}
-  #     PUBLIC
-  #       database)
+  if (${TOOL_PROJECT_NAME} MATCHES "dbimport")
+    target_link_libraries(${TOOL_PROJECT_NAME}
+      PUBLIC
+        database
+      PRIVATE
+        acore-core-interface)
 
-  #   # Install config
-  #   CopyToolConfig(${TOOL_PROJECT_NAME} ${TOOL_NAME})
-  # else()
+    # Install config
+    CopyToolConfig(${TOOL_PROJECT_NAME} ${TOOL_NAME})
+  else()
     target_link_libraries(${TOOL_PROJECT_NAME}
       PUBLIC
         common
@@ -132,7 +134,7 @@ foreach(TOOL_NAME ${TOOLS_BUILD_LIST})
         zlib
         Recast
         g3dlib)
-  #  endif()
+  endif()
 
   unset(TOOL_PUBLIC_INCLUDES)
   CollectIncludeDirectories(
