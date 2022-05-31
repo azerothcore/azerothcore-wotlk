@@ -19,7 +19,6 @@
 #define ACORE_SHAREDDEFINES_H
 
 #include "Define.h"
-#include "DetourNavMesh.h"
 #include "EnumFlag.h"
 #include <cassert>
 
