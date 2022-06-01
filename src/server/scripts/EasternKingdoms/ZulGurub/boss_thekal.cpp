@@ -165,6 +165,9 @@ public:
             }).Schedule(9s, [this](TaskContext context) {
                 DoCastVictim(SPELL_SILENCE);
                 context.Repeat(20s, 25s);
+            }).Schedule(16s, [this](TaskContext context) {
+                DoCastSelf(SPELL_BLOODLUST);
+                context.Repeat(20s, 28s);
             });
         }
 
@@ -174,7 +177,7 @@ public:
             CheckPhaseTransition();
 
             _scheduler.Schedule(10s, [this, data](TaskContext /*context*/) {
-                if (!_lorkhanDied || !_zathDied)
+                if ((!_lorkhanDied || !_zathDied) && !WasDead)
                 {
                     ReviveZealot(data);
                 }
@@ -195,7 +198,7 @@ public:
                 Talk(EMOTE_THEKAL_DIES);
             }
 
-            if (!Enraged && WasDead && me->HealthBelowPctDamaged(20, damage))
+            if (!Enraged && me->HealthBelowPctDamaged(20, damage) && me->GetEntry() != NPC_HIGH_PRIEST_THEKAL)
             {
                 DoCastSelf(SPELL_ENRAGE);
                 Enraged = true;
@@ -241,11 +244,11 @@ public:
         {
             if (data == DATA_LORKHAN)
             {
-                _lorkhanDied = dead ? true : false;
+                _lorkhanDied = dead;
             }
             else if (data == DATA_ZATH)
             {
-                _zathDied = dead ? true : false;
+                _zathDied = dead;
             }
         }
 
@@ -253,32 +256,34 @@ public:
         {
             if (WasDead && _lorkhanDied && _zathDied)
             {
-                Talk(SAY_AGGRO);
-                me->SetStandState(UNIT_STAND_STATE_STAND);
-                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                DoResetThreat();
-
                 _scheduler.Schedule(3s, [this](TaskContext /*context*/) {
-                    DoCastSelf(SPELL_TIGER_FORM);
-                    me->SetReactState(REACT_AGGRESSIVE);
+                    Talk(SAY_AGGRO);
+                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    DoResetThreat();
 
-                    _scheduler.Schedule(30s, [this](TaskContext context) {
-                        DoCastSelf(SPELL_FRENZY);
-                        context.Repeat();
-                    }).Schedule(4s, [this](TaskContext context) {
-                        DoCastVictim(SPELL_FORCEPUNCH);
-                        context.Repeat(16s, 21s);
-                    }).Schedule(12s, [this](TaskContext context) {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        {
-                            DoCast(target, SPELL_CHARGE);
-                            DoResetThreat();
-                            AttackStart(target);
-                        }
-                        context.Repeat(15s, 22s);
-                    }).Schedule(25s, [this](TaskContext context) {
-                        DoCastVictim(SPELL_SUMMONTIGERS, true);
-                        context.Repeat(10s, 14s);
+                    _scheduler.Schedule(6s, [this](TaskContext /*context*/) {
+                        DoCastSelf(SPELL_TIGER_FORM);
+                        me->SetReactState(REACT_AGGRESSIVE);
+
+                        _scheduler.Schedule(30s, [this](TaskContext context) {
+                            DoCastSelf(SPELL_FRENZY);
+                            context.Repeat();
+                        }).Schedule(4s, [this](TaskContext context) {
+                            DoCastVictim(SPELL_FORCEPUNCH);
+                            context.Repeat(16s, 21s);
+                        }).Schedule(12s, [this](TaskContext context) {
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                            {
+                                DoCast(target, SPELL_CHARGE);
+                                DoResetThreat();
+                                AttackStart(target);
+                            }
+                            context.Repeat(15s, 22s);
+                        }).Schedule(25s, [this](TaskContext context) {
+                            DoCastVictim(SPELL_SUMMONTIGERS, true);
+                            context.Repeat(10s, 14s);
+                        });
                     });
                 });
             }
@@ -336,9 +341,6 @@ public:
             _scheduler.Schedule(1s, [this](TaskContext context) {
                 DoCastSelf(SPELL_SHIELD);
                 context.Repeat(1min);
-            }).Schedule(16s, [this](TaskContext context) {
-                DoCastSelf(SPELL_BLOODLUST);
-                context.Repeat(20s, 28s);
             }).Schedule(32s, [this](TaskContext context) {
                 Unit* thekal = instance->GetCreature(DATA_THEKAL);
                 Unit* zath = instance->GetCreature(DATA_ZATH);
