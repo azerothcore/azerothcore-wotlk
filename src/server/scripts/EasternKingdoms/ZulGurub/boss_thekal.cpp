@@ -23,7 +23,10 @@
 enum Says
 {
     SAY_AGGRO                 = 0,
-    SAY_DEATH                 = 1
+    SAY_DEATH                 = 1,
+
+    EMOTE_ZEALOT_DIES         = 0,
+    EMOTE_THEKAL_DIES         = 2
 };
 
 enum Spells
@@ -189,6 +192,7 @@ public:
                 me->AttackStop();
                 WasDead = true;
                 CheckPhaseTransition();
+                Talk(EMOTE_THEKAL_DIES);
             }
 
             if (!Enraged && WasDead && me->HealthBelowPctDamaged(20, damage))
@@ -366,6 +370,7 @@ public:
         {
             if (damage >= me->GetHealth() && me->HasReactState(REACT_AGGRESSIVE))
             {
+                Talk(EMOTE_ZEALOT_DIES);
                 me->RemoveAllAuras();
                 me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetStandState(UNIT_STAND_STATE_SLEEP);
@@ -462,6 +467,7 @@ public:
         {
             if (damage >= me->GetHealth() && me->HasReactState(REACT_AGGRESSIVE))
             {
+                Talk(EMOTE_ZEALOT_DIES);
                 me->RemoveAllAuras();
                 me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetStandState(UNIT_STAND_STATE_SLEEP);
