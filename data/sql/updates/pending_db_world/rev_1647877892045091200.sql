@@ -1,5 +1,3 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1647877892045091200');
-
 /* Set correct movement flags for Buzzard creatures */
 UPDATE `creature_template_movement` SET `Ground` = 2 WHERE `CreatureId` IN (2830, 2829);
 
