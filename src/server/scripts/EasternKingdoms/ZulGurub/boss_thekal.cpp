@@ -212,7 +212,6 @@ public:
                 me->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->ResetFaction();
-                me->SetReactState(REACT_AGGRESSIVE);
                 me->SetFullHealth();
                 WasDead = false;
             }
