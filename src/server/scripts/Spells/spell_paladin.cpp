@@ -247,7 +247,7 @@ class spell_pal_sacred_shield_base : public AuraScript
             }
 
             if (caster && procSpell->SpellFamilyName == SPELLFAMILY_PALADIN &&
-                    procSpell->SpellFamilyFlags.HasFlag(0x40000000) && caster->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_PALADIN, 3021, 0)) //need infusion of light
+                    procSpell->SpellFamilyFlags.HasFlag(0x40000000) && caster->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_PALADIN, 3021, 0)) // need infusion of light
             {
                 int32 basepoints = int32(float(healinfo->GetHeal()) / 12.0f);
                 // Item - Paladin T9 Holy 4P Bonus (Flash of Light)
