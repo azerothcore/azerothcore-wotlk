@@ -14,12 +14,26 @@
 # This to stop a few silly crashes that could have been avoided IF people
 # weren't doing some -O3 psychooptimizations etc.
 
+# Specified files for Windows
+if (WIN32)
+  # Crash logs
+  set(winDebugging
+    ${CMAKE_SOURCE_DIR}/src/common/Debugging/WheatyExceptionReport.cpp
+    ${CMAKE_SOURCE_DIR}/src/common/Debugging/WheatyExceptionReport.h)
+
+  # Service
+  set(winService
+    ${CMAKE_SOURCE_DIR}/src/common/Platform/ServiceWin32.cpp
+    ${CMAKE_SOURCE_DIR}/src/common/Platform/ServiceWin32.h)
+endif()
+
 if(CMAKE_COMPILER_IS_GNUCXX AND NOT MINGW)
   add_definitions(-fno-delete-null-pointer-checks)
 endif()
 
 add_subdirectory(genrev)
+add_subdirectory(server)
 
-if( SERVERS )
-  add_subdirectory(server)
+if (TOOLS_BUILD AND NOT TOOLS_BUILD STREQUAL "none")
+  add_subdirectory(tools)
 endif()
