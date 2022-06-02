@@ -1,26 +1,43 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Group.h"
 #include "LFGMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "the_slave_pens.h"
 
 #define GOSSIP_TEXT_ID          15864
 #define QUEST_SUMMON_AHUNE      11691
 #define ITEM_MAGMA_TOTEM        34953
 #define AHUNE_DEFAULT_MODEL     23344
-#define TEXT_RETREAT            "Ahune Retreats. His defenses diminish."
-#define TEXT_RESURFACE          "Ahune will soon resurface."
 
 const Position AhuneSummonPos = {-97.3473f, -233.139f, -1.27587f, M_PI / 2};
 const Position TotemPos[3] = { {-115.141f, -143.317f, -2.09467f, 4.92772f}, {-120.178f, -144.398f, -2.23786f, 4.92379f}, {-125.277f, -145.463f, -1.95209f, 4.97877f} };
 const Position MinionSummonPos = {-97.154404f, -204.382675f, -1.19f, M_PI / 2};
+
+enum Text
+{
+    EMOTE_RETREAT               = 0,
+    EMOTE_RESURFACE             = 1,
+};
 
 enum EventSpells
 {
@@ -80,7 +97,7 @@ public:
         {
             SetCombatMovement(false);
             SetEquipmentSlots(false, 54806, EQUIP_UNEQUIP, EQUIP_UNEQUIP);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             InvokerGUID.Clear();
             events.Reset();
             events.RescheduleEvent(EVENT_EMERGE, 12000);
@@ -91,6 +108,17 @@ public:
         EventMap events;
         SummonList summons;
         ObjectGuid InvokerGUID;
+
+        bool CanBeSeen(Player const* player) override
+        {
+            if (player->IsGameMaster())
+            {
+                return true;
+            }
+
+            Group const* group = player->GetGroup();
+            return group && sLFGMgr->GetDungeon(group->GetGUID()) == lfg::LFG_DUNGEON_FROST_LORD_AHUNE;
+        }
 
         void StartPhase1()
         {
@@ -110,7 +138,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim() && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+            if (!UpdateVictim() && !me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                 return;
 
             events.Update(diff);
@@ -134,19 +162,19 @@ public:
                 case EVENT_INVOKER_SAY_1:
                     if (Player* plr = ObjectAccessor::GetPlayer(*me, InvokerGUID))
                     {
-                        plr->MonsterSay("The Ice Stone has melted!", LANG_UNIVERSAL, 0);
+                        plr->Say("The Ice Stone has melted!", LANG_UNIVERSAL);
                         plr->CastSpell(plr, SPELL_MAKE_BONFIRE, true);
                     }
                     events.RescheduleEvent(EVENT_INVOKER_SAY_2, 2000);
                     break;
                 case EVENT_INVOKER_SAY_2:
                     if (Player* plr = ObjectAccessor::GetPlayer(*me, InvokerGUID))
-                        plr->MonsterSay("Ahune, your strength grows no more!", LANG_UNIVERSAL, 0);
+                        plr->Say("Ahune, your strength grows no more!", LANG_UNIVERSAL);
                     events.RescheduleEvent(EVENT_INVOKER_SAY_3, 2000);
                     break;
                 case EVENT_INVOKER_SAY_3:
                     if (Player* plr = ObjectAccessor::GetPlayer(*me, InvokerGUID))
-                        plr->MonsterSay("Your frozen reign will not come to pass!", LANG_UNIVERSAL, 0);
+                        plr->Say("Your frozen reign will not come to pass!", LANG_UNIVERSAL);
                     break;
                 case EVENT_ATTACK:
                     events.Reset();
@@ -155,11 +183,11 @@ public:
                     me->SetInCombatWithZone();
                     if (!me->IsInCombat())
                     {
-                        EnterEvadeMode();
+                        EnterEvadeMode(EVADE_REASON_OTHER);
                         return;
                     }
                     else
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     break;
                 case EVENT_TOTEMS_ATTACK:
                     for (uint8 i = 0; i < 3; ++i)
@@ -168,8 +196,8 @@ public:
                     events.RescheduleEvent(EVENT_SUBMERGE, 10000);
                     break;
                 case EVENT_SUBMERGE:
-                    me->MonsterTextEmote(TEXT_RETREAT, 0, true);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    Talk(EMOTE_RETREAT);
+                    me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->CastSpell(me, SPELL_SUBMERGE_0, true);
                     me->CastSpell(me, SPELL_SELF_STUN, true);
                     if (Creature* c = DoSummon(NPC_FROZEN_CORE, *me, 24000, TEMPSUMMON_TIMED_DESPAWN))
@@ -181,10 +209,10 @@ public:
                     events.RescheduleEvent(EVENT_EMERGE_WARNING, 20000);
                     break;
                 case EVENT_EMERGE_WARNING:
-                    me->MonsterTextEmote(TEXT_RESURFACE, 0, true);
+                    Talk(EMOTE_RESURFACE);
                     break;
                 case EVENT_COMBAT_EMERGE:
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->RemoveAura(SPELL_SELF_STUN);
                     me->CastSpell(me, SPELL_EMERGE_0, false);
                     // me->CastSpell(me, SPELL_AHUNE_RESURFACES, true); // done in SummonedCreatureDespawn
@@ -193,7 +221,7 @@ public:
                     break;
 
                 case EVENT_SPELL_COLD_SLAP:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_NEAREST, 0, 5.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 5.0f, true))
                         if (target->GetPositionZ() < me->GetPositionZ() + 6.0f)
                         {
                             int32 dmg = urand(5500, 6000);
@@ -208,7 +236,7 @@ public:
                     {
                         float dist = (float)urand(3, 10);
                         float angle = rand_norm() * 2 * M_PI;
-                        me->CastSpell(MinionSummonPos.GetPositionX() + cos(angle)*dist, MinionSummonPos.GetPositionY() + sin(angle)*dist, MinionSummonPos.GetPositionZ(), SPELL_SUMMON_HAILSTONE, false);
+                        me->CastSpell(MinionSummonPos.GetPositionX() + cos(angle)*dist, MinionSummonPos.GetPositionY() + std::sin(angle)*dist, MinionSummonPos.GetPositionZ(), SPELL_SUMMON_HAILSTONE, false);
                         events.RepeatEvent(30000);
                     }
                     break;
@@ -217,12 +245,12 @@ public:
                     {
                         float dist = (float)urand(3, 10);
                         float angle = rand_norm() * 2 * M_PI;
-                        me->CastSpell(MinionSummonPos.GetPositionX() + cos(angle)*dist, MinionSummonPos.GetPositionY() + sin(angle)*dist, MinionSummonPos.GetPositionZ(), SPELL_SUMMON_COLDWAVE, false);
+                        me->CastSpell(MinionSummonPos.GetPositionX() + cos(angle)*dist, MinionSummonPos.GetPositionY() + std::sin(angle)*dist, MinionSummonPos.GetPositionZ(), SPELL_SUMMON_COLDWAVE, false);
                     }
                     {
                         float dist = (float)urand(3, 10);
                         float angle = rand_norm() * 2 * M_PI;
-                        me->CastSpell(MinionSummonPos.GetPositionX() + cos(angle)*dist, MinionSummonPos.GetPositionY() + sin(angle)*dist, MinionSummonPos.GetPositionZ(), SPELL_SUMMON_FROSTWIND, false);
+                        me->CastSpell(MinionSummonPos.GetPositionX() + cos(angle)*dist, MinionSummonPos.GetPositionY() + std::sin(angle)*dist, MinionSummonPos.GetPositionZ(), SPELL_SUMMON_FROSTWIND, false);
                     }
                     events.RepeatEvent(6000);
                     break;
@@ -236,14 +264,14 @@ public:
 
         void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             events.Reset();
             summons.DespawnAll();
             me->DespawnOrUnsummon(1);
 
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void JustSummoned(Creature* summon) override
@@ -278,7 +306,7 @@ public:
 
             bool finished = false;
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
-            if (!players.isEmpty())
+            if (!players.IsEmpty())
                 for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
                     if (Player* player = i->GetSource())
                     {
@@ -287,7 +315,7 @@ public:
                         if (player->GetGroup() && !finished)
                         {
                             finished = true;
-                            sLFGMgr->FinishDungeon(player->GetGroup()->GetGUID(), 286, me->FindMap());
+                            sLFGMgr->FinishDungeon(player->GetGroup()->GetGUID(), lfg::LFG_DUNGEON_FROST_LORD_AHUNE, me->FindMap());
                         }
                     }
         }

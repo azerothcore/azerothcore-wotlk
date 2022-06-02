@@ -1,12 +1,24 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "magisters_terrace.h"
 #include "Opcodes.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
-#include "WorldPacket.h"
+#include "ScriptedCreature.h"
+#include "magisters_terrace.h"
 
 enum Says
 {
@@ -94,7 +106,7 @@ public:
             summons.DespawnAll();
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
             instance->SetData(DATA_KAELTHAS_EVENT, NOT_STARTED);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
         }
 
         void JustSummoned(Creature* summon) override
@@ -108,7 +120,7 @@ public:
         void InitializeAI() override
         {
             ScriptedAI::InitializeAI();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
         }
 
         void JustDied(Unit*) override
@@ -150,7 +162,7 @@ public:
                 if (me->isRegeneratingHealth())
                 {
                     me->SetRegeneratingHealth(false);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     me->CombatStop();
                     me->SetReactState(REACT_PASSIVE);
                     LapseAction(ACTION_REMOVE_FLY);
@@ -188,7 +200,7 @@ public:
             switch (events2.ExecuteEvent())
             {
                 case EVENT_INIT_COMBAT:
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     if (Unit* target = SelectTargetFromPlayerList(50.0f))
                         AttackStart(target);
                     return;
@@ -211,7 +223,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_FIREBALL, urand(3000, 4500));
                     break;
                 case EVENT_SPELL_FLAMESTRIKE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                     {
                         me->CastSpell(target, SPELL_FLAMESTRIKE_SUMMON, true);
                         Talk(SAY_FLAMESTRIKE);

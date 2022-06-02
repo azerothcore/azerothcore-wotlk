@@ -1,11 +1,24 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "utgarde_pinnacle.h"
 
@@ -46,9 +59,6 @@ enum Misc
     NPC_RITUAL_CHANNELER                    = 27281,
     NPC_ARTHAS                              = 29280,
     NPC_FLAME_BRAZIER                       = 27273,
-
-    // ACTIONS
-    ACTION_START_SORROWGRAVE                = 1,
 };
 
 enum Events
@@ -123,18 +133,18 @@ public:
             events.Reset();
             events2.Reset();
             if (!Started)
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             else
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                 me->SetHover(true);
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             me->SetControlled(false, UNIT_STATE_ROOT);
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void SetData(uint32 data, uint32 param) override
@@ -142,7 +152,7 @@ public:
             if (data != 1 || param != 1 || Started || (instance && instance->GetData(DATA_SVALA_SORROWGRAVE) == DONE))
                 return;
 
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             Started = true;
             me->setActive(true);
             events2.ScheduleEvent(EVENT_SVALA_START, 5000);
@@ -237,7 +247,7 @@ public:
                         me->UpdateEntry(NPC_SVALA_SORROWGRAVE);
                         me->SetCorpseDelay(sWorld->getIntConfig(CONFIG_CORPSE_DECAY_ELITE));
                         me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 6.0f);
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                         if (Creature* Arthas = ObjectAccessor::GetCreature(*me, ArthasGUID))
                             Arthas->InterruptNonMeleeSpells(false);
                         me->RemoveAllAuras();
@@ -273,7 +283,7 @@ public:
                     break;
                 case EVENT_SVALA_TALK9:
                     me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 3.0f);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     me->LoadEquipment(1, true);
                     me->setActive(false);
                     if (Player* target = SelectTargetFromPlayerList(100.0f))
@@ -313,7 +323,7 @@ public:
                         break;
                     }
                 case EVENT_SORROWGRAVE_RITUAL:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                     {
                         Talk(SAY_SACRIFICE_PLAYER);
 
@@ -327,7 +337,7 @@ public:
                         me->SetControlled(true, UNIT_STATE_ROOT);
                         me->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
                         me->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     }
 
                     events.DelayEvents(25001); // +1 just to be sure
@@ -339,7 +349,7 @@ public:
                     me->CastSpell(me, SPELL_RITUAL_STRIKE, true);
                     return;
                 case EVENT_SORROWGRAVE_FINISH_RITUAL:
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->SetControlled(false, UNIT_STATE_ROOT);
                     AttackStart(me->GetVictim());
                     me->GetMotionMaster()->MoveFall(0, true);

@@ -1,10 +1,23 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "drak_tharon_keep.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "drak_tharon_keep.h"
 
 enum Yells
 {
@@ -82,9 +95,9 @@ public:
             _summonTargetLeftGUID.Clear();
             _stage = 0;
 
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
             _achievement = true;
         }
@@ -138,8 +151,8 @@ public:
 
             me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
             me->RemoveAllAuras();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void JustDied(Unit* killer) override
@@ -161,7 +174,7 @@ public:
         void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
-            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE) && summon->GetEntry() != NPC_CRYSTAL_CHANNEL_TARGET && summon->GetEntry() != NPC_CRYSTAL_HANDLER)
+            if (me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) && summon->GetEntry() != NPC_CRYSTAL_CHANNEL_TARGET && summon->GetEntry() != NPC_CRYSTAL_HANDLER)
                 summon->SetReactState(REACT_DEFENSIVE);
             else if (summon->GetEntry() != NPC_CRYSTAL_CHANNEL_TARGET)
                 summon->SetInCombatWithZone();
@@ -210,13 +223,13 @@ public:
                     events.Reset();
                     events.ScheduleEvent(EVENT_CAST_OFFENSIVE_SPELL, 3000);
                     events.ScheduleEvent(EVENT_SPELL_SUMMON_MINIONS, 10000);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->InterruptNonMeleeSpells(false);
                     break;
                 case EVENT_CAST_OFFENSIVE_SPELL:
                     if (!me->HasUnitState(UNIT_STATE_CASTING))
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                             me->CastSpell(target, RAND(SPELL_BLIZZARD, SPELL_FROSTBOLT, SPELL_TOUCH_OF_MISERY), false);
 
                     events.ScheduleEvent(EVENT_CAST_OFFENSIVE_SPELL, 500);
@@ -231,8 +244,6 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_SUMMON_MINIONS, 500);
                     break;
             }
-
-            EnterEvadeIfOutOfCombatArea();
         }
 
         bool CheckEvadeIfOutOfCombatArea() const override

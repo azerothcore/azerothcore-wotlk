@@ -1,13 +1,24 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2020 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AvgDiffTracker.h"
+#include "MapUpdater.h"
 #include "LFGMgr.h"
 #include "Map.h"
-#include "MapUpdater.h"
+#include "Metric.h"
 
 class UpdateRequest
 {
@@ -28,9 +39,11 @@ public:
 
     void call() override
     {
+        METRIC_TIMER("map_update_time_diff", METRIC_TAG("map_id", std::to_string(m_map.GetId())));
         m_map.Update(m_diff, s_diff);
         m_updater.update_finished();
     }
+
 private:
     Map& m_map;
     MapUpdater& m_updater;
@@ -45,10 +58,7 @@ public:
 
     void call() override
     {
-        uint32 startTime = getMSTime();
         sLFGMgr->Update(m_diff, 1);
-        uint32 totalTime = getMSTimeDiff(startTime, getMSTime());
-        lfgDiffTracker.Update(totalTime);
         m_updater.update_finished();
     }
 private:
@@ -60,13 +70,9 @@ MapUpdater::MapUpdater(): pending_requests(0)
 {
 }
 
-MapUpdater::~MapUpdater()
-{
-    deactivate();
-}
-
 void MapUpdater::activate(size_t num_threads)
 {
+    _workerThreads.reserve(num_threads);
     for (size_t i = 0; i < num_threads; ++i)
     {
         _workerThreads.push_back(std::thread(&MapUpdater::WorkerThread, this));
@@ -83,7 +89,10 @@ void MapUpdater::deactivate()
 
     for (auto& thread : _workerThreads)
     {
-        thread.join();
+        if (thread.joinable())
+        {
+            thread.join();
+        }
     }
 }
 

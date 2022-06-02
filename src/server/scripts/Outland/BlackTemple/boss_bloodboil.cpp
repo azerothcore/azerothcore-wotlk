@@ -1,10 +1,23 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "black_temple.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "black_temple.h"
 
 enum Says
 {
@@ -151,7 +164,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_ARCING_SMASH, 15000);
                     break;
                 case EVENT_SPELL_FEL_GEYSER:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 40.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 40.0f, true))
                     {
                         me->RemoveAurasByType(SPELL_AURA_MOD_TAUNT);
                         me->CastSpell(me, SPELL_FEL_RAGE_SELF, true);
@@ -175,7 +188,6 @@ public:
             }
 
             DoMeleeAttackIfReady();
-            EnterEvadeIfOutOfCombatArea();
         }
 
         bool CheckEvadeIfOutOfCombatArea() const override
@@ -233,7 +245,7 @@ public:
         {
             PreventHitEffect(effIndex);
             if (Unit* target = GetHitUnit())
-                GetCaster()->getThreatManager().modifyThreatPercent(target, -20);
+                GetCaster()->GetThreatMgr().modifyThreatPercent(target, -20);
         }
 
         void Register() override

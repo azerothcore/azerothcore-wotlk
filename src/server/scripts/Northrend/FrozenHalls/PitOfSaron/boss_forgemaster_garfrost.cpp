@@ -1,16 +1,29 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "CreatureGroups.h"
 #include "Opcodes.h"
-#include "pit_of_saron.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
 #include "WorldSession.h"
+#include "pit_of_saron.h"
 
 enum Yells
 {
@@ -156,7 +169,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit*  /*target*/, const SpellInfo* spell) override
+        void SpellHitTarget(Unit*  /*target*/, SpellInfo const* spell) override
         {
             if (spell->Id == uint32(SPELL_SARONITE_TRIGGERED))
             {
@@ -206,7 +219,7 @@ public:
                 if (x < 600.0f || x > 770.0f || y < -270.0f || y > -137.0f || z < 514.0f || z > 550.0f)
                 {
                     me->SetHealth(me->GetMaxHealth());
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     if (CreatureGroup* f = me->GetFormation())
                     {
                         const CreatureGroup::CreatureGroupMemberType& m = f->GetMembers();
@@ -229,7 +242,7 @@ public:
                     break;
                 case EVENT_SPELL_THROW_SARONITE:
                     bCanSayBoulderHit = true;
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 140.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 140.0f, true))
                     {
                         WorldPacket data;
                         ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, me, nullptr, EMOTE_THROW_SARONITE);
@@ -251,7 +264,7 @@ public:
                     events.RepeatEvent(35000);
                     break;
                 case EVENT_SPELL_DEEP_FREEZE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                     {
                         Talk(EMOTE_DEEP_FREEZE, target);
                         me->CastSpell(target, SPELL_DEEP_FREEZE, false);
@@ -276,11 +289,11 @@ public:
                 Talk(SAY_SLAY_1);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->DisableRotate(false);
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
     };
 

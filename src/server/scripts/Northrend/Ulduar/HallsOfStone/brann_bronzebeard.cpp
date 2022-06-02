@@ -1,21 +1,33 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "halls_of_stone.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellScript.h"
+#include "halls_of_stone.h"
 
 #define GOSSIP_ITEM_1       "Brann, it would be our honor!"
 #define GOSSIP_ITEM_2       "Let's move Brann, enough of the history lessons!"
 #define GOSSIP_ITEM_3       "We dont have time for this right now, we have to keep going."
 #define GOSSIP_ITEM_4       "We're with you Brann! Open it!"
 #define TEXT_ID_START       13100
-#define YELL_AGGRO          "You be dead soon enough!"
 
 enum NPCs
 {
@@ -302,9 +314,9 @@ public:
             SetDespawnAtEnd(false);
             ResetEvent();
 
-            me->setFaction(35);
+            me->SetFaction(FACTION_FRIENDLY);
             me->SetReactState(REACT_PASSIVE);
-            me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+            me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
 
             if(pInstance)
             {
@@ -326,31 +338,31 @@ public:
                 case ACTION_START_TRIBUNAL:
                     {
                         Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
-                        if (!PlayerList.isEmpty())
+                        if (!PlayerList.IsEmpty())
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                             {
-                                me->setFaction(i->GetSource()->getFaction());
+                                me->SetFaction(i->GetSource()->GetFaction());
                                 break;
                             }
 
                         SetEscortPaused(false);
                         InitializeEvent();
-                        me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+                        me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
                         break;
                     }
                 case ACTION_GO_TO_SJONNIR:
                     SetEscortPaused(false);
                     ResetEvent();
-                    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+                    me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
                     break;
                 case ACTION_START_SJONNIR_FIGHT:
-                    me->setFaction(35);
-                    me->MonsterYell("Don't worry! Ol' Brann's got yer back! Keep that metal monstrosity busy, and I'll see if I can't sweet talk this machine into helping ye!", LANG_UNIVERSAL, 0);
+                    me->SetFaction(FACTION_FRIENDLY);
+                    me->Yell("Don't worry! Ol' Brann's got yer back! Keep that metal monstrosity busy, and I'll see if I can't sweet talk this machine into helping ye!", LANG_UNIVERSAL);
                     me->PlayDirectSound(14274);
                     SetEscortPaused(false);
                     break;
                 case ACTION_SJONNIR_DEAD:
-                    me->MonsterYell("Loken? That's downright bothersome... We might've neutralized the iron dwarves, but I'd lay odds there's another machine somewhere else churnin' out a whole mess o' these iron vrykul!", LANG_UNIVERSAL, 0);
+                    me->Yell("Loken? That's downright bothersome... We might've neutralized the iron dwarves, but I'd lay odds there's another machine somewhere else churnin' out a whole mess o' these iron vrykul!", LANG_UNIVERSAL);
                     me->PlayDirectSound(14278);
                     events.ScheduleEvent(EVENT_END, 14000);
                     break;
@@ -365,7 +377,7 @@ public:
                     Start(false, true, ObjectGuid::Empty, 0, true, false);
                     SetNextWaypoint(20, false);
                     ResetEvent();
-                    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+                    me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
                     break;
                 case ACTION_OPEN_DOOR:
                     if (GameObject* door = ObjectAccessor::GetGameObject(*me, pInstance->GetGuidData(GO_SJONNIR_DOOR)))
@@ -492,7 +504,7 @@ public:
                             me->CastSpell(me, 59046, true); // credit
                         }
 
-                        me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                        me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
 
                         // Spawn Chest and quest credit
                         if (Player* plr = SelectTargetFromPlayerList(200.0f))
@@ -501,7 +513,7 @@ public:
                             {
                                 plr->RemoveGameObject(go, false);
                                 go->SetLootMode(1);
-                                go->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
+                                go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
                             }
 
                             plr->GroupEventHappens(QUEST_HALLS_OF_STONE, me);
@@ -516,7 +528,7 @@ public:
                             door->SetGoState(GO_STATE_ACTIVE);
                         SetEscortPaused(false);
                         ResetEvent();
-                        me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+                        me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
                         break;
                     }
                 case EVENT_END:
@@ -525,8 +537,8 @@ public:
                         if (pInstance)
                             pInstance->SetData(BRANN_BRONZEBEARD, 6);
 
-                        me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-                        me->MonsterYell("I'll use the forge to make batches o' earthen to stand guard... But our greatest challenge still remains: find and stop Loken!", LANG_UNIVERSAL, 0);
+                        me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                        me->Yell("I'll use the forge to make batches o' earthen to stand guard... But our greatest challenge still remains: find and stop Loken!", LANG_UNIVERSAL);
                         me->PlayDirectSound(14279);
                         break;
                     }
@@ -556,7 +568,7 @@ public:
 
                     if (cs)
                     {
-                        cs->MonsterYell(Conversation[SpeechCount].text, LANG_UNIVERSAL, 0);
+                        cs->Yell(Conversation[SpeechCount].text, LANG_UNIVERSAL);
                         cs->PlayDirectSound(Conversation[SpeechCount].sound);
                     }
 
@@ -641,7 +653,7 @@ void brann_bronzebeard::brann_bronzebeardAI::WaypointReached(uint32 id)
         // Stop before stairs and ask to start
         case 9:
             SetEscortPaused(true);
-            me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+            me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
             if (pInstance)
                 pInstance->SetData(BRANN_BRONZEBEARD, 2);
 
@@ -662,9 +674,9 @@ void brann_bronzebeard::brann_bronzebeardAI::WaypointReached(uint32 id)
             if(pInstance)
             {
                 pInstance->SetData(BRANN_BRONZEBEARD, 5);
-                me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                 if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_SJONNIR)))
-                    cr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    cr->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetOrientation(3.132660f);
                 DoCast(me, 58506, false);
             }
@@ -722,7 +734,7 @@ public:
             {
                 case EVENT_DRP_CHARGE:
                     {
-                        if (Unit* tgt = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* tgt = SelectTarget(SelectTargetMethod::Random, 0))
                             me->CastSpell(tgt, SPELL_DRP_CHARGE, false);
 
                         events.RepeatEvent(10000);

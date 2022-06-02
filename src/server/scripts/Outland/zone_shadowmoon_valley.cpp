@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -28,12 +39,11 @@ EndContentData */
 
 #include "Group.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellScript.h"
-#include "WorldSession.h"
 
 // Ours
 class spell_q10612_10613_the_fel_and_the_furious : public SpellScriptLoader
@@ -64,8 +74,8 @@ public:
                 Creature* cr2 = go->SummonTrigger(go->GetPositionX(), go->GetPositionY(), go->GetPositionZ() + 2.0f, 0.0f, 100);
                 if (cr2)
                 {
-                    cr2->setFaction(14);
-                    cr2->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
+                    cr2->SetFaction(FACTION_MONSTER);
+                    cr2->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
                     GetCaster()->CastSpell(cr2, 38083, true);
                 }
 
@@ -241,11 +251,11 @@ public:
                 caster->AI()->SetData(TYPE_INFERNAL, DATA_DIED);
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_SUMMON_INFERNAL)
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_PACIFIED | UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_PACIFIED | UNIT_FLAG_NOT_SELECTABLE);
                 me->SetDisplayId(MODEL_INFERNAL);
             }
         }
@@ -417,10 +427,6 @@ public:
 
 enum EnshlavedNetherwingDrake
 {
-    // Factions
-    FACTION_DEFAULT                 = 62,
-    FACTION_FRIENDLY                = 1840, // Not sure if this is correct, it was taken off of Mordenai.
-
     // Spells
     SPELL_HIT_FORCE_OF_NELTHARAKU   = 38762,
     SPELL_FORCE_OF_NELTHARAKU       = 38775,
@@ -456,14 +462,14 @@ public:
         void Reset() override
         {
             if (!Tapped)
-                me->setFaction(FACTION_DEFAULT);
+                me->SetFaction(FACTION_ORC_DRAGONMAW);
 
             FlyTimer = 1000;
             me->SetDisableGravity(false);
             me->SetVisible(true);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (!caster)
                 return;
@@ -473,7 +479,7 @@ public:
                 Tapped = true;
                 PlayerGUID = caster->GetGUID();
 
-                me->setFaction(FACTION_FRIENDLY);
+                me->SetFaction(FACTION_FLAYER_HUNTER); // Not sure if this is correct, it was taken off of Mordenai.
 
                 Unit* Dragonmaw = me->FindNearestCreature(NPC_DRAGONMAW_SUBJUGATOR, 50);
                 if (Dragonmaw)
@@ -482,7 +488,7 @@ public:
                     AttackStart(Dragonmaw);
                 }
 
-                HostileReference* ref = me->getThreatManager().getOnlineContainer().getReferenceByTarget(caster);
+                HostileReference* ref = me->GetThreatMgr().getOnlineContainer().getReferenceByTarget(caster);
                 if (ref)
                     ref->removeReference();
             }
@@ -528,10 +534,10 @@ public:
 
                                 Position pos;
                                 if (Unit* EscapeDummy = me->FindNearestCreature(NPC_ESCAPE_DUMMY, 30))
-                                    EscapeDummy->GetPosition(&pos);
+                                    pos = EscapeDummy->GetPosition();
                                 else
                                 {
-                                    me->GetRandomNearPosition(pos, 20);
+                                    pos = me->GetRandomNearPosition(20);
                                     pos.m_positionZ += 25;
                                 }
 
@@ -606,7 +612,7 @@ public:
             events.ScheduleEvent(EVENT_SUNDER, urand(5000, 10000));
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (!caster)
                 return;
@@ -824,8 +830,7 @@ enum Earthmender
     SPELL_HEALING_WAVE          = 12491,
 
     QUEST_ESCAPE_COILSCAR       = 10451,
-    NPC_COILSKAR_ASSASSIN       = 21044,
-    FACTION_EARTHEN             = 1726                      //guessed
+    NPC_COILSKAR_ASSASSIN       = 21044
 };
 
 class npc_earthmender_wilda : public CreatureScript
@@ -838,7 +843,7 @@ public:
         if (quest->GetQuestId() == QUEST_ESCAPE_COILSCAR)
         {
             creature->AI()->Talk(SAY_WIL_START, player);
-            creature->setFaction(FACTION_EARTHEN);
+            creature->SetFaction(FACTION_EARTHEN_RING); //guessed
 
             if (npc_earthmender_wildaAI* pEscortAI = CAST_AI(npc_earthmender_wilda::npc_earthmender_wildaAI, creature->AI()))
                 pEscortAI->Start(false, false, player->GetGUID(), quest);
@@ -1103,7 +1108,7 @@ public:
             Timers = false;
 
             me->AddUnitState(UNIT_STATE_ROOT);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             me->SetTarget();
         }
 
@@ -1142,7 +1147,7 @@ public:
                 case 6:
                     if (Player* AggroTarget = ObjectAccessor::GetPlayer(*me, AggroTargetGUID))
                     {
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                         me->ClearUnitState(UNIT_STATE_ROOT);
 
                         float x, y, z;
@@ -1449,7 +1454,7 @@ public:
             {
                 if (SpellTimer1 <= diff)
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                     {
                         if (target->GetTypeId() == TYPEID_PLAYER)
                         {
@@ -1629,11 +1634,7 @@ enum Enraged_Dpirits
     NPC_CREDIT_EARTH                        = 21092,
 
     // Captured Spell / Buff
-    SPELL_SOUL_CAPTURED                     = 36115,
-
-    // Factions
-    FACTION_ENRAGED_SOUL_FRIENDLY           = 35,
-    FACTION_ENRAGED_SOUL_HOSTILE            = 14
+    SPELL_SOUL_CAPTURED                     = 36115
 };
 
 class npc_enraged_spirit : public CreatureScript
@@ -1701,7 +1702,7 @@ public:
                 totemOspirits = me->FindNearestCreature(ENTRY_TOTEM_OF_SPIRITS, RADIUS_TOTEM_OF_SPIRITS);
                 if (totemOspirits)
                 {
-                    Summoned->setFaction(FACTION_ENRAGED_SOUL_FRIENDLY);
+                    Summoned->SetFaction(FACTION_FRIENDLY);
                     Summoned->GetMotionMaster()->MovePoint(0, totemOspirits->GetPositionX(), totemOspirits->GetPositionY(), Summoned->GetPositionZ());
 
                     if (Unit* owner = totemOspirits->GetOwner())
@@ -1760,7 +1761,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if (!tapped && spell->Id == SPELL_WHISTLE)
             {

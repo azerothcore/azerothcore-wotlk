@@ -1,16 +1,29 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
+#include "oculus.h"
 #include "CombatAI.h"
 #include "InstanceScript.h"
 #include "MotionMaster.h"
 #include "ObjectAccessor.h"
-#include "oculus.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
@@ -119,7 +132,7 @@ public:
                 }
                 if (resetPosition)
                 {
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                     switch (me->GetEntry())
                     {
                     case NPC_VERDISA:
@@ -148,7 +161,7 @@ public:
             {
                 Talk(SAY_BELGARISTRASZ);
             }
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
         }
     };
 
@@ -184,7 +197,7 @@ public:
                     openedMenu[player->GetGUID()] = true;
                 }
 
-                if (openedMenu[player->GetGUID()] != true)
+                if (!openedMenu[player->GetGUID()])
                 {
                     AddGossipItemFor(player, 9708, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
                     SendGossipMenuFor(player, GOSSIP_TEXTID_DRAKES, creature->GetGUID());
@@ -644,7 +657,15 @@ public:
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            int32 amount = aurEff->GetAmount() + eventInfo.GetDamageInfo()->GetDamage();
+
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo || !damageInfo->GetDamage())
+            {
+                return;
+            }
+
+            int32 amount = aurEff->GetAmount() + damageInfo->GetDamage();
 
             uint8 num = amount / 15000;
             if (amount >= 15000)
@@ -905,7 +926,7 @@ public:
                 case EFFECT_1:
                     _drakeGUID = drake->GetGUID();
                     caster->AddAura(SPELL_DRAKE_FLAG_VISUAL, caster);
-                    caster->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    caster->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     caster->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
                     drake->CastSpell(drake, SPELL_SOAR_TRIGGER);
                     if (drake->GetEntry() == NPC_RUBY_DRAKE)
@@ -929,12 +950,12 @@ public:
 
             if (drake)
             {
-                drake->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED);
+                drake->RemoveUnitFlag(UNIT_FLAG_POSSESSED);
                 drake->RemoveAurasDueToSpell(GetId());
                 drake->RemoveAurasDueToSpell(SPELL_SOAR_TRIGGER);
                 drake->RemoveAurasDueToSpell(SPELL_RUBY_EVASIVE_AURA);
             }
-            caster->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            caster->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             caster->RemoveAurasDueToSpell(SPELL_DRAKE_FLAG_VISUAL);
         }
 
@@ -972,7 +993,7 @@ public:
 
             if (!drake)
             {
-                caster->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                caster->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 caster->RemoveAurasDueToSpell(SPELL_DRAKE_FLAG_VISUAL);
             }
         }

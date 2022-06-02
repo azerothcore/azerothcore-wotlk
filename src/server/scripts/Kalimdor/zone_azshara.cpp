@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -18,9 +29,9 @@ npc_depth_charge
 EndContentData */
 
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 /*######
@@ -58,7 +69,7 @@ public:
 
         void EnterCombat(Unit* /*who*/) override { }
 
-        void SpellHit(Unit* unit, const SpellInfo* spell) override
+        void SpellHit(Unit* unit, SpellInfo const* spell) override
         {
             if (spellhit)
                 return;
@@ -344,8 +355,8 @@ public:
                 if (me->IsWithinDist(player, 10) && me->GetPositionX() > player->GetPositionX() && !Reached)
                 {
                     Talk(SAY_RIZZLE_FINAL);
-                    me->SetUInt32Value(UNIT_NPC_FLAGS, 1);
-                    me->setFaction(35);
+                    me->ReplaceAllNpcFlags(NPCFlags(1));
+                    me->SetFaction(FACTION_FRIENDLY);
                     me->GetMotionMaster()->MoveIdle();
                     me->RemoveAurasDueToSpell(SPELL_PERIODIC_DEPTH_CHARGE);
                     Reached = true;
@@ -406,7 +417,7 @@ public:
         {
             me->SetHover(true);
             me->SetSwim(true);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             WeMustDie = false;
             WeMustDieTimer = 1000;
         }

@@ -1,20 +1,32 @@
+/*
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "GameEventMgr.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
-#include "WorldSession.h"
 
-enum eTrickOrTreatSpells
-{
-    SPELL_TRICK                 = 24714,
-    SPELL_TREAT                 = 24715,
-    SPELL_TRICKED_OR_TREATED    = 24755,
-    HALLOWEEN_EVENTID           = 12,
-    GOSSIP_MENU                 = 9733,
-    GOSSIP_MENU_EVENT           = 342
-};
+constexpr auto SPELL_TRICK = 24714;
+constexpr auto SPELL_TREAT = 24715;
+constexpr auto SPELL_TRICKED_OR_TREATED = 24755;
+constexpr auto HALLOWEEN_EVENTID = 12;
+constexpr auto GOSSIP_MENU = 9733;
+constexpr auto GOSSIP_MENU_EVENT = 342;
 
 class npc_innkeeper : public CreatureScript
 {

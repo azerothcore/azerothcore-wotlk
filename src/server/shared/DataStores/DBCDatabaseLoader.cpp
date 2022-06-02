@@ -1,11 +1,22 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2020 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "DatabaseEnv.h"
 #include "DBCDatabaseLoader.h"
+#include "DatabaseEnv.h"
 #include "Errors.h"
 #include "StringFormat.h"
 
@@ -35,13 +46,13 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
     // Check if sql index pos is valid
     if (int32(result->GetFieldCount() - 1) < _sqlIndexPos)
     {
-        ASSERT(false, "Invalid index pos for dbc: '%s'", _sqlTableName);
+        ASSERT(false, "Invalid index pos for dbc: '{}'", _sqlTableName);
         return nullptr;
     }
 
     // Resize index table
     // database query *MUST* contain ORDER BY `index_field` DESC clause
-    uint32 indexTableSize = std::max(records, (*result)[_sqlIndexPos].GetUInt32() + 1);
+    uint32 indexTableSize = std::max(records, (*result)[_sqlIndexPos].Get<uint32>() + 1);
     if (indexTableSize > records)
     {
         char** tmpIdxTable = new char* [indexTableSize];
@@ -59,7 +70,7 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
     do
     {
         Field* fields = result->Fetch();
-        uint32 indexValue = fields[_sqlIndexPos].GetUInt32();
+        uint32 indexValue = fields[_sqlIndexPos].Get<uint32>();
         char* dataValue = indexTable[indexValue];
 
         // If exist in DBC file override from DB
@@ -75,34 +86,34 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
             switch (*dbcFormat)
             {
                 case FT_FLOAT:
-                    *reinterpret_cast<float*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].GetFloat();
+                    *reinterpret_cast<float*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].Get<float>();
                     dataOffset += sizeof(float);
                     break;
                 case FT_IND:
                 case FT_INT:
-                    *reinterpret_cast<uint32*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].GetUInt32();
+                    *reinterpret_cast<uint32*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].Get<uint32>();
                     dataOffset += sizeof(uint32);
                     break;
                 case FT_BYTE:
-                    *reinterpret_cast<uint8*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].GetUInt8();
+                    *reinterpret_cast<uint8*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].Get<uint8>();
                     dataOffset += sizeof(uint8);
                     break;
                 case FT_STRING:
-                    *reinterpret_cast<char**>(&dataValue[dataOffset]) = CloneStringToPool(fields[sqlColumnNumber].GetString());
+                    *reinterpret_cast<char**>(&dataValue[dataOffset]) = CloneStringToPool(fields[sqlColumnNumber].Get<std::string>());
                     dataOffset += sizeof(char*);
                     break;
                 case FT_SORT:
                 case FT_NA:
                     break;
                 default:
-                    ASSERT(false, "Unsupported data type '%c' in table '%s'", *dbcFormat, _sqlTableName);
+                    ASSERT(false, "Unsupported data type '%c' in table '{}'", *dbcFormat, _sqlTableName);
                     return nullptr;
             }
 
             ++sqlColumnNumber;
         }
 
-        ASSERT(sqlColumnNumber == result->GetFieldCount(), "SQL format string does not match database for table: '%s'", _sqlTableName);
+        ASSERT(sqlColumnNumber == result->GetFieldCount(), "SQL format string does not match database for table: '{}'", _sqlTableName);
         ASSERT(dataOffset == _recordSize);
     } while (result->NextRow());
 

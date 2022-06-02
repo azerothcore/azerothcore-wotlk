@@ -1,6 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _QUERYHOLDER_H
@@ -12,8 +24,7 @@
 class AC_DATABASE_API SQLQueryHolderBase
 {
 friend class SQLQueryHolderTask;
-private:
-    std::vector<std::pair<PreparedStatementBase*, PreparedQueryResult>> m_queries;
+
 public:
     SQLQueryHolderBase() = default;
     virtual ~SQLQueryHolderBase();
@@ -23,6 +34,9 @@ public:
 
 protected:
     bool SetPreparedQueryImpl(size_t index, PreparedStatementBase* stmt);
+
+private:
+    std::vector<std::pair<PreparedStatementBase*, PreparedQueryResult>> m_queries;
 };
 
 template<typename T>
@@ -37,10 +51,6 @@ public:
 
 class AC_DATABASE_API SQLQueryHolderTask : public SQLOperation
 {
-private:
-    std::shared_ptr<SQLQueryHolderBase> m_holder;
-    QueryResultHolderPromise m_result;
-
 public:
     explicit SQLQueryHolderTask(std::shared_ptr<SQLQueryHolderBase> holder)
         : m_holder(std::move(holder)) { }
@@ -49,6 +59,10 @@ public:
 
     bool Execute() override;
     QueryResultHolderFuture GetFuture() { return m_result.get_future(); }
+
+private:
+    std::shared_ptr<SQLQueryHolderBase> m_holder;
+    QueryResultHolderPromise m_result;
 };
 
 class AC_DATABASE_API SQLQueryHolderCallback
@@ -58,7 +72,6 @@ public:
         : m_holder(std::move(holder)), m_future(std::move(future)) { }
 
     SQLQueryHolderCallback(SQLQueryHolderCallback&&) = default;
-
     SQLQueryHolderCallback& operator=(SQLQueryHolderCallback&&) = default;
 
     void AfterComplete(std::function<void(SQLQueryHolderBase const&)> callback) &

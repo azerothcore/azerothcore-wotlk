@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -10,8 +21,8 @@ SD%Complete: 85%
 SDComment:
 EndScriptData */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "zulaman.h"
 
@@ -252,15 +263,14 @@ public:
 
         void SpawnAdds()
         {
-            Creature* creature = nullptr;
             for (uint8 i = 0; i < 4; ++i)
             {
-                creature = me->SummonCreature(SpiritInfo[i].entry, SpiritInfo[i].x, SpiritInfo[i].y, SpiritInfo[i].z, SpiritInfo[i].orient, TEMPSUMMON_DEAD_DESPAWN, 0);
+                Creature* creature = me->SummonCreature(SpiritInfo[i].entry, SpiritInfo[i].x, SpiritInfo[i].y, SpiritInfo[i].z, SpiritInfo[i].orient, TEMPSUMMON_DEAD_DESPAWN, 0);
                 if (creature)
                 {
                     creature->CastSpell(creature, SPELL_SPIRIT_AURA, true);
-                    creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    creature->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    creature->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     SpiritGUID[i] = creature->GetGUID();
                 }
             }
@@ -326,9 +336,9 @@ public:
                             {
                                 Vortex->CastSpell(Vortex, SPELL_CYCLONE_PASSIVE, true);
                                 Vortex->CastSpell(Vortex, SPELL_CYCLONE_VISUAL, true);
-                                Vortex->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                                Vortex->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                                 Vortex->SetSpeed(MOVE_RUN, 1.0f);
-                                Vortex->AI()->AttackStart(SelectTarget(SELECT_TARGET_RANDOM, 0));
+                                Vortex->AI()->AttackStart(SelectTarget(SelectTargetMethod::Random, 0));
                                 DoZoneInCombat(Vortex);
                             }
                         }
@@ -389,7 +399,7 @@ public:
 
                     if (Grievous_Throw_Timer <= diff)
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                             DoCast(target, SPELL_GRIEVOUS_THROW, false);
                         Grievous_Throw_Timer = 10000;
                     }
@@ -420,7 +430,7 @@ public:
                     {
                         if (!TankGUID)
                         {
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             {
                                 TankGUID = me->GetVictim()->GetGUID();
                                 me->SetSpeed(MOVE_RUN, 5.0f);
@@ -436,7 +446,7 @@ public:
                             {
                                 Unit* target = me->GetVictim();
                                 if (!target || !target->isTargetableForAttack()) target = ObjectAccessor::GetUnit(*me, TankGUID);
-                                if (!target || !target->isTargetableForAttack()) target = SelectTarget(SELECT_TARGET_RANDOM, 0);
+                                if (!target || !target->isTargetableForAttack()) target = SelectTarget(SelectTargetMethod::Random, 0);
                                 if (target)
                                 {
                                     AttackStart(target);
@@ -471,7 +481,7 @@ public:
                     {
                         if (!TankGUID)
                         {
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             {
                                 TankGUID = me->GetVictim()->GetGUID();
                                 me->SetSpeed(MOVE_RUN, 5.0f);
@@ -485,7 +495,7 @@ public:
                             Unit* target = me->GetVictim();
                             if (!target || !target->isTargetableForAttack())
                             {
-                                target = SelectTarget(SELECT_TARGET_RANDOM, 0);
+                                target = SelectTarget(SelectTargetMethod::Random, 0);
                                 AttackStart(target);
                             }
                             if (target)
@@ -502,7 +512,7 @@ public:
                                         TankGUID.Clear();
                                     }
                                     else
-                                        AttackStart(SelectTarget(SELECT_TARGET_RANDOM, 0));
+                                        AttackStart(SelectTarget(SelectTargetMethod::Random, 0));
                                 }
                             }
                             else
@@ -525,7 +535,7 @@ public:
 
                     if (Pillar_Of_Fire_Timer <= diff)
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             DoCast(target, SPELL_SUMMON_PILLAR);
                         Pillar_Of_Fire_Timer = 10000;
                     }
@@ -533,7 +543,7 @@ public:
 
                     if (Flame_Breath_Timer <= diff)
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             me->SetInFront(target);
                         DoCast(me, SPELL_FLAME_BREATH);
                         Flame_Breath_Timer = 10000;
@@ -572,7 +582,7 @@ public:
 
         void EnterCombat(Unit* /*target*/) override { }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_ZAP_INFORM)
                 DoCast(caster, SPELL_ZAP_DAMAGE, true);
@@ -582,7 +592,7 @@ public:
         {
             //if the vortex reach the target, it change his target to another player
             if (me->IsWithinMeleeRange(me->GetVictim()))
-                AttackStart(SelectTarget(SELECT_TARGET_RANDOM, 0));
+                AttackStart(SelectTarget(SelectTargetMethod::Random, 0));
         }
     };
 

@@ -1,5 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /**
@@ -21,20 +34,20 @@
     auto dx = destX - startX;
     auto dy = destY - startY;
 
-    auto ang = atan2(dy, dx);
+    auto ang = std::atan2(dy, dx);
     ang = (ang >= 0) ? ang : 2 * float(M_PI) + ang;
     return ang;
 }
 
 [[nodiscard]] inline float getSlopeAngle(float startX, float startY, float startZ, float destX, float destY, float destZ)
 {
-    float floorDist = sqrt(pow(startY - destY, 2.0f) + pow(startX - destX, 2.0f));
-    return atan(abs(destZ - startZ) / abs(floorDist));
+    float floorDist = std::sqrt(pow(startY - destY, 2.0f) + pow(startX - destX, 2.0f));
+    return atan(std::abs(destZ - startZ) / std::abs(floorDist));
 }
 
 [[nodiscard]] inline float getSlopeAngleAbs(float startX, float startY, float startZ, float destX, float destY, float destZ)
 {
-    return abs(getSlopeAngle(startX, startY, startZ, destX, destY, destZ));
+    return std::abs(getSlopeAngle(startX, startY, startZ, destX, destY, destZ));
 }
 
 [[nodiscard]] inline double getCircleAreaByRadius(double radius)

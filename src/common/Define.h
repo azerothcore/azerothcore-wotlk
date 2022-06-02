@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ACORE_DEFINE_H
@@ -16,12 +27,12 @@
 #define ACORE_BIGENDIAN    1
 
 #if !defined(ACORE_ENDIAN)
-#  if defined (ACE_BIG_ENDIAN)
+#  if defined (BOOST_BIG_ENDIAN)
 #    define ACORE_ENDIAN ACORE_BIGENDIAN
-#  else //ACE_BYTE_ORDER != ACE_BIG_ENDIAN
+#  else
 #    define ACORE_ENDIAN ACORE_LITTLEENDIAN
-#  endif //ACE_BYTE_ORDER
-#endif //ACORE_ENDIAN
+#  endif
+#endif
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
 #  define ACORE_PATH_MAX MAX_PATH
@@ -84,13 +95,10 @@
 #  define AC_GAME_API AC_API_IMPORT
 #endif
 
-#define UI64FMTD "%" PRIu64
 #define UI64LIT(N) UINT64_C(N)
-
-#define SI64FMTD "%" PRId64
 #define SI64LIT(N) INT64_C(N)
 
-#define SZFMTD "%" PRIuPTR
+#define STRING_VIEW_FMT_ARG(str) static_cast<int>((str).length()), (str).data()
 
 typedef std::int64_t int64;
 typedef std::int32_t int32;

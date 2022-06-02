@@ -1,10 +1,23 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "magisters_terrace.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "magisters_terrace.h"
 
 enum Says
 {
@@ -61,7 +74,7 @@ public:
         SummonList summons;
         ObjectGuid CrystalGUID;
 
-        bool CanAIAttack(const Unit* who) const override
+        bool CanAIAttack(Unit const* who) const override
         {
             return who->GetPositionX() > 216.0f;
         }
@@ -154,7 +167,7 @@ public:
                 if (Unit* crystal = ObjectAccessor::GetUnit(*me, CrystalGUID))
                 {
                     Talk(EMOTE_CRYSTAL);
-                    crystal->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
+                    crystal->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
                     crystal->CastSpell(me, SPELL_MANA_RAGE, true);
                     me->CastSpell(crystal, SPELL_FEL_CRYSTAL_COSMETIC, true);
                     events.SetPhase(1);
@@ -177,12 +190,12 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_DRAIN_LIFE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, DUNGEON_MODE(SPELL_DRAIN_LIFE_N, SPELL_DRAIN_LIFE_H), false);
                     events.ScheduleEvent(EVENT_SPELL_DRAIN_LIFE, 10000, 1);
                     return;
                 case EVENT_SPELL_DRAIN_MANA:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, PowerUsersSelector(me, POWER_MANA, 40.0f, false)))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, POWER_MANA, 40.0f, false)))
                         me->CastSpell(target, SPELL_DRAIN_MANA, false);
                     events.ScheduleEvent(EVENT_SPELL_DRAIN_MANA, 10000, 1);
                     return;

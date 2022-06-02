@@ -1,10 +1,23 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "oculus.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "oculus.h"
 
 enum Spells
 {
@@ -89,12 +102,12 @@ public:
                 pInstance->SetData(DATA_VAROS, NOT_STARTED);
                 if( pInstance->GetData(DATA_CC_COUNT) < 10 )
                 {
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->CastSpell(me, 50053, true);
                 }
                 else
                 {
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->InterruptNonMeleeSpells(false);
                     me->RemoveAura(50053);
                 }
@@ -132,11 +145,11 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->DisableRotate(false);
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void MoveInLineOfSight(Unit*  /*who*/) override {}
@@ -160,7 +173,7 @@ public:
                     break;
                 case EVENT_AMPLIFY_MAGIC:
                     {
-                        if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true) )
+                        if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true) )
                             me->CastSpell(target, SPELL_AMPLIFY_MAGIC, false);
                         events.RepeatEvent(urand(17500, 22500));
                     }
@@ -191,7 +204,7 @@ public:
                                 events.ScheduleEvent(EVENT_CALL_AZURE_RING_CAPTAIN_1, 16000);
                                 break;
                         }
-                        if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true) )
+                        if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true) )
                         {
                             if( Creature* trigger = me->SummonCreature(NPC_ARCANE_BEAM, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 13000) )
                             {

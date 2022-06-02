@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -21,48 +32,11 @@ npc_wizzlecrank_shredder
 EndContentData */
 
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
-
-/*######
-## npc_beaten_corpse
-######*/
-
-#define GOSSIP_CORPSE "Examine corpse in detail..."
-
-enum BeatenCorpse
-{
-    QUEST_LOST_IN_BATTLE    = 4921
-};
-
-class npc_beaten_corpse : public CreatureScript
-{
-public:
-    npc_beaten_corpse() : CreatureScript("npc_beaten_corpse") { }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
-        {
-            SendGossipMenuFor(player, 3558, creature->GetGUID());
-            player->TalkedToCreature(creature->GetEntry(), creature->GetGUID());
-        }
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (player->GetQuestStatus(QUEST_LOST_IN_BATTLE) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_LOST_IN_BATTLE) == QUEST_STATUS_COMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_CORPSE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-        SendGossipMenuFor(player, 3557, creature->GetGUID());
-        return true;
-    }
-};
 
 /*######
 # npc_gilthares
@@ -80,8 +54,7 @@ enum Gilthares
     SAY_GIL_FREED               = 7,
 
     QUEST_FREE_FROM_HOLD        = 898,
-    AREA_MERCHANT_COAST         = 391,
-    FACTION_ESCORTEE            = 232                       //guessed, possible not needed for this quest
+    AREA_MERCHANT_COAST         = 391
 };
 
 class npc_gilthares : public CreatureScript
@@ -93,7 +66,7 @@ public:
     {
         if (quest->GetQuestId() == QUEST_FREE_FROM_HOLD)
         {
-            creature->setFaction(FACTION_ESCORTEE);
+            creature->SetFaction(FACTION_ESCORTEE_H_NEUTRAL_ACTIVE); //guessed, possible not needed for this quest
             creature->SetStandState(UNIT_STAND_STATE_STAND);
 
             creature->AI()->Talk(SAY_GIL_START, player);
@@ -186,7 +159,7 @@ public:
     {
         npc_taskmaster_fizzuleAI(Creature* creature) : ScriptedAI(creature)
         {
-            factionNorm = creature->getFaction();
+            factionNorm = creature->GetFaction();
         }
 
         uint32 factionNorm;
@@ -199,23 +172,23 @@ public:
             IsFriend = false;
             ResetTimer = 120000;
             FlareCount = 0;
-            me->setFaction(factionNorm);
+            me->SetFaction(factionNorm);
         }
 
         void DoFriend()
         {
             me->RemoveAllAuras();
-            me->DeleteThreatList();
+            me->GetThreatMgr().ClearAllThreat();
             me->CombatStop(true);
 
             me->StopMoving();
             me->GetMotionMaster()->MoveIdle();
 
-            me->setFaction(FACTION_FRIENDLY_F);
+            me->SetFaction(FACTION_FRIENDLY);
             me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_FLARE || spell->Id == SPELL_FOLLY)
             {
@@ -252,7 +225,7 @@ public:
             {
                 if (FlareCount >= 2)
                 {
-                    if (me->getFaction() == FACTION_FRIENDLY_F)
+                    if (me->GetFaction() == FACTION_FRIENDLY_F)
                         return;
 
                     DoFriend();
@@ -271,7 +244,6 @@ enum TwiggyFlathead
     NPC_BIG_WILL                = 6238,
     NPC_AFFRAY_CHALLENGER       = 6240,
 
-    SAY_BIG_WILL_READY          = 0,
     SAY_TWIGGY_FLATHEAD_BEGIN   = 0,
     SAY_TWIGGY_FLATHEAD_FRAY    = 1,
     SAY_TWIGGY_FLATHEAD_DOWN    = 2,
@@ -334,10 +306,10 @@ public:
 
         void EnterCombat(Unit* /*who*/) override { }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             CleanUp();
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void CleanUp()
@@ -371,7 +343,7 @@ public:
                 Player* pWarrior = ObjectAccessor::GetPlayer(*me, PlayerGUID);
                 if (!pWarrior || me->GetDistance2d(pWarrior) >= 200.0f)
                 {
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     return;
                 }
 
@@ -379,7 +351,7 @@ public:
                 {
                     Talk(SAY_TWIGGY_FLATHEAD_DOWN);
                     pWarrior->FailQuest(1719);
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     return;
                 }
 
@@ -398,9 +370,9 @@ public:
                             Creature* creature = me->SummonCreature(NPC_AFFRAY_CHALLENGER, AffrayChallengerLoc[i], TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000);
                             if (!creature)
                                 continue;
-                            creature->setFaction(35);
-                            creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                            creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            creature->SetFaction(FACTION_FRIENDLY);
+                            creature->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                            creature->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             creature->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
                             AffrayChallenger[i] = creature->GetGUID();
                         }
@@ -437,10 +409,10 @@ public:
                             Creature* creature = ObjectAccessor::GetCreature(*me, AffrayChallenger[Wave]);
                             if (creature && creature->IsAlive())
                             {
-                                creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                                creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                creature->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                                creature->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                                 creature->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
-                                creature->setFaction(14);
+                                creature->SetFaction(FACTION_MONSTER);
                                 creature->AI()->AttackStart(pWarrior);
                             }
                             ++Wave;
@@ -463,15 +435,15 @@ public:
                             if (!creature || !creature->IsAlive())
                             {
                                 Talk(SAY_TWIGGY_FLATHEAD_OVER);
-                                EnterEvadeMode();
+                                EnterEvadeMode(EVADE_REASON_OTHER);
                                 return;
                             }
-                            else if (creature) // Makes BIG WILL attackable.
+                            else // Makes BIG WILL attackable.
                             {
-                                creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                                creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                creature->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                                creature->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                                 creature->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
-                                creature->setFaction(14);
+                                creature->SetFaction(FACTION_MONSTER);
                                 creature->AI()->AttackStart(pWarrior);
                             }
                             WaveTimer = 2000;
@@ -501,7 +473,6 @@ enum Wizzlecrank
     SAY_END             = 6,
 
     QUEST_ESCAPE        = 863,
-    FACTION_RATCHET     = 637,
     NPC_PILOT_WIZZ      = 3451,
     NPC_MERCENARY       = 3282,
 };
@@ -582,7 +553,10 @@ public:
         void JustSummoned(Creature* summoned) override
         {
             if (summoned->GetEntry() == NPC_PILOT_WIZZ)
+            {
                 me->SetStandState(UNIT_STAND_STATE_DEAD);
+                me->RestoreFaction();
+            }
 
             if (summoned->GetEntry() == NPC_MERCENARY)
                 summoned->AI()->AttackStart(me);
@@ -634,7 +608,7 @@ public:
     {
         if (quest->GetQuestId() == QUEST_ESCAPE)
         {
-            creature->setFaction(FACTION_RATCHET);
+            creature->SetFaction(FACTION_RATCHET);
             creature->AI()->Talk(SAY_START);
             if (npc_escortAI* pEscortAI = CAST_AI(npc_wizzlecrank_shredder::npc_wizzlecrank_shredderAI, creature->AI()))
                 pEscortAI->Start(true, false, player->GetGUID());
@@ -650,7 +624,6 @@ public:
 
 void AddSC_the_barrens()
 {
-    new npc_beaten_corpse();
     new npc_gilthares();
     new npc_taskmaster_fizzule();
     new npc_twiggy_flathead();

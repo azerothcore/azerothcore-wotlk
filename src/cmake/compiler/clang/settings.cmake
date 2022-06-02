@@ -1,6 +1,13 @@
 #
-# Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-# Copyright (C) 2008-2019 TrinityCore <https://www.trinitycore.org/>
+# This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+#
+# This file is free software; as a special exception the author gives
+# unlimited permission to copy and/or distribute it, with or without
+# modifications, as long as this notice is preserved.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
 
 if ((USE_COREPCH OR USE_SCRIPTPCH) AND (CMAKE_C_COMPILER_LAUNCHER STREQUAL "ccache" OR CMAKE_CXX_COMPILER_LAUNCHER STREQUAL "ccache"))
@@ -39,13 +46,6 @@ int main()
 }
 " CLANG_HAVE_PROPER_CHARCONV)
 
-if (NOT CLANG_HAVE_PROPER_CHARCONV)
-  message(STATUS "Clang: Detected from_chars bug for 64-bit integers, workaround enabled")
-  target_compile_definitions(acore-compile-option-interface
-  INTERFACE
-    -DACORE_NEED_CHARCONV_WORKAROUND)
-endif()
-
 if(WITH_WARNINGS)
   target_compile_options(acore-warning-interface
     INTERFACE
@@ -64,6 +64,52 @@ if(WITH_COREDEBUG)
     INTERFACE
       -g3)
   message(STATUS "Clang: Debug-flags set (-g3)")
+endif()
+
+if(MSAN)
+    target_compile_options(acore-compile-option-interface
+            INTERFACE
+            -fno-omit-frame-pointer
+            -fsanitize=memory
+            -fsanitize-memory-track-origins
+            -mllvm
+            -msan-keep-going=1)
+
+    target_link_options(acore-compile-option-interface
+            INTERFACE
+            -fno-omit-frame-pointer
+            -fsanitize=memory
+            -fsanitize-memory-track-origins)
+
+    message(STATUS "Clang: Enabled Memory Sanitizer MSan")
+endif()
+
+if(UBSAN)
+    target_compile_options(acore-compile-option-interface
+            INTERFACE
+            -fno-omit-frame-pointer
+            -fsanitize=undefined)
+
+    target_link_options(acore-compile-option-interface
+            INTERFACE
+            -fno-omit-frame-pointer
+            -fsanitize=undefined)
+
+    message(STATUS "Clang: Enabled Undefined Behavior Sanitizer UBSan")
+endif()
+
+if(TSAN)
+    target_compile_options(acore-compile-option-interface
+            INTERFACE
+            -fno-omit-frame-pointer
+            -fsanitize=thread)
+
+    target_link_options(acore-compile-option-interface
+            INTERFACE
+            -fno-omit-frame-pointer
+            -fsanitize=thread)
+
+    message(STATUS "Clang: Enabled Thread Sanitizer TSan")
 endif()
 
 # -Wno-narrowing needed to suppress a warning in g3d

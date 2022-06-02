@@ -1,6 +1,19 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "CreatureAI.h"
 #include "InstanceScript.h"
@@ -42,7 +55,7 @@ public:
                     if (_encounters[DATA_IRONAYA_DOORS] == DONE)
                     {
                         HandleGameObject(ObjectGuid::Empty, true, gameobject);
-                        gameobject->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        gameobject->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     }
                     break;
                 case GO_TEMPLE_DOOR:
@@ -77,6 +90,15 @@ public:
 
             if (data == DONE)
                 SaveToDB();
+        }
+
+        uint32 GetData(uint32 data) const override
+        {
+            if (data < MAX_ENCOUNTERS)
+            {
+                return _encounters[data];
+            }
+            return 0;
         }
 
         std::string GetSaveData() override
@@ -156,6 +178,11 @@ public:
     }
 };
 
+enum UldamanStonedEnum
+{
+    MAP_ULDAMAN = 70
+};
+
 class spell_uldaman_stoned : public SpellScriptLoader
 {
 public:
@@ -167,21 +194,21 @@ public:
 
         bool Load() override
         {
-            return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
+            return GetUnitOwner()->GetTypeId() == TYPEID_UNIT && GetUnitOwner()->GetMapId() == MAP_ULDAMAN;
         }
 
         void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             Creature* target = GetUnitOwner()->ToCreature();
             target->SetReactState(REACT_PASSIVE);
-            target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            target->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
         }
 
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             Creature* target = GetUnitOwner()->ToCreature();
             target->SetReactState(REACT_AGGRESSIVE);
-            target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            target->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
         }
 
         void Register() override
@@ -209,7 +236,8 @@ public:
         void HandleSendEvent(SpellEffIndex  /*effIndex*/)
         {
             InstanceScript* instance = GetCaster()->GetInstanceScript();
-            if (!instance || instance->GetData(DATA_ARCHAEDAS) == IN_PROGRESS)
+
+            if (!instance || instance->GetData(DATA_ARCHAEDAS) == IN_PROGRESS || instance->GetData(DATA_ARCHAEDAS) == DONE)
                 return;
 
             instance->SetData(DATA_ARCHAEDAS, IN_PROGRESS);

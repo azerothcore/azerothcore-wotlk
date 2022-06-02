@@ -1,11 +1,24 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "oculus.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "oculus.h"
 
 enum Spells
 {
@@ -23,7 +36,7 @@ enum Spells
 };
 
 #define SPELL_EMPOWERED_ARCANE_EXPLOSION        DUNGEON_MODE(SPELL_EMPOWERED_ARCANE_EXPLOSION_N, SPELL_EMPOWERED_ARCANE_EXPLOSION_H)
-#define SPELL_TIME_BOMB                         DUNGEON_MODE(SPELL_TIME_BOMB_N, SPELL_TIME_BOMB_H)
+//#define SPELL_TIME_BOMB                         DUNGEON_MODE(SPELL_TIME_BOMB_N, SPELL_TIME_BOMB_H)
 
 enum UromNPCs
 {
@@ -113,9 +126,9 @@ public:
             {
                 pInstance->SetData(DATA_UROM, NOT_STARTED);
                 if( pInstance->GetData(DATA_VAROS) != DONE )
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 else
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             }
 
             me->CastSpell(me, SPELL_EVOCATION, true);
@@ -195,7 +208,7 @@ public:
         void LeaveCombat()
         {
             me->RemoveAllAuras();
-            me->DeleteThreatList();
+            me->GetThreatMgr().ClearAllThreat();
             me->CombatStop(true);
             me->LoadCreaturesAddon(true);
             me->SetLootRecipient(nullptr);
@@ -219,7 +232,7 @@ public:
             Talk(SAY_PLAYER_KILL);
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             switch( spell->Id )
             {
@@ -264,7 +277,7 @@ public:
                     me->GetMotionMaster()->MoveIdle();
                     me->StopMoving();
                     me->SetControlled(true, UNIT_STATE_ROOT);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->SetCanFly(true);
                     me->SetDisableGravity(true);
                     me->NearTeleportTo(1103.69f, 1048.76f, 512.279f, 1.16f);
@@ -322,7 +335,7 @@ public:
                     events.RepeatEvent(urand(7000, 11000));
                     break;
                 case EVENT_TIME_BOMB:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true) )
                         DoCast(target, DUNGEON_MODE(SPELL_TIME_BOMB_N, SPELL_TIME_BOMB_H));
                     events.RepeatEvent(urand(20000, 25000));
                     break;
@@ -341,18 +354,18 @@ public:
                     me->SetDisableGravity(false);
                     me->NearTeleportTo(x, y, z, 0.0f);
                     me->SetControlled(false, UNIT_STATE_ROOT);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
                     break;
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             me->SetCanFly(false);
             me->SetDisableGravity(false);
             me->SetControlled(false, UNIT_STATE_ROOT);
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
     };
 };

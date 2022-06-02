@@ -1,11 +1,23 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "nexus.h"
-#include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "nexus.h"
 
 enum eEnums
 {
@@ -43,7 +55,7 @@ enum Events
 enum Misc
 {
     NPC_CRYSTAL_SPIKE                       = 27099,
-    NPC_CRYSTALLINE_TANGLER                 = 32665,
+//    NPC_CRYSTALLINE_TANGLER                 = 32665,
     GO_CRYSTAL_SPIKE                        = 188537
 };
 
@@ -134,7 +146,7 @@ public:
                     events.ScheduleEvent(EVENT_ORMOROK_SPELL_REFLECTION, 30000);
                     break;
                 case EVENT_ORMOROK_SUMMON:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_FARTHEST, 0, 50.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, 50.0f, true))
                         me->CastSpell(target, SPELL_SUMMON_CRYSTALLINE_TANGLER, true);
                     events.ScheduleEvent(EVENT_ORMOROK_SUMMON, 17000);
                     break;
@@ -152,7 +164,7 @@ public:
                     {
                         float o = rand_norm() * 2.0f * M_PI;
                         float x = me->GetPositionX() + 5.0f * _spikesCount * cos(o);
-                        float y = me->GetPositionY() + 5.0f * _spikesCount * sin(o);
+                        float y = me->GetPositionY() + 5.0f * _spikesCount * std::sin(o);
                         float h = me->GetMapHeight(x, y, me->GetPositionZ());
 
                         if (h != INVALID_HEIGHT)

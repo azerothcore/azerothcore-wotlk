@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "DatabaseEnv.h"
@@ -11,6 +22,7 @@
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
+#include "MiscPackets.h"
 #include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -119,8 +131,19 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recvData)
     }
 
     Group* group = GetPlayer()->GetGroup();
-    if (group && (group->isBGGroup() || group->isBFGroup()))
-        group = GetPlayer()->GetOriginalGroup();
+    if (group)
+    {
+        if (group->isLFGGroup() && group->IsLfgRandomInstance())
+        {
+            SendPartyResult(PARTY_OP_INVITE, membername, ERR_TARGET_NOT_IN_INSTANCE_S);
+            return;
+        }
+
+        if (group->isBGGroup() || group->isBFGroup())
+        {
+            group = GetPlayer()->GetOriginalGroup();
+        }
+    }
 
     Group* group2 = player->GetGroup();
     if (group2 && (group2->isBGGroup() || group2->isBFGroup()))
@@ -228,8 +251,8 @@ void WorldSession::HandleGroupAcceptOpcode(WorldPacket& recvData)
 
     if (group->GetLeaderGUID() == GetPlayer()->GetGUID())
     {
-        LOG_ERROR("network.opcode", "HandleGroupAcceptOpcode: player %s (%s) tried to accept an invite to his own group",
-            GetPlayer()->GetName().c_str(), GetPlayer()->GetGUID().ToString().c_str());
+        LOG_ERROR("network.opcode", "HandleGroupAcceptOpcode: player {} ({}) tried to accept an invite to his own group",
+            GetPlayer()->GetName(), GetPlayer()->GetGUID().ToString());
         return;
     }
 
@@ -301,18 +324,34 @@ void WorldSession::HandleGroupUninviteGuidOpcode(WorldPacket& recvData)
     //can't uninvite yourself
     if (guid == GetPlayer()->GetGUID())
     {
-        LOG_ERROR("network.opcode", "WorldSession::HandleGroupUninviteGuidOpcode: leader %s (%s) tried to uninvite himself from the group.",
-            GetPlayer()->GetName().c_str(), GetPlayer()->GetGUID().ToString().c_str());
+        LOG_ERROR("network.opcode", "WorldSession::HandleGroupUninviteGuidOpcode: leader {} ({}) tried to uninvite himself from the group.",
+            GetPlayer()->GetName(), GetPlayer()->GetGUID().ToString());
         return;
     }
 
-    // Xinef: name is properly filled in packets
-    sObjectMgr->GetPlayerNameByGUID(guid.GetCounter(), name);
+    sCharacterCache->GetCharacterNameByGuid(guid, name);
 
-    PartyResult res = GetPlayer()->CanUninviteFromGroup();
+    PartyResult res = GetPlayer()->CanUninviteFromGroup(guid);
     if (res != ERR_PARTY_RESULT_OK)
     {
-        SendPartyResult(PARTY_OP_UNINVITE, name, res);
+        if (res == ERR_PARTY_LFG_BOOT_NOT_ELIGIBLE_S)
+        {
+            if (Player* kickTarget = ObjectAccessor::FindConnectedPlayer(guid))
+            {
+                if (Aura* dungeonCooldownAura = kickTarget->GetAura(lfg::LFG_SPELL_DUNGEON_COOLDOWN))
+                {
+                    int32 elapsedTime = dungeonCooldownAura->GetMaxDuration() - dungeonCooldownAura->GetDuration();
+                    if (static_cast<int32>(sWorld->getIntConfig(CONFIG_LFG_KICK_PREVENTION_TIMER)) > elapsedTime)
+                    {
+                        SendPartyResult(PARTY_OP_UNINVITE, name, res, (sWorld->getIntConfig(CONFIG_LFG_KICK_PREVENTION_TIMER) - elapsedTime) / 1000);
+                    }
+                }
+            }
+        } else
+        {
+            SendPartyResult(PARTY_OP_UNINVITE, name, res);
+        }
+
         return;
     }
 
@@ -321,13 +360,13 @@ void WorldSession::HandleGroupUninviteGuidOpcode(WorldPacket& recvData)
         return;
 
     // Xinef: do not allow to kick with empty reason, this will resend packet with given reason
-    if (grp->isLFGGroup() && reason.empty())
+    if (grp->isLFGGroup(true) && reason.empty())
     {
         SendPartyResult(PARTY_OP_UNINVITE, name, ERR_VOTE_KICK_REASON_NEEDED);
         return;
     }
 
-    if (grp->IsLeader(guid) && !grp->isLFGGroup())
+    if (grp->IsLeader(guid) && !grp->isLFGGroup(true))
     {
         SendPartyResult(PARTY_OP_UNINVITE, name, ERR_NOT_LEADER);
         return;
@@ -362,21 +401,23 @@ void WorldSession::HandleGroupUninviteOpcode(WorldPacket& recvData)
     // can't uninvite yourself
     if (GetPlayer()->GetName() == membername)
     {
-        LOG_ERROR("network.opcode", "WorldSession::HandleGroupUninviteOpcode: leader %s (%s) tried to uninvite himself from the group.",
-            GetPlayer()->GetName().c_str(), GetPlayer()->GetGUID().ToString().c_str());
-        return;
-    }
-
-    PartyResult res = GetPlayer()->CanUninviteFromGroup();
-    if (res != ERR_PARTY_RESULT_OK)
-    {
-        SendPartyResult(PARTY_OP_UNINVITE, "", res);
+        LOG_ERROR("network.opcode", "WorldSession::HandleGroupUninviteOpcode: leader {} ({}) tried to uninvite himself from the group.",
+            GetPlayer()->GetName(), GetPlayer()->GetGUID().ToString());
         return;
     }
 
     Group* grp = GetPlayer()->GetGroup();
     if (!grp)
+    {
         return;
+    }
+
+    PartyResult res = GetPlayer()->CanUninviteFromGroup(grp->GetMemberGUID(membername));
+    if (res != ERR_PARTY_RESULT_OK)
+    {
+        SendPartyResult(PARTY_OP_UNINVITE, "", res);
+        return;
+    }
 
     if (ObjectGuid guid = grp->GetMemberGUID(membername))
     {
@@ -452,7 +493,7 @@ void WorldSession::HandleLootMethodOpcode(WorldPacket& recvData)
 
     /** error handling **/
     // Xinef: Check if group is LFG
-    if (!group->IsLeader(GetPlayer()->GetGUID()) || group->isLFGGroup())
+    if (!group->IsLeader(GetPlayer()->GetGUID()) || group->isLFGGroup(true))
         return;
 
     if (lootMethod > NEED_BEFORE_GREED)
@@ -520,31 +561,13 @@ void WorldSession::HandleMinimapPingOpcode(WorldPacket& recvData)
     GetPlayer()->GetGroup()->BroadcastPacket(&data, true, -1, GetPlayer()->GetGUID());
 }
 
-void WorldSession::HandleRandomRollOpcode(WorldPacket& recvData)
+void WorldSession::HandleRandomRollOpcode(WorldPackets::Misc::RandomRollClient& packet)
 {
-    LOG_DEBUG("network", "WORLD: Received MSG_RANDOM_ROLL");
+    uint32 minimum, maximum;
+    minimum = packet.Min;
+    maximum = packet.Max;
 
-    uint32 minimum, maximum, roll;
-    recvData >> minimum;
-    recvData >> maximum;
-
-    /** error handling **/
-    if (minimum > maximum || maximum > 10000)                // < 32768 for urand call
-        return;
-    /********************/
-
-    // everything's fine, do it
-    roll = urand(minimum, maximum);
-
-    WorldPacket data(MSG_RANDOM_ROLL, 4 + 4 + 4 + 8);
-    data << uint32(minimum);
-    data << uint32(maximum);
-    data << uint32(roll);
-    data << GetPlayer()->GetGUID();
-    if (GetPlayer()->GetGroup())
-        GetPlayer()->GetGroup()->BroadcastPacket(&data, false);
-    else
-        SendPacket(&data);
+    GetPlayer()->DoRandomRoll(minimum, maximum);
 }
 
 void WorldSession::HandleRaidTargetUpdateOpcode(WorldPacket& recvData)
@@ -640,7 +663,7 @@ void WorldSession::HandleGroupChangeSubGroupOpcode(WorldPacket& recvData)
     else
     {
         CharacterDatabase.EscapeString(name);
-        guid = sObjectMgr->GetPlayerGUIDByName(name.c_str());
+        guid = sCharacterCache->GetCharacterGuidByName(name);
     }
 
     group->ChangeMembersGroup(guid, groupNr);
@@ -789,7 +812,7 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
 
         if (!player->IsAlive())
         {
-            if (player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
+            if (player->HasPlayerFlag(PLAYER_FLAGS_GHOST))
                 playerStatus |= MEMBER_STATUS_GHOST;
             else
                 playerStatus |= MEMBER_STATUS_DEAD;
@@ -991,7 +1014,7 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recvData)
 
     if (!player->IsAlive())
     {
-        if (player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
+        if (player->HasPlayerFlag(PLAYER_FLAGS_GHOST))
             playerStatus |= MEMBER_STATUS_GHOST;
         else
             playerStatus |= MEMBER_STATUS_DEAD;
@@ -1144,7 +1167,7 @@ void WorldSession::HandleGroupSwapSubGroupOpcode(WorldPacket& recv_data)
         }
         else
         {
-            if (ObjectGuid guid = sObjectMgr->GetPlayerGUIDByName(playerName))
+            if (ObjectGuid guid = sCharacterCache->GetCharacterGuidByName(playerName))
             {
                 return guid;
             }

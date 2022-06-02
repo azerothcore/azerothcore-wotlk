@@ -1,11 +1,24 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "magtheridons_lair.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "magtheridons_lair.h"
 
 enum Yells
 {
@@ -101,7 +114,7 @@ public:
             _Reset();
             me->CastSpell(me, SPELL_SHADOW_CAGE, true);
             me->SetReactState(REACT_PASSIVE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
         }
 
         void KilledUnit(Unit*  /*victim*/) override
@@ -151,7 +164,7 @@ public:
                     break;
             }
 
-            if (!UpdateVictim() || !CheckInRoom())
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
@@ -171,7 +184,7 @@ public:
                     Talk(SAY_FREE);
                     break;
                 case EVENT_ENTER_COMBAT:
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
                     me->SetReactState(REACT_AGGRESSIVE);
                     events.ScheduleEvent(EVENT_CLEAVE, 9000);
                     events.ScheduleEvent(EVENT_BLAST_NOVA, 60000);
@@ -230,7 +243,7 @@ public:
                     events.ScheduleEvent(EVENT_DEBRIS, 20000);
                     break;
                 case EVENT_DEBRIS:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                     {
                         target->CastSpell(target, SPELL_DEBRIS_VISUAL, true, nullptr, nullptr, me->GetGUID());
                         me->m_Events.AddEvent(new DealDebrisDamage(*me, target->GetGUID()), me->m_Events.CalculateTime(5000));

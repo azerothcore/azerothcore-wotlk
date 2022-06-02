@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -11,8 +22,8 @@ SDComment: Mind Control not working because of core bug. Shades visible for all.
 SDCategory: Zul'Gurub
 EndScriptData */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "zulgurub.h"
 
 enum Say
@@ -99,17 +110,12 @@ public:
                         events.ScheduleEvent(EVENT_POWERFULLHEALINGWARD, urand(14000, 20000));
                         break;
                     case EVENT_HEX:
-                        if (Unit* target = me->GetVictim())
-                        {
-                            DoCast(target, SPELL_HEX, true);
-                            if (DoGetThreat(target))
-                                DoModifyThreatPercent(target, -80);
-                        }
+                        DoCastVictim(SPELL_HEX, true);
                         events.ScheduleEvent(EVENT_HEX, urand(12000, 20000));
                         break;
                     case EVENT_DELUSIONSOFJINDO: // HACK
                         // Casting the delusion curse with a shade so shade will attack the same target with the curse.
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         {
                             DoCast(target, SPELL_DELUSIONSOFJINDO);
                             Creature* Shade = me->SummonCreature(NPC_SHADE_OF_JINDO, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
@@ -120,37 +126,37 @@ public:
                         break;
                     case EVENT_TELEPORT: // Possible HACK
                         // Teleports a random player and spawns 9 Sacrificed Trolls to attack player
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         {
-                            DoTeleportPlayer(target, TeleportLoc.m_positionX, TeleportLoc.m_positionY, TeleportLoc.m_positionZ, TeleportLoc.m_orientation);
+                            DoTeleportPlayer(target, TeleportLoc.m_positionX, TeleportLoc.m_positionY, TeleportLoc.m_positionZ, TeleportLoc.GetOrientation());
                             if (DoGetThreat(me->GetVictim()))
                                 DoModifyThreatPercent(target, -100);
                             Creature* SacrificedTroll;
-                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, target->GetPositionX() + 2, target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
+                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, TeleportLoc.m_positionX + 2, TeleportLoc.m_positionY, TeleportLoc.m_positionZ, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
                             if (SacrificedTroll)
                                 SacrificedTroll->AI()->AttackStart(target);
-                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, target->GetPositionX() - 2, target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
+                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, TeleportLoc.m_positionX - 2, TeleportLoc.m_positionY, TeleportLoc.m_positionZ, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
                             if (SacrificedTroll)
                                 SacrificedTroll->AI()->AttackStart(target);
-                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, target->GetPositionX() + 4, target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
+                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, TeleportLoc.m_positionX + 4, TeleportLoc.m_positionY, TeleportLoc.m_positionZ, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
                             if (SacrificedTroll)
                                 SacrificedTroll->AI()->AttackStart(target);
-                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, target->GetPositionX() - 4, target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
+                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, TeleportLoc.m_positionX - 4, TeleportLoc.m_positionY, TeleportLoc.m_positionZ, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
                             if (SacrificedTroll)
                                 SacrificedTroll->AI()->AttackStart(target);
-                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, target->GetPositionX(), target->GetPositionY() + 2, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
+                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, TeleportLoc.m_positionX, TeleportLoc.m_positionY + 2, TeleportLoc.m_positionZ, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
                             if (SacrificedTroll)
                                 SacrificedTroll->AI()->AttackStart(target);
-                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, target->GetPositionX(), target->GetPositionY() - 2, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
+                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, TeleportLoc.m_positionX, TeleportLoc.m_positionY - 2, TeleportLoc.m_positionZ, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
                             if (SacrificedTroll)
                                 SacrificedTroll->AI()->AttackStart(target);
-                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, target->GetPositionX(), target->GetPositionY() + 4, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
+                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, TeleportLoc.m_positionX, TeleportLoc.m_positionY + 4, TeleportLoc.m_positionZ, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
                             if (SacrificedTroll)
                                 SacrificedTroll->AI()->AttackStart(target);
-                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, target->GetPositionX(), target->GetPositionY() - 4, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
+                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, TeleportLoc.m_positionX, TeleportLoc.m_positionY - 4, TeleportLoc.m_positionZ, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
                             if (SacrificedTroll)
                                 SacrificedTroll->AI()->AttackStart(target);
-                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, target->GetPositionX() + 3, target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
+                            SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, TeleportLoc.m_positionX + 3, TeleportLoc.m_positionY, TeleportLoc.m_positionZ, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
                             if (SacrificedTroll)
                                 SacrificedTroll->AI()->AttackStart(target);
                         }
@@ -162,6 +168,11 @@ public:
             }
 
             DoMeleeAttackIfReady();
+        }
+
+        bool CanAIAttack(Unit const* target) const override
+        {
+            return !target->HasAura(SPELL_HEX);
         }
     };
 

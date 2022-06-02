@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifdef _WIN32
@@ -11,11 +22,6 @@
 #include <cstring>
 #include <windows.h>
 #include <winsvc.h>
-
-// stupid ACE define
-#ifdef main
-#undef main
-#endif //main
 
 #if !defined(WINADVAPI)
 #if !defined(_ADVAPI32_)
@@ -40,16 +46,16 @@ typedef WINADVAPI BOOL (WINAPI* CSD_T)(SC_HANDLE, DWORD, LPCVOID);
 
 bool WinServiceInstall()
 {
-    SC_HANDLE serviceControlManager = OpenSCManager(0, 0, SC_MANAGER_CREATE_SERVICE);
+    SC_HANDLE serviceControlMgr = OpenSCManager(0, 0, SC_MANAGER_CREATE_SERVICE);
 
-    if (serviceControlManager)
+    if (serviceControlMgr)
     {
         char path[_MAX_PATH + 10];
         if (GetModuleFileName( 0, path, sizeof(path) / sizeof(path[0]) ) > 0)
         {
             SC_HANDLE service;
             std::strcat(path, " --service");
-            service = CreateService(serviceControlManager,
+            service = CreateService(serviceControlMgr,
                                     serviceName,                                // name of service
                                     serviceLongName,                            // service name to display
                                     SERVICE_ALL_ACCESS,                         // desired access
@@ -69,7 +75,7 @@ bool WinServiceInstall()
                 if (!advapi32)
                 {
                     CloseServiceHandle(service);
-                    CloseServiceHandle(serviceControlManager);
+                    CloseServiceHandle(serviceControlMgr);
                     return false;
                 }
 
@@ -77,7 +83,7 @@ bool WinServiceInstall()
                 if (!ChangeService_Config2)
                 {
                     CloseServiceHandle(service);
-                    CloseServiceHandle(serviceControlManager);
+                    CloseServiceHandle(serviceControlMgr);
                     return false;
                 }
 
@@ -104,18 +110,18 @@ bool WinServiceInstall()
                 CloseServiceHandle(service);
             }
         }
-        CloseServiceHandle(serviceControlManager);
+        CloseServiceHandle(serviceControlMgr);
     }
     return true;
 }
 
 bool WinServiceUninstall()
 {
-    SC_HANDLE serviceControlManager = OpenSCManager(0, 0, SC_MANAGER_CONNECT);
+    SC_HANDLE serviceControlMgr = OpenSCManager(0, 0, SC_MANAGER_CONNECT);
 
-    if (serviceControlManager)
+    if (serviceControlMgr)
     {
-        SC_HANDLE service = OpenService(serviceControlManager,
+        SC_HANDLE service = OpenService(serviceControlMgr,
                                         serviceName, SERVICE_QUERY_STATUS | DELETE);
         if (service)
         {
@@ -130,7 +136,7 @@ bool WinServiceUninstall()
             CloseServiceHandle(service);
         }
 
-        CloseServiceHandle(serviceControlManager);
+        CloseServiceHandle(serviceControlMgr);
     }
     return true;
 }
@@ -248,7 +254,7 @@ bool WinServiceRun()
 
     if (!StartServiceCtrlDispatcher(serviceTable))
     {
-        LOG_ERROR("server", "StartService Failed. Error [%u]", ::GetLastError());
+        LOG_ERROR("server", "StartService Failed. Error [{}]", ::GetLastError());
         return false;
     }
     return true;

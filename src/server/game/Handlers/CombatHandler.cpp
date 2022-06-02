@@ -1,10 +1,22 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "CreatureAI.h"
+#include "CombatPackets.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "ObjectDefines.h"
@@ -19,7 +31,7 @@ void WorldSession::HandleAttackSwingOpcode(WorldPacket& recvData)
     ObjectGuid guid;
     recvData >> guid;
 
-    LOG_DEBUG("network", "WORLD: Recvd CMSG_ATTACKSWING: %s", guid.ToString().c_str());
+    LOG_DEBUG("network", "WORLD: Recvd CMSG_ATTACKSWING: {}", guid.ToString());
 
     Unit* pEnemy = ObjectAccessor::GetUnit(*_player, guid);
 
@@ -59,18 +71,15 @@ void WorldSession::HandleAttackStopOpcode(WorldPacket& /*recvData*/)
     GetPlayer()->AttackStop();
 }
 
-void WorldSession::HandleSetSheathedOpcode(WorldPacket& recvData)
+void WorldSession::HandleSetSheathedOpcode(WorldPackets::Combat::SetSheathed& packet)
 {
-    uint32 sheathed;
-    recvData >> sheathed;
-
-    if (sheathed >= MAX_SHEATH_STATE)
+    if (packet.CurrentSheathState >= MAX_SHEATH_STATE)
     {
-        LOG_ERROR("network.opcode", "Unknown sheath state %u ??", sheathed);
+        LOG_ERROR("network.opcode", "Unknown sheath state {} ??", packet.CurrentSheathState);
         return;
     }
 
-    GetPlayer()->SetSheath(SheathState(sheathed));
+    _player->SetSheath(SheathState(packet.CurrentSheathState));
 }
 
 void WorldSession::SendAttackStop(Unit const* enemy)

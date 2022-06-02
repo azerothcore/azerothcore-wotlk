@@ -1,10 +1,23 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "azjol_nerub.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "azjol_nerub.h"
 
 enum Spells
 {
@@ -69,14 +82,14 @@ public:
             events2.Reset();
 
             me->SummonCreature(NPC_WATCHER_NARJIL, 511.8f, 666.493f, 776.278f, 0.977f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
-            me->SummonCreature(NPC_SHADOWCASTER, 518.13f, 667.0f, 775.74f, 1.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
+            me->SummonCreature(NPC_SHADOWCASTER, 511.63f, 672.44f, 775.71f, 0.90f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
             me->SummonCreature(NPC_WARRIOR, 506.75f, 670.7f, 776.24f, 0.92f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
             me->SummonCreature(NPC_WATCHER_GASHRA, 526.66f, 663.605f, 775.805f, 1.23f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
-            me->SummonCreature(NPC_SKIRMISHER, 522.23f, 668.97f, 775.66f, 1.18f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
-            me->SummonCreature(NPC_WARRIOR, 532.4f, 666.47f, 775.67f, 1.45f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
+            me->SummonCreature(NPC_SKIRMISHER, 522.91f, 660.18f, 776.19f, 1.28f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
+            me->SummonCreature(NPC_WARRIOR, 528.14f, 659.72f, 776.14f, 1.37f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
             me->SummonCreature(NPC_WATCHER_SILTHIK, 543.826f, 665.123f, 776.245f, 1.55f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
             me->SummonCreature(NPC_SKIRMISHER, 547.5f, 669.96f, 776.1f, 2.3f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
-            me->SummonCreature(NPC_SHADOWCASTER, 536.96f, 667.28f, 775.6f, 1.72f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
+            me->SummonCreature(NPC_SHADOWCASTER, 548.64f, 664.27f, 776.74f, 1.77f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -196,7 +209,7 @@ public:
                     events.ScheduleEvent(EVENT_KRIK_MIND_FLAY, 15000);
                     break;
                 case EVENT_KRIK_CURSE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                         me->CastSpell(target, SPELL_CURSE_OF_FATIGUE, true);
                     events.ScheduleEvent(EVENT_KRIK_CURSE, 10000);
                     break;

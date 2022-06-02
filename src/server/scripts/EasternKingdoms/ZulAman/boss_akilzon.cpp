@@ -1,7 +1,18 @@
-﻿/*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+/*
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -17,8 +28,8 @@ EndScriptData */
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Weather.h"
 #include "zulaman.h"
 
@@ -46,14 +57,15 @@ enum Says
     SAY_DEATH                   = 5
 };
 
-enum Misc
-{
-    NPC_SOARING_EAGLE           = 24858,
-    SE_LOC_X_MAX                = 400,
-    SE_LOC_X_MIN                = 335,
-    SE_LOC_Y_MAX                = 1435,
-    SE_LOC_Y_MIN                = 1370
-};
+constexpr auto NPC_SOARING_EAGLE = 24858;
+
+//enum Misc
+//{
+//    SE_LOC_X_MAX                = 400,
+//    SE_LOC_X_MIN                = 335,
+//    SE_LOC_Y_MAX                = 1435,
+//    SE_LOC_Y_MIN                = 1370
+//};
 
 enum Events
 {
@@ -174,10 +186,10 @@ public:
                     y = 1380.0f + rand() % 60;
                     if (Unit* trigger = me->SummonTrigger(x, y, z, 0, 2000))
                     {
-                        trigger->setFaction(35);
+                        trigger->SetFaction(FACTION_FRIENDLY);
                         trigger->SetMaxHealth(100000);
                         trigger->SetHealth(100000);
-                        trigger->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        trigger->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         if (Cloud)
                             Cloud->CastCustomSpell(trigger, /*43661*/SPELL_ZAP, &bp0, nullptr, nullptr, true, 0, 0, Cloud->GetGUID());
                     }
@@ -213,7 +225,7 @@ public:
                 {
                     case EVENT_STATIC_DISRUPTION:
                         {
-                            Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1);
+                            Unit* target = SelectTarget(SelectTargetMethod::Random, 1);
                             if (!target)
                                 target = me->GetVictim();
                             if (target)
@@ -229,7 +241,7 @@ public:
                         }
                     case EVENT_GUST_OF_WIND:
                         {
-                            Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1);
+                            Unit* target = SelectTarget(SelectTargetMethod::Random, 1);
                             if (!target)
                                 target = me->GetVictim();
                             if (target)
@@ -243,7 +255,7 @@ public:
                         break;
                     case EVENT_ELECTRICAL_STORM:
                         {
-                            Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50, true);
+                            Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50, true);
                             if (!target)
                             {
                                 EnterEvadeMode();
@@ -269,10 +281,10 @@ public:
                                 Cloud->SetDisableGravity(true);
                                 Cloud->StopMoving();
                                 Cloud->SetObjectScale(1.0f);
-                                Cloud->setFaction(35);
+                                Cloud->SetFaction(FACTION_FRIENDLY);
                                 Cloud->SetMaxHealth(9999999);
                                 Cloud->SetHealth(9999999);
-                                Cloud->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                                Cloud->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                             }
                             StormCount = 1;
                             events.ScheduleEvent(EVENT_ELECTRICAL_STORM, 60000); // 60 seconds(bosskillers)
@@ -312,7 +324,7 @@ public:
                             Unit* bird = ObjectAccessor::GetUnit(*me, BirdGUIDs[i]);
                             if (!bird) //they despawned on die
                             {
-                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                                 {
                                     x = target->GetPositionX() + irand(-10, 10);
                                     y = target->GetPositionY() + irand(-10, 10);
@@ -408,7 +420,7 @@ public:
 
             if (arrived)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                 {
                     float x, y, z;
                     if (EagleSwoop_Timer)

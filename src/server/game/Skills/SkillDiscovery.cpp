@@ -1,13 +1,24 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "SkillDiscovery.h"
 #include "DatabaseEnv.h"
 #include "Log.h"
 #include "Player.h"
-#include "SkillDiscovery.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "Util.h"
@@ -43,7 +54,7 @@ void LoadSkillDiscoveryTable()
 
     if (!result)
     {
-        LOG_ERROR("sql.sql", ">> Loaded 0 skill discovery definitions. DB table `skill_discovery_template` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 skill discovery definitions. DB table `skill_discovery_template` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -57,10 +68,10 @@ void LoadSkillDiscoveryTable()
     {
         Field* fields = result->Fetch();
 
-        uint32 spellId         = fields[0].GetUInt32();
-        int32  reqSkillOrSpell = fields[1].GetInt32();
-        uint32 reqSkillValue   = fields[2].GetUInt16();
-        float  chance          = fields[3].GetFloat();
+        uint32 spellId         = fields[0].Get<uint32>();
+        int32  reqSkillOrSpell = fields[1].Get<int32>();
+        uint32 reqSkillValue   = fields[2].Get<uint16>();
+        float  chance          = fields[3].Get<float>();
 
         if (chance <= 0)                                    // chance
         {
@@ -77,7 +88,7 @@ void LoadSkillDiscoveryTable()
             {
                 if (reportedReqSpells.find(absReqSkillOrSpell) == reportedReqSpells.end())
                 {
-                    LOG_ERROR("sql.sql", "Spell (ID: %u) have not existed spell (ID: %i) in `reqSpell` field in `skill_discovery_template` table", spellId, reqSkillOrSpell);
+                    LOG_ERROR("sql.sql", "Spell (ID: {}) have not existed spell (ID: {}) in `reqSpell` field in `skill_discovery_template` table", spellId, reqSkillOrSpell);
                     reportedReqSpells.insert(absReqSkillOrSpell);
                 }
                 continue;
@@ -90,8 +101,8 @@ void LoadSkillDiscoveryTable()
             {
                 if (reportedReqSpells.find(absReqSkillOrSpell) == reportedReqSpells.end())
                 {
-                    LOG_ERROR("sql.sql", "Spell (ID: %u) not have MECHANIC_DISCOVERY (28) value in Mechanic field in spell.dbc"
-                                     " and not 100%% chance random discovery ability but listed for spellId %u (and maybe more) in `skill_discovery_template` table",
+                    LOG_ERROR("sql.sql", "Spell (ID: {}) not have MECHANIC_DISCOVERY (28) value in Mechanic field in spell.dbc"
+                                     " and not 100% chance random discovery ability but listed for spellId {} (and maybe more) in `skill_discovery_template` table",
                                      absReqSkillOrSpell, spellId);
                     reportedReqSpells.insert(absReqSkillOrSpell);
                 }
@@ -106,7 +117,7 @@ void LoadSkillDiscoveryTable()
 
             if (bounds.first == bounds.second)
             {
-                LOG_ERROR("sql.sql", "Spell (ID: %u) not listed in `SkillLineAbility.dbc` but listed with `reqSpell`=0 in `skill_discovery_template` table", spellId);
+                LOG_ERROR("sql.sql", "Spell (ID: {}) not listed in `SkillLineAbility.dbc` but listed with `reqSpell`=0 in `skill_discovery_template` table", spellId);
                 continue;
             }
 
@@ -115,7 +126,7 @@ void LoadSkillDiscoveryTable()
         }
         else
         {
-            LOG_ERROR("sql.sql", "Spell (ID: %u) have negative value in `reqSpell` field in `skill_discovery_template` table", spellId);
+            LOG_ERROR("sql.sql", "Spell (ID: {}) have negative value in `reqSpell` field in `skill_discovery_template` table", spellId);
             continue;
         }
 
@@ -123,7 +134,7 @@ void LoadSkillDiscoveryTable()
     } while (result->NextRow());
 
     if (!ssNonDiscoverableEntries.str().empty())
-        LOG_ERROR("sql.sql", "Some items can't be successfully discovered: have in chance field value < 0.000001 in `skill_discovery_template` DB table . List:\n%s", ssNonDiscoverableEntries.str().c_str());
+        LOG_ERROR("sql.sql", "Some items can't be successfully discovered: have in chance field value < 0.000001 in `skill_discovery_template` DB table . List:\n{}", ssNonDiscoverableEntries.str());
 
     // report about empty data for explicit discovery spells
     for (uint32 spell_id = 1; spell_id < sSpellMgr->GetSpellInfoStoreSize(); ++spell_id)
@@ -137,10 +148,10 @@ void LoadSkillDiscoveryTable()
             continue;
 
         if (SkillDiscoveryStore.find(int32(spell_id)) == SkillDiscoveryStore.end())
-            LOG_ERROR("sql.sql", "Spell (ID: %u) is 100%% chance random discovery ability but not have data in `skill_discovery_template` table", spell_id);
+            LOG_ERROR("sql.sql", "Spell (ID: {}) is 100% chance random discovery ability but not have data in `skill_discovery_template` table", spell_id);
     }
 
-    LOG_INFO("server.loading", ">> Loaded %u skill discovery definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} skill discovery definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 

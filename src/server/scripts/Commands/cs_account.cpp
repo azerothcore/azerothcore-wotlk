@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -11,8 +22,8 @@ Comment: All account related commands
 Category: commandscripts
 EndScriptData */
 
-#include "AccountMgr.h"
 #include "AES.h"
+#include "AccountMgr.h"
 #include "Base32.h"
 #include "Chat.h"
 #include "CryptoGenerics.h"
@@ -27,14 +38,20 @@ EndScriptData */
 #include <openssl/rand.h>
 #include <unordered_map>
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class account_commandscript : public CommandScript
 {
 public:
     account_commandscript() : CommandScript("account_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> accountSetCommandTable =
+        static ChatCommandTable accountSetCommandTable =
         {
             { "addon",      SEC_GAMEMASTER,     true,   &HandleAccountSetAddonCommand,          "" },
             { "gmlevel",    SEC_CONSOLE,        true,   &HandleAccountSetGmLevelCommand,        "" },
@@ -42,24 +59,24 @@ public:
             { "2fa",        SEC_PLAYER,         true,   &HandleAccountSet2FACommand,            "" }
         };
 
-        static std::vector<ChatCommand> accountLockCommandTable
+        static ChatCommandTable accountLockCommandTable
         {
             { "country",    SEC_PLAYER,         true,   &HandleAccountLockCountryCommand,       "" },
             { "ip",         SEC_PLAYER,         true,   &HandleAccountLockIpCommand,            "" }
         };
 
-        static std::vector<ChatCommand> account2faCommandTable
+        static ChatCommandTable account2faCommandTable
         {
             { "setup",      SEC_PLAYER,         false,  &HandleAccount2FASetupCommand,          "" },
             { "remove",     SEC_PLAYER,         false,  &HandleAccount2FARemoveCommand,         "" },
         };
 
-        static std::vector<ChatCommand> accountRemoveCommandTable
+        static ChatCommandTable accountRemoveCommandTable
         {
             { "country",    SEC_ADMINISTRATOR,  true,  &HandleAccountRemoveLockCountryCommand,  "" }
         };
 
-        static std::vector<ChatCommand> accountCommandTable =
+        static ChatCommandTable accountCommandTable =
         {
             { "2fa",        SEC_PLAYER,         true,   nullptr, "", account2faCommandTable        },
             { "addon",      SEC_MODERATOR,      false,  &HandleAccountAddonCommand,             "" },
@@ -73,7 +90,7 @@ public:
             { "",           SEC_PLAYER,         false,  &HandleAccountCommand,                  "" }
         };
 
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "account", SEC_PLAYER, true, nullptr, "", accountCommandTable }
         };
@@ -104,12 +121,12 @@ public:
 
         { // check if 2FA already enabled
             auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_TOTP_SECRET);
-            stmt->setUInt32(0, accountId);
+            stmt->SetData(0, accountId);
             PreparedQueryResult result = LoginDatabase.Query(stmt);
 
             if (!result)
             {
-                LOG_ERROR("misc", "Account %u not found in login database when processing .account 2fa setup command.", accountId);
+                LOG_ERROR("misc", "Account {} not found in login database when processing .account 2fa setup command.", accountId);
                 handler->SendSysMessage(LANG_UNKNOWN_ERROR);
                 handler->SetSentErrorMessage(true);
                 return false;
@@ -138,8 +155,8 @@ public:
                     Acore::Crypto::AEEncryptWithRandomIV<Acore::Crypto::AES>(pair.first->second, *masterKey);
 
                 auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_TOTP_SECRET);
-                stmt->setBinary(0, pair.first->second);
-                stmt->setUInt32(1, accountId);
+                stmt->SetData(0, pair.first->second);
+                stmt->SetData(1, accountId);
                 LoginDatabase.Execute(stmt);
 
                 suggestions.erase(pair.first);
@@ -179,12 +196,12 @@ public:
         Acore::Crypto::TOTP::Secret secret;
         { // get current TOTP secret
             auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_TOTP_SECRET);
-            stmt->setUInt32(0, accountId);
+            stmt->SetData(0, accountId);
             PreparedQueryResult result = LoginDatabase.Query(stmt);
 
             if (!result)
             {
-                LOG_ERROR("misc", "Account %u not found in login database when processing .account 2fa setup command.", accountId);
+                LOG_ERROR("misc", "Account {} not found in login database when processing .account 2fa setup command.", accountId);
                 handler->SendSysMessage(LANG_UNKNOWN_ERROR);
                 handler->SetSentErrorMessage(true);
                 return false;
@@ -198,7 +215,7 @@ public:
                 return false;
             }
 
-            secret = field->GetBinary();
+            secret = field->Get<Binary>();
         }
 
         if (token)
@@ -208,7 +225,7 @@ public:
                 bool success = Acore::Crypto::AEDecrypt<Acore::Crypto::AES>(secret, *masterKey);
                 if (!success)
                 {
-                    LOG_ERROR("misc", "Account %u has invalid ciphertext in TOTP token.", accountId);
+                    LOG_ERROR("misc", "Account {} has invalid ciphertext in TOTP token.", accountId);
                     handler->SendSysMessage(LANG_UNKNOWN_ERROR);
                     handler->SetSentErrorMessage(true);
                     return false;
@@ -218,8 +235,8 @@ public:
             if (Acore::Crypto::TOTP::ValidateToken(secret, *token))
             {
                 auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_TOTP_SECRET);
-                stmt->setNull(0);
-                stmt->setUInt32(1, accountId);
+                stmt->SetData(0);
+                stmt->SetData(1, accountId);
                 LoginDatabase.Execute(stmt);
                 handler->SendSysMessage(LANG_2FA_REMOVE_COMPLETE);
                 return true;
@@ -246,8 +263,8 @@ public:
 
         uint32 accountId = handler->GetSession()->GetAccountId();
 
-        int expansion = atoi(exp); //get int anyway (0 if error)
-        if (expansion < 0 || uint8(expansion) > sWorld->getIntConfig(CONFIG_EXPANSION))
+        auto expansion = Acore::StringTo<uint8>(exp); //get int anyway (0 if error)
+        if (!expansion || *expansion > sWorld->getIntConfig(CONFIG_EXPANSION))
         {
             handler->SendSysMessage(LANG_IMPROPER_VALUE);
             handler->SetSentErrorMessage(true);
@@ -256,12 +273,12 @@ public:
 
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_EXPANSION);
 
-        stmt->setUInt8(0, uint8(expansion));
-        stmt->setUInt32(1, accountId);
+        stmt->SetData(0, *expansion);
+        stmt->SetData(1, accountId);
 
         LoginDatabase.Execute(stmt);
 
-        handler->PSendSysMessage(LANG_ACCOUNT_ADDON, expansion);
+        handler->PSendSysMessage(LANG_ACCOUNT_ADDON, *expansion);
         return true;
     }
 
@@ -284,9 +301,9 @@ public:
                 handler->PSendSysMessage(LANG_ACCOUNT_CREATED, accountName);
                 if (handler->GetSession())
                 {
-                    LOG_DEBUG("warden", "Account: %d (IP: %s) Character:[%s] (%s) Change Password.",
-                                   handler->GetSession()->GetAccountId(), handler->GetSession()->GetRemoteAddress().c_str(),
-                                   handler->GetSession()->GetPlayer()->GetName().c_str(), handler->GetSession()->GetPlayer()->GetGUID().ToString().c_str());
+                    LOG_DEBUG("warden", "Account: {} (IP: {}) Character:[{}] ({}) Change Password.",
+                                   handler->GetSession()->GetAccountId(), handler->GetSession()->GetRemoteAddress(),
+                                   handler->GetSession()->GetPlayer()->GetName(), handler->GetSession()->GetPlayer()->GetGUID().ToString());
                 }
                 break;
             case AOR_NAME_TOO_LONG:
@@ -394,22 +411,22 @@ public:
         do
         {
             Field* fieldsDB = result->Fetch();
-            std::string name = fieldsDB[0].GetString();
-            uint32 account = fieldsDB[1].GetUInt32();
+            std::string name = fieldsDB[0].Get<std::string>();
+            uint32 account = fieldsDB[1].Get<uint32>();
 
             ///- Get the username, last IP and GM level of each account
             // No SQL injection. account is uint32.
             LoginDatabasePreparedStatement* loginStmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_INFO);
-            loginStmt->setUInt32(0, account);
+            loginStmt->SetData(0, account);
             PreparedQueryResult resultLogin = LoginDatabase.Query(loginStmt);
 
             if (resultLogin)
             {
                 Field* fieldsLogin = resultLogin->Fetch();
                 handler->PSendSysMessage(LANG_ACCOUNT_LIST_LINE,
-                                         fieldsLogin[0].GetCString(), name.c_str(), fieldsLogin[1].GetCString(),
-                                         fieldsDB[2].GetUInt16(), fieldsDB[3].GetUInt16(), fieldsLogin[3].GetUInt8(),
-                                         fieldsLogin[2].GetUInt8());
+                                         fieldsLogin[0].Get<std::string>().c_str(), name.c_str(), fieldsLogin[1].Get<std::string>().c_str(),
+                                         fieldsDB[2].Get<uint16>(), fieldsDB[3].Get<uint16>(), fieldsLogin[3].Get<uint8>(),
+                                         fieldsLogin[2].Get<uint8>());
             }
             else
                 handler->PSendSysMessage(LANG_ACCOUNT_LIST_ERROR, name.c_str());
@@ -450,8 +467,8 @@ public:
         }
 
         auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK_COUNTRY);
-        stmt->setString(0, "00");
-        stmt->setUInt32(1, accountId);
+        stmt->SetData(0, "00");
+        stmt->SetData(1, accountId);
         LoginDatabase.Execute(stmt);
         handler->PSendSysMessage(LANG_COMMAND_ACCLOCKUNLOCKED);
 
@@ -476,8 +493,8 @@ public:
                 if (IpLocationRecord const* location = sIPLocation->GetLocationRecord(handler->GetSession()->GetRemoteAddress()))
                 {
                     auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK_COUNTRY);
-                    stmt->setString(0, location->CountryCode);
-                    stmt->setUInt32(1, handler->GetSession()->GetAccountId());
+                    stmt->SetData(0, location->CountryCode);
+                    stmt->SetData(1, handler->GetSession()->GetAccountId());
                     LoginDatabase.Execute(stmt);
                     handler->PSendSysMessage(LANG_COMMAND_ACCLOCKLOCKED);
                 }
@@ -491,8 +508,8 @@ public:
             else if (param == "off")
             {
                 auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK_COUNTRY);
-                stmt->setString(0, "00");
-                stmt->setUInt32(1, handler->GetSession()->GetAccountId());
+                stmt->SetData(0, "00");
+                stmt->SetData(1, handler->GetSession()->GetAccountId());
                 LoginDatabase.Execute(stmt);
                 handler->PSendSysMessage(LANG_COMMAND_ACCLOCKUNLOCKED);
             }
@@ -521,16 +538,16 @@ public:
 
             if (param == "on")
             {
-                stmt->setBool(0, true);                                     // locked
+                stmt->SetData(0, true);                                     // locked
                 handler->PSendSysMessage(LANG_COMMAND_ACCLOCKLOCKED);
             }
             else if (param == "off")
             {
-                stmt->setBool(0, false);                                    // unlocked
+                stmt->SetData(0, false);                                    // unlocked
                 handler->PSendSysMessage(LANG_COMMAND_ACCLOCKUNLOCKED);
             }
 
-            stmt->setUInt32(1, handler->GetSession()->GetAccountId());
+            stmt->SetData(1, handler->GetSession()->GetAccountId());
 
             LoginDatabase.Execute(stmt);
             return true;
@@ -641,8 +658,8 @@ public:
         if (secret == "off")
         {
             auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_TOTP_SECRET);
-            stmt->setNull(0);
-            stmt->setUInt32(1, targetAccountId);
+            stmt->SetData(0);
+            stmt->SetData(1, targetAccountId);
             LoginDatabase.Execute(stmt);
             handler->PSendSysMessage(LANG_2FA_REMOVE_COMPLETE);
             return true;
@@ -675,8 +692,8 @@ public:
             Acore::Crypto::AEEncryptWithRandomIV<Acore::Crypto::AES>(*decoded, *masterKey);
 
         auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_TOTP_SECRET);
-        stmt->setBinary(0, *decoded);
-        stmt->setUInt32(1, targetAccountId);
+        stmt->SetData(0, *decoded);
+        stmt->SetData(1, targetAccountId);
         LoginDatabase.Execute(stmt);
 
         handler->PSendSysMessage(LANG_2FA_SECRET_SET_COMPLETE, accountName.c_str());
@@ -739,18 +756,18 @@ public:
                 handler->HasLowerSecurityAccount(nullptr, accountId, true))
             return false;
 
-        int expansion = atoi(exp); //get int anyway (0 if error)
-        if (expansion < 0 || uint8(expansion) > sWorld->getIntConfig(CONFIG_EXPANSION))
+        auto expansion = Acore::StringTo<uint8>(exp); //get int anyway (0 if error)
+        if (!expansion || *expansion > sWorld->getIntConfig(CONFIG_EXPANSION))
             return false;
 
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_EXPANSION);
 
-        stmt->setUInt8(0, expansion);
-        stmt->setUInt32(1, accountId);
+        stmt->SetData(0, *expansion);
+        stmt->SetData(1, accountId);
 
         LoginDatabase.Execute(stmt);
 
-        handler->PSendSysMessage(LANG_ACCOUNT_SETADDON, accountName.c_str(), accountId, expansion);
+        handler->PSendSysMessage(LANG_ACCOUNT_SETADDON, accountName.c_str(), accountId, *expansion);
         return true;
     }
 
@@ -792,7 +809,7 @@ public:
         }
 
         // Check for invalid specified GM level.
-        gm = (isAccountNameGiven) ? atoi(arg2) : atoi(arg1);
+        gm = (isAccountNameGiven) ? Acore::StringTo<int32>(arg2).value_or(0) : Acore::StringTo<int32>(arg1).value_or(0);
         if (gm > SEC_CONSOLE)
         {
             handler->SendSysMessage(LANG_BAD_VALUE);
@@ -802,7 +819,7 @@ public:
 
         // handler->getSession() == nullptr only for console
         targetAccountId = (isAccountNameGiven) ? AccountMgr::GetId(targetAccountName) : handler->getSelectedPlayer()->GetSession()->GetAccountId();
-        int32 gmRealmID = (isAccountNameGiven) ? atoi(arg3) : atoi(arg2);
+        int32 gmRealmID = (isAccountNameGiven) ? Acore::StringTo<int32>(arg3).value_or(0) : Acore::StringTo<int32>(arg2).value_or(0);
         uint32 playerSecurity;
         if (handler->GetSession())
             playerSecurity = AccountMgr::GetSecurity(handler->GetSession()->GetAccountId(), gmRealmID);
@@ -824,8 +841,8 @@ public:
         {
             LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_ACCESS_GMLEVEL_TEST);
 
-            stmt->setUInt32(0, targetAccountId);
-            stmt->setUInt8(1, uint8(gm));
+            stmt->SetData(0, targetAccountId);
+            stmt->SetData(1, uint8(gm));
 
             PreparedQueryResult result = LoginDatabase.Query(stmt);
 
@@ -851,13 +868,13 @@ public:
         if (gmRealmID == -1)
         {
             stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_ACCOUNT_ACCESS);
-            stmt->setUInt32(0, targetAccountId);
+            stmt->SetData(0, targetAccountId);
         }
         else
         {
             stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_ACCOUNT_ACCESS_BY_REALM);
-            stmt->setUInt32(0, targetAccountId);
-            stmt->setUInt32(1, realm.Id.Realm);
+            stmt->SetData(0, targetAccountId);
+            stmt->SetData(1, realm.Id.Realm);
         }
 
         LoginDatabase.Execute(stmt);
@@ -866,9 +883,9 @@ public:
         {
             stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT_ACCESS);
 
-            stmt->setUInt32(0, targetAccountId);
-            stmt->setUInt8(1, uint8(gm));
-            stmt->setInt32(2, gmRealmID);
+            stmt->SetData(0, targetAccountId);
+            stmt->SetData(1, uint8(gm));
+            stmt->SetData(2, gmRealmID);
 
             LoginDatabase.Execute(stmt);
         }

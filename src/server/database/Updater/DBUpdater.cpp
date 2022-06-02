@@ -1,6 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "DBUpdater.h"
@@ -13,7 +25,7 @@
 #include "QueryResult.h"
 #include "StartProcess.h"
 #include "UpdateFetcher.h"
-#include <boost/filesystem/operations.hpp>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 
@@ -27,7 +39,7 @@ std::string DBUpdaterUtil::GetCorrectedMySQLExecutable()
 
 bool DBUpdaterUtil::CheckExecutable()
 {
-    boost::filesystem::path exe(GetCorrectedMySQLExecutable());
+    std::filesystem::path exe(GetCorrectedMySQLExecutable());
     if (!is_regular_file(exe))
     {
         exe = Acore::SearchExecutableInPath("mysql");
@@ -38,8 +50,8 @@ bool DBUpdaterUtil::CheckExecutable()
             return true;
         }
 
-        LOG_FATAL("sql.updates", "Didn't find any executable MySQL binary at \'%s\' or in path, correct the path in the *.conf (\"MySQLExecutable\").",
-            absolute(exe).generic_string().c_str());
+        LOG_FATAL("sql.updates", "Didn't find any executable MySQL binary at \'{}\' or in path, correct the path in the *.conf (\"MySQLExecutable\").",
+            absolute(exe).generic_string());
 
         return false;
     }
@@ -158,15 +170,18 @@ BaseLocation DBUpdater<T>::GetBaseLocationType()
 template<class T>
 bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
 {
-    LOG_WARN("sql.updates", "Database \"%s\" does not exist, do you want to create it? [yes (default) / no]: ",
-             pool.GetConnectionInfo()->database.c_str());
+    LOG_WARN("sql.updates", "Database \"{}\" does not exist, do you want to create it? [yes (default) / no]: ",
+             pool.GetConnectionInfo()->database);
 
-    std::string answer;
-    std::getline(std::cin, answer);
-    if (!answer.empty() && !(answer.substr(0, 1) == "y"))
-        return false;
+    if (!sConfigMgr->isDryRun())
+    {
+        std::string answer;
+        std::getline(std::cin, answer);
+        if (!answer.empty() && !(answer.substr(0, 1) == "y"))
+            return false;
+    }
 
-    LOG_INFO("sql.updates", "Creating database \"%s\"...", pool.GetConnectionInfo()->database.c_str());
+    LOG_INFO("sql.updates", "Creating database \"{}\"...", pool.GetConnectionInfo()->database);
 
     // Path of temp file
     static Path const temp("create_table.sql");
@@ -175,12 +190,11 @@ bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
     std::ofstream file(temp.generic_string());
     if (!file.is_open())
     {
-        LOG_FATAL("sql.updates", "Failed to create temporary query file \"%s\"!", temp.generic_string().c_str());
+        LOG_FATAL("sql.updates", "Failed to create temporary query file \"{}\"!", temp.generic_string());
         return false;
     }
 
     file << "CREATE DATABASE `" << pool.GetConnectionInfo()->database << "` DEFAULT CHARACTER SET UTF8MB4 COLLATE utf8mb4_general_ci;\n\n";
-
     file.close();
 
     try
@@ -190,40 +204,40 @@ bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
     }
     catch (UpdateException&)
     {
-        LOG_FATAL("sql.updates", "Failed to create database %s! Does the user (named in *.conf) have `CREATE`, `ALTER`, `DROP`, `INSERT` and `DELETE` privileges on the MySQL server?", pool.GetConnectionInfo()->database.c_str());
-        boost::filesystem::remove(temp);
+        LOG_FATAL("sql.updates", "Failed to create database {}! Does the user (named in *.conf) have `CREATE`, `ALTER`, `DROP`, `INSERT` and `DELETE` privileges on the MySQL server?", pool.GetConnectionInfo()->database);
+        std::filesystem::remove(temp);
         return false;
     }
 
     LOG_INFO("sql.updates", "Done.");
     LOG_INFO("sql.updates", " ");
-    boost::filesystem::remove(temp);
+    std::filesystem::remove(temp);
     return true;
 }
 
 template<class T>
-bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool)
+bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::string_view modulesList /*= {}*/)
 {
     if (!DBUpdaterUtil::CheckExecutable())
         return false;
 
-    LOG_INFO("sql.updates", "Updating %s database...", DBUpdater<T>::GetTableName().c_str());
+    LOG_INFO("sql.updates", "Updating {} database...", DBUpdater<T>::GetTableName());
 
     Path const sourceDirectory(BuiltInConfig::GetSourceDirectory());
 
     if (!is_directory(sourceDirectory))
     {
-        LOG_ERROR("sql.updates", "DBUpdater: The given source directory %s does not exist, change the path to the directory where your sql directory exists (for example c:\\source\\trinitycore). Shutting down.",
-                  sourceDirectory.generic_string().c_str());
+        LOG_ERROR("sql.updates", "DBUpdater: The given source directory {} does not exist, change the path to the directory where your sql directory exists (for example c:\\source\\trinitycore). Shutting down.",
+                  sourceDirectory.generic_string());
         return false;
     }
 
     auto CheckUpdateTable = [&](std::string const& tableName)
     {
-        auto checkTable = DBUpdater<T>::Retrieve(pool, Acore::StringFormat("SHOW TABLES LIKE '%s'", tableName.c_str()));
+        auto checkTable = DBUpdater<T>::Retrieve(pool, Acore::StringFormatFmt("SHOW TABLES LIKE '{}'", tableName));
         if (!checkTable)
         {
-            LOG_WARN("sql.updates", "> Table '%s' not exist! Try add based table", tableName.c_str());
+            LOG_WARN("sql.updates", "> Table '{}' not exist! Try add based table", tableName);
 
             Path const temp(GetBaseFilesDirectory() + tableName + ".sql");
 
@@ -233,7 +247,7 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool)
             }
             catch (UpdateException&)
             {
-                LOG_FATAL("sql.updates", "Failed apply file to database %s! Does the user (named in *.conf) have `INSERT` and `DELETE` privileges on the MySQL server?", pool.GetConnectionInfo()->database.c_str());
+                LOG_FATAL("sql.updates", "Failed apply file to database {}! Does the user (named in *.conf) have `INSERT` and `DELETE` privileges on the MySQL server?", pool.GetConnectionInfo()->database);
                 return false;
             }
 
@@ -248,7 +262,7 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool)
 
     UpdateFetcher updateFetcher(sourceDirectory, [&](std::string const & query) { DBUpdater<T>::Apply(pool, query); },
     [&](Path const & file) { DBUpdater<T>::ApplyFile(pool, file); },
-    [&](std::string const & query) -> QueryResult { return DBUpdater<T>::Retrieve(pool, query); }, DBUpdater<T>::GetDBModuleName());
+    [&](std::string const & query) -> QueryResult { return DBUpdater<T>::Retrieve(pool, query); }, DBUpdater<T>::GetDBModuleName(), modulesList);
 
     UpdateResult result;
     try
@@ -264,15 +278,75 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool)
         return false;
     }
 
-    std::string const info = Acore::StringFormat("Containing " SZFMTD " new and " SZFMTD " archived updates.",
-                             result.recent, result.archived);
+    std::string const info = Acore::StringFormatFmt("Containing {} new and {} archived updates.", result.recent, result.archived);
 
     if (!result.updated)
-        LOG_INFO("sql.updates", ">> %s database is up-to-date! %s", DBUpdater<T>::GetTableName().c_str(), info.c_str());
+        LOG_INFO("sql.updates", ">> {} database is up-to-date! {}", DBUpdater<T>::GetTableName(), info);
     else
-        LOG_INFO("sql.updates", ">> Applied " SZFMTD " %s. %s", result.updated, result.updated == 1 ? "query" : "queries", info.c_str());
+        LOG_INFO("sql.updates", ">> Applied {} {}. {}", result.updated, result.updated == 1 ? "query" : "queries", info);
 
     LOG_INFO("sql.updates", " ");
+
+    return true;
+}
+
+template<class T>
+bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::vector<std::string> const* setDirectories)
+{
+    if (!DBUpdaterUtil::CheckExecutable())
+    {
+        return false;
+    }
+
+    Path const sourceDirectory(BuiltInConfig::GetSourceDirectory());
+    if (!is_directory(sourceDirectory))
+    {
+        return false;
+    }
+
+    auto CheckUpdateTable = [&](std::string const& tableName)
+    {
+        auto checkTable = DBUpdater<T>::Retrieve(pool, Acore::StringFormatFmt("SHOW TABLES LIKE '{}'", tableName));
+        if (!checkTable)
+        {
+            Path const temp(GetBaseFilesDirectory() + tableName + ".sql");
+            try
+            {
+                DBUpdater<T>::ApplyFile(pool, temp);
+            }
+            catch (UpdateException&)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        return true;
+    };
+
+    if (!CheckUpdateTable("updates") || !CheckUpdateTable("updates_include"))
+    {
+        return false;
+    }
+
+    UpdateFetcher updateFetcher(sourceDirectory, [&](std::string const & query) { DBUpdater<T>::Apply(pool, query); },
+    [&](Path const & file) { DBUpdater<T>::ApplyFile(pool, file); },
+    [&](std::string const & query) -> QueryResult { return DBUpdater<T>::Retrieve(pool, query); }, DBUpdater<T>::GetDBModuleName(), setDirectories);
+
+    UpdateResult result;
+    try
+    {
+        result = updateFetcher.Update(
+                     sConfigMgr->GetOption<bool>("Updates.Redundancy", true),
+                     sConfigMgr->GetOption<bool>("Updates.AllowRehash", true),
+                     sConfigMgr->GetOption<bool>("Updates.ArchivedRedundancy", false),
+                     sConfigMgr->GetOption<int32>("Updates.CleanDeadRefMaxCount", 3));
+    }
+    catch (UpdateException&)
+    {
+        return false;
+    }
 
     return true;
 }
@@ -289,27 +363,27 @@ bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
     if (!DBUpdaterUtil::CheckExecutable())
         return false;
 
-    LOG_INFO("sql.updates", "Database %s is empty, auto populating it...", DBUpdater<T>::GetTableName().c_str());
+    LOG_INFO("sql.updates", "Database {} is empty, auto populating it...", DBUpdater<T>::GetTableName());
 
     std::string const DirPathStr = DBUpdater<T>::GetBaseFilesDirectory();
 
     Path const DirPath(DirPathStr);
-    if (!boost::filesystem::is_directory(DirPath))
+    if (!std::filesystem::is_directory(DirPath))
     {
-        LOG_ERROR("sql.updates", ">> Directory \"%s\" not exist", DirPath.generic_string().c_str());
+        LOG_ERROR("sql.updates", ">> Directory \"{}\" not exist", DirPath.generic_string());
         return false;
     }
 
     if (DirPath.empty())
     {
-        LOG_ERROR("sql.updates", ">> Directory \"%s\" is empty", DirPath.generic_string().c_str());
+        LOG_ERROR("sql.updates", ">> Directory \"{}\" is empty", DirPath.generic_string());
         return false;
     }
 
-    boost::filesystem::directory_iterator const DirItr;
+    std::filesystem::directory_iterator const DirItr;
     uint32 FilesCount = 0;
 
-    for (boost::filesystem::directory_iterator itr(DirPath); itr != DirItr; ++itr)
+    for (std::filesystem::directory_iterator itr(DirPath); itr != DirItr; ++itr)
     {
         if (itr->path().extension() == ".sql")
             FilesCount++;
@@ -317,16 +391,16 @@ bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
 
     if (!FilesCount)
     {
-        LOG_ERROR("sql.updates", ">> In directory \"%s\" not exist '*.sql' files", DirPath.generic_string().c_str());
+        LOG_ERROR("sql.updates", ">> In directory \"{}\" not exist '*.sql' files", DirPath.generic_string());
         return false;
     }
 
-    for (boost::filesystem::directory_iterator itr(DirPath); itr != DirItr; ++itr)
+    for (std::filesystem::directory_iterator itr(DirPath); itr != DirItr; ++itr)
     {
         if (itr->path().extension() != ".sql")
             continue;
 
-        LOG_INFO("sql.updates", ">> Applying \'%s\'...", itr->path().filename().generic_string().c_str());
+        LOG_INFO("sql.updates", ">> Applying \'{}\'...", itr->path().filename().generic_string());
 
         try
         {
@@ -405,8 +479,17 @@ void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& hos
     // Set max allowed packet to 1 GB
     args.emplace_back("--max-allowed-packet=1GB");
 
+#if !defined(MARIADB_VERSION_ID) && MYSQL_VERSION_ID >= 80000
+
+    if (ssl == "ssl")
+        args.emplace_back("--ssl-mode=REQUIRED");
+
+#else
+
     if (ssl == "ssl")
         args.emplace_back("--ssl");
+
+#endif
 
     // Database
     if (!database.empty())
@@ -418,12 +501,12 @@ void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& hos
 
     if (ret != EXIT_SUCCESS)
     {
-        LOG_FATAL("sql.updates", "Applying of file \'%s\' to database \'%s\' failed!" \
+        LOG_FATAL("sql.updates", "Applying of file \'{}\' to database \'{}\' failed!" \
             " If you are a user, please pull the latest revision from the repository. "
             "Also make sure you have not applied any of the databases with your sql client. "
             "You cannot use auto-update system and import sql files from AzerothCore repository with your sql client. "
             "If you are a developer, please fix your sql query.",
-            path.generic_string().c_str(), pool.GetConnectionInfo()->database.c_str());
+            path.generic_string(), pool.GetConnectionInfo()->database);
 
         throw UpdateException("update failed");
     }

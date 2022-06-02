@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ACORE_MOTIONMASTER_H
@@ -87,9 +98,9 @@ struct ChaseAngle
     float RelativeAngle; // we want to be at this angle relative to the target (0 = front, M_PI = back)
     float Tolerance;     // but we'll tolerate anything within +- this much
 
-    float UpperBound() const;
-    float LowerBound() const;
-    bool IsAngleOkay(float relativeAngle) const;
+    [[nodiscard]] float UpperBound() const;
+    [[nodiscard]] float LowerBound() const;
+    [[nodiscard]] bool IsAngleOkay(float relativeAngle) const;
 };
 
 // assume it is 25 yard per 0.6 second
@@ -207,7 +218,8 @@ public:
     void MoveTakeoff(uint32 id, Position const& pos, float speed = 0.0f);
     void MoveTakeoff(uint32 id, float x, float y, float z, float speed = 0.0f); // pussywizard: added for easy calling by passing 3 floats x, y, z
 
-    void MoveCharge(float x, float y, float z, float speed = SPEED_CHARGE, uint32 id = EVENT_CHARGE, const Movement::PointsArray* path = nullptr, bool generatePath = false, float orientation = 0.0f);
+    void MoveCharge(float x, float y, float z, float speed = SPEED_CHARGE, uint32 id = EVENT_CHARGE, const Movement::PointsArray* path = nullptr, bool generatePath = false, float orientation = 0.0f, ObjectGuid targetGUID = ObjectGuid::Empty);
+    void MoveCharge(PathGenerator const& path, float speed = SPEED_CHARGE, ObjectGuid targetGUID = ObjectGuid::Empty);
     void MoveKnockbackFrom(float srcX, float srcY, float speedXY, float speedZ);
     void MoveJumpTo(float angle, float speedXY, float speedZ);
     void MoveJump(Position const& pos, float speedXY, float speedZ, uint32 id = 0)

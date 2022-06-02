@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -12,11 +23,11 @@ SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
 #include "Item.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Spell.h"
-#include "temple_of_ahnqiraj.h"
 #include "WorldPacket.h"
+#include "temple_of_ahnqiraj.h"
 
 enum Spells
 {
@@ -104,7 +115,7 @@ struct boss_twinemperorsAI : public ScriptedAI
             if (ohealth <= 0)
             {
                 pOtherBoss->setDeathState(JUST_DIED);
-                pOtherBoss->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+                pOtherBoss->SetDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
             }
         }
     }
@@ -116,7 +127,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         {
             pOtherBoss->SetHealth(0);
             pOtherBoss->setDeathState(JUST_DIED);
-            pOtherBoss->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+            pOtherBoss->SetDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
             CAST_AI(boss_twinemperorsAI, pOtherBoss->AI())->DontYellWhenDead = true;
         }
         if (!DontYellWhenDead)                              // I hope AI is not threaded
@@ -146,7 +157,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit* caster, const SpellInfo* entry) override
+    void SpellHit(Unit* caster, SpellInfo const* entry) override
     {
         if (caster == me)
             return;
@@ -202,7 +213,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         Creature* pOtherBoss = GetOtherBoss();
         if (pOtherBoss)
         {
-            //me->MonsterYell("Teleporting ...", LANG_UNIVERSAL, 0);
+            //me->Yell("Teleporting ...", LANG_UNIVERSAL);
             Position thisPos;
             thisPos.Relocate(me);
             Position otherPos;
@@ -246,7 +257,7 @@ struct boss_twinemperorsAI : public ScriptedAI
                 me->ClearUnitState(UNIT_STATE_STUNNED);
                 if (Unit* nearu = me->SelectNearestTarget(100))
                 {
-                    //DoYell(nearu->GetName(), LANG_UNIVERSAL, 0);
+                    //DoYell(nearu->GetName(), LANG_UNIVERSAL);
                     AttackStart(nearu);
                     me->AddThreat(nearu, 10000);
                 }
@@ -278,9 +289,9 @@ struct boss_twinemperorsAI : public ScriptedAI
         if (!who || me->GetVictim())
             return;
 
-        if (me->_CanDetectFeignDeathOf(who) && me->CanCreatureAttack(who))
+        if (me->CanCreatureAttack(who))
         {
-            if (me->IsWithinDistInMap(who, PULL_RANGE) && me->GetDistanceZ(who) <= /*CREATURE_Z_ATTACK_RANGE*/7 /*there are stairs*/)
+            if (me->IsWithinDistInMap(who, PULL_RANGE, true, false) && me->GetDistanceZ(who) <= /*CREATURE_Z_ATTACK_RANGE*/7 /*there are stairs*/)
             {
                 //if (who->HasStealthAura())
                 //    who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
@@ -308,7 +319,7 @@ struct boss_twinemperorsAI : public ScriptedAI
                 if (c->isDead())
                 {
                     c->Respawn();
-                    c->setFaction(7);
+                    c->SetFaction(FACTION_CREATURE);
                     c->RemoveAllAuras();
                 }
                 if (c->IsWithinDistInMap(me, ABUSE_BUG_RANGE))
@@ -403,8 +414,8 @@ public:
 
         void CastSpellOnBug(Creature* target) override
         {
-            target->setFaction(14);
-            target->AI()->AttackStart(me->getThreatManager().getHostilTarget());
+            target->SetFaction(FACTION_MONSTER);
+            target->AI()->AttackStart(me->GetThreatMgr().getHostileTarget());
             target->AddAura(SPELL_MUTATE_BUG, target);
             target->SetFullHealth();
         }
@@ -428,7 +439,7 @@ public:
 
             if (UpperCut_Timer <= diff)
             {
-                Unit* randomMelee = SelectTarget(SELECT_TARGET_RANDOM, 0, NOMINAL_MELEE_RANGE, true);
+                Unit* randomMelee = SelectTarget(SelectTargetMethod::Random, 0, NOMINAL_MELEE_RANGE, true);
                 if (randomMelee)
                     DoCast(randomMelee, SPELL_UPPERCUT);
                 UpperCut_Timer = 15000 + rand() % 15000;
@@ -475,7 +486,6 @@ public:
         uint32 Scorpions_Timer;
         int Rand;
         int RandX;
-        int RandY;
 
         Creature* Summoned;
 
@@ -493,7 +503,7 @@ public:
 
         void CastSpellOnBug(Creature* target) override
         {
-            target->setFaction(14);
+            target->SetFaction(FACTION_MONSTER);
             target->AddAura(SPELL_EXPLODEBUG, target);
             target->SetFullHealth();
         }
@@ -526,10 +536,11 @@ public:
             //Blizzard_Timer
             if (Blizzard_Timer <= diff)
             {
-                Unit* target = nullptr;
-                target = SelectTarget(SELECT_TARGET_RANDOM, 0, 45, true);
+                Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 45, true);
                 if (target)
+                {
                     DoCast(target, SPELL_BLIZZARD);
+                }
                 Blizzard_Timer = 15000 + rand() % 15000;
             }
             else Blizzard_Timer -= diff;
@@ -537,7 +548,7 @@ public:
             if (ArcaneBurst_Timer <= diff)
             {
                 Unit* mvic;
-                if ((mvic = SelectTarget(SELECT_TARGET_NEAREST, 0, NOMINAL_MELEE_RANGE, true)) != nullptr)
+                if ((mvic = SelectTarget(SelectTargetMethod::MaxDistance, 0, NOMINAL_MELEE_RANGE, true)) != nullptr)
                 {
                     DoCast(mvic, SPELL_ARCANEBURST);
                     ArcaneBurst_Timer = 5000;

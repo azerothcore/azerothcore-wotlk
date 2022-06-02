@@ -1,11 +1,26 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #ifndef DEF_STRATHOLME_H
 #define DEF_STRATHOLME_H
 
 #include "SpellAuras.h"
+
+#define StratholmeScriptName "instance_stratholme"
 
 enum DataTypes
 {
@@ -18,6 +33,8 @@ enum DataTypes
 
     DATA_BARON_RUN_NONE                 = 0,
     DATA_BARON_RUN_GATE                 = 1,
+    DATA_JARIEN                         = 2,
+    DATA_SOTHOS                         = 3
 };
 
 enum CreatureIds
@@ -32,10 +49,19 @@ enum CreatureIds
     NPC_PLAGUED_RAT                     = 10441,
     NPC_PLAGUED_INSECT                  = 10461,
     NPC_PLAGUED_MAGGOT                  = 10536,
+    NPC_JARIEN                          = 16101,
+    NPC_SOTHOS                          = 16102,
+    NPC_SPIRIT_OF_JARIEN                = 16103,
+    NPC_SPIRIT_OF_SOTHOS                = 16104
 };
 
 enum GameobjectIds
 {
+    GO_CRUSADER_SQUARE_DOOR             = 175967,
+    GO_HOARD_DOOR                       = 175968,
+    GO_HALL_OF_HIGH_COMMAND             = 176194,
+    GO_GAUNTLET_DOOR_1                  = 175357,
+    GO_GAUNTLET_DOOR_2                  = 175356,
     GO_ZIGGURAT_DOORS1                  = 175380,  // baroness
     GO_ZIGGURAT_DOORS2                  = 175379,  // nerub'enkan
     GO_ZIGGURAT_DOORS3                  = 175381,  // maleki
@@ -49,6 +75,7 @@ enum GameobjectIds
     GO_PORT_TRAP_GATE_2                 = 175350,  // Gate trap scarlet side
     GO_PORT_TRAP_GATE_3                 = 175355,  // Gate trap undead side
     GO_PORT_TRAP_GATE_4                 = 175354,
+    GO_JARIEN_AND_SOTHOS_HEIRLOOMS      = 181083
 };
 
 enum MiscIds
@@ -76,5 +103,13 @@ enum MiscIds
 
     SPELL_BARON_ULTIMATUM               = 27861
 };
+
+template <class AI, class T>
+inline AI* GetStratholmeAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, StratholmeScriptName);
+}
+
+#define RegisterStratholmeCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetStratholmeAI)
 
 #endif

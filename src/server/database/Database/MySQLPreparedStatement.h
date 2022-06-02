@@ -1,6 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef MySQLPreparedStatement_h__
@@ -24,7 +36,7 @@ friend class MySQLConnection;
 friend class PreparedStatementBase;
 
 public:
-    MySQLPreparedStatement(MySQLStmt* stmt, std::string queryString);
+    MySQLPreparedStatement(MySQLStmt* stmt, std::string_view queryString);
     ~MySQLPreparedStatement();
 
     void BindParameters(PreparedStatementBase* stmt);
@@ -32,18 +44,19 @@ public:
     uint32 GetParameterCount() const { return m_paramCount; }
 
 protected:
-    void SetParameter(uint8 index, std::nullptr_t);
-    void SetParameter(uint8 index, bool value);
+    void SetParameter(const uint8 index, bool value);
+    void SetParameter(const uint8 index, std::nullptr_t /*value*/);
+    void SetParameter(const uint8 index, std::string const& value);
+    void SetParameter(const uint8 index, std::vector<uint8> const& value);
+
     template<typename T>
-    void SetParameter(uint8 index, T value);
-    void SetParameter(uint8 index, std::string const& value);
-    void SetParameter(uint8 index, std::vector<uint8> const& value);
+    void SetParameter(const uint8 index, T value);
 
     MySQLStmt* GetSTMT() { return m_Mstmt; }
     MySQLBind* GetBind() { return m_bind; }
     PreparedStatementBase* m_stmt;
     void ClearParameters();
-    void AssertValidIndex(uint8 index);
+    void AssertValidIndex(const uint8 index);
     std::string getQueryString() const;
 
 private:
@@ -51,7 +64,7 @@ private:
     uint32 m_paramCount;
     std::vector<bool> m_paramsSet;
     MySQLBind* m_bind;
-    std::string const m_queryString;
+    std::string m_queryString{};
 
     MySQLPreparedStatement(MySQLPreparedStatement const& right) = delete;
     MySQLPreparedStatement& operator=(MySQLPreparedStatement const& right) = delete;

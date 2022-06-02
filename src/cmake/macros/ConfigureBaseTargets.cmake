@@ -1,6 +1,13 @@
 #
-# Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-# Copyright (C) 2008-2019 TrinityCore <https://www.trinitycore.org/>
+# This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+#
+# This file is free software; as a special exception the author gives
+# unlimited permission to copy and/or distribute it, with or without
+# modifications, as long as this notice is preserved.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
 
 # An interface library to make the target com available to other targets
@@ -9,28 +16,9 @@ add_library(acore-compile-option-interface INTERFACE)
 # Use -std=c++11 instead of -std=gnu++11
 set(CXX_EXTENSIONS OFF)
 
-# Enable support С++17
-set(CMAKE_CXX_STANDARD 17)
-message(STATUS "Enabled С++17 support")
-
-# An interface library to make the target features available to other targets
-add_library(acore-feature-interface INTERFACE)
-
-target_compile_features(acore-feature-interface
-  INTERFACE
-    cxx_alias_templates
-    cxx_auto_type
-    cxx_constexpr
-    cxx_decltype
-    cxx_decltype_auto
-    cxx_final
-    cxx_lambdas
-    cxx_generic_lambdas
-    cxx_variadic_templates
-    cxx_defaulted_functions
-    cxx_nullptr
-    cxx_trailing_return_types
-    cxx_return_type_deduction)
+# Enable C++20 support
+set(CMAKE_CXX_STANDARD 20)
+message(STATUS "Enabled С++20 standard")
 
 # An interface library to make the warnings level available to other targets
 # This interface taget is set-up through the platform specific script
@@ -38,10 +26,10 @@ add_library(acore-warning-interface INTERFACE)
 
 # An interface used for all other interfaces
 add_library(acore-default-interface INTERFACE)
+
 target_link_libraries(acore-default-interface
   INTERFACE
-    acore-compile-option-interface
-    acore-feature-interface)
+    acore-compile-option-interface)
 
 # An interface used for silencing all warnings
 add_library(acore-no-warning-interface INTERFACE)

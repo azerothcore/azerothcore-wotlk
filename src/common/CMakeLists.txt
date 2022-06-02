@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+# This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -8,6 +8,7 @@
 # This program is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
 
 CollectSourceFiles(
   ${CMAKE_CURRENT_SOURCE_DIR}
@@ -15,7 +16,20 @@ CollectSourceFiles(
   # Exclude
   ${CMAKE_CURRENT_SOURCE_DIR}/Debugging
   ${CMAKE_CURRENT_SOURCE_DIR}/Platform
+  ${CMAKE_CURRENT_SOURCE_DIR}/Collision
+  ${CMAKE_CURRENT_SOURCE_DIR}/Navigation
   ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders)
+
+if (BUILD_APPLICATION_WORLDSERVER OR BUILD_TOOLS_MAPS)
+  unset(PRIVATE_SOURCES)
+  CollectSourceFiles(
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    PRIVATE_SOURCES
+    # Exclude
+    ${CMAKE_CURRENT_SOURCE_DIR}/Debugging
+    ${CMAKE_CURRENT_SOURCE_DIR}/Platform
+    ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders)
+endif()
 
 # Manually set sources for Debugging directory as we don't want to include WheatyExceptionReport in common project
 # It needs to be included both in authserver and worldserver for the static global variable to be properly initialized
@@ -52,17 +66,22 @@ target_link_libraries(common
   PRIVATE
     acore-core-interface
   PUBLIC
-    ace
     boost
     argon2
-    g3dlib
-    Detour
     sfmt
     utf8cpp
     openssl
     threads
     jemalloc
+    stdfs
     fmt)
+
+if (BUILD_APPLICATION_WORLDSERVER OR BUILD_TOOLS_MAPS)
+  target_link_libraries(common
+    PUBLIC
+      g3dlib
+      Detour)
+endif()
 
 set_target_properties(common
   PROPERTIES

@@ -1,11 +1,21 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "BattlefieldMgr.h"
-#include "ObjectMgr.h"
 #include "Player.h"
 #include "Zones/BattlefieldWG.h"
 
@@ -75,7 +85,7 @@ void BattlefieldMgr::HandlePlayerEnterZone(Player* player, uint32 zoneid)
         return;
 
     itr->second->HandlePlayerEnterZone(player, zoneid);
-    LOG_DEBUG("bg.battlefield", "Player %s entered outdoorpvp id %u", player->GetGUID().ToString().c_str(), itr->second->GetTypeId());
+    LOG_DEBUG("bg.battlefield", "Player {} entered outdoorpvp id {}", player->GetGUID().ToString(), itr->second->GetTypeId());
 }
 
 void BattlefieldMgr::HandlePlayerLeaveZone(Player* player, uint32 zoneid)
@@ -88,7 +98,7 @@ void BattlefieldMgr::HandlePlayerLeaveZone(Player* player, uint32 zoneid)
     if (!itr->second->HasPlayer(player))
         return;
     itr->second->HandlePlayerLeaveZone(player, zoneid);
-    LOG_DEBUG("bg.battlefield", "Player %s left outdoorpvp id %u", player->GetGUID().ToString().c_str(), itr->second->GetTypeId());
+    LOG_DEBUG("bg.battlefield", "Player {} left outdoorpvp id {}", player->GetGUID().ToString(), itr->second->GetTypeId());
 }
 
 Battlefield* BattlefieldMgr::GetBattlefieldToZoneId(uint32 zoneid)

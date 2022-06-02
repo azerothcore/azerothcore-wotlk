@@ -1,13 +1,26 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "GameObjectAI.h"
 #include "MoveSplineInit.h"
 #include "Player.h"
-#include "scholomance.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "scholomance.h"
 
 enum Spells
 {
@@ -84,33 +97,24 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            if (GameObject* gate = me->GetMap()->GetGameObject(instance->GetGuidData(GO_GATE_KIRTONOS)))
-            {
-                gate->SetGoState(GO_STATE_ACTIVE);
-            }
-
             instance->SetData(DATA_KIRTONOS_THE_HERALD, DONE);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
-            if (GameObject* gate = me->GetMap()->GetGameObject(instance->GetGuidData(GO_GATE_KIRTONOS)))
-            {
-                gate->SetGoState(GO_STATE_ACTIVE);
-            }
-
-            instance->SetData(DATA_KIRTONOS_THE_HERALD, NOT_STARTED);
+            instance->SetData(DATA_KIRTONOS_THE_HERALD, FAIL);
             me->DespawnOrUnsummon(1);
         }
 
         void IsSummonedBy(Unit* /*summoner*/) override
         {
             events2.Reset();
-            events2.ScheduleEvent(INTRO_1, 500);
+            events2.ScheduleEvent(INTRO_1, 1000);
             me->SetDisableGravity(true);
             me->SetReactState(REACT_PASSIVE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            Talk(EMOTE_SUMMONED);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC); // for some reason he aggroes if we don't have this.
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC); // might not be needed, but guardians and stuff like that could mess up.
         }
 
         void MovementInform(uint32 type, uint32 id) override
@@ -132,15 +136,12 @@ public:
             {
                 case INTRO_1:
                     me->GetMotionMaster()->MovePath(KIRTONOS_PATH, false);
+                    Talk(EMOTE_SUMMONED);
                     break;
                 case INTRO_2:
                     me->GetMotionMaster()->MovePoint(0, PosMove[0]);
                     break;
                 case INTRO_3:
-                    if (GameObject* gate = me->GetMap()->GetGameObject(instance->GetGuidData(GO_GATE_KIRTONOS)))
-                    {
-                        gate->SetGoState(GO_STATE_READY);
-                    }
                     me->SetFacingTo(0.01745329f);
                     break;
                 case INTRO_4:
@@ -152,7 +153,9 @@ public:
                 case INTRO_5:
                     me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
                     me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(WEAPON_KIRTONOS_STAFF));
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
                     me->SetReactState(REACT_AGGRESSIVE);
                     break;
                 case INTRO_6:
@@ -201,7 +204,7 @@ public:
                     events.ScheduleEvent(EVENT_CURSE_OF_TONGUES, 20000);
                     break;
                 case EVENT_DOMINATE_MIND:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 20.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 20.0f, true))
                     {
                         me->CastSpell(target, SPELL_DOMINATE_MIND, false);
                     }
@@ -229,7 +232,6 @@ public:
                         events.ScheduleEvent(EVENT_WING_FLAP, 13000);
                         me->CastSpell(me, SPELL_KIRTONOS_TRANSFORM, true);
                         me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(WEAPON_KIRTONOS_STAFF));
-
                         // Schedule Dominate Mind on every 2nd caster transform
                         if ((TransformsCount - 2) % 4 == 0)
                         {

@@ -1,6 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _LOGINDATABASE_H
@@ -19,6 +31,7 @@ enum LoginDatabaseStatements : uint32
     LOGIN_SEL_REALMLIST,
     LOGIN_DEL_EXPIRED_IP_BANS,
     LOGIN_UPD_EXPIRED_ACCOUNT_BANS,
+    LOGIN_SEL_IP_INFO,
     LOGIN_SEL_IP_BANNED,
     LOGIN_INS_IP_AUTO_BANNED,
     LOGIN_SEL_ACCOUNT_BANNED,
@@ -37,6 +50,7 @@ enum LoginDatabaseStatements : uint32
     LOGIN_SEL_ACCOUNT_INFO_BY_NAME,
     LOGIN_SEL_ACCOUNT_LIST_BY_EMAIL,
     LOGIN_SEL_NUM_CHARS_ON_REALM,
+    LOGIN_SEL_REALM_CHARACTER_COUNTS,
     LOGIN_SEL_ACCOUNT_BY_IP,
     LOGIN_INS_IP_BANNED,
     LOGIN_DEL_IP_NOT_BANNED,
@@ -45,9 +59,8 @@ enum LoginDatabaseStatements : uint32
     LOGIN_SEL_ACCOUNT_BY_ID,
     LOGIN_INS_ACCOUNT_BANNED,
     LOGIN_UPD_ACCOUNT_NOT_BANNED,
-    LOGIN_DEL_REALM_CHARACTERS_BY_REALM,
     LOGIN_DEL_REALM_CHARACTERS,
-    LOGIN_INS_REALM_CHARACTERS,
+    LOGIN_REP_REALM_CHARACTERS,
     LOGIN_SEL_SUM_REALM_CHARACTERS,
     LOGIN_INS_ACCOUNT,
     LOGIN_INS_REALM_CHARACTERS_INIT,
@@ -114,7 +127,7 @@ public:
     //- Constructors for sync and async connections
     LoginDatabaseConnection(MySQLConnectionInfo& connInfo);
     LoginDatabaseConnection(ProducerConsumerQueue<SQLOperation*>* q, MySQLConnectionInfo& connInfo);
-    ~LoginDatabaseConnection();
+    ~LoginDatabaseConnection() override;
 
     //- Loads database type specific prepared statements
     void DoPrepareStatements() override;

@@ -1,12 +1,25 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "karazhan.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
+#include "karazhan.h"
 
 enum eSay
 {
@@ -172,7 +185,6 @@ public:
 
             if (me->IsVisible())
                 DoMeleeAttackIfReady();
-            EnterEvadeIfOutOfCombatArea();
         }
 
         bool CheckEvadeIfOutOfCombatArea() const override
@@ -224,7 +236,7 @@ public:
             }
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Mechanic == MECHANIC_DISARM && _events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
@@ -237,13 +249,13 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_MOUNT_TARGET_MIDNIGHT)
             {
                 Talk(SAY_ATTUMEN1_MOUNT);
                 _events.Reset();
-                me->GetMotionMaster()->MovePoint(POINT_MOVE_TO_MIDNIGHT, target->GetPositionX() + 2.0f * cos(target->GetAngle(me)), target->GetPositionY() + 2.0f * sin(target->GetAngle(me)), target->GetPositionZ() + 0.2f, true, true, MOTION_SLOT_CONTROLLED);
+                me->GetMotionMaster()->MovePoint(POINT_MOVE_TO_MIDNIGHT, target->GetPositionX() + 2.0f * cos(target->GetAngle(me)), target->GetPositionY() + 2.0f * std::sin(target->GetAngle(me)), target->GetPositionZ() + 0.2f, true, true, MOTION_SLOT_CONTROLLED);
             }
         }
 
@@ -252,7 +264,7 @@ public:
             if (type == POINT_MOTION_TYPE && point == POINT_MOVE_TO_MIDNIGHT)
             {
                 if (TempSummon* summon = me->ToTempSummon())
-                    if (Unit* midnight = summon->GetSummoner())
+                    if (Unit* midnight = summon->GetSummonerUnit())
                         midnight->GetAI()->SetData(DATA_ATTUMEN_READY, 0);
             }
         }
@@ -342,7 +354,7 @@ public:
             Talk(SAY_ATTUMEN2_DEATH);
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Mechanic == MECHANIC_DISARM && _events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
@@ -356,7 +368,7 @@ public:
             if (type == POINT_MOTION_TYPE && point == POINT_MOVE_TO_MIDNIGHT)
             {
                 if (TempSummon* summon = me->ToTempSummon())
-                    if (Unit* midnight = summon->GetSummoner())
+                    if (Unit* midnight = summon->GetSummonerUnit())
                         midnight->GetAI()->SetData(DATA_ATTUMEN_READY, 0);
             }
         }
@@ -385,7 +397,7 @@ public:
                     _events.ScheduleEvent(EVENT_RANDOM_YELL, urand(30000, 70000));
                     break;
                 case EVENT_SPELL_CHARGE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_FARTHEST, 0, 24.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, 24.0f, true))
                         me->CastSpell(target, SPELL_CHARGE_MIDNIGHT, false);
                     _events.ScheduleEvent(EVENT_SPELL_CHARGE, 20000);
                     break;

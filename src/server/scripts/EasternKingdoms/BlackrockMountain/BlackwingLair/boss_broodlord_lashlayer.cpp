@@ -1,15 +1,27 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "blackwing_lair.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
 #include "InstanceScript.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "blackwing_lair.h"
+#include "SpellScript.h"
 
 enum Say
 {
@@ -40,7 +52,8 @@ enum Events
 
 enum Actions
 {
-    ACTION_DEACTIVATE = 0
+    ACTION_DEACTIVATE = 0,
+    ACTION_DISARMED   = 1
 };
 
 class boss_broodlord : public CreatureScript
@@ -71,7 +84,9 @@ public:
             std::list<GameObject*> _goList;
             GetGameObjectListWithEntryInGrid(_goList, me, GO_SUPPRESSION_DEVICE, 200.0f);
             for (std::list<GameObject*>::const_iterator itr = _goList.begin(); itr != _goList.end(); itr++)
+            {
                 ((*itr)->AI()->DoAction(ACTION_DEACTIVATE));
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -91,7 +106,7 @@ public:
                         break;
                     case EVENT_BLASTWAVE:
                         DoCastVictim(SPELL_BLASTWAVE);
-                        events.ScheduleEvent(EVENT_BLASTWAVE, 8000, 16000);
+                        events.ScheduleEvent(EVENT_BLASTWAVE, 20000, 35000);
                         break;
                     case EVENT_MORTALSTRIKE:
                         DoCastVictim(SPELL_MORTALSTRIKE);
@@ -129,6 +144,19 @@ class go_suppression_device : public GameObjectScript
     public:
         go_suppression_device() : GameObjectScript("go_suppression_device") { }
 
+        void OnLootStateChanged(GameObject* go, uint32 state, Unit* /*unit*/) override
+        {
+            switch (state)
+            {
+                case GO_JUST_DEACTIVATED: // This case prevents the Gameobject despawn by Disarm Trap
+                    go->SetLootState(GO_READY);
+                    [[fallthrough]];
+                case GO_ACTIVATED:
+                    go->AI()->DoAction(ACTION_DISARMED);
+                    break;
+            }
+        }
+
         struct go_suppression_deviceAI : public GameObjectAI
         {
             go_suppression_deviceAI(GameObject* go) : GameObjectAI(go), _instance(go->GetInstanceScript()), _active(true) { }
@@ -153,10 +181,10 @@ class go_suppression_device : public GameObjectScript
                     switch (eventId)
                     {
                         case EVENT_SUPPRESSION_CAST:
-                            if (go->GetGoState() == GO_STATE_READY)
+                            if (me->GetGoState() == GO_STATE_READY)
                             {
-                                go->CastSpell(nullptr, SPELL_SUPPRESSION_AURA);
-                                go->SendCustomAnim(0);
+                                me->CastSpell(nullptr, SPELL_SUPPRESSION_AURA);
+                                me->SendCustomAnim(0);
                             }
                             _events.ScheduleEvent(EVENT_SUPPRESSION_CAST, 5000);
                             break;
@@ -167,27 +195,21 @@ class go_suppression_device : public GameObjectScript
                 }
             }
 
-            void OnLootStateChanged(uint32 state, Unit* /*unit*/)
-            {
-                switch (state)
-                {
-                    case GO_ACTIVATED:
-                        Deactivate();
-                        _events.CancelEvent(EVENT_SUPPRESSION_CAST);
-                        _events.ScheduleEvent(EVENT_SUPPRESSION_RESET, 30000, 120000);
-                        break;
-                    case GO_JUST_DEACTIVATED: // This case prevents the Gameobject despawn by Disarm Trap
-                        go->SetLootState(GO_READY);
-                        break;
-                }
-            }
-
             void DoAction(int32 action) override
             {
                 if (action == ACTION_DEACTIVATE)
                 {
-                    Deactivate();
                     _events.CancelEvent(EVENT_SUPPRESSION_RESET);
+                }
+                else if (action == ACTION_DISARMED)
+                {
+                    Deactivate();
+                    _events.CancelEvent(EVENT_SUPPRESSION_CAST);
+
+                    if (_instance->GetBossState(DATA_BROODLORD_LASHLAYER) != DONE)
+                    {
+                        _events.ScheduleEvent(EVENT_SUPPRESSION_RESET, urand(30000, 120000));
+                    }
                 }
             }
 
@@ -196,11 +218,12 @@ class go_suppression_device : public GameObjectScript
                 if (_active)
                     return;
                 _active = true;
-                if (go->GetGoState() == GO_STATE_ACTIVE)
-                    go->SetGoState(GO_STATE_READY);
-                go->SetLootState(GO_READY);
-                go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-                _events.ScheduleEvent(EVENT_SUPPRESSION_CAST, 1000);
+                if (me->GetGoState() == GO_STATE_ACTIVE)
+                    me->SetGoState(GO_STATE_READY);
+                me->SetLootState(GO_READY);
+                me->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                _events.ScheduleEvent(EVENT_SUPPRESSION_CAST, 5000);
+                me->Respawn();
             }
 
             void Deactivate()
@@ -208,8 +231,8 @@ class go_suppression_device : public GameObjectScript
                 if (!_active)
                     return;
                 _active = false;
-                go->SetGoState(GO_STATE_ACTIVE);
-                go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                me->SetGoState(GO_STATE_ACTIVE);
+                me->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                 _events.CancelEvent(EVENT_SUPPRESSION_CAST);
             }
 
@@ -219,14 +242,34 @@ class go_suppression_device : public GameObjectScript
             bool _active;
         };
 
-        GameObjectAI* GetAI(GameObject* go) const
+        GameObjectAI* GetAI(GameObject* go) const override
         {
             return new go_suppression_deviceAI(go);
         }
+};
+
+class spell_suppression_aura : public SpellScript
+{
+    PrepareSpellScript(spell_suppression_aura);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if([&](WorldObject* target) -> bool
+        {
+            Unit* unit = target->ToUnit();
+            return !unit || unit->HasAuraType(SPELL_AURA_MOD_STEALTH);
+        });
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_suppression_aura::FilterTargets, EFFECT_ALL, TARGET_UNIT_DEST_AREA_ENEMY);
+    }
 };
 
 void AddSC_boss_broodlord()
 {
     new boss_broodlord();
     new go_suppression_device();
+    RegisterSpellScript(spell_suppression_aura);
 }

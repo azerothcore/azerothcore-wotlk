@@ -1,20 +1,31 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "SpellScript.h"
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "SpellMgr.h"
-#include "SpellScript.h"
 #include <string>
 
 bool _SpellScript::_Validate(SpellInfo const* entry)
 {
     if (!Validate(entry))
     {
-        LOG_ERROR("scripts.spells", "_SpellScript::_Validate: Spell `%u` did not pass Validate() function of script `%s` - script will not be added to the spell", entry->Id, m_scriptName->c_str());
+        LOG_ERROR("scripts.spells", "_SpellScript::_Validate: Spell `{}` did not pass Validate() function of script `{}` - script will not be added to the spell", entry->Id, m_scriptName->c_str());
         return false;
     }
     return true;
@@ -24,7 +35,7 @@ bool _SpellScript::_ValidateSpellInfo(uint32 spellId)
 {
     if (!sSpellMgr->GetSpellInfo(spellId))
     {
-        LOG_ERROR("scripts.spells", "_SpellScript::ValidateSpellInfo: Spell %u does not exist.", spellId);
+        LOG_ERROR("scripts.spells", "_SpellScript::ValidateSpellInfo: Spell {} does not exist.", spellId);
         return false;
     }
 
@@ -193,6 +204,16 @@ void SpellScript::EffectHandler::Call(SpellScript* spellScript, SpellEffIndex ef
     (spellScript->*pEffectHandlerScript)(effIndex);
 }
 
+SpellScript::BeforeHitHandler::BeforeHitHandler(SpellBeforeHitFnType pBeforeHitHandlerScript)
+{
+    _pBeforeHitHandlerScript = pBeforeHitHandlerScript;
+}
+
+void SpellScript::BeforeHitHandler::Call(SpellScript* spellScript, SpellMissInfo missInfo)
+{
+    (spellScript->*_pBeforeHitHandlerScript)(missInfo);
+}
+
 SpellScript::HitHandler::HitHandler(SpellHitFnType _pHitHandlerScript)
 {
     pHitHandlerScript = _pHitHandlerScript;
@@ -296,31 +317,31 @@ bool SpellScript::_Validate(SpellInfo const* entry)
 {
     for (std::list<EffectHandler>::iterator itr = OnEffectLaunch.begin(); itr != OnEffectLaunch.end(); ++itr)
         if (!(*itr).GetAffectedEffectsMask(entry))
-            LOG_ERROR("spells.scripts", "TSCR: Spell `%u` Effect `%s` of script `%s` did not match dbc effect data - handler bound to hook `OnEffectLaunch` of SpellScript won't be executed", entry->Id, (*itr).ToString().c_str(), m_scriptName->c_str());
+            LOG_ERROR("spells.scripts", "Spell `{}` Effect `{}` of script `{}` did not match dbc effect data - handler bound to hook `OnEffectLaunch` of SpellScript won't be executed", entry->Id, (*itr).ToString(), m_scriptName->c_str());
 
     for (std::list<EffectHandler>::iterator itr = OnEffectLaunchTarget.begin(); itr != OnEffectLaunchTarget.end(); ++itr)
         if (!(*itr).GetAffectedEffectsMask(entry))
-            LOG_ERROR("spells.scripts", "TSCR: Spell `%u` Effect `%s` of script `%s` did not match dbc effect data - handler bound to hook `OnEffectLaunchTarget` of SpellScript won't be executed", entry->Id, (*itr).ToString().c_str(), m_scriptName->c_str());
+            LOG_ERROR("spells.scripts", "Spell `{}` Effect `{}` of script `{}` did not match dbc effect data - handler bound to hook `OnEffectLaunchTarget` of SpellScript won't be executed", entry->Id, (*itr).ToString(), m_scriptName->c_str());
 
     for (std::list<EffectHandler>::iterator itr = OnEffectHit.begin(); itr != OnEffectHit.end(); ++itr)
         if (!(*itr).GetAffectedEffectsMask(entry))
-            LOG_ERROR("spells.scripts", "TSCR: Spell `%u` Effect `%s` of script `%s` did not match dbc effect data - handler bound to hook `OnEffectHit` of SpellScript won't be executed", entry->Id, (*itr).ToString().c_str(), m_scriptName->c_str());
+            LOG_ERROR("spells.scripts", "Spell `{}` Effect `{}` of script `{}` did not match dbc effect data - handler bound to hook `OnEffectHit` of SpellScript won't be executed", entry->Id, (*itr).ToString(), m_scriptName->c_str());
 
     for (std::list<EffectHandler>::iterator itr = OnEffectHitTarget.begin(); itr != OnEffectHitTarget.end(); ++itr)
         if (!(*itr).GetAffectedEffectsMask(entry))
-            LOG_ERROR("spells.scripts", "TSCR: Spell `%u` Effect `%s` of script `%s` did not match dbc effect data - handler bound to hook `OnEffectHitTarget` of SpellScript won't be executed", entry->Id, (*itr).ToString().c_str(), m_scriptName->c_str());
+            LOG_ERROR("spells.scripts", "Spell `{}` Effect `{}` of script `{}` did not match dbc effect data - handler bound to hook `OnEffectHitTarget` of SpellScript won't be executed", entry->Id, (*itr).ToString(), m_scriptName->c_str());
 
     for (std::list<ObjectAreaTargetSelectHandler>::iterator itr = OnObjectAreaTargetSelect.begin(); itr != OnObjectAreaTargetSelect.end(); ++itr)
         if (!(*itr).GetAffectedEffectsMask(entry))
-            LOG_ERROR("spells.scripts", "TSCR: Spell `%u` Effect `%s` of script `%s` did not match dbc effect data - handler bound to hook `OnObjectAreaTargetSelect` of SpellScript won't be executed", entry->Id, (*itr).ToString().c_str(), m_scriptName->c_str());
+            LOG_ERROR("spells.scripts", "Spell `{}` Effect `{}` of script `{}` did not match dbc effect data - handler bound to hook `OnObjectAreaTargetSelect` of SpellScript won't be executed", entry->Id, (*itr).ToString(), m_scriptName->c_str());
 
     for (std::list<ObjectTargetSelectHandler>::iterator itr = OnObjectTargetSelect.begin(); itr != OnObjectTargetSelect.end(); ++itr)
         if (!(*itr).GetAffectedEffectsMask(entry))
-            LOG_ERROR("spells.scripts", "TSCR: Spell `%u` Effect `%s` of script `%s` did not match dbc effect data - handler bound to hook `OnObjectTargetSelect` of SpellScript won't be executed", entry->Id, (*itr).ToString().c_str(), m_scriptName->c_str());
+            LOG_ERROR("spells.scripts", "Spell `{}` Effect `{}` of script `{}` did not match dbc effect data - handler bound to hook `OnObjectTargetSelect` of SpellScript won't be executed", entry->Id, (*itr).ToString(), m_scriptName->c_str());
 
     for (std::list<DestinationTargetSelectHandler>::iterator itr = OnDestinationTargetSelect.begin(); itr != OnDestinationTargetSelect.end(); ++itr)
         if (!(*itr).GetAffectedEffectsMask(entry))
-            LOG_ERROR("spells.scripts", "TSCR: Spell `%u` Effect `%s` of script `%s` did not match dbc effect data - handler bound to hook `OnDestinationTargetSelect` of SpellScript won't be executed", entry->Id, (*itr).ToString().c_str(), m_scriptName->c_str());
+            LOG_ERROR("spells.scripts", "Spell `{}` Effect `{}` of script `{}` did not match dbc effect data - handler bound to hook `OnDestinationTargetSelect` of SpellScript won't be executed", entry->Id, (*itr).ToString(), m_scriptName->c_str());
 
     return _SpellScript::_Validate(entry);
 }
@@ -428,7 +449,7 @@ Unit* SpellScript::GetHitUnit()
 {
     if (!IsInTargetHook())
     {
-        LOG_ERROR("spells.scripts", "TSCR: Script: `%s` Spell: `%u`: function SpellScript::GetHitUnit was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
+        LOG_ERROR("spells.scripts", "Script: `{}` Spell: `{}`: function SpellScript::GetHitUnit was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
         return nullptr;
     }
     return m_spell->unitTarget;
@@ -438,7 +459,7 @@ Creature* SpellScript::GetHitCreature()
 {
     if (!IsInTargetHook())
     {
-        LOG_ERROR("spells.scripts", "TSCR: Script: `%s` Spell: `%u`: function SpellScript::GetHitCreature was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
+        LOG_ERROR("spells.scripts", "Script: `{}` Spell: `{}`: function SpellScript::GetHitCreature was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
         return nullptr;
     }
     if (m_spell->unitTarget)
@@ -451,7 +472,7 @@ Player* SpellScript::GetHitPlayer()
 {
     if (!IsInTargetHook())
     {
-        LOG_ERROR("spells.scripts", "TSCR: Script: `%s` Spell: `%u`: function SpellScript::GetHitPlayer was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
+        LOG_ERROR("spells.scripts", "Script: `{}` Spell: `{}`: function SpellScript::GetHitPlayer was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
         return nullptr;
     }
     if (m_spell->unitTarget)
@@ -464,7 +485,7 @@ Item* SpellScript::GetHitItem()
 {
     if (!IsInTargetHook())
     {
-        LOG_ERROR("spells.scripts", "TSCR: Script: `%s` Spell: `%u`: function SpellScript::GetHitItem was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
+        LOG_ERROR("spells.scripts", "Script: `{}` Spell: `{}`: function SpellScript::GetHitItem was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
         return nullptr;
     }
     return m_spell->itemTarget;
@@ -474,7 +495,7 @@ GameObject* SpellScript::GetHitGObj()
 {
     if (!IsInTargetHook())
     {
-        LOG_ERROR("spells.scripts", "TSCR: Script: `%s` Spell: `%u`: function SpellScript::GetHitGObj was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
+        LOG_ERROR("spells.scripts", "Script: `{}` Spell: `{}`: function SpellScript::GetHitGObj was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
         return nullptr;
     }
     return m_spell->gameObjTarget;
@@ -484,7 +505,7 @@ WorldLocation* SpellScript::GetHitDest()
 {
     if (!IsInEffectHook())
     {
-        LOG_ERROR("spells.scripts", "TSCR: Script: `%s` Spell: `%u`: function SpellScript::GetHitDest was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
+        LOG_ERROR("spells.scripts", "Script: `{}` Spell: `{}`: function SpellScript::GetHitDest was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
         return nullptr;
     }
     return m_spell->destTarget;
@@ -494,7 +515,7 @@ int32 SpellScript::GetHitDamage()
 {
     if (!IsInTargetHook())
     {
-        LOG_ERROR("spells.scripts", "TSCR: Script: `%s` Spell: `%u`: function SpellScript::GetHitDamage was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
+        LOG_ERROR("spells.scripts", "Script: `{}` Spell: `{}`: function SpellScript::GetHitDamage was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
         return 0;
     }
     return m_spell->m_damage;
@@ -504,7 +525,7 @@ void SpellScript::SetHitDamage(int32 damage)
 {
     if (!IsInTargetHook())
     {
-        LOG_ERROR("spells.scripts", "TSCR: Script: `%s` Spell: `%u`: function SpellScript::SetHitDamage was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
+        LOG_ERROR("spells.scripts", "Script: `{}` Spell: `{}`: function SpellScript::SetHitDamage was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
         return;
     }
     m_spell->m_damage = damage;
@@ -514,7 +535,7 @@ int32 SpellScript::GetHitHeal()
 {
     if (!IsInTargetHook())
     {
-        LOG_ERROR("spells.scripts", "TSCR: Script: `%s` Spell: `%u`: function SpellScript::GetHitHeal was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
+        LOG_ERROR("spells.scripts", "Script: `{}` Spell: `{}`: function SpellScript::GetHitHeal was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
         return 0;
     }
     return m_spell->m_healing;
@@ -524,7 +545,7 @@ void SpellScript::SetHitHeal(int32 heal)
 {
     if (!IsInTargetHook())
     {
-        LOG_ERROR("spells.scripts", "TSCR: Script: `%s` Spell: `%u`: function SpellScript::SetHitHeal was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
+        LOG_ERROR("spells.scripts", "Script: `{}` Spell: `{}`: function SpellScript::SetHitHeal was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
         return;
     }
     m_spell->m_healing = heal;
@@ -534,7 +555,7 @@ Aura* SpellScript::GetHitAura()
 {
     if (!IsInTargetHook())
     {
-        LOG_ERROR("spells.scripts", "TSCR: Script: `%s` Spell: `%u`: function SpellScript::GetHitAura was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
+        LOG_ERROR("spells.scripts", "Script: `{}` Spell: `{}`: function SpellScript::GetHitAura was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
         return nullptr;
     }
     if (!m_spell->m_spellAura)
@@ -548,7 +569,7 @@ void SpellScript::PreventHitAura()
 {
     if (!IsInTargetHook())
     {
-        LOG_ERROR("spells.scripts", "TSCR: Script: `%s` Spell: `%u`: function SpellScript::PreventHitAura was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
+        LOG_ERROR("spells.scripts", "Script: `{}` Spell: `{}`: function SpellScript::PreventHitAura was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
         return;
     }
     if (m_spell->m_spellAura)
@@ -559,7 +580,7 @@ void SpellScript::PreventHitEffect(SpellEffIndex effIndex)
 {
     if (!IsInHitPhase() && !IsInEffectHook())
     {
-        LOG_ERROR("spells.scripts", "TSCR: Script: `%s` Spell: `%u`: function SpellScript::PreventHitEffect was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
+        LOG_ERROR("spells.scripts", "Script: `{}` Spell: `{}`: function SpellScript::PreventHitEffect was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
         return;
     }
     m_hitPreventEffectMask |= 1 << effIndex;
@@ -570,7 +591,7 @@ void SpellScript::PreventHitDefaultEffect(SpellEffIndex effIndex)
 {
     if (!IsInHitPhase() && !IsInEffectHook())
     {
-        LOG_ERROR("spells.scripts", "TSCR: Script: `%s` Spell: `%u`: function SpellScript::PreventHitDefaultEffect was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
+        LOG_ERROR("spells.scripts", "Script: `{}` Spell: `{}`: function SpellScript::PreventHitDefaultEffect was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
         return;
     }
     m_hitPreventDefaultEffectMask |= 1 << effIndex;
@@ -580,7 +601,7 @@ int32 SpellScript::GetEffectValue() const
 {
     if (!IsInEffectHook())
     {
-        LOG_ERROR("spells.scripts", "Script: `%s` Spell: `%u`: function SpellScript::GetEffectValue was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
+        LOG_ERROR("spells.scripts", "Script: `{}` Spell: `{}`: function SpellScript::GetEffectValue was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
         return 0;
     }
     return m_spell->damage;
@@ -590,7 +611,7 @@ void SpellScript::SetEffectValue(int32 value)
 {
     if (!IsInEffectHook())
     {
-        LOG_ERROR("spells.scripts", "Script: `%s` Spell: `%u`: function SpellScript::SetEffectValue was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
+        LOG_ERROR("spells.scripts", "Script: `{}` Spell: `{}`: function SpellScript::SetEffectValue was called, but function has no effect in current hook!", m_scriptName->c_str(), m_scriptSpellId);
         return;
     }
     m_spell->damage = value;
@@ -608,7 +629,7 @@ void SpellScript::CreateItem(uint32 effIndex, uint32 itemId)
 
 SpellInfo const* SpellScript::GetTriggeringSpell()
 {
-    return m_spell->m_triggeredByAuraSpell;
+    return m_spell->m_triggeredByAuraSpell.spellInfo;
 }
 
 void SpellScript::FinishCast(SpellCastResult result)
@@ -626,7 +647,7 @@ void SpellScript::SetCustomCastResultMessage(SpellCustomErrors result)
 {
     if (!IsInCheckCastHook())
     {
-        LOG_ERROR("spells.scripts", "TSCR: Script: `%s` Spell: `%u`: function SpellScript::SetCustomCastResultMessage was called while spell not in check cast phase!", m_scriptName->c_str(), m_scriptSpellId);
+        LOG_ERROR("spells.scripts", "Script: `{}` Spell: `{}`: function SpellScript::SetCustomCastResultMessage was called while spell not in check cast phase!", m_scriptName->c_str(), m_scriptSpellId);
         return;
     }
 
@@ -642,95 +663,95 @@ bool AuraScript::_Validate(SpellInfo const* entry)
 {
     for (std::list<CheckAreaTargetHandler>::iterator itr = DoCheckAreaTarget.begin(); itr != DoCheckAreaTarget.end();  ++itr)
         if (!entry->HasAreaAuraEffect() && !entry->HasEffect(SPELL_EFFECT_PERSISTENT_AREA_AURA))
-            LOG_ERROR("spells.scripts", "TSCR: Spell `%u` of script `%s` does not have area aura effect - handler bound to hook `DoCheckAreaTarget` of AuraScript won't be executed", entry->Id, m_scriptName->c_str());
+            LOG_ERROR("spells.scripts", "Spell `{}` of script `{}` does not have area aura effect - handler bound to hook `DoCheckAreaTarget` of AuraScript won't be executed", entry->Id, m_scriptName->c_str());
 
     for (std::list<AuraDispelHandler>::iterator itr = OnDispel.begin(); itr != OnDispel.end();  ++itr)
         if (!entry->HasEffect(SPELL_EFFECT_APPLY_AURA) && !entry->HasAreaAuraEffect())
-            LOG_ERROR("spells.scripts", "TSCR: Spell `%u` of script `%s` does not have apply aura effect - handler bound to hook `OnDispel` of AuraScript won't be executed", entry->Id, m_scriptName->c_str());
+            LOG_ERROR("spells.scripts", "Spell `{}` of script `{}` does not have apply aura effect - handler bound to hook `OnDispel` of AuraScript won't be executed", entry->Id, m_scriptName->c_str());
 
     for (std::list<AuraDispelHandler>::iterator itr = AfterDispel.begin(); itr != AfterDispel.end();  ++itr)
         if (!entry->HasEffect(SPELL_EFFECT_APPLY_AURA) && !entry->HasAreaAuraEffect())
-            LOG_ERROR("spells.scripts", "TSCR: Spell `%u` of script `%s` does not have apply aura effect - handler bound to hook `AfterDispel` of AuraScript won't be executed", entry->Id, m_scriptName->c_str());
+            LOG_ERROR("spells.scripts", "Spell `{}` of script `{}` does not have apply aura effect - handler bound to hook `AfterDispel` of AuraScript won't be executed", entry->Id, m_scriptName->c_str());
 
     for (std::list<EffectApplyHandler>::iterator itr = OnEffectApply.begin(); itr != OnEffectApply.end();  ++itr)
         if (!(*itr).GetAffectedEffectsMask(entry))
-            LOG_ERROR("spells.scripts", "TSCR: Spell `%u` Effect `%s` of script `%s` did not match dbc effect data - handler bound to hook `OnEffectApply` of AuraScript won't be executed", entry->Id, (*itr).ToString().c_str(), m_scriptName->c_str());
+            LOG_ERROR("spells.scripts", "Spell `{}` Effect `{}` of script `{}` did not match dbc effect data - handler bound to hook `OnEffectApply` of AuraScript won't be executed", entry->Id, (*itr).ToString(), m_scriptName->c_str());
 
     for (std::list<EffectApplyHandler>::iterator itr = OnEffectRemove.begin(); itr != OnEffectRemove.end();  ++itr)
         if (!(*itr).GetAffectedEffectsMask(entry))
-            LOG_ERROR("spells.scripts", "TSCR: Spell `%u` Effect `%s` of script `%s` did not match dbc effect data - handler bound to hook `OnEffectRemove` of AuraScript won't be executed", entry->Id, (*itr).ToString().c_str(), m_scriptName->c_str());
+            LOG_ERROR("spells.scripts", "Spell `{}` Effect `{}` of script `{}` did not match dbc effect data - handler bound to hook `OnEffectRemove` of AuraScript won't be executed", entry->Id, (*itr).ToString(), m_scriptName->c_str());
 
     for (std::list<EffectApplyHandler>::iterator itr = AfterEffectApply.begin(); itr != AfterEffectApply.end();  ++itr)
         if (!(*itr).GetAffectedEffectsMask(entry))
-            LOG_ERROR("spells.scripts", "TSCR: Spell `%u` Effect `%s` of script `%s` did not match dbc effect data - handler bound to hook `AfterEffectApply` of AuraScript won't be executed", entry->Id, (*itr).ToString().c_str(), m_scriptName->c_str());
+            LOG_ERROR("spells.scripts", "Spell `{}` Effect `{}` of script `{}` did not match dbc effect data - handler bound to hook `AfterEffectApply` of AuraScript won't be executed", entry->Id, (*itr).ToString(), m_scriptName->c_str());
 
     for (std::list<EffectApplyHandler>::iterator itr = AfterEffectRemove.begin(); itr != AfterEffectRemove.end();  ++itr)
         if (!(*itr).GetAffectedEffectsMask(entry))
-            LOG_ERROR("spells.scripts", "TSCR: Spell `%u` Effect `%s` of script `%s` did not match dbc effect data - handler bound to hook `AfterEffectRemove` of AuraScript won't be executed", entry->Id, (*itr).ToString().c_str(), m_scriptName->c_str());
+            LOG_ERROR("spells.scripts", "Spell `{}` Effect `{}` of script `{}` did not match dbc effect data - handler bound to hook `AfterEffectRemove` of AuraScript won't be executed", entry->Id, (*itr).ToString(), m_scriptName->c_str());
 
     for (std::list<EffectPeriodicHandler>::iterator itr = OnEffectPeriodic.begin(); itr != OnEffectPeriodic.end();  ++itr)
         if (!(*itr).GetAffectedEffectsMask(entry))
-            LOG_ERROR("spells.scripts", "TSCR: Spell `%u` Effect `%s` of script `%s` did not match dbc effect data - handler bound to hook `OnEffectPeriodic` of AuraScript won't be executed", entry->Id, (*itr).ToString().c_str(), m_scriptName->c_str());
+            LOG_ERROR("spells.scripts", "Spell `{}` Effect `{}` of script `{}` did not match dbc effect data - handler bound to hook `OnEffectPeriodic` of AuraScript won't be executed", entry->Id, (*itr).ToString(), m_scriptName->c_str());
 
     for (std::list<EffectUpdatePeriodicHandler>::iterator itr = OnEffectUpdatePeriodic.begin(); itr != OnEffectUpdatePeriodic.end();  ++itr)
         if (!(*itr).GetAffectedEffectsMask(entry))
-            LOG_ERROR("spells.scripts", "TSCR: Spell `%u` Effect `%s` of script `%s` did not match dbc effect data - handler bound to hook `OnEffectUpdatePeriodic` of AuraScript won't be executed", entry->Id, (*itr).ToString().c_str(), m_scriptName->c_str());
+            LOG_ERROR("spells.scripts", "Spell `{}` Effect `{}` of script `{}` did not match dbc effect data - handler bound to hook `OnEffectUpdatePeriodic` of AuraScript won't be executed", entry->Id, (*itr).ToString(), m_scriptName->c_str());
 
     for (std::list<EffectCalcAmountHandler>::iterator itr = DoEffectCalcAmount.begin(); itr != DoEffectCalcAmount.end();  ++itr)
         if (!(*itr).GetAffectedEffectsMask(entry))
-            LOG_ERROR("spells.scripts", "TSCR: Spell `%u` Effect `%s` of script `%s` did not match dbc effect data - handler bound to hook `DoEffectCalcAmount` of AuraScript won't be executed", entry->Id, (*itr).ToString().c_str(), m_scriptName->c_str());
+            LOG_ERROR("spells.scripts", "Spell `{}` Effect `{}` of script `{}` did not match dbc effect data - handler bound to hook `DoEffectCalcAmount` of AuraScript won't be executed", entry->Id, (*itr).ToString(), m_scriptName->c_str());
 
     for (std::list<EffectCalcPeriodicHandler>::iterator itr = DoEffectCalcPeriodic.begin(); itr != DoEffectCalcPeriodic.end();  ++itr)
         if (!(*itr).GetAffectedEffectsMask(entry))
-            LOG_ERROR("spells.scripts", "TSCR: Spell `%u` Effect `%s` of script `%s` did not match dbc effect data - handler bound to hook `DoEffectCalcPeriodic` of AuraScript won't be executed", entry->Id, (*itr).ToString().c_str(), m_scriptName->c_str());
+            LOG_ERROR("spells.scripts", "Spell `{}` Effect `{}` of script `{}` did not match dbc effect data - handler bound to hook `DoEffectCalcPeriodic` of AuraScript won't be executed", entry->Id, (*itr).ToString(), m_scriptName->c_str());
 
     for (std::list<EffectCalcSpellModHandler>::iterator itr = DoEffectCalcSpellMod.begin(); itr != DoEffectCalcSpellMod.end();  ++itr)
         if (!(*itr).GetAffectedEffectsMask(entry))
-            LOG_ERROR("spells.scripts", "TSCR: Spell `%u` Effect `%s` of script `%s` did not match dbc effect data - handler bound to hook `DoEffectCalcSpellMod` of AuraScript won't be executed", entry->Id, (*itr).ToString().c_str(), m_scriptName->c_str());
+            LOG_ERROR("spells.scripts", "Spell `{}` Effect `{}` of script `{}` did not match dbc effect data - handler bound to hook `DoEffectCalcSpellMod` of AuraScript won't be executed", entry->Id, (*itr).ToString(), m_scriptName->c_str());
 
     for (std::list<EffectAbsorbHandler>::iterator itr = OnEffectAbsorb.begin(); itr != OnEffectAbsorb.end();  ++itr)
         if (!(*itr).GetAffectedEffectsMask(entry))
-            LOG_ERROR("spells.scripts", "TSCR: Spell `%u` Effect `%s` of script `%s` did not match dbc effect data - handler bound to hook `OnEffectAbsorb` of AuraScript won't be executed", entry->Id, (*itr).ToString().c_str(), m_scriptName->c_str());
+            LOG_ERROR("spells.scripts", "Spell `{}` Effect `{}` of script `{}` did not match dbc effect data - handler bound to hook `OnEffectAbsorb` of AuraScript won't be executed", entry->Id, (*itr).ToString(), m_scriptName->c_str());
 
     for (std::list<EffectAbsorbHandler>::iterator itr = AfterEffectAbsorb.begin(); itr != AfterEffectAbsorb.end();  ++itr)
         if (!(*itr).GetAffectedEffectsMask(entry))
-            LOG_ERROR("spells.scripts", "TSCR: Spell `%u` Effect `%s` of script `%s` did not match dbc effect data - handler bound to hook `AfterEffectAbsorb` of AuraScript won't be executed", entry->Id, (*itr).ToString().c_str(), m_scriptName->c_str());
+            LOG_ERROR("spells.scripts", "Spell `{}` Effect `{}` of script `{}` did not match dbc effect data - handler bound to hook `AfterEffectAbsorb` of AuraScript won't be executed", entry->Id, (*itr).ToString(), m_scriptName->c_str());
 
     for (std::list<EffectManaShieldHandler>::iterator itr = OnEffectManaShield.begin(); itr != OnEffectManaShield.end();  ++itr)
         if (!(*itr).GetAffectedEffectsMask(entry))
-            LOG_ERROR("spells.scripts", "TSCR: Spell `%u` Effect `%s` of script `%s` did not match dbc effect data - handler bound to hook `OnEffectManaShield` of AuraScript won't be executed", entry->Id, (*itr).ToString().c_str(), m_scriptName->c_str());
+            LOG_ERROR("spells.scripts", "Spell `{}` Effect `{}` of script `{}` did not match dbc effect data - handler bound to hook `OnEffectManaShield` of AuraScript won't be executed", entry->Id, (*itr).ToString(), m_scriptName->c_str());
 
     for (std::list<EffectManaShieldHandler>::iterator itr = AfterEffectManaShield.begin(); itr != AfterEffectManaShield.end();  ++itr)
         if (!(*itr).GetAffectedEffectsMask(entry))
-            LOG_ERROR("spells.scripts", "TSCR: Spell `%u` Effect `%s` of script `%s` did not match dbc effect data - handler bound to hook `AfterEffectManaShield` of AuraScript won't be executed", entry->Id, (*itr).ToString().c_str(), m_scriptName->c_str());
+            LOG_ERROR("spells.scripts", "Spell `{}` Effect `{}` of script `{}` did not match dbc effect data - handler bound to hook `AfterEffectManaShield` of AuraScript won't be executed", entry->Id, (*itr).ToString(), m_scriptName->c_str());
 
     for (std::list<EffectSplitHandler>::iterator itr = OnEffectSplit.begin(); itr != OnEffectSplit.end();  ++itr)
         if (!(*itr).GetAffectedEffectsMask(entry))
-            LOG_ERROR("spells.scripts", "Spell `%u` Effect `%s` of script `%s` did not match dbc effect data - handler bound to hook `OnEffectSplit` of AuraScript won't be executed", entry->Id, (*itr).ToString().c_str(), m_scriptName->c_str());
+            LOG_ERROR("spells.scripts", "Spell `{}` Effect `{}` of script `{}` did not match dbc effect data - handler bound to hook `OnEffectSplit` of AuraScript won't be executed", entry->Id, (*itr).ToString(), m_scriptName->c_str());
 
     for (std::list<CheckProcHandler>::iterator itr = DoCheckProc.begin(); itr != DoCheckProc.end(); ++itr)
         if (!entry->HasEffect(SPELL_EFFECT_APPLY_AURA) && !entry->HasAreaAuraEffect())
-            LOG_ERROR("spells.scripts", "Spell `%u` of script `%s` does not have apply aura effect - handler bound to hook `DoCheckProc` of AuraScript won't be executed", entry->Id, m_scriptName->c_str());
+            LOG_ERROR("spells.scripts", "Spell `{}` of script `{}` does not have apply aura effect - handler bound to hook `DoCheckProc` of AuraScript won't be executed", entry->Id, m_scriptName->c_str());
 
     for (std::list<AuraProcHandler>::iterator itr = DoPrepareProc.begin(); itr != DoPrepareProc.end(); ++itr)
         if (!entry->HasEffect(SPELL_EFFECT_APPLY_AURA) && !entry->HasAreaAuraEffect())
-            LOG_ERROR("spells.scripts", "Spell `%u` of script `%s` does not have apply aura effect - handler bound to hook `DoPrepareProc` of AuraScript won't be executed", entry->Id, m_scriptName->c_str());
+            LOG_ERROR("spells.scripts", "Spell `{}` of script `{}` does not have apply aura effect - handler bound to hook `DoPrepareProc` of AuraScript won't be executed", entry->Id, m_scriptName->c_str());
 
     for (std::list<AuraProcHandler>::iterator itr = OnProc.begin(); itr != OnProc.end(); ++itr)
         if (!entry->HasEffect(SPELL_EFFECT_APPLY_AURA) && !entry->HasAreaAuraEffect())
-            LOG_ERROR("spells.scripts", "Spell `%u` of script `%s` does not have apply aura effect - handler bound to hook `OnProc` of AuraScript won't be executed", entry->Id, m_scriptName->c_str());
+            LOG_ERROR("spells.scripts", "Spell `{}` of script `{}` does not have apply aura effect - handler bound to hook `OnProc` of AuraScript won't be executed", entry->Id, m_scriptName->c_str());
 
     for (std::list<AuraProcHandler>::iterator itr = AfterProc.begin(); itr != AfterProc.end(); ++itr)
         if (!entry->HasEffect(SPELL_EFFECT_APPLY_AURA) && !entry->HasAreaAuraEffect())
-            LOG_ERROR("spells.scripts", "Spell `%u` of script `%s` does not have apply aura effect - handler bound to hook `AfterProc` of AuraScript won't be executed", entry->Id, m_scriptName->c_str());
+            LOG_ERROR("spells.scripts", "Spell `{}` of script `{}` does not have apply aura effect - handler bound to hook `AfterProc` of AuraScript won't be executed", entry->Id, m_scriptName->c_str());
 
     for (std::list<EffectProcHandler>::iterator itr = OnEffectProc.begin(); itr != OnEffectProc.end(); ++itr)
         if (!(*itr).GetAffectedEffectsMask(entry))
-            LOG_ERROR("spells.scripts", "Spell `%u` Effect `%s` of script `%s` did not match dbc effect data - handler bound to hook `OnEffectProc` of AuraScript won't be executed", entry->Id, (*itr).ToString().c_str(), m_scriptName->c_str());
+            LOG_ERROR("spells.scripts", "Spell `{}` Effect `{}` of script `{}` did not match dbc effect data - handler bound to hook `OnEffectProc` of AuraScript won't be executed", entry->Id, (*itr).ToString(), m_scriptName->c_str());
 
     for (std::list<EffectProcHandler>::iterator itr = AfterEffectProc.begin(); itr != AfterEffectProc.end(); ++itr)
         if (!(*itr).GetAffectedEffectsMask(entry))
-            LOG_ERROR("spells.scripts", "Spell `%u` Effect `%s` of script `%s` did not match dbc effect data - handler bound to hook `AfterEffectProc` of AuraScript won't be executed", entry->Id, (*itr).ToString().c_str(), m_scriptName->c_str());
+            LOG_ERROR("spells.scripts", "Spell `{}` Effect `{}` of script `{}` did not match dbc effect data - handler bound to hook `AfterEffectProc` of AuraScript won't be executed", entry->Id, (*itr).ToString(), m_scriptName->c_str());
 
     return _SpellScript::_Validate(entry);
 }
@@ -962,7 +983,7 @@ void AuraScript::PreventDefaultAction()
             m_defaultActionPrevented = true;
             break;
         default:
-            LOG_ERROR("spells.scripts", "TSCR: Script: `%s` Spell: `%u` AuraScript::PreventDefaultAction called in a hook in which the call won't have effect!", m_scriptName->c_str(), m_scriptSpellId);
+            LOG_ERROR("spells.scripts", "Script: `{}` Spell: `{}` AuraScript::PreventDefaultAction called in a hook in which the call won't have effect!", m_scriptName->c_str(), m_scriptSpellId);
             break;
     }
 }
@@ -1149,7 +1170,7 @@ Unit* AuraScript::GetTarget() const
         case AURA_SCRIPT_HOOK_EFFECT_AFTER_PROC:
             return m_auraApplication->GetTarget();
         default:
-            LOG_ERROR("spells.scripts", "TSCR: Script: `%s` Spell: `%u` AuraScript::GetTarget called in a hook in which the call won't have effect!", m_scriptName->c_str(), m_scriptSpellId);
+            LOG_ERROR("spells.scripts", "Script: `{}` Spell: `{}` AuraScript::GetTarget called in a hook in which the call won't have effect!", m_scriptName->c_str(), m_scriptSpellId);
     }
 
     return nullptr;

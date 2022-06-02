@@ -1,10 +1,23 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "InstanceScript.h"
-#include "magisters_terrace.h"
 #include "ScriptMgr.h"
+#include "magisters_terrace.h"
 
 class instance_magisters_terrace : public InstanceMapScript
 {
@@ -76,7 +89,7 @@ public:
                     HandleGameObject(KaelDoorGUID, data != IN_PROGRESS);
                     if (data == DONE)
                         if (GameObject* escapeOrb = instance->GetGameObject(EscapeOrbGUID))
-                            escapeOrb->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                            escapeOrb->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     Encounter[identifier] = data;
                     break;
             }
@@ -131,7 +144,7 @@ public:
                     break;
                 case GO_ESCAPE_ORB:
                     if (GetData(DATA_KAELTHAS_EVENT) == DONE)
-                        go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     EscapeOrbGUID = go->GetGUID();
                     break;
             }

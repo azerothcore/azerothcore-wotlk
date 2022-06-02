@@ -1,18 +1,28 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
-#include "shadowfang_keep.h"
 #include "TemporarySummon.h"
+#include "shadowfang_keep.h"
 
-enum Creatures
+enum Spells
 {
-    NPC_ASH                 = 3850,
-    NPC_ADA                 = 3849,
-    NPC_ARCHMAGE_ARUGAL     = 4275,
-    NPC_ARUGAL_VOIDWALKER   = 4627
+    SPELL_SUMMON_VALENTINE_ADD = 68610
 };
 
 class instance_shadowfang_keep : public InstanceMapScript
@@ -34,6 +44,27 @@ public:
             memset(&_encounters, 0, sizeof(_encounters));
         }
 
+        void OnCreatureCreate(Creature* creature) override
+        {
+            switch (creature->GetEntry())
+            {
+                case NPC_DND_CRAZED_APOTHECARY_GENERATOR:
+                    _crazedApothecaryGeneratorGUIDs.push_back(creature->GetGUID());
+                    break;
+                case NPC_APOTHECARY_HUMMEL:
+                    _apothecaryHummel = creature->GetGUID();
+                    break;
+                case NPC_CRAZED_APOTHECARY:
+                    if (Creature* hummel = instance->GetCreature(_apothecaryHummel))
+                    {
+                        hummel->AI()->JustSummoned(creature);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
         void OnGameObjectCreate(GameObject* gameobject) override
         {
             switch (gameobject->GetEntry())
@@ -50,6 +81,8 @@ public:
                     if (_encounters[TYPE_WOLF_MASTER_NANDOS] == DONE)
                         HandleGameObject(ObjectGuid::Empty, true, gameobject);
                     break;
+                default:
+                    break;
             }
         }
 
@@ -61,6 +94,17 @@ public:
                 case TYPE_FENRUS_THE_DEVOURER:
                 case TYPE_WOLF_MASTER_NANDOS:
                     _encounters[type] = data;
+                    break;
+                case DATA_SPAWN_VALENTINE_ADDS:
+                    for (ObjectGuid guid : _crazedApothecaryGeneratorGUIDs)
+                    {
+                        if (Creature* generator = instance->GetCreature(guid))
+                        {
+                            generator->CastSpell(nullptr, SPELL_SUMMON_VALENTINE_ADD);
+                        }
+                    }
+                    break;
+                default:
                     break;
             }
 
@@ -96,6 +140,8 @@ public:
 
     private:
         uint32 _encounters[MAX_ENCOUNTERS];
+        GuidVector _crazedApothecaryGeneratorGUIDs;
+        ObjectGuid _apothecaryHummel;
     };
 };
 

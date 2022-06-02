@@ -1,4 +1,4 @@
-name: core-build
+name: main
 on:
   push:
     branches:
@@ -14,68 +14,36 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # the result of the matrix will be the combination of all attributes, so we get os*compiler*modules builds
+        # the result of the matrix will be the combination of all attributes, so we get os*compiler builds
         os: [ubuntu-20.04]
         compiler: [clang]
-        modules: [without]
-        extra_logs: [false]
-        # we can include specific combinations here
-        include:
-          - os: ubuntu-20.04
-            compiler: clang12
-            modules: without
-            extra_logs: true
-          - os: ubuntu-20.04
-            compiler: clang11
-            modules: without
-            extra_logs: false
-          - os: ubuntu-18.04
-            compiler: clang10
-            modules: without
-            extra_logs: false
-          - os: ubuntu-18.04
-            compiler: gcc8
-            modules: without
-            extra_logs: false
-          - os: ubuntu-20.04
-            compiler: gcc # default in 20.04 is gcc 9
-            modules: without
-            extra_logs: false
-          - os: ubuntu-20.04
-            compiler: gcc10
-            modules: without
-            extra_logs: false
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.modules }}-modules-extra_logs-${{ matrix.extra_logs }}
+    name: ${{ matrix.os }}-${{ matrix.compiler }}
     env:
       COMPILER: ${{ matrix.compiler }}
-      EXTRA_LOGS: ${{ matrix.extra_logs }}
     if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v2
-      - name: Checkout modules
-        run: ./apps/ci/ci-install-modules.sh
-        if: matrix.modules == 'with'
       - name: Cache
         uses: actions/cache@v2
         with:
           path: var/ccache
-          key: ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}:${{ github.sha }}
+          key: ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ github.ref }}:${{ github.sha }}
           restore-keys: |
-            ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}
-            ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules
+            ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ github.ref }}
+            ccache:${{ matrix.os }}:${{ matrix.compiler }}
       - name: Configure OS
         run: source ./acore.sh install-deps
         env:
           CONTINUOUS_INTEGRATION: true
       - name: Create conf/config.sh
-        run: source ./apps/ci/ci-conf.sh
-      - name: Import db
-        run: source ./apps/ci/ci-import-db.sh
+        run: source ./apps/ci/ci-conf-core.sh
+      - name: Process pending sql
+        run: bash bin/acore-db-pendings
       - name: Build
         run: source ./apps/ci/ci-compile.sh
       - name: Dry run
-        run: source ./apps/ci/ci-worldserver-dry-run.sh
+        run: source ./apps/ci/ci-dry-run.sh worldserver
       - name: Check startup errors
         run: source ./apps/ci/ci-error-check.sh
       - name: Run unit tests

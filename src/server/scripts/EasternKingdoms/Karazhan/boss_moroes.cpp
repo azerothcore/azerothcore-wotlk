@@ -1,11 +1,24 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "karazhan.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "karazhan.h"
 
 enum Yells
 {
@@ -205,7 +218,7 @@ public:
                     me->CastSpell(me, SPELL_BERSERK, true);
                     break;
                 case EVENT_SPELL_BLIND:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 10.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 10.0f, true))
                         me->CastSpell(target, SPELL_BLIND, false);
                     events.ScheduleEvent(EVENT_SPELL_BLIND, urand(25000, 40000));
                     break;
@@ -222,7 +235,7 @@ public:
                     return;
                 case EVENT_SPELL_GARROTE:
                     Talk(SAY_SPECIAL);
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                         target->CastSpell(target, SPELL_GARROTE, true);
                     me->CastSpell(me, SPELL_VANISH_TELEPORT, false);
                     events.SetPhase(0);
@@ -259,8 +272,7 @@ public:
             PreventHitDefaultEffect(effIndex);
             if (Unit* target = GetHitUnit())
             {
-                Position pos;
-                target->GetFirstCollisionPosition(pos, 5.0f, M_PI);
+                Position pos = target->GetFirstCollisionPosition(5.0f, M_PI);
                 GetCaster()->CastSpell(target, SPELL_GARROTE_DUMMY, true);
                 GetCaster()->RemoveAurasDueToSpell(SPELL_VANISH);
                 GetCaster()->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), target->GetOrientation());

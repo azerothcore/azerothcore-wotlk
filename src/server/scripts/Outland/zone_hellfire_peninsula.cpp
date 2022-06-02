@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -19,10 +30,10 @@ npc_fel_guard_hound
 EndContentData */
 
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellScript.h"
 #include "WorldSession.h"
 
@@ -71,8 +82,6 @@ enum Aeranas
 {
     SAY_SUMMON                  = 0,
     SAY_FREE                    = 1,
-    FACTION_HOSTILE             = 16,
-    FACTION_FRIENDLY            = 35,
     SPELL_ENVELOPING_WINDS      = 15535,
     SPELL_SHOCK                 = 12553
 };
@@ -92,8 +101,8 @@ public:
             envelopingWinds_Timer = 9000;
             shock_Timer = 5000;
 
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-            me->setFaction(FACTION_FRIENDLY);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
+            me->SetFaction(FACTION_FRIENDLY);
 
             Talk(SAY_SUMMON);
         }
@@ -104,7 +113,7 @@ public:
             {
                 if (faction_Timer <= diff)
                 {
-                    me->setFaction(FACTION_HOSTILE);
+                    me->SetFaction(FACTION_MONSTER_2);
                     faction_Timer = 0;
                 }
                 else faction_Timer -= diff;
@@ -115,10 +124,10 @@ public:
 
             if (HealthBelowPct(30))
             {
-                me->setFaction(FACTION_FRIENDLY);
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                me->SetFaction(FACTION_FRIENDLY);
+                me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                 me->RemoveAllAuras();
-                me->DeleteThreatList();
+                me->GetThreatMgr().ClearAllThreat();
                 me->CombatStop(true);
                 Talk(SAY_FREE);
                 return;
@@ -238,8 +247,7 @@ enum WoundedBloodElf
     SAY_ELF_AGGRO               = 5,
     QUEST_ROAD_TO_FALCON_WATCH  = 9375,
     NPC_HAALESHI_WINDWALKER     = 16966,
-    NPC_HAALESHI_TALONGUARD     = 16967,
-    FACTION_FALCON_WATCH_QUEST  = 775
+    NPC_HAALESHI_TALONGUARD     = 16967
 };
 
 class npc_wounded_blood_elf : public CreatureScript
@@ -268,7 +276,7 @@ public:
         {
             if (quest->GetQuestId() == QUEST_ROAD_TO_FALCON_WATCH)
             {
-                me->setFaction(FACTION_FALCON_WATCH_QUEST);
+                me->SetFaction(FACTION_ESCORTEE_H_PASSIVE);
                 npc_escortAI::Start(true, false, player->GetGUID());
             }
         }

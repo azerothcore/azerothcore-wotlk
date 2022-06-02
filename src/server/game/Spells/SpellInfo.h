@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SPELLINFO_H
@@ -169,11 +180,11 @@ enum SpellCustomAttributes
     SPELL_ATTR0_CU_NO_INITIAL_THREAT             = 0x00000010,
     SPELL_ATTR0_CU_AURA_CC                       = 0x00000020,
     SPELL_ATTR0_CU_DONT_BREAK_STEALTH            = 0x00000040,
-    SPELL_ATTR0_CU_NONE3                         = 0x00000080,   // UNUSED
+    SPELL_ATTR0_CU_NO_PVP_FLAG                   = 0x00000080,
     SPELL_ATTR0_CU_DIRECT_DAMAGE                 = 0x00000100,
     SPELL_ATTR0_CU_CHARGE                        = 0x00000200,
     SPELL_ATTR0_CU_PICKPOCKET                    = 0x00000400,
-    SPELL_ATTR0_CU_NONE4                         = 0x00000800,   // UNUSED
+    SPELL_ATTR0_CU_IGNORE_EVADE                  = 0x00000800,
     SPELL_ATTR0_CU_NEGATIVE_EFF0                 = 0x00001000,
     SPELL_ATTR0_CU_NEGATIVE_EFF1                 = 0x00002000,
     SPELL_ATTR0_CU_NEGATIVE_EFF2                 = 0x00004000,
@@ -181,15 +192,18 @@ enum SpellCustomAttributes
     SPELL_ATTR0_CU_REQ_TARGET_FACING_CASTER      = 0x00010000,
     SPELL_ATTR0_CU_REQ_CASTER_BEHIND_TARGET      = 0x00020000,
     SPELL_ATTR0_CU_ALLOW_INFLIGHT_TARGET         = 0x00040000,
-    SPELL_ATTR0_CU_NONE6                         = 0x00080000,   // UNUSED
+    SPELL_ATTR0_CU_NEEDS_AMMO_DATA               = 0x00080000,
     SPELL_ATTR0_CU_BINARY_SPELL                  = 0x00100000,
     SPELL_ATTR0_CU_NO_POSITIVE_TAKEN_BONUS       = 0x00200000,
     SPELL_ATTR0_CU_SINGLE_AURA_STACK             = 0x00400000, // pussywizard
     SPELL_ATTR0_CU_SCHOOLMASK_NORMAL_WITH_MAGIC  = 0x00800000,
-    SPELL_ATTR0_CU_ENCOUNTER_REWARD              = 0x01000000, // pussywizard
+    SPELL_ATTR0_CU_AURA_CANNOT_BE_SAVED          = 0x01000000,
     SPELL_ATTR0_CU_POSITIVE_EFF0                 = 0x02000000,
     SPELL_ATTR0_CU_POSITIVE_EFF1                 = 0x04000000,
     SPELL_ATTR0_CU_POSITIVE_EFF2                 = 0x08000000,
+    SPELL_ATTR0_CU_FORCE_SEND_CATEGORY_COOLDOWNS = 0x10000000,
+    SPELL_ATTR0_CU_FORCE_AURA_SAVING             = 0x20000800,
+    SPELL_ATTR0_CU_ENCOUNTER_REWARD              = 0x40000000, // pussywizard
 
     SPELL_ATTR0_CU_NEGATIVE                      = SPELL_ATTR0_CU_NEGATIVE_EFF0 | SPELL_ATTR0_CU_NEGATIVE_EFF1 | SPELL_ATTR0_CU_NEGATIVE_EFF2,
     SPELL_ATTR0_CU_POSITIVE                      = SPELL_ATTR0_CU_POSITIVE_EFF0 | SPELL_ATTR0_CU_POSITIVE_EFF1 | SPELL_ATTR0_CU_POSITIVE_EFF2,
@@ -202,7 +216,7 @@ class SpellImplicitTargetInfo
 private:
     Targets _target;
 public:
-    SpellImplicitTargetInfo() {}
+    SpellImplicitTargetInfo() : _target(Targets(0)) {}
     SpellImplicitTargetInfo(uint32 target);
 
     bool IsArea() const;
@@ -225,7 +239,8 @@ private:
         SpellTargetCheckTypes SelectionCheckType; // defines selection criteria
         SpellTargetDirectionTypes DirectionType; // direction for cone and dest targets
     };
-    static StaticData _data[TOTAL_SPELL_TARGETS];
+
+    static std::array<StaticData, TOTAL_SPELL_TARGETS> _data;
 };
 
 class SpellEffectInfo
@@ -291,11 +306,14 @@ private:
         SpellEffectImplicitTargetTypes ImplicitTargetType; // defines what target can be added to effect target list if there's no valid target type provided for effect
         SpellTargetObjectTypes UsedTargetObjectType; // defines valid target object type for spell effect
     };
-    static StaticData _data[TOTAL_SPELL_EFFECTS];
+
+    static std::array<StaticData, TOTAL_SPELL_EFFECTS> _data;
 };
 
-class SpellInfo
+class AC_GAME_API SpellInfo
 {
+friend class SpellMgr;
+
 public:
     uint32 Id;
     SpellCategoryEntry const* CategoryEntry;
@@ -349,18 +367,19 @@ public:
     SpellRangeEntry const* RangeEntry;
     float  Speed;
     uint32 StackAmount;
-    uint32 Totem[2];
-    int32  Reagent[MAX_SPELL_REAGENTS];
-    uint32 ReagentCount[MAX_SPELL_REAGENTS];
+    std::array<uint32, 2> Totem;
+    std::array<int32, MAX_SPELL_REAGENTS>  Reagent;
+    std::array<uint32, MAX_SPELL_REAGENTS> ReagentCount;
     int32  EquippedItemClass;
     int32  EquippedItemSubClassMask;
     int32  EquippedItemInventoryTypeMask;
-    uint32 TotemCategory[2];
-    uint32 SpellVisual[2];
+    std::array<uint32, 2> TotemCategory;
+    std::array<uint32, 2> SpellVisual;
     uint32 SpellIconID;
     uint32 ActiveIconID;
-    char* SpellName[16];
-    char* Rank[16];
+    uint32 SpellPriority;
+    std::array<char const*, 16> SpellName;
+    std::array<char const*, 16> Rank;
     uint32 MaxTargetLevel;
     uint32 MaxAffectedTargets;
     uint32 SpellFamilyName;
@@ -369,7 +388,7 @@ public:
     uint32 PreventionType;
     int32  AreaGroupId;
     uint32 SchoolMask;
-    SpellEffectInfo Effects[MAX_SPELL_EFFECTS];
+    std::array<SpellEffectInfo, MAX_SPELL_EFFECTS> Effects;
     uint32 ExplicitTargetMask;
     SpellChainNode const* ChainEntry;
 
@@ -390,15 +409,15 @@ public:
     bool HasAnyAura() const;
     bool HasAreaAuraEffect() const;
 
-    inline bool HasAttribute(SpellAttr0 attribute) const { return Attributes & attribute; }
-    inline bool HasAttribute(SpellAttr1 attribute) const { return AttributesEx & attribute; }
-    inline bool HasAttribute(SpellAttr2 attribute) const { return AttributesEx2 & attribute; }
-    inline bool HasAttribute(SpellAttr3 attribute) const { return AttributesEx3 & attribute; }
-    inline bool HasAttribute(SpellAttr4 attribute) const { return AttributesEx4 & attribute; }
-    inline bool HasAttribute(SpellAttr5 attribute) const { return AttributesEx5 & attribute; }
-    inline bool HasAttribute(SpellAttr6 attribute) const { return AttributesEx6 & attribute; }
-    inline bool HasAttribute(SpellAttr7 attribute) const { return AttributesEx7 & attribute; }
-    inline bool HasAttribute(SpellCustomAttributes customAttribute) const { return AttributesCu & customAttribute; }
+    inline bool HasAttribute(SpellAttr0 attribute) const { return (Attributes & attribute) != 0; }
+    inline bool HasAttribute(SpellAttr1 attribute) const { return (AttributesEx & attribute) != 0; }
+    inline bool HasAttribute(SpellAttr2 attribute) const { return (AttributesEx2 & attribute) != 0; }
+    inline bool HasAttribute(SpellAttr3 attribute) const { return (AttributesEx3 & attribute) != 0; }
+    inline bool HasAttribute(SpellAttr4 attribute) const { return (AttributesEx4 & attribute) != 0; }
+    inline bool HasAttribute(SpellAttr5 attribute) const { return (AttributesEx5 & attribute) != 0; }
+    inline bool HasAttribute(SpellAttr6 attribute) const { return (AttributesEx6 & attribute) != 0; }
+    inline bool HasAttribute(SpellAttr7 attribute) const { return (AttributesEx7 & attribute) != 0; }
+    inline bool HasAttribute(SpellCustomAttributes customAttribute) const { return (AttributesCu & customAttribute) != 0; }
 
     bool IsExplicitDiscovery() const;
     bool IsLootCrafting() const;
@@ -463,7 +482,7 @@ public:
     // xinef: aura stacking
     bool IsStrongerAuraActive(Unit const* caster, Unit const* target) const;
     bool IsAuraEffectEqual(SpellInfo const* otherSpellInfo) const;
-    bool ValidateAttribute6SpellDamageMods(const Unit* caster, const AuraEffect* auraEffect, bool isDot) const;
+    bool ValidateAttribute6SpellDamageMods(Unit const* caster, const AuraEffect* auraEffect, bool isDot) const;
 
     SpellSchoolMask GetSchoolMask() const;
     uint32 GetAllEffectsMechanicMask() const;
@@ -502,15 +521,26 @@ public:
     bool IsDifferentRankOf(SpellInfo const* spellInfo) const;
     bool IsHighRankOf(SpellInfo const* spellInfo) const;
 
+    std::array<SpellEffectInfo, MAX_SPELL_EFFECTS> const& GetEffects() const { return Effects; }
+    SpellEffectInfo const& GetEffect(SpellEffIndex index) const { ASSERT(index < Effects.size()); return Effects[index]; }
+
     // loading helpers
-    uint32 _GetExplicitTargetMask() const;
+    void _InitializeExplicitTargetMask();
     bool _IsPositiveEffect(uint8 effIndex, bool deep) const;
     bool _IsPositiveSpell() const;
     static bool _IsPositiveTarget(uint32 targetA, uint32 targetB);
+
     AuraStateType LoadAuraState() const;
     SpellSpecificType LoadSpellSpecific() const;
+
     // unloading helpers
     void _UnloadImplicitTargetConditionLists();
+
+    bool CheckElixirStacking(Unit const* caster) const;
+
+private:
+    std::array<SpellEffectInfo, MAX_SPELL_EFFECTS>& _GetEffects() { return Effects; }
+    SpellEffectInfo& _GetEffect(SpellEffIndex index) { ASSERT(index < Effects.size()); return Effects[index]; }
 };
 
 #endif // _SPELLINFO_H

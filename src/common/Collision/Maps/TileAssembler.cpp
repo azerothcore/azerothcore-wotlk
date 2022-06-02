@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "TileAssembler.h"
@@ -12,6 +23,7 @@
 #include <iomanip>
 #include <set>
 #include <sstream>
+#include <boost/filesystem.hpp>
 
 using G3D::Vector3;
 using G3D::AABox;
@@ -43,7 +55,7 @@ namespace VMAP
     TileAssembler::TileAssembler(const std::string& pSrcDirName, const std::string& pDestDirName)
         : iDestDir(pDestDirName), iSrcDir(pSrcDirName)
     {
-        //mkdir(iDestDir);
+        boost::filesystem::create_directory(iDestDir);
         //init();
     }
 
@@ -315,7 +327,7 @@ namespace VMAP
         float pos_x;
         float pos_y;
         float pos_z;
-        short type;
+        short material;
     };
 #pragma pack(pop)
     //=================================================================
@@ -370,6 +382,7 @@ namespace VMAP
         char ident[8];
         if (fread(ident, 1, 8, model_list) != 8 || memcmp(ident, VMAP::RAW_VMAP_MAGIC, 8) != 0)
         {
+            fclose(model_list);
             return;
         }
 
@@ -520,19 +533,29 @@ namespace VMAP
             delete[] vectorarray;
         }
         // ----- liquid
-        liquid = 0;
-        if (liquidflags & 1)
+        liquid = nullptr;
+        if (liquidflags & 3)
         {
-            WMOLiquidHeader hlq;
             READ_OR_RETURN(&blockId, 4);
             CMP_OR_RETURN(blockId, "LIQU");
             READ_OR_RETURN(&blocksize, sizeof(int));
-            READ_OR_RETURN(&hlq, sizeof(WMOLiquidHeader));
-            liquid = new WmoLiquid(hlq.xtiles, hlq.ytiles, Vector3(hlq.pos_x, hlq.pos_y, hlq.pos_z), hlq.type);
-            uint32 size = hlq.xverts * hlq.yverts;
-            READ_OR_RETURN(liquid->GetHeightStorage(), size * sizeof(float));
-            size = hlq.xtiles * hlq.ytiles;
-            READ_OR_RETURN(liquid->GetFlagsStorage(), size);
+            uint32 liquidType;
+            READ_OR_RETURN(&liquidType, sizeof(uint32));
+            if (liquidflags & 1)
+            {
+                WMOLiquidHeader hlq;
+                READ_OR_RETURN(&hlq, sizeof(WMOLiquidHeader));
+                liquid = new WmoLiquid(hlq.xtiles, hlq.ytiles, Vector3(hlq.pos_x, hlq.pos_y, hlq.pos_z), liquidType);
+                uint32 size = hlq.xverts * hlq.yverts;
+                READ_OR_RETURN(liquid->GetHeightStorage(), size * sizeof(float));
+                size = hlq.xtiles * hlq.ytiles;
+                READ_OR_RETURN(liquid->GetFlagsStorage(), size);
+            }
+            else
+            {
+                liquid = new WmoLiquid(0, 0, Vector3::zero(), liquidType);
+                liquid->GetHeightStorage()[0] = bounds.high().z;
+            }
         }
 
         return true;

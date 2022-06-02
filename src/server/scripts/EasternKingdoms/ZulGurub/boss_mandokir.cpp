@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -11,8 +22,8 @@ SDComment: Ohgan function needs improvements.
 SDCategory: Zul'Gurub
 EndScriptData */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
@@ -105,14 +116,17 @@ public:
         {
             if (me->GetPositionZ() > 140.0f)
             {
-                killCount = 0;
                 events.ScheduleEvent(EVENT_CHECK_START, 1000);
                 if (Creature* speaker = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_VILEBRANCH_SPEAKER)))
                     if (!speaker->IsAlive())
                         speaker->Respawn(true);
             }
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+
+            killCount = 0;
+            me->RemoveAurasDueToSpell(SPELL_FRENZY);
+            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             summons.DespawnAll();
+            instance->SetBossState(DATA_OHGAN, NOT_STARTED);
             me->Mount(MODEL_OHGAN_MOUNT);
         }
 
@@ -200,7 +214,7 @@ public:
                                     events.ScheduleEvent(EVENT_CHECK_START, 1000);
                                 break;
                             case EVENT_STARTED:
-                                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                                 break;
                             default:
                                 break;
@@ -240,7 +254,7 @@ public:
                             events.ScheduleEvent(EVENT_CHECK_OHGAN, 1000);
                         break;
                     case EVENT_WATCH_PLAYER:
-                        if (Unit* player = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                        if (Unit* player = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                         {
                             DoCast(player, SPELL_WATCH);
                             Talk(SAY_WATCH, player);
@@ -248,7 +262,7 @@ public:
                         events.ScheduleEvent(EVENT_WATCH_PLAYER, urand(12000, 15000));
                         break;
                     case EVENT_CHARGE_PLAYER:
-                        DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0, 40, true), SPELL_CHARGE);
+                        DoCast(SelectTarget(SelectTargetMethod::Random, 0, 40, true), SPELL_CHARGE);
                         events.ScheduleEvent(EVENT_CHARGE_PLAYER, urand(22000, 30000));
                         break;
                     default:

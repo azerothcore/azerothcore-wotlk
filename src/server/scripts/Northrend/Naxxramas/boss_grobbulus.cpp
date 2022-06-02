@@ -1,14 +1,27 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "naxxramas.h"
 #include "PassiveAI.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
-#include "SpellScript.h"
-#include "SpellAuras.h"
+#include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
+#include "naxxramas.h"
 
 enum Spells
 {
@@ -94,7 +107,7 @@ public:
             events.ScheduleEvent(EVENT_BERSERK, RAID_MODE(720000, 540000));
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == RAID_MODE(SPELL_SLIME_SPRAY_10, SPELL_SLIME_SPRAY_25) && target->GetTypeId() == TYPEID_PLAYER)
             {
@@ -164,7 +177,7 @@ public:
                     events.RepeatEvent(20000);
                     break;
                 case EVENT_MUTATING_INJECTION:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100.0f, true, -SPELL_MUTATING_INJECTION))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true, -SPELL_MUTATING_INJECTION))
                     {
                         me->CastSpell(target, SPELL_MUTATING_INJECTION, false);
                     }
@@ -198,7 +211,7 @@ public:
             sizeTimer = 0;
             auraVisualTimer = 1;
             me->SetFloatValue(UNIT_FIELD_COMBATREACH, 2.0f);
-            me->setFaction(21);
+            me->SetFaction(FACTION_BOOTY_BAY);
         }
 
         void KilledUnit(Unit* who) override

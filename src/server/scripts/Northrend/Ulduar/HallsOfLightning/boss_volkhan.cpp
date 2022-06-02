@@ -1,11 +1,24 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "halls_of_lightning.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "halls_of_lightning.h"
 
 enum VolkahnSpells
 {
@@ -190,9 +203,9 @@ public:
             summons.Summon(summon);
             if (summon->GetEntry() == NPC_MOLTEN_GOLEM)
             {
-                summon->setFaction(me->getFaction());
+                summon->SetFaction(me->GetFaction());
 
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                     summon->AI()->AttackStart(target);
             }
         }
@@ -233,7 +246,7 @@ public:
                 events.ScheduleEvent(EVENT_MOVE_TO_ANVIL, 0, 0, 2);
         }
 
-        void SpellHitTarget(Unit* /*who*/, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit* /*who*/, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_TEMPER)
             {
@@ -344,7 +357,7 @@ public:
             if (uiDamage >= me->GetHealth())
             {
                 me->UpdateEntry(NPC_BRITTLE_GOLEM, 0, false);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_DISABLE_MOVE);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_DISABLE_MOVE);
                 me->SetHealth(me->GetMaxHealth());
                 me->RemoveAllAuras();
                 me->AttackStop();
@@ -446,7 +459,7 @@ public:
         {
             _attackGUID.Clear();
             _isActive = urand(0, 1);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             me->CastSpell(me, SPELL_FREEZE_ANIM, true);
         }
 
@@ -509,7 +522,7 @@ public:
 
             if (eventId == EVENT_UNFREEZE)
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->CastSpell(me, SPELL_AWAKEN, true);
                 me->RemoveAllAuras();
                 _isActive = true;
@@ -544,11 +557,11 @@ public:
                     events.RepeatEvent(12000);
                     break;
                 case EVENT_THROW:
-                    me->CastSpell(SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true, 0), me->GetMap()->IsHeroic() ? SPELL_THROW_H : SPELL_THROW_N, true);
+                    me->CastSpell(SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, 0), me->GetMap()->IsHeroic() ? SPELL_THROW_H : SPELL_THROW_N, true);
                     events.RepeatEvent(10000 + rand() % 15000);
                     break;
                 case EVENT_DEADLY_THROW:
-                    me->CastSpell(SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true, 0), me->GetMap()->IsHeroic() ? SPELL_DEADLY_THROW_H : SPELL_DEADLY_THROW_N, true);
+                    me->CastSpell(SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, 0), me->GetMap()->IsHeroic() ? SPELL_DEADLY_THROW_H : SPELL_DEADLY_THROW_N, true);
                     events.RepeatEvent(15000 + rand() % 15000);
                     break;
                 case EVENT_DEFLECTION:

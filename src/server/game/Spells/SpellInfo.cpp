@@ -1,10 +1,21 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Battleground.h"
+#include "SpellInfo.h"
 #include "Chat.h"
 #include "ConditionMgr.h"
 #include "DBCStores.h"
@@ -13,7 +24,6 @@
 #include "Spell.h"
 #include "SpellAuraDefines.h"
 #include "SpellAuraEffects.h"
-#include "SpellInfo.h"
 #include "SpellMgr.h"
 
 uint32 GetTargetFlagMask(SpellTargetObjectTypes objType)
@@ -196,8 +206,8 @@ uint32 SpellImplicitTargetInfo::GetExplicitTargetMask(bool& srcSet, bool& dstSet
     return targetMask;
 }
 
-SpellImplicitTargetInfo::StaticData  SpellImplicitTargetInfo::_data[TOTAL_SPELL_TARGETS] =
-{
+std::array<SpellImplicitTargetInfo::StaticData, TOTAL_SPELL_TARGETS> SpellImplicitTargetInfo::_data =
+{ {
     {TARGET_OBJECT_TYPE_NONE, TARGET_REFERENCE_TYPE_NONE,   TARGET_SELECT_CATEGORY_NYI,     TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        //
     {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_DEFAULT, TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 1 TARGET_UNIT_CASTER
     {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_NEARBY,  TARGET_CHECK_ENEMY,    TARGET_DIR_NONE},        // 2 TARGET_UNIT_NEARBY_ENEMY
@@ -309,7 +319,7 @@ SpellImplicitTargetInfo::StaticData  SpellImplicitTargetInfo::_data[TOTAL_SPELL_
     {TARGET_OBJECT_TYPE_GOBJ, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_CONE,    TARGET_CHECK_DEFAULT,  TARGET_DIR_FRONT},       // 108 TARGET_GAMEOBJECT_CONE
     {TARGET_OBJECT_TYPE_NONE, TARGET_REFERENCE_TYPE_NONE,   TARGET_SELECT_CATEGORY_NYI,     TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 109
     {TARGET_OBJECT_TYPE_DEST, TARGET_REFERENCE_TYPE_NONE,   TARGET_SELECT_CATEGORY_NYI,     TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 110 TARGET_DEST_UNK_110
-};
+} };
 
 SpellEffectInfo::SpellEffectInfo(SpellEntry const* spellEntry, SpellInfo const* spellInfo, uint8 effIndex)
 {
@@ -381,7 +391,7 @@ bool SpellEffectInfo::IsFarUnitTargetEffect() const
            || (Effect == SPELL_EFFECT_SUMMON_RAF_FRIEND)
            || (Effect == SPELL_EFFECT_RESURRECT)
            || (Effect == SPELL_EFFECT_RESURRECT_NEW)
-           /*|| (Effect == SPELL_EFFECT_SKIN_PLAYER_CORPSE) Xinef: This is not Far Unit Target Effect... what a bullshit*/;
+           /*|| (Effect == SPELL_EFFECT_SKIN_PLAYER_CORPSE) Xinef: This is not Far Unit Target Effect*/;
 }
 
 bool SpellEffectInfo::IsFarDestTargetEffect() const
@@ -439,10 +449,10 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
     if (caster)
     {
         // bonus amount from combo points
-        if (caster->m_movedByPlayer)
-            if (uint8 comboPoints = caster->m_movedByPlayer->ToPlayer()->GetComboPoints())
-                if (float comboDamage = PointsPerComboPoint)
-                    value += comboDamage * comboPoints;
+        if (uint8 comboPoints = caster->GetComboPoints())
+        {
+            value += PointsPerComboPoint * comboPoints;
+        }
 
         value = caster->ApplyEffectModifiers(_spellInfo, _effIndex, value);
 
@@ -587,8 +597,8 @@ SpellTargetObjectTypes SpellEffectInfo::GetUsedTargetObjectType() const
     return _data[Effect].UsedTargetObjectType;
 }
 
-SpellEffectInfo::StaticData  SpellEffectInfo::_data[TOTAL_SPELL_EFFECTS] =
-{
+std::array<SpellEffectInfo::StaticData, TOTAL_SPELL_EFFECTS> SpellEffectInfo::_data =
+{ {
     // implicit target type           used target object type
     {EFFECT_IMPLICIT_TARGET_NONE,     TARGET_OBJECT_TYPE_NONE}, // 0
     {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 1 SPELL_EFFECT_INSTAKILL
@@ -750,12 +760,12 @@ SpellEffectInfo::StaticData  SpellEffectInfo::_data[TOTAL_SPELL_EFFECTS] =
     {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 157 SPELL_EFFECT_CREATE_ITEM_2
     {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_ITEM}, // 158 SPELL_EFFECT_MILLING
     {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 159 SPELL_EFFECT_ALLOW_RENAME_PET
-    {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 160 SPELL_EFFECT_160
+    {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 160 SPELL_EFFECT_FORCE_CAST_2
     {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 161 SPELL_EFFECT_TALENT_SPEC_COUNT
     {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 162 SPELL_EFFECT_TALENT_SPEC_SELECT
     {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 163 SPELL_EFFECT_163
     {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 164 SPELL_EFFECT_REMOVE_AURA
-};
+} };
 
 SpellInfo::SpellInfo(SpellEntry const* spellEntry)
 {
@@ -811,25 +821,19 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
     RangeEntry = spellEntry->RangeIndex ? sSpellRangeStore.LookupEntry(spellEntry->RangeIndex) : nullptr;
     Speed = spellEntry->Speed;
     StackAmount = spellEntry->StackAmount;
-    for (uint8 i = 0; i < 2; ++i)
-        Totem[i] = spellEntry->Totem[i];
-    for (uint8 i = 0; i < MAX_SPELL_REAGENTS; ++i)
-        Reagent[i] = spellEntry->Reagent[i];
-    for (uint8 i = 0; i < MAX_SPELL_REAGENTS; ++i)
-        ReagentCount[i] = spellEntry->ReagentCount[i];
+    Totem = spellEntry->Totem;
+    Reagent = spellEntry->Reagent;
+    ReagentCount = spellEntry->ReagentCount;
     EquippedItemClass = spellEntry->EquippedItemClass;
     EquippedItemSubClassMask = spellEntry->EquippedItemSubClassMask;
     EquippedItemInventoryTypeMask = spellEntry->EquippedItemInventoryTypeMask;
-    for (uint8 i = 0; i < 2; ++i)
-        TotemCategory[i] = spellEntry->TotemCategory[i];
-    for (uint8 i = 0; i < 2; ++i)
-        SpellVisual[i] = spellEntry->SpellVisual[i];
+    TotemCategory = spellEntry->TotemCategory;
+    SpellVisual = spellEntry->SpellVisual;
     SpellIconID = spellEntry->SpellIconID;
     ActiveIconID = spellEntry->ActiveIconID;
-    for (uint8 i = 0; i < 16; ++i)
-        SpellName[i] = spellEntry->SpellName[i];
-    for (uint8 i = 0; i < 16; ++i)
-        Rank[i] = spellEntry->Rank[i];
+    SpellPriority = spellEntry->SpellPriority;
+    SpellName = spellEntry->SpellName;
+    Rank = spellEntry->Rank;
     MaxTargetLevel = spellEntry->MaxTargetLevel;
     MaxAffectedTargets = spellEntry->MaxAffectedTargets;
     SpellFamilyName = spellEntry->SpellFamilyName;
@@ -840,8 +844,9 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
     SchoolMask = spellEntry->SchoolMask;
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         Effects[i] = SpellEffectInfo(spellEntry, this, i);
-    ExplicitTargetMask = _GetExplicitTargetMask();
+
     ChainEntry = nullptr;
+    ExplicitTargetMask = 0;
 
     // Mine
     _isStackableWithRanks = false;
@@ -1238,7 +1243,7 @@ bool SpellInfo::IsChanneled() const
 
 bool SpellInfo::IsMoveAllowedChannel() const
 {
-    return IsChanneled() && (HasAttribute(SPELL_ATTR5_ALLOW_ACTION_DURING_CHANNEL) || (!(ChannelInterruptFlags & (AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING))));
+    return IsChanneled() && HasAttribute(SPELL_ATTR5_ALLOW_ACTION_DURING_CHANNEL);
 }
 
 bool SpellInfo::NeedsComboPoints() const
@@ -1276,8 +1281,19 @@ bool SpellInfo::IsAffectedBySpellMod(SpellModifier const* mod) const
             return false;
 
     SpellInfo const* affectSpell = sSpellMgr->GetSpellInfo(mod->spellId);
+
+    if (!affectSpell)
+    {
+        return false;
+    }
+
+    if (!sScriptMgr->OnIsAffectedBySpellModCheck(affectSpell, this, mod))
+    {
+        return true;
+    }
+
     // False if affect_spell == nullptr or spellFamily not equal
-    if (!affectSpell || affectSpell->SpellFamilyName != SpellFamilyName)
+    if (affectSpell->SpellFamilyName != SpellFamilyName)
         return false;
 
     // true
@@ -1289,15 +1305,27 @@ bool SpellInfo::IsAffectedBySpellMod(SpellModifier const* mod) const
 
 bool SpellInfo::CanPierceImmuneAura(SpellInfo const* aura) const
 {
+    // aura can't be pierced
+    if (!aura || aura->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))
+    {
+        return false;
+    }
+
     // these spells pierce all avalible spells (Resurrection Sickness for example)
     if (HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))
         return true;
 
     // these spells (Cyclone for example) can pierce all...
-    if ((AttributesEx & SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS)
-            // ...but not these (Divine shield for example)                                                                                 // xinef: banish exception, banish can override banish to cancel itself
-            && !(aura && (aura->Mechanic == MECHANIC_IMMUNE_SHIELD || aura->Mechanic == MECHANIC_INVULNERABILITY || (aura->Mechanic == MECHANIC_BANISH && (Mechanic != MECHANIC_BANISH || !(AttributesEx2 & SPELL_ATTR2_CANNOT_CAST_ON_TAPPED))))))
-        return true;
+    if (HasAttribute(SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS) || HasAttribute(SPELL_ATTR2_NO_SCHOOL_IMMUNITIES))
+    {
+        if (aura->Mechanic != MECHANIC_IMMUNE_SHIELD &&
+               aura->Mechanic != MECHANIC_INVULNERABILITY &&
+               aura->Mechanic != MECHANIC_BANISH)
+        {
+            return true;
+        }
+
+    }
 
     return false;
 }
@@ -1308,22 +1336,20 @@ bool SpellInfo::CanDispelAura(SpellInfo const* aura) const
     if (aura->IsPassive())
         return false;
 
-    // Xinef: At frist we check non-player auras, that should be never dispellable
-    // Xinef: Eg. Mark of the Fallen Champion
-    if (aura->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES) && aura->SpellFamilyName == SPELLFAMILY_GENERIC)
+    // These auras (like Divine Shield) can't be dispelled
+    if (aura->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))
         return false;
 
     // These spells (like Mass Dispel) can dispell all auras
     if (HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))
         return true;
 
-    // These auras (like Divine Shield) can't be dispelled
-    if (aura->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))
-        return false;
-
     // These auras (Cyclone for example) are not dispelable
-    if (aura->HasAttribute(SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS))
+    if ((aura->HasAttribute(SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS) && aura->Mechanic != MECHANIC_NONE)
+        || aura->HasAttribute(SPELL_ATTR2_NO_SCHOOL_IMMUNITIES))
+    {
         return false;
+    }
 
     return true;
 }
@@ -1333,14 +1359,6 @@ bool SpellInfo::IsSingleTarget() const
     // all other single target spells have if it has AttributesEx5
     if (AttributesEx5 & SPELL_ATTR5_LIMIT_N)
         return true;
-
-    switch (GetSpellSpecific())
-    {
-        case SPELL_SPECIFIC_JUDGEMENT:
-            return true;
-        default:
-            break;
-    }
 
     return false;
 }
@@ -1419,7 +1437,7 @@ SpellCastResult SpellInfo::CheckShapeshift(uint32 form) const
         shapeInfo = sSpellShapeshiftStore.LookupEntry(form);
         if (!shapeInfo)
         {
-            LOG_ERROR("spells", "GetErrorAtShapeshiftedCast: unknown shapeshift %u", form);
+            LOG_ERROR("spells", "GetErrorAtShapeshiftedCast: unknown shapeshift {}", form);
             return SPELL_CAST_OK;
         }
         actAsShifted = !(shapeInfo->flags1 & 1);            // shapeshift acts as normal form for spells
@@ -1474,29 +1492,17 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
     }
 
     // continent limitation (virtual continent)
-    if (HasAttribute(SPELL_ATTR4_ONLY_FLYING_AREAS))
+    if (HasAttribute(SPELL_ATTR4_ONLY_FLYING_AREAS) && (area_id || zone_id))
     {
-        if (strict)
+        AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(area_id);
+        if (!areaEntry)
         {
-            AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(area_id);
-            if (!areaEntry)
-            {
-                areaEntry = sAreaTableStore.LookupEntry(zone_id);
-            }
-
-            if (!areaEntry || !areaEntry->IsFlyable() || !player->canFlyInZone(map_id, zone_id, this))
-            {
-                return SPELL_FAILED_INCORRECT_AREA;
-            }
+            areaEntry = sAreaTableStore.LookupEntry(zone_id);
         }
-        else
+
+        if (!areaEntry || !areaEntry->IsFlyable() || (strict && (areaEntry->flags & AREA_FLAG_NO_FLY_ZONE) != 0) || !player->canFlyInZone(map_id, zone_id, this))
         {
-            uint32 const v_map = GetVirtualMapForMapAndZone(map_id, zone_id);
-            MapEntry const* mapEntry = sMapStore.LookupEntry(v_map);
-            if (!mapEntry || mapEntry->Expansion() < 1 || !mapEntry->IsContinent())
-            {
-                return SPELL_FAILED_INCORRECT_AREA;
-            }
+            return SPELL_FAILED_INCORRECT_AREA;
         }
     }
 
@@ -1605,12 +1611,19 @@ bool SpellInfo::IsStrongerAuraActive(Unit const* caster, Unit const* target) con
             if (!auraGroup || auraGroup != groupId)
                 continue;
 
+            if (IsRankOf((*iter)->GetSpellInfo()) && (sFlag & SPELL_GROUP_SPECIAL_FLAG_SKIP_STRONGER_SAME_SPELL))
+            {
+                continue;
+            }
+
             // xinef: check priority before effect mask
-            if (sFlag >= SPELL_GROUP_SPECIAL_FLAG_PRIORITY1)
+            if (sFlag >= SPELL_GROUP_SPECIAL_FLAG_PRIORITY1 && sFlag <= SPELL_GROUP_SPECIAL_FLAG_PRIORITY4)
             {
                 SpellGroupSpecialFlags sFlagCurr = sSpellMgr->GetSpellGroupSpecialFlags((*iter)->GetId());
-                if (sFlagCurr >= SPELL_GROUP_SPECIAL_FLAG_PRIORITY1 && sFlagCurr < sFlag)
+                if (sFlagCurr >= SPELL_GROUP_SPECIAL_FLAG_PRIORITY1 && sFlagCurr <= SPELL_GROUP_SPECIAL_FLAG_PRIORITY4 && sFlagCurr < sFlag)
+                {
                     return true;
+                }
             }
 
             // xinef: check aura effect equal auras only, some auras have different effects on different ranks - check rank also
@@ -1639,10 +1652,10 @@ bool SpellInfo::IsStrongerAuraActive(Unit const* caster, Unit const* target) con
                 if (player->m_spellModTakingSpell && player->m_spellModTakingSpell->m_spellInfo->Id == Id)
                     basePoints = player->m_spellModTakingSpell->GetSpellValue()->EffectBasePoints[i];
 
-            int32 curValue = abs(Effects[i].CalcValue(caster, &basePoints));
+            int32 curValue = std::abs(Effects[i].CalcValue(caster, &basePoints));
             int32 auraValue = (sFlag & SPELL_GROUP_SPECIAL_FLAG_BASE_AMOUNT_CHECK) ?
-                              abs((*iter)->GetSpellInfo()->Effects[(*iter)->GetEffIndex()].CalcValue((*iter)->GetCaster())) :
-                              abs((*iter)->GetAmount());
+                              std::abs((*iter)->GetSpellInfo()->Effects[(*iter)->GetEffIndex()].CalcValue((*iter)->GetCaster())) :
+                              std::abs((*iter)->GetAmount());
 
             // xinef: for same spells, divide amount by stack amount
             if (Id == (*iter)->GetId())
@@ -1705,7 +1718,7 @@ bool SpellInfo::IsAuraEffectEqual(SpellInfo const* otherSpellInfo) const
     return matchCount * 2 == auraCount;
 }
 
-bool SpellInfo::ValidateAttribute6SpellDamageMods(const Unit* caster, const AuraEffect* auraEffect, bool isDot) const
+bool SpellInfo::ValidateAttribute6SpellDamageMods(Unit const* caster, const AuraEffect* auraEffect, bool isDot) const
 {
     // Xinef: no attribute
     if (!(AttributesEx6 & SPELL_ATTR6_IGNORE_CASTER_DAMAGE_MODIFIERS))
@@ -1715,7 +1728,7 @@ bool SpellInfo::ValidateAttribute6SpellDamageMods(const Unit* caster, const Aura
     // Xinef: Scourge Strike - Trigger
     if (Id == 70890 && auraEffect)
     {
-        const SpellInfo* auraInfo = auraEffect->GetSpellInfo();
+        SpellInfo const* auraInfo = auraEffect->GetSpellInfo();
         return auraInfo->SpellIconID == 3086 ||
                (auraInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && (auraInfo->SpellFamilyFlags & flag96(8388608, 64, 16) || auraInfo->SpellIconID == 235 || auraInfo->SpellIconID == 154));
     }
@@ -1815,7 +1828,7 @@ SpellCastResult SpellInfo::CheckTarget(Unit const* caster, WorldObject const* ta
         return SPELL_FAILED_BAD_TARGETS;
 
     // checked in Unit::IsValidAttack/AssistTarget, shouldn't be checked for ENTRY targets
-    //if (!(AttributesEx6 & SPELL_ATTR6_CAN_TARGET_UNTARGETABLE) && target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+    //if (!(AttributesEx6 & SPELL_ATTR6_CAN_TARGET_UNTARGETABLE) && target->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
     //    return SPELL_FAILED_BAD_TARGETS;
 
     //if (!(AttributesEx6 & SPELL_ATTR6_NO_AURA_LOG)
@@ -1864,7 +1877,7 @@ SpellCastResult SpellInfo::CheckTarget(Unit const* caster, WorldObject const* ta
     if (ExcludeTargetAuraSpell && unitTarget->HasAura(sSpellMgr->GetSpellIdForDifficulty(ExcludeTargetAuraSpell, caster)))
         return SPELL_FAILED_TARGET_AURASTATE;
 
-    if (unitTarget->HasAuraType(SPELL_AURA_PREVENT_RESURRECTION))
+    if (unitTarget->HasAuraType(SPELL_AURA_PREVENT_RESURRECTION) && !HasAttribute(SPELL_ATTR7_BYPASS_NO_RESURRECTION_AURA))
         if (HasEffect(SPELL_EFFECT_SELF_RESURRECT) || HasEffect(SPELL_EFFECT_RESURRECT) || HasEffect(SPELL_EFFECT_RESURRECT_NEW))
             return SPELL_FAILED_TARGET_CANNOT_BE_RESURRECTED;
 
@@ -2255,8 +2268,8 @@ float SpellInfo::GetMinRange(bool positive) const
     if (!RangeEntry)
         return 0.0f;
     if (positive)
-        return RangeEntry->minRangeFriend;
-    return RangeEntry->minRangeHostile;
+        return RangeEntry->RangeMin[1];
+    return RangeEntry->RangeMin[0];
 }
 
 float SpellInfo::GetMaxRange(bool positive, Unit* caster, Spell* spell) const
@@ -2265,9 +2278,9 @@ float SpellInfo::GetMaxRange(bool positive, Unit* caster, Spell* spell) const
         return 0.0f;
     float range;
     if (positive)
-        range = RangeEntry->maxRangeFriend;
+        range = RangeEntry->RangeMax[1];
     else
-        range = RangeEntry->maxRangeHostile;
+        range = RangeEntry->RangeMax[0];
     if (caster)
         if (Player* modOwner = caster->GetSpellModOwner())
             modOwner->ApplySpellMod(Id, SPELLMOD_RANGE, range, spell);
@@ -2278,14 +2291,14 @@ int32 SpellInfo::GetDuration() const
 {
     if (!DurationEntry)
         return 0;
-    return (DurationEntry->Duration[0] == -1) ? -1 : abs(DurationEntry->Duration[0]);
+    return (DurationEntry->Duration[0] == -1) ? -1 : std::abs(DurationEntry->Duration[0]);
 }
 
 int32 SpellInfo::GetMaxDuration() const
 {
     if (!DurationEntry)
         return 0;
-    return (DurationEntry->Duration[2] == -1) ? -1 : abs(DurationEntry->Duration[2]);
+    return (DurationEntry->Duration[2] == -1) ? -1 : std::abs(DurationEntry->Duration[2]);
 }
 
 uint32 SpellInfo::CalcCastTime(Unit* caster, Spell* spell) const
@@ -2322,6 +2335,7 @@ uint32 SpellInfo::GetMaxTicks() const
                 case SPELL_AURA_PERIODIC_DAMAGE:
                 case SPELL_AURA_PERIODIC_HEAL:
                 case SPELL_AURA_PERIODIC_LEECH:
+                case SPELL_AURA_PERIODIC_TRIGGER_SPELL_FROM_CLIENT:
                     if (Effects[x].Amplitude != 0)
                         return DotDuration / Effects[x].Amplitude;
                     break;
@@ -2347,7 +2361,7 @@ int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask, S
         // Else drain all power
         if (PowerType < MAX_POWERS)
             return caster->GetPower(Powers(PowerType));
-        LOG_ERROR("spells", "SpellInfo::CalcPowerCost: Unknown power type '%d' in spell %d", PowerType, Id);
+        LOG_ERROR("spells", "SpellInfo::CalcPowerCost: Unknown power type '{}' in spell {}", PowerType, Id);
         return 0;
     }
 
@@ -2376,13 +2390,13 @@ int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask, S
                 LOG_DEBUG("spells.aura", "CalculateManaCost: Not implemented yet!");
                 break;
             default:
-                LOG_ERROR("spells", "CalculateManaCost: Unknown power type '%d' in spell %d", PowerType, Id);
+                LOG_ERROR("spells", "CalculateManaCost: Unknown power type '{}' in spell {}", PowerType, Id);
                 return 0;
         }
     }
     SpellSchools school = GetFirstSchoolInMask(schoolMask);
     // Flat mod from caster auras by spell school
-    powerCost += caster->GetInt32Value(UNIT_FIELD_POWER_COST_MODIFIER + school);
+    powerCost += caster->GetInt32Value(static_cast<uint16>(UNIT_FIELD_POWER_COST_MODIFIER) + school);
 
     // Shiv - costs 20 + weaponSpeed*10 energy (apply only to non-triggered spell with energy cost)
     if (AttributesEx4 & SPELL_ATTR4_WEAPON_SPEED_COST_SCALING)
@@ -2418,7 +2432,7 @@ int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask, S
     }
 
     // PCT mod from user auras by school
-    powerCost = int32(powerCost * (1.0f + caster->GetFloatValue(UNIT_FIELD_POWER_COST_MULTIPLIER + school)));
+    powerCost = int32(powerCost * (1.0f + caster->GetFloatValue(static_cast<uint16>(UNIT_FIELD_POWER_COST_MULTIPLIER) + school)));
     if (powerCost < 0)
         powerCost = 0;
     return powerCost;
@@ -2527,7 +2541,7 @@ bool SpellInfo::IsHighRankOf(SpellInfo const* spellInfo) const
     return false;
 }
 
-uint32 SpellInfo::_GetExplicitTargetMask() const
+void SpellInfo::_InitializeExplicitTargetMask()
 {
     bool srcSet = false;
     bool dstSet = false;
@@ -2552,7 +2566,7 @@ uint32 SpellInfo::_GetExplicitTargetMask() const
             effectTargetMask &= ~(TARGET_FLAG_UNIT_MASK | TARGET_FLAG_GAMEOBJECT | TARGET_FLAG_CORPSE_MASK | TARGET_FLAG_DEST_LOCATION);
         targetMask |= effectTargetMask;
     }
-    return targetMask;
+    ExplicitTargetMask = targetMask;
 }
 
 bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
@@ -2653,6 +2667,7 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
                     case SPELL_AURA_ADD_TARGET_TRIGGER:
                         return true;
                     case SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE:
+                    case SPELL_AURA_PERIODIC_TRIGGER_SPELL_FROM_CLIENT:
                     case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
                         if (!deep)
                         {
@@ -2821,4 +2836,51 @@ void SpellInfo::_UnloadImplicitTargetConditionLists()
         }
         delete cur;
     }
+}
+
+bool SpellInfo::CheckElixirStacking(Unit const* caster) const
+{
+    if (!caster)
+    {
+        return true;
+    }
+
+    // xinef: check spell group
+    uint32 groupId = sSpellMgr->GetSpellGroup(Id);
+    if (groupId != SPELL_GROUP_GUARDIAN_AND_BATTLE_ELIXIRS)
+    {
+        return true;
+    }
+
+    SpellGroupSpecialFlags sFlag = sSpellMgr->GetSpellGroupSpecialFlags(Id);
+    for (uint8 i = EFFECT_0; i < MAX_SPELL_EFFECTS; ++i)
+    {
+        if (!Effects[i].IsAura())
+        {
+            continue;
+        }
+
+        Unit::AuraApplicationMap const& Auras = caster->GetAppliedAuras();
+        for (Unit::AuraApplicationMap::const_iterator itr = Auras.begin(); itr != Auras.end(); ++itr)
+        {
+            // xinef: aura is not groupped or in different group
+            uint32 auraGroup = sSpellMgr->GetSpellGroup(itr->first);
+            if (auraGroup != groupId)
+            {
+                continue;
+            }
+
+            // Cannot apply guardian/battle elixir if flask is present
+            if (sFlag == SPELL_GROUP_SPECIAL_FLAG_ELIXIR_BATTLE || sFlag == SPELL_GROUP_SPECIAL_FLAG_ELIXIR_GUARDIAN)
+            {
+                SpellGroupSpecialFlags sAuraFlag = sSpellMgr->GetSpellGroupSpecialFlags(itr->first);
+                if ((sAuraFlag & SPELL_GROUP_SPECIAL_FLAG_FLASK) == SPELL_GROUP_SPECIAL_FLAG_FLASK)
+                {
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
 }

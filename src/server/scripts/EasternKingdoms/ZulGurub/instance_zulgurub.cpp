@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -17,8 +28,8 @@ EndScriptData */
 
 DoorData const doorData[] =
 {
-    { GO_FORCEFIELD, DATA_ARLOKK, DOOR_TYPE_ROOM, BOUNDARY_NONE },
-    { 0,             0,           DOOR_TYPE_ROOM, BOUNDARY_NONE } // END
+    { GO_FORCEFIELD, DATA_ARLOKK, DOOR_TYPE_ROOM },
+    { 0,             0,           DOOR_TYPE_ROOM } // END
 };
 
 class instance_zulgurub : public InstanceMapScript
@@ -32,12 +43,6 @@ public:
         {
             SetBossNumber(EncounterCount);
             LoadDoorData(doorData);
-        }
-
-        bool IsEncounterInProgress() const override
-        {
-            // not active in Zul'Gurub
-            return false;
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -62,6 +67,9 @@ public:
                 case NPC_ARLOKK:
                     _arlokkGUID = creature->GetGUID();
                     break;
+                case NPC_HAKKAR:
+                    _hakkarGUID = creature->GetGUID();
+                    break;
             }
         }
 
@@ -75,9 +83,9 @@ public:
                 case GO_GONG_OF_BETHEKK:
                     _goGongOfBethekkGUID = go->GetGUID();
                     if (GetBossState(DATA_ARLOKK) == DONE)
-                        go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     else
-                        go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
                 default:
                     break;
@@ -102,22 +110,18 @@ public:
             {
                 case DATA_LORKHAN:
                     return _zealotLorkhanGUID;
-                    break;
                 case DATA_ZATH:
                     return _zealotZathGUID;
-                    break;
                 case DATA_THEKAL:
                     return _highPriestTekalGUID;
-                    break;
                 case DATA_JINDO:
                     return _jindoTheHexxerGUID;
-                    break;
                 case NPC_ARLOKK:
                     return _arlokkGUID;
-                    break;
                 case GO_GONG_OF_BETHEKK:
                     return _goGongOfBethekkGUID;
-                    break;
+                case DATA_HAKKAR:
+                    return _hakkarGUID;
             }
 
             return ObjectGuid::Empty;
@@ -176,6 +180,7 @@ public:
         ObjectGuid _vilebranchSpeakerGUID;
         ObjectGuid _arlokkGUID;
         ObjectGuid _goGongOfBethekkGUID;
+        ObjectGuid _hakkarGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

@@ -1,5 +1,18 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef BLACK_TEMPLE_H_
@@ -81,9 +94,7 @@ enum MiscIds
     SPELL_SHADOW_INFERNO_DAMAGE     = 39646,
     SPELL_CHAOTIC_CHARGE            = 41033,
     SPELL_DEMENTIA1                 = 41406,
-    SPELL_DEMENTIA2                 = 41409,
-
-    FACTION_ASHTONGUE               = 1820
+    SPELL_DEMENTIA2                 = 41409
 };
 
 template <class AI, class T>

@@ -1,17 +1,27 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "DatabaseEnv.h"
-#include "DBCStores.h"
 #include "ItemEnchantmentMgr.h"
+#include "DBCStores.h"
+#include "DatabaseEnv.h"
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Util.h"
 #include <functional>
-#include <stdlib.h>
 #include <vector>
 
 struct EnchStoreItem
@@ -48,9 +58,9 @@ void LoadRandomEnchantmentsTable()
         {
             Field* fields = result->Fetch();
 
-            uint32 entry = fields[0].GetUInt32();
-            uint32 ench = fields[1].GetUInt32();
-            float chance = fields[2].GetFloat();
+            uint32 entry = fields[0].Get<uint32>();
+            uint32 ench = fields[1].Get<uint32>();
+            float chance = fields[2].Get<float>();
 
             if (chance > 0.000001f && chance <= 100.0f)
                 RandomItemEnch[entry].push_back(EnchStoreItem(ench, chance));
@@ -58,12 +68,12 @@ void LoadRandomEnchantmentsTable()
             ++count;
         } while (result->NextRow());
 
-        LOG_INFO("server.loading", ">> Loaded %u Item Enchantment definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+        LOG_INFO("server.loading", ">> Loaded {} Item Enchantment definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
         LOG_INFO("server.loading", " ");
     }
     else
     {
-        LOG_ERROR("sql.sql", ">> Loaded 0 Item Enchantment definitions. DB table `item_enchantment_template` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 Item Enchantment definitions. DB table `item_enchantment_template` is empty.");
         LOG_INFO("server.loading", " ");
     }
 }
@@ -79,7 +89,7 @@ uint32 GetItemEnchantMod(int32 entry)
     EnchantmentStore::const_iterator tab = RandomItemEnch.find(entry);
     if (tab == RandomItemEnch.end())
     {
-        LOG_ERROR("sql.sql", "Item RandomProperty / RandomSuffix id #%u used in `item_template` but it does not have records in `item_enchantment_template` table.", entry);
+        LOG_ERROR("sql.sql", "Item RandomProperty / RandomSuffix id #{} used in `item_template` but it does not have records in `item_enchantment_template` table.", entry);
         return 0;
     }
 

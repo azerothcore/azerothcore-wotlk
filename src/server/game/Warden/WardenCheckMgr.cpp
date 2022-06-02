@@ -1,14 +1,25 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "WardenCheckMgr.h"
 #include "Database/DatabaseEnv.h"
 #include "Log.h"
 #include "Util.h"
 #include "Warden.h"
-#include "WardenCheckMgr.h"
 #include "WorldSession.h"
 
 WardenCheckMgr::WardenCheckMgr()
@@ -39,14 +50,14 @@ void WardenCheckMgr::LoadWardenChecks()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 Warden checks. DB table `warden_checks` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 Warden checks. DB table `warden_checks` is empty!");
         LOG_INFO("server.loading", " ");
         return;
     }
 
     Field* fields = result->Fetch();
 
-    uint16 maxCheckId = fields[0].GetUInt16();
+    uint16 maxCheckId = fields[0].Get<uint16>();
 
     CheckStore.resize(maxCheckId + 1);
 
@@ -58,21 +69,21 @@ void WardenCheckMgr::LoadWardenChecks()
     {
         fields = result->Fetch();
 
-        uint16 id               = fields[0].GetUInt16();
-        uint8 checkType         = fields[1].GetUInt8();
+        uint16 id               = fields[0].Get<uint16>();
+        uint8 checkType         = fields[1].Get<uint8>();
 
         if (checkType == LUA_EVAL_CHECK && id > 9999)
         {
-            LOG_ERROR("warden", "sql.sql: Warden Lua check with id %u found in `warden_checks`. Lua checks may have four-digit IDs at most. Skipped.", id);
+            LOG_ERROR("warden", "sql.sql: Warden Lua check with id {} found in `warden_checks`. Lua checks may have four-digit IDs at most. Skipped.", id);
             continue;
         }
 
-        std::string data        = fields[2].GetString();
-        std::string checkResult = fields[3].GetString();
-        uint32 address          = fields[4].GetUInt32();
-        uint8 length            = fields[5].GetUInt8();
-        std::string str         = fields[6].GetString();
-        std::string comment     = fields[7].GetString();
+        std::string data        = fields[2].Get<std::string>();
+        std::string checkResult = fields[3].Get<std::string>();
+        uint32 address          = fields[4].Get<uint32>();
+        uint8 length            = fields[5].Get<uint8>();
+        std::string str         = fields[6].Get<std::string>();
+        std::string comment     = fields[7].Get<std::string>();
 
         WardenCheck &wardenCheck = CheckStore.at(id);
         wardenCheck.Type = checkType;
@@ -122,7 +133,7 @@ void WardenCheckMgr::LoadWardenChecks()
             {
                 if (wardenCheck.Length > WARDEN_MAX_LUA_CHECK_LENGTH)
                 {
-                    LOG_ERROR("warden", "sql.sql: Found over-long Lua check for Warden check with id %u in `warden_checks`. Max length is %u. Skipped.", id, WARDEN_MAX_LUA_CHECK_LENGTH);
+                    LOG_ERROR("warden", "sql.sql: Found over-long Lua check for Warden check with id {} in `warden_checks`. Max length is {}. Skipped.", id, WARDEN_MAX_LUA_CHECK_LENGTH);
                     continue;
                 }
 
@@ -146,7 +157,7 @@ void WardenCheckMgr::LoadWardenChecks()
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server.loading", ">> Loaded %u warden checks.", count);
+    LOG_INFO("server.loading", ">> Loaded {} warden checks.", count);
     LOG_INFO("server.loading", " ");
 }
 
@@ -165,7 +176,7 @@ void WardenCheckMgr::LoadWardenOverrides()
 
     if (!result)
     {
-        LOG_INFO("server.loading", ">> Loaded 0 Warden action overrides. DB table `warden_action` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 Warden action overrides. DB table `warden_action` is empty!");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -176,15 +187,15 @@ void WardenCheckMgr::LoadWardenOverrides()
     {
         Field* fields = result->Fetch();
 
-        uint16 checkId = fields[0].GetUInt16();
-        uint8  action  = fields[1].GetUInt8();
+        uint16 checkId = fields[0].Get<uint16>();
+        uint8  action  = fields[1].Get<uint8>();
 
         // Check if action value is in range (0-2, see WardenActions enum)
         if (action > WARDEN_ACTION_BAN)
-            LOG_ERROR("warden", "Warden check override action out of range (ID: %u, action: %u)", checkId, action);
+            LOG_ERROR("warden", "Warden check override action out of range (ID: {}, action: {})", checkId, action);
         // Check if check actually exists before accessing the CheckStore vector
         else if (checkId > CheckStore.size())
-            LOG_ERROR("warden", "Warden check action override for non-existing check (ID: %u, action: %u), skipped", checkId, action);
+            LOG_ERROR("warden", "Warden check action override for non-existing check (ID: {}, action: {}), skipped", checkId, action);
         else
         {
             CheckStore.at(checkId).Action = WardenActions(action);
@@ -192,7 +203,7 @@ void WardenCheckMgr::LoadWardenOverrides()
         }
     } while (result->NextRow());
 
-    LOG_INFO("server.loading", ">> Loaded %u warden action overrides.", count);
+    LOG_INFO("server.loading", ">> Loaded {} warden action overrides.", count);
     LOG_INFO("server.loading", " ");
 }
 

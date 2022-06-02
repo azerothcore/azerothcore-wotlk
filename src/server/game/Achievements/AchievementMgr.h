@@ -1,20 +1,31 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 #ifndef __ACORE_ACHIEVEMENTMGR_H
 #define __ACORE_ACHIEVEMENTMGR_H
 
-#include <map>
-#include <string>
-#include <chrono>
-
 #include "Common.h"
-#include "DatabaseEnv.h"
 #include "DBCEnums.h"
 #include "DBCStores.h"
+#include "DatabaseEnv.h"
 #include "ObjectGuid.h"
+#include <chrono>
+#include <map>
+#include <string>
 
 typedef std::list<AchievementCriteriaEntry const*> AchievementCriteriaEntryList;
 typedef std::list<AchievementEntry const*>         AchievementEntryList;
@@ -55,9 +66,10 @@ enum AchievementCriteriaDataType
     ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_ID              = 20, // map_id         0             player must be on map with id in map_id
     ACHIEVEMENT_CRITERIA_DATA_TYPE_S_PLAYER_CLASS_RACE = 21, // class_id       race_id
     ACHIEVEMENT_CRITERIA_DATA_TYPE_NTH_BIRTHDAY        = 22, // N                            login on day of N-th Birthday
-    ACHIEVEMENT_CRITERIA_DATA_TYPE_S_KNOWN_TITLE       = 23  // title_id                     known (pvp) title, values from dbc
+    ACHIEVEMENT_CRITERIA_DATA_TYPE_S_KNOWN_TITLE       = 23, // title_id                     known (pvp) title, values from dbc
+    ACHIEVEMENT_CRITERIA_DATA_TYPE_BG_TEAMS_SCORES     = 24, // winner_score   loser score   player's team win bg and their teams have exact scores
 };
-#define MAX_ACHIEVEMENT_CRITERIA_DATA_TYPE               24 // maximum value in AchievementCriteriaDataType enum
+#define MAX_ACHIEVEMENT_CRITERIA_DATA_TYPE               25 // maximum value in AchievementCriteriaDataType enum
 
 enum AchievementCommonCategories
 {
@@ -156,7 +168,7 @@ struct AchievementCriteriaData
             uint32 min_score;
             uint32 max_score;
         } bg_loss_team_score;
-        // ACHIEVEMENT_CRITERIA_DATA_TYPE_INSTANCE_SCRIPT        = 18 (no data)
+        // ACHIEVEMENT_CRITERIA_DATA_TYPE_INSTANCE_SCRIPT   = 18 (no data)
         // ACHIEVEMENT_CRITERIA_DATA_TYPE_S_EQUIPED_ITEM    = 19
         struct
         {
@@ -168,16 +180,22 @@ struct AchievementCriteriaData
         {
             uint32 mapId;
         } map_id;
-        // ACHIEVEMENT_CRITERIA_DATA_TYPE_NTH_BIRTHDAY      = 21
+        // ACHIEVEMENT_CRITERIA_DATA_TYPE_NTH_BIRTHDAY      = 22
         struct
         {
             uint32 nth_birthday;
         } birthday_login;
-        // ACHIEVEMENT_CRITERIA_DATA_TYPE_KNOWN_TITLE       = 22
+        // ACHIEVEMENT_CRITERIA_DATA_TYPE_KNOWN_TITLE       = 23
         struct
         {
             uint32 title_id;
         } known_title;
+        // ACHIEVEMENT_CRITERIA_DATA_TYPE_BG_TEAMS_SCORES   = 24
+        struct
+        {
+            uint32 winner_score;
+            uint32 loser_score;
+        } teams_scores;
         // ...
         struct
         {
@@ -207,7 +225,7 @@ struct AchievementCriteriaData
 
 struct AchievementCriteriaDataSet
 {
-    AchievementCriteriaDataSet()  {}
+    AchievementCriteriaDataSet()  = default;
     typedef std::vector<AchievementCriteriaData> Storage;
     void Add(AchievementCriteriaData const& data) { storage.push_back(data); }
     bool Meets(Player const* source, Unit const* target, uint32 miscvalue = 0) const;
@@ -285,7 +303,7 @@ private:
     bool IsCompletedCriteria(AchievementCriteriaEntry const* achievementCriteria, AchievementEntry const* achievement);
     bool IsCompletedAchievement(AchievementEntry const* entry);
     bool CanUpdateCriteria(AchievementCriteriaEntry const* criteria, AchievementEntry const* achievement);
-    void BuildAllDataPacket(WorldPacket* data, bool inspect = false) const;
+    void BuildAllDataPacket(WorldPacket* data) const;
 
     Player* m_player;
     CriteriaProgressMap m_criteriaProgress;
@@ -382,7 +400,7 @@ private:
     // store achievements by referenced achievement id to speed up lookup
     AchievementListByReferencedId m_AchievementListByReferencedId;
 
-    typedef std::unordered_map<uint32 /*achievementId*/, std::chrono::system_clock::time_point /*completionTime*/> AllCompletedAchievements;
+    typedef std::unordered_map<uint32 /*achievementId*/, SystemTimePoint /*completionTime*/> AllCompletedAchievements;
     AllCompletedAchievements m_allCompletedAchievements;
 
     AchievementRewards m_achievementRewards;

@@ -1,12 +1,25 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "icecrown_citadel.h"
 #include "ObjectMgr.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuras.h"
+#include "icecrown_citadel.h"
 
 enum ScriptTexts
 {
@@ -99,7 +112,7 @@ public:
         {
             if (!instance->CheckRequiredBosses(DATA_FESTERGUT, who->ToPlayer()))
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 instance->DoCastSpellOnPlayers(LIGHT_S_HAMMER_TELEPORT);
                 return;
             }
@@ -138,11 +151,11 @@ public:
             instance->SetBossState(DATA_FESTERGUT, FAIL);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
             if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
-                professor->AI()->EnterEvadeMode();
+                professor->AI()->EnterEvadeMode(why);
         }
 
         void KilledUnit(Unit* victim) override
@@ -176,7 +189,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim() || !CheckInRoom())
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
@@ -222,12 +235,12 @@ public:
                     {
                         std::list<Unit*> targets;
                         uint32 minTargets = RAID_MODE<uint32>(3, 8, 3, 8);
-                        SelectTargetList(targets, minTargets, SELECT_TARGET_RANDOM, -5.0f, true);
+                        SelectTargetList(targets, minTargets, SelectTargetMethod::Random, -5.0f, true);
                         float minDist = 0.0f;
                         if (targets.size() >= minTargets)
                             minDist = -5.0f;
 
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, minDist, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, minDist, true))
                             me->CastSpell(target, SPELL_VILE_GAS, false);
                         events.ScheduleEvent(EVENT_VILE_GAS, urand(28000, 35000), 1);
                         break;
@@ -237,7 +250,7 @@ public:
                     events.ScheduleEvent(EVENT_GASTRIC_BLOAT, urand(15000, 17500));
                     break;
                 case EVENT_FESTERGUT_GOO:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankTargetSelector(me)))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, NonTankTargetSelector(me)))
                         if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
                             professor->CastSpell(target, SPELL_MALLABLE_GOO_H, true);
                     events.ScheduleEvent(EVENT_FESTERGUT_GOO, urand(15000, 20000));

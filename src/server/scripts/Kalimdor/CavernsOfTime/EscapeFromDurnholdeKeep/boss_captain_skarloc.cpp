@@ -1,10 +1,23 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "old_hillsbrad.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "old_hillsbrad.h"
 
 enum CaptainSkarloc
 {
@@ -69,7 +82,7 @@ public:
             summons.Summon(summon);
             if (Creature* thrall = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(DATA_THRALL_GUID)))
                 thrall->AI()->JustSummoned(summon);
-            summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            summon->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
 
             if (summon->GetEntry() == NPC_SKARLOC_MOUNT)
                 return;
@@ -90,7 +103,7 @@ public:
                 path.push_back(G3D::Vector3(startPath[i].GetPositionX(), startPath[i].GetPositionY(), startPath[i].GetPositionZ()));
 
             me->GetMotionMaster()->MoveSplinePath(&path);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             me->Mount(SKARLOC_MOUNT_MODEL);
         }
 
@@ -155,13 +168,13 @@ public:
                     Talk(SAY_ENTER);
                     break;
                 case EVENT_START_FIGHT:
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     me->SetInCombatWithZone();
                     for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                         if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
                             if (summon->GetEntry() != NPC_SKARLOC_MOUNT)
                             {
-                                summon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                                summon->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                                 summon->SetInCombatWithZone();
                             }
                     break;

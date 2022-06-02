@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ACORE_CALENDARMGR_H
@@ -9,8 +20,8 @@
 
 #include "Common.h"
 #include "DatabaseEnv.h"
-#include "WorldPacket.h"
 #include "ObjectGuid.h"
+#include "WorldPacket.h"
 #include <unordered_map>
 
 enum CalendarMailAnswers
@@ -136,8 +147,7 @@ public:
         _text = calendarInvite.GetText();
     }
 
-    CalendarInvite() : _inviteId(1), _eventId(0), _statusTime(time(nullptr)),
-        _status(CALENDAR_STATUS_INVITED), _rank(CALENDAR_RANK_PLAYER), _text("") { }
+    CalendarInvite();
 
     CalendarInvite(uint64 inviteId, uint64 eventId, ObjectGuid invitee, ObjectGuid senderGUID, time_t statusTime,
                    CalendarInviteStatus status, CalendarModerationRank rank, std::string text) :

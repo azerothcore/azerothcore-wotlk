@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -21,10 +32,10 @@ npc_lord_gregor_lescovar
 EndContentData */
 
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 
 /*######
 ## npc_bartleby
@@ -32,7 +43,6 @@ EndContentData */
 
 enum Bartleby
 {
-    FACTION_ENEMY       = 168,
     QUEST_BEAT          = 1640
 };
 
@@ -45,7 +55,7 @@ public:
     {
         if (quest->GetQuestId() == QUEST_BEAT)
         {
-            creature->setFaction(FACTION_ENEMY);
+            creature->SetFaction(FACTION_ENEMY);
             creature->AI()->AttackStart(player);
         }
         return true;
@@ -60,15 +70,15 @@ public:
     {
         npc_bartlebyAI(Creature* creature) : ScriptedAI(creature)
         {
-            m_uiNormalFaction = creature->getFaction();
+            m_uiNormalFaction = creature->GetFaction();
         }
 
         uint32 m_uiNormalFaction;
 
         void Reset() override
         {
-            if (me->getFaction() != m_uiNormalFaction)
-                me->setFaction(m_uiNormalFaction);
+            if (me->GetFaction() != m_uiNormalFaction)
+                me->SetFaction(m_uiNormalFaction);
         }
 
         void AttackedBy(Unit* pAttacker) override
@@ -145,7 +155,7 @@ public:
             MarzonGUID.Clear();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->DisappearAndDie();
 
@@ -248,8 +258,8 @@ public:
                             if (Creature* pTyrion = me->FindNearestCreature(NPC_TYRION, 20.0f, true))
                                 pTyrion->AI()->Talk(SAY_TYRION_2);
                             if (Creature* pMarzon = ObjectAccessor::GetCreature(*me, MarzonGUID))
-                                pMarzon->setFaction(14);
-                            me->setFaction(14);
+                                pMarzon->SetFaction(FACTION_MONSTER);
+                            me->SetFaction(FACTION_MONSTER);
                             uiTimer = 0;
                             uiPhase = 0;
                             break;
@@ -299,7 +309,7 @@ public:
 
             if (me->IsSummon())
             {
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                 {
                     if (summoner->GetTypeId() == TYPEID_UNIT && summoner->IsAlive() && !summoner->IsInCombat())
                         summoner->ToCreature()->AI()->AttackStart(who);
@@ -307,13 +317,13 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->DisappearAndDie();
 
             if (me->IsSummon())
             {
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                 {
                     if (summoner->GetTypeId() == TYPEID_UNIT && summoner->IsAlive())
                         summoner->ToCreature()->DisappearAndDie();
@@ -328,7 +338,7 @@ public:
 
             if (me->IsSummon())
             {
-                Unit* summoner = me->ToTempSummon()->GetSummoner();
+                Unit* summoner = me->ToTempSummon()->GetSummonerUnit();
                 if (summoner && summoner->GetTypeId() == TYPEID_UNIT && summoner->IsAIEnabled)
                 {
                     npc_lord_gregor_lescovar::npc_lord_gregor_lescovarAI* ai =

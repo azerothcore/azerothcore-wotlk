@@ -1,16 +1,29 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "GridNotifiers.h"
 #include "Group.h"
-#include "icecrown_citadel.h"
 #include "ObjectMgr.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "Vehicle.h"
+#include "icecrown_citadel.h"
 
 enum ScriptTexts
 {
@@ -188,10 +201,10 @@ private:
 };
 
 // xinef: malleable goo selector, check for target validity
-struct MalleableGooSelector : public Acore::unary_function<Unit*, bool>
+struct MalleableGooSelector
 {
-    const Unit* me;
-    MalleableGooSelector(Unit const* unit) : me(unit) {}
+public:
+    MalleableGooSelector(Unit const* unit) : me(unit) { }
 
     bool operator()(Unit const* target) const
     {
@@ -203,6 +216,8 @@ struct MalleableGooSelector : public Acore::unary_function<Unit*, bool>
 
         return me->IsValidAttackTarget(target);
     }
+private:
+    Unit const* me;
 };
 
 class boss_professor_putricide : public CreatureScript
@@ -238,7 +253,7 @@ public:
             me->SetStandState(UNIT_STAND_STATE_STAND);
 
             if (instance->GetBossState(DATA_ROTFACE) == DONE && instance->GetBossState(DATA_FESTERGUT) == DONE)
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
 
         uint32 GetData(uint32 type) const override
@@ -268,14 +283,14 @@ public:
                 BossAI::AttackStart(who);
         }
 
-        bool CanAIAttack(const Unit* target) const override
+        bool CanAIAttack(Unit const* target) const override
         {
             return me->IsVisible() && target->GetPositionZ() > 388.0f && target->GetPositionZ() < 410.0f && target->GetPositionY() > 3157.1f && target->GetExactDist2dSq(4356.0f, 3211.0f) < 80.0f * 80.0f;
         }
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 BossAI::MoveInLineOfSight(who);
         }
 
@@ -486,7 +501,7 @@ public:
                 {
                     sayFestergutDeathTimer = 0;
                     Talk(SAY_FESTERGUT_DEATH);
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                 }
                 else
                     sayFestergutDeathTimer -= diff;
@@ -497,7 +512,7 @@ public:
                 {
                     sayRotfaceDeathTimer = 0;
                     Talk(SAY_ROTFACE_DEATH);
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                 }
                 else
                     sayRotfaceDeathTimer -= diff;
@@ -505,11 +520,11 @@ public:
             else if (bCallEvade)
             {
                 bCallEvade = false;
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 return;
             }
 
-            if (!UpdateVictim() || !CheckInRoom())
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
@@ -533,7 +548,7 @@ public:
                 case EVENT_SLIME_PUDDLE:
                     {
                         std::list<Unit*> targets;
-                        SelectTargetList(targets, 2, SELECT_TARGET_RANDOM, 0.0f, true);
+                        SelectTargetList(targets, 2, SelectTargetMethod::Random, 0.0f, true);
                         if (!targets.empty())
                             for (std::list<Unit*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
                                 me->CastSpell(*itr, SPELL_SLIME_PUDDLE_TRIGGER, true);
@@ -606,7 +621,7 @@ public:
                     instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_OOZE_VARIABLE);
                     break;
                 case EVENT_UNBOUND_PLAGUE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, UnboundPlagueTargetSelector(me)))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, UnboundPlagueTargetSelector(me)))
                     {
                         me->CastSpell(target, SPELL_UNBOUND_PLAGUE, false);
                         me->CastSpell(target, SPELL_UNBOUND_PLAGUE_SEARCHER, false);
@@ -619,7 +634,7 @@ public:
                     if (Is25ManRaid())
                     {
                         std::list<Unit*> targets;
-                        SelectTargetList(targets, MalleableGooSelector(me), (IsHeroic() ? 3 : 2), SELECT_TARGET_RANDOM);
+                        SelectTargetList(targets, MalleableGooSelector(me), (IsHeroic() ? 3 : 2), SelectTargetMethod::Random);
 
                         if (!targets.empty())
                         {
@@ -630,7 +645,7 @@ public:
                     }
                     else
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, MalleableGooSelector(me)))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, MalleableGooSelector(me)))
                         {
                             Talk(EMOTE_MALLEABLE_GOO);
                             me->CastSpell(target, SPELL_MALLEABLE_GOO, true);
@@ -650,12 +665,12 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             Position p = me->GetHomePosition();
             if (!me->IsInCombat() && me->GetExactDist2d(&p) > 10.0f)
                 me->GetMotionMaster()->MoveCharge(tablePos.GetPositionX(), tablePos.GetPositionY(), tablePos.GetPositionZ(), 15.0f, POINT_TABLE);
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
         }
 
         void ChangePhase()
@@ -784,7 +799,7 @@ public:
             else if (targetGUID)
             {
                 Unit* target = ObjectAccessor::GetUnit(*me, targetGUID);
-                if (me->GetVictim()->GetGUID() != targetGUID || !target || !me->IsValidAttackTarget(target) || target->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH) || target->GetExactDist2dSq(4356.0f, 3211.0f) > 80.0f * 80.0f || target->GetPositionZ() < 380.0f || target->GetPositionZ() > 405.0f)
+                if (me->GetVictim()->GetGUID() != targetGUID || !target || !me->IsValidAttackTarget(target) || target->HasUnitFlag2(UNIT_FLAG2_FEIGN_DEATH) || target->GetExactDist2dSq(4356.0f, 3211.0f) > 80.0f * 80.0f || target->GetPositionZ() < 380.0f || target->GetPositionZ() > 405.0f)
                     SelectNewTarget();
             }
         }
@@ -880,8 +895,8 @@ public:
         // big hax to unlock Abomination Eat Ooze ability, requires caster aura spell from difficulty X, but unlocks clientside when got base aura
         void HandleScript(SpellEffIndex  /*effIndex*/)
         {
-            const SpellInfo* s1 = sSpellMgr->GetSpellInfo(70346);
-            const SpellInfo* s2 = sSpellMgr->GetSpellInfo(72456);
+            SpellInfo const* s1 = sSpellMgr->GetSpellInfo(70346);
+            SpellInfo const* s2 = sSpellMgr->GetSpellInfo(72456);
             if (s1 && s2)
                 if (Unit* target = GetHitUnit())
                 {
@@ -1124,7 +1139,7 @@ public:
         void StartAttack()
         {
             GetCaster()->ClearUnitState(UNIT_STATE_CASTING);
-            GetCaster()->DeleteThreatList();
+            GetCaster()->GetThreatMgr().ClearAllThreat();
             GetCaster()->ToCreature()->SetInCombatWithZone();
             GetCaster()->ToCreature()->AI()->AttackStart(GetHitUnit());
             GetCaster()->AddThreat(GetHitUnit(), 500000000.0f);    // value seen in sniff
@@ -1525,8 +1540,7 @@ public:
             SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(uint32(GetSpellInfo()->Effects[effIndex].MiscValueB));
             uint32 duration = uint32(GetSpellInfo()->GetDuration());
 
-            Position pos;
-            caster->GetPosition(&pos);
+            Position pos = caster->GetPosition();
             TempSummon* summon = caster->GetMap()->SummonCreature(entry, pos, properties, duration, caster, GetSpellInfo()->Id);
             if (!summon || !summon->IsVehicle())
                 return;

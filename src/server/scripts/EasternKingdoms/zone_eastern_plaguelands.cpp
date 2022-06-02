@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -20,9 +31,9 @@ EndContentData */
 
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "WorldSession.h"
 
@@ -61,7 +72,7 @@ public:
     {
         if (quest->GetQuestId() == QUEST_BALANCE_OF_LIGHT_AND_SHADOW)
         {
-            creature->AI()->SetData(player->getFaction(), 0);
+            creature->AI()->SetData(player->GetFaction(), 0);
             creature->AI()->SetGUID(player->GetGUID());
         }
 
@@ -91,7 +102,7 @@ public:
             _playerGUID.Clear();
             events.Reset();
             summons.DespawnAll();
-            me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+            me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
         }
 
         void SetData(uint32 faction, uint32) override
@@ -102,7 +113,7 @@ public:
         void SetGUID(ObjectGuid guid, int32) override
         {
             _playerGUID = guid;
-            me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+            me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
             events.Reset();
             summons.DespawnAll();
 
@@ -149,7 +160,7 @@ public:
             summons.Summon(creature);
             if (creature->GetEntry() == NPC_INJURED_PEASANT || creature->GetEntry() == NPC_PLAGUED_PEASANT)
             {
-                creature->setFaction(_faction);
+                creature->SetFaction(_faction);
                 if (!_spoken)
                 {
                     _spoken = true;
@@ -164,7 +175,7 @@ public:
                 float z = 159.65f;
                 creature->SetWalk(true);
                 creature->GetMotionMaster()->MovePoint(0, x, y, z);
-                creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+                creature->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
             }
         }
 
@@ -253,7 +264,7 @@ public:
         uint32 timer;
         ObjectGuid _targetGUID;
 
-        void SpellHit(Unit*, const SpellInfo* spellInfo) override
+        void SpellHit(Unit*, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_SHOOT && roll_chance_i(7))
                 me->CastSpell(me, SPELL_DEATHS_DOOR, true);
@@ -265,7 +276,7 @@ public:
                 return;
 
             if (TempSummon* summon = me->ToTempSummon())
-                if (Unit* creature = summon->GetSummoner())
+                if (Unit* creature = summon->GetSummonerUnit())
                     creature->GetAI()->DoAction(1);
 
             me->DespawnOrUnsummon(1);
@@ -274,7 +285,7 @@ public:
         void JustDied(Unit*) override
         {
             if (TempSummon* summon = me->ToTempSummon())
-                if (Unit* creature = summon->GetSummoner())
+                if (Unit* creature = summon->GetSummonerUnit())
                     creature->GetAI()->DoAction(2);
         }
 
@@ -303,32 +314,6 @@ public:
 };
 
 // Theirs
-class npc_ghoul_flayer : public CreatureScript
-{
-public:
-    npc_ghoul_flayer() : CreatureScript("npc_ghoul_flayer") { }
-
-    struct npc_ghoul_flayerAI : public ScriptedAI
-    {
-        npc_ghoul_flayerAI(Creature* creature) : ScriptedAI(creature) { }
-
-        void Reset() override { }
-
-        void EnterCombat(Unit* /*who*/) override { }
-
-        void JustDied(Unit* killer) override
-        {
-            if (killer->GetTypeId() == TYPEID_PLAYER)
-                me->SummonCreature(11064, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000);
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_ghoul_flayerAI(creature);
-    }
-};
-
 /*######
 ## npc_augustus_the_touched
 ######*/
@@ -359,47 +344,6 @@ public:
     }
 };
 
-/*######
-## npc_darrowshire_spirit
-######*/
-
-enum DarrowshireSpirit
-{
-    SPELL_SPIRIT_SPAWNIN    = 17321
-};
-
-class npc_darrowshire_spirit : public CreatureScript
-{
-public:
-    npc_darrowshire_spirit() : CreatureScript("npc_darrowshire_spirit") { }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        SendGossipMenuFor(player, 3873, creature->GetGUID());
-        player->TalkedToCreature(creature->GetEntry(), creature->GetGUID());
-        creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        return true;
-    }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_darrowshire_spiritAI(creature);
-    }
-
-    struct npc_darrowshire_spiritAI : public ScriptedAI
-    {
-        npc_darrowshire_spiritAI(Creature* creature) : ScriptedAI(creature) { }
-
-        void Reset() override
-        {
-            DoCast(me, SPELL_SPIRIT_SPAWNIN);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        }
-
-        void EnterCombat(Unit* /*who*/) override { }
-    };
-};
-
 void AddSC_eastern_plaguelands()
 {
     // Ours
@@ -407,7 +351,5 @@ void AddSC_eastern_plaguelands()
     new npc_balance_of_light_and_shadow();
 
     // Theirs
-    new npc_ghoul_flayer();
     new npc_augustus_the_touched();
-    new npc_darrowshire_spirit();
 }

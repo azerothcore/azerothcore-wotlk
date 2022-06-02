@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -12,6 +23,7 @@ Category: commandscripts
 EndScriptData */
 
 #include "AccountMgr.h"
+#include "CharacterCache.h"
 #include "Chat.h"
 #include "GameEventMgr.h"
 #include "ObjectAccessor.h"
@@ -20,64 +32,66 @@ EndScriptData */
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
 #include "SpellInfo.h"
+#include "SpellMgr.h"
+
+using namespace Acore::ChatCommands;
 
 class lookup_commandscript : public CommandScript
 {
 public:
     lookup_commandscript() : CommandScript("lookup_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> lookupPlayerCommandTable =
+        static ChatCommandTable lookupPlayerCommandTable =
         {
-            { "ip",             SEC_GAMEMASTER,     true,  &HandleLookupPlayerIpCommand,        "" },
-            { "account",        SEC_GAMEMASTER,     true,  &HandleLookupPlayerAccountCommand,   "" },
-            { "email",          SEC_GAMEMASTER,     true,  &HandleLookupPlayerEmailCommand,     "" }
+            { "ip",      HandleLookupPlayerIpCommand,      SEC_GAMEMASTER, Console::Yes  },
+            { "account", HandleLookupPlayerAccountCommand, SEC_GAMEMASTER, Console::Yes  },
+            { "email",   HandleLookupPlayerEmailCommand,   SEC_GAMEMASTER, Console::Yes  }
         };
 
-        static std::vector<ChatCommand> lookupSpellCommandTable =
+        static ChatCommandTable lookupCommandTable =
         {
-            { "id",             SEC_MODERATOR,      true,  &HandleLookupSpellIdCommand,         "" },
-            { "",               SEC_MODERATOR,      true,  &HandleLookupSpellCommand,           "" }
+            { "area",     HandleLookupAreaCommand,         SEC_MODERATOR, Console::Yes  },
+            { "creature", HandleLookupCreatureCommand,     SEC_MODERATOR, Console::Yes  },
+            { "event",    HandleLookupEventCommand,        SEC_MODERATOR, Console::Yes  },
+            { "faction",  HandleLookupFactionCommand,      SEC_MODERATOR, Console::Yes  },
+            { "item",     HandleLookupItemCommand,         SEC_MODERATOR, Console::Yes  },
+            { "item set", HandleLookupItemSetCommand,      SEC_MODERATOR, Console::Yes  },
+            { "map",      HandleLookupMapCommand,          SEC_MODERATOR, Console::Yes  },
+            { "object",   HandleLookupObjectCommand,       SEC_MODERATOR, Console::Yes  },
+            { "gobject",  HandleLookupObjectCommand,       SEC_MODERATOR, Console::Yes  },
+            { "quest",    HandleLookupQuestCommand,        SEC_MODERATOR, Console::Yes  },
+            { "skill",    HandleLookupSkillCommand,        SEC_MODERATOR, Console::Yes  },
+            { "taxinode", HandleLookupTaxiNodeCommand,     SEC_MODERATOR, Console::Yes  },
+            { "teleport", HandleLookupTeleCommand,         SEC_MODERATOR, Console::Yes  },
+            { "title",    HandleLookupTitleCommand,        SEC_MODERATOR, Console::Yes  },
+            { "spell",    HandleLookupSpellCommand,        SEC_MODERATOR, Console::Yes  },
+            { "spell id", HandleLookupSpellIdCommand,      SEC_MODERATOR, Console::Yes  },
+            { "player",   lookupPlayerCommandTable },
         };
 
-        static std::vector<ChatCommand> lookupCommandTable =
+        static ChatCommandTable commandTable =
         {
-            { "area",           SEC_MODERATOR,      true,  &HandleLookupAreaCommand,        "" },
-            { "creature",       SEC_MODERATOR,      true,  &HandleLookupCreatureCommand,    "" },
-            { "event",          SEC_MODERATOR,      true,  &HandleLookupEventCommand,       "" },
-            { "faction",        SEC_MODERATOR,      true,  &HandleLookupFactionCommand,     "" },
-            { "item",           SEC_MODERATOR,      true,  &HandleLookupItemCommand,        "" },
-            { "itemset",        SEC_MODERATOR,      true,  &HandleLookupItemSetCommand,     "" },
-            { "object",         SEC_MODERATOR,      true,  &HandleLookupObjectCommand,      "" },
-            { "gobject",        SEC_MODERATOR,      true,  &HandleLookupObjectCommand,      "" },
-            { "quest",          SEC_MODERATOR,      true,  &HandleLookupQuestCommand,       "" },
-            { "skill",          SEC_MODERATOR,      true,  &HandleLookupSkillCommand,       "" },
-            { "taxinode",       SEC_MODERATOR,      true,  &HandleLookupTaxiNodeCommand,    "" },
-            { "teleport",       SEC_MODERATOR,      true,  &HandleLookupTeleCommand,        "" },
-            { "title",          SEC_MODERATOR,      true,  &HandleLookupTitleCommand,       "" },
-            { "map",            SEC_MODERATOR,      true,  &HandleLookupMapCommand,         "" },
-            { "player",         SEC_GAMEMASTER,     true,  nullptr, "", lookupPlayerCommandTable },
-            { "spell",          SEC_MODERATOR,      true,  nullptr, "", lookupSpellCommandTable }
+            { "lookup", lookupCommandTable }
         };
 
-        static std::vector<ChatCommand> commandTable =
-        {
-            { "lookup",         SEC_MODERATOR,  true,  nullptr,                                 "", lookupCommandTable }
-        };
         return commandTable;
     }
 
-    static bool HandleLookupAreaCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupAreaCommand(ChatHandler* handler, Tail namePart)
     {
-        if (!*args)
+        if (namePart.empty())
+        {
             return false;
+        }
 
-        std::string namePart = args;
         std::wstring wNamePart;
 
         if (!Utf8toWStr(namePart, wNamePart))
+        {
             return false;
+        }
 
         bool found = false;
         uint32 count = 0;
@@ -87,73 +101,89 @@ public:
         wstrToLower(wNamePart);
 
         // Search in AreaTable.dbc
-        for (uint32 i = 0; i < sAreaTableStore.GetNumRows(); ++i)
+        for (auto areaEntry : sAreaTableStore)
         {
-            AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(i);
-            if (areaEntry)
+            int locale = handler->GetSessionDbcLocale();
+            std::string name = areaEntry->area_name[locale];
+
+            if (name.empty())
             {
-                int locale = handler->GetSessionDbcLocale();
-                std::string name = areaEntry->area_name[locale];
-                if (name.empty())
-                    continue;
+                continue;
+            }
 
-                if (!Utf8FitTo(name, wNamePart))
+            if (!Utf8FitTo(name, wNamePart))
+            {
+                locale = 0;
+                for (; locale < TOTAL_LOCALES; ++locale)
                 {
-                    locale = 0;
-                    for (; locale < TOTAL_LOCALES; ++locale)
+                    if (locale == handler->GetSessionDbcLocale())
                     {
-                        if (locale == handler->GetSessionDbcLocale())
-                            continue;
+                        continue;
+                    }
 
-                        name = areaEntry->area_name[locale];
-                        if (name.empty())
-                            continue;
+                    name = areaEntry->area_name[locale];
+                    if (name.empty())
+                    {
+                        continue;
+                    }
 
-                        if (Utf8FitTo(name, wNamePart))
-                            break;
+                    if (Utf8FitTo(name, wNamePart))
+                    {
+                        break;
                     }
                 }
+            }
 
-                if (locale < TOTAL_LOCALES)
+            if (locale < TOTAL_LOCALES)
+            {
+                if (maxResults && count++ == maxResults)
                 {
-                    if (maxResults && count++ == maxResults)
-                    {
-                        handler->PSendSysMessage(LANG_COMMAND_LOOKUP_MAX_RESULTS, maxResults);
-                        return true;
-                    }
+                    handler->PSendSysMessage(LANG_COMMAND_LOOKUP_MAX_RESULTS, maxResults);
+                    return true;
+                }
 
-                    // send area in "id - [name]" format
-                    std::ostringstream ss;
-                    if (handler->GetSession())
-                        ss << areaEntry->ID << " - |cffffffff|Harea:" << areaEntry->ID << "|h[" << name << ' ' << localeNames[locale] << "]|h|r";
-                    else
-                        ss << areaEntry->ID << " - " << name << ' ' << localeNames[locale];
+                // send area in "id - [name]" format
+                std::ostringstream ss;
+                if (handler->GetSession())
+                {
+                    ss << areaEntry->ID << " - |cffffffff|Harea:" << areaEntry->ID << "|h[" << name << ' ' << localeNames[locale] << "]|h|r";
+                }
+                else
+                {
+                    ss << areaEntry->ID << " - " << name << ' ' << localeNames[locale];
+                }
 
-                    handler->SendSysMessage(ss.str().c_str());
+                handler->SendSysMessage(ss.str().c_str());
 
-                    if (!found)
-                        found = true;
+                if (!found)
+                {
+                    found = true;
                 }
             }
         }
 
         if (!found)
+        {
             handler->SendSysMessage(LANG_COMMAND_NOAREAFOUND);
+        }
 
         return true;
     }
 
-    static bool HandleLookupCreatureCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupCreatureCommand(ChatHandler* handler, Tail namePart)
     {
-        if (!*args)
+        if (namePart.empty())
+        {
             return false;
+        }
 
-        std::string namePart = args;
         std::wstring wNamePart;
 
         // converting string that we try to find to lower case
         if (!Utf8toWStr(namePart, wNamePart))
+        {
             return false;
+        }
 
         wstrToLower(wNamePart);
 
@@ -161,10 +191,9 @@ public:
         uint32 count = 0;
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
 
-        CreatureTemplateContainer const* ctc = sObjectMgr->GetCreatureTemplates();
-        for (CreatureTemplateContainer::const_iterator itr = ctc->begin(); itr != ctc->end(); ++itr)
+        for (auto const& [entry, creatureTemplate] : *sObjectMgr->GetCreatureTemplates())
         {
-            uint32 id = itr->second.Entry;
+            uint32 id = creatureTemplate.Entry;
             uint8 localeIndex = handler->GetSessionDbLocaleIndex();
             if (CreatureLocale const* creatureLocale = sObjectMgr->GetCreatureLocale(id))
             {
@@ -181,21 +210,29 @@ public:
                         }
 
                         if (handler->GetSession())
+                        {
                             handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CHAT, id, id, name.c_str());
+                        }
                         else
+                        {
                             handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CONSOLE, id, name.c_str());
+                        }
 
                         if (!found)
+                        {
                             found = true;
+                        }
 
                         continue;
                     }
                 }
             }
 
-            std::string name = itr->second.Name;
+            std::string name = creatureTemplate.Name;
             if (name.empty())
+            {
                 continue;
+            }
 
             if (Utf8FitTo(name, wNamePart))
             {
@@ -206,32 +243,43 @@ public:
                 }
 
                 if (handler->GetSession())
+                {
                     handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CHAT, id, id, name.c_str());
+                }
                 else
+                {
                     handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CONSOLE, id, name.c_str());
+                }
 
                 if (!found)
+                {
                     found = true;
+                }
             }
         }
 
         if (!found)
+        {
             handler->SendSysMessage(LANG_COMMAND_NOCREATUREFOUND);
+        }
 
         return true;
     }
 
-    static bool HandleLookupEventCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupEventCommand(ChatHandler* handler, Tail namePart)
     {
-        if (!*args)
+        if (namePart.empty())
+        {
             return false;
+        }
 
-        std::string namePart = args;
         std::wstring wNamePart;
 
         // converting string that we try to find to lower case
         if (!Utf8toWStr(namePart, wNamePart))
+        {
             return false;
+        }
 
         wstrToLower(wNamePart);
 
@@ -248,7 +296,9 @@ public:
 
             std::string descr = eventData.description;
             if (descr.empty())
+            {
                 continue;
+            }
 
             if (Utf8FitTo(descr, wNamePart))
             {
@@ -261,134 +311,181 @@ public:
                 char const* active = activeEvents.find(id) != activeEvents.end() ? handler->GetAcoreString(LANG_ACTIVE) : "";
 
                 if (handler->GetSession())
+                {
                     handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CHAT, id, id, eventData.description.c_str(), active);
+                }
                 else
+                {
                     handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CONSOLE, id, eventData.description.c_str(), active);
+                }
 
                 if (!found)
+                {
                     found = true;
+                }
             }
         }
 
         if (!found)
+        {
             handler->SendSysMessage(LANG_NOEVENTFOUND);
+        }
 
         return true;
     }
 
-    static bool HandleLookupFactionCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupFactionCommand(ChatHandler* handler, Tail namePart)
     {
-        if (!*args)
+        if (namePart.empty())
+        {
             return false;
+        }
 
         // Can be nullptr at console call
         Player* target = handler->getSelectedPlayer();
 
-        std::string namePart = args;
         std::wstring wNamePart;
 
         if (!Utf8toWStr(namePart, wNamePart))
+        {
             return false;
+        }
 
         // converting string that we try to find to lower case
-        wstrToLower (wNamePart);
+        wstrToLower(wNamePart);
 
         bool found = false;
         uint32 count = 0;
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
 
-        for (uint32 id = 0; id < sFactionStore.GetNumRows(); ++id)
+        for (auto factionEntry : sFactionStore)
         {
-            FactionEntry const* factionEntry = sFactionStore.LookupEntry(id);
-            if (factionEntry)
+            FactionState const* factionState = target ? target->GetReputationMgr().GetState(factionEntry) : nullptr;
+
+            int locale = handler->GetSessionDbcLocale();
+            std::string name = factionEntry->name[locale];
+            if (name.empty())
             {
-                FactionState const* factionState = target ? target->GetReputationMgr().GetState(factionEntry) : nullptr;
+                continue;
+            }
 
-                int locale = handler->GetSessionDbcLocale();
-                std::string name = factionEntry->name[locale];
-                if (name.empty())
-                    continue;
+            if (!Utf8FitTo(name, wNamePart))
+            {
+                locale = 0;
 
-                if (!Utf8FitTo(name, wNamePart))
+                for (; locale < TOTAL_LOCALES; ++locale)
                 {
-                    locale = 0;
-                    for (; locale < TOTAL_LOCALES; ++locale)
+                    if (locale == handler->GetSessionDbcLocale())
                     {
-                        if (locale == handler->GetSessionDbcLocale())
-                            continue;
+                        continue;
+                    }
 
-                        name = factionEntry->name[locale];
-                        if (name.empty())
-                            continue;
+                    name = factionEntry->name[locale];
+                    if (name.empty())
+                    {
+                        continue;
+                    }
 
-                        if (Utf8FitTo(name, wNamePart))
-                            break;
+                    if (Utf8FitTo(name, wNamePart))
+                    {
+                        break;
                     }
                 }
+            }
 
-                if (locale < TOTAL_LOCALES)
+            if (locale < TOTAL_LOCALES)
+            {
+                if (maxResults && count++ == maxResults)
                 {
-                    if (maxResults && count++ == maxResults)
+                    handler->PSendSysMessage(LANG_COMMAND_LOOKUP_MAX_RESULTS, maxResults);
+                    return true;
+                }
+
+                // send faction in "id - [faction] rank reputation [visible] [at war] [own team] [unknown] [invisible] [inactive]" format
+                // or              "id - [faction] [no reputation]" format
+                std::ostringstream ss;
+                if (handler->GetSession())
+                {
+                    ss << factionEntry->ID << " - |cffffffff|Hfaction:" << factionEntry->ID << "|h[" << name << ' ' << localeNames[locale] << "]|h|r";
+                }
+                else
+                {
+                    ss << factionEntry->ID << " - " << name << ' ' << localeNames[locale];
+                }
+
+                if (factionState) // and then target != nullptr also
+                {
+                    uint32 index = target->GetReputationMgr().GetReputationRankStrIndex(factionEntry);
+                    std::string rankName = handler->GetAcoreString(index);
+
+                    ss << ' ' << rankName << "|h|r (" << target->GetReputationMgr().GetReputation(factionEntry) << ')';
+
+                    if (factionState->Flags & FACTION_FLAG_VISIBLE)
                     {
-                        handler->PSendSysMessage(LANG_COMMAND_LOOKUP_MAX_RESULTS, maxResults);
-                        return true;
+                        ss << handler->GetAcoreString(LANG_FACTION_VISIBLE);
                     }
 
-                    // send faction in "id - [faction] rank reputation [visible] [at war] [own team] [unknown] [invisible] [inactive]" format
-                    // or              "id - [faction] [no reputation]" format
-                    std::ostringstream ss;
-                    if (handler->GetSession())
-                        ss << id << " - |cffffffff|Hfaction:" << id << "|h[" << name << ' ' << localeNames[locale] << "]|h|r";
-                    else
-                        ss << id << " - " << name << ' ' << localeNames[locale];
-
-                    if (factionState) // and then target != nullptr also
+                    if (factionState->Flags & FACTION_FLAG_AT_WAR)
                     {
-                        uint32 index = target->GetReputationMgr().GetReputationRankStrIndex(factionEntry);
-                        std::string rankName = handler->GetAcoreString(index);
-
-                        ss << ' ' << rankName << "|h|r (" << target->GetReputationMgr().GetReputation(factionEntry) << ')';
-
-                        if (factionState->Flags & FACTION_FLAG_VISIBLE)
-                            ss << handler->GetAcoreString(LANG_FACTION_VISIBLE);
-                        if (factionState->Flags & FACTION_FLAG_AT_WAR)
-                            ss << handler->GetAcoreString(LANG_FACTION_ATWAR);
-                        if (factionState->Flags & FACTION_FLAG_PEACE_FORCED)
-                            ss << handler->GetAcoreString(LANG_FACTION_PEACE_FORCED);
-                        if (factionState->Flags & FACTION_FLAG_HIDDEN)
-                            ss << handler->GetAcoreString(LANG_FACTION_HIDDEN);
-                        if (factionState->Flags & FACTION_FLAG_INVISIBLE_FORCED)
-                            ss << handler->GetAcoreString(LANG_FACTION_INVISIBLE_FORCED);
-                        if (factionState->Flags & FACTION_FLAG_INACTIVE)
-                            ss << handler->GetAcoreString(LANG_FACTION_INACTIVE);
+                        ss << handler->GetAcoreString(LANG_FACTION_ATWAR);
                     }
-                    else
-                        ss << handler->GetAcoreString(LANG_FACTION_NOREPUTATION);
 
-                    handler->SendSysMessage(ss.str().c_str());
+                    if (factionState->Flags & FACTION_FLAG_PEACE_FORCED)
+                    {
+                        ss << handler->GetAcoreString(LANG_FACTION_PEACE_FORCED);
+                    }
 
-                    if (!found)
-                        found = true;
+                    if (factionState->Flags & FACTION_FLAG_HIDDEN)
+                    {
+                        ss << handler->GetAcoreString(LANG_FACTION_HIDDEN);
+                    }
+
+                    if (factionState->Flags & FACTION_FLAG_INVISIBLE_FORCED)
+                    {
+                        ss << handler->GetAcoreString(LANG_FACTION_INVISIBLE_FORCED);
+                    }
+
+                    if (factionState->Flags & FACTION_FLAG_INACTIVE)
+                    {
+                        ss << handler->GetAcoreString(LANG_FACTION_INACTIVE);
+                    }
+                }
+                else
+                {
+                    ss << handler->GetAcoreString(LANG_FACTION_NOREPUTATION);
+                }
+
+                handler->SendSysMessage(ss.str().c_str());
+
+                if (!found)
+                {
+                    found = true;
                 }
             }
         }
 
         if (!found)
+        {
             handler->SendSysMessage(LANG_COMMAND_FACTION_NOTFOUND);
+        }
+
         return true;
     }
 
-    static bool HandleLookupItemCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupItemCommand(ChatHandler* handler, Tail namePart)
     {
-        if (!*args)
+        if (namePart.empty())
+        {
             return false;
+        }
 
-        std::string namePart = args;
         std::wstring wNamePart;
 
         // converting string that we try to find to lower case
         if (!Utf8toWStr(namePart, wNamePart))
+        {
             return false;
+        }
 
         wstrToLower(wNamePart);
 
@@ -397,14 +494,13 @@ public:
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
 
         // Search in `item_template`
-        ItemTemplateContainer const* its = sObjectMgr->GetItemTemplateStore();
-        for (ItemTemplateContainer::const_iterator itr = its->begin(); itr != its->end(); ++itr)
+        for (auto const& [entry, itemTemplate] : *sObjectMgr->GetItemTemplateStore())
         {
             int localeIndex = handler->GetSessionDbLocaleIndex();
             if (localeIndex >= 0)
             {
                 uint8 ulocaleIndex = uint8(localeIndex);
-                if (ItemLocale const* il = sObjectMgr->GetItemLocale(itr->second.ItemId))
+                if (ItemLocale const* il = sObjectMgr->GetItemLocale(itemTemplate.ItemId))
                 {
                     if (il->Name.size() > ulocaleIndex && !il->Name[ulocaleIndex].empty())
                     {
@@ -419,12 +515,18 @@ public:
                             }
 
                             if (handler->GetSession())
-                                handler->PSendSysMessage(LANG_ITEM_LIST_CHAT, itr->second.ItemId, itr->second.ItemId, name.c_str());
+                            {
+                                handler->PSendSysMessage(LANG_ITEM_LIST_CHAT, itemTemplate.ItemId, itemTemplate.ItemId, name.c_str());
+                            }
                             else
-                                handler->PSendSysMessage(LANG_ITEM_LIST_CONSOLE, itr->second.ItemId, name.c_str());
+                            {
+                                handler->PSendSysMessage(LANG_ITEM_LIST_CONSOLE, itemTemplate.ItemId, name.c_str());
+                            }
 
                             if (!found)
+                            {
                                 found = true;
+                            }
 
                             continue;
                         }
@@ -432,9 +534,11 @@ public:
                 }
             }
 
-            std::string name = itr->second.Name1;
+            std::string name = itemTemplate.Name1;
             if (name.empty())
+            {
                 continue;
+            }
 
             if (Utf8FitTo(name, wNamePart))
             {
@@ -445,31 +549,42 @@ public:
                 }
 
                 if (handler->GetSession())
-                    handler->PSendSysMessage(LANG_ITEM_LIST_CHAT, itr->second.ItemId, itr->second.ItemId, name.c_str());
+                {
+                    handler->PSendSysMessage(LANG_ITEM_LIST_CHAT, itemTemplate.ItemId, itemTemplate.ItemId, name.c_str());
+                }
                 else
-                    handler->PSendSysMessage(LANG_ITEM_LIST_CONSOLE, itr->second.ItemId, name.c_str());
+                {
+                    handler->PSendSysMessage(LANG_ITEM_LIST_CONSOLE, itemTemplate.ItemId, name.c_str());
+                }
 
                 if (!found)
+                {
                     found = true;
+                }
             }
         }
 
         if (!found)
+        {
             handler->SendSysMessage(LANG_COMMAND_NOITEMFOUND);
+        }
 
         return true;
     }
 
-    static bool HandleLookupItemSetCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupItemSetCommand(ChatHandler* handler, Tail namePart)
     {
-        if (!*args)
+        if (namePart.empty())
+        {
             return false;
+        }
 
-        std::string namePart = args;
         std::wstring wNamePart;
 
         if (!Utf8toWStr(namePart, wNamePart))
+        {
             return false;
+        }
 
         // converting string that we try to find to lower case
         wstrToLower(wNamePart);
@@ -487,7 +602,9 @@ public:
                 int locale = handler->GetSessionDbcLocale();
                 std::string name = set->name[locale];
                 if (name.empty())
+                {
                     continue;
+                }
 
                 if (!Utf8FitTo(name, wNamePart))
                 {
@@ -495,14 +612,20 @@ public:
                     for (; locale < TOTAL_LOCALES; ++locale)
                     {
                         if (locale == handler->GetSessionDbcLocale())
+                        {
                             continue;
+                        }
 
                         name = set->name[locale];
                         if (name.empty())
+                        {
                             continue;
+                        }
 
                         if (Utf8FitTo(name, wNamePart))
+                        {
                             break;
+                        }
                     }
                 }
 
@@ -516,32 +639,44 @@ public:
 
                     // send item set in "id - [namedlink locale]" format
                     if (handler->GetSession())
+                    {
                         handler->PSendSysMessage(LANG_ITEMSET_LIST_CHAT, id, id, name.c_str(), localeNames[locale]);
+                    }
                     else
+                    {
                         handler->PSendSysMessage(LANG_ITEMSET_LIST_CONSOLE, id, name.c_str(), localeNames[locale]);
+                    }
 
                     if (!found)
+                    {
                         found = true;
+                    }
                 }
             }
         }
+
         if (!found)
+        {
             handler->SendSysMessage(LANG_COMMAND_NOITEMSETFOUND);
+        }
 
         return true;
     }
 
-    static bool HandleLookupObjectCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupObjectCommand(ChatHandler* handler, Tail namePart)
     {
-        if (!*args)
+        if (namePart.empty())
+        {
             return false;
+        }
 
-        std::string namePart = args;
         std::wstring wNamePart;
 
         // converting string that we try to find to lower case
         if (!Utf8toWStr(namePart, wNamePart))
+        {
             return false;
+        }
 
         wstrToLower(wNamePart);
 
@@ -549,11 +684,10 @@ public:
         uint32 count = 0;
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
 
-        GameObjectTemplateContainer const* gotc = sObjectMgr->GetGameObjectTemplates();
-        for (GameObjectTemplateContainer::const_iterator itr = gotc->begin(); itr != gotc->end(); ++itr)
+        for (auto const& [entry, gameObjectTemplate] : *sObjectMgr->GetGameObjectTemplates())
         {
             uint8 localeIndex = handler->GetSessionDbLocaleIndex();
-            if (GameObjectLocale const* objectLocalte = sObjectMgr->GetGameObjectLocale(itr->second.entry))
+            if (GameObjectLocale const* objectLocalte = sObjectMgr->GetGameObjectLocale(gameObjectTemplate.entry))
             {
                 if (objectLocalte->Name.size() > localeIndex && !objectLocalte->Name[localeIndex].empty())
                 {
@@ -568,21 +702,29 @@ public:
                         }
 
                         if (handler->GetSession())
-                            handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CHAT, itr->second.entry, itr->second.entry, name.c_str());
+                        {
+                            handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CHAT, gameObjectTemplate.entry, gameObjectTemplate.entry, name.c_str());
+                        }
                         else
-                            handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CONSOLE, itr->second.entry, name.c_str());
+                        {
+                            handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CONSOLE, gameObjectTemplate.entry, name.c_str());
+                        }
 
                         if (!found)
+                        {
                             found = true;
+                        }
 
                         continue;
                     }
                 }
             }
 
-            std::string name = itr->second.name;
+            std::string name = gameObjectTemplate.name;
             if (name.empty())
+            {
                 continue;
+            }
 
             if (Utf8FitTo(name, wNamePart))
             {
@@ -593,35 +735,46 @@ public:
                 }
 
                 if (handler->GetSession())
-                    handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CHAT, itr->second.entry, itr->second.entry, name.c_str());
+                {
+                    handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CHAT, gameObjectTemplate.entry, gameObjectTemplate.entry, name.c_str());
+                }
                 else
-                    handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CONSOLE, itr->second.entry, name.c_str());
+                {
+                    handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CONSOLE, gameObjectTemplate.entry, name.c_str());
+                }
 
                 if (!found)
+                {
                     found = true;
+                }
             }
         }
 
         if (!found)
+        {
             handler->SendSysMessage(LANG_COMMAND_NOGAMEOBJECTFOUND);
+        }
 
         return true;
     }
 
-    static bool HandleLookupQuestCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupQuestCommand(ChatHandler* handler, Tail namePart)
     {
-        if (!*args)
+        if (namePart.empty())
+        {
             return false;
+        }
 
         // can be nullptr at console call
         Player* target = handler->getSelectedPlayer();
 
-        std::string namePart = args;
         std::wstring wNamePart;
 
         // converting string that we try to find to lower case
         if (!Utf8toWStr(namePart, wNamePart))
+        {
             return false;
+        }
 
         wstrToLower(wNamePart);
 
@@ -629,11 +782,8 @@ public:
         uint32 count = 0;
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
 
-        ObjectMgr::QuestMap const& qTemplates = sObjectMgr->GetQuestTemplates();
-        for (ObjectMgr::QuestMap::const_iterator iter = qTemplates.begin(); iter != qTemplates.end(); ++iter)
+        for (auto const& [entry, qInfo] : sObjectMgr->GetQuestTemplates())
         {
-            Quest* qInfo = iter->second;
-
             int localeIndex = handler->GetSessionDbLocaleIndex();
             if (localeIndex >= 0)
             {
@@ -675,12 +825,19 @@ public:
                             }
 
                             if (handler->GetSession())
+                            {
                                 handler->PSendSysMessage(LANG_QUEST_LIST_CHAT, qInfo->GetQuestId(), qInfo->GetQuestId(), qInfo->GetQuestLevel(), title.c_str(), statusStr);
+                            }
                             else
+                            {
                                 handler->PSendSysMessage(LANG_QUEST_LIST_CONSOLE, qInfo->GetQuestId(), title.c_str(), statusStr);
+                            }
 
                             if (!found)
+                            {
                                 found = true;
+                            }
+
                             continue;
                         }
                     }
@@ -689,7 +846,9 @@ public:
 
             std::string title = qInfo->GetTitle();
             if (title.empty())
+            {
                 continue;
+            }
 
             if (Utf8FitTo(title, wNamePart))
             {
@@ -722,34 +881,45 @@ public:
                 }
 
                 if (handler->GetSession())
+                {
                     handler->PSendSysMessage(LANG_QUEST_LIST_CHAT, qInfo->GetQuestId(), qInfo->GetQuestId(), qInfo->GetQuestLevel(), title.c_str(), statusStr);
+                }
                 else
+                {
                     handler->PSendSysMessage(LANG_QUEST_LIST_CONSOLE, qInfo->GetQuestId(), title.c_str(), statusStr);
+                }
 
                 if (!found)
+                {
                     found = true;
+                }
             }
         }
 
         if (!found)
+        {
             handler->SendSysMessage(LANG_COMMAND_NOQUESTFOUND);
+        }
 
         return true;
     }
 
-    static bool HandleLookupSkillCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupSkillCommand(ChatHandler* handler, Tail namePart)
     {
-        if (!*args)
+        if (namePart.empty())
+        {
             return false;
+        }
 
         // can be nullptr in console call
         Player* target = handler->getSelectedPlayer();
 
-        std::string namePart = args;
         std::wstring wNamePart;
 
         if (!Utf8toWStr(namePart, wNamePart))
+        {
             return false;
+        }
 
         // converting string that we try to find to lower case
         wstrToLower(wNamePart);
@@ -759,85 +929,102 @@ public:
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
 
         // Search in SkillLine.dbc
-        for (uint32 id = 0; id < sSkillLineStore.GetNumRows(); id++)
+        for (auto skillInfo : sSkillLineStore)
         {
-            SkillLineEntry const* skillInfo = sSkillLineStore.LookupEntry(id);
-            if (skillInfo)
+            int locale = handler->GetSessionDbcLocale();
+            std::string name = skillInfo->name[locale];
+
+            if (name.empty())
             {
-                int locale = handler->GetSessionDbcLocale();
-                std::string name = skillInfo->name[locale];
-                if (name.empty())
-                    continue;
+                continue;
+            }
 
-                if (!Utf8FitTo(name, wNamePart))
+            if (!Utf8FitTo(name, wNamePart))
+            {
+                locale = 0;
+                for (; locale < TOTAL_LOCALES; ++locale)
                 {
-                    locale = 0;
-                    for (; locale < TOTAL_LOCALES; ++locale)
+                    if (locale == handler->GetSessionDbcLocale())
                     {
-                        if (locale == handler->GetSessionDbcLocale())
-                            continue;
+                        continue;
+                    }
 
-                        name = skillInfo->name[locale];
-                        if (name.empty())
-                            continue;
+                    name = skillInfo->name[locale];
+                    if (name.empty())
+                    {
+                        continue;
+                    }
 
-                        if (Utf8FitTo(name, wNamePart))
-                            break;
+                    if (Utf8FitTo(name, wNamePart))
+                    {
+                        break;
                     }
                 }
+            }
 
-                if (locale < TOTAL_LOCALES)
+            if (locale < TOTAL_LOCALES)
+            {
+                if (maxResults && count++ == maxResults)
                 {
-                    if (maxResults && count++ == maxResults)
-                    {
-                        handler->PSendSysMessage(LANG_COMMAND_LOOKUP_MAX_RESULTS, maxResults);
-                        return true;
-                    }
+                    handler->PSendSysMessage(LANG_COMMAND_LOOKUP_MAX_RESULTS, maxResults);
+                    return true;
+                }
 
-                    char valStr[50] = "";
-                    char const* knownStr = "";
-                    if (target && target->HasSkill(id))
-                    {
-                        knownStr = handler->GetAcoreString(LANG_KNOWN);
-                        uint32 curValue = target->GetPureSkillValue(id);
-                        uint32 maxValue  = target->GetPureMaxSkillValue(id);
-                        uint32 permValue = target->GetSkillPermBonusValue(id);
-                        uint32 tempValue = target->GetSkillTempBonusValue(id);
+                std::string valStr;
+                std::string knownStr;
 
-                        char const* valFormat = handler->GetAcoreString(LANG_SKILL_VALUES);
-                        snprintf(valStr, 50, valFormat, curValue, maxValue, permValue, tempValue);
-                    }
+                if (target && target->HasSkill(skillInfo->id))
+                {
+                    knownStr = handler->GetAcoreString(LANG_KNOWN);
+                    uint32 curValue = target->GetPureSkillValue(skillInfo->id);
+                    uint32 maxValue = target->GetPureMaxSkillValue(skillInfo->id);
+                    uint32 permValue = target->GetSkillPermBonusValue(skillInfo->id);
+                    uint32 tempValue = target->GetSkillTempBonusValue(skillInfo->id);
 
-                    // send skill in "id - [namedlink locale]" format
-                    if (handler->GetSession())
-                        handler->PSendSysMessage(LANG_SKILL_LIST_CHAT, id, id, name.c_str(), localeNames[locale], knownStr, valStr);
-                    else
-                        handler->PSendSysMessage(LANG_SKILL_LIST_CONSOLE, id, name.c_str(), localeNames[locale], knownStr, valStr);
+                    valStr = Acore::StringFormat(handler->GetAcoreString(LANG_SKILL_VALUES), curValue, maxValue, permValue, tempValue);
+                }
 
-                    if (!found)
-                        found = true;
+                // send skill in "id - [namedlink locale]" format
+                if (handler->GetSession())
+                {
+                    handler->PSendSysMessage(LANG_SKILL_LIST_CHAT, skillInfo->id, skillInfo->id, name.c_str(), localeNames[locale], knownStr.c_str(), valStr.c_str());
+                }
+                else
+                {
+                    handler->PSendSysMessage(LANG_SKILL_LIST_CONSOLE, skillInfo->id, name.c_str(), localeNames[locale], knownStr.c_str(), valStr.c_str());
+                }
+
+                if (!found)
+                {
+                    found = true;
                 }
             }
         }
+
         if (!found)
+        {
             handler->SendSysMessage(LANG_COMMAND_NOSKILLFOUND);
+        }
 
         return true;
     }
 
-    static bool HandleLookupSpellCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupSpellCommand(ChatHandler* handler, Tail namePart)
     {
-        if (!*args)
+        if (namePart.empty())
+        {
             return false;
+        }
 
         // can be nullptr at console call
         Player* target = handler->getSelectedPlayer();
 
-        std::string namePart = args;
         std::wstring wNamePart;
 
         if (!Utf8toWStr(namePart, wNamePart))
+        {
             return false;
+        }
 
         // converting string that we try to find to lower case
         wstrToLower(wNamePart);
@@ -855,7 +1042,9 @@ public:
                 int locale = handler->GetSessionDbcLocale();
                 std::string name = spellInfo->SpellName[locale];
                 if (name.empty())
+                {
                     continue;
+                }
 
                 if (!Utf8FitTo(name, wNamePart))
                 {
@@ -863,14 +1052,20 @@ public:
                     for (; locale < TOTAL_LOCALES; ++locale)
                     {
                         if (locale == handler->GetSessionDbcLocale())
+                        {
                             continue;
+                        }
 
                         name = spellInfo->SpellName[locale];
                         if (name.empty())
+                        {
                             continue;
+                        }
 
                         if (Utf8FitTo(name, wNamePart))
+                        {
                             break;
+                        }
                     }
                 }
 
@@ -900,66 +1095,240 @@ public:
                     // send spell in "id - [name, rank N] [talent] [passive] [learn] [known]" format
                     std::ostringstream ss;
                     if (handler->GetSession())
+                    {
                         ss << id << " - |cffffffff|Hspell:" << id << "|h[" << name;
+                    }
                     else
+                    {
                         ss << id << " - " << name;
+                    }
 
                     // include rank in link name
                     if (rank)
+                    {
                         ss << handler->GetAcoreString(LANG_SPELL_RANK) << rank;
+                    }
 
                     if (handler->GetSession())
+                    {
                         ss << ' ' << localeNames[locale] << "]|h|r";
+                    }
                     else
+                    {
                         ss << ' ' << localeNames[locale];
+                    }
 
                     if (talent)
+                    {
                         ss << handler->GetAcoreString(LANG_TALENT);
+                    }
+
                     if (passive)
+                    {
                         ss << handler->GetAcoreString(LANG_PASSIVE);
+                    }
+
                     if (learn)
+                    {
                         ss << handler->GetAcoreString(LANG_LEARN);
+                    }
+
                     if (known)
+                    {
                         ss << handler->GetAcoreString(LANG_KNOWN);
+                    }
+
                     if (active)
+                    {
                         ss << handler->GetAcoreString(LANG_ACTIVE);
+                    }
 
                     handler->SendSysMessage(ss.str().c_str());
 
                     if (!found)
+                    {
                         found = true;
+                    }
                 }
             }
         }
+
         if (!found)
+        {
             handler->SendSysMessage(LANG_COMMAND_NOSPELLFOUND);
+        }
 
         return true;
     }
 
-    static bool HandleLookupSpellIdCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupSpellIdCommand(ChatHandler* handler, SpellInfo const* spell)
     {
-        if (!*args)
-            return false;
-
         // can be nullptr at console call
         Player* target = handler->getSelectedPlayer();
-
-        uint32 id = atoi((char*)args);
 
         bool found = false;
         uint32 count = 0;
         uint32 maxResults = 1;
 
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(id);
-        if (spellInfo)
+        if (!SpellMgr::IsSpellValid(spell))
+        {
+            handler->PSendSysMessage(LANG_COMMAND_SPELL_BROKEN, spell->Id);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        int locale = handler->GetSessionDbcLocale();
+        std::string name = spell->SpellName[locale];
+        if (name.empty())
+        {
+            handler->SendSysMessage(LANG_COMMAND_NOSPELLFOUND);
+            return true;
+        }
+
+        if (locale < TOTAL_LOCALES)
+        {
+            if (maxResults && count++ == maxResults)
+            {
+                handler->PSendSysMessage(LANG_COMMAND_LOOKUP_MAX_RESULTS, maxResults);
+                return true;
+            }
+
+            bool known = target && target->HasSpell(spell->Id);
+            bool learn = (spell->Effects[0].Effect == SPELL_EFFECT_LEARN_SPELL);
+
+            SpellInfo const* learnSpellInfo = sSpellMgr->GetSpellInfo(spell->Effects[0].TriggerSpell);
+
+            uint32 talentCost = GetTalentSpellCost(spell->Id);
+
+            bool talent = (talentCost > 0);
+            bool passive = spell->IsPassive();
+            bool active = target && target->HasAura(spell->Id);
+
+            // unit32 used to prevent interpreting uint8 as char at output
+            // find rank of learned spell for learning spell, or talent rank
+            uint32 rank = talentCost ? talentCost : learn && learnSpellInfo ? learnSpellInfo->GetRank() : spell->GetRank();
+
+            // send spell in "id - [name, rank N] [talent] [passive] [learn] [known]" format
+            std::ostringstream ss;
+            if (handler->GetSession())
+            {
+                ss << spell->Id << " - |cffffffff|Hspell:" << spell->Id << "|h[" << name;
+            }
+            else
+            {
+                ss << spell->Id << " - " << name;
+            }
+
+            // include rank in link name
+            if (rank)
+            {
+                ss << handler->GetAcoreString(LANG_SPELL_RANK) << rank;
+            }
+
+            if (handler->GetSession())
+            {
+                ss << ' ' << localeNames[locale] << "]|h|r";
+            }
+            else
+            {
+                ss << ' ' << localeNames[locale];
+            }
+
+            if (talent)
+            {
+                ss << handler->GetAcoreString(LANG_TALENT);
+            }
+
+            if (passive)
+            {
+                ss << handler->GetAcoreString(LANG_PASSIVE);
+            }
+
+            if (learn)
+            {
+                ss << handler->GetAcoreString(LANG_LEARN);
+            }
+
+            if (known)
+            {
+                ss << handler->GetAcoreString(LANG_KNOWN);
+            }
+
+            if (active)
+            {
+                ss << handler->GetAcoreString(LANG_ACTIVE);
+            }
+
+            handler->SendSysMessage(ss.str().c_str());
+
+            if (!found)
+            {
+                found = true;
+            }
+        }
+
+        if (!found)
+        {
+            handler->SendSysMessage(LANG_COMMAND_NOSPELLFOUND);
+        }
+
+        return true;
+    }
+
+    static bool HandleLookupTaxiNodeCommand(ChatHandler* handler, Tail namePart)
+    {
+        if (namePart.empty())
+        {
+            return false;
+        }
+
+        std::wstring wNamePart;
+
+        if (!Utf8toWStr(namePart, wNamePart))
+        {
+            return false;
+        }
+
+        // converting string that we try to find to lower case
+        wstrToLower(wNamePart);
+
+        bool found = false;
+        uint32 count = 0;
+        uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
+
+        // Search in TaxiNodes.dbc
+        for (auto nodeEntry : sTaxiNodesStore)
         {
             int locale = handler->GetSessionDbcLocale();
-            std::string name = spellInfo->SpellName[locale];
+            std::string name = nodeEntry->name[locale];
+
             if (name.empty())
             {
-                handler->SendSysMessage(LANG_COMMAND_NOSPELLFOUND);
-                return true;
+                continue;
+            }
+
+            if (!Utf8FitTo(name, wNamePart))
+            {
+                locale = 0;
+
+                for (; locale < TOTAL_LOCALES; ++locale)
+                {
+                    if (locale == handler->GetSessionDbcLocale())
+                    {
+                        continue;
+                    }
+
+                    name = nodeEntry->name[locale];
+                    if (name.empty())
+                    {
+                        continue;
+                    }
+
+                    if (Utf8FitTo(name, wNamePart))
+                    {
+                        break;
+                    }
+                }
             }
 
             if (locale < TOTAL_LOCALES)
@@ -970,153 +1339,46 @@ public:
                     return true;
                 }
 
-                bool known = target && target->HasSpell(id);
-                bool learn = (spellInfo->Effects[0].Effect == SPELL_EFFECT_LEARN_SPELL);
-
-                SpellInfo const* learnSpellInfo = sSpellMgr->GetSpellInfo(spellInfo->Effects[0].TriggerSpell);
-
-                uint32 talentCost = GetTalentSpellCost(id);
-
-                bool talent = (talentCost > 0);
-                bool passive = spellInfo->IsPassive();
-                bool active = target && target->HasAura(id);
-
-                // unit32 used to prevent interpreting uint8 as char at output
-                // find rank of learned spell for learning spell, or talent rank
-                uint32 rank = talentCost ? talentCost : learn && learnSpellInfo ? learnSpellInfo->GetRank() : spellInfo->GetRank();
-
-                // send spell in "id - [name, rank N] [talent] [passive] [learn] [known]" format
-                std::ostringstream ss;
+                // send taxinode in "id - [name] (Map:m X:x Y:y Z:z)" format
                 if (handler->GetSession())
-                    ss << id << " - |cffffffff|Hspell:" << id << "|h[" << name;
+                {
+                    handler->PSendSysMessage(LANG_TAXINODE_ENTRY_LIST_CHAT, nodeEntry->ID, nodeEntry->ID, name.c_str(), localeNames[locale],
+                                             nodeEntry->map_id, nodeEntry->x, nodeEntry->y, nodeEntry->z);
+                }
                 else
-                    ss << id << " - " << name;
-
-                // include rank in link name
-                if (rank)
-                    ss << handler->GetAcoreString(LANG_SPELL_RANK) << rank;
-
-                if (handler->GetSession())
-                    ss << ' ' << localeNames[locale] << "]|h|r";
-                else
-                    ss << ' ' << localeNames[locale];
-
-                if (talent)
-                    ss << handler->GetAcoreString(LANG_TALENT);
-                if (passive)
-                    ss << handler->GetAcoreString(LANG_PASSIVE);
-                if (learn)
-                    ss << handler->GetAcoreString(LANG_LEARN);
-                if (known)
-                    ss << handler->GetAcoreString(LANG_KNOWN);
-                if (active)
-                    ss << handler->GetAcoreString(LANG_ACTIVE);
-
-                handler->SendSysMessage(ss.str().c_str());
+                {
+                    handler->PSendSysMessage(LANG_TAXINODE_ENTRY_LIST_CONSOLE, nodeEntry->ID, name.c_str(), localeNames[locale],
+                                             nodeEntry->map_id, nodeEntry->x, nodeEntry->y, nodeEntry->z);
+                }
 
                 if (!found)
+                {
                     found = true;
+                }
             }
         }
-
         if (!found)
-            handler->SendSysMessage(LANG_COMMAND_NOSPELLFOUND);
-
-        return true;
-    }
-
-    static bool HandleLookupTaxiNodeCommand(ChatHandler* handler, const char* args)
-    {
-        if (!*args)
-            return false;
-
-        std::string namePart = args;
-        std::wstring wNamePart;
-
-        if (!Utf8toWStr(namePart, wNamePart))
-            return false;
-
-        // converting string that we try to find to lower case
-        wstrToLower(wNamePart);
-
-        bool found = false;
-        uint32 count = 0;
-        uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
-
-        // Search in TaxiNodes.dbc
-        for (uint32 id = 0; id < sTaxiNodesStore.GetNumRows(); id++)
         {
-            TaxiNodesEntry const* nodeEntry = sTaxiNodesStore.LookupEntry(id);
-            if (nodeEntry)
-            {
-                int locale = handler->GetSessionDbcLocale();
-                std::string name = nodeEntry->name[locale];
-                if (name.empty())
-                    continue;
-
-                if (!Utf8FitTo(name, wNamePart))
-                {
-                    locale = 0;
-                    for (; locale < TOTAL_LOCALES; ++locale)
-                    {
-                        if (locale == handler->GetSessionDbcLocale())
-                            continue;
-
-                        name = nodeEntry->name[locale];
-                        if (name.empty())
-                            continue;
-
-                        if (Utf8FitTo(name, wNamePart))
-                            break;
-                    }
-                }
-
-                if (locale < TOTAL_LOCALES)
-                {
-                    if (maxResults && count++ == maxResults)
-                    {
-                        handler->PSendSysMessage(LANG_COMMAND_LOOKUP_MAX_RESULTS, maxResults);
-                        return true;
-                    }
-
-                    // send taxinode in "id - [name] (Map:m X:x Y:y Z:z)" format
-                    if (handler->GetSession())
-                        handler->PSendSysMessage(LANG_TAXINODE_ENTRY_LIST_CHAT, id, id, name.c_str(), localeNames[locale],
-                                                 nodeEntry->map_id, nodeEntry->x, nodeEntry->y, nodeEntry->z);
-                    else
-                        handler->PSendSysMessage(LANG_TAXINODE_ENTRY_LIST_CONSOLE, id, name.c_str(), localeNames[locale],
-                                                 nodeEntry->map_id, nodeEntry->x, nodeEntry->y, nodeEntry->z);
-
-                    if (!found)
-                        found = true;
-                }
-            }
-        }
-        if (!found)
             handler->SendSysMessage(LANG_COMMAND_NOTAXINODEFOUND);
+        }
 
         return true;
     }
 
     // Find teleport in game_tele order by name
-    static bool HandleLookupTeleCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupTeleCommand(ChatHandler* handler, Tail namePart)
     {
-        if (!*args)
+        if (namePart.empty())
         {
-            handler->SendSysMessage(LANG_COMMAND_TELE_PARAMETER);
-            handler->SetSentErrorMessage(true);
             return false;
         }
 
-        char const* str = strtok((char*)args, " ");
-        if (!str)
-            return false;
-
-        std::string namePart = str;
         std::wstring wNamePart;
 
         if (!Utf8toWStr(namePart, wNamePart))
+        {
             return false;
+        }
 
         // converting string that we try to find to lower case
         wstrToLower(wNamePart);
@@ -1126,13 +1388,12 @@ public:
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
         bool limitReached = false;
 
-        GameTeleContainer const& teleMap = sObjectMgr->GetGameTeleMap();
-        for (GameTeleContainer::const_iterator itr = teleMap.begin(); itr != teleMap.end(); ++itr)
+        for (auto const& [id, tele] : sObjectMgr->GetGameTeleMap())
         {
-            GameTele const* tele = &itr->second;
-
-            if (tele->wnameLow.find(wNamePart) == std::wstring::npos)
+            if (tele.wnameLow.find(wNamePart) == std::wstring::npos)
+            {
                 continue;
+            }
 
             if (maxResults && count++ == maxResults)
             {
@@ -1141,26 +1402,38 @@ public:
             }
 
             if (handler->GetSession())
-                reply << "  |cffffffff|Htele:" << itr->first << "|h[" << tele->name << "]|h|r\n";
+            {
+                reply << "  |cffffffff|Htele:" << id << "|h[" << tele.name << "]|h|r\n";
+            }
             else
-                reply << "  " << itr->first << ' ' << tele->name << "\n";
+            {
+                reply << "  " << id << ' ' << tele.name << "\n";
+            }
         }
 
         if (reply.str().empty())
+        {
             handler->SendSysMessage(LANG_COMMAND_TELE_NOLOCATION);
+        }
         else
+        {
             handler->PSendSysMessage(LANG_COMMAND_TELE_LOCATION, reply.str().c_str());
+        }
 
         if (limitReached)
+        {
             handler->PSendSysMessage(LANG_COMMAND_LOOKUP_MAX_RESULTS, maxResults);
+        }
 
         return true;
     }
 
-    static bool HandleLookupTitleCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupTitleCommand(ChatHandler* handler, Tail namePart)
     {
-        if (!*args)
+        if (namePart.empty())
+        {
             return false;
+        }
 
         // can be nullptr in console call
         Player* target = handler->getSelectedPlayer();
@@ -1168,11 +1441,12 @@ public:
         // title name have single string arg for player name
         char const* targetName = target ? target->GetName().c_str() : "NAME";
 
-        std::string namePart = args;
         std::wstring wNamePart;
 
         if (!Utf8toWStr(namePart, wNamePart))
+        {
             return false;
+        }
 
         // converting string that we try to find to lower case
         wstrToLower(wNamePart);
@@ -1181,76 +1455,86 @@ public:
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
 
         // Search in CharTitles.dbc
-        for (uint32 id = 0; id < sCharTitlesStore.GetNumRows(); id++)
+        for (auto titleInfo : sCharTitlesStore)
         {
-            CharTitlesEntry const* titleInfo = sCharTitlesStore.LookupEntry(id);
-            if (titleInfo)
+            int locale = handler->GetSessionDbcLocale();
+            std::string name = titleInfo->nameMale[locale];
+            if (name.empty())
             {
-                int locale = handler->GetSessionDbcLocale();
-                std::string name = titleInfo->nameMale[locale];
-                if (name.empty())
-                    continue;
+                continue;
+            }
 
-                if (!Utf8FitTo(name, wNamePart))
+            if (!Utf8FitTo(name, wNamePart))
+            {
+                locale = 0;
+                for (; locale < TOTAL_LOCALES; ++locale)
                 {
-                    locale = 0;
-                    for (; locale < TOTAL_LOCALES; ++locale)
+                    if (locale == handler->GetSessionDbcLocale())
                     {
-                        if (locale == handler->GetSessionDbcLocale())
-                            continue;
-
-                        name = titleInfo->nameMale[locale];
-                        if (name.empty())
-                            continue;
-
-                        if (Utf8FitTo(name, wNamePart))
-                            break;
-                    }
-                }
-
-                if (locale < TOTAL_LOCALES)
-                {
-                    if (maxResults && counter == maxResults)
-                    {
-                        handler->PSendSysMessage(LANG_COMMAND_LOOKUP_MAX_RESULTS, maxResults);
-                        return true;
+                        continue;
                     }
 
-                    char const* knownStr = target && target->HasTitle(titleInfo) ? handler->GetAcoreString(LANG_KNOWN) : "";
+                    name = titleInfo->nameMale[locale];
+                    if (name.empty())
+                    {
+                        continue;
+                    }
 
-                    char const* activeStr = target && target->GetUInt32Value(PLAYER_CHOSEN_TITLE) == titleInfo->bit_index
-                                            ? handler->GetAcoreString(LANG_ACTIVE)
-                                            : "";
-
-                    char titleNameStr[80];
-                    snprintf(titleNameStr, 80, name.c_str(), targetName);
-
-                    // send title in "id (idx:idx) - [namedlink locale]" format
-                    if (handler->GetSession())
-                        handler->PSendSysMessage(LANG_TITLE_LIST_CHAT, id, titleInfo->bit_index, id, titleNameStr, localeNames[locale], knownStr, activeStr);
-                    else
-                        handler->PSendSysMessage(LANG_TITLE_LIST_CONSOLE, id, titleInfo->bit_index, titleNameStr, localeNames[locale], knownStr, activeStr);
-
-                    ++counter;
+                    if (Utf8FitTo(name, wNamePart))
+                    {
+                        break;
+                    }
                 }
             }
+
+            if (locale < TOTAL_LOCALES)
+            {
+                if (maxResults && counter == maxResults)
+                {
+                    handler->PSendSysMessage(LANG_COMMAND_LOOKUP_MAX_RESULTS, maxResults);
+                    return true;
+                }
+
+                char const* knownStr = target && target->HasTitle(titleInfo) ? handler->GetAcoreString(LANG_KNOWN) : "";
+                char const* activeStr = target && target->GetUInt32Value(PLAYER_CHOSEN_TITLE) == titleInfo->bit_index ? handler->GetAcoreString(LANG_ACTIVE) : "";
+
+                std::string titleNameStr = Acore::StringFormat(name, targetName);
+
+                // send title in "id (idx:idx) - [namedlink locale]" format
+                if (handler->GetSession())
+                {
+                    handler->PSendSysMessage(LANG_TITLE_LIST_CHAT, titleInfo->ID, titleInfo->bit_index, titleInfo->ID, titleNameStr, localeNames[locale], knownStr, activeStr);
+                }
+                else
+                {
+                    handler->PSendSysMessage(LANG_TITLE_LIST_CONSOLE, titleInfo->ID, titleInfo->bit_index, titleNameStr, localeNames[locale], knownStr, activeStr);
+                }
+
+                ++counter;
+            }
         }
-        if (counter == 0)  // if counter == 0 then we found nth
+
+        if (!counter)  // if counter == 0 then we found nth
+        {
             handler->SendSysMessage(LANG_COMMAND_NOTITLEFOUND);
+        }
 
         return true;
     }
 
-    static bool HandleLookupMapCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupMapCommand(ChatHandler* handler, Tail namePart)
     {
-        if (!*args)
+        if (namePart.empty())
+        {
             return false;
+        }
 
-        std::string namePart = args;
         std::wstring wNamePart;
 
         if (!Utf8toWStr(namePart, wNamePart))
+        {
             return false;
+        }
 
         wstrToLower(wNamePart);
 
@@ -1259,121 +1543,107 @@ public:
         uint8 locale = handler->GetSession() ? handler->GetSession()->GetSessionDbcLocale() : sWorld->GetDefaultDbcLocale();
 
         // search in Map.dbc
-        for (uint32 id = 0; id < sMapStore.GetNumRows(); id++)
+        for (auto mapInfo : sMapStore)
         {
-            if (MapEntry const* mapInfo = sMapStore.LookupEntry(id))
+            std::string name = mapInfo->name[locale];
+
+            if (name.empty())
             {
-                std::string name = mapInfo->name[locale];
-                if (name.empty())
-                    continue;
+                continue;
+            }
 
-                if (Utf8FitTo(name, wNamePart) && locale < TOTAL_LOCALES)
+            if (Utf8FitTo(name, wNamePart) && locale < TOTAL_LOCALES)
+            {
+                if (maxResults && counter == maxResults)
                 {
-                    if (maxResults && counter == maxResults)
-                    {
-                        handler->PSendSysMessage(LANG_COMMAND_LOOKUP_MAX_RESULTS, maxResults);
-                        return true;
-                    }
-
-                    std::ostringstream ss;
-                    ss << id << " - [" << name << ']';
-
-                    if (mapInfo->IsContinent())
-                        ss << handler->GetAcoreString(LANG_CONTINENT);
-
-                    switch (mapInfo->map_type)
-                    {
-                        case MAP_INSTANCE:
-                            ss << handler->GetAcoreString(LANG_INSTANCE);
-                            break;
-                        case MAP_RAID:
-                            ss << handler->GetAcoreString(LANG_RAID);
-                            break;
-                        case MAP_BATTLEGROUND:
-                            ss << handler->GetAcoreString(LANG_BATTLEGROUND);
-                            break;
-                        case MAP_ARENA:
-                            ss << handler->GetAcoreString(LANG_ARENA);
-                            break;
-                    }
-
-                    handler->SendSysMessage(ss.str().c_str());
-
-                    ++counter;
+                    handler->PSendSysMessage(LANG_COMMAND_LOOKUP_MAX_RESULTS, maxResults);
+                    return true;
                 }
+
+                std::ostringstream ss;
+                ss << mapInfo->MapID << " - [" << name << ']';
+
+                if (mapInfo->IsContinent())
+                {
+                    ss << handler->GetAcoreString(LANG_CONTINENT);
+                }
+
+                switch (mapInfo->map_type)
+                {
+                    case MAP_INSTANCE:
+                        ss << handler->GetAcoreString(LANG_INSTANCE);
+                        break;
+                    case MAP_RAID:
+                        ss << handler->GetAcoreString(LANG_RAID);
+                        break;
+                    case MAP_BATTLEGROUND:
+                        ss << handler->GetAcoreString(LANG_BATTLEGROUND);
+                        break;
+                    case MAP_ARENA:
+                        ss << handler->GetAcoreString(LANG_ARENA);
+                        break;
+                }
+
+                handler->SendSysMessage(ss.str().c_str());
+
+                ++counter;
             }
         }
 
         if (!counter)
+        {
             handler->SendSysMessage(LANG_COMMAND_NOMAPFOUND);
+        }
 
         return true;
     }
 
-    static bool HandleLookupPlayerIpCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupPlayerIpCommand(ChatHandler* handler, Optional<Tail> ip, Optional<int32> limit)
     {
-        std::string ip;
-        int32 limit;
-        char* limitStr;
-
-        Player* target = handler->getSelectedPlayer();
-        if (!*args)
+        Player* target = handler->getSelectedPlayerOrSelf();
+        if (!ip)
         {
             // nullptr only if used from console
             if (!target || target == handler->GetSession()->GetPlayer())
+            {
                 return false;
+            }
 
-            ip = target->GetSession()->GetRemoteAddress();
-            limit = -1;
+            *ip = target->GetSession()->GetRemoteAddress();
         }
         else
         {
-            ip = strtok((char*)args, " ");
-            limitStr = strtok(nullptr, " ");
-            limit = limitStr ? atoi(limitStr) : -1;
+            ip = *ip;
         }
 
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BY_IP);
-        stmt->setString(0, ip);
+        stmt->SetData(0, *ip);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
 
-        return LookupPlayerSearchCommand(result, limit, handler);
+        return LookupPlayerSearchCommand(result, *limit ? *limit : -1, handler);
     }
 
-    static bool HandleLookupPlayerAccountCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupPlayerAccountCommand(ChatHandler* handler, std::string account, Optional<int32> limit)
     {
-        if (!*args)
+        if (!Utf8ToUpperOnlyLatin(account))
+        {
             return false;
-
-        std::string account = strtok((char*)args, " ");
-        char* limitStr = strtok(nullptr, " ");
-        int32 limit = limitStr ? atoi(limitStr) : -1;
-
-        if (!Utf8ToUpperOnlyLatin
-                (account))
-            return false;
+        }
 
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_LIST_BY_NAME);
-        stmt->setString(0, account);
+        stmt->SetData(0, account);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
 
-        return LookupPlayerSearchCommand(result, limit, handler);
+        return LookupPlayerSearchCommand(result, *limit ? *limit : -1, handler);
     }
 
-    static bool HandleLookupPlayerEmailCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupPlayerEmailCommand(ChatHandler* handler, std::string email, Optional<int32> limit)
     {
-        if (!*args)
-            return false;
-
-        std::string email = strtok((char*)args, " ");
-        char* limitStr = strtok(nullptr, " ");
-        int32 limit = limitStr ? atoi(limitStr) : -1;
-
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_LIST_BY_EMAIL);
-        stmt->setString(0, email);
+        stmt->SetData(0, email);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
 
-        return LookupPlayerSearchCommand(result, limit, handler);
+        return LookupPlayerSearchCommand(result, *limit ? *limit : -1, handler);
     }
 
     static bool LookupPlayerSearchCommand(PreparedQueryResult result, int32 limit, ChatHandler* handler)
@@ -1389,9 +1659,6 @@ public:
         uint32 count = 0;
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
 
-        const char* name_races[RACE_DRAENEI] = {"Human", "Orc", "Dwarf", "Night Elf", "Undead", "Tauren", "Gnome", "Troll", "", "Blood Elf", "Draenei"};
-        const char* name_classes[CLASS_DRUID] = {"Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Death Knight", "Shaman", "Mage", "Warlock", "", "Druid"};
-
         do
         {
             if (maxResults && count++ == maxResults)
@@ -1401,11 +1668,11 @@ public:
             }
 
             Field* fields           = result->Fetch();
-            uint32 accountId        = fields[0].GetUInt32();
-            std::string accountName = fields[1].GetString();
+            uint32 accountId        = fields[0].Get<uint32>();
+            std::string accountName = fields[1].Get<std::string>();
 
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_GUID_NAME_BY_ACC);
-            stmt->setUInt32(0, accountId);
+            stmt->SetData(0, accountId);
             PreparedQueryResult result2 = CharacterDatabase.Query(stmt);
 
             if (result2)
@@ -1415,28 +1682,33 @@ public:
                 do
                 {
                     Field* characterFields   = result2->Fetch();
-                    ObjectGuid::LowType guid = characterFields[0].GetUInt32();
-                    std::string name         = characterFields[1].GetString();
+                    ObjectGuid::LowType guid = characterFields[0].Get<uint32>();
+                    std::string name         = characterFields[1].Get<std::string>();
                     uint8 plevel = 0, prace = 0, pclass = 0;
                     bool online = ObjectAccessor::FindPlayerByLowGUID(guid) != nullptr;
 
-                    if (const GlobalPlayerData* gpd = sWorld->GetGlobalPlayerData(guid))
+                    if (CharacterCacheEntry const* gpd = sCharacterCache->GetCharacterCacheByName(name))
                     {
-                        plevel = gpd->level;
-                        prace = gpd->race;
-                        pclass = gpd->playerClass;
+                        plevel = gpd->Level;
+                        prace = gpd->Race;
+                        pclass = gpd->Class;
                     }
 
                     if (plevel > 0 && prace > 0 && prace <= RACE_DRAENEI && pclass > 0 && pclass <= CLASS_DRUID)
-                        handler->PSendSysMessage("  %s (GUID %u) - %s - %s - %u%s", name.c_str(), guid, name_races[prace - 1], name_classes[pclass - 1], plevel, (online ? " - [ONLINE]" : ""));
+                    {
+                        handler->PSendSysMessage("  %s (GUID %u) - %s - %s - %u%s", name.c_str(), guid, EnumUtils::ToTitle(Races(prace)), EnumUtils::ToTitle(Classes(pclass)), plevel, (online ? " - [ONLINE]" : ""));
+                    }
                     else
+                    {
                         handler->PSendSysMessage(LANG_LOOKUP_PLAYER_CHARACTER, name.c_str(), guid);
+                    }
+
                     ++counter;
                 } while (result2->NextRow() && (limit == -1 || counter < limit));
             }
         } while (result->NextRow());
 
-        if (counter == 0) // empty accounts only
+        if (!counter) // empty accounts only
         {
             handler->PSendSysMessage(LANG_NO_PLAYERS_FOUND);
             handler->SetSentErrorMessage(true);

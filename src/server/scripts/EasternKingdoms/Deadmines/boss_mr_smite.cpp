@@ -1,10 +1,23 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "deadmines.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "deadmines.h"
 
 enum Spells
 {
@@ -54,7 +67,7 @@ public:
             me->LoadEquipment(EQUIP_SWORD);
             me->SetCanDualWield(false);
             me->SetStandState(UNIT_STAND_STATE_STAND);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+            me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
@@ -81,7 +94,7 @@ public:
                         me->GetMotionMaster()->Clear();
                         me->GetMotionMaster()->MovePoint(EQUIP_TWO_SWORDS, 1.859f, -780.72f, 9.831f);
                         Talk(SAY_SWAP1);
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+                        me->SetUnitFlag(UNIT_FLAG_PACIFIED);
                         me->SetReactState(REACT_PASSIVE);
                         health67 = true;
                         break;
@@ -96,7 +109,7 @@ public:
                         me->GetMotionMaster()->Clear();
                         me->GetMotionMaster()->MovePoint(EQUIP_MACE, 1.859f, -780.72f, 9.831f);
                         Talk(SAY_SWAP2);
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+                        me->SetUnitFlag(UNIT_FLAG_PACIFIED);
                         me->SetReactState(REACT_PASSIVE);
                         health34 = true;
                         break;
@@ -122,7 +135,7 @@ public:
                     break;
                 case EVENT_RESTORE_COMBAT:
                     me->SetReactState(REACT_AGGRESSIVE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+                    me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
                     me->SetStandState(UNIT_STAND_STATE_STAND);
                     if (me->GetVictim())
                     {

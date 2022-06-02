@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2020 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ACORE_DBCSFRM_H
@@ -21,12 +32,13 @@ char constexpr CharStartOutfitEntryfmt[] = "dbbbXiiiiiiiiiiiiiiiiiiiiiiiixxxxxxx
 char constexpr CharTitlesEntryfmt[] = "nxssssssssssssssssxssssssssssssssssxi";
 char constexpr ChatChannelsEntryfmt[] = "nixssssssssssssssssxxxxxxxxxxxxxxxxxx"; // ChatChannelsEntryfmt, index not used (more compact store)
 char constexpr ChrClassesEntryfmt[] = "nxixssssssssssssssssxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxixii";
-char constexpr ChrRacesEntryfmt[] = "nxixiixixxxxixssssssssssssssssxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxi";
+char constexpr ChrRacesEntryfmt[] = "niixiixixxxxixssssssssssssssssxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxi";
 char constexpr CinematicCameraEntryfmt[] = "nsiffff";
 char constexpr CinematicSequencesEntryfmt[] = "nxixxxxxxx";
-char constexpr CreatureDisplayInfofmt[] = "nixxfxxxxxxxxxxx";
+char constexpr CreatureDisplayInfofmt[] = "nixifxxxxxxxxxxx";
+char constexpr CreatureDisplayInfoExtrafmt[] = "diixxxxxxxxxxxxxxxxxx";
 char constexpr CreatureFamilyfmt[] = "nfifiiiiixssssssssssssssssxx";
-char constexpr CreatureModelDatafmt[] = "nxxxfxxxxxxxxxfffxxxxxxxxxxx";
+char constexpr CreatureModelDatafmt[] = "nixxfxxxxxxxxxfffxxxxxxxxxxx";
 char constexpr CreatureSpellDatafmt[] = "niiiixxxx";
 char constexpr CreatureTypefmt[] = "nxxxxxxxxxxxxxxxxxx";
 char constexpr CurrencyTypesfmt[] = "xnxi";
@@ -89,7 +101,7 @@ char constexpr SpellCastTimefmt[] = "nixx";
 char constexpr SpellCategoryfmt[] = "ni";
 char constexpr SpellDifficultyfmt[] = "niiii";
 char constexpr SpellDurationfmt[] = "niii";
-char constexpr SpellEntryfmt[] = "niiiiiiiiiiiixixiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiifxiiiiiiiiiiiiiiiiiiiiiiiiiiiifffiiiiiiiiiiiiiiiiiiiiifffiiiiiiiiiiiiiiifffiiiiiiiiiiiiixssssssssssssssssxssssssssssssssssxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxiiiiiiiiiiixfffxxxiiiiixxfffxx";
+char constexpr SpellEntryfmt[] = "niiiiiiiiiiiixixiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiifxiiiiiiiiiiiiiiiiiiiiiiiiiiiifffiiiiiiiiiiiiiiiiiiiiifffiiiiiiiiiiiiiiifffiiiiiiiiiiiiiissssssssssssssssxssssssssssssssssxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxiiiiiiiiiiixfffxxxiiiiixxfffxx";
 char constexpr SpellFocusObjectfmt[] = "nxxxxxxxxxxxxxxxxx";
 char constexpr SpellItemEnchantmentfmt[] = "niiiiiiixxxiiissssssssssssssssxiiiiiii";
 char constexpr SpellItemEnchantmentConditionfmt[] = "nbbbbbxxxxxbbbbbbbbbbiiiiiXXXXX";
@@ -97,6 +109,7 @@ char constexpr SpellRadiusfmt[] = "nfff";
 char constexpr SpellRangefmt[] = "nffffixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 char constexpr SpellRuneCostfmt[] = "niiii";
 char constexpr SpellShapeshiftfmt[] = "nxxxxxxxxxxxxxxxxxxiixiiixxiiiiiiii";
+char constexpr SpellVisualfmt[] = "dxxxxxxiixxxxxxxxxxxxxxxxxxxxxxx";
 char constexpr StableSlotPricesfmt[] = "ni";
 char constexpr SummonPropertiesfmt[] = "niiiii";
 char constexpr TalentEntryfmt[] = "niiiiiiiixxxxixxixxixxx";

@@ -1,6 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2008-2021 TrinityCore <http://www.trinitycore.org/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef LogCommon_h__
@@ -11,13 +23,13 @@
 // EnumUtils: DESCRIBE THIS
 enum LogLevel : uint8
 {
-    LOG_LEVEL_DISABLED,
-    LOG_LEVEL_FATAL,
-    LOG_LEVEL_ERROR,
-    LOG_LEVEL_WARN,
-    LOG_LEVEL_INFO,
-    LOG_LEVEL_DEBUG,
-    LOG_LEVEL_TRACE,
+    LOG_LEVEL_DISABLED = 0,
+    LOG_LEVEL_FATAL = 1,
+    LOG_LEVEL_ERROR = 2,
+    LOG_LEVEL_WARN = 3,
+    LOG_LEVEL_INFO = 4,
+    LOG_LEVEL_DEBUG = 5,
+    LOG_LEVEL_TRACE = 6,
 
     NUM_ENABLED_LOG_LEVELS = LOG_LEVEL_TRACE, // SKIP
     LOG_LEVEL_INVALID = 0xFF // SKIP

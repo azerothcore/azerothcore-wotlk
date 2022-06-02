@@ -1,16 +1,29 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "icecrown_citadel.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "Vehicle.h"
+#include "icecrown_citadel.h"
 #include <random>
 
 enum ScriptTexts
@@ -58,7 +71,7 @@ enum Events
 
 uint32 const boneSpikeSummonId[3] = {69062, 72669, 72670};
 
-struct BoneStormMoveTargetSelector : public Acore::unary_function<Unit*, bool>
+struct BoneStormMoveTargetSelector
 {
 public:
     BoneStormMoveTargetSelector(Creature* source) : _source(source) { }
@@ -83,222 +96,212 @@ private:
     Creature const* _source;
 };
 
-class boss_lord_marrowgar : public CreatureScript
+struct boss_lord_marrowgar : public BossAI
 {
 public:
-    boss_lord_marrowgar() : CreatureScript("boss_lord_marrowgar") { }
-
-    struct boss_lord_marrowgarAI : public BossAI
+    boss_lord_marrowgar(Creature* creature) : BossAI(creature, DATA_LORD_MARROWGAR)
     {
-        boss_lord_marrowgarAI(Creature* creature) : BossAI(creature, DATA_LORD_MARROWGAR)
+        _introDone = false;
+        _boneSlice = false;
+    }
+
+    bool _introDone;
+    bool _boneSlice;
+    ObjectGuid _lastBoneSliceTargets[3];
+
+    void Reset() override
+    {
+        me->SetReactState(REACT_AGGRESSIVE);
+        _Reset();
+        events.ScheduleEvent(EVENT_ENABLE_BONE_SLICE, 10000);
+        events.ScheduleEvent(EVENT_SPELL_BONE_SPIKE_GRAVEYARD, urand(10000, 15000));
+        events.ScheduleEvent(EVENT_SPELL_COLDFLAME, 5000);
+        events.ScheduleEvent(EVENT_WARN_BONE_STORM, urand(45000, 50000));
+        events.ScheduleEvent(EVENT_ENRAGE, 600000);
+
+        _boneSlice = false;
+
+        for (uint8 i = 0; i < 3; ++i)
+            _lastBoneSliceTargets[i].Clear();
+
+        instance->SetData(DATA_BONED_ACHIEVEMENT, uint32(true));
+    }
+
+    void EnterCombat(Unit* /*who*/) override
+    {
+        Talk(SAY_AGGRO);
+        me->setActive(true);
+        DoZoneInCombat();
+        instance->SetBossState(DATA_LORD_MARROWGAR, IN_PROGRESS);
+    }
+
+    void SpellHitTarget(Unit* target, SpellInfo const* spell) override
+    {
+        if (target && (spell->Id == 69055 || spell->Id == 70814)) // Bone Slice (Saber Lash)
+            for (uint8 i = 0; i < 3; ++i)
+                if (!_lastBoneSliceTargets[i])
+                {
+                    _lastBoneSliceTargets[i] = target->GetGUID();
+                    break;
+                }
+    }
+
+    ObjectGuid GetGUID(int32 id) const override
+    {
+        if (id >= 0 && id <= 2)
+            return _lastBoneSliceTargets[id];
+
+        return ObjectGuid::Empty;
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
         {
-            _introDone = false;
-            _boneSlice = false;
+            case 0:
+                break;
+            case EVENT_ENABLE_BONE_SLICE:
+                _boneSlice = true;
+                break;
+            case EVENT_SPELL_BONE_SPIKE_GRAVEYARD:
+                {
+                    bool a = me->HasAura(SPELL_BONE_STORM);
+                    if (IsHeroic() || !a)
+                        me->CastSpell(me, SPELL_BONE_SPIKE_GRAVEYARD, a);
+                    events.RepeatEvent(urand(15000, 20000));
+                }
+                break;
+            case EVENT_SPELL_COLDFLAME:
+                if (!me->HasAura(SPELL_BONE_STORM))
+                    me->CastSpell((Unit*)nullptr, SPELL_COLDFLAME_NORMAL, false);
+                events.RepeatEvent(5000);
+                break;
+            case EVENT_SPELL_COLDFLAME_BONE_STORM:
+                me->CastSpell(me, SPELL_COLDFLAME_BONE_STORM, false);
+                break;
+            case EVENT_WARN_BONE_STORM:
+                _boneSlice = false;
+                Talk(EMOTE_BONE_STORM);
+                Talk(SAY_BONE_STORM);
+                me->FinishSpell(CURRENT_MELEE_SPELL, false);
+                me->CastSpell(me, SPELL_BONE_STORM, false);
+                me->SetReactState(REACT_PASSIVE); // to prevent chasing another target on UpdateVictim()
+                me->GetMotionMaster()->MoveIdle();
+                me->GetMotionMaster()->MovementExpired();
+                events.RepeatEvent(urand(90000, 95000));
+                events.ScheduleEvent(EVENT_BEGIN_BONE_STORM, 3050);
+                break;
+            case EVENT_BEGIN_BONE_STORM:
+                {
+                    uint32 _boneStormDuration = RAID_MODE<uint32>(20000, 30000, 20000, 30000);
+                    if (Aura* pStorm = me->GetAura(SPELL_BONE_STORM))
+                        pStorm->SetDuration(int32(_boneStormDuration));
+                    events.ScheduleEvent(EVENT_BONE_STORM_MOVE, 0);
+                    events.ScheduleEvent(EVENT_END_BONE_STORM, _boneStormDuration + 1);
+                }
+                break;
+            case EVENT_BONE_STORM_MOVE:
+                {
+                    if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == POINT_MOTION_TYPE)
+                    {
+                        events.RepeatEvent(1);
+                        break;
+                    }
+                    events.RepeatEvent(5000);
+                    Unit* unit = SelectTarget(SelectTargetMethod::Random, 0, BoneStormMoveTargetSelector(me));
+                    if (!unit)
+                    {
+                        if ((unit = SelectTarget(SelectTargetMethod::MaxThreat, 0, 175.0f, true)))
+                            if (unit->GetPositionX() > -337.0f)
+                            {
+                                EnterEvadeMode();
+                                return;
+                            }
+                    }
+                    if (unit)
+                        me->GetMotionMaster()->MoveCharge(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ(), 25.0f, 1337);
+                    break;
+                }
+                break;
+            case EVENT_END_BONE_STORM:
+                me->StopMoving();
+                me->GetMotionMaster()->MovementExpired();
+                me->SetReactState(REACT_AGGRESSIVE);
+                DoStartMovement(me->GetVictim());
+                events.CancelEvent(EVENT_BONE_STORM_MOVE);
+                events.ScheduleEvent(EVENT_ENABLE_BONE_SLICE, 10000);
+                if (!IsHeroic())
+                    events.RescheduleEvent(EVENT_SPELL_BONE_SPIKE_GRAVEYARD, urand(15000, 20000));
+                break;
+            case EVENT_ENRAGE:
+                me->CastSpell(me, SPELL_BERSERK, true);
+                Talk(SAY_BERSERK);
+                break;
         }
 
-        bool _introDone;
-        bool _boneSlice;
-        ObjectGuid _lastBoneSliceTargets[3];
+        if (me->HasAura(SPELL_BONE_STORM))
+            return;
 
-        void Reset() override
+        if (_boneSlice && !me->GetCurrentSpell(CURRENT_MELEE_SPELL))
+            DoCastVictim(SPELL_BONE_SLICE);
+
+        if (_boneSlice && me->isAttackReady() && me->GetVictim() && !me->HasUnitState(UNIT_STATE_CASTING) && me->IsWithinMeleeRange(me->GetVictim()))
         {
-            me->SetReactState(REACT_AGGRESSIVE);
-            _Reset();
-            events.ScheduleEvent(EVENT_ENABLE_BONE_SLICE, 10000);
-            events.ScheduleEvent(EVENT_SPELL_BONE_SPIKE_GRAVEYARD, urand(10000, 15000));
-            events.ScheduleEvent(EVENT_SPELL_COLDFLAME, 5000);
-            events.ScheduleEvent(EVENT_WARN_BONE_STORM, urand(45000, 50000));
-            events.ScheduleEvent(EVENT_ENRAGE, 600000);
-
-            _boneSlice = false;
-
             for (uint8 i = 0; i < 3; ++i)
                 _lastBoneSliceTargets[i].Clear();
-
-            instance->SetData(DATA_BONED_ACHIEVEMENT, uint32(true));
         }
 
-        void EnterCombat(Unit* /*who*/) override
-        {
-            Talk(SAY_AGGRO);
-            me->setActive(true);
-            DoZoneInCombat();
-            instance->SetBossState(DATA_LORD_MARROWGAR, IN_PROGRESS);
-        }
+        DoMeleeAttackIfReady();
+    }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
-        {
-            if (target && (spell->Id == 69055 || spell->Id == 70814)) // Bone Slice (Saber Lash)
-                for (uint8 i = 0; i < 3; ++i)
-                    if (!_lastBoneSliceTargets[i])
-                    {
-                        _lastBoneSliceTargets[i] = target->GetGUID();
-                        break;
-                    }
-        }
-
-        ObjectGuid GetGUID(int32 id) const override
-        {
-            if (id >= 0 && id <= 2)
-                return _lastBoneSliceTargets[id];
-
-            return ObjectGuid::Empty;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim() || !CheckInRoom())
-                return;
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case 0:
-                    break;
-                case EVENT_ENABLE_BONE_SLICE:
-                    _boneSlice = true;
-                    break;
-                case EVENT_SPELL_BONE_SPIKE_GRAVEYARD:
-                    {
-                        bool a = me->HasAura(SPELL_BONE_STORM);
-                        if (IsHeroic() || !a)
-                            me->CastSpell(me, SPELL_BONE_SPIKE_GRAVEYARD, a);
-                        events.RepeatEvent(urand(15000, 20000));
-                    }
-                    break;
-                case EVENT_SPELL_COLDFLAME:
-                    if (!me->HasAura(SPELL_BONE_STORM))
-                        me->CastSpell((Unit*)nullptr, SPELL_COLDFLAME_NORMAL, false);
-                    events.RepeatEvent(5000);
-                    break;
-                case EVENT_SPELL_COLDFLAME_BONE_STORM:
-                    me->CastSpell(me, SPELL_COLDFLAME_BONE_STORM, false);
-                    break;
-                case EVENT_WARN_BONE_STORM:
-                    _boneSlice = false;
-                    Talk(EMOTE_BONE_STORM);
-                    Talk(SAY_BONE_STORM);
-                    me->FinishSpell(CURRENT_MELEE_SPELL, false);
-                    me->CastSpell(me, SPELL_BONE_STORM, false);
-                    me->SetReactState(REACT_PASSIVE); // to prevent chasing another target on UpdateVictim()
-                    me->GetMotionMaster()->MoveIdle();
-                    me->GetMotionMaster()->MovementExpired();
-                    events.RepeatEvent(urand(90000, 95000));
-                    events.ScheduleEvent(EVENT_BEGIN_BONE_STORM, 3050);
-                    break;
-                case EVENT_BEGIN_BONE_STORM:
-                    {
-                        uint32 _boneStormDuration = RAID_MODE<uint32>(20000, 30000, 20000, 30000);
-                        if (Aura* pStorm = me->GetAura(SPELL_BONE_STORM))
-                            pStorm->SetDuration(int32(_boneStormDuration));
-                        events.ScheduleEvent(EVENT_BONE_STORM_MOVE, 0);
-                        events.ScheduleEvent(EVENT_END_BONE_STORM, _boneStormDuration + 1);
-                    }
-                    break;
-                case EVENT_BONE_STORM_MOVE:
-                    {
-                        if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == POINT_MOTION_TYPE)
-                        {
-                            events.RepeatEvent(1);
-                            break;
-                        }
-                        events.RepeatEvent(5000);
-                        Unit* unit = SelectTarget(SELECT_TARGET_RANDOM, 0, BoneStormMoveTargetSelector(me));
-                        if (!unit)
-                        {
-                            if ((unit = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 175.0f, true)))
-                                if (unit->GetPositionX() > -337.0f)
-                                {
-                                    EnterEvadeMode();
-                                    return;
-                                }
-                        }
-                        if (unit)
-                            me->GetMotionMaster()->MoveCharge(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ(), 25.0f, 1337);
-                        break;
-                    }
-                    break;
-                case EVENT_END_BONE_STORM:
-                    me->StopMoving();
-                    me->GetMotionMaster()->MovementExpired();
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    DoStartMovement(me->GetVictim());
-                    events.CancelEvent(EVENT_BONE_STORM_MOVE);
-                    events.ScheduleEvent(EVENT_ENABLE_BONE_SLICE, 10000);
-                    if (!IsHeroic())
-                        events.RescheduleEvent(EVENT_SPELL_BONE_SPIKE_GRAVEYARD, urand(15000, 20000));
-                    break;
-                case EVENT_ENRAGE:
-                    me->CastSpell(me, SPELL_BERSERK, true);
-                    Talk(SAY_BERSERK);
-                    break;
-            }
-
-            if (me->HasAura(SPELL_BONE_STORM))
-                return;
-
-            if (_boneSlice && !me->GetCurrentSpell(CURRENT_MELEE_SPELL))
-                DoCastVictim(SPELL_BONE_SLICE);
-
-            if (_boneSlice && me->isAttackReady() && me->GetVictim() && !me->HasUnitState(UNIT_STATE_CASTING) && me->IsWithinMeleeRange(me->GetVictim()))
-            {
-                for (uint8 i = 0; i < 3; ++i)
-                    _lastBoneSliceTargets[i].Clear();
-            }
-
-            DoMeleeAttackIfReady();
-        }
-
-        void MovementInform(uint32 type, uint32 id) override
-        {
-            if (type != POINT_MOTION_TYPE || id != 1337)
-                return;
-
-            events.ScheduleEvent(EVENT_SPELL_COLDFLAME_BONE_STORM, 0);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            Talk(SAY_DEATH);
-            _JustDied();
-        }
-
-        void JustReachedHome() override
-        {
-            _JustReachedHome();
-            instance->SetBossState(DATA_LORD_MARROWGAR, FAIL);
-        }
-
-        void KilledUnit(Unit* victim) override
-        {
-            if (victim->GetTypeId() == TYPEID_PLAYER)
-                Talk(SAY_KILL);
-        }
-
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (!_introDone && me->IsAlive() && who->GetTypeId() == TYPEID_PLAYER && me->GetExactDist2dSq(who) <= 10000.0f) // 100*100, moveinlineofsight limited to 60yd anyway
-            {
-                Talk(SAY_ENTER_ZONE);
-                _introDone = true;
-            }
-
-            BossAI::MoveInLineOfSight(who);
-        }
-
-        bool CanAIAttack(Unit const* target) const override
-        {
-            return target->GetPositionX() < -337.0f; // main gate
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void MovementInform(uint32 type, uint32 id) override
     {
-        return GetIcecrownCitadelAI<boss_lord_marrowgarAI>(creature);
+        if (type != POINT_MOTION_TYPE || id != 1337)
+            return;
+
+        events.ScheduleEvent(EVENT_SPELL_COLDFLAME_BONE_STORM, 0);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        Talk(SAY_DEATH);
+        _JustDied();
+    }
+
+    void JustReachedHome() override
+    {
+        _JustReachedHome();
+        instance->SetBossState(DATA_LORD_MARROWGAR, FAIL);
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim->GetTypeId() == TYPEID_PLAYER)
+            Talk(SAY_KILL);
+    }
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (!_introDone && me->IsAlive() && who->GetTypeId() == TYPEID_PLAYER && me->GetExactDist2dSq(who) <= 10000.0f) // 100*100, moveinlineofsight limited to 60yd anyway
+        {
+            Talk(SAY_ENTER_ZONE);
+            _introDone = true;
+        }
+
+        BossAI::MoveInLineOfSight(who);
+    }
+
+    bool CanAIAttack(Unit const* target) const override
+    {
+        return target->GetPositionX() < -337.0f; // main gate
     }
 };
 
@@ -336,7 +339,7 @@ public:
                         me->DisableSpline();
                         me->CastSpell(me, SPELL_COLDFLAME_SUMMON, true);
                         float nx = me->GetPositionX() + 5.0f * cos(me->GetOrientation());
-                        float ny = me->GetPositionY() + 5.0f * sin(me->GetOrientation());
+                        float ny = me->GetPositionY() + 5.0f * std::sin(me->GetOrientation());
                         if (!me->IsWithinLOS(nx, ny, 42.5f))
                         {
                             break;
@@ -378,7 +381,7 @@ public:
                 return;
 
             if (TempSummon* summ = me->ToTempSummon())
-                if (Unit* trapped = summ->GetSummoner())
+                if (Unit* trapped = summ->GetSummonerUnit())
                 {
                     Position exitPos = {me->GetPositionX(), me->GetPositionY(), 60.0f, me->GetOrientation()};
                     trapped->UpdateAllowedPositionZ(exitPos.GetPositionX(), exitPos.GetPositionY(), exitPos.m_positionZ);
@@ -430,7 +433,7 @@ public:
 
             if (TempSummon* summ = me->ToTempSummon())
             {
-                if (Unit* trapped = summ->GetSummoner())
+                if (Unit* trapped = summ->GetSummonerUnit())
                 {
                     if (!trapped->IsOnVehicle(me) || !trapped->IsAlive() || !me->GetInstanceScript() || me->GetInstanceScript()->GetBossState(DATA_LORD_MARROWGAR) != IN_PROGRESS || trapped->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
                     {
@@ -476,9 +479,9 @@ public:
         void SelectTarget(std::list<WorldObject*>& targets)
         {
             targets.clear();
-            Unit* target = GetCaster()->GetAI()->SelectTarget(SELECT_TARGET_RANDOM, 1, -1.0f, true, -SPELL_IMPALED); // -1.0f as it takes into account object size
+            Unit* target = GetCaster()->GetAI()->SelectTarget(SelectTargetMethod::Random, 1, -1.0f, true, -SPELL_IMPALED); // -1.0f as it takes into account object size
             if (!target)
-                target = GetCaster()->GetAI()->SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true); // if only tank or noone outside of boss' model
+                target = GetCaster()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true); // if only tank or noone outside of boss' model
             if (!target)
                 return;
 
@@ -492,17 +495,17 @@ public:
             float dist = caster->GetObjectSize() / 2.0f;
             float z = caster->GetPositionZ() + 2.5f;
             float nx = caster->GetPositionX() + dist * cos(angle);
-            float ny = caster->GetPositionY() + dist * sin(angle);
+            float ny = caster->GetPositionY() + dist * std::sin(angle);
 
             if (!caster->IsWithinLOS(nx, ny, z))
             {
                 nx = caster->GetPositionX() + 0.5f * cos(angle);
-                ny = caster->GetPositionY() + 0.5f * sin(angle);
+                ny = caster->GetPositionY() + 0.5f * std::sin(angle);
             }
 
             if (caster->IsWithinLOS(nx, ny, z))
             {
-                caster->m_orientation = angle;
+                caster->SetOrientation(angle);
                 caster->CastSpell(nx, ny, z, uint32(GetEffectValue()), true);
             }
         }
@@ -596,10 +599,10 @@ public:
             for (uint8 i = 0; i < 4; ++i)
             {
                 float nx = x + 2.5f * cos((M_PI / 4) + (i * (M_PI / 2)));
-                float ny = y + 2.5f * sin((M_PI / 4) + (i * (M_PI / 2)));
+                float ny = y + 2.5f * std::sin((M_PI / 4) + (i * (M_PI / 2)));
                 if (caster->IsWithinLOS(nx, ny, z))
                 {
-                    caster->m_orientation = (M_PI / 4) + (i * (M_PI / 2));
+                    caster->SetOrientation((M_PI / 4) + (i * (M_PI / 2)));
                     caster->CastSpell(nx, ny, z, uint32(GetEffectValue() + i), true);
                 }
             }
@@ -691,7 +694,7 @@ public:
 
 void AddSC_boss_lord_marrowgar()
 {
-    new boss_lord_marrowgar();
+    RegisterIcecrownCitadelCreatureAI(boss_lord_marrowgar);
     new npc_coldflame();
     new npc_bone_spike();
     new spell_marrowgar_coldflame();

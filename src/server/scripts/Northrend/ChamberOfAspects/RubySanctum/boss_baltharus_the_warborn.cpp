@@ -1,12 +1,25 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "ObjectMgr.h"
-#include "ruby_sanctum.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
+#include "ruby_sanctum.h"
 
 enum Texts
 {
@@ -211,7 +224,7 @@ public:
                     break;
                 case EVENT_ENERVATING_BRAND:
                     for (uint8 i = 0; i < RAID_MODE<uint8>(2, 4, 2, 4); i++)
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 45.0f, true, -SPELL_ENERVATING_BRAND))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 45.0f, true, -SPELL_ENERVATING_BRAND))
                             me->CastSpell(target, SPELL_ENERVATING_BRAND, true);
                     events.ScheduleEvent(EVENT_ENERVATING_BRAND, 26000);
                     break;
@@ -298,7 +311,7 @@ public:
                     break;
                 case EVENT_ENERVATING_BRAND:
                     for (uint8 i = 0; i < RAID_MODE<uint8>(4, 10, 4, 10); i++)
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 45.0f, true, -SPELL_ENERVATING_BRAND))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 45.0f, true, -SPELL_ENERVATING_BRAND))
                             me->CastSpell(target, SPELL_ENERVATING_BRAND, true);
                     _events.ScheduleEvent(EVENT_ENERVATING_BRAND, 26000);
                     break;
@@ -364,7 +377,7 @@ public:
         void Reset() override
         {
             _events.Reset();
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
 
             // Xinef: after soft reset npc is no longer present
             if (me->GetInstanceScript()->GetBossState(DATA_BALTHARUS_THE_WARBORN) == DONE)
@@ -426,7 +439,7 @@ public:
                     Talk(SAY_XERESTRASZA_EVENT_6);
                     break;
                 case EVENT_XERESTRASZA_EVENT_7:
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                     Talk(SAY_XERESTRASZA_EVENT_7);
                     me->setActive(false);
                     break;

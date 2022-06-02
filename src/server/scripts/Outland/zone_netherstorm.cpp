@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -20,10 +31,10 @@ EndContentData */
 
 #include "GameObjectAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 /*  ###################################
@@ -43,10 +54,7 @@ enum DeathblowToTheLegion
     DEATHBLOW_TO_THE_LEGION = 10409, // Quest ID
     TURNING_POINT           = 10507, // Quest ID
     SOCRETHAR_QUEST_CREDIT  = 35762, // Quest spell
-    SOCRETHAR_TP_STONE      = 29796,
-
-    EXODAR_FACTION          = 1806,
-    EXODAR_ENEMY_FACTION    = 90
+    SOCRETHAR_TP_STONE      = 29796
 };
 
 enum RoleplayActions
@@ -257,14 +265,14 @@ public:
         if (action == GOSSIP_ACTION_INFO_DEF + 1)
         {
             CloseGossipMenuFor(player);
-            creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             creature->AI()->DoAction(EVENT_START_PLAYER_READY);
             if (Creature* orelis = creature->FindNearestCreature(EXARCH_ORELIS, 15.0f, true))
                 orelis->AI()->DoAction(EVENT_ORELIS_WALK);
             if (Creature* karja = creature->FindNearestCreature(ANCHORITE_KARJA, 15.0f, true))
                 karja->AI()->DoAction(EVENT_KARJA_WALK);
             if (Creature* socrethar = creature->FindNearestCreature(SOCRETHAR, 500.0f, true))
-                socrethar->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
+                socrethar->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
         }
 
         return true;
@@ -389,7 +397,7 @@ public:
             if (param == EVENT_KARJA_WALK)
             {
                 me->GetMotionMaster()->MovePath(KARJA_PATH_ID, false);
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             }
             else if (param == RESET_DEATHBLOW_EVENT)
             {
@@ -462,7 +470,7 @@ public:
             if (param == EVENT_ORELIS_WALK)
             {
                 me->GetMotionMaster()->MovePath(ORELIS_PATH_ID, false);
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             }
             else if (param == RESET_DEATHBLOW_EVENT)
             {
@@ -552,37 +560,32 @@ public:
             switch (CreatureID)
             {
                 case ADYEN_THE_LIGHTBRINGER:
-                    adyen = nullptr;
                     adyen = me->FindNearestCreature(ADYEN_THE_LIGHTBRINGER, 100.0f, true);
-                    if (adyen != nullptr)
+                    if (adyen)
                         return true;
                     break;
                 case EXARCH_ORELIS:
-                    orelis = nullptr;
                     orelis = me->FindNearestCreature(EXARCH_ORELIS, 100.0f, true);
-                    if (orelis != nullptr)
+                    if (orelis)
                         return true;
                     break;
                 case ANCHORITE_KARJA:
-                    karja = nullptr;
                     karja = me->FindNearestCreature(ANCHORITE_KARJA, 100.0f, true);
-                    if (karja != nullptr)
+                    if (karja)
                         return true;
                     break;
                 case KAYLAAN_THE_LOST:
-                    kaylaan = nullptr;
                     kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 100.0f, true);
-                    if (kaylaan != nullptr)
+                    if (kaylaan)
                         return true;
                     break;
                 case ISHANAH_HIGH_PRIESTESS:
-                    ishanah = nullptr;
                     ishanah = me->FindNearestCreature(ISHANAH_HIGH_PRIESTESS, 100.0f, true);
-                    if (ishanah == nullptr)
+                    if (!ishanah)
                     {
                         // Ishanah may be dead; in this case we also need a reference to the creature for the respawn
                         ishanah = me->FindNearestCreature(ISHANAH_HIGH_PRIESTESS, 100.0f, false);
-                        if (ishanah != nullptr)
+                        if (ishanah)
                             return true;
                     }
                     else
@@ -595,11 +598,7 @@ public:
         void Reset() override
         {
             me->SetReactState(REACT_PASSIVE);
-            me->setFaction(EXODAR_ENEMY_FACTION);
-            adyen   = nullptr;
-            orelis  = nullptr;
-            karja   = nullptr;
-            ishanah = nullptr;
+            me->SetFaction(FACTION_DEMON);
         }
 
         void DoAction(int32 param) override
@@ -635,7 +634,7 @@ public:
 
             if (GetCreature(ISHANAH_HIGH_PRIESTESS))
             {
-                ishanah->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                ishanah->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                 ishanah->DespawnOrUnsummon(60000);
             }
 
@@ -739,7 +738,7 @@ public:
                     case EVENT_FIGHT_ALDOR:
                         if (GetCreature(KAYLAAN_THE_LOST))
                         {
-                            kaylaan->setFaction(EXODAR_ENEMY_FACTION);
+                            kaylaan->SetFaction(FACTION_DEMON);
                             if (GetCreature(ADYEN_THE_LIGHTBRINGER))
                                 kaylaan->AI()->AttackStart(adyen);
                         }
@@ -747,7 +746,7 @@ public:
                     case EVENT_END_ALDOR_FIGHT:
                         if (GetCreature(KAYLAAN_THE_LOST))
                         {
-                            kaylaan->setFaction(EXODAR_FACTION);
+                            kaylaan->SetFaction(FACTION_DEMON);
                             kaylaan->GetMotionMaster()->MoveTargetedHome();
                             kaylaan->CombatStop();
                             kaylaan->ClearInCombat();
@@ -785,7 +784,7 @@ public:
                         if (Creature* summonIshanah = me->SummonCreature(ISHANAH_HIGH_PRIESTESS, IshanahSpawnPosition, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 180000))
                         {
                             summonIshanah->GetMotionMaster()->MovePath(ISHANAH_PATH_ID, false);
-                            summonIshanah->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                            summonIshanah->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                         }
                         break;
                     case EVENT_ISHANAH_SAY_1:
@@ -845,7 +844,7 @@ public:
                             ishanah->Respawn();
                             ishanah->setActive(true); // ensure that Ishanah disappears, even when no player is near
                             ishanah->DespawnOrUnsummon(600000); // ensure that Ishanah disappears after 10 minutes
-                            ishanah->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                            ishanah->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                         }
                         _actionEvents.ScheduleEvent(EVENT_SOCRETHAR_SAY_6, 3000);
                         break;
@@ -865,8 +864,8 @@ public:
                         break;
                     case EVENT_FINAL_FIGHT:
                         // Prepare Socrethar for encounter
-                        me->setFaction(EXODAR_ENEMY_FACTION);
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
+                        me->SetFaction(FACTION_DEMON);
+                        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
                         me->SetReactState(REACT_AGGRESSIVE);
 
                         // Engage combat with Socrethar
@@ -1097,7 +1096,7 @@ public:
         {
             if (!summons.empty())
             {
-                for (ObjectGuid guid : summons)
+                for (ObjectGuid const& guid : summons)
                     if (Creature* cr = ObjectAccessor::GetCreature(*me, guid))
                     {
                         float x, y, z, o;
@@ -1139,7 +1138,7 @@ public:
                 {
                     summons.Summon(*itr);
                     (*itr)->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
-                    (*itr)->setFaction(250);
+                    (*itr)->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_ACTIVE);
                 }
                 cl.clear();
                 me->GetCreaturesWithEntryInRange(cl, 20.0f, NPC_PROTECTORATE_DEFENDER);
@@ -1147,10 +1146,10 @@ public:
                 {
                     summons.Summon(*itr);
                     (*itr)->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
-                    (*itr)->setFaction(250);
+                    (*itr)->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_ACTIVE);
                 }
 
-                me->setFaction(250);
+                me->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_ACTIVE);
                 Talk(SAY_SAEED_0);
                 events.ScheduleEvent(EVENT_START_WALK, 3000);
             }
@@ -1158,17 +1157,17 @@ public:
             {
                 Talk(SAY_SAEED_2);
                 SetEscortPaused(false);
-                me->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+                me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (fight)
                 SetEscortPaused(false);
 
             SummonsAction(nullptr);
-            npc_escortAI::EnterEvadeMode();
+            npc_escortAI::EnterEvadeMode(why);
         }
 
         void SummonsAction(Unit* who)
@@ -1177,7 +1176,7 @@ public:
             for (GuidList::iterator itr = summons.begin(); itr != summons.end(); ++itr, i += 1.0f)
                 if (Creature* cr = ObjectAccessor::GetCreature(*me, *itr))
                 {
-                    if (who == nullptr)
+                    if (!who)
                     {
                         cr->GetMotionMaster()->Clear(false);
                         cr->GetMotionMaster()->MoveFollow(me, 2.0f, M_PI / 2.0f + (i / summons.size() * M_PI));
@@ -1200,7 +1199,7 @@ public:
             {
                 case 16:
                     Talk(SAY_SAEED_1);
-                    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP);
                     SetEscortPaused(true);
                     break;
                 case 18:
@@ -1259,7 +1258,7 @@ public:
                     if (Creature* dimensius = me->FindNearestCreature(NPC_DIMENSIUS, 50.0f))
                     {
                         dimensius->RemoveAurasDueToSpell(SPELL_DIMENSIUS_TRANSFORM);
-                        dimensius->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                        dimensius->ReplaceAllUnitFlags(UNIT_FLAG_DISABLE_MOVE);
                         AttackStart(dimensius);
                         fight = true;
                     }
@@ -1444,7 +1443,7 @@ public:
                 return true;
             }
 
-            LOG_DEBUG("scripts.ai", "TSCR: npc_commander_dawnforge event already in progress, need to wait.");
+            LOG_DEBUG("scripts.ai", "npc_commander_dawnforge event already in progress, need to wait.");
             return false;
         }
 
@@ -1720,7 +1719,7 @@ public:
                 PlayerGUID = who->GetGUID();
         }
 
-        //void SpellHit(Unit* /*caster*/, const SpellInfo* /*spell*/)
+        //void SpellHit(Unit* /*caster*/, SpellInfo const* /*spell*/)
         //{
         //    DoCast(me, SPELL_DE_MATERIALIZE);
         //}
@@ -1742,7 +1741,7 @@ public:
             // some code to cast spell Mana Burn on random target which has mana
             if (ManaBurnTimer <= diff)
             {
-                std::list<HostileReference*> AggroList = me->getThreatManager().getThreatList();
+                std::list<HostileReference*> AggroList = me->GetThreatMgr().getThreatList();
                 std::list<Unit*> UnitsWithMana;
 
                 for (std::list<HostileReference*>::const_iterator itr = AggroList.begin(); itr != AggroList.end(); ++itr)
@@ -1813,8 +1812,8 @@ public:
     {
         if (quest->GetQuestId() == Q_ALMABTRIEB)
         {
-            creature->setFaction(113);
-            creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            creature->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
+            creature->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             creature->AI()->Talk(SAY_BESSY_0);
             CAST_AI(npc_escortAI, (creature->AI()))->Start(true, false, player->GetGUID());
         }
@@ -1981,7 +1980,7 @@ public:
         {
             if (npc_maxx_a_million_escortAI* pEscortAI = CAST_AI(npc_maxx_a_million_escort::npc_maxx_a_million_escortAI, creature->AI()))
             {
-                creature->setFaction(113);
+                creature->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
                 pEscortAI->Start(false, false, player->GetGUID());
             }
         }

@@ -1,10 +1,25 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
+#include "PetitionMgr.h"
 #include "DatabaseEnv.h"
 #include "Log.h"
-#include "PetitionMgr.h"
+#include "ObjectAccessor.h"
+#include "Player.h"
 #include "QueryResult.h"
 #include "Timer.h"
 
@@ -30,7 +45,7 @@ void PetitionMgr::LoadPetitions()
     QueryResult result = CharacterDatabase.Query("SELECT ownerguid, petitionguid, name, type FROM petition");
     if (!result)
     {
-        LOG_INFO("server.loading", ">>  Loaded 0 Petitions!");
+        LOG_WARN("server.loading", ">> Loaded 0 Petitions!");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -39,11 +54,11 @@ void PetitionMgr::LoadPetitions()
     do
     {
         Field* fields = result->Fetch();
-        AddPetition(ObjectGuid::Create<HighGuid::Item>(fields[1].GetUInt32()), ObjectGuid::Create<HighGuid::Player>(fields[0].GetUInt32()), fields[2].GetString(), fields[3].GetUInt8());
+        AddPetition(ObjectGuid::Create<HighGuid::Item>(fields[1].Get<uint32>()), ObjectGuid::Create<HighGuid::Player>(fields[0].Get<uint32>()), fields[2].Get<std::string>(), fields[3].Get<uint8>());
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server.loading", ">> Loaded %d Petitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} Petitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
@@ -55,7 +70,7 @@ void PetitionMgr::LoadSignatures()
     QueryResult result = CharacterDatabase.Query("SELECT petitionguid, playerguid, player_account FROM petition_sign");
     if (!result)
     {
-        LOG_INFO("server.loading", ">>  Loaded 0 Petition signs!");
+        LOG_WARN("server.loading", ">> Loaded 0 Petition signs!");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -64,11 +79,11 @@ void PetitionMgr::LoadSignatures()
     do
     {
         Field* fields = result->Fetch();
-        AddSignature(ObjectGuid::Create<HighGuid::Item>(fields[0].GetUInt32()), fields[2].GetUInt32(), ObjectGuid::Create<HighGuid::Player>(fields[1].GetUInt32()));
+        AddSignature(ObjectGuid::Create<HighGuid::Item>(fields[0].Get<uint32>()), fields[2].Get<uint32>(), ObjectGuid::Create<HighGuid::Player>(fields[1].Get<uint32>()));
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server.loading", ">> Loaded %d Petition signs in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} Petition signs in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
@@ -99,6 +114,18 @@ void PetitionMgr::RemovePetitionByOwnerAndType(ObjectGuid ownerGuid, uint8 type)
     {
         if (itr->second.ownerGuid == ownerGuid && (!type || type == itr->second.petitionType))
         {
+            // Remove invalid charter item
+            if (type == itr->second.petitionType)
+            {
+                if (Player* owner = ObjectAccessor::FindConnectedPlayer(ownerGuid))
+                {
+                    if (Item* item = owner->GetItemByGuid(itr->first))
+                    {
+                        owner->DestroyItem(item->GetBagSlot(), item->GetSlot(), true);
+                    }
+                }
+            }
+
             // remove signatures
             SignatureStore.erase(itr->first);
             PetitionStore.erase(itr++);

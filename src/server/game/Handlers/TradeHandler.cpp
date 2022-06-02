@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Item.h"
@@ -13,6 +24,7 @@
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
 #include "Spell.h"
+#include "SpellMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
@@ -57,13 +69,13 @@ void WorldSession::SendTradeStatus(TradeStatus status)
 
 void WorldSession::HandleIgnoreTradeOpcode(WorldPacket& /*recvPacket*/)
 {
-    LOG_DEBUG("network", "WORLD: Ignore Trade %s", _player->GetGUID().ToString().c_str());
+    LOG_DEBUG("network", "WORLD: Ignore Trade {}", _player->GetGUID().ToString());
     // recvPacket.print_storage();
 }
 
 void WorldSession::HandleBusyTradeOpcode(WorldPacket& /*recvPacket*/)
 {
-    LOG_DEBUG("network", "WORLD: Busy Trade %s", _player->GetGUID().ToString().c_str());
+    LOG_DEBUG("network", "WORLD: Busy Trade {}", _player->GetGUID().ToString());
     // recvPacket.print_storage();
 }
 
@@ -128,8 +140,8 @@ void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
     {
         ItemPosCountVec traderDst;
         ItemPosCountVec playerDst;
-        bool traderCanTrade = (myItems[i] == nullptr || trader->CanStoreItem(NULL_BAG, NULL_SLOT, traderDst, myItems[i], false) == EQUIP_ERR_OK);
-        bool playerCanTrade = (hisItems[i] == nullptr || _player->CanStoreItem(NULL_BAG, NULL_SLOT, playerDst, hisItems[i], false) == EQUIP_ERR_OK);
+        bool traderCanTrade = (!myItems[i] || trader->CanStoreItem(NULL_BAG, NULL_SLOT, traderDst, myItems[i], false) == EQUIP_ERR_OK);
+        bool playerCanTrade = (!hisItems[i] || _player->CanStoreItem(NULL_BAG, NULL_SLOT, playerDst, hisItems[i], false) == EQUIP_ERR_OK);
         if (traderCanTrade && playerCanTrade)
         {
             // Ok, if trade item exists and can be stored
@@ -138,7 +150,7 @@ void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
             if (myItems[i])
             {
                 // logging
-                LOG_DEBUG("network", "partner storing: %s", myItems[i]->GetGUID().ToString().c_str());
+                LOG_DEBUG("network", "partner storing: {}", myItems[i]->GetGUID().ToString());
 
                 // adjust time (depends on /played)
                 if (myItems[i]->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE))
@@ -149,7 +161,7 @@ void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
             if (hisItems[i])
             {
                 // logging
-                LOG_DEBUG("network", "player storing: %s", hisItems[i]->GetGUID().ToString().c_str());
+                LOG_DEBUG("network", "player storing: {}", hisItems[i]->GetGUID().ToString());
 
                 // adjust time (depends on /played)
                 if (hisItems[i]->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE))
@@ -165,21 +177,21 @@ void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
             if (myItems[i])
             {
                 if (!traderCanTrade)
-                    LOG_ERROR("network.opcode", "trader can't store item: %s", myItems[i]->GetGUID().ToString().c_str());
+                    LOG_ERROR("network.opcode", "trader can't store item: {}", myItems[i]->GetGUID().ToString());
                 if (_player->CanStoreItem(NULL_BAG, NULL_SLOT, playerDst, myItems[i], false) == EQUIP_ERR_OK)
                     _player->MoveItemToInventory(playerDst, myItems[i], true, true);
                 else
-                    LOG_ERROR("network.opcode", "player can't take item back: %s", myItems[i]->GetGUID().ToString().c_str());
+                    LOG_ERROR("network.opcode", "player can't take item back: {}", myItems[i]->GetGUID().ToString());
             }
             // return the already removed items to the original owner
             if (hisItems[i])
             {
                 if (!playerCanTrade)
-                    LOG_ERROR("network.opcode", "player can't store item: %s", hisItems[i]->GetGUID().ToString().c_str());
+                    LOG_ERROR("network.opcode", "player can't store item: {}", hisItems[i]->GetGUID().ToString());
                 if (trader->CanStoreItem(NULL_BAG, NULL_SLOT, traderDst, hisItems[i], false) == EQUIP_ERR_OK)
                     trader->MoveItemToInventory(traderDst, hisItems[i], true, true);
                 else
-                    LOG_ERROR("network.opcode", "trader can't take item back: %s", hisItems[i]->GetGUID().ToString().c_str());
+                    LOG_ERROR("network.opcode", "trader can't take item back: {}", hisItems[i]->GetGUID().ToString());
             }
         }
     }
@@ -197,7 +209,7 @@ static void setAcceptTradeMode(TradeData* myTrade, TradeData* hisTrade, Item * *
     {
         if (Item* item = myTrade->GetItem(TradeSlots(i)))
         {
-            LOG_DEBUG("network.opcode", "player trade item %s bag: %u slot: %u", item->GetGUID().ToString().c_str(), item->GetBagSlot(), item->GetSlot());
+            LOG_DEBUG("network.opcode", "player trade item {} bag: {} slot: {}", item->GetGUID().ToString(), item->GetBagSlot(), item->GetSlot());
             //Can return nullptr
             myItems[i] = item;
             myItems[i]->SetInTrade();
@@ -205,7 +217,7 @@ static void setAcceptTradeMode(TradeData* myTrade, TradeData* hisTrade, Item * *
 
         if (Item* item = hisTrade->GetItem(TradeSlots(i)))
         {
-            LOG_DEBUG("network.opcode", "partner trade item %s bag: %u slot: %u", item->GetGUID().ToString().c_str(), item->GetBagSlot(), item->GetSlot());
+            LOG_DEBUG("network.opcode", "partner trade item {} bag: {} slot: {}", item->GetGUID().ToString(), item->GetBagSlot(), item->GetSlot());
             hisItems[i] = item;
             hisItems[i]->SetInTrade();
         }
@@ -451,13 +463,13 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
 
         if( my_trade->GetMoney() >= 10 * GOLD )
         {
-            CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"<TRADE>\", NOW())",
-                GetAccountId(), _player->GetGUID().GetCounter(), _player->GetName().c_str(), GetRemoteAddress().c_str(), trader->GetSession()->GetAccountId(), trader->GetName().c_str(), my_trade->GetMoney());
+            CharacterDatabase.Execute("INSERT INTO log_money VALUES({}, {}, \"{}\", \"{}\", {}, \"{}\", {}, \"goods\", NOW(), {})",
+                GetAccountId(), _player->GetGUID().GetCounter(), _player->GetName(), GetRemoteAddress(), trader->GetSession()->GetAccountId(), trader->GetName(), my_trade->GetMoney(), 6);
         }
         if( his_trade->GetMoney() >= 10 * GOLD )
         {
-            CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"<TRADE>\", NOW())",
-                trader->GetSession()->GetAccountId(), trader->GetGUID().GetCounter(), trader->GetName().c_str(), trader->GetSession()->GetRemoteAddress().c_str(), GetAccountId(), _player->GetName().c_str(), his_trade->GetMoney());
+            CharacterDatabase.Execute("INSERT INTO log_money VALUES({}, {}, \"{}\", \"{}\", {}, \"{}\", {}, \"goods\", NOW(), {})",
+                trader->GetSession()->GetAccountId(), trader->GetGUID().GetCounter(), trader->GetName(), trader->GetSession()->GetRemoteAddress(), GetAccountId(), _player->GetName(), his_trade->GetMoney(), 6);
         }
 
         // update money

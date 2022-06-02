@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -11,8 +22,8 @@ SDComment:
 SDCategory: Zul'Gurub
 EndScriptData */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "zulgurub.h"
 
 enum Spells
@@ -80,7 +91,7 @@ public:
                 SetEquipmentSlots(false, EQUIP_UNEQUIP, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
                 me->SetDisplayId(11686);
 
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 Invisible = true;
 
                 Invisible_Timer = urand(15000, 30000);
@@ -91,8 +102,7 @@ public:
             {
                 if (Ambush_Timer <= diff)
                 {
-                    Unit* target = nullptr;
-                    target = SelectTarget(SELECT_TARGET_RANDOM, 0);
+                    Unit* target = SelectTarget(SelectTargetMethod::Random, 0);
                     if (target)
                     {
                         me->NearTeleportTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), me->GetOrientation());
@@ -114,7 +124,7 @@ public:
                     me->SetDisplayId(15268);
                     SetEquipmentSlots(false, EQUIP_ID_MAIN_HAND, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
 
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     Invisible = false;
 
                     Visible_Timer = 4000;
@@ -127,14 +137,17 @@ public:
             {
                 if (Aggro_Timer <= diff)
                 {
-                    Unit* target = nullptr;
-                    target = SelectTarget(SELECT_TARGET_RANDOM, 1);
+                    Unit* target = SelectTarget(SelectTargetMethod::Random, 1);
 
                     if (DoGetThreat(me->GetVictim()))
+                    {
                         DoModifyThreatPercent(me->GetVictim(), -50);
+                    }
 
                     if (target)
+                    {
                         AttackStart(target);
+                    }
 
                     Aggro_Timer = urand(7000, 20000);
                 }

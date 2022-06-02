@@ -1,5 +1,18 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "InstanceScript.h"
@@ -9,13 +22,13 @@
 
 DoorData const doorData[] =
 {
-    { GO_FIRE_BARRIER,     DATA_FELMYST_DOORS,  DOOR_TYPE_PASSAGE, BOUNDARY_NONE },
-    { GO_MURUS_GATE_1,     DATA_MURU,     DOOR_TYPE_ROOM,    BOUNDARY_NONE },
-    { GO_MURUS_GATE_2,     DATA_MURU,     DOOR_TYPE_PASSAGE, BOUNDARY_NONE },
-    { GO_BOSS_COLLISION_1, DATA_KALECGOS, DOOR_TYPE_ROOM,    BOUNDARY_NONE },
-    { GO_BOSS_COLLISION_2, DATA_KALECGOS, DOOR_TYPE_ROOM,    BOUNDARY_NONE },
-    { GO_FORCE_FIELD,      DATA_KALECGOS, DOOR_TYPE_ROOM,    BOUNDARY_NONE },
-    { 0,                   0,             DOOR_TYPE_ROOM,    BOUNDARY_NONE } // END
+    { GO_FIRE_BARRIER,     DATA_FELMYST_DOORS,  DOOR_TYPE_PASSAGE },
+    { GO_MURUS_GATE_1,     DATA_MURU,     DOOR_TYPE_ROOM   },
+    { GO_MURUS_GATE_2,     DATA_MURU,     DOOR_TYPE_PASSAGE },
+    { GO_BOSS_COLLISION_1, DATA_KALECGOS, DOOR_TYPE_ROOM   },
+    { GO_BOSS_COLLISION_2, DATA_KALECGOS, DOOR_TYPE_ROOM   },
+    { GO_FORCE_FIELD,      DATA_KALECGOS, DOOR_TYPE_ROOM   },
+    { 0,                   0,             DOOR_TYPE_ROOM   } // END
 };
 
 class instance_sunwell_plateau : public InstanceMapScript
@@ -43,7 +56,7 @@ public:
         {
             Map::PlayerList const& players = instance->GetPlayers();
 
-            if (!players.isEmpty())
+            if (!players.IsEmpty())
             {
                 for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                 {
@@ -53,7 +66,7 @@ public:
                 }
             }
             //else
-            //    TC_LOG_DEBUG("scripts", "Instance Sunwell Plateau: GetPlayerInMap, but PlayerList is empty!");
+            //    LOG_DEBUG("scripts", "Instance Sunwell Plateau: GetPlayerInMap, but PlayerList is empty!");
 
             return nullptr;
         }

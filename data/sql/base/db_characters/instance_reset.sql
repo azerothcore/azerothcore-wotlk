@@ -1,30 +1,105 @@
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+-- --------------------------------------------------------
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
+-- --------------------------------------------------------
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET NAMES utf8 */;
+/*!50503 SET NAMES utf8mb4 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+-- Dumpar struktur för tabell acore_characters.instance_reset
 DROP TABLE IF EXISTS `instance_reset`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = UTF8MB4 */;
-CREATE TABLE `instance_reset` 
-(
+CREATE TABLE IF NOT EXISTS `instance_reset` (
   `mapid` SMALLINT unsigned NOT NULL DEFAULT 0,
   `difficulty` TINYINT unsigned NOT NULL DEFAULT 0,
   `resettime` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`mapid`,`difficulty`),
   KEY `difficulty` (`difficulty`)
-) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-LOCK TABLES `instance_reset` WRITE;
+-- Dumpar data för tabell acore_characters.instance_reset: ~71 rows (ungefär)
+DELETE FROM `instance_reset`;
 /*!40000 ALTER TABLE `instance_reset` DISABLE KEYS */;
+INSERT INTO `instance_reset` (`mapid`, `difficulty`, `resettime`) VALUES
+	(249, 0, 1651147200),
+	(249, 1, 1651147200),
+	(269, 1, 1650859200),
+	(309, 0, 1651032000),
+	(409, 0, 1651147200),
+	(469, 0, 1651147200),
+	(509, 0, 1651032000),
+	(531, 0, 1651147200),
+	(532, 0, 1651147200),
+	(533, 0, 1651147200),
+	(533, 1, 1651147200),
+	(534, 0, 1651147200),
+	(540, 1, 1650859200),
+	(542, 1, 1650859200),
+	(543, 1, 1650859200),
+	(544, 0, 1651147200),
+	(545, 1, 1650859200),
+	(546, 1, 1650859200),
+	(547, 1, 1650859200),
+	(548, 0, 1651147200),
+	(550, 0, 1651147200),
+	(552, 1, 1650859200),
+	(553, 1, 1650859200),
+	(554, 1, 1650859200),
+	(555, 1, 1650859200),
+	(556, 1, 1650859200),
+	(557, 1, 1650859200),
+	(558, 1, 1650859200),
+	(560, 1, 1650859200),
+	(564, 0, 1651147200),
+	(565, 0, 1651147200),
+	(568, 0, 1651032000),
+	(574, 1, 1650859200),
+	(575, 1, 1650859200),
+	(576, 1, 1650168000),
+	(578, 1, 1650801600),
+	(580, 0, 1651147200),
+	(585, 1, 1650801600),
+	(595, 1, 1650801600),
+	(598, 1, 1650801600),
+	(599, 1, 1650801600),
+	(600, 1, 1650801600),
+	(601, 1, 1650801600),
+	(602, 1, 1650801600),
+	(603, 0, 1651147200),
+	(603, 1, 1651147200),
+	(604, 1, 1650801600),
+	(608, 1, 1650801600),
+	(615, 0, 1651147200),
+	(615, 1, 1651147200),
+	(616, 0, 1651147200),
+	(616, 1, 1651147200),
+	(619, 1, 1650801600),
+	(624, 0, 1651147200),
+	(624, 1, 1651147200),
+	(631, 0, 1651147200),
+	(631, 1, 1651147200),
+	(631, 2, 1651147200),
+	(631, 3, 1651147200),
+	(632, 1, 1650801600),
+	(649, 0, 1651147200),
+	(649, 1, 1651147200),
+	(649, 2, 1651147200),
+	(649, 3, 1651147200),
+	(650, 1, 1650801600),
+	(658, 1, 1650801600),
+	(668, 1, 1650801600),
+	(724, 0, 1651147200),
+	(724, 1, 1651147200),
+	(724, 2, 1651147200),
+	(724, 3, 1651147200);
 /*!40000 ALTER TABLE `instance_reset` ENABLE KEYS */;
-UNLOCK TABLES;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
+/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
+/*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;

@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef OUTDOOR_PVP_TF_
@@ -21,10 +32,10 @@ const uint32 OutdoorPvPTFBuffZones[OutdoorPvPTFBuffZonesNum] =
 };
 
 // locked for 6 hours after capture
-const uint32 TF_LOCK_TIME = 3600 * 6 * 1000;
+const uint32 TF_LOCK_TIME = 6 * HOUR * IN_MILLISECONDS;
 
 // update lock timer every 1/4 minute (overkill, but this way it's sure the timer won't "jump" 2 minutes at once.)
-const uint32 TF_LOCK_TIME_UPDATE = 15000;
+const uint32 TF_LOCK_TIME_UPDATE = 15 * IN_MILLISECONDS;
 
 // blessing of auchindoun
 #define TF_CAPTURE_BUFF 33377
@@ -67,23 +78,23 @@ const tf_tower_world_state TFTowerWorldStates[TF_TOWER_NUM] =
     {0xa85, 0xa84, 0xa83}
 };
 
-const uint32 TFTowerPlayerEnterEvents[TF_TOWER_NUM] =
-{
-    12226,
-    12497,
-    12486,
-    12499,
-    12501
-};
+//const uint32 TFTowerPlayerEnterEvents[TF_TOWER_NUM] =
+//{
+//    12226,
+//    12497,
+//    12486,
+//    12499,
+//    12501
+//};
 
-const uint32 TFTowerPlayerLeaveEvents[TF_TOWER_NUM] =
-{
-    12225,
-    12496,
-    12487,
-    12498,
-    12500
-};
+//const uint32 TFTowerPlayerLeaveEvents[TF_TOWER_NUM] =
+//{
+//    12225,
+//    12496,
+//    12487,
+//    12498,
+//    12500
+//};
 
 enum TFWorldStates
 {
@@ -127,6 +138,8 @@ public:
     bool HandlePlayerEnter(Player* player) override;
     void HandlePlayerLeave(Player* player) override;
 
+    void ResetToTeamControlled(TeamId team);
+
     void UpdateTowerState();
 
 protected:
@@ -151,6 +164,19 @@ public:
 
     void SendRemoveWorldStates(Player* player) override;
 
+    void SaveRequiredWorldStates() const;
+
+    void ResetZoneToTeamControlled(TeamId team);
+
+    void RecalculateClientUILockTime()
+    {
+        uint32 minutes_left = m_LockTimer / 60000;
+        hours_left = minutes_left / 60;
+        minutes_left -= hours_left * 60;
+        second_digit = minutes_left % 10;
+        first_digit = minutes_left / 10;
+    }
+
     uint32 GetAllianceTowersControlled() const;
     void SetAllianceTowersControlled(uint32 count);
 
@@ -161,6 +187,7 @@ public:
 
 private:
     bool m_IsLocked;
+    bool m_JustLocked;
     uint32 m_LockTimer;
     uint32 m_LockTimerUpdate;
 

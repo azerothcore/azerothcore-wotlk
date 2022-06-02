@@ -1,34 +1,28 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "BattlegroundBE.h"
-#include "Language.h"
-#include "Object.h"
-#include "ObjectMgr.h"
+#include "Log.h"
 #include "Player.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
 
 BattlegroundBE::BattlegroundBE()
 {
     BgObjects.resize(BG_BE_OBJECT_MAX);
-
-    StartDelayTimes[BG_STARTING_EVENT_FIRST]  = BG_START_DELAY_1M;
-    StartDelayTimes[BG_STARTING_EVENT_SECOND] = BG_START_DELAY_30S;
-    StartDelayTimes[BG_STARTING_EVENT_THIRD]  = BG_START_DELAY_15S;
-    StartDelayTimes[BG_STARTING_EVENT_FOURTH] = BG_START_DELAY_NONE;
-    //we must set messageIds
-    StartMessageIds[BG_STARTING_EVENT_FIRST]  = LANG_ARENA_ONE_MINUTE;
-    StartMessageIds[BG_STARTING_EVENT_SECOND] = LANG_ARENA_THIRTY_SECONDS;
-    StartMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_ARENA_FIFTEEN_SECONDS;
-    StartMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_ARENA_HAS_BEGUN;
-}
-
-BattlegroundBE::~BattlegroundBE()
-{
 }
 
 void BattlegroundBE::StartingEventCloseDoors()
@@ -47,39 +41,6 @@ void BattlegroundBE::StartingEventOpenDoors()
 
     for (uint32 i = BG_BE_OBJECT_BUFF_1; i <= BG_BE_OBJECT_BUFF_2; ++i)
         SpawnBGObject(i, 60);
-}
-
-void BattlegroundBE::AddPlayer(Player* player)
-{
-    Battleground::AddPlayer(player);
-    PlayerScores[player->GetGUID()] = new BattlegroundScore(player);
-    Battleground::UpdateArenaWorldState();
-}
-
-void BattlegroundBE::RemovePlayer(Player* /*player*/)
-{
-    if (GetStatus() == STATUS_WAIT_LEAVE)
-        return;
-
-    Battleground::UpdateArenaWorldState();
-    CheckArenaWinConditions();
-}
-
-void BattlegroundBE::HandleKillPlayer(Player* player, Player* killer)
-{
-    if (GetStatus() != STATUS_IN_PROGRESS)
-        return;
-
-    if (!killer)
-    {
-        LOG_ERROR("bg.battleground", "Killer player not found");
-        return;
-    }
-
-    Battleground::HandleKillPlayer(player, killer);
-
-    Battleground::UpdateArenaWorldState();
-    CheckArenaWinConditions();
 }
 
 bool BattlegroundBE::HandlePlayerUnderMap(Player* player)
@@ -128,14 +89,8 @@ void BattlegroundBE::HandleAreaTrigger(Player* player, uint32 trigger)
 
 void BattlegroundBE::FillInitialWorldStates(WorldPacket& data)
 {
-    data << uint32(0x9f3) << uint32(1);           // 9
-    Battleground::UpdateArenaWorldState();
-}
-
-void BattlegroundBE::Init()
-{
-    //call parent's class reset
-    Battleground::Init();
+    data << uint32(0x9f3) << uint32(1); // 9
+    Arena::FillInitialWorldStates(data);
 }
 
 bool BattlegroundBE::SetupBattleground()
@@ -157,9 +112,4 @@ bool BattlegroundBE::SetupBattleground()
     }
 
     return true;
-}
-
-void BattlegroundBE::UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor)
-{
-    Battleground::UpdatePlayerScore(player, type, value, doAddHonor);
 }

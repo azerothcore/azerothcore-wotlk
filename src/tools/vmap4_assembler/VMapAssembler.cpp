@@ -1,24 +1,42 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <string>
 #include <iostream>
+#include <string>
 
 #include "TileAssembler.h"
 
 int main(int argc, char* argv[])
 {
-    if (argc != 3)
+    std::string src = "Buildings";
+    std::string dest = "vmaps";
+
+    if (argc > 3)
     {
         std::cout << "usage: " << argv[0] << " <raw data dir> <vmap dest dir>" << std::endl;
         return 1;
     }
-
-    std::string src = argv[1];
-    std::string dest = argv[2];
+    else
+    {
+        if (argc > 1)
+            src = argv[1];
+        if (argc > 2)
+            dest = argv[2];
+    }
 
     std::cout << "using " << src << " as source directory and writing output to " << dest << std::endl;
 

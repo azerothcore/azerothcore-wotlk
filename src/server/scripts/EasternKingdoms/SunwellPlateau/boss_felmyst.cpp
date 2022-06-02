@@ -1,13 +1,25 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Cell.h"
 #include "CellImpl.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "sunwell_plateau.h"
 
 enum Yells
@@ -133,7 +145,7 @@ public:
             if (param == ACTION_START_EVENT)
             {
                 me->SetVisible(true);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 events2.ScheduleEvent(EVENT_INTRO_1, 3000);
             }
         }
@@ -141,7 +153,7 @@ public:
         void Reset() override
         {
             BossAI::Reset();
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             me->SetReactState(REACT_PASSIVE);
             me->SetDisableGravity(false);
             events2.Reset();
@@ -151,7 +163,7 @@ public:
         void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             if (events.Empty() && events2.Empty())
                 events2.ScheduleEvent(EVENT_INTRO_2, 3000);
         }
@@ -250,7 +262,7 @@ public:
                     events.ScheduleEvent(EVENT_LAND, 3000, 1);
                     events.ScheduleEvent(EVENT_SPELL_BERSERK, 600000);
                     me->SetInCombatWithZone();
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->CastSpell(me, SPELL_NOXIOUS_FUMES, true);
                     me->GetMotionMaster()->MovePoint(POINT_MISC, 1472.18f, 603.38f, 34.0f, false, true);
                     break;
@@ -295,7 +307,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_GAS_NOVA, 20000, 1);
                     break;
                 case EVENT_SPELL_ENCAPSULATE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                         me->CastSpell(target, SPELL_ENCAPSULATE_CHANNEL, false);
                     events.ScheduleEvent(EVENT_SPELL_ENCAPSULATE, 25000, 1);
                     break;
@@ -436,7 +448,7 @@ public:
             me->CastSpell(me, SPELL_DEMONIC_VAPOR_TRAIL_PERIODIC, true);
         }
 
-        void SpellHitTarget(Unit*, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit*, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_DEMONIC_VAPOR)
                 me->CastSpell(me, SPELL_SUMMON_BLAZING_DEAD, true);
@@ -458,7 +470,7 @@ public:
         void JustSummoned(Creature* summon) override
         {
             summon->SetInCombatWithZone();
-            summon->AI()->AttackStart(summon->AI()->SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f));
+            summon->AI()->AttackStart(summon->AI()->SelectTarget(SelectTargetMethod::Random, 0, 100.0f));
         }
     };
 };

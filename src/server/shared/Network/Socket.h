@@ -1,19 +1,31 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef __SOCKET_H__
 #define __SOCKET_H__
 
-#include "MessageBuffer.h"
 #include "Log.h"
+#include "MessageBuffer.h"
 #include <atomic>
-#include <queue>
-#include <memory>
-#include <functional>
-#include <type_traits>
 #include <boost/asio/ip/tcp.hpp>
+#include <functional>
+#include <memory>
+#include <queue>
+#include <type_traits>
 
 using boost::asio::ip::tcp;
 
@@ -119,8 +131,8 @@ public:
         _socket.shutdown(boost::asio::socket_base::shutdown_send, shutdownError);
 
         if (shutdownError)
-            LOG_DEBUG("network", "Socket::CloseSocket: %s errored when shutting down socket: %i (%s)", GetRemoteIpAddress().to_string().c_str(),
-                shutdownError.value(), shutdownError.message().c_str());
+            LOG_DEBUG("network", "Socket::CloseSocket: {} errored when shutting down socket: {} ({})", GetRemoteIpAddress().to_string(),
+                shutdownError.value(), shutdownError.message());
 
         OnClose();
     }
@@ -158,8 +170,8 @@ protected:
         _socket.set_option(tcp::no_delay(enable), err);
 
         if (err)
-            LOG_DEBUG("network", "Socket::SetNoDelay: failed to set_option(boost::asio::ip::tcp::no_delay) for %s - %d (%s)",
-                GetRemoteIpAddress().to_string().c_str(), err.value(), err.message().c_str());
+            LOG_DEBUG("network", "Socket::SetNoDelay: failed to set_option(boost::asio::ip::tcp::no_delay) for {} - {} ({})",
+                GetRemoteIpAddress().to_string(), err.value(), err.message());
     }
 
 private:

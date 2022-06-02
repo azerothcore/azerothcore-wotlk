@@ -1,14 +1,24 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "hyjal_trash.h"
-#include "hyjal.h"
-#include "hyjalAI.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "hyjal.h"
 
 enum Spells
 {
@@ -20,9 +30,9 @@ enum Spells
     SPELL_DISEASE_CLOUD     = 31607,
     SPELL_KNOCKDOWN         = 31610,
     SPELL_FRENZY            = 31540,
-    SPELL_RAISE_DEAD_1      = 31617,
-    SPELL_RAISE_DEAD_2      = 31624,
-    SPELL_RAISE_DEAD_3      = 31625,
+//    SPELL_RAISE_DEAD_1      = 31617,
+//    SPELL_RAISE_DEAD_2      = 31624,
+//    SPELL_RAISE_DEAD_3      = 31625,
     SPELL_SHADOW_BOLT       = 31627,
     SPELL_BANSHEE_CURSE     = 31651,
     SPELL_BANSHEE_WAIL      = 38183,
@@ -390,7 +400,7 @@ void hyjal_trashAI::JustDied(Unit* /*killer*/)
         instance->SetData(DATA_TRASH, 0);//signal trash is dead
 
     if ((instance->GetData(DATA_RAIDDAMAGE) < MINRAIDDAMAGE && !me->isWorldBoss()) || (damageTaken < me->GetMaxHealth() / 4 && me->isWorldBoss()))
-        me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);//no loot
+        me->RemoveDynamicFlag(UNIT_DYNFLAG_LOOTABLE);//no loot
 }
 
 class npc_giant_infernal : public CreatureScript
@@ -406,8 +416,8 @@ public:
             meteor = false;//call once!
             CanMove = false;
             Delay = rand() % 30000;
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetDisplayId(MODEL_INVIS);
             go = false;
             Reset();
@@ -461,7 +471,7 @@ public:
                 if (trigger)
                 {
                     trigger->SetVisible(false);
-                    trigger->setFaction(me->getFaction());
+                    trigger->SetFaction(me->GetFaction());
                     trigger->SetDisableGravity(true);
                     trigger->CastSpell(me, SPELL_METEOR, true);
                 }
@@ -472,8 +482,8 @@ public:
             {
                 if (spawnTimer <= diff)
                 {
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->SetDisplayId(me->GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID));
                     CanMove = true;
                     if (instance->GetData(DATA_ALLIANCE_RETREAT) && !instance->GetData(DATA_HORDE_RETREAT))
@@ -754,7 +764,7 @@ public:
 
         void JustSummoned(Creature* summon) override
         {
-            Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30, true);
+            Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30, true);
             if (target)
                 summon->Attack(target, false);
             summons.Summon(summon);
@@ -1355,7 +1365,7 @@ public:
                 forcemove = false;
                 if (forcemove)
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->Attack(target, false);
                 }
                 if (MoveTimer <= diff)

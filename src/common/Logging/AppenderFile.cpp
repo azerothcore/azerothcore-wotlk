@@ -1,13 +1,25 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2008-2021 TrinityCore <http://www.trinitycore.org/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "AppenderFile.h"
 #include "Log.h"
 #include "LogMessage.h"
 #include "StringConvert.h"
-#include "Util.h"
+#include "Timer.h"
 #include <algorithm>
 
 AppenderFile::AppenderFile(uint8 id, std::string const& name, LogLevel level, AppenderFlags flags, std::vector<std::string_view> const& args) :
@@ -19,7 +31,7 @@ AppenderFile::AppenderFile(uint8 id, std::string const& name, LogLevel level, Ap
 {
     if (args.size() < 4)
     {
-        throw InvalidAppenderArgsException(Acore::StringFormat("Log::CreateAppenderFromConfig: Missing file name for appender %s", name.c_str()));
+        throw InvalidAppenderArgsException(Acore::StringFormatFmt("Log::CreateAppenderFromConfig: Missing file name for appender {}", name));
     }
 
     _fileName.assign(args[3]);
@@ -51,7 +63,7 @@ AppenderFile::AppenderFile(uint8 id, std::string const& name, LogLevel level, Ap
         }
         else
         {
-            throw InvalidAppenderArgsException(Acore::StringFormat("Log::CreateAppenderFromConfig: Invalid size '%s' for appender %s", std::string(args[5]).c_str(), name.c_str()));
+            throw InvalidAppenderArgsException(Acore::StringFormatFmt("Log::CreateAppenderFromConfig: Invalid size '{}' for appender {}", args[5], name));
         }
     }
 
@@ -115,7 +127,7 @@ FILE* AppenderFile::OpenFile(std::string const& filename, std::string const& mod
         CloseFile();
         std::string newName(fullName);
         newName.push_back('.');
-        newName.append(LogMessage::getTimeStr(time(nullptr)));
+        newName.append(LogMessage::getTimeStr(GetEpochTime()));
         std::replace(newName.begin(), newName.end(), ':', '-');
         rename(fullName.c_str(), newName.c_str()); // no error handling... if we couldn't make a backup, just ignore
     }

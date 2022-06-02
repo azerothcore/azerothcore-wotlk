@@ -1,12 +1,23 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
 
@@ -106,7 +117,7 @@ public:
                         if (!(*itr)->IsSummon())
                             continue;
 
-                        if (Unit* summoner = (*itr)->ToTempSummon()->GetSummoner())
+                        if (Unit* summoner = (*itr)->ToTempSummon()->GetSummonerUnit())
                             if (!summoner->HasAura(SPELL_NO_SUMMON_AURA) && !summoner->HasAura(SPELL_SUMMON_ZENTABRA_TRIGGER)
                                     && !summoner->IsInCombat())
                             {
@@ -168,7 +179,7 @@ public:
             if (victim->GetTypeId() != TYPEID_UNIT || !victim->IsSummon())
                 return;
 
-            if (Unit* vehSummoner = victim->ToTempSummon()->GetSummoner())
+            if (Unit* vehSummoner = victim->ToTempSummon()->GetSummonerUnit())
             {
                 vehSummoner->RemoveAurasDueToSpell(SPELL_NO_SUMMON_AURA);
                 vehSummoner->RemoveAurasDueToSpell(SPELL_DETECT_INVIS);
@@ -186,8 +197,8 @@ public:
             if (HealthBelowPct(20))
             {
                 damage = 0;
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                if (Unit* vehSummoner = attacker->ToTempSummon()->GetSummoner())
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                if (Unit* vehSummoner = attacker->ToTempSummon()->GetSummonerUnit())
                 {
                     vehSummoner->AddAura(SPELL_SUMMON_ZENTABRA_TRIGGER, vehSummoner);
                     vehSummoner->CastSpell(vehSummoner, SPELL_SUMMON_ZENTABRA, true);
@@ -224,7 +235,7 @@ public:
                         if (Unit* tiger = ObjectAccessor::GetUnit(*me, _tigerGuid))
                         {
                             if (tiger->IsSummon())
-                                if (Unit* vehSummoner = tiger->ToTempSummon()->GetSummoner())
+                                if (Unit* vehSummoner = tiger->ToTempSummon()->GetSummonerUnit())
                                     me->AddAura(SPELL_NO_SUMMON_AURA, vehSummoner);
                         }
                         _events.ScheduleEvent(EVENT_NOSUMMON, 50000);

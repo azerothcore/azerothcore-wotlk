@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef WMO_H
@@ -14,9 +25,6 @@
 
 #include "vec3d.h"
 #include "loadlib/loadlib.h"
-
-#define TILESIZE (533.33333f)
-#define CHUNKSIZE ((TILESIZE) / 16.0f)
 
 // MOPY flags
 enum MopyFlags
@@ -32,7 +40,7 @@ enum MopyFlags
 };
 
 class WMOInstance;
-class WMOManager;
+class WMOMgr;
 class MPQFile;
 namespace ADT { struct MODF; }
 
@@ -73,7 +81,7 @@ private:
     std::string filename;
 public:
     unsigned int color;
-    uint32 nTextures, nGroups, nPortals, nLights, nDoodadNames, nDoodadDefs, nDoodadSets, RootWMOID, liquidType;
+    uint32 nTextures, nGroups, nPortals, nLights, nDoodadNames, nDoodadDefs, nDoodadSets, RootWMOID, flags;
     float bbcorn1[3];
     float bbcorn2[3];
 
@@ -94,7 +102,7 @@ struct WMOLiquidHeader
     float pos_x;
     float pos_y;
     float pos_z;
-    short type;
+    short material;
 };
 
 struct WMOLiquidVert
@@ -130,7 +138,7 @@ public:
     uint16 moprNItems;
     uint16 nBatchA;
     uint16 nBatchB;
-    uint32 nBatchC, fogIdx, liquidType, groupWMOID;
+    uint32 nBatchC, fogIdx, groupLiquid, groupWMOID;
 
     int mopy_size, moba_size;
     int LiquEx_size;
@@ -143,8 +151,9 @@ public:
     WMOGroup(std::string const& filename);
     ~WMOGroup();
 
-    bool open();
-    int ConvertToVMAPGroupWmo(FILE* output, WMORoot* rootWMO, bool preciseVectorData);
+    bool open(WMORoot* rootWMO);
+    int ConvertToVMAPGroupWmo(FILE* output, bool preciseVectorData);
+    uint32 GetLiquidTypeId(uint32 liquidTypeId);
 };
 
 namespace MapObject

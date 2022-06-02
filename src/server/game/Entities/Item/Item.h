@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef AZEROTHCORE_ITEM_H
@@ -24,6 +35,7 @@ struct ItemSetEffect
     SpellInfo const* spells[8];
 };
 
+// EnumUtils: DESCRIBE THIS
 enum InventoryResult
 {
     EQUIP_ERR_OK                                 = 0,
@@ -117,6 +129,7 @@ enum InventoryResult
     EQUIP_ERR_ITEM_MAX_LIMIT_CATEGORY_EQUIPPED_EXCEEDED  = 89
 };
 
+// EnumUtils: DESCRIBE THIS
 enum BuyResult
 {
     BUY_ERR_CANT_FIND_ITEM                      = 0,
@@ -130,6 +143,7 @@ enum BuyResult
     BUY_ERR_REPUTATION_REQUIRE                  = 12
 };
 
+// EnumUtils: DESCRIBE THIS
 enum SellResult
 {
     SELL_ERR_CANT_FIND_ITEM                      = 1,       // The item was not found.
@@ -239,7 +253,7 @@ public:
     void SetInTrade(bool b = true) { mb_in_trade = b; }
     [[nodiscard]] bool IsInTrade() const { return mb_in_trade; }
 
-    bool HasEnchantRequiredSkill(const Player* player) const;
+    bool HasEnchantRequiredSkill(Player const* player) const;
     [[nodiscard]] uint32 GetEnchantRequiredLevel() const;
 
     bool IsFitToSpellRequirements(SpellInfo const* spellInfo) const;

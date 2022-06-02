@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -17,130 +28,16 @@ quest_a_pawn_on_the_eternal_pawn
 EndContentData */
 
 #include "AccountMgr.h"
-#include "BanManager.h"
+#include "GameObject.h"
+#include "GameObjectAI.h"
 #include "Group.h"
+#include "ObjectMgr.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "Spell.h"
 #include "SpellInfo.h"
-
-/*###
-## npcs_rutgar_and_frankal
-###*/
-
-//gossip item text best guess
-#define GOSSIP_ITEM1 "I seek information about Natalia"
-
-#define GOSSIP_ITEM2 "That sounds dangerous!"
-#define GOSSIP_ITEM3 "What did you do?"
-#define GOSSIP_ITEM4 "Who?"
-#define GOSSIP_ITEM5 "Women do that. What did she demand?"
-#define GOSSIP_ITEM6 "What do you mean?"
-#define GOSSIP_ITEM7 "What happened next?"
-
-#define GOSSIP_ITEM11 "Yes, please continue"
-#define GOSSIP_ITEM12 "What language?"
-#define GOSSIP_ITEM13 "The Priestess attacked you?!"
-#define GOSSIP_ITEM14 "I should ask the monkey about this"
-#define GOSSIP_ITEM15 "Then what..."
-
-enum RutgarAndFrankal //trigger creatures to kill
-{
-    TRIGGER_FRANKAL     = 15221,
-    TRIGGER_RUTGAR      = 15222
-};
-
-class npcs_rutgar_and_frankal : public CreatureScript
-{
-public:
-    npcs_rutgar_and_frankal() : CreatureScript("npcs_rutgar_and_frankal") { }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        switch (action)
-        {
-            case GOSSIP_ACTION_INFO_DEF:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                SendGossipMenuFor(player, 7755, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 1:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                SendGossipMenuFor(player, 7756, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 2:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                SendGossipMenuFor(player, 7757, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 3:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-                SendGossipMenuFor(player, 7758, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 4:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-                SendGossipMenuFor(player, 7759, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 5:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM7, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-                SendGossipMenuFor(player, 7760, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 6:
-                SendGossipMenuFor(player, 7761, creature->GetGUID());
-                //'kill' our trigger to update quest status
-                player->KilledMonsterCredit(TRIGGER_RUTGAR);
-                break;
-
-            case GOSSIP_ACTION_INFO_DEF + 9:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM11, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
-                SendGossipMenuFor(player, 7762, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 10:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM12, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
-                SendGossipMenuFor(player, 7763, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 11:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM13, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 12);
-                SendGossipMenuFor(player, 7764, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 12:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM14, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 13);
-                SendGossipMenuFor(player, 7765, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 13:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM15, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 14);
-                SendGossipMenuFor(player, 7766, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 14:
-                SendGossipMenuFor(player, 7767, creature->GetGUID());
-                //'kill' our trigger to update quest status
-                player->KilledMonsterCredit(TRIGGER_FRANKAL);
-                break;
-        }
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (player->GetQuestStatus(8304) == QUEST_STATUS_INCOMPLETE &&
-                creature->GetEntry() == 15170 &&
-                !player->GetReqKillOrCastCurrentCount(8304, TRIGGER_RUTGAR))
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-
-        if (player->GetQuestStatus(8304) == QUEST_STATUS_INCOMPLETE &&
-                creature->GetEntry() == 15171 &&
-                player->GetReqKillOrCastCurrentCount(8304, TRIGGER_RUTGAR))
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
-
-        SendGossipMenuFor(player, 7754, creature->GetGUID());
-
-        return true;
-    }
-};
 
 /*####
 # quest_a_pawn_on_the_eternal_board (Defines)
@@ -148,9 +45,6 @@ public:
 enum EternalBoard
 {
     QUEST_A_PAWN_ON_THE_ETERNAL_BOARD   = 8519,
-
-    FACTION_HOSTILE                     = 14,
-    FACTION_FRIENDLY                    = 35,
 
     C_ANACHRONOS                        = 15381,
     C_FANDRAL_STAGHELM                  = 15382,
@@ -437,14 +331,17 @@ public:
             PlayerGUID.Clear();
             eventEnd = false;
 
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         }
 
         void HandleAnimation()
         {
             Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID);
+
             if (!player)
+            {
                 return;
+            }
 
             Creature* Fandral = player->FindNearestCreature(C_FANDRAL_STAGHELM, 100.0f);
             Creature* Arygos = player->FindNearestCreature(C_ARYGOS, 100.0f);
@@ -455,7 +352,7 @@ public:
                 return;
 
             AnimationTimer = EventAnim[AnimationCount].Timer;
-            if (eventEnd == false)
+            if (!eventEnd)
             {
                 switch (AnimationCount)
                 {
@@ -635,22 +532,26 @@ public:
                         break;
                     case 51:
                         {
-                            uint32 entries[4] = { 15423, 15424, 15414, 15422 };
-                            Unit* mob = nullptr;
-                            for (uint8 i = 0; i < 4; ++i)
+                            std::list<Creature*> constructList;
+
+                            me->GetCreatureListWithEntryInGrid(constructList, 15423, 100.0f);
+                            me->GetCreatureListWithEntryInGrid(constructList, 15424, 100.0f);
+                            me->GetCreatureListWithEntryInGrid(constructList, 15414, 100.0f);
+                            me->GetCreatureListWithEntryInGrid(constructList, 15422, 100.0f);
+
+                            if (!constructList.empty())
                             {
-                                mob = player->FindNearestCreature(entries[i], 50, me);
-                                while (mob)
+                                for (std::list<Creature*>::const_iterator itr = constructList.begin(); itr != constructList.end(); ++itr)
                                 {
-                                    mob->RemoveFromWorld();
-                                    mob = player->FindNearestCreature(15423, 50, me);
+                                    (*itr)->RemoveFromWorld();
                                 }
                             }
+
                             break;
                         }
                     case 52:
                         Fandral->GetMotionMaster()->MoveCharge(-8028.75f, 1538.795f, 2.61f, 4);
-                        Fandral->AI()->Talk(ANACHRONOS_SAY_9, me);
+                        Talk(ANACHRONOS_SAY_9);
                         break;
                     case 53:
                         Fandral->AI()->Talk(FANDRAL_SAY_6);
@@ -659,7 +560,8 @@ public:
                         Talk(ANACHRONOS_EMOTE_2);
                         break;
                     case 55:
-                        Fandral->SetVisible(false);
+                        //Fandral should not dispear atm.
+                        //Fandral->SetVisible(false);
                         break;
                     case 56:
                         Talk(ANACHRONOS_EMOTE_3);
@@ -675,8 +577,7 @@ public:
                         me->GetMotionMaster()->MoveCharge(-8117.99f, 1532.24f, 3.94f, 4);
                         break;
                     case 60:
-                        if (player)
-                            Talk(ANACHRONOS_SAY_10, player);
+                        Talk(ANACHRONOS_SAY_10, player);
                         me->GetMotionMaster()->MoveCharge(-8113.46f, 1524.16f, 2.89f, 4);
                         break;
                     case 61:
@@ -926,8 +827,6 @@ public:
 
             if (Group* EventGroup = player->GetGroup())
             {
-                Player* groupMember = nullptr;
-
                 uint8 GroupMemberCount = 0;
                 uint8 DeadMemberCount = 0;
                 uint8 FailedMemberCount = 0;
@@ -936,7 +835,7 @@ public:
 
                 for (Group::member_citerator itr = members.begin(); itr != members.end(); ++itr)
                 {
-                    groupMember = ObjectAccessor::GetPlayer(*me, itr->guid);
+                    Player* groupMember = ObjectAccessor::GetPlayer(*me, itr->guid);
                     if (!groupMember)
                         continue;
                     if (!groupMember->IsWithinDistInMap(me, EVENT_AREA_RADIUS) && groupMember->GetQuestStatus(QUEST_A_PAWN_ON_THE_ETERNAL_BOARD) == QUEST_STATUS_INCOMPLETE)
@@ -997,7 +896,7 @@ void npc_qiraj_war_spawn::npc_qiraj_war_spawnAI::JustDied(Unit* /*slayer*/)
     if (Creature* mob = ObjectAccessor::GetCreature(*me, MobGUID))
         if (npc_anachronos_quest_trigger::npc_anachronos_quest_triggerAI* triggerAI = CAST_AI(npc_anachronos_quest_trigger::npc_anachronos_quest_triggerAI, mob->AI()))
             triggerAI->LiveCounter();
-};
+}
 
 /*#####
 # go_crystalline_tear
@@ -1022,26 +921,26 @@ public:
 
                 if (Merithra)
                 {
-                    Merithra->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+                    Merithra->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
                     Merithra->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                     Merithra->SetUInt32Value(UNIT_FIELD_DISPLAYID, 15420);
-                    Merithra->setFaction(35);
+                    Merithra->SetFaction(FACTION_FRIENDLY);
                 }
 
                 if (Caelestrasz)
                 {
-                    Caelestrasz->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+                    Caelestrasz->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
                     Caelestrasz->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                     Caelestrasz->SetUInt32Value(UNIT_FIELD_DISPLAYID, 15419);
-                    Caelestrasz->setFaction(35);
+                    Caelestrasz->SetFaction(FACTION_FRIENDLY);
                 }
 
                 if (Arygos)
                 {
-                    Arygos->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+                    Arygos->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
                     Arygos->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                     Arygos->SetUInt32Value(UNIT_FIELD_DISPLAYID, 15418);
-                    Arygos->setFaction(35);
+                    Arygos->SetFaction(FACTION_FRIENDLY);
                 }
 
                 if (Anachronos)
@@ -1067,374 +966,252 @@ public:
 ## go_wind_stone
 ###*/
 
-enum WSSpells
+enum WindStone
 {
-    SPELL_PUNISHMENT = 24803,
-    SPELL_SPAWN_IN = 25035,
-
-    AURA_TWILIGHT_SET = 24746,
-    AURA_MEDALLION = 24748,
-    AURA_RING = 24782,
-
+    AURA_TWILIGHT_SET    = 24746,
+    AURA_MEDALLION       = 24748,
+    AURA_RING            = 24782,
+    SPELL_PUNISHMENT     = 24803,
+    SPELL_SPAWN_IN       = 25035,
     SPELL_TEMPLAR_RANDOM = 24745,
-    SPELL_TEMPLAR_FIRE = 24747,
-    SPELL_TEMPLAR_AIR = 24757,
-    SPELL_TEMPLAR_EARTH = 24759,
-    SPELL_TEMPLAR_WATER = 24761,
-
-    SPELL_DUKE_RANDOM = 24762,
-    SPELL_DUKE_FIRE = 24766,
-    SPELL_DUKE_AIR = 24769,
-    SPELL_DUKE_EARTH = 24771,
-    SPELL_DUKE_WATER = 24773,
-
-    SPELL_ROYAL_RANDOM = 24785,
-    SPELL_ROYAL_FIRE = 24787,
-    SPELL_ROYAL_AIR = 24791,
-    SPELL_ROYAL_EARTH = 24792,
-    SPELL_ROYAL_WATER = 24793
+    SPELL_TEMPLAR_FIRE   = 24747,
+    SPELL_TEMPLAR_AIR    = 24757,
+    SPELL_TEMPLAR_EARTH  = 24759,
+    SPELL_TEMPLAR_WATER  = 24761,
+    SPELL_DUKE_RANDOM    = 24762,
+    SPELL_DUKE_FIRE      = 24766,
+    SPELL_DUKE_AIR       = 24769,
+    SPELL_DUKE_EARTH     = 24771,
+    SPELL_DUKE_WATER     = 24773,
+    SPELL_ROYAL_RANDOM   = 24785,
+    SPELL_ROYAL_FIRE     = 24787,
+    SPELL_ROYAL_AIR      = 24791,
+    SPELL_ROYAL_EARTH    = 24792,
+    SPELL_ROYAL_WATER    = 24793,
+    GOSSIPID_LESSER_WS   = 6540,
+    GOSSIPID_WS          = 6542,
+    GOSSIPID_GREATER_WS  = 6543,
+    NPC_TEMPLAR_FIRE     = 15209,
+    NPC_TEMPLAR_WATER    = 15211,
+    NPC_TEMPLAR_AIR      = 15212,
+    NPC_TEMPLAR_EARTH    = 15307,
+    NPC_DUKE_FIRE        = 15206,
+    NPC_DUKE_WATER       = 15207,
+    NPC_DUKE_EARTH       = 15208,
+    NPC_DUKE_AIR         = 15220,
+    NPC_ROYAL_FIRE       = 15203,
+    NPC_ROYAL_AIR        = 15204,
+    NPC_ROYAL_EARTH      = 15205,
+    NPC_ROYAL_WATER      = 15305,
+    SAY_ON_SPAWN_IN      = 0
 };
 
-enum WSGossip
+class DelayedWindstoneSummonEvent : public BasicEvent
 {
-    GOSSIPID_LESSER_WS = 6540,
-    GOSSIPID_WS = 6542,
-    GOSSIPID_GREATER_WS = 6543
+public:
+    DelayedWindstoneSummonEvent(TempSummon* summon, ObjectGuid playerGUID) : _summon(summon), _playerGUID(playerGUID) { }
+
+    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
+    {
+        if (Player* player = ObjectAccessor::FindPlayer(_playerGUID))
+        {
+            _summon->AI()->AttackStart(player);
+        }
+
+        return true;
+    }
+
+private:
+    TempSummon* _summon;
+    ObjectGuid _playerGUID;
 };
-
-enum WSCreatures
-{
-    NPC_TEMPLAR_FIRE = 15209,
-    NPC_TEMPLAR_WATER = 15211,
-    NPC_TEMPLAR_AIR = 15212,
-    NPC_TEMPLAR_EARTH = 15307,
-
-    NPC_DUKE_FIRE = 15206,
-    NPC_DUKE_WATER = 15207,
-    NPC_DUKE_EARTH = 15208,
-    NPC_DUKE_AIR = 15220,
-
-    NPC_ROYAL_FIRE = 15203,
-    NPC_ROYAL_AIR = 15204,
-    NPC_ROYAL_EARTH = 15205,
-    NPC_ROYAL_WATER = 15305
-};
-
-enum WSItems
-{
-    ITEM_TEMPLAR_FIRE = 20416,
-    ITEM_TEMPLAR_EARTH =  20419,
-    ITEM_TEMPLAR_WATER = 20420,
-    ITEM_TEMPLAR_AIR = 20418,
-
-    ITEM_DUKE_FIRE = 20432,
-    ITEM_DUKE_EARTH =  20435,
-    ITEM_DUKE_WATER = 20436,
-    ITEM_DUKE_AIR = 20433,
-
-    ITEM_ROYAL_FIRE = 20447,
-    ITEM_ROYAL_EARTH =  20449,
-    ITEM_ROYAL_WATER = 20450,
-    ITEM_ROYAL_AIR = 20448,
-};
-
-enum WS
-{
-    TEMPLAR = 0,
-    DUKE = 1,
-    ROYAL = 2,
-
-    FIRE = 0x1,
-    WATER = 0x2,
-    EARTH = 0x4,
-    AIR = 0x8
-};
-
-enum WSTexts
-{
-    SAY_TEMPLAR_AGGRO = 0,
-    SAY_DUKE_AGGRO = 0,
-    YELL_ROYAL_AGGRO = 0
-};
-
-#define GOSSIP_TEMPLAR_RANDOM "I am no cultist, you monster! Come to me and face your destruction!"
-#define GOSSIP_TEMPLAR_FIRE "Crimson Templar! I hold your signet! Heed my call!"
-#define GOSSIP_TEMPLAR_EARTH "Earthen Templar! I hold your signet! Heed my call!"
-#define GOSSIP_TEMPLAR_AIR "Hoary Templar! I hold your signet! Heed my call!"
-#define GOSSIP_TEMPLAR_WATER "Azure Templar! I hold your signet! Heed my call!"
-
-#define GOSSIP_DUKE_RANDOM "You will listen to this, vile duke! I am not your Twilight's Hammer lapdog! I am here to challenge you! Come! Come, and meet your death..."
-#define GOSSIP_DUKE_FIRE "Duke of Cynders! I hold your signet! Heed my call!"
-#define GOSSIP_DUKE_EARTH "The Duke of Shards! I hold your signet! Heed my call!"
-#define GOSSIP_DUKE_AIR "The Duke of Zephyrs! I hold your signet! Heed my call!"
-#define GOSSIP_DUKE_WATER "The Duke of Fathoms! I hold your signet! Heed my call!"
-
-#define GOSSIP_ROYAL_RANDOM "The day of the judgement has come, fiend! I challenge you to battle!"
-#define GOSSIP_ROYAL_FIRE "Prince Skaldrenox! I hold your signet! Heed my call!"
-#define GOSSIP_ROYAL_EARTH "Baron Kazum! I hold your signet! Heed my call!"
-#define GOSSIP_ROYAL_AIR "High Marshal Whirlaxis! I hold your signet! Heed my call!"
-#define GOSSIP_ROYAL_WATER "Lord Skwol! I hold your signet! Heed my call!"
 
 class go_wind_stone : public GameObjectScript
 {
 public:
-    go_wind_stone() : GameObjectScript("go_wind_stone") { }
+    go_wind_stone() : GameObjectScript("go_wind_stone") {}
 
-private:
-    uint8 GetPlayerRank(Player* player) // For random summoning
+    struct go_wind_stoneAI : public GameObjectAI
     {
-        bool setAura = player->HasAura(AURA_TWILIGHT_SET, player->GetGUID());
-        bool medallionAura = player->HasAura(AURA_MEDALLION, player->GetGUID());
-        bool ringAura = player->HasAura(AURA_RING, player->GetGUID());
+        go_wind_stoneAI(GameObject* go) : GameObjectAI(go) {}
 
-        if (setAura && medallionAura && ringAura)
-            return 3;
-        else if (setAura && medallionAura)
-            return 2;
-        else if (setAura)
-            return 1;
-        else
-            return 0;
-    }
-
-    uint8 GetItems(Player* player, WS type)
-    {
-        uint8 result = 0x0;
-
-        switch (type)
+        void InitializeAI() override
         {
-            case TEMPLAR:
-                {
-                    if (player->HasItemCount(ITEM_TEMPLAR_FIRE))
-                        result |= FIRE;
-                    if (player->HasItemCount(ITEM_TEMPLAR_WATER))
-                        result |= WATER;
-                    if (player->HasItemCount(ITEM_TEMPLAR_EARTH))
-                        result |= EARTH;
-                    if (player->HasItemCount(ITEM_TEMPLAR_AIR))
-                        result |= AIR;
-                    break;
-                }
-            case DUKE:
-                {
-                    if (player->HasItemCount(ITEM_DUKE_FIRE))
-                        result |= FIRE;
-                    if (player->HasItemCount(ITEM_DUKE_WATER))
-                        result |= WATER;
-                    if (player->HasItemCount(ITEM_DUKE_EARTH))
-                        result |= EARTH;
-                    if (player->HasItemCount(ITEM_DUKE_AIR))
-                        result |= AIR;
-                    break;
-                }
-            case ROYAL:
-                {
-                    if (player->HasItemCount(ITEM_ROYAL_FIRE))
-                        result |= FIRE;
-                    if (player->HasItemCount(ITEM_ROYAL_WATER))
-                        result |= WATER;
-                    if (player->HasItemCount(ITEM_ROYAL_EARTH))
-                        result |= EARTH;
-                    if (player->HasItemCount(ITEM_ROYAL_AIR))
-                        result |= AIR;
-                    break;
-                }
-            default:
-                break;
+            me->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
         }
-        return result;
-    }
 
-    void SummonNPC(GameObject* go, Player* player, uint32 npc, uint32 spellId)
-    {
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-        if (!spellInfo)
-            return;
-        SpellInfo const* spellInfoTrigger = sSpellMgr->GetSpellInfo(spellInfo->Effects[EFFECT_0].TriggerSpell);
-        if (!spellInfoTrigger)
-            return;
-        Spell* spell = new Spell(player, spellInfoTrigger, TRIGGERED_NONE);
-        SpellCastResult result = spell->CheckCast(true);
-        delete spell;
-        if (result != SPELL_CAST_OK)
+        bool GossipHello(Player* player, bool reportUse) override
         {
-            if (result == SPELL_FAILED_REAGENTS)
+            if (reportUse)
             {
-                std::string accountName;
-                AccountMgr::GetName(player->GetSession()->GetAccountId(), accountName);
-                sBan->BanAccount(accountName, "0s", "Wind Stone exploit", "Server");
+                uint32 gossipId         = me->GetGOInfo()->GetGossipMenuId();
+                bool   _twilightSetAura = (player->HasAura(AURA_TWILIGHT_SET, player->GetGUID()) ? true : false);
+                bool   _medallionAura   = (player->HasAura(AURA_MEDALLION, player->GetGUID()) ? true : false);
+                bool   _ringAura        = (player->HasAura(AURA_RING, player->GetGUID()) ? true : false);
+
+                switch (gossipId)
+                {
+                case GOSSIPID_LESSER_WS:
+                {
+                    if (!_twilightSetAura)
+                        me->CastSpell(player, SPELL_PUNISHMENT);
+                    break;
+                }
+                case GOSSIPID_WS:
+                {
+                    if (!_twilightSetAura || !_medallionAura)
+                        me->CastSpell(player, SPELL_PUNISHMENT);
+                    break;
+                }
+                case GOSSIPID_GREATER_WS:
+                {
+                    if (!_twilightSetAura || !_medallionAura || !_ringAura)
+                        me->CastSpell(player, SPELL_PUNISHMENT);
+                    break;
+                }
+                default:
+                    break;
+                }
             }
-            return;
+            return false;
         }
-        player->CastSpell(player, spellInfoTrigger->Id, false);
-        TempSummon* summons = go->SummonCreature(npc, go->GetPositionX(), go->GetPositionY(), go->GetPositionZ(), player->GetOrientation() - M_PI, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 10 * 60 * 1000);
-        summons->CastSpell(summons, SPELL_SPAWN_IN, false);
-        switch (summons->GetEntry())
+
+        bool GossipSelect(Player* player, uint32 sender, uint32 action) override
         {
-            case NPC_TEMPLAR_FIRE:
-            case NPC_TEMPLAR_WATER:
-            case NPC_TEMPLAR_AIR:
-            case NPC_TEMPLAR_EARTH:
-                summons->AI()->Talk(SAY_TEMPLAR_AGGRO);
-                break;
+            Seconds respawnTimer = 0s;
+            player->PlayerTalkClass->SendCloseGossip();
 
-            case NPC_DUKE_FIRE:
-            case NPC_DUKE_WATER:
-            case NPC_DUKE_EARTH:
-            case NPC_DUKE_AIR:
-                summons->AI()->Talk(SAY_DUKE_AGGRO);
-                break;
-            case NPC_ROYAL_FIRE:
-            case NPC_ROYAL_AIR:
-            case NPC_ROYAL_EARTH:
-            case NPC_ROYAL_WATER:
-                summons->AI()->Talk(YELL_ROYAL_AGGRO);
-                break;
+            Creature* lastSpawn = ObjectAccessor::GetCreature(*me, _creatureGuid);
+            if (lastSpawn && lastSpawn->IsAlive())
+            {
+                // We already summoned something recently, return.
+                CloseGossipMenuFor(player);
+                return true;
+            }
+            else
+            {
+                _creatureGuid.Clear();
+            }
+
+            if (sender == GOSSIPID_LESSER_WS)
+            {
+                respawnTimer = 300s; // Lesser Windstone respawn in 5 minutes
+
+                switch (action)
+                {
+                case 0:
+                    SummonNPC(me, player, RAND(NPC_TEMPLAR_WATER, NPC_TEMPLAR_FIRE, NPC_TEMPLAR_EARTH, NPC_TEMPLAR_AIR), SPELL_TEMPLAR_RANDOM);
+                    break;
+                case 1:
+                    SummonNPC(me, player, NPC_TEMPLAR_FIRE, SPELL_TEMPLAR_FIRE);
+                    break;
+                case 2:
+                    SummonNPC(me, player, NPC_TEMPLAR_WATER, SPELL_TEMPLAR_WATER);
+                    break;
+                case 3:
+                    SummonNPC(me, player, NPC_TEMPLAR_EARTH, SPELL_TEMPLAR_EARTH);
+                    break;
+                case 4:
+                    SummonNPC(me, player, NPC_TEMPLAR_AIR, SPELL_TEMPLAR_AIR);
+                    break;
+                default:
+                    break;
+                }
+            }
+            else if (sender == GOSSIPID_WS)
+            {
+                respawnTimer = 900s; // Windstone respawn in 15 minutes
+
+                switch (action)
+                {
+                case 0:
+                    SummonNPC(me, player, RAND(NPC_DUKE_WATER, NPC_DUKE_FIRE, NPC_DUKE_EARTH, NPC_DUKE_AIR), SPELL_DUKE_RANDOM);
+                    break;
+                case 1:
+                    SummonNPC(me, player, NPC_DUKE_FIRE, SPELL_DUKE_FIRE);
+                    break;
+                case 2:
+                    SummonNPC(me, player, NPC_DUKE_WATER, SPELL_DUKE_WATER);
+                    break;
+                case 3:
+                    SummonNPC(me, player, NPC_DUKE_EARTH, SPELL_DUKE_EARTH);
+                    break;
+                case 4:
+                    SummonNPC(me, player, NPC_DUKE_AIR, SPELL_DUKE_AIR);
+                    break;
+                default:
+                    break;
+                }
+            }
+            else if (sender == GOSSIPID_GREATER_WS)
+            {
+                respawnTimer = 10800s; // Greater Windstone respawn in 3 hours
+
+                switch (action)
+                {
+                case 0:
+                    SummonNPC(me, player, RAND(NPC_ROYAL_WATER, NPC_ROYAL_FIRE, NPC_ROYAL_EARTH, NPC_ROYAL_AIR), SPELL_ROYAL_RANDOM);
+                    break;
+                case 1:
+                    SummonNPC(me, player, NPC_ROYAL_FIRE, SPELL_ROYAL_FIRE);
+                    break;
+                case 2:
+                    SummonNPC(me, player, NPC_ROYAL_WATER, SPELL_ROYAL_WATER);
+                    break;
+                case 3:
+                    SummonNPC(me, player, NPC_ROYAL_EARTH, SPELL_ROYAL_EARTH);
+                    break;
+                case 4:
+                    SummonNPC(me, player, NPC_ROYAL_AIR, SPELL_ROYAL_AIR);
+                    break;
+                default:
+                    break;
+                }
+            }
+
+            me->DespawnOrUnsummon(5000ms, respawnTimer); // Despawn in 5 Seconds for respawnTimer value
+            me->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+            CloseGossipMenuFor(player);
+            return false;
         }
-        summons->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-        summons->SendMeleeAttackStart(player);
-        summons->CombatStart(player);
-    }
 
-public:
-    bool OnGossipHello(Player* player, GameObject* go) override
+        void SummonNPC(GameObject* go, Player* player, uint32 npc, uint32 spellId)
+        {
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            if (!spellInfo)
+                return;
+            SpellInfo const* spellInfoTrigger = sSpellMgr->GetSpellInfo(spellInfo->Effects[EFFECT_0].TriggerSpell);
+            if (!spellInfoTrigger)
+                return;
+            Spell*          spell  = new Spell(player, spellInfoTrigger, TRIGGERED_NONE);
+            SpellCastResult result = spell->CheckCast(true);
+            delete spell;
+            if (result != SPELL_CAST_OK)
+            {
+                return;
+            }
+            player->CastSpell(player, spellInfoTrigger->Id, false);
+            if (TempSummon* summons = go->SummonCreature(npc, go->GetPositionX(), go->GetPositionY(), go->GetPositionZ(), player->GetOrientation() - M_PI, TEMPSUMMON_TIMED_DESPAWN_OOC_ALIVE, 6000))
+            {
+                summons->SetCorpseDelay(5 * MINUTE);
+                summons->SetTarget(player->GetGUID());
+                summons->SetLootRecipient(player);
+                summons->CastSpell(summons, SPELL_SPAWN_IN, false);
+                summons->AI()->Talk(SAY_ON_SPAWN_IN, player);
+                summons->m_Events.AddEvent(new DelayedWindstoneSummonEvent(summons, player->GetGUID()), summons->m_Events.CalculateTime(5200));
+                _creatureGuid = summons->GetGUID();
+            }
+        }
+
+        private:
+            ObjectGuid _creatureGuid;
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const
     {
-        uint8 rank = GetPlayerRank(player);
-
-        uint32 gossipId = go->GetGOInfo()->GetGossipMenuId();
-        switch (gossipId)
-        {
-            case GOSSIPID_LESSER_WS:
-                {
-                    if (rank >= 1) // 1 or 2 or 3
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_TEMPLAR_RANDOM, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                    else
-                    {
-                        go->CastSpell(player, SPELL_PUNISHMENT);
-                        break;
-                    }
-
-                    uint8 item = GetItems(player, TEMPLAR);
-                    if (item & FIRE)
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_TEMPLAR_FIRE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                    if (item & WATER)
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_TEMPLAR_WATER, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                    if (item & EARTH)
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_TEMPLAR_EARTH, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-                    if (item & AIR)
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_TEMPLAR_AIR, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-                    break;
-                }
-            case GOSSIPID_WS:
-                {
-                    if (rank >= 2) // 2 or 3
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_DUKE_RANDOM, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-                    else
-                    {
-                        go->CastSpell(player, SPELL_PUNISHMENT);
-                        break;
-                    }
-
-                    uint8 item = GetItems(player, DUKE);
-                    if (item & FIRE)
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_DUKE_FIRE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
-                    if (item & WATER)
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_DUKE_WATER, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 8);
-                    if (item & EARTH)
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_DUKE_EARTH, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
-                    if (item & AIR)
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_DUKE_AIR, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 10);
-                    break;
-                }
-            case GOSSIPID_GREATER_WS:
-                {
-                    if (rank == 3) // 3
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ROYAL_RANDOM, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
-                    else
-                    {
-                        go->CastSpell(player, SPELL_PUNISHMENT);
-                        break;
-                    }
-
-                    uint8 item = GetItems(player, ROYAL);
-                    if (item & FIRE)
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ROYAL_FIRE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 12);
-                    if (item & WATER)
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ROYAL_WATER, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 13);
-                    if (item & EARTH)
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ROYAL_EARTH, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 14);
-                    if (item & AIR)
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ROYAL_AIR, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 15);
-                    break;
-                }
-            default:
-                break;
-        }
-
-        SendGossipMenuFor(player, player->GetGossipTextId(gossipId, go), go->GetGUID());
-        return true;
+        return new go_wind_stoneAI(go);
     }
 
-    bool OnGossipSelect(Player* player, GameObject* go, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        player->PlayerTalkClass->SendCloseGossip();
-
-        switch (action)
-        {
-            case GOSSIP_ACTION_INFO_DEF + 1:
-                SummonNPC(go, player, RAND(NPC_TEMPLAR_WATER, NPC_TEMPLAR_FIRE, NPC_TEMPLAR_EARTH, NPC_TEMPLAR_AIR), SPELL_TEMPLAR_RANDOM);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 2:
-                SummonNPC(go, player, NPC_TEMPLAR_FIRE, SPELL_TEMPLAR_FIRE);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 3:
-                SummonNPC(go, player, NPC_TEMPLAR_WATER, SPELL_TEMPLAR_WATER);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 4:
-                SummonNPC(go, player, NPC_TEMPLAR_EARTH, SPELL_TEMPLAR_EARTH);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 5:
-                SummonNPC(go, player, NPC_TEMPLAR_AIR, SPELL_TEMPLAR_AIR);
-                break;
-
-            case GOSSIP_ACTION_INFO_DEF + 6:
-                SummonNPC(go, player, RAND(NPC_DUKE_FIRE, NPC_DUKE_WATER, NPC_DUKE_EARTH, NPC_DUKE_AIR), SPELL_DUKE_RANDOM);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 7:
-                SummonNPC(go, player, NPC_DUKE_FIRE, SPELL_DUKE_FIRE);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 8:
-                SummonNPC(go, player, NPC_DUKE_WATER, SPELL_DUKE_WATER);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 9:
-                SummonNPC(go, player, NPC_DUKE_EARTH, SPELL_DUKE_EARTH);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 10:
-                SummonNPC(go, player, NPC_DUKE_AIR, SPELL_DUKE_AIR);
-                break;
-
-            case GOSSIP_ACTION_INFO_DEF + 11:
-                SummonNPC(go, player, RAND(NPC_ROYAL_FIRE, NPC_ROYAL_AIR, NPC_ROYAL_EARTH, NPC_ROYAL_WATER), SPELL_ROYAL_RANDOM);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 12:
-                SummonNPC(go, player, NPC_ROYAL_FIRE, SPELL_ROYAL_FIRE);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 13:
-                SummonNPC(go, player, NPC_ROYAL_WATER, SPELL_ROYAL_WATER);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 14:
-                SummonNPC(go, player, NPC_ROYAL_EARTH, SPELL_ROYAL_EARTH);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 15:
-                SummonNPC(go, player, NPC_ROYAL_AIR, SPELL_ROYAL_AIR);
-                break;
-
-            default:
-                break;
-        }
-        return true;
-    }
 };
 
 void AddSC_silithus()
@@ -1443,6 +1220,5 @@ void AddSC_silithus()
     new npc_anachronos_quest_trigger();
     new npc_anachronos_the_ancient();
     new npc_qiraj_war_spawn();
-    new npcs_rutgar_and_frankal();
     new go_wind_stone();
 }

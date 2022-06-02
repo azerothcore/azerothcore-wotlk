@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _CHANNEL_H
@@ -13,12 +24,14 @@
 #include <list>
 #include <map>
 #include <string>
+#include <utility>
 
 class Player;
 
 #define CHANNEL_BAN_DURATION            DAY*60
 
-enum ChatNotify
+// EnumUtils: DESCRIBE THIS
+enum ChatNotify : uint8
 {
     CHAT_JOINED_NOTICE                = 0x00,           //+ "%s joined channel.";
     CHAT_LEFT_NOTICE                  = 0x01,           //+ "%s left channel.";
@@ -109,10 +122,10 @@ enum ChannelMemberFlags
 class ChannelRights
 {
 public:
-    ChannelRights() : flags(0), speakDelay(0) {}
-    ChannelRights(const uint32& f, const uint32& d, const std::string& jm, const std::string& sm, const std::set<uint32>& ml) : flags(f), speakDelay(d), joinMessage(jm), speakMessage(sm), moderators(ml) {}
-    uint32 flags;
-    uint32 speakDelay;
+    ChannelRights()  = default;
+    ChannelRights(const uint32& f, const uint32& d, std::string  jm, std::string  sm, std::set<uint32>  ml) : flags(f), speakDelay(d), joinMessage(std::move(jm)), speakMessage(std::move(sm)), moderators(std::move(ml)) {}
+    uint32 flags{0};
+    uint32 speakDelay{0};
     std::string joinMessage;
     std::string speakMessage;
     std::set<uint32> moderators;
@@ -137,40 +150,29 @@ class Channel
     {
         ObjectGuid player;
         uint8 flags;
-        uint64 lastSpeakTime; // pussywizard
         Player* plrPtr; // pussywizard
 
-        bool HasFlag(uint8 flag) const { return flags & flag; }
+        [[nodiscard]] bool HasFlag(uint8 flag) const { return flags & flag; }
         void SetFlag(uint8 flag) { if (!HasFlag(flag)) flags |= flag; }
-        bool IsOwner() const { return flags & MEMBER_FLAG_OWNER; }
+        [[nodiscard]] bool IsOwner() const { return flags & MEMBER_FLAG_OWNER; }
         void SetOwner(bool state)
         {
             if (state) flags |= MEMBER_FLAG_OWNER;
             else flags &= ~MEMBER_FLAG_OWNER;
         }
-        bool IsOwnerGM() const { return _gmStatus; }
+        [[nodiscard]] bool IsOwnerGM() const { return _gmStatus; }
         void SetOwnerGM(bool on) { _gmStatus = on; }
-        bool IsModerator() const { return flags & MEMBER_FLAG_MODERATOR; }
+        [[nodiscard]] bool IsModerator() const { return flags & MEMBER_FLAG_MODERATOR; }
         void SetModerator(bool state)
         {
             if (state) flags |= MEMBER_FLAG_MODERATOR;
             else flags &= ~MEMBER_FLAG_MODERATOR;
         }
-        bool IsMuted() const { return flags & MEMBER_FLAG_MUTED; }
+        [[nodiscard]] bool IsMuted() const { return flags & MEMBER_FLAG_MUTED; }
         void SetMuted(bool state)
         {
             if (state) flags |= MEMBER_FLAG_MUTED;
             else flags &= ~MEMBER_FLAG_MUTED;
-        }
-        bool IsAllowedToSpeak(uint64 speakDelay) // pussywizard
-        {
-            if (lastSpeakTime + speakDelay <= static_cast<uint64>(sWorld->GetGameTime()))
-            {
-                lastSpeakTime = sWorld->GetGameTime();
-                return true;
-            }
-            else
-                return false;
         }
     private:
         bool _gmStatus = false;
@@ -178,16 +180,16 @@ class Channel
 
 public:
     Channel(std::string const& name, uint32 channel_id, uint32 channelDBId, TeamId teamId = TEAM_NEUTRAL, bool announce = true, bool ownership = true);
-    std::string const& GetName() const { return _name; }
-    uint32 GetChannelId() const { return _channelId; }
-    bool IsConstant() const { return _channelId != 0; }
-    bool IsAnnounce() const { return _announce; }
-    bool IsLFG() const { return GetFlags() & CHANNEL_FLAG_LFG; }
-    std::string const& GetPassword() const { return _password; }
+    [[nodiscard]] std::string const& GetName() const { return _name; }
+    [[nodiscard]] uint32 GetChannelId() const { return _channelId; }
+    [[nodiscard]] bool IsConstant() const { return _channelId != 0; }
+    [[nodiscard]] bool IsAnnounce() const { return _announce; }
+    [[nodiscard]] bool IsLFG() const { return GetFlags() & CHANNEL_FLAG_LFG; }
+    [[nodiscard]] std::string const& GetPassword() const { return _password; }
     void SetPassword(std::string const& npassword) { _password = npassword; }
-    uint32 GetNumPlayers() const { return playersStore.size(); }
-    uint8 GetFlags() const { return _flags; }
-    bool HasFlag(uint8 flag) const { return _flags & flag; }
+    [[nodiscard]] uint32 GetNumPlayers() const { return playersStore.size(); }
+    [[nodiscard]] uint8 GetFlags() const { return _flags; }
+    [[nodiscard]] bool HasFlag(uint8 flag) const { return _flags & flag; }
 
     void JoinChannel(Player* player, std::string const& pass);
     void LeaveChannel(Player* player, bool send = true);
@@ -268,15 +270,15 @@ private:
     void SendToOne(WorldPacket* data, ObjectGuid who);
     void SendToAllWatching(WorldPacket* data);
 
-    bool IsOn(ObjectGuid who) const { return playersStore.find(who) != playersStore.end(); }
-    bool IsBanned(ObjectGuid guid) const;
+    [[nodiscard]] bool IsOn(ObjectGuid who) const { return playersStore.find(who) != playersStore.end(); }
+    [[nodiscard]] bool IsBanned(ObjectGuid guid) const;
 
     void UpdateChannelInDB() const;
     void UpdateChannelUseageInDB() const;
     void AddChannelBanToDB(ObjectGuid guid, uint32 time) const;
     void RemoveChannelBanFromDB(ObjectGuid guid) const;
 
-    uint8 GetPlayerFlags(ObjectGuid guid) const
+    [[nodiscard]] uint8 GetPlayerFlags(ObjectGuid guid) const
     {
         PlayerContainer::const_iterator itr = playersStore.find(guid);
         return itr != playersStore.end() ? itr->second.flags : 0;

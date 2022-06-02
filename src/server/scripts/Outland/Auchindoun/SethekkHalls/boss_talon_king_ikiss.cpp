@@ -1,9 +1,22 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "sethekk_halls.h"
 
 enum TailonkingIkiss
@@ -112,7 +125,7 @@ public:
                     events.RepeatEvent(urand(7000, 12000));
                     break;
                 case EVENT_SPELL_POLYMORPH:
-                    if (Unit* target = (IsHeroic() ? SelectTarget(SELECT_TARGET_RANDOM, 0) : SelectTarget(SELECT_TARGET_TOPAGGRO, 1)))
+                    if (Unit* target = (IsHeroic() ? SelectTarget(SelectTargetMethod::Random, 0) : SelectTarget(SelectTargetMethod::MaxThreat, 1)))
                         me->CastSpell(target, SPELL_POLYMORPH_N, false);
                     events.RepeatEvent(urand(15000, 17500));
                     break;
@@ -130,7 +143,7 @@ public:
                     break;
                 case EVENT_SPELL_BLINK:
                     Talk(EMOTE_ARCANE_EXP);
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                     {
                         me->CastSpell(target, SPELL_BLINK, false);
                         me->NearTeleportTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation());
@@ -186,7 +199,7 @@ public:
         boss_anzuAI(Creature* creature) : ScriptedAI(creature), summons(me)
         {
             talkTimer = 1;
-            me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->ReplaceAllUnitFlags(UNIT_FLAG_NON_ATTACKABLE);
             me->AddAura(SPELL_SHADOWFORM, me);
         }
 
@@ -240,7 +253,7 @@ public:
             Talk(SAY_SUMMON);
             me->CastSpell(me, SPELL_BANISH_SELF, true);
             for (uint8 i = 0; i < 5; ++i)
-                me->SummonCreature(23132 /*NPC_BROOD_OF_ANZU*/, me->GetPositionX() + 20 * cos((float)i), me->GetPositionY() + 20 * sin((float)i), me->GetPositionZ() + 25.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                me->SummonCreature(23132 /*NPC_BROOD_OF_ANZU*/, me->GetPositionX() + 20 * cos((float)i), me->GetPositionY() + 20 * std::sin((float)i), me->GetPositionZ() + 25.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
         }
 
         void UpdateAI(uint32 diff) override
@@ -255,7 +268,7 @@ public:
                 }
                 else if (talkTimer >= 16000)
                 {
-                    me->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
+                    me->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
                     me->RemoveAurasDueToSpell(SPELL_SHADOWFORM);
                     Talk(SAY_ANZU_INTRO2);
                     talkTimer = 0;
@@ -277,13 +290,13 @@ public:
                     events.DelayEvents(3000);
                     break;
                 case EVENT_SPELL_BOMB:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                         me->CastSpell(target, SPELL_SPELL_BOMB, false);
                     events.RepeatEvent(urand(16000, 24500));
                     events.DelayEvents(3000);
                     break;
                 case EVENT_SPELL_CYCLONE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 45.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 45.0f, true))
                         me->CastSpell(target, SPELL_CYCLONE, false);
                     events.RepeatEvent(urand(22000, 27000));
                     events.DelayEvents(3000);

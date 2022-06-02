@@ -1,13 +1,26 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Group.h"
 #include "LFGMgr.h"
-#include "oculus.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "oculus.h"
 
 class instance_oculus : public InstanceMapScript
 {
@@ -135,19 +148,29 @@ public:
                         DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW, 0);
 
                         if( Creature* urom = instance->GetCreature(uiUromGUID) )
-                            urom->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            urom->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     }
                     break;
                 case DATA_UROM:
                     m_auiEncounter[DATA_UROM] = data;
                     if( data == DONE )
                         if( Creature* eregos = instance->GetCreature(uiEregosGUID) )
-                            eregos->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            eregos->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     break;
                 case DATA_EREGOS:
                     m_auiEncounter[DATA_EREGOS] = data;
                     if (data == DONE)
+                    {
                         DoRespawnGameObject(EregosCacheGUID, 7 * DAY);
+
+                        if (GameObject* cache = instance->GetGameObject(EregosCacheGUID))
+                        {
+                            if (Creature* eregos = instance->GetCreature(uiEregosGUID))
+                            {
+                                cache->SetLootRecipient(eregos);
+                            }
+                        }
+                    }
                     break;
                 case DATA_CC_COUNT:
                     if( CentrifugeCount < 10 )
@@ -158,7 +181,7 @@ public:
                     if( CentrifugeCount >= 10 )
                         if( Creature* varos = instance->GetCreature(uiVarosGUID) )
                         {
-                            varos->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            varos->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             varos->InterruptNonMeleeSpells(false);
                             varos->RemoveAura(50053);
                         }

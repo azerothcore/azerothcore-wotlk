@@ -1,12 +1,23 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "ConfusedMovementGenerator.h"
 #include "Creature.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "Player.h"
@@ -26,7 +37,7 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* unit)
     float y = unit->GetPositionY();
     float z = unit->GetPositionZ();
 
-    Map const* map = unit->GetBaseMap();
+    Map const* map = unit->GetMap();
 
     bool is_water_ok, is_land_ok;
     _InitSpecific(unit, is_water_ok, is_land_ok);
@@ -41,7 +52,7 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* unit)
         Acore::NormalizeMapCoord(wanderY);
 
         float new_z = unit->GetMapHeight(wanderX, wanderY, z);
-        if (new_z <= INVALID_HEIGHT || fabs(z - new_z) > 3.0f) // pussywizard
+        if (new_z <= INVALID_HEIGHT || std::fabs(z - new_z) > 3.0f) // pussywizard
         {
             i_waypoints[idx][0] = idx > 0 ? i_waypoints[idx - 1][0] : x;
             i_waypoints[idx][1] = idx > 0 ? i_waypoints[idx - 1][1] : y;
@@ -50,7 +61,7 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* unit)
         }
         else if (unit->IsWithinLOS(wanderX, wanderY, z))
         {
-            bool is_water = map->IsInWater(wanderX, wanderY, z);
+            bool is_water = map->IsInWater(unit->GetPhaseMask(), wanderX, wanderY, z, unit->GetCollisionHeight());
 
             if ((is_water && !is_water_ok) || (!is_water && !is_land_ok))
             {
@@ -83,7 +94,7 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* unit)
     i_nextMove = urand(1, MAX_CONF_WAYPOINTS);
     DoUpdate(unit, 1);
 
-    unit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED);
+    unit->SetUnitFlag(UNIT_FLAG_CONFUSED);
     unit->AddUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_CONFUSED_MOVE);
 }
 
@@ -110,8 +121,11 @@ void ConfusedMovementGenerator<T>::DoReset(T* unit)
 template<class T>
 bool ConfusedMovementGenerator<T>::DoUpdate(T* unit, uint32 diff)
 {
-    if (unit->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DISTRACTED))
+    if (unit->HasUnitState(UNIT_STATE_NOT_MOVE) || unit->IsMovementPreventedByCasting())
+    {
+        unit->StopMoving();
         return true;
+    }
 
     if (i_nextMoveTime.Passed())
     {
@@ -149,7 +163,7 @@ bool ConfusedMovementGenerator<T>::DoUpdate(T* unit, uint32 diff)
 template<>
 void ConfusedMovementGenerator<Player>::DoFinalize(Player* unit)
 {
-    unit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED);
+    unit->RemoveUnitFlag(UNIT_FLAG_CONFUSED);
     unit->ClearUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_CONFUSED_MOVE);
     unit->StopMoving();
 }
@@ -157,7 +171,7 @@ void ConfusedMovementGenerator<Player>::DoFinalize(Player* unit)
 template<>
 void ConfusedMovementGenerator<Creature>::DoFinalize(Creature* unit)
 {
-    unit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED);
+    unit->RemoveUnitFlag(UNIT_FLAG_CONFUSED);
     unit->ClearUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_CONFUSED_MOVE);
     if (unit->GetVictim())
         unit->SetTarget(unit->GetVictim()->GetGUID());

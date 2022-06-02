@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /// \addtogroup u2w
@@ -12,9 +23,9 @@
 #define __WORLDSESSION_H
 
 #include "AccountMgr.h"
-#include "AuthDefines.h"
 #include "AddonMgr.h"
-#include "BanManager.h"
+#include "AuthDefines.h"
+#include "BanMgr.h"
 #include "CircularBuffer.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
@@ -22,8 +33,8 @@
 #include "Packet.h"
 #include "SharedDefines.h"
 #include "World.h"
-#include <utility>
 #include <map>
+#include <utility>
 
 class Creature;
 class GameObject;
@@ -60,6 +71,94 @@ namespace lfg
 
 namespace WorldPackets
 {
+    namespace LFG
+    {
+        class LFGJoin;
+        class LFGLeave;
+    }
+
+    namespace Chat
+    {
+        class EmoteClient;
+    }
+
+    namespace Character
+    {
+        class LogoutCancel;
+        class LogoutRequest;
+        class ShowingCloak;
+        class ShowingHelm;
+        class PlayerLogout;
+        class PlayedTimeClient;
+    }
+
+    namespace Totem
+    {
+        class TotemDestroyed;
+    }
+
+    namespace Bank
+    {
+        class AutoBankItem;
+        class AutoStoreBankItem;
+        class BuyBankSlot;
+    }
+
+    namespace Combat
+    {
+        class SetSheathed;
+    }
+
+    namespace Guild
+    {
+        class QueryGuildInfo;
+        class GuildCreate;
+        class GuildInviteByName;
+        class AcceptGuildInvite;
+        class GuildDeclineInvitation;
+        class GuildGetInfo;
+        class GuildGetRoster;
+        class GuildPromoteMember;
+        class GuildDemoteMember;
+        class GuildOfficerRemoveMember;
+        class GuildLeave;
+        class GuildDelete;
+        class GuildUpdateMotdText;
+        class GuildAddRank;
+        class GuildDeleteRank;
+        class GuildUpdateInfoText;
+        class GuildSetMemberNote;
+        class GuildEventLogQuery;
+        class GuildBankRemainingWithdrawMoneyQuery;
+        class GuildPermissionsQuery;
+        class GuildSetRankPermissions;
+        class GuildBankActivate;
+        class GuildBankQueryTab;
+        class GuildBankDepositMoney;
+        class GuildBankWithdrawMoney;
+        class GuildBankSwapItems;
+        class GuildBankBuyTab;
+        class GuildBankUpdateTab;
+        class GuildBankLogQuery;
+        class GuildBankTextQuery;
+        class GuildBankSetTabText;
+        class GuildSetGuildMaster;
+        class SaveGuildEmblem;
+    }
+
+    namespace Misc
+    {
+        class RandomRollClient;
+    }
+
+    namespace Pet
+    {
+        class DismissCritter;
+        class PetAbandon;
+        class PetStopAttack;
+        class PetSpellAutocast;
+        class RequestPetInfo;
+    }
 }
 
 enum AccountDataType
@@ -230,14 +329,14 @@ struct PacketCounter
 class WorldSession
 {
 public:
-    WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime);
+    WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime);
     ~WorldSession();
 
     bool PlayerLoading() const { return m_playerLoading; }
     bool PlayerLogout() const { return m_playerLogout; }
     bool PlayerLogoutWithSave() const { return m_playerLogout && m_playerSave; }
 
-    void ReadAddonsInfo(WorldPacket& data);
+    void ReadAddonsInfo(ByteBuffer& data);
     void SendAddonsInfo();
 
     void ReadMovementInfo(WorldPacket& data, MovementInfo* mi);
@@ -283,7 +382,7 @@ public:
     bool isLogingOut() const { return _logoutTime || m_playerLogout; }
 
     /// Engage the logout process for the user
-    void LogoutRequest(time_t requestTime)
+    void SetLogoutStartTime(time_t requestTime)
     {
         _logoutTime = requestTime;
     }
@@ -298,11 +397,18 @@ public:
     void KickPlayer(bool setKicked = true) { return this->KickPlayer("Unknown reason", setKicked); }
     void KickPlayer(std::string const& reason, bool setKicked = true);
 
+    // Returns true if all contained hyperlinks are valid
+    // May kick player on false depending on world config (handler should abort)
+    bool ValidateHyperlinksAndMaybeKick(std::string_view str);
+    // Returns true if the message contains no hyperlinks
+    // May kick player on false depending on world config (handler should abort)
+    bool DisallowHyperlinksAndMaybeKick(std::string_view str);
+
     void QueuePacket(WorldPacket* new_packet);
     bool Update(uint32 diff, PacketFilter& updater);
 
     /// Handle the authentication waiting queue (to be completed)
-    void SendAuthWaitQue(uint32 position);
+    void SendAuthWaitQueue(uint32 position);
 
     //void SendTestCreatureQueryOpcode(uint32 entry, ObjectGuid guid, uint32 testvalue);
     void SendNameQueryOpcode(ObjectGuid guid);
@@ -449,7 +555,7 @@ public:                                                 // opcodes handlers
     void SendSetPlayerDeclinedNamesResult(DeclinedNameResult result, ObjectGuid guid);
 
     // played time
-    void HandlePlayedTime(WorldPacket& recvPacket);
+    void HandlePlayedTime(WorldPackets::Character::PlayedTimeClient& packet);
 
     // new
     void HandleMoveUnRootAck(WorldPacket& recvPacket);
@@ -469,8 +575,8 @@ public:                                                 // opcodes handlers
     void HandleMountSpecialAnimOpcode(WorldPacket& recvdata);
 
     // character view
-    void HandleShowingHelmOpcode(WorldPacket& recvData);
-    void HandleShowingCloakOpcode(WorldPacket& recvData);
+    void HandleShowingHelmOpcode(WorldPackets::Character::ShowingHelm& packet);
+    void HandleShowingCloakOpcode(WorldPackets::Character::ShowingCloak& packet);
 
     // repair
     void HandleRepairItemOpcode(WorldPacket& recvPacket);
@@ -488,9 +594,9 @@ public:                                                 // opcodes handlers
     void HandleLootReleaseOpcode(WorldPacket& recvPacket);
     void HandleLootMasterGiveOpcode(WorldPacket& recvPacket);
     void HandleWhoOpcode(WorldPacket& recvPacket);
-    void HandleLogoutRequestOpcode(WorldPacket& recvPacket);
-    void HandlePlayerLogoutOpcode(WorldPacket& recvPacket);
-    void HandleLogoutCancelOpcode(WorldPacket& recvPacket);
+    void HandleLogoutRequestOpcode(WorldPackets::Character::LogoutRequest& logoutRequest);
+    void HandlePlayerLogoutOpcode(WorldPackets::Character::PlayerLogout& playerLogout);
+    void HandleLogoutCancelOpcode(WorldPackets::Character::LogoutCancel& logoutCancel);
 
     // GM Ticket opcodes
     void HandleGMTicketCreateOpcode(WorldPacket& recvPacket);
@@ -507,7 +613,7 @@ public:                                                 // opcodes handlers
     void HandleZoneUpdateOpcode(WorldPacket& recvPacket);
     void HandleSetSelectionOpcode(WorldPacket& recvPacket);
     void HandleStandStateChangeOpcode(WorldPacket& recvPacket);
-    void HandleEmoteOpcode(WorldPacket& recvPacket);
+    void HandleEmoteOpcode(WorldPackets::Chat::EmoteClient& packet);
     void HandleContactListOpcode(WorldPacket& recvPacket);
     void HandleAddFriendOpcode(WorldPacket& recvPacket);
     void HandleDelFriendOpcode(WorldPacket& recvPacket);
@@ -584,28 +690,28 @@ public:                                                 // opcodes handlers
     void HandleOfferPetitionOpcode(WorldPacket& recvData);
     void HandleTurnInPetitionOpcode(WorldPacket& recvData);
 
-    void HandleGuildQueryOpcode(WorldPacket& recvPacket);
-    void HandleGuildCreateOpcode(WorldPacket& recvPacket);
-    void HandleGuildInviteOpcode(WorldPacket& recvPacket);
-    void HandleGuildRemoveOpcode(WorldPacket& recvPacket);
-    void HandleGuildAcceptOpcode(WorldPacket& recvPacket);
-    void HandleGuildDeclineOpcode(WorldPacket& recvPacket);
-    void HandleGuildInfoOpcode(WorldPacket& recvPacket);
-    void HandleGuildEventLogQueryOpcode(WorldPacket& recvPacket);
-    void HandleGuildRosterOpcode(WorldPacket& recvPacket);
-    void HandleGuildPromoteOpcode(WorldPacket& recvPacket);
-    void HandleGuildDemoteOpcode(WorldPacket& recvPacket);
-    void HandleGuildLeaveOpcode(WorldPacket& recvPacket);
-    void HandleGuildDisbandOpcode(WorldPacket& recvPacket);
-    void HandleGuildLeaderOpcode(WorldPacket& recvPacket);
-    void HandleGuildMOTDOpcode(WorldPacket& recvPacket);
-    void HandleGuildSetPublicNoteOpcode(WorldPacket& recvPacket);
-    void HandleGuildSetOfficerNoteOpcode(WorldPacket& recvPacket);
-    void HandleGuildRankOpcode(WorldPacket& recvPacket);
-    void HandleGuildAddRankOpcode(WorldPacket& recvPacket);
-    void HandleGuildDelRankOpcode(WorldPacket& recvPacket);
-    void HandleGuildChangeInfoTextOpcode(WorldPacket& recvPacket);
-    void HandleSaveGuildEmblemOpcode(WorldPacket& recvPacket);
+    void HandleGuildQueryOpcode(WorldPackets::Guild::QueryGuildInfo& query);
+    void HandleGuildCreateOpcode(WorldPackets::Guild::GuildCreate& packet);
+    void HandleGuildInviteOpcode(WorldPackets::Guild::GuildInviteByName& packet);
+    void HandleGuildRemoveOpcode(WorldPackets::Guild::GuildOfficerRemoveMember& packet);
+    void HandleGuildAcceptOpcode(WorldPackets::Guild::AcceptGuildInvite& invite);
+    void HandleGuildDeclineOpcode(WorldPackets::Guild::GuildDeclineInvitation& decline);
+    void HandleGuildInfoOpcode(WorldPackets::Guild::GuildGetInfo& packet);
+    void HandleGuildEventLogQueryOpcode(WorldPackets::Guild::GuildEventLogQuery& packet);
+    void HandleGuildRosterOpcode(WorldPackets::Guild::GuildGetRoster& packet);
+    void HandleGuildPromoteOpcode(WorldPackets::Guild::GuildPromoteMember& promote);
+    void HandleGuildDemoteOpcode(WorldPackets::Guild::GuildDemoteMember& demote);
+    void HandleGuildLeaveOpcode(WorldPackets::Guild::GuildLeave& leave);
+    void HandleGuildDisbandOpcode(WorldPackets::Guild::GuildDelete& packet);
+    void HandleGuildLeaderOpcode(WorldPackets::Guild::GuildSetGuildMaster& packet);
+    void HandleGuildMOTDOpcode(WorldPackets::Guild::GuildUpdateMotdText& packet);
+    void HandleGuildSetPublicNoteOpcode(WorldPackets::Guild::GuildSetMemberNote& packet);
+    void HandleGuildSetOfficerNoteOpcode(WorldPackets::Guild::GuildSetMemberNote& packet);
+    void HandleGuildRankOpcode(WorldPackets::Guild::GuildSetRankPermissions& packet);
+    void HandleGuildAddRankOpcode(WorldPackets::Guild::GuildAddRank& packet);
+    void HandleGuildDelRankOpcode(WorldPackets::Guild::GuildDeleteRank& packet);
+    void HandleGuildChangeInfoTextOpcode(WorldPackets::Guild::GuildUpdateInfoText& packet);
+    void HandleSaveGuildEmblemOpcode(WorldPackets::Guild::SaveGuildEmblem& packet);
 
     void HandleTaxiNodeStatusQueryOpcode(WorldPacket& recvPacket);
     void HandleTaxiQueryAvailableNodes(WorldPacket& recvPacket);
@@ -615,8 +721,6 @@ public:                                                 // opcodes handlers
     void SendActivateTaxiReply(ActivateTaxiReply reply);
 
     void HandleTabardVendorActivateOpcode(WorldPacket& recvPacket);
-    void HandleBankerActivateOpcode(WorldPacket& recvPacket);
-    void HandleBuyBankSlotOpcode(WorldPacket& recvPacket);
     void HandleTrainerListOpcode(WorldPacket& recvPacket);
     void HandleTrainerBuySpellOpcode(WorldPacket& recvPacket);
     void HandlePetitionShowListOpcode(WorldPacket& recvPacket);
@@ -627,18 +731,13 @@ public:                                                 // opcodes handlers
     void HandleBinderActivateOpcode(WorldPacket& recvPacket);
     void HandleListStabledPetsOpcode(WorldPacket& recvPacket);
     void HandleStablePet(WorldPacket& recvPacket);
-    void HandleStablePetCallback(PreparedQueryResult result);
     void HandleUnstablePet(WorldPacket& recvPacket);
-    void HandleUnstablePetCallback(uint32 petId, PreparedQueryResult result);
     void HandleBuyStableSlot(WorldPacket& recvPacket);
     void HandleStableRevivePet(WorldPacket& recvPacket);
     void HandleStableSwapPet(WorldPacket& recvPacket);
-    void HandleStableSwapPetCallback(uint32 petId, PreparedQueryResult result);
     void HandleOpenWrappedItemCallback(uint8 bagIndex, uint8 slot, ObjectGuid::LowType itemLowGUID, PreparedQueryResult result);
     void HandleLoadActionsSwitchSpec(PreparedQueryResult result);
     void HandleCharacterAuraFrozen(PreparedQueryResult result);
-    uint8 HandleLoadPetFromDBFirstCallback(PreparedQueryResult result, uint8 asynchLoadType);
-    void HandleLoadPetFromDBSecondCallback(LoadPetFromDBQueryHolder const& holder);
 
     void HandleDuelAcceptedOpcode(WorldPacket& recvPacket);
     void HandleDuelCancelledOpcode(WorldPacket& recvPacket);
@@ -663,6 +762,12 @@ public:                                                 // opcodes handlers
     void HandleAuctionListOwnerItemsEvent(ObjectGuid creatureGuid);
     void HandleAuctionPlaceBid(WorldPacket& recvData);
     void HandleAuctionListPendingSales(WorldPacket& recvData);
+
+    // Bank
+    void HandleBankerActivateOpcode(WorldPacket& recvData);
+    void HandleAutoBankItemOpcode(WorldPackets::Bank::AutoBankItem& packet);
+    void HandleAutoStoreBankItemOpcode(WorldPackets::Bank::AutoStoreBankItem& packet);
+    void HandleBuyBankSlotOpcode(WorldPackets::Bank::BuyBankSlot& buyBankSlot);
 
     void HandleGetMailList(WorldPacket& recvData);
     void HandleSendMail(WorldPacket& recvData);
@@ -690,13 +795,11 @@ public:                                                 // opcodes handlers
     void HandleAutoEquipItemSlotOpcode(WorldPacket& recvPacket);
     void HandleSwapItem(WorldPacket& recvPacket);
     void HandleBuybackItem(WorldPacket& recvPacket);
-    void HandleAutoBankItemOpcode(WorldPacket& recvPacket);
-    void HandleAutoStoreBankItemOpcode(WorldPacket& recvPacket);
     void HandleWrapItemOpcode(WorldPacket& recvPacket);
 
     void HandleAttackSwingOpcode(WorldPacket& recvPacket);
     void HandleAttackStopOpcode(WorldPacket& recvPacket);
-    void HandleSetSheathedOpcode(WorldPacket& recvPacket);
+    void HandleSetSheathedOpcode(WorldPackets::Combat::SetSheathed& packet);
 
     void HandleUseItemOpcode(WorldPacket& recvPacket);
     void HandleOpenItemOpcode(WorldPacket& recvPacket);
@@ -775,14 +878,14 @@ public:                                                 // opcodes handlers
 
     //Pet
     void HandlePetAction(WorldPacket& recvData);
-    void HandlePetStopAttack(WorldPacket& recvData);
+    void HandlePetStopAttack(WorldPackets::Pet::PetStopAttack& packet);
     void HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spellid, uint16 flag, ObjectGuid guid2);
     void HandlePetNameQuery(WorldPacket& recvData);
     void HandlePetSetAction(WorldPacket& recvData);
-    void HandlePetAbandon(WorldPacket& recvData);
+    void HandlePetAbandon(WorldPackets::Pet::PetAbandon& packet);
     void HandlePetRename(WorldPacket& recvData);
     void HandlePetCancelAuraOpcode(WorldPacket& recvPacket);
-    void HandlePetSpellAutocastOpcode(WorldPacket& recvPacket);
+    void HandlePetSpellAutocastOpcode(WorldPackets::Pet::PetSpellAutocast& packet);
     void HandlePetCastSpellOpcode(WorldPacket& recvPacket);
     void HandlePetLearnTalent(WorldPacket& recvPacket);
     void HandleLearnPreviewTalentsPet(WorldPacket& recvPacket);
@@ -793,8 +896,8 @@ public:                                                 // opcodes handlers
     void HandleCharRenameCallBack(std::shared_ptr<CharacterRenameInfo> renameInfo, PreparedQueryResult result);
     void HandleSetPlayerDeclinedNames(WorldPacket& recvData);
 
-    void HandleTotemDestroyed(WorldPacket& recvData);
-    void HandleDismissCritter(WorldPacket& recvData);
+    void HandleTotemDestroyed(WorldPackets::Totem::TotemDestroyed& totemDestroyed);
+    void HandleDismissCritter(WorldPackets::Pet::DismissCritter& dismissCritter);
 
     //Battleground
     void HandleBattlemasterHelloOpcode(WorldPacket& recvData);
@@ -810,7 +913,7 @@ public:                                                 // opcodes handlers
     void HandleWardenDataOpcode(WorldPacket& recvData);
     void HandleWorldTeleportOpcode(WorldPacket& recvData);
     void HandleMinimapPingOpcode(WorldPacket& recvData);
-    void HandleRandomRollOpcode(WorldPacket& recvData);
+    void HandleRandomRollOpcode(WorldPackets::Misc::RandomRollClient& packet);
     void HandleFarSightOpcode(WorldPacket& recvData);
     void HandleSetDungeonDifficultyOpcode(WorldPacket& recvData);
     void HandleSetRaidDifficultyOpcode(WorldPacket& recvData);
@@ -838,8 +941,8 @@ public:                                                 // opcodes handlers
     void HandleLfgSetCommentOpcode(WorldPacket& recvData);
     void HandleLfgPlayerLockInfoRequestOpcode(WorldPacket& recvData);
     void HandleLfgPartyLockInfoRequestOpcode(WorldPacket& recvData);
-    void HandleLfgJoinOpcode(WorldPacket& recvData);
-    void HandleLfgLeaveOpcode(WorldPacket& recvData);
+    void HandleLfgJoinOpcode(WorldPackets::LFG::LFGJoin& lfgJoin);
+    void HandleLfgLeaveOpcode(WorldPackets::LFG::LFGLeave& lfgleave);
     void HandleLfgSetRolesOpcode(WorldPacket& recvData);
     void HandleLfgProposalResultOpcode(WorldPacket& recvData);
     void HandleLfgSetBootVoteOpcode(WorldPacket& recvData);
@@ -879,7 +982,7 @@ public:                                                 // opcodes handlers
     void HandleCancelMountAuraOpcode(WorldPacket& recvData);
     void HandleSelfResOpcode(WorldPacket& recvData);
     void HandleComplainOpcode(WorldPacket& recvData);
-    void HandleRequestPetInfoOpcode(WorldPacket& recvData);
+    void HandleRequestPetInfo(WorldPackets::Pet::RequestPetInfo& packet);
 
     // Socket gem
     void HandleSocketOpcode(WorldPacket& recvData);
@@ -895,19 +998,19 @@ public:                                                 // opcodes handlers
     void HandleSetTaxiBenchmarkOpcode(WorldPacket& recvData);
 
     // Guild Bank
-    void HandleGuildPermissions(WorldPacket& recvData);
-    void HandleGuildBankMoneyWithdrawn(WorldPacket& recvData);
-    void HandleGuildBankerActivate(WorldPacket& recvData);
-    void HandleGuildBankQueryTab(WorldPacket& recvData);
-    void HandleGuildBankLogQuery(WorldPacket& recvData);
-    void HandleGuildBankDepositMoney(WorldPacket& recvData);
-    void HandleGuildBankWithdrawMoney(WorldPacket& recvData);
-    void HandleGuildBankSwapItems(WorldPacket& recvData);
+    void HandleGuildPermissions(WorldPackets::Guild::GuildPermissionsQuery& packet);
+    void HandleGuildBankMoneyWithdrawn(WorldPackets::Guild::GuildBankRemainingWithdrawMoneyQuery& packet);
+    void HandleGuildBankerActivate(WorldPackets::Guild::GuildBankActivate& packet);
+    void HandleGuildBankQueryTab(WorldPackets::Guild::GuildBankQueryTab& packet);
+    void HandleGuildBankLogQuery(WorldPackets::Guild::GuildBankLogQuery& packet);
+    void HandleGuildBankDepositMoney(WorldPackets::Guild::GuildBankDepositMoney& packet);
+    void HandleGuildBankWithdrawMoney(WorldPackets::Guild::GuildBankWithdrawMoney& packet);
+    void HandleGuildBankSwapItems(WorldPackets::Guild::GuildBankSwapItems& packet);
 
-    void HandleGuildBankUpdateTab(WorldPacket& recvData);
-    void HandleGuildBankBuyTab(WorldPacket& recvData);
-    void HandleQueryGuildBankTabText(WorldPacket& recvData);
-    void HandleSetGuildBankTabText(WorldPacket& recvData);
+    void HandleGuildBankUpdateTab(WorldPackets::Guild::GuildBankUpdateTab& packet);
+    void HandleGuildBankBuyTab(WorldPackets::Guild::GuildBankBuyTab& packet);
+    void HandleQueryGuildBankTabText(WorldPackets::Guild::GuildBankTextQuery& packet);
+    void HandleSetGuildBankTabText(WorldPackets::Guild::GuildBankSetTabText& packet);
 
     // Refer-a-Friend
     void HandleGrantLevel(WorldPacket& recvData);
@@ -987,7 +1090,7 @@ protected:
     {
         friend class World;
     public:
-        DosProtection(WorldSession* s) : Session(s), _policy((Policy)sWorld->getIntConfig(CONFIG_PACKET_SPOOF_POLICY)) { }
+        DosProtection(WorldSession* s);
         bool EvaluateOpcode(WorldPacket& p, time_t time) const;
     protected:
         enum Policy
@@ -1035,20 +1138,20 @@ private:
 
     ObjectGuid::LowType m_GUIDLow;
     Player* _player;
-    WorldSocket* m_Socket;
+    std::shared_ptr<WorldSocket> m_Socket;
     std::string m_Address;
-    // std::string m_LAddress;                             // Last Attempted Remote Adress - we can not set attempted ip for a non-existing session!
 
     AccountTypes _security;
     bool _skipQueue;
     uint32 _accountId;
+    std::string _accountName;
     uint8 m_expansion;
     uint32 m_total_time;
 
     typedef std::list<AddonInfo> AddonsList;
 
     // Warden
-    Warden* _warden;                                    // Remains nullptr if Warden system is not enabled by config
+    std::unique_ptr<Warden> _warden;                    // Remains nullptr if Warden system is not enabled by config
 
     time_t _logoutTime;
     bool m_inQueue;                                     // session wait in auth.queue
@@ -1057,7 +1160,7 @@ private:
     bool m_playerSave;
     LocaleConstant m_sessionDbcLocale;
     LocaleConstant m_sessionDbLocaleIndex;
-    uint32 m_latency;
+    std::atomic<uint32> m_latency;
     AccountData m_accountData[NUM_ACCOUNT_DATA_TYPES];
     uint32 m_Tutorials[MAX_ACCOUNT_TUTORIAL_VALUES];
     bool   m_TutorialsChanged;
@@ -1067,7 +1170,6 @@ private:
     LockedQueue<WorldPacket*> _recvQueue;
     uint32 m_currentVendorEntry;
     ObjectGuid m_currentBankerGUID;
-    time_t timeWhoCommandAllowed;
     uint32 _offlineTime;
     bool _kicked;
     bool _shouldSetOfflineInDB;
@@ -1081,6 +1183,9 @@ private:
     std::map<uint32, uint32> _pendingTimeSyncRequests; // key: counter. value: server time when packet with that counter was sent.
     uint32 _timeSyncNextCounter;
     uint32 _timeSyncTimer;
+
+    WorldSession(WorldSession const& right) = delete;
+    WorldSession& operator=(WorldSession const& right) = delete;
 };
 #endif
 /// @}

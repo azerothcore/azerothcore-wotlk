@@ -1,9 +1,22 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
 #include "trial_of_the_crusader.h"
@@ -132,7 +145,7 @@ public:
                 pInstance->SetData(TYPE_JARAXXUS, IN_PROGRESS);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             switch( spell->Id )
             {
@@ -198,12 +211,12 @@ public:
                     events.RepeatEvent(urand(10000, 15000));
                     break;
                 case EVENT_SPELL_FEL_LIGHTNING:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true) )
                         me->CastSpell(target, SPELL_FEL_LIGHTNING, false);
                     events.RepeatEvent(urand(10000, 15000));
                     break;
                 case EVENT_SPELL_INCINERATE_FLESH:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true) )
                     {
                         Talk(EMOTE_INCINERATE, target);
                         Talk(SAY_INCINERATE);
@@ -217,7 +230,7 @@ public:
                     events.RepeatEvent(urand(25000, 45000));
                     break;
                 case EVENT_SPELL_LEGION_FLAME:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true) )
                     {
                         Talk(EMOTE_LEGION_FLAME, target);
                         me->CastSpell(target, SPELL_LEGION_FLAME, false);
@@ -225,7 +238,7 @@ public:
                     events.RepeatEvent(30000);
                     break;
                 case EVENT_SPELL_TOUCH_OF_JARAXXUS:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true) )
                         me->CastSpell(target, SPELL_TOUCH_OF_JARAXXUS, false);
                     events.RepeatEvent(urand(10000, 15000));
                     break;
@@ -266,11 +279,11 @@ public:
             summons.Summon(summon);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             events.Reset();
             summons.DespawnAll();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             if( pInstance )
                 pInstance->SetData(TYPE_FAILED, 1);
         }
@@ -321,7 +334,7 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_FEL_STEAK:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 44.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 44.0f, true) )
                     {
                         DoResetThreat();
                         me->AddThreat(target, 50000.0f);
@@ -342,7 +355,7 @@ public:
             me->DespawnOrUnsummon(10000);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->DespawnOrUnsummon();
         }
@@ -379,7 +392,7 @@ public:
                 events.RescheduleEvent(EVENT_SPELL_MISTRESS_KISS, urand(10000, 15000));
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo*  /*spell*/) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const*  /*spell*/) override
         {
             //if (caster && spell && spell->Id == 66287 /*control vehicle*/)
             //  caster->ClearUnitState(UNIT_STATE_ONVEHICLE);
@@ -405,7 +418,7 @@ public:
                     events.RepeatEvent(urand(15000, 25000));
                     break;
                 case EVENT_SPELL_SPINNING_PAIN_SPIKE:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 140.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 140.0f, true) )
                         me->CastSpell(target, SPELL_SPINNING_PAIN_SPIKE, false);
                     events.RepeatEvent(urand(25000, 30000));
                     break;
@@ -423,7 +436,7 @@ public:
             me->DespawnOrUnsummon(10000);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->DespawnOrUnsummon();
         }

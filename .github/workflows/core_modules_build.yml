@@ -4,6 +4,7 @@ on:
     branches:
       - 'master'
   pull_request:
+    types: ['labeled', 'labeled', 'opened', 'synchronize', 'reopened']
 
 concurrency:
   group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
@@ -18,13 +19,11 @@ jobs:
         os: [ubuntu-20.04]
         compiler: [clang]
         modules: [with]
-        extra_logs: [false]
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.modules }}-modules-extra_logs-${{ matrix.extra_logs }}
+    name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.modules }}-modules
     env:
       COMPILER: ${{ matrix.compiler }}
-      EXTRA_LOGS: ${{ matrix.extra_logs }}
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && (github.ref == 'refs/heads/master' || contains(github.event.pull_request.labels.*.name, 'file-cpp') || github.event.label.name == 'file-cpp' || contains(github.event.pull_request.labels.*.name, 'run-build') || github.event.label.name == 'run-build')
     steps:
       - uses: actions/checkout@v2
       - name: Checkout modules
@@ -43,13 +42,11 @@ jobs:
         env:
           CONTINUOUS_INTEGRATION: true
       - name: Create conf/config.sh
-        run: source ./apps/ci/ci-conf.sh
-      - name: Import db
-        run: source ./apps/ci/ci-import-db.sh
+        run: source ./apps/ci/ci-conf-core.sh
       - name: Build
         run: source ./apps/ci/ci-compile.sh
       - name: Dry run
-        run: source ./apps/ci/ci-worldserver-dry-run.sh
+        run: source ./apps/ci/ci-dry-run.sh worldserver
       - name: Check startup errors
         run: source ./apps/ci/ci-error-check.sh
       - name: Run unit tests

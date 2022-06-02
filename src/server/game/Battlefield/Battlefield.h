@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef BATTLEFIELD_H_
@@ -44,12 +55,9 @@ enum BattlefieldSounds
     BF_START                                     = 3439
 };
 
-enum BattlefieldTimers
-{
-    BATTLEFIELD_OBJECTIVE_UPDATE_INTERVAL        = 1000
-};
+constexpr auto BATTLEFIELD_OBJECTIVE_UPDATE_INTERVAL = 1000;
 
-const uint32 BattlefieldFactions[BG_TEAMS_COUNT] =
+const uint32 BattlefieldFactions[PVP_TEAMS_COUNT] =
 {
     1732, // Alliance
     1735  // Horde
@@ -315,8 +323,7 @@ public:
     /// Called when a player enter in battlefield zone
     virtual void OnPlayerEnterZone(Player* /*player*/) {};
 
-    void SendWarningToAllInZone(uint32 entry);
-    void SendWarningToPlayer(Player* player, uint32 entry);
+    void SendWarning(uint8 id, WorldObject const* target = nullptr);
 
     void PlayerAcceptInviteToQueue(Player* player);
     void PlayerAcceptInviteToWar(Player* player);
@@ -364,11 +371,11 @@ protected:
     BfCapturePointVector m_capturePoints;
 
     // Players info maps
-    GuidUnorderedSet m_players[BG_TEAMS_COUNT];             // Players in zone
-    GuidUnorderedSet m_PlayersInQueue[BG_TEAMS_COUNT];      // Players in the queue
-    GuidUnorderedSet m_PlayersInWar[BG_TEAMS_COUNT];        // Players in WG combat
-    PlayerTimerMap m_InvitedPlayers[BG_TEAMS_COUNT];
-    PlayerTimerMap m_PlayersWillBeKick[BG_TEAMS_COUNT];
+    GuidUnorderedSet m_players[PVP_TEAMS_COUNT];             // Players in zone
+    GuidUnorderedSet m_PlayersInQueue[PVP_TEAMS_COUNT];      // Players in the queue
+    GuidUnorderedSet m_PlayersInWar[PVP_TEAMS_COUNT];        // Players in WG combat
+    PlayerTimerMap m_InvitedPlayers[PVP_TEAMS_COUNT];
+    PlayerTimerMap m_PlayersWillBeKick[PVP_TEAMS_COUNT];
 
     // Variables that must exist for each battlefield
     uint32 m_TypeId;                                        // See enum BattlefieldTypes
@@ -395,7 +402,7 @@ protected:
     uint32 m_StartGroupingTimer;                            // Timer for invite players in area 15 minute before start battle
     bool m_StartGrouping;                                   // bool for know if all players in area has been invited
 
-    GuidUnorderedSet m_Groups[BG_TEAMS_COUNT];              // Contain different raid group
+    GuidUnorderedSet m_Groups[PVP_TEAMS_COUNT];              // Contain different raid group
 
     std::vector<uint64> m_Data64;
     std::vector<uint32> m_Data32;
@@ -406,9 +413,9 @@ protected:
     virtual void SendRemoveWorldStates(Player* /*player*/) {}
 
     // use for send a packet for all player list
-    void BroadcastPacketToZone(WorldPacket& data) const;
-    void BroadcastPacketToQueue(WorldPacket& data) const;
-    void BroadcastPacketToWar(WorldPacket& data) const;
+    void BroadcastPacketToZone(WorldPacket const* data) const;
+    void BroadcastPacketToQueue(WorldPacket const* data) const;
+    void BroadcastPacketToWar(WorldPacket const* data) const;
 
     // CapturePoint system
     void AddCapturePoint(BfCapturePoint* cp) { m_capturePoints.push_back(cp); }

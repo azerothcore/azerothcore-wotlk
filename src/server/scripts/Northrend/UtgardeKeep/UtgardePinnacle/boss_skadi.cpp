@@ -1,24 +1,40 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "CombatAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
-#include "utgarde_pinnacle.h"
 #include "Vehicle.h"
+#include "utgarde_pinnacle.h"
 
 enum Misc
 {
     // TEXTS
     SAY_AGGRO                           = 0,
     SAY_KILL                            = 1,
-    EMOTE_RANGE                         = 2,
     SAY_DEATH                           = 3,
     SAY_DRAKE_DEATH                     = 5,
     SAY_DRAKE_BREATH                    = 6,
+
+    // EMOTES
+    EMOTE_DEEP_BREATH                   = 0,
+    EMOTE_RANGE                         = 1,
 
     // SPELLS
     SPELL_CRUSH_N                       = 50234,
@@ -28,9 +44,9 @@ enum Misc
     SPELL_WHIRLWIND_N                   = 50228,
     SPELL_WHIRLWIND_H                   = 50228,
 
-    SPELL_FLAME_VISUAL                  = 47592,
-    SPELL_FLAME_BREATH_N                = 47579,
-    SPELL_FLAME_BREATH_H                = 60020,
+    SPELL_FREEZING_CLOUD_VISUAL         = 47592,
+    SPELL_FREEZING_CLOUD_N              = 47579,
+    SPELL_FREEZING_CLOUD_H              = 60020,
 
     SPELL_LAUNCH_HARPOON                = 48642,
 
@@ -82,8 +98,6 @@ static Position SkadiPosition[] =
     {490.76f, -517.389f, 123.368f, 0.0f}
 };
 
-#define EMOTE_IN_RANGE   "Skadi the Ruthless is within range of the harpoon launchers"
-
 enum phase
 {
     PHASE_NONE,
@@ -120,7 +134,7 @@ public:
         {
             events.Reset();
             summons.DespawnAll();
-            if (Creature* cr = me->SummonCreature(NPC_GRAUF, 341.741f, -516.955f, 104.669f, 3.12414f))
+            if (Creature* cr = me->SummonCreature(NPC_GRAUF, 341.741f, -516.955f, 116.669f, 3.12414f))
             {
                 GraufGUID = cr->GetGUID();
                 summons.Summon(cr);
@@ -213,7 +227,7 @@ public:
                     }
                 case EVENT_SKADI_SPEAR:
                     {
-                        if (Unit* tgt = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* tgt = SelectTarget(SelectTargetMethod::Random, 0))
                             me->CastSpell(tgt, IsHeroic() ? SPELL_POISONED_SPEAR_H : SPELL_POISONED_SPEAR_N, false);
 
                         events.RepeatEvent(10000);
@@ -308,10 +322,10 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
         {
-            if (spellInfo->Id == 47593) // SPELL_FLAME_VISUAL trigger
-                target->CastSpell(target, me->GetMap()->IsHeroic() ? SPELL_FLAME_BREATH_H : SPELL_FLAME_BREATH_N, true);
+            if (spellInfo->Id == 47593) // SPELL_FREEZING_CLOUD_VISUAL trigger
+                target->CastSpell(target, me->GetMap()->IsHeroic() ? SPELL_FREEZING_CLOUD_H : SPELL_FREEZING_CLOUD_N, true);
         }
 
         void SpawnFlameTriggers(uint8 point)
@@ -328,13 +342,13 @@ public:
             {
                 Creature* cr;
                 if ((cr = me->SummonCreature(NPC_BREATH_TRIGGER, 483, -484.9f, 105, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000)))
-                    cr->CastSpell(cr, cr->GetMap()->IsHeroic() ? SPELL_FLAME_BREATH_H : SPELL_FLAME_BREATH_N, true);
+                    cr->CastSpell(cr, cr->GetMap()->IsHeroic() ? SPELL_FREEZING_CLOUD_H : SPELL_FREEZING_CLOUD_N, true);
                 if ((cr = me->SummonCreature(NPC_BREATH_TRIGGER, 471.0f, -484.7f, 105, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000)))
-                    cr->CastSpell(cr, cr->GetMap()->IsHeroic() ? SPELL_FLAME_BREATH_H : SPELL_FLAME_BREATH_N, true);
+                    cr->CastSpell(cr, cr->GetMap()->IsHeroic() ? SPELL_FREEZING_CLOUD_H : SPELL_FREEZING_CLOUD_N, true);
 
                 for (uint8 j = 0; j < 7; j++)
                     if ((cr = me->SummonCreature(NPC_BREATH_TRIGGER, 477.0f, -507.0f + (j * 3), 105.0f, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000)))
-                        cr->CastSpell(cr, cr->GetMap()->IsHeroic() ? SPELL_FLAME_BREATH_H : SPELL_FLAME_BREATH_N, true);
+                        cr->CastSpell(cr, cr->GetMap()->IsHeroic() ? SPELL_FREEZING_CLOUD_H : SPELL_FREEZING_CLOUD_N, true);
             }
         }
 
@@ -344,15 +358,14 @@ public:
             {
                 case 0:
                 case 1:
-                    me->RemoveAurasDueToSpell(SPELL_FLAME_VISUAL);
+                    me->RemoveAurasDueToSpell(SPELL_FREEZING_CLOUD_VISUAL);
                     me->SetFacingTo(M_PI * 2);
                     break;
                 case 2:
                 case 3:
                     if (m_pInstance)
                         m_pInstance->SetData(SKADI_IN_RANGE, 1);
-
-                    me->MonsterTextEmote(EMOTE_IN_RANGE, 0, true);
+                    Talk(EMOTE_RANGE);
                     me->SetFacingTo(M_PI);
                     break;
             }
@@ -453,8 +466,9 @@ public:
                         me->GetMotionMaster()->MovePoint(targetPoint, SkadiPosition[targetPoint].GetPositionX(), SkadiPosition[targetPoint].GetPositionY(), SkadiPosition[targetPoint].GetPositionZ());
                         if (targetPoint <= 1)
                         {
+                            Talk(EMOTE_DEEP_BREATH);
                             SpawnFlameTriggers(targetPoint);
-                            me->CastSpell(me, SPELL_FLAME_VISUAL, false);
+                            me->CastSpell(me, SPELL_FREEZING_CLOUD_VISUAL, false);
                         }
 
                         if (m_pInstance)

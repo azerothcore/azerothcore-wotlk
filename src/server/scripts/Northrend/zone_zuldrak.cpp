@@ -1,16 +1,25 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CombatAI.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
-#include "ScriptedEscortAI.h"
-#include "ScriptedGossip.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "Vehicle.h"
@@ -121,33 +130,33 @@ public:
             switch (counter)
             {
                 case 1:
-                    me->MonsterTextEmote("Quickly, get me some...", player, true);
-                    me->MonsterTextEmote(itemName, player, true);
+                    me->TextEmote("Quickly, get me some...", player, true);
+                    me->TextEmote(itemName, player, true);
                     me->CastSpell(player, auraId, true);
                     break;
                 case 2:
-                    me->MonsterTextEmote("Find me some...", player, true);
-                    me->MonsterTextEmote(itemName, player, true);
+                    me->TextEmote("Find me some...", player, true);
+                    me->TextEmote(itemName, player, true);
                     me->CastSpell(player, auraId, true);
                     break;
                 case 3:
-                    me->MonsterTextEmote("I think it needs...", player, true);
-                    me->MonsterTextEmote(itemName, player, true);
+                    me->TextEmote("I think it needs...", player, true);
+                    me->TextEmote(itemName, player, true);
                     me->CastSpell(player, auraId, true);
                     break;
                 case 4:
-                    me->MonsterTextEmote("Alright, now fetch me some...", player, true);
-                    me->MonsterTextEmote(itemName, player, true);
+                    me->TextEmote("Alright, now fetch me some...", player, true);
+                    me->TextEmote(itemName, player, true);
                     me->CastSpell(player, auraId, true);
                     break;
                 case 5:
-                    me->MonsterTextEmote("Before it thickens, we must add...", player, true);
-                    me->MonsterTextEmote(itemName, player, true);
+                    me->TextEmote("Before it thickens, we must add...", player, true);
+                    me->TextEmote(itemName, player, true);
                     me->CastSpell(player, auraId, true);
                     break;
                 case 6:
-                    me->MonsterTextEmote("It's thickening! Quickly get me some...", player, true);
-                    me->MonsterTextEmote(itemName, player, true);
+                    me->TextEmote("It's thickening! Quickly get me some...", player, true);
+                    me->TextEmote(itemName, player, true);
                     me->CastSpell(player, auraId, true);
                     break;
             }
@@ -258,7 +267,7 @@ public:
                     {
                         ghoul->SetReactState(REACT_DEFENSIVE);
                         float o = me->GetAngle(ghoul);
-                        ghoul->GetMotionMaster()->MovePoint(1, me->GetPositionX() + 2 * cos(o), me->GetPositionY() + 2 * sin(o), me->GetPositionZ());
+                        ghoul->GetMotionMaster()->MovePoint(1, me->GetPositionX() + 2 * cos(o), me->GetPositionY() + 2 * std::sin(o), me->GetPositionZ());
                         checkTimer = 1;
                         findTimer = 0;
                     }
@@ -293,7 +302,7 @@ public:
                             ghoul->GetMotionMaster()->MoveTargetedHome();
                         }
 
-                        if (Unit* owner = me->ToTempSummon()->GetSummoner())
+                        if (Unit* owner = me->ToTempSummon()->GetSummonerUnit())
                             if (Player* player = owner->ToPlayer())
                                 player->KilledMonsterCredit(me->GetEntry());
 
@@ -379,15 +388,15 @@ public:
         ObjectGuid playerGUID;
         ObjectGuid lichGUID;
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (playerGUID)
                 if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
                     if (player->IsWithinDistInMap(me, 80))
                         return;
-            me->setFaction(974);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            ScriptedAI::EnterEvadeMode();
+            me->SetFaction(FACTION_UNDEAD_SCOURGE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void Reset() override
@@ -396,9 +405,9 @@ public:
             summons.DespawnAll();
             playerGUID.Clear();
             lichGUID.Clear();
-            me->setFaction(974);
+            me->SetFaction(FACTION_UNDEAD_SCOURGE);
             me->SetVisible(false);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -414,7 +423,7 @@ public:
                             who->ToPlayer()->NearTeleportTo(6143.76f, -1969.7f, 417.57f, 2.08f);
                         else
                         {
-                            EnterEvadeMode();
+                            EnterEvadeMode(EVADE_REASON_OTHER);
                             return;
                         }
                     }
@@ -442,7 +451,7 @@ public:
                 me->SetFacingToObject(cr);
                 lichGUID = cr->GetGUID();
                 float o = me->GetAngle(cr);
-                cr->GetMotionMaster()->MovePoint(0, me->GetPositionX() + cos(o) * 6.0f, me->GetPositionY() + sin(o) * 6.0f, me->GetPositionZ());
+                cr->GetMotionMaster()->MovePoint(0, me->GetPositionX() + cos(o) * 6.0f, me->GetPositionY() + std::sin(o) * 6.0f, me->GetPositionZ());
             }
         }
 
@@ -456,26 +465,26 @@ public:
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (damage >= me->GetHealth() && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+            if (damage >= me->GetHealth() && !me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
             {
                 damage = 0;
                 me->RemoveAllAuras();
                 me->CombatStop();
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                me->setFaction(35);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetFaction(FACTION_FRIENDLY);
                 events.Reset();
                 events.ScheduleEvent(EVENT_BETRAYAL_4, 1000);
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_THROW_PORTAL_CRYSTAL)
                 if (Aura* aura = target->AddAura(SPELL_ARTHAS_PORTAL, target))
                     aura->SetDuration(48000);
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_TOUCH_OF_DEATH)
             {
@@ -564,11 +573,11 @@ public:
                     break;
                 case EVENT_BETRAYAL_14:
                     playerGUID.Clear();
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
             }
 
-            if (me->getFaction() == 35 || me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_STUNNED))
+            if (me->GetFaction() == FACTION_FRIENDLY || me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_STUNNED))
                 return;
 
             if (!UpdateVictim())
@@ -626,7 +635,7 @@ public:
 
         void Reset() override
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void UpdateAI(uint32 diff) override
@@ -664,7 +673,7 @@ public:
             me->DespawnOrUnsummon(1);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_UNLOCK_SHACKLE)
             {
@@ -715,18 +724,18 @@ public:
 
         void Reset() override
         {
-            me->setFaction(35);
+            me->SetFaction(FACTION_FRIENDLY);
             DoCast(me, SPELL_KNEEL, true); // Little Hack for kneel - Thanks Illy :P
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_FREE_RAGECLAW)
             {
                 me->RemoveAurasDueToSpell(SPELL_LEFT_CHAIN);
                 me->RemoveAurasDueToSpell(SPELL_RIGHT_CHAIN);
                 me->RemoveAurasDueToSpell(SPELL_KNEEL);
-                me->setFaction(me->GetCreatureTemplate()->faction);
+                me->SetFaction(me->GetCreatureTemplate()->faction);
                 DoCast(me, SPELL_UNSHACKLED, true);
                 Talk(SAY_RAGECLAW);
                 me->GetMotionMaster()->MoveRandom(10);
@@ -804,7 +813,7 @@ public:
 
         void Reset() override
         {
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_COWER);
             _heading = me->GetOrientation();
         }
@@ -818,14 +827,14 @@ public:
                 switch (eventId)
                 {
                     case EVENT_RECRUIT_1:
-                        me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                         Talk(SAY_RECRUIT);
                         _events.ScheduleEvent(EVENT_RECRUIT_2, 3000);
                         break;
                     case EVENT_RECRUIT_2:
                         me->SetWalk(true);
-                        me->GetMotionMaster()->MovePoint(0, me->GetPositionX() + (cos(_heading) * 10), me->GetPositionY() + (sin(_heading) * 10), me->GetPositionZ());
+                        me->GetMotionMaster()->MovePoint(0, me->GetPositionX() + (cos(_heading) * 10), me->GetPositionY() + (std::sin(_heading) * 10), me->GetPositionZ());
                         me->DespawnOrUnsummon(5000);
                         break;
                     default:
@@ -918,7 +927,7 @@ public:
             Reset();
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (spell->Id != GYMERS_GRAB)
                 return;

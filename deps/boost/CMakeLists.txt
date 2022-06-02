@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+# This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -8,9 +8,6 @@
 # This program is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-#
-# User has manually chosen to ignore the git-tests, so throw them a warning.
-# This is done EACH compile so they can be alerted about the consequences.
 #
 
 if(WIN32)
@@ -30,7 +27,7 @@ include (CheckCXXSourceCompiles)
 
 if (WIN32)
   # On windows the requirements are higher according to the wiki.
-  set(BOOST_REQUIRED_VERSION 1.70)
+  set(BOOST_REQUIRED_VERSION 1.74)
 else()
   set(BOOST_REQUIRED_VERSION 1.67)
 endif()

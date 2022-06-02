@@ -47,7 +47,7 @@ Modules are essential to AzerothCore's success. Modules allow users to plug them
 We have a lot of modules already made, some of them are very important and will ease your work:
 
 * [Transmogrification](https://github.com/azerothcore/mod-transmog)
-* [Eluna (lua engine) support](https://github.com/azerothcore/mod-eluna-lua-engine/ "Creator of Eluna is part of our core team")
+* [Eluna (lua engine) support](https://github.com/azerothcore/mod-eluna/ "Creator of Eluna is part of our core team")
 * Full list available in the AzerothCore catalogue (link at the end)
 
 ### Configuration files
@@ -164,15 +164,15 @@ This project exists thanks to:
 - [Our Facebook page](https://www.facebook.com/AzerothCore/)
 - [Our LinkedIn page](https://www.linkedin.com/company/azerothcore/)
 
-
-## Sponsors
-
-List of organizations that help AzerothCore:
-
-[![JetBrains](https://user-images.githubusercontent.com/75517/51205146-7f225c80-1905-11e9-82e0-835627be170d.png)](https://www.jetbrains.com/?from=AzerothCore)
-
-
 ## License
 
 - The new AzerothCore source components are released under the [GNU AGPL v3](https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3)
 - The old sources based on MaNGOS/TrinityCore are released under the [GNU GPL v2](https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2)
+
+
+## Special thanks
+
+[JetBrains](https://www.jetbrains.com/?from=AzerothCore) is providing free [open-source licenses](https://www.jetbrains.com/community/opensource/) to the AzerothCore developers.
+
+[![JetBrains](https://user-images.githubusercontent.com/75517/51205146-7f225c80-1905-11e9-82e0-835627be170d.png)](https://www.jetbrains.com/?from=AzerothCore)
+

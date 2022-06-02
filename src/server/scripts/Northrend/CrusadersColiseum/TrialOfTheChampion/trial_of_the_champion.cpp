@@ -1,12 +1,25 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
+#include "trial_of_the_champion.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
-#include "trial_of_the_champion.h"
 
 #define GOSSIP_START_EVENT1a "I am ready."
 #define GOSSIP_START_EVENT1b "I am ready. However I'd like to skip the pageantry."
@@ -20,7 +33,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if (!creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
+        if (!creature->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
             return true;
 
         InstanceScript* pInstance = creature->GetInstanceScript();
@@ -63,7 +76,7 @@ public:
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction) override
     {
-        if(!creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
+        if(!creature->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
             return true;
 
         InstanceScript* pInstance = creature->GetInstanceScript();
@@ -73,7 +86,7 @@ public:
         if(uiAction == GOSSIP_ACTION_INFO_DEF + 1338 || uiAction == GOSSIP_ACTION_INFO_DEF + 1341 || uiAction == GOSSIP_ACTION_INFO_DEF + 1339 || uiAction == GOSSIP_ACTION_INFO_DEF + 1340)
         {
             pInstance->SetData(DATA_ANNOUNCER_GOSSIP_SELECT, (uiAction == GOSSIP_ACTION_INFO_DEF + 1341 ? 1 : 0));
-            creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
         }
 
         CloseGossipMenuFor(player);
@@ -96,7 +109,7 @@ public:
                 return;
             if( pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_ALLIANCE )
                 me->UpdateEntry(NPC_ARELAS);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE); // removed during black knight scene
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE); // removed during black knight scene
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override

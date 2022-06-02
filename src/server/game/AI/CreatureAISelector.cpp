@@ -1,12 +1,23 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureAISelector.h"
 #include "Creature.h"
 #include "CreatureAIFactory.h"
-#include "CreatureAISelector.h"
 #include "MovementGenerator.h"
 #include "PassiveAI.h"
 #include "Pet.h"
@@ -42,7 +53,7 @@ namespace FactorySelector
                 ai_factory = ai_registry.GetRegistryItem("VehicleAI");
             else if (creature->HasUnitTypeMask(UNIT_MASK_CONTROLABLE_GUARDIAN) && ((Guardian*)creature)->GetOwner()->GetTypeId() == TYPEID_PLAYER)
                 ai_factory = ai_registry.GetRegistryItem("PetAI");
-            else if (creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK))
+            else if (creature->HasNpcFlag(UNIT_NPC_FLAG_SPELLCLICK))
                 ai_factory = ai_registry.GetRegistryItem("NullCreatureAI");
             else if (creature->IsGuard())
                 ai_factory = ai_registry.GetRegistryItem("GuardAI");
@@ -82,9 +93,9 @@ namespace FactorySelector
         }
 
         // select NullCreatureAI if not another cases
-        ainame = (ai_factory == nullptr) ? "NullCreatureAI" : ai_factory->key();
-        LOG_DEBUG("scripts.ai", "Creature %s used AI is %s.", creature->GetGUID().ToString().c_str(), ainame.c_str());
-        return (ai_factory == nullptr ? new NullCreatureAI(creature) : ai_factory->Create(creature));
+        ainame = (!ai_factory) ? "NullCreatureAI" : ai_factory->key();
+        LOG_DEBUG("scripts.ai", "Creature {} used AI is {}.", creature->GetGUID().ToString(), ainame);
+        return (!ai_factory ? new NullCreatureAI(creature) : ai_factory->Create(creature));
     }
 
     MovementGenerator* selectMovementGenerator(Creature* creature)
@@ -112,7 +123,7 @@ namespace FactorySelector
             }
         }*/
 
-        return (mv_factory == nullptr ? nullptr : mv_factory->Create(creature));
+        return (!mv_factory ? nullptr : mv_factory->Create(creature));
     }
 
     GameObjectAI* SelectGameObjectAI(GameObject* go)
@@ -127,9 +138,9 @@ namespace FactorySelector
 
         //future goAI types go here
 
-        std::string ainame = (ai_factory == nullptr || go->GetScriptId()) ? "NullGameObjectAI" : ai_factory->key();
-        LOG_DEBUG("scripts.ai", "GameObject %s used AI is %s.", go->GetGUID().ToString().c_str(), ainame.c_str());
+        std::string ainame = (!ai_factory || go->GetScriptId()) ? "NullGameObjectAI" : ai_factory->key();
+        LOG_DEBUG("scripts.ai", "GameObject {} used AI is {}.", go->GetGUID().ToString(), ainame);
 
-        return (ai_factory == nullptr ? new NullGameObjectAI(go) : ai_factory->Create(go));
+        return (!ai_factory ? new NullGameObjectAI(go) : ai_factory->Create(go));
     }
 }

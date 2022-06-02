@@ -1,17 +1,27 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #define _CRT_SECURE_NO_DEPRECATE
 #include <cerrno>
 #include <cstdio>
-#include <iostream>
 #include <list>
 #include <map>
-#include <vector>
 #include <sys/stat.h>
+#include <vector>
 
 #ifdef WIN32
 #include <Windows.h>
@@ -22,19 +32,13 @@
 #undef min
 #undef max
 
-//#pragma warning(disable : 4505)
-//#pragma comment(lib, "Winmm.lib")
-
-#include <map>
-
 //From Extractor
-#include "adtfile.h"
-#include "wdtfile.h"
-#include "dbcfile.h"
-#include "wmo.h"
-#include "mpq_libmpq04.h"
-
 #include "vmapexport.h"
+#include "adtfile.h"
+#include "dbcfile.h"
+#include "mpq_libmpq04.h"
+#include "wdtfile.h"
+#include "wmo.h"
 
 //------------------------------------------------------------------------------
 // Defines
@@ -159,14 +163,14 @@ bool ExtractSingleWmo(std::string& fname)
 
             string s = groupFileName;
             WMOGroup fgroup(s);
-            if (!fgroup.open())
+            if (!fgroup.open(&froot))
             {
                 printf("Could not open all Group file for: %s\n", plain_name);
                 file_ok = false;
                 break;
             }
 
-            Wmo_nVertices += fgroup.ConvertToVMAPGroupWmo(output, &froot, preciseVectorData);
+            Wmo_nVertices += fgroup.ConvertToVMAPGroupWmo(output, preciseVectorData);
             for (uint16 groupReference : fgroup.DoodadReferences)
             {
                 if (groupReference >= doodads.Spawns.size())

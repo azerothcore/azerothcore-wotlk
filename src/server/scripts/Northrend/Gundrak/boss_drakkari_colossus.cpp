@@ -1,10 +1,23 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "gundrak.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "gundrak.h"
 
 enum Spells
 {
@@ -111,8 +124,8 @@ public:
             for (uint8 i = 0; i < 5; i++)
                 me->SummonCreature(NPC_LIVING_MOJO, mojoPosition[i].GetPositionX(), mojoPosition[i].GetPositionY(), mojoPosition[i].GetPositionZ(), 0, TEMPSUMMON_MANUAL_DESPAWN, 0);
 
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void InitializeAI() override
@@ -165,7 +178,7 @@ public:
             summons.Despawn(summon);
             if (summon->GetEntry() == NPC_DRAKKARI_ELEMENTAL)
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->RemoveAurasDueToSpell(SPELL_FREEZE_ANIM);
                 if (me->GetVictim())
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
@@ -183,7 +196,7 @@ public:
             if (!UpdateVictim())
                 return;
 
-            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 return;
 
             events.Update(diff);
@@ -191,7 +204,7 @@ public:
             {
                 case EVENT_COLOSSUS_START_FIGHT:
                     me->RemoveAurasDueToSpell(SPELL_FREEZE_ANIM);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     break;
                 case EVENT_COLOSSUS_MIGHTY_BLOW:
                     me->CastSpell(me->GetVictim(), SPELL_MIGHTY_BLOW, false);
@@ -202,7 +215,7 @@ public:
                     {
                         me->CastSpell(me, SPELL_EMERGE, false);
                         me->CastSpell(me, SPELL_EMERGE_SUMMON, true);
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         me->GetMotionMaster()->Clear();
                         break;
                     }
@@ -213,7 +226,7 @@ public:
                     {
                         me->CastSpell(me, SPELL_EMERGE, false);
                         me->CastSpell(me, SPELL_EMERGE_SUMMON, true);
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         me->GetMotionMaster()->Clear();
                         break;
                     }
@@ -344,7 +357,7 @@ public:
             if (me->ToTempSummon())
             {
                 if (who->GetTypeId() == TYPEID_PLAYER || who->GetOwnerGUID().IsPlayer())
-                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                         summoner->GetAI()->DoAction(ACTION_INFORM);
                 return;
             }

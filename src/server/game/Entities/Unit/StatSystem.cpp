@@ -1,10 +1,22 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Creature.h"
+#include "Config.h"
 #include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -290,7 +302,7 @@ void Player::UpdateMaxHealth()
 
 void Player::UpdateMaxPower(Powers power)
 {
-    UnitMods unitMod = UnitMods(UNIT_MOD_POWER_START + power);
+    UnitMods unitMod = UnitMods(static_cast<uint16>(UNIT_MOD_POWER_START) + power);
 
     float bonusPower = (power == POWER_MANA && GetCreatePowers(power) > 0) ? GetManaBonusFromIntellect() : 0;
 
@@ -601,6 +613,12 @@ void Player::UpdateBlockPercentage()
         value += GetTotalAuraModifier(SPELL_AURA_MOD_BLOCK_PERCENT);
         // Increase from rating
         value += GetRatingBonusValue(CR_BLOCK);
+
+        if (sConfigMgr->GetOption<bool>("Stats.Limits.Enable", false))
+        {
+            value = value > sConfigMgr->GetOption<float>("Stats.Limits.Block", 95.0f) ? sConfigMgr->GetOption<float>("Stats.Limits.Block", 95.0f) : value;
+        }
+
         value = value < 0.0f ? 0.0f : value;
     }
     SetStatFloatValue(PLAYER_BLOCK_PERCENTAGE, value);
@@ -635,6 +653,12 @@ void Player::UpdateCritPercentage(WeaponAttackType attType)
     float value = GetTotalPercentageModValue(modGroup) + GetRatingBonusValue(cr);
     // Modify crit from weapon skill and maximized defense skill of same level victim difference
     value += (int32(GetWeaponSkillValue(attType)) - int32(GetMaxSkillValueForLevel())) * 0.04f;
+
+    if (sConfigMgr->GetOption<bool>("Stats.Limits.Enable", false))
+    {
+        value = value > sConfigMgr->GetOption<float>("Stats.Limits.Crit", 95.0f) ? sConfigMgr->GetOption<float>("Stats.Limits.Crit", 95.0f) : value;
+    }
+
     value = value < 0.0f ? 0.0f : value;
     SetStatFloatValue(index, value);
 }
@@ -730,6 +754,11 @@ void Player::UpdateParryPercentage()
         m_realParry = m_realParry < 0.0f ? 0.0f : m_realParry;
 
         value = std::max(diminishing + nondiminishing, 0.0f);
+
+        if (sConfigMgr->GetOption<bool>("Stats.Limits.Enable", false))
+        {
+            value = value > sConfigMgr->GetOption<float>("Stats.Limits.Parry", 95.0f) ? sConfigMgr->GetOption<float>("Stats.Limits.Parry", 95.0f) : value;
+        }
     }
 
     SetStatFloatValue(PLAYER_PARRY_PERCENTAGE, value);
@@ -768,6 +797,11 @@ void Player::UpdateDodgePercentage()
     m_realDodge = m_realDodge < 0.0f ? 0.0f : m_realDodge;
     float value = std::max(diminishing + nondiminishing, 0.0f);
 
+    if (sConfigMgr->GetOption<bool>("Stats.Limits.Enable", false))
+    {
+        value = value > sConfigMgr->GetOption<float>("Stats.Limits.Dodge", 95.0f) ? sConfigMgr->GetOption<float>("Stats.Limits.Dodge", 95.0f) : value;
+    }
+
     SetStatFloatValue(PLAYER_DODGE_PERCENTAGE, value);
 }
 
@@ -799,7 +833,7 @@ void Player::UpdateSpellCritChance(uint32 school)
 void Player::UpdateArmorPenetration(int32 amount)
 {
     // Store Rating Value
-    SetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_ARMOR_PENETRATION, amount);
+    SetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_ARMOR_PENETRATION), amount);
 }
 
 void Player::UpdateMeleeHitChances()
@@ -884,7 +918,7 @@ void Player::UpdateManaRegen()
 
     float Intellect = GetStat(STAT_INTELLECT);
     // Mana regen from spirit and intellect
-    float power_regen = sqrt(Intellect) * OCTRegenMPPerSpirit();
+    float power_regen = std::sqrt(Intellect) * OCTRegenMPPerSpirit();
     // Apply PCT bonus from SPELL_AURA_MOD_POWER_REGEN_PERCENT aura on spirit base regen
     power_regen *= GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, POWER_MANA);
 
@@ -1002,7 +1036,7 @@ void Creature::UpdateMaxHealth()
 
 void Creature::UpdateMaxPower(Powers power)
 {
-    UnitMods unitMod = UnitMods(UNIT_MOD_POWER_START + power);
+    UnitMods unitMod = UnitMods(static_cast<uint16>(UNIT_MOD_POWER_START) + power);
 
     float value  = GetTotalAuraModValue(unitMod);
     SetMaxPower(power, uint32(value));
@@ -1202,7 +1236,7 @@ void Guardian::UpdateMaxHealth()
 
 void Guardian::UpdateMaxPower(Powers power)
 {
-    UnitMods unitMod = UnitMods(UNIT_MOD_POWER_START + power);
+    UnitMods unitMod = UnitMods(static_cast<uint16>(UNIT_MOD_POWER_START) + power);
 
     float addValue = (power == POWER_MANA) ? std::max<float>(GetStat(STAT_INTELLECT) - GetCreateStat(STAT_INTELLECT), 0.0f) : 0.0f;
     float multiplicator = 15.0f;

@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Corpse.h"
@@ -15,12 +26,9 @@
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
 
 void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
 {
@@ -40,7 +48,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
         //    go = nullptr;
 
         // not check distance for GO in case owned GO (fishing bobber case, for example) or Fishing hole GO
-        if (!go || ((go->GetOwnerGUID() != _player->GetGUID() && go->GetGoType() != GAMEOBJECT_TYPE_FISHINGHOLE) && !go->IsWithinDistInMap(_player, INTERACTION_DISTANCE)))
+        if (!go || ((go->GetOwnerGUID() != _player->GetGUID() && go->GetGoType() != GAMEOBJECT_TYPE_FISHINGHOLE) && !go->IsWithinDistInMap(_player)))
         {
             player->SendLootRelease(lguid);
             return;
@@ -111,8 +119,10 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
                 GameObject* go = GetPlayer()->GetMap()->GetGameObject(guid);
 
                 // do not check distance for GO if player is the owner of it (ex. fishing bobber)
-                if (go && ((go->GetOwnerGUID() == player->GetGUID() || go->IsWithinDistInMap(player, INTERACTION_DISTANCE))))
+                if (go && ((go->GetOwnerGUID() == player->GetGUID() || go->IsWithinDistInMap(player))))
+                {
                     loot = &go->loot;
+                }
 
                 break;
             }
@@ -170,7 +180,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
                 if (!member)
                     continue;
 
-                if (player->IsAtGroupRewardDistance(member))
+                if (player->IsAtLootRewardDistance(member))
                     playersNear.push_back(member);
             }
 
@@ -197,9 +207,9 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
             data << uint8(1);   // "You loot..."
             SendPacket(&data);
         }
-#ifdef ELUNA
-        sEluna->OnLootMoney(player, loot->gold);
-#endif
+
+        sScriptMgr->OnLootMoney(player, loot->gold);
+
         loot->gold = 0;
 
         // Delete the money loot record from the DB
@@ -223,11 +233,11 @@ void WorldSession::HandleLootOpcode(WorldPacket& recvData)
     if (!GetPlayer()->IsAlive() || !guid.IsCreatureOrVehicle())
         return;
 
-    GetPlayer()->SendLoot(guid, LOOT_CORPSE);
-
     // interrupt cast
     if (GetPlayer()->IsNonMeleeSpellCast(false))
         GetPlayer()->InterruptNonMeleeSpells(false);
+
+    GetPlayer()->SendLoot(guid, LOOT_CORPSE);
 }
 
 void WorldSession::HandleLootReleaseOpcode(WorldPacket& recvData)
@@ -252,7 +262,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
     player->SetLootGUID(ObjectGuid::Empty);
     player->SendLootRelease(lguid);
 
-    player->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOOTING);
+    player->RemoveUnitFlag(UNIT_FLAG_LOOTING);
 
     if (!player->IsInWorld())
         return;
@@ -262,8 +272,10 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
         GameObject* go = GetPlayer()->GetMap()->GetGameObject(lguid);
 
         // not check distance for GO in case owned GO (fishing bobber case, for example) or Fishing hole GO
-        if (!go || ((go->GetOwnerGUID() != _player->GetGUID() && go->GetGoType() != GAMEOBJECT_TYPE_FISHINGHOLE) && !go->IsWithinDistInMap(_player, INTERACTION_DISTANCE)))
+        if (!go || ((go->GetOwnerGUID() != _player->GetGUID() && go->GetGoType() != GAMEOBJECT_TYPE_FISHINGHOLE) && !go->IsWithinDistInMap(_player)))
+        {
             return;
+        }
 
         loot = &go->loot;
 
@@ -292,7 +304,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
                 // Xinef: prevents exploits with just opening GO and spawning bilions of npcs, which can crash core if you know what you're doin ;)
                 if (go->GetGoType() == GAMEOBJECT_TYPE_CHEST && go->GetGOInfo()->chest.eventId)
                 {
-                    LOG_DEBUG("spells.aura", "Chest ScriptStart id %u for GO %u", go->GetGOInfo()->chest.eventId, go->GetSpawnId());
+                    LOG_DEBUG("spells.aura", "Chest ScriptStart id {} for GO {}", go->GetGOInfo()->chest.eventId, go->GetSpawnId());
                     player->GetMap()->ScriptsStart(sEventScripts, go->GetGOInfo()->chest.eventId, player, go);
                 }
             }
@@ -368,7 +380,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
             if (!creature->IsAlive())
                 creature->AllLootRemovedFromCorpse();
 
-            creature->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+            creature->RemoveDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
             loot->clear();
         }
         else
@@ -410,7 +422,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
         return;
     }
 
-    LOG_DEBUG("network", "WorldSession::HandleLootMasterGiveOpcode (CMSG_LOOT_MASTER_GIVE, 0x02A3) Target = [%s].", target->GetName().c_str());
+    LOG_DEBUG("network", "WorldSession::HandleLootMasterGiveOpcode (CMSG_LOOT_MASTER_GIVE, 0x02A3) Target = [{}].", target->GetName());
 
     if (_player->GetLootGUID() != lootguid)
     {
@@ -421,7 +433,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
     if (!_player->IsInRaidWith(target))
     {
         _player->SendLootError(lootguid, LOOT_ERROR_MASTER_OTHER);
-        //LOG_DEBUG("network", "MasterLootItem: Player %s tried to give an item to ineligible player %s !", GetPlayer()->GetName().c_str(), target->GetName().c_str());
+        //LOG_DEBUG("network", "MasterLootItem: Player {} tried to give an item to ineligible player {} !", GetPlayer()->GetName(), target->GetName());
         return;
     }
 
@@ -449,7 +461,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
 
     if (slotid >= loot->items.size() + loot->quest_items.size())
     {
-        LOG_DEBUG("loot", "MasterLootItem: Player %s might be using a hack! (slot %d, size %lu)", GetPlayer()->GetName().c_str(), slotid, (unsigned long)loot->items.size());
+        LOG_DEBUG("loot", "MasterLootItem: Player {} might be using a hack! (slot {}, size {})", GetPlayer()->GetName(), slotid, (unsigned long)loot->items.size());
         return;
     }
 
@@ -478,10 +490,6 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
     Item* newitem = target->StoreNewItem(dest, item.itemid, true, item.randomPropertyId, looters);
     target->SendNewItem(newitem, uint32(item.count), false, false, true);
     target->UpdateLootAchievements(&item, loot);
-
-#ifdef ELUNA
-    sEluna->OnLootItem(target, newitem, item.count, lootguid);
-#endif
 
     // mark as looted
     item.count = 0;

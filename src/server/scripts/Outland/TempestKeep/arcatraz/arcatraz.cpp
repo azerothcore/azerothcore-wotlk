@@ -1,10 +1,23 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "arcatraz.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 
 enum MillhouseSays
 {
@@ -79,7 +92,7 @@ public:
             ScriptedAI::InitializeAI();
 
             me->SetReactState(REACT_PASSIVE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             events2.Reset();
             events2.ScheduleEvent(EVENT_TELEPORT_VISUAL, 0);
             events2.ScheduleEvent(EVENT_MILLHOUSE_INTRO1, 3000);
@@ -161,7 +174,7 @@ public:
                 case EVENT_MILLHOUSE_INTRO9:
                     me->SetFacingTo(M_PI * 1.5f);
                     me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), M_PI * 1.5f);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     me->SetReactState(REACT_AGGRESSIVE);
                     events2.ScheduleEvent(EVENT_SEARCH_FIGHT, 1000);
                     break;
@@ -334,7 +347,7 @@ public:
                 {
                     instance->DoCastSpellOnPlayers(SPELL_QID10886);
                     creature->AI()->Talk(SAY_COMPLETE);
-                    creature->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    creature->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP);
                 }
             }
         }
@@ -352,9 +365,9 @@ public:
         {
             _Reset();
             me->setActive(false);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-            me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
-            me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
+            me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
             me->CastSpell((Unit*)nullptr, SPELL_TARGET_OMEGA, false);
             instance->HandleGameObject(instance->GetGuidData(DATA_WARDENS_SHIELD), true);
             instance->SetBossState(DATA_WARDEN_MELLICHAR, NOT_STARTED);
@@ -366,7 +379,7 @@ public:
             {
                 me->setActive(true);
                 me->InterruptNonMeleeSpells(false);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                 events.ScheduleEvent(EVENT_WARDEN_INTRO1, 1500);
                 events.ScheduleEvent(EVENT_WARDEN_CHECK_PLAYERS, 1000);
                 instance->SetBossState(DATA_WARDEN_MELLICHAR, IN_PROGRESS);
@@ -522,7 +535,7 @@ public:
                 case EVENT_WARDEN_INTRO25:
                     if (Creature* cr = me->SummonCreature(NPC_HARBINGER_SKYRISS, 445.763f, -191.639f, 44.64f, 1.60f, TEMPSUMMON_MANUAL_DESPAWN))
                     {
-                        cr->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        cr->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                         cr->CastSpell(cr, SPELL_TELEPORT_VISUAL, true);
                     }
                     events.ScheduleEvent(EVENT_WARDEN_INTRO26, 1000);
@@ -545,11 +558,11 @@ public:
 
                 case EVENT_WARDEN_INTRO29:
                     events.Reset();
-                    me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
-                    me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+                    me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
+                    me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                     if (Creature* creature = summons.GetCreatureWithEntry(NPC_HARBINGER_SKYRISS))
                     {
-                        creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        creature->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                         if (Player* player = SelectTargetFromPlayerList(50.0f))
                             AttackStart(player);
                     }

@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef AZEROTHCORE_COMMON_H
@@ -14,13 +25,12 @@
 #include <utility>
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
-#include <ace/config-all.h>
 #include <ws2tcpip.h>
 #if AC_COMPILER == AC_COMPILER_INTEL
 #    if !defined(BOOST_ASIO_HAS_MOVE)
 #      define BOOST_ASIO_HAS_MOVE
 #    endif // !defined(BOOST_ASIO_HAS_MOVE)
-#  endif // if WARHEAD_COMPILER == WARHEAD_COMPILER_INTEL
+#  endif // if AC_COMPILER == AC_COMPILER_INTEL
 #else
 #include <cstdlib>
 #include <netdb.h>
@@ -42,16 +52,14 @@
 
 #define MAX_NETCLIENT_PACKET_SIZE (32767 - 1)               // Client hardcap: int16 with trailing zero space otherwise crash on memory free
 
-enum TimeConstants
-{
-    MINUTE          = 60,
-    HOUR            = MINUTE * 60,
-    DAY             = HOUR * 24,
-    WEEK            = DAY * 7,
-    MONTH           = DAY * 30,
-    YEAR            = MONTH * 12,
-    IN_MILLISECONDS = 1000
-};
+// TimeConstants
+constexpr auto MINUTE = 60;
+constexpr auto HOUR = MINUTE * 60;
+constexpr auto DAY = HOUR * 24;
+constexpr auto WEEK = DAY * 7;
+constexpr auto MONTH = DAY * 30;
+constexpr auto YEAR = MONTH * 12;
+constexpr auto IN_MILLISECONDS = 1000;
 
 enum AccountTypes
 {
@@ -86,15 +94,6 @@ AC_COMMON_API extern char const* localeNames[TOTAL_LOCALES];
 
 AC_COMMON_API LocaleConstant GetLocaleByName(const std::string& name);
 AC_COMMON_API void CleanStringForMysqlQuery(std::string& str);
-
-// we always use stdlibc++ std::max/std::min, undefine some not C++ standard defines (Win API and some other platforms)
-#ifdef max
-#undef max
-#endif
-
-#ifdef min
-#undef min
-#endif
 
 #define MAX_QUERY_LEN 32*1024
 

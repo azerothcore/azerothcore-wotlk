@@ -1,12 +1,25 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
-#include "sunwell_plateau.h"
+#include "ScriptedCreature.h"
 #include "WorldSession.h"
+#include "sunwell_plateau.h"
 
 enum Yells
 {
@@ -130,7 +143,7 @@ public:
             me->SetStandState(UNIT_STAND_STATE_SLEEP);
             me->SetDisableGravity(false);
             me->SetReactState(REACT_AGGRESSIVE);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE + UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
             events2.Reset();
 
             sathBanished = false;
@@ -183,9 +196,9 @@ public:
             }
         }
 
-        void JustDied(Unit* who) override
+        void JustDied(Unit* killer) override
         {
-            BossAI::JustDied(who);
+            BossAI::JustDied(killer);
         }
 
         void EnterCombat(Unit* who) override
@@ -227,8 +240,8 @@ public:
                     me->RemoveAllAuras();
                     me->SetReactState(REACT_PASSIVE);
                     me->CombatStop();
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    me->setFaction(35);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetFaction(FACTION_FRIENDLY);
                     events2.ScheduleEvent(EVENT_TALK_GOOD_2, 1000);
                     break;
                 case EVENT_TALK_GOOD_2:
@@ -256,7 +269,7 @@ public:
                     me->SetReactState(REACT_PASSIVE);
                     me->CombatStop();
                     me->RemoveAllAuras();
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     Talk(SAY_EVIL_ENRAGE);
                     events2.ScheduleEvent(EVENT_TALK_BAD_2, 3000);
                     break;
@@ -576,9 +589,14 @@ public:
                 case EVENT_CHECK_HEALTH:
                     if (me->HealthBelowPct(10))
                     {
-                        if (InstanceScript* instance = me->GetInstanceScript())
-                            if (Creature* kalecgos = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KALECGOS)))
+                        if (InstanceScript* instanceScript = me->GetInstanceScript())
+                        {
+                            if (Creature *kalecgos = ObjectAccessor::GetCreature(*me, instanceScript->GetGuidData(
+                                    NPC_KALECGOS)))
+                            {
                                 kalecgos->AI()->DoAction(ACTION_ENRAGE_OTHER);
+                            }
+                        }
                         DoAction(ACTION_ENRAGE);
                         break;
                     }

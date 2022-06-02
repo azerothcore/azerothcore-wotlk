@@ -1,12 +1,25 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "GameObject.h"
-#include "karazhan.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "karazhan.h"
 
 enum ShadeOfAran
 {
@@ -149,7 +162,7 @@ public:
         void FlameWreathEffect()
         {
             std::vector<Unit*> targets;
-            ThreatContainer::StorageType const& t_list = me->getThreatManager().getThreatList();
+            ThreatContainer::StorageType const& t_list = me->GetThreatMgr().getThreatList();
 
             if (t_list.empty())
                 return;
@@ -273,7 +286,7 @@ public:
             {
                 if (!me->IsNonMeleeSpellCast(false))
                 {
-                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true);
+                    Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true);
                     if (!target)
                         return;
 
@@ -317,7 +330,7 @@ public:
                         DoCast(me, SPELL_AOE_CS);
                         break;
                     case 1:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                             DoCast(target, SPELL_CHAINSOFICE);
                         break;
                 }
@@ -377,7 +390,7 @@ public:
 
                         if (Creature* pSpawn = me->SummonCreature(CREATURE_ARAN_BLIZZARD, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 25000))
                         {
-                            pSpawn->setFaction(me->getFaction());
+                            pSpawn->SetFaction(me->GetFaction());
                             pSpawn->CastSpell(pSpawn, SPELL_CIRCULAR_BLIZZARD, false);
                         }
                         break;
@@ -392,68 +405,63 @@ public:
             {
                 ElementalsSpawned = true;
 
-                Creature* ElementalOne = nullptr;
-                Creature* ElementalTwo = nullptr;
-                Creature* ElementalThree = nullptr;
-                Creature* ElementalFour = nullptr;
-
-                ElementalOne = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11168.1f, -1939.29f, 232.092f, 1.46f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
-                ElementalTwo = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11138.2f, -1915.38f, 232.092f, 3.00f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
-                ElementalThree = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11161.7f, -1885.36f, 232.092f, 4.59f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
-                ElementalFour = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11192.4f, -1909.36f, 232.092f, 6.19f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
+                Creature* ElementalOne = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11168.1f, -1939.29f, 232.092f, 1.46f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
+                Creature* ElementalTwo = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11138.2f, -1915.38f, 232.092f, 3.00f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
+                Creature* ElementalThree = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11161.7f, -1885.36f, 232.092f, 4.59f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
+                Creature* ElementalFour = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11192.4f, -1909.36f, 232.092f, 6.19f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
 
                 if (ElementalOne)
                 {
-                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
+                    Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true);
                     if (!target)
                         return;
 
                     DoStartNoMovement(target);
                     ElementalOne->SetInCombatWithZone();
                     ElementalOne->CombatStart(target);
-                    ElementalOne->setFaction(me->getFaction());
+                    ElementalOne->SetFaction(me->GetFaction());
                     ElementalOne->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
                     ElementalOne->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
                 }
 
                 if (ElementalTwo)
                 {
-                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
+                    Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true);
                     if (!target)
                         return;
 
                     DoStartNoMovement(target);
                     ElementalTwo->SetInCombatWithZone();
                     ElementalTwo->CombatStart(target);
-                    ElementalTwo->setFaction(me->getFaction());
+                    ElementalTwo->SetFaction(me->GetFaction());
                     ElementalTwo->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
                     ElementalTwo->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
                 }
 
                 if (ElementalThree)
                 {
-                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
+                    Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true);
                     if (!target)
                         return;
 
                     DoStartNoMovement(target);
                     ElementalThree->SetInCombatWithZone();
                     ElementalThree->CombatStart(target);
-                    ElementalThree->setFaction(me->getFaction());
+                    ElementalThree->SetFaction(me->GetFaction());
                     ElementalThree->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
                     ElementalThree->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
                 }
 
                 if (ElementalFour)
                 {
-                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
+                    Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true);
                     if (!target)
                         return;
 
                     DoStartNoMovement(target);
                     ElementalFour->SetInCombatWithZone();
                     ElementalFour->CombatStart(target);
-                    ElementalFour->setFaction(me->getFaction());
+                    ElementalFour->SetFaction(me->GetFaction());
                     ElementalFour->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
                     ElementalFour->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
                 }
@@ -468,7 +476,7 @@ public:
                     if (Creature* unit = me->SummonCreature(CREATURE_SHADOW_OF_ARAN, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
                     {
                         unit->Attack(me->GetVictim(), true);
-                        unit->setFaction(me->getFaction());
+                        unit->SetFaction(me->GetFaction());
                     }
                 }
 
@@ -518,7 +526,7 @@ public:
                 DrinkInturrupted = true;
         }
 
-        void SpellHit(Unit* /*pAttacker*/, const SpellInfo* Spell) override
+        void SpellHit(Unit* /*pAttacker*/, SpellInfo const* Spell) override
         {
             //We only care about interrupt effects and only if they are durring a spell currently being cast
             if ((Spell->Effects[0].Effect != SPELL_EFFECT_INTERRUPT_CAST &&

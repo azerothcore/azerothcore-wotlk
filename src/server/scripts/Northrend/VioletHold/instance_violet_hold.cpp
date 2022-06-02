@@ -1,10 +1,23 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "violet_hold.h"
 
 #define CLEANUP_CHECK_INTERVAL  5000
@@ -152,7 +165,7 @@ public:
             {
                 case GO_ACTIVATION_CRYSTAL:
                     HandleGameObject(ObjectGuid::Empty, false, go); // make go not used yet
-                    go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE); // not useable at the beginning
+                    go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE); // not useable at the beginning
                     GO_ActivationCrystalGUID.push_back(go->GetGUID());
                     break;
                 case GO_MAIN_DOOR:
@@ -332,13 +345,13 @@ public:
                     if (Creature* pGuard1 = instance->GetCreature(NPC_ErekemGuardGUID[0]))
                     {
                         pGuard1->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                        pGuard1->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC);
+                        pGuard1->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC);
                         pGuard1->GetMotionMaster()->MovePoint(0, BossStartMove21);
                     }
                     if (Creature* pGuard2 = instance->GetCreature(NPC_ErekemGuardGUID[1]))
                     {
                         pGuard2->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                        pGuard2->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC);
+                        pGuard2->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC);
                         pGuard2->GetMotionMaster()->MovePoint(0, BossStartMove22);
                     }
                     break;
@@ -371,7 +384,7 @@ public:
             if (pBoss)
             {
                 pBoss->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                pBoss->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC);
+                pBoss->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC);
                 pBoss->SetReactState(REACT_AGGRESSIVE);
                 if ((WaveCount == 6 && m_auiEncounter[0] == DONE) || (WaveCount == 12 && m_auiEncounter[1] == DONE))
                     pBoss->SetLootMode(0);
@@ -434,11 +447,11 @@ public:
                         DoUpdateWorldState(WORLD_STATE_VH_PRISON_STATE, (uint32)GateHealth);
                         DoUpdateWorldState(WORLD_STATE_VH_WAVE_COUNT, (uint32)WaveCount);
 
-                        for (ObjectGuid guid : GO_ActivationCrystalGUID)
+                        for (ObjectGuid const& guid : GO_ActivationCrystalGUID)
                             if (GameObject* go = instance->GetGameObject(guid))
                             {
                                 HandleGameObject(ObjectGuid::Empty, false, go); // not used yet
-                                go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE); // make it useable
+                                go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE); // make it useable
                             }
                         events.RescheduleEvent(EVENT_SUMMON_PORTAL, 4000);
                     }
@@ -484,7 +497,7 @@ public:
                     break;
                 case EVENT_CYANIGOSA_ATTACK:
                     if (Creature* c = instance->GetCreature(NPC_CyanigosaGUID))
-                        c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC);
+                        c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC);
                     break;
             }
         }
@@ -528,11 +541,11 @@ public:
             CLEANED = true;
 
             // reset defense crystals
-            for (ObjectGuid guid : GO_ActivationCrystalGUID)
+            for (ObjectGuid const& guid : GO_ActivationCrystalGUID)
                 if (GameObject* go = instance->GetGameObject(guid))
                 {
                     HandleGameObject(ObjectGuid::Empty, false, go); // not used yet
-                    go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE); // not useable at the beginning
+                    go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE); // not useable at the beginning
                 }
 
             // reset positions of Sinclari and Guards
@@ -555,7 +568,7 @@ public:
             NPC_PortalGUID.Clear();
 
             // remove trash
-            for (ObjectGuid guid : trashMobs)
+            for (ObjectGuid const& guid : trashMobs)
                 if (Creature* c = instance->GetCreature(guid))
                     c->DespawnOrUnsummon();
 
@@ -581,15 +594,15 @@ public:
                 HandleGameObject(GO_ZuramatCellGUID, false);
 
                 // respawn bosses
-                if (Creature* c = instance->GetCreature(NPC_MoraggGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC); }
-                if (Creature* c = instance->GetCreature(NPC_MoraggGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC); }
-                if (Creature* c = instance->GetCreature(NPC_ErekemGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC); }
-                if (Creature* c = instance->GetCreature(NPC_ErekemGuardGUID[0])) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC); }
-                if (Creature* c = instance->GetCreature(NPC_ErekemGuardGUID[1])) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC); }
-                if (Creature* c = instance->GetCreature(NPC_IchoronGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC); }
-                if (Creature* c = instance->GetCreature(NPC_LavanthorGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC); }
-                if (Creature* c = instance->GetCreature(NPC_XevozzGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC); }
-                if (Creature* c = instance->GetCreature(NPC_ZuramatGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC); }
+                if (Creature* c = instance->GetCreature(NPC_MoraggGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC); }
+                if (Creature* c = instance->GetCreature(NPC_MoraggGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC); }
+                if (Creature* c = instance->GetCreature(NPC_ErekemGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC); }
+                if (Creature* c = instance->GetCreature(NPC_ErekemGuardGUID[0])) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC); }
+                if (Creature* c = instance->GetCreature(NPC_ErekemGuardGUID[1])) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC); }
+                if (Creature* c = instance->GetCreature(NPC_IchoronGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC); }
+                if (Creature* c = instance->GetCreature(NPC_LavanthorGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC); }
+                if (Creature* c = instance->GetCreature(NPC_XevozzGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC); }
+                if (Creature* c = instance->GetCreature(NPC_ZuramatGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC); }
                 if (Creature* c = instance->GetCreature(NPC_CyanigosaGUID)) { c->DespawnOrUnsummon(); }
             }
 

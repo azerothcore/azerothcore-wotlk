@@ -1,9 +1,22 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "SpellAuraEffects.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "ObjectAccessor.h"
@@ -14,7 +27,7 @@
 #include "World.h"
 
 DynamicObject::DynamicObject(bool isWorldObject) : WorldObject(isWorldObject), MovableMapObject(),
-    _aura(nullptr), _removedAura(nullptr), _caster(nullptr), _duration(0), _isViewpoint(false)
+    _aura(nullptr), _removedAura(nullptr), _caster(nullptr), _duration(0), _isViewpoint(false), _updateViewerVisibilityTimer(0)
 {
     m_objectType |= TYPEMASK_DYNAMICOBJECT;
     m_objectTypeId = TYPEID_DYNAMICOBJECT;
@@ -91,11 +104,13 @@ bool DynamicObject::CreateDynamicObject(ObjectGuid::LowType guidlow, Unit* caste
     Relocate(pos);
     if (!IsPositionValid())
     {
-        LOG_ERROR("dyobject", "DynamicObject (spell %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)", spellId, GetPositionX(), GetPositionY());
+        LOG_ERROR("dyobject", "DynamicObject (spell {}) not created. Suggested coordinates isn't valid (X: {} Y: {})", spellId, GetPositionX(), GetPositionY());
         return false;
     }
 
     WorldObject::_Create(guidlow, HighGuid::DynamicObject, caster->GetPhaseMask());
+
+    UpdatePositionData();
 
     SetEntry(spellId);
     SetObjectScale(1);
@@ -109,15 +124,17 @@ bool DynamicObject::CreateDynamicObject(ObjectGuid::LowType guidlow, Unit* caste
     SetByteValue(DYNAMICOBJECT_BYTES, 0, type);
     SetUInt32Value(DYNAMICOBJECT_SPELLID, spellId);
     SetFloatValue(DYNAMICOBJECT_RADIUS, radius);
-    SetUInt32Value(DYNAMICOBJECT_CASTTIME, World::GetGameTimeMS());
-
-    if (IsWorldObject())
-        setActive(true);    //must before add to map to be put in world container
+    SetUInt32Value(DYNAMICOBJECT_CASTTIME, GameTime::GetGameTimeMS().count());
 
     if (!GetMap()->AddToMap(this, true))
     {
         // Returning false will cause the object to be deleted - remove from transport
         return false;
+    }
+
+    if (IsWorldObject())
+    {
+        setActive(true);
     }
 
     return true;
@@ -151,7 +168,22 @@ void DynamicObject::Update(uint32 p_time)
     if (expired)
         Remove();
     else
+    {
+        if (_updateViewerVisibilityTimer)
+        {
+            if (_updateViewerVisibilityTimer <= p_time)
+            {
+                _updateViewerVisibilityTimer = 0;
+
+                if (Player* playerCaster = _caster->ToPlayer())
+                    playerCaster->UpdateVisibilityForPlayer();
+            }
+            else
+                _updateViewerVisibilityTimer -= p_time;
+        }
+
         sScriptMgr->OnDynamicObjectUpdate(this, p_time);
+    }
 }
 
 void DynamicObject::Remove()
@@ -200,13 +232,22 @@ void DynamicObject::RemoveAura()
         _removedAura->_Remove(AURA_REMOVE_BY_DEFAULT);
 }
 
-void DynamicObject::SetCasterViewpoint()
+void DynamicObject::SetCasterViewpoint(bool updateViewerVisibility)
 {
     if (Player* caster = _caster->ToPlayer())
     {
+        // Remove old farsight viewpoint
+        if (Unit* farsightObject = ObjectAccessor::GetUnit(*caster, caster->GetGuidValue(PLAYER_FARSIGHT)))
+        {
+            _oldFarsightGUID = caster->GetGuidValue(PLAYER_FARSIGHT);
+            caster->SetViewpoint(farsightObject, false);
+        }
+
         caster->SetViewpoint(this, true);
         _isViewpoint = true;
     }
+
+    _updateViewerVisibilityTimer = updateViewerVisibility ? 100 : 0;
 }
 
 void DynamicObject::RemoveCasterViewpoint()
@@ -215,6 +256,13 @@ void DynamicObject::RemoveCasterViewpoint()
     {
         caster->SetViewpoint(this, false);
         _isViewpoint = false;
+
+        // Restore prev farsight viewpoint
+        if (Unit* farsightObject = ObjectAccessor::GetUnit(*caster, _oldFarsightGUID))
+        {
+            caster->SetViewpoint(farsightObject, true);
+        }
+        _oldFarsightGUID.Clear();
     }
 }
 

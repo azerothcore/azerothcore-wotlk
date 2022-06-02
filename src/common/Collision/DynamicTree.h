@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _DYNTREE_H
@@ -15,6 +26,12 @@ namespace G3D
     class Vector3;
 }
 
+namespace VMAP
+{
+    struct AreaAndLiquidData;
+    enum class ModelIgnoreFlags : uint32;
+}
+
 class GameObjectModel;
 struct DynTreeImpl;
 
@@ -26,11 +43,12 @@ public:
     DynamicMapTree();
     ~DynamicMapTree();
 
-    [[nodiscard]] bool isInLineOfSight(float x1, float y1, float z1, float x2, float y2,
-                                       float z2, uint32 phasemask) const;
+    [[nodiscard]] bool isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, VMAP::ModelIgnoreFlags ignoreFlags) const;
 
-    bool GetIntersectionTime(uint32 phasemask, const G3D::Ray& ray,
-                             const G3D::Vector3& endPos, float& maxDist) const;
+    bool GetIntersectionTime(uint32 phasemask, const G3D::Ray& ray, const G3D::Vector3& endPos, float& maxDist) const;
+
+    bool GetAreaInfo(float x, float y, float& z, uint32 phasemask, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const;
+    void GetAreaAndLiquidData(float x, float y, float z, uint32 phasemask, uint8 reqLiquidType, VMAP::AreaAndLiquidData& data) const;
 
     bool GetObjectHitPos(uint32 phasemask, const G3D::Vector3& pPos1,
                          const G3D::Vector3& pPos2, G3D::Vector3& pResultHitPos,

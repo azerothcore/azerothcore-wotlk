@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /*
@@ -13,11 +24,17 @@
 #include "CellImpl.h"
 #include "CombatAI.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "PassiveAI.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
+#include "SpellScript.h"
+
+// TODO: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+//  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
+#include "GridNotifiersImpl.h"
 
 enum DeathKnightSpells
 {
@@ -62,10 +79,13 @@ public:
 
             // Xinef: Night of the Dead avoidance
             if (Aura* aur = me->GetAura(SPELL_DK_NIGHT_OF_THE_DEAD))
-                if (Unit* owner = me->GetOwner())
-                    if (AuraEffect* aurEff = owner->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DEATHKNIGHT, 2718, 0))
-                        if (aur->GetEffect(0))
-                            aur->GetEffect(0)->SetAmount(-aurEff->GetSpellInfo()->Effects[EFFECT_2].CalcValue());
+                if (AuraEffect* aurEff = owner->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DEATHKNIGHT, 2718, 0))
+                {
+                    if (aur->GetEffect(0))
+                    {
+                        aur->GetEffect(0)->SetAmount(-aurEff->GetSpellInfo()->Effects[EFFECT_2].CalcValue());
+                    }
+                }
 
             me->SetCanFly(true);
             me->SetDisableGravity(true);
@@ -136,7 +156,7 @@ public:
             me->SetSpeed(MOVE_FLIGHT, 1.0f, true);
             me->SetSpeed(MOVE_RUN, 1.0f, true);
             float x = me->GetPositionX() + 20 * cos(me->GetOrientation());
-            float y = me->GetPositionY() + 20 * sin(me->GetOrientation());
+            float y = me->GetPositionY() + 20 * std::sin(me->GetOrientation());
             float z = me->GetPositionZ() + 40;
             me->DisableSpline();
             me->GetMotionMaster()->Clear(false);
@@ -155,7 +175,7 @@ public:
                 _initialSelection = false;
                 // Find victim of Summon Gargoyle spell
                 std::list<Unit*> targets;
-                Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 50);
+                Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 50.0f);
                 Acore::UnitListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
                 Cell::VisitAllObjects(me, searcher, 50.0f);
                 for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
@@ -287,10 +307,35 @@ public:
     }
 };
 
+class spell_pet_dk_gargoyle_strike : public SpellScript
+{
+    PrepareSpellScript(spell_pet_dk_gargoyle_strike);
+
+    void HandleDamageCalc(SpellEffIndex /*effIndex*/)
+    {
+        int32 damage = 60;
+        if (Unit* caster = GetCaster())
+        {
+            if (caster->getLevel() >= 60)
+            {
+                damage += (caster->getLevel() - 60) * 4;
+            }
+        }
+
+        SetEffectValue(damage);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_pet_dk_gargoyle_strike::HandleDamageCalc, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+    }
+};
+
 void AddSC_deathknight_pet_scripts()
 {
     new npc_pet_dk_ebon_gargoyle();
     new npc_pet_dk_ghoul();
     new npc_pet_dk_army_of_the_dead();
     new npc_pet_dk_dancing_rune_weapon();
+    RegisterSpellScript(spell_pet_dk_gargoyle_strike);
 }

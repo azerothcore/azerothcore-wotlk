@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -19,10 +30,10 @@ EndContentData */
 #include "MoveSplineInit.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SmartScriptMgr.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
@@ -115,11 +126,16 @@ public:
 
         void Reset() override
         {
+            ResetData();
+        }
+
+        void ResetData()
+        {
             events.Reset();
             summons.DespawnAll();
             playerGUID.Clear();
             currentQuest = 0;
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+            me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
         }
 
         void JustSummoned(Creature* creature) override
@@ -135,27 +151,27 @@ public:
             switch(currentQuest)
             {
                 case QUEST_BFV_FALLEN_HEROES:
-                    me->SummonCreature(NPC_ELDRETH, 8245.5f, 3522.7f, 627.67f, 3.11f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                    me->SummonCreature(NPC_GENESS, 8217.45f, 3546.0f, 628.20f, 4.41f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                    me->SummonCreature(NPC_JHADRAS, 8179.99f, 3523.72f, 628.1f, 5.95f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                    me->SummonCreature(NPC_MASUD, 8184.97f, 3491.2f, 625.33f, 0.6f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                    me->SummonCreature(NPC_RITH, 8213.5f, 3478.5f, 626.79f, 1.56f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                    me->SummonCreature(NPC_TALLA, 8238.30f, 3485.5f, 628.5f, 2.157f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                    me->SummonCreature(NPC_ELDRETH, 8245.5f, 3522.7f, 627.67f, 3.11f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
+                    me->SummonCreature(NPC_GENESS, 8217.45f, 3546.0f, 628.20f, 4.41f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
+                    me->SummonCreature(NPC_JHADRAS, 8179.99f, 3523.72f, 628.1f, 5.95f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
+                    me->SummonCreature(NPC_MASUD, 8184.97f, 3491.2f, 625.33f, 0.6f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
+                    me->SummonCreature(NPC_RITH, 8213.5f, 3478.5f, 626.79f, 1.56f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
+                    me->SummonCreature(NPC_TALLA, 8238.30f, 3485.5f, 628.5f, 2.157f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
                     break;
                 case QUEST_BFV_DARK_MASTER:
-                    me->SummonCreature(NPC_DARK_MASTER, 8184.97f, 3491.2f, 625.33f, 0.6f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                    me->SummonCreature(NPC_DARK_MASTER, 8184.97f, 3491.2f, 625.33f, 0.6f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
                     break;
                 case QUEST_BFV_SIGRID:
-                    me->SummonCreature(NPC_SIGRID, 8238.30f, 3485.5f, 628.5f, 2.157f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                    me->SummonCreature(NPC_SIGRID, 8238.30f, 3485.5f, 628.5f, 2.157f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
                     break;
                 case QUEST_BFV_CARNAGE:
-                    me->SummonCreature(NPC_CARNAGE, 8179.99f, 3523.72f, 628.1f, 5.95f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                    me->SummonCreature(NPC_CARNAGE, 8179.99f, 3523.72f, 628.1f, 5.95f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
                     break;
                 case QUEST_BFV_THANE:
-                    me->SummonCreature(NPC_THANE, 8217.45f, 3546.0f, 628.20f, 4.41f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                    me->SummonCreature(NPC_THANE, 8217.45f, 3546.0f, 628.20f, 4.41f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
                     break;
                 case QUEST_BFV_FINAL:
-                    me->SummonCreature(NPC_PRINCE, 8245.5f, 3522.7f, 627.67f, 3.11f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                    me->SummonCreature(NPC_PRINCE, 8245.5f, 3522.7f, 627.67f, 3.11f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
                     break;
             }
         }
@@ -171,7 +187,7 @@ public:
         void CheckSummons()
         {
             bool allow = true;
-            for (ObjectGuid guid : summons)
+            for (ObjectGuid const& guid : summons)
                 if (Creature* cr = ObjectAccessor::GetCreature(*me, guid))
                     if (cr->IsAlive())
                         allow = false;
@@ -184,31 +200,42 @@ public:
                     switch (quest)
                     {
                         case QUEST_BFV_FALLEN_HEROES:
-                            me->MonsterYell("$N has defeated the fallen heroes of Valhalas battles past. This is only a beginning, but it will suffice.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                            me->Yell("$N has defeated the fallen heroes of Valhalas battles past. This is only a beginning, but it will suffice.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                             break;
                         case QUEST_BFV_DARK_MASTER:
-                            me->MonsterYell("Khit'rix the Dark Master has been defeated by $N and his band of companions. Let the next challenge be issued!", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                            me->Yell("Khit'rix the Dark Master has been defeated by $N and his band of companions. Let the next challenge be issued!", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                             break;
                         case QUEST_BFV_SIGRID:
-                            me->MonsterYell("$N has defeated Sigrid Iceborn for a second time. Well, this time he did it with the help of his friends, but a win is a win!", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                            me->Yell("$N has defeated Sigrid Iceborn for a second time. Well, this time he did it with the help of his friends, but a win is a win!", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                             break;
                         case QUEST_BFV_CARNAGE:
-                            me->MonsterYell("The horror known as Carnage is no more. Could it be that $N is truly worthy of battle in Valhalas? We shall see.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                            me->Yell("The horror known as Carnage is no more. Could it be that $N is truly worthy of battle in Valhalas? We shall see.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                             break;
                         case QUEST_BFV_THANE:
-                            me->MonsterYell("Thane Banahogg the Deathblow has fallen to $N and his fighting companions. He has but one challenge ahead of him. Who will it be?", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                            me->Yell("Thane Banahogg the Deathblow has fallen to $N and his fighting companions. He has but one challenge ahead of him. Who will it be?", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                             break;
                         case QUEST_BFV_FINAL:
-                            me->MonsterYell("The unthinkable has happened... $N has slain Prince Sandoval!", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                            me->Yell("The unthinkable has happened... $N has slain Prince Sandoval!", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                             break;
                     }
-
                     player->GroupEventHappens(quest, player);
                 }
                 playerGUID2 = playerGUID;
                 EnterEvadeMode();
                 if (quest == QUEST_BFV_FINAL)
                     events.ScheduleEvent(EVENT_VALHALAS_THIRD, 7000);
+            }
+            else
+            {
+                uint32 quest = currentQuest;
+                if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
+                {
+                    if (!player->HasQuest(quest))
+                    {
+                        ResetData();
+                        return;
+                    }
+                }
             }
         }
 
@@ -223,27 +250,27 @@ public:
                         {
                             case QUEST_BFV_FALLEN_HEROES:
                                 events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8000);
-                                me->MonsterYell("$N and comrades in arms have chosen to accept honorable combat within the sacred confines of Valhalas.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                                me->Yell("$N and comrades in arms have chosen to accept honorable combat within the sacred confines of Valhalas.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                                 break;
                             case QUEST_BFV_DARK_MASTER:
                                 events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8000);
-                                me->MonsterYell("$N has accepted the challenge of Khit'rix the Dark Master. May the gods show mercy upon him for Khit'rix surely will not.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                                me->Yell("$N has accepted the challenge of Khit'rix the Dark Master. May the gods show mercy upon him for Khit'rix surely will not.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                                 break;
                             case QUEST_BFV_SIGRID:
                                 PrepareSummons();
-                                me->MonsterTextEmote("Circling Valhalas, Sigrid Iceborn approaches to seek her revenge!", nullptr, true);
+                                me->TextEmote("Circling Valhalas, Sigrid Iceborn approaches to seek her revenge!", nullptr, true);
                                 break;
                             case QUEST_BFV_CARNAGE:
                                 events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8000);
-                                me->MonsterYell("From the bowels of the Underhalls comes Carnage. Brave and foolish $N has accepted the challenge. $N and his group stand ready to face the monstrosity.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                                me->Yell("From the bowels of the Underhalls comes Carnage. Brave and foolish $N has accepted the challenge. $N and his group stand ready to face the monstrosity.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                                 break;
                             case QUEST_BFV_THANE:
                                 events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8000);
-                                me->MonsterYell("Thane Banahogg returns to Valhalas for the first time in ages to prove that the vrykul are the only beings worthy to fight within its sacred ring. Will $N prove him wrong?", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                                me->Yell("Thane Banahogg returns to Valhalas for the first time in ages to prove that the vrykul are the only beings worthy to fight within its sacred ring. Will $N prove him wrong?", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                                 break;
                             case QUEST_BFV_FINAL:
                                 events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8000);
-                                me->MonsterYell("From the depths of Icecrown Citadel, one of the Lich King's chosen comes to put an end to the existence of $N and his friends.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                                me->Yell("From the depths of Icecrown Citadel, one of the Lich King's chosen comes to put an end to the existence of $N and his friends.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                                 break;
                         }
 
@@ -256,21 +283,21 @@ public:
                         switch (currentQuest)
                         {
                             case QUEST_BFV_FALLEN_HEROES:
-                                me->MonsterYell("There can only be one outcome to such a battle: death for one side or the other. Let $n prove himself upon the bones of these outsiders who have fallen before!", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
-                                me->MonsterTextEmote("The fallen heroes of Valhalas emerge from the ground to do battle once more!", nullptr, true);
+                                me->Yell("There can only be one outcome to such a battle: death for one side or the other. Let $n prove himself upon the bones of these outsiders who have fallen before!", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                                me->TextEmote("The fallen heroes of Valhalas emerge from the ground to do battle once more!", nullptr, true);
                                 break;
                             case QUEST_BFV_DARK_MASTER:
-                                me->MonsterTextEmote("Khit'rix the Dark Master skitters into Valhalas from the southeast!", nullptr, true);
+                                me->TextEmote("Khit'rix the Dark Master skitters into Valhalas from the southeast!", nullptr, true);
                                 break;
                             case QUEST_BFV_CARNAGE:
-                                me->MonsterTextEmote("Lumbering in from the south, the smell of Carnage precedes him!", nullptr, true);
+                                me->TextEmote("Lumbering in from the south, the smell of Carnage precedes him!", nullptr, true);
                                 break;
                             case QUEST_BFV_THANE:
-                                me->MonsterTextEmote("Thane Banahogg appears upon the overlook to the southeast!", nullptr, true);
+                                me->TextEmote("Thane Banahogg appears upon the overlook to the southeast!", nullptr, true);
                                 break;
                             case QUEST_BFV_FINAL:
-                                me->MonsterYell("Warriors of Jotunheim, I present to you, Blood Prince Sandoval!", LANG_UNIVERSAL, nullptr);
-                                me->MonsterTextEmote("Without warning, Prince Sandoval magically appears within Valhalas!", nullptr, true);
+                                me->Yell("Warriors of Jotunheim, I present to you, Blood Prince Sandoval!", LANG_UNIVERSAL);
+                                me->TextEmote("Without warning, Prince Sandoval magically appears within Valhalas!", nullptr, true);
                                 break;
                         }
 
@@ -279,13 +306,13 @@ public:
                     }
                 case EVENT_VALHALAS_THIRD:
                     {
-                        me->MonsterYell("In defeating him, he and his fighting companions have proven themselves worthy of battle in this most sacred place of vrykul honor.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                        me->Yell("In defeating him, he and his fighting companions have proven themselves worthy of battle in this most sacred place of vrykul honor.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                         events.ScheduleEvent(EVENT_VALHALAS_THIRD + 2, 7000);
                         break;
                     }
                 case EVENT_VALHALAS_THIRD+2:
                     {
-                        me->MonsterYell("ALL HAIL $N, CHAMPION OF VALHALAS! ", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID2));
+                        me->Yell("ALL HAIL $N, CHAMPION OF VALHALAS! ", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID2));
                         break;
                     }
                 case EVENT_VALHALAS_CHECK_PLAYER:
@@ -310,29 +337,32 @@ public:
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
-        creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-        if (npc_battle_at_valhalasAI* vAI = CAST_AI(npc_battle_at_valhalas::npc_battle_at_valhalasAI, creature->AI()))
+        npc_battle_at_valhalasAI* vAI = CAST_AI(npc_battle_at_valhalas::npc_battle_at_valhalasAI, creature->AI());
+        vAI->ResetData();
+
+        creature->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
+        if (vAI)
             vAI->StartBattle(player->GetGUID(), quest->GetQuestId());
 
         switch (quest->GetQuestId())
         {
             case QUEST_BFV_FALLEN_HEROES:
-                creature->MonsterSay("Valhalas is yours to win or die in, $N. But whatever you do, stay within the bounds of the arena. To flee is to lose and be dishonored.", LANG_UNIVERSAL, player);
+                creature->Say("Valhalas is yours to win or die in, $N. But whatever you do, stay within the bounds of the arena. To flee is to lose and be dishonored.", LANG_UNIVERSAL, player);
                 break;
             case QUEST_BFV_DARK_MASTER:
-                creature->MonsterSay("Prepare yourself. Khit'rix will be entering Valhalas from the southeast. Remember, do not leave the ring or you will lose the battle.", LANG_UNIVERSAL, player);
+                creature->Say("Prepare yourself. Khit'rix will be entering Valhalas from the southeast. Remember, do not leave the ring or you will lose the battle.", LANG_UNIVERSAL, player);
                 break;
             case QUEST_BFV_SIGRID:
-                creature->MonsterYell("Sigrid Iceborn has returned to the heights of Jotunheim to prove herself against $N. When last they met, $N bester her in personal combat. Let us see the outcome of this match.", LANG_UNIVERSAL, player);
+                creature->Yell("Sigrid Iceborn has returned to the heights of Jotunheim to prove herself against $N. When last they met, $N bester her in personal combat. Let us see the outcome of this match.", LANG_UNIVERSAL, player);
                 break;
             case QUEST_BFV_CARNAGE:
-                creature->MonsterSay("Carnage is coming! Remember, no matter what you do, do NOT leave the battle ring or I will disqualify you and your group.", LANG_UNIVERSAL, 0);
+                creature->Say("Carnage is coming! Remember, no matter what you do, do NOT leave the battle ring or I will disqualify you and your group.", LANG_UNIVERSAL);
                 break;
             case QUEST_BFV_THANE:
-                creature->MonsterSay("Look to the southeast and you will see the thane upon the platform near Gjonner the Merciless when he shows himself. Let him come down. Stay within the ring of Valhalas.", LANG_UNIVERSAL, 0);
+                creature->Say("Look to the southeast and you will see the thane upon the platform near Gjonner the Merciless when he shows himself. Let him come down. Stay within the ring of Valhalas.", LANG_UNIVERSAL);
                 break;
             case QUEST_BFV_FINAL:
-                creature->MonsterSay("It's too late to run now. Do not leave the ring. Die bravely, $N!", LANG_UNIVERSAL, 0);
+                creature->Say("It's too late to run now. Do not leave the ring. Die bravely, $N!", LANG_UNIVERSAL);
                 break;
         }
 
@@ -457,9 +487,9 @@ public:
 
             events.Reset();
             events.RescheduleEvent(EVENT_START, 1000);
-            me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+            me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
             me->SetWalk(true);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             me->setActive(true);
             me->SetReactState(REACT_PASSIVE);
         }
@@ -477,7 +507,7 @@ public:
                         _landgrenGUID = cr->GetGUID();
 
                         float o = cr->GetAngle(me);
-                        me->GetMotionMaster()->MovePoint(1, cr->GetPositionX() + cos(o) * 3, cr->GetPositionY() + sin(o) * 3, cr->GetPositionZ());
+                        me->GetMotionMaster()->MovePoint(1, cr->GetPositionX() + cos(o) * 3, cr->GetPositionY() + std::sin(o) * 3, cr->GetPositionZ());
                         events.RescheduleEvent(EVENT_SOUL_COAX, 5000);
                     }
                     else
@@ -565,7 +595,7 @@ public:
                     events.ScheduleEvent(EVENT_SCENE_10, 3000);
                     break;
                 case EVENT_SCENE_10:
-                    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                    me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_QUESTGIVER);
                     Talk(SAY_ARETE_6);
                     me->DespawnOrUnsummon(60000);
                     break;
@@ -720,7 +750,7 @@ public:
             else if (summon->GetEntry() != NPC_INVOKER_BASALEPH)
             {
                 summon->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
-                summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                summon->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                 summon->GetMotionMaster()->MovePoint(4, 6135.97f, 2753.84f, 573.92f);
             }
         }
@@ -883,7 +913,7 @@ public:
                                 if (summon->GetEntry() == NPC_DISGUISED_CRUSADER)
                                 {
                                     summon->SetWalk(false);
-                                    summon->GetMotionMaster()->MovePoint(2, 6132.38f + 4 * cos(2 * M_PI * (i / 3.0)), 2760.76f + 4 * sin(2 * M_PI * (i / 3.0)), me->GetPositionZ());
+                                    summon->GetMotionMaster()->MovePoint(2, 6132.38f + 4 * cos(2 * M_PI * (i / 3.0)), 2760.76f + 4 * std::sin(2 * M_PI * (i / 3.0)), me->GetPositionZ());
                                 }
                         break;
                     }
@@ -944,7 +974,7 @@ public:
                         for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                             if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
                             {
-                                summon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                                summon->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                                 if (summon->GetEntry() >= NPC_TIRION_EBON_KNIGHT && summon->GetEntry() <= NPC_TIRION_MOGRAINE)
                                 {
                                     if (summon->GetEntry() == NPC_TIRION_MOGRAINE)
@@ -1258,7 +1288,7 @@ public:
         Unit* GetSummoner()
         {
             if (TempSummon* tempSummon = me->ToTempSummon())
-                return tempSummon->GetSummoner();
+                return tempSummon->GetSummonerUnit();
             return nullptr;
         }
 
@@ -1274,7 +1304,7 @@ public:
             me->SetCanFly(true);
             me->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
             me->SetSpeed(MOVE_FLIGHT, 0.1f);
-            me->setFaction(summoner->getFaction());
+            me->SetFaction(summoner->GetFaction());
         }
 
         void DamageTaken(Unit* who, uint32&, DamageEffectType, SpellSchoolMask) override
@@ -1293,7 +1323,7 @@ public:
             if (Unit* passenger = kit->GetPassenger(SEAT_ENGINEERING))
                 if (init && !passenger->HasAura(SPELL_BURNING))
                 {
-                    me->MonsterTextEmote("Your Vehicle is burning!", GetSummoner(), true);
+                    me->TextEmote("Your Vehicle is burning!", GetSummoner(), true);
                     passenger->AddAura(SPELL_BURNING, passenger);
                 }
 
@@ -1412,6 +1442,78 @@ public:
     }
 };
 
+class spell_onslaught_or_call_bone_gryphon : public SpellScriptLoader
+{
+public:
+    spell_onslaught_or_call_bone_gryphon() : SpellScriptLoader("spell_onslaught_or_call_bone_gryphon") { }
+
+    class spell_onslaught_or_call_bone_gryphon_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_onslaught_or_call_bone_gryphon_SpellScript);
+
+        void ChangeSummonPos(SpellEffIndex /*effIndex*/)
+        {
+            WorldLocation summonPos = *GetExplTargetDest();
+            Position offset = { 0.0f, 0.0f, 3.0f, 0.0f };
+            summonPos.RelocateOffset(offset);
+            SetExplTargetDest(summonPos);
+            GetHitDest()->RelocateOffset(offset);
+        }
+
+        void Register() override
+        {
+            OnEffectHit += SpellEffectFn(spell_onslaught_or_call_bone_gryphon_SpellScript::ChangeSummonPos, EFFECT_0, SPELL_EFFECT_SUMMON);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_onslaught_or_call_bone_gryphon_SpellScript();
+    }
+};
+
+enum OnslaughtGryphon
+{
+    SPELL_DELIVER_GRYPHON            = 54420,
+    SPELL_ONSLAUGHT_GRYPHON          = 49641,
+
+    NPC_CAPTURED_ONSLAUGHT_GRYPHON   = 29415,
+
+    SEAT_PLAYER                      = 0
+};
+
+class spell_deliver_gryphon : public SpellScript
+{
+    PrepareSpellScript(spell_deliver_gryphon);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DELIVER_GRYPHON, SPELL_ONSLAUGHT_GRYPHON });
+    }
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            if (Vehicle* gryphon = caster->GetVehicleKit())
+            {
+                if (Unit* player = gryphon->GetPassenger(SEAT_PLAYER))
+                {
+                    player->ExitVehicle();
+                    player->RemoveAurasDueToSpell(VEHICLE_SPELL_PARACHUTE);
+                    player->RemoveAurasDueToSpell(SPELL_ONSLAUGHT_GRYPHON);
+                    player->SummonCreature(NPC_CAPTURED_ONSLAUGHT_GRYPHON, 7434.7f, 4213.3f, 316.52f, 3.88f, TEMPSUMMON_TIMED_DESPAWN, 1 * MINUTE * IN_MILLISECONDS);
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_deliver_gryphon::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 // Theirs
 /*######
 ## npc_guardian_pavilion
@@ -1526,9 +1628,9 @@ public:
             events.ScheduleEvent(EVENT_DUMMY_RECAST_DEFEND, 5000);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            if (!_EnterEvadeMode())
+            if (!_EnterEvadeMode(why))
                 return;
 
             Reset();
@@ -1599,7 +1701,7 @@ public:
                 case EVENT_DUMMY_RESET:
                     if (UpdateVictim())
                     {
-                        EnterEvadeMode();
+                        EnterEvadeMode(EVADE_REASON_OTHER);
                         events.ScheduleEvent(EVENT_DUMMY_RESET, 10000);
                     }
                     break;
@@ -2042,7 +2144,7 @@ public:
 
             if (id == POINT_GRAB_DECOY)
                 if (TempSummon* summon = me->ToTempSummon())
-                    if (Unit* summoner = summon->GetSummoner())
+                    if (Unit* summoner = summon->GetSummonerUnit())
                         DoCast(summoner, SPELL_GRAB);
         }
 
@@ -2098,6 +2200,8 @@ void AddSC_icecrown()
     new spell_fight_fire_bomber();
     new spell_anti_air_rocket_bomber();
     new npc_infra_green_bomber_generic();
+    new spell_onslaught_or_call_bone_gryphon();
+    RegisterSpellScript(spell_deliver_gryphon);
 
     // Theirs
     new npc_guardian_pavilion();

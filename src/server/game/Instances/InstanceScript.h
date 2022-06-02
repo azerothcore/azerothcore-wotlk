@@ -1,23 +1,34 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ACORE_INSTANCE_DATA_H
 #define ACORE_INSTANCE_DATA_H
 
-//#include "GameObject.h"
-//#include "Map.h"
+#include "CreatureAI.h"
 #include "ObjectMgr.h"
 #include "World.h"
 #include "ZoneScript.h"
+#include <set>
 
-#define OUT_SAVE_INST_DATA             LOG_DEBUG("scripts.ai", "TSCR: Saving Instance Data for Instance %s (Map %d, Instance Id %d)", instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
-#define OUT_SAVE_INST_DATA_COMPLETE    LOG_DEBUG("scripts.ai", "TSCR: Saving Instance Data for Instance %s (Map %d, Instance Id %d) completed.", instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
-#define OUT_LOAD_INST_DATA(a)          LOG_DEBUG("scripts.ai", "TSCR: Loading Instance Data for Instance %s (Map %d, Instance Id %d). Input is '%s'", instance->GetMapName(), instance->GetId(), instance->GetInstanceId(), a)
-#define OUT_LOAD_INST_DATA_COMPLETE    LOG_DEBUG("scripts.ai", "TSCR: Instance Data Load for Instance %s (Map %d, Instance Id: %d) is complete.", instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
-#define OUT_LOAD_INST_DATA_FAIL        LOG_ERROR("scripts.ai", "TSCR: Unable to load Instance Data for Instance %s (Map %d, Instance Id: %d).", instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
+#define OUT_SAVE_INST_DATA             LOG_DEBUG("scripts.ai", "Saving Instance Data for Instance {} (Map {}, Instance Id {})", instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
+#define OUT_SAVE_INST_DATA_COMPLETE    LOG_DEBUG("scripts.ai", "Saving Instance Data for Instance {} (Map {}, Instance Id {}) completed.", instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
+#define OUT_LOAD_INST_DATA(a)          LOG_DEBUG("scripts.ai", "Loading Instance Data for Instance {} (Map {}, Instance Id {}). Input is '{}'", instance->GetMapName(), instance->GetId(), instance->GetInstanceId(), a)
+#define OUT_LOAD_INST_DATA_COMPLETE    LOG_DEBUG("scripts.ai", "Instance Data Load for Instance {} (Map {}, Instance Id: {}) is complete.", instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
+#define OUT_LOAD_INST_DATA_FAIL        LOG_ERROR("scripts.ai", "Unable to load Instance Data for Instance {} (Map {}, Instance Id: {}).", instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
 
 class Map;
 class Unit;
@@ -58,30 +69,30 @@ enum DoorType
     MAX_DOOR_TYPES,
 };
 
-enum BoundaryType
-{
-    BOUNDARY_NONE = 0,
-    BOUNDARY_N,
-    BOUNDARY_S,
-    BOUNDARY_E,
-    BOUNDARY_W,
-    BOUNDARY_NE,
-    BOUNDARY_NW,
-    BOUNDARY_SE,
-    BOUNDARY_SW,
-    BOUNDARY_MAX_X = BOUNDARY_N,
-    BOUNDARY_MIN_X = BOUNDARY_S,
-    BOUNDARY_MAX_Y = BOUNDARY_W,
-    BOUNDARY_MIN_Y = BOUNDARY_E,
-};
-
-typedef std::map<BoundaryType, float> BossBoundaryMap;
-
 struct DoorData
 {
     uint32 entry, bossId;
     DoorType type;
-    uint32 boundary;
+};
+
+struct BossBoundaryEntry
+{
+    uint32 const bossId;
+    AreaBoundary const* const boundary;
+};
+
+struct BossBoundaryData
+{
+    typedef std::vector<BossBoundaryEntry> StorageType;
+    typedef StorageType::const_iterator const_iterator;
+
+    BossBoundaryData(std::initializer_list<BossBoundaryEntry> data) : _data(data) { }
+    ~BossBoundaryData();
+    const_iterator begin() const { return _data.begin(); }
+    const_iterator end() const { return _data.end(); }
+
+private:
+    StorageType _data;
 };
 
 struct MinionData
@@ -101,16 +112,15 @@ struct BossInfo
     EncounterState state;
     DoorSet door[MAX_DOOR_TYPES];
     MinionSet minion;
-    BossBoundaryMap boundary;
+    CreatureBoundary boundary;
 };
 
 struct DoorInfo
 {
-    explicit DoorInfo(BossInfo* _bossInfo, DoorType _type, BoundaryType _boundary)
-        : bossInfo(_bossInfo), type(_type), boundary(_boundary) {}
+    explicit DoorInfo(BossInfo* _bossInfo, DoorType _type)
+            : bossInfo(_bossInfo), type(_type) { }
     BossInfo* bossInfo;
     DoorType type;
-    BoundaryType boundary;
 };
 
 struct MinionInfo
@@ -123,6 +133,8 @@ typedef std::multimap<uint32 /*entry*/, DoorInfo> DoorInfoMap;
 typedef std::pair<DoorInfoMap::const_iterator, DoorInfoMap::const_iterator> DoorInfoMapBounds;
 
 typedef std::map<uint32 /*entry*/, MinionInfo> MinionInfoMap;
+typedef std::map<uint32 /*type*/, ObjectGuid /*guid*/> ObjectGuidMap;
+typedef std::map<uint32 /*entry*/, uint32 /*type*/> ObjectInfoMap;
 
 class InstanceScript : public ZoneScript
 {
@@ -153,6 +165,20 @@ public:
     //This is to prevent players from entering during boss encounters.
     virtual bool IsEncounterInProgress() const;
 
+    // Called when a creature/gameobject is added to map or removed from map.
+    // Insert/Remove objectguid to dynamic guid store
+    void OnCreatureCreate(Creature* creature) override;
+    void OnCreatureRemove(Creature* creature) override;
+
+    void OnGameObjectCreate(GameObject* go) override;
+    void OnGameObjectRemove(GameObject* go) override;
+
+    ObjectGuid GetObjectGuid(uint32 type) const;
+    ObjectGuid GetGuidData(uint32 type) const override;
+
+    Creature* GetCreature(uint32 type);
+    GameObject* GetGameObject(uint32 type);
+
     //Called when a player successfully enters the instance.
     virtual void OnPlayerEnter(Player* /*player*/) {}
 
@@ -168,6 +194,12 @@ public:
 
     //Respawns a GO having negative spawntimesecs in gameobject-table
     void DoRespawnGameObject(ObjectGuid guid, uint32 timeToDespawn = MINUTE);
+
+    // Respawns a creature.
+    void DoRespawnCreature(ObjectGuid guid, bool force = false);
+
+    // Respawns a creature from the creature object storage.
+    void DoRespawnCreature(uint32 type, bool force = false);
 
     //sends world state update to all players in instance
     void DoUpdateWorldState(uint32 worldstateId, uint32 worldstateValue);
@@ -194,7 +226,7 @@ public:
     virtual bool SetBossState(uint32 id, EncounterState state);
     EncounterState GetBossState(uint32 id) const { return id < bosses.size() ? bosses[id].state : TO_BE_DECIDED; }
     static std::string GetBossStateName(uint8 state);
-    BossBoundaryMap const* GetBossBoundary(uint32 id) const { return id < bosses.size() ? &bosses[id].boundary : nullptr; }
+    CreatureBoundary const* GetBossBoundary(uint32 id) const { return id < bosses.size() ? &bosses[id].boundary : nullptr; }
     BossInfo const* GetBossInfo(uint32 id) const { return &bosses[id]; }
 
     // Achievement criteria additional requirements check
@@ -215,12 +247,23 @@ public:
 
     uint32 GetEncounterCount() const { return bosses.size(); }
 
+    // Only used by areatriggers that inherit from OnlyOnceAreaTriggerScript
+    void MarkAreaTriggerDone(uint32 id) { _activatedAreaTriggers.insert(id); }
+    void ResetAreaTriggerDone(uint32 id) { _activatedAreaTriggers.erase(id); }
+    bool IsAreaTriggerDone(uint32 id) const { return _activatedAreaTriggers.find(id) != _activatedAreaTriggers.end(); }
+
     // Allows to perform particular actions
     virtual void DoAction(int32 /*action*/) {}
 protected:
     void SetBossNumber(uint32 number) { bosses.resize(number); }
+    void LoadBossBoundaries(BossBoundaryData const& data);
     void LoadDoorData(DoorData const* data);
     void LoadMinionData(MinionData const* data);
+    void LoadObjectData(ObjectData const* creatureData, ObjectData const* gameObjectData);
+
+    void AddObject(Creature* obj, bool add);
+    void AddObject(GameObject* obj, bool add);
+    void AddObject(WorldObject* obj, uint32 type, bool add);
 
     void AddDoor(GameObject* door, bool add);
     void AddMinion(Creature* minion, bool add);
@@ -231,10 +274,16 @@ protected:
     std::string LoadBossState(char const* data);
     std::string GetBossSaveData();
 private:
+    static void LoadObjectData(ObjectData const* creatureData, ObjectInfoMap& objectInfo);
+
     std::vector<BossInfo> bosses;
     DoorInfoMap doors;
     MinionInfoMap minions;
+    ObjectInfoMap _creatureInfo;
+    ObjectInfoMap _gameObjectInfo;
+    ObjectGuidMap _objectGuids;
     uint32 completedEncounters; // completed encounter mask, bit indexes are DungeonEncounter.dbc boss numbers, used for packets
+    std::unordered_set<uint32> _activatedAreaTriggers;
 };
 
 #endif

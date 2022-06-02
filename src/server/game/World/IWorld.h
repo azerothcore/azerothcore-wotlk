@@ -1,5 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef AZEROTHCORE_IWORLD_H
@@ -7,10 +20,10 @@
 
 #include "AsyncCallbackProcessor.h"
 #include "Common.h"
+#include "Duration.h"
 #include "ObjectGuid.h"
 #include "QueryResult.h"
 #include "SharedDefines.h"
-#include "Timer.h"
 #include <atomic>
 #include <list>
 #include <map>
@@ -22,28 +35,22 @@ class WorldSession;
 class Player;
 
 /// Storage class for commands issued for delayed execution
-struct CliCommandHolder
+struct AC_GAME_API CliCommandHolder
 {
-    typedef void Print(void*, const char*);
-    typedef void CommandFinished(void*, bool success);
+    using Print = void(*)(void*, std::string_view);
+    using CommandFinished = void(*)(void*, bool success);
 
     void* m_callbackArg;
     char* m_command;
-    Print* m_print;
+    Print m_print;
+    CommandFinished m_commandFinished;
 
-    CommandFinished* m_commandFinished;
+    CliCommandHolder(void* callbackArg, char const* command, Print zprint, CommandFinished commandFinished);
+    ~CliCommandHolder();
 
-    CliCommandHolder(void* callbackArg, const char* command, Print* zprint, CommandFinished* commandFinished)
-            : m_callbackArg(callbackArg), m_print(zprint), m_commandFinished(commandFinished)
-    {
-        // TODO: fix Codacy warning
-        //  "Does not handle strings that are not \0-terminated; if given one it may perform an over-read (it could cause a crash if unprotected) (CWE-126)."
-        size_t len = strlen(command) + 1;
-        m_command = new char[len];
-        memcpy(m_command, command, len);
-    }
-
-    ~CliCommandHolder() { delete[] m_command; }
+private:
+    CliCommandHolder(CliCommandHolder const& right) = delete;
+    CliCommandHolder& operator=(CliCommandHolder const& right) = delete;
 };
 
 typedef std::unordered_map<uint32, WorldSession*> SessionMap;
@@ -108,6 +115,7 @@ enum WorldBoolConfigs
     CONFIG_BATTLEGROUND_CAST_DESERTER,
     CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE,
     CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_PLAYERONLY,
+    CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_TIMED,
     CONFIG_BATTLEGROUND_STORE_STATISTICS_ENABLE,
     CONFIG_BATTLEGROUND_TRACK_DESERTERS,
     CONFIG_BG_XP_FOR_KILL,
@@ -118,7 +126,7 @@ enum WorldBoolConfigs
     CONFIG_OFFHAND_CHECK_AT_SPELL_UNLEARN,
     CONFIG_VMAP_INDOOR_CHECK,
     CONFIG_PET_LOS,
-    CONFIG_START_ALL_SPELLS,
+    CONFIG_START_CUSTOM_SPELLS,
     CONFIG_START_ALL_EXPLORED,
     CONFIG_START_ALL_REP,
     CONFIG_ALWAYS_MAXSKILL,
@@ -161,6 +169,13 @@ enum WorldBoolConfigs
     CONFIG_DUNGEON_ACCESS_REQUIREMENTS_LFG_DBC_LEVEL_OVERRIDE,
     CONFIG_REGEN_HP_CANNOT_REACH_TARGET_IN_RAID,
     CONFIG_SET_BOP_ITEM_TRADEABLE,
+    CONFIG_ALLOW_LOGGING_IP_ADDRESSES_IN_DATABASE,
+    CONFIG_REALM_LOGIN_ENABLED,
+    CONFIG_PLAYER_SETTINGS_ENABLED,
+    CONFIG_ALLOW_JOIN_BG_AND_LFG,
+    CONFIG_MISS_CHANCE_MULTIPLIER_ONLY_FOR_PLAYERS,
+    CONFIG_LEAVE_GROUP_ON_LOGOUT,
+    CONFIG_VMAP_BLIZZLIKE_PVP_LOS,
     BOOL_CONFIG_VALUE_COUNT
 };
 
@@ -206,6 +221,7 @@ enum WorldIntConfigs
     CONFIG_CHARACTER_CREATING_DISABLED_CLASSMASK,
     CONFIG_CHARACTERS_PER_ACCOUNT,
     CONFIG_CHARACTERS_PER_REALM,
+    CONFIG_CREATURE_STOP_FOR_PLAYER,
     CONFIG_HEROIC_CHARACTERS_PER_REALM,
     CONFIG_CHARACTER_CREATING_MIN_LEVEL_FOR_HEROIC_CHARACTER,
     CONFIG_SKIP_CINEMATICS,
@@ -215,6 +231,7 @@ enum WorldIntConfigs
     CONFIG_START_HEROIC_PLAYER_LEVEL,
     CONFIG_START_PLAYER_MONEY,
     CONFIG_MAX_HONOR_POINTS,
+    CONFIG_MAX_HONOR_POINTS_MONEY_PER_POINT,
     CONFIG_START_HONOR_POINTS,
     CONFIG_MAX_ARENA_POINTS,
     CONFIG_START_ARENA_POINTS,
@@ -278,17 +295,21 @@ enum WorldIntConfigs
     CONFIG_INSTANT_LOGOUT,
     CONFIG_DISABLE_BREATHING,
     CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_SPAM_DELAY,
+    CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_TIMER,
     CONFIG_BATTLEGROUND_PREMATURE_FINISH_TIMER,
     CONFIG_BATTLEGROUND_PREMADE_GROUP_WAIT_FOR_MATCH,
     CONFIG_BATTLEGROUND_REPORT_AFK_TIMER,
     CONFIG_BATTLEGROUND_REPORT_AFK,
     CONFIG_BATTLEGROUND_INVITATION_TYPE,
     CONFIG_BATTLEGROUND_PLAYER_RESPAWN,
-    CONFIG_BATTLEGROUND_BUFF_RESPAWN,
+    CONFIG_BATTLEGROUND_RESTORATION_BUFF_RESPAWN,
+    CONFIG_BATTLEGROUND_BERSERKING_BUFF_RESPAWN,
+    CONFIG_BATTLEGROUND_SPEED_BUFF_RESPAWN,
     CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMIT_MIN_LEVEL,
     CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMIT_MIN_PLAYERS,
     CONFIG_ARENA_MAX_RATING_DIFFERENCE,
     CONFIG_ARENA_RATING_DISCARD_TIMER,
+    CONFIG_ARENA_PREV_OPPONENTS_DISCARD_TIMER,
     CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS,
     CONFIG_ARENA_GAMES_REQUIRED,
     CONFIG_ARENA_SEASON_ID,
@@ -299,8 +320,6 @@ enum WorldIntConfigs
     CONFIG_PVP_TOKEN_MAP_TYPE,
     CONFIG_PVP_TOKEN_ID,
     CONFIG_PVP_TOKEN_COUNT,
-    CONFIG_INTERVAL_LOG_UPDATE,
-    CONFIG_MIN_LOG_UPDATE,
     CONFIG_ENABLE_SINFO_LOGIN,
     CONFIG_PLAYER_ALLOW_COMMANDS,
     CONFIG_NUMTHREADS,
@@ -321,6 +340,7 @@ enum WorldIntConfigs
     CONFIG_CHARDELETE_MIN_LEVEL,
     CONFIG_AUTOBROADCAST_CENTER,
     CONFIG_AUTOBROADCAST_INTERVAL,
+    CONFIG_AUTOBROADCAST_MIN_LEVEL_DISABLE,
     CONFIG_MAX_RESULTS_LOOKUP_COMMANDS,
     CONFIG_DB_PING_INTERVAL,
     CONFIG_PRESERVE_CUSTOM_CHANNEL_DURATION,
@@ -377,6 +397,10 @@ enum WorldIntConfigs
     CONFIG_NPC_EVADE_IF_NOT_REACHABLE,
     CONFIG_NPC_REGEN_TIME_IF_NOT_REACHABLE_IN_RAID,
     CONFIG_FFA_PVP_TIMER,
+    CONFIG_LOOT_NEED_BEFORE_GREED_ILVL_RESTRICTION,
+    CONFIG_LFG_MAX_KICK_COUNT,
+    CONFIG_LFG_KICK_PREVENTION_TIMER,
+    CONFIG_CHANGE_FACTION_MAX_MONEY,
     INT_CONFIG_VALUE_COUNT
 };
 
@@ -421,8 +445,14 @@ enum Rates
     RATE_DROP_MONEY,
     RATE_REWARD_BONUS_MONEY,
     RATE_XP_KILL,
-    RATE_XP_BG_KILL,
+    RATE_XP_BG_KILL_AV,
+    RATE_XP_BG_KILL_WSG,
+    RATE_XP_BG_KILL_AB,
+    RATE_XP_BG_KILL_EOTS,
+    RATE_XP_BG_KILL_SOTA,
+    RATE_XP_BG_KILL_IC,
     RATE_XP_QUEST,
+    RATE_XP_QUEST_DF,
     RATE_XP_EXPLORE,
     RATE_XP_PET,
     RATE_XP_PET_NEXT_LEVEL,
@@ -466,136 +496,101 @@ enum Rates
     RATE_DURABILITY_LOSS_ABSORB,
     RATE_DURABILITY_LOSS_BLOCK,
     RATE_MOVESPEED,
+    RATE_MISS_CHANCE_MULTIPLIER_TARGET_CREATURE,
+    RATE_MISS_CHANCE_MULTIPLIER_TARGET_PLAYER,
     MAX_RATES
-};
-
-// xinef: global storage
-struct GlobalPlayerData
-{
-    ObjectGuid::LowType guidLow;
-    uint32 accountId;
-    std::string name;
-    uint8 race;
-    uint8 playerClass;
-    uint8 gender;
-    uint8 level;
-    uint16 mailCount;
-    uint32 guildId;
-    uint32 groupId;
-    std::map<uint8, uint32> arenaTeamId;
 };
 
 class IWorld
 {
 public:
-    virtual ~IWorld() {}
-    virtual WorldSession* FindSession(uint32 id) const = 0;
-    virtual WorldSession* FindOfflineSession(uint32 id) const = 0;
-    virtual WorldSession* FindOfflineSessionForCharacterGUID(ObjectGuid::LowType guidLow) const = 0;
+    virtual ~IWorld() = default;
+    [[nodiscard]] virtual WorldSession* FindSession(uint32 id) const = 0;
+    [[nodiscard]] virtual WorldSession* FindOfflineSession(uint32 id) const = 0;
+    [[nodiscard]] virtual WorldSession* FindOfflineSessionForCharacterGUID(ObjectGuid::LowType guidLow) const = 0;
     virtual void AddSession(WorldSession* s) = 0;
     virtual void SendAutoBroadcast() = 0;
     virtual bool KickSession(uint32 id) = 0;
     virtual void UpdateMaxSessionCounters() = 0;
-    virtual const SessionMap& GetAllSessions() const = 0;
-    virtual uint32 GetActiveAndQueuedSessionCount() const = 0;
-    virtual uint32 GetActiveSessionCount() const = 0;
-    virtual uint32 GetQueuedSessionCount() const = 0;
-    virtual uint32 GetMaxQueuedSessionCount() const = 0;
-    virtual uint32 GetMaxActiveSessionCount() const = 0;
-    virtual uint32 GetPlayerCount() const = 0;
-    virtual uint32 GetMaxPlayerCount() const = 0;
+    [[nodiscard]] virtual const SessionMap& GetAllSessions() const = 0;
+    [[nodiscard]] virtual uint32 GetActiveAndQueuedSessionCount() const = 0;
+    [[nodiscard]] virtual uint32 GetActiveSessionCount() const = 0;
+    [[nodiscard]] virtual uint32 GetQueuedSessionCount() const = 0;
+    [[nodiscard]] virtual uint32 GetMaxQueuedSessionCount() const = 0;
+    [[nodiscard]] virtual uint32 GetMaxActiveSessionCount() const = 0;
+    [[nodiscard]] virtual uint32 GetPlayerCount() const = 0;
+    [[nodiscard]] virtual uint32 GetMaxPlayerCount() const = 0;
     virtual void IncreasePlayerCount() = 0;
     virtual void DecreasePlayerCount() = 0;
     virtual Player* FindPlayerInZone(uint32 zone) = 0;
-    virtual bool IsClosed() const = 0;
+    [[nodiscard]] virtual bool IsClosed() const = 0;
     virtual void SetClosed(bool val) = 0;
-    virtual AccountTypes GetPlayerSecurityLimit() const = 0;
+    [[nodiscard]] virtual AccountTypes GetPlayerSecurityLimit() const = 0;
     virtual void SetPlayerSecurityLimit(AccountTypes sec) = 0;
     virtual void LoadDBAllowedSecurityLevel() = 0;
     virtual void SetPlayerAmountLimit(uint32 limit) = 0;
-    virtual uint32 GetPlayerAmountLimit() const = 0;
+    [[nodiscard]] virtual uint32 GetPlayerAmountLimit() const = 0;
     virtual void AddQueuedPlayer(WorldSession*) = 0;
     virtual bool RemoveQueuedPlayer(WorldSession* session) = 0;
     virtual int32 GetQueuePos(WorldSession*) = 0;
     virtual bool HasRecentlyDisconnected(WorldSession*) = 0;
-    virtual bool getAllowMovement() const = 0;
+    [[nodiscard]] virtual bool getAllowMovement() const = 0;
     virtual void SetAllowMovement(bool allow) = 0;
     virtual void SetNewCharString(std::string const& str) = 0;
-    virtual std::string const& GetNewCharString() const = 0;
-    virtual LocaleConstant GetDefaultDbcLocale() const = 0;
-    virtual std::string const& GetDataPath() const = 0;
-    virtual time_t const& GetStartTime() const = 0;
-    virtual time_t const& GetGameTime() const = 0;
-    virtual uint32 GetUptime() const = 0;
-    virtual uint32 GetUpdateTime() const = 0;
-    virtual void SetRecordDiffInterval(int32 t)  = 0;
-    virtual time_t GetNextDailyQuestsResetTime() const = 0;
-    virtual time_t GetNextWeeklyQuestsResetTime() const = 0;
-    virtual time_t GetNextRandomBGResetTime() const = 0;
-    virtual uint16 GetConfigMaxSkillValue() const = 0;
+    [[nodiscard]] virtual std::string const& GetNewCharString() const = 0;
+    [[nodiscard]] virtual LocaleConstant GetDefaultDbcLocale() const = 0;
+    [[nodiscard]] virtual std::string const& GetDataPath() const = 0;
+    [[nodiscard]] virtual Seconds GetNextDailyQuestsResetTime() const = 0;
+    [[nodiscard]] virtual Seconds GetNextWeeklyQuestsResetTime() const = 0;
+    [[nodiscard]] virtual Seconds GetNextRandomBGResetTime() const = 0;
+    [[nodiscard]] virtual uint16 GetConfigMaxSkillValue() const = 0;
     virtual void SetInitialWorldSettings() = 0;
     virtual void LoadConfigSettings(bool reload = false) = 0;
     virtual void SendWorldText(uint32 string_id, ...) = 0;
+    virtual void SendWorldTextOptional(uint32 string_id, uint32 flag, ...) = 0;
     virtual void SendGlobalText(const char* text, WorldSession* self) = 0;
     virtual void SendGMText(uint32 string_id, ...) = 0;
-    virtual void SendGlobalMessage(WorldPacket* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
-    virtual void SendGlobalGMMessage(WorldPacket* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
-    virtual bool SendZoneMessage(uint32 zone, WorldPacket* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
+    virtual void SendGlobalMessage(WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
+    virtual void SendGlobalGMMessage(WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
+    virtual bool SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
     virtual void SendZoneText(uint32 zone, const char* text, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
-    virtual void SendServerMessage(ServerMessageType type, const char* text = "", Player* player = nullptr) = 0;
-    virtual bool IsShuttingDown() const = 0;
-    virtual uint32 GetShutDownTimeLeft() const = 0;
-    virtual void ShutdownServ(uint32 time, uint32 options, uint8 exitcode) = 0;
+    virtual void SendServerMessage(ServerMessageType messageID, std::string stringParam = "", Player* player = nullptr) = 0;
+    [[nodiscard]] virtual bool IsShuttingDown() const = 0;
+    [[nodiscard]] virtual uint32 GetShutDownTimeLeft() const = 0;
+    virtual void ShutdownServ(uint32 time, uint32 options, uint8 exitcode, const std::string& reason = std::string()) = 0;
     virtual void ShutdownCancel() = 0;
-    virtual void ShutdownMsg(bool show = false, Player* player = nullptr) = 0;
+    virtual void ShutdownMsg(bool show = false, Player* player = nullptr, const std::string& reason = std::string()) = 0;
     virtual void Update(uint32 diff) = 0;
     virtual void UpdateSessions(uint32 diff) = 0;
     virtual void setRate(Rates rate, float value) = 0;
-    virtual float getRate(Rates rate) const = 0;
+    [[nodiscard]] virtual float getRate(Rates rate) const = 0;
     virtual void setBoolConfig(WorldBoolConfigs index, bool value) = 0;
-    virtual bool getBoolConfig(WorldBoolConfigs index) const = 0;
+    [[nodiscard]] virtual bool getBoolConfig(WorldBoolConfigs index) const = 0;
     virtual void setFloatConfig(WorldFloatConfigs index, float value) = 0;
-    virtual float getFloatConfig(WorldFloatConfigs index) const = 0;
+    [[nodiscard]] virtual float getFloatConfig(WorldFloatConfigs index) const = 0;
     virtual void setIntConfig(WorldIntConfigs index, uint32 value) = 0;
-    virtual uint32 getIntConfig(WorldIntConfigs index) const = 0;
+    [[nodiscard]] virtual uint32 getIntConfig(WorldIntConfigs index) const = 0;
     virtual void setWorldState(uint32 index, uint64 value) = 0;
-    virtual uint64 getWorldState(uint32 index) const = 0;
+    [[nodiscard]] virtual uint64 getWorldState(uint32 index) const = 0;
     virtual void LoadWorldStates() = 0;
-    virtual bool IsPvPRealm() const = 0;
-    virtual bool IsFFAPvPRealm() const = 0;
+    [[nodiscard]] virtual bool IsPvPRealm() const = 0;
+    [[nodiscard]] virtual bool IsFFAPvPRealm() const = 0;
     virtual void KickAll() = 0;
     virtual void KickAllLess(AccountTypes sec) = 0;
     virtual uint32 GetNextWhoListUpdateDelaySecs() = 0;
-    virtual void LoadGlobalPlayerDataStore() = 0;
-    virtual ObjectGuid GetGlobalPlayerGUID(std::string const& name) const = 0;
-    virtual GlobalPlayerData const* GetGlobalPlayerData(ObjectGuid::LowType guid) const = 0;
-    virtual void AddGlobalPlayerData(ObjectGuid::LowType guid, uint32 accountId, std::string const& name, uint8 gender, uint8 race, uint8 playerClass, uint8 level, uint16 mailCount, uint32 guildId) = 0;
-    virtual void UpdateGlobalPlayerData(ObjectGuid::LowType guid, uint8 mask, std::string const& name, uint8 level = 0, uint8 gender = 0, uint8 race = 0, uint8 playerClass = 0) = 0;
-    virtual void UpdateGlobalPlayerMails(ObjectGuid::LowType guid, int16 count, bool add = true) = 0;
-    virtual void UpdateGlobalPlayerGuild(ObjectGuid::LowType guid, uint32 guildId) = 0;
-    virtual void UpdateGlobalPlayerGroup(ObjectGuid::LowType guid, uint32 groupId) = 0;
-    virtual void UpdateGlobalPlayerArenaTeam(ObjectGuid::LowType guid, uint8 slot, uint32 arenaTeamId) = 0;
-    virtual void UpdateGlobalNameData(ObjectGuid::LowType guidLow, std::string const& oldName, std::string const& newName) = 0;
-    virtual void DeleteGlobalPlayerData(ObjectGuid::LowType guid, std::string const& name) = 0;
     virtual void ProcessCliCommands() = 0;
     virtual void QueueCliCommand(CliCommandHolder* commandHolder) = 0;
     virtual void ForceGameEventUpdate() = 0;
     virtual void UpdateRealmCharCount(uint32 accid) = 0;
-    virtual LocaleConstant GetAvailableDbcLocale(LocaleConstant locale) const = 0;
+    [[nodiscard]] virtual LocaleConstant GetAvailableDbcLocale(LocaleConstant locale) const = 0;
     virtual void LoadDBVersion() = 0;
-    virtual void LoadDBRevision() = 0;
-    virtual char const* GetDBVersion() const = 0;
-    virtual char const* GetWorldDBRevision() const = 0;
-    virtual char const* GetCharacterDBRevision() const = 0;
-    virtual char const* GetAuthDBRevision() const = 0;
+    [[nodiscard]] virtual char const* GetDBVersion() const = 0;
     virtual void LoadAutobroadcasts() = 0;
     virtual void UpdateAreaDependentAuras() = 0;
-    virtual uint32 GetCleaningFlags() const = 0;
+    [[nodiscard]] virtual uint32 GetCleaningFlags() const = 0;
     virtual void   SetCleaningFlags(uint32 flags) = 0;
     virtual void   ResetEventSeasonalQuests(uint16 event_id) = 0;
-    virtual time_t GetNextTimeWithDayAndHour(int8 dayOfWeek, int8 hour) = 0;
-    virtual time_t GetNextTimeWithMonthAndHour(int8 month, int8 hour) = 0;
-    virtual std::string const& GetRealmName() const = 0;
+    [[nodiscard]] virtual std::string const& GetRealmName() const = 0;
     virtual void SetRealmName(std::string name) = 0;
     virtual void RemoveOldCorpses() = 0;
 };

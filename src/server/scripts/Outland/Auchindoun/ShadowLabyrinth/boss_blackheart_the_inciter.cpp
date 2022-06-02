@@ -1,9 +1,22 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "shadow_labyrinth.h"
 
 enum BlackheartTheInciter
@@ -81,11 +94,11 @@ public:
                 instance->SetData(DATA_BLACKHEARTTHEINCITEREVENT, IN_PROGRESS);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (InciteChaos && SelectTargetFromPlayerList(100.0f))
                 return;
-            CreatureAI::EnterEvadeMode();
+            CreatureAI::EnterEvadeMode(why);
         }
 
         void UpdateAI(uint32 diff) override
@@ -103,7 +116,7 @@ public:
                     {
                         me->CastSpell(me, SPELL_INCITE_CHAOS, false);
 
-                        std::list<HostileReference*> t_list = me->getThreatManager().getThreatList();
+                        std::list<HostileReference*> t_list = me->GetThreatMgr().getThreatList();
                         for (std::list<HostileReference*>::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
                         {
                             Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
@@ -119,7 +132,7 @@ public:
                         break;
                     }
                 case EVENT_SPELL_CHARGE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_CHARGE, false);
                     events.RepeatEvent(urand(15000, 25000));
                     break;

@@ -1,0 +1,64 @@
+-- DB update 2021_09_14_00 -> 2021_09_14_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_09_14_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_09_14_00 2021_09_14_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1620443413425226200'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1620443413425226200');
+
+DROP TABLE IF EXISTS `spellvisual_dbc`; 
+CREATE TABLE IF NOT EXISTS `spellvisual_dbc` (
+  `ID` INT NOT NULL DEFAULT 0,
+  `PrecastKit` INT NOT NULL DEFAULT 0,
+  `CastKit` INT NOT NULL DEFAULT 0,
+  `ImpactKit` INT NOT NULL DEFAULT 0,
+  `StateKit` INT NOT NULL DEFAULT 0,
+  `StateDoneKit` INT NOT NULL DEFAULT 0,
+  `ChannelKit` INT NOT NULL DEFAULT 0,
+  `HasMissile` INT NOT NULL DEFAULT 0,
+  `MissileModel` INT NOT NULL DEFAULT 0,
+  `MissilePathType` INT NOT NULL DEFAULT 0,
+  `MissileDestinationAttachment` INT NOT NULL DEFAULT 0,
+  `MissileSound` INT NOT NULL DEFAULT 0,
+  `AnimEventSoundID` INT NOT NULL DEFAULT 0,
+  `Flags` INT NOT NULL DEFAULT 0,
+  `CasterImpactKit` INT NOT NULL DEFAULT 0,
+  `TargetImpactKit` INT NOT NULL DEFAULT 0,
+  `MissileAttachment` INT NOT NULL DEFAULT 0,
+  `MissileFollowGroundHeight` INT NOT NULL DEFAULT 0,
+  `MissileFollowGroundDropSpeed` INT NOT NULL DEFAULT 0,
+  `MissileFollowGroundApproach` INT NOT NULL DEFAULT 0,
+  `MissileFollowGroundFlags` INT NOT NULL DEFAULT 0,
+  `MissileMotion` INT NOT NULL DEFAULT 0,
+  `MissileTargetingKit` INT NOT NULL DEFAULT 0,
+  `InstantAreaKit` INT NOT NULL DEFAULT 0,
+  `ImpactAreaKit` INT NOT NULL DEFAULT 0,
+  `PersistentAreaKit` INT NOT NULL DEFAULT 0,
+  `MissileCastOffsetX` FLOAT NOT NULL DEFAULT 0,
+  `MissileCastOffsetY` FLOAT NOT NULL DEFAULT 0,
+  `MissileCastOffsetZ` FLOAT NOT NULL DEFAULT 0,
+  `MissileImpactOffsetX` FLOAT NOT NULL DEFAULT 0,
+  `MissileImpactOffsetY` FLOAT NOT NULL DEFAULT 0,
+  `MissileImpactOffsetZ` FLOAT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 COLLATE=utf8mb4_general_ci;
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_09_14_01' WHERE sql_rev = '1620443413425226200';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

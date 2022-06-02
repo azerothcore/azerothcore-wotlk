@@ -1,15 +1,26 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "BattlegroundIC.h"
 #include "CombatAI.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
 
@@ -30,15 +41,15 @@ public:
         uint32 faction;
         EventMap events;
 
-        void JustDied(Unit* ) override
+        void JustDied(Unit* /*killer*/) override
         {
             if (me->GetEntry() == NPC_KEEP_CANNON)
             {
-                faction = me->getFaction();
+                faction = me->GetFaction();
                 me->Respawn();
                 me->UpdateEntry(NPC_BROKEN_KEEP_CANNON, nullptr, false);
                 me->RemoveVehicleKit();
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+                me->SetNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
             }
         }
 
@@ -48,9 +59,9 @@ public:
             {
                 me->UpdateEntry(NPC_KEEP_CANNON, nullptr, false);
                 if (faction)
-                    me->setFaction(faction);
+                    me->SetFaction(faction);
                 me->CreateVehicleKit(510, NPC_KEEP_CANNON);
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
                 events.ScheduleEvent(EVENT_RESTORE_FLAG, 4000);
             }
         }
@@ -61,7 +72,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_RESTORE_FLAG:
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
                     break;
             }
 
@@ -234,7 +245,7 @@ public:
             }
             else
             {
-                if (me->GetDistance(me->GetHomePosition()) < 40.0f && abs(me->GetPositionZ() - me->GetHomePosition().GetPositionZ()) < 5.0f)
+                if (me->GetDistance(me->GetHomePosition()) < 40.0f && std::abs(me->GetPositionZ() - me->GetHomePosition().GetPositionZ()) < 5.0f)
                 {
                     rage = false;
                     me->RemoveAurasDueToSpell(SPELL_IOCBOSS_RAGE);
@@ -274,7 +285,7 @@ public:
                     events.RepeatEvent(22000);
                     break;
                 case EVENT_DAGGER_THROW:
-                    if (Unit* tgt = SelectTarget(SELECT_TARGET_RANDOM))
+                    if (Unit* tgt = SelectTarget(SelectTargetMethod::Random))
                         me->CastSpell(tgt, SPELL_IOCBOSS_DAGGER_THROW, false);
 
                     events.RepeatEvent(10000);
@@ -466,7 +477,7 @@ public:
 
                 float dist = position->GetExactDist2d(player->GetPositionX(), player->GetPositionY());
                 float elevation = GetSpell()->m_targets.GetElevation();
-                float speedZ = std::max(10.0f, float(50.0f * sin(elevation)));
+                float speedZ = std::max(10.0f, float(50.0f * std::sin(elevation)));
                 float speedXY = dist * 10.0f / speedZ;
 
                 player->GetMotionMaster()->MoveJump(position->GetPositionX(), position->GetPositionY(), position->GetPositionZ(), speedXY, speedZ);

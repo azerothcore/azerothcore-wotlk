@@ -1,10 +1,23 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "PassiveAI.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "utgarde_keep.h"
@@ -58,7 +71,7 @@ public:
         npc_frost_tombAI(Creature* c) : NullCreatureAI(c)
         {
             if (TempSummon* t = c->ToTempSummon())
-                if (Unit* s = t->GetSummoner())
+                if (Unit* s = t->GetSummonerUnit())
                 {
                     PrisonerGUID = s->GetGUID();
                     if( me->GetInstanceScript() && me->GetInstanceScript()->instance->IsHeroic() )
@@ -74,7 +87,7 @@ public:
 
         void JustDied(Unit* killer) override
         {
-            if (killer->GetGUID() != me->GetGUID())
+            if (killer && killer->GetGUID() != me->GetGUID())
                 if (InstanceScript* pInstance = me->GetInstanceScript())
                     pInstance->SetData(DATA_ON_THE_ROCKS_ACHIEV, 0);
 
@@ -184,7 +197,7 @@ public:
                     events.RepeatEvent(urand(4000, 5000));
                     break;
                 case EVENT_FROST_TOMB:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true) )
                         if( !target->HasAura(SPELL_FROST_TOMB_AURA) )
                         {
                             Talk(SAY_FROST_TOMB_EMOTE, target);
@@ -201,7 +214,7 @@ public:
                     {
                         float dist = rand_norm() * 4 + 3.0f;
                         float angle = rand_norm() * 2 * M_PI;
-                        if( Creature* c = me->SummonCreature(NPC_SKELETON, 156.2f + cos(angle) * dist, 259.1f + sin(angle) * dist, 42.9f, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000) )
+                        if( Creature* c = me->SummonCreature(NPC_SKELETON, 156.2f + cos(angle) * dist, 259.1f + std::sin(angle) * dist, 42.9f, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000) )
                             if( Unit* target = c->SelectNearestTarget(250.0f) )
                             {
                                 c->AddThreat(target, 5.0f);
@@ -263,15 +276,15 @@ public:
                 damage = 0;
                 me->InterruptNonMeleeSpells(true);
                 me->RemoveAllAuras();
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetControlled(true, UNIT_STATE_ROOT);
                 me->GetMotionMaster()->MovementExpired();
                 me->GetMotionMaster()->MoveIdle();
                 me->StopMoving();
                 me->SetStandState(UNIT_STAND_STATE_DEAD);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
-                me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
-                me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                me->SetUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
+                me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
+                me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
                 events.RescheduleEvent(EVENT_RESURRECT, 12000);
             }
         }
@@ -298,12 +311,12 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_DECREPIFY:
-                    if( !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) )
+                    if( !me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE) )
                         me->CastSpell(me->GetVictim(), SPELL_DECREPIFY, false);
                     events.RepeatEvent(urand(15000, 25000));
                     break;
                 case EVENT_SPELL_BONE_ARMOR:
-                    if( !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) )
+                    if( !me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE) )
                         me->CastSpell((Unit*)nullptr, SPELL_BONE_ARMOR, false);
                     events.RepeatEvent(urand(40000, 120000));
                     break;
@@ -311,19 +324,19 @@ public:
                     events.DelayEvents(3500);
                     DoCast(me, SPELL_SCOURGE_RESURRECTION, true);
                     me->SetStandState(UNIT_STAND_STATE_STAND);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
-                    me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                    me->RemoveUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
+                    me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
+                    me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
                     events.RescheduleEvent(EVENT_RESURRECT_2, 3000);
                     break;
                 case EVENT_RESURRECT_2:
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->SetControlled(false, UNIT_STATE_ROOT);
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
                     break;
             }
 
-            if( !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) )
+            if( !me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE) )
                 DoMeleeAttackIfReady();
         }
     };

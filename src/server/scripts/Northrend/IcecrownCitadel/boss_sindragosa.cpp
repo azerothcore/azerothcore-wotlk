@@ -1,13 +1,27 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
+#include "GameTime.h"
 #include "GridNotifiers.h"
-#include "icecrown_citadel.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "icecrown_citadel.h"
 
 enum Texts
 {
@@ -202,8 +216,7 @@ public:
             if (!sindragosa->IsAlive())
                 return true;
 
-            Position pos;
-            _owner->GetPosition(&pos);
+            Position pos = _owner->GetPosition();
             _owner->UpdateGroundPositionZ(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
 
             if (TempSummon* summon = sindragosa->SummonCreature(NPC_ICE_TOMB, pos))
@@ -225,7 +238,7 @@ private:
     ObjectGuid _sindragosaGUID;
 };
 
-struct LastPhaseIceTombTargetSelector : public Acore::unary_function<Unit*, bool>
+struct LastPhaseIceTombTargetSelector
 {
 public:
     LastPhaseIceTombTargetSelector(Creature* source) : _source(source) { }
@@ -281,7 +294,6 @@ public:
 
             if (!_summoned)
             {
-                me->SetCanFly(true);
                 me->SetDisableGravity(true);
             }
         }
@@ -312,7 +324,7 @@ public:
         {
             if (!instance->CheckRequiredBosses(DATA_SINDRAGOSA, victim->ToPlayer()) || !me->IsVisible())
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 instance->DoCastSpellOnPlayers(LIGHT_S_HAMMER_TELEPORT);
                 return;
             }
@@ -342,7 +354,7 @@ public:
             Talk(SAY_AGGRO);
         }
 
-        bool CanAIAttack(const Unit* target) const override
+        bool CanAIAttack(Unit const* target) const override
         {
             return me->IsVisible() && target->GetEntry() != NPC_CROK_SCOURGEBANE;
         }
@@ -353,14 +365,13 @@ public:
             instance->SetBossState(DATA_SINDRAGOSA, FAIL);
             if (_summoned)
             {
-                me->SetCanFly(false);
                 me->SetDisableGravity(false);
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE)) // this flag is removed after she lands and can be engaged
+            if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE)) // this flag is removed after she lands and can be engaged
             {
                 const Map::PlayerList& pl = me->GetMap()->GetPlayers();
                 for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
@@ -370,7 +381,7 @@ public:
             }
             me->DisableRotate(false);
             me->SetControlled(false, UNIT_STATE_ROOT);
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
         }
 
         void KilledUnit(Unit* victim) override
@@ -394,9 +405,8 @@ public:
                     return;
 
                 me->setActive(true);
-                me->SetCanFly(true);
                 me->SetDisableGravity(true);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetSpeed(MOVE_RUN, 4.28571f);
                 float moveTime = me->GetExactDist(&SindragosaFlyInPos) / (me->GetSpeed(MOVE_RUN) * 0.001f);
                 me->m_Events.AddEvent(new FrostwyrmLandEvent(*me, SindragosaLandPos), me->m_Events.CalculateTime(uint64(moveTime) + 250));
@@ -421,11 +431,10 @@ public:
             {
                 case POINT_FROSTWYRM_LAND:
                     me->setActive(false);
-                    me->SetCanFly(false);
                     me->SetDisableGravity(false);
                     me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run);
                     me->SetHomePosition(SindragosaLandPos);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
 
                     // Sindragosa enters combat as soon as she lands
                     me->SetInCombatWithZone();
@@ -449,7 +458,6 @@ public:
                 case POINT_LAND_GROUND:
                     {
                         _isInAirPhase = false;
-                        me->SetCanFly(false);
                         me->SetDisableGravity(false);
                         me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run);
                         me->SetReactState(REACT_AGGRESSIVE);
@@ -515,7 +523,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim() || !CheckInRoom())
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
@@ -582,7 +590,7 @@ public:
 
                 // AIR PHASE EVENTS BELOW:
                 case EVENT_AIR_PHASE:
-                    // pussywizard: unroot may be scheduled after this event cos of events shitness (time must be unique)
+                    // pussywizard: unroot may be scheduled after this event cos of events (time must be unique)
                     if (me->HasUnitState(UNIT_STATE_ROOT))
                     {
                         events.CancelEvent(EVENT_UNROOT);
@@ -599,9 +607,7 @@ public:
                     me->AttackStop();
                     me->GetMotionMaster()->MoveIdle();
                     me->StopMoving();
-                    me->SetCanFly(true);
                     me->SetDisableGravity(true);
-                    me->SendMovementFlagUpdate();
                     me->GetMotionMaster()->MoveTakeoff(POINT_TAKEOFF, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 20.0f, 10.0f);
                     events.CancelEventGroup(EVENT_GROUP_LAND_PHASE);
                     events.ScheduleEvent(EVENT_AIR_PHASE, 110000);
@@ -666,7 +672,7 @@ public:
                         events.ScheduleEvent(EVENT_THIRD_PHASE_CHECK, 5000);
                     break;
                 case EVENT_ICE_TOMB:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, LastPhaseIceTombTargetSelector(me)))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, LastPhaseIceTombTargetSelector(me)))
                     {
                         Talk(EMOTE_WARN_FROZEN_ORB, target);
                         me->CastSpell(target, SPELL_ICE_TOMB_DUMMY, true);
@@ -842,7 +848,7 @@ public:
 
             uint32 damage = uint32( (GetEffectValue() / _targetCount) * (1.0f - ResistFactor) );
 
-            SpellNonMeleeDamage damageInfo(GetCaster(), GetHitUnit(), GetSpellInfo()->Id, GetSpellInfo()->SchoolMask);
+            SpellNonMeleeDamage damageInfo(GetCaster(), GetHitUnit(), GetSpellInfo(), GetSpellInfo()->SchoolMask);
             damageInfo.damage = damage;
             GetCaster()->SendSpellNonMeleeDamageLog(&damageInfo);
             GetCaster()->DealSpellDamage(&damageInfo, false);
@@ -941,11 +947,11 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            const SpellInfo* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo();
+            SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
             if (!spellInfo)
                 return false;
 
-            uint32 currMSTime = World::GetGameTimeMS();
+            uint32 currMSTime = GameTime::GetGameTimeMS().count();
             std::map<uint32, uint32>::iterator itr = _lastMSTimeForSpell.find(spellInfo->Id);
             if (itr != _lastMSTimeForSpell.end())
             {
@@ -1279,7 +1285,7 @@ public:
         float ox, oy, oz;
         _caster->GetPosition(ox, oy, oz);
         DynamicMapTree const& dTree = unit->GetMap()->GetDynamicMapTree();
-        return !dTree.isInLineOfSight(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ() + 2.f, ox, oy, oz + 2.f, unit->GetPhaseMask());
+        return !dTree.isInLineOfSight(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ() + 2.f, ox, oy, oz + 2.f, unit->GetPhaseMask(), VMAP::ModelIgnoreFlags::Nothing);
     }
 
 private:
@@ -1389,7 +1395,6 @@ public:
 
             if (!_summoned)
             {
-                me->SetCanFly(true);
                 me->SetDisableGravity(true);
             }
         }
@@ -1399,7 +1404,6 @@ public:
             ScriptedAI::JustReachedHome();
             if (_summoned)
             {
-                me->SetCanFly(false);
                 me->SetDisableGravity(false);
             }
         }
@@ -1427,7 +1431,7 @@ public:
                     return;
 
                 me->setActive(true);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                 float moveTime = me->GetExactDist(&SpinestalkerFlyPos) / (me->GetSpeed(MOVE_RUN) * 0.001f);
                 me->m_Events.AddEvent(new FrostwyrmLandEvent(*me, SpinestalkerLandPos), me->m_Events.CalculateTime(uint64(moveTime) + 250));
                 me->SetDefaultMovementType(IDLE_MOTION_TYPE);
@@ -1443,11 +1447,10 @@ public:
                 return;
 
             me->setActive(false);
-            me->SetCanFly(false);
             me->SetDisableGravity(false);
             me->SetHomePosition(SpinestalkerLandPos);
             me->SetFacingTo(SpinestalkerLandPos.GetOrientation());
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
         }
 
         void UpdateAI(uint32 diff) override
@@ -1523,7 +1526,6 @@ public:
 
             if (!_summoned)
             {
-                me->SetCanFly(true);
                 me->SetDisableGravity(true);
             }
         }
@@ -1533,7 +1535,6 @@ public:
             ScriptedAI::JustReachedHome();
             if (_summoned)
             {
-                me->SetCanFly(false);
                 me->SetDisableGravity(false);
             }
         }
@@ -1561,7 +1562,7 @@ public:
                     return;
 
                 me->setActive(true);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                 float moveTime = me->GetExactDist(&RimefangFlyPos) / (me->GetSpeed(MOVE_RUN) * 0.001f);
                 me->m_Events.AddEvent(new FrostwyrmLandEvent(*me, RimefangLandPos), me->m_Events.CalculateTime(uint64(moveTime) + 250));
                 me->SetDefaultMovementType(IDLE_MOTION_TYPE);
@@ -1579,15 +1580,13 @@ public:
             if (point == POINT_FROSTWYRM_LAND)
             {
                 me->setActive(false);
-                me->SetCanFly(false);
                 me->SetDisableGravity(false);
                 me->SetHomePosition(RimefangLandPos);
                 me->SetFacingTo(RimefangLandPos.GetOrientation());
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
             }
             else if (point == POINT_LAND_GROUND)
             {
-                me->SetCanFly(false);
                 me->SetDisableGravity(false);
                 me->SetReactState(REACT_DEFENSIVE);
                 if (Unit* victim = me->SelectVictim())
@@ -1631,15 +1630,13 @@ public:
                         me->SendMeleeAttackStop(me->GetVictim());
 
                         me->AttackStop();
-                        me->SetCanFly(true);
                         me->SetDisableGravity(true);
-                        me->SendMovementFlagUpdate();
                         float floorZ = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
                         float destZ;
                         if (floorZ > 190.0f) destZ = floorZ + 25.0f;
                         else destZ = me->GetPositionZ() + 25.0f;
                         me->GetMotionMaster()->MoveTakeoff(0, me->GetPositionX(), me->GetPositionY(), destZ, me->GetSpeed(MOVE_RUN));
-                        float moveTime = fabs(destZ - me->GetPositionZ()) / (me->GetSpeed(MOVE_RUN) * 0.001f);
+                        float moveTime = std::fabs(destZ - me->GetPositionZ()) / (me->GetSpeed(MOVE_RUN) * 0.001f);
                         _events.ScheduleEvent(EVENT_ICY_BLAST, uint32(moveTime) + urand(60000, 70000));
                         _events.ScheduleEvent(EVENT_ICY_BLAST_CAST, uint32(moveTime) + 250);
                         break;
@@ -1647,7 +1644,7 @@ public:
                 case EVENT_ICY_BLAST_CAST:
                     if (--_icyBlastCounter)
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                         {
                             me->SetFacingToObject(target);
                             me->CastSpell(target, SPELL_ICY_BLAST, false);

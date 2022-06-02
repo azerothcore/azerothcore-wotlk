@@ -1,11 +1,24 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "InstanceScript.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "stratholme.h"
 
 const Position BlackGuardPos[10] =
@@ -147,6 +160,10 @@ public:
                         SaveToDB();
                     }
                     break;
+                case NPC_BARON_RIVENDARE:
+                    events.CancelEvent(EVENT_BARON_TIME);
+                    DoRemoveAurasDueToSpellOnPlayers(SPELL_BARON_ULTIMATUM);
+                    break;
             }
         }
 
@@ -154,55 +171,74 @@ public:
         {
             switch (go->GetEntry())
             {
+                case GO_CRUSADER_SQUARE_DOOR:
+                case GO_HOARD_DOOR:
+                case GO_HALL_OF_HIGH_COMMAND:
+                case GO_GAUNTLET_DOOR_1:
+                case GO_GAUNTLET_DOOR_2:
+                    go->UpdateSaveToDb(true);
+                    break;
                 case GO_ZIGGURAT_DOORS1:
+                    go->UpdateSaveToDb(true);
                     _zigguratDoorsGUID1 = go->GetGUID();
                     if (GetData(TYPE_ZIGGURAT1) >= 1)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_ZIGGURAT_DOORS2:
+                    go->UpdateSaveToDb(true);
                     _zigguratDoorsGUID2 = go->GetGUID();
                     if (GetData(TYPE_ZIGGURAT2) >= 1)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_ZIGGURAT_DOORS3:
+                    go->UpdateSaveToDb(true);
                     _zigguratDoorsGUID3 = go->GetGUID();
                     if (GetData(TYPE_ZIGGURAT3) >= 1)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_GAUNTLET_GATE:
+                    go->UpdateSaveToDb(true);
                     _gauntletGateGUID = go->GetGUID();
                     if (_zigguratState1 == 2 && _zigguratState2 == 2 && _zigguratState3 == 2)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_SLAUGTHER_GATE:
+                    go->UpdateSaveToDb(true);
                     _slaughterGateGUID = go->GetGUID();
                     if (_zigguratState1 == 2 && _zigguratState2 == 2 && _zigguratState3 == 2)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_ZIGGURAT_DOORS4:
+                    go->UpdateSaveToDb(true);
                     _zigguratDoorsGUID4 = go->GetGUID();
                     if (_slaughterProgress == 4)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_ZIGGURAT_DOORS5:
+                    go->UpdateSaveToDb(true);
                     _zigguratDoorsGUID5 = go->GetGUID();
                     if (_slaughterProgress == 4)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_SLAUGHTER_GATE_SIDE:
+                    go->UpdateSaveToDb(true);
                     if (_slaughterProgress >= 2)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_PORT_TRAP_GATE_1:
+                    go->UpdateSaveToDb(true);
                     _trapGatesGUIDs[0] = go->GetGUID();
                     break;
                 case GO_PORT_TRAP_GATE_2:
+                    go->UpdateSaveToDb(true);
                     _trapGatesGUIDs[1] = go->GetGUID();
                     break;
                 case GO_PORT_TRAP_GATE_3:
+                    go->UpdateSaveToDb(true);
                     _trapGatesGUIDs[2] = go->GetGUID();
                     break;
                 case GO_PORT_TRAP_GATE_4:
+                    go->UpdateSaveToDb(true);
                     _trapGatesGUIDs[3] = go->GetGUID();
                     break;
             }
@@ -375,7 +411,7 @@ public:
                     if (Player* player = itr->GetSource())
                     {
                         // should pet also trigger the trap? could not find any source for it
-                        if (player && !player->IsGameMaster() && player->IsWithinDist2d(aGateTrap[i].m_positionX, aGateTrap[i].m_positionY, 5.5f))
+                        if (!player->IsGameMaster() && player->IsWithinDist2d(aGateTrap[i].m_positionX, aGateTrap[i].m_positionY, 5.5f))
                         {
                             // Check if timer was not already set by another player/pet a few milliseconds before
                             if (_gateTrapsCooldown[i])
@@ -495,7 +531,7 @@ public:
                 case EVENT_FORCE_SLAUGHTER_EVENT:
                     {
                         Map::PlayerList const& PlayerList = instance->GetPlayers();
-                        if (!PlayerList.isEmpty())
+                        if (!PlayerList.IsEmpty())
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                 if (Player* player = i->GetSource())
                                     if (player->GetDistance2d(4034.97f, -3402.13f) < 50.0f)

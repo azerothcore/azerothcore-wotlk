@@ -1,14 +1,25 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ACORE_SHAREDDEFINES_H
 #define ACORE_SHAREDDEFINES_H
 
 #include "Define.h"
-#include "DetourNavMesh.h"
+#include "EnumFlag.h"
 #include <cassert>
 
 float const GROUND_HEIGHT_TOLERANCE = 0.05f; // Extra tolerance to z position to check if it is in air or on ground.
@@ -52,30 +63,31 @@ enum Gender
 };
 
 // Race value is index in ChrRaces.dbc
+// EnumUtils: DESCRIBE THIS
 enum Races
 {
-    RACE_NONE           = 0,
-    RACE_HUMAN          = 1,
-    RACE_ORC            = 2,
-    RACE_DWARF          = 3,
-    RACE_NIGHTELF       = 4,
-    RACE_UNDEAD_PLAYER  = 5,
-    RACE_TAUREN         = 6,
-    RACE_GNOME          = 7,
-    RACE_TROLL          = 8,
-    //RACE_GOBLIN         = 9,
-    RACE_BLOODELF       = 10,
-    RACE_DRAENEI        = 11
-                          //RACE_FEL_ORC        = 12,
-                          //RACE_NAGA           = 13,
-                          //RACE_BROKEN         = 14,
-                          //RACE_SKELETON       = 15,
-                          //RACE_VRYKUL         = 16,
-                          //RACE_TUSKARR        = 17,
-                          //RACE_FOREST_TROLL   = 18,
-                          //RACE_TAUNKA         = 19,
-                          //RACE_NORTHREND_SKELETON = 20,
-                          //RACE_ICE_TROLL      = 21
+    RACE_NONE               = 0,  // SKIP
+    RACE_HUMAN              = 1,  // TITLE Human
+    RACE_ORC                = 2,  // TITLE Orc
+    RACE_DWARF              = 3,  // TITLE Dwarf
+    RACE_NIGHTELF           = 4,  // TITLE Night Elf
+    RACE_UNDEAD_PLAYER      = 5,  // TITLE Undead
+    RACE_TAUREN             = 6,  // TITLE Tauren
+    RACE_GNOME              = 7,  // TITLE Gnome
+    RACE_TROLL              = 8,  // TITLE Troll
+    //RACE_GOBLIN             = 9,
+    RACE_BLOODELF           = 10, // TITLE Blood Elf
+    RACE_DRAENEI            = 11 //, TITLE Draenei
+    //RACE_FEL_ORC        = 12,
+    //RACE_NAGA           = 13,
+    //RACE_BROKEN         = 14,
+    //RACE_SKELETON       = 15,
+    //RACE_VRYKUL         = 16,
+    //RACE_TUSKARR        = 17,
+    //RACE_FOREST_TROLL   = 18,
+    //RACE_TAUNKA         = 19,
+    //RACE_NORTHREND_SKELETON = 20,
+    //RACE_ICE_TROLL      = 21
 };
 
 // max+1 for player race
@@ -94,20 +106,21 @@ enum Races
 #define RACEMASK_HORDE RACEMASK_ALL_PLAYABLE & ~RACEMASK_ALLIANCE
 
 // Class value is index in ChrClasses.dbc
+// EnumUtils: DESCRIBE THIS
 enum Classes
 {
-    CLASS_NONE          = 0,
-    CLASS_WARRIOR       = 1,
-    CLASS_PALADIN       = 2,
-    CLASS_HUNTER        = 3,
-    CLASS_ROGUE         = 4,
-    CLASS_PRIEST        = 5,
-    CLASS_DEATH_KNIGHT  = 6,
-    CLASS_SHAMAN        = 7,
-    CLASS_MAGE          = 8,
-    CLASS_WARLOCK       = 9,
+    CLASS_NONE          = 0, // SKIP
+    CLASS_WARRIOR       = 1, // TITLE Warrior
+    CLASS_PALADIN       = 2, // TITLE Paladin
+    CLASS_HUNTER        = 3, // TITLE Hunter
+    CLASS_ROGUE         = 4, // TITLE Rogue
+    CLASS_PRIEST        = 5, // TITLE Priest
+    CLASS_DEATH_KNIGHT  = 6, // TITLE Death Knight
+    CLASS_SHAMAN        = 7, // TITLE Shaman
+    CLASS_MAGE          = 8, // TITLE Mage
+    CLASS_WARLOCK       = 9, // TITLE Warlock
     //CLASS_UNK           = 10,
-    CLASS_DRUID         = 11
+    CLASS_DRUID         = 11 // TITLE Druid
 };
 
 // max+1 for player class
@@ -144,6 +157,60 @@ enum ReputationRank
     REP_HONORED     = 5,
     REP_REVERED     = 6,
     REP_EXALTED     = 7
+};
+
+enum FactionTemplates
+{
+    FACTION_NONE                        = 0,
+    FACTION_CREATURE                    = 7,
+    FACTION_ESCORTEE_A_NEUTRAL_PASSIVE  = 10,
+    FACTION_MONSTER                     = 14,
+    FACTION_MONSTER_2                   = 16,
+    FACTION_BOOTY_BAY                   = 21,
+    FACTION_TROLL_BLOODSCALP            = 28,
+    FACTION_PREY                        = 31,
+    FACTION_ESCORTEE_H_NEUTRAL_PASSIVE  = 33,
+    FACTION_FRIENDLY                    = 35,
+    FACTION_TROLL_FROSTMANE             = 37,
+    FACTION_OGRE                        = 45,
+    FACTION_ORC_DRAGONMAW               = 62,
+    FACTION_HORDE_GENERIC               = 83,
+    FACTION_ALLIANCE_GENERIC            = 84,
+    FACTION_BLACKFATHOM                 = 88,
+    FACTION_DEMON                       = 90,
+    FACTION_ELEMENTAL                   = 91,
+    FACTION_DRAGONFLIGHT_BLACK          = 103,
+    FACTION_ESCORTEE_N_NEUTRAL_PASSIVE  = 113,
+    FACTION_STORMWIND                   = 123,
+    FACTION_ENEMY                       = 168,
+    FACTION_ESCORTEE_A_NEUTRAL_ACTIVE   = 231,
+    FACTION_ESCORTEE_H_NEUTRAL_ACTIVE   = 232,
+    FACTION_ESCORTEE_N_NEUTRAL_ACTIVE   = 250,
+    FACTION_ESCORTEE_N_FRIEND_PASSIVE   = 290,
+    FACTION_TITAN                       = 415,
+    FACTION_ESCORTEE_N_FRIEND_ACTIVE    = 495,
+    FACTION_RATCHET                     = 637,
+    FACTION_GOBLIN_DARK_IRON_BAR_PATRON = 736,
+    FACTION_DARK_IRON_DWARVES           = 754,
+    FACTION_ESCORTEE_A_PASSIVE          = 774,
+    FACTION_ESCORTEE_H_PASSIVE          = 775,
+    FACTION_UNDEAD_SCOURGE              = 974,
+    FACTION_DRAGONKIN                   = 1720,
+    FACTION_EARTHEN_RING                = 1726,
+    FACTION_ALLIANCE_GENERIC_WG         = 1732,
+    FACTION_HORDE_GENERIC_WG            = 1735,
+    FACTION_ARAKKOA                     = 1738,
+    FACTION_ASHTONGUE_DEATHSWORN        = 1820,
+    FACTION_FLAYER_HUNTER               = 1840,
+    FACTION_MONSTER_SPAR_BUDDY          = 1868,
+    FACTION_VALIANCE_EXPEDITION_7       = 1974,
+    FACTION_ESCORTEE_N_ACTIVE           = 1986,
+    FACTION_UNDEAD_SCOURGE_9            = 1988,
+    FACTION_ESCORTEE_H_ACTIVE           = 2046,
+    FACTION_UNDEAD_SCOURGE_2            = 2068,
+    FACTION_UNDEAD_SCOURGE_3            = 2084,
+    FACTION_SCARLET_CRUSADE             = 2089,
+    FACTION_SCARLET_CRUSADE_2           = 2096
 };
 
 #define MIN_REPUTATION_RANK (REP_HATED)
@@ -194,7 +261,7 @@ enum SpellSchools
     SPELL_SCHOOL_ARCANE                 = 6
 };
 
-#define MAX_SPELL_SCHOOL                  7
+constexpr auto MAX_SPELL_SCHOOL = 7;
 
 enum SpellSchoolMask
 {
@@ -267,11 +334,22 @@ const uint32 ItemQualityColors[MAX_ITEM_QUALITY] =
     0xffe6cc80         //LIGHT YELLOW
 };
 
+size_t constexpr MAX_QUEST_DIFFICULTY = 5;
+uint32 constexpr QuestDifficultyColors[MAX_QUEST_DIFFICULTY] =
+{
+    0xff40c040,
+    0xff808080,
+    0xffffff00,
+    0xffff8040,
+    0xffff2020
+};
+
 // ***********************************
 // Spell Attributes definitions
 // ***********************************
 
-enum SpellAttr0
+// EnumUtils: DESCRIBE THIS
+enum SpellAttr0 : uint32
 {
     SPELL_ATTR0_PROC_FAILURE_BURNS_CHARGE        = 0x00000001, // TITLE Unknown attribute 0@Attr0
     SPELL_ATTR0_USES_RANGED_SLOT                 = 0x00000002, // TITLE Treat as ranged attack DESCRIPTION Use ammo, ranged attack range modifiers, ranged haste, etc.
@@ -307,7 +385,8 @@ enum SpellAttr0
     SPELL_ATTR0_NO_AURA_CANCEL                   = 0x80000000  // TITLE Aura cannot be cancelled DESCRIPTION Prevents the player from voluntarily canceling a positive aura
 };
 
-enum SpellAttr1
+// EnumUtils: DESCRIBE THIS
+enum SpellAttr1 : uint32
 {
     SPELL_ATTR1_DISMISS_PET_FIRST                        = 0x00000001, // TITLE Dismiss Pet on cast DESCRIPTION Without this attribute, summoning spells will fail if caster already has a pet
     SPELL_ATTR1_USE_ALL_MANA                             = 0x00000002, // TITLE Drain all power DESCRIPTION Ignores listed power cost and drains entire pool instead
@@ -343,7 +422,8 @@ enum SpellAttr1
     SPELL_ATTR1_CAST_WHEN_LEARNED                        = 0x80000000  // TITLE Unknown attribute 31@Attr1
 };
 
-enum SpellAttr2
+// EnumUtils: DESCRIBE THIS
+enum SpellAttr2 : uint32
 {
     SPELL_ATTR2_ALLOW_DEAD_TARGET                    = 0x00000001, // TITLE Can target dead players or corpses
     SPELL_ATTR2_NO_SHAPESHIFT_UI                     = 0x00000002, // TITLE Unknown attribute 1@Attr2 DESCRIPTION vanish, shadowform, Ghost Wolf and other
@@ -379,7 +459,8 @@ enum SpellAttr2
     SPELL_ATTR2_RETAIN_ITEM_CAST                     = 0x80000000  // TITLE Food buff (client only)
 };
 
-enum SpellAttr3
+// EnumUtils: DESCRIBE THIS
+enum SpellAttr3 : uint32
 {
     SPELL_ATTR3_PVP_ENABLING                          = 0x00000001, // TITLE Unknown attribute 0@Attr3
     SPELL_ATTR3_NO_PROC_EQUIP_REQUIREMENT             = 0x00000002, // TITLE 1 Ignores subclass mask check when checking proc
@@ -415,7 +496,8 @@ enum SpellAttr3
     SPELL_ATTR3_NOT_ON_AOE_IMMUNE                     = 0x80000000  // TITLE Unknown attribute 31@Attr3
 };
 
-enum SpellAttr4
+// EnumUtils: DESCRIBE THIS
+enum SpellAttr4 : uint32
 {
     SPELL_ATTR4_NO_CAST_LOG                        = 0x00000001, // TITLE Cannot be resisted
     SPELL_ATTR4_CLASS_TRIGGER_ONLY_ON_TARGET       = 0x00000002, // TITLE Only proc on self-cast
@@ -451,7 +533,8 @@ enum SpellAttr4
     SPELL_ATTR4_USE_FACING_FROM_SPELL              = 0x80000000  // TITLE Unknown attribute 31@Attr4 DESCRIPTION Polymorph (chicken) 228 and Sonic Boom (38052,38488)
 };
 
-enum SpellAttr5
+// EnumUtils: DESCRIBE THIS
+enum SpellAttr5 : uint32
 {
     SPELL_ATTR5_ALLOW_ACTION_DURING_CHANNEL                    = 0x00000001, // TITLE Can be channeled while moving
     SPELL_ATTR5_NO_REAGENT_COST_WITH_AURA                      = 0x00000002, // TITLE No reagents during arena preparation
@@ -487,7 +570,8 @@ enum SpellAttr5
     SPELL_ATTR5_ADD_MELEE_HIT_RATING                           = 0x80000000  // TITLE Unknown attribute 31@Attr5 DESCRIPTION Forces nearby enemies to attack caster?
 };
 
-enum SpellAttr6
+// EnumUtils: DESCRIBE THIS
+enum SpellAttr6 : uint32
 {
     SPELL_ATTR6_NO_COOLDOWN_ON_TOOLTIP                     = 0x00000001, // TITLE Don't display cooldown (client only)
     SPELL_ATTR6_DO_NOT_RESET_COOLDOWN_IN_ARENA             = 0x00000002, // TITLE Only usable in arena
@@ -523,7 +607,8 @@ enum SpellAttr6
     SPELL_ATTR6_NO_CATEGORY_COOLDOWN_MODS                  = 0x80000000  // TITLE Ignore cooldown modifiers for category cooldown
 };
 
-enum SpellAttr7
+// EnumUtils: DESCRIBE THIS
+enum SpellAttr7 : uint32
 {
     SPELL_ATTR7_ALLOW_SPELL_REFLECTION                        = 0x00000001, // TITLE Unknown attribute 0@Attr7 DESCRIPTION Shaman's new spells (Call of the ...), Feign Death.
     SPELL_ATTR7_NO_TARGET_DURATION_MOD                        = 0x00000002, // TITLE Ignore duration modifiers
@@ -548,11 +633,11 @@ enum SpellAttr7
     SPELL_ATTR7_NO_CLIENT_FAIL_WHILE_STUNNED_FLEEING_CONFUSED = 0x00100000, // TITLE Unknown attribute 20@Attr7 DESCRIPTION Invulnerability related?
     SPELL_ATTR7_RETAIN_COOLDOWN_THROUGH_LOAD                  = 0x00200000, // TITLE Unknown attribute 21@Attr7
     SPELL_ATTR7_IGNORES_COLD_WEATHER_FLYING_REQUIREMENT       = 0x00400000, // TITLE Ignore cold weather flying restriction DESCRIPTION Set for loaner mounts, allows them to be used despite lacking required flight skill
-    SPELL_ATTR7_NO_ATTACK_DODGE                               = 0x00800000, // TITLE Unknown attribute 23@Attr7 DESCRIPTION Motivate, Mutilate, Shattering Throw
-    SPELL_ATTR7_NO_ATTACK_PARRY                               = 0x01000000, // TITLE Unknown attribute 24@Attr7 DESCRIPTION Motivate, Mutilate, Perform Speech, Shattering Throw
-    SPELL_ATTR7_NO_ATTACK_MISS                                = 0x02000000, // TITLE Unknown attribute 25@Attr7
+    SPELL_ATTR7_NO_ATTACK_DODGE                               = 0x00800000, // TITLE Spell cannot be dodged 23@Attr7 DESCRIPTION Motivate, Mutilate, Shattering Throw
+    SPELL_ATTR7_NO_ATTACK_PARRY                               = 0x01000000, // TITLE Spell cannot be parried 24@Attr7 DESCRIPTION Motivate, Mutilate, Perform Speech, Shattering Throw
+    SPELL_ATTR7_NO_ATTACK_MISS                                = 0x02000000, // TITLE Spell cannot be missed 25@Attr7
     SPELL_ATTR7_TREAT_AS_NPC_AOE                              = 0x04000000, // TITLE Unknown attribute 26@Attr7
-    SPELL_ATTR7_BYPASS_NO_RESSURECTION_AURA                   = 0x08000000, // TITLE Unknown attribute 27@Attr7
+    SPELL_ATTR7_BYPASS_NO_RESURRECTION_AURA                   = 0x08000000, // TITLE Bypasses the prevent resurrection aura
     SPELL_ATTR7_DO_NOT_COUNT_FOR_PVP_SCOREBOARD               = 0x10000000, // TITLE Consolidate in raid buff frame (client only)
     SPELL_ATTR7_REFLECTION_ONLY_DEFENDS                       = 0x20000000, // TITLE Unknown attribute 29@Attr7 DESCRIPTION only 69028, 71237
     SPELL_ATTR7_CAN_PROC_FROM_SUPPRESSED_TARGET_PROCS         = 0x40000000, // TITLE Unknown attribute 30@Attr7 DESCRIPTION Burning Determination, Divine Sacrifice, Earth Shield, Prayer of Mending
@@ -822,7 +907,7 @@ enum SpellEffects
     SPELL_EFFECT_CREATE_ITEM_2                      = 157,
     SPELL_EFFECT_MILLING                            = 158,
     SPELL_EFFECT_ALLOW_RENAME_PET                   = 159,
-    SPELL_EFFECT_160                                = 160,
+    SPELL_EFFECT_FORCE_CAST_2                       = 160,
     SPELL_EFFECT_TALENT_SPEC_COUNT                  = 161,
     SPELL_EFFECT_TALENT_SPEC_SELECT                 = 162,
     SPELL_EFFECT_163                                = 163,
@@ -830,7 +915,8 @@ enum SpellEffects
     TOTAL_SPELL_EFFECTS                             = 165
 };
 
-enum SpellCastResult
+// EnumUtils: DESCRIBE THIS
+enum SpellCastResult : uint8
 {
     SPELL_FAILED_SUCCESS = 0,
     SPELL_FAILED_AFFECTING_COMBAT = 1,
@@ -1169,6 +1255,7 @@ enum GhostVisibilityType
 };
 
 // Spell aura states
+// EnumUtils: DESCRIBE THIS
 enum AuraStateType
 {
     // (C) used in caster aura state     (T) used in target aura state
@@ -1204,7 +1291,8 @@ enum AuraStateType
     (1<<(AURA_STATE_CONFLAGRATE-1))|(1<<(AURA_STATE_DEADLY_POISON-1)))
 
 // Spell mechanics
-enum Mechanics
+// EnumUtils: DESCRIBE THIS
+enum Mechanics : uint32
 {
     MECHANIC_NONE             = 0,
     MECHANIC_CHARM            = 1,
@@ -1237,7 +1325,8 @@ enum Mechanics
     MECHANIC_DISCOVERY        = 28,
     MECHANIC_IMMUNE_SHIELD    = 29,                         // Divine (Blessing) Shield/Protection and Ice Block
     MECHANIC_SAPPED           = 30,
-    MECHANIC_ENRAGED          = 31
+    MECHANIC_ENRAGED          = 31,
+    MAX_MECHANIC              = 32 // SKIP
 };
 
 // Used for spell 42292 Immune Movement Impairment and Loss of Control (0x49967ca6)
@@ -1481,7 +1570,7 @@ enum GameobjectTypes
 #define MAX_GAMEOBJECT_TYPE                  36             // sending to client this or greater value can crash client.
 #define MAX_GAMEOBJECT_DATA                  24             // Max number of uint32 vars in gameobject_template data field
 
-enum GameObjectFlags
+enum GameObjectFlags : uint32
 {
     GO_FLAG_IN_USE          = 0x00000001,                   // disables interaction while animated
     GO_FLAG_LOCKED          = 0x00000002,                   // require key, spell, event, etc to be opened. Makes "Locked" appear in tooltip
@@ -1493,6 +1582,8 @@ enum GameObjectFlags
     GO_FLAG_DAMAGED         = 0x00000200,
     GO_FLAG_DESTROYED       = 0x00000400,
 };
+
+DEFINE_ENUM_FLAG(GameObjectFlags);
 
 enum GameObjectDynamicLowFlags
 {
@@ -1769,9 +1860,10 @@ enum TextEmotes
 };
 
 // Emotes.dbc
+// EnumUtils: DESCRIBE THIS
 enum Emote
 {
-    EMOTE_ONESHOT_NONE                  = 0,
+    EMOTE_ONESHOT_NONE                  = 0, // SKIP
     EMOTE_ONESHOT_TALK                  = 1,
     EMOTE_ONESHOT_BOW                   = 2,
     EMOTE_ONESHOT_WAVE                  = 3,
@@ -2463,7 +2555,8 @@ enum LockKeyType
 {
     LOCK_KEY_NONE  = 0,
     LOCK_KEY_ITEM  = 1,
-    LOCK_KEY_SKILL = 2
+    LOCK_KEY_SKILL = 2,
+    LOCK_KEY_SPELL = 3
 };
 
 enum LockType
@@ -2574,7 +2667,7 @@ enum CreatureTypeFlags
     CREATURE_TYPE_FLAG_TAMEABLE                          = 0x00000001,   // Makes the mob tameable (must also be a beast and have family set)
     CREATURE_TYPE_FLAG_VISIBLE_TO_GHOSTS                 = 0x00000002,   // Creature is also visible for not alive player. Allows gossip interaction if npcflag allows?
     CREATURE_TYPE_FLAG_BOSS_MOB                          = 0x00000004,   // Changes creature's visible level to "??" in the creature's portrait - Immune Knockback.
-    CREATURE_TYPE_FLAG_DO_NOT_PLAY_WOUND_PARRY_ANIMATION = 0x00000008,
+    CREATURE_TYPE_FLAG_DO_NOT_PLAY_WOUND_ANIM            = 0x00000008,   // Does not play wound animation on parry
     CREATURE_TYPE_FLAG_NO_FACTION_TOOLTIP                = 0x00000010,
     CREATURE_TYPE_FLAG_MORE_AUDIBLE                      = 0x00000020,   // Sound related
     CREATURE_TYPE_FLAG_SPELL_ATTACKABLE                  = 0x00000040,
@@ -2593,7 +2686,7 @@ enum CreatureTypeFlags
     CREATURE_TYPE_FLAG_COLLIDE_WITH_MISSILES             = 0x00080000,   // Projectiles can collide with this creature - interacts with TARGET_DEST_TRAJ
     CREATURE_TYPE_FLAG_NO_NAME_PLATE                     = 0x00100000,
     CREATURE_TYPE_FLAG_DO_NOT_PLAY_MOUNTED_ANIMATIONS    = 0x00200000,
-    CREATURE_TYPE_FLAG_IS_LINK_ALL                       = 0x00400000,
+    CREATURE_TYPE_FLAG_LINK_ALL                          = 0x00400000,
     CREATURE_TYPE_FLAG_INTERACT_ONLY_WITH_CREATOR        = 0x00800000,
     CREATURE_TYPE_FLAG_DO_NOT_PLAY_UNIT_EVENT_SOUNDS     = 0x01000000,
     CREATURE_TYPE_FLAG_HAS_NO_SHADOW_BLOB                = 0x02000000,
@@ -2602,7 +2695,7 @@ enum CreatureTypeFlags
     CREATURE_TYPE_FLAG_DO_NOT_SHEATHE                    = 0x10000000,
     CREATURE_TYPE_FLAG_DO_NOT_TARGET_ON_INTERACTION      = 0x20000000,
     CREATURE_TYPE_FLAG_DO_NOT_RENDER_OBJECT_NAME         = 0x40000000,
-    CREATURE_TYPE_FLAG_UNIT_IS_QUEST_BOSS                = 0x80000000    // Not verified
+    CREATURE_TYPE_FLAG_QUEST_BOSS                        = 0x80000000    // Not verified
 };
 
 enum CreatureEliteType
@@ -3024,6 +3117,7 @@ enum WeatherType
 
 #define MAX_WEATHER_TYPE 4
 
+// EnumUtils: DESCRIBE THIS
 enum ChatMsg
 {
     CHAT_MSG_ADDON                  = 0xFFFFFFFF,
@@ -3187,6 +3281,11 @@ enum SummonType
 enum EventId
 {
     EVENT_CHARGE            = 1003,
+
+    /// Special charge event which is used for charge spells that have explicit targets
+    /// and had a path already generated - using it in PointMovementGenerator will not
+    /// create a new spline and launch it
+    EVENT_CHARGE_PREPATH    = 1005,
 };
 
 enum ResponseCodes
@@ -3308,8 +3407,27 @@ enum ResponseCodes
     CHAR_NAME_DECLENSION_DOESNT_MATCH_BASE_NAME            = 0x67
 };
 
+enum PvPTeamId
+{
+    PVP_TEAM_HORDE       = 0, // Battleground: Horde,    Arena: Green
+    PVP_TEAM_ALLIANCE    = 1, // Battleground: Alliance, Arena: Gold
+    PVP_TEAM_NEUTRAL     = 2  // Battleground: Neutral,  Arena: None
+};
+
+uint8 constexpr PVP_TEAMS_COUNT = 2;
+
+inline PvPTeamId GetPvPTeamId(TeamId teamId)
+{
+    return teamId == TEAM_ALLIANCE ? PVP_TEAM_ALLIANCE : PVP_TEAM_HORDE;
+}
+
+inline TeamId GetTeamId(PvPTeamId teamId)
+{
+    return teamId == PVP_TEAM_ALLIANCE ? TEAM_ALLIANCE : TEAM_HORDE;
+}
+
 // indexes of BattlemasterList.dbc
-enum BattlegroundTypeId
+enum BattlegroundTypeId : uint8
 {
     BATTLEGROUND_TYPE_NONE     = 0, // None
     BATTLEGROUND_AV            = 1, // Alterac Valley
@@ -3449,7 +3567,7 @@ enum DuelCompleteType
 };
 
 // handle the queue types and bg types separately to enable joining queue for different sized arenas at the same time
-enum BattlegroundQueueTypeId
+enum BattlegroundQueueTypeId : uint8
 {
     BATTLEGROUND_QUEUE_NONE      = 0,
     BATTLEGROUND_QUEUE_AV        = 1,
@@ -3477,7 +3595,7 @@ enum GroupJoinBattlegroundResult
     ERR_BATTLEGROUND_QUEUED_FOR_RATED       = -6,           // You cannot queue for another battle while queued for a rated arena match
     ERR_BATTLEGROUND_TEAM_LEFT_QUEUE        = -7,           // Your team has left the arena queue
     ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND    = -8,           // You can't do that in a battleground.
-    ERR_BATTLEGROUND_JOIN_XP_GAIN           = -9,           // wtf, doesn't exist in client...
+    ERR_BATTLEGROUND_JOIN_XP_GAIN           = -9,           // doesn't exist in client...
     ERR_BATTLEGROUND_JOIN_RANGE_INDEX       = -10,          // Cannot join the queue unless all members of your party are in the same battleground level range.
     ERR_BATTLEGROUND_JOIN_TIMED_OUT         = -11,          // %s was unavailable to join the queue. (ObjectGuid guid exist in client cache)
     ERR_BATTLEGROUND_JOIN_FAILED            = -12,          // Join as a group failed (ObjectGuid guid doesn't exist in client cache)
@@ -3573,6 +3691,19 @@ enum ServerProcessTypes
     SERVER_PROCESS_WORLDSERVER = 1,
 
     NUM_SERVER_PROCESS_TYPES
+};
+
+// Login Failure Reasons
+enum class LoginFailureReason : uint8
+{
+    Failed             = 0,
+    NoWorld            = 1,
+    DuplicateCharacter = 2,
+    NoInstances        = 3,
+    Disabled           = 4,
+    NoCharacter        = 5,
+    LockedForTransfer  = 6,
+    LockedByBilling    = 7
 };
 
 namespace Acore::Impl

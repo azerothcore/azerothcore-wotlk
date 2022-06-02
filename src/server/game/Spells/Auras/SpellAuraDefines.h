@@ -1,8 +1,20 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 #ifndef ACORE_SPELLAURADEFINES_H
 #define ACORE_SPELLAURADEFINES_H
 
@@ -96,7 +108,7 @@ enum AuraType
     SPELL_AURA_TRACK_RESOURCES = 45,
     SPELL_AURA_46 = 46,                                     // Ignore all Gear test spells
     SPELL_AURA_MOD_PARRY_PERCENT = 47,
-    SPELL_AURA_48 = 48,                                     // One periodic spell
+    SPELL_AURA_PERIODIC_TRIGGER_SPELL_FROM_CLIENT = 48, // One periodic spell
     SPELL_AURA_MOD_DODGE_PERCENT = 49,
     SPELL_AURA_MOD_CRITICAL_HEALING_AMOUNT = 50,
     SPELL_AURA_MOD_BLOCK_PERCENT = 51,
@@ -373,4 +385,15 @@ enum AuraObjectType
     UNIT_AURA_TYPE,
     DYNOBJ_AURA_TYPE,
 };
+
+enum AuraRemoveMode
+{
+    AURA_REMOVE_NONE = 0,
+    AURA_REMOVE_BY_DEFAULT = 1,       // scripted remove, remove by stack with aura with different ids and sc aura remove
+    AURA_REMOVE_BY_CANCEL,
+    AURA_REMOVE_BY_ENEMY_SPELL,       // dispel and absorb aura destroy
+    AURA_REMOVE_BY_EXPIRE,            // aura duration has ended
+    AURA_REMOVE_BY_DEATH
+};
+
 #endif

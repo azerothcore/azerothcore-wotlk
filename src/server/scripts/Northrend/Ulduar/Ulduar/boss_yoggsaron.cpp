@@ -1,15 +1,28 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "CreatureAI.h"
 #include "Object.h"
 #include "Opcodes.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "ScriptMgr.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
 #include "ulduar.h"
@@ -386,9 +399,9 @@ public:
             me->SummonCreature(NPC_SANITY_WELL, 1899.94f, 0.330621f, 332.296f, 0.0f);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            if (!_EnterEvadeMode())
+            if (!_EnterEvadeMode(why))
                 return;
 
             Position pos;
@@ -402,13 +415,13 @@ public:
         {
             if (apply)
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
                 me->DisableRotate(false);
                 me->ClearUnitState(UNIT_STATE_ROOT);
             }
             else
             {
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE);
                 me->DisableRotate(true);
                 me->AddUnitState(UNIT_STATE_ROOT);
             }
@@ -471,7 +484,7 @@ public:
             events.ScheduleEvent(EVENT_SARA_P1_SUMMON, 0, 0, EVENT_PHASE_ONE);
             events.SetPhase(EVENT_PHASE_ONE);
 
-            me->MonsterYell("The time to strike at the head of the beast will soon be upon us! Focus your anger and hatred on his minions!", LANG_UNIVERSAL, 0);
+            me->Yell("The time to strike at the head of the beast will soon be upon us! Focus your anger and hatred on his minions!", LANG_UNIVERSAL);
             me->PlayDirectSound(SARA_AGGRO);
             me->setActive(true);
         }
@@ -521,7 +534,7 @@ public:
             uint32 dist = urand(38, 48);
             float o = rand_norm() * M_PI * 2;
             float Zplus = (dist - 38) / 6.5f;
-            if (Creature* cr = me->SummonCreature(entry, me->GetPositionX() + dist * cos(o), me->GetPositionY() + dist * sin(o), 327.2 + Zplus, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
+            if (Creature* cr = me->SummonCreature(entry, me->GetPositionX() + dist * cos(o), me->GetPositionY() + dist * std::sin(o), 327.2 + Zplus, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
             {
                 cr->CastSpell(cr, SPELL_TENTACLE_ERUPT, true);
                 cr->CastSpell(cr, SPELL_VOID_ZONE_SMALL, true);
@@ -536,7 +549,7 @@ public:
                 uint32 dist = urand(38, 48);
                 float o = rand_norm() * M_PI * 2;
                 float Zplus = (dist - 38) / 6.5f;
-                me->SummonCreature(NPC_DEATH_ORB, me->GetPositionX() + dist * cos(o), me->GetPositionY() + dist * sin(o), 327.2 + Zplus, 0, TEMPSUMMON_TIMED_DESPAWN, 20000);
+                me->SummonCreature(NPC_DEATH_ORB, me->GetPositionX() + dist * cos(o), me->GetPositionY() + dist * std::sin(o), 327.2 + Zplus, 0, TEMPSUMMON_TIMED_DESPAWN, 20000);
             }
         }
 
@@ -550,7 +563,7 @@ public:
             {
                 if ((cr = me->SummonCreature(NPC_DESCEND_INTO_MADNESS, yoggPortalLoc[i].x, yoggPortalLoc[i].y, yoggPortalLoc[i].z, 0, TEMPSUMMON_TIMED_DESPAWN, 25000)))
                 {
-                    cr->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE);
+                    cr->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE);
                     cr->SetArmor(_currentIllusion);
                 }
             }
@@ -571,12 +584,12 @@ public:
 
             if (urand(0, 1))
             {
-                me->MonsterYell(_secondPhase ? "Tremble, mortals, before the coming of the end!" : "Yes! YES! Show them no mercy! Give no pause to your attacks!", LANG_UNIVERSAL, 0);
+                me->Yell(_secondPhase ? "Tremble, mortals, before the coming of the end!" : "Yes! YES! Show them no mercy! Give no pause to your attacks!", LANG_UNIVERSAL);
                 me->PlayDirectSound(_secondPhase ? SARA_P2_CAST2 : SARA_P1_CAST1);
             }
             else
             {
-                me->MonsterYell(_secondPhase ? "Suffocate upon your own hate!" : "Let hatred and rage guide your blows!", LANG_UNIVERSAL, 0);
+                me->Yell(_secondPhase ? "Suffocate upon your own hate!" : "Let hatred and rage guide your blows!", LANG_UNIVERSAL);
                 me->PlayDirectSound(_secondPhase ? SARA_P2_CAST1 : SARA_P1_CAST2);
             }
         }
@@ -588,17 +601,17 @@ public:
 
             if (urand(0, 1))
             {
-                me->MonsterYell("Could they have been saved?", LANG_UNIVERSAL, 0);
+                me->Yell("Could they have been saved?", LANG_UNIVERSAL);
                 me->PlayDirectSound(SARA_P1_KILL2);
             }
             else
             {
-                me->MonsterYell("Powerless to act...", LANG_UNIVERSAL, 0);
+                me->Yell("Powerless to act...", LANG_UNIVERSAL);
                 me->PlayDirectSound(SARA_P1_KILL1);
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_SANITY)
                 if (Aura* aur = target->GetAura(SPELL_SANITY))
@@ -693,7 +706,7 @@ public:
                         cr->SetVisible(false);
 
                     _p2TalkTimer++;
-                    me->MonsterYell("I am the lucid dream.", LANG_UNIVERSAL, 0);
+                    me->Yell("I am the lucid dream.", LANG_UNIVERSAL);
                     me->PlayDirectSound(SARA_P2_START);
                 }
                 return;
@@ -723,7 +736,7 @@ public:
             if (!SelectTargetFromPlayerList(90, SPELL_INSANE1))
             {
                 m_pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_INSANE1);
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 return;
             }
 
@@ -734,18 +747,18 @@ public:
                 {
                     EntryCheckPredicate pred(NPC_OMINOUS_CLOUD);
                     summons.DoAction(ACTION_UNSUMMON_CLOUDS, pred);
-                    me->MonsterYell("The monster in your nightmares.", LANG_UNIVERSAL, 0);
+                    me->Yell("The monster in your nightmares.", LANG_UNIVERSAL);
                     _p2TalkTimer = 20000;
                 }
                 else if (_p2TalkTimer >= 25000 && _p2TalkTimer < 40000)
                 {
                     summons.DespawnEntry(NPC_OMINOUS_CLOUD);
-                    me->MonsterYell("The fiend of a thousand faces.", LANG_UNIVERSAL, 0);
+                    me->Yell("The fiend of a thousand faces.", LANG_UNIVERSAL);
                     _p2TalkTimer = 40000;
                 }
                 else if (_p2TalkTimer >= 44500 && _p2TalkTimer < 60000)
                 {
-                    me->MonsterYell("Cower before my true form.", LANG_UNIVERSAL, 0);
+                    me->Yell("Cower before my true form.", LANG_UNIVERSAL);
                     _p2TalkTimer = 60000;
                 }
                 else if (_p2TalkTimer >= 64000)
@@ -782,7 +795,7 @@ public:
                 case EVENT_SARA_P1_SPELLS:
                     {
                         uint32 spell = RAND(SPELL_SARAS_ANGER_TARGET_SELECTOR, SPELL_SARAS_BLESSING_TARGET_SELECTOR, SPELL_SARAS_FAVOR_TARGET_SELECTOR);
-                        me->CastSpell(me, spell, false);
+                        me->CastCustomSpell(spell, SPELLVALUE_MAX_TARGETS, 1, nullptr, false);
                         SpellSounds();
                         events.RepeatEvent(me->GetMap()->Is25ManRaid() ? urand(0, 3000) : 4000 + urand(0, 2000));
                         break;
@@ -934,7 +947,7 @@ public:
                 for (uint8 i = 0; i <= dist; ++i)
                 {
                     float angle = M_PI * 2 / dist * i;
-                    AddWaypoint(i, Middle.GetPositionX() + dist * cos(angle), Middle.GetPositionY() + dist * sin(angle), me->GetPositionZ(), 0);
+                    AddWaypoint(i, Middle.GetPositionX() + dist * cos(angle), Middle.GetPositionY() + dist * std::sin(angle), me->GetPositionZ(), 0);
                 }
             }
             else
@@ -942,7 +955,7 @@ public:
                 for (uint8 i = 0; i <= dist; ++i)
                 {
                     float angle = M_PI * 2 - (M_PI * 2 / dist * i);
-                    AddWaypoint(i, Middle.GetPositionX() + dist * cos(angle), Middle.GetPositionY() + dist * sin(angle), me->GetPositionZ(), 0);
+                    AddWaypoint(i, Middle.GetPositionX() + dist * cos(angle), Middle.GetPositionY() + dist * std::sin(angle), me->GetPositionZ(), 0);
                 }
             }
         }
@@ -1058,7 +1071,7 @@ public:
             uint32 dist = urand(38, 48);
             float o = rand_norm() * M_PI * 2;
             float Zplus = (dist - 38) / 6.5f;
-            me->SummonCreature(NPC_IMMORTAL_GUARDIAN, me->GetPositionX() + dist * cos(o), me->GetPositionY() + dist * sin(o), 327.2 + Zplus, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
+            me->SummonCreature(NPC_IMMORTAL_GUARDIAN, me->GetPositionX() + dist * cos(o), me->GetPositionY() + dist * std::sin(o), 327.2 + Zplus, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
         }
 
         void JustDied(Unit*  /*who*/) override
@@ -1066,7 +1079,7 @@ public:
             summons.DespawnAll();
             events.Reset();
 
-            me->MonsterYell("Your fate is sealed. The end of days is finally upon you and ALL who inhabit this miserable little seedling. Uulwi ifis halahs gag erh'ongg w'ssh.", LANG_UNIVERSAL, 0);
+            me->Yell("Your fate is sealed. The end of days is finally upon you and ALL who inhabit this miserable little seedling. Uulwi ifis halahs gag erh'ongg w'ssh.", LANG_UNIVERSAL);
             me->PlayDirectSound(YS_P3_DEATH);
 
             if (m_pInstance)
@@ -1099,15 +1112,15 @@ public:
                 me->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
                 me->SetInCombatWithZone();
 
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_PACIFIED);
+                me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_PACIFIED);
             }
             else if (param == ACTION_YOGG_SARON_START_YELL)
             {
-                me->MonsterYell("BOW DOWN BEFORE THE GOD OF DEATH!", LANG_UNIVERSAL, 0);
+                me->Yell("BOW DOWN BEFORE THE GOD OF DEATH!", LANG_UNIVERSAL);
             }
             else if (param == ACTION_YOGG_SARON_OPEN_PORTAL_YELL)
             {
-                me->MonsterYell("MADNESS WILL CONSUME YOU!", LANG_UNIVERSAL, 0);
+                me->Yell("MADNESS WILL CONSUME YOU!", LANG_UNIVERSAL);
                 me->PlayDirectSound(YS_OPEN_PORTALS);
             }
             else if (param == ACTION_YOGG_SARON_START_P3)
@@ -1122,7 +1135,7 @@ public:
                 events.ScheduleEvent(EVENT_YS_SUMMON_GUARDIAN, 0);
                 _thirdPhase = true;
 
-                me->MonsterYell("Look upon the true face of death and know that your end comes soon!", LANG_UNIVERSAL, 0);
+                me->Yell("Look upon the true face of death and know that your end comes soon!", LANG_UNIVERSAL);
                 me->PlayDirectSound(YS_P3_START);
             }
             else if (param == ACTION_YOGG_SARON_HARD_MODE)
@@ -1150,7 +1163,7 @@ public:
             return 0;
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_IN_THE_MAWS_OF_THE_OLD_GOD)
                 me->AddLootMode(32);
@@ -1168,14 +1181,14 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_YS_LUNATIC_GAZE:
-                    me->MonsterYell("Hoohehehahahaha... AHAHAHAHAHAHA!", LANG_UNIVERSAL, 0);
+                    me->Yell("Hoohehehahahaha... AHAHAHAHAHAHA!", LANG_UNIVERSAL);
                     me->PlayDirectSound(YS_P3_LUNATIC_GAZE);
                     me->CastSpell(me, SPELL_LUNATIC_GAZE_YS, true);
                     events.RepeatEvent(12000);
                     break;
                 case EVENT_YS_DEAFENING_ROAR:
-                    me->MonsterTextEmote("Yogg-Saron opens his mouth wide!", 0, true);
-                    me->MonsterYell("Eternal suffering awaits!", LANG_UNIVERSAL, 0);
+                    me->TextEmote("Yogg-Saron opens his mouth wide!", nullptr, true);
+                    me->Yell("Eternal suffering awaits!", LANG_UNIVERSAL);
                     me->PlayDirectSound(YS_P3_DEAFENING_ROAR);
                     me->CastSpell(me, SPELL_DEAFENING_ROAR, false);
                     events.RepeatEvent(50000);
@@ -1720,26 +1733,42 @@ class boss_yoggsaron_descend_portal : public CreatureScript
 public:
     boss_yoggsaron_descend_portal() : CreatureScript("boss_yoggsaron_descend_portal") { }
 
-    bool OnGossipHello(Player* player, Creature* creature) override
+    struct boss_yoggsaron_descend_portalAI : public PassiveAI
     {
-        if (!creature->GetUInt32Value(UNIT_NPC_FLAGS))
-            return true;
-        switch (creature->GetArmor())
+        boss_yoggsaron_descend_portalAI(Creature* creature) : PassiveAI(creature), _instance(creature->GetInstanceScript()) {}
+
+        void OnSpellClick(Unit* clicker, bool& spellClickHandled) override
         {
-            case ACTION_ILLUSION_DRAGONS:
-                player->CastSpell(player, SPELL_TELEPORT_TO_CHAMBER, true);
-                break;
-            case ACTION_ILLUSION_ICECROWN:
-                player->CastSpell(player, SPELL_TELEPORT_TO_ICECROWN, true);
-                break;
-            case ACTION_ILLUSION_STORMWIND:
-                player->CastSpell(player, SPELL_TELEPORT_TO_STORMWIND, true);
-                break;
+            if (!spellClickHandled)
+                return;
+
+            if (!me->GetUInt32Value(UNIT_NPC_FLAGS))
+                return;
+
+            switch (me->GetArmor())
+            {
+                case ACTION_ILLUSION_DRAGONS:
+                    clicker->CastSpell(clicker, SPELL_TELEPORT_TO_CHAMBER, true);
+                    break;
+                case ACTION_ILLUSION_ICECROWN:
+                    clicker->CastSpell(clicker, SPELL_TELEPORT_TO_ICECROWN, true);
+                    break;
+                case ACTION_ILLUSION_STORMWIND:
+                    clicker->CastSpell(clicker, SPELL_TELEPORT_TO_STORMWIND, true);
+                    break;
+            }
+
+            me->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+            me->DespawnOrUnsummon(1000);
         }
 
-        creature->SetUInt32Value(UNIT_NPC_FLAGS, 0);
-        creature->DespawnOrUnsummon(1000);
-        return true;
+    private:
+        InstanceScript* _instance;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetUlduarAI<boss_yoggsaron_descend_portalAI>(creature);
     }
 };
 
@@ -1769,7 +1798,7 @@ public:
         void JustDied(Unit*) override
         {
             if (me->IsSummon())
-                if (Unit* sara = me->ToTempSummon()->GetSummoner())
+                if (Unit* sara = me->ToTempSummon()->GetSummonerUnit())
                     sara->GetAI()->DoAction(ACTION_INFLUENCE_TENTACLE_DIED);
         }
     };
@@ -1814,7 +1843,7 @@ public:
                 damage = me->GetHealth() - 1;
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
+        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_SHADOW_BEACON)
                 caster->GetAI()->DoAction(ACTION_YOGG_SARON_SHADOW_BEACON);
@@ -1919,10 +1948,10 @@ public:
             else
                 return;
 
-            PlaySound(soundId);
+            Playsound(soundId);
         }
 
-        void PlaySound(uint32 soundId)
+        void Playsound(uint32 soundId)
         {
             WorldPacket data(SMSG_PLAY_SOUND, 4);
             data << uint32(soundId);
@@ -2033,10 +2062,10 @@ public:
             else
                 return;
 
-            PlaySound(soundId);
+            Playsound(soundId);
         }
 
-        void PlaySound(uint32 soundId)
+        void Playsound(uint32 soundId)
         {
             WorldPacket data(SMSG_PLAY_SOUND, 4);
             data << uint32(soundId);
@@ -2067,7 +2096,7 @@ public:
                         NextStep(2000);
                         break;
                     case 2:
-                        PlaySound(GAR_2);
+                        Playsound(GAR_2);
                         NextStep(6500);
                         break;
                     case 3:
@@ -2079,7 +2108,7 @@ public:
                         NextStep(2500);
                         break;
                     case 5:
-                        PlaySound(YS_V1_2);
+                        Playsound(YS_V1_2);
                         NextStep(2500);
                         break;
                     case 6:
@@ -2153,10 +2182,10 @@ public:
             else
                 return;
 
-            PlaySound(soundId);
+            Playsound(soundId);
         }
 
-        void PlaySound(uint32 soundId)
+        void Playsound(uint32 soundId)
         {
             WorldPacket data(SMSG_PLAY_SOUND, 4);
             data << uint32(soundId);
@@ -2234,7 +2263,7 @@ public:
             me->CastSpell(me, SPELL_INSANE_PERIODIC, true);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_INSANE1)
             {
@@ -2261,7 +2290,7 @@ public:
                         if (Player* player = ObjectAccessor::GetPlayer(*me, _guid))
                         {
                             me->PlayDirectSound(15760, player);
-                            me->MonsterWhisper("Destroy them minion, your master commands it!", player, false);
+                            me->Whisper("Destroy them minion, your master commands it!", LANG_UNIVERSAL, player);
                         }
                         break;
                     }
@@ -2270,6 +2299,7 @@ public:
     };
 };
 
+// 63830, 63881 - Malady of the Mind
 class spell_yogg_saron_malady_of_the_mind : public SpellScriptLoader
 {
 public:
@@ -2303,6 +2333,7 @@ public:
     }
 };
 
+// 63802 - Brain Link
 class spell_yogg_saron_brain_link : public SpellScriptLoader
 {
 public:
@@ -2346,7 +2377,7 @@ public:
             }
 
             Unit* _target = ObjectAccessor::GetUnit(*owner, _targetGUID);
-            if (!_target || !_target->IsAlive() || fabs(owner->GetPositionZ() - _target->GetPositionZ()) > 10.0f) // Target or owner underground
+            if (!_target || !_target->IsAlive() || std::fabs(owner->GetPositionZ() - _target->GetPositionZ()) > 10.0f) // Target or owner underground
             {
                 SetDuration(0);
                 return;
@@ -2404,6 +2435,7 @@ public:
     }
 };
 
+// 64465 - Shadow Beacon
 class spell_yogg_saron_shadow_beacon : public SpellScriptLoader
 {
     public:
@@ -2442,6 +2474,7 @@ class spell_yogg_saron_shadow_beacon : public SpellScriptLoader
         }
 };
 
+// 65206 - Destabilization Matrix
 class spell_yogg_saron_destabilization_matrix : public SpellScriptLoader
 {
 public:
@@ -2486,6 +2519,7 @@ public:
     }
 };
 
+// 64172 - Titanic Storm
 class spell_yogg_saron_titanic_storm : public SpellScriptLoader
 {
 public:
@@ -2530,6 +2564,7 @@ public:
     }
 };
 
+// 64164, 64168 - Lunatic Gaze
 class spell_yogg_saron_lunatic_gaze : public SpellScriptLoader
 {
 public:
@@ -2563,7 +2598,7 @@ public:
     }
 };
 
-// Protective Gaze
+// 64174 - Protective Gaze
 class spell_yogg_saron_protective_gaze : public SpellScriptLoader
 {
 public:
@@ -2603,6 +2638,7 @@ public:
     }
 };
 
+// 64161 - Empowered
 class spell_yogg_saron_empowered : public SpellScriptLoader
 {
 public:
@@ -2641,6 +2677,7 @@ public:
     }
 };
 
+// 64555 - Insane Periodic
 class spell_yogg_saron_insane_periodic_trigger : public SpellScriptLoader
 {
 public:
@@ -2659,7 +2696,7 @@ public:
 
             Unit* caster = GetCaster();
             caster->PlayDirectSound(VOYS_INSANE1, target);
-            caster->MonsterWhisper("Your will is no longer you own...", target, false);
+            caster->Whisper("Your will is no longer you own...", LANG_UNIVERSAL, target);
             caster->CastSpell(target, SPELL_INSANE1, true);
             target->CastSpell(target, SPELL_INSANE2, true);
         }
@@ -2689,6 +2726,7 @@ public:
     }
 };
 
+// 63120 - Insane
 class spell_yogg_saron_insane : public SpellScriptLoader
 {
 public:
@@ -2715,6 +2753,7 @@ public:
     }
 };
 
+// 64169 - Sanity Well
 class spell_yogg_saron_sanity_well : public SpellScriptLoader
 {
 public:
@@ -2753,6 +2792,14 @@ public:
     }
 };
 
+/* 63881 - Malady of the Mind
+   63795 - Psychosis
+   63830 - Malady of the Mind
+   64164 - Lunatic Gaze
+   64059 - Induce Madness
+   63803 - Brain Link
+   65301 - Psychosis
+   64168 - Lunatic Gaze */
 class spell_yogg_saron_sanity_reduce : public SpellScriptLoader
 {
 public:
@@ -2823,6 +2870,7 @@ public:
     }
 };
 
+// 64467 - Empowering Shadows
 class spell_yogg_saron_empowering_shadows : public SpellScriptLoader
 {
 public:
@@ -2851,6 +2899,7 @@ public:
     }
 };
 
+// 64184 - In the Maws of the Old God
 class spell_yogg_saron_in_the_maws_of_the_old_god : public SpellScriptLoader
 {
 public:
@@ -2888,7 +2937,10 @@ public:
     }
 };
 
-class spell_yogg_saron_target_selectors : public SpellScriptLoader    // 63744, 63745, 63747, 65206
+/* 63744 - Sara's Anger
+   63747 - Sara's Fervor
+   63745 - Sara's Blessing */
+class spell_yogg_saron_target_selectors : public SpellScriptLoader
 {
 public:
     spell_yogg_saron_target_selectors() : SpellScriptLoader("spell_yogg_saron_target_selectors") { }
@@ -2918,7 +2970,8 @@ public:
     }
 };
 
-class spell_yogg_saron_grim_reprisal : public SpellScriptLoader     // 63305
+// 63305 - Grim Reprisal
+class spell_yogg_saron_grim_reprisal : public SpellScriptLoader
 {
 public:
     spell_yogg_saron_grim_reprisal() : SpellScriptLoader("spell_yogg_saron_grim_reprisal") { }
@@ -2934,8 +2987,15 @@ public:
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
-            int32 damage = CalculatePct(int32(eventInfo.GetDamageInfo()->GetDamage()), 60);
-            GetTarget()->CastCustomSpell(SPELL_GRIM_REPRISAL_DAMAGE, SPELLVALUE_BASE_POINT0, damage, eventInfo.GetDamageInfo()->GetAttacker(), true, nullptr, aurEff);
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo || !damageInfo->GetDamage())
+            {
+                return;
+            }
+
+            int32 damage = CalculatePct(static_cast<int32>(damageInfo->GetDamage()), 60);
+            GetTarget()->CastCustomSpell(SPELL_GRIM_REPRISAL_DAMAGE, SPELLVALUE_BASE_POINT0, damage, damageInfo->GetAttacker(), true, nullptr, aurEff);
         }
 
         void Register() override

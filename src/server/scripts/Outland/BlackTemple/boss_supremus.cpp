@@ -1,10 +1,23 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "black_temple.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "black_temple.h"
 
 enum Supremus
 {
@@ -98,7 +111,7 @@ public:
             if (summon->GetEntry() == NPC_SUPREMUS_PUNCH_STALKER)
             {
                 summon->ToTempSummon()->InitStats(20000);
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                     summon->GetMotionMaster()->MoveFollow(target, 0.0f, 0.0f, MOTION_SLOT_CONTROLLED);
             }
             else
@@ -113,7 +126,7 @@ public:
         Unit* FindHatefulStrikeTarget()
         {
             Unit* target = nullptr;
-            ThreatContainer::StorageType const& threatlist = me->getThreatManager().getThreatList();
+            ThreatContainer::StorageType const& threatlist = me->GetThreatMgr().getThreatList();
             for (ThreatContainer::StorageType::const_iterator i = threatlist.begin(); i != threatlist.end(); ++i)
             {
                 Unit* unit = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid());
@@ -152,7 +165,7 @@ public:
                     SchedulePhase(!me->HasAura(SPELL_SNARE_SELF));
                     break;
                 case EVENT_SWITCH_TARGET:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                     {
                         DoResetThreat();
                         me->AddThreat(target, 5000000.0f);
@@ -171,7 +184,7 @@ public:
                     events.ScheduleEvent(EVENT_CHECK_DIST, 1, EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_SPELL_VOLCANIC_ERUPTION:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                     {
                         me->CastSpell(target, SPELL_VOLCANIC_ERUPTION, true);
                         Talk(EMOTE_GROUND_CRACK);
@@ -181,7 +194,6 @@ public:
             }
 
             DoMeleeAttackIfReady();
-            EnterEvadeIfOutOfCombatArea();
         }
 
         bool CheckEvadeIfOutOfCombatArea() const override

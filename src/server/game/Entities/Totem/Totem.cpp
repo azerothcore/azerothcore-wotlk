@@ -1,18 +1,28 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Totem.h"
 #include "Group.h"
 #include "ObjectMgr.h"
-#include "Opcodes.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
-#include "Totem.h"
-#include "WorldPacket.h"
+#include "TotemPackets.h"
 
 Totem::Totem(SummonPropertiesEntry const* properties, ObjectGuid owner) : Minion(properties, owner, false)
 {
@@ -46,14 +56,15 @@ void Totem::InitStats(uint32 duration)
     // Xinef: Set level for Unit totems
     if (Unit* owner = ObjectAccessor::GetUnit(*this, m_owner))
     {
-        if (owner->GetTypeId() == TYPEID_PLAYER && m_Properties->Slot >= SUMMON_SLOT_TOTEM && m_Properties->Slot < MAX_TOTEM_SLOT)
+        uint32 slot = m_Properties->Slot;
+        if (owner->GetTypeId() == TYPEID_PLAYER && slot >= SUMMON_SLOT_TOTEM && slot < MAX_TOTEM_SLOT)
         {
-            WorldPacket data(SMSG_TOTEM_CREATED, 1 + 8 + 4 + 4);
-            data << uint8(m_Properties->Slot - 1);
-            data << GetGUID();
-            data << uint32(duration);
-            data << uint32(GetUInt32Value(UNIT_CREATED_BY_SPELL));
-            owner->ToPlayer()->SendDirectMessage(&data);
+            WorldPackets::Totem::TotemCreated data;
+            data.Totem = GetGUID();
+            data.Slot = slot - SUMMON_SLOT_TOTEM;
+            data.Duration = duration;
+            data.SpellID = GetUInt32Value(UNIT_CREATED_BY_SPELL);
+            owner->ToPlayer()->SendDirectMessage(data.Write());
 
             // set display id depending on caster's race
             SetDisplayId(owner->GetModelForTotem(PlayerTotemType(m_Properties->Id)));
@@ -86,9 +97,16 @@ void Totem::InitSummon()
     {
         SetReactState(REACT_AGGRESSIVE);
         GetOwner()->CastSpell(this, 6277, true);
+
+        // Farsight objects should be active
+        setActive(true);
+        SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
     }
 
-    this->GetMotionMaster()->MoveFall();
+    if (!IsInWater())
+    {
+        GetMotionMaster()->MoveFall();
+    }
 }
 
 void Totem::UnSummon(uint32 msTime)

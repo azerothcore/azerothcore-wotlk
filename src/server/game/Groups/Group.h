@@ -1,17 +1,29 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef AZEROTHCORE_GROUP_H
 #define AZEROTHCORE_GROUP_H
 
 #include "DBCEnums.h"
-#include "GroupRefManager.h"
+#include "GroupRefMgr.h"
 #include "LootMgr.h"
 #include "QueryResult.h"
 #include "SharedDefines.h"
+#include <functional>
 
 class Battlefield;
 class Battleground;
@@ -197,12 +209,13 @@ public:
 
     // properties accessories
     bool IsFull() const;
-    bool isLFGGroup()  const;
+    bool isLFGGroup(bool restricted = false)  const;
     bool isRaidGroup() const;
     bool isBFGroup()   const;
     bool isBGGroup()   const;
     bool IsCreated()   const;
     ObjectGuid GetLeaderGUID() const;
+    Player* GetLeader();
     ObjectGuid GetGUID() const;
     const char* GetLeaderName() const;
     LootMethod GetLootMethod() const;
@@ -231,7 +244,7 @@ public:
 
     uint8 GetMemberGroup(ObjectGuid guid) const;
 
-    void ConvertToLFG();
+    void ConvertToLFG(bool restricted = true);
     void ConvertToRaid();
 
     void SetBattlegroundGroup(Battleground* bg);
@@ -258,8 +271,8 @@ public:
     void SendUpdateToPlayer(ObjectGuid playerGUID, MemberSlot* slot = nullptr);
     void UpdatePlayerOutOfRange(Player* player);
     // ignore: GUID of player that will be ignored
-    void BroadcastPacket(WorldPacket* packet, bool ignorePlayersInBGRaid, int group = -1, ObjectGuid ignore = ObjectGuid::Empty);
-    void BroadcastReadyCheck(WorldPacket* packet);
+    void BroadcastPacket(WorldPacket const* packet, bool ignorePlayersInBGRaid, int group = -1, ObjectGuid ignore = ObjectGuid::Empty);
+    void BroadcastReadyCheck(WorldPacket const* packet);
     void OfflineReadyCheck();
 
     /*********************************************************/
@@ -298,13 +311,10 @@ public:
     bool IsLfgHeroic() const { return isLFGGroup() && (m_lfgGroupFlags & GROUP_LFG_FLAG_IS_HEROIC); }
 
     // Difficulty Change
-    uint32 GetDifficultyChangePreventionTime() const { return _difficultyChangePreventionTime > time(nullptr) ? _difficultyChangePreventionTime - time(nullptr) : 0; }
+    uint32 GetDifficultyChangePreventionTime() const;
     DifficultyPreventionChangeType GetDifficultyChangePreventionReason() const { return _difficultyChangePreventionType; }
-    void SetDifficultyChangePrevention(DifficultyPreventionChangeType type)
-    {
-        _difficultyChangePreventionTime = time(nullptr) + MINUTE;
-        _difficultyChangePreventionType = type;
-    }
+    void SetDifficultyChangePrevention(DifficultyPreventionChangeType type);
+    void DoForAllMembers(std::function<void(Player*)> const& worker);
 
 protected:
     void _homebindIfInstance(Player* player);
@@ -318,7 +328,7 @@ protected:
     void ToggleGroupMemberFlag(member_witerator slot, uint8 flag, bool apply);
 
     MemberSlotList      m_memberSlots;
-    GroupRefManager     m_memberMgr;
+    GroupRefMgr     m_memberMgr;
     InvitesList         m_invitees;
     ObjectGuid          m_leaderGuid;
     std::string         m_leaderName;

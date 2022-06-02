@@ -1,15 +1,28 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
-#include "ulduar.h"
 #include "Vehicle.h"
+#include "ulduar.h"
 
 enum KologarnSays
 {
@@ -172,9 +185,9 @@ public:
                 ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            if (!_EnterEvadeMode())
+            if (!_EnterEvadeMode(why))
                 return;
             Reset();
             me->setActive(false);
@@ -222,24 +235,26 @@ public:
             _looksAchievement = true;
 
             me->SetDisableGravity(true);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+            me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE);
             me->DisableRotate(true);
 
             events.Reset();
             summons.DespawnAll();
 
             if (m_pInstance)
+            {
                 m_pInstance->SetData(TYPE_KOLOGARN, NOT_STARTED);
+
+                // Open the door inside Kologarn chamber
+                if (GameObject* door = m_pInstance->instance->GetGameObject(m_pInstance->GetGuidData(GO_KOLOGARN_DOORS)))
+                    door->SetGoState(GO_STATE_ACTIVE);
+            }
 
             AttachLeftArm();
             AttachRightArm();
 
             // Reset breath on pull
             breathReady = false;
-
-            // Open the door inside Kologarn chamber
-            if (GameObject* door = me->FindNearestGameObject(GO_KOLOGARN_DOORS, 100.0f))
-                door->SetGoState(GO_STATE_ACTIVE);
         }
 
         void DoAction(int32 param) override
@@ -288,6 +303,13 @@ public:
 
             Talk(SAY_DEATH);
 
+            if (m_pInstance)
+            {
+                // Open the door inside Kologarn chamber
+                if (GameObject* door = m_pInstance->instance->GetGameObject(m_pInstance->GetGuidData(GO_KOLOGARN_DOORS)))
+                    door->SetGoState(GO_STATE_ACTIVE);
+            }
+
             if (GameObject* bridge = me->FindNearestGameObject(GO_KOLOGARN_BRIDGE, 100))
                 bridge->SetGoState(GO_STATE_READY);
 
@@ -296,7 +318,8 @@ public:
             {
                 me->RemoveGameObject(go, false);
                 go->SetSpellId(1); // hack to make it despawn
-                go->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
+                go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
+                go->SetLootRecipient(me);
             }
             if (Creature* arm = ObjectAccessor::GetCreature(*me, _left))
                 arm->DespawnOrUnsummon(3000); // visual
@@ -370,15 +393,20 @@ public:
             me->setActive(true);
 
             // Close the door inside Kologarn chamber
-            if (GameObject* door = me->FindNearestGameObject(GO_KOLOGARN_DOORS, 100.0f))
-                door->SetGoState(GO_STATE_READY);
+            if (m_pInstance)
+            {
+                if (GameObject* door = m_pInstance->instance->GetGameObject(m_pInstance->GetGuidData(GO_KOLOGARN_DOORS)))
+                {
+                    door->SetGoState(GO_STATE_READY);
+                }
+            }
         }
 
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 return;
             }
 
@@ -435,7 +463,7 @@ public:
                 {
                     events.ScheduleEvent(EVENT_FOCUSED_EYEBEAM, 20000);
 
-                    if ((eyebeamTarget = SelectTarget(SELECT_TARGET_FARTHEST, 0, 0, true)))
+                    if ((eyebeamTarget = SelectTarget(SelectTargetMethod::MinDistance, 0, 0, true)))
                     {
                         me->CastSpell(eyebeamTarget, SPELL_FOCUSED_EYEBEAM_SUMMON, false);
                     }
@@ -496,7 +524,7 @@ public:
         int32 _damageDone;
         bool _combatStarted;
 
-        void EnterEvadeMode() override {}
+        void EnterEvadeMode(EvadeReason /*why*/ = EVADE_REASON_OTHER) override {}
         void MoveInLineOfSight(Unit*) override {}
         void AttackStart(Unit*) override {}
         void UpdateAI(uint32  /*diff*/) override {}
@@ -635,14 +663,14 @@ public:
 };
 
 // predicate function to select non main tank target
-class StoneGripTargetSelector : public Acore::unary_function<Unit*, bool>
+class StoneGripTargetSelector
 {
 public:
     StoneGripTargetSelector(Creature* me, Unit const* victim) : _me(me), _victim(victim) {}
 
     bool operator() (WorldObject* target) const
     {
-        if (target == _victim && _me->getThreatManager().getThreatList().size() > 1)
+        if (target == _victim && _me->GetThreatMgr().getThreatList().size() > 1)
             return true;
 
         if (target->GetTypeId() != TYPEID_PLAYER)
@@ -651,6 +679,7 @@ public:
         return false;
     }
 
+private:
     Creature* _me;
     Unit const* _victim;
 };

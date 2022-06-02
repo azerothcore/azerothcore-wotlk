@@ -1,13 +1,24 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "CharacterDatabaseCleaner.h"
 #include "Common.h"
-#include "Database/DatabaseEnv.h"
 #include "DBCStores.h"
+#include "Database/DatabaseEnv.h"
 #include "Log.h"
 #include "SpellMgr.h"
 #include "World.h"
@@ -23,11 +34,11 @@ void CharacterDatabaseCleaner::CleanDatabase()
     uint32 oldMSTime = getMSTime();
 
     // check flags which clean ups are necessary
-    QueryResult result = CharacterDatabase.PQuery("SELECT value FROM worldstates WHERE entry = %d", WS_CLEANING_FLAGS);
+    QueryResult result = CharacterDatabase.Query("SELECT value FROM worldstates WHERE entry = {}", WS_CLEANING_FLAGS);
     if (!result)
         return;
 
-    uint32 flags = (*result)[0].GetUInt32();
+    uint32 flags = (*result)[0].Get<uint32>();
 
     // clean up
     if (flags & CLEANING_FLAG_ACHIEVEMENT_PROGRESS)
@@ -48,20 +59,20 @@ void CharacterDatabaseCleaner::CleanDatabase()
     // NOTE: In order to have persistentFlags be set in worldstates for the next cleanup,
     // you need to define them at least once in worldstates.
     flags &= sWorld->getIntConfig(CONFIG_PERSISTENT_CHARACTER_CLEAN_FLAGS);
-    CharacterDatabase.DirectPExecute("UPDATE worldstates SET value = %u WHERE entry = %d", flags, WS_CLEANING_FLAGS);
+    CharacterDatabase.DirectExecute("UPDATE worldstates SET value = {} WHERE entry = {}", flags, WS_CLEANING_FLAGS);
 
     sWorld->SetCleaningFlags(flags);
 
-    LOG_INFO("server.loading", ">> Cleaned character database in %u ms", GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Cleaned character database in {} ms", GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
 void CharacterDatabaseCleaner::CheckUnique(const char* column, const char* table, bool (*check)(uint32))
 {
-    QueryResult result = CharacterDatabase.PQuery("SELECT DISTINCT %s FROM %s", column, table);
+    QueryResult result = CharacterDatabase.Query("SELECT DISTINCT {} FROM {}", column, table);
     if (!result)
     {
-        LOG_INFO("sql.sql", "Table %s is empty.", table);
+        LOG_INFO("sql.sql", "Table {} is empty.", table);
         return;
     }
 
@@ -71,7 +82,7 @@ void CharacterDatabaseCleaner::CheckUnique(const char* column, const char* table
     {
         Field* fields = result->Fetch();
 
-        uint32 id = fields[0].GetUInt32();
+        uint32 id = fields[0].Get<uint32>();
 
         if (!check(id))
         {
@@ -135,7 +146,7 @@ bool CharacterDatabaseCleaner::TalentCheck(uint32 talent_id)
 
 void CharacterDatabaseCleaner::CleanCharacterTalent()
 {
-    CharacterDatabase.DirectPExecute("DELETE FROM character_talent WHERE specMask >= %u", 1 << MAX_TALENT_SPECS);
+    CharacterDatabase.DirectExecute("DELETE FROM character_talent WHERE specMask >= {}", 1 << MAX_TALENT_SPECS);
     CheckUnique("spell", "character_talent", &TalentCheck);
 }
 

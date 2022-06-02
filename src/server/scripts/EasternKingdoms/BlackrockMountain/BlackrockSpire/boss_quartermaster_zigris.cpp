@@ -1,12 +1,24 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "blackrock_spire.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "SpellInfo.h"
+#include "blackrock_spire.h"
 
 enum Spells
 {
@@ -18,71 +30,122 @@ enum Spells
 
 enum Events
 {
-    EVENT_SHOOT                     = 1,
-    EVENT_STUN_BOMB                 = 2
+    EVENT_STUN_BOMB                 = 1,
+    EVENT_HOOKED_NET,
+    EVENT_SHOOT
 };
 
-class quartermaster_zigris : public CreatureScript
+struct boss_quartermaster_zigris : public BossAI
 {
-public:
-    quartermaster_zigris() : CreatureScript("quartermaster_zigris") { }
-
-    struct boss_quatermasterzigrisAI : public BossAI
+    boss_quartermaster_zigris(Creature* creature) : BossAI(creature, DATA_QUARTERMASTER_ZIGRIS)
     {
-        boss_quatermasterzigrisAI(Creature* creature) : BossAI(creature, DATA_QUARTERMASTER_ZIGRIS) { }
+        _hasDrunkPotion = false;
+    }
 
-        void Reset() override
+    void Reset() override
+    {
+        _Reset();
+        SetCombatMovement(false);
+        _hasDrunkPotion = false;
+    }
+
+    void EnterCombat(Unit* who) override
+    {
+        BossAI::EnterCombat(who);
+        events.ScheduleEvent(EVENT_STUN_BOMB, 16000);
+        events.ScheduleEvent(EVENT_HOOKED_NET, 14000);
+        events.ScheduleEvent(EVENT_SHOOT, 1000);
+    }
+
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*effType*/, SpellSchoolMask /*schoolMask*/) override
+    {
+        if (!_hasDrunkPotion && me->HealthBelowPctDamaged(50, damage))
         {
-            _Reset();
+            _hasDrunkPotion = true;
+            DoCastSelf(SPELL_HEALING_POTION, true);
+        }
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        _JustDied();
+    }
+
+    void SpellHitTarget(Unit* /*target*/, SpellInfo const* spellInfo) override
+    {
+        if (spellInfo->Id == SPELL_STUNBOMB || spellInfo->Id == SPELL_HOOKEDNET)
+        {
+            if (me->IsWithinMeleeRange(me->GetVictim()))
+            {
+                me->GetMotionMaster()->MoveBackwards(me->GetVictim(), 10.0f);
+            }
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+        {
+            return;
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
         {
-            _EnterCombat();
-            events.ScheduleEvent(EVENT_SHOOT,      1000);
-            events.ScheduleEvent(EVENT_STUN_BOMB, 16000);
+            return;
         }
 
-        void JustDied(Unit* /*killer*/) override
+        while (uint32 eventId = events.ExecuteEvent())
         {
-            _JustDied();
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
+            switch (eventId)
+            {
+                case EVENT_STUN_BOMB:
+                    DoCastVictim(SPELL_STUNBOMB);
+                    events.ScheduleEvent(EVENT_STUN_BOMB, 14000);
+                    break;
+                case EVENT_HOOKED_NET:
+                    if (me->IsWithinMeleeRange(me->GetVictim()))
+                    {
+                        DoCastVictim(SPELL_HOOKEDNET);
+                        events.RepeatEvent(16000);
+                    }
+                    else
+                    {
+                        events.RepeatEvent(3000);
+                    }
+                    break;
+                case EVENT_SHOOT:
+                    if (!me->IsWithinMeleeRange(me->GetVictim()) && me->IsWithinLOSInMap(me->GetVictim()))
+                    {
+                        DoCastVictim(SPELL_SHOOT);
+                        me->GetMotionMaster()->Clear();
+                        SetCombatMovement(false);
+                    }
+                    else if (!me->IsWithinLOSInMap(me->GetVictim()))
+                    {
+                        SetCombatMovement(true);
+                        me->GetMotionMaster()->Clear();
+                        me->GetMotionMaster()->MoveChase(me->GetVictim());
+                    }
+                    events.RepeatEvent(2000);
+                    break;
+            }
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            while (uint32 eventId = events.ExecuteEvent())
             {
-                switch (eventId)
-                {
-                    case EVENT_SHOOT:
-                        DoCastVictim(SPELL_SHOOT);
-                        events.ScheduleEvent(EVENT_SHOOT, 500);
-                        break;
-                    case EVENT_STUN_BOMB:
-                        DoCastVictim(SPELL_STUNBOMB);
-                        events.ScheduleEvent(EVENT_STUN_BOMB, 14000);
-                        break;
-                }
+                return;
             }
-            DoMeleeAttackIfReady();
         }
-    };
 
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetBlackrockSpireAI<boss_quatermasterzigrisAI>(creature);
+        DoMeleeAttackIfReady();
     }
+
+    private:
+        bool _hasDrunkPotion;
 };
 
-void AddSC_boss_quatermasterzigris()
+void AddSC_boss_quartermasterzigris()
 {
-    new quartermaster_zigris();
+    RegisterBlackrockSpireCreatureAI(boss_quartermaster_zigris);
 }

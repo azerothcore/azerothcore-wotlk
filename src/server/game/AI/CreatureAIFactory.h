@@ -1,8 +1,20 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 #ifndef ACORE_CREATUREAIFACTORY_H
 #define ACORE_CREATUREAIFACTORY_H
 
@@ -22,7 +34,7 @@ struct CreatureAIFactory : public SelectableAI
 
     CreatureAI* Create(void*) const;
 
-    int Permit(const Creature* c) const { return REAL_AI::Permissible(c); }
+    int Permit(Creature const* c) const { return REAL_AI::Permissible(c); }
 };
 
 template<class REAL_AI>
@@ -49,7 +61,7 @@ struct GameObjectAIFactory : public SelectableGameObjectAI
 
     GameObjectAI* Create(void*) const;
 
-    int Permit(const GameObject* g) const { return REAL_GO_AI::Permissible(g); }
+    int Permit(GameObject const* g) const { return REAL_GO_AI::Permissible(g); }
 };
 
 template<class REAL_GO_AI>

@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /*
@@ -11,23 +22,24 @@ Comment: Blood siphon spell buggy cause of Core Issue.
 Category: Zul'Gurub
 */
 
-#include "ScriptedCreature.h"
+#include "Player.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "zulgurub.h"
 
 enum Says
 {
     SAY_AGGRO                   = 0,
     SAY_FLEEING                 = 1,
-    SAY_MINION_DESTROY          = 2,     // Where does it belong?
-    SAY_PROTECT_ALTAR           = 3      // Where does it belong?
+    SAY_MINION_DESTROY          = 2,
+    SAY_PROTECT_ALTAR           = 3
 };
 
 enum Spells
 {
     SPELL_BLOOD_SIPHON          = 24322, // Buggy ?
     SPELL_CORRUPTED_BLOOD       = 24328,
-    SPELL_CAUSE_INSANITY        = 24327, // Spell needs scripting.
+    SPELL_CAUSE_INSANITY        = 24327,
     SPELL_WILL_OF_HAKKAR        = 24178,
     SPELL_ENRAGE                = 24318,
     // The Aspects of all High Priests spells
@@ -42,7 +54,7 @@ enum Events
 {
     EVENT_BLOOD_SIPHON          = 1,
     EVENT_CORRUPTED_BLOOD       = 2,
-    EVENT_CAUSE_INSANITY        = 3,     // Spell needs scripting. Event disabled
+    EVENT_CAUSE_INSANITY        = 3,
     EVENT_WILL_OF_HAKKAR        = 4,
     EVENT_ENRAGE                = 5,
     // The Aspects of all High Priests events
@@ -116,12 +128,15 @@ public:
                         events.ScheduleEvent(EVENT_CORRUPTED_BLOOD, urand(30000, 45000));
                         break;
                     case EVENT_CAUSE_INSANITY:
-                        // DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true), SPELL_CAUSE_INSANITY);
-                        // events.ScheduleEvent(EVENT_CAUSE_INSANITY, urand(35000, 45000));
+                        if (Unit* victim = SelectTarget(SelectTargetMethod::MaxThreat, 0))
+                        {
+                            DoCast(victim, SPELL_CAUSE_INSANITY, true);
+                        }
+                        events.ScheduleEvent(EVENT_CAUSE_INSANITY, urand(35000, 45000));
                         break;
                     case EVENT_WILL_OF_HAKKAR:
                         // Xinef: Skip Tank
-                        DoCast(SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true), SPELL_WILL_OF_HAKKAR);
+                        DoCast(SelectTarget(SelectTargetMethod::Random, 1, 100, true), SPELL_WILL_OF_HAKKAR);
                         events.ScheduleEvent(EVENT_WILL_OF_HAKKAR, urand(25000, 35000));
                         break;
                     case EVENT_ENRAGE:
@@ -164,7 +179,58 @@ public:
     }
 };
 
+class at_zulgurub_entrance_speech : public OnlyOnceAreaTriggerScript
+{
+public:
+    at_zulgurub_entrance_speech() : OnlyOnceAreaTriggerScript("at_zulgurub_entrance_speech") {}
+
+    bool _OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    {
+        if (InstanceScript* instance = player->GetInstanceScript())
+        {
+            // Instance map's enormous, Hakkar's GRID is not loaded by the time players enter.
+            // Without this, the creature never says anything, because it doesn't load in time.
+            player->GetMap()->LoadGrid(-11783.99f, -1655.27f);
+
+            if (Creature* hakkar = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_HAKKAR)))
+            {
+                hakkar->setActive(true);
+                if (hakkar->GetAI())
+                {
+                    hakkar->AI()->Talk(SAY_PROTECT_ALTAR);
+                }
+            }
+            return false;
+        }
+        return false;
+    }
+};
+
+class at_zulgurub_temple_speech : public OnlyOnceAreaTriggerScript
+{
+public:
+    at_zulgurub_temple_speech() : OnlyOnceAreaTriggerScript("at_zulgurub_temple_speech") {}
+
+    bool _OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    {
+        if (InstanceScript* instance = player->GetInstanceScript())
+        {
+            if (Creature* hakkar = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_HAKKAR)))
+            {
+                if (hakkar->GetAI())
+                {
+                    hakkar->AI()->Talk(SAY_MINION_DESTROY);
+                }
+            }
+            return false;
+        }
+        return false;
+    }
+};
+
 void AddSC_boss_hakkar()
 {
     new boss_hakkar();
+    new at_zulgurub_entrance_speech();
+    new at_zulgurub_temple_speech();
 }

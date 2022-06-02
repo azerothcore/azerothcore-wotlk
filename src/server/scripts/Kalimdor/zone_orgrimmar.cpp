@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -17,9 +28,10 @@ npc_thrall_warchief
 EndContentData */
 
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
+#include "TaskScheduler.h"
 
 /*######
 ## npc_shenthul
@@ -124,11 +136,27 @@ public:
 
 enum ThrallWarchief
 {
-    QUEST_6566              = 6566,
+    QUEST_6566                     = 6566,
 
-    SPELL_CHAIN_LIGHTNING   = 16033,
-    SPELL_SHOCK             = 16034
+    SPELL_CHAIN_LIGHTNING          = 16033,
+    SPELL_SHOCK                    = 16034,
+
+    // For The Horde! (ID: 4974)
+    QUEST_FOR_THE_HORDE            = 4974,
+    SPELL_WARCHIEF_BLESSING        = 16609,
+    NPC_HERALD_OF_THRALL           = 10719,
+    ACTION_START_TALKING           = 0,
+
+    SAY_THRALL_ON_QUEST_REWARD_0   = 0,
+    SAY_THRALL_ON_QUEST_REWARD_1   = 1,
+
+    AREA_ORGRIMMAR                 = 1637,
+    AREA_RAZOR_HILL                = 362,
+    AREA_CAMP_TAURAJO              = 378,
+    AREA_CROSSROADS                = 380
 };
+
+const Position heraldOfThrallPos = { -462.404f, -2637.68f, 96.0656f, 5.8606f };
 
 #define GOSSIP_HTW "Please share your wisdom with me, Warchief."
 #define GOSSIP_STW1 "What discoveries?"
@@ -193,6 +221,19 @@ public:
         return true;
     }
 
+    bool OnQuestReward(Player* /*player*/, Creature* creature, Quest const* quest, uint32 /*item*/) override
+    {
+        if (quest->GetQuestId() == QUEST_FOR_THE_HORDE)
+        {
+            if (creature && creature->AI())
+            {
+                creature->AI()->DoAction(ACTION_START_TALKING);
+            }
+        }
+
+        return true;
+    }
+
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_thrall_warchiefAI(creature);
@@ -213,8 +254,43 @@ public:
 
         void EnterCombat(Unit* /*who*/) override { }
 
+        void DoAction(int32 action) override
+        {
+            if (action == ACTION_START_TALKING)
+            {
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                me->GetMap()->LoadGrid(heraldOfThrallPos.GetPositionX(), heraldOfThrallPos.GetPositionY());
+                me->SummonCreature(NPC_HERALD_OF_THRALL, heraldOfThrallPos, TEMPSUMMON_TIMED_DESPAWN, 20 * IN_MILLISECONDS);
+                _scheduler.Schedule(2s, [this](TaskContext /*context*/)
+                    {
+                        Talk(SAY_THRALL_ON_QUEST_REWARD_0);
+                    })
+                .Schedule(13s, [this](TaskContext /*context*/)
+                    {
+                        Talk(SAY_THRALL_ON_QUEST_REWARD_1);
+                    })
+                .Schedule(15s, [this](TaskContext /*context*/)
+                    {
+                        DoCastAOE(SPELL_WARCHIEF_BLESSING, true);
+                        me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                        me->GetMap()->DoForAllPlayers([&](Player* p)
+                            {
+                                if (p->IsAlive() && !p->IsGameMaster())
+                                {
+                                    if (p->GetAreaId() == AREA_ORGRIMMAR || p->GetAreaId() == AREA_RAZOR_HILL || p->GetAreaId() == AREA_CROSSROADS || p->GetAreaId() == AREA_CAMP_TAURAJO)
+                                    {
+                                        p->CastSpell(p, SPELL_WARCHIEF_BLESSING, true);
+                                    }
+                                }
+                            });
+                    });
+            }
+        }
+
         void UpdateAI(uint32 diff) override
         {
+            _scheduler.Update(diff);
+
             if (!UpdateVictim())
                 return;
 
@@ -234,6 +310,9 @@ public:
 
             DoMeleeAttackIfReady();
         }
+
+        protected:
+            TaskScheduler _scheduler;
     };
 };
 

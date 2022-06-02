@@ -1,13 +1,24 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
 SDName: Tanaris
 SD%Complete: 80
-SDComment: Quest support: 648, 1560, 2954, 4005, 10277, 10279(Special flight path). Noggenfogger vendor
+SDComment: Quest support: 1560, 2954, 4005, 10277, 10279(Special flight path). Noggenfogger vendor
 SDCategory: Tanaris
 EndScriptData */
 
@@ -16,16 +27,15 @@ npc_aquementas
 npc_custodian_of_time
 npc_steward_of_time
 npc_stone_watcher_of_norgannon
-npc_OOX17
 npc_tooga
 EndContentData */
 
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedFollowerAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "WorldSession.h"
 
 /*######
@@ -65,7 +75,7 @@ public:
         {
             SendItemTimer = 0;
             SwitchFactionTimer = 10000;
-            me->setFaction(35);
+            me->SetFaction(FACTION_FRIENDLY);
             isFriendly = true;
 
             AquaJetTimer = 5000;
@@ -99,7 +109,7 @@ public:
             {
                 if (SwitchFactionTimer <= diff)
                 {
-                    me->setFaction(91);
+                    me->SetFaction(FACTION_ELEMENTAL);
                     isFriendly = false;
                 }
                 else SwitchFactionTimer -= diff;
@@ -274,8 +284,6 @@ public:
 ## npc_steward_of_time
 ######*/
 
-#define GOSSIP_ITEM_FLIGHT  "Please take me to the master's lair."
-
 class npc_steward_of_time : public CreatureScript
 {
 public:
@@ -301,15 +309,19 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (creature->IsQuestGiver())
+        {
             player->PrepareQuestMenu(creature->GetGUID());
+        }
 
         if (player->GetQuestStatus(10279) == QUEST_STATUS_INCOMPLETE || player->GetQuestRewardStatus(10279))
         {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_FLIGHT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, 8072, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
             SendGossipMenuFor(player, 9978, creature->GetGUID());
         }
         else
+        {
             SendGossipMenuFor(player, 9977, creature->GetGUID());
+        }
 
         return true;
     }
@@ -318,13 +330,6 @@ public:
 /*######
 ## npc_stone_watcher_of_norgannon
 ######*/
-
-#define GOSSIP_ITEM_NORGANNON_1     "What function do you serve?"
-#define GOSSIP_ITEM_NORGANNON_2     "What are the Plates of Uldum?"
-#define GOSSIP_ITEM_NORGANNON_3     "Where are the Plates of Uldum?"
-#define GOSSIP_ITEM_NORGANNON_4     "Excuse me? We've been \"reschedueled for visitations\"? What does that mean?!"
-#define GOSSIP_ITEM_NORGANNON_5     "So, what's inside Uldum?"
-#define GOSSIP_ITEM_NORGANNON_6     "I will return when i have the Plates of Uldum."
 
 class npc_stone_watcher_of_norgannon : public CreatureScript
 {
@@ -337,23 +342,23 @@ public:
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                AddGossipItemFor(player, 57001, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                 SendGossipMenuFor(player, 1675, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+1:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, 57002, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                 SendGossipMenuFor(player, 1676, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                AddGossipItemFor(player, 57003, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
                 SendGossipMenuFor(player, 1677, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+3:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+                AddGossipItemFor(player, 57004, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
                 SendGossipMenuFor(player, 1678, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+4:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+                AddGossipItemFor(player, 57005, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
                 SendGossipMenuFor(player, 1679, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+5:
@@ -367,105 +372,19 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (creature->IsQuestGiver())
+        {
             player->PrepareQuestMenu(creature->GetGUID());
+        }
 
         if (player->GetQuestStatus(2954) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+        {
+            AddGossipItemFor(player, 57000, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+        }
 
         SendGossipMenuFor(player, 1674, creature->GetGUID());
 
         return true;
     }
-};
-
-/*######
-## npc_OOX17
-######*/
-
-enum Npc00X17
-{
-    SAY_OOX_START           = 0,
-    SAY_OOX_AGGRO           = 1,
-    SAY_OOX_AMBUSH          = 2,
-    SAY_OOX17_AMBUSH_REPLY  = 0,
-    SAY_OOX_END             = 3,
-
-    Q_OOX17                 = 648,
-    SPAWN_FIRST             = 7803,
-    SPAWN_SECOND_1          = 5617,
-    SPAWN_SECOND_2          = 7805
-};
-
-class npc_OOX17 : public CreatureScript
-{
-public:
-    npc_OOX17() : CreatureScript("npc_OOX17") { }
-
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
-    {
-        if (quest->GetQuestId() == Q_OOX17)
-        {
-            creature->setFaction(113);
-            creature->SetFullHealth();
-            creature->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-            creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-            creature->AI()->Talk(SAY_OOX_START);
-
-            if (npc_escortAI* pEscortAI = CAST_AI(npc_OOX17::npc_OOX17AI, creature->AI()))
-                pEscortAI->Start(true, false, player->GetGUID());
-        }
-        return true;
-    }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_OOX17AI(creature);
-    }
-
-    struct npc_OOX17AI : public npc_escortAI
-    {
-        npc_OOX17AI(Creature* creature) : npc_escortAI(creature) { }
-
-        void WaypointReached(uint32 waypointId) override
-        {
-            if (Player* player = GetPlayerForEscort())
-            {
-                switch (waypointId)
-                {
-                    case 23:
-                        me->SummonCreature(SPAWN_FIRST, -8350.96f, -4445.79f, 10.10f, 6.20f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-                        me->SummonCreature(SPAWN_FIRST, -8355.96f, -4447.79f, 10.10f, 6.27f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-                        me->SummonCreature(SPAWN_FIRST, -8353.96f, -4442.79f, 10.10f, 6.08f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-                        Talk(SAY_OOX_AMBUSH);
-                        break;
-                    case 56:
-                        me->SummonCreature(SPAWN_SECOND_1, -7510.07f, -4795.50f, 9.35f, 6.06f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-                        me->SummonCreature(SPAWN_SECOND_2, -7515.07f, -4797.50f, 9.35f, 6.22f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-                        me->SummonCreature(SPAWN_SECOND_2, -7518.07f, -4792.50f, 9.35f, 6.22f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-                        Talk(SAY_OOX_AMBUSH);
-                        if (Creature* scoff = me->FindNearestCreature(SPAWN_SECOND_2, 30))
-                            scoff->AI()->Talk(SAY_OOX17_AMBUSH_REPLY);
-                        break;
-                    case 86:
-                        Talk(SAY_OOX_END);
-                        player->GroupEventHappens(Q_OOX17, me);
-                        break;
-                }
-            }
-        }
-
-        void Reset() override { }
-
-        void EnterCombat(Unit* /*who*/) override
-        {
-            Talk(SAY_OOX_AGGRO);
-        }
-
-        void JustSummoned(Creature* summoned) override
-        {
-            summoned->AI()->AttackStart(me);
-        }
-    };
 };
 
 /*####
@@ -636,6 +555,5 @@ void AddSC_tanaris()
     new npc_custodian_of_time();
     new npc_steward_of_time();
     new npc_stone_watcher_of_norgannon();
-    new npc_OOX17();
     new npc_tooga();
 }

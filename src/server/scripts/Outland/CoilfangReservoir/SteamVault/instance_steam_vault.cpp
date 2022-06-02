@@ -1,6 +1,19 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
@@ -20,14 +33,14 @@ public:
         if (go->GetEntry() == GO_ACCESS_PANEL_HYDRO)
             if (instance->GetData(TYPE_HYDROMANCER_THESPIA) == DONE)
             {
-                go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                 instance->SetData(TYPE_HYDROMANCER_THESPIA, SPECIAL);
             }
 
         if (go->GetEntry() == GO_ACCESS_PANEL_MEK)
             if (instance->GetData(TYPE_MEKGINEER_STEAMRIGGER) == DONE)
             {
-                go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                 instance->SetData(TYPE_MEKGINEER_STEAMRIGGER, SPECIAL);
             }
 
@@ -92,14 +105,14 @@ public:
                 case GO_ACCESS_PANEL_HYDRO:
                     AccessPanelHydro = go->GetGUID();
                     if (GetData(TYPE_HYDROMANCER_THESPIA) == DONE)
-                        go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     else if (GetData(TYPE_HYDROMANCER_THESPIA) == SPECIAL)
                         HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
                 case GO_ACCESS_PANEL_MEK:
                     AccessPanelMek = go->GetGUID();
                     if (GetData(TYPE_MEKGINEER_STEAMRIGGER) == DONE)
-                        go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     else if (GetData(TYPE_MEKGINEER_STEAMRIGGER) == SPECIAL)
                         HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
@@ -119,7 +132,7 @@ public:
                     else if (data == DONE)
                     {
                         if (GameObject* panel = instance->GetGameObject(AccessPanelHydro))
-                            panel->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                            panel->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     }
 
                     m_auiEncounter[type] = data;
@@ -133,7 +146,7 @@ public:
                     else if (data == DONE)
                     {
                         if (GameObject* panel = instance->GetGameObject(AccessPanelMek))
-                            panel->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                            panel->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     }
 
                     m_auiEncounter[type] = data;

@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -12,8 +23,8 @@ SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "temple_of_ahnqiraj.h"
 
 /*
@@ -188,7 +199,7 @@ public:
             //Reset flags
             me->RemoveAurasDueToSpell(SPELL_RED_COLORATION);
             me->RemoveAurasDueToSpell(SPELL_FREEZE_ANIM);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
             me->SetVisible(true);
 
             //Reset Phase
@@ -209,7 +220,7 @@ public:
         void SpawnEyeTentacle(float x, float y)
         {
             if (Creature* Spawned = DoSpawnCreature(NPC_EYE_TENTACLE, x, y, 0, 0, TEMPSUMMON_CORPSE_DESPAWN, 500))
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                     if (Spawned->AI())
                         Spawned->AI()->AttackStart(target);
         }
@@ -249,7 +260,7 @@ public:
                     if (BeamTimer <= diff)
                     {
                         //SPELL_GREEN_BEAM
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         {
                             me->InterruptNonMeleeSpells(false);
                             DoCast(target, SPELL_GREEN_BEAM);
@@ -266,15 +277,15 @@ public:
                     //ClawTentacleTimer
                     if (ClawTentacleTimer <= diff)
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         {
-                            Creature* Spawned = nullptr;
-
                             //Spawn claw tentacle on the random target
-                            Spawned = me->SummonCreature(NPC_CLAW_TENTACLE, *target, TEMPSUMMON_CORPSE_DESPAWN, 500);
+                            Creature* spawned = me->SummonCreature(NPC_CLAW_TENTACLE, *target, TEMPSUMMON_CORPSE_DESPAWN, 500);
 
-                            if (Spawned && Spawned->AI())
-                                Spawned->AI()->AttackStart(target);
+                            if (spawned && spawned->AI())
+                            {
+                                spawned->AI()->AttackStart(target);
+                            }
                         }
 
                         //One claw tentacle every 12.5 seconds
@@ -295,7 +306,7 @@ public:
                         me->SetTarget();
 
                         //Select random target for dark beam to start on
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         {
                             //Face our target
                             DarkGlareAngle = me->GetAngle(target);
@@ -412,7 +423,7 @@ public:
                     me->RemoveAurasDueToSpell(SPELL_RED_COLORATION);
 
                     //Reset to normal emote state and prevent select and attack
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
 
                     //Remove Target field
                     me->SetTarget();
@@ -511,7 +522,7 @@ public:
 
             //Reset flags
             me->RemoveAurasDueToSpell(SPELL_TRANSFORM);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
             me->SetVisible(false);
 
             instance->SetData(DATA_CTHUN_PHASE, PHASE_NOT_STARTED);
@@ -548,7 +559,7 @@ public:
                 Unit* unit = ObjectAccessor::GetUnit(*me, i->first);
 
                 //Only units out of stomach
-                if (unit && i->second == false)
+                if (unit && !i->second)
                     temp.push_back(unit);
 
                 ++i;
@@ -582,7 +593,7 @@ public:
                     //Play random sound to the zone
                     Map::PlayerList const& PlayerList = map->GetPlayers();
 
-                    if (!PlayerList.isEmpty())
+                    if (!PlayerList.IsEmpty())
                     {
                         for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
                         {
@@ -639,7 +650,7 @@ public:
                         me->SetFullHealth();
 
                         me->SetVisible(true);
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
 
                         //Emerging phase
                         //AttackStart(ObjectAccessor::GetUnit(*me, HoldpPlayer));
@@ -648,7 +659,7 @@ public:
                         //Place all units in threat list on outside of stomach
                         Stomach_Map.clear();
 
-                        for (std::list<HostileReference*>::const_iterator i = me->getThreatManager().getThreatList().begin(); i != me->getThreatManager().getThreatList().end(); ++i)
+                        for (std::list<HostileReference*>::const_iterator i = me->GetThreatMgr().getThreatList().begin(); i != me->GetThreatMgr().getThreatList().end(); ++i)
                             Stomach_Map[(*i)->getUnitGuid()] = false;   //Outside stomach
 
                         //Spawn 2 flesh tentacles
@@ -692,7 +703,7 @@ public:
                             Unit* unit = ObjectAccessor::GetUnit(*me, i->first);
 
                             //Only move units in stomach
-                            if (unit && i->second == true)
+                            if (unit && i->second)
                             {
                                 //Teleport each player out
                                 DoTeleportPlayer(unit, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 10, float(rand() % 6));
@@ -723,7 +734,7 @@ public:
                             Unit* unit = ObjectAccessor::GetUnit(*me, i->first);
 
                             //Only apply to units in stomach
-                            if (unit && i->second == true)
+                            if (unit && i->second)
                             {
                                 //Cast digestive acid on them
                                 DoCast(unit, SPELL_DIGESTIVE_ACID, true);
@@ -956,7 +967,7 @@ public:
             //MindflayTimer
             if (MindflayTimer <= diff)
             {
-                Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0);
+                Unit* target = SelectTarget(SelectTargetMethod::Random, 0);
                 if (target && !target->HasAura(SPELL_DIGESTIVE_ACID))
                     DoCast(target, SPELL_MIND_FLAY);
 
@@ -1032,7 +1043,7 @@ public:
                     //Dissapear and reappear at new position
                     me->SetVisible(false);
 
-                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0);
+                    Unit* target = SelectTarget(SelectTargetMethod::Random, 0);
                     if (!target)
                     {
                         Unit::Kill(me, me);
@@ -1146,7 +1157,7 @@ public:
                     //Dissapear and reappear at new position
                     me->SetVisible(false);
 
-                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0);
+                    Unit* target = SelectTarget(SelectTargetMethod::Random, 0);
                     if (!target)
                     {
                         Unit::Kill(me, me);
@@ -1254,7 +1265,7 @@ public:
             //BeamTimer
             if (BeamTimer <= diff)
             {
-                Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0);
+                Unit* target = SelectTarget(SelectTargetMethod::Random, 0);
                 if (target && !target->HasAura(SPELL_DIGESTIVE_ACID))
                     DoCast(target, SPELL_GREEN_BEAM);
 
@@ -1286,7 +1297,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             if (TempSummon* summon = me->ToTempSummon())
-                if (Unit* summoner = summon->GetSummoner())
+                if (Unit* summoner = summon->GetSummonerUnit())
                     if (summoner->IsAIEnabled)
                         summoner->GetAI()->DoAction(ACTION_FLESH_TENTACLE_KILLED);
         }

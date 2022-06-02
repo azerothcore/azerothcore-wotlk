@@ -1,9 +1,22 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "utgarde_keep.h"
 
 enum eDisplayId
@@ -118,7 +131,7 @@ public:
             me->SetDisplayId(DISPLAYID_DEFAULT);
             me->LoadEquipment(1);
             FeignDeath(false);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->DisableRotate(false);
 
@@ -133,7 +146,7 @@ public:
                 damage = 0;
                 me->InterruptNonMeleeSpells(true);
                 me->RemoveAllAuras();
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetControlled(false, UNIT_STATE_ROOT);
                 me->DisableRotate(false);
                 me->GetMotionMaster()->MovementExpired();
@@ -176,7 +189,7 @@ public:
             else if (s->GetEntry() == NPC_THROW)
             {
                 ThrowGUID = s->GetGUID();
-                if( Unit* t = SelectTarget(SELECT_TARGET_RANDOM, 0, 70.0f, true) )
+                if( Unit* t = SelectTarget(SelectTargetMethod::Random, 0, 70.0f, true) )
                     s->GetMotionMaster()->MovePoint(0, t->GetPositionX(), t->GetPositionY(), t->GetPositionZ());
             }
         }
@@ -194,16 +207,16 @@ public:
             if (apply)
             {
                 me->SetStandState(UNIT_STAND_STATE_DEAD);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
-                me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
-                me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                me->SetUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
+                me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
+                me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
             }
             else
             {
                 me->SetStandState(UNIT_STAND_STATE_STAND);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
-                me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
-                me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                me->RemoveUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
+                me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
+                me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
             }
         }
 
@@ -219,11 +232,11 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->DisableRotate(false);
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void UpdateAI(uint32 diff) override
@@ -283,7 +296,7 @@ public:
                         c->DespawnOrUnsummon();
                         summons.DespawnAll();
                     }
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     AttackStart(me->GetVictim());
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
                     Talk(YELL_AGGRO_2);
@@ -304,8 +317,8 @@ public:
                 case EVENT_SPELL_ROAR:
                     Talk(EMOTE_ROAR);
 
-                    me->_AddCreatureSpellCooldown(SPELL_STAGGERING_ROAR, 0);
-                    me->_AddCreatureSpellCooldown(SPELL_DREADFUL_ROAR, 0);
+                    me->_AddCreatureSpellCooldown(SPELL_STAGGERING_ROAR, 0, 0);
+                    me->_AddCreatureSpellCooldown(SPELL_DREADFUL_ROAR, 0, 0);
 
                     if (me->GetDisplayId() == DISPLAYID_DEFAULT)
                         me->CastSpell((Unit*)nullptr, SPELL_STAGGERING_ROAR, false);
@@ -372,7 +385,7 @@ public:
                     break;
             }
 
-            if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 DoMeleeAttackIfReady();
         }
     };

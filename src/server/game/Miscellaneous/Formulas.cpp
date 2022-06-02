@@ -1,12 +1,24 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Formulas.h"
-#include "Log.h"
+#include "Battleground.h"
 #include "Creature.h"
+#include "Log.h"
 #include "Player.h"
 #include "World.h"
 
@@ -27,7 +39,7 @@ uint32 Acore::XP::BaseGain(uint8 pl_level, uint8 mob_level, ContentLevels conten
         nBaseExp = 580;
         break;
     default:
-        LOG_ERROR("misc", "BaseGain: Unsupported content level %u", content);
+        LOG_ERROR("misc", "BaseGain: Unsupported content level {}", content);
         nBaseExp = 45;
         break;
     }
@@ -79,11 +91,44 @@ uint32 Acore::XP::Gain(Player* player, Unit* unit, bool isBattleGround /*= false
                     xpMod *= 2.0f;
             }
 
-            // This requires TrinityCore creature_template.ExperienceModifier feature
-            // xpMod *= creature->GetCreatureTemplate()->ModExperience;
+            xpMod *= creature->GetCreatureTemplate()->ModExperience;
         }
 
-        xpMod *= isBattleGround ? sWorld->getRate(RATE_XP_BG_KILL) : sWorld->getRate(RATE_XP_KILL);
+        if (isBattleGround)
+        {
+            switch (player->GetMapId())
+            {
+                case MAP_BG_ALTERAC_VALLEY:
+                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL_AV);
+                    break;
+                case MAP_BG_WARSONG_GULCH:
+                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL_WSG);
+                    break;
+                case MAP_BG_ARATHI_BASIN:
+                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL_AB);
+                    break;
+                case MAP_BG_EYE_OF_THE_STORM:
+                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL_EOTS);
+                    break;
+                case MAP_BG_STRAND_OF_THE_ANCIENTS:
+                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL_SOTA);
+                    break;
+                case MAP_BG_ISLE_OF_CONQUEST:
+                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL_IC);
+                    break;
+            }
+        }
+        else
+        {
+            xpMod *= sWorld->getRate(RATE_XP_KILL);
+        }
+
+        // if players dealt less than 50% of the damage and were credited anyway (due to CREATURE_FLAG_EXTRA_NO_PLAYER_DAMAGE_REQ), scale XP gained appropriately (linear scaling)
+        if (creature && creature->m_PlayerDamageReq)
+        {
+            xpMod *= 1.0f - 2.0f * creature->m_PlayerDamageReq / creature->GetMaxHealth();
+        }
+
         gain = uint32(gain * xpMod);
     }
 

@@ -1,13 +1,29 @@
+/*
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Creature.h"
 #include "GameObject.h"
 #include "InstanceScript.h"
-#include "karazhan.h"
 #include "Map.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "karazhan.h"
 
 const Position OptionalSpawn[] =
 {
@@ -127,7 +143,7 @@ public:
                         HandleGameObject(m_uiStageDoorLeftGUID, true);
                         HandleGameObject(m_uiStageDoorRightGUID, true);
                         if (GameObject* sideEntrance = instance->GetGameObject(m_uiSideEntranceDoor))
-                            sideEntrance->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+                            sideEntrance->RemoveGameObjectFlag(GO_FLAG_LOCKED);
                         instance->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, 16812, nullptr);
                     }
                     break;
@@ -171,9 +187,9 @@ public:
                 case GO_MASSIVE_DOOR:
                     m_uiMassiveDoor = go->GetGUID();
                     if (GetBossState(DATA_ARAN) != IN_PROGRESS)
-                        go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+                        go->SetGameObjectFlag(GO_FLAG_LOCKED);
                     else
-                        go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+                        go->RemoveGameObjectFlag(GO_FLAG_LOCKED);
                     break;
                 case GO_GAMESMAN_HALL_DOOR:
                     m_uiGamesmansDoor = go->GetGUID();
@@ -184,9 +200,9 @@ public:
                 case GO_NETHERSPACE_DOOR:
                     m_uiNetherspaceDoor = go->GetGUID();
                     if (GetBossState(DATA_PRINCE) != IN_PROGRESS)
-                        go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+                        go->SetGameObjectFlag(GO_FLAG_LOCKED);
                     else
-                        go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+                        go->RemoveGameObjectFlag(GO_FLAG_LOCKED);
                     break;
                 case GO_MASTERS_TERRACE_DOOR:
                     MastersTerraceDoor[0] = go->GetGUID();
@@ -197,9 +213,9 @@ public:
                 case GO_SIDE_ENTRANCE_DOOR:
                     m_uiSideEntranceDoor = go->GetGUID();
                     if (GetBossState(DATA_OPERA_PERFORMANCE) == DONE)
-                        go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+                        go->SetGameObjectFlag(GO_FLAG_LOCKED);
                     else
-                        go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+                        go->RemoveGameObjectFlag(GO_FLAG_LOCKED);
                     break;
                 case GO_DUST_COVERED_CHEST:
                     DustCoveredChest = go->GetGUID();
@@ -377,7 +393,7 @@ public:
         void HandleDummy(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
-            GetCaster()->getThreatManager().resetAllAggro();
+            GetCaster()->GetThreatMgr().ResetAllThreat();
             if (Unit* target = GetHitUnit())
                 GetCaster()->CastSpell(target, SPELL_BLINK, true);
         }

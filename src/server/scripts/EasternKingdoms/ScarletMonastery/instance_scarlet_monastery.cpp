@@ -1,14 +1,25 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-REWRITTEN BY XINEF
-*/
-
-#include "scarletmonastery.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SmartAI.h"
+#include "scarletmonastery.h"
 
 enum AshbringerEventMisc
 {
@@ -25,7 +36,6 @@ enum AshbringerEventMisc
     NPC_FAIRBANKS                   =   4542,
     NPC_COMMANDER_MOGRAINE          =   3976,
     NPC_INQUISITOR_WHITEMANE        =   3977,
-    FACTION_FRIENDLY_TO_ALL         =   35,
     DOOR_HIGH_INQUISITOR_ID         =   104600,
 };
 
@@ -75,8 +85,7 @@ public:
                 player->GetCreatureListWithEntryInGrid(ScarletList, NPC_COMMANDER_MOGRAINE, 4000.0f);
                 player->GetCreatureListWithEntryInGrid(ScarletList, NPC_FAIRBANKS, 4000.0f);
                 if (!ScarletList.empty())
-                    for (std::list<Creature*>::iterator itr = ScarletList.begin(); itr != ScarletList.end(); itr++)
-                        (*itr)->setFaction(FACTION_FRIENDLY_TO_ALL);
+                    for (std::list<Creature*>::iterator itr = ScarletList.begin(); itr != ScarletList.end(); itr++) (*itr)->SetFaction(FACTION_FRIENDLY);
             }
         }
 
@@ -97,8 +106,7 @@ public:
                 player->GetCreatureListWithEntryInGrid(ScarletList, NPC_COMMANDER_MOGRAINE, 4000.0f);
                 player->GetCreatureListWithEntryInGrid(ScarletList, NPC_FAIRBANKS, 4000.0f);
                 if (!ScarletList.empty())
-                    for (std::list<Creature*>::iterator itr = ScarletList.begin(); itr != ScarletList.end(); itr++)
-                        (*itr)->setFaction(FACTION_FRIENDLY_TO_ALL);
+                    for (std::list<Creature*>::iterator itr = ScarletList.begin(); itr != ScarletList.end(); itr++) (*itr)->SetFaction(FACTION_FRIENDLY);
             }
         }
 
@@ -210,7 +218,7 @@ public:
                     if (player->HasAura(AURA_ASHBRINGER) && !SayAshbringer)
                     {
                         Talk(SAY_WELCOME);
-                        me->setFaction(FACTION_FRIENDLY_TO_ALL);
+                        me->SetFaction(FACTION_FRIENDLY);
                         me->SetSheath(SHEATH_STATE_UNARMED);
                         me->SetFacingToObject(player);
                         me->SetStandState(UNIT_STAND_STATE_KNEEL);
@@ -307,7 +315,7 @@ public:
                     return 10 * IN_MILLISECONDS;
                 case 4:
                     me->SummonCreature(NPC_HIGHLORD_MOGRAINE, 1065.130737f, 1399.350586f, 30.763723f, 6.282961f, TEMPSUMMON_TIMED_DESPAWN, 400000)->SetName("Highlord Mograine");
-                    me->FindNearestCreature(NPC_HIGHLORD_MOGRAINE, 200.0f)->setFaction(FACTION_FRIENDLY_TO_ALL);
+                    me->FindNearestCreature(NPC_HIGHLORD_MOGRAINE, 200.0f)->SetFaction(FACTION_FRIENDLY);
                     return 30 * IN_MILLISECONDS;
                 case 5:
                     mograine->StopMovingOnCurrentPos();
@@ -352,8 +360,8 @@ public:
         void Reset() override
         {
             //Incase wipe during phase that mograine fake death
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
             SayAshbringer = false;
             timer = 0;
@@ -370,11 +378,11 @@ public:
                 if (Player* player = who->ToPlayer())
                     if (player->HasAura(AURA_ASHBRINGER) && !SayAshbringer)
                     {
-                        me->setFaction(FACTION_FRIENDLY_TO_ALL);
+                        me->SetFaction(FACTION_FRIENDLY);
                         me->SetSheath(SHEATH_STATE_UNARMED);
                         me->SetStandState(UNIT_STAND_STATE_KNEEL);
                         me->SetFacingToObject(player);
-                        me->MonsterYell(12389, LANG_UNIVERSAL, player);
+                        // me->Yell(12389, LANG_UNIVERSAL, player); // Doesn't exist
                         SayAshbringer = true;
                     }
 
@@ -408,7 +416,7 @@ public:
                 me->ClearComboPointHolders();
                 me->RemoveAllAuras();
                 me->ClearAllReactives();
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->CastSpell(me, SPELL_PERMANENT_FEIGN_DEATH, true);
 
                 hasDied = true;
@@ -423,7 +431,7 @@ public:
             Talk(SAY_MO_KILL);
         }
 
-        void SpellHit(Unit* /*who*/, const SpellInfo* spell) override
+        void SpellHit(Unit* /*who*/, SpellInfo const* spell) override
         {
             //When hit with resurrection say text
             if (spell->Id == SPELL_SCARLET_RESURRECTION)
@@ -455,8 +463,8 @@ public:
                 if (Unit* Whitemane = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_WHITEMANE)))
                 {
                     //Incase wipe during phase that mograine fake death
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
                     me->CastSpell(me, SPELL_RETRIBUTION_AURA, true);
                     me->CastSpell(Whitemane, SPELL_LAY_ON_HANDS, true);
@@ -772,8 +780,8 @@ public:
                 if (Player* player = who->ToPlayer())
                     if (player->HasAura(AURA_ASHBRINGER) && !SayAshbringer)
                     {
-                        me->setFaction(FACTION_FRIENDLY_TO_ALL);
-                        me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        me->SetFaction(FACTION_FRIENDLY);
+                        me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         me->SetSheath(SHEATH_STATE_UNARMED);
                         me->CastSpell(me, 57767, true);
                         me->SetDisplayId(16179);

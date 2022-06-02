@@ -1,10 +1,23 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "drak_tharon_keep.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "drak_tharon_keep.h"
 
 enum Yells
 {
@@ -131,12 +144,12 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_CURSE_OF_LIFE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
                         me->CastSpell(target, SPELL_CURSE_OF_LIFE, false);
                     events.ScheduleEvent(EVENT_SPELL_CURSE_OF_LIFE, 13000);
                     break;
                 case EVENT_SPELL_RAIN_OF_FIRE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
                         me->CastSpell(target, SPELL_RAIN_OF_FIRE, false);
                     events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, 16000);
                     break;
@@ -148,7 +161,7 @@ public:
                     if (me->HealthBelowPct(50))
                     {
                         Talk(SAY_FLESH);
-                        me->getThreatManager().resetAllAggro();
+                        me->GetThreatMgr().ResetAllThreat();
                         me->CastSpell((Unit*)nullptr, SPELL_TURN_FLESH, false);
 
                         events.Reset();
@@ -166,7 +179,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_POISON_CLOUD, 6000);
                     break;
                 case EVENT_SPELL_EYE_BEAM:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 35.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 35.0f, true))
                         me->CastSpell(target, SPELL_EYE_BEAM, false);
                     break;
                 case EVENT_SPELL_LIGHTNING_BREATH:
@@ -174,7 +187,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_LIGHTNING_BREATH, 8000);
                     break;
                 case EVENT_SPELL_POISON_CLOUD:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 35.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 35.0f, true))
                         me->CastSpell(target, SPELL_POISON_CLOUD, false);
                     events.ScheduleEvent(EVENT_SPELL_POISON_CLOUD, 10000);
                     break;
@@ -244,7 +257,7 @@ public:
         void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             PreventDefaultAction();
-            GetUnitOwner()->getThreatManager().resetAllAggro();
+            GetUnitOwner()->GetThreatMgr().ResetAllThreat();
             GetUnitOwner()->GetMotionMaster()->Clear();
             GetUnitOwner()->CastSpell((Unit*)nullptr, SPELL_TURN_BONES, false);
             GetUnitOwner()->GetAI()->DoAction(ACTION_TURN_BONES);

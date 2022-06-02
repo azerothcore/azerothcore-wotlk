@@ -1,11 +1,24 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "pit_of_saron.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Vehicle.h"
+#include "pit_of_saron.h"
 
 enum Texts
 {
@@ -62,7 +75,7 @@ public:
 
         void Reset() override
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             events.Reset();
             if (me->HasReactState(REACT_AGGRESSIVE)) // Reset() called by EnterEvadeMode()
             {
@@ -104,7 +117,7 @@ public:
 
                 // start real fight
                 me->RemoveAllAuras();
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 DoZoneInCombat();
                 me->CastSpell(me, 43979, true);
                 Talk(SAY_AGGRO);
@@ -160,18 +173,18 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_FORCEFUL_SMASH, urand(40000, 48000));
                     break;
                 case EVENT_SPELL_OVERLORDS_BRAND:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 95.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 95.0f, true))
                         me->CastSpell(target, SPELL_OVERLORDS_BRAND, false);
                     events.RepeatEvent(urand(11000, 12000));
                     break;
                 case EVENT_RIMEFANG_SPELL_ICY_BLAST:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 190.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 190.0f, true))
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_RIMEFANG_GUID)))
                             c->CastSpell(target, RIMEFANG_SPELL_ICY_BLAST, false);
                     events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_MARK_OF_RIMEFANG:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 190.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 190.0f, true))
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_RIMEFANG_GUID)))
                         {
                             Talk(SAY_MARK);
@@ -201,7 +214,7 @@ public:
                 Talk(RAND(SAY_SLAY_1, SAY_SLAY_2));
         }
 
-        bool CanAIAttack(const Unit* who) const override
+        bool CanAIAttack(Unit const* who) const override
         {
             switch (who->GetEntry())
             {

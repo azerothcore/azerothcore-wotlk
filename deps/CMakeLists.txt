@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+# This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -16,30 +16,34 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
   endif()
 endif()
 
+add_subdirectory(SFMT)
+add_subdirectory(argon2)
+add_subdirectory(boost)
+add_subdirectory(fmt)
+add_subdirectory(jemalloc)
+add_subdirectory(openssl)
+add_subdirectory(stdfs)
 add_subdirectory(threads)
+add_subdirectory(utf8cpp)
 
-if(SERVERS OR TOOLS)
-  add_subdirectory(acelite)
-  add_subdirectory(boost)
+# if ((APPS_BUILD AND (NOT APPS_BUILD STREQUAL "none")) OR BUILD_TOOLS_DB_IMPORT) #DB import PR
+if ((APPS_BUILD AND (NOT APPS_BUILD STREQUAL "none")))
+  add_subdirectory(mysql)
+endif()
+
+if (BUILD_APPLICATION_WORLDSERVER OR BUILD_TOOLS_MAPS)
   add_subdirectory(zlib)
   add_subdirectory(g3dlite)
   add_subdirectory(recastnavigation)
-  add_subdirectory(fmt)
-  add_subdirectory(SFMT)
-  add_subdirectory(utf8cpp)
-  add_subdirectory(openssl)
-  add_subdirectory(argon2)
-  add_subdirectory(jemalloc)
 endif()
 
-if(SERVERS)
-  add_subdirectory(mysql)
+if (BUILD_APPLICATION_WORLDSERVER)
   add_subdirectory(readline)
   add_subdirectory(gsoap)
   add_subdirectory(gperftools)
 endif()
 
-if(TOOLS)
+if (BUILD_TOOLS_MAPS)
   add_subdirectory(bzip2)
   add_subdirectory(libmpq)
 endif()

@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -11,10 +22,10 @@ SDComment: Not sure about timing and portals placing
 SDCategory: Karazhan
 EndScriptData */
 
-#include "karazhan.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "karazhan.h"
 
 enum Netherspite
 {
@@ -100,12 +111,12 @@ public:
             if (dist(xn, yn, xh, yh) >= dist(xn, yn, xp, yp) || dist(xp, yp, xh, yh) >= dist(xn, yn, xp, yp))
                 return false;
             // check  distance from the beam
-            return (abs((xn - xp) * yh + (yp - yn) * xh - xn * yp + xp * yn) / dist(xn, yn, xp, yp) < 1.5f);
+            return (std::abs((xn - xp) * yh + (yp - yn) * xh - xn * yp + xp * yn) / dist(xn, yn, xp, yp) < 1.5f);
         }
 
         float dist(float xa, float ya, float xb, float yb) // auxiliary method for distance
         {
-            return sqrt((xa - xb) * (xa - xb) + (ya - yb) * (ya - yb));
+            return std::sqrt((xa - xb) * (xa - xb) + (ya - yb) * (ya - yb));
         }
 
         void Reset() override
@@ -201,7 +212,7 @@ public:
                     }
                     // aggro target if Red Beam
                     if (j == RED_PORTAL && me->GetVictim() != target && target->GetTypeId() == TYPEID_PLAYER)
-                        me->getThreatManager().addThreat(target, 100000.0f + DoGetThreat(me->GetVictim()));
+                        me->GetThreatMgr().addThreat(target, 100000.0f + DoGetThreat(me->GetVictim()));
                 }
         }
 
@@ -259,7 +270,7 @@ public:
             // Void Zone
             if (VoidZoneTimer <= diff)
             {
-                DoCast(SelectTarget(SELECT_TARGET_RANDOM, 1, 45, true), SPELL_VOIDZONE, true);
+                DoCast(SelectTarget(SelectTargetMethod::Random, 1, 45, true), SPELL_VOIDZONE, true);
                 VoidZoneTimer = 15000;
             }
             else
@@ -312,7 +323,7 @@ public:
                 // Netherbreath
                 if (NetherbreathTimer <= diff)
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40, true))
                         DoCast(target, SPELL_NETHERBREATH);
                     NetherbreathTimer = urand(5000, 7000);
                 }

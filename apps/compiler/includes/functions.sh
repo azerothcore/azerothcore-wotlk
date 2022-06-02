@@ -19,7 +19,12 @@ function comp_ccacheEnable() {
     export CCACHE_COMPRESSLEVEL=${CCACHE_COMPRESSLEVEL:-9}
     #export CCACHE_NODIRECT=true
 
-    export CCUSTOMOPTIONS="$CCUSTOMOPTIONS -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
+    unamestr=$(uname)
+    if [[ "$unamestr" == 'Darwin' ]]; then
+      export CCUSTOMOPTIONS="$CCUSTOMOPTIONS -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DMYSQL_ADD_INCLUDE_PATH=/usr/local/include -DMYSQL_LIBRARY=/usr/local/lib/libmysqlclient.dylib -DREADLINE_INCLUDE_DIR=/usr/local/opt/readline/include -DREADLINE_LIBRARY=/usr/local/opt/readline/lib/libreadline.dylib -DOPENSSL_INCLUDE_DIR=/usr/local/opt/openssl@1.1/include -DOPENSSL_SSL_LIBRARIES=/usr/local/opt/openssl@1.1/lib/libssl.dylib -DOPENSSL_CRYPTO_LIBRARIES=/usr/local/opt/openssl@1.1/lib/libcrypto.dylib"
+    else
+      export CCUSTOMOPTIONS="$CCUSTOMOPTIONS -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
+    fi
 }
 
 function comp_ccacheClean() {
@@ -65,17 +70,24 @@ function comp_configure() {
 
   comp_ccacheEnable
 
-  cmake $SRCPATH -DCMAKE_INSTALL_PREFIX=$BINPATH $DCONF -DSERVERS=$CSERVERS \
+  cmake $SRCPATH -DCMAKE_INSTALL_PREFIX=$BINPATH $DCONF \
+  -DAPPS_BUILD=$CAPPS_BUILD \
+  -DTOOLS_BUILD=$CTOOLS_BUILD \
   -DSCRIPTS=$CSCRIPTS \
+  -DMODULES=$CMODULES \
   -DBUILD_TESTING=$CBUILD_TESTING \
-  -DTOOLS=$CTOOLS -DUSE_SCRIPTPCH=$CSCRIPTPCH -DUSE_COREPCH=$CCOREPCH -DWITH_COREDEBUG=$CDEBUG  -DCMAKE_BUILD_TYPE=$CTYPE -DWITH_WARNINGS=$CWARNINGS \
-  -DCMAKE_C_COMPILER=$CCOMPILERC -DCMAKE_CXX_COMPILER=$CCOMPILERCXX -DENABLE_EXTRA_LOGS=$CEXTRA_LOGS "-DDISABLED_AC_MODULES=$CDISABLED_AC_MODULES" $CCUSTOMOPTIONS
+  -DUSE_SCRIPTPCH=$CSCRIPTPCH \
+  -DUSE_COREPCH=$CCOREPCH \
+  -DCMAKE_BUILD_TYPE=$CTYPE \
+  -DWITH_WARNINGS=$CWARNINGS \
+  -DCMAKE_C_COMPILER=$CCOMPILERC \
+  -DCMAKE_CXX_COMPILER=$CCOMPILERCXX \
+  $CBUILD_APPS_LIST $CBUILD_TOOLS_LIST $CCUSTOMOPTIONS
 
   cd $CWD
 
   runHooks "ON_AFTER_CONFIG"
 }
-
 
 function comp_compile() {
   [ $MTHREADS == 0 ] && MTHREADS=$(grep -c ^processor /proc/cpuinfo) && MTHREADS=$(($MTHREADS + 2))
@@ -103,9 +115,9 @@ function comp_compile() {
 
   runHooks "ON_AFTER_BUILD"
 
-  # set worldserver SUID bit
-  sudo chown root:root "$AC_BINPATH_FULL/worldserver"
-  sudo chmod u+s "$AC_BINPATH_FULL/worldserver"
+  # set all aplications SUID bit
+  sudo chown -R root:root "$AC_BINPATH_FULL"
+  sudo chmod -R u+s "$AC_BINPATH_FULL"
 }
 
 function comp_build() {
@@ -114,6 +126,6 @@ function comp_build() {
 }
 
 function comp_all() {
-    comp_clean
-    comp_build
+  comp_clean
+  comp_build
 }

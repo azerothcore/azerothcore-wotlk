@@ -1,32 +1,43 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "molten_core.h"
-#include "ScriptedCreature.h"
+#include "Player.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "molten_core.h"
 
 enum Spells
 {
-    SPELL_ARCANE_EXPLOSION      = 19712,
-    SPELL_SHAZZRAH_CURSE        = 19713,
-    SPELL_MAGIC_GROUNDING       = 19714,
-    SPELL_COUNTERSPELL          = 19715,
-    SPELL_SHAZZRAH_GATE_DUMMY   = 23138, // Teleports to and attacks a random target.
-    SPELL_SHAZZRAH_GATE         = 23139,
+    SPELL_ARCANE_EXPLOSION              = 19712,
+    SPELL_SHAZZRAH_CURSE                = 19713,
+    SPELL_MAGIC_GROUNDING               = 19714,
+    SPELL_COUNTERSPELL                  = 19715,
+    SPELL_SHAZZRAH_GATE_DUMMY           = 23138, // Teleports to and attacks a random target. About every 45 seconds Shazzrah will blink to random target causing a wipe of the threat list (source: wowwwiki)
+    SPELL_SHAZZRAH_GATE                 = 23139,
 };
 
 enum Events
 {
     EVENT_ARCANE_EXPLOSION              = 1,
-    EVENT_ARCANE_EXPLOSION_TRIGGERED    = 2,
-    EVENT_SHAZZRAH_CURSE                = 3,
-    EVENT_MAGIC_GROUNDING               = 4,
-    EVENT_COUNTERSPELL                  = 5,
-    EVENT_SHAZZRAH_GATE                 = 6,
+    EVENT_SHAZZRAH_CURSE,
+    EVENT_MAGIC_GROUNDING,
+    EVENT_COUNTERSPELL,
+    EVENT_SHAZZRAH_GATE,
 };
 
 class boss_shazzrah : public CreatureScript
@@ -36,66 +47,57 @@ public:
 
     struct boss_shazzrahAI : public BossAI
     {
-        boss_shazzrahAI(Creature* creature) : BossAI(creature, BOSS_SHAZZRAH) { }
+        boss_shazzrahAI(Creature* creature) : BossAI(creature, DATA_SHAZZRAH) {}
 
-        void EnterCombat(Unit* target) override
+        void EnterCombat(Unit* /*target*/) override
         {
-            BossAI::EnterCombat(target);
-            events.ScheduleEvent(EVENT_ARCANE_EXPLOSION, 6000);
-            events.ScheduleEvent(EVENT_SHAZZRAH_CURSE, 10000);
-            events.ScheduleEvent(EVENT_MAGIC_GROUNDING, 24000);
-            events.ScheduleEvent(EVENT_COUNTERSPELL, 15000);
-            events.ScheduleEvent(EVENT_SHAZZRAH_GATE, 45000);
+            _EnterCombat();
+            events.ScheduleEvent(EVENT_ARCANE_EXPLOSION, urand(2000, 4000));
+            events.ScheduleEvent(EVENT_SHAZZRAH_CURSE, urand(7000, 11000));
+            events.ScheduleEvent(EVENT_MAGIC_GROUNDING, urand(14000, 19000));
+            events.ScheduleEvent(EVENT_COUNTERSPELL, urand(9000, 10000));
+            events.ScheduleEvent(EVENT_SHAZZRAH_GATE, 30000);
         }
 
-        void UpdateAI(uint32 diff) override
+        void ExecuteEvent(uint32 eventId) override
         {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            while (uint32 eventId = events.ExecuteEvent())
+            switch (eventId)
             {
-                switch (eventId)
+                case EVENT_ARCANE_EXPLOSION:
                 {
-                    case EVENT_ARCANE_EXPLOSION:
-                        DoCastVictim(SPELL_ARCANE_EXPLOSION);
-                        events.ScheduleEvent(EVENT_ARCANE_EXPLOSION, urand(4000, 7000));
-                        break;
-                    // Triggered subsequent to using "Gate of Shazzrah".
-                    case EVENT_ARCANE_EXPLOSION_TRIGGERED:
-                        DoCastVictim(SPELL_ARCANE_EXPLOSION);
-                        break;
-                    case EVENT_SHAZZRAH_CURSE:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true, -SPELL_SHAZZRAH_CURSE))
-                            DoCast(target, SPELL_SHAZZRAH_CURSE);
-                        events.ScheduleEvent(EVENT_SHAZZRAH_CURSE, urand(25000, 30000));
-                        break;
-                    case EVENT_MAGIC_GROUNDING:
-                        DoCast(me, SPELL_MAGIC_GROUNDING);
-                        events.ScheduleEvent(EVENT_MAGIC_GROUNDING, 35000);
-                        break;
-                    case EVENT_COUNTERSPELL:
-                        DoCastVictim(SPELL_COUNTERSPELL);
-                        events.ScheduleEvent(EVENT_COUNTERSPELL, urand(16000, 20000));
-                        break;
-                    case EVENT_SHAZZRAH_GATE:
-                        DoResetThreat();
-                        DoCastAOE(SPELL_SHAZZRAH_GATE_DUMMY);
-                        events.ScheduleEvent(EVENT_ARCANE_EXPLOSION_TRIGGERED, 2000);
-                        events.RescheduleEvent(EVENT_ARCANE_EXPLOSION, urand(3000, 6000));
-                        events.ScheduleEvent(EVENT_SHAZZRAH_GATE, 45000);
-                        break;
-                    default:
-                        break;
+                    DoCastVictim(SPELL_ARCANE_EXPLOSION);
+                    events.RepeatEvent(urand(4000, 5000));
+                    break;
+                }
+                case EVENT_SHAZZRAH_CURSE:
+                {
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_SHAZZRAH_CURSE))
+                    {
+                        DoCast(target, SPELL_SHAZZRAH_CURSE);
+                    }
+                    events.RepeatEvent(urand(23000, 26000));
+                    break;
+                }
+                case EVENT_MAGIC_GROUNDING:
+                {
+                    DoCastSelf(SPELL_MAGIC_GROUNDING);
+                    events.RepeatEvent(urand(7000, 9000));
+                    break;
+                }
+                case EVENT_COUNTERSPELL:
+                {
+                    DoCastAOE(SPELL_COUNTERSPELL);
+                    events.RepeatEvent(urand(15000, 18000));
+                    break;
+                }
+                case EVENT_SHAZZRAH_GATE:
+                {
+                    DoCastAOE(SPELL_SHAZZRAH_GATE_DUMMY);
+                    events.RescheduleEvent(EVENT_ARCANE_EXPLOSION, urand(3000, 6000));
+                    events.RepeatEvent(45000);
+                    break;
                 }
             }
-
-            DoMeleeAttackIfReady();
         }
     };
 
@@ -109,7 +111,7 @@ public:
 class spell_shazzrah_gate_dummy : public SpellScriptLoader
 {
 public:
-    spell_shazzrah_gate_dummy() : SpellScriptLoader("spell_shazzrah_gate_dummy") { }
+    spell_shazzrah_gate_dummy() : SpellScriptLoader("spell_shazzrah_gate_dummy") {}
 
     class spell_shazzrah_gate_dummy_SpellScript : public SpellScript
     {
@@ -122,21 +124,56 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            if (targets.empty())
-                return;
+            Unit* caster = GetCaster();
+            if (!targets.empty())
+            {
+                targets.remove_if([caster](WorldObject const* target) -> bool
+                {
+                    Player const* plrTarget = target->ToPlayer();
+                    // Should not target non player targets
+                    if (!plrTarget)
+                    {
+                        return true;
+                    }
 
-            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
-            targets.clear();
-            targets.push_back(target);
+                    // Should skip current victim
+                    if (caster->GetVictim() == plrTarget)
+                    {
+                        return true;
+                    }
+
+                    // Should not target enemies within melee range
+                    if (plrTarget->IsWithinMeleeRange(caster))
+                    {
+                        return true;
+                    }
+
+                    return false;
+                });
+            }
+
+            if (!targets.empty())
+            {
+                Acore::Containers::RandomResize(targets, 1);
+            }
         }
 
         void HandleScript(SpellEffIndex /*effIndex*/)
         {
-            if (Unit* target = GetHitUnit())
+            Unit* caster = GetCaster();
+            Unit* target = GetHitUnit();
+
+            if (caster && target)
             {
-                target->CastSpell(GetCaster(), SPELL_SHAZZRAH_GATE, true);
-                if (Creature* creature = GetCaster()->ToCreature())
-                    creature->AI()->AttackStart(target); // Attack the target which caster will teleport to.
+                target->CastSpell(caster, SPELL_SHAZZRAH_GATE, true);
+                caster->CastSpell(nullptr, SPELL_ARCANE_EXPLOSION);
+
+                if (Creature* creatureCaster = caster->ToCreature())
+                {
+                    creatureCaster->GetThreatMgr().ResetAllThreat();
+                    creatureCaster->GetThreatMgr().addThreat(target, 1);
+                    creatureCaster->AI()->AttackStart(target); // Attack the target which caster will teleport to.
+                }
             }
         }
 
@@ -156,5 +193,7 @@ public:
 void AddSC_boss_shazzrah()
 {
     new boss_shazzrah();
+
+    // Spells
     new spell_shazzrah_gate_dummy();
 }

@@ -1,16 +1,29 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Opcodes.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
-#include "ulduar.h"
 #include "Vehicle.h"
+#include "ulduar.h"
 
 enum XT002Spells
 {
@@ -78,17 +91,20 @@ enum NPCs
     NPC_PILE_TRIGGER            = 33337,
 };
 
-enum Sounds
+enum Texts
 {
-    XT_SOUND_AGGRO              = 15724,
-    XT_SOUND_HEART_OPEN         = 15725,
-    XT_SOUND_HEART_CLOSED       = 15726,
-    XT_SOUND_TANTARUM           = 15727,
-    XT_SOUND_SLAY1              = 15728,
-    XT_SOUND_SLAY2              = 15729,
-    XT_SOUND_ENRAGE             = 15730,
-    XT_SOUND_DEATH              = 15731,
-    XT_SOUND_SUMMON             = 15732,
+    SAY_AGGRO                   = 0,
+    SAY_HEART_OPENED            = 1,
+    SAY_HEART_CLOSED            = 2,
+    SAY_TYMPANIC_TANTRUM        = 3,
+    SAY_SLAY                    = 4,
+    SAY_BERSERK                 = 5,
+    SAY_DEATH                   = 6,
+    SAY_SUMMON                  = 7,
+    EMOTE_HEART_OPENED          = 8,
+    EMOTE_HEART_CLOSED          = 9,
+    EMOTE_TYMPANIC_TANTRUM      = 10,
+    EMOTE_SCRAPBOT              = 11,
 };
 
 enum Misc
@@ -153,7 +169,7 @@ public:
             _gravityAchievement = true;
 
             me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_STAND); // emerge
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
             me->SetControlled(false, UNIT_STATE_STUNNED);
 
             if (m_pInstance)
@@ -190,8 +206,7 @@ public:
             RescheduleEvents(); // Other events are scheduled here
 
             me->setActive(true);
-            me->MonsterYell("New toys? For me? I promise I won't break them this time!", LANG_UNIVERSAL, 0);
-            me->PlayDirectSound(XT_SOUND_AGGRO);
+            Talk(SAY_AGGRO);
 
             if (m_pInstance)
             {
@@ -210,23 +225,13 @@ public:
         {
             if (victim->GetTypeId() == TYPEID_PLAYER && !urand(0, 2))
             {
-                if (urand(0, 1))
-                {
-                    me->MonsterYell("I... I think I broke it.", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(XT_SOUND_SLAY1);
-                }
-                else
-                {
-                    me->MonsterYell("I guess it doesn't bend that way.", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(XT_SOUND_SLAY2);
-                }
+                Talk(SAY_SLAY);
             }
         }
 
-        void JustDied(Unit* /*victim*/) override
+        void JustDied(Unit* /*killer*/) override
         {
-            me->MonsterYell("You are bad... Toys... Very... Baaaaad!", LANG_UNIVERSAL, 0);
-            me->PlayDirectSound(XT_SOUND_DEATH);
+            Talk(SAY_DEATH);
 
             if (m_pInstance)
             {
@@ -266,7 +271,7 @@ public:
 
                 me->CastSpell(me, SPELL_HEARTBREAK, true);
 
-                me->MonsterTextEmote("XT-002 Deconstructor's heart is severed from his body.", 0, true);
+                Talk(EMOTE_HEART_CLOSED);
                 events.ScheduleEvent(EVENT_REMOVE_EMOTE, 4000);
                 return;
             }
@@ -316,8 +321,7 @@ public:
                         me->SetControlled(true, UNIT_STATE_STUNNED);
                         me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_SUBMERGED); // submerge with animation
 
-                        me->MonsterYell("So tired. I will rest for just a moment!", LANG_UNIVERSAL, 0);
-                        me->PlayDirectSound(XT_SOUND_HEART_OPEN);
+                        Talk(SAY_HEART_OPENED);
 
                         events.CancelEventGroup(1);
                         events.ScheduleEvent(EVENT_START_SECOND_PHASE, 5000);
@@ -342,22 +346,20 @@ public:
                     events.ScheduleEvent(EVENT_GRAVITY_BOMB, 10000, 1);
                     break;
                 case EVENT_TYMPANIC_TANTARUM:
-                    me->MonsterTextEmote("XT-002 Deconstructor begins to cause the earth to quake.", 0, true);
-                    me->MonsterYell("NO! NO! NO! NO! NO!", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(XT_SOUND_TANTARUM);
+                    Talk(EMOTE_TYMPANIC_TANTRUM);
+                    Talk(SAY_TYMPANIC_TANTRUM);
                     me->CastSpell(me, SPELL_TYMPANIC_TANTARUM, true);
                     events.RepeatEvent(60000);
                     return;
                 case EVENT_ENRAGE:
-                    me->MonsterYell("I'm tired of these toys. I don't want to play anymore!", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(XT_SOUND_ENRAGE);
+                    Talk(SAY_BERSERK);
                     me->CastSpell(me, SPELL_XT002_ENRAGE, true);
                     break;
 
                 // Animation events
                 case EVENT_START_SECOND_PHASE:
-                    me->MonsterTextEmote("XT-002 Deconstructor's heart is exposed and leaking energy.", 0, true);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                    Talk(EMOTE_HEART_OPENED);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                     if (Unit* heart = me->GetVehicleKit() ? me->GetVehicleKit()->GetPassenger(HEART_VEHICLE_SEAT) : nullptr)
                         heart->GetAI()->DoAction(ACTION_AWAKEN_HEART);
 
@@ -370,8 +372,7 @@ public:
                         return;
                     }
 
-                    me->MonsterYell("I'm ready to play!", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(XT_SOUND_HEART_CLOSED);
+                    Talk(SAY_HEART_CLOSED);
 
                     me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_STAND); // emerge
                     // Hide heart
@@ -381,7 +382,7 @@ public:
                     events.ScheduleEvent(EVENT_REMOVE_EMOTE, 4000);
                     return;
                 case EVENT_REMOVE_EMOTE:
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                     me->SetControlled(false, UNIT_STATE_STUNNED);
 
                     RescheduleEvents();
@@ -408,7 +409,7 @@ public:
     {
         npc_xt002_heartAI(Creature* pCreature) : PassiveAI(pCreature), summons(me)
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
         }
 
         SummonList summons;
@@ -451,7 +452,7 @@ public:
                 me->SetHealth(me->GetMaxHealth());
                 me->CastSpell(me, SPELL_HEART_OVERLOAD, true);
                 me->CastSpell(me, SPELL_EXPOSED_HEART, false);    // Channeled
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
 
                 if (!summons.HasEntry(NPC_PILE_TRIGGER))
                     SummonPiles();
@@ -464,7 +465,7 @@ public:
                         pXT002->AI()->DoAction(_damageDone);
                         _damageDone = 0;
                     }
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
             }
         }
 
@@ -485,7 +486,7 @@ public:
                 me->CastSpell(pile, SPELL_ENERGY_ORB, true);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
         {
             // spawn not-so-random robots
             if (spellInfo->Id == SPELL_ENERGY_ORB_TRIGGER && target->GetEntry() == NPC_PILE_TRIGGER)
@@ -520,7 +521,7 @@ public:
                 }
         }
 
-        void JustDied(Unit* /*victim*/) override
+        void JustDied(Unit* /*killer*/) override
         {
             me->SetVisible(false);
             if (me->GetInstanceScript())
@@ -531,7 +532,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE))
+            if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE))
             {
                 _timerSpawn += diff;
                 if (_timerSpawn >= 1900)
@@ -578,7 +579,7 @@ public:
         void JustDied(Unit* killer) override
         {
             // Nerf Scrapbots achievement
-            if (killer->GetEntry() == NPC_XE321_BOOMBOT)
+            if (killer && killer->GetEntry() == NPC_XE321_BOOMBOT)
                 if (me->GetInstanceScript())
                 {
                     me->GetInstanceScript()->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_SPELL_TARGET, 65037);
@@ -586,7 +587,7 @@ public:
                 }
         }
 
-        // tc idiots, they use updateAI, while we have movementinform :)
+        // tc use updateAI, while we have movementinform :)
         void MovementInform(uint32 type, uint32  /*param*/) override
         {
             if (type == POINT_MOTION_TYPE)
@@ -606,7 +607,7 @@ public:
                     }
 
                     if (!urand(0, 2))
-                        me->MonsterTextEmote("XT-002 Deconstructor consumes scrap bot to repair himself.", 0, true);
+                        pXT002->AI()->Talk(EMOTE_SCRAPBOT);
 
                     me->DespawnOrUnsummon(1);
                 }
@@ -769,7 +770,7 @@ public:
             me->m_Events.AddEvent(new BoomEvent(me), me->m_Events.CalculateTime(1 * IN_MILLISECONDS));
         }
 
-        void JustDied(Unit*) override
+        void JustDied(Unit* /*killer*/) override
         {
             me->m_Events.AddEvent(new BoomEvent(me), me->m_Events.CalculateTime(1 * IN_MILLISECONDS));
         }
@@ -786,7 +787,7 @@ public:
             }
         }
 
-        // tc idiots, they use updateAI, while we have movementinform :)
+        // tc they use updateAI, while we have movementinform :)
         void MovementInform(uint32 type, uint32  /*param*/) override
         {
             if (type == POINT_MOTION_TYPE)
@@ -853,6 +854,7 @@ public:
     };
 };
 
+// 62775 - Tympanic Tantrum
 class spell_xt002_tympanic_tantrum : public SpellScriptLoader
 {
 public:
@@ -886,6 +888,7 @@ public:
     }
 };
 
+// 64234, 63024 - Gravity Bomb
 class spell_xt002_gravity_bomb_aura : public SpellScriptLoader
 {
 public:
@@ -956,6 +959,7 @@ public:
     }
 };
 
+// 64233, 63025 - Gravity Bomb
 class spell_xt002_gravity_bomb_damage : public SpellScriptLoader
 {
 public:
@@ -988,6 +992,7 @@ public:
     }
 };
 
+// 63018, 65121 - Searing Light
 class spell_xt002_searing_light_spawn_life_spark : public SpellScriptLoader
 {
 public:

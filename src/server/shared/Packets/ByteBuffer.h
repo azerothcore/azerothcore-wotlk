@@ -1,17 +1,29 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _BYTEBUFFER_H
 #define _BYTEBUFFER_H
 
-#include "Define.h"
 #include "ByteConverter.h"
+#include "Define.h"
 #include <array>
+#include <cstring>
 #include <string>
 #include <vector>
-#include <cstring>
 
 class MessageBuffer;
 
@@ -19,9 +31,9 @@ class MessageBuffer;
 class AC_SHARED_API ByteBufferException : public std::exception
 {
 public:
-    ~ByteBufferException() noexcept = default;
+    ~ByteBufferException() noexcept override = default;
 
-    char const* what() const noexcept override { return msg_.c_str(); }
+    [[nodiscard]] char const* what() const noexcept override { return msg_.c_str(); }
 
 protected:
     std::string & message() noexcept { return msg_; }
@@ -35,7 +47,7 @@ class AC_SHARED_API ByteBufferPositionException : public ByteBufferException
 public:
     ByteBufferPositionException(bool add, size_t pos, size_t size, size_t valueSize);
 
-    ~ByteBufferPositionException() noexcept = default;
+    ~ByteBufferPositionException() noexcept override = default;
 };
 
 class AC_SHARED_API ByteBufferSourceException : public ByteBufferException
@@ -43,7 +55,7 @@ class AC_SHARED_API ByteBufferSourceException : public ByteBufferException
 public:
     ByteBufferSourceException(size_t pos, size_t size, size_t valueSize);
 
-    ~ByteBufferSourceException() noexcept = default;
+    ~ByteBufferSourceException() noexcept override = default;
 };
 
 class AC_SHARED_API ByteBufferInvalidValueException : public ByteBufferException
@@ -51,7 +63,7 @@ class AC_SHARED_API ByteBufferInvalidValueException : public ByteBufferException
 public:
     ByteBufferInvalidValueException(char const* type, char const* value);
 
-    ~ByteBufferInvalidValueException() noexcept = default;
+    ~ByteBufferInvalidValueException() noexcept override = default;
 };
 
 class AC_SHARED_API ByteBuffer
@@ -60,7 +72,7 @@ public:
     constexpr static size_t DEFAULT_SIZE = 0x1000;
 
     // constructor
-    ByteBuffer() : _rpos(0), _wpos(0)
+    ByteBuffer()
     {
         _storage.reserve(DEFAULT_SIZE);
     }
@@ -343,7 +355,7 @@ public:
         return r;
     }
 
-    template <typename T> T read(size_t pos) const
+    template <typename T> [[nodiscard]] T read(size_t pos) const
     {
         if (pos + sizeof(T) > size())
         {
@@ -516,7 +528,7 @@ public:
     void hexlike() const;
 
 protected:
-    size_t _rpos, _wpos;
+    size_t _rpos{0}, _wpos{0};
     std::vector<uint8> _storage;
 };
 

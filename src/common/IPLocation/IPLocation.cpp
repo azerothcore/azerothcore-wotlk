@@ -1,18 +1,27 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "IPLocation.h"
-#include "Common.h"
 #include "Config.h"
 #include "Errors.h"
 #include "IpAddress.h"
 #include "Log.h"
 #include "StringConvert.h"
 #include <fstream>
-#include <iostream>
-
 IpLocationStore::IpLocationStore()
 {
 }
@@ -37,13 +46,13 @@ void IpLocationStore::Load()
     std::ifstream databaseFile(databaseFilePath);
     if (!databaseFile)
     {
-        LOG_ERROR("server.loading", "IPLocation: No ip database file exists (%s).", databaseFilePath.c_str());
+        LOG_ERROR("server.loading", "IPLocation: No ip database file exists ({}).", databaseFilePath);
         return;
     }
 
     if (!databaseFile.is_open())
     {
-        LOG_ERROR("server.loading", "IPLocation: Ip database file (%s) can not be opened.", databaseFilePath.c_str());
+        LOG_ERROR("server.loading", "IPLocation: Ip database file ({}) can not be opened.", databaseFilePath);
         return;
     }
 
@@ -92,7 +101,7 @@ void IpLocationStore::Load()
 
     databaseFile.close();
 
-    LOG_INFO("server.loading", ">> Loaded %u ip location entries.", static_cast<uint32>(_ipLocationStore.size()));
+    LOG_INFO("server.loading", ">> Loaded {} ip location entries.", static_cast<uint32>(_ipLocationStore.size()));
     LOG_INFO("server.loading", " ");
 }
 

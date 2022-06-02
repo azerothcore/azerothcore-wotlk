@@ -1,11 +1,22 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 
@@ -128,7 +139,7 @@ public:
                         _events.ScheduleEvent(EVENT_VOID_BOLT, urand(15000, 18000));
                         break;
                     case EVENT_MARK_OF_KAZZAK:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, PowerUsersSelector(me, POWER_MANA, 100.0f, true)))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, POWER_MANA, 100.0f, true)))
                             DoCast(target, SPELL_MARK_OF_KAZZAK);
                         _events.ScheduleEvent(EVENT_MARK_OF_KAZZAK, 20000);
                         break;
@@ -138,7 +149,7 @@ public:
                         _events.ScheduleEvent(EVENT_ENRAGE, 30000);
                         break;
                     case EVENT_TWISTED_REFLECTION:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                             DoCast(target, SPELL_TWISTED_REFLECTION);
                         _events.ScheduleEvent(EVENT_TWISTED_REFLECTION, 15000);
                         break;

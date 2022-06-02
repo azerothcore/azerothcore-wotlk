@@ -1,6 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2008-2021 TrinityCore <http://www.trinitycore.org/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "AppenderConsole.h"
@@ -10,7 +22,6 @@
 #include "StringFormat.h"
 #include "Tokenize.h"
 #include "Util.h"
-#include <sstream>
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
 #include <Windows.h>
@@ -41,8 +52,8 @@ void AppenderConsole::InitColors(std::string const& name, std::string_view str)
     std::vector<std::string_view> colorStrs = Acore::Tokenize(str, ' ', false);
     if (colorStrs.size() != NUM_ENABLED_LOG_LEVELS)
     {
-        throw InvalidAppenderArgsException(Acore::StringFormat("Log::CreateAppenderFromConfig: Invalid color data '%s' for console appender %s (expected %u entries, got %zu)",
-            std::string(str).c_str(), name.c_str(), NUM_ENABLED_LOG_LEVELS, colorStrs.size()));
+        throw InvalidAppenderArgsException(Acore::StringFormatFmt("Log::CreateAppenderFromConfig: Invalid color data '{}' for console appender {} (expected {} entries, got {})",
+            str, name, NUM_ENABLED_LOG_LEVELS, colorStrs.size()));
     }
 
     for (uint8 i = 0; i < NUM_ENABLED_LOG_LEVELS; ++i)
@@ -53,8 +64,8 @@ void AppenderConsole::InitColors(std::string const& name, std::string_view str)
         }
         else
         {
-            throw InvalidAppenderArgsException(Acore::StringFormat("Log::CreateAppenderFromConfig: Invalid color '%s' for log level %s on console appender %s",
-                std::string(colorStrs[i]).c_str(), EnumUtils::ToTitle(static_cast<LogLevel>(i)), name.c_str()));
+            throw InvalidAppenderArgsException(Acore::StringFormatFmt("Log::CreateAppenderFromConfig: Invalid color '{}' for log level {} on console appender {}",
+                colorStrs[i], EnumUtils::ToTitle(static_cast<LogLevel>(i)), name));
         }
     }
 
@@ -183,6 +194,8 @@ void AppenderConsole::_write(LogMessage const* message)
             case LOG_LEVEL_FATAL:
                 index = 0;
                 break;
+            case LOG_LEVEL_ERROR:
+                [[fallthrough]];
             default:
                 index = 1;
                 break;

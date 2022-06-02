@@ -1,16 +1,29 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
+#include "razorfen_downs.h"
 #include "Cell.h"
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Player.h"
-#include "razorfen_downs.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 
 /*######
 ## npc_belnistrasz for Quest 3525 "Extinguishing the Idol"
@@ -31,8 +44,6 @@ enum Belnistrasz
     EVENT_COMPLETE               = 4,
     EVENT_FIREBALL               = 5,
     EVENT_FROST_NOVA             = 6,
-
-    FACTION_ESCORT               = 250,
 
     PATH_ESCORT                  = 871710,
     POINT_REACH_IDOL             = 17,
@@ -79,7 +90,7 @@ public:
                 channeling = false;
                 eventProgress = 0;
                 spawnerCount  = 0;
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                 me->SetReactState(REACT_AGGRESSIVE);
             }
         }
@@ -108,8 +119,8 @@ public:
             {
                 eventInProgress = true;
                 Talk(SAY_QUEST_ACCEPTED);
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                me->setFaction(FACTION_ESCORT);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
+                me->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_ACTIVE);
                 me->GetMotionMaster()->MovePath(PATH_ESCORT, false);
             }
         }
@@ -251,8 +262,8 @@ public:
                 me->SummonCreature(NPC_WITHERED_BATTLE_BOAR, me->GetPositionX(),  me->GetPositionY(),  me->GetPositionZ(),  me->GetOrientation());
                 if (data > 0 && me->GetOrientation() < 4.0f)
                     me->SummonCreature(NPC_WITHERED_BATTLE_BOAR, me->GetPositionX(),  me->GetPositionY(),  me->GetPositionZ(),  me->GetOrientation());
-                me->SummonCreature(NPC_DEATHS_HEAD_GEOMANCER, me->GetPositionX() + (cos(me->GetOrientation() - (M_PI / 2)) * 2), me->GetPositionY() + (sin(me->GetOrientation() - (M_PI / 2)) * 2), me->GetPositionZ(),  me->GetOrientation());
-                me->SummonCreature(NPC_WITHERED_QUILGUARD, me->GetPositionX() + (cos(me->GetOrientation() + (M_PI / 2)) * 2), me->GetPositionY() + (sin(me->GetOrientation() + (M_PI / 2)) * 2), me->GetPositionZ(),  me->GetOrientation());
+                me->SummonCreature(NPC_DEATHS_HEAD_GEOMANCER, me->GetPositionX() + (cos(me->GetOrientation() - (M_PI / 2)) * 2), me->GetPositionY() + (std::sin(me->GetOrientation() - (M_PI / 2)) * 2), me->GetPositionZ(),  me->GetOrientation());
+                me->SummonCreature(NPC_WITHERED_QUILGUARD, me->GetPositionX() + (cos(me->GetOrientation() + (M_PI / 2)) * 2), me->GetPositionY() + (std::sin(me->GetOrientation() + (M_PI / 2)) * 2), me->GetPositionZ(),  me->GetOrientation());
             }
             else if (data == 7)
                 me->SummonCreature(NPC_PLAGUEMAW_THE_ROTTING, me->GetPositionX(),  me->GetPositionY(),  me->GetPositionZ(),  me->GetOrientation());

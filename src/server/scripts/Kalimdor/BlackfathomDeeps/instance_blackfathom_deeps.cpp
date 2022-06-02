@@ -1,10 +1,23 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "blackfathom_deeps.h"
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
+#include "blackfathom_deeps.h"
 
 class instance_blackfathom_deeps : public InstanceMapScript
 {
@@ -39,8 +52,13 @@ public:
                                      unit->GetEntry() == NPC_MURKSHALLOW_SOFTSHELL || unit->GetEntry() == NPC_AKU_MAI_SNAPJAW))
             {
                 if (--_requiredDeaths == 0)
-                    if (_encounters[TYPE_FIRE1] == DONE && _encounters[TYPE_FIRE2] == DONE && _encounters[TYPE_FIRE3] == DONE && _encounters[TYPE_FIRE4] == DONE)
+                {
+                    if (IsFireEventDone())
+                    {
                         HandleGameObject(_akumaiPortalGUID, true);
+                        _encounters[TYPE_AKU_MAI_EVENT] = DONE;
+                    }
+                }
             }
         }
 
@@ -52,22 +70,22 @@ public:
                 case GO_FIRE_OF_AKU_MAI_2:
                 case GO_FIRE_OF_AKU_MAI_3:
                 case GO_FIRE_OF_AKU_MAI_4:
-                    if (_encounters[gameobject->GetEntry() - GO_FIRE_OF_AKU_MAI_1 + 1] == DONE)
+                    if (_encounters[TYPE_AKU_MAI_EVENT] == DONE)
                     {
-                        gameobject->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
+                        gameobject->SetGameObjectFlag(GO_FLAG_IN_USE);
                         gameobject->SetGoState(GO_STATE_ACTIVE);
                     }
                     break;
                 case GO_SHRINE_OF_GELIHAST:
                     if (_encounters[TYPE_GELIHAST] == DONE)
-                        gameobject->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        gameobject->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
                 case GO_ALTAR_OF_THE_DEEPS:
                     if (_encounters[TYPE_AKU_MAI] == DONE)
-                        gameobject->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        gameobject->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
                 case GO_AKU_MAI_DOOR:
-                    if (_encounters[TYPE_FIRE1] == DONE && _encounters[TYPE_FIRE2] == DONE && _encounters[TYPE_FIRE3] == DONE && _encounters[TYPE_FIRE4] == DONE)
+                    if (IsFireEventDone() && _encounters[TYPE_AKU_MAI_EVENT] == DONE)
                         HandleGameObject(ObjectGuid::Empty, true, gameobject);
                     _akumaiPortalGUID = gameobject->GetGUID();
                     break;
@@ -84,6 +102,7 @@ public:
                 case TYPE_FIRE3:
                 case TYPE_FIRE4:
                 case TYPE_AKU_MAI:
+                case TYPE_AKU_MAI_EVENT:
                     _encounters[type] = data;
                     break;
             }
@@ -116,6 +135,11 @@ public:
                         _encounters[i] = NOT_STARTED;
                 }
             }
+        }
+
+        bool IsFireEventDone()
+        {
+            return _encounters[TYPE_FIRE1] == DONE && _encounters[TYPE_FIRE2] == DONE && _encounters[TYPE_FIRE3] == DONE && _encounters[TYPE_FIRE4] == DONE;
         }
 
     private:

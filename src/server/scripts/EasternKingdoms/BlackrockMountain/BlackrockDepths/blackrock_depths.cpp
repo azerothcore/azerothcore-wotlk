@@ -1,98 +1,149 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "blackrock_depths.h"
+#include "GameTime.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "WorldSession.h"
 
-uint32 braziersUsed = 0;
+enum IronhandData
+{
+    IRONHAND_FLAMES_TIMER      = 16000,
+    IRONHAND_FLAMES_TIMER_RAND = 3000,
+    IRONHAND_N_GROUPS          = 3,
+    SPELL_GOUT_OF_FLAMES       = 15529
+};
 
-//go_shadowforge_brazier
 class go_shadowforge_brazier : public GameObjectScript
 {
 public:
-    go_shadowforge_brazier() : GameObjectScript("go_shadowforge_brazier") { }
+    go_shadowforge_brazier() : GameObjectScript("go_shadowforge_brazier") {}
 
     bool OnGossipHello(Player* /*player*/, GameObject* go) override
     {
         if (InstanceScript* instance = go->GetInstanceScript())
         {
-            if (instance->GetData(TYPE_LYCEUM) == IN_PROGRESS)
-                instance->SetData(TYPE_LYCEUM, DONE);
-            else
-                instance->SetData(TYPE_LYCEUM, IN_PROGRESS);
-            // If used brazier open linked doors (North or South)
-            if (go->GetGUID() == instance->GetGuidData(DATA_SF_BRAZIER_N))
+            GameObject* northBrazier = ObjectAccessor::GetGameObject(*go, instance->GetGuidData(DATA_SF_BRAZIER_N));
+            GameObject* southBrazier = ObjectAccessor::GetGameObject(*go, instance->GetGuidData(DATA_SF_BRAZIER_S));
+
+            if (!northBrazier || !southBrazier)
             {
-                if (braziersUsed == 0)
-                {
-                    braziersUsed = 1;
-                }
-                else if(braziersUsed == 2)
-                {
-                    instance->HandleGameObject(instance->GetGuidData(DATA_GOLEM_DOOR_N), true);
-                    instance->HandleGameObject(instance->GetGuidData(DATA_GOLEM_DOOR_S), true);
-                    braziersUsed = 0;
-                }
+                return false;
             }
-            else if (go->GetGUID() == instance->GetGuidData(DATA_SF_BRAZIER_S))
+
+            // should only happen on first brazier
+            if (instance->GetData(TYPE_LYCEUM) == NOT_STARTED)
             {
-                if (braziersUsed == 0)
+                instance->SetData(TYPE_LYCEUM, IN_PROGRESS);
+            }
+
+            // Check if the opposite brazier is lit - if it is, open the gates.
+            if ((go->GetGUID() == northBrazier->GetGUID() && southBrazier->GetGoState() == GO_STATE_ACTIVE) || (go->GetGUID() == southBrazier->GetGUID() && northBrazier->GetGoState() == GO_STATE_ACTIVE))
+            {
+                instance->SetData(TYPE_LYCEUM, DONE);
+            }
+            return false;
+        }
+        return false;
+    };
+};
+
+class ironhand_guardian : public CreatureScript
+{
+public:
+    ironhand_guardian() : CreatureScript("brd_ironhand_guardian") {}
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetBlackrockDepthsAI<ironhand_guardianAI>(creature);
+    }
+
+   struct ironhand_guardianAI : public CreatureAI
+    {
+        ironhand_guardianAI(Creature* creature) : CreatureAI(creature) {}
+        bool flames_enabled = false;
+
+        void SetData(uint32 id, uint32 value) override
+        {
+            if (id  == 0)
+            {
+                if (value == 0 || value == 1)
                 {
-                    braziersUsed = 2;
-                }
-                else if (braziersUsed == 1)
-                {
-                    instance->HandleGameObject(instance->GetGuidData(DATA_GOLEM_DOOR_N), true);
-                    instance->HandleGameObject(instance->GetGuidData(DATA_GOLEM_DOOR_S), true);
-                    braziersUsed = 0;
+                    flames_enabled = (bool) (value);
+                    events.ScheduleEvent(SPELL_GOUT_OF_FLAMES, urand(1, IRONHAND_N_GROUPS) * IRONHAND_FLAMES_TIMER / IRONHAND_N_GROUPS);
                 }
             }
         }
-        return false;
-    }
+
+        void UpdateAI(uint32 diff) override
+        {
+            events.Update(diff);
+
+            if (flames_enabled)
+            {
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                {
+                    return;
+                }
+                while (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                        case SPELL_GOUT_OF_FLAMES:
+                            DoCast(SPELL_GOUT_OF_FLAMES);
+                            events.RescheduleEvent(SPELL_GOUT_OF_FLAMES, urand(IRONHAND_FLAMES_TIMER - IRONHAND_FLAMES_TIMER_RAND, IRONHAND_FLAMES_TIMER + IRONHAND_FLAMES_TIMER_RAND));
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+        EventMap events;
+    };
 };
 
-enum eChallenge
+struct Wave
 {
-    QUEST_THE_CHALLENGE                 = 9015,
-    GO_BANNER_OF_PROVOCATION            = 181058,
-    GO_ARENA_SPOILS                     = 181074,
-
-    NPC_GRIMSTONE                       = 10096,
-    NPC_THELDREN                        = 16059,
+    uint32 entry;
+    uint32 amount;
 };
 
-uint32 theldrenTeam[] =
+static Wave RingMobs[] = // different amounts based on the type
 {
-    16053, 16055, 16050, 16051, 16049, 16052, 16054, 16058
-};
-
-uint32 RingMob[] =
-{
-    8925,                                                   // Dredge Worm
-    8926,                                                   // Deep Stinger
-    8927,                                                   // Dark Screecher
-    8928,                                                   // Burrowing Thundersnout
-    8933,                                                   // Cave Creeper
-    8932,                                                   // Borer Beetle
-};
+    {NPC_DREDGE_WORM, 3},
+    {NPC_DEEP_STINGER, 3},
+    {NPC_DARK_SCREECHER, 3},
+    {NPC_THUNDERSNOUT, 2},
+    {NPC_CAVE_CREEPER, 3},
+    {NPC_BORER_BEETLE, 6}};
 
 uint32 RingBoss[] =
 {
-    9027,                                                   // Gorosh
-    9028,                                                   // Grizzle
-    9029,                                                   // Eviscerator
-    9030,                                                   // Ok'thor
-    9031,                                                   // Anub'shiah
-    9032,                                                   // Hedrum
+    NPC_GOROSH,
+    NPC_GRIZZLE,
+    NPC_EVISCERATOR,
+    NPC_OKTHOR,
+    NPC_ANUBSHIAH,
+    NPC_HEDRUM
 };
 
 class at_ring_of_law : public AreaTriggerScript
@@ -104,13 +155,18 @@ public:
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {
+            time_t now = GameTime::GetGameTime().count();
             if (instance->GetData(TYPE_RING_OF_LAW) == IN_PROGRESS || instance->GetData(TYPE_RING_OF_LAW) == DONE)
+            {
                 return false;
+            }
+            if (now - instance->GetData(DATA_TIME_RING_FAIL) < 2 * 60) // in case of wipe, so people can rez.
+            {
+                return false;
+            }
 
             instance->SetData(TYPE_RING_OF_LAW, IN_PROGRESS);
-            player->SummonCreature(NPC_GRIMSTONE, 625.559f, -205.618f, -52.735f, 2.609f, TEMPSUMMON_DEAD_DESPAWN, 0);
-
-            return false;
+            return true;
         }
         return false;
     }
@@ -142,9 +198,11 @@ public:
         npc_grimstoneAI(Creature* creature) : npc_escortAI(creature), summons(me)
         {
             instance = creature->GetInstanceScript();
-            MobSpawnId = rand() % 6;
+            MobSpawnId    = instance ? instance->GetData(DATA_ARENA_MOBS) : urand(0, 5);
+            BossSpawnId   = instance ? instance->GetData(DATA_ARENA_BOSS) : urand(0, 5);
             eventPhase = 0;
             eventTimer = 1000;
+            resetTimer = 0;
             theldrenEvent = false;
             summons.DespawnAll();
         }
@@ -154,12 +212,14 @@ public:
 
         uint8 eventPhase;
         uint32 eventTimer;
+        uint32 resetTimer;
         uint8 MobSpawnId;
+        uint8  BossSpawnId;
         bool theldrenEvent;
 
         void Reset() override
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         }
 
         void JustSummoned(Creature* summon) override
@@ -174,7 +234,10 @@ public:
             summons.Despawn(summon);
             // All Summons killed, next phase
             if (summons.empty())
+            {
+                resetTimer = 0;
                 eventTimer = 5000;
+            }
         }
 
         void WaypointReached(uint32 waypointId) override
@@ -228,13 +291,62 @@ public:
                     me->SummonCreature(theldrenTeam[i], 644.300f, -175.989f, -53.739f, 3.418f, TEMPSUMMON_DEAD_DESPAWN, 0);
             }
             else
-                me->SummonCreature(RingBoss[rand() % 6], 644.300f, -175.989f, -53.739f, 3.418f, TEMPSUMMON_DEAD_DESPAWN, 0);
+                me->SummonCreature(RingBoss[BossSpawnId], 644.300f, -175.989f, -53.739f, 3.418f, TEMPSUMMON_DEAD_DESPAWN, 0);
+            resetTimer = 30000;
+        }
+
+        bool updateReset(uint32 diff)
+        {
+            // as long as the summoned creatures have someone to attack, we reset the timer.
+            // once they don't find anyone, the timer will count down until it is smaller than diff and reset.
+            bool doReset = false;
+            if (resetTimer > 0)
+            {
+                for (const auto& sum : summons)
+                {
+                    if (Creature* creature = ObjectAccessor::GetCreature(*me, sum))
+                    {
+                        if (creature->IsAlive() && creature->GetVictim())
+                        {
+                            resetTimer = 30000;
+                            break; // only need to find one.
+                        }
+                    }
+                }
+
+                resetTimer -= diff;
+                if (resetTimer <= diff)
+                {
+                    doReset = true;
+                }
+            }
+            return doReset;
+        }
+
+        void SpawnWave(uint32 mobId)
+        {
+            for (uint32 i = 0; i < RingMobs[mobId].amount; i++)
+            {
+                me->SummonCreature(RingMobs[mobId].entry, 608.960f + 0.4f * i, -235.322f, -53.907f, 1.857f, TEMPSUMMON_DEAD_DESPAWN, 0);
+            }
+            resetTimer = 30000;
         }
 
         void UpdateEscortAI(uint32 diff) override
         {
             if (!instance)
                 return;
+
+            // reset if our mobs don't have a target.
+            if (updateReset(diff))
+            {
+                summons.DespawnAll();
+                HandleGameObject(DATA_ARENA4, true);
+                HandleGameObject(DATA_ARENA3, false);
+                HandleGameObject(DATA_ARENA2, false);
+                HandleGameObject(DATA_ARENA1, false);
+                instance->SetData(TYPE_RING_OF_LAW, FAIL);
+            }
 
             if (eventTimer)
             {
@@ -262,39 +374,38 @@ public:
                         case 4:
                             SetEscortPaused(false);
                             me->SetVisible(false);
-                            me->SummonCreature(RingMob[MobSpawnId], 608.960f, -235.322f, -53.907f, 1.857f, TEMPSUMMON_DEAD_DESPAWN, 0);
-                            eventTimer = 8000;
+                            SpawnWave(MobSpawnId); // wave 1
+                            eventTimer = 15000;
                             break;
                         case 5:
-                            me->SummonCreature(RingMob[MobSpawnId], 608.960f, -235.322f, -53.907f, 1.857f, TEMPSUMMON_DEAD_DESPAWN, 0);
-                            me->SummonCreature(RingMob[MobSpawnId], 608.960f, -235.322f, -53.907f, 1.857f, TEMPSUMMON_DEAD_DESPAWN, 0);
-                            eventTimer = 8000;
+                            SpawnWave(MobSpawnId); // wave 2
+                            eventTimer = 0; // will be set from SummonedCreatureDies
                             break;
                         case 6:
-                            me->SummonCreature(RingMob[MobSpawnId], 608.960f, -235.322f, -53.907f, 1.857f, TEMPSUMMON_DEAD_DESPAWN, 0);
-                            eventTimer = 0;
-                            break;
-                        case 7:
                             me->SetVisible(true);
                             HandleGameObject(DATA_ARENA1, false);
                             Talk(SAY_TEXT6);
                             SetEscortPaused(false);
                             eventTimer = 0;
                             break;
-                        case 8:
+                        case 7:
                             HandleGameObject(DATA_ARENA2, true);
                             eventTimer = 5000;
                             break;
-                        case 9:
+                        case 8:
                             me->SetVisible(false);
                             SummonBoss();
                             eventTimer = 0;
                             break;
-                        case 10:
+                        case 9:
                             if (theldrenEvent)
                             {
-                                if (GameObject* go = me->SummonGameObject(GO_ARENA_SPOILS, 596.48f, -187.91f, -54.14f, 4.9f, 0.0f, 0.0f, 0.0f, 0.0f, 300))
+                                // All objects are removed from world once tempsummons despawn, so have a player spawn it instead.
+                                Player* player = me->SelectNearestPlayer(100.0f);
+                                if (GameObject* go = player->SummonGameObject(GO_ARENA_SPOILS, 596.48f, -187.91f, -54.14f, 4.9f, 0.0f, 0.0f, 0.0f, 0.0f, 300))
+                                {
                                     go->SetOwnerGUID(ObjectGuid::Empty);
+                                }
 
                                 Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                                 for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
@@ -575,7 +686,7 @@ public:
                     //spell by trap has effect61, this indicate the bar go hostile
 
                     if (Unit* tmp = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_PHALANX)))
-                        tmp->setFaction(14);
+                        tmp->SetFaction(FACTION_MONSTER);
 
                     //for later, this event(s) has alot more to it.
                     //optionally, DONE can trigger bar to go hostile.
@@ -599,4 +710,5 @@ void AddSC_blackrock_depths()
     new npc_phalanx();
     new npc_lokhtos_darkbargainer();
     new npc_rocknot();
+    new ironhand_guardian();
 }

@@ -1,11 +1,39 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef DBCENUMS_H
 #define DBCENUMS_H
+
+#pragma pack(push, 1)
+
+struct DBCPosition2D
+{
+    float X;
+    float Y;
+};
+
+struct DBCPosition3D
+{
+    float X;
+    float Y;
+    float Z;
+};
+
+#pragma pack(pop)
 
 // Client expected level limitation, like as used in DBC item max levels for "until max player level"
 // use as default max player level, must be fit max level for used client
@@ -278,11 +306,35 @@ enum SpawnMask
     SPAWNMASK_RAID_ALL          = (SPAWNMASK_RAID_NORMAL_ALL | SPAWNMASK_RAID_HEROIC_ALL),
 };
 
+enum FactionFlags
+{
+    FACTION_FLAG_NONE               = 0x00,                 // no faction flag
+    FACTION_FLAG_VISIBLE            = 0x01,                 // makes visible in client (set or can be set at interaction with target of this faction)
+    FACTION_FLAG_AT_WAR             = 0x02,                 // enable AtWar-button in client. player controlled (except opposition team always war state), Flag only set on initial creation
+    FACTION_FLAG_HIDDEN             = 0x04,                 // hidden faction from reputation pane in client (player can gain reputation, but this update not sent to client)
+    FACTION_FLAG_INVISIBLE_FORCED   = 0x08,                 // always overwrite FACTION_FLAG_VISIBLE and hide faction in rep.list, used for hide opposite team factions
+    FACTION_FLAG_PEACE_FORCED       = 0x10,                 // always overwrite FACTION_FLAG_AT_WAR, used for prevent war with own team factions
+    FACTION_FLAG_INACTIVE           = 0x20,                 // player controlled, state stored in characters.data (CMSG_SET_FACTION_INACTIVE)
+    FACTION_FLAG_RIVAL              = 0x40,                 // flag for the two competing outland factions
+    FACTION_FLAG_SPECIAL            = 0x80                  // horde and alliance home cities and their northrend allies have this flag
+};
+
 enum FactionTemplateFlags
 {
-    FACTION_TEMPLATE_FLAG_PVP               = 0x00000800,   // flagged for PvP
-    FACTION_TEMPLATE_FLAG_CONTESTED_GUARD   = 0x00001000,   // faction will attack players that were involved in PvP combats
-    FACTION_TEMPLATE_FLAG_HOSTILE_BY_DEFAULT = 0x00002000,
+    FACTION_TEMPLATE_FLAG_RESPOND_TO_CALL_FOR_HELP           = 0x0001, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_BROADCAST_TO_ENEMIES_LOW_PRIORITY  = 0x0002, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_BROADCAST_TO_ENEMIES_MED_PRIORITY  = 0x0004, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_BROADCAST_TO_ENEMIES_HIGH_PRIORITY = 0x0008, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_SEARCH_FOR_ENEMIES_LOW_PRIORITY    = 0x0010, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_SEARCH_FOR_ENEMIES_MED_PRIORITY    = 0x0020, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_SEARCH_FOR_ENEMIES_HIGH_PRIORITY   = 0x0040, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_SEARCH_FOR_FRIENDS_LOW_PRIORITY    = 0x0080, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_SEARCH_FOR_FRIENDS_MED_PRIORITY    = 0x0100, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_SEARCH_FOR_FRIENDS_HIGH_PRIORITY   = 0x0200, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_FLEE_FROM_CALL_FOR_HELP            = 0x0400, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_ASSIST_PLAYERS                     = 0x0800, // Old title: FACTION_TEMPLATE_FLAG_ASSIST_PLAYERS, Old comment: flagged for PvP //@todo: Should see if this is implemented correctly.
+    FACTION_TEMPLATE_FLAG_ATTACK_PVP_ACTIVE_PLAYERS          = 0x1000, // Old title: FACTION_TEMPLATE_FLAG_ATTACK_PVP_ACTIVE_PLAYERS, Old comment: faction will attack players that were involved in PvP combats //@todo: Should see if this is implemented correctly.
+    FACTION_TEMPLATE_FLAG_HATES_ALL_EXCEPT_FRIENDS           = 0x2000, // Old title: FACTION_TEMPLATE_FLAG_HATES_ALL_EXCEPT_FRIENDS, Old comment: //@todo: Should see if this is implemented correctly.
 };
 
 enum FactionMasks
@@ -377,8 +429,8 @@ enum SummonPropFlags
     SUMMON_PROP_FLAG_UNK1            = 0x00000001,          // 75 spells in 3.0.3, something unfriendly
     SUMMON_PROP_FLAG_UNK2            = 0x00000002,          // 616 spells in 3.0.3, something friendly
     SUMMON_PROP_FLAG_UNK3            = 0x00000004,          // 22 spells in 3.0.3, no idea...
-    SUMMON_PROP_FLAG_UNK4            = 0x00000008,          // 49 spells in 3.0.3, some mounts
-    SUMMON_PROP_FLAG_UNK5            = 0x00000010,          // 25 spells in 3.0.3, quest related?
+    SUMMON_PROP_FLAG_DESPAWN_ON_SUMMONER_DEATH = 0x00000008, // 49 spells in 3.0.3, some mounts
+    SUMMON_PROP_FLAG_PERSONAL_SPAWN            = 0x00000010, // 25 spells in 3.0.3, quest related?
     SUMMON_PROP_FLAG_UNK6            = 0x00000020,          // 0 spells in 3.3.5, unused
     SUMMON_PROP_FLAG_UNK7            = 0x00000040,          // 12 spells in 3.0.3, no idea
     SUMMON_PROP_FLAG_UNK8            = 0x00000080,          // 4 spells in 3.0.3, no idea

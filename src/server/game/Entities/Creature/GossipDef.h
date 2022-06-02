@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef AZEROTHCORE_GOSSIP_H
@@ -9,6 +20,7 @@
 
 #include "Common.h"
 #include "NPCHandler.h"
+#include "Object.h"
 #include "QuestDef.h"
 
 class WorldSession;
@@ -153,7 +165,7 @@ public:
     ~GossipMenu();
 
     void AddMenuItem(int32 menuItemId, uint8 icon, std::string const& message, uint32 sender, uint32 action, std::string const& boxMessage, uint32 boxMoney, bool coded = false);
-    void AddMenuItem(uint32 menuId, uint32 menuItemId, uint32 sender, uint32 action);
+    void AddMenuItem(uint32 menuId, uint32 menuItemId, uint32 sender, uint32 action, uint32 boxMoney);
 
     void SetMenuId(uint32 menu_id) { _menuId = menu_id; }
     [[nodiscard]] uint32 GetMenuId() const { return _menuId; }
@@ -263,7 +275,7 @@ public:
     /*********************************************************/
     void SendQuestGiverStatus(uint8 questStatus, ObjectGuid npcGUID) const;
 
-    void SendQuestGiverQuestList(QEmote const& eEmote, const std::string& Title, ObjectGuid npcGUID);
+    void SendQuestGiverQuestList(QEmote const& eEmote, std::string const& Title, ObjectGuid guid);
 
     void SendQuestQueryResponse(Quest const* quest) const;
     void SendQuestGiverQuestDetails(Quest const* quest, ObjectGuid npcGUID, bool activateAccept) const;

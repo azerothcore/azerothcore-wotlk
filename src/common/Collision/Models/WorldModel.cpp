@@ -1,11 +1,23 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "WorldModel.h"
 #include "MapTree.h"
+#include "ModelIgnoreFlags.h"
 #include "ModelInstance.h"
 #include "VMapDefinitions.h"
 
@@ -30,7 +42,7 @@ namespace VMAP
         const Vector3 p(ray.direction().cross(e2));
         const float a = e1.dot(p);
 
-        if (fabs(a) < EPS)
+        if (std::fabs(a) < EPS)
         {
             // Determinant is ill-conditioned; abort early
             return false;
@@ -95,8 +107,16 @@ namespace VMAP
     WmoLiquid::WmoLiquid(uint32 width, uint32 height, const Vector3& corner, uint32 type):
         iTilesX(width), iTilesY(height), iCorner(corner), iType(type)
     {
-        iHeight = new float[(width + 1) * (height + 1)];
-        iFlags = new uint8[width * height];
+        if (width && height)
+        {
+            iHeight = new float[(width + 1) * (height + 1)];
+            iFlags = new uint8[width * height];
+        }
+        else
+        {
+            iHeight = new float[1];
+            iFlags = nullptr;
+        }
     }
 
     WmoLiquid::WmoLiquid(const WmoLiquid& other): iHeight(0), iFlags(0)
@@ -145,6 +165,13 @@ namespace VMAP
 
     bool WmoLiquid::GetLiquidHeight(const Vector3& pos, float& liqHeight) const
     {
+        // simple case
+        if (!iFlags)
+        {
+            liqHeight = iHeight[0];
+            return true;
+        }
+
         float tx_f = (pos.x - iCorner.x) / LIQUID_TILE_SIZE;
         uint32 tx = uint32(tx_f);
         if (tx_f < 0.0f || tx >= iTilesX)
@@ -160,7 +187,7 @@ namespace VMAP
 
         // check if tile shall be used for liquid level
         // checking for 0x08 *might* be enough, but disabled tiles always are 0x?F:
-        if ((iFlags[tx + ty * iTilesX] & 0x0F) == 0x0F)
+        if (iFlags && (iFlags[tx + ty * iTilesX] & 0x0F) == 0x0F)
         {
             return false;
         }
@@ -182,6 +209,11 @@ namespace VMAP
           0           1
         */
 
+        if (!iHeight)
+        {
+            return false;
+        }
+
         const uint32 rowOffset = iTilesX + 1;
         if (dx > dy) // case (a)
         {
@@ -202,8 +234,8 @@ namespace VMAP
     {
         return 2 * sizeof(uint32) +
                sizeof(Vector3) +
-               (iTilesX + 1) * (iTilesY + 1) * sizeof(float) +
-               iTilesX * iTilesY;
+               sizeof(uint32) +
+               (iFlags ? ((iTilesX + 1) * (iTilesY + 1) * sizeof(float) + iTilesX * iTilesY) : sizeof(float));
     }
 
     bool WmoLiquid::writeToFile(FILE* wf)
@@ -214,12 +246,17 @@ namespace VMAP
                 fwrite(&iCorner, sizeof(Vector3), 1, wf) == 1 &&
                 fwrite(&iType, sizeof(uint32), 1, wf) == 1)
         {
-            uint32 size = (iTilesX + 1) * (iTilesY + 1);
-            if (fwrite(iHeight, sizeof(float), size, wf) == size)
+            if (iTilesX && iTilesY)
             {
-                size = iTilesX * iTilesY;
-                result = fwrite(iFlags, sizeof(uint8), size, wf) == size;
+                uint32 size = (iTilesX + 1) * (iTilesY + 1);
+                if (fwrite(iHeight, sizeof(float), size, wf) == size)
+                {
+                    size = iTilesX * iTilesY;
+                    result = fwrite(iFlags, sizeof(uint8), size, wf) == size;
+                }
             }
+            else
+                result = fwrite(iHeight, sizeof(float), 1, wf) == 1;
         }
 
         return result;
@@ -235,13 +272,21 @@ namespace VMAP
                 fread(&liquid->iCorner, sizeof(Vector3), 1, rf) == 1 &&
                 fread(&liquid->iType, sizeof(uint32), 1, rf) == 1)
         {
-            uint32 size = (liquid->iTilesX + 1) * (liquid->iTilesY + 1);
-            liquid->iHeight = new float[size];
-            if (fread(liquid->iHeight, sizeof(float), size, rf) == size)
+            if (liquid->iTilesX && liquid->iTilesY)
             {
-                size = liquid->iTilesX * liquid->iTilesY;
-                liquid->iFlags = new uint8[size];
-                result = fread(liquid->iFlags, sizeof(uint8), size, rf) == size;
+                uint32 size = (liquid->iTilesX + 1) * (liquid->iTilesY + 1);
+                liquid->iHeight = new float[size];
+                if (fread(liquid->iHeight, sizeof(float), size, rf) == size)
+                {
+                    size = liquid->iTilesX * liquid->iTilesY;
+                    liquid->iFlags = new uint8[size];
+                    result = fread(liquid->iFlags, sizeof(uint8), size, rf) == size;
+                }
+            }
+            else
+            {
+                liquid->iHeight = new float[1];
+                result = fread(liquid->iHeight, sizeof(float), 1, rf) == 1;
             }
         }
 
@@ -289,7 +334,7 @@ namespace VMAP
         bool result = true;
         uint32 chunkSize, count;
 
-        if (result && fwrite(&iBound, sizeof(G3D::AABox), 1, wf) != 1) { result = false; }
+        if (fwrite(&iBound, sizeof(G3D::AABox), 1, wf) != 1) { result = false; }
         if (result && fwrite(&iMogpFlags, sizeof(uint32), 1, wf) != 1) { result = false; }
         if (result && fwrite(&iGroupWMOID, sizeof(uint32), 1, wf) != 1) { result = false; }
 
@@ -343,7 +388,7 @@ namespace VMAP
         delete iLiquid;
         iLiquid = nullptr;
 
-        if (result && fread(&iBound, sizeof(G3D::AABox), 1, rf) != 1) { result = false; }
+        if (fread(&iBound, sizeof(G3D::AABox), 1, rf) != 1) { result = false; }
         if (result && fread(&iMogpFlags, sizeof(uint32), 1, rf) != 1) { result = false; }
         if (result && fread(&iGroupWMOID, sizeof(uint32), 1, rf) != 1) { result = false; }
 
@@ -412,7 +457,6 @@ namespace VMAP
         {
             return false;
         }
-        GModelRayCallback callback(triangles, vertices);
         Vector3 rPos = pos - 0.1f * down;
         float dist = G3D::inf();
         G3D::Ray ray(rPos, down);
@@ -470,8 +514,18 @@ namespace VMAP
         bool hit;
     };
 
-    bool WorldModel::IntersectRay(const G3D::Ray& ray, float& distance, bool stopAtFirstHit) const
+    bool WorldModel::IntersectRay(const G3D::Ray& ray, float& distance, bool stopAtFirstHit, ModelIgnoreFlags ignoreFlags) const
     {
+        // If the caller asked us to ignore certain objects we should check flags
+        if ((ignoreFlags & ModelIgnoreFlags::M2) != ModelIgnoreFlags::Nothing)
+        {
+            // M2 models are not taken into account for LoS calculation if caller requested their ignoring.
+            if (Flags & MOD_M2)
+            {
+                return false;
+            }
+        }
+
         // small M2 workaround, maybe better make separate class with virtual intersection funcs
         // in any case, there's no need to use a bound tree if we only have one submodel
         if (groupModels.size() == 1)
@@ -554,6 +608,7 @@ namespace VMAP
         groupTree.intersectPoint(p, callback);
         if (callback.hit != groupModels.end())
         {
+            info.rootId   = RootWMOID;
             info.hitModel = &(*callback.hit);
             dist = callback.zDist;
             return true;
@@ -621,7 +676,7 @@ namespace VMAP
         {
             //if (fread(&chunkSize, sizeof(uint32), 1, rf) != 1) result = false;
 
-            if (result && fread(&count, sizeof(uint32), 1, rf) != 1) { result = false; }
+            if (fread(&count, sizeof(uint32), 1, rf) != 1) { result = false; }
             if (result) { groupModels.resize(count); }
             //if (result && fread(&groupModels[0], sizeof(GroupModel), count, rf) != count) result = false;
             for (uint32 i = 0; i < count && result; ++i)

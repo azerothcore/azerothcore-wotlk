@@ -1,36 +1,73 @@
 #
-# Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-# Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+# This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+#
+# This file is free software; as a special exception the author gives
+# unlimited permission to copy and/or distribute it, with or without
+# modifications, as long as this notice is preserved.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
 
 #
 # Use it like:
-# CopyDefaultConfig(worldserver)
+# CopyApplicationConfig(${APP_PROJECT_NAME} ${APPLICATION_NAME})
 #
 
-function(CopyDefaultConfig servertype)
+function(CopyApplicationConfig projectName appName)
+  GetPathToApplication(${appName} SOURCE_APP_PATH)
+
   if(WIN32)
     if("${CMAKE_MAKE_PROGRAM}" MATCHES "MSBuild")
-      add_custom_command(TARGET ${servertype}
+      add_custom_command(TARGET ${projectName}
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/configs")
-      add_custom_command(TARGET ${servertype}
+      add_custom_command(TARGET ${projectName}
         POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${servertype}.conf.dist" "${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/configs")
+        COMMAND ${CMAKE_COMMAND} -E copy "${SOURCE_APP_PATH}/${appName}.conf.dist" "${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/configs")
     elseif(MINGW)
       add_custom_command(TARGET ${servertype}
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/bin/configs")
       add_custom_command(TARGET ${servertype}
         POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${servertype}.conf.dist ${CMAKE_BINARY_DIR}/bin/configs")
+        COMMAND ${CMAKE_COMMAND} -E copy "${SOURCE_APP_PATH}/${appName}.conf.dist ${CMAKE_BINARY_DIR}/bin/configs")
     endif()
   endif()
 
   if(UNIX)
-    install(FILES "${servertype}.conf.dist" DESTINATION "${CONF_DIR}")
+    install(FILES "${SOURCE_APP_PATH}/${appName}.conf.dist" DESTINATION "${CONF_DIR}")
   elseif(WIN32)
-    install(FILES "${servertype}.conf.dist" DESTINATION "${CMAKE_INSTALL_PREFIX}/configs")
+    install(FILES "${SOURCE_APP_PATH}/${appName}.conf.dist" DESTINATION "${CMAKE_INSTALL_PREFIX}/configs")
+  endif()
+endfunction()
+
+function(CopyToolConfig projectName appName)
+  GetPathToTool(${appName} SOURCE_APP_PATH)
+
+  if(WIN32)
+    if("${CMAKE_MAKE_PROGRAM}" MATCHES "MSBuild")
+      add_custom_command(TARGET ${projectName}
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/configs")
+      add_custom_command(TARGET ${projectName}
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy "${SOURCE_APP_PATH}/${appName}.conf.dist" "${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/configs")
+    elseif(MINGW)
+      add_custom_command(TARGET ${servertype}
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/bin/configs")
+      add_custom_command(TARGET ${servertype}
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy "${SOURCE_APP_PATH}/${appName}.conf.dist ${CMAKE_BINARY_DIR}/bin/configs")
+    endif()
+  endif()
+
+  if(UNIX)
+    install(FILES "${SOURCE_APP_PATH}/${appName}.conf.dist" DESTINATION "${CONF_DIR}")
+  elseif(WIN32)
+    install(FILES "${SOURCE_APP_PATH}/${appName}.conf.dist" DESTINATION "${CMAKE_INSTALL_PREFIX}/configs")
   endif()
 endfunction()
 
@@ -44,17 +81,17 @@ function(CopyModuleConfig configDir)
 
   if(WIN32)
     if("${CMAKE_MAKE_PROGRAM}" MATCHES "MSBuild")
-      add_custom_command(TARGET worldserver
+      add_custom_command(TARGET modules
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/${postPath}")
-      add_custom_command(TARGET worldserver
+      add_custom_command(TARGET modules
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy "${configDir}" "${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/${postPath}")
     elseif(MINGW)
-      add_custom_command(TARGET worldserver
+      add_custom_command(TARGET modules
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/bin/${postPath}")
-      add_custom_command(TARGET worldserver
+      add_custom_command(TARGET modules
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy "${configDir} ${CMAKE_BINARY_DIR}/bin/${postPath}")
     endif()
@@ -66,36 +103,4 @@ function(CopyModuleConfig configDir)
     install(FILES "${configDir}" DESTINATION "${CMAKE_INSTALL_PREFIX}/${postPath}")
   endif()
   unset(postPath)
-endfunction()
-
-# Stores the absolut path of the given config module in the variable
-function(GetPathToModuleConfig module variable)
-  set(${variable} "${CMAKE_SOURCE_DIR}/modules/${module}/conf" PARENT_SCOPE)
-endfunction()
-
-# Creates a list of all configs modules
-# and stores it in the given variable.
-function(CollectModulesConfig)
-  file(GLOB LOCALE_MODULE_LIST RELATIVE
-    ${CMAKE_SOURCE_DIR}/modules
-    ${CMAKE_SOURCE_DIR}/modules/*)
-
-  message(STATUS "* Modules config list:")
-
-  foreach(CONFIG_MODULE ${LOCALE_MODULE_LIST})
-    GetPathToModuleConfig(${CONFIG_MODULE} MODULE_CONFIG_PATH)
-
-    file(GLOB MODULE_CONFIG_LIST RELATIVE
-      ${MODULE_CONFIG_PATH}
-      ${MODULE_CONFIG_PATH}/*.conf.dist)
-
-    foreach(configFileName ${MODULE_CONFIG_LIST})
-      CopyModuleConfig("${MODULE_CONFIG_PATH}/${configFileName}")
-      set(CONFIG_LIST ${CONFIG_LIST}${configFileName},)
-      message(STATUS "  |- ${configFileName}")
-    endforeach()
-
-  endforeach()
-  message("")
-  add_definitions(-DCONFIG_FILE_LIST=$<1:"${CONFIG_LIST}">)
 endfunction()

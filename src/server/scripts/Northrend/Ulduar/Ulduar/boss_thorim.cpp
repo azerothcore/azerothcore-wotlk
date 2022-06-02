@@ -1,12 +1,25 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "ulduar.h"
@@ -254,29 +267,36 @@ const Position ArenaNPCs[] =
     {2087.46f, -298.71f, 440.5f,  0.59f}
 };
 
-enum ThorimSounds
+enum Texts
 {
-    SOUND_AGGRO1                = 15733,
-    SOUND_AGGRO2                = 15734,
-    SOUND_SPECIAL1              = 15735,
-    SOUND_SPECIAL2              = 15736,
-    SOUND_SPECIAL3              = 15737,
-    SOUND_JUMPDOWN              = 15738,
-    SOUND_SLAY1                 = 15739,
-    SOUND_SLAY2                 = 15740,
-    SOUND_BERSERK               = 15741,
-    SOUND_AWIPE                 = 15742,
-    SOUND_DEFEATED              = 15743,
-    SOUND_NORM1                 = 15744,
-    SOUND_NORM2                 = 15745,
-    SOUND_NORM3                 = 15746,
-    SOUND_HARD1                 = 15747,
-    SOUND_HARD2                 = 15748,
-    SOUND_HARD3                 = 15749,
+    // Thorim
+    SAY_AGGRO_1                 = 0,
+    SAY_AGGRO_2                 = 1,
+    SAY_SPECIAL_1               = 2, // Unused
+    SAY_SPECIAL_2               = 3,
+    SAY_SPECIAL_3               = 4, // Unused
+    SAY_JUMPDOWN                = 5,
+    SAY_SLAY                    = 6,
+    SAY_BERSERK                 = 7,
+    SAY_WIPE                    = 8,
+    SAY_DEATH                   = 9,
+    SAY_END_NORMAL_1            = 10,
+    SAY_END_NORMAL_2            = 11,
+    SAY_END_NORMAL_3            = 12,
+    SAY_END_HARD_1              = 13,
+    SAY_END_HARD_2              = 14,
+    SAY_END_HARD_3              = 15,
 
-    SOUND_SIF_START             = 15668,
-    SOUND_SIF_DESPAWN           = 15669,
-    SOUND_SIF_EVENT             = 15670,
+    // Sif
+    SAY_SIF_AGGRO               = 0,
+    SAY_SIF_HM_MISSED           = 1,
+    SAY_SIF_HM_REACHED          = 2,
+
+    // Ancient Rune Giant
+    SAY_GIANT_RUNIC_MIGHT       = 0,
+
+    // Runic Colossus
+    SAY_COLOSSUS_RUNIC_BARRIER  = 0,
 };
 
 enum Misc
@@ -339,13 +359,13 @@ public:
         {
             if (apply)
             {
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_PACIFIED);
+                me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_PACIFIED);
                 me->DisableRotate(true);
                 me->AddUnitState(UNIT_STATE_ROOT);
             }
             else
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_PACIFIED);
+                me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_PACIFIED);
                 me->DisableRotate(false);
                 me->ClearUnitState(UNIT_STATE_ROOT);
                 me->resetAttackTimer(BASE_ATTACK);
@@ -407,7 +427,7 @@ public:
             GameObject* go;
             if ((go = GetThorimObject(DATA_THORIM_LEVER)))
             {
-                go->SetUInt32Value(GAMEOBJECT_FLAGS, 48);
+                go->ReplaceAllGameObjectFlags((GameObjectFlags)48);
                 go->SetGoState(GO_STATE_READY);
             }
             if ((go = GetThorimObject(DATA_THORIM_FIRST_DOORS)))
@@ -420,10 +440,10 @@ public:
                 go->SetGoState(GO_STATE_ACTIVE);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             DisableThorim(false);
-            CreatureAI::EnterEvadeMode();
+            CreatureAI::EnterEvadeMode(why);
         }
 
         void Reset() override
@@ -472,34 +492,22 @@ public:
                 if (_trashCounter >= 6)
                 {
                     if (GameObject* go = GetThorimObject(DATA_THORIM_LEVER))
-                        go->RemoveFlag(GAMEOBJECT_FLAGS, 48);
+                        go->RemoveGameObjectFlag((GameObjectFlags)48);
 
+                    events.ScheduleEvent(EVENT_THORIM_AGGRO, 0);
                     events.SetPhase(EVENT_PHASE_START);
                     events.ScheduleEvent(EVENT_THORIM_START_PHASE1, 20000);
                     _trashCounter = 0;
                 }
-                else if (_trashCounter == 5)
-                    events.ScheduleEvent(EVENT_THORIM_AGGRO, 0);
             }
             else if (param == ACTION_ALLOW_HIT)
                 _isHitAllowed = true;
         }
 
-        void KilledUnit(Unit*) override
+        void KilledUnit(Unit* victim) override
         {
-            if (urand(0, 2))
-                return;
-
-            if (urand(0, 1))
-            {
-                me->MonsterYell("Can't you at least put up a fight!?", LANG_UNIVERSAL, 0);
-                me->PlayDirectSound(SOUND_SLAY1);
-            }
-            else
-            {
-                me->MonsterYell("Pathetic!", LANG_UNIVERSAL, 0);
-                me->PlayDirectSound(SOUND_SLAY2);
-            }
+            if (victim->GetTypeId() == TYPEID_PLAYER)
+                Talk(SAY_SLAY);
         }
 
         void JustReachedHome() override { me->setActive(false); }
@@ -531,8 +539,7 @@ public:
                 me->GetMotionMaster()->MoveJump(Middle.GetPositionX(), Middle.GetPositionY(), Middle.GetPositionZ(), 20, 20);
                 me->RemoveAura(SPELL_SHEATH_OF_LIGHTNING);
 
-                me->MonsterYell("Impertinent whelps! You dare challenge me atop my pedestal! I will crush you myself!", LANG_UNIVERSAL, 0);
-                me->PlayDirectSound(SOUND_JUMPDOWN);
+                Talk(SAY_JUMPDOWN);
 
                 // Hard Mode
                 if (!me->HasAura(62565 /*TOUCH OF DOMINION TRIGGER*/))
@@ -556,16 +563,15 @@ public:
                 if (!_encounterFinished)
                 {
                     _encounterFinished = true;
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    me->setFaction(35);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetFaction(FACTION_FRIENDLY);
                     me->SetHealth(me->GetMaxHealth());
                     me->CombatStop();
                     me->RemoveAllAuras();
                     events.Reset();
                     DisableThorim(true);
 
-                    me->MonsterYell("Stay your arms! I yield!", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(SOUND_DEFEATED);
+                    Talk(SAY_DEATH);
 
                     events.SetPhase(EVENT_PHASE_OUTRO);
                     events.ScheduleEvent(EVENT_THORIM_OUTRO1, 2000, 0, EVENT_PHASE_OUTRO);
@@ -578,8 +584,11 @@ public:
                     if (_hardMode)
                         chestId += 1; // hard mode offset
 
-                    if ((go = me->SummonGameObject(chestId, 2134.73f, -286.32f, 419.51f, 0.0f, 0, 0, 0, 0, 0)))
-                        go->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
+                    if ((go = me->SummonGameObject(chestId, 2134.73f, -286.32f, 419.51f, 4.65f, 0, 0, 0, 0, 0)))
+                    {
+                        go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
+                        go->SetLootRecipient(me->GetMap());
+                    }
 
                     // Defeat credit
                     if (m_pInstance)
@@ -604,12 +613,12 @@ public:
                 if ((cr = me->SummonCreature((_spawnCommoners ? NPC_DARK_RUNE_COMMONER : RollTable[urand(0, 2)]), ArenaNPCs[rnd], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000)))
                     cr->GetMotionMaster()->MoveJump(
                         Middle.GetPositionX() + urand(19, 24) * cos(Middle.GetAngle(cr)),
-                        Middle.GetPositionY() + urand(19, 24) * sin(Middle.GetAngle(cr)),
+                        Middle.GetPositionY() + urand(19, 24) * std::sin(Middle.GetAngle(cr)),
                         Middle.GetPositionZ(), 20, 20);
             }
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
+        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_LIGHTNING_ORB_CHARGER)
             {
@@ -620,32 +629,10 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_LIGHTNING_CHARGE_DAMAGE && target->GetTypeId() == TYPEID_PLAYER)
                 _hitByLightning = true;
-        }
-
-        void PlaySpecial()
-        {
-            if (urand(0, 9))
-                return;
-
-            switch (urand(0, 2))
-            {
-                case 0:
-                    me->MonsterYell("Behold the power of the storms and despair!", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(SOUND_SPECIAL1);
-                    break;
-                case 1:
-                    me->MonsterYell("Do not hold back! Destroy them!", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(SOUND_SPECIAL2);
-                    break;
-                case 2:
-                    me->MonsterYell("Have you begun to regret your intrusion? ", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(SOUND_SPECIAL3);
-                    break;
-            }
         }
 
         Player* GetArenaPlayer()
@@ -670,8 +657,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_THORIM_AGGRO:
-                    me->MonsterYell("Interlopers! You mortals who dare to interfere with my sport will pay... Wait--you...", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(SOUND_AGGRO1);
+                    Talk(SAY_AGGRO_1);
                     events.ScheduleEvent(EVENT_THORIM_AGGRO2, 9000);
 
                     if (GameObject* go = GetThorimObject(DATA_THORIM_FENCE))
@@ -680,8 +666,7 @@ public:
                     break;
                 case EVENT_THORIM_AGGRO2:
                     {
-                        me->MonsterYell("I remember you... In the mountains... But you... what is this? Where am--", LANG_UNIVERSAL, 0);
-                        me->PlayDirectSound(SOUND_AGGRO2);
+                        Talk(SAY_AGGRO_2);
 
                         EntryCheckPredicate pred(NPC_SIF);
                         summons.DoAction(ACTION_SIF_START_TALK, pred);
@@ -702,12 +687,10 @@ public:
                 case EVENT_THORIM_STORMHAMMER:
                     me->CastCustomSpell(SPELL_STORMHAMMER, SPELLVALUE_MAX_TARGETS, 1, me->GetVictim(), false);
                     events.RepeatEvent(16000);
-                    PlaySpecial();
                     break;
                 case EVENT_THORIM_CHARGE_ORB:
                     me->CastCustomSpell(SPELL_CHARGE_ORB, SPELLVALUE_MAX_TARGETS, 1, me, false);
                     events.RepeatEvent(16000);
-                    PlaySpecial();
                     break;
                 case EVENT_THORIM_LIGHTNING_ORB:
                     {
@@ -719,8 +702,7 @@ public:
                         }
 
                         // No players found
-                        me->MonsterYell("Failures! Weaklings!", LANG_UNIVERSAL, 0);
-                        me->PlayDirectSound(SOUND_AWIPE);
+                        Talk(SAY_WIPE);
                         me->SummonCreature(NPC_LIGHTNING_ORB, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
 
                         _isArenaEmpty = true;
@@ -736,7 +718,6 @@ public:
                 case EVENT_THORIM_FILL_ARENA:
                     SpawnArenaNPCs();
                     events.RepeatEvent(10000);
-                    PlaySpecial();
                     break;
                 case EVENT_THORIM_UNBALANCING_STRIKE:
                     me->CastSpell(me->GetVictim(), SPELL_UNBALANCING_STRIKE, false);
@@ -746,55 +727,48 @@ public:
                     me->CastSpell(me, SPELL_LIGHTNING_PILLAR_P2, true);
                     break;
                 case EVENT_THORIM_CHAIN_LIGHTNING:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_CHAIN_LIGHTNING, false);
                     events.RepeatEvent(15000);
                     break;
                 case EVENT_THORIM_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
-                    me->MonsterYell("My patience has reached its limit!", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(SOUND_BERSERK);
+                    Talk(SAY_BERSERK);
                     break;
                 case EVENT_THORIM_OUTRO1:
                     if (_hardMode)
                     {
-                        me->MonsterYell("You! Fiend! You are not my beloved! Be gone!", LANG_UNIVERSAL, 0);
-                        me->PlayDirectSound(SOUND_HARD1);
+                        Talk(SAY_END_HARD_1);
                         events.ScheduleEvent(EVENT_THORIM_OUTRO2, 5000, 0, 3);
                         EntryCheckPredicate pred(NPC_SIF);
                         summons.DoAction(ACTION_SIF_TRANSFORM, pred);
                     }
                     else
                     {
-                        me->MonsterYell("I feel as though I am awakening from a nightmare, but the shadows in this place yet linger.", LANG_UNIVERSAL, 0);
-                        me->PlayDirectSound(SOUND_NORM1);
+                        Talk(SAY_END_NORMAL_1);
                         events.ScheduleEvent(EVENT_THORIM_OUTRO2, 9000, 0, 3);
                     }
                     break;
                 case EVENT_THORIM_OUTRO2:
                     if (_hardMode)
                     {
-                        me->MonsterYell("Behold the hand behind all the evil that has befallen Ulduar! Left my kingdom in ruins, corrupted my brother and slain my wife!", LANG_UNIVERSAL, 0);
-                        me->PlayDirectSound(SOUND_HARD2);
+                        Talk(SAY_END_HARD_2);
                         events.ScheduleEvent(EVENT_THORIM_OUTRO3, 12000, 0, 3);
                     }
                     else
                     {
-                        me->MonsterYell("Sif... was Sif here? Impossible--she died by my brother's hand. A dark nightmare indeed....", LANG_UNIVERSAL, 0);
-                        me->PlayDirectSound(SOUND_NORM2);
+                        Talk(SAY_END_NORMAL_2);
                         events.ScheduleEvent(EVENT_THORIM_OUTRO3, 10000, 0, 3);
                     }
                     break;
                 case EVENT_THORIM_OUTRO3:
                     if (_hardMode)
                     {
-                        me->MonsterYell("And now it falls to you, champions, to avenge us all! The task before you is great, but I will lend you my aid as I am able. You must prevail!", LANG_UNIVERSAL, 0);
-                        me->PlayDirectSound(SOUND_HARD3);
+                        Talk(SAY_END_HARD_3);
                     }
                     else
                     {
-                        me->MonsterYell("I need time to reflect.... I will aid your cause if you should require it. I owe you at least that much. Farewell.", LANG_UNIVERSAL, 0);
-                        me->PlayDirectSound(SOUND_NORM3);
+                        Talk(SAY_END_NORMAL_3);
                     }
 
                     // Defeat credit
@@ -875,17 +849,14 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_SIF_FINISH_DOMINION:
-                    me->PlayDirectSound(SOUND_SIF_DESPAWN);
-                    me->MonsterYell("This pathetic morons are harmless. Relive my station, dispose of them!", LANG_UNIVERSAL, 0);
+                    Talk(SAY_SIF_HM_MISSED);
                     me->DespawnOrUnsummon(5000);
                     break;
                 case EVENT_SIF_START_TALK:
-                    me->MonsterYell("Thorim, my lord, why else would these invaders have come into your sanctum but to slay you? They must be stopped!", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(SOUND_SIF_START);
+                    Talk(SAY_SIF_AGGRO);
                     break;
                 case EVENT_SIF_JOIN_TALK:
-                    me->PlayDirectSound(SOUND_SIF_EVENT);
-                    me->MonsterYell("Impossible! Lord Thorim, I will bring your foes a frigid death!", LANG_UNIVERSAL, 0);
+                    Talk(SAY_SIF_HM_REACHED);
                     events.ScheduleEvent(EVENT_SIF_FROST_NOVA_START, 1000);
                     events.ScheduleEvent(EVENT_SIF_FROSTBOLT_VALLEY, 11000);
                     events.ScheduleEvent(EVENT_SIF_BLIZZARD, 15000);
@@ -943,7 +914,7 @@ public:
 
         uint32 Timer;
 
-        void EnterEvadeMode() override {}
+        void EnterEvadeMode(EvadeReason /*why*/) override {}
         void MoveInLineOfSight(Unit*) override {}
         void AttackStart(Unit*) override {}
 
@@ -1080,7 +1051,7 @@ public:
             me->SetDisableGravity(true);
         }
 
-        void SpellHit(Unit*, const SpellInfo* spellInfo) override
+        void SpellHit(Unit*, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_CHARGE_ORB)
                 me->CastSpell(me, SPELL_LIGHTNING_PILLAR_P1, true);
@@ -1142,7 +1113,7 @@ public:
                         }
                     }
                 _playerAttack = true;
-                me->getThreatManager().resetAllAggro();
+                me->GetThreatMgr().ResetAllThreat();
                 me->CallForHelp(40.0f);
                 AttackStart(who);
             }
@@ -1205,7 +1176,7 @@ public:
                     events.RepeatEvent(10000);
                     break;
                 case EVENT_DR_ACOLYTE_HS:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_HOLY_SMITE, false);
                     events.RepeatEvent(1600);
                     break;
@@ -1330,7 +1301,7 @@ public:
                     events.RepeatEvent(10000);
                     break;
                 case EVENT_DR_ACOLYTE_HS:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_HOLY_SMITE, false);
                     events.RepeatEvent(1600);
                     break;
@@ -1404,8 +1375,13 @@ public:
         void JustDied(Unit*) override
         {
             if (me->GetInstanceScript())
+            {
                 if (GameObject* go = ObjectAccessor::GetGameObject(*me, me->GetInstanceScript()->GetGuidData(DATA_THORIM_FIRST_DOORS)))
                     go->SetGoState(GO_STATE_ACTIVE);
+
+                if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_THORIM)))
+                    cr->AI()->Talk(SAY_SPECIAL_2);
+            }
         }
 
         void EnterCombat(Unit*) override
@@ -1419,7 +1395,7 @@ public:
             _checkTarget = true;
         }
 
-        void SpellHit(Unit*, const SpellInfo* spellInfo) override
+        void SpellHit(Unit*, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_RUNIC_SMASH_LEFT || spellInfo->Id == SPELL_RUNIC_SMASH_RIGHT)
             {
@@ -1459,8 +1435,10 @@ public:
             {
                 case EVENT_RC_RUNIC_SMASH_TRIGGER:
                     _nextTriggerPos += 16.0f;
-                    if (!(_nextTriggerPos > -260.0f))
+                    if (_nextTriggerPos <= -260.0f)
+                    {
                         events.RescheduleEvent(EVENT_RC_RUNIC_SMASH_TRIGGER, 500);
+                    }
 
                     RunRunicSmash(true);
                     break;
@@ -1476,7 +1454,7 @@ public:
                     break;
                 case EVENT_RC_RUNIC_BARRIER:
                     me->CastSpell(me, SPELL_RUNIC_BARRIER, false);
-                    me->MonsterTextEmote("Runic Colossus surrounds itself with a crackling Runic Barrier!", 0, true);
+                    Talk(SAY_COLOSSUS_RUNIC_BARRIER);
                     events.RepeatEvent(20000);
                     break;
                 case EVENT_RC_SMASH:
@@ -1484,7 +1462,7 @@ public:
                     events.RepeatEvent(10000);
                     break;
                 case EVENT_RC_CHARGE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_CHARGE, false);
                     events.RepeatEvent(15000);
                     break;
@@ -1526,7 +1504,7 @@ public:
             events.ScheduleEvent(EVENT_ARG_STOMP, 8000);
 
             me->CastSpell(me, SPELL_RUNIC_FORTIFICATION, false);
-            me->MonsterTextEmote("Ancient Rune Giant fortifies nearby allies with runic might", 0, true);
+            Talk(SAY_GIANT_RUNIC_MIGHT);
         }
 
         void JustDied(Unit*) override
@@ -1559,7 +1537,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_ARG_RD:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_RUNE_DETONATION, false);
                     events.RepeatEvent(12000);
                     break;
@@ -1630,7 +1608,7 @@ public:
             }
         }
 
-        bool CanAIAttack(const Unit* target) const override
+        bool CanAIAttack(Unit const* target) const override
         {
             return target->GetPositionX() < 2180 && target->GetPositionZ() < 425;
         }
@@ -1681,7 +1659,7 @@ public:
                     events.RepeatEvent(8000);
                     break;
                 case EVENT_DR_EVOKER_RL:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_RUNIC_LIGHTNING, false);
                     events.RepeatEvent(2500);
                     break;
@@ -1697,12 +1675,12 @@ public:
                     events.RepeatEvent(10000);
                     break;
                 case EVENT_DR_CHAMPION_CH:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_CHARGE, false);
                     events.RepeatEvent(12000);
                     break;
                 case EVENT_DR_CHAMPION_WH:
-                    if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED))
+                    if (!me->HasUnitFlag(UNIT_FLAG_DISARMED))
                         me->CastSpell(me, SPELL_WHIRLWIND, false);
                     events.RepeatEvent(6000);
                     break;

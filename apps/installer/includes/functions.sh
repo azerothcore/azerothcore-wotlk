@@ -47,7 +47,11 @@ function inst_configureOS() {
 
 function inst_updateRepo() {
     cd "$AC_PATH_ROOT"
-    git pull origin $(git rev-parse --abbrev-ref HEAD)
+    if [ ! -z $INSTALLER_PULL_FROM ]; then
+        git pull "$ORIGIN_REMOTE" "$INSTALLER_PULL_FROM"
+    else
+        git pull "$ORIGIN_REMOTE" $(git rev-parse --abbrev-ref HEAD)
+    fi
 }
 
 function inst_resetRepo() {
@@ -219,7 +223,7 @@ function inst_simple_restarter {
 
 function inst_download_client_data {
     # change the following version when needed
-    local VERSION=v10
+    local VERSION=v14
 
     echo "#######################"
     echo "Client data downloader"
@@ -227,7 +231,7 @@ function inst_download_client_data {
 
     # first check if it's defined in env, otherwise use the default
     local path="${DATAPATH:-$AC_BINPATH_FULL}"
-    local zipPath="${DATAPATH_ZIP:-"$DATAPATH/data.zip"}"
+    local zipPath="${DATAPATH_ZIP:-"$path/data.zip"}"
 
     dataVersionFile="$path/data-version"
 

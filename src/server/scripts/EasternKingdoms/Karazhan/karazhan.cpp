@@ -1,8 +1,19 @@
 /*
-* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
-* Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
-* Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 /* ScriptData
 SDName: Karazhan
@@ -19,10 +30,10 @@ EndContentData */
 
 #include "karazhan.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -178,7 +189,7 @@ public:
                                               me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f,
                                               TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000))
                     {
-                        spotlight->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        spotlight->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         spotlight->CastSpell(spotlight, SPELL_SPOTLIGHT, false);
                         m_uiSpotlightGUID = spotlight->GetGUID();
                     }
@@ -228,7 +239,7 @@ public:
 
         void PrepareEncounter()
         {
-            LOG_DEBUG("scripts.ai", "TSCR: Barnes Opera Event - Introduction complete - preparing encounter %d", m_uiEventId);
+            LOG_DEBUG("scripts.ai", "Barnes Opera Event - Introduction complete - preparing encounter {}", m_uiEventId);
             uint8 index = 0;
             uint8 count = 0;
 
@@ -254,11 +265,7 @@ public:
                 float PosX = Spawns[index][1];
 
                 if (Creature* creature = me->SummonCreature(entry, PosX, SPAWN_Y, SPAWN_Z, SPAWN_O, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, HOUR * 2 * IN_MILLISECONDS))
-                {
-                    // In case database has bad flags
-                    creature->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
-                    creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                }
+                    creature->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             }
 
             RaidWiped = false;
@@ -298,7 +305,7 @@ public:
                             return;
 
                         Map::PlayerList const& PlayerList = map->GetPlayers();
-                        if (PlayerList.isEmpty())
+                        if (PlayerList.IsEmpty())
                             return;
 
                         RaidWiped = true;
@@ -474,30 +481,30 @@ public:
 
         void EnterCombat(Unit* /*who*/) override {}
 
-        uint32 NextStep(uint32 Step)
+        uint32 NextStep(uint32 nextStep)
         {
-            switch(Step)
+            switch(nextStep)
             {
                 case 1:
-                    me->MonsterYell(SAY_DIALOG_MEDIVH_1, LANG_UNIVERSAL, 0);
+                    me->Yell(SAY_DIALOG_MEDIVH_1, LANG_UNIVERSAL);
                     return 10000;
                 case 2:
                     if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
-                        arca->MonsterYell(SAY_DIALOG_ARCANAGOS_2, LANG_UNIVERSAL, 0);
+                        arca->Yell(SAY_DIALOG_ARCANAGOS_2, LANG_UNIVERSAL);
                     return 20000;
                 case 3:
-                    me->MonsterYell(SAY_DIALOG_MEDIVH_3, LANG_UNIVERSAL, 0);
+                    me->Yell(SAY_DIALOG_MEDIVH_3, LANG_UNIVERSAL);
                     return 10000;
                 case 4:
                     if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
-                        arca->MonsterYell(SAY_DIALOG_ARCANAGOS_4, LANG_UNIVERSAL, 0);
+                        arca->Yell(SAY_DIALOG_ARCANAGOS_4, LANG_UNIVERSAL);
                     return 20000;
                 case 5:
-                    me->MonsterYell(SAY_DIALOG_MEDIVH_5, LANG_UNIVERSAL, 0);
+                    me->Yell(SAY_DIALOG_MEDIVH_5, LANG_UNIVERSAL);
                     return 20000;
                 case 6:
                     if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
-                        arca->MonsterYell(SAY_DIALOG_ARCANAGOS_6, LANG_UNIVERSAL, 0);
+                        arca->Yell(SAY_DIALOG_ARCANAGOS_6, LANG_UNIVERSAL);
 
                     ATimer = 5500;
                     MTimer = 6600;
@@ -508,7 +515,7 @@ public:
                     me->CastSpell(me, SPELL_MANA_SHIELD, true);
                     return 5500;
                 case 9:
-                    me->MonsterTextEmote(EMOTE_DIALOG_MEDIVH_7, 0, false);
+                    me->TextEmote(EMOTE_DIALOG_MEDIVH_7);
                     me->CastSpell(me, 30972, true);
                     return 10000;
                 case 10:
@@ -518,7 +525,7 @@ public:
                     return 1000;
                 case 11:
                     if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
-                        arca->MonsterYell(SAY_DIALOG_ARCANAGOS_8, LANG_UNIVERSAL, 0);
+                        arca->Yell(SAY_DIALOG_ARCANAGOS_8, LANG_UNIVERSAL);
                     return 5000;
                 case 12:
                     if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
@@ -529,7 +536,7 @@ public:
                     }
                     return 10000;
                 case 13:
-                    me->MonsterYell(SAY_DIALOG_MEDIVH_9, LANG_UNIVERSAL, 0);
+                    me->Yell(SAY_DIALOG_MEDIVH_9, LANG_UNIVERSAL);
                     return 10000;
                 case 14:
                     if (me->GetMap()->IsDungeon())

@@ -1,9 +1,22 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "sunwell_plateau.h"
 
@@ -98,15 +111,15 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
             if (Creature* alythess = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_GRAND_WARLOCK_ALYTHESS)))
             {
                 if (!alythess->IsAlive())
                     alythess->Respawn(true);
                 else if (!alythess->IsInEvadeMode())
-                    alythess->AI()->EnterEvadeMode();
+                    alythess->AI()->EnterEvadeMode(why);
             }
         }
 
@@ -147,7 +160,7 @@ public:
         void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
-            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
             {
                 summon->AI()->AttackStart(target);
                 summon->AddThreat(target, 10000000);
@@ -179,7 +192,7 @@ public:
                     break;
                 case EVENT_SPELL_SHADOW_NOVA:
                     {
-                        Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 100.0f);
+                        Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
                         if (!target)
                             target = me->GetVictim();
                         Talk(EMOTE_SHADOW_NOVA, target);
@@ -194,7 +207,7 @@ public:
                     break;
                 case EVENT_SPELL_CONFLAGRATION:
                     {
-                        Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 100.0f);
+                        Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
                         if (!target)
                             target = me->GetVictim();
                         me->CastSpell(target, SPELL_CONFLAGRATION, false);
@@ -246,15 +259,15 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
             if (Creature* scorlash = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_LADY_SACROLASH)))
             {
                 if (!scorlash->IsAlive())
                     scorlash->Respawn(true);
                 else if (!scorlash->IsInEvadeMode())
-                    scorlash->AI()->EnterEvadeMode();
+                    scorlash->AI()->EnterEvadeMode(why);
             }
         }
 
@@ -321,7 +334,7 @@ public:
                     break;
                 case EVENT_SPELL_SHADOW_NOVA:
                     {
-                        Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 100.0f);
+                        Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
                         if (!target)
                             target = me->GetVictim();
                         me->CastSpell(target, SPELL_SHADOW_NOVA, false);
@@ -330,7 +343,7 @@ public:
                     }
                 case EVENT_SPELL_CONFLAGRATION:
                     {
-                        Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 100.0f);
+                        Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
                         if (!target)
                             target = me->GetVictim();
                         Talk(EMOTE_CONFLAGRATION, target);

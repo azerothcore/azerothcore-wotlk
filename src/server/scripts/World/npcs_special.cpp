@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -25,27 +36,31 @@ npc_locksmith            75%    list of keys needs to be confirmed
 npc_firework            100%    NPC's summoned by rockets and rocket clusters, for making them cast visual
 EndContentData */
 
-#include "Cell.h"
 #include "CellImpl.h"
 #include "Chat.h"
 #include "CombatAI.h"
 #include "CreatureTextMgr.h"
 #include "DBCStructure.h"
 #include "GameEventMgr.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
-#include "Group.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Pet.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SmartAI.h"
 #include "SpellAuras.h"
-#include "WaypointManager.h"
+#include "WaypointMgr.h"
 #include "World.h"
+
+// TODO: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+//  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
+#include "GridNotifiersImpl.h"
 
 enum elderClearwater
 {
@@ -105,9 +120,7 @@ public:
             {
                 case EVENT_CLEARWATER_ANNOUNCE:
                     {
-                        time_t curtime = time(nullptr);
-                        tm strdate;
-                        localtime_r(&curtime, &strdate);
+                        tm strdate = Acore::Time::TimeBreakdown();
 
                         if (!preWarning && strdate.tm_hour == 13 && strdate.tm_min == 55)
                         {
@@ -205,6 +218,8 @@ enum riggleBassbait
     QUEST_MASTER_ANGLER                 = 8193,
 
     DATA_ANGLER_FINISHED                = 1,
+
+    GAME_EVENT_FISHING                  = 62
 };
 
 class npc_riggle_bassbait : public CreatureScript
@@ -218,7 +233,7 @@ public:
         {
             events.Reset();
             events.ScheduleEvent(EVENT_RIGGLE_ANNOUNCE, 1000, 1, 0);
-            finished = false;
+            finished = sWorld->getWorldState(GAME_EVENT_FISHING) == 1;
             startWarning = false;
             finishWarning = false;
         }
@@ -239,7 +254,10 @@ public:
         void DoAction(int32 param) override
         {
             if (param == DATA_ANGLER_FINISHED)
+            {
                 finished = true;
+                sWorld->setWorldState(GAME_EVENT_FISHING, 1);
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -249,14 +267,14 @@ public:
             {
                 case EVENT_RIGGLE_ANNOUNCE:
                     {
-                        time_t curtime = time(nullptr);
-                        tm strdate;
-                        localtime_r(&curtime, &strdate);
+                        tm strdate = Acore::Time::TimeBreakdown();
+
                         if (!startWarning && strdate.tm_hour == 14 && strdate.tm_min == 0)
                         {
                             sCreatureTextMgr->SendChat(me, RIGGLE_SAY_START, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
                             startWarning = true;
                         }
+
                         if (!finishWarning && strdate.tm_hour == 16 && strdate.tm_min == 0)
                         {
                             sCreatureTextMgr->SendChat(me, RIGGLE_SAY_END, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
@@ -327,9 +345,9 @@ public:
             resetTimer = 5000;
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            if (!_EnterEvadeMode())
+            if (!_EnterEvadeMode(why))
                 return;
 
             Reset();
@@ -348,7 +366,7 @@ public:
 
             if (resetTimer <= diff)
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
                 resetTimer = 5000;
             }
             else
@@ -387,9 +405,9 @@ public:
             me->SelectLevel();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            if (!_EnterEvadeMode())
+            if (!_EnterEvadeMode(why))
                 return;
 
             Reset();
@@ -503,14 +521,14 @@ public:
             }
 
             if (!SpawnAssoc)
-                LOG_ERROR("sql.sql", "TCSR: Creature template entry %u has ScriptName npc_air_force_bots, but it's not handled by that script", creature->GetEntry());
+                LOG_ERROR("sql.sql", "TCSR: Creature template entry {} has ScriptName npc_air_force_bots, but it's not handled by that script", creature->GetEntry());
             else
             {
                 CreatureTemplate const* spawnedTemplate = sObjectMgr->GetCreatureTemplate(SpawnAssoc->spawnedCreatureEntry);
 
                 if (!spawnedTemplate)
                 {
-                    LOG_ERROR("sql.sql", "TCSR: Creature template entry %u does not exist in DB, which is required by npc_air_force_bots", SpawnAssoc->spawnedCreatureEntry);
+                    LOG_ERROR("sql.sql", "TCSR: Creature template entry {} does not exist in DB, which is required by npc_air_force_bots", SpawnAssoc->spawnedCreatureEntry);
                     SpawnAssoc = nullptr;
                     return;
                 }
@@ -530,7 +548,7 @@ public:
                 SpawnedGUID = summoned->GetGUID();
             else
             {
-                LOG_ERROR("sql.sql", "TCSR: npc_air_force_bots: wasn't able to spawn Creature %u", SpawnAssoc->spawnedCreatureEntry);
+                LOG_ERROR("sql.sql", "TCSR: npc_air_force_bots: wasn't able to spawn Creature {}", SpawnAssoc->spawnedCreatureEntry);
                 SpawnAssoc = nullptr;
             }
 
@@ -639,9 +657,7 @@ enum ChickenCluck
     EMOTE_HELLO         = 0,
     EMOTE_CLUCK_TEXT    = 2,
 
-    QUEST_CLUCK         = 3861,
-    FACTION_FRIENDLY    = 35,
-    FACTION_CHICKEN     = 31
+    QUEST_CLUCK         = 3861
 };
 
 class npc_chicken_cluck : public CreatureScript
@@ -658,8 +674,8 @@ public:
         void Reset() override
         {
             ResetFlagTimer = 120000;
-            me->setFaction(FACTION_CHICKEN);
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+            me->SetFaction(FACTION_PREY);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
         }
 
         void EnterCombat(Unit* /*who*/) override { }
@@ -667,7 +683,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
             // Reset flags after a certain time has passed so that the next player has to start the 'event' again
-            if (me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER))
+            if (me->HasNpcFlag(UNIT_NPC_FLAG_QUESTGIVER))
             {
                 if (ResetFlagTimer <= diff)
                 {
@@ -689,16 +705,16 @@ public:
                 case TEXT_EMOTE_CHICKEN:
                     if (player->GetQuestStatus(QUEST_CLUCK) == QUEST_STATUS_NONE && rand() % 30 == 1)
                     {
-                        me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                        me->setFaction(FACTION_FRIENDLY);
+                        me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
+                        me->SetFaction(FACTION_FRIENDLY);
                         Talk(EMOTE_HELLO);
                     }
                     break;
                 case TEXT_EMOTE_CHEER:
                     if (player->GetQuestStatus(QUEST_CLUCK) == QUEST_STATUS_COMPLETE)
                     {
-                        me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                        me->setFaction(FACTION_FRIENDLY);
+                        me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
+                        me->SetFaction(FACTION_FRIENDLY);
                         Talk(EMOTE_CLUCK_TEXT);
                     }
                     break;
@@ -918,7 +934,7 @@ public:
 
             Event = false;
 
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void BeginEvent(Player* player)
@@ -943,7 +959,7 @@ public:
             }
 
             Event = true;
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void PatientDied(Location* point)
@@ -983,7 +999,7 @@ public:
                     {
                         if (!Patients.empty())
                         {
-                            for (ObjectGuid const guid : Patients)
+                            for (ObjectGuid const& guid : Patients)
                             {
                                 if (Creature* patient = ObjectAccessor::GetCreature(*me, guid))
                                     patient->setDeathState(JUST_DIED);
@@ -1045,10 +1061,10 @@ public:
             Coord = nullptr;
 
             //no select
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
             //no regen health
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
+            me->SetUnitFlag(UNIT_FLAG_IN_COMBAT);
 
             //to make them lay with face down
             me->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_DEAD);
@@ -1087,10 +1103,10 @@ public:
                         CAST_AI(npc_doctor::npc_doctorAI, doctor->AI())->PatientSaved(me, player, Coord);
 
             //make not selectable
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
             //regen health
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
+            me->RemoveUnitFlag(UNIT_FLAG_IN_COMBAT);
 
             //stand up
             me->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_STAND);
@@ -1123,10 +1139,10 @@ public:
 
             if (me->IsAlive() && me->GetHealth() <= 6)
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_IN_COMBAT);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->setDeathState(JUST_DIED);
-                me->SetFlag(UNIT_DYNAMIC_FLAGS, 32);
+                me->SetDynamicFlag(32);
 
                 if (DoctorGUID)
                     if (Creature* doctor = ObjectAccessor::GetCreature((*me), DoctorGUID))
@@ -1168,7 +1184,7 @@ void npc_doctor::npc_doctorAI::UpdateAI(uint32 diff)
                     patientEntry = HordeSoldierId[rand() % 3];
                     break;
                 default:
-                    LOG_ERROR("scripts", "TSCR: Invalid entry for Triage doctor. Please check your database");
+                    LOG_ERROR("scripts", "Invalid entry for Triage doctor. Please check your database");
                     return;
             }
 
@@ -1177,7 +1193,7 @@ void npc_doctor::npc_doctorAI::UpdateAI(uint32 diff)
                 if (Creature* Patient = me->SummonCreature(patientEntry, point->x, point->y, point->z, point->o, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
                 {
                     //303, this flag appear to be required for client side item->spell to work (TARGET_SINGLE_FRIEND)
-                    Patient->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+                    Patient->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
 
                     Patients.push_back(Patient->GetGUID());
                     CAST_AI(npc_injured_patient::npc_injured_patientAI, Patient->AI())->DoctorGUID = me->GetGUID();
@@ -1433,7 +1449,7 @@ public:
 
         void Reset() override
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -1707,7 +1723,7 @@ public:
     {
         if (creature->IsSummon())
         {
-            if (player == creature->ToTempSummon()->GetSummoner())
+            if (player == creature->ToTempSummon()->GetSummonerUnit())
             {
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ENGINEERING1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ENGINEERING2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
@@ -1968,7 +1984,7 @@ public:
     bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
-        bool noXPGain = player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_XP_GAIN);
+        bool noXPGain = player->HasPlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
         bool doSwitch = false;
         auto toggleXpCost = sWorld->getIntConfig(CONFIG_TOGGLE_XP_COST);
 
@@ -1996,12 +2012,12 @@ public:
             else if (noXPGain)
             {
                 player->ModifyMoney(-toggleXpCost);
-                player->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_XP_GAIN);
+                player->RemovePlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
             }
             else if (!noXPGain)
             {
                 player->ModifyMoney(-toggleXpCost);
-                player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_XP_GAIN);
+                player->SetPlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
             }
         }
         player->PlayerTalkClass->SendCloseGossip();
@@ -2229,7 +2245,7 @@ public:
                     break;
             }
 
-            const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
 
             if (spellInfo && spellInfo->Effects[0].Effect == SPELL_EFFECT_SUMMON_OBJECT_WILD)
                 return spellInfo->Effects[0].MiscValue;
@@ -2450,6 +2466,83 @@ public:
     }
 };
 
+enum VenomhideHatchlingMisc
+{
+    ITEM_VENOMHIDE_BABY_TOOTH = 47196,
+
+    MODEL_BABY_RAPTOR              = 29251,
+    MODEL_BABY_RAPTOR_REPTILE_EYES = 29809,
+    MODEL_ADOLESCENT_RAPTOR        = 29103,
+    MODEL_FULL_RAPTOR              = 5291,
+};
+
+enum VenomhideHatchlingTexts
+{
+    TALK_EMOTE_EAT = 0,
+};
+
+enum VenomhideHatchlingSpellEmotes
+{
+    SPELL_SILITHID_MEAT       = 65258,
+    SPELL_SILITHID_EGG        = 65265,
+    SPELL_FRESH_DINOSAUR_MEAT = 65200,
+};
+
+class npc_venomhide_hatchling : public CreatureScript
+{
+public:
+    npc_venomhide_hatchling() : CreatureScript("npc_venomhide_hatchling") {}
+
+    struct npc_venomhide_hatchlingAI : public ScriptedAI
+    {
+        npc_venomhide_hatchlingAI(Creature* creature) : ScriptedAI(creature) {}
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (summoner->GetTypeId() != TYPEID_PLAYER)
+            {
+                return;
+            }
+
+            if (summoner->ToPlayer()->GetItemCount(ITEM_VENOMHIDE_BABY_TOOTH) >= 6)
+            {
+                me->SetDisplayId(MODEL_BABY_RAPTOR_REPTILE_EYES);
+            }
+            if (summoner->ToPlayer()->GetItemCount(ITEM_VENOMHIDE_BABY_TOOTH) >= 11)
+            {
+                me->SetDisplayId(MODEL_ADOLESCENT_RAPTOR);
+            }
+            if (summoner->ToPlayer()->GetItemCount(ITEM_VENOMHIDE_BABY_TOOTH) >= 16)
+            {
+                me->SetDisplayId(MODEL_FULL_RAPTOR);
+            }
+        }
+
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+        {
+            if (spell->Id == SPELL_SILITHID_EGG || spell->Id == SPELL_SILITHID_MEAT || spell->Id == SPELL_FRESH_DINOSAUR_MEAT)
+            {
+                Talk(TALK_EMOTE_EAT);
+            }
+        }
+    };
+
+    bool OnGossipHello(Player* player, Creature* creature) override
+    {
+        if (creature->GetOwnerGUID() && creature->GetOwnerGUID() == player->GetGUID())
+        {
+            return false;
+        }
+
+        return true;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_venomhide_hatchlingAI(creature);
+    }
+};
+
 void AddSC_npcs_special()
 {
     // Ours
@@ -2457,6 +2550,7 @@ void AddSC_npcs_special()
     new npc_riggle_bassbait();
     new npc_target_dummy();
     new npc_training_dummy();
+    new npc_venomhide_hatchling();
 
     // Theirs
     new npc_air_force_bots();

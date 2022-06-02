@@ -1,14 +1,27 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "icecrown_citadel.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellAuras.h"
+#include "icecrown_citadel.h"
 
 enum ScriptTexts
 {
@@ -238,7 +251,7 @@ public:
         void Reset() override
         {
             _Reset();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
             me->SetReactState(REACT_DEFENSIVE);
             events.Reset();
             _introDone = false;
@@ -270,7 +283,7 @@ public:
 
             if (!instance->CheckRequiredBosses(DATA_DEATHBRINGER_SAURFANG, who->ToPlayer()))
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 instance->DoCastSpellOnPlayers(LIGHT_S_HAMMER_TELEPORT);
                 return;
             }
@@ -303,14 +316,14 @@ public:
                 creature->AI()->DoAction(ACTION_START_OUTRO);
         }
 
-        bool CanAIAttack(const Unit*  /*target*/) const override
+        bool CanAIAttack(Unit const*  /*target*/) const override
         {
             return _introDone;
         }
 
         void AttackStart(Unit* victim) override
         {
-            if (!_introDone || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC))
+            if (!_introDone || me->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC))
                 return;
 
             ScriptedAI::AttackStart(victim);
@@ -335,14 +348,14 @@ public:
             if (!_frenzied && HealthBelowPct(31)) // AT 30%, not below
             {
                 _frenzied = true;
-                DoCast(me, SPELL_FRENZY);
+                DoCast(me, SPELL_FRENZY, true);
                 Talk(SAY_FRENZY);
             }
         }
 
         void JustSummoned(Creature* summon) override
         {
-            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true))
                 summon->AI()->AttackStart(target);
 
             //if (IsHeroic())
@@ -392,7 +405,7 @@ public:
                     if (Player* p = itr->GetSource())
                         if (p->GetTransport())
                         {
-                            EnterEvadeMode();
+                            EnterEvadeMode(EVADE_REASON_OTHER);
                             return;
                         }
             }
@@ -452,7 +465,7 @@ public:
             switch (action)
             {
                 case ACTION_MARK_OF_THE_FALLEN_CHAMPION:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true, -SPELL_MARK_OF_THE_FALLEN_CHAMPION))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true, -SPELL_MARK_OF_THE_FALLEN_CHAMPION))
                     {
                         ++_fallenChampionCastCount;
                         me->CastSpell(target, SPELL_MARK_OF_THE_FALLEN_CHAMPION, false);
@@ -482,9 +495,9 @@ public:
             return 0;
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
             if (Creature* creature = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SAURFANG_EVENT_NPC)))
                 creature->AI()->DoAction(ACTION_EVADE);
         }
@@ -518,7 +531,7 @@ public:
         void Reset() override
         {
             _events.Reset();
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->SetReactState(REACT_PASSIVE);
         }
 
@@ -545,7 +558,7 @@ public:
                         for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
                             (*itr)->AI()->SetData(0, x++);
 
-                        me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         Talk(SAY_INTRO_HORDE_1);
                         _events.SetPhase(PHASE_INTRO_H);
                         _events.ScheduleEvent(EVENT_INTRO_HORDE_2, 5000, 0, PHASE_INTRO_H);
@@ -555,10 +568,10 @@ public:
                         if (GameObject* teleporter = ObjectAccessor::GetGameObject(*me, _instance->GetGuidData(GO_SCOURGE_TRANSPORTER_SAURFANG)))
                         {
                             _instance->HandleGameObject(ObjectGuid::Empty, false, teleporter);
-                            teleporter->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
+                            teleporter->SetGameObjectFlag(GO_FLAG_IN_USE);
                         }
 
-                        deathbringer->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        deathbringer->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         deathbringer->SetWalk(false);
                         deathbringer->GetMotionMaster()->MovePoint(POINT_SAURFANG, deathbringerPos.GetPositionX(), deathbringerPos.GetPositionY(), deathbringerPos.GetPositionZ());
                     }
@@ -632,7 +645,7 @@ public:
                         if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
                         {
                             deathbringer->CastSpell(me, SPELL_RIDE_VEHICLE, true);
-                            deathbringer->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                            deathbringer->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                             deathbringer->setDeathState(ALIVE);
                         }
                         _events.ScheduleEvent(EVENT_OUTRO_HORDE_4, 1000);
@@ -694,7 +707,7 @@ public:
                     if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
                     {
                         deathbringer->AI()->DoAction(ACTION_INTRO_DONE);
-                        deathbringer->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                        deathbringer->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                         if (Player* target = deathbringer->SelectNearestPlayer(100.0f))
                             deathbringer->AI()->AttackStart(target);
                     }
@@ -779,7 +792,7 @@ public:
         void Reset() override
         {
             _events.Reset();
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->SetReactState(REACT_PASSIVE);
         }
 
@@ -806,7 +819,7 @@ public:
                         for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
                             (*itr)->AI()->SetData(0, x++);
 
-                        me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         Talk(SAY_INTRO_ALLIANCE_1);
                         _events.SetPhase(PHASE_INTRO_A);
                         _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_2, 2500, 0, PHASE_INTRO_A);
@@ -817,10 +830,10 @@ public:
                         if (GameObject* teleporter = ObjectAccessor::GetGameObject(*me, _instance->GetGuidData(GO_SCOURGE_TRANSPORTER_SAURFANG)))
                         {
                             _instance->HandleGameObject(ObjectGuid::Empty, false, teleporter);
-                            teleporter->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
+                            teleporter->SetGameObjectFlag(GO_FLAG_IN_USE);
                         }
 
-                        deathbringer->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        deathbringer->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         deathbringer->SetWalk(false);
                         deathbringer->GetMotionMaster()->MovePoint(POINT_SAURFANG, deathbringerPos.GetPositionX(), deathbringerPos.GetPositionY(), deathbringerPos.GetPositionZ());
                     }
@@ -932,7 +945,7 @@ public:
                     if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
                     {
                         deathbringer->AI()->DoAction(ACTION_INTRO_DONE);
-                        deathbringer->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                        deathbringer->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                         if (Player* target = deathbringer->SelectNearestPlayer(100.0f))
                             deathbringer->AI()->AttackStart(target);
                     }
@@ -1046,15 +1059,16 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            SpellInfo const* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo();
-            return eventInfo.GetActor() && eventInfo.GetActionTarget() && (eventInfo.GetDamageInfo()->GetDamage() || eventInfo.GetHitMask() & PROC_EX_ABSORB) && procSpell && procSpell->SpellIconID != 2731; // Xinef: Mark of the Fallen Champion
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+            return eventInfo.GetActor() && eventInfo.GetActionTarget() && ((damageInfo && damageInfo->GetDamage()) || eventInfo.GetHitMask() & PROC_EX_ABSORB) && procSpell && procSpell->SpellIconID != 2731; // Xinef: Mark of the Fallen Champion
         }
 
         void HandleProc(AuraEffect const*  /*aurEff*/, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
             Unit* victim = eventInfo.GetActionTarget();
-            SpellInfo const* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo();
+            SpellInfo const* procSpell = eventInfo.GetSpellInfo();
 
             //uint32 markCount = 0;
             //if (Creature* saurfang = eventInfo.GetActor()->ToCreature())
@@ -1078,7 +1092,6 @@ public:
         {
             DoCheckProc += AuraCheckProcFn(spell_deathbringer_blood_link_AuraScript::CheckProc);
             OnEffectProc += AuraEffectProcFn(spell_deathbringer_blood_link_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
-
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_deathbringer_blood_link_AuraScript::HandlePeriodicTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
@@ -1100,8 +1113,9 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            SpellInfo const* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo();
-            return eventInfo.GetActor() && eventInfo.GetActionTarget() && (eventInfo.GetDamageInfo()->GetDamage() || eventInfo.GetHitMask() & PROC_EX_ABSORB) && (!procSpell || procSpell->SpellIconID != 2731); // Xinef: Mark of the Fallen Champion
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+            return eventInfo.GetActor() && eventInfo.GetActionTarget() && ((damageInfo && damageInfo->GetDamage()) || eventInfo.GetHitMask() & PROC_EX_ABSORB) && (!procSpell || procSpell->SpellIconID != 2731); // Xinef: Mark of the Fallen Champion
         }
 
         void HandleProc(AuraEffect const*  /*aurEff*/, ProcEventInfo& eventInfo)

@@ -1,10 +1,23 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "violet_hold.h"
 
@@ -57,11 +70,6 @@ enum eSpells
 #define SPELL_WATER_BOLT_VOLLEY             DUNGEON_MODE(SPELL_WATER_BOLT_VOLLEY_N, SPELL_WATER_BOLT_VOLLEY_H)
 #define SPELL_FRENZY                        DUNGEON_MODE(SPELL_FRENZY_N, SPELL_FRENZY_H)
 
-enum eEvents
-{
-    EVENT_SPELL_WATER_BOLT_VOLLEY = 1,
-};
-
 class boss_ichoron : public CreatureScript
 {
 public:
@@ -93,7 +101,7 @@ public:
             bIsFrenzy = false;
             uiDrainedTimer = 15000;
             uiWaterBoltVolleyTimer = urand(7000, 12000);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetDisplayId(me->GetNativeDisplayId());
         }
 
@@ -130,14 +138,14 @@ public:
                 me->CastSpell(me, SPELL_PROTECTIVE_BUBBLE, true);
             }
 
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetDisplayId(me->GetNativeDisplayId());
         }
 
         void IchoronDoCastToAllHostilePlayers(uint32 spellId, bool triggered)
         {
             Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
-            if (PlayerList.isEmpty())
+            if (PlayerList.IsEmpty())
                 return;
 
             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
@@ -183,16 +191,16 @@ public:
                         me->CastSpell(me, SPELL_DRAINED, true);
                         bIsExploded = true;
                         uiDrainedTimer = 15000;
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         me->SetDisplayId(11686);
                         for (uint8 i = 0; i < MAX_SPAWN_LOC; ++i)
                         {
                             float angle = rand_norm() * 2 * M_PI;
                             Position p1(SpawnLoc[i]), p2(SpawnLoc[i]);
                             p1.m_positionX += 2.5f * cos(angle);
-                            p1.m_positionY += 2.5f * sin(angle);
+                            p1.m_positionY += 2.5f * std::sin(angle);
                             p2.m_positionX -= 2.5f * cos(angle);
-                            p2.m_positionY -= 2.5f * sin(angle);
+                            p2.m_positionY -= 2.5f * std::sin(angle);
                             DoSummon(NPC_ICHOR_GLOBULE, p1, 60000, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN);
                             DoSummon(NPC_ICHOR_GLOBULE, p2, 60000, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN);
                         }
@@ -209,7 +217,7 @@ public:
                         bool bIsWaterElementsAlive = false;
                         if (!globules.empty())
                         {
-                            for (ObjectGuid const guid : globules)
+                            for (ObjectGuid const& guid : globules)
                                 if (Creature* pTemp = ObjectAccessor::GetCreature(*me, guid))
                                     if (pTemp->IsAlive())
                                     {
@@ -265,7 +273,7 @@ public:
         {
             Talk(SAY_DEATH);
             bIsExploded = false;
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetDisplayId(me->GetNativeDisplayId());
             globules.DespawnAll();
             if (pInstance)
@@ -281,10 +289,11 @@ public:
 
         void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            ScriptedAI::EnterEvadeMode();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            ScriptedAI::EnterEvadeMode(why);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+
             if (pInstance)
                 pInstance->SetData(DATA_FAILED, 1);
         }
@@ -312,7 +321,7 @@ public:
         InstanceScript* pInstance;
         uint32 uiRangeCheck_Timer;
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_CREATE_GLOBULE_VISUAL)
                 me->CastSpell(me, SPELL_WATER_GLOBULE, true);

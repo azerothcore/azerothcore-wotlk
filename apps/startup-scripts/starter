@@ -11,6 +11,9 @@ if [ $GDB_ENABLED -eq 1 ]; then
     echo "set debug timestamp" >> "$GDB_FILE"
     echo "run -c $3" >> "$GDB_FILE"
     echo "bt" >> "$GDB_FILE"
+    echo "bt full" >> "$GDB_FILE"
+    echo "info thread" >> "$GDB_FILE"
+    echo "thread apply all backtrace full" >> "$GDB_FILE"
 
     [ ! -f "$SYSLOG" ] && touch "$SYSLOG"
     [ ! -f "$SYSERR" ] && touch "$SYSERR"

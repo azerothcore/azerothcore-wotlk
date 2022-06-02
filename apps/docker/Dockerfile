@@ -27,7 +27,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Do not use acore dashboard to install
 # since it's not cacheable by docker
 RUN apt-get update && apt-get install -y gdb gdbserver git dos2unix lsb-core sudo curl unzip \
-  make cmake clang libmysqlclient-dev libace-dev \
+  make cmake clang libmysqlclient-dev \
   libboost-system1.7*-dev libboost-filesystem1.7*-dev libboost-program-options1.7*-dev libboost-iostreams1.7*-dev \
   build-essential libtool cmake-data openssl libgoogle-perftools-dev google-perftools \
   libssl-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev mysql-client \
@@ -109,7 +109,7 @@ RUN addgroup --gid $GROUP_ID acore && \
 # install the required dependencies to run the server
 RUN apt-get update && apt-get install -y dos2unix gdb gdbserver google-perftools libgoogle-perftools-dev net-tools \
     libboost-system1.7*-dev libboost-filesystem1.7*-dev libboost-program-options1.7*-dev libboost-iostreams1.7*-dev \
-    tzdata libmysqlclient-dev libace-dev mysql-client curl unzip && rm -rf /var/lib/apt/lists/* ;
+    tzdata libmysqlclient-dev mysql-client curl unzip && rm -rf /var/lib/apt/lists/* ;
 
 # change timezone in container
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
@@ -181,7 +181,7 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/authserver.conf.dockerdist
 COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/worldserver.conf.dockerdist /azerothcore/env/dist/etc/worldserver.conf.dockerdist
 
 # install eluna
-RUN git clone --depth=1 --branch=master --recursive https://github.com/azerothcore/mod-eluna-lua-engine.git /azerothcore/modules/mod-eluna-lua-engine
+RUN git clone --depth=1 --branch=master https://github.com/azerothcore/mod-eluna.git /azerothcore/modules/mod-eluna
 
 ENV USER_CONF_PATH=/azerothcore/apps/docker/config-docker.sh
 ENV CTYPE=RelWithDebInfo
@@ -189,7 +189,8 @@ ENV AC_CCACHE=true
 ENV CCACHE_CPP2=true
 ENV CSCRIPTPCH=OFF
 ENV CCOREPCH=OFF
-ENV CTOOLS=ON
+# ENV CTOOLS_BUILD=all
+ENV CTOOLS_BUILD=maps-only
 ENV CSCRIPTS=static
 RUN bash apps/docker/docker-build-prod.sh
 
@@ -281,7 +282,7 @@ ENV TZ=Etc/UTC
 # set noninteractive mode so tzdata doesn't ask to set timezone on install
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y libmysqlclient-dev libace-dev libssl-dev libbz2-dev \ 
+RUN apt-get update && apt-get install -y libmysqlclient-dev libssl-dev libbz2-dev \
     libboost-system1.7*-dev libboost-filesystem1.7*-dev libboost-program-options1.7*-dev libboost-iostreams1.7*-dev \
     sudo && rm -rf /var/lib/apt/lists/* ;
 
@@ -303,8 +304,9 @@ RUN mkdir -p /azerothcore/env/client/maps
 RUN mkdir -p /azerothcore/env/client/mmaps
 RUN mkdir -p /azerothcore/env/client/vmaps
 
-COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/mapextractor /azerothcore/env/client/mapextractor
-COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/mmaps_generator /azerothcore/env/client/mmaps_generator
-COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/vmap4assembler /azerothcore/env/client/vmap4assembler
-COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/vmap4extractor /azerothcore/env/client/vmap4extractor
+# Need fix
+# COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/mapextractor /azerothcore/env/client/mapextractor
+# COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/mmaps_generator /azerothcore/env/client/mmaps_generator
+# COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/vmap4assembler /azerothcore/env/client/vmap4assembler
+# COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/vmap4extractor /azerothcore/env/client/vmap4extractor
 

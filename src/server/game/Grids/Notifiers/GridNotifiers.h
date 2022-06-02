@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ACORE_GRIDNOTIFIERS_H
@@ -11,8 +22,10 @@
 #include "CreatureAI.h"
 #include "DynamicObject.h"
 #include "GameObject.h"
+#include "Group.h"
 #include "Object.h"
 #include "ObjectGridLoader.h"
+#include "Optional.h"
 #include "Player.h"
 #include "Spell.h"
 #include "Unit.h"
@@ -34,13 +47,14 @@ namespace Acore
         bool i_largeOnly;
         UpdateData i_data;
 
-        VisibleNotifier(Player& player, bool gobjOnly, bool largeOnly) : i_player(player), vis_guids(player.m_clientGUIDs), i_visibleNow(player.m_newVisible), i_gobjOnly(gobjOnly), i_largeOnly(largeOnly)
+        VisibleNotifier(Player& player, bool gobjOnly, bool largeOnly) :
+            i_player(player), vis_guids(player.m_clientGUIDs), i_visibleNow(player.m_newVisible), i_gobjOnly(gobjOnly), i_largeOnly(largeOnly)
         {
             i_visibleNow.clear();
         }
 
         void Visit(GameObjectMapType&);
-        template<class T> void Visit(GridRefManager<T>& m);
+        template<class T> void Visit(GridRefMgr<T>& m);
         void SendToSelf(void);
     };
 
@@ -49,7 +63,7 @@ namespace Acore
         WorldObject& i_object;
 
         explicit VisibleChangesNotifier(WorldObject& object) : i_object(object) {}
-        template<class T> void Visit(GridRefManager<T>&) {}
+        template<class T> void Visit(GridRefMgr<T>&) {}
         void Visit(PlayerMapType&);
         void Visit(CreatureMapType&);
         void Visit(DynamicObjectMapType&);
@@ -57,9 +71,9 @@ namespace Acore
 
     struct PlayerRelocationNotifier : public VisibleNotifier
     {
-        PlayerRelocationNotifier(Player& player, bool largeOnly) : VisibleNotifier(player, false, largeOnly) {}
+        PlayerRelocationNotifier(Player& player, bool largeOnly): VisibleNotifier(player, false, largeOnly) { }
 
-        template<class T> void Visit(GridRefManager<T>& m) { VisibleNotifier::Visit(m); }
+        template<class T> void Visit(GridRefMgr<T>& m) { VisibleNotifier::Visit(m); }
         void Visit(PlayerMapType&);
     };
 
@@ -67,7 +81,7 @@ namespace Acore
     {
         Creature& i_creature;
         CreatureRelocationNotifier(Creature& c) : i_creature(c) {}
-        template<class T> void Visit(GridRefManager<T>&) {}
+        template<class T> void Visit(GridRefMgr<T>&) {}
         void Visit(PlayerMapType&);
     };
 
@@ -76,19 +90,19 @@ namespace Acore
         Unit& i_unit;
         bool isCreature;
         explicit AIRelocationNotifier(Unit& unit) : i_unit(unit), isCreature(unit.GetTypeId() == TYPEID_UNIT)  {}
-        template<class T> void Visit(GridRefManager<T>&) {}
+        template<class T> void Visit(GridRefMgr<T>&) {}
         void Visit(CreatureMapType&);
     };
 
     struct MessageDistDeliverer
     {
-        WorldObject* i_source;
-        WorldPacket* i_message;
+        WorldObject const* i_source;
+        WorldPacket const* i_message;
         uint32 i_phaseMask;
         float i_distSq;
         TeamId teamId;
         Player const* skipped_receiver;
-        MessageDistDeliverer(WorldObject* src, WorldPacket* msg, float dist, bool own_team_only = false, Player const* skipped = nullptr)
+        MessageDistDeliverer(WorldObject const* src, WorldPacket const* msg, float dist, bool own_team_only = false, Player const* skipped = nullptr)
             : i_source(src), i_message(msg), i_phaseMask(src->GetPhaseMask()), i_distSq(dist * dist)
             , teamId((own_team_only && src->GetTypeId() == TYPEID_PLAYER) ? src->ToPlayer()->GetTeamId() : TEAM_NEUTRAL)
             , skipped_receiver(skipped)
@@ -97,7 +111,7 @@ namespace Acore
         void Visit(PlayerMapType& m);
         void Visit(CreatureMapType& m);
         void Visit(DynamicObjectMapType& m);
-        template<class SKIP> void Visit(GridRefManager<SKIP>&) {}
+        template<class SKIP> void Visit(GridRefMgr<SKIP>&) {}
 
         void SendPacket(Player* player)
         {
@@ -125,7 +139,7 @@ namespace Acore
         void Visit(PlayerMapType& m);
         void Visit(CreatureMapType& m);
         void Visit(DynamicObjectMapType& m);
-        template<class SKIP> void Visit(GridRefManager<SKIP>&) {}
+        template<class SKIP> void Visit(GridRefMgr<SKIP>&) {}
 
         void SendPacket(Player* player)
         {
@@ -142,7 +156,7 @@ namespace Acore
         uint32 i_timeDiff;
         bool i_largeOnly;
         explicit ObjectUpdater(const uint32 diff, bool largeOnly) : i_timeDiff(diff), i_largeOnly(largeOnly) {}
-        template<class T> void Visit(GridRefManager<T>& m);
+        template<class T> void Visit(GridRefMgr<T>& m);
         void Visit(PlayerMapType&) {}
         void Visit(CorpseMapType&) {}
     };
@@ -150,6 +164,32 @@ namespace Acore
     // SEARCHERS & LIST SEARCHERS & WORKERS
 
     // WorldObject searchers & workers
+
+    // Generic base class to insert elements into arbitrary containers using push_back
+    template<typename Type>
+    class ContainerInserter
+    {
+        using InserterType = void(*)(void*, Type&&);
+
+        void* ref;
+        InserterType inserter;
+
+        // MSVC workaround
+        template<typename T>
+        static void InserterOf(void* ref, Type&& type)
+        {
+            static_cast<T*>(ref)->push_back(std::move(type));
+        }
+
+    protected:
+        template<typename T>
+        ContainerInserter(T& ref_) : ref(&ref_), inserter(&InserterOf<T>) { }
+
+        void Insert(Type type)
+        {
+            inserter(ref, std::move(type));
+        }
+    };
 
     template<class Check>
     struct WorldObjectSearcher
@@ -168,7 +208,7 @@ namespace Acore
         void Visit(CorpseMapType& m);
         void Visit(DynamicObjectMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     template<class Check>
@@ -188,19 +228,20 @@ namespace Acore
         void Visit(CorpseMapType& m);
         void Visit(DynamicObjectMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     template<class Check>
-    struct WorldObjectListSearcher
+    struct WorldObjectListSearcher : ContainerInserter<WorldObject*>
     {
         uint32 i_mapTypeMask;
         uint32 i_phaseMask;
-        std::list<WorldObject*>& i_objects;
         Check& i_check;
 
-        WorldObjectListSearcher(WorldObject const* searcher, std::list<WorldObject*>& objects, Check& check, uint32 mapTypeMask = GRID_MAP_TYPE_MASK_ALL)
-            : i_mapTypeMask(mapTypeMask), i_phaseMask(searcher->GetPhaseMask()), i_objects(objects), i_check(check) {}
+        template<typename Container>
+        WorldObjectListSearcher(WorldObject const* searcher, Container& container, Check & check, uint32 mapTypeMask = GRID_MAP_TYPE_MASK_ALL)
+                : ContainerInserter<WorldObject*>(container),
+                  i_mapTypeMask(mapTypeMask), i_phaseMask(searcher->GetPhaseMask()), i_check(check) { }
 
         void Visit(PlayerMapType& m);
         void Visit(CreatureMapType& m);
@@ -208,7 +249,7 @@ namespace Acore
         void Visit(GameObjectMapType& m);
         void Visit(DynamicObjectMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     template<class Do>
@@ -265,7 +306,7 @@ namespace Acore
                     i_do(itr->GetSource());
         }
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     // Gameobject searchers
@@ -282,7 +323,7 @@ namespace Acore
 
         void Visit(GameObjectMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     // Last accepted by Check GO if any (Check can change requirements at each call)
@@ -298,22 +339,23 @@ namespace Acore
 
         void Visit(GameObjectMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     template<class Check>
-    struct GameObjectListSearcher
+    struct GameObjectListSearcher : ContainerInserter<GameObject*>
     {
         uint32 i_phaseMask;
-        std::list<GameObject*>& i_objects;
         Check& i_check;
 
-        GameObjectListSearcher(WorldObject const* searcher, std::list<GameObject*>& objects, Check& check)
-            : i_phaseMask(searcher->GetPhaseMask()), i_objects(objects), i_check(check) {}
+        template<typename Container>
+        GameObjectListSearcher(WorldObject const* searcher, Container& container, Check & check)
+                : ContainerInserter<GameObject*>(container),
+                  i_phaseMask(searcher->GetPhaseMask()), i_check(check) { }
 
         void Visit(GameObjectMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     template<class Functor>
@@ -329,7 +371,7 @@ namespace Acore
                     _func(itr->GetSource());
         }
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
 
     private:
         Functor& _func;
@@ -352,7 +394,7 @@ namespace Acore
         void Visit(CreatureMapType& m);
         void Visit(PlayerMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     // Last accepted by Check Unit if any (Check can change requirements at each call)
@@ -369,24 +411,25 @@ namespace Acore
         void Visit(CreatureMapType& m);
         void Visit(PlayerMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     // All accepted by Check units if any
     template<class Check>
-    struct UnitListSearcher
+    struct UnitListSearcher : ContainerInserter<Unit*>
     {
         uint32 i_phaseMask;
-        std::list<Unit*>& i_objects;
         Check& i_check;
 
-        UnitListSearcher(WorldObject const* searcher, std::list<Unit*>& objects, Check& check)
-            : i_phaseMask(searcher->GetPhaseMask()), i_objects(objects), i_check(check) {}
+        template<typename Container>
+        UnitListSearcher(WorldObject const* searcher, Container& container, Check& check)
+                : ContainerInserter<Unit*>(container),
+                  i_phaseMask(searcher->GetPhaseMask()), i_check(check) { }
 
         void Visit(PlayerMapType& m);
         void Visit(CreatureMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     // Creature searchers
@@ -403,7 +446,7 @@ namespace Acore
 
         void Visit(CreatureMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     // Last accepted by Check Creature if any (Check can change requirements at each call)
@@ -419,22 +462,23 @@ namespace Acore
 
         void Visit(CreatureMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     template<class Check>
-    struct CreatureListSearcher
+    struct CreatureListSearcher : ContainerInserter<Creature*>
     {
         uint32 i_phaseMask;
-        std::list<Creature*>& i_objects;
         Check& i_check;
 
-        CreatureListSearcher(WorldObject const* searcher, std::list<Creature*>& objects, Check& check)
-            : i_phaseMask(searcher->GetPhaseMask()), i_objects(objects), i_check(check) {}
+        template<typename Container>
+        CreatureListSearcher(WorldObject const* searcher, Container& container, Check & check)
+                : ContainerInserter<Creature*>(container),
+                  i_phaseMask(searcher->GetPhaseMask()), i_check(check) { }
 
         void Visit(CreatureMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     template<class Do>
@@ -453,7 +497,7 @@ namespace Acore
                     i_do(itr->GetSource());
         }
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     // Player searchers
@@ -470,22 +514,23 @@ namespace Acore
 
         void Visit(PlayerMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     template<class Check>
-    struct PlayerListSearcher
+    struct PlayerListSearcher : ContainerInserter<Player*>
     {
         uint32 i_phaseMask;
-        std::list<Player*>& i_objects;
         Check& i_check;
 
-        PlayerListSearcher(WorldObject const* searcher, std::list<Player*>& objects, Check& check)
-            : i_phaseMask(searcher->GetPhaseMask()), i_objects(objects), i_check(check) {}
+        template<typename Container>
+        PlayerListSearcher(WorldObject const* searcher, Container& container, Check & check)
+                : ContainerInserter<Player*>(container),
+                  i_phaseMask(searcher->GetPhaseMask()), i_check(check) { }
 
         void Visit(PlayerMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     template<class Check>
@@ -501,7 +546,7 @@ namespace Acore
         void Visit(PlayerMapType& m);
         void Visit(CreatureMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     template<class Check>
@@ -517,7 +562,7 @@ namespace Acore
 
         void Visit(PlayerMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     template<class Do>
@@ -536,7 +581,7 @@ namespace Acore
                     i_do(itr->GetSource());
         }
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     template<class Do>
@@ -556,7 +601,7 @@ namespace Acore
                     i_do(itr->GetSource());
         }
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     // CHECKS && DO classes
@@ -676,10 +721,12 @@ namespace Acore
     class NearestGameObjectEntryInObjectRangeCheck
     {
     public:
-        NearestGameObjectEntryInObjectRangeCheck(WorldObject const& obj, uint32 entry, float range) : i_obj(obj), i_entry(entry), i_range(range) {}
+        NearestGameObjectEntryInObjectRangeCheck(WorldObject const& obj, uint32 entry, float range, bool onlySpawned = false) :
+            i_obj(obj), i_entry(entry), i_range(range), i_onlySpawned(onlySpawned) { }
+
         bool operator()(GameObject* go)
         {
-            if (go->GetEntry() == i_entry && i_obj.IsWithinDistInMap(go, i_range))
+            if (go->GetEntry() == i_entry && i_obj.IsWithinDistInMap(go, i_range) && (!i_onlySpawned || go->isSpawned()))
             {
                 i_range = i_obj.GetDistance(go);        // use found GO range as new range limit for next check
                 return true;
@@ -690,6 +737,7 @@ namespace Acore
         WorldObject const& i_obj;
         uint32 i_entry;
         float  i_range;
+        bool   i_onlySpawned;
 
         // prevent clone this object
         NearestGameObjectEntryInObjectRangeCheck(NearestGameObjectEntryInObjectRangeCheck const&);
@@ -737,6 +785,30 @@ namespace Acore
         Unit const* i_obj;
         float i_range;
         uint32 i_hp;
+    };
+
+    class MostHPPercentMissingInRange
+    {
+    public:
+        MostHPPercentMissingInRange(Unit const* obj, float range, uint32 minHpPct, uint32 maxHpPct) :
+            i_obj(obj), i_range(range), i_minHpPct(minHpPct), i_maxHpPct(maxHpPct), i_hpPct(101.f) { }
+
+        bool operator()(Unit* u)
+        {
+            if (u->IsAlive() && u->IsInCombat() && !i_obj->IsHostileTo(u) && i_obj->IsWithinDistInMap(u, i_range) &&
+                i_minHpPct <= u->GetHealthPct() && u->GetHealthPct() <= i_maxHpPct && u->GetHealthPct() < i_hpPct)
+            {
+                i_hpPct = u->GetHealthPct();
+                return true;
+            }
+
+            return false;
+        }
+
+    private:
+        Unit const* i_obj;
+        float i_range;
+        float i_minHpPct, i_maxHpPct, i_hpPct;
     };
 
     class FriendlyCCedInRange
@@ -832,7 +904,7 @@ namespace Acore
         AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck(Unit const* funit, float range)
             : i_funit(funit), i_range(range) {}
 
-        bool operator()(const Unit* u)
+        bool operator()(Unit const* u)
         {
             return u->IsAlive()
                    && i_funit->IsWithinDistInMap(u, i_range)
@@ -931,7 +1003,7 @@ namespace Acore
         bool operator()(Unit* u)
         {
             if (u->isTargetableForAttack(true, i_funit) && i_obj->IsWithinDistInMap(u, i_range) &&
-                (i_funit->IsInCombatWith(u) || i_funit->IsHostileTo(u)) && i_obj->CanSeeOrDetect(u))
+                (i_funit->IsInCombatWith(u) || u->IsHostileTo(i_funit)) && i_obj->CanSeeOrDetect(u))
             {
                 i_range = i_obj->GetDistance(u);        // use found unit range as new range limit for next check
                 return true;
@@ -989,7 +1061,7 @@ namespace Acore
         {}
         bool operator()(Unit* u)
         {
-            if (!u->IsAlive() || u->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE) || (u->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC) && !u->IsInCombat()))
+            if (!u->IsAlive() || u->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE) || (u->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC) && !u->IsInCombat()))
                 return false;
             if (u->GetGUID() == i_funit->GetGUID())
                 return false;
@@ -1060,7 +1132,7 @@ namespace Acore
         }
         bool operator()(Unit* u)
         {
-            if (!me->IsWithinDistInMap(u, m_range))
+            if (!me->IsWithinDistInMap(u, m_range, true, false))
                 return false;
 
             if (!me->IsValidAttackTarget(u))
@@ -1086,7 +1158,7 @@ namespace Acore
         explicit NearestHostileUnitInAttackDistanceCheck(Creature const* creature, float dist) : me(creature), m_range(dist) {}
         bool operator()(Unit* u)
         {
-            if (!me->IsWithinDistInMap(u, m_range))
+            if (!me->IsWithinDistInMap(u, m_range, true, false))
                 return false;
 
             if (!me->CanStartAttack(u))
@@ -1099,6 +1171,30 @@ namespace Acore
         Creature const* me;
         float m_range;
         NearestHostileUnitInAttackDistanceCheck(NearestHostileUnitInAttackDistanceCheck const&);
+    };
+
+    class NearestVisibleDetectableContestedGuardUnitCheck
+    {
+    public:
+        explicit NearestVisibleDetectableContestedGuardUnitCheck(Unit const* unit) : me(unit) {}
+        bool operator()(Unit* u)
+        {
+            if (!u->CanSeeOrDetect(me, true, true, false))
+            {
+                return false;
+            }
+
+            if (!u->IsContestedGuard())
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+    private:
+        Unit const* me;
+        NearestVisibleDetectableContestedGuardUnitCheck(NearestVisibleDetectableContestedGuardUnitCheck const&);
     };
 
     class AnyAssistCreatureInRangeCheck
@@ -1172,7 +1268,7 @@ namespace Acore
 
         bool operator()(Creature* u)
         {
-            if (u->GetEntry() == i_entry && u->IsAlive() == i_alive && i_obj.IsWithinDistInMap(u, i_range))
+            if (u->GetEntry() == i_entry && u->IsAlive() == i_alive && i_obj.IsWithinDist(u, i_range) && i_obj.InSamePhase(u))
             {
                 i_range = i_obj.GetDistance(u);         // use found unit range as new range limit for next check
                 return true;
@@ -1282,7 +1378,7 @@ namespace Acore
     class AllGameObjectsWithEntryInRange
     {
     public:
-        AllGameObjectsWithEntryInRange(const WorldObject* object, uint32 entry, float maxRange) : m_pObject(object), m_uiEntry(entry), m_fRange(maxRange) {}
+        AllGameObjectsWithEntryInRange(WorldObject const* object, uint32 entry, float maxRange) : m_pObject(object), m_uiEntry(entry), m_fRange(maxRange) {}
         bool operator() (GameObject* go)
         {
             if (go->GetEntry() == m_uiEntry && m_pObject->IsWithinDist(go, m_fRange, false))
@@ -1291,7 +1387,7 @@ namespace Acore
             return false;
         }
     private:
-        const WorldObject* m_pObject;
+        WorldObject const* m_pObject;
         uint32 m_uiEntry;
         float m_fRange;
     };
@@ -1299,7 +1395,7 @@ namespace Acore
     class AllCreaturesOfEntryInRange
     {
     public:
-        AllCreaturesOfEntryInRange(const WorldObject* object, uint32 entry, float maxRange) : m_pObject(object), m_uiEntry(entry), m_fRange(maxRange) {}
+        AllCreaturesOfEntryInRange(WorldObject const* object, uint32 entry, float maxRange) : m_pObject(object), m_uiEntry(entry), m_fRange(maxRange) {}
         bool operator() (Unit* unit)
         {
             if (unit->GetEntry() == m_uiEntry && m_pObject->IsWithinDist(unit, m_fRange, false))
@@ -1309,9 +1405,82 @@ namespace Acore
         }
 
     private:
-        const WorldObject* m_pObject;
+        WorldObject const* m_pObject;
         uint32 m_uiEntry;
         float m_fRange;
+    };
+
+    class MostHPMissingGroupInRange
+    {
+    public:
+        MostHPMissingGroupInRange(Unit const* obj, float range, uint32 hp) : i_obj(obj), i_range(range), i_hp(hp) {}
+
+        bool operator()(Unit* u)
+        {
+            if (i_obj == u)
+            {
+                return false;
+            }
+
+            Player* player = nullptr;
+            if (u->GetTypeId() == TYPEID_PLAYER)
+            {
+                player = u->ToPlayer();
+            }
+
+            else if (u->IsPet() && u->GetOwner())
+            {
+                player = u->GetOwner()->ToPlayer();
+            }
+
+            if (!player)
+            {
+                return false;
+            }
+
+            Group* group = player->GetGroup();
+            if (!group || !group->IsMember(i_obj->IsPet() ? i_obj->GetOwnerGUID() : i_obj->GetGUID()))
+            {
+                return false;
+            }
+
+            if (u->IsAlive() && !i_obj->IsHostileTo(u) && i_obj->IsWithinDistInMap(u, i_range) && u->GetMaxHealth() - u->GetHealth() > i_hp)
+            {
+                i_hp = u->GetMaxHealth() - u->GetHealth();
+                return true;
+            }
+
+            return false;
+        }
+
+    private:
+        Unit const* i_obj;
+        float       i_range;
+        uint32      i_hp;
+    };
+
+    class AllDeadCreaturesInRange
+    {
+    public:
+        AllDeadCreaturesInRange(WorldObject const* obj, float range, bool reqAlive = true) : _obj(obj), _range(range), _reqAlive(reqAlive) {}
+
+        bool operator()(Unit* unit) const
+        {
+            if (_reqAlive && unit->IsAlive())
+            {
+                return false;
+            }
+            if (!_obj->IsWithinDistInMap(unit, _range))
+            {
+                return false;
+            }
+            return true;
+        }
+
+    private:
+        WorldObject const* _obj;
+        float              _range;
+        bool               _reqAlive;
     };
 
     class PlayerAtMinimumRangeAway
@@ -1351,13 +1520,13 @@ namespace Acore
     class AllWorldObjectsInRange
     {
     public:
-        AllWorldObjectsInRange(const WorldObject* object, float maxRange) : m_pObject(object), m_fRange(maxRange) {}
+        AllWorldObjectsInRange(WorldObject const* object, float maxRange) : m_pObject(object), m_fRange(maxRange) {}
         bool operator() (WorldObject* go)
         {
             return m_pObject->IsWithinDist(go, m_fRange, false) && m_pObject->InSamePhase(go);
         }
     private:
-        const WorldObject* m_pObject;
+        WorldObject const* m_pObject;
         float m_fRange;
     };
 
@@ -1412,14 +1581,14 @@ namespace Acore
     class AllWorldObjectsInExactRange
     {
     public:
-        AllWorldObjectsInExactRange(const WorldObject* object, float range, bool equals) : _object(object), _range(range), _equals(equals) { }
+        AllWorldObjectsInExactRange(WorldObject const* object, float range, bool equals) : _object(object), _range(range), _equals(equals) { }
         bool operator() (WorldObject const* object)
         {
             return (_object->GetExactDist2d(object) > _range) == _equals;
         }
 
     private:
-        const WorldObject* _object;
+        WorldObject const* _object;
         float _range;
         bool _equals;
     };

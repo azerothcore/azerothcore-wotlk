@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -19,8 +30,8 @@ EndContentData */
 #include "PassiveAI.h"
 #include "Pet.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
 
@@ -135,7 +146,7 @@ public:
             morlenGUID.Clear();
             summons.DespawnAll();
             if (Creature* c = me->FindNearestCreature(NPC_THALORIEN_REMAINS, 100.0f, true))
-                c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             events.Reset();
             events.ScheduleEvent(EVENT_CHECK_PLAYER, 5000);
             events.ScheduleEvent(EVENT_SUMMON_SOLDIERS, 0);
@@ -204,7 +215,7 @@ public:
             {
                 damage = 0;
                 me->setActive(false);
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
             }
         }
 
@@ -232,7 +243,7 @@ public:
                             break;
                         }
                     me->setActive(false);
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     return;
                 case EVENT_SUMMON_SOLDIERS:
                     for (uint8 i = 0; i < SUNWELL_DEFENDER_NUM; ++i)
@@ -307,48 +318,45 @@ public:
                             // emerge cast tr false 66947
                             case EVENT_SPAWN_WAVE_1:
                                 {
-                                    Position spawnPos;
-                                    c->GetPosition(&spawnPos);
-                                    spawnPos.m_orientation = 5.80f;
+                                    Position spawnPos = c->GetPosition();
+                                    spawnPos.SetOrientation(5.80f);
                                     spawnPos.m_positionX += 5.0f * cos(4.5f);
-                                    spawnPos.m_positionY += 5.0f * sin(4.5f);
+                                    spawnPos.m_positionY += 5.0f * std::sin(4.5f);
                                     for (uint8 i = 0; i < 5; ++i)
                                         if (me->SummonCreature(NPC_SCOURGE_ZOMBIE, spawnPos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000))
                                         {
                                             spawnPos.m_positionX += 2.5f * cos(4.5f);
-                                            spawnPos.m_positionY += 2.5f * sin(4.5f);
+                                            spawnPos.m_positionY += 2.5f * std::sin(4.5f);
                                         }
                                 }
                                 break;
                             case EVENT_SPAWN_WAVE_2:
                                 {
-                                    Position spawnPos;
-                                    c->GetPosition(&spawnPos);
-                                    spawnPos.m_orientation = 5.80f;
+                                    Position spawnPos = c->GetPosition();
+                                    spawnPos.SetOrientation(5.80f);
                                     spawnPos.m_positionX += 7.0f * cos(4.0f);
-                                    spawnPos.m_positionY += 7.0f * sin(4.0f);
+                                    spawnPos.m_positionY += 7.0f * std::sin(4.0f);
                                     for (uint8 i = 0; i < 3; ++i)
                                         if (Creature* s = me->SummonCreature(NPC_GHOUL_INVADER, spawnPos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000))
                                         {
                                             s->CastSpell(s, 66947, false); // emerge effect
                                             spawnPos.m_positionX += 4.0f * cos(4.5f);
-                                            spawnPos.m_positionY += 4.0f * sin(4.5f);
+                                            spawnPos.m_positionY += 4.0f * std::sin(4.5f);
                                         }
                                 }
                                 break;
                             case EVENT_SPAWN_WAVE_3:
                                 {
-                                    Position spawnPos;
-                                    c->GetPosition(&spawnPos);
-                                    spawnPos.m_orientation = 5.80f;
+                                    Position spawnPos = c->GetPosition();
+                                    spawnPos.SetOrientation(5.80f);
                                     spawnPos.m_positionX += 8.0f * cos(4.0f);
-                                    spawnPos.m_positionY += 8.0f * sin(4.0f);
+                                    spawnPos.m_positionY += 8.0f * std::sin(4.0f);
                                     for (uint8 i = 0; i < 3; ++i)
                                         if (Creature* s = me->SummonCreature(NPC_CRYPT_RAIDER, spawnPos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000))
                                         {
                                             s->CastSpell(s, 66947, false); // emerge effect
                                             spawnPos.m_positionX += 4.0f * cos(4.5f);
-                                            spawnPos.m_positionY += 4.0f * sin(4.5f);
+                                            spawnPos.m_positionY += 4.0f * std::sin(4.5f);
                                         }
                                 }
                                 break;
@@ -364,7 +372,7 @@ public:
                                 continue;
                             else
                                 c->AI()->Talk(SAY_MORLEN_4);
-                            c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                            c->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                             c->AI()->AttackStart(me);
                         }
                     break;
@@ -385,7 +393,7 @@ public:
                 case EVENT_DISAPPEAR:
                     me->SetVisible(false);
                     me->setActive(false);
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_SET_FACING:
                     me->SetFacingTo(2.45f);
@@ -417,11 +425,11 @@ public:
                 events.ScheduleEvent(EVENT_SET_FACING, 0);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (me->isActiveObject())
                 return;
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void SetData(uint32 type, uint32 id) override
@@ -603,7 +611,7 @@ public:
                     if (Creature* c = me->FindNearestCreature(NPC_SUNWELL_VISUAL_BUNNY, 60.0f, true))
                         c->DespawnOrUnsummon(1);
                     if (GameObject* go = me->FindNearestGameObject(GO_QUEL_DELAR, 60.0f))
-                        go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     me->SetWalk(true);
                     if (me->GetCreatureData())
                         me->GetMotionMaster()->MovePoint(0, me->GetCreatureData()->posX, me->GetCreatureData()->posY, me->GetCreatureData()->posZ);

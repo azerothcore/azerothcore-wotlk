@@ -1,15 +1,26 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "OutdoorPvPNA.h"
 #include "GameGraveyard.h"
-#include "MapManager.h"
 #include "Language.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
-#include "OutdoorPvPNA.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "World.h"
@@ -334,7 +345,7 @@ bool OPvPCapturePointNA::HandleCustomSpell(Player* player, uint32 spellId, GameO
             nodes[0] = FlightPathStartNodes[NA_ROOST_N];
             nodes[1] = FlightPathEndNodes[NA_ROOST_N];
             player->ActivateTaxiPathTo(nodes);
-            player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP);
+            player->SetPlayerFlag(PLAYER_FLAGS_IN_PVP);
             player->UpdatePvP(true, true);
             retval = true;
             break;
@@ -342,7 +353,7 @@ bool OPvPCapturePointNA::HandleCustomSpell(Player* player, uint32 spellId, GameO
             nodes[0] = FlightPathStartNodes[NA_ROOST_S];
             nodes[1] = FlightPathEndNodes[NA_ROOST_S];
             player->ActivateTaxiPathTo(nodes);
-            player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP);
+            player->SetPlayerFlag(PLAYER_FLAGS_IN_PVP);
             player->UpdatePvP(true, true);
             retval = true;
             break;
@@ -350,7 +361,7 @@ bool OPvPCapturePointNA::HandleCustomSpell(Player* player, uint32 spellId, GameO
             nodes[0] = FlightPathStartNodes[NA_ROOST_W];
             nodes[1] = FlightPathEndNodes[NA_ROOST_W];
             player->ActivateTaxiPathTo(nodes);
-            player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP);
+            player->SetPlayerFlag(PLAYER_FLAGS_IN_PVP);
             player->UpdatePvP(true, true);
             retval = true;
             break;
@@ -358,7 +369,7 @@ bool OPvPCapturePointNA::HandleCustomSpell(Player* player, uint32 spellId, GameO
             nodes[0] = FlightPathStartNodes[NA_ROOST_E];
             nodes[1] = FlightPathEndNodes[NA_ROOST_E];
             player->ActivateTaxiPathTo(nodes);
-            player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP);
+            player->SetPlayerFlag(PLAYER_FLAGS_IN_PVP);
             player->UpdatePvP(true, true);
             retval = true;
             break;

@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ACORE_GRIDNOTIFIERSIMPL_H
@@ -10,23 +21,26 @@
 #include "Corpse.h"
 #include "CreatureAI.h"
 #include "GridNotifiers.h"
+#include "Object.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "SpellAuras.h"
 #include "UpdateData.h"
 #include "WorldPacket.h"
+#include "WorldSession.h"
 
 template<class T>
-inline void Acore::VisibleNotifier::Visit(GridRefManager<T>& m)
+inline void Acore::VisibleNotifier::Visit(GridRefMgr<T>& m)
 {
     // Xinef: Update gameobjects only
     if (i_gobjOnly)
         return;
 
-    for (typename GridRefManager<T>::iterator iter = m.begin(); iter != m.end(); ++iter)
+    for (typename GridRefMgr<T>::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
         if (i_largeOnly != iter->GetSource()->IsVisibilityOverridden())
             continue;
+
         vis_guids.erase(iter->GetSource()->GetGUID());
         i_player.UpdateVisibilityOf(iter->GetSource(), i_data, i_visibleNow);
     }
@@ -239,7 +253,7 @@ void Acore::WorldObjectListSearcher<Check>::Visit(PlayerMapType& m)
 
     for (PlayerMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
         if (i_check(itr->GetSource()))
-            i_objects.push_back(itr->GetSource());
+            Insert(itr->GetSource());
 }
 
 template<class Check>
@@ -250,7 +264,7 @@ void Acore::WorldObjectListSearcher<Check>::Visit(CreatureMapType& m)
 
     for (CreatureMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
         if (i_check(itr->GetSource()))
-            i_objects.push_back(itr->GetSource());
+            Insert(itr->GetSource());
 }
 
 template<class Check>
@@ -261,7 +275,7 @@ void Acore::WorldObjectListSearcher<Check>::Visit(CorpseMapType& m)
 
     for (CorpseMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
         if (i_check(itr->GetSource()))
-            i_objects.push_back(itr->GetSource());
+            Insert(itr->GetSource());
 }
 
 template<class Check>
@@ -272,7 +286,7 @@ void Acore::WorldObjectListSearcher<Check>::Visit(GameObjectMapType& m)
 
     for (GameObjectMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
         if (i_check(itr->GetSource()))
-            i_objects.push_back(itr->GetSource());
+            Insert(itr->GetSource());
 }
 
 template<class Check>
@@ -283,7 +297,7 @@ void Acore::WorldObjectListSearcher<Check>::Visit(DynamicObjectMapType& m)
 
     for (DynamicObjectMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
         if (i_check(itr->GetSource()))
-            i_objects.push_back(itr->GetSource());
+            Insert(itr->GetSource());
 }
 
 // Gameobject searchers
@@ -327,7 +341,7 @@ void Acore::GameObjectListSearcher<Check>::Visit(GameObjectMapType& m)
     for (GameObjectMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
         if (itr->GetSource()->InSamePhase(i_phaseMask))
             if (i_check(itr->GetSource()))
-                i_objects.push_back(itr->GetSource());
+                Insert(itr->GetSource());
 }
 
 // Unit searchers
@@ -404,7 +418,7 @@ void Acore::UnitListSearcher<Check>::Visit(PlayerMapType& m)
     for (PlayerMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
         if (itr->GetSource()->InSamePhase(i_phaseMask))
             if (i_check(itr->GetSource()))
-                i_objects.push_back(itr->GetSource());
+                Insert(itr->GetSource());
 }
 
 template<class Check>
@@ -413,7 +427,7 @@ void Acore::UnitListSearcher<Check>::Visit(CreatureMapType& m)
     for (CreatureMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
         if (itr->GetSource()->InSamePhase(i_phaseMask))
             if (i_check(itr->GetSource()))
-                i_objects.push_back(itr->GetSource());
+                Insert(itr->GetSource());
 }
 
 // Creature searchers
@@ -457,7 +471,7 @@ void Acore::CreatureListSearcher<Check>::Visit(CreatureMapType& m)
     for (CreatureMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
         if (itr->GetSource()->InSamePhase(i_phaseMask))
             if (i_check(itr->GetSource()))
-                i_objects.push_back(itr->GetSource());
+                Insert(itr->GetSource());
 }
 
 template<class Check>
@@ -466,7 +480,7 @@ void Acore::PlayerListSearcher<Check>::Visit(PlayerMapType& m)
     for (PlayerMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
         if (itr->GetSource()->InSamePhase(i_phaseMask))
             if (i_check(itr->GetSource()))
-                i_objects.push_back(itr->GetSource());
+                Insert(itr->GetSource());
 }
 
 template<class Check>

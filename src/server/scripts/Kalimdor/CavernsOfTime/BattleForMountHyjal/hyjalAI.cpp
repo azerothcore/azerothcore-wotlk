@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -11,15 +22,14 @@ SDComment:
 SDCategory: Caverns of Time, Mount Hyjal
 EndScriptData */
 
+#include "hyjalAI.h"
 #include "Cell.h"
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "hyjal_trash.h"
-#include "hyjalAI.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "ScriptMgr.h"
+#include "hyjal_trash.h"
 
 enum Spawns
 {
@@ -377,7 +387,7 @@ void hyjalAI::Reset()
     Debug = false;
 
     //Flags
-    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
     //Initialize spells
     memset(Spells, 0, sizeof(Spell) * HYJAL_AI_MAX_SPELLS);
@@ -396,11 +406,11 @@ void hyjalAI::Reset()
     DoHide = true;
 }
 
-void hyjalAI::EnterEvadeMode()
+void hyjalAI::EnterEvadeMode(EvadeReason /*why*/)
 {
     if (me->GetEntry() != JAINA)
         me->RemoveAllAuras();
-    me->DeleteThreatList();
+    me->GetThreatMgr().ClearAllThreat();
     me->CombatStop(true);
     me->LoadCreaturesAddon(true);
 
@@ -546,7 +556,7 @@ void hyjalAI::SummonNextWave(const Wave wave[18], uint32 Count, float Base[4][3]
         else
         {
             NextWaveTimer = 15000;
-            //TC_LOG_DEBUG("scripts", "HyjalAI: debug mode is enabled. Next Wave in 15 seconds");
+            //LOG_DEBUG("scripts", "HyjalAI: debug mode is enabled. Next Wave in 15 seconds");
         }
     }
     else
@@ -577,7 +587,7 @@ void hyjalAI::StartEvent(Player* player)
     CheckTimer = 5000;
     PlayerGUID = player->GetGUID();
 
-    me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+    me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
     instance->DoUpdateWorldState(WORLD_STATE_WAVES, 0);
     instance->DoUpdateWorldState(WORLD_STATE_ENEMY, 0);
@@ -609,7 +619,7 @@ void hyjalAI::Retreat()
         Creature* JainaDummy = me->SummonCreature(JAINA, JainaDummySpawn[0][0], JainaDummySpawn[0][1], JainaDummySpawn[0][2], JainaDummySpawn[0][3], TEMPSUMMON_TIMED_DESPAWN, 60000);
         if (JainaDummy)
         {
-            JainaDummy->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            JainaDummy->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             CAST_AI(hyjalAI, JainaDummy->AI())->IsDummy = true;
             DummyGuid = JainaDummy->GetGUID();
         }
@@ -619,7 +629,7 @@ void hyjalAI::Retreat()
     }
     SpawnVeins();
     Overrun = true;
-    me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);//cant talk after overrun event started
+    me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);//cant talk after overrun event started
 }
 
 void hyjalAI::SpawnVeins()
@@ -813,7 +823,7 @@ void hyjalAI::UpdateAI(uint32 diff)
                     }
                     EventBegun = false;
                     CheckTimer = 0;
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     BossGUID[i].Clear();
                     instance->DoUpdateWorldState(WORLD_STATE_ENEMY, 0); // Reset world state for enemies to disable it
                 }
@@ -844,7 +854,7 @@ void hyjalAI::UpdateAI(uint32 diff)
                         break;
 
                     case TARGETTYPE_RANDOM:
-                        target = SelectTarget(SELECT_TARGET_RANDOM, 0);
+                        target = SelectTarget(SelectTargetMethod::Random, 0);
                         break;
 
                     case TARGETTYPE_VICTIM:
@@ -900,7 +910,7 @@ void hyjalAI::HideNearPos(float x, float y)
         for (std::list<Creature*>::const_iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
         {
             (*itr)->SetVisible(false);
-            (*itr)->setFaction(35);//make them friendly so mobs won't attack them
+            (*itr)->SetFaction(FACTION_FRIENDLY); // make them friendly so mobs won't attack them
         }
     }
 }
@@ -916,7 +926,7 @@ void hyjalAI::WaypointReached(uint32 waypointId)
 {
     if (waypointId == 1 || (waypointId == 0 && me->GetEntry() == THRALL))
     {
-        me->MonsterYell(YELL_HURRY, LANG_UNIVERSAL, nullptr);
+        me->Yell(YELL_HURRY, LANG_UNIVERSAL);
         WaitForTeleport = true;
         TeleportTimer = 20000;
         if (me->GetEntry() == JAINA)
@@ -978,8 +988,8 @@ void hyjalAI::DoOverrun(uint32 faction, const uint32 diff)
                     if ((*itr) && (*itr)->IsAlive())
                     {
                         (*itr)->CastSpell(*itr, SPELL_TELEPORT_VISUAL, true);
-                        (*itr)->setFaction(35);//make them friendly so mobs won't attack them
-                        (*itr)->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        (*itr)->SetFaction(FACTION_FRIENDLY); // make them friendly so mobs won't attack them
+                        (*itr)->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     }
                 }
                 DoCast(me, SPELL_TELEPORT_VISUAL);

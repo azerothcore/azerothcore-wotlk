@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ACORE_PETAI_H
@@ -38,7 +49,7 @@ public:
     explicit PetAI(Creature* c);
 
     void UpdateAI(uint32) override;
-    static int Permissible(const Creature*);
+    static int Permissible(Creature const*);
 
     void KilledUnit(Unit* /*victim*/) override;
     void AttackStart(Unit* target) override;
@@ -53,8 +64,11 @@ public:
     //
     void MoveInLineOfSight(Unit* /*who*/) override {} // CreatureAI interferes with returning pets
     void MoveInLineOfSight_Safe(Unit* /*who*/) {} // CreatureAI interferes with returning pets
-    void EnterEvadeMode() override {} // For fleeing, pets don't use this type of Evade mechanic
-    void SpellHit(Unit* caster, const SpellInfo* spellInfo) override;
+
+    void EnterEvadeMode(EvadeReason /*why*/) override {} // For fleeing, pets don't use this type of Evade mechanic
+    void SpellHit(Unit* caster, SpellInfo const* spellInfo) override;
+
+    void PetStopAttack() override;
 
 private:
     bool _isVisible(Unit*) const;
@@ -73,7 +87,7 @@ private:
     Unit* SelectNextTarget(bool allowAutoSelect) const;
     void HandleReturnMovement();
     void DoAttack(Unit* target, bool chase);
-    bool CanAttack(Unit* target, const SpellInfo* spellInfo = nullptr);
+    bool CanAttack(Unit* target, SpellInfo const* spellInfo = nullptr);
     void ClearCharmInfoFlags();
 };
 #endif

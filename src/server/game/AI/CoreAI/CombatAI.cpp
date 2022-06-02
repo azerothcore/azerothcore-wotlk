@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "CombatAI.h"
@@ -15,7 +26,7 @@
 // AggressorAI
 /////////////////
 
-int AggressorAI::Permissible(const Creature* creature)
+int AggressorAI::Permissible(Creature const* creature)
 {
     // have some hostile factions, it will be selected by IsHostileTo check at MoveInLineOfSight
     if (!creature->IsCivilian() && !creature->IsNeutralToAll())
@@ -158,7 +169,7 @@ void CasterAI::UpdateAI(uint32 diff)
 ArcherAI::ArcherAI(Creature* c) : CreatureAI(c)
 {
     if (!me->m_spells[0])
-        LOG_ERROR("entities.unit.ai", "ArcherAI set for creature (entry = %u) with spell1=0. AI will do nothing", me->GetEntry());
+        LOG_ERROR("entities.unit.ai", "ArcherAI set for creature (entry = {}) with spell1=0. AI will do nothing", me->GetEntry());
 
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(me->m_spells[0]);
     m_minRange = spellInfo ? spellInfo->GetMinRange(false) : 0;
@@ -207,7 +218,7 @@ void ArcherAI::UpdateAI(uint32 /*diff*/)
 TurretAI::TurretAI(Creature* c) : CreatureAI(c)
 {
     if (!me->m_spells[0])
-        LOG_ERROR("entities.unit.ai", "TurretAI set for creature (entry = %u) with spell1=0. AI will do nothing", me->GetEntry());
+        LOG_ERROR("entities.unit.ai", "TurretAI set for creature (entry = {}) with spell1=0. AI will do nothing", me->GetEntry());
 
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(me->m_spells[0]);
     m_minRange = spellInfo ? spellInfo->GetMinRange(false) : 0;
@@ -215,7 +226,7 @@ TurretAI::TurretAI(Creature* c) : CreatureAI(c)
     me->m_SightDistance = me->m_CombatDistance;
 }
 
-bool TurretAI::CanAIAttack(const Unit* /*who*/) const
+bool TurretAI::CanAIAttack(Unit const* /*who*/) const
 {
     // TODO: use one function to replace it
     if (!me->IsWithinCombatRange(me->GetVictim(), me->m_CombatDistance)
@@ -281,7 +292,7 @@ void VehicleAI::LoadConditions()
 {
     conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_CREATURE_TEMPLATE_VEHICLE, me->GetEntry());
     if (!conditions.empty())
-        LOG_DEBUG("condition", "VehicleAI::LoadConditions: loaded %u conditions", uint32(conditions.size()));
+        LOG_DEBUG("condition", "VehicleAI::LoadConditions: loaded {} conditions", uint32(conditions.size()));
 }
 
 void VehicleAI::CheckConditions(uint32 diff)

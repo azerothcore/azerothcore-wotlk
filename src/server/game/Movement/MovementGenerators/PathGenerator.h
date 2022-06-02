@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _PATH_GENERATOR_H
@@ -9,9 +20,9 @@
 
 #include "DetourNavMesh.h"
 #include "DetourNavMeshQuery.h"
-#include "MapDefines.h"
 #include "MMapFactory.h"
-#include "MMapManager.h"
+#include "MMapMgr.h"
+#include "MapDefines.h"
 #include "MoveSplineInitArgs.h"
 #include "SharedDefines.h"
 #include <G3D/Vector3.h>
@@ -73,18 +84,18 @@ class PathGenerator
         void SetUseRaycast(bool useRaycast) { _useRaycast = useRaycast; }
 
         // result getters
-        G3D::Vector3 const& GetStartPosition() const { return _startPosition; }
-        G3D::Vector3 const& GetEndPosition() const { return _endPosition; }
-        G3D::Vector3 const& GetActualEndPosition() const { return _actualEndPosition; }
+        [[nodiscard]] G3D::Vector3 const& GetStartPosition() const { return _startPosition; }
+        [[nodiscard]] G3D::Vector3 const& GetEndPosition() const { return _endPosition; }
+        [[nodiscard]] G3D::Vector3 const& GetActualEndPosition() const { return _actualEndPosition; }
 
-        Movement::PointsArray const& GetPath() const { return _pathPoints; }
+        [[nodiscard]] Movement::PointsArray const& GetPath() const { return _pathPoints; }
 
-        PathType GetPathType() const { return _type; }
+        [[nodiscard]] PathType GetPathType() const { return _type; }
 
         // shortens the path until the destination is the specified distance from the target point
         void ShortenPathUntilDist(G3D::Vector3 const& point, float dist);
 
-        float getPathLength() const
+        [[nodiscard]] float getPathLength() const
         {
             float len = 0.0f;
             float dx, dy, dz;
@@ -94,7 +105,7 @@ class PathGenerator
                 dx = _pathPoints[0].x - _startPosition.x;
                 dy = _pathPoints[0].y - _startPosition.y;
                 dz = _pathPoints[0].z - _startPosition.z;
-                len += sqrt( dx * dx + dy * dy + dz * dz );
+                len += std::sqrt( dx * dx + dy * dy + dz * dz );
             }
             else
             {
@@ -106,9 +117,15 @@ class PathGenerator
                 dx = _pathPoints[i].x - _pathPoints[i - 1].x;
                 dy = _pathPoints[i].y - _pathPoints[i - 1].y;
                 dz = _pathPoints[i].z - _pathPoints[i - 1].z;
-                len += sqrt( dx * dx + dy * dy + dz * dz );
+                len += std::sqrt( dx * dx + dy * dy + dz * dz );
             }
             return len;
+        }
+
+        void Clear()
+        {
+            _polyLength = 0;
+            _pathPoints.clear();
         }
 
     private:
@@ -139,25 +156,19 @@ class PathGenerator
         void SetActualEndPosition(G3D::Vector3 const& point) { _actualEndPosition = point; }
         void NormalizePath();
 
-        void Clear()
-        {
-            _polyLength = 0;
-            _pathPoints.clear();
-        }
-
-        bool InRange(G3D::Vector3 const& p1, G3D::Vector3 const& p2, float r, float h) const;
-        float Dist3DSqr(G3D::Vector3 const& p1, G3D::Vector3 const& p2) const;
+        [[nodiscard]] bool InRange(G3D::Vector3 const& p1, G3D::Vector3 const& p2, float r, float h) const;
+        [[nodiscard]] float Dist3DSqr(G3D::Vector3 const& p1, G3D::Vector3 const& p2) const;
         bool InRangeYZX(float const* v1, float const* v2, float r, float h) const;
 
         dtPolyRef GetPathPolyByPosition(dtPolyRef const* polyPath, uint32 polyPathSize, float const* Point, float* Distance = nullptr) const;
         dtPolyRef GetPolyByLocation(float const* Point, float* Distance) const;
-        bool HaveTile(G3D::Vector3 const& p) const;
+        [[nodiscard]] bool HaveTile(G3D::Vector3 const& p) const;
 
         void BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 const& endPos);
         void BuildPointPath(float const* startPoint, float const* endPoint);
         void BuildShortcut();
 
-        NavTerrain GetNavTerrain(float x, float y, float z) const;
+        [[nodiscard]] NavTerrainFlag GetNavTerrain(float x, float y, float z) const;
         void CreateFilter();
         void UpdateFilter();
 

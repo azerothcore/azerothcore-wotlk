@@ -1,10 +1,23 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "karazhan.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "karazhan.h"
 
 enum ServantQuartersSpells
 {
@@ -49,7 +62,7 @@ public:
             events.Reset();
             me->SetVisible(false);
             me->SetReactState(REACT_PASSIVE);
-            me->setFaction(35);
+            me->SetFaction(FACTION_FRIENDLY);
             _events2.Reset();
             _events2.ScheduleEvent(EVENT_CHECK_VISIBILITY, 5000);
             if (me->GetEntry() == NPC_HYAKISS_THE_LURKER)
@@ -120,7 +133,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_ACIDIC_FANG, urand(12000, 18000));
                     break;
                 case EVENT_SPELL_HYAKISS_WEB:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f))
                         me->CastSpell(target, SPELL_HYAKISS_WEB, false);
                     events.ScheduleEvent(EVENT_SPELL_HYAKISS_WEB, 15000);
                     break;
@@ -133,7 +146,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_WING_BUFFET, urand(12000, 18000));
                     break;
                 case EVENT_SPELL_DIVE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_FARTHEST, 0, FarthestTargetSelector(me, 40.0f, false, true)))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, FarthestTargetSelector(me, 40.0f, false, true)))
                         me->CastSpell(target, SPELL_DIVE, false);
                     events.ScheduleEvent(EVENT_SPELL_DIVE, 20000);
                     break;

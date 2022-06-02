@@ -1,14 +1,27 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "forge_of_souls.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "forge_of_souls.h"
 
 enum eTexts
 {
@@ -131,7 +144,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_PHANTOM_BLAST_H)
                 bAchiev = false;
@@ -152,7 +165,7 @@ public:
             }
         }
 
-        bool CanAIAttack(const Unit* target) const override { return target->GetPositionZ() > 706.5f; }
+        bool CanAIAttack(Unit const* target) const override { return target->GetPositionZ() > 706.5f; }
 
         void UpdateAI(uint32 diff) override
         {
@@ -199,7 +212,7 @@ public:
                     events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_MIRRORED_SOUL:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 90.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 90.0f, true))
                     {
                         me->CastSpell(target, SPELL_MIRRORED_SOUL, false);
                         me->setAttackTimer(BASE_ATTACK, 2500);
@@ -208,7 +221,7 @@ public:
                     events.RepeatEvent(urand(20000, 30000));
                     break;
                 case EVENT_SPELL_WELL_OF_SOULS:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
                         me->CastSpell(target, SPELL_WELL_OF_SOULS, false);
                     events.RepeatEvent(urand(25000, 30000));
                     events.DelayEventsToMax(4000, 0);
@@ -224,7 +237,7 @@ public:
                 case EVENT_SPELL_WAILING_SOULS:
                     Talk(SAY_FACE_WAILING_SOUL);
                     Talk(EMOTE_WAILING_SOUL);
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                         me->CastCustomSpell(SPELL_WAILING_SOULS_TARGETING, SPELLVALUE_MAX_TARGETS, 1, target, false);
                     events.RepeatEvent(80000);
                     events.DelayEventsToMax(20000, 0);
@@ -280,11 +293,11 @@ public:
                 }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->DisableRotate(false);
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
     };
 

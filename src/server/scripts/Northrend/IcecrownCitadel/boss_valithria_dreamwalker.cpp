@@ -1,16 +1,29 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Cell.h"
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "icecrown_citadel.h"
 #include "ObjectMgr.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
+#include "icecrown_citadel.h"
 
 enum Texts
 {
@@ -144,8 +157,9 @@ public:
     }
 };
 
-struct ManaVoidSelector : public Acore::unary_function<Unit*, bool>
+struct ManaVoidSelector
 {
+public:
     explicit ManaVoidSelector(WorldObject const* source) : _source(source) { }
 
     bool operator()(Unit* unit) const
@@ -153,6 +167,7 @@ struct ManaVoidSelector : public Acore::unary_function<Unit*, bool>
         return unit->getPowerType() == POWER_MANA && _source->GetDistance(unit) > 15.0f;
     }
 
+private:
     WorldObject const* _source;
 };
 
@@ -349,8 +364,13 @@ public:
                 Talk(SAY_VALITHRIA_75_PERCENT);
             }
             else if (_instance->GetBossState(DATA_VALITHRIA_DREAMWALKER) == NOT_STARTED)
+            {
                 if (Creature* trigger = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_TRIGGER)))
+                {
                     trigger->AI()->DoAction(ACTION_ENTER_COMBAT);
+                    _instance->SetBossState(DATA_VALITHRIA_DREAMWALKER, IN_PROGRESS);
+                }
+            }
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -386,7 +406,7 @@ public:
                 me->CastSpell(me, SPELL_AWARD_REPUTATION_BOSS_KILL, true);
                 // this display id was found in sniff instead of the one on aura
                 me->SetDisplayId(11686);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->DespawnOrUnsummon(4000);
                 if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_LICH_KING)))
                     lichKing->CastSpell(lichKing, SPELL_SPAWN_CHEST, false);
@@ -572,7 +592,7 @@ public:
             {
                 checkTimer = 3000;
                 me->SetInCombatWithZone();
-                ThreatContainer::StorageType const& threatList = me->getThreatManager().getThreatList();
+                ThreatContainer::StorageType const& threatList = me->GetThreatMgr().getThreatList();
                 if (!threatList.empty())
                     for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
                         if (Unit* target = (*itr)->getTarget())
@@ -755,12 +775,12 @@ public:
                         _events.ScheduleEvent(EVENT_FROSTBOLT_VOLLEY, urand(8000, 15000));
                         break;
                     case EVENT_MANA_VOID:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, ManaVoidSelector(me)))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, ManaVoidSelector(me)))
                             me->CastSpell(target, SPELL_MANA_VOID, false);
                         _events.ScheduleEvent(EVENT_MANA_VOID, urand(20000, 25000));
                         break;
                     case EVENT_COLUMN_OF_FROST:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, -10.0f, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, -10.0f, true))
                             me->CastSpell(target, SPELL_COLUMN_OF_FROST, false);
                         _events.ScheduleEvent(EVENT_COLUMN_OF_FROST, urand(15000, 25000));
                         break;
@@ -839,7 +859,7 @@ public:
 
         void AttackStart(Unit*) override {}
         void MoveInLineOfSight(Unit*) override {}
-        void EnterEvadeMode() override {}
+        void EnterEvadeMode(EvadeReason /*why*/) override {}
 
         void UpdateAI(uint32 diff) override
         {
@@ -1029,7 +1049,7 @@ public:
                 {
                     timer = 0;
                     me->SetDisplayId(11686);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->DespawnOrUnsummon(2000);
                 }
                 else
@@ -1138,7 +1158,7 @@ public:
             float startAngle = 3 * M_PI / 2;
             float maxAddAngle = ((target->GetMap()->GetSpawnMode() % 2) == 0 ? M_PI : 2 * M_PI);
             float angle = startAngle + rand_norm() * maxAddAngle;
-            target->CastSpell(target->GetPositionX() + cos(angle)*dist, target->GetPositionY() + sin(angle)*dist, target->GetPositionZ(), spellId, true);
+            target->CastSpell(target->GetPositionX() + cos(angle)*dist, target->GetPositionY() + std::sin(angle)*dist, target->GetPositionZ(), spellId, true);
         }
 
         void Register() override

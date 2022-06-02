@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ACORE_SMARTAI_H
@@ -36,6 +47,9 @@ public:
     ~SmartAI() override {};
     explicit SmartAI(Creature* c);
 
+    // Check whether we are currently permitted to make the creature take action
+    bool IsAIControlled() const;
+
     // Start moving to the desired MovePoint
     void StartPath(bool run = false, uint32 path = 0, bool repeat = false, Unit* invoker = nullptr);
     bool LoadPath(uint32 entry);
@@ -69,7 +83,7 @@ public:
     void EnterCombat(Unit* enemy) override;
 
     // Called for reaction at stopping attack at no attackers or targets
-    void EnterEvadeMode() override;
+    void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override;
 
     // Called when the creature is killed
     void JustDied(Unit* killer) override;
@@ -80,6 +94,9 @@ public:
     // Called when the creature summon successfully other creature
     void JustSummoned(Creature* creature) override;
 
+    // Called when a summoned unit dies
+    void SummonedCreatureDies(Creature* summon, Unit* killer) override;
+
     // Tell creature to attack and follow the victim
     void AttackStart(Unit* who) override;
 
@@ -87,10 +104,10 @@ public:
     void MoveInLineOfSight(Unit* who) override;
 
     // Called when hit by a spell
-    void SpellHit(Unit* unit, const SpellInfo* spellInfo) override;
+    void SpellHit(Unit* unit, SpellInfo const* spellInfo) override;
 
     // Called when spell hits a target
-    void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override;
+    void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override;
 
     // Called at any Damage from any attacker (before damage apply)
     void DamageTaken(Unit* done_by, uint32& damage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask) override;
@@ -119,9 +136,6 @@ public:
     // called when the corpse of this creature gets removed
     void CorpseRemoved(uint32& respawnDelay) override;
 
-    // Called at World update tick if creature is charmed
-    void UpdateAIWhileCharmed(const uint32 diff);
-
     // Called when a Player/Creature enters the creature (vehicle)
     void PassengerBoarded(Unit* who, int8 seatId, bool apply) override;
 
@@ -132,7 +146,7 @@ public:
     void OnCharmed(bool apply) override;
 
     // Called when victim is in line of sight
-    bool CanAIAttack(const Unit* who) const override;
+    bool CanAIAttack(Unit const* who) const override;
 
     // Used in scripts to share variables
     void DoAction(int32 param = 0) override;
@@ -150,7 +164,7 @@ public:
     ObjectGuid GetGUID(int32 id = 0) const override;
 
     //core related
-    static int32 Permissible(const Creature*);
+    static int32 Permissible(Creature const*);
 
     // Called at movepoint reached
     void MovepointReached(uint32 id);
@@ -161,6 +175,8 @@ public:
     void SetFly(bool fly = true);
 
     void SetSwim(bool swim = true);
+
+    void SetEvadeDisabled(bool disable = true);
 
     void SetInvincibilityHpLevel(uint32 level) { mInvincibilityHpLevel = level; }
 
@@ -189,6 +205,7 @@ public:
     void SetForcedCombatMove(float dist);
 
 private:
+    bool mIsCharmed;
     uint32 mFollowCreditType;
     uint32 mFollowArrivedTimer;
     uint32 mFollowCredit;
@@ -212,12 +229,13 @@ private:
     uint32 GetWPCount() { return mWayPoints ? mWayPoints->size() : 0; }
     bool mCanRepeatPath;
     bool mRun;
+    bool mEvadeDisabled;
     bool mCanAutoAttack;
     bool mCanCombatMove;
     bool mForcedPaused;
     uint32 mInvincibilityHpLevel;
 
-    bool AssistPlayerInCombat(Unit* who);
+    bool AssistPlayerInCombatAgainst(Unit* who);
 
     uint32 mDespawnTime;
     uint32 mDespawnState;
@@ -241,7 +259,7 @@ public:
     void InitializeAI() override;
     void Reset() override;
     SmartScript* GetScript() { return &mScript; }
-    static int32 Permissible(const GameObject* g);
+    static int32 Permissible(GameObject const* g);
 
     bool GossipHello(Player* player, bool reportUse) override;
     bool GossipSelect(Player* player, uint32 sender, uint32 action) override;
@@ -254,7 +272,10 @@ public:
     void OnGameEvent(bool start, uint16 eventId) override;
     void OnStateChanged(uint32 state, Unit* unit) override;
     void EventInform(uint32 eventId) override;
-    void SpellHit(Unit* unit, const SpellInfo* spellInfo) override;
+    void SpellHit(Unit* unit, SpellInfo const* spellInfo) override;
+
+    // Called when a summoned unit dies
+    void SummonedCreatureDies(Creature* summon, Unit* killer) override;
 
 protected:
     SmartScript mScript;

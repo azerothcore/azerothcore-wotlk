@@ -1,8 +1,19 @@
 /*
-* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
-* Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
-* Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 /* ScriptData
 SDName: Instance_Mount_Hyjal
@@ -12,13 +23,11 @@ SDCategory: Caverns of Time, Mount Hyjal
 EndScriptData */
 
 #include "Chat.h"
-#include "hyjal_trash.h"
 #include "InstanceScript.h"
 #include "Opcodes.h"
-#include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 #include "WorldPacket.h"
+#include "hyjal_trash.h"
 
 /* Battle of Mount Hyjal encounters:
 0 - Rage Winterchill event
@@ -29,7 +38,6 @@ EndScriptData */
 */
 
 #define YELL_EFFORTS        "All of your efforts have been in vain, for the draining of the World Tree has already begun. Soon the heart of your world will beat no more."
-#define YELL_EFFORTS_NAME   "Archimonde"
 
 class instance_hyjal : public InstanceMapScript
 {
@@ -181,20 +189,17 @@ public:
                                 {
                                     unit->SetVisible(false);
                                     Map::PlayerList const& PlayerList = map->GetPlayers();
-                                    if (PlayerList.isEmpty())
+                                    if (PlayerList.IsEmpty())
                                         return;
 
                                     for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                     {
-                                        if (i->GetSource())
+                                        if (Player* player = i->GetSource())
                                         {
                                             WorldPacket packet;
-                                            ChatHandler::BuildChatPacket(packet, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, unit, i->GetSource(), YELL_EFFORTS);
-                                            i->GetSource()->GetSession()->SendPacket(&packet);
-
-                                            WorldPacket data2(SMSG_PLAY_SOUND, 4);
-                                            data2 << 10986;
-                                            i->GetSource()->GetSession()->SendPacket(&data2);
+                                            ChatHandler::BuildChatPacket(packet, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, unit, player, YELL_EFFORTS);
+                                            player->SendDirectMessage(&packet);
+                                            player->PlayDirectSound(10986, player);
                                         }
                                     }
                                 }
@@ -220,7 +225,7 @@ public:
                     {
                         if (!m_uiAncientGemGUID.empty())
                         {
-                            for (ObjectGuid const guid : m_uiAncientGemGUID)
+                            for (ObjectGuid const& guid : m_uiAncientGemGUID)
                             {
                                 //don't know how long it expected
                                 DoRespawnGameObject(guid, DAY);
@@ -248,7 +253,7 @@ public:
                     break;
             }
 
-            // TC_LOG_DEBUG("scripts", "Instance Hyjal: Instance data updated for event %u (Data=%u)", type, data);
+            // LOG_DEBUG("scripts", "Instance Hyjal: Instance data updated for event {} (Data={})", type, data);
 
             if (data == DONE)
             {

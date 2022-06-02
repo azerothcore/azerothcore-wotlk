@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -12,45 +23,55 @@ Category: commandscripts
 EndScriptData */
 
 #include "Chat.h"
+#include "DBCStores.h"
+#include "DatabaseEnv.h"
 #include "Group.h"
 #include "Language.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
+
+using namespace Acore::ChatCommands;
 
 class tele_commandscript : public CommandScript
 {
 public:
     tele_commandscript() : CommandScript("tele_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> teleCommandTable =
+        static ChatCommandTable teleNameNpcCommandTable =
         {
-            { "add",            SEC_ADMINISTRATOR,   false, &HandleTeleAddCommand,             "" },
-            { "del",            SEC_ADMINISTRATOR,   true,  &HandleTeleDelCommand,             "" },
-            { "name",           SEC_GAMEMASTER,      true,  &HandleTeleNameCommand,            "" },
-            { "group",          SEC_GAMEMASTER,      false, &HandleTeleGroupCommand,           "" },
-            { "",               SEC_MODERATOR,       false, &HandleTeleCommand,                "" }
+            { "id",     HandleTeleNameNpcIdCommand,      SEC_GAMEMASTER,    Console::Yes },
+            { "guid",   HandleTeleNameNpcSpawnIdCommand, SEC_GAMEMASTER,    Console::Yes },
+            { "name",   HandleTeleNameNpcNameCommand,    SEC_GAMEMASTER,    Console::Yes },
         };
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable teleNameCommandTable =
         {
-            { "teleport",           SEC_MODERATOR,      false, nullptr,      "", teleCommandTable }
+            { "npc",    teleNameNpcCommandTable },
+            { "",       HandleTeleNameCommand,           SEC_GAMEMASTER,    Console::Yes },
+        };
+        static ChatCommandTable teleCommandTable =
+        {
+            { "add",    HandleTeleAddCommand,            SEC_ADMINISTRATOR, Console::No },
+            { "del",    HandleTeleDelCommand,            SEC_ADMINISTRATOR, Console::Yes },
+            { "name",   teleNameCommandTable },
+            { "group",  HandleTeleGroupCommand,          SEC_GAMEMASTER,    Console::No },
+            { "",       HandleTeleCommand,               SEC_GAMEMASTER,    Console::No }
+        };
+        static ChatCommandTable commandTable =
+        {
+            { "teleport", teleCommandTable }
         };
         return commandTable;
     }
 
-    static bool HandleTeleAddCommand(ChatHandler* handler, const char* args)
+    static bool HandleTeleAddCommand(ChatHandler* handler, std::string const& name)
     {
-        if (!*args)
-            return false;
-
         Player* player = handler->GetSession()->GetPlayer();
         if (!player)
             return false;
-
-        std::string name = args;
 
         if (sObjectMgr->GetGameTele(name))
         {
@@ -81,13 +102,8 @@ public:
         return true;
     }
 
-    static bool HandleTeleDelCommand(ChatHandler* handler, const char* args)
+    static bool HandleTeleDelCommand(ChatHandler* handler, GameTele const* tele)
     {
-        if (!*args)
-            return false;
-
-        // id, or string, or [name] Shift-click form |color|Htele:id|h[name]|h|r
-        GameTele const* tele = handler->extractGameTeleFromLink((char*)args);
         if (!tele)
         {
             handler->SendSysMessage(LANG_COMMAND_TELE_NOTFOUND);
@@ -100,74 +116,33 @@ public:
         return true;
     }
 
-    // teleport player to given game_tele.entry
-    static bool HandleTeleNameCommand(ChatHandler* handler, const char* args)
+    static bool DoNameTeleport(ChatHandler* handler, PlayerIdentifier player, uint32 mapId, Position const& pos, std::string const& locationName)
     {
-        char* nameStr;
-        char* teleStr;
-        handler->extractOptFirstArg((char*)args, &nameStr, &teleStr);
-        if (!teleStr)
-            return false;
-
-        Player* target;
-        ObjectGuid target_guid;
-        std::string target_name;
-        if (!handler->extractPlayerTarget(nameStr, &target, &target_guid, &target_name))
-            return false;
-
-        if (strcmp(teleStr, "$home") == 0)    // References target's homebind
+        if (!MapMgr::IsValidMapCoord(mapId, pos) || sObjectMgr->IsTransportMap(mapId))
         {
-            if (target)
-                target->TeleportTo(target->m_homebindMapId, target->m_homebindX, target->m_homebindY, target->m_homebindZ, target->GetOrientation());
-            else
-            {
-                CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_HOMEBIND);
-                stmt->setUInt32(0, target_guid.GetCounter());
-                PreparedQueryResult resultDB = CharacterDatabase.Query(stmt);
-
-                if (resultDB)
-                {
-                    Field* fieldsDB = resultDB->Fetch();
-                    uint32 mapId = fieldsDB[0].GetUInt16();
-                    uint32 zoneId = fieldsDB[1].GetUInt16();
-                    float posX = fieldsDB[2].GetFloat();
-                    float posY = fieldsDB[3].GetFloat();
-                    float posZ = fieldsDB[4].GetFloat();
-
-                    Player::SavePositionInDB(mapId, posX, posY, posZ, 0, zoneId, target_guid);
-                }
-            }
-
-            return true;
-        }
-
-        // id, or string, or [name] Shift-click form |color|Htele:id|h[name]|h|r
-        GameTele const* tele = handler->extractGameTeleFromLink(teleStr);
-        if (!tele)
-        {
-            handler->SendSysMessage(LANG_COMMAND_TELE_NOTFOUND);
+            handler->PSendSysMessage(LANG_INVALID_TARGET_COORD, pos.GetPositionX(), pos.GetPositionY(), mapId);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        if (target)
+        if (Player* target = player.GetConnectedPlayer())
         {
             // check online security
-            if (handler->HasLowerSecurity(target))
+            if (handler->HasLowerSecurity(target, ObjectGuid::Empty))
                 return false;
 
-            std::string chrNameLink = handler->playerLink(target_name);
+            std::string chrNameLink = handler->playerLink(target->GetName());
 
-            if (target->IsBeingTeleported() == true)
+            if (target->IsBeingTeleported())
             {
                 handler->PSendSysMessage(LANG_IS_TELEPORTED, chrNameLink.c_str());
                 handler->SetSentErrorMessage(true);
                 return false;
             }
 
-            handler->PSendSysMessage(LANG_TELEPORTING_TO, chrNameLink.c_str(), "", tele->name.c_str());
+            handler->PSendSysMessage(LANG_TELEPORTING_TO, chrNameLink.c_str(), "", locationName.c_str());
             if (handler->needReportToTarget(target))
-                (ChatHandler(target->GetSession())).PSendSysMessage(LANG_TELEPORTED_TO_BY, handler->GetNameLink().c_str());
+                ChatHandler(target->GetSession()).PSendSysMessage(LANG_TELEPORTED_TO_BY, handler->GetNameLink().c_str());
 
             // stop flight if need
             if (target->IsInFlight())
@@ -175,33 +150,72 @@ public:
                 target->GetMotionMaster()->MovementExpired();
                 target->CleanupAfterTaxiFlight();
             }
-            // save only in non-flight case
-            else
+            else // save only in non-flight case
                 target->SaveRecallPosition();
 
-            target->TeleportTo(tele->mapId, tele->position_x, tele->position_y, tele->position_z, tele->orientation);
+            target->TeleportTo({ mapId, pos });
         }
         else
         {
             // check offline security
-            if (handler->HasLowerSecurity(nullptr, target_guid))
+            if (handler->HasLowerSecurity(nullptr, player.GetGUID()))
                 return false;
 
-            std::string nameLink = handler->playerLink(target_name);
+            std::string nameLink = handler->playerLink(player.GetName());
 
-            handler->PSendSysMessage(LANG_TELEPORTING_TO, nameLink.c_str(), handler->GetAcoreString(LANG_OFFLINE), tele->name.c_str());
-            Player::SavePositionInDB(tele->mapId, tele->position_x, tele->position_y, tele->position_z, tele->orientation,
-                                     sMapMgr->GetZoneId(tele->mapId, tele->position_x, tele->position_y, tele->position_z), target_guid);
+            handler->PSendSysMessage(LANG_TELEPORTING_TO, nameLink.c_str(), handler->GetAcoreString(LANG_OFFLINE), locationName.c_str());
+
+            Player::SavePositionInDB({ mapId, pos }, sMapMgr->GetZoneId(PHASEMASK_NORMAL, { mapId, pos }), player.GetGUID(), nullptr);
         }
 
         return true;
     }
 
-    //Teleport group to given game_tele.entry
-    static bool HandleTeleGroupCommand(ChatHandler* handler, const char* args)
+    // teleport player to given game_tele.entry
+    static bool HandleTeleNameCommand(ChatHandler* handler, Optional<PlayerIdentifier> player, Variant<GameTele const*, EXACT_SEQUENCE("$home")> where)
     {
-        if (!*args)
+        if (!player)
+            player = PlayerIdentifier::FromTargetOrSelf(handler);
+        if (!player)
             return false;
+
+        if (where.index() == 1)    // References target's homebind
+        {
+            if (Player* target = player->GetConnectedPlayer())
+                target->TeleportTo(target->m_homebindMapId, target->m_homebindX, target->m_homebindY, target->m_homebindZ, target->GetOrientation());
+            else
+            {
+                CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_HOMEBIND);
+                stmt->SetData(0, player->GetGUID().GetCounter());
+                PreparedQueryResult resultDB = CharacterDatabase.Query(stmt);
+
+                if (resultDB)
+                {
+                    Field* fieldsDB = resultDB->Fetch();
+                    WorldLocation loc(fieldsDB[0].Get<uint16>(), fieldsDB[2].Get<float>(), fieldsDB[3].Get<float>(), fieldsDB[4].Get<float>(), 0.0f);
+                    uint32 zoneId = fieldsDB[1].Get<uint16>();
+
+                    Player::SavePositionInDB(loc, zoneId, player->GetGUID(), nullptr);
+                }
+            }
+
+            return true;
+        }
+
+        // id, or string, or [name] Shift-click form |color|Htele:id|h[name]|h|r
+        GameTele const* tele = where.get<GameTele const*>();
+        return DoNameTeleport(handler, *player, tele->mapId, { tele->position_x, tele->position_y, tele->position_z, tele->orientation }, tele->name);
+    }
+
+    //Teleport group to given game_tele.entry
+    static bool HandleTeleGroupCommand(ChatHandler* handler, GameTele const* tele)
+    {
+        if (!tele)
+        {
+            handler->SendSysMessage(LANG_COMMAND_TELE_NOTFOUND);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
 
         Player* target = handler->getSelectedPlayer();
         if (!target)
@@ -212,17 +226,8 @@ public:
         }
 
         // check online security
-        if (handler->HasLowerSecurity(target))
+        if (handler->HasLowerSecurity(target, ObjectGuid::Empty))
             return false;
-
-        // id, or string, or [name] Shift-click form |color|Htele:id|h[name]|h|r
-        GameTele const* tele = handler->extractGameTeleFromLink((char*)args);
-        if (!tele)
-        {
-            handler->SendSysMessage(LANG_COMMAND_TELE_NOTFOUND);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
 
         MapEntry const* map = sMapStore.LookupEntry(tele->mapId);
         if (!map || map->IsBattlegroundOrArena())
@@ -250,7 +255,7 @@ public:
                 continue;
 
             // check online security
-            if (handler->HasLowerSecurity(player))
+            if (handler->HasLowerSecurity(player, ObjectGuid::Empty))
                 return false;
 
             std::string plNameLink = handler->GetNameLink(player);
@@ -263,17 +268,16 @@ public:
 
             handler->PSendSysMessage(LANG_TELEPORTING_TO, plNameLink.c_str(), "", tele->name.c_str());
             if (handler->needReportToTarget(player))
-                (ChatHandler(player->GetSession())).PSendSysMessage(LANG_TELEPORTED_TO_BY, nameLink.c_str());
+                ChatHandler(player->GetSession()).PSendSysMessage(LANG_TELEPORTED_TO_BY, nameLink.c_str());
 
             // stop flight if need
-            if (player->IsInFlight())
+            if (target->IsInFlight())
             {
-                player->GetMotionMaster()->MovementExpired();
-                player->CleanupAfterTaxiFlight();
+                target->GetMotionMaster()->MovementExpired();
+                target->CleanupAfterTaxiFlight();
             }
-            // save only in non-flight case
-            else
-                player->SaveRecallPosition();
+            else // save only in non-flight case
+                target->SaveRecallPosition();
 
             player->TeleportTo(tele->mapId, tele->position_x, tele->position_y, tele->position_z, tele->orientation);
         }
@@ -281,16 +285,8 @@ public:
         return true;
     }
 
-    static bool HandleTeleCommand(ChatHandler* handler, const char* args)
+    static bool HandleTeleCommand(ChatHandler* handler, GameTele const* tele)
     {
-        if (!*args)
-            return false;
-
-        Player* me = handler->GetSession()->GetPlayer();
-
-        // id, or string, or [name] Shift-click form |color|Htele:id|h[name]|h|r
-        GameTele const* tele = handler->extractGameTeleFromLink((char*)args);
-
         if (!tele)
         {
             handler->SendSysMessage(LANG_COMMAND_TELE_NOTFOUND);
@@ -298,7 +294,8 @@ public:
             return false;
         }
 
-        if (me->IsInCombat())
+        Player* player = handler->GetSession()->GetPlayer();
+        if (player->IsInCombat())
         {
             handler->SendSysMessage(LANG_YOU_IN_COMBAT);
             handler->SetSentErrorMessage(true);
@@ -306,7 +303,7 @@ public:
         }
 
         MapEntry const* map = sMapStore.LookupEntry(tele->mapId);
-        if (!map || map->IsBattlegroundOrArena())
+        if (!map || (map->IsBattlegroundOrArena() && (player->GetMapId() != tele->mapId || !player->IsGameMaster())))
         {
             handler->SendSysMessage(LANG_CANNOT_TELE_TO_BG);
             handler->SetSentErrorMessage(true);
@@ -314,17 +311,81 @@ public:
         }
 
         // stop flight if need
-        if (me->IsInFlight())
+        if (player->IsInFlight())
         {
-            me->GetMotionMaster()->MovementExpired();
-            me->CleanupAfterTaxiFlight();
+            player->GetMotionMaster()->MovementExpired();
+            player->CleanupAfterTaxiFlight();
         }
-        // save only in non-flight case
-        else
-            me->SaveRecallPosition();
+        else // save only in non-flight case
+            player->SaveRecallPosition();
 
-        me->TeleportTo(tele->mapId, tele->position_x, tele->position_y, tele->position_z, tele->orientation);
+        player->TeleportTo(tele->mapId, tele->position_x, tele->position_y, tele->position_z, tele->orientation);
         return true;
+    }
+
+    static bool HandleTeleNameNpcIdCommand(ChatHandler* handler, PlayerIdentifier player, Variant<Hyperlink<creature_entry>, uint32> creatureId)
+    {
+        CreatureData const* spawnpoint = nullptr;
+        for (auto const& pair : sObjectMgr->GetAllCreatureData())
+        {
+            if (pair.second.id1 != *creatureId)
+                continue;
+
+            if (!spawnpoint)
+                spawnpoint = &pair.second;
+            else
+            {
+                handler->SendSysMessage(LANG_COMMAND_GOCREATMULTIPLE);
+                break;
+            }
+        }
+
+        if (!spawnpoint)
+        {
+            handler->SendSysMessage(LANG_COMMAND_GOCREATNOTFOUND);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        CreatureTemplate const* creatureTemplate = ASSERT_NOTNULL(sObjectMgr->GetCreatureTemplate(*creatureId));
+
+        return DoNameTeleport(handler, player, spawnpoint->mapid, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, creatureTemplate->Name);
+    }
+
+    static bool HandleTeleNameNpcSpawnIdCommand(ChatHandler* handler, PlayerIdentifier player, Variant<Hyperlink<creature>, ObjectGuid::LowType> spawnId)
+    {
+        CreatureData const* spawnpoint = sObjectMgr->GetCreatureData(spawnId);
+        if (!spawnpoint)
+        {
+            handler->SendSysMessage(LANG_COMMAND_GOCREATNOTFOUND);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        CreatureTemplate const* creatureTemplate = ASSERT_NOTNULL(sObjectMgr->GetCreatureTemplate(spawnpoint->id1));
+
+        return DoNameTeleport(handler, player, spawnpoint->mapid, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, creatureTemplate->Name);
+    }
+
+    static bool HandleTeleNameNpcNameCommand(ChatHandler* handler, PlayerIdentifier player, Tail name)
+    {
+        std::string normalizedName(name);
+        WorldDatabase.EscapeString(normalizedName);
+
+        // May need work //PussyWizardEliteMalcrom
+        QueryResult result = WorldDatabase.Query("SELECT c.position_x, c.position_y, c.position_z, c.orientation, c.map, ct.name FROM creature c INNER JOIN creature_template ct ON c.id1 = ct.entry WHERE ct.name LIKE '{}'", normalizedName);
+        if (!result)
+        {
+            handler->SendSysMessage(LANG_COMMAND_GOCREATNOTFOUND);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (result->GetRowCount() > 1)
+            handler->SendSysMessage(LANG_COMMAND_GOCREATMULTIPLE);
+
+        Field* fields = result->Fetch();
+        return DoNameTeleport(handler, player, fields[4].Get<uint16>(), { fields[0].Get<float>(), fields[1].Get<float>(), fields[2].Get<float>(), fields[3].Get<float>() }, fields[5].Get<std::string>());
     }
 };
 

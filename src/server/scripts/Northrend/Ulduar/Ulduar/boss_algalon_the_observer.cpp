@@ -1,15 +1,28 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "GameObjectAI.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "MoveSplineInit.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "ulduar.h"
 
@@ -270,7 +283,7 @@ public:
         bool _fedOnTears;
         bool _heraldOfTheTitans;
 
-        bool IsValidHeraldItem(const ItemTemplate* item)
+        bool IsValidHeraldItem(ItemTemplate const* item)
         {
             if (!item) // should not happen, but checked in GetAverageItemLevel()
                 return true;
@@ -337,7 +350,7 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (_fightWon)
                 return;
@@ -353,7 +366,7 @@ public:
                 return;
             }
 
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void Reset() override
@@ -364,9 +377,9 @@ public:
             events.Reset();
             summons.DespawnAll();
             me->SetReactState(REACT_PASSIVE);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
             me->SetSheath(SHEATH_STATE_UNARMED);
-            me->setFaction(190);
+            me->SetFaction(190);
             me->CastSpell(me, SPELL_DUAL_WIELD, true);
 
             _phaseTwo = false;
@@ -390,8 +403,8 @@ public:
             {
                 case ACTION_START_INTRO:
                     {
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                        me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_DO_NOT_FADE_IN);
+                        me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                        me->SetUnitFlag2(UNIT_FLAG2_DO_NOT_FADE_IN);
                         me->SetDisableGravity(true);
                         me->CastSpell(me, SPELL_ARRIVAL, true);
                         me->CastSpell(me, SPELL_RIDE_THE_LIGHTNING, true);
@@ -424,8 +437,8 @@ public:
 
                     me->SetReactState(REACT_PASSIVE);
                     me->AttackStop();
-                    me->setFaction(35);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetFaction(FACTION_FRIENDLY);
+                    me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->InterruptNonMeleeSpells(false);
                     if (m_pInstance)
                         m_pInstance->SetData(TYPE_ALGALON, NOT_STARTED);
@@ -433,7 +446,7 @@ public:
                 case ACTION_INIT_ALGALON:
                     _firstPull = false;
                     _fedOnTears = false;
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                     break;
                 case ACTION_ASCEND:
                     summons.DespawnAll();
@@ -457,14 +470,14 @@ public:
 
             if (!m_pInstance)
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 return;
             }
 
             uint32 introDelay = 0;
             me->setActive(true);
             me->SetInCombatWithZone();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_NPC);
             events.Reset();
             events.SetPhase(PHASE_ROLE_PLAY);
 
@@ -554,7 +567,7 @@ public:
                         break;
                     }
                 case NPC_UNLEASHED_DARK_MATTER:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                         if (summon->Attack(target, true))
                             summon->GetMotionMaster()->MoveChase(target);
                     break;
@@ -589,8 +602,8 @@ public:
                 damage = 0;
                 me->SetReactState(REACT_PASSIVE);
                 me->AttackStop();
-                me->setFaction(35);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->SetFaction(FACTION_FRIENDLY);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 events.Reset();
                 summons.DespawnAll();
                 me->InterruptNonMeleeSpells(false);
@@ -636,7 +649,7 @@ public:
                     break;
                 case EVENT_INTRO_FINISH:
                     events.Reset();
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                     if (Creature* brann = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(NPC_BRANN_BRONZBEARD_ALG)))
                         brann->AI()->DoAction(ACTION_FINISH_INTRO);
                     break;
@@ -646,14 +659,14 @@ public:
                     break;
                 case EVENT_REMOVE_UNNATTACKABLE:
                     me->SetSheath(SHEATH_STATE_MELEE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_NPC);
                     break;
                 case EVENT_INTRO_TIMER_DONE:
                     events.SetPhase(PHASE_NORMAL);
                     me->CastSpell((Unit*)nullptr, SPELL_SUPERMASSIVE_FAIL, true);
                     // Hack: _IsValidTarget failed earlier due to flags, call AttackStart again
                     me->SetReactState(REACT_AGGRESSIVE);
-                    me->setFaction(14);
+                    me->SetFaction(FACTION_MONSTER);
                     if (Player* target = SelectTargetFromPlayerList(150.0f))
                         AttackStart(target);
                     me->SetInCombatWithZone();
@@ -723,21 +736,29 @@ public:
                     break;
                 case EVENT_OUTRO_1:
                     me->RemoveAllAuras();
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_RENAME);
+                    me->SetUnitFlag(UNIT_FLAG_RENAME);
                     break;
                 case EVENT_OUTRO_2:
+                {
+                    Player* lootRecipent = me->GetLootRecipient();
                     _EnterEvadeMode();
+                    // LootRecipent is cleared in _EnterEvadeMode, restore it
+                    me->SetLootRecipient(lootRecipent);
                     me->GetMotionMaster()->MovePoint(POINT_ALGALON_OUTRO, AlgalonOutroPos);
                     break;
+                }
                 case EVENT_OUTRO_3:
                     me->CastSpell((Unit*)nullptr, SPELL_KILL_CREDIT);
                     // Summon Chest
                     if (GameObject* go = me->SummonGameObject(RAID_MODE(GO_ALGALON_CHEST, GO_ALGALON_CHEST_HERO), 1632.1f, -306.561f, 417.321f, 4.69494f, 0, 0, 0, 1, 0))
-                        go->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
+                    {
+                        go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
+                        go->SetLootRecipient(me);
+                    }
                     break;
                 case EVENT_OUTRO_4:
                     me->CastSpell((Unit*)nullptr, SPELL_SUPERMASSIVE_FAIL);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     break;
                 case EVENT_OUTRO_5:
                     if (Creature* brann = me->SummonCreature(NPC_BRANN_BRONZBEARD_ALG, BrannOutroPos[0], TEMPSUMMON_TIMED_DESPAWN, 131500))
@@ -964,7 +985,7 @@ public:
             {
                 case ACTION_ACTIVATE_STAR:
                     me->SetReactState(REACT_AGGRESSIVE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     _isActive = true;
 
                     if (Player* target = SelectTargetFromPlayerList(250.0f))
@@ -1088,7 +1109,7 @@ public:
         bool GossipHello(Player* player, bool  /*reportUse*/) override
         {
             bool hasKey = true;
-            if (LockEntry const* lock = sLockStore.LookupEntry(go->GetGOInfo()->goober.lockId))
+            if (LockEntry const* lock = sLockStore.LookupEntry(me->GetGOInfo()->goober.lockId))
             {
                 hasKey = false;
                 for (uint32 i = 0; i < MAX_LOCK_CASE; ++i)
@@ -1111,18 +1132,18 @@ public:
                 return false;
             _locked = true;
             // Start Algalon event
-            go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
+            me->SetGameObjectFlag(GO_FLAG_IN_USE);
             events.ScheduleEvent(EVENT_DESPAWN_CONSOLE, 5000);
-            if (Creature* brann = go->SummonCreature(NPC_BRANN_BRONZBEARD_ALG, BrannIntroSpawnPos))
+            if (Creature* brann = me->SummonCreature(NPC_BRANN_BRONZBEARD_ALG, BrannIntroSpawnPos))
                 brann->AI()->DoAction(ACTION_START_INTRO);
 
-            if (InstanceScript* instance = go->GetInstanceScript())
+            if (InstanceScript* instance = me->GetInstanceScript())
             {
                 instance->SetData(DATA_ALGALON_SUMMON_STATE, 1);
-                if (GameObject* sigil = ObjectAccessor::GetGameObject(*go, instance->GetGuidData(GO_DOODAD_UL_SIGILDOOR_01)))
+                if (GameObject* sigil = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_DOODAD_UL_SIGILDOOR_01)))
                     sigil->SetGoState(GO_STATE_ACTIVE);
 
-                if (GameObject* sigil = ObjectAccessor::GetGameObject(*go, instance->GetGuidData(GO_DOODAD_UL_SIGILDOOR_02)))
+                if (GameObject* sigil = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_DOODAD_UL_SIGILDOOR_02)))
                     sigil->SetGoState(GO_STATE_ACTIVE);
             }
 
@@ -1138,7 +1159,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_DESPAWN_CONSOLE:
-                    go->Delete();
+                    me->Delete();
                     break;
             }
         }

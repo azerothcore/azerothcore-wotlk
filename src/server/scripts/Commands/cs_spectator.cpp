@@ -1,5 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "AccountMgr.h"
@@ -10,30 +23,32 @@
 #include "ScriptMgr.h"
 #include "World.h"
 
+using namespace Acore::ChatCommands;
+
 class spectator_commandscript : public CommandScript
 {
 public:
     spectator_commandscript() : CommandScript("spectator_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> spectatorCommandTable =
+        static ChatCommandTable spectatorCommandTable =
         {
-            { "version",        SEC_CONSOLE,        false, &HandleSpectatorVersionCommand,                  "" },
-            { "reset",          SEC_CONSOLE,        false, &HandleSpectatorResetCommand,                    "" },
-            { "spectate",       SEC_CONSOLE,        false, &ArenaSpectator::HandleSpectatorSpectateCommand, "" },
-            { "watch",          SEC_CONSOLE,        false, &ArenaSpectator::HandleSpectatorWatchCommand,    "" },
-            { "leave",          SEC_CONSOLE,        false, &HandleSpectatorLeaveCommand,                    "" },
-            { "",               SEC_CONSOLE,        false, &HandleSpectatorCommand,                         "" }
+            { "version",  HandleSpectatorVersionCommand,  SEC_PLAYER, Console::No },
+            { "reset",    HandleSpectatorResetCommand,    SEC_PLAYER, Console::No },
+            { "spectate", HandleSpectatorSpectateCommand, SEC_PLAYER, Console::No },
+            { "watch",    HandleSpectatorWatchCommand,    SEC_PLAYER, Console::No },
+            { "leave",    HandleSpectatorLeaveCommand,    SEC_PLAYER, Console::No },
+            { "",         HandleSpectatorCommand,         SEC_PLAYER, Console::No }
         };
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
-            { "spect",          SEC_CONSOLE,        false, nullptr,                                         "", spectatorCommandTable }
+            { "spect", spectatorCommandTable }
         };
         return commandTable;
     }
 
-    static bool HandleSpectatorCommand(ChatHandler* handler, char const*  /*args*/)
+    static bool HandleSpectatorCommand(ChatHandler* handler)
     {
         handler->PSendSysMessage("Incorrect syntax.");
         handler->PSendSysMessage("Command has subcommands:");
@@ -42,14 +57,14 @@ public:
         return true;
     }
 
-    static bool HandleSpectatorVersionCommand(ChatHandler* handler, char const* args)
+    static bool HandleSpectatorVersionCommand(ChatHandler* handler, uint16 version)
     {
-        if (atoi(args) < SPECTATOR_ADDON_VERSION)
+        if (version < SPECTATOR_ADDON_VERSION)
             ArenaSpectator::SendCommand(handler->GetSession()->GetPlayer(), "%sOUTDATED", SPECTATOR_ADDON_PREFIX);
         return true;
     }
 
-    static bool HandleSpectatorResetCommand(ChatHandler* handler, char const*  /*args*/)
+    static bool HandleSpectatorResetCommand(ChatHandler* handler)
     {
         Player* p = handler->GetSession()->GetPlayer();
         if (!p->IsSpectator())
@@ -58,7 +73,7 @@ public:
         return true;
     }
 
-    static bool HandleSpectatorLeaveCommand(ChatHandler* handler, char const*  /*args*/)
+    static bool HandleSpectatorLeaveCommand(ChatHandler* handler)
     {
         Player* player = handler->GetSession()->GetPlayer();
         if (!player->IsSpectator() || !player->FindMap() || !player->FindMap()->IsBattleArena())
@@ -69,6 +84,22 @@ public:
 
         //player->SetIsSpectator(false);
         player->TeleportToEntryPoint();
+        return true;
+    }
+
+    static bool HandleSpectatorSpectateCommand(ChatHandler* handler, std::string const& name)
+    {
+        if (!ArenaSpectator::HandleSpectatorSpectateCommand(handler, name))
+            return false;
+
+        return true;
+    }
+
+    static bool HandleSpectatorWatchCommand(ChatHandler* handler, std::string const& name)
+    {
+        if (!ArenaSpectator::HandleSpectatorWatchCommand(handler, name))
+            return false;
+
         return true;
     }
 };

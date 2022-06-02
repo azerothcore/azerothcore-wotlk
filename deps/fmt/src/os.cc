@@ -26,19 +26,17 @@
 #    endif
 #    include <io.h>
 
-#    define O_CREAT _O_CREAT
-#    define O_TRUNC _O_TRUNC
-
 #    ifndef S_IRUSR
 #      define S_IRUSR _S_IREAD
 #    endif
-
 #    ifndef S_IWUSR
 #      define S_IWUSR _S_IWRITE
 #    endif
-
-#    ifdef __MINGW32__
-#      define _SH_DENYNO 0x40
+#    ifndef S_IRGRP
+#      define S_IRGRP 0
+#    endif
+#    ifndef S_IROTH
+#      define S_IROTH 0
 #    endif
 #  endif  // _WIN32
 #endif    // FMT_USE_FCNTL
@@ -72,14 +70,14 @@ inline std::size_t convert_rwcount(std::size_t count) { return count; }
 FMT_BEGIN_NAMESPACE
 
 #ifdef _WIN32
-detail::utf16_to_utf8::utf16_to_utf8(wstring_view s) {
+detail::utf16_to_utf8::utf16_to_utf8(basic_string_view<wchar_t> s) {
   if (int error_code = convert(s)) {
     FMT_THROW(windows_error(error_code,
                             "cannot convert string from UTF-16 to UTF-8"));
   }
 }
 
-int detail::utf16_to_utf8::convert(wstring_view s) {
+int detail::utf16_to_utf8::convert(basic_string_view<wchar_t> s) {
   if (s.size() > INT_MAX) return ERROR_INVALID_PARAMETER;
   int s_size = static_cast<int>(s.size());
   if (s_size == 0) {
@@ -129,8 +127,8 @@ class system_message {
   }
   ~system_message() { LocalFree(message_); }
   explicit operator bool() const FMT_NOEXCEPT { return result_ != 0; }
-  operator wstring_view() const FMT_NOEXCEPT {
-    return wstring_view(message_, result_);
+  operator basic_string_view<wchar_t>() const FMT_NOEXCEPT {
+    return basic_string_view<wchar_t>(message_, result_);
   }
 };
 
@@ -159,7 +157,7 @@ FMT_API const std::error_category& system_category() FMT_NOEXCEPT {
 std::system_error vwindows_error(int err_code, string_view format_str,
                                  format_args args) {
   auto ec = std::error_code(err_code, system_category());
-  throw std::system_error(ec, vformat(format_str, args));
+  return std::system_error(ec, vformat(format_str, args));
 }
 
 void detail::format_windows_error(detail::buffer<char>& out, int error_code,
@@ -213,7 +211,10 @@ int buffered_file::fileno() const {
 
 #if FMT_USE_FCNTL
 file::file(cstring_view path, int oflag) {
-  int mode = S_IRUSR | S_IWUSR;
+#  ifdef _WIN32
+  using mode_t = int;
+#  endif
+  mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
 #  if defined(_WIN32) && !defined(__MINGW32__)
   fd_ = -1;
   FMT_POSIX_CALL(sopen_s(&fd_, path.c_str(), oflag, _SH_DENYNO, mode));

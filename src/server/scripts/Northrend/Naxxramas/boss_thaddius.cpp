@@ -1,12 +1,25 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "naxxramas.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "naxxramas.h"
 
 enum Says
 {
@@ -139,8 +152,8 @@ public:
             BossAI::Reset();
             events.Reset();
             summons.DespawnAll();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            me->SetControlled(false, UNIT_STATE_ROOT);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->SetControlled(true, UNIT_STATE_ROOT);
             summonTimer = 0;
             reviveTimer = 0;
             resetTimer = 1;
@@ -155,7 +168,7 @@ public:
                 cr->InterruptNonMeleeSpells(true);
                 cr->CastSpell(cr, SPELL_FEUGEN_CHAIN, false);
                 cr->SetDisableGravity(true);
-                cr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                cr->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                 cr->SetControlled(true, UNIT_STATE_ROOT);
             }
             if (Creature* cr = me->SummonCreature(NPC_TESLA_COIL, 3487.04f, -2911.68f, 318.75f, 0.0f))
@@ -164,7 +177,7 @@ public:
                 cr->InterruptNonMeleeSpells(true);
                 cr->CastSpell(cr, SPELL_STALAGG_CHAIN, false);
                 cr->SetDisableGravity(true);
-                cr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                cr->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                 cr->SetControlled(true, UNIT_STATE_ROOT);
             }
 
@@ -186,6 +199,11 @@ public:
                     }
                 }
             }
+
+            pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_POSITIVE_POLARITY);
+            pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_POSITIVE_CHARGE_STACK);
+            pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_NEGATIVE_POLARITY);
+            pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_NEGATIVE_CHARGE_STACK);
         }
 
         void KilledUnit(Unit* who) override
@@ -206,8 +224,10 @@ public:
             Talk(SAY_DEATH);
             if (pInstance)
             {
-                pInstance->DoRemoveAurasDueToSpellOnPlayers(28059);
-                pInstance->DoRemoveAurasDueToSpellOnPlayers(28084);
+                pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_POSITIVE_POLARITY);
+                pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_POSITIVE_CHARGE_STACK);
+                pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_NEGATIVE_POLARITY);
+                pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_NEGATIVE_CHARGE_STACK);
                 if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_THADDIUS_GATE)))
                 {
                     go->SetGoState(GO_STATE_ACTIVE);
@@ -284,7 +304,7 @@ public:
                 case EVENT_THADDIUS_INIT:
                 {
                     me->RemoveAllAuras();
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                     {
                         if (Creature* cr = ObjectAccessor::GetCreature(*me, (*itr)))
@@ -311,7 +331,7 @@ public:
                     Talk(SAY_AGGRO);
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->SetControlled(false, UNIT_STATE_STUNNED);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     events.ScheduleEvent(EVENT_THADDIUS_CHAIN_LIGHTNING, 14000);
                     events.ScheduleEvent(EVENT_THADDIUS_BERSERK, 360000);
                     events.ScheduleEvent(EVENT_THADDIUS_POLARITY_SHIFT, 30000);
@@ -330,7 +350,6 @@ public:
                     break;
                 case EVENT_ALLOW_BALL_LIGHTNING:
                     ballLightningEnabled = true;
-                    me->SetControlled(true, UNIT_STATE_ROOT);
                     break;
             }
 
@@ -340,7 +359,7 @@ public:
             }
             else if (ballLightningEnabled)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
+                if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat))
                 {
                     me->CastSpell(target, SPELL_BALL_LIGHTNING, false);
                 }
@@ -384,15 +403,15 @@ public:
             if (Creature* cr = me->FindNearestCreature(NPC_TESLA_COIL, 150.0f))
             {
                 cr->CastSpell(cr, me->GetEntry() == NPC_STALAGG ? SPELL_STALAGG_CHAIN : SPELL_FEUGEN_CHAIN, false);
-                cr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                cr->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                 myCoil = cr->GetGUID();
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             me->SetControlled(false, UNIT_STATE_STUNNED);
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void EnterCombat(Unit* pWho) override
@@ -454,7 +473,7 @@ public:
             }
         }
 
-        void JustDied(Unit* ) override
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(me->GetEntry() == NPC_STALAGG ? SAY_STAL_DEATH : SAY_FEUG_DEATH);
             Talk(me->GetEntry() == NPC_STALAGG ? EMOTE_STAL_DEATH : EMOTE_FEUG_DEATH);
@@ -534,17 +553,17 @@ public:
                             if (!feugen->IsAlive() || !feugen->GetVictim() || !me->GetVictim())
                                 return;
 
-                            float threatFeugen = feugen->getThreatManager().getThreat(feugen->GetVictim());
-                            float threatStalagg = me->getThreatManager().getThreat(me->GetVictim());
+                            float threatFeugen = feugen->GetThreatMgr().getThreat(feugen->GetVictim());
+                            float threatStalagg = me->GetThreatMgr().getThreat(me->GetVictim());
                             Unit* tankFeugen = feugen->GetVictim();
                             Unit* tankStalagg = me->GetVictim();
 
-                            feugen->getThreatManager().modifyThreatPercent(tankFeugen, -100);
+                            feugen->GetThreatMgr().modifyThreatPercent(tankFeugen, -100);
                             feugen->AddThreat(tankStalagg, threatFeugen);
                             feugen->CastSpell(tankStalagg, SPELL_MAGNETIC_PULL, true);
                             feugen->AI()->DoAction(ACTION_MAGNETIC_PULL);
 
-                            me->getThreatManager().modifyThreatPercent(tankStalagg, -100);
+                            me->GetThreatMgr().modifyThreatPercent(tankStalagg, -100);
                             me->AddThreat(tankFeugen, threatStalagg);
                             me->CastSpell(tankFeugen, SPELL_MAGNETIC_PULL, true);
                             DoAction(ACTION_MAGNETIC_PULL);
@@ -563,7 +582,7 @@ public:
                                 me->RemoveAurasDueToSpell(me->GetEntry() == NPC_STALAGG ? SPELL_STALAGG_CHAIN : SPELL_FEUGEN_CHAIN);
                                 cr->InterruptNonMeleeSpells(true);
                             }
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 1000.f, true))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 1000.f, true))
                             {
                                 cr->CastStop(SPELL_TESLA_SHOCK);
                                 cr->CastSpell(target, SPELL_TESLA_SHOCK, true);
@@ -610,10 +629,10 @@ public:
                     }
                 }
             }
+
             if (count)
             {
-                uint32 spellId = 0;
-                spellId = GetSpellInfo()->Id == SPELL_POSITIVE_CHARGE ? SPELL_NEGATIVE_CHARGE_STACK : SPELL_NEGATIVE_CHARGE_STACK;
+                uint32 spellId = GetSpellInfo()->Id == SPELL_POSITIVE_CHARGE ? SPELL_POSITIVE_CHARGE_STACK : SPELL_NEGATIVE_CHARGE_STACK;
                 GetCaster()->SetAuraStack(spellId, GetCaster(), count);
             }
         }
@@ -669,6 +688,8 @@ public:
             Unit* caster = GetCaster();
             if (Unit* target = GetHitUnit())
             {
+                target->RemoveAurasDueToSpell(SPELL_POSITIVE_CHARGE_STACK);
+                target->RemoveAurasDueToSpell(SPELL_NEGATIVE_CHARGE_STACK);
                 target->CastSpell(target, roll_chance_i(50) ? SPELL_POSITIVE_POLARITY : SPELL_NEGATIVE_POLARITY, true, nullptr, nullptr, caster->GetGUID());
             }
         }
@@ -715,7 +736,7 @@ public:
     {
     public:
         npc_teslaAI(Creature* creature) : ScriptedAI(creature) { }
-        void EnterEvadeMode() override { } // never stop casting due to evade
+        void EnterEvadeMode(EvadeReason /*why*/) override { } // never stop casting due to evade
         void UpdateAI(uint32 /*diff*/) override { } // never do anything unless told
         void EnterCombat(Unit* /*who*/) override { }
         void DamageTaken(Unit* /*who*/, uint32& damage, DamageEffectType, SpellSchoolMask) override { damage = 0; } // no, you can't kill it

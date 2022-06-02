@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -11,8 +22,8 @@ SDComment:
 SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "temple_of_ahnqiraj.h"
 
 enum Sartura
@@ -22,8 +33,8 @@ enum Sartura
     SAY_DEATH           = 2,
 
     SPELL_WHIRLWIND     = 26083,
-    SPELL_ENRAGE        = 28747,            //Not sure if right ID.
-    SPELL_ENRAGEHARD    = 28798,
+    SPELL_ENRAGE        = 8269,
+    SPELL_BERSERK       = 27680,
 
     //Guard Spell
     SPELL_WHIRLWINDADD  = 26038,
@@ -97,7 +108,7 @@ public:
                 if (WhirlWindRandom_Timer <= diff)
                 {
                     //Attack random Gamers
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
                     {
                         me->AddThreat(target, 1.0f);
                         me->TauntApply(target);
@@ -128,7 +139,7 @@ public:
                 if (AggroReset_Timer <= diff)
                 {
                     //Attack random Gamers
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
                     {
                         me->AddThreat(target, 1.0f);
                         me->TauntApply(target);
@@ -155,7 +166,7 @@ public:
                 {
                     if (!HealthAbovePct(20) && !me->IsNonMeleeSpellCast(false))
                     {
-                        DoCast(me, SPELL_ENRAGE);
+                        DoCast(me, SPELL_ENRAGE, true);
                         Enraged = true;
                     }
                 }
@@ -165,7 +176,7 @@ public:
                 {
                     if (EnrageHard_Timer <= diff)
                     {
-                        DoCast(me, SPELL_ENRAGEHARD);
+                        DoCast(me, SPELL_BERSERK, true);
                         EnragedHard = true;
                     }
                     else EnrageHard_Timer -= diff;
@@ -238,7 +249,7 @@ public:
                 if (WhirlWindRandom_Timer <= diff)
                 {
                     //Attack random Gamers
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
                     {
                         me->AddThreat(target, 1.0f);
                         me->TauntApply(target);
@@ -261,7 +272,7 @@ public:
                 if (AggroReset_Timer <= diff)
                 {
                     //Attack random Gamers
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
                     {
                         me->AddThreat(target, 1.0f);
                         me->TauntApply(target);

@@ -1,29 +1,30 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-/* ScriptData
-SDName: Dragonblight
-SD%Complete: 100
-SDComment:
-SDCategory: Dragonblight
-EndScriptData */
-
-/* ContentData
-EndContentData */
 
 #include "CellImpl.h"
 #include "Chat.h"
 #include "CombatAI.h"
 #include "CreatureTextMgr.h"
+#include "GridNotifiersImpl.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
-#include "ScriptedEscortAI.h"
-#include "ScriptedGossip.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
@@ -32,19 +33,33 @@ EndContentData */
 /********
 QUEST Conversing With the Depths (12032)
 ********/
-#define QUEST_CONVERSING_WITH_THE_DEPTHS 12032
-#define DEEPDIVING_PEARL_BUFF 41273
-#define NPC_OACHANOA 26648
-#define NPC_CONVERSING_WITH_THE_DEPTHS_TRIGGER 70100
-#define OACHANOA_T_1_1 "Little "
-#define OACHANOA_T_1_2 ", why do you call me forth? Are you working with the trolls of this land? Have you come to kill me and take my power as your own?"
-#define OACHANOA_T_2 "I sense uncertainty in you, and I do not trust it whether you are with them, or not. If you wish my augury for the Kalu'ak, you will have to prove yourself first."
-#define OACHANOA_T_3 "I will lay a mild compulsion upon you. Jump into the depths before me so that you put yourself into my element and thereby display your submission."
-#define OACHANOA_T_4_1 "Well done, "
-#define OACHANOA_T_4_2 ". Your display of respect is duly noted. Now, I have information for you that you must convey to the Kalu'ak."
-#define OACHANOA_T_5 "Simply put, you must tell the tuskarr that they cannot run. If they do so, their spirits will be destroyed by the evil rising within Northrend."
-#define OACHANOA_T_6 "Tell the mystic that his people are to stand and fight alongside the Horde and Alliance against the forces of Malygos and the Lich King."
-#define OACHANOA_T_7_1 "Now swim back with the knowledge I have granted you. Do what you can for them "
+
+enum DepthsMisc
+{
+    QUEST_CONVERSING_WITH_THE_DEPTHS        = 12032,
+    DEEPDIVING_PEARL_BUFF                   = 41273,
+    NPC_OACHANOA                            = 26648,
+    NPC_CONVERSING_WITH_THE_DEPTHS_TRIGGER  = 70100,
+};
+
+enum DepthsTexts
+{
+    // Oacha'noa being summoned
+    SAY_OACHANOA_SUMMONED_0                 = 0,
+    SAY_OACHANOA_SUMMONED_1                 = 1,
+    SAY_OACHANOA_SUMMONED_2                 = 2,
+    SAY_OACHANOA_SUMMONED_3                 = 3,
+    //SAY_OACHANOA_SUMMONED_4                 = 4, // Unused(no source) and no BroadcastTextId
+
+    // If success
+    SAY_OACHANOA_SUCCESS                    = 5,
+    WHISPER_OACHANOA_SUCCESS_0              = 6,
+    WHISPER_OACHANOA_SUCCESS_1              = 7,
+    WHISPER_OACHANOA_SUCCESS_2              = 8,
+
+    // If failed
+    SAY_OACHANOA_FAILED                     = 9,
+};
 
 class npc_conversing_with_the_depths_trigger : public CreatureScript
 {
@@ -62,15 +77,20 @@ public:
 
         bool running;
         bool secondpart;
+        bool canjump;
         int32 timer;
         uint8 step;
         ObjectGuid pGUID;
         ObjectGuid oachanoaGUID;
 
+        Creature* GetOachanoa() {return ObjectAccessor::GetCreature(*me, oachanoaGUID);}
+        Player* GetPlayer() {return ObjectAccessor::GetPlayer(*me, pGUID);}
+
         void Reset() override
         {
             running = false;
             secondpart = false;
+            canjump = false;
             timer = 0;
             step = 0;
             pGUID.Clear();
@@ -83,63 +103,48 @@ public:
             timer = time;
         }
 
-        void Say(std::string text, bool yell)
-        {
-            Creature* c = ObjectAccessor::GetCreature(*me, oachanoaGUID);
-            Player* player = ObjectAccessor::GetPlayer(*me, pGUID);
-            if (!c || !player)
-            {
-                Reset();
-                return;
-            }
-
-            if (yell)
-                c->MonsterYell(text.c_str(), LANG_UNIVERSAL, player);
-            else
-                c->MonsterWhisper(text.c_str(), player, false);
-        }
-
         void DespawnOachanoa()
         {
-            if (Creature* c = ObjectAccessor::GetCreature(*me, oachanoaGUID))
+            if (Creature* c = GetOachanoa())
                 c->DespawnOrUnsummon();
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if( running )
+            if (running)
             {
-                if( Player* p = ObjectAccessor::GetPlayer(*me, pGUID) )
-                    if( p->GetPositionZ() < 1.0f && !secondpart )
+                if (Player* p = GetPlayer())
+                    if (p->GetPositionZ() < 1.0f && !secondpart)  // Player is in the water
                     {
-                        if( p->HasAura(DEEPDIVING_PEARL_BUFF) )
+                        if (p->HasAura(DEEPDIVING_PEARL_BUFF) && canjump)
                         {
                             NextStep(500);
                             secondpart = true;
                         }
-                        else
+                        else // Despawn and fail quest if player jumps too early
                         {
+                            p->SendQuestFailed(QUEST_CONVERSING_WITH_THE_DEPTHS);
                             DespawnOachanoa();
                             Reset();
                         }
                     }
 
-                if( timer != 0 )
+                if (timer != 0)
                 {
                     timer -= diff;
-                    if( timer < 0 )
+                    if (timer < 0)
                         timer = 0;
                 }
                 else
-                    switch( step )
+                    switch (step)
                     {
                         case 0:
                             NextStep(10000);
                             break;
-                        case 1:
+                        case 1: // Oacha'noa being summoned
                             {
                                 Creature* c = me->SummonCreature(NPC_OACHANOA, 2406.24f, 1701.98f, 0.1f, 0.3f, TEMPSUMMON_TIMED_DESPAWN, 90000, 0);
-                                if( !c )
+                                if (!c)
                                 {
                                     Reset();
                                     return;
@@ -147,85 +152,111 @@ public:
                                 c->SetCanFly(true);
                                 c->GetMotionMaster()->MovePoint(0, 2406.25f, 1701.98f, 0.1f);
                                 oachanoaGUID = c->GetGUID();
+
                                 NextStep(3000);
                                 break;
                             }
                         case 2:
                             {
-                                Player* p = ObjectAccessor::GetPlayer(*me, pGUID);
-                                if( !p )
+                                Player* p = GetPlayer();
+                                if (!p)
                                 {
                                     Reset();
                                     return;
                                 }
-                                std::string text = (OACHANOA_T_1_1 + p->GetName() + OACHANOA_T_1_2);
-                                Say(text, true);
+                                if (Creature* c = GetOachanoa())
+                                    c->AI()->Talk(SAY_OACHANOA_SUMMONED_0, p);
+
                                 NextStep(6000);
                                 break;
                             }
                         case 3:
-                            Say(OACHANOA_T_2, true);
-                            NextStep(6000);
-                            break;
+                            {
+                                if (Creature* c = GetOachanoa())
+                                    c->AI()->Talk(SAY_OACHANOA_SUMMONED_1);
+
+                                NextStep(6000);
+                                break;
+                            }
                         case 4:
                             {
-                                Say(OACHANOA_T_3, true);
-                                Player* p = ObjectAccessor::GetPlayer(*me, pGUID);
-                                if( !p )
+                                if (Creature* c = GetOachanoa())
+                                    c->AI()->Talk(SAY_OACHANOA_SUMMONED_2);
+                                Player* p = GetPlayer();
+                                if (!p)
                                 {
                                     Reset();
                                     return;
                                 }
                                 p->CastSpell(p, DEEPDIVING_PEARL_BUFF, true);
-                                NextStep(30000);
-                                break;
-                            }
-                        case 5:
-                            DespawnOachanoa();
-                            Reset();
-                            break;
-                        case 6:
-                            {
-                                Player* p = ObjectAccessor::GetPlayer(*me, pGUID);
-                                if( !p )
-                                {
-                                    Reset();
-                                    return;
-                                }
-
-                                std::string text = (OACHANOA_T_4_1 + p->GetName() + OACHANOA_T_4_2);
-                                Say(text, true);
 
                                 NextStep(6000);
                                 break;
                             }
-                        case 7:
-                            Say(OACHANOA_T_5, false);
-                            NextStep(6000);
-                            break;
+                        case 5: // 20s countdown starts, the player can jump now
+                            {
+                                canjump = true;
+                                if (Creature* c = GetOachanoa())
+                                    c->AI()->Talk(SAY_OACHANOA_SUMMONED_3);
+
+                                NextStep(20500);
+                                break;
+                            }
+                        case 6: // If failed (player DOESN'T jump within 20 seconds)
+                            {
+                                Player* p = GetPlayer();
+                                if (Creature* c = GetOachanoa())
+                                    c->AI()->Talk(SAY_OACHANOA_FAILED, p);
+
+                                DespawnOachanoa();
+                                Reset();
+                                break;
+                            }
+                        case 7: // If success (player jumps)
+                            {
+                                Player* p = GetPlayer();
+                                if (!p)
+                                {
+                                    Reset();
+                                    return;
+                                }
+                                if (Creature* c = GetOachanoa())
+                                    c->AI()->Talk(SAY_OACHANOA_SUCCESS, p);
+
+                                NextStep(6000);
+                                break;
+                            }
                         case 8:
-                            Say(OACHANOA_T_6, false);
-                            NextStep(6000);
-                            break;
+                            {
+                                Player* p = GetPlayer();
+                                if (Creature* c = GetOachanoa())
+                                    c->AI()->Talk(WHISPER_OACHANOA_SUCCESS_0, p);
+
+                                NextStep(6000);
+                                break;
+                            }
                         case 9:
                             {
-                                Player* p = ObjectAccessor::GetPlayer(*me, pGUID);
-                                if( !p )
-                                {
-                                    Reset();
-                                    return;
-                                }
-                                const char* name_races[RACE_DRAENEI] = {"human", "orc", "dwarf", "nightelf", "undead", "tauren", "gnome", "troll", "", "bloodelf", "draenei"};
-                                if( p->getRace() > 11 )
+                                Player* p = GetPlayer();
+                                if (Creature* c = GetOachanoa())
+                                    c->AI()->Talk(WHISPER_OACHANOA_SUCCESS_1, p);
+
+                                NextStep(6000);
+                                break;
+                            }
+                        case 10:
+                            {
+                                Player* p = GetPlayer();
+                                if (!p)
                                 {
                                     Reset();
                                     return;
                                 }
 
-                                std::string text = (OACHANOA_T_7_1 + std::string(name_races[p->getRace() - 1]));
-                                Say(text, true);
+                                if (Creature* c = GetOachanoa())
+                                    c->AI()->Talk(WHISPER_OACHANOA_SUCCESS_2, p);
 
-                                p->AreaExploredOrEventHappens(12032);
+                                p->AreaExploredOrEventHappens(QUEST_CONVERSING_WITH_THE_DEPTHS);
 
                                 DespawnOachanoa();
                                 Reset();
@@ -311,7 +342,7 @@ public:
         void InitializeAI() override
         {
             if (me->ToTempSummon())
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                 {
                     summonerGUID = summoner->GetGUID();
                     float x, y, z;
@@ -320,7 +351,7 @@ public:
                     {
                         futureGUID = cr->GetGUID();
                         summoner->CastSpell(cr, SPELL_CLONE_CASTER, true);
-                        cr->setFaction(summoner->getFaction());
+                        cr->SetFaction(summoner->GetFaction());
                         cr->SetReactState(REACT_AGGRESSIVE);
                     }
                 }
@@ -349,12 +380,12 @@ public:
             {
                 case EVENT_START_EVENT:
                     if (Creature* cr = getFuture())
-                        cr->MonsterWhisper(IsFuture() ? "Hey there, $N, don't be alarmed. It's me... you... from the future. I'm here to help." : "Whoa! You're me, but from the future! Hey, my equipment got an upgrade! Cool!", getSummoner());
+                        cr->Whisper(IsFuture() ? "Hey there, $N, don't be alarmed. It's me... you... from the future. I'm here to help." : "Whoa! You're me, but from the future! Hey, my equipment got an upgrade! Cool!", LANG_UNIVERSAL, getSummoner());
                     events.ScheduleEvent(EVENT_FIGHT_1, 7000);
                     break;
                 case EVENT_FIGHT_1:
                     if (Creature* cr = getFuture())
-                        cr->MonsterWhisper(IsFuture() ? "Heads up... here they come. I'll help as much as I can. Let's just keep them off the hourglass!" : "Here come the Infinites! I've got to keep the hourglass safe. Can you help?", getSummoner());
+                        cr->Whisper(IsFuture() ? "Heads up... here they come. I'll help as much as I can. Let's just keep them off the hourglass!" : "Here come the Infinites! I've got to keep the hourglass safe. Can you help?", LANG_UNIVERSAL, getSummoner());
                     events.ScheduleEvent(EVENT_FIGHT_2, 6000);
                     break;
                 case EVENT_FIGHT_2:
@@ -405,13 +436,13 @@ public:
                         if (Player* player = getSummoner())
                             player->GroupEventHappens(IsFuture() ? QUEST_MYSTERY_OF_THE_INFINITE : QUEST_MYSTERY_OF_THE_INFINITE_REDUX, me);
 
-                        me->MonsterWhisper(IsFuture() ? "Look, $N, the hourglass has revealed Nozdormu!" : "What the heck? Nozdormu is up there!", getSummoner());
+                        me->Whisper(IsFuture() ? "Look, $N, the hourglass has revealed Nozdormu!" : "What the heck? Nozdormu is up there!", LANG_UNIVERSAL, getSummoner());
                         events.ScheduleEvent(EVENT_FINISH_EVENT, 6000);
                         break;
                     }
                 case EVENT_FINISH_EVENT:
                     {
-                        me->MonsterWhisper(IsFuture() ? "Farewell, $N. Keep us alive and get some better equipment!" : "I feel like I'm being pulled away through time. Thanks for the help....", getSummoner());
+                        me->Whisper(IsFuture() ? "Farewell, $N. Keep us alive and get some better equipment!" : "I feel like I'm being pulled away through time. Thanks for the help....", LANG_UNIVERSAL, getSummoner());
                         me->DespawnOrUnsummon(500);
                         if (getFuture())
                             getFuture()->DespawnOrUnsummon(500);
@@ -452,7 +483,7 @@ public:
             }
 
             if (Creature* cr = getFuture())
-                cr->MonsterWhisper(text.c_str(), getSummoner());
+                cr->Whisper(text, LANG_UNIVERSAL, getSummoner());
         }
     };
 };
@@ -471,16 +502,16 @@ public:
     {
         npc_future_youAI(Creature* c) : ScriptedAI(c) {}
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
+            me->RemoveUnitFlag(UNIT_FLAG_IN_COMBAT);
             me->ClearUnitState(UNIT_STATE_EVADE);
         }
 
         void Reset() override
         {
-            if (me->ToTempSummon() && me->ToTempSummon()->GetSummoner())
-                me->setFaction(me->ToTempSummon()->GetSummoner()->getFaction());
+            if (me->ToTempSummon() && me->ToTempSummon()->GetSummonerUnit())
+                me->SetFaction(me->ToTempSummon()->GetSummonerUnit()->GetFaction());
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -522,7 +553,7 @@ public:
             me->SetCorpseDelay(1);
         }
 
-        bool CanAIAttack(const Unit* who) const override
+        bool CanAIAttack(Unit const* who) const override
         {
             return who->GetEntry() == NPC_INJURED_7TH_LEGION_SOLDER;
         }
@@ -569,7 +600,7 @@ public:
                 me->RemoveAllAuras();
                 me->DespawnOrUnsummon(1000);
                 if (TempSummon* summon = me->ToTempSummon())
-                    if (Unit* owner = summon->GetSummoner())
+                    if (Unit* owner = summon->GetSummonerUnit())
                         if (Player* player = owner->ToPlayer())
                             player->KilledMonsterCredit(me->GetEntry());
             }
@@ -837,7 +868,7 @@ public:
                     c->RemoveAllAuras();
                     c->CastSpell(c, SPELL_SAC_HOLY_ZONE_AURA, true);
                     if (GameObject* go = me->FindNearestGameObject(GO_SAC_LIGHTS_VENGEANCE_3, 150.0f))
-                        go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     playerGUID.Clear();
                     events.RescheduleEvent(2, 60000);
                 }
@@ -956,7 +987,7 @@ public:
                         c->CastSpell(c, SPELL_SAC_VEGARD_SUMMON_GHOULS_AURA, false);
                     }
                     if (GameObject* go = me->FindNearestGameObject(GO_SAC_LIGHTS_VENGEANCE_1, 150.0f))
-                        go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
                 case 15: // remove light
                     if (Creature* x = me->FindNearestCreature(NPC_SAC_LIGHTS_VENGEANCE_VEH_2, 150.0f, true))
@@ -1065,7 +1096,7 @@ public:
         if (!_owner->IsAlive())
             return true;
         _owner->GetMotionMaster()->MoveRandom(5.0f);
-        _owner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        _owner->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         _owner->SetReactState(REACT_AGGRESSIVE);
         _owner->CastSpell(_owner, SPELL_SAC_GHOUL_AREA_AURA, true);
         return true;
@@ -1082,7 +1113,7 @@ public:
 
     bool Execute(uint64 /*time*/, uint32 /*diff*/) override
     {
-        _owner->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        _owner->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         _owner->SetReactState(REACT_PASSIVE);
         _owner->SetDisplayId(11686);
         return true;
@@ -1129,14 +1160,14 @@ public:
 
         void AttackStart(Unit* who) override
         {
-            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 return;
             ScriptedAI::AttackStart(who);
         }
 
-        bool CanAIAttack(const Unit* target) const override
+        bool CanAIAttack(Unit const* target) const override
         {
-            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE) || target->HasUnitState(UNIT_STATE_STUNNED) || me->GetDisplayId() == 11686)
+            if (me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) || target->HasUnitState(UNIT_STATE_STUNNED) || me->GetDisplayId() == 11686)
                 return false;
             Position homePos = me->GetHomePosition();
             return target->GetExactDistSq(&homePos) < 30.0f * 30.0f;
@@ -1151,7 +1182,7 @@ public:
 
         void Deactivate()
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetReactState(REACT_PASSIVE);
             me->SetDisplayId(11686);
         }
@@ -1262,7 +1293,7 @@ public:
         npc_q24545_vegardAI(Creature* c) : ScriptedAI(c)
         {
             me->SetReactState(REACT_PASSIVE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             events.Reset();
             events.ScheduleEvent(1, 7000);
             events.ScheduleEvent(2, urand(7000, 20000));
@@ -1300,7 +1331,7 @@ public:
                     break;
                 case 1:
                     me->SetReactState(REACT_AGGRESSIVE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     if (Unit* t = me->SelectNearestTarget(50.0f))
                         AttackStart(t);
                     break;
@@ -1522,7 +1553,7 @@ public:
             {
                 if (id == 1)
                 {
-                    me->SetFacingTo(PosTalkLocations[talkWing].m_orientation);
+                    me->SetFacingTo(PosTalkLocations[talkWing].GetOrientation());
                     TurnAudience();
 
                     switch (talkWing)
@@ -1620,9 +1651,7 @@ public:
 
         void StoreTargets()
         {
-            uint8 creaturecount;
-
-            creaturecount = 0;
+            uint8 creturesCount = 0;
 
             for (uint8 ii = 0; ii < 3; ++ii)
             {
@@ -1630,10 +1659,10 @@ public:
                 GetCreatureListWithEntryInGrid(creatureList, me, AudienceMobs[ii], 15.0f);
                 for (std::list<Creature*>::iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
                 {
-                    if (Creature* creatureList = *itr)
+                    if (Creature* creature = *itr)
                     {
-                        audienceList[creaturecount] = creatureList->GetGUID();
-                        ++creaturecount;
+                        audienceList[creturesCount] = creature->GetGUID();
+                        ++creturesCount;
                     }
                 }
             }
@@ -1760,9 +1789,7 @@ enum StrengthenAncientsMisc
     SPELL_CREATE_ITEM_BARK      = 47550,
     SPELL_CONFUSED              = 47044,
 
-    NPC_LOTHALOR                = 26321,
-
-    FACTION_WALKER_ENEMY        = 14,
+    NPC_LOTHALOR                = 26321
 };
 
 class spell_q12096_q12092_dummy : public SpellScriptLoader // Strengthen the Ancients: On Interact Dummy to Woodlands Walker
@@ -1784,7 +1811,7 @@ public:
             if (!tree || !player)
                 return;
 
-            tree->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+            tree->RemoveNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
 
             if (roll == 1) // friendly version
             {
@@ -1795,7 +1822,7 @@ public:
             else if (roll == 0) // enemy version
             {
                 tree->AI()->Talk(SAY_WALKER_ENEMY, player);
-                tree->setFaction(FACTION_WALKER_ENEMY);
+                tree->SetFaction(FACTION_MONSTER);
                 tree->Attack(player, true);
             }
         }
@@ -1886,7 +1913,7 @@ public:
                 Talk (SAY_AGGRO, player);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (spell->Id != SPELL_HIGH_EXECUTORS_BRANDING_IRON)
                 return;

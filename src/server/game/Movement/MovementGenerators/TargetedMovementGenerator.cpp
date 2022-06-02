@@ -1,16 +1,27 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "TargetedMovementGenerator.h"
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "MoveSplineInit.h"
 #include "Pet.h"
 #include "Player.h"
 #include "Spell.h"
-#include "TargetedMovementGenerator.h"
 #include "Transport.h"
 
 static bool IsMutualChase(Unit* owner, Unit* target)
@@ -22,7 +33,7 @@ static bool IsMutualChase(Unit* owner, Unit* target)
 }
 
 template<class T>
-bool ChaseMovementGenerator<T>::PositionOkay(T* owner, Unit* target, std::optional<float> maxDistance, std::optional<ChaseAngle> angle)
+bool ChaseMovementGenerator<T>::PositionOkay(T* owner, Unit* target, Optional<float> maxDistance, Optional<ChaseAngle> angle)
 {
     float const distSq = owner->GetExactDistSq(target);
     if (maxDistance && distSq > G3D::square(*maxDistance))
@@ -71,14 +82,14 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     float const minTarget = (_range ? _range->MinTolerance : 0.0f) + hitboxSum;
     float const maxRange = _range ? _range->MaxRange + hitboxSum : owner->GetMeleeRange(target); // melee range already includes hitboxes
     float const maxTarget = _range ? _range->MaxTolerance + hitboxSum : CONTACT_DISTANCE + hitboxSum;
-    std::optional<ChaseAngle> angle = mutualChase ? std::optional<ChaseAngle>() : _angle;
+    Optional<ChaseAngle> angle = mutualChase ? Optional<ChaseAngle>() : _angle;
 
     i_recheckDistance.Update(time_diff);
     if (i_recheckDistance.Passed())
     {
         i_recheckDistance.Reset(100);
 
-        if (i_recalculateTravel && PositionOkay(owner, target, _movingTowards ? maxTarget : std::optional<float>(), angle))
+        if (i_recalculateTravel && PositionOkay(owner, target, _movingTowards ? maxTarget : Optional<float>(), angle))
         {
             i_recalculateTravel = false;
             i_path = nullptr;
@@ -114,7 +125,13 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     if (PositionOkay(owner, target, maxRange, angle) && !owner->HasUnitState(UNIT_STATE_CHASE_MOVE))
         return true;
 
-    bool moveToward = !owner->IsInDist(target, maxRange);
+    float tarX, tarY, tarZ;
+    target->GetPosition(tarX, tarY, tarZ);
+
+    bool withinRange = owner->IsInDist(target, maxRange);
+    bool withinLOS   = owner->IsWithinLOS(tarX, tarY, tarZ);
+    bool moveToward  = !(withinRange && withinLOS);
+
     _mutualChase = mutualChase;
 
     if (owner->HasUnitState(UNIT_STATE_CHASE_MOVE))
@@ -131,6 +148,8 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
     if (!i_path || moveToward != _movingTowards)
         i_path = std::make_unique<PathGenerator>(owner);
+    else
+        i_path->Clear();
 
     float x, y, z;
     bool shortenPath;
@@ -170,7 +189,18 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     bool walk = false;
     if (cOwner && !cOwner->IsPet())
     {
-        walk = owner->IsWalking();
+        switch (cOwner->GetMovementTemplate().GetChase())
+        {
+        case CreatureChaseMovementType::CanWalk:
+            if (owner->IsWalking())
+                walk = true;
+            break;
+        case CreatureChaseMovementType::AlwaysWalk:
+            walk = true;
+            break;
+        default:
+            break;
+        }
     }
 
     owner->AddUnitState(UNIT_STATE_CHASE_MOVE);
@@ -190,6 +220,7 @@ void ChaseMovementGenerator<Player>::DoInitialize(Player* owner)
 {
     i_path = nullptr;
     _lastTargetPosition.reset();
+    owner->StopMoving();
     owner->AddUnitState(UNIT_STATE_CHASE);
 }
 
@@ -199,6 +230,7 @@ void ChaseMovementGenerator<Creature>::DoInitialize(Creature* owner)
     i_path = nullptr;
     _lastTargetPosition.reset();
     owner->SetWalk(false);
+    owner->StopMoving();
     owner->AddUnitState(UNIT_STATE_CHASE);
 }
 
@@ -229,13 +261,118 @@ void ChaseMovementGenerator<T>::MovementInform(T* owner)
 
 //-----------------------------------------------//
 
-template<class T>
-bool FollowMovementGenerator<T>::PositionOkay(T* owner, Unit* target, float range, std::optional<ChaseAngle> angle)
+static Optional<float> GetVelocity(Unit* owner, Unit* target, G3D::Vector3 const& dest, bool playerPet)
 {
-    if (owner->GetExactDistSq(target) > G3D::square(owner->GetCombatReach() + target->GetCombatReach() + range))
+    Optional<float> speed = {};
+    if (!owner->IsInCombat() && !owner->IsVehicle() && !owner->HasUnitFlag(UNIT_FLAG_POSSESSED) &&
+        (owner->IsPet() || owner->IsGuardian() || owner->GetGUID() == target->GetCritterGUID() || owner->GetCharmerOrOwnerGUID() == target->GetGUID()))
+    {
+        UnitMoveType moveType = Movement::SelectSpeedType(target->GetUnitMovementFlags());
+        speed = std::max(target->GetSpeed(moveType), owner->GetSpeed(moveType));
+
+        if (playerPet)
+        {
+            float distance = owner->GetDistance2d(dest.x, dest.y) - (*speed / 2.f);
+            if (distance > 0.f)
+            {
+                float multiplier = 1.f + (distance / 10.f);
+                *speed *= multiplier;
+            }
+            else
+            {
+                switch (moveType)
+                {
+                    case MOVE_RUN_BACK:
+                    case MOVE_SWIM_BACK:
+                    case MOVE_FLIGHT_BACK:
+                        break;
+                    default:
+                        *speed *= 0.9f;
+                        break;
+                }
+            }
+        }
+    }
+
+    return speed;
+}
+
+static Position const PredictPosition(Unit* target)
+{
+    Position pos = target->GetPosition();
+
+     // 0.5 - it's time (0.5 sec) between starting movement opcode (e.g. MSG_MOVE_START_FORWARD) and MSG_MOVE_HEARTBEAT sent by client
+    float speed = target->GetSpeed(Movement::SelectSpeedType(target->GetUnitMovementFlags())) * 0.5f;
+    float orientation = target->GetOrientation();
+
+    if (target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FORWARD))
+    {
+        pos.m_positionX += cos(orientation) * speed;
+        pos.m_positionY += std::sin(orientation) * speed;
+    }
+    else if (target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_BACKWARD))
+    {
+        pos.m_positionX -= cos(orientation) * speed;
+        pos.m_positionY -= std::sin(orientation) * speed;
+    }
+
+    if (target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_STRAFE_LEFT))
+    {
+        pos.m_positionX += cos(orientation + M_PI / 2.f) * speed;
+        pos.m_positionY += std::sin(orientation + M_PI / 2.f) * speed;
+    }
+    else if (target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_STRAFE_RIGHT))
+    {
+        pos.m_positionX += cos(orientation - M_PI / 2.f) * speed;
+        pos.m_positionY += std::sin(orientation - M_PI / 2.f) * speed;
+    }
+
+    return pos;
+}
+
+template<class T>
+bool FollowMovementGenerator<T>::PositionOkay(Unit* target, bool isPlayerPet, bool& targetIsMoving, uint32 diff)
+{
+    if (!_lastTargetPosition)
         return false;
 
-    return !angle || angle->IsAngleOkay(target->GetRelativeAngle(owner));
+    float exactDistSq = target->GetExactDistSq(_lastTargetPosition->GetPositionX(), _lastTargetPosition->GetPositionY(), _lastTargetPosition->GetPositionZ());
+    float distanceTolerance = 0.25f;
+    // For creatures, increase tolerance
+    if (target->GetTypeId() == TYPEID_UNIT)
+    {
+        distanceTolerance += _range + _range;
+    }
+
+    if (isPlayerPet)
+    {
+        targetIsMoving = target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD | MOVEMENTFLAG_STRAFE_LEFT | MOVEMENTFLAG_STRAFE_RIGHT);
+    }
+
+    if (exactDistSq > distanceTolerance)
+        return false;
+
+    if (isPlayerPet)
+    {
+        if (!targetIsMoving)
+        {
+            if (i_recheckPredictedDistanceTimer.GetExpiry())
+            {
+                i_recheckPredictedDistanceTimer.Update(diff);
+                if (i_recheckPredictedDistanceTimer.Passed())
+                {
+                    i_recheckPredictedDistanceTimer = 0;
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    return true;
 }
 
 template<class T>
@@ -272,107 +409,78 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         (i_target->GetTypeId() == TYPEID_PLAYER && i_target->ToPlayer()->IsGameMaster()) // for .npc follow
         ; // closes "bool forceDest", that way it is more appropriate, so we can comment out crap whenever we need to
 
-    i_recheckDistance.Update(time_diff);
-    if (i_recheckDistance.Passed())
+    bool targetIsMoving = false;
+    if (PositionOkay(target, owner->IsGuardian() && target->GetTypeId() == TYPEID_PLAYER, targetIsMoving, time_diff))
     {
-        i_recheckDistance.Reset(100);
-
-        if (i_recalculateTravel && PositionOkay(owner, target, _range, _angle))
+        if (owner->HasUnitState(UNIT_STATE_FOLLOW_MOVE) && owner->movespline->Finalized())
         {
-            i_recalculateTravel = false;
+            owner->ClearUnitState(UNIT_STATE_FOLLOW_MOVE);
             i_path = nullptr;
-            owner->StopMoving();
-            _lastTargetPosition.reset();
             MovementInform(owner);
-            return true;
+
+            if (i_recheckPredictedDistance)
+            {
+                i_recheckPredictedDistanceTimer.Reset(1000);
+            }
+
+            owner->SetFacingTo(target->GetOrientation());
         }
-    }
-
-    if (owner->HasUnitState(UNIT_STATE_FOLLOW_MOVE) && owner->movespline->Finalized())
-    {
-        i_recalculateTravel = false;
-        i_path = nullptr;
-        owner->ClearUnitState(UNIT_STATE_FOLLOW_MOVE);
-        MovementInform(owner);
-    }
-
-    Position targetPosition = i_target->GetPosition();
-
-    if (_lastTargetPosition && _lastTargetPosition->GetExactDistSq(&targetPosition) == 0.0f)
-        return true;
-
-    _lastTargetPosition = targetPosition;
-
-    if (PositionOkay(owner, target, _range + PET_FOLLOW_DIST) && !owner->HasUnitState(UNIT_STATE_FOLLOW_MOVE))
-        return true;
-
-    if (!i_path)
-        i_path = std::make_unique<PathGenerator>(owner);
-
-    float x, y, z;
-    // select angle
-    float tAngle;
-    float const curAngle = target->GetRelativeAngle(owner);
-    if (!oPet)
-    {
-        // for non pets, keep the relative angle
-        // decided during the summon
-        tAngle = _angle.RelativeAngle;
-    }
-    else if (_angle.IsAngleOkay(curAngle))
-    {
-        tAngle = curAngle;
     }
     else
     {
-        float const diffUpper = Position::NormalizeOrientation(curAngle - _angle.UpperBound());
-        float const diffLower = Position::NormalizeOrientation(_angle.LowerBound() - curAngle);
-        if (diffUpper < diffLower)
-            tAngle = _angle.UpperBound();
+        Position targetPosition = target->GetPosition();
+        _lastTargetPosition = targetPosition;
+
+        // If player is moving and their position is not updated, we need to predict position
+        if (targetIsMoving)
+        {
+            Position predictedPosition = PredictPosition(target);
+            if (_lastPredictedPosition && _lastPredictedPosition->GetExactDistSq(&predictedPosition) < 0.25f)
+                return true;
+
+            _lastPredictedPosition = predictedPosition;
+            targetPosition = predictedPosition;
+            i_recheckPredictedDistance = true;
+        }
         else
-            tAngle = _angle.LowerBound();
+        {
+            i_recheckPredictedDistance = false;
+            i_recheckPredictedDistanceTimer.Reset(0);
+        }
+
+        if (!i_path)
+            i_path = std::make_unique<PathGenerator>(owner);
+        else
+            i_path->Clear();
+
+        target->MovePositionToFirstCollision(targetPosition, owner->GetCombatReach() + _range, target->ToAbsoluteAngle(_angle.RelativeAngle) - target->GetOrientation());
+
+        float x, y, z;
+        targetPosition.GetPosition(x, y, z);
+
+        if (owner->IsHovering())
+            owner->UpdateAllowedPositionZ(x, y, z);
+
+        bool success = i_path->CalculatePath(x, y, z, forceDest);
+        if (!success || (i_path->GetPathType() & PATHFIND_NOPATH && !followingMaster))
+        {
+            if (!owner->IsStopped())
+                owner->StopMoving();
+
+            return true;
+        }
+
+        owner->AddUnitState(UNIT_STATE_FOLLOW_MOVE);
+
+        Movement::MoveSplineInit init(owner);
+        init.MovebyPath(i_path->GetPath());
+        init.SetWalk(target->IsWalking());
+        if (Optional<float> velocity = GetVelocity(owner, target, i_path->GetActualEndPosition(), owner->IsGuardian() && target->GetTypeId() == TYPEID_PLAYER))
+            init.SetVelocity(*velocity);
+        init.Launch();
     }
-
-    target->GetNearPoint(owner, x, y, z, _range, 0.f, target->ToAbsoluteAngle(tAngle));
-
-    i_recalculateTravel = true;
-
-    bool success = i_path->CalculatePath(x, y, z, forceDest);
-    if (!success || i_path->GetPathType() & PATHFIND_NOPATH)
-    {
-        if (cOwner)
-            cOwner->SetCannotReachTarget(true);
-        return true;
-    }
-
-    owner->AddUnitState(UNIT_STATE_FOLLOW_MOVE);
-
-    Movement::MoveSplineInit init(owner);
-    init.MovebyPath(i_path->GetPath());
-    init.SetFacing(target->GetOrientation());
-    init.SetWalk(target->IsWalking());
-    init.Launch();
 
     return true;
-}
-
-template<>
-void FollowMovementGenerator<Player>::_updateSpeed(Player* /*owner*/)
-{
-    // nothing to do for Player
-}
-
-template<>
-void FollowMovementGenerator<Creature>::_updateSpeed(Creature* owner)
-{
-    // pet only sync speed with owner
-    /// Make sure we are not in the process of a map change (IsInWorld)
-    if (!owner->GetOwnerGUID().IsPlayer() || !owner->IsInWorld() || !i_target.isValid() || i_target->GetGUID() != owner->GetOwnerGUID())
-        return;
-
-    owner->UpdateSpeed(MOVE_RUN, true);
-    owner->UpdateSpeed(MOVE_WALK, true);
-    owner->UpdateSpeed(MOVE_SWIM, true);
 }
 
 template<class T>
@@ -381,14 +489,12 @@ void FollowMovementGenerator<T>::DoInitialize(T* owner)
     i_path = nullptr;
     _lastTargetPosition.reset();
     owner->AddUnitState(UNIT_STATE_FOLLOW);
-    _updateSpeed(owner);
 }
 
 template<class T>
 void FollowMovementGenerator<T>::DoFinalize(T* owner)
 {
     owner->ClearUnitState(UNIT_STATE_FOLLOW | UNIT_STATE_FOLLOW_MOVE);
-    _updateSpeed(owner);
 }
 
 template<class T>

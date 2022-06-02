@@ -1,61 +1,67 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /** \addtogroup u2w User to World Communication
  *  @{
  *  \file WorldSocketMgr.h
- *  \author Derex <derex101@gmail.com>
  */
 
 #ifndef __WORLDSOCKETMGR_H
 #define __WORLDSOCKETMGR_H
 
-#include "Common.h"
+#include "SocketMgr.h"
 
 class WorldSocket;
-class ReactorRunnable;
-class ACE_Event_Handler;
 
 /// Manages all sockets connected to peers and network threads
-class WorldSocketMgr
+class AC_GAME_API WorldSocketMgr : public SocketMgr<WorldSocket>
 {
-public:
-    friend class WorldSocket;
+    typedef SocketMgr<WorldSocket> BaseSocketMgr;
 
-    static WorldSocketMgr* instance();
+public:
+    static WorldSocketMgr& Instance();
 
     /// Start network, listen at address:port .
-    int StartNetwork(uint16 port, const char* address);
+    bool StartWorldNetwork(Acore::Asio::IoContext& ioContext, std::string const& bindIp, uint16 port, int networkThreads);
 
     /// Stops all network threads, It will wait for all running threads .
-    void StopNetwork();
+    void StopNetwork() override;
 
-    /// Wait untill all network threads have "joined" .
-    void Wait();
+    void OnSocketOpen(tcp::socket&& sock, uint32 threadIndex) override;
 
-private:
-    int OnSocketOpen(WorldSocket* sock);
+    std::size_t GetApplicationSendBufferSize() const { return _socketApplicationSendBufferSize; }
 
-    int StartReactiveIO(uint16 port, const char* address);
-
-private:
+protected:
     WorldSocketMgr();
-    virtual ~WorldSocketMgr();
 
-    ReactorRunnable* m_NetThreads;
-    size_t m_NetThreadsCount;
+    NetworkThread<WorldSocket>* CreateThreads() const override;
 
-    int m_SockOutKBuff;
-    int m_SockOutUBuff;
-    bool m_UseNoDelay;
+    static void OnSocketAccept(tcp::socket&& sock, uint32 threadIndex)
+    {
+        Instance().OnSocketOpen(std::forward<tcp::socket>(sock), threadIndex);
+    }
 
-    class WorldSocketAcceptor* m_Acceptor;
+private:
+    int32 _socketSystemSendBufferSize;
+    int32 _socketApplicationSendBufferSize;
+    bool _tcpNoDelay;
 };
 
-#define sWorldSocketMgr WorldSocketMgr::instance()
+#define sWorldSocketMgr WorldSocketMgr::Instance()
 
 #endif
 /// @}

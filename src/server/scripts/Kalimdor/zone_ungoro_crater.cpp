@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -17,10 +28,10 @@ npc_ringo
 EndContentData */
 
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedFollowerAI.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 enum AmeData
@@ -53,7 +64,7 @@ public:
             creature->AI()->Talk(SAY_READY, player);
             creature->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
             // Change faction so mobs attack
-            creature->setFaction(113);
+            creature->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
         }
         return true;
     }
@@ -153,8 +164,7 @@ enum Ringo
 
     SPELL_REVIVE_RINGO          = 15591,
     QUEST_A_LITTLE_HELP         = 4491,
-    NPC_SPRAGGLE                = 9997,
-    FACTION_ESCORTEE            = 113
+    NPC_SPRAGGLE                = 9997
 };
 
 class npc_ringo : public CreatureScript
@@ -169,7 +179,7 @@ public:
             if (npc_ringoAI* ringoAI = CAST_AI(npc_ringo::npc_ringoAI, creature->AI()))
             {
                 creature->SetStandState(UNIT_STAND_STATE_STAND);
-                ringoAI->StartFollow(player, FACTION_ESCORTEE, quest);
+                ringoAI->StartFollow(player, FACTION_ESCORTEE_N_NEUTRAL_PASSIVE, quest);
             }
         }
 
@@ -220,7 +230,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* /*pCaster*/, const SpellInfo* pSpell) override
+        void SpellHit(Unit* /*pCaster*/, SpellInfo const* pSpell) override
         {
             if (HasFollowState(STATE_FOLLOW_INPROGRESS | STATE_FOLLOW_PAUSED) && pSpell->Id == SPELL_REVIVE_RINGO)
                 ClearFaint();

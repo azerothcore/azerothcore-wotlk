@@ -1,12 +1,24 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "azjol_nerub.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
-#include "ScriptedEscortAI.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "azjol_nerub.h"
 
 enum Spells
 {
@@ -137,7 +149,7 @@ public:
         {
             Map::PlayerList const& playerList = me->GetMap()->GetPlayers();
             for(Map::PlayerList::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
-                if (me->GetDistance(itr->GetSource()) < 130.0f && itr->GetSource()->IsAlive() && !itr->GetSource()->IsGameMaster() && me->CanCreatureAttack(itr->GetSource()) && me->_CanDetectFeignDeathOf(itr->GetSource()))
+                if (me->GetDistance(itr->GetSource()) < 130.0f && itr->GetSource()->IsAlive() && !itr->GetSource()->IsGameMaster() && me->CanCreatureAttack(itr->GetSource()))
                     return true;
 
             return false;
@@ -159,7 +171,7 @@ public:
                     events.ScheduleEvent(EVENT_HADRONOX_PIERCE, 8000);
                     break;
                 case EVENT_HADRONOX_ACID:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, false))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, false))
                         me->CastSpell(target, SPELL_ACID_CLOUD, false);
                     events.ScheduleEvent(EVENT_HADRONOX_ACID, 25000);
                     break;
@@ -183,7 +195,6 @@ public:
             }
 
             DoMeleeAttackIfReady();
-            EnterEvadeIfOutOfCombatArea();
         }
 
         bool CheckEvadeIfOutOfCombatArea() const override
@@ -216,7 +227,7 @@ public:
             events.Reset();
 
             if (me->ToTempSummon())
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                     if (summoner->GetEntry() == me->GetEntry())
                     {
                         me->CastSpell(me, RAND(SPELL_SUMMON_ANUBAR_CHAMPION, SPELL_SUMMON_ANUBAR_CRYPT_FIEND, SPELL_SUMMON_ANUBAR_NECROMANCER), true);
@@ -246,7 +257,7 @@ public:
         void EnterCombat(Unit*) override
         {
             if (me->ToTempSummon())
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                     if (summoner->GetEntry() != me->GetEntry())
                     {
                         summoner->GetAI()->DoAction(ACTION_START_EVENT);

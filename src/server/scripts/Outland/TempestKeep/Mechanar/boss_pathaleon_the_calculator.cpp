@@ -1,10 +1,23 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "mechanar.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "mechanar.h"
 
 enum Says
 {
@@ -111,13 +124,13 @@ public:
                     events.ScheduleEvent(EVENT_ARCANE_TORRENT, 15000);
                     break;
                 case EVENT_MANA_TAP:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, PowerUsersSelector(me, POWER_MANA, 40.0f, false)))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, POWER_MANA, 40.0f, false)))
                         me->CastSpell(target, SPELL_MANA_TAP, false);
                     events.ScheduleEvent(EVENT_MANA_TAP, 18000);
                     break;
                 case EVENT_DOMINATION:
                     Talk(SAY_DOMINATION);
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 50.0f))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 50.0f))
                         me->CastSpell(target, SPELL_DOMINATION, false);
                     events.ScheduleEvent(EVENT_DOMINATION, 30000);
                     break;

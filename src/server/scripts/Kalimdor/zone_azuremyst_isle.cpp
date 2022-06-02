@@ -1,8 +1,19 @@
 /*
-* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
-* Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
-* Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 /* ScriptData
 SDName: Azuremyst_Isle
@@ -24,10 +35,10 @@ EndContentData */
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 
 /*######
 ## npc_draenei_survivor
@@ -71,7 +82,7 @@ public:
             DoCast(me, SPELL_IRRIDATION, true);
 
             me->SetPvP(true);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
+            me->SetUnitFlag(UNIT_FLAG_IN_COMBAT);
             me->SetHealth(me->CountPctFromMaxHealth(10));
             me->SetStandState(UNIT_STAND_STATE_SLEEP);
         }
@@ -90,11 +101,11 @@ public:
             }
         }
 
-        void SpellHit(Unit* Caster, const SpellInfo* Spell) override
+        void SpellHit(Unit* Caster, SpellInfo const* Spell) override
         {
             if (Spell->SpellFamilyFlags[2] & 0x080000000)
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+                me->RemoveUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
 
                 DoCast(me, SPELL_STUNNED, true);
@@ -171,7 +182,7 @@ public:
 
         void Reset() override
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
+            me->SetUnitFlag(UNIT_FLAG_IN_COMBAT);
             me->SetHealth(me->CountPctFromMaxHealth(15));
             switch (urand(0, 1))
             {
@@ -217,8 +228,7 @@ enum Magwin
     EVENT_STAND                 = 3,
     EVENT_TALK_END              = 4,
     EVENT_COWLEN_TALK           = 5,
-    QUEST_A_CRY_FOR_HELP        = 9528,
-    FACTION_QUEST               = 113
+    QUEST_A_CRY_FOR_HELP        = 9528
 };
 
 class npc_magwin : public CreatureScript
@@ -286,7 +296,7 @@ public:
                         {
                             Talk(SAY_START, player);
                         }
-                        me->setFaction(FACTION_QUEST);
+                        me->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
                         _events.ScheduleEvent(EVENT_START_ESCORT, 1000);
                         break;
                     case EVENT_START_ESCORT:
@@ -349,7 +359,7 @@ public:
         {
             if (Creature* ravager = go->FindNearestCreature(NPC_DEATH_RAVAGER, 5.0f, true))
             {
-                ravager->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                ravager->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 ravager->SetReactState(REACT_AGGRESSIVE);
                 ravager->AI()->AttackStart(player);
             }
@@ -375,7 +385,7 @@ public:
             RendTimer = 30000;
             EnragingBiteTimer = 20000;
 
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             me->SetReactState(REACT_PASSIVE);
         }
 
@@ -452,8 +462,7 @@ public:
                 Talk(CAPITIVE_SAY, owner);
                 _playerGUID = owner->GetGUID();
             }
-            Position pos;
-            me->GetNearPosition(pos, 3.0f, 0.0f);
+            Position pos = me->GetNearPosition(3.0f, 0.0f);
             me->GetMotionMaster()->MovePoint(POINT_INIT, pos);
         }
 

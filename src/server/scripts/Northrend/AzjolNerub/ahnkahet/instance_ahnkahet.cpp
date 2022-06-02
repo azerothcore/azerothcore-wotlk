@@ -1,196 +1,175 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "ahnkahet.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "ahnkahet.h"
+#include <array>
 
 class instance_ahnkahet : public InstanceMapScript
 {
 public:
-    instance_ahnkahet() : InstanceMapScript("instance_ahnkahet", 619) { }
+    instance_ahnkahet() : InstanceMapScript(AhnKahetScriptName, 619) { }
 
     struct instance_ahnkahet_InstanceScript : public InstanceScript
     {
-        instance_ahnkahet_InstanceScript(Map* pMap) : InstanceScript(pMap) {Initialize();};
-
-        ObjectGuid Elder_Nadox;
-        ObjectGuid Prince_Taldaram;
-        ObjectGuid Jedoga_Shadowseeker;
-        ObjectGuid Herald_Volazj;
-        ObjectGuid Amanitar;
-
-        ObjectGuid Prince_TaldaramPlatform;
-        ObjectGuid Prince_TaldaramGate;
-
-        uint32 m_auiEncounter[MAX_ENCOUNTER];
-        uint32 spheres;
-
-        bool nadoxAchievement;
-        bool jedogaAchievement;
-
-        void Initialize() override
+        instance_ahnkahet_InstanceScript(Map* pMap) : InstanceScript(pMap), canSaveBossStates(false)
         {
-            memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
-
-            spheres = NOT_STARTED;
-
-            nadoxAchievement = false;
-            jedogaAchievement = false;
-        }
-
-        bool IsEncounterInProgress() const override
-        {
-            for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-                if (m_auiEncounter[i] == IN_PROGRESS) return true;
-
-            return false;
+            SetBossNumber(MAX_ENCOUNTER);
+            teldaramSpheres.fill(NOT_STARTED);
         }
 
         void OnCreatureCreate(Creature* pCreature) override
         {
-            switch(pCreature->GetEntry())
+            switch (pCreature->GetEntry())
             {
                 case NPC_ELDER_NADOX:
-                    Elder_Nadox = pCreature->GetGUID();
+                    elderNadox_GUID = pCreature->GetGUID();
                     break;
                 case NPC_PRINCE_TALDARAM:
-                    Prince_Taldaram = pCreature->GetGUID();
+                    princeTaldaram_GUID = pCreature->GetGUID();
                     break;
                 case NPC_JEDOGA_SHADOWSEEKER:
-                    Jedoga_Shadowseeker = pCreature->GetGUID();
+                    jedogaShadowseeker_GUID = pCreature->GetGUID();
                     break;
                 case NPC_HERALD_JOLAZJ:
-                    Herald_Volazj = pCreature->GetGUID();
+                    heraldVolazj_GUID = pCreature->GetGUID();
                     break;
                 case NPC_AMANITAR:
-                    Amanitar = pCreature->GetGUID();
+                    amanitar_GUID = pCreature->GetGUID();
                     break;
             }
         }
 
         void OnGameObjectCreate(GameObject* pGo) override
         {
-            switch(pGo->GetEntry())
+            switch (pGo->GetEntry())
             {
-                case 193564:
-                    Prince_TaldaramPlatform = pGo->GetGUID();
-                    if (m_auiEncounter[1] == DONE)
+                case GO_TELDARAM_PLATFORM:
+                {
+                    taldaramPlatform_GUID = pGo->GetGUID();
+                    if (IsAllSpheresActivated() || GetBossState(DATA_PRINCE_TALDARAM) == DONE)
+                    {
                         HandleGameObject(ObjectGuid::Empty, true, pGo);
+                    }
 
                     break;
-                case 193093:
-                    if (spheres == DONE)
+                }
+                case GO_TELDARAM_SPHERE1:
+                case GO_TELDARAM_SPHERE2:
+                {
+                    if (teldaramSpheres.at(pGo->GetEntry() == GO_TELDARAM_SPHERE1 ? 0 : 1) == DONE || GetBossState(DATA_PRINCE_TALDARAM) == DONE)
                     {
                         pGo->SetGoState(GO_STATE_ACTIVE);
-                        pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        pGo->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     }
                     else
-                        pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-
-                    break;
-                case 193094:
-                    if (spheres == DONE)
                     {
-                        pGo->SetGoState(GO_STATE_ACTIVE);
-                        pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        pGo->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     }
-                    else
-                        pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
 
                     break;
-                case 192236:
-                    Prince_TaldaramGate = pGo->GetGUID(); // Web gate past Prince Taldaram
-                    if (m_auiEncounter[1] == DONE)
+                }
+                case GO_TELDARAM_DOOR:
+                {
+                    taldaramGate_GUID = pGo->GetGUID(); // Web gate past Prince Taldaram
+                    if (GetBossState(DATA_PRINCE_TALDARAM) == DONE)
+                    {
                         HandleGameObject(ObjectGuid::Empty, true, pGo);
+                    }
 
                     break;
+                }
             }
         }
 
-        ObjectGuid GetGuidData(uint32 identifier) const override
+        bool SetBossState(uint32 type, EncounterState state) override
         {
-            switch(identifier)
+            if (!InstanceScript::SetBossState(type, state))
             {
-                case DATA_ELDER_NADOX:
-                    return Elder_Nadox;
-                case DATA_PRINCE_TALDARAM:
-                    return Prince_Taldaram;
-                case DATA_JEDOGA_SHADOWSEEKER:
-                    return Jedoga_Shadowseeker;
-                case DATA_HERALD_VOLAZJ:
-                    return Herald_Volazj;
-                case DATA_AMANITAR:
-                    return Amanitar;
-                case DATA_PRINCE_TALDARAM_PLATFORM:
-                    return Prince_TaldaramPlatform;
+                return false;
             }
 
-            return ObjectGuid::Empty;
-        }
-
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
-        {
-            switch(criteria_id)
+            if (type == DATA_PRINCE_TALDARAM && state == DONE)
             {
-                case 7317: // Respect Your Elders (2038)
-                    return nadoxAchievement;
-                case 7359: // Volunteer Work (2056)
-                    return jedogaAchievement;
+                HandleGameObject(taldaramGate_GUID, true);
             }
-            return false;
+
+            if (canSaveBossStates)
+            {
+                SaveToDB();
+            }
+
+            return true;
         }
 
         void SetData(uint32 type, uint32 data) override
         {
-            switch(type)
+            if (type == DATA_TELDRAM_SPHERE1 || type == DATA_TELDRAM_SPHERE2)
             {
-                case DATA_HERALD_VOLAZJ_EVENT:
-                case DATA_AMANITAR_EVENT:
-                case DATA_ELDER_NADOX_EVENT:
-                case DATA_JEDOGA_SHADOWSEEKER_EVENT:
-                    m_auiEncounter[type] = data;
-                    break;
-                case DATA_PRINCE_TALDARAM_EVENT:
-                    if (data == DONE)
-                        HandleGameObject(Prince_TaldaramGate, true);
 
-                    m_auiEncounter[type] = data;
-                    break;
-                case DATA_SPHERE_EVENT:
-                    spheres = data;
-                    break;
-                case DATA_NADOX_ACHIEVEMENT:
-                    nadoxAchievement = (bool)data;
-                    return;
-                case DATA_JEDOGA_ACHIEVEMENT:
-                    jedogaAchievement = (bool)data;
-                    return;
-            }
-
-            if (data == DONE)
+                teldaramSpheres[type == DATA_TELDRAM_SPHERE1 ? 0 : 1] = data;
                 SaveToDB();
+
+                if (IsAllSpheresActivated())
+                {
+                    HandleGameObject(taldaramPlatform_GUID, true, nullptr);
+
+                    Creature* teldaram = instance->GetCreature(princeTaldaram_GUID);
+                    if (teldaram && teldaram->IsAlive())
+                    {
+                        teldaram->AI()->DoAction(ACTION_REMOVE_PRISON);
+                    }
+                }
+            }
         }
 
         uint32 GetData(uint32 type) const override
         {
-            switch(type)
+            switch (type)
             {
-                case DATA_ELDER_NADOX_EVENT:
-                case DATA_PRINCE_TALDARAM_EVENT:
-                case DATA_JEDOGA_SHADOWSEEKER_EVENT:
-                case DATA_HERALD_VOLAZJ:
-                case DATA_AMANITAR_EVENT:
-                    return m_auiEncounter[type];
-
-                case DATA_SPHERE_EVENT:
-                    return spheres;
+                case DATA_TELDRAM_SPHERE1:
+                    return teldaramSpheres.at(0);
+                case DATA_TELDRAM_SPHERE2:
+                    return teldaramSpheres.at(1);
             }
 
             return 0;
+        }
+
+        ObjectGuid GetGuidData(uint32 type) const override
+        {
+            switch (type)
+            {
+                case DATA_ELDER_NADOX:
+                    return elderNadox_GUID;
+                case DATA_PRINCE_TALDARAM:
+                    return princeTaldaram_GUID;
+                case DATA_JEDOGA_SHADOWSEEKER:
+                    return jedogaShadowseeker_GUID;
+                case DATA_HERALD_VOLAZJ:
+                    return heraldVolazj_GUID;
+                case DATA_AMANITAR:
+                    return amanitar_GUID;
+            }
+
+            return ObjectGuid::Empty;
         }
 
         std::string GetSaveData() override
@@ -198,9 +177,11 @@ public:
             OUT_SAVE_INST_DATA;
 
             std::ostringstream saveStream;
-            saveStream << "A K " << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' '
-                       << m_auiEncounter[2] << ' ' << m_auiEncounter[3] << ' ' << m_auiEncounter[4] << ' '
-                       << spheres;
+            // Encounter states
+            saveStream << "A K " << GetBossSaveData();
+
+            // Extra data
+            saveStream << teldaramSpheres[0] << ' ' << teldaramSpheres[1];
 
             OUT_SAVE_INST_DATA_COMPLETE;
             return saveStream.str();
@@ -217,28 +198,54 @@ public:
             OUT_LOAD_INST_DATA(in);
 
             char dataHead1, dataHead2;
-            uint32 data0, data1, data2, data3, data4, data5;
 
             std::istringstream loadStream(in);
-            loadStream >> dataHead1 >> dataHead2 >> data0 >> data1 >> data2 >> data3 >> data4 >> data5;
+            loadStream >> dataHead1 >> dataHead2;
 
             if (dataHead1 == 'A' && dataHead2 == 'K')
             {
-                m_auiEncounter[0] = data0;
-                m_auiEncounter[1] = data1;
-                m_auiEncounter[2] = data2;
-                m_auiEncounter[3] = data3;
-                m_auiEncounter[4] = data4;
-
+                // Encounter states
                 for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-                    if (m_auiEncounter[i] == IN_PROGRESS)
-                        m_auiEncounter[i] = NOT_STARTED;
+                {
+                    uint32 tmpState;
+                    loadStream >> tmpState;
+                    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
+                    {
+                        tmpState = NOT_STARTED;
+                    }
 
-                spheres = data5;
+                    SetBossState(i, EncounterState(tmpState));
+                }
+
+                // Extra data
+                loadStream >> teldaramSpheres[0] >> teldaramSpheres[1];
             }
-            else OUT_LOAD_INST_DATA_FAIL;
+            else
+            {
+                OUT_LOAD_INST_DATA_FAIL;
+                return;
+            }
 
+            canSaveBossStates = true;
             OUT_LOAD_INST_DATA_COMPLETE;
+        }
+
+    private:
+        ObjectGuid elderNadox_GUID;
+        ObjectGuid princeTaldaram_GUID;
+        ObjectGuid jedogaShadowseeker_GUID;
+        ObjectGuid heraldVolazj_GUID;
+        ObjectGuid amanitar_GUID;
+
+        // Teldaram related
+        ObjectGuid taldaramPlatform_GUID;
+        ObjectGuid taldaramGate_GUID;
+        std::array<uint32, 2> teldaramSpheres;  // Used to identify activation status for sphere activation
+        bool canSaveBossStates;     // Indicates that it is safe to trigger SaveToDB call in SetBossState
+
+        bool IsAllSpheresActivated() const
+        {
+            return teldaramSpheres.at(0) == DONE && teldaramSpheres.at(1) == DONE;
         }
     };
 
@@ -248,49 +255,25 @@ public:
     }
 };
 
-class spell_shadow_sickle_periodic_damage : public SpellScriptLoader
+// 56702 Shadow Sickle
+// 59103 Shadow Sickle
+class spell_shadow_sickle_periodic_damage : public AuraScript
 {
-public:
-    spell_shadow_sickle_periodic_damage() : SpellScriptLoader("spell_shadow_sickle_periodic_damage") { }
+    PrepareAuraScript(spell_shadow_sickle_periodic_damage);
 
-    class spell_shadow_sickle_periodic_damage_AuraScript : public AuraScript
+    void HandlePeriodic(AuraEffect const*  /*aurEff*/)
     {
-        PrepareAuraScript(spell_shadow_sickle_periodic_damage_AuraScript);
+        GetCaster()->CastSpell(nullptr, SPELL_SHADOW_SICKLE);
+    }
 
-        void HandlePeriodic(AuraEffect const*  /*aurEff*/)
-        {
-            PreventDefaultAction();
-
-            if (Unit* caster = GetCaster())
-            {
-                std::list<Player*> PlayerList;
-                PlayerList.clear();
-
-                Map::PlayerList const& players = caster->GetMap()->GetPlayers();
-                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                    if (Player* player = itr->GetSource()->ToPlayer())
-                        if (player->IsWithinDist(caster, 40.0f) && player->IsAlive()) // SPELL_SHADOW_SICKLE_H & SPELL_SHADOW_SICKLE range is 40 yards
-                            PlayerList.push_back(player);
-
-                if (!PlayerList.empty())
-                    caster->CastSpell(Acore::Containers::SelectRandomContainerElement(PlayerList), caster->GetMap()->IsHeroic() ? SPELL_SHADOW_SICKLE_H : SPELL_SHADOW_SICKLE, true);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_shadow_sickle_periodic_damage_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_shadow_sickle_periodic_damage_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_shadow_sickle_periodic_damage::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
 void AddSC_instance_ahnkahet()
 {
     new instance_ahnkahet;
-    new spell_shadow_sickle_periodic_damage();
+    RegisterSpellScript(spell_shadow_sickle_periodic_damage);
 }

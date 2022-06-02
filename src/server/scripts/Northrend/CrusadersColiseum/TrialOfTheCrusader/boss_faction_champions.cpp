@@ -1,10 +1,23 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "trial_of_the_crusader.h"
 
@@ -89,16 +102,16 @@ struct boss_faction_championsAI : public ScriptedAI
 
     void RecalculateThreat()
     {
-        ThreatContainer::StorageType const& tList = me->getThreatManager().getThreatList();
+        ThreatContainer::StorageType const& tList = me->GetThreatMgr().getThreatList();
         for( ThreatContainer::StorageType::const_iterator itr = tList.begin(); itr != tList.end(); ++itr )
         {
             Unit* pUnit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
-            if( pUnit && pUnit->GetTypeId() == TYPEID_PLAYER && me->getThreatManager().getThreat(pUnit) )
+            if( pUnit && pUnit->GetTypeId() == TYPEID_PLAYER && me->GetThreatMgr().getThreat(pUnit) )
             {
                 float threatMod = GetThreatMod(me->GetDistance2d(pUnit), (float)pUnit->GetArmor(), pUnit->GetHealth(), pUnit->GetMaxHealth(), pUnit);
-                me->getThreatManager().modifyThreatPercent(pUnit, -100);
-                //me->getThreatManager().doAddThreat(pUnit, 10000000.0f * threatMod);
-                if (HostileReference* ref = me->getThreatManager().getOnlineContainer().getReferenceByTarget(pUnit))
+                me->GetThreatMgr().modifyThreatPercent(pUnit, -100);
+                //me->getThreatMgr().doAddThreat(pUnit, 10000000.0f * threatMod);
+                if (HostileReference* ref = me->GetThreatMgr().getOnlineContainer().getReferenceByTarget(pUnit))
                     ref->addThreat(10000000.0f * threatMod);
             }
         }
@@ -121,7 +134,7 @@ struct boss_faction_championsAI : public ScriptedAI
             pInstance->SetData(TYPE_FACTION_CHAMPIONS_PLAYER_DIED, 1);
     }
 
-    void EnterEvadeMode() override
+    void EnterEvadeMode(EvadeReason /* why */) override
     {
         if( pInstance )
             pInstance->SetData(TYPE_FAILED, 0);
@@ -164,7 +177,7 @@ struct boss_faction_championsAI : public ScriptedAI
 
     uint32 EnemiesInRange(float distance)
     {
-        ThreatContainer::StorageType const& tList = me->getThreatManager().getThreatList();
+        ThreatContainer::StorageType const& tList = me->GetThreatMgr().getThreatList();
         uint32 count = 0;
         Unit* target;
         for( ThreatContainer::StorageType::const_iterator iter = tList.begin(); iter != tList.end(); ++iter )
@@ -178,7 +191,7 @@ struct boss_faction_championsAI : public ScriptedAI
 
     Unit* SelectEnemyCaster(bool casting, float range)
     {
-        ThreatContainer::StorageType const& tList = me->getThreatManager().getThreatList();
+        ThreatContainer::StorageType const& tList = me->GetThreatMgr().getThreatList();
         Unit* target;
         for( ThreatContainer::StorageType::const_iterator iter = tList.begin(); iter != tList.end(); ++iter )
         {
@@ -279,7 +292,7 @@ public:
 
         bool myCanCast()
         {
-            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
+            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasUnitFlag(UNIT_FLAG_SILENCED) || IsCCed());
         }
 
         void UpdateAI(uint32 diff) override
@@ -408,7 +421,7 @@ public:
 
         bool myCanCast()
         {
-            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
+            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasUnitFlag(UNIT_FLAG_SILENCED) || IsCCed());
         }
 
         void UpdateAI(uint32 diff) override
@@ -453,7 +466,7 @@ public:
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_HEX:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 20.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 20.0f, true) )
                         me->CastSpell(target, SPELL_HEX, false);
                     events.RepeatEvent(45000);
                     EventMapGCD(events, 1500);
@@ -531,7 +544,7 @@ public:
 
         bool myCanCast()
         {
-            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
+            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasUnitFlag(UNIT_FLAG_SILENCED) || IsCCed());
         }
 
         void UpdateAI(uint32 diff) override
@@ -600,7 +613,7 @@ public:
                         events.RepeatEvent(10000);
                     break;
                 case EVENT_SPELL_HAMMER_OF_JUSTICE:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_NEAREST, 0, 15.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 15.0f, true) )
                     {
                         me->CastSpell(target, SPELL_HAMMER_OF_JUSTICE, false);
                         events.RepeatEvent(40000);
@@ -664,7 +677,7 @@ public:
 
         bool myCanCast()
         {
-            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
+            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasUnitFlag(UNIT_FLAG_SILENCED) || IsCCed());
         }
 
         void UpdateAI(uint32 diff) override
@@ -701,7 +714,7 @@ public:
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_DISPEL:
-                    if( Unit* target = (urand(0, 1) ? SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 30.0f, true) : SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_DISPEL, 40.0f)) )
+                    if( Unit* target = (urand(0, 1) ? SelectTarget(SelectTargetMethod::MaxThreat, 0, 30.0f, true) : SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_DISPEL, 40.0f)) )
                         me->CastSpell(target, SPELL_DISPEL, false);
                     events.RepeatEvent(urand(10000, 15000));
                     EventMapGCD(events, 1500);
@@ -787,7 +800,7 @@ public:
 
         bool myCanCast()
         {
-            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
+            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasUnitFlag(UNIT_FLAG_SILENCED) || IsCCed());
         }
 
         void UpdateAI(uint32 diff) override
@@ -861,7 +874,7 @@ public:
                         events.RepeatEvent(6000);
                     break;
                 case EVENT_SPELL_DISPEL:
-                    if( Unit* target = (urand(0, 1) ? SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 30.0f, true) : SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_DISPEL, 40.0f)) )
+                    if( Unit* target = (urand(0, 1) ? SelectTarget(SelectTargetMethod::MaxThreat, 0, 30.0f, true) : SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_DISPEL, 40.0f)) )
                         me->CastSpell(target, SPELL_DISPEL, false);
                     events.RepeatEvent(urand(10000, 15000));
                     EventMapGCD(events, 1500);
@@ -941,7 +954,7 @@ public:
 
         bool myCanCast()
         {
-            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
+            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasUnitFlag(UNIT_FLAG_SILENCED) || IsCCed());
         }
 
         void JustSummoned(Creature* c) override
@@ -998,7 +1011,7 @@ public:
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_FEAR:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 20.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 20.0f, true) )
                         me->CastSpell(target, SPELL_FEAR, false);
                     events.RepeatEvent(urand(10000, 15000));
                     EventMapGCD(events, 1500);
@@ -1084,7 +1097,7 @@ public:
 
         bool myCanCast()
         {
-            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
+            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasUnitFlag(UNIT_FLAG_SILENCED) || IsCCed());
         }
 
         void UpdateAI(uint32 diff) override
@@ -1130,7 +1143,7 @@ public:
                         me->CastSpell((Unit*)nullptr, SPELL_FROST_NOVA, false);
                         events.RepeatEvent(15000);
                         EventMapGCD(events, 1500);
-                        // blink disabled, fucking movement shit not working
+                        // blink disabled, movement not working
                     }
                     else
                         events.RepeatEvent(6000);
@@ -1162,7 +1175,7 @@ public:
                         events.RepeatEvent(6000);
                     break;
                 case EVENT_SPELL_POLYMORPH:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true) )
                         me->CastSpell(target, SPELL_POLYMORPH, false);
                     events.RepeatEvent(15000);
                     EventMapGCD(events, 1500);
@@ -1232,7 +1245,7 @@ public:
 
         bool myCanCast()
         {
-            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_DISARM_RANGED) || IsCCed());
+            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasUnitFlag2(UNIT_FLAG2_DISARM_RANGED) || IsCCed());
         }
 
         void JustSummoned(Creature* c) override
@@ -1310,7 +1323,7 @@ public:
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_WYVERN_STING:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 35.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 35.0f, true) )
                     {
                         me->CastSpell(target, SPELL_WYVERN_STING, false);
                         events.RepeatEvent(60000);
@@ -1385,7 +1398,7 @@ public:
 
         bool myCanCast()
         {
-            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
+            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasUnitFlag(UNIT_FLAG_SILENCED) || IsCCed());
         }
 
         void JustSummoned(Creature* c) override
@@ -1444,7 +1457,7 @@ public:
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_ENTANGLING_ROOTS:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true) )
                         me->CastSpell(target, SPELL_ENTANGLING_ROOTS, false);
                     events.RepeatEvent(urand(10000, 15000));
                     EventMapGCD(events, 1500);
@@ -1456,7 +1469,7 @@ public:
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_CYCLONE:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_NEAREST, 0, 20.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 20.0f, true) )
                         me->CastSpell(target, SPELL_CYCLONE, false);
                     events.RepeatEvent(urand(25000, 40000));
                     EventMapGCD(events, 1500);
@@ -1549,7 +1562,7 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_BLADESTORM:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) )
+                    if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
                         events.RepeatEvent(5000);
                         break;
@@ -1574,7 +1587,7 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_MORTAL_STRIKE:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) )
+                    if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
                         events.RepeatEvent(5000);
                         break;
@@ -1605,7 +1618,7 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_OVERPOWER:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) )
+                    if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
                         events.RepeatEvent(5000);
                         break;
@@ -1620,7 +1633,7 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_SUNDER_ARMOR:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) )
+                    if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
                         events.RepeatEvent(5000);
                         break;
@@ -1635,7 +1648,7 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_SHATTERING_THROW:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) )
+                    if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
                         events.RepeatEvent(5000);
                         break;
@@ -1650,7 +1663,7 @@ public:
                         events.RepeatEvent(6000);
                     break;
                 case EVENT_SPELL_RETALIATION:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) )
+                    if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
                         events.RepeatEvent(5000);
                         break;
@@ -1776,7 +1789,7 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_FROST_STRIKE:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) )
+                    if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
                         events.RepeatEvent(5000);
                         break;
@@ -1898,7 +1911,7 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_FAN_OF_KNIVES:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) )
+                    if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
                         events.RepeatEvent(5000);
                         break;
@@ -1913,7 +1926,7 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_BLIND:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_BOTTOMAGGRO, 0, 20.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::MinThreat, 0, 20.0f, true) )
                     {
                         me->CastSpell(target, SPELL_BLIND, false);
                         events.RepeatEvent(120000);
@@ -1933,7 +1946,7 @@ public:
                         events.RepeatEvent(6000);
                     break;
                 case EVENT_SPELL_BLADE_FLURRY:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) )
+                    if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                         events.RepeatEvent(5000);
                     else
                     {
@@ -1953,7 +1966,7 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_HEMORRHAGE:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) )
+                    if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
                         events.RepeatEvent(5000);
                         break;
@@ -1968,7 +1981,7 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_EVISCERATE:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) )
+                    if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
                         events.RepeatEvent(5000);
                         break;
@@ -2056,12 +2069,12 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_EARTH_SHOCK_ENH:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) )
+                    if( me->HasUnitFlag(UNIT_FLAG_SILENCED) )
                     {
                         events.RepeatEvent(5000);
                         break;
                     }
-                    if( Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 25.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 25.0f, true) )
                     {
                         me->CastSpell(target, SPELL_EARTH_SHOCK_ENH, false);
                         events.RepeatEvent(urand(6000, 8000));
@@ -2071,12 +2084,12 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_LAVA_LASH:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_DISARM_OFFHAND) )
+                    if( me->HasUnitFlag2(UNIT_FLAG2_DISARM_OFFHAND) )
                     {
                         events.RepeatEvent(5000);
                         break;
                     }
-                    if( Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 5.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 5.0f, true) )
                     {
                         me->CastSpell(target, SPELL_LAVA_LASH, false);
                         events.RepeatEvent(urand(6000, 8000));
@@ -2086,12 +2099,12 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_STORMSTRIKE:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) && me->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_DISARM_OFFHAND) )
+                    if( me->HasUnitFlag(UNIT_FLAG_DISARMED) && me->HasUnitFlag2(UNIT_FLAG2_DISARM_OFFHAND) )
                     {
                         events.RepeatEvent(5000);
                         break;
                     }
-                    if( Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 5.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 5.0f, true) )
                     {
                         me->CastSpell(target, SPELL_STORMSTRIKE, false);
                         events.RepeatEvent(urand(8000, 9000));
@@ -2199,12 +2212,12 @@ public:
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_CRUSADER_STRIKE:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) )
+                    if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
                         events.RepeatEvent(5000);
                         break;
                     }
-                    if( Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 5.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 5.0f, true) )
                     {
                         me->CastSpell(target, SPELL_CRUSADER_STRIKE, false);
                         events.RepeatEvent(urand(6000, 8000));
@@ -2224,7 +2237,7 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_DIVINE_STORM:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) )
+                    if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
                         events.RepeatEvent(5000);
                         break;
@@ -2239,7 +2252,7 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_HAMMER_OF_JUSTICE_RET:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 15.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 15.0f, true) )
                     {
                         me->CastSpell(target, SPELL_HAMMER_OF_JUSTICE_RET, false);
                         events.RepeatEvent(40000);
@@ -2259,7 +2272,7 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_JUDGEMENT_OF_COMMAND:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 20.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 20.0f, true) )
                     {
                         me->CastSpell(target, SPELL_JUDGEMENT_OF_COMMAND, false);
                         events.RepeatEvent(urand(10000, 15000));
@@ -2269,7 +2282,7 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_REPENTANCE:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_BOTTOMAGGRO, 0, 20.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::MinThreat, 0, 20.0f, true) )
                     {
                         me->CastSpell(target, SPELL_REPENTANCE, false);
                         events.RepeatEvent(60000);
@@ -2320,7 +2333,7 @@ public:
 
         bool myCanCast()
         {
-            return !(me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
+            return !(me->HasUnitFlag(UNIT_FLAG_SILENCED) || IsCCed());
         }
 
         void UpdateAI(uint32 diff) override
@@ -2355,7 +2368,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /* why */) override
         {
             me->DespawnOrUnsummon();
         }
@@ -2422,39 +2435,11 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /* why */) override
         {
             me->DespawnOrUnsummon();
         }
     };
-};
-
-class go_toc_champions_cache : public GameObjectScript
-{
-public:
-    go_toc_champions_cache() : GameObjectScript("go_toc_champions_cache") { }
-
-    bool OnGossipHello(Player* player, GameObject* go) override
-    {
-        if (player->IsGameMaster())
-            return false;
-
-        if (!go->loot.items.size())
-            return false;
-
-        for(std::vector<LootItem>::iterator itr = go->loot.items.begin(); itr != go->loot.items.end(); ++itr)
-            if( ItemTemplate const* iProto = sObjectMgr->GetItemTemplate((*itr).itemid) )
-                if( ((iProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && player->GetTeamId() != TEAM_HORDE) || ((iProto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY) && player->GetTeamId() != TEAM_ALLIANCE) )
-                    if (!((*itr).is_looted))
-                    {
-                        (*itr).count = 0;
-                        (*itr).is_looted = true;
-                        if (go->loot.unlootedCount)
-                            --go->loot.unlootedCount;
-                    }
-
-        return false;
-    }
 };
 
 class spell_faction_champion_warl_unstable_affliction : public SpellScriptLoader
@@ -2507,6 +2492,5 @@ void AddSC_boss_faction_champions()
     new npc_toc_retro_paladin();
     new npc_toc_pet_warlock();
     new npc_toc_pet_hunter();
-    new go_toc_champions_cache();
     new spell_faction_champion_warl_unstable_affliction();
 }
