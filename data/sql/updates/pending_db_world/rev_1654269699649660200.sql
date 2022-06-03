@@ -10,23 +10,23 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (17191, 0, 2, 0, 1, 0, 100, 0, 0, 0, 605000, 605000, 0, 11, 12550, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Siltfin Oracle - Out of Combat - Cast \'Lightning Shield\''),
 (17191, 0, 4, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 23, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Siltfin Oracle - On Aggro - Increment Phase (No Repeat)'),
 (17191, 0, 5, 0, 9, 1, 100, 0, 0, 40, 3400, 4800, 0, 11, 9739, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Siltfin Oracle - Within 0-40 Range - Cast \'Wrath\' (Phase 1)'),
-(17191, 0, 7, 0, 61, 1, 100, 512, 0, 7, 0, 0, 0, 23, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Siltfin Oracle - Between 0-7% Mana - Increment Phase (Phase 1) (No Repeat)'),
+(17191, 0, 7, 0, 61, 1, 100, 512, 0, 0, 0, 0, 0, 23, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Siltfin Oracle - Between 0-7% Mana - Increment Phase (Phase 1) (No Repeat)'),
 (17191, 0, 11, 0, 3, 2, 100, 512, 15, 100, 100, 100, 0, 23, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Siltfin Oracle - Between 15-100% Mana - Decrement Phase (Phase 2)'),
-(17191, 0, 13, 14, 61, 0, 100, 512, 0, 15, 0, 0, 0, 21, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Siltfin Oracle - Between 0-15% Health - Enable Combat Movement (No Repeat)'),
-(17191, 0, 14, 0, 61, 0, 100, 512, 0, 15, 0, 0, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Siltfin Oracle - Between 0-15% Health - Flee For Assist (No Repeat)'),
+(17191, 0, 13, 14, 61, 0, 100, 512, 0, 0, 0, 0, 0, 21, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Siltfin Oracle - Between 0-15% Health - Enable Combat Movement (No Repeat)'),
+(17191, 0, 14, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Siltfin Oracle - Between 0-15% Health - Flee For Assist (No Repeat)'),
 (17191, 0, 15, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 12, 17612, 1, 120000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Siltfin Oracle - On Just Died - Summon Creature \'Quel\'dorei Magewraith\'');
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 17192) AND (`source_type` = 0) AND (`id` IN (3, 5, 7, 9, 10, 12, 13, 14, 15, 17));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (17192, 0, 3, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 23, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Siltfin Hunter - On Aggro - Increment Phase (No Repeat)'),
-(17192, 0, 5, 0, 61, 1, 100, 0, 5, 30, 2300, 3900, 0, 40, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Siltfin Hunter - Within 5-30 Range - Set Sheath Ranged (Phase 1)'),
-(17192, 0, 7, 0, 61, 1, 100, 512, 25, 80, 0, 0, 0, 20, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Siltfin Hunter - Within 25-80 Range - Start Attacking (Phase 1)'),
-(17192, 0, 9, 10, 61, 1, 100, 512, 0, 5, 0, 0, 0, 40, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Siltfin Hunter - Within 0-5 Range - Set Sheath Melee (Phase 1)'),
-(17192, 0, 10, 0, 61, 1, 100, 512, 0, 5, 0, 0, 0, 20, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Siltfin Hunter - Within 0-5 Range - Start Attacking (Phase 1)'),
-(17192, 0, 12, 0, 61, 1, 100, 512, 5, 15, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Siltfin Hunter - Within 5-15 Range - Stop Attacking (Phase 1)'),
+(17192, 0, 5, 0, 61, 1, 100, 0, 0, 0, 0, 0, 0, 40, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Siltfin Hunter - Within 5-30 Range - Set Sheath Ranged (Phase 1)'),
+(17192, 0, 7, 0, 61, 1, 100, 512, 0, 0, 0, 0, 0, 20, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Siltfin Hunter - Within 25-80 Range - Start Attacking (Phase 1)'),
+(17192, 0, 9, 10, 61, 1, 100, 512, 0, 0, 0, 0, 0, 40, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Siltfin Hunter - Within 0-5 Range - Set Sheath Melee (Phase 1)'),
+(17192, 0, 10, 0, 61, 1, 100, 512, 0, 0, 0, 0, 0, 20, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Siltfin Hunter - Within 0-5 Range - Start Attacking (Phase 1)'),
+(17192, 0, 12, 0, 61, 1, 100, 512, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Siltfin Hunter - Within 5-15 Range - Stop Attacking (Phase 1)'),
 (17192, 0, 13, 14, 2, 0, 100, 513, 0, 15, 0, 0, 0, 23, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Siltfin Hunter - Between 0-15% Health - Increment Phase (No Repeat)'),
-(17192, 0, 14, 15, 61, 0, 100, 512, 0, 15, 0, 0, 0, 21, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Siltfin Hunter - Between 0-15% Health - Enable Combat Movement (No Repeat)'),
-(17192, 0, 15, 0, 61, 0, 100, 512, 0, 15, 0, 0, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Siltfin Hunter - Between 0-15% Health - Flee For Assist (No Repeat)'),
+(17192, 0, 14, 15, 61, 0, 100, 512, 0, 0, 0, 0, 0, 21, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Siltfin Hunter - Between 0-15% Health - Enable Combat Movement (No Repeat)'),
+(17192, 0, 15, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Siltfin Hunter - Between 0-15% Health - Flee For Assist (No Repeat)'),
 (17192, 0, 17, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 12, 17612, 1, 120000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Siltfin Hunter - On Just Died - Summon Creature \'Quel\'dorei Magewraith\'');
 
 -- Condition for SMARTAI
