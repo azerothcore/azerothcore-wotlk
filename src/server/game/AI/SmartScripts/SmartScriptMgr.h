@@ -582,7 +582,7 @@ enum SMART_ACTION
     SMART_ACTION_ADD_NPC_FLAG                       = 82,     // Flags
     SMART_ACTION_REMOVE_NPC_FLAG                    = 83,     // Flags
     SMART_ACTION_SIMPLE_TALK                        = 84,     // groupID, can be used to make players say groupID, Text_over event is not triggered, whisper can not be used (Target units will say the text)
-    SMART_ACTION_INVOKER_CAST                       = 85,     // spellID, castFlags,   if avaliable, last used invoker will cast spellId with castFlags on targets
+    SMART_ACTION_SELF_CAST                          = 85,     // spellID, castFlags
     SMART_ACTION_CROSS_CAST                         = 86,     // spellID, castFlags, CasterTargetType, CasterTarget param1, CasterTarget param2, CasterTarget param3, ( + the origonal target fields as Destination target),   CasterTargets will cast spellID on all Targets (use with caution if targeting multiple * multiple units)
     SMART_ACTION_CALL_RANDOM_TIMED_ACTIONLIST       = 87,     // script9 ids 1-9
     SMART_ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST = 88,     // script9 id min, max
@@ -631,7 +631,7 @@ enum SMART_ACTION
     SMART_ACTION_SPAWN_SPAWNGROUP                   = 131,    // TODO: NOT SUPPORTED YET
     SMART_ACTION_DESPAWN_SPAWNGROUP                 = 132,    // TODO: NOT SUPPORTED YET
     SMART_ACTION_RESPAWN_BY_SPAWNID                 = 133,    // TODO: NOT SUPPORTED YET
-    // SMART_ACTION_INVOKER_CAST                    = 134,    // TODO: solve name conflicts
+    SMART_ACTION_INVOKER_CAST                       = 134,    // spellID, castFlags
     SMART_ACTION_PLAY_CINEMATIC                     = 135,    // entry, cinematic
     SMART_ACTION_SET_MOVEMENT_SPEED                 = 136,    // movementType, speedInteger, speedFraction
 
@@ -769,7 +769,8 @@ struct SmartAction
         struct
         {
             uint32 spell;
-            uint32 flags;
+            uint32 castFlags;
+            uint32 triggerFlags;
             uint32 targetsLimit;
         } cast;
 

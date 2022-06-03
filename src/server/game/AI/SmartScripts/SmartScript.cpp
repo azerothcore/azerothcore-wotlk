@@ -689,7 +689,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 if (e.GetScriptType() == SMART_SCRIPT_TYPE_AREATRIGGER)
                     caster = unit->SummonTrigger(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ(), unit->GetOrientation(), 5000);
 
-                if (e.action.cast.targetsLimit > 0 && targets->size() > e.action.cast.targetsLimit)
+                if (e.action.cast.targetsLimit)
                     Acore::Containers::RandomResize(*targets, e.action.cast.targetsLimit);
 
                 for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
@@ -705,15 +705,15 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                     if (caster && caster != me) // Areatrigger cast
                     {
-                        caster->CastSpell((*itr)->ToUnit(), e.action.cast.spell, (e.action.cast.flags & SMARTCAST_TRIGGERED));
+                        caster->CastSpell((*itr)->ToUnit(), e.action.cast.spell, (e.action.cast.castFlags & SMARTCAST_TRIGGERED));
                     }
-                    else if (me && (!(e.action.cast.flags & SMARTCAST_AURA_NOT_PRESENT) || !(*itr)->ToUnit()->HasAura(e.action.cast.spell)))
+                    else if (me && (!(e.action.cast.castFlags & SMARTCAST_AURA_NOT_PRESENT) || !(*itr)->ToUnit()->HasAura(e.action.cast.spell)))
                     {
-                        if (e.action.cast.flags & SMARTCAST_INTERRUPT_PREVIOUS)
+                        if (e.action.cast.castFlags & SMARTCAST_INTERRUPT_PREVIOUS)
                             me->InterruptNonMeleeSpells(false);
 
                         // Xinef: flag usable only if caster has max dist set
-                        if ((e.action.cast.flags & SMARTCAST_COMBAT_MOVE) && GetCasterMaxDist() > 0.0f && me->GetMaxPower(GetCasterPowerType()) > 0)
+                        if ((e.action.cast.castFlags & SMARTCAST_COMBAT_MOVE) && GetCasterMaxDist() > 0.0f && me->GetMaxPower(GetCasterPowerType()) > 0)
                         {
                             // Xinef: check mana case only and operate movement accordingly, LoS and range is checked in targetet movement generator
                             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(e.action.cast.spell);
@@ -731,11 +731,45 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                             }
                         }
 
-                        me->CastSpell((*itr)->ToUnit(), e.action.cast.spell, (e.action.cast.flags & SMARTCAST_TRIGGERED));
+                        me->CastSpell((*itr)->ToUnit(), e.action.cast.spell, (e.action.cast.castFlags & SMARTCAST_TRIGGERED));
                     }
                 }
 
                 delete targets;
+                break;
+            }
+        case SMART_ACTION_SELF_CAST:
+            {
+                ObjectList* targets = GetTargets(e, unit);
+                if (!targets)
+                    break;
+
+                if (e.action.cast.targetsLimit)
+                    Acore::Containers::RandomResize(*targets, e.action.cast.targetsLimit);
+
+                TriggerCastFlags triggerFlags = TRIGGERED_NONE;
+                if (e.action.cast.castFlags & SMARTCAST_TRIGGERED)
+                {
+                    if (e.action.cast.triggerFlags)
+                        triggerFlags = TriggerCastFlags(e.action.cast.triggerFlags);
+                    else
+                        triggerFlags = TRIGGERED_FULL_MASK;
+                }
+
+                for (auto & target : *targets)
+                {
+                    Unit* uTarget = target->ToUnit();
+                    if (!uTarget)
+                        continue;
+
+                    if (!(e.action.cast.castFlags & SMARTCAST_AURA_NOT_PRESENT) || !uTarget->HasAura(e.action.cast.spell))
+                    {
+                        if (e.action.cast.castFlags & SMARTCAST_INTERRUPT_PREVIOUS)
+                            uTarget->InterruptNonMeleeSpells(false);
+
+                        uTarget->CastSpell(uTarget, e.action.cast.spell, triggerFlags);
+                    }
+                }
                 break;
             }
         case SMART_ACTION_INVOKER_CAST:
@@ -756,12 +790,12 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     if (!IsUnit(*itr))
                         continue;
 
-                    if (!(e.action.cast.flags & SMARTCAST_AURA_NOT_PRESENT) || !(*itr)->ToUnit()->HasAura(e.action.cast.spell))
+                    if (!(e.action.cast.castFlags & SMARTCAST_AURA_NOT_PRESENT) || !(*itr)->ToUnit()->HasAura(e.action.cast.spell))
                     {
-                        if (e.action.cast.flags & SMARTCAST_INTERRUPT_PREVIOUS)
+                        if (e.action.cast.castFlags & SMARTCAST_INTERRUPT_PREVIOUS)
                             tempLastInvoker->InterruptNonMeleeSpells(false);
 
-                        tempLastInvoker->CastSpell((*itr)->ToUnit(), e.action.cast.spell, (e.action.cast.flags & SMARTCAST_TRIGGERED));
+                        tempLastInvoker->CastSpell((*itr)->ToUnit(), e.action.cast.spell, (e.action.cast.castFlags & SMARTCAST_TRIGGERED));
                     }
                 }
 
@@ -2225,15 +2259,15 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         if (!IsUnit(*it))
                             continue;
 
-                        if (!(e.action.cast.flags & SMARTCAST_AURA_NOT_PRESENT) || !(*it)->ToUnit()->HasAura(e.action.cast.spell))
+                        if (!(e.action.cast.castFlags & SMARTCAST_AURA_NOT_PRESENT) || !(*it)->ToUnit()->HasAura(e.action.cast.spell))
                         {
-                            if (!interruptedSpell && e.action.cast.flags & SMARTCAST_INTERRUPT_PREVIOUS)
+                            if (!interruptedSpell && e.action.cast.castFlags & SMARTCAST_INTERRUPT_PREVIOUS)
                             {
                                 (*itr)->ToUnit()->InterruptNonMeleeSpells(false);
                                 interruptedSpell = true;
                             }
 
-                            (*itr)->ToUnit()->CastSpell((*it)->ToUnit(), e.action.cast.spell, (e.action.cast.flags & SMARTCAST_TRIGGERED));
+                            (*itr)->ToUnit()->CastSpell((*it)->ToUnit(), e.action.cast.spell, (e.action.cast.castFlags & SMARTCAST_TRIGGERED));
                         }
                         else
                             LOG_DEBUG("sql.sql", "Spell {} not casted because it has flag SMARTCAST_AURA_NOT_PRESENT and the target {} already has the aura",
@@ -4712,7 +4746,7 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
         // delay spell cast event if another spell is being casted
         if (e.GetActionType() == SMART_ACTION_CAST)
         {
-            if (!(e.action.cast.flags & (SMARTCAST_INTERRUPT_PREVIOUS | SMARTCAST_TRIGGERED)))
+            if (!(e.action.cast.castFlags & (SMARTCAST_INTERRUPT_PREVIOUS | SMARTCAST_TRIGGERED)))
             {
                 if (me && me->HasUnitState(UNIT_STATE_CASTING))
                 {
@@ -4954,7 +4988,7 @@ void SmartScript::OnInitialize(WorldObject* obj, AreaTrigger const* at)
         }
 
         // Xinef: if smartcast combat move flag is present
-        if (i->GetActionType() == SMART_ACTION_CAST && (i->action.cast.flags & SMARTCAST_COMBAT_MOVE))
+        if (i->GetActionType() == SMART_ACTION_CAST && (i->action.cast.castFlags & SMARTCAST_COMBAT_MOVE))
         {
             if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(i->action.cast.spell))
             {
