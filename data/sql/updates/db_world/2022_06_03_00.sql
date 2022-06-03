@@ -1,3 +1,4 @@
+-- DB update 2022_06_02_01 -> 2022_06_03_00
 
 DELETE FROM `spell_proc_event` WHERE `entry` = '71602';
 DELETE FROM `spell_proc_event` WHERE `entry` = '75465';
