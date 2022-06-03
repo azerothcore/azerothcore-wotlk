@@ -4514,6 +4514,39 @@ class spell_gen_remove_impairing_auras : public SpellScript
     }
 };
 
+enum AzuremistIsles
+{
+    NESTLEWOOD_OWLKIN_ENTRY = 16518,
+    INOCULATED_OWLKIN_ENTRY = 16534,
+};
+
+class spell_inoculate_nestlewood_owlkin : public AuraScript
+{
+    PrepareAuraScript(spell_inoculate_nestlewood_owlkin);
+
+    void HandleEffectPeriodic(AuraEffect const* aurEff)
+    {
+        if (Creature* owlkin = GetTarget()->ToCreature())
+        {
+            if (owlkin->GetEntry() == NESTLEWOOD_OWLKIN_ENTRY)
+            {
+                Player* caster = GetCaster()->ToPlayer();
+                owlkin->UpdateEntry(INOCULATED_OWLKIN_ENTRY);
+                owlkin->StopMoving();
+                owlkin->SetFacingToObject(caster);
+                owlkin->SetUnitFlag(UnitFlags(UNIT_FLAG_IMMUNE_TO_PC));
+                owlkin->DespawnOrUnsummon(15000);
+                caster->RewardPlayerAndGroupAtEvent(INOCULATED_OWLKIN_ENTRY, caster);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_inoculate_nestlewood_owlkin::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -4648,4 +4681,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_holiday_buff_food);
     RegisterSpellScript(spell_gen_arcane_charge);
     RegisterSpellScript(spell_gen_remove_impairing_auras);
+    RegisterSpellScript(spell_inoculate_nestlewood_owlkin);
 }
