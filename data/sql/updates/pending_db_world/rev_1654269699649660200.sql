@@ -34,6 +34,14 @@ DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGrou
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (22, 1, 17190, 0, 0, 47, 0, 9595, 8, 0, 0, 0, 0, '', 'Spawn Magewraith if player has quest \'Control\'');
 
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 16) AND (`SourceEntry` = 17191) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 47) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 9595) AND (`ConditionValue2` = 8) AND (`ConditionValue3` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(22, 16, 17191, 0, 0, 47, 0, 9595, 8, 0, 0, 0, 0, '', 'Spawn Magewraith if player has quest \'Control\'');
+
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 18) AND (`SourceEntry` = 17192) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 47) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 9595) AND (`ConditionValue2` = 8) AND (`ConditionValue3` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(22, 18, 17192, 0, 0, 47, 0, 9595, 8, 0, 0, 0, 0, '', 'Spawn Magewraith if player has quest \'Control\'');
+
 -- Remove current Magewraith spawns
 DELETE FROM `creature` WHERE `id1` = 17612;
 
