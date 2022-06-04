@@ -472,7 +472,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                                 {
                                     PlayerMenu menu(session);
                                     menu.SendQuestGiverQuestDetails(q, me->GetGUID(), true);
-                                    LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction:: SMART_ACTION_OFFER_QUEST: Player guidLow {} - offering quest {}", player->GetGUID().GetCounter(), e.action.questOffer.questID);
+                                    LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction:: SMART_ACTION_OFFER_QUEST: Player guidLow {} - offering quest {}",
+                                              player->GetGUID().GetCounter(), e.action.questOffer.questID);
                                 }
                             }
                         }
@@ -1079,7 +1080,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     if (IsCreature(target))
                     {
                         target->ToCreature()->SetInCombatWithZone();
-                        LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction: SMART_ACTION_SET_IN_COMBAT_WITH_ZONE: Creature {}, target: {}", me->GetGUID().GetCounter(), target->GetGUID().GetCounter());
+                        LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction: SMART_ACTION_SET_IN_COMBAT_WITH_ZONE: Creature {}, target: {}",
+                                  me->GetGUID().GetCounter(), target->GetGUID().GetCounter());
                     }
                 }
             }
@@ -1098,7 +1100,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         Acore::BroadcastTextBuilder builder(target, CHAT_MSG_MONSTER_EMOTE, BROADCAST_TEXT_CALL_FOR_HELP, LANG_UNIVERSAL, nullptr);
                         sCreatureTextMgr->SendChatPacket(target, builder, CHAT_MSG_MONSTER_EMOTE);
                     }
-                    LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction: SMART_ACTION_CALL_FOR_HELP: Creature {}, target: {}", me->GetGUID().GetCounter(), target->GetGUID().GetCounter());
+                    LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction: SMART_ACTION_CALL_FOR_HELP: Creature {}, target: {}",
+                              me->GetGUID().GetCounter(), target->GetGUID().GetCounter());
                 }
             }
             break;
@@ -1109,7 +1112,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             {
                 me->SetSheath(SheathState(e.action.setSheath.sheath));
                 LOG_DEBUG("sql.sql", "SmartScript::ProcessAction: SMART_ACTION_SET_SHEATH: Creature {}, State: {}",
-                               me->GetGUID().ToString(), e.action.setSheath.sheath);
+                               me->GetGUID().GetCounter(), e.action.setSheath.sheath);
             }
             break;
         }
