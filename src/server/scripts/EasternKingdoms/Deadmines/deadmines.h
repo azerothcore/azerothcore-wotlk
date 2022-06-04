@@ -32,7 +32,13 @@ enum DataTypes
 enum GameObjects
 {
     GO_FACTORY_DOOR             = 13965,
-    GO_IRON_CLAD_DOOR           = 16397
+    GO_HEAVY_DOOR_1             = 17153,
+    GO_HEAVY_DOOR_2             = 17154,
+    GO_IRON_CLAD_DOOR           = 16397,
+    GO_DOOR_LEVER_1             = 101831,
+    GO_DOOR_LEVER_2             = 101833,
+    GO_DOOR_LEVER_3             = 101834,
+    GO_CANNON                   = 16398,
 };
 
 template <class AI, class T>
