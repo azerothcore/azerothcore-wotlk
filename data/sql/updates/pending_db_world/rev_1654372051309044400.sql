@@ -7,7 +7,9 @@ INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_f
 (301, "%s has disabled %s's chat for %s. Reason: %s.", NULL, NULL, "Ihr hab den Chat von %s für %s abgeschaltet. Von: %s, Grund: %s", NULL, NULL, "%s ha desactivado el chat de %s durante %s. Razón: %s.", "%s ha desactivado el chat de %s durante %s. Razón: %s.", NULL),
 (11003, "Server: %s has muted %s for %s, reason: %s", NULL, NULL, NULL, "系统公告: %s has muted %s for %s, 原因: %s", NULL, NULL, NULL, "Server: %s замутил %s на %s, причина: %s");
 
-DELETE FROM `command` WHERE `name` IN ("mute","npc set spawntime");
-INSERT INTO `command` (`name`, `security`, `help`) VALUES
-("mute", 2, "Syntax: .mute [$playerName] $mutetime [$reason]\r\nDisible chat messaging for any character from account of character $playerName (or currently selected) at $mutetime time. Player can be offline.\n$mutetime: use a timestring like \"1d15h33s\"."),
-("npc set spawntime", 3, "Syntax: .npc set spawntime $time\r\nAdjust spawntime of selected creature to time.\n$time: use a timestring like \"10m30s\".");
+UPDATE `command` SET `help` = "Syntax: .mute [$playerName] $mutetime [$reason]\r\nDisible chat messaging for any character from account of character $playerName (or currently selected) at $mutetime time. Player can be offline.\n$mutetime: use a timestring like \"1d15h33s\"." WHERE `name` = "mute";
+UPDATE `command` SET `help` = "Syntax: .npc set spawntime #time\r\nAdjust spawntime of selected creature to #time.\n#time: use a timestring like \"10m30s\"." WHERE `name` = "npc set spawntime";
+UPDATE `command` SET `help` = "Syntax: .server idlerestart #delay\r\nRestart the server after #delay if no active connections are present (no players). Use #exist_code or 2 as program exist code.\n#delay: use a timestring like \"1h15m30s\"." WHERE `name` = "server idlerestart";
+UPDATE `command` SET `help` = "Syntax: .server idleshutdown #delay [#exist_code]\r\nShut the server down after #delay if no active connections are present (no players). Use #exist_code or 0 as program exist code.\n#delay: use a timestring like \"1h15m30s\"." WHERE `name` = "server idleshutdown";
+UPDATE `command` SET `help` = "Syntax: .server restart #delay\r\nRestart the server after #delay. Use #exist_code or 2 as program exist code.\n#delay: use a timestring like \"1h15m30s\"." WHERE `name` = "server restart";
+UPDATE `command` SET `help` = "Syntax: .server shutdown #delay [#exit_code]\r\nShut the server down after #delay. Use #exit_code or 0 as program exit code.\n#delay: use a timestring like \"1h15m30s\"." WHERE `name` = "server shutdown";
