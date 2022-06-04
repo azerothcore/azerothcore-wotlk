@@ -130,6 +130,20 @@ public:
             return true;
         }
 
+        int32 duration = 0;
+        if (QueryResult result = CharacterDatabase.Query("SELECT remainTime FROM character_aura WHERE guid = {} AND spell = {}", player->GetGUID().GetCounter(), isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER))
+        {
+            Field* fields = result->Fetch();
+            duration = fields[0].Get<int32>();
+
+            if (duration < 0 || uint32(duration) >= time * IN_MILLISECONDS)
+            {
+                handler->PSendSysMessage("Player %s already has a longer %s Deserter active.", handler->playerLink(player->GetName()), isInstance ? "Instance" : "Battleground");
+                return true;
+            }
+            CharacterDatabase.Query("DELETE FROM character_aura WHERE guid = {} AND spell = {}", player->GetGUID().GetCounter(), isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER);
+        }
+
         uint8 index = 0;
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_AURA);
         stmt->SetData(index++, player->GetGUID().GetCounter());
