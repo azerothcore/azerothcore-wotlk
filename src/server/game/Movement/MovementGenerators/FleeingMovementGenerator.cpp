@@ -148,9 +148,16 @@ void FleeingMovementGenerator<T>::SetTargetLocation(T* owner)
     // Same position - recheck
     if (_path->getPathLength() < MIN_PATH_LENGTH)
     {
+        if (_fleeTargetGUID)
+        {
+            ++_shortPathsCount;
+        }
+
         _timer.Reset(100);
         return;
     }
+
+    _shortPathsCount = 0;
 
     Movement::MoveSplineInit init(owner);
     init.MovebyPath(_path->GetPath());
@@ -162,8 +169,13 @@ void FleeingMovementGenerator<T>::SetTargetLocation(T* owner)
 template<class T>
 void FleeingMovementGenerator<T>::GetPoint(T* owner, Position& position)
 {
-    float casterDistance, casterAngle;
-    if (Unit* fleeTarget = ObjectAccessor::GetUnit(*owner, _fleeTargetGUID))
+    float casterDistance = 0.f;
+    float casterAngle = 0.f;
+    Unit* fleeTarget = nullptr;
+    if (_shortPathsCount < 5)
+        fleeTarget = ObjectAccessor::GetUnit(*owner, _fleeTargetGUID);
+
+    if (fleeTarget)
     {
         casterDistance = fleeTarget->GetDistance(owner);
         if (casterDistance > 0.2f)
@@ -181,7 +193,8 @@ void FleeingMovementGenerator<T>::GetPoint(T* owner, Position& position)
         casterAngle = frand(0.0f, 2.0f * float(M_PI));
     }
 
-    float distance, angle;
+    float distance = 0.f;
+    float angle = 0.f;
     if (casterDistance < MIN_QUIET_DISTANCE)
     {
         distance = frand(0.4f, 1.3f) * (MIN_QUIET_DISTANCE - casterDistance);
