@@ -1358,24 +1358,39 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                 break;
             }
         case SMART_ACTION_RANDOM_EMOTE:
-            if (e.action.randomEmote.emote1 && !IsEmoteValid(e, e.action.randomEmote.emote1))
-                return false;
+            {
+                if (std::all_of(e.action.randomEmote.emotes.begin(), e.action.randomEmote.emotes.end(), [](uint32 emote) { return emote == 0; }))
+                {
+                    LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} does not have any non-zero emote",
+                              e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
+                    return false;
+                }
 
-            if (e.action.randomEmote.emote2 && !IsEmoteValid(e, e.action.randomEmote.emote2))
-                return false;
-
-            if (e.action.randomEmote.emote3 && !IsEmoteValid(e, e.action.randomEmote.emote3))
-                return false;
-
-            if (e.action.randomEmote.emote4 && !IsEmoteValid(e, e.action.randomEmote.emote4))
-                return false;
-
-            if (e.action.randomEmote.emote5 && !IsEmoteValid(e, e.action.randomEmote.emote5))
-                return false;
-
-            if (e.action.randomEmote.emote6 && !IsEmoteValid(e, e.action.randomEmote.emote6))
-                return false;
-            break;
+                for (uint32 emote : e.action.randomEmote.emotes)
+                    if (emote && !IsEmoteValid(e, emote))
+                        return false;
+                break;
+        }
+        case SMART_ACTION_CALL_RANDOM_TIMED_ACTIONLIST:
+            {
+                if (std::all_of(e.action.randTimedActionList.actionLists.begin(), e.action.randTimedActionList.actionLists.end(), [](uint32 actionList) { return actionList == 0; }))
+                {
+                    LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} does not have any non-zero action list",
+                                 e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
+                    return false;
+                }
+                break;
+            }
+        case SMART_ACTION_START_CLOSEST_WAYPOINT:
+            {
+                if (std::all_of(e.action.closestWaypointFromList.wps.begin(), e.action.closestWaypointFromList.wps.end(), [](uint32 wp) { return wp == 0; }))
+                {
+                    LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} does not have any non-zero waypoint id",
+                                 e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
+                    return false;
+                }
+                break;
+            }
         case SMART_ACTION_CAST:
         case SMART_ACTION_INVOKER_CAST:
             if (!IsSpellValid(e, e.action.cast.spell))
@@ -1434,36 +1449,29 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             break;
         case SMART_ACTION_RANDOM_PHASE:
             {
-                if (e.action.randomPhase.phase1 >= SMART_EVENT_PHASE_MAX ||
-                        e.action.randomPhase.phase2 >= SMART_EVENT_PHASE_MAX ||
-                        e.action.randomPhase.phase3 >= SMART_EVENT_PHASE_MAX ||
-                        e.action.randomPhase.phase4 >= SMART_EVENT_PHASE_MAX ||
-                        e.action.randomPhase.phase5 >= SMART_EVENT_PHASE_MAX ||
-                        e.action.randomPhase.phase6 >= SMART_EVENT_PHASE_MAX)
+                if (std::all_of(e.action.randomPhase.phases.begin(), e.action.randomPhase.phases.end(), [](uint32 phase) { return phase == 0; }))
+                {
+                    LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} does not have any non-zero phase",
+                                 e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
+                    return false;
+                }
+
+                if (std::any_of(e.action.randomPhase.phases.begin(), e.action.randomPhase.phases.end(), [](uint32 phase) { return phase >= SMART_EVENT_PHASE_MAX; }))
                 {
                     LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} attempts to set invalid phase, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
                     return false;
                 }
-                if (e.action.randomPhase.phase1 == 0 &&
-                        e.action.randomPhase.phase2 == 0 &&
-                        e.action.randomPhase.phase3 == 0 &&
-                        e.action.randomPhase.phase4 == 0 &&
-                        e.action.randomPhase.phase5 == 0 &&
-                        e.action.randomPhase.phase6 == 0)
-                {
-                    LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} attempts to set invalid phase, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
-                    return false;
-                }
+                break;
             }
-            break;
         case SMART_ACTION_RANDOM_PHASE_RANGE:       //PhaseMin, PhaseMax
             {
                 if (e.action.randomPhaseRange.phaseMin >= SMART_EVENT_PHASE_MAX ||
-                        e.action.randomPhaseRange.phaseMax >= SMART_EVENT_PHASE_MAX)
+                    e.action.randomPhaseRange.phaseMax >= SMART_EVENT_PHASE_MAX)
                 {
                     LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} attempts to set invalid phase, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
                     return false;
                 }
+
                 if (!IsMinMaxValid(e, e.action.randomPhaseRange.phaseMin, e.action.randomPhaseRange.phaseMax))
                     return false;
                 break;
@@ -1570,7 +1578,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             }
         case SMART_ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST:
             {
-                if (!IsMinMaxValid(e, e.action.randRangeTimedActionList.idMin, e.action.randRangeTimedActionList.idMax))
+                if (!IsMinMaxValid(e, e.action.randTimedActionList.actionLists[0], e.action.randTimedActionList.actionLists[1]))
                     return false;
                 break;
             }
@@ -1625,12 +1633,10 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             {
                 if (e.GetScriptType() == SMART_SCRIPT_TYPE_CREATURE)
                 {
-                    int8 equipId = (int8)e.action.equip.entry;
-
-                    if (equipId)
+                    if (int8 equipId = static_cast<int8>(e.action.equip.entry))
                     {
-                        EquipmentInfo const* einfo = sObjectMgr->GetEquipmentInfo(e.entryOrGuid, equipId);
-                        if (!einfo)
+                        EquipmentInfo const* eInfo = sObjectMgr->GetEquipmentInfo(e.entryOrGuid, equipId);
+                        if (!eInfo)
                         {
                             LOG_ERROR("scripts.ai.sai", "SmartScript: SMART_ACTION_EQUIP uses non-existent equipment info id {} for creature {}, skipped.", equipId, e.entryOrGuid);
                             return false;
@@ -1779,7 +1785,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_CALL_TIMED_ACTIONLIST:
         case SMART_ACTION_EVADE:
         case SMART_ACTION_SET_ACTIVE:
-        case SMART_ACTION_START_CLOSEST_WAYPOINT:
         case SMART_ACTION_FOLLOW:
         case SMART_ACTION_SET_ORIENTATION:
         case SMART_ACTION_STORE_TARGET_LIST:
@@ -1814,7 +1819,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_SET_NPC_FLAG:
         case SMART_ACTION_ADD_NPC_FLAG:
         case SMART_ACTION_REMOVE_NPC_FLAG:
-        case SMART_ACTION_CALL_RANDOM_TIMED_ACTIONLIST:
         case SMART_ACTION_RANDOM_MOVE:
         case SMART_ACTION_SET_UNIT_FIELD_BYTES_1:
         case SMART_ACTION_REMOVE_UNIT_FIELD_BYTES_1:
