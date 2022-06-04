@@ -238,6 +238,25 @@ public:
         return true;
     }
 
+    /**
+    * @brief Removes the Deserter Debuff from all players
+    *
+    * This function removes a Deserter Debuff of the given type (Instance or BG) from
+    * all players, online or offline.
+    *
+    * @param handler The ChatHandler, passed by the system.
+    * @param isInstance provided by the relaying functions, so we don't have
+    * to write that much code :)
+    *
+    * @return true if everything was correct, false if an error occured.
+    *
+    * Example Usage:
+    * @code
+    * .deserter instance remove all
+    * -or-
+    * .deserter bg remove all
+    * @endcode
+    */
     static bool HandleDeserterRemoveAll(ChatHandler* handler, bool isInstance)
     {
         CharacterDatabase.Query("DELETE FROM character_aura WHERE spell = {} AND remainTime <= 1800000", isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER);
