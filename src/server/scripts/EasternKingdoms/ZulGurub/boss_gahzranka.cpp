@@ -29,7 +29,7 @@ EndScriptData */
 enum Spells
 {
     SPELL_FROSTBREATH               = 16099,
-    SPELL_MASSIVEGEYSER             = 22421, // Not working. (summon)
+    SPELL_MASSIVEGEYSER             = 22421,
     SPELL_SLAM                      = 24326
 };
 
