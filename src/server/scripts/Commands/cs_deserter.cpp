@@ -257,6 +257,7 @@ public:
     {
         uint32 deserterSpell = isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER;
         uint64 deserterCount = 0;
+        bool countOnline = true;
 
         QueryResult result = CharacterDatabase.Query("SELECT COUNT(guid) FROM character_aura WHERE spell = {} AND remainTime <= 1800000", deserterSpell);
         if (result)
@@ -264,13 +265,11 @@ public:
             deserterCount = (*result)[0].Get<uint64>();
         }
 
-        if (deserterCount == 0)
+        if (deserterCount > 0)
         {
-            handler->PSendSysMessage("No player on this realm has %s Deserter with a duration of 30min or less.", isInstance ? "Instance" : "Battleground");
-            return true;
+            CharacterDatabase.Execute("DELETE FROM character_aura WHERE spell = {} AND remainTime <= 1800000", deserterSpell);
+            countOnline = false;
         }
-
-        CharacterDatabase.Execute("DELETE FROM character_aura WHERE spell = {} AND remainTime <= 1800000", deserterSpell);
 
         std::shared_lock<std::shared_mutex> lock(*HashMapHolder<Player>::GetLock());
         HashMapHolder<Player>::MapType const& onlinePlayerList = ObjectAccessor::GetPlayers();
@@ -280,8 +279,16 @@ public:
             Aura* aura = player->GetAura(deserterSpell);
             if (aura && aura->GetDuration() <= 1800000)
             {
+                if (countOnline)
+                    deserterCount++;
                 player->RemoveAura(deserterSpell);
             }
+        }
+
+        if (deserterCount == 0)
+        {
+            handler->PSendSysMessage("No player on this realm has %s Deserter with a duration of 30min or less.", isInstance ? "Instance" : "Battleground");
+            return true;
         }
 
         handler->PSendSysMessage("%s Deserter has been removed from %u player(s) with a duration of 30min or less.", isInstance ? "Instance" : "Battleground", deserterCount);
