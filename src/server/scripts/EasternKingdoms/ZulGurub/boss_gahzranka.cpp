@@ -58,7 +58,6 @@ public:
         void IsSummonedBy(Unit* /*summoner*/) override
         {
             me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
-            me->AddUnitState(UNIT_STATE_IGNORE_PATHFINDING);
         }
 
         void Reset() override
