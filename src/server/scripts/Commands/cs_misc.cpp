@@ -2374,9 +2374,14 @@ public:
     }
 
     // mute player for some times
-    static bool HandleMuteCommand(ChatHandler* handler, Optional<PlayerIdentifier> player, uint32 notSpeakTime, Tail muteReason)
+    static bool HandleMuteCommand(ChatHandler* handler, Optional<PlayerIdentifier> player, std::string notSpeakTime, Tail muteReason)
     {
         std::string muteReasonStr{ muteReason };
+
+        if (notSpeakTime.empty())
+        {
+            return false;
+        }
 
         if (muteReason.empty())
         {
@@ -2412,6 +2417,7 @@ public:
         }
 
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
+        uint32 muteDuration = TimeStringToSecs(notSpeakTime);
         std::string muteBy = "";
         if (handler->GetSession())
         {
@@ -2425,22 +2431,22 @@ public:
         if (target)
         {
             // Target is online, mute will be in effect right away.
-            int64 muteTime = GameTime::GetGameTime().count() + notSpeakTime * MINUTE;
+            int64 muteTime = GameTime::GetGameTime().count() + muteDuration;
             target->GetSession()->m_muteTime = muteTime;
             stmt->SetData(0, muteTime);
             std::string nameLink = handler->playerLink(player->GetName());
 
             if (sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD))
             {
-                sWorld->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy.c_str(), nameLink.c_str(), notSpeakTime, muteReasonStr.c_str());
+                sWorld->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy.c_str(), nameLink.c_str(), secsToTimeString(muteDuration, true).c_str(), muteReasonStr.c_str());
             }
 
-            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOUR_CHAT_DISABLED, notSpeakTime, muteBy.c_str(), muteReasonStr.c_str());
+            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOUR_CHAT_DISABLED, secsToTimeString(muteDuration, true).c_str(), muteBy.c_str(), muteReasonStr.c_str());
         }
         else
         {
             // Target is offline, mute will be in effect starting from the next login.
-            stmt->SetData(0, -int32(notSpeakTime * MINUTE));
+            stmt->SetData(0, -int32(muteDuration));
         }
 
         stmt->SetData(1, muteReasonStr);
@@ -2450,7 +2456,7 @@ public:
 
         stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT_MUTE);
         stmt->SetData(0, accountId);
-        stmt->SetData(1, notSpeakTime);
+        stmt->SetData(1, muteDuration / MINUTE);
         stmt->SetData(2, muteBy);
         stmt->SetData(3, muteReasonStr);
         LoginDatabase.Execute(stmt);
@@ -2459,7 +2465,7 @@ public:
 
         if (sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD) && !target)
         {
-            sWorld->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy.c_str(), nameLink.c_str(), notSpeakTime, muteReasonStr.c_str());
+            sWorld->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy.c_str(), nameLink.c_str(), secsToTimeString(muteDuration, true).c_str(), muteReasonStr.c_str());
         }
         else
         {
@@ -2469,7 +2475,7 @@ public:
             for (HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
                 if (itr->second->GetSession()->GetSecurity())
                     ChatHandler(itr->second->GetSession()).PSendSysMessage(target ? LANG_YOU_DISABLE_CHAT : LANG_COMMAND_DISABLE_CHAT_DELAYED,
-                            (handler->GetSession() ? handler->GetSession()->GetPlayerName().c_str() : handler->GetAcoreString(LANG_CONSOLE)), nameLink.c_str(), notSpeakTime, muteReasonStr.c_str());
+                            (handler->GetSession() ? handler->GetSession()->GetPlayerName().c_str() : handler->GetAcoreString(LANG_CONSOLE)), nameLink.c_str(), secsToTimeString(muteDuration, true).c_str(), muteReasonStr.c_str());
         }
 
         return true;
