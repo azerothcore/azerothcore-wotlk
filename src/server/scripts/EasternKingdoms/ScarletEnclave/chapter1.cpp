@@ -219,7 +219,7 @@ public:
             if (creature->AI()->GetData(DATA_IN_PROGRESS))
                 return true;
 
-            creature->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+            creature->SetImmuneToPC(false);
             creature->RemoveUnitFlag(UNIT_FLAG_SWIMMING);
 
             player->CastSpell(creature, SPELL_DUEL, false);
@@ -584,7 +584,7 @@ public:
         {
             ScriptedAI::MoveInLineOfSight(who);
 
-            if (!who->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC) && who->GetEntry() == NPC_GHOUL && me->IsWithinDistInMap(who, 10.0f))
+            if (!who->IsImmuneToNPC() && who->GetEntry() == NPC_GHOUL && me->IsWithinDistInMap(who, 10.0f))
                 if (Unit* owner = who->GetOwner())
                     if (Player* player = owner->ToPlayer())
                     {
@@ -593,7 +593,7 @@ public:
                             creature->CastSpell(owner, 52517, true);
 
                         creature->AI()->SetGUID(me->GetGUID());
-                        creature->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        creature->SetImmuneToAll(true);
                     }
         }
 
@@ -743,7 +743,7 @@ public:
             phase = PHASE_CHAINED;
             events.Reset();
             me->SetFaction(FACTION_CREATURE);
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetImmuneToPC(true);
             me->SetUInt32Value(UNIT_FIELD_BYTES_1, 8);
             me->LoadEquipment(0, true);
         }
@@ -844,7 +844,7 @@ public:
                         else
                         {
                             me->SetFaction(FACTION_MONSTER);
-                            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                            me->SetImmuneToPC(false);
                             phase = PHASE_ATTACKING;
 
                             if (Player* target = ObjectAccessor::GetPlayer(*me, playerGUID))

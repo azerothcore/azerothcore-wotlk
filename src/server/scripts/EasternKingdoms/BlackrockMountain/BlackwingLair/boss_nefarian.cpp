@@ -499,7 +499,8 @@ public:
                 me->SetFaction(FACTION_DRAGONFLIGHT_BLACK);
                 me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
-                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetImmuneToPC(true);
             }
         }
 

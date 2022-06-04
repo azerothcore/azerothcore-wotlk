@@ -2647,6 +2647,7 @@ void Player::InitStatsForLevel(bool reapplyMods)
                UNIT_FLAG_STUNNED        | UNIT_FLAG_IN_COMBAT    | UNIT_FLAG_DISARMED         |
                UNIT_FLAG_CONFUSED       | UNIT_FLAG_FLEEING      | UNIT_FLAG_NOT_SELECTABLE   |
                UNIT_FLAG_SKINNABLE      | UNIT_FLAG_MOUNT        | UNIT_FLAG_TAXI_FLIGHT      );
+    SetImmuneToPC(false);
     SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);   // must be set
 
     SetUnitFlag2(UNIT_FLAG2_REGENERATE_POWER);// must be set

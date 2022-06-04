@@ -345,13 +345,15 @@ public:
                     if (Creature* pGuard1 = instance->GetCreature(NPC_ErekemGuardGUID[0]))
                     {
                         pGuard1->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                        pGuard1->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC);
+                        pGuard1->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                        pGuard1->SetImmuneToNPC(false);
                         pGuard1->GetMotionMaster()->MovePoint(0, BossStartMove21);
                     }
                     if (Creature* pGuard2 = instance->GetCreature(NPC_ErekemGuardGUID[1]))
                     {
                         pGuard2->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                        pGuard2->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC);
+                        pGuard2->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                        pGuard2->SetImmuneToNPC(false);
                         pGuard2->GetMotionMaster()->MovePoint(0, BossStartMove22);
                     }
                     break;
@@ -384,7 +386,8 @@ public:
             if (pBoss)
             {
                 pBoss->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                pBoss->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC);
+                pBoss->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                pBoss->SetImmuneToNPC(false);
                 pBoss->SetReactState(REACT_AGGRESSIVE);
                 if ((WaveCount == 6 && m_auiEncounter[0] == DONE) || (WaveCount == 12 && m_auiEncounter[1] == DONE))
                     pBoss->SetLootMode(0);
@@ -497,7 +500,10 @@ public:
                     break;
                 case EVENT_CYANIGOSA_ATTACK:
                     if (Creature* c = instance->GetCreature(NPC_CyanigosaGUID))
-                        c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC);
+                    {
+                        c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                        c->SetImmuneToNPC(false);
+                    }
                     break;
             }
         }

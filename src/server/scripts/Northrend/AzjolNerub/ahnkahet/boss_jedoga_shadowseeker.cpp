@@ -165,7 +165,8 @@ struct boss_jedoga_shadowseeker : public BossAI
     void Reset() override
     {
         me->SetReactState(REACT_PASSIVE);
-        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+        me->SetImmuneToAll(true);
         me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
         me->SetDisableGravity(true);
         me->SetHover(true);
@@ -254,7 +255,8 @@ struct boss_jedoga_shadowseeker : public BossAI
                         {
                             summon->GetMotionMaster()->MovePoint(POINT_INITIAL, VolunteerSpotPositions[i][1]);
                             summon->SetReactState(REACT_PASSIVE);
-                            summon->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC );
+                            summon->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                            summon->SetImmuneToAll(true);
                             summons.Summon(summon);
                         }
                     }
@@ -583,7 +585,8 @@ struct npc_twilight_volunteer : public ScriptedAI
             DoCastSelf(SPELL_ACTIVATE_INITIATE, true);
             me->RemoveAurasDueToSpell(SPELL_WHITE_SPHERE);
             me->SetControlled(false, UNIT_STATE_STUNNED);
-            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+            me->SetImmuneToAll(false);
 
             Talk(SAY_CHOSEN);
             me->SetStandState(UNIT_STAND_STATE_STAND);

@@ -717,7 +717,7 @@ class spell_q11198_take_down_tethyr : public SpellScript
     {
         PreventHitDefaultEffect(effIndex);
         if (Unit* unit = GetHitUnit())
-            if (unit->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC))
+            if (unit->IsImmuneToPC())
                 return;
         GetCaster()->CastCustomSpell(42576 /*SPELL_CANNON_BLAST*/, SPELLVALUE_BASE_POINT0, GetEffectValue(), GetCaster(), true);
     }
@@ -1002,13 +1002,13 @@ class spell_q11396_11399_force_shield_arcane_purple_x3 : public AuraScript
     void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         Unit* target = GetTarget();
-        target->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+        target->SetImmuneToPC(true);
         target->SetControlled(true, UNIT_STATE_STUNNED);
     }
 
     void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        GetTarget()->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+        GetTarget()->SetImmuneTOPC(false);
     }
 
     void Register() override

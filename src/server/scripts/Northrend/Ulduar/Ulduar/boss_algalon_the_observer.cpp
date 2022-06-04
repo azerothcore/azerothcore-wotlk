@@ -377,7 +377,7 @@ public:
             events.Reset();
             summons.DespawnAll();
             me->SetReactState(REACT_PASSIVE);
-            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetImmuneToPC(false);
             me->SetSheath(SHEATH_STATE_UNARMED);
             me->SetFaction(190);
             me->CastSpell(me, SPELL_DUAL_WIELD, true);
@@ -403,7 +403,7 @@ public:
             {
                 case ACTION_START_INTRO:
                     {
-                        me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                        me->SetImmuneToPC(true);
                         me->SetUnitFlag2(UNIT_FLAG2_DO_NOT_FADE_IN);
                         me->SetDisableGravity(true);
                         me->CastSpell(me, SPELL_ARRIVAL, true);
@@ -446,7 +446,7 @@ public:
                 case ACTION_INIT_ALGALON:
                     _firstPull = false;
                     _fedOnTears = false;
-                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                    me->SetImmuneToPC(false);
                     break;
                 case ACTION_ASCEND:
                     summons.DespawnAll();
@@ -477,7 +477,8 @@ public:
             uint32 introDelay = 0;
             me->setActive(true);
             me->SetInCombatWithZone();
-            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            me->SetImmuneToNPC(true);
             events.Reset();
             events.SetPhase(PHASE_ROLE_PLAY);
 
@@ -649,7 +650,7 @@ public:
                     break;
                 case EVENT_INTRO_FINISH:
                     events.Reset();
-                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                    me->SetImmuneToPC(false);
                     if (Creature* brann = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(NPC_BRANN_BRONZBEARD_ALG)))
                         brann->AI()->DoAction(ACTION_FINISH_INTRO);
                     break;
@@ -659,7 +660,8 @@ public:
                     break;
                 case EVENT_REMOVE_UNNATTACKABLE:
                     me->SetSheath(SHEATH_STATE_MELEE);
-                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetImmuneToNPC(false);
                     break;
                 case EVENT_INTRO_TIMER_DONE:
                     events.SetPhase(PHASE_NORMAL);
@@ -985,7 +987,8 @@ public:
             {
                 case ACTION_ACTIVATE_STAR:
                     me->SetReactState(REACT_AGGRESSIVE);
-                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE$);
+                    me->SetImmuneToAll(false);
                     _isActive = true;
 
                     if (Player* target = SelectTargetFromPlayerList(250.0f))

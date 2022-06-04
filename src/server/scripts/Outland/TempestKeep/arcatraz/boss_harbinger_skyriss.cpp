@@ -75,7 +75,7 @@ public:
         {
             events.Reset();
             summons.DespawnAll();
-            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(false);
         }
 
         void EnterCombat(Unit* /*who*/) override
