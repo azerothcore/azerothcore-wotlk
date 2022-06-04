@@ -4283,12 +4283,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].MiscValueB = 844;
     });
 
-    //  Vanish
-    ApplySpellFix({ 24699 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AuraInterruptFlags = 0;
-    });
-
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
