@@ -117,8 +117,14 @@ public:
 
         if (target)
         {
-            Aura* aura = target->AddAura(isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER, target);
+            Aura* aura = target->GetAura(isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER);
+            if (aura && aura->GetDuration() >= (int32)time * IN_MILLISECONDS)
+            {
+                handler->PSendSysMessage("Player %s already has a longer %s Deserter active.", handler->playerLink(player->GetName()), isInstance ? "Instance" : "Battleground");
+                return true;
+            }
 
+            aura = target->AddAura(isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER, target);
             if (!aura)
             {
                 handler->SendSysMessage(LANG_BAD_VALUE);
@@ -136,7 +142,7 @@ public:
             Field* fields = result->Fetch();
             duration = fields[0].Get<int32>();
 
-            if (duration < 0 || uint32(duration) >= time * IN_MILLISECONDS)
+            if (duration < 0 || duration >= (int32)time * IN_MILLISECONDS)
             {
                 handler->PSendSysMessage("Player %s already has a longer %s Deserter active.", handler->playerLink(player->GetName()), isInstance ? "Instance" : "Battleground");
                 return true;
