@@ -2383,6 +2383,11 @@ public:
             return false;
         }
 
+        if (atoi(notSpeakTime.c_str()) < 0)
+        {
+            return false;
+        }
+
         if (muteReason.empty())
         {
             muteReasonStr = handler->GetAcoreString(LANG_NO_REASON);
@@ -2418,6 +2423,16 @@ public:
 
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
         uint32 muteDuration = TimeStringToSecs(notSpeakTime);
+        if (muteDuration <= 0)
+        {
+            muteDuration = atoi(notSpeakTime.c_str());
+        }
+
+        if (muteDuration <= 0)
+        {
+            return false;
+        }
+
         std::string muteBy = "";
         if (handler->GetSession())
         {
