@@ -1,3 +1,4 @@
+-- DB update 2022_06_03_01 -> 2022_06_04_00
 /* Set correct movement flags for Buzzard creatures */
 UPDATE `creature_template_movement` SET `Ground` = 2 WHERE `CreatureId` IN (2830, 2829);
 
