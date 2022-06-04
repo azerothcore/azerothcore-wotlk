@@ -987,11 +987,32 @@ public:
     }
 
     //spawn time handling
-    static bool HandleNpcSetSpawnTimeCommand(ChatHandler* handler, uint32 spawnTime)
+    static bool HandleNpcSetSpawnTimeCommand(ChatHandler* handler, std::string spawnTimeStr)
     {
+        if (spawnTimeStr.empty())
+        {
+            return false;
+        }
+
+        if (atoi(spawnTimeStr.c_str()) < 0)
+        {
+            return false;
+        }
+
         Creature* creature = handler->getSelectedCreature();
         if (!creature)
             return false;
+
+        uint32 spawnTime = TimeStringToSecs(spawnTimeStr);
+        if (spawnTime <= 0)
+        {
+            spawnTime = atoi(spawnTimeStr.c_str());
+        }
+
+        if (spawnTime <= 0)
+        {
+            return false;
+        }
 
         WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_SPAWN_TIME_SECS);
         stmt->SetData(0, spawnTime);
@@ -999,7 +1020,7 @@ public:
         WorldDatabase.Execute(stmt);
 
         creature->SetRespawnDelay(spawnTime);
-        handler->PSendSysMessage(LANG_COMMAND_SPAWNTIME, spawnTime);
+        handler->PSendSysMessage(LANG_COMMAND_SPAWNTIME, secsToTimeString(spawnTime, true).c_str());
 
         return true;
     }
