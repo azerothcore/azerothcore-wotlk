@@ -117,8 +117,29 @@ public:
         return true;
     }
 
-    static bool HandleBattlefieldTimer(ChatHandler* handler, uint32 battleId, uint32 time)
+    static bool HandleBattlefieldTimer(ChatHandler* handler, uint32 battleId, std::string timeStr)
     {
+        if (timeStr.empty())
+        {
+            return false;
+        }
+
+        if (atoi(timeStr.c_str()) < 0)
+        {
+            return false;
+        }
+
+        uint32 time = TimeStringToSecs(timeStr);
+        if (time <= 0)
+        {
+            time = atoi(timeStr.c_str());
+        }
+
+        if (time <= 0)
+        {
+            return false;
+        }
+
         Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
 
         if (!bf)

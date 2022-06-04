@@ -13,3 +13,4 @@ UPDATE `command` SET `help` = "Syntax: .server idlerestart #delay\r\nRestart the
 UPDATE `command` SET `help` = "Syntax: .server idleshutdown #delay [#exist_code]\r\nShut the server down after #delay if no active connections are present (no players). Use #exist_code or 0 as program exist code.\n#delay: use a timestring like \"1h15m30s\"." WHERE `name` = "server idleshutdown";
 UPDATE `command` SET `help` = "Syntax: .server restart #delay\r\nRestart the server after #delay. Use #exist_code or 2 as program exist code.\n#delay: use a timestring like \"1h15m30s\"." WHERE `name` = "server restart";
 UPDATE `command` SET `help` = "Syntax: .server shutdown #delay [#exit_code]\r\nShut the server down after #delay. Use #exit_code or 0 as program exit code.\n#delay: use a timestring like \"1h15m30s\"." WHERE `name` = "server shutdown";
+UPDATE `command` SET `help` = "Syntax: .bf timer #battleid #timer\n#timer: use a timestring like \"1h15m30s\"." WHERE `name` = "bf timer";
