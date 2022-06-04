@@ -515,7 +515,7 @@ public:
                 {
                     darnavan->RemoveAllAuras();
                     darnavan->SetFaction(FACTION_FRIENDLY);
-                    darnavan->DeleteThreatList();
+                    darnavan->GetThreatMgr().ClearAllThreat();
                     darnavan->CombatStop(true);
                     darnavan->GetMotionMaster()->MoveIdle();
                     darnavan->StopMoving();

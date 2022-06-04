@@ -50,14 +50,16 @@ enum WarriorSpells
     SPELL_WARRIOR_RETALIATION_DAMAGE                = 22858,
     SPELL_WARRIOR_SLAM                              = 50783,
     SPELL_WARRIOR_SUNDER_ARMOR                      = 58567,
-    SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK     = 26654,
+    SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1   = 12723,
+    SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_2   = 26654,
     SPELL_WARRIOR_TAUNT                             = 355,
     SPELL_WARRIOR_UNRELENTING_ASSAULT_RANK_1        = 46859,
     SPELL_WARRIOR_UNRELENTING_ASSAULT_RANK_2        = 46860,
     SPELL_WARRIOR_UNRELENTING_ASSAULT_TRIGGER_1     = 64849,
     SPELL_WARRIOR_UNRELENTING_ASSAULT_TRIGGER_2     = 64850,
     SPELL_WARRIOR_VIGILANCE_PROC                    = 50725,
-    SPELL_WARRIOR_VIGILANCE_REDIRECT_THREAT         = 59665
+    SPELL_WARRIOR_VIGILANCE_REDIRECT_THREAT         = 59665,
+    SPELL_WARRIOR_WHIRLWIND_OFF                     = 44949
 };
 
 enum WarriorSpellIcons
@@ -613,7 +615,7 @@ class spell_warr_sweeping_strikes : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK });
+        return ValidateSpellInfo({ SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_2 });
     }
 
     bool Load() override
@@ -624,21 +626,27 @@ class spell_warr_sweeping_strikes : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        if (!eventInfo.GetActor() || eventInfo.GetProcTarget())
+        Unit* actor = eventInfo.GetActor();
+        if (!actor)
         {
             return false;
+        }
+
+        if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
+        {
+            switch (spellInfo->Id)
+            {
+                case SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1:
+                case SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_2:
+                case SPELL_WARRIOR_WHIRLWIND_OFF:
+                    return false;
+                default:
+                    break;
+            }
         }
 
         _procTarget = eventInfo.GetActor()->SelectNearbyNoTotemTarget(eventInfo.GetProcTarget());
-
-        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-
-        if (!damageInfo || !damageInfo->GetSpellInfo())
-        {
-            return false;
-        }
-
-        return _procTarget && !damageInfo->GetSpellInfo();
+        return _procTarget != nullptr;
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
@@ -646,8 +654,17 @@ class spell_warr_sweeping_strikes : public AuraScript
         PreventDefaultAction();
         if (DamageInfo* damageInfo = eventInfo.GetDamageInfo())
         {
-            int32 damage = damageInfo->GetUnmitigatedDamage();
-            GetTarget()->CastCustomSpell(_procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK, &damage, 0, 0, true, nullptr, aurEff);
+            SpellInfo const* spellInfo = damageInfo->GetSpellInfo();
+            if (spellInfo && spellInfo->Id == SPELL_WARRIOR_EXECUTE && !_procTarget->HasAuraState(AURA_STATE_HEALTHLESS_20_PERCENT))
+            {
+                // If triggered by Execute (while target is not under 20% hp) deals normalized weapon damage
+                GetTarget()->CastSpell(_procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_2, aurEff);
+            }
+            else
+            {
+                int32 damage = damageInfo->GetUnmitigatedDamage();
+                GetTarget()->CastCustomSpell(_procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1, &damage, 0, 0, true, nullptr, aurEff);
+            }
         }
     }
 
@@ -658,7 +675,7 @@ class spell_warr_sweeping_strikes : public AuraScript
     }
 
 private:
-    Unit* _procTarget;
+    Unit* _procTarget = nullptr;
 };
 
 // 50720 - Vigilance

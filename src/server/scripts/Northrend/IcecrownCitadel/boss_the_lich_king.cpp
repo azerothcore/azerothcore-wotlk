@@ -1647,7 +1647,7 @@ public:
                     return;
                 }
 
-            me->DeleteThreatList();
+            me->GetThreatMgr().ClearAllThreat();
             me->CombatStop(false);
         }
 
@@ -3370,7 +3370,7 @@ public:
             if (!me->IsAlive())
                 return;
 
-            me->DeleteThreatList();
+            me->GetThreatMgr().ClearAllThreat();
             me->CombatStop(false);
         }
     };

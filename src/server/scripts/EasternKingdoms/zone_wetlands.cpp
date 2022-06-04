@@ -118,7 +118,7 @@ public:
 
                     me->RestoreFaction();
                     me->RemoveAllAuras();
-                    me->DeleteThreatList();
+                    me->GetThreatMgr().ClearAllThreat();
                     me->CombatStop(true);
 
                     SetRun(false);

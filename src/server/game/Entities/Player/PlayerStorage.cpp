@@ -4758,6 +4758,14 @@ void Player::SendEnchantmentDurations()
     }
 }
 
+void Player::UpdateEnchantmentDurations()
+{
+    for (EnchantDurationList::iterator itr = m_enchantDuration.begin(); itr != m_enchantDuration.end(); ++itr)
+    {
+        itr->item->SetEnchantmentDuration(itr->slot, itr->leftduration, this);
+    }
+}
+
 void Player::SendItemDurations()
 {
     for (ItemDurationList::const_iterator itr = m_itemDuration.begin(); itr != m_itemDuration.end(); ++itr)
