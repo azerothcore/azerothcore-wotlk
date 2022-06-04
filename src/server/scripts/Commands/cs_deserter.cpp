@@ -79,6 +79,7 @@ public:
     * selected player, with the provided duration in seconds.
     *
     * @param handler The ChatHandler, passed by the system.
+    * @param player The target player, either by name, the target or self
     * @param time The provided duration in seconds.
     * @param isInstance provided by the relaying functions, so we don't have
     * to write that much code :)
@@ -87,9 +88,11 @@ public:
     *
     * Example Usage:
     * @code
-    * .deserter instance add 3600 (one hour)
+    * .deserter instance add 3600 (one hour) (using player target or self)
     * -or-
-    * .deserter bg add 3600 (one hour)
+    * .deserter bg add 3600 (one hour) (using player target or self)
+    * -or-
+    * .deserter bg add Gozzim 3600 (one hour) (using player of name 'Gozzim')
     * @endcode
     */
     static bool HandleDeserterAdd(ChatHandler* handler, Optional<PlayerIdentifier> player, uint32 time, bool isInstance)
@@ -150,6 +153,7 @@ public:
         stmt->SetData(index, 0);
         CharacterDatabase.Execute(stmt);
 
+        handler->PSendSysMessage("%us of %s Deserter has been added to player %s.", time, isInstance ? "Instance" : "Battleground", player->GetName());
         return true;
     }
 
@@ -160,6 +164,7 @@ public:
     * selected player.
     *
     * @param handler The ChatHandler, passed by the system.
+    * @param player The target player, either by name, the target or self
     * @param isInstance provided by the relaying functions, so we don't have
     * to write that much code :)
     *
@@ -167,9 +172,11 @@ public:
     *
     * Example Usage:
     * @code
-    * .deserter instance remove
+    * .deserter instance remove (using player target or self)
     * -or-
-    * .deserter bg remove
+    * .deserter bg remove (using player target or self)
+    * -or-
+    * .deserter bg remove Gozzim (using player of name 'Gozzim')
     * @endcode
     */
     static bool HandleDeserterRemove(ChatHandler* handler, Optional<PlayerIdentifier> player, bool isInstance)
@@ -187,15 +194,47 @@ public:
         }
 
         Player* target = player->GetConnectedPlayer();
+        uint32 spellId = isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER;
+        int32 duration = 0;
 
         if (target)
         {
-            target->RemoveAura(isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER);
+            duration = target->GetAura(spellId)->GetDuration();
+            if (duration == 0)
+            {
+                handler->PSendSysMessage("Player %s does not have %s Deserter.", player->GetName(), isInstance ? "Instance" : "Battleground");
+                return true;
+            }
+
+            target->RemoveAura(spellId);
+        }
+        else
+        {
+            PreparedQueryResult result = CharacterDatabase.Query("SELECT remiainTime FROM character_aura WHERE guid = {} AND spell = {}", player->GetGUID().GetCounter(), spellId)
+            if (!result)
+            {
+                handler->PSendSysMessage("Player %s does not have %s Deserter.", player->GetName(), isInstance ? "Instance" : "Battleground");
+                return true;
+            }
+
+            Field* fields = result->Fetch();
+            duration = fields[0].Get<int32>();
+            if (duration == 0)
+            {
+                handler->PSendSysMessage("Player %s does not have %s Deserter.", player->GetName(), isInstance ? "Instance" : "Battleground");
+                return true;
+            }
+
+            CharacterDatabase.Query("DELETE FROM character_aura WHERE guid = {} AND spell = {}", player->GetGUID().GetCounter(), spellId);
+        }
+
+        if (duration < 0)
+        {
+            handler->PSendSysMessage("Permanent %s Deserter has been removed from player %s.", duration, isInstance ? "Instance" : "Battleground", player->GetName());
             return true;
         }
 
-        CharacterDatabase.Query("DELETE FROM character_aura WHERE guid = {} AND spell = {}", player->GetGUID().GetCounter(), isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER);
-
+        handler->PSendSysMessage("%us of %s Deserter has been removed from player %s.", duration, isInstance ? "Instance" : "Battleground", player->GetName());
         return true;
     }
 
@@ -215,7 +254,7 @@ public:
             }
         }
 
-        handler->PSendSysMessage("%s Deserter has been removed from all players", isInstance ? "Instance" : "Battleground");
+        handler->PSendSysMessage("%s Deserter has been removed from all players.", isInstance ? "Instance" : "Battleground");
         return true;
     }
 
