@@ -53,6 +53,12 @@ public:
     {
         boss_hazzarahAI(Creature* creature) : BossAI(creature, DATA_EDGE_OF_MADNESS) { }
 
+        void JustSummoned(Creature* summon) override
+        {
+            BossAI::JustSummoned(summon);
+            DoZoneInCombat(summon);
+        }
+
         void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
