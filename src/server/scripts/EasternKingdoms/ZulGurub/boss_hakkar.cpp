@@ -39,7 +39,7 @@ enum Spells
 {
     SPELL_BLOOD_SIPHON          = 24322, // Buggy ?
     SPELL_CORRUPTED_BLOOD       = 24328,
-    SPELL_CAUSE_INSANITY        = 24327, // Spell needs scripting.
+    SPELL_CAUSE_INSANITY        = 24327,
     SPELL_WILL_OF_HAKKAR        = 24178,
     SPELL_ENRAGE                = 24318,
     // The Aspects of all High Priests spells
@@ -54,7 +54,7 @@ enum Events
 {
     EVENT_BLOOD_SIPHON          = 1,
     EVENT_CORRUPTED_BLOOD       = 2,
-    EVENT_CAUSE_INSANITY        = 3,     // Spell needs scripting. Event disabled
+    EVENT_CAUSE_INSANITY        = 3,
     EVENT_WILL_OF_HAKKAR        = 4,
     EVENT_ENRAGE                = 5,
     // The Aspects of all High Priests events
@@ -128,8 +128,11 @@ public:
                         events.ScheduleEvent(EVENT_CORRUPTED_BLOOD, urand(30000, 45000));
                         break;
                     case EVENT_CAUSE_INSANITY:
-                        // DoCast(SelectTarget(SelectTargetMethod::Random, 0, 100, true), SPELL_CAUSE_INSANITY);
-                        // events.ScheduleEvent(EVENT_CAUSE_INSANITY, urand(35000, 45000));
+                        if (Unit* victim = SelectTarget(SelectTargetMethod::MaxThreat, 0))
+                        {
+                            DoCast(victim, SPELL_CAUSE_INSANITY, true);
+                        }
+                        events.ScheduleEvent(EVENT_CAUSE_INSANITY, urand(35000, 45000));
                         break;
                     case EVENT_WILL_OF_HAKKAR:
                         // Xinef: Skip Tank
