@@ -4524,7 +4524,7 @@ class spell_inoculate_nestlewood_owlkin : public AuraScript
 {
     PrepareAuraScript(spell_inoculate_nestlewood_owlkin);
 
-    void HandleEffectPeriodic(AuraEffect const* aurEff)
+    void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
     {
         if (Creature* owlkin = GetTarget()->ToCreature())
         {
