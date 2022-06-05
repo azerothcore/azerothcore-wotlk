@@ -126,6 +126,8 @@ public:
 
         if (atoi(timeStr.c_str()) < 0)
         {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -137,6 +139,8 @@ public:
 
         if (time <= 0)
         {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
