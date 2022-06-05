@@ -79,7 +79,8 @@ public:
     * selected player, with the provided duration in seconds.
     *
     * @param handler The ChatHandler, passed by the system.
-    * @param time The provided duration as TimeString.
+    * @param player Player by name. Optional, defaults to selected or self.
+    * @param time The provided duration as TimeString. Optional, defaults to bg/instance default time.
     * @param isInstance provided by the relaying functions, so we don't have
     * to write that much code :)
     *
@@ -92,7 +93,7 @@ public:
     * .deserter bg add 1h30m
     * @endcode
     */
-    static bool HandleDeserterAdd(ChatHandler* handler, Optional<PlayerIdentifier> player, std::string time, bool isInstance)
+    static bool HandleDeserterAdd(ChatHandler* handler, Optional<PlayerIdentifier> player, Optional<std::string> time, bool isInstance)
     {
         if (!player)
         {
@@ -106,17 +107,17 @@ public:
             return false;
         }
 
-        if (time.empty())
+        if (!time)
         {
-            return false;
+            time = isInstance ? "30m" : "15m";
         }
 
         Player* target = player->GetConnectedPlayer();
-        int32 duration = TimeStringToSecs(time);
+        int32 duration = TimeStringToSecs(time.value());
 
         if (duration == 0)
         {
-            duration = atoi(time.c_str());
+            duration = atoi(time.value().c_str());
         }
 
         if (duration == 0)
@@ -231,13 +232,13 @@ public:
     }
 
     /// @sa HandleDeserterAdd()
-    static bool HandleDeserterInstanceAdd(ChatHandler* handler, Optional<PlayerIdentifier> player, std::string time)
+    static bool HandleDeserterInstanceAdd(ChatHandler* handler, Optional<PlayerIdentifier> player, Optional<std::string> time)
     {
         return HandleDeserterAdd(handler, player, time, true);
     }
 
     /// @sa HandleDeserterAdd()
-    static bool HandleDeserterBGAdd(ChatHandler* handler, Optional<PlayerIdentifier> player, std::string time)
+    static bool HandleDeserterBGAdd(ChatHandler* handler, Optional<PlayerIdentifier> player, Optional<std::string> time)
     {
         return HandleDeserterAdd(handler, player, time, false);
     }
