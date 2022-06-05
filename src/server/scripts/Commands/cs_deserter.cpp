@@ -79,7 +79,7 @@ public:
     * selected player, with the provided duration in seconds.
     *
     * @param handler The ChatHandler, passed by the system.
-    * @param time The provided duration in seconds.
+    * @param time The provided duration as TimeString.
     * @param isInstance provided by the relaying functions, so we don't have
     * to write that much code :)
     *
@@ -87,12 +87,12 @@ public:
     *
     * Example Usage:
     * @code
-    * .deserter instance add 3600 (one hour)
+    * .deserter instance add 1h30m
     * -or-
-    * .deserter bg add 3600 (one hour)
+    * .deserter bg add 1h30m
     * @endcode
     */
-    static bool HandleDeserterAdd(ChatHandler* handler, Optional<PlayerIdentifier> player, uint32 time, bool isInstance)
+    static bool HandleDeserterAdd(ChatHandler* handler, Optional<PlayerIdentifier> player, std::string time, bool isInstance)
     {
         if (!player)
         {
@@ -106,14 +106,25 @@ public:
             return false;
         }
 
-        if (!time)
+        if (time.empty())
+        {
+            return false;
+        }
+
+        Player* target = player->GetConnectedPlayer();
+        int32 duration = TimeStringToSecs(time);
+
+        if (duration == 0)
+        {
+            duration = atoi(time.c_str());
+        }
+
+        if (duration == 0)
         {
             handler->SendSysMessage(LANG_BAD_VALUE);
             handler->SetSentErrorMessage(true);
             return false;
         }
-
-        Player* target = player->GetConnectedPlayer();
 
         if (target)
         {
@@ -131,7 +142,7 @@ public:
                 handler->SetSentErrorMessage(true);
                 return false;
             }
-            aura->SetDuration(time * IN_MILLISECONDS);
+            aura->SetDuration(duration * IN_MILLISECONDS);
 
             return true;
         }
@@ -166,7 +177,7 @@ public:
         stmt->SetData(index++, 0);
         stmt->SetData(index++, 0);
         stmt->SetData(index++, isInstance ? 1800000 : 900000);
-        stmt->SetData(index++, time * 1000);
+        stmt->SetData(index++, duration * 1000);
         stmt->SetData(index, 0);
         CharacterDatabase.Execute(stmt);
 
@@ -240,13 +251,13 @@ public:
     }
 
     /// @sa HandleDeserterAdd()
-    static bool HandleDeserterInstanceAdd(ChatHandler* handler, Optional<PlayerIdentifier> player, uint32 time)
+    static bool HandleDeserterInstanceAdd(ChatHandler* handler, Optional<PlayerIdentifier> player, std::string time)
     {
         return HandleDeserterAdd(handler, player, time, true);
     }
 
     /// @sa HandleDeserterAdd()
-    static bool HandleDeserterBGAdd(ChatHandler* handler, Optional<PlayerIdentifier> player, uint32 time)
+    static bool HandleDeserterBGAdd(ChatHandler* handler, Optional<PlayerIdentifier> player, std::string time)
     {
         return HandleDeserterAdd(handler, player, time, false);
     }
