@@ -199,9 +199,33 @@ public:
         return true;
     }
 
-    static bool HandleDeserterRemoveAll(ChatHandler* handler, bool isInstance, Optional<int32> maxTime)
+    static bool HandleDeserterRemoveAll(ChatHandler* handler, bool isInstance, Optional<std::string> maxTime)
     {
-        int32 remainTime = maxTime.value_or(isInstance ? 1800 : 900);
+        int32 remainTime = isInstance ? 1800 : 900;
+
+        if (maxTime.has_value() && !maxTime.value().empty())
+        {
+            remainTime = TimeStringToSecs(maxTime.value());
+            if (remainTime == 0)
+            {
+                remainTime = atoi(maxTime.value().c_str());
+            }
+        }
+
+        if (remainTime == 0)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (remainTime == 0)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
         if (remainTime < 0)
         {
             CharacterDatabase.Execute("DELETE FROM character_aura WHERE spell = {}", isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER);
@@ -251,12 +275,12 @@ public:
         return HandleDeserterRemove(handler, player, false);
     }
 
-    static bool HandleDeserterInstanceRemoveAll(ChatHandler* handler, Optional<int32> maxTime)
+    static bool HandleDeserterInstanceRemoveAll(ChatHandler* handler, Optional<std::string> maxTime)
     {
         return HandleDeserterRemoveAll(handler, true, maxTime);
     }
 
-    static bool HandleDeserterBGRemoveAll(ChatHandler* handler, Optional<int32> maxTime)
+    static bool HandleDeserterBGRemoveAll(ChatHandler* handler, Optional<std::string> maxTime)
     {
         return HandleDeserterRemoveAll(handler, false, maxTime);
     }
