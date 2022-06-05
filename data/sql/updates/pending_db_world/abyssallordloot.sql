@@ -1,4 +1,4 @@
-DELETE FROM `creature_loot_template` WHERE (`Entry` = 15204) AND (`Item` IN (20689, 20690, 20691)) OR (`Entry` = 15205) AND (`Item` IN (20686, 20687, 20688)) OR (`Entry` = 15305) AND (`Item` IN (20683, 20684, 20685))OR (`Item` IN (20680, 20681, 20682));  ;
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 15204) AND (`Item` IN (20689, 20690, 20691)) OR (`Entry` = 15205) AND (`Item` IN (20686, 20687, 20688)) OR (`Entry` = 15305) AND (`Item` IN (20683, 20684, 20685))OR (`Item` IN (20680, 20681, 20682));
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (15203, 20680, 0, 33.3334, 0, 1, 3, 1, 1, 'Prince Skaldrenox - Abyssal Mail Pauldrons'),
 (15203, 20681, 0, 33.3333, 0, 1, 3, 1, 1, 'Prince Skaldrenox - Abyssal Leather Bracers'),
