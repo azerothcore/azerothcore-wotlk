@@ -2385,6 +2385,8 @@ public:
 
         if (atoi(notSpeakTime.c_str()) < 0)
         {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -2430,6 +2432,8 @@ public:
 
         if (muteDuration <= 0)
         {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 

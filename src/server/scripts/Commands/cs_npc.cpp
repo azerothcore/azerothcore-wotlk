@@ -996,6 +996,8 @@ public:
 
         if (atoi(spawnTimeStr.c_str()) < 0)
         {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -1011,6 +1013,8 @@ public:
 
         if (spawnTime <= 0)
         {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
