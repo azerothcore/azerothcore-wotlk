@@ -269,7 +269,7 @@ public:
         return true;
     }
 
-    static bool HandleServerShutDownCommand(ChatHandler* /*handler*/, std::string time, Optional<int32> exitCode, Tail reason)
+    static bool HandleServerShutDownCommand(ChatHandler* handler, std::string time, Optional<int32> exitCode, Tail reason)
     {
         std::wstring wReason   = std::wstring();
         std::string  strReason = std::string();
@@ -324,7 +324,7 @@ public:
         return true;
     }
 
-    static bool HandleServerRestartCommand(ChatHandler* /*handler*/, std::string time, Optional<int32> exitCode, Tail reason)
+    static bool HandleServerRestartCommand(ChatHandler* handler, std::string time, Optional<int32> exitCode, Tail reason)
     {
         std::wstring wReason = std::wstring();
         std::string strReason    = std::string();
@@ -379,7 +379,7 @@ public:
         return true;
     }
 
-    static bool HandleServerIdleRestartCommand(ChatHandler* /*handler*/, std::string time, Optional<int32> exitCode, Tail reason)
+    static bool HandleServerIdleRestartCommand(ChatHandler* handler, std::string time, Optional<int32> exitCode, Tail reason)
     {
         std::wstring wReason   = std::wstring();
         std::string  strReason = std::string();
@@ -434,7 +434,7 @@ public:
         return true;
     }
 
-    static bool HandleServerIdleShutDownCommand(ChatHandler* /*handler*/, std::string time, Optional<int32> exitCode, Tail reason)
+    static bool HandleServerIdleShutDownCommand(ChatHandler* handler, std::string time, Optional<int32> exitCode, Tail reason)
     {
         std::wstring wReason   = std::wstring();
         std::string  strReason = std::string();
