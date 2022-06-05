@@ -55,8 +55,19 @@ public:
 
         void JustSummoned(Creature* summon) override
         {
-            BossAI::JustSummoned(summon);
-            DoZoneInCombat(summon);
+            summons.Summon(summon);
+            summon->SetReactState(REACT_PASSIVE);
+            summon->SetVisible(false);
+            summon->m_Events.AddEventAtOffset([summon]()
+            {
+                summon->SetVisible(true);
+            }, 2s);
+
+            summon->m_Events.AddEventAtOffset([summon]()
+            {
+                summon->SetReactState(REACT_AGGRESSIVE);
+                summon->SetInCombatWithZone();
+            }, 3500ms);
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -66,6 +77,11 @@ public:
             events.ScheduleEvent(EVENT_EARTH_SHOCK, 8s, 18s);
             events.ScheduleEvent(EVENT_CHAIN_BURN, 12s, 28s);
             events.ScheduleEvent(EVENT_ILLUSIONS, 16s, 24s);
+        }
+
+        bool CanAIAttack(Unit const* target) const override
+        {
+            return !target->HasAura(SPELL_SLEEP);
         }
 
         void UpdateAI(uint32 diff) override
@@ -91,7 +107,10 @@ public:
                         events.ScheduleEvent(EVENT_EARTH_SHOCK, 8s, 18s);
                         break;
                     case EVENT_CHAIN_BURN:
-                        DoCastVictim(SPELL_CHAIN_BURN);
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, [&](Unit* u) { return u && !u->IsPet() && u->getPowerType() == POWER_MANA; }))
+                        {
+                            DoCast(target, SPELL_CHAIN_BURN, false);
+                        }
                         events.ScheduleEvent(EVENT_CHAIN_BURN, 12s, 28s);
                         break;
                     case EVENT_ILLUSIONS:
@@ -115,7 +134,28 @@ public:
     }
 };
 
+class spell_chain_burn : public SpellScript
+{
+    PrepareSpellScript(spell_chain_burn);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        Unit* caster = GetCaster();
+        targets.remove_if([caster](WorldObject* target) -> bool
+        {
+            Unit* unit = target->ToUnit();
+            return !unit || unit->getPowerType() != POWER_MANA || caster->GetVictim() == unit;
+        });
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_chain_burn::FilterTargets, EFFECT_0, TARGET_UNIT_TARGET_ENEMY);
+    }
+};
+
 void AddSC_boss_hazzarah()
 {
     new boss_hazzarah();
+    RegisterSpellScript(spell_chain_burn);
 }
