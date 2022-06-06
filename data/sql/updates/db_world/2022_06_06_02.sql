@@ -1,3 +1,4 @@
+-- DB update 2022_06_06_01 -> 2022_06_06_02
 -- Flame Leviathan add mising Boss Emote (15 and above)
 DELETE FROM `creature_text` WHERE `CreatureID` = 33113;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
