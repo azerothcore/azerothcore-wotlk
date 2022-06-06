@@ -4520,7 +4520,7 @@ enum AzuremistIsles
     INOCULATED_OWLKIN_ENTRY = 16534,
 };
 
-class spell_inoculate_nestlewood_owlkin : public AuraScript
+class spell_inoculate_nestlewood_owlkin : public SpellScript
 {
     PrepareAuraScript(spell_inoculate_nestlewood_owlkin);
 
