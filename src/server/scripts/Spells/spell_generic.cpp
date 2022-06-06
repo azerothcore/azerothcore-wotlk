@@ -4543,7 +4543,7 @@ class spell_inoculate_nestlewood_owlkin : public AuraScript
 
     void Register() override
     {
-        OnEffectPeriodic += AuraEffectPeriodicFn(spell_inoculate_nestlewood_owlkin::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_inoculate_nestlewood_owlkin::HandleEffectPeriodic, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
     }
 };
 
