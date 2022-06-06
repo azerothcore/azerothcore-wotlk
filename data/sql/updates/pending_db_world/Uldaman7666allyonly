@@ -1,0 +1,1 @@
+UPDATE item_template SET flagsextra ="2" WHERE NAME = "shattered necklace"; #
