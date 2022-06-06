@@ -964,7 +964,7 @@ public:
     {
         npc_scarlet_miner_cartAI(Creature* creature) : PassiveAI(creature)
         {
-            me->ReplaceAllUnitFlags(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(true);
             me->SetFaction(FACTION_FRIENDLY);
             me->SetDisplayId(me->GetCreatureTemplate()->Modelid1); // Modelid2 is a horse.
         }
@@ -987,7 +987,8 @@ public:
                 me->SetSpeed(MOVE_RUN, 1.25f);
 
                 me->GetMotionMaster()->MoveFollow(miner, 1.0f, 0);
-                me->ReplaceAllUnitFlags(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                me->ReplaceAllUnitFlags(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetImmuneToAll(true);
                 me->SetFaction(FACTION_FRIENDLY);
             }
         }
@@ -1097,7 +1098,8 @@ public:
                     {
                         me->SetFacingToObject(car);
                         // xinef: add some flags
-                        car->ReplaceAllUnitFlags(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        car->ReplaceAllUnitFlags(UNIT_FLAG_NON_ATTACKABLE);
+                        car->SetImmuneToAll(true);
                         car->SetFaction(FACTION_FRIENDLY);
                     }
                     Talk(SAY_SCARLET_MINER_0);

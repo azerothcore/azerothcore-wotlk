@@ -1009,7 +1009,7 @@ public:
 
         void AttackStart(Unit* victim) override
         {
-            if (me->HasReactState(REACT_PASSIVE) || me->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC))
+            if (me->HasReactState(REACT_PASSIVE) || me->IsImmuneToAll())
                 return;
             BossAI::AttackStart(victim);
         }
@@ -1039,7 +1039,7 @@ public:
 
         void EnterCombat(Unit* /*attacker*/) override
         {
-            if (me->HasReactState(REACT_PASSIVE) || me->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC))
+            if (me->HasReactState(REACT_PASSIVE) || me->IsImmuneToAll())
             {
                 me->CombatStop(false);
                 me->SetImmuneToAll(true);
