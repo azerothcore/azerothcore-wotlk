@@ -898,6 +898,47 @@ namespace Acore
         float i_range;
     };
 
+    class NearestAttackableNoTotemUnitInObjectRangeCheck
+    {
+    public:
+        NearestAttackableNoTotemUnitInObjectRangeCheck(WorldObject const* obj, Unit const* owner, float range) : i_obj(obj), i_owner(owner), i_range(range) {}
+
+        bool operator()(Unit* u)
+        {
+            if (!u->IsAlive())
+            {
+                return false;
+            }
+
+            if (u->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET)
+            {
+                return false;
+            }
+
+            if (u->GetTypeId() == TYPEID_UNIT && u->ToCreature()->IsTotem())
+            {
+                return false;
+            }
+
+            if (!u->isTargetableForAttack(false, i_owner))
+            {
+                return false;
+            }
+
+            if (!i_obj->IsWithinDistInMap(u, i_range) || !i_owner->IsValidAttackTarget(u) || !i_obj->IsWithinLOSInMap(u))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+    private:
+        WorldObject const* i_obj;
+        Unit const* i_owner;
+        float i_range;
+    };
+
     class AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck
     {
     public:
