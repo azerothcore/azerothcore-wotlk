@@ -6,7 +6,7 @@ DELETE FROM `smart_scripts` WHERE `entryorguid` = @NESTLEWOOD_OWLKIN * 100 AND `
 
 UPDATE `creature_template` SET `AIName` = '' WHERE `entry` = @NESTLEWOOD_OWLKIN;
 
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = @NESTLEWOOD_OWLKIN) AND (`source_type` = 0)
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = @NESTLEWOOD_OWLKIN) AND (`source_type` = 0);
 
-DELETE FROM `spell_script_names` WHERE `spell_id` = 29528;
+DELETE FROM `spell_script_names` WHERE `spell_id` = @SPELL_INOCULATE;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (@SPELL_INOCULATE, 'spell_inoculate_nestlewood_owlkin');
