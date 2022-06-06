@@ -110,12 +110,7 @@ public:
                         events.ScheduleEvent(EVENT_POWERFULLHEALINGWARD, urand(14000, 20000));
                         break;
                     case EVENT_HEX:
-                        if (Unit* target = me->GetVictim())
-                        {
-                            DoCast(target, SPELL_HEX, true);
-                            if (DoGetThreat(target))
-                                DoModifyThreatPercent(target, -80);
-                        }
+                        DoCastVictim(SPELL_HEX, true);
                         events.ScheduleEvent(EVENT_HEX, urand(12000, 20000));
                         break;
                     case EVENT_DELUSIONSOFJINDO: // HACK
@@ -173,6 +168,11 @@ public:
             }
 
             DoMeleeAttackIfReady();
+        }
+
+        bool CanAIAttack(Unit const* target) const override
+        {
+            return !target->HasAura(SPELL_HEX);
         }
     };
 
