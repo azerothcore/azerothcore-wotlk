@@ -1929,7 +1929,7 @@ public:
             {
                 target->SetReactState(REACT_AGGRESSIVE);
                 target->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                tagret->SetImmuneToPC(false);
+                target->SetImmuneToPC(false);
                 target->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
             }
         }

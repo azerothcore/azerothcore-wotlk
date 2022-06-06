@@ -278,7 +278,7 @@ public:
                             extraEvents.SetPhase(PHASE_EMERGED);
                             me->RemoveAurasDueToSpell(SPELL_RAGNAROS_SUBMERGE_EFFECT);
                             me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                            me->SetImmuneToAll(falsse);
+                            me->SetImmuneToAll(false);
                             me->SetReactState(REACT_AGGRESSIVE);
                             DoZoneInCombat();
                             break;

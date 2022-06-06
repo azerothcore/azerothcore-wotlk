@@ -987,7 +987,7 @@ public:
             {
                 case ACTION_ACTIVATE_STAR:
                     me->SetReactState(REACT_AGGRESSIVE);
-                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE$);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->SetImmuneToAll(false);
                     _isActive = true;
 

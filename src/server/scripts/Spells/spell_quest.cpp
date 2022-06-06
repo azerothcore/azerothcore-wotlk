@@ -1008,7 +1008,7 @@ class spell_q11396_11399_force_shield_arcane_purple_x3 : public AuraScript
 
     void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        GetTarget()->SetImmuneTOPC(false);
+        GetTarget()->SetImmuneToPC(false);
     }
 
     void Register() override

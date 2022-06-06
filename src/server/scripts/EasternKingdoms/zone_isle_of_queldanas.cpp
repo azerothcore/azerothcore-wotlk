@@ -372,7 +372,7 @@ public:
                                 continue;
                             else
                                 c->AI()->Talk(SAY_MORLEN_4);
-                            c->SetImmuneToall(false);
+                            c->SetImmuneToAll(false);
                             c->AI()->AttackStart(me);
                         }
                     break;
