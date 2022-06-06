@@ -1,5 +1,5 @@
-SET @NESTLEWOOD_OWLKIN  = 16518;
-SET @SPELL_INOCULATE    = 29528;
+SET @NESTLEWOOD_OWLKIN  := 16518;
+SET @SPELL_INOCULATE   := 29528;
 
 -- Clearing Owlkin's SmartAI
 DELETE FROM `smart_scripts` WHERE `entryorguid` = @NESTLEWOOD_OWLKIN * 100 AND `source_type` = 9;
