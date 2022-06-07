@@ -12,11 +12,8 @@
 
 CU_RUN_HOOK(BEFORE_SCRIPTS_LIBRARY)
 
-message("")
-
 # Make the script module list available in the current scope
 GetScriptModuleList(SCRIPT_MODULE_LIST)
-GetModuleSourceList(MODULES_MODULE_LIST)
 
 # Make the native install offset available in this scope
 GetInstallOffset(INSTALL_OFFSET)
@@ -31,18 +28,6 @@ elseif(SCRIPTS MATCHES "static")
   set(SCRIPTS_DEFAULT_LINKAGE "static")
 else()
   set(SCRIPTS_DEFAULT_LINKAGE "disabled")
-endif()
-
-# Sets the MODULES_${SOURCE_MODULE} variables
-# when using predefined templates for script building
-# like dynamic, static
-# Sets MODULES_DEFAULT_LINKAGE
-if(MODULES MATCHES "dynamic")
-  set(MODULES_DEFAULT_LINKAGE "dynamic")
-elseif(MODULES MATCHES "static")
-  set(MODULES_DEFAULT_LINKAGE "static")
-else()
-  set(MODULES_DEFAULT_LINKAGE "disabled")
 endif()
 
 # Sets SCRIPTS_USE_WHITELIST
@@ -93,8 +78,8 @@ list(SORT SCRIPT_GRAPH_KEYS)
 list(REMOVE_DUPLICATES SCRIPT_GRAPH_KEYS)
 
 # Display the script graph
-message("* Script configuration (${SCRIPTS}):
-  |")
+message("* Script configuration (${SCRIPTS}):")
+message("  |")
 
 foreach(SCRIPT_GRAPH_KEY ${SCRIPT_GRAPH_KEYS})
   if(NOT SCRIPT_GRAPH_KEY STREQUAL "disabled")
@@ -108,10 +93,8 @@ foreach(SCRIPT_GRAPH_KEY ${SCRIPT_GRAPH_KEYS})
   message("  |")
 endforeach()
 
-message("")
-
 # Base sources which are used by every script project
-if(USE_SCRIPTPCH)
+if (USE_SCRIPTPCH)
   set(PRIVATE_PCH_HEADER ScriptPCH.h)
 endif()
 
