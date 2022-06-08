@@ -182,6 +182,8 @@ public:
     void CopyBinds(ObjectGuid from, ObjectGuid to, Player* toPlr = nullptr);
     void UnbindAllFor(InstanceSave* save);
 
+    void SanitizeInstanceSavedData();
+    void DeleteInstanceSavedData(uint32 instanceId);
 protected:
     static uint16 ResetTimeDelay[];
     static PlayerBindStorage playerBindStorage;

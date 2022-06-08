@@ -36,6 +36,7 @@
 #include "IoContext.h"
 #include "MapMgr.h"
 #include "Metric.h"
+#include "ModuleMgr.h"
 #include "ModulesScriptLoader.h"
 #include "MySQLThreading.h"
 #include "OpenSSLCrypto.h"
@@ -54,12 +55,12 @@
 #include <boost/asio/signal_set.hpp>
 #include <boost/program_options.hpp>
 #include <csignal>
+#include <filesystem>
+#include <iostream>
 #include <openssl/crypto.h>
 #include <openssl/opensslv.h>
 
-#include "ModuleMgr.h"
-
-#ifdef _WIN32
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
 #include "ServiceWin32.h"
 char serviceName[] = "worldserver";
 char serviceLongName[] = "AzerothCore world service";
@@ -78,6 +79,8 @@ int m_ServiceStatus = -1;
 #endif
 
 #define WORLD_SLEEP_CONST 10
+using namespace boost::program_options;
+namespace fs = std::filesystem;
 
 class FreezeDetector
 {
@@ -110,20 +113,7 @@ void ShutdownCLIThread(std::thread* cliThread);
 void AuctionListingRunnable();
 void ShutdownAuctionListingThread(std::thread* thread);
 void WorldUpdateLoop();
-
-/// Print out the usage string for this program on the console.
-void usage(const char* prog)
-{
-    printf("Usage:\n");
-    printf(" %s [<options>]\n", prog);
-    printf("    -c config_file           use config_file as configuration file\n");
-#ifdef _WIN32
-    printf("    Running as service functions:\n");
-    printf("    --service                run as service\n");
-    printf("    -s install               install service\n");
-    printf("    -s uninstall             uninstall service\n");
-#endif
-}
+variables_map GetConsoleArguments(int argc, char** argv, fs::path& configFile, [[maybe_unused]] std::string& cfg_service);
 
 /// Launch the Azeroth server
 int main(int argc, char** argv)
@@ -131,66 +121,26 @@ int main(int argc, char** argv)
     Acore::Impl::CurrentServerProcessHolder::_type = SERVER_PROCESS_WORLDSERVER;
     signal(SIGABRT, &Acore::AbortHandler);
 
-    ///- Command line parsing to get the configuration file name
-    std::string configFile = sConfigMgr->GetConfigPath() + std::string(_ACORE_CORE_CONFIG);
-    int c = 1;
-    while (c < argc)
-    {
-        if (strcmp(argv[c], "--dry-run") == 0)
-        {
-            sConfigMgr->setDryRun(true);
-        }
+    // Command line parsing
+    auto configFile = fs::path(sConfigMgr->GetConfigPath() + std::string(_ACORE_CORE_CONFIG));
+    std::string configService;
+    auto vm = GetConsoleArguments(argc, argv, configFile, configService);
 
-        if (!strcmp(argv[c], "-c"))
-        {
-            if (++c >= argc)
-            {
-                printf("Runtime-Error: -c option requires an input argument");
-                usage(argv[0]);
-                return 1;
-            }
-            else
-                configFile = argv[c];
-        }
+    // exit if help or version is enabled
+    if (vm.count("help"))
+        return 0;
 
-#ifdef _WIN32
-        if (strcmp(argv[c], "-s") == 0) // Services
-        {
-            if (++c >= argc)
-            {
-                printf("Runtime-Error: -s option requires an input argument");
-                usage(argv[0]);
-                return 1;
-            }
-
-            if (strcmp(argv[c], "install") == 0)
-            {
-                if (WinServiceInstall())
-                    printf("Installing service\n");
-                return 1;
-            }
-            else if (strcmp(argv[c], "uninstall") == 0)
-            {
-                if (WinServiceUninstall())
-                    printf("Uninstalling service\n");
-                return 1;
-            }
-            else
-            {
-                printf("Runtime-Error: unsupported option %s", argv[c]);
-                usage(argv[0]);
-                return 1;
-            }
-        }
-
-        if (strcmp(argv[c], "--service") == 0)
-            WinServiceRun();
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
+    if (configService.compare("install") == 0)
+        return WinServiceInstall() == true ? 0 : 1;
+    else if (configService.compare("uninstall") == 0)
+        return WinServiceUninstall() == true ? 0 : 1;
+    else if (configService.compare("run") == 0)
+        WinServiceRun();
 #endif
-        ++c;
-    }
 
     // Add file and args in config
-    sConfigMgr->Configure(configFile, { argv, argv + argc }, CONFIG_FILE_LIST);
+    sConfigMgr->Configure(configFile.generic_string(), {argv, argv + argc}, CONFIG_FILE_LIST);
 
     if (!sConfigMgr->LoadAppConfigs())
         return 1;
@@ -199,7 +149,8 @@ int main(int argc, char** argv)
 
     // Init all logs
     sLog->RegisterAppender<AppenderDB>();
-    sLog->Initialize();
+    // If logs are supposed to be handled async then we need to pass the IoContext into the Log singleton
+    sLog->Initialize(sConfigMgr->GetOption<bool>("Log.Async.Enable", false) ? ioContext.get() : nullptr);
 
     Acore::Banner::Show("worldserver-daemon",
         [](std::string_view text)
@@ -398,7 +349,7 @@ int main(int argc, char** argv)
 
     // Launch CliRunnable thread
     std::shared_ptr<std::thread> cliThread;
-#ifdef _WIN32
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
     if (sConfigMgr->GetOption<bool>("Console.Enable", true) && (m_ServiceStatus == -1)/* need disable console in service mode*/)
 #else
     if (sConfigMgr->GetOption<bool>("Console.Enable", true))
@@ -420,6 +371,8 @@ int main(int argc, char** argv)
 
     // Shutdown starts here
     threadPool.reset();
+
+    sLog->SetSynchronous();
 
     sScriptMgr->OnShutdown();
 
@@ -764,4 +717,45 @@ void ShutdownAuctionListingThread(std::thread* thread)
         thread->join();
         delete thread;
     }
+}
+
+variables_map GetConsoleArguments(int argc, char** argv, fs::path& configFile, [[maybe_unused]] std::string& configService)
+{
+    options_description all("Allowed options");
+    all.add_options()
+        ("help,h", "print usage message")
+        ("version,v", "print version build info")
+        ("dry-run,d", "Dry run")
+        ("config,c", value<fs::path>(&configFile)->default_value(fs::path(sConfigMgr->GetConfigPath() + std::string(_ACORE_CORE_CONFIG))), "use <arg> as configuration file");
+
+#if AC_PLATFORM == WARHEAD_PLATFORM_WINDOWS
+    options_description win("Windows platform specific options");
+    win.add_options()
+        ("service,s", value<std::string>(&configService)->default_value(""), "Windows service options: [install | uninstall]");
+
+    all.add(win);
+#endif
+
+    variables_map vm;
+
+    try
+    {
+        store(command_line_parser(argc, argv).options(all).allow_unregistered().run(), vm);
+        notify(vm);
+    }
+    catch (std::exception const& e)
+    {
+        std::cerr << e.what() << "\n";
+    }
+
+    if (vm.count("help"))
+    {
+        std::cout << all << "\n";
+    }
+    else if (vm.count("dry-run"))
+    {
+        sConfigMgr->setDryRun(true);
+    }
+
+    return vm;
 }

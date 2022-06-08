@@ -15,16 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Dragonblight
-SD%Complete: 100
-SDComment:
-SDCategory: Dragonblight
-EndScriptData */
-
-/* ContentData
-EndContentData */
-
 #include "CellImpl.h"
 #include "Chat.h"
 #include "CombatAI.h"
@@ -43,19 +33,33 @@ EndContentData */
 /********
 QUEST Conversing With the Depths (12032)
 ********/
-#define QUEST_CONVERSING_WITH_THE_DEPTHS 12032
-#define DEEPDIVING_PEARL_BUFF 41273
-#define NPC_OACHANOA 26648
-#define NPC_CONVERSING_WITH_THE_DEPTHS_TRIGGER 70100
-#define OACHANOA_T_1_1 "Little "
-#define OACHANOA_T_1_2 ", why do you call me forth? Are you working with the trolls of this land? Have you come to kill me and take my power as your own?"
-#define OACHANOA_T_2 "I sense uncertainty in you, and I do not trust it whether you are with them, or not. If you wish my augury for the Kalu'ak, you will have to prove yourself first."
-#define OACHANOA_T_3 "I will lay a mild compulsion upon you. Jump into the depths before me so that you put yourself into my element and thereby display your submission."
-#define OACHANOA_T_4_1 "Well done, "
-#define OACHANOA_T_4_2 ". Your display of respect is duly noted. Now, I have information for you that you must convey to the Kalu'ak."
-#define OACHANOA_T_5 "Simply put, you must tell the tuskarr that they cannot run. If they do so, their spirits will be destroyed by the evil rising within Northrend."
-#define OACHANOA_T_6 "Tell the mystic that his people are to stand and fight alongside the Horde and Alliance against the forces of Malygos and the Lich King."
-#define OACHANOA_T_7_1 "Now swim back with the knowledge I have granted you. Do what you can for them "
+
+enum DepthsMisc
+{
+    QUEST_CONVERSING_WITH_THE_DEPTHS        = 12032,
+    DEEPDIVING_PEARL_BUFF                   = 41273,
+    NPC_OACHANOA                            = 26648,
+    NPC_CONVERSING_WITH_THE_DEPTHS_TRIGGER  = 70100,
+};
+
+enum DepthsTexts
+{
+    // Oacha'noa being summoned
+    SAY_OACHANOA_SUMMONED_0                 = 0,
+    SAY_OACHANOA_SUMMONED_1                 = 1,
+    SAY_OACHANOA_SUMMONED_2                 = 2,
+    SAY_OACHANOA_SUMMONED_3                 = 3,
+    //SAY_OACHANOA_SUMMONED_4                 = 4, // Unused(no source) and no BroadcastTextId
+
+    // If success
+    SAY_OACHANOA_SUCCESS                    = 5,
+    WHISPER_OACHANOA_SUCCESS_0              = 6,
+    WHISPER_OACHANOA_SUCCESS_1              = 7,
+    WHISPER_OACHANOA_SUCCESS_2              = 8,
+
+    // If failed
+    SAY_OACHANOA_FAILED                     = 9,
+};
 
 class npc_conversing_with_the_depths_trigger : public CreatureScript
 {
@@ -73,15 +77,20 @@ public:
 
         bool running;
         bool secondpart;
+        bool canjump;
         int32 timer;
         uint8 step;
         ObjectGuid pGUID;
         ObjectGuid oachanoaGUID;
 
+        Creature* GetOachanoa() {return ObjectAccessor::GetCreature(*me, oachanoaGUID);}
+        Player* GetPlayer() {return ObjectAccessor::GetPlayer(*me, pGUID);}
+
         void Reset() override
         {
             running = false;
             secondpart = false;
+            canjump = false;
             timer = 0;
             step = 0;
             pGUID.Clear();
@@ -94,63 +103,48 @@ public:
             timer = time;
         }
 
-        void Say(std::string text, bool yell)
-        {
-            Creature* c = ObjectAccessor::GetCreature(*me, oachanoaGUID);
-            Player* player = ObjectAccessor::GetPlayer(*me, pGUID);
-            if (!c || !player)
-            {
-                Reset();
-                return;
-            }
-
-            if (yell)
-                c->Yell(text.c_str(), LANG_UNIVERSAL, player);
-            else
-                c->Whisper(text.c_str(), LANG_UNIVERSAL, player);
-        }
-
         void DespawnOachanoa()
         {
-            if (Creature* c = ObjectAccessor::GetCreature(*me, oachanoaGUID))
+            if (Creature* c = GetOachanoa())
                 c->DespawnOrUnsummon();
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if( running )
+            if (running)
             {
-                if( Player* p = ObjectAccessor::GetPlayer(*me, pGUID) )
-                    if( p->GetPositionZ() < 1.0f && !secondpart )
+                if (Player* p = GetPlayer())
+                    if (p->GetPositionZ() < 1.0f && !secondpart)  // Player is in the water
                     {
-                        if( p->HasAura(DEEPDIVING_PEARL_BUFF) )
+                        if (p->HasAura(DEEPDIVING_PEARL_BUFF) && canjump)
                         {
                             NextStep(500);
                             secondpart = true;
                         }
-                        else
+                        else // Despawn and fail quest if player jumps too early
                         {
+                            p->SendQuestFailed(QUEST_CONVERSING_WITH_THE_DEPTHS);
                             DespawnOachanoa();
                             Reset();
                         }
                     }
 
-                if( timer != 0 )
+                if (timer != 0)
                 {
                     timer -= diff;
-                    if( timer < 0 )
+                    if (timer < 0)
                         timer = 0;
                 }
                 else
-                    switch( step )
+                    switch (step)
                     {
                         case 0:
                             NextStep(10000);
                             break;
-                        case 1:
+                        case 1: // Oacha'noa being summoned
                             {
                                 Creature* c = me->SummonCreature(NPC_OACHANOA, 2406.24f, 1701.98f, 0.1f, 0.3f, TEMPSUMMON_TIMED_DESPAWN, 90000, 0);
-                                if( !c )
+                                if (!c)
                                 {
                                     Reset();
                                     return;
@@ -158,85 +152,111 @@ public:
                                 c->SetCanFly(true);
                                 c->GetMotionMaster()->MovePoint(0, 2406.25f, 1701.98f, 0.1f);
                                 oachanoaGUID = c->GetGUID();
+
                                 NextStep(3000);
                                 break;
                             }
                         case 2:
                             {
-                                Player* p = ObjectAccessor::GetPlayer(*me, pGUID);
-                                if( !p )
+                                Player* p = GetPlayer();
+                                if (!p)
                                 {
                                     Reset();
                                     return;
                                 }
-                                std::string text = (OACHANOA_T_1_1 + p->GetName() + OACHANOA_T_1_2);
-                                Say(text, true);
+                                if (Creature* c = GetOachanoa())
+                                    c->AI()->Talk(SAY_OACHANOA_SUMMONED_0, p);
+
                                 NextStep(6000);
                                 break;
                             }
                         case 3:
-                            Say(OACHANOA_T_2, true);
-                            NextStep(6000);
-                            break;
+                            {
+                                if (Creature* c = GetOachanoa())
+                                    c->AI()->Talk(SAY_OACHANOA_SUMMONED_1);
+
+                                NextStep(6000);
+                                break;
+                            }
                         case 4:
                             {
-                                Say(OACHANOA_T_3, true);
-                                Player* p = ObjectAccessor::GetPlayer(*me, pGUID);
-                                if( !p )
+                                if (Creature* c = GetOachanoa())
+                                    c->AI()->Talk(SAY_OACHANOA_SUMMONED_2);
+                                Player* p = GetPlayer();
+                                if (!p)
                                 {
                                     Reset();
                                     return;
                                 }
                                 p->CastSpell(p, DEEPDIVING_PEARL_BUFF, true);
-                                NextStep(30000);
-                                break;
-                            }
-                        case 5:
-                            DespawnOachanoa();
-                            Reset();
-                            break;
-                        case 6:
-                            {
-                                Player* p = ObjectAccessor::GetPlayer(*me, pGUID);
-                                if( !p )
-                                {
-                                    Reset();
-                                    return;
-                                }
-
-                                std::string text = (OACHANOA_T_4_1 + p->GetName() + OACHANOA_T_4_2);
-                                Say(text, true);
 
                                 NextStep(6000);
                                 break;
                             }
-                        case 7:
-                            Say(OACHANOA_T_5, false);
-                            NextStep(6000);
-                            break;
+                        case 5: // 20s countdown starts, the player can jump now
+                            {
+                                canjump = true;
+                                if (Creature* c = GetOachanoa())
+                                    c->AI()->Talk(SAY_OACHANOA_SUMMONED_3);
+
+                                NextStep(20500);
+                                break;
+                            }
+                        case 6: // If failed (player DOESN'T jump within 20 seconds)
+                            {
+                                Player* p = GetPlayer();
+                                if (Creature* c = GetOachanoa())
+                                    c->AI()->Talk(SAY_OACHANOA_FAILED, p);
+
+                                DespawnOachanoa();
+                                Reset();
+                                break;
+                            }
+                        case 7: // If success (player jumps)
+                            {
+                                Player* p = GetPlayer();
+                                if (!p)
+                                {
+                                    Reset();
+                                    return;
+                                }
+                                if (Creature* c = GetOachanoa())
+                                    c->AI()->Talk(SAY_OACHANOA_SUCCESS, p);
+
+                                NextStep(6000);
+                                break;
+                            }
                         case 8:
-                            Say(OACHANOA_T_6, false);
-                            NextStep(6000);
-                            break;
+                            {
+                                Player* p = GetPlayer();
+                                if (Creature* c = GetOachanoa())
+                                    c->AI()->Talk(WHISPER_OACHANOA_SUCCESS_0, p);
+
+                                NextStep(6000);
+                                break;
+                            }
                         case 9:
                             {
-                                Player* p = ObjectAccessor::GetPlayer(*me, pGUID);
-                                if( !p )
-                                {
-                                    Reset();
-                                    return;
-                                }
-                                const char* name_races[RACE_DRAENEI] = {"human", "orc", "dwarf", "nightelf", "undead", "tauren", "gnome", "troll", "", "bloodelf", "draenei"};
-                                if( p->getRace() > 11 )
+                                Player* p = GetPlayer();
+                                if (Creature* c = GetOachanoa())
+                                    c->AI()->Talk(WHISPER_OACHANOA_SUCCESS_1, p);
+
+                                NextStep(6000);
+                                break;
+                            }
+                        case 10:
+                            {
+                                Player* p = GetPlayer();
+                                if (!p)
                                 {
                                     Reset();
                                     return;
                                 }
 
-                                std::string text = (OACHANOA_T_7_1 + std::string(name_races[p->getRace() - 1]));
-                                Say(text, true);
+                                if (Creature* c = GetOachanoa())
+                                    c->AI()->Talk(WHISPER_OACHANOA_SUCCESS_2, p);
 
-                                p->AreaExploredOrEventHappens(12032);
+                                p->AreaExploredOrEventHappens(QUEST_CONVERSING_WITH_THE_DEPTHS);
 
                                 DespawnOachanoa();
                                 Reset();

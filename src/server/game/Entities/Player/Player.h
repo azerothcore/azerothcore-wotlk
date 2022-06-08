@@ -1355,6 +1355,7 @@ public:
     void ApplyEnchantment(Item* item, bool apply);
     void UpdateSkillEnchantments(uint16 skill_id, uint16 curr_value, uint16 new_value);
     void SendEnchantmentDurations();
+    void UpdateEnchantmentDurations();
     void BuildEnchantmentsInfoData(WorldPacket* data);
     void AddItemDurations(Item* item);
     void RemoveItemDurations(Item* item);
@@ -2945,7 +2946,15 @@ template <class T> T Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& bas
                 return;
             }
 
-            totalflat += mod->value;
+            int32 flatValue = mod->value;
+
+            // SPELL_MOD_THREAT - divide by 100 (in packets we send threat * 100)
+            if (mod->op == SPELLMOD_THREAT)
+            {
+                flatValue /= 100;
+            }
+
+            totalflat += flatValue;
         }
         else if (mod->type == SPELLMOD_PCT)
         {

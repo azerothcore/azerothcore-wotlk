@@ -305,7 +305,7 @@ bool CreatureAI::_EnterEvadeMode(EvadeReason /*why*/)
 
     me->ClearComboPointHolders(); // Remove all combo points targeting this unit
     // sometimes bosses stuck in combat?
-    me->DeleteThreatList();
+    me->GetThreatMgr().ClearAllThreat();
     me->CombatStop(true);
     me->LoadCreaturesAddon(true);
     me->SetLootRecipient(nullptr);

@@ -41,8 +41,11 @@
 #include "SharedDefines.h"
 #include "Util.h"
 #include <boost/asio/signal_set.hpp>
+#include <boost/program_options.hpp>
 #include <boost/version.hpp>
 #include <csignal>
+#include <filesystem>
+#include <iostream>
 #include <openssl/crypto.h>
 #include <openssl/opensslv.h>
 
@@ -51,19 +54,15 @@
 #endif
 
 using boost::asio::ip::tcp;
+using namespace boost::program_options;
+namespace fs = std::filesystem;
 
 bool StartDB();
 void StopDB();
 void SignalHandler(std::weak_ptr<Acore::Asio::IoContext> ioContextRef, boost::system::error_code const& error, int signalNumber);
 void KeepDatabaseAliveHandler(std::weak_ptr<Acore::Asio::DeadlineTimer> dbPingTimerRef, int32 dbPingInterval, boost::system::error_code const& error);
 void BanExpiryHandler(std::weak_ptr<Acore::Asio::DeadlineTimer> banExpiryCheckTimerRef, int32 banExpiryCheckInterval, boost::system::error_code const& error);
-
-/// Print out the usage string for this program on the console.
-void usage(const char* prog)
-{
-    LOG_INFO("server.authserver", "Usage: \n {} [<options>]\n"
-        "    -c config_file           use config_file as configuration file\n\r", prog);
-}
+variables_map GetConsoleArguments(int argc, char** argv, fs::path& configFile);
 
 /// Launch the auth server
 int main(int argc, char** argv)
@@ -71,34 +70,23 @@ int main(int argc, char** argv)
     Acore::Impl::CurrentServerProcessHolder::_type = SERVER_PROCESS_AUTHSERVER;
     signal(SIGABRT, &Acore::AbortHandler);
 
-    // Command line parsing to get the configuration file name
-    std::string configFile = sConfigMgr->GetConfigPath() + std::string(_ACORE_REALM_CONFIG);
-    int count = 1;
-    while (count < argc)
-    {
-        if (strcmp(argv[count], "-c") == 0)
-        {
-            if (++count >= argc)
-            {
-                printf("Runtime-Error: -c option requires an input argument\n");
-                usage(argv[0]);
-                return 1;
-            }
-            else
-                configFile = argv[count];
-        }
-        ++count;
-    }
+    // Command line parsing
+    auto configFile = fs::path(sConfigMgr->GetConfigPath() + std::string(_ACORE_REALM_CONFIG));
+    auto vm = GetConsoleArguments(argc, argv, configFile);
+
+    // exit if help or version is enabled
+    if (vm.count("help"))
+        return 0;
 
     // Add file and args in config
-    sConfigMgr->Configure(configFile, std::vector<std::string>(argv, argv + argc));
+    sConfigMgr->Configure(configFile.generic_string(), std::vector<std::string>(argv, argv + argc));
 
     if (!sConfigMgr->LoadAppConfigs())
         return 1;
 
     // Init logging
     sLog->RegisterAppender<AppenderDB>();
-    sLog->Initialize();
+    sLog->Initialize(nullptr);
 
     Acore::Banner::Show("authserver",
         [](std::string_view text)
@@ -147,6 +135,13 @@ int main(int argc, char** argv)
     {
         LOG_ERROR("server.authserver", "No valid realms specified.");
         return 1;
+    }
+
+    // Stop auth server if dry run
+    if (sConfigMgr->isDryRun())
+    {
+        LOG_INFO("server.authserver", "Dry run completed, terminating.");
+        return 0;
     }
 
     // Start the listening port (acceptor) for auth connections
@@ -267,4 +262,37 @@ void BanExpiryHandler(std::weak_ptr<Acore::Asio::DeadlineTimer> banExpiryCheckTi
             banExpiryCheckTimer->async_wait(std::bind(&BanExpiryHandler, banExpiryCheckTimerRef, banExpiryCheckInterval, std::placeholders::_1));
         }
     }
+}
+
+variables_map GetConsoleArguments(int argc, char** argv, fs::path& configFile)
+{
+    options_description all("Allowed options");
+    all.add_options()
+        ("help,h", "print usage message")
+        ("version,v", "print version build info")
+        ("dry-run,d", "Dry run")
+        ("config,c", value<fs::path>(&configFile)->default_value(fs::path(sConfigMgr->GetConfigPath() + std::string(_ACORE_REALM_CONFIG))), "use <arg> as configuration file");
+
+    variables_map variablesMap;
+
+    try
+    {
+        store(command_line_parser(argc, argv).options(all).allow_unregistered().run(), variablesMap);
+        notify(variablesMap);
+    }
+    catch (std::exception const& e)
+    {
+        std::cerr << e.what() << "\n";
+    }
+
+    if (variablesMap.count("help"))
+    {
+        std::cout << all << "\n";
+    }
+    else if (variablesMap.count("dry-run"))
+    {
+        sConfigMgr->setDryRun(true);
+    }
+
+    return variablesMap;
 }

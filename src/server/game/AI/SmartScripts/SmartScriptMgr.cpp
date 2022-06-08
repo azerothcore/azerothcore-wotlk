@@ -79,11 +79,12 @@ void SmartWaypointMgr::LoadFromDB()
         Field* fields = result->Fetch();
         uint32 entry = fields[0].Get<uint32>();
         uint32 id = fields[1].Get<uint32>();
-        float x, y, z, o;
-        x = fields[2].Get<float>();
-        y = fields[3].Get<float>();
-        z = fields[4].Get<float>();
-        o = fields[5].Get<float>();
+        float x = fields[2].Get<float>();
+        float y = fields[3].Get<float>();
+        float z = fields[4].Get<float>();
+        Optional<float> o;
+        if (!fields[5].IsNull())
+            o = fields[5].Get<float>();
         uint32 delay = fields[6].Get<uint32>();
 
         if (last_entry != entry)
