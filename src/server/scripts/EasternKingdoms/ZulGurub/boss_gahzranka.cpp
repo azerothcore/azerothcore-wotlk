@@ -121,7 +121,7 @@ class spell_gahzranka_slam : public SpellScript
         }
     }
 
-    void HandleWipeThreat(SpellEffIndex effIndex)
+    void HandleWipeThreat(SpellEffIndex /*effIndex*/)
     {
         if (_wipeThreat)
         {
