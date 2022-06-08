@@ -1,3 +1,4 @@
+-- DB update 2022_06_06_05 -> 2022_06_08_00
 --
 /*  Frostmane Troll Whelp - GUID 1311  */
 
