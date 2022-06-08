@@ -64,22 +64,23 @@ enum Spells
 enum Events
 {
     // Spider form
-    EVENT_CHARGE_PLAYER       = 6,
-    EVENT_ENVELOPING_WEB      = 7,
-    EVENT_CORROSIVE_POISON    = 8,
-    EVENT_POISON_SHOCK        = 9,
+    EVENT_CHARGE_PLAYER       = 7,
+    EVENT_ENVELOPING_WEB      = 8,
+    EVENT_CORROSIVE_POISON    = 9,
+    EVENT_POISON_SHOCK        = 10,
 
     // Troll form
-    EVENT_POISON_VOLLEY       = 10,
-    EVENT_DRAIN_LIFE          = 11,
-    EVENT_ENLARGE             = 12,
+    EVENT_POISON_VOLLEY       = 11,
+    EVENT_DRAIN_LIFE          = 12,
+    EVENT_ENLARGE             = 13,
 
     // All
     EVENT_SPAWN_START_SPIDERS = 1,
     EVENT_TRANSFORM           = 2,
     EVENT_TRANSFORM_BACK      = 3,
     EVENT_HATCH_SPIDER_EGG    = 4,
-    EVENT_THRASH              = 5
+    EVENT_THRASH              = 5,
+    EVENT_TALK_FIRST_SPIDERS  = 6,
 };
 
 enum Phases
@@ -143,7 +144,7 @@ struct boss_marli : public BossAI
             switch (eventId)
             {
                 case EVENT_SPAWN_START_SPIDERS:
-                    Talk(SAY_SPIDER_SPAWN);
+                    events.ScheduleEvent(EVENT_TALK_FIRST_SPIDERS, 500, 0, PHASE_TWO);
                     DoCastAOE(SPELL_HATCH_EGGS);
                     events.ScheduleEvent(EVENT_TRANSFORM, 60000, 0, PHASE_TWO);
                     events.ScheduleEvent(EVENT_POISON_VOLLEY, 15000, 0, PHASE_TWO);
@@ -153,13 +154,15 @@ struct boss_marli : public BossAI
                     events.ScheduleEvent(EVENT_ENLARGE, urand(10000, 20000), 0, PHASE_TWO);
                     events.SetPhase(PHASE_TWO);
                     break;
+                case EVENT_TALK_FIRST_SPIDERS:
+                    Talk(SAY_SPIDER_SPAWN);
+                    break;
                 case EVENT_POISON_VOLLEY:
                     DoCastVictim(SPELL_POISON_VOLLEY, true);
                     events.ScheduleEvent(EVENT_POISON_VOLLEY, urand(10000, 20000), 0, PHASE_TWO);
                     break;
-                    break;
                 case EVENT_HATCH_SPIDER_EGG:
-                    DoCastSelf(SPELL_HATCH_SPIDER_EGG);
+                    DoCastSelf(SPELL_HATCH_SPIDER_EGG, true);
                     events.ScheduleEvent(EVENT_HATCH_SPIDER_EGG, 20000, 0, PHASE_TWO);
                     break;
                 case EVENT_DRAIN_LIFE:
@@ -177,6 +180,7 @@ struct boss_marli : public BossAI
                 case EVENT_TRANSFORM:
                     Talk(SAY_TRANSFORM);
                     DoCastSelf(SPELL_SPIDER_FORM, true);
+                    
                     me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, true); // hack
                     events.ScheduleEvent(EVENT_ENVELOPING_WEB, 5000, 0, PHASE_THREE);
                     events.ScheduleEvent(EVENT_CHARGE_PLAYER, 6000, 0, PHASE_THREE);
@@ -187,12 +191,12 @@ struct boss_marli : public BossAI
                     break;
                 case EVENT_ENVELOPING_WEB:
                     DoCastAOE(SPELL_ENVELOPING_WEB);
-                    events.ScheduleEvent(EVENT_CHARGE_PLAYER, 1000, 0, PHASE_THREE);
+                    events.ScheduleEvent(EVENT_CHARGE_PLAYER, 500, 0, PHASE_THREE);
                     events.ScheduleEvent(EVENT_ENVELOPING_WEB, urand(15000, 20000), 0, PHASE_THREE);
                     break;
                 case EVENT_CHARGE_PLAYER:
                 {
-                    Unit* target = SelectTarget(SelectTargetMethod::Random, 1, [this](Unit* target) -> bool
+                    Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [this](Unit* target) -> bool
                         {
                             if (target->GetTypeId() != TYPEID_PLAYER || target->getPowerType() != Powers::POWER_MANA)
                                 return false;
@@ -208,7 +212,7 @@ struct boss_marli : public BossAI
                     break;
                 }
                 case EVENT_CORROSIVE_POISON:
-                    DoCastRandomTarget(SPELL_CORROSIVE_POISON);
+                    DoCastVictim(SPELL_CORROSIVE_POISON);
                     events.ScheduleEvent(EVENT_CORROSIVE_POISON, urand(25000, 35000), 0, PHASE_THREE);
                     break;
                 case EVENT_POISON_SHOCK:
@@ -321,10 +325,35 @@ class spell_enveloping_webs : public SpellScript
     }
 };
 
+// 24084 - Mar'li Transform
+class spell_marli_transform : public AuraScript
+{
+    PrepareAuraScript(spell_marli_transform);
+
+    void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetCaster() && GetCaster()->ToCreature())
+            GetCaster()->ToCreature()->LoadEquipment(0, true);
+    }
+
+    void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetCaster() && GetCaster()->ToCreature())
+            GetCaster()->ToCreature()->LoadEquipment(1, true);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_marli_transform::HandleApply, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_marli_transform::HandleRemove, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_boss_marli()
 {
     RegisterCreatureAI(boss_marli);
     RegisterCreatureAI(npc_spawn_of_marli);
     RegisterSpellScript(spell_hatch_eggs);
     RegisterSpellScript(spell_enveloping_webs);
+    RegisterSpellScript(spell_marli_transform);
 }
