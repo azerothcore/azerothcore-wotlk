@@ -214,29 +214,6 @@ enum EVENTS
     EVENT_EMERGENCY_BOT_ATTACK                      = 70,
 };
 
-enum SOUNDS
-{
-    SOUND_TANK_INTRO                                = 15611,
-    SOUND_TANK_ACTIVE                               = 15612,
-    SOUND_TANK_SLAY_1                               = 15613,
-    SOUND_TANK_SLAY_2                               = 15614,
-    SOUND_TANK_DEATH                                = 15615,
-    SOUND_TORSO_ACTIVE                              = 15616,
-    SOUND_TORSO_SLAY_1                              = 15617,
-    SOUND_TORSO_SLAY_2                              = 15618,
-    SOUND_TORSO_DEATH                               = 15619,
-    SOUND_HEAD_ACTIVE                               = 15620,
-    SOUND_HEAD_SLAY_1                               = 15621,
-    SOUND_HEAD_SLAY_2                               = 15622,
-    SOUND_HEAD_DEATH                                = 15623,
-    SOUND_VOLTRON_ACTIVE                            = 15624,
-    SOUND_VOLTRON_SLAY_1                            = 15625,
-    SOUND_VOLTRON_SLAY_2                            = 15626,
-    SOUND_VOLTRON_DEATH                             = 15627,
-    SOUND_BERSERK                                   = 15628,
-    SOUND_TANK_HARD_INTRO                           = 15629,
-};
-
 #define SPELL_NAPALM_SHELL                          RAID_MODE(SPELL_NAPALM_SHELL_10, SPELL_NAPALM_SHELL_25)
 #define SPELL_PLASMA_BLAST                          RAID_MODE(SPELL_PLASMA_BLAST_10, SPELL_PLASMA_BLAST_25)
 #define SPELL_MINE_EXPLOSION                        RAID_MODE(SPELL_MINE_EXPLOSION_10, SPELL_MINE_EXPLOSION_25)
@@ -245,41 +222,42 @@ enum SOUNDS
 #define SPELL_HAND_PULSE_L                          RAID_MODE(SPELL_HAND_PULSE_10_L, SPELL_HAND_PULSE_25_L)
 #define SPELL_FROST_BOMB_EXPLOSION                  RAID_MODE(SPELL_FROST_BOMB_EXPLOSION_10, SPELL_FROST_BOMB_EXPLOSION_25)
 
-#define TEXT_AGGRO                                  "Oh, my! I wasn't expecting company! The workshop is such a mess! How embarrassing!"
-#define TEXT_BERSERK                                "Oh, my! It would seem that we are out of time, my friends!"
-#define TEXT_HARDMODE                               "Now why would you go and do something like that? Didn't you see the sign that said 'DO NOT PUSH THIS BUTTON!'? How will we finish testing with the self-destruct mechanism active?"
-#define TEXT_LMK2_ACTIVATE                          "We haven't much time, friends! You're going to help me test out my latest and greatest creation. Now, before you change your minds, remember, that you kind of owe it to me after the mess you made with the XT-002."
-#define TEXT_LMK2_SLAIN_1                           "MEDIC!"
-#define TEXT_LMK2_SLAIN_2                           "I can fix that... or, maybe not! Sheesh, what a mess..."
-#define TEXT_LMK2_DEATH                             "WONDERFUL! Positively marvelous results! Hull integrity at 98.9 percent! Barely a dent! Moving right along."
-#define TEXT_VX001_ACTIVATE                         "Behold the VX-001 Anti-personnel Assault Cannon! You might want to take cover."
-#define TEXT_VX001_SLAIN_1                          "Fascinating. I think they call that a \"clean kill\"."
-#define TEXT_VX001_SLAIN_2                          "Note to self: Cannon highly effective against flesh."
-#define TEXT_VX001_DEATH                            "Thank you, friends! Your efforts have yielded some fantastic data! Now, where did I put-- oh, there it is!"
-#define TEXT_ACU_ACTIVATE                           "Isn't it beautiful? I call it the magnificent aerial command unit!"
-#define TEXT_ACU_SLAIN_1                            "Outplayed!"
-#define TEXT_ACU_SLAIN_2                            "You can do better than that!"
-#define TEXT_ACU_DEATH                              "Preliminary testing phase complete. Now comes the true test!!"
-#define TEXT_VOLTRON_ACTIVATE                       "Gaze upon its magnificence! Bask in its glorious, um, glory! I present you... V-07-TR-0N!"
-#define TEXT_VOLTRON_SLAIN_1                        "Prognosis: Negative!"
-#define TEXT_VOLTRON_SLAIN_2                        "You're not going to get up from that one, friend."
-#define TEXT_VOLTRON_DEATH                          "It would appear that I've made a slight miscalculation. I allowed my mind to be corrupted by the fiend in the prison, overriding my primary directive. All systems seem to be functional now. Clear."
-
-enum ComputerTalks
+enum Texts
 {
-    TALK_COMPUTER_INITIATED = 0,
-    TALK_COMPUTER_TERMINATED = 1,
-    TALK_COMPUTER_TEN = 2,
-    TALK_COMPUTER_NINE = 3,
-    TALK_COMPUTER_EIGHT = 4,
-    TALK_COMPUTER_SEVEN = 5,
-    TALK_COMPUTER_SIX = 6,
-    TALK_COMPUTER_FIVE = 7,
-    TALK_COMPUTER_FOUR = 8,
-    TALK_COMPUTER_THREE = 9,
-    TALK_COMPUTER_TWO = 10,
-    TALK_COMPUTER_ONE = 11,
-    TALK_COMPUTER_ZERO = 12,
+    // Mimiron
+    SAY_AGGRO                                       = 0, // Unused
+    SAY_HARDMODE_ON                                 = 1,
+    SAY_MKII_ACTIVATE                               = 2,
+    SAY_MKII_SLAY                                   = 3,
+    SAY_MKII_DEATH                                  = 4,
+    SAY_VX001_ACTIVATE                              = 5,
+    SAY_VX001_SLAY                                  = 6,
+    SAY_VX001_DEATH                                 = 7,
+    SAY_AERIAL_ACTIVATE                             = 8,
+    SAY_AERIAL_SLAY                                 = 9,
+    SAY_AERIAL_DEATH                                = 10,
+    SAY_V07TRON_ACTIVATE                            = 11,
+    SAY_V07TRON_SLAY                                = 12,
+    SAY_V07TRON_DEATH                               = 13,
+    SAY_BERSERK                                     = 14,
+
+    // MK II
+    EMOTE_PLASMA_BLAST                              = 0,
+
+    // Computer (Hardmode countdown)
+    TALK_COMPUTER_INITIATED                         = 0,
+    TALK_COMPUTER_TERMINATED                        = 1,
+    TALK_COMPUTER_TEN                               = 2,
+    TALK_COMPUTER_NINE                              = 3,
+    TALK_COMPUTER_EIGHT                             = 4,
+    TALK_COMPUTER_SEVEN                             = 5,
+    TALK_COMPUTER_SIX                               = 6,
+    TALK_COMPUTER_FIVE                              = 7,
+    TALK_COMPUTER_FOUR                              = 8,
+    TALK_COMPUTER_THREE                             = 9,
+    TALK_COMPUTER_TWO                               = 10,
+    TALK_COMPUTER_ONE                               = 11,
+    TALK_COMPUTER_ZERO                              = 12,
 };
 
 #define GetMimiron() ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_MIMIRON))
@@ -382,8 +360,7 @@ public:
 
             if (!hardmode)
             {
-                me->Yell(TEXT_LMK2_ACTIVATE, LANG_UNIVERSAL);
-                me->PlayDirectSound(SOUND_TANK_ACTIVE);
+                Talk(SAY_MKII_ACTIVATE);
                 events.ScheduleEvent(EVENT_SIT_LMK2, 6000);
                 events.ScheduleEvent(EVENT_BERSERK, 900000);
             }
@@ -448,8 +425,7 @@ public:
                         computer->AI()->Talk(minutesTalkNum++);
                     break;
                 case EVENT_MIMIRON_SAY_HARDMODE:
-                    me->Yell(TEXT_HARDMODE, LANG_UNIVERSAL);
-                    me->PlayDirectSound(SOUND_TANK_HARD_INTRO);
+                    Talk(SAY_HARDMODE_ON);
                     events.ScheduleEvent(EVENT_SPAWN_FLAMES_INITIAL, 0);
                     events.ScheduleEvent(EVENT_SIT_LMK2, 4000);
                     break;
@@ -485,8 +461,7 @@ public:
                     break;
                 case EVENT_BERSERK:
                     berserk = true;
-                    me->Yell(TEXT_BERSERK, LANG_UNIVERSAL);
-                    me->PlayDirectSound(SOUND_BERSERK);
+                    Talk(SAY_BERSERK);
                     if( hardmode )
                         me->SummonCreature(33576, 2744.78f, 2569.47f, 364.32f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 120000);
                     events.ScheduleEvent(EVENT_BERSERK_2, 0);
@@ -533,8 +508,7 @@ public:
                     if (Creature* LMK2 = GetLMK2())
                     {
                         me->EnterVehicle(LMK2, 1);
-                        me->Yell(TEXT_LMK2_DEATH, LANG_UNIVERSAL);
-                        me->PlayDirectSound(SOUND_TANK_DEATH);
+                        Talk(SAY_MKII_DEATH);
                         LMK2->SetFacingTo(3.58f);
                         events.ScheduleEvent(EVENT_ELEVATOR_INTERVAL_0, 6000);
                         break;
@@ -574,8 +548,7 @@ public:
                     EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_SITTING_ON_VX001:
-                    me->Yell(TEXT_VX001_ACTIVATE, LANG_UNIVERSAL);
-                    me->PlayDirectSound(SOUND_TORSO_ACTIVE);
+                    Talk(SAY_VX001_ACTIVATE);
                     events.ScheduleEvent(EVENT_ENTER_VX001, 5000);
                     break;
                 case EVENT_ENTER_VX001:
@@ -632,8 +605,7 @@ public:
                     break;
                 case EVENT_SAY_VX001_DEAD:
                     changeAllowedFlameSpreadTime = true;
-                    me->Yell(TEXT_VX001_DEATH, LANG_UNIVERSAL);
-                    me->PlayDirectSound(SOUND_TORSO_DEATH);
+                    Talk(SAY_VX001_DEATH);
                     events.ScheduleEvent(EVENT_ENTER_ACU, 7000);
                     break;
                 case EVENT_ENTER_ACU:
@@ -646,8 +618,7 @@ public:
                     EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_SAY_ACU_ACTIVATE:
-                    me->Yell(TEXT_ACU_ACTIVATE, LANG_UNIVERSAL);
-                    me->PlayDirectSound(SOUND_HEAD_ACTIVE);
+                    Talk(SAY_AERIAL_ACTIVATE);
                     events.ScheduleEvent(EVENT_ACU_START_ATTACK, 4000);
                     break;
                 case EVENT_ACU_START_ATTACK:
@@ -662,8 +633,7 @@ public:
                     EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_SAY_ACU_DEAD:
-                    me->Yell(TEXT_ACU_DEATH, LANG_UNIVERSAL);
-                    me->PlayDirectSound(SOUND_HEAD_DEATH);
+                    Talk(SAY_AERIAL_DEATH);
                     events.ScheduleEvent(EVENT_LEVIATHAN_COME_CLOSER, 5000);
                     break;
                 case EVENT_LEVIATHAN_COME_CLOSER:
@@ -721,8 +691,7 @@ public:
                         ACU->SetDisableGravity(false);
                         ACU->EnterVehicle(VX001, 3);
                         me->EnterVehicle(VX001, 1);
-                        me->Yell(TEXT_VOLTRON_ACTIVATE, LANG_UNIVERSAL);
-                        me->PlayDirectSound(SOUND_VOLTRON_ACTIVE);
+                        Talk(SAY_V07TRON_ACTIVATE);
                         events.ScheduleEvent(EVENT_START_PHASE4, 10000);
                     }
                     break;
@@ -815,8 +784,7 @@ public:
                     }
                     break;
                 case EVENT_SAY_VOLTRON_DEAD:
-                    me->Yell(TEXT_VOLTRON_DEATH, LANG_UNIVERSAL);
-                    me->PlayDirectSound(SOUND_VOLTRON_DEATH);
+                    Talk(SAY_V07TRON_DEATH);
                     // spawn chest
                     if (uint32 chestId = (hardmode ? RAID_MODE(GO_MIMIRON_CHEST_HARD, GO_MIMIRON_CHEST_HERO_HARD) : RAID_MODE(GO_MIMIRON_CHEST, GO_MIMIRON_CHEST_HERO)))
                     {
@@ -1168,7 +1136,7 @@ public:
                 case EVENT_SPELL_PLASMA_BLAST:
                     if (Unit* victim = me->GetVictim())
                     {
-                        me->TextEmote("Leviathan Mk II begins to cast Plasma Blast!", nullptr, true);
+                        Talk(EMOTE_PLASMA_BLAST);
                         cannon->CastSpell(victim, SPELL_PLASMA_BLAST, false);
                     }
                     events.RepeatEvent(22000);
@@ -1194,34 +1162,16 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if( who->GetTypeId() == TYPEID_PLAYER )
+            if (who->GetTypeId() == TYPEID_PLAYER)
                 if (Creature* c = GetMimiron())
                 {
-                    if( Phase == 1 )
+                    if (Phase == 1)
                     {
-                        if( rand() % 2 )
-                        {
-                            c->Yell(TEXT_LMK2_SLAIN_1, LANG_UNIVERSAL);
-                            c->PlayDirectSound(SOUND_TANK_SLAY_1);
-                        }
-                        else
-                        {
-                            c->Yell(TEXT_LMK2_SLAIN_2, LANG_UNIVERSAL);
-                            c->PlayDirectSound(SOUND_TANK_SLAY_2);
-                        }
+                        c->AI()->Talk(SAY_MKII_SLAY);
                     }
                     else
                     {
-                        if( rand() % 2 )
-                        {
-                            c->Yell(TEXT_VOLTRON_SLAIN_1, LANG_UNIVERSAL);
-                            c->PlayDirectSound(SOUND_VOLTRON_SLAY_1);
-                        }
-                        else
-                        {
-                            c->Yell(TEXT_VOLTRON_SLAIN_2, LANG_UNIVERSAL);
-                            c->PlayDirectSound(SOUND_VOLTRON_SLAY_2);
-                        }
+                        c->AI()->Talk(SAY_V07TRON_SLAY);
                     }
                 }
         }
@@ -1548,34 +1498,16 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if( who->GetTypeId() == TYPEID_PLAYER )
-                if( Creature* c = GetMimiron() )
+            if (who->GetTypeId() == TYPEID_PLAYER)
+                if (Creature* c = GetMimiron())
                 {
-                    if( Phase == 2 )
+                    if (Phase == 2)
                     {
-                        if( rand() % 2 )
-                        {
-                            c->Yell(TEXT_VX001_SLAIN_1, LANG_UNIVERSAL);
-                            c->PlayDirectSound(SOUND_TORSO_SLAY_1);
-                        }
-                        else
-                        {
-                            c->Yell(TEXT_VX001_SLAIN_2, LANG_UNIVERSAL);
-                            c->PlayDirectSound(SOUND_TORSO_SLAY_2);
-                        }
+                        c->AI()->Talk(SAY_VX001_SLAY);
                     }
                     else
                     {
-                        if( rand() % 2 )
-                        {
-                            c->Yell(TEXT_VOLTRON_SLAIN_1, LANG_UNIVERSAL);
-                            c->PlayDirectSound(SOUND_VOLTRON_SLAY_1);
-                        }
-                        else
-                        {
-                            c->Yell(TEXT_VOLTRON_SLAIN_2, LANG_UNIVERSAL);
-                            c->PlayDirectSound(SOUND_VOLTRON_SLAY_2);
-                        }
+                        c->AI()->Talk(SAY_V07TRON_SLAY);
                     }
                 }
         }
@@ -1871,34 +1803,16 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if( who->GetTypeId() == TYPEID_PLAYER )
-                if( Creature* c = GetMimiron() )
+            if (who->GetTypeId() == TYPEID_PLAYER)
+                if (Creature* c = GetMimiron())
                 {
-                    if( Phase == 3 )
+                    if (Phase == 3)
                     {
-                        if( rand() % 2 )
-                        {
-                            c->Yell(TEXT_ACU_SLAIN_1, LANG_UNIVERSAL);
-                            c->PlayDirectSound(SOUND_HEAD_SLAY_1);
-                        }
-                        else
-                        {
-                            c->Yell(TEXT_ACU_SLAIN_2, LANG_UNIVERSAL);
-                            c->PlayDirectSound(SOUND_HEAD_SLAY_2);
-                        }
+                        c->AI()->Talk(SAY_AERIAL_SLAY);
                     }
                     else
                     {
-                        if( rand() % 2 )
-                        {
-                            c->Yell(TEXT_VOLTRON_SLAIN_1, LANG_UNIVERSAL);
-                            c->PlayDirectSound(SOUND_VOLTRON_SLAY_1);
-                        }
-                        else
-                        {
-                            c->Yell(TEXT_VOLTRON_SLAIN_2, LANG_UNIVERSAL);
-                            c->PlayDirectSound(SOUND_VOLTRON_SLAY_2);
-                        }
+                        c->AI()->Talk(SAY_V07TRON_SLAY);
                     }
                 }
         }

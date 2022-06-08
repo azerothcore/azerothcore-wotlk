@@ -1041,6 +1041,25 @@ public:
 
     static std::unordered_map<int, goEventFlag> gameObjectToEventFlag; // Gameobject -> event flag
 
+    void SaveInstanceData(uint8 state);
+    void UpdateInstanceData(uint8 state);
+    bool FindStateSavedOnInstance();
+    bool ValidateGameobjectType();
+    uint8 GetStateSavedOnInstance();
+    bool IsInstanceGameobject();
+    uint8 GameobjectStateToInt(GOState* state);
+
+    /* A check to verify if this object is available to be saved on the DB when
+     * a state change occurs
+     */
+    bool IsAbleToSaveOnDb();
+
+    /* Enable or Disable the ability to save on the database this gameobject's state
+     * whenever it changes
+     */
+    void UpdateSaveToDb(bool enable);
+
+    void SavingStateOnDB();
 protected:
     bool AIM_Initialize();
     GameObjectModel* CreateModel();
@@ -1097,5 +1116,7 @@ private:
         return IsInRange(obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), dist2compare);
     }
     GameObjectAI* m_AI;
+
+    bool m_saveStateOnDb = false;
 };
 #endif

@@ -28,4 +28,23 @@ inline AI* GetGnomereganAI(T* obj)
     return GetInstanceAI<AI>(obj, GnomereganScriptName);
 }
 
+enum DataTypes
+{
+    TYPE_GRUBBIS    = 0,
+    MAX_ENCOUNTERS  = 1
+};
+
+enum GameObjects
+{
+    GO_CAVE_IN_1            = 146085,
+    GO_CAVE_IN_2            = 146086,
+    GO_WORKSHOP_DOOR        = 90858,
+    GO_FINAL_CHAMBER_DOOR   = 142207,
+};
+
+enum NPCs
+{
+    NPC_EMI_SHORTFUSE = 7998
+};
+
 #endif

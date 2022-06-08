@@ -29,7 +29,14 @@ EndScriptData */
 DoorData const doorData[] =
 {
     { GO_FORCEFIELD, DATA_ARLOKK, DOOR_TYPE_ROOM },
-    { 0,             0,           DOOR_TYPE_ROOM } // END
+    { 0,             0,           DOOR_TYPE_ROOM }
+};
+
+ObjectData const creatureData[] =
+{
+    { NPC_HIGH_PRIEST_THEKAL, DATA_THEKAL  },
+    { NPC_ZEALOT_LORKHAN,     DATA_LORKHAN },
+    { NPC_ZEALOT_ZATH,        DATA_ZATH    }
 };
 
 class instance_zulgurub : public InstanceMapScript
@@ -43,21 +50,15 @@ public:
         {
             SetBossNumber(EncounterCount);
             LoadDoorData(doorData);
+            LoadObjectData(creatureData, nullptr);
         }
 
         void OnCreatureCreate(Creature* creature) override
         {
+            InstanceScript::OnCreatureCreate(creature);
+
             switch (creature->GetEntry())
             {
-                case NPC_ZEALOT_LORKHAN:
-                    _zealotLorkhanGUID = creature->GetGUID();
-                    break;
-                case NPC_ZEALOT_ZATH:
-                    _zealotZathGUID = creature->GetGUID();
-                    break;
-                case NPC_HIGH_PRIEST_THEKAL:
-                    _highPriestTekalGUID = creature->GetGUID();
-                    break;
                 case NPC_JINDO_THE_HEXXER:
                     _jindoTheHexxerGUID = creature->GetGUID();
                     break;
@@ -75,11 +76,10 @@ public:
 
         void OnGameObjectCreate(GameObject* go) override
         {
+            InstanceScript::OnGameObjectCreate(go);
+
             switch (go->GetEntry())
             {
-                case GO_FORCEFIELD:
-                    AddDoor(go, true);
-                    break;
                 case GO_GONG_OF_BETHEKK:
                     _goGongOfBethekkGUID = go->GetGUID();
                     if (GetBossState(DATA_ARLOKK) == DONE)
@@ -92,28 +92,10 @@ public:
             }
         }
 
-        void OnGameObjectRemove(GameObject* go) override
-        {
-            switch (go->GetEntry())
-            {
-                case GO_FORCEFIELD:
-                    AddDoor(go, false);
-                    break;
-                default:
-                    break;
-            }
-        }
-
         ObjectGuid GetGuidData(uint32 uiData) const override
         {
             switch (uiData)
             {
-                case DATA_LORKHAN:
-                    return _zealotLorkhanGUID;
-                case DATA_ZATH:
-                    return _zealotZathGUID;
-                case DATA_THEKAL:
-                    return _highPriestTekalGUID;
                 case DATA_JINDO:
                     return _jindoTheHexxerGUID;
                 case NPC_ARLOKK:
@@ -170,12 +152,9 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
     private:
-        //If all High Priest bosses were killed. Lorkhan, Zath and Ohgan are added too.
-        //Storing Lorkhan, Zath and Thekal because we need to cast on them later. Jindo is needed for healfunction too.
+        // If all High Priest bosses were killed. Ohgan is added too.
+        // Jindo is needed for healfunction.
 
-        ObjectGuid _zealotLorkhanGUID;
-        ObjectGuid _zealotZathGUID;
-        ObjectGuid _highPriestTekalGUID;
         ObjectGuid _jindoTheHexxerGUID;
         ObjectGuid _vilebranchSpeakerGUID;
         ObjectGuid _arlokkGUID;

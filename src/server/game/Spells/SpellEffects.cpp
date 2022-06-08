@@ -2213,6 +2213,9 @@ void Spell::EffectSummonChangeItem(SpellEffIndex effIndex)
     if (!pNewItem)
         return;
 
+    // Client-side enchantment durations update
+    player->UpdateEnchantmentDurations();
+
     for (uint8 j = PERM_ENCHANTMENT_SLOT; j <= TEMP_ENCHANTMENT_SLOT; ++j)
         if (m_CastItem->GetEnchantmentId(EnchantmentSlot(j)))
             pNewItem->SetEnchantment(EnchantmentSlot(j), m_CastItem->GetEnchantmentId(EnchantmentSlot(j)), m_CastItem->GetEnchantmentDuration(EnchantmentSlot(j)), m_CastItem->GetEnchantmentCharges(EnchantmentSlot(j)));
@@ -2719,6 +2722,9 @@ void Spell::EffectAddFarsight(SpellEffIndex effIndex)
     if (!m_caster->IsInWorld())
         return;
 
+    // Remove old farsight if exist
+    bool updateViewerVisibility = m_caster->RemoveDynObject(m_spellInfo->Id);
+
     DynamicObject* dynObj = new DynamicObject(true);
     if (!dynObj->CreateDynamicObject(m_caster->GetMap()->GenerateLowGuid<HighGuid::DynamicObject>(), m_caster, m_spellInfo->Id, *destTarget, radius, DYNAMIC_OBJECT_FARSIGHT_FOCUS))
     {
@@ -2727,9 +2733,7 @@ void Spell::EffectAddFarsight(SpellEffIndex effIndex)
     }
 
     dynObj->SetDuration(duration);
-    dynObj->SetCasterViewpoint();
-
-    m_caster->ToPlayer()->UpdateVisibilityForPlayer();
+    dynObj->SetCasterViewpoint(updateViewerVisibility);
 }
 
 void Spell::EffectUntrainTalents(SpellEffIndex /*effIndex*/)
@@ -3290,17 +3294,17 @@ void Spell::EffectTaunt(SpellEffIndex /*effIndex*/)
         return;
     }
 
-    if (!unitTarget->getThreatMgr().getOnlineContainer().empty())
+    if (!unitTarget->GetThreatMgr().getOnlineContainer().empty())
     {
         // Also use this effect to set the taunter's threat to the taunted creature's highest value
-        float myThreat = unitTarget->getThreatMgr().getThreat(m_caster);
-        float topThreat = unitTarget->getThreatMgr().getOnlineContainer().getMostHated()->getThreat();
+        float myThreat = unitTarget->GetThreatMgr().getThreat(m_caster);
+        float topThreat = unitTarget->GetThreatMgr().getOnlineContainer().getMostHated()->getThreat();
         if (topThreat > myThreat)
-            unitTarget->getThreatMgr().doAddThreat(m_caster, topThreat - myThreat);
+            unitTarget->GetThreatMgr().doAddThreat(m_caster, topThreat - myThreat);
 
         //Set aggro victim to caster
-        if (HostileReference* forcedVictim = unitTarget->getThreatMgr().getOnlineContainer().getReferenceByTarget(m_caster))
-            unitTarget->getThreatMgr().setCurrentVictim(forcedVictim);
+        if (HostileReference* forcedVictim = unitTarget->GetThreatMgr().getOnlineContainer().getReferenceByTarget(m_caster))
+            unitTarget->GetThreatMgr().setCurrentVictim(forcedVictim);
     }
 
     if (unitTarget->ToCreature()->IsAIEnabled && !unitTarget->ToCreature()->HasReactState(REACT_PASSIVE))
@@ -3347,13 +3351,6 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                         {
                             AddPct(totalDamagePercentMod, unitTarget->GetDiseasesByCaster(m_caster->GetGUID(), 1) * 30.0f);
                             break;
-                        }
-                    // sweeping strikes
-                    case 26654:
-                        {
-                            this->damage = 0;
-                            m_damage = m_spellValue->EffectBasePoints[effIndex];
-                            return;
                         }
                 }
                 break;
@@ -5367,7 +5364,7 @@ void Spell::EffectModifyThreatPercent(SpellEffIndex /*effIndex*/)
     if (!unitTarget)
         return;
 
-    unitTarget->getThreatMgr().modifyThreatPercent(m_caster, damage);
+    unitTarget->GetThreatMgr().modifyThreatPercent(m_caster, damage);
 }
 
 void Spell::EffectTransmitted(SpellEffIndex effIndex)

@@ -49,13 +49,15 @@ public:
     {
         static ChatCommandTable deserterInstanceCommandTable =
         {
-            { "add",      HandleDeserterInstanceAdd,    SEC_ADMINISTRATOR,    Console::No },
-            { "remove",   HandleDeserterInstanceRemove, SEC_ADMINISTRATOR, Console::No }
+            { "add",        HandleDeserterInstanceAdd,       SEC_ADMINISTRATOR, Console::Yes },
+            { "remove all", HandleDeserterInstanceRemoveAll, SEC_ADMINISTRATOR, Console::Yes },
+            { "remove",     HandleDeserterInstanceRemove,    SEC_ADMINISTRATOR, Console::Yes }
         };
         static ChatCommandTable deserterBGCommandTable =
         {
-            { "add",      HandleDeserterBGAdd,    SEC_ADMINISTRATOR, Console::No },
-            { "remove",   HandleDeserterBGRemove, SEC_ADMINISTRATOR, Console::No }
+            { "add",        HandleDeserterBGAdd,       SEC_ADMINISTRATOR, Console::Yes },
+            { "remove all", HandleDeserterBGRemoveAll, SEC_ADMINISTRATOR, Console::Yes },
+            { "remove",     HandleDeserterBGRemove,    SEC_ADMINISTRATOR, Console::Yes }
         };
 
         static ChatCommandTable deserterCommandTable =
@@ -90,9 +92,13 @@ public:
     * .deserter bg add 3600 (one hour)
     * @endcode
     */
-    static bool HandleDeserterAdd(ChatHandler* handler, uint32 time, bool isInstance)
+    static bool HandleDeserterAdd(ChatHandler* handler, Optional<PlayerIdentifier> player, uint32 time, bool isInstance)
     {
-        Player* player = handler->getSelectedPlayer();
+        if (!player)
+        {
+            player = PlayerIdentifier::FromTargetOrSelf(handler);
+        }
+
         if (!player)
         {
             handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -107,15 +113,42 @@ public:
             return false;
         }
 
-        Aura* aura = player->AddAura(isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER, player);
+        Player* target = player->GetConnectedPlayer();
 
-        if (!aura)
+        if (target)
         {
-            handler->SendSysMessage(LANG_BAD_VALUE);
-            handler->SetSentErrorMessage(true);
-            return false;
+            Aura* aura = target->AddAura(isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER, target);
+
+            if (!aura)
+            {
+                handler->SendSysMessage(LANG_BAD_VALUE);
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
+            aura->SetDuration(time * IN_MILLISECONDS);
+
+            return true;
         }
-        aura->SetDuration(time * IN_MILLISECONDS);
+
+        uint8 index = 0;
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_AURA);
+        stmt->SetData(index++, player->GetGUID().GetCounter());
+        stmt->SetData(index++, player->GetGUID().GetCounter());
+        stmt->SetData(index++, 0);
+        stmt->SetData(index++, isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER);
+        stmt->SetData(index++, 1);
+        stmt->SetData(index++, 1);
+        stmt->SetData(index++, 1);
+        stmt->SetData(index++, 0);
+        stmt->SetData(index++, 0);
+        stmt->SetData(index++, 0);
+        stmt->SetData(index++, 0);
+        stmt->SetData(index++, 0);
+        stmt->SetData(index++, 0);
+        stmt->SetData(index++, isInstance ? 1800000 : 900000);
+        stmt->SetData(index++, time * 1000);
+        stmt->SetData(index, 0);
+        CharacterDatabase.Execute(stmt);
 
         return true;
     }
@@ -139,9 +172,13 @@ public:
     * .deserter bg remove
     * @endcode
     */
-    static bool HandleDeserterRemove(ChatHandler* handler, bool isInstance)
+    static bool HandleDeserterRemove(ChatHandler* handler, Optional<PlayerIdentifier> player, bool isInstance)
     {
-        Player* player = handler->getSelectedPlayer();
+        if (!player)
+        {
+            player = PlayerIdentifier::FromTargetOrSelf(handler);
+        }
+
         if (!player)
         {
             handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -149,33 +186,71 @@ public:
             return false;
         }
 
-        player->RemoveAura(isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER);
+        Player* target = player->GetConnectedPlayer();
+
+        if (target)
+        {
+            target->RemoveAura(isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER);
+            return true;
+        }
+
+        CharacterDatabase.Query("DELETE FROM character_aura WHERE guid = {} AND spell = {}", player->GetGUID().GetCounter(), isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER);
 
         return true;
     }
 
-    /// @sa HandleDeserterAdd()
-    static bool HandleDeserterInstanceAdd(ChatHandler* handler, uint32 time)
+    static bool HandleDeserterRemoveAll(ChatHandler* handler, bool isInstance)
     {
-        return HandleDeserterAdd(handler, time, true);
+        CharacterDatabase.Query("DELETE FROM character_aura WHERE spell = {} AND remainTime <= 1800000", isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER);
+
+        std::shared_lock<std::shared_mutex> lock(*HashMapHolder<Player>::GetLock());
+        HashMapHolder<Player>::MapType const& onlinePlayerList = ObjectAccessor::GetPlayers();
+        for (HashMapHolder<Player>::MapType::const_iterator itr = onlinePlayerList.begin(); itr != onlinePlayerList.end(); ++itr)
+        {
+            Player* player = itr->second;
+            Aura* aura = player->GetAura(isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER);
+            if (aura && aura->GetDuration() <= 1800000)
+            {
+                player->RemoveAura(isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER);
+            }
+        }
+
+        handler->PSendSysMessage("%s Deserter has been removed from all players", isInstance ? "Instance" : "Battleground");
+        return true;
     }
 
     /// @sa HandleDeserterAdd()
-    static bool HandleDeserterBGAdd(ChatHandler* handler, uint32 time)
+    static bool HandleDeserterInstanceAdd(ChatHandler* handler, Optional<PlayerIdentifier> player, uint32 time)
     {
-        return HandleDeserterAdd(handler, time, false);
+        return HandleDeserterAdd(handler, player, time, true);
+    }
+
+    /// @sa HandleDeserterAdd()
+    static bool HandleDeserterBGAdd(ChatHandler* handler, Optional<PlayerIdentifier> player, uint32 time)
+    {
+        return HandleDeserterAdd(handler, player, time, false);
     }
 
     /// @sa HandleDeserterRemove()
-    static bool HandleDeserterInstanceRemove(ChatHandler* handler)
+    static bool HandleDeserterInstanceRemove(ChatHandler* handler, Optional<PlayerIdentifier> player)
     {
-        return HandleDeserterRemove(handler, true);
+        return HandleDeserterRemove(handler, player, true);
     }
 
     /// @sa HandleDeserterRemove()
-    static bool HandleDeserterBGRemove(ChatHandler* handler)
+    static bool HandleDeserterBGRemove(ChatHandler* handler, Optional<PlayerIdentifier> player)
     {
-        return HandleDeserterRemove(handler, false);
+        return HandleDeserterRemove(handler, player, false);
+    }
+
+    static bool HandleDeserterInstanceRemoveAll(ChatHandler* handler)
+    {
+        return HandleDeserterRemoveAll(handler, true);
+    }
+
+    static bool HandleDeserterBGRemoveAll(ChatHandler* handler)
+    {
+        return HandleDeserterRemoveAll(handler, false);
     }
 };
 

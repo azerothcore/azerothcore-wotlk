@@ -1829,6 +1829,11 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 {
                     target->RemoveAurasDueToSpell(47017);
                 }
+                // Lightning Shield vs The Earthshatterer 8/9 set bonus
+                if (GetSpellInfo()->SpellFamilyFlags[0] & 0x00000400)
+                {
+                    target->RemoveAurasDueToSpell(28820);
+                }
                 break;
             }
             case SPELLFAMILY_DEATHKNIGHT:

@@ -216,7 +216,7 @@ public:
     template <class PREDICATE>
     Unit* SelectTarget(SelectTargetMethod targetType, uint32 position, PREDICATE const& predicate)
     {
-        ThreatContainer::StorageType const& threatlist = me->getThreatMgr().getThreatList();
+        ThreatContainer::StorageType const& threatlist = me->GetThreatMgr().getThreatList();
         if (position >= threatlist.size())
             return nullptr;
 
@@ -278,7 +278,7 @@ public:
     template <class PREDICATE>
     void SelectTargetList(std::list<Unit*>& targetList, PREDICATE const& predicate, uint32 maxTargets, SelectTargetMethod targetType)
     {
-        ThreatContainer::StorageType const& threatlist = me->getThreatMgr().getThreatList();
+        ThreatContainer::StorageType const& threatlist = me->GetThreatMgr().getThreatList();
         if (threatlist.empty())
             return;
 

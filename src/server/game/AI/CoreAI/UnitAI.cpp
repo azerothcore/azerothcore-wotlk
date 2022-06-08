@@ -110,7 +110,7 @@ SpellCastResult UnitAI::DoAddAuraToAllHostilePlayers(uint32 spellid)
 {
     if (me->IsInCombat())
     {
-        ThreatContainer::StorageType threatlist = me->getThreatMgr().getThreatList();
+        ThreatContainer::StorageType threatlist = me->GetThreatMgr().getThreatList();
         for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
         {
             if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
@@ -133,7 +133,7 @@ SpellCastResult UnitAI::DoCastToAllHostilePlayers(uint32 spellid, bool triggered
 {
     if (me->IsInCombat())
     {
-        ThreatContainer::StorageType threatlist = me->getThreatMgr().getThreatList();
+        ThreatContainer::StorageType threatlist = me->GetThreatMgr().getThreatList();
         for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
         {
             if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
