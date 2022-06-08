@@ -180,7 +180,6 @@ struct boss_marli : public BossAI
                 case EVENT_TRANSFORM:
                     Talk(SAY_TRANSFORM);
                     DoCastSelf(SPELL_SPIDER_FORM, true);
-                    
                     me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, true); // hack
                     events.ScheduleEvent(EVENT_ENVELOPING_WEB, 5000, 0, PHASE_THREE);
                     events.ScheduleEvent(EVENT_CHARGE_PLAYER, 6000, 0, PHASE_THREE);
