@@ -1,3 +1,4 @@
+-- DB update 2022_06_09_00 -> 2022_06_09_01
 --
 DELETE FROM `npc_text` WHERE `ID` IN (7637,100117,100118,100119);
 INSERT INTO `npc_text` (`ID`,`text0_0`,`BroadcastTextID0`,`Probability0`) VALUES
