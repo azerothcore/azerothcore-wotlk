@@ -115,7 +115,7 @@ foreach(TOOL_NAME ${TOOLS_BUILD_LIST})
   # Need fix errors in maps tools
   # target_link_libraries(${TOOL_PROJECT_NAME}
   #   PRIVATE
-  #     acore-core-interface)
+  #     acore-dependency-interface)
 
   if (${TOOL_PROJECT_NAME} MATCHES "dbimport")
     target_link_libraries(${TOOL_PROJECT_NAME}
@@ -127,6 +127,11 @@ foreach(TOOL_NAME ${TOOLS_BUILD_LIST})
     # Install config
     CopyToolConfig(${TOOL_PROJECT_NAME} ${TOOL_NAME})
   else()
+
+    target_link_libraries(${TOOL_PROJECT_NAME}
+    PRIVATE
+      acore-dependency-interface)
+
     target_link_libraries(${TOOL_PROJECT_NAME}
       PUBLIC
         common
