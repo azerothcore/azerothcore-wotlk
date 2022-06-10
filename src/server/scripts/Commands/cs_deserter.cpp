@@ -113,11 +113,11 @@ public:
         }
 
         Player* target = player->GetConnectedPlayer();
-        int32 duration = TimeStringToSecs(time.value());
+        int32 duration = TimeStringToSecs(*time);
 
         if (duration == 0)
         {
-            duration = atoi(time.value().c_str());
+            duration = Acore::StringTo<int32>(*time).value_or(0);
         }
 
         if (duration == 0)

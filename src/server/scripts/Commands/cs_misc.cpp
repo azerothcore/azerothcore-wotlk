@@ -2383,7 +2383,7 @@ public:
             return false;
         }
 
-        if (atoi(notSpeakTime.c_str()) < 0)
+        if (Acore::StringTo<uint32>(notSpeakTime).value_or(0) < 0)
         {
             handler->SendSysMessage(LANG_BAD_VALUE);
             handler->SetSentErrorMessage(true);
@@ -2427,7 +2427,7 @@ public:
         uint32 muteDuration = TimeStringToSecs(notSpeakTime);
         if (muteDuration <= 0)
         {
-            muteDuration = atoi(notSpeakTime.c_str());
+            muteDuration = Acore::StringTo<uint32>(notSpeakTime).value_or(0);
         }
 
         if (muteDuration <= 0)

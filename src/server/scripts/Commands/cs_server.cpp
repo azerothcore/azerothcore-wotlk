@@ -279,7 +279,7 @@ public:
             return false;
         }
 
-        if (atoi(time.c_str()) < 0)
+        if (Acore::StringTo<uint32>(time).value_or(0) < 0)
         {
             handler->SendSysMessage(LANG_BAD_VALUE);
             handler->SetSentErrorMessage(true);
@@ -302,7 +302,7 @@ public:
         uint32 delay = TimeStringToSecs(time);
         if (delay <= 0)
         {
-            delay = atoi(time.c_str());
+            delay = Acore::StringTo<uint32>(time).value_or(0);
         }
 
         if (delay <= 0)
@@ -334,7 +334,7 @@ public:
             return false;
         }
 
-        if (atoi(time.c_str()) < 0)
+        if (Acore::StringTo<uint32>(time).value_or(0) < 0)
         {
             handler->SendSysMessage(LANG_BAD_VALUE);
             handler->SetSentErrorMessage(true);
@@ -357,7 +357,7 @@ public:
         uint32 delay = TimeStringToSecs(time);
         if (delay <= 0)
         {
-            delay = atoi(time.c_str());
+            delay = Acore::StringTo<uint32>(time).value_or(0);
         }
 
         if (delay <= 0)
@@ -389,7 +389,7 @@ public:
             return false;
         }
 
-        if (atoi(time.c_str()) < 0)
+        if (Acore::StringTo<uint32>(time).value_or(0) < 0)
         {
             handler->SendSysMessage(LANG_BAD_VALUE);
             handler->SetSentErrorMessage(true);
@@ -412,7 +412,7 @@ public:
         uint32 delay = TimeStringToSecs(time);
         if (delay <= 0)
         {
-            delay = atoi(time.c_str());
+            delay = Acore::StringTo<uint32>(time).value_or(0);
         }
 
         if (delay <= 0)
@@ -444,7 +444,7 @@ public:
             return false;
         }
 
-        if (atoi(time.c_str()) < 0)
+        if (Acore::StringTo<uint32>(time).value_or(0) < 0)
         {
             handler->SendSysMessage(LANG_BAD_VALUE);
             handler->SetSentErrorMessage(true);
@@ -467,7 +467,7 @@ public:
         uint32 delay = TimeStringToSecs(time);
         if (delay <= 0)
         {
-            delay = atoi(time.c_str());
+            delay = Acore::StringTo<uint32>(time).value_or(0);
         }
 
         if (delay <= 0)
