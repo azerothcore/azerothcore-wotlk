@@ -2383,7 +2383,7 @@ public:
             return false;
         }
 
-        if (Acore::StringTo<uint32>(notSpeakTime).value_or(0) < 0)
+        if (Acore::StringTo<int32>(notSpeakTime).value_or(0) < 0)
         {
             handler->SendSysMessage(LANG_BAD_VALUE);
             handler->SetSentErrorMessage(true);
@@ -2424,10 +2424,10 @@ public:
         }
 
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
-        uint32 muteDuration = TimeStringToSecs(notSpeakTime);
+        int32 muteDuration = TimeStringToSecs(notSpeakTime);
         if (muteDuration <= 0)
         {
-            muteDuration = Acore::StringTo<uint32>(notSpeakTime).value_or(0);
+            muteDuration = Acore::StringTo<int32>(notSpeakTime).value_or(0);
         }
 
         if (muteDuration <= 0)
