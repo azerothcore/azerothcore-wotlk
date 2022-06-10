@@ -124,7 +124,7 @@ public:
             return false;
         }
 
-        if (atoi(timeStr.c_str()) < 0)
+        if (Acore::StringTo<uint32>(timeStr).value_or(0) < 0)
         {
             handler->SendSysMessage(LANG_BAD_VALUE);
             handler->SetSentErrorMessage(true);
@@ -134,7 +134,7 @@ public:
         uint32 time = TimeStringToSecs(timeStr);
         if (time <= 0)
         {
-            time = atoi(timeStr.c_str());
+            time = Acore::StringTo<uint32>(timeStr).value_or(0);
         }
 
         if (time <= 0)
