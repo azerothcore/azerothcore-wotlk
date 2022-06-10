@@ -79,7 +79,7 @@ public:
     * selected player, with the provided duration in seconds.
     *
     * @param handler The ChatHandler, passed by the system.
-    * @param player Player by name. Optional, defaults to selected or self.
+    * @param playerName Player by name. Optional, defaults to selected or self.
     * @param time The provided duration as TimeString. Optional, defaults to bg/instance default time.
     * @param isInstance provided by the relaying functions, so we don't have
     * to write that much code :)
@@ -93,18 +93,49 @@ public:
     * .deserter bg add 1h30m
     * @endcode
     */
-    static bool HandleDeserterAdd(ChatHandler* handler, Optional<PlayerIdentifier> player, Optional<std::string> time, bool isInstance)
+    static bool HandleDeserterAdd(ChatHandler* handler, Optional<std::string> playerName, Optional<std::string> time, bool isInstance)
     {
-        if (!player)
+        Player* target;
+        ObjectGuid guid;
+
+        if (playerName)
         {
-            player = PlayerIdentifier::FromTargetOrSelf(handler);
+            if (!normalizePlayerName(*playerName))
+            {
+                handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
+
+            guid = sCharacterCache->GetCharacterGuidByName(*playerName);
+            if (guid)
+            {
+                target = ObjectAccessor::FindPlayerByName(*playerName);
+            }
+            else
+            {
+                if (time)
+                {
+                    handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
+                    handler->SetSentErrorMessage(true);
+                    return false;
+                }
+
+                time = playerName;
+                playerName = "";
+            }
         }
 
-        if (!player)
+        if (!playerName || playerName->empty())
         {
-            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
-            handler->SetSentErrorMessage(true);
-            return false;
+            if (!handler->GetSession())
+            {
+                return false;
+            }
+
+            target = handler->getSelectedPlayerOrSelf();
+            playerName = target->GetName();
+            guid = target->GetGUID();
         }
 
         if (!time)
@@ -112,7 +143,6 @@ public:
             time = isInstance ? "30m" : "15m";
         }
 
-        Player* target = player->GetConnectedPlayer();
         int32 duration = TimeStringToSecs(*time);
 
         if (duration == 0)
@@ -144,8 +174,8 @@ public:
 
         uint8 index = 0;
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_AURA);
-        stmt->SetData(index++, player->GetGUID().GetCounter());
-        stmt->SetData(index++, player->GetGUID().GetCounter());
+        stmt->SetData(index++, guid.GetCounter());
+        stmt->SetData(index++, guid.GetCounter());
         stmt->SetData(index++, 0);
         stmt->SetData(index++, isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER);
         stmt->SetData(index++, 1);
@@ -232,15 +262,15 @@ public:
     }
 
     /// @sa HandleDeserterAdd()
-    static bool HandleDeserterInstanceAdd(ChatHandler* handler, Optional<PlayerIdentifier> player, Optional<std::string> time)
+    static bool HandleDeserterInstanceAdd(ChatHandler* handler, Optional<std::string> playerName, Optional<std::string> time)
     {
-        return HandleDeserterAdd(handler, player, time, true);
+        return HandleDeserterAdd(handler, playerName, time, true);
     }
 
     /// @sa HandleDeserterAdd()
-    static bool HandleDeserterBGAdd(ChatHandler* handler, Optional<PlayerIdentifier> player, Optional<std::string> time)
+    static bool HandleDeserterBGAdd(ChatHandler* handler, Optional<std::string> playerName, Optional<std::string> time)
     {
-        return HandleDeserterAdd(handler, player, time, false);
+        return HandleDeserterAdd(handler, playerName, time, false);
     }
 
     /// @sa HandleDeserterRemove()
