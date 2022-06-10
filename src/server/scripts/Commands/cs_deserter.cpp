@@ -203,20 +203,13 @@ public:
     {
         int32 remainTime = isInstance ? 1800 : 900;
 
-        if (maxTime.has_value() && !maxTime.value().empty())
+        if (maxTime)
         {
-            remainTime = TimeStringToSecs(maxTime.value());
+            remainTime = TimeStringToSecs(*maxTime);
             if (remainTime == 0)
             {
-                remainTime = atoi(maxTime.value().c_str());
+                remainTime = Acore::StringTo<int32>(*maxTime).value_or(0);
             }
-        }
-
-        if (remainTime == 0)
-        {
-            handler->SendSysMessage(LANG_BAD_VALUE);
-            handler->SetSentErrorMessage(true);
-            return false;
         }
 
         if (remainTime == 0)
