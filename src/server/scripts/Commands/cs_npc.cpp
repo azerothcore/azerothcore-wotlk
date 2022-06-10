@@ -994,7 +994,7 @@ public:
             return false;
         }
 
-        if (Acore::StringTo<uint32>(spawnTimeStr).value_or(0) < 0)
+        if (Acore::StringTo<int32>(spawnTimeStr).value_or(0) < 0)
         {
             handler->SendSysMessage(LANG_BAD_VALUE);
             handler->SetSentErrorMessage(true);
@@ -1005,10 +1005,10 @@ public:
         if (!creature)
             return false;
 
-        uint32 spawnTime = TimeStringToSecs(spawnTimeStr);
+        int32 spawnTime = TimeStringToSecs(spawnTimeStr);
         if (spawnTime <= 0)
         {
-            spawnTime = Acore::StringTo<uint32>(spawnTimeStr).value_or(0);
+            spawnTime = Acore::StringTo<int32>(spawnTimeStr).value_or(0);
         }
 
         if (spawnTime <= 0)

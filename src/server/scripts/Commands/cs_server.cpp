@@ -279,7 +279,7 @@ public:
             return false;
         }
 
-        if (Acore::StringTo<uint32>(time).value_or(0) < 0)
+        if (Acore::StringTo<int32>(time).value_or(0) < 0)
         {
             handler->SendSysMessage(LANG_BAD_VALUE);
             handler->SetSentErrorMessage(true);
@@ -299,10 +299,10 @@ public:
             }
         }
 
-        uint32 delay = TimeStringToSecs(time);
+        int32 delay = TimeStringToSecs(time);
         if (delay <= 0)
         {
-            delay = Acore::StringTo<uint32>(time).value_or(0);
+            delay = Acore::StringTo<int32>(time).value_or(0);
         }
 
         if (delay <= 0)
@@ -334,7 +334,7 @@ public:
             return false;
         }
 
-        if (Acore::StringTo<uint32>(time).value_or(0) < 0)
+        if (Acore::StringTo<int32>(time).value_or(0) < 0)
         {
             handler->SendSysMessage(LANG_BAD_VALUE);
             handler->SetSentErrorMessage(true);
@@ -354,10 +354,10 @@ public:
             }
         }
 
-        uint32 delay = TimeStringToSecs(time);
+        int32 delay = TimeStringToSecs(time);
         if (delay <= 0)
         {
-            delay = Acore::StringTo<uint32>(time).value_or(0);
+            delay = Acore::StringTo<int32>(time).value_or(0);
         }
 
         if (delay <= 0)
@@ -389,7 +389,7 @@ public:
             return false;
         }
 
-        if (Acore::StringTo<uint32>(time).value_or(0) < 0)
+        if (Acore::StringTo<int32>(time).value_or(0) < 0)
         {
             handler->SendSysMessage(LANG_BAD_VALUE);
             handler->SetSentErrorMessage(true);
@@ -409,10 +409,10 @@ public:
             }
         }
 
-        uint32 delay = TimeStringToSecs(time);
+        int32 delay = TimeStringToSecs(time);
         if (delay <= 0)
         {
-            delay = Acore::StringTo<uint32>(time).value_or(0);
+            delay = Acore::StringTo<int32>(time).value_or(0);
         }
 
         if (delay <= 0)
@@ -444,7 +444,7 @@ public:
             return false;
         }
 
-        if (Acore::StringTo<uint32>(time).value_or(0) < 0)
+        if (Acore::StringTo<int32>(time).value_or(0) < 0)
         {
             handler->SendSysMessage(LANG_BAD_VALUE);
             handler->SetSentErrorMessage(true);
@@ -464,10 +464,10 @@ public:
             }
         }
 
-        uint32 delay = TimeStringToSecs(time);
+        int32 delay = TimeStringToSecs(time);
         if (delay <= 0)
         {
-            delay = Acore::StringTo<uint32>(time).value_or(0);
+            delay = Acore::StringTo<int32>(time).value_or(0);
         }
 
         if (delay <= 0)

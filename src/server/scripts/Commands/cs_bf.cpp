@@ -124,17 +124,17 @@ public:
             return false;
         }
 
-        if (Acore::StringTo<uint32>(timeStr).value_or(0) < 0)
+        if (Acore::StringTo<int32>(timeStr).value_or(0) < 0)
         {
             handler->SendSysMessage(LANG_BAD_VALUE);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        uint32 time = TimeStringToSecs(timeStr);
+        int32 time = TimeStringToSecs(timeStr);
         if (time <= 0)
         {
-            time = Acore::StringTo<uint32>(timeStr).value_or(0);
+            time = Acore::StringTo<int32>(timeStr).value_or(0);
         }
 
         if (time <= 0)
