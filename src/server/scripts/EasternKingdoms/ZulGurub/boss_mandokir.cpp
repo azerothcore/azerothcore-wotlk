@@ -348,10 +348,7 @@ public:
                             }
                             if (meleeRangeTargets.size() >= 5)
                             {
-                                if (Unit* currentTarget = me->GetVictim())
-                                {
-                                    me->CastSpell(currentTarget, SPELL_MANDOKIR_CLEAVE, false);
-                                }
+                                DoCastVictim(SPELL_MANDOKIR_CLEAVE);
                             }
                             events.ScheduleEvent(EVENT_CLEAVE, urand(10000, 20000));
                             break;
