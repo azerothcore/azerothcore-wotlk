@@ -34,157 +34,155 @@
 enum LeviathanSpells
 {
     // Leviathan basic
-    SPELL_PURSUED                   = 62374,
-    SPELL_GATHERING_SPEED           = 62375,
-    SPELL_BATTERING_RAM             = 62376,
-    SPELL_FLAME_VENTS               = 62396,
-    SPELL_MISSILE_BARRAGE           = 62400,
-    SPELL_NAPALM_10                 = 63666,
-    SPELL_NAPALM_25                 = 65026,
-    SPELL_INVIS_AND_STEALTH_DETECT  = 18950,
-    SPELL_TRANSITUS_SHIELD_IMPACT   = 48387,
+    SPELL_PURSUED                       = 62374,
+    SPELL_GATHERING_SPEED               = 62375,
+    SPELL_BATTERING_RAM                 = 62376,
+    SPELL_FLAME_VENTS                   = 62396,
+    SPELL_MISSILE_BARRAGE               = 62400,
+    SPELL_NAPALM_10                     = 63666,
+    SPELL_NAPALM_25                     = 65026,
+    SPELL_INVIS_AND_STEALTH_DETECT      = 18950,
+    SPELL_TRANSITUS_SHIELD_IMPACT       = 48387,
 
     // Shutdown spells
-    SPELL_SYSTEMS_SHUTDOWN          = 62475,
-    SPELL_OVERLOAD_CIRCUIT          = 62399,
+    SPELL_SYSTEMS_SHUTDOWN              = 62475,
+    SPELL_OVERLOAD_CIRCUIT              = 62399,
 
     // hard mode
-    SPELL_TOWER_OF_STORMS           = 65076,
-    SPELL_TOWER_OF_FLAMES           = 65075,
-    SPELL_TOWER_OF_FROST            = 65077,
-    SPELL_TOWER_OF_LIFE             = 64482,
+    SPELL_TOWER_OF_STORMS               = 65076,
+    SPELL_TOWER_OF_FLAMES               = 65075,
+    SPELL_TOWER_OF_FROST                = 65077,
+    SPELL_TOWER_OF_LIFE                 = 64482,
 
-    SPELL_HODIRS_FURY               = 62533,
-    SPELL_FREYA_WARD                = 62906, // removed spawn effect
-    SPELL_MIMIRONS_INFERNO          = 62909,
-    SPELL_THORIMS_HAMMER            = 62911,
+    SPELL_HODIRS_FURY                   = 62533,
+    SPELL_FREYA_WARD                    = 62906, // removed spawn effect
+    SPELL_MIMIRONS_INFERNO              = 62909,
+    SPELL_THORIMS_HAMMER                = 62911,
 
-    SPELL_FREYA_DUMMY_BLUE          = 63294,
-    SPELL_FREYA_DUMMY_GREEN         = 63295,
-    SPELL_FREYA_DUMMY_YELLOW        = 63292,
+    SPELL_FREYA_DUMMY_BLUE              = 63294,
+    SPELL_FREYA_DUMMY_GREEN             = 63295,
+    SPELL_FREYA_DUMMY_YELLOW            = 63292,
 
     // Leviathan turret spell
-    SPELL_SEARING_FLAME             = 62402,
+    SPELL_SEARING_FLAME                 = 62402,
     // On turret Destory
-    SPELL_SMOKE_TRAIL               = 63575,
+    SPELL_SMOKE_TRAIL                   = 63575,
 
     // Pool of tar blaze
-    SPELL_BLAZE                     = 62292,
+    SPELL_BLAZE                         = 62292,
 
     // Pyrite
-    SPELL_LIQUID_PYRITE             = 62494,
-    SPELL_DUSTY_EXPLOSION           = 63360,
-    SPELL_DUST_CLOUD_IMPACT         = 54740,
+    SPELL_LIQUID_PYRITE                 = 62494,
+    SPELL_DUSTY_EXPLOSION               = 63360,
+    SPELL_DUST_CLOUD_IMPACT             = 54740,
 };
 
 enum GosNpcs
 {
-    NPC_FLAME_LEVIATHAN_TURRET      = 33139,
-    NPC_SEAT                        = 33114,
-    NPC_MECHANOLIFT                 = 33214,
-    NPC_LIQUID                      = 33189,
+    NPC_FLAME_LEVIATHAN_TURRET          = 33139,
+    NPC_SEAT                            = 33114,
+    NPC_MECHANOLIFT                     = 33214,
+    NPC_LIQUID                          = 33189,
 
     // Starting event
-    NPC_ULDUAR_COLOSSUS             = 33237,
-    NPC_BRANN_RADIO                 = 34054,
-    NPC_ULDUAR_GAUNTLET_GENERATOR   = 33571,
-    NPC_DEFENDER_GENERATED          = 33572,
+    NPC_ULDUAR_COLOSSUS                 = 33237,
+    NPC_BRANN_RADIO                     = 34054,
+    NPC_ULDUAR_GAUNTLET_GENERATOR       = 33571,
+    NPC_DEFENDER_GENERATED              = 33572,
 
     // Hard Mode
-    NPC_THORIM_HAMMER_TARGET        = 33364,
-    NPC_THORIM_HAMMER               = 33365,
-    NPC_FREYA_WARD_TARGET           = 33366,
-    NPC_FREYA_WARD                  = 33367,
-    NPC_MIMIRONS_INFERNO_TARGET     = 33369,
-    NPC_MIMIRONS_INFERNO            = 33370,
-    NPC_HODIRS_FURY_TARGET          = 33108,
-    NPC_HODIRS_FURY                 = 33212,
+    NPC_THORIM_HAMMER_TARGET            = 33364,
+    NPC_THORIM_HAMMER                   = 33365,
+    NPC_FREYA_WARD_TARGET               = 33366,
+    NPC_FREYA_WARD                      = 33367,
+    NPC_MIMIRONS_INFERNO_TARGET         = 33369,
+    NPC_MIMIRONS_INFERNO                = 33370,
+    NPC_HODIRS_FURY_TARGET              = 33108,
+    NPC_HODIRS_FURY                     = 33212,
 };
 
 enum Events
 {
-    EVENT_PURSUE = 1,
-    EVENT_MISSILE,
-    EVENT_VENT,
-    EVENT_SPEED,
-    EVENT_SUMMON,
-    EVENT_REINSTALL,
-    EVENT_HODIRS_FURY,
-    EVENT_FREYA,
-    EVENT_MIMIRONS_INFERNO,
-    EVENT_THORIMS_HAMMER,
-    EVENT_SOUND_BEGINNING,
-    EVENT_POSITION_CHECK,
+    EVENT_PURSUE                        = 1,
+    EVENT_MISSILE                       = 2,
+    EVENT_VENT                          = 3,
+    EVENT_SPEED                         = 4,
+    EVENT_SUMMON                        = 5,
+    EVENT_REINSTALL                     = 6,
+    EVENT_HODIRS_FURY                   = 7,
+    EVENT_FREYA                         = 8,
+    EVENT_MIMIRONS_INFERNO              = 9,
+    EVENT_THORIMS_HAMMER                = 10,
+    EVENT_SOUND_BEGINNING               = 11,
+    EVENT_POSITION_CHECK                = 12,
 };
 
 enum Texts
 {
-    FLAME_LEVIATHAN_SAY_AGGRO = 0,
-    FLAME_LEVIATHAN_SAY_SLAY,
-    FLAME_LEVIATHAN_SAY_DEATH,
-    FLAME_LEVIATHAN_SAY_PURSUE,
-    FLAME_LEVIATHAN_SAY_HARDMODE,
-    FLAME_LEVIATHAN_SAY_TOWER_NONE,
-    FLAME_LEVIATHAN_SAY_TOWER_FROST,
-    FLAME_LEVIATHAN_SAY_TOWER_FLAME,
-    FLAME_LEVIATHAN_SAY_TOWER_NATURE,
-    FLAME_LEVIATHAN_SAY_TOWER_STORM,
-    FLAME_LEVIATHAN_SAY_PLAYER_RIDING,
-    FLAME_LEVIATHAN_SAY_OVERLOAD,
-    FLAME_LEVIATHAN_EMOTE_PURSUE,
-    FLAME_LEVIATHAN_EMOTE_OVERLOAD,
-    FLAME_LEVIATHAN_EMOTE_REPAIR
-};
+    FLAME_LEVIATHAN_SAY_AGGRO           = 0,
+    FLAME_LEVIATHAN_SAY_SLAY            = 1,
+    FLAME_LEVIATHAN_SAY_DEATH           = 2,
+    FLAME_LEVIATHAN_SAY_PURSUE          = 3,
+    FLAME_LEVIATHAN_SAY_HARDMODE        = 4,
+    FLAME_LEVIATHAN_SAY_TOWER_NONE      = 5,
+    FLAME_LEVIATHAN_SAY_TOWER_FROST     = 6,
+    FLAME_LEVIATHAN_SAY_TOWER_FLAME     = 7,
+    FLAME_LEVIATHAN_SAY_TOWER_NATURE    = 8,
+    FLAME_LEVIATHAN_SAY_TOWER_STORM     = 9,
+    FLAME_LEVIATHAN_SAY_PLAYER_RIDING   = 10,
+    FLAME_LEVIATHAN_SAY_OVERLOAD        = 11,
+    FLAME_LEVIATHAN_EMOTE_PURSUE        = 12,
+    FLAME_LEVIATHAN_EMOTE_OVERLOAD      = 13,
+    FLAME_LEVIATHAN_EMOTE_REPAIR        = 14,
+    FLAME_LEVIATHAN_EMOTE_FROST         = 15,
+    FLAME_LEVIATHAN_EMOTE_FLAME         = 16,
+    FLAME_LEVIATHAN_EMOTE_NATURE        = 17,
+    FLAME_LEVIATHAN_EMOTE_STORM         = 18,
+    FLAME_LEVIATHAN_EMOTE_REACTIVATE    = 19,
 
-enum Sounds
-{
-    RSOUND_L0                       = 15807,
-    RSOUND_L1                       = 15804,
-    RSOUND_L2                       = 15805,
-    RSOUND_L3                       = 15806,
-    RSOUND_ENGAGE                   = 15794,
-    RSOUND_SILOS                    = 15795,
-    RSOUND_GENERATORS               = 15796,
-    RSOUND_HODIR                    = 15797,
-    RSOUND_FREYA                    = 15798,
-    RSOUND_MIMIRON                  = 15799,
-    RSOUND_THORIM                   = 15801,
-    RSOUND_STATION                  = 15803,
+    // NPC_BRANN_RADIO
+    BRANN_RADIO_SAY_FL_START_0          = 0,
+    BRANN_RADIO_SAY_FL_START_1          = 1,
+    BRANN_RADIO_SAY_FL_START_2          = 2,
+    BRANN_RADIO_SAY_GENERATORS          = 3,
+    BRANN_RADIO_SAY_STATIONS            = 4,
+    BRANN_RADIO_SAY_TOWER_THORIM        = 5,
+    BRANN_RADIO_SAY_TOWER_HODIR         = 6,
+    BRANN_RADIO_SAY_TOWER_FREYA         = 7,
+    BRANN_RADIO_SAY_TOWER_MIMIRON       = 8,
+
+    // Vehicle Repair - Said by a spell, BroadcastTextID, same as FLAME_LEVIATHAN_EMOTE_REPAIR
+    VEHICLE_EMOTE_REPAIR                = 33538,
 };
 
 enum Seats
 {
-    SEAT_PLAYER                     = 0,
-    SEAT_TURRET                     = 1,
-    SEAT_DEVICE                     = 2,
-    SEAT_CANNON                     = 7,
+    SEAT_PLAYER                         = 0,
+    SEAT_TURRET                         = 1,
+    SEAT_DEVICE                         = 2,
+    SEAT_CANNON                         = 7,
 };
 
 enum Misc
 {
-    DATA_EVENT_STARTED              = 1,
-    DATA_GET_TOWER_COUNT            = 2,
-    DATA_GET_SHUTDOWN               = 3,
+    DATA_EVENT_STARTED                  = 1,
+    DATA_GET_TOWER_COUNT                = 2,
+    DATA_GET_SHUTDOWN                   = 3,
 
-    TOWER_OF_STORMS                 = 2,
-    TOWER_OF_FLAMES                 = 1,
-    TOWER_OF_FROST                  = 3,
-    TOWER_OF_LIFE                   = 0,
+    TOWER_OF_STORMS                     = 2,
+    TOWER_OF_FLAMES                     = 1,
+    TOWER_OF_FROST                      = 3,
+    TOWER_OF_LIFE                       = 0,
 
-    ACTION_START_NORGANNON_EVENT    = 1,
-    ACTION_START_NORGANNON_BRANN    = 2,
-    ACTION_START_BRANN_EVENT        = 3,
-    ACTION_DESPAWN_ADDS             = 4,
-    ACTION_DELAY_CANNON             = 5,
-    ACTION_DESTROYED_TURRET         = 6,
+    ACTION_START_NORGANNON_EVENT        = 1,
+    ACTION_START_NORGANNON_BRANN        = 2,
+    ACTION_START_BRANN_EVENT            = 3,
+    ACTION_DESPAWN_ADDS                 = 4,
+    ACTION_DELAY_CANNON                 = 5,
+    ACTION_DESTROYED_TURRET             = 6,
 };
-const Position homePos = {322.39f, -14.5f, 409.8f, 3.14f};
 
-///////////////////////////////////////////
-//
-// BOSS CODE
-//
-///////////////////////////////////////////
+const Position homePos = {322.39f, -14.5f, 409.8f, 3.14f};
 
 class boss_flame_leviathan : public CreatureScript
 {
@@ -217,7 +215,7 @@ public:
 
         // Custom
         void BindPlayers();
-        void RadioSay(const char* text, uint32 soundId);
+        void RadioSay(uint8 textid);
         void ActivateTowers();
         void TurnGates(bool _start, bool _death);
         void TurnHealStations(bool _apply);
@@ -357,18 +355,18 @@ public:
                 _speakTimer += diff;
                 if (_speakTimer <= 10000)
                 {
-                    RadioSay("You've done it! You've broken the defenses of Ulduar. In a few moments, we will be dropping in to...", RSOUND_L1);
                     _speakTimer = 10000;
+                    RadioSay(BRANN_RADIO_SAY_FL_START_0);
                 }
                 else if (_speakTimer > 16000 && _speakTimer < 20000)
                 {
                     _speakTimer = 20000;
-                    RadioSay("What is that? Be careful! Something's headed your way!", RSOUND_L2);
+                    RadioSay(BRANN_RADIO_SAY_FL_START_1);
                 }
                 else if (_speakTimer > 24000 && _speakTimer < 40000)
                 {
                     _speakTimer = 40000;
-                    RadioSay("Quicly! Evasive action! Evasive act--", RSOUND_L3);
+                    RadioSay(BRANN_RADIO_SAY_FL_START_2);
                 }
                 else if (_speakTimer > 41000 && _speakTimer < 60000)
                 {
@@ -443,27 +441,27 @@ public:
                         if (Unit* seat = vehicle->GetPassenger(i))
                             if (seat->GetTypeId() == TYPEID_UNIT)
                                 seat->ToCreature()->AI()->EnterEvadeMode();
-                    me->TextEmote("Flame Leviathan reactivated. Resumming combat functions.", nullptr, true);
+                    Talk(FLAME_LEVIATHAN_EMOTE_REACTIVATE);
                     return;
                 case EVENT_THORIMS_HAMMER:
                     SummonTowerHelpers(TOWER_OF_STORMS);
                     events.RepeatEvent(60000 + rand() % 60000);
-                    me->TextEmote("Flame Leviathan activates Thorim's Hammer.", nullptr, true);
+                    Talk(FLAME_LEVIATHAN_EMOTE_STORM);
                     Talk(FLAME_LEVIATHAN_SAY_TOWER_STORM);
                     return;
                 case EVENT_FREYA:
                     SummonTowerHelpers(TOWER_OF_LIFE);
-                    me->TextEmote("Flame Leviathan activates Freya's Ward.", nullptr, true);
+                    Talk(FLAME_LEVIATHAN_EMOTE_NATURE);
                     Talk(FLAME_LEVIATHAN_SAY_TOWER_NATURE);
                     return;
                 case EVENT_MIMIRONS_INFERNO:
                     SummonTowerHelpers(TOWER_OF_FLAMES);
-                    me->TextEmote("Flame Leviathan activates Mimiron's Inferno.", nullptr, true);
+                    Talk(FLAME_LEVIATHAN_EMOTE_FLAME);
                     Talk(FLAME_LEVIATHAN_SAY_TOWER_FLAME);
                     return;
                 case EVENT_HODIRS_FURY:
                     SummonTowerHelpers(TOWER_OF_FROST);
-                    me->TextEmote("Flame Leviathan activates Hodir's Fury.", nullptr, true);
+                    Talk(FLAME_LEVIATHAN_EMOTE_FROST);
                     Talk(FLAME_LEVIATHAN_SAY_TOWER_FROST);
                     return;
             }
@@ -499,14 +497,11 @@ void boss_flame_leviathan::boss_flame_leviathanAI::BindPlayers()
     me->GetMap()->ToInstanceMap()->PermBindAllPlayers();
 }
 
-void boss_flame_leviathan::boss_flame_leviathanAI::RadioSay(const char* text, uint32 soundId)
+void boss_flame_leviathan::boss_flame_leviathanAI::RadioSay(uint8 textid)
 {
     if (Creature* r = me->SummonCreature(NPC_BRANN_RADIO, me->GetPositionX() - 150, me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 5000))
     {
-        WorldPacket data;
-        ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, r, nullptr, text);
-        r->SendMessageToSetInRange(&data, 200, true);
-        r->PlayDirectSound(soundId);
+        r->AI()->Talk(textid);
     }
 }
 
@@ -1223,13 +1218,6 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
-        void Say(const char* text)
-        {
-            WorldPacket data;
-            ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, me, nullptr, text);
-            me->SendMessageToSetInRange(&data, 100.0f, true);
-        }
-
         void MoveInLineOfSight(Unit* who) override
         {
             if (!_lock)
@@ -1242,8 +1230,7 @@ public:
                 {
                     if (me->GetDistance2d(who) <= 60.0f && who->GetPositionZ() > 430.0f)
                     {
-                        Say("This generator powers Mimiron's Gaze. In moments, it can turn earth to ash, stone to magma--we cannot let it reach full power!");
-                        me->PlayDirectSound(RSOUND_MIMIRON);
+                        Talk(BRANN_RADIO_SAY_TOWER_MIMIRON);
                         _lock = true;
                     }
                 }
@@ -1252,8 +1239,7 @@ public:
                 {
                     if (me->GetDistance2d(who) <= 60.0f && who->GetPositionZ() < 380.0f)
                     {
-                        Say("You're approaching the tower of Freya. It contains the power to turn barren wastelands into jungles teeming with life overnight");
-                        me->PlayDirectSound(RSOUND_FREYA);
+                        Talk(BRANN_RADIO_SAY_TOWER_FREYA);
                         _lock = true;
                     }
                 }
@@ -1262,8 +1248,7 @@ public:
                 {
                     if (me->GetDistance2d(who) <= 40.0f)
                     {
-                        Say("It appears you are near a repair station. Drive your vehicle on to the platform and it should be automatically repaired.");
-                        me->PlayDirectSound(RSOUND_STATION);
+                        Talk(BRANN_RADIO_SAY_STATIONS);
                         _lock = true;
                     }
                 }
@@ -1272,8 +1257,7 @@ public:
                 {
                     if (me->GetDistance2d(who) <= 40.0f)
                     {
-                        Say("This tower powers the hammer of Hodir. It is said to have the power to turn entire armies to ice!");
-                        me->PlayDirectSound(RSOUND_HODIR);
+                        Talk(BRANN_RADIO_SAY_TOWER_HODIR);
                         _lock = true;
                     }
                 }
@@ -1282,8 +1266,7 @@ public:
                 {
                     if (me->GetDistance2d(who) <= 60.0f)
                     {
-                        Say("Aaaah, the tower of Krolmir. It is said that the power of Thorim has been used only once. And that it turned an entire continent to dust...");
-                        me->PlayDirectSound(RSOUND_THORIM);
+                        Talk(BRANN_RADIO_SAY_TOWER_THORIM);
                         _lock = true;
                     }
                 }
@@ -1292,8 +1275,7 @@ public:
                 {
                     if (who->GetPositionX() >= -480.0f)
                     {
-                        Say("There are four generators powering the defense structures. If you sabotage the generators, the missile attacks will stop!");
-                        me->PlayDirectSound(RSOUND_GENERATORS);
+                        Talk(BRANN_RADIO_SAY_GENERATORS);
                         _lock = true;
                     }
                 }
@@ -1533,7 +1515,7 @@ public:
             if (!driver)
                 return;
 
-            driver->TextEmote("Automatic repair sequence initiated.", driver, true);
+            //driver->TextEmote(VEHICLE_EMOTE_REPAIR, driver, true); // No source
 
             // Actually should/could use basepoints (100) for this spell effect as percentage of health, but oh well.
             vehicle->GetBase()->SetFullHealth();

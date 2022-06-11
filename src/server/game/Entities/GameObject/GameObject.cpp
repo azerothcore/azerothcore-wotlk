@@ -701,8 +701,8 @@ void GameObject::Update(uint32 diff)
                         // search unfriendly creature
                         if (owner && goInfo->trap.autoCloseTime != -1) // hunter trap
                         {
-                            Acore::AnyUnfriendlyNoTotemUnitInObjectRangeCheck checker(this, owner, radius);
-                            Acore::UnitSearcher<Acore::AnyUnfriendlyNoTotemUnitInObjectRangeCheck> searcher(this, target, checker);
+                            Acore::NearestAttackableNoTotemUnitInObjectRangeCheck checker(this, owner, radius);
+                            Acore::UnitSearcher<Acore::NearestAttackableNoTotemUnitInObjectRangeCheck> searcher(this, target, checker);
                             Cell::VisitAllObjects(this, searcher, radius);
                         }
                         else                                        // environmental trap
