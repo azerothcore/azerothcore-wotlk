@@ -83,11 +83,6 @@ public:
             events.ScheduleEvent(EVENT_ILLUSIONS, 16s, 24s);
         }
 
-        bool CanAIAttack(Unit const* target) const override
-        {
-            return !target->HasAura(SPELL_SLEEP);
-        }
-
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
