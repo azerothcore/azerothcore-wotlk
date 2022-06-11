@@ -56,7 +56,10 @@ public:
         void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
+
+            summon->SetCorpseDelay(10);
             summon->SetReactState(REACT_PASSIVE);
+            summon->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE);
             summon->SetVisible(false);
             summon->m_Events.AddEventAtOffset([summon]()
             {
@@ -65,6 +68,7 @@ public:
 
             summon->m_Events.AddEventAtOffset([summon]()
             {
+                summon->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
                 summon->SetReactState(REACT_AGGRESSIVE);
                 summon->SetInCombatWithZone();
             }, 3500ms);
