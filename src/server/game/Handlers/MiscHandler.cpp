@@ -732,7 +732,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
     }
 
     bool isTavernAreatrigger = sObjectMgr->IsTavernAreaTrigger(triggerId);
-    if (!player->IsInAreaTriggerRadius(atEntry, isTavernAreatrigger ? 5.f, 0.f))
+    if (!player->IsInAreaTriggerRadius(atEntry, isTavernAreatrigger ? 5.f : 0.f))
     {
         LOG_DEBUG("network", "HandleAreaTriggerOpcode: Player {} ({}) too far (trigger map: {} player map: {}), ignore Area Trigger ID: {}",
                        player->GetName(), player->GetGUID().ToString(), atEntry->map, player->GetMapId(), triggerId);
