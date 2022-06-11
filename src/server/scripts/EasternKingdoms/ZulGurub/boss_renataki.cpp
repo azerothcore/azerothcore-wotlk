@@ -169,7 +169,7 @@ public:
                                 {
                                     if (!target->IsWithinMeleeRange(me))
                                     {
-                                        _thousandBladesTargets.insert(target->GetGUID());
+                                        _thousandBladesTargets.insert(target);
                                     }
                                 }
 
@@ -180,7 +180,7 @@ public:
                                     {
                                         if (target->IsWithinMeleeRange(me))
                                         {
-                                            _thousandBladesTargets.insert(target->GetGUID());
+                                            _thousandBladesTargets.insert(target);
                                         }
                                     }
                                 }
@@ -194,10 +194,10 @@ public:
 
                         if (!_thousandBladesTargets.empty())
                         {
-                            GuidSet::iterator itr = _thousandBladesTargets.begin();
+                            std::set<Unit*>::iterator itr = _thousandBladesTargets.begin();
                             std::advance(itr, urand(0, _thousandBladesTargets.size() - 1));
 
-                            if (Unit* target = ObjectAccessor::GetUnit(*me, *itr))
+                            if (Unit* target = *itr)
                             {
                                 DoCast(target, SPELL_THOUSAND_BLADES, false);
                             }
@@ -226,7 +226,7 @@ public:
         bool _enraged;
         uint32 _dynamicFlags;
         uint8 _thousandBladesCount;
-        GuidSet _thousandBladesTargets;
+        std::set<Unit*> _thousandBladesTargets;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
