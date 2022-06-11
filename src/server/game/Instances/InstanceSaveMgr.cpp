@@ -132,6 +132,7 @@ bool InstanceSaveMgr::DeleteInstanceSaveIfNeeded(InstanceSave* save, bool skipMa
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INSTANCE_BY_INSTANCE);
         stmt->SetData(0, save->GetInstanceId());
         CharacterDatabase.Execute(stmt);
+        DeleteInstanceSavedData(save->GetInstanceId());
 
         // clear respawn times (if map is loaded do it just to be sure, if already unloaded it won't do it by itself)
         Map::DeleteRespawnTimesInDB(save->GetMapId(), save->GetInstanceId());
@@ -238,6 +239,22 @@ bool InstanceSave::RemovePlayer(ObjectGuid guid, InstanceSaveMgr* ism)
     return deleteSave;
 }
 
+void InstanceSaveMgr::SanitizeInstanceSavedData()
+{
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SANITIZE_INSTANCE_SAVED_DATA);
+    CharacterDatabase.Execute(stmt);
+}
+
+void InstanceSaveMgr::DeleteInstanceSavedData(uint32 instanceId)
+{
+    if (instanceId)
+    {
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DELETE_INSTANCE_SAVED_DATA);
+        stmt->SetData(0, instanceId);
+        CharacterDatabase.Execute(stmt);
+    }
+}
+
 void InstanceSaveMgr::LoadInstances()
 {
     uint32 oldMSTime = getMSTime();
@@ -269,6 +286,9 @@ void InstanceSaveMgr::LoadInstances()
     // pussywizard
     LoadInstanceSaves();
     LoadCharacterBinds();
+
+    // Sanitize pending rows on Instance_saved_data for data that wasn't deleted properly
+    SanitizeInstanceSavedData();
 
     LOG_INFO("server.loading", ">> Loaded instances and binds in {} ms", GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
@@ -503,6 +523,7 @@ void InstanceSaveMgr::_ResetSave(InstanceSaveHashMap::iterator& itr)
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INSTANCE_BY_INSTANCE);
         stmt->SetData(0, itr->second->GetInstanceId());
         CharacterDatabase.Execute(stmt);
+        DeleteInstanceSavedData(itr->second->GetInstanceId());
 
         // clear respawn times if the map is already unloaded and won't do it by itself
         if (!sMapMgr->FindMap(itr->second->GetMapId(), itr->second->GetInstanceId()))

@@ -1200,13 +1200,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER_AREA_PARTY);
     });
 
-    // Shadow Weaving
-    ApplySpellFix({ 15257, 15331, 15332 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
-        spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_PROC_TRIGGER_SPELL;
-    });
-
     // Hymn of Hope
     ApplySpellFix({ 64904 }, [](SpellInfo* spellInfo)
     {

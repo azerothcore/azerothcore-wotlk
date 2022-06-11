@@ -292,7 +292,7 @@ public:
 
     static bool HandleBanInfoHelper(uint32 accountId, char const* accountName, ChatHandler* handler)
     {
-        QueryResult result = LoginDatabase.Query("SELECT FROM_UNIXTIME(bandate, '%Y-%m-%d..%H:%I:%s') as bandate, unbandate-bandate, active, unbandate, banreason, bannedby FROM account_banned WHERE id = '{}' ORDER BY bandate ASC", accountId);
+        QueryResult result = LoginDatabase.Query("SELECT FROM_UNIXTIME(bandate, '%Y-%m-%d..%H:%i:%s') as bandate, unbandate-bandate, active, unbandate, banreason, bannedby FROM account_banned WHERE id = '{}' ORDER BY bandate ASC", accountId);
         if (!result)
         {
             handler->PSendSysMessage(LANG_BANINFO_NOACCOUNTBAN, accountName);
@@ -380,7 +380,14 @@ public:
         std::string IP = ipStr;
 
         LoginDatabase.EscapeString(IP);
-        QueryResult result = LoginDatabase.Query("SELECT ip, FROM_UNIXTIME(bandate), FROM_UNIXTIME(unbandate), unbandate-UNIX_TIMESTAMP(), banreason, bannedby, unbandate-bandate FROM ip_banned WHERE ip = '{}'", IP);
+        QueryResult result = LoginDatabase.Query("\
+            SELECT \
+                ip, FROM_UNIXTIME(bandate, '%Y-%m-%d %H:%i:%s'), FROM_UNIXTIME(unbandate, '%Y-%m-%d %H:%i:%s'), \
+                IF (unbandate > UNIX_TIMESTAMP(), unbandate - UNIX_TIMESTAMP(), 0) AS timeRemaining, \
+                banreason, bannedby, unbandate - bandate = 0 AS permanent \
+            FROM ip_banned \
+            WHERE ip = '{}' \
+        ", IP);
         if (!result)
         {
             handler->PSendSysMessage(LANG_BANINFO_NOIP);
@@ -388,7 +395,7 @@ public:
         }
 
         Field* fields = result->Fetch();
-        bool permanent = !fields[6].Get<uint64>();
+        bool permanent = fields[6].Get<uint64>() == 1;
         handler->PSendSysMessage(LANG_BANINFO_IPENTRY,
             fields[0].Get<std::string>().c_str(), fields[1].Get<std::string>().c_str(), permanent ? handler->GetAcoreString(LANG_BANINFO_NEVER) : fields[2].Get<std::string>().c_str(),
             permanent ? handler->GetAcoreString(LANG_BANINFO_INFINITE) : secsToTimeString(fields[3].Get<uint64>(), true).c_str(), fields[4].Get<std::string>().c_str(), fields[5].Get<std::string>().c_str());

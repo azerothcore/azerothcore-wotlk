@@ -12404,7 +12404,7 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo)
         {
             SpellInfo const* immuneSpellInfo = sSpellMgr->GetSpellInfo(itr->spellId);
             if (((itr->type & spellInfo->GetSchoolMask()) == spellInfo->GetSchoolMask())
-                    && !(immuneSpellInfo && immuneSpellInfo->IsPositive()) && !spellInfo->IsPositive()
+                    && (!immuneSpellInfo || immuneSpellInfo->IsPositive()) && !spellInfo->IsPositive()
                     && !spellInfo->CanPierceImmuneAura(immuneSpellInfo))
                 return true;
         }
@@ -17930,7 +17930,9 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
 
     if (GetTypeId() == TYPEID_UNIT)
     {
+        GetMotionMaster()->Clear(false);
         GetMotionMaster()->MoveIdle();
+        StopMoving();
 
         if (charmer->GetTypeId() == TYPEID_PLAYER &&
             charmer->getClass() == CLASS_WARLOCK)
@@ -20665,6 +20667,61 @@ bool Unit::CanRestoreMana(SpellInfo const* spellInfo) const
             return HasSpell(53583);
         default:
             break;
+    }
+
+    return false;
+}
+
+bool Unit::IsInDisallowedMountForm() const
+{
+    if (SpellInfo const* transformSpellInfo = sSpellMgr->GetSpellInfo(getTransForm()))
+    {
+        if (transformSpellInfo->HasAttribute(SPELL_ATTR0_ALLOW_WHILE_MOUNTED))
+        {
+            return false;
+        }
+    }
+
+    if (ShapeshiftForm form = GetShapeshiftForm())
+    {
+        SpellShapeshiftEntry const* shapeshift = sSpellShapeshiftStore.LookupEntry(form);
+        if (!shapeshift)
+        {
+            return true;
+        }
+
+        if (!(shapeshift->flags1 & 0x1))
+        {
+            return true;
+        }
+    }
+
+    if (GetDisplayId() == GetNativeDisplayId())
+    {
+        return false;
+    }
+
+    CreatureDisplayInfoEntry const* display = sCreatureDisplayInfoStore.LookupEntry(GetDisplayId());
+    if (!display)
+    {
+        return true;
+    }
+
+    CreatureDisplayInfoExtraEntry const* displayExtra = sCreatureDisplayInfoExtraStore.LookupEntry(display->ExtendedDisplayInfoID);
+    if (!displayExtra)
+    {
+        return true;
+    }
+
+    CreatureModelDataEntry const* model = sCreatureModelDataStore.LookupEntry(display->ModelId);
+    ChrRacesEntry const* race = sChrRacesStore.LookupEntry(displayExtra->DisplayRaceID);
+
+    if (model && !(model->HasFlag(CREATURE_MODEL_DATA_FLAGS_CAN_MOUNT)))
+    {
+        if (race && !(race->HasFlag(CHRRACES_FLAGS_CAN_MOUNT)))
+        {
+            return true;
+        }
     }
 
     return false;
