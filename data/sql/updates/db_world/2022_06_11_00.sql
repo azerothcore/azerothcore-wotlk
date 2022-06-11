@@ -1,3 +1,4 @@
+-- DB update 2022_06_09_01 -> 2022_06_11_00
 -- Add Chinese translation of road signs
 DELETE FROM `gameobject_template_locale` WHERE `entry` IN (184084,176365,176364) AND `locale` = 'zhCN';
 INSERT INTO `gameobject_template_locale` (`entry`, `locale`, `name`, `castBarCaption`, `VerifiedBuild`) VALUES 
