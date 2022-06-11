@@ -28,7 +28,7 @@ EndScriptData */
 
 enum Spells
 {
-    SPELL_LIGHTNING_CLOUD       = 25033,
+    SPELL_LIGHTNING_CLOUD       = 24683,
     SPELL_CHAIN_LIGHTNING       = 24680,
     SPELL_FORKED_LIGHTNING      = 24682
 };
