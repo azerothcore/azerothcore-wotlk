@@ -83,6 +83,14 @@ public:
             events.ScheduleEvent(EVENT_ILLUSIONS, 16s, 24s);
         }
 
+        bool CanAIAttack(Unit const* target) const override
+        {
+            if (me->GetThreatMgr().getThreatList().size() > 1 && me->GetThreatMgr().getOnlineContainer().getMostHated()->getTarget() == target)
+                return !target->HasAura(SPELL_SLEEP);
+
+            return true;
+        }
+
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
@@ -100,7 +108,7 @@ public:
                     case EVENT_SLEEP:
                         DoCastVictim(SPELL_SLEEP, true);
                         events.ScheduleEvent(EVENT_SLEEP, 24s, 32s);
-                        break;
+                        return;
                     case EVENT_EARTH_SHOCK:
                         DoCastVictim(SPELL_EARTH_SHOCK);
                         events.ScheduleEvent(EVENT_EARTH_SHOCK, 8s, 18s);
