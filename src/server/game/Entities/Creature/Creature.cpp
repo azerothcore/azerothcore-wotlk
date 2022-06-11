@@ -3570,7 +3570,10 @@ void Creature::LowerPlayerDamageReq(uint32 unDamage, bool damagedByPlayer /*= tr
     if (_playerDamageReq)
         _playerDamageReq > unDamage ? _playerDamageReq -= unDamage : _playerDamageReq = 0;
 
-    _damagedByPlayer = damagedByPlayer;
+    if (!_damagedByPlayer)
+    {
+        _damagedByPlayer = damagedByPlayer;
+    }
 }
 
 void Creature::ResetPlayerDamageReq()
