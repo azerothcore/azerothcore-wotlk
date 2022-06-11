@@ -58,6 +58,9 @@ public:
             _Reset();
             me->SetReactState(REACT_AGGRESSIVE);
             _enraged = false;
+            _thousandBladesCount = urand(2, 5);
+            _thousandBladesTargets.clear();
+            _dynamicFlags = me->GetDynamicFlags();
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -82,7 +85,25 @@ public:
 
         bool CanAIAttack(Unit const* target) const override
         {
-            return !target->HasAura(SPELL_GOUGE);
+            if (me->GetThreatMgr().getThreatList().size() > 1 && me->GetThreatMgr().getOnlineContainer().getMostHated()->getTarget() == target)
+                return !target->HasAura(SPELL_GOUGE);
+
+            return true;
+        }
+
+        bool CanBeSeen(Player const* player) override
+        {
+            return me->GetReactState() == REACT_AGGRESSIVE;
+        }
+
+        bool CanSeeAlways(WorldObject const* obj) override
+        {
+            if (me->GetReactState() == REACT_PASSIVE)
+            {
+                return obj->ToCreature() && obj->ToCreature()->IsPet();
+            }
+
+            return false;
         }
 
         void UpdateAI(uint32 diff) override
@@ -101,38 +122,111 @@ public:
                 {
                     case EVENT_VANISH:
                         me->SetReactState(REACT_PASSIVE);
+                        _dynamicFlags = me->GetDynamicFlags();
+                        me->RemoveDynamicFlag(UNIT_DYNFLAG_TRACK_UNIT);
                         DoCastSelf(SPELL_VANISH);
                         events.DelayEvents(5s);
                         events.ScheduleEvent(EVENT_AMBUSH, 5s);
                         events.ScheduleEvent(EVENT_VANISH, 38s, 45s);
-                        break;
+                        return;
                     case EVENT_AMBUSH:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
                         {
                             me->NearTeleportTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), me->GetOrientation());
                             DoCast(target, SPELL_AMBUSH, true);
                         }
+                        me->SetDynamicFlag(_dynamicFlags);
                         me->RemoveAurasDueToSpell(SPELL_VANISH);
                         me->SetReactState(REACT_AGGRESSIVE);
                         break;
                     case EVENT_GOUGE:
                         DoCastAOE(SPELL_GOUGE);
                         events.ScheduleEvent(EVENT_GOUGE, 10s, 15s);
-                        break;
+                        return;
                     case EVENT_THOUSAND_BLADES:
-                        DoCastVictim(SPELL_THOUSAND_BLADES);
-                        events.ScheduleEvent(EVENT_THOUSAND_BLADES, 15s, 22s);
+                    {
+                        if (_thousandBladesTargets.empty())
+                        {
+                            std::list<Unit*> targetList;
+                            ThreatContainer::StorageType const& threatlist = me->GetThreatMgr().getThreatList();
+                            for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
+                            {
+                                if (Unit* target = (*itr)->getTarget())
+                                {
+                                    if (target->IsAlive() && target->IsWithinDist2d(me, 100.f))
+                                    {
+                                        targetList.push_back(target);
+                                    }
+                                }
+                            }
+
+                            if (!targetList.empty())
+                            {
+                                Acore::Containers::RandomShuffle(targetList);
+
+                                // First get ranged targets
+                                for (Unit* target : targetList)
+                                {
+                                    if (!target->IsWithinMeleeRange(me))
+                                    {
+                                        _thousandBladesTargets.insert(target->GetGUID());
+                                    }
+                                }
+
+                                if (_thousandBladesTargets.size() < _thousandBladesCount)
+                                {
+                                    // if still not enough, get melee targets
+                                    for (Unit* target : targetList)
+                                    {
+                                        if (target->IsWithinMeleeRange(me))
+                                        {
+                                            _thousandBladesTargets.insert(target->GetGUID());
+                                        }
+                                    }
+                                }
+
+                                if (!_thousandBladesTargets.empty())
+                                {
+                                    Acore::Containers::RandomResize(_thousandBladesTargets, _thousandBladesCount);
+                                }
+                            }
+                        }
+
+                        if (!_thousandBladesTargets.empty())
+                        {
+                            GuidSet::iterator itr = _thousandBladesTargets.begin();
+                            std::advance(itr, urand(0, _thousandBladesTargets.size() - 1));
+
+                            if (Unit* target = ObjectAccessor::GetUnit(*me, *itr))
+                            {
+                                DoCast(target, SPELL_THOUSAND_BLADES, false);
+                            }
+
+                            _thousandBladesTargets.erase(itr);
+
+                            events.ScheduleEvent(EVENT_THOUSAND_BLADES, 500ms);
+                        }
+                        else
+                        {
+                            _thousandBladesCount = urand(2, 5);
+                            events.ScheduleEvent(EVENT_THOUSAND_BLADES, 15s, 22s);
+                        }
                         break;
+                    }
                     default:
                         break;
                 }
             }
 
-            DoMeleeAttackIfReady();
+            if (me->GetReactState() == REACT_AGGRESSIVE)
+                DoMeleeAttackIfReady();
         }
 
     private:
         bool _enraged;
+        uint32 _dynamicFlags;
+        uint8 _thousandBladesCount;
+        GuidSet _thousandBladesTargets;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
