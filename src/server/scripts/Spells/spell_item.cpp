@@ -284,7 +284,10 @@ class spell_item_magic_dust : public AuraScript
         {
             uint8 chance = 100 - std::min<uint8>(100, target->getLevel() - 30 * urand(3, 10));
             if (!roll_chance_i(chance))
+            {
                 PreventDefaultAction();
+                Remove();
+            }
         }
     }
 
