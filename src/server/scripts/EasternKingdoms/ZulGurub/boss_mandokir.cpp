@@ -486,7 +486,6 @@ public:
     {
         instance = me->GetInstanceScript();
         me->AddUnitMovementFlag(MOVEMENTFLAG_HOVER);
-        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
     }
 
     void Reset() override
