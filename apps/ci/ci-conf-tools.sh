@@ -7,7 +7,6 @@ MTHREADS=$(($(grep -c ^processor /proc/cpuinfo) + 2))
 CWARNINGS=ON
 CDEBUG=OFF
 CTYPE=Release
-CSCRIPTS=static
 CAPPS_BUILD=none
 CTOOLS_BUILD=maps-only
 CSCRIPTPCH=OFF
