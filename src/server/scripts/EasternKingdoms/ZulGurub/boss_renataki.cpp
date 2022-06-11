@@ -91,7 +91,7 @@ public:
             return true;
         }
 
-        bool CanBeSeen(Player const* player) override
+        bool CanBeSeen(Player const* /*player*/) override
         {
             return me->GetReactState() == REACT_AGGRESSIVE;
         }
@@ -147,7 +147,7 @@ public:
                     {
                         if (_thousandBladesTargets.empty())
                         {
-                            std::list<Unit*> targetList;
+                            std::vector<Unit*> targetList;
                             ThreatContainer::StorageType const& threatlist = me->GetThreatMgr().getThreatList();
                             for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
                             {
@@ -169,7 +169,7 @@ public:
                                 {
                                     if (!target->IsWithinMeleeRange(me))
                                     {
-                                        _thousandBladesTargets.insert(target);
+                                        _thousandBladesTargets.push_back(target);
                                     }
                                 }
 
@@ -180,7 +180,7 @@ public:
                                     {
                                         if (target->IsWithinMeleeRange(me))
                                         {
-                                            _thousandBladesTargets.insert(target);
+                                            _thousandBladesTargets.push_back(target);
                                         }
                                     }
                                 }
@@ -194,7 +194,7 @@ public:
 
                         if (!_thousandBladesTargets.empty())
                         {
-                            std::set<Unit*>::iterator itr = _thousandBladesTargets.begin();
+                            std::vector<Unit*>::iterator itr = _thousandBladesTargets.begin();
                             std::advance(itr, urand(0, _thousandBladesTargets.size() - 1));
 
                             if (Unit* target = *itr)
@@ -226,7 +226,7 @@ public:
         bool _enraged;
         uint32 _dynamicFlags;
         uint8 _thousandBladesCount;
-        std::set<Unit*> _thousandBladesTargets;
+        std::vector<Unit*> _thousandBladesTargets;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
