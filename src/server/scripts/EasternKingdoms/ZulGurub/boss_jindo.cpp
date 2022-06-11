@@ -34,15 +34,15 @@ enum Say
 enum Spells
 {
     SPELL_BRAINWASHTOTEM            = 24262,
-    SPELL_POWERFULLHEALINGWARD      = 24309, // HACKED Totem summoned by script because the spell totems will not cast.
+    SPELL_POWERFULLHEALINGWARD      = 24309,
     SPELL_HEX                       = 24053,
     SPELL_DELUSIONSOFJINDO          = 24306,
-    SPELL_SHADEOFJINDO              = 24308, // HACKED
     //Healing Ward Spell
-    SPELL_HEAL                      = 38588, // HACKED Totems are not working right. Right heal spell ID is 24311 but this spell is not casting...
+    SPELL_HEAL                      = 24311,
     //Shade of Jindo Spell
-    SPELL_SHADOWSHOCK               = 19460,
-    SPELL_INVISIBLE                 = 24699
+    SPELL_SHADEOFJINDO_PASSIVE      = 24307,
+    SPELL_SHADEOFJINDO_VISUAL       = 24313,
+    SPELL_SHADOWSHOCK               = 19460
 };
 
 enum Events
@@ -104,18 +104,12 @@ public:
                         DoCast(me, SPELL_BRAINWASHTOTEM);
                         events.ScheduleEvent(EVENT_BRAINWASHTOTEM, urand(18000, 26000));
                         break;
-                    case EVENT_POWERFULLHEALINGWARD: // HACK
-                        //DoCast(me, SPELL_POWERFULLHEALINGWARD);
-                        me->SummonCreature(14987, me->GetPositionX() + 3, me->GetPositionY() - 2, me->GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 30000);
+                    case EVENT_POWERFULLHEALINGWARD:
+                        DoCastSelf(SPELL_POWERFULLHEALINGWARD, true);
                         events.ScheduleEvent(EVENT_POWERFULLHEALINGWARD, urand(14000, 20000));
                         break;
                     case EVENT_HEX:
-                        if (Unit* target = me->GetVictim())
-                        {
-                            DoCast(target, SPELL_HEX, true);
-                            if (DoGetThreat(target))
-                                DoModifyThreatPercent(target, -80);
-                        }
+                        DoCastVictim(SPELL_HEX, true);
                         events.ScheduleEvent(EVENT_HEX, urand(12000, 20000));
                         break;
                     case EVENT_DELUSIONSOFJINDO: // HACK
@@ -173,6 +167,11 @@ public:
             }
 
             DoMeleeAttackIfReady();
+        }
+
+        bool CanAIAttack(Unit const* target) const override
+        {
+            return !target->HasAura(SPELL_HEX);
         }
     };
 
@@ -251,7 +250,8 @@ public:
         void Reset() override
         {
             ShadowShock_Timer = 1000;
-            DoCast(me, SPELL_INVISIBLE, true);
+            DoCastSelf(SPELL_SHADEOFJINDO_PASSIVE, true);
+            DoCastSelf(SPELL_SHADEOFJINDO_VISUAL, true);
         }
 
         void EnterCombat(Unit* /*who*/) override { }

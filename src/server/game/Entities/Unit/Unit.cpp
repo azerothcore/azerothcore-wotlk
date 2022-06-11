@@ -12404,7 +12404,7 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo)
         {
             SpellInfo const* immuneSpellInfo = sSpellMgr->GetSpellInfo(itr->spellId);
             if (((itr->type & spellInfo->GetSchoolMask()) == spellInfo->GetSchoolMask())
-                    && !(immuneSpellInfo && immuneSpellInfo->IsPositive()) && !spellInfo->IsPositive()
+                    && (!immuneSpellInfo || immuneSpellInfo->IsPositive()) && !spellInfo->IsPositive()
                     && !spellInfo->CanPierceImmuneAura(immuneSpellInfo))
                 return true;
         }
@@ -17930,7 +17930,9 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
 
     if (GetTypeId() == TYPEID_UNIT)
     {
+        GetMotionMaster()->Clear(false);
         GetMotionMaster()->MoveIdle();
+        StopMoving();
 
         if (charmer->GetTypeId() == TYPEID_PLAYER &&
             charmer->getClass() == CLASS_WARLOCK)

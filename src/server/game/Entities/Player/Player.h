@@ -2946,7 +2946,15 @@ template <class T> T Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& bas
                 return;
             }
 
-            totalflat += mod->value;
+            int32 flatValue = mod->value;
+
+            // SPELL_MOD_THREAT - divide by 100 (in packets we send threat * 100)
+            if (mod->op == SPELLMOD_THREAT)
+            {
+                flatValue /= 100;
+            }
+
+            totalflat += flatValue;
         }
         else if (mod->type == SPELLMOD_PCT)
         {

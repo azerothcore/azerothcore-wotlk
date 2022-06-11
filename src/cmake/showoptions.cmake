@@ -32,29 +32,30 @@ message("")
 
 # Show infomation about the options selected during configuration
 
-if( SERVERS )
-  message("* Build world/auth                : Yes (default)")
+if (APPS_BUILD AND (NOT APPS_BUILD STREQUAL "none"))
+  message("* Build applications              : Yes (${APPS_BUILD})")
 else()
-  message("* Build world/authserver          : No")
+  message("* Build applications              : No")
 endif()
 
-if(SCRIPTS AND (NOT SCRIPTS STREQUAL "none"))
+if (TOOLS_BUILD AND (NOT TOOLS_BUILD STREQUAL "none"))
+  message("* Build tools                     : Yes (${TOOLS_BUILD})")
+  add_definitions(-DNO_CORE_FUNCS)
+else()
+  message("* Build tools                     : No")
+endif()
+
+if (SCRIPTS AND (NOT SCRIPTS STREQUAL "none"))
   message("* Build with scripts              : Yes (${SCRIPTS})")
+
 else()
   message("* Build with scripts              : No")
 endif()
 
-if(MODULES  AND (NOT MODULES STREQUAL "none"))
+if (MODULES  AND (NOT MODULES STREQUAL "none"))
   message("* Build with modules              : Yes (${MODULES})")
 else()
   message("* Build with modules              : No")
-endif()
-
-if( TOOLS )
-  message("* Build map/vmap tools            : Yes")
-  add_definitions(-DNO_CORE_FUNCS)
-else()
-  message("* Build map/vmap tools            : No  (default)")
 endif()
 
 if( BUILD_TESTING )
