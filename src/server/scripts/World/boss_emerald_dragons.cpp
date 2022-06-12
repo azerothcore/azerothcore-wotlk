@@ -537,11 +537,6 @@ enum TaerarSpells
     SPELL_ARCANE_BLAST              = 24857,
 };
 
-uint32 const TaerarShadeSpells[] =
-{
-    SPELL_SUMMON_SHADE_1, SPELL_SUMMON_SHADE_2, SPELL_SUMMON_SHADE_3
-};
-
 class boss_taerar : public CreatureScript
 {
 public:
@@ -576,33 +571,6 @@ public:
         void SummonedCreatureDies(Creature* /*summon*/, Unit*) override
         {
             --_shades;
-        }
-
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
-        {
-            // At 75, 50 or 25 percent health, we need to activate the shades and go "banished"
-            // Note: _stage holds the amount of times they have been summoned
-            if (!_banished && !HealthAbovePct(100 - 25 * _stage))
-            {
-                _banished = true;
-                _banishedTimer = 60000;
-
-                me->InterruptNonMeleeSpells(false);
-                DoStopAttack();
-
-                Talk(SAY_TAERAR_SUMMON_SHADES);
-
-                uint32 count = sizeof(TaerarShadeSpells) / sizeof(uint32);
-                for (uint32 i = 0; i < count; ++i)
-                    DoCastVictim(TaerarShadeSpells[i], true);
-                _shades += count;
-
-                DoCast(SPELL_SHADE);
-                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
-                me->SetReactState(REACT_PASSIVE);
-
-                ++_stage;
-            }
         }
 
         void ExecuteEvent(uint32 eventId) override
@@ -647,6 +615,29 @@ public:
                 events.Update(diff);
 
                 return;
+            }
+            // At 75, 50 or 25 percent health, we need to activate the shades and go "banished"
+            // Note: _stage holds the amount of times they have been summoned
+            if (!_banished && !HealthAbovePct(100 - 25 * _stage))
+            {
+                _banished = true;
+                _banishedTimer = 60000;
+
+                me->InterruptNonMeleeSpells(false);
+                DoStopAttack();
+
+                Talk(SAY_TAERAR_SUMMON_SHADES);
+
+                DoCast(SPELL_SUMMON_SHADE_1);
+                DoCast(SPELL_SUMMON_SHADE_2);
+                DoCast(SPELL_SUMMON_SHADE_3);
+                _shades += 3;
+
+                DoCast(SPELL_SHADE);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                me->SetReactState(REACT_PASSIVE);
+
+                ++_stage;
             }
 
             emerald_dragonAI::UpdateAI(diff);
