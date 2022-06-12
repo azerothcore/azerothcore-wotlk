@@ -471,7 +471,10 @@ public:
         void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
-                DoCast(who, SPELL_PUTRID_MUSHROOM, true);
+            {
+                who->CastSpell(who, SPELL_PUTRID_MUSHROOM, true);
+            }
+
             emerald_dragonAI::KilledUnit(who);
         }
 
