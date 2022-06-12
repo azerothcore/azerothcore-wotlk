@@ -196,6 +196,7 @@ public:
     virtual bool CanSeeAlways(WorldObject const* /*obj*/) { return false; }
 
     virtual bool CanBeSeen(Player const* /*seer*/) { return true; }
+    virtual bool CanAlwaysBeDetectable(WorldObject const* /*seer*/) { return false; }
 
     virtual void PetStopAttack() { }
 

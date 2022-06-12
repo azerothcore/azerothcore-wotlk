@@ -106,6 +106,16 @@ public:
             return false;
         }
 
+        bool CanAlwaysBeDetectable(WorldObject const* seer) override
+        {
+            if (me->GetReactState() == REACT_PASSIVE)
+            {
+                return seer->ToCreature() && seer->ToCreature()->IsPet();
+            }
+
+            return false;
+        }
+
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
