@@ -576,7 +576,6 @@ public:
         {
             --_shades;
         }
-        
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             // At 75, 50 or 25 percent health, we need to activate the shades and go "banished"
