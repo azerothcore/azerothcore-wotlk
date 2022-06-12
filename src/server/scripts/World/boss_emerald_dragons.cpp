@@ -262,9 +262,9 @@ public:
         }
 
         // Summon druid spirits on 75%, 50% and 25% health
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (!HealthAbovePct(100 - 25 * _stage))
+            if (me->HealthBelowPctDamaged(100 - (25 * _stage), damage))
             {
                 Talk(SAY_YSONDRE_SUMMON_DRUIDS);
 
@@ -349,9 +349,9 @@ public:
             WorldBossAI::EnterCombat(who);
         }
 
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (!HealthAbovePct(100 - 25 * _stage))
+            if (me->HealthBelowPctDamaged(100 - (25 * _stage), damage))
             {
                 Talk(SAY_LETHON_DRAW_SPIRIT);
                 DoCast(me, SPELL_DRAW_SPIRIT);
@@ -481,9 +481,9 @@ public:
             WorldBossAI::EnterCombat(who);
         }
 
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (!HealthAbovePct(100 - 25 * _stage))
+            if (me->HealthBelowPctDamaged(100 - (25 * _stage), damage))
             {
                 Talk(SAY_EMERISS_CAST_CORRUPTION);
                 DoCast(me, SPELL_CORRUPTION_OF_EARTH, true);
