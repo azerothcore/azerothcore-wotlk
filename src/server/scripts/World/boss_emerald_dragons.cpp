@@ -537,6 +537,10 @@ enum TaerarSpells
     SPELL_ARCANE_BLAST              = 24857,
 };
 
+uint32 const TaerarShadeSpells[] =
+{
+    SPELL_SUMMON_SHADE_1, SPELL_SUMMON_SHADE_2, SPELL_SUMMON_SHADE_3
+};
 class boss_taerar : public CreatureScript
 {
 public:
@@ -628,10 +632,10 @@ public:
 
                 Talk(SAY_TAERAR_SUMMON_SHADES);
 
-                DoCast(SPELL_SUMMON_SHADE_1);
-                DoCast(SPELL_SUMMON_SHADE_2);
-                DoCast(SPELL_SUMMON_SHADE_3);
-                _shades += 3;
+                uint32 count = sizeof(TaerarShadeSpells) / sizeof(uint32);
+                for (uint32 i = 0; i < count; ++i)
+                    DoCast(TaerarShadeSpells[i]);
+                _shades += count;
 
                 DoCast(SPELL_SHADE);
                 me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
