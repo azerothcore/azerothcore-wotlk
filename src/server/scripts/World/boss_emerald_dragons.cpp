@@ -340,13 +340,14 @@ public:
         {
             _stage = 1;
             emerald_dragonAI::Reset();
-            events.ScheduleEvent(EVENT_SHADOW_BOLT_WHIRL, 10000);
+            me->RemoveAurasDueToSpell(SPELL_SHADOW_BOLT_WHIRL);
         }
 
         void EnterCombat(Unit* who) override
         {
             Talk(SAY_LETHON_AGGRO);
             WorldBossAI::EnterCombat(who);
+            DoCastSelf(SPELL_SHADOW_BOLT_WHIRL, true);
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -372,10 +373,6 @@ public:
         {
             switch (eventId)
             {
-                case EVENT_SHADOW_BOLT_WHIRL:
-                    me->CastSpell((Unit*)nullptr, SPELL_SHADOW_BOLT_WHIRL, false);
-                    events.ScheduleEvent(EVENT_SHADOW_BOLT_WHIRL, urand(15000, 30000));
-                    break;
                 default:
                     emerald_dragonAI::ExecuteEvent(eventId);
                     break;
@@ -709,6 +706,42 @@ public:
     }
 };
 
+class aura_shadow_bolt_whirl : public AuraScript
+{
+    PrepareAuraScript(aura_shadow_bolt_whirl);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SHADOW_BOLT_WHIRL });
+    }
+
+    void HandlePeriodic(AuraEffect const* aurEff)
+    {
+        
+        Unit* caster = GetCaster(); 
+        Unit* target = GetTarget();
+
+        if (!caster || !target)
+            return;
+        std::array<uint32, 8> spellForTick = { 24820, 24821, 24822, 24823, 24835, 24836, 24837, 24838 };
+        uint32 tick = (aurEff->GetTickNumber() + 7/*-1*/) % 8;
+
+                        // casted in left/right (but triggered spell have wide forward cone)
+                        float forward = target->GetOrientation();
+                        if (tick <= 3)
+                            target->SetOrientation(forward + 0.75f * M_PI - tick * M_PI / 8);       // Left
+                        else
+                            target->SetOrientation(forward - 0.75f * M_PI + (8 - tick) * M_PI / 8); // Right
+
+                        target->CastSpell(target, spellForTick[tick], true);
+                        target->SetOrientation(forward);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(aura_shadow_bolt_whirl::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
 class spell_mark_of_nature : public SpellScriptLoader
 {
 public:
@@ -762,4 +795,5 @@ void AddSC_emerald_dragons()
     // dragon spellscripts
     new spell_dream_fog_sleep();
     new spell_mark_of_nature();
+    RegisterSpellScript(aura_shadow_bolt_whirl);
 };
