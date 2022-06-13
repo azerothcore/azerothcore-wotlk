@@ -699,13 +699,12 @@ class aura_shadow_bolt_whirl : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_SHADOW_BOLT_WHIRL });
+        return ValidateSpellInfo({ 24820, 24821, 24822, 24823, 24835, 24836, 24837, 24838 });
     }
 
     void HandlePeriodic(AuraEffect const* aurEff)
     {
-        
-        Unit* caster = GetCaster(); 
+        Unit* caster = GetCaster();
         Unit* target = GetTarget();
 
         if (!caster || !target)
@@ -713,15 +712,15 @@ class aura_shadow_bolt_whirl : public AuraScript
         std::array<uint32, 8> spellForTick = { 24820, 24821, 24822, 24823, 24835, 24836, 24837, 24838 };
         uint32 tick = (aurEff->GetTickNumber() + 7/*-1*/) % 8;
 
-                        // casted in left/right (but triggered spell have wide forward cone)
-                        float forward = target->GetOrientation();
-                        if (tick <= 3)
-                            target->SetOrientation(forward + 0.75f * M_PI - tick * M_PI / 8);       // Left
-                        else
-                            target->SetOrientation(forward - 0.75f * M_PI + (8 - tick) * M_PI / 8); // Right
+        // casted in left/right (but triggered spell have wide forward cone)
+        float forward = target->GetOrientation();
+        if (tick <= 3)
+            target->SetOrientation(forward + 0.75f * M_PI - tick * M_PI / 8);       // Left
+        else
+            target->SetOrientation(forward - 0.75f * M_PI + (8 - tick) * M_PI / 8); // Right
 
-                        target->CastSpell(target, spellForTick[tick], true);
-                        target->SetOrientation(forward);
+        target->CastSpell(target, spellForTick[tick], true);
+        target->SetOrientation(forward);
     }
 
     void Register() override
