@@ -95,7 +95,7 @@ public:
     */
     static bool HandleDeserterAdd(ChatHandler* handler, Optional<std::string> playerName, Optional<std::string> time, bool isInstance)
     {
-        Player* target;
+        Player* target = handler->getSelectedPlayerOrSelf();
         ObjectGuid guid;
 
         if (playerName)
@@ -133,7 +133,6 @@ public:
                 return false;
             }
 
-            target = handler->getSelectedPlayerOrSelf();
             playerName = target->GetName();
             guid = target->GetGUID();
         }
