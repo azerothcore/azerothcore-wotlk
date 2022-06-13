@@ -703,7 +703,7 @@ public:
 
 class spell_shadow_bolt_whirl : public AuraScript
 {
-    PrepareAuraScript(aura_shadow_bolt_whirl);
+    PrepareAuraScript(spell_shadow_bolt_whirl);
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
