@@ -699,7 +699,7 @@ class aura_shadow_bolt_whirl : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_SHADOW_BOLT_WHIRL });
+        return ValidateSpellInfo({ 24820, 24821, 24822, 24823, 24835, 24836, 24837, 24838 });
     }
 
     void HandlePeriodic(AuraEffect const* aurEff)
