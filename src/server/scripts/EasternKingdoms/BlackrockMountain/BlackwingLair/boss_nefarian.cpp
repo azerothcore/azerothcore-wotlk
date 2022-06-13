@@ -358,6 +358,7 @@ public:
 
             DoCast(me, SPELL_NEFARIANS_BARRIER);
             SetCombatMovement(false);
+            me->SetImmuneToPC(false);
             AttackStart(SelectTarget(SelectTargetMethod::Random, 0, 200.f, true));
             events.ScheduleEvent(EVENT_SHADOWBLINK, 500);
             events.ScheduleEvent(EVENT_SHADOW_BOLT, 3000);

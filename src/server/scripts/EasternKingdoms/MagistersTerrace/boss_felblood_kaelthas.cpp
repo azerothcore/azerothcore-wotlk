@@ -120,7 +120,7 @@ public:
         void InitializeAI() override
         {
             ScriptedAI::InitializeAI();
-            me->SetImmuneToAll(true);;
+            me->SetImmuneToAll(true);
         }
 
         void JustDied(Unit*) override
