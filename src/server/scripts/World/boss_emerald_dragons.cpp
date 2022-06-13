@@ -262,9 +262,9 @@ public:
         }
 
         // Summon druid spirits on 75%, 50% and 25% health
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (!HealthAbovePct(100 - 25 * _stage))
+            if (me->HealthBelowPctDamaged(100 - (25 * _stage), damage))
             {
                 Talk(SAY_YSONDRE_SUMMON_DRUIDS);
 
@@ -349,9 +349,9 @@ public:
             WorldBossAI::EnterCombat(who);
         }
 
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (!HealthAbovePct(100 - 25 * _stage))
+            if (me->HealthBelowPctDamaged(100 - (25 * _stage), damage))
             {
                 Talk(SAY_LETHON_DRAW_SPIRIT);
                 DoCast(me, SPELL_DRAW_SPIRIT);
@@ -471,7 +471,10 @@ public:
         void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
-                DoCast(who, SPELL_PUTRID_MUSHROOM, true);
+            {
+                who->CastSpell(who, SPELL_PUTRID_MUSHROOM, true);
+            }
+
             emerald_dragonAI::KilledUnit(who);
         }
 
@@ -481,9 +484,9 @@ public:
             WorldBossAI::EnterCombat(who);
         }
 
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (!HealthAbovePct(100 - 25 * _stage))
+            if (me->HealthBelowPctDamaged(100 - (25 * _stage), damage))
             {
                 Talk(SAY_EMERISS_CAST_CORRUPTION);
                 DoCast(me, SPELL_CORRUPTION_OF_EARTH, true);
@@ -541,7 +544,6 @@ uint32 const TaerarShadeSpells[] =
 {
     SPELL_SUMMON_SHADE_1, SPELL_SUMMON_SHADE_2, SPELL_SUMMON_SHADE_3
 };
-
 class boss_taerar : public CreatureScript
 {
 public:
@@ -578,11 +580,11 @@ public:
             --_shades;
         }
 
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             // At 75, 50 or 25 percent health, we need to activate the shades and go "banished"
             // Note: _stage holds the amount of times they have been summoned
-            if (!_banished && !HealthAbovePct(100 - 25 * _stage))
+            if (!_banished && me->HealthBelowPctDamaged(100 - (25 * _stage), damage))
             {
                 _banished = true;
                 _banishedTimer = 60000;
@@ -594,9 +596,8 @@ public:
 
                 uint32 count = sizeof(TaerarShadeSpells) / sizeof(uint32);
                 for (uint32 i = 0; i < count; ++i)
-                    DoCastVictim(TaerarShadeSpells[i], true);
+                    DoCast(TaerarShadeSpells[i]);
                 _shades += count;
-
                 DoCast(SPELL_SHADE);
                 me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                 me->SetReactState(REACT_PASSIVE);
@@ -604,7 +605,6 @@ public:
                 ++_stage;
             }
         }
-
         void ExecuteEvent(uint32 eventId) override
         {
             switch (eventId)
@@ -648,7 +648,6 @@ public:
 
                 return;
             }
-
             emerald_dragonAI::UpdateAI(diff);
         }
 
