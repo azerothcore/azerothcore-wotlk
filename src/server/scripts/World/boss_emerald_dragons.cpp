@@ -312,9 +312,18 @@ enum LethonTexts
 
 enum LethonSpells
 {
+    24820, 24821, 24822, 24823, 24835, 24836, 24837, 24838
     SPELL_DRAW_SPIRIT               = 24811,
     SPELL_SHADOW_BOLT_WHIRL         = 24834,
     SPELL_DARK_OFFERING             = 24804,
+    SPELL_SHADOW_BOLT_WHIRL1        = 24820,
+    SPELL_SHADOW_BOLT_WHIRL2        = 24821,
+    SPELL_SHADOW_BOLT_WHIRL3        = 24822,
+    SPELL_SHADOW_BOLT_WHIRL4        = 24823,
+    SPELL_SHADOW_BOLT_WHIRL5        = 24835,
+    SPELL_SHADOW_BOLT_WHIRL6        = 24836,
+    SPELL_SHADOW_BOLT_WHIRL7        = 24837,
+    SPELL_SHADOW_BOLT_WHIRL8        = 24838,
 };
 
 enum LethonCreatures
@@ -699,7 +708,7 @@ class aura_shadow_bolt_whirl : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ 24820, 24821, 24822, 24823, 24835, 24836, 24837, 24838 });
+        return ValidateSpellInfo({ SPELL_SHADOW_BOLT_WHIRL1, SPELL_SHADOW_BOLT_WHIRL2, SPELL_SHADOW_BOLT_WHIRL3, SPELL_SHADOW_BOLT_WHIRL4, SPELL_SHADOW_BOLT_WHIRL5, SPELL_SHADOW_BOLT_WHIRL6, SPELL_SHADOW_BOLT_WHIRL7, SPELL_SHADOW_BOLT_WHIRL8 });
     }
 
     void HandlePeriodic(AuraEffect const* aurEff)
