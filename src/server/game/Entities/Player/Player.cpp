@@ -2139,10 +2139,8 @@ void Player::SetInWater(bool apply)
     getHostileRefMgr().updateThreatTables();
 }
 
-bool Player::IsInAreaTriggerRadius(const AreaTrigger* trigger) const
+bool Player::IsInAreaTriggerRadius(AreaTrigger const* trigger, float delta) const
 {
-    static const float delta = 5.0f;
-
     if (!trigger || GetMapId() != trigger->map)
         return false;
 
