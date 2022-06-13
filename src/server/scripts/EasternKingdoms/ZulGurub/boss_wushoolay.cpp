@@ -28,14 +28,16 @@ EndScriptData */
 
 enum Spells
 {
-    SPELL_LIGHTNINGCLOUD        = 25033,
-    SPELL_LIGHTNINGWAVE         = 24819
+    SPELL_LIGHTNING_CLOUD       = 24683,
+    SPELL_CHAIN_LIGHTNING       = 24680,
+    SPELL_FORKED_LIGHTNING      = 24682
 };
 
 enum Events
 {
-    EVENT_LIGHTNINGCLOUD        = 1,
-    EVENT_LIGHTNINGWAVE         = 2
+    EVENT_LIGHTNING_CLOUD       = 1,
+    EVENT_CHAIN_LIGHTNING       = 2,
+    EVENT_FORKED_LIGHTNING      = 3
 };
 
 class boss_wushoolay : public CreatureScript
@@ -47,21 +49,12 @@ public:
     {
         boss_wushoolayAI(Creature* creature) : BossAI(creature, DATA_EDGE_OF_MADNESS) { }
 
-        void Reset() override
-        {
-            _Reset();
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            _JustDied();
-        }
-
         void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
-            events.ScheduleEvent(EVENT_LIGHTNINGCLOUD, urand(5000, 10000));
-            events.ScheduleEvent(EVENT_LIGHTNINGWAVE, urand(8000, 16000));
+            events.ScheduleEvent(EVENT_LIGHTNING_CLOUD, 7s, 15s);
+            events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, 12s, 16s);
+            events.ScheduleEvent(EVENT_FORKED_LIGHTNING, 8s, 12s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -78,13 +71,23 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_LIGHTNINGCLOUD:
-                        DoCastVictim(SPELL_LIGHTNINGCLOUD, true);
-                        events.ScheduleEvent(EVENT_LIGHTNINGCLOUD, urand(15000, 20000));
+                    case EVENT_LIGHTNING_CLOUD:
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                        {
+                            me->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), SPELL_LIGHTNING_CLOUD, false);
+                        }
+                        events.ScheduleEvent(EVENT_LIGHTNING_CLOUD, 9s, 20s);
                         break;
-                    case EVENT_LIGHTNINGWAVE:
-                        DoCast(SelectTarget(SelectTargetMethod::Random, 0, 100, true), SPELL_LIGHTNINGWAVE);
-                        events.ScheduleEvent(EVENT_LIGHTNINGWAVE, urand(12000, 16000));
+                    case EVENT_CHAIN_LIGHTNING:
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                        {
+                            DoCast(target, SPELL_CHAIN_LIGHTNING);
+                        }
+                        events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, 12s, 24s);
+                        break;
+                    case EVENT_FORKED_LIGHTNING:
+                        DoCastAOE(SPELL_FORKED_LIGHTNING);
+                        events.ScheduleEvent(EVENT_FORKED_LIGHTNING, 8s, 20s);
                         break;
                     default:
                         break;

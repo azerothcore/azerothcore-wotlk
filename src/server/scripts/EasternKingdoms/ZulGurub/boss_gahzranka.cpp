@@ -24,6 +24,7 @@ EndScriptData */
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "zulgurub.h"
 
 enum Spells
@@ -31,8 +32,8 @@ enum Spells
     SPELL_FROSTBREATH               = 16099,
     SPELL_MASSIVEGEYSER             = 22421,
     SPELL_SLAM                      = 24326,
+    SPELL_THRASH                    = 3417, // Triggers 3391
     SPELL_SPLASH                    = 24593
-};
 
 enum Events
 {
@@ -46,7 +47,7 @@ enum Misc
     GAMEOBJECT_MUDSKUNK_LURE        = 180346
 };
 
-class boss_gahzranka : public CreatureScript // gahzranka
+class boss_gahzranka : public CreatureScript
 {
 public:
     boss_gahzranka() : CreatureScript("boss_gahzranka") { }
@@ -73,9 +74,10 @@ public:
         void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
+            me->AddAura(SPELL_THRASH, me);
             events.ScheduleEvent(EVENT_FROSTBREATH, 8000);
             events.ScheduleEvent(EVENT_MASSIVEGEYSER, 25000);
-            events.ScheduleEvent(EVENT_SLAM, 17000);
+            events.ScheduleEvent(EVENT_SLAM, 15000);
         }
 
         void UpdateAI(uint32 diff) override
@@ -93,11 +95,11 @@ public:
                 switch (eventId)
                 {
                     case EVENT_FROSTBREATH:
-                        DoCastVictim(SPELL_FROSTBREATH, true);
-                        events.ScheduleEvent(EVENT_FROSTBREATH, urand(7000, 11000));
+                        DoCastVictim(SPELL_FROSTBREATH);
+                        events.ScheduleEvent(EVENT_FROSTBREATH, urand(8000, 20000));
                         break;
                     case EVENT_MASSIVEGEYSER:
-                        DoCastVictim(SPELL_MASSIVEGEYSER, true);
+                        DoCastVictim(SPELL_MASSIVEGEYSER);
                         events.ScheduleEvent(EVENT_MASSIVEGEYSER, urand(22000, 32000));
                         break;
                     case EVENT_SLAM:
@@ -117,6 +119,42 @@ public:
     {
         return GetZulGurubAI<boss_gahzrankaAI>(creature);
     }
+};
+
+class spell_gahzranka_slam : public SpellScript
+{
+    PrepareSpellScript(spell_gahzranka_slam);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            _wipeThreat = targets.size() < caster->GetThreatMgr().getThreatList().size();
+        }
+    }
+
+    void HandleWipeThreat(SpellEffIndex /*effIndex*/)
+    {
+        if (_wipeThreat)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                if (Unit* target = GetHitUnit())
+                {
+                    caster->GetThreatMgr().modifyThreatPercent(target, -100);
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_gahzranka_slam::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_gahzranka_slam::HandleWipeThreat, EFFECT_1, SPELL_EFFECT_KNOCK_BACK);
+    }
+
+private:
+    bool _wipeThreat = false;
 };
 
 class spell_pagles_point_cast : public SpellScript
@@ -158,5 +196,6 @@ class spell_pagles_point_cast : public SpellScript
 void AddSC_boss_gahzranka()
 {
     new boss_gahzranka();
+    RegisterSpellScript(spell_gahzranka_slam);
     RegisterSpellScript(spell_pagles_point_cast);
 }
