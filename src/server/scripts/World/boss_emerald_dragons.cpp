@@ -704,7 +704,6 @@ class aura_shadow_bolt_whirl : public AuraScript
 
     void HandlePeriodic(AuraEffect const* aurEff)
     {
-        
         Unit* caster = GetCaster(); 
         Unit* target = GetTarget();
 
