@@ -4,7 +4,7 @@ DELETE FROM `event_scripts` WHERE `id`=9104;
 
 DELETE FROM `spell_script_names` WHERE `spell_id`=24325;
 INSERT INTO `spell_script_names` VALUES
-(24325, "spell_pagles_point_cast");
+(24325, 'spell_pagles_point_cast');
 
 DELETE FROM `waypoint_data` WHERE `id`=151140;
 INSERT INTO `waypoint_data`  VALUES
