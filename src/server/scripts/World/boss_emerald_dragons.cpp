@@ -302,9 +302,6 @@ public:
  * ---
  * --- Dragonspecific scripts and handling: LETHON
  * ---
- *
- * @todo
- * - Spell: Shadow bolt whirl casts needs custom handling (spellscript)
  */
 
 enum LethonTexts
@@ -366,16 +363,6 @@ public:
             {
                 Position targetPos = target->GetPosition();
                 me->SummonCreature(NPC_SPIRIT_SHADE, targetPos, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 50000);
-            }
-        }
-
-        void ExecuteEvent(uint32 eventId) override
-        {
-            switch (eventId)
-            {
-                default:
-                    emerald_dragonAI::ExecuteEvent(eventId);
-                    break;
             }
         }
 
