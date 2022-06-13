@@ -701,7 +701,7 @@ public:
     }
 };
 
-class aura_shadow_bolt_whirl : public AuraScript
+class spell_shadow_bolt_whirl : public AuraScript
 {
     PrepareAuraScript(aura_shadow_bolt_whirl);
 
@@ -733,7 +733,7 @@ class aura_shadow_bolt_whirl : public AuraScript
 
     void Register() override
     {
-        OnEffectPeriodic += AuraEffectPeriodicFn(aura_shadow_bolt_whirl::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_shadow_bolt_whirl::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 class spell_mark_of_nature : public SpellScriptLoader
@@ -789,5 +789,5 @@ void AddSC_emerald_dragons()
     // dragon spellscripts
     new spell_dream_fog_sleep();
     new spell_mark_of_nature();
-    RegisterSpellScript(aura_shadow_bolt_whirl);
+    RegisterSpellScript(spell_shadow_bolt_whirl);
 };
