@@ -34,6 +34,7 @@ enum Spells
     SPELL_SLAM                      = 24326,
     SPELL_THRASH                    = 3417, // Triggers 3391
     SPELL_SPLASH                    = 24593
+};
 
 enum Events
 {
