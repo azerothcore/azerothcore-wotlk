@@ -1,5 +1,5 @@
 --
-UPDATE `spell_target_position` SET `PositionX`=-11688.5, `PositionY`=-1737.74, `PositionZ`=8.409842 WHERE id IN (24325, 24593);
+UPDATE `spell_target_position` SET `PositionX`=-11688.5, `PositionY`=-1737.74, `PositionZ`=8.409842 WHERE `id` IN (24325, 24593);
 DELETE FROM `event_scripts` WHERE `id`=9104;
 
 DELETE FROM `spell_script_names` WHERE `spell_id`=24325;
