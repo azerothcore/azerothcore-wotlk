@@ -80,7 +80,7 @@ public:
                 {
                     if (hasYelled < 5)
                     {
-                        if (me->IsAlive() == true)
+                        if (me->IsAlive())
                         {
                             Talk(SenatorYells[hasYelled]);
                         }
