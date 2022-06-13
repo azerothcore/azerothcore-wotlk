@@ -312,7 +312,6 @@ enum LethonTexts
 
 enum LethonSpells
 {
-    24820, 24821, 24822, 24823, 24835, 24836, 24837, 24838
     SPELL_DRAW_SPIRIT               = 24811,
     SPELL_SHADOW_BOLT_WHIRL         = 24834,
     SPELL_DARK_OFFERING             = 24804,
