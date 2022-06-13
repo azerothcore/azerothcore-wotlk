@@ -1,3 +1,4 @@
+-- DB update 2022_06_13_03 -> 2022_06_13_04
 DELETE FROM `player_factionchange_items` WHERE `alliance_id` IN (16393, 16397, 16423, 16422, 16424, 16421, 16401, 16403, 16425, 16426, 16427, 16428, 16369, 16391, 16413, 16414, 16415, 16416, 17594, 17596, 17598, 17599, 17600, 17601) OR `horde_id` IN (16498, 16499, 16505, 16506, 16507, 16508, 17570, 17571, 17572, 17573, 17576, 17577, 16509, 16510, 16513, 16514, 16515, 16516, 16494, 16496, 16501, 16503, 16504);
 INSERT INTO `player_factionchange_items` (`alliance_id`, `alliance_comment`, `horde_id`, `horde_comment`) VALUES
 (16393, 'Knight-Lieutenant\'s Dragonhide Footwraps', 16494, 'Blood Guard\'s Dragonhide Boots'),
