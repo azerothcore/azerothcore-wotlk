@@ -4044,18 +4044,18 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             ProcessTimedAction(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax);
             break;
         case SMART_EVENT_UPDATE_OOC:
-            if (me && me->IsInCombat())
+            if (me && me->IsEngaged())
                 return;
             ProcessTimedAction(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax);
             break;
         case SMART_EVENT_UPDATE_IC:
-            if (!me || !me->IsInCombat())
+            if (!me || !me->IsEngaged())
                 return;
             ProcessTimedAction(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax);
             break;
         case SMART_EVENT_HEALTH_PCT:
             {
-                if (!me || !me->IsInCombat() || !me->GetMaxHealth())
+                if (!me || !me->IsEngaged() || !me->GetMaxHealth())
                     return;
                 uint32 perc = (uint32)me->GetHealthPct();
                 if (perc > e.event.minMaxRepeat.max || perc < e.event.minMaxRepeat.min)
@@ -4065,7 +4065,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             }
         case SMART_EVENT_TARGET_HEALTH_PCT:
             {
-                if (!me || !me->IsInCombat() || !me->GetVictim() || !me->GetVictim()->GetMaxHealth())
+                if (!me || !me->IsEngaged() || !me->GetVictim() || !me->GetVictim()->GetMaxHealth())
                     return;
                 uint32 perc = (uint32)me->GetVictim()->GetHealthPct();
                 if (perc > e.event.minMaxRepeat.max || perc < e.event.minMaxRepeat.min)
@@ -4075,7 +4075,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             }
         case SMART_EVENT_MANA_PCT:
             {
-                if (!me || !me->IsInCombat() || !me->GetMaxPower(POWER_MANA))
+                if (!me || !me->IsEngaged() || !me->GetMaxPower(POWER_MANA))
                     return;
                 uint32 perc = uint32(me->GetPowerPct(POWER_MANA));
                 if (perc > e.event.minMaxRepeat.max || perc < e.event.minMaxRepeat.min)
@@ -4085,7 +4085,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             }
         case SMART_EVENT_TARGET_MANA_PCT:
             {
-                if (!me || !me->IsInCombat() || !me->GetVictim() || !me->GetVictim()->GetMaxPower(POWER_MANA))
+                if (!me || !me->IsEngaged() || !me->GetVictim() || !me->GetVictim()->GetMaxPower(POWER_MANA))
                     return;
                 uint32 perc = uint32(me->GetVictim()->GetPowerPct(POWER_MANA));
                 if (perc > e.event.minMaxRepeat.max || perc < e.event.minMaxRepeat.min)
@@ -4095,7 +4095,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             }
         case SMART_EVENT_RANGE:
             {
-                if (!me || !me->IsInCombat() || !me->GetVictim())
+                if (!me || !me->IsEngaged() || !me->GetVictim())
                     return;
 
                 if (me->IsInRange(me->GetVictim(), (float)e.event.minMaxRepeat.min, (float)e.event.minMaxRepeat.max))
@@ -4106,7 +4106,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             }
         case SMART_EVENT_VICTIM_CASTING:
             {
-                if (!me || !me->IsInCombat())
+                if (!me || !me->IsEngaged())
                     return;
 
                 Unit* victim = me->GetVictim();
@@ -4124,7 +4124,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             }
         case SMART_EVENT_FRIENDLY_HEALTH:
             {
-                if (!me || !me->IsInCombat())
+                if (!me || !me->IsEngaged())
                     return;
 
                 Unit* target = DoSelectLowestHpFriendly((float)e.event.friendlyHealth.radius, e.event.friendlyHealth.hpDeficit);
@@ -4139,7 +4139,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             }
         case SMART_EVENT_FRIENDLY_IS_CC:
             {
-                if (!me || !me->IsInCombat())
+                if (!me || !me->IsEngaged())
                     return;
 
                 std::list<Creature*> pList;
@@ -4285,7 +4285,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             }
         case SMART_EVENT_OOC_LOS:
             {
-                if (!me || me->IsInCombat())
+                if (!me || me->IsEngaged())
                     return;
                 //can trigger if closer than fMaxAllowedRange
                 float range = (float)e.event.los.maxDist;
@@ -4309,7 +4309,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             }
         case SMART_EVENT_IC_LOS:
             {
-                if (!me || !me->IsInCombat())
+                if (!me || !me->IsEngaged())
                     return;
                 //can trigger if closer than fMaxAllowedRange
                 float range = (float)e.event.los.maxDist;
@@ -4507,7 +4507,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             }
         case SMART_EVENT_FRIENDLY_HEALTH_PCT:
             {
-                if (!me || !me->IsInCombat())
+                if (!me || !me->IsEngaged())
                     return;
 
                 Unit* target = nullptr;
@@ -4701,10 +4701,10 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
     if (e.event.event_phase_mask && !IsInPhase(e.event.event_phase_mask))
         return;
 
-    if (e.GetEventType() == SMART_EVENT_UPDATE_IC && (!me || !me->IsInCombat()))
+    if (e.GetEventType() == SMART_EVENT_UPDATE_IC && (!me || !me->IsEngaged()))
         return;
 
-    if (e.GetEventType() == SMART_EVENT_UPDATE_OOC && (me && me->IsInCombat()))//can be used with me=nullptr (go script)
+    if (e.GetEventType() == SMART_EVENT_UPDATE_OOC && (me && me->IsEngaged()))//can be used with me=nullptr (go script)
         return;
 
     if (e.timer < diff)
@@ -4982,7 +4982,7 @@ void SmartScript::OnMoveInLineOfSight(Unit* who)
     if (!me)
         return;
 
-    ProcessEventsFor(me->IsInCombat() ? SMART_EVENT_IC_LOS : SMART_EVENT_OOC_LOS, who);
+    ProcessEventsFor(me->IsEngaged() ? SMART_EVENT_IC_LOS : SMART_EVENT_OOC_LOS, who);
 }
 
 /*
