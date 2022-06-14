@@ -1,3 +1,4 @@
+-- DB update 2022_06_14_01 -> 2022_06_14_02
 --
 UPDATE `spell_target_position` SET `PositionX`=-11688.5, `PositionY`=-1737.74, `PositionZ`=8.409842 WHERE `id` IN (24325, 24593);
 DELETE FROM `event_scripts` WHERE `id`=9104;
