@@ -61,7 +61,8 @@ enum CreatureIds
     NPC_VILEBRANCH_SPEAKER  = 11391, // Mandokir Event
     NPC_CHAINED_SPIRIT      = 15117, // Mandokir Event
     NPC_HAKKAR              = 14834,
-    NPC_ZULGURUB_TIGER      = 11361
+    NPC_ZULGURUB_TIGER      = 11361,
+    NPC_BRAIN_WASH_TOTEM    = 15112
 };
 
 enum GameobjectIds
