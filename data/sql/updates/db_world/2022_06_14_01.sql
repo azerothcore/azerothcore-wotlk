@@ -1,3 +1,4 @@
+-- DB update 2022_06_14_00 -> 2022_06_14_01
 --
 ALTER TABLE `gameobject_template_addon`
 	ADD COLUMN `artkit0` INT NOT NULL DEFAULT 0 AFTER `maxgold`,
