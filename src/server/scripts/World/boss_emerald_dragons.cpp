@@ -717,7 +717,7 @@ class spell_shadow_bolt_whirl : public AuraScript
 
         if (!caster || !target)
             return;
-        std::array<uint32, 8> spellForTick = { 24820, 24821, 24822, 24823, 24835, 24836, 24837, 24838 };
+        std::array<uint32, 8> spellForTick = { SPELL_SHADOW_BOLT_WHIRL1, SPELL_SHADOW_BOLT_WHIRL2, SPELL_SHADOW_BOLT_WHIRL3, SPELL_SHADOW_BOLT_WHIRL4, SPELL_SHADOW_BOLT_WHIRL5, SPELL_SHADOW_BOLT_WHIRL6, SPELL_SHADOW_BOLT_WHIRL7, SPELL_SHADOW_BOLT_WHIRL8 };
         uint32 tick = (aurEff->GetTickNumber() + 7/*-1*/) % 8;
 
         // casted in left/right (but triggered spell have wide forward cone)
