@@ -18,4 +18,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (496600, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Private Hendel - Actionlist - Start Attacking'),
 (496600, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Private Hendel - Actionlist - Set Event Phase 1'),
 (5184, 0, 0, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 11, 7165, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Theramore Sentry - On Aggro - Cast \'Battle Stance\''),
-(5184, 0, 1, 0, 38, 0, 100, 0, 3, 3, 0, 0, 0, 41, 60000, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Theramore Sentry - On Data Set 3 3 - Despawn In 60000 ms');
+(5184, 0, 1, 0, 38, 1, 100, 0, 3, 3, 0, 0, 0, 41, 60000, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Theramore Sentry - On Data Set 3 3 - Despawn In 60000 ms (Phase 1)');
