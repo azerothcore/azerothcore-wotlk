@@ -1,7 +1,8 @@
 --
 DELETE FROM `creature_text` WHERE `CreatureID`=15111 AND `GroupID`=0;
-INSERT INTO `creature_text` (`CreatureID`, `Text`, `Type`, `Probability`, `BroadcastTextId`) VALUES (15111, 'I gonna make you into mojo!', 12, 100, 10435);
-INSERT INTO `creature_text` (`CreatureID`, `ID`, `Text`, `Type`, `Probability`, `BroadcastTextId`) VALUES (15111, 1, 'Troll mojo da strongest mojo!', 12, 100, 10437);
+INSERT INTO `creature_text` (`CreatureID`, `ID`, `Text`, `Type`, `Probability`, `BroadcastTextId`) VALUES 
+(15111, 0, 'I gonna make you into mojo!', 12, 100, 10435),
+(15111, 1, 'Troll mojo da strongest mojo!', 12, 100, 10437);
 
 DELETE FROM `creature_template_spell` WHERE (`CreatureID` = 15111) AND (`Index` IN (0, 1));
 INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `VerifiedBuild`) VALUES
