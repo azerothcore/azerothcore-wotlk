@@ -1,9 +1,9 @@
 --
 DELETE FROM `pool_template` WHERE entry IN (391, 392, 393); 
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES ('391', '4', 'Brontus Kodo Pack Combo 1 -- 4 Barrens Kodo Pack');
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES ('392', '4', 'Brontus Kodo Pack Combo 2 -- Mixed Kodo Pack');
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES ('393', '4', 'Brontus Kodo Pack Combo 3 -- Brontus Pack');
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES ('394', '1', 'Brontus Kodo Pack Pool of Pools');
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (391, 4, 'Brontus Kodo Pack Combo 1 -- 4 Barrens Kodo Pack');
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (392, 4, 'Brontus Kodo Pack Combo 2 -- Mixed Kodo Pack');
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (393, 4, 'Brontus Kodo Pack Combo 3 -- Brontus Pack');
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (394, 1, 'Brontus Kodo Pack Pool of Pools');
 
 DELETE FROM `creature` WHERE guid IN (51815);
 /* Combo 1 */
@@ -25,24 +25,24 @@ INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, 
 
 DELETE FROM `pool_creature` WHERE guid IN (45809, 45810, 45811, 45812, 45813, 45814, 45815, 45816, 45817, 45818, 45819, 45820);
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES 
-('45809', '391', 'Brontus Kodo Pack Combo 1 -- 4 Barrens Kodo Pack Leader Mob'),
-('45810', '391', 'Brontus Kodo Pack Combo 1 -- 4 Barrens Kodo Pack'),
-('45811', '391', 'Brontus Kodo Pack Combo 1 -- 4 Barrens Kodo Pack'),
-('45812', '391', 'Brontus Kodo Pack Combo 1 -- 4 Barrens Kodo Pack'),
-('45813', '392', 'Brontus Kodo Pack Combo 2 -- Mixed Kodo Pack Leader Mob'),
-('45814', '392', 'Brontus Kodo Pack Combo 2 -- Mixed Kodo Pack'),
-('45815', '392', 'Brontus Kodo Pack Combo 2 -- Mixed Kodo Pack'),
-('45816', '392', 'Brontus Kodo Pack Combo 2 -- Mixed Kodo Pack'),
-('45817', '393', 'Brontus Kodo Pack Combo 3 -- Brontus Pack Leader Mob'),
-('45818', '393', 'Brontus Kodo Pack Combo 3 -- Brontus Pack'),
-('45819', '393', 'Brontus Kodo Pack Combo 3 -- Brontus Pack'),
-('45820', '393', 'Brontus Kodo Pack Combo 3 -- Brontus Pack');
+(45809, 391, 'Brontus Kodo Pack Combo 1 -- 4 Barrens Kodo Pack Leader Mob'),
+(45810, 391, 'Brontus Kodo Pack Combo 1 -- 4 Barrens Kodo Pack'),
+(45811, 391, 'Brontus Kodo Pack Combo 1 -- 4 Barrens Kodo Pack'),
+(45812, 391, 'Brontus Kodo Pack Combo 1 -- 4 Barrens Kodo Pack'),
+(45813, 392, 'Brontus Kodo Pack Combo 2 -- Mixed Kodo Pack Leader Mob'),
+(45814, 392, 'Brontus Kodo Pack Combo 2 -- Mixed Kodo Pack'),
+(45815, 392, 'Brontus Kodo Pack Combo 2 -- Mixed Kodo Pack'),
+(45816, 392, 'Brontus Kodo Pack Combo 2 -- Mixed Kodo Pack'),
+(45817, 393, 'Brontus Kodo Pack Combo 3 -- Brontus Pack Leader Mob'),
+(45818, 393, 'Brontus Kodo Pack Combo 3 -- Brontus Pack'),
+(45819, 393, 'Brontus Kodo Pack Combo 3 -- Brontus Pack'),
+(45820, 393, 'Brontus Kodo Pack Combo 3 -- Brontus Pack');
 
 DELETE FROM `pool_pool` WHERE pool_id IN (391, 392, 393);
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES 
-('391', '394', '55', 'Brontus Kodo Pack Combo 1 -- 4 Barrens Kodo Pack'),
-('392', '394', '30', 'Brontus Kodo Pack Combo 2 -- Mixed Kodo Pack'),
-('393', '394', '15', 'Brontus Kodo Pack Combo 3 -- Brontus Pack');
+(391, 394, 55, 'Brontus Kodo Pack Combo 1 -- 4 Barrens Kodo Pack'),
+(392, 394, 30, 'Brontus Kodo Pack Combo 2 -- Mixed Kodo Pack'),
+(393, 394, 15, 'Brontus Kodo Pack Combo 3 -- Brontus Pack');
 
 -- Pathing for Kodos with Brontus
 SET @NPC := 45809;
