@@ -47,14 +47,14 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALU
 -- Pathing for Kodos with Brontus
 SET @NPC := 45809;
 SET @path := @NPC * 10;
-DELETE FROM creature_addon WHERE guid=@NPC;
-DELETE FROM creature_addon WHERE guid=@NPC+4;
-DELETE FROM creature_addon WHERE guid=@NPC+8;
-INSERT INTO creature_addon (guid,path_id,mount,bytes1,bytes2,emote,visibilityDistanceType,auras) VALUES (@NPC,@path,0,0,1,0,0, '');
-INSERT INTO creature_addon (guid,path_id,mount,bytes1,bytes2,emote,visibilityDistanceType,auras) VALUES (@NPC+4,@path,0,0,1,0,0, '');
-INSERT INTO creature_addon (guid,path_id,mount,bytes1,bytes2,emote,visibilityDistanceType,auras) VALUES (@NPC+8,@path,0,0,1,0,0, '');
-DELETE FROM waypoint_data WHERE id=@path;
-INSERT INTO waypoint_data (id,point,position_x,position_y,position_z,orientation,delay,move_type,action,action_chance,wpguid) VALUES
+DELETE FROM `creature_addon` WHERE `guid` IN (@NPC, @NPC+4, @NPC+8);
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES
+(@NPC,@path,0,0,1,0,0, ''),
+(@NPC+4,@path,0,0,1,0,0, ''),
+(@NPC+8,@path,0,0,1,0,0, '');
+
+DELETE FROM `waypoint_data` WHERE `id`=@path;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
 (@path,1,-3780.6667,-1879.9966,94.51902,0,0,0,0,100,0),
 (@path,2,-3765.317,-1912.2642,92.659584,0,0,0,0,100,0),
 (@path,3,-3743.7683,-1944.3379,93.25019,0,0,0,0,100,0),
