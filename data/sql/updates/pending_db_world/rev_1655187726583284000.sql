@@ -23,7 +23,7 @@ INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, 
 (45819, 3235, 0, 0, 1, 0, 0, 1, 1, 0, -3798.8208, -1829.7017, 94.17238, 4.366050243377685546, 1800, 0, 0, 1, 0, 0, 0, 0, 0, '', 0),
 (45820, 3236, 0, 0, 1, 0, 0, 1, 1, 0, -3807.5981, -1865.3707, 92.56358, 1.319851279258728027, 1800, 0, 0, 1, 0, 0, 0, 0, 0, '', 0);
 
-DELETE FROM `pool_creature` WHERE guid IN (45809, 45810, 45811, 45812, 45813, 45814, 45815, 45816, 45817, 45818, 45819, 45820);
+DELETE FROM `pool_creature` WHERE `guid` IN (45809, 45810, 45811, 45812, 45813, 45814, 45815, 45816, 45817, 45818, 45819, 45820);
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES 
 (45809, 391, 'Brontus Kodo Pack Combo 1 -- 4 Barrens Kodo Pack Leader Mob'),
 (45810, 391, 'Brontus Kodo Pack Combo 1 -- 4 Barrens Kodo Pack'),
