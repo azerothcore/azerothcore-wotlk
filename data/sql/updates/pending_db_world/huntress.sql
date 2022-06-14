@@ -7,7 +7,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (16332, 0, 3, 4, 9, 0, 100, 0, 5, 30, 2300, 3900, 0, 11, 6660, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Darnassian Huntress - Within 5-30 Range - Cast \'Shoot\''),
 (16332, 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 40, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Darnassian Huntress - Within 5-30 Range - Set Sheath Ranged'),
 (16332, 0, 5, 6, 9, 0, 100, 0, 25, 80, 0, 0, 0, 21, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Darnassian Huntress - Within 25-80 Range - Enable Combat Movement'),
-(16332, 0, 6, 0, 61, 0, 100, 0, 25, 80, 0, 0, 0, 20, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Darnassian Huntress - Within 25-80 Range - Start Attacking'),
+(16332, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 20, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Darnassian Huntress - Within 25-80 Range - Start Attacking'),
 (16332, 0, 7, 8, 9, 0, 100, 0, 0, 5, 0, 0, 0, 21, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Darnassian Huntress - Within 0-5 Range - Enable Combat Movement'),
 (16332, 0, 8, 9, 61, 0, 100, 0, 0, 0, 0, 0, 0, 40, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Darnassian Huntress - Within 0-5 Range - Set Sheath Melee'),
 (16332, 0, 9, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 20, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Darnassian Huntress - Within 0-5 Range - Start Attacking'),
