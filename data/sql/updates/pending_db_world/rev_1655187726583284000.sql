@@ -1,11 +1,11 @@
 --
-DELETE FROM `pool_template` WHERE entry IN (391, 392, 393); 
+DELETE FROM `pool_template` WHERE `entry` IN (391, 392, 393); 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (391, 4, 'Brontus Kodo Pack Combo 1 -- 4 Barrens Kodo Pack');
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (392, 4, 'Brontus Kodo Pack Combo 2 -- Mixed Kodo Pack');
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (393, 4, 'Brontus Kodo Pack Combo 3 -- Brontus Pack');
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (394, 1, 'Brontus Kodo Pack Pool of Pools');
 
-DELETE FROM `creature` WHERE guid IN (51815);
+DELETE FROM `creature` WHERE `guid` IN (51815);
 /* Combo 1 */
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 (45809, 3236, 0, 0, 1, 0, 0, 1, 1, 0, -3787.7153, -1848.3755, 93.918015, 2.55345463752746582, 600, 0, 0, 1, 0, 2, 0, 0, 0, '', 0), -- .go xyz -3787.7153 -1848.3755 93.918015 Leader 
@@ -38,7 +38,7 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
 (45819, 393, 'Brontus Kodo Pack Combo 3 -- Brontus Pack'),
 (45820, 393, 'Brontus Kodo Pack Combo 3 -- Brontus Pack');
 
-DELETE FROM `pool_pool` WHERE pool_id IN (391, 392, 393);
+DELETE FROM `pool_pool` WHERE `pool_id` IN (391, 392, 393);
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES 
 (391, 394, 55, 'Brontus Kodo Pack Combo 1 -- 4 Barrens Kodo Pack'),
 (392, 394, 30, 'Brontus Kodo Pack Combo 2 -- Mixed Kodo Pack'),
@@ -169,7 +169,7 @@ INSERT INTO waypoint_data (id,point,position_x,position_y,position_z,orientation
 (@path,112,-3802.9849,-1847.3167,94.4449,0,0,0,0,100,0);
 -- 0x204CB0002003294000001C00001E1E9F .go xyz -3780.6667 -1879.9966 94.51902
 
-DELETE FROM `creature_formations` where leaderGUID in(45809, 45813, 45817);
+DELETE FROM `creature_formations` WHERE `leaderGUID` IN (45809, 45813, 45817);
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
 (45809, 45809, 0, 0, 512, 0, 0), -- Leader
 (45809, 45810, 5, 190, 512, 0, 0), -- A
