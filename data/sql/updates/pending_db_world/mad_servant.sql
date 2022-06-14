@@ -1,5 +1,5 @@
 --
-DELETE FROM `creature_text` WHERE `CreatureID`=15111 AND `GroupID`=0;
+DELETE FROM `creature_text` WHERE `CreatureID`=15111 AND `GroupID` IN (0,1);
 INSERT INTO `creature_text` (`CreatureID`, `ID`, `Text`, `Type`, `Probability`, `BroadcastTextId`) VALUES 
 (15111, 0, 'I gonna make you into mojo!', 12, 100, 10435),
 (15111, 1, 'Troll mojo da strongest mojo!', 12, 100, 10437);
