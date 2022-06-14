@@ -17,7 +17,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (496600, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Private Hendel - Actionlist - Set Event Phase 1'),
 (5184, 0, 0, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 11, 7165, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Theramore Sentry - On Aggro - Cast \'Battle Stance\''),
 (5184, 0, 1, 0, 38, 0, 100, 513, 3, 3, 1, 2, 0, 41, 60000, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Theramore Sentry - On Data Set 3 3 - Despawn In 60000 ms (No Repeat)'),
-(496603, 9, 0, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 41, 1000, 300, 0, 0, 0, 0, 19, 5184, 50, 0, 0, 0, 0, 0, 0, 'Private Hendel - Actionlist - Despawn In 1000 ms'),
+(496603, 9, 0, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 41, 1, 300, 0, 0, 0, 0, 19, 5184, 50, 0, 0, 0, 0, 0, 0, 'Private Hendel - Actionlist - Despawn In 1000 ms'),
 (496603, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 6, 1324, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Private Hendel - Actionlist - Fail Quest \'The Missing Diplomat\''),
 (496603, 9, 2, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 41, 1, 300, 0, 0, 0, 0, 19, 5184, 50, 0, 0, 0, 0, 0, 0, 'Private Hendel - Actionlist - Despawn Instant'),
 (496603, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 41, 1, 300, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Private Hendel - Actionlist - Despawn Instant');
