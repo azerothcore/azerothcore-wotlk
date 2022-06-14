@@ -1095,7 +1095,7 @@ public:
 
     [[nodiscard]] bool IsInWater() const override { return m_isInWater; }
     [[nodiscard]] bool IsFalling() const;
-    bool IsInAreaTriggerRadius(const AreaTrigger* trigger) const;
+    bool IsInAreaTriggerRadius(AreaTrigger const* trigger, float delta = 0.f) const;
 
     void SendInitialPacketsBeforeAddToMap();
     void SendInitialPacketsAfterAddToMap();
@@ -2946,7 +2946,15 @@ template <class T> T Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& bas
                 return;
             }
 
-            totalflat += mod->value;
+            int32 flatValue = mod->value;
+
+            // SPELL_MOD_THREAT - divide by 100 (in packets we send threat * 100)
+            if (mod->op == SPELLMOD_THREAT)
+            {
+                flatValue /= 100;
+            }
+
+            totalflat += flatValue;
         }
         else if (mod->type == SPELLMOD_PCT)
         {

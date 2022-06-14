@@ -30,7 +30,15 @@ EndScriptData */
 DoorData const doorData[] =
 {
     { GO_FORCEFIELD, DATA_ARLOKK, DOOR_TYPE_ROOM },
-    { 0,             0,           DOOR_TYPE_ROOM } // END
+    { 0,             0,           DOOR_TYPE_ROOM }
+};
+
+ObjectData const creatureData[] =
+{
+    { NPC_HIGH_PRIEST_THEKAL, DATA_THEKAL  },
+    { NPC_ZEALOT_LORKHAN,     DATA_LORKHAN },
+    { NPC_ZEALOT_ZATH,        DATA_ZATH    },
+    { NPC_PRIESTESS_MARLI,    DATA_MARLI   }
 };
 
 class instance_zulgurub : public InstanceMapScript
@@ -43,22 +51,17 @@ public:
         instance_zulgurub_InstanceMapScript(Map* map) : InstanceScript(map)
         {
             SetBossNumber(EncounterCount);
+            LoadObjectData(creatureData, nullptr);
             LoadDoorData(doorData);
+            LoadObjectData(creatureData, nullptr);
         }
 
         void OnCreatureCreate(Creature* creature) override
         {
+            InstanceScript::OnCreatureCreate(creature);
+
             switch (creature->GetEntry())
             {
-                case NPC_ZEALOT_LORKHAN:
-                    _zealotLorkhanGUID = creature->GetGUID();
-                    break;
-                case NPC_ZEALOT_ZATH:
-                    _zealotZathGUID = creature->GetGUID();
-                    break;
-                case NPC_HIGH_PRIEST_THEKAL:
-                    _highPriestTekalGUID = creature->GetGUID();
-                    break;
                 case NPC_JINDO_THE_HEXXER:
                     _jindoTheHexxerGUID = creature->GetGUID();
                     break;
@@ -71,16 +74,28 @@ public:
                 case NPC_HAKKAR:
                     _hakkarGUID = creature->GetGUID();
                     break;
+                case NPC_SPAWN_OF_MARLI:
+                    if (Creature* marli = GetCreature(DATA_MARLI))
+                    {
+                        marli->AI()->JustSummoned(creature);
+                    }
+                    break;
+                case NPC_GAHZRANKA:
+                    _gahzrankaGUID = creature->GetGUID();
+                    break;
+                default:
+                    break;
             }
+
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         void OnGameObjectCreate(GameObject* go) override
         {
+            InstanceScript::OnGameObjectCreate(go);
+
             switch (go->GetEntry())
             {
-                case GO_FORCEFIELD:
-                    AddDoor(go, true);
-                    break;
                 case GO_GONG_OF_BETHEKK:
                     _goGongOfBethekkGUID = go->GetGUID();
                     if (GetBossState(DATA_ARLOKK) == DONE)
@@ -93,28 +108,10 @@ public:
             }
         }
 
-        void OnGameObjectRemove(GameObject* go) override
-        {
-            switch (go->GetEntry())
-            {
-                case GO_FORCEFIELD:
-                    AddDoor(go, false);
-                    break;
-                default:
-                    break;
-            }
-        }
-
         ObjectGuid GetGuidData(uint32 uiData) const override
         {
             switch (uiData)
             {
-                case DATA_LORKHAN:
-                    return _zealotLorkhanGUID;
-                case DATA_ZATH:
-                    return _zealotZathGUID;
-                case DATA_THEKAL:
-                    return _highPriestTekalGUID;
                 case DATA_JINDO:
                     return _jindoTheHexxerGUID;
                 case NPC_ARLOKK:
@@ -126,6 +123,16 @@ public:
             }
 
             return ObjectGuid::Empty;
+        }
+
+        uint32 GetData(uint32 type) const override
+        {
+            if (type == DATA_GAHZRANKA)
+            {
+                return _gahzrankaGUID || GetBossState(DATA_GAHZRANKA) == DONE;
+            }
+
+            return 0;
         }
 
         std::string GetSaveData() override
@@ -171,17 +178,15 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
     private:
-        //If all High Priest bosses were killed. Lorkhan, Zath and Ohgan are added too.
-        //Storing Lorkhan, Zath and Thekal because we need to cast on them later. Jindo is needed for healfunction too.
+        // If all High Priest bosses were killed. Ohgan is added too.
+        // Jindo is needed for healfunction.
 
-        ObjectGuid _zealotLorkhanGUID;
-        ObjectGuid _zealotZathGUID;
-        ObjectGuid _highPriestTekalGUID;
         ObjectGuid _jindoTheHexxerGUID;
         ObjectGuid _vilebranchSpeakerGUID;
         ObjectGuid _arlokkGUID;
         ObjectGuid _goGongOfBethekkGUID;
         ObjectGuid _hakkarGUID;
+        ObjectGuid _gahzrankaGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
