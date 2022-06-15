@@ -57,9 +57,6 @@ enum Events
 
 uint8 const NUM_CRYSTALS = 9;
 
-// You spin me right round, baby
-// right round like a record, baby
-// right round round round
 Position CrystalCoordinates[NUM_CRYSTALS] =
 {
     { -9394.230469f, 1951.808594f, 85.97733f, 0.0f },
