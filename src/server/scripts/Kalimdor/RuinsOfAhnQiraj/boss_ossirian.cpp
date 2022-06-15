@@ -34,11 +34,11 @@ enum Texts
 
 enum Spells
 {
-    SPELL_SILENCE               = 25195,
-    SPELL_CYCLONE               = 25189,
-    SPELL_STOMP                 = 25188,
+    SPELL_CURSE_OF_TONGUES      = 25195,
+    SPELL_ENVELOPING_WINDS      = 25189,
+    SPELL_WAR_STOMP             = 25188,
     SPELL_STRENGHT_OF_OSSIRIAN  = 25176,
-    SPELL_SUMMON                = 20477,
+    SPELL_SUMMON_PLAYER         = 20477,
     SPELL_SAND_STORM            = 25160,
     SPELL_SUMMON_CRYSTAL        = 25192
 };
@@ -222,7 +222,7 @@ public:
             events.Update(diff);
             if (me->GetDistance(me->GetVictim()) > 60.00f && me->GetDistance(me->GetVictim()) < 120.00f)
             {
-                DoCastVictim(SPELL_SUMMON);
+                DoCastVictim(SPELL_SUMMON_PLAYER);
             }
 
             bool ApplySupreme = true;
@@ -254,15 +254,15 @@ public:
                 switch (eventId)
                 {
                     case EVENT_SILENCE:
-                        DoCastAOE(SPELL_SILENCE);
+                        DoCastAOE(SPELL_CURSE_OF_TONGUES);
                         events.ScheduleEvent(EVENT_SILENCE, urand(20000, 30000));
                         break;
                     case EVENT_CYCLONE:
-                        DoCastVictim(SPELL_CYCLONE);
+                        DoCastVictim(SPELL_ENVELOPING_WINDS);
                         events.ScheduleEvent(EVENT_CYCLONE, 20000);
                         break;
                     case EVENT_STOMP:
-                        DoCastAOE(SPELL_STOMP);
+                        DoCastAOE(SPELL_WAR_STOMP);
                         events.ScheduleEvent(EVENT_STOMP, 30000);
                         break;
                     default:
