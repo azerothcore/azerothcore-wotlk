@@ -117,9 +117,15 @@ public:
         void DoAction(int32 action) override
         {
             if (action == ACTION_TRIGGER_WEAKNESS)
+            {
                 if (Creature* Trigger = me->GetMap()->GetCreature(TriggerGUID))
+                {
                     if (!Trigger->HasUnitState(UNIT_STATE_CASTING))
+                    {
                         Trigger->CastSpell(Trigger, SpellWeakness[urand(0, 4)], false);
+                    }
+                }
+            }
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -129,7 +135,6 @@ public:
             events.ScheduleEvent(EVENT_SILENCE, 30000);
             events.ScheduleEvent(EVENT_CYCLONE, 20000);
             events.ScheduleEvent(EVENT_STOMP, 30000);
-
             DoCast(me, SPELL_SUPREME);
             Talk(SAY_AGGRO);
 
@@ -139,14 +144,14 @@ public:
 
             WorldPackets::Misc::Weather weather(WEATHER_STATE_HEAVY_SANDSTORM, 1.0f);
             map->SendToPlayers(weather.Write());
-
             for (uint8 i = 0; i < NUM_TORNADOS; ++i)
             {
                 Position Point = me->GetRandomPoint(RoomCenter, RoomRadius);
                 if (Creature* Tornado = me->GetMap()->SummonCreature(NPC_SAND_VORTEX, Point))
+                {
                     Tornado->CastSpell(Tornado, SPELL_SAND_STORM, true);
+                }
             }
-
             SpawnNextCrystal();
         }
 
@@ -171,14 +176,17 @@ public:
         void Cleanup()
         {
             if (GameObject* Crystal = me->GetMap()->GetGameObject(CrystalGUID))
+            {
                 Crystal->Use(me);
+            }
         }
 
         void SpawnNextCrystal()
         {
             if (CrystalIterator == NUM_CRYSTALS)
+            {
                 CrystalIterator = 0;
-
+            }
             if (Creature* Trigger = me->GetMap()->SummonCreature(NPC_OSSIRIAN_TRIGGER, CrystalCoordinates[CrystalIterator]))
             {
                 TriggerGUID = Trigger->GetGUID();
@@ -212,15 +220,17 @@ public:
                 return;
 
             events.Update(diff);
-
-            // No kiting!
             if (me->GetDistance(me->GetVictim()) > 60.00f && me->GetDistance(me->GetVictim()) < 120.00f)
+            {
                 DoCastVictim(SPELL_SUMMON);
+            }
 
             bool ApplySupreme = true;
 
             if (me->HasAura(SPELL_SUPREME))
+            {
                 ApplySupreme = false;
+            }
             else
             {
                 for (uint8 i = 0; i < NUM_WEAKNESS; ++i)
@@ -244,7 +254,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_SILENCE:
-                        DoCast(me, SPELL_SILENCE);
+                        DoCastAOE(SPELL_SILENCE);
                         events.ScheduleEvent(EVENT_SILENCE, urand(20000, 30000));
                         break;
                     case EVENT_CYCLONE:
@@ -252,14 +262,13 @@ public:
                         events.ScheduleEvent(EVENT_CYCLONE, 20000);
                         break;
                     case EVENT_STOMP:
-                        DoCast(me, SPELL_STOMP);
+                        DoCastAOE(SPELL_STOMP);
                         events.ScheduleEvent(EVENT_STOMP, 30000);
                         break;
                     default:
                         break;
                 }
             }
-
             DoMeleeAttackIfReady();
         }
     };
