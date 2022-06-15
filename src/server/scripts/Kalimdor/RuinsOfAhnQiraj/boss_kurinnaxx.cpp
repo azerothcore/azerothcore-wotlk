@@ -100,10 +100,6 @@ public:
                         {
                             target->CastSpell(target, SPELL_SANDTRAP, true);
                         }
-                        else
-                        {
-                            DoCastVictim(SPELL_SANDTRAP);
-                        }
                         events.ScheduleEvent(EVENT_SANDTRAP, urand(10000, 15000));
                         break;
                     case EVENT_WIDE_SLASH:
