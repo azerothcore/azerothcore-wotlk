@@ -25,37 +25,37 @@
 
 enum Texts
 {
-    SAY_SUPREME             = 0,
-    SAY_INTRO               = 1,
-    SAY_AGGRO               = 2,
-    SAY_SLAY                = 3,
-    SAY_DEATH               = 4
+    SAY_SUPREME                 = 0,
+    SAY_INTRO                   = 1,
+    SAY_AGGRO                   = 2,
+    SAY_SLAY                    = 3,
+    SAY_DEATH                   = 4
 };
 
 enum Spells
 {
-    SPELL_SILENCE           = 25195,
-    SPELL_CYCLONE           = 25189,
-    SPELL_STOMP             = 25188,
-    SPELL_SUPREME           = 25176,
-    SPELL_SUMMON            = 20477,
-    SPELL_SAND_STORM        = 25160,
-    SPELL_SUMMON_CRYSTAL    = 25192
+    SPELL_SILENCE               = 25195,
+    SPELL_CYCLONE               = 25189,
+    SPELL_STOMP                 = 25188,
+    SPELL_STRENGHT_OF_OSSIRIAN  = 25176,
+    SPELL_SUMMON                = 20477,
+    SPELL_SAND_STORM            = 25160,
+    SPELL_SUMMON_CRYSTAL        = 25192
 };
 
 enum Actions
 {
-    ACTION_TRIGGER_WEAKNESS = 1
+    ACTION_TRIGGER_WEAKNESS     = 1
 };
 
 enum Events
 {
-    EVENT_SILENCE           = 1,
-    EVENT_CYCLONE           = 2,
-    EVENT_STOMP             = 3
+    EVENT_SILENCE               = 1,
+    EVENT_CYCLONE               = 2,
+    EVENT_STOMP                 = 3
 };
 
-uint8 const NUM_CRYSTALS = 9;
+uint8 const NUM_CRYSTALS        = 9;
 
 Position CrystalCoordinates[NUM_CRYSTALS] =
 {
@@ -107,7 +107,7 @@ public:
             {
                 if (spell->Id == SpellWeakness[i])
                 {
-                    me->RemoveAurasDueToSpell(SPELL_SUPREME);
+                    me->RemoveAurasDueToSpell(SPELL_STRENGHT_OF_OSSIRIAN);
                     ((TempSummon*)caster)->UnSummon();
                     SpawnNextCrystal();
                 }
@@ -135,7 +135,7 @@ public:
             events.ScheduleEvent(EVENT_SILENCE, 30000);
             events.ScheduleEvent(EVENT_CYCLONE, 20000);
             events.ScheduleEvent(EVENT_STOMP, 30000);
-            DoCast(me, SPELL_SUPREME);
+            DoCast(me, SPELL_STRENGHT_OF_OSSIRIAN);
             Talk(SAY_AGGRO);
 
             Map* map = me->GetMap();
@@ -227,7 +227,7 @@ public:
 
             bool ApplySupreme = true;
 
-            if (me->HasAura(SPELL_SUPREME))
+            if (me->HasAura(SPELL_STRENGHT_OF_OSSIRIAN))
             {
                 ApplySupreme = false;
             }
@@ -245,7 +245,7 @@ public:
 
             if (ApplySupreme)
             {
-                DoCast(me, SPELL_SUPREME);
+                DoCast(me, SPELL_STRENGHT_OF_OSSIRIAN);
                 Talk(SAY_SUPREME);
             }
 
