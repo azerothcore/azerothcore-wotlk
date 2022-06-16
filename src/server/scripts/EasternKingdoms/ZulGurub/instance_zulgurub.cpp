@@ -22,6 +22,7 @@ SDComment: Missing reset function after killing a boss for Ohgan, Thekal.
 SDCategory: Zul'Gurub
 EndScriptData */
 
+#include "GameObjectAI.h"
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
 #include "zulgurub.h"
@@ -194,7 +195,56 @@ public:
     }
 };
 
+enum EdgeOfMadnessEnum
+{
+    EVENT_EDGE_OF_MADNESS_GRILEK    = 27,
+    EVENT_EDGE_OF_MADNESS_HAZZARAH  = 28,
+    EVENT_EDGE_OF_MADNESS_RENATAKI  = 29,
+    EVENT_EDGE_OF_MADNESS_WUSHOOLAY = 30
+};
+
+std::vector<std::pair<uint32, uint32>> BrazierOfMadnessContainer =
+{
+    { EVENT_EDGE_OF_MADNESS_GRILEK,     NPC_GRILEK      },
+    { EVENT_EDGE_OF_MADNESS_HAZZARAH,   NPC_HAZZARAH    },
+    { EVENT_EDGE_OF_MADNESS_RENATAKI,   NPC_RENATAKI    },
+    { EVENT_EDGE_OF_MADNESS_WUSHOOLAY,  NPC_WUSHOOLAY   }
+};
+
+Position const edgeOfMagnessSummonPos = { -11901.229f, -1906.366f, 65.358f, 0.942f };
+
+struct go_brazier_of_madness : public GameObjectAI
+{
+    go_brazier_of_madness(GameObject* go) : GameObjectAI(go) { }
+
+    bool GossipHello(Player* /*player*/, bool reportUse) override
+    {
+        if (reportUse)
+        {
+            return true;
+        }
+
+        uint32 bossEntry = 0;
+        for (uint8 i = 0; i < 4; ++i)
+        {
+            if (sGameEventMgr->IsActiveEvent(BrazierOfMadnessContainer[i].first))
+            {
+                bossEntry = BrazierOfMadnessContainer[i].second;
+                break;
+            }
+        }
+
+        if (bossEntry)
+        {
+            me->SummonCreature(bossEntry, edgeOfMagnessSummonPos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2 * HOUR * IN_MILLISECONDS);
+        }
+
+        return false;
+    }
+};
+
 void AddSC_instance_zulgurub()
 {
     new instance_zulgurub();
+    RegisterGameObjectAI(go_brazier_of_madness);
 }

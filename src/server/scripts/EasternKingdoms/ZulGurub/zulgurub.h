@@ -63,7 +63,11 @@ enum CreatureIds
     NPC_HAKKAR              = 14834,
     NPC_ZULGURUB_TIGER      = 11361,
     NPC_BRAIN_WASH_TOTEM    = 15112,
-    NPC_GAHZRANKA           = 15114
+    NPC_GAHZRANKA           = 15114,
+    NPC_GRILEK              = 15082,
+    NPC_HAZZARAH            = 15083,
+    NPC_RENATAKI            = 15084,
+    NPC_WUSHOOLAY           = 15085
 };
 
 enum GameobjectIds
