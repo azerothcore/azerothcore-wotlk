@@ -1809,6 +1809,21 @@ bool Creature::CanAlwaysSee(WorldObject const* obj) const
     return false;
 }
 
+bool Creature::IsAlwaysDetectableFor(WorldObject const* seer) const
+{
+    if (Unit::IsAlwaysDetectableFor(seer))
+    {
+        return true;
+    }
+
+    if (IsAIEnabled && AI()->CanAlwaysBeDetectable(seer))
+    {
+        return true;
+    }
+
+    return false;
+}
+
 bool Creature::CanStartAttack(Unit const* who) const
 {
     if (IsCivilian())
