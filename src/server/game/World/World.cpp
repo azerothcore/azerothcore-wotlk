@@ -1185,6 +1185,13 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_OFFHAND_CHECK_AT_SPELL_UNLEARN]            = sConfigMgr->GetOption<bool>("OffhandCheckAtSpellUnlearn", true);
     m_int_configs[CONFIG_CREATURE_STOP_FOR_PLAYER]                   = sConfigMgr->GetOption<uint32>("Creature.MovingStopTimeForPlayer", 3 * MINUTE * IN_MILLISECONDS);
 
+    m_float_configs[CONFIG_WATER_BREATH_TIMER]                       = sConfigMgr->GetOption<float>("WaterBreath.Timer", 3.0f);
+    if (m_float_configs[CONFIG_WATER_BREATH_TIMER] <= 0)
+    {
+        LOG_ERROR("server.loading", "WaterBreath.Timer ({}) must be > 0. Using 3 instead.", m_float_configs[CONFIG_WATER_BREATH_TIMER]);
+        m_float_configs[CONFIG_WATER_BREATH_TIMER] = 3;
+    }
+
     if (int32 clientCacheId = sConfigMgr->GetOption<int32>("ClientCacheVersion", 0))
     {
         // overwrite DB/old value
