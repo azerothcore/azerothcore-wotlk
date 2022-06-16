@@ -316,6 +316,8 @@ Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
 
     _oldFactionId = 0;
 
+    _isWalkingBeforeCharm = false;
+
     _lastExtraAttackSpell = 0;
 }
 
@@ -10482,8 +10484,12 @@ void Unit::SetCharm(Unit* charm, bool apply)
         if (!charm->AddGuidValue(UNIT_FIELD_CHARMEDBY, GetGUID()))
             LOG_FATAL("entities.unit", "Unit {} is being charmed, but it already has a charmer {}", charm->GetEntry(), charm->GetCharmerGUID().ToString());
 
-        if (charm->HasUnitMovementFlag(MOVEMENTFLAG_WALKING))
+        _isWalkingBeforeCharm = charm->IsWalking();
+        if (_isWalkingBeforeCharm)
+        {
             charm->SetWalk(false);
+            charm->SendMovementFlagUpdate();
+        }
 
         m_Controlled.insert(charm);
     }
@@ -10519,6 +10525,12 @@ void Unit::SetCharm(Unit* charm, bool apply)
             charm->m_ControlledByPlayer = false;
             charm->RemoveUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
             charm->SetByteValue(UNIT_FIELD_BYTES_2, 1, 0);
+        }
+
+        if (charm->IsWalking() != _isWalkingBeforeCharm)
+        {
+            charm->SetWalk(_isWalkingBeforeCharm);
+            charm->SendMovementFlagUpdate(true); // send packet to self, to update movement state on player.
         }
 
         m_Controlled.erase(charm);
@@ -13168,7 +13180,7 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
                 creature->AI()->EnterCombat(enemy);
 
             if (creature->GetFormation())
-                creature->GetFormation()->MemberAttackStart(creature, enemy);
+                creature->GetFormation()->MemberEngagingTarget(creature, enemy);
         }
 
         creature->RefreshSwimmingFlag();

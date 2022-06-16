@@ -738,48 +738,6 @@ class spell_gen_no_offhand_proc : public AuraScript
     }
 };
 
-/* 71602 - Item - Icecrown 25 Normal Caster Trinket 1 Base
-   71645 - Item - Icecrown 25 Heroic Caster Trinket 1 Base
-   71845 - Item - Icecrown 25 Normal Caster Weapon Proc
-   71846 - Item - Icecrown 25 Heroic Caster Weapon Proc
-   72419 - Item - Icecrown Reputation Ring Healer Trigger
-   75465 - Item - Chamber of Aspects 25 Nuker Trinket
-   75474 - Item - Chamber of Aspects 25 Heroic Nuker Trinket */
-class spell_gen_proc_once_per_cast : public AuraScript
-{
-    PrepareAuraScript(spell_gen_proc_once_per_cast);
-
-    bool Load() override
-    {
-        _spellPointer = nullptr;
-        return true;
-    }
-
-    bool CheckProc(ProcEventInfo& eventInfo)
-    {
-        if (eventInfo.GetActor())
-        {
-            if (Player* player = eventInfo.GetActor()->ToPlayer())
-            {
-                if (player->m_spellModTakingSpell == _spellPointer)
-                {
-                    return false;
-                }
-                _spellPointer = player->m_spellModTakingSpell;
-            }
-        }
-        return true;
-    }
-
-    void Register() override
-    {
-        DoCheckProc += AuraCheckProcFn(spell_gen_proc_once_per_cast::CheckProc);
-    }
-
-private:
-    Spell* _spellPointer;
-};
-
 // 70805 - Item - Rogue T10 2P Bonus
 class spell_gen_proc_on_self : public AuraScript
 {
@@ -4545,7 +4503,6 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_use_spell_base_level_check);
     RegisterSpellScript(spell_gen_proc_from_direct_damage);
     RegisterSpellScript(spell_gen_no_offhand_proc);
-    RegisterSpellScript(spell_gen_proc_once_per_cast);
     RegisterSpellScript(spell_gen_proc_on_self);
     RegisterSpellScript(spell_gen_proc_not_self);
     RegisterSpellScript(spell_gen_baby_murloc_passive);

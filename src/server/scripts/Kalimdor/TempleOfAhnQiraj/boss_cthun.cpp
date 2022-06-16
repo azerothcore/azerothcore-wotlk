@@ -25,37 +25,8 @@ EndScriptData */
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "TaskScheduler.h"
 #include "temple_of_ahnqiraj.h"
-
-/*
- * This is a 2 phases events. Here follows an explanation of the main events and transition between phases and sub-phases.
- *
- * The first phase is the EYE phase: the Eye of C'Thun is active and C'thun is not active.
- *     During this phase, the "Eye of C'Thun" alternates between 2 sub-phases:
- *         - PHASE_EYE_GREEN_BEAM:
- *             50 sec phase during which the Eye mainly casts its Green Beam every 3 sec.
- *         - PHASE_EYE_RED_BEAM:
- *             35 sec phase during which the Eye casts its red beam every sec.
- *     This EYE phase ends when the "Eye of C'Thun" is killed. Then starts the CTHUN phase.
- *
- * The second phase is the CTHUN phase. The Eye of C'Thun is not active and C'Thun is active.
- *     This phase starts with the transformation of the Eye into C'Thun (PHASE_CTHUN_TRANSITION).
- *     After the transformation, C'Thun alternates between 2 sub-phases:
- *         - PHASE_CTHUN_STOMACH:
- *             - C'Thun is almost insensible to all damage (99% damage reduction).
- *             - It spawns 2 tentacles in its stomach.
- *             - C'Thun swallows players.
- *             - This sub-phase ends when the 2 tentacles are killed. Swallowed players are regurgitate.
- *
- *         - PHASE_CTHUN_WEAK:
- *             - weakened C'Thun takes normal damage.
- *             - This sub-phase ends after 45 secs.
- *
- *     This CTHUN phase ends when C'Thun is killed
- *
- * Note:
- * - the current phase is stored in the instance data to be easily shared between the eye and cthun.
- */
 
 enum Phases
 {
@@ -99,7 +70,7 @@ enum Spells
     //SAME AS PHASE1
 
     //Giant Claw Tentacles
-    SPELL_MASSIVE_GROUND_RUPTURE                = 26100,
+    SPELL_MASSIVE_GROUND_RUPTURE                = 26478,
 
     //Also casts Hamstring
     SPELL_THRASH                                = 3391,
@@ -111,6 +82,10 @@ enum Spells
     SPELL_MOUTH_TENTACLE                        = 26332,
     SPELL_EXIT_STOMACH_KNOCKBACK                = 25383,
     SPELL_DIGESTIVE_ACID                        = 26476,
+
+    // Tentacles
+    SPELL_SUBMERGE_VISUAL                       = 26234,
+    SPELL_BIRTH                                 = 26262
 };
 
 enum Actions
@@ -140,6 +115,20 @@ const Position FleshTentaclePos[2] =
 {
     { -8571.0f, 1990.0f, -98.0f, 1.22f},
     { -8525.0f, 1994.0f, -98.0f, 2.12f},
+};
+
+class NotInStomachSelector
+{
+public:
+    NotInStomachSelector() { }
+
+    bool operator()(Unit* unit) const
+    {
+        if (unit->GetTypeId() != TYPEID_PLAYER || unit->HasAura(SPELL_DIGESTIVE_ACID))
+            return false;
+
+        return true;
+    }
 };
 
 //Kick out position
@@ -917,32 +906,40 @@ public:
     {
         eye_tentacleAI(Creature* creature) : ScriptedAI(creature)
         {
-            if (Creature* pPortal = me->SummonCreature(NPC_SMALL_PORTAL, *me, TEMPSUMMON_CORPSE_DESPAWN))
+            if (Creature* portal = me->SummonCreature(NPC_SMALL_PORTAL, *me, TEMPSUMMON_CORPSE_DESPAWN))
             {
-                pPortal->SetReactState(REACT_PASSIVE);
-                Portal = pPortal->GetGUID();
+                portal->SetReactState(REACT_PASSIVE);
+                _portalGUID = portal->GetGUID();
             }
 
             SetCombatMovement(false);
         }
 
-        uint32 MindflayTimer;
-        uint32 KillSelfTimer;
-        ObjectGuid Portal;
-
         void JustDied(Unit* /*killer*/) override
         {
-            if (Unit* p = ObjectAccessor::GetUnit(*me, Portal))
+            if (Unit* p = ObjectAccessor::GetUnit(*me, _portalGUID))
+            {
                 Unit::Kill(p, p);
+            }
         }
 
         void Reset() override
         {
-            //Mind flay half a second after we spawn
-            MindflayTimer = 500;
+            _scheduler.Schedule(500ms, [this](TaskContext /*task*/)
+            {
+                DoCastAOE(SPELL_GROUND_RUPTURE);
+            }).Schedule(5min, [this](TaskContext /*task*/)
+            {
+                me->DespawnOrUnsummon();
+            }).Schedule(1s, 5s, [this](TaskContext context)
+            {
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [&](Unit* u) { return u && u->GetTypeId() == TYPEID_PLAYER && !u->HasAura(SPELL_DIGESTIVE_ACID) && !u->HasAura(SPELL_MIND_FLAY); }))
+                {
+                   DoCast(target, SPELL_MIND_FLAY);
+                }
 
-            //This prevents eyes from overlapping
-            KillSelfTimer = 35000;
+                context.Repeat(10s, 15s);
+            });
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -956,26 +953,12 @@ public:
             if (!UpdateVictim())
                 return;
 
-            //KillSelfTimer
-            if (KillSelfTimer <= diff)
-            {
-                Unit::Kill(me, me);
-                return;
-            }
-            else KillSelfTimer -= diff;
-
-            //MindflayTimer
-            if (MindflayTimer <= diff)
-            {
-                Unit* target = SelectTarget(SelectTargetMethod::Random, 0);
-                if (target && !target->HasAura(SPELL_DIGESTIVE_ACID))
-                    DoCast(target, SPELL_MIND_FLAY);
-
-                //Mindflay every 10 seconds
-                MindflayTimer = 10000;
-            }
-            else MindflayTimer -= diff;
+            _scheduler.Update(diff);
         }
+
+    private:
+        TaskScheduler _scheduler;
+        ObjectGuid _portalGUID;
     };
 };
 
@@ -995,35 +978,41 @@ public:
         {
             SetCombatMovement(false);
 
-            if (Creature* pPortal = me->SummonCreature(NPC_SMALL_PORTAL, *me, TEMPSUMMON_CORPSE_DESPAWN))
+            if (Creature* portal = me->SummonCreature(NPC_SMALL_PORTAL, *me, TEMPSUMMON_CORPSE_DESPAWN))
             {
-                pPortal->SetReactState(REACT_PASSIVE);
-                Portal = pPortal->GetGUID();
+                portal->SetReactState(REACT_PASSIVE);
+                _portalGUID = portal->GetGUID();
             }
         }
 
-        uint32 GroundRuptureTimer;
-        uint32 HamstringTimer;
-        uint32 EvadeTimer;
-        ObjectGuid Portal;
-
         void JustDied(Unit* /*killer*/) override
         {
-            if (Unit* p = ObjectAccessor::GetUnit(*me, Portal))
+            if (Unit* p = ObjectAccessor::GetUnit(*me, _portalGUID))
+            {
                 Unit::Kill(p, p);
+            }
         }
 
         void Reset() override
         {
-            //First rupture should happen half a second after we spawn
-            GroundRuptureTimer = 500;
-            HamstringTimer = 2000;
-            EvadeTimer = 5000;
+            _scheduler.Schedule(Milliseconds(500), [this](TaskContext /*task*/)
+            {
+                DoCastAOE(SPELL_GROUND_RUPTURE);
+            }).Schedule(Minutes(5), [this](TaskContext /*task*/)
+            {
+                me->DespawnOrUnsummon();
+            });
         }
 
         void EnterCombat(Unit* /*who*/) override
         {
             DoZoneInCombat();
+
+            _scheduler.Schedule(2s, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_HAMSTRING);
+                context.Repeat(5s);
+            });
         }
 
         void UpdateAI(uint32 diff) override
@@ -1032,62 +1021,14 @@ public:
             if (!UpdateVictim())
                 return;
 
-            //EvadeTimer
-            if (!me->IsWithinMeleeRange(me->GetVictim()))
-            {
-                if (EvadeTimer <= diff)
-                {
-                    if (Unit* p = ObjectAccessor::GetUnit(*me, Portal))
-                        Unit::Kill(p, p);
-
-                    //Dissapear and reappear at new position
-                    me->SetVisible(false);
-
-                    Unit* target = SelectTarget(SelectTargetMethod::Random, 0);
-                    if (!target)
-                    {
-                        Unit::Kill(me, me);
-                        return;
-                    }
-
-                    if (!target->HasAura(SPELL_DIGESTIVE_ACID))
-                    {
-                        me->SetPosition(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0);
-                        if (Creature* pPortal = me->SummonCreature(NPC_SMALL_PORTAL, *me, TEMPSUMMON_CORPSE_DESPAWN))
-                        {
-                            pPortal->SetReactState(REACT_PASSIVE);
-                            Portal = pPortal->GetGUID();
-                        }
-
-                        GroundRuptureTimer = 500;
-                        HamstringTimer = 2000;
-                        EvadeTimer = 5000;
-                        AttackStart(target);
-                    }
-
-                    me->SetVisible(true);
-                }
-                else EvadeTimer -= diff;
-            }
-
-            //GroundRuptureTimer
-            if (GroundRuptureTimer <= diff)
-            {
-                DoCastVictim(SPELL_GROUND_RUPTURE);
-                GroundRuptureTimer = 30000;
-            }
-            else GroundRuptureTimer -= diff;
-
-            //HamstringTimer
-            if (HamstringTimer <= diff)
-            {
-                DoCastVictim(SPELL_HAMSTRING);
-                HamstringTimer = 5000;
-            }
-            else HamstringTimer -= diff;
+            _scheduler.Update(diff);
 
             DoMeleeAttackIfReady();
         }
+
+    private:
+        TaskScheduler _scheduler;
+        ObjectGuid _portalGUID;
     };
 };
 
@@ -1107,37 +1048,112 @@ public:
         {
             SetCombatMovement(false);
 
-            if (Creature* pPortal = me->SummonCreature(NPC_GIANT_PORTAL, *me, TEMPSUMMON_CORPSE_DESPAWN))
+            if (Creature* portal = me->SummonCreature(NPC_GIANT_PORTAL, *me, TEMPSUMMON_CORPSE_DESPAWN))
             {
-                pPortal->SetReactState(REACT_PASSIVE);
-                Portal = pPortal->GetGUID();
+                portal->SetReactState(REACT_PASSIVE);
+                _portalGUID = portal->GetGUID();
             }
         }
 
-        uint32 GroundRuptureTimer;
-        uint32 ThrashTimer;
-        uint32 HamstringTimer;
-        uint32 EvadeTimer;
-        ObjectGuid Portal;
-
         void JustDied(Unit* /*killer*/) override
         {
-            if (Unit* p = ObjectAccessor::GetUnit(*me, Portal))
+            if (Unit* p = ObjectAccessor::GetUnit(*me, _portalGUID))
+            {
                 Unit::Kill(p, p);
+            }
         }
 
         void Reset() override
         {
-            //First rupture should happen half a second after we spawn
-            GroundRuptureTimer = 500;
-            HamstringTimer = 2000;
-            ThrashTimer = 5000;
-            EvadeTimer = 5000;
+            _scheduler.Schedule(500ms, [this](TaskContext /*task*/)
+            {
+                DoCastAOE(SPELL_MASSIVE_GROUND_RUPTURE);
+            });
         }
 
         void EnterCombat(Unit* /*who*/) override
         {
             DoZoneInCombat();
+
+            _scheduler.Schedule(2s, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_HAMSTRING);
+                context.Repeat(10s);
+            }).Schedule(5s, [this](TaskContext context) {
+                DoCastSelf(SPELL_THRASH);
+                context.Repeat(10s);
+            });
+        }
+
+        void ScheduleMeleeCheck()
+        {
+            // Check if a target is in melee range
+            _scheduler.Schedule(10s, [this](TaskContext task)
+            {
+                if (Unit* target = me->GetVictim())
+                {
+                    if (!target->IsWithinMeleeRange(me))
+                    {
+                        // Main target not found within melee range, try to select a new one
+                        if (Player* newTarget = me->SelectNearestPlayer(5.0f))
+                        {
+                            AttackStart(newTarget);
+                        }
+                        else // Main target not found, and failed to acquire a new target... Submerge
+                        {
+                            Submerge();
+                        }
+                    }
+                }
+
+                task.Repeat();
+            });
+        }
+
+        void Submerge()
+        {
+            if (me->SelectNearestPlayer(5.0f))
+            {
+                return;
+            }
+
+            // Despawn portal
+            if (Creature* p = ObjectAccessor::GetCreature(*me, _portalGUID))
+            {
+                p->DespawnOrUnsummon();
+            }
+
+            DoCastSelf(SPELL_SUBMERGE_VISUAL);
+            me->SetHealth(me->GetMaxHealth());
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+
+            _scheduler.CancelAll();
+
+            _scheduler.Schedule(5s, [this](TaskContext /*task*/)
+            {
+                Emerge();
+            });
+        }
+
+        void Emerge()
+        {
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, NotInStomachSelector()))
+            {
+                Position pos = target->GetPosition();
+                me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), 0);
+                if (Creature* portal = me->SummonCreature(NPC_GIANT_PORTAL, pos, TEMPSUMMON_CORPSE_DESPAWN))
+                {
+                    portal->SetReactState(REACT_PASSIVE);
+                    _portalGUID = portal->GetGUID();
+                }
+
+                me->RemoveAurasDueToSpell(SPELL_SUBMERGE_VISUAL);
+                DoCastSelf(SPELL_BIRTH);
+                DoCastAOE(SPELL_MASSIVE_GROUND_RUPTURE, true);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+
+                ScheduleMeleeCheck();
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -1146,70 +1162,14 @@ public:
             if (!UpdateVictim())
                 return;
 
-            //EvadeTimer
-            if (!me->IsWithinMeleeRange(me->GetVictim()))
-            {
-                if (EvadeTimer <= diff)
-                {
-                    if (Unit* p = ObjectAccessor::GetUnit(*me, Portal))
-                        Unit::Kill(p, p);
-
-                    //Dissapear and reappear at new position
-                    me->SetVisible(false);
-
-                    Unit* target = SelectTarget(SelectTargetMethod::Random, 0);
-                    if (!target)
-                    {
-                        Unit::Kill(me, me);
-                        return;
-                    }
-
-                    if (!target->HasAura(SPELL_DIGESTIVE_ACID))
-                    {
-                        me->SetPosition(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0);
-                        if (Creature* pPortal = me->SummonCreature(NPC_GIANT_PORTAL, *me, TEMPSUMMON_CORPSE_DESPAWN))
-                        {
-                            pPortal->SetReactState(REACT_PASSIVE);
-                            Portal = pPortal->GetGUID();
-                        }
-
-                        GroundRuptureTimer = 500;
-                        HamstringTimer = 2000;
-                        ThrashTimer = 5000;
-                        EvadeTimer = 5000;
-                        AttackStart(target);
-                    }
-                    me->SetVisible(true);
-                }
-                else EvadeTimer -= diff;
-            }
-
-            //GroundRuptureTimer
-            if (GroundRuptureTimer <= diff)
-            {
-                DoCastVictim(SPELL_GROUND_RUPTURE);
-                GroundRuptureTimer = 30000;
-            }
-            else GroundRuptureTimer -= diff;
-
-            //ThrashTimer
-            if (ThrashTimer <= diff)
-            {
-                DoCastVictim(SPELL_THRASH);
-                ThrashTimer = 10000;
-            }
-            else ThrashTimer -= diff;
-
-            //HamstringTimer
-            if (HamstringTimer <= diff)
-            {
-                DoCastVictim(SPELL_HAMSTRING);
-                HamstringTimer = 10000;
-            }
-            else HamstringTimer -= diff;
+            _scheduler.Update(diff);
 
             DoMeleeAttackIfReady();
         }
+
+    private:
+        TaskScheduler _scheduler;
+        ObjectGuid _portalGUID;
     };
 };
 
@@ -1229,26 +1189,34 @@ public:
         {
             SetCombatMovement(false);
 
-            if (Creature* pPortal = me->SummonCreature(NPC_GIANT_PORTAL, *me, TEMPSUMMON_CORPSE_DESPAWN))
+            if (Creature* portal = me->SummonCreature(NPC_GIANT_PORTAL, *me, TEMPSUMMON_CORPSE_DESPAWN))
             {
-                pPortal->SetReactState(REACT_PASSIVE);
-                Portal = pPortal->GetGUID();
+                portal->SetReactState(REACT_PASSIVE);
+                _portalGUID = portal->GetGUID();
             }
         }
 
-        uint32 BeamTimer;
-        ObjectGuid Portal;
-
         void JustDied(Unit* /*killer*/) override
         {
-            if (Unit* p = ObjectAccessor::GetUnit(*me, Portal))
+            if (Unit* p = ObjectAccessor::GetUnit(*me, _portalGUID))
+            {
                 Unit::Kill(p, p);
+            }
         }
 
         void Reset() override
         {
-            //Green Beam half a second after we spawn
-            BeamTimer = 500;
+            _scheduler.Schedule(500ms, [this](TaskContext /*task*/)
+            {
+                DoCastAOE(SPELL_MASSIVE_GROUND_RUPTURE);
+            }).Schedule(1s, 5s, [this](TaskContext context) {
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_DIGESTIVE_ACID))
+                {
+                    DoCast(target, SPELL_GREEN_BEAM);
+                }
+
+                context.Repeat(2100ms);
+            });
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -1262,18 +1230,12 @@ public:
             if (!UpdateVictim())
                 return;
 
-            //BeamTimer
-            if (BeamTimer <= diff)
-            {
-                Unit* target = SelectTarget(SelectTargetMethod::Random, 0);
-                if (target && !target->HasAura(SPELL_DIGESTIVE_ACID))
-                    DoCast(target, SPELL_GREEN_BEAM);
-
-                //Beam every 2 seconds
-                BeamTimer = 2100;
-            }
-            else BeamTimer -= diff;
+            _scheduler.Update(diff);
         }
+
+    private:
+        TaskScheduler _scheduler;
+        ObjectGuid _portalGUID;
     };
 };
 
