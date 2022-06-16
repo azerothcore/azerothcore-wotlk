@@ -2548,6 +2548,7 @@ private:
     bool m_duringRemoveFromWorld; // lock made to not add stuff after begining removing from world
 
     uint32 _oldFactionId;           ///< faction before charm
+    bool _isWalkingBeforeCharm;     ///< Are we walking before we were charmed?
 
     [[nodiscard]] float processDummyAuras(float TakenTotalMod) const;
 

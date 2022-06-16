@@ -302,9 +302,6 @@ public:
  * ---
  * --- Dragonspecific scripts and handling: LETHON
  * ---
- *
- * @todo
- * - Spell: Shadow bolt whirl casts needs custom handling (spellscript)
  */
 
 enum LethonTexts
@@ -318,6 +315,14 @@ enum LethonSpells
     SPELL_DRAW_SPIRIT               = 24811,
     SPELL_SHADOW_BOLT_WHIRL         = 24834,
     SPELL_DARK_OFFERING             = 24804,
+    SPELL_SHADOW_BOLT_WHIRL1        = 24820,
+    SPELL_SHADOW_BOLT_WHIRL2        = 24821,
+    SPELL_SHADOW_BOLT_WHIRL3        = 24822,
+    SPELL_SHADOW_BOLT_WHIRL4        = 24823,
+    SPELL_SHADOW_BOLT_WHIRL5        = 24835,
+    SPELL_SHADOW_BOLT_WHIRL6        = 24836,
+    SPELL_SHADOW_BOLT_WHIRL7        = 24837,
+    SPELL_SHADOW_BOLT_WHIRL8        = 24838,
 };
 
 enum LethonCreatures
@@ -340,13 +345,14 @@ public:
         {
             _stage = 1;
             emerald_dragonAI::Reset();
-            events.ScheduleEvent(EVENT_SHADOW_BOLT_WHIRL, 10000);
+            me->RemoveAurasDueToSpell(SPELL_SHADOW_BOLT_WHIRL);
         }
 
         void EnterCombat(Unit* who) override
         {
             Talk(SAY_LETHON_AGGRO);
             WorldBossAI::EnterCombat(who);
+            DoCastSelf(SPELL_SHADOW_BOLT_WHIRL, true);
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -365,20 +371,6 @@ public:
             {
                 Position targetPos = target->GetPosition();
                 me->SummonCreature(NPC_SPIRIT_SHADE, targetPos, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 50000);
-            }
-        }
-
-        void ExecuteEvent(uint32 eventId) override
-        {
-            switch (eventId)
-            {
-                case EVENT_SHADOW_BOLT_WHIRL:
-                    me->CastSpell((Unit*)nullptr, SPELL_SHADOW_BOLT_WHIRL, false);
-                    events.ScheduleEvent(EVENT_SHADOW_BOLT_WHIRL, urand(15000, 30000));
-                    break;
-                default:
-                    emerald_dragonAI::ExecuteEvent(eventId);
-                    break;
             }
         }
 
@@ -712,6 +704,41 @@ public:
     }
 };
 
+class spell_shadow_bolt_whirl : public AuraScript
+{
+    PrepareAuraScript(spell_shadow_bolt_whirl);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SHADOW_BOLT_WHIRL1, SPELL_SHADOW_BOLT_WHIRL2, SPELL_SHADOW_BOLT_WHIRL3, SPELL_SHADOW_BOLT_WHIRL4, SPELL_SHADOW_BOLT_WHIRL5, SPELL_SHADOW_BOLT_WHIRL6, SPELL_SHADOW_BOLT_WHIRL7, SPELL_SHADOW_BOLT_WHIRL8 });
+    }
+
+    void HandlePeriodic(AuraEffect const* aurEff)
+    {
+        Unit* caster = GetCaster();
+        Unit* target = GetTarget();
+
+        if (!caster || !target)
+            return;
+        std::array<uint32, 8> spellForTick = { SPELL_SHADOW_BOLT_WHIRL1, SPELL_SHADOW_BOLT_WHIRL2, SPELL_SHADOW_BOLT_WHIRL3, SPELL_SHADOW_BOLT_WHIRL4, SPELL_SHADOW_BOLT_WHIRL5, SPELL_SHADOW_BOLT_WHIRL6, SPELL_SHADOW_BOLT_WHIRL7, SPELL_SHADOW_BOLT_WHIRL8 };
+        uint32 tick = (aurEff->GetTickNumber() + 7/*-1*/) % 8;
+
+        // casted in left/right (but triggered spell have wide forward cone)
+        float forward = target->GetOrientation();
+        if (tick <= 3)
+            target->SetOrientation(forward + 0.75f * M_PI - tick * M_PI / 8);       // Left
+        else
+            target->SetOrientation(forward - 0.75f * M_PI + (8 - tick) * M_PI / 8); // Right
+
+        target->CastSpell(target, spellForTick[tick], true);
+        target->SetOrientation(forward);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_shadow_bolt_whirl::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
 class spell_mark_of_nature : public SpellScriptLoader
 {
 public:
@@ -765,4 +792,5 @@ void AddSC_emerald_dragons()
     // dragon spellscripts
     new spell_dream_fog_sleep();
     new spell_mark_of_nature();
+    RegisterSpellScript(spell_shadow_bolt_whirl);
 };
