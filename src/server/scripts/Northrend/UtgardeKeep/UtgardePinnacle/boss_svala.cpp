@@ -323,7 +323,7 @@ public:
                         break;
                     }
                 case EVENT_SORROWGRAVE_RITUAL:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                     {
                         Talk(SAY_SACRIFICE_PLAYER);
 
