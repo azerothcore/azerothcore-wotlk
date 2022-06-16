@@ -91,6 +91,14 @@ enum Spells
 enum Actions
 {
     ACTION_FLESH_TENTACLE_KILLED                = 1,
+
+    ACTION_SPAWN_EYE_TENTACLES                  = 1,
+};
+
+enum Misc
+{
+    MAX_TENTACLE_GROUPS                         = 5,
+    GROUP_BEAM_PHASE                            = 1
 };
 
 enum Yells
@@ -146,44 +154,21 @@ public:
 
     struct eye_of_cthunAI : public ScriptedAI
     {
-        eye_of_cthunAI(Creature* creature) : ScriptedAI(creature)
+        eye_of_cthunAI(Creature* creature) : ScriptedAI(creature), _summons(creature)
         {
             instance = creature->GetInstanceScript();
 
             SetCombatMovement(false);
         }
 
-        InstanceScript* instance;
-
-        //Global variables
-        uint32 PhaseTimer;
-
-        //Eye beam phase
-        uint32 BeamTimer;
-        uint32 EyeTentacleTimer;
-        uint32 ClawTentacleTimer;
-
-        //Dark Glare phase
-        uint32 DarkGlareTick;
-        uint32 DarkGlareTickTimer;
-        float DarkGlareAngle;
-        bool ClockWise;
-
         void Reset() override
         {
-            //Phase information
-            PhaseTimer = 50000;                                 //First dark glare in 50 seconds
-
-            //Eye beam phase 50 seconds
-            BeamTimer = 3000;
-            EyeTentacleTimer = 45000;                           //Always spawns 5 seconds before Dark Beam
-            ClawTentacleTimer = 12500;                          //4 per Eye beam phase (unsure if they spawn during Dark beam)
-
             //Dark Beam phase 35 seconds (each tick = 1 second, 35 ticks)
             DarkGlareTick = 0;
-            DarkGlareTickTimer = 1000;
             DarkGlareAngle = 0;
             ClockWise = false;
+
+            _eyeTentacleCounter = 0;
 
             //Reset flags
             me->RemoveAurasDueToSpell(SPELL_RED_COLORATION);
@@ -198,20 +183,128 @@ public:
             Creature* pPortal = me->FindNearestCreature(NPC_CTHUN_PORTAL, 10);
             if (pPortal)
                 pPortal->SetReactState(REACT_PASSIVE);
+
+            _summons.DespawnAll();
+            _scheduler.CancelAll();
         }
 
         void EnterCombat(Unit* /*who*/) override
         {
             DoZoneInCombat();
+            ScheduleTasks();
             instance->SetData(DATA_CTHUN_PHASE, PHASE_EYE_GREEN_BEAM);
         }
 
-        void SpawnEyeTentacle(float x, float y)
+        void DoAction(int32 action) override
         {
-            if (Creature* Spawned = DoSpawnCreature(NPC_EYE_TENTACLE, x, y, 0, 0, TEMPSUMMON_CORPSE_DESPAWN, 500))
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                    if (Spawned->AI())
-                        Spawned->AI()->AttackStart(target);
+            if (action == ACTION_SPAWN_EYE_TENTACLES)
+            {
+                me->SummonCreatureGroup(_eyeTentacleCounter);
+                _eyeTentacleCounter++;
+
+                if (_eyeTentacleCounter >= MAX_TENTACLE_GROUPS)
+                {
+                    _eyeTentacleCounter = 0;
+                }
+            }
+        }
+
+        void ScheduleTasks()
+        {
+            _scheduler.Schedule(3s, [this](TaskContext task)
+            {
+                DoCastRandomTarget(SPELL_GREEN_BEAM);
+                task.SetGroup(GROUP_BEAM_PHASE);
+                task.Repeat();
+            }).Schedule(12s, [this](TaskContext task)
+            {
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
+                {
+                    if (Creature* tentacle = me->SummonCreature(NPC_CLAW_TENTACLE, *target, TEMPSUMMON_CORPSE_DESPAWN, 1000))
+                    {
+                        tentacle->AI()->AttackStart(target);
+                    }
+                }
+
+                task.SetGroup(GROUP_BEAM_PHASE);
+                task.Repeat();
+            }).Schedule(45s, [this](TaskContext task)
+            {
+                DoAction(ACTION_SPAWN_EYE_TENTACLES);
+                task.SetGroup(GROUP_BEAM_PHASE);
+                task.Repeat();
+            }).Schedule(50s, [this](TaskContext /*task*/)
+            {
+                _scheduler.CancelGroup(GROUP_BEAM_PHASE);
+
+                me->StopMoving();
+                me->SetReactState(REACT_PASSIVE);
+                me->InterruptNonMeleeSpells(false);
+                me->SetTarget(ObjectGuid::Empty);
+
+                _scheduler.Schedule(1s, [this](TaskContext /*task*/)
+                {
+                    //Select random target for dark beam to start on
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
+                    {
+                        //Face our target
+                        DarkGlareAngle = me->GetAngle(target);
+                        DarkGlareTick = 0;
+                        ClockWise = RAND(true, false);
+
+                        me->SetTarget(target->GetGUID());
+
+                        //Add red coloration to C'thun
+                        DoCast(me, SPELL_RED_COLORATION, true);
+
+                        //Freeze animation
+                        DoCast(me, SPELL_FREEZE_ANIM, true);
+
+                        me->StopMoving();
+                        me->SetFacingToObject(target);
+                        me->SetOrientation(DarkGlareAngle);
+                    }
+
+                    _scheduler.Schedule(3s, [this](TaskContext tasker)
+                    {
+                        me->SetTarget(ObjectGuid::Empty);
+                        me->StopMoving();
+
+                        if (ClockWise)
+                        {
+                            me->SetFacingTo(DarkGlareAngle + DarkGlareTick * float(M_PI) / 35);
+                            me->SetOrientation(DarkGlareAngle + DarkGlareTick * float(M_PI) / 35);
+
+                        }
+                        else
+                        {
+                            me->SetFacingTo(DarkGlareAngle - DarkGlareTick * float(M_PI) / 35);
+                            me->SetOrientation(DarkGlareAngle - DarkGlareTick * float(M_PI) / 35);
+                        }
+
+                        DoCastSelf(SPELL_DARK_GLARE);
+                        ++DarkGlareTick;
+
+                        if (tasker.GetRepeatCounter() >= 35)
+                        {
+                            _scheduler.CancelAll();
+                            me->SetReactState(REACT_AGGRESSIVE);
+                            me->RemoveAurasDueToSpell(SPELL_RED_COLORATION);
+                            me->RemoveAurasDueToSpell(SPELL_FREEZE_ANIM);
+                            me->InterruptNonMeleeSpells(false);
+                            ScheduleTasks();
+                        }
+                        else
+                            tasker.Repeat(1s);
+                    });
+                });
+            });
+        }
+
+        void JustSummoned(Creature* summon) override
+        {
+            _summons.Summon(summon);
+            summon->SetInCombatWithZone();
         }
 
         void UpdateAI(uint32 diff) override
@@ -220,162 +313,8 @@ public:
             if (!UpdateVictim())
                 return;
 
-            uint32 currentPhase = instance->GetData(DATA_CTHUN_PHASE);
-            if (currentPhase == PHASE_EYE_GREEN_BEAM || currentPhase == PHASE_EYE_RED_BEAM)
+            switch (instance->GetData(DATA_CTHUN_PHASE))
             {
-                // EyeTentacleTimer
-                if (EyeTentacleTimer <= diff)
-                {
-                    //Spawn the 8 Eye Tentacles in the corret spots
-                    SpawnEyeTentacle(0, 20);                //south
-                    SpawnEyeTentacle(10, 10);               //south west
-                    SpawnEyeTentacle(20, 0);                //west
-                    SpawnEyeTentacle(10, -10);              //north west
-
-                    SpawnEyeTentacle(0, -20);               //north
-                    SpawnEyeTentacle(-10, -10);             //north east
-                    SpawnEyeTentacle(-20, 0);               // east
-                    SpawnEyeTentacle(-10, 10);              // south east
-
-                    EyeTentacleTimer = 45000;
-                }
-                else EyeTentacleTimer -= diff;
-            }
-
-            switch (currentPhase)
-            {
-                case PHASE_EYE_GREEN_BEAM:
-                    //BeamTimer
-                    if (BeamTimer <= diff)
-                    {
-                        //SPELL_GREEN_BEAM
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        {
-                            me->InterruptNonMeleeSpells(false);
-                            DoCast(target, SPELL_GREEN_BEAM);
-
-                            //Correctly update our target
-                            me->SetTarget(target->GetGUID());
-                        }
-
-                        //Beam every 3 seconds
-                        BeamTimer = 3000;
-                    }
-                    else BeamTimer -= diff;
-
-                    //ClawTentacleTimer
-                    if (ClawTentacleTimer <= diff)
-                    {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        {
-                            //Spawn claw tentacle on the random target
-                            Creature* spawned = me->SummonCreature(NPC_CLAW_TENTACLE, *target, TEMPSUMMON_CORPSE_DESPAWN, 500);
-
-                            if (spawned && spawned->AI())
-                            {
-                                spawned->AI()->AttackStart(target);
-                            }
-                        }
-
-                        //One claw tentacle every 12.5 seconds
-                        ClawTentacleTimer = 12500;
-                    }
-                    else ClawTentacleTimer -= diff;
-
-                    //PhaseTimer
-                    if (PhaseTimer <= diff)
-                    {
-                        //Switch to Dark Beam
-                        instance->SetData(DATA_CTHUN_PHASE, PHASE_EYE_RED_BEAM);
-
-                        me->InterruptNonMeleeSpells(false);
-                        me->SetReactState(REACT_PASSIVE);
-
-                        //Remove any target
-                        me->SetTarget();
-
-                        //Select random target for dark beam to start on
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        {
-                            //Face our target
-                            DarkGlareAngle = me->GetAngle(target);
-                            DarkGlareTickTimer = 4000;
-                            DarkGlareTick = 0;
-                            ClockWise = RAND(true, false);
-                        }
-
-                        //Add red coloration to C'thun
-                        DoCast(me, SPELL_RED_COLORATION, true);
-
-                        //Freeze animation
-                        DoCast(me, SPELL_FREEZE_ANIM);
-                        me->StopMoving();
-                        me->SetFacingTo(DarkGlareAngle);
-                        me->SetOrientation(DarkGlareAngle);
-
-                        //Darkbeam for 35 seconds
-                        PhaseTimer = 35000;
-                    }
-                    else PhaseTimer -= diff;
-
-                    break;
-
-                case PHASE_EYE_RED_BEAM:
-                    if (DarkGlareTick < 35)
-                    {
-                        if (DarkGlareTickTimer <= diff)
-                        {
-                            me->StopMoving();
-
-                            //Set angle and cast
-                            if (ClockWise)
-                            {
-                                me->SetFacingTo(DarkGlareAngle + DarkGlareTick * M_PI / 35);
-                                me->SetOrientation(DarkGlareAngle + DarkGlareTick * M_PI / 35);
-                            }
-                            else
-                            {
-                                me->SetFacingTo(DarkGlareAngle - DarkGlareTick * M_PI / 35);
-                                me->SetOrientation(DarkGlareAngle - DarkGlareTick * M_PI / 35);
-                            }
-
-                            //Actual dark glare cast, maybe something missing here?
-                            DoCast(me, SPELL_DARK_GLARE, false);
-
-                            //Increase tick
-                            ++DarkGlareTick;
-
-                            //1 second per tick
-                            DarkGlareTickTimer = 1000;
-                        }
-                        else DarkGlareTickTimer -= diff;
-                    }
-
-                    //PhaseTimer
-                    if (PhaseTimer <= diff)
-                    {
-                        //Switch to Eye Beam
-                        instance->SetData(DATA_CTHUN_PHASE, PHASE_EYE_GREEN_BEAM);
-
-                        BeamTimer = 3000;
-                        ClawTentacleTimer = 12500;              //4 per Eye beam phase (unsure if they spawn during Dark beam)
-
-                        me->InterruptNonMeleeSpells(false);
-
-                        //Remove Red coloration from c'thun
-                        me->RemoveAurasDueToSpell(SPELL_RED_COLORATION);
-                        me->RemoveAurasDueToSpell(SPELL_FREEZE_ANIM);
-
-                        //set it back to aggressive
-                        me->SetReactState(REACT_AGGRESSIVE);
-
-                        //Eye Beam for 50 seconds
-                        PhaseTimer = 50000;
-                    }
-                    else PhaseTimer -= diff;
-
-                    break;
-
                 //Transition phase
                 case PHASE_CTHUN_TRANSITION:
                     //Remove any target
@@ -386,13 +325,16 @@ public:
 
                 //Dead phase
                 case PHASE_CTHUN_DONE:
-                    Creature* pPortal = me->FindNearestCreature(NPC_CTHUN_PORTAL, 10);
-                    if (pPortal)
+                    if (Creature* pPortal = me->FindNearestCreature(NPC_CTHUN_PORTAL, 10))
+                    {
                         pPortal->DespawnOrUnsummon();
+                    }
 
                     me->DespawnOrUnsummon();
                     break;
             }
+
+            _scheduler.Update(diff);
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -437,6 +379,18 @@ public:
                     return;
             }
         }
+
+        private:
+            InstanceScript* instance;
+
+            //Dark Glare phase
+            uint32 DarkGlareTick;
+            float DarkGlareAngle;
+            bool ClockWise;
+
+            uint32 _eyeTentacleCounter;
+            TaskScheduler _scheduler;
+            SummonList _summons;
     };
 };
 
@@ -522,15 +476,6 @@ public:
             DoZoneInCombat();
         }
 
-        void SpawnEyeTentacle(float x, float y)
-        {
-            Creature* Spawned;
-            Spawned = DoSpawnCreature(NPC_EYE_TENTACLE, x, y, 0, 0, TEMPSUMMON_CORPSE_DESPAWN, 500);
-            if (Spawned && Spawned->AI())
-                if (Unit* target = SelectRandomNotStomach())
-                    Spawned->AI()->AttackStart(target);
-        }
-
         Unit* SelectRandomNotStomach()
         {
             if (Stomach_Map.empty())
@@ -607,16 +552,10 @@ public:
                 // EyeTentacleTimer
                 if (EyeTentacleTimer <= diff)
                 {
-                    //Spawn the 8 Eye Tentacles in the corret spots
-                    SpawnEyeTentacle(0, 20);                //south
-                    SpawnEyeTentacle(10, 10);               //south west
-                    SpawnEyeTentacle(20, 0);                //west
-                    SpawnEyeTentacle(10, -10);              //north west
-
-                    SpawnEyeTentacle(0, -20);               //north
-                    SpawnEyeTentacle(-10, -10);             //north east
-                    SpawnEyeTentacle(-20, 0);               // east
-                    SpawnEyeTentacle(-10, 10);              // south east
+                    if (Creature* eye = instance->GetCreature(DATA_EYE_OF_CTHUN))
+                    {
+                        eye->AI()->DoAction(ACTION_SPAWN_EYE_TENTACLES);
+                    }
 
                     EyeTentacleTimer = 30000; // every 30sec in phase 2
                 }
