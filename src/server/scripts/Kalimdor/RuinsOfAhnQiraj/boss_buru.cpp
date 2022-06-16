@@ -75,9 +75,12 @@ public:
             BossAI::EnterEvadeMode(why);
 
             for (ObjectGuid const& guid : Eggs)
+            {
                 if (Creature* egg = me->GetMap()->GetCreature(guid))
+                {
                     egg->Respawn();
-
+                }
+            }
             Eggs.clear();
         }
 
@@ -85,20 +88,22 @@ public:
         {
             _EnterCombat();
             Talk(EMOTE_TARGET, who);
-            DoCast(me, SPELL_THORNS);
-
+            DoCastSelf(SPELL_THORNS);
             events.ScheduleEvent(EVENT_DISMEMBER, 5000);
             events.ScheduleEvent(EVENT_GATHERING_SPEED, 9000);
             events.ScheduleEvent(EVENT_FULL_SPEED, 60000);
-
             _phase = PHASE_EGG;
         }
 
         void DoAction(int32 action) override
         {
             if (action == ACTION_EXPLODE)
+            {
                 if (_phase == PHASE_EGG)
+                {
                     Unit::DealDamage(me, me, 45000);
+                }
+            }
         }
 
         void KilledUnit(Unit* victim) override
@@ -116,7 +121,6 @@ public:
             me->RemoveAurasDueToSpell(SPELL_GATHERING_SPEED);
             events.ScheduleEvent(EVENT_GATHERING_SPEED, 9000);
             events.ScheduleEvent(EVENT_FULL_SPEED, 60000);
-
             if (Unit* victim = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
             {
                 DoResetThreat();
@@ -138,7 +142,6 @@ public:
                 return;
 
             events.Update(diff);
-
             while (uint32 eventId = events.ExecuteEvent())
             {
                 switch (eventId)
@@ -148,14 +151,14 @@ public:
                         events.ScheduleEvent(EVENT_DISMEMBER, 5000);
                         break;
                     case EVENT_GATHERING_SPEED:
-                        DoCast(me, SPELL_GATHERING_SPEED);
+                        DoCastSelf(SPELL_GATHERING_SPEED);
                         events.ScheduleEvent(EVENT_GATHERING_SPEED, 9000);
                         break;
                     case EVENT_FULL_SPEED:
-                        DoCast(me, SPELL_FULL_SPEED);
+                        DoCastSelf(SPELL_FULL_SPEED);
                         break;
                     case EVENT_CREEPING_PLAGUE:
-                        DoCast(me, SPELL_CREEPING_PLAGUE);
+                        DoCastSelf(SPELL_CREEPING_PLAGUE);
                         events.ScheduleEvent(EVENT_CREEPING_PLAGUE, 6000);
                         break;
                     case EVENT_RESPAWN_EGG:
@@ -172,12 +175,12 @@ public:
 
             if (me->GetHealthPct() < 20.0f && _phase == PHASE_EGG)
             {
-                DoCast(me, SPELL_BURU_TRANSFORM); // Enrage
-                DoCast(me, SPELL_FULL_SPEED, true);
+                DoCastSelf(SPELL_BURU_TRANSFORM);
+                DoCastSelf(SPELL_FULL_SPEED, true);
                 me->RemoveAurasDueToSpell(SPELL_THORNS);
+                events.ScheduleEvent(EVENT_CREEPING_PLAGUE, 2000);
                 _phase = PHASE_TRANSFORM;
             }
-
             DoMeleeAttackIfReady();
         }
     private:
@@ -207,27 +210,40 @@ public:
         void EnterCombat(Unit* attacker) override
         {
             if (Creature* buru = me->GetMap()->GetCreature(_instance->GetGuidData(DATA_BURU)))
+            {
                 if (!buru->IsInCombat())
+                {
                     buru->AI()->AttackStart(attacker);
+                }
+            }
         }
 
         void JustSummoned(Creature* who) override
         {
             if (who->GetEntry() == NPC_HATCHLING)
+            {
                 if (Creature* buru = me->GetMap()->GetCreature(_instance->GetGuidData(DATA_BURU)))
+                {
                     if (Unit* target = buru->AI()->SelectTarget(SelectTargetMethod::Random))
+                    {
                         who->AI()->AttackStart(target);
+                    }
+                }
+            }
         }
 
         void JustDied(Unit* /*killer*/) override
         {
             DoCastAOE(SPELL_EXPLODE, true);
             DoCastAOE(SPELL_EXPLODE_2, true); // Unknown purpose
-            DoCast(me, SPELL_SUMMON_HATCHLING, true);
-
+            DoCastSelf(SPELL_SUMMON_HATCHLING);
             if (Creature* buru = me->GetMap()->GetCreature(_instance->GetGuidData(DATA_BURU)))
+            {
                 if (boss_buru::boss_buruAI* buruAI = dynamic_cast<boss_buru::boss_buruAI*>(buru->AI()))
+                {
                     buruAI->ManageRespawn(me->GetGUID());
+                }
+            }
         }
     private:
         InstanceScript* _instance;
@@ -251,13 +267,17 @@ public:
         void HandleAfterCast()
         {
             if (Creature* buru = GetCaster()->FindNearestCreature(NPC_BURU, 5.f))
+            {
                 buru->AI()->DoAction(ACTION_EXPLODE);
+            }
         }
 
         void HandleDummyHitTarget(SpellEffIndex /*effIndex*/)
         {
             if (Unit* target = GetHitUnit())
+            {
                 Unit::DealDamage(GetCaster(), target, -16 * GetCaster()->GetDistance(target) + 500);
+            }
         }
 
         void Register() override
