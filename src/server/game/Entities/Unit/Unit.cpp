@@ -13168,7 +13168,7 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
                 creature->AI()->EnterCombat(enemy);
 
             if (creature->GetFormation())
-                creature->GetFormation()->MemberAttackStart(creature, enemy);
+                creature->GetFormation()->MemberEngagingTarget(creature, enemy);
         }
 
         creature->RefreshSwimmingFlag();

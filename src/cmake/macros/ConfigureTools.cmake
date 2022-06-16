@@ -75,9 +75,9 @@ function(CheckToolsBuildList)
       list(APPEND BUILD_TOOLS_WHITELIST map_extractor mmaps_generator vmap4_assembler vmap4_extractor)
     endif()
 
-    # if (TOOLS_BUILD STREQUAL "db-only")
-    #   list(APPEND BUILD_TOOLS_WHITELIST dbimport)
-    # endif()
+    if (TOOLS_BUILD STREQUAL "db-only")
+      list(APPEND BUILD_TOOLS_WHITELIST dbimport)
+    endif()
   endif()
 
   # Set the TOOL_${TOOL_BUILD_NAME} variables from the
