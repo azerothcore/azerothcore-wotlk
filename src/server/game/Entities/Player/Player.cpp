@@ -1620,7 +1620,11 @@ void Player::ProcessDelayedOperations()
         SaveToDB(false, false);
 
     if (m_DelayedOperations & DELAYED_SPELL_CAST_DESERTER)
-        CastSpell(this, 26013, true);               // Deserter
+    {
+        Aura* aura = GetAura(26013);
+        if (!aura || aura->GetDuration() <= 900000)
+            CastSpell(this, 26013, true);
+    }
 
     if (m_DelayedOperations & DELAYED_BG_MOUNT_RESTORE)
     {
@@ -2139,10 +2143,8 @@ void Player::SetInWater(bool apply)
     getHostileRefMgr().updateThreatTables();
 }
 
-bool Player::IsInAreaTriggerRadius(const AreaTrigger* trigger) const
+bool Player::IsInAreaTriggerRadius(AreaTrigger const* trigger, float delta) const
 {
-    static const float delta = 5.0f;
-
     if (!trigger || GetMapId() != trigger->map)
         return false;
 
