@@ -32,7 +32,7 @@ enum AreaLimitation
     SPELL_ONSLAUGHT_GRYPHON                = 49641,
     SPELL_BOUNDARY_WARNING                 = 51272,
     SPELL_BOUNDARY_WARNING_2               = 51259,
-    SPELL_BOUNDARY_WARNING_3               = 56966,
+    //SPELL_BOUNDARY_WARNING_3               = 56966,
     SPELL_COMMAND_ARGENT_SKYTALON          = 56678,
     SPELL_WYRMREST_DEFENDER_MOUNT          = 49256,
 
@@ -164,7 +164,7 @@ public:
             sCreatureTextMgr->SendChat(gryphon, TEXT_EMOTE, target, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, target);
             target->CastSpell(target, SPELL_WARNING_GRYPHON, true);
         }
-        
+
 	    // any way out of the game using mount will be removed
         if (!caster || caster->GetVehicleCreatureBase())
             return;
@@ -278,7 +278,7 @@ public:
             sCreatureTextMgr->SendChat(gryphon, TEXT_EMOTE, target, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, target);
             target->CastSpell(target, SPELL_BOUNDARY_WARNING, true);
         }
-		
+
         // any way out of the game using mount will be removed
         if (!caster || caster->GetVehicleCreatureBase())
             return;
