@@ -166,7 +166,7 @@ This project exists thanks to:
 
 ## License
 
-- The AzerothCore source is released under the [GNU GPL v2 or later](https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE)
+- The AzerothCore source is released under the [GNU GPL v2 or later](https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE), the new file created from scratch are released under the GNU Affero GPLv3.
 - The old source based on MaNGOS/TrinityCore are released under the [GNU GPL v2 or later](https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE)
 
 
