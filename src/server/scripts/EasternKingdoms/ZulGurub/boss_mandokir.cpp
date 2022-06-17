@@ -113,6 +113,32 @@ Position const PosMandokir[2] =
     { -12197.86f, -1949.392f, 130.2745f, 0.0f }
 };
 
+void RevivePlayer(Unit* victim, ObjectGuid& reviveGUID)
+{
+    std::list<Creature*> chainedSpirits;
+    GetCreatureListWithEntryInGrid(chainedSpirits, victim, NPC_CHAINED_SPIRIT, 200.f);
+    if (chainedSpirits.empty())
+        return;
+
+    // Sort the list by distance to the victim.
+    chainedSpirits.sort([victim](Creature const* c1, Creature const* c2)
+        {
+            return c1->GetDistance2d(victim) < c2->GetDistance2d(victim);
+        });
+
+    // Now we have to check if the spirit is already reviving someone...
+    for (Creature* spirit : chainedSpirits)
+    {
+        if (!spirit->isMoving() && !spirit->HasUnitState(UNIT_STATE_CASTING))
+        {
+            spirit->AI()->SetGUID(reviveGUID);
+            spirit->AI()->DoAction(ACTION_REVIVE);
+            reviveGUID.Clear();
+            break;
+        }
+    }
+}
+
 class boss_mandokir : public CreatureScript
 {
 public:
@@ -146,14 +172,11 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            // Do not want to unsummon Ohgan
-            for (int i = 0; i < CHAINED_SPIRIT_COUNT; ++i)
-            {
-                if (Creature* unsummon = ObjectAccessor::GetCreature(*me, chainedSpiritGUIDs[i]))
-                {
-                    unsummon->DespawnOrUnsummon();
-                }
-            }
+            std::list<Creature*> chainedSpirits;
+            GetCreatureListWithEntryInGrid(chainedSpirits, me, NPC_CHAINED_SPIRIT, 200.f);
+            for (Creature* spirit : chainedSpirits)
+                spirit->DespawnOrUnsummon();
+
             instance->SetBossState(DATA_MANDOKIR, DONE);
             instance->SaveToDB();
         }
@@ -177,7 +200,6 @@ public:
             for (int i = 0; i < CHAINED_SPIRIT_COUNT; ++i)
             {
                 Creature* chainedSpirit = me->SummonCreature(NPC_CHAINED_SPIRIT, PosSummonChainedSpirits[i], TEMPSUMMON_CORPSE_DESPAWN);
-                chainedSpiritGUIDs[i] = chainedSpirit->GetGUID();
             }
             DoZoneInCombat();
         }
@@ -188,7 +210,7 @@ public:
                 return;
 
             reviveGUID = victim->GetGUID();
-            DoAction(ACTION_START_REVIVE);
+            RevivePlayer(victim, reviveGUID);
             if (++killCount == 3)
             {
                 Talk(SAY_DING_KILL);
@@ -199,29 +221,8 @@ public:
                         jindo->AI()->Talk(SAY_GRATS_JINDO);
                     }
                 }
-                DoCast(me, SPELL_LEVEL_UP, true);
+                DoCastSelf(SPELL_LEVEL_UP, true);
                 killCount = 0;
-            }
-        }
-
-        void DoAction(int32 action) override
-        {
-            if (action == ACTION_START_REVIVE)
-            {
-                std::list<Creature*> creatures;
-                GetCreatureListWithEntryInGrid(creatures, me, NPC_CHAINED_SPIRIT, 200.0f);
-                if (creatures.empty())
-                    return;
-
-                for (std::list<Creature*>::iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
-                {
-                    if (Creature* chainedSpirit = ObjectAccessor::GetCreature(*me, (*itr)->GetGUID()))
-                    {
-                        chainedSpirit->AI()->SetGUID(reviveGUID);
-                        chainedSpirit->AI()->DoAction(ACTION_REVIVE);
-                        reviveGUID.Clear();
-                    }
-                }
             }
         }
 
@@ -316,8 +317,8 @@ public:
                         events.ScheduleEvent(EVENT_WATCH_PLAYER, urand(12000, 24000));
                         break;
                     case EVENT_CHARGE_PLAYER:
-                        DoCast(SelectTarget(SelectTargetMethod::Random, 0, 40, true), SPELL_CHARGE);
-                        events.ScheduleEvent(EVENT_FRIGHTENING_SHOUT, 1500);
+                        DoCast(SelectTarget(SelectTargetMethod::MaxDistance, 0, 40, true), SPELL_CHARGE);
+                        events.ScheduleEvent(EVENT_FRIGHTENING_SHOUT, 500);
                         if (Unit* mainTarget = SelectTarget(SelectTargetMethod::MaxThreat, 0, 100.0f))
                         {
                             me->GetThreatMgr().modifyThreatPercent(mainTarget, -100);
@@ -357,12 +358,12 @@ public:
                         break;
                 }
             }
+
             DoMeleeAttackIfReady();
         }
 
     private:
         uint8 killCount;
-        ObjectGuid chainedSpiritGUIDs[CHAINED_SPIRIT_COUNT];
         ObjectGuid reviveGUID;
     };
 
@@ -394,9 +395,9 @@ public:
             me->AddAura(SPELL_THRASH, me);
             _scheduler.CancelAll();
             _scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
+            {
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
 
             reviveGUID.Clear();
         }
@@ -406,12 +407,10 @@ public:
             if (victim->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            reviveGUID = victim->GetGUID();
-            DoAction(ACTION_START_REVIVE);
             _scheduler.Schedule(6s, 12s, [this](TaskContext context)
             {
-            DoCastVictim(SPELL_SUNDERARMOR);
-            context.Repeat(6s, 12s);
+                DoCastVictim(SPELL_SUNDERARMOR);
+                context.Repeat(6s, 12s);
             });
         }
 
@@ -421,25 +420,7 @@ public:
                 return;
 
             reviveGUID = victim->GetGUID();
-            DoAction(ACTION_START_REVIVE);
-        }
-
-        void DoAction(int32 action) override
-        {
-            if (action == ACTION_START_REVIVE)
-            {
-                std::list<Creature*> creatures;
-                GetCreatureListWithEntryInGrid(creatures, me, NPC_CHAINED_SPIRIT, 200.0f);
-                if (creatures.empty())
-                    return;
-
-                for (Creature* chainedSpirit : creatures)
-                {
-                    chainedSpirit->AI()->SetGUID(reviveGUID);
-                    chainedSpirit->AI()->DoAction(ACTION_REVIVE);
-                    reviveGUID.Clear();
-                }
-            }
+            RevivePlayer(victim, reviveGUID);
         }
 
         void SetGUID(ObjectGuid const guid, int32 /*type = 0 */) override
@@ -525,15 +506,6 @@ public:
 
     void JustDied(Unit* /*killer*/) override
     {
-        Player* target = ObjectAccessor::GetPlayer(*me, revivePlayerGUID);
-        if (!target || target->IsAlive())
-            return;
-
-        if (Creature* mandokir = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_MANDOKIR)))
-        {
-            mandokir->GetAI()->SetGUID(target->GetGUID());
-            mandokir->GetAI()->DoAction(ACTION_START_REVIVE);
-        }
         me->DespawnOrUnsummon();
     }
 
