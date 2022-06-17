@@ -165,7 +165,7 @@ public:
             target->CastSpell(target, SPELL_WARNING_GRYPHON, true);
         }
 
-	    // any way out of the game using mount will be removed
+        // any way out of the game using mount will be removed
         if (!caster || caster->GetVehicleCreatureBase())
             return;
 
