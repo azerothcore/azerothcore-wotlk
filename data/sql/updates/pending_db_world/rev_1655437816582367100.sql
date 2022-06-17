@@ -113,12 +113,12 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VA
 (@OGUID+19, 438, 0, 'Mulgore Venture Co Cave Outside Chest 2 of 2');
 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
-(439, 1, 'Mulgore SW Harpies, Battered Chest 106318');
+(439, 1, 'Mulgore SE Harpies, Battered Chest 106318');
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
-(@OGUID+20, 439, 0, 'Mulgore SW Harpies Chest 1 of 4'),
-(@OGUID+21, 439, 0, 'Mulgore SW Harpies Chest 2 of 4'),
-(@OGUID+22, 439, 0, 'Mulgore SW Harpies Chest 3 of 4'),
-(@OGUID+23, 439, 0, 'Mulgore SW Harpies Chest 4 of 4');
+(@OGUID+20, 439, 0, 'Mulgore SE Harpies Chest 1 of 4'),
+(@OGUID+21, 439, 0, 'Mulgore SE Harpies Chest 2 of 4'),
+(@OGUID+22, 439, 0, 'Mulgore SE Harpies Chest 3 of 4'),
+(@OGUID+23, 439, 0, 'Mulgore SE Harpies Chest 4 of 4');
 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (440, 1, 'Mulgore East Palemane Gnoll Camp, Battered Chest 106318');
