@@ -358,6 +358,7 @@ public:
 
             DoCast(me, SPELL_NEFARIANS_BARRIER);
             SetCombatMovement(false);
+            me->SetImmuneToPC(false);
             AttackStart(SelectTarget(SelectTargetMethod::Random, 0, 200.f, true));
             events.ScheduleEvent(EVENT_SHADOWBLINK, 500);
             events.ScheduleEvent(EVENT_SHADOW_BOLT, 3000);
@@ -499,7 +500,8 @@ public:
                 me->SetFaction(FACTION_DRAGONFLIGHT_BLACK);
                 me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
-                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetImmuneToPC(true);
             }
         }
 

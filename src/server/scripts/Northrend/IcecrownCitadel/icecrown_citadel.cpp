@@ -743,7 +743,8 @@ public:
                     return;
 
                 me->setActive(true);
-                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetImmuneToAll(true);
                 // Load Grid with Sister Svalna
                 me->GetMap()->LoadGrid(4356.71f, 2484.33f);
                 if (Creature* svalna = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_SISTER_SVALNA)))
@@ -930,7 +931,8 @@ public:
                     Talk(SAY_CROK_INTRO_3);
                     break;
                 case EVENT_START_PATHING:
-                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetImmuneToAll(false);
                     Start(true, true);
                     break;
                 case EVENT_SCOURGE_STRIKE:
@@ -998,7 +1000,7 @@ public:
         void Reset() override
         {
             _Reset();
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(true);
             me->SetReactState(REACT_PASSIVE);
             me->SetCanFly(true);
             me->SetDisableGravity(true);
@@ -1007,7 +1009,7 @@ public:
 
         void AttackStart(Unit* victim) override
         {
-            if (me->HasReactState(REACT_PASSIVE) || me->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC))
+            if (me->HasReactState(REACT_PASSIVE) || me->IsImmuneToAll())
                 return;
             BossAI::AttackStart(victim);
         }
@@ -1037,10 +1039,10 @@ public:
 
         void EnterCombat(Unit* /*attacker*/) override
         {
-            if (me->HasReactState(REACT_PASSIVE) || me->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC))
+            if (me->HasReactState(REACT_PASSIVE) || me->IsImmuneToAll())
             {
                 me->CombatStop(false);
-                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetImmuneToAll(true);
                 me->SetReactState(REACT_PASSIVE);
                 return;
             }
@@ -1121,7 +1123,7 @@ public:
             if (type != EFFECT_MOTION_TYPE || id != POINT_LAND)
                 return;
 
-            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(false);
             me->SetCanFly(false);
             me->SetDisableGravity(false);
             me->SetReactState(REACT_AGGRESSIVE);
@@ -1915,7 +1917,8 @@ public:
             if (Creature* target = GetTarget()->ToCreature())
             {
                 target->SetReactState(REACT_PASSIVE);
-                target->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
+                target->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                target->SetImmuneToPC(true);
                 target->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_02);
             }
         }
@@ -1925,7 +1928,8 @@ public:
             if (Creature* target = GetTarget()->ToCreature())
             {
                 target->SetReactState(REACT_AGGRESSIVE);
-                target->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
+                target->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                target->SetImmuneToPC(false);
                 target->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
             }
         }
