@@ -25,6 +25,31 @@
 #include "SpellScript.h"
 #include "Vehicle.h"
 
+enum Texts
+{
+    // Freya
+    GOSSIP_MENU_FREYA     = 10324,
+    NPC_TEXT_FREYA        = 14332,
+
+    // Hodir
+    GOSSIP_MENU_HODIR     = 10335,
+    NPC_TEXT_HODIR        = 14326,
+
+    // Mimiron
+    GOSSIP_MENU_MIMIRON   = 10336,
+    NPC_TEXT_MIMIRON      = 14334,
+
+    // Thorim
+    GOSSIP_MENU_THORIM    = 10337,
+    NPC_TEXT_THORIM       = 14333,
+
+    // Confirm assistance
+    GOSSIP_MENU_CONFIRM   = 10333,
+    NPC_TEXT_CONFIRM      = 14325,
+
+    SAY_KEEPER_SELECTED   = 1,
+};
+
 class npc_ulduar_keeper : public CreatureScript
 {
 public:
@@ -32,45 +57,75 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Lend us your aid, keeper. Together we shall defeat Yogg-Saron.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
-        return true;
-    }
-
-    bool OnGossipSelect(Player*  /*player*/, Creature* creature, uint32  /*uiSender*/, uint32  /*uiAction*/) override
-    {
-        creature->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
-        uint8 _keeper = 0;
+        uint32 gossipMenuId = 0;
+        uint32 gossipTextId = 0;
         switch (creature->GetEntry())
         {
             case NPC_FREYA_GOSSIP:
-                creature->Yell("Eonar, your servant calls for your blessing!", LANG_UNIVERSAL);
-                creature->PlayDirectSound(15535);
-                _keeper = KEEPER_FREYA;
+                gossipMenuId = GOSSIP_MENU_FREYA;
+                gossipTextId = NPC_TEXT_FREYA;
                 break;
             case NPC_HODIR_GOSSIP:
-                creature->Yell("The veil of winter will protect you, champions!", LANG_UNIVERSAL);
-                creature->PlayDirectSound(15559);
-                _keeper = KEEPER_HODIR;
+                gossipMenuId = GOSSIP_MENU_HODIR;
+                gossipTextId = NPC_TEXT_HODIR;
                 break;
             case NPC_MIMIRON_GOSSIP:
-                creature->Yell("Combat matrix enhanced. Behold wonderous rapidity!", LANG_UNIVERSAL);
-                creature->PlayDirectSound(15630);
-                _keeper = KEEPER_MIMIRON;
+                gossipMenuId = GOSSIP_MENU_MIMIRON;
+                gossipTextId = NPC_TEXT_MIMIRON;
                 break;
             case NPC_THORIM_GOSSIP:
-                creature->Yell("Golganneth, lend me your strengh! Grant my mortal allies the power of thunder!", LANG_UNIVERSAL);
-                creature->PlayDirectSound(15750);
-                _keeper = KEEPER_THORIM;
+                gossipMenuId = GOSSIP_MENU_THORIM;
+                gossipTextId = NPC_TEXT_THORIM;
                 break;
         }
 
-        if (creature->GetInstanceScript())
-        {
-            creature->GetInstanceScript()->SetData(TYPE_WATCHERS, _keeper);
-            creature->DespawnOrUnsummon(6000);
-        }
+        AddGossipItemFor(player, gossipMenuId, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        SendGossipMenuFor(player, gossipTextId, creature->GetGUID());
+        return true;
+    }
 
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
+    {
+        ClearGossipMenuFor(player);
+        uint8 _keeper = 0;
+        switch (action)
+        {
+            case GOSSIP_ACTION_INFO_DEF+1:
+                AddGossipItemFor(player, GOSSIP_MENU_CONFIRM, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                SendGossipMenuFor(player, NPC_TEXT_CONFIRM, creature);
+                break;
+            case GOSSIP_ACTION_INFO_DEF+2:
+            {
+                switch (creature->GetEntry())
+                {
+                    case NPC_FREYA_GOSSIP:
+                        creature->AI()->Talk(SAY_KEEPER_SELECTED);
+                        _keeper = KEEPER_FREYA;
+                        break;
+                    case NPC_HODIR_GOSSIP:
+                        creature->AI()->Talk(SAY_KEEPER_SELECTED);
+                        _keeper = KEEPER_HODIR;
+                        break;
+                    case NPC_MIMIRON_GOSSIP:
+                        creature->AI()->Talk(SAY_KEEPER_SELECTED);
+                        _keeper = KEEPER_MIMIRON;
+                        break;
+                    case NPC_THORIM_GOSSIP:
+                        creature->AI()->Talk(SAY_KEEPER_SELECTED);
+                        _keeper = KEEPER_THORIM;
+                        break;
+                }
+
+                creature->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
+                CloseGossipMenuFor(player);
+
+                if (creature->GetInstanceScript())
+                {
+                    creature->GetInstanceScript()->SetData(TYPE_WATCHERS, _keeper);
+                    creature->DespawnOrUnsummon(6000);
+                }
+            }
+        }
         return true;
     }
 };

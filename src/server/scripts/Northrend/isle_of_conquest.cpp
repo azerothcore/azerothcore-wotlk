@@ -127,8 +127,13 @@ public:
 
         void JustDied(Unit* killer) override
         {
-            if (Player* player = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
-                player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS, 1, 0, me);
+            if (killer)
+            {
+                if (Player* player = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
+                {
+                    player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS, 1, 0, me);
+                }
+            }
         }
     };
 

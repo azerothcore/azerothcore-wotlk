@@ -220,7 +220,9 @@ class spell_pal_sacred_shield_base : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        return !(eventInfo.GetHitMask() & PROC_EX_INTERNAL_HOT) && eventInfo.GetDamageInfo() && eventInfo.GetDamageInfo()->GetDamage() > 0;
+        HealInfo* healinfo = eventInfo.GetHealInfo();
+        DamageInfo* damageinfo = eventInfo.GetDamageInfo();
+        return !(eventInfo.GetHitMask() & PROC_EX_INTERNAL_HOT) && ((healinfo && healinfo->GetHeal() > 0) || (damageinfo && damageinfo->GetDamage() > 0));
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
@@ -231,14 +233,14 @@ class spell_pal_sacred_shield_base : public AuraScript
         {
             Unit* caster = eventInfo.GetActor();
 
-            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            HealInfo* healinfo = eventInfo.GetHealInfo();
 
-            if (!damageInfo || !damageInfo->GetDamage())
+            if (!healinfo || !healinfo->GetHeal())
             {
                 return;
             }
 
-            SpellInfo const* procSpell = damageInfo->GetSpellInfo();
+            SpellInfo const* procSpell = healinfo->GetSpellInfo();
             if (!procSpell)
             {
                 return;
@@ -247,12 +249,12 @@ class spell_pal_sacred_shield_base : public AuraScript
             if (caster && procSpell->SpellFamilyName == SPELLFAMILY_PALADIN &&
                     procSpell->SpellFamilyFlags.HasFlag(0x40000000) && caster->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_PALADIN, 3021, 0)) // need infusion of light
             {
-                int32 basepoints = int32(float(damageInfo->GetDamage()) / 12.0f);
+                int32 basepoints = int32(float(healinfo->GetHeal()) / 12.0f);
                 // Item - Paladin T9 Holy 4P Bonus (Flash of Light)
                 if (AuraEffect const* aurEffect = caster->GetAuraEffect(67191, EFFECT_0))
                     AddPct(basepoints, aurEffect->GetAmount());
 
-                caster->CastCustomSpell(eventInfo.GetActionTarget(), 66922, &basepoints, nullptr, nullptr, true, 0, aurEff, caster->GetGUID());
+                caster->CastCustomSpell(eventInfo.GetActionTarget(), 66922, &basepoints, nullptr, nullptr, true, nullptr, aurEff, caster->GetGUID());
                 return;
             }
 

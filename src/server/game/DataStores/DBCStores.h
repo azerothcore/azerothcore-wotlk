@@ -104,6 +104,7 @@ extern DBCStorage <EmotesEntry>                  sEmotesStore;
 extern DBCStorage <EmotesTextEntry>              sEmotesTextStore;
 extern DBCStorage <FactionEntry>                 sFactionStore;
 extern DBCStorage <FactionTemplateEntry>         sFactionTemplateStore;
+extern DBCStorage <GameObjectArtKitEntry>        sGameObjectArtKitStore;
 extern DBCStorage <GameObjectDisplayInfoEntry>   sGameObjectDisplayInfoStore;
 extern DBCStorage <GemPropertiesEntry>           sGemPropertiesStore;
 extern DBCStorage <GlyphPropertiesEntry>         sGlyphPropertiesStore;

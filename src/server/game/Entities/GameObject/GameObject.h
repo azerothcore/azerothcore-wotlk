@@ -25,6 +25,7 @@
 #include "Object.h"
 #include "SharedDefines.h"
 #include "Unit.h"
+#include <array>
 
 class GameObjectAI;
 class Transport;
@@ -676,6 +677,7 @@ struct GameObjectTemplateAddon
     uint32  flags;
     uint32  mingold;
     uint32  maxgold;
+    std::array<uint32, 4> artKits = {};
 };
 
 // Benchmarked: Faster than std::map (insert/find)
@@ -735,6 +737,35 @@ enum GOState
 };
 
 #define MAX_GO_STATE              3
+
+enum class GameObjectActions : uint32
+{
+    // Name from client executable      // Comments
+    None,                           // -NONE-
+    AnimateCustom0,                 // Animate Custom0
+    AnimateCustom1,                 // Animate Custom1
+    AnimateCustom2,                 // Animate Custom2
+    AnimateCustom3,                 // Animate Custom3
+    Disturb,                        // Disturb                          // Triggers trap
+    Unlock,                         // Unlock                           // Resets GO_FLAG_LOCKED
+    Lock,                           // Lock                             // Sets GO_FLAG_LOCKED
+    Open,                           // Open                             // Sets GO_STATE_ACTIVE
+    OpenAndUnlock,                  // Open + Unlock                    // Sets GO_STATE_ACTIVE and resets GO_FLAG_LOCKED
+    Close,                          // Close                            // Sets GO_STATE_READY
+    ToggleOpen,                     // Toggle Open
+    Destroy,                        // Destroy                          // Sets GO_STATE_DESTROYED
+    Rebuild,                        // Rebuild                          // Resets from GO_STATE_DESTROYED
+    Creation,                       // Creation
+    Despawn,                        // Despawn
+    MakeInert,                      // Make Inert                       // Disables interactions
+    MakeActive,                     // Make Active                      // Enables interactions
+    CloseAndLock,                   // Close + Lock                     // Sets GO_STATE_READY and sets GO_FLAG_LOCKED
+    UseArtKit0,                     // Use ArtKit0                      // 46904: 121
+    UseArtKit1,                     // Use ArtKit1                      // 36639: 81, 46903: 122
+    UseArtKit2,                     // Use ArtKit2
+    UseArtKit3,                     // Use ArtKit3
+    SetTapList,                     // Set Tap List
+};
 
 // from `gameobject`
 struct GameObjectData

@@ -387,6 +387,8 @@ public:
 
     void ModifyThreatPercentTemp(Unit* victim, int32 percent, Milliseconds duration);
 
+    void ResetFaction() { SetFaction(GetCreatureTemplate()->faction); }
+
 protected:
     bool CreateFromProto(ObjectGuid::LowType guidlow, uint32 Entry, uint32 vehId, const CreatureData* data = nullptr);
     bool InitEntry(uint32 entry, const CreatureData* data = nullptr);
@@ -442,6 +444,7 @@ protected:
 
     [[nodiscard]] bool IsInvisibleDueToDespawn() const override;
     bool CanAlwaysSee(WorldObject const* obj) const override;
+    bool IsAlwaysDetectableFor(WorldObject const* seer) const override;
 
 private:
     void ForcedDespawn(uint32 timeMSToDespawn = 0, Seconds forcedRespawnTimer = 0s);

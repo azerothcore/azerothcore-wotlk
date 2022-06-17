@@ -90,7 +90,7 @@ uint32 MySQLConnection::Open()
     MYSQL* mysqlInit = mysql_init(nullptr);
     if (!mysqlInit)
     {
-        LOG_ERROR("sql.sql", "Could not initialize Mysql connection to database `{}`", m_connectionInfo.database);
+        LOG_ERROR("sql.driver", "Could not initialize Mysql connection to database `{}`", m_connectionInfo.database);
         return CR_UNKNOWN_ERROR;
     }
 
@@ -170,7 +170,7 @@ uint32 MySQLConnection::Open()
     }
     else
     {
-        LOG_ERROR("sql.sql", "Could not connect to MySQL database at {}: {}", m_connectionInfo.host, mysql_error(mysqlInit));
+        LOG_ERROR("sql.driver", "Could not connect to MySQL database at {}: {}", m_connectionInfo.host, mysql_error(mysqlInit));
         uint32 errorCode = mysql_errno(mysqlInit);
         mysql_close(mysqlInit);
         return errorCode;

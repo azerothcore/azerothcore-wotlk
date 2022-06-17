@@ -85,6 +85,7 @@ enum AHerosBurden
 
     NPC_JALOOT                  = 28667,
     NPC_ZEPIK                   = 28668,
+    NPC_ARTRUIS                 = 28659,
 
     EVENT_CAST_FROST_BOLT       = 1,
     EVENT_CAST_FROST_NOVA       = 2,
@@ -99,6 +100,16 @@ enum AHerosBurden
     ACTION_MAKE_FRIENDLY        = 2,
 
     GO_ARTRUIS_PHYLACTERY       = 190777,
+
+    // Texts
+    SAY_TURNED_FRIENDLY         = 0, // Zepik and Jaloot
+
+    SAY_ARTRUIS_AGGRO           = 0,
+    SAY_ARTRUIS_TALK_1          = 1,
+    SAY_ARTRUIS_TALK_2          = 2,
+    SAY_ARTRUIS_TALK_3          = 3,
+    SAY_ARTRUIS_SHIELD          = 4, // Boss emote
+    SAY_ARTRUIS_TALK_4          = 5,
 };
 
 class npc_artruis_the_hearthless : public CreatureScript
@@ -143,7 +154,7 @@ public:
 
         void EnterCombat(Unit*  /*who*/) override
         {
-            me->Yell("Ah, the heroes. Your little friends said you would come. This certainly saves me the trouble of hunting you down myself.", LANG_UNIVERSAL);
+            Talk(SAY_ARTRUIS_AGGRO);
             me->CastSpell(me, SPELL_ARTRUIS_ICY_VEINS, true);
             events.RescheduleEvent(EVENT_CAST_FROST_BOLT, 4000);
             events.RescheduleEvent(EVENT_CAST_FROST_NOVA, 15000);
@@ -187,7 +198,7 @@ public:
                         }
                         else if (action == ACTION_MAKE_FRIENDLY && me->GetVictim())
                         {
-                            minion->Say("Now you not catch us with back turned! Now we hurt you bad undead. BAD!", LANG_UNIVERSAL);
+                            minion->AI()->Talk(SAY_TURNED_FRIENDLY);
                             minion->RemoveAurasDueToSpell(SPELL_ARTRUIS_BINDING);
                             minion->SetFaction(me->GetVictim()->GetFaction());
                             minion->AddThreat(me, 100000.0f);
@@ -215,21 +226,22 @@ public:
                     if (me->GetHealthPct() <= 30)
                     {
                         me->SetControlled(true, UNIT_STATE_STUNNED);
-                        me->TextEmote("Artruis is shielded. You must choose your side quickly to break his spell.", nullptr, true);
+                        Talk(SAY_ARTRUIS_SHIELD);
+                        Talk(SAY_ARTRUIS_TALK_3);
                         SummonsAction(ACTION_BIND_MINIONS);
                         break;
                     }
                     events.RepeatEvent(1000);
                     break;
                 case EVENT_ARTRUIS_TALK1:
-                    me->Yell("I have weathered a hundred years of war and suffering. Do you truly think it wise to pit your mortal bodies against a being that cannot die? I'd venture you have more to lose.", LANG_UNIVERSAL);
+                    Talk(SAY_ARTRUIS_TALK_1);
                     events.RescheduleEvent(EVENT_ARTRUIS_TALK2, 10000);
                     break;
                 case EVENT_ARTRUIS_TALK2:
-                    me->Yell("Even shattered into countless pieces, the crystals all around weaken me... perhaps i should not have underestimated the titans so...", LANG_UNIVERSAL);
+                    Talk(SAY_ARTRUIS_TALK_2);
                     break;
                 case EVENT_ARTRUIS_TALK3:
-                    me->Yell("Arthas once mustered strength... of the very same sort... perhaps he is the path that you will follow.", LANG_UNIVERSAL);
+                    Talk(SAY_ARTRUIS_TALK_4);
                     break;
                 case EVENT_CAST_FROST_BOLT:
                     me->CastSpell(me->GetVictim(), SPELL_ARTRUIS_FROSTBOLT, false);
@@ -261,24 +273,24 @@ public:
 quest Still At It (12644)
 ******/
 
-#define MCM_TEXT_START "Beginning the distillation in 5 seconds."
-#define MCM_TEXT_PRESSURE "Pressure's too high! Open the pressure valve!"
-#define MCM_TEXT_HEAT "The still needs heat! Light the brazier!"
-#define MCM_TEXT_BANANA "Add bananas!"
-#define MCM_TEXT_ORANGE "Add another orange! Quickly!"
-#define MCM_TEXT_PAPAYA "Put a papaya in the still!"
-#define MCM_TEXT_CORRECT1 "Nicely handled! Stay on your toes!"
-#define MCM_TEXT_CORRECT2 "That'll do. Never know what it'll need next..."
-#define MCM_TEXT_CORRECT3 "Good job! Keep your eyes open, now."
-#define MCM_TEXT_SUCCESS1 "Well done! Be ready for anything!"
-#define MCM_TEXT_SUCCESS2 "We've done it! Come get the cask."
-#define MCM_TEXT_FAILED "You have FAILED!!!"
-#define ACTION_PRESSURE 1
-#define ACTION_HEAT 2
-//#define ACTION_BANANA 3
-//#define ACTION_ORANGE 4
-//#define ACTION_PAPAYA 5
-#define NPC_WANTS_BANANAS 28537
+enum StillAtIt
+{
+    NPC_MANUS                   = 28566,
+    NPC_WANTS_BANANAS           = 28537,
+
+    QUEST_STILL_AT_IT           = 12644,
+    GOSSIP_MANUS_MENU           = 9713,
+
+    SAY_MANUS_START             = 0,
+    SAY_MANUS_ORANGE            = 1,
+    SAY_MANUS_PAPAYA            = 2,
+    SAY_MANUS_BANANA            = 3,
+    SAY_MANUS_PRESSUE           = 4,
+    SAY_MANUS_HEAT              = 5,
+    SAY_MANUS_WELL_DONE         = 6,
+    SAY_MANUS_FAILED            = 7,
+    SAY_MANUS_END               = 8,
+};
 
 class npc_still_at_it_trigger : public CreatureScript
 {
@@ -305,6 +317,8 @@ public:
 
         npc_still_at_it_triggerAI(Creature* pCreature) : NullCreatureAI(pCreature) {}
 
+        Creature* GetManus() {return ObjectAccessor::GetCreature(*me, thunderbrewGUID);}
+
         void Reset() override
         {
             running = false;
@@ -324,20 +338,12 @@ public:
             damage = 0;
         }
 
-        void Say(const char* text)
-        {
-            if (Creature* th = ObjectAccessor::GetCreature(*me, thunderbrewGUID))
-                th->Say(text, LANG_UNIVERSAL);
-            else
-                Reset();
-        }
-
         void Start()
         {
             timer = 5000;
             running = true;
             stepcount = urand(5, 10);
-            Say(MCM_TEXT_START);
+            GetManus()->AI()->Talk(SAY_MANUS_START);
         }
 
         void CheckAction(uint8 a, ObjectGuid guid)
@@ -348,27 +354,15 @@ public:
             if (a == expectedaction)
             {
                 currentstep++;
-                uint8 s = urand(0, 2);
 
                 if (Creature* th = ObjectAccessor::GetCreature(*me, thunderbrewGUID))
                     th->HandleEmoteCommand(EMOTE_ONESHOT_CHEER_NO_SHEATHE);
 
-                switch (s)
-                {
-                    case 0:
-                        Say(MCM_TEXT_CORRECT1);
-                        break;
-                    case 1:
-                        Say(MCM_TEXT_CORRECT2);
-                        break;
-                    default:
-                        Say(MCM_TEXT_CORRECT3);
-                        break;
-                }
+                GetManus()->AI()->Talk(SAY_MANUS_WELL_DONE);
 
                 if (currentstep >= stepcount)
                 {
-                    Say(MCM_TEXT_SUCCESS1);
+                    GetManus()->AI()->Talk(SAY_MANUS_WELL_DONE);
                     success = true;
                     timer = 3000;
                 }
@@ -380,7 +374,7 @@ public:
             }
             else
             {
-                Say(MCM_TEXT_FAILED);
+                GetManus()->AI()->Talk(SAY_MANUS_FAILED);
                 Reset();
             }
         }
@@ -417,15 +411,15 @@ public:
                     if( timer < 0 )
                         timer = 0;
                 }
-                else if ( success)
+                else if (success)
                 {
-                    Say(MCM_TEXT_SUCCESS2);
-                    me->SummonGameObject(190643, 5546.55f, 5768.0f, -78.03f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 60000);
+                    GetManus()->AI()->Talk(SAY_MANUS_END);
+                    me->SummonGameObject(190643, 5546.55f, 5768.0f, -78.03f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0);
                     Reset();
                 }
                 else if (expectedaction != 0) // didn't make it in 10 seconds
                 {
-                    Say(MCM_TEXT_FAILED);
+                    GetManus()->AI()->Talk(SAY_MANUS_FAILED);
                     Reset();
                 }
                 else // it's time to rand next move
@@ -434,19 +428,19 @@ public:
                     switch (expectedaction)
                     {
                         case 1:
-                            Say(MCM_TEXT_PRESSURE);
+                            GetManus()->AI()->Talk(SAY_MANUS_PRESSUE);
                             break;
                         case 2:
-                            Say(MCM_TEXT_HEAT);
+                            GetManus()->AI()->Talk(SAY_MANUS_HEAT);
                             break;
                         case 3:
-                            Say(MCM_TEXT_BANANA);
+                            GetManus()->AI()->Talk(SAY_MANUS_BANANA);
                             break;
                         case 4:
-                            Say(MCM_TEXT_ORANGE);
+                            GetManus()->AI()->Talk(SAY_MANUS_ORANGE);
                             break;
                         case 5:
-                            Say(MCM_TEXT_PAPAYA);
+                            GetManus()->AI()->Talk(SAY_MANUS_PAPAYA);
                             break;
                     }
                     timer = 10000;
@@ -469,8 +463,8 @@ public:
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
-        if (player->GetQuestStatus(12644) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I'm ready to start the distillation, uh, Tipsy.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        if (player->GetQuestStatus(QUEST_STILL_AT_IT) == QUEST_STATUS_INCOMPLETE)
+            AddGossipItemFor(player, GOSSIP_MANUS_MENU, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         return true;
@@ -541,13 +535,13 @@ public:
 ## npc_vekjik
 ######*/
 
-#define GOSSIP_VEKJIK_ITEM1 "Shaman Vekjik, I have spoken with the big-tongues and they desire peace. I have brought this offering on their behalf."
-#define GOSSIP_VEKJIK_ITEM2 "No no... I had no intentions of betraying your people. I was only defending myself. it was all a misunderstanding."
-
 enum Vekjik
 {
-    GOSSIP_TEXTID_VEKJIK1       = 13137,
-    GOSSIP_TEXTID_VEKJIK2       = 13138,
+    GOSSIP_VEKJIK_MENU_1        = 9678,
+    GOSSIP_VEKJIK_MENU_2        = 9686,
+
+    GOSSIP_TEXTID_VEKJIK_1       = 13137,
+    GOSSIP_TEXTID_VEKJIK_2       = 13138,
 
     SAY_TEXTID_VEKJIK1          = 0,
 
@@ -568,8 +562,8 @@ public:
 
         if (player->GetQuestStatus(QUEST_MAKING_PEACE) == QUEST_STATUS_INCOMPLETE)
         {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_VEKJIK_ITEM1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            SendGossipMenuFor(player, GOSSIP_TEXTID_VEKJIK1, creature->GetGUID());
+            AddGossipItemFor(player, GOSSIP_VEKJIK_MENU_1, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            SendGossipMenuFor(player, GOSSIP_TEXTID_VEKJIK_1, creature->GetGUID());
             return true;
         }
 
@@ -583,8 +577,8 @@ public:
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF+1:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_VEKJIK_ITEM2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                SendGossipMenuFor(player, GOSSIP_TEXTID_VEKJIK2, creature->GetGUID());
+                AddGossipItemFor(player, GOSSIP_VEKJIK_MENU_2, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                SendGossipMenuFor(player, GOSSIP_TEXTID_VEKJIK_2, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
                 CloseGossipMenuFor(player);
@@ -603,19 +597,19 @@ public:
 ## avatar_of_freya
 ######*/
 
-#define GOSSIP_ITEM_AOF1 "I want to stop the Scourge as much as you do. How can I help?"
-#define GOSSIP_ITEM_AOF2 "You can trust me. I am no friend of the Lich King."
-#define GOSSIP_ITEM_AOF3 "I will not fail."
-
 enum Freya
 {
     QUEST_FREYA_PACT         = 12621,
 
     SPELL_FREYA_CONVERSATION = 52045,
 
-    GOSSIP_TEXTID_AVATAR1    = 13303,
-    GOSSIP_TEXTID_AVATAR2    = 13304,
-    GOSSIP_TEXTID_AVATAR3    = 13305
+    GOSSIP_AVATAR_MENU_1     = 9720,
+    GOSSIP_AVATAR_MENU_2     = 9721,
+    GOSSIP_AVATAR_MENU_3     = 9722,
+
+    GOSSIP_TEXTID_AVATAR_1   = 13303,
+    GOSSIP_TEXTID_AVATAR_2   = 13304,
+    GOSSIP_TEXTID_AVATAR_3   = 13305,
 };
 
 class npc_avatar_of_freya : public CreatureScript
@@ -629,9 +623,9 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (player->GetQuestStatus(QUEST_FREYA_PACT) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_AOF1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_AVATAR_MENU_1, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
-        SendGossipMenuFor(player, GOSSIP_TEXTID_AVATAR1, creature);
+        SendGossipMenuFor(player, GOSSIP_TEXTID_AVATAR_1, creature);
         return true;
     }
 
@@ -641,12 +635,12 @@ public:
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF+1:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_AOF2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                SendGossipMenuFor(player, GOSSIP_TEXTID_AVATAR2, creature);
+                AddGossipItemFor(player, GOSSIP_AVATAR_MENU_2, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                SendGossipMenuFor(player, GOSSIP_TEXTID_AVATAR_2, creature);
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_AOF3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                SendGossipMenuFor(player, GOSSIP_TEXTID_AVATAR3, creature);
+                AddGossipItemFor(player, GOSSIP_AVATAR_MENU_3, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                SendGossipMenuFor(player, GOSSIP_TEXTID_AVATAR_3, creature);
                 break;
             case GOSSIP_ACTION_INFO_DEF+3:
                 player->CastSpell(player, SPELL_FREYA_CONVERSATION, true);
@@ -828,8 +822,6 @@ public:
 ## npc_jungle_punch_target
 #####*/
 
-constexpr auto SAY_OFFER = "Care to try Grimbooze Thunderbrew's new jungle punch?";
-
 enum JunglePunch
 {
     ITEM_TANKARD                        = 2705,
@@ -846,7 +838,10 @@ enum JunglePunch
     SAY_HEMET_HADRIUS_TAMARA_3          = 2,
 
     SAY_HEMET_4                         = 3, // unused
-    SAY_HEMET_5                         = 4  // unused
+    SAY_HEMET_5                         = 4,  // unused
+
+    // Player Say
+    SAY_OFFER                           = 28558,
 };
 
 enum NesingwaryChildrensWeek
@@ -1013,7 +1008,7 @@ public:
                     continue;
 
                 player->KilledMonsterCredit(me->GetEntry());
-                player->Say(SAY_OFFER, LANG_UNIVERSAL);
+                player->Say(SAY_OFFER);
                 sayStep = 1;
                 break;
             }
@@ -1038,10 +1033,6 @@ public:
 ## npc_adventurous_dwarf
 ######*/
 
-#define GOSSIP_OPTION_ORANGE    "Can you spare an orange?"
-#define GOSSIP_OPTION_BANANAS   "Have a spare bunch of bananas?"
-#define GOSSIP_OPTION_PAPAYA    "I could really use a papaya."
-
 enum AdventurousDwarf
 {
     QUEST_12634         = 12634,
@@ -1054,10 +1045,14 @@ enum AdventurousDwarf
     SPELL_ADD_BANANAS   = 52074,
     SPELL_ADD_PAPAYA    = 52076,
 
-    GOSSIP_MENU_DWARF   = 13307,
-
     SAY_DWARF_OUCH      = 0,
-    SAY_DWARF_HELP      = 1
+    SAY_DWARF_HELP      = 1,
+
+    // Gossips
+    GOSSIP_DWARF_MENU   = 9724,
+    GOSSIP_DWARF_ORANGE = 0,
+    GOSSIP_DWARF_BANANA = 1,
+    GOSSIP_DWARF_PAPAYA = 2,
 };
 
 class npc_adventurous_dwarf : public CreatureScript
@@ -1084,15 +1079,15 @@ public:
             return false;
 
         if (player->GetItemCount(ITEM_ORANGE) < 1)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_OPTION_ORANGE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_DWARF_MENU, GOSSIP_DWARF_ORANGE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         if (player->GetItemCount(ITEM_BANANAS) < 2)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_OPTION_BANANAS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            AddGossipItemFor(player, GOSSIP_DWARF_MENU, GOSSIP_DWARF_BANANA, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
 
         if (player->GetItemCount(ITEM_PAPAYA) < 1)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_OPTION_PAPAYA, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            AddGossipItemFor(player, GOSSIP_DWARF_MENU, GOSSIP_DWARF_PAPAYA, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
 
-        SendGossipMenuFor(player, GOSSIP_MENU_DWARF, creature);
+        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature);
         return true;
     }
 

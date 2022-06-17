@@ -316,8 +316,6 @@ public:
     void SetDifficultyChangePrevention(DifficultyPreventionChangeType type);
     void DoForAllMembers(std::function<void(Player*)> const& worker);
 
-    // Reset Instance Gameobjects
-    void ResetInstanceSavedGameobjects(uint32 instanceId);
 protected:
     void _homebindIfInstance(Player* player);
     void _cancelHomebindIfInstance(Player* player);

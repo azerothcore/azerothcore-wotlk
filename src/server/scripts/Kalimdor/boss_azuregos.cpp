@@ -69,8 +69,6 @@ public:
                 {
                     if (p->GetZoneId() == me->GetZoneId())
                     {
-
-                        p->RemoveAurasDueToSpell(SPELL_AURA_OF_FROST);
                         p->RemoveAurasDueToSpell(SPELL_CHILL);
                         p->RemoveAurasDueToSpell(SPELL_FROST_BREATH);
                     }

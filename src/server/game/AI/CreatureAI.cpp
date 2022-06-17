@@ -134,14 +134,6 @@ void CreatureAI::DoZoneInCombat(Creature* creature /*= nullptr*/, float maxRange
             {
                 creature->AddThreat(player, 0.0f);
             }
-
-            /* Causes certain things to never leave the threat list (Priest Lightwell, etc):
-            for (Unit::ControlSet::const_iterator itr = player->m_Controlled.begin(); itr != player->m_Controlled.end(); ++itr)
-            {
-                creature->SetInCombatWith(*itr);
-                (*itr)->SetInCombatWith(creature);
-                creature->AddThreat(*itr, 0.0f);
-            }*/
         }
     }
 }
@@ -161,7 +153,7 @@ void CreatureAI::MoveInLineOfSight_Safe(Unit* who)
 
 void CreatureAI::MoveInLineOfSight(Unit* who)
 {
-    if (me->GetVictim())
+    if (me->IsEngaged())
         return;
 
     // pussywizard: civilian, non-combat pet or any other NOT HOSTILE TO ANYONE (!)
@@ -182,7 +174,7 @@ void CreatureAI::TriggerAlert(Unit const* who) const
     if (!who || who->GetTypeId() != TYPEID_PLAYER)
         return;
     // If this unit isn't an NPC, is already distracted, is in combat, is confused, stunned or fleeing, do nothing
-    if (me->GetTypeId() != TYPEID_UNIT || me->IsInCombat() || me->HasUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_STUNNED | UNIT_STATE_FLEEING | UNIT_STATE_DISTRACTED))
+    if (me->GetTypeId() != TYPEID_UNIT || me->IsEngaged() || me->HasUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_STUNNED | UNIT_STATE_FLEEING | UNIT_STATE_DISTRACTED))
         return;
     // Only alert for hostiles!
     if (me->IsCivilian() || me->HasReactState(REACT_PASSIVE) || !me->IsHostileTo(who) || !me->_IsTargetAcceptable(who))
@@ -253,7 +245,7 @@ void CreatureAI::SetGazeOn(Unit* target)
 
 bool CreatureAI::UpdateVictimWithGaze()
 {
-    if (!me->IsInCombat())
+    if (!me->IsEngaged())
         return false;
 
     if (me->HasReactState(REACT_PASSIVE))
@@ -271,7 +263,7 @@ bool CreatureAI::UpdateVictimWithGaze()
 
 bool CreatureAI::UpdateVictim()
 {
-    if (!me->IsInCombat())
+    if (!me->IsEngaged())
         return false;
 
     if (!me->HasReactState(REACT_PASSIVE))

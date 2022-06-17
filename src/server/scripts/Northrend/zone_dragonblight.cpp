@@ -294,28 +294,52 @@ public:
 
 enum hourglass
 {
-    NPC_FUTURE_HOURGLASS            = 27840,
-    NPC_FUTURE_YOU                  = 27899,
+    NPC_FUTURE_HOURGLASS                    = 27840,
+    NPC_FUTURE_YOU                          = 27899,
 
-    NPC_PAST_HOURGLASS              = 32327,
-    NPC_PAST_YOU                    = 32331,
+    NPC_PAST_HOURGLASS                      = 32327,
+    NPC_PAST_YOU                            = 32331,
 
-    NPC_INFINITE_ASSAILANT          = 27896,
-    NPC_INFINITE_CHRONO_MAGUS       = 27898,
-    NPC_INFINITE_DESTROYER          = 27897,
-    NPC_INFINITE_TIMERENDER         = 27900,
+    NPC_INFINITE_ASSAILANT                  = 27896,
+    NPC_INFINITE_CHRONO_MAGUS               = 27898,
+    NPC_INFINITE_DESTROYER                  = 27897,
+    NPC_INFINITE_TIMERENDER                 = 27900,
+    NPC_NOZDORMU                            = 27925,
 
-    SPELL_CLONE_CASTER              = 49889,
-    SPELL_TELEPORT_EFFECT           = 52096,
+    SPELL_NOZDORMU_INVIS                    = 50013,
+    SPELL_CLONE_CASTER                      = 49889,
+    SPELL_TELEPORT_EFFECT                   = 52096,
 
-    EVENT_START_EVENT               = 1,
-    EVENT_FIGHT_1                   = 2,
-    EVENT_FIGHT_2                   = 3,
-    EVENT_CHECK_FINISH              = 4,
-    EVENT_FINISH_EVENT              = 5,
+    EVENT_START_EVENT                       = 1,
+    EVENT_FIGHT_1                           = 2,
+    EVENT_FIGHT_2                           = 3,
+    EVENT_CHECK_FINISH                      = 4,
+    EVENT_FINISH_EVENT                      = 5,
 
-    QUEST_MYSTERY_OF_THE_INFINITE   = 12470,
-    QUEST_MYSTERY_OF_THE_INFINITE_REDUX = 13343,
+    QUEST_MYSTERY_OF_THE_INFINITE           = 12470,
+    QUEST_MYSTERY_OF_THE_INFINITE_REDUX     = 13343,
+};
+
+enum hourglassText
+{
+    // (All are whispers) Both NPC_PAST_YOU and NPC_FUTURE_YOU share the same creature_text GroupIDs
+    // Start
+    SAY_HOURGLASS_START_1                   = 1,
+    SAY_HOURGLASS_START_2                   = 2,
+
+    // Random whispers during the fight
+    SAY_HOURGLASS_RANDOM_1                  = 3,
+    SAY_HOURGLASS_RANDOM_2                  = 4,
+    SAY_HOURGLASS_RANDOM_3                  = 5,
+    SAY_HOURGLASS_RANDOM_4                  = 6,
+    SAY_HOURGLASS_RANDOM_5                  = 7,
+    SAY_HOURGLASS_RANDOM_6                  = 8,
+    SAY_HOURGLASS_RANDOM_7                  = 9,
+    SAY_HOURGLASS_RANDOM_8                  = 10,
+
+    // End
+    SAY_HOURGLASS_END_1                     = 11,
+    SAY_HOURGLASS_END_2                     = 12,
 };
 
 class npc_hourglass_of_eternity : public CreatureScript
@@ -332,24 +356,26 @@ public:
     {
         npc_hourglass_of_eternityAI(Creature* c) : ScriptedAI(c) {}
 
-        ObjectGuid summonerGUID;
-        ObjectGuid futureGUID;
+        ObjectGuid pGUID;
+        ObjectGuid copyGUID;
         EventMap events;
         uint8 count[3];
         uint8 phase;
+        uint8 randomTalk;
+        uint8 lastRandomTalk;
 
-        bool IsFuture() { return me->GetEntry() == NPC_FUTURE_HOURGLASS; }
+        bool IsFuture() {return me->GetEntry() == NPC_FUTURE_HOURGLASS;}
         void InitializeAI() override
         {
             if (me->ToTempSummon())
                 if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                 {
-                    summonerGUID = summoner->GetGUID();
+                    pGUID = summoner->GetGUID();
                     float x, y, z;
                     me->GetNearPoint(summoner, x, y, z, me->GetCombatReach(), 0.0f, rand_norm() * 2 * M_PI);
                     if (Creature* cr = summoner->SummonCreature((IsFuture() ? NPC_FUTURE_YOU : NPC_PAST_YOU), x, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 210000))
                     {
-                        futureGUID = cr->GetGUID();
+                        copyGUID = cr->GetGUID();
                         summoner->CastSpell(cr, SPELL_CLONE_CASTER, true);
                         cr->SetFaction(summoner->GetFaction());
                         cr->SetReactState(REACT_AGGRESSIVE);
@@ -365,12 +391,24 @@ public:
             events.ScheduleEvent(EVENT_START_EVENT, 4000);
         }
 
-        Player* getSummoner() { return ObjectAccessor::GetPlayer(*me, summonerGUID); }
-        Creature* getFuture() { return ObjectAccessor::GetCreature(*me, futureGUID); }
+        Player* GetPlayer() {return ObjectAccessor::GetPlayer(*me, pGUID);}
+        Creature* GetCopy() {return ObjectAccessor::GetCreature(*me, copyGUID);}
 
         uint32 randEntry()
         {
             return NPC_INFINITE_ASSAILANT + urand(0, 2);
+        }
+
+        void ShowNozdormu()
+        {
+            if (Creature* cr = me->FindNearestCreature(NPC_NOZDORMU, 100.0f, true))
+                cr->RemoveAura(SPELL_NOZDORMU_INVIS);
+        }
+
+        void HideNozdormu()
+        {
+            if (Creature* cr = me->FindNearestCreature(NPC_NOZDORMU, 100.0f, true))
+                cr->AddAura(SPELL_NOZDORMU_INVIS, cr);
         }
 
         void UpdateAI(uint32 diff) override
@@ -379,13 +417,13 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_START_EVENT:
-                    if (Creature* cr = getFuture())
-                        cr->Whisper(IsFuture() ? "Hey there, $N, don't be alarmed. It's me... you... from the future. I'm here to help." : "Whoa! You're me, but from the future! Hey, my equipment got an upgrade! Cool!", LANG_UNIVERSAL, getSummoner());
+                    if (Creature* cr = GetCopy())
+                        cr->AI()->Talk(SAY_HOURGLASS_START_1, GetPlayer());
                     events.ScheduleEvent(EVENT_FIGHT_1, 7000);
                     break;
                 case EVENT_FIGHT_1:
-                    if (Creature* cr = getFuture())
-                        cr->Whisper(IsFuture() ? "Heads up... here they come. I'll help as much as I can. Let's just keep them off the hourglass!" : "Here come the Infinites! I've got to keep the hourglass safe. Can you help?", LANG_UNIVERSAL, getSummoner());
+                    if (Creature* cr = GetCopy())
+                        cr->AI()->Talk(SAY_HOURGLASS_START_2, GetPlayer());
                     events.ScheduleEvent(EVENT_FIGHT_2, 6000);
                     break;
                 case EVENT_FIGHT_2:
@@ -433,57 +471,44 @@ public:
                             return;
                         }
 
-                        if (Player* player = getSummoner())
+                        ShowNozdormu();
+                        if (Player* player = GetPlayer())
                             player->GroupEventHappens(IsFuture() ? QUEST_MYSTERY_OF_THE_INFINITE : QUEST_MYSTERY_OF_THE_INFINITE_REDUX, me);
 
-                        me->Whisper(IsFuture() ? "Look, $N, the hourglass has revealed Nozdormu!" : "What the heck? Nozdormu is up there!", LANG_UNIVERSAL, getSummoner());
+                        if (Creature* cr = GetCopy())
+                        {
+                            cr->SetFacingToObject(me->FindNearestCreature(NPC_NOZDORMU, 100.0f, true));
+                            cr->AI()->Talk(SAY_HOURGLASS_END_1, GetPlayer());
+                        }
                         events.ScheduleEvent(EVENT_FINISH_EVENT, 6000);
                         break;
                     }
                 case EVENT_FINISH_EVENT:
                     {
-                        me->Whisper(IsFuture() ? "Farewell, $N. Keep us alive and get some better equipment!" : "I feel like I'm being pulled away through time. Thanks for the help....", LANG_UNIVERSAL, getSummoner());
+                        HideNozdormu();
+                        if (Creature* cr = GetCopy())
+                            cr->AI()->Talk(SAY_HOURGLASS_END_2, GetPlayer());
                         me->DespawnOrUnsummon(500);
-                        if (getFuture())
-                            getFuture()->DespawnOrUnsummon(500);
+                        if (GetCopy())
+                            GetCopy()->DespawnOrUnsummon(500);
                         break;
                     }
             }
         }
 
-        void randomWhisper()
+        void randomWhisper() // Do not repeat the same line
         {
-            std::string text = "";
-            switch(urand(0, IsFuture() ? 7 : 5))
+            randomTalk = urand(SAY_HOURGLASS_RANDOM_1, SAY_HOURGLASS_RANDOM_8); // 3 to 10
+            if (randomTalk == lastRandomTalk)
             {
-                case 0:
-                    text = IsFuture() ? "What? Am I here alone. We both have a stake at this, you know!" : "This equipment looks cool and all, but couldn't we have done a little better? Are you even raiding?";
-                    break;
-                case 1:
-                    text = IsFuture() ? "No matter what, you can't die, because would mean that I would cease to exist, right? But, I was here before when I was you. I'm so confused!" : "Chromie said that if I don't do this just right, I might wink out of existence. If I go, then you go!";
-                    break;
-                case 2:
-                    text = IsFuture() ? "Sorry, but Chromie said that I couldn't reveal anything about your future to you. She said that if I did, I would cease to exist." : "I just want you to know that if we get through this alive, I'm making sure that we turn out better than you. No offense.";
-                    break;
-                case 3:
-                    text = IsFuture() ? "Look at you fight; no wonder I turned to drinking." : "Looks like I'm an underachiever.";
-                    break;
-                case 4:
-                    text = IsFuture() ? "Wow, I'd forgotten how inexperienced I used to be." : "Wait a minute! If you're here, then that means that in the not-so-distant future I'm going to be you helping me? Are we stuck in a time loop?!";
-                    break;
-                case 5:
-                    text = IsFuture() ? "I can't believe that I used to wear that." : "I think I'm going to turn to drinking after this.";
-                    break;
-                case 6:
-                    text = "Listen. I'm not supposed to tell you this, but there's going to be this party that you're invited to. Whatever you do, DO NOT DRINK THE PUNCH!";
-                    break;
-                case 7:
-                    text = "Wish I could remember how many of the Infinite Dragonflight were going to try to stop you. This fight was so long ago.";
-                    break;
+                randomWhisper();
             }
-
-            if (Creature* cr = getFuture())
-                cr->Whisper(text, LANG_UNIVERSAL, getSummoner());
+            else
+            {
+                if (Creature* cr = GetCopy())
+                    cr->AI()->Talk(randomTalk, GetPlayer());
+                lastRandomTalk = randomTalk;
+            }
         }
     };
 };
@@ -516,7 +541,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (!me->GetVictim() && who->GetEntry() >= NPC_INFINITE_ASSAILANT && who->GetEntry() <= NPC_INFINITE_TIMERENDER)
+            if (!me->GetVictim() && !who->IsFlying() && who->GetEntry() >= NPC_INFINITE_ASSAILANT && who->GetEntry() <= NPC_INFINITE_TIMERENDER)
                 AttackStart(who);
         }
 

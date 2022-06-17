@@ -1045,9 +1045,9 @@ public:
             if (reportUse)
             {
                 uint32 gossipId         = me->GetGOInfo()->GetGossipMenuId();
-                bool   _twilightSetAura = (player->HasAura(AURA_TWILIGHT_SET, player->GetGUID()) ? true : false);
-                bool   _medallionAura   = (player->HasAura(AURA_MEDALLION, player->GetGUID()) ? true : false);
-                bool   _ringAura        = (player->HasAura(AURA_RING, player->GetGUID()) ? true : false);
+                bool   _twilightSetAura = (player->HasAura(AURA_TWILIGHT_SET, player->GetGUID()));
+                bool   _medallionAura   = (player->HasAura(AURA_MEDALLION, player->GetGUID()));
+                bool   _ringAura        = (player->HasAura(AURA_RING, player->GetGUID()));
 
                 switch (gossipId)
                 {

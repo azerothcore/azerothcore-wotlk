@@ -78,6 +78,15 @@ public:
     }
 };
 
+// The cleansing
+enum TurmoilTexts
+{
+    SAY_TURMOIL_0                = 0,
+    SAY_TURMOIL_1                = 1,
+    SAY_TURMOIL_HALF_HP          = 2,
+    SAY_TURMOIL_DEATH            = 3,
+};
+
 class npc_your_inner_turmoil : public CreatureScript
 {
 public:
@@ -89,16 +98,18 @@ public:
 
         uint32 timer;
         short phase;
+        bool health50;
 
         void Reset() override
         {
             timer = 0;
             phase = 0;
+            health50 = false;
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (timer >= 6000 && phase < 4)
+            if (timer >= 6000 && phase < 2)
             {
                 phase++;
                 setphase(phase);
@@ -110,6 +121,20 @@ public:
             DoMeleeAttackIfReady();
         }
 
+        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType  /*damagetype*/, SpellSchoolMask  /*damageSchoolMask*/) override
+        {
+            if (HealthBelowPct(50) && !health50)
+            {
+                Talk(SAY_TURMOIL_HALF_HP, me->ToTempSummon()->GetSummonerUnit()->ToPlayer());
+                health50 = true;
+            }
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            Talk(SAY_TURMOIL_DEATH, me->ToTempSummon()->GetSummonerUnit()->ToPlayer());
+        }
+
         void setphase(short newPhase)
         {
             Unit* summoner = me->ToTempSummon() ? me->ToTempSummon()->GetSummonerUnit() : nullptr;
@@ -119,16 +144,11 @@ public:
             switch (newPhase)
             {
                 case 1:
-                    me->Whisper("You think that you can get rid of me through meditation?", LANG_UNIVERSAL, summoner->ToPlayer());
+                    Talk(SAY_TURMOIL_0, summoner->ToPlayer());
                     return;
                 case 2:
-                    me->Whisper("Fool! I will destroy you and finally become that which has been building inside of you all these years!", LANG_UNIVERSAL, summoner->ToPlayer());
-                    return;
-                case 3:
-                    me->Whisper("You cannot defeat me. I'm an inseparable part of you!", LANG_UNIVERSAL, summoner->ToPlayer());
-                    return;
-                case 4:
-                    me->Whisper("NOOOOOOOoooooooooo!", LANG_UNIVERSAL, summoner->ToPlayer());
+                {
+                    Talk(SAY_TURMOIL_1, summoner->ToPlayer());
                     me->SetLevel(summoner->getLevel());
                     me->SetFaction(FACTION_MONSTER);
                     if (me->GetExactDist(summoner) < 50.0f)
@@ -137,6 +157,7 @@ public:
                         summoner->CastSpell(me, 50218, true); // clone caster
                         AttackStart(summoner);
                     }
+                }
             }
         }
     };

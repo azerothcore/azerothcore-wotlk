@@ -28,13 +28,20 @@ EndScriptData */
 
 enum Spells
 {
-    SPELL_AMBUSH                = 34794,
-    SPELL_THOUSANDBLADES        = 34799
+    SPELL_VANISH            = 24699,
+    SPELL_AMBUSH            = 24337,
+    SPELL_GOUGE             = 24698,
+    SPELL_THOUSAND_BLADES   = 24649,
+    SPELL_THRASH            = 3417,
+    SPELL_ENRAGE            = 8269
 };
 
-enum Misc
+enum Events
 {
-    EQUIP_ID_MAIN_HAND          = 0  //was item display id 31818, but this id does not exist
+    EVENT_VANISH            = 1,
+    EVENT_AMBUSH            = 2,
+    EVENT_GOUGE             = 3,
+    EVENT_THOUSAND_BLADES   = 4
 };
 
 class boss_renataki : public CreatureScript
@@ -46,36 +53,67 @@ public:
     {
         boss_renatakiAI(Creature* creature) : BossAI(creature, DATA_EDGE_OF_MADNESS) { }
 
-        uint32 Invisible_Timer;
-        uint32 Ambush_Timer;
-        uint32 Visible_Timer;
-        uint32 Aggro_Timer;
-        uint32 ThousandBlades_Timer;
-
-        bool Invisible;
-        bool Ambushed;
-
         void Reset() override
         {
             _Reset();
-            Invisible_Timer = urand(8000, 18000);
-            Ambush_Timer = 3000;
-            Visible_Timer = 4000;
-            Aggro_Timer = urand(15000, 25000);
-            ThousandBlades_Timer = urand(4000, 8000);
-
-            Invisible = false;
-            Ambushed = false;
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            _JustDied();
+            me->SetReactState(REACT_AGGRESSIVE);
+            _enraged = false;
+            _thousandBladesCount = urand(2, 5);
+            _thousandBladesTargets.clear();
+            _dynamicFlags = me->GetDynamicFlags();
         }
 
         void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
+            events.ScheduleEvent(EVENT_VANISH, 23s, 25s);
+            events.ScheduleEvent(EVENT_GOUGE, 5s, 10s);
+            events.ScheduleEvent(EVENT_THOUSAND_BLADES, 15s, 20s);
+
+            DoCastSelf(SPELL_THRASH, true);
+        }
+
+        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+        {
+            if (!_enraged && HealthBelowPct(30))
+            {
+                me->TextEmote("%s becomes enraged", me, false);
+                DoCast(me, SPELL_ENRAGE);
+                _enraged = true;
+            }
+        }
+
+        bool CanAIAttack(Unit const* target) const override
+        {
+            if (me->GetThreatMgr().getThreatList().size() > 1 && me->GetThreatMgr().getOnlineContainer().getMostHated()->getTarget() == target)
+                return !target->HasAura(SPELL_GOUGE);
+
+            return true;
+        }
+
+        bool CanBeSeen(Player const* /*player*/) override
+        {
+            return me->GetReactState() == REACT_AGGRESSIVE;
+        }
+
+        bool CanSeeAlways(WorldObject const* obj) override
+        {
+            if (me->GetReactState() == REACT_PASSIVE)
+            {
+                return obj->ToCreature() && obj->ToCreature()->IsPet();
+            }
+
+            return false;
+        }
+
+        bool CanAlwaysBeDetectable(WorldObject const* seer) override
+        {
+            if (me->GetReactState() == REACT_PASSIVE)
+            {
+                return seer->ToCreature() && seer->ToCreature()->IsPet();
+            }
+
+            return false;
         }
 
         void UpdateAI(uint32 diff) override
@@ -83,86 +121,122 @@ public:
             if (!UpdateVictim())
                 return;
 
-            //Invisible_Timer
-            if (Invisible_Timer <= diff)
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while (uint32 eventId = events.ExecuteEvent())
             {
-                me->InterruptSpell(CURRENT_GENERIC_SPELL);
-
-                SetEquipmentSlots(false, EQUIP_UNEQUIP, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
-                me->SetDisplayId(11686);
-
-                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                Invisible = true;
-
-                Invisible_Timer = urand(15000, 30000);
-            }
-            else Invisible_Timer -= diff;
-
-            if (Invisible)
-            {
-                if (Ambush_Timer <= diff)
+                switch (eventId)
                 {
-                    Unit* target = SelectTarget(SelectTargetMethod::Random, 0);
-                    if (target)
+                    case EVENT_VANISH:
+                        me->SetReactState(REACT_PASSIVE);
+                        _dynamicFlags = me->GetDynamicFlags();
+                        me->RemoveDynamicFlag(UNIT_DYNFLAG_TRACK_UNIT);
+                        DoCastSelf(SPELL_VANISH);
+                        events.DelayEvents(5s);
+                        events.ScheduleEvent(EVENT_AMBUSH, 5s);
+                        events.ScheduleEvent(EVENT_VANISH, 38s, 45s);
+                        return;
+                    case EVENT_AMBUSH:
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
+                        {
+                            me->NearTeleportTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), me->GetOrientation());
+                            DoCast(target, SPELL_AMBUSH, true);
+                        }
+                        me->SetDynamicFlag(_dynamicFlags);
+                        me->RemoveAurasDueToSpell(SPELL_VANISH);
+                        me->SetReactState(REACT_AGGRESSIVE);
+                        break;
+                    case EVENT_GOUGE:
+                        DoCastAOE(SPELL_GOUGE);
+                        events.ScheduleEvent(EVENT_GOUGE, 10s, 15s);
+                        return;
+                    case EVENT_THOUSAND_BLADES:
                     {
-                        me->NearTeleportTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), me->GetOrientation());
-                        DoCast(target, SPELL_AMBUSH);
-                    }
+                        if (_thousandBladesTargets.empty())
+                        {
+                            std::vector<Unit*> targetList;
+                            ThreatContainer::StorageType const& threatlist = me->GetThreatMgr().getThreatList();
+                            for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
+                            {
+                                if (Unit* target = (*itr)->getTarget())
+                                {
+                                    if (target->IsAlive() && target->IsWithinDist2d(me, 100.f))
+                                    {
+                                        targetList.push_back(target);
+                                    }
+                                }
+                            }
 
-                    Ambushed = true;
-                    Ambush_Timer = 3000;
+                            if (!targetList.empty())
+                            {
+                                Acore::Containers::RandomShuffle(targetList);
+
+                                // First get ranged targets
+                                for (Unit* target : targetList)
+                                {
+                                    if (!target->IsWithinMeleeRange(me))
+                                    {
+                                        _thousandBladesTargets.push_back(target);
+                                    }
+                                }
+
+                                if (_thousandBladesTargets.size() < _thousandBladesCount)
+                                {
+                                    // if still not enough, get melee targets
+                                    for (Unit* target : targetList)
+                                    {
+                                        if (target->IsWithinMeleeRange(me))
+                                        {
+                                            _thousandBladesTargets.push_back(target);
+                                        }
+                                    }
+                                }
+
+                                if (!_thousandBladesTargets.empty())
+                                {
+                                    Acore::Containers::RandomResize(_thousandBladesTargets, _thousandBladesCount);
+                                }
+                            }
+                        }
+
+                        if (!_thousandBladesTargets.empty())
+                        {
+                            std::vector<Unit*>::iterator itr = _thousandBladesTargets.begin();
+                            std::advance(itr, urand(0, _thousandBladesTargets.size() - 1));
+
+                            if (Unit* target = *itr)
+                            {
+                                DoCast(target, SPELL_THOUSAND_BLADES, false);
+                            }
+
+                            _thousandBladesTargets.erase(itr);
+
+                            events.ScheduleEvent(EVENT_THOUSAND_BLADES, 500ms);
+                        }
+                        else
+                        {
+                            _thousandBladesCount = urand(2, 5);
+                            events.ScheduleEvent(EVENT_THOUSAND_BLADES, 15s, 22s);
+                        }
+                        break;
+                    }
+                    default:
+                        break;
                 }
-                else Ambush_Timer -= diff;
             }
 
-            if (Ambushed)
-            {
-                if (Visible_Timer <= diff)
-                {
-                    me->InterruptSpell(CURRENT_GENERIC_SPELL);
-
-                    me->SetDisplayId(15268);
-                    SetEquipmentSlots(false, EQUIP_ID_MAIN_HAND, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
-
-                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    Invisible = false;
-
-                    Visible_Timer = 4000;
-                }
-                else Visible_Timer -= diff;
-            }
-
-            //Resetting some aggro so he attacks other gamers
-            if (!Invisible)
-            {
-                if (Aggro_Timer <= diff)
-                {
-                    Unit* target = SelectTarget(SelectTargetMethod::Random, 1);
-
-                    if (DoGetThreat(me->GetVictim()))
-                    {
-                        DoModifyThreatPercent(me->GetVictim(), -50);
-                    }
-
-                    if (target)
-                    {
-                        AttackStart(target);
-                    }
-
-                    Aggro_Timer = urand(7000, 20000);
-                }
-                else Aggro_Timer -= diff;
-
-                if (ThousandBlades_Timer <= diff)
-                {
-                    DoCastVictim(SPELL_THOUSANDBLADES);
-                    ThousandBlades_Timer = urand(7000, 12000);
-                }
-                else ThousandBlades_Timer -= diff;
-            }
-
-            DoMeleeAttackIfReady();
+            if (me->GetReactState() == REACT_AGGRESSIVE)
+                DoMeleeAttackIfReady();
         }
+
+    private:
+        bool _enraged;
+        uint32 _dynamicFlags;
+        uint8 _thousandBladesCount;
+        std::vector<Unit*> _thousandBladesTargets;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
