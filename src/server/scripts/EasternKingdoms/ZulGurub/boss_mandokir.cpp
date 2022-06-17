@@ -413,7 +413,6 @@ public:
 };
 
 // Ohgan
-
 enum OhganSpells
 {
     SPELL_SUNDERARMOR         = 24317,
@@ -561,7 +560,6 @@ enum VilebranchSpells
     SPELL_DEMORALIZING_SHOUT  = 13730,
     SPELL_CLEAVE              = 15284
 };
-
 
 struct npc_vilebranch_speaker : public ScriptedAI
 {
