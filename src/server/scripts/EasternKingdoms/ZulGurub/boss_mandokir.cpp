@@ -562,61 +562,51 @@ enum VilebranchSpells
     SPELL_CLEAVE              = 15284
 };
 
-class npc_vilebranch_speaker : public CreatureScript
+
+struct npc_vilebranch_speaker : public ScriptedAI
 {
-public:
-    npc_vilebranch_speaker() : CreatureScript("npc_vilebranch_speaker") { }
+    npc_vilebranch_speaker(Creature* creature) : ScriptedAI(creature), instance(creature->GetInstanceScript()) { }
 
-    struct npc_vilebranch_speakerAI : public ScriptedAI
+    void Reset() override
     {
-        npc_vilebranch_speakerAI(Creature* creature) : ScriptedAI(creature), instance(creature->GetInstanceScript()) { }
+        _scheduler.CancelAll();
+    }
 
-        void Reset() override
-        {
-            demoralizing_Shout_Timer = urand(2000, 4000);
-            cleave_Timer = urand(5000, 8000);
-        }
-
-        void EnterCombat(Unit* /*who*/) override { }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            instance->SetBossState(DATA_MANDOKIR, SPECIAL);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            // Return since we have no target
-            if (!UpdateVictim())
-                return;
-
-            if (demoralizing_Shout_Timer <= diff)
+    void EnterCombat(Unit* /*who*/) override
+    {
+        _scheduler
+            .Schedule(2s, 4s, [this](TaskContext context)
             {
-                DoCast(me, SPELL_DEMORALIZING_SHOUT);
-                demoralizing_Shout_Timer = urand(22000, 30000);
-            }
-            else demoralizing_Shout_Timer -= diff;
-
-            if (cleave_Timer <= diff)
+                DoCastAOE(SPELL_DEMORALIZING_SHOUT);
+                context.Repeat(22s, 30s);
+            })
+            .Schedule(5s, 8s, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_CLEAVE, true);
-                cleave_Timer = urand(6000, 9000);
-            }
-            else cleave_Timer -= diff;
-
-            DoMeleeAttackIfReady();
-        }
-
-    private:
-        uint32 demoralizing_Shout_Timer;
-        uint32 cleave_Timer;
-        InstanceScript* instance;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetZulGurubAI<npc_vilebranch_speakerAI>(creature);
+                context.Repeat(6s, 9s);
+            });
     }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        instance->SetBossState(DATA_MANDOKIR, SPECIAL);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        // Return since we have no target
+        if (!UpdateVictim())
+            return;
+
+        _scheduler.Update(diff, [this]
+            {
+                DoMeleeAttackIfReady();
+            });
+    }
+
+private:
+    TaskScheduler _scheduler;
+    InstanceScript* instance;
 };
 
 class spell_threatening_gaze : public AuraScript
@@ -646,6 +636,6 @@ void AddSC_boss_mandokir()
     new boss_mandokir();
     new npc_ohgan();
     RegisterZulGurubCreatureAI(npc_chained_spirit);
-    new npc_vilebranch_speaker();
+    RegisterZulGurubCreatureAI(npc_vilebranch_speaker);
     RegisterSpellScript(spell_threatening_gaze);
 }
