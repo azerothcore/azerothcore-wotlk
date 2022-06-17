@@ -99,7 +99,7 @@ public:
             target->CastSpell(target, SPELL_WARNING_WYRMREST, true);
         }
 
-        // any way out of the game using mount will be removed 
+        // any way out of the game using mount will be removed
         if (!caster || caster->GetVehicleCreatureBase())
             return;
 
@@ -164,7 +164,7 @@ public:
             sCreatureTextMgr->SendChat(gryphon, TEXT_EMOTE, target, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, target);
             target->CastSpell(target, SPELL_WARNING_GRYPHON, true);
         }
-            
+        
 	    // any way out of the game using mount will be removed
         if (!caster || caster->GetVehicleCreatureBase())
             return;
