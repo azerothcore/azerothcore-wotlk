@@ -207,11 +207,11 @@ Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
     m_removedAurasCount(0),
     i_motionMaster(new MotionMaster(this)),
     m_regenTimer(0),
-    m_ThreatMgr(this),
+    m_threatMgr(this),
+    m_combatMgr(this),
     m_vehicle(nullptr),
     m_vehicleKit(nullptr),
     m_unitTypeMask(UNIT_MASK_NONE),
-    m_HostileRefMgr(this),
     m_comboTarget(nullptr),
     m_comboPoints(0)
 {
@@ -280,18 +280,12 @@ Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
     m_modSpellHitChance = 0.0f;
     m_baseSpellCritChance = 5;
 
-    m_CombatTimer = 0;
     m_lastManaUse = 0;
-
-    for (uint8 i = 0; i < MAX_SPELL_SCHOOL; ++i)
-        m_threatModifier[i] = 1.0f;
 
     for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i)
         m_speed_rate[i] = 1.0f;
 
     m_charmInfo = nullptr;
-
-    _redirectThreatInfo = RedirectThreatInfo();
 
     // remove aurastates allowing special moves
     for (uint8 i = 0; i < MAX_REACTIVE; ++i)
@@ -424,25 +418,6 @@ void Unit::Update(uint32 p_time)
 
     _UpdateSpells( p_time );
 
-    if (CanHaveThreatList() && GetThreatMgr().isNeedUpdateToClient(p_time))
-        SendThreatListUpdate();
-
-    // update combat timer only for players and pets (only pets with PetAI)
-    if (IsInCombat() && (GetTypeId() == TYPEID_PLAYER || ((IsPet() || HasUnitTypeMask(UNIT_MASK_CONTROLABLE_GUARDIAN)) && IsControlledByPlayer())))
-    {
-        // Check UNIT_STATE_MELEE_ATTACKING or UNIT_STATE_CHASE (without UNIT_STATE_FOLLOW in this case) so pets can reach far away
-        // targets without stopping half way there and running off.
-        // These flags are reset after target dies or another command is given.
-        if (m_HostileRefMgr.IsEmpty())
-        {
-            // m_CombatTimer set at aura start and it will be freeze until aura removing
-            if (m_CombatTimer <= p_time)
-                ClearInCombat();
-            else
-                m_CombatTimer -= p_time;
-        }
-    }
-
     _lastDamagedTargetGuid = ObjectGuid::Empty;
     if (_lastExtraAttackSpell)
     {
@@ -459,6 +434,8 @@ void Unit::Update(uint32 p_time)
         }
         _lastExtraAttackSpell = 0;
     }
+
+    m_combatMgr.Update(p_time);
 
     // not implemented before 3.0.2
     // xinef: if attack time > 0, reduce by diff
@@ -1029,7 +1006,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
                 victim->ToCreature()->SetLastDamagedTime(GameTime::GetGameTime().count() + MAX_AGGRO_RESET_TIME);
 
             if (attacker)
-                victim->AddThreat(attacker, float(damage), damageSchoolMask, spellProto);
+                victim->GetThreatMgr().AddThreat(attacker, float(damage), spellProto);
         }
         else                                                // victim is a player
         {
@@ -2346,7 +2323,7 @@ void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType, bool extr
     // CombatStart puts the target into stand state, so we need to cache sit state here to know if we should crit later
     const bool sittingVictim = victim->GetTypeId() == TYPEID_PLAYER && (victim->IsSitState() || victim->getStandState() == UNIT_STAND_STATE_SLEEP);
 
-    CombatStart(victim);
+    AtTargetAttacked(victim, true);
     RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_MELEE_ATTACK);
 
     if (attType != BASE_ATTACK && attType != OFF_ATTACK)
@@ -8275,7 +8252,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             triggered_spell_id = 54445;
                             target = this;
                             float addThreat = float(CalculatePct(procSpell->Effects[0].CalcValue(this), triggerAmount));
-                            victim->AddThreat(this, addThreat);
+                            victim->GetThreatMgr().AddThreat(this, addThreat);
                             break;
                         }
                     // Silverback
@@ -8924,7 +8901,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                             return false;
 
                         if (victim && victim->IsAlive())
-                            victim->GetThreatMgr().modifyThreatPercent(this, -10);
+                            victim->GetThreatMgr().ModifyThreatByPercent(this, -10);
 
                         basepoints0 = int32(CountPctFromMaxHealth(triggerAmount));
                         trigger_spell_id = 31616;
@@ -9953,11 +9930,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     //    ToCreature()->SetCombatStartPosition(GetPositionX(), GetPositionY(), GetPositionZ());
     if (creature && !(IsControllableGuardian() && IsControlledByPlayer()))
     {
-        // should not let player enter combat by right clicking target - doesn't helps
-        SetInCombatWith(victim);
-        if (victim->GetTypeId() == TYPEID_PLAYER)
-            victim->SetInCombatWith(this);
-        AddThreat(victim, 0.0f);
+        EngageWithTarget(victim); // ensure that anything we're attacking has threat
 
         creature->SendAIReaction(AI_REACTION_HOSTILE);
         creature->CallAssistance();
@@ -10009,7 +9982,25 @@ bool Unit::AttackStop()
     return true;
 }
 
-void Unit::CombatStop(bool includingCast)
+void Unit::ValidateAttackersAndOwnTarget()
+{
+    // iterate attackers
+    UnitVector toRemove;
+    AttackerSet const& attackers = getAttackers();
+    for (Unit* attacker : attackers)
+        if (!attacker->IsValidAttackTarget(this))
+            toRemove.push_back(attacker);
+
+    for (Unit* attacker : toRemove)
+        attacker->AttackStop();
+
+    // remove our own victim
+    if (Unit* victim = GetVictim())
+        if (!IsValidAttackTarget(victim))
+            AttackStop();
+}
+
+void Unit::CombatStop(bool includingCast, bool mutualPvP)
 {
     if (includingCast && IsNonMeleeSpellCast(false))
         InterruptNonMeleeSpells(false);
@@ -10018,19 +10009,22 @@ void Unit::CombatStop(bool includingCast)
     RemoveAllAttackers();
     if (GetTypeId() == TYPEID_PLAYER)
         ToPlayer()->SendAttackSwingCancelAttack();     // melee and ranged forced attack cancel
-    ClearInCombat();
 
-    // xinef: just in case
-    if (IsPetInCombat() && GetTypeId() != TYPEID_PLAYER)
-        ClearInPetCombat();
+    if (mutualPvP)
+        ClearInCombat();
+    else
+    { // vanish and brethren are weird
+        m_combatMgr.EndAllPvECombat();
+        m_combatMgr.SuppressPvPCombat();
+    }
 }
 
 void Unit::CombatStopWithPets(bool includingCast)
 {
     CombatStop(includingCast);
 
-    for (ControlSet::const_iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
-        (*itr)->CombatStop(includingCast);
+    for (Unit* minion : m_Controlled)
+        minion->CombatStop(includingCast);
 }
 
 bool Unit::isAttackingPlayer() const
@@ -10417,6 +10411,7 @@ void Unit::SetMinion(Minion* minion, bool apply)
             }
         }
     }
+    UpdatePetCombatState();
 }
 
 void Unit::GetAllMinionsByEntry(std::list<Creature*>& Minions, uint32 entry)
@@ -10517,6 +10512,7 @@ void Unit::SetCharm(Unit* charm, bool apply)
 
         m_Controlled.erase(charm);
     }
+    UpdatePetCombatState();
 }
 
 int32 Unit::DealHeal(Unit* healer, Unit* victim, uint32 addhealth)
@@ -10680,6 +10676,9 @@ void Unit::RemoveAllControlled(bool onDeath /*= false*/)
             LOG_ERROR("entities.unit", "Unit {} is trying to release unit {} which is neither charmed nor owned by it", GetEntry(), target->GetEntry());
         }
     }
+
+    if (!IsPet()) // pets don't use the flag for this
+        RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT); // m_controlled is now empty, so we know none of our minions are in combat
 }
 
 Unit* Unit::GetNextRandomRaidMemberOrPet(float radius)
@@ -10842,7 +10841,7 @@ void Unit::EnergizeBySpell(Unit* victim, uint32 spellID, uint32 damage, Powers p
     if (powerType != POWER_HAPPINESS)
     {
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellID);
-        victim->getHostileRefMgr().threatAssist(this, float(damage) * 0.5f, spellInfo);
+        victim->GetThreatMgr().ForwardThreatForAssistingMe(this, float(damage) * 0.5f, spellInfo, true);
     }
 
     SendEnergizeSpellLog(victim, spellID, damage, powerType);
@@ -13001,264 +13000,74 @@ void Unit::Dismount()
     }
 }
 
-void Unit::SetInCombatWith(Unit* enemy, uint32 duration)
+void Unit::EngageWithTarget(Unit* enemy)
 {
-    // Xinef: Dont allow to start combat with triggers
-    if (enemy->GetTypeId() == TYPEID_UNIT && enemy->ToCreature()->IsTrigger())
+    if (!enemy)
         return;
 
-    Unit* eOwner = enemy->GetCharmerOrOwnerOrSelf();
-    if (eOwner->IsPvP() || eOwner->IsFFAPvP())
-    {
-        SetInCombatState(true, enemy, duration);
-        return;
-    }
+    if (CanHaveThreatList())
+        m_threatMgr.AddThreat(enemy, 0.0f, nullptr, true, true);
+    else
+        SetInCombatWith(enemy);
+}
 
-    // check for duel
-    if (eOwner->GetTypeId() == TYPEID_PLAYER && eOwner->ToPlayer()->duel)
+void Unit::SetImmuneToAll(bool apply, bool keepCombat)
+{
+    if (apply)
     {
-        Unit const* myOwner = GetCharmerOrOwnerOrSelf();
-        if (((Player const*)eOwner)->duel->Opponent == myOwner)
-        {
-            SetInCombatState(true, enemy, duration);
-            return;
-        }
+        SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+        ValidateAttackersAndOwnTarget();
+        if (!keepCombat)
+            m_combatMgr.EndAllCombat();
     }
-    SetInCombatState(false, enemy, duration);
+    else
+        RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
 }
 
 void Unit::SetImmuneToPC(bool apply, bool keepCombat)
 {
-    (void)keepCombat;
     if (apply)
+    {
         SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+        ValidateAttackersAndOwnTarget();
+        if (!keepCombat)
+        {
+            std::list<CombatReference*> toEnd;
+            for (auto const& pair : m_combatMgr.GetPvECombatRefs())
+                if (pair.second->GetOther(this)->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
+                    toEnd.push_back(pair.second);
+            for (auto const& pair : m_combatMgr.GetPvPCombatRefs())
+                if (pair.second->GetOther(this)->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
+                    toEnd.push_back(pair.second);
+            for (CombatReference* ref : toEnd)
+                ref->EndCombat();
+        }
+    }
     else
         RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
 }
 
 void Unit::SetImmuneToNPC(bool apply, bool keepCombat)
 {
-    (void)keepCombat;
     if (apply)
+    {
         SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+        ValidateAttackersAndOwnTarget();
+        if (!keepCombat)
+        {
+            std::list<CombatReference*> toEnd;
+            for (auto const& pair : m_combatMgr.GetPvECombatRefs())
+                if (!pair.second->GetOther(this)->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
+                    toEnd.push_back(pair.second);
+            for (auto const& pair : m_combatMgr.GetPvPCombatRefs())
+                if (!pair.second->GetOther(this)->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
+                    toEnd.push_back(pair.second);
+            for (CombatReference* ref : toEnd)
+                ref->EndCombat();
+        }
+    }
     else
         RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
-}
-
-void Unit::CombatStart(Unit* victim, bool initialAggro)
-{
-    // Xinef: Dont allow to start combat with triggers
-    if (victim->GetTypeId() == TYPEID_UNIT && victim->ToCreature()->IsTrigger())
-        return;
-
-    if (initialAggro)
-    {
-        // Make player victim stand up automatically
-        if (victim->getStandState() && victim->IsPlayer())
-        {
-            victim->SetStandState(UNIT_STAND_STATE_STAND);
-        }
-
-        if (!victim->IsInCombat() && victim->GetTypeId() != TYPEID_PLAYER && !victim->ToCreature()->HasReactState(REACT_PASSIVE) && victim->ToCreature()->IsAIEnabled)
-        {
-            if (victim->IsPet())
-                victim->ToCreature()->AI()->AttackedBy(this); // PetAI has special handler before AttackStart()
-            else
-            {
-                victim->ToCreature()->AI()->AttackStart(this);
-                // if the target is an NPC with a pet or minion, pet should react.
-                if (Unit* victimControlledUnit = victim->GetFirstControlled())
-                {
-                    victimControlledUnit->SetInCombatWith(this);
-                    SetInCombatWith(victimControlledUnit);
-                    victimControlledUnit->AddThreat(this, 0.0f);
-                }
-            }
-
-            // if unit has an owner, put owner in combat.
-            if (Unit* victimOwner = victim->GetOwner())
-            {
-                if (!(victimOwner->IsInCombatWith(this)))
-                {
-                    /* warding off to not take over aggro for no reason
-                    Using only AddThreat causes delay in attack */
-                    if (!victimOwner->IsInCombat() && victimOwner->IsAIEnabled)
-                    {
-                        victimOwner->ToCreature()->AI()->AttackStart(this);
-                    }
-                    victimOwner->SetInCombatWith(this);
-                    SetInCombatWith(victimOwner);
-                    victimOwner->AddThreat(this, 0.0f);
-                }
-            }
-        }
-
-        SetInCombatWith(victim);
-        victim->SetInCombatWith(this);
-
-        // Xinef: If pet started combat - put owner in combat
-        if (Unit* owner = GetOwner())
-        {
-            owner->SetInCombatWith(victim);
-            victim->SetInCombatWith(owner);
-        }
-    }
-
-    Unit* who = victim->GetCharmerOrOwnerOrSelf();
-    if (who->GetTypeId() == TYPEID_PLAYER)
-        SetContestedPvP(who->ToPlayer());
-
-    Player* player = GetCharmerOrOwnerPlayerOrPlayerItself();
-    if (player && who->IsPvP() && (who->GetTypeId() != TYPEID_PLAYER || !player->duel || player->duel->Opponent != who))
-    {
-        player->UpdatePvP(true);
-        player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
-    }
-}
-
-void Unit::CombatStartOnCast(Unit* target, bool initialAggro, uint32 duration)
-{
-    // Xinef: Dont allow to start combat with triggers
-    if (target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->IsTrigger())
-        return;
-
-    if (initialAggro)
-    {
-        SetInCombatWith(target, duration);
-
-        // Xinef: If pet started combat - put owner in combat
-        if (Unit* owner = GetOwner())
-            owner->SetInCombatWith(target, duration);
-    }
-
-    Unit* who = target->GetCharmerOrOwnerOrSelf();
-    if (who->GetTypeId() == TYPEID_PLAYER)
-        SetContestedPvP(who->ToPlayer());
-
-    Player* player = GetCharmerOrOwnerPlayerOrPlayerItself();
-    if (player && who->IsPvP() && (who->GetTypeId() != TYPEID_PLAYER || !player->duel || player->duel->Opponent != who))
-    {
-        player->UpdatePvP(true);
-        player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
-    }
-}
-
-void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
-{
-    // only alive units can be in combat
-    if (!IsAlive())
-        return;
-
-    if (PvP)
-        m_CombatTimer = std::max<uint32>(GetCombatTimer(), std::max<uint32>(5500, duration));
-    else if (duration)
-        m_CombatTimer = std::max<uint32>(GetCombatTimer(), duration);
-
-    if (HasUnitState(UNIT_STATE_EVADE) || GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET)
-        return;
-
-    // xinef: if we somehow engage in combat (scripts, dunno) with player, remove this flag so he can fight back
-    if (GetTypeId() == TYPEID_UNIT && enemy && IsImmuneToPC() && enemy->GetCharmerOrOwnerPlayerOrPlayerItself())
-        SetImmuneToPC(true); // unit has engaged in combat, remove immunity so players can fight back
-
-    if (IsInCombat())
-        return;
-
-    SetUnitFlag(UNIT_FLAG_IN_COMBAT);
-
-    if (Creature* creature = ToCreature())
-    {
-        // Set home position at place of engaging combat for escorted creatures
-        if ((IsAIEnabled && creature->AI()->IsEscorted()) ||
-                GetMotionMaster()->GetCurrentMovementGeneratorType() == WAYPOINT_MOTION_TYPE ||
-                GetMotionMaster()->GetCurrentMovementGeneratorType() == ESCORT_MOTION_TYPE)
-            creature->SetHomePosition(GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
-
-        if (enemy)
-        {
-            if (IsAIEnabled)
-                creature->AI()->EnterCombat(enemy);
-
-            if (creature->GetFormation())
-                creature->GetFormation()->MemberEngagingTarget(creature, enemy);
-        }
-
-        creature->RefreshSwimmingFlag();
-
-        if (IsPet())
-        {
-            UpdateSpeed(MOVE_RUN, true);
-            UpdateSpeed(MOVE_SWIM, true);
-            UpdateSpeed(MOVE_FLIGHT, true);
-        }
-
-        if (!(creature->GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_ALLOW_MOUNTED_COMBAT))
-            Dismount();
-        if (!IsStandState()) // pussywizard: already done in CombatStart(target, initialAggro) for the target, but when aggro'ing from MoveInLOS CombatStart is not called!
-            SetStandState(UNIT_STAND_STATE_STAND);
-    }
-
-    for (Unit::ControlSet::iterator itr = m_Controlled.begin(); itr != m_Controlled.end();)
-    {
-        Unit* controlled = *itr;
-        ++itr;
-
-        // Xinef: Dont set combat for passive units, they will evade in next update...
-        if (controlled->GetTypeId() == TYPEID_UNIT && controlled->ToCreature()->HasReactState(REACT_PASSIVE))
-            continue;
-
-        controlled->SetInCombatState(PvP, enemy, duration);
-    }
-
-    if (Player* player = this->ToPlayer())
-    {
-        sScriptMgr->OnPlayerEnterCombat(player, enemy);
-    }
-}
-
-void Unit::ClearInCombat()
-{
-    m_CombatTimer = 0;
-    RemoveUnitFlag(UNIT_FLAG_IN_COMBAT);
-
-    // Player's state will be cleared in Player::UpdateContestedPvP
-    if (Creature* creature = ToCreature())
-    {
-        if (creature->GetCreatureTemplate() && creature->GetCreatureTemplate()->unit_flags & UNIT_FLAG_IMMUNE_TO_PC)
-            SetImmuneToPC(true); // set immunity state to the one from db on evade
-
-        ClearUnitState(UNIT_STATE_ATTACK_PLAYER);
-        if (HasDynamicFlag(UNIT_DYNFLAG_TAPPED))
-            ReplaceAllDynamicFlags(creature->GetCreatureTemplate()->dynamicflags);
-
-        creature->SetAssistanceTimer(0);
-
-        // Xinef: will be recalculated at follow movement generator initialization
-        if (!IsPet() && !IsCharmed())
-            return;
-    }
-    else if (Player* player = ToPlayer())
-    {
-        player->UpdatePotionCooldown();
-        if (player->getClass() == CLASS_DEATH_KNIGHT)
-            for (uint8 i = 0; i < MAX_RUNES; ++i)
-                player->SetGracePeriod(i, 0);
-    }
-
-    if (Player* player = this->ToPlayer())
-    {
-        sScriptMgr->OnPlayerLeaveCombat(player);
-    }
-}
-
-void Unit::ClearInPetCombat()
-{
-    RemoveUnitFlag(UNIT_FLAG_PET_IN_COMBAT);
-    RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_LEAVE_COMBAT);
-    if (Unit* owner = GetOwner())
-    {
-        owner->RemoveUnitFlag(UNIT_FLAG_PET_IN_COMBAT);
-    }
 }
 
 bool Unit::isTargetableForAttack(bool checkFakeDeath, Unit const* byWho) const
@@ -13948,7 +13757,6 @@ void Unit::setDeathState(DeathState s, bool despawn)
     {
         CombatStop();
         GetThreatMgr().ClearAllThreat();
-        getHostileRefMgr().deleteReferences();
         ClearComboPointHolders();                           // any combo points pointed to unit lost at it death
 
         if (IsNonMeleeSpellCast(false))
@@ -13993,211 +13801,54 @@ void Unit::setDeathState(DeathState s, bool despawn)
     m_deathState = s;
 }
 
-/*########################################
-########                          ########
-########       AGGRO SYSTEM       ########
-########                          ########
-########################################*/
-bool Unit::CanHaveThreatList() const
-{
-    // only creatures can have threat list
-    if (GetTypeId() != TYPEID_UNIT)
-        return false;
-
-    // only alive units can have threat list
-    if (!IsAlive() || isDying())
-        return false;
-
-    // totems can not have threat list
-    if (ToCreature()->IsTotem())
-        return false;
-
-    // vehicles can not have threat list
-    if (ToCreature()->IsVehicle() && GetMap()->IsBattlegroundOrArena())
-        return false;
-
-    // summons can not have a threat list, unless they are controlled by a creature
-    if (HasUnitTypeMask(UNIT_MASK_MINION | UNIT_MASK_GUARDIAN | UNIT_MASK_CONTROLABLE_GUARDIAN) && ((Pet*)this)->GetOwnerGUID().IsPlayer())
-        return false;
-
-    return true;
-}
-
 //======================================================================
 
-float Unit::ApplyTotalThreatModifier(float fThreat, SpellSchoolMask schoolMask)
+void Unit::AtExitCombat()
 {
-    if (!HasAuraType(SPELL_AURA_MOD_THREAT) || fThreat < 0)
-        return fThreat;
-
-    SpellSchools school = GetFirstSchoolInMask(schoolMask);
-
-    return fThreat * m_threatModifier[school];
+    RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_LEAVE_COMBAT);
 }
 
-//======================================================================
-
-void Unit::AddThreat(Unit* victim, float fThreat, SpellSchoolMask schoolMask, SpellInfo const* threatSpell)
+void Unit::AtTargetAttacked(Unit* target, bool canInitialAggro)
 {
-    // Only mobs can manage threat lists
-    if (CanHaveThreatList() && !HasUnitState(UNIT_STATE_EVADE))
+    if (!target->IsEngaged() && !canInitialAggro)
+        return;
+    target->EngageWithTarget(this);
+    if (Unit* targetOwner = target->GetCharmerOrOwner())
+        targetOwner->EngageWithTarget(this);
+
+    //Patch 3.0.8: All player spells which cause a creature to become aggressive to you will now also immediately cause the creature to be tapped.
+    if (Creature* creature = target->ToCreature())
+        if (!creature->hasLootRecipient() && GetTypeId() == TYPEID_PLAYER)
+            creature->SetLootRecipient(this);
+
+    Player* myPlayerOwner = GetCharmerOrOwnerPlayerOrPlayerItself();
+    Player* targetPlayerOwner = target->GetCharmerOrOwnerPlayerOrPlayerItself();
+    if (myPlayerOwner && targetPlayerOwner && !(myPlayerOwner->duel && myPlayerOwner->duel->Opponent == targetPlayerOwner))
     {
-        m_ThreatMgr.addThreat(victim, fThreat, schoolMask, threatSpell);
+        myPlayerOwner->UpdatePvP(true);
+        myPlayerOwner->SetContestedPvP(targetPlayerOwner);
+        myPlayerOwner->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
     }
 }
 
-//======================================================================
-
-void Unit::TauntApply(Unit* taunter)
+void Unit::UpdatePetCombatState()
 {
-    ASSERT(GetTypeId() == TYPEID_UNIT);
+    ASSERT(!IsPet()); // player pets do not use UNIT_FLAG_PET_IN_COMBAT for this purpose - but player pets should also never have minions of their own to call this
 
-    if (!taunter || (taunter->GetTypeId() == TYPEID_PLAYER && taunter->ToPlayer()->IsGameMaster()))
-        return;
+    bool state = false;
+    for (Unit* minion : m_Controlled)
+        if (minion->IsInCombat())
+        {
+            state = true;
+            break;
+        }
 
-    if (!CanHaveThreatList())
-        return;
-
-    Creature* creature = ToCreature();
-
-    if (creature->HasReactState(REACT_PASSIVE))
-        return;
-
-    Unit* target = GetVictim();
-    if (target && target == taunter)
-        return;
-
-    SetInFront(taunter);
-    if (creature->IsAIEnabled)
-        creature->AI()->AttackStart(taunter);
-
-    //m_ThreatMgr.tauntApply(taunter);
-}
-
-//======================================================================
-
-void Unit::TauntFadeOut(Unit* taunter)
-{
-    ASSERT(GetTypeId() == TYPEID_UNIT);
-
-    if (!taunter || (taunter->GetTypeId() == TYPEID_PLAYER && taunter->ToPlayer()->IsGameMaster()))
-        return;
-
-    if (!CanHaveThreatList())
-        return;
-
-    Creature* creature = ToCreature();
-
-    if (creature->HasReactState(REACT_PASSIVE))
-        return;
-
-    Unit* target = GetVictim();
-    if (!target || target != taunter)
-        return;
-
-    if (m_ThreatMgr.isThreatListEmpty())
-    {
-        if (creature->IsAIEnabled)
-            creature->AI()->EnterEvadeMode(CreatureAI::EVADE_REASON_NO_HOSTILES);
-        return;
-    }
-
-    target = creature->SelectVictim();  // might have more taunt auras remaining
-
-    if (target && target != taunter)
-    {
-        SetInFront(target);
-        if (creature->IsAIEnabled)
-            creature->AI()->AttackStart(target);
-    }
-}
-
-//======================================================================
-
-Unit* Creature::SelectVictim()
-{
-    // function provides main threat functionality
-    // next-victim-selection algorithm and evade mode are called
-    // threat list sorting etc.
-
-    Unit* target = nullptr;
-
-    // First checking if we have some taunt on us
-    AuraEffectList const& tauntAuras = GetAuraEffectsByType(SPELL_AURA_MOD_TAUNT);
-    if (!tauntAuras.empty())
-        for (Unit::AuraEffectList::const_reverse_iterator itr = tauntAuras.rbegin(); itr != tauntAuras.rend(); ++itr)
-            if (Unit* caster = (*itr)->GetCaster())
-                if (CanCreatureAttack(caster) && !caster->HasAuraTypeWithCaster(SPELL_AURA_IGNORED, GetGUID()))
-                {
-                    target = caster;
-                    break;
-                }
-
-    if (CanHaveThreatList())
-    {
-        if (!target && !m_ThreatMgr.isThreatListEmpty())
-            target = m_ThreatMgr.getHostileTarget();
-    }
-    else if (!HasReactState(REACT_PASSIVE))
-    {
-        // we have player pet probably
-        target = getAttackerForHelper();
-        if (!target && IsSummon())
-            if (Unit* owner = ToTempSummon()->GetOwner())
-            {
-                if (owner->IsInCombat())
-                    target = owner->getAttackerForHelper();
-                if (!target)
-                    for (ControlSet::const_iterator itr = owner->m_Controlled.begin(); itr != owner->m_Controlled.end(); ++itr)
-                        if ((*itr)->IsInCombat())
-                        {
-                            target = (*itr)->getAttackerForHelper();
-                            if (target)
-                                break;
-                        }
-            }
-    }
+    if (state)
+        SetUnitFlag(UNIT_FLAG_PET_IN_COMBAT);
     else
-        return nullptr;
-
-    if (target && CanCreatureAttack(target))
-    {
-        SetInFront(target);
-        return target;
-    }
-
-    // last case when creature must not go to evade mode:
-    // it in combat but attacker not make any damage and not enter to aggro radius to have record in threat list
-    // Note: creature does not have targeted movement generator but has attacker in this case
-    for (AttackerSet::const_iterator itr = m_attackers.begin(); itr != m_attackers.end(); ++itr)
-        if ((*itr) && CanCreatureAttack(*itr) && (*itr)->GetTypeId() != TYPEID_PLAYER && !(*itr)->ToCreature()->HasUnitTypeMask(UNIT_MASK_CONTROLABLE_GUARDIAN))
-            return nullptr;
-
-    if (GetVehicle())
-        return nullptr;
-
-    // pussywizard: not sure why it's here
-    // pussywizard: can't evade when having invisibility aura with duration? o_O
-    Unit::AuraEffectList const& iAuras = GetAuraEffectsByType(SPELL_AURA_MOD_INVISIBILITY);
-    if (!iAuras.empty())
-    {
-        for (Unit::AuraEffectList::const_iterator itr = iAuras.begin(); itr != iAuras.end(); ++itr)
-            if ((*itr)->GetBase()->IsPermanent())
-            {
-                AI()->EnterEvadeMode(CreatureAI::EVADE_REASON_NO_HOSTILES);
-                break;
-            }
-        return nullptr;
-    }
-
-    // enter in evade mode in other case
-    AI()->EnterEvadeMode();
-
-    return nullptr;
+        RemoveUnitFlag(UNIT_FLAG_PET_IN_COMBAT);
 }
 
-//======================================================================
-//======================================================================
 //======================================================================
 
 float Unit::ApplyEffectModifiers(SpellInfo const* spellProto, uint8 effect_index, float value) const
@@ -15118,8 +14769,6 @@ void Unit::CleanupBeforeRemoveFromMap(bool finalCleanup)
     CombatStop();
     ClearComboPoints();
     ClearComboPointHolders();
-    GetThreatMgr().ClearAllThreat();
-    getHostileRefMgr().deleteReferences();
     GetMotionMaster()->Clear(false);                    // remove different non-standard movement generators.
 }
 
@@ -16194,8 +15843,7 @@ Player* Unit::GetSpellModOwner() const
         return player;
 
     if (Unit* owner = GetOwner())
-        if (Player* player = owner->ToPlayer())
-            return player;
+        return owner->ToPlayer();
 
     return nullptr;
 }
@@ -17405,7 +17053,6 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
 
                 // Stop attacks
                 victim->CombatStop();
-                victim->getHostileRefMgr().deleteReferences();
 
                 // restore for use at real death
                 victim->SetUInt32Value(PLAYER_SELF_RES_SPELL, ressSpellId);
@@ -17434,7 +17081,6 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
     }
 
     // 10% durability loss on death
-    // clean InHateListOf
     if (Player* plrVictim = victim->ToPlayer())
     {
         // remember victim PvP death for corpse type and corpse reclaim delay
@@ -17919,7 +17565,6 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
 
     // Xinef: dont reset threat and combat, put them on offline list, moved down after faction changes
     //  CombatStop(); // TODO: CombatStop(true) may cause crash (interrupt spells)
-    //  DeleteThreatList();
 
     Player* playerCharmer = charmer->ToPlayer();
 
@@ -18127,6 +17772,7 @@ void Unit::RemoveCharmedBy(Unit* charmer)
     ASSERT(type != CHARM_TYPE_VEHICLE || (GetTypeId() == TYPEID_UNIT && IsVehicle()));
 
     charmer->SetCharm(this, false);
+    m_combatMgr.RevalidateCombat();
 
     StopAttackingInvalidTarget();
 
@@ -18178,7 +17824,7 @@ void Unit::RemoveCharmedBy(Unit* charmer)
     {
         if (Unit* target = ObjectAccessor::GetUnit(*this, itr->first))
             if (!IsFriendlyTo(target))
-                AddThreat(target, itr->second);
+                GetThreatMgr().AddThreat(target, itr->second);
     }
 
     _charmThreatInfo.clear();
@@ -18199,6 +17845,8 @@ void Unit::RemoveCharmedBy(Unit* charmer)
     }
     else
         ToPlayer()->SetClientControl(this, true); // verified
+
+    EngageWithTarget(charmer);
 
     // a guardian should always have charminfo
     if (playerCharmer && this != charmer->GetFirstControlled())
@@ -18566,46 +18214,7 @@ void Unit::SetPhaseMask(uint32 newPhaseMask, bool update)
         return;
 
     if (IsInWorld())
-    {
-        // xinef: to comment, bellow line should be removed
-        // pussywizard: goign to other phase (valithria, algalon) should not remove such auras
-        //RemoveNotOwnSingleTargetAuras(newPhaseMask, true);            // we can lost access to caster or target
-
-        if (!sScriptMgr->CanSetPhaseMask(this, newPhaseMask, update))
-            return;
-
-        // modify hostile references for new phasemask, some special cases deal with hostile references themselves
-        if (GetTypeId() == TYPEID_UNIT || (!ToPlayer()->IsGameMaster() && !ToPlayer()->GetSession()->PlayerLogout()))
-        {
-            HostileRefMgr& refMgr = getHostileRefMgr();
-            HostileReference* ref = refMgr.getFirst();
-
-            while (ref)
-            {
-                if (Unit* unit = ref->GetSource()->GetOwner())
-                    if (Creature* creature = unit->ToCreature())
-                        refMgr.setOnlineOfflineState(creature, creature->InSamePhase(newPhaseMask));
-
-                ref = ref->next();
-            }
-
-            // modify threat lists for new phasemask
-            if (GetTypeId() != TYPEID_PLAYER)
-            {
-                ThreatContainer::StorageType threatList = GetThreatMgr().getThreatList();
-                ThreatContainer::StorageType offlineThreatList = GetThreatMgr().getOfflineThreatList();
-
-                // merge expects sorted lists
-                threatList.sort();
-                offlineThreatList.sort();
-                threatList.merge(offlineThreatList);
-
-                for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
-                    if (Unit* unit = (*itr)->getTarget())
-                        unit->getHostileRefMgr().setOnlineOfflineState(ToCreature(), unit->InSamePhase(newPhaseMask));
-            }
-        }
-    }
+        m_threatMgr.UpdateOnlineStates(true, true);
 
     WorldObject::SetPhaseMask(newPhaseMask, update);
 
@@ -18632,6 +18241,7 @@ void Unit::UpdateObjectVisibility(bool forced, bool /*fromUpdate*/)
         AddToNotify(NOTIFY_VISIBILITY_CHANGED);
     else
     {
+        m_threatMgr.UpdateOnlineStates(true, true);
         WorldObject::UpdateObjectVisibility(true);
         Acore::AIRelocationNotifier notifier(*this);
         float radius = 60.0f;
@@ -18992,11 +18602,6 @@ uint32 Unit::GetModelForTotem(PlayerTotemType totemType)
             }
     }
     return 0;
-}
-
-Unit* Unit::GetRedirectThreatTarget() const
-{
-    return _redirectThreatInfo.GetTargetGUID() ? ObjectAccessor::GetUnit(*this, _redirectThreatInfo.GetTargetGUID()) : nullptr;
 }
 
 void Unit::JumpTo(float speedXY, float speedZ, bool forward)
@@ -19542,64 +19147,6 @@ void Unit::UpdateHeight(float newZ)
         GetVehicleKit()->RelocatePassengers();
 }
 
-void Unit::SendThreatListUpdate()
-{
-    if (!GetThreatMgr().isThreatListEmpty())
-    {
-        uint32 count = GetThreatMgr().getThreatList().size();
-
-        //LOG_DEBUG("entities.unit", "WORLD: Send SMSG_THREAT_UPDATE Message");
-        WorldPacket data(SMSG_THREAT_UPDATE, 8 + count * 8);
-        data << GetPackGUID();
-        data << uint32(count);
-        ThreatContainer::StorageType const& tlist = GetThreatMgr().getThreatList();
-        for (ThreatContainer::StorageType::const_iterator itr = tlist.begin(); itr != tlist.end(); ++itr)
-        {
-            data << (*itr)->getUnitGuid().WriteAsPacked();
-            data << uint32((*itr)->getThreat() * 100);
-        }
-        SendMessageToSet(&data, false);
-    }
-}
-
-void Unit::SendChangeCurrentVictimOpcode(HostileReference* pHostileReference)
-{
-    if (!GetThreatMgr().isThreatListEmpty())
-    {
-        uint32 count = GetThreatMgr().getThreatList().size();
-
-        LOG_DEBUG("entities.unit", "WORLD: Send SMSG_HIGHEST_THREAT_UPDATE Message");
-        WorldPacket data(SMSG_HIGHEST_THREAT_UPDATE, 8 + 8 + count * 8);
-        data << GetPackGUID();
-        data << pHostileReference->getUnitGuid().WriteAsPacked();
-        data << uint32(count);
-        ThreatContainer::StorageType const& tlist = GetThreatMgr().getThreatList();
-        for (ThreatContainer::StorageType::const_iterator itr = tlist.begin(); itr != tlist.end(); ++itr)
-        {
-            data << (*itr)->getUnitGuid().WriteAsPacked();
-            data << uint32((*itr)->getThreat() * 100);
-        }
-        SendMessageToSet(&data, false);
-    }
-}
-
-void Unit::SendClearThreatListOpcode()
-{
-    LOG_DEBUG("entities.unit", "WORLD: Send SMSG_THREAT_CLEAR Message");
-    WorldPacket data(SMSG_THREAT_CLEAR, 8);
-    data << GetPackGUID();
-    SendMessageToSet(&data, false);
-}
-
-void Unit::SendRemoveFromThreatListOpcode(HostileReference* pHostileReference)
-{
-    LOG_DEBUG("entities.unit", "WORLD: Send SMSG_THREAT_REMOVE Message");
-    WorldPacket data(SMSG_THREAT_REMOVE, 8 + 8);
-    data << GetPackGUID();
-    data << pHostileReference->getUnitGuid().WriteAsPacked();
-    SendMessageToSet(&data, false);
-}
-
 void Unit::RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker)
 {
     float addRage;
@@ -19659,10 +19206,15 @@ void Unit::StopAttackFaction(uint32 faction_id)
             ++itr;
     }
 
-    getHostileRefMgr().deleteReferencesForFaction(faction_id);
+    std::vector<CombatReference*> refsToEnd;
+    for (auto const& pair : m_combatMgr.GetPvECombatRefs())
+        if (pair.second->GetOther(this)->GetFactionTemplateEntry()->faction == faction_id)
+            refsToEnd.push_back(pair.second);
+    for (CombatReference* ref : refsToEnd)
+        ref->EndCombat();
 
-    for (ControlSet::const_iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
-        (*itr)->StopAttackFaction(faction_id);
+    for (Unit* minion : m_Controlled)
+        minion->StopAttackFaction(faction_id);
 }
 
 void Unit::StopAttackingInvalidTarget()
@@ -20497,25 +20049,6 @@ void Unit::setRace(uint8 race)
 {
     if (GetTypeId() == TYPEID_PLAYER)
         m_race = race;
-}
-
-// Check if unit in combat with specific unit
-bool Unit::IsInCombatWith(Unit const* who) const
-{
-    // Check target exists
-    if (!who)
-        return false;
-    // Search in threat list
-    ObjectGuid guid = who->GetGUID();
-    for (ThreatContainer::StorageType::const_iterator i = m_ThreatMgr.getThreatList().begin(); i != m_ThreatMgr.getThreatList().end(); ++i)
-    {
-        HostileReference* ref = (*i);
-        // Return true if the unit matches
-        if (ref && ref->getUnitGuid() == guid)
-            return true;
-    }
-    // Nothing found, false.
-    return false;
 }
 
 /**

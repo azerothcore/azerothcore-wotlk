@@ -718,8 +718,9 @@ class spell_warr_vigilance : public AuraScript
         //! this glyph is a proc
         if (Unit* caster = GetCaster())
         {
+            Unit* target = GetTarget();
             if (AuraEffect const* glyph = caster->GetAuraEffect(SPELL_WARRIOR_GLYPH_OF_VIGILANCE, EFFECT_0))
-                GetTarget()->ModifyRedirectThreat(glyph->GetAmount());
+                target->GetThreatMgr().ModifyThreatByPercent(target, glyph->GetAmount());
         }
     }
 
@@ -734,7 +735,7 @@ class spell_warr_vigilance : public AuraScript
             target->RemoveAurasDueToSpell(SPELL_GEN_DAMAGE_REDUCTION_AURA);
         }
 
-        target->ResetRedirectThreat();
+        target->GetThreatMgr().UnregisterRedirectThreat(SPELL_WARRIOR_VIGILANCE_REDIRECT_THREAT, GetCasterGUID());
     }
 
     bool CheckProc(ProcEventInfo& /*eventInfo*/)

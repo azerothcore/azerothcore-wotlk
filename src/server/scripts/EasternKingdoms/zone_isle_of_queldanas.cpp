@@ -675,7 +675,7 @@ public:
 
                 if (Creature* Myrmidon = me->FindNearestCreature(DM, 70))
                 {
-                    me->AddThreat(Myrmidon, 100000.0f);
+                    me->GetThreatMgr().AddThreat(Myrmidon, 100000.0f);
                     AttackStart(Myrmidon);
                 }
             }

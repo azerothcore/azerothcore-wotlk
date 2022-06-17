@@ -548,7 +548,7 @@ public:
                 case EVENT_SLIME_PUDDLE:
                     {
                         std::list<Unit*> targets;
-                        SelectTargetList(targets, 2, SelectTargetMethod::Random, 0.0f, true);
+                        SelectTargetList(targets, 2, SelectTargetMethod::Random, 0, 0.0f, true);
                         if (!targets.empty())
                             for (std::list<Unit*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
                                 me->CastSpell(*itr, SPELL_SLIME_PUDDLE_TRIGGER, true);
@@ -634,7 +634,7 @@ public:
                     if (Is25ManRaid())
                     {
                         std::list<Unit*> targets;
-                        SelectTargetList(targets, MalleableGooSelector(me), (IsHeroic() ? 3 : 2), SelectTargetMethod::Random);
+                        SelectTargetList(targets, (IsHeroic() ? 3 : 2), SelectTargetMethod::Random, 0, MalleableGooSelector(me));
 
                         if (!targets.empty())
                         {
@@ -1142,7 +1142,7 @@ public:
             GetCaster()->GetThreatMgr().ClearAllThreat();
             GetCaster()->ToCreature()->SetInCombatWithZone();
             GetCaster()->ToCreature()->AI()->AttackStart(GetHitUnit());
-            GetCaster()->AddThreat(GetHitUnit(), 500000000.0f);    // value seen in sniff
+            GetCaster()->GetThreatMgr().AddThreat(GetHitUnit(), 500000000.0f, nullptr, true, true);    // value seen in sniff
             if (Creature* c = GetCaster()->ToCreature())
                 c->AI()->SetGUID(GetHitUnit()->GetGUID(), -1);
         }

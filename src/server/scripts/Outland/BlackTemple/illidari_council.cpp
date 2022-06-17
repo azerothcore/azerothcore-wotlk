@@ -553,7 +553,7 @@ public:
                     me->CastSpell(me, SPELL_VANISH_OUT, false);
                     break;
                 case EVENT_SPELL_ENRAGE:
-                    DoResetThreat();
+                    ResetThreatList();
                     if (Creature* council = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ILLIDARI_COUNCIL)))
                         council->GetAI()->DoAction(ACTION_ENRAGE);
                     break;

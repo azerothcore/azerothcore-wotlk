@@ -676,11 +676,11 @@ struct boss_nefarian : public BossAI
                     break;
                 case EVENT_CLASSCALL:
                     std::set<uint8> classesPresent;
-                    for (auto& ref : me->GetThreatMgr().getThreatList())
+                    for (auto const& pair : me->GetCombatMgr().GetPvECombatRefs())
                     {
-                        if (ref->getTarget() && ref->getTarget()->GetTypeId() == TYPEID_PLAYER)
+                        if (pair.second->GetOther(me)->GetTypeId() == TYPEID_PLAYER)
                         {
-                            classesPresent.insert(ref->getTarget()->getClass());
+                            classesPresent.insert(pair.second->GetOther(me)->getClass());
                         }
                     }
                     uint8 targetClass = Acore::Containers::SelectRandomContainerElement(classesPresent);

@@ -102,17 +102,14 @@ struct boss_faction_championsAI : public ScriptedAI
 
     void RecalculateThreat()
     {
-        ThreatContainer::StorageType const& tList = me->GetThreatMgr().getThreatList();
-        for( ThreatContainer::StorageType::const_iterator itr = tList.begin(); itr != tList.end(); ++itr )
+        for (auto const& pair : me->GetCombatMgr().GetPvECombatRefs())
         {
-            Unit* pUnit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
-            if( pUnit && pUnit->GetTypeId() == TYPEID_PLAYER && me->GetThreatMgr().getThreat(pUnit) )
+            Unit* pUnit = pair.second->GetOther(me);
+            if( pUnit && pUnit->GetTypeId() == TYPEID_PLAYER && me->GetThreatMgr().GetThreat(pUnit) )
             {
                 float threatMod = GetThreatMod(me->GetDistance2d(pUnit), (float)pUnit->GetArmor(), pUnit->GetHealth(), pUnit->GetMaxHealth(), pUnit);
-                me->GetThreatMgr().modifyThreatPercent(pUnit, -100);
-                //me->getThreatMgr().doAddThreat(pUnit, 10000000.0f * threatMod);
-                if (HostileReference* ref = me->GetThreatMgr().getOnlineContainer().getReferenceByTarget(pUnit))
-                    ref->addThreat(10000000.0f * threatMod);
+                me->GetThreatMgr().ModifyThreatByPercent(pUnit, -100);
+                me->GetThreatMgr().AddThreat(pUnit, 10000000.0f * threatMod);
             }
         }
     }
@@ -177,12 +174,10 @@ struct boss_faction_championsAI : public ScriptedAI
 
     uint32 EnemiesInRange(float distance)
     {
-        ThreatContainer::StorageType const& tList = me->GetThreatMgr().getThreatList();
         uint32 count = 0;
-        Unit* target;
-        for( ThreatContainer::StorageType::const_iterator iter = tList.begin(); iter != tList.end(); ++iter )
+        for (auto const& pair : me->GetCombatMgr().GetPvECombatRefs())
         {
-            target = ObjectAccessor::GetUnit((*me), (*iter)->getUnitGuid());
+            Unit* target = pair.second->GetOther(me);
             if( target && me->GetDistance2d(target) < distance )
                 ++count;
         }
@@ -191,11 +186,9 @@ struct boss_faction_championsAI : public ScriptedAI
 
     Unit* SelectEnemyCaster(bool casting, float range)
     {
-        ThreatContainer::StorageType const& tList = me->GetThreatMgr().getThreatList();
-        Unit* target;
-        for( ThreatContainer::StorageType::const_iterator iter = tList.begin(); iter != tList.end(); ++iter )
+        for (auto const& pair : me->GetCombatMgr().GetPvECombatRefs())
         {
-            target = ObjectAccessor::GetUnit((*me), (*iter)->getUnitGuid());
+            Unit* target = pair.second->GetOther(me);
             if( target && target->getPowerType() == POWER_MANA && (!casting || target->HasUnitState(UNIT_STATE_CASTING)) && me->GetExactDist(target) <= range )
                 return target;
         }

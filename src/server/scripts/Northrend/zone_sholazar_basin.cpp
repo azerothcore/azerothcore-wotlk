@@ -201,7 +201,7 @@ public:
                             minion->AI()->Talk(SAY_TURNED_FRIENDLY);
                             minion->RemoveAurasDueToSpell(SPELL_ARTRUIS_BINDING);
                             minion->SetFaction(me->GetVictim()->GetFaction());
-                            minion->AddThreat(me, 100000.0f);
+                            minion->GetThreatMgr().AddThreat(me, 100000.0f);
                             minion->AI()->AttackStart(me);
                             minion->DespawnOrUnsummon(900000);
                             events.RescheduleEvent(EVENT_ARTRUIS_TALK3, 5000);

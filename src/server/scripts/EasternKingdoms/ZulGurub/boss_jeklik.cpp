@@ -148,7 +148,7 @@ struct boss_jeklik : public BossAI
             me->RemoveAurasDueToSpell(SPELL_BAT_FORM);
             me->SetHover(false);
             me->SetDisableGravity(false);
-            DoResetThreat();
+            ResetThreatList();
             events.SetPhase(PHASE_TWO);
             events.CancelEventGroup(PHASE_ONE);
 

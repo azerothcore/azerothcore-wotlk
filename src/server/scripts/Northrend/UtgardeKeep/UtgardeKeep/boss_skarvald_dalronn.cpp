@@ -101,7 +101,7 @@ public:
             {
                 if (Unit* target = me->SelectNearestTarget(50.0f))
                 {
-                    me->AddThreat(target, 0.0f);
+                    me->GetThreatMgr().AddThreat(target, 0.0f);
                     AttackStart(target);
                 }
             }
@@ -137,7 +137,7 @@ public:
                 {
                     if (!dalronn->IsInCombat() && who)
                     {
-                        dalronn->AddThreat(who, 0.0f);
+                        dalronn->GetThreatMgr().AddThreat(who, 0.0f);
                         dalronn->AI()->AttackStart(who);
                     }
                 }
@@ -198,8 +198,8 @@ public:
                 case EVENT_SHARVALD_CHARGE:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, (IsHeroic() ? 100.0f : 30.0f), true))
                     {
-                        ScriptedAI::DoResetThreat();
-                        me->AddThreat(target, 10000.0f);
+                        ScriptedAI::ResetThreatList();
+                        me->GetThreatMgr().AddThreat(target, 10000.0f);
                         me->CastSpell(target, SPELL_CHARGE, false);
                     }
                     events.RepeatEvent(urand(5000, 10000));
@@ -266,7 +266,7 @@ public:
             {
                 if (Unit* target = me->SelectNearestTarget(50.0f))
                 {
-                    me->AddThreat(target, 0.0f);
+                    me->GetThreatMgr().AddThreat(target, 0.0f);
                     AttackStart(target);
                 }
             }
@@ -305,7 +305,7 @@ public:
                 {
                     if (!skarvald->IsInCombat() && who)
                     {
-                        skarvald->AddThreat(who, 0.0f);
+                        skarvald->GetThreatMgr().AddThreat(who, 0.0f);
                         skarvald->AI()->AttackStart(who);
                     }
                 }

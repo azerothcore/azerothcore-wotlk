@@ -251,19 +251,18 @@ public:
             if (!info)
                 return;
 
-            ThreatContainer::StorageType const& t_list = me->GetThreatMgr().getThreatList();
+            Unit* tank = me->GetThreatMgr().GetCurrentVictim();
             std::vector<Unit*> targets;
 
-            if (t_list.empty())
-                return;
+            for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
+            {
+                Unit* target = ref->GetVictim();
+                if (target != tank && target->IsAlive() && target->GetTypeId() == TYPEID_PLAYER)
+                    targets.push_back(target);
+            }
 
-            //begin + 1, so we don't target the one with the highest threat
-            ThreatContainer::StorageType::const_iterator itr = t_list.begin();
-            std::advance(itr, 1);
-            for (; itr != t_list.end(); ++itr) //store the threat list in a different container
-                if (Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
-                    if (target->IsAlive() && target->GetTypeId() == TYPEID_PLAYER)
-                        targets.push_back(target);
+            if (targets.empty())
+                return;
 
             //cut down to size if we have more than 5 targets
             while (targets.size() > 5)
@@ -496,10 +495,10 @@ public:
             {
                 if (me->GetVictim())
                 {
-                    DoModifyThreatPercent(me->GetVictim(), -100);
+                    ModifyThreatByPercent(me->GetVictim(), -100);
                 }
 
-                me->AddThreat(target, 1000000.0f);
+                me->GetThreatMgr().AddThreat(target, 1000000.0f);
             }
         }
 

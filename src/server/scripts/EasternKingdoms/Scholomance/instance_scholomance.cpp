@@ -269,14 +269,14 @@ public:
         {
             Unit* target = GetTarget();
             if (Unit* caster = GetCaster())
-                caster->TauntApply(target);
+                caster->GetThreatMgr().TauntUpdate();
         }
 
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             Unit* target = GetTarget();
             if (Unit* caster = GetCaster())
-                caster->TauntFadeOut(target);
+                target->GetThreatMgr().TauntUpdate();
         }
 
         void Register() override
@@ -308,7 +308,7 @@ public:
                     if (Creature* creature = target->ToCreature())
                     {
                         creature->AI()->AttackStart(caster);
-                        creature->AddThreat(caster, 10000.0f);
+                        creature->GetThreatMgr().AddThreat(caster, 10000.0f);
                     }
         }
 
@@ -371,18 +371,15 @@ public:
 
         Unit* SelectUnitCasting()
         {
-          ThreatContainer::StorageType threatlist = me->GetThreatMgr().getThreatList();
-          for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
-          {
-              if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
-              {
-                  if (unit->HasUnitState(UNIT_STATE_CASTING))
-                  {
-                      return unit;
-                  }
-              }
-          }
-          return nullptr;
+            for (auto const& pair : me->GetCombatMgr().GetPvECombatRefs())
+            {
+                Unit* unit = pair.second->GetOther(me);
+                if (unit->HasUnitState(UNIT_STATE_CASTING))
+                {
+                    return unit;
+                }
+            }
+            return nullptr;
         }
 
         void JustReachedHome() override

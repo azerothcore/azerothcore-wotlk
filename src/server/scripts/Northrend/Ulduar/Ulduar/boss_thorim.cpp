@@ -552,9 +552,9 @@ public:
                     summons.DoAction(ACTION_SIF_JOIN_FIGHT, pred);
                 }
 
-                DoResetThreat();
+                ResetThreatList();
                 if (Player* player = GetArenaPlayer())
-                    me->AddThreat(player, 1000.0f);
+                    me->GetThreatMgr().AddThreat(player, 1000.0f);
             }
 
             if (damage >= me->GetHealth())
@@ -1633,7 +1633,7 @@ public:
             if (target)
             {
                 AttackStart(target);
-                me->AddThreat(target, 500.0f);
+                me->GetThreatMgr().AddThreat(target, 500.0f);
                 if (me->GetEntry() == NPC_DARK_RUNE_EVOKER && urand(0, 1))
                     me->CastSpell(me, SPELL_RUNIC_SHIELD, false);
                 else if (me->GetEntry() == NPC_DARK_RUNE_CHAMPION && !urand(0, 2))

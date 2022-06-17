@@ -335,7 +335,7 @@ public:
                             if (Player* p = itr->GetSource())
                                 if (p->IsAlive() && p != me->GetVictim() && p->GetGUID() != _offtankGUID && !p->IsGameMaster() && p->GetDistance(me) < 70.0f)
                                 {
-                                    float th = me->GetThreatMgr().getThreatWithoutTemp(p);
+                                    float th = me->GetThreatMgr().GetThreat(p);
                                     if (!target || th > maxThreat)
                                     {
                                         target = p;

@@ -265,7 +265,7 @@ public:
                         // shapeshift at 50% health
                         DoCast(me, SPELL_VENOXIS_TRANSFORM);
                         Talk(SAY_VENOXIS_TRANSFORM);
-                        DoResetThreat();
+                        ResetThreatList();
 
                         // phase two events (snakeform)
                         events.ScheduleEvent(EVENT_VENOM_SPIT, 5000, 0, PHASE_TWO);

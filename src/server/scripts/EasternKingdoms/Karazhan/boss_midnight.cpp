@@ -433,14 +433,14 @@ public:
         {
             Unit* target = GetTarget();
             if (Unit* caster = GetCaster())
-                caster->TauntApply(target);
+                target->GetThreatMgr().TauntUpdate();
         }
 
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             Unit* target = GetTarget();
             if (Unit* caster = GetCaster())
-                caster->TauntFadeOut(target);
+                target->GetThreatMgr().TauntUpdate();
         }
 
         void Register() override

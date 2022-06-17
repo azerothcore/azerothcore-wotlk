@@ -392,17 +392,6 @@ void Player::Update(uint32 p_time)
         // != GetCharmGUID())))
         RemovePet(pet, PET_SAVE_NOT_IN_SLOT, true);
 
-    // pussywizard:
-    if (m_hostileReferenceCheckTimer <= p_time)
-    {
-        m_hostileReferenceCheckTimer = 15000;
-        if (!GetMap()->IsDungeon())
-            getHostileRefMgr().deleteReferencesOutOfRange(
-                GetVisibilityRange());
-    }
-    else
-        m_hostileReferenceCheckTimer -= p_time;
-
     // we should execute delayed teleports only for alive(!) players
     // because we don't want player's ghost teleported from graveyard
     // xinef: so we store it to the end of the world and teleport out of the ass

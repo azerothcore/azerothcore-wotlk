@@ -499,7 +499,7 @@ public:
     bool Execute(uint64 /*time*/, uint32 /*diff*/) override
     {
         _owner->SetReactState(REACT_AGGRESSIVE);
-        if (!_owner->GetThreatMgr().isThreatListEmpty())
+        if (!_owner->GetThreatMgr().IsThreatListEmpty())
             if (Unit* target = _owner->SelectVictim())
                 _owner->AI()->AttackStart(target);
         if (!_owner->GetVictim())
@@ -2378,7 +2378,7 @@ public:
                     {
                         me->SetControlled(false, UNIT_STATE_ROOT);
 
-                        if (!me->GetThreatMgr().isThreatListEmpty())
+                        if (!me->GetThreatMgr().IsThreatListEmpty())
                             if (Unit* target = me->SelectVictim())
                                 AttackStart(target);
                         if (!me->GetVictim())
@@ -3017,7 +3017,7 @@ public:
 
             GetCaster()->ToCreature()->SetInCombatWithZone();
             GetCaster()->ToCreature()->AI()->AttackStart(GetHitUnit());
-            GetCaster()->AddThreat(GetHitUnit(), GetCaster()->GetMaxHealth() * 0.2f);
+            GetCaster()->GetThreatMgr().AddThreat(GetHitUnit(), GetCaster()->GetMaxHealth() * 0.2f);
         }
 
         void Register() override

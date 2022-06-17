@@ -44,7 +44,7 @@ struct npc_pet_hunter_snake_trap : public ScriptedAI
         if (!me->GetVictim())
             if (Unit* tgt = me->SelectNearestTarget(10.0f))
             {
-                me->AddThreat(tgt, 100000.0f);
+                me->GetThreatMgr().AddThreat(tgt, 100000.0f);
                 AttackStart(tgt);
             }
     }
@@ -75,7 +75,7 @@ struct npc_pet_hunter_snake_trap : public ScriptedAI
 
             if (me->IsWithinDistInMap(who, 10.0f))
             {
-                me->AddThreat(who, 100000.0f);
+                me->GetThreatMgr().AddThreat(who, 100000.0f);
                 AttackStart(who);
             }
         }

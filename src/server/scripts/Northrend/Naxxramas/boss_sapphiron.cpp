@@ -152,7 +152,7 @@ public:
                     {
                         me->SetInCombatWith(player);
                         player->SetInCombatWith(me);
-                        me->AddThreat(player, 0.0f);
+                        me->GetThreatMgr().AddThreat(player, 0.0f);
                     }
                 }
             }
@@ -321,17 +321,16 @@ public:
                         }
 
                         std::vector<Unit*> targets;
-                        auto i = me->GetThreatMgr().getThreatList().begin();
-                        for (; i != me->GetThreatMgr().getThreatList().end(); ++i)
+                        for (auto const& pair : me->GetCombatMgr().GetPvECombatRefs())
                         {
-                            if ((*i)->getTarget()->GetTypeId() == TYPEID_PLAYER)
+                            if (pair.second->GetOther(me)->GetTypeId() == TYPEID_PLAYER)
                             {
                                 bool inList = false;
                                 if (!blockList.empty())
                                 {
                                     for (GuidList::const_iterator itr = blockList.begin(); itr != blockList.end(); ++itr)
                                     {
-                                        if ((*i)->getTarget()->GetGUID() == *itr)
+                                        if (pair.second->GetOther(me)->GetGUID() == *itr)
                                         {
                                             inList = true;
                                             break;
@@ -340,7 +339,7 @@ public:
                                 }
                                 if (!inList)
                                 {
-                                    targets.push_back((*i)->getTarget());
+                                    targets.push_back(pair.second->GetOther(me));
                                 }
                             }
                         }

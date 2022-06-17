@@ -162,15 +162,9 @@ public:
         void FlameWreathEffect()
         {
             std::vector<Unit*> targets;
-            ThreatContainer::StorageType const& t_list = me->GetThreatMgr().getThreatList();
-
-            if (t_list.empty())
-                return;
-
-            //store the threat list in a different container
-            for (ThreatContainer::StorageType::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
+            for (auto const& pair : me->GetCombatMgr().GetPvECombatRefs())
             {
-                Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
+                Unit* target = pair.second->GetOther(me);
                 //only on alive players
                 if (target && target->IsAlive() && target->GetTypeId() == TYPEID_PLAYER)
                     targets.push_back(target);
@@ -418,7 +412,7 @@ public:
 
                     DoStartNoMovement(target);
                     ElementalOne->SetInCombatWithZone();
-                    ElementalOne->CombatStart(target);
+                    ElementalOne->EngageWithTarget(target);
                     ElementalOne->SetFaction(me->GetFaction());
                     ElementalOne->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
                     ElementalOne->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
@@ -432,7 +426,7 @@ public:
 
                     DoStartNoMovement(target);
                     ElementalTwo->SetInCombatWithZone();
-                    ElementalTwo->CombatStart(target);
+                    ElementalTwo->EngageWithTarget(target);
                     ElementalTwo->SetFaction(me->GetFaction());
                     ElementalTwo->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
                     ElementalTwo->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
@@ -446,7 +440,7 @@ public:
 
                     DoStartNoMovement(target);
                     ElementalThree->SetInCombatWithZone();
-                    ElementalThree->CombatStart(target);
+                    ElementalThree->EngageWithTarget(target);
                     ElementalThree->SetFaction(me->GetFaction());
                     ElementalThree->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
                     ElementalThree->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
@@ -460,7 +454,7 @@ public:
 
                     DoStartNoMovement(target);
                     ElementalFour->SetInCombatWithZone();
-                    ElementalFour->CombatStart(target);
+                    ElementalFour->EngageWithTarget(target);
                     ElementalFour->SetFaction(me->GetFaction());
                     ElementalFour->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
                     ElementalFour->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);

@@ -53,12 +53,11 @@ void NPCStaveQuestAI::StorePlayerGUID()
         return;
     }
 
-    for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
+    for (auto const& pair : me->GetCombatMgr().GetPvECombatRefs())
     {
-        if ((*itr)->getTarget()->GetTypeId() == TYPEID_PLAYER)
-        {
-            playerGUID = (*itr)->getUnitGuid();
-        }
+        Unit* playerGUID = pair.second->GetOther(me);
+        if (playerGUID->GetTypeId() == TYPEID_PLAYER)
+            playerGUID->GetGUID(); //TODO -> GUID from the list
     }
 }
 
@@ -107,11 +106,11 @@ bool NPCStaveQuestAI::UnitIsUnfair(Unit* unit)
 
 bool NPCStaveQuestAI::IsFairFight()
 {
-    for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
+    for (auto const& pair : me->GetCombatMgr().GetPvECombatRefs())
     {
-        Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
+        Unit* unit = pair.second->GetOther(me);
 
-        if (!(*itr)->getThreat())
+        if (!unit->GetThreatMgr().IsThreatListEmpty())
         {
             // if target threat is 0 its fair, this prevents despawn in the case when
             // there is a bystander since UpdateVictim adds nearby enemies to the threatlist
@@ -129,7 +128,7 @@ bool NPCStaveQuestAI::IsFairFight()
 
 bool NPCStaveQuestAI::ValidThreatlist()
 {
-    if (threatList.size() == 1)
+    if (me->GetThreatMgr().GetThreatListSize() == 1)
     {
         return true;
     }

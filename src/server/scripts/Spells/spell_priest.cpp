@@ -889,12 +889,12 @@ class spell_pri_mind_control : public AuraScript
             if (Unit* target = GetTarget())
             {
                 uint32 duration = static_cast<uint32>(GetDuration());
-                caster->SetInCombatWith(target, duration);
-                target->SetInCombatWith(caster, duration);
+                caster->SetInCombatWith(target);
+                target->SetInCombatWith(caster);
             }
         }
     }
-
+    // TODO Fix SetCombatTImer
     void HandleRemoveEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Unit* caster = GetCaster())

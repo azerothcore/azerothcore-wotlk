@@ -485,13 +485,11 @@ public:
                 Unit* Dragonmaw = me->FindNearestCreature(NPC_DRAGONMAW_SUBJUGATOR, 50);
                 if (Dragonmaw)
                 {
-                    me->AddThreat(Dragonmaw, 100000.0f);
+                    me->GetThreatMgr().AddThreat(Dragonmaw, 100000.0f);
                     AttackStart(Dragonmaw);
                 }
 
-                HostileReference* ref = me->GetThreatMgr().getOnlineContainer().getReferenceByTarget(caster);
-                if (ref)
-                    ref->removeReference();
+                me->GetThreatMgr().ClearThreat(caster);
             }
         }
 
@@ -1141,7 +1139,7 @@ public:
                     if (Player* AggroTarget = ObjectAccessor::GetPlayer(*me, AggroTargetGUID))
                     {
                         me->SetTarget(AggroTarget->GetGUID());
-                        me->AddThreat(AggroTarget, 1);
+                        me->GetThreatMgr().AddThreat(AggroTarget, 1);
                         me->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
                     }
                     break;

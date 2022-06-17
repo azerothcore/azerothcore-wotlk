@@ -119,7 +119,7 @@ public:
 
             if (Unit* victim = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
             {
-                DoResetThreat();
+                ResetThreatList();
                 AttackStart(victim);
                 Talk(EMOTE_TARGET, victim);
             }

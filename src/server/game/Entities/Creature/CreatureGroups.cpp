@@ -208,9 +208,7 @@ void CreatureGroup::MemberEngagingTarget(Creature* member, Unit* target)
     for (auto const& itr : m_members)
     {
         Creature* pMember = itr.first;
-        if (m_leader) // avoid crash if leader was killed and reset.
-            LOG_DEBUG("entities.unit", "GROUP ATTACK: group instance id {} calls member instid {}", m_leader->GetInstanceId(), member->GetInstanceId());
-
+       
         //Skip one check
         if (pMember == member)
             continue;
@@ -218,11 +216,8 @@ void CreatureGroup::MemberEngagingTarget(Creature* member, Unit* target)
         if (!pMember->IsAlive())
             continue;
 
-        if (pMember->GetVictim())
-            continue;
-
         if (pMember->IsValidAttackTarget(target) && pMember->AI())
-            pMember->AI()->AttackStart(target);
+            pMember->EngageWithTarget(target);
     }
 }
 

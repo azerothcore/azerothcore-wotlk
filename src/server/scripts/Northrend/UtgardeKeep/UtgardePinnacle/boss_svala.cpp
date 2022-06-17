@@ -388,7 +388,7 @@ public:
 
             if (pWho)
             {
-                me->AddThreat(pWho, 10000000.0f);
+                me->GetThreatMgr().AddThreat(pWho, 10000000.0f);
                 me->CastSpell(pWho, SPELL_PARALYZE, false);
             }
         }

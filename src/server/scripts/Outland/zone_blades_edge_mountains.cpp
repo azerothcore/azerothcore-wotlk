@@ -208,7 +208,7 @@ public:
             if (Creature* Target = GetClosestCreatureWithEntry(me, NPC_DEATHS_DOOR_FEL_CANNON_TARGET_BUNNY, 200.0f))
             {
                 me->SetFacingToObject(Target);
-                me->TauntFadeOut(Target);
+                Target->GetThreatMgr().TauntUpdate();
                 me->CombatStop(); // force
             }
 

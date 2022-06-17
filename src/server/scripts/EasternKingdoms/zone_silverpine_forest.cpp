@@ -241,7 +241,7 @@ public:
                     target = me;
 
                 summoned->SetFaction(FACTION_STORMWIND);
-                summoned->AddThreat(target, 32.0f);
+                summoned->GetThreatMgr().AddThreat(target, 32.0f);
                 summoned->AI()->AttackStart(target);
             }
         }

@@ -2821,7 +2821,6 @@ public:
         }
 
         playerTarget->CombatStop();
-        playerTarget->getHostileRefMgr().deleteReferences();
         return true;
     }
 

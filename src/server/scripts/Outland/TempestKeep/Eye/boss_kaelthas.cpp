@@ -480,7 +480,7 @@ public:
                     events2.CancelEvent(EVENT_PREFIGHT_PHASE71);
                     Talk(SAY_PHASE4_INTRO2);
                     phase = PHASE_FINAL;
-                    DoResetThreat();
+                    ResetThreatList();
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         AttackStart(target);
@@ -993,19 +993,7 @@ public:
         void HandleScriptEffect(SpellEffIndex effIndex)
         {
             PreventHitEffect(effIndex);
-
-            ThreatContainer::StorageType const& ThreatList = GetCaster()-> GetThreatMgr().getThreatList();
-            std::list<Unit*> targetList;
-            for (ThreatContainer::StorageType::const_iterator itr = ThreatList.begin(); itr != ThreatList.end(); ++itr)
-            {
-                Unit* target = ObjectAccessor::GetUnit(*GetCaster(), (*itr)->getUnitGuid());
-                if (target && target->GetTypeId() == TYPEID_PLAYER)
-                    targetList.push_back(target);
-            }
-
-            Acore::Containers::RandomResize(targetList, 5);
-            for (std::list<Unit*>::const_iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
-                GetCaster()->CastSpell(*itr, SPELL_NETHER_BEAM_DAMAGE, true);
+            //@TODO Need rewrite
         }
 
         void Register() override

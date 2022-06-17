@@ -197,7 +197,7 @@ public:
                     events.RepeatEvent(urand(4000, 5000));
                     break;
                 case EVENT_FROST_TOMB:
-                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true) )
                         if( !target->HasAura(SPELL_FROST_TOMB_AURA) )
                         {
                             Talk(SAY_FROST_TOMB_EMOTE, target);
@@ -217,7 +217,7 @@ public:
                         if( Creature* c = me->SummonCreature(NPC_SKELETON, 156.2f + cos(angle) * dist, 259.1f + std::sin(angle) * dist, 42.9f, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000) )
                             if( Unit* target = c->SelectNearestTarget(250.0f) )
                             {
-                                c->AddThreat(target, 5.0f);
+                                c->GetThreatMgr().AddThreat(target, 5.0f);
                                 DoZoneInCombat(c);
                             }
                     }

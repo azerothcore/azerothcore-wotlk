@@ -335,7 +335,7 @@ public:
             if (!_isEmpowered)
             {
                 if (attacker)
-                    me->AddThreat(attacker, float(damage));
+                    me->GetThreatMgr().AddThreat(attacker, float(damage));
                 damage = 0;
             }
         }
@@ -605,7 +605,7 @@ public:
             if (!_isEmpowered)
             {
                 if (attacker)
-                    me->AddThreat(attacker, float(damage));
+                    me->GetThreatMgr().AddThreat(attacker, float(damage));
                 damage = 0;
             }
         }
@@ -899,7 +899,7 @@ public:
             if (!_isEmpowered)
             {
                 if (attacker)
-                    me->AddThreat(attacker, float(damage));
+                    me->GetThreatMgr().AddThreat(attacker, float(damage));
                 damage = 0;
             }
         }
@@ -1206,7 +1206,7 @@ public:
                 return;
 
             me->GetThreatMgr().ClearAllThreat();
-            me->AddThreat(attacker, 500000000.0f);
+            me->GetThreatMgr().AddThreat(attacker, 500000000.0f);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -1320,7 +1320,7 @@ public:
                 if (me->GetEntry() == NPC_BALL_OF_INFERNO_FLAME)
                     me->CastSpell(me, SPELL_BALL_OF_FLAMES_PERIODIC, true);
                 me->ClearUnitState(UNIT_STATE_CASTING | UNIT_STATE_STUNNED);
-                me->AddThreat(target, 1000.0f);
+                me->GetThreatMgr().AddThreat(target, 1000.0f);
                 me->SetCanFly(true);
                 me->SetDisableGravity(true);
                 me->SetHover(true);

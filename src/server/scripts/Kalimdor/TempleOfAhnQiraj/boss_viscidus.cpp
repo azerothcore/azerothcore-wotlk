@@ -201,7 +201,7 @@ public:
 
             if (_phase == PHASE_GLOB && summons.empty())
             {
-                DoResetThreat();
+                ResetThreatList();
                 me->NearTeleportTo(ViscidusCoord.GetPositionX(),
                                    ViscidusCoord.GetPositionY(),
                                    ViscidusCoord.GetPositionZ(),

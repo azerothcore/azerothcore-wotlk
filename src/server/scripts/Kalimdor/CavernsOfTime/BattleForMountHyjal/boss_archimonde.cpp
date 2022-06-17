@@ -325,16 +325,10 @@ public:
                 return;
 
             // Now lets get archimode threat list
-            ThreatContainer::StorageType const& t_list = me->GetThreatMgr().getThreatList();
-
-            if (t_list.empty())
-                return;
-
-            ThreatContainer::StorageType::const_iterator itr = t_list.begin();
-
-            if (Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
-                if (target->IsAlive() && target->GetTypeId() == TYPEID_PLAYER)
-                    spellEffectTargets.push_back(target);
+            for (auto const& pair : me->GetCombatMgr().GetPvECombatRefs())
+                if (Unit* target = pair.second->GetOther(me))
+                    if (target->IsAlive() && target->GetTypeId() == TYPEID_PLAYER)
+                        spellEffectTargets.push_back(target);
 
             for (auto iter = spellEffectTargets.begin(); iter != spellEffectTargets.end(); ++iter)
                 if (Unit* target = *iter)
@@ -435,16 +429,11 @@ public:
                 if (victim && me->IsWithinMeleeRange(victim))
                     return false;
 
-                ThreatContainer::StorageType const& threatlist = me->GetThreatMgr().getThreatList();
-                if (threatlist.empty())
-                    return false;
-
-                auto itr = threatlist.begin();
-                for (; itr != threatlist.end(); ++itr)
+                for (auto const& pair : me->GetCombatMgr().GetPvECombatRefs())
                 {
-                    Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
-                    if (unit && unit->IsAlive() && me->IsWithinMeleeRange(unit))
-                        fingerOfDeathTargets.push_back(unit);
+                    if (Unit* unit = pair.second->GetOther(me))
+                        if (unit && unit->IsAlive() && me->IsWithinMeleeRange(unit))
+                            fingerOfDeathTargets.push_back(unit);
                 }
 
                 /* Previous check searched for targets in meele range and

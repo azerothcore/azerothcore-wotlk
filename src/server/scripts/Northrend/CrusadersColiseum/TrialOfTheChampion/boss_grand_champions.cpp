@@ -159,7 +159,6 @@ public:
         void Reset() override
         {
             me->SetReactState(REACT_PASSIVE);
-            me->getHostileRefMgr().setOnlineOfflineState(false);
         }
 
         void OnCharmed(bool apply) override
@@ -297,7 +296,7 @@ public:
                             if( Unit* target = ObjectAccessor::GetUnit(*me, LIST.at(rnd)) )
                             {
                                 me->GetThreatMgr().ResetAllThreat();
-                                me->AddThreat(target, 10000.0f);
+                                me->GetThreatMgr().AddThreat(target, 10000.0f);
                                 AttackStart(target);
                                 me->CastSpell(target, SPELL_MINIONS_CHARGE, false);
                             }
@@ -756,7 +755,7 @@ public:
                             if( Unit* target = ObjectAccessor::GetUnit(*me, LIST.at(rnd)) )
                             {
                                 me->GetThreatMgr().ResetAllThreat();
-                                me->AddThreat(target, 10000.0f);
+                                me->GetThreatMgr().AddThreat(target, 10000.0f);
                                 AttackStart(target);
                                 me->CastSpell(target, SPELL_MINIONS_CHARGE, false);
                             }
@@ -927,8 +926,8 @@ public:
                             Player* player = itr->GetSource();
                             if( player && me->IsInRange(player, 8.0f, 25.0f, false) )
                             {
-                                DoResetThreat();
-                                me->AddThreat(player, 5.0f);
+                                ResetThreatList();
+                                me->GetThreatMgr().AddThreat(player, 5.0f);
                                 me->CastSpell(player, SPELL_INTERCEPT, false);
                                 break;
                             }

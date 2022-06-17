@@ -170,7 +170,7 @@ public:
                 if (Unit* charmer = ObjectAccessor::GetUnit(*me, _charmerGUID))
                 {
                     charmer->RemoveAurasDueToSpell(SPELL_MINDCONTROL_VISUAL);
-                    me->TauntApply(charmer);
+                    charmer->GetThreatMgr().TauntUpdate();
                 }
             }
         }
@@ -246,7 +246,7 @@ public:
                         DoCastVictim(SPELL_CONFLAGRATION);
                         if (me->GetVictim() && me->GetVictim()->HasAura(SPELL_CONFLAGRATION))
                             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
-                                me->TauntApply(target);
+                                target->GetThreatMgr().TauntUpdate();
                         events.ScheduleEvent(EVENT_CONFLAGRATION, 30000);
                         break;
                 }

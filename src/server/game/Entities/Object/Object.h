@@ -430,8 +430,9 @@ public:
 
     virtual void SetPhaseMask(uint32 newPhaseMask, bool update);
     [[nodiscard]] uint32 GetPhaseMask() const { return m_phaseMask; }
-    bool InSamePhase(WorldObject const* obj) const { return InSamePhase(obj->GetPhaseMask()); }
     [[nodiscard]] bool InSamePhase(uint32 phasemask) const { return m_useCombinedPhases ? GetPhaseMask() & phasemask : GetPhaseMask() == phasemask; }
+    bool InSamePhase(WorldObject const* obj) const { return obj && InSamePhase(obj->GetPhaseMask()); }
+    static bool InSamePhase(WorldObject const* a, WorldObject const* b) { return a && a->InSamePhase(b); }
 
     [[nodiscard]] uint32 GetZoneId() const;
     [[nodiscard]] uint32 GetAreaId() const;
@@ -551,9 +552,7 @@ public:
     void RemoveFromNotify(uint16 f) { m_notifyflags &= ~f; }
     [[nodiscard]] bool isNeedNotify(uint16 f) const { return m_notifyflags & f;}
     [[nodiscard]] uint16 GetNotifyFlags() const { return m_notifyflags; }
-    [[nodiscard]] bool NotifyExecuted(uint16 f) const { return m_executed_notifies & f;}
-    void SetNotified(uint16 f) { m_executed_notifies |= f;}
-    void ResetAllNotifies() { m_notifyflags = 0; m_executed_notifies = 0; }
+    void ResetAllNotifies() { m_notifyflags = 0; }
 
     [[nodiscard]] bool isActiveObject() const { return m_isActive; }
     void setActive(bool isActiveObject);
@@ -655,7 +654,6 @@ private:
     // false: use phaseMask to represent single phases only (up to 4294967295 phases)
 
     uint16 m_notifyflags;
-    uint16 m_executed_notifies;
 
     virtual bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D, bool useBoundingRadius = true) const;
 

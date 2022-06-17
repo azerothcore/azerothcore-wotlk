@@ -126,7 +126,7 @@ public:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 30.0f, true))
                     {
                         me->GetThreatMgr().ResetAllThreat();
-                        me->AddThreat(target, 500.0f);
+                        me->GetThreatMgr().AddThreat(target, 500.0f);
                         me->CastSpell(target, SPELL_ECK_SPRING, false);
                     }
 

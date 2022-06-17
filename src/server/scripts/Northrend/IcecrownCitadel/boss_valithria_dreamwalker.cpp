@@ -592,12 +592,12 @@ public:
             {
                 checkTimer = 3000;
                 me->SetInCombatWithZone();
-                ThreatContainer::StorageType const& threatList = me->GetThreatMgr().getThreatList();
-                if (!threatList.empty())
-                    for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
-                        if (Unit* target = (*itr)->getTarget())
-                            if (target->IsAlive() && target->GetTypeId() == TYPEID_PLAYER && me->GetExactDist(target) < 200.0f && !target->IsImmunedToDamageOrSchool(SPELL_SCHOOL_MASK_ALL))
-                                return;
+                for (auto const& pair : me->GetCombatMgr().GetPvECombatRefs())
+                {
+                    if (Unit* target = pair.second->GetOther(me))
+                        if (target->IsAlive() && target->GetTypeId() == TYPEID_PLAYER && me->GetExactDist(target) < 200.0f && !target->IsImmunedToDamageOrSchool(SPELL_SCHOOL_MASK_ALL))
+                            return;
+                }
                 EnterEvadeMode();
             }
             else

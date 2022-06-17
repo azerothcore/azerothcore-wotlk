@@ -144,7 +144,6 @@ void WorldSession::HandlePetStopAttack(WorldPackets::Pet::PetStopAttack& packet)
         return;
 
     pet->AttackStop();
-    pet->ClearInPetCombat();
 }
 
 void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spellId, uint16 flag, ObjectGuid guid2)
@@ -190,7 +189,6 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                     {
                         pet->AttackStop();
                         pet->InterruptNonMeleeSpells(false);
-                        pet->ClearInPetCombat();
                         pet->GetMotionMaster()->MoveFollow(_player, PET_FOLLOW_DIST, pet->GetFollowAngle());
                         if (pet->ToPet())
                             pet->ToPet()->ClearCastWhenWillAvailable();
@@ -320,7 +318,6 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                     pet->AttackStop();
                     if (pet->ToPet())
                         pet->ToPet()->ClearCastWhenWillAvailable();
-                    pet->ClearInPetCombat();
                     [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
 
                 case REACT_DEFENSIVE:                       //recovery

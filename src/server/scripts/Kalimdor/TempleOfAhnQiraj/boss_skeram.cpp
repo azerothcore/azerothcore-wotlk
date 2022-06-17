@@ -156,7 +156,7 @@ public:
                         break;
                     case EVENT_BLINK:
                         DoCast(me, BlinkSpells[urand(0, 2)]);
-                        DoResetThreat();
+                        ResetThreatList();
                         me->SetVisible(true);
                         events.ScheduleEvent(EVENT_BLINK, urand(10000, 30000));
                         break;

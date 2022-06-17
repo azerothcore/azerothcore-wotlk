@@ -162,7 +162,7 @@ public:
             creature->GetMotionMaster()->MoveChase(me);
             creature->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
             creature->AI()->AttackStart(me);
-            creature->AddThreat(me, 0.0f);
+            creature->GetThreatMgr().AddThreat(me, 0.0f);
             summons.Summon(creature);
         }
 

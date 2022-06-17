@@ -299,13 +299,12 @@ public:
             if (events.GetPhaseMask() & PHASE_ONE_MASK && damage >= me->GetPower(POWER_MANA))
             {
                 // reset threat
-                ThreatContainer::StorageType const& threatlist = me->GetThreatMgr().getThreatList();
-                for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
+                for (auto const& pair : me->GetCombatMgr().GetPvECombatRefs())
                 {
-                    Unit* unit = ObjectAccessor::GetUnit((*me), (*itr)->getUnitGuid());
+                    Unit* unit = pair.second->GetOther(me);
 
-                    if (unit && DoGetThreat(unit))
-                        DoModifyThreatPercent(unit, -100);
+                    if (unit && GetThreat(unit))
+                        ModifyThreatByPercent(unit, -100);
                 }
 
                 Talk(SAY_PHASE_2);
@@ -445,7 +444,7 @@ public:
                             count = 3;
 
                         std::list<Unit*> targets;
-                        SelectTargetList(targets, NonTankTargetSelector(me, true), count, SelectTargetMethod::Random);
+                        SelectTargetList(targets, count, SelectTargetMethod::Random, 0, NonTankTargetSelector(me, true));
                         if (!targets.empty())
                             for (std::list<Unit*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
                                 me->CastSpell(*itr, SPELL_SUMMON_SHADE, true);
@@ -931,7 +930,7 @@ public:
             if (!targetGUID)
             {
                 me->GetThreatMgr().ResetAllThreat();
-                me->AddThreat(who, 1000000.0f);
+                me->GetThreatMgr().AddThreat(who, 1000000.0f);
                 targetGUID = who->GetGUID();
             }
         }

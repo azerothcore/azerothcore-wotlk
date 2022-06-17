@@ -145,7 +145,7 @@ public:
         me->GetMotionMaster()->MoveIdle();
         me->SetSpeed(MOVE_RUN, 15.f/7.f); // From sniffs
         DoCastSelf(SPELL_FULL_HEAL, true);
-        DoResetThreat();
+        ResetThreatList();
         isEating = false;
 
         _scheduler.Schedule(4s, [this](TaskContext /*context*/)
@@ -389,7 +389,7 @@ struct boss_yauj : public boss_bug_trio
         .Schedule(12s, 24s, [this](TaskContext context)
         {
             DoCastAOE(SPELL_FEAR);
-            DoResetThreat();
+            ResetThreatList();
             context.Repeat(20s);
         })
         .Schedule(12s, [this](TaskContext context)
@@ -421,7 +421,7 @@ class spell_vem_knockback : public SpellScript
         {
             if (Creature* cCaster = GetCaster()->ToCreature())
             {
-                cCaster->GetThreatMgr().modifyThreatPercent(target, -80);
+                cCaster->GetThreatMgr().ModifyThreatByPercent(target, -80);
             }
         }
     }

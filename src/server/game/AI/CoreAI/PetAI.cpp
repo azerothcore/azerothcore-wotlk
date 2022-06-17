@@ -72,7 +72,6 @@ void PetAI::_stopAttack()
         me->GetMotionMaster()->Clear();
         me->GetMotionMaster()->MoveIdle();
         me->CombatStop();
-        me->getHostileRefMgr().deleteReferences();
         return;
     }
 
@@ -252,7 +251,7 @@ void PetAI::UpdateAI(uint32 diff)
                 if (spellInfo->CanBeUsedInCombat())
                 {
                     // Check if we're in combat or commanded to attack (exlude auras with infinity duration)
-                    if (!me->IsInCombat() && spellInfo->GetMaxDuration() != -1 && !me->IsPetInCombat())
+                    if (!me->IsInCombat() && spellInfo->GetMaxDuration() != -1 && !me->GetCharmInfo()->IsCommandAttack())
                     {
                         continue;
                     }
@@ -485,7 +484,7 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
         if (!tauntAuras.empty())
             for (Unit::AuraEffectList::const_reverse_iterator itr = tauntAuras.rbegin(); itr != tauntAuras.rend(); ++itr)
                 if (Unit* caster = (*itr)->GetCaster())
-                    if (me->CanCreatureAttack(caster) && !caster->HasAuraTypeWithCaster(SPELL_AURA_IGNORED, me->GetGUID()))
+                    if (me->CanCreatureAttack(caster) && !caster->HasAuraTypeWithCaster(SPELL_AURA_MOD_DETAUNT, me->GetGUID()))
                         return caster;
     }
 
@@ -564,7 +563,7 @@ void PetAI::HandleReturnMovement()
 
     // xinef: remember that npcs summoned by npcs can also be pets
     me->GetThreatMgr().ClearAllThreat();
-    me->ClearInPetCombat();
+    me->SetUnitFlag(UNIT_FLAG_PET_IN_COMBAT); // on player pets, this flag indicates that we're actively going after a target - we're returning, so remove it
 }
 
 void PetAI::SpellHit(Unit* caster, SpellInfo const* spellInfo)
@@ -585,11 +584,7 @@ void PetAI::DoAttack(Unit* target, bool chase)
 
     if (me->Attack(target, true))
     {
-        // xinef: properly fix fake combat after pet is sent to attack
-        if (Unit* owner = me->GetOwner())
-            owner->SetUnitFlag(UNIT_FLAG_PET_IN_COMBAT);
-
-        me->SetUnitFlag(UNIT_FLAG_PET_IN_COMBAT);
+        me->SetUnitFlag(UNIT_FLAG_PET_IN_COMBAT); // on player pets, this flag indicates we're actively going after a target - that's what we're doing, so set it
 
         // Play sound to let the player know the pet is attacking something it picked on its own
         if (me->HasReactState(REACT_AGGRESSIVE) && !me->GetCharmInfo()->IsCommandAttack())

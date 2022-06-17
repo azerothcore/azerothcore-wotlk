@@ -211,12 +211,12 @@ public:
                     events.RepeatEvent(urand(10000, 15000));
                     break;
                 case EVENT_SPELL_FEL_LIGHTNING:
-                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true) )
                         me->CastSpell(target, SPELL_FEL_LIGHTNING, false);
                     events.RepeatEvent(urand(10000, 15000));
                     break;
                 case EVENT_SPELL_INCINERATE_FLESH:
-                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true) )
                     {
                         Talk(EMOTE_INCINERATE, target);
                         Talk(SAY_INCINERATE);
@@ -230,7 +230,7 @@ public:
                     events.RepeatEvent(urand(25000, 45000));
                     break;
                 case EVENT_SPELL_LEGION_FLAME:
-                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true) )
                     {
                         Talk(EMOTE_LEGION_FLAME, target);
                         me->CastSpell(target, SPELL_LEGION_FLAME, false);
@@ -336,8 +336,8 @@ public:
                 case EVENT_SPELL_FEL_STEAK:
                     if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 44.0f, true) )
                     {
-                        DoResetThreat();
-                        me->AddThreat(target, 50000.0f);
+                        ResetThreatList();
+                        me->GetThreatMgr().AddThreat(target, 50000.0f);
                         me->CastSpell(target, SPELL_FEL_STEAK_MORPH, true);
                         me->CastSpell(target, SPELL_FEL_STEAK, true);
                         events.RepeatEvent(30000);

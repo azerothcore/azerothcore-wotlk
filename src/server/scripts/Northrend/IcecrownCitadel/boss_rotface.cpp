@@ -315,7 +315,7 @@ public:
                     {
                         std::list<Unit*> targets;
                         uint32 minTargets = RAID_MODE<uint32>(3, 8, 3, 8);
-                        SelectTargetList(targets, minTargets, SelectTargetMethod::Random, -5.0f, true);
+                        SelectTargetList(targets, minTargets, SelectTargetMethod::Random, 0, -5.0f, true);
                         float minDist = 0.0f;
                         if (targets.size() >= minTargets)
                             minDist = -5.0f;
@@ -363,7 +363,7 @@ public:
             if (!summoner)
                 return;
 
-            me->AddThreat(summoner, 500000.0f);
+            me->GetThreatMgr().AddThreat(summoner, 500000.0f);
             AttackStart(summoner);
         }
 
@@ -383,12 +383,12 @@ public:
                 me->CastSpell(me, SPELL_WEAK_RADIATING_OOZE, true);
                 events.Reset();
                 events.ScheduleEvent(EVENT_STICKY_OOZE, 5000);
-                DoResetThreat();
+                ResetThreatList();
                 me->SetInCombatWithZone();
                 if (TempSummon* ts = me->ToTempSummon())
                     if (Unit* summoner = ts->GetSummonerUnit())
                     {
-                        me->AddThreat(summoner, 500000.0f);
+                        me->GetThreatMgr().AddThreat(summoner, 500000.0f);
                         AttackStart(summoner);
                     }
             }
@@ -468,7 +468,7 @@ public:
                 me->CastSpell(me, SPELL_GREEN_ABOMINATION_HITTIN__YA_PROC, true);
                 events.Reset();
                 events.ScheduleEvent(EVENT_STICKY_OOZE, 5000);
-                DoResetThreat();
+                ResetThreatList();
                 me->SetInCombatWithZone();
                 if (Player* p = me->SelectNearestPlayer(100.0f))
                     AttackStart(p);

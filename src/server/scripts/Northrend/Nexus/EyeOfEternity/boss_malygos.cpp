@@ -1505,7 +1505,7 @@ public:
                 {
                     uint8 i = 0;
                     std::list<Unit*> drakes;
-                    c->AI()->SelectTargetList(drakes, (c->GetMap()->GetSpawnMode() == 0 ? 1 : 3), SelectTargetMethod::Random, 0.0f, false, 57403 /*only drakes have this aura*/);
+                    c->AI()->SelectTargetList(drakes, (c->GetMap()->GetSpawnMode() == 0 ? 1 : 3), SelectTargetMethod::Random,0,  0.0f, false, true, 57403 /*only drakes have this aura*/);
                     for (std::list<Unit*>::iterator itr = drakes.begin(); itr != drakes.end() && i < 3; ++itr)
                     {
                         DrakeGUID[i++] = (*itr)->GetGUID();

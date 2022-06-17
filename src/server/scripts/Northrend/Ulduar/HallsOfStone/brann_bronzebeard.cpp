@@ -588,7 +588,7 @@ public:
                 if(cr)
                 {
                     cr->AI()->AttackStart(me);
-                    cr->AddThreat(me, 100.0f);
+                    cr->GetThreatMgr().AddThreat(me, 100.0f);
                     cr->SetInCombatWithZone();
                 }
             }

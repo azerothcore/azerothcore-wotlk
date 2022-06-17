@@ -409,26 +409,8 @@ struct boss_taldaram : public BossAI
                 }
                 case EVENT_PRINCE_VANISH:
                 {
-                    //Count alive players
-                    uint8 count = 0;
-                    std::list<HostileReference*> const t_list = me->GetThreatMgr().getThreatList();
-                    if (!t_list.empty())
-                    {
-                        for (HostileReference const* reference : t_list)
-                        {
-                            if (reference)
-                            {
-                                Unit const* pTarget = ObjectAccessor::GetUnit(*me, reference->getUnitGuid());
-                                if (pTarget && pTarget->GetTypeId() == TYPEID_PLAYER && pTarget->IsAlive())
-                                {
-                                    ++count;
-                                }
-                            }
-                        }
-                    }
-
                     // He only vanishes if there are 3 or more alive players
-                    if (count > 2)
+                    if (me->GetThreatMgr().GetThreatListSize() > 2)
                     {
                         Talk(SAY_VANISH);
                         DoCastSelf(SPELL_VANISH, false);

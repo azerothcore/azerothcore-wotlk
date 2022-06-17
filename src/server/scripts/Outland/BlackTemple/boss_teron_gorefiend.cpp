@@ -317,7 +317,7 @@ public:
                 if (Player* player = i->GetSource())
                 {
                     if (GetUnitOwner()->IsValidAttackTarget(player))
-                        GetUnitOwner()->AddThreat(player, 1000000.0f);
+                        GetUnitOwner()->GetThreatMgr().AddThreat(player, 1000000.0f);
                 }
 
             GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_BRIEF_STUN, true);

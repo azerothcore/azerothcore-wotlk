@@ -323,15 +323,15 @@ public:
                 else
                 {
                     me->resetAttackTimer();
-                    ThreatContainer::StorageType const& threatList = me->GetThreatMgr().getThreatList();
-                    for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
-                        if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
+                    for (auto const& pair : me->GetCombatMgr().GetPvECombatRefs())
+                    {
+                        if (Unit* unit = pair.second->GetOther(me))
                             if (me->IsWithinMeleeRange(unit))
                             {
                                 me->AttackerStateUpdate(unit);
                                 return;
                             }
-
+                    }
                     me->CastSpell(me, SPELL_FLAME_BUFFET, false);
                 }
             }

@@ -429,10 +429,10 @@ public:
             {
                 case SPELL_CLAW_N:
                 case SPELL_CLAW_H:
-                    DoResetThreat();
+                    ResetThreatList();
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f))
                     {
-                        me->AddThreat(target, 100.0f);
+                        me->GetThreatMgr().AddThreat(target, 100.0f);
                         AttackStart(target);
                     }
                     break;

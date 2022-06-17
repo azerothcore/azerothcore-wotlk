@@ -913,11 +913,11 @@ public:
                     {
                         Talk(SAY_WOLF_HOOD);
                         DoCast(target, SPELL_LITTLE_RED_RIDING_HOOD, true);
-                        TempThreat = DoGetThreat(target);
+                        TempThreat = GetThreat(target);
                         if (TempThreat)
-                            DoModifyThreatPercent(target, -100);
+                            ModifyThreatByPercent(target, -100);
                         HoodGUID = target->GetGUID();
-                        me->AddThreat(target, 1000000.0f);
+                        me->GetThreatMgr().AddThreat(target, 1000000.0f);
                         ChaseTimer = 20000;
                         IsChasing = true;
                     }
@@ -929,9 +929,9 @@ public:
                     if (Unit* target = ObjectAccessor::GetUnit(*me, HoodGUID))
                     {
                         HoodGUID.Clear();
-                        if (DoGetThreat(target))
-                            DoModifyThreatPercent(target, -100);
-                        me->AddThreat(target, TempThreat);
+                        if (GetThreat(target))
+                            ModifyThreatByPercent(target, -100);
+                        me->GetThreatMgr().AddThreat(target, TempThreat);
                         TempThreat = 0;
                     }
 
@@ -1272,7 +1272,7 @@ public:
                 Creature* Julianne = ObjectAccessor::GetCreature(*me, JulianneGUID);
                 if (Julianne && Julianne->GetVictim())
                 {
-                    me->AddThreat(Julianne->GetVictim(), 1.0f);
+                    me->GetThreatMgr().AddThreat(Julianne->GetVictim(), 1.0f);
                     AttackStart(Julianne->GetVictim());
                 }
             }

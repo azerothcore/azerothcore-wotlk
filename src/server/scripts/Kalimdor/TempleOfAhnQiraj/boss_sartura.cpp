@@ -110,8 +110,8 @@ public:
                     //Attack random Gamers
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
                     {
-                        me->AddThreat(target, 1.0f);
-                        me->TauntApply(target);
+                        me->GetThreatMgr().AddThreat(target, 1.0f);
+                        target->GetThreatMgr().TauntUpdate();
                         AttackStart(target);
                     }
                     WhirlWindRandom_Timer = urand(3000, 7000);
@@ -141,8 +141,8 @@ public:
                     //Attack random Gamers
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
                     {
-                        me->AddThreat(target, 1.0f);
-                        me->TauntApply(target);
+                        me->GetThreatMgr().AddThreat(target, 1.0f);
+                        target->GetThreatMgr().TauntUpdate();
                         AttackStart(target);
                     }
                     AggroReset = true;
@@ -251,8 +251,8 @@ public:
                     //Attack random Gamers
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
                     {
-                        me->AddThreat(target, 1.0f);
-                        me->TauntApply(target);
+                        me->GetThreatMgr().AddThreat(target, 1.0f);
+                        target->GetThreatMgr().TauntUpdate();
                         AttackStart(target);
                     }
 
@@ -274,8 +274,8 @@ public:
                     //Attack random Gamers
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
                     {
-                        me->AddThreat(target, 1.0f);
-                        me->TauntApply(target);
+                        me->GetThreatMgr().AddThreat(target, 1.0f);
+                        target->GetThreatMgr().TauntUpdate();
                         AttackStart(target);
                     }
 

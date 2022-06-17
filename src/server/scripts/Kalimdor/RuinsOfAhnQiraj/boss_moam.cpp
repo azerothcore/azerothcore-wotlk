@@ -142,10 +142,9 @@ public:
                         {
                             std::list<Unit*> targetList;
                             {
-                                const std::list<HostileReference*>& threatlist = me->GetThreatMgr().getThreatList();
-                                for (std::list<HostileReference*>::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
-                                    if ((*itr)->getTarget()->GetTypeId() == TYPEID_PLAYER && (*itr)->getTarget()->getPowerType() == POWER_MANA)
-                                        targetList.push_back((*itr)->getTarget());
+                                for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
+                                    if (ref->GetVictim()->GetTypeId() == TYPEID_PLAYER && ref->GetVictim()->getPowerType() == POWER_MANA)
+                                        targetList.push_back(ref->GetVictim());
                             }
 
                             Acore::Containers::RandomResize(targetList, 5);

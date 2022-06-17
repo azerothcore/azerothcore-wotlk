@@ -163,7 +163,7 @@ public:
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
             {
                 summon->AI()->AttackStart(target);
-                summon->AddThreat(target, 10000000);
+                summon->GetThreatMgr().AddThreat(target, 10000000);
             }
         }
 

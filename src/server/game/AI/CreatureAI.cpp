@@ -117,22 +117,17 @@ void CreatureAI::DoZoneInCombat(Creature* creature /*= nullptr*/, float maxRange
     {
         if (Player* player = itr->GetSource())
         {
-            if (!IsValidCombatTarget(creature, player))
-            {
+            if (!player->IsAlive() || !CombatMgr::CanBeginCombat(creature, player))
                 continue;
-            }
 
-            if (!creature->IsWithinDistInMap(player, maxRangeToNearestTarget))
-            {
-                continue;
-            }
+            creature->EngageWithTarget(player);
 
-            creature->SetInCombatWith(player);
-            player->SetInCombatWith(creature);
+            for (Unit* pet : player->m_Controlled)
+                creature->EngageWithTarget(pet);
 
             if (creature->CanHaveThreatList())
             {
-                creature->AddThreat(player, 0.0f);
+                creature->GetThreatMgr().AddThreat(player, 0.0f);
             }
         }
     }
@@ -164,7 +159,7 @@ void CreatureAI::MoveInLineOfSight(Unit* who)
             return;
 
     if (me->HasReactState(REACT_AGGRESSIVE) && me->CanStartAttack(who))
-        AttackStart(who);
+        me->EngageWithTarget(who);
 }
 
 // Distract creature, if player gets too close while stealthed/prowling
@@ -275,11 +270,13 @@ bool CreatureAI::UpdateVictim()
     // xinef: if we have any victim, just return true
     else if (me->GetVictim() && me->GetExactDist(me->GetVictim()) < 30.0f)
         return true;
-    else if (me->GetThreatMgr().isThreatListEmpty())
+    else if (me->GetThreatMgr().IsThreatListEmpty(true))
     {
         EnterEvadeMode();
         return false;
     }
+    else
+        me->AttackStop();
 
     return true;
 }

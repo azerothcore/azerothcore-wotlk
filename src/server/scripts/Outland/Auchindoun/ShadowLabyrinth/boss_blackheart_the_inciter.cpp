@@ -116,15 +116,13 @@ public:
                     {
                         me->CastSpell(me, SPELL_INCITE_CHAOS, false);
 
-                        std::list<HostileReference*> t_list = me->GetThreatMgr().getThreatList();
-                        for (std::list<HostileReference*>::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
+                        for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
                         {
-                            Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
-                            if (target && target->GetTypeId() == TYPEID_PLAYER)
+                            if (Player* target = ref->GetVictim()->ToPlayer())
                                 me->CastSpell(target, SPELL_INCITE_CHAOS_B, true);
                         }
 
-                        DoResetThreat();
+                        ResetThreatList();
                         InciteChaos = true;
                         events.DelayEvents(15000);
                         events.RepeatEvent(40000);

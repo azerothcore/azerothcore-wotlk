@@ -230,7 +230,7 @@ struct boss_twinemperorsAI : public ScriptedAI
     {
         me->InterruptNonMeleeSpells(false);
         DoStopAttack();
-        DoResetThreat();
+        ResetThreatList();
         DoCast(me, SPELL_TWIN_TELEPORT_VISUAL);
         me->AddUnitState(UNIT_STATE_STUNNED);
         AfterTeleport = true;
@@ -259,7 +259,7 @@ struct boss_twinemperorsAI : public ScriptedAI
                 {
                     //DoYell(nearu->GetName(), LANG_UNIVERSAL);
                     AttackStart(nearu);
-                    me->AddThreat(nearu, 10000);
+                    me->GetThreatMgr().AddThreat(nearu, 10000);
                 }
                 return true;
             }
@@ -415,7 +415,7 @@ public:
         void CastSpellOnBug(Creature* target) override
         {
             target->SetFaction(FACTION_MONSTER);
-            target->AI()->AttackStart(me->GetThreatMgr().getHostileTarget());
+            target->AI()->AttackStart(target);
             target->AddAura(SPELL_MUTATE_BUG, target);
             target->SetFullHealth();
         }
@@ -585,7 +585,7 @@ public:
                 if (me->Attack(who, false))
                 {
                     me->GetMotionMaster()->MoveChase(who, VEKLOR_DIST, 0);
-                    me->AddThreat(who, 0.0f);
+                    me->GetThreatMgr().AddThreat(who, 0.0f);
                 }
             }
         }

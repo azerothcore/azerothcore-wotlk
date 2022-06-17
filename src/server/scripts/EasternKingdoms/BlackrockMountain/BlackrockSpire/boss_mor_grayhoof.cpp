@@ -122,13 +122,13 @@ struct boss_mor_grayhoof : public BossAI
 
                         // Sleep can target tank, we need to drop threat temporarily on the target.
                         _sleepTargetGUID = target->GetGUID();
-                        _sleepTargetThreat = me->GetThreatMgr().getThreat(target);
-                        me->GetThreatMgr().modifyThreatPercent(target, -100);
+                        _sleepTargetThreat = me->GetThreatMgr().GetThreat(target);
+                        me->GetThreatMgr().ModifyThreatByPercent(target, -100);
                         _scheduler.Schedule(10s, [this](TaskContext /*context*/)
                             {
                                 if (Unit* sleepTarget = ObjectAccessor::GetUnit(*me, _sleepTargetGUID))
                                 {
-                                    me->GetThreatMgr().addThreat(sleepTarget, _sleepTargetThreat);
+                                    me->GetThreatMgr().AddThreat(sleepTarget, _sleepTargetThreat);
                                 }
                             });
                     }

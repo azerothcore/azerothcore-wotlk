@@ -208,7 +208,7 @@ public:
                         break;
                     case EVENT_MARK_OF_ARLOKK:
                         {
-                            Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, urand(1, 3), 0.0f, false, -SPELL_MARK_OF_ARLOKK);
+                            Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, urand(1, 3), 0.0f, false, true, -SPELL_MARK_OF_ARLOKK);
                             if (!target)
                                 target = me->GetVictim();
                             if (target)
@@ -231,7 +231,7 @@ public:
                             me->UpdateDamagePhysical(BASE_ATTACK);
                             */
                             me->AttackStop();
-                            DoResetThreat();
+                            ResetThreatList();
                             me->SetReactState(REACT_PASSIVE);
                             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                             DoCast(me, SPELL_VANISH_VISUAL);

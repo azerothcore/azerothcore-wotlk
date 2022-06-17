@@ -959,6 +959,8 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
     else
         SetName(creature->GetNameForLocaleIdx(sObjectMgr->GetDBCLocaleIndex()));
 
+    GetThreatMgr().Initialize();
+
     return true;
 }
 

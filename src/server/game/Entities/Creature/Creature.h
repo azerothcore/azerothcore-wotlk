@@ -85,10 +85,22 @@ public:
     MovementGeneratorType GetDefaultMovementType() const override { return m_defaultMovementType; }
     void SetDefaultMovementType(MovementGeneratorType mgt) { m_defaultMovementType = mgt; }
 
+    Unit* SelectVictim();
+
     void SetReactState(ReactStates st) { m_reactState = st; }
     [[nodiscard]] ReactStates GetReactState() const { return m_reactState; }
     [[nodiscard]] bool HasReactState(ReactStates state) const { return (m_reactState == state); }
     void InitializeReactState();
+
+    using Unit::IsImmuneToAll;
+    using Unit::SetImmuneToAll;
+    void SetImmuneToAll(bool apply) override { Unit::SetImmuneToAll(apply, HasReactState(REACT_PASSIVE)); }
+    using Unit::IsImmuneToPC;
+    using Unit::SetImmuneToPC;
+    void SetImmuneToPC(bool apply) override { Unit::SetImmuneToPC(apply, HasReactState(REACT_PASSIVE)); }
+    using Unit::IsImmuneToNPC;
+    using Unit::SetImmuneToNPC;
+    void SetImmuneToNPC(bool apply) override { Unit::SetImmuneToNPC(apply, HasReactState(REACT_PASSIVE)); }
 
     ///// TODO RENAME THIS!!!!!
     bool isCanInteractWithBattleMaster(Player* player, bool msg) const;
@@ -337,8 +349,6 @@ public:
     [[nodiscard]] CreatureGroup* GetFormation() { return m_formation; }
     void SetFormation(CreatureGroup* formation) { m_formation = formation; }
 
-    Unit* SelectVictim();
-
     void SetDisableReputationGain(bool disable) { DisableReputationGain = disable; }
     [[nodiscard]] bool IsReputationGainDisabled() const { return DisableReputationGain; }
     [[nodiscard]] bool IsDamageEnoughForLootingAndReward() const { return (m_creatureInfo->flags_extra & CREATURE_FLAG_EXTRA_NO_PLAYER_DAMAGE_REQ) || (m_PlayerDamageReq == 0); }
@@ -388,6 +398,9 @@ public:
     void ModifyThreatPercentTemp(Unit* victim, int32 percent, Milliseconds duration);
 
     void ResetFaction() { SetFaction(GetCreatureTemplate()->faction); }
+
+    void AtEnterCombat() override;
+    void AtExitCombat() override;
 
 protected:
     bool CreateFromProto(ObjectGuid::LowType guidlow, uint32 Entry, uint32 vehId, const CreatureData* data = nullptr);

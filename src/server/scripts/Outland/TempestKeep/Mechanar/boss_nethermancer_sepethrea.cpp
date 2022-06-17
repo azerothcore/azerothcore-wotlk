@@ -69,7 +69,7 @@ public:
             if (Unit* victim = me->GetVictim())
             {
                 summon->AI()->AttackStart(victim);
-                summon->AddThreat(victim, 1000.0f);
+                summon->GetThreatMgr().AddThreat(victim, 1000.0f);
                 summon->SetInCombatWithZone();
             }
         }

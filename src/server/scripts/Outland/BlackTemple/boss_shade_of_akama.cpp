@@ -247,9 +247,9 @@ public:
                     if (me->IsWithinMeleeRange(me->GetVictim()))
                     {
                         me->SetReactState(REACT_AGGRESSIVE);
-                        DoResetThreat();
+                        ResetThreatList();
                         me->GetVictim()->InterruptNonMeleeSpells(false);
-                        me->AddThreat(me->GetVictim(), 1000000.0f);
+                        me->GetThreatMgr().AddThreat(me->GetVictim(), 1000000.0f);
                         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         me->SetImmuneToAll(false);
                         summonsGenerator.DoAction(ACTION_STOP_SPAWNING);
@@ -483,7 +483,7 @@ public:
             summon->SetInCombatWithZone();
             if (Unit* akama = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_AKAMA_SHADE)))
             {
-                summon->AddThreat(akama, 500.0f);
+                summon->GetThreatMgr().AddThreat(akama, 500.0f);
                 summon->AI()->AttackStart(akama);
             }
         }

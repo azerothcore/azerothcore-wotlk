@@ -992,21 +992,21 @@ public:
                             cr->UpdateEntry(NPC_INFINITE_ADVERSARY, nullptr, false);
                             cr->SetReactState(REACT_AGGRESSIVE);
                             cr->SetInCombatWithZone();
-                            cr->AddThreat(me, 0.0f);
+                            cr->GetThreatMgr().AddThreat(me, 0.0f);
                         }
                         if (Creature* cr = GetEventNpc(NPC_INFINITE_AGENT)) // it is infinite agent now :)
                         {
                             cr->SetImmuneToAll(false);
                             cr->SetReactState(REACT_AGGRESSIVE);
                             cr->SetInCombatWithZone();
-                            cr->AddThreat(me, 0.0f);
+                            cr->GetThreatMgr().AddThreat(me, 0.0f);
                         }
                         if (Creature* cr = GetEventNpc(NPC_INFINITE_HUNTER)) // it is infinite hunter now :)
                         {
                             cr->SetImmuneToAll(false);
                             cr->SetReactState(REACT_AGGRESSIVE);
                             cr->SetInCombatWithZone();
-                            cr->AddThreat(me, 0.0f);
+                            cr->GetThreatMgr().AddThreat(me, 0.0f);
                         }
                         ScheduleNextEvent(currentEvent, 2000);
                         break;
@@ -1100,7 +1100,7 @@ public:
                             cr->SetImmuneToAll(false);
                             cr->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             cr->SetReactState(REACT_AGGRESSIVE);
-                            cr->AddThreat(me, 0.0f);
+                            cr->GetThreatMgr().AddThreat(me, 0.0f);
                             cr->SetInCombatWithZone();
                         }
                         ScheduleNextEvent(currentEvent, 1000);
@@ -1125,7 +1125,7 @@ public:
                             cr->SetImmuneToAll(false);
                             cr->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             cr->SetInCombatWithZone();
-                            cr->AddThreat(me, 0.0f);
+                            cr->GetThreatMgr().AddThreat(me, 0.0f);
                             AttackStart(cr);
                         }
                         eventInRun = false;
@@ -1352,7 +1352,7 @@ void npc_arthas::npc_arthasAI::SpawnTimeRift()
                     AttackStart(cr);
 
                 cr->SetInCombatWithZone();
-                cr->AddThreat(me, 0.0f);
+                cr->GetThreatMgr().AddThreat(me, 0.0f);
                 cr->SetReactState(REACT_AGGRESSIVE);
                 cr->GetMotionMaster()->MovePoint(POINT_CHRONOS, RiftAndSpawnsLocations[timeRiftId][i][1], RiftAndSpawnsLocations[timeRiftId][i][2], RiftAndSpawnsLocations[timeRiftId][i][3]);
             }

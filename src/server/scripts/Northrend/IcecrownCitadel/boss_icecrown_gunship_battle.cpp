@@ -905,7 +905,7 @@ public:
                             {
                                 me->SetInCombatWith(p);
                                 p->SetInCombatWith(me);
-                                me->AddThreat(p, 0.0f);
+                                me->GetThreatMgr().AddThreat(p, 0.0f);
                             }
                 }
                 else
@@ -949,7 +949,7 @@ public:
                         for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                             if (Player* p = itr->GetSource())
                                 if (!p->IsGameMaster())
-                                    p->SetInCombatState(true);
+                                    p->IsInCombat();
                         _events.ScheduleEvent(EVENT_KEEP_PLAYER_IN_COMBAT, 4000);
                     }
                     break;
@@ -1241,7 +1241,7 @@ public:
                             {
                                 me->SetInCombatWith(p);
                                 p->SetInCombatWith(me);
-                                me->AddThreat(p, 0.0f);
+                                me->GetThreatMgr().AddThreat(p, 0.0f);
                             }
                 }
                 else
@@ -1288,7 +1288,7 @@ public:
                         for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                             if (Player* p = itr->GetSource())
                                 if (!p->IsGameMaster())
-                                    p->SetInCombatState(true);
+                                    p->IsInCombat();
                         _events.ScheduleEvent(EVENT_KEEP_PLAYER_IN_COMBAT, 4000);
                     }
                     break;
@@ -1620,7 +1620,7 @@ struct npc_gunship_boarding_addAI : public ScriptedAI
                         anyValid = true;
                         me->SetInCombatWith(p);
                         p->SetInCombatWith(me);
-                        me->AddThreat(p, 0.0f);
+                        me->GetThreatMgr().AddThreat(p, 0.0f);
                     }
         }
         else
@@ -1781,7 +1781,7 @@ public:
                         if (Player* player = me->SelectNearestPlayer(50.0f))
                         {
                             me->SetInCombatWithZone();
-                            me->AddThreat(player, 1.0f);
+                            me->GetThreatMgr().AddThreat(player, 1.0f);
                         }
                         me->CastSpell((Unit*)nullptr, SPELL_BELOW_ZERO, false);
                         break;
@@ -1862,7 +1862,7 @@ public:
                             anyValid = true;
                             me->SetInCombatWith(p);
                             p->SetInCombatWith(me);
-                            me->AddThreat(p, 0.0f);
+                            me->GetThreatMgr().AddThreat(p, 0.0f);
                         }
             }
             else

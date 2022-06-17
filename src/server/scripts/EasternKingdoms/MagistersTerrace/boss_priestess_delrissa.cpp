@@ -299,16 +299,13 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
 
     void RecalculateThreat()
     {
-        ThreatContainer::StorageType const& tList = me->GetThreatMgr().getThreatList();
-        for( ThreatContainer::StorageType::const_iterator itr = tList.begin(); itr != tList.end(); ++itr )
+        for (auto const& pair : me->GetCombatMgr().GetPvECombatRefs())
         {
-            Unit* pUnit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
-            if( pUnit && pUnit->GetTypeId() == TYPEID_PLAYER && me->GetThreatMgr().getThreat(pUnit) )
+            Unit* pUnit = pair.second->GetOther(me);
+            if( pUnit && pUnit->GetTypeId() == TYPEID_PLAYER && me->GetThreatMgr().GetThreat(pUnit) )
             {
-                float threatMod = GetThreatMod(me->GetDistance2d(pUnit), (float)pUnit->GetArmor(), pUnit->GetHealth(), pUnit->GetMaxHealth(), pUnit);
-                me->GetThreatMgr().modifyThreatPercent(pUnit, -100);
-                if (HostileReference* ref = me->GetThreatMgr().getOnlineContainer().getReferenceByTarget(pUnit))
-                    ref->addThreat(10000000.0f * threatMod);
+                me->GetThreatMgr().ModifyThreatByPercent(pUnit, -100);
+                me->GetThreatMgr().ClearThreat(pUnit);
             }
         }
     }
@@ -462,9 +459,9 @@ public:
             {
                 case EVENT_SPELL_VANISH:
                     me->CastSpell(me, SPELL_VANISH, false);
-                    DoResetThreat();
+                    ResetThreatList();
                     if (Unit* unit = SelectTarget(SelectTargetMethod::Random, 0))
-                        me->AddThreat(unit, 1000.0f);
+                        me->GetThreatMgr().AddThreat(unit, 1000.0f);
 
                     events.ScheduleEvent(EVENT_SPELL_VANISH, 30000);
                     break;
@@ -741,14 +738,14 @@ public:
                 case EVENT_SPELL_BLINK:
                     {
                         bool InMeleeRange = false;
-                        ThreatContainer::StorageType const& t_list = me->GetThreatMgr().getThreatList();
-                        for (ThreatContainer::StorageType::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
-                            if (Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
-                                if (target->IsWithinMeleeRange(me))
-                                {
-                                    InMeleeRange = true;
-                                    break;
-                                }
+                        for (auto const& pair : me->GetCombatMgr().GetPvECombatRefs())
+                        {
+                            if (pair.second->GetOther(me)->IsWithinMeleeRange(me))
+                            {
+                                InMeleeRange = true;
+                                break;
+                            }
+                        }
 
                         if (InMeleeRange)
                             me->CastSpell(me, SPELL_BLINK, false);

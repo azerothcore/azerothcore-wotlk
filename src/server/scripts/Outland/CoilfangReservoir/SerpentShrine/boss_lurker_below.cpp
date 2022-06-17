@@ -187,14 +187,15 @@ public:
                 target = me->GetVictim();
             else
             {
-                ThreatContainer::StorageType const& t_list = me->GetThreatMgr().getThreatList();
-                for (ThreatContainer::StorageType::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
-                    if (Unit* threatTarget = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
+                for (auto const& pair : me->GetCombatMgr().GetPvECombatRefs())
+                {
+                    if (Unit* threatTarget = pair.second->GetOther(me))
                         if (me->IsWithinMeleeRange(threatTarget))
                         {
                             target = threatTarget;
                             break;
                         }
+                }   
             }
 
             if (target)

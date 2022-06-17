@@ -145,8 +145,8 @@ public:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         {
                             DoTeleportPlayer(target, TeleportLoc.m_positionX, TeleportLoc.m_positionY, TeleportLoc.m_positionZ, TeleportLoc.GetOrientation());
-                            if (DoGetThreat(me->GetVictim()))
-                                DoModifyThreatPercent(target, -100);
+                            if (GetThreat(me->GetVictim()))
+                                ModifyThreatByPercent(target, -100);
                             Creature* SacrificedTroll;
                             SacrificedTroll = me->SummonCreature(NPC_SACRIFICED_TROLL, TeleportLoc.m_positionX + 2, TeleportLoc.m_positionY, TeleportLoc.m_positionZ, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
                             if (SacrificedTroll)

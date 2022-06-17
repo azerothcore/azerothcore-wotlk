@@ -1184,7 +1184,7 @@ public:
                     break;
                 case EVENT_DETONATING_LASHER_FLAME_LASH:
                     me->CastSpell(me->GetVictim(), SPELL_FLAME_LASH, false);
-                    DoResetThreat();
+                    ResetThreatList();
                     if (Unit* target = SelectTargetFromPlayerList(80))
                         AttackStart(target);
                     else

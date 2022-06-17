@@ -427,7 +427,7 @@ public:
                 case EVENT_CHAINS:
                     for (uint8 i = 0; i < 3; ++i)
                     {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true, -SPELL_CHAINS_OF_KELTHUZAD))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true, true, -SPELL_CHAINS_OF_KELTHUZAD))
                         {
                             me->CastSpell(target, SPELL_CHAINS_OF_KELTHUZAD, true);
                         }
@@ -437,24 +437,11 @@ public:
                     break;
                 case EVENT_DETONATE_MANA:
                     {
-                        std::vector<Unit*> unitList;
-                        ThreatContainer::StorageType const& threatList = me->GetThreatMgr().getThreatList();
-                        for (auto itr : threatList)
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true, true, SPELL_DETONATE_MANA))
                         {
-                            if (itr->getTarget()->GetTypeId() == TYPEID_PLAYER
-                                    && itr->getTarget()->getPowerType() == POWER_MANA
-                                    && itr->getTarget()->GetPower(POWER_MANA))
-                                    {
-                                        unitList.push_back(itr->getTarget());
-                                    }
+                            me->CastSpell(target, SPELL_DETONATE_MANA, true);
                         }
-                        if (!unitList.empty())
-                        {
-                            auto itr = unitList.begin();
-                            advance(itr, urand(0, unitList.size() - 1));
-                            me->CastSpell(*itr, SPELL_DETONATE_MANA, false);
-                            Talk(SAY_SPECIAL);
-                        }
+                        Talk(SAY_SPECIAL);
                         events.RepeatEvent(30000);
                         break;
                     }
@@ -597,7 +584,7 @@ public:
 
             if (me->GetEntry() != NPC_UNSTOPPABLE_ABOMINATION && me->GetEntry() != NPC_GUARDIAN_OF_ICECROWN)
             {
-                me->AddThreat(who, 1000000.0f);
+                me->GetThreatMgr().AddThreat(who, 1000000.0f);
             }
         }
 

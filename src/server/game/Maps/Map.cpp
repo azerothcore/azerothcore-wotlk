@@ -835,20 +835,10 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
         // handle updates for creatures in combat with player and are more than X yards away
         if (player->IsInCombat())
         {
-            updateList.clear();
-            float rangeSq = player->GetGridActivationRange() - 1.0f;
-            rangeSq = rangeSq * rangeSq;
-            HostileReference* ref = player->getHostileRefMgr().getFirst();
-            while (ref)
-            {
-                if (Unit* unit = ref->GetSource()->GetOwner())
-                    if (Creature* cre = unit->ToCreature())
-                        if (cre->FindMap() == player->FindMap() && cre->GetExactDist2dSq(player) > rangeSq)
-                            updateList.push_back(cre);
-                ref = ref->next();
-            }
-            for (std::vector<Creature*>::const_iterator itr = updateList.begin(); itr != updateList.end(); ++itr)
-                VisitNearbyCellsOf(*itr, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
+            for (auto const& pair : player->GetCombatMgr().GetPvECombatRefs())
+                if (Creature* unit = pair.second->GetOther(player)->ToCreature())
+                    if (unit->GetMapId() == player->GetMapId() && !unit->IsWithinDistInMap(player, GetVisibilityRange(), false))
+                        VisitNearbyCellsOf(unit, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
         }
     }
 
@@ -913,7 +903,7 @@ struct ResetNotifier
 
 void Map::RemovePlayerFromMap(Player* player, bool remove)
 {
-    player->getHostileRefMgr().deleteReferences(true); // pussywizard: multithreading crashfix
+    player->CombatStop();
 
     bool inWorld = player->IsInWorld();
     player->RemoveFromWorld();
