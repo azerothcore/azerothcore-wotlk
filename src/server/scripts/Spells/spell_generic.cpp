@@ -4472,6 +4472,31 @@ class spell_gen_remove_impairing_auras : public SpellScript
     }
 };
 
+class spell_gen_purge_vehicle_control : public SpellScript
+{
+    PrepareSpellScript(spell_gen_purge_vehicle_control);
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* vehicle = GetCaster()->GetVehicleBase())
+        {
+            auto& auraArea = vehicle->GetAppliedAuras();
+            for (auto iter = auraArea.begin(); iter != auraArea.end();)
+            {
+                if (iter->second->IsPositive())
+                    vehicle->RemoveAura(iter);
+                else
+                    ++iter;
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_gen_purge_vehicle_control::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -4605,4 +4630,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_holiday_buff_food);
     RegisterSpellScript(spell_gen_arcane_charge);
     RegisterSpellScript(spell_gen_remove_impairing_auras);
+    RegisterSpellScript(spell_gen_purge_vehicle_control);
 }

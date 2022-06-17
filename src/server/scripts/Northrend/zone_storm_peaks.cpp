@@ -820,7 +820,7 @@ enum FreedProtoDrake
 
     AREA_VALLEY_OF_ANCIENT_WINTERS      = 4437,
 
-    TEXT_EMOTE                          = 0,
+    TEXT_EMOTE                          = 1,
 
     SPELL_KILL_CREDIT_PRISONER          = 55144,
     SPELL_SUMMON_LIBERATED              = 55073,
