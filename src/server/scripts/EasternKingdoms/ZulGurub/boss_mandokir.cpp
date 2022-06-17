@@ -615,11 +615,8 @@ class spell_threatening_gaze : public AuraScript
     {
         if (Unit* caster = GetCaster())
         {
-            if (Unit* target = GetTarget())
-            {
-                if (caster->GetAI())
-                    caster->GetAI()->DoAction(ACTION_CHECK_TG_TARGET);
-            }
+            if (caster->GetAI())
+                caster->GetAI()->DoAction(ACTION_CHECK_TG_TARGET);
         }
     }
 
