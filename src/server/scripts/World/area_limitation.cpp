@@ -140,12 +140,12 @@ public:
             return true;
         return false;
     }
-        
+ 
     bool Load() override
     {
         return GetUnitOwner()->GetTypeId() == TYPEID_PLAYER;
     }
-        
+ 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo(
