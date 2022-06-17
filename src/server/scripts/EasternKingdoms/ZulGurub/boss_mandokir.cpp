@@ -172,7 +172,6 @@ public:
             reviveGUID.Clear();
             threateningTargetGUID.Clear();
             threatTGTarget = 0.f;
-            _scheduler.CancelAll();
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -239,17 +238,7 @@ public:
                 {
                     if (threatTGTarget < me->GetThreatMgr().getThreat(playerGazed))
                     {
-                        if (!me->IsWithinLOSInMap(playerGazed))
-                        {
-                            DoCast(playerGazed, SPELL_SUMMON_PLAYER, true);
-                            _scheduler.Schedule(25ms, [this, playerGazed](TaskContext /*context*/)
-                                {
-                                    if (playerGazed)
-                                        DoCast(playerGazed, SPELL_THREATENING_GAZE_CHARGE);
-                                });
-                        }
-                        else
-                            DoCast(playerGazed, SPELL_THREATENING_GAZE_CHARGE);
+                        DoCast(playerGazed, SPELL_THREATENING_GAZE_CHARGE);
                     }
                 }
 
@@ -312,8 +301,6 @@ public:
 
             if (me->HasUnitState(UNIT_STATE_CASTING) || me->HasUnitState(UNIT_STATE_CHARGING))
                 return;
-
-            _scheduler.Update(diff);
 
             while (uint32 eventId = events.ExecuteEvent())
             {
@@ -403,7 +390,6 @@ public:
         ObjectGuid reviveGUID;
         ObjectGuid threateningTargetGUID;
         float threatTGTarget;
-        TaskScheduler _scheduler;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
