@@ -24,15 +24,15 @@
 
 enum DataTypes
 {
-    DATA_KURINNAXX          = 0,
-    DATA_RAJAXX             = 1,
-    DATA_MOAM               = 2,
-    DATA_BURU               = 3,
-    DATA_AYAMISS            = 4,
-    DATA_OSSIRIAN           = 5,
-    NUM_ENCOUNTER           = 6,
+    DATA_KURINNAXX              = 0,
+    DATA_RAJAXX                 = 1,
+    DATA_MOAM                   = 2,
+    DATA_BURU                   = 3,
+    DATA_AYAMISS                = 4,
+    DATA_OSSIRIAN               = 5,
+    NUM_ENCOUNTER               = 6,
 
-    DATA_PARALYZED          = 7
+    DATA_PARALYZED              = 7
 };
 
 enum Creatures
@@ -49,6 +49,7 @@ enum Creatures
     NPC_SAND_VORTEX             = 15428,
     NPC_OSSIRIAN_TRIGGER        = 15590,
     NPC_HATCHLING               = 15521,
+    NPC_BURU_EGG                = 15514,
     NPC_LARVA                   = 15555,
     NPC_SWARMER                 = 15546,
     NPC_HORNET                  = 15934

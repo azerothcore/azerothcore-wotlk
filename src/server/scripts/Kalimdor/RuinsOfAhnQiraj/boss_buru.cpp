@@ -71,7 +71,6 @@ public:
         void EnterEvadeMode(EvadeReason why) override
         {
             BossAI::EnterEvadeMode(why);
-
             for (ObjectGuid const& guid : Eggs)
             {
                 if (Creature* egg = me->GetMap()->GetCreature(guid))
@@ -181,12 +180,18 @@ public:
 
             if (me->GetHealthPct() < 20.0f && _phase == PHASE_EGG)
             {
+                _phase = PHASE_TRANSFORM;
                 DoCastSelf(SPELL_BURU_TRANSFORM);
                 DoCastSelf(SPELL_FULL_SPEED, true);
                 me->RemoveAurasDueToSpell(SPELL_THORNS);
                 events.CancelEvent(EVENT_DISMEMBER);
                 events.ScheduleEvent(EVENT_CREEPING_PLAGUE, 2000);
-                _phase = PHASE_TRANSFORM;
+                std::list<Creature*> RemainingEgg;
+                me->GetCreaturesWithEntryInRange(RemainingEgg, 100.0f, NPC_BURU_EGG);
+                for (std::list<Creature*>::const_iterator itr = RemainingEgg.begin(); itr != RemainingEgg.end(); ++itr)
+                {
+                    Unit::Kill(*itr, *itr);
+                }
             }
             DoMeleeAttackIfReady();
         }
@@ -241,17 +246,20 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            DoCast(me, SPELL_EXPLODE, true);
-            DoCast(me, SPELL_EXPLODE_2, true);
-            DoCast(me, SPELL_BURU_EGG_TRIGGER, true);
-            DoCast(me, SPELL_SUMMON_HATCHLING, true);
             if (Creature* buru = me->GetMap()->GetCreature(_instance->GetGuidData(DATA_BURU)))
             {
-                if (boss_buru::boss_buruAI* buruAI = dynamic_cast<boss_buru::boss_buruAI*>(buru->AI()))
+                if (!buru->HasAura(SPELL_BURU_TRANSFORM))
                 {
-                    buruAI->ManageRespawn(me->GetGUID());
+                    DoCast(me, SPELL_EXPLODE, true);
+                    DoCast(me, SPELL_EXPLODE_2, true);
+                    DoCast(me, SPELL_BURU_EGG_TRIGGER, true);
+                    if (boss_buru::boss_buruAI* buruAI = dynamic_cast<boss_buru::boss_buruAI*>(buru->AI()))
+                    {
+                        buruAI->ManageRespawn(me->GetGUID());
+                    }
                 }
             }
+            DoCast(me, SPELL_SUMMON_HATCHLING, true);
         }
     private:
         InstanceScript* _instance;

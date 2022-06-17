@@ -67,7 +67,9 @@ public:
         void SetGuidData(uint32 type, ObjectGuid data) override
         {
             if (type == DATA_PARALYZED)
+            {
                 _paralyzedGUID = data;
+            }
         }
 
         ObjectGuid GetGuidData(uint32 type) const override
@@ -131,7 +133,9 @@ public:
                 }
             }
             else
+            {
                 OUT_LOAD_INST_DATA_FAIL;
+            }
 
             OUT_LOAD_INST_DATA_COMPLETE;
         }
