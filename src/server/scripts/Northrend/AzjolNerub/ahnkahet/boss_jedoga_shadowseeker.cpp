@@ -359,6 +359,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                 me->ClearUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
                 ReschedulleCombatEvents();
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                me->SetImmuneToAll(false);
                 me->SetReactState(REACT_AGGRESSIVE);
 
                 me->RemoveAurasDueToSpell(SPELL_SPHERE_VISUAL);
