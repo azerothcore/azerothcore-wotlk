@@ -35,7 +35,7 @@ enum Spells
     SPELL_BURU_TRANSFORM        = 24721,
     SPELL_SUMMON_HATCHLING      = 1881,
     SPELL_EXPLODE               = 19593,
-    SPELL_EXPLODE_2             = 5255,
+    SPELL_EXPLODE_2             = 5255, // Server-side script
     SPELL_BURU_EGG_TRIGGER      = 26646
 };
 
@@ -66,9 +66,7 @@ public:
 
     struct boss_buruAI : public BossAI
     {
-        boss_buruAI(Creature* creature) : BossAI(creature, DATA_BURU)
-        {
-        }
+        boss_buruAI(Creature* creature) : BossAI(creature, DATA_BURU) {}
 
         void EnterEvadeMode(EvadeReason why) override
         {
@@ -93,6 +91,14 @@ public:
             events.ScheduleEvent(EVENT_GATHERING_SPEED, 9000);
             events.ScheduleEvent(EVENT_FULL_SPEED, 60000);
             _phase = PHASE_EGG;
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            if (InstanceScript* pInstance = me->GetInstanceScript())
+            {
+                pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_CREEPING_PLAGUE);
+            }
         }
 
         void DoAction(int32 action) override
@@ -158,8 +164,8 @@ public:
                         DoCastSelf(SPELL_FULL_SPEED);
                         break;
                     case EVENT_CREEPING_PLAGUE:
-                        DoCastSelf(SPELL_CREEPING_PLAGUE);
-                        events.ScheduleEvent(EVENT_CREEPING_PLAGUE, 6000);
+                        DoCastAOE(SPELL_CREEPING_PLAGUE);
+                        events.ScheduleEvent(EVENT_CREEPING_PLAGUE, urand(6250, 6500));
                         break;
                     case EVENT_RESPAWN_EGG:
                         if (Creature* egg = me->GetMap()->GetCreature(*Eggs.begin()))
@@ -178,6 +184,7 @@ public:
                 DoCastSelf(SPELL_BURU_TRANSFORM);
                 DoCastSelf(SPELL_FULL_SPEED, true);
                 me->RemoveAurasDueToSpell(SPELL_THORNS);
+                events.CancelEvent(EVENT_DISMEMBER);
                 events.ScheduleEvent(EVENT_CREEPING_PLAGUE, 2000);
                 _phase = PHASE_TRANSFORM;
             }
@@ -234,9 +241,10 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            DoCastAOE(SPELL_EXPLODE, true);
-            DoCastAOE(SPELL_EXPLODE_2, true); // Unknown purpose
-            DoCastSelf(SPELL_SUMMON_HATCHLING);
+            DoCast(me, SPELL_EXPLODE, true);
+            DoCast(me, SPELL_EXPLODE_2, true);
+            DoCast(me, SPELL_BURU_EGG_TRIGGER, true);
+            DoCast(me, SPELL_SUMMON_HATCHLING, true);
             if (Creature* buru = me->GetMap()->GetCreature(_instance->GetGuidData(DATA_BURU)))
             {
                 if (boss_buru::boss_buruAI* buruAI = dynamic_cast<boss_buru::boss_buruAI*>(buru->AI()))
