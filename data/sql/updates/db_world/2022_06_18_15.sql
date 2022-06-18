@@ -1,3 +1,4 @@
+-- DB update 2022_06_18_14 -> 2022_06_18_15
 --
 -- Mulgore 10618 Gameobjects that need removed before Mulgore can be rebuilt
 DELETE FROM `gameobject` WHERE `guid` IN (18442, 18443, 18444, 18445, 18446, 18447, 18448, 18449, 18450, 18451, 18452, 18453, 18454, 18455, 85767, 85772, 85882, 85883);

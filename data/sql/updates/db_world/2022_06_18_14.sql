@@ -1,3 +1,4 @@
+-- DB update 2022_06_18_13 -> 2022_06_18_14
 --
 DELETE FROM `creature_loot_template` WHERE item=6838;
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES 
