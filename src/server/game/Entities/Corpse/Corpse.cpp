@@ -197,3 +197,65 @@ void Corpse::ResetGhostTime()
 {
     m_time = GameTime::GetGameTime().count();
 }
+
+void Corpse::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target) const
+{
+    if (!target)
+        return;
+
+    ByteBuffer fieldBuffer;
+    UpdateMask updateMask;
+    updateMask.SetCount(m_valuesCount);
+
+    uint32* flags = nullptr;
+    uint32 visibleFlag = GetUpdateFieldData(target, flags);
+
+    for (uint16 index = 0; index < m_valuesCount; ++index)
+    {
+        if (_fieldNotifyFlags & flags[index] || ((updateType == UPDATETYPE_VALUES ? _changesMask.GetBit(index) : m_uint32Values[index]) && (flags[index] & visibleFlag)))
+        {
+            updateMask.SetBit(index);
+
+            if (index == CORPSE_FIELD_BYTES_1 || index == CORPSE_FIELD_BYTES_2)
+            {
+                Player* owner = ObjectAccessor::GetPlayer(*this, GetOwnerGUID());
+                if (owner && owner != target && sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP) && owner->IsInRaidWith(target) && owner->GetTeamId() != target->GetTeamId())
+                {
+                    uint32 playerBytes = target->GetUInt32Value(PLAYER_BYTES);
+                    uint32 playerBytes2 = target->GetUInt32Value(PLAYER_BYTES_2);
+
+                    uint8 race = target->getRace();
+                    uint8 skin = (uint8)(playerBytes);
+                    uint8 face = (uint8)(playerBytes >> 8);
+                    uint8 hairstyle = (uint8)(playerBytes >> 16);
+                    uint8 haircolor = (uint8)(playerBytes >> 24);
+                    uint8 facialhair = (uint8)(playerBytes2);
+
+                    uint32 corpseBytes1 = ((0x00) | (race << 8) | (target->GetByteValue(PLAYER_BYTES_3, 0) << 16) | (skin << 24));
+                    uint32 corpseBytes2 = ((face) | (hairstyle << 8) | (haircolor << 16) | (facialhair << 24));
+
+                    if (index == CORPSE_FIELD_BYTES_1)
+                    {
+                        fieldBuffer << corpseBytes1;
+                    }
+                    else
+                    {
+                        fieldBuffer << corpseBytes2;
+                    }
+                }
+                else
+                {
+                    fieldBuffer << m_uint32Values[index];
+                }
+            }
+            else
+            {
+                fieldBuffer << m_uint32Values[index];
+            }
+        }
+    }
+
+    *data << uint8(updateMask.GetBlockCount());
+    updateMask.AppendToPacket(data);
+    data->append(fieldBuffer);
+}
