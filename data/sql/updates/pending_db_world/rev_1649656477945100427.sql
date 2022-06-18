@@ -1,4 +1,4 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1649656477945100427');
+
 
 DELETE FROM `npc_text_locale` WHERE `ID`=13321 AND `locale` IN ('esES','esMX','frFR','zhCN','deDE'); 
 INSERT INTO `npc_text_locale` (`ID`, `Locale`, `Text0_0`, `Text0_1`) VALUES
