@@ -1,3 +1,4 @@
+-- DB update 2022_06_18_08 -> 2022_06_18_09
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 11350;
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 11350);

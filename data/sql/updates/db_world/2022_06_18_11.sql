@@ -1,3 +1,4 @@
+-- DB update 2022_06_18_10 -> 2022_06_18_11
 
 UPDATE `quest_template` SET `LogDescription` = 'Talin Keeneye would like you to kill 12 Small Crag Boars.'  WHERE `ID` = 183;
 UPDATE `quest_template` SET `QuestCompletionLog` = 'Return to Orgnil Soulscar in Durotar.'  WHERE `ID` = 806;
