@@ -1,3 +1,4 @@
+-- DB update 2022_06_18_03 -> 2022_06_18_04
 --
 DELETE FROM `pool_template` WHERE `entry` IN (391, 392, 393); 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (391, 4, 'Brontus Kodo Pack Combo 1 -- 4 Barrens Kodo Pack');
