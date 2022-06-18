@@ -64,8 +64,7 @@ enum Events
     EVENT_WATCH_PLAYER        = 8,
     EVENT_CHARGE_PLAYER       = 9,
     EVENT_EXECUTE             = 10,
-    EVENT_FRIGHTENING_SHOUT   = 11,
-    EVENT_CLEAVE              = 12
+    EVENT_CLEAVE              = 11
 };
 
 enum Action
@@ -318,12 +317,21 @@ public:
                         events.ScheduleEvent(EVENT_WATCH_PLAYER, urand(12000, 24000));
                         break;
                     case EVENT_CHARGE_PLAYER:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, FarthestTargetSelector(me, 40.f, false, true)))
-                            DoCast(target, SPELL_CHARGE);
-                        events.ScheduleEvent(EVENT_FRIGHTENING_SHOUT, 500);
-                        if (Unit* mainTarget = SelectTarget(SelectTargetMethod::MaxThreat, 0, 100.0f))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, [this](Unit const* target)
+                            {
+                                if (!me || !target)
+                                    return false;
+                                if (target->GetTypeId() != TYPEID_PLAYER || !me->IsWithinLOSInMap(target))
+                                    return false;
+                                return true;
+                            }))
                         {
-                            me->GetThreatMgr().modifyThreatPercent(mainTarget, -100);
+                            DoCast(target, SPELL_CHARGE);
+                            events.DelayEvents(1500);
+                            if (Unit* mainTarget = SelectTarget(SelectTargetMethod::MaxThreat, 0, 100.0f))
+                            {
+                                me->GetThreatMgr().modifyThreatPercent(mainTarget, -100);
+                            }
                         }
                         events.ScheduleEvent(EVENT_CHARGE_PLAYER, urand(30000, 40000));
                         break;
@@ -333,9 +341,6 @@ public:
                             DoCastVictim(SPELL_EXECUTE, true);
                         }
                         events.ScheduleEvent(EVENT_EXECUTE, urand(7000, 14000));
-                        break;
-                    case EVENT_FRIGHTENING_SHOUT:
-                        DoCastAOE(SPELL_FRIGHTENING_SHOUT);
                         break;
                     case EVENT_CLEAVE:
                         {
@@ -605,6 +610,24 @@ public:
     }
 };
 
+class spell_mandokir_charge : public SpellScript
+{
+    PrepareSpellScript(spell_mandokir_charge);
+
+    void LaunchHit(SpellEffIndex /*effIndex*/)
+    {
+        Unit* caster = GetCaster();
+        Unit* target = GetHitUnit();
+        if (caster && target)
+            caster->CastSpell(target, SPELL_FRIGHTENING_SHOUT, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_mandokir_charge::LaunchHit, EFFECT_0, SPELL_EFFECT_CHARGE);
+    }
+};
+
 void AddSC_boss_mandokir()
 {
     new boss_mandokir();
@@ -612,4 +635,5 @@ void AddSC_boss_mandokir()
     RegisterZulGurubCreatureAI(npc_chained_spirit);
     RegisterZulGurubCreatureAI(npc_vilebranch_speaker);
     new spell_threatening_gaze();
+    RegisterSpellScript(spell_mandokir_charge);
 }
