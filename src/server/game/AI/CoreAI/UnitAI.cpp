@@ -37,10 +37,12 @@ void UnitAI::AttackStartCaster(Unit* victim, float dist)
         me->GetMotionMaster()->MoveChase(victim, dist);
 }
 
-void UnitAI::DoMeleeAttackIfReady()
+void UnitAI::DoMeleeAttackIfReady(bool ignoreCasting /*= false*/)
 {
-    if (me->HasUnitState(UNIT_STATE_CASTING))
+    if (!ignoreCasting && me->HasUnitState(UNIT_STATE_CASTING))
+    {
         return;
+    }
 
     Unit* victim = me->GetVictim();
     if (!victim || !victim->IsInWorld())
@@ -57,7 +59,7 @@ void UnitAI::DoMeleeAttackIfReady()
             if (me->getAttackTimer(OFF_ATTACK) < ATTACK_DISPLAY_DELAY)
                 me->setAttackTimer(OFF_ATTACK, ATTACK_DISPLAY_DELAY);
 
-        me->AttackerStateUpdate(victim);
+        me->AttackerStateUpdate(victim, BASE_ATTACK, false, ignoreCasting);
         me->resetAttackTimer();
     }
 
@@ -67,7 +69,7 @@ void UnitAI::DoMeleeAttackIfReady()
         if (me->getAttackTimer(BASE_ATTACK) < ATTACK_DISPLAY_DELAY)
             me->setAttackTimer(BASE_ATTACK, ATTACK_DISPLAY_DELAY);
 
-        me->AttackerStateUpdate(victim, OFF_ATTACK);
+        me->AttackerStateUpdate(victim, OFF_ATTACK, false, ignoreCasting);
         me->resetAttackTimer(OFF_ATTACK);
     }
 }

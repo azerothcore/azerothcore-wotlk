@@ -49,17 +49,7 @@ float ThreatCalcHelper::calcThreat(Unit* hatedUnit, Unit* hatingUnit, float thre
             modOwner->ApplySpellMod(threatSpell->Id, SPELLMOD_THREAT, threat);
     }
 
-    threat = hatedUnit->ApplyTotalThreatModifier(threat, schoolMask);
-
-    if (Creature* hatingCreature = hatingUnit->ToCreature())
-    {
-        if (hatingCreature->IsAIEnabled)
-        {
-            hatingCreature->AI()->CalculateThreat(hatedUnit, threat, threatSpell);
-        }
-    }
-
-    return threat;
+    return hatedUnit->ApplyTotalThreatModifier(threat, schoolMask);
 }
 
 bool ThreatCalcHelper::isValidProcess(Unit* hatedUnit, Unit* hatingUnit, SpellInfo const* threatSpell)
@@ -437,10 +427,19 @@ void ThreatMgr::clearReferences()
 
 void ThreatMgr::addThreat(Unit* victim, float threat, SpellSchoolMask schoolMask, SpellInfo const* threatSpell)
 {
-    if (!ThreatCalcHelper::isValidProcess(victim, GetOwner(), threatSpell))
+    if (!ThreatCalcHelper::isValidProcess(victim, iOwner, threatSpell))
         return;
 
-    doAddThreat(victim, ThreatCalcHelper::calcThreat(victim, iOwner, threat, schoolMask, threatSpell));
+    threat = ThreatCalcHelper::calcThreat(victim, iOwner, threat, schoolMask, threatSpell);
+    if (Creature* hatingCreature = iOwner->ToCreature())
+    {
+        if (hatingCreature->IsAIEnabled)
+        {
+            hatingCreature->AI()->CalculateThreat(victim, threat, threatSpell);
+        }
+    }
+
+    doAddThreat(victim, threat);
 }
 
 void ThreatMgr::doAddThreat(Unit* victim, float threat)

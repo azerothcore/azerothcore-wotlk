@@ -328,7 +328,7 @@ public:
 
     float DoGetSpellMaxRange(uint32 spellId, bool positive = false);
 
-    void DoMeleeAttackIfReady();
+    void DoMeleeAttackIfReady(bool ignoreCasting = false);
     bool DoSpellAttackIfReady(uint32 spell);
 
     static AISpellInfoType* AISpellInfo;
