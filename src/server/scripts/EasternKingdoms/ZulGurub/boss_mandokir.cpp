@@ -271,39 +271,6 @@ public:
             }
         }
 
-        void DoMeleeAttackIfReady(bool ignoreCasting)
-        {
-            if (!ignoreCasting && me->HasUnitState(UNIT_STATE_CASTING))
-            {
-                return;
-            }
-
-            Unit* victim = me->GetVictim();
-            if (!victim || !victim->IsInWorld())
-            {
-                return;
-            }
-
-            if (!me->IsWithinMeleeRange(victim))
-            {
-                return;
-            }
-
-            if (me->isAttackReady())
-            {
-                if (me->haveOffhandWeapon())
-                {
-                    if (me->getAttackTimer(OFF_ATTACK) < ATTACK_DISPLAY_DELAY)
-                    {
-                        me->setAttackTimer(OFF_ATTACK, ATTACK_DISPLAY_DELAY);
-                    }
-                }
-
-                me->AttackerStateUpdate(victim);
-                me->resetAttackTimer();
-            }
-        }
-
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
@@ -427,7 +394,7 @@ public:
                 }
             }
 
-            DoMeleeAttackIfReady(false);
+            DoMeleeAttackIfReady();
         }
 
     private:
@@ -728,7 +695,9 @@ class spell_threatening_gaze_charge : public SpellScript
 
     void LaunchHit(SpellEffIndex effIndex)
     {
-        GetSpell()->HandleEffects(GetHitUnit(), nullptr, nullptr, effIndex, SPELL_EFFECT_HANDLE_LAUNCH_TARGET);
+        if (Unit* caster = GetCaster())
+            if (Unit* target = GetHitUnit())
+                caster->CastSpell(target, GetSpellInfo()->Effects[effIndex].TriggerSpell, true);
     }
 
     void Register() override
