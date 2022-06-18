@@ -107,7 +107,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_SLEEP:
-                        DoCastVictim(SPELL_SLEEP, true);
+                        DoCastAOE(SPELL_SLEEP, true);
                         events.ScheduleEvent(EVENT_SLEEP, 24s, 32s);
                         return;
                     case EVENT_EARTH_SHOCK:
