@@ -36,17 +36,17 @@ enum Says
 
 enum Spells
 {
-    SPELL_CHARGE                  = 24408,
-    SPELL_OVERPOWER               = 24407,
-    SPELL_FRIGHTENING_SHOUT       = 19134,
-    SPELL_WHIRLWIND               = 13736, // triggers 15589
-    SPELL_MORTAL_STRIKE           = 16856,
-    SPELL_FRENZY                  = 24318,
-    SPELL_THREATENING_GAZE        = 24314, // triggers 24315 and 24316
-    SPELL_THREATENING_GAZE_CHARGE = 24315, // triggers 24316
-    SPELL_LEVEL_UP                = 24312,
-    SPELL_EXECUTE                 = 7160,
-    SPELL_MANDOKIR_CLEAVE         = 20691,
+    SPELL_CHARGE              = 24408,
+    SPELL_OVERPOWER           = 24407,
+    SPELL_FRIGHTENING_SHOUT   = 19134,
+    SPELL_WHIRLWIND           = 13736, // triggers 15589
+    SPELL_MORTAL_STRIKE       = 16856,
+    SPELL_FRENZY              = 24318,
+    SPELL_WATCH               = 24314, // triggers 24315 and 24316
+    SPELL_WATCH_CHARGE        = 24315, // triggers 24316
+    SPELL_LEVEL_UP            = 24312,
+    SPELL_EXECUTE             = 7160,
+    SPELL_MANDOKIR_CLEAVE     = 20691,
     SPELL_SUMMON_PLAYER           = 25104,
 
     SPELL_REVIVE                  = 24341 // chained spirit
@@ -61,7 +61,7 @@ enum Events
     EVENT_MORTAL_STRIKE       = 5,
     EVENT_WHIRLWIND           = 6,
     EVENT_CHECK_OHGAN         = 7,
-    EVENT_THREATENING_GAZE    = 8,
+    EVENT_WATCH_PLAYER        = 8,
     EVENT_CHARGE_PLAYER       = 9,
     EVENT_EXECUTE             = 10,
     EVENT_FRIGHTENING_SHOUT   = 11,
@@ -170,8 +170,6 @@ public:
             instance->SetBossState(DATA_OHGAN, NOT_STARTED);
             me->Mount(MODEL_OHGAN_MOUNT);
             reviveGUID.Clear();
-            threateningTargetGUID.Clear();
-            threatTGTarget = 0.f;
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -192,7 +190,7 @@ public:
             events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(14000, 28000));
             events.ScheduleEvent(EVENT_WHIRLWIND, urand(24000, 30000));
             events.ScheduleEvent(EVENT_CHECK_OHGAN, 1000);
-            events.ScheduleEvent(EVENT_THREATENING_GAZE, urand(12000, 24000));
+            events.ScheduleEvent(EVENT_WATCH_PLAYER, urand(12000, 24000));
             events.ScheduleEvent(EVENT_CHARGE_PLAYER, urand(30000, 40000));
             events.ScheduleEvent(EVENT_EXECUTE, urand(7000, 14000));
             events.ScheduleEvent(EVENT_CLEAVE, urand(10000, 20000));
@@ -227,23 +225,6 @@ public:
                 }
                 DoCastSelf(SPELL_LEVEL_UP, true);
                 killCount = 0;
-            }
-        }
-
-        void DoAction(int32 action) override
-        {
-            if (action == ACTION_CHECK_TG_TARGET)
-            {
-                if (Player* playerGazed = ObjectAccessor::GetPlayer(*me, threateningTargetGUID))
-                {
-                    if (threatTGTarget < me->GetThreatMgr().getThreat(playerGazed))
-                    {
-                        DoCast(playerGazed, SPELL_THREATENING_GAZE_CHARGE);
-                    }
-                }
-
-                threateningTargetGUID.Clear();
-                threatTGTarget = 0.f;
             }
         }
 
@@ -329,15 +310,13 @@ public:
                             events.ScheduleEvent(EVENT_CHECK_OHGAN, 1000);
                         }
                         break;
-                    case EVENT_THREATENING_GAZE:
+                    case EVENT_WATCH_PLAYER:
                         if (Unit* player = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                         {
-                            DoCast(player, SPELL_THREATENING_GAZE);
+                            DoCast(player, SPELL_WATCH);
                             Talk(SAY_WATCH, player);
-                            threateningTargetGUID = player->GetGUID();
-                            threatTGTarget = me->GetThreatMgr().getThreat(player);
                         }
-                        events.ScheduleEvent(EVENT_THREATENING_GAZE, urand(12000, 24000));
+                        events.ScheduleEvent(EVENT_WATCH_PLAYER, urand(12000, 24000));
                         break;
                     case EVENT_CHARGE_PLAYER:
                         DoCast(SelectTarget(SelectTargetMethod::MaxDistance, 0, 40, true), SPELL_CHARGE);
@@ -388,8 +367,6 @@ public:
     private:
         uint8 killCount;
         ObjectGuid reviveGUID;
-        ObjectGuid threateningTargetGUID;
-        float threatTGTarget;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -593,22 +570,38 @@ private:
     InstanceScript* instance;
 };
 
-class spell_threatening_gaze : public AuraScript
+class spell_threatening_gaze : public SpellScriptLoader
 {
-    PrepareAuraScript(spell_threatening_gaze);
+public:
+    spell_threatening_gaze() : SpellScriptLoader("spell_threatening_gaze") { }
 
-    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    class spell_threatening_gaze_AuraScript : public AuraScript
     {
-        if (Unit* caster = GetCaster())
+        PrepareAuraScript(spell_threatening_gaze_AuraScript);
+
+        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            if (caster->GetAI())
-                caster->GetAI()->DoAction(ACTION_CHECK_TG_TARGET);
+            if (Unit* caster = GetCaster())
+            {
+                if (Unit* target = GetTarget())
+                {
+                    if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE && GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_DEATH)
+                    {
+                        caster->CastSpell(target, SPELL_WATCH_CHARGE, true);
+                    }
+                }
+            }
         }
-    }
 
-    void Register() override
+        void Register() override
+        {
+            OnEffectRemove += AuraEffectRemoveFn(spell_threatening_gaze_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
     {
-        OnEffectRemove += AuraEffectRemoveFn(spell_threatening_gaze::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        return new spell_threatening_gaze_AuraScript();
     }
 };
 
@@ -618,5 +611,5 @@ void AddSC_boss_mandokir()
     new npc_ohgan();
     RegisterZulGurubCreatureAI(npc_chained_spirit);
     RegisterZulGurubCreatureAI(npc_vilebranch_speaker);
-    RegisterSpellScript(spell_threatening_gaze);
+    new spell_threatening_gaze();
 }
