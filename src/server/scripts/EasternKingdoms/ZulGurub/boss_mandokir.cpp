@@ -47,9 +47,9 @@ enum Spells
     SPELL_LEVEL_UP            = 24312,
     SPELL_EXECUTE             = 7160,
     SPELL_MANDOKIR_CLEAVE     = 20691,
-    SPELL_SUMMON_PLAYER           = 25104,
+    SPELL_SUMMON_PLAYER       = 25104,
 
-    SPELL_REVIVE                  = 24341 // chained spirit
+    SPELL_REVIVE              = 24341 // chained spirit
 };
 
 enum Events
@@ -71,8 +71,7 @@ enum Events
 enum Action
 {
     ACTION_START_REVIVE       = 1, // broodlord mandokir
-    ACTION_REVIVE             = 2, // chained spirit
-    ACTION_CHECK_TG_TARGET    = 3
+    ACTION_REVIVE             = 2 // chained spirit
 };
 
 enum Misc
