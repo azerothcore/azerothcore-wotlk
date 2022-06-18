@@ -318,7 +318,8 @@ public:
                         events.ScheduleEvent(EVENT_WATCH_PLAYER, urand(12000, 24000));
                         break;
                     case EVENT_CHARGE_PLAYER:
-                        DoCast(SelectTarget(SelectTargetMethod::MaxDistance, 0, 40, true), SPELL_CHARGE);
+                        if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, FarthestTargetSelector(me, 40.f, false, true)))
+                            DoCast(target, SPELL_CHARGE);
                         events.ScheduleEvent(EVENT_FRIGHTENING_SHOUT, 500);
                         if (Unit* mainTarget = SelectTarget(SelectTargetMethod::MaxThreat, 0, 100.0f))
                         {
