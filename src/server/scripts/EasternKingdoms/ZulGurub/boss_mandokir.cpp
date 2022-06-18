@@ -80,7 +80,8 @@ enum Misc
     MODEL_OHGAN_MOUNT         = 15271,
     PATH_MANDOKIR             = 492861,
     POINT_MANDOKIR_END        = 24,
-    CHAINED_SPIRIT_COUNT      = 20
+    CHAINED_SPIRIT_COUNT      = 20,
+    ACTION_CHARGE             = 1
 };
 
 Position const PosSummonChainedSpirits[CHAINED_SPIRIT_COUNT] =
@@ -142,6 +143,7 @@ public:
             instance->SetBossState(DATA_OHGAN, NOT_STARTED);
             me->Mount(MODEL_OHGAN_MOUNT);
             reviveGUID.Clear();
+            _chargeTarget.first.Clear();
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -225,9 +227,23 @@ public:
             }
         }
 
-        void SetGUID(ObjectGuid const guid, int32 /*type = 0 */) override
+        void SetGUID(ObjectGuid const guid, int32 type) override
         {
-            reviveGUID = guid;
+            if (type == ACTION_CHARGE)
+            {
+                if (_chargeTarget.first == guid && _chargeTarget.second > 0.f)
+                {
+                    if (Unit* target = ObjectAccessor::GetUnit(*me, _chargeTarget.first))
+                    {
+                        me->RemoveAurasDueToSpell(SPELL_WHIRLWIND);
+                        DoCast(target, SPELL_WATCH_CHARGE, true);
+                    }
+                }
+            }
+            else
+            {
+                reviveGUID = guid;
+            }
         }
 
         void MovementInform(uint32 type, uint32 id) override
@@ -240,6 +256,51 @@ public:
                     me->SetHomePosition(PosMandokir[0]);
                     instance->SetBossState(DATA_MANDOKIR, NOT_STARTED);
                 }
+            }
+        }
+
+        void CalculateThreat(Unit* hatedUnit, float& threat, SpellInfo const* threatSpell) override
+        {
+            if (_chargeTarget.first == hatedUnit->GetGUID())
+            {
+                // Do not count DOTs/HOTs
+                if (!threatSpell || !threatSpell->HasAttribute(SPELL_ATTR0_CU_NO_INITIAL_THREAT))
+                {
+                    _chargeTarget.second += threat;
+                }
+            }
+        }
+
+        void DoMeleeAttackIfReady(bool ignoreCasting)
+        {
+            if (!ignoreCasting && me->HasUnitState(UNIT_STATE_CASTING))
+            {
+                return;
+            }
+
+            Unit* victim = me->GetVictim();
+            if (!victim || !victim->IsInWorld())
+            {
+                return;
+            }
+
+            if (!me->IsWithinMeleeRange(victim))
+            {
+                return;
+            }
+
+            if (me->isAttackReady())
+            {
+                if (me->haveOffhandWeapon())
+                {
+                    if (me->getAttackTimer(OFF_ATTACK) < ATTACK_DISPLAY_DELAY)
+                    {
+                        me->setAttackTimer(OFF_ATTACK, ATTACK_DISPLAY_DELAY);
+                    }
+                }
+
+                me->AttackerStateUpdate(victim);
+                me->resetAttackTimer();
             }
         }
 
@@ -278,7 +339,14 @@ public:
             }
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
+            {
+                if (me->GetCurrentSpellCastTime(SPELL_WATCH) >= 0)
+                {
+                    DoMeleeAttackIfReady(true);
+                }
+
                 return;
+            }
 
             while (uint32 eventId = events.ExecuteEvent())
             {
@@ -312,6 +380,7 @@ public:
                         {
                             DoCast(player, SPELL_WATCH);
                             Talk(SAY_WATCH, player);
+                            _chargeTarget = std::make_pair(player->GetGUID(), 0.f);
                         }
                         events.ScheduleEvent(EVENT_WATCH_PLAYER, urand(12000, 24000));
                         break;
@@ -357,13 +426,15 @@ public:
                         break;
                 }
             }
-            DoMeleeAttackIfReady();
+
+            DoMeleeAttackIfReady(false);
         }
 
     private:
         uint8 killCount;
         ObjectGuid chainedSpiritGUIDs[CHAINED_SPIRIT_COUNT];
         ObjectGuid reviveGUID;
+        std::pair<ObjectGuid, float> _chargeTarget;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -619,13 +690,16 @@ public:
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            if (Unit* caster = GetCaster())
+            if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
             {
                 if (Unit* target = GetTarget())
                 {
-                    if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE && GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_DEATH)
+                    if (Creature* caster = GetCaster()->ToCreature())
                     {
-                        caster->CastSpell(target, SPELL_WATCH_CHARGE, true);
+                        if (caster->IsAIEnabled)
+                        {
+                            caster->AI()->SetGUID(target->GetGUID(), ACTION_CHARGE);
+                        }
                     }
                 }
             }
@@ -643,6 +717,27 @@ public:
     }
 };
 
+class spell_threatening_gaze_charge : public SpellScript
+{
+    PrepareSpellScript(spell_threatening_gaze_charge)
+
+    void PreventLaunchHit(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+    }
+
+    void LaunchHit(SpellEffIndex effIndex)
+    {
+        GetSpell()->HandleEffects(GetHitUnit(), nullptr, nullptr, effIndex, SPELL_EFFECT_HANDLE_LAUNCH_TARGET);
+    }
+
+    void Register() override
+    {
+        OnEffectLaunchTarget += SpellEffectFn(spell_threatening_gaze_charge::PreventLaunchHit, EFFECT_1, SPELL_EFFECT_TRIGGER_SPELL);
+        OnEffectHitTarget += SpellEffectFn(spell_threatening_gaze_charge::LaunchHit, EFFECT_1, SPELL_EFFECT_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_boss_mandokir()
 {
     new boss_mandokir();
@@ -650,4 +745,5 @@ void AddSC_boss_mandokir()
     RegisterZulGurubCreatureAI(npc_chained_spirit);
     new npc_vilebranch_speaker();
     new spell_threatening_gaze();
+    RegisterSpellScript(spell_threatening_gaze_charge);
 }
