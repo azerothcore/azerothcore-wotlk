@@ -271,6 +271,43 @@ public:
             }
         }
 
+        void DoMeleeAttackIfReady(bool ignoreCasting)
+        {
+            if (!ignoreCasting && me->HasUnitState(UNIT_STATE_CASTING))
+            {
+                return;
+            }
+
+            Unit* victim = me->GetVictim();
+            if (!victim || !victim->IsInWorld())
+                return;
+
+            if (!me->IsWithinMeleeRange(victim))
+                return;
+
+            //Make sure our attack is ready and we aren't currently casting before checking distance
+            if (me->isAttackReady())
+            {
+                // xinef: prevent base and off attack in same time, delay attack at 0.2 sec
+                if (me->haveOffhandWeapon())
+                    if (me->getAttackTimer(OFF_ATTACK) < ATTACK_DISPLAY_DELAY)
+                        me->setAttackTimer(OFF_ATTACK, ATTACK_DISPLAY_DELAY);
+
+                me->AttackerStateUpdate(victim, BASE_ATTACK, false, ignoreCasting);
+                me->resetAttackTimer();
+            }
+
+            if (me->haveOffhandWeapon() && me->isAttackReady(OFF_ATTACK))
+            {
+                // xinef: delay main hand attack if both will hit at the same time (players code)
+                if (me->getAttackTimer(BASE_ATTACK) < ATTACK_DISPLAY_DELAY)
+                    me->setAttackTimer(BASE_ATTACK, ATTACK_DISPLAY_DELAY);
+
+                me->AttackerStateUpdate(victim, OFF_ATTACK, false, ignoreCasting);
+                me->resetAttackTimer(OFF_ATTACK);
+            }
+        }
+
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
@@ -394,7 +431,7 @@ public:
                 }
             }
 
-            DoMeleeAttackIfReady();
+            DoMeleeAttackIfReady(false);
         }
 
     private:
