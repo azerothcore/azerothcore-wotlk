@@ -162,8 +162,32 @@ class spell_chain_burn : public SpellScript
     }
 };
 
+class spell_hazzarah_sleep : public SpellScript
+{
+    PrepareSpellScript(spell_hazzarah_sleep);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if([](WorldObject* target) -> bool
+        {
+            return target->ToUnit() && !target->ToUnit()->IsAlive();
+        });
+
+        if (targets.empty())
+            return;
+
+        Acore::Containers::RandomResize(targets, targets.size() - 1);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hazzarah_sleep::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
+
 void AddSC_boss_hazzarah()
 {
     new boss_hazzarah();
     RegisterSpellScript(spell_chain_burn);
+    RegisterSpellScript(spell_hazzarah_sleep);
 }
