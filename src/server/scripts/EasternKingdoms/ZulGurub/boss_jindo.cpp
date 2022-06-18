@@ -86,6 +86,23 @@ public:
             Talk(SAY_AGGRO);
         }
 
+        void JustSummoned(Creature* summon) override
+        {
+            BossAI::JustSummoned(summon);
+
+            switch (summon->GetEntry())
+            {
+                case NPC_BRAIN_WASH_TOTEM:
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
+                    {
+                        summon->CastSpell(target, summon->m_spells[0], true);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())

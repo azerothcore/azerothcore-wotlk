@@ -440,6 +440,7 @@ protected:
 
     [[nodiscard]] bool IsInvisibleDueToDespawn() const override;
     bool CanAlwaysSee(WorldObject const* obj) const override;
+    bool IsAlwaysDetectableFor(WorldObject const* seer) const override;
 
 private:
     void ForcedDespawn(uint32 timeMSToDespawn = 0, Seconds forcedRespawnTimer = 0s);

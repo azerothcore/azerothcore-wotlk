@@ -22,6 +22,7 @@ SDComment: Missing reset function after killing a boss for Ohgan, Thekal.
 SDCategory: Zul'Gurub
 EndScriptData */
 
+#include "GameObjectAI.h"
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
 #include "zulgurub.h"
@@ -36,7 +37,8 @@ ObjectData const creatureData[] =
 {
     { NPC_HIGH_PRIEST_THEKAL, DATA_THEKAL  },
     { NPC_ZEALOT_LORKHAN,     DATA_LORKHAN },
-    { NPC_ZEALOT_ZATH,        DATA_ZATH    }
+    { NPC_ZEALOT_ZATH,        DATA_ZATH    },
+    { NPC_PRIESTESS_MARLI,    DATA_MARLI   }
 };
 
 class instance_zulgurub : public InstanceMapScript
@@ -49,6 +51,7 @@ public:
         instance_zulgurub_InstanceMapScript(Map* map) : InstanceScript(map)
         {
             SetBossNumber(EncounterCount);
+            LoadObjectData(creatureData, nullptr);
             LoadDoorData(doorData);
             LoadObjectData(creatureData, nullptr);
         }
@@ -71,7 +74,20 @@ public:
                 case NPC_HAKKAR:
                     _hakkarGUID = creature->GetGUID();
                     break;
+                case NPC_SPAWN_OF_MARLI:
+                    if (Creature* marli = GetCreature(DATA_MARLI))
+                    {
+                        marli->AI()->JustSummoned(creature);
+                    }
+                    break;
+                case NPC_GAHZRANKA:
+                    _gahzrankaGUID = creature->GetGUID();
+                    break;
+                default:
+                    break;
             }
+
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         void OnGameObjectCreate(GameObject* go) override
@@ -107,6 +123,16 @@ public:
             }
 
             return ObjectGuid::Empty;
+        }
+
+        uint32 GetData(uint32 type) const override
+        {
+            if (type == DATA_GAHZRANKA)
+            {
+                return _gahzrankaGUID || GetBossState(DATA_GAHZRANKA) == DONE;
+            }
+
+            return 0;
         }
 
         std::string GetSaveData() override
@@ -160,6 +186,7 @@ public:
         ObjectGuid _arlokkGUID;
         ObjectGuid _goGongOfBethekkGUID;
         ObjectGuid _hakkarGUID;
+        ObjectGuid _gahzrankaGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
@@ -168,7 +195,56 @@ public:
     }
 };
 
+enum EdgeOfMadnessEnum
+{
+    EVENT_EDGE_OF_MADNESS_GRILEK    = 27,
+    EVENT_EDGE_OF_MADNESS_HAZZARAH  = 28,
+    EVENT_EDGE_OF_MADNESS_RENATAKI  = 29,
+    EVENT_EDGE_OF_MADNESS_WUSHOOLAY = 30
+};
+
+std::vector<std::pair<uint32, uint32>> BrazierOfMadnessContainer =
+{
+    { EVENT_EDGE_OF_MADNESS_GRILEK,     NPC_GRILEK      },
+    { EVENT_EDGE_OF_MADNESS_HAZZARAH,   NPC_HAZZARAH    },
+    { EVENT_EDGE_OF_MADNESS_RENATAKI,   NPC_RENATAKI    },
+    { EVENT_EDGE_OF_MADNESS_WUSHOOLAY,  NPC_WUSHOOLAY   }
+};
+
+Position const edgeOfMagnessSummonPos = { -11901.229f, -1906.366f, 65.358f, 0.942f };
+
+struct go_brazier_of_madness : public GameObjectAI
+{
+    go_brazier_of_madness(GameObject* go) : GameObjectAI(go) { }
+
+    bool GossipHello(Player* /*player*/, bool reportUse) override
+    {
+        if (reportUse)
+        {
+            return true;
+        }
+
+        uint32 bossEntry = 0;
+        for (uint8 i = 0; i < 4; ++i)
+        {
+            if (sGameEventMgr->IsActiveEvent(BrazierOfMadnessContainer[i].first))
+            {
+                bossEntry = BrazierOfMadnessContainer[i].second;
+                break;
+            }
+        }
+
+        if (bossEntry)
+        {
+            me->SummonCreature(bossEntry, edgeOfMagnessSummonPos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2 * HOUR * IN_MILLISECONDS);
+        }
+
+        return false;
+    }
+};
+
 void AddSC_instance_zulgurub()
 {
     new instance_zulgurub();
+    RegisterGameObjectAI(go_brazier_of_madness);
 }
