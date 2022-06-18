@@ -114,7 +114,7 @@ public:
     // Called for reaction at stopping attack at no attackers or targets
     virtual void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER);
 
-    // Called for reaction at enter to combat if not in combat yet (enemy can be nullptr)
+    // Called for reaction when initially engaged
     virtual void EnterCombat(Unit* /*victim*/) {}
 
     // Called when the creature is killed
@@ -196,6 +196,7 @@ public:
     virtual bool CanSeeAlways(WorldObject const* /*obj*/) { return false; }
 
     virtual bool CanBeSeen(Player const* /*seer*/) { return true; }
+    virtual bool CanAlwaysBeDetectable(WorldObject const* /*seer*/) { return false; }
 
     virtual void PetStopAttack() { }
 
