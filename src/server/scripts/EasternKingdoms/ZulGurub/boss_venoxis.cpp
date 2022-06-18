@@ -205,7 +205,7 @@ public:
                         DoCast(me, SPELL_RENEW);
                         events.ScheduleEvent(EVENT_RENEW, urand(25000, 30000), 0, PHASE_ONE);
                         break;
-                    case EVENT_HOLY_NOVA:
+                    case EVENT_HOLY_WRATH:
                         _inMeleeRange = 0;
 
                         for (uint8 i = 0; i < 10; ++i)
@@ -218,19 +218,18 @@ public:
 
                         // trigger spellcast only if we have 3 or more targets to affect
                         if (_inMeleeRange >= 3)
-                            DoCastVictim(SPELL_HOLY_NOVA);
+                            DoCastVictim(SPELL_HOLY_WRATH);
 
-                        events.ScheduleEvent(EVENT_HOLY_NOVA, urand(45000, 75000), 0, PHASE_ONE);
+                        events.ScheduleEvent(EVENT_HOLY_WRATH, urand(10000, 15000), 0, PHASE_ONE);
                         break;
                     case EVENT_HOLY_FIRE:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                             DoCast(target, SPELL_HOLY_FIRE);
                         events.ScheduleEvent(EVENT_HOLY_FIRE, urand(45000, 60000), 0, PHASE_ONE);
                         break;
-                    case EVENT_HOLY_WRATH:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random))
-                            DoCast(target, SPELL_HOLY_WRATH);
-                        events.ScheduleEvent(EVENT_HOLY_WRATH, urand(45000, 60000), 0, PHASE_ONE);
+                    case EVENT_HOLY_NOVA:
+                        DoCastSelf(SPELL_HOLY_NOVA);
+                        events.ScheduleEvent(EVENT_HOLY_NOVA, urand(12000, 25000), 0, PHASE_ONE);
                         break;
 
                     //
