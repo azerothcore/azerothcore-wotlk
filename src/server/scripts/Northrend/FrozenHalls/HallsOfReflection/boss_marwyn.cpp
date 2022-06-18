@@ -63,7 +63,7 @@ public:
         void Reset() override
         {
             startFightTimer = 0;
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(true);
             events.Reset();
             if (pInstance)
                 pInstance->SetData(DATA_MARWYN, NOT_STARTED);
@@ -71,7 +71,7 @@ public:
 
         void EnterCombat(Unit* /*who*/) override
         {
-            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(false);
 
             events.ScheduleEvent(EVENT_OBLITERATE, 15000);
             events.ScheduleEvent(EVENT_WELL_OF_CORRUPTION, 13000);

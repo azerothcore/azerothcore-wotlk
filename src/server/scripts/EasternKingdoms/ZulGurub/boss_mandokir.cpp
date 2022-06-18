@@ -138,7 +138,7 @@ public:
                 }
             }
             me->RemoveAurasDueToSpell(SPELL_FRENZY);
-            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(false);
             instance->SetBossState(DATA_OHGAN, NOT_STARTED);
             me->Mount(MODEL_OHGAN_MOUNT);
             reviveGUID.Clear();
@@ -267,7 +267,7 @@ public:
                                 }
                                 break;
                             case EVENT_STARTED:
-                                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                                me->SetImmuneToAll(false);
                                 break;
                             default:
                                 break;

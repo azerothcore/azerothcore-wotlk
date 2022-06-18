@@ -1113,7 +1113,7 @@ namespace Acore
         {}
         bool operator()(Unit* u)
         {
-            if (!u->IsAlive() || u->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE) || (u->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC) && !u->IsInCombat()))
+            if (!u->IsAlive() || u->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE) || (u->IsImmuneToPC() && !u->IsInCombat()))
                 return false;
             if (u->GetGUID() == i_funit->GetGUID())
                 return false;

@@ -215,7 +215,7 @@ void npc_escortAI::EnterEvadeMode(EvadeReason /*why*/)
     {
         me->GetMotionMaster()->MoveTargetedHome();
         if (HasImmuneToNPCFlags)
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToNPC(true);
         Reset();
     }
 }
@@ -497,10 +497,10 @@ void npc_escortAI::Start(bool isActiveAttacker /* = true*/, bool run /* = false 
 
     //disable npcflags
     me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
-    if (me->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC))
+    if (me->IsImmuneToNPC())
     {
         HasImmuneToNPCFlags = true;
-        me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+        me->SetImmuneToNPC(false);
     }
 
     LOG_DEBUG("scripts.ai", "EscortAI started with {} waypoints. ActiveAttacker = {}, Run = {}, PlayerGUID = {}",

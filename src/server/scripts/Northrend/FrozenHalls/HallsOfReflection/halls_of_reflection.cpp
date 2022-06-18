@@ -755,7 +755,10 @@ public:
         {
             ScriptedAI::EnterEvadeMode(why);
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
-                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+            {
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetImmuneToAll(false);
+            }
         }
     };
 };
@@ -851,7 +854,10 @@ public:
         {
             ScriptedAI::EnterEvadeMode(why);
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
-                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+            {
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetImmuneToAll(false);
+            }
         }
     };
 };
@@ -994,7 +1000,10 @@ public:
         {
             ScriptedAI::EnterEvadeMode(why);
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
-                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+            {
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetImmuneToAll(false);
+            }
         }
     };
 };
@@ -1077,7 +1086,10 @@ public:
         {
             ScriptedAI::EnterEvadeMode(why);
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
-                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+            {
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetImmuneToAll(false);
+            }
         }
     };
 };
@@ -1161,7 +1173,10 @@ public:
         {
             ScriptedAI::EnterEvadeMode(why);
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
-                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+            {
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetImmuneToAll(false);
+            }
         }
     };
 };

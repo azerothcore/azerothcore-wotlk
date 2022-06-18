@@ -724,13 +724,13 @@ public:
                                             if (ptarget->GetPositionX() > 120)
                                             {
                                                 ptarget->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(WEAPON_SPEAR));
-                                                ptarget->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                                                ptarget->SetImmuneToPC(true);
                                                 ptarget->SetReactState(REACT_PASSIVE);
                                                 ptarget->AI()->SetData(0, 1);
                                             }
                                             else
                                             {
-                                                ptarget->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                                                ptarget->SetImmuneToPC(true);
                                                 ptarget->SetReactState(REACT_PASSIVE);
                                                 ptarget->AI()->SetData(0, 2);
                                             }
