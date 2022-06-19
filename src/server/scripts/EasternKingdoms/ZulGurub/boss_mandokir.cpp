@@ -139,10 +139,11 @@ public:
                 }
             }
             me->RemoveAurasDueToSpell(SPELL_FRENZY);
-            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(false);
             instance->SetBossState(DATA_OHGAN, NOT_STARTED);
             me->Mount(MODEL_OHGAN_MOUNT);
             reviveGUID.Clear();
+            _useExecute = false;
             _chargeTarget.first.Clear();
         }
 
@@ -163,14 +164,13 @@ public:
         void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
-            events.ScheduleEvent(EVENT_OVERPOWER, urand(6000, 8000));
+            events.ScheduleEvent(EVENT_OVERPOWER, 1000);
             events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(14000, 28000));
             events.ScheduleEvent(EVENT_WHIRLWIND, urand(24000, 30000));
             events.ScheduleEvent(EVENT_CHECK_OHGAN, 1000);
             events.ScheduleEvent(EVENT_WATCH_PLAYER, urand(12000, 24000));
             events.ScheduleEvent(EVENT_CHARGE_PLAYER, urand(30000, 40000));
-            events.ScheduleEvent(EVENT_EXECUTE, urand(7000, 14000));
-            events.ScheduleEvent(EVENT_CLEAVE, urand(10000, 20000));
+            events.ScheduleEvent(EVENT_CLEAVE, 1000);
             me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
             Talk(SAY_AGGRO);
             me->Dismount();
@@ -271,6 +271,26 @@ public:
             }
         }
 
+        void DamageDealt(Unit* doneTo, uint32& damage, DamageEffectType /*damagetype*/) override
+        {
+            if (doneTo && doneTo == me->GetVictim())
+            {
+                if (doneTo->HealthBelowPctDamaged(20, damage))
+                {
+                    if (!_useExecute)
+                    {
+                        _useExecute = true;
+                        events.ScheduleEvent(EVENT_EXECUTE, 1000);
+                    }
+                }
+                else if (_useExecute)
+                {
+                    _useExecute = false;
+                    events.CancelEvent(EVENT_EXECUTE);
+                }
+            }
+        }
+                
         void DoMeleeAttackIfReady(bool ignoreCasting)
         {
             if (!ignoreCasting && me->HasUnitState(UNIT_STATE_CASTING))
@@ -332,7 +352,7 @@ public:
                                 }
                                 break;
                             case EVENT_STARTED:
-                                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                                me->SetImmuneToAll(false);
                                 break;
                             default:
                                 break;
@@ -357,8 +377,14 @@ public:
                 switch (eventId)
                 {
                     case EVENT_OVERPOWER:
-                        DoCastVictim(SPELL_OVERPOWER);
-                        events.ScheduleEvent(EVENT_OVERPOWER, urand(6000, 8000));
+                        if (DoCastVictim(SPELL_OVERPOWER) == SPELL_CAST_OK)
+                        {
+                            events.ScheduleEvent(EVENT_OVERPOWER, urand(6000, 8000));
+                        }
+                        else
+                        {
+                            events.ScheduleEvent(EVENT_OVERPOWER, 1000);
+                        }
                         break;
                     case EVENT_MORTAL_STRIKE:
                         DoCastVictim(SPELL_MORTAL_STRIKE);
@@ -398,10 +424,7 @@ public:
                         events.ScheduleEvent(EVENT_CHARGE_PLAYER, urand(30000, 40000));
                         break;
                     case EVENT_EXECUTE:
-                        if (me->GetVictim() && me->GetVictim()->HealthBelowPct(20))
-                        {
-                            DoCastVictim(SPELL_EXECUTE, true);
-                        }
+                        DoCastVictim(SPELL_EXECUTE, true);
                         events.ScheduleEvent(EVENT_EXECUTE, urand(7000, 14000));
                         break;
                     case EVENT_FRIGHTENING_SHOUT:
@@ -422,8 +445,12 @@ public:
                             if (meleeRangeTargets.size() >= 5)
                             {
                                 DoCastVictim(SPELL_MANDOKIR_CLEAVE);
+                                events.ScheduleEvent(EVENT_CLEAVE, urand(10000, 20000));
                             }
-                            events.ScheduleEvent(EVENT_CLEAVE, urand(10000, 20000));
+                            else
+                            {
+                                events.ScheduleEvent(EVENT_CLEAVE, 1000);
+                            }
                             break;
                         }
                     default:
@@ -438,6 +465,7 @@ public:
         uint8 killCount;
         ObjectGuid chainedSpiritGUIDs[CHAINED_SPIRIT_COUNT];
         ObjectGuid reviveGUID;
+        bool _useExecute;
         std::pair<ObjectGuid, float> _chargeTarget;
     };
 

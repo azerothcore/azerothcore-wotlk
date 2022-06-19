@@ -1431,7 +1431,7 @@ public:
                     return;
 
                 me->setActive(true);
-                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                me->SetImmuneToPC(true);
                 float moveTime = me->GetExactDist(&SpinestalkerFlyPos) / (me->GetSpeed(MOVE_RUN) * 0.001f);
                 me->m_Events.AddEvent(new FrostwyrmLandEvent(*me, SpinestalkerLandPos), me->m_Events.CalculateTime(uint64(moveTime) + 250));
                 me->SetDefaultMovementType(IDLE_MOTION_TYPE);
@@ -1450,7 +1450,7 @@ public:
             me->SetDisableGravity(false);
             me->SetHomePosition(SpinestalkerLandPos);
             me->SetFacingTo(SpinestalkerLandPos.GetOrientation());
-            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetImmuneToPC(false);
         }
 
         void UpdateAI(uint32 diff) override
@@ -1562,7 +1562,7 @@ public:
                     return;
 
                 me->setActive(true);
-                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                me->SetImmuneToPC(true);
                 float moveTime = me->GetExactDist(&RimefangFlyPos) / (me->GetSpeed(MOVE_RUN) * 0.001f);
                 me->m_Events.AddEvent(new FrostwyrmLandEvent(*me, RimefangLandPos), me->m_Events.CalculateTime(uint64(moveTime) + 250));
                 me->SetDefaultMovementType(IDLE_MOTION_TYPE);
@@ -1583,7 +1583,7 @@ public:
                 me->SetDisableGravity(false);
                 me->SetHomePosition(RimefangLandPos);
                 me->SetFacingTo(RimefangLandPos.GetOrientation());
-                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                me->SetImmuneToPC(false);
             }
             else if (point == POINT_LAND_GROUND)
             {

@@ -1647,6 +1647,13 @@ public:
 
     [[nodiscard]] bool IsInFlight()  const { return HasUnitState(UNIT_STATE_IN_FLIGHT); }
 
+    void SetImmuneToAll(bool apply, bool keepCombat = false) { SetImmuneToPC(apply, keepCombat); SetImmuneToNPC(apply, keepCombat); }
+    bool IsImmuneToAll() const { return IsImmuneToPC() && IsImmuneToNPC(); }
+    void SetImmuneToPC(bool apply, bool keepCombat = false);
+    bool IsImmuneToPC() const { return HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC); }
+    void SetImmuneToNPC(bool apply, bool keepCombat = false);
+    bool IsImmuneToNPC() const { return HasUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC); }
+
     bool IsEngaged() const { return IsInCombat(); }
     bool IsEngagedBy(Unit const* who) const { return IsInCombatWith(who); }
 

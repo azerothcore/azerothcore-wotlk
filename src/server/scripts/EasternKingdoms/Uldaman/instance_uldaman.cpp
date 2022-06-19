@@ -201,14 +201,14 @@ public:
         {
             Creature* target = GetUnitOwner()->ToCreature();
             target->SetReactState(REACT_PASSIVE);
-            target->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            target->SetImmuneToAll(true);
         }
 
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             Creature* target = GetUnitOwner()->ToCreature();
             target->SetReactState(REACT_AGGRESSIVE);
-            target->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            target->SetImmuneToAll(false);
         }
 
         void Register() override

@@ -1830,14 +1830,14 @@ bool Creature::CanStartAttack(Unit const* who) const
         return false;
 
     // This set of checks is should be done only for creatures
-    if ((HasUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC) && who->GetTypeId() != TYPEID_PLAYER) ||      // flag is valid only for non player characters
-        (HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC) && who->GetTypeId() == TYPEID_PLAYER))         // immune to PC and target is a player, return false
+    if ((IsImmuneToNPC() && who->GetTypeId() != TYPEID_PLAYER) ||      // flag is valid only for non player characters
+        (IsImmuneToPC() && who->GetTypeId() == TYPEID_PLAYER))         // immune to PC and target is a player, return false
     {
         return false;
     }
 
     if (Unit* owner = who->GetOwner())
-        if (owner->GetTypeId() == TYPEID_PLAYER && HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC))     // immune to PC and target has player owner
+        if (owner->GetTypeId() == TYPEID_PLAYER && IsImmuneToPC())     // immune to PC and target has player owner
             return false;
 
     // Do not attack non-combat pets
@@ -2368,7 +2368,7 @@ bool Creature::CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction /
     if (IsCivilian())
         return false;
 
-    if (HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_NPC))
+    if (HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE) || IsImmuneToNPC())
         return false;
 
     // skip fighting creature

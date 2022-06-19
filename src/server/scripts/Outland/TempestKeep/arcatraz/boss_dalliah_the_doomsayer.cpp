@@ -66,14 +66,14 @@ public:
         {
             _Reset();
             events2.Reset();
-            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(false);
         }
 
         void InitializeAI() override
         {
             BossAI::InitializeAI();
             if (instance->GetBossState(DATA_SOCCOTHRATES) != DONE)
-                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetImmuneToAll(true);
         }
 
         void JustDied(Unit* /*killer*/) override
