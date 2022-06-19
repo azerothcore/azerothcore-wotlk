@@ -701,8 +701,8 @@ void GameObject::Update(uint32 diff)
                         // search unfriendly creature
                         if (owner && goInfo->trap.autoCloseTime != -1) // hunter trap
                         {
-                            Acore::AnyUnfriendlyNoTotemUnitInObjectRangeCheck checker(this, owner, radius);
-                            Acore::UnitSearcher<Acore::AnyUnfriendlyNoTotemUnitInObjectRangeCheck> searcher(this, target, checker);
+                            Acore::NearestAttackableNoTotemUnitInObjectRangeCheck checker(this, owner, radius);
+                            Acore::UnitSearcher<Acore::NearestAttackableNoTotemUnitInObjectRangeCheck> searcher(this, target, checker);
                             Cell::VisitAllObjects(this, searcher, radius);
                         }
                         else                                        // environmental trap
@@ -2088,7 +2088,7 @@ void GameObject::CastSpell(Unit* target, uint32 spellId)
             trigger->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
 
         // xinef: Remove Immunity flags
-        trigger->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+        trigger->SetImmuneToNPC(false);
         // xinef: set proper orientation, fixes cast against stealthed targets
         if (target)
             trigger->SetInFront(target);

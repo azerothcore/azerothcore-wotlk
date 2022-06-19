@@ -731,7 +731,8 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
         return;
     }
 
-    if (!player->IsInAreaTriggerRadius(atEntry))
+    bool isTavernAreatrigger = sObjectMgr->IsTavernAreaTrigger(triggerId);
+    if (!player->IsInAreaTriggerRadius(atEntry, isTavernAreatrigger ? 5.f : 0.f))
     {
         LOG_DEBUG("network", "HandleAreaTriggerOpcode: Player {} ({}) too far (trigger map: {} player map: {}), ignore Area Trigger ID: {}",
                        player->GetName(), player->GetGUID().ToString(), atEntry->map, player->GetMapId(), triggerId);
@@ -749,7 +750,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
             if (player->GetQuestStatus(questId) == QUEST_STATUS_INCOMPLETE)
                 player->AreaExploredOrEventHappens(questId);
 
-    if (sObjectMgr->IsTavernAreaTrigger(triggerId))
+    if (isTavernAreatrigger)
     {
         // set resting flag we are in the inn
         player->SetRestFlag(REST_FLAG_IN_TAVERN, atEntry->entry);

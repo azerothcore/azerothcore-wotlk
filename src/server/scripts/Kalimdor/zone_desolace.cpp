@@ -258,14 +258,14 @@ public:
                 {
                     summon->SetFaction(faction);
                     if (remove)
-                        summon->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+                        summon->SetImmuneToNPC(false);
                     else
-                        summon->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+                        summon->SetImmuneToNPC(true);
                 }
             if (remove)
-                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetImmuneToNPC(false);
             else
-                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetImmuneToNPC(true);
             me->SetFaction(faction);
         }
 
