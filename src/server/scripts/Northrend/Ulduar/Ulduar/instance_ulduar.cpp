@@ -185,7 +185,7 @@ public:
                 else // if (m_algalonTimer = TIMER_ALGALON_TO_SUMMON)
                 {
                     m_algalonTimer = TIMER_ALGALON_SUMMONED;
-                    algalon->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                    algalon->SetImmuneToPC(false);
                 }
             }
         }

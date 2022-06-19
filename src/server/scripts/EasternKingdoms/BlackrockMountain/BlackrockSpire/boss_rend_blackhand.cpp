@@ -114,11 +114,13 @@ public:
 
             if (instance->GetBossState(DATA_GYTH) == IN_PROGRESS)
             {
-                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_PREPARATION);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PREPARATION);
+                me->SetImmuneToAll(false);
                 return;
             }
 
-            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_PREPARATION);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PREPARATION);
+            me->SetImmuneToAll(true);
             gythEvent = false;
             victorGUID.Clear();
             waveDoorGUID.Clear();

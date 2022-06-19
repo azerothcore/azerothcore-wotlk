@@ -38,12 +38,14 @@ enum DataTypes
     DATA_BUG_TRIO_DEATH     = 14,
     DATA_CTHUN_PHASE        = 20,
     DATA_VISCIDUS           = 21,
-    DATA_SARTURA            = 22
+    DATA_SARTURA            = 22,
+
+    DATA_EYE_OF_CTHUN       = 23
 };
 
 enum Creatures
 {
-    BOSS_EYE_OF_CTHUN       = 15589,
+    NPC_EYE_OF_CTHUN        = 15589,
     NPC_CTHUN_PORTAL        = 15896,
     NPC_CLAW_TENTACLE       = 15725,
     NPC_EYE_TENTACLE        = 15726,

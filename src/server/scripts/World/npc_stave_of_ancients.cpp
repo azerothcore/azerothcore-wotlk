@@ -371,7 +371,8 @@ public:
                     if (!ValidThreatlist())
                     {
                         SetHomePosition();
-                        me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1);
+                        me->SetImmuneToAll(true);
                         me->DespawnOrUnsummon(5000);
                         break;
                     }
@@ -751,8 +752,10 @@ public:
                         SetHomePosition();
                         PreciousAI()->SetHomePosition();
 
-                        Precious()->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-                        me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        Precious()->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1);
+                        Precious()->SetImmuneToAll(true);
+                        me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1);
+                        me->SetImmuneToAll(true);
 
                         Precious()->DespawnOrUnsummon(5000);
 
@@ -962,7 +965,8 @@ public:
                     {
                         SetHomePosition();
                         me->RemoveAllMinionsByEntry(CREEPING_DOOM_ENTRY);
-                        me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1);
+                        me->SetImmuneToAll(true);
                         me->CombatStop(true);
                         me->Say(NELSON_DESPAWN_SAY);
                         me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
@@ -1136,7 +1140,8 @@ public:
                     if (!ValidThreatlist())
                     {
                         SetHomePosition();
-                        me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1);
+                        me->SetImmuneToAll(true);
                         me->CombatStop(true);
                         me->Say(FRANKLIN_DESPAWN_SAY);
                         me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
