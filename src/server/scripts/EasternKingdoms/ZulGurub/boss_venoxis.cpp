@@ -206,30 +206,18 @@ public:
                         events.ScheduleEvent(EVENT_RENEW, urand(25000, 30000), 0, PHASE_ONE);
                         break;
                     case EVENT_HOLY_WRATH:
-                        _inMeleeRange = 0;
-
-                        for (uint8 i = 0; i < 10; ++i)
-                        {
-                            if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, i))
-                                // check if target is within melee-distance
-                                if (me->IsWithinMeleeRange(target))
-                                    ++_inMeleeRange;
-                        }
-
-                        // trigger spellcast only if we have 3 or more targets to affect
-                        if (_inMeleeRange >= 3)
-                            DoCastVictim(SPELL_HOLY_WRATH);
-
-                        events.ScheduleEvent(EVENT_HOLY_WRATH, urand(10000, 15000), 0, PHASE_ONE);
+                        if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat))
+                            DoCast(target, SPELL_HOLY_WRATH);
+                        events.ScheduleEvent(EVENT_HOLY_WRATH, urand(12000, 22000), 0, PHASE_ONE);
                         break;
                     case EVENT_HOLY_FIRE:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                             DoCast(target, SPELL_HOLY_FIRE);
-                        events.ScheduleEvent(EVENT_HOLY_FIRE, urand(45000, 60000), 0, PHASE_ONE);
+                        events.ScheduleEvent(EVENT_HOLY_FIRE, urand(10000, 24000), 0, PHASE_ONE);
                         break;
                     case EVENT_HOLY_NOVA:
                         DoCastSelf(SPELL_HOLY_NOVA);
-                        events.ScheduleEvent(EVENT_HOLY_NOVA, urand(12000, 25000), 0, PHASE_ONE);
+                        events.ScheduleEvent(EVENT_HOLY_NOVA, urand(10000, 24000), 0, PHASE_ONE);
                         break;
 
                     //
