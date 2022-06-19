@@ -5856,31 +5856,27 @@ SpellCastResult Spell::CheckCast(bool strict)
             if ((!m_caster->IsTotem() || !m_spellInfo->IsPositive()) && !m_spellInfo->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT) &&
                 !m_spellInfo->HasAttribute(SPELL_ATTR5_ALWAYS_AOE_LINE_OF_SIGHT) && !(m_spellFlags & SPELL_FLAG_REDIRECTED))
             {
-                WorldObject* losCenter = nullptr;
+                bool castedByGameobject = false;
                 uint32 losChecks = LINEOFSIGHT_ALL_CHECKS;
                 if (m_originalCasterGUID.IsGameObject())
                 {
-                    losCenter = m_caster->GetMap()->GetGameObject(m_originalCasterGUID);
+                    castedByGameobject = m_caster->GetMap()->GetGameObject(m_originalCasterGUID) != nullptr;
                 }
                 else if (m_caster->GetEntry() == WORLD_TRIGGER)
                 {
                     if (TempSummon* tempSummon = m_caster->ToTempSummon())
                     {
-                        losCenter = tempSummon->GetSummonerGameObject();
+                        castedByGameobject = tempSummon->GetSummonerGameObject() != nullptr;
                     }
                 }
 
-                if (losCenter)
+                if (castedByGameobject)
                 {
                     // If spell casted by gameobject then ignore M2 models
                     losChecks &= ~LINEOFSIGHT_CHECK_GOBJECT_M2;
                 }
-                else
-                {
-                    losCenter = m_caster;
-                }
 
-                if (!losCenter->IsWithinLOSInMap(target, VMAP::ModelIgnoreFlags::M2, LineOfSightChecks(losChecks)))
+                if (!m_caster->IsWithinLOSInMap(target, VMAP::ModelIgnoreFlags::M2, LineOfSightChecks(losChecks)))
                 {
                     return SPELL_FAILED_LINE_OF_SIGHT;
                 }
@@ -7973,7 +7969,6 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
                 }
             }
 
-            WorldObject* caster = nullptr;
             if (gobCaster)
             {
                 if (gobCaster->GetGOInfo()->IsIgnoringLOSChecks())
@@ -7981,14 +7976,8 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
                     return true;
                 }
 
-                caster = gobCaster;
-
                 // If spell casted by gameobject then ignore M2 models
                 losChecks &= ~LINEOFSIGHT_CHECK_GOBJECT_M2;
-            }
-            else
-            {
-                caster = m_caster;
             }
 
             if (target != m_caster)
@@ -8004,7 +7993,7 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
                         return false;
                     }
                 }
-                else if (!target->IsWithinLOSInMap(caster, VMAP::ModelIgnoreFlags::M2, LineOfSightChecks(losChecks)))
+                else if (!m_caster->IsWithinLOSInMap(target, VMAP::ModelIgnoreFlags::M2, LineOfSightChecks(losChecks)))
                 {
                     return false;
                 }
