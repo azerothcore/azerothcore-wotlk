@@ -1,5 +1,3 @@
-
-
 DELETE FROM `npc_text_locale` WHERE `ID`=13321 AND `locale` IN ('esES','esMX','frFR','zhCN','deDE'); 
 INSERT INTO `npc_text_locale` (`ID`, `Locale`, `Text0_0`, `Text0_1`) VALUES
 (13321,"frFR","","Depuis ce quai, la Bravoure fait l\'aller-retour entre Hurlevent et Auberdine."),
