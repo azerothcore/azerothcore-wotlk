@@ -372,12 +372,12 @@ void ThreatMgr::AddThreat(Unit* target, float amount, SpellInfo const* spell, bo
     PutThreatListRef(target->GetGUID(), ref);
     target->GetThreatMgr().PutThreatenedByMeRef(_owner->GetGUID(), ref);
 
-    Creature* cOwner = _owner->ToCreature();
-    assert(cOwner); // if we got here the owner can have a threat list, and must be a creature!
-    if (!_ownerEngaged && (cOwner->HasReactState(REACT_PASSIVE) || !ref->IsOffline()))
+    if (!_ownerEngaged)
     {
         _ownerEngaged = true;
 
+        Creature* cOwner = _owner->ToCreature();
+        ASSERT(cOwner); // if we got here the owner can have a threat list, and must be a creature!
         SaveCreatureHomePositionIfNeed(cOwner);
         if (cOwner->IsAIEnabled)
             cOwner->AI()->EnterCombat(target);
@@ -396,26 +396,16 @@ void ThreatMgr::MatchUnitThreatToHighestThreat(Unit* target)
     if (_sortedThreatList.empty())
         return;
 
-    auto it = _sortedThreatList.begin(), end = _sortedThreatList.end();
+    auto it = _sortedThreatList.ordered_begin(), end = _sortedThreatList.ordered_end();
     ThreatReference const* highest = *it;
-    if (!highest->IsOnline())
+    if (!highest->IsAvailable())
         return;
 
-    if (highest->_taunted) // might need to skip this - new max could be one of the preceding elements (heap property) since there is only one taunt element
+    if (highest->IsTaunting() && ((++it) != end)) // might need to skip this - max threat could be the preceding element (there is only one taunt element)
     {
-        if ((++it) != end)
-        {
-            ThreatReference const* a = *it;
-            if (a->IsOnline() && a->GetThreat() > highest->GetThreat())
-                highest = a;
-
-            if ((++it) != end)
-            {
-                ThreatReference const* a = *it;
-                if (a->IsOnline() && a->GetThreat() > highest->GetThreat())
-                    highest = a;
-            }
-        }
+        ThreatReference const* a = *it;
+        if (a->IsAvailable() && a->GetThreat() > highest->GetThreat())
+            highest = a;
     }
 
     AddThreat(target, highest->GetThreat() - GetThreat(target, true), nullptr, true, true);
@@ -716,7 +706,7 @@ void ThreatMgr::PurgeThreatListRef(ObjectGuid const& guid, bool sendRemove)
         _currentVictimRef = nullptr;
 
     _sortedThreatList.erase(ref->_handle);
-    if (sendRemove && ref->IsOnline())
+    if (sendRemove && ref->IsAvailable())
         SendRemoveToClients(ref->_victim);
 }
 
