@@ -64,7 +64,7 @@ enum BatIds
 
 enum Events
 {
-    // Phase one
+    // Phase one,
     EVENT_CHARGE_JEKLIK         = 1,
     EVENT_PIERCE_ARMOR,
     EVENT_BLOOD_LEECH,
@@ -97,6 +97,8 @@ Position const SpawnBat[6] =
     { -12293.6220f, -1380.2640f, 144.8304f, 5.483f }
 };
 
+Position const homePosition = { -12291.9f, -1380.08f, 144.902f, 2.28638f };
+
 struct boss_jeklik : public BossAI
 {
     boss_jeklik(Creature* creature) : BossAI(creature, DATA_JEKLIK) { }
@@ -106,7 +108,9 @@ struct boss_jeklik : public BossAI
         DoCastSelf(SPELL_GREEN_CHANNELING);
         me->SetHover(false);
         me->SetDisableGravity(false);
+        me->SetReactState(REACT_PASSIVE);
         _Reset();
+        SetCombatMovement(false);
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -117,22 +121,31 @@ struct boss_jeklik : public BossAI
 
     void EnterEvadeMode(EvadeReason why) override
     {
-        const Position homePos = me->GetHomePosition();
-        me->NearTeleportTo(homePos.GetPositionX(), homePos.GetPositionY(), homePos.GetPositionZ(), homePos.GetOrientation());
+        me->GetMotionMaster()->Clear();
+        me->SetHomePosition(homePosition);
+        me->NearTeleportTo(homePosition.GetPositionX(), homePosition.GetPositionY(), homePosition.GetPositionZ(), homePosition.GetOrientation());
         BossAI::EnterEvadeMode(why);
     }
 
     void EnterCombat(Unit* /*who*/) override
     {
-        _EnterCombat();
         Talk(SAY_AGGRO);
         me->RemoveAurasDueToSpell(SPELL_GREEN_CHANNELING);
         me->SetHover(true);
         me->SetDisableGravity(true);
-        me->AddUnitState(UNIT_STATE_IGNORE_PATHFINDING);
-        DoCastSelf(SPELL_BAT_FORM);
-        events.SetPhase(PHASE_ONE);
+        DoCastSelf(SPELL_BAT_FORM, true);
 
+        me->GetMotionMaster()->MovePath(me->GetEntry(), false);
+    }
+
+    void PathEndReached(uint32 /*pathId*/) override
+    {
+        me->SetHover(false);
+        me->SetDisableGravity(false);
+        _EnterCombat();
+        SetCombatMovement(true);
+        me->SetReactState(REACT_AGGRESSIVE);
+        events.SetPhase(PHASE_ONE);
         events.ScheduleEvent(EVENT_CHARGE_JEKLIK, urand(10000, 20000), PHASE_ONE);
         events.ScheduleEvent(EVENT_PIERCE_ARMOR, urand(5000, 15000), PHASE_ONE);
         events.ScheduleEvent(EVENT_BLOOD_LEECH, urand(5000, 15000), PHASE_ONE);
@@ -146,8 +159,6 @@ struct boss_jeklik : public BossAI
         if (events.IsInPhase(PHASE_ONE) && !HealthAbovePct(50))
         {
             me->RemoveAurasDueToSpell(SPELL_BAT_FORM);
-            me->SetHover(false);
-            me->SetDisableGravity(false);
             DoResetThreat();
             events.SetPhase(PHASE_TWO);
             events.CancelEventGroup(PHASE_ONE);
