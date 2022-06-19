@@ -285,7 +285,7 @@ bool Group::CheckLevelForRaid()
         if (Player* player = ObjectAccessor::FindPlayer(citr->guid))
             if (player->getLevel() < sConfigMgr->GetOption<int32>("Group.Raid.LevelRestriction", 10))
                 return true;
-    
+
     return false;
 }
 
