@@ -999,7 +999,11 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             victim->ToCreature()->SetLootRecipient(attacker);
 
         if (!attacker || attacker->IsControlledByPlayer() || attacker->IsCreatedByPlayer())
-            victim->ToCreature()->LowerPlayerDamageReq(health < damage ?  health : damage);
+        {
+            uint32 unDamage = health < damage ? health : damage;
+            bool damagedByPlayer = unDamage && attacker && attacker->m_movedByPlayer != nullptr;
+            victim->ToCreature()->LowerPlayerDamageReq(unDamage, damagedByPlayer);
+        }
     }
 
     if (health <= damage)
