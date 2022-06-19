@@ -173,6 +173,9 @@ void ThreatMgr::Initialize()
 
 void ThreatMgr::Update(uint32 tdiff)
 {
+    if (!CanHaveThreatList() || !IsEngaged())
+        return;
+
     if (_updateClientTimer <= tdiff)
     {
         _updateClientTimer = CLIENT_THREAT_UPDATE_INTERVAL;
@@ -330,8 +333,10 @@ void ThreatMgr::AddThreat(Unit* target, float amount, SpellInfo const* spell, bo
         if (!redirInfo.empty())
         {
             float const origAmount = amount;
-            for (auto const& pair : redirInfo) // (victim,pct)
+            // intentional iteration by index - there's a nested AddThreat call further down that might cause AI calls which might modify redirect info through spells
+            for (size_t i = 0; i < redirInfo.size(); ++i)
             {
+                auto const pair = redirInfo[i]; // (victim,pct)
                 Unit* redirTarget = nullptr;
                 auto it = _myThreatListEntries.find(pair.first); // try to look it up in our threat list first (faster)
                 if (it != _myThreatListEntries.end())
@@ -349,7 +354,7 @@ void ThreatMgr::AddThreat(Unit* target, float amount, SpellInfo const* spell, bo
         }
     }
 
-    // otherwise, ensure we're in combat (threat implies combat!)
+    // ensure we're in combat (threat implies combat!)
     if (!_owner->GetCombatMgr().SetInCombatWith(target)) // if this returns false, we're not actually in combat, and thus cannot have threat!
         return;                                              // typical causes: bad scripts trying to add threat to GMs, dead targets etc
 
