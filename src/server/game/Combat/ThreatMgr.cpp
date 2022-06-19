@@ -371,12 +371,13 @@ void ThreatMgr::AddThreat(Unit* target, float amount, SpellInfo const* spell, bo
     ThreatReference* ref = new ThreatReference(this, target, amount);
     PutThreatListRef(target->GetGUID(), ref);
     target->GetThreatMgr().PutThreatenedByMeRef(_owner->GetGUID(), ref);
-    if (!ref->IsOffline() && !_ownerEngaged)
+
+    Creature* cOwner = _owner->ToCreature();
+    assert(cOwner); // if we got here the owner can have a threat list, and must be a creature!
+    if (!_ownerEngaged && (cOwner->HasReactState(REACT_PASSIVE) || !ref->IsOffline()))
     {
         _ownerEngaged = true;
 
-        Creature* cOwner = _owner->ToCreature();
-        assert(cOwner); // if we got here the owner can have a threat list, and must be a creature!
         SaveCreatureHomePositionIfNeed(cOwner);
         if (cOwner->IsAIEnabled)
             cOwner->AI()->EnterCombat(target);
@@ -606,8 +607,11 @@ void ThreatMgr::ForwardThreatForAssistingMe(Unit* assistant, float baseAmount, S
 {
     if (spell && spell->HasAttribute(SPELL_ATTR1_NO_THREAT)) // shortcut, none of the calls would do anything
         return;
+    if (_threatenedByMe.empty())
+        return;
+    float const perTarget = baseAmount / _threatenedByMe.size(); // Threat is divided evenly among all targets (LibThreat sourced)
     for (auto const& pair : _threatenedByMe)
-        pair.second->GetOwner()->GetThreatMgr().AddThreat(assistant, baseAmount, spell, ignoreModifiers);
+        pair.second->GetOwner()->GetThreatMgr().AddThreat(assistant, perTarget, spell, ignoreModifiers);
 }
 
 void ThreatMgr::RemoveMeFromThreatLists()
