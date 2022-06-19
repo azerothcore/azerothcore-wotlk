@@ -80,7 +80,7 @@ public:
             owner->CastSpell(owner, SPELL_SUBDUED, true);
             GetCaster()->CastSpell(GetCaster(), SPELL_DRAKE_HATCHLING_SUBDUED, true);
             owner->SetFaction(FACTION_FRIENDLY);
-            owner->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            owner->SetImmuneToAll(true);
             owner->DespawnOrUnsummon(3 * MINUTE * IN_MILLISECONDS);
         }
 
@@ -1505,7 +1505,7 @@ public:
 
         void Reset() override
         {
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetImmuneToAll(true);
             _events.ScheduleEvent(EVENT_THASSARIAN_CAST, 1000);
         }
 
@@ -1673,7 +1673,7 @@ public:
                         {
                             _arlosGUID = arlos->GetGUID();
                             arlos->SetWalk(true);
-                            arlos->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                            arlos->SetImmuneToAll(true);
                             arlos->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                             arlos->GetMotionMaster()->MovePath(PATH_ARLOS, false);
                         }
@@ -1681,7 +1681,7 @@ public:
                         {
                             _leryssaGUID = leryssa->GetGUID();
                             leryssa->SetWalk(true);
-                            leryssa->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                            leryssa->SetImmuneToAll(true);
                             leryssa->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                             leryssa->GetMotionMaster()->MovePath(PATH_LERYSSA, false);
                         }

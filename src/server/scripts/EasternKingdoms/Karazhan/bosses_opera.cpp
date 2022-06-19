@@ -107,7 +107,7 @@ void SummonCroneIfReady(InstanceScript* instance, Creature* creature)
             if (creature->GetVictim())
                 pCrone->AI()->AttackStart(creature->GetVictim());
             pCrone->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-            pCrone->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+            pCrone->SetImmuneToPC(false);
         }
     }
 }

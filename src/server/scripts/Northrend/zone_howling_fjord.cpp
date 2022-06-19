@@ -125,7 +125,13 @@ public:
         {
             if (HealthBelowPct(50) && !health50)
             {
-                Talk(SAY_TURMOIL_HALF_HP, me->ToTempSummon()->GetSummonerUnit()->ToPlayer());
+                WorldObject* summoner = nullptr;
+                if (TempSummon const* tempSummon = me->ToTempSummon())
+                {
+                    summoner = tempSummon->GetSummonerUnit();
+                }
+
+                Talk(SAY_TURMOIL_HALF_HP, summoner);
                 health50 = true;
             }
         }
