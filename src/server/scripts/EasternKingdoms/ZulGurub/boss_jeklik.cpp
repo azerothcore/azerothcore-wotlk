@@ -64,7 +64,7 @@ enum BatIds
 
 enum Events
 {
-    // Phase one,
+    // Phase one
     EVENT_CHARGE_JEKLIK         = 1,
     EVENT_PIERCE_ARMOR,
     EVENT_BLOOD_LEECH,
