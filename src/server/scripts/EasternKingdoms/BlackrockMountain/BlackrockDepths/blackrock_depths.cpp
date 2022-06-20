@@ -435,6 +435,11 @@ enum PhalanxSpells
     SPELL_MIGHTYBLOW                    = 14099
 };
 
+enum PhalanxPaths
+{
+    PHALANX_PATH_ID                     = 32365006,
+};
+
 class npc_phalanx : public CreatureScript
 {
 public:
@@ -625,6 +630,7 @@ public:
 
         uint32 BreakKeg_Timer;
         uint32 BreakDoor_Timer;
+        uint32 PhalanxMove_Timer;
 
         void Reset() override
         {
@@ -633,6 +639,7 @@ public:
 
             BreakKeg_Timer = 0;
             BreakDoor_Timer = 0;
+            PhalanxMove_Timer = 0;
         }
 
         void DoGo(uint32 id, uint32 state)
@@ -685,8 +692,7 @@ public:
                     DoGo(DATA_GO_BAR_KEG_TRAP, 0);               //doesn't work very well, leaving code here for future
                     //spell by trap has effect61, this indicate the bar go hostile
 
-                    if (Unit* tmp = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_PHALANX)))
-                        tmp->SetFaction(FACTION_MONSTER);
+                    PhalanxMove_Timer = 5000;
 
                     //for later, this event(s) has alot more to it.
                     //optionally, DONE can trigger bar to go hostile.
@@ -695,6 +701,20 @@ public:
                     BreakDoor_Timer = 0;
                 }
                 else BreakDoor_Timer -= diff;
+            }
+
+            if (PhalanxMove_Timer)
+            {
+                if (PhalanxMove_Timer <= diff)
+                {
+                    if (Unit* phalanx = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_PHALANX))) {
+                        phalanx->SetFaction(FACTION_MONSTER);
+                        phalanx->GetMotionMaster()->MovePath(PHALANX_PATH_ID, false);
+                    }
+
+                    PhalanxMove_Timer = 0;
+                }
+                else PhalanxMove_Timer -= diff;
             }
 
             npc_escortAI::UpdateAI(diff);
