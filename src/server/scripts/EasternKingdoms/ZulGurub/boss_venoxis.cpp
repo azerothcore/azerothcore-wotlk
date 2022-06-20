@@ -145,11 +145,11 @@ public:
             // Always running events
             events.ScheduleEvent(EVENT_THRASH, 5000);
             // Phase one events (regular form)
-            events.ScheduleEvent(EVENT_HOLY_NOVA, 5000, 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_HOLY_NOVA, urand(5000, 15000), 0, PHASE_ONE);
             events.ScheduleEvent(EVENT_DISPEL_MAGIC, 35000, 0, PHASE_ONE);
-            events.ScheduleEvent(EVENT_HOLY_FIRE, 10000, 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_HOLY_FIRE, urand(10000,20000), 0, PHASE_ONE);
             events.ScheduleEvent(EVENT_RENEW, 30000, 0, PHASE_ONE);
-            events.ScheduleEvent(EVENT_HOLY_WRATH, 60000, 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_HOLY_WRATH, urand(15000, 25000), 0, PHASE_ONE);
 
             events.SetPhase(PHASE_ONE);
 
