@@ -88,7 +88,7 @@ inline bool IsValidCombatTarget(Creature* source, Player* target)
     return true;
 }
 
-void CreatureAI::DoZoneInCombat(Creature* creature /*= nullptr*/, float maxRangeToNearestTarget /*= 250.0f*/)
+void CreatureAI::DoZoneInCombat(Creature* creature /*= nullptr*/)
 {
     if (!creature)
     {

@@ -146,7 +146,7 @@ void ThreatReference::ClearThreat(bool sendRemove)
     return true;
 }
 
-ThreatMgr::ThreatMgr(Unit* owner) : _owner(owner), _ownerCanHaveThreatList(false), _ownerEngaged(false), _updateClientTimer(CLIENT_THREAT_UPDATE_INTERVAL), _currentVictimRef(nullptr)
+ThreatMgr::ThreatMgr(Unit* owner) : _owner(owner), _ownerCanHaveThreatList(false), _ownerEngaged(false), _updateClientTimer(CLIENT_THREAT_UPDATE_INTERVAL), _currentVictimRef(nullptr), _fixateRef(nullptr)
 {
     for (int8 i = 0; i < MAX_SPELL_SCHOOL; ++i)
         _singleSchoolModifiers[i] = 1.0f;
@@ -449,10 +449,36 @@ void ThreatMgr::ClearAllThreat()
     while (!_myThreatListEntries.empty());
 }
 
+void ThreatMgr::FixateTarget(Unit* target)
+{
+    if (target)
+    {
+        auto it = _myThreatListEntries.find(target->GetGUID());
+        if (it != _myThreatListEntries.end())
+        {
+            _fixateRef = it->second;
+            return;
+        }
+    }
+    _fixateRef = nullptr;
+}
+
+Unit* ThreatMgr::GetFixateTarget() const
+{
+    if (_fixateRef)
+        return _fixateRef->GetVictim();
+    else
+        return nullptr;
+}
+
 ThreatReference const* ThreatMgr::ReselectVictim()
 {
+    // fixated target is always preferred
+    if (_fixateRef && _fixateRef->IsAvailable())
+        return _fixateRef;
+
     ThreatReference const* oldVictimRef = _currentVictimRef;
-    if (oldVictimRef && !oldVictimRef->IsAvailable())
+    if (oldVictimRef && oldVictimRef->IsOffline())
         oldVictimRef = nullptr;
     // in 99% of cases - we won't need to actually look at anything beyond the first element
     ThreatReference const* highest = _sortedThreatList.top();
@@ -697,6 +723,8 @@ void ThreatMgr::PurgeThreatListRef(ObjectGuid const& guid, bool sendRemove)
 
     if (_currentVictimRef == ref)
         _currentVictimRef = nullptr;
+    if (_fixateRef == ref)
+        _fixateRef = nullptr;
 
     _sortedThreatList.erase(ref->_handle);
     if (sendRemove && ref->IsAvailable())

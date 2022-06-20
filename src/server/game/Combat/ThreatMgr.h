@@ -159,6 +159,12 @@ public:
     // Removes all targets from the threat list (will cause evade in UpdateVictim if called)
     void ClearAllThreat();
 
+    // Fixate on the passed target; this target will always be selected until the fixtate is cleared
+        // (if the target is not in the threat list, does nothing)
+    void FixateTarget(Unit* target);
+    void ClearFixate() { FixateTarget(nullptr); }
+    Unit* GetFixateTarget() const;
+
     // sends SMSG_THREAT_UPDATE to all nearby clients (used by client to forward threat list info to addons)
     void SendThreatListToClients() const;
 
@@ -203,6 +209,7 @@ private:
     std::unordered_map<ObjectGuid, ThreatReference*> _myThreatListEntries;
     ThreatReference const* _currentVictimRef;
     ThreatReference const* ReselectVictim();
+    ThreatReference const* _fixateRef;
 
     ///== OTHERS' THREAT LISTS ==
     void PutThreatenedByMeRef(ObjectGuid const& guid, ThreatReference* ref);

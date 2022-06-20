@@ -813,6 +813,7 @@ public:
         if (mgr.IsEngaged())
         {
             count = 0;
+            Unit* fixateVictim = mgr.GetFixateTarget();
             handler->PSendSysMessage("Threat list of %s (guid %u, DB GUID %u)", target->GetName().c_str(), target->GetGUID().GetCounter(), target->GetTypeId() == TYPEID_UNIT ? target->ToCreature()->GetSpawnId() : 0);
             for (ThreatReference const* ref : mgr.GetSortedThreatList())
             {
@@ -820,27 +821,30 @@ public:
                 char const* onlineStr;
                 switch (ref->GetOnlineState())
                 {
-                case ThreatReference::ONLINE_STATE_SUPPRESSED:
-                    onlineStr = " [SUPPRESSED]";
-                    break;
-                case ThreatReference::ONLINE_STATE_OFFLINE:
-                    onlineStr = " [OFFLINE]";
-                    break;
-                default:
-                    onlineStr = "";
+                    case ThreatReference::ONLINE_STATE_SUPPRESSED:
+                        onlineStr = " [SUPPRESSED]";
+                        break;
+                    case ThreatReference::ONLINE_STATE_OFFLINE:
+                        onlineStr = " [OFFLINE]";
+                        break;
+                    default:
+                        onlineStr = "";
                 }
                 char const* tauntStr;
-                switch (ref->GetTauntState())
-                {
-                case ThreatReference::TAUNT_STATE_TAUNT:
-                    tauntStr = " [TAUNT]";
-                    break;
-                case ThreatReference::TAUNT_STATE_DETAUNT:
-                    tauntStr = " [DETAUNT]";
-                    break;
-                default:
-                    tauntStr = "";
-                }
+                if (unit == fixateVictim)
+                    tauntStr = " [FIXATE]";
+                else
+                    switch (ref->GetTauntState())
+                    {
+                        case ThreatReference::TAUNT_STATE_TAUNT:
+                            tauntStr = " [TAUNT]";
+                            break;
+                        case ThreatReference::TAUNT_STATE_DETAUNT:
+                            tauntStr = " [DETAUNT]";
+                            break;
+                        default:
+                            tauntStr = "";
+                    }
                 handler->PSendSysMessage("   %u.   %s   (guid %u)  - threat %f%s%s", ++count, unit->GetName().c_str(), unit->GetGUID().GetCounter(), ref->GetThreat(), tauntStr, onlineStr);
             }
             handler->SendSysMessage("End of threat list.");

@@ -269,7 +269,7 @@ public:
         {
             Unit* target = GetTarget();
             if (Unit* caster = GetCaster())
-                caster->GetThreatMgr().TauntUpdate();
+                target->GetThreatMgr().TauntUpdate();
         }
 
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
