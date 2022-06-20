@@ -86,7 +86,7 @@ public:
 
         bool CanAIAttack(Unit const* target) const override
         {
-            if (me->GetThreatMgr().getThreatList().size() > 1 && me->GetThreatMgr().getOnlineContainer().getMostHated()->getTarget() == target)
+            if (me->GetThreatMgr().GetThreatListSize() > 1 && me->GetThreatMgr().GetCurrentVictim())
                 return !target->HasAura(SPELL_SLEEP);
 
             return true;

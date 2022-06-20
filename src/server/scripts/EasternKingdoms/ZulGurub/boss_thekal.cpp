@@ -260,7 +260,7 @@ public:
                     Talk(SAY_AGGRO);
                     me->SetStandState(UNIT_STAND_STATE_STAND);
                     me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    DoResetThreat();
+                    ResetThreatList();
 
                     _scheduler.Schedule(6s, [this](TaskContext /*context*/) {
                         DoCastSelf(SPELL_TIGER_FORM);
@@ -276,7 +276,7 @@ public:
                             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             {
                                 DoCast(target, SPELL_CHARGE);
-                                DoResetThreat();
+                                ResetThreatList();
                                 AttackStart(target);
                             }
                             context.Repeat(15s, 22s);
@@ -450,9 +450,9 @@ public:
             }).Schedule(25s, [this](TaskContext context) {
                 DoCastVictim(SPELL_GOUGE);
 
-                if (DoGetThreat(me->GetVictim()))
+                if (GetThreat(me->GetVictim()))
                 {
-                    DoModifyThreatPercent(me->GetVictim(), -100);
+                    ModifyThreatByPercent(me->GetVictim(), -100);
                 }
 
                 context.Repeat(17s, 27s);

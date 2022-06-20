@@ -314,7 +314,7 @@ class spell_enveloping_webs : public SpellScript
         Unit* hitUnit = GetHitUnit();
         if (caster && hitUnit && hitUnit->GetTypeId() == TYPEID_PLAYER)
         {
-            caster->GetThreatMgr().modifyThreatPercent(hitUnit, -100);
+            caster->GetThreatMgr().ModifyThreatByPercent(hitUnit, -100);
         }
     }
 

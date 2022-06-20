@@ -76,7 +76,7 @@ public:
                 {
                     case EVENT_AVATAR:
                         DoCast(me, SPELL_AVATAR);
-                        DoResetThreat();
+                        ResetThreatList();
                         me->SetReactState(REACT_PASSIVE);
                         events.ScheduleEvent(EVENT_START_PURSUIT, 2s);
                         events.ScheduleEvent(EVENT_AVATAR, 45s, 50s);
