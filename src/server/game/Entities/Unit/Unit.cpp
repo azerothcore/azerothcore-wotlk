@@ -3870,7 +3870,11 @@ bool Unit::isInAccessiblePlaceFor(Creature const* c) const
             return false;
     }
 
-    if (IsInWater())
+    LiquidStatus liquidStatus = GetLiquidData().Status;
+    bool isInWater = (liquidStatus & MAP_LIQUID_STATUS_SWIMMING) != 0;
+
+    // In water or jumping in water
+    if (isInWater || (liquidStatus == LIQUID_MAP_ABOVE_WATER && (IsFalling() || (ToPlayer() && ToPlayer()->IsFalling()))))
     {
         return c->CanEnterWater();
     }
