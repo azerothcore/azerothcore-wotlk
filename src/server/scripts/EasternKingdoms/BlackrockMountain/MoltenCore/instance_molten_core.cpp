@@ -280,7 +280,7 @@ public:
                             {
                                 if (Creature* minion = instance->GetCreature(minionGuid))
                                 {
-                                    minion->AI()->DoZoneInCombat(nullptr, 150.0f);
+                                    minion->AI()->DoZoneInCombat();
                                 }
                             }
                         }

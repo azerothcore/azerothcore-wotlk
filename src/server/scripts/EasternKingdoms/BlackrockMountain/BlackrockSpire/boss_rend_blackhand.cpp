@@ -155,7 +155,7 @@ public:
                 return;
             }
 
-            summon->AI()->DoZoneInCombat(nullptr, 100.0f);
+            summon->AI()->DoZoneInCombat();
         }
 
         void EnterCombat(Unit* /*who*/) override

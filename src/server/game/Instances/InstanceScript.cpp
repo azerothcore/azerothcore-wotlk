@@ -196,7 +196,7 @@ void InstanceScript::UpdateMinionState(Creature* minion, EncounterState state)
                 minion->Respawn();
             else
             {
-                minion->AI()->DoZoneInCombat(nullptr, 100.0f);
+                minion->AI()->DoZoneInCombat();
             }
             break;
         default:

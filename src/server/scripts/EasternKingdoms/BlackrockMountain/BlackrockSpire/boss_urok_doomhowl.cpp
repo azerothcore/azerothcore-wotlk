@@ -54,7 +54,7 @@ public:
             me->CastSpell(me, SPELL_UROK_SPAWN, true);
             BossAI::InitializeAI();
             Talk(SAY_SUMMON);
-            DoZoneInCombat(nullptr, 100.0f);
+            DoZoneInCombat();
 
             if (GameObject* challenge = instance->instance->GetGameObject(instance->GetGuidData(GO_UROK_CHALLENGE)))
             {
