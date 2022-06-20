@@ -195,7 +195,7 @@ public:
                             target = threatTarget;
                             break;
                         }
-                }   
+                }
             }
 
             if (target)

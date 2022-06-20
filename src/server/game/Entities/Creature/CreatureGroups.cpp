@@ -208,7 +208,7 @@ void CreatureGroup::MemberEngagingTarget(Creature* member, Unit* target)
     for (auto const& itr : m_members)
     {
         Creature* pMember = itr.first;
-       
+
         //Skip one check
         if (pMember == member)
             continue;

@@ -4071,7 +4071,7 @@ void Spell::_cast(bool skipCheck)
             {
                 m_caster->AtTargetAttacked(target, !m_spellInfo->HasAttribute(SPELL_ATTR3_SUPRESS_TARGET_PROCS));
                 m_caster->GetDelayMoment() + 500// xinef: increase this time so we dont leave and enter combat in a moment
-            } 
+            }
     */
 
     if (m_caster->GetTypeId() == TYPEID_PLAYER)

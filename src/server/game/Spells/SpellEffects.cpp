@@ -4032,14 +4032,12 @@ void Spell::EffectSanctuary(SpellEffIndex /*effIndex*/)
         unitTarget->CombatStop(false, false);
 
         /* @TODO - Check if it's always necessary with combat rewrite
-        
         // Night Elf: Shadowmeld only resets threat temporarily
         if (m_spellInfo->Id != 59646)
             unitTarget->GetThreatMgr().ModifyThreatByPercent(-100); // fix error
 
         if (unitTarget->GetTypeId() == TYPEID_PLAYER)
             unitTarget->ToPlayer()->SendAttackSwingCancelAttack();     // melee and ranged forced attack cancel
-
         */ 
     }
     else
