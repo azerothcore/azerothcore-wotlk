@@ -49,6 +49,8 @@ enum CreatureIds
     NPC_ZULIAN_PROWLER      = 15101, // Arlokk Event
     NPC_ZEALOT_LORKHAN      = 11347,
     NPC_ZEALOT_ZATH         = 11348,
+    NPC_PRIESTESS_MARLI     = 14510,
+    NPC_SPAWN_OF_MARLI      = 15041,
     NPC_HIGH_PRIEST_THEKAL  = 14509,
     NPC_JINDO_THE_HEXXER    = 11380,
     NPC_NIGHTMARE_ILLUSION  = 15163,
@@ -57,9 +59,15 @@ enum CreatureIds
     NPC_MANDOKIR            = 11382, // Mandokir Event
     NPC_OHGAN               = 14988, // Mandokir Event
     NPC_VILEBRANCH_SPEAKER  = 11391, // Mandokir Event
-    NPC_CHAINED_SPIRT       = 15117,  // Mandokir Event
+    NPC_CHAINED_SPIRIT      = 15117, // Mandokir Event
     NPC_HAKKAR              = 14834,
-    NPC_ZULGURUB_TIGER      = 11361
+    NPC_ZULGURUB_TIGER      = 11361,
+    NPC_BRAIN_WASH_TOTEM    = 15112,
+    NPC_GAHZRANKA           = 15114,
+    NPC_GRILEK              = 15082,
+    NPC_HAZZARAH            = 15083,
+    NPC_RENATAKI            = 15084,
+    NPC_WUSHOOLAY           = 15085
 };
 
 enum GameobjectIds
@@ -73,5 +81,7 @@ inline AI* GetZulGurubAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, ZGScriptName);
 }
+
+#define RegisterZulGurubCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetZulGurubAI)
 
 #endif

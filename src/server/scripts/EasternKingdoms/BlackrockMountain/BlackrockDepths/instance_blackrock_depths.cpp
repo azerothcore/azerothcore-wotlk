@@ -752,7 +752,7 @@ public:
                 {
                     ++TombEventCounter;
                     boss->SetFaction(FACTION_DARK_IRON_DWARVES);
-                    boss->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                    boss->SetImmuneToPC(false);
 
                     // find suitable target here.
                     Player* target = boss->SelectNearestPlayer(130);
@@ -786,7 +786,7 @@ public:
                         boss->SetLootRecipient(nullptr);
                     }
                     boss->SetFaction(FACTION_FRIENDLY);
-                    boss->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC); // think this is useless
+                    boss->SetImmuneToPC(true); // think this is useless
                     if (i == 6) // doomrel needs explicit reset
                     {
                         boss->AI()->Reset();

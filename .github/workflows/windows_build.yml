@@ -17,7 +17,7 @@ jobs:
       matrix:
         os: [windows-latest]
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.os }}-${{ matrix.compiler }}
+    name: ${{ matrix.os }}
     env:
       BOOST_ROOT: C:\local\boost_1_79_0
     if: github.repository == 'azerothcore/azerothcore-wotlk' && (github.ref == 'refs/heads/master' || contains(github.event.pull_request.labels.*.name, 'run-build') || github.event.label.name == 'run-build')
@@ -29,7 +29,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p build && cd build
-          cmake .. -DTOOLS=ON
+          cmake .. -DTOOLS_BUILD=all
           cmake --build . --config Release --parallel 4
       - name: Copy dll files
         shell: bash

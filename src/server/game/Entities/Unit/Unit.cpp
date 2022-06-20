@@ -315,6 +315,8 @@ Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
 
     _oldFactionId = 0;
 
+    _isWalkingBeforeCharm = false;
+
     _lastExtraAttackSpell = 0;
 }
 
@@ -997,7 +999,11 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             victim->ToCreature()->SetLootRecipient(attacker);
 
         if (!attacker || attacker->IsControlledByPlayer() || attacker->IsCreatedByPlayer())
-            victim->ToCreature()->LowerPlayerDamageReq(health < damage ?  health : damage);
+        {
+            uint32 unDamage = health < damage ? health : damage;
+            bool damagedByPlayer = unDamage && attacker && attacker->m_movedByPlayer != nullptr;
+            victim->ToCreature()->LowerPlayerDamageReq(unDamage, damagedByPlayer);
+        }
     }
 
     if (health <= damage)
@@ -10464,8 +10470,12 @@ void Unit::SetCharm(Unit* charm, bool apply)
         if (!charm->AddGuidValue(UNIT_FIELD_CHARMEDBY, GetGUID()))
             LOG_FATAL("entities.unit", "Unit {} is being charmed, but it already has a charmer {}", charm->GetEntry(), charm->GetCharmerGUID().ToString());
 
-        if (charm->HasUnitMovementFlag(MOVEMENTFLAG_WALKING))
+        _isWalkingBeforeCharm = charm->IsWalking();
+        if (_isWalkingBeforeCharm)
+        {
             charm->SetWalk(false);
+            charm->SendMovementFlagUpdate();
+        }
 
         m_Controlled.insert(charm);
     }
@@ -10501,6 +10511,12 @@ void Unit::SetCharm(Unit* charm, bool apply)
             charm->m_ControlledByPlayer = false;
             charm->RemoveUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
             charm->SetByteValue(UNIT_FIELD_BYTES_2, 1, 0);
+        }
+
+        if (charm->IsWalking() != _isWalkingBeforeCharm)
+        {
+            charm->SetWalk(_isWalkingBeforeCharm);
+            charm->SendMovementFlagUpdate(true); // send packet to self, to update movement state on player.
         }
 
         m_Controlled.erase(charm);
@@ -13015,6 +13031,24 @@ void Unit::SetInCombatWith(Unit* enemy, uint32 duration)
     SetInCombatState(false, enemy, duration);
 }
 
+void Unit::SetImmuneToPC(bool apply, bool keepCombat)
+{
+    (void)keepCombat;
+    if (apply)
+        SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+    else
+        RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+}
+
+void Unit::SetImmuneToNPC(bool apply, bool keepCombat)
+{
+    (void)keepCombat;
+    if (apply)
+        SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+    else
+        RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+}
+
 void Unit::CombatStart(Unit* victim, bool initialAggro)
 {
     // Xinef: Dont allow to start combat with triggers
@@ -13128,8 +13162,8 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
         return;
 
     // xinef: if we somehow engage in combat (scripts, dunno) with player, remove this flag so he can fight back
-    if (GetTypeId() == TYPEID_UNIT && enemy && HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC) && enemy->GetCharmerOrOwnerPlayerOrPlayerItself())
-        RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC); // unit has engaged in combat, remove immunity so players can fight back
+    if (GetTypeId() == TYPEID_UNIT && enemy && IsImmuneToPC() && enemy->GetCharmerOrOwnerPlayerOrPlayerItself())
+        SetImmuneToPC(true); // unit has engaged in combat, remove immunity so players can fight back
 
     if (IsInCombat())
         return;
@@ -13150,7 +13184,7 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
                 creature->AI()->EnterCombat(enemy);
 
             if (creature->GetFormation())
-                creature->GetFormation()->MemberAttackStart(creature, enemy);
+                creature->GetFormation()->MemberEngagingTarget(creature, enemy);
         }
 
         creature->RefreshSwimmingFlag();
@@ -13195,7 +13229,7 @@ void Unit::ClearInCombat()
     if (Creature* creature = ToCreature())
     {
         if (creature->GetCreatureTemplate() && creature->GetCreatureTemplate()->unit_flags & UNIT_FLAG_IMMUNE_TO_PC)
-            SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC); // set immunity state to the one from db on evade
+            SetImmuneToPC(true); // set immunity state to the one from db on evade
 
         ClearUnitState(UNIT_STATE_ATTACK_PLAYER);
         if (HasDynamicFlag(UNIT_DYNFLAG_TAPPED))
@@ -13239,7 +13273,7 @@ bool Unit::isTargetableForAttack(bool checkFakeDeath, Unit const* byWho) const
     if (HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE))
         return false;
 
-    if (HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC) && byWho && byWho->GetCharmerOrOwnerPlayerOrPlayerItself())
+    if (IsImmuneToPC() && byWho && byWho->GetCharmerOrOwnerPlayerOrPlayerItself())
         return false;
 
     if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->IsGameMaster())
@@ -13294,11 +13328,11 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, Wo
     }
     // check flags
     if (target->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_TAXI_FLIGHT | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_NON_ATTACKABLE_2)
-            || (!HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && target->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC))
-            || (!target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && HasUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC))
-            || (HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && target->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC))
+            || (!HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && target->IsImmuneToNPC())
+            || (!target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && IsImmuneToNPC())
+            || (HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && target->IsImmuneToPC())
             // check if this is a world trigger cast - GOs are using world triggers to cast their spells, so we need to ignore their immunity flag here, this is a temp workaround, needs removal when go cast is implemented properly
-            || ((GetEntry() != WORLD_TRIGGER && (!obj || !obj->isType(TYPEMASK_GAMEOBJECT | TYPEMASK_DYNAMICOBJECT))) && target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC)))
+            || ((GetEntry() != WORLD_TRIGGER && (!obj || !obj->isType(TYPEMASK_GAMEOBJECT | TYPEMASK_DYNAMICOBJECT))) && target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && IsImmuneToPC()))
         return false;
 
     // CvC case - can attack each other only when one of them is hostile
@@ -13413,12 +13447,12 @@ bool Unit::_IsValidAssistTarget(Unit const* target, SpellInfo const* bySpell) co
 
         if (HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
         {
-            if (target->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC))
+            if (target->IsImmuneToPC())
                 return false;
         }
         else
         {
-            if (target->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC))
+            if (target->IsImmuneToNPC())
                 return false;
         }
     }
@@ -15707,9 +15741,9 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
             else // For attacker
             {
                 // Overpower on victim dodge
-                if (procExtra & PROC_EX_DODGE )
+                if (procExtra & PROC_EX_DODGE)
                 {
-                    if (GetTypeId() == TYPEID_PLAYER && getClass() == CLASS_WARRIOR)
+                    if (getClass() == CLASS_WARRIOR)
                     {
                         AddComboPoints(target, 1);
                         StartReactiveTimer(REACTIVE_OVERPOWER);
@@ -16500,8 +16534,10 @@ void Unit::UpdateReactives(uint32 p_time)
                         ModifyAuraState(AURA_STATE_HUNTER_PARRY, false);
                     break;
                 case REACTIVE_OVERPOWER:
-                    if (getClass() == CLASS_WARRIOR && GetTypeId() == TYPEID_PLAYER)
+                    if (getClass() == CLASS_WARRIOR)
+                    {
                         ClearComboPoints();
+                    }
                     break;
                 case REACTIVE_WOLVERINE_BITE:
                     if (IsHunterPet())
