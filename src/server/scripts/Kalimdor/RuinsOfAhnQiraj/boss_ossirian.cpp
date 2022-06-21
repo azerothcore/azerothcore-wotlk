@@ -25,37 +25,37 @@
 
 enum Texts
 {
-    SAY_SUPREME             = 0,
-    SAY_INTRO               = 1,
-    SAY_AGGRO               = 2,
-    SAY_SLAY                = 3,
-    SAY_DEATH               = 4
+    SAY_SUPREME                 = 0,
+    SAY_INTRO                   = 1,
+    SAY_AGGRO                   = 2,
+    SAY_SLAY                    = 3,
+    SAY_DEATH                   = 4
 };
 
 enum Spells
 {
-    SPELL_SILENCE           = 25195,
-    SPELL_CYCLONE           = 25189,
-    SPELL_STOMP             = 25188,
-    SPELL_SUPREME           = 25176,
-    SPELL_SUMMON            = 20477,
-    SPELL_SAND_STORM        = 25160,
-    SPELL_SUMMON_CRYSTAL    = 25192
+    SPELL_CURSE_OF_TONGUES      = 25195,
+    SPELL_ENVELOPING_WINDS      = 25189,
+    SPELL_WAR_STOMP             = 25188,
+    SPELL_STRENGHT_OF_OSSIRIAN  = 25176,
+    SPELL_SUMMON_PLAYER         = 20477,
+    SPELL_SAND_STORM            = 25160,
+    SPELL_SUMMON_CRYSTAL        = 25192
 };
 
 enum Actions
 {
-    ACTION_TRIGGER_WEAKNESS = 1
+    ACTION_TRIGGER_WEAKNESS     = 1
 };
 
 enum Events
 {
-    EVENT_SILENCE           = 1,
-    EVENT_CYCLONE           = 2,
-    EVENT_STOMP             = 3
+    EVENT_SILENCE               = 1,
+    EVENT_CYCLONE               = 2,
+    EVENT_STOMP                 = 3
 };
 
-uint8 const NUM_CRYSTALS = 9;
+uint8 const NUM_CRYSTALS        = 9;
 
 // You spin me right round, baby
 // right round like a record, baby
@@ -110,7 +110,7 @@ public:
             {
                 if (spell->Id == SpellWeakness[i])
                 {
-                    me->RemoveAurasDueToSpell(SPELL_SUPREME);
+                    me->RemoveAurasDueToSpell(SPELL_STRENGHT_OF_OSSIRIAN);
                     ((TempSummon*)caster)->UnSummon();
                     SpawnNextCrystal();
                 }
@@ -120,9 +120,15 @@ public:
         void DoAction(int32 action) override
         {
             if (action == ACTION_TRIGGER_WEAKNESS)
+            {
                 if (Creature* Trigger = me->GetMap()->GetCreature(TriggerGUID))
+                {
                     if (!Trigger->HasUnitState(UNIT_STATE_CASTING))
+                    {
                         Trigger->CastSpell(Trigger, SpellWeakness[urand(0, 4)], false);
+                    }
+                }
+            }
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -132,8 +138,7 @@ public:
             events.ScheduleEvent(EVENT_SILENCE, 30000);
             events.ScheduleEvent(EVENT_CYCLONE, 20000);
             events.ScheduleEvent(EVENT_STOMP, 30000);
-
-            DoCast(me, SPELL_SUPREME);
+            DoCast(me, SPELL_STRENGHT_OF_OSSIRIAN);
             Talk(SAY_AGGRO);
 
             Map* map = me->GetMap();
@@ -142,14 +147,14 @@ public:
 
             WorldPackets::Misc::Weather weather(WEATHER_STATE_HEAVY_SANDSTORM, 1.0f);
             map->SendToPlayers(weather.Write());
-
             for (uint8 i = 0; i < NUM_TORNADOS; ++i)
             {
                 Position Point = me->GetRandomPoint(RoomCenter, RoomRadius);
                 if (Creature* Tornado = me->GetMap()->SummonCreature(NPC_SAND_VORTEX, Point))
+                {
                     Tornado->CastSpell(Tornado, SPELL_SAND_STORM, true);
+                }
             }
-
             SpawnNextCrystal();
         }
 
@@ -174,7 +179,9 @@ public:
         void Cleanup()
         {
             if (GameObject* Crystal = me->GetMap()->GetGameObject(CrystalGUID))
+            {
                 Crystal->Use(me);
+            }
         }
 
         void SpawnNextCrystal()
@@ -215,15 +222,15 @@ public:
                 return;
 
             events.Update(diff);
-
-            // No kiting!
             if (me->GetDistance(me->GetVictim()) > 60.00f && me->GetDistance(me->GetVictim()) < 120.00f)
-                DoCastVictim(SPELL_SUMMON);
-
+            {
+                DoCastVictim(SPELL_SUMMON_PLAYER);
+            }
             bool ApplySupreme = true;
-
-            if (me->HasAura(SPELL_SUPREME))
+            if (me->HasAura(SPELL_STRENGHT_OF_OSSIRIAN))
+            {
                 ApplySupreme = false;
+            }
             else
             {
                 for (uint8 i = 0; i < NUM_WEAKNESS; ++i)
@@ -238,7 +245,7 @@ public:
 
             if (ApplySupreme)
             {
-                DoCast(me, SPELL_SUPREME);
+                DoCast(me, SPELL_STRENGHT_OF_OSSIRIAN);
                 Talk(SAY_SUPREME);
             }
 
@@ -247,22 +254,21 @@ public:
                 switch (eventId)
                 {
                     case EVENT_SILENCE:
-                        DoCast(me, SPELL_SILENCE);
+                        DoCastAOE(SPELL_CURSE_OF_TONGUES);
                         events.ScheduleEvent(EVENT_SILENCE, urand(20000, 30000));
                         break;
                     case EVENT_CYCLONE:
-                        DoCastVictim(SPELL_CYCLONE);
+                        DoCastVictim(SPELL_ENVELOPING_WINDS);
                         events.ScheduleEvent(EVENT_CYCLONE, 20000);
                         break;
                     case EVENT_STOMP:
-                        DoCast(me, SPELL_STOMP);
+                        DoCastAOE(SPELL_WAR_STOMP);
                         events.ScheduleEvent(EVENT_STOMP, 30000);
                         break;
                     default:
                         break;
                 }
             }
-
             DoMeleeAttackIfReady();
         }
     };
