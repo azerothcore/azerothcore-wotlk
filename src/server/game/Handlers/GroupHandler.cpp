@@ -621,6 +621,12 @@ void WorldSession::HandleGroupRaidConvertOpcode(WorldPacket& /*recvData*/)
         return;
 
     /** error handling **/
+    if (group->CheckLevelForRaid())
+    {
+        SendPartyResult(PARTY_OP_INVITE, "", ERR_RAID_DISALLOWED_BY_LEVEL);
+        return;
+    }
+
     if (!group->IsLeader(GetPlayer()->GetGUID()) || group->GetMembersCount() < 2 || group->isLFGGroup()) // pussywizard: not allowed for lfg groups, it is either raid from the beginning or not!
         return;
     /********************/
