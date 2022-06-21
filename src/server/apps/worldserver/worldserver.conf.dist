@@ -3596,6 +3596,16 @@ Calculate.Creature.Zone.Area.Data = 0
 Calculate.Gameoject.Zone.Area.Data = 0
 
 #
+#    Group.Raid.LevelRestriction
+#
+#     The Group members need to the same, or higher level than the specified value.
+#     Minimum level is 10.
+#        Default: 10
+#
+
+Group.Raid.LevelRestriction = 10
+
+#
 #    LFG.Location.All
 #
 #     Includes satellite to search for work elsewhere LFG

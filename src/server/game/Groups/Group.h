@@ -245,6 +245,7 @@ public:
     uint8 GetMemberGroup(ObjectGuid guid) const;
 
     void ConvertToLFG(bool restricted = true);
+    bool CheckLevelForRaid();
     void ConvertToRaid();
 
     void SetBattlegroundGroup(Battleground* bg);

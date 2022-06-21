@@ -147,8 +147,7 @@ namespace MMAP
     {
         friend class TileBuilder;
     public:
-        MapBuilder(Optional<float> maxWalkableAngle,
-                   Optional<float> maxWalkableAngleNotSteep,
+        MapBuilder(float maxWalkableAngle,
                    bool skipLiquid,
                    bool skipContinents,
                    bool skipJunkMaps,
@@ -204,8 +203,7 @@ namespace MMAP
         bool m_skipBattlegrounds;
         bool m_skipLiquid;
 
-        Optional<float> m_maxWalkableAngle;
-        Optional<float> m_maxWalkableAngleNotSteep;
+        float m_maxWalkableAngle;
         bool m_bigBaseUnit;
         int32 m_mapid;
 
