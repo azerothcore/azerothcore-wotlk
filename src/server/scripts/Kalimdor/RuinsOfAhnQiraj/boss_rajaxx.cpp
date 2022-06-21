@@ -23,7 +23,7 @@
 enum Yells
 {
     // The time of our retribution is at hand! Let darkness reign in the hearts of our enemies! Sound: 8645 Emote: 35
-    SAY_ANDOROV_INTRO         = 0,   // Before for the first wave
+    SAY_ANDOROV_INTRO         = 0,   // Before the first wave
     SAY_ANDOROV_ATTACK        = 1,   // Beginning the event
 
     SAY_WAVE3                 = 0,
@@ -63,9 +63,7 @@ public:
 
     struct boss_rajaxxAI : public BossAI
     {
-        boss_rajaxxAI(Creature* creature) : BossAI(creature, DATA_RAJAXX)
-        {
-        }
+        boss_rajaxxAI(Creature* creature) : BossAI(creature, DATA_RAJAXX) {}
 
         void Reset() override
         {
@@ -92,7 +90,6 @@ public:
                 return;
 
             events.Update(diff);
-
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
@@ -105,14 +102,13 @@ public:
                         events.ScheduleEvent(EVENT_DISARM, 22000);
                         break;
                     case EVENT_THUNDERCRASH:
-                        DoCast(me, SPELL_THUNDERCRASH);
+                        DoCastSelf(SPELL_THUNDERCRASH);
                         events.ScheduleEvent(EVENT_THUNDERCRASH, 21000);
                         break;
                     default:
                         break;
                 }
             }
-
             DoMeleeAttackIfReady();
         }
     private:
@@ -136,7 +132,6 @@ class spell_rajaxx_thundercrash : public SpellScript
         {
             damage = 200;
         }
-
         SetHitDamage(damage);
     }
 
