@@ -456,6 +456,7 @@ private:
 
     mutable std::shared_ptr<time_t> _lastDamagedTime; // Part of Evade mechanics
 
+    bool m_cannotReachTarget;
     uint32 m_cannotReachTimer;
 
     Spell const* _focusSpell;   ///> Locks the target during spell cast for proper facing
