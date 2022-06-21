@@ -280,7 +280,7 @@ struct violet_hold_trashAI : public npc_escortAI
         if (!who->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
         {
             me->InterruptNonMeleeSpells(false);
-            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToNPC(false);
         }
     }
 
@@ -372,7 +372,7 @@ struct violet_hold_trashAI : public npc_escortAI
     void CreatureStartAttackDoor()
     {
         RemoveEscortState(STATE_ESCORT_ESCORTING | STATE_ESCORT_RETURNING | STATE_ESCORT_PAUSED);
-        me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+        me->SetImmuneToNPC(true);
         me->CastSpell((Unit*)nullptr, SPELL_DESTROY_DOOR_SEAL, true);
     }
 
@@ -380,7 +380,7 @@ struct violet_hold_trashAI : public npc_escortAI
     {
         if (!HasEscortState(STATE_ESCORT_ESCORTING))
         {
-            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToNPC(false);
             me->SetHomePosition(1845.577759f + rand_norm() * 5 - 2.5f, 800.681152f + rand_norm() * 5 - 2.5f, 44.104248f, M_PI);
         }
 

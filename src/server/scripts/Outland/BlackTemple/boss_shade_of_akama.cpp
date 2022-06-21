@@ -131,7 +131,8 @@ public:
         {
             BossAI::Reset();
             me->SetReactState(REACT_PASSIVE);
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            me->SetImmuneToAll(true);
             me->SetWalk(true);
         }
 
@@ -249,7 +250,8 @@ public:
                         DoResetThreat();
                         me->GetVictim()->InterruptNonMeleeSpells(false);
                         me->AddThreat(me->GetVictim(), 1000000.0f);
-                        me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                        me->SetImmuneToAll(false);
                         summonsGenerator.DoAction(ACTION_STOP_SPAWNING);
                         break;
                     }

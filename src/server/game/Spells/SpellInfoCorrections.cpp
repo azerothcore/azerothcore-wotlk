@@ -1369,6 +1369,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CAST;
     });
 
+    // Frightening Shout
+    ApplySpellFix({ 19134 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
+    });
+
     // Isle of Conquest
     ApplySpellFix({ 66551 }, [](SpellInfo* spellInfo)
     {
