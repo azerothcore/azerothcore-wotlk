@@ -261,6 +261,7 @@ public:
             }
             DoCast(me, SPELL_SUMMON_HATCHLING, true);
         }
+
     private:
         InstanceScript* _instance;
     };
