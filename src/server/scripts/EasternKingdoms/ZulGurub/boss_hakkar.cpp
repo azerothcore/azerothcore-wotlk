@@ -101,8 +101,8 @@ public:
         void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
-            events.ScheduleEvent(EVENT_BLOOD_SIPHON, 9000); // 90s
-            /*events.ScheduleEvent(EVENT_CORRUPTED_BLOOD, 25000);
+            events.ScheduleEvent(EVENT_BLOOD_SIPHON, 90000);
+            events.ScheduleEvent(EVENT_CORRUPTED_BLOOD, 25000);
             events.ScheduleEvent(EVENT_CAUSE_INSANITY, 17000);
             events.ScheduleEvent(EVENT_WILL_OF_HAKKAR, 17000);
             events.ScheduleEvent(EVENT_ENRAGE, 600000);
@@ -115,7 +115,7 @@ public:
             if (instance->GetBossState(DATA_THEKAL) != DONE)
                 events.ScheduleEvent(EVENT_ASPECT_OF_THEKAL, 8000);
             if (instance->GetBossState(DATA_ARLOKK) != DONE)
-                events.ScheduleEvent(EVENT_ASPECT_OF_ARLOKK, 18000);*/
+                events.ScheduleEvent(EVENT_ASPECT_OF_ARLOKK, 18000);
             Talk(SAY_AGGRO);
         }
 
