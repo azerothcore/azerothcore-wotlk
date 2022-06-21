@@ -25,6 +25,7 @@ Category: Zul'Gurub
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "zulgurub.h"
 
 enum Says
@@ -37,7 +38,10 @@ enum Says
 
 enum Spells
 {
-    SPELL_BLOOD_SIPHON          = 24322, // Buggy ?
+    SPELL_POISONOUS_BLOOD       = 24321,
+    SPELL_BLOOD_SIPHON_HEAL     = 24322,
+    SPELL_BLOOD_SIPHON_DMG      = 24323,
+    SPELL_BLOOD_SIPHON          = 24324,
     SPELL_CORRUPTED_BLOOD       = 24328,
     SPELL_CAUSE_INSANITY        = 24327,
     SPELL_WILL_OF_HAKKAR        = 24178,
@@ -74,6 +78,16 @@ public:
     {
         boss_hakkarAI(Creature* creature) : BossAI(creature, DATA_HAKKAR) { }
 
+        bool CheckInRoom() override
+        {
+            if (me->GetPositionZ() < 52.f || me->GetPositionZ() > 57.28f)
+            {
+                BossAI::EnterEvadeMode(EVADE_REASON_BOUNDARY);
+                return false;
+            }
+            return true;
+        }
+
         void Reset() override
         {
             _Reset();
@@ -87,8 +101,8 @@ public:
         void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
-            events.ScheduleEvent(EVENT_BLOOD_SIPHON, 90000);
-            events.ScheduleEvent(EVENT_CORRUPTED_BLOOD, 25000);
+            events.ScheduleEvent(EVENT_BLOOD_SIPHON, 9000); // 90s
+            /*events.ScheduleEvent(EVENT_CORRUPTED_BLOOD, 25000);
             events.ScheduleEvent(EVENT_CAUSE_INSANITY, 17000);
             events.ScheduleEvent(EVENT_WILL_OF_HAKKAR, 17000);
             events.ScheduleEvent(EVENT_ENRAGE, 600000);
@@ -101,13 +115,13 @@ public:
             if (instance->GetBossState(DATA_THEKAL) != DONE)
                 events.ScheduleEvent(EVENT_ASPECT_OF_THEKAL, 8000);
             if (instance->GetBossState(DATA_ARLOKK) != DONE)
-                events.ScheduleEvent(EVENT_ASPECT_OF_ARLOKK, 18000);
+                events.ScheduleEvent(EVENT_ASPECT_OF_ARLOKK, 18000);*/
             Talk(SAY_AGGRO);
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim())
+            if (!UpdateVictim() || !CheckInRoom())
                 return;
 
             events.Update(diff);
@@ -228,9 +242,55 @@ public:
     }
 };
 
+class spell_hakkar_cause_insanity : public SpellScript
+{
+    PrepareSpellScript(spell_hakkar_cause_insanity);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        if (targets.size() > 1)
+            targets.resize(1);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hakkar_cause_insanity::FilterTargets, EFFECT_ALL, TARGET_UNIT_TARGET_ENEMY);
+    }
+};
+
+class spell_hakkar_blood_siphon : public SpellScript
+{
+    PrepareSpellScript(spell_hakkar_blood_siphon);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_BLOOD_SIPHON_HEAL, SPELL_BLOOD_SIPHON_DMG });
+    }
+
+    void OnSpellHit()
+    {
+        Unit* caster = GetCaster();
+        Unit* target = GetHitUnit();
+        if (!caster || !target)
+            return;
+
+        if (target->HasAura(SPELL_POISONOUS_BLOOD))
+            target->CastSpell(caster, SPELL_BLOOD_SIPHON_DMG, true);
+        else
+            target->CastSpell(caster, SPELL_BLOOD_SIPHON_HEAL, true);
+    }
+
+    void Register() override
+    {
+        OnHit += SpellHitFn(spell_hakkar_blood_siphon::OnSpellHit);
+    }
+};
+
 void AddSC_boss_hakkar()
 {
     new boss_hakkar();
     new at_zulgurub_entrance_speech();
     new at_zulgurub_temple_speech();
+    RegisterSpellScript(spell_hakkar_cause_insanity);
+    RegisterSpellScript(spell_hakkar_blood_siphon);
 }
