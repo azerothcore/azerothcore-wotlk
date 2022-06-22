@@ -77,9 +77,7 @@ public:
 
     struct boss_ayamissAI : public BossAI
     {
-        boss_ayamissAI(Creature* creature) : BossAI(creature, DATA_AYAMISS)
-        {
-        }
+        boss_ayamissAI(Creature* creature) : BossAI(creature, DATA_AYAMISS) {}
 
         void Reset() override
         {
@@ -101,7 +99,9 @@ public:
                     break;
                 case NPC_HORNET:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random))
+                    {
                         who->AI()->AttackStart(target);
+                    }
                     break;
             }
         }
@@ -131,13 +131,11 @@ public:
         void EnterCombat(Unit* attacker) override
         {
             BossAI::EnterCombat(attacker);
-
             events.ScheduleEvent(EVENT_STINGER_SPRAY, urand(20000, 30000));
             events.ScheduleEvent(EVENT_POISON_STINGER, 5000);
             events.ScheduleEvent(EVENT_SUMMON_SWARMER, 5000);
             events.ScheduleEvent(EVENT_SWARMER_ATTACK, 60000);
             events.ScheduleEvent(EVENT_PARALYZE, 15000);
-
             me->SetCanFly(true);
             me->SetDisableGravity(true);
             me->GetMotionMaster()->MovePoint(POINT_AIR, AyamissAirPos);
@@ -149,7 +147,6 @@ public:
                 return;
 
             events.Update(diff);
-
             if (_phase == PHASE_AIR && me->GetHealthPct() < 70.0f)
             {
                 _phase = PHASE_GROUND;
@@ -169,7 +166,7 @@ public:
 
             if (!_enraged && me->GetHealthPct() < 20.0f)
             {
-                DoCast(me, SPELL_FRENZY);
+                DoCastSelf(SPELL_FRENZY);
                 Talk(EMOTE_FRENZY);
                 _enraged = true;
             }
@@ -179,7 +176,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_STINGER_SPRAY:
-                        DoCast(me, SPELL_STINGER_SPRAY);
+                        DoCastSelf(SPELL_STINGER_SPRAY);
                         events.ScheduleEvent(EVENT_STINGER_SPRAY, urand(15000, 20000));
                         break;
                     case EVENT_POISON_STINGER:
@@ -198,10 +195,15 @@ public:
                         break;
                     case EVENT_SWARMER_ATTACK:
                         for (ObjectGuid const& guid : _swarmers)
+                        {
                             if (Creature* swarmer = me->GetMap()->GetCreature(guid))
+                            {
                                 if (Unit* target = SelectTarget(SelectTargetMethod::Random))
+                                {
                                     swarmer->AI()->AttackStart(target);
-
+                                }
+                            }
+                        }
                         _swarmers.clear();
                         events.ScheduleEvent(EVENT_SWARMER_ATTACK, 60000);
                         break;
@@ -250,9 +252,15 @@ public:
         void MovementInform(uint32 type, uint32 id) override
         {
             if (type == POINT_MOTION_TYPE)
+            {
                 if (id == POINT_PARALYZE)
+                {
                     if (Player* target = ObjectAccessor::GetPlayer(*me, _instance->GetGuidData(DATA_PARALYZED)))
-                        DoCast(target, SPELL_FEED); // Omnomnom
+                    {
+                        DoCast(target, SPELL_FEED);
+                    }
+                }
+            }
         }
 
         void MoveInLineOfSight(Unit* who) override
