@@ -21,8 +21,8 @@
 
 enum Texts
 {
-    EMOTE_AGGRO             = 0,
-    EMOTE_MANA_FULL         = 1
+    EMOTE_AGGRO                 = 0,
+    EMOTE_MANA_FULL             = 1
 };
 
 enum Spells
@@ -38,17 +38,17 @@ enum Spells
 
 enum Events
 {
-    EVENT_TRAMPLE           = 1,
-    EVENT_DRAIN_MANA        = 2,
-    EVENT_STONE_PHASE       = 3,
-    EVENT_STONE_PHASE_END   = 4,
-    EVENT_WIDE_SLASH        = 5,
+    EVENT_TRAMPLE               = 1,
+    EVENT_DRAIN_MANA            = 2,
+    EVENT_STONE_PHASE           = 3,
+    EVENT_STONE_PHASE_END       = 4,
+    EVENT_WIDE_SLASH            = 5
 };
 
 enum Actions
 {
-    ACTION_STONE_PHASE_START = 1,
-    ACTION_STONE_PHASE_END   = 2,
+    ACTION_STONE_PHASE_START    = 1,
+    ACTION_STONE_PHASE_END      = 2
 };
 
 class boss_moam : public CreatureScript
@@ -58,9 +58,7 @@ public:
 
     struct boss_moamAI : public BossAI
     {
-        boss_moamAI(Creature* creature) : BossAI(creature, DATA_MOAM)
-        {
-        }
+        boss_moamAI(Creature* creature) : BossAI(creature, DATA_MOAM) {}
 
         void Reset() override
         {
@@ -93,10 +91,10 @@ public:
                     }
                 case ACTION_STONE_PHASE_START:
                     {
-                        DoCast(me, SPELL_SUMMON_MANA_FIEND_1);
-                        DoCast(me, SPELL_SUMMON_MANA_FIEND_2);
-                        DoCast(me, SPELL_SUMMON_MANA_FIEND_3);
-                        DoCast(me, SPELL_ENERGIZE);
+                        DoCastSelf(SPELL_SUMMON_MANA_FIEND_1);
+                        DoCastSelf(SPELL_SUMMON_MANA_FIEND_2);
+                        DoCastSelf(SPELL_SUMMON_MANA_FIEND_3);
+                        DoCastSelf(SPELL_ENERGIZE);
                         events.ScheduleEvent(EVENT_STONE_PHASE_END, 90000);
                         break;
                     }
@@ -115,7 +113,9 @@ public:
             if (me->GetPower(POWER_MANA) == me->GetMaxPower(POWER_MANA))
             {
                 if (_isStonePhase)
+                {
                     DoAction(ACTION_STONE_PHASE_END);
+                }
                 DoCastAOE(SPELL_ARCANE_ERUPTION);
                 me->SetPower(POWER_MANA, 0);
             }
@@ -123,7 +123,9 @@ public:
             if (_isStonePhase)
             {
                 if (events.ExecuteEvent() == EVENT_STONE_PHASE_END)
+                {
                     DoAction(ACTION_STONE_PHASE_END);
+                }
                 return;
             }
 
@@ -144,31 +146,33 @@ public:
                             {
                                 const std::list<HostileReference*>& threatlist = me->GetThreatMgr().getThreatList();
                                 for (std::list<HostileReference*>::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
+                                {
                                     if ((*itr)->getTarget()->GetTypeId() == TYPEID_PLAYER && (*itr)->getTarget()->getPowerType() == POWER_MANA)
+                                    {
                                         targetList.push_back((*itr)->getTarget());
+                                    }
+                                }
                             }
-
                             Acore::Containers::RandomResize(targetList, 5);
-
                             for (std::list<Unit*>::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
+                            {
                                 DoCast(*itr, SPELL_DRAIN_MANA);
-
+                            }
                             events.ScheduleEvent(EVENT_DRAIN_MANA, urand(5000, 15000));
                             break;
                         }/*
                         case EVENT_WIDE_SLASH:
-                            DoCast(me, SPELL_WIDE_SLASH);
+                            DoCastSelf(SPELL_WIDE_SLASH);
                             events.ScheduleEvent(EVENT_WIDE_SLASH, 11000);
                             break;
                         case EVENT_TRASH:
-                            DoCast(me, SPELL_TRASH);
+                            DoCastSelf(SPELL_TRASH);
                             events.ScheduleEvent(EVENT_WIDE_SLASH, 16000);
                             break;*/
                     default:
                         break;
                 }
             }
-
             DoMeleeAttackIfReady();
         }
     private:
