@@ -18224,7 +18224,7 @@ void Unit::SetPhaseMask(uint32 newPhaseMask, bool update)
         return;
 
     if (IsInWorld())
-        m_threatMgr.UpdateOnlineStates(true, true);
+        m_threatMgr.EvaluateSuppressed();
 
     WorldObject::SetPhaseMask(newPhaseMask, update);
 
@@ -18251,7 +18251,6 @@ void Unit::UpdateObjectVisibility(bool forced, bool /*fromUpdate*/)
         AddToNotify(NOTIFY_VISIBILITY_CHANGED);
     else
     {
-        m_threatMgr.UpdateOnlineStates(true, true);
         WorldObject::UpdateObjectVisibility(true);
         Acore::AIRelocationNotifier notifier(*this);
         float radius = 60.0f;

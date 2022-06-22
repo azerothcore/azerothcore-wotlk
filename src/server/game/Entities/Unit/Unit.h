@@ -1667,7 +1667,6 @@ public:
     void SetCombatTimer(uint32 timer) { m_CombatTimer = timer; }  //TODO Remove
 
     void SendClearTarget();
-    void SendThreatListUpdate() { m_threatMgr.SendThreatListToClients(); }
 
     [[nodiscard]] bool HasAuraTypeWithFamilyFlags(AuraType auraType, uint32 familyName, uint32 familyFlags) const;
     [[nodiscard]] bool virtual HasSpell(uint32 /*spellID*/) const { return false; }

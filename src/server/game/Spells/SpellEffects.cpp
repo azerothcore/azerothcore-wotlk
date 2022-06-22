@@ -4037,7 +4037,7 @@ void Spell::EffectSanctuary(SpellEffIndex /*effIndex*/)
             unitTarget->GetThreatMgr().ModifyThreatByPercent(-100); // fix error
 
         if (unitTarget->GetTypeId() == TYPEID_PLAYER)
-            unitTarget->ToPlayer()->SendAttackSwingCancelAttack();     // melee and ranged forced attack cancel*/ 
+            unitTarget->ToPlayer()->SendAttackSwingCancelAttack();     // melee and ranged forced attack cancel*/
     }
     else
     {

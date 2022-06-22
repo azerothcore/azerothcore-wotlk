@@ -595,7 +595,7 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
 
     LoadSpellTemplateImmunity();
 
-    GetThreatMgr().UpdateOnlineStates(true, true);
+    GetThreatMgr().EvaluateSuppressed();
 
     return true;
 }
@@ -2077,7 +2077,7 @@ Unit* Creature::SelectVictim()
     Unit* target = nullptr;
 
     if (CanHaveThreatList())
-        target = GetThreatMgr().SelectVictim();
+        target = GetThreatMgr().GetCurrentVictim();
     else if (!HasReactState(REACT_PASSIVE))
     {
         // We're a player pet, probably
