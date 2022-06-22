@@ -13013,6 +13013,9 @@ void Unit::EngageWithTarget(Unit* enemy)
     if (!enemy)
         return;
 
+    if (IsEngagedBy(enemy))
+        return;
+
     if (CanHaveThreatList())
         m_threatMgr.AddThreat(enemy, 0.0f, nullptr, true, true);
     else

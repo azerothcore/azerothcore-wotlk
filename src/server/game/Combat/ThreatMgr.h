@@ -140,7 +140,7 @@ public:
     auto const& GetThreatenedByMeList() const { return _threatenedByMe; }
 
     // Notify the ThreatManager that its owner may now be suppressed on others' threat lists (immunity or damage-breakable CC being applied)
-    void EvaluateSuppressed();
+    void EvaluateSuppressed(bool canExpire = false);
     ///== AFFECT MY THREAT LIST ==
     void AddThreat(Unit* target, float amount, SpellInfo const* spell = nullptr, bool ignoreModifiers = false, bool ignoreRedirects = false);
     void ScaleThreat(Unit* target, float factor);
@@ -202,6 +202,7 @@ private:
     void PutThreatListRef(ObjectGuid const& guid, ThreatReference* ref);
     void PurgeThreatListRef(ObjectGuid const& guid);
 
+    bool _needClientUpdate;
     uint32 _updateTimer;
     threat_list_heap _sortedThreatList;
     std::unordered_map<ObjectGuid, ThreatReference*> _myThreatListEntries;
@@ -259,6 +260,7 @@ public:
     OnlineState GetOnlineState() const { return _online; }
     bool IsOnline() const { return (_online >= ONLINE_STATE_ONLINE); }
     bool IsAvailable() const { return (_online > ONLINE_STATE_OFFLINE); }
+    bool IsSuppressed() const { return (_online == ONLINE_STATE_SUPPRESSED); }
     bool IsOffline() const { return (_online <= ONLINE_STATE_OFFLINE); }
     TauntState GetTauntState() const { return IsTaunting() ? TAUNT_STATE_TAUNT : _taunted; }
     bool IsTaunting() const { return _taunted >= TAUNT_STATE_TAUNT; }
@@ -273,10 +275,10 @@ public:
 
 private:
     static bool FlagsAllowFighting(Unit const* a, Unit const* b);
-    ThreatReference(ThreatMgr* mgr, Unit* victim, float amount) :
+    ThreatReference(ThreatMgr* mgr, Unit* victim) :
         _owner(reinterpret_cast<Creature*>(mgr->_owner)), _mgr(*mgr), _victim(victim),
-        _online(ShouldBeOffline() ? ONLINE_STATE_OFFLINE : ShouldBeSuppressed() ? ONLINE_STATE_SUPPRESSED : ONLINE_STATE_ONLINE),
-        _baseAmount(IsOnline() ? amount : 0.0f), _tempModifier(0), _taunted(TAUNT_STATE_NONE) { }
+        _online(ShouldBeSuppressed() ? ONLINE_STATE_SUPPRESSED : ONLINE_STATE_ONLINE),
+        _baseAmount(0.0f), _tempModifier(0), _taunted(TAUNT_STATE_NONE) { }
 
     void UnregisterAndFree();
 

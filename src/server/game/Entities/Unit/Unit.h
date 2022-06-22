@@ -2513,6 +2513,7 @@ private:
     //TimeTrackerSmall m_movesplineTimer;
 
     Diminishing m_Diminishing;
+
     // Manage all Units that are threatened by us
     friend class CombatMgr;
     CombatMgr m_combatMgr;

@@ -878,7 +878,7 @@ class spell_pri_vampiric_touch : public AuraScript
 };
 
 // 605 - Mind Control
-class spell_pri_mind_control : public AuraScript
+class spell_pri_mind_control : public AuraScript        // TODO Fix the spell
 {
     PrepareAuraScript(spell_pri_mind_control);
 
@@ -888,13 +888,12 @@ class spell_pri_mind_control : public AuraScript
         {
             if (Unit* target = GetTarget())
             {
-                uint32 duration = static_cast<uint32>(GetDuration());
                 caster->SetInCombatWith(target);
                 target->SetInCombatWith(caster);
             }
         }
     }
-    // TODO Fix SetCombatTImer
+
     void HandleRemoveEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Unit* caster = GetCaster())
