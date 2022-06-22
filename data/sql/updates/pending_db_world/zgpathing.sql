@@ -1,8 +1,8 @@
 SET @NPC := 49132;
 SET @path := @NPC * 10;
 UPDATE creature SET wander_distance=0,MovementType=2,position_x=-12317.01,position_y=-1447.9121,position_z=130.70255 WHERE guid=@NPC;
-UPDATE creature SET wander_distance=0,MovementType=2,position_x=-12317.01,position_y=-1447.9121,position_z=130.70255 WHERE guid=49131;
-UPDATE creature SET wander_distance=0,MovementType=2,position_x=-12317.01,position_y=-1447.9121,position_z=130.70255 WHERE guid=49133;
+UPDATE creature SET wander_distance=0,MovementType=0,position_x=-12317.01,position_y=-1447.9121,position_z=130.70255 WHERE guid=49131;
+UPDATE creature SET wander_distance=0,MovementType=0,position_x=-12317.01,position_y=-1447.9121,position_z=130.70255 WHERE guid=49133;
 DELETE FROM creature_addon WHERE guid=@NPC;
 INSERT INTO creature_addon (guid,path_id,mount,bytes1,bytes2,emote,visibilityDistanceType,auras) VALUES (@NPC,@path,0,0,1,0,0, '');
 DELETE FROM waypoint_data WHERE id=@path;
@@ -15,9 +15,6 @@ INSERT INTO waypoint_data (id,point,position_x,position_y,position_z,orientation
 (@path,6,-12251.229,-1419.3248,130.7252,0,0,0,0,100,0),
 (@path,7,-12274.962,-1432.1677,130.7252,0,0,0,0,100,0),
 (@path,8,-12294.435,-1452.9664,130.7252,0,0,0,0,100,0);
-
-
-
 
 DELETE FROM `creature` WHERE (`id1` = 11372 AND guid = 49090) OR (`id1` = 11371 AND guid = 49090);
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
@@ -145,7 +142,7 @@ INSERT INTO waypoint_data (id,point,position_x,position_y,position_z,orientation
 (@path,2,-12056.444,-1439.4609,130.26523,0,0,0,0,100,0),
 (@path,3,-12064.653,-1446.329,130.2684,0,0,0,0,100,0),
 (@path,4,-12076.898,-1450.6375,130.39133,0,0,0,0,100,0),
-(@path,5,-12088.711,-1450.2057,130.85104,0,0,0,0,100,0),
+(@path,5,-12088.711,-1450.2057,130.85104,0,0,0,0,400,0),
 (@path,6,-12064.653,-1446.329,130.2684,0,0,0,0,100,0),
 (@path,7,-12056.444,-1439.4609,130.26523,0,0,0,0,100,0);
 
@@ -161,4 +158,5 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 ('49146', '49143', '10', '185', '515', '0', '0'),
 ('49146', '49147', '10', '170', '515', '0', '0'),
 ('49132', '49132', '0', '0', '515', '0', '0'),
-('49132', '49131', '2', '155', '515', '5', '8');
+('49132', '49131', '2', '155', '515', '0', '0'),
+('49132', '49133', '2', '205', '515', '0', '0');
