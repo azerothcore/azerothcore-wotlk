@@ -16,9 +16,10 @@ INSERT INTO waypoint_data (id,point,position_x,position_y,position_z,orientation
 (@path,7,-12274.962,-1432.1677,130.7252,0,0,0,0,100,0),
 (@path,8,-12294.435,-1452.9664,130.7252,0,0,0,0,100,0);
 
-DELETE FROM `creature` WHERE (`id1` = 11372 AND guid = 49090) OR (`id1` = 11371 AND guid = 49090);
+DELETE FROM `creature` WHERE (`id1` = 11372 AND guid = 49090) OR (`id1` = 11371 AND `guid` = 49090) OR (`id1` = 14750 AND  `guid` = 49139) OR (`id1`= 11368 AND `guid` = 49139);
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
-(49090, 11371, 0, 0, 309, 0, 0, 1, 1, 0, -11862.2, -1317.21, 79.0372, 4.15388, 7200, 0, 0, 15260, 0, 0, 0, 0, 0, '', 0);
+(49090, 11371, 0, 0, 309, 0, 0, 1, 1, 0, -11862.2, -1317.21, 79.0372, 4.15388, 7200, 0, 0, 15260, 0, 0, 0, 0, 0, '', 0),
+(49139, 14750, 0, 0, 309, 0, 0, 1, 1, 0, -12237.4, -1413.4, 130.85, 3.49715, 7200, 5, 0, 31440, 0, 1, 0, 0, 0, '', 0);
 
 SET @NPC := 49090;
 SET @path := @NPC * 10;
@@ -167,37 +168,40 @@ SET @path := @NPC * 10;
 SET @NPC2 := 49189;
 SET @NPC3 := 49188;
 SET @NPC4 := 49187;
-UPDATE creature SET wander_distance=0,MovementType=2,position_x=-12139.658,position_y=-1462.6881,position_z=130.72519 WHERE guid=@NPC;
-UPDATE creature SET wander_distance=0,MovementType=0,position_x=-12139.658,position_y=-1462.6881,position_z=130.72519 WHERE guid=@NPC2;
-UPDATE creature SET wander_distance=0,MovementType=0,position_x=-12139.658,position_y=-1462.6881,position_z=130.72519 WHERE guid=@NPC3;
-UPDATE creature SET wander_distance=0,MovementType=0,position_x=-12139.658,position_y=-1462.6881,position_z=130.72519 WHERE guid=@NPC4;
+SET @NPC5 := 49140;
+SET @NPC6 := 49139;
+UPDATE creature SET wander_distance=0,MovementType=2,position_x=-12139.658,position_y=-1462.6881,position_z=132.72519 WHERE guid=@NPC;
+UPDATE creature SET wander_distance=0,MovementType=0,position_x=-12138.658,position_y=-1462.6881,position_z=132.72519 WHERE guid=@NPC2;
+UPDATE creature SET wander_distance=0,MovementType=0,position_x=-12140.658,position_y=-1462.6881,position_z=132.72519 WHERE guid=@NPC3;
+UPDATE creature SET wander_distance=0,MovementType=0,position_x=-12139.658,position_y=-1461.6881,position_z=132.72519 WHERE guid=@NPC4;
+UPDATE creature SET wander_distance=0,MovementType=0,position_x=-12139.658,position_y=-1463.6881,position_z=132.72519 WHERE guid=@NPC5;
+UPDATE creature SET wander_distance=0,MovementType=0,position_x=-12139.658,position_y=-1461.3881,position_z=132.72519 WHERE guid=@NPC6;
 DELETE FROM creature_addon WHERE guid=@NPC;
 INSERT INTO creature_addon (guid,path_id,mount,bytes1,bytes2,emote,visibilityDistanceType,auras) VALUES (@NPC,@path,0,0,1,0,0, '');
 DELETE FROM waypoint_data WHERE id=@path;
 INSERT INTO waypoint_data (id,point,position_x,position_y,position_z,orientation,delay,move_type,action,action_chance,wpguid) VALUES
-(@path,1,-12139.658,-1462.6881,130.72519,0,0,0,0,100,0),
-(@path,2,-12145.165,-1472.5826,130.72519,0,0,0,0,100,0),
-(@path,3,-12150.585,-1480.6031,130.72519,0,0,0,0,100,0),
-(@path,4,-12155.898,-1487.2714,130.88535,0,0,0,0,100,0),
-(@path,5,-12162.413,-1488.4478,130.95273,0,0,0,0,100,0),
-(@path,6,-12166.849,-1484.3025,130.72519,0,0,0,0,100,0),
-(@path,7,-12169.933,-1475.3961,130.72519,0,0,0,0,100,0),
-(@path,8,-12168.736,-1461.0402,130.72519,0,0,0,0,100,0),
-(@path,9,-12165.8,-1451.5284,131.1915,0,0,0,0,100,0),
-(@path,10,-12159.837,-1446.8896,131.52573,0,0,0,0,100,0),
-(@path,11,-12154.368,-1448.3627,131.15585,0,0,0,0,100,0),
-(@path,12,-12148.044,-1460.6128,130.72519,0,0,0,0,100,0),
-(@path,13,-12142.502,-1469.3756,130.72519,0,0,0,0,100,0),
-(@path,14,-12139.423,-1477.193,130.72519,0,0,0,0,100,0),
-(@path,15,-12142.655,-1487.7107,130.81308,0,0,0,0,100,0),
-(@path,16,-12150.853,-1489.0536,131.22275,0,0,0,0,100,0),
-(@path,17,-12157.748,-1478.774,130.72519,0,0,0,0,100,0),
-(@path,18,-12158.351,-1465.1509,131.22519,0,0,0,0,100,0),
-(@path,19,-12156.007,-1450.0975,130.72519,0,0,0,0,100,0),
-(@path,20,-12153.582,-1446.1135,131.67294,0,0,0,0,100,0),
-(@path,21,-12146.194,-1444.6774,132.9537,0,0,0,0,100,0),
-(@path,22,-12139.783,-1452.6754,130.72519,0,0,0,0,100,0);
- 
+(@path,1,-12139.658,-1462.6881,131.72519,0,0,2,0,100,0),
+(@path,2,-12145.165,-1472.5826,131.72519,0,0,2,0,100,0),
+(@path,3,-12150.585,-1480.6031,131.72519,0,0,2,0,100,0),
+(@path,4,-12155.898,-1487.2714,131.88535,0,0,2,0,100,0),
+(@path,5,-12162.413,-1488.4478,131.95273,0,0,2,0,100,0),
+(@path,6,-12166.849,-1484.3025,131.72519,0,0,2,0,100,0),
+(@path,7,-12169.933,-1475.3961,131.72519,0,0,2,0,100,0),
+(@path,8,-12168.736,-1461.0402,131.72519,0,0,2,0,100,0),
+(@path,9,-12165.8,-1451.5284,132.1915,0,0,0,2,100,0),
+(@path,10,-12159.837,-1446.8896,132.52573,0,0,2,0,100,0),
+(@path,11,-12154.368,-1448.3627,132.15585,0,0,2,0,100,0),
+(@path,12,-12148.044,-1460.6128,131.72519,0,0,2,0,100,0),
+(@path,13,-12142.502,-1469.3756,131.72519,0,0,2,0,100,0),
+(@path,14,-12139.423,-1477.193,131.72519,0,0,2,0,100,0),
+(@path,15,-12142.655,-1487.7107,131.81308,0,0,2,0,100,0),
+(@path,16,-12150.853,-1489.0536,132.22275,0,0,2,0,100,0),
+(@path,17,-12157.748,-1478.774,131.72519,0,0,2,0,100,0),
+(@path,18,-12158.351,-1465.1509,132.22519,0,0,2,0,100,0),
+(@path,19,-12156.007,-1450.0975,131.72519,0,0,2,0,100,0),
+(@path,20,-12153.582,-1446.1135,132.67294,0,0,2,0,100,0),
+(@path,21,-12146.194,-1444.6774,133.9537,0,0,2,0,100,0),
+(@path,22,-12139.783,-1452.6754,131.72519,0,0,2,0,100,0);
 DELETE FROM `creature_formations` WHERE `leaderguid` IN (49090, 49751, 49752, 49146, 49147, 49132, 49135, 49186, 49189);
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES 
 ('49751', '49751', '0', '0', '515', '0', '0'),
@@ -218,4 +222,6 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 ('49186', '49186', '0', '0', '515', '0', '0'),
 ('49186', '49189', '5', '180', '515', '0', '0'),
 ('49186', '49188', '5', '205', '515', '0', '0'),
-('49186', '49187', '5', '155', '515', '0', '0');
+('49186', '49140', '5', '180', '515', '0', '0'),
+('49186', '49139', '10', '205', '515', '0', '0'),
+('49186', '49187', '10', '155', '515', '0', '0');
