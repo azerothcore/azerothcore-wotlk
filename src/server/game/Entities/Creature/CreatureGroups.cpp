@@ -265,6 +265,11 @@ void CreatureGroup::MemberEvaded(Creature* member)
                 continue;
             }
 
+            if (itr.second.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_DONT_RESPAWN_LEADER_ON_EVADE)) && pMember == m_leader)
+            {
+                continue;
+            }
+
             pMember->Respawn();
         }
     }
