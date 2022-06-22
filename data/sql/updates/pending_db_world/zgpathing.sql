@@ -1,7 +1,7 @@
 DELETE FROM `creature` WHERE (`id1` = 11372 AND guid = 49090) OR (`id1` = 11371 AND guid = 49090);
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 (49090, 11371, 0, 0, 309, 0, 0, 1, 1, 0, -11862.2, -1317.21, 79.0372, 4.15388, 7200, 0, 0, 15260, 0, 0, 0, 0, 0, '', 0);
--- Pathing for Entry: 11371
+
 SET @NPC := 49090;
 SET @path := @NPC * 10;
 UPDATE creature SET wander_distance=0,MovementType=2,position_x=-11874.843,position_y=-1325.8516,position_z=78.68711 WHERE guid=@NPC;
