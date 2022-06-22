@@ -1,3 +1,4 @@
+-- DB update 2022_06_22_02 -> 2022_06_22_03
 --
 DELETE FROM `command` WHERE `name` IN ("deserter instance remove all", "deserter bg remove all");
 
