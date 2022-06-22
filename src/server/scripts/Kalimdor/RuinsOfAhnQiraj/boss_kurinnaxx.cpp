@@ -56,7 +56,6 @@ public:
             _enraged = false;
             events.ScheduleEvent(EVENT_MORTAL_WOUND, urand(8000, 10000));
             events.ScheduleEvent(EVENT_SANDTRAP, urand(5000, 15000));
-            events.ScheduleEvent(EVENT_TRASH, 1000);
             events.ScheduleEvent(EVENT_WIDE_SLASH, urand(10000, 15000));
         }
 
