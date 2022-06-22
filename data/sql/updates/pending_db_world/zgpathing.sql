@@ -198,7 +198,7 @@ INSERT INTO waypoint_data (id,point,position_x,position_y,position_z,orientation
 (@path,21,-12146.194,-1444.6774,132.9537,0,0,0,0,100,0),
 (@path,22,-12139.783,-1452.6754,130.72519,0,0,0,0,100,0);
  
-DELETE FROM `creature_formations` WHERE `leaderguid` IN (49090, 49751, 49752, 49146, 49147, 49132, 49135, 49186, 49187);
+DELETE FROM `creature_formations` WHERE `leaderguid` IN (49090, 49751, 49752, 49146, 49147, 49132, 49135, 49186, 49189);
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES 
 ('49751', '49751', '0', '0', '515', '0', '0'),
 ('49751', '49752', '2', '270', '515', '0', '0'),
