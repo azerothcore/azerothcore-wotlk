@@ -97,6 +97,11 @@ Position const SpawnBat[6] =
     { -12293.6220f, -1380.2640f, 144.8304f, 5.483f }
 };
 
+enum Misc
+{
+    PATH_JEKLIK_INTRO = 145170
+};
+
 Position const homePosition = { -12291.9f, -1380.08f, 144.902f, 2.28638f };
 
 struct boss_jeklik : public BossAI
@@ -135,7 +140,7 @@ struct boss_jeklik : public BossAI
         me->SetDisableGravity(true);
         DoCastSelf(SPELL_BAT_FORM, true);
 
-        me->GetMotionMaster()->MovePath(me->GetEntry(), false);
+        me->GetMotionMaster()->MovePath(PATH_JEKLIK_INTRO, false);
     }
 
     void PathEndReached(uint32 /*pathId*/) override
