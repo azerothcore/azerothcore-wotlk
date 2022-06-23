@@ -147,7 +147,6 @@ public:
             _hasSubmergedOnce = false;
             _isKnockbackEmoteAllowed = true;
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-            me->SetControlled(true, UNIT_STATE_ROOT);
             _lavaBurstGUIDS.clear();
         }
 
