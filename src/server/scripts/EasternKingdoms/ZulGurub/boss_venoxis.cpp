@@ -145,11 +145,11 @@ public:
             // Always running events
             events.ScheduleEvent(EVENT_THRASH, 5000);
             // Phase one events (regular form)
-            events.ScheduleEvent(EVENT_HOLY_NOVA, 5000, 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_HOLY_NOVA, urand(5000, 15000), 0, PHASE_ONE);
             events.ScheduleEvent(EVENT_DISPEL_MAGIC, 35000, 0, PHASE_ONE);
-            events.ScheduleEvent(EVENT_HOLY_FIRE, 10000, 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_HOLY_FIRE, urand(10000,20000), 0, PHASE_ONE);
             events.ScheduleEvent(EVENT_RENEW, 30000, 0, PHASE_ONE);
-            events.ScheduleEvent(EVENT_HOLY_WRATH, 60000, 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_HOLY_WRATH, urand(15000, 25000), 0, PHASE_ONE);
 
             events.SetPhase(PHASE_ONE);
 
@@ -205,32 +205,19 @@ public:
                         DoCast(me, SPELL_RENEW);
                         events.ScheduleEvent(EVENT_RENEW, urand(25000, 30000), 0, PHASE_ONE);
                         break;
-                    case EVENT_HOLY_NOVA:
-                        _inMeleeRange = 0;
-
-                        for (uint8 i = 0; i < 10; ++i)
-                        {
-                            if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, i))
-                                // check if target is within melee-distance
-                                if (me->IsWithinMeleeRange(target))
-                                    ++_inMeleeRange;
-                        }
-
-                        // trigger spellcast only if we have 3 or more targets to affect
-                        if (_inMeleeRange >= 3)
-                            DoCastVictim(SPELL_HOLY_NOVA);
-
-                        events.ScheduleEvent(EVENT_HOLY_NOVA, urand(45000, 75000), 0, PHASE_ONE);
+                    case EVENT_HOLY_WRATH:
+                        if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat))
+                            DoCast(target, SPELL_HOLY_WRATH);
+                        events.ScheduleEvent(EVENT_HOLY_WRATH, urand(12000, 22000), 0, PHASE_ONE);
                         break;
                     case EVENT_HOLY_FIRE:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                             DoCast(target, SPELL_HOLY_FIRE);
-                        events.ScheduleEvent(EVENT_HOLY_FIRE, urand(45000, 60000), 0, PHASE_ONE);
+                        events.ScheduleEvent(EVENT_HOLY_FIRE, urand(10000, 24000), 0, PHASE_ONE);
                         break;
-                    case EVENT_HOLY_WRATH:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random))
-                            DoCast(target, SPELL_HOLY_WRATH);
-                        events.ScheduleEvent(EVENT_HOLY_WRATH, urand(45000, 60000), 0, PHASE_ONE);
+                    case EVENT_HOLY_NOVA:
+                        DoCastSelf(SPELL_HOLY_NOVA);
+                        events.ScheduleEvent(EVENT_HOLY_NOVA, urand(10000, 24000), 0, PHASE_ONE);
                         break;
 
                     //
