@@ -548,6 +548,8 @@ struct boss_nefarian : public BossAI
             }
             me->DespawnOrUnsummon();
         }
+
+        classesPresent.clear();
     }
 
     void EnterCombat(Unit* /*who*/) override {}
@@ -675,15 +677,20 @@ struct boss_nefarian : public BossAI
                     events.ScheduleEvent(EVENT_TAILLASH, 10000);
                     break;
                 case EVENT_CLASSCALL:
-                    std::set<uint8> classesPresent;
-                    for (auto& ref : me->GetThreatMgr().getThreatList())
+                    if (classesPresent.empty())
                     {
-                        if (ref->getTarget() && ref->getTarget()->GetTypeId() == TYPEID_PLAYER)
+                        for (auto& ref : me->GetThreatMgr().getThreatList())
                         {
-                            classesPresent.insert(ref->getTarget()->getClass());
+                            if (ref->getTarget() && ref->getTarget()->GetTypeId() == TYPEID_PLAYER)
+                            {
+                                classesPresent.insert(ref->getTarget()->getClass());
+                            }
                         }
                     }
+
                     uint8 targetClass = Acore::Containers::SelectRandomContainerElement(classesPresent);
+
+                    classesPresent.erase(targetClass);
 
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, ClassCallSelector(me, targetClass)))
                     {
@@ -755,6 +762,7 @@ struct boss_nefarian : public BossAI
 private:
     bool Phase3;
     bool _introDone;
+    std::set<uint8> classesPresent;
 };
 
 enum TotemSpells
