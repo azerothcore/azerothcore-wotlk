@@ -42,11 +42,6 @@ class SpellInfo;
  *  - Both owner and victim are valid units, which are currently in the world. Neither can be nullptr.                                                  *
  *  - There is an active combat reference between owner and victim.                                                                                     *
  *                                                                                                                                                      *
- * ThreatManager also keeps track of whether its owner is engaged (a boolean flag).                                                                     *
- *  - If a (non-offline) threat list entry is added to a not-yet-engaged ThreatManager, it calls JustEngagedWith on its owner's AI.                     *
- *  - The engaged state is cleared in ClearAllThreat (which is invoked on evade).                                                                       *
- *  - This flag can be accessed through the IsEngaged method. For creatures that can have a threat list, this is equal to Unit::IsEngaged.              *
- *                                                                                                                                                      *
  * Note that (threat => combat) is a strong guarantee provided in conjunction with CombatManager. Thus:                                                 *
  *  - Adding threat will also create a combat reference between the units if one doesn't exist yet (even if the owner can't have a threat list!)        *
  *  - Ending combat between two units will also delete any threat references that may exist between them.                                               *
@@ -111,7 +106,6 @@ public:
     // returns an arbitrary non-offline victim from owner's threat list if one exists, nullptr otherwise
     Unit* GetAnyTarget() const;
 
-    bool IsEngaged() const { return _ownerEngaged; }
     // are there any entries in owner's threat list?
     bool IsThreatListEmpty(bool includeOffline = false) const;
     // is there a threat list entry on owner's threat list with victim == who?
@@ -187,7 +181,6 @@ public:
 private:
     Unit* const _owner;
     bool _ownerCanHaveThreatList;
-    bool _ownerEngaged;
 
     static const CompareThreatLessThan CompareThreat;
     static bool CompareReferencesLT(ThreatReference const* a, ThreatReference const* b, float aWeight);
@@ -277,8 +270,10 @@ private:
     static bool FlagsAllowFighting(Unit const* a, Unit const* b);
     ThreatReference(ThreatMgr* mgr, Unit* victim) :
         _owner(reinterpret_cast<Creature*>(mgr->_owner)), _mgr(*mgr), _victim(victim),
-        _online(ShouldBeSuppressed() ? ONLINE_STATE_SUPPRESSED : ONLINE_STATE_ONLINE),
-        _baseAmount(0.0f), _tempModifier(0), _taunted(TAUNT_STATE_NONE) { }
+        _baseAmount(0.0f), _tempModifier(0), _taunted(TAUNT_STATE_NONE)
+    {
+        _online = ShouldBeSuppressed() ? ONLINE_STATE_SUPPRESSED : ONLINE_STATE_ONLINE;
+    }
 
     void UnregisterAndFree();
 

@@ -167,7 +167,7 @@ void ThreatReference::UnregisterAndFree()
     return true;
 }
 
-ThreatMgr::ThreatMgr(Unit* owner) : _owner(owner), _ownerCanHaveThreatList(false), _ownerEngaged(false), _needClientUpdate(false), _updateTimer(THREAT_UPDATE_INTERVAL), _currentVictimRef(nullptr), _fixateRef(nullptr)
+ThreatMgr::ThreatMgr(Unit* owner) : _owner(owner), _ownerCanHaveThreatList(false), _needClientUpdate(false), _updateTimer(THREAT_UPDATE_INTERVAL), _currentVictimRef(nullptr), _fixateRef(nullptr)
 {
     for (int8 i = 0; i < MAX_SPELL_SCHOOL; ++i)
         _singleSchoolModifiers[i] = 1.0f;
@@ -187,7 +187,7 @@ void ThreatMgr::Initialize()
 
 void ThreatMgr::Update(uint32 tdiff)
 {
-    if (!CanHaveThreatList() || !IsEngaged())
+    if (!CanHaveThreatList() || IsThreatListEmpty())
         return;
 
     if (_updateTimer <= tdiff)
@@ -294,13 +294,6 @@ void ThreatMgr::EvaluateSuppressed(bool canExpire)
     }
 }
 
-static void SaveCreatureHomePositionIfNeed(Creature* c)
-{
-    MovementGeneratorType const movetype = c->GetMotionMaster()->GetCurrentMovementGeneratorType();
-    if (movetype == WAYPOINT_MOTION_TYPE || movetype == POINT_MOTION_TYPE || (c->IsAIEnabled && c->AI()->IsEscorted()))
-        c->SetHomePosition(c->GetPosition());
-}
-
 void ThreatMgr::AddThreat(Unit* target, float amount, SpellInfo const* spell, bool ignoreModifiers, bool ignoreRedirects)
 {
     // step 1: we can shortcut if the spell has one of the NO_THREAT attrs set - nothing will happen
@@ -401,18 +394,10 @@ void ThreatMgr::AddThreat(Unit* target, float amount, SpellInfo const* spell, bo
     if (ref->IsOnline()) // ...and if the ref is online it also gets the threat it should have
         ref->AddThreat(amount);
 
-    if (!_ownerEngaged)
+    if (!_owner->IsEngaged())
     {
-        Creature* cOwner = ASSERT_NOTNULL(_owner->ToCreature()); // if we got here the owner can have a threat list, and must be a creature!
-        _ownerEngaged = true;
-
+        _owner->AtEngage(target);
         UpdateVictim();
-
-        SaveCreatureHomePositionIfNeed(cOwner);
-        if (cOwner->IsAIEnabled)
-            cOwner->AI()->EnterCombat(target);
-        if (CreatureGroup* formation = cOwner->GetFormation())
-            formation->MemberEngagingTarget(cOwner, target);
     }
 }
 
@@ -489,14 +474,17 @@ void ThreatMgr::ClearThreat(ThreatReference* ref)
 
 void ThreatMgr::ClearAllThreat()
 {
-    _ownerEngaged = false;
-    if (_myThreatListEntries.empty())
-        return;
-
-    SendClearAllThreatToClients();
-    do
-        _myThreatListEntries.begin()->second->UnregisterAndFree();
-    while (!_myThreatListEntries.empty());
+    if (!_myThreatListEntries.empty())
+    {
+        SendClearAllThreatToClients();
+        do
+            _myThreatListEntries.begin()->second->UnregisterAndFree();
+        while (!_myThreatListEntries.empty());
+    }
+    // note: i don't really like having this here
+    // (maybe engage flag should be in creature ai? it's inherently an AI property...)
+    if (_owner->IsEngaged())
+        _owner->AtDisengage();
 }
 
 void ThreatMgr::FixateTarget(Unit* target)

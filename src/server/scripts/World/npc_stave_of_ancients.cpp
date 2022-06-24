@@ -55,9 +55,9 @@ void NPCStaveQuestAI::StorePlayerGUID()
 
     for (auto const& pair : me->GetCombatMgr().GetPvECombatRefs())
     {
-        Unit* playerGUID = pair.second->GetOther(me);
-        if (playerGUID->GetTypeId() == TYPEID_PLAYER)
-            playerGUID->GetGUID(); //TODO -> GUID from the list
+        Unit* player= pair.second->GetOther(me);
+        if (player->GetTypeId() == TYPEID_PLAYER)
+            playerGUID = player->GetGUID();
     }
 }
 

@@ -267,15 +267,13 @@ public:
 
         void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            Unit* target = GetTarget();
-            if (Unit* caster = GetCaster())
+            if (Unit* target = GetTarget())
                 target->GetThreatMgr().TauntUpdate();
         }
 
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            Unit* target = GetTarget();
-            if (Unit* caster = GetCaster())
+            if (Unit* target = GetTarget())
                 target->GetThreatMgr().TauntUpdate();
         }
 

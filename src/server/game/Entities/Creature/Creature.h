@@ -395,8 +395,8 @@ public:
 
     void ResetFaction() { SetFaction(GetCreatureTemplate()->faction); }
 
-    void AtEnterCombat() override;
-    void AtExitCombat() override;
+    void AtEngage(Unit* target) override;
+    void AtDisengage() override;
 
 protected:
     bool CreateFromProto(ObjectGuid::LowType guidlow, uint32 Entry, uint32 vehId, const CreatureData* data = nullptr);

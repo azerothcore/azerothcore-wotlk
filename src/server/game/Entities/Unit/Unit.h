@@ -1629,10 +1629,10 @@ public:
 
     /// ====================== THREAT & COMBAT ====================
     bool CanHaveThreatList() const { return m_threatMgr.CanHaveThreatList(); }
-    // For NPCs with threat list: Whether there are any enemies on our threat list
-    // For other units: Whether we're in combat
-    // This value is different from IsInCombat when a projectile spell is midair (combat on launch - threat+aggro on impact)
-    bool IsEngaged() const { return CanHaveThreatList() ? m_threatMgr.IsEngaged() : IsInCombat(); }
+    // This value can be different from IsInCombat:
+    // - when a projectile spell is midair against a creature (combat on launch - threat+aggro on impact)
+    // - when the creature has no targets left, but the AI has not yet ceased engaged logic
+    bool IsEngaged() const { return m_isEngaged; }
     bool IsEngagedBy(Unit const* who) const { return CanHaveThreatList() ? IsThreatenedBy(who) : IsInCombatWith(who); }
     void EngageWithTarget(Unit* who); // Adds target to threat list if applicable, otherwise just sets combat state
     // Combat handling
@@ -2236,6 +2236,9 @@ public:
     virtual void AtEnterCombat() { }
     virtual void AtExitCombat();
 
+    virtual void AtEngage(Unit* /*target*/) { m_isEngaged = true; }
+    virtual void AtDisengage() { m_isEngaged = false; }
+
     ///-----------Combo point system-------------------
        // This unit having CP on other units
     [[nodiscard]] uint8 GetComboPoints(Unit const* who = nullptr) const { return (who && m_comboTarget != who) ? 0 : m_comboPoints; }
@@ -2514,7 +2517,8 @@ private:
 
     Diminishing m_Diminishing;
 
-    // Manage all Units that are threatened by us
+    // Threat+combat management
+    bool m_isEngaged;
     friend class CombatMgr;
     CombatMgr m_combatMgr;
     friend class ThreatMgr;
