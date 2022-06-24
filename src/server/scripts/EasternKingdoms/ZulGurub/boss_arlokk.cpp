@@ -106,7 +106,7 @@ public:
             me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, uint32(WEAPON_DAGGER));
             me->SetWalk(false);
             me->SetHomePosition(PosMoveOnSpawn[0]);
-            me->GetMotionMaster()->MoveTargetedHome(); // maybe?
+            me->GetMotionMaster()->MoveTargetedHome();
         }
 
         void JustDied(Unit* /*killer*/) override
