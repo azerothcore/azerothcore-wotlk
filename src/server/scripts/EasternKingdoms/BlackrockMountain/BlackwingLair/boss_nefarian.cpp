@@ -358,6 +358,7 @@ public:
 
             DoCast(me, SPELL_NEFARIANS_BARRIER);
             SetCombatMovement(false);
+            me->SetImmuneToPC(false);
             AttackStart(SelectTarget(SelectTargetMethod::Random, 0, 200.f, true));
             events.ScheduleEvent(EVENT_SHADOWBLINK, 500);
             events.ScheduleEvent(EVENT_SHADOW_BOLT, 3000);
@@ -499,7 +500,8 @@ public:
                 me->SetFaction(FACTION_DRAGONFLIGHT_BLACK);
                 me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
-                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetImmuneToPC(true);
             }
         }
 
@@ -546,6 +548,8 @@ struct boss_nefarian : public BossAI
             }
             me->DespawnOrUnsummon();
         }
+
+        classesPresent.clear();
     }
 
     void EnterCombat(Unit* /*who*/) override {}
@@ -673,15 +677,20 @@ struct boss_nefarian : public BossAI
                     events.ScheduleEvent(EVENT_TAILLASH, 10000);
                     break;
                 case EVENT_CLASSCALL:
-                    std::set<uint8> classesPresent;
-                    for (auto& ref : me->GetThreatMgr().getThreatList())
+                    if (classesPresent.empty())
                     {
-                        if (ref->getTarget() && ref->getTarget()->GetTypeId() == TYPEID_PLAYER)
+                        for (auto& ref : me->GetThreatMgr().getThreatList())
                         {
-                            classesPresent.insert(ref->getTarget()->getClass());
+                            if (ref->getTarget() && ref->getTarget()->GetTypeId() == TYPEID_PLAYER)
+                            {
+                                classesPresent.insert(ref->getTarget()->getClass());
+                            }
                         }
                     }
+
                     uint8 targetClass = Acore::Containers::SelectRandomContainerElement(classesPresent);
+
+                    classesPresent.erase(targetClass);
 
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, ClassCallSelector(me, targetClass)))
                     {
@@ -753,6 +762,7 @@ struct boss_nefarian : public BossAI
 private:
     bool Phase3;
     bool _introDone;
+    std::set<uint8> classesPresent;
 };
 
 enum TotemSpells

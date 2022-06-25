@@ -103,35 +103,6 @@ public:
                 zealot->ResetFaction();
             }
 
-            // TODO: do this in formations, once a flag is added to prevent leaders from respawning as well.
-            std::list<Creature*> creatureList;
-            GetCreatureListWithEntryInGrid(creatureList, me, NPC_ZULGURUB_TIGER, 15.0f);
-
-            if (_catGuids.empty())
-            {
-                for (Creature* creature : creatureList)
-                {
-                    _catGuids.push_back(creature->GetGUID());
-                    if (!creature->IsAlive())
-                    {
-                        creature->Respawn(true);
-                    }
-                }
-            }
-            else
-            {
-                for (ObjectGuid guid : _catGuids)
-                {
-                    if (Creature* creature = ObjectAccessor::GetCreature(*me, guid))
-                    {
-                        if (!creature->IsAlive())
-                        {
-                            creature->Respawn(true);
-                        }
-                    }
-                }
-            }
-
             _scheduler.SetValidator([this]
             {
                 return !me->HasUnitState(UNIT_STATE_CASTING);
