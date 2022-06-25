@@ -1363,7 +1363,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].Amplitude = 15000;
     });
 
-
     // Frightening Shout
     ApplySpellFix({ 19134 }, [](SpellInfo* spellInfo)
     {
