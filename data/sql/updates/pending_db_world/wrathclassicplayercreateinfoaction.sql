@@ -1,4 +1,4 @@
-DELETE FROM `playercreateinfo_action`; --I hate this, but it's a lot easier than going through and individually grabbing all the things to delete.
+DELETE FROM `playercreateinfo_action`;
 INSERT INTO `playercreateinfo_action` (`race`, `class`, `button`, `action`, `type`) VALUES
   (1, 1, 96, 6603, 0),
   (1, 1, 84, 6603, 0),
