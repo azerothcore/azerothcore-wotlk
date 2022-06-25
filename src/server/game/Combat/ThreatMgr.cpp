@@ -32,7 +32,7 @@
 //==============================================================
 
 // The hatingUnit is not used yet
-float ThreatCalcHelper::calcThreat(Unit* hatedUnit, Unit* hatingUnit, float threat, SpellSchoolMask schoolMask, SpellInfo const* threatSpell)
+float ThreatCalcHelper::calcThreat(Unit* hatedUnit, float threat, SpellSchoolMask schoolMask, SpellInfo const* threatSpell)
 {
     if (threatSpell)
     {
@@ -430,7 +430,7 @@ void ThreatMgr::addThreat(Unit* victim, float threat, SpellSchoolMask schoolMask
     if (!ThreatCalcHelper::isValidProcess(victim, iOwner, threatSpell))
         return;
 
-    threat = ThreatCalcHelper::calcThreat(victim, iOwner, threat, schoolMask, threatSpell);
+    threat = ThreatCalcHelper::calcThreat(victim, threat, schoolMask, threatSpell);
     if (Creature* hatingCreature = iOwner->ToCreature())
     {
         if (hatingCreature->IsAIEnabled)
