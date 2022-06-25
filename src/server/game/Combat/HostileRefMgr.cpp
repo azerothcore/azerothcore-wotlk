@@ -38,7 +38,7 @@ void HostileRefMgr::threatAssist(Unit* victim, float baseThreat, SpellInfo const
         return;
 
     HostileReference* ref = getFirst();
-    float threat = ThreatCalcHelper::calcThreat(victim, iOwner, baseThreat, (threatSpell ? threatSpell->GetSchoolMask() : SPELL_SCHOOL_MASK_NORMAL), threatSpell);
+    float threat = ThreatCalcHelper::calcThreat(victim, baseThreat, (threatSpell ? threatSpell->GetSchoolMask() : SPELL_SCHOOL_MASK_NORMAL), threatSpell);
     threat /= getSize();
     while (ref)
     {
