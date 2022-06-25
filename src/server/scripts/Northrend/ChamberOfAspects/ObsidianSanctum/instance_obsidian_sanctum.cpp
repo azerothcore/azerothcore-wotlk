@@ -8,18 +8,24 @@
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTIgCULAR PURPOSE. See the GNU Affero General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaBoundary.h"
 #include "CreatureAIImpl.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "obsidian_sanctum.h"
+
+BossBoundaryData const boundaries =
+{
+    { DATA_SARTHARION, new RectangleBoundary(3218.86f, 3275.69f, 484.68f, 572.4f) }
+};
 
 class instance_obsidian_sanctum : public InstanceMapScript
 {
@@ -36,6 +42,7 @@ public:
         instance_obsidian_sanctum_InstanceMapScript(Map* pMap) : InstanceScript(pMap), portalCount(0)
         {
             SetBossNumber(MAX_ENCOUNTERS);
+            LoadBossBoundaries(boundaries);
         }
 
         bool IsEncounterInProgress() const override
