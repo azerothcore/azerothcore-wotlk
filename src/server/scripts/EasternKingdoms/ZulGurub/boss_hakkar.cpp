@@ -161,7 +161,7 @@ public:
                     case EVENT_ASPECT_OF_MARLI:
                         if (Unit* victim = SelectTarget(SelectTargetMethod::MaxThreat, 0, 5.f, true))
                         {
-                            DoCastVictim(SPELL_ASPECT_OF_MARLI, true);
+                            DoCast(victim, SPELL_ASPECT_OF_MARLI, true);
                             me->GetThreatMgr().modifyThreatPercent(victim, -100.f);
                         }
                         events.ScheduleEvent(EVENT_ASPECT_OF_MARLI, 10000);
@@ -173,7 +173,7 @@ public:
                     case EVENT_ASPECT_OF_ARLOKK:
                         if (Unit* victim = SelectTarget(SelectTargetMethod::MaxThreat, 0, 5.f, true))
                         {
-                            DoCastVictim(SPELL_ASPECT_OF_ARLOKK, true);
+                            DoCast(victim, SPELL_ASPECT_OF_ARLOKK, true);
                             me->GetThreatMgr().modifyThreatPercent(victim, -100.f);
                         }
                         events.ScheduleEvent(EVENT_ASPECT_OF_ARLOKK, urand(10000, 15000));
