@@ -7846,7 +7846,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                                 Aura* flameShock  = aurEff->GetBase();
                                 int32 extraTime = 2 * aurEff->GetAmplitude();
                                 flameShock->SetMaxDuration(flameShock->GetMaxDuration() + extraTime);
-                                flameShock->SetDuration(flameShock->GetDuration() + 2 * extraTime);
+                                flameShock->SetDuration(flameShock->GetDuration() + extraTime);
 
                                 return true;
                             }
