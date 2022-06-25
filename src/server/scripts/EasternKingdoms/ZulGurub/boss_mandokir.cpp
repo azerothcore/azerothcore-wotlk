@@ -312,7 +312,7 @@ public:
                 }
             }
         }
-                
+
         void DoMeleeAttackIfReady(bool ignoreCasting)
         {
             if (!ignoreCasting && me->HasUnitState(UNIT_STATE_CASTING))
