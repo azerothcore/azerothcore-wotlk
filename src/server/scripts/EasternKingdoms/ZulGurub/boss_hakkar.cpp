@@ -44,7 +44,6 @@ enum Spells
     SPELL_BLOOD_SIPHON          = 24324,
     SPELL_CORRUPTED_BLOOD       = 24328,
     SPELL_CAUSE_INSANITY        = 24327,
-    SPELL_WILL_OF_HAKKAR        = 24178,
     SPELL_ENRAGE                = 24318,
     // The Aspects of all High Priests spells
     SPELL_ASPECT_OF_JEKLIK      = 24687,
@@ -59,14 +58,13 @@ enum Events
     EVENT_BLOOD_SIPHON          = 1,
     EVENT_CORRUPTED_BLOOD       = 2,
     EVENT_CAUSE_INSANITY        = 3,
-    EVENT_WILL_OF_HAKKAR        = 4,
-    EVENT_ENRAGE                = 5,
+    EVENT_ENRAGE                = 4,
     // The Aspects of all High Priests events
-    EVENT_ASPECT_OF_JEKLIK      = 6,
-    EVENT_ASPECT_OF_VENOXIS     = 7,
-    EVENT_ASPECT_OF_MARLI       = 8,
-    EVENT_ASPECT_OF_THEKAL      = 9,
-    EVENT_ASPECT_OF_ARLOKK      = 10
+    EVENT_ASPECT_OF_JEKLIK      = 5,
+    EVENT_ASPECT_OF_VENOXIS     = 6,
+    EVENT_ASPECT_OF_MARLI       = 7,
+    EVENT_ASPECT_OF_THEKAL      = 8,
+    EVENT_ASPECT_OF_ARLOKK      = 9
 };
 
 class boss_hakkar : public CreatureScript
@@ -104,7 +102,6 @@ public:
             events.ScheduleEvent(EVENT_BLOOD_SIPHON, 90000);
             events.ScheduleEvent(EVENT_CORRUPTED_BLOOD, 25000);
             events.ScheduleEvent(EVENT_CAUSE_INSANITY, 17000);
-            events.ScheduleEvent(EVENT_WILL_OF_HAKKAR, 17000);
             events.ScheduleEvent(EVENT_ENRAGE, 600000);
             if (instance->GetBossState(DATA_JEKLIK) != DONE)
                 events.ScheduleEvent(EVENT_ASPECT_OF_JEKLIK, 4000);
@@ -142,16 +139,11 @@ public:
                         events.ScheduleEvent(EVENT_CORRUPTED_BLOOD, urand(30000, 45000));
                         break;
                     case EVENT_CAUSE_INSANITY:
-                        if (Unit* victim = me->GetVictim())
+                        if (Unit* victim = SelectTarget(SelectTargetMethod::MaxThreat, 0, 30.f, true))
                         {
                             DoCast(victim, SPELL_CAUSE_INSANITY);
                         }
                         events.ScheduleEvent(EVENT_CAUSE_INSANITY, urand(35000, 45000));
-                        break;
-                    case EVENT_WILL_OF_HAKKAR:
-                        // Xinef: Skip Tank
-                        DoCast(SelectTarget(SelectTargetMethod::Random, 1, 100, true), SPELL_WILL_OF_HAKKAR);
-                        events.ScheduleEvent(EVENT_WILL_OF_HAKKAR, urand(25000, 35000));
                         break;
                     case EVENT_ENRAGE:
                         if (!me->HasAura(SPELL_ENRAGE))
@@ -242,22 +234,6 @@ public:
     }
 };
 
-class spell_hakkar_cause_insanity : public SpellScript
-{
-    PrepareSpellScript(spell_hakkar_cause_insanity);
-
-    void FilterTargets(std::list<WorldObject*>& targets)
-    {
-        if (targets.size() > 1)
-            targets.resize(1);
-    }
-
-    void Register() override
-    {
-        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hakkar_cause_insanity::FilterTargets, EFFECT_ALL, TARGET_UNIT_TARGET_ENEMY);
-    }
-};
-
 class spell_hakkar_blood_siphon : public SpellScript
 {
     PrepareSpellScript(spell_hakkar_blood_siphon);
@@ -291,6 +267,5 @@ void AddSC_boss_hakkar()
     new boss_hakkar();
     new at_zulgurub_entrance_speech();
     new at_zulgurub_temple_speech();
-    RegisterSpellScript(spell_hakkar_cause_insanity);
     RegisterSpellScript(spell_hakkar_blood_siphon);
 }
