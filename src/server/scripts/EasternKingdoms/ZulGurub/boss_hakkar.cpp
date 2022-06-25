@@ -159,7 +159,11 @@ public:
                         events.ScheduleEvent(EVENT_ASPECT_OF_VENOXIS, 8000);
                         break;
                     case EVENT_ASPECT_OF_MARLI:
-                        DoCastVictim(SPELL_ASPECT_OF_MARLI, true);
+                        if (Unit* victim = SelectTarget(SelectTargetMethod::MaxThreat, 0, 5.f, true))
+                        {
+                            DoCastVictim(SPELL_ASPECT_OF_MARLI, true);
+                            me->GetThreatMgr().modifyThreatPercent(victim, -100.f);
+                        }
                         events.ScheduleEvent(EVENT_ASPECT_OF_MARLI, 10000);
                         break;
                     case EVENT_ASPECT_OF_THEKAL:
@@ -167,7 +171,11 @@ public:
                         events.ScheduleEvent(EVENT_ASPECT_OF_THEKAL, 15000);
                         break;
                     case EVENT_ASPECT_OF_ARLOKK:
-                        DoCastVictim(SPELL_ASPECT_OF_ARLOKK, true);
+                        if (Unit* victim = SelectTarget(SelectTargetMethod::MaxThreat, 0, 5.f, true))
+                        {
+                            DoCastVictim(SPELL_ASPECT_OF_ARLOKK, true);
+                            me->GetThreatMgr().modifyThreatPercent(victim, -100.f);
+                        }
                         events.ScheduleEvent(EVENT_ASPECT_OF_ARLOKK, urand(10000, 15000));
                         break;
                     default:
