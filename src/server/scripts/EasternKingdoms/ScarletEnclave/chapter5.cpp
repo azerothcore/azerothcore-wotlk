@@ -703,7 +703,7 @@ public:
                                 summon->GetMotionMaster()->Clear(false);
                             }
                         me->CombatStop(true);
-                        me->GetThreatMgr().ClearAllThreat();
+                        me->GetThreatMgr().NotifyDisengaged();
                         me->SetImmuneToAll(true);
                         me->SetReactState(REACT_PASSIVE);
                         me->GetMotionMaster()->Clear(false);

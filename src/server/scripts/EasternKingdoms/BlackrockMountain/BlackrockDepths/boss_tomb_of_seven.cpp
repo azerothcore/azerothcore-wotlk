@@ -203,8 +203,8 @@ public:
         void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->RemoveAllAuras();
-            me->GetThreatMgr().ClearAllThreat();
             me->CombatStop(true);
+            me->GetThreatMgr().NotifyDisengaged();
             me->LoadCreaturesAddon(true);
             if (me->IsAlive())
                 me->GetMotionMaster()->MoveTargetedHome();

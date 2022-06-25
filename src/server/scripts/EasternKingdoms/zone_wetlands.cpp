@@ -118,8 +118,8 @@ public:
 
                     me->RestoreFaction();
                     me->RemoveAllAuras();
-                    me->GetThreatMgr().ClearAllThreat();
                     me->CombatStop(true);
+                    me->GetThreatMgr().NotifyDisengaged();
 
                     SetRun(false);
                 }

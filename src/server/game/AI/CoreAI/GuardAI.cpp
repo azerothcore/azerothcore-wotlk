@@ -43,15 +43,15 @@ void GuardAI::EnterEvadeMode(EvadeReason /*why*/)
     {
         me->GetMotionMaster()->MoveIdle();
         me->CombatStop(true);
-        me->GetThreatMgr().ClearAllThreat();
+        me->GetThreatMgr().NotifyDisengaged();
         return;
     }
 
     LOG_DEBUG("entities.unit", "Guard entry: {} enters evade mode.", me->GetEntry());
 
     me->RemoveAllAuras();
-    me->GetThreatMgr().ClearAllThreat();
     me->CombatStop(true);
+    me->GetThreatMgr().NotifyDisengaged();
 
     // Remove ChaseMovementGenerator from MotionMaster stack list, and add HomeMovementGenerator instead
     if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)

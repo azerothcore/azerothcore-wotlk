@@ -178,8 +178,8 @@ public:
         void DoFriend()
         {
             me->RemoveAllAuras();
-            me->GetThreatMgr().ClearAllThreat();
             me->CombatStop(true);
+            me->GetThreatMgr().NotifyDisengaged();
 
             me->StopMoving();
             me->GetMotionMaster()->MoveIdle();

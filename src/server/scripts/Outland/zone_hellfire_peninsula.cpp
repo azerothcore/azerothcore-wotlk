@@ -127,8 +127,8 @@ public:
                 me->SetFaction(FACTION_FRIENDLY);
                 me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                 me->RemoveAllAuras();
-                me->GetThreatMgr().ClearAllThreat();
                 me->CombatStop(true);
+                me->GetThreatMgr().NotifyDisengaged();
                 Talk(SAY_FREE);
                 return;
             }

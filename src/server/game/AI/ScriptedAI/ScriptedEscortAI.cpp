@@ -201,8 +201,8 @@ void npc_escortAI::ReturnToLastPoint()
 void npc_escortAI::EnterEvadeMode(EvadeReason /*why*/)
 {
     me->RemoveAllAuras();
-    me->GetThreatMgr().ClearAllThreat();
     me->CombatStop(true);
+    me->GetThreatMgr().NotifyDisengaged();
     me->SetLootRecipient(nullptr);
 
     if (HasEscortState(STATE_ESCORT_ESCORTING))

@@ -1123,8 +1123,8 @@ public:
                 return;
 
             me->RemoveEvadeAuras();
-            me->GetThreatMgr().ClearAllThreat();
             me->CombatStop(true);
+            me->GetThreatMgr().NotifyDisengaged();
             me->LoadCreaturesAddon(true);
             me->SetLootRecipient(nullptr);
             me->ResetPlayerDamageReq();

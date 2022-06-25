@@ -239,8 +239,8 @@ public:
                 if (!_allowDeath)
                 {
                     me->RemoveAllAuras();
-                    me->GetThreatMgr().ClearAllThreat();
                     me->CombatStop(true);
+                    me->GetThreatMgr().NotifyDisengaged();
                     damage = 0;
 
                     me->SetReactState(REACT_PASSIVE);

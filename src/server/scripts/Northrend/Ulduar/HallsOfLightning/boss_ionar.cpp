@@ -258,8 +258,8 @@ public:
             if (param == ACTION_CALLBACK)
             {
                 me->SetSpeed(MOVE_RUN, 2.5f);
-                me->GetThreatMgr().ClearAllThreat();
                 me->CombatStop(true);
+                me->GetThreatMgr().NotifyDisengaged();
                 me->GetMotionMaster()->MoveTargetedHome();
                 returning = true;
             }

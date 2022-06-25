@@ -551,8 +551,8 @@ public:
                     me->SetReactState(REACT_PASSIVE);
                     me->RemoveAllAuras();
                     AddCreatureAddonAuras();
-                    me->GetThreatMgr().ClearAllThreat();
                     me->CombatStop(true);
+                    me->GetThreatMgr().NotifyDisengaged();
                     me->GetMotionMaster()->Clear();
                     me->StopMoving();
                     me->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, 0);
@@ -582,8 +582,8 @@ public:
                     me->SetReactState(REACT_PASSIVE);
                     me->RemoveAllAuras();
                     AddCreatureAddonAuras();
-                    me->GetThreatMgr().ClearAllThreat();
                     me->CombatStop(true);
+                    me->GetThreatMgr().NotifyDisengaged();
                     me->GetMotionMaster()->Clear();
                     me->SetRegeneratingHealth(false);
                     me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);

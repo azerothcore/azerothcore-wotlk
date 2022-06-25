@@ -208,8 +208,8 @@ public:
         void LeaveCombat()
         {
             me->RemoveAllAuras();
-            me->GetThreatMgr().ClearAllThreat();
             me->CombatStop(true);
+            me->GetThreatMgr().NotifyDisengaged();
             me->LoadCreaturesAddon(true);
             me->SetLootRecipient(nullptr);
             me->ResetPlayerDamageReq();

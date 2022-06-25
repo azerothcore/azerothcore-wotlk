@@ -223,12 +223,6 @@ void CreatureAI::EnterEvadeMode(EvadeReason why)
     }
 }
 
-/*void CreatureAI::AttackedBy(Unit* attacker)
-{
-    if (!me->GetVictim())
-        AttackStart(attacker);
-}*/
-
 void CreatureAI::SetGazeOn(Unit* target)
 {
     if (me->IsValidAttackTarget(target))
@@ -293,9 +287,8 @@ bool CreatureAI::_EnterEvadeMode(EvadeReason /*why*/)
     me->RemoveEvadeAuras();
 
     me->ClearComboPointHolders(); // Remove all combo points targeting this unit
-    // sometimes bosses stuck in combat?
-    me->GetThreatMgr().ClearAllThreat();
     me->CombatStop(true);
+    me->GetThreatMgr().NotifyDisengaged();
     me->LoadCreaturesAddon(true);
     me->SetLootRecipient(nullptr);
     me->ResetPlayerDamageReq();
