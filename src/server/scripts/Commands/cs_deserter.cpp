@@ -260,9 +260,34 @@ public:
         return true;
     }
 
-    static bool HandleDeserterRemoveAll(ChatHandler* handler, bool isInstance)
+    static bool HandleDeserterRemoveAll(ChatHandler* handler, bool isInstance, Optional<std::string> maxTime)
     {
-        CharacterDatabase.Query("DELETE FROM character_aura WHERE spell = {} AND remainTime <= 1800000", isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER);
+        int32 remainTime = isInstance ? 1800 : 900;
+
+        if (maxTime)
+        {
+            remainTime = TimeStringToSecs(*maxTime);
+            if (remainTime == 0)
+            {
+                remainTime = Acore::StringTo<int32>(*maxTime).value_or(0);
+            }
+        }
+
+        if (remainTime == 0)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (remainTime < 0)
+        {
+            CharacterDatabase.Execute("DELETE FROM character_aura WHERE spell = {}", isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER);
+        }
+        else
+        {
+            CharacterDatabase.Execute("DELETE FROM character_aura WHERE spell = {} AND remainTime <= {}", isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER, remainTime * IN_MILLISECONDS);
+        }
 
         std::shared_lock<std::shared_mutex> lock(*HashMapHolder<Player>::GetLock());
         HashMapHolder<Player>::MapType const& onlinePlayerList = ObjectAccessor::GetPlayers();
@@ -270,7 +295,7 @@ public:
         {
             Player* player = itr->second;
             Aura* aura = player->GetAura(isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER);
-            if (aura && aura->GetDuration() <= 1800000)
+            if (aura && (remainTime < 0 || aura->GetDuration() <= remainTime * IN_MILLISECONDS))
             {
                 player->RemoveAura(isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER);
             }
@@ -304,14 +329,14 @@ public:
         return HandleDeserterRemove(handler, player, false);
     }
 
-    static bool HandleDeserterInstanceRemoveAll(ChatHandler* handler)
+    static bool HandleDeserterInstanceRemoveAll(ChatHandler* handler, Optional<std::string> maxTime)
     {
-        return HandleDeserterRemoveAll(handler, true);
+        return HandleDeserterRemoveAll(handler, true, maxTime);
     }
 
-    static bool HandleDeserterBGRemoveAll(ChatHandler* handler)
+    static bool HandleDeserterBGRemoveAll(ChatHandler* handler, Optional<std::string> maxTime)
     {
-        return HandleDeserterRemoveAll(handler, false);
+        return HandleDeserterRemoveAll(handler, false, maxTime);
     }
 };
 
