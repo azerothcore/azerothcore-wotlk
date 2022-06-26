@@ -553,8 +553,10 @@ void Pet::SavePetToDB(PetSaveMode mode)
         // save pet
         std::string actionBar = GenerateActionBarData();
 
-        ASSERT(owner->GetPetStable()->CurrentPet && owner->GetPetStable()->CurrentPet->PetNumber == m_charmInfo->GetPetNumber());
-        FillPetInfo(&owner->GetPetStable()->CurrentPet.value());
+        if (owner->GetPetStable()->CurrentPet && owner->GetPetStable()->CurrentPet->PetNumber == m_charmInfo->GetPetNumber())
+        {
+            FillPetInfo(&owner->GetPetStable()->CurrentPet.value());
+        }
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHAR_PET);
         stmt->SetData(0, m_charmInfo->GetPetNumber());

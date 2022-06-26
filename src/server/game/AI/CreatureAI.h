@@ -215,6 +215,9 @@ public:
 
     static bool IsInBounds(CreatureBoundary const& boundary, Position const* who);
     bool IsInBoundary(Position const* who = nullptr) const;
+
+    virtual void CalculateThreat(Unit* /*hatedUnit*/, float& /*threat*/, SpellInfo const* /*threatSpell*/) { }
+
 protected:
     void EngagementStart(Unit* who);
     void EngagementOver();

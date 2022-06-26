@@ -982,7 +982,7 @@ struct npc_drakonid_spawner : public ScriptedAI
             {
                 if (Creature* construct = ObjectAccessor::GetCreature(*me, summonGuid))
                 {
-                    construct->UpdateEntry(NPC_BONE_CONSTRUCT);
+                    construct->UpdateEntry(NPC_BONE_CONSTRUCT, true);
                     construct->SetReactState(REACT_PASSIVE);
                     construct->SetStandState(UNIT_STAND_STATE_DEAD);
                     construct->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);

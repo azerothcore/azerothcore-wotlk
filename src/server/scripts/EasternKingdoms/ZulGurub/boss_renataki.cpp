@@ -211,9 +211,15 @@ public:
                                 DoCast(target, SPELL_THOUSAND_BLADES, false);
                             }
 
-                            _thousandBladesTargets.erase(itr);
-
-                            events.ScheduleEvent(EVENT_THOUSAND_BLADES, 500ms);
+                            if (_thousandBladesTargets.erase(itr) != _thousandBladesTargets.end())
+                            {
+                                events.ScheduleEvent(EVENT_THOUSAND_BLADES, 500ms);
+                            }
+                            else
+                            {
+                                _thousandBladesCount = urand(2, 5);
+                                events.ScheduleEvent(EVENT_THOUSAND_BLADES, 15s, 22s);
+                            }
                         }
                         else
                         {
