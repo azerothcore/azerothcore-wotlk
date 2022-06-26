@@ -453,7 +453,8 @@ enum eJuggle
 
     SPELL_TORCH_CHECK           = 45644,
     SPELL_GIVE_TORCH            = 45280,
-    QUEST_CHECK                 = 11937,
+    QUEST_TORCH_CATCHING_A           = 11657,
+    QUEST_TORCH_CATCHING_H           = 11923
 };
 
 class spell_midsummer_juggling_torch : public SpellScript
@@ -507,6 +508,32 @@ class spell_midsummer_juggling_torch : public SpellScript
     }
 };
 
+// 45644 - Juggle Torch (Catch)
+class spell_midsummer_torch_catch : public SpellScript
+{
+    PrepareSpellScript(spell_midsummer_torch_catch);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_GIVE_TORCH });
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        Player* player = GetHitPlayer();
+        if (!player)
+            return;
+
+        if (player->GetQuestStatus(QUEST_TORCH_CATCHING_A) == QUEST_STATUS_REWARDED || player->GetQuestStatus(QUEST_TORCH_CATCHING_H) == QUEST_STATUS_REWARDED)
+            player->CastSpell(player, SPELL_GIVE_TORCH);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_midsummer_torch_catch::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 void AddSC_event_midsummer_scripts()
 {
     // NPCs
@@ -520,4 +547,5 @@ void AddSC_event_midsummer_scripts()
     RegisterSpellScript(spell_midsummer_torch_quest);
     RegisterSpellScript(spell_midsummer_fling_torch);
     RegisterSpellScript(spell_midsummer_juggling_torch);
+    RegisterSpellScript(spell_midsummer_torch_catch);
 }
