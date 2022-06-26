@@ -281,7 +281,7 @@ public:
             }
         }
 
-        void CalculateThreat(Unit* hatedUnit, float& threat, SpellInfo const* threatSpell) override
+        void CalculateThreat(Unit* hatedUnit, float& threat, SpellInfo const* threatSpell)
         {
             if (_chargeTarget.first == hatedUnit->GetGUID())
             {

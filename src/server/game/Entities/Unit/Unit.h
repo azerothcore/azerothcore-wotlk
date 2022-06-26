@@ -1242,8 +1242,6 @@ private:
 
 class Unit : public WorldObject
 {
-    friend class CombatMgr;
-    friend class ThreatMgr;
 public:
     typedef std::unordered_set<Unit*> AttackerSet;
     typedef std::set<Unit*> ControlSet;
@@ -2521,8 +2519,10 @@ private:
     Diminishing m_Diminishing;
 
     // Threat+combat management
-    CombatMgr m_combatMgr;
+    friend class ThreatMgr;
     ThreatMgr m_threatMgr;
+    friend class CombatMgr;
+    CombatMgr m_combatMgr;
 
     FollowerRefMgr m_FollowingRefMgr;
 
