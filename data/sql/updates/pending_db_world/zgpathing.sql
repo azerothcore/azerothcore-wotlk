@@ -11,8 +11,8 @@ DELETE FROM `creature` WHERE (`id1` = 14880) OR(`id1` = 14750 AND `GUID` = 49185
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 (49185, 14750, 0, 0, 309, 0, 0, 1, 1, 0, -12213.109, -1477.2382, 130.725, 130.93126, 7200, 5, 0, 31440, 0, 1, 0, 0, 0, '', 0),
 (49167, 14750, 0, 0, 309, 0, 0, 1, 1, 0, -12215.109, -1477.2382, 130.725, 130.93126, 7200, 5, 0, 31440, 0, 1, 0, 0, 0, '', 0),
-(49156, 11368, 0, 0, 309, 0, 0, 1, 1, 0, -12215.109, -1476.2382, 130.725, 3.1765, 7200, 0, 0, 5341, 0, 1, 0, 0, 0, '', 0),
-(49157, 11368, 0, 0, 309, 0, 0, 1, 1, 0, -12215.109, -1478.2382, 130.725, 0.314159, 7200, 0, 0, 5341, 0, 1, 0, 0, 0, '', 0),
+(49156, 11368, 0, 0, 309, 0, 0, 1, 1, 0, -12215.109, -1476.2382, 130.725, 3.1765, 7200, 0, 0, 5341, 0, 0, 0, 0, 0, '', 0),
+(49157, 11368, 0, 0, 309, 0, 0, 1, 1, 0, -12215.109, -1478.2382, 130.725, 0.314159, 7200, 0, 0, 5341, 0, 0, 0, 0, 0, '', 0),
 (49201, 14880, 0, 0, 309, 0, 0, 1, 1, 0, -12289.1, -1645.61, 132.135, 6.24203, 7200, 0, 0, 4048, 0, 0, 0, 0, 0, '', 0),
 (49202, 14880, 0, 0, 309, 0, 0, 1, 1, 0, -12286.4, -1669.35, 130.333, 5.43666, 7200, 0, 0, 4048, 0, 0, 0, 0, 0, '', 0),
 (49762, 14880, 0, 0, 309, 0, 0, 1, 1, 0, -12120.4, -1755.58, 80.2268, 2.14157, 7200, 0, 0, 4048, 0, 0, 0, 0, 0, '', 0),
@@ -107,7 +107,7 @@ SET @path := @NPC * 10;
 SET @NPC2 := 49752;
 SET @path2 := @NPC * 10;
 UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=-11915.182,`position_y`=-1309.0254,`position_z`=77.85016 WHERE `guid`=@NPC;
-UPDATE `creature` SET `wander_distance`=0,`MovementType`=1,`position_x`=-11917.182,`position_y`=-1309.0254,`position_z`=77.85016 WHERE `guid`=@NPC2;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=0,`position_x`=-11917.182,`position_y`=-1309.0254,`position_z`=77.85016 WHERE `guid`=@NPC2;
 DELETE FROM `creature_addon` WHERE `guid`=@NPC;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@path,0,0,1,0,0, '');
 DELETE FROM `waypoint_data` WHERE `id` IN (@path,@path2);
@@ -201,11 +201,11 @@ SET @NPC3 := 49188;
 SET @NPC4 := 49187;
 SET @NPC5 := 49140;
 SET @NPC6 := 49139;
-UPDATE `creature` SET `wander_distance`=0,`MovementType`=1,`position_x`=-12138.658,`position_y`=-1462.6881,`position_z`=132.72519 WHERE `guid`=@NPC2;
-UPDATE `creature` SET `wander_distance`=0,`MovementType`=1,`position_x`=-12140.658,`position_y`=-1462.6881,`position_z`=132.72519 WHERE `guid`=@NPC3;
-UPDATE `creature` SET `wander_distance`=0,`MovementType`=1,`position_x`=-12139.658,`position_y`=-1461.6881,`position_z`=132.72519 WHERE `guid`=@NPC4;
-UPDATE `creature` SET `wander_distance`=0,`MovementType`=1,`position_x`=-12139.658,`position_y`=-1463.6881,`position_z`=132.72519 WHERE `guid`=@NPC5;
-UPDATE `creature` SET `wander_distance`=0,`MovementType`=1,`position_x`=-12139.658,`position_y`=-1461.3881,`position_z`=132.72519 WHERE `guid`=@NPC6;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=0,`position_x`=-12138.658,`position_y`=-1462.6881,`position_z`=132.72519 WHERE `guid`=@NPC2;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=0,`position_x`=-12140.658,`position_y`=-1462.6881,`position_z`=132.72519 WHERE `guid`=@NPC3;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=0,`position_x`=-12139.658,`position_y`=-1461.6881,`position_z`=132.72519 WHERE `guid`=@NPC4;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=0,`position_x`=-12139.658,`position_y`=-1463.6881,`position_z`=132.72519 WHERE `guid`=@NPC5;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=0,`position_x`=-12139.658,`position_y`=-1461.3881,`position_z`=132.72519 WHERE `guid`=@NPC6;
 UPDATE `creature` SET `wander_distance`=2,`MovementType`=2,`position_x`=-12139.658,`position_y`=-1462.6881,`position_z`=130.72519 WHERE `guid`=@NPC;
 DELETE FROM `creature_addon` WHERE `guid`=@NPC;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
