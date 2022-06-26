@@ -361,7 +361,9 @@ public:
         void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_MARK_OF_ARLOKK_TRIGGER) // Should only hit if line of sight
-                me->Attack(caster, true);
+            {
+                AttackStart(caster);
+            }
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -390,7 +392,9 @@ public:
                 {
                     case EVENT_ATTACK:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0.0f, 100, false))
-                            me->Attack(target, true);
+                        {
+                            AttackStart(target);
+                        }
                         break;
                     default:
                         break;
