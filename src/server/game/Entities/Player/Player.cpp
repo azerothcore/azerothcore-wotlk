@@ -10592,7 +10592,7 @@ void Player::AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 ite
     // cooldown information stored in item prototype
     // This used in same way in WorldSession::HandleItemQuerySingleOpcode data sending to client.
 
-    bool useSpellCooldown = false;
+    bool useSpellCooldown = spellInfo->HasAttribute(SPELL_ATTR7_CAN_BE_MULTI_CAST);
     if (itemId)
     {
         if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId))
