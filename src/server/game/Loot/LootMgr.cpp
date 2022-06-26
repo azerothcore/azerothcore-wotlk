@@ -1670,7 +1670,7 @@ void LootTemplate::Process(Loot& loot, LootStore const& store, uint16 lootMode, 
         LootStoreItem* item = *i;
         if (creature && item->reqlevel > 0 && creature->getLevel() < item->reqlevel) // The creature is not a high enough level to drop this item
             continue;
-        if (creature && item->reqlevel < 0 && creature->getLevel() > item->reqlevel) // The creature is too high a level to drop this item
+        if (creature && item->reqlevel < 0 && creature->getLevel() > -(item->reqlevel)) // The creature is too high a level to drop this item
             continue;
         if (!(item->lootmode & lootMode))                         // Do not add if mode mismatch
             continue;
