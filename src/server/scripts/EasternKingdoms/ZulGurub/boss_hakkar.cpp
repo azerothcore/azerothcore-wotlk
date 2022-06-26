@@ -37,7 +37,9 @@ enum Says
 
 enum Spells
 {
-    SPELL_BLOOD_SIPHON          = 24322, // Buggy ?
+    SPELL_BLOOD_SIPHON          = 24324,
+    SPELL_BLOOD_SIPHON_HEAL     = 24322,
+    SPELL_BLOOD_SIPHON_DAMAGE   = 24323,
     SPELL_CORRUPTED_BLOOD       = 24328,
     SPELL_CAUSE_INSANITY        = 24327,
     SPELL_WILL_OF_HAKKAR        = 24178,
@@ -47,7 +49,8 @@ enum Spells
     SPELL_ASPECT_OF_VENOXIS     = 24688,
     SPELL_ASPECT_OF_MARLI       = 24686,
     SPELL_ASPECT_OF_THEKAL      = 24689,
-    SPELL_ASPECT_OF_ARLOKK      = 24690
+    SPELL_ASPECT_OF_ARLOKK      = 24690,
+    SPELL_POISONOUS_BLOOD       = 24321
 };
 
 enum Events
@@ -120,7 +123,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_BLOOD_SIPHON:
-                        DoCastVictim(SPELL_BLOOD_SIPHON, true);
+                        DoCastAOE(SPELL_BLOOD_SIPHON, true);
                         events.ScheduleEvent(EVENT_BLOOD_SIPHON, 90000);
                         break;
                     case EVENT_CORRUPTED_BLOOD:
@@ -228,9 +231,41 @@ public:
     }
 };
 
+class spell_blood_siphon : public SpellScript
+{
+    PrepareSpellScript(spell_blood_siphon);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        // Max. 20 targets
+        if (!targets.empty())
+        {
+            Acore::Containers::RandomResize(targets, 20);
+        }
+    }
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            if (Player* player = GetHitPlayer())
+            {
+                player->CastSpell(caster, player->HasAura(SPELL_POISONOUS_BLOOD) ? SPELL_BLOOD_SIPHON_DAMAGE : SPELL_BLOOD_SIPHON_HEAL, true);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_blood_siphon::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_blood_siphon::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_boss_hakkar()
 {
     new boss_hakkar();
     new at_zulgurub_entrance_speech();
     new at_zulgurub_temple_speech();
+    RegisterSpellScript(spell_blood_siphon);
 }
