@@ -7844,13 +7844,9 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             if (AuraEffect const* aurEff = target->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_SHAMAN, 0x10000000, 0x0, 0x0, GetGUID()))
                             {
                                 Aura* flameShock  = aurEff->GetBase();
-                                int32 maxDuration = flameShock->GetMaxDuration();
-                                int32 newDuration = flameShock->GetDuration() + 2 * aurEff->GetAmplitude();
-
-                                flameShock->SetDuration(newDuration);
-                                // is it blizzlike to change max duration for FS?
-                                if (newDuration > maxDuration)
-                                    flameShock->SetMaxDuration(newDuration);
+                                int32 extraTime = 2 * aurEff->GetAmplitude();
+                                flameShock->SetMaxDuration(flameShock->GetMaxDuration() + extraTime);
+                                flameShock->SetDuration(flameShock->GetDuration() + extraTime);
 
                                 return true;
                             }
