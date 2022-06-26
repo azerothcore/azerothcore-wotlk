@@ -207,11 +207,11 @@ Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
     m_removedAurasCount(0),
     i_motionMaster(new MotionMaster(this)),
     m_regenTimer(0),
-    m_threatMgr(this),
-    m_combatMgr(this),
     m_vehicle(nullptr),
     m_vehicleKit(nullptr),
     m_unitTypeMask(UNIT_MASK_NONE),
+    m_combatMgr(this),
+    m_threatMgr(this),
     m_comboTarget(nullptr),
     m_comboPoints(0)
 {
