@@ -85,12 +85,12 @@ void ThreatReference::UpdateOffline()
         return false;
     if (a->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
     {
-        if (b->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC))
+        if (b->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC))
             return false;
     }
     else
     {
-        if (b->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
+        if (b->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC))
             return false;
     }
     return true;
@@ -394,6 +394,7 @@ void ThreatMgr::AddThreat(Unit* target, float amount, SpellInfo const* spell, bo
     target->GetThreatMgr().PutThreatenedByMeRef(_owner->GetGUID(), ref);
 
     ref->UpdateOffline();
+    if (ref->IsOnline()) // we only add the threat if the ref is currently available
         ref->AddThreat(amount);
 
     if (!_currentVictimRef)

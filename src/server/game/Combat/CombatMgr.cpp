@@ -81,12 +81,6 @@ void CombatReference::EndCombat()
     delete this;
 }
 
-CombatMgr::~CombatMgr()
-{
-    ASSERT(_pveRefs.empty(), "CombatManager::~CombatManager - %s: we still have %zu PvE combat references, one of them is with %s", _owner->GetGUID().ToString().c_str(), _pveRefs.size(), _pveRefs.begin()->first.ToString().c_str());
-    ASSERT(_pvpRefs.empty(), "CombatManager::~CombatManager - %s: we still have %zu PvP combat references, one of them is with %s", _owner->GetGUID().ToString().c_str(), _pvpRefs.size(), _pvpRefs.begin()->first.ToString().c_str());
-}
-
 bool PvPCombatReference::Update(uint32 tdiff)
 {
     if (_combatTimer <= tdiff)
@@ -123,6 +117,12 @@ void PvPCombatReference::SuppressFor(Unit* who)
     if (who->GetCombatMgr().UpdateOwnerCombatState())
         if (who->IsAIEnabled)
             who->GetAI()->JustExitedCombat();
+}
+
+CombatMgr::~CombatMgr()
+{
+    ASSERT(_pveRefs.empty(), "CombatManager::~CombatManager - %s: we still have %zu PvE combat references, one of them is with %s", _owner->GetGUID().ToString().c_str(), _pveRefs.size(), _pveRefs.begin()->first.ToString().c_str());
+    ASSERT(_pvpRefs.empty(), "CombatManager::~CombatManager - %s: we still have %zu PvP combat references, one of them is with %s", _owner->GetGUID().ToString().c_str(), _pvpRefs.size(), _pvpRefs.begin()->first.ToString().c_str());
 }
 
 void CombatMgr::Update(uint32 tdiff)
@@ -195,7 +195,7 @@ bool CombatMgr::SetInCombatWith(Unit* who)
         NotifyAICombat(_owner, who);
     if (needOtherAI)
         NotifyAICombat(who, _owner);
-    return  IsInCombatWith(who);
+    return IsInCombatWith(who);
 }
 
 bool CombatMgr::IsInCombatWith(ObjectGuid const& guid) const
@@ -355,14 +355,14 @@ bool CombatMgr::UpdateOwnerCombatState() const
 
     if (combatState)
     {
-        _owner->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
+        _owner->SetUnitFlag(UNIT_FLAG_IN_COMBAT);
         _owner->AtEnterCombat();
         if (_owner->GetTypeId() != TYPEID_UNIT)
             _owner->AtEngage(GetAnyTarget());
     }
     else
     {
-        _owner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
+        _owner->RemoveUnitFlag(UNIT_FLAG_IN_COMBAT);
         _owner->AtExitCombat();
         if (_owner->GetTypeId() != TYPEID_UNIT)
             _owner->AtDisengage();

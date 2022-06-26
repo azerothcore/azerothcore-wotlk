@@ -154,8 +154,8 @@ public:
     // Removes all targets from the threat list (will cause evade in UpdateVictim if called)
     void ClearAllThreat();
 
-    // Fixate on the passed target; this target will always be selected until the fixtate is cleared
-        // (if the target is not in the threat list, does nothing)
+    // Fixate on the passed target; this target will always be selected until the fixate is cleared
+    // (if the target is not in the threat list, does nothing)
     void FixateTarget(Unit* target);
     void ClearFixate() { FixateTarget(nullptr); }
     Unit* GetFixateTarget() const;
@@ -274,6 +274,7 @@ public:
 
 private:
     static bool FlagsAllowFighting(Unit const* a, Unit const* b);
+
     ThreatReference(ThreatMgr* mgr, Unit* victim) :
         _owner(reinterpret_cast<Creature*>(mgr->_owner)), _mgr(*mgr), _victim(victim),
         _baseAmount(0.0f), _tempModifier(0), _taunted(TAUNT_STATE_NONE)

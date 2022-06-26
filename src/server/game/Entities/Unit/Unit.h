@@ -1664,7 +1664,7 @@ public:
     ThreatMgr& GetThreatMgr() { return m_threatMgr; }
     ThreatMgr const& GetThreatMgr() const { return m_threatMgr; }
 
-    void SetCombatTimer(uint32 timer) { m_CombatTimer = timer; }  //TODO Remove
+    void SetCombatTimer(uint32 timer) { m_CombatTimer = timer; }
 
     void SendClearTarget();
 
