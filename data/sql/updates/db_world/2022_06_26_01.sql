@@ -1,3 +1,4 @@
+-- DB update 2022_06_26_00 -> 2022_06_26_01
 --
 SET @ENTRY := 14517;
 SET @PATH := @ENTRY*10;
