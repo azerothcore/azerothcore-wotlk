@@ -120,6 +120,7 @@ enum LootSlotType
 };
 
 class Player;
+class Creature;
 class LootStore;
 class ConditionMgr;
 class GameObject;
