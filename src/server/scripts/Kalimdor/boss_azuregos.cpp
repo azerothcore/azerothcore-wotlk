@@ -17,9 +17,9 @@
 
 #include "GameTime.h"
 #include "Player.h"
-#include "ScriptedGossip.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
 #include "SpellScript.h"
 #include "TaskScheduler.h"
 

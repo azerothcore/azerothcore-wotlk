@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Creature.h"
 #include "Config.h"
+#include "Creature.h"
 #include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"

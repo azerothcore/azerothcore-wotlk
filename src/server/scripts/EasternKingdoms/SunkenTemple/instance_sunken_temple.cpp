@@ -21,8 +21,8 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "SpellScript.h"
-#include "sunken_temple.h"
 #include "Unit.h"
+#include "sunken_temple.h"
 
 class instance_sunken_temple : public InstanceMapScript
 {

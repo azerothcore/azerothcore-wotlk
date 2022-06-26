@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AreaBoundary.h"
 #include "ScriptedCreature.h"
+#include "AreaBoundary.h"
 #include "Cell.h"
 #include "CellImpl.h"
 #include "GameTime.h"

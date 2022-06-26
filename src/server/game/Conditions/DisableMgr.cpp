@@ -23,9 +23,9 @@
 #include "Player.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
-#include "World.h"
-#include "Tokenize.h"
 #include "StringConvert.h"
+#include "Tokenize.h"
+#include "World.h"
 
 namespace DisableMgr
 {

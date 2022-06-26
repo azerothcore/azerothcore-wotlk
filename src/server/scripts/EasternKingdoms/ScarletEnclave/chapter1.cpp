@@ -17,6 +17,7 @@
 
 #include "CombatAI.h"
 #include "CreatureTextMgr.h"
+#include "MoveSplineInit.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"
@@ -27,7 +28,6 @@
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
-#include "MoveSplineInit.h"
 
  /*######
  ## npc_eye_of_acherus

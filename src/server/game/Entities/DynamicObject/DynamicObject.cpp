@@ -15,13 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "SpellAuraEffects.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
 #include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
 #include "Transport.h"
 #include "UpdateMask.h"
 #include "World.h"

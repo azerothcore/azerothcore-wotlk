@@ -17,8 +17,8 @@
 
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "Tokenize.h"
 #include "StringConvert.h"
+#include "Tokenize.h"
 
 PlayerTaxi::PlayerTaxi() : _taxiSegment(0)
 {

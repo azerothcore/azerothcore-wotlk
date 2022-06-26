@@ -21,8 +21,8 @@
 #include "AreaBoundary.h"
 #include "Common.h"
 #include "Creature.h"
-#include "UnitAI.h"
 #include "EventMap.h"
+#include "UnitAI.h"
 
 class WorldObject;
 class Unit;

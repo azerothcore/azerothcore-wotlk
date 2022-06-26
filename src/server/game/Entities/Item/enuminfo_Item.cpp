@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Item.h"
 #include "Define.h"
+#include "Item.h"
 #include "SmartEnum.h"
 #include <stdexcept>
 

@@ -18,8 +18,8 @@
 #ifndef PetPackets_h__
 #define PetPackets_h__
 
-#include "Packet.h"
 #include "ObjectGuid.h"
+#include "Packet.h"
 
 namespace WorldPackets
 {

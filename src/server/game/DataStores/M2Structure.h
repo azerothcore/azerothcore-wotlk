@@ -18,8 +18,8 @@
 #ifndef ACORE_M2STRUCTURE_H
 #define ACORE_M2STRUCTURE_H
 
-#include <G3D/Vector3.h>
 #include <G3D/AABox.h>
+#include <G3D/Vector3.h>
 
 // Structures for M2 file. Source: https://wowdev.wiki
 #pragma pack(push, 1)
