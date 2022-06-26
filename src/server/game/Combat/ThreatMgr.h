@@ -164,6 +164,7 @@ public:
     }
 
     HostileReference* getReferenceByTarget(Unit* victim) const;
+    HostileReference* getReferenceByTarget(ObjectGuid const& guid) const;
 
     [[nodiscard]] StorageType const& getThreatList() const { return iThreatList; }
 

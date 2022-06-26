@@ -261,12 +261,18 @@ HostileReference* ThreatContainer::getReferenceByTarget(Unit* victim) const
     if (!victim)
         return nullptr;
 
-    ObjectGuid const guid = victim->GetGUID();
+    return getReferenceByTarget(victim->GetGUID());
+}
+
+HostileReference* ThreatContainer::getReferenceByTarget(ObjectGuid const& guid) const
+{
     for (ThreatContainer::StorageType::const_iterator i = iThreatList.begin(); i != iThreatList.end(); ++i)
     {
         HostileReference* ref = (*i);
         if (ref && ref->getUnitGuid() == guid)
+        {
             return ref;
+        }
     }
 
     return nullptr;

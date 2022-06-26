@@ -303,7 +303,7 @@ bool CreatureAI::_EnterEvadeMode(EvadeReason /*why*/)
     me->SetLootRecipient(nullptr);
     me->ResetPlayerDamageReq();
     me->SetLastDamagedTime(0);
-    me->SetCannotReachTarget(false);
+    me->SetCannotReachTarget();
 
     if (me->IsInEvadeMode())
     {
