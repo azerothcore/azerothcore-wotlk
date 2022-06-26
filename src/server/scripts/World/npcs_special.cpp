@@ -769,12 +769,13 @@ public:
 
         void Reset() override
         {
-            Active = false;
-            CanIteract = 0;
+            Active = true;
+            CanIteract = 3500;
             DoCast(me, SPELL_BRAZIER, true);
             DoCast(me, SPELL_FIERY_AURA, false);
             me->UpdateHeight(me->GetPositionZ() + 0.94f);
             me->SetDisableGravity(true);
+            me->HandleEmoteCommand(EMOTE_ONESHOT_DANCE);
             me->SendMovementFlagUpdate();
         }
 
