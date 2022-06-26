@@ -2329,14 +2329,14 @@ void Unit::CalcHealAbsorb(HealInfo& healInfo)
         healInfo.AbsorbHeal(absorbAmount);
 }
 
-void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType, bool extra)
+void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType /*= BASE_ATTACK*/, bool extra /*= false*/, bool ignoreCasting /*= false*/)
 {
     if (HasUnitFlag(UNIT_FLAG_PACIFIED))
     {
         return;
     }
 
-    if (HasUnitState(UNIT_STATE_CANNOT_AUTOATTACK) && !extra)
+    if (HasUnitState(UNIT_STATE_CANNOT_AUTOATTACK) && !extra && !ignoreCasting)
     {
         return;
     }

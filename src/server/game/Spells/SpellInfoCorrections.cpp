@@ -1363,12 +1363,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].Amplitude = 15000;
     });
 
-    // Threatening Gaze
-    ApplySpellFix({ 24314 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CAST;
-    });
-
     // Frightening Shout
     ApplySpellFix({ 19134 }, [](SpellInfo* spellInfo)
     {
