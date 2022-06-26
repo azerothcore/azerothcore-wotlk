@@ -520,6 +520,56 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,5,-12350.196,-1669.4393,131.14233,0,0,1,0,100,0),
 (@PATH,6,-12338.354,-1643.7845,131.38538,0,0,1,0,100,0);
 
+SET @NPC := 91493;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=-12247.839,`position_y`=-1818.8044,`position_z`=130.26392 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,-12247.839,-1818.8044,130.26392,0,0,0,0,100,0),
+(@PATH,2,-12232.867,-1818.0723,128.23663,0,0,0,0,100,0),
+(@PATH,3,-12200.451,-1819.7026,113.88873,0,0,0,0,100,0),
+(@PATH,4,-12166.817,-1818.2793,96.6946,0,0,0,0,100,0),
+(@PATH,5,-12133.23,-1818.3303,81.926414,0,0,0,0,100,0),
+(@PATH,6,-12122.129,-1814.8438,80.20083,0,0,0,0,100,0),
+(@PATH,7,-12112.913,-1800.0133,80.45083,0,0,0,0,100,0),
+(@PATH,8,-12100.052,-1795.4763,80.59078,0,0,0,0,100,0),
+(@PATH,9,-12066.56,-1789.7352,70.61766,0,0,0,0,100,0),
+(@PATH,10,-12100.052,-1795.4763,80.59078,0,0,0,0,100,0),
+(@PATH,11,-12112.913,-1800.0133,80.45083,0,0,0,0,100,0),
+(@PATH,12,-12122.129,-1814.8438,80.20083,0,0,0,0,100,0),
+(@PATH,13,-12133.23,-1818.3303,81.926414,0,0,0,0,100,0),
+(@PATH,14,-12166.817,-1818.2793,96.6946,0,0,0,0,100,0),
+(@PATH,15,-12200.451,-1819.7026,113.88873,0,0,0,0,100,0);
+
+SET @NPC := 91435;
+SET @path := @NPC * 10;
+UPDATE creature SET wander_distance=0,MovementType=2,position_x=-11795.8,position_y=-1851.9052,position_z=46.358498 WHERE guid=@NPC;
+DELETE FROM creature_addon WHERE guid=@NPC;
+INSERT INTO creature_addon (guid,path_id,mount,bytes1,bytes2,emote,visibilityDistanceType,auras) VALUES (@NPC,@path,0,0,1,0,0, '');
+DELETE FROM waypoint_data WHERE id=@path;
+INSERT INTO waypoint_data (id,point,position_x,position_y,position_z,orientation,delay,move_type,action,action_chance,wpguid) VALUES
+(@path,1,-11795.8,-1851.9052,46.358498,0,0,0,0,100,0),
+(@path,2,-11766.936,-1849.6432,41.644875,0,0,0,0,100,0),
+(@path,3,-11722.593,-1850.4967,40.44426,0,0,0,0,100,0),
+(@path,4,-11690.838,-1850.0109,40.56508,0,0,0,0,100,0),
+(@path,5,-11659.619,-1844.8069,40.565075,0,0,0,0,100,0),
+(@path,6,-11643.126,-1826.8016,40.566326,0,0,0,0,100,0),
+(@path,7,-11619.31,-1797.6473,40.440327,0,0,0,0,100,0),
+(@path,8,-11614.934,-1765.2982,38.932186,0,0,0,0,100,0),
+(@path,9,-11611.702,-1736.597,38.78375,0,0,0,0,100,0),
+(@path,10,-11619.879,-1701.0035,38.80264,0,0,0,0,100,0),
+(@path,11,-11611.702,-1736.597,38.78375,0,0,0,0,100,0),
+(@path,12,-11614.934,-1765.2982,38.932186,0,0,0,0,100,0),
+(@path,13,-11619.31,-1797.6473,40.440327,0,0,0,0,100,0),
+(@path,14,-11643.126,-1826.8016,40.566326,0,0,0,0,100,0),
+(@path,15,-11659.619,-1844.8069,40.565075,0,0,0,0,100,0),
+(@path,16,-11690.838,-1850.0109,40.56508,0,0,0,0,100,0),
+(@path,17,-11722.593,-1850.4967,40.44426,0,0,0,0,100,0),
+(@path,18,-11766.936,-1849.6432,41.644875,0,0,0,0,100,0);
+
+
 DELETE FROM `creature_formations` WHERE `leaderguid` IN (49090, 49751, 49752, 49146, 49147, 49132, 49135, 49186, 49189, 52136, 49157, 49158, 49167, 49185, 51452, 49760, 49762, 49763, 49195, 49766, 49201);
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES 
 ('49751', '49751', '0', '0', '515', '0', '0'),
