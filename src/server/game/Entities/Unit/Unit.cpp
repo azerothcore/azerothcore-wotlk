@@ -18612,23 +18612,38 @@ void Unit::SetPhaseMask(uint32 newPhaseMask, bool update)
         }
     }
 
-    WorldObject::SetPhaseMask(newPhaseMask, update);
+    WorldObject::SetPhaseMask(newPhaseMask, false);
 
     if (!IsInWorld())
+    {
         return;
+    }
 
     for (ControlSet::const_iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); )
     {
         Unit* controlled = *itr;
         ++itr;
         if (controlled->GetTypeId() == TYPEID_UNIT)
+        {
             controlled->SetPhaseMask(newPhaseMask, true);
+        }
     }
 
     for (uint8 i = 0; i < MAX_SUMMON_SLOT; ++i)
+    {
         if (m_SummonSlot[i])
+        {
             if (Creature* summon = GetMap()->GetCreature(m_SummonSlot[i]))
+            {
                 summon->SetPhaseMask(newPhaseMask, true);
+            }
+        }
+    }
+
+    if (update)
+    {
+        UpdateObjectVisibility();
+    }
 }
 
 void Unit::UpdateObjectVisibility(bool forced, bool /*fromUpdate*/)

@@ -8973,16 +8973,18 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
         // only if current pet in slot
         pet->SavePetToDB(mode);
 
-        ASSERT(m_petStable->CurrentPet && m_petStable->CurrentPet->PetNumber == pet->GetCharmInfo()->GetPetNumber());
-        if (mode == PET_SAVE_NOT_IN_SLOT)
+        if (m_petStable->CurrentPet && m_petStable->CurrentPet->PetNumber == pet->GetCharmInfo()->GetPetNumber())
         {
-            m_petStable->UnslottedPets.push_back(std::move(*m_petStable->CurrentPet));
-            m_petStable->CurrentPet.reset();
+            if (mode == PET_SAVE_NOT_IN_SLOT)
+            {
+                m_petStable->UnslottedPets.push_back(std::move(*m_petStable->CurrentPet));
+                m_petStable->CurrentPet.reset();
+            }
+            else if (mode == PET_SAVE_AS_DELETED)
+                m_petStable->CurrentPet.reset();
+            // else if (stable slots) handled in opcode handlers due to required swaps
+            // else (current pet) doesnt need to do anything
         }
-        else if (mode == PET_SAVE_AS_DELETED)
-            m_petStable->CurrentPet.reset();
-        // else if (stable slots) handled in opcode handlers due to required swaps
-        // else (current pet) doesnt need to do anything
 
         SetMinion(pet, false);
 
