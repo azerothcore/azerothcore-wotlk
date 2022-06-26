@@ -221,7 +221,7 @@ public:
             BossAI::Reset();
             events.Reset();
             summons.DespawnAll();
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
             me->SetReactState(REACT_AGGRESSIVE);
             if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_KELTHUZAD_FLOOR)))
             {
@@ -254,10 +254,10 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
-            ScriptedAI::EnterEvadeMode();
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void KilledUnit(Unit* who) override
@@ -300,7 +300,7 @@ public:
         {
             BossAI::EnterCombat(who);
             Talk(SAY_SUMMON_MINIONS);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
             me->RemoveAllAttackers();
             me->SetTarget();
             me->SetReactState(REACT_PASSIVE);
@@ -383,7 +383,7 @@ public:
                     Talk(SAY_AGGRO);
                     events.Reset();
                     summons.DoAction(ACTION_SECOND_PHASE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
                     me->RemoveAura(SPELL_KELTHUZAD_CHANNEL);
                     me->SetReactState(REACT_AGGRESSIVE);
@@ -438,7 +438,7 @@ public:
                 case EVENT_DETONATE_MANA:
                     {
                         std::vector<Unit*> unitList;
-                        ThreatContainer::StorageType const& threatList = me->getThreatMgr().getThreatList();
+                        ThreatContainer::StorageType const& threatList = me->GetThreatMgr().getThreatList();
                         for (auto itr : threatList)
                         {
                             if (itr->getTarget()->GetTypeId() == TYPEID_PLAYER
@@ -505,7 +505,7 @@ public:
                     }
                     break;
             }
-            if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
+            if (!me->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
                 DoMeleeAttackIfReady();
         }
     };
@@ -554,8 +554,8 @@ public:
             }
             if (param == ACTION_GUARDIANS_OFF)
             {
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->RemoveAllAuras();
                 EnterEvadeMode();
                 me->SetPosition(me->GetHomePosition());

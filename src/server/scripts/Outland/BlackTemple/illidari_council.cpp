@@ -229,6 +229,7 @@ struct boss_illidari_council_memberAI : public ScriptedAI
     boss_illidari_council_memberAI(Creature* creature) : ScriptedAI(creature)
     {
         instance = creature->GetInstanceScript();
+        SetBoundary(instance->GetBossBoundary(DATA_ILLIDARI_COUNCIL));
     }
 
     InstanceScript* instance;
@@ -239,10 +240,10 @@ struct boss_illidari_council_memberAI : public ScriptedAI
         events.Reset();
     }
 
-    void EnterEvadeMode() override
+    void EnterEvadeMode(EvadeReason why) override
     {
         me->SetOwnerGUID(ObjectGuid::Empty);
-        ScriptedAI::EnterEvadeMode();
+        ScriptedAI::EnterEvadeMode(why);
     }
 
     void DoAction(int32 param) override

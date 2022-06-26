@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.creature_onkill_reputation
+-- Dumpar struktur för tabell acore_world.creature_onkill_reputation
 DROP TABLE IF EXISTS `creature_onkill_reputation`;
 CREATE TABLE IF NOT EXISTS `creature_onkill_reputation` (
   `creature_id` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Creature Identifier',
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `creature_onkill_reputation` (
   PRIMARY KEY (`creature_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='Creature OnKill Reputation gain';
 
--- Дамп данных таблицы acore_world.creature_onkill_reputation: 2 045 rows
+-- Dumpar data för tabell acore_world.creature_onkill_reputation: 2 045 rows
 DELETE FROM `creature_onkill_reputation`;
 /*!40000 ALTER TABLE `creature_onkill_reputation` DISABLE KEYS */;
 INSERT INTO `creature_onkill_reputation` (`creature_id`, `RewOnKillRepFaction1`, `RewOnKillRepFaction2`, `MaxStanding1`, `IsTeamAward1`, `RewOnKillRepValue1`, `MaxStanding2`, `IsTeamAward2`, `RewOnKillRepValue2`, `TeamDependent`) VALUES
@@ -106,22 +106,22 @@ INSERT INTO `creature_onkill_reputation` (`creature_id`, `RewOnKillRepFaction1`,
 	(2590, 349, 70, 5, 0, 5, 3, 0, -25, 0),
 	(2591, 349, 70, 5, 0, 5, 3, 0, -25, 0),
 	(2594, 87, 21, 5, 0, 5, 7, 0, -25, 0),
-	(2610, 87, 21, 5, 0, 5, 7, 127, -125, 0),
+	(2610, 87, 21, 5, 0, 5, 7, 0, -125, 0),
 	(2622, 87, 21, 5, 0, 5, 7, 0, -25, 0),
 	(2625, 87, 21, 5, 0, 25, 7, 0, -125, 0),
 	(2627, 87, 21, 5, 0, 5, 7, 0, -25, 0),
-	(2636, 87, 21, 5, 0, 25, 7, 127, -125, 0),
+	(2636, 87, 21, 5, 0, 25, 7, 0, -125, 0),
 	(2663, 87, 21, 5, 0, 5, 7, 0, -25, 0),
 	(2664, 87, 21, 5, 0, 5, 7, 0, -25, 0),
 	(2670, 87, 21, 5, 0, 5, 7, 0, -25, 0),
 	(2685, 87, 21, 5, 0, 5, 7, 0, -25, 0),
 	(2699, 87, 21, 5, 0, 5, 7, 0, -25, 0),
 	(2767, 87, 21, 5, 0, 5, 7, 1, -125, 0),
-	(2768, 87, 21, 5, 0, 5, 7, 127, -125, 0),
+	(2768, 87, 21, 5, 0, 5, 7, 0, -125, 0),
 	(2769, 87, 21, 5, 0, 5, 7, 1, -125, 0),
-	(2774, 87, 21, 5, 0, 5, 7, 127, -125, 0),
-	(2778, 87, 21, 5, 0, 25, 7, 127, -125, 0),
-	(2817, 87, 21, 5, 0, 5, 7, 127, -125, 0),
+	(2774, 87, 21, 5, 0, 5, 7, 0, -125, 0),
+	(2778, 87, 21, 5, 0, 25, 7, 0, -125, 0),
+	(2817, 87, 21, 5, 0, 5, 7, 0, -125, 0),
 	(2832, 87, 21, 5, 0, 5, 7, 0, -25, 0),
 	(2834, 87, 21, 5, 0, 5, 7, 0, -25, 0),
 	(2836, 87, 21, 5, 0, 5, 7, 0, -25, 0),
@@ -250,7 +250,7 @@ INSERT INTO `creature_onkill_reputation` (`creature_id`, `RewOnKillRepFaction1`,
 	(8557, 529, 0, 4, 0, 10, 0, 0, 0, 0),
 	(8558, 529, 0, 6, 0, 10, 0, 0, 0, 0),
 	(9017, 749, 0, 5, 0, 15, 0, 0, 0, 0),
-	(9179, 87, 21, 6, 0, 5, 7, 127, -125, 0),
+	(9179, 87, 21, 6, 0, 5, 7, 0, -125, 0),
 	(9462, 576, 0, 7, 0, 60, 0, 0, 0, 0),
 	(9464, 576, 0, 7, 0, 60, 0, 0, 0, 0),
 	(9536, 169, 0, 7, 0, -125, 0, 0, 0, 0),
@@ -429,7 +429,7 @@ INSERT INTO `creature_onkill_reputation` (`creature_id`, `RewOnKillRepFaction1`,
 	(12118, 749, 0, 6, 0, 100, 0, 0, 0, 0),
 	(12122, 730, 0, 7, 0, 5, 0, 0, 0, 0),
 	(12127, 729, 0, 6, 0, 5, 0, 0, 0, 0),
-	(12136, 21, 0, 7, 127, -125, 0, 0, 0, 0),
+	(12136, 21, 0, 7, 0, -125, 0, 0, 0, 0),
 	(12259, 749, 0, 6, 0, 100, 0, 0, 0, 0),
 	(12262, 529, 0, 6, 0, 10, 0, 0, 0, 0),
 	(12263, 529, 0, 6, 0, 10, 0, 0, 0, 0),

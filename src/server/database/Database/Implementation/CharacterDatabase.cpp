@@ -36,7 +36,7 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_INS_CHARACTER_BAN, "INSERT INTO character_banned VALUES (?, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()+?, ?, ?, 1)", CONNECTION_ASYNC);
     PrepareStatement(CHAR_UPD_CHARACTER_BAN, "UPDATE character_banned SET active = 0 WHERE guid = ? AND active != 0", CONNECTION_ASYNC);
     PrepareStatement(CHAR_DEL_CHARACTER_BAN, "DELETE cb FROM character_banned cb INNER JOIN characters c ON c.guid = cb.guid WHERE c.account = ?", CONNECTION_ASYNC);
-    PrepareStatement(CHAR_SEL_BANINFO, "SELECT FROM_UNIXTIME(bandate), unbandate-bandate, active, unbandate, banreason, bannedby FROM character_banned WHERE guid = ? ORDER BY bandate ASC", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_SEL_BANINFO, "SELECT FROM_UNIXTIME(bandate, '%Y-%m-%d %H:%i:%s'), unbandate-bandate, active, unbandate, banreason, bannedby FROM character_banned WHERE guid = ? ORDER BY bandate ASC", CONNECTION_SYNCH);
     PrepareStatement(CHAR_SEL_GUID_BY_NAME_FILTER, "SELECT guid, name FROM characters WHERE name LIKE CONCAT('%%', ?, '%%')", CONNECTION_SYNCH);
     PrepareStatement(CHAR_SEL_BANINFO_LIST, "SELECT bandate, unbandate, bannedby, banreason FROM character_banned WHERE guid = ? ORDER BY unbandate", CONNECTION_SYNCH);
     PrepareStatement(CHAR_SEL_BANNED_NAME, "SELECT characters.name FROM characters, character_banned WHERE character_banned.guid = ? AND character_banned.guid = characters.guid", CONNECTION_SYNCH);
@@ -92,6 +92,8 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_SEL_CHARACTER_ACTIONS, "SELECT a.button, a.action, a.type FROM character_action as a, characters as c WHERE a.guid = c.guid AND a.spec = c.activeTalentGroup AND a.guid = ? ORDER BY button", CONNECTION_ASYNC);
     PrepareStatement(CHAR_SEL_CHARACTER_MAILCOUNT_UNREAD, "SELECT COUNT(id) FROM mail WHERE receiver = ? AND (checked & 1) = 0 AND deliver_time <= ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_SEL_CHARACTER_MAILCOUNT_UNREAD_SYNCH, "SELECT COUNT(id) FROM mail WHERE receiver = ? AND (checked & 1) = 0 AND deliver_time <= ?", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_SEL_MAIL_SERVER_CHARACTER, "SELECT mailId from mail_server_character WHERE guid = ? and mailId = ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_REP_MAIL_SERVER_CHARACTER, "REPLACE INTO mail_server_character (guid, mailId) values (?, ?)", CONNECTION_ASYNC);
     PrepareStatement(CHAR_SEL_CHARACTER_SOCIALLIST, "SELECT friend, flags, note FROM character_social JOIN characters ON characters.guid = character_social.friend WHERE character_social.guid = ? AND deleteinfos_name IS NULL LIMIT 255", CONNECTION_ASYNC);
     PrepareStatement(CHAR_SEL_CHARACTER_HOMEBIND, "SELECT mapId, zoneId, posX, posY, posZ FROM character_homebind WHERE guid = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_SEL_CHARACTER_SPELLCOOLDOWNS, "SELECT spell, category, item, time, needSend FROM character_spell_cooldown WHERE guid = ?", CONNECTION_ASYNC);
@@ -599,6 +601,13 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_SEL_CHAR_SETTINGS, "SELECT source, data FROM character_settings WHERE guid = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_REP_CHAR_SETTINGS, "REPLACE INTO character_settings (guid, source, data) VALUES (?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(CHAR_DEL_CHAR_SETTINGS, "DELETE FROM character_settings WHERE guid = ?", CONNECTION_ASYNC);
+
+    // Instance saved data. Stores the states of gameobjects in instances to be loaded on server start
+    PrepareStatement(CHAR_SELECT_INSTANCE_SAVED_DATA, "SELECT id, guid, state FROM instance_saved_go_state_data", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_UPDATE_INSTANCE_SAVED_DATA, "UPDATE instance_saved_go_state_data SET state = ? WHERE guid = ? AND id = ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_INSERT_INSTANCE_SAVED_DATA, "INSERT INTO instance_saved_go_state_data (id, guid, state) VALUES (?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_DELETE_INSTANCE_SAVED_DATA, "DELETE FROM instance_saved_go_state_data WHERE id = ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_SANITIZE_INSTANCE_SAVED_DATA, "DELETE FROM instance_saved_go_state_data WHERE id NOT IN (SELECT instance.id FROM instance)", CONNECTION_ASYNC);
 }
 
 CharacterDatabaseConnection::CharacterDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo)

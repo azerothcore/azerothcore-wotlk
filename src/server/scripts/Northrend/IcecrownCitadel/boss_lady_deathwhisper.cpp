@@ -299,7 +299,7 @@ public:
             if (events.GetPhaseMask() & PHASE_ONE_MASK && damage >= me->GetPower(POWER_MANA))
             {
                 // reset threat
-                ThreatContainer::StorageType const& threatlist = me->getThreatMgr().getThreatList();
+                ThreatContainer::StorageType const& threatlist = me->GetThreatMgr().getThreatList();
                 for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
                 {
                     Unit* unit = ObjectAccessor::GetUnit((*me), (*itr)->getUnitGuid());
@@ -330,7 +330,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if ((!UpdateVictim() && !(events.GetPhaseMask() & PHASE_INTRO_MASK)) || !CheckInRoom())
+            if (!UpdateVictim() && !(events.GetPhaseMask() & PHASE_INTRO_MASK))
                 return;
 
             events.Update(diff);
@@ -515,7 +515,7 @@ public:
                 {
                     darnavan->RemoveAllAuras();
                     darnavan->SetFaction(FACTION_FRIENDLY);
-                    darnavan->DeleteThreatList();
+                    darnavan->GetThreatMgr().ClearAllThreat();
                     darnavan->CombatStop(true);
                     darnavan->GetMotionMaster()->MoveIdle();
                     darnavan->StopMoving();
@@ -610,7 +610,7 @@ public:
             if (me->SummonCreature(entry, pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
                 if (TempSummon* trigger = me->SummonCreature(WORLD_TRIGGER, pos, TEMPSUMMON_TIMED_DESPAWN, 2000))
                 {
-                    trigger->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                    trigger->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                     trigger->CastSpell(trigger, SPELL_TELEPORT_VISUAL, true);
                 }
         }
@@ -744,10 +744,10 @@ public:
                     break;
                 case EVENT_CULTIST_DARK_MARTYRDOM_REVIVE:
                     me->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
-                    me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+                    me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
+                    me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                     me->UpdateEntry(NPC_REANIMATED_FANATIC);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED | UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_STUNNED | UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
                     me->SetReactState(REACT_AGGRESSIVE);
                     DoZoneInCombat(me);
                     me->CastSpell(me, SPELL_FANATIC_S_DETERMINATION);
@@ -759,9 +759,9 @@ public:
                     me->CastSpell(me, SPELL_PERMANENT_FEIGN_DEATH, true);
                     me->CastSpell(me, SPELL_CLEAR_ALL_DEBUFFS, true);
                     me->CastSpell(me, SPELL_FULL_HEAL, true);
-                    me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
-                    me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED | UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
+                    me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
+                    me->SetUnitFlag(UNIT_FLAG_STUNNED | UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
                     Reset();
                     events.ScheduleEvent(EVENT_CULTIST_DARK_MARTYRDOM_REVIVE, 6000);
                     break;
@@ -865,10 +865,10 @@ public:
                     break;
                 case EVENT_CULTIST_DARK_MARTYRDOM_REVIVE:
                     me->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
-                    me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+                    me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
+                    me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                     me->UpdateEntry(NPC_REANIMATED_ADHERENT);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED | UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_STUNNED | UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
                     me->SetReactState(REACT_AGGRESSIVE);
                     DoZoneInCombat(me);
                     me->CastSpell(me, SPELL_ADHERENT_S_DETERMINATION);
@@ -880,9 +880,9 @@ public:
                     me->CastSpell(me, SPELL_PERMANENT_FEIGN_DEATH, true);
                     me->CastSpell(me, SPELL_CLEAR_ALL_DEBUFFS, true);
                     me->CastSpell(me, SPELL_FULL_HEAL, true);
-                    me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
-                    me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED | UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
+                    me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
+                    me->SetUnitFlag(UNIT_FLAG_STUNNED | UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
                     Reset();
                     events.ScheduleEvent(EVENT_CULTIST_DARK_MARTYRDOM_REVIVE, 6000);
                     break;
@@ -930,7 +930,7 @@ public:
             ScriptedAI::AttackStart(who);
             if (!targetGUID)
             {
-                me->getThreatMgr().resetAllAggro();
+                me->GetThreatMgr().ResetAllThreat();
                 me->AddThreat(who, 1000000.0f);
                 targetGUID = who->GetGUID();
             }
@@ -983,7 +983,7 @@ public:
         }
 
         void MoveInLineOfSight(Unit*  /*who*/) override {}
-        void EnterEvadeMode() override {}
+        void EnterEvadeMode(EvadeReason /*why*/ = EVADE_REASON_OTHER) override {}
     };
 
     CreatureAI* GetAI(Creature* creature) const override

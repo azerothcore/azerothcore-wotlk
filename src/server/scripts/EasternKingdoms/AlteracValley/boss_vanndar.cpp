@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "BattlegroundAV.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 
@@ -49,19 +50,77 @@ public:
         uint32 StormboltTimer;
         uint32 ResetTimer;
         uint32 YellTimer;
+        bool Attacked;
 
         void Reset() override
         {
-            AvatarTimer        = 3 * IN_MILLISECONDS;
-            ThunderclapTimer   = 4 * IN_MILLISECONDS;
-            StormboltTimer     = 6 * IN_MILLISECONDS;
-            ResetTimer         = 5 * IN_MILLISECONDS;
+            AvatarTimer  = 3 * IN_MILLISECONDS;
+            ThunderclapTimer = 4 * IN_MILLISECONDS;
+            StormboltTimer = 6 * IN_MILLISECONDS;
+            ResetTimer = 5 * IN_MILLISECONDS;
             YellTimer = urand(20 * IN_MILLISECONDS, 30 * IN_MILLISECONDS);
+            Attacked = false;
         }
 
         void EnterCombat(Unit* /*who*/) override
         {
             Talk(YELL_AGGRO);
+        }
+
+        void AttackStart(Unit* victim) override
+        {
+            ScriptedAI::AttackStart(victim);
+
+            if (!Attacked)
+            {
+                Attacked = true;
+
+                // Mini bosses should attack as well
+                if (BattlegroundMap* bgMap = me->GetMap()->ToBattlegroundMap())
+                {
+                    if (Battleground* bg = bgMap->GetBG())
+                    {
+                        for (uint8 i = AV_CPLACE_A_MARSHAL_SOUTH; i <= AV_CPLACE_A_MARSHAL_STONE; ++i)
+                        {
+                            if (Creature* marshall = bg->GetBGCreature(i))
+                            {
+                                if (marshall->IsAIEnabled && !marshall->GetVictim())
+                                {
+                                    marshall->AI()->AttackStart(victim);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        void EnterEvadeMode(EvadeReason why) override
+        {
+            ScriptedAI::EnterEvadeMode(why);
+
+            if (Attacked)
+            {
+                Attacked = false;
+
+                // Evade mini bosses
+                if (BattlegroundMap* bgMap = me->GetMap()->ToBattlegroundMap())
+                {
+                    if (Battleground* bg = bgMap->GetBG())
+                    {
+                        for (uint8 i = AV_CPLACE_A_MARSHAL_SOUTH; i <= AV_CPLACE_A_MARSHAL_STONE; ++i)
+                        {
+                            if (Creature* marshall = bg->GetBGCreature(i))
+                            {
+                                if (marshall->IsAIEnabled && !marshall->IsInEvadeMode())
+                                {
+                                    marshall->AI()->EnterEvadeMode();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -102,7 +161,7 @@ public:
             {
                 if (me->GetDistance2d(me->GetHomePosition().GetPositionX(), me->GetHomePosition().GetPositionY()) > 50)
                 {
-                    EnterEvadeMode();
+                    ScriptedAI::EnterEvadeMode();
                     Talk(YELL_EVADE);
                 }
                 ResetTimer = 5 * IN_MILLISECONDS;

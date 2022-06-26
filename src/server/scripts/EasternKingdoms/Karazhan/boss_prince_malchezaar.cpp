@@ -144,7 +144,7 @@ public:
             if (spell->Id == SPELL_INFERNAL_RELAY)
             {
                 me->SetDisplayId(me->GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID));
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 HellfireTimer = 4000;
                 CleanupTimer = 170000;
             }
@@ -251,7 +251,7 @@ public:
             if (!info)
                 return;
 
-            ThreatContainer::StorageType const& t_list = me->getThreatMgr().getThreatList();
+            ThreatContainer::StorageType const& t_list = me->GetThreatMgr().getThreatList();
             std::vector<Unit*> targets;
 
             if (t_list.empty())
@@ -477,7 +477,7 @@ public:
         void Initialize()
         {
             AxesTargetSwitchTimer = 7500;
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetCanDualWield(true);
         }
 

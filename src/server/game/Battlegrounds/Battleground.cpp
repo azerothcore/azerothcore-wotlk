@@ -1077,7 +1077,7 @@ void Battleground::StartBattleground()
 void Battleground::AddPlayer(Player* player)
 {
     // remove afk from player
-    if (player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_AFK))
+    if (player->HasPlayerFlag(PLAYER_FLAGS_AFK))
         player->ToggleAFK();
 
     sScriptMgr->OnBattlegroundBeforeAddPlayer(this, player);
@@ -1764,7 +1764,7 @@ void Battleground::HandleKillPlayer(Player* victim, Player* killer)
     if (!isArena())
     {
         // To be able to remove insignia -- ONLY IN Battlegrounds
-        victim->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
+        victim->SetUnitFlag(UNIT_FLAG_SKINNABLE);
         RewardXPAtKill(killer, victim);
     }
 }

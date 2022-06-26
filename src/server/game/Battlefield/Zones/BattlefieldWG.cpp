@@ -225,7 +225,7 @@ void BattlefieldWG::OnBattleStart()
         // Update faction of relic, only attacker can click on
         go->SetUInt32Value(GAMEOBJECT_FACTION, WintergraspFaction[GetAttackerTeam()]);
         // Set in use (not allow to click on before last door is broken)
-        go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+        go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
 
         // save guid
         m_titansRelic = go->GetGUID();
@@ -476,9 +476,19 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     m_PlayersInWar[TEAM_HORDE].clear();
 
     if (!endByTimer) // win alli/horde
+    {
+        uint32 const worldStateId = GetDefenderTeam() == TEAM_ALLIANCE ? WORLDSTATE_ALLIANCE_KEEP_CAPTURED : WORLDSTATE_HORDE_KEEP_CAPTURED;
+        sWorld->setWorldState(worldStateId, sWorld->getWorldState(worldStateId) + 1);
+
         SendWarning((GetDefenderTeam() == TEAM_ALLIANCE) ? BATTLEFIELD_WG_TEXT_WIN_KEEP : (BATTLEFIELD_WG_TEXT_WIN_KEEP + 2));
+    }
     else // defend alli/horde
+    {
+        uint32 const worldStateId = GetDefenderTeam() == TEAM_ALLIANCE ? WORLDSTATE_ALLIANCE_KEEP_DEFENDED : WORLDSTATE_HORDE_KEEP_DEFENDED;
+        sWorld->setWorldState(worldStateId, sWorld->getWorldState(worldStateId) + 1);
+
         SendWarning((GetDefenderTeam() == TEAM_ALLIANCE) ? BATTLEFIELD_WG_TEXT_DEFEND_KEEP : (BATTLEFIELD_WG_TEXT_DEFEND_KEEP + 2));
+    }
 }
 
 // *******************************************************
@@ -694,29 +704,60 @@ void BattlefieldWG::OnGameObjectCreate(GameObject* go)
 void BattlefieldWG::HandleKill(Player* killer, Unit* victim)
 {
     if (killer == victim)
+    {
         return;
+    }
 
     TeamId killerTeam = killer->GetTeamId();
 
     // xinef: tower cannons also grant rank
     if (victim->GetTypeId() == TYPEID_PLAYER || IsKeepNpc(victim->GetEntry()) || victim->GetEntry() == NPC_WINTERGRASP_TOWER_CANNON)
     {
-        for (GuidUnorderedSet::const_iterator itr = m_PlayersInWar[killerTeam].begin(); itr != m_PlayersInWar[killerTeam].end(); ++itr)
-            if (Player* player = ObjectAccessor::FindPlayer(*itr))
+        if (victim->GetTypeId() == TYPEID_PLAYER && victim->HasAura(SPELL_LIEUTENANT))
+        {
+            // Quest - Wintergrasp - PvP Kill - Horde/Alliance
+            for (auto& playerGuid : m_PlayersInWar[killerTeam])
+            {
+                if (Player* player = ObjectAccessor::FindPlayer(playerGuid))
+                {
+                    if (player->GetDistance2d(killer) < 40)
+                    {
+                        player->KilledMonsterCredit(killerTeam == TEAM_HORDE ? NPC_QUEST_PVP_KILL_ALLIANCE : NPC_QUEST_PVP_KILL_HORDE);
+                    }
+                }
+            }
+        }
+
+        for (auto& playerGuid : m_PlayersInWar[killerTeam])
+        {
+            if (Player* player = ObjectAccessor::FindPlayer(playerGuid))
+            {
                 if (player->GetDistance2d(killer) < 40)
+                {
                     PromotePlayer(player);
+                }
+            }
+        }
 
         // Xinef: Allow to Skin non-released corpse
         if (victim->GetTypeId() == TYPEID_PLAYER)
-            victim->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
+        {
+            victim->SetUnitFlag(UNIT_FLAG_SKINNABLE);
+        }
     }
     else if (victim->IsVehicle() && !killer->IsFriendlyTo(victim))
     {
         // Quest - Wintergrasp - PvP Kill - Vehicle
-        for (GuidUnorderedSet::const_iterator itr = m_PlayersInWar[killerTeam].begin(); itr != m_PlayersInWar[killerTeam].end(); ++itr)
-            if (Player* player = ObjectAccessor::FindPlayer(*itr))
+        for (auto& playerGuid : m_PlayersInWar[killerTeam])
+        {
+            if (Player* player = ObjectAccessor::FindPlayer(playerGuid))
+            {
                 if (player->GetDistance2d(killer) < 40)
+                {
                     player->KilledMonsterCredit(NPC_QUEST_PVP_KILL_VEHICLE);
+                }
+            }
+        }
     }
 }
 
@@ -898,6 +939,11 @@ void BattlefieldWG::FillInitialWorldStates(WorldPacket& data)
     data << uint32(BATTLEFIELD_WG_WORLD_STATE_VEHICLE_A) << uint32(GetData(BATTLEFIELD_WG_DATA_VEHICLE_A));
     data << uint32(BATTLEFIELD_WG_WORLD_STATE_MAX_VEHICLE_A) << GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_A);
 
+    data << uint32(WORLDSTATE_HORDE_KEEP_CAPTURED) << uint32(sWorld->getWorldState(WORLDSTATE_HORDE_KEEP_CAPTURED));
+    data << uint32(WORLDSTATE_HORDE_KEEP_DEFENDED) << uint32(sWorld->getWorldState(WORLDSTATE_HORDE_KEEP_DEFENDED));
+    data << uint32(WORLDSTATE_ALLIANCE_KEEP_CAPTURED) << uint32(sWorld->getWorldState(WORLDSTATE_ALLIANCE_KEEP_CAPTURED));
+    data << uint32(WORLDSTATE_ALLIANCE_KEEP_DEFENDED) << uint32(sWorld->getWorldState(WORLDSTATE_ALLIANCE_KEEP_DEFENDED));
+
     for (GameObjectBuilding::const_iterator itr = BuildingsInZone.begin(); itr != BuildingsInZone.end(); ++itr)
         data << (*itr)->m_WorldState << (*itr)->m_State;
 
@@ -913,7 +959,7 @@ void BattlefieldWG::SendInitWorldStatesTo(Player* player)
     data << uint32(m_MapId);
     data << uint32(m_ZoneId);
     data << uint32(0);
-    data << uint16(10 + BuildingsInZone.size() + WorkshopsList.size()); // Number of fields
+    data << uint16(14 + BuildingsInZone.size() + WorkshopsList.size()); // Number of fields
 
     FillInitialWorldStates(data);
 

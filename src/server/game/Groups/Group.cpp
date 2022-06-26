@@ -18,6 +18,7 @@
 #include "Group.h"
 #include "Battleground.h"
 #include "BattlegroundMgr.h"
+#include "Config.h"
 #include "DatabaseEnv.h"
 #include "GameTime.h"
 #include "GroupMgr.h"
@@ -112,7 +113,7 @@ bool Group::Create(Player* leader)
     m_guid = ObjectGuid::Create<HighGuid::Group>(lowguid);
     m_leaderGuid = leaderGuid;
     m_leaderName = leader->GetName();
-    leader->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_GROUP_LEADER);
+    leader->SetPlayerFlag(PLAYER_FLAGS_GROUP_LEADER);
 
     if (isBGGroup() || isBFGroup())
         m_groupType = GROUPTYPE_BGRAID;
@@ -276,6 +277,16 @@ void Group::ConvertToLFG(bool restricted /*= true*/)
     }
 
     SendUpdate();
+}
+
+bool Group::CheckLevelForRaid()
+{
+    for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
+        if (Player* player = ObjectAccessor::FindPlayer(citr->guid))
+            if (player->getLevel() < sConfigMgr->GetOption<int32>("Group.Raid.LevelRestriction", 10))
+                return true;
+
+    return false;
 }
 
 void Group::ConvertToRaid()
@@ -725,9 +736,9 @@ void Group::ChangeLeader(ObjectGuid newLeaderGuid)
     }
 
     if (Player* oldLeader = ObjectAccessor::FindConnectedPlayer(m_leaderGuid))
-        oldLeader->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_GROUP_LEADER);
+        oldLeader->RemovePlayerFlag(PLAYER_FLAGS_GROUP_LEADER);
 
-    newLeader->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_GROUP_LEADER);
+    newLeader->SetPlayerFlag(PLAYER_FLAGS_GROUP_LEADER);
     m_leaderGuid = newLeader->GetGUID();
     m_leaderName = newLeader->GetName();
     ToggleGroupMemberFlag(slot, MEMBER_FLAG_ASSISTANT, false);
@@ -744,6 +755,8 @@ void Group::Disband(bool hideDestroy /* = false */)
     sScriptMgr->OnGroupDisband(this);
 
     Player* player;
+    uint32 instanceId = 0;
+
     for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
     {
         if (!isBGGroup() && !isBFGroup())
@@ -752,6 +765,11 @@ void Group::Disband(bool hideDestroy /* = false */)
         }
 
         player = ObjectAccessor::FindConnectedPlayer(citr->guid);
+
+        if (player && !instanceId && !isBGGroup() && !isBFGroup())
+        {
+            instanceId = player->GetInstanceId();
+        }
 
         _homebindIfInstance(player);
         if (!isBGGroup() && !isBFGroup())
@@ -820,6 +838,9 @@ void Group::Disband(bool hideDestroy /* = false */)
         stmt->SetData(0, GetGUID().GetCounter());
         CharacterDatabase.Execute(stmt);
     }
+
+    // Cleaning up instance saved data for gameobjects when a group is disbanded
+    sInstanceSaveMgr->DeleteInstanceSavedData(instanceId);
 
     sGroupMgr->RemoveGroup(this);
     delete this;
@@ -1871,7 +1892,7 @@ void Group::UpdateLooterGuid(WorldObject* pLootedObject, bool ifneed)
     }
 }
 
-GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* bgTemplate, BattlegroundQueueTypeId  /*bgQueueTypeId*/, uint32 MinPlayerCount, uint32 /*MaxPlayerCount*/, bool isRated, uint32 arenaSlot)
+GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* bgTemplate, BattlegroundQueueTypeId bgQueueTypeId, uint32 MinPlayerCount, uint32 /*MaxPlayerCount*/, bool isRated, uint32 arenaSlot)
 {
     // check if this group is LFG group
     if (isLFGGroup())
@@ -1943,6 +1964,12 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
         // pussywizard: check for free slot, this is actually ensured before calling this function, but just in case
         if (!member->HasFreeBattlegroundQueueId())
             return ERR_BATTLEGROUND_TOO_MANY_QUEUES;
+
+        // don't let join if someone from the group is already in that bg queue
+        if (member->InBattlegroundQueueForBattlegroundQueueType(bgQueueTypeId))
+        {
+            return ERR_BATTLEGROUND_JOIN_FAILED;
+        }
 
         // don't let join if someone from the group is in bg queue random
         if (member->InBattlegroundQueueForBattlegroundQueueType(bgQueueTypeIdRandom))
@@ -2043,7 +2070,11 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* leader)
                         toUnbind.push_back(instanceSave);
                     }
                     else
+                    {
                         leader->SendResetInstanceFailed(0, instanceSave->GetMapId());
+                    }
+
+                    sInstanceSaveMgr->DeleteInstanceSavedData(instanceSave->GetInstanceId());
                 }
                 for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
                     sInstanceSaveMgr->UnbindAllFor(*itr);
@@ -2067,7 +2098,11 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* leader)
                         toUnbind.push_back(instanceSave);
                     }
                     else
+                    {
                         leader->SendResetInstanceFailed(0, instanceSave->GetMapId());
+                    }
+
+                    sInstanceSaveMgr->DeleteInstanceSavedData(instanceSave->GetInstanceId());
                 }
                 for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
                     sInstanceSaveMgr->UnbindAllFor(*itr);

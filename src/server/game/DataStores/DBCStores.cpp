@@ -20,6 +20,7 @@
 #include "DBCFileLoader.h"
 #include "DBCfmt.h"
 #include "Errors.h"
+#include "LFGMgr.h"
 #include "Log.h"
 #include "SharedDefines.h"
 #include "SpellMgr.h"
@@ -55,6 +56,7 @@ DBCStorage <ChrRacesEntry> sChrRacesStore(ChrRacesEntryfmt);
 DBCStorage <CinematicCameraEntry> sCinematicCameraStore(CinematicCameraEntryfmt);
 DBCStorage <CinematicSequencesEntry> sCinematicSequencesStore(CinematicSequencesEntryfmt);
 DBCStorage <CreatureDisplayInfoEntry> sCreatureDisplayInfoStore(CreatureDisplayInfofmt);
+DBCStorage <CreatureDisplayInfoExtraEntry> sCreatureDisplayInfoExtraStore(CreatureDisplayInfoExtrafmt);
 DBCStorage <CreatureFamilyEntry> sCreatureFamilyStore(CreatureFamilyfmt);
 DBCStorage <CreatureModelDataEntry> sCreatureModelDataStore(CreatureModelDatafmt);
 DBCStorage <CreatureSpellDataEntry> sCreatureSpellDataStore(CreatureSpellDatafmt);
@@ -73,6 +75,8 @@ typedef std::map<uint32, SimpleFactionsList> FactionTeamMap;
 static FactionTeamMap sFactionTeamMap;
 DBCStorage <FactionEntry> sFactionStore(FactionEntryfmt);
 DBCStorage <FactionTemplateEntry> sFactionTemplateStore(FactionTemplateEntryfmt);
+
+DBCStorage <GameObjectArtKitEntry> sGameObjectArtKitStore(GameObjectArtKitfmt);
 
 DBCStorage <GameObjectDisplayInfoEntry> sGameObjectDisplayInfoStore(GameObjectDisplayInfofmt);
 DBCStorage <GemPropertiesEntry> sGemPropertiesStore(GemPropertiesEntryfmt);
@@ -278,6 +282,7 @@ void LoadDBCStores(const std::string& dataPath)
     LOAD_DBC(sCinematicCameraStore,                 "CinematicCamera.dbc",                  "cinematiccamera_dbc");
     LOAD_DBC(sCinematicSequencesStore,              "CinematicSequences.dbc",               "cinematicsequences_dbc");
     LOAD_DBC(sCreatureDisplayInfoStore,             "CreatureDisplayInfo.dbc",              "creaturedisplayinfo_dbc");
+    LOAD_DBC(sCreatureDisplayInfoExtraStore,        "CreatureDisplayInfoExtra.dbc",         "creaturedisplayinfoextra_dbc");
     LOAD_DBC(sCreatureFamilyStore,                  "CreatureFamily.dbc",                   "creaturefamily_dbc");
     LOAD_DBC(sCreatureModelDataStore,               "CreatureModelData.dbc",                "creaturemodeldata_dbc");
     LOAD_DBC(sCreatureSpellDataStore,               "CreatureSpellData.dbc",                "creaturespelldata_dbc");
@@ -291,6 +296,7 @@ void LoadDBCStores(const std::string& dataPath)
     LOAD_DBC(sEmotesTextStore,                      "EmotesText.dbc",                       "emotestext_dbc");
     LOAD_DBC(sFactionStore,                         "Faction.dbc",                          "faction_dbc");
     LOAD_DBC(sFactionTemplateStore,                 "FactionTemplate.dbc",                  "factiontemplate_dbc");
+    LOAD_DBC(sGameObjectArtKitStore,                "GameObjectArtKit.dbc",                 "gameobjectartkit_dbc");
     LOAD_DBC(sGameObjectDisplayInfoStore,           "GameObjectDisplayInfo.dbc",            "gameobjectdisplayinfo_dbc");
     LOAD_DBC(sGemPropertiesStore,                   "GemProperties.dbc",                    "gemproperties_dbc");
     LOAD_DBC(sGlyphPropertiesStore,                 "GlyphProperties.dbc",                  "glyphproperties_dbc");
@@ -510,7 +516,7 @@ void LoadDBCStores(const std::string& dataPath)
 
     for (uint32 i = 1; i < sTaxiPathStore.GetNumRows(); ++i)
         if (TaxiPathEntry const* entry = sTaxiPathStore.LookupEntry(i))
-            sTaxiPathSetBySource[entry->from][entry->to] = TaxiPathBySourceAndDestination(entry->ID, entry->price);
+            sTaxiPathSetBySource[entry->from][entry->to] = entry;
 
     // Calculate path nodes count
     uint32 pathCount = sTaxiPathStore.GetNumRows();
@@ -559,7 +565,7 @@ void LoadDBCStores(const std::string& dataPath)
                 for (TaxiPathSetForSource::const_iterator dest_i = src_i->second.begin(); dest_i != src_i->second.end(); ++dest_i)
                 {
                     // not spell path
-                    if (dest_i->second.price || spellPaths.find(dest_i->second.ID) == spellPaths.end())
+                    if (dest_i->second->price || spellPaths.find(dest_i->second->ID) == spellPaths.end())
                     {
                         ok = true;
                         break;
@@ -836,6 +842,19 @@ LFGDungeonEntry const* GetLFGDungeon(uint32 mapId, Difficulty difficulty)
     for (LFGDungeonEntry const* dungeon : sLFGDungeonStore)
         if (dungeon->map == int32(mapId) && Difficulty(dungeon->difficulty) == difficulty)
             return dungeon;
+
+    return nullptr;
+}
+
+LFGDungeonEntry const* GetZoneLFGDungeonEntry(std::string const& zoneName, LocaleConstant locale)
+{
+    for (LFGDungeonEntry const* dungeon : sLFGDungeonStore)
+    {
+        if (dungeon->type == lfg::LFG_TYPE_ZONE && zoneName.find(dungeon->name[locale]) != std::string::npos)
+        {
+            return dungeon;
+        }
+    }
 
     return nullptr;
 }

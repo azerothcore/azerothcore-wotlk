@@ -24,6 +24,7 @@
 #include "CinematicMgr.h"
 #include "DBCStores.h"
 #include "DatabaseEnvFwd.h"
+#include "EnumFlag.h"
 #include "GroupReference.h"
 #include "InstanceSaveMgr.h"
 #include "Item.h"
@@ -35,7 +36,9 @@
 #include "PlayerSettings.h"
 #include "PlayerTaxi.h"
 #include "QuestDef.h"
+#include "SpellAuras.h"
 #include "SpellMgr.h"
+#include "SpellInfo.h"
 #include "TradeData.h"
 #include "Unit.h"
 #include "WorldSession.h"
@@ -464,7 +467,7 @@ enum DrunkenState
 
 #define MAX_DRUNKEN   4
 
-enum PlayerFlags
+enum PlayerFlags : uint32
 {
     PLAYER_FLAGS_GROUP_LEADER      = 0x00000001,
     PLAYER_FLAGS_AFK               = 0x00000002,
@@ -499,6 +502,8 @@ enum PlayerFlags
     PLAYER_FLAGS_UNK30             = 0x40000000,
     PLAYER_FLAGS_UNK31             = 0x80000000,
 };
+
+DEFINE_ENUM_FLAG(PlayerFlags);
 
 enum PlayerBytesOffsets //@todo: Implement
 {
@@ -1078,13 +1083,19 @@ public:
 
     void Update(uint32 time) override;
 
+    PlayerFlags GetPlayerFlags() const { return PlayerFlags(GetUInt32Value(PLAYER_FLAGS)); }
+    bool HasPlayerFlag(PlayerFlags flags) const { return HasFlag(PLAYER_FLAGS, flags) != 0; }
+    void SetPlayerFlag(PlayerFlags flags) { SetFlag(PLAYER_FLAGS, flags); }
+    void RemovePlayerFlag(PlayerFlags flags) { RemoveFlag(PLAYER_FLAGS, flags); }
+    void ReplaceAllPlayerFlags(PlayerFlags flags) { SetUInt32Value(PLAYER_FLAGS, flags); }
+
     static bool BuildEnumData(PreparedQueryResult result, WorldPacket* data);
 
     void SetInWater(bool apply);
 
     [[nodiscard]] bool IsInWater() const override { return m_isInWater; }
     [[nodiscard]] bool IsFalling() const;
-    bool IsInAreaTriggerRadius(const AreaTrigger* trigger) const;
+    bool IsInAreaTriggerRadius(AreaTrigger const* trigger, float delta = 0.f) const;
 
     void SendInitialPacketsBeforeAddToMap();
     void SendInitialPacketsAfterAddToMap();
@@ -1097,8 +1108,8 @@ public:
 
     void ToggleAFK();
     void ToggleDND();
-    [[nodiscard]] bool isAFK() const { return HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_AFK); }
-    [[nodiscard]] bool isDND() const { return HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_DND); }
+    [[nodiscard]] bool isAFK() const { return HasPlayerFlag(PLAYER_FLAGS_AFK); }
+    [[nodiscard]] bool isDND() const { return HasPlayerFlag(PLAYER_FLAGS_DND); }
     [[nodiscard]] uint8 GetChatTag() const;
     std::string autoReplyMsg;
 
@@ -1114,7 +1125,7 @@ public:
     void ContinueTaxiFlight();
     // mount_id can be used in scripting calls
 
-    [[nodiscard]] bool IsDeveloper() const { return HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_DEVELOPER); }
+    [[nodiscard]] bool IsDeveloper() const { return HasPlayerFlag(PLAYER_FLAGS_DEVELOPER); }
     void SetDeveloper(bool on) { ApplyModFlag(PLAYER_FLAGS, PLAYER_FLAGS_DEVELOPER, on); }
     [[nodiscard]] bool isAcceptWhispers() const { return m_ExtraFlags & PLAYER_EXTRA_ACCEPT_WHISPERS; }
     void SetAcceptWhispers(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_ACCEPT_WHISPERS; else m_ExtraFlags &= ~PLAYER_EXTRA_ACCEPT_WHISPERS; }
@@ -1344,6 +1355,7 @@ public:
     void ApplyEnchantment(Item* item, bool apply);
     void UpdateSkillEnchantments(uint16 skill_id, uint16 curr_value, uint16 new_value);
     void SendEnchantmentDurations();
+    void UpdateEnchantmentDurations();
     void BuildEnchantmentsInfoData(WorldPacket* data);
     void AddItemDurations(Item* item);
     void RemoveItemDurations(Item* item);
@@ -1802,7 +1814,7 @@ public:
     void ResetContestedPvP()
     {
         ClearUnitState(UNIT_STATE_ATTACK_PLAYER);
-        RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_CONTESTED_PVP);
+        RemovePlayerFlag(PLAYER_FLAGS_CONTESTED_PVP);
         m_contestedPvPTimer = 0;
     }
 
@@ -1975,6 +1987,7 @@ public:
     void BuildPlayerRepop();
     void RepopAtGraveyard();
 
+    void SendDurabilityLoss();
     void DurabilityLossAll(double percent, bool inventory);
     void DurabilityLoss(Item* item, double percent);
     void DurabilityPointsLossAll(int32 points, bool inventory);
@@ -2910,65 +2923,125 @@ template <class T> T Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& bas
 {
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
+    {
         return 0;
+    }
+
     float totalmul = 1.0f;
     int32 totalflat = 0;
 
-    // Drop charges for triggering spells instead of triggered ones
-    if (m_spellModTakingSpell)
-        spell = m_spellModTakingSpell;
-
-    for (auto mod : m_spellMods[op])
+    auto calculateSpellMod = [&](SpellModifier* mod)
     {
-        // Charges can be set only for mods with auras
-        if (!mod->ownerAura)
-            ASSERT(mod->charges == 0);
-
-        if (!IsAffectedBySpellmod(spellInfo, mod, spell))
-            continue;
-
         // xinef: temporary pets cannot use charged mods of owner, needed for mirror image QQ they should use their own auras
         if (temporaryPet && mod->charges != 0)
-            continue;
+        {
+            return;
+        }
 
         if (mod->type == SPELLMOD_FLAT)
         {
             // xinef: do not allow to consume more than one 100% crit increasing spell
             if (mod->op == SPELLMOD_CRITICAL_CHANCE && totalflat >= 100)
-                continue;
+            {
+                return;
+            }
 
-            totalflat += mod->value;
+            int32 flatValue = mod->value;
+
+            // SPELL_MOD_THREAT - divide by 100 (in packets we send threat * 100)
+            if (mod->op == SPELLMOD_THREAT)
+            {
+                flatValue /= 100;
+            }
+
+            totalflat += flatValue;
         }
         else if (mod->type == SPELLMOD_PCT)
         {
             // skip percent mods for null basevalue (most important for spell mods with charges)
             if (basevalue == T(0) || totalmul == 0.0f)
-                continue;
+            {
+                return;
+            }
 
             // special case (skip > 10sec spell casts for instant cast setting)
             if (mod->op == SPELLMOD_CASTING_TIME && basevalue >= T(10000) && mod->value <= -100)
-                continue;
+            {
+                return;
+            }
             // xinef: special exception for surge of light, dont affect crit chance if previous mods were not applied
             else if (mod->op == SPELLMOD_CRITICAL_CHANCE && spell && !HasSpellMod(mod, spell))
-                continue;
+            {
+                return;
+            }
             // xinef: special case for backdraft gcd reduce with backlast time reduction, dont affect gcd if cast time was not applied
             else if (mod->op == SPELLMOD_GLOBAL_COOLDOWN && spell && !HasSpellMod(mod, spell))
-                continue;
+            {
+                return;
+            }
 
             // xinef: those two mods should be multiplicative (Glyph of Renew)
             if (mod->op == SPELLMOD_DAMAGE || mod->op == SPELLMOD_DOT)
+            {
                 totalmul *= CalculatePct(1.0f, 100.0f + mod->value);
+            }
             else
+            {
                 totalmul += CalculatePct(1.0f, mod->value);
+            }
         }
 
         DropModCharge(mod, spell);
+    };
+
+    // Drop charges for triggering spells instead of triggered ones
+    if (m_spellModTakingSpell)
+    {
+        spell = m_spellModTakingSpell;
     }
+
+    SpellModifier* chargedMod = nullptr;
+    for (auto mod : m_spellMods[op])
+    {
+        // Charges can be set only for mods with auras
+        if (!mod->ownerAura)
+        {
+            ASSERT(!mod->charges);
+        }
+
+        if (!IsAffectedBySpellmod(spellInfo, mod, spell))
+        {
+            continue;
+        }
+
+        if (mod->ownerAura->IsUsingCharges())
+        {
+            if (!chargedMod || (chargedMod->ownerAura->GetSpellInfo()->SpellPriority < mod->ownerAura->GetSpellInfo()->SpellPriority))
+            {
+                chargedMod = mod;
+            }
+
+            continue;
+        }
+
+        calculateSpellMod(mod);
+    }
+
+    if (chargedMod)
+    {
+        calculateSpellMod(chargedMod);
+    }
+
     float diff = 0.0f;
     if (op == SPELLMOD_CASTING_TIME || op == SPELLMOD_DURATION)
+    {
         diff = ((float)basevalue + totalflat) * (totalmul - 1.0f) + (float)totalflat;
+    }
     else
+    {
         diff = (float)basevalue * (totalmul - 1.0f) + (float)totalflat;
+    }
+
     basevalue = T((float)basevalue + diff);
     return T(diff);
 }

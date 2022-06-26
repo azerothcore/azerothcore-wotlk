@@ -64,6 +64,8 @@ PvPDifficultyEntry const* GetBattlegroundBracketById(uint32 mapid, BattlegroundB
 CharStartOutfitEntry const* GetCharStartOutfitEntry(uint8 race, uint8 class_, uint8 gender);
 
 LFGDungeonEntry const* GetLFGDungeon(uint32 mapId, Difficulty difficulty);
+LFGDungeonEntry const* GetZoneLFGDungeonEntry(std::string const& zoneName, LocaleConstant locale);
+
 uint32 GetDefaultMapLight(uint32 mapId);
 
 typedef std::unordered_multimap<uint32, SkillRaceClassInfoEntry const*> SkillRaceClassInfoMap;
@@ -88,6 +90,7 @@ extern DBCStorage <ChrRacesEntry>                sChrRacesStore;
 extern DBCStorage <CinematicCameraEntry>         sCinematicCameraStore;
 extern DBCStorage <CinematicSequencesEntry>      sCinematicSequencesStore;
 extern DBCStorage <CreatureDisplayInfoEntry>     sCreatureDisplayInfoStore;
+extern DBCStorage <CreatureDisplayInfoExtraEntry> sCreatureDisplayInfoExtraStore;
 extern DBCStorage <CreatureFamilyEntry>          sCreatureFamilyStore;
 extern DBCStorage <CreatureModelDataEntry>       sCreatureModelDataStore;
 extern DBCStorage <CreatureSpellDataEntry>       sCreatureSpellDataStore;
@@ -101,6 +104,7 @@ extern DBCStorage <EmotesEntry>                  sEmotesStore;
 extern DBCStorage <EmotesTextEntry>              sEmotesTextStore;
 extern DBCStorage <FactionEntry>                 sFactionStore;
 extern DBCStorage <FactionTemplateEntry>         sFactionTemplateStore;
+extern DBCStorage <GameObjectArtKitEntry>        sGameObjectArtKitStore;
 extern DBCStorage <GameObjectDisplayInfoEntry>   sGameObjectDisplayInfoStore;
 extern DBCStorage <GemPropertiesEntry>           sGemPropertiesStore;
 extern DBCStorage <GlyphPropertiesEntry>         sGlyphPropertiesStore;

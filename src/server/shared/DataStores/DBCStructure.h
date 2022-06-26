@@ -667,10 +667,17 @@ struct ChrClassesEntry
     uint32  expansion;                                      // 59 (0 - original race, 1 - tbc addon, ...)
 };
 
+enum ChrRacesFlags
+{
+    CHRRACES_FLAGS_NOT_PLAYABLE = 0x01,
+    CHRRACES_FLAGS_BARE_FEET    = 0x02,
+    CHRRACES_FLAGS_CAN_MOUNT    = 0x04
+};
+
 struct ChrRacesEntry
 {
     uint32      RaceID;                                     // 0
-    // 1 unused
+    uint32      Flags;                                      // 1
     uint32      FactionID;                                  // 2 facton template id
     // 3 unused
     uint32      model_m;                                    // 4
@@ -688,6 +695,8 @@ struct ChrRacesEntry
     // 64 string flags, unused
     // 65-67 unused
     uint32      expansion;                                  // 68 (0 - original race, 1 - tbc addon, ...)
+
+    inline bool HasFlag(ChrRacesFlags flag) const { return (Flags & flag) != 0; }
 };
 
 struct CinematicCameraEntry
@@ -712,7 +721,7 @@ struct CreatureDisplayInfoEntry
     uint32      Displayid;                                  // 0        m_ID
     uint32      ModelId;                                    // 1        m_modelID
     // 2        m_soundID
-    // 3        m_extendedDisplayInfoID
+    uint32      ExtendedDisplayInfoID;                      // 3
     float       scale;                                      // 4        m_creatureModelScale
     // 5        m_creatureModelAlpha
     // 6-8      m_textureVariation[3]
@@ -723,6 +732,21 @@ struct CreatureDisplayInfoEntry
     // 13       m_particleColorID
     // 14       m_creatureGeosetData
     // 15       m_objectEffectPackageID
+};
+
+struct CreatureDisplayInfoExtraEntry
+{
+    //uint32 ID;                                            // 0
+    uint32 DisplayRaceID;                                   // 1
+    uint32 DisplaySexID;                                    // 2
+    //uint32 SkinID;                                        // 3
+    //uint32 FaceID;                                        // 4
+    //uint32 HairStyleID;                                   // 5
+    //uint32 HairColorID;                                   // 6
+    //uint32 FacialHairID;                                  // 7
+    //uint32 NPCItemDisplay[11];                            // 8-18
+    //uint32 Flags;                                         // 19
+    //char const* BakeName;                                 // 20
 };
 
 struct CreatureFamilyEntry
@@ -741,11 +765,16 @@ struct CreatureFamilyEntry
     // 27       m_iconFile
 };
 
+enum CreatureModelDataFlags
+{
+    CREATURE_MODEL_DATA_FLAGS_CAN_MOUNT     = 0x00000080
+};
+
 struct CreatureModelDataEntry
 {
     uint32 Id;
-    //uint32 Flags;
-    //char const* ModelPath[16]
+    uint32 Flags;
+    //char const* ModelPath
     //uint32 Unk1;
     float Scale;                                             // Used in calculation of unit collision data
     //int32 Unk2
@@ -761,6 +790,8 @@ struct CreatureModelDataEntry
     float CollisionHeight;
     float MountHeight;                                       // Used in calculation of unit collision data when mounted
     //float Unks[11]
+
+    inline bool HasFlag(CreatureModelDataFlags flag) const { return (Flags & flag) != 0; }
 };
 
 #define MAX_CREATURE_SPELL_DATA_SLOT 4
@@ -946,6 +977,13 @@ struct FactionTemplateEntry
         return hostileMask == 0 && friendlyMask == 0;
     }
     [[nodiscard]] bool IsContestedGuardFaction() const { return (factionFlags & FACTION_TEMPLATE_FLAG_ATTACK_PVP_ACTIVE_PLAYERS) != 0; }
+};
+
+struct GameObjectArtKitEntry
+{
+    uint32 ID;                                              // 0
+    //char* TextureVariation[3]                             // 1-3 m_textureVariations[3]
+    //char* AttachModel[4]                                  // 4-8 m_attachModels[4]
 };
 
 struct GameObjectDisplayInfoEntry
@@ -1637,7 +1675,7 @@ struct SpellEntry
     std::array<uint32, 2> SpellVisual;                              // 131-132  m_spellVisualID
     uint32    SpellIconID;                                          // 133      m_spellIconID
     uint32    ActiveIconID;                                         // 134      m_activeIconID
-    //uint32    SpellPriority;                                      // 135 not used
+    uint32    SpellPriority;                                        // 135 not used
     std::array<char const*, 16> SpellName;                          // 136-151  m_name_lang
     //uint32    SpellNameFlag;                                      // 152 not used
     std::array<char const*, 16> Rank;                               // 153-168  m_nameSubtext_lang
@@ -2159,15 +2197,7 @@ struct TalentSpellPos
 
 typedef std::map<uint32, TalentSpellPos> TalentSpellPosMap;
 
-struct TaxiPathBySourceAndDestination
-{
-    TaxiPathBySourceAndDestination()  = default;
-    TaxiPathBySourceAndDestination(uint32 _id, uint32 _price) : ID(_id), price(_price) {}
-
-    uint32    ID{0};
-    uint32    price{0};
-};
-typedef std::map<uint32, TaxiPathBySourceAndDestination> TaxiPathSetForSource;
+typedef std::map<uint32, TaxiPathEntry const*> TaxiPathSetForSource;
 typedef std::map<uint32, TaxiPathSetForSource> TaxiPathSetBySource;
 
 typedef std::vector<TaxiPathNodeEntry const*> TaxiPathNodeList;

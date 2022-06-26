@@ -310,7 +310,7 @@ public:
                     continue;
                 }
 
-                dragon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                dragon->SetImmuneToNPC(true);
                 dragon->SetFullHealth();
 
                 ++dragonsCount;
@@ -729,7 +729,7 @@ struct boss_sartharion_dragonAI : public BossAI
         events.Reset();
         ClearInstance();
 
-        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        me->SetImmuneToNPC(false);
         me->SetSpeed(MOVE_FLIGHT, 1.0f);
         me->SetCanFly(false);
         me->ResetLootMode();
@@ -790,7 +790,7 @@ struct boss_sartharion_dragonAI : public BossAI
             }
         }
 
-        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        me->SetImmuneToNPC(false);
         me->SetInCombatWithZone();
     }
 

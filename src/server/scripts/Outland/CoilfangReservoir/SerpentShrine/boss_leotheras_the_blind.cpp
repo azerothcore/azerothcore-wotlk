@@ -289,7 +289,7 @@ public:
         ObjectGuid ownerGUID;
         EventMap events;
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->DespawnOrUnsummon(1);
         }
@@ -355,7 +355,7 @@ public:
         void HandleScriptEffect(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
-            GetCaster()->getThreatMgr().resetAllAggro();
+            GetCaster()->GetThreatMgr().ResetAllThreat();
 
             if (roll_chance_i(33))
                 if (Unit* target = GetCaster()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))

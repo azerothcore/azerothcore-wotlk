@@ -621,6 +621,12 @@ void WorldSession::HandleGroupRaidConvertOpcode(WorldPacket& /*recvData*/)
         return;
 
     /** error handling **/
+    if (group->CheckLevelForRaid())
+    {
+        SendPartyResult(PARTY_OP_INVITE, "", ERR_RAID_DISALLOWED_BY_LEVEL);
+        return;
+    }
+
     if (!group->IsLeader(GetPlayer()->GetGUID()) || group->GetMembersCount() < 2 || group->isLFGGroup()) // pussywizard: not allowed for lfg groups, it is either raid from the beginning or not!
         return;
     /********************/
@@ -812,7 +818,7 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
 
         if (!player->IsAlive())
         {
-            if (player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
+            if (player->HasPlayerFlag(PLAYER_FLAGS_GHOST))
                 playerStatus |= MEMBER_STATUS_GHOST;
             else
                 playerStatus |= MEMBER_STATUS_DEAD;
@@ -1014,7 +1020,7 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recvData)
 
     if (!player->IsAlive())
     {
-        if (player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
+        if (player->HasPlayerFlag(PLAYER_FLAGS_GHOST))
             playerStatus |= MEMBER_STATUS_GHOST;
         else
             playerStatus |= MEMBER_STATUS_DEAD;

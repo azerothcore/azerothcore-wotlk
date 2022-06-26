@@ -576,7 +576,7 @@ void WorldSession::HandleCancelChanneling(WorldPacket& recvData)
     if (mover != _player && mover->GetTypeId() == TYPEID_PLAYER)
         return;
 
-    mover->InterruptSpell(CURRENT_CHANNELED_SPELL, true, true, true);
+    mover->InterruptSpell(CURRENT_CHANNELED_SPELL);
 }
 
 void WorldSession::HandleTotemDestroyed(WorldPackets::Totem::TotemDestroyed& totemDestroyed)
@@ -689,9 +689,9 @@ void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
         // Display items in visible slots
         for (EquipmentSlots const* itr = &itemSlots[0]; *itr != EQUIPMENT_SLOT_END; ++itr)
         {
-            if (*itr == EQUIPMENT_SLOT_HEAD && player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_HELM))
+            if (*itr == EQUIPMENT_SLOT_HEAD && player->HasPlayerFlag(PLAYER_FLAGS_HIDE_HELM))
                 data << uint32(0);
-            else if (*itr == EQUIPMENT_SLOT_BACK && player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_CLOAK))
+            else if (*itr == EQUIPMENT_SLOT_BACK && player->HasPlayerFlag(PLAYER_FLAGS_HIDE_CLOAK))
                 data << uint32(0);
             else if (Item const* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, *itr))
             {

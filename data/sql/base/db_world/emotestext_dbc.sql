@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,11 +12,11 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.emotestext_dbc
+-- Dumpar struktur för tabell acore_world.emotestext_dbc
 DROP TABLE IF EXISTS `emotestext_dbc`;
 CREATE TABLE IF NOT EXISTS `emotestext_dbc` (
   `ID` INT NOT NULL DEFAULT 0,
-  `Name` varchar(100) DEFAULT NULL,
+  `Name` VARCHAR(100) DEFAULT NULL,
   `EmoteID` INT NOT NULL DEFAULT 0,
   `EmoteText_1` INT NOT NULL DEFAULT 0,
   `EmoteText_2` INT NOT NULL DEFAULT 0,
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS `emotestext_dbc` (
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_world.emotestext_dbc: 0 rows
+-- Dumpar data för tabell acore_world.emotestext_dbc: 0 rows
 DELETE FROM `emotestext_dbc`;
 /*!40000 ALTER TABLE `emotestext_dbc` DISABLE KEYS */;
 /*!40000 ALTER TABLE `emotestext_dbc` ENABLE KEYS */;

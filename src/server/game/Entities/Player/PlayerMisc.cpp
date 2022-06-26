@@ -198,7 +198,9 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
                 InstanceSave* instanceSave = itr->second.save;
                 MapEntry const* entry = sMapStore.LookupEntry(itr->first);
                 if (!entry || entry->IsRaid() || !instanceSave->CanReset())
+                {
                     continue;
+                }
 
                 Map* map = sMapMgr->FindMap(instanceSave->GetMapId(), instanceSave->GetInstanceId());
                 if (!map || map->ToInstanceMap()->Reset(method))
@@ -207,10 +209,16 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
                     toUnbind.push_back(instanceSave);
                 }
                 else
+                {
                     p->SendResetInstanceFailed(0, instanceSave->GetMapId());
+                }
+
+                sInstanceSaveMgr->DeleteInstanceSavedData(instanceSave->GetInstanceId());
             }
             for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
+            {
                 sInstanceSaveMgr->UnbindAllFor(*itr);
+            }
         }
             break;
         case INSTANCE_RESET_CHANGE_DIFFICULTY:
@@ -225,7 +233,9 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
                 InstanceSave* instanceSave = itr->second.save;
                 MapEntry const* entry = sMapStore.LookupEntry(itr->first);
                 if (!entry || entry->IsRaid() != isRaid || !instanceSave->CanReset())
+                {
                     continue;
+                }
 
                 Map* map = sMapMgr->FindMap(instanceSave->GetMapId(), instanceSave->GetInstanceId());
                 if (!map || map->ToInstanceMap()->Reset(method))
@@ -234,7 +244,11 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
                     toUnbind.push_back(instanceSave);
                 }
                 else
+                {
                     p->SendResetInstanceFailed(0, instanceSave->GetMapId());
+                }
+
+                sInstanceSaveMgr->DeleteInstanceSavedData(instanceSave->GetInstanceId());
             }
             for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
                 sInstanceSaveMgr->UnbindAllFor(*itr);
@@ -262,6 +276,8 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
                     }
                     //else
                     //  p->SendResetInstanceFailed(0, instanceSave->GetMapId());
+
+                    sInstanceSaveMgr->DeleteInstanceSavedData(instanceSave->GetInstanceId());
                 }
                 for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
                     sInstanceSaveMgr->PlayerUnbindInstance(p->GetGUID(), (*itr)->GetMapId(), (*itr)->GetDifficulty(), true, p);
@@ -353,8 +369,8 @@ void Player::UpdatePvPFlag(time_t currTime)
 
     if (currTime < (pvpInfo.EndTimer + 300 + 5))
     {
-        if (currTime > (pvpInfo.EndTimer + 4) && !HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_TIMER))
-            SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_TIMER);
+        if (currTime > (pvpInfo.EndTimer + 4) && !HasPlayerFlag(PLAYER_FLAGS_PVP_TIMER))
+            SetPlayerFlag(PLAYER_FLAGS_PVP_TIMER);
 
         return;
     }

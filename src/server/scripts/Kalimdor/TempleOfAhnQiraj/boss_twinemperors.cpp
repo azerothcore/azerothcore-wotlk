@@ -115,7 +115,7 @@ struct boss_twinemperorsAI : public ScriptedAI
             if (ohealth <= 0)
             {
                 pOtherBoss->setDeathState(JUST_DIED);
-                pOtherBoss->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+                pOtherBoss->SetDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
             }
         }
     }
@@ -127,7 +127,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         {
             pOtherBoss->SetHealth(0);
             pOtherBoss->setDeathState(JUST_DIED);
-            pOtherBoss->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+            pOtherBoss->SetDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
             CAST_AI(boss_twinemperorsAI, pOtherBoss->AI())->DontYellWhenDead = true;
         }
         if (!DontYellWhenDead)                              // I hope AI is not threaded
@@ -415,7 +415,7 @@ public:
         void CastSpellOnBug(Creature* target) override
         {
             target->SetFaction(FACTION_MONSTER);
-            target->AI()->AttackStart(me->getThreatMgr().getHostilTarget());
+            target->AI()->AttackStart(me->GetThreatMgr().getHostileTarget());
             target->AddAura(SPELL_MUTATE_BUG, target);
             target->SetFullHealth();
         }

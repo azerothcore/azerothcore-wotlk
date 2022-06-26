@@ -4758,6 +4758,14 @@ void Player::SendEnchantmentDurations()
     }
 }
 
+void Player::UpdateEnchantmentDurations()
+{
+    for (EnchantDurationList::iterator itr = m_enchantDuration.begin(); itr != m_enchantDuration.end(); ++itr)
+    {
+        itr->item->SetEnchantmentDuration(itr->slot, itr->leftduration, this);
+    }
+}
+
 void Player::SendItemDurations()
 {
     for (ItemDurationList::const_iterator itr = m_itemDuration.begin(); itr != m_itemDuration.end(); ++itr)
@@ -5053,7 +5061,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     SetByteValue(PLAYER_BYTES_2, 3, fields[15].Get<uint8>());
     SetByteValue(PLAYER_BYTES_3, 0, fields[5].Get<uint8>());
     SetByteValue(PLAYER_BYTES_3, 1, fields[54].Get<uint8>());
-    SetUInt32Value(PLAYER_FLAGS, fields[16].Get<uint32>());
+    ReplaceAllPlayerFlags((PlayerFlags)fields[16].Get<uint32>());
     SetInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, fields[53].Get<uint32>());
 
     SetUInt64Value(PLAYER_FIELD_KNOWN_CURRENCIES, fields[52].Get<uint64>());
@@ -5398,7 +5406,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     SetGuidValue(PLAYER_FARSIGHT, ObjectGuid::Empty);
     SetCreatorGUID(ObjectGuid::Empty);
 
-    RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FORCE_MOVEMENT);
+    RemoveUnitFlag2(UNIT_FLAG2_FORCE_MOVEMENT);
 
     // reset some aura modifiers before aura apply
     SetUInt32Value(PLAYER_TRACK_CREATURES, 0);
@@ -5460,7 +5468,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     _LoadGlyphAuras();
     _LoadAuras(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_AURAS), time_diff);
     // add ghost flag (must be after aura load: PLAYER_FLAGS_GHOST set in aura)
-    if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
+    if (HasPlayerFlag(PLAYER_FLAGS_GHOST))
     {
         m_deathState = DEAD;
         AddUnitState(UNIT_STATE_ISOLATED);
@@ -5595,7 +5603,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     // RaF stuff.
     m_grantableLevels = fields[71].Get<uint8>();
     if (GetSession()->IsARecruiter() || (GetSession()->GetRecruiterId() != 0))
-        SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_REFER_A_FRIEND);
+        SetDynamicFlag(UNIT_DYNFLAG_REFER_A_FRIEND);
 
     if (m_grantableLevels > 0)
         SetByteValue(PLAYER_FIELD_BYTES, 1, 0x01);
@@ -6514,7 +6522,7 @@ void Player::_LoadGroup()
             {
                 if (group->IsLeader(GetGUID()))
                 {
-                    SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_GROUP_LEADER);
+                    SetPlayerFlag(PLAYER_FLAGS_GROUP_LEADER);
                 }
 
                 uint8 subgroup = group->GetMemberGroup(GetGUID());
@@ -6528,7 +6536,7 @@ void Player::_LoadGroup()
     }
 
     if (!GetGroup() || !GetGroup()->IsLeader(GetGUID()))
-        RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_GROUP_LEADER);
+        RemovePlayerFlag(PLAYER_FLAGS_GROUP_LEADER);
 }
 
 void Player::BindToInstance()
@@ -7331,7 +7339,7 @@ void Player::_SaveInventory(CharacterDatabaseTransaction trans)
         if (item->GetState() != ITEM_REMOVED)
         {
             Item* test = GetItemByPos(item->GetBagSlot(), item->GetSlot());
-            if (test == nullptr)
+            if (!test)
             {
                 ObjectGuid::LowType bagTestGUID = 0;
                 if (Item* test2 = GetItemByPos(INVENTORY_SLOT_BAG_0, item->GetBagSlot()))

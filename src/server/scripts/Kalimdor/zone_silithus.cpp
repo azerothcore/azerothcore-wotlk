@@ -331,7 +331,7 @@ public:
             PlayerGUID.Clear();
             eventEnd = false;
 
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         }
 
         void HandleAnimation()
@@ -532,21 +532,26 @@ public:
                         break;
                     case 51:
                         {
-                            uint32 entries[4] = { 15423, 15424, 15414, 15422 };
-                            for (uint8 i = 0; i < 4; ++i)
+                            std::list<Creature*> constructList;
+
+                            me->GetCreatureListWithEntryInGrid(constructList, 15423, 100.0f);
+                            me->GetCreatureListWithEntryInGrid(constructList, 15424, 100.0f);
+                            me->GetCreatureListWithEntryInGrid(constructList, 15414, 100.0f);
+                            me->GetCreatureListWithEntryInGrid(constructList, 15422, 100.0f);
+
+                            if (!constructList.empty())
                             {
-                                Unit* mob = player->FindNearestCreature(entries[i], 50, me);
-                                while (mob)
+                                for (std::list<Creature*>::const_iterator itr = constructList.begin(); itr != constructList.end(); ++itr)
                                 {
-                                    mob->RemoveFromWorld();
-                                    mob = player->FindNearestCreature(15423, 50, me);
+                                    (*itr)->RemoveFromWorld();
                                 }
                             }
+
                             break;
                         }
                     case 52:
                         Fandral->GetMotionMaster()->MoveCharge(-8028.75f, 1538.795f, 2.61f, 4);
-                        Fandral->AI()->Talk(ANACHRONOS_SAY_9, me);
+                        Talk(ANACHRONOS_SAY_9);
                         break;
                     case 53:
                         Fandral->AI()->Talk(FANDRAL_SAY_6);
@@ -555,7 +560,8 @@ public:
                         Talk(ANACHRONOS_EMOTE_2);
                         break;
                     case 55:
-                        Fandral->SetVisible(false);
+                        //Fandral should not dispear atm.
+                        //Fandral->SetVisible(false);
                         break;
                     case 56:
                         Talk(ANACHRONOS_EMOTE_3);
@@ -915,7 +921,7 @@ public:
 
                 if (Merithra)
                 {
-                    Merithra->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+                    Merithra->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
                     Merithra->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                     Merithra->SetUInt32Value(UNIT_FIELD_DISPLAYID, 15420);
                     Merithra->SetFaction(FACTION_FRIENDLY);
@@ -923,7 +929,7 @@ public:
 
                 if (Caelestrasz)
                 {
-                    Caelestrasz->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+                    Caelestrasz->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
                     Caelestrasz->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                     Caelestrasz->SetUInt32Value(UNIT_FIELD_DISPLAYID, 15419);
                     Caelestrasz->SetFaction(FACTION_FRIENDLY);
@@ -931,7 +937,7 @@ public:
 
                 if (Arygos)
                 {
-                    Arygos->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+                    Arygos->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
                     Arygos->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                     Arygos->SetUInt32Value(UNIT_FIELD_DISPLAYID, 15418);
                     Arygos->SetFaction(FACTION_FRIENDLY);
@@ -1031,7 +1037,7 @@ public:
 
         void InitializeAI() override
         {
-            me->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+            me->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
         }
 
         bool GossipHello(Player* player, bool reportUse) override
@@ -1039,9 +1045,9 @@ public:
             if (reportUse)
             {
                 uint32 gossipId         = me->GetGOInfo()->GetGossipMenuId();
-                bool   _twilightSetAura = (player->HasAura(AURA_TWILIGHT_SET, player->GetGUID()) ? true : false);
-                bool   _medallionAura   = (player->HasAura(AURA_MEDALLION, player->GetGUID()) ? true : false);
-                bool   _ringAura        = (player->HasAura(AURA_RING, player->GetGUID()) ? true : false);
+                bool   _twilightSetAura = (player->HasAura(AURA_TWILIGHT_SET, player->GetGUID()));
+                bool   _medallionAura   = (player->HasAura(AURA_MEDALLION, player->GetGUID()));
+                bool   _ringAura        = (player->HasAura(AURA_RING, player->GetGUID()));
 
                 switch (gossipId)
                 {
@@ -1164,7 +1170,7 @@ public:
             }
 
             me->DespawnOrUnsummon(5000ms, respawnTimer); // Despawn in 5 Seconds for respawnTimer value
-            me->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+            me->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
             CloseGossipMenuFor(player);
             return false;
         }

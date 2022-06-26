@@ -102,16 +102,16 @@ struct boss_faction_championsAI : public ScriptedAI
 
     void RecalculateThreat()
     {
-        ThreatContainer::StorageType const& tList = me->getThreatMgr().getThreatList();
+        ThreatContainer::StorageType const& tList = me->GetThreatMgr().getThreatList();
         for( ThreatContainer::StorageType::const_iterator itr = tList.begin(); itr != tList.end(); ++itr )
         {
             Unit* pUnit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
-            if( pUnit && pUnit->GetTypeId() == TYPEID_PLAYER && me->getThreatMgr().getThreat(pUnit) )
+            if( pUnit && pUnit->GetTypeId() == TYPEID_PLAYER && me->GetThreatMgr().getThreat(pUnit) )
             {
                 float threatMod = GetThreatMod(me->GetDistance2d(pUnit), (float)pUnit->GetArmor(), pUnit->GetHealth(), pUnit->GetMaxHealth(), pUnit);
-                me->getThreatMgr().modifyThreatPercent(pUnit, -100);
+                me->GetThreatMgr().modifyThreatPercent(pUnit, -100);
                 //me->getThreatMgr().doAddThreat(pUnit, 10000000.0f * threatMod);
-                if (HostileReference* ref = me->getThreatMgr().getOnlineContainer().getReferenceByTarget(pUnit))
+                if (HostileReference* ref = me->GetThreatMgr().getOnlineContainer().getReferenceByTarget(pUnit))
                     ref->addThreat(10000000.0f * threatMod);
             }
         }
@@ -134,7 +134,7 @@ struct boss_faction_championsAI : public ScriptedAI
             pInstance->SetData(TYPE_FACTION_CHAMPIONS_PLAYER_DIED, 1);
     }
 
-    void EnterEvadeMode() override
+    void EnterEvadeMode(EvadeReason /* why */) override
     {
         if( pInstance )
             pInstance->SetData(TYPE_FAILED, 0);
@@ -177,7 +177,7 @@ struct boss_faction_championsAI : public ScriptedAI
 
     uint32 EnemiesInRange(float distance)
     {
-        ThreatContainer::StorageType const& tList = me->getThreatMgr().getThreatList();
+        ThreatContainer::StorageType const& tList = me->GetThreatMgr().getThreatList();
         uint32 count = 0;
         Unit* target;
         for( ThreatContainer::StorageType::const_iterator iter = tList.begin(); iter != tList.end(); ++iter )
@@ -191,7 +191,7 @@ struct boss_faction_championsAI : public ScriptedAI
 
     Unit* SelectEnemyCaster(bool casting, float range)
     {
-        ThreatContainer::StorageType const& tList = me->getThreatMgr().getThreatList();
+        ThreatContainer::StorageType const& tList = me->GetThreatMgr().getThreatList();
         Unit* target;
         for( ThreatContainer::StorageType::const_iterator iter = tList.begin(); iter != tList.end(); ++iter )
         {
@@ -292,7 +292,7 @@ public:
 
         bool myCanCast()
         {
-            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
+            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasUnitFlag(UNIT_FLAG_SILENCED) || IsCCed());
         }
 
         void UpdateAI(uint32 diff) override
@@ -421,7 +421,7 @@ public:
 
         bool myCanCast()
         {
-            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
+            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasUnitFlag(UNIT_FLAG_SILENCED) || IsCCed());
         }
 
         void UpdateAI(uint32 diff) override
@@ -544,7 +544,7 @@ public:
 
         bool myCanCast()
         {
-            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
+            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasUnitFlag(UNIT_FLAG_SILENCED) || IsCCed());
         }
 
         void UpdateAI(uint32 diff) override
@@ -677,7 +677,7 @@ public:
 
         bool myCanCast()
         {
-            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
+            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasUnitFlag(UNIT_FLAG_SILENCED) || IsCCed());
         }
 
         void UpdateAI(uint32 diff) override
@@ -800,7 +800,7 @@ public:
 
         bool myCanCast()
         {
-            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
+            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasUnitFlag(UNIT_FLAG_SILENCED) || IsCCed());
         }
 
         void UpdateAI(uint32 diff) override
@@ -954,7 +954,7 @@ public:
 
         bool myCanCast()
         {
-            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
+            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasUnitFlag(UNIT_FLAG_SILENCED) || IsCCed());
         }
 
         void JustSummoned(Creature* c) override
@@ -1097,7 +1097,7 @@ public:
 
         bool myCanCast()
         {
-            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
+            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasUnitFlag(UNIT_FLAG_SILENCED) || IsCCed());
         }
 
         void UpdateAI(uint32 diff) override
@@ -1245,7 +1245,7 @@ public:
 
         bool myCanCast()
         {
-            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_DISARM_RANGED) || IsCCed());
+            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasUnitFlag2(UNIT_FLAG2_DISARM_RANGED) || IsCCed());
         }
 
         void JustSummoned(Creature* c) override
@@ -1398,7 +1398,7 @@ public:
 
         bool myCanCast()
         {
-            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
+            return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasUnitFlag(UNIT_FLAG_SILENCED) || IsCCed());
         }
 
         void JustSummoned(Creature* c) override
@@ -1562,7 +1562,7 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_BLADESTORM:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) )
+                    if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
                         events.RepeatEvent(5000);
                         break;
@@ -1587,7 +1587,7 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_MORTAL_STRIKE:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) )
+                    if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
                         events.RepeatEvent(5000);
                         break;
@@ -1618,7 +1618,7 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_OVERPOWER:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) )
+                    if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
                         events.RepeatEvent(5000);
                         break;
@@ -1633,7 +1633,7 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_SUNDER_ARMOR:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) )
+                    if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
                         events.RepeatEvent(5000);
                         break;
@@ -1648,7 +1648,7 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_SHATTERING_THROW:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) )
+                    if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
                         events.RepeatEvent(5000);
                         break;
@@ -1663,7 +1663,7 @@ public:
                         events.RepeatEvent(6000);
                     break;
                 case EVENT_SPELL_RETALIATION:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) )
+                    if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
                         events.RepeatEvent(5000);
                         break;
@@ -1789,7 +1789,7 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_FROST_STRIKE:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) )
+                    if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
                         events.RepeatEvent(5000);
                         break;
@@ -1911,7 +1911,7 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_FAN_OF_KNIVES:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) )
+                    if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
                         events.RepeatEvent(5000);
                         break;
@@ -1946,7 +1946,7 @@ public:
                         events.RepeatEvent(6000);
                     break;
                 case EVENT_SPELL_BLADE_FLURRY:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) )
+                    if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                         events.RepeatEvent(5000);
                     else
                     {
@@ -1966,7 +1966,7 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_HEMORRHAGE:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) )
+                    if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
                         events.RepeatEvent(5000);
                         break;
@@ -1981,7 +1981,7 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_EVISCERATE:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) )
+                    if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
                         events.RepeatEvent(5000);
                         break;
@@ -2069,7 +2069,7 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_EARTH_SHOCK_ENH:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) )
+                    if( me->HasUnitFlag(UNIT_FLAG_SILENCED) )
                     {
                         events.RepeatEvent(5000);
                         break;
@@ -2084,7 +2084,7 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_LAVA_LASH:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_DISARM_OFFHAND) )
+                    if( me->HasUnitFlag2(UNIT_FLAG2_DISARM_OFFHAND) )
                     {
                         events.RepeatEvent(5000);
                         break;
@@ -2099,7 +2099,7 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_STORMSTRIKE:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) && me->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_DISARM_OFFHAND) )
+                    if( me->HasUnitFlag(UNIT_FLAG_DISARMED) && me->HasUnitFlag2(UNIT_FLAG2_DISARM_OFFHAND) )
                     {
                         events.RepeatEvent(5000);
                         break;
@@ -2212,7 +2212,7 @@ public:
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_CRUSADER_STRIKE:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) )
+                    if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
                         events.RepeatEvent(5000);
                         break;
@@ -2237,7 +2237,7 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_DIVINE_STORM:
-                    if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) )
+                    if( me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
                         events.RepeatEvent(5000);
                         break;
@@ -2333,7 +2333,7 @@ public:
 
         bool myCanCast()
         {
-            return !(me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
+            return !(me->HasUnitFlag(UNIT_FLAG_SILENCED) || IsCCed());
         }
 
         void UpdateAI(uint32 diff) override
@@ -2368,7 +2368,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /* why */) override
         {
             me->DespawnOrUnsummon();
         }
@@ -2435,7 +2435,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /* why */) override
         {
             me->DespawnOrUnsummon();
         }

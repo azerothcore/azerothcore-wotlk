@@ -272,12 +272,12 @@ public:
             return false;
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (IsAnyPlayerValid())
                 return;
 
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
         }
 
         void AttackStart(Unit* who) override
@@ -473,7 +473,7 @@ public:
             me->SetInCombatWithZone();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
         }
 
@@ -1155,20 +1155,20 @@ public:
 
         void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*handle*/)
         {
-            GetTarget()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            GetTarget()->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             GetTarget()->ToCreature()->SetReactState(REACT_DEFENSIVE);
             GetTarget()->GetMotionMaster()->Clear();
-            GetTarget()->getThreatMgr().clearReferences();
+            GetTarget()->GetThreatMgr().clearReferences();
             GetTarget()->RemoveAllAttackers();
             GetTarget()->AttackStop();
         }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*handle*/)
         {
-            GetTarget()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            GetTarget()->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             GetTarget()->ToCreature()->SetReactState(REACT_DEFENSIVE);
             GetTarget()->GetMotionMaster()->Clear();
-            GetTarget()->getThreatMgr().clearReferences();
+            GetTarget()->GetThreatMgr().clearReferences();
             GetTarget()->RemoveAllAttackers();
             GetTarget()->AttackStop();
         }

@@ -175,9 +175,8 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
     //! but formationDest contains global coordinates
     init.MoveTo(node->x, node->y, z, true, true);
 
-    //! Accepts angles such as 0.00001 and -0.00001, 0 must be ignored, default value in waypoint table
-    if (node->orientation && node->delay)
-        init.SetFacing(node->orientation);
+    if (node->orientation.has_value() && node->delay > 0)
+        init.SetFacing(*node->orientation);
 
     switch (node->move_type)
     {
@@ -256,6 +255,14 @@ void WaypointMovementGenerator<Creature>::MovementInform(Creature* creature)
 {
     if (creature->AI())
         creature->AI()->MovementInform(WAYPOINT_MOTION_TYPE, i_currentNode);
+
+    if (Unit* owner = creature->GetCharmerOrOwner())
+    {
+        if (UnitAI* AI = owner->GetAI())
+        {
+            AI->SummonMovementInform(creature, WAYPOINT_MOTION_TYPE, i_currentNode);
+        }
+    }
 }
 
 //----------------------------------------------------//
@@ -308,7 +315,7 @@ void FlightPathMovementGenerator::DoFinalize(Player* player)
 
     // xinef: this should be cleaned by CleanupAfterTaxiFlight(); function!
     player->Dismount();
-    player->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_TAXI_FLIGHT);
+    player->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_TAXI_FLIGHT);
 
     if (player->m_taxi.empty())
     {
@@ -320,7 +327,7 @@ void FlightPathMovementGenerator::DoFinalize(Player* player)
         player->SetFallInformation(GameTime::GetGameTime().count(), player->GetPositionZ());
     }
 
-    player->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_TAXI_BENCHMARK);
+    player->RemovePlayerFlag(PLAYER_FLAGS_TAXI_BENCHMARK);
 }
 
 #define PLAYER_FLIGHT_SPEED 32.0f
@@ -329,7 +336,7 @@ void FlightPathMovementGenerator::DoReset(Player* player)
 {
     player->getHostileRefMgr().setOnlineOfflineState(false);
     player->AddUnitState(UNIT_STATE_IN_FLIGHT);
-    player->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_TAXI_FLIGHT);
+    player->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_TAXI_FLIGHT);
 
     Movement::MoveSplineInit init(player);
     uint32 end = GetPathAtMapEnd();

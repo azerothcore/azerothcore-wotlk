@@ -63,10 +63,10 @@ MinionData const minionData[] =
 
 DoorData const doorData[] =
 {
-    { GO_GYTH_EXIT_DOOR,    DATA_WARCHIEF_REND_BLACKHAND,  DOOR_TYPE_PASSAGE, BOUNDARY_NONE },
-    { GO_DRAKKISATH_DOOR_1, DATA_GENERAL_DRAKKISATH,       DOOR_TYPE_PASSAGE, BOUNDARY_NONE },
-    { GO_DRAKKISATH_DOOR_2, DATA_GENERAL_DRAKKISATH,       DOOR_TYPE_PASSAGE, BOUNDARY_NONE },
-    { 0,                 0,          DOOR_TYPE_ROOM,                          BOUNDARY_NONE } // END
+    { GO_GYTH_EXIT_DOOR,    DATA_WARCHIEF_REND_BLACKHAND,  DOOR_TYPE_PASSAGE },
+    { GO_DRAKKISATH_DOOR_1, DATA_GENERAL_DRAKKISATH,       DOOR_TYPE_PASSAGE },
+    { GO_DRAKKISATH_DOOR_2, DATA_GENERAL_DRAKKISATH,       DOOR_TYPE_PASSAGE },
+    { 0,                 0,          DOOR_TYPE_ROOM,                         } // END
 };
 
 class instance_blackrock_spire : public InstanceMapScript
@@ -78,7 +78,7 @@ public:
     {
         uint32 CurrentSolakarWave = 0;
         uint32 SolakarState       = NOT_STARTED; // there should be a global instance encounter state, where is it?
-        std::vector<TempSummon*> SolakarSummons;
+        GuidVector SolakarSummons;
 
         instance_blackrock_spireMapScript(InstanceMap* map) : InstanceScript(map)
         {
@@ -360,11 +360,11 @@ public:
                             }
                             break;
                         case FAIL:
-                            for (const auto& creature : SolakarSummons)
+                            for (ObjectGuid const& guid : SolakarSummons)
                             {
-                                if (creature)
+                                if (Creature* creature = instance->GetCreature(guid))
                                 {
-                                    creature->RemoveFromWorld();
+                                    creature->DespawnOrUnsummon();
                                 }
                             }
                             SolakarSummons.clear();
@@ -429,11 +429,19 @@ public:
         {
             if (number < MAX_WAVE_COUNT)
             {
-                SolakarSummons.push_back(instance->SummonCreature(NPC_ROOKERY_GUARDIAN, SolakarPosLeft));
-                SolakarSummons.push_back(instance->SummonCreature(NPC_ROOKERY_HATCHER, SolakarPosRight));
+                if (Creature* summon = instance->SummonCreature(NPC_ROOKERY_GUARDIAN, SolakarPosLeft))
+                {
+                    SolakarSummons.push_back(summon->GetGUID());
+                }
+
+                if (Creature* summon = instance->SummonCreature(NPC_ROOKERY_HATCHER, SolakarPosRight))
+                {
+                    SolakarSummons.push_back(summon->GetGUID());
+                }
+
                 if (number == 0)
                 {
-                    if (Creature* FirstHatcher = SolakarSummons.back()) // works because we spawned a hatcher second
+                    if (Creature* FirstHatcher = instance->GetCreature(SolakarSummons.back())) // works because we spawned a hatcher second
                     {
                         FirstHatcher->AI()->Talk(SAY_SOLAKAR_FIRST_HATCHER);
                     }
@@ -441,7 +449,10 @@ public:
             }
             else if (number == MAX_WAVE_COUNT)
             {
-                SolakarSummons.push_back(instance->SummonCreature(NPC_SOLAKAR, SolakarPosBoss));
+                if (Creature* summon = instance->SummonCreature(NPC_SOLAKAR, SolakarPosBoss))
+                {
+                    SolakarSummons.push_back(summon->GetGUID());
+                }
             }
         }
 

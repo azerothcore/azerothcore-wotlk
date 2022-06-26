@@ -159,7 +159,7 @@ public:
                     summons.Summon(spark);
                     spark->CastSpell(spark, me->GetMap()->IsHeroic() ? SPELL_SPARK_VISUAL_TRIGGER_H : SPELL_SPARK_VISUAL_TRIGGER_N, true);
                     spark->CastSpell(spark, SPELL_RANDOM_LIGHTNING, true);
-                    spark->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                    spark->SetUnitFlag(UNIT_FLAG_PACIFIED | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                     spark->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0);
 
                     if (Player* tgt = SelectTargetFromPlayerList(100))
@@ -258,7 +258,7 @@ public:
             if (param == ACTION_CALLBACK)
             {
                 me->SetSpeed(MOVE_RUN, 2.5f);
-                me->DeleteThreatList();
+                me->GetThreatMgr().ClearAllThreat();
                 me->CombatStop(true);
                 me->GetMotionMaster()->MoveTargetedHome();
                 returning = true;

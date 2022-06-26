@@ -743,7 +743,8 @@ public:
                     return;
 
                 me->setActive(true);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetImmuneToAll(true);
                 // Load Grid with Sister Svalna
                 me->GetMap()->LoadGrid(4356.71f, 2484.33f);
                 if (Creature* svalna = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_SISTER_SVALNA)))
@@ -766,7 +767,7 @@ public:
                 _handledWP4 = false;
 
                 me->CombatStop();
-                me->DeleteThreatList();
+                me->GetThreatMgr().ClearAllThreat();
             }
         }
 
@@ -930,7 +931,8 @@ public:
                     Talk(SAY_CROK_INTRO_3);
                     break;
                 case EVENT_START_PATHING:
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetImmuneToAll(false);
                     Start(true, true);
                     break;
                 case EVENT_SCOURGE_STRIKE:
@@ -998,7 +1000,7 @@ public:
         void Reset() override
         {
             _Reset();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(true);
             me->SetReactState(REACT_PASSIVE);
             me->SetCanFly(true);
             me->SetDisableGravity(true);
@@ -1007,7 +1009,7 @@ public:
 
         void AttackStart(Unit* victim) override
         {
-            if (me->HasReactState(REACT_PASSIVE) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC))
+            if (me->HasReactState(REACT_PASSIVE) || me->IsImmuneToAll())
                 return;
             BossAI::AttackStart(victim);
         }
@@ -1037,10 +1039,10 @@ public:
 
         void EnterCombat(Unit* /*attacker*/) override
         {
-            if (me->HasReactState(REACT_PASSIVE) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC))
+            if (me->HasReactState(REACT_PASSIVE) || me->IsImmuneToAll())
             {
                 me->CombatStop(false);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetImmuneToAll(true);
                 me->SetReactState(REACT_PASSIVE);
                 return;
             }
@@ -1121,7 +1123,7 @@ public:
             if (type != EFFECT_MOTION_TYPE || id != POINT_LAND)
                 return;
 
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(false);
             me->SetCanFly(false);
             me->SetDisableGravity(false);
             me->SetReactState(REACT_AGGRESSIVE);
@@ -1140,7 +1142,7 @@ public:
                     {
                         Talk(EMOTE_SVALNA_IMPALE, target);
                         summon->CastCustomSpell(VEHICLE_SPELL_RIDE_HARDCODED, SPELLVALUE_BASE_POINT0, 1, target, false);
-                        summon->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_HIDE_BODY | UNIT_FLAG2_ALLOW_ENEMY_INTERACT);
+                        summon->SetUnitFlag2(UNIT_FLAG2_HIDE_BODY | UNIT_FLAG2_ALLOW_ENEMY_INTERACT);
                     }
                     break;
                 default:
@@ -1251,9 +1253,9 @@ public:
         return (me->GetPositionY() > 2660.0f) == (target->GetPositionY() > 2660.0f) && (target->GetTypeId() == TYPEID_PLAYER || target->IsInCombat());
     }
 
-    void EnterEvadeMode() override
+    void EnterEvadeMode(EvadeReason why) override
     {
-        if (!_EnterEvadeMode())
+        if (!_EnterEvadeMode(why))
             return;
 
         me->GetMotionMaster()->Clear(false);
@@ -1694,7 +1696,7 @@ public:
 
             events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING) || me->isFeared() || me->isFrozen() || me->HasUnitState(UNIT_STATE_STUNNED) || me->HasUnitState(UNIT_STATE_CONFUSED) || ((me->GetEntry() == NPC_YMIRJAR_DEATHBRINGER || me->GetEntry() == NPC_YMIRJAR_FROSTBINDER) && me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED)))
+            if (me->HasUnitState(UNIT_STATE_CASTING) || me->isFeared() || me->isFrozen() || me->HasUnitState(UNIT_STATE_STUNNED) || me->HasUnitState(UNIT_STATE_CONFUSED) || ((me->GetEntry() == NPC_YMIRJAR_DEATHBRINGER || me->GetEntry() == NPC_YMIRJAR_FROSTBINDER) && me->HasUnitFlag(UNIT_FLAG_SILENCED)))
                 return;
 
             switch (events.ExecuteEvent())
@@ -1773,15 +1775,15 @@ public:
                 Position myPos = me->GetPosition();
                 me->NearTeleportTo(c->GetPositionX(), c->GetPositionY(), c->GetPositionZ(), c->GetOrientation());
                 c->NearTeleportTo(myPos.GetPositionX(), myPos.GetPositionY(), myPos.GetPositionZ(), myPos.GetOrientation());
-                const ThreatContainer::StorageType me_tl = me->getThreatMgr().getThreatList();
-                const ThreatContainer::StorageType target_tl = c->getThreatMgr().getThreatList();
+                const ThreatContainer::StorageType me_tl = me->GetThreatMgr().getThreatList();
+                const ThreatContainer::StorageType target_tl = c->GetThreatMgr().getThreatList();
                 DoResetThreat();
                 for (ThreatContainer::StorageType::const_iterator iter = target_tl.begin(); iter != target_tl.end(); ++iter)
-                    me->getThreatMgr().addThreat((*iter)->getTarget(), (*iter)->getThreat());
+                    me->GetThreatMgr().addThreat((*iter)->getTarget(), (*iter)->getThreat());
 
-                c->getThreatMgr().resetAllAggro();
+                c->GetThreatMgr().ResetAllThreat();
                 for (ThreatContainer::StorageType::const_iterator iter = me_tl.begin(); iter != me_tl.end(); ++iter)
-                    c->getThreatMgr().addThreat((*iter)->getTarget(), (*iter)->getThreat());
+                    c->GetThreatMgr().addThreat((*iter)->getTarget(), (*iter)->getThreat());
             }
         }
 
@@ -1915,7 +1917,8 @@ public:
             if (Creature* target = GetTarget()->ToCreature())
             {
                 target->SetReactState(REACT_PASSIVE);
-                target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
+                target->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                target->SetImmuneToPC(true);
                 target->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_02);
             }
         }
@@ -1925,7 +1928,8 @@ public:
             if (Creature* target = GetTarget()->ToCreature())
             {
                 target->SetReactState(REACT_AGGRESSIVE);
-                target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
+                target->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                target->SetImmuneToPC(false);
                 target->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
             }
         }

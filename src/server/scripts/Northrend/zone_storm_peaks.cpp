@@ -45,7 +45,7 @@ public:
 
         void AttackStart(Unit* /*who*/) override {}
         void EnterCombat(Unit* /*who*/) override {}
-        void EnterEvadeMode() override {}
+        void EnterEvadeMode(EvadeReason /* why */) override {}
 
         void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
         {
@@ -348,11 +348,11 @@ public:
         bool switching;
         bool startPath;
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (switching || me->HasAuraType(SPELL_AURA_CONTROL_VEHICLE))
                 return;
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void Reset() override
@@ -492,7 +492,7 @@ public:
                 else
                 {
                     me->RemoveAllAuras();
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                 }
                 return;
             }
@@ -521,7 +521,7 @@ public:
                         else
                         {
                             me->RemoveAllAuras();
-                            EnterEvadeMode();
+                            EnterEvadeMode(EVADE_REASON_OTHER);
                             return;
                         }
                     }
@@ -546,7 +546,7 @@ public:
                     if (!player)
                     {
                         me->RemoveAllAuras();
-                        EnterEvadeMode();
+                        EnterEvadeMode(EVADE_REASON_OTHER);
                     }
                 }
                 return;
@@ -573,7 +573,7 @@ public:
                     else
                     {
                         me->RemoveAllAuras();
-                        EnterEvadeMode();
+                        EnterEvadeMode(EVADE_REASON_OTHER);
                     }
                 }
             }
@@ -659,7 +659,7 @@ public:
             {
                 caster->CastSpell(caster, SPELL_JORMUNGAR_SUBMERGE_VISUAL, true);
                 caster->ApplySpellImmune(SPELL_COLOSSUS_GROUND_SLAM, IMMUNITY_ID, SPELL_COLOSSUS_GROUND_SLAM, true);
-                caster->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                caster->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
                 caster->SetControlled(false, UNIT_STATE_ROOT);
                 for (uint8 i = 0; i < MAX_CREATURE_SPELLS; ++i)
                     caster->m_spells[i] = 0;
@@ -670,7 +670,7 @@ public:
             {
                 caster->RemoveAurasDueToSpell(SPELL_JORMUNGAR_SUBMERGE_VISUAL);
                 caster->ApplySpellImmune(SPELL_COLOSSUS_GROUND_SLAM, IMMUNITY_ID, SPELL_COLOSSUS_GROUND_SLAM, false);
-                caster->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                caster->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE);
                 caster->SetControlled(true, UNIT_STATE_ROOT);
 
                 if (CreatureTemplate const* ct = sObjectMgr->GetCreatureTemplate(caster->GetEntry()))
@@ -923,7 +923,7 @@ public:
 
         void AttackStart(Unit* /*who*/) override { }
         void EnterCombat(Unit* /*who*/) override { }
-        void EnterEvadeMode() override { }
+        void EnterEvadeMode(EvadeReason /*why*/) override { }
 
         void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
         {

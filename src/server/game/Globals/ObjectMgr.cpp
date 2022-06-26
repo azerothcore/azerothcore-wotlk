@@ -1189,13 +1189,13 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
             return;
     }
 
-    if (cInfo->GossipMenuId && !(cInfo->npcflag & UNIT_NPC_FLAG_GOSSIP))
+    if ((cInfo->GossipMenuId && !(cInfo->npcflag & UNIT_NPC_FLAG_GOSSIP)) && !(cInfo->flags_extra & CREATURE_FLAG_EXTRA_MODULE))
     {
         LOG_ERROR("sql.sql", "Creature (Entry: {}) has assigned gossip menu {}, but npcflag does not include UNIT_NPC_FLAG_GOSSIP (1).", cInfo->Entry, cInfo->GossipMenuId);
     }
-    else if (!cInfo->GossipMenuId && (cInfo->npcflag & UNIT_NPC_FLAG_GOSSIP))
+    else if ((!cInfo->GossipMenuId && (cInfo->npcflag & UNIT_NPC_FLAG_GOSSIP)) && !(cInfo->flags_extra & CREATURE_FLAG_EXTRA_MODULE))
     {
-        LOG_ERROR("sql.sql", "Creature (Entry: {}) has npcflag UNIT_NPC_FLAG_GOSSIP (1), but gossip menu is unassigned.", cInfo->Entry);
+        LOG_INFO("sql.sql", "Creature (Entry: {}) has npcflag UNIT_NPC_FLAG_GOSSIP (1), but gossip menu is unassigned.", cInfo->Entry);
     }
 }
 
@@ -3429,7 +3429,7 @@ void ObjectMgr::LoadPetLevelInfo()
 
         PetLevelInfo*& pInfoMapEntry = _petInfoStore[creature_id];
 
-        if (pInfoMapEntry == nullptr)
+        if (!pInfoMapEntry)
             pInfoMapEntry = new PetLevelInfo[sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)];
 
         // data for level 1 stored in [0] array element, ...
@@ -6435,8 +6435,8 @@ void ObjectMgr::GetTaxiPath(uint32 source, uint32 destination, uint32& path, uin
         return;
     }
 
-    cost = dest_i->second.price;
-    path = dest_i->second.ID;
+    cost = dest_i->second->price;
+    path = dest_i->second->ID;
 }
 
 uint32 ObjectMgr::GetTaxiMountDisplayId(uint32 id, TeamId teamId, bool allowed_alt_team /* = false */)
@@ -7183,8 +7183,8 @@ void ObjectMgr::LoadGameObjectTemplateAddons()
 {
     uint32 oldMSTime = getMSTime();
 
-    //                                                0       1       2      3        4
-    QueryResult result = WorldDatabase.Query("SELECT entry, faction, flags, mingold, maxgold FROM gameobject_template_addon");
+    //                                                0       1       2      3        4       5        6        7        8
+    QueryResult result = WorldDatabase.Query("SELECT entry, faction, flags, mingold, maxgold, artkit0, artkit1, artkit2, artkit3 FROM gameobject_template_addon");
 
     if (!result)
     {
@@ -7214,6 +7214,21 @@ void ObjectMgr::LoadGameObjectTemplateAddons()
         gameObjectAddon.flags   = fields[2].Get<uint32>();
         gameObjectAddon.mingold = fields[3].Get<uint32>();
         gameObjectAddon.maxgold = fields[4].Get<uint32>();
+
+        for (uint32 i = 0; i < gameObjectAddon.artKits.size(); i++)
+        {
+            uint32 artKitID = fields[5 + i].Get<uint32>();
+            if (!artKitID)
+                continue;
+
+            if (!sGameObjectArtKitStore.LookupEntry(artKitID))
+            {
+                LOG_ERROR("sql.sql", "GameObject (Entry: {}) has invalid `artkit{}` {} defined, set to zero instead.", entry, i, artKitID);
+                continue;
+            }
+
+            gameObjectAddon.artKits[i] = artKitID;
+        }
 
         // checks
         if (gameObjectAddon.faction && !sFactionTemplateStore.LookupEntry(gameObjectAddon.faction))
@@ -8497,7 +8512,7 @@ GameTele const* ObjectMgr::GetGameTele(std::string_view name) const
     {
         if (itr->second.wnameLow == wname)
             return &itr->second;
-        else if (alt == nullptr && itr->second.wnameLow.find(wname) != std::wstring::npos)
+        else if (!alt && itr->second.wnameLow.find(wname) != std::wstring::npos)
             alt = &itr->second;
     }
 
@@ -9760,4 +9775,183 @@ uint32 ObjectMgr::GetQuestMoneyReward(uint8 level, uint32 questMoneyDifficulty) 
     }
 
     return 0;
+}
+
+void ObjectMgr::LoadInstanceSavedGameobjectStateData()
+{
+    uint32 oldMSTime = getMSTime();
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SELECT_INSTANCE_SAVED_DATA);
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+    if (!result)
+    {
+        // There's no gameobject with this GUID saved on the DB
+        LOG_INFO("sql.sql", ">> Loaded 0 Instance saved gameobject state data. DB table `instance_saved_go_state_data` is empty.");
+        return;
+    }
+
+    Field* fields;
+    uint32 count = 0;
+    do
+    {
+        fields = result->Fetch();
+        GameobjectInstanceSavedStateList.push_back({ fields[0].Get<uint32>(), fields[1].Get<uint32>(), fields[2].Get<unsigned short>() });
+        count++;
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} instance saved gameobject state data in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
+uint8 ObjectMgr::GetInstanceSavedGameobjectState(uint32 id, uint32 guid)
+{
+    for (auto it = GameobjectInstanceSavedStateList.begin(); it != GameobjectInstanceSavedStateList.end(); it++)
+    {
+        if (it->m_guid == guid && it->m_instance == id)
+        {
+            return it->m_state;
+        }
+    }
+    return 3; // Any state higher than 2 to get the default state
+}
+
+bool ObjectMgr::FindInstanceSavedGameobjectState(uint32 id, uint32 guid)
+{
+    for (auto it = GameobjectInstanceSavedStateList.begin(); it != GameobjectInstanceSavedStateList.end(); it++)
+    {
+        if (it->m_guid == guid && it->m_instance == id)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void ObjectMgr::SetInstanceSavedGameobjectState(uint32 id, uint32 guid, uint8 state)
+{
+    for (auto it = GameobjectInstanceSavedStateList.begin(); it != GameobjectInstanceSavedStateList.end(); it++)
+    {
+        if (it->m_guid == guid && it->m_instance == id)
+        {
+            it->m_state = state;
+        }
+    }
+}
+void ObjectMgr::NewInstanceSavedGameobjectState(uint32 id, uint32 guid, uint8 state)
+{
+    GameobjectInstanceSavedStateList.push_back({ id, guid, state });
+}
+
+void ObjectMgr::SendServerMail(Player* player, uint32 id, uint32 reqLevel, uint32 reqPlayTime, uint32 rewardMoneyA, uint32 rewardMoneyH, uint32 rewardItemA, uint32 rewardItemCountA, uint32 rewardItemH, uint32 rewardItemCountH, std::string subject, std::string body, uint8 active) const
+{
+    if (active)
+    {
+        if (player->getLevel() < reqLevel)
+            return;
+
+        if (player->GetTotalPlayedTime() < reqPlayTime)
+            return;
+
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+
+        MailSender sender(MAIL_NORMAL, player->GetGUID().GetCounter(), MAIL_STATIONERY_GM);
+        MailDraft draft(subject, body);
+
+        draft.AddMoney(player->GetTeamId() == TEAM_ALLIANCE ? rewardMoneyH : rewardMoneyA);
+        if (Item* mailItem = Item::CreateItem(player->GetTeamId() == TEAM_ALLIANCE ? rewardItemH : rewardItemA, player->GetTeamId() == TEAM_ALLIANCE ? rewardItemCountH : rewardItemCountA))
+        {
+            mailItem->SaveToDB(trans);
+            draft.AddItem(mailItem);
+        }
+
+        draft.SendMailTo(trans, MailReceiver(player), sender);
+        CharacterDatabase.CommitTransaction(trans);
+
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_MAIL_SERVER_CHARACTER);
+        stmt->SetData(0, player->GetGUID().GetCounter());
+        stmt->SetData(1, id);
+        CharacterDatabase.Execute(stmt);
+
+        LOG_DEBUG("entities.player", "ObjectMgr::SendServerMail() Sent mail id {} to {}", id, player->GetGUID().ToString());
+    }
+}
+
+void ObjectMgr::LoadMailServerTemplates()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _serverMailStore.clear(); // for reload case
+
+    //                                                    0     1           2              3         4         5        6             7       8             9          10      11
+    QueryResult result = CharacterDatabase.Query("SELECT `id`, `reqLevel`, `reqPlayTime`, `moneyA`, `moneyH`, `itemA`, `itemCountA`, `itemH`,`itemCountH`, `subject`, `body`, `active` FROM `mail_server_template`");
+    if (!result)
+    {
+        LOG_INFO("sql.sql", ">> Loaded 0 server mail rewards. DB table `mail_server_template` is empty.");
+        LOG_INFO("server.loading", " ");
+        return;
+    }
+
+    _serverMailStore.rehash(result->GetRowCount());
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].Get<uint32>();
+
+        ServerMail& servMail = _serverMailStore[id];
+
+        servMail.id          = id;
+        servMail.reqLevel    = fields[1].Get<uint8>();
+        servMail.reqPlayTime = fields[2].Get<uint32>();
+        servMail.moneyA      = fields[3].Get<uint32>();
+        servMail.moneyH      = fields[4].Get<uint32>();
+        servMail.itemA       = fields[5].Get<uint32>();
+        servMail.itemCountA  = fields[6].Get<uint32>();
+        servMail.itemH       = fields[7].Get<uint32>();
+        servMail.itemCountH  = fields[8].Get<uint32>();
+        servMail.subject     = fields[9].Get<std::string>();
+        servMail.body        = fields[10].Get<std::string>();
+        servMail.active      = fields[11].Get<uint8>();
+
+        if (servMail.reqLevel > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+        {
+            LOG_ERROR("sql.sql", "Table `mail_server_template` has reqLevel {} but max level is {} for id {}, skipped.", servMail.reqLevel, sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL), servMail.id);
+            return;
+        }
+
+        if (servMail.moneyA > MAX_MONEY_AMOUNT || servMail.moneyH > MAX_MONEY_AMOUNT)
+        {
+            LOG_ERROR("sql.sql", "Table `mail_server_template` has moneyA {} or moneyH {} larger than MAX_MONEY_AMOUNT {} for id {}, skipped.", servMail.moneyA, servMail.moneyH, MAX_MONEY_AMOUNT, servMail.id);
+            return;
+        }
+
+        ItemTemplate const* itemTemplateA = sObjectMgr->GetItemTemplate(servMail.itemA);
+        if (!itemTemplateA && servMail.itemA)
+        {
+            LOG_ERROR("sql.sql", "Table `mail_server_template` has invalid item in itemA {} for id {}, skipped.", servMail.itemA, servMail.id);
+            return;
+        }
+        ItemTemplate const* itemTemplateH = sObjectMgr->GetItemTemplate(servMail.itemH);
+        if (!itemTemplateH && servMail.itemH)
+        {
+            LOG_ERROR("sql.sql", "Table `mail_server_template` has invalid item in itemH {} for id {}, skipped.", servMail.itemH, servMail.id);
+            return;
+        }
+
+        if (!servMail.itemA && servMail.itemCountA)
+        {
+            LOG_ERROR("sql.sql", "Table `mail_server_template` has itemCountA {} with no ItemA, set to 0", servMail.itemCountA);
+            servMail.itemCountA = 0;
+        }
+        if (!servMail.itemH && servMail.itemCountH)
+        {
+            LOG_ERROR("sql.sql", "Table `mail_server_template` has itemCountH {} with no ItemH, set to 0", servMail.itemCountH);
+            servMail.itemCountH = 0;
+        }
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} Mail Server Template in {} ms", _serverMailStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }

@@ -50,7 +50,7 @@ union u_map_magic
 };
 
 u_map_magic MapMagic        = { {'M', 'A', 'P', 'S'} };
-uint32 MapVersionMagic      = 8;
+uint32 MapVersionMagic      = 9;
 u_map_magic MapAreaMagic    = { {'A', 'R', 'E', 'A'} };
 u_map_magic MapHeightMagic  = { {'M', 'H', 'G', 'T'} };
 u_map_magic MapLiquidMagic  = { {'M', 'L', 'I', 'Q'} };
@@ -121,12 +121,20 @@ bool Map::ExistVMap(uint32 mapid, int gx, int gy)
     {
         if (vmgr->isMapLoadingEnabled())
         {
-            bool exists = vmgr->existsMap((sWorld->GetDataPath() + "vmaps").c_str(),  mapid, gx, gy);
-            if (!exists)
+            VMAP::LoadResult result = vmgr->existsMap((sWorld->GetDataPath() + "vmaps").c_str(), mapid, gx, gy);
+            std::string name = vmgr->getDirFileName(mapid, gx, gy);
+            switch (result)
             {
-                std::string name = vmgr->getDirFileName(mapid, gx, gy);
-                LOG_ERROR("maps", "VMap file '{}' is missing or points to wrong version of vmap file. Redo vmaps with latest version of vmap_assembler.exe.", (sWorld->GetDataPath() + "vmaps/" + name));
-                return false;
+                case VMAP::LoadResult::Success:
+                    break;
+                case VMAP::LoadResult::FileNotFound:
+                    LOG_ERROR("maps", "VMap file '{}' does not exist", (sWorld->GetDataPath() + "vmaps/" + name));
+                    LOG_ERROR("maps", "Please place VMAP files (*.vmtree and *.vmtile) in the vmap directory ({}), or correct the DataDir setting in your worldserver.conf file.", (sWorld->GetDataPath() + "vmaps/"));
+                    return false;
+                case VMAP::LoadResult::VersionMismatch:
+                    LOG_ERROR("maps", "VMap file '{}' couldn't be loaded", (sWorld->GetDataPath() + "vmaps/" + name));
+                    LOG_ERROR("maps", "This is because the version of the VMap file and the version of this module are different, please re-extract the maps with the tools compiled with this module.");
+                    return false;
             }
         }
     }
@@ -351,7 +359,7 @@ void Map::SwitchGridContainers(Creature* obj, bool on)
 
     LOG_DEBUG("maps", "Switch object {} from grid[{}, {}] {}", obj->GetGUID().ToString(), cell.GridX(), cell.GridY(), on);
     NGridType* ngrid = getNGrid(cell.GridX(), cell.GridY());
-    ASSERT(ngrid != nullptr);
+    ASSERT(ngrid);
 
     GridType& grid = ngrid->GetGridType(cell.CellX(), cell.CellY());
 
@@ -389,7 +397,7 @@ void Map::SwitchGridContainers(GameObject* obj, bool on)
 
     //LOG_DEBUG(LOG_FILTER_MAPS, "Switch object {} from grid[{}, {}] {}", obj->GetGUID().ToString(), cell.data.Part.grid_x, cell.data.Part.grid_y, on);
     NGridType* ngrid = getNGrid(cell.GridX(), cell.GridY());
-    ASSERT(ngrid != nullptr);
+    ASSERT(ngrid);
 
     GridType& grid = ngrid->GetGridType(cell.CellX(), cell.CellY());
 
@@ -463,7 +471,7 @@ bool Map::EnsureGridLoaded(const Cell& cell)
     EnsureGridCreated(GridCoord(cell.GridX(), cell.GridY()));
     NGridType* grid = getNGrid(cell.GridX(), cell.GridY());
 
-    ASSERT(grid != nullptr);
+    ASSERT(grid);
     if (!isGridObjectDataLoaded(cell.GridX(), cell.GridY()))
     {
         //if (!isGridObjectDataLoaded(cell.GridX(), cell.GridY()))
@@ -1328,7 +1336,8 @@ GridMap::GridMap()
     _maxHeight = nullptr;
     _minHeight = nullptr;
     // Liquid data
-    _liquidType    = 0;
+    _liquidGlobalEntry = 0;
+    _liquidGlobalFlags = 0;
     _liquidOffX   = 0;
     _liquidOffY   = 0;
     _liquidWidth  = 0;
@@ -1505,7 +1514,8 @@ bool GridMap::loadLiquidData(FILE* in, uint32 offset, uint32 /*size*/)
     if (fread(&header, sizeof(header), 1, in) != 1 || header.fourcc != MapLiquidMagic.asUInt)
         return false;
 
-    _liquidType   = header.liquidType;
+    _liquidGlobalEntry = header.liquidType;
+    _liquidGlobalFlags = header.liquidFlags;
     _liquidOffX  = header.offsetX;
     _liquidOffY  = header.offsetY;
     _liquidWidth = header.width;
@@ -1885,7 +1895,7 @@ inline LiquidData const GridMap::GetLiquidData(float x, float y, float z, float 
     LiquidData liquidData;
 
     // Check water type (if no water return)
-    if (_liquidType || _liquidFlags)
+    if (_liquidGlobalFlags || _liquidFlags)
     {
         // Get cell
         float cx = MAP_RESOLUTION * (32 - x / SIZE_OF_GRIDS);
@@ -1895,38 +1905,34 @@ inline LiquidData const GridMap::GetLiquidData(float x, float y, float z, float 
         int y_int = (int) cy & (MAP_RESOLUTION - 1);
 
         // Check water type in cell
-        int    idx   = (x_int >> 3) * 16 + (y_int >> 3);
-        uint8  type  = _liquidFlags ? _liquidFlags[idx] : _liquidType;
-        uint32 entry = 0;
-        if (_liquidEntry)
+        int idx=(x_int>>3)*16 + (y_int>>3);
+        uint8 type = _liquidFlags ? _liquidFlags[idx] : _liquidGlobalFlags;
+        uint32 entry = _liquidEntry ? _liquidEntry[idx] : _liquidGlobalEntry;
+        if (LiquidTypeEntry const* liquidEntry = sLiquidTypeStore.LookupEntry(entry))
         {
-            if (LiquidTypeEntry const* liquidEntry = sLiquidTypeStore.LookupEntry(_liquidEntry[idx]))
+            type &= MAP_LIQUID_TYPE_DARK_WATER;
+            uint32 liqTypeIdx = liquidEntry->Type;
+            if (entry < 21)
             {
-                entry = liquidEntry->Id;
-                type &= MAP_LIQUID_TYPE_DARK_WATER;
-                uint32 liqTypeIdx = liquidEntry->Type;
-                if (entry < 21)
+                if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(getArea(x, y)))
                 {
-                    if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(getArea(x, y)))
+                    uint32 overrideLiquid = area->LiquidTypeOverride[liquidEntry->Type];
+                    if (!overrideLiquid && area->zone)
                     {
-                        uint32 overrideLiquid = area->LiquidTypeOverride[liquidEntry->Type];
-                        if (!overrideLiquid && area->zone)
-                        {
-                            area = sAreaTableStore.LookupEntry(area->zone);
-                            if (area)
-                                overrideLiquid = area->LiquidTypeOverride[liquidEntry->Type];
-                        }
+                        area = sAreaTableStore.LookupEntry(area->zone);
+                        if (area)
+                            overrideLiquid = area->LiquidTypeOverride[liquidEntry->Type];
+                    }
 
-                        if (LiquidTypeEntry const* liq = sLiquidTypeStore.LookupEntry(overrideLiquid))
-                        {
-                            entry      = overrideLiquid;
-                            liqTypeIdx = liq->Type;
-                        }
+                    if (LiquidTypeEntry const* liq = sLiquidTypeStore.LookupEntry(overrideLiquid))
+                    {
+                        entry      = overrideLiquid;
+                        liqTypeIdx = liq->Type;
                     }
                 }
-
-                type |= 1 << liqTypeIdx;
             }
+
+            type |= 1 << liqTypeIdx;
         }
 
          // Check req liquid type mask
@@ -1944,7 +1950,7 @@ inline LiquidData const GridMap::GetLiquidData(float x, float y, float z, float 
                 float ground_level = getHeight(x, y);
 
                 // Check water level and ground level
-                if (liquid_level >= ground_level && z >= ground_level - 2)
+                if (liquid_level >= ground_level && z >= ground_level)
                 {
                     // All ok in water -> store data
                     liquidData.Entry  = entry;
@@ -1957,9 +1963,9 @@ inline LiquidData const GridMap::GetLiquidData(float x, float y, float z, float 
 
                     if (delta > collisionHeight)
                         liquidData.Status = LIQUID_MAP_UNDER_WATER;
-                    else if (delta > 0.2f)
+                    else if (delta > 0.0f)
                         liquidData.Status = LIQUID_MAP_IN_WATER;
-                    else if (delta > -0.2f)
+                    else if (delta > -0.1f)
                         liquidData.Status = LIQUID_MAP_WATER_WALK;
                     else
                         liquidData.Status = LIQUID_MAP_ABOVE_WATER;
@@ -2015,7 +2021,7 @@ Transport* Map::GetTransportForPos(uint32 phase, float x, float y, float z, Worl
         if ((*itr)->IsInWorld() && (*itr)->GetExactDistSq(x, y, z) < 75.0f * 75.0f && (*itr)->m_model)
         {
             float dist = 30.0f;
-            bool hit = (*itr)->m_model->intersectRay(r, dist, false, phase);
+            bool hit = (*itr)->m_model->intersectRay(r, dist, false, phase, VMAP::ModelIgnoreFlags::Nothing);
             if (hit)
                 return *itr;
         }
@@ -2025,7 +2031,7 @@ Transport* Map::GetTransportForPos(uint32 phase, float x, float y, float z, Worl
             if (staticTrans->m_model)
             {
                 float dist = 10.0f;
-                bool hit = staticTrans->m_model->intersectRay(r, dist, false, phase);
+                bool hit = staticTrans->m_model->intersectRay(r, dist, false, phase, VMAP::ModelIgnoreFlags::Nothing);
                 if (hit)
                     if (GetHeight(phase, x, y, z, true, 30.0f) < (v.z - dist + 1.0f))
                         return staticTrans->ToTransport();
@@ -2251,9 +2257,9 @@ LiquidData const Map::GetLiquidData(uint32 phaseMask, float x, float y, float z,
         // Get position delta
         if (delta > collisionHeight)
             liquidData.Status = LIQUID_MAP_UNDER_WATER;
-        if (delta > 0.2f)
+        else if (delta > 0.0f)
             liquidData.Status = LIQUID_MAP_IN_WATER;
-        if (delta > -0.2f)
+        else if (delta > -0.1f)
             liquidData.Status = LIQUID_MAP_WATER_WALK;
         else
             liquidData.Status = LIQUID_MAP_ABOVE_WATER;
@@ -2400,9 +2406,9 @@ void Map::GetFullTerrainStatusForPosition(uint32 /*phaseMask*/, float x, float y
 
         if (delta > collisionHeight)
             data.liquidInfo.Status = LIQUID_MAP_UNDER_WATER;
-        else if (delta > 0.2f)
+        else if (delta > 0.0f)
             data.liquidInfo.Status = LIQUID_MAP_IN_WATER;
-        else if (delta > -0.2f)
+        else if (delta > -0.1f)
             data.liquidInfo.Status = LIQUID_MAP_WATER_WALK;
         else
             data.liquidInfo.Status = LIQUID_MAP_ABOVE_WATER;
@@ -2432,14 +2438,35 @@ float Map::GetWaterLevel(float x, float y) const
         return 0;
 }
 
-bool Map::isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, LineOfSightChecks checks) const
+bool Map::isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, LineOfSightChecks checks, VMAP::ModelIgnoreFlags ignoreFlags) const
 {
-    if ((checks & LINEOFSIGHT_CHECK_VMAP) && !VMAP::VMapFactory::createOrGetVMapMgr()->isInLineOfSight(GetId(), x1, y1, z1, x2, y2, z2))
-        return false;
+    if (!sWorld->getBoolConfig(CONFIG_VMAP_BLIZZLIKE_PVP_LOS))
+    {
+        if (IsBattlegroundOrArena())
+        {
+            ignoreFlags = VMAP::ModelIgnoreFlags::Nothing;
+        }
+    }
 
-    if (sWorld->getBoolConfig(CONFIG_CHECK_GOBJECT_LOS) && (checks & LINEOFSIGHT_CHECK_GOBJECT)
-            && !_dynamicTree.isInLineOfSight(x1, y1, z1, x2, y2, z2, phasemask))
+    if ((checks & LINEOFSIGHT_CHECK_VMAP) && !VMAP::VMapFactory::createOrGetVMapMgr()->isInLineOfSight(GetId(), x1, y1, z1, x2, y2, z2, ignoreFlags))
+    {
         return false;
+    }
+
+    if (sWorld->getBoolConfig(CONFIG_CHECK_GOBJECT_LOS) && (checks & LINEOFSIGHT_CHECK_GOBJECT_ALL))
+    {
+        ignoreFlags = VMAP::ModelIgnoreFlags::Nothing;
+        if (!(checks & LINEOFSIGHT_CHECK_GOBJECT_M2))
+        {
+            ignoreFlags = VMAP::ModelIgnoreFlags::M2;
+        }
+
+        if (!_dynamicTree.isInLineOfSight(x1, y1, z1, x2, y2, z2, phasemask, ignoreFlags))
+        {
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -3602,7 +3629,7 @@ Corpse* Map::ConvertCorpseToBones(ObjectGuid const ownerGuid, bool insignia /*= 
         bones->SetPhaseMask(corpse->GetPhaseMask(), false);
 
         bones->SetUInt32Value(CORPSE_FIELD_FLAGS, CORPSE_FLAG_UNK2 | CORPSE_FLAG_BONES);
-        bones->SetGuidValue(CORPSE_FIELD_OWNER, ObjectGuid::Empty);
+        bones->SetGuidValue(CORPSE_FIELD_OWNER, corpse->GetOwnerGUID());
 
         for (uint8 i = 0; i < EQUIPMENT_SLOT_END; ++i)
             if (corpse->GetUInt32Value(CORPSE_FIELD_ITEM + i))

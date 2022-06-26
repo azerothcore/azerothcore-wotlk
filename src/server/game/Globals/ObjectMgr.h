@@ -667,6 +667,7 @@ typedef std::array<std::unordered_map<uint32, QuestGreeting>, 2> QuestGreetingCo
 
 typedef std::unordered_map<uint32, VendorItemData> CacheVendorItemContainer;
 typedef std::unordered_map<uint32, TrainerSpellData> CacheTrainerSpellContainer;
+typedef std::unordered_map<uint32, ServerMail> ServerMailContainer;
 
 enum SkillRangeType
 {
@@ -1040,6 +1041,7 @@ public:
     void LoadInstanceTemplate();
     void LoadInstanceEncounters();
     void LoadMailLevelRewards();
+    void LoadMailServerTemplates();
     void LoadVehicleTemplateAccessories();
     void LoadVehicleAccessories();
 
@@ -1168,6 +1170,8 @@ public:
 
         return nullptr;
     }
+
+    [[nodiscard]] ServerMailContainer const& GetAllServerMailStore() const { return _serverMailStore; }
 
     [[nodiscard]] BroadcastText const* GetBroadcastText(uint32 id) const
     {
@@ -1404,7 +1408,13 @@ public:
     [[nodiscard]] bool IsTransportMap(uint32 mapId) const { return _transportMaps.count(mapId) != 0; }
 
     [[nodiscard]] uint32 GetQuestMoneyReward(uint8 level, uint32 questMoneyDifficulty) const;
+    void SendServerMail(Player* player, uint32 id, uint32 reqLevel, uint32 reqPlayTime, uint32 rewardMoneyA, uint32 rewardMoneyH, uint32 rewardItemA, uint32 rewardItemCountA, uint32 rewardItemH, uint32 rewardItemCountH, std::string subject, std::string body, uint8 active) const;
 
+    void LoadInstanceSavedGameobjectStateData();
+    bool FindInstanceSavedGameobjectState(uint32 id, uint32 guid);
+    uint8 GetInstanceSavedGameobjectState(uint32 id, uint32 guid);
+    void SetInstanceSavedGameobjectState(uint32 id, uint32 guid, uint8 state);
+    void NewInstanceSavedGameobjectState(uint32 id, uint32 guid, uint8 state);
 private:
     // first free id for selected id type
     uint32 _auctionId; // pussywizard: accessed by a single thread
@@ -1558,6 +1568,8 @@ private:
     CacheVendorItemContainer _cacheVendorItemStore;
     CacheTrainerSpellContainer _cacheTrainerSpellStore;
 
+    ServerMailContainer _serverMailStore;
+
     std::set<uint32> _difficultyEntries[MAX_DIFFICULTY - 1]; // already loaded difficulty 1 value in creatures, used in CheckCreatureTemplate
     std::set<uint32> _hasDifficultyEntries[MAX_DIFFICULTY - 1]; // already loaded creatures with difficulty 1 values, used in CheckCreatureTemplate
 
@@ -1572,6 +1584,14 @@ private:
     std::set<uint32> _transportMaps; // Helper container storing map ids that are for transports only, loaded from gameobject_template
 
     QuestMoneyRewardStore _questMoneyRewards;
+
+    struct GameobjectInstanceSavedState
+    {
+        uint32 m_instance;
+        uint32 m_guid;
+        unsigned short m_state;
+    };
+    std::vector<GameobjectInstanceSavedState> GameobjectInstanceSavedStateList;
 };
 
 #define sObjectMgr ObjectMgr::instance()

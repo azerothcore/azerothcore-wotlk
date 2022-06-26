@@ -106,7 +106,7 @@ public:
             summons.DespawnAll();
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
             instance->SetData(DATA_KAELTHAS_EVENT, NOT_STARTED);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(false);
         }
 
         void JustSummoned(Creature* summon) override
@@ -120,7 +120,7 @@ public:
         void InitializeAI() override
         {
             ScriptedAI::InitializeAI();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(true);
         }
 
         void JustDied(Unit*) override
@@ -162,7 +162,8 @@ public:
                 if (me->isRegeneratingHealth())
                 {
                     me->SetRegeneratingHealth(false);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE);
+                    me->SetImmuneToAll(true);
                     me->CombatStop();
                     me->SetReactState(REACT_PASSIVE);
                     LapseAction(ACTION_REMOVE_FLY);
@@ -200,7 +201,7 @@ public:
             switch (events2.ExecuteEvent())
             {
                 case EVENT_INIT_COMBAT:
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->SetImmuneToAll(false);
                     if (Unit* target = SelectTargetFromPlayerList(50.0f))
                         AttackStart(target);
                     return;

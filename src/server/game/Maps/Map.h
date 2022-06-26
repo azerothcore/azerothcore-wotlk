@@ -63,6 +63,11 @@ class PathGenerator;
 
 enum WeatherState : uint32;
 
+namespace VMAP
+{
+    enum class ModelIgnoreFlags : uint32;
+}
+
 namespace Acore
 {
     struct ObjectUpdater;
@@ -123,7 +128,8 @@ struct map_heightHeader
 struct map_liquidHeader
 {
     uint32 fourcc;
-    uint16 flags;
+    uint8 flags;
+    uint8 liquidFlags;
     uint16 liquidType;
     uint8  offsetX;
     uint8  offsetY;
@@ -153,7 +159,6 @@ enum LiquidStatus
 #define MAP_ALL_LIQUIDS   (MAP_LIQUID_TYPE_WATER | MAP_LIQUID_TYPE_OCEAN | MAP_LIQUID_TYPE_MAGMA | MAP_LIQUID_TYPE_SLIME)
 
 #define MAP_LIQUID_TYPE_DARK_WATER  0x10
-#define MAP_LIQUID_TYPE_WMO_WATER   0x20
 
 #define MAX_HEIGHT            100000.0f                     // can be use for find ground height at surface
 #define INVALID_HEIGHT       -100000.0f                     // for check, must be equal to VMAP_INVALID_HEIGHT, real value for unknown height is VMAP_INVALID_HEIGHT_VALUE
@@ -183,10 +188,13 @@ struct PositionFullTerrainStatus
 
 enum LineOfSightChecks
 {
-    LINEOFSIGHT_CHECK_VMAP      = 0x1, // check static floor layout data
-    LINEOFSIGHT_CHECK_GOBJECT   = 0x2, // check dynamic game object data
+    LINEOFSIGHT_CHECK_VMAP          = 0x1, // check static floor layout data
+    LINEOFSIGHT_CHECK_GOBJECT_WMO   = 0x2, // check dynamic game object data (wmo models)
+    LINEOFSIGHT_CHECK_GOBJECT_M2    = 0x4, // check dynamic game object data (m2 models)
 
-    LINEOFSIGHT_ALL_CHECKS      = (LINEOFSIGHT_CHECK_VMAP | LINEOFSIGHT_CHECK_GOBJECT)
+    LINEOFSIGHT_CHECK_GOBJECT_ALL   = LINEOFSIGHT_CHECK_GOBJECT_WMO | LINEOFSIGHT_CHECK_GOBJECT_M2,
+
+    LINEOFSIGHT_ALL_CHECKS          = LINEOFSIGHT_CHECK_VMAP | LINEOFSIGHT_CHECK_GOBJECT_ALL
 };
 
 class GridMap
@@ -219,7 +227,8 @@ class GridMap
     uint8* _liquidFlags;
     float* _liquidMap;
     uint16 _gridArea;
-    uint16 _liquidType;
+    uint16 _liquidGlobalEntry;
+    uint8 _liquidGlobalFlags;
     uint8 _liquidOffX;
     uint8 _liquidOffY;
     uint8 _liquidWidth;
@@ -539,7 +548,7 @@ public:
 
     float GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, float* ground = nullptr, bool swim = false, float collisionHeight = DEFAULT_COLLISION_HEIGHT) const;
     [[nodiscard]] float GetHeight(uint32 phasemask, float x, float y, float z, bool vmap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
-    [[nodiscard]] bool isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, LineOfSightChecks checks) const;
+    [[nodiscard]] bool isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, LineOfSightChecks checks, VMAP::ModelIgnoreFlags ignoreFlags) const;
     bool CanReachPositionAndGetValidCoords(WorldObject const* source, PathGenerator *path, float &destX, float &destY, float &destZ, bool failOnCollision = true, bool failOnSlopes = true) const;
     bool CanReachPositionAndGetValidCoords(WorldObject const* source, float &destX, float &destY, float &destZ, bool failOnCollision = true, bool failOnSlopes = true) const;
     bool CanReachPositionAndGetValidCoords(WorldObject const* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool failOnCollision = true, bool failOnSlopes = true) const;
@@ -633,6 +642,11 @@ public:
     void RemoveUpdateObject(Object* obj)
     {
         _updateObjects.erase(obj);
+    }
+
+    size_t GetActiveNonPlayersCount() const
+    {
+        return m_activeNonPlayers.size();
     }
 
 private:

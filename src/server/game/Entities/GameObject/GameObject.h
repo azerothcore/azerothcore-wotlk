@@ -25,6 +25,7 @@
 #include "Object.h"
 #include "SharedDefines.h"
 #include "Unit.h"
+#include <array>
 
 class GameObjectAI;
 class Transport;
@@ -647,6 +648,25 @@ struct GameObjectTemplate
     {
         return IsForQuests;
     }
+
+    [[nodiscard]] bool IsIgnoringLOSChecks() const
+    {
+        switch (type)
+        {
+            case GAMEOBJECT_TYPE_BUTTON:
+                return button.losOK == 0;
+            case GAMEOBJECT_TYPE_QUESTGIVER:
+                return questgiver.losOK == 0;
+            case GAMEOBJECT_TYPE_CHEST:
+                return chest.losOK == 0;
+            case GAMEOBJECT_TYPE_GOOBER:
+                return goober.losOK == 0;
+            case GAMEOBJECT_TYPE_FLAGSTAND:
+                return flagstand.losOK == 0;
+            default:
+                return false;
+        }
+    }
 };
 
 // From `gameobject_template_addon`
@@ -657,6 +677,7 @@ struct GameObjectTemplateAddon
     uint32  flags;
     uint32  mingold;
     uint32  maxgold;
+    std::array<uint32, 4> artKits = {};
 };
 
 // Benchmarked: Faster than std::map (insert/find)
@@ -717,6 +738,35 @@ enum GOState
 
 #define MAX_GO_STATE              3
 
+enum class GameObjectActions : uint32
+{
+    // Name from client executable      // Comments
+    None,                           // -NONE-
+    AnimateCustom0,                 // Animate Custom0
+    AnimateCustom1,                 // Animate Custom1
+    AnimateCustom2,                 // Animate Custom2
+    AnimateCustom3,                 // Animate Custom3
+    Disturb,                        // Disturb                          // Triggers trap
+    Unlock,                         // Unlock                           // Resets GO_FLAG_LOCKED
+    Lock,                           // Lock                             // Sets GO_FLAG_LOCKED
+    Open,                           // Open                             // Sets GO_STATE_ACTIVE
+    OpenAndUnlock,                  // Open + Unlock                    // Sets GO_STATE_ACTIVE and resets GO_FLAG_LOCKED
+    Close,                          // Close                            // Sets GO_STATE_READY
+    ToggleOpen,                     // Toggle Open
+    Destroy,                        // Destroy                          // Sets GO_STATE_DESTROYED
+    Rebuild,                        // Rebuild                          // Resets from GO_STATE_DESTROYED
+    Creation,                       // Creation
+    Despawn,                        // Despawn
+    MakeInert,                      // Make Inert                       // Disables interactions
+    MakeActive,                     // Make Active                      // Enables interactions
+    CloseAndLock,                   // Close + Lock                     // Sets GO_STATE_READY and sets GO_FLAG_LOCKED
+    UseArtKit0,                     // Use ArtKit0                      // 46904: 121
+    UseArtKit1,                     // Use ArtKit1                      // 36639: 81, 46903: 122
+    UseArtKit2,                     // Use ArtKit2
+    UseArtKit3,                     // Use ArtKit3
+    SetTapList,                     // Set Tap List
+};
+
 // from `gameobject`
 struct GameObjectData
 {
@@ -770,6 +820,9 @@ public:
     void AddToWorld() override;
     void RemoveFromWorld() override;
     void CleanupsBeforeDelete(bool finalCleanup = true) override;
+
+    uint32 GetDynamicFlags() const override { return GetUInt32Value(GAMEOBJECT_DYNAMIC); }
+    void ReplaceAllDynamicFlags(uint32 flag) override { SetUInt32Value(GAMEOBJECT_DYNAMIC, flag); }
 
     virtual bool Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0);
     void Update(uint32 p_time) override;
@@ -853,6 +906,12 @@ public:
     void SetPhaseMask(uint32 newPhaseMask, bool update) override;
     void EnableCollision(bool enable);
 
+    GameObjectFlags GetGameObjectFlags() const { return GameObjectFlags(GetUInt32Value(GAMEOBJECT_FLAGS)); }
+    bool HasGameObjectFlag(GameObjectFlags flags) const { return HasFlag(GAMEOBJECT_FLAGS, flags) != 0; }
+    void SetGameObjectFlag(GameObjectFlags flags) { SetFlag(GAMEOBJECT_FLAGS, flags); }
+    void RemoveGameObjectFlag(GameObjectFlags flags) { RemoveFlag(GAMEOBJECT_FLAGS, flags); }
+    void ReplaceAllGameObjectFlags(GameObjectFlags flags) { SetUInt32Value(GAMEOBJECT_FLAGS, flags); }
+
     void Use(Unit* user);
 
     [[nodiscard]] LootState getLootState() const { return m_lootState; }
@@ -929,9 +988,9 @@ public:
     void SetDestructibleState(GameObjectDestructibleState state, Player* eventInvoker = nullptr, bool setHealth = false);
     [[nodiscard]] GameObjectDestructibleState GetDestructibleState() const
     {
-        if (HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_DESTROYED))
+        if (HasGameObjectFlag(GO_FLAG_DESTROYED))
             return GO_DESTRUCTIBLE_DESTROYED;
-        if (HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_DAMAGED))
+        if (HasGameObjectFlag(GO_FLAG_DAMAGED))
             return GO_DESTRUCTIBLE_DAMAGED;
         return GO_DESTRUCTIBLE_INTACT;
     }
@@ -982,6 +1041,25 @@ public:
 
     static std::unordered_map<int, goEventFlag> gameObjectToEventFlag; // Gameobject -> event flag
 
+    void SaveInstanceData(uint8 state);
+    void UpdateInstanceData(uint8 state);
+    bool FindStateSavedOnInstance();
+    bool ValidateGameobjectType();
+    uint8 GetStateSavedOnInstance();
+    bool IsInstanceGameobject();
+    uint8 GameobjectStateToInt(GOState* state);
+
+    /* A check to verify if this object is available to be saved on the DB when
+     * a state change occurs
+     */
+    bool IsAbleToSaveOnDb();
+
+    /* Enable or Disable the ability to save on the database this gameobject's state
+     * whenever it changes
+     */
+    void UpdateSaveToDb(bool enable);
+
+    void SavingStateOnDB();
 protected:
     bool AIM_Initialize();
     GameObjectModel* CreateModel();
@@ -1038,5 +1116,7 @@ private:
         return IsInRange(obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), dist2compare);
     }
     GameObjectAI* m_AI;
+
+    bool m_saveStateOnDb = false;
 };
 #endif

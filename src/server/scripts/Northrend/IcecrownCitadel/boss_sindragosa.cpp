@@ -324,7 +324,7 @@ public:
         {
             if (!instance->CheckRequiredBosses(DATA_SINDRAGOSA, victim->ToPlayer()) || !me->IsVisible())
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 instance->DoCastSpellOnPlayers(LIGHT_S_HAMMER_TELEPORT);
                 return;
             }
@@ -369,9 +369,9 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE)) // this flag is removed after she lands and can be engaged
+            if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE)) // this flag is removed after she lands and can be engaged
             {
                 const Map::PlayerList& pl = me->GetMap()->GetPlayers();
                 for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
@@ -381,7 +381,7 @@ public:
             }
             me->DisableRotate(false);
             me->SetControlled(false, UNIT_STATE_ROOT);
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
         }
 
         void KilledUnit(Unit* victim) override
@@ -406,7 +406,7 @@ public:
 
                 me->setActive(true);
                 me->SetDisableGravity(true);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetSpeed(MOVE_RUN, 4.28571f);
                 float moveTime = me->GetExactDist(&SindragosaFlyInPos) / (me->GetSpeed(MOVE_RUN) * 0.001f);
                 me->m_Events.AddEvent(new FrostwyrmLandEvent(*me, SindragosaLandPos), me->m_Events.CalculateTime(uint64(moveTime) + 250));
@@ -434,7 +434,7 @@ public:
                     me->SetDisableGravity(false);
                     me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run);
                     me->SetHomePosition(SindragosaLandPos);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
 
                     // Sindragosa enters combat as soon as she lands
                     me->SetInCombatWithZone();
@@ -523,7 +523,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim() || !CheckInRoom())
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
@@ -1285,7 +1285,7 @@ public:
         float ox, oy, oz;
         _caster->GetPosition(ox, oy, oz);
         DynamicMapTree const& dTree = unit->GetMap()->GetDynamicMapTree();
-        return !dTree.isInLineOfSight(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ() + 2.f, ox, oy, oz + 2.f, unit->GetPhaseMask());
+        return !dTree.isInLineOfSight(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ() + 2.f, ox, oy, oz + 2.f, unit->GetPhaseMask(), VMAP::ModelIgnoreFlags::Nothing);
     }
 
 private:
@@ -1431,7 +1431,7 @@ public:
                     return;
 
                 me->setActive(true);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                me->SetImmuneToPC(true);
                 float moveTime = me->GetExactDist(&SpinestalkerFlyPos) / (me->GetSpeed(MOVE_RUN) * 0.001f);
                 me->m_Events.AddEvent(new FrostwyrmLandEvent(*me, SpinestalkerLandPos), me->m_Events.CalculateTime(uint64(moveTime) + 250));
                 me->SetDefaultMovementType(IDLE_MOTION_TYPE);
@@ -1450,7 +1450,7 @@ public:
             me->SetDisableGravity(false);
             me->SetHomePosition(SpinestalkerLandPos);
             me->SetFacingTo(SpinestalkerLandPos.GetOrientation());
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetImmuneToPC(false);
         }
 
         void UpdateAI(uint32 diff) override
@@ -1562,7 +1562,7 @@ public:
                     return;
 
                 me->setActive(true);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                me->SetImmuneToPC(true);
                 float moveTime = me->GetExactDist(&RimefangFlyPos) / (me->GetSpeed(MOVE_RUN) * 0.001f);
                 me->m_Events.AddEvent(new FrostwyrmLandEvent(*me, RimefangLandPos), me->m_Events.CalculateTime(uint64(moveTime) + 250));
                 me->SetDefaultMovementType(IDLE_MOTION_TYPE);
@@ -1583,7 +1583,7 @@ public:
                 me->SetDisableGravity(false);
                 me->SetHomePosition(RimefangLandPos);
                 me->SetFacingTo(RimefangLandPos.GetOrientation());
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                me->SetImmuneToPC(false);
             }
             else if (point == POINT_LAND_GROUND)
             {

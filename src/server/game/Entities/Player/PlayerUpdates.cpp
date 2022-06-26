@@ -94,7 +94,7 @@ void Player::Update(uint32 p_time)
 
     // Xinef: update charm AI only if we are controlled by creature or
     // non-posses player charm
-    if (IsCharmed() && !HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
+    if (IsCharmed() && !HasUnitFlag(UNIT_FLAG_POSSESSED))
     {
         m_charmUpdateTimer += p_time;
         if (m_charmUpdateTimer >= 1000)
@@ -232,7 +232,7 @@ void Player::Update(uint32 p_time)
         }
     }
 
-    if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING))
+    if (HasPlayerFlag(PLAYER_FLAGS_RESTING))
     {
         if (now > lastTick && _restTime > 0) // freeze update
         {
@@ -277,10 +277,11 @@ void Player::Update(uint32 p_time)
             // supposed to be in one
             if (HasRestFlag(REST_FLAG_IN_TAVERN))
             {
-                AreaTrigger const* atEntry =
-                    sObjectMgr->GetAreaTrigger(GetInnTriggerId());
-                if (!atEntry || !IsInAreaTriggerRadius(atEntry))
+                AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(GetInnTriggerId());
+                if (!atEntry || !IsInAreaTriggerRadius(atEntry, 5.f))
+                {
                     RemoveRestFlag(REST_FLAG_IN_TAVERN);
+                }
             }
 
             uint32 newzone, newarea;
@@ -1192,6 +1193,11 @@ void Player::UpdateArea(uint32 newArea)
 
 void Player::UpdateZone(uint32 newZone, uint32 newArea)
 {
+    if (!newZone)
+    {
+        return;
+    }
+
     if (m_zoneUpdateId != newZone)
     {
         sOutdoorPvPMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
@@ -1379,7 +1385,7 @@ void Player::UpdatePvPState()
     }
     else // in friendly area
     {
-        if (IsPvP() && !HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP) &&
+        if (IsPvP() && !HasPlayerFlag(PLAYER_FLAGS_IN_PVP) &&
             pvpInfo.EndTimer == 0)
             pvpInfo.EndTimer = GameTime::GetGameTime().count(); // start toggle-off
     }
@@ -1467,7 +1473,7 @@ void Player::UpdatePvP(bool state, bool _override)
         SetPvP(state);
     }
 
-    RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_TIMER);
+    RemovePlayerFlag(PLAYER_FLAGS_PVP_TIMER);
     sScriptMgr->OnPlayerPVPFlagChange(this, state);
 }
 
@@ -1543,6 +1549,10 @@ void Player::UpdateVisibilityForPlayer(bool mapChange)
 
 void Player::UpdateObjectVisibility(bool forced, bool fromUpdate)
 {
+    // Prevent updating visibility if player is not in world (example: LoadFromDB sets drunkstate which updates invisibility while player is not in map)
+    if (!IsInWorld())
+        return;
+
     if (!forced)
         AddToNotify(NOTIFY_VISIBILITY_CHANGED);
     else if (!isBeingLoaded())
@@ -1686,8 +1696,7 @@ void Player::UpdateTriggerVisibility()
             // units (values dependent on GM state)
             if (!creature || (!creature->IsTrigger() &&
                               !creature->HasAuraType(SPELL_AURA_TRANSFORM) &&
-                              !creature->HasFlag(UNIT_FIELD_FLAGS,
-                                                 UNIT_FLAG_NOT_SELECTABLE)))
+                              !creature->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE)))
                 continue;
 
             creature->SetFieldNotifyFlag(UF_FLAG_PUBLIC);
@@ -1734,7 +1743,7 @@ void Player::UpdateForQuestWorldObjects()
                 continue;
 
             // check if this unit requires quest specific flags
-            if (!obj->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK))
+            if (!obj->HasNpcFlag(UNIT_NPC_FLAG_SPELLCLICK))
                 continue;
 
             SpellClickInfoMapBounds clickPair = sObjectMgr->GetSpellClickInfoMapBounds(obj->GetEntry());

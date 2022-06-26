@@ -452,10 +452,8 @@ Player::~Player()
 
     if (!m_isInSharedVisionOf.empty())
     {
-        LOG_INFO("misc", "Player::~Player (A1)");
         do
         {
-            LOG_INFO("misc", "Player::~Player (A2)");
             Unit* u = *(m_isInSharedVisionOf.begin());
             u->RemovePlayerFromVision(this);
         } while (!m_isInSharedVisionOf.empty());
@@ -527,9 +525,9 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
     if (sWorld->getIntConfig(CONFIG_GAME_TYPE) == REALM_TYPE_PVP || sWorld->getIntConfig(CONFIG_GAME_TYPE) == REALM_TYPE_RPPVP)
     {
         SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_PVP);
-        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+        SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
     }
-    SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_REGENERATE_POWER);
+    SetUnitFlag2(UNIT_FLAG2_REGENERATE_POWER);
     SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);               // fix cast time showed in spell tooltip on client
     SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 1.0f);            // default for players in 3.0.3
 
@@ -737,22 +735,13 @@ void Player::SendMirrorTimer(MirrorTimerType Type, uint32 MaxValue, uint32 Curre
             StopMirrorTimer(Type);
         return;
     }
-    WorldPacket data(SMSG_START_MIRROR_TIMER, (21));
-    data << (uint32)Type;
-    data << CurrentValue;
-    data << MaxValue;
-    data << Regen;
-    data << (uint8)0;
-    data << (uint32)0;                                      // spell id
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(WorldPackets::Misc::StartMirrorTimer(Type, CurrentValue, MaxValue, Regen, 0, 0).Write());
 }
 
 void Player::StopMirrorTimer(MirrorTimerType Type)
 {
     m_MirrorTimer[Type] = DISABLED_MIRROR_TIMER;
-    WorldPacket data(SMSG_STOP_MIRROR_TIMER, 4);
-    data << (uint32)Type;
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(WorldPackets::Misc::StopMirrorTimer(Type).Write());
 }
 
 bool Player::IsImmuneToEnvironmentalDamage()
@@ -801,11 +790,11 @@ uint32 Player::EnvironmentalDamage(EnviromentalDamage type, uint32 damage)
     {
         if (type == DAMAGE_FALL)                               // DealDamage not apply item durability loss at self damage
         {
-            LOG_DEBUG("entities.player", "We are fall to death, loosing 10 percents durability");
-            DurabilityLossAll(0.10f, false);
+            LOG_DEBUG("entities.player", "Player::EnvironmentalDamage: Player '{}' ({}) fall to death, losing {} durability",
+                GetName(), GetGUID().ToString(), sWorld->getRate(RATE_DURABILITY_LOSS_ON_DEATH));
+            DurabilityLossAll(sWorld->getRate(RATE_DURABILITY_LOSS_ON_DEATH), false);
             // durability lost message
-            WorldPacket data2(SMSG_DURABILITY_DAMAGE_DEATH, 0);
-            GetSession()->SendPacket(&data2);
+            SendDurabilityLoss();
         }
 
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_DEATHS_FROM, 1, type);
@@ -903,7 +892,7 @@ void Player::HandleDrowning(uint32 time_diff)
                     uint32 damage = GetMaxHealth() / 5 + urand(0, getLevel() - 1);
                     EnvironmentalDamage(DAMAGE_EXHAUSTED, damage);
                 }
-                else if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))       // Teleport ghost to graveyard
+                else if (HasPlayerFlag(PLAYER_FLAGS_GHOST))       // Teleport ghost to graveyard
                     RepopAtGraveyard();
             }
             else if (!(m_MirrorTimerFlagsLast & UNDERWATER_INDARKWATER))
@@ -1075,14 +1064,14 @@ void Player::SetRestState(uint32 triggerId)
 {
     _innTriggerId = triggerId;
     _restTime = GameTime::GetGameTime().count();
-    SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
+    SetPlayerFlag(PLAYER_FLAGS_RESTING);
 }
 
 void Player::RemoveRestState()
 {
     _innTriggerId = 0;
     _restTime = 0;
-    RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
+    RemovePlayerFlag(PLAYER_FLAGS_RESTING);
 }
 
 bool Player::BuildEnumData(PreparedQueryResult result, WorldPacket* data)
@@ -1631,7 +1620,11 @@ void Player::ProcessDelayedOperations()
         SaveToDB(false, false);
 
     if (m_DelayedOperations & DELAYED_SPELL_CAST_DESERTER)
-        CastSpell(this, 26013, true);               // Deserter
+    {
+        Aura* aura = GetAura(26013);
+        if (!aura || aura->GetDuration() <= 900000)
+            CastSpell(this, 26013, true);
+    }
 
     if (m_DelayedOperations & DELAYED_BG_MOUNT_RESTORE)
     {
@@ -2071,7 +2064,7 @@ Creature* Player::GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask)
         return nullptr;
 
     // appropriate npc type
-    if (npcflagmask && !creature->HasFlag(UNIT_NPC_FLAGS, npcflagmask))
+    if (npcflagmask && !creature->HasNpcFlag(NPCFlags(npcflagmask)))
         return nullptr;
 
     // not allow interaction under control, but allow with own pets
@@ -2150,10 +2143,8 @@ void Player::SetInWater(bool apply)
     getHostileRefMgr().updateThreatTables();
 }
 
-bool Player::IsInAreaTriggerRadius(const AreaTrigger* trigger) const
+bool Player::IsInAreaTriggerRadius(AreaTrigger const* trigger, float delta) const
 {
-    static const float delta = 5.0f;
-
     if (!trigger || GetMapId() != trigger->map)
         return false;
 
@@ -2181,8 +2172,8 @@ void Player::SetGameMaster(bool on)
         m_ExtraFlags |= PLAYER_EXTRA_GM_ON;
         if (AccountMgr::IsGMAccount(GetSession()->GetSecurity()))
             SetFaction(FACTION_FRIENDLY);
-        SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_GM);
-        SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
+        SetPlayerFlag(PLAYER_FLAGS_GM);
+        SetUnitFlag2(UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
 
         if (Pet* pet = GetPet())
         {
@@ -2212,8 +2203,8 @@ void Player::SetGameMaster(bool on)
 
         m_ExtraFlags &= ~ PLAYER_EXTRA_GM_ON;
         SetFactionForRace(getRace(true));
-        RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_GM);
-        RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
+        RemovePlayerFlag(PLAYER_FLAGS_GM);
+        RemoveUnitFlag2(UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
 
         if (Pet* pet = GetPet())
         {
@@ -2275,7 +2266,7 @@ bool Player::IsGroupVisibleFor(Player const* p) const
 
 bool Player::IsInSameGroupWith(Player const* p) const
 {
-    return p == this || (GetGroup() != nullptr &&
+    return p == this || (GetGroup() &&
                          GetGroup() == p->GetGroup() &&
                          GetGroup()->SameSubGroup(this, p));
 }
@@ -2346,7 +2337,7 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate, bool isLFGReward)
         return;
     }
 
-    if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_XP_GAIN))
+    if (HasPlayerFlag(PLAYER_FLAGS_NO_XP_GAIN))
     {
         return;
     }
@@ -2652,18 +2643,19 @@ void Player::InitStatsForLevel(bool reapplyMods)
 
     // cleanup unit flags (will be re-applied if need at aura load).
     RemoveFlag(UNIT_FIELD_FLAGS,
-               UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_ATTACKABLE_1 |
-               UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC  | UNIT_FLAG_LOOTING          |
-               UNIT_FLAG_PET_IN_COMBAT  | UNIT_FLAG_SILENCED     | UNIT_FLAG_PACIFIED         |
-               UNIT_FLAG_STUNNED        | UNIT_FLAG_IN_COMBAT    | UNIT_FLAG_DISARMED         |
-               UNIT_FLAG_CONFUSED       | UNIT_FLAG_FLEEING      | UNIT_FLAG_NOT_SELECTABLE   |
-               UNIT_FLAG_SKINNABLE      | UNIT_FLAG_MOUNT        | UNIT_FLAG_TAXI_FLIGHT      );
-    SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);   // must be set
+               UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE  | UNIT_FLAG_NOT_ATTACKABLE_1 |
+               UNIT_FLAG_LOOTING        | UNIT_FLAG_PET_IN_COMBAT | UNIT_FLAG_SILENCED         |
+               UNIT_FLAG_PACIFIED       | UNIT_FLAG_STUNNED       | UNIT_FLAG_IN_COMBAT        |
+               UNIT_FLAG_DISARMED       | UNIT_FLAG_CONFUSED      | UNIT_FLAG_FLEEING          |
+               UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_SKINNABLE     | UNIT_FLAG_MOUNT            |
+               UNIT_FLAG_TAXI_FLIGHT);
+    SetImmuneToAll(false);
+    SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);   // must be set
 
-    SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_REGENERATE_POWER);// must be set
+    SetUnitFlag2(UNIT_FLAG2_REGENERATE_POWER);// must be set
 
     // cleanup player flags (will be re-applied if need at aura load), to avoid have ghost flag without ghost aura, for example.
-    RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_AFK | PLAYER_FLAGS_DND | PLAYER_FLAGS_GM | PLAYER_FLAGS_GHOST | PLAYER_ALLOW_ONLY_ABILITY);
+    RemovePlayerFlag(PLAYER_FLAGS_AFK | PLAYER_FLAGS_DND | PLAYER_FLAGS_GM | PLAYER_FLAGS_GHOST | PLAYER_ALLOW_ONLY_ABILITY);
 
     RemoveStandFlags(UNIT_STAND_FLAGS_ALL);                 // one form stealth modified bytes
     RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP | UNIT_BYTE2_FLAG_SANCTUARY);
@@ -3748,7 +3740,7 @@ void Player::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) c
     {
         for (uint8 i = 0; i < EQUIPMENT_SLOT_END; ++i)
         {
-            if (m_items[i] == nullptr)
+            if (!m_items[i])
                 continue;
 
             m_items[i]->BuildCreateUpdateBlockForPlayer(data, target);
@@ -3756,14 +3748,14 @@ void Player::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) c
 
         for (uint8 i = INVENTORY_SLOT_BAG_START; i < BANK_SLOT_BAG_END; ++i)
         {
-            if (m_items[i] == nullptr)
+            if (!m_items[i])
                 continue;
 
             m_items[i]->BuildCreateUpdateBlockForPlayer(data, target);
         }
         for (uint8 i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; ++i)
         {
-            if (m_items[i] == nullptr)
+            if (!m_items[i])
                 continue;
 
             m_items[i]->BuildCreateUpdateBlockForPlayer(data, target);
@@ -3779,7 +3771,7 @@ void Player::DestroyForPlayer(Player* target, bool onDeath) const
 
     for (uint8 i = 0; i < EQUIPMENT_SLOT_END; ++i) // xinef: previously INVENTORY_SLOT_BAG_END
     {
-        if (m_items[i] == nullptr)
+        if (!m_items[i])
             continue;
 
         m_items[i]->DestroyForPlayer(target);
@@ -3789,14 +3781,14 @@ void Player::DestroyForPlayer(Player* target, bool onDeath) const
     {
         for (uint8 i = INVENTORY_SLOT_BAG_START; i < BANK_SLOT_BAG_END; ++i)
         {
-            if (m_items[i] == nullptr)
+            if (!m_items[i])
                 continue;
 
             m_items[i]->DestroyForPlayer(target);
         }
         for (uint8 i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; ++i)
         {
-            if (m_items[i] == nullptr)
+            if (!m_items[i])
                 continue;
 
             m_items[i]->DestroyForPlayer(target);
@@ -4341,7 +4333,7 @@ void Player::BuildPlayerRepop()
     {
         SetMovement(MOVE_UNROOT);
     }
-    RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE); // BG - remove insignia related
+    RemoveUnitFlag(UNIT_FLAG_SKINNABLE); // BG - remove insignia related
     int32 corpseReclaimDelay = CalculateCorpseReclaimDelay();
     if (corpseReclaimDelay >= 0)
     {
@@ -4370,7 +4362,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
     RemoveAurasDueToSpell(8326);                            // SPELL_AURA_GHOST
 
     if (GetSession()->IsARecruiter() || (GetSession()->GetRecruiterId() != 0))
-        SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_REFER_A_FRIEND);
+        SetDynamicFlag(UNIT_DYNFLAG_REFER_A_FRIEND);
 
     setDeathState(ALIVE);
     SetMovement(MOVE_LAND_WALK);
@@ -4440,9 +4432,9 @@ void Player::KillPlayer()
     StopMirrorTimers();                                     //disable timers(bars)
 
     setDeathState(CORPSE);
-    //SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_IN_PVP);
+    //SetUnitFlag(UNIT_FLAG_NOT_IN_PVP);
 
-    SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_NONE);
+    ReplaceAllDynamicFlags(UNIT_DYNFLAG_NONE);
     ApplyModFlag(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTE_RELEASE_TIMER, !sMapStore.LookupEntry(GetMapId())->Instanceable() && !HasAuraType(SPELL_AURA_PREVENT_RESURRECTION));
 
     // 6 minutes until repop at graveyard
@@ -4506,9 +4498,9 @@ Corpse* Player::CreateCorpse()
     corpse->SetUInt32Value(CORPSE_FIELD_BYTES_2, _cfb2);
 
     uint32 flags = CORPSE_FLAG_UNK2;
-    if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_HELM))
+    if (HasPlayerFlag(PLAYER_FLAGS_HIDE_HELM))
         flags |= CORPSE_FLAG_HIDE_HELM;
-    if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_CLOAK))
+    if (HasPlayerFlag(PLAYER_FLAGS_HIDE_CLOAK))
         flags |= CORPSE_FLAG_HIDE_CLOAK;
 
     // Xinef: Player can loop corpses while in BG or in WG
@@ -4588,6 +4580,11 @@ void Player::SpawnCorpseBones(bool triggerSave /*= true*/)
 Corpse* Player::GetCorpse() const
 {
     return GetMap()->GetCorpseByPlayer(GetGUID());
+}
+
+void Player::SendDurabilityLoss()
+{
+    SendDirectMessage(WorldPackets::Misc::DurabilityDamageDeath().Write());
 }
 
 void Player::DurabilityLossAll(double percent, bool inventory)
@@ -4846,7 +4843,7 @@ void Player::RepopAtGraveyard()
     else if (GetPositionZ() < GetMap()->GetMinHeight(GetPositionX(), GetPositionY()))
         TeleportTo(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, GetOrientation());
 
-    RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_IS_OUT_OF_BOUNDS);
+    RemovePlayerFlag(PLAYER_FLAGS_IS_OUT_OF_BOUNDS);
 }
 
 bool Player::CanJoinConstantChannelInZone(ChatChannelsEntry const* channel, AreaTableEntry const* zone)
@@ -4980,7 +4977,7 @@ float Player::GetMeleeCritFromAgility()
 
     GtChanceToMeleeCritBaseEntry const* critBase  = sGtChanceToMeleeCritBaseStore.LookupEntry(pclass - 1);
     GtChanceToMeleeCritEntry     const* critRatio = sGtChanceToMeleeCritStore.LookupEntry((pclass - 1) * GT_MAX_LEVEL + level - 1);
-    if (critBase == nullptr || critRatio == nullptr)
+    if (!critBase || !critRatio)
         return 0.0f;
 
     float crit = critBase->base + GetStat(STAT_AGILITY) * critRatio->ratio;
@@ -5028,7 +5025,7 @@ void Player::GetDodgeFromAgility(float& diminishing, float& nondiminishing)
 
     // Dodge per agility is proportional to crit per agility, which is available from DBC files
     GtChanceToMeleeCritEntry  const* dodgeRatio = sGtChanceToMeleeCritStore.LookupEntry((pclass - 1) * GT_MAX_LEVEL + level - 1);
-    if (dodgeRatio == nullptr || pclass > MAX_CLASSES)
+    if (!dodgeRatio || pclass > MAX_CLASSES)
         return;
 
     // TODO: research if talents/effects that increase total agility by x% should increase non-diminishing part
@@ -5050,7 +5047,7 @@ float Player::GetSpellCritFromIntellect()
 
     GtChanceToSpellCritBaseEntry const* critBase  = sGtChanceToSpellCritBaseStore.LookupEntry(pclass - 1);
     GtChanceToSpellCritEntry     const* critRatio = sGtChanceToSpellCritStore.LookupEntry((pclass - 1) * GT_MAX_LEVEL + level - 1);
-    if (critBase == nullptr || critRatio == nullptr)
+    if (!critBase || !critRatio)
         return 0.0f;
 
     float crit = critBase->base + GetStat(STAT_INTELLECT) * critRatio->ratio;
@@ -5102,7 +5099,7 @@ float Player::OCTRegenHPPerSpirit()
 
     GtOCTRegenHPEntry     const* baseRatio = sGtOCTRegenHPStore.LookupEntry((pclass - 1) * GT_MAX_LEVEL + level - 1);
     GtRegenHPPerSptEntry  const* moreRatio = sGtRegenHPPerSptStore.LookupEntry((pclass - 1) * GT_MAX_LEVEL + level - 1);
-    if (baseRatio == nullptr || moreRatio == nullptr)
+    if (!baseRatio || !moreRatio)
         return 0.0f;
 
     // Formula from PaperDollFrame script
@@ -5125,7 +5122,7 @@ float Player::OCTRegenMPPerSpirit()
 
     //    GtOCTRegenMPEntry     const* baseRatio = sGtOCTRegenMPStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + level-1);
     GtRegenMPPerSptEntry  const* moreRatio = sGtRegenMPPerSptStore.LookupEntry((pclass - 1) * GT_MAX_LEVEL + level - 1);
-    if (moreRatio == nullptr)
+    if (!moreRatio)
         return 0.0f;
 
     // Formula get from PaperDollFrame script
@@ -6047,7 +6044,7 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
         }
     }
 
-    if (uVictim != nullptr)
+    if (uVictim)
     {
         if (groupsize > 1)
             honor_f /= groupsize;
@@ -6971,7 +6968,7 @@ void Player::ApplyItemEquipSpell(Item* item, bool apply, bool form_change)
             continue;
 
         // Spells that should stay on the caster after removing the item.
-        constexpr std::array<uint32, 1> spellExceptions = { /*Electromagnetic Gigaflux Reactivator*/ 11826 };
+        constexpr std::array<int32, 1> spellExceptions = { /*Electromagnetic Gigaflux Reactivator*/ 11826 };
         const auto found = std::find(std::begin(spellExceptions), std::end(spellExceptions), spellData.SpellId);
 
         // wrong triggering type
@@ -7124,10 +7121,6 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
                 LOG_ERROR("entities.player", "WORLD: unknown Item spellid {}", spellData.SpellId);
                 continue;
             }
-
-            // not allow proc extra attack spell at extra attack
-            if (m_extraAttacks && spellInfo->HasEffect(SPELL_EFFECT_ADD_EXTRA_ATTACKS))
-                return;
 
             float chance = (float)spellInfo->ProcChance;
 
@@ -7551,7 +7544,7 @@ void Player::SendQuestGiverStatusMultiple()
             Creature* questgiver = ObjectAccessor::GetCreatureOrPetOrVehicle(*this, *itr);
             if (!questgiver || questgiver->IsHostileTo(this))
                 continue;
-            if (!questgiver->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER))
+            if (!questgiver->HasNpcFlag(UNIT_NPC_FLAG_QUESTGIVER))
                 continue;
 
             questStatus = GetQuestDialogStatus(questgiver);
@@ -7874,7 +7867,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
         else
         {
             // Xinef: Exploit fix
-            if (!creature->HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE))
+            if (!creature->HasDynamicFlag(UNIT_DYNFLAG_LOOTABLE))
             {
                 SendLootError(guid, LOOT_ERROR_DIDNT_KILL);
                 return;
@@ -7998,7 +7991,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
         loot->AddLooter(GetGUID());
 
         if (loot_type == LOOT_CORPSE && !guid.IsItem())
-            SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOOTING);
+            SetUnitFlag(UNIT_FLAG_LOOTING);
     }
     else
         SendLootError(guid, LOOT_ERROR_DIDNT_KILL);
@@ -8834,7 +8827,7 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
     pet->SetCreatorGUID(GetGUID());
     pet->SetFaction(GetFaction());
     pet->setPowerType(POWER_MANA);
-    pet->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+    pet->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
     pet->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
     pet->InitStatsForLevel(getLevel());
 
@@ -8959,56 +8952,58 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
 
         return;
     }
-
-    pet->CombatStop();
-
-    if (returnreagent)
+    else
     {
-        switch (pet->GetEntry())
+        pet->CombatStop();
+
+        if (returnreagent)
         {
-            //warlock pets except imp are removed(?) when logging out
-            case 1860:
-            case 1863:
-            case 417:
-            case 17252:
-                mode = PET_SAVE_NOT_IN_SLOT;
-                break;
+            switch (pet->GetEntry())
+            {
+                //warlock pets except imp are removed(?) when logging out
+                case 1860:
+                case 1863:
+                case 417:
+                case 17252:
+                    mode = PET_SAVE_NOT_IN_SLOT;
+                    break;
+            }
         }
-    }
 
-    // only if current pet in slot
-    pet->SavePetToDB(mode);
+        // only if current pet in slot
+        pet->SavePetToDB(mode);
 
-    ASSERT(m_petStable->CurrentPet && m_petStable->CurrentPet->PetNumber == pet->GetCharmInfo()->GetPetNumber());
-    if (mode == PET_SAVE_NOT_IN_SLOT)
-    {
-        m_petStable->UnslottedPets.push_back(std::move(*m_petStable->CurrentPet));
-        m_petStable->CurrentPet.reset();
-    }
-    else if (mode == PET_SAVE_AS_DELETED)
-        m_petStable->CurrentPet.reset();
-    // else if (stable slots) handled in opcode handlers due to required swaps
-    // else (current pet) doesnt need to do anything
+        ASSERT(m_petStable->CurrentPet && m_petStable->CurrentPet->PetNumber == pet->GetCharmInfo()->GetPetNumber());
+        if (mode == PET_SAVE_NOT_IN_SLOT)
+        {
+            m_petStable->UnslottedPets.push_back(std::move(*m_petStable->CurrentPet));
+            m_petStable->CurrentPet.reset();
+        }
+        else if (mode == PET_SAVE_AS_DELETED)
+            m_petStable->CurrentPet.reset();
+        // else if (stable slots) handled in opcode handlers due to required swaps
+        // else (current pet) doesnt need to do anything
 
-    SetMinion(pet, false);
+        SetMinion(pet, false);
 
-    pet->AddObjectToRemoveList();
-    pet->m_removed = true;
+        pet->AddObjectToRemoveList();
+        pet->m_removed = true;
 
-    if (pet->isControlled())
-    {
-        WorldPacket data(SMSG_PET_SPELLS, 8);
-        data << uint64(0);
-        GetSession()->SendPacket(&data);
+        if (pet->isControlled())
+        {
+            WorldPacket data(SMSG_PET_SPELLS, 8);
+            data << uint64(0);
+            GetSession()->SendPacket(&data);
 
-        if (GetGroup())
-            SetGroupUpdateFlag(GROUP_UPDATE_PET);
-    }
+            if (GetGroup())
+                SetGroupUpdateFlag(GROUP_UPDATE_PET);
+        }
 
-    if (NeedSendSpectatorData() && pet->GetCreatureTemplate()->family)
-    {
-        ArenaSpectator::SendCommand_UInt32Value(FindMap(), GetGUID(), "PHP", 0);
-        ArenaSpectator::SendCommand_UInt32Value(FindMap(), GetGUID(), "PET", 0);
+        if (NeedSendSpectatorData() && pet->GetCreatureTemplate()->family)
+        {
+            ArenaSpectator::SendCommand_UInt32Value(FindMap(), GetGUID(), "PHP", 0);
+            ArenaSpectator::SendCommand_UInt32Value(FindMap(), GetGUID(), "PET", 0);
+        }
     }
 }
 
@@ -9787,7 +9782,7 @@ void Player::DropModCharge(SpellModifier* mod, Spell* spell)
 
 void Player::SetSpellModTakingSpell(Spell* spell, bool apply)
 {
-    if (apply && m_spellModTakingSpell != nullptr)
+    if (apply && m_spellModTakingSpell)
     {
         LOG_INFO("misc", "Player::SetSpellModTakingSpell (A1) - {}, {}", spell->m_spellInfo->Id, m_spellModTakingSpell->m_spellInfo->Id);
         return;
@@ -9950,7 +9945,7 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
         return false;
     }
 
-    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
+    if (HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         return false;
 
     // taximaster case
@@ -10151,7 +10146,7 @@ void Player::CleanupAfterTaxiFlight()
     }
     m_taxi.ClearTaxiDestinations();        // not destinations, clear source node
     Dismount();
-    RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_TAXI_FLIGHT);
+    RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_TAXI_FLIGHT);
     getHostileRefMgr().setOnlineOfflineState(true);
 }
 
@@ -11041,6 +11036,11 @@ void Player::LeaveBattleground(Battleground* bg)
     // xinef: reset corpse reclaim time
     m_deathExpireTime = GameTime::GetGameTime().count();
 
+    // Remove all dots
+    RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
+    RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
+    RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
+
     // pussywizard: clear movement, because after porting player will move to arena cords
     GetMotionMaster()->MovementExpired();
     StopMoving();
@@ -11224,7 +11224,7 @@ void Player::SetSelection(ObjectGuid guid)
 
 void Player::SetGroup(Group* group, int8 subgroup)
 {
-    if (group == nullptr)
+    if (!group)
         m_group.unlink();
     else
     {
@@ -12215,7 +12215,7 @@ bool Player::HasItemFitToSpellRequirements(SpellInfo const* spellInfo, Item cons
 bool Player::CanNoReagentCast(SpellInfo const* spellInfo) const
 {
     // don't take reagents for spells with SPELL_ATTR5_NO_REAGENT_COST_WITH_AURA
-    if (spellInfo->HasAttribute(SPELL_ATTR5_NO_REAGENT_COST_WITH_AURA) && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREPARATION))
+    if (spellInfo->HasAttribute(SPELL_ATTR5_NO_REAGENT_COST_WITH_AURA) && HasUnitFlag(UNIT_FLAG_PREPARATION))
         return true;
 
     // Check no reagent use mask
@@ -12525,14 +12525,14 @@ void Player::SetClientControl(Unit* target, bool allowMove, bool packetOnly /*= 
     if (target->GetTypeId() != TYPEID_UNIT)
         return;
 
-    if (allowMove && target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
+    if (allowMove && target->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
     {
         target->ClearUnitState(UNIT_STATE_ROOT);
         target->SetControlled(true, UNIT_STATE_ROOT);
     }
     else if (!allowMove && target->HasUnitState(UNIT_STATE_ROOT) && !target->HasUnitTypeMask(UNIT_MASK_ACCESSORY))
     {
-        if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
+        if (target->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         {
             // Xinef: restore original orientation, important for shooting vehicles!
             Position pos = target->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && target->GetTransGUID() && target->GetTransGUID().IsMOTransport() ? target->ToCreature()->GetTransportHomePosition() : target->ToCreature()->GetHomePosition();
@@ -12758,7 +12758,7 @@ void Player::RemoveFromBattlegroundOrBattlefieldRaid()
 
 void Player::SetOriginalGroup(Group* group, int8 subgroup)
 {
-    if (group == nullptr)
+    if (!group)
         m_originalGroup.unlink();
     else
     {
@@ -12821,7 +12821,7 @@ void Player::SetViewpoint(WorldObject* target, bool apply)
 
         if (!AddGuidValue(PLAYER_FARSIGHT, target->GetGUID()))
         {
-            LOG_FATAL("entities.player", "Player::CreateViewpoint: Player {} cannot add new viewpoint!", GetName());
+            LOG_DEBUG("entities.player", "Player::CreateViewpoint: Player {} cannot add new viewpoint!", GetName());
             return;
         }
 
@@ -12841,7 +12841,7 @@ void Player::SetViewpoint(WorldObject* target, bool apply)
 
         if (!RemoveGuidValue(PLAYER_FARSIGHT, target->GetGUID()))
         {
-            LOG_FATAL("entities.player", "Player::CreateViewpoint: Player {} cannot remove current viewpoint!", GetName());
+            LOG_DEBUG("entities.player", "Player::CreateViewpoint: Player {} cannot remove current viewpoint!", GetName());
             return;
         }
 
@@ -13172,7 +13172,7 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
     // Xinef: exploit protection, dont allow to loot normal items if player is not master loot and not below loot threshold
     // Xinef: only quest, ffa and conditioned items
     if (!item->is_underthreshold && loot->roundRobinPlayer && !GetLootGUID().IsItem() && GetGroup() && GetGroup()->GetLootMethod() == MASTER_LOOT && GetGUID() != GetGroup()->GetMasterLooterGuid())
-        if (qitem == nullptr && ffaitem == nullptr && conditem == nullptr)
+        if (!qitem && !ffaitem && !conditem)
         {
             SendLootRelease(GetLootGUID());
             return;
@@ -13874,7 +13874,7 @@ bool Player::CanResummonPet(uint32 spellid)
 
 bool Player::CanSeeSpellClickOn(Creature const* c) const
 {
-    if (!c->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK))
+    if (!c->HasNpcFlag(UNIT_NPC_FLAG_SPELLCLICK))
         return false;
 
     SpellClickInfoMapBounds clickPair = sObjectMgr->GetSpellClickInfoMapBounds(c->GetEntry());
@@ -13897,7 +13897,7 @@ bool Player::CanSeeSpellClickOn(Creature const* c) const
 
 bool Player::CanSeeVendor(Creature const* creature) const
 {
-    if (!creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_VENDOR))
+    if (!creature->HasNpcFlag(UNIT_NPC_FLAG_VENDOR))
         return true;
 
     ConditionList conditions = sConditionMgr->GetConditionsForNpcVendorEvent(creature->GetEntry(), 0);
@@ -14309,7 +14309,7 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         stmt->SetData(index++, GetByteValue(PLAYER_BYTES_2, 0));
         stmt->SetData(index++, GetByteValue(PLAYER_BYTES_2, 2));
         stmt->SetData(index++, GetByteValue(PLAYER_BYTES_2, 3));
-        stmt->SetData(index++, GetUInt32Value(PLAYER_FLAGS));
+        stmt->SetData(index++, (uint32)GetPlayerFlags());
         stmt->SetData(index++, (uint16)GetMapId());
         stmt->SetData(index++, (uint32)GetInstanceId());
         stmt->SetData(index++, (uint8(GetDungeonDifficulty()) | uint8(GetRaidDifficulty()) << 4));
@@ -14340,7 +14340,7 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         stmt->SetData(index++, m_Played_time[PLAYED_TIME_LEVEL]);
         stmt->SetData(index++, finiteAlways(_restBonus));
         stmt->SetData(index++, uint32(GameTime::GetGameTime().count()));
-        stmt->SetData(index++,  (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) ? 1 : 0));
+        stmt->SetData(index++,  (HasPlayerFlag(PLAYER_FLAGS_RESTING) ? 1 : 0));
         //save, far from tavern/city
         //save, but in tavern/city
         stmt->SetData(index++, m_resetTalentsCost);
@@ -14426,7 +14426,7 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         stmt->SetData(index++, GetByteValue(PLAYER_BYTES_2, 0));
         stmt->SetData(index++, GetByteValue(PLAYER_BYTES_2, 2));
         stmt->SetData(index++, GetByteValue(PLAYER_BYTES_2, 3));
-        stmt->SetData(index++, GetUInt32Value(PLAYER_FLAGS));
+        stmt->SetData(index++, GetPlayerFlags());
 
         if (!IsBeingTeleported())
         {
@@ -14479,7 +14479,7 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         stmt->SetData(index++, m_Played_time[PLAYED_TIME_LEVEL]);
         stmt->SetData(index++, finiteAlways(_restBonus));
         stmt->SetData(index++, uint32(GameTime::GetGameTime().count()));
-        stmt->SetData(index++,  (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) ? 1 : 0));
+        stmt->SetData(index++,  (HasPlayerFlag(PLAYER_FLAGS_RESTING) ? 1 : 0));
         //save, far from tavern/city
         //save, but in tavern/city
         stmt->SetData(index++, m_resetTalentsCost);
@@ -14962,7 +14962,7 @@ void Player::SetIsSpectator(bool on)
         m_ExtraFlags |= PLAYER_EXTRA_SPECTATOR_ON;
         AddUnitState(UNIT_STATE_ISOLATED);
         //SetFaction(1100);
-        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
         ResetContestedPvP();
         SetDisplayId(23691);
@@ -14973,7 +14973,7 @@ void Player::SetIsSpectator(bool on)
         if (IsSpectator())
             ClearUnitState(UNIT_STATE_ISOLATED);
         m_ExtraFlags &= ~PLAYER_EXTRA_SPECTATOR_ON;
-        RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         RestoreDisplayId();
 
         if (!IsGameMaster())
@@ -15741,7 +15741,7 @@ void Player::SetRestFlag(RestFlag restFlag, uint32 triggerId /*= 0*/)
     if (!oldRestMask && _restFlagMask) // only set flag/time on the first rest state
     {
         _restTime = GameTime::GetGameTime().count();
-        SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
+        SetPlayerFlag(PLAYER_FLAGS_RESTING);
     }
 
     if (triggerId)
@@ -15756,7 +15756,7 @@ void Player::RemoveRestFlag(RestFlag restFlag)
     if (oldRestMask && !_restFlagMask) // only remove flag/time on the last rest state remove
     {
         _restTime = 0;
-        RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
+        RemovePlayerFlag(PLAYER_FLAGS_RESTING);
     }
 }
 

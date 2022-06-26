@@ -225,7 +225,8 @@ public:
             BossAI::Reset();
             events.Reset();
             summons.DespawnAll();
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_DISABLE_MOVE);
+            me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
+            me->SetImmuneToPC(false);
             me->SetReactState(REACT_PASSIVE);
             secondPhase = false;
             gateOpened = false;
@@ -256,7 +257,7 @@ public:
             events.ScheduleEvent(EVENT_INTRO_2, 4000);
             events.ScheduleEvent(EVENT_INTRO_3, 9000);
             events.ScheduleEvent(EVENT_INTRO_4, 14000);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+            me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE);
             events.ScheduleEvent(EVENT_SUMMON_ADDS, 30000);
             events.ScheduleEvent(EVENT_CHECK_PLAYERS, 120000);
             if (pInstance)
@@ -452,10 +453,10 @@ public:
                     {
                         me->CastSpell(me, SPELL_TELEPORT_LIVE, false);
                     }
-                    me->getThreatMgr().resetAggro(NotOnSameSide(me));
+                    me->GetThreatMgr().resetAggro(NotOnSameSide(me));
                     if (Unit* pTarget = SelectTarget(SelectTargetMethod::MaxDistance, 0))
                     {
-                        me->getThreatMgr().addThreat(pTarget, 100.0f);
+                        me->GetThreatMgr().addThreat(pTarget, 100.0f);
                         AttackStart(pTarget);
                     }
                     events.RepeatEvent(20000);
@@ -485,7 +486,8 @@ public:
                         Talk(EMOTE_PHASE_TWO);
                         me->CastSpell(me, SPELL_TELEPORT_LIVE, false);
                         me->SetReactState(REACT_AGGRESSIVE);
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_DISABLE_MOVE);
+                        me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
+                        me->SetImmuneToPC(false);
                         me->RemoveAllAuras();
                         summons.DoZoneInCombat();
                         events.ScheduleEvent(EVENT_SHADOW_BOLT, 1000);

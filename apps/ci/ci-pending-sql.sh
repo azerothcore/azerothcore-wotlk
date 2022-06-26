@@ -13,7 +13,7 @@ function import() {
     folder="db_"$db
     pendingPath="$AC_PATH_ROOT/data/sql/updates/pending_$folder"
     updPath="$UPDATES_PATH/$folder"
-    archivedPath="$AC_PATH_ROOT/data/sql/archive/$folder/5.x"
+    archivedPath="$AC_PATH_ROOT/data/sql/archive/$folder/6.x"
 
     latestUpd=$(ls -1 $updPath/ | tail -n 1)
 
@@ -43,10 +43,6 @@ function import() {
 
             newVer=$dateToday"_"$cnt
 
-            startTransaction="START TRANSACTION;";
-            updHeader="ALTER TABLE version_db_"$db" CHANGE COLUMN "$oldVer" "$newVer" bit;";
-            endTransaction="COMMIT;";
-
             newFile="$updPath/"$dateToday"_"$cnt".sql"
 
             oldFile=$(basename "$entry")
@@ -61,45 +57,7 @@ function import() {
 
             echo "-- DB update $oldVer -> $newVer" > "$newFile";
 
-            if [[ $isRev -eq 1 ]]; then
-                echo "DROP PROCEDURE IF EXISTS \`updateDb\`;" >> "$newFile";
-                echo "DELIMITER //"  >> "$newFile";
-                echo "CREATE PROCEDURE updateDb ()" >> "$newFile";
-                echo "proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';" >> "$newFile";
-                echo "SELECT COUNT(*) INTO @COLEXISTS"  >> "$newFile";
-                echo "FROM information_schema.COLUMNS" >> "$newFile";
-                echo "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_"$db"' AND COLUMN_NAME = '"$oldVer"';" >> "$newFile";
-                echo "IF @COLEXISTS = 0 THEN LEAVE proc; END IF;" >> "$newFile";
-            fi
-
-            echo "$startTransaction" >> "$newFile";
-            echo "$updHeader" >> "$newFile";
-
-            if [[ $isRev -eq 1 ]]; then
-                echo "SELECT sql_rev INTO OK FROM version_db_"$db" WHERE sql_rev = '$rev'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;" >> "$newFile";
-            fi;
-
-            echo "--" >> "$newFile";
-            echo "-- START UPDATING QUERIES" >> "$newFile";
-            echo "--" >> "$newFile";
-            echo "" >> "$newFile";
-
             cat $entry >> "$newFile";
-
-            echo "" >> "$newFile";
-            echo "--" >> "$newFile";
-            echo "-- END UPDATING QUERIES" >> "$newFile";
-            echo "--" >> "$newFile";
-            echo "UPDATE version_db_"$db" SET date = '"$newVer"' WHERE sql_rev = '"$rev"';" >> "$newFile";
-
-            echo "$endTransaction" >> "$newFile";
-
-            if [[ $isRev -eq 1 ]]; then
-                echo "END //" >> "$newFile";
-                echo "DELIMITER ;" >> "$newFile";
-                echo "CALL updateDb();" >> "$newFile";
-                echo "DROP PROCEDURE IF EXISTS \`updateDb\`;" >> "$newFile";
-            fi;
 
             currentHash="$(git log --diff-filter=A "$entry" | grep "^commit " | sed -e 's/commit //')"
 

@@ -78,6 +78,15 @@ public:
     }
 };
 
+// The cleansing
+enum TurmoilTexts
+{
+    SAY_TURMOIL_0                = 0,
+    SAY_TURMOIL_1                = 1,
+    SAY_TURMOIL_HALF_HP          = 2,
+    SAY_TURMOIL_DEATH            = 3,
+};
+
 class npc_your_inner_turmoil : public CreatureScript
 {
 public:
@@ -89,16 +98,18 @@ public:
 
         uint32 timer;
         short phase;
+        bool health50;
 
         void Reset() override
         {
             timer = 0;
             phase = 0;
+            health50 = false;
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (timer >= 6000 && phase < 4)
+            if (timer >= 6000 && phase < 2)
             {
                 phase++;
                 setphase(phase);
@@ -110,6 +121,26 @@ public:
             DoMeleeAttackIfReady();
         }
 
+        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType  /*damagetype*/, SpellSchoolMask  /*damageSchoolMask*/) override
+        {
+            if (HealthBelowPct(50) && !health50)
+            {
+                WorldObject* summoner = nullptr;
+                if (TempSummon const* tempSummon = me->ToTempSummon())
+                {
+                    summoner = tempSummon->GetSummonerUnit();
+                }
+
+                Talk(SAY_TURMOIL_HALF_HP, summoner);
+                health50 = true;
+            }
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            Talk(SAY_TURMOIL_DEATH, me->ToTempSummon()->GetSummonerUnit()->ToPlayer());
+        }
+
         void setphase(short newPhase)
         {
             Unit* summoner = me->ToTempSummon() ? me->ToTempSummon()->GetSummonerUnit() : nullptr;
@@ -119,16 +150,11 @@ public:
             switch (newPhase)
             {
                 case 1:
-                    me->Whisper("You think that you can get rid of me through meditation?", LANG_UNIVERSAL, summoner->ToPlayer());
+                    Talk(SAY_TURMOIL_0, summoner->ToPlayer());
                     return;
                 case 2:
-                    me->Whisper("Fool! I will destroy you and finally become that which has been building inside of you all these years!", LANG_UNIVERSAL, summoner->ToPlayer());
-                    return;
-                case 3:
-                    me->Whisper("You cannot defeat me. I'm an inseparable part of you!", LANG_UNIVERSAL, summoner->ToPlayer());
-                    return;
-                case 4:
-                    me->Whisper("NOOOOOOOoooooooooo!", LANG_UNIVERSAL, summoner->ToPlayer());
+                {
+                    Talk(SAY_TURMOIL_1, summoner->ToPlayer());
                     me->SetLevel(summoner->getLevel());
                     me->SetFaction(FACTION_MONSTER);
                     if (me->GetExactDist(summoner) < 50.0f)
@@ -137,6 +163,7 @@ public:
                         summoner->CastSpell(me, 50218, true); // clone caster
                         AttackStart(summoner);
                     }
+                }
             }
         }
     };
@@ -310,9 +337,6 @@ public:
 ## npc_razael_and_lyana
 ######*/
 
-#define GOSSIP_RAZAEL_REPORT "High Executor Anselm wants a report on the situation."
-#define GOSSIP_LYANA_REPORT "High Executor Anselm requests your report."
-
 enum Razael
 {
     QUEST_REPORTS_FROM_THE_FIELD = 11221,
@@ -340,7 +364,7 @@ public:
                 case NPC_RAZAEL:
                     if (!player->GetReqKillOrCastCurrentCount(QUEST_REPORTS_FROM_THE_FIELD, NPC_RAZAEL))
                     {
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_RAZAEL_REPORT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                        AddGossipItemFor(player, 8870, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                         SendGossipMenuFor(player, GOSSIP_TEXTID_RAZAEL1, creature->GetGUID());
                         return true;
                     }
@@ -348,7 +372,7 @@ public:
                 case NPC_LYANA:
                     if (!player->GetReqKillOrCastCurrentCount(QUEST_REPORTS_FROM_THE_FIELD, NPC_LYANA))
                     {
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LYANA_REPORT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                        AddGossipItemFor(player, 8879, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                         SendGossipMenuFor(player, GOSSIP_TEXTID_LYANA1, creature->GetGUID());
                         return true;
                     }

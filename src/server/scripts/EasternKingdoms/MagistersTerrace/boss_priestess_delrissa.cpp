@@ -142,7 +142,7 @@ public:
                 me->loot.clear();
                 me->loot.FillLoot(me->GetCreatureTemplate()->lootid, LootTemplates_Creature, me->GetLootRecipient(), false, false, 1, me);
                 instance->SetData(DATA_DELRISSA_EVENT, DONE);
-                me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+                me->SetDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
             }
             ++HelpersKilled;
         }
@@ -194,7 +194,7 @@ public:
                 case EVENT_CHECK_DIST:
                     if (me->GetDistance(me->GetHomePosition()) > 75.0f)
                     {
-                        EnterEvadeMode();
+                        EnterEvadeMode(EVADE_REASON_OTHER);
                         return;
                     }
                     events.ScheduleEvent(EVENT_CHECK_DIST, 5000);
@@ -299,15 +299,15 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
 
     void RecalculateThreat()
     {
-        ThreatContainer::StorageType const& tList = me->getThreatMgr().getThreatList();
+        ThreatContainer::StorageType const& tList = me->GetThreatMgr().getThreatList();
         for( ThreatContainer::StorageType::const_iterator itr = tList.begin(); itr != tList.end(); ++itr )
         {
             Unit* pUnit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
-            if( pUnit && pUnit->GetTypeId() == TYPEID_PLAYER && me->getThreatMgr().getThreat(pUnit) )
+            if( pUnit && pUnit->GetTypeId() == TYPEID_PLAYER && me->GetThreatMgr().getThreat(pUnit) )
             {
                 float threatMod = GetThreatMod(me->GetDistance2d(pUnit), (float)pUnit->GetArmor(), pUnit->GetHealth(), pUnit->GetMaxHealth(), pUnit);
-                me->getThreatMgr().modifyThreatPercent(pUnit, -100);
-                if (HostileReference* ref = me->getThreatMgr().getOnlineContainer().getReferenceByTarget(pUnit))
+                me->GetThreatMgr().modifyThreatPercent(pUnit, -100);
+                if (HostileReference* ref = me->GetThreatMgr().getOnlineContainer().getReferenceByTarget(pUnit))
                     ref->addThreat(10000000.0f * threatMod);
             }
         }
@@ -325,7 +325,7 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
         summons.Summon(summon);
     }
 
-    void EnterEvadeMode() override
+    void EnterEvadeMode(EvadeReason why) override
     {
         if (Creature* delrissa = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_DELRISSA)))
             if (!delrissa->IsAlive())
@@ -333,13 +333,13 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
                 delrissa->Respawn();
                 return;
             }
-        ScriptedAI::EnterEvadeMode();
+        ScriptedAI::EnterEvadeMode(why);
     }
 
     void EnterCombat(Unit* who) override
     {
         if (Creature* delrissa = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_DELRISSA)))
-            if (delrissa->IsAlive() && !delrissa->IsInCombat())
+            if (delrissa->IsAlive() && !delrissa->IsEngaged())
                 delrissa->AI()->AttackStart(who);
 
         events.ScheduleEvent(EVENT_SPELL_HELPER_HEALING_POTION, 1000);
@@ -741,7 +741,7 @@ public:
                 case EVENT_SPELL_BLINK:
                     {
                         bool InMeleeRange = false;
-                        ThreatContainer::StorageType const& t_list = me->getThreatMgr().getThreatList();
+                        ThreatContainer::StorageType const& t_list = me->GetThreatMgr().getThreatList();
                         for (ThreatContainer::StorageType::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
                             if (Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
                                 if (target->IsWithinMeleeRange(me))

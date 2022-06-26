@@ -22,9 +22,15 @@
 #include <iterator>
 
 template <class T>
-class DBCStorageIterator : public std::iterator<std::forward_iterator_tag, T>
+class DBCStorageIterator
 {
 public:
+    using iterator_category = std::forward_iterator_tag;
+    using value_type = T;
+    using difference_type = std::ptrdiff_t;
+    using pointer = T*;
+    using reference = T&;
+
     DBCStorageIterator() : _index(nullptr) { }
     DBCStorageIterator(T** index, uint32 size, uint32 pos = 0) : _index(index), _pos(pos), _end(size)
     {

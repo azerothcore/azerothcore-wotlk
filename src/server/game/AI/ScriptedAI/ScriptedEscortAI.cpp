@@ -70,7 +70,7 @@ void npc_escortAI::AttackStart(Unit* who)
 }
 
 //see followerAI
-bool npc_escortAI::AssistPlayerInCombat(Unit* who)
+bool npc_escortAI::AssistPlayerInCombatAgainst(Unit* who)
 {
     if (!who || !who->GetVictim())
     {
@@ -138,7 +138,7 @@ void npc_escortAI::MoveInLineOfSight(Unit* who)
         return;
 
     if (!me->HasUnitState(UNIT_STATE_STUNNED) && who->isTargetableForAttack(true, me) && who->isInAccessiblePlaceFor(me))
-        if (HasEscortState(STATE_ESCORT_ESCORTING) && AssistPlayerInCombat(who))
+        if (HasEscortState(STATE_ESCORT_ESCORTING) && AssistPlayerInCombatAgainst(who))
             return;
 
     if (me->CanStartAttack(who))
@@ -198,10 +198,10 @@ void npc_escortAI::ReturnToLastPoint()
     me->GetMotionMaster()->MovePoint(POINT_LAST_POINT, x, y, z);
 }
 
-void npc_escortAI::EnterEvadeMode()
+void npc_escortAI::EnterEvadeMode(EvadeReason /*why*/)
 {
     me->RemoveAllAuras();
-    me->DeleteThreatList();
+    me->GetThreatMgr().ClearAllThreat();
     me->CombatStop(true);
     me->SetLootRecipient(nullptr);
 
@@ -215,7 +215,7 @@ void npc_escortAI::EnterEvadeMode()
     {
         me->GetMotionMaster()->MoveTargetedHome();
         if (HasImmuneToNPCFlags)
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToNPC(true);
         Reset();
     }
 }
@@ -496,11 +496,11 @@ void npc_escortAI::Start(bool isActiveAttacker /* = true*/, bool run /* = false 
     }
 
     //disable npcflags
-    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
-    if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
+    me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
+    if (me->IsImmuneToNPC())
     {
         HasImmuneToNPCFlags = true;
-        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        me->SetImmuneToNPC(false);
     }
 
     LOG_DEBUG("scripts.ai", "EscortAI started with {} waypoints. ActiveAttacker = {}, Run = {}, PlayerGUID = {}",

@@ -93,7 +93,8 @@ public:
             ApplyImmunities(true);
             SummonChannelers();
             me->SetReactState(REACT_PASSIVE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->SetImmuneToAll(true);
             if (instance)
                 instance->SetData(DATA_KELIDAN, NOT_STARTED);
         }
@@ -143,7 +144,8 @@ public:
                         return;
                 }
                 me->SetReactState(REACT_AGGRESSIVE);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetImmuneToAll(false);
                 if (Unit* target = me->SelectNearestPlayer(100.0f))
                     AttackStart(target);
             }

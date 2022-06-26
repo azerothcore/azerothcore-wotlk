@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,17 +12,17 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.item_set_names
+-- Dumpar struktur för tabell acore_world.item_set_names
 DROP TABLE IF EXISTS `item_set_names`;
 CREATE TABLE IF NOT EXISTS `item_set_names` (
   `entry` MEDIUMINT unsigned NOT NULL,
-  `name` varchar(255) NOT NULL DEFAULT '',
+  `name` VARCHAR(255) NOT NULL DEFAULT '',
   `InventoryType` TINYINT unsigned NOT NULL DEFAULT 0,
   `VerifiedBuild` SMALLINT DEFAULT 0,
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_world.item_set_names: 2 481 rows
+-- Dumpar data för tabell acore_world.item_set_names: 2 481 rows
 DELETE FROM `item_set_names`;
 /*!40000 ALTER TABLE `item_set_names` DISABLE KEYS */;
 INSERT INTO `item_set_names` (`entry`, `name`, `InventoryType`, `VerifiedBuild`) VALUES

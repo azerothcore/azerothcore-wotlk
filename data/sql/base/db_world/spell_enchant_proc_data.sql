@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.spell_enchant_proc_data
+-- Dumpar struktur för tabell acore_world.spell_enchant_proc_data
 DROP TABLE IF EXISTS `spell_enchant_proc_data`;
 CREATE TABLE IF NOT EXISTS `spell_enchant_proc_data` (
   `entry` INT unsigned NOT NULL,
@@ -20,10 +20,10 @@ CREATE TABLE IF NOT EXISTS `spell_enchant_proc_data` (
   `PPMChance` float NOT NULL DEFAULT 0,
   `procEx` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`entry`),
-  CHECK (`PPMChance` >= 0)
+  CONSTRAINT `spell_enchant_proc_data_chk_1` CHECK ((`PPMChance` >= 0))
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='Spell enchant proc data';
 
--- Дамп данных таблицы acore_world.spell_enchant_proc_data: 42 rows
+-- Dumpar data för tabell acore_world.spell_enchant_proc_data: 42 rows
 DELETE FROM `spell_enchant_proc_data`;
 /*!40000 ALTER TABLE `spell_enchant_proc_data` DISABLE KEYS */;
 INSERT INTO `spell_enchant_proc_data` (`entry`, `customChance`, `PPMChance`, `procEx`) VALUES

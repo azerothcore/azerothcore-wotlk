@@ -228,16 +228,16 @@ public:
             me->SetDisableGravity(false);
             me->CastSpell(me, SPELL_DUAL_WIELD, true);
             me->LoadEquipment(0, true);
-            me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(true);
             beamPosId = urand(0, 3);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
 
             if (Creature* akama = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_AKAMA)))
-                akama->AI()->EnterEvadeMode();
+                akama->AI()->EnterEvadeMode(why);
         }
 
         bool CanAIAttack(Unit const* target) const override
@@ -265,7 +265,7 @@ public:
                 me->SetTarget(summon->GetGUID());
                 me->SetFacingToObject(summon);
                 summon->SetFacingToObject(me);
-                summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                summon->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 summon->SetReactState(REACT_PASSIVE);
                 summon->CastSpell(summon, SPELL_TELEPORT_VISUAL_ONLY, true);
             }
@@ -341,10 +341,9 @@ public:
 
         void JustDied(Unit*  /*killer*/) override
         {
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
             summons.DespawnEntry(NPC_PARASITIC_SHADOWFIEND);
-            instance->SetBossState(DATA_ILLIDAN_STORMRAGE, DONE);
-            instance->SaveToDB();
+            _JustDied();
         }
 
         void KilledUnit(Unit*  /*victim*/) override
@@ -366,7 +365,7 @@ public:
                 if (events.GetNextEventTime(EVENT_FINISH_TRANSFORM))
                     return;
 
-                if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+                if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                 {
                     if (Creature* maiev = summons.GetCreatureWithEntry(NPC_MAIEV_SHADOWSONG))
                     {
@@ -397,7 +396,7 @@ public:
                     }
 
                     events.Reset();
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 }
             }
         }
@@ -462,8 +461,6 @@ public:
                     break;
             }
 
-            EnterEvadeIfOutOfCombatArea();
-
             if (!UpdateVictim())
                 return;
 
@@ -519,7 +516,7 @@ public:
                     {
                         me->CastSpell(me, SPELL_SHADOW_PRISON, true);
                         me->SendMeleeAttackStop(me->GetVictim());
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                         Talk(SAY_ILLIDAN_MAIEV1);
                         events.Reset();
                         events.ScheduleEvent(EVENT_PHASE_5_SCENE1, 9000);
@@ -547,11 +544,11 @@ public:
                     break;
                 case EVENT_PHASE_5_SCENE5:
                     me->SetTarget(me->GetVictim()->GetGUID());
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                     if (Creature* maiev = summons.GetCreatureWithEntry(NPC_MAIEV_SHADOWSONG))
                     {
                         maiev->SetReactState(REACT_AGGRESSIVE);
-                        maiev->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        maiev->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         maiev->AI()->AttackStart(me);
                     }
                     ScheduleNormalEvents(5);
@@ -570,7 +567,7 @@ public:
                         me->SetTarget();
                         me->GetMotionMaster()->Clear();
                         me->StopMovingOnCurrentPos();
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
                         me->SetDisableGravity(true);
 
@@ -621,8 +618,8 @@ public:
                     me->SetDisableGravity(false);
                     break;
                 case EVENT_START_PHASE_3_LAND:
-                    me->getThreatMgr().resetAllAggro();
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->GetThreatMgr().ResetAllThreat();
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->SetTarget(me->GetVictim()->GetGUID());
                     AttackStart(me->GetVictim());
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
@@ -634,7 +631,7 @@ public:
                 // ///////////////////////////
                 case EVENT_PHASE_4_START:
                     me->CastSpell(me, SPELL_DEMON_TRANSFORM_1, true);
-                    me->getThreatMgr().resetAllAggro();
+                    me->GetThreatMgr().ResetAllThreat();
                     me->GetMotionMaster()->MoveChase(me->GetVictim(), 35.0f);
                     events.Reset();
                     events.ScheduleEvent(EVENT_SPELL_SHADOW_BLAST, 11000);
@@ -657,7 +654,7 @@ public:
                     break;
                 case EVENT_REMOVE_DEMON_FORM:
                     me->CastSpell(me, SPELL_DEMON_TRANSFORM_1, true);
-                    me->getThreatMgr().resetAllAggro();
+                    me->GetThreatMgr().ResetAllThreat();
                     events.Reset();
                     if (summons.HasEntry(NPC_MAIEV_SHADOWSONG))
                     {
@@ -697,7 +694,7 @@ public:
                     break;
             }
 
-            if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 DoMeleeAttackIfReady();
         }
 
@@ -796,7 +793,7 @@ public:
         void Reset() override
         {
             me->SetReactState(REACT_AGGRESSIVE);
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->setActive(false);
             me->SetVisible(instance->GetBossState(DATA_ILLIDARI_COUNCIL) == DONE && instance->GetBossState(DATA_ILLIDAN_STORMRAGE) != DONE);
             events.Reset();
@@ -806,7 +803,7 @@ public:
         void sGossipSelect(Player* player, uint32 /*sender*/, uint32  /*action*/) override
         {
             CloseGossipMenuFor(player);
-            me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+            me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
             me->setActive(true);
 
             if (instance->GetBossState(DATA_AKAMA_FINISHED) != DONE)
@@ -835,7 +832,7 @@ public:
         void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
-            summon->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+            summon->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
             if (summon->GetEntry() == NPC_ILLIDARI_ELITE)
             {
                 me->AddThreat(summon, 1000000.0f);
@@ -864,7 +861,7 @@ public:
             }
             else if (pointId == POINT_ILLIDAN)
             {
-                me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP);
                 me->setActive(false);
                 me->SetReactState(REACT_AGGRESSIVE);
             }
@@ -960,7 +957,7 @@ public:
                 case EVENT_AKAMA_SCENE_29:
                     if (Creature* illidan = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ILLIDAN_STORMRAGE)))
                     {
-                        illidan->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        illidan->SetImmuneToAll(false);
                         illidan->SetInCombatWithZone();
                         AttackStart(illidan);
                     }

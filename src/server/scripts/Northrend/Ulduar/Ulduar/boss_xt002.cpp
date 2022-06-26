@@ -91,17 +91,20 @@ enum NPCs
     NPC_PILE_TRIGGER            = 33337,
 };
 
-enum Sounds
+enum Texts
 {
-    XT_SOUND_AGGRO              = 15724,
-    XT_SOUND_HEART_OPEN         = 15725,
-    XT_SOUND_HEART_CLOSED       = 15726,
-    XT_SOUND_TANTARUM           = 15727,
-    XT_SOUND_SLAY1              = 15728,
-    XT_SOUND_SLAY2              = 15729,
-    XT_SOUND_ENRAGE             = 15730,
-    XT_SOUND_DEATH              = 15731,
-    XT_SOUND_SUMMON             = 15732,
+    SAY_AGGRO                   = 0,
+    SAY_HEART_OPENED            = 1,
+    SAY_HEART_CLOSED            = 2,
+    SAY_TYMPANIC_TANTRUM        = 3,
+    SAY_SLAY                    = 4,
+    SAY_BERSERK                 = 5,
+    SAY_DEATH                   = 6,
+    SAY_SUMMON                  = 7,
+    EMOTE_HEART_OPENED          = 8,
+    EMOTE_HEART_CLOSED          = 9,
+    EMOTE_TYMPANIC_TANTRUM      = 10,
+    EMOTE_SCRAPBOT              = 11,
 };
 
 enum Misc
@@ -166,7 +169,7 @@ public:
             _gravityAchievement = true;
 
             me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_STAND); // emerge
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
             me->SetControlled(false, UNIT_STATE_STUNNED);
 
             if (m_pInstance)
@@ -203,8 +206,7 @@ public:
             RescheduleEvents(); // Other events are scheduled here
 
             me->setActive(true);
-            me->Yell("New toys? For me? I promise I won't break them this time!", LANG_UNIVERSAL);
-            me->PlayDirectSound(XT_SOUND_AGGRO);
+            Talk(SAY_AGGRO);
 
             if (m_pInstance)
             {
@@ -223,23 +225,13 @@ public:
         {
             if (victim->GetTypeId() == TYPEID_PLAYER && !urand(0, 2))
             {
-                if (urand(0, 1))
-                {
-                    me->Yell("I... I think I broke it.", LANG_UNIVERSAL);
-                    me->PlayDirectSound(XT_SOUND_SLAY1);
-                }
-                else
-                {
-                    me->Yell("I guess it doesn't bend that way.", LANG_UNIVERSAL);
-                    me->PlayDirectSound(XT_SOUND_SLAY2);
-                }
+                Talk(SAY_SLAY);
             }
         }
 
         void JustDied(Unit* /*killer*/) override
         {
-            me->Yell("You are bad... Toys... Very... Baaaaad!", LANG_UNIVERSAL);
-            me->PlayDirectSound(XT_SOUND_DEATH);
+            Talk(SAY_DEATH);
 
             if (m_pInstance)
             {
@@ -279,7 +271,7 @@ public:
 
                 me->CastSpell(me, SPELL_HEARTBREAK, true);
 
-                me->TextEmote("XT-002 Deconstructor's heart is severed from his body.", nullptr, true);
+                Talk(EMOTE_HEART_CLOSED);
                 events.ScheduleEvent(EVENT_REMOVE_EMOTE, 4000);
                 return;
             }
@@ -329,8 +321,7 @@ public:
                         me->SetControlled(true, UNIT_STATE_STUNNED);
                         me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_SUBMERGED); // submerge with animation
 
-                        me->Yell("So tired. I will rest for just a moment!", LANG_UNIVERSAL);
-                        me->PlayDirectSound(XT_SOUND_HEART_OPEN);
+                        Talk(SAY_HEART_OPENED);
 
                         events.CancelEventGroup(1);
                         events.ScheduleEvent(EVENT_START_SECOND_PHASE, 5000);
@@ -355,22 +346,20 @@ public:
                     events.ScheduleEvent(EVENT_GRAVITY_BOMB, 10000, 1);
                     break;
                 case EVENT_TYMPANIC_TANTARUM:
-                    me->TextEmote("XT-002 Deconstructor begins to cause the earth to quake.", nullptr, true);
-                    me->Yell("NO! NO! NO! NO! NO!", LANG_UNIVERSAL);
-                    me->PlayDirectSound(XT_SOUND_TANTARUM);
+                    Talk(EMOTE_TYMPANIC_TANTRUM);
+                    Talk(SAY_TYMPANIC_TANTRUM);
                     me->CastSpell(me, SPELL_TYMPANIC_TANTARUM, true);
                     events.RepeatEvent(60000);
                     return;
                 case EVENT_ENRAGE:
-                    me->Yell("I'm tired of these toys. I don't want to play anymore!", LANG_UNIVERSAL);
-                    me->PlayDirectSound(XT_SOUND_ENRAGE);
+                    Talk(SAY_BERSERK);
                     me->CastSpell(me, SPELL_XT002_ENRAGE, true);
                     break;
 
                 // Animation events
                 case EVENT_START_SECOND_PHASE:
-                    me->TextEmote("XT-002 Deconstructor's heart is exposed and leaking energy.", nullptr, true);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                    Talk(EMOTE_HEART_OPENED);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                     if (Unit* heart = me->GetVehicleKit() ? me->GetVehicleKit()->GetPassenger(HEART_VEHICLE_SEAT) : nullptr)
                         heart->GetAI()->DoAction(ACTION_AWAKEN_HEART);
 
@@ -383,8 +372,7 @@ public:
                         return;
                     }
 
-                    me->Yell("I'm ready to play!", LANG_UNIVERSAL);
-                    me->PlayDirectSound(XT_SOUND_HEART_CLOSED);
+                    Talk(SAY_HEART_CLOSED);
 
                     me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_STAND); // emerge
                     // Hide heart
@@ -394,7 +382,7 @@ public:
                     events.ScheduleEvent(EVENT_REMOVE_EMOTE, 4000);
                     return;
                 case EVENT_REMOVE_EMOTE:
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                     me->SetControlled(false, UNIT_STATE_STUNNED);
 
                     RescheduleEvents();
@@ -421,7 +409,7 @@ public:
     {
         npc_xt002_heartAI(Creature* pCreature) : PassiveAI(pCreature), summons(me)
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
         }
 
         SummonList summons;
@@ -464,7 +452,7 @@ public:
                 me->SetHealth(me->GetMaxHealth());
                 me->CastSpell(me, SPELL_HEART_OVERLOAD, true);
                 me->CastSpell(me, SPELL_EXPOSED_HEART, false);    // Channeled
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
 
                 if (!summons.HasEntry(NPC_PILE_TRIGGER))
                     SummonPiles();
@@ -477,7 +465,7 @@ public:
                         pXT002->AI()->DoAction(_damageDone);
                         _damageDone = 0;
                     }
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
             }
         }
 
@@ -544,7 +532,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE))
+            if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE))
             {
                 _timerSpawn += diff;
                 if (_timerSpawn >= 1900)
@@ -619,7 +607,7 @@ public:
                     }
 
                     if (!urand(0, 2))
-                        me->TextEmote("XT-002 Deconstructor consumes scrap bot to repair himself.", nullptr, true);
+                        pXT002->AI()->Talk(EMOTE_SCRAPBOT);
 
                     me->DespawnOrUnsummon(1);
                 }

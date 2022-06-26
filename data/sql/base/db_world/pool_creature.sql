@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,19 +12,19 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_world.pool_creature
+-- Dumpar struktur för tabell acore_world.pool_creature
 DROP TABLE IF EXISTS `pool_creature`;
 CREATE TABLE IF NOT EXISTS `pool_creature` (
   `guid` INT unsigned NOT NULL DEFAULT 0,
   `pool_entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `chance` float NOT NULL DEFAULT 0,
-  `description` varchar(255) DEFAULT NULL,
+  `description` VARCHAR(255) DEFAULT NULL,
   PRIMARY KEY (`guid`),
   KEY `idx_guid` (`guid`),
-  CHECK (`chance` >= 0)
+  CONSTRAINT `pool_creature_chk_1` CHECK ((`chance` >= 0))
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы acore_world.pool_creature: 971 rows
+-- Dumpar data för tabell acore_world.pool_creature: 972 rows
 DELETE FROM `pool_creature`;
 /*!40000 ALTER TABLE `pool_creature` DISABLE KEYS */;
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES
@@ -55,7 +55,6 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALU
 	(28407, 1005, 0, 'Vultros (462) - Spawn 1'),
 	(28408, 1008, 0, 'Fenros (507) - Spawn 1'),
 	(28411, 1010, 0, 'Lupos (521) - Spawn 1'),
-	(28458, 1004, 0, 'Leprithus (572) - Spawn 1'),
 	(28459, 1013, 0, 'Kazon (584) - Spawn 1'),
 	(28480, 1015, 0, 'Rohh the Silent (947) - Spawn 1'),
 	(31806, 1012, 0, 'Chatter (616) - Spawn 1'),
@@ -148,10 +147,6 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALU
 	(134015, 1003, 10, 'Or\'Kalar (2773) - Spawn 3'),
 	(134014, 1003, 10, 'Or\'Kalar (2773) - Spawn 2'),
 	(14616, 1003, 50, 'Or\'Kalar (2773) - Spawn 1'),
-	(134020, 1004, 0, 'Leprithus (572) - Spawn 2'),
-	(134021, 1004, 0, 'Leprithus (572) - Spawn 3'),
-	(134022, 1004, 0, 'Leprithus (572) - Spawn 4'),
-	(134023, 1004, 0, 'Leprithus (572) - Spawn 5'),
 	(134024, 1005, 0, 'Vultros (462) - Spawn 2'),
 	(134025, 1005, 0, 'Vultros (462) - Spawn 3'),
 	(134026, 1005, 0, 'Vultros (462) - Spawn 4'),
@@ -998,7 +993,13 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALU
 	(24183, 389, 0, 'Un\'Goro Develsaur Center Pool 1 of 2'),
 	(24184, 389, 0, 'Un\'Goro Develsaur Center Pool 2 of 2'),
 	(24185, 390, 0, 'Un\'Goro Develsaur West Pool 1 of 2'),
-	(24186, 390, 0, 'Un\'Goro Develsaur West Pool 2 of 2');
+	(24186, 390, 0, 'Un\'Goro Develsaur West Pool 2 of 2'),
+	(86300, 86300, 0, 'Sewer Beast (86300)'),
+	(86301, 86300, 0, 'Sewer Beast (86301)'),
+	(300492, 86300, 0, 'Sewer Beast (300492)'),
+	(300493, 86300, 0, 'Sewer Beast (300493)'),
+	(300494, 86300, 0, 'Sewer Beast (300494)'),
+	(300495, 86300, 0, 'Sewer Beast (300495)');
 /*!40000 ALTER TABLE `pool_creature` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

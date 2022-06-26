@@ -523,7 +523,7 @@ public:
             return false;
         }
 
-        creature->SetUInt32Value(UNIT_NPC_FLAGS, NPCFlags(npcFlags));
+        creature->ReplaceAllNpcFlags(NPCFlags(npcFlags));
 
         WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_NPCFLAG);
 
@@ -588,7 +588,7 @@ public:
 
         CreatureTemplate const* cInfo = target->GetCreatureTemplate();
         uint32 faction = target->GetFaction();
-        uint32 npcflags = target->GetUInt32Value(UNIT_NPC_FLAGS);
+        uint32 npcflags = target->GetNpcFlags();
         uint32 mechanicImmuneMask = cInfo->MechanicImmuneMask;
         uint32 spellSchoolImmuneMask = cInfo->SpellSchoolImmuneMask;
         uint32 displayid = target->GetDisplayId();
@@ -614,7 +614,7 @@ public:
         handler->PSendSysMessage(LANG_NPCINFO_LEVEL, target->getLevel());
         handler->PSendSysMessage(LANG_NPCINFO_EQUIPMENT, target->GetCurrentEquipmentId(), target->GetOriginalEquipmentId());
         handler->PSendSysMessage(LANG_NPCINFO_HEALTH, target->GetCreateHealth(), target->GetMaxHealth(), target->GetHealth());
-        handler->PSendSysMessage(LANG_NPCINFO_FLAGS, target->GetUInt32Value(UNIT_FIELD_FLAGS), target->GetUInt32Value(UNIT_FIELD_FLAGS_2), target->GetUInt32Value(UNIT_DYNAMIC_FLAGS), target->GetFaction());
+        handler->PSendSysMessage(LANG_NPCINFO_FLAGS, target->GetUnitFlags(), target->GetUnitFlags2(), target->GetDynamicFlags(), target->GetFaction());
         handler->PSendSysMessage(LANG_COMMAND_RAWPAWNTIMES, defRespawnDelayStr.c_str(), curRespawnDelayStr.c_str());
         handler->PSendSysMessage(LANG_NPCINFO_LOOT,  cInfo->lootid, cInfo->pickpocketLootId, cInfo->SkinLootId);
         handler->PSendSysMessage(LANG_NPCINFO_DUNGEON_ID, target->GetInstanceId());
@@ -987,11 +987,36 @@ public:
     }
 
     //spawn time handling
-    static bool HandleNpcSetSpawnTimeCommand(ChatHandler* handler, uint32 spawnTime)
+    static bool HandleNpcSetSpawnTimeCommand(ChatHandler* handler, std::string spawnTimeStr)
     {
+        if (spawnTimeStr.empty())
+        {
+            return false;
+        }
+
+        if (Acore::StringTo<int32>(spawnTimeStr).value_or(0) < 0)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
         Creature* creature = handler->getSelectedCreature();
         if (!creature)
             return false;
+
+        int32 spawnTime = TimeStringToSecs(spawnTimeStr);
+        if (spawnTime <= 0)
+        {
+            spawnTime = Acore::StringTo<int32>(spawnTimeStr).value_or(0);
+        }
+
+        if (spawnTime <= 0)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
 
         WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_SPAWN_TIME_SECS);
         stmt->SetData(0, spawnTime);
@@ -999,7 +1024,7 @@ public:
         WorldDatabase.Execute(stmt);
 
         creature->SetRespawnDelay(spawnTime);
-        handler->PSendSysMessage(LANG_COMMAND_SPAWNTIME, spawnTime);
+        handler->PSendSysMessage(LANG_COMMAND_SPAWNTIME, secsToTimeString(spawnTime, true).c_str());
 
         return true;
     }

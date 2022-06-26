@@ -146,7 +146,7 @@ public:
             morlenGUID.Clear();
             summons.DespawnAll();
             if (Creature* c = me->FindNearestCreature(NPC_THALORIEN_REMAINS, 100.0f, true))
-                c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             events.Reset();
             events.ScheduleEvent(EVENT_CHECK_PLAYER, 5000);
             events.ScheduleEvent(EVENT_SUMMON_SOLDIERS, 0);
@@ -215,7 +215,7 @@ public:
             {
                 damage = 0;
                 me->setActive(false);
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
             }
         }
 
@@ -243,7 +243,7 @@ public:
                             break;
                         }
                     me->setActive(false);
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     return;
                 case EVENT_SUMMON_SOLDIERS:
                     for (uint8 i = 0; i < SUNWELL_DEFENDER_NUM; ++i)
@@ -372,7 +372,7 @@ public:
                                 continue;
                             else
                                 c->AI()->Talk(SAY_MORLEN_4);
-                            c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                            c->SetImmuneToAll(false);
                             c->AI()->AttackStart(me);
                         }
                     break;
@@ -393,7 +393,7 @@ public:
                 case EVENT_DISAPPEAR:
                     me->SetVisible(false);
                     me->setActive(false);
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_SET_FACING:
                     me->SetFacingTo(2.45f);
@@ -425,11 +425,11 @@ public:
                 events.ScheduleEvent(EVENT_SET_FACING, 0);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (me->isActiveObject())
                 return;
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void SetData(uint32 type, uint32 id) override
@@ -611,7 +611,7 @@ public:
                     if (Creature* c = me->FindNearestCreature(NPC_SUNWELL_VISUAL_BUNNY, 60.0f, true))
                         c->DespawnOrUnsummon(1);
                     if (GameObject* go = me->FindNearestGameObject(GO_QUEL_DELAR, 60.0f))
-                        go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     me->SetWalk(true);
                     if (me->GetCreatureData())
                         me->GetMotionMaster()->MovePoint(0, me->GetCreatureData()->posX, me->GetCreatureData()->posY, me->GetCreatureData()->posZ);

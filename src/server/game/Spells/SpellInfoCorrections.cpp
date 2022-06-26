@@ -244,7 +244,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         48108,  // Hot Streak
         51124,  // Killing Machine
         54741,  // Firestarter
-        57761,  // Fireball!
         64823,  // Item - Druid T8 Balance 4P Bonus
         34477,  // Misdirection
         44401,  // Missile Barrage
@@ -252,6 +251,13 @@ void SpellMgr::LoadSpellInfoCorrections()
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->ProcCharges = 1;
+    });
+
+    // Fireball
+    ApplySpellFix({ 57761 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ProcCharges = 1;
+        spellInfo->SpellPriority = 50;
     });
 
     // Tidal Wave
@@ -910,6 +916,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->SpellLevel = 0;
         spellInfo->BaseLevel = 0;
         spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(5); // 40yd
     });
 
     // Earth Shield
@@ -1193,13 +1200,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER_AREA_PARTY);
     });
 
-    // Shadow Weaving
-    ApplySpellFix({ 15257, 15331, 15332 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
-        spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_PROC_TRIGGER_SPELL;
-    });
-
     // Hymn of Hope
     ApplySpellFix({ 64904 }, [](SpellInfo* spellInfo)
     {
@@ -1361,6 +1361,18 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 49099 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].Amplitude = 15000;
+    });
+
+    // Threatening Gaze
+    ApplySpellFix({ 24314 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CAST;
+    });
+
+    // Frightening Shout
+    ApplySpellFix({ 19134 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
     });
 
     // Isle of Conquest
@@ -3666,8 +3678,8 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].BasePoints = 0;
     });
 
-    // Krolmir, Hammer of Storms (13010)
-    ApplySpellFix({ 56606, 56541 }, [](SpellInfo* spellInfo)
+    // Riding Jokkum
+    ApplySpellFix({ 56606 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].BasePoints = 1;
     });
@@ -4160,14 +4172,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(152); // 150 yards
     });
 
-    // Shadowbolt Volley
-    ApplySpellFix({ 22665 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(152); // 150 yards
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(41); // 150 yards
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
-    });
-
     // Manastorm
     ApplySpellFix({ 21097 }, [](SpellInfo* spellInfo)
     {
@@ -4224,12 +4228,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx |= SPELL_ATTR1_EXCLUDE_CASTER;
     });
 
-    // Suppression Aura
-    ApplySpellFix({ 22247 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
-    });
-
     // Cosmetic - Lightning Beam Channel
     ApplySpellFix({ 45537 }, [](SpellInfo* spellInfo)
     {
@@ -4241,6 +4239,60 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->Effects[EFFECT_0].BasePoints = 4374;
         spellInfo->Effects[EFFECT_0].DieSides = 1250;
+    });
+
+    // Explosion - Razorgore
+    ApplySpellFix({ 20038 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_50000_YARDS);
+        spellInfo->Attributes |= SPELL_ATTR0_NO_IMMUNITIES;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
+    });
+
+    // Brood Power : Bronze
+    ApplySpellFix({ 22311 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_CASTER_PROCS;
+    });
+
+    // Rapture
+    ApplySpellFix({ 63652, 63653, 63654, 63655 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+    });
+
+    // Everlasting Affliction
+    ApplySpellFix({ 47422 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->SchoolMask = SPELL_SCHOOL_MASK_SHADOW;
+    });
+
+    // Flametongue Weapon (Passive) (Rank 6)
+    ApplySpellFix({ 16312 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;
+        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21);
+    });
+
+    // Mana Tide Totem
+    // Cleansing Totem Effect
+    ApplySpellFix({ 39609, 52025 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(5); // 40yd
+    });
+
+    // Increased Totem Radius
+    ApplySpellFix({ 21895 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[0].SpellClassMask = flag96(0x0603E000, 0x00200100);
+    });
+
+    // Jokkum Summon
+    ApplySpellFix({ 56541 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].MiscValueB = 844;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

@@ -218,6 +218,8 @@ enum WintergraspNpcs
     NPC_QUEST_SOUTHERN_TOWER_KILL                   = 35074,
     NPC_QUEST_VEHICLE_PROTECTED                     = 31284,
     NPC_QUEST_PVP_KILL_VEHICLE                      = 31093,
+    NPC_QUEST_PVP_KILL_HORDE                        = 39019,
+    NPC_QUEST_PVP_KILL_ALLIANCE                     = 31086,
 };
 
 struct BfWGCoordGY
@@ -523,7 +525,11 @@ enum WintergraspWorldstates
     WORLDSTATE_WORKSHOP_SE = 3703,
     WORLDSTATE_WORKSHOP_SW = 3702,
     WORLDSTATE_WORKSHOP_K_W = 3698,
-    WORLDSTATE_WORKSHOP_K_E = 3699
+    WORLDSTATE_WORKSHOP_K_E = 3699,
+    WORLDSTATE_HORDE_KEEP_CAPTURED = 4022,
+    WORLDSTATE_HORDE_KEEP_DEFENDED = 4024,
+    WORLDSTATE_ALLIANCE_KEEP_CAPTURED = 4023,
+    WORLDSTATE_ALLIANCE_KEEP_DEFENDED = 4025,
 };
 
 // TODO: Handle this with creature_text ?
@@ -1204,7 +1210,7 @@ struct BfWGGameObjectBuilding
             case BATTLEFIELD_WG_OBJECTTYPE_DOOR_LAST:
                 m_WG->SetRelicInteractible(true);
                 if (GameObject* go = m_WG->GetRelic())
-                    go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                    go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                 else
                     LOG_ERROR("bg.battlefield", "BattlefieldWG: Relic not found.");
                 break;

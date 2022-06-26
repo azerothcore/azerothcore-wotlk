@@ -221,7 +221,7 @@ public:
 
     [[nodiscard]] Unit* GetOwner() const { return iOwner; }
 
-    Unit* getHostilTarget();
+    Unit* getHostileTarget();
 
     void tauntApply(Unit* taunter);
     void tauntFadeOut(Unit* taunter);
@@ -232,6 +232,11 @@ public:
 
     // Reset all aggro without modifying the threadlist.
     void resetAllAggro();
+
+    // -- compatibility layer for combat rewrite
+    void ResetAllThreat() { resetAllAggro(); }
+
+    void ClearAllThreat();
 
     // Reset all aggro of unit in threadlist satisfying the predicate.
     template<class PREDICATE> void resetAggro(PREDICATE predicate)

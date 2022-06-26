@@ -264,7 +264,7 @@ void ChaseMovementGenerator<T>::MovementInform(T* owner)
 static Optional<float> GetVelocity(Unit* owner, Unit* target, G3D::Vector3 const& dest, bool playerPet)
 {
     Optional<float> speed = {};
-    if (!owner->IsInCombat() && !owner->IsVehicle() && !owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED) &&
+    if (!owner->IsInCombat() && !owner->IsVehicle() && !owner->HasUnitFlag(UNIT_FLAG_POSSESSED) &&
         (owner->IsPet() || owner->IsGuardian() || owner->GetGUID() == target->GetCritterGUID() || owner->GetCharmerOrOwnerGUID() == target->GetGUID()))
     {
         UnitMoveType moveType = Movement::SelectSpeedType(target->GetUnitMovementFlags());
@@ -453,11 +453,10 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         else
             i_path->Clear();
 
-        float distance = _range - target->GetCombatReach();
+        target->MovePositionToFirstCollision(targetPosition, owner->GetCombatReach() + _range, target->ToAbsoluteAngle(_angle.RelativeAngle) - target->GetOrientation());
 
-        float relAngle = _angle.RelativeAngle;
         float x, y, z;
-        target->GetNearPoint(owner, x, y, z, owner->GetCombatReach(), distance, target->ToAbsoluteAngle(relAngle), 0.f, &targetPosition);
+        targetPosition.GetPosition(x, y, z);
 
         if (owner->IsHovering())
             owner->UpdateAllowedPositionZ(x, y, z);

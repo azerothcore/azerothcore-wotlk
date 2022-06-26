@@ -94,11 +94,11 @@ public:
                 instance->SetData(DATA_BLACKHEARTTHEINCITEREVENT, IN_PROGRESS);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (InciteChaos && SelectTargetFromPlayerList(100.0f))
                 return;
-            CreatureAI::EnterEvadeMode();
+            CreatureAI::EnterEvadeMode(why);
         }
 
         void UpdateAI(uint32 diff) override
@@ -116,7 +116,7 @@ public:
                     {
                         me->CastSpell(me, SPELL_INCITE_CHAOS, false);
 
-                        std::list<HostileReference*> t_list = me->getThreatMgr().getThreatList();
+                        std::list<HostileReference*> t_list = me->GetThreatMgr().getThreatList();
                         for (std::list<HostileReference*>::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
                         {
                             Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());

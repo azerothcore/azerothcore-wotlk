@@ -19,7 +19,7 @@
 #define ACORE_SHAREDDEFINES_H
 
 #include "Define.h"
-#include "DetourNavMesh.h"
+#include "EnumFlag.h"
 #include <cassert>
 
 float const GROUND_HEIGHT_TOLERANCE = 0.05f; // Extra tolerance to z position to check if it is in air or on ground.
@@ -1570,7 +1570,7 @@ enum GameobjectTypes
 #define MAX_GAMEOBJECT_TYPE                  36             // sending to client this or greater value can crash client.
 #define MAX_GAMEOBJECT_DATA                  24             // Max number of uint32 vars in gameobject_template data field
 
-enum GameObjectFlags
+enum GameObjectFlags : uint32
 {
     GO_FLAG_IN_USE          = 0x00000001,                   // disables interaction while animated
     GO_FLAG_LOCKED          = 0x00000002,                   // require key, spell, event, etc to be opened. Makes "Locked" appear in tooltip
@@ -1582,6 +1582,8 @@ enum GameObjectFlags
     GO_FLAG_DAMAGED         = 0x00000200,
     GO_FLAG_DESTROYED       = 0x00000400,
 };
+
+DEFINE_ENUM_FLAG(GameObjectFlags);
 
 enum GameObjectDynamicLowFlags
 {
@@ -3279,6 +3281,11 @@ enum SummonType
 enum EventId
 {
     EVENT_CHARGE            = 1003,
+
+    /// Special charge event which is used for charge spells that have explicit targets
+    /// and had a path already generated - using it in PointMovementGenerator will not
+    /// create a new spline and launch it
+    EVENT_CHARGE_PREPATH    = 1005,
 };
 
 enum ResponseCodes

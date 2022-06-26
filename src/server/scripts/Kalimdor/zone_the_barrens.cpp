@@ -178,7 +178,7 @@ public:
         void DoFriend()
         {
             me->RemoveAllAuras();
-            me->DeleteThreatList();
+            me->GetThreatMgr().ClearAllThreat();
             me->CombatStop(true);
 
             me->StopMoving();
@@ -306,10 +306,10 @@ public:
 
         void EnterCombat(Unit* /*who*/) override { }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             CleanUp();
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void CleanUp()
@@ -343,7 +343,7 @@ public:
                 Player* pWarrior = ObjectAccessor::GetPlayer(*me, PlayerGUID);
                 if (!pWarrior || me->GetDistance2d(pWarrior) >= 200.0f)
                 {
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     return;
                 }
 
@@ -351,7 +351,7 @@ public:
                 {
                     Talk(SAY_TWIGGY_FLATHEAD_DOWN);
                     pWarrior->FailQuest(1719);
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     return;
                 }
 
@@ -371,8 +371,8 @@ public:
                             if (!creature)
                                 continue;
                             creature->SetFaction(FACTION_FRIENDLY);
-                            creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                            creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            creature->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                            creature->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             creature->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
                             AffrayChallenger[i] = creature->GetGUID();
                         }
@@ -409,8 +409,8 @@ public:
                             Creature* creature = ObjectAccessor::GetCreature(*me, AffrayChallenger[Wave]);
                             if (creature && creature->IsAlive())
                             {
-                                creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                                creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                creature->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                                creature->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                                 creature->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
                                 creature->SetFaction(FACTION_MONSTER);
                                 creature->AI()->AttackStart(pWarrior);
@@ -435,13 +435,13 @@ public:
                             if (!creature || !creature->IsAlive())
                             {
                                 Talk(SAY_TWIGGY_FLATHEAD_OVER);
-                                EnterEvadeMode();
+                                EnterEvadeMode(EVADE_REASON_OTHER);
                                 return;
                             }
                             else // Makes BIG WILL attackable.
                             {
-                                creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                                creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                creature->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                                creature->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                                 creature->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
                                 creature->SetFaction(FACTION_MONSTER);
                                 creature->AI()->AttackStart(pWarrior);
