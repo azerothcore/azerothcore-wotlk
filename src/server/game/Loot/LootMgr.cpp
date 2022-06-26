@@ -145,8 +145,8 @@ uint32 LootStore::LoadLootTable()
     // Clearing store (for reloading case)
     Clear();
 
-    //                                                  0     1            2               3         4         5             6
-    QueryResult result = WorldDatabase.Query("SELECT Entry, Item, Reference, Chance, QuestRequired, LootMode, GroupId, MinCount, MaxCount FROM {}", GetName());
+    //                                                  0     1      2          3         4            5          6      7         8          9
+    QueryResult result = WorldDatabase.Query("SELECT Entry, Item, Reference, Chance, QuestRequired, LootMode, GroupId, MinCount, MaxCount, ReqLevel FROM {}", GetName());
 
     if (!result)
         return 0;
@@ -166,6 +166,7 @@ uint32 LootStore::LoadLootTable()
         uint8  groupid             = fields[6].Get<uint8>();
         int32  mincount            = fields[7].Get<uint8>();
         int32  maxcount            = fields[8].Get<uint8>();
+        int8   reqlevel            = fields[9].Get<int8>();
 
         if (maxcount > std::numeric_limits<uint8>::max())
         {
@@ -179,7 +180,7 @@ uint32 LootStore::LoadLootTable()
             lootmode = 1;
         }
 
-        LootStoreItem* storeitem = new LootStoreItem(item, reference, chance, needsquest, lootmode, groupid, mincount, maxcount);
+        LootStoreItem* storeitem = new LootStoreItem(item, reference, chance, needsquest, lootmode, groupid, mincount, maxcount, reqlevel);
 
         if (!storeitem->IsValid(*this, entry))            // Validity checks
         {
@@ -564,7 +565,8 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
     items.reserve(MAX_NR_LOOT_ITEMS);
     quest_items.reserve(MAX_NR_QUEST_ITEMS);
 
-    tab->Process(*this, store, lootMode, lootOwner);          // Processing is done there, callback via Loot::AddItem()
+    Creature* creature = lootSource->ToCreature();
+    tab->Process(*this, store, lootMode, lootOwner, 0, creature ? creature : nullptr);          // Processing is done there, callback via Loot::AddItem()
 
     sScriptMgr->OnAfterLootTemplateProcess(this, tab, store, lootOwner, personal, noEmptyError, lootMode);
 
@@ -1646,7 +1648,7 @@ bool LootTemplate::CopyConditions(LootItem* li, uint32 conditionLootId) const
 }
 
 // Rolls for every item in the template and adds the rolled items the the loot
-void LootTemplate::Process(Loot& loot, LootStore const& store, uint16 lootMode, Player const* player, uint8 groupId) const
+void LootTemplate::Process(Loot& loot, LootStore const& store, uint16 lootMode, Player const* player, uint8 groupId, Creature* creature) const
 {
     bool rate = store.IsRatesAllowed();
 
@@ -1666,6 +1668,10 @@ void LootTemplate::Process(Loot& loot, LootStore const& store, uint16 lootMode, 
     for (LootStoreItemList::const_iterator i = Entries.begin(); i != Entries.end(); ++i)
     {
         LootStoreItem* item = *i;
+        if (creature && item->reqlevel > 0 && creature->getLevel() < item->reqlevel) // The creature is not a high enough level to drop this item
+            continue;
+        if (creature && item->reqlevel < 0 && creature->getLevel() > item->reqlevel) // The creature is too high a level to drop this item
+            continue;
         if (!(item->lootmode & lootMode))                         // Do not add if mode mismatch
             continue;
 

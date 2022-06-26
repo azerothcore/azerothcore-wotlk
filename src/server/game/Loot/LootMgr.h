@@ -135,13 +135,14 @@ struct LootStoreItem
     uint8   groupid     : 7;
     uint8   mincount;                                       // mincount for drop items
     uint8   maxcount;                                       // max drop count for the item mincount or Ref multiplicator
+    int8    reqlevel;                                          // minimum level (positive) or maximum level (negative) of creature required for items to drop
     ConditionList conditions;                               // additional loot condition
 
     // Constructor
     // displayid is filled in IsValid() which must be called after
-    LootStoreItem(uint32 _itemid, int32 _reference, float _chance, bool _needs_quest, uint16 _lootmode, uint8 _groupid, int32 _mincount, uint8 _maxcount)
+    LootStoreItem(uint32 _itemid, int32 _reference, float _chance, bool _needs_quest, uint16 _lootmode, uint8 _groupid, int32 _mincount, uint8 _maxcount, int8 _reqlevel)
         : itemid(_itemid), reference(_reference), chance(_chance), needs_quest(_needs_quest),
-          lootmode(_lootmode), groupid(_groupid), mincount(_mincount), maxcount(_maxcount)
+          lootmode(_lootmode), groupid(_groupid), mincount(_mincount), maxcount(_maxcount), reqlevel(_reqlevel)
     {}
 
     bool Roll(bool rate, Player const* player, Loot& loot, LootStore const& store) const;                             // Checks if the entry takes it's chance (at loot generation)
@@ -253,7 +254,7 @@ public:
     // Adds an entry to the group (at loading stage)
     void AddEntry(LootStoreItem* item);
     // Rolls for every item in the template and adds the rolled items the the loot
-    void Process(Loot& loot, LootStore const& store, uint16 lootMode, Player const* player, uint8 groupId = 0) const;
+    void Process(Loot& loot, LootStore const& store, uint16 lootMode, Player const* player, uint8 groupId = 0, Creature* creature = nullptr) const;
     void CopyConditions(ConditionList conditions);
     bool CopyConditions(LootItem* li, uint32 conditionLootId = 0) const;
 
