@@ -204,11 +204,12 @@ public:
         {
             me->RemoveAllAuras();
             me->CombatStop(true);
-            me->GetThreatMgr().NotifyDisengaged();
             me->LoadCreaturesAddon(true);
             if (me->IsAlive())
                 me->GetMotionMaster()->MoveTargetedHome();
             me->SetLootRecipient(nullptr);
+
+            EngagementOver();
         }
 
         void UpdateAI(uint32 diff) override

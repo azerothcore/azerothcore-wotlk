@@ -224,14 +224,11 @@ void CombatMgr::InheritCombatStatesFrom(Unit const* who)
     }
     for (auto& ref : mgr._pvpRefs)
     {
-        if (!IsInCombatWith(ref.first))
-        {
-            Unit* target = ref.second->GetOther(who);
-            if ((_owner->IsImmuneToPC() && target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED)) ||
-                (_owner->IsImmuneToNPC() && !target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED)))
+        Unit* target = ref.second->GetOther(who);
+        if ((_owner->IsImmuneToPC() && target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED)) ||
+            (_owner->IsImmuneToNPC() && !target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED)))
                 continue;
-            SetInCombatWith(target);
-        }
+        SetInCombatWith(target);
     }
 }
 
@@ -322,13 +319,8 @@ void CombatMgr::EndAllPvPCombat()
 
 /*static*/ void CombatMgr::NotifyAICombat(Unit* me, Unit* other)
 {
-    if (!me->IsAIEnabled)
-        return;
-    me->GetAI()->JustEnteredCombat(other);
-
-    if (Creature* cMe = me->ToCreature())
-        if (!cMe->CanHaveThreatList())
-            cMe->AI()->EnterCombat(other);
+    if (UnitAI* ai = me->GetAI())
+        ai->JustEnteredCombat(other);
 }
 
 void CombatMgr::PutReference(ObjectGuid const& guid, CombatReference* ref)
@@ -365,14 +357,14 @@ bool CombatMgr::UpdateOwnerCombatState() const
     {
         _owner->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
         _owner->AtEnterCombat();
-        if (!_owner->CanHaveThreatList() && !_owner->IsEngaged())
+        if (_owner->GetTypeId() != TYPEID_UNIT)
             _owner->AtEngage(GetAnyTarget());
     }
     else
     {
         _owner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
         _owner->AtExitCombat();
-        if (_owner->IsEngaged() && !(_owner->ToCreature() && _owner->CanHaveThreatList() && _owner->ToCreature()->IsAIEnabled))
+        if (_owner->GetTypeId() != TYPEID_UNIT)
             _owner->AtDisengage();
     }
 

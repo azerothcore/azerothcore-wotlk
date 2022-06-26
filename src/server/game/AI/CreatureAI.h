@@ -93,9 +93,11 @@ public:
 
     void Talk(uint8 id, WorldObject const* whisperTarget = nullptr);
 
-    explicit CreatureAI(Creature* creature) : UnitAI(creature), me(creature), _boundary(nullptr), _negateBoundary(false), m_MoveInLineOfSight_locked(false) { }
+    explicit CreatureAI(Creature* creature) : UnitAI(creature), me(creature), _boundary(nullptr), _negateBoundary(false), _isEngaged(false), m_MoveInLineOfSight_locked(false) { }
 
     ~CreatureAI() override {}
+
+    bool IsEngaged() const { return _isEngaged; }
 
     void MoveCircleChecks();
     void MoveBackwardsChecks();
@@ -114,11 +116,17 @@ public:
     // Called for reaction at stopping attack at no attackers or targets
     virtual void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER);
 
+    // Called for reaction whenever we start being in combat (overridden from base UnitAI)
+    void JustEnteredCombat(Unit* /*who*/) override;
+
+    // Called for reaction whenever a new non-offline unit is added to the threat list
+    virtual void JustStartedThreateningMe(Unit* who) { if (!IsEngaged()) EngagementStart(who); }
+
     // Called for reaction when initially engaged
     virtual void EnterCombat(Unit* /*victim*/) {}
 
     // Called when the creature is killed
-    virtual void JustDied(Unit* /*killer*/) {}
+    virtual void JustDied(Unit* /*killer*/) { if (IsEngaged()) EngagementOver(); }
 
     // Called when the creature kills a unit
     virtual void KilledUnit(Unit* /*victim*/) {}
@@ -208,6 +216,9 @@ public:
     static bool IsInBounds(CreatureBoundary const& boundary, Position const* who);
     bool IsInBoundary(Position const* who = nullptr) const;
 protected:
+    void EngagementStart(Unit* who);
+    void EngagementOver();
+
     virtual void MoveInLineOfSight(Unit* /*who*/);
 
     bool _EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER);
@@ -216,6 +227,7 @@ protected:
     bool _negateBoundary;
 
 private:
+    bool _isEngaged;
     bool m_MoveInLineOfSight_locked;
 };
 

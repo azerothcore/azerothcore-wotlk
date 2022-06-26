@@ -134,7 +134,7 @@ public:
                 t->RemoveAura(SPELL_CHANGE_VEHICLE);
                 me->RemoveAllAuras();
                 me->CombatStop(true);
-                me->GetThreatMgr().NotifyDisengaged();
+                EngagementOver();
                 me->SetHealth(me->GetMaxHealth());
                 if( pInstance )
                     if( Creature* gormok = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_GORMOK)) )

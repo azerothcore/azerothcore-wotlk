@@ -385,7 +385,7 @@ struct violet_hold_trashAI : public npc_escortAI
         }
 
         me->CombatStop(true);
-        me->GetThreatMgr().NotifyDisengaged();
+        EngagementOver();
         if (HasEscortState(STATE_ESCORT_ESCORTING))
         {
             AddEscortState(STATE_ESCORT_RETURNING);

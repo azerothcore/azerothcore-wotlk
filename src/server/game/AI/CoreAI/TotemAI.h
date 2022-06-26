@@ -19,20 +19,19 @@
 #define ACORE_TOTEMAI_H
 
 #include "CreatureAI.h"
+#include "PassiveAI.h"
 #include "Timer.h"
 
 class Creature;
 class Totem;
 
-class TotemAI : public CreatureAI
+class TotemAI : public NullCreatureAI
 {
 public:
     explicit TotemAI(Creature* c);
 
-    void MoveInLineOfSight(Unit* who) override;
     void AttackStart(Unit* victim) override;
 
-    void EnterEvadeMode(EvadeReason /*why*/) override;
     void SpellHit(Unit* /*caster*/, SpellInfo const* /*spellInfo*/) override;
 
     void DoAction(int32 param) override;

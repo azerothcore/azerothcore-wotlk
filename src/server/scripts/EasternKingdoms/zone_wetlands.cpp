@@ -119,7 +119,7 @@ public:
                     me->RestoreFaction();
                     me->RemoveAllAuras();
                     me->CombatStop(true);
-                    me->GetThreatMgr().NotifyDisengaged();
+                    EngagementOver();
 
                     SetRun(false);
                 }

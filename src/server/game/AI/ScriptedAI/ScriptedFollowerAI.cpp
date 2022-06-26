@@ -149,10 +149,17 @@ void FollowerAI::JustRespawned()
 
 void FollowerAI::EnterEvadeMode(EvadeReason /*why*/)
 {
+    if (!me->IsAlive())
+    {
+        EngagementOver();
+        return;
+    }
+
     me->RemoveAllAuras();
     me->CombatStop(true);
-    me->GetThreatMgr().NotifyDisengaged();
     me->SetLootRecipient(nullptr);
+
+    EngagementOver();
 
     if (HasFollowState(STATE_FOLLOW_INPROGRESS))
     {

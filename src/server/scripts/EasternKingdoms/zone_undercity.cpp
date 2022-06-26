@@ -1014,7 +1014,7 @@ public:
         void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->CombatStop(true);
-            me->GetThreatMgr().NotifyDisengaged();
+            EngagementOver();
             me->SetLootRecipient(nullptr);
 
             if (HasEscortState(STATE_ESCORT_ESCORTING))

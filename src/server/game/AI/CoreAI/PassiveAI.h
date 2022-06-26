@@ -40,6 +40,9 @@ public:
 
     void MoveInLineOfSight(Unit*) override {}
     void AttackStart(Unit* target) override;
+    void JustEnteredCombat(Unit* who) override { EngagementStart(who); }
+    void JustExitedCombat() override { EngagementOver(); }
+    void JustStartedThreateningMe(Unit*) override { }
     void UpdateAI(uint32) override;
     void EnterEvadeMode(EvadeReason /*why*/) override {}
 
@@ -56,6 +59,8 @@ public:
 
     void MoveInLineOfSight(Unit*) override {}
     void AttackStart(Unit*) override {}
+    void JustStartedThreateningMe(Unit*) override { }
+    void JustEnteredCombat(Unit*) override { }
     void UpdateAI(uint32) override {}
     void EnterEvadeMode(EvadeReason /*why*/) override {}
     void OnCharmed(bool /*apply*/) override {}

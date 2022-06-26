@@ -1124,7 +1124,7 @@ public:
 
             me->RemoveEvadeAuras();
             me->CombatStop(true);
-            me->GetThreatMgr().NotifyDisengaged();
+            EngagementOver();
             me->LoadCreaturesAddon(true);
             me->SetLootRecipient(nullptr);
             me->ResetPlayerDamageReq();

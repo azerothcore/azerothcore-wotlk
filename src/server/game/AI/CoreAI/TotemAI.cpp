@@ -33,9 +33,9 @@ int TotemAI::Permissible(Creature const* creature)
     return PERMIT_BASE_NO;
 }
 
-TotemAI::TotemAI(Creature* c) : CreatureAI(c)
+TotemAI::TotemAI(Creature* creature) : NullCreatureAI(creature)
 {
-    ASSERT(c->IsTotem());
+    ASSERT(creature->IsTotem(), "TotemAI: AI assigned to a non-totem creature (%s)!", creature->GetGUID().ToString().c_str());
 }
 
 void TotemAI::SpellHit(Unit* /*caster*/, SpellInfo const* /*spellInfo*/)
@@ -44,15 +44,6 @@ void TotemAI::SpellHit(Unit* /*caster*/, SpellInfo const* /*spellInfo*/)
 
 void TotemAI::DoAction(int32 /*param*/)
 {
-}
-
-void TotemAI::MoveInLineOfSight(Unit* /*who*/)
-{
-}
-
-void TotemAI::EnterEvadeMode(EvadeReason /*why*/)
-{
-    me->CombatStop(true);
 }
 
 void TotemAI::UpdateAI(uint32 /*diff*/)

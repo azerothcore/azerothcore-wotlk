@@ -259,7 +259,7 @@ public:
             {
                 me->SetSpeed(MOVE_RUN, 2.5f);
                 me->CombatStop(true);
-                me->GetThreatMgr().NotifyDisengaged();
+                EngagementOver();
                 me->GetMotionMaster()->MoveTargetedHome();
                 returning = true;
             }

@@ -3671,6 +3671,13 @@ uint32 Creature::GetPlayerDamageReq() const
     return _playerDamageReq;
 }
 
+bool Creature::IsEngaged() const
+{
+    if (CreatureAI const* ai = AI())
+        return ai->IsEngaged();
+    return false;
+}
+
 void Creature::AtEngage(Unit* target)
 {
     Unit::AtEngage(target);

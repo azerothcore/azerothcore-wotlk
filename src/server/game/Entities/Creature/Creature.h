@@ -395,6 +395,7 @@ public:
 
     void ResetFaction() { SetFaction(GetCreatureTemplate()->faction); }
 
+    bool IsEngaged() const override;
     void AtEngage(Unit* target) override;
     void AtDisengage() override;
 

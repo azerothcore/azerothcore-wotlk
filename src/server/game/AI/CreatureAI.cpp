@@ -107,15 +107,12 @@ void CreatureAI::DoZoneInCombat(Creature* creature /*= nullptr*/)
         return;
     }
 
-    Map::PlayerList const& playerList = map->GetPlayers();
-    if (playerList.IsEmpty())
-    {
+    if (!map->HavePlayers())
         return;
-    }
 
-    for (Map::PlayerList::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
+    for (MapReference const& ref : map->GetPlayers())
     {
-        if (Player* player = itr->GetSource())
+        if (Player* player = ref.GetSource())
         {
             if (!player->IsAlive() || !CombatMgr::CanBeginCombat(creature, player))
                 continue;
@@ -185,6 +182,12 @@ void CreatureAI::TriggerAlert(Unit const* who) const
     me->GetMotionMaster()->MoveDistract(5 * IN_MILLISECONDS);
 }
 
+void CreatureAI::JustEnteredCombat(Unit* who)
+{
+    if (!IsEngaged() && !me->CanHaveThreatList())
+        EngagementStart(who);
+}
+
 void CreatureAI::EnterEvadeMode(EvadeReason why)
 {
     if (!_EnterEvadeMode(why))
@@ -252,7 +255,7 @@ bool CreatureAI::UpdateVictimWithGaze()
 
 bool CreatureAI::UpdateVictim()
 {
-    if (!me->IsEngaged())
+    if (!IsEngaged())
         return false;
 
     if (!me->HasReactState(REACT_PASSIVE))
@@ -275,10 +278,44 @@ bool CreatureAI::UpdateVictim()
     return true;
 }
 
+void CreatureAI::EngagementStart(Unit* who)
+{
+    if (_isEngaged)
+    {
+        LOG_ERROR("scripts.ai", "CreatureAI::EngagementStart called even though creature is already engaged. Creature debug info:\n%s", GetDebugInfo());
+        return;
+    }
+    _isEngaged = true;
+
+    me->AtEngage(who);
+}
+
+void CreatureAI::EngagementOver()
+{
+    if (!_isEngaged)
+    {
+        LOG_ERROR("scripts.ai", "CreatureAI::EngagementOver called even though creature is not currently engaged. Creature debug info:\n%s", GetDebugInfo());
+        return;
+    }
+    _isEngaged = false;
+
+    me->AtDisengage();
+}
+
 bool CreatureAI::_EnterEvadeMode(EvadeReason /*why*/)
 {
+    if (me->IsInEvadeMode())
+    {
+        return false;
+    }
+    else if (CreatureGroup* formation = me->GetFormation())
+    {
+        formation->MemberEvaded(me);
+    }
+
     if (!me->IsAlive())
     {
+        EngagementOver();
         return false;
     }
 
@@ -288,21 +325,12 @@ bool CreatureAI::_EnterEvadeMode(EvadeReason /*why*/)
 
     me->ClearComboPointHolders(); // Remove all combo points targeting this unit
     me->CombatStop(true);
-    me->GetThreatMgr().NotifyDisengaged();
     me->LoadCreaturesAddon(true);
     me->SetLootRecipient(nullptr);
     me->ResetPlayerDamageReq();
     me->SetLastDamagedTime(0);
     me->SetCannotReachTarget(false);
-
-    if (me->IsInEvadeMode())
-    {
-        return false;
-    }
-    else if (CreatureGroup* formation = me->GetFormation())
-    {
-        formation->MemberEvaded(me);
-    }
+    EngagementOver();
 
     return true;
 }

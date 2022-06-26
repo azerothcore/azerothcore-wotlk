@@ -552,7 +552,7 @@ public:
                     me->RemoveAllAuras();
                     AddCreatureAddonAuras();
                     me->CombatStop(true);
-                    me->GetThreatMgr().NotifyDisengaged();
+                    EngagementOver();
                     me->GetMotionMaster()->Clear();
                     me->StopMoving();
                     me->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, 0);
@@ -583,7 +583,7 @@ public:
                     me->RemoveAllAuras();
                     AddCreatureAddonAuras();
                     me->CombatStop(true);
-                    me->GetThreatMgr().NotifyDisengaged();
+                    EngagementOver();
                     me->GetMotionMaster()->Clear();
                     me->SetRegeneratingHealth(false);
                     me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);

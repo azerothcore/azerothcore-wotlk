@@ -240,7 +240,7 @@ public:
                 {
                     me->RemoveAllAuras();
                     me->CombatStop(true);
-                    me->GetThreatMgr().NotifyDisengaged();
+                    EngagementOver();
                     damage = 0;
 
                     me->SetReactState(REACT_PASSIVE);

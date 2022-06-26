@@ -703,10 +703,11 @@ public:
                                 summon->GetMotionMaster()->Clear(false);
                             }
                         me->CombatStop(true);
-                        me->GetThreatMgr().NotifyDisengaged();
                         me->SetImmuneToAll(true);
                         me->SetReactState(REACT_PASSIVE);
                         me->GetMotionMaster()->Clear(false);
+
+                        EngagementOver();
 
                         // Position main stars
                         summons.DoAction(ACTION_POSITION_NPCS);

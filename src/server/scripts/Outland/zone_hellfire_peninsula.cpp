@@ -128,7 +128,7 @@ public:
                 me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                 me->RemoveAllAuras();
                 me->CombatStop(true);
-                me->GetThreatMgr().NotifyDisengaged();
+                EngagementOver();
                 Talk(SAY_FREE);
                 return;
             }

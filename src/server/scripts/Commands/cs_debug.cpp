@@ -786,7 +786,7 @@ public:
         ThreatMgr& mgr = target->GetThreatMgr();
         if (!target->IsAlive())
         {
-            handler->PSendSysMessage("%s (GUID %u) is not alive.", target->GetName().c_str(), target->GetGUID().GetCounter());
+            handler->PSendSysMessage("%s (GUID %u) is not alive.%s", target->GetName().c_str(), target->GetGUID().GetCounter(), target->IsEngaged() ? " (It is, however, engaged. Huh?)" : "");
             return true;
         }
 
