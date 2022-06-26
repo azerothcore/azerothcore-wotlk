@@ -2406,6 +2406,12 @@ public:
     virtual void ProcessTerrainStatusUpdate();
 
     [[nodiscard]] bool CanRestoreMana(SpellInfo const* spellInfo) const;
+private:
+    // Threat+combat management
+    friend class ThreatMgr;
+    ThreatMgr m_threatMgr;
+    friend class CombatMgr;
+    CombatMgr m_combatMgr;
 
 protected:
     explicit Unit (bool isWorldObject);
@@ -2517,12 +2523,6 @@ private:
     //TimeTrackerSmall m_movesplineTimer;
 
     Diminishing m_Diminishing;
-
-    // Threat+combat management
-    friend class ThreatMgr;
-    ThreatMgr m_threatMgr;
-    friend class CombatMgr;
-    CombatMgr m_combatMgr;
 
     FollowerRefMgr m_FollowingRefMgr;
 
