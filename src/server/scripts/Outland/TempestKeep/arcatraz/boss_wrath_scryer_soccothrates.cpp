@@ -87,14 +87,14 @@ public:
             _Reset();
             events2.Reset();
             me->CastSpell(me, SPELL_FEL_IMMOLATION, true);
-            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(false);
         }
 
         void InitializeAI() override
         {
             BossAI::InitializeAI();
             if (!preFight)
-                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetImmuneToAll(true);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -185,9 +185,9 @@ public:
                     if (Creature* dalliah = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_DALLIAH)))
                     {
                         dalliah->SetFacingToObject(me);
-                        dalliah->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        dalliah->SetImmuneToAll(false);
                         me->SetFacingToObject(dalliah);
-                        me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        me->SetImmuneToAll(false);
                         dalliah->SetHomePosition(dalliah->GetPositionX(), dalliah->GetPositionY(), dalliah->GetPositionZ(), 1.51737f);
                         me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 4.725722f);
                     }

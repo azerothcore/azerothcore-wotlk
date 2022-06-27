@@ -770,7 +770,8 @@ public:
                     }
                     else
                     {
-                        turret->ReplaceAllUnitFlags(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        turret->ReplaceAllUnitFlags(UNIT_FLAG_NOT_SELECTABLE);
+                        turret->SetImmuneToAll(true);
                         if (turret->GetTypeId() == TYPEID_UNIT)
                             turret->ToCreature()->AI()->EnterEvadeMode();
                     }

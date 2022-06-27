@@ -30,6 +30,7 @@ EndScriptData */
 ObjectData const creatureData[] =
 {
     { NPC_SARTURA, DATA_SARTURA },
+    { NPC_EYE_OF_CTHUN, DATA_EYE_OF_CTHUN }
 };
 
 class instance_temple_of_ahnqiraj : public InstanceMapScript

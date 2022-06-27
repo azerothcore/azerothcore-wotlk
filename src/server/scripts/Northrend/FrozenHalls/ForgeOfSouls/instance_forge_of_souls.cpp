@@ -20,6 +20,12 @@
 #include "ScriptedCreature.h"
 #include "forge_of_souls.h"
 
+BossBoundaryData const boundaries =
+{
+    { DATA_BRONJAHM,    new CircleBoundary(Position(5297.3f, 2506.45f), 100.96)                                                                                   },
+    { DATA_DEVOURER,    new ParallelogramBoundary(Position(5663.56f, 2570.53f), Position(5724.39f, 2520.45f), Position(5570.36f, 2461.42f)) }
+};
+
 class instance_forge_of_souls : public InstanceMapScript
 {
 public:
@@ -32,7 +38,10 @@ public:
 
     struct instance_forge_of_souls_InstanceScript : public InstanceScript
     {
-        instance_forge_of_souls_InstanceScript(Map* map) : InstanceScript(map) {}
+        instance_forge_of_souls_InstanceScript(Map* map) : InstanceScript(map)
+        {
+            LoadBossBoundaries(boundaries);
+        }
 
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         TeamId teamIdInInstance;

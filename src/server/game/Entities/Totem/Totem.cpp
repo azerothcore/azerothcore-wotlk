@@ -85,6 +85,8 @@ void Totem::InitStats(uint32 duration)
 
 void Totem::InitSummon()
 {
+    Minion::InitSummon();
+
     if (m_type == TOTEM_PASSIVE && GetSpell())
         CastSpell(this, GetSpell(), true);
 

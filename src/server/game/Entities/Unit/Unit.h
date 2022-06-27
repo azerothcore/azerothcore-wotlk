@@ -1326,6 +1326,7 @@ public:
     bool IsWithinCombatRange(Unit const* obj, float dist2compare) const;
     bool IsWithinMeleeRange(Unit const* obj, float dist = 0.f) const;
     float GetMeleeRange(Unit const* target) const;
+    [[nodiscard]] virtual SpellSchoolMask GetMeleeDamageSchoolMask() const;
     bool GetRandomContactPoint(Unit const* target, float& x, float& y, float& z, bool force = false) const;
     uint32 m_extraAttacks;
     bool m_canDualWield;
@@ -1342,6 +1343,9 @@ public:
     {
         if (GetVictim() != nullptr)
             return GetVictim();
+
+        if (!IsEngaged())
+            return nullptr;
 
         if (!m_attackers.empty())
             return *(m_attackers.begin());
@@ -1529,7 +1533,7 @@ public:
     void TriggerAurasProcOnEvent(ProcEventInfo& eventInfo, std::list<AuraApplication*>& procAuras);
 
     void HandleEmoteCommand(uint32 emoteId);
-    void AttackerStateUpdate (Unit* victim, WeaponAttackType attType = BASE_ATTACK, bool extra = false);
+    void AttackerStateUpdate (Unit* victim, WeaponAttackType attType = BASE_ATTACK, bool extra = false, bool ignoreCasting = false);
 
     void CalculateMeleeDamage(Unit* victim, uint32 damage, CalcDamageInfo* damageInfo, WeaponAttackType attackType = BASE_ATTACK, const bool sittingVictim = false);
     void DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss);
@@ -1642,6 +1646,16 @@ public:
     [[nodiscard]] bool IsCritter() const { return GetCreatureType() == CREATURE_TYPE_CRITTER; }
 
     [[nodiscard]] bool IsInFlight()  const { return HasUnitState(UNIT_STATE_IN_FLIGHT); }
+
+    void SetImmuneToAll(bool apply, bool keepCombat = false) { SetImmuneToPC(apply, keepCombat); SetImmuneToNPC(apply, keepCombat); }
+    bool IsImmuneToAll() const { return IsImmuneToPC() && IsImmuneToNPC(); }
+    void SetImmuneToPC(bool apply, bool keepCombat = false);
+    bool IsImmuneToPC() const { return HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC); }
+    void SetImmuneToNPC(bool apply, bool keepCombat = false);
+    bool IsImmuneToNPC() const { return HasUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC); }
+
+    bool IsEngaged() const { return IsInCombat(); }
+    bool IsEngagedBy(Unit const* who) const { return IsInCombatWith(who); }
 
     [[nodiscard]] bool IsInCombat() const { return HasUnitFlag(UNIT_FLAG_IN_COMBAT); }
     bool IsInCombatWith(Unit const* who) const;
@@ -2103,6 +2117,7 @@ public:
     void TauntApply(Unit* victim);
     void TauntFadeOut(Unit* taunter);
     ThreatMgr& GetThreatMgr() { return m_ThreatMgr; }
+    ThreatMgr const& GetThreatMgr() const { return m_ThreatMgr; }
     void addHatedBy(HostileReference* pHostileReference) { m_HostileRefMgr.insertFirst(pHostileReference); };
     void removeHatedBy(HostileReference* /*pHostileReference*/) { /* nothing to do yet */ }
     HostileRefMgr& getHostileRefMgr() { return m_HostileRefMgr; }
@@ -2473,8 +2488,6 @@ protected:
     CharmInfo* m_charmInfo;
     SharedVisionList m_sharedVision;
 
-    [[nodiscard]] virtual SpellSchoolMask GetMeleeDamageSchoolMask() const;
-
     MotionMaster* i_motionMaster;
 
     uint32 m_reactiveTimer[MAX_REACTIVE];
@@ -2542,6 +2555,7 @@ private:
     bool m_duringRemoveFromWorld; // lock made to not add stuff after begining removing from world
 
     uint32 _oldFactionId;           ///< faction before charm
+    bool _isWalkingBeforeCharm;     ///< Are we walking before we were charmed?
 
     [[nodiscard]] float processDummyAuras(float TakenTotalMod) const;
 

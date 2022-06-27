@@ -186,7 +186,7 @@ public:
                 Field* fields = result->Fetch();
                 remainTime = fields[0].Get<int32>();
 
-                if (remainTime < 0 || remainTime >= duration  * IN_MILLISECONDS)
+                if (remainTime < 0 || remainTime >= duration * IN_MILLISECONDS)
                 {
                     handler->PSendSysMessage("Player %s already has a longer %s Deserter active.", handler->playerLink(*playerName), isInstance ? "Instance" : "Battleground");
                     return true;
@@ -304,23 +304,56 @@ public:
     * @param handler The ChatHandler, passed by the system.
     * @param isInstance provided by the relaying functions, so we don't have
     * to write that much code :)
+    * @param maxTime Optional: The maximum remaining time of the Debuff on players to be removed.
+    * Any Deserter Debuff with a higher remaining time will not be removed. Use -1 for any.
+    * Default: 15m for BG, 30m for Instance
     *
     * @return true if everything was correct, false if an error occured.
     *
     * Example Usage:
     * @code
-    * .deserter instance remove all
-    * -or-
     * .deserter bg remove all
+    * -or-
+    * .deserter bg remove all 30m
+    * -or-
+    * .deserter bg remove all -1
     * @endcode
     */
-    static bool HandleDeserterRemoveAll(ChatHandler* handler, bool isInstance)
+    static bool HandleDeserterRemoveAll(ChatHandler* handler, bool isInstance, Optional<std::string> maxTime)
     {
+        int32 remainTime = isInstance ? 1800 : 900;
         uint32 deserterSpell = isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER;
         uint64 deserterCount = 0;
         bool countOnline = true;
 
-        QueryResult result = CharacterDatabase.Query("SELECT COUNT(guid) FROM character_aura WHERE spell = {} AND remainTime <= 1800000", deserterSpell);
+        if (maxTime)
+        {
+            remainTime = TimeStringToSecs(*maxTime);
+            if (remainTime == 0)
+            {
+                remainTime = Acore::StringTo<int32>(*maxTime).value_or(0);
+            }
+        }
+
+        if (remainTime == 0)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        QueryResult result;
+        if (remainTime < 0)
+        {
+            result = CharacterDatabase.Query("SELECT COUNT(guid) FROM character_aura WHERE spell = {}", deserterSpell);
+            CharacterDatabase.Execute("DELETE FROM character_aura WHERE spell = {}", deserterSpell);
+        }
+        else
+        {
+            result = CharacterDatabase.Query("SELECT COUNT(guid) FROM character_aura WHERE spell = {} AND remainTime <= {}", deserterSpell, remainTime * IN_MILLISECONDS);
+            CharacterDatabase.Execute("DELETE FROM character_aura WHERE spell = {} AND remainTime <= {}", deserterSpell, remainTime * IN_MILLISECONDS);
+        }
+
         if (result)
         {
             deserterCount = (*result)[0].Get<uint64>();
@@ -328,7 +361,6 @@ public:
 
         if (deserterCount > 0)
         {
-            CharacterDatabase.Execute("DELETE FROM character_aura WHERE spell = {} AND remainTime <= 1800000", deserterSpell);
             countOnline = false;
         }
 
@@ -338,7 +370,7 @@ public:
         {
             Player* player = itr->second;
             Aura* aura = player->GetAura(deserterSpell);
-            if (aura && aura->GetDuration() <= 1800000)
+            if (aura && (remainTime < 0 || aura->GetDuration() <= remainTime * IN_MILLISECONDS))
             {
                 if (countOnline)
                     deserterCount++;
@@ -380,14 +412,14 @@ public:
         return HandleDeserterRemove(handler, player, false);
     }
 
-    static bool HandleDeserterInstanceRemoveAll(ChatHandler* handler)
+    static bool HandleDeserterInstanceRemoveAll(ChatHandler* handler, Optional<std::string> maxTime)
     {
-        return HandleDeserterRemoveAll(handler, true);
+        return HandleDeserterRemoveAll(handler, true, maxTime);
     }
 
-    static bool HandleDeserterBGRemoveAll(ChatHandler* handler)
+    static bool HandleDeserterBGRemoveAll(ChatHandler* handler, Optional<std::string> maxTime)
     {
-        return HandleDeserterRemoveAll(handler, false);
+        return HandleDeserterRemoveAll(handler, false, maxTime);
     }
 };
 
