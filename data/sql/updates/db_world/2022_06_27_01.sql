@@ -1,3 +1,4 @@
+-- DB update 2022_06_27_00 -> 2022_06_27_01
 --
 DELETE FROM `areatrigger_scripts` WHERE `entry`=3956;
 INSERT INTO `areatrigger_scripts` VALUES
