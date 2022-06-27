@@ -92,7 +92,7 @@ public:
     * -or-
     * .deserter bg add 1h30m (using player target or self)
     * -or-
-    * .deserter bg add Testplayer 1h30m (using player of name 'Testplayer')
+    * .deserter bg add Tester 1h30m (using player of name 'Tester')
     * @endcode
     */
     static bool HandleDeserterAdd(ChatHandler* handler, Optional<std::string> playerName, Optional<std::string> time, bool isInstance)
@@ -238,7 +238,7 @@ public:
     * -or-
     * .deserter bg remove (using player target or self)
     * -or-
-    * .deserter bg remove Testplayer (using player of name 'Testplayer')
+    * .deserter bg remove Tester (using player of name 'Tester')
     * @endcode
     */
     static bool HandleDeserterRemove(ChatHandler* handler, Optional<PlayerIdentifier> player, bool isInstance)
@@ -305,8 +305,8 @@ public:
     * @param isInstance provided by the relaying functions, so we don't have
     * to write that much code :)
     * @param maxTime Optional: The maximum remaining time of the Debuff on players to be removed.
-    * Any Deserter Debuff with a higher remaining time will not be removed. Use -1 for any.
-    * Default: 15m for BG, 30m for Instance
+    * Any Player with a Deserter Debuff of this time or less will get their Debuff removed. Use -1 for any.
+    * Default: 15m for BG, 30m for Instance.
     *
     * @return true if everything was correct, false if an error occured.
     *
@@ -321,8 +321,8 @@ public:
     */
     static bool HandleDeserterRemoveAll(ChatHandler* handler, bool isInstance, Optional<std::string> maxTime)
     {
-        int32 remainTime = isInstance ? 1800 : 900;
         uint32 deserterSpell = isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER;
+        int32 remainTime = isInstance ? 1800 : 900;
         uint64 deserterCount = 0;
         bool countOnline = true;
 
@@ -335,6 +335,7 @@ public:
             }
         }
 
+        // Optimization. Do not execute any further functions or Queries if remainTime is 0.
         if (remainTime == 0)
         {
             handler->SendSysMessage(LANG_BAD_VALUE);
@@ -343,15 +344,13 @@ public:
         }
 
         QueryResult result;
-        if (remainTime < 0)
+        if (remainTime > 0)
         {
-            result = CharacterDatabase.Query("SELECT COUNT(guid) FROM character_aura WHERE spell = {}", deserterSpell);
-            CharacterDatabase.Execute("DELETE FROM character_aura WHERE spell = {}", deserterSpell);
+            result = CharacterDatabase.Query("SELECT COUNT(guid) FROM character_aura WHERE spell = {} AND remainTime <= {}", deserterSpell, remainTime * IN_MILLISECONDS);
         }
         else
         {
-            result = CharacterDatabase.Query("SELECT COUNT(guid) FROM character_aura WHERE spell = {} AND remainTime <= {}", deserterSpell, remainTime * IN_MILLISECONDS);
-            CharacterDatabase.Execute("DELETE FROM character_aura WHERE spell = {} AND remainTime <= {}", deserterSpell, remainTime * IN_MILLISECONDS);
+            result = CharacterDatabase.Query("SELECT COUNT(guid) FROM character_aura WHERE spell = {}", deserterSpell);
         }
 
         if (result)
@@ -359,9 +358,18 @@ public:
             deserterCount = (*result)[0].Get<uint64>();
         }
 
+        // Optimization. Only execute these if there even is a result.
         if (deserterCount > 0)
         {
             countOnline = false;
+            if (remainTime > 0)
+            {
+                CharacterDatabase.Execute("DELETE FROM character_aura WHERE spell = {} AND remainTime <= {}", deserterSpell, remainTime * IN_MILLISECONDS);
+            }
+            else
+            {
+                CharacterDatabase.Execute("DELETE FROM character_aura WHERE spell = {}", deserterSpell);
+            }
         }
 
         std::shared_lock<std::shared_mutex> lock(*HashMapHolder<Player>::GetLock());
@@ -378,13 +386,19 @@ public:
             }
         }
 
+        std::string remainTimeStr = secsToTimeString(remainTime);
+        if (remainTime < 0)
+        {
+            remainTimeStr = "infinity";
+        }
+
         if (deserterCount == 0)
         {
-            handler->PSendSysMessage("No player on this realm has %s Deserter with a duration of 30min or less.", isInstance ? "Instance" : "Battleground");
+            handler->PSendSysMessage("No player on this realm has %s Deserter with a duration of %s or less.", isInstance ? "Instance" : "Battleground", remainTimeStr);
             return true;
         }
 
-        handler->PSendSysMessage("%s Deserter has been removed from %u player(s) with a duration of 30min or less.", isInstance ? "Instance" : "Battleground", deserterCount);
+        handler->PSendSysMessage("%s Deserter has been removed from %u player(s) with a duration of %s or less.", isInstance ? "Instance" : "Battleground", deserterCount, remainTimeStr);
         return true;
     }
 
