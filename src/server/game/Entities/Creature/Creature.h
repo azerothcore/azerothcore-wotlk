@@ -169,7 +169,8 @@ public:
 
     void UpdateMovementFlags();
     uint32 GetRandomId(uint32 id1, uint32 id2, uint32 id3);
-    bool UpdateEntry(uint32 entry, const CreatureData* data = nullptr, bool changelevel = true );
+    bool UpdateEntry(uint32 entry, const CreatureData* data = nullptr, bool changelevel = true, bool updateAI = false);
+    bool UpdateEntry(uint32 entry, bool updateAI) { return UpdateEntry(entry, nullptr, true, updateAI); }
     bool UpdateStats(Stats stat) override;
     bool UpdateAllStats() override;
     void UpdateResistances(uint32 school) override;
