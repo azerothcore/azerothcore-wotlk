@@ -89,7 +89,7 @@ public:
                         DoCast(me, SPELL_AVATAR);
 
                         me->SetReactState(REACT_PASSIVE);
-                        DoResetThreat();
+                        ResetThreatList();
                         events.ScheduleEvent(EVENT_START_PURSUIT, 2s);
                         events.ScheduleEvent(EVENT_STOP_PURSUIT, 15s);
                         events.ScheduleEvent(EVENT_AVATAR, 45s, 50s);
