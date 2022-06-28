@@ -1,3 +1,4 @@
+-- DB update 2022_06_28_04 -> 2022_06_28_05
 --
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 756) AND (`source_type` = 0);
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 669) AND (`source_type` = 0) AND (`id` IN (0));
