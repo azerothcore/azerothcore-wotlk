@@ -1579,6 +1579,23 @@ void WorldSession::HandleRemoveGlyph(WorldPacket& recvData)
         if (GlyphPropertiesEntry const* glyphEntry = sGlyphPropertiesStore.LookupEntry(glyph))
         {
             _player->RemoveAurasDueToSpell(glyphEntry->SpellId);
+
+            // Removed any triggered auras
+            Unit::AuraMap& ownedAuras = _player->GetOwnedAuras();
+            for (Unit::AuraMap::iterator iter = ownedAuras.begin(); iter != ownedAuras.end();)
+            {
+                Aura* aura = iter->second;
+                if (SpellInfo const* triggeredByAuraSpellInfo = aura->GetTriggeredByAuraSpellInfo())
+                {
+                    if (triggeredByAuraSpellInfo->Id == glyphEntry->SpellId)
+                    {
+                        _player->RemoveOwnedAura(iter);
+                        continue;
+                    }
+                }
+                ++iter;
+            }
+
             _player->SendLearnPacket(glyphEntry->SpellId, false); // Send packet to properly handle client-side spell tooltips
             _player->SetGlyph(slot, 0, true);
             _player->SendTalentsInfoData(false);
