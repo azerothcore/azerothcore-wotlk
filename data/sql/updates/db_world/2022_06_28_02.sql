@@ -1,3 +1,4 @@
+-- DB update 2022_06_28_01 -> 2022_06_28_02
 UPDATE `creature_template` SET `speed_walk`=1,`speed_run`=1.14286 WHERE `entry` IN(11371, 11350, 11372, 11830, 13321, 11374, 15043, 11831, 11351, 11359, 11387, 11373, 15042, 14758);
 UPDATE `creature_template` SET `speed_walk`=1, `speed_run`=0.85714 WHERE `entry` IN(2914, 1420);
 UPDATE `creature_template` SET `speed_walk`=0.66667, `speed_run`=2.14286 WHERE `entry` IN(11352);
