@@ -1,3 +1,4 @@
+-- DB update 2022_06_27_01 -> 2022_06_28_00
 -- Hungering Plaguehound
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 30952;
