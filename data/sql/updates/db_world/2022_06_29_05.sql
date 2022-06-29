@@ -1,3 +1,4 @@
+-- DB update 2022_06_29_04 -> 2022_06_29_05
 --
 SET @NPC := 300758; # Actual GUID is unknown, but this is the same placeholder GUID used by Vmangos and is available
 SET @PATH := @NPC * 10;
