@@ -71,9 +71,6 @@ public:
             Initialize();
         }
 
-        bool Enraged;
-        bool WasDead;
-
         void Initialize()
         {
             Enraged = false;
@@ -90,17 +87,16 @@ public:
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->SetReactState(REACT_AGGRESSIVE);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->LoadEquipment(1, true);
 
             if (Creature* zealot = instance->GetCreature(DATA_LORKHAN))
             {
                 zealot->AI()->Reset();
-                zealot->ResetFaction();
             }
 
             if (Creature* zealot = instance->GetCreature(DATA_ZATH))
             {
                 zealot->AI()->Reset();
-                zealot->ResetFaction();
             }
 
             _scheduler.SetValidator([this]
@@ -157,16 +153,21 @@ public:
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (!WasDead && damage >= me->GetHealth())
+            if (me->GetEntry() == NPC_HIGH_PRIEST_THEKAL && damage >= me->GetHealth())
             {
                 damage = me->GetHealth() - 1;
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                me->SetReactState(REACT_PASSIVE);
-                me->SetStandState(UNIT_STAND_STATE_SLEEP);
-                me->AttackStop();
-                WasDead = true;
-                CheckPhaseTransition();
-                Talk(EMOTE_THEKAL_DIES);
+
+                if (!WasDead)
+                {
+                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetReactState(REACT_PASSIVE);
+                    me->SetStandState(UNIT_STAND_STATE_SLEEP);
+                    me->AttackStop();
+                    DoResetThreat();
+                    WasDead = true;
+                    CheckPhaseTransition();
+                    Talk(EMOTE_THEKAL_DIES);
+                }
             }
 
             if (!Enraged && me->HealthBelowPctDamaged(20, damage) && me->GetEntry() != NPC_HIGH_PRIEST_THEKAL)
@@ -182,7 +183,7 @@ public:
             {
                 me->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                me->ResetFaction();
+                me->RestoreFaction();
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->SetFullHealth();
                 WasDead = false;
@@ -202,11 +203,7 @@ public:
         {
             if (Creature* zealot = instance->GetCreature(zealotData))
             {
-                zealot->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-                zealot->ResetFaction();
-                zealot->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                zealot->SetReactState(REACT_AGGRESSIVE);
-                zealot->SetFullHealth();
+                zealot->Respawn(true);
                 UpdateZealotStatus(zealotData, false);
             }
         }
@@ -231,10 +228,10 @@ public:
                     Talk(SAY_AGGRO);
                     me->SetStandState(UNIT_STAND_STATE_STAND);
                     me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    DoResetThreat();
 
                     _scheduler.Schedule(6s, [this](TaskContext /*context*/) {
                         DoCastSelf(SPELL_TIGER_FORM);
+                        me->LoadEquipment(0, true);
                         me->SetReactState(REACT_AGGRESSIVE);
 
                         _scheduler.Schedule(30s, [this](TaskContext context) {
@@ -260,8 +257,11 @@ public:
             }
             else
             {
-                _scheduler.Schedule(10s, [this](TaskContext /*context*/) {
-                    DoAction(ACTION_RESSURRECT);
+                _scheduler.Schedule(10s, [this](TaskContext context) {
+                    if (!(WasDead && _lorkhanDied && _zathDied))
+                    {
+                        DoAction(ACTION_RESSURRECT);
+                    }
                 });
             }
         }
@@ -271,6 +271,8 @@ public:
             GuidVector _catGuids;
             bool _lorkhanDied;
             bool _zathDied;
+            bool Enraged;
+            bool WasDead;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -295,10 +297,6 @@ public:
 
         void Reset() override
         {
-            me->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            me->SetReactState(REACT_AGGRESSIVE);
-
             _scheduler.CancelAll();
 
             _scheduler.SetValidator([this]
@@ -339,24 +337,13 @@ public:
             });
         }
 
-        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
+        void JustDied(Unit* /*killer*/) override
         {
-            if (damage >= me->GetHealth() && me->HasReactState(REACT_AGGRESSIVE))
+            Talk(EMOTE_ZEALOT_DIES);
+
+            if (Creature* thekal = instance->GetCreature(DATA_THEKAL))
             {
-                Talk(EMOTE_ZEALOT_DIES);
-                me->RemoveAllAuras();
-                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                me->SetStandState(UNIT_STAND_STATE_SLEEP);
-                me->SetReactState(REACT_PASSIVE);
-                me->InterruptNonMeleeSpells(false);
-                me->AttackStop();
-
-                damage = 0;
-
-                if (Creature* thekal = instance->GetCreature(DATA_THEKAL))
-                {
-                    thekal->AI()->SetData(ACTION_RESSURRECT, DATA_LORKHAN);
-                }
+                thekal->AI()->SetData(ACTION_RESSURRECT, DATA_LORKHAN);
             }
         }
 
@@ -395,10 +382,6 @@ public:
 
         void Reset() override
         {
-            me->SetStandState(UNIT_STAND_STATE_STAND);
-            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            me->SetReactState(REACT_AGGRESSIVE);
-
             _scheduler.CancelAll();
 
             _scheduler.SetValidator([this]
@@ -436,23 +419,13 @@ public:
             });
         }
 
-        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
+        void JustDied(Unit* /*killer*/) override
         {
-            if (damage >= me->GetHealth() && me->HasReactState(REACT_AGGRESSIVE))
+            Talk(EMOTE_ZEALOT_DIES);
+
+            if (Creature* thekal = instance->GetCreature(DATA_THEKAL))
             {
-                Talk(EMOTE_ZEALOT_DIES);
-                me->RemoveAllAuras();
-                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                me->SetStandState(UNIT_STAND_STATE_SLEEP);
-                me->SetReactState(REACT_PASSIVE);
-                me->AttackStop();
-
-                damage = 0;
-
-                if (Creature* thekal = instance->GetCreature(DATA_THEKAL))
-                {
-                    thekal->AI()->SetData(ACTION_RESSURRECT, DATA_ZATH);
-                }
+                thekal->AI()->SetData(ACTION_RESSURRECT, DATA_ZATH);
             }
         }
 
