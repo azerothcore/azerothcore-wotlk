@@ -32,3 +32,5 @@ DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('spell_random_aggro', 's
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (23878, 'spell_random_aggro'),
 (24306, 'spell_delusions_of_jindo');
+
+UPDATE `creature_template` SET `speed_run` = 1.14286, `speed_walk` = 1.32 WHERE `entry` = 11380;

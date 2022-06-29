@@ -246,7 +246,7 @@ class spell_delusions_of_jindo : public SpellScript
 {
     PrepareSpellScript(spell_delusions_of_jindo);
 
-    bool Validate(SpellInfo const* spellInfo) override
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo({ SPELL_SUMMON_SHADE_OF_JINDO });
     }
