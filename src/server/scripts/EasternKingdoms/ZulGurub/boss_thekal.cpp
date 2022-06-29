@@ -257,7 +257,7 @@ public:
             }
             else
             {
-                _scheduler.Schedule(10s, [this](TaskContext context) {
+                _scheduler.Schedule(10s, [this](TaskContext /*context*/) {
                     if (!(WasDead && _lorkhanDied && _zathDied))
                     {
                         DoAction(ACTION_RESSURRECT);
