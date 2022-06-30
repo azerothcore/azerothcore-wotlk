@@ -242,6 +242,7 @@ bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_BG_TEAMS_SCORES:
             return true;                                    // not check correctness node indexes
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_EQUIPED_ITEM:
+        case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_ITEM_QUALITY:
             if (equipped_item.item_quality >= MAX_ITEM_QUALITY)
             {
                 LOG_ERROR("sql.sql", "Table `achievement_criteria_requirement` (Entry: {} Type: {}) for requirement ACHIEVEMENT_CRITERIA_REQUIRE_S_EQUIPED_ITEM ({}) has unknown quality state in value1 ({}), ignored.",
@@ -433,6 +434,13 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
                 return source && source->HasTitle(titleInfo->bit_index);
 
             return false;
+        }
+        case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_ITEM_QUALITY:
+        {
+            ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(miscvalue1);
+            if (!pProto)
+                return false;
+            return pProto->Quality == item.item_quality;
         }
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_BG_TEAMS_SCORES:
         {
