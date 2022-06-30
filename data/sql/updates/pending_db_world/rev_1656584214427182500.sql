@@ -30,7 +30,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25802);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (25802, 0, 0, 0, 1, 0, 100, 1, 0, 0, 0, 0, 0, 18, 33024, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaw the Mammoth Destroyer - Out of Combat - Set Flags Immune To Players (No Repeat)'),
-(25802, 0, 1, 0, 46, 0, 100, 0, 4896, 0, 0, 0, 0, 80, 2580200, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaw the Mammoth Destroyer - On Trigger - Run Script'),
+(25802, 0, 1, 0, 101, 0, 100, 1, 1, 20, 0, 0, 0, 80, 2580200, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaw the Mammoth Destroyer - On Min Players in Range - Run Script (No Repeat)'),
 (25802, 0, 2, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 11, 46310, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaw the Mammoth Destroyer - On Just Died - Cast \'Drop War Halberd\'');
 
 -- Kaw events
@@ -48,7 +48,7 @@ UPDATE `creature_template` SET `unit_flags` = 2 WHERE (`entry` = 25881);
 
 DELETE FROM `smart_scripts` WHERE `entryorguid`= 25881;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(25881, 0, 0, 0, 46, 0, 100, 1, 4896, 0, 0, 0, 0, 80, 2588100, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Moria - On Trigger - Run Script (No Repeat)'),
+(25881, 0, 0, 0, 101, 0, 100, 1, 1, 10, 0, 0, 0, 80, 2588100, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Moria - On Min Players in Range - Run Script (No Repeat)'),
 (25881, 0, 1, 0, 6, 0, 100, 1, 0, 0, 0, 0, 0, 19, 33024, 0, 0, 0, 0, 0, 19, 25802, 100, 0, 0, 0, 0, 0, 0, 'Moria - On Just Died - Remove Flags Immune To Players (No Repeat)'),
 (25881, 0, 2, 0, 1, 0, 100, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Moria - Out of Combat - Set Reactstate Passive (No Repeat)'),
 (25881, 0, 3, 0, 1, 0, 100, 1, 0, 0, 0, 0, 0, 28, 46260, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Moria - Out of Combat - Remove Aura \'Riding Wooly Mammoth Bull\' (No Repeat)');
