@@ -27,8 +27,8 @@ enum DataTypes
     DATA_SKERAM             = 1,
     DATA_KRI                = 2,
     DATA_VEM                = 3,
-    DATA_VEMISDEAD          = 4,
-    DATA_VEM_DEATH          = 5,
+    DATA_YAUJ               = 4,
+    DATA_BUG_TRIO           = 5,
     DATA_VEKLOR             = 6,
     DATA_VEKLORISDEAD       = 7,
     DATA_VEKLOR_DEATH       = 8,
@@ -38,12 +38,14 @@ enum DataTypes
     DATA_BUG_TRIO_DEATH     = 14,
     DATA_CTHUN_PHASE        = 20,
     DATA_VISCIDUS           = 21,
-    DATA_SARTURA            = 22
+    DATA_SARTURA            = 22,
+
+    DATA_EYE_OF_CTHUN       = 23
 };
 
 enum Creatures
 {
-    BOSS_EYE_OF_CTHUN       = 15589,
+    NPC_EYE_OF_CTHUN        = 15589,
     NPC_CTHUN_PORTAL        = 15896,
     NPC_CLAW_TENTACLE       = 15725,
     NPC_EYE_TENTACLE        = 15726,
@@ -60,6 +62,7 @@ enum Creatures
     NPC_SKERAM              = 15263,
     NPC_VEM                 = 15544,
     NPC_KRI                 = 15511,
+    NPC_YAUJ                = 15543,
     NPC_VEKLOR              = 15276,
     NPC_VEKNILASH           = 15275,
     NPC_OURO                = 15517,

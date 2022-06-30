@@ -179,7 +179,7 @@ public:
             me->SetFaction(FACTION_FRIENDLY);
 
             // was set before event start, so set again
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetImmuneToPC(true);
 
             if (instance->GetData(TYPE_TOMB_OF_SEVEN) == DONE) // what is this trying to do? Probably some kind of crash recovery
             {
@@ -203,7 +203,7 @@ public:
         void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->RemoveAllAuras();
-            me->DeleteThreatList();
+            me->GetThreatMgr().ClearAllThreat();
             me->CombatStop(true);
             me->LoadCreaturesAddon(true);
             if (me->IsAlive())

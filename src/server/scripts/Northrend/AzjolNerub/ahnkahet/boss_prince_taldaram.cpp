@@ -214,7 +214,7 @@ struct boss_taldaram : public BossAI
         // Event not started
         if (instance->GetData(DATA_TELDRAM_SPHERE1) != DONE || instance->GetData(DATA_TELDRAM_SPHERE2) != DONE)
         {
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(true);
             me->SetDisableGravity(true);
             me->SetHover(true);
             if (!me->HasAura(SPELL_BEAM_VISUAL))
@@ -260,7 +260,8 @@ struct boss_taldaram : public BossAI
                 me->SetDisableGravity(false);
                 me->SetHover(false);
                 me->RemoveAllAuras();
-                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE| UNIT_FLAG_NOT_SELECTABLE);
+                me->SetImmuneToAll(false);
                 me->UpdatePosition(me->GetHomePosition(), true);
             }
             summons.DespawnEntry(NPC_JEDOGA_CONTROLLER);
@@ -274,7 +275,8 @@ struct boss_taldaram : public BossAI
             me->SetDisableGravity(false);
             me->SetHover(false);
             me->RemoveAllAuras();
-            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE| UNIT_FLAG_NOT_SELECTABLE);
+            me->SetImmuneToAll(false);
         }
     }
 
@@ -409,7 +411,7 @@ struct boss_taldaram : public BossAI
                 {
                     //Count alive players
                     uint8 count = 0;
-                    std::list<HostileReference*> const t_list = me->getThreatMgr().getThreatList();
+                    std::list<HostileReference*> const t_list = me->GetThreatMgr().getThreatList();
                     if (!t_list.empty())
                     {
                         for (HostileReference const* reference : t_list)

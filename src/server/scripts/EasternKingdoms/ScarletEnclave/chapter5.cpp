@@ -465,7 +465,7 @@ public:
             if (battleStarted == ENCOUNTER_STATE_OUTRO && cr->GetEntry() == NPC_DEFENDER_OF_THE_LIGHT)
             {
                 cr->SetReactState(REACT_PASSIVE);
-                cr->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                cr->SetImmuneToAll(true);
                 cr->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
                 cr->HandleEmoteCommand(EMOTE_STATE_READY1H);
             }
@@ -546,7 +546,7 @@ public:
             events.Reset();
             summons.DespawnAll();
 
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(true);
             me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->SetVisible(true);
@@ -670,7 +670,7 @@ public:
                         break;
                     }
                 case EVENT_START_COUNTDOWN_14:
-                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->SetImmuneToAll(false);
                     me->SummonCreatureGroup(5);
                     return;
                 case EVENT_FINISH_FIGHT_1:
@@ -697,14 +697,14 @@ public:
                             if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
                             {
                                 summon->CombatStop(true);
-                                summon->DeleteThreatList();
-                                summon->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                                summon->GetThreatMgr().ClearAllThreat();
+                                summon->SetImmuneToAll(true);
                                 summon->SetReactState(REACT_PASSIVE);
                                 summon->GetMotionMaster()->Clear(false);
                             }
                         me->CombatStop(true);
-                        me->DeleteThreatList();
-                        me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        me->GetThreatMgr().ClearAllThreat();
+                        me->SetImmuneToAll(true);
                         me->SetReactState(REACT_PASSIVE);
                         me->GetMotionMaster()->Clear(false);
 
@@ -1027,7 +1027,7 @@ public:
                     {
                         tirion->CastSpell(tirion, SPELL_TIRION_CHARGE, true);
                         tirion->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
-                        tirion->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        tirion->SetImmuneToAll(true);
                     }
                     break;
                 case EVENT_OUTRO_SCENE_44:

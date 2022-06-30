@@ -1407,19 +1407,214 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
             }
         case TARGET_DEST_CASTER_FRONT_LEAP:
             {
-                Unit* unitCaster = m_caster->ToUnit();
-                if (!unitCaster)
+                float distance = m_spellInfo->Effects[effIndex].CalcRadius(m_caster);
+                Map* map = m_caster->GetMap();
+                uint32 mapid = m_caster->GetMapId();
+                uint32 phasemask = m_caster->GetPhaseMask();
+                float collisionHeight = m_caster->GetCollisionHeight();
+                float destx = 0.0f, desty = 0.0f, destz = 0.0f, ground = 0.0f, startx = 0.0f, starty = 0.0f, startz = 0.0f, starto = 0.0f;
+
+                Position pos;
+                Position lastpos;
+                m_caster->GetPosition(startx, starty, startz, starto);
+                pos.Relocate(startx, starty, startz, starto);
+                destx = pos.GetPositionX() + distance * cos(pos.GetOrientation());
+                desty = pos.GetPositionY() + distance * sin(pos.GetOrientation());
+
+                ground = map->GetHeight(phasemask, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
+
+                bool isCasterInWater = m_caster->IsInWater();
+                if (!m_caster->HasUnitMovementFlag(MOVEMENTFLAG_FALLING) || (pos.GetPositionZ() - ground < distance))
                 {
-                    break;
+                    float tstX = 0.0f, tstY = 0.0f, tstZ = 0.0f, prevX = 0.0f, prevY = 0.0f, prevZ = 0.0f;
+                    float tstZ1 = 0.0f, tstZ2 = 0.0f, tstZ3 = 0.0f, destz1 = 0.0f, destz2 = 0.0f, destz3 = 0.0f, srange = 0.0f, srange1 = 0.0f, srange2 = 0.0f, srange3 = 0.0f;
+                    float maxtravelDistZ = 2.65f;
+                    float overdistance = 0.0f;
+                    float totalpath = 0.0f;
+                    float beforewaterz = 0.0f;
+                    bool inwater = false;
+                    bool wcol = false;
+                    const float  step = 2.0f;
+                    const uint8 numChecks = ceil(fabs(distance / step));
+                    const float DELTA_X = (destx - pos.GetPositionX()) / numChecks;
+                    const float DELTA_Y = (desty - pos.GetPositionY()) / numChecks;
+                    int j = 1;
+                    for (; j < (numChecks + 1); j++)
+                    {
+                        prevX = pos.GetPositionX() + (float(j - 1) * DELTA_X);
+                        prevY = pos.GetPositionY() + (float(j - 1) * DELTA_Y);
+                        tstX = pos.GetPositionX() + (float(j) * DELTA_X);
+                        tstY = pos.GetPositionY() + (float(j) * DELTA_Y);
+
+                        if (j < 2)
+                        {
+                            prevZ = pos.GetPositionZ();
+                        }
+                        else
+                        {
+                            prevZ = tstZ;
+                        }
+
+                        tstZ = map->GetHeight(phasemask, tstX, tstY, prevZ + maxtravelDistZ, true);
+                        ground = tstZ;
+
+                        if (!isCasterInWater)
+                        {
+                            if (map->IsInWater(phasemask, tstX, tstY, tstZ, collisionHeight))
+                            {
+                                if (!(beforewaterz != 0.0f))
+                                {
+                                    beforewaterz = prevZ;
+                                }
+                                tstZ = beforewaterz;
+                                srange = sqrt((tstY - prevY) * (tstY - prevY) + (tstX - prevX) * (tstX - prevX));
+                                //TC_LOG_ERROR("server", "(start was from land) step in water , number of cycle = %i , distance of step = %f, total path = %f, Z = %f", j, srange, totalpath, tstZ);
+                            }
+                        }
+                        else if (map->IsInWater(phasemask, tstX, tstY, tstZ, collisionHeight))
+                        {
+                            prevZ = pos.GetPositionZ();
+                            tstZ = pos.GetPositionZ();
+                            srange = sqrt((tstY - prevY) * (tstY - prevY) + (tstX - prevX) * (tstX - prevX));
+
+                            inwater = true;
+                            if (inwater && (fabs(tstZ - ground) < 2.0f))
+                            {
+                                wcol = true;
+                                //TC_LOG_ERROR("server", "step in water with collide and use standart check (for continue way after possible collide), number of cycle = %i ", j);
+                            }
+
+                            // if (j < 2)
+                            //    TC_LOG_ERROR("server", "(start in water) step in water, number of cycle = %i , distance of step = %f, total path = %f", j, srange, totalpath);
+                            // else
+                            //    TC_LOG_ERROR("server", "step in water, number of cycle = %i , distance of step = %f, total path = %f", j, srange, totalpath);
+                        }
+
+                        bool IsInWater = map->IsInWater(phasemask, tstX, tstY, tstZ, collisionHeight);
+                        if ((!IsInWater && tstZ != beforewaterz) || wcol)  // second safety check z for blink way if on the ground
+                        {
+                            if (inwater && !IsInWater)
+                                inwater = false;
+
+                            // highest available point
+                            tstZ1 = map->GetHeight(phasemask, tstX, tstY, prevZ + maxtravelDistZ, true, 25.0f);
+                            // upper or floor
+                            tstZ2 = map->GetHeight(phasemask, tstX, tstY, prevZ, true, 25.0f);
+                            //lower than floor
+                            tstZ3 = map->GetHeight(phasemask, tstX, tstY, prevZ - maxtravelDistZ / 2, true, 25.0f);
+
+                            //distance of rays, will select the shortest in 3D
+                            srange1 = sqrt((tstY - prevY) * (tstY - prevY) + (tstX - prevX) * (tstX - prevX) + (tstZ1 - prevZ) * (tstZ1 - prevZ));
+                            //TC_LOG_ERROR("server", "step = %i, distance of ray1 = %f", j, srange1);
+                            srange2 = sqrt((tstY - prevY) * (tstY - prevY) + (tstX - prevX) * (tstX - prevX) + (tstZ2 - prevZ) * (tstZ2 - prevZ));
+                            //TC_LOG_ERROR("server", "step = %i, distance of ray2 = %f", j, srange2);
+                            srange3 = sqrt((tstY - prevY) * (tstY - prevY) + (tstX - prevX) * (tstX - prevX) + (tstZ3 - prevZ) * (tstZ3 - prevZ));
+                            //TC_LOG_ERROR("server", "step = %i, distance of ray3 = %f", j, srange3);
+
+                            if (srange1 < srange2)
+                            {
+                                tstZ = tstZ1;
+                                srange = srange1;
+                            }
+                            else if (srange3 < srange2)
+                            {
+                                tstZ = tstZ3;
+                                srange = srange3;
+                            }
+                            else
+                            {
+                                tstZ = tstZ2;
+                                srange = srange2;
+                            }
+
+                            //TC_LOG_ERROR("server", "step on ground, number of cycle = %i , distance of step = %f, total path = %f", j, srange, totalpath);
+                        }
+
+                        destx = tstX;
+                        desty = tstY;
+                        destz = tstZ;
+
+                        totalpath += srange;
+
+                        if (totalpath > distance)
+                        {
+                            overdistance = totalpath - distance;
+                            //TC_LOG_ERROR("server", "total path > than distance in 3D , need to move back a bit for save distance, total path = %f, overdistance = %f", totalpath, overdistance);
+                        }
+
+                        bool col = VMAP::VMapFactory::createOrGetVMapMgr()->GetObjectHitPos(mapid, prevX, prevY, prevZ + 0.5f, tstX, tstY, tstZ + 0.5f, tstX, tstY, tstZ, -0.5f);
+                        // check dynamic collision
+                        bool dcol = m_caster->GetMap()->GetObjectHitPos(phasemask, prevX, prevY, prevZ + 0.5f, tstX, tstY, tstZ + 0.5f, tstX, tstY, tstZ, -0.5f);
+
+                        // collision occured
+                        if (col || dcol || (overdistance > 0.0f && !map->IsInWater(phasemask, tstX, tstY, ground, collisionHeight)) || (fabs(prevZ - tstZ) > maxtravelDistZ && (tstZ > prevZ)))
+                        {
+                            if ((overdistance > 0.0f) && (overdistance < step))
+                            {
+                                destx = prevX + overdistance * cos(pos.GetOrientation());
+                                desty = prevY + overdistance * sin(pos.GetOrientation());
+                                //TC_LOG_ERROR("server", "(collision) collision occured 1");
+                            }
+                            else
+                            {
+                                // move back a bit
+                                destx = tstX - (0.6 * cos(pos.GetOrientation()));
+                                desty = tstY - (0.6 * sin(pos.GetOrientation()));
+                                //TC_LOG_ERROR("server", "(collision) collision occured 2");
+                            }
+
+                            // highest available point
+                            destz1 = map->GetHeight(phasemask, destx, desty, prevZ + maxtravelDistZ, true, 25.0f);
+                            // upper or floor
+                            destz2 = map->GetHeight(phasemask, destx, desty, prevZ, true, 25.0f);
+                            //lower than floor
+                            destz3 = map->GetHeight(phasemask, destx, desty, prevZ - maxtravelDistZ / 2, true, 25.0f);
+
+                            //distance of rays, will select the shortest in 3D
+                            srange1 = sqrt((desty - prevY) * (desty - prevY) + (destx - prevX) * (destx - prevX) + (destz1 - prevZ) * (destz1 - prevZ));
+                            srange2 = sqrt((desty - prevY) * (desty - prevY) + (destx - prevX) * (destx - prevX) + (destz2 - prevZ) * (destz2 - prevZ));
+                            srange3 = sqrt((desty - prevY) * (desty - prevY) + (destx - prevX) * (destx - prevX) + (destz3 - prevZ) * (destz3 - prevZ));
+
+                            if (srange1 < srange2)
+                                destz = destz1;
+                            else if (srange3 < srange2)
+                                destz = destz3;
+                            else
+                                destz = destz2;
+
+                            if (inwater && destz < prevZ && !wcol)
+                                destz = prevZ;
+                            //TC_LOG_ERROR("server", "(collision) destZ rewrited in prevZ");
+
+                            break;
+                        }
+                        // we have correct destz now
+                    }
+                    //}
+
+                    lastpos.Relocate(destx, desty, destz + 0.5f, pos.GetOrientation());
+                    dest = SpellDestination(lastpos);
                 }
+                else
+                {
+                    float z = pos.GetPositionZ();
+                    bool col = VMAP::VMapFactory::createOrGetVMapMgr()->GetObjectHitPos(mapid, pos.GetPositionX(), pos.GetPositionY(), z + 0.5f, destx, desty, z + 0.5f, destx, desty, z, -0.5f);
+                    // check dynamic collision
+                    bool dcol = m_caster->GetMap()->GetObjectHitPos(phasemask, pos.GetPositionX(), pos.GetPositionY(), z + 0.5f, destx, desty, z + 0.5f, destx, desty, z, -0.5f);
 
-                float dist = m_spellInfo->Effects[effIndex].CalcRadius(unitCaster);
-                float angle = targetType.CalcDirectionAngle();
+                    // collision occured
+                    if (col || dcol)
+                    {
+                        // move back a bit
+                        destx = destx - (0.6 * cos(pos.GetOrientation()));
+                        desty = desty - (0.6 * sin(pos.GetOrientation()));
+                    }
 
-                Position pos = dest._position;
-
-                unitCaster->MovePositionToFirstCollision(pos, dist, angle);
-                dest.Relocate(pos);
+                    lastpos.Relocate(destx, desty, z, pos.GetOrientation());
+                    dest = SpellDestination(lastpos);
+                    //float range = sqrt((desty - pos.GetPositionY())*(desty - pos.GetPositionY()) + (destx - pos.GetPositionX())*(destx - pos.GetPositionX()));
+                    //TC_LOG_ERROR("server", "Blink number 2, in falling but at a hight, distance of blink = %f", range);
+                }
                 break;
             }
         default:
@@ -3444,8 +3639,15 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
         // skip triggered spell (item equip spell casting and other not explicit character casts/item uses)
         if (!(_triggeredCastFlags & TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS) && m_spellInfo->IsBreakingStealth())
         {
-            m_caster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CAST, 0, m_spellInfo->Id == 75);
-            m_caster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_SPELL_ATTACK, 0, m_spellInfo->Id == 75);
+            // Farsight spells exception
+            uint32 exceptSpellId = 0;
+            if (m_spellInfo->HasEffect(SPELL_EFFECT_ADD_FARSIGHT))
+            {
+                exceptSpellId = m_spellInfo->Id;
+            }
+
+            m_caster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CAST, exceptSpellId, m_spellInfo->Id == 75);
+            m_caster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_SPELL_ATTACK, exceptSpellId, m_spellInfo->Id == 75);
         }
 
         m_caster->SetCurrentCastedSpell(this);
@@ -3505,14 +3707,17 @@ void Spell::cancel(bool bySelf)
             break;
 
         case SPELL_STATE_CASTING:
-            for (std::list<TargetInfo>::const_iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
-                if ((*ihit).missCondition == SPELL_MISS_NONE)
-                    if (Unit* unit = m_caster->GetGUID() == ihit->targetGUID ? m_caster : ObjectAccessor::GetUnit(*m_caster, ihit->targetGUID))
-                        unit->RemoveOwnedAura(m_spellInfo->Id, m_originalCasterGUID, 0, AURA_REMOVE_BY_CANCEL);
+            if (!bySelf)
+            {
+                for (std::list<TargetInfo>::const_iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
+                    if ((*ihit).missCondition == SPELL_MISS_NONE)
+                        if (Unit* unit = m_caster->GetGUID() == ihit->targetGUID ? m_caster : ObjectAccessor::GetUnit(*m_caster, ihit->targetGUID))
+                            unit->RemoveOwnedAura(m_spellInfo->Id, m_originalCasterGUID, 0, AURA_REMOVE_BY_CANCEL);
 
-            SendChannelUpdate(0);
-            SendInterrupted(0);
-            SendCastResult(SPELL_FAILED_INTERRUPTED);
+                SendChannelUpdate(0);
+                SendInterrupted(0);
+                SendCastResult(SPELL_FAILED_INTERRUPTED);
+            }
 
             if (m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->ToPlayer()->NeedSendSpectatorData())
                 ArenaSpectator::SendCommand_Spell(m_caster->FindMap(), m_caster->GetGUID(), "SPE", m_spellInfo->Id, bySelf ? 99998 : 99999);
@@ -3523,7 +3728,6 @@ void Spell::cancel(bool bySelf)
 
             m_appliedMods.clear();
             break;
-
         default:
             break;
     }
@@ -3532,7 +3736,12 @@ void Spell::cancel(bool bySelf)
     if (m_selfContainer && *m_selfContainer == this)
         *m_selfContainer = nullptr;
 
-    m_caster->RemoveDynObject(m_spellInfo->Id);
+    // Do not remove current far sight object (already done in Spell::EffectAddFarsight) to prevent from reset viewpoint to player
+    if (!(bySelf && m_spellInfo->HasEffect(SPELL_EFFECT_ADD_FARSIGHT)))
+    {
+        m_caster->RemoveDynObject(m_spellInfo->Id);
+    }
+
     if (m_spellInfo->IsChanneled()) // if not channeled then the object for the current cast wasn't summoned yet
         m_caster->RemoveGameObject(m_spellInfo->Id, true);
 
@@ -5642,31 +5851,27 @@ SpellCastResult Spell::CheckCast(bool strict)
             if ((!m_caster->IsTotem() || !m_spellInfo->IsPositive()) && !m_spellInfo->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT) &&
                 !m_spellInfo->HasAttribute(SPELL_ATTR5_ALWAYS_AOE_LINE_OF_SIGHT) && !(m_spellFlags & SPELL_FLAG_REDIRECTED))
             {
-                WorldObject* losCenter = nullptr;
+                bool castedByGameobject = false;
                 uint32 losChecks = LINEOFSIGHT_ALL_CHECKS;
                 if (m_originalCasterGUID.IsGameObject())
                 {
-                    losCenter = m_caster->GetMap()->GetGameObject(m_originalCasterGUID);
+                    castedByGameobject = m_caster->GetMap()->GetGameObject(m_originalCasterGUID) != nullptr;
                 }
                 else if (m_caster->GetEntry() == WORLD_TRIGGER)
                 {
                     if (TempSummon* tempSummon = m_caster->ToTempSummon())
                     {
-                        losCenter = tempSummon->GetSummonerGameObject();
+                        castedByGameobject = tempSummon->GetSummonerGameObject() != nullptr;
                     }
                 }
 
-                if (losCenter)
+                if (castedByGameobject)
                 {
                     // If spell casted by gameobject then ignore M2 models
                     losChecks &= ~LINEOFSIGHT_CHECK_GOBJECT_M2;
                 }
-                else
-                {
-                    losCenter = m_caster;
-                }
 
-                if (!losCenter->IsWithinLOSInMap(target, VMAP::ModelIgnoreFlags::M2, LineOfSightChecks(losChecks)))
+                if (!m_caster->IsWithinLOSInMap(target, VMAP::ModelIgnoreFlags::M2, LineOfSightChecks(losChecks)))
                 {
                     return SPELL_FAILED_LINE_OF_SIGHT;
                 }
@@ -5683,31 +5888,27 @@ SpellCastResult Spell::CheckCast(bool strict)
         if ((!m_caster->IsTotem() || !m_spellInfo->IsPositive()) && !m_spellInfo->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT) &&
             !m_spellInfo->HasAttribute(SPELL_ATTR5_ALWAYS_AOE_LINE_OF_SIGHT))
         {
-            WorldObject* losCenter = nullptr;
+            bool castedByGameobject = false;
             uint32 losChecks = LINEOFSIGHT_ALL_CHECKS;
             if (m_originalCasterGUID.IsGameObject())
             {
-                losCenter = m_caster->GetMap()->GetGameObject(m_originalCasterGUID);
+                castedByGameobject = m_caster->GetMap()->GetGameObject(m_originalCasterGUID) != nullptr;
             }
             else if (m_caster->GetEntry() == WORLD_TRIGGER)
             {
                 if (TempSummon* tempSummon = m_caster->ToTempSummon())
                 {
-                    losCenter = tempSummon->GetSummonerGameObject();
+                    castedByGameobject = tempSummon->GetSummonerGameObject() != nullptr;
                 }
             }
 
-            if (losCenter)
+            if (castedByGameobject)
             {
                 // If spell casted by gameobject then ignore M2 models
                 losChecks &= ~LINEOFSIGHT_CHECK_GOBJECT_M2;
             }
-            else
-            {
-                losCenter = m_caster;
-            }
 
-            if (!losCenter->IsWithinLOS(x, y, z, VMAP::ModelIgnoreFlags::M2, LineOfSightChecks((losChecks))))
+            if (!m_caster->IsWithinLOS(x, y, z, VMAP::ModelIgnoreFlags::M2, LineOfSightChecks((losChecks))))
             {
                 return SPELL_FAILED_LINE_OF_SIGHT;
             }
@@ -7763,7 +7964,6 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
                 }
             }
 
-            WorldObject* caster = nullptr;
             if (gobCaster)
             {
                 if (gobCaster->GetGOInfo()->IsIgnoringLOSChecks())
@@ -7771,14 +7971,8 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
                     return true;
                 }
 
-                caster = gobCaster;
-
                 // If spell casted by gameobject then ignore M2 models
                 losChecks &= ~LINEOFSIGHT_CHECK_GOBJECT_M2;
-            }
-            else
-            {
-                caster = m_caster;
             }
 
             if (target != m_caster)
@@ -7794,7 +7988,7 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
                         return false;
                     }
                 }
-                else if (!target->IsWithinLOSInMap(caster, VMAP::ModelIgnoreFlags::M2, LineOfSightChecks(losChecks)))
+                else if (!m_caster->IsWithinLOSInMap(target, VMAP::ModelIgnoreFlags::M2, LineOfSightChecks(losChecks)))
                 {
                     return false;
                 }
@@ -7996,7 +8190,6 @@ void Spell::HandleLaunchPhase()
 
     PrepareTargetProcessing();
 
-    bool firstTarget = true;
     for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
     {
         TargetInfo& target = *ihit;
@@ -8030,14 +8223,14 @@ void Spell::HandleLaunchPhase()
                     break;
             }
         }
-        DoAllEffectOnLaunchTarget(target, multiplier, firstTarget);
-        firstTarget = false;
+
+        DoAllEffectOnLaunchTarget(target, multiplier);
     }
 
     FinishTargetProcessing();
 }
 
-void Spell::DoAllEffectOnLaunchTarget(TargetInfo& targetInfo, float* multiplier, bool firstTarget)
+void Spell::DoAllEffectOnLaunchTarget(TargetInfo& targetInfo, float* multiplier)
 {
     Unit* unit = nullptr;
     // In case spell hit target, do all effect on that target
@@ -8049,7 +8242,6 @@ void Spell::DoAllEffectOnLaunchTarget(TargetInfo& targetInfo, float* multiplier,
     if (!unit)
         return;
 
-    uint8 ssEffect = MAX_SPELL_EFFECTS;
     for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
         if (targetInfo.effectMask & (1 << i))
@@ -8080,18 +8272,6 @@ void Spell::DoAllEffectOnLaunchTarget(TargetInfo& targetInfo, float* multiplier,
                 m_damageMultipliers[i] *= multiplier[i];
             }
             targetInfo.damage += m_damage;
-
-            // Sweeping Strikes
-            switch (m_spellInfo->Effects[i].Effect)
-            {
-                case SPELL_EFFECT_SCHOOL_DAMAGE:
-                case SPELL_EFFECT_WEAPON_DAMAGE:
-                case SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL:
-                case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
-                case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
-                    ssEffect = i;
-                    break;
-            }
         }
     }
 
@@ -8108,31 +8288,6 @@ void Spell::DoAllEffectOnLaunchTarget(TargetInfo& targetInfo, float* multiplier,
     float critChance = caster->SpellDoneCritChance(unit, m_spellInfo, m_spellSchoolMask, m_attackType, false);
     critChance = unit->SpellTakenCritChance(caster, m_spellInfo, m_spellSchoolMask, critChance, m_attackType, false);
     targetInfo.crit = roll_chance_f(std::max(0.0f, critChance));
-
-    // Sweeping strikes
-    if (m_caster->getClass() == CLASS_WARRIOR && ssEffect < MAX_SPELL_EFFECTS && m_spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR &&
-            ((m_spellInfo->Id != 50622 && m_spellInfo->Id != 44949) || firstTarget))
-    {
-        if (Aura* aur = m_caster->GetAura(12328))
-        {
-            Unit* target = m_caster->SelectNearbyNoTotemTarget(unit);
-            if (!target || target == unit)
-                return; // finish
-
-            int32 mdmg = m_damage;
-            int32 basepoints = 0;
-            m_damage = 0;
-
-            HandleEffects(target, nullptr, nullptr, ssEffect, SPELL_EFFECT_HANDLE_LAUNCH_TARGET);
-
-            basepoints = (targetInfo.crit ? Unit::SpellCriticalDamageBonus(m_caster, m_spellInfo, m_damage, target) : m_damage);
-            m_damage = mdmg;
-            m_caster->CastCustomSpell(target, 26654, &basepoints, nullptr, nullptr, true);
-
-            if (m_spellInfo->Id != 44949)
-                aur->DropCharge();
-        }
-    }
 }
 
 SpellCastResult Spell::CanOpenLock(uint32 effIndex, uint32 lockId, SkillType& skillId, int32& reqSkillValue, int32& skillValue)

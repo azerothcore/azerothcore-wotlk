@@ -620,7 +620,7 @@ public:
                 case EVENT_SUMMON_CHRONO:
                     if (Creature* epoch = me->SummonCreature(NPC_EPOCH_HUNTER, 2640.49f, 696.15f, 64.31f, 4.51f, TEMPSUMMON_MANUAL_DESPAWN))
                     {
-                        epoch->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        epoch->SetImmuneToAll(true);
                         epoch->AI()->Talk(SAY_EPOCH_ENTER1);
                     }
                     break;
@@ -703,7 +703,7 @@ public:
                 case EVENT_CALL_EPOCH:
                     if (Creature* epoch = summons.GetCreatureWithEntry(NPC_EPOCH_HUNTER))
                     {
-                        epoch->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        epoch->SetImmuneToAll(false);
                         epoch->GetMotionMaster()->MovePoint(0, *me, false, true);
                     }
                     break;
@@ -759,7 +759,7 @@ public:
                     Talk(SAY_EVENT_COMPLETE);
                     break;
                 case EVENT_THRALL_RUN_AWAY:
-                    me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->SetImmuneToAll(true);
                     me->SetReactState(REACT_PASSIVE);
                     SetEscortPaused(false);
                     break;

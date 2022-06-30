@@ -898,6 +898,47 @@ namespace Acore
         float i_range;
     };
 
+    class NearestAttackableNoTotemUnitInObjectRangeCheck
+    {
+    public:
+        NearestAttackableNoTotemUnitInObjectRangeCheck(WorldObject const* obj, Unit const* owner, float range) : i_obj(obj), i_owner(owner), i_range(range) {}
+
+        bool operator()(Unit* u)
+        {
+            if (!u->IsAlive())
+            {
+                return false;
+            }
+
+            if (u->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET)
+            {
+                return false;
+            }
+
+            if (u->GetTypeId() == TYPEID_UNIT && u->ToCreature()->IsTotem())
+            {
+                return false;
+            }
+
+            if (!u->isTargetableForAttack(false, i_owner))
+            {
+                return false;
+            }
+
+            if (!i_obj->IsWithinDistInMap(u, i_range) || !i_owner->IsValidAttackTarget(u) || !i_obj->IsWithinLOSInMap(u))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+    private:
+        WorldObject const* i_obj;
+        Unit const* i_owner;
+        float i_range;
+    };
+
     class AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck
     {
     public:
@@ -1037,8 +1078,19 @@ namespace Acore
         bool operator()(Unit* u)
         {
             // Check contains checks for: live, non-selectable, non-attackable flags, flight check and GM check, ignore totems
-            if (u->GetTypeId() == TYPEID_UNIT && ((Creature*)u)->IsTotem())
-                return false;
+            if (Creature* creature = u->ToCreature())
+            {
+                if (creature->IsTotem())
+                {
+                    return false;
+                }
+
+                if (creature->IsAvoidingAOE())
+                {
+                    return false;
+                }
+
+            }
 
             if (i_funit->_IsValidAttackTarget(u, _spellInfo, i_obj->GetTypeId() == TYPEID_DYNAMICOBJECT ? i_obj : nullptr) && i_obj->IsWithinDistInMap(u, i_range))
                 return true;
@@ -1061,7 +1113,7 @@ namespace Acore
         {}
         bool operator()(Unit* u)
         {
-            if (!u->IsAlive() || u->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE) || (u->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC) && !u->IsInCombat()))
+            if (!u->IsAlive() || u->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE) || (u->IsImmuneToPC() && !u->IsInCombat()))
                 return false;
             if (u->GetGUID() == i_funit->GetGUID())
                 return false;

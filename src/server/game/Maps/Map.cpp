@@ -1336,7 +1336,8 @@ GridMap::GridMap()
     _maxHeight = nullptr;
     _minHeight = nullptr;
     // Liquid data
-    _liquidType    = 0;
+    _liquidGlobalEntry = 0;
+    _liquidGlobalFlags = 0;
     _liquidOffX   = 0;
     _liquidOffY   = 0;
     _liquidWidth  = 0;
@@ -1513,7 +1514,8 @@ bool GridMap::loadLiquidData(FILE* in, uint32 offset, uint32 /*size*/)
     if (fread(&header, sizeof(header), 1, in) != 1 || header.fourcc != MapLiquidMagic.asUInt)
         return false;
 
-    _liquidType   = header.liquidType;
+    _liquidGlobalEntry = header.liquidType;
+    _liquidGlobalFlags = header.liquidFlags;
     _liquidOffX  = header.offsetX;
     _liquidOffY  = header.offsetY;
     _liquidWidth = header.width;
@@ -1893,7 +1895,7 @@ inline LiquidData const GridMap::GetLiquidData(float x, float y, float z, float 
     LiquidData liquidData;
 
     // Check water type (if no water return)
-    if (_liquidType || _liquidFlags)
+    if (_liquidGlobalFlags || _liquidFlags)
     {
         // Get cell
         float cx = MAP_RESOLUTION * (32 - x / SIZE_OF_GRIDS);
@@ -1903,38 +1905,34 @@ inline LiquidData const GridMap::GetLiquidData(float x, float y, float z, float 
         int y_int = (int) cy & (MAP_RESOLUTION - 1);
 
         // Check water type in cell
-        int    idx   = (x_int >> 3) * 16 + (y_int >> 3);
-        uint8  type  = _liquidFlags ? _liquidFlags[idx] : _liquidType;
-        uint32 entry = 0;
-        if (_liquidEntry)
+        int idx=(x_int>>3)*16 + (y_int>>3);
+        uint8 type = _liquidFlags ? _liquidFlags[idx] : _liquidGlobalFlags;
+        uint32 entry = _liquidEntry ? _liquidEntry[idx] : _liquidGlobalEntry;
+        if (LiquidTypeEntry const* liquidEntry = sLiquidTypeStore.LookupEntry(entry))
         {
-            if (LiquidTypeEntry const* liquidEntry = sLiquidTypeStore.LookupEntry(_liquidEntry[idx]))
+            type &= MAP_LIQUID_TYPE_DARK_WATER;
+            uint32 liqTypeIdx = liquidEntry->Type;
+            if (entry < 21)
             {
-                entry = liquidEntry->Id;
-                type &= MAP_LIQUID_TYPE_DARK_WATER;
-                uint32 liqTypeIdx = liquidEntry->Type;
-                if (entry < 21)
+                if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(getArea(x, y)))
                 {
-                    if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(getArea(x, y)))
+                    uint32 overrideLiquid = area->LiquidTypeOverride[liquidEntry->Type];
+                    if (!overrideLiquid && area->zone)
                     {
-                        uint32 overrideLiquid = area->LiquidTypeOverride[liquidEntry->Type];
-                        if (!overrideLiquid && area->zone)
-                        {
-                            area = sAreaTableStore.LookupEntry(area->zone);
-                            if (area)
-                                overrideLiquid = area->LiquidTypeOverride[liquidEntry->Type];
-                        }
+                        area = sAreaTableStore.LookupEntry(area->zone);
+                        if (area)
+                            overrideLiquid = area->LiquidTypeOverride[liquidEntry->Type];
+                    }
 
-                        if (LiquidTypeEntry const* liq = sLiquidTypeStore.LookupEntry(overrideLiquid))
-                        {
-                            entry      = overrideLiquid;
-                            liqTypeIdx = liq->Type;
-                        }
+                    if (LiquidTypeEntry const* liq = sLiquidTypeStore.LookupEntry(overrideLiquid))
+                    {
+                        entry      = overrideLiquid;
+                        liqTypeIdx = liq->Type;
                     }
                 }
-
-                type |= 1 << liqTypeIdx;
             }
+
+            type |= 1 << liqTypeIdx;
         }
 
          // Check req liquid type mask
@@ -2259,9 +2257,9 @@ LiquidData const Map::GetLiquidData(uint32 phaseMask, float x, float y, float z,
         // Get position delta
         if (delta > collisionHeight)
             liquidData.Status = LIQUID_MAP_UNDER_WATER;
-        if (delta > 0.0f)
+        else if (delta > 0.0f)
             liquidData.Status = LIQUID_MAP_IN_WATER;
-        if (delta > -0.1f)
+        else if (delta > -0.1f)
             liquidData.Status = LIQUID_MAP_WATER_WALK;
         else
             liquidData.Status = LIQUID_MAP_ABOVE_WATER;
@@ -2442,6 +2440,14 @@ float Map::GetWaterLevel(float x, float y) const
 
 bool Map::isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, LineOfSightChecks checks, VMAP::ModelIgnoreFlags ignoreFlags) const
 {
+    if (!sWorld->getBoolConfig(CONFIG_VMAP_BLIZZLIKE_PVP_LOS))
+    {
+        if (IsBattlegroundOrArena())
+        {
+            ignoreFlags = VMAP::ModelIgnoreFlags::Nothing;
+        }
+    }
+
     if ((checks & LINEOFSIGHT_CHECK_VMAP) && !VMAP::VMapFactory::createOrGetVMapMgr()->isInLineOfSight(GetId(), x1, y1, z1, x2, y2, z2, ignoreFlags))
     {
         return false;
@@ -3623,7 +3629,7 @@ Corpse* Map::ConvertCorpseToBones(ObjectGuid const ownerGuid, bool insignia /*= 
         bones->SetPhaseMask(corpse->GetPhaseMask(), false);
 
         bones->SetUInt32Value(CORPSE_FIELD_FLAGS, CORPSE_FLAG_UNK2 | CORPSE_FLAG_BONES);
-        bones->SetGuidValue(CORPSE_FIELD_OWNER, ObjectGuid::Empty);
+        bones->SetGuidValue(CORPSE_FIELD_OWNER, corpse->GetOwnerGUID());
 
         for (uint8 i = 0; i < EQUIPMENT_SLOT_END; ++i)
             if (corpse->GetUInt32Value(CORPSE_FIELD_ITEM + i))

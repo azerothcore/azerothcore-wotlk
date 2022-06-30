@@ -142,7 +142,7 @@ public:
                 me->SetCanFly(false);
                 me->SetDisableGravity(false);
                 me->SetFacingTo(0.25f);
-                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetImmuneToAll(false);
             }
         }
 
