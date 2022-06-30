@@ -80,6 +80,8 @@ bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
         case ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS:
         case ACHIEVEMENT_CRITERIA_TYPE_REACH_LEVEL:
         case ACHIEVEMENT_CRITERIA_TYPE_ON_LOGIN:
+        case ACHIEVEMENT_CRITERIA_TYPE_LOOT_EPIC_ITEM:
+        case ACHIEVEMENT_CRITERIA_TYPE_RECEIVE_EPIC_ITEM:
             break;
         default:
             if (dataType != ACHIEVEMENT_CRITERIA_DATA_TYPE_SCRIPT)
