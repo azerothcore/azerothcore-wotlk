@@ -19139,6 +19139,21 @@ void Unit::_EnterVehicle(Vehicle* vehicle, int8 seatId, AuraApplication const* a
 
         WorldPacket data(SMSG_ON_CANCEL_EXPECTED_RIDE_VEHICLE_AURA, 0);
         player->GetSession()->SendPacket(&data);
+
+        if (vehicle->GetBase()->GetTypeId() == TYPEID_UNIT)
+        {
+            // If a player entered a vehicle that is part of a formation, remove it from said formation and replace current movement generator with MoveIdle (no movement)
+            if (CreatureGroup* creatureGroup = vehicle->GetBase()->ToCreature()->GetFormation())
+            {
+                creatureGroup->RemoveMember(vehicle->GetBase()->ToCreature());
+                vehicle->GetBase()->GetMotionMaster()->MoveIdle();
+            }
+
+            // If the vehicle has the random movement generator active, replace it with MoveIdle (no movement) so it won't override player control
+            if (vehicle->GetBase()->GetMotionMaster()->GetCurrentMovementGeneratorType() == RANDOM_MOTION_TYPE)
+                vehicle->GetBase()->GetMotionMaster()->MoveIdle();
+        }
+
     }
 
     ASSERT(!m_vehicle);
@@ -19260,6 +19275,10 @@ void Unit::_ExitVehicle(Position const* exitPosition)
 
         sScriptMgr->AnticheatSetUnderACKmount(player);
         sScriptMgr->AnticheatSetSkipOnePacketForASH(player, true);
+
+        // When a player exits a creature vehicle, restore its default motion generator (if any)
+        if (vehicle->GetBase()->GetTypeId() == TYPEID_UNIT)
+            vehicle->GetBase()->GetMotionMaster()->InitDefault();
     }
     else if (HasUnitMovementFlag(MOVEMENTFLAG_ROOT))
     {
