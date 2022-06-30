@@ -1,4 +1,25 @@
 --
 DELETE FROM `achievement_criteria_data` WHERE `criteria_id` IN (6140, 6141);
-INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES (6140, 25, 4, 0);
-INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES (6141, 25, 5, 0);
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES
+(6140, 25, 4, 0),
+(6141, 25, 5, 0),
+(6142, 25, 4, 0),
+(4768, 25, 4, 0),
+(4769, 25, 4, 0),
+(4770, 25, 4, 0),
+(4771, 25, 4, 0),
+(4772, 25, 4, 0),
+(4773, 25, 4, 0),
+(4774, 25, 4, 0),
+(4775, 25, 4, 0),
+(4776, 25, 4, 0),
+(4777, 25, 4, 0),
+(4778, 25, 4, 0),
+(4779, 25, 4, 0),
+(4780, 25, 4, 0),
+(4781, 25, 4, 0),
+(4782, 25, 4, 0),
+(4783, 25, 4, 0),
+(4784, 25, 4, 0),
+(4785, 25, 4, 0),
+(4786, 25, 4, 0);
