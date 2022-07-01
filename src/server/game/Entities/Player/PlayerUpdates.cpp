@@ -980,9 +980,9 @@ void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType, Item* ite
 
 void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool defence, Item* item /*= nullptr*/)
 {
-    uint8 plevel = getLevel();
+    uint8  playerLevel = getLevel();
     uint16 currentSkillValue = defence ? GetBaseDefenseSkillValue() : GetBaseWeaponSkillValue(attType);
-    uint16 currentSkillMax = 5 * plevel;
+    uint16 currentSkillMax = 5 * playerLevel;
     int32  skillDiff = currentSkillMax - currentSkillValue;
 
     // Max skill reached for level.
@@ -992,15 +992,15 @@ void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool def
         return;
     }
 
-    uint8 greylevel = Acore::XP::GetGrayLevel(plevel);
+    uint8 greylevel = Acore::XP::GetGrayLevel(playerLevel);
     uint8 moblevel = defence ? victim->getLevelForTarget(this) : victim->getLevel(); // if defense than victim == attacker
     /*if (moblevel < greylevel)
         return;*/
     // Patch 3.0.8 (2009-01-20): You can no longer skill up weapons on mobs that are immune to damage.
 
-    if (moblevel > plevel + 5)
+    if (moblevel > playerLevel + 5)
     {
-        moblevel = plevel + 5;
+        moblevel = playerLevel + 5;
     }
 
     uint8 lvldif = moblevel - greylevel;
@@ -1009,13 +1009,15 @@ void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool def
         lvldif = 3;
     }
 
-    float chance = float(3 * lvldif * skillDiff) / plevel;
+    float chance = float(3 * lvldif * skillDiff) / playerLevel;
     if (!defence)
     {
         chance += chance * 0.02f * GetStat(STAT_INTELLECT);
     }
 
     chance = chance < 1.0f ? 1.0f : chance; // minimum chance to increase skill is 1%
+
+    LOG_DEBUG("entities.player", "Player::UpdateCombatSkills(defence:{}, playerLevel:{}, moblevel:{}) -> ({}/{}) chance to increase skill is {}\%", defence, playerLevel, moblevel, currentSkillValue, currentSkillMax, chance);
 
     if (roll_chance_f(chance))
     {
