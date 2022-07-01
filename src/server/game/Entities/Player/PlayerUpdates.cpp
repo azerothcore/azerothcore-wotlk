@@ -980,42 +980,54 @@ void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType, Item* ite
 
 void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool defence, Item* item /*= nullptr*/)
 {
-    uint8 plevel    = getLevel(); // if defense than victim == attacker
+    uint8 plevel = getLevel();
+    uint16 currentSkillValue = defence ? GetBaseDefenseSkillValue() : GetBaseWeaponSkillValue(attType);
+    uint16 currentSkillMax = 5 * plevel;
+    int32  skillDiff = currentSkillMax - currentSkillValue;
+
+    // Max skill reached for level.
+    // Can in some cases be less than 0: having max skill and then .level -1 as example.
+    if (skillDiff <= 0)
+    {
+        return;
+    }
+
     uint8 greylevel = Acore::XP::GetGrayLevel(plevel);
-    uint8 moblevel  = victim->getLevelForTarget(this);
+    uint8 moblevel = defence ? victim->getLevelForTarget(this) : victim->getLevel(); // if defense than victim == attacker
     /*if (moblevel < greylevel)
         return;*/
     // Patch 3.0.8 (2009-01-20): You can no longer skill up weapons on mobs that are immune to damage.
 
     if (moblevel > plevel + 5)
+    {
         moblevel = plevel + 5;
+    }
 
     uint8 lvldif = moblevel - greylevel;
     if (lvldif < 3)
+    {
         lvldif = 3;
+    }
 
-    uint32 skilldif = 5 * plevel - (defence ? GetBaseDefenseSkillValue()
-                                            : GetBaseWeaponSkillValue(attType));
-    if (skilldif <= 0)
-        return;
-
-    float chance = float(3 * lvldif * skilldif) / plevel;
+    float chance = float(3 * lvldif * skillDiff) / plevel;
     if (!defence)
-        if (getClass() == CLASS_WARRIOR || getClass() == CLASS_ROGUE)
-            chance += chance * 0.02f * GetStat(STAT_INTELLECT);
+    {
+        chance += chance * 0.02f * GetStat(STAT_INTELLECT);
+    }
 
-    chance =
-        chance < 1.0f ? 1.0f : chance; // minimum chance to increase skill is 1%
+    chance = chance < 1.0f ? 1.0f : chance; // minimum chance to increase skill is 1%
 
     if (roll_chance_f(chance))
     {
         if (defence)
+        {
             UpdateDefense();
+        }
         else
+        {
             UpdateWeaponSkill(victim, attType, item);
+        }
     }
-    else
-        return;
 }
 
 void Player::UpdateSkillsForLevel()
