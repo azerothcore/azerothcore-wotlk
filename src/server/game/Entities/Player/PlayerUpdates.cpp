@@ -1003,7 +1003,7 @@ void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool def
         moblevel = playerLevel + 5;
     }
 
-    uint8 lvldif = moblevel - greylevel;
+    int16 lvldif = moblevel - greylevel;
     if (lvldif < 3)
     {
         lvldif = 3;
