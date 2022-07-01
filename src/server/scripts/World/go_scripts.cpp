@@ -825,7 +825,7 @@ public:
                             Acore::AnyPlayerInObjectRangeCheck check(me, me->GetVisibilityRange(), false);
                             Acore::PlayerListSearcherWithSharedVision<Acore::AnyPlayerInObjectRangeCheck> searcher(me, targets, check);
                             Cell::VisitWorldObjects(me, searcher, me->GetVisibilityRange());
-                            for (std::list<Player*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
+                            for (Player const* player : targets)
                             {
                                 Player* player = (*iter);
 
