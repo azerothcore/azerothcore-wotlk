@@ -38,12 +38,23 @@ void HostileRefMgr::threatAssist(Unit* victim, float baseThreat, SpellInfo const
         return;
 
     HostileReference* ref = getFirst();
-    float threat = ThreatCalcHelper::calcThreat(victim, iOwner, baseThreat, (threatSpell ? threatSpell->GetSchoolMask() : SPELL_SCHOOL_MASK_NORMAL), threatSpell);
+    float threat = ThreatCalcHelper::calcThreat(victim, baseThreat, (threatSpell ? threatSpell->GetSchoolMask() : SPELL_SCHOOL_MASK_NORMAL), threatSpell);
     threat /= getSize();
     while (ref)
     {
-        if (ThreatCalcHelper::isValidProcess(victim, ref->GetSource()->GetOwner(), threatSpell))
+        Unit* refOwner = ref->GetSource()->GetOwner();
+        if (ThreatCalcHelper::isValidProcess(victim, refOwner, threatSpell))
+        {
+            if (Creature* hatingCreature = refOwner->ToCreature())
+            {
+                if (hatingCreature->IsAIEnabled)
+                {
+                    hatingCreature->AI()->CalculateThreat(victim, threat, threatSpell);
+                }
+            }
+
             ref->GetSource()->doAddThreat(victim, threat);
+        }
 
         ref = ref->next();
     }
