@@ -821,19 +821,21 @@ public:
                             if (!IsHolidayActive(HOLIDAY_FIRE_FESTIVAL))
                                 break;
 
-                            Map::PlayerList const& players = me->GetMap()->GetPlayers();
-                            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                            std::list<Player*> targets;
+                            Acore::AnyPlayerInObjectRangeCheck check(me, me->GetVisibilityRange(), false);
+                            Acore::PlayerListSearcherWithSharedVision<Acore::AnyPlayerInObjectRangeCheck> searcher(me, targets, check);
+                            Cell::VisitWorldObjects(me, searcher, me->GetVisibilityRange());
+                            for (std::list<Player*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
                             {
-                                if (Player* player = itr->GetSource())
+                                Player* player = (*iter);
+
+                                if (player->GetTeamId() == TEAM_HORDE)
                                 {
-                                    if (player->GetTeamId() == TEAM_HORDE)
-                                    {
-                                        me->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_H, player);
-                                    }
-                                    else
-                                    {
-                                        me->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_A, player);
-                                    }
+                                    me->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_H, player);
+                                }
+                                else
+                                {
+                                    me->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_A, player);
                                 }
                             }
 
