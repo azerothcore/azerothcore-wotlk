@@ -2321,16 +2321,17 @@ void AchievementMgr::BuildAllDataPacket(WorldPacket* data) const
     }
 
     *data << int32(-1);
+    time_t now = GameTime::GetGameTime().count();
 
     for (CriteriaProgressMap::const_iterator iter = m_criteriaProgress.begin(); iter != m_criteriaProgress.end(); ++iter)
     {
         *data << uint32(iter->first);
         data->appendPackGUID(iter->second.counter);
         *data << GetPlayer()->GetPackGUID();
-        *data << uint32(0);
+        *data << uint32(0); // TODO: This should be 1 if it is a failed timed criteria
         data->AppendPackedTime(iter->second.date);
-        *data << uint32(0);
-        *data << uint32(0);
+        *data << uint32(now - iter->second.date);
+        *data << uint32(now - iter->second.date);
     }
 
     *data << int32(-1);
