@@ -827,8 +827,6 @@ public:
                             Cell::VisitWorldObjects(me, searcher, me->GetVisibilityRange());
                             for (Player const* player : targets)
                             {
-                                Player* player = (*iter);
-
                                 if (player->GetTeamId() == TEAM_HORDE)
                                 {
                                     me->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_H, player);
