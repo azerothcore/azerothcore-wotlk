@@ -825,7 +825,7 @@ public:
                             Acore::AnyPlayerInObjectRangeCheck check(me, me->GetVisibilityRange(), false);
                             Acore::PlayerListSearcherWithSharedVision<Acore::AnyPlayerInObjectRangeCheck> searcher(me, targets, check);
                             Cell::VisitWorldObjects(me, searcher, me->GetVisibilityRange());
-                            for (Player const* player : targets)
+                            for (Player* player : targets)
                             {
                                 if (player->GetTeamId() == TEAM_HORDE)
                                 {
