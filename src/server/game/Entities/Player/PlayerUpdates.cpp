@@ -980,12 +980,6 @@ void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType, Item* ite
 
 void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool defence, Item* item /*= nullptr*/)
 {
-    // No skill gain in pvp
-    if (victim->IsCharmedOwnedByPlayerOrPlayer())
-    {
-        return;
-    }
-
     uint8 plevel = getLevel();
     uint16 currentSkillValue = defence ? GetBaseDefenseSkillValue() : GetBaseWeaponSkillValue(attType);
     uint16 currentSkillMax = 5 * plevel;
