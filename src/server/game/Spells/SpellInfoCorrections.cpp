@@ -4308,6 +4308,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_2].Effect = 0;
         spellInfo->Attributes |= SPELL_ATTR0_NO_AURA_CANCEL;
         spellInfo->AttributesEx5 |= SPELL_ATTR5_ALLOW_ACTION_DURING_CHANNEL;
+        spellInfo->ChannelInterruptFlags &= ~AURA_INTERRUPT_FLAG_MOVE;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
