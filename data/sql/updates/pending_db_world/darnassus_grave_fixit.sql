@@ -5,7 +5,7 @@ DELETE FROM `graveyard_zone` WHERE `ID`=469 AND `GhostZone`=1657;
 -- originally was faction 469 alliance and should be 0 ID originally 469
 DELETE FROM `graveyard_zone` WHERE `ID`=91 AND `GhostZone`=141;
 INSERT INTO `graveyard_zone` (`ID`, `GhostZone`, `Faction`, `Comment`) VALUES 
-(91, 141, 0, 'Teldrassil, Dolanaar GY - Teldrassil');
+(91, 141, 0, 'Teldrassil, Dolanaar GY');
 
 -- id originally 469
 DELETE FROM `graveyard_zone` WHERE `ID`=91 AND `GhostZone`=1657;
