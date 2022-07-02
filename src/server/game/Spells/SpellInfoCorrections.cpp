@@ -4295,6 +4295,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Dispel = DISPEL_NONE;
     });
 
+    // Summon Nightmare Illusions
+    ApplySpellFix({ 24681, 24728, 24729 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].MiscValueB = 64;
+    });
+
     // Blood Siphon
     ApplySpellFix({ 24322, 24323 }, [](SpellInfo* spellInfo)
     {
