@@ -2056,17 +2056,16 @@ void GameObject::CastSpell(Unit* target, uint32 spellId)
     bool self = false;
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
-        if (spellInfo->Effects[i].TargetA.GetTarget() == TARGET_UNIT_CASTER)
+        if (spellInfo->Effects[i].TargetA.GetReferenceType() == TARGET_REFERENCE_TYPE_CASTER && !spellInfo->Effects[i].TargetB.GetTarget())
         {
             self = true;
             break;
         }
     }
 
-    if (self)
+    if (self && target && target->GetGUID() != GetGUID())
     {
-        if (target)
-            target->CastSpell(target, spellInfo, true);
+        target->CastSpell(target, spellInfo, true);
         return;
     }
 
