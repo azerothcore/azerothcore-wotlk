@@ -269,6 +269,11 @@ class spell_blood_siphon : public SpellScript
 {
     PrepareSpellScript(spell_blood_siphon);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_BLOOD_SIPHON_DAMAGE, SPELL_BLOOD_SIPHON_HEAL });
+    }
+
     void FilterTargets(std::list<WorldObject*>& targets)
     {
         // Max. 20 targets

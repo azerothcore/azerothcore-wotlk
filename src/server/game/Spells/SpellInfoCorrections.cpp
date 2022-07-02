@@ -4306,6 +4306,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_MOD_STUN;
         spellInfo->Effects[EFFECT_2].Effect = 0;
+        spellInfo->Attributes |= SPELL_ATTR0_NO_AURA_CANCEL;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
