@@ -453,8 +453,8 @@ enum eJuggle
 
     SPELL_TORCH_CHECK           = 45644,
     SPELL_GIVE_TORCH            = 45280,
-    QUEST_TORCH_CATCHING_A           = 11657,
-    QUEST_TORCH_CATCHING_H           = 11923
+    QUEST_TORCH_CATCHING_A      = 11657,
+    QUEST_TORCH_CATCHING_H      = 11923
 };
 
 class spell_midsummer_juggling_torch : public SpellScript
@@ -522,10 +522,14 @@ class spell_midsummer_torch_catch : public SpellScript
     {
         Player* player = GetHitPlayer();
         if (!player)
+        {
             return;
+        }
 
         if (player->GetQuestStatus(QUEST_TORCH_CATCHING_A) == QUEST_STATUS_REWARDED || player->GetQuestStatus(QUEST_TORCH_CATCHING_H) == QUEST_STATUS_REWARDED)
+        {
             player->CastSpell(player, SPELL_GIVE_TORCH);
+        }
     }
 
     void Register() override
