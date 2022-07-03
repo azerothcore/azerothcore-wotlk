@@ -4393,6 +4393,23 @@ void Spell::EffectApplyGlyph(SpellEffIndex effIndex)
                 if (GlyphPropertiesEntry const* oldGlyphEntry = sGlyphPropertiesStore.LookupEntry(oldGlyph))
                 {
                     player->RemoveAurasDueToSpell(oldGlyphEntry->SpellId);
+
+                    // Removed any triggered auras
+                    Unit::AuraMap& ownedAuras = player->GetOwnedAuras();
+                    for (Unit::AuraMap::iterator iter = ownedAuras.begin(); iter != ownedAuras.end();)
+                    {
+                        Aura* aura = iter->second;
+                        if (SpellInfo const* triggeredByAuraSpellInfo = aura->GetTriggeredByAuraSpellInfo())
+                        {
+                            if (triggeredByAuraSpellInfo->Id == oldGlyphEntry->SpellId)
+                            {
+                                player->RemoveOwnedAura(iter);
+                                continue;
+                            }
+                        }
+                        ++iter;
+                    }
+
                     player->SendLearnPacket(oldGlyphEntry->SpellId, false); // Send packet to properly handle client-side spell tooltips
                 }
 

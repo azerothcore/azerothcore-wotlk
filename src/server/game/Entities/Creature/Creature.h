@@ -394,8 +394,6 @@ public:
 
     void ModifyThreatPercentTemp(Unit* victim, int32 percent, Milliseconds duration);
 
-    void ResetFaction() { SetFaction(GetCreatureTemplate()->faction); }
-
     bool IsEngaged() const override;
     void AtEngage(Unit* target) override;
     void AtDisengage() override;
