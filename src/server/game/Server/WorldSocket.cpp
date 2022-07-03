@@ -509,6 +509,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     // Check that Key and account name are the same on client and server
     uint8 t[4] = { 0x00,0x00,0x00,0x00 };
 
+    bool isPremium = false; // VIP
     Acore::Crypto::SHA1 sha;
     sha.UpdateData(authSession->Account);
     sha.UpdateData(t);
@@ -574,6 +575,16 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
         return;
     }
 
+    // Check premium - VIP
+    stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_PREMIUM);
+    stmt->SetData(0, account.Id);
+    PreparedQueryResult premresult = LoginDatabase.Query(stmt);
+    
+        if (premresult)
+        {
+        isPremium = true;
+        }
+
     // Check locked state for server
     AccountTypes allowedAccountType = sWorld->GetPlayerSecurityLimit();
     LOG_DEBUG("network", "Allowed Level: {} Player Level {}", allowedAccountType, account.Security);
@@ -603,7 +614,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     sScriptMgr->OnLastIpUpdate(account.Id, address);
 
     _worldSession = new WorldSession(account.Id, std::move(authSession->Account), shared_from_this(), account.Security,
-        account.Expansion, account.MuteTime, account.Locale, account.Recruiter, account.IsRectuiter, account.Security ? true : false, account.TotalTime);
+        isPremium, account.Expansion, account.MuteTime, account.Locale, account.Recruiter, account.IsRectuiter, account.Security ? true : false, account.TotalTime); // VIP
 
     _worldSession->ReadAddonsInfo(authSession->AddonInfo);
 

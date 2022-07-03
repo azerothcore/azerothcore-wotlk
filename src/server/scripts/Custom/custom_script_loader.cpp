@@ -17,10 +17,14 @@
 
 // This is where scripts' loading functions should be declared:
 // void MyExampleScript()
+void AddSC_npc_premium_master();
+void AddSC_premium_commandscript();
+
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
 void AddCustomScripts()
 {
-    // MyExampleScript()
+    AddSC_npc_premium_master();
+    AddSC_premium_commandscript();
 }
