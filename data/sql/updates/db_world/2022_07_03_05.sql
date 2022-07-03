@@ -1,3 +1,4 @@
+-- DB update 2022_07_03_04 -> 2022_07_03_05
 --
 SET @NPC_HEBJIN := 28636;
 SET @NPC_BAT := 28639;

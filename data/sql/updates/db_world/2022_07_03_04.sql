@@ -1,3 +1,4 @@
+-- DB update 2022_07_03_03 -> 2022_07_03_04
 -- delete wrong game_graveyard link to graveyard_zone
 DELETE FROM `graveyard_zone` WHERE `ID`=469 AND `GhostZone`=141;
 DELETE FROM `graveyard_zone` WHERE `ID`=469 AND `GhostZone`=1657;
