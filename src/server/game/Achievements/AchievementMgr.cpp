@@ -1544,6 +1544,9 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     ItemTemplate const* proto = sObjectMgr->GetItemTemplate(miscValue1);
                     if (!proto || proto->Quality < ITEM_QUALITY_EPIC)
                         continue;
+                    AchievementCriteriaDataSet const* data = sAchievementMgr->GetCriteriaDataSet(achievementCriteria);
+                    if (!data || !data->Meets(GetPlayer(), unit, miscValue1))
+                        continue;
                     SetCriteriaProgress(achievementCriteria, 1, PROGRESS_ACCUMULATE);
                     break;
                 }
