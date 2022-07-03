@@ -163,7 +163,7 @@ public:
                     me->SetReactState(REACT_PASSIVE);
                     me->SetStandState(UNIT_STAND_STATE_SLEEP);
                     me->AttackStop();
-                    DoResetThreat();
+                    ResetThreatList();
                     WasDead = true;
                     CheckPhaseTransition();
                     Talk(EMOTE_THEKAL_DIES);
