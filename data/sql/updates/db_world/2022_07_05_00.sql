@@ -1,3 +1,4 @@
+-- DB update 2022_07_03_07 -> 2022_07_05_00
 --
 DELETE FROM `waypoint_data` WHERE  `id`=518940;
 INSERT INTO `acore_world`.`waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`) VALUES 
