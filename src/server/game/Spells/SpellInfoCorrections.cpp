@@ -4301,7 +4301,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].MiscValueB = 64;
     });
 
-
     // Blood Siphon
     ApplySpellFix({ 24322, 24323 }, [](SpellInfo* spellInfo)
     {
