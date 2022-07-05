@@ -1774,9 +1774,13 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             AC_SAI_IS_BOOLEAN_VALID(e, e.action.setHealthRegen.regenHealth);
             break;
         }
+        case SMART_ACTION_CALL_TIMED_ACTIONLIST:
+        {
+            AC_SAI_IS_BOOLEAN_VALID(e, e.action.timedActionList.allowOverride);
+            break;
+        }
         case SMART_ACTION_FLEE_FOR_ASSIST:
         case SMART_ACTION_MOVE_TO_POS:
-        case SMART_ACTION_CALL_TIMED_ACTIONLIST:
         case SMART_ACTION_EVADE:
         case SMART_ACTION_SET_ACTIVE:
         case SMART_ACTION_START_CLOSEST_WAYPOINT:
