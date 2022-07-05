@@ -11,7 +11,7 @@ INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, 
 SET @NPC := 52267;
 SET @PATH := @NPC * 10;
 UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=-12279.661,`position_y`=-1437.7651,`position_z`=130.7252 WHERE `guid`=@NPC;
-UPDATE `creature` SET `wander_distance`=0,`MovementType`=1,`position_x`=-12279.661,`position_y`=-1437.7651,`position_z`=130.7252 WHERE `guid` IN (52265, 52266, 52268, 52269, 52270, 52271);
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=1, `wander_distance`= 4, `position_x`=-12279.661,`position_y`=-1437.7651,`position_z`=130.7252 WHERE `guid` IN (52265, 52266, 52268, 52269, 52270, 52271);
 DELETE FROM `creature_addon` WHERE `guid`=@NPC;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
 DELETE FROM `waypoint_data` WHERE `id`=@PATH;
