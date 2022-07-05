@@ -13181,7 +13181,7 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
 
     // xinef: if we somehow engage in combat (scripts, dunno) with player, remove this flag so he can fight back
     if (GetTypeId() == TYPEID_UNIT && enemy && IsImmuneToPC() && enemy->GetCharmerOrOwnerPlayerOrPlayerItself())
-        SetImmuneToPC(true); // unit has engaged in combat, remove immunity so players can fight back
+        SetImmuneToPC(false); // unit has engaged in combat, remove immunity so players can fight back
 
     if (IsInCombat())
         return;

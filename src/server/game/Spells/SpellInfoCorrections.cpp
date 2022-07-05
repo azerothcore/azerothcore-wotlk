@@ -4295,6 +4295,24 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Dispel = DISPEL_NONE;
     });
 
+    // Summon Nightmare Illusions
+    ApplySpellFix({ 24681, 24728, 24729 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].MiscValueB = 64;
+    });
+
+    // Place Fake Fur
+    ApplySpellFix({ 46085 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].MiscValue = 8;
+    });
+
+    // Smash Mammoth Trap
+    ApplySpellFix({ 46201 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].MiscValue = 8;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
