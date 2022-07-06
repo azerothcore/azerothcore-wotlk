@@ -213,11 +213,15 @@ public:
         return _menuItems;
     }
 
+    void SetSenderGUID(ObjectGuid guid) { _senderGUID = guid; }
+    [[nodiscard]] ObjectGuid GetSenderGUID() const { return _senderGUID; }
+
 private:
     GossipMenuItemContainer _menuItems;
     GossipMenuItemDataContainer _menuItemData;
     uint32 _menuId;
     LocaleConstant _locale;
+    ObjectGuid _senderGUID;
 };
 
 class QuestMenu
@@ -266,8 +270,8 @@ public:
     [[nodiscard]] uint32 GetGossipOptionAction(uint32 selection) const { return _gossipMenu.GetMenuItemAction(selection); }
     [[nodiscard]] bool IsGossipOptionCoded(uint32 selection) const { return _gossipMenu.IsMenuItemCoded(selection); }
 
-    void SendGossipMenu(uint32 titleTextId, ObjectGuid objectGUID) const;
-    void SendCloseGossip() const;
+    void SendGossipMenu(uint32 titleTextId, ObjectGuid objectGUID);
+    void SendCloseGossip();
     void SendPointOfInterest(uint32 poiId) const;
 
     /*********************************************************/
