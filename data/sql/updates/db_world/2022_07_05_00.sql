@@ -1,7 +1,7 @@
 -- DB update 2022_07_03_07 -> 2022_07_05_00
 --
 DELETE FROM `waypoint_data` WHERE  `id`=518940;
-INSERT INTO `acore_world`.`waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`) VALUES 
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`) VALUES 
 (518940, 1, 3866.84, -672.53, 328.888),
 (518940, 2, 3866.84, -672.534, 328.888),
 (518940, 3, 3818.17, -768.04, 314.71),
