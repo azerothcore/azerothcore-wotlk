@@ -1,3 +1,4 @@
+-- DB update 2022_07_05_02 -> 2022_07_06_00
 --
 DELETE FROM `command` WHERE `name` = 'debug play visual';
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
