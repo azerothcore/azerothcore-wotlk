@@ -285,6 +285,7 @@ void Creature::AddToWorld()
         }
 
         loot.sourceWorldObjectGUID = GetGUID();
+
         sScriptMgr->OnCreatureAddWorld(this);
     }
 }
