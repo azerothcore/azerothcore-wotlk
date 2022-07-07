@@ -100,4 +100,3 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (52267, 52268, 10, 155, 514, 0, 0),
 (52267, 52265, 10, 180, 514, 0, 0),
 (52267, 52266, 5, 180, 514, 0, 0);
-
