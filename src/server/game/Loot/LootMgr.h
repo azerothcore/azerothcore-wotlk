@@ -176,8 +176,8 @@ struct LootItem
     LootItem() = default;
 
     // Basic checks for player/item compatibility - if false no chance to see the item in the loot
-    bool AllowedForPlayer(Player const* player, bool isGivenByMasterLooter = false, bool allowQuestLoot = true) const;
-
+    bool AllowedForPlayer(Player const* player, bool isGivenByMasterLooter = false, bool allowQuestLoot = true, ObjectGuid source = ObjectGuid::Empty) const;
+    bool AllowedForPlayer(Player const* player, ObjectGuid source) { return AllowedForPlayer(player, false, true, source); };
     void AddAllowedLooter(Player const* player);
     [[nodiscard]] const AllowedLooterSet& GetAllowedLooters() const { return allowedGUIDs; }
 };
@@ -327,6 +327,7 @@ struct Loot
 
     // GUID of container that holds this loot (item_instance.entry), set for items that can be looted
     ObjectGuid containerGUID;
+    ObjectGuid sourceWorldObjectGUID;
     GameObject* sourceGameObject{nullptr};
 
     Loot(uint32 _gold = 0) : gold(_gold) { }

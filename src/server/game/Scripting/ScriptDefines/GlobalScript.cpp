@@ -161,3 +161,18 @@ void ScriptMgr::OnLoadSpellCustomAttr(SpellInfo* spell)
         script->OnLoadSpellCustomAttr(spell);
     });
 }
+
+bool ScriptMgr::OnAllowedForPlayerLootCheck(Player const* player, ObjectGuid source)
+{
+    auto ret = IsValidBoolScript<GlobalScript>([&](GlobalScript* script)
+    {
+        return script->OnAllowedForPlayerLootCheck(player, source);
+    });
+
+    if (ret && *ret)
+    {
+        return true;
+    }
+
+    return false;
+}
