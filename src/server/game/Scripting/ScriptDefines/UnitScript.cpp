@@ -210,3 +210,11 @@ void ScriptMgr::OnUnitUpdate(Unit* unit, uint32 diff)
         script->OnUnitUpdate(unit, diff);
     });
 }
+
+void ScriptMgr::OnDisplayIdChange(Unit* unit, uint32 displayId)
+{
+    ExecuteScript<UnitScript>([&](UnitScript* script)
+    {
+        script->OnDisplayIdChange(unit, displayId);
+    });
+}

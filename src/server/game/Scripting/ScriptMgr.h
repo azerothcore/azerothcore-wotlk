@@ -459,6 +459,8 @@ public:
      * @param diff Contains information about the diff time
      */
     virtual void OnUnitUpdate(Unit* /*unit*/, uint32 /*diff*/) { }
+
+    virtual void OnDisplayIdChange(Unit* /*unit*/, uint32 /*displayId*/) { }
 };
 
 class MovementHandlerScript : public ScriptObject
@@ -2396,6 +2398,7 @@ public: /* UnitScript */
     bool IsCustomBuildValuesUpdate(Unit const* unit, uint8 updateType, ByteBuffer& fieldBuffer, Player const* target, uint16 index);
     bool OnBuildValuesUpdate(Unit const* unit, uint8 updateType, ByteBuffer& fieldBuffer, Player* target, uint16 index);
     void OnUnitUpdate(Unit* unit, uint32 diff);
+    void OnDisplayIdChange(Unit* unit, uint32 displayId);
 
 public: /* MovementHandlerScript */
     void OnPlayerMove(Player* player, MovementInfo movementInfo, uint32 opcode);
