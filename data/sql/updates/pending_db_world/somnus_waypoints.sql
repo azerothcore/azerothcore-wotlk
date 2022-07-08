@@ -2,7 +2,7 @@
 SET @NPC := 42880;
 SET @PATH := @NPC * 10;
 
-UPDATE `creature` SET `position_x`=-10641.5, `position_y`=-3982.49, `position_z`=21.758038, `orientation`=6.15793, `MovementType`='2' WHERE  `guid`=@NPC;
+UPDATE `creature` SET `position_x`=-10661, `position_y`=-3924.57, `position_z`=18.8015, `orientation`=5.83672, `MovementType`='2' WHERE  `guid`=@NPC;
 
 DELETE FROM `creature_addon` WHERE `guid` = @NPC;
 INSERT INTO `creature_addon` (`guid`, `path_id`) VALUES (@NPC, @PATH);
