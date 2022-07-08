@@ -1,3 +1,7 @@
+DELETE FROM `creature` WHERE (`guid` = 91457);
+INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
+(91457, 11353, 0, 0, 309, 0, 0, 1, 1, 1, -11625.6, -1488.06, 45.3629, 4.20245, 7200, 0, 0, 21364, 0, 2, 0, 0, 0, '', 0);
+
 DELETE FROM `creature` WHERE (`id1` = 14750 AND `guid` IN (52265, 52266)) OR (`id1` = 11368 AND `guid` IN (52267, 52268, 52269, 52270, 52271));
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 (52265, 14750, 0, 0, 309, 0, 0, 1, 1, 0, -12139.7, -1461.39, 132.725, 3.49715, 7200, 4, 0, 31440, 0, 1, 0, 0, 0, '', 0),
@@ -297,7 +301,26 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,21,-11562.911,-1508.6621,55.512184,0,0,0,0,100,0),
 (@PATH,22,-11540.652,-1510.0276,62.370094,0,0,0,0,100,0);
 
-DELETE FROM `creature_formations` WHERE `leaderguid` IN (49123, 49130, 52267, 49651, 49359);
+SET @NPC := 91458;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=-11655.185,`position_y`=-1556.1298,`position_z`=41.085743 WHERE `guid`=@NPC;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=0,`position_x`=-11654.185,`position_y`=-1556.1298,`position_z`=41.085743 WHERE `guid`=91457;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,-11655.185,-1556.1298,41.085743,0,0,0,0,100,0),
+(@PATH,2,-11646.647,-1520.3574,39.52875,0,0,0,0,100,0),
+(@PATH,3,-11635.523,-1505.7322,41.577824,0,0,0,0,100,0),
+(@PATH,4,-11617.473,-1473.5356,48.90151,0,0,0,0,100,0),
+(@PATH,5,-11620.747,-1453.2869,54.162476,0,0,0,0,100,0),
+(@PATH,6,-11638.18,-1449.1713,59.971928,0,0,0,0,100,0),
+(@PATH,7,-11620.747,-1453.2869,54.162476,0,0,0,0,100,0),
+(@PATH,8,-11617.473,-1473.5356,48.90151,0,0,0,0,100,0),
+(@PATH,9,-11635.523,-1505.7322,41.577824,0,0,0,0,100,0),
+(@PATH,10,-11646.647,-1520.3574,39.52875,0,0,0,0,100,0);
+
+DELETE FROM `creature_formations` WHERE `leaderGUID` IN (49123, 49130, 52267, 49651, 49359, 91458, 91457, 91441);
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES 
 (49123, 49123, 0, 0, 514, 0, 0),
 (49123, 49128, 5, 195, 514, 0, 0),
@@ -324,5 +347,9 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (91441, 91441, 0, 0, 514, 0, 0),
 (91441, 91440, 4, 90, 514, 0, 0),
 (51951, 51951, 0, 0, 514, 0, 0),
-(51951, 51952, 4, 90, 514, 0, 0);
+(51951, 51952, 2, 90, 514, 0, 0),
+(91458, 91458, 0, 0, 514, 0, 0),
+(91458, 91457, 2, 90, 514, 0, 0);
+
+
 
