@@ -1,3 +1,4 @@
+-- DB update 2022_07_09_00 -> 2022_07_09_01
 --
 UPDATE `creature_template` SET `flags_extra`=130 WHERE `entry`=15047;
 
