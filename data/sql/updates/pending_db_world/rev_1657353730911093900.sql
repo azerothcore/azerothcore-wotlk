@@ -6,5 +6,5 @@ INSERT INTO `areatrigger_scripts` VALUES
 
 DELETE FROM `creature_text` WHERE `CreatureID`=14834 AND `groupid` IN (5,6);
 INSERT INTO `creature_text` VALUES
-(14834,5,0,'Pledge your allegiance to Hakkar and the pain you suffer shall be minimal.',7,0,100,0,0,0,10593,0,'Hakkar Bloodfire Pit Whisper'),
-(14834,6,0,'The world will suffer immeasurable cruelties under my reign.',7,0,100,0,0,0,10590,0,'Hakkar Edge Of Madness Whisper');
+(14834,5,0,'Pledge your allegiance to Hakkar and the pain you suffer shall be minimal.',15,0,100,0,0,0,10593,0,'Hakkar Bloodfire Pit Whisper'),
+(14834,6,0,'The world will suffer immeasurable cruelties under my reign.',15,0,100,0,0,0,10590,0,'Hakkar Edge Of Madness Whisper');
