@@ -34,7 +34,9 @@ enum Says
     SAY_FLEEING                     = 1,
     SAY_MINION_DESTROY              = 2,
     SAY_PROTECT_ALTAR               = 3,
-    SAY_PROTECT_GURUBASHI_EMPIRE    = 4
+    SAY_PROTECT_GURUBASHI_EMPIRE    = 4,
+    SAY_PLEDGE_ALLEGIANCE           = 5,
+    SAY_WORLD_WILL_SUFFER           = 6
 };
 
 enum Spells
@@ -215,8 +217,8 @@ public:
                     hakkar->AI()->Talk(SAY_PROTECT_GURUBASHI_EMPIRE);
                 }
             }
-            return false;
         }
+
         return false;
     }
 };
@@ -237,8 +239,8 @@ public:
                     hakkar->AI()->Talk(SAY_PROTECT_ALTAR);
                 }
             }
-            return false;
         }
+
         return false;
     }
 };
@@ -259,11 +261,56 @@ public:
                     hakkar->AI()->Talk(SAY_MINION_DESTROY);
                 }
             }
-            return false;
         }
+
         return false;
     }
 };
+
+class at_zulgurub_bloodfire_pit_speech : public OnlyOnceAreaTriggerScript
+{
+public:
+    at_zulgurub_bloodfire_pit_speech() : OnlyOnceAreaTriggerScript("at_zulgurub_bloodfire_pit_speech") {}
+
+    bool _OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    {
+        if (InstanceScript* instance = player->GetInstanceScript())
+        {
+            if (Creature* hakkar = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_HAKKAR)))
+            {
+                if (hakkar->GetAI())
+                {
+                    hakkar->AI()->Talk(SAY_PLEDGE_ALLEGIANCE);
+                }
+            }
+        }
+
+        return false;
+    }
+};
+
+class at_zulgurub_edge_of_madness_speech : public OnlyOnceAreaTriggerScript
+{
+public:
+    at_zulgurub_edge_of_madness_speech() : OnlyOnceAreaTriggerScript("at_zulgurub_edge_of_madness_speech") {}
+
+    bool _OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    {
+        if (InstanceScript* instance = player->GetInstanceScript())
+        {
+            if (Creature* hakkar = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_HAKKAR)))
+            {
+                if (hakkar->GetAI())
+                {
+                    hakkar->AI()->Talk(SAY_WORLD_WILL_SUFFER);
+                }
+            }
+        }
+
+        return false;
+    }
+};
+
 
 class spell_hakkar_blood_siphon : public SpellScript
 {
@@ -299,5 +346,7 @@ void AddSC_boss_hakkar()
     new at_zulgurub_entrance_speech();
     new at_zulgurub_bridge_speech();
     new at_zulgurub_temple_speech();
+    new at_zulgurub_bloodfire_pit_speech();
+    new at_zulgurub_edge_of_madness_speech();
     RegisterSpellScript(spell_hakkar_blood_siphon);
 }
