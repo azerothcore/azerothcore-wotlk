@@ -65,24 +65,24 @@ public:
     {
         boss_jindoAI(Creature* creature) : BossAI(creature, DATA_JINDO) { }
 
-        void Reset() override
+        void InitializeAI() override
         {
-            _Reset();
+            Reset();
+
+            _evading = false;
+            _evadingTimer = 0;
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void EnterCombat(Unit* who) override
         {
-            _JustDied();
-        }
+            BossAI::EnterCombat(who);
 
-        void EnterCombat(Unit* /*who*/) override
-        {
-            _EnterCombat();
             events.ScheduleEvent(EVENT_BRAINWASHTOTEM, 20000);
             events.ScheduleEvent(EVENT_POWERFULLHEALINGWARD, 16000);
             events.ScheduleEvent(EVENT_HEX, 8000);
             events.ScheduleEvent(EVENT_DELUSIONSOFJINDO, 10000);
             events.ScheduleEvent(EVENT_TELEPORT, 5000);
+
             Talk(SAY_AGGRO);
         }
 
@@ -103,8 +103,34 @@ public:
             }
         }
 
+        void EnterEvadeMode(EvadeReason evadeReason) override
+        {
+            if (_EnterEvadeMode(evadeReason))
+            {
+                me->AddUnitState(UNIT_STATE_EVADE);
+                Reset();
+                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_DANCE);
+                _evading = true;
+                _evadingTimer = 4000;
+            }
+        }
+
         void UpdateAI(uint32 diff) override
         {
+            if (_evading)
+            {
+                if (_evadingTimer <= diff)
+                {
+                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
+                    me->GetMotionMaster()->MoveTargetedHome();
+                    _evading = false;
+                }
+                else
+                    _evadingTimer -= diff;
+
+                return;
+            }
+
             if (!UpdateVictim())
                 return;
 
@@ -190,6 +216,10 @@ public:
         {
             return !target->HasAura(SPELL_HEX);
         }
+
+    private:
+        bool _evading;
+        uint32 _evadingTimer;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
