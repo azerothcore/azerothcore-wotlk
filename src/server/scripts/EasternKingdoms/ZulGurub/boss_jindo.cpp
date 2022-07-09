@@ -65,14 +65,6 @@ public:
     {
         boss_jindoAI(Creature* creature) : BossAI(creature, DATA_JINDO) { }
 
-        void InitializeAI() override
-        {
-            Reset();
-
-            _evading = false;
-            _evadingTimer = 0;
-        }
-
         void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
@@ -110,27 +102,17 @@ public:
                 me->AddUnitState(UNIT_STATE_EVADE);
                 Reset();
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_DANCE);
-                _evading = true;
-                _evadingTimer = 4000;
+
+                me->m_Events.AddEventAtOffset([&]()
+                {
+                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
+                    me->GetMotionMaster()->MoveTargetedHome();
+                }, 4s);
             }
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (_evading)
-            {
-                if (_evadingTimer <= diff)
-                {
-                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
-                    me->GetMotionMaster()->MoveTargetedHome();
-                    _evading = false;
-                }
-                else
-                    _evadingTimer -= diff;
-
-                return;
-            }
-
             if (!UpdateVictim())
                 return;
 
@@ -216,10 +198,6 @@ public:
         {
             return !target->HasAura(SPELL_HEX);
         }
-
-    private:
-        bool _evading;
-        uint32 _evadingTimer;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
