@@ -34,7 +34,8 @@ enum Says
     SAY_FLEEING                     = 1,
     SAY_MINION_DESTROY              = 2,
     SAY_PROTECT_ALTAR               = 3,
-    SAY_PROTECT_GURUBASHI_EMPIRE    = 4
+    SAY_PROTECT_GURUBASHI_EMPIRE    = 4,
+    SAY_EVADE                       = 7
 };
 
 enum Spells
@@ -115,6 +116,13 @@ public:
             if (instance->GetBossState(DATA_ARLOKK) != DONE)
                 events.ScheduleEvent(EVENT_ASPECT_OF_ARLOKK, 18000);
             Talk(SAY_AGGRO);
+        }
+
+        void EnterEvadeMode(EvadeReason evadeReason) override
+        {
+            BossAI::EnterEvadeMode(evadeReason);
+
+            Talk(SAY_EVADE);
         }
 
         void UpdateAI(uint32 diff) override
