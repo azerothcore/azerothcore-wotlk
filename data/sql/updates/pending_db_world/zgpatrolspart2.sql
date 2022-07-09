@@ -4,12 +4,10 @@ UPDATE `creature`  SET `id1` = 11353 WHERE `guid` IN (51389, 51394);
 UPDATE `creature`  SET `id1` = 11357,`equipment_id` = 0 WHERE `guid` = 51389;
 UPDATE `creature`  SET `id1` = 11359,`equipment_id` = 0 WHERE `guid` = 51391;
 
-DELETE FROM `creature` WHERE `guid` IN (49149, 91457);
+DELETE FROM `creature` WHERE `guid` IN (49149, 91457) OR (`id1` = 14750 AND `guid` IN (52265, 52266)) OR (`id1` = 11368 AND `guid` IN (52267, 52268, 52269, 52270, 52271));
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 (91457, 11353, 0, 0, 309, 0, 0, 1, 1, 1, -11625.6, -1488.06, 45.3629, 4.20245, 7200, 0, 0, 21364, 0, 2, 0, 0, 0, '', 0),
-(49149, 15111, 0, 0, 309, 0, 0, 1, 1, 1, -11856.7, -1871.74, 64.2785, 4.6087, 7200, 5, 0, 12575, 9944, 1, 0, 0, 0, '', 0);
-DELETE FROM `creature` WHERE (`id1` = 14750 AND `guid` IN (52265, 52266)) OR (`id1` = 11368 AND `guid` IN (52267, 52268, 52269, 52270, 52271));
-INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
+(49149, 15111, 0, 0, 309, 0, 0, 1, 1, 1, -11856.7, -1871.74, 64.2785, 4.6087, 7200, 5, 0, 12575, 9944, 1, 0, 0, 0, '', 0),
 (52265, 14750, 0, 0, 309, 0, 0, 1, 1, 0, -12139.7, -1461.39, 132.725, 3.49715, 7200, 4, 0, 31440, 0, 1, 0, 0, 0, '', 0),
 (52266, 14750, 0, 0, 309, 0, 0, 1, 1, 0, -12199.8, -1432.72, 133.302, 3.49715, 7200, 4, 0, 31440, 0, 1, 0, 0, 0, '', 0),
 (52267, 11368, 0, 0, 309, 0, 0, 1, 1, 0, -12199.8, -1432.72, 133.302, 5.11337, 7200, 0, 0, 5341, 0, 2, 0, 0, 0, '', 0),
