@@ -311,7 +311,6 @@ public:
     }
 };
 
-
 class spell_hakkar_blood_siphon : public SpellScript
 {
     PrepareSpellScript(spell_hakkar_blood_siphon);
