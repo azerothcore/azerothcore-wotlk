@@ -39,10 +39,9 @@ enum Says
 
 enum Spells
 {
-    SPELL_POISONOUS_BLOOD       = 24321,
-    SPELL_BLOOD_SIPHON_HEAL     = 24322,
-    SPELL_BLOOD_SIPHON_DMG      = 24323,
     SPELL_BLOOD_SIPHON          = 24324,
+    SPELL_BLOOD_SIPHON_HEAL     = 24322,
+    SPELL_BLOOD_SIPHON_DAMAGE   = 24323,
     SPELL_CORRUPTED_BLOOD       = 24328,
     SPELL_CAUSE_INSANITY        = 24327,
     SPELL_ENRAGE                = 24318,
@@ -51,7 +50,8 @@ enum Spells
     SPELL_ASPECT_OF_VENOXIS     = 24688,
     SPELL_ASPECT_OF_MARLI       = 24686,
     SPELL_ASPECT_OF_THEKAL      = 24689,
-    SPELL_ASPECT_OF_ARLOKK      = 24690
+    SPELL_ASPECT_OF_ARLOKK      = 24690,
+    SPELL_POISONOUS_BLOOD       = 24321
 };
 
 enum Events
@@ -265,31 +265,39 @@ public:
     }
 };
 
-class spell_hakkar_blood_siphon : public SpellScript
+class spell_blood_siphon : public SpellScript
 {
-    PrepareSpellScript(spell_hakkar_blood_siphon);
+    PrepareSpellScript(spell_blood_siphon);
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_BLOOD_SIPHON_HEAL, SPELL_BLOOD_SIPHON_DMG });
+        return ValidateSpellInfo({ SPELL_BLOOD_SIPHON_DAMAGE, SPELL_BLOOD_SIPHON_HEAL });
     }
 
-    void OnSpellHit()
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        Unit* caster = GetCaster();
-        Unit* target = GetHitUnit();
-        if (!caster || !target)
-            return;
+        // Max. 20 targets
+        if (!targets.empty())
+        {
+            Acore::Containers::RandomResize(targets, 20);
+        }
+    }
 
-        if (target->HasAura(SPELL_POISONOUS_BLOOD))
-            target->CastSpell(caster, SPELL_BLOOD_SIPHON_DMG, true);
-        else
-            target->CastSpell(caster, SPELL_BLOOD_SIPHON_HEAL, true);
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            if (Player* player = GetHitPlayer())
+            {
+                player->CastSpell(caster, player->HasAura(SPELL_POISONOUS_BLOOD) ? SPELL_BLOOD_SIPHON_DAMAGE : SPELL_BLOOD_SIPHON_HEAL, true);
+            }
+        }
     }
 
     void Register() override
     {
-        OnHit += SpellHitFn(spell_hakkar_blood_siphon::OnSpellHit);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_blood_siphon::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_blood_siphon::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -299,5 +307,5 @@ void AddSC_boss_hakkar()
     new at_zulgurub_entrance_speech();
     new at_zulgurub_bridge_speech();
     new at_zulgurub_temple_speech();
-    RegisterSpellScript(spell_hakkar_blood_siphon);
+    RegisterSpellScript(spell_blood_siphon);
 }
