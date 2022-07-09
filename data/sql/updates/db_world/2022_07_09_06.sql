@@ -1,3 +1,4 @@
+-- DB update 2022_07_09_05 -> 2022_07_09_06
 DELETE FROM `gameobject` WHERE (`id` = 165658) AND (`guid` IN (43103, 43104, 43105, 43106, 43107, 43108, 43166, 43167, 43168, 43169, 43170, 43171, 43172, 43173, 43174, 43175, 56435, 56436, 56438));
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`) VALUES
 (43103, 165658, 230, 0, 0, 1, 1, 502.794, -191.522, -57.5144, -0.401426, 0, 0, 0.199368, -0.979925, 604800, 100, 1, '', 0),
