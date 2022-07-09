@@ -51,7 +51,6 @@ public:
         instance_zulgurub_InstanceMapScript(Map* map) : InstanceScript(map)
         {
             SetBossNumber(EncounterCount);
-            LoadObjectData(creatureData, nullptr);
             LoadDoorData(doorData);
             LoadObjectData(creatureData, nullptr);
         }

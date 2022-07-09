@@ -68,8 +68,9 @@ enum AchievementCriteriaDataType
     ACHIEVEMENT_CRITERIA_DATA_TYPE_NTH_BIRTHDAY        = 22, // N                            login on day of N-th Birthday
     ACHIEVEMENT_CRITERIA_DATA_TYPE_S_KNOWN_TITLE       = 23, // title_id                     known (pvp) title, values from dbc
     ACHIEVEMENT_CRITERIA_DATA_TYPE_BG_TEAMS_SCORES     = 24, // winner_score   loser score   player's team win bg and their teams have exact scores
+    ACHIEVEMENT_CRITERIA_DATA_TYPE_S_ITEM_QUALITY      = 25  // item_quality
 };
-#define MAX_ACHIEVEMENT_CRITERIA_DATA_TYPE               25 // maximum value in AchievementCriteriaDataType enum
+#define MAX_ACHIEVEMENT_CRITERIA_DATA_TYPE               26 // maximum value in AchievementCriteriaDataType enum
 
 enum AchievementCommonCategories
 {
@@ -196,6 +197,11 @@ struct AchievementCriteriaData
             uint32 winner_score;
             uint32 loser_score;
         } teams_scores;
+        // ACHIEVEMENT_CRITERIA_DATA_TYPE_S_ITEM_QUALITY    = 25
+        struct
+        {
+            uint32 item_quality;
+        } item;
         // ...
         struct
         {

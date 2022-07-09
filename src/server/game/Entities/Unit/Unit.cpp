@@ -2329,14 +2329,14 @@ void Unit::CalcHealAbsorb(HealInfo& healInfo)
         healInfo.AbsorbHeal(absorbAmount);
 }
 
-void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType, bool extra)
+void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType /*= BASE_ATTACK*/, bool extra /*= false*/, bool ignoreCasting /*= false*/)
 {
     if (HasUnitFlag(UNIT_FLAG_PACIFIED))
     {
         return;
     }
 
-    if (HasUnitState(UNIT_STATE_CANNOT_AUTOATTACK) && !extra)
+    if (HasUnitState(UNIT_STATE_CANNOT_AUTOATTACK) && !extra && !ignoreCasting)
     {
         return;
     }
@@ -7844,13 +7844,9 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             if (AuraEffect const* aurEff = target->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_SHAMAN, 0x10000000, 0x0, 0x0, GetGUID()))
                             {
                                 Aura* flameShock  = aurEff->GetBase();
-                                int32 maxDuration = flameShock->GetMaxDuration();
-                                int32 newDuration = flameShock->GetDuration() + 2 * aurEff->GetAmplitude();
-
-                                flameShock->SetDuration(newDuration);
-                                // is it blizzlike to change max duration for FS?
-                                if (newDuration > maxDuration)
-                                    flameShock->SetMaxDuration(newDuration);
+                                int32 extraTime = 2 * aurEff->GetAmplitude();
+                                flameShock->SetMaxDuration(flameShock->GetMaxDuration() + extraTime);
+                                flameShock->SetDuration(flameShock->GetDuration() + extraTime);
 
                                 return true;
                             }
@@ -13167,7 +13163,7 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
 
     // xinef: if we somehow engage in combat (scripts, dunno) with player, remove this flag so he can fight back
     if (GetTypeId() == TYPEID_UNIT && enemy && IsImmuneToPC() && enemy->GetCharmerOrOwnerPlayerOrPlayerItself())
-        SetImmuneToPC(true); // unit has engaged in combat, remove immunity so players can fight back
+        SetImmuneToPC(false); // unit has engaged in combat, remove immunity so players can fight back
 
     if (IsInCombat())
         return;
@@ -17974,8 +17970,7 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
         GetMotionMaster()->MoveIdle();
         StopMoving();
 
-        if (charmer->GetTypeId() == TYPEID_PLAYER &&
-            charmer->getClass() == CLASS_WARLOCK)
+        if (charmer->GetTypeId() == TYPEID_PLAYER && charmer->getClass() == CLASS_WARLOCK && ToCreature()->GetCreatureTemplate()->type == CREATURE_TYPE_DEMON)
         {
             // Disable CreatureAI/SmartAI and switch to CharmAI when charmed by warlock
             Creature* charmed = ToCreature();
@@ -18617,23 +18612,38 @@ void Unit::SetPhaseMask(uint32 newPhaseMask, bool update)
         }
     }
 
-    WorldObject::SetPhaseMask(newPhaseMask, update);
+    WorldObject::SetPhaseMask(newPhaseMask, false);
 
     if (!IsInWorld())
+    {
         return;
+    }
 
     for (ControlSet::const_iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); )
     {
         Unit* controlled = *itr;
         ++itr;
         if (controlled->GetTypeId() == TYPEID_UNIT)
+        {
             controlled->SetPhaseMask(newPhaseMask, true);
+        }
     }
 
     for (uint8 i = 0; i < MAX_SUMMON_SLOT; ++i)
+    {
         if (m_SummonSlot[i])
+        {
             if (Creature* summon = GetMap()->GetCreature(m_SummonSlot[i]))
+            {
                 summon->SetPhaseMask(newPhaseMask, true);
+            }
+        }
+    }
+
+    if (update)
+    {
+        UpdateObjectVisibility();
+    }
 }
 
 void Unit::UpdateObjectVisibility(bool forced, bool /*fromUpdate*/)

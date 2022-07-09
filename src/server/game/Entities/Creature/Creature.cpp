@@ -284,6 +284,8 @@ void Creature::AddToWorld()
             GetZoneScript()->OnCreatureCreate(this);
         }
 
+        loot.sourceWorldObjectGUID = GetGUID();
+
         sScriptMgr->OnCreatureAddWorld(this);
     }
 }
@@ -487,7 +489,7 @@ bool Creature::InitEntry(uint32 Entry, const CreatureData* data)
     return true;
 }
 
-bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changelevel)
+bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changelevel, bool updateAI)
 {
     if (!InitEntry(Entry, data))
         return false;
@@ -596,6 +598,12 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
     SetDetectionDistance(cInfo->detection_range);
 
     LoadSpellTemplateImmunity();
+
+    if (updateAI)
+    {
+        AIM_Initialize();
+    }
+
     return true;
 }
 

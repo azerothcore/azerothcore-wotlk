@@ -38,7 +38,8 @@ enum Events
     EVENT_AVATAR                    = 1,
     EVENT_GROUND_TREMOR             = 2,
     EVENT_START_PURSUIT             = 3,
-    EVENT_ENTANGLING_ROOTS          = 4
+    EVENT_STOP_PURSUIT              = 4,
+    EVENT_ENTANGLING_ROOTS          = 5
 };
 
 class boss_grilek : public CreatureScript // grilek
@@ -50,6 +51,12 @@ public:
     {
         boss_grilekAI(Creature* creature) : BossAI(creature, DATA_EDGE_OF_MADNESS)
         {
+        }
+
+        void Reset() override
+        {
+            _pursuitTargetGUID.Clear();
+            BossAI::Reset();
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -75,10 +82,15 @@ public:
                 switch (eventId)
                 {
                     case EVENT_AVATAR:
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                        {
+                            _pursuitTargetGUID = target->GetGUID();
+                        }
                         DoCast(me, SPELL_AVATAR);
-                        DoResetThreat();
                         me->SetReactState(REACT_PASSIVE);
+                        DoResetThreat();
                         events.ScheduleEvent(EVENT_START_PURSUIT, 2s);
+                        events.ScheduleEvent(EVENT_STOP_PURSUIT, 15s);
                         events.ScheduleEvent(EVENT_AVATAR, 45s, 50s);
                         break;
                     case EVENT_GROUND_TREMOR:
@@ -87,6 +99,17 @@ public:
                         break;
                     case EVENT_START_PURSUIT:
                         me->SetReactState(REACT_AGGRESSIVE);
+                        if (Unit* pursuitTarget = ObjectAccessor::GetUnit(*me, _pursuitTargetGUID))
+                        {
+                            me->GetThreatMgr().addThreat(pursuitTarget, 1000000.f);
+                        }
+                        break;
+                    case EVENT_STOP_PURSUIT:
+                        if (Unit* pursuitTarget = ObjectAccessor::GetUnit(*me, _pursuitTargetGUID))
+                        {
+                            _pursuitTargetGUID.Clear();
+                            me->GetThreatMgr().addThreat(pursuitTarget, -1000000.f);
+                        }
                         break;
                     case EVENT_ENTANGLING_ROOTS:
                         DoCastVictim(SPELL_ENTANGLING_ROOTS);
@@ -99,6 +122,9 @@ public:
 
             DoMeleeAttackIfReady();
         }
+
+    private:
+        ObjectGuid _pursuitTargetGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
