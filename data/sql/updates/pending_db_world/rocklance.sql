@@ -44,8 +44,9 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`) VALUES (@NPC, 20588, 3, 215, 512);
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`) VALUES (@NPC, 14007, 3, 135, 512);
 
-UPDATE `creature` SET `spawntimesecs`=43200 WHERE  `guid`=14007;
-UPDATE `creature` SET `spawntimesecs`=43200 WHERE  `guid`=20588;
+UPDATE `creature` SET `spawntimesecs`=25000 WHERE  `guid`=14007;
+UPDATE `creature` SET `spawntimesecs`=25000 WHERE  `guid`=20588;
+UPDATE `creature` SET `spawntimesecs`=19800 WHERE  `guid`=@NPC;
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 5841;
 
