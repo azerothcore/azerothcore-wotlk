@@ -126,7 +126,10 @@ public:
                         events.ScheduleEvent(EVENT_POWERFULLHEALINGWARD, urand(14000, 20000));
                         break;
                     case EVENT_HEX:
-                        DoCastVictim(SPELL_HEX, true);
+                        if (me->GetThreatMgr().getThreatList().size() > 1)
+                        {
+                            DoCastVictim(SPELL_HEX, true);
+                        }
                         events.ScheduleEvent(EVENT_HEX, urand(12000, 20000));
                         break;
                     case EVENT_DELUSIONSOFJINDO: // HACK
@@ -188,7 +191,10 @@ public:
 
         bool CanAIAttack(Unit const* target) const override
         {
-            return !target->HasAura(SPELL_HEX);
+            if (me->GetThreatMgr().getThreatList().size() > 1 && me->GetThreatMgr().getOnlineContainer().getMostHated()->getTarget() == target)
+                return !target->HasAura(SPELL_HEX);
+
+            return true;
         }
     };
 
