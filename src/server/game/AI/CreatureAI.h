@@ -211,6 +211,8 @@ public:
 
     virtual void CalculateThreat(Unit* /*hatedUnit*/, float& /*threat*/, SpellInfo const* /*threatSpell*/) { }
 
+    virtual bool OnTeleportUnreacheablePlayer(Player* /*player*/) { return false; }
+
 protected:
     virtual void MoveInLineOfSight(Unit* /*who*/);
 

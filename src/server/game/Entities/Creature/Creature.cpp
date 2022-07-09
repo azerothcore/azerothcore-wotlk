@@ -825,9 +825,8 @@ void Creature::Update(uint32 diff)
                 if (m_cannotReachTimer >= (sWorld->getIntConfig(CONFIG_NPC_EVADE_IF_NOT_REACHABLE) * IN_MILLISECONDS))
                 {
                     Player* cannotReachPlayer = ObjectAccessor::GetPlayer(*this, m_cannotReachTarget);
-                    if (cannotReachPlayer && IsEngagedBy(cannotReachPlayer) && GetCreatureTemplate()->HasFlagsExtra(CREATURE_FLAG_EXTRA_TELEPORT_UNREACHABLE_PLAYERS))
+                    if (cannotReachPlayer && IsEngagedBy(cannotReachPlayer) && IsAIEnabled && AI()->OnTeleportUnreacheablePlayer(cannotReachPlayer))
                     {
-                        cannotReachPlayer->TeleportTo(*this);
                         SetCannotReachTarget();
                     }
                     else if (!GetMap()->IsRaid())

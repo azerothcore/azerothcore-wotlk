@@ -49,7 +49,9 @@ enum Spells
     SPELL_MANDOKIR_CLEAVE     = 20691,
     SPELL_SUMMON_PLAYER       = 25104,
 
-    SPELL_REVIVE              = 24341 // chained spirit
+    SPELL_REVIVE              = 24341, // chained spirit
+
+    SPELL_SUMMON_PLAYER       = 25104
 };
 
 enum Events
@@ -311,6 +313,12 @@ public:
                     events.CancelEvent(EVENT_EXECUTE);
                 }
             }
+        }
+
+        bool OnTeleportUnreacheablePlayer(Player* player) override
+        {
+            DoCast(player, SPELL_SUMMON_PLAYER, true);
+            return true;
         }
 
         void DoMeleeAttackIfReady(bool ignoreCasting)
