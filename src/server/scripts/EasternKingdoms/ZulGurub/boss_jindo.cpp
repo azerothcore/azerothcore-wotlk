@@ -198,6 +198,13 @@ struct npc_shade_of_jindo : public ScriptedAI
     void Reset() override
     {
         _scheduler.CancelAll();
+
+        _scheduler.
+            Schedule(1s, [this](TaskContext context)
+            {
+                DoCastAOE(SPELL_RANDOM_AGGRO, true);
+                context.Repeat();
+            });
     }
 
     void EnterCombat(Unit* /*who*/) override
