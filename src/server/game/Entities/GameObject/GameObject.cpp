@@ -159,6 +159,8 @@ void GameObject::AddToWorld()
 
         WorldObject::AddToWorld();
 
+        loot.sourceWorldObjectGUID = GetGUID();
+
         sScriptMgr->OnGameObjectAddWorld(this);
     }
 }
