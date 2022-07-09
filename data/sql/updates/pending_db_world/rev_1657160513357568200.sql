@@ -27,7 +27,7 @@ DELETE FROM `pool_gameobject` WHERE `guid` BETWEEN @OGUID+0 AND @OGUID+15;
 DELETE FROM `pool_template` WHERE `entry` IN (447);
 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
-(447, 4, 'ZG Hakkari Throium Vein');
+(447, 4, 'ZG Hakkari Thorium Vein');
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (@OGUID+0, 447, 0, 'ZG Hakkari Throium Vein 1/16'),
 (@OGUID+1, 447, 0, 'ZG Hakkari Throium Vein 2/16'),
