@@ -49,9 +49,7 @@ enum Spells
     SPELL_MANDOKIR_CLEAVE     = 20691,
     SPELL_SUMMON_PLAYER       = 25104,
 
-    SPELL_REVIVE              = 24341, // chained spirit
-
-    SPELL_SUMMON_PLAYER       = 25104
+    SPELL_REVIVE              = 24341 // chained spirit
 };
 
 enum Events
