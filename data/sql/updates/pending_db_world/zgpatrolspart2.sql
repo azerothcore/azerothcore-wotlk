@@ -1,4 +1,4 @@
-UPDATE `creature` SET `wander_distance`=0,`MovementType`=1 WHERE `guid` IN (49295, 49303, 49304, 49306, 49800, 49814, 51344, 51580, 51581);
+UPDATE `creature` SET `wander_distance`=17,`MovementType`=1 WHERE `guid` IN (49295, 49303, 49304, 49306, 49800, 49814, 51344, 51580, 51581);
 
 DELETE FROM `creature` WHERE `guid` IN (49149, 91457);
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
