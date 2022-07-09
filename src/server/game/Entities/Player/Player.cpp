@@ -13180,7 +13180,7 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
             return;
         }
 
-    if (!item->AllowedForPlayer(this))
+    if (!item->AllowedForPlayer(this, loot->sourceWorldObjectGUID))
     {
         SendLootRelease(GetLootGUID());
         return;
