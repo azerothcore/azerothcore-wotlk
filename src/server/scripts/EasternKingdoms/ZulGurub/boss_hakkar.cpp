@@ -35,6 +35,8 @@ enum Says
     SAY_MINION_DESTROY              = 2,
     SAY_PROTECT_ALTAR               = 3,
     SAY_PROTECT_GURUBASHI_EMPIRE    = 4,
+    SAY_PLEDGE_ALLEGIANCE           = 5,
+    SAY_WORLD_WILL_SUFFER           = 6,
     SAY_EVADE                       = 7
 };
 
@@ -226,8 +228,8 @@ public:
                     hakkar->AI()->Talk(SAY_PROTECT_GURUBASHI_EMPIRE);
                 }
             }
-            return false;
         }
+
         return false;
     }
 };
@@ -241,6 +243,10 @@ public:
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {
+            // Instance map's enormous, Hakkar's GRID is not loaded by the time players enter.
+           // Without this, the creature never says anything, because it doesn't load in time.
+            player->GetMap()->LoadGrid(-11783.99f, -1655.27f);
+
             if (Creature* hakkar = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_HAKKAR)))
             {
                 if (hakkar->GetAI())
@@ -248,8 +254,8 @@ public:
                     hakkar->AI()->Talk(SAY_PROTECT_ALTAR);
                 }
             }
-            return false;
         }
+
         return false;
     }
 };
@@ -263,6 +269,10 @@ public:
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {
+            // Instance map's enormous, Hakkar's GRID is not loaded by the time players enter.
+           // Without this, the creature never says anything, because it doesn't load in time.
+            player->GetMap()->LoadGrid(-11783.99f, -1655.27f);
+
             if (Creature* hakkar = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_HAKKAR)))
             {
                 if (hakkar->GetAI())
@@ -270,8 +280,60 @@ public:
                     hakkar->AI()->Talk(SAY_MINION_DESTROY);
                 }
             }
-            return false;
         }
+
+        return false;
+    }
+};
+
+class at_zulgurub_bloodfire_pit_speech : public OnlyOnceAreaTriggerScript
+{
+public:
+    at_zulgurub_bloodfire_pit_speech() : OnlyOnceAreaTriggerScript("at_zulgurub_bloodfire_pit_speech") {}
+
+    bool _OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    {
+        if (InstanceScript* instance = player->GetInstanceScript())
+        {
+            // Instance map's enormous, Hakkar's GRID is not loaded by the time players enter.
+           // Without this, the creature never says anything, because it doesn't load in time.
+            player->GetMap()->LoadGrid(-11783.99f, -1655.27f);
+
+            if (Creature* hakkar = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_HAKKAR)))
+            {
+                if (hakkar->GetAI())
+                {
+                    hakkar->AI()->Talk(SAY_PLEDGE_ALLEGIANCE, player);
+                }
+            }
+        }
+
+        return false;
+    }
+};
+
+class at_zulgurub_edge_of_madness_speech : public OnlyOnceAreaTriggerScript
+{
+public:
+    at_zulgurub_edge_of_madness_speech() : OnlyOnceAreaTriggerScript("at_zulgurub_edge_of_madness_speech") {}
+
+    bool _OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    {
+        if (InstanceScript* instance = player->GetInstanceScript())
+        {
+            // Instance map's enormous, Hakkar's GRID is not loaded by the time players enter.
+           // Without this, the creature never says anything, because it doesn't load in time.
+            player->GetMap()->LoadGrid(-11783.99f, -1655.27f);
+
+            if (Creature* hakkar = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_HAKKAR)))
+            {
+                if (hakkar->GetAI())
+                {
+                    hakkar->AI()->Talk(SAY_WORLD_WILL_SUFFER, player);
+                }
+            }
+        }
+
         return false;
     }
 };
@@ -318,5 +380,7 @@ void AddSC_boss_hakkar()
     new at_zulgurub_entrance_speech();
     new at_zulgurub_bridge_speech();
     new at_zulgurub_temple_speech();
+    new at_zulgurub_bloodfire_pit_speech();
+    new at_zulgurub_edge_of_madness_speech();
     RegisterSpellScript(spell_blood_siphon);
 }
