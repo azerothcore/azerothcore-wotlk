@@ -1,3 +1,4 @@
+-- DB update 2022_07_09_01 -> 2022_07_09_02
 --
 -- ZG Herbalism Improvements
 -- Out with the old
