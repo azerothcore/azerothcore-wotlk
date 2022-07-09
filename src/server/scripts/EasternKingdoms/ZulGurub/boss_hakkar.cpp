@@ -140,9 +140,12 @@ public:
                         events.ScheduleEvent(EVENT_CORRUPTED_BLOOD, urand(30000, 45000));
                         break;
                     case EVENT_CAUSE_INSANITY:
-                        if (Unit* victim = SelectTarget(SelectTargetMethod::MaxThreat, 0, 30.f, true))
+                        if (me->GetThreatMgr().getThreatList().size() > 1)
                         {
-                            DoCast(victim, SPELL_CAUSE_INSANITY);
+                            if (Unit* victim = SelectTarget(SelectTargetMethod::MaxThreat, 0, 30.f, true))
+                            {
+                                DoCast(victim, SPELL_CAUSE_INSANITY);
+                            }
                         }
                         events.ScheduleEvent(EVENT_CAUSE_INSANITY, urand(35000, 45000));
                         break;
