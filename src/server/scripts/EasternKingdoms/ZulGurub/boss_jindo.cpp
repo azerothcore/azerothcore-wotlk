@@ -58,24 +58,15 @@ struct boss_jindo : public BossAI
 {
     boss_jindo(Creature* creature) : BossAI(creature, DATA_JINDO) { }
 
-    void Reset() override
+    void EnterCombat(Unit* who) override
     {
-        _Reset();
-    }
-
-    void JustDied(Unit* /*killer*/) override
-    {
-        _JustDied();
-    }
-
-    void EnterCombat(Unit* /*who*/) override
-    {
-        _EnterCombat();
+        BossAI::EnterCombat(who);
         events.ScheduleEvent(EVENT_BRAIN_WASH_TOTEM, 20000);
         events.ScheduleEvent(EVENT_POWERFULL_HEALING_WARD, 16000);
         events.ScheduleEvent(EVENT_HEX, 8000);
         events.ScheduleEvent(EVENT_DELUSIONS_OF_JINDO, 10000);
         events.ScheduleEvent(EVENT_TELEPORT, 5000);
+
         Talk(SAY_AGGRO);
     }
 
@@ -93,6 +84,22 @@ struct boss_jindo : public BossAI
             break;
         default:
             break;
+        }
+    }
+
+    void EnterEvadeMode(EvadeReason evadeReason) override
+    {
+        if (_EnterEvadeMode(evadeReason))
+        {
+            me->AddUnitState(UNIT_STATE_EVADE);
+            Reset();
+            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_DANCE);
+
+            me->m_Events.AddEventAtOffset([&]()
+            {
+                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
+                me->GetMotionMaster()->MoveTargetedHome();
+            }, 4s);
         }
     }
 
