@@ -1,3 +1,4 @@
+-- DB update 2022_07_09_02 -> 2022_07_09_03
 UPDATE `creature` SET `wander_distance`=17,`MovementType`=1 WHERE `guid` IN (49295, 49303, 49304, 49306, 49800, 49814, 51344, 51580, 51581);
 UPDATE `creature`  SET `id1` = 11830 WHERE `guid` = 51392;
 UPDATE `creature`  SET `id1` = 11353 WHERE `guid` IN (51389, 51394);
