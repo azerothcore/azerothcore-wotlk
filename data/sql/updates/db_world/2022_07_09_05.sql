@@ -1,3 +1,4 @@
+-- DB update 2022_07_09_04 -> 2022_07_09_05
 --
 -- ZG Mining Improvements
 -- Remove Old Nodes
