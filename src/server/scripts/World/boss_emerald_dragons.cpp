@@ -276,7 +276,7 @@ public:
                     ++attackersCount;
                 }
 
-                uint8 amount = attackersCount < 20 ? attackersCount * 0.75f : 15;
+                uint8 amount = attackersCount < 30 ? attackersCount * 0.5f : 15;
                 amount = amount < 1 ? 1 : amount;
 
                 for (uint8 i = 0; i < amount; ++i)
