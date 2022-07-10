@@ -203,10 +203,7 @@ public:
         {
             if (Creature* zealot = instance->GetCreature(zealotData))
             {
-                Position const originalHomePos = zealot->GetHomePosition();
-                zealot->SetHomePosition(zealot->GetPosition());
                 zealot->Respawn(true);
-                zealot->SetHomePosition(originalHomePos);
                 zealot->SetInCombatWithZone();
                 UpdateZealotStatus(zealotData, false);
             }
