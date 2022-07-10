@@ -237,7 +237,7 @@ public:
                             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                             DoCastSelf(SPELL_VANISH_VISUAL);
                             DoCastSelf(SPELL_VANISH);
-                            events.ScheduleEvent(EVENT_VANISH, 5000, 0, PHASE_ONE);
+                            events.ScheduleEvent(EVENT_VANISH, 1000, 0, PHASE_ONE);
                             break;
                         }
                     case EVENT_VANISH:
@@ -249,7 +249,7 @@ public:
                     case EVENT_VANISH_2:
                         DoCastSelf(SPELL_VANISH);
                         DoCastSelf(SPELL_SUPER_INVIS);
-                        events.ScheduleEvent(EVENT_VISIBLE, urand(50000, 58000), 0, PHASE_ONE);
+                        events.ScheduleEvent(EVENT_VISIBLE, urand(7000, 10000), 0, PHASE_ONE);
                         break;
                     case EVENT_VISIBLE:
                         me->SetReactState(REACT_AGGRESSIVE);
