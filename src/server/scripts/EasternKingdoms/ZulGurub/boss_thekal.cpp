@@ -144,7 +144,7 @@ public:
             CheckPhaseTransition();
 
             _scheduler.Schedule(10s, [this, data](TaskContext /*context*/) {
-                if ((!_lorkhanDied || !_zathDied) && !WasDead)
+                if (!_lorkhanDied || !_zathDied || !WasDead)
                 {
                     ReviveZealot(data);
                 }
