@@ -273,9 +273,7 @@ public:
 
                 for (const auto attacker : attackers)
                 {
-                    if (Player* pPlayer = attacker->GetSource()->GetOwner()->ToPlayer())
-                        if (pPlayer && pPlayer->IsAlive() && !pPlayer->IsGameMaster())
-                            ++attackersCount;
+                    ++attackersCount;
                 }
 
                 uint8 amount = attackersCount < 20 ? attackersCount * 0.75f : 15;
