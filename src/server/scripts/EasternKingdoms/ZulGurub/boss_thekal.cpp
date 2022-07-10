@@ -144,7 +144,7 @@ public:
             CheckPhaseTransition();
 
             _scheduler.Schedule(10s, [this, data](TaskContext /*context*/) {
-                if ((!_lorkhanDied || !_zathDied) && !WasDead)
+                if (!_lorkhanDied || !_zathDied || !WasDead)
                 {
                     ReviveZealot(data);
                 }
@@ -153,7 +153,7 @@ public:
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (me->GetEntry() == NPC_HIGH_PRIEST_THEKAL && damage >= me->GetHealth())
+            if (!me->HasAura(SPELL_TIGER_FORM) && damage >= me->GetHealth())
             {
                 damage = me->GetHealth() - 1;
 
@@ -170,7 +170,7 @@ public:
                 }
             }
 
-            if (!Enraged && me->HealthBelowPctDamaged(20, damage) && me->GetEntry() != NPC_HIGH_PRIEST_THEKAL)
+            if (!Enraged && me->HealthBelowPctDamaged(20, damage) && me->HasAura(SPELL_TIGER_FORM))
             {
                 DoCastSelf(SPELL_ENRAGE);
                 Enraged = true;
@@ -204,6 +204,7 @@ public:
             if (Creature* zealot = instance->GetCreature(zealotData))
             {
                 zealot->Respawn(true);
+                zealot->SetInCombatWithZone();
                 UpdateZealotStatus(zealotData, false);
             }
         }
