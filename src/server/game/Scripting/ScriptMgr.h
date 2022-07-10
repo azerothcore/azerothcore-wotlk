@@ -1549,6 +1549,9 @@ public:
 
     // Called after loading spell dbc corrections
     virtual void OnLoadSpellCustomAttr(SpellInfo* /*spell*/) { }
+
+    // Called when checking if a player can see the creature loot
+    virtual bool OnAllowedForPlayerLootCheck(Player const* /*player*/, ObjectGuid /*source*/) { return false; };
 };
 
 class BGScript : public ScriptObject
@@ -2371,6 +2374,7 @@ public: /* GlobalScript */
     bool OnIsAffectedBySpellModCheck(SpellInfo const* affectSpell, SpellInfo const* checkSpell, SpellModifier const* mod);
     bool OnSpellHealingBonusTakenNegativeModifiers(Unit const* target, Unit const* caster, SpellInfo const* spellInfo, float& val);
     void OnLoadSpellCustomAttr(SpellInfo* spell);
+    bool OnAllowedForPlayerLootCheck(Player const* player, ObjectGuid source);
 
 public: /* Scheduled scripts */
     uint32 IncreaseScheduledScriptsCount() { return ++_scheduledScripts; }
