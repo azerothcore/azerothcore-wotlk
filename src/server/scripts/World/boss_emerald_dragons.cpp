@@ -268,7 +268,20 @@ public:
             {
                 Talk(SAY_YSONDRE_SUMMON_DRUIDS);
 
-                for (uint8 i = 0; i < 10; ++i)
+                auto const& attackers = me->GetThreatMgr().getThreatList();
+                uint8 attackersCount = 0;
+
+                for (const auto attacker : attackers)
+                {
+                    if (Player* pPlayer = attacker->GetSource()->GetOwner()->ToPlayer())
+                        if (pPlayer && pPlayer->IsAlive() && !pPlayer->IsGameMaster())
+                            ++attackersCount;
+                }
+
+                uint8 amount = attackersCount < 20 ? attackersCount * 0.75f : 15;
+                amount = amount < 3 ? 3 : amount;
+
+                for (uint8 i = 0; i < amount; ++i)
                     DoCast(me, SPELL_SUMMON_DRUID_SPIRITS, true);
                 ++_stage;
             }
