@@ -153,7 +153,7 @@ public:
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (me->GetEntry() == NPC_HIGH_PRIEST_THEKAL && damage >= me->GetHealth())
+            if (!me->HasAura(SPELL_TIGER_FORM) && damage >= me->GetHealth())
             {
                 damage = me->GetHealth() - 1;
 
@@ -170,7 +170,7 @@ public:
                 }
             }
 
-            if (!Enraged && me->HealthBelowPctDamaged(20, damage) && me->GetEntry() != NPC_HIGH_PRIEST_THEKAL)
+            if (!Enraged && me->HealthBelowPctDamaged(20, damage) && me->HasAura(SPELL_TIGER_FORM))
             {
                 DoCastSelf(SPELL_ENRAGE);
                 Enraged = true;
@@ -203,7 +203,11 @@ public:
         {
             if (Creature* zealot = instance->GetCreature(zealotData))
             {
+                Position const originalHomePos = zealot->GetHomePosition();
+                zealot->SetHomePosition(zealot->GetPosition());
                 zealot->Respawn(true);
+                zealot->SetHomePosition(originalHomePos);
+                zealot->SetInCombatWithZone();
                 UpdateZealotStatus(zealotData, false);
             }
         }
