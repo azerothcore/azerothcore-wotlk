@@ -643,6 +643,12 @@ public:
             emerald_dragonAI::UpdateAI(diff);
         }
 
+        void JustDied(Unit* /*killer*/) override
+        {
+            _JustDied();
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+        }
+
     private:
         bool   _banished;                              // used for shades activation testing
         uint32 _banishedTimer;                         // counter for banishment timeout
