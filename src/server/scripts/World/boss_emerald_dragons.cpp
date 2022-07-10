@@ -277,7 +277,7 @@ public:
                 }
 
                 uint8 amount = attackersCount < 20 ? attackersCount * 0.75f : 15;
-                amount = amount < 3 ? 3 : amount;
+                amount = amount < 1 ? 1 : amount;
 
                 for (uint8 i = 0; i < amount; ++i)
                     DoCast(me, SPELL_SUMMON_DRUID_SPIRITS, true);
