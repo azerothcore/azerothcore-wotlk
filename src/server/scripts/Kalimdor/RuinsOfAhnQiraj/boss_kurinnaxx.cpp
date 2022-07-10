@@ -25,7 +25,7 @@ enum Spells
     SPELL_MORTALWOUND       = 25646,
     SPELL_SANDTRAP          = 25648,
     SPELL_ENRAGE            = 26527,
-    //SPELL_SUMMON_PLAYER   = 26446,
+    SPELL_SUMMON_PLAYER     = 26446,
     SPELL_WIDE_SLASH        = 25814
 };
 
@@ -83,6 +83,12 @@ public:
                 return;
 
             events.Update(diff);
+
+            if (me->GetDistance(me->GetVictim()) > 60.00f && me->GetDistance(me->GetVictim()) < 120.00f)
+            {
+                DoCastVictim(SPELL_SUMMON_PLAYER);
+            }
+
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
