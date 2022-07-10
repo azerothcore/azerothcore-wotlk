@@ -1230,9 +1230,9 @@ bool WorldObject::_IsWithinDist(WorldObject const* obj, float dist2compare, bool
     return distsq < maxdist * maxdist;
 }
 
-Position WorldObject::GetHitSpherePointFor(Position const& dest) const
+Position WorldObject::GetHitSpherePointFor(Position const& dest, Optional<float> collisionHeight) const
 {
-    G3D::Vector3 vThis(GetPositionX(), GetPositionY(), GetPositionZ() + GetCollisionHeight());
+    G3D::Vector3 vThis(GetPositionX(), GetPositionY(), GetPositionZ() + (collisionHeight ? *collisionHeight : GetCollisionHeight()));
     G3D::Vector3 vObj(dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ());
     G3D::Vector3 contactPoint = vThis + (vObj - vThis).directionOrZero() * std::min(dest.GetExactDist(this), GetCombatReach());
 
@@ -1341,7 +1341,7 @@ bool WorldObject::IsWithinLOS(float ox, float oy, float oz, VMAP::ModelIgnoreFla
     return true;
 }
 
-bool WorldObject::IsWithinLOSInMap(WorldObject const* obj, VMAP::ModelIgnoreFlags ignoreFlags, LineOfSightChecks checks) const
+bool WorldObject::IsWithinLOSInMap(WorldObject const* obj, VMAP::ModelIgnoreFlags ignoreFlags, LineOfSightChecks checks, Optional<float> collisionHeight /*= {}*/) const
 {
    if (!IsInMap(obj))
         return false;
@@ -1353,7 +1353,7 @@ bool WorldObject::IsWithinLOSInMap(WorldObject const* obj, VMAP::ModelIgnoreFlag
         oz += obj->GetCollisionHeight();
     }
     else
-        obj->GetHitSpherePointFor({ GetPositionX(), GetPositionY(), GetPositionZ() + GetCollisionHeight() }, ox, oy, oz);
+        obj->GetHitSpherePointFor({ GetPositionX(), GetPositionY(), GetPositionZ() + (collisionHeight ? *collisionHeight : GetCollisionHeight()) }, ox, oy, oz);
 
     float x, y, z;
     if (GetTypeId() == TYPEID_PLAYER)
@@ -1362,14 +1362,14 @@ bool WorldObject::IsWithinLOSInMap(WorldObject const* obj, VMAP::ModelIgnoreFlag
         z += GetCollisionHeight();
     }
     else
-        GetHitSpherePointFor({ obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ() + obj->GetCollisionHeight() }, x, y, z);
+        GetHitSpherePointFor({ obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ() + obj->GetCollisionHeight() }, x, y, z, collisionHeight);
 
     return GetMap()->isInLineOfSight(x, y, z, ox, oy, oz, GetPhaseMask(), checks, ignoreFlags);
 }
 
-void WorldObject::GetHitSpherePointFor(Position const& dest, float& x, float& y, float& z) const
+void WorldObject::GetHitSpherePointFor(Position const& dest, float& x, float& y, float& z, Optional<float> collisionHeight) const
 {
-    Position pos = GetHitSpherePointFor(dest);
+    Position pos = GetHitSpherePointFor(dest, collisionHeight);
     x = pos.GetPositionX();
     y = pos.GetPositionY();
     z = pos.GetPositionZ();
