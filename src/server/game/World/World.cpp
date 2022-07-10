@@ -2651,13 +2651,17 @@ void World::SendGMText(uint32 string_id, ...)
     Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
     for (SessionMap::iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
     {
-        if (!itr->second || !itr->second->GetPlayer() || !itr->second->GetPlayer()->IsInWorld())
+        // Session should have permissions to receive global gm messages
+        WorldSession* session = itr->second;
+        if (!session || AccountMgr::IsPlayerAccount(session->GetSecurity()))
             continue;
 
-        if (AccountMgr::IsPlayerAccount(itr->second->GetSecurity()))
+        // Player should be in world
+        Player* player = session->GetPlayer();
+        if (!player || !player->IsInWorld())
             continue;
 
-        wt_do(itr->second->GetPlayer());
+        wt_do(session->GetPlayer());
     }
 
     va_end(ap);
