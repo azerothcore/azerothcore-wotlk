@@ -1,1 +1,1 @@
-UPDATE `creature_onkill_reputation` SET `RewOnKillRepFaction1` = 0, `RewOnKillRepFaction2` = 0, `MaxStanding1` = 0, `RewOnKillRepValue1` = 0, `MaxStanding2` = 0, `RewOnKillRepValue2` = 0, `TeamDependent` = 0 WHERE (`creature_id` = 14889);
+DELETE FROM `creature_onkill_reputation` WHERE (`creature_id` = 14889);
