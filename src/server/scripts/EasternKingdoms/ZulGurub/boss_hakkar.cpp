@@ -34,15 +34,17 @@ enum Says
     SAY_FLEEING                     = 1,
     SAY_MINION_DESTROY              = 2,
     SAY_PROTECT_ALTAR               = 3,
-    SAY_PROTECT_GURUBASHI_EMPIRE    = 4
+    SAY_PROTECT_GURUBASHI_EMPIRE    = 4,
+    SAY_PLEDGE_ALLEGIANCE           = 5,
+    SAY_WORLD_WILL_SUFFER           = 6,
+    SAY_EVADE                       = 7
 };
 
 enum Spells
 {
-    SPELL_POISONOUS_BLOOD       = 24321,
-    SPELL_BLOOD_SIPHON_HEAL     = 24322,
-    SPELL_BLOOD_SIPHON_DMG      = 24323,
     SPELL_BLOOD_SIPHON          = 24324,
+    SPELL_BLOOD_SIPHON_HEAL     = 24322,
+    SPELL_BLOOD_SIPHON_DAMAGE   = 24323,
     SPELL_CORRUPTED_BLOOD       = 24328,
     SPELL_CAUSE_INSANITY        = 24327,
     SPELL_ENRAGE                = 24318,
@@ -51,7 +53,8 @@ enum Spells
     SPELL_ASPECT_OF_VENOXIS     = 24688,
     SPELL_ASPECT_OF_MARLI       = 24686,
     SPELL_ASPECT_OF_THEKAL      = 24689,
-    SPELL_ASPECT_OF_ARLOKK      = 24690
+    SPELL_ASPECT_OF_ARLOKK      = 24690,
+    SPELL_POISONOUS_BLOOD       = 24321
 };
 
 enum Events
@@ -87,9 +90,19 @@ public:
             return true;
         }
 
+        void ApplyHakkarPowerStacks()
+        {
+            me->RemoveAurasDueToSpell(SPELL_HAKKAR_POWER);
+            for (int i = DATA_JEKLIK; i < DATA_HAKKAR; i++)
+                if (instance->GetBossState(i) != DONE)
+                    DoCastSelf(SPELL_HAKKAR_POWER, true);
+        }
+
         void Reset() override
         {
             _Reset();
+
+            ApplyHakkarPowerStacks();
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -105,16 +118,23 @@ public:
             events.ScheduleEvent(EVENT_CAUSE_INSANITY, 17000);
             events.ScheduleEvent(EVENT_ENRAGE, 600000);
             if (instance->GetBossState(DATA_JEKLIK) != DONE)
-                events.ScheduleEvent(EVENT_ASPECT_OF_JEKLIK, 4000);
+                events.ScheduleEvent(EVENT_ASPECT_OF_JEKLIK, 21000);
             if (instance->GetBossState(DATA_VENOXIS) != DONE)
-                events.ScheduleEvent(EVENT_ASPECT_OF_VENOXIS, 7000);
+                events.ScheduleEvent(EVENT_ASPECT_OF_VENOXIS, 14000);
             if (instance->GetBossState(DATA_MARLI) != DONE)
-                events.ScheduleEvent(EVENT_ASPECT_OF_MARLI, 12000);
+                events.ScheduleEvent(EVENT_ASPECT_OF_MARLI, 15000);
             if (instance->GetBossState(DATA_THEKAL) != DONE)
-                events.ScheduleEvent(EVENT_ASPECT_OF_THEKAL, 8000);
+                events.ScheduleEvent(EVENT_ASPECT_OF_THEKAL, 10000);
             if (instance->GetBossState(DATA_ARLOKK) != DONE)
                 events.ScheduleEvent(EVENT_ASPECT_OF_ARLOKK, 18000);
             Talk(SAY_AGGRO);
+        }
+
+        void EnterEvadeMode(EvadeReason evadeReason) override
+        {
+            BossAI::EnterEvadeMode(evadeReason);
+
+            Talk(SAY_EVADE);
         }
 
         void UpdateAI(uint32 diff) override
@@ -140,9 +160,12 @@ public:
                         events.ScheduleEvent(EVENT_CORRUPTED_BLOOD, urand(30000, 45000));
                         break;
                     case EVENT_CAUSE_INSANITY:
-                        if (Unit* victim = SelectTarget(SelectTargetMethod::MaxThreat, 0, 30.f, true))
+                        if (me->GetThreatMgr().getThreatList().size() > 1)
                         {
-                            DoCast(victim, SPELL_CAUSE_INSANITY);
+                            if (Unit* victim = SelectTarget(SelectTargetMethod::MaxThreat, 0, 30.f, true))
+                            {
+                                DoCast(victim, SPELL_CAUSE_INSANITY);
+                            }
                         }
                         events.ScheduleEvent(EVENT_CAUSE_INSANITY, urand(35000, 45000));
                         break;
@@ -153,11 +176,11 @@ public:
                         break;
                     case EVENT_ASPECT_OF_JEKLIK:
                         DoCastVictim(SPELL_ASPECT_OF_JEKLIK, true);
-                        events.ScheduleEvent(EVENT_ASPECT_OF_JEKLIK, urand(10000, 14000));
+                        events.ScheduleEvent(EVENT_ASPECT_OF_JEKLIK, 24000);
                         break;
                     case EVENT_ASPECT_OF_VENOXIS:
                         DoCastVictim(SPELL_ASPECT_OF_VENOXIS, true);
-                        events.ScheduleEvent(EVENT_ASPECT_OF_VENOXIS, 8000);
+                        events.ScheduleEvent(EVENT_ASPECT_OF_VENOXIS, urand(16000, 18000));
                         break;
                     case EVENT_ASPECT_OF_MARLI:
                         if (Unit* victim = SelectTarget(SelectTargetMethod::MaxThreat, 0, 5.f, true))
@@ -165,7 +188,7 @@ public:
                             DoCast(victim, SPELL_ASPECT_OF_MARLI, true);
                             me->GetThreatMgr().modifyThreatPercent(victim, -100.f);
                         }
-                        events.ScheduleEvent(EVENT_ASPECT_OF_MARLI, 10000);
+                        events.ScheduleEvent(EVENT_ASPECT_OF_MARLI, 45000);
                         break;
                     case EVENT_ASPECT_OF_THEKAL:
                         DoCastVictim(SPELL_ASPECT_OF_THEKAL, true);
@@ -215,8 +238,8 @@ public:
                     hakkar->AI()->Talk(SAY_PROTECT_GURUBASHI_EMPIRE);
                 }
             }
-            return false;
         }
+
         return false;
     }
 };
@@ -230,6 +253,10 @@ public:
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {
+            // Instance map's enormous, Hakkar's GRID is not loaded by the time players enter.
+           // Without this, the creature never says anything, because it doesn't load in time.
+            player->GetMap()->LoadGrid(-11783.99f, -1655.27f);
+
             if (Creature* hakkar = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_HAKKAR)))
             {
                 if (hakkar->GetAI())
@@ -237,8 +264,8 @@ public:
                     hakkar->AI()->Talk(SAY_PROTECT_ALTAR);
                 }
             }
-            return false;
         }
+
         return false;
     }
 };
@@ -252,6 +279,10 @@ public:
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {
+            // Instance map's enormous, Hakkar's GRID is not loaded by the time players enter.
+           // Without this, the creature never says anything, because it doesn't load in time.
+            player->GetMap()->LoadGrid(-11783.99f, -1655.27f);
+
             if (Creature* hakkar = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_HAKKAR)))
             {
                 if (hakkar->GetAI())
@@ -259,37 +290,114 @@ public:
                     hakkar->AI()->Talk(SAY_MINION_DESTROY);
                 }
             }
-            return false;
         }
+
         return false;
     }
 };
 
-class spell_hakkar_blood_siphon : public SpellScript
+class at_zulgurub_bloodfire_pit_speech : public OnlyOnceAreaTriggerScript
 {
-    PrepareSpellScript(spell_hakkar_blood_siphon);
+public:
+    at_zulgurub_bloodfire_pit_speech() : OnlyOnceAreaTriggerScript("at_zulgurub_bloodfire_pit_speech") {}
+
+    bool _OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    {
+        if (InstanceScript* instance = player->GetInstanceScript())
+        {
+            // Instance map's enormous, Hakkar's GRID is not loaded by the time players enter.
+           // Without this, the creature never says anything, because it doesn't load in time.
+            player->GetMap()->LoadGrid(-11783.99f, -1655.27f);
+
+            if (Creature* hakkar = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_HAKKAR)))
+            {
+                if (hakkar->GetAI())
+                {
+                    hakkar->AI()->Talk(SAY_PLEDGE_ALLEGIANCE, player);
+                }
+            }
+        }
+
+        return false;
+    }
+};
+
+class at_zulgurub_edge_of_madness_speech : public OnlyOnceAreaTriggerScript
+{
+public:
+    at_zulgurub_edge_of_madness_speech() : OnlyOnceAreaTriggerScript("at_zulgurub_edge_of_madness_speech") {}
+
+    bool _OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    {
+        if (InstanceScript* instance = player->GetInstanceScript())
+        {
+            // Instance map's enormous, Hakkar's GRID is not loaded by the time players enter.
+           // Without this, the creature never says anything, because it doesn't load in time.
+            player->GetMap()->LoadGrid(-11783.99f, -1655.27f);
+
+            if (Creature* hakkar = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_HAKKAR)))
+            {
+                if (hakkar->GetAI())
+                {
+                    hakkar->AI()->Talk(SAY_WORLD_WILL_SUFFER, player);
+                }
+            }
+        }
+
+        return false;
+    }
+};
+
+class spell_blood_siphon : public SpellScript
+{
+    PrepareSpellScript(spell_blood_siphon);
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_BLOOD_SIPHON_HEAL, SPELL_BLOOD_SIPHON_DMG });
+        return ValidateSpellInfo({ SPELL_BLOOD_SIPHON_DAMAGE, SPELL_BLOOD_SIPHON_HEAL });
     }
 
-    void OnSpellHit()
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        Unit* caster = GetCaster();
-        Unit* target = GetHitUnit();
-        if (!caster || !target)
-            return;
+        // Max. 20 targets
+        if (!targets.empty())
+        {
+            Acore::Containers::RandomResize(targets, 20);
+        }
+    }
 
-        if (target->HasAura(SPELL_POISONOUS_BLOOD))
-            target->CastSpell(caster, SPELL_BLOOD_SIPHON_DMG, true);
-        else
-            target->CastSpell(caster, SPELL_BLOOD_SIPHON_HEAL, true);
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            if (Player* player = GetHitPlayer())
+            {
+                player->CastSpell(caster, player->HasAura(SPELL_POISONOUS_BLOOD) ? SPELL_BLOOD_SIPHON_DAMAGE : SPELL_BLOOD_SIPHON_HEAL, true);
+            }
+        }
     }
 
     void Register() override
     {
-        OnHit += SpellHitFn(spell_hakkar_blood_siphon::OnSpellHit);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_blood_siphon::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_blood_siphon::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+class spell_hakkar_power_down : public SpellScript
+{
+    PrepareSpellScript(spell_hakkar_power_down);
+
+    void HandleOnHit()
+    {
+        if (Unit* caster = GetCaster())
+            if (caster->HasAura(SPELL_HAKKAR_POWER))
+                caster->RemoveAuraFromStack(SPELL_HAKKAR_POWER);
+    }
+
+    void Register() override
+    {
+        OnHit += SpellHitFn(spell_hakkar_power_down::HandleOnHit);
     }
 };
 
@@ -299,5 +407,8 @@ void AddSC_boss_hakkar()
     new at_zulgurub_entrance_speech();
     new at_zulgurub_bridge_speech();
     new at_zulgurub_temple_speech();
-    RegisterSpellScript(spell_hakkar_blood_siphon);
+    new at_zulgurub_bloodfire_pit_speech();
+    new at_zulgurub_edge_of_madness_speech();
+    RegisterSpellScript(spell_blood_siphon);
+    RegisterSpellScript(spell_hakkar_power_down);
 }
