@@ -218,3 +218,27 @@ void ScriptMgr::OnDisplayIdChange(Unit* unit, uint32 displayId)
         script->OnDisplayIdChange(unit, displayId);
     });
 }
+
+void ScriptMgr::OnUnitEnterEvadeMode(Unit* unit, uint8 evadeReason)
+{
+    ExecuteScript<UnitScript>([&](UnitScript* script)
+    {
+        script->OnUnitEnterEvadeMode(unit, evadeReason);
+    });
+}
+
+void ScriptMgr::OnUnitEnterCombat(Unit* unit, Unit* victim)
+{
+    ExecuteScript<UnitScript>([&](UnitScript* script)
+    {
+        script->OnUnitEnterCombat(unit, victim);
+    });
+}
+
+void ScriptMgr::OnUnitDeath(Unit* unit, Unit* killer)
+{
+    ExecuteScript<UnitScript>([&](UnitScript* script)
+    {
+        script->OnUnitDeath(unit, killer);
+    });
+}
