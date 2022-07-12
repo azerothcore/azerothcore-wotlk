@@ -224,7 +224,7 @@ public:
                     break;
                 case EVENT_ENERVATING_BRAND:
                     for (uint8 i = 0; i < RAID_MODE<uint8>(2, 4, 2, 4); i++)
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 45.0f, true, -SPELL_ENERVATING_BRAND))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 45.0f, true, -SPELL_ENERVATING_BRAND))
                             me->CastSpell(target, SPELL_ENERVATING_BRAND, true);
                     events.ScheduleEvent(EVENT_ENERVATING_BRAND, 26000);
                     break;
@@ -311,7 +311,7 @@ public:
                     break;
                 case EVENT_ENERVATING_BRAND:
                     for (uint8 i = 0; i < RAID_MODE<uint8>(4, 10, 4, 10); i++)
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 45.0f, true, -SPELL_ENERVATING_BRAND))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 45.0f, true, -SPELL_ENERVATING_BRAND))
                             me->CastSpell(target, SPELL_ENERVATING_BRAND, true);
                     _events.ScheduleEvent(EVENT_ENERVATING_BRAND, 26000);
                     break;
@@ -377,7 +377,7 @@ public:
         void Reset() override
         {
             _events.Reset();
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
 
             // Xinef: after soft reset npc is no longer present
             if (me->GetInstanceScript()->GetBossState(DATA_BALTHARUS_THE_WARBORN) == DONE)
@@ -439,7 +439,7 @@ public:
                     Talk(SAY_XERESTRASZA_EVENT_6);
                     break;
                 case EVENT_XERESTRASZA_EVENT_7:
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                     Talk(SAY_XERESTRASZA_EVENT_7);
                     me->setActive(false);
                     break;

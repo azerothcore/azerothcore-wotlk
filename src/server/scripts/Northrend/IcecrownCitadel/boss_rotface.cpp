@@ -151,7 +151,7 @@ public:
         {
             if (!instance->CheckRequiredBosses(DATA_ROTFACE, who->ToPlayer()))
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 instance->DoCastSpellOnPlayers(LIGHT_S_HAMMER_TELEPORT);
                 return;
             }
@@ -219,13 +219,13 @@ public:
                 Talk(SAY_KILL);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->DisableRotate(false);
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
             if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
-                professor->AI()->EnterEvadeMode();
+                professor->AI()->EnterEvadeMode(why);
         }
 
         void SpellHitTarget(Unit* target, SpellInfo const* spell) override
@@ -258,7 +258,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim() || !CheckInRoom())
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
@@ -273,7 +273,7 @@ public:
                     me->DisableRotate(false);
                     break;
                 case EVENT_SLIME_SPRAY:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankTargetSelector(me)))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, NonTankTargetSelector(me)))
                     {
                         if (Creature* c = me->SummonCreature(NPC_OOZE_SPRAY_STALKER, *target, TEMPSUMMON_TIMED_DESPAWN, 8000))
                         {
@@ -315,12 +315,12 @@ public:
                     {
                         std::list<Unit*> targets;
                         uint32 minTargets = RAID_MODE<uint32>(3, 8, 3, 8);
-                        SelectTargetList(targets, minTargets, SELECT_TARGET_RANDOM, -5.0f, true);
+                        SelectTargetList(targets, minTargets, SelectTargetMethod::Random, -5.0f, true);
                         float minDist = 0.0f;
                         if (targets.size() >= minTargets)
                             minDist = -5.0f;
 
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, minDist, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, minDist, true))
                             if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
                                 professor->CastSpell(target, SPELL_VILE_GAS_H, true); // triggered, to skip LoS check
                     }
@@ -407,7 +407,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->SetInCombatWithZone();
         }
@@ -492,7 +492,7 @@ public:
                 DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->SetInCombatWithZone();
         }
@@ -897,7 +897,7 @@ public:
         void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
-            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                 summon->AI()->AttackStart(target);
         }
 

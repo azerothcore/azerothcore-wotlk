@@ -22,8 +22,8 @@ SDComment: No model for submerging. Currently just invisible.
 SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "temple_of_ahnqiraj.h"
 
 enum Spells
@@ -156,7 +156,7 @@ public:
             {
                 //Cast
                 me->HandleEmoteCommand(EMOTE_ONESHOT_SUBMERGE);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetFaction(FACTION_FRIENDLY);
                 DoCast(me, SPELL_DIRTMOUND_PASSIVE);
 
@@ -168,7 +168,7 @@ public:
             //ChangeTarget_Timer
             if (Submerged && ChangeTarget_Timer <= diff)
             {
-                Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0);
+                Unit* target = SelectTarget(SelectTargetMethod::Random, 0);
 
                 if (target)
                     me->NearTeleportTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), me->GetOrientation());
@@ -180,7 +180,7 @@ public:
             //Back_Timer
             if (Submerged && Back_Timer <= diff)
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetFaction(FACTION_MONSTER);
 
                 DoCastVictim(SPELL_GROUND_RUPTURE);

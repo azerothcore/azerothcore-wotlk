@@ -108,7 +108,7 @@ class InstanceSaveMgr
     friend class InstanceSave;
 
 private:
-    InstanceSaveMgr()  {};
+    InstanceSaveMgr()  = default;;
     ~InstanceSaveMgr();
 
 public:
@@ -166,7 +166,7 @@ public:
 
     InstanceSave* AddInstanceSave(uint32 mapId, uint32 instanceId, Difficulty difficulty, bool startup = false);
     bool DeleteInstanceSaveIfNeeded(uint32 InstanceId, bool skipMapCheck);
-    bool DeleteInstanceSaveIfNeeded(InstanceSave* save, bool skipMapCheck);
+    bool DeleteInstanceSaveIfNeeded(InstanceSave* save, bool skipMapCheck, bool deleteSave = true);
 
     InstanceSave* GetInstanceSave(uint32 InstanceId);
 
@@ -182,6 +182,8 @@ public:
     void CopyBinds(ObjectGuid from, ObjectGuid to, Player* toPlr = nullptr);
     void UnbindAllFor(InstanceSave* save);
 
+    void SanitizeInstanceSavedData();
+    void DeleteInstanceSavedData(uint32 instanceId);
 protected:
     static uint16 ResetTimeDelay[];
     static PlayerBindStorage playerBindStorage;

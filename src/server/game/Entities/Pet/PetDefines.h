@@ -18,84 +18,74 @@
 #ifndef AZEROTHCORE_PET_DEFINES_H
 #define AZEROTHCORE_PET_DEFINES_H
 
-enum PetType
+#include "Define.h"
+#include "Optional.h"
+#include <array>
+#include <string>
+#include <vector>
+
+enum ReactStates : uint8;
+
+enum PetType : uint8
 {
-    SUMMON_PET              = 0,
-    HUNTER_PET              = 1,
-    MAX_PET_TYPE            = 4
+    SUMMON_PET                  = 0,
+    HUNTER_PET                  = 1,
+    MAX_PET_TYPE                = 4
 };
 
-#define MAX_PET_STABLES         4
+constexpr auto MAX_PET_STABLES = 4;
 
 // stored in character_pet.slot
-enum PetSaveMode
+enum PetSaveMode : int8
 {
-    PET_SAVE_AS_DELETED        = -1,                        // not saved in fact
-    PET_SAVE_AS_CURRENT        =  0,                        // in current slot (with player)
-    PET_SAVE_FIRST_STABLE_SLOT =  1,
-    PET_SAVE_LAST_STABLE_SLOT  =  MAX_PET_STABLES,          // last in DB stable slot index (including), all higher have same meaning as PET_SAVE_NOT_IN_SLOT
-    PET_SAVE_NOT_IN_SLOT       =  100                       // for avoid conflict with stable size grow will use 100
+    PET_SAVE_AS_DELETED         = -1,                        // not saved in fact
+    PET_SAVE_AS_CURRENT         =  0,                        // in current slot (with player)
+    PET_SAVE_FIRST_STABLE_SLOT  =  1,
+    PET_SAVE_LAST_STABLE_SLOT   =  MAX_PET_STABLES,          // last in DB stable slot index (including), all higher have same meaning as PET_SAVE_NOT_IN_SLOT
+    PET_SAVE_NOT_IN_SLOT        =  100                       // for avoid conflict with stable size grow will use 100
 };
 
 enum HappinessState
 {
-    UNHAPPY = 1,
-    CONTENT = 2,
-    HAPPY   = 3
+    UNHAPPY                     = 1,
+    CONTENT                     = 2,
+    HAPPY                       = 3
 };
 
 enum PetSpellState
 {
-    PETSPELL_UNCHANGED = 0,
-    PETSPELL_CHANGED   = 1,
-    PETSPELL_NEW       = 2,
-    PETSPELL_REMOVED   = 3
+    PETSPELL_UNCHANGED          = 0,
+    PETSPELL_CHANGED            = 1,
+    PETSPELL_NEW                = 2,
+    PETSPELL_REMOVED            = 3
 };
 
 enum PetSpellType
 {
-    PETSPELL_NORMAL = 0,
-    PETSPELL_FAMILY = 1,
-    PETSPELL_TALENT = 2
+    PETSPELL_NORMAL             = 0,
+    PETSPELL_FAMILY             = 1,
+    PETSPELL_TALENT             = 2
 };
 
 enum ActionFeedback
 {
-    FEEDBACK_NONE            = 0,
-    FEEDBACK_PET_DEAD        = 1,
-    FEEDBACK_NOTHING_TO_ATT  = 2,
-    FEEDBACK_CANT_ATT_TARGET = 3
+    FEEDBACK_NONE               = 0,
+    FEEDBACK_PET_DEAD           = 1,
+    FEEDBACK_NOTHING_TO_ATT     = 2,
+    FEEDBACK_CANT_ATT_TARGET    = 3
 };
 
 enum PetTalk
 {
-    PET_TALK_SPECIAL_SPELL  = 0,
-    PET_TALK_ATTACK         = 1
-};
-
-// used at pet loading query list preparing, and later result selection
-enum PetLoadQueryIndex
-{
-    PET_LOAD_QUERY_LOADAURAS                    = 0,
-    PET_LOAD_QUERY_LOADSPELLS                   = 1,
-    PET_LOAD_QUERY_LOADSPELLCOOLDOWN            = 2,
-    MAX_PET_LOAD_QUERY,
-};
-
-enum PetLoadStage
-{
-    PET_LOAD_DEFAULT                            = 0,
-    PET_LOAD_HANDLE_UNSTABLE_CALLBACK           = 1, // used also in HandleStableSwapPetCallback, uses same error / ok messages
-    PET_LOAD_BG_RESURRECT                       = 2,
-    PET_LOAD_SUMMON_PET                         = 3,
-    PET_LOAD_SUMMON_DEAD_PET                    = 4
+    PET_TALK_SPECIAL_SPELL      = 0,
+    PET_TALK_ATTACK             = 1
 };
 
 enum PetLoadState
 {
-    PET_LOAD_OK                                 = 0,
-    PET_LOAD_NO_RESULT                          = 1,
-    PET_LOAD_ERROR                              = 2
+    PET_LOAD_OK                 = 0,
+    PET_LOAD_NO_RESULT          = 1,
+    PET_LOAD_ERROR              = 2
 };
 
 enum NPCEntries
@@ -201,5 +191,40 @@ enum PetScalingSpells
 
 #define PET_FOLLOW_DIST  1.0f
 #define PET_FOLLOW_ANGLE (M_PI/2)
+
+class PetStable
+{
+public:
+    struct PetInfo
+    {
+        PetInfo() { }
+
+        std::string Name;
+        std::string ActionBar;
+        uint32 PetNumber = 0;
+        uint32 CreatureId = 0;
+        uint32 DisplayId = 0;
+        uint32 Experience = 0;
+        uint32 Health = 0;
+        uint32 Mana = 0;
+        uint32 Happiness = 0;
+        uint32 LastSaveTime = 0;
+        uint32 CreatedBySpellId = 0;
+        uint8 Level = 0;
+        ReactStates ReactState = ReactStates(0);
+        PetType Type = MAX_PET_TYPE;
+        bool WasRenamed = false;
+    };
+
+    Optional<PetInfo> CurrentPet;                                   // PET_SAVE_AS_CURRENT
+    std::array<Optional<PetInfo>, MAX_PET_STABLES> StabledPets;     // PET_SAVE_FIRST_STABLE_SLOT - PET_SAVE_LAST_STABLE_SLOT
+    uint32 MaxStabledPets = 0;
+    std::vector<PetInfo> UnslottedPets;                             // PET_SAVE_NOT_IN_SLOT
+
+    [[nodiscard]] PetInfo const* GetUnslottedHunterPet() const
+    {
+        return UnslottedPets.size() == 1 && UnslottedPets[0].Type == HUNTER_PET ? &UnslottedPets[0] : nullptr;
+    }
+};
 
 #endif

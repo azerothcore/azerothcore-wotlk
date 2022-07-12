@@ -132,7 +132,7 @@ public:
                 }
                 if (resetPosition)
                 {
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                     switch (me->GetEntry())
                     {
                     case NPC_VERDISA:
@@ -161,7 +161,7 @@ public:
             {
                 Talk(SAY_BELGARISTRASZ);
             }
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
         }
     };
 
@@ -926,7 +926,7 @@ public:
                 case EFFECT_1:
                     _drakeGUID = drake->GetGUID();
                     caster->AddAura(SPELL_DRAKE_FLAG_VISUAL, caster);
-                    caster->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    caster->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     caster->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
                     drake->CastSpell(drake, SPELL_SOAR_TRIGGER);
                     if (drake->GetEntry() == NPC_RUBY_DRAKE)
@@ -950,12 +950,12 @@ public:
 
             if (drake)
             {
-                drake->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED);
+                drake->RemoveUnitFlag(UNIT_FLAG_POSSESSED);
                 drake->RemoveAurasDueToSpell(GetId());
                 drake->RemoveAurasDueToSpell(SPELL_SOAR_TRIGGER);
                 drake->RemoveAurasDueToSpell(SPELL_RUBY_EVASIVE_AURA);
             }
-            caster->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            caster->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             caster->RemoveAurasDueToSpell(SPELL_DRAKE_FLAG_VISUAL);
         }
 
@@ -993,7 +993,7 @@ public:
 
             if (!drake)
             {
-                caster->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                caster->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 caster->RemoveAurasDueToSpell(SPELL_DRAKE_FLAG_VISUAL);
             }
         }

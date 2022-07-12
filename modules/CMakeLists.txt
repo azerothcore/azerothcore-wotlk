@@ -10,8 +10,6 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
 
-message("")
-
 # Make the script module list available in the current scope
 GetModuleSourceList(MODULES_MODULE_LIST)
 
@@ -78,8 +76,8 @@ foreach(SOURCE_MODULE ${MODULES_MODULE_LIST})
     set(${MODULE_MODULE_VARIABLE} "static")
   endif()
 
-  # Use only static for mod-eluna-lua-engine
-  if (SOURCE_MODULE MATCHES "mod-eluna-lua-engine")
+  # Use only static for mod-eluna
+  if (SOURCE_MODULE MATCHES "mod-eluna")
     ConfigureElunaModule(${SOURCE_MODULE})
   endif()
 
@@ -290,7 +288,7 @@ target_include_directories(modules
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${PUBLIC_INCLUDES})
 
-set_target_properties(scripts
+set_target_properties(modules
   PROPERTIES
     FOLDER
       "modules")

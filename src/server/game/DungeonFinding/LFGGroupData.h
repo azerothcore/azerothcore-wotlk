@@ -48,28 +48,29 @@ namespace lfg
         void DecreaseKicksLeft();
 
         // General
-        LfgState GetState() const;
-        LfgState GetOldState() const;
-        LfgGuidSet const& GetPlayers() const;
-        uint8 GetPlayerCount() const;
-        ObjectGuid GetLeader() const;
+        [[nodiscard]] LfgState GetState() const;
+        [[nodiscard]] LfgState GetOldState() const;
+        [[nodiscard]] LfgGuidSet const& GetPlayers() const;
+        [[nodiscard]] uint8 GetPlayerCount() const;
+        [[nodiscard]] ObjectGuid GetLeader() const;
 
         // Dungeon
-        uint32 GetDungeon(bool asId = true) const;
+        [[nodiscard]] uint32 GetDungeon(bool asId = true) const;
 
         // VoteKick
-        uint8 GetKicksLeft() const;
+        [[nodiscard]] uint8 GetKicksLeft() const;
 
     private:
         // General
-        LfgState m_State;                                  ///< State if group in LFG
-        LfgState m_OldState;                               ///< Old State
-        ObjectGuid m_Leader;                               ///< Leader GUID
-        LfgGuidSet m_Players;                              ///< Players in group
+        LfgState m_State;                   ///< State if group in LFG
+        LfgState m_OldState;                ///< Old State
+        ObjectGuid m_Leader;                ///< Leader GUID
+        LfgGuidSet m_Players;               ///< Players in group
         // Dungeon
-        uint32 m_Dungeon;                                  ///< Dungeon entry
+        uint32 m_Dungeon;                   ///< Dungeon entry
+        bool _isLFGGroup;
         // Vote Kick
-        uint8 m_KicksLeft;                                 ///< Number of kicks left
+        uint8 m_KicksLeft;                  ///< Number of kicks left
     };
 
 } // namespace lfg

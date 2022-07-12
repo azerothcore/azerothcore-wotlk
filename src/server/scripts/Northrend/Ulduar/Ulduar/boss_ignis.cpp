@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameTime.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -56,26 +57,17 @@
 #define NPC_SCORCHED_GROUND             33123
 #define NPC_WATER_TRIGGER               22515
 
-#define TEXT_AGGRO                      "Insolent whelps! Your blood will temper the weapons used to reclaim this world!"
-#define TEXT_ACTIVATE_CONSTRUCT         "Arise, soldiers of the Iron Crucible! The Makers' will be done!"
-#define TEXT_SCORCH_1                   "Let the inferno consume you!"
-#define TEXT_SCORCH_2                   "BURN! Burn in the makers fire!"
-#define TEXT_SLAG_POT                   "I will burn away your impurities!"
-#define TEXT_SLAY_1                     "More scraps for the scrapheap!"
-#define TEXT_SLAY_2                     "Your bones will serve as kindling!"
-#define TEXT_BERSERK                    "Let it be finished!"
-#define TEXT_DEATH                      "I. Have. Failed."
-#define TEXT_FLAME_JETS                 "Ignis The Furnace Master begins to cast Flame Jets!"
-
-#define SOUND_AGGRO                     15564
-#define SOUND_ACTIVATE_CONSTRUCT        15565
-#define SOUND_SLAG_POT                  15566
-#define SOUND_SCORCH_1                  15567
-#define SOUND_SCORCH_2                  15568
-#define SOUND_SLAY_1                    15569
-#define SOUND_SLAY_2                    15570
-#define SOUND_BERSERK                   15571
-#define SOUND_DEATH                     15572
+enum Texts
+{
+    SAY_AGGRO       = 0,
+    SAY_SUMMON      = 1,
+    SAY_SLAG_POT    = 2,
+    SAY_SCORCH      = 3,
+    SAY_SLAY        = 4,
+    SAY_BERSERK     = 5,
+    SAY_DEATH       = 6,
+    EMOTE_JETS      = 7,
+};
 
 #define ACHIEV_STOKIN_THE_FURNACE_EVENT 20951
 
@@ -112,7 +104,7 @@ public:
         {
             timer = 1000;
             me->SetReactState(REACT_PASSIVE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void JustReachedHome() override
@@ -120,12 +112,12 @@ public:
             me->CastSpell(me, 38757, true);
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_ACTIVATE_CONSTRUCT)
             {
                 me->RemoveAura(38757);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetReactState(REACT_AGGRESSIVE);
                 if (InstanceScript* instance = me->GetInstanceScript())
                     if (Creature* ignis = ObjectAccessor::GetCreature(*me, instance->GetGuidData(TYPE_IGNIS)))
@@ -146,7 +138,7 @@ public:
                             heat->ModStackAmount(-1);
                         }
                         me->CastSpell(me, SPELL_MOLTEN, true);
-                        me->getThreatMgr().resetAllAggro();
+                        me->GetThreatMgr().ResetAllThreat();
                     }
                 }
             }
@@ -259,8 +251,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_FLAME_JETS, 32000);
             events.ScheduleEvent(EVENT_GRAB, 25000);
 
-            me->Yell(TEXT_AGGRO, LANG_UNIVERSAL);
-            me->PlayDirectSound(SOUND_AGGRO);
+            Talk(SAY_AGGRO);
             DoZoneInCombat();
 
             if( InstanceScript* m_pInstance = me->GetInstanceScript() )
@@ -276,10 +267,10 @@ public:
             if (id == 1337)
             {
                 if (lastShatterMSTime)
-                    if (getMSTimeDiff(lastShatterMSTime, World::GetGameTimeMS()) <= 5000)
+                    if (getMSTimeDiff(lastShatterMSTime, GameTime::GetGameTimeMS().count()) <= 5000)
                         bShattered = true;
 
-                lastShatterMSTime = World::GetGameTimeMS();
+                lastShatterMSTime = GameTime::GetGameTimeMS().count();
             }
         }
 
@@ -295,24 +286,15 @@ public:
             me->setActive(false);
         }
 
-        void KilledUnit(Unit*  /*victim*/) override
+        void KilledUnit(Unit* victim) override
         {
-            if( rand() % 2 )
-            {
-                me->Yell(TEXT_SLAY_1, LANG_UNIVERSAL);
-                me->PlayDirectSound(SOUND_SLAY_1);
-            }
-            else
-            {
-                me->Yell(TEXT_SLAY_2, LANG_UNIVERSAL);
-                me->PlayDirectSound(SOUND_SLAY_2);
-            }
+            if (victim->GetTypeId() == TYPEID_PLAYER)
+                Talk(SAY_SLAY);
         }
 
-        void JustDied(Unit* /*victim*/) override
+        void JustDied(Unit* /*killer*/) override
         {
-            me->Yell(TEXT_DEATH, LANG_UNIVERSAL);
-            me->PlayDirectSound(SOUND_DEATH);
+            Talk(SAY_DEATH);
 
             if( me->GetInstanceScript() )
                 me->GetInstanceScript()->SetData(TYPE_IGNIS, DONE);
@@ -324,7 +306,7 @@ public:
                     Unit::Kill(*itr, *itr);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (caster && spell->Id == SPELL_GRAB_CONTROL_2)
             {
@@ -342,7 +324,7 @@ public:
 
             if( me->GetPositionX() < 490.0f || me->GetPositionX() > 690.0f || me->GetPositionY() < 130.0f || me->GetPositionY() > 410.0f )
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 return;
             }
 
@@ -356,27 +338,18 @@ public:
                 case 0:
                     break;
                 case EVENT_ACTIVATE_CONSTRUCT:
+                    Talk(SAY_SUMMON);
                     me->CastCustomSpell(SPELL_ACTIVATE_CONSTRUCT, SPELLVALUE_MAX_TARGETS, 1, (Unit*)nullptr, false);
                     if (++counter >= 20)
                     {
-                        me->Yell(TEXT_BERSERK, LANG_UNIVERSAL);
-                        me->PlayDirectSound(SOUND_BERSERK);
+                        Talk(SAY_BERSERK);
                         me->CastSpell(me, SPELL_BERSERK, true);
                         break;
                     }
                     events.RepeatEvent(RAID_MODE(40000, 30000));
                     break;
                 case EVENT_SPELL_SCORCH:
-                    if( rand() % 2 )
-                    {
-                        me->Yell(TEXT_SCORCH_1, LANG_UNIVERSAL);
-                        me->PlayDirectSound(SOUND_SCORCH_1);
-                    }
-                    else
-                    {
-                        me->Yell(TEXT_SCORCH_2, LANG_UNIVERSAL);
-                        me->PlayDirectSound(SOUND_SCORCH_2);
-                    }
+                    Talk(SAY_SCORCH);
                     me->SetControlled(true, UNIT_STATE_ROOT);
                     me->DisableRotate(true);
                     me->SendMovementFlagUpdate();
@@ -389,7 +362,7 @@ public:
                     me->DisableRotate(false);
                     break;
                 case EVENT_SPELL_FLAME_JETS:
-                    me->TextEmote(TEXT_FLAME_JETS, nullptr, true);
+                    Talk(EMOTE_JETS);
                     me->CastSpell(me->GetVictim(), S_FLAME_JETS, false);
                     events.RepeatEvent(25000);
                     break;
@@ -428,8 +401,7 @@ public:
                             int8 pos = urand(0, playerGUIDs.size() - 1);
                             if( Player* pTarget = ObjectAccessor::GetPlayer(*me, playerGUIDs.at(pos)) )
                             {
-                                me->Yell(TEXT_SLAG_POT, LANG_UNIVERSAL);
-                                me->PlayDirectSound(SOUND_SLAG_POT);
+                                Talk(SAY_SLAG_POT);
                                 me->CastSpell(pTarget, SPELL_GRAB, false);
                             }
                         }
@@ -443,11 +415,11 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->DisableRotate(false);
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
     };
 };
@@ -465,7 +437,7 @@ public:
         {
             if (aurEff->GetTotalTicks() >= 0 && aurEff->GetTickNumber() == uint32(aurEff->GetTotalTicks()))
                 if (Unit* c = GetCaster())
-                    if (Creature* s = c->SummonCreature(NPC_SCORCHED_GROUND, c->GetPositionX() + 20.0f * cos(c->GetOrientation()), c->GetPositionY() + 20.0f * sin(c->GetOrientation()), 361.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 30000))
+                    if (Creature* s = c->SummonCreature(NPC_SCORCHED_GROUND, c->GetPositionX() + 20.0f * cos(c->GetOrientation()), c->GetPositionY() + 20.0f * std::sin(c->GetOrientation()), 361.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 30000))
                     {
                         if (!s->FindNearestCreature(NPC_WATER_TRIGGER, 25.0f, true)) // must be away from the water
                             s->CastSpell(s, (aurEff->GetId() == 62546 ? SPELL_SCORCHED_GROUND_10 : SPELL_SCORCHED_GROUND_25), true);

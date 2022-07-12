@@ -140,7 +140,7 @@ public:                                                 // modifiers
 
 public:                                                 // finishers
     void SendReturnToSender(uint32 sender_acc, ObjectGuid::LowType sender_guid, ObjectGuid::LowType receiver_guid, CharacterDatabaseTransaction trans);
-    void SendMailTo(CharacterDatabaseTransaction trans, MailReceiver const& receiver, MailSender const& sender, MailCheckMask checked = MAIL_CHECK_MASK_NONE, uint32 deliver_delay = 0, uint32 custom_expiration = 0, bool deleteMailItemsFromDB = false, bool sendMail = true, int32 auctionId = 0);
+    void SendMailTo(CharacterDatabaseTransaction trans, MailReceiver const& receiver, MailSender const& sender, MailCheckMask checked = MAIL_CHECK_MASK_NONE, uint32 deliver_delay = 0, uint32 custom_expiration = 0, bool deleteMailItemsFromDB = false, bool sendMail = true);
 
 private:
     void deleteIncludedItems(CharacterDatabaseTransaction trans, bool inDB = false);
@@ -183,10 +183,6 @@ struct Mail
     uint32 checked;
     MailState state;
 
-    // < 0 Pending
-    // > 0 Delivery
-    int32 auctionId;
-
     void AddItem(ObjectGuid::LowType itemGuidLow, uint32 item_template)
     {
         MailItemInfo mii;
@@ -213,6 +209,23 @@ struct Mail
     [[nodiscard]] bool IsSentByGM() const { return stationery == MAIL_STATIONERY_GM; }
     [[nodiscard]] bool IsCODPayment() const { return checked & MAIL_CHECK_MASK_COD_PAYMENT; }
     [[nodiscard]] bool IsReturnedMail() const { return checked & MAIL_CHECK_MASK_RETURNED; }
+};
+
+struct ServerMail
+{
+    ServerMail() = default;
+    uint32 id{ 0 };
+    uint8 reqLevel{ 0 };
+    uint32 reqPlayTime{ 0 };
+    uint32 moneyA{ 0 };
+    uint32 moneyH{ 0 };
+    uint32 itemA{ 0 };
+    uint32 itemCountA{ 0 };
+    uint32 itemH{ 0 };
+    uint32 itemCountH{ 0 };
+    std::string subject;
+    std::string body;
+    uint8 active{ 0 };
 };
 
 #endif

@@ -37,6 +37,74 @@ public:
         instance_gnomeregan_InstanceMapScript(Map* map) : InstanceScript(map)
         {
         }
+
+        void OnCreatureCreate(Creature* creature) override
+        {
+            switch (creature->GetEntry())
+            {
+                case NPC_EMI_SHORTFUSE:
+                    if (_encounters[TYPE_GRUBBIS] == DONE)
+                    {
+                        creature->DespawnOrUnsummon();
+                    }
+                    break;
+            }
+        }
+
+        void OnGameObjectCreate(GameObject* gameobject) override
+        {
+            switch (gameobject->GetEntry())
+            {
+                case GO_CAVE_IN_1:
+                case GO_CAVE_IN_2:
+                case GO_WORKSHOP_DOOR:
+                case GO_FINAL_CHAMBER_DOOR:
+                    gameobject->UpdateSaveToDb(true);
+                    break;
+            }
+        }
+
+        void SetData(uint32 type, uint32 data) override
+        {
+            switch (type)
+            {
+            case TYPE_GRUBBIS:
+                _encounters[type] = data;
+                break;
+            }
+
+            if (data == DONE)
+                SaveToDB();
+        }
+
+        std::string GetSaveData() override
+        {
+            std::ostringstream saveStream;
+            saveStream << "D E " << _encounters[0];
+            return saveStream.str();
+        }
+
+        void Load(const char* in) override
+        {
+            if (!in)
+                return;
+
+            char dataHead1, dataHead2;
+            std::istringstream loadStream(in);
+            loadStream >> dataHead1 >> dataHead2;
+            if (dataHead1 == 'D' && dataHead2 == 'E')
+            {
+                for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
+                {
+                    loadStream >> _encounters[i];
+                    if (_encounters[i] == IN_PROGRESS)
+                        _encounters[i] = NOT_STARTED;
+                }
+            }
+        }
+
+    private:
+        uint32 _encounters[MAX_ENCOUNTERS];
     };
 };
 

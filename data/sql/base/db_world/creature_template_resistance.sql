@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,18 +12,18 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.creature_template_resistance
+-- Dumpar struktur för tabell acore_world.creature_template_resistance
 DROP TABLE IF EXISTS `creature_template_resistance`;
 CREATE TABLE IF NOT EXISTS `creature_template_resistance` (
-  `CreatureID` mediumint(8) unsigned NOT NULL,
+  `CreatureID` MEDIUMINT unsigned NOT NULL,
   `School` TINYINT unsigned NOT NULL,
   `Resistance` SMALLINT DEFAULT NULL,
   `VerifiedBuild` SMALLINT DEFAULT 0,
   PRIMARY KEY (`CreatureID`,`School`),
-  CHECK (`School` >= 1 and `School` <= 6)
+  CONSTRAINT `creature_template_resistance_chk_1` CHECK (((`School` >= 1) and (`School` <= 6)))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.creature_template_resistance: ~1 600 rows (приблизительно)
+-- Dumpar data för tabell acore_world.creature_template_resistance: ~1 600 rows (ungefär)
 DELETE FROM `creature_template_resistance`;
 /*!40000 ALTER TABLE `creature_template_resistance` DISABLE KEYS */;
 INSERT INTO `creature_template_resistance` (`CreatureID`, `School`, `Resistance`, `VerifiedBuild`) VALUES

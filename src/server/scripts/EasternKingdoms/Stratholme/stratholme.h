@@ -33,6 +33,8 @@ enum DataTypes
 
     DATA_BARON_RUN_NONE                 = 0,
     DATA_BARON_RUN_GATE                 = 1,
+    DATA_JARIEN                         = 2,
+    DATA_SOTHOS                         = 3
 };
 
 enum CreatureIds
@@ -47,10 +49,19 @@ enum CreatureIds
     NPC_PLAGUED_RAT                     = 10441,
     NPC_PLAGUED_INSECT                  = 10461,
     NPC_PLAGUED_MAGGOT                  = 10536,
+    NPC_JARIEN                          = 16101,
+    NPC_SOTHOS                          = 16102,
+    NPC_SPIRIT_OF_JARIEN                = 16103,
+    NPC_SPIRIT_OF_SOTHOS                = 16104
 };
 
 enum GameobjectIds
 {
+    GO_CRUSADER_SQUARE_DOOR             = 175967,
+    GO_HOARD_DOOR                       = 175968,
+    GO_HALL_OF_HIGH_COMMAND             = 176194,
+    GO_GAUNTLET_DOOR_1                  = 175357,
+    GO_GAUNTLET_DOOR_2                  = 175356,
     GO_ZIGGURAT_DOORS1                  = 175380,  // baroness
     GO_ZIGGURAT_DOORS2                  = 175379,  // nerub'enkan
     GO_ZIGGURAT_DOORS3                  = 175381,  // maleki
@@ -64,6 +75,7 @@ enum GameobjectIds
     GO_PORT_TRAP_GATE_2                 = 175350,  // Gate trap scarlet side
     GO_PORT_TRAP_GATE_3                 = 175355,  // Gate trap undead side
     GO_PORT_TRAP_GATE_4                 = 175354,
+    GO_JARIEN_AND_SOTHOS_HEIRLOOMS      = 181083
 };
 
 enum MiscIds
@@ -97,5 +109,7 @@ inline AI* GetStratholmeAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, StratholmeScriptName);
 }
+
+#define RegisterStratholmeCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetStratholmeAI)
 
 #endif

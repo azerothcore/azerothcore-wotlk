@@ -40,7 +40,6 @@ EndContentData */
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
-#include "WorldSession.h"
 
 // Ours
 enum fumping
@@ -375,7 +374,7 @@ public:
             me->SetFaction(FACTION_FRIENDLY);
             me->SetStandState(UNIT_STAND_STATE_SIT);
             me->RemoveAllAuras();
-            me->DeleteThreatList();
+            me->GetThreatMgr().ClearAllThreat();
             me->CombatStop(true);
             UnkorUnfriendly_Timer = 60000;
         }

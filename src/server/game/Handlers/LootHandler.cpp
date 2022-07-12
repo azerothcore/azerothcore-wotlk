@@ -262,7 +262,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
     player->SetLootGUID(ObjectGuid::Empty);
     player->SendLootRelease(lguid);
 
-    player->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOOTING);
+    player->RemoveUnitFlag(UNIT_FLAG_LOOTING);
 
     if (!player->IsInWorld())
         return;
@@ -304,7 +304,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
                 // Xinef: prevents exploits with just opening GO and spawning bilions of npcs, which can crash core if you know what you're doin ;)
                 if (go->GetGoType() == GAMEOBJECT_TYPE_CHEST && go->GetGOInfo()->chest.eventId)
                 {
-                    LOG_DEBUG("spells.aura", "Chest ScriptStart id %u for GO %u", go->GetGOInfo()->chest.eventId, go->GetSpawnId());
+                    LOG_DEBUG("spells.aura", "Chest ScriptStart id {} for GO {}", go->GetGOInfo()->chest.eventId, go->GetSpawnId());
                     player->GetMap()->ScriptsStart(sEventScripts, go->GetGOInfo()->chest.eventId, player, go);
                 }
             }
@@ -380,7 +380,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
             if (!creature->IsAlive())
                 creature->AllLootRemovedFromCorpse();
 
-            creature->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+            creature->RemoveDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
             loot->clear();
         }
         else
@@ -422,7 +422,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
         return;
     }
 
-    LOG_DEBUG("network", "WorldSession::HandleLootMasterGiveOpcode (CMSG_LOOT_MASTER_GIVE, 0x02A3) Target = [%s].", target->GetName().c_str());
+    LOG_DEBUG("network", "WorldSession::HandleLootMasterGiveOpcode (CMSG_LOOT_MASTER_GIVE, 0x02A3) Target = [{}].", target->GetName());
 
     if (_player->GetLootGUID() != lootguid)
     {
@@ -433,7 +433,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
     if (!_player->IsInRaidWith(target))
     {
         _player->SendLootError(lootguid, LOOT_ERROR_MASTER_OTHER);
-        //LOG_DEBUG("network", "MasterLootItem: Player %s tried to give an item to ineligible player %s !", GetPlayer()->GetName().c_str(), target->GetName().c_str());
+        //LOG_DEBUG("network", "MasterLootItem: Player {} tried to give an item to ineligible player {} !", GetPlayer()->GetName(), target->GetName());
         return;
     }
 
@@ -461,7 +461,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
 
     if (slotid >= loot->items.size() + loot->quest_items.size())
     {
-        LOG_DEBUG("loot", "MasterLootItem: Player %s might be using a hack! (slot %d, size %lu)", GetPlayer()->GetName().c_str(), slotid, (unsigned long)loot->items.size());
+        LOG_DEBUG("loot", "MasterLootItem: Player {} might be using a hack! (slot {}, size {})", GetPlayer()->GetName(), slotid, (unsigned long)loot->items.size());
         return;
     }
 
@@ -469,7 +469,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
 
     ItemPosCountVec dest;
     InventoryResult msg = target->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, item.itemid, item.count);
-    if (!item.AllowedForPlayer(target, true))
+    if (!item.AllowedForPlayer(target, loot->sourceWorldObjectGUID))
         msg = EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
     if (msg != EQUIP_ERR_OK)
     {

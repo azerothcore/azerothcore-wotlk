@@ -93,9 +93,9 @@ public:
             {
                 pInstance->SetData(DATA_EREGOS, NOT_STARTED);
                 if( pInstance->GetData(DATA_UROM) != DONE )
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 else
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             }
 
             events.Reset();
@@ -223,7 +223,7 @@ public:
                     Talk(SAY_SHIELD);
                     me->CastSpell(me, SPELL_PLANAR_SHIFT, false);
                     for( uint8 i = 0; i < 3; ++i )
-                        if( Unit* t = SelectTarget(SELECT_TARGET_RANDOM, 0, 300.0f, false) )
+                        if( Unit* t = SelectTarget(SelectTargetMethod::Random, 0, 300.0f, false) )
                             if( Creature* pa = me->SummonCreature(NPC_PLANAR_ANOMALY, *me, TEMPSUMMON_TIMED_DESPAWN, 17000) )
                             {
                                 pa->SetCanFly(true);

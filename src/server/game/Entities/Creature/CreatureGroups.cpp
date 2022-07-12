@@ -45,13 +45,13 @@ void FormationMgr::AddCreatureToGroup(uint32 groupId, Creature* member)
     //Add member to an existing group
     if (itr != map->CreatureGroupHolder.end())
     {
-        LOG_DEBUG("entities.unit", "Group found: %u, inserting creature %s, Group InstanceID %u", groupId, member->GetGUID().ToString().c_str(), member->GetInstanceId());
+        LOG_DEBUG("entities.unit", "Group found: {}, inserting creature {}, Group InstanceID {}", groupId, member->GetGUID().ToString(), member->GetInstanceId());
         itr->second->AddMember(member);
     }
     //Create new group
     else
     {
-        LOG_DEBUG("entities.unit", "Group not found: %u. Creating new group.", groupId);
+        LOG_DEBUG("entities.unit", "Group not found: {}. Creating new group.", groupId);
         CreatureGroup* group = new CreatureGroup(groupId);
         map->CreatureGroupHolder[groupId] = group;
         group->AddMember(member);
@@ -60,10 +60,10 @@ void FormationMgr::AddCreatureToGroup(uint32 groupId, Creature* member)
 
 void FormationMgr::RemoveCreatureFromGroup(CreatureGroup* group, Creature* member)
 {
-    LOG_DEBUG("entities.unit", "Deleting member pointer to spawnId: %u from group %u", member->GetSpawnId(), group->GetId());
+    LOG_DEBUG("entities.unit", "Deleting member pointer to spawnId: {} from group {}", member->GetSpawnId(), group->GetId());
     group->RemoveMember(member);
 
-    if (group->isEmpty())
+    if (group->IsEmpty())
     {
         Map* map = member->FindMap();
         if (!map)
@@ -71,7 +71,7 @@ void FormationMgr::RemoveCreatureFromGroup(CreatureGroup* group, Creature* membe
             return;
         }
 
-        LOG_DEBUG("entities.unit", "Deleting group with InstanceID %u", member->GetInstanceId());
+        LOG_DEBUG("entities.unit", "Deleting group with InstanceID {}", member->GetInstanceId());
         map->CreatureGroupHolder.erase(group->GetId());
         delete group;
     }
@@ -86,7 +86,7 @@ void FormationMgr::LoadCreatureFormations()
     QueryResult result = WorldDatabase.Query("SELECT leaderGUID, memberGUID, dist, angle, groupAI, point_1, point_2 FROM creature_formations ORDER BY leaderGUID");
     if (!result)
     {
-        LOG_ERROR("sql.sql", ">>  Loaded 0 creatures in formations. DB table `creature_formations` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 creatures in formations. DB table `creature_formations` is empty!");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -98,26 +98,26 @@ void FormationMgr::LoadCreatureFormations()
 
         //Load group member data
         FormationInfo group_member;
-        group_member.leaderGUID            = fields[0].GetUInt32();
-        ObjectGuid::LowType const memberGUID = fields[1].GetUInt32();
-        float const follow_dist             = fields[2].GetFloat();
-        float const follow_angle            = fields[3].GetFloat() * (static_cast<float>(M_PI) / 180);
-        group_member.groupAI               = fields[4].GetUInt16();
-        group_member.point_1               = fields[5].GetUInt16();
-        group_member.point_2               = fields[6].GetUInt16();
+        group_member.leaderGUID            = fields[0].Get<uint32>();
+        ObjectGuid::LowType const memberGUID = fields[1].Get<uint32>();
+        float const follow_dist             = fields[2].Get<float>();
+        float const follow_angle            = fields[3].Get<float>() * (static_cast<float>(M_PI) / 180);
+        group_member.groupAI               = fields[4].Get<uint16>();
+        group_member.point_1               = fields[5].Get<uint16>();
+        group_member.point_2               = fields[6].Get<uint16>();
 
         //If creature is group leader we may skip loading of dist/angle
         if (group_member.leaderGUID != memberGUID)
         {
             if (!group_member.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_SUPPORTED)))
             {
-                LOG_ERROR("sql.sql", "creature_formations table leader guid %u and member guid %u has unsupported GroupAI flag value (%u). Skipped", group_member.leaderGUID, memberGUID, group_member.groupAI);
+                LOG_ERROR("sql.sql", "creature_formations table leader guid {} and member guid {} has unsupported GroupAI flag value ({}). Skipped", group_member.leaderGUID, memberGUID, group_member.groupAI);
                 continue;
             }
 
             if (!group_member.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER)) && (follow_dist > 0.0f || follow_angle > 0.0f))
             {
-                LOG_ERROR("sql.sql", "creature_formations table member guid %u and leader guid %u cannot have follow distance or follow angle because don't have GROUP_AI_FLAG_FOLLOW_LEADER flag. Values are not gonna be used", memberGUID, group_member.leaderGUID);
+                LOG_ERROR("sql.sql", "creature_formations table member guid {} and leader guid {} cannot have follow distance or follow angle because don't have GROUP_AI_FLAG_FOLLOW_LEADER flag. Values are not gonna be used", memberGUID, group_member.leaderGUID);
                 group_member.follow_dist       = 0.0f;
                 group_member.follow_angle      = 0.0f;
             }
@@ -132,7 +132,7 @@ void FormationMgr::LoadCreatureFormations()
             // Leader can have 0 AI flags - its allowed
             if (group_member.groupAI && !group_member.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_SUPPORTED)))
             {
-                LOG_ERROR("sql.sql", "creature_formations table leader guid %u and member guid %u has unsupported GroupAI flag value (%u). Skipped", group_member.leaderGUID, memberGUID, group_member.groupAI);
+                LOG_ERROR("sql.sql", "creature_formations table leader guid {} and member guid {} has unsupported GroupAI flag value ({}). Skipped", group_member.leaderGUID, memberGUID, group_member.groupAI);
                 continue;
             }
 
@@ -140,19 +140,19 @@ void FormationMgr::LoadCreatureFormations()
             group_member.follow_angle      = 0.0f;
             if (follow_dist > 0.0f || follow_angle > 0.0f)
             {
-                LOG_ERROR("sql.sql", "creature_formations table member guid %u and leader guid %u cannot have follow distance or follow angle. Values are not gonna be used", memberGUID, group_member.leaderGUID);
+                LOG_ERROR("sql.sql", "creature_formations table member guid {} and leader guid {} cannot have follow distance or follow angle. Values are not gonna be used", memberGUID, group_member.leaderGUID);
             }
         }
 
         if (!sObjectMgr->GetCreatureData(group_member.leaderGUID))
         {
-            LOG_ERROR("sql.sql", "creature_formations table leader guid %u incorrect (does not exist). Skipped", group_member.leaderGUID);
+            LOG_ERROR("sql.sql", "creature_formations table leader guid {} incorrect (does not exist). Skipped", group_member.leaderGUID);
             continue;
         }
 
         if (!sObjectMgr->GetCreatureData(memberGUID))
         {
-            LOG_ERROR("sql.sql", "creature_formations table member guid %u incorrect (does not exist). Skipped", memberGUID);
+            LOG_ERROR("sql.sql", "creature_formations table member guid {} incorrect (does not exist). Skipped", memberGUID);
             continue;
         }
 
@@ -160,18 +160,18 @@ void FormationMgr::LoadCreatureFormations()
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server.loading", ">> Loaded %u creatures in formations in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} creatures in formations in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
 void CreatureGroup::AddMember(Creature* member)
 {
-    LOG_DEBUG("entities.unit", "CreatureGroup::AddMember: Adding unit %s.", member->GetGUID().ToString().c_str());
+    LOG_DEBUG("entities.unit", "CreatureGroup::AddMember: Adding unit {}.", member->GetGUID().ToString());
 
     //Check if it is a leader
     if (member->GetSpawnId() == m_groupID)
     {
-        LOG_DEBUG("entities.unit", "Unit %s is formation leader. Adding group.", member->GetGUID().ToString().c_str());
+        LOG_DEBUG("entities.unit", "Unit {} is formation leader. Adding group.", member->GetGUID().ToString());
         m_leader = member;
     }
 
@@ -190,7 +190,7 @@ void CreatureGroup::RemoveMember(Creature* member)
     member->SetFormation(nullptr);
 }
 
-void CreatureGroup::MemberAttackStart(Creature* member, Unit* target)
+void CreatureGroup::MemberEngagingTarget(Creature* member, Unit* target)
 {
     uint8 const groupAI = sFormationMgr->CreatureGroupMap[member->GetSpawnId()].groupAI;
     if (member == m_leader)
@@ -209,7 +209,7 @@ void CreatureGroup::MemberAttackStart(Creature* member, Unit* target)
     {
         Creature* pMember = itr.first;
         if (m_leader) // avoid crash if leader was killed and reset.
-            LOG_DEBUG("entities.unit", "GROUP ATTACK: group instance id %u calls member instid %u", m_leader->GetInstanceId(), member->GetInstanceId());
+            LOG_DEBUG("entities.unit", "GROUP ATTACK: group instance id {} calls member instid {}", m_leader->GetInstanceId(), member->GetInstanceId());
 
         //Skip one check
         if (pMember == member)
@@ -229,7 +229,7 @@ void CreatureGroup::MemberAttackStart(Creature* member, Unit* target)
 void CreatureGroup::MemberEvaded(Creature* member)
 {
     uint8 const groupAI = sFormationMgr->CreatureGroupMap[member->GetSpawnId()].groupAI;
-    if (!(groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_EVADE_TOGETHER)))
+    if (!(groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_EVADE_MASK)))
     {
         return;
     }
@@ -243,18 +243,39 @@ void CreatureGroup::MemberEvaded(Creature* member)
             continue;
         }
 
-        if (pMember == member || pMember->isDead() || pMember->IsInEvadeMode() || !pMember->IsInCombat() ||
-                !itr.second.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_EVADE_TOGETHER)))
+        if (pMember == member || pMember->IsInEvadeMode() || !itr.second.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_EVADE_MASK)))
         {
             continue;
         }
 
-        if (pMember->IsAIEnabled)
+        if (itr.second.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_EVADE_TOGETHER)))
         {
-            if (CreatureAI* pMemberAI = pMember->AI())
+            if (!pMember->IsAlive() || !pMember->IsInCombat())
             {
-                pMemberAI->EnterEvadeMode();
+                continue;
             }
+
+            if (pMember->IsAIEnabled)
+            {
+                if (CreatureAI* pMemberAI = pMember->AI())
+                {
+                    pMemberAI->EnterEvadeMode();
+                }
+            }
+        }
+        else
+        {
+            if (pMember->IsAlive())
+            {
+                continue;
+            }
+
+            if (itr.second.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_DONT_RESPAWN_LEADER_ON_EVADE)) && pMember == m_leader)
+            {
+                continue;
+            }
+
+            pMember->Respawn();
         }
     }
 }
@@ -281,7 +302,7 @@ void CreatureGroup::FormationReset(bool dismiss, bool initMotionMaster)
                 {
                     member->GetMotionMaster()->MoveIdle();
                 }
-                LOG_DEBUG("entities.unit", "Set %s movement for member %s", dismiss ? "default" : "idle", member->GetGUID().ToString().c_str());
+                LOG_DEBUG("entities.unit", "Set {} movement for member {}", dismiss ? "default" : "idle", member->GetGUID().ToString());
             }
         }
     }
@@ -317,7 +338,7 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, bool run)
 
         // Xinef: this should be automatized, if turn angle is greater than PI/2 (90�) we should swap formation angle
         float followAngle = pFormationInfo.follow_angle;
-        if (static_cast<float>(M_PI) - fabs(fabs(m_leader->GetOrientation() - pathAngle) - static_cast<float>(M_PI)) > static_cast<float>(M_PI)* 0.5f)
+        if (static_cast<float>(M_PI) - std::fabs(std::fabs(m_leader->GetOrientation() - pathAngle) - static_cast<float>(M_PI)) > static_cast<float>(M_PI)* 0.5f)
         {
             // pussywizard: in both cases should be 2*M_PI - follow_angle
             // pussywizard: also, GetCurrentWaypointID() returns 0..n-1, while point_1 must be > 0, so +1

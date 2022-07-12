@@ -124,13 +124,13 @@ public:
                     events.ScheduleEvent(EVENT_ARCANE_TORRENT, 15000);
                     break;
                 case EVENT_MANA_TAP:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, PowerUsersSelector(me, POWER_MANA, 40.0f, false)))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, POWER_MANA, 40.0f, false)))
                         me->CastSpell(target, SPELL_MANA_TAP, false);
                     events.ScheduleEvent(EVENT_MANA_TAP, 18000);
                     break;
                 case EVENT_DOMINATION:
                     Talk(SAY_DOMINATION);
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 50.0f))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 50.0f))
                         me->CastSpell(target, SPELL_DOMINATION, false);
                     events.ScheduleEvent(EVENT_DOMINATION, 30000);
                     break;

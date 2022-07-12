@@ -184,7 +184,7 @@ public:
         {
             for (uint8 i = 0; i < 4; ++i)
                 if (GameObject* orb = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1 + i)))
-                    orb->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                    orb->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
         }
 
         void Reset() override
@@ -293,7 +293,7 @@ public:
         void InitializeAI() override
         {
             ScriptedAI::InitializeAI();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
             phase = PHASE_NORMAL;
             events.Reset();
@@ -308,11 +308,11 @@ public:
             events.Reset();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (me->GetReactState() == REACT_PASSIVE)
                 return;
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void AttackStart(Unit* who) override
@@ -329,9 +329,9 @@ public:
                 me->SetTarget();
                 me->SetReactState(REACT_PASSIVE);
                 me->RemoveAllAuras();
-                me->DeleteThreatList();
+                me->GetThreatMgr().ClearAllThreat();
                 me->SetRegeneratingHealth(false);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->HandleEmoteCommand(EMOTE_ONESHOT_DROWN);
                 me->resetAttackTimer();
                 events.Reset();
@@ -421,7 +421,7 @@ public:
                     break;
                 case EVENT_INIT_FIGHT:
                     me->SetReactState(REACT_AGGRESSIVE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->SetInCombatWithZone();
                     return;
                 case EVENT_TEXT_SPEACH11:
@@ -478,7 +478,7 @@ public:
                     {
                         anveena->CastSpell(anveena, SPELL_SACRIFICE_OF_ANVEENA, true);
                         me->CastSpell(me, SPELL_CUSTOM_08_STATE, true);
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+                        me->SetUnitFlag(UNIT_FLAG_PACIFIED);
                         events.DelayEvents(7001);
                         events2.ScheduleEvent(EVENT_RESTORE_MELEE, 7000);
                     }
@@ -486,7 +486,7 @@ public:
                     break;
                 case EVENT_RESTORE_MELEE:
                     me->RemoveAurasDueToSpell(SPELL_CUSTOM_08_STATE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+                    me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
                     break;
             }
 
@@ -570,7 +570,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_SOUL_FLAY, urand(4000, 5000));
                     break;
                 case EVENT_SPELL_LEGION_LIGHTNING:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
                         me->CastSpell(target, SPELL_LEGION_LIGHTNING, false);
                     events.ScheduleEvent(EVENT_SPELL_LEGION_LIGHTNING, phase == PHASE_SACRIFICE ? 15000 : 30000);
                     events.RescheduleEvent(EVENT_SPELL_SOUL_FLAY, 2000);
@@ -585,7 +585,7 @@ public:
                     for (uint8 i = 1; i < phase; ++i)
                     {
                         float x = me->GetPositionX() + 18.0f * cos((i * 2.0f - 1.0f) * M_PI / 3.0f);
-                        float y = me->GetPositionY() + 18.0f * sin((i * 2.0f - 1.0f) * M_PI / 3.0f);
+                        float y = me->GetPositionY() + 18.0f * std::sin((i * 2.0f - 1.0f) * M_PI / 3.0f);
                         if (Creature* orb = me->SummonCreature(NPC_SHIELD_ORB, x, y, 40.0f, 0, TEMPSUMMON_CORPSE_DESPAWN))
                         {
                             Movement::PointsArray movementArray;
@@ -595,7 +595,7 @@ public:
                             for (uint8 j = 1; j < 20; ++j)
                             {
                                 x = me->GetPositionX() + 18.0f * cos(((i * 2.0f - 1.0f) * M_PI / 3.0f) + (j / 20.0f * 2 * M_PI));
-                                y = me->GetPositionY() + 18.0f * sin(((i * 2.0f - 1.0f) * M_PI / 3.0f) + (j / 20.0f * 2 * M_PI));
+                                y = me->GetPositionY() + 18.0f * std::sin(((i * 2.0f - 1.0f) * M_PI / 3.0f) + (j / 20.0f * 2 * M_PI));
                                 movementArray.push_back(G3D::Vector3(x, y, 40.0f));
                             }
 
@@ -643,9 +643,9 @@ public:
             {
                 if (GameObject* orb = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1 + i)))
                 {
-                    if (orb->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE))
+                    if (orb->HasGameObjectFlag(GO_FLAG_NOT_SELECTABLE))
                     {
-                        orb->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        orb->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                         if (Creature* trigger = me->SummonTrigger(orb->GetPositionX(), orb->GetPositionY(), orb->GetPositionZ(), 0, 10 * MINUTE * IN_MILLISECONDS))
                         {
                             trigger->CastSpell(trigger, SPELL_RING_OF_BLUE_FLAMES, true, nullptr, nullptr, trigger->GetGUID());
@@ -866,8 +866,8 @@ public:
                     events.ScheduleEvent(eventId + 1, 6000);
                     break;
                 case EVENT_SCENE_03:
-                    me->SummonCreature(NPC_SHATTRATH_PORTAL_DUMMY, 1727.08f + cos(5.14f), 656.82f + sin(5.14f), 28.37f + 2.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10000);
-                    me->SummonCreature(NPC_SHATTRATH_PORTAL_DUMMY, 1738.84f + cos(2.0f), 627.32f + sin(2.0f), 28.26f + 2.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                    me->SummonCreature(NPC_SHATTRATH_PORTAL_DUMMY, 1727.08f + cos(5.14f), 656.82f + std::sin(5.14f), 28.37f + 2.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                    me->SummonCreature(NPC_SHATTRATH_PORTAL_DUMMY, 1738.84f + cos(2.0f), 627.32f + std::sin(2.0f), 28.26f + 2.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10000);
                     events.ScheduleEvent(eventId + 1, 11000);
                     break;
                 case EVENT_SCENE_04:
@@ -880,7 +880,7 @@ public:
                         first->m_Events.AddEvent(new MoveDelayed(first, 1718.70f, 607.78f, 28.06f, 2.323f), first->m_Events.CalculateTime(5000));
                         first->m_Events.AddEvent(new FixOrientation(first), first->m_Events.CalculateTime(12000));
                         for (uint8 i = 0; i < 9; ++i)
-                            if (Creature* follower = me->SummonCreature(NPC_SHATTERED_SUN_SOLDIER, 1729.48f + 5 * cos(i * 2.0f * M_PI / 9), 640.49f + 5 * sin(i * 2.0f * M_PI / 9), 28.06f, 3.49f))
+                            if (Creature* follower = me->SummonCreature(NPC_SHATTERED_SUN_SOLDIER, 1729.48f + 5 * cos(i * 2.0f * M_PI / 9), 640.49f + 5 * std::sin(i * 2.0f * M_PI / 9), 28.06f, 3.49f))
                                 follower->GetMotionMaster()->MoveFollow(first, 3.0f, follower->GetAngle(first));
                     }
                     events.ScheduleEvent(eventId + 1, 10000);
@@ -891,7 +891,7 @@ public:
                         first->m_Events.AddEvent(new MoveDelayed(first, 1678.69f, 649.27f, 28.06f, 5.46f), first->m_Events.CalculateTime(5000));
                         first->m_Events.AddEvent(new FixOrientation(first), first->m_Events.CalculateTime(14500));
                         for (uint8 i = 0; i < 9; ++i)
-                            if (Creature* follower = me->SummonCreature(NPC_SHATTERED_SUN_SOLDIER, 1729.48f + 5 * cos(i * 2.0f * M_PI / 9), 640.49f + 5 * sin(i * 2.0f * M_PI / 9), 28.06f, 3.49f))
+                            if (Creature* follower = me->SummonCreature(NPC_SHATTERED_SUN_SOLDIER, 1729.48f + 5 * cos(i * 2.0f * M_PI / 9), 640.49f + 5 * std::sin(i * 2.0f * M_PI / 9), 28.06f, 3.49f))
                                 follower->GetMotionMaster()->MoveFollow(first, 3.0f, follower->GetAngle(first));
                     }
                     events.ScheduleEvent(eventId + 1, 12000);
@@ -1038,7 +1038,7 @@ public:
         void HandlePeriodic(AuraEffect const* aurEff)
         {
             PreventDefaultAction();
-            if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SELECT_TARGET_RANDOM, 0, 60.0f, true))
+            if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
                 GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
         }
 
@@ -1258,7 +1258,7 @@ public:
         void HandlePeriodic(AuraEffect const* aurEff)
         {
             PreventDefaultAction();
-            if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SELECT_TARGET_RANDOM, 0, 60.0f, true))
+            if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
                 GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
         }
 

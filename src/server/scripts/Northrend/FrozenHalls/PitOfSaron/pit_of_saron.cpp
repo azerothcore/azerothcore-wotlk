@@ -198,7 +198,7 @@ public:
                                 c->SendMovementFlagUpdate();
                                 float dist = rand_norm() * 2.0f;
                                 float angle = rand_norm() * 2 * M_PI;
-                                c->GetMotionMaster()->MoveTakeoff(0, c->GetPositionX() + dist * cos(angle), c->GetPositionY() + dist * sin(angle), c->GetPositionZ() + 6.0f + (float)urand(0, 4), 1.5f + frand(0.0f, 1.5f));
+                                c->GetMotionMaster()->MoveTakeoff(0, c->GetPositionX() + dist * cos(angle), c->GetPositionY() + dist * std::sin(angle), c->GetPositionZ() + 6.0f + (float)urand(0, 4), 1.5f + frand(0.0f, 1.5f));
                             }
                     }
 
@@ -280,7 +280,7 @@ public:
                                 c->SetSpeed(MOVE_RUN, 0.8f);
                                 c->SetInCombatWithZone();
                                 c->GetMotionMaster()->MoveChase(me, dist, angle);
-                                c->SetHomePosition(me->GetPositionX() + dist * cos(angle), me->GetPositionY() + dist * sin(angle), me->GetPositionZ(), 0.0f);
+                                c->SetHomePosition(me->GetPositionX() + dist * cos(angle), me->GetPositionY() + dist * std::sin(angle), me->GetPositionZ(), 0.0f);
                             }
                     }
 
@@ -476,7 +476,7 @@ public:
                     events.RepeatEvent(4000);
                     break;
                 case 2: // Conversion Beam
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
                         me->CastSpell(target, 69578, false);
                     events.RepeatEvent(urand(20000, 25000));
                     break;
@@ -541,7 +541,7 @@ public:
                             {
                                 float angle = c->GetAngle(me);
                                 float x = c->GetPositionX() + cos(angle) * 12.0f;
-                                float y = c->GetPositionY() + sin(angle) * 12.0f;
+                                float y = c->GetPositionY() + std::sin(angle) * 12.0f;
                                 me->GetMotionMaster()->MovePoint(2, x, y, c->GetPositionZ());
                             }
 
@@ -685,7 +685,7 @@ public:
                     me->SetFacingTo(PTSTyrannusWaitPos2.GetOrientation());
                     break;
                 case 5:
-                    me->GetMotionMaster()->MoveTakeoff(10, me->GetPositionX() + 2.0f * cos(me->GetOrientation()), me->GetPositionY() + 2.0f * sin(me->GetOrientation()), me->GetPositionZ() + 30.0f, 7.0f);
+                    me->GetMotionMaster()->MoveTakeoff(10, me->GetPositionX() + 2.0f * cos(me->GetOrientation()), me->GetPositionY() + 2.0f * std::sin(me->GetOrientation()), me->GetPositionZ() + 30.0f, 7.0f);
                     break;
                 case 6:
                     me->GetMotionMaster()->MovePoint(4, PTSTyrannusWaitPos3, false);
@@ -701,7 +701,7 @@ public:
                         {
                             deathbringerGUID[0] = c->GetGUID();
                             c->SetReactState(REACT_PASSIVE);
-                            c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             c->SetHomePosition(915.10f, 75.31f, 553.81f, 3.75f);
                             c->SetWalk(false);
                             c->GetMotionMaster()->MoveSplinePath(&path);
@@ -710,7 +710,7 @@ public:
                         {
                             deathbringerGUID[1] = c->GetGUID();
                             c->SetReactState(REACT_PASSIVE);
-                            c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             c->SetHomePosition(883.15f, 54.6254f, 528.5f, 3.75f);
                             c->SetWalk(false);
                             path.push_back(G3D::Vector3(883.15f, 54.6254f, 528.5f));
@@ -758,14 +758,14 @@ public:
                     if (Creature* c = pInstance->instance->GetCreature(deathbringerGUID[0]))
                     {
                         c->SetReactState(REACT_AGGRESSIVE);
-                        c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     }
                     break;
                 case 36:
                     if (Creature* c = pInstance->instance->GetCreature(deathbringerGUID[1]))
                     {
                         c->SetReactState(REACT_AGGRESSIVE);
-                        c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     }
                     break;
                 case 60:
@@ -877,7 +877,7 @@ public:
         uint16 timer1;
         uint16 timer2;
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if (target && spell && target->GetTypeId() == TYPEID_PLAYER && spell->Id == 70827 && pInstance)
                 pInstance->SetData(DATA_ACHIEV_DONT_LOOK_UP, 0);
@@ -930,7 +930,7 @@ public:
                 if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_GUID)))
                 {
                     c->AI()->Talk(SAY_PREFIGHT_1);
-                    c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                    c->SetImmuneToPC(false);
                     c->SetReactState(REACT_AGGRESSIVE);
                     //c->ClearUnitState(UNIT_STATE_ONVEHICLE);
                     if (Player* plr = c->SelectNearestPlayer(100.0f))
@@ -979,7 +979,7 @@ public:
                         c->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_CHEER);
                         float ang = frand(1.92f, 2.36f);
                         float dist = urand(50, 85);
-                        c->GetMotionMaster()->MovePoint(0, TSSpawnPos.GetPositionX() + cos(ang)*dist, TSSpawnPos.GetPositionY() + sin(ang)*dist, 628.2f);
+                        c->GetMotionMaster()->MovePoint(0, TSSpawnPos.GetPositionX() + cos(ang)*dist, TSSpawnPos.GetPositionY() + std::sin(ang)*dist, 628.2f);
                     }
             }
             else if (p == 3)
@@ -1106,24 +1106,24 @@ public:
     {
         npc_pos_freed_slaveAI(Creature* creature) : SmartAI(creature)
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+            me->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
             // immune to falling icicles
             me->ApplySpellImmune(0, IMMUNITY_ID, 69425, true);
             me->ApplySpellImmune(0, IMMUNITY_ID, 70827, true);
         }
 
-        bool CanAIAttack(const Unit* who) const override
+        bool CanAIAttack(Unit const* who) const override
         {
             return who->GetEntry() == NPC_FALLEN_WARRIOR;
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /* why */) override
         {
             if (!me->IsAlive() || me->IsInEvadeMode())
                 return;
 
             me->RemoveEvadeAuras();
-            me->DeleteThreatList();
+            me->GetThreatMgr().ClearAllThreat();
             me->CombatStop(true);
             me->LoadCreaturesAddon(true);
             me->SetLootRecipient(nullptr);
@@ -1150,7 +1150,7 @@ public:
             pInstance = me->GetInstanceScript();
             barrierGUID.Clear();
             events.Reset();
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
 
             if (pInstance)
             {
@@ -1181,13 +1181,13 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if ((spell->Id == SPELL_TELEPORT_JAINA || spell->Id == SPELL_TELEPORT_SYLVANAS) && target && target->GetTypeId() == TYPEID_PLAYER)
             {
                 float angle = rand_norm() * 2 * M_PI;
                 float dist = urand(1, 4);
-                target->ToPlayer()->NearTeleportTo(me->GetPositionX() + cos(angle)*dist, me->GetPositionY() + sin(angle)*dist, me->GetPositionZ(), me->GetOrientation());
+                target->ToPlayer()->NearTeleportTo(me->GetPositionX() + cos(angle)*dist, me->GetPositionY() + std::sin(angle)*dist, me->GetPositionZ(), me->GetOrientation());
             }
         }
 
@@ -1206,7 +1206,7 @@ public:
                         Talk(SAY_JAINA_OUTRO_3);
                     break;
                 case 6:
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                     if (GameObject* g = me->FindNearestGameObject(GO_HOR_PORTCULLIS, 50.0f))
                         g->SetGoState(GO_STATE_ACTIVE);
                     break;

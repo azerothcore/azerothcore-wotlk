@@ -38,7 +38,7 @@ TotemAI::TotemAI(Creature* c) : CreatureAI(c)
     ASSERT(c->IsTotem());
 }
 
-void TotemAI::SpellHit(Unit* /*caster*/, const SpellInfo* /*spellInfo*/)
+void TotemAI::SpellHit(Unit* /*caster*/, SpellInfo const* /*spellInfo*/)
 {
 }
 
@@ -50,7 +50,7 @@ void TotemAI::MoveInLineOfSight(Unit* /*who*/)
 {
 }
 
-void TotemAI::EnterEvadeMode()
+void TotemAI::EnterEvadeMode(EvadeReason /*why*/)
 {
     me->CombatStop(true);
 }

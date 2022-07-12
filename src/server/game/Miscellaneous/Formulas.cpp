@@ -16,6 +16,7 @@
  */
 
 #include "Formulas.h"
+#include "Battleground.h"
 #include "Creature.h"
 #include "Log.h"
 #include "Player.h"
@@ -38,7 +39,7 @@ uint32 Acore::XP::BaseGain(uint8 pl_level, uint8 mob_level, ContentLevels conten
         nBaseExp = 580;
         break;
     default:
-        LOG_ERROR("misc", "BaseGain: Unsupported content level %u", content);
+        LOG_ERROR("misc", "BaseGain: Unsupported content level {}", content);
         nBaseExp = 45;
         break;
     }
@@ -93,12 +94,39 @@ uint32 Acore::XP::Gain(Player* player, Unit* unit, bool isBattleGround /*= false
             xpMod *= creature->GetCreatureTemplate()->ModExperience;
         }
 
-        xpMod *= isBattleGround ? sWorld->getRate(RATE_XP_BG_KILL) : sWorld->getRate(RATE_XP_KILL);
+        if (isBattleGround)
+        {
+            switch (player->GetMapId())
+            {
+                case MAP_BG_ALTERAC_VALLEY:
+                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL_AV);
+                    break;
+                case MAP_BG_WARSONG_GULCH:
+                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL_WSG);
+                    break;
+                case MAP_BG_ARATHI_BASIN:
+                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL_AB);
+                    break;
+                case MAP_BG_EYE_OF_THE_STORM:
+                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL_EOTS);
+                    break;
+                case MAP_BG_STRAND_OF_THE_ANCIENTS:
+                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL_SOTA);
+                    break;
+                case MAP_BG_ISLE_OF_CONQUEST:
+                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL_IC);
+                    break;
+            }
+        }
+        else
+        {
+            xpMod *= sWorld->getRate(RATE_XP_KILL);
+        }
 
         // if players dealt less than 50% of the damage and were credited anyway (due to CREATURE_FLAG_EXTRA_NO_PLAYER_DAMAGE_REQ), scale XP gained appropriately (linear scaling)
-        if (creature && creature->m_PlayerDamageReq)
+        if (creature && creature->GetPlayerDamageReq())
         {
-            xpMod *= 1.0f - 2.0f * creature->m_PlayerDamageReq / creature->GetMaxHealth();
+            xpMod *= 1.0f - 2.0f * creature->GetPlayerDamageReq() / creature->GetMaxHealth();
         }
 
         gain = uint32(gain * xpMod);

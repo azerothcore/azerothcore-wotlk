@@ -37,20 +37,20 @@ void GuardAI::Reset()
     me->CastSpell(me, 18950 /*SPELL_INVISIBILITY_AND_STEALTH_DETECTION*/, true);
 }
 
-void GuardAI::EnterEvadeMode()
+void GuardAI::EnterEvadeMode(EvadeReason /*why*/)
 {
     if (!me->IsAlive())
     {
         me->GetMotionMaster()->MoveIdle();
         me->CombatStop(true);
-        me->DeleteThreatList();
+        me->GetThreatMgr().ClearAllThreat();
         return;
     }
 
-    LOG_DEBUG("entities.unit", "Guard entry: %u enters evade mode.", me->GetEntry());
+    LOG_DEBUG("entities.unit", "Guard entry: {} enters evade mode.", me->GetEntry());
 
     me->RemoveAllAuras();
-    me->DeleteThreatList();
+    me->GetThreatMgr().ClearAllThreat();
     me->CombatStop(true);
 
     // Remove ChaseMovementGenerator from MotionMaster stack list, and add HomeMovementGenerator instead

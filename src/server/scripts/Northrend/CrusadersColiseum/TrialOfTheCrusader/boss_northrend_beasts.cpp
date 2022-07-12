@@ -133,7 +133,7 @@ public:
             {
                 t->RemoveAura(SPELL_CHANGE_VEHICLE);
                 me->RemoveAllAuras();
-                me->DeleteThreatList();
+                me->GetThreatMgr().ClearAllThreat();
                 me->CombatStop(true);
                 me->SetHealth(me->GetMaxHealth());
                 if( pInstance )
@@ -293,7 +293,7 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_IMPALE:
-                    if( !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) )
+                    if( !me->HasUnitFlag(UNIT_FLAG_DISARMED) )
                     {
                         if( Unit* victim = me->GetVictim() )
                             me->CastSpell(victim, SPELL_IMPALE, false);
@@ -402,11 +402,11 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             events.Reset();
             summons.DespawnAll();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             if( pInstance )
                 pInstance->SetData(TYPE_FAILED, 1);
         }
@@ -491,11 +491,11 @@ struct boss_jormungarAI : public ScriptedAI
         switch( param )
         {
             case -1:
-                if( !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) )
+                if( !me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE) )
                     events.RescheduleEvent(EVENT_SUBMERGE, 1500);
                 break;
             case -2:
-                if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) )
+                if( me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE) )
                     bIsStationary = true; // it will come out mobile soon
                 else if( me->GetDisplayId() == _MODEL_STATIONARY )
                     events.RescheduleEvent(EVENT_SUBMERGE, 1000);
@@ -568,7 +568,7 @@ struct boss_jormungarAI : public ScriptedAI
             case EVENT_SUBMERGE:
                 {
                     bIsStationary = (me->GetDisplayId() == _MODEL_STATIONARY);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                     me->CastSpell(me, SPELL_SUBMERGE_0, false);
                     Talk(EMOTE_SUBMERGE);
 
@@ -588,10 +588,10 @@ struct boss_jormungarAI : public ScriptedAI
                     {
                         c->SetSpeed(MOVE_RUN, 2.5f);
                         c->CastSpell(c, SPELL_CHURNING_GROUND, true);
-                        c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_PACIFIED);
-                        c->GetMotionMaster()->MovePoint(0, Locs[LOC_CENTER].GetPositionX() + cos(angle)*dist, Locs[LOC_CENTER].GetPositionY() + sin(angle)*dist, me->GetPositionZ());
+                        c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_PACIFIED);
+                        c->GetMotionMaster()->MovePoint(0, Locs[LOC_CENTER].GetPositionX() + cos(angle)*dist, Locs[LOC_CENTER].GetPositionY() + std::sin(angle)*dist, me->GetPositionZ());
                     }
-                    me->UpdatePosition(Locs[LOC_CENTER].GetPositionX() + cos(angle)*dist, Locs[LOC_CENTER].GetPositionY() + sin(angle)*dist, me->GetPositionZ(), me->GetOrientation(), true);
+                    me->UpdatePosition(Locs[LOC_CENTER].GetPositionX() + cos(angle)*dist, Locs[LOC_CENTER].GetPositionY() + std::sin(angle)*dist, me->GetPositionZ(), me->GetOrientation(), true);
                     me->StopMovingOnCurrentPos();
                     DoResetThreat();
 
@@ -618,12 +618,12 @@ struct boss_jormungarAI : public ScriptedAI
                     me->RemoveAurasDueToSpell(SPELL_SUBMERGE_0);
                     me->CastSpell(me, SPELL_EMERGE_0, false);
                     Talk(EMOTE_EMERGE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                     ScheduleEvents();
                 }
                 break;
             case EVENT_SPELL_SPRAY:
-                if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true) )
+                if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true) )
                     me->CastSpell(target, _SPELL_SPRAY, false);
                 events.RepeatEvent(20000);
                 break;
@@ -647,7 +647,7 @@ struct boss_jormungarAI : public ScriptedAI
                 break;
         }
 
-        if( !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) )
+        if( !me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE) )
         {
             if( me->GetDisplayId() == _MODEL_STATIONARY )
                 DoSpellAttackIfReady(_SPELL_SPIT);
@@ -667,10 +667,10 @@ struct boss_jormungarAI : public ScriptedAI
         }
     }
 
-    void EnterEvadeMode() override
+    void EnterEvadeMode(EvadeReason /*why*/) override
     {
         events.Reset();
-        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         if( pInstance )
             pInstance->SetData(TYPE_FAILED, 1);
     }
@@ -884,7 +884,7 @@ public:
                     events.RepeatEvent(urand(15000, 20000));
                     break;
                 case EVENT_SPELL_ARCTIC_BREATH:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 90.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 90.0f, true) )
                         me->CastSpell(target, SPELL_ARCTIC_BREATH, false);
                     events.RepeatEvent(urand(20000, 30000));
                     break;
@@ -906,7 +906,7 @@ public:
                     events.RescheduleEvent(EVENT_GAZE, 2000);
                     break;
                 case EVENT_GAZE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 500.0f, true) )
                     {
                         TargetGUID = target->GetGUID();
                         me->SetGuidValue(UNIT_FIELD_TARGET, TargetGUID);
@@ -939,10 +939,10 @@ public:
                         if( angle > 1.0f && angle < 2.0f ) // near main gate
                             dist = 46.0f;
                         destX = Locs[LOC_CENTER].GetPositionX() + cos(angle) * dist;
-                        destY = Locs[LOC_CENTER].GetPositionY() + sin(angle) * dist;
+                        destY = Locs[LOC_CENTER].GetPositionY() + std::sin(angle) * dist;
                         destZ = Locs[LOC_CENTER].GetPositionZ() + 1.0f;
                         me->StopMoving();
-                        me->GetMotionMaster()->MoveJump(Locs[LOC_CENTER].GetPositionX() + cos(jumpangle) * 35.0f, Locs[LOC_CENTER].GetPositionY() + sin(jumpangle) * 35.0f, Locs[LOC_CENTER].GetPositionZ() + 1.0f, 40.0f, 12.0f);
+                        me->GetMotionMaster()->MoveJump(Locs[LOC_CENTER].GetPositionX() + cos(jumpangle) * 35.0f, Locs[LOC_CENTER].GetPositionY() + std::sin(jumpangle) * 35.0f, Locs[LOC_CENTER].GetPositionZ() + 1.0f, 40.0f, 12.0f);
 
                         events.RescheduleEvent(EVENT_TRAMPLE, 1500);
 
@@ -1000,10 +1000,10 @@ public:
                 DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             events.Reset();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             if( pInstance )
                 pInstance->SetData(TYPE_FAILED, 1);
         }

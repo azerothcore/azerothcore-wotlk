@@ -37,13 +37,13 @@ jobs:
         env:
           CONTINUOUS_INTEGRATION: true
       - name: Create conf/config.sh
-        run: source ./apps/ci/ci-conf.sh
-      - name: Import db
-        run: source ./apps/ci/ci-import-db.sh
+        run: source ./apps/ci/ci-conf-core.sh
+      - name: Process pending sql
+        run: bash bin/acore-db-pendings
       - name: Build
         run: source ./apps/ci/ci-compile.sh
       - name: Dry run
-        run: source ./apps/ci/ci-worldserver-dry-run.sh
+        run: source ./apps/ci/ci-dry-run.sh worldserver
       - name: Check startup errors
         run: source ./apps/ci/ci-error-check.sh
       - name: Run unit tests

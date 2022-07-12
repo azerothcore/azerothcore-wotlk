@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,15 +12,15 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.skill_fishing_base_level
+-- Dumpar struktur för tabell acore_world.skill_fishing_base_level
 DROP TABLE IF EXISTS `skill_fishing_base_level`;
 CREATE TABLE IF NOT EXISTS `skill_fishing_base_level` (
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Area identifier',
+  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Area identifier',
   `skill` SMALLINT NOT NULL DEFAULT 0 COMMENT 'Base skill level requirement',
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Fishing system';
 
--- Дамп данных таблицы _acore_world.skill_fishing_base_level: 94 rows
+-- Dumpar data för tabell acore_world.skill_fishing_base_level: 94 rows
 DELETE FROM `skill_fishing_base_level`;
 /*!40000 ALTER TABLE `skill_fishing_base_level` DISABLE KEYS */;
 INSERT INTO `skill_fishing_base_level` (`entry`, `skill`) VALUES

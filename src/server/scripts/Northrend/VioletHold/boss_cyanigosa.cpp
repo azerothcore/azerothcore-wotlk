@@ -95,7 +95,7 @@ public:
                 events.RescheduleEvent(EVENT_SPELL_MANA_DESTRUCTION, 20000);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if (!target || !spell)
                 return;
@@ -134,12 +134,12 @@ public:
 
                     break;
                 case EVENT_SPELL_BLIZZARD:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 45.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 45.0f, true))
                         me->CastSpell(target, SPELL_BLIZZARD, false);
                     events.RepeatEvent(15000);
                     break;
                 case EVENT_SPELL_MANA_DESTRUCTION:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                         me->CastSpell(target, SPELL_MANA_DESTRUCTION, false);
                     events.RepeatEvent(20000);
                     break;
@@ -179,12 +179,12 @@ public:
 
         void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             me->SetControlled(false, UNIT_STATE_ROOT);
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
             events.Reset();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             if (pInstance)
                 pInstance->SetData(DATA_FAILED, 1);
         }

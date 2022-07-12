@@ -124,7 +124,7 @@ public:
                 case EVENT_TREACHEROUS_AURA:
                     if (roll_chance_i(33))
                         Talk(SAY_CURSE);
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_TREACHEROUS_AURA, false);
                     events.ScheduleEvent(EVENT_TREACHEROUS_AURA, urand(12000, 18000));
                     break;
@@ -138,7 +138,7 @@ public:
                         events.ScheduleEvent(EVENT_DEMONIC_SHIELD, 1000);
                     break;
                 case EVENT_ORBITAL_STRIKE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 15.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 15.0f, true))
                     {
                         _targetGUID = target->GetGUID();
                         me->CastSpell(target, SPELL_ORBITAL_STRIKE, false);

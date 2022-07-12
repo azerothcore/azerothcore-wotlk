@@ -61,7 +61,7 @@ public:
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (bReset || spell->Id != 3607)
                 return;
@@ -71,8 +71,8 @@ public:
                 if (player->GetQuestStatus(592) == QUEST_STATUS_INCOMPLETE) //Yenniku's Release
                 {
                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_STUN);
-                    me->CombatStop();                   //stop combat
-                    me->DeleteThreatList();             //unsure of this
+                    me->CombatStop();                                //stop combat
+                    me->GetThreatMgr().ClearAllThreat();             //unsure of this
                     me->SetFaction(FACTION_HORDE_GENERIC);
 
                     bReset = true;
@@ -104,7 +104,7 @@ public:
                         if (player->GetTeamId() == TEAM_HORDE)
                         {
                             me->CombatStop();
-                            me->DeleteThreatList();
+                            me->GetThreatMgr().ClearAllThreat();
                         }
                     }
                 }

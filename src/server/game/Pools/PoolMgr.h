@@ -32,7 +32,7 @@ struct PoolObject
 {
     uint32  guid;
     float   chance;
-    PoolObject(uint32 _guid, float _chance): guid(_guid), chance(fabs(_chance)) {}
+    PoolObject(uint32 _guid, float _chance): guid(_guid), chance(std::fabs(_chance)) {}
 };
 
 class Pool                                                  // for Pool of Pool case
@@ -72,7 +72,7 @@ public:
     explicit PoolGroup() : poolId(0) { }
     void SetPoolId(uint32 pool_id) { poolId = pool_id; }
     ~PoolGroup() {};
-    bool isEmpty() const { return ExplicitlyChanced.empty() && EqualChanced.empty(); }
+    bool IsEmpty() const { return ExplicitlyChanced.empty() && EqualChanced.empty(); }
     void AddEntry(PoolObject& poolitem, uint32 maxentries);
     bool CheckPool() const;
     void DespawnObject(ActivePoolData& spawns, ObjectGuid::LowType guid = 0);

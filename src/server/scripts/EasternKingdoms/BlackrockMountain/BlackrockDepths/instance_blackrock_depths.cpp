@@ -15,12 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameTime.h"
 #include "InstanceScript.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "blackrock_depths.h"
 
-#define MAX_ENCOUNTER 6
+constexpr auto MAX_ENCOUNTER = 6;
 
 enum Timers
 {
@@ -29,28 +30,16 @@ enum Timers
     TIMER_TOMB_RESET     = 15000
 };
 
-enum Creatures
+enum Distances
 {
-    NPC_EMPEROR                 = 9019,
-    NPC_PHALANX                 = 9502,
-    NPC_ANGERREL                = 9035,
-    NPC_DOPEREL                 = 9040,
-    NPC_HATEREL                 = 9034,
-    NPC_VILEREL                 = 9036,
-    NPC_SEETHREL                = 9038,
-    NPC_GLOOMREL                = 9037,
-    NPC_DOOMREL                 = 9039,
-    NPC_MOIRA                   = 8929,
+    RADIUS_RING_OF_LAW      = 80,
+    DISTANCE_EMPEROR_ROOM   = 125
+};
 
-    NPC_WATCHMAN_DOOMGRIP       = 9476,
-
-    NPC_WEAPON_TECHNICIAN       = 8920,
-    NPC_DOOMFORGE_ARCANASMITH   = 8900,
-    NPC_RAGEREAVER_GOLEM        = 8906,
-    NPC_WRATH_HAMMER_CONSTRUCT  = 8907,
-    NPC_GOLEM_LORD_ARGELMACH    = 8983,
-
-    NPC_COREN_DIREBREW          = 23872
+enum PrincessQuests
+{
+    PRINCESS_QUEST_HORDE        = 4004,
+    PRINCESS_QUEST_ALLIANCE     = 4363
 };
 
 enum GameObjects
@@ -127,6 +116,8 @@ public:
         ObjectGuid PhalanxGUID;
         ObjectGuid MagmusGUID;
         ObjectGuid MoiraGUID;
+        ObjectGuid PriestessGUID;
+        ObjectGuid IronhandGUID[6];
         ObjectGuid CorenGUID;
 
         ObjectGuid GoArena1GUID;
@@ -158,9 +149,67 @@ public:
         uint32 TombTimer;
         uint32 TombEventCounter;
         uint32 OpenedCoofers;
+        uint32 IronhandCounter;
 
         GuidList ArgelmachAdds;
         ObjectGuid ArgelmachGUID;
+
+        TempSummon* TempSummonGrimstone = nullptr;
+        Position GrimstonePositon = Position(625.559f, -205.618f, -52.735f, 2.609f);
+        time_t timeRingFail = 0;
+        uint8 arenaMobsToSpawn;
+        uint8 arenaBossToSpawn;
+
+        std::vector<ObjectGuid> ArenaSpectators;
+        Position CenterOfRingOfLaw = Position(595.289, -186.56);
+
+        ObjectGuid EmperorSenators[5];
+        std::vector<ObjectGuid> EmperorSenatorsVector;
+        Position EmperorSpawnPos = Position(1380.52, -831, 115);
+
+        void OnPlayerEnter(Player* /* player */) override
+        {
+            ReplaceMoiraIfSaved(); // In case a player joins the party during the run
+         //   SetData(TYPE_RING_OF_LAW, DONE);
+        }
+
+        void ReplaceMoiraIfSaved()
+        {
+            ObjectGuid* GUIDToReplace = &PriestessGUID; // default to having Moira
+            ObjectGuid* GUIDToSpawn   = &MoiraGUID;
+            uint32      NPCEntry      = NPC_MOIRA;
+            bool        MoiraSaved    = true;
+
+            // check if all players saved her.
+            Map::PlayerList const& lPlayers = instance->GetPlayers();
+            if (!lPlayers.IsEmpty())
+            {
+                for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
+                {
+                    if (Player* player = itr->GetSource())
+                    {
+                        // set to false if this player hasn't saved her. Another player can't put it to true.
+                        MoiraSaved = MoiraSaved && ((player->GetQuestStatus(PRINCESS_QUEST_HORDE) == QUEST_STATUS_REWARDED)
+                                                    || (player->GetQuestStatus(PRINCESS_QUEST_ALLIANCE) == QUEST_STATUS_REWARDED));
+                    }
+                }
+            }
+
+            // assign correct GUIDs and spawn targets
+            if (MoiraSaved)
+            {
+                GUIDToReplace = &MoiraGUID;
+                GUIDToSpawn   = &PriestessGUID;
+                NPCEntry      = NPC_PRIESTESS;
+            }
+
+            if (Creature* CreatureToReplace = instance->GetCreature(*GUIDToReplace))
+            {
+                Creature* NewSpawn = instance->SummonCreature(NPCEntry, CreatureToReplace->GetPosition());
+                CreatureToReplace->RemoveFromWorld();
+                *GUIDToSpawn = NewSpawn->GetGUID();
+            }
+        }
 
         void Initialize() override
         {
@@ -170,8 +219,14 @@ public:
             GhostKillCount = 0;
             TombTimer = TIMER_TOMB_START;
             TombEventCounter = 0;
-            OpenedCoofers = 0;
             tombResetTimer   = 0;
+            OpenedCoofers = 0;
+            IronhandCounter  = 0;
+            ArenaSpectators.clear();
+
+            // these are linked to the dungeon and not how many times the arena started.
+            arenaMobsToSpawn = urand(0, 5);
+            arenaBossToSpawn = urand(0, 5);
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -214,7 +269,7 @@ public:
                 case NPC_MAGMUS:
                     MagmusGUID = creature->GetGUID();
                     if (!creature->IsAlive())
-                        HandleGameObject(GetGuidData(DATA_THRONE_DOOR), true); // if Magmus is dead open door to last boss
+                        HandleGameObject(GoThroneGUID, true); // if Magmus is dead open door to last boss
                     break;
                 case NPC_WEAPON_TECHNICIAN:
                 case NPC_DOOMFORGE_ARCANASMITH:
@@ -227,6 +282,38 @@ public:
                     break;
                 case NPC_GOLEM_LORD_ARGELMACH:
                     ArgelmachGUID = creature->GetGUID();
+                    break;
+                case NPC_IRONHAND_GUARDIAN:
+                    IronhandGUID[IronhandCounter] = creature->GetGUID();
+                    IronhandCounter++;
+                    break;
+                case NPC_ARENA_SPECTATOR:
+                    ArenaSpectators.push_back(creature->GetGUID());
+                    if (encounter[TYPE_RING_OF_LAW] == DONE) // added for crashes
+                    {
+                        creature->SetFaction(FACTION_NEUTRAL);
+                        creature->SetReactState(REACT_DEFENSIVE);
+                    }
+                    break;
+                case NPC_SHADOWFORGE_PEASANT:
+                case NPC_SHADOWFORCE_CITIZEN: // both do the same
+                    if (creature->GetDistance2d(CenterOfRingOfLaw.GetPositionX(), CenterOfRingOfLaw.GetPositionY()) < (float)RADIUS_RING_OF_LAW)
+                    {
+                        ArenaSpectators.push_back(creature->GetGUID());
+                    }
+                    if (encounter[TYPE_RING_OF_LAW] == DONE) // added for crashes
+                    {
+                        creature->SetFaction(FACTION_NEUTRAL);
+                        creature->SetReactState(REACT_DEFENSIVE);
+                    }
+                    break;
+                case NPC_SHADOWFORGE_SENATOR:
+                    // keep track of Senators that are not too far from emperor. Can't really use emperor as creature due to him possibly not being spawned.
+                    // some senators spawn at ring of law
+                    if (creature->GetDistance2d(EmperorSpawnPos.GetPositionX(), EmperorSpawnPos.GetPositionY()) < (float)DISTANCE_EMPEROR_ROOM)
+                    {
+                        EmperorSenatorsVector.push_back(creature->GetGUID());
+                    }
                     break;
                 default:
                     break;
@@ -309,6 +396,7 @@ public:
 
         void OnUnitDeath(Unit* unit) override
         {
+            uint32 deadSenators = 0;
             switch (unit->GetEntry())
             {
                 case NPC_WEAPON_TECHNICIAN:
@@ -316,6 +404,28 @@ public:
                 case NPC_RAGEREAVER_GOLEM:
                 case NPC_WRATH_HAMMER_CONSTRUCT:
                     ArgelmachAdds.remove(unit->GetGUID());
+                    break;
+                case NPC_MAGMUS:
+                    SetData(TYPE_IRON_HALL, DONE);
+                    break;
+                case NPC_SHADOWFORGE_SENATOR:
+                    deadSenators = 1; //hacky, but we cannot count the unit that just died through its state because OnUnitDeath() is called before the state is set.
+                    for (const auto &senatorGUID: EmperorSenatorsVector)
+                    {
+                        if (Creature* senator = instance->GetCreature(senatorGUID))
+                        {
+                            if (!senator->IsAlive() || senator->isDying())
+                            {
+                                deadSenators++;
+                            }
+                        }
+                    }
+
+                    if (Creature* emperor = instance->GetCreature(EmperorGUID))
+                    {
+                        // send % of senators that died
+                        emperor->AI()->SetData(0, (100 * deadSenators) / EmperorSenatorsVector.size());
+                    }
                     break;
                 case NPC_ANGERREL:
                 case NPC_DOPEREL:
@@ -337,12 +447,39 @@ public:
 
         void SetData(uint32 type, uint32 data) override
         {
-            LOG_DEBUG("scripts.ai", "Instance Blackrock Depths: SetData update (Type: %u Data %u)", type, data);
+            LOG_DEBUG("scripts.ai", "Instance Blackrock Depths: SetData update (Type: {} Data {})", type, data);
 
             switch (type)
             {
                 case TYPE_RING_OF_LAW:
                     encounter[0] = data;
+                    switch(data)
+                    {
+                    case IN_PROGRESS:
+                        TempSummonGrimstone = instance->SummonCreature(NPC_GRIMSTONE, GrimstonePositon);
+                        break;
+                    case FAIL:
+                        if (TempSummonGrimstone)
+                        {
+                            TempSummonGrimstone->RemoveFromWorld();
+                            TempSummonGrimstone = nullptr;
+                            timeRingFail = GameTime::GetGameTime().count();
+                        }
+                        SetData(TYPE_RING_OF_LAW, NOT_STARTED);
+                        break;
+                    case DONE:
+                        for (const auto& itr : ArenaSpectators)
+                        {
+                            if (Creature* spectator = instance->GetCreature(itr))
+                            {
+                                spectator->SetFaction(FACTION_NEUTRAL);
+                                spectator->SetReactState(REACT_DEFENSIVE);
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                    }
                     break;
                 case TYPE_VAULT:
                     encounter[1] = data;
@@ -370,9 +507,37 @@ public:
                     break;
                 case TYPE_LYCEUM:
                     encounter[4] = data;
+                    if (data == DONE)
+                    {
+                        HandleGameObject(GetGuidData(DATA_GOLEM_DOOR_N), true);
+                        HandleGameObject(GetGuidData(DATA_GOLEM_DOOR_S), true);
+                        if (Creature* magmus = instance->GetCreature(MagmusGUID))
+                        {
+                            magmus->AI()->Talk(0);
+                        }
+                        ReplaceMoiraIfSaved(); // Need to place the correct final boss, but we need her to be spawned first.
+                    }
                     break;
                 case TYPE_IRON_HALL:
                     encounter[5] = data;
+                    switch (data)
+                    {
+                    case NOT_STARTED:
+                    case IN_PROGRESS:
+                        for (int i = 0; i < 6; i++)
+                        {
+                            if (Creature* ironhand = instance->GetCreature(IronhandGUID[i]))
+                            {
+                                ironhand->AI()->SetData(0, data == IN_PROGRESS);
+                            }
+                        }
+                        break;
+                    case DONE:
+                        HandleGameObject(GetGuidData(DATA_THRONE_DOOR), true);
+                        break;
+                    default:
+                        break;
+                    }
                     break;
                 case DATA_OPEN_COFFER_DOORS:
                     OpenedCoofers += 1;
@@ -492,6 +657,12 @@ public:
                     return encounter[4];
                 case TYPE_IRON_HALL:
                     return encounter[5];
+                case DATA_TIME_RING_FAIL:
+                    return timeRingFail;
+                case DATA_ARENA_MOBS:
+                    return arenaMobsToSpawn;
+                case DATA_ARENA_BOSS:
+                    return arenaBossToSpawn;
             }
             return 0;
         }
@@ -581,7 +752,7 @@ public:
                 {
                     ++TombEventCounter;
                     boss->SetFaction(FACTION_DARK_IRON_DWARVES);
-                    boss->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                    boss->SetImmuneToPC(false);
 
                     // find suitable target here.
                     Player* target = boss->SelectNearestPlayer(130);
@@ -608,14 +779,14 @@ public:
                         //do not call EnterEvadeMode(), it will create infinit loops
                         boss->Respawn();
                         boss->RemoveAllAuras();
-                        boss->DeleteThreatList();
+                        boss->GetThreatMgr().ClearAllThreat();
                         boss->CombatStop(true);
                         boss->LoadCreaturesAddon(true);
                         boss->GetMotionMaster()->MoveTargetedHome();
                         boss->SetLootRecipient(nullptr);
                     }
                     boss->SetFaction(FACTION_FRIENDLY);
-                    boss->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC); // think this is useless
+                    boss->SetImmuneToPC(true); // think this is useless
                     if (i == 6) // doomrel needs explicit reset
                     {
                         boss->AI()->Reset();

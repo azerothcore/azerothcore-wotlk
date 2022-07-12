@@ -71,7 +71,7 @@ public:
         EventMap events2;
         void Reset() override
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             EventStage = EVENT_STAGE_NONE;
             PeonEngagedCount = 0;
             PeonKilledCount = 0;
@@ -194,7 +194,7 @@ public:
                 {
                     Talk(SAY_AGGRO);
                     EventStage = EVENT_STAGE_MAIN;
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     if (Unit* target = me->SelectNearestPlayer(50.0f))
                         AttackStart(target);
 
@@ -215,12 +215,12 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_SHADOW_FISSURE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_SHADOW_FISSURE, false);
                     events.RescheduleEvent(EVENT_SPELL_SHADOW_FISSURE, urand(7500, 10000));
                     break;
                 case EVENT_SPELL_DEATH_COIL:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, DUNGEON_MODE(SPELL_DEATH_COIL_N, SPELL_DEATH_COIL_H), false);
                     events.RescheduleEvent(EVENT_SPELL_DEATH_COIL, urand(15000, 20000));
                     break;

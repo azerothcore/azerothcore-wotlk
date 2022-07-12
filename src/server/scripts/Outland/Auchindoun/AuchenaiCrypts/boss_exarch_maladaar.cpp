@@ -123,7 +123,7 @@ public:
                     events.RepeatEvent(2000);
                     break;
                 case EVENT_SPELL_SOUL:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                     {
                         Talk(SAY_ROAR);
                         me->CastSpell(target, SPELL_STOLEN_SOUL, false);
@@ -138,7 +138,7 @@ public:
                     events.RepeatEvent(urand(25000, 30000));
                     break;
                 case EVENT_SPELL_RIBBON:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_RIBBON_OF_SOULS, false);
                     events.RepeatEvent(urand(10000, 20000));
                     break;

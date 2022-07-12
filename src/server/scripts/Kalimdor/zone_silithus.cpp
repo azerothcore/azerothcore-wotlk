@@ -28,17 +28,16 @@ quest_a_pawn_on_the_eternal_pawn
 EndContentData */
 
 #include "AccountMgr.h"
-#include "BanMgr.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
 #include "Group.h"
+#include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "Spell.h"
 #include "SpellInfo.h"
-#include "WorldSession.h"
 
 /*####
 # quest_a_pawn_on_the_eternal_board (Defines)
@@ -332,7 +331,7 @@ public:
             PlayerGUID.Clear();
             eventEnd = false;
 
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         }
 
         void HandleAnimation()
@@ -533,21 +532,26 @@ public:
                         break;
                     case 51:
                         {
-                            uint32 entries[4] = { 15423, 15424, 15414, 15422 };
-                            for (uint8 i = 0; i < 4; ++i)
+                            std::list<Creature*> constructList;
+
+                            me->GetCreatureListWithEntryInGrid(constructList, 15423, 100.0f);
+                            me->GetCreatureListWithEntryInGrid(constructList, 15424, 100.0f);
+                            me->GetCreatureListWithEntryInGrid(constructList, 15414, 100.0f);
+                            me->GetCreatureListWithEntryInGrid(constructList, 15422, 100.0f);
+
+                            if (!constructList.empty())
                             {
-                                Unit* mob = player->FindNearestCreature(entries[i], 50, me);
-                                while (mob)
+                                for (std::list<Creature*>::const_iterator itr = constructList.begin(); itr != constructList.end(); ++itr)
                                 {
-                                    mob->RemoveFromWorld();
-                                    mob = player->FindNearestCreature(15423, 50, me);
+                                    (*itr)->RemoveFromWorld();
                                 }
                             }
+
                             break;
                         }
                     case 52:
                         Fandral->GetMotionMaster()->MoveCharge(-8028.75f, 1538.795f, 2.61f, 4);
-                        Fandral->AI()->Talk(ANACHRONOS_SAY_9, me);
+                        Talk(ANACHRONOS_SAY_9);
                         break;
                     case 53:
                         Fandral->AI()->Talk(FANDRAL_SAY_6);
@@ -556,7 +560,8 @@ public:
                         Talk(ANACHRONOS_EMOTE_2);
                         break;
                     case 55:
-                        Fandral->SetVisible(false);
+                        //Fandral should not dispear atm.
+                        //Fandral->SetVisible(false);
                         break;
                     case 56:
                         Talk(ANACHRONOS_EMOTE_3);
@@ -916,7 +921,7 @@ public:
 
                 if (Merithra)
                 {
-                    Merithra->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+                    Merithra->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
                     Merithra->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                     Merithra->SetUInt32Value(UNIT_FIELD_DISPLAYID, 15420);
                     Merithra->SetFaction(FACTION_FRIENDLY);
@@ -924,7 +929,7 @@ public:
 
                 if (Caelestrasz)
                 {
-                    Caelestrasz->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+                    Caelestrasz->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
                     Caelestrasz->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                     Caelestrasz->SetUInt32Value(UNIT_FIELD_DISPLAYID, 15419);
                     Caelestrasz->SetFaction(FACTION_FRIENDLY);
@@ -932,7 +937,7 @@ public:
 
                 if (Arygos)
                 {
-                    Arygos->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+                    Arygos->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
                     Arygos->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                     Arygos->SetUInt32Value(UNIT_FIELD_DISPLAYID, 15418);
                     Arygos->SetFaction(FACTION_FRIENDLY);
@@ -1001,6 +1006,26 @@ enum WindStone
     SAY_ON_SPAWN_IN      = 0
 };
 
+class DelayedWindstoneSummonEvent : public BasicEvent
+{
+public:
+    DelayedWindstoneSummonEvent(TempSummon* summon, ObjectGuid playerGUID) : _summon(summon), _playerGUID(playerGUID) { }
+
+    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
+    {
+        if (Player* player = ObjectAccessor::FindPlayer(_playerGUID))
+        {
+            _summon->AI()->AttackStart(player);
+        }
+
+        return true;
+    }
+
+private:
+    TempSummon* _summon;
+    ObjectGuid _playerGUID;
+};
+
 class go_wind_stone : public GameObjectScript
 {
 public:
@@ -1010,14 +1035,19 @@ public:
     {
         go_wind_stoneAI(GameObject* go) : GameObjectAI(go) {}
 
+        void InitializeAI() override
+        {
+            me->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+        }
+
         bool GossipHello(Player* player, bool reportUse) override
         {
             if (reportUse)
             {
                 uint32 gossipId         = me->GetGOInfo()->GetGossipMenuId();
-                bool   _twilightSetAura = (player->HasAura(AURA_TWILIGHT_SET, player->GetGUID()) ? true : false);
-                bool   _medallionAura   = (player->HasAura(AURA_MEDALLION, player->GetGUID()) ? true : false);
-                bool   _ringAura        = (player->HasAura(AURA_RING, player->GetGUID()) ? true : false);
+                bool   _twilightSetAura = (player->HasAura(AURA_TWILIGHT_SET, player->GetGUID()));
+                bool   _medallionAura   = (player->HasAura(AURA_MEDALLION, player->GetGUID()));
+                bool   _ringAura        = (player->HasAura(AURA_RING, player->GetGUID()));
 
                 switch (gossipId)
                 {
@@ -1048,10 +1078,25 @@ public:
 
         bool GossipSelect(Player* player, uint32 sender, uint32 action) override
         {
+            Seconds respawnTimer = 0s;
             player->PlayerTalkClass->SendCloseGossip();
+
+            Creature* lastSpawn = ObjectAccessor::GetCreature(*me, _creatureGuid);
+            if (lastSpawn && lastSpawn->IsAlive())
+            {
+                // We already summoned something recently, return.
+                CloseGossipMenuFor(player);
+                return true;
+            }
+            else
+            {
+                _creatureGuid.Clear();
+            }
 
             if (sender == GOSSIPID_LESSER_WS)
             {
+                respawnTimer = 300s; // Lesser Windstone respawn in 5 minutes
+
                 switch (action)
                 {
                 case 0:
@@ -1075,6 +1120,8 @@ public:
             }
             else if (sender == GOSSIPID_WS)
             {
+                respawnTimer = 900s; // Windstone respawn in 15 minutes
+
                 switch (action)
                 {
                 case 0:
@@ -1098,6 +1145,8 @@ public:
             }
             else if (sender == GOSSIPID_GREATER_WS)
             {
+                respawnTimer = 10800s; // Greater Windstone respawn in 3 hours
+
                 switch (action)
                 {
                 case 0:
@@ -1119,6 +1168,10 @@ public:
                     break;
                 }
             }
+
+            me->DespawnOrUnsummon(5000ms, respawnTimer); // Despawn in 5 Seconds for respawnTimer value
+            me->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+            CloseGossipMenuFor(player);
             return false;
         }
 
@@ -1135,22 +1188,23 @@ public:
             delete spell;
             if (result != SPELL_CAST_OK)
             {
-                if (result == SPELL_FAILED_REAGENTS)
-                {
-                    std::string accountName;
-                    AccountMgr::GetName(player->GetSession()->GetAccountId(), accountName);
-                    sBan->BanAccount(accountName, "0s", "Wind Stone exploit", "Server");
-                }
                 return;
             }
             player->CastSpell(player, spellInfoTrigger->Id, false);
-            TempSummon* summons = go->SummonCreature(npc, go->GetPositionX(), go->GetPositionY(), go->GetPositionZ(), player->GetOrientation() - M_PI, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 10 * 60 * 1000);
-            summons->CastSpell(summons, SPELL_SPAWN_IN, false);
-            summons->AI()->Talk(SAY_ON_SPAWN_IN);
-            summons->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            summons->SendMeleeAttackStart(player);
-            summons->CombatStart(player);
+            if (TempSummon* summons = go->SummonCreature(npc, go->GetPositionX(), go->GetPositionY(), go->GetPositionZ(), player->GetOrientation() - M_PI, TEMPSUMMON_TIMED_DESPAWN_OOC_ALIVE, 6000))
+            {
+                summons->SetCorpseDelay(5 * MINUTE);
+                summons->SetTarget(player->GetGUID());
+                summons->SetLootRecipient(player);
+                summons->CastSpell(summons, SPELL_SPAWN_IN, false);
+                summons->AI()->Talk(SAY_ON_SPAWN_IN, player);
+                summons->m_Events.AddEvent(new DelayedWindstoneSummonEvent(summons, player->GetGUID()), summons->m_Events.CalculateTime(5200));
+                _creatureGuid = summons->GetGUID();
+            }
         }
+
+        private:
+            ObjectGuid _creatureGuid;
     };
 
     GameObjectAI* GetAI(GameObject* go) const

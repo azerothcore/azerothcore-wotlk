@@ -54,6 +54,8 @@ public:
     void AddToWorld() override;
     void RemoveFromWorld() override;
 
+    void BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target) const override;
+
     bool Create(ObjectGuid::LowType guidlow);
     bool Create(ObjectGuid::LowType guidlow, Player* owner);
 
@@ -66,10 +68,10 @@ public:
     [[nodiscard]] ObjectGuid GetOwnerGUID() const { return GetGuidValue(CORPSE_FIELD_OWNER); }
 
     [[nodiscard]] time_t const& GetGhostTime() const { return m_time; }
-    void ResetGhostTime() { m_time = time(nullptr); }
+    void ResetGhostTime();
     [[nodiscard]] CorpseType GetType() const { return m_type; }
 
-    CellCoord const& GetCellCoord() const { return _cellCoord; }
+    [[nodiscard]] CellCoord const& GetCellCoord() const { return _cellCoord; }
     void SetCellCoord(CellCoord const& cellCoord) { _cellCoord = cellCoord; }
 
     Loot loot;                                          // remove insignia ONLY at BG

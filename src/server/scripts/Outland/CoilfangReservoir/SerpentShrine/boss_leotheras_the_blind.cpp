@@ -289,7 +289,7 @@ public:
         ObjectGuid ownerGUID;
         EventMap events;
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->DespawnOrUnsummon(1);
         }
@@ -316,7 +316,7 @@ public:
                 damage = 0;
         }
 
-        bool CanAIAttack(const Unit* who) const override
+        bool CanAIAttack(Unit const* who) const override
         {
             return who->GetGUID() == ownerGUID;
         }
@@ -355,10 +355,10 @@ public:
         void HandleScriptEffect(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
-            GetCaster()->getThreatMgr().resetAllAggro();
+            GetCaster()->GetThreatMgr().ResetAllThreat();
 
             if (roll_chance_i(33))
-                if (Unit* target = GetCaster()->GetAI()->SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true))
+                if (Unit* target = GetCaster()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
                     target->CastSpell(GetCaster(), SPELL_TAUNT, true);
         }
 

@@ -18,15 +18,17 @@
 #ifndef ACORE_INSTANCE_DATA_H
 #define ACORE_INSTANCE_DATA_H
 
+#include "CreatureAI.h"
 #include "ObjectMgr.h"
 #include "World.h"
 #include "ZoneScript.h"
+#include <set>
 
-#define OUT_SAVE_INST_DATA             LOG_DEBUG("scripts.ai", "Saving Instance Data for Instance %s (Map %d, Instance Id %d)", instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
-#define OUT_SAVE_INST_DATA_COMPLETE    LOG_DEBUG("scripts.ai", "Saving Instance Data for Instance %s (Map %d, Instance Id %d) completed.", instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
-#define OUT_LOAD_INST_DATA(a)          LOG_DEBUG("scripts.ai", "Loading Instance Data for Instance %s (Map %d, Instance Id %d). Input is '%s'", instance->GetMapName(), instance->GetId(), instance->GetInstanceId(), a)
-#define OUT_LOAD_INST_DATA_COMPLETE    LOG_DEBUG("scripts.ai", "Instance Data Load for Instance %s (Map %d, Instance Id: %d) is complete.", instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
-#define OUT_LOAD_INST_DATA_FAIL        LOG_ERROR("scripts.ai", "Unable to load Instance Data for Instance %s (Map %d, Instance Id: %d).", instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
+#define OUT_SAVE_INST_DATA             LOG_DEBUG("scripts.ai", "Saving Instance Data for Instance {} (Map {}, Instance Id {})", instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
+#define OUT_SAVE_INST_DATA_COMPLETE    LOG_DEBUG("scripts.ai", "Saving Instance Data for Instance {} (Map {}, Instance Id {}) completed.", instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
+#define OUT_LOAD_INST_DATA(a)          LOG_DEBUG("scripts.ai", "Loading Instance Data for Instance {} (Map {}, Instance Id {}). Input is '{}'", instance->GetMapName(), instance->GetId(), instance->GetInstanceId(), a)
+#define OUT_LOAD_INST_DATA_COMPLETE    LOG_DEBUG("scripts.ai", "Instance Data Load for Instance {} (Map {}, Instance Id: {}) is complete.", instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
+#define OUT_LOAD_INST_DATA_FAIL        LOG_ERROR("scripts.ai", "Unable to load Instance Data for Instance {} (Map {}, Instance Id: {}).", instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
 
 class Map;
 class Unit;
@@ -67,30 +69,30 @@ enum DoorType
     MAX_DOOR_TYPES,
 };
 
-enum BoundaryType
-{
-    BOUNDARY_NONE = 0,
-    BOUNDARY_N,
-    BOUNDARY_S,
-    BOUNDARY_E,
-    BOUNDARY_W,
-    BOUNDARY_NE,
-    BOUNDARY_NW,
-    BOUNDARY_SE,
-    BOUNDARY_SW,
-    BOUNDARY_MAX_X = BOUNDARY_N,
-    BOUNDARY_MIN_X = BOUNDARY_S,
-    BOUNDARY_MAX_Y = BOUNDARY_W,
-    BOUNDARY_MIN_Y = BOUNDARY_E,
-};
-
-typedef std::map<BoundaryType, float> BossBoundaryMap;
-
 struct DoorData
 {
     uint32 entry, bossId;
     DoorType type;
-    uint32 boundary;
+};
+
+struct BossBoundaryEntry
+{
+    uint32 const bossId;
+    AreaBoundary const* const boundary;
+};
+
+struct BossBoundaryData
+{
+    typedef std::vector<BossBoundaryEntry> StorageType;
+    typedef StorageType::const_iterator const_iterator;
+
+    BossBoundaryData(std::initializer_list<BossBoundaryEntry> data) : _data(data) { }
+    ~BossBoundaryData();
+    const_iterator begin() const { return _data.begin(); }
+    const_iterator end() const { return _data.end(); }
+
+private:
+    StorageType _data;
 };
 
 struct MinionData
@@ -110,16 +112,15 @@ struct BossInfo
     EncounterState state;
     DoorSet door[MAX_DOOR_TYPES];
     MinionSet minion;
-    BossBoundaryMap boundary;
+    CreatureBoundary boundary;
 };
 
 struct DoorInfo
 {
-    explicit DoorInfo(BossInfo* _bossInfo, DoorType _type, BoundaryType _boundary)
-        : bossInfo(_bossInfo), type(_type), boundary(_boundary) {}
+    explicit DoorInfo(BossInfo* _bossInfo, DoorType _type)
+            : bossInfo(_bossInfo), type(_type) { }
     BossInfo* bossInfo;
     DoorType type;
-    BoundaryType boundary;
 };
 
 struct MinionInfo
@@ -194,6 +195,12 @@ public:
     //Respawns a GO having negative spawntimesecs in gameobject-table
     void DoRespawnGameObject(ObjectGuid guid, uint32 timeToDespawn = MINUTE);
 
+    // Respawns a creature.
+    void DoRespawnCreature(ObjectGuid guid, bool force = false);
+
+    // Respawns a creature from the creature object storage.
+    void DoRespawnCreature(uint32 type, bool force = false);
+
     //sends world state update to all players in instance
     void DoUpdateWorldState(uint32 worldstateId, uint32 worldstateValue);
 
@@ -219,7 +226,7 @@ public:
     virtual bool SetBossState(uint32 id, EncounterState state);
     EncounterState GetBossState(uint32 id) const { return id < bosses.size() ? bosses[id].state : TO_BE_DECIDED; }
     static std::string GetBossStateName(uint8 state);
-    BossBoundaryMap const* GetBossBoundary(uint32 id) const { return id < bosses.size() ? &bosses[id].boundary : nullptr; }
+    CreatureBoundary const* GetBossBoundary(uint32 id) const { return id < bosses.size() ? &bosses[id].boundary : nullptr; }
     BossInfo const* GetBossInfo(uint32 id) const { return &bosses[id]; }
 
     // Achievement criteria additional requirements check
@@ -249,6 +256,7 @@ public:
     virtual void DoAction(int32 /*action*/) {}
 protected:
     void SetBossNumber(uint32 number) { bosses.resize(number); }
+    void LoadBossBoundaries(BossBoundaryData const& data);
     void LoadDoorData(DoorData const* data);
     void LoadMinionData(MinionData const* data);
     void LoadObjectData(ObjectData const* creatureData, ObjectData const* gameObjectData);

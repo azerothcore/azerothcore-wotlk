@@ -117,8 +117,8 @@ public:
         {
             if (MoveEvent)
             {
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 inMove = false;
                 waitTimer = 0;
                 me->SetSpeed(MOVE_RUN, 2);
@@ -268,8 +268,8 @@ public:
 
                                     Talk(SAY_WAVE4);
 
-                                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
 
                                     MoveEvent = false;
                                 }
@@ -425,7 +425,7 @@ public:
                 if (Surge_Timer <= diff)
                 {
                     Talk(SAY_SURGE);
-                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 45, true);
+                    Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 45, true);
                     if (target)
                         DoCast(target, SPELL_SURGE);
                     Surge_Timer = urand(15000, 20000);

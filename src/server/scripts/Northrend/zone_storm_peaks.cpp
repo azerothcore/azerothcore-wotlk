@@ -45,7 +45,7 @@ public:
 
         void AttackStart(Unit* /*who*/) override {}
         void EnterCombat(Unit* /*who*/) override {}
-        void EnterEvadeMode() override {}
+        void EnterEvadeMode(EvadeReason /* why */) override {}
 
         void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
         {
@@ -147,7 +147,7 @@ public:
                 me->SetControlled(true, UNIT_STATE_STUNNED);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
+        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_STORM_HAMMER)
             {
@@ -348,11 +348,11 @@ public:
         bool switching;
         bool startPath;
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (switching || me->HasAuraType(SPELL_AURA_CONTROL_VEHICLE))
                 return;
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void Reset() override
@@ -413,7 +413,7 @@ public:
                 setCharm = true;
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
+        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
         {
             if (!playerGUID && spellInfo->Id == SPELL_SPEAR_OF_HODIR)
             {
@@ -492,7 +492,7 @@ public:
                 else
                 {
                     me->RemoveAllAuras();
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                 }
                 return;
             }
@@ -521,7 +521,7 @@ public:
                         else
                         {
                             me->RemoveAllAuras();
-                            EnterEvadeMode();
+                            EnterEvadeMode(EVADE_REASON_OTHER);
                             return;
                         }
                     }
@@ -546,7 +546,7 @@ public:
                     if (!player)
                     {
                         me->RemoveAllAuras();
-                        EnterEvadeMode();
+                        EnterEvadeMode(EVADE_REASON_OTHER);
                     }
                 }
                 return;
@@ -573,7 +573,7 @@ public:
                     else
                     {
                         me->RemoveAllAuras();
-                        EnterEvadeMode();
+                        EnterEvadeMode(EVADE_REASON_OTHER);
                     }
                 }
             }
@@ -659,7 +659,7 @@ public:
             {
                 caster->CastSpell(caster, SPELL_JORMUNGAR_SUBMERGE_VISUAL, true);
                 caster->ApplySpellImmune(SPELL_COLOSSUS_GROUND_SLAM, IMMUNITY_ID, SPELL_COLOSSUS_GROUND_SLAM, true);
-                caster->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                caster->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
                 caster->SetControlled(false, UNIT_STATE_ROOT);
                 for (uint8 i = 0; i < MAX_CREATURE_SPELLS; ++i)
                     caster->m_spells[i] = 0;
@@ -670,7 +670,7 @@ public:
             {
                 caster->RemoveAurasDueToSpell(SPELL_JORMUNGAR_SUBMERGE_VISUAL);
                 caster->ApplySpellImmune(SPELL_COLOSSUS_GROUND_SLAM, IMMUNITY_ID, SPELL_COLOSSUS_GROUND_SLAM, false);
-                caster->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                caster->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE);
                 caster->SetControlled(true, UNIT_STATE_ROOT);
 
                 if (CreatureTemplate const* ct = sObjectMgr->GetCreatureTemplate(caster->GetEntry()))
@@ -789,7 +789,7 @@ public:
                 me->DespawnOrUnsummon();
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (spell->Id != SPELL_ICE_LANCE)
                 return;
@@ -923,7 +923,7 @@ public:
 
         void AttackStart(Unit* /*who*/) override { }
         void EnterCombat(Unit* /*who*/) override { }
-        void EnterEvadeMode() override { }
+        void EnterEvadeMode(EvadeReason /*why*/) override { }
 
         void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
         {
@@ -971,7 +971,27 @@ public:
         void PassengerBoarded(Unit* who, int8 /*seat*/, bool apply) override
         {
             if (apply)
+            {
+                class DelayedTransportPositionOffsets : public BasicEvent
+                {
+                    public:
+                        DelayedTransportPositionOffsets(Unit* owner) : _owner(owner) { }
+
+                        bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
+                        {
+                            _owner->m_movementInfo.transport.pos.Relocate(-3.5f, 0.f, -0.2f, 0.f);
+                            return true;
+                        }
+
+                    private:
+                        Unit* _owner;
+                };
+
+                if (who->IsPlayer())
+                    who->m_Events.AddEvent(new DelayedTransportPositionOffsets(who), who->m_Events.CalculateTime(500));
+
                 return;
+            }
 
             if (who->GetEntry() == NPC_HYLDSMEET_DRAKERIDER)
                 _accessoryRespawnTimer = 5 * MINUTE * IN_MILLISECONDS;
@@ -1047,21 +1067,40 @@ public:
     }
 };
 
+enum CollapsingCave
+{
+    SPELL_COLLAPSING_CAVE = 55486
+};
+
+// 55693 - Remove Collapsing Cave Aura
+class spell_q12823_remove_collapsing_cave_aura : public SpellScript
+{
+    PrepareSpellScript(spell_q12823_remove_collapsing_cave_aura);
+
+    void HandleScriptEffect(SpellEffIndex /* effIndex */)
+    {
+        GetHitUnit()->RemoveAurasDueToSpell(SPELL_COLLAPSING_CAVE);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q12823_remove_collapsing_cave_aura::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_storm_peaks()
 {
-    // Ours
     new npc_frosthound();
     new npc_iron_watcher();
     new npc_time_lost_proto_drake();
     new npc_wild_wyrm();
     new spell_q13003_thursting_hodirs_spear();
     new spell_q13007_iron_colossus();
-
-    // Theirs
     new npc_roxi_ramrocket();
     new npc_brunnhildar_prisoner();
     new npc_freed_protodrake();
     new npc_icefang();
     new npc_hyldsmeet_protodrake();
     new spell_close_rift();
+    RegisterSpellScript(spell_q12823_remove_collapsing_cave_aura);
 }

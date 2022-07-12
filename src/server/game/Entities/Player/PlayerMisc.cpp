@@ -16,6 +16,7 @@
  */
 
 #include "AccountMgr.h"
+#include "GameTime.h"
 #include "MapMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -31,7 +32,7 @@ void Player::UpdateSpeakTime(uint32 specialMessageLimit)
     if (!AccountMgr::IsPlayerAccount(GetSession()->GetSecurity()))
         return;
 
-    time_t current = time (nullptr);
+    time_t current = GameTime::GetGameTime().count();
     if (m_speakTime > current)
     {
         uint32 max_count = specialMessageLimit ? specialMessageLimit : sWorld->getIntConfig(CONFIG_CHATFLOOD_MESSAGE_COUNT);
@@ -74,13 +75,13 @@ void Player::SavePositionInDB(uint32 mapid, float x, float y, float z, float o, 
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHARACTER_POSITION);
 
-    stmt->setFloat(0, x);
-    stmt->setFloat(1, y);
-    stmt->setFloat(2, z);
-    stmt->setFloat(3, o);
-    stmt->setUInt16(4, uint16(mapid));
-    stmt->setUInt16(5, uint16(zone));
-    stmt->setUInt32(6, guid.GetCounter());
+    stmt->SetData(0, x);
+    stmt->SetData(1, y);
+    stmt->SetData(2, z);
+    stmt->SetData(3, o);
+    stmt->SetData(4, uint16(mapid));
+    stmt->SetData(5, uint16(zone));
+    stmt->SetData(6, guid.GetCounter());
 
     CharacterDatabase.Execute(stmt);
 }
@@ -89,38 +90,27 @@ void Player::SavePositionInDB(WorldLocation const& loc, uint16 zoneId, ObjectGui
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHARACTER_POSITION);
 
-    stmt->setFloat(0, loc.GetPositionX());
-    stmt->setFloat(1, loc.GetPositionY());
-    stmt->setFloat(2, loc.GetPositionZ());
-    stmt->setFloat(3, loc.GetOrientation());
-    stmt->setUInt16(4, uint16(loc.GetMapId()));
-    stmt->setUInt16(5, zoneId);
-    stmt->setUInt32(6, guid.GetCounter());
+    stmt->SetData(0, loc.GetPositionX());
+    stmt->SetData(1, loc.GetPositionY());
+    stmt->SetData(2, loc.GetPositionZ());
+    stmt->SetData(3, loc.GetOrientation());
+    stmt->SetData(4, uint16(loc.GetMapId()));
+    stmt->SetData(5, zoneId);
+    stmt->SetData(6, guid.GetCounter());
 
     CharacterDatabase.ExecuteOrAppend(trans, stmt);
-}
-
-void Player::SetUInt32ValueInArray(Tokenizer& tokens, uint16 index, uint32 value)
-{
-    char buf[11];
-    snprintf(buf, 11, "%u", value);
-
-    if (index >= tokens.size())
-        return;
-
-    tokens[index] = buf;
 }
 
 void Player::Customize(CharacterCustomizeInfo const* customizeInfo, CharacterDatabaseTransaction trans)
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GENDER_AND_APPEARANCE);
-    stmt->setUInt8(0, customizeInfo->Gender);
-    stmt->setUInt8(1, customizeInfo->Skin);
-    stmt->setUInt8(2, customizeInfo->Face);
-    stmt->setUInt8(3, customizeInfo->HairStyle);
-    stmt->setUInt8(4, customizeInfo->HairColor);
-    stmt->setUInt8(5, customizeInfo->FacialHair);
-    stmt->setUInt32(6, customizeInfo->Guid.GetCounter());
+    stmt->SetData(0, customizeInfo->Gender);
+    stmt->SetData(1, customizeInfo->Skin);
+    stmt->SetData(2, customizeInfo->Face);
+    stmt->SetData(3, customizeInfo->HairStyle);
+    stmt->SetData(4, customizeInfo->HairColor);
+    stmt->SetData(5, customizeInfo->FacialHair);
+    stmt->SetData(6, customizeInfo->Guid.GetCounter());
 
     CharacterDatabase.ExecuteOrAppend(trans, stmt);
 }
@@ -206,9 +196,11 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
             for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end(); ++itr)
             {
                 InstanceSave* instanceSave = itr->second.save;
-                const MapEntry* entry = sMapStore.LookupEntry(itr->first);
+                MapEntry const* entry = sMapStore.LookupEntry(itr->first);
                 if (!entry || entry->IsRaid() || !instanceSave->CanReset())
+                {
                     continue;
+                }
 
                 Map* map = sMapMgr->FindMap(instanceSave->GetMapId(), instanceSave->GetInstanceId());
                 if (!map || map->ToInstanceMap()->Reset(method))
@@ -217,10 +209,16 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
                     toUnbind.push_back(instanceSave);
                 }
                 else
+                {
                     p->SendResetInstanceFailed(0, instanceSave->GetMapId());
+                }
+
+                sInstanceSaveMgr->DeleteInstanceSavedData(instanceSave->GetInstanceId());
             }
             for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
+            {
                 sInstanceSaveMgr->UnbindAllFor(*itr);
+            }
         }
             break;
         case INSTANCE_RESET_CHANGE_DIFFICULTY:
@@ -233,9 +231,11 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
             for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end(); ++itr)
             {
                 InstanceSave* instanceSave = itr->second.save;
-                const MapEntry* entry = sMapStore.LookupEntry(itr->first);
+                MapEntry const* entry = sMapStore.LookupEntry(itr->first);
                 if (!entry || entry->IsRaid() != isRaid || !instanceSave->CanReset())
+                {
                     continue;
+                }
 
                 Map* map = sMapMgr->FindMap(instanceSave->GetMapId(), instanceSave->GetInstanceId());
                 if (!map || map->ToInstanceMap()->Reset(method))
@@ -244,7 +244,11 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
                     toUnbind.push_back(instanceSave);
                 }
                 else
+                {
                     p->SendResetInstanceFailed(0, instanceSave->GetMapId());
+                }
+
+                sInstanceSaveMgr->DeleteInstanceSavedData(instanceSave->GetInstanceId());
             }
             for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
                 sInstanceSaveMgr->UnbindAllFor(*itr);
@@ -272,6 +276,8 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
                     }
                     //else
                     //  p->SendResetInstanceFailed(0, instanceSave->GetMapId());
+
+                    sInstanceSaveMgr->DeleteInstanceSavedData(instanceSave->GetInstanceId());
                 }
                 for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
                     sInstanceSaveMgr->PlayerUnbindInstance(p->GetGUID(), (*itr)->GetMapId(), (*itr)->GetDifficulty(), true, p);
@@ -363,8 +369,8 @@ void Player::UpdatePvPFlag(time_t currTime)
 
     if (currTime < (pvpInfo.EndTimer + 300 + 5))
     {
-        if (currTime > (pvpInfo.EndTimer + 4) && !HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_TIMER))
-            SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_TIMER);
+        if (currTime > (pvpInfo.EndTimer + 4) && !HasPlayerFlag(PLAYER_FLAGS_PVP_TIMER))
+            SetPlayerFlag(PLAYER_FLAGS_PVP_TIMER);
 
         return;
     }
@@ -427,7 +433,7 @@ void Player::SendItemRetrievalMail(std::vector<std::pair<uint32, uint32>> mailIt
     if (mailItems.empty())
     {
         // Skip send if empty items
-        FMT_LOG_ERROR("entities.player.items", "> SendItemRetrievalMail: Attempt to send almost with items without items. Player {}", GetGUID().ToString());
+        LOG_ERROR("entities.player.items", "> SendItemRetrievalMail: Attempt to send almost with items without items. Player {}", GetGUID().ToString());
         return;
     }
 
@@ -442,13 +448,13 @@ void Player::SendItemRetrievalMail(std::vector<std::pair<uint32, uint32>> mailIt
         ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemEntry);
         if (!itemTemplate)
         {
-            FMT_LOG_ERROR("entities.player.items", "> SendItemRetrievalMail: Item id {} is invalid", itemEntry);
+            LOG_ERROR("entities.player.items", "> SendItemRetrievalMail: Item id {} is invalid", itemEntry);
             return;
         }
 
         if (itemCount < 1 || (itemTemplate->MaxCount > 0 && itemCount > static_cast<uint32>(itemTemplate->MaxCount)))
         {
-            FMT_LOG_ERROR("entities.player.items", "> SendItemRetrievalMail: Incorrect item count ({}) for item id {}", itemEntry, itemCount);
+            LOG_ERROR("entities.player.items", "> SendItemRetrievalMail: Incorrect item count ({}) for item id {}", itemEntry, itemCount);
             return;
         }
 

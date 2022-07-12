@@ -15,23 +15,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaBoundary.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "azjol_nerub.h"
 
 DoorData const doorData[] =
 {
-    { GO_KRIKTHIR_DOORS,    DATA_KRIKTHIR_THE_GATEWATCHER_EVENT,    DOOR_TYPE_PASSAGE,      BOUNDARY_NONE },
-    { GO_ANUBARAK_DOORS1,   DATA_ANUBARAK_EVENT,    DOOR_TYPE_ROOM,     BOUNDARY_NONE },
-    { GO_ANUBARAK_DOORS2,   DATA_ANUBARAK_EVENT,    DOOR_TYPE_ROOM,     BOUNDARY_NONE },
-    { GO_ANUBARAK_DOORS3,   DATA_ANUBARAK_EVENT,    DOOR_TYPE_ROOM,     BOUNDARY_NONE },
-    { 0,                    0,                      DOOR_TYPE_ROOM,     BOUNDARY_NONE }
+    { GO_KRIKTHIR_DOORS,    DATA_KRIKTHIR_THE_GATEWATCHER_EVENT,    DOOR_TYPE_PASSAGE },
+    { GO_ANUBARAK_DOORS1,   DATA_ANUBARAK_EVENT,    DOOR_TYPE_ROOM },
+    { GO_ANUBARAK_DOORS2,   DATA_ANUBARAK_EVENT,    DOOR_TYPE_ROOM },
+    { GO_ANUBARAK_DOORS3,   DATA_ANUBARAK_EVENT,    DOOR_TYPE_ROOM },
+    { 0,                    0,                      DOOR_TYPE_ROOM }
 };
 
 ObjectData const creatureData[] =
 {
     { NPC_KRIKTHIR_THE_GATEWATCHER, DATA_KRIKTHIR_THE_GATEWATCHER_EVENT },
     { NPC_HADRONOX,                 DATA_HADRONOX_EVENT                 }
+};
+
+BossBoundaryData const boundaries =
+{
+    { DATA_KRIKTHIR_THE_GATEWATCHER_EVENT, new RectangleBoundary(400.0f, 580.0f, 623.5f, 810.0f) },
+    { DATA_HADRONOX_EVENT, new ZRangeBoundary(666.0f, 776.0f) },
+    { DATA_ANUBARAK_EVENT, new CircleBoundary(Position(550.6178f, 253.5917f), 26.0f) }
 };
 
 class instance_azjol_nerub : public InstanceMapScript
@@ -44,6 +52,7 @@ public:
         instance_azjol_nerub_InstanceScript(Map* map) : InstanceScript(map)
         {
             SetBossNumber(MAX_ENCOUNTERS);
+            LoadBossBoundaries(boundaries);
             LoadDoorData(doorData);
             LoadObjectData(creatureData, nullptr);
         };

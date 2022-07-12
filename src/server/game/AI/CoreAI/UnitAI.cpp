@@ -90,12 +90,12 @@ bool UnitAI::DoSpellAttackIfReady(uint32 spell)
     return false;
 }
 
-Unit* UnitAI::SelectTarget(SelectAggroTarget targetType, uint32 position, float dist, bool playerOnly, int32 aura)
+Unit* UnitAI::SelectTarget(SelectTargetMethod targetType, uint32 position, float dist, bool playerOnly, int32 aura)
 {
     return SelectTarget(targetType, position, DefaultTargetSelector(me, dist, playerOnly, aura));
 }
 
-void UnitAI::SelectTargetList(std::list<Unit*>& targetList, uint32 num, SelectAggroTarget targetType, float dist, bool playerOnly, int32 aura)
+void UnitAI::SelectTargetList(std::list<Unit*>& targetList, uint32 num, SelectTargetMethod targetType, float dist, bool playerOnly, int32 aura)
 {
     SelectTargetList(targetList, DefaultTargetSelector(me, dist, playerOnly, aura), num, targetType);
 }
@@ -106,35 +106,50 @@ float UnitAI::DoGetSpellMaxRange(uint32 spellId, bool positive)
     return spellInfo ? spellInfo->GetMaxRange(positive) : 0;
 }
 
-void UnitAI::DoAddAuraToAllHostilePlayers(uint32 spellid)
+SpellCastResult UnitAI::DoAddAuraToAllHostilePlayers(uint32 spellid)
 {
     if (me->IsInCombat())
     {
-        ThreatContainer::StorageType threatlist = me->getThreatMgr().getThreatList();
+        ThreatContainer::StorageType threatlist = me->GetThreatMgr().getThreatList();
         for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
         {
             if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
+            {
                 if (unit->GetTypeId() == TYPEID_PLAYER)
+                {
                     me->AddAura(spellid, unit);
+                    return SPELL_CAST_OK;
+                }
+            }
+            else
+                return SPELL_FAILED_BAD_TARGETS;
         }
     }
+
+    return SPELL_FAILED_CUSTOM_ERROR;
 }
 
-void UnitAI::DoCastToAllHostilePlayers(uint32 spellid, bool triggered)
+SpellCastResult UnitAI::DoCastToAllHostilePlayers(uint32 spellid, bool triggered)
 {
     if (me->IsInCombat())
     {
-        ThreatContainer::StorageType threatlist = me->getThreatMgr().getThreatList();
+        ThreatContainer::StorageType threatlist = me->GetThreatMgr().getThreatList();
         for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
         {
             if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
+            {
                 if (unit->GetTypeId() == TYPEID_PLAYER)
-                    me->CastSpell(unit, spellid, triggered);
+                    return me->CastSpell(unit, spellid, triggered);
+            }
+            else
+                return SPELL_FAILED_BAD_TARGETS;
         }
     }
+
+    return SPELL_FAILED_CUSTOM_ERROR;
 }
 
-void UnitAI::DoCast(uint32 spellId)
+SpellCastResult UnitAI::DoCast(uint32 spellId)
 {
     Unit* target = nullptr;
 
@@ -149,10 +164,11 @@ void UnitAI::DoCast(uint32 spellId)
             break;
         case AITARGET_ENEMY:
             {
-                const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-                bool playerOnly = spellInfo->HasAttribute(SPELL_ATTR3_ONLY_ON_PLAYER);
-                //float range = GetSpellMaxRange(spellInfo, false);
-                target = SelectTarget(SELECT_TARGET_RANDOM, 0, spellInfo->GetMaxRange(false), playerOnly);
+                if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId))
+                {
+                    bool playerOnly = spellInfo->HasAttribute(SPELL_ATTR3_ONLY_ON_PLAYER);
+                    target = SelectTarget(SelectTargetMethod::Random, 0, spellInfo->GetMaxRange(false), playerOnly);
+                }
                 break;
             }
         case AITARGET_ALLY:
@@ -163,59 +179,63 @@ void UnitAI::DoCast(uint32 spellId)
             break;
         case AITARGET_DEBUFF:
             {
-                const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-                bool playerOnly = spellInfo->HasAttribute(SPELL_ATTR3_ONLY_ON_PLAYER);
-                float range = spellInfo->GetMaxRange(false);
+                if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId))
+                {
+                    bool playerOnly = spellInfo->HasAttribute(SPELL_ATTR3_ONLY_ON_PLAYER);
+                    float range = spellInfo->GetMaxRange(false);
 
-                DefaultTargetSelector targetSelector(me, range, playerOnly, -(int32)spellId);
-                if (!(spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_VICTIM)
-                        && targetSelector(me->GetVictim()))
-                    target = me->GetVictim();
-                else
-                    target = SelectTarget(SELECT_TARGET_RANDOM, 0, targetSelector);
+                    DefaultTargetSelector targetSelector(me, range, playerOnly, -(int32)spellId);
+                    if (!(spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_VICTIM)
+                            && targetSelector(me->GetVictim()))
+                        target = me->GetVictim();
+                    else
+                        target = SelectTarget(SelectTargetMethod::Random, 0, targetSelector);
+                }
                 break;
             }
     }
 
     if (target)
         me->CastSpell(target, spellId, false);
+
+    return SPELL_FAILED_BAD_TARGETS;
 }
 
-void UnitAI::DoCast(Unit* victim, uint32 spellId, bool triggered)
+SpellCastResult UnitAI::DoCast(Unit* victim, uint32 spellId, bool triggered)
 {
-    if (!victim || (me->HasUnitState(UNIT_STATE_CASTING) && !triggered))
-        return;
+    if (!victim)
+        return SPELL_FAILED_BAD_TARGETS;
 
-    me->CastSpell(victim, spellId, triggered);
+    if (me->HasUnitState(UNIT_STATE_CASTING) && !triggered)
+        return SPELL_FAILED_SPELL_IN_PROGRESS;
+
+    return me->CastSpell(victim, spellId, triggered);
 }
 
-void UnitAI::DoCastVictim(uint32 spellId, bool triggered)
+SpellCastResult UnitAI::DoCastVictim(uint32 spellId, bool triggered)
 {
-    if (!me->GetVictim() || (me->HasUnitState(UNIT_STATE_CASTING) && !triggered))
-        return;
+    if (Unit* victim = me->GetVictim())
+        return DoCast(victim, spellId, triggered);
 
-    me->CastSpell(me->GetVictim(), spellId, triggered);
+    return SPELL_FAILED_BAD_TARGETS;
 }
 
-void UnitAI::DoCastAOE(uint32 spellId, bool triggered)
-{
-    if (!triggered && me->HasUnitState(UNIT_STATE_CASTING))
-        return;
-
-    me->CastSpell((Unit*)nullptr, spellId, triggered);
-}
-
-void UnitAI::DoCastRandomTarget(uint32 spellId, uint32 threatTablePosition, float dist, bool playerOnly, bool triggered)
+SpellCastResult UnitAI::DoCastAOE(uint32 spellId, bool triggered)
 {
     if (!triggered && me->HasUnitState(UNIT_STATE_CASTING))
+        return SPELL_FAILED_SPELL_IN_PROGRESS;
+
+    return me->CastSpell((Unit*)nullptr, spellId, triggered);
+}
+
+SpellCastResult UnitAI::DoCastRandomTarget(uint32 spellId, uint32 threatTablePosition, float dist, bool playerOnly, bool triggered)
+{
+    if (Unit* target = SelectTarget(SelectTargetMethod::Random, threatTablePosition, dist, playerOnly))
     {
-        return;
+        return DoCast(target, spellId, triggered);
     }
 
-    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, threatTablePosition, dist, playerOnly))
-    {
-        me->CastSpell(target, spellId, triggered);
-    }
+    return SPELL_FAILED_BAD_TARGETS;
 }
 
 #define UPDATE_TARGET(a) {if (AIInfo->target<a) AIInfo->target=a;}
@@ -225,7 +245,7 @@ void UnitAI::FillAISpellInfo()
     AISpellInfo = new AISpellInfoType[sSpellMgr->GetSpellInfoStoreSize()];
 
     AISpellInfoType* AIInfo = AISpellInfo;
-    const SpellInfo* spellInfo;
+    SpellInfo const* spellInfo;
 
     for (uint32 i = 0; i < sSpellMgr->GetSpellInfoStoreSize(); ++i, ++AIInfo)
     {
@@ -316,7 +336,7 @@ bool SpellTargetSelector::operator()(Unit const* target) const
         return false;
 
     // copypasta from Spell::CheckRange
-    uint32 range_type = _spellInfo->RangeEntry ? _spellInfo->RangeEntry->type : 0;
+    uint32 range_type = _spellInfo->RangeEntry ? _spellInfo->RangeEntry->Flags : 0;
     float max_range = _caster->GetSpellMaxRangeForTarget(target, _spellInfo);
     float min_range = _caster->GetSpellMinRangeForTarget(target, _spellInfo);
 

@@ -31,6 +31,12 @@
 #include "Spell.h"
 #include "WorldSession.h"
 
+BossBoundaryData::~BossBoundaryData()
+{
+    for (const_iterator it = begin(); it != end(); ++it)
+        delete it->boundary;
+}
+
 void InstanceScript::SaveToDB()
 {
     std::string data = GetSaveData();
@@ -43,8 +49,8 @@ void InstanceScript::SaveToDB()
         save->SetInstanceData(data);
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_INSTANCE_SAVE_DATA);
-    stmt->setString(0, data);
-    stmt->setUInt32(1, instance->GetInstanceId());
+    stmt->SetData(0, data);
+    stmt->SetData(1, instance->GetInstanceId());
     CharacterDatabase.Execute(stmt);
 }
 
@@ -120,6 +126,13 @@ bool InstanceScript::IsEncounterInProgress() const
     return false;
 }
 
+void InstanceScript::LoadBossBoundaries(const BossBoundaryData& data)
+{
+    for (BossBoundaryEntry const& entry : data)
+        if (entry.bossId < bosses.size())
+            bosses[entry.bossId].boundary.push_back(entry.boundary);
+}
+
 void InstanceScript::LoadMinionData(const MinionData* data)
 {
     while (data->entry)
@@ -129,7 +142,7 @@ void InstanceScript::LoadMinionData(const MinionData* data)
 
         ++data;
     }
-    LOG_DEBUG("scripts.ai", "InstanceScript::LoadMinionData: " UI64FMTD " minions loaded.", uint64(minions.size()));
+    LOG_DEBUG("scripts.ai", "InstanceScript::LoadMinionData: {} minions loaded.", uint64(minions.size()));
 }
 
 void InstanceScript::LoadDoorData(const DoorData* data)
@@ -137,11 +150,11 @@ void InstanceScript::LoadDoorData(const DoorData* data)
     while (data->entry)
     {
         if (data->bossId < bosses.size())
-            doors.insert(std::make_pair(data->entry, DoorInfo(&bosses[data->bossId], data->type, BoundaryType(data->boundary))));
+            doors.insert(std::make_pair(data->entry, DoorInfo(&bosses[data->bossId], data->type)));
 
         ++data;
     }
-    LOG_DEBUG("scripts.ai", "InstanceScript::LoadDoorData: " UI64FMTD " doors loaded.", uint64(doors.size()));
+    LOG_DEBUG("scripts.ai", "InstanceScript::LoadDoorData: {} doors loaded.", uint64(doors.size()));
 }
 
 void InstanceScript::LoadObjectData(ObjectData const* creatureData, ObjectData const* gameObjectData)
@@ -156,7 +169,7 @@ void InstanceScript::LoadObjectData(ObjectData const* creatureData, ObjectData c
         LoadObjectData(gameObjectData, _gameObjectInfo);
     }
 
-    LOG_DEBUG("scripts", "InstanceScript::LoadObjectData: " SZFMTD " objects loaded.", _creatureInfo.size() + _gameObjectInfo.size());
+    LOG_DEBUG("scripts", "InstanceScript::LoadObjectData: {} objects loaded.", _creatureInfo.size() + _gameObjectInfo.size());
 }
 
 void InstanceScript::LoadObjectData(ObjectData const* data, ObjectInfoMap& objectInfo)
@@ -181,8 +194,10 @@ void InstanceScript::UpdateMinionState(Creature* minion, EncounterState state)
         case IN_PROGRESS:
             if (!minion->IsAlive())
                 minion->Respawn();
-            else if (!minion->GetVictim())
+            else
+            {
                 minion->AI()->DoZoneInCombat(nullptr, 100.0f);
+            }
             break;
         default:
             break;
@@ -266,28 +281,6 @@ void InstanceScript::AddDoor(GameObject* door, bool add)
         if (add)
         {
             data.bossInfo->door[data.type].insert(door);
-            switch (data.boundary)
-            {
-                default:
-                case BOUNDARY_NONE:
-                    break;
-                case BOUNDARY_N:
-                case BOUNDARY_S:
-                    data.bossInfo->boundary[data.boundary] = door->GetPositionX();
-                    break;
-                case BOUNDARY_E:
-                case BOUNDARY_W:
-                    data.bossInfo->boundary[data.boundary] = door->GetPositionY();
-                    break;
-                case BOUNDARY_NW:
-                case BOUNDARY_SE:
-                    data.bossInfo->boundary[data.boundary] = door->GetPositionX() + door->GetPositionY();
-                    break;
-                case BOUNDARY_NE:
-                case BOUNDARY_SW:
-                    data.bossInfo->boundary[data.boundary] = door->GetPositionX() - door->GetPositionY();
-                    break;
-            }
         }
         else
             data.bossInfo->door[data.type].erase(door);
@@ -386,7 +379,7 @@ void InstanceScript::DoUseDoorOrButton(ObjectGuid uiGuid, uint32 uiWithRestoreTi
                 go->ResetDoorOrButton();
         }
         else
-            LOG_ERROR("scripts.ai", "SD2: Script call DoUseDoorOrButton, but gameobject entry %u is type %u.", go->GetEntry(), go->GetGoType());
+            LOG_ERROR("scripts.ai", "SD2: Script call DoUseDoorOrButton, but gameobject entry {} is type {}.", go->GetEntry(), go->GetGoType());
     }
 }
 
@@ -406,11 +399,27 @@ void InstanceScript::DoRespawnGameObject(ObjectGuid uiGuid, uint32 uiTimeToDespa
     }
 }
 
+void InstanceScript::DoRespawnCreature(ObjectGuid guid, bool force)
+{
+    if (Creature* creature = instance->GetCreature(guid))
+    {
+        creature->Respawn(force);
+    }
+}
+
+void InstanceScript::DoRespawnCreature(uint32 type, bool force)
+{
+    if (Creature* creature = instance->GetCreature(GetObjectGuid(type)))
+    {
+        creature->Respawn(force);
+    }
+}
+
 void InstanceScript::DoUpdateWorldState(uint32 uiStateId, uint32 uiStateData)
 {
     Map::PlayerList const& lPlayers = instance->GetPlayers();
 
-    if (!lPlayers.isEmpty())
+    if (!lPlayers.IsEmpty())
     {
         for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
             if (Player* player = itr->GetSource())
@@ -427,7 +436,7 @@ void InstanceScript::DoSendNotifyToInstance(char const* format, ...)
 {
     InstanceMap::PlayerList const& players = instance->GetPlayers();
 
-    if (!players.isEmpty())
+    if (!players.IsEmpty())
     {
         va_list ap;
         va_start(ap, format);
@@ -445,7 +454,7 @@ void InstanceScript::DoUpdateAchievementCriteria(AchievementCriteriaTypes type, 
 {
     Map::PlayerList const& PlayerList = instance->GetPlayers();
 
-    if (!PlayerList.isEmpty())
+    if (!PlayerList.IsEmpty())
         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
             if (Player* player = i->GetSource())
                 player->UpdateAchievementCriteria(type, miscValue1, miscValue2, unit);
@@ -456,7 +465,7 @@ void InstanceScript::DoStartTimedAchievement(AchievementCriteriaTimedTypes type,
 {
     Map::PlayerList const& PlayerList = instance->GetPlayers();
 
-    if (!PlayerList.isEmpty())
+    if (!PlayerList.IsEmpty())
         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
             if (Player* player = i->GetSource())
                 player->StartTimedAchievement(type, entry);
@@ -467,7 +476,7 @@ void InstanceScript::DoStopTimedAchievement(AchievementCriteriaTimedTypes type, 
 {
     Map::PlayerList const& PlayerList = instance->GetPlayers();
 
-    if (!PlayerList.isEmpty())
+    if (!PlayerList.IsEmpty())
         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
             if (Player* player = i->GetSource())
                 player->RemoveTimedAchievement(type, entry);
@@ -477,7 +486,7 @@ void InstanceScript::DoStopTimedAchievement(AchievementCriteriaTimedTypes type, 
 void InstanceScript::DoRemoveAurasDueToSpellOnPlayers(uint32 spell)
 {
     Map::PlayerList const& PlayerList = instance->GetPlayers();
-    if (!PlayerList.isEmpty())
+    if (!PlayerList.IsEmpty())
     {
         for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
         {
@@ -496,7 +505,7 @@ void InstanceScript::DoCastSpellOnPlayers(uint32 spell)
 {
     Map::PlayerList const& PlayerList = instance->GetPlayers();
 
-    if (!PlayerList.isEmpty())
+    if (!PlayerList.IsEmpty())
         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
             if (Player* player = i->GetSource())
                 player->CastSpell(player, spell, true);
@@ -504,7 +513,7 @@ void InstanceScript::DoCastSpellOnPlayers(uint32 spell)
 
 bool InstanceScript::CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* /*source*/, Unit const* /*target*/ /*= nullptr*/, uint32 /*miscvalue1*/ /*= 0*/)
 {
-    LOG_ERROR("scripts.ai", "Achievement system call InstanceScript::CheckAchievementCriteriaMeet but instance script for map %u not have implementation for achievement criteria %u",
+    LOG_ERROR("scripts.ai", "Achievement system call InstanceScript::CheckAchievementCriteriaMeet but instance script for map {} not have implementation for achievement criteria {}",
                    instance->GetId(), criteria_id);
     return false;
 }
@@ -522,8 +531,8 @@ void InstanceScript::SetCompletedEncountersMask(uint32 newMask, bool save)
             iSave->SetCompletedEncounterMask(completedEncounters);
 
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_INSTANCE_SAVE_ENCOUNTERMASK);
-        stmt->setUInt32(0, completedEncounters);
-        stmt->setUInt32(1, instance->GetInstanceId());
+        stmt->SetData(0, completedEncounters);
+        stmt->SetData(1, instance->GetInstanceId());
         CharacterDatabase.Execute(stmt);
     }
 }

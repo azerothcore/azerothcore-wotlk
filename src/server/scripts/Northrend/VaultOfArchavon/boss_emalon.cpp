@@ -125,7 +125,7 @@ public:
             events.ScheduleEvent(EVENT_SUMMON_NEXT_MINION, 4000);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
         {
             // restore minions health
             if (spellInfo->Id == SPELL_OVERCHARGE)
@@ -149,7 +149,7 @@ public:
                 pInstance->SetData(EVENT_EMALON, IN_PROGRESS);
         }
 
-        void JustDied(Unit* ) override
+        void JustDied(Unit* /*killer*/) override
         {
             summons.DespawnAll();
             events.Reset();
@@ -169,7 +169,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_CHAIN_LIGHTNING:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, RAID_MODE(SPELL_CHAIN_LIGHTNING_10, SPELL_CHAIN_LIGHTNING_25), false);
                     events.RepeatEvent(25000);
                     break;

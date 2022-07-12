@@ -135,7 +135,7 @@ public:
             summons.DespawnAll();
             playerGUID.Clear();
             currentQuest = 0;
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+            me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
         }
 
         void JustSummoned(Creature* creature) override
@@ -340,7 +340,7 @@ public:
         npc_battle_at_valhalasAI* vAI = CAST_AI(npc_battle_at_valhalas::npc_battle_at_valhalasAI, creature->AI());
         vAI->ResetData();
 
-        creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+        creature->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
         if (vAI)
             vAI->StartBattle(player->GetGUID(), quest->GetQuestId());
 
@@ -487,9 +487,9 @@ public:
 
             events.Reset();
             events.RescheduleEvent(EVENT_START, 1000);
-            me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+            me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
             me->SetWalk(true);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(true);
             me->setActive(true);
             me->SetReactState(REACT_PASSIVE);
         }
@@ -507,7 +507,7 @@ public:
                         _landgrenGUID = cr->GetGUID();
 
                         float o = cr->GetAngle(me);
-                        me->GetMotionMaster()->MovePoint(1, cr->GetPositionX() + cos(o) * 3, cr->GetPositionY() + sin(o) * 3, cr->GetPositionZ());
+                        me->GetMotionMaster()->MovePoint(1, cr->GetPositionX() + cos(o) * 3, cr->GetPositionY() + std::sin(o) * 3, cr->GetPositionZ());
                         events.RescheduleEvent(EVENT_SOUL_COAX, 5000);
                     }
                     else
@@ -595,7 +595,7 @@ public:
                     events.ScheduleEvent(EVENT_SCENE_10, 3000);
                     break;
                 case EVENT_SCENE_10:
-                    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                    me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_QUESTGIVER);
                     Talk(SAY_ARETE_6);
                     me->DespawnOrUnsummon(60000);
                     break;
@@ -750,7 +750,7 @@ public:
             else if (summon->GetEntry() != NPC_INVOKER_BASALEPH)
             {
                 summon->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
-                summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                summon->SetImmuneToAll(true);
                 summon->GetMotionMaster()->MovePoint(4, 6135.97f, 2753.84f, 573.92f);
             }
         }
@@ -913,7 +913,7 @@ public:
                                 if (summon->GetEntry() == NPC_DISGUISED_CRUSADER)
                                 {
                                     summon->SetWalk(false);
-                                    summon->GetMotionMaster()->MovePoint(2, 6132.38f + 4 * cos(2 * M_PI * (i / 3.0)), 2760.76f + 4 * sin(2 * M_PI * (i / 3.0)), me->GetPositionZ());
+                                    summon->GetMotionMaster()->MovePoint(2, 6132.38f + 4 * cos(2 * M_PI * (i / 3.0)), 2760.76f + 4 * std::sin(2 * M_PI * (i / 3.0)), me->GetPositionZ());
                                 }
                         break;
                     }
@@ -974,7 +974,7 @@ public:
                         for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                             if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
                             {
-                                summon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                                summon->SetImmuneToAll(false);
                                 if (summon->GetEntry() >= NPC_TIRION_EBON_KNIGHT && summon->GetEntry() <= NPC_TIRION_MOGRAINE)
                                 {
                                     if (summon->GetEntry() == NPC_TIRION_MOGRAINE)
@@ -1472,6 +1472,48 @@ public:
     }
 };
 
+enum OnslaughtGryphon
+{
+    SPELL_DELIVER_GRYPHON            = 54420,
+    SPELL_ONSLAUGHT_GRYPHON          = 49641,
+
+    NPC_CAPTURED_ONSLAUGHT_GRYPHON   = 29415,
+
+    SEAT_PLAYER                      = 0
+};
+
+class spell_deliver_gryphon : public SpellScript
+{
+    PrepareSpellScript(spell_deliver_gryphon);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DELIVER_GRYPHON, SPELL_ONSLAUGHT_GRYPHON });
+    }
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            if (Vehicle* gryphon = caster->GetVehicleKit())
+            {
+                if (Unit* player = gryphon->GetPassenger(SEAT_PLAYER))
+                {
+                    player->ExitVehicle();
+                    player->RemoveAurasDueToSpell(VEHICLE_SPELL_PARACHUTE);
+                    player->RemoveAurasDueToSpell(SPELL_ONSLAUGHT_GRYPHON);
+                    player->SummonCreature(NPC_CAPTURED_ONSLAUGHT_GRYPHON, 7434.7f, 4213.3f, 316.52f, 3.88f, TEMPSUMMON_TIMED_DESPAWN, 1 * MINUTE * IN_MILLISECONDS);
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_deliver_gryphon::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 // Theirs
 /*######
 ## npc_guardian_pavilion
@@ -1586,9 +1628,9 @@ public:
             events.ScheduleEvent(EVENT_DUMMY_RECAST_DEFEND, 5000);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            if (!_EnterEvadeMode())
+            if (!_EnterEvadeMode(why))
                 return;
 
             Reset();
@@ -1659,7 +1701,7 @@ public:
                 case EVENT_DUMMY_RESET:
                     if (UpdateVictim())
                     {
-                        EnterEvadeMode();
+                        EnterEvadeMode(EVADE_REASON_OTHER);
                         events.ScheduleEvent(EVENT_DUMMY_RESET, 10000);
                     }
                     break;
@@ -2159,6 +2201,7 @@ void AddSC_icecrown()
     new spell_anti_air_rocket_bomber();
     new npc_infra_green_bomber_generic();
     new spell_onslaught_or_call_bone_gryphon();
+    RegisterSpellScript(spell_deliver_gryphon);
 
     // Theirs
     new npc_guardian_pavilion();

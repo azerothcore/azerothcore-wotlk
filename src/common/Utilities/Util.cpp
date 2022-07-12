@@ -19,95 +19,16 @@
 #include "Common.h"
 #include "Containers.h"
 #include "IpAddress.h"
-#include "StringFormat.h"
+#include "StringConvert.h"
+#include "Tokenize.h"
 #include <algorithm>
 #include <boost/core/demangle.hpp>
 #include <cctype>
 #include <cstdarg>
 #include <ctime>
-#include <iomanip>
 #include <sstream>
 #include <string>
 #include <utf8.h>
-
-Tokenizer::Tokenizer(const std::string& src, const char sep, uint32 vectorReserve)
-{
-    m_str = new char[src.length() + 1];
-    memcpy(m_str, src.c_str(), src.length() + 1);
-
-    if (vectorReserve)
-    {
-        m_storage.reserve(vectorReserve);
-    }
-
-    char* posold = m_str;
-    char* posnew = m_str;
-
-    for (;;)
-    {
-        if (*posnew == sep)
-        {
-            m_storage.push_back(posold);
-            posold = posnew + 1;
-
-            *posnew = '\0';
-        }
-        else if (*posnew == '\0')
-        {
-            // Hack like, but the old code accepted these kind of broken strings,
-            // so changing it would break other things
-            if (posold != posnew)
-            {
-                m_storage.push_back(posold);
-            }
-
-            break;
-        }
-
-        ++posnew;
-    }
-}
-
-#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
-struct tm* localtime_r(time_t const* time, struct tm* result)
-{
-    localtime_s(result, time);
-    return result;
-}
-#endif
-
-tm TimeBreakdown(time_t time)
-{
-    tm timeLocal;
-    localtime_r(&time, &timeLocal);
-    return timeLocal;
-}
-
-time_t LocalTimeToUTCTime(time_t time)
-{
-#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
-    return time + _timezone;
-#else
-    return time + timezone;
-#endif
-}
-
-time_t GetLocalHourTimestamp(time_t time, uint8 hour, bool onlyAfterTime)
-{
-    tm timeLocal = TimeBreakdown(time);
-    timeLocal.tm_hour = 0;
-    timeLocal.tm_min = 0;
-    timeLocal.tm_sec = 0;
-    time_t midnightLocal = mktime(&timeLocal);
-    time_t hourLocal = midnightLocal + hour * HOUR;
-
-    if (onlyAfterTime && hourLocal <= time)
-    {
-        hourLocal += DAY;
-    }
-
-    return hourLocal;
-}
 
 void stripLineInvisibleChars(std::string& str)
 {
@@ -185,41 +106,55 @@ std::string secsToTimeString(uint64 timeInSecs, bool shortText)
     return str;
 }
 
-int32 MoneyStringToMoney(const std::string& moneyString)
+Optional<int32> MoneyStringToMoney(std::string_view moneyString)
 {
     int32 money = 0;
 
-    if (!(std::count(moneyString.begin(), moneyString.end(), 'g') == 1 ||
-            std::count(moneyString.begin(), moneyString.end(), 's') == 1 ||
-            std::count(moneyString.begin(), moneyString.end(), 'c') == 1))
-    {
-        return 0;    // Bad format
-    }
+    bool hadG = false;
+    bool hadS = false;
+    bool hadC = false;
 
-    Tokenizer tokens(moneyString, ' ');
-    for (Tokenizer::const_iterator itr = tokens.begin(); itr != tokens.end(); ++itr)
+    for (std::string_view token : Acore::Tokenize(moneyString, ' ', false))
     {
-        std::string tokenString(*itr);
-        size_t gCount = std::count(tokenString.begin(), tokenString.end(), 'g');
-        size_t sCount = std::count(tokenString.begin(), tokenString.end(), 's');
-        size_t cCount = std::count(tokenString.begin(), tokenString.end(), 'c');
-        if (gCount + sCount + cCount != 1)
+        uint32 unit;
+        switch (token[token.length() - 1])
         {
-            return 0;
+        case 'g':
+            if (hadG)
+            {
+                return std::nullopt;
+            }
+            hadG = true;
+            unit = 100 * 100;
+            break;
+        case 's':
+            if (hadS)
+            {
+                return std::nullopt;
+            }
+            hadS = true;
+            unit = 100;
+            break;
+        case 'c':
+            if (hadC)
+            {
+                return std::nullopt;
+            }
+            hadC = true;
+            unit = 1;
+            break;
+        default:
+            return std::nullopt;
         }
 
-        uint32 amount = atoi(*itr);
-        if (gCount == 1)
+        Optional<uint32> amount = Acore::StringTo<uint32>(token.substr(0, token.length() - 1));
+        if (amount)
         {
-            money += amount * 100 * 100;
+            money += (unit * *amount);
         }
-        else if (sCount == 1)
+        else
         {
-            money += amount * 100;
-        }
-        else if (cCount == 1)
-        {
-            money += amount;
+            return std::nullopt;
         }
     }
 
@@ -267,36 +202,6 @@ uint32 TimeStringToSecs(const std::string& timestring)
     return secs;
 }
 
-std::string TimeToTimestampStr(time_t t)
-{
-    tm aTm;
-    localtime_r(&t, &aTm);
-    //       YYYY   year
-    //       MM     month (2 digits 01-12)
-    //       DD     day (2 digits 01-31)
-    //       HH     hour (2 digits 00-23)
-    //       MM     minutes (2 digits 00-59)
-    //       SS     seconds (2 digits 00-59)
-    char buf[20];
-    int ret = snprintf(buf, 20, "%04d-%02d-%02d_%02d-%02d-%02d", aTm.tm_year + 1900, aTm.tm_mon + 1, aTm.tm_mday, aTm.tm_hour, aTm.tm_min, aTm.tm_sec);
-
-    if (ret < 0)
-    {
-        return std::string("ERROR");
-    }
-
-    return std::string(buf);
-}
-
-std::string TimeToHumanReadable(time_t t)
-{
-    tm time;
-    localtime_r(&t, &time);
-    char buf[30];
-    strftime(buf, 30, "%c", &time);
-    return std::string(buf);
-}
-
 /// Check if the string is a valid ip address representation
 bool IsIPAddress(char const* ipaddress)
 {
@@ -314,7 +219,7 @@ bool IsIPAddress(char const* ipaddress)
 uint32 CreatePIDFile(std::string const& filename)
 {
     FILE* pid_file = fopen(filename.c_str(), "w");
-    if (pid_file == nullptr)
+    if (!pid_file)
     {
         return 0;
     }

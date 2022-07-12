@@ -251,7 +251,7 @@ public:
         void Reset() override
         {
             _Reset();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
+            me->SetImmuneToAll(true);
             me->SetReactState(REACT_DEFENSIVE);
             events.Reset();
             _introDone = false;
@@ -283,7 +283,7 @@ public:
 
             if (!instance->CheckRequiredBosses(DATA_DEATHBRINGER_SAURFANG, who->ToPlayer()))
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 instance->DoCastSpellOnPlayers(LIGHT_S_HAMMER_TELEPORT);
                 return;
             }
@@ -316,14 +316,14 @@ public:
                 creature->AI()->DoAction(ACTION_START_OUTRO);
         }
 
-        bool CanAIAttack(const Unit*  /*target*/) const override
+        bool CanAIAttack(Unit const*  /*target*/) const override
         {
             return _introDone;
         }
 
         void AttackStart(Unit* victim) override
         {
-            if (!_introDone || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC))
+            if (!_introDone || me->IsImmuneToPC())
                 return;
 
             ScriptedAI::AttackStart(victim);
@@ -348,14 +348,14 @@ public:
             if (!_frenzied && HealthBelowPct(31)) // AT 30%, not below
             {
                 _frenzied = true;
-                DoCast(me, SPELL_FRENZY);
+                DoCast(me, SPELL_FRENZY, true);
                 Talk(SAY_FRENZY);
             }
         }
 
         void JustSummoned(Creature* summon) override
         {
-            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true))
                 summon->AI()->AttackStart(target);
 
             //if (IsHeroic())
@@ -405,7 +405,7 @@ public:
                     if (Player* p = itr->GetSource())
                         if (p->GetTransport())
                         {
-                            EnterEvadeMode();
+                            EnterEvadeMode(EVADE_REASON_OTHER);
                             return;
                         }
             }
@@ -465,7 +465,7 @@ public:
             switch (action)
             {
                 case ACTION_MARK_OF_THE_FALLEN_CHAMPION:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true, -SPELL_MARK_OF_THE_FALLEN_CHAMPION))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true, -SPELL_MARK_OF_THE_FALLEN_CHAMPION))
                     {
                         ++_fallenChampionCastCount;
                         me->CastSpell(target, SPELL_MARK_OF_THE_FALLEN_CHAMPION, false);
@@ -495,9 +495,9 @@ public:
             return 0;
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
             if (Creature* creature = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SAURFANG_EVENT_NPC)))
                 creature->AI()->DoAction(ACTION_EVADE);
         }
@@ -531,7 +531,7 @@ public:
         void Reset() override
         {
             _events.Reset();
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->SetReactState(REACT_PASSIVE);
         }
 
@@ -558,7 +558,7 @@ public:
                         for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
                             (*itr)->AI()->SetData(0, x++);
 
-                        me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         Talk(SAY_INTRO_HORDE_1);
                         _events.SetPhase(PHASE_INTRO_H);
                         _events.ScheduleEvent(EVENT_INTRO_HORDE_2, 5000, 0, PHASE_INTRO_H);
@@ -568,10 +568,10 @@ public:
                         if (GameObject* teleporter = ObjectAccessor::GetGameObject(*me, _instance->GetGuidData(GO_SCOURGE_TRANSPORTER_SAURFANG)))
                         {
                             _instance->HandleGameObject(ObjectGuid::Empty, false, teleporter);
-                            teleporter->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
+                            teleporter->SetGameObjectFlag(GO_FLAG_IN_USE);
                         }
 
-                        deathbringer->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        deathbringer->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         deathbringer->SetWalk(false);
                         deathbringer->GetMotionMaster()->MovePoint(POINT_SAURFANG, deathbringerPos.GetPositionX(), deathbringerPos.GetPositionY(), deathbringerPos.GetPositionZ());
                     }
@@ -645,7 +645,7 @@ public:
                         if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
                         {
                             deathbringer->CastSpell(me, SPELL_RIDE_VEHICLE, true);
-                            deathbringer->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                            deathbringer->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                             deathbringer->setDeathState(ALIVE);
                         }
                         _events.ScheduleEvent(EVENT_OUTRO_HORDE_4, 1000);
@@ -707,7 +707,7 @@ public:
                     if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
                     {
                         deathbringer->AI()->DoAction(ACTION_INTRO_DONE);
-                        deathbringer->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                        deathbringer->SetImmuneToPC(false);
                         if (Player* target = deathbringer->SelectNearestPlayer(100.0f))
                             deathbringer->AI()->AttackStart(target);
                     }
@@ -792,7 +792,7 @@ public:
         void Reset() override
         {
             _events.Reset();
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->SetReactState(REACT_PASSIVE);
         }
 
@@ -819,7 +819,7 @@ public:
                         for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
                             (*itr)->AI()->SetData(0, x++);
 
-                        me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         Talk(SAY_INTRO_ALLIANCE_1);
                         _events.SetPhase(PHASE_INTRO_A);
                         _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_2, 2500, 0, PHASE_INTRO_A);
@@ -830,10 +830,10 @@ public:
                         if (GameObject* teleporter = ObjectAccessor::GetGameObject(*me, _instance->GetGuidData(GO_SCOURGE_TRANSPORTER_SAURFANG)))
                         {
                             _instance->HandleGameObject(ObjectGuid::Empty, false, teleporter);
-                            teleporter->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
+                            teleporter->SetGameObjectFlag(GO_FLAG_IN_USE);
                         }
 
-                        deathbringer->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        deathbringer->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         deathbringer->SetWalk(false);
                         deathbringer->GetMotionMaster()->MovePoint(POINT_SAURFANG, deathbringerPos.GetPositionX(), deathbringerPos.GetPositionY(), deathbringerPos.GetPositionZ());
                     }
@@ -945,7 +945,7 @@ public:
                     if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
                     {
                         deathbringer->AI()->DoAction(ACTION_INTRO_DONE);
-                        deathbringer->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                        deathbringer->SetImmuneToPC(false);
                         if (Player* target = deathbringer->SelectNearestPlayer(100.0f))
                             deathbringer->AI()->AttackStart(target);
                     }

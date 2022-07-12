@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.6.4-MariaDB - mariadb.org binary distribution
--- Операционная система:         Win64
--- HeidiSQL Версия:              11.3.0.6295
+-- Värd:                         127.0.0.1
+-- Serverversion:                8.0.28 - MySQL Community Server - GPL
+-- Server-OS:                    Win64
+-- HeidiSQL Version:             11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,19 +12,19 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.character_spell_cooldown
+-- Dumpar struktur för tabell acore_characters.character_spell_cooldown
 DROP TABLE IF EXISTS `character_spell_cooldown`;
 CREATE TABLE IF NOT EXISTS `character_spell_cooldown` (
   `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier, Low part',
-  `spell` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Spell Identifier',
-  `category` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `spell` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Spell Identifier',
+  `category` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `item` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Item Identifier',
   `time` INT unsigned NOT NULL DEFAULT 0,
   `needSend` TINYINT unsigned NOT NULL DEFAULT 1,
   PRIMARY KEY (`guid`,`spell`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_characters.character_spell_cooldown: ~0 rows (приблизительно)
+-- Dumpar data för tabell acore_characters.character_spell_cooldown: ~0 rows (ungefär)
 DELETE FROM `character_spell_cooldown`;
 /*!40000 ALTER TABLE `character_spell_cooldown` DISABLE KEYS */;
 /*!40000 ALTER TABLE `character_spell_cooldown` ENABLE KEYS */;

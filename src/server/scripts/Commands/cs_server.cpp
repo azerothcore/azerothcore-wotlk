@@ -22,9 +22,9 @@
  Category: commandscripts
  EndScriptData */
 
-#include "AvgDiffTracker.h"
 #include "Chat.h"
 #include "Config.h"
+#include "GameTime.h"
 #include "GitRevision.h"
 #include "Language.h"
 #include "ModuleMgr.h"
@@ -34,6 +34,7 @@
 #include "ScriptMgr.h"
 #include "ServerMotd.h"
 #include "StringConvert.h"
+#include "UpdateTime.h"
 #include "VMapFactory.h"
 #include "VMapMgr2.h"
 #include <boost/version.hpp>
@@ -77,7 +78,6 @@ public:
 
         static ChatCommandTable serverSetCommandTable =
         {
-            { "difftime",     HandleServerSetDiffTimeCommand,    SEC_CONSOLE,       Console::Yes },
             { "loglevel",     HandleServerSetLogLevelCommand,    SEC_CONSOLE,       Console::Yes },
             { "motd",         HandleServerSetMotdCommand,        SEC_ADMINISTRATOR, Console::Yes },
             { "closed",       HandleServerSetClosedCommand,      SEC_CONSOLE,       Console::Yes },
@@ -119,11 +119,11 @@ public:
 
         {
             uint16 dbPort = 0;
-            if (QueryResult res = LoginDatabase.PQuery("SELECT port FROM realmlist WHERE id = %u", realm.Id.Realm))
-                dbPort = (*res)[0].GetUInt16();
+            if (QueryResult res = LoginDatabase.Query("SELECT port FROM realmlist WHERE id = {}", realm.Id.Realm))
+                dbPort = (*res)[0].Get<uint16>();
 
             if (dbPort)
-                dbPortOutput = Acore::StringFormat("Realmlist (Realm Id: %u) configured in port %" PRIu16, realm.Id.Realm, dbPort);
+                dbPortOutput = Acore::StringFormatFmt("Realmlist (Realm Id: {}) configured in port {}", realm.Id.Realm, dbPort);
             else
                 dbPortOutput = Acore::StringFormat("Realm Id: %u not found in `realmlist` table. Please check your setup", realm.Id.Realm);
         }
@@ -183,7 +183,7 @@ public:
                 return val;
             });
 
-            handler->PSendSysMessage("%s directory located in %s. Total size: " SZFMTD " bytes", subDir.c_str(), mapPath.generic_string().c_str(), folderSize);
+            handler->PSendSysMessage(Acore::StringFormatFmt("{} directory located in {}. Total size: {} bytes", subDir.c_str(), mapPath.generic_string().c_str(), folderSize).c_str());
         }
 
         LocaleConstant defaultLocale = sWorld->GetDefaultDbcLocale();
@@ -213,15 +213,15 @@ public:
         handler->PSendSysMessage("Using %s DBC Locale as default. All available DBC locales: %s", localeNames[defaultLocale], availableLocales.c_str());
 
         handler->PSendSysMessage("Using World DB: %s", sWorld->GetDBVersion());
-        handler->PSendSysMessage("Using World DB Revision: %s", sWorld->GetWorldDBRevision());
-        handler->PSendSysMessage("Using Character DB Revision: %s", sWorld->GetCharacterDBRevision());
-        handler->PSendSysMessage("Using Auth DB Revision: %s", sWorld->GetAuthDBRevision());
 
         handler->PSendSysMessage("LoginDatabase queue size: %zu", LoginDatabase.QueueSize());
         handler->PSendSysMessage("CharacterDatabase queue size: %zu", CharacterDatabase.QueueSize());
         handler->PSendSysMessage("WorldDatabase queue size: %zu", WorldDatabase.QueueSize());
 
-        handler->SendSysMessage("> List enable modules:");
+        if (Acore::Module::GetEnableModulesList().empty())
+            handler->SendSysMessage("No modules enabled");
+        else
+            handler->SendSysMessage("> List enable modules:");
 
         for (auto const& modName : Acore::Module::GetEnableModulesList())
         {
@@ -238,23 +238,16 @@ public:
         uint32 activeSessionCount = sWorld->GetActiveSessionCount();
         uint32 queuedSessionCount = sWorld->GetQueuedSessionCount();
         uint32 connPeak = sWorld->GetMaxActiveSessionCount();
-        std::string uptime = secsToTimeString(sWorld->GetUptime()).append(".");
-        uint32 updateTime = sWorld->GetUpdateTime();
-        uint32 avgUpdateTime = avgDiffTracker.getAverage();
 
         handler->PSendSysMessage("%s", GitRevision::GetFullVersion());
         if (!queuedSessionCount)
             handler->PSendSysMessage("Connected players: %u. Characters in world: %u.", activeSessionCount, playerCount);
         else
             handler->PSendSysMessage("Connected players: %u. Characters in world: %u. Queue: %u.", activeSessionCount, playerCount, queuedSessionCount);
-        handler->PSendSysMessage("Connection peak: %u.", connPeak);
-        handler->PSendSysMessage(LANG_UPTIME, uptime.c_str());
-        handler->PSendSysMessage("Update time diff: %ums, average: %ums.", updateTime, avgUpdateTime);
 
-        if (handler->GetSession())
-            if (Player* p = handler->GetSession()->GetPlayer())
-                if (p->IsDeveloper())
-                    handler->PSendSysMessage("DEV wavg: %ums, nsmax: %ums, nsavg: %ums. LFG avg: %ums, max: %ums.", avgDiffTracker.getTimeWeightedAverage(), devDiffTracker.getMax(), devDiffTracker.getAverage(), lfgDiffTracker.getAverage(), lfgDiffTracker.getMax());
+        handler->PSendSysMessage("Connection peak: %u.", connPeak);
+        handler->PSendSysMessage(LANG_UPTIME, secsToTimeString(GameTime::GetUptime().count()).c_str());
+        handler->PSendSysMessage("Update time diff: %ums, average: %ums.", sWorldUpdateTime.GetLastUpdateTime(), sWorldUpdateTime.GetAverageUpdateTime());
 
         //! Can't use sWorld->ShutdownMsg here in case of console command
         if (sWorld->IsShuttingDown())
@@ -276,10 +269,22 @@ public:
         return true;
     }
 
-    static bool HandleServerShutDownCommand(ChatHandler* /*handler*/, int32 time, Optional<int32> exitCode, Tail reason)
+    static bool HandleServerShutDownCommand(ChatHandler* handler, std::string time, Optional<int32> exitCode, Tail reason)
     {
         std::wstring wReason   = std::wstring();
         std::string  strReason = std::string();
+
+        if (time.empty())
+        {
+            return false;
+        }
+
+        if (Acore::StringTo<int32>(time).value_or(0) < 0)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
 
         if (!reason.empty())
         {
@@ -294,23 +299,48 @@ public:
             }
         }
 
+        int32 delay = TimeStringToSecs(time);
+        if (delay <= 0)
+        {
+            delay = Acore::StringTo<int32>(time).value_or(0);
+        }
+
+        if (delay <= 0)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
         if (exitCode && *exitCode >= 0 && *exitCode <= 125)
         {
-            sWorld->ShutdownServ(time, 0, *exitCode);
+            sWorld->ShutdownServ(delay, 0, *exitCode);
         }
         else
         {
-            sWorld->ShutdownServ(time, 0, SHUTDOWN_EXIT_CODE, strReason);
+            sWorld->ShutdownServ(delay, 0, SHUTDOWN_EXIT_CODE, strReason);
         }
 
         return true;
     }
 
-    static bool HandleServerRestartCommand(ChatHandler* /*handler*/, int32 time, Optional<int32> exitCode, Tail reason)
+    static bool HandleServerRestartCommand(ChatHandler* handler, std::string time, Optional<int32> exitCode, Tail reason)
     {
         std::wstring wReason = std::wstring();
         std::string strReason    = std::string();
 
+        if (time.empty())
+        {
+            return false;
+        }
+
+        if (Acore::StringTo<int32>(time).value_or(0) < 0)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
         if (!reason.empty())
         {
             if (!Utf8toWStr(reason, wReason))
@@ -324,22 +354,47 @@ public:
             }
         }
 
+        int32 delay = TimeStringToSecs(time);
+        if (delay <= 0)
+        {
+            delay = Acore::StringTo<int32>(time).value_or(0);
+        }
+
+        if (delay <= 0)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
         if (exitCode && *exitCode >= 0 && *exitCode <= 125)
         {
-            sWorld->ShutdownServ(time, SHUTDOWN_MASK_RESTART, *exitCode);
+            sWorld->ShutdownServ(delay, SHUTDOWN_MASK_RESTART, *exitCode);
         }
         else
         {
-            sWorld->ShutdownServ(time, SHUTDOWN_MASK_RESTART, RESTART_EXIT_CODE, strReason);
+            sWorld->ShutdownServ(delay, SHUTDOWN_MASK_RESTART, RESTART_EXIT_CODE, strReason);
         }
 
         return true;
     }
 
-    static bool HandleServerIdleRestartCommand(ChatHandler* /*handler*/, int32 time, Optional<int32> exitCode, Tail reason)
+    static bool HandleServerIdleRestartCommand(ChatHandler* handler, std::string time, Optional<int32> exitCode, Tail reason)
     {
         std::wstring wReason   = std::wstring();
         std::string  strReason = std::string();
+
+        if (time.empty())
+        {
+            return false;
+        }
+
+        if (Acore::StringTo<int32>(time).value_or(0) < 0)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
 
         if (!reason.empty())
         {
@@ -354,22 +409,47 @@ public:
             }
         }
 
+        int32 delay = TimeStringToSecs(time);
+        if (delay <= 0)
+        {
+            delay = Acore::StringTo<int32>(time).value_or(0);
+        }
+
+        if (delay <= 0)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
         if (exitCode && *exitCode >= 0 && *exitCode <= 125)
         {
-            sWorld->ShutdownServ(time, SHUTDOWN_MASK_RESTART | SHUTDOWN_MASK_IDLE, *exitCode);
+            sWorld->ShutdownServ(delay, SHUTDOWN_MASK_RESTART | SHUTDOWN_MASK_IDLE, *exitCode);
         }
         else
         {
-            sWorld->ShutdownServ(time, SHUTDOWN_MASK_RESTART | SHUTDOWN_MASK_IDLE, RESTART_EXIT_CODE, strReason);
+            sWorld->ShutdownServ(delay, SHUTDOWN_MASK_RESTART | SHUTDOWN_MASK_IDLE, RESTART_EXIT_CODE, strReason);
         }
 
         return true;
     }
 
-    static bool HandleServerIdleShutDownCommand(ChatHandler* /*handler*/, int32 time, Optional<int32> exitCode, Tail reason)
+    static bool HandleServerIdleShutDownCommand(ChatHandler* handler, std::string time, Optional<int32> exitCode, Tail reason)
     {
         std::wstring wReason   = std::wstring();
         std::string  strReason = std::string();
+
+        if (time.empty())
+        {
+            return false;
+        }
+
+        if (Acore::StringTo<int32>(time).value_or(0) < 0)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
 
         if (!reason.empty())
         {
@@ -384,13 +464,26 @@ public:
             }
         }
 
+        int32 delay = TimeStringToSecs(time);
+        if (delay <= 0)
+        {
+            delay = Acore::StringTo<int32>(time).value_or(0);
+        }
+
+        if (delay <= 0)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
         if (exitCode && *exitCode >= 0 && *exitCode <= 125)
         {
-            sWorld->ShutdownServ(time, SHUTDOWN_MASK_IDLE, *exitCode);
+            sWorld->ShutdownServ(delay, SHUTDOWN_MASK_IDLE, *exitCode);
         }
         else
         {
-            sWorld->ShutdownServ(time, SHUTDOWN_MASK_IDLE, SHUTDOWN_EXIT_CODE, strReason);
+            sWorld->ShutdownServ(delay, SHUTDOWN_MASK_IDLE, SHUTDOWN_EXIT_CODE, strReason);
         }
 
         return true;
@@ -437,18 +530,6 @@ public:
     static bool HandleServerSetLogLevelCommand(ChatHandler* /*handler*/, bool isLogger, std::string const& name, int32 level)
     {
         sLog->SetLogLevel(name, level, isLogger);
-        return true;
-    }
-
-    // set diff time record interval
-    static bool HandleServerSetDiffTimeCommand(ChatHandler* /*handler*/, int32 newTime)
-    {
-        if (newTime < 0)
-            return false;
-
-        sWorld->SetRecordDiffInterval(newTime);
-        printf("Record diff every %u ms\n", newTime);
-
         return true;
     }
 };

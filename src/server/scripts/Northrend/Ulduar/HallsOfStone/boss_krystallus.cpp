@@ -122,7 +122,7 @@ public:
             {
                 case EVENT_BOULDER:
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, 0))
                             me->CastSpell(target, DUNGEON_MODE(BOULDER_TOSS, BOULDER_TOSS_H), false);
 
                         events.RepeatEvent(5000 + rand() % 2000);

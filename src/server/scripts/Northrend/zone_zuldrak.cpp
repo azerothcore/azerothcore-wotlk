@@ -15,12 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CombatAI.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"
@@ -269,7 +267,7 @@ public:
                     {
                         ghoul->SetReactState(REACT_DEFENSIVE);
                         float o = me->GetAngle(ghoul);
-                        ghoul->GetMotionMaster()->MovePoint(1, me->GetPositionX() + 2 * cos(o), me->GetPositionY() + 2 * sin(o), me->GetPositionZ());
+                        ghoul->GetMotionMaster()->MovePoint(1, me->GetPositionX() + 2 * cos(o), me->GetPositionY() + 2 * std::sin(o), me->GetPositionZ());
                         checkTimer = 1;
                         findTimer = 0;
                     }
@@ -390,15 +388,15 @@ public:
         ObjectGuid playerGUID;
         ObjectGuid lichGUID;
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (playerGUID)
                 if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
                     if (player->IsWithinDistInMap(me, 80))
                         return;
             me->SetFaction(FACTION_UNDEAD_SCOURGE);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            ScriptedAI::EnterEvadeMode();
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void Reset() override
@@ -409,7 +407,7 @@ public:
             lichGUID.Clear();
             me->SetFaction(FACTION_UNDEAD_SCOURGE);
             me->SetVisible(false);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -425,7 +423,7 @@ public:
                             who->ToPlayer()->NearTeleportTo(6143.76f, -1969.7f, 417.57f, 2.08f);
                         else
                         {
-                            EnterEvadeMode();
+                            EnterEvadeMode(EVADE_REASON_OTHER);
                             return;
                         }
                     }
@@ -453,7 +451,7 @@ public:
                 me->SetFacingToObject(cr);
                 lichGUID = cr->GetGUID();
                 float o = me->GetAngle(cr);
-                cr->GetMotionMaster()->MovePoint(0, me->GetPositionX() + cos(o) * 6.0f, me->GetPositionY() + sin(o) * 6.0f, me->GetPositionZ());
+                cr->GetMotionMaster()->MovePoint(0, me->GetPositionX() + cos(o) * 6.0f, me->GetPositionY() + std::sin(o) * 6.0f, me->GetPositionZ());
             }
         }
 
@@ -467,26 +465,26 @@ public:
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (damage >= me->GetHealth() && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+            if (damage >= me->GetHealth() && !me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
             {
                 damage = 0;
                 me->RemoveAllAuras();
                 me->CombatStop();
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetFaction(FACTION_FRIENDLY);
                 events.Reset();
                 events.ScheduleEvent(EVENT_BETRAYAL_4, 1000);
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_THROW_PORTAL_CRYSTAL)
                 if (Aura* aura = target->AddAura(SPELL_ARTHAS_PORTAL, target))
                     aura->SetDuration(48000);
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_TOUCH_OF_DEATH)
             {
@@ -575,7 +573,7 @@ public:
                     break;
                 case EVENT_BETRAYAL_14:
                     playerGUID.Clear();
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
             }
 
@@ -637,7 +635,7 @@ public:
 
         void Reset() override
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void UpdateAI(uint32 diff) override
@@ -675,7 +673,7 @@ public:
             me->DespawnOrUnsummon(1);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_UNLOCK_SHACKLE)
             {
@@ -730,7 +728,7 @@ public:
             DoCast(me, SPELL_KNEEL, true); // Little Hack for kneel - Thanks Illy :P
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_FREE_RAGECLAW)
             {
@@ -815,7 +813,7 @@ public:
 
         void Reset() override
         {
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_COWER);
             _heading = me->GetOrientation();
         }
@@ -829,14 +827,14 @@ public:
                 switch (eventId)
                 {
                     case EVENT_RECRUIT_1:
-                        me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                         Talk(SAY_RECRUIT);
                         _events.ScheduleEvent(EVENT_RECRUIT_2, 3000);
                         break;
                     case EVENT_RECRUIT_2:
                         me->SetWalk(true);
-                        me->GetMotionMaster()->MovePoint(0, me->GetPositionX() + (cos(_heading) * 10), me->GetPositionY() + (sin(_heading) * 10), me->GetPositionZ());
+                        me->GetMotionMaster()->MovePoint(0, me->GetPositionX() + (cos(_heading) * 10), me->GetPositionY() + (std::sin(_heading) * 10), me->GetPositionZ());
                         me->DespawnOrUnsummon(5000);
                         break;
                     default:
@@ -929,7 +927,7 @@ public:
             Reset();
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (spell->Id != GYMERS_GRAB)
                 return;

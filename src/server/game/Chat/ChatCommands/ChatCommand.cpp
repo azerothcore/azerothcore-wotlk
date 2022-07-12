@@ -56,7 +56,7 @@ void Acore::Impl::ChatCommands::ChatCommandNode::LoadFromBuilder(ChatCommandBuil
         else
         {
             std::vector<std::string_view> const tokens = Acore::Tokenize(builder._name, COMMAND_DELIMITER, false);
-            ASSERT(!tokens.empty(), "Invalid command name '" STRING_VIEW_FMT "'.", STRING_VIEW_FMT_ARG(builder._name));
+            ASSERT(!tokens.empty(), "Invalid command name '{}'.", builder._name);
             ChatSubCommandMap* subMap = &map;
             for (size_t i = 0, n = (tokens.size() - 1); i < n; ++i)
                 subMap = &((*subMap)[tokens[i]]._subCommands);
@@ -88,9 +88,9 @@ static ChatSubCommandMap COMMAND_MAP;
         do
         {
             Field* fields = result->Fetch();
-            std::string_view const name = fields[0].GetStringView();
-            std::string_view const help = fields[2].GetStringView();
-            uint32 const secLevel = fields[1].GetUInt8();
+            std::string_view const name = fields[0].Get<std::string_view>();
+            std::string_view const help = fields[2].Get<std::string_view>();
+            uint32 const secLevel = fields[1].Get<uint8>();
 
             ChatCommandNode* cmd = nullptr;
             ChatSubCommandMap* map = &COMMAND_MAP;
@@ -105,7 +105,7 @@ static ChatSubCommandMap COMMAND_MAP;
                 }
                 else
                 {
-                    LOG_ERROR("sql.sql", "Table `command` contains data for non-existant command '" STRING_VIEW_FMT "'. Skipped.", STRING_VIEW_FMT_ARG(name));
+                    LOG_ERROR("sql.sql", "Table `command` contains data for non-existant command '{}'. Skipped.", name);
                     cmd = nullptr;
                     break;
                 }
@@ -116,19 +116,19 @@ static ChatSubCommandMap COMMAND_MAP;
 
             if (cmd->_invoker && (cmd->_permission.RequiredLevel != secLevel))
             {
-                LOG_WARN("sql.sql", "Table `command` has permission %u for '" STRING_VIEW_FMT "' which does not match the core (%u). Overriding.",
-                    secLevel, STRING_VIEW_FMT_ARG(name), cmd->_permission.RequiredLevel);
+                LOG_WARN("sql.sql", "Table `command` has permission {} for '{}' which does not match the core ({}). Overriding.",
+                    secLevel, name, cmd->_permission.RequiredLevel);
 
                 cmd->_permission.RequiredLevel = secLevel;
             }
 
             if (std::holds_alternative<std::string>(cmd->_help))
-                LOG_ERROR("sql.sql", "Table `command` contains duplicate data for command '" STRING_VIEW_FMT "'. Skipped.", STRING_VIEW_FMT_ARG(name));
+                LOG_ERROR("sql.sql", "Table `command` contains duplicate data for command '{}'. Skipped.", name);
 
             if (std::holds_alternative<std::monostate>(cmd->_help))
                 cmd->_help.emplace<std::string>(help);
             else
-                LOG_ERROR("sql.sql", "Table `command` contains legacy help text for command '" STRING_VIEW_FMT "', which uses `trinity_string`. Skipped.", STRING_VIEW_FMT_ARG(name));
+                LOG_ERROR("sql.sql", "Table `command` contains legacy help text for command '{}', which uses `trinity_string`. Skipped.", name);
         } while (result->NextRow());
     }
 
@@ -139,7 +139,7 @@ static ChatSubCommandMap COMMAND_MAP;
 void Acore::Impl::ChatCommands::ChatCommandNode::ResolveNames(std::string name)
 {
     if (_invoker && std::holds_alternative<std::monostate>(_help))
-        LOG_WARN("sql.sql", "Table `command` is missing help text for command '" STRING_VIEW_FMT "'.", STRING_VIEW_FMT_ARG(name));
+        LOG_WARN("sql.sql", "Table `command` is missing help text for command '{}'.", name);
 
     _name = name;
 
@@ -449,13 +449,11 @@ namespace Acore::Impl::ChatCommands
                 {
                     if (prefix.empty())
                     {
-                        return Acore::StringFormat(STRING_VIEW_FMT "%c" STRING_VIEW_FMT,
-                            STRING_VIEW_FMT_ARG(match), COMMAND_DELIMITER, STRING_VIEW_FMT_ARG(suffix));
+                        return Acore::StringFormatFmt("{}{}{}", match, COMMAND_DELIMITER, suffix);
                     }
                     else
                     {
-                        return Acore::StringFormat(STRING_VIEW_FMT "%c" STRING_VIEW_FMT "%c" STRING_VIEW_FMT,
-                            STRING_VIEW_FMT_ARG(prefix), COMMAND_DELIMITER, STRING_VIEW_FMT_ARG(match), COMMAND_DELIMITER, STRING_VIEW_FMT_ARG(suffix));
+                        return Acore::StringFormatFmt("{}{}{}{}{}", prefix, COMMAND_DELIMITER, match, COMMAND_DELIMITER, suffix);
                     }
                 });
 
@@ -473,8 +471,7 @@ namespace Acore::Impl::ChatCommands
             path.assign(it1->first);
         else
         {
-            path = Acore::StringFormat(STRING_VIEW_FMT "%c" STRING_VIEW_FMT,
-                STRING_VIEW_FMT_ARG(path), COMMAND_DELIMITER, STRING_VIEW_FMT_ARG(it1->first));
+            path = Acore::StringFormatFmt("{}{}{}", path, COMMAND_DELIMITER, it1->first);
         }
         cmd = &it1->second;
         map = &cmd->_subCommands;
@@ -486,10 +483,7 @@ namespace Acore::Impl::ChatCommands
     { /* there is some trailing text, leave it as is */
         if (cmd)
         { /* if we matched a command at some point, auto-complete it */
-            return {
-                Acore::StringFormat(STRING_VIEW_FMT "%c" STRING_VIEW_FMT,
-                    STRING_VIEW_FMT_ARG(path), COMMAND_DELIMITER, STRING_VIEW_FMT_ARG(oldTail))
-            };
+            return { Acore::StringFormatFmt("{}{}{}", path, COMMAND_DELIMITER, oldTail) };
         }
         else
             return {};
@@ -502,8 +496,7 @@ namespace Acore::Impl::ChatCommands
                 return std::string(match);
             else
             {
-                return Acore::StringFormat(STRING_VIEW_FMT "%c" STRING_VIEW_FMT,
-                    STRING_VIEW_FMT_ARG(prefix), COMMAND_DELIMITER, STRING_VIEW_FMT_ARG(match));
+                return Acore::StringFormatFmt("{}{}{}", prefix, COMMAND_DELIMITER, match);
             }
         });
 

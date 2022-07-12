@@ -91,7 +91,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if (!creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
+        if (!creature->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
             return true;
 
         if (creature->IsQuestGiver())
@@ -134,7 +134,7 @@ public:
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction) override
     {
-        if (!creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
+        if (!creature->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
             return true;
 
         InstanceScript* instance = creature->GetInstanceScript();
@@ -154,13 +154,13 @@ public:
                 CloseGossipMenuFor(player);
                 if (creature->AI())
                     creature->AI()->DoAction(ACTION_START_INTRO);
-                creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
                 CloseGossipMenuFor(player);
                 if (creature->AI())
                     creature->AI()->DoAction(ACTION_SKIP_INTRO);
-                creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                 break;
         }
 
@@ -233,7 +233,7 @@ public:
                     me->GetMotionMaster()->MovePoint(0, SpawnPos);
                     break;
                 case EVENT_PRE_INTRO_3:
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                     Talk(me->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_INTRO_2 : SAY_SYLVANAS_INTRO_1);
                     me->SetFacingTo(0.89f);
                     break;
@@ -685,7 +685,7 @@ public:
             if (a == 1)
             {
                 me->SetInCombatWithZone();
-                if (Unit* target = SelectTarget(SELECT_TARGET_NEAREST, 0, 0.0f, true))
+                if (Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 0.0f, true))
                     AttackStart(target);
             }
         }
@@ -705,7 +705,7 @@ public:
 
         void AttackStart(Unit* who) override
         {
-            if (!me->IsVisible() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (!me->IsVisible() || me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 return;
             ScriptedAI::AttackStart(who);
         }
@@ -751,11 +751,14 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+            {
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetImmuneToAll(false);
+            }
         }
     };
 };
@@ -781,7 +784,7 @@ public:
             if (a == 1)
             {
                 me->SetInCombatWithZone();
-                if (Unit* target = SelectTarget(SELECT_TARGET_NEAREST, 0, 0.0f, true))
+                if (Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 0.0f, true))
                     AttackStart(target);
             }
         }
@@ -802,7 +805,7 @@ public:
 
         void AttackStart(Unit* who) override
         {
-            if (!me->IsVisible() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (!me->IsVisible() || me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 return;
             ScriptedAI::AttackStart(who);
         }
@@ -847,11 +850,14 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+            {
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetImmuneToAll(false);
+            }
         }
     };
 };
@@ -892,12 +898,12 @@ public:
             npc_phantom_mageAI::UpdateAI(diff);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (numOfUpd)
                 return;
 
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
             if (me->IsSummon())
                 me->ToTempSummon()->DespawnOrUnsummon(1);
         }
@@ -925,7 +931,7 @@ public:
             if (a == 1)
             {
                 me->SetInCombatWithZone();
-                if (Unit* target = SelectTarget(SELECT_TARGET_NEAREST, 0, 0.0f, true))
+                if (Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 0.0f, true))
                     AttackStart(target);
             }
         }
@@ -945,7 +951,7 @@ public:
 
         void AttackStart(Unit* who) override
         {
-            if (!me->IsVisible() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (!me->IsVisible() || me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 return;
             ScriptedAI::AttackStart(who);
         }
@@ -990,11 +996,14 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+            {
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetImmuneToAll(false);
+            }
         }
     };
 };
@@ -1020,7 +1029,7 @@ public:
             if (a == 1)
             {
                 me->SetInCombatWithZone();
-                if (Unit* target = SelectTarget(SELECT_TARGET_NEAREST, 0, 0.0f, true))
+                if (Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 0.0f, true))
                     AttackStart(target);
             }
         }
@@ -1039,7 +1048,7 @@ public:
 
         void AttackStart(Unit* who) override
         {
-            if (!me->IsVisible() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (!me->IsVisible() || me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 return;
             ScriptedAI::AttackStart(who);
         }
@@ -1073,11 +1082,14 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+            {
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetImmuneToAll(false);
+            }
         }
     };
 };
@@ -1103,7 +1115,7 @@ public:
             if (a == 1)
             {
                 me->SetInCombatWithZone();
-                if (Unit* target = SelectTarget(SELECT_TARGET_NEAREST, 0, 0.0f, true))
+                if (Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 0.0f, true))
                     AttackStart(target);
             }
         }
@@ -1122,7 +1134,7 @@ public:
 
         void AttackStart(Unit* who) override
         {
-            if (!me->IsVisible() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (!me->IsVisible() || me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 return;
             ScriptedAI::AttackStart(who);
         }
@@ -1157,11 +1169,14 @@ public:
             DoSpellAttackIfReady(SPELL_SHOOT);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+            {
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetImmuneToAll(false);
+            }
         }
     };
 };
@@ -1202,7 +1217,7 @@ public:
             Position p = me->GetHomePosition();
             if (me->GetExactDist(&p) > 30.0f)
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 return;
             }
 
@@ -1234,10 +1249,10 @@ public:
                 pInstance->SetData(DATA_FROSTSWORN_GENERAL, DONE);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             pInstance->SetData(ACTION_SPIRITUAL_REFLECTIONS_HIDE, 1);
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
     };
 
@@ -1296,10 +1311,10 @@ public:
             me->CastSpell((Unit*)nullptr, SPELL_SPIRIT_BURST, false);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             me->UpdatePosition(me->GetHomePosition(), true);
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
             me->SetVisible(false);
         }
     };
@@ -1460,7 +1475,7 @@ public:
             summons.Despawn(s);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if (target && target->IsAlive() && spell->Id == SPELL_LICH_KING_ZAP_PLAYER)
                 Unit::DealDamage(me, target, 10000);
@@ -1619,7 +1634,7 @@ public:
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32  /*uiAction*/) override
     {
-        if (!creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
+        if (!creature->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
             return true;
 
         ClearGossipMenuFor(player);
@@ -1627,7 +1642,7 @@ public:
         if (InstanceScript* pInstance = creature->GetInstanceScript())
             if (!pInstance->GetData(DATA_LICH_KING))
             {
-                creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                 creature->AI()->DoAction(ACTION_START_LK_FIGHT_REAL);
                 return true;
             }
@@ -1748,7 +1763,7 @@ public:
                 case EVENT_ADD_GOSSIP:
                     me->RemoveAura(me->GetEntry() == NPC_JAINA_PART2 ? SPELL_JAINA_ICE_BARRIER : SPELL_SYLVANAS_CLOAK_OF_DARKNESS);
                     me->SetFacingTo(LeaderEscapePos.GetOrientation());
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     break;
                 case EVENT_START_RUN:
                     {

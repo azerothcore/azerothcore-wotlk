@@ -71,7 +71,7 @@ public:
                 }
                 case EVENT_SHAZZRAH_CURSE:
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true, -SPELL_SHAZZRAH_CURSE))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_SHAZZRAH_CURSE))
                     {
                         DoCast(target, SPELL_SHAZZRAH_CURSE);
                     }
@@ -170,8 +170,8 @@ public:
 
                 if (Creature* creatureCaster = caster->ToCreature())
                 {
-                    creatureCaster->getThreatMgr().resetAllAggro();
-                    creatureCaster->getThreatMgr().addThreat(target, 1);
+                    creatureCaster->GetThreatMgr().ResetAllThreat();
+                    creatureCaster->GetThreatMgr().addThreat(target, 1);
                     creatureCaster->AI()->AttackStart(target); // Attack the target which caster will teleport to.
                 }
             }

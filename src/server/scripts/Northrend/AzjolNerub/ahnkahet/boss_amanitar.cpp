@@ -123,7 +123,7 @@ struct boss_amanitar : public BossAI
         events.ScheduleEvent(EVENT_RESPAWN, 40000, 60000);
     }
 
-    void JustDied(Unit* /*Killer*/) override
+    void JustDied(Unit* /*killer*/) override
     {
         _JustDied();
         instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_MINI);
@@ -140,10 +140,10 @@ struct boss_amanitar : public BossAI
         BossAI::SummonedCreatureDies(summon, killer);
     }
 
-    void EnterEvadeMode() override
+    void EnterEvadeMode(EvadeReason why) override
     {
         instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_MINI);
-        BossAI::EnterEvadeMode();
+        BossAI::EnterEvadeMode(why);
     }
 
     void ExecuteEvent(uint32 eventId) override
@@ -163,7 +163,7 @@ struct boss_amanitar : public BossAI
             }
             case EVENT_ROOTS:
             {
-                if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                if (Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                 {
                     DoCast(pTarget, SPELL_ENTANGLING_ROOTS, false);
                 }
@@ -179,7 +179,7 @@ struct boss_amanitar : public BossAI
             }
             case EVENT_BOLT:
             {
-                if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                if (Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                 {
                     DoCast(pTarget, SPELL_VENOM_BOLT_VOLLEY, false);
                 }
@@ -204,7 +204,7 @@ struct boss_amanitar : public BossAI
                     }
                 }
 
-                if (SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true, -SPELL_MINI))
+                if (SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_MINI))
                 {
                     DoCastSelf(SPELL_REMOVE_MUSHROOM_POWER, true);
                     DoCastAOE(SPELL_MINI);
@@ -237,15 +237,15 @@ struct npc_amanitar_mushrooms : public ScriptedAI
         SetCombatMovement(false);
 
         //TODO: this prolly needs to be done in database
-        pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        pCreature->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        pCreature->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         pCreature->SetRegeneratingHealth(false);
     }
 
     // Disabled events
     void EnterCombat(Unit* /*who*/) override {}
     void AttackStart(Unit* /*victim*/) override {}
-    void EnterEvadeMode() override {}
+    void EnterEvadeMode(EvadeReason /*why*/) override {}
 
     void Reset() override
     {

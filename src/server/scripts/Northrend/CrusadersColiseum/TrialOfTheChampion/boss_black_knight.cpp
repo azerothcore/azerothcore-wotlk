@@ -120,7 +120,8 @@ public:
             summons.DespawnAll();
             Phase = 1;
             me->SetDisplayId(me->GetNativeDisplayId());
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->SetImmuneToAll(true);
             me->SetReactState(REACT_PASSIVE);
             if( pInstance )
                 pInstance->SetData(BOSS_BLACK_KNIGHT, NOT_STARTED);
@@ -128,15 +129,15 @@ public:
             //me->SetLootMode(0); // [LOOT]
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             me->DespawnOrUnsummon(1);
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+            if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
             {
                 damage = 0;
                 return;
@@ -147,16 +148,16 @@ public:
                 damage = 0;
                 me->SetHealth(me->GetMaxHealth());
                 events.Reset();
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->RemoveAllAuras();
                 me->SetControlled(true, UNIT_STATE_STUNNED);
                 me->CastSpell(me, SPELL_BK_GHOUL_EXPLODE, true);
                 summons.clear();
 
                 me->CastSpell(me, SPELL_BK_FEIGN_DEATH, true);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
-                me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
-                me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                me->SetUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
+                me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
+                me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
                 me->AddUnitState(UNIT_STATE_DIED);
             }
         }
@@ -187,18 +188,19 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit*  /*target*/, const SpellInfo* spell) override
+        void SpellHitTarget(Unit*  /*target*/, SpellInfo const* spell) override
         {
             switch( spell->Id )
             {
                 case SPELL_BLACK_KNIGHT_RES:
                     me->SetHealth(me->GetMaxHealth());
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetImmuneToAll(false);
                     me->SetControlled(false, UNIT_STATE_STUNNED);
 
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
-                    me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                    me->RemoveUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
+                    me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
+                    me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
                     me->ClearUnitState(UNIT_STATE_DIED);
 
                     ++Phase;
@@ -225,7 +227,7 @@ public:
                             events.ScheduleEvent(EVENT_SPELL_MARKED_DEATH, 1000);
                             break;
                         default:
-                            EnterEvadeMode();
+                            EnterEvadeMode(EVADE_REASON_OTHER);
                             break;
                     }
                     break;
@@ -263,7 +265,7 @@ public:
                     events.RepeatEvent(urand(5000, 6000));
                     break;
                 case EVENT_SPELL_DEATH_RESPITE:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true) )
                         me->CastSpell(target, SPELL_DEATH_RESPITE, false);
                     events.RepeatEvent(urand(13000, 15000));
                     break;
@@ -273,7 +275,7 @@ public:
                     events.RepeatEvent(urand(15000, 17000));
                     break;
                 case EVENT_SPELL_DESECRATION:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true) )
                         me->CastSpell(target, SPELL_DESECRATION, false);
                     events.RepeatEvent(urand(14000, 17000));
                     break;
@@ -282,7 +284,7 @@ public:
                     events.RepeatEvent(urand(2000, 4000));
                     break;
                 case EVENT_SPELL_MARKED_DEATH:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.000000f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.000000f, true) )
                         me->CastSpell(target, SPELL_MARKED_DEATH, false);
                     events.RepeatEvent(9000);
                     break;
@@ -342,6 +344,8 @@ public:
         {
             Start(false, true, ObjectGuid::Empty, nullptr);
             SetDespawnAtEnd(true);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetImmuneToAll(true);
         }
 
         void DoAction(int32 param) override
@@ -410,23 +414,23 @@ public:
             events.RescheduleEvent(2, urand(3000, 4000)); // claw
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_BK_GHOUL_EXPLODE)
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+                me->RemoveUnitFlag(UNIT_FLAG_STUNNED);
                 me->CastSpell(me, SPELL_EXPLODE, false);
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             switch(spell->Id)
             {
                 case SPELL_CLAW_N:
                 case SPELL_CLAW_H:
                     DoResetThreat();
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f))
                     {
                         me->AddThreat(target, 100.0f);
                         AttackStart(target);

@@ -165,7 +165,7 @@ struct npc_taldaram_flamesphere : public NullCreatureAI
 
                 float angle = me->GetAngle(&victimPos) + angleOffset;
                 float x = me->GetPositionX() + DATA_SPHERE_DISTANCE * cos(angle);
-                float y = me->GetPositionY() + DATA_SPHERE_DISTANCE * sin(angle);
+                float y = me->GetPositionY() + DATA_SPHERE_DISTANCE * std::sin(angle);
                 me->GetMotionMaster()->MovePoint(POINT_ORB, x, y, me->GetPositionZ());
 
                 moveTimer = 0;
@@ -214,7 +214,7 @@ struct boss_taldaram : public BossAI
         // Event not started
         if (instance->GetData(DATA_TELDRAM_SPHERE1) != DONE || instance->GetData(DATA_TELDRAM_SPHERE2) != DONE)
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(true);
             me->SetDisableGravity(true);
             me->SetHover(true);
             if (!me->HasAura(SPELL_BEAM_VISUAL))
@@ -260,7 +260,8 @@ struct boss_taldaram : public BossAI
                 me->SetDisableGravity(false);
                 me->SetHover(false);
                 me->RemoveAllAuras();
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE| UNIT_FLAG_NOT_SELECTABLE);
+                me->SetImmuneToAll(false);
                 me->UpdatePosition(me->GetHomePosition(), true);
             }
             summons.DespawnEntry(NPC_JEDOGA_CONTROLLER);
@@ -274,7 +275,8 @@ struct boss_taldaram : public BossAI
             me->SetDisableGravity(false);
             me->SetHover(false);
             me->RemoveAllAuras();
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE| UNIT_FLAG_NOT_SELECTABLE);
+            me->SetImmuneToAll(false);
         }
     }
 
@@ -328,7 +330,7 @@ struct boss_taldaram : public BossAI
         me->InterruptNonMeleeSpells(true);
     }
 
-    void SpellHitTarget(Unit* /*target*/, const SpellInfo *spellInfo) override
+    void SpellHitTarget(Unit* /*target*/, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_CONJURE_FLAME_SPHERE)
         {
@@ -409,7 +411,7 @@ struct boss_taldaram : public BossAI
                 {
                     //Count alive players
                     uint8 count = 0;
-                    std::list<HostileReference*> const t_list = me->getThreatMgr().getThreatList();
+                    std::list<HostileReference*> const t_list = me->GetThreatMgr().getThreatList();
                     if (!t_list.empty())
                     {
                         for (HostileReference const* reference : t_list)
@@ -430,7 +432,7 @@ struct boss_taldaram : public BossAI
                     {
                         Talk(SAY_VANISH);
                         DoCastSelf(SPELL_VANISH, false);
-                        if (Unit* pEmbraceTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                        if (Unit* pEmbraceTarget = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                         {
                             vanishTarget_GUID = pEmbraceTarget->GetGUID();
                         }
@@ -507,7 +509,7 @@ public:
             return true;
         }
 
-        go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+        go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
         go->SetGoState(GO_STATE_ACTIVE);
 
         uint32 const objectIndex = go->GetEntry() == GO_TELDARAM_SPHERE1 ? DATA_TELDRAM_SPHERE1 : DATA_TELDRAM_SPHERE2;

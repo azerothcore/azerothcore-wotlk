@@ -100,7 +100,7 @@ class spell_pal_seal_of_command_aura : public AuraScript
             return false;
         }
 
-        if (const SpellInfo* procSpell = eventInfo.GetSpellInfo())
+        if (SpellInfo const* procSpell = eventInfo.GetSpellInfo())
         {
             if (procSpell->SpellIconID == 3025) // Righteous Vengeance, should not proc SoC
             {
@@ -115,7 +115,7 @@ class spell_pal_seal_of_command_aura : public AuraScript
     {
         PreventDefaultAction();
         int32 targets = 3;
-        if (const SpellInfo* procSpell = eventInfo.GetSpellInfo())
+        if (SpellInfo const* procSpell = eventInfo.GetSpellInfo())
         {
             if (procSpell->IsAffectingArea())
             {
@@ -146,7 +146,7 @@ class spell_pal_seal_of_command : public SpellScript
 
     void FilterTargets(std::list<WorldObject*>& targets)
     {
-        if (const SpellValue* spellValue = GetSpellValue())
+        if (SpellValue const* spellValue = GetSpellValue())
             if (spellValue->MaxAffectedTargets == 1)
                 targets.clear();
     }
@@ -198,7 +198,7 @@ class spell_pal_sacred_shield_base : public AuraScript
     {
         if (Unit* caster = GetCaster())
         {
-            const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell);
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell);
             amount = spellInfo->Effects[EFFECT_0].CalcValue();
 
             // +75.00% from sp bonus
@@ -220,7 +220,9 @@ class spell_pal_sacred_shield_base : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        return !(eventInfo.GetHitMask() & PROC_EX_INTERNAL_HOT) && eventInfo.GetDamageInfo() && eventInfo.GetDamageInfo()->GetDamage() > 0;
+        HealInfo* healinfo = eventInfo.GetHealInfo();
+        DamageInfo* damageinfo = eventInfo.GetDamageInfo();
+        return !(eventInfo.GetHitMask() & PROC_EX_INTERNAL_HOT) && ((healinfo && healinfo->GetHeal() > 0) || (damageinfo && damageinfo->GetDamage() > 0));
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
@@ -231,14 +233,14 @@ class spell_pal_sacred_shield_base : public AuraScript
         {
             Unit* caster = eventInfo.GetActor();
 
-            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            HealInfo* healinfo = eventInfo.GetHealInfo();
 
-            if (!damageInfo || !damageInfo->GetDamage())
+            if (!healinfo || !healinfo->GetHeal())
             {
                 return;
             }
 
-            const SpellInfo* procSpell = damageInfo->GetSpellInfo();
+            SpellInfo const* procSpell = healinfo->GetSpellInfo();
             if (!procSpell)
             {
                 return;
@@ -247,12 +249,12 @@ class spell_pal_sacred_shield_base : public AuraScript
             if (caster && procSpell->SpellFamilyName == SPELLFAMILY_PALADIN &&
                     procSpell->SpellFamilyFlags.HasFlag(0x40000000) && caster->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_PALADIN, 3021, 0)) // need infusion of light
             {
-                int32 basepoints = int32(float(damageInfo->GetDamage()) / 12.0f);
+                int32 basepoints = int32(float(healinfo->GetHeal()) / 12.0f);
                 // Item - Paladin T9 Holy 4P Bonus (Flash of Light)
                 if (AuraEffect const* aurEffect = caster->GetAuraEffect(67191, EFFECT_0))
                     AddPct(basepoints, aurEffect->GetAmount());
 
-                caster->CastCustomSpell(eventInfo.GetActionTarget(), 66922, &basepoints, nullptr, nullptr, true, 0, aurEff, caster->GetGUID());
+                caster->CastCustomSpell(eventInfo.GetActionTarget(), 66922, &basepoints, nullptr, nullptr, true, nullptr, aurEff, caster->GetGUID());
                 return;
             }
 

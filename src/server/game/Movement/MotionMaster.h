@@ -98,9 +98,9 @@ struct ChaseAngle
     float RelativeAngle; // we want to be at this angle relative to the target (0 = front, M_PI = back)
     float Tolerance;     // but we'll tolerate anything within +- this much
 
-    float UpperBound() const;
-    float LowerBound() const;
-    bool IsAngleOkay(float relativeAngle) const;
+    [[nodiscard]] float UpperBound() const;
+    [[nodiscard]] float LowerBound() const;
+    [[nodiscard]] bool IsAngleOkay(float relativeAngle) const;
 };
 
 // assume it is 25 yard per 0.6 second
@@ -219,6 +219,7 @@ public:
     void MoveTakeoff(uint32 id, float x, float y, float z, float speed = 0.0f); // pussywizard: added for easy calling by passing 3 floats x, y, z
 
     void MoveCharge(float x, float y, float z, float speed = SPEED_CHARGE, uint32 id = EVENT_CHARGE, const Movement::PointsArray* path = nullptr, bool generatePath = false, float orientation = 0.0f, ObjectGuid targetGUID = ObjectGuid::Empty);
+    void MoveCharge(PathGenerator const& path, float speed = SPEED_CHARGE, ObjectGuid targetGUID = ObjectGuid::Empty);
     void MoveKnockbackFrom(float srcX, float srcY, float speedXY, float speedZ);
     void MoveJumpTo(float angle, float speedXY, float speedZ);
     void MoveJump(Position const& pos, float speedXY, float speedZ, uint32 id = 0)

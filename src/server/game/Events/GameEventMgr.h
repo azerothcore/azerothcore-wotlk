@@ -22,17 +22,18 @@
 #include "ObjectGuid.h"
 #include "SharedDefines.h"
 #include <map>
+#include <unordered_map>
 
-#define max_ge_check_delay DAY  // 1 day in seconds
+#define max_ge_check_delay DAY          // 1 day in seconds
 
 enum GameEventState
 {
-    GAMEEVENT_NORMAL = 0,   // standard game events
-    GAMEEVENT_WORLD_INACTIVE = 1,   // not yet started
-    GAMEEVENT_WORLD_CONDITIONS = 2,  // condition matching phase
-    GAMEEVENT_WORLD_NEXTPHASE = 3,   // conditions are met, now 'length' timer to start next event
-    GAMEEVENT_WORLD_FINISHED = 4,    // next events are started, unapply this one
-    GAMEEVENT_INTERNAL = 5, // never handled in update
+    GAMEEVENT_NORMAL            = 0,    // standard game events
+    GAMEEVENT_WORLD_INACTIVE    = 1,    // not yet started
+    GAMEEVENT_WORLD_CONDITIONS  = 2,    // condition matching phase
+    GAMEEVENT_WORLD_NEXTPHASE   = 3,    // conditions are met, now 'length' timer to start next event
+    GAMEEVENT_WORLD_FINISHED    = 4,    // next events are started, unapply this one
+    GAMEEVENT_INTERNAL          = 5,    // never handled in update
 };
 
 struct GameEventFinishCondition
@@ -54,7 +55,7 @@ typedef std::map<uint32 /*condition id*/, GameEventFinishCondition> GameEventCon
 
 struct GameEventData
 {
-    GameEventData()  { }
+    GameEventData()  = default;
     uint32 eventId;
     time_t start{1};           // occurs after this time
     time_t end{0};             // occurs before this time
@@ -82,10 +83,10 @@ struct ModelEquip
 
 struct NPCVendorEntry
 {
-    uint32 entry;                                           // creature entry
-    uint32 item;                                            // item id
-    int32  maxcount;                                        // 0 for infinite
-    uint32 incrtime;                                        // time for restore items amount if maxcount != 0
+    uint32 entry;                       // creature entry
+    uint32 item;                        // item id
+    int32  maxcount;                    // 0 for infinite
+    uint32 incrtime;                    // time for restore items amount if maxcount != 0
     uint32 ExtendedCost;
 };
 
@@ -161,6 +162,7 @@ private:
     typedef std::list<GuidNPCFlagPair> NPCFlagList;
     typedef std::vector<NPCFlagList> GameEventNPCFlagMap;
     typedef std::vector<uint32> GameEventBitmask;
+    typedef std::unordered_map<uint32, std::vector<uint32>> GameEventSeasonalQuestsMap;
     GameEventQuestMap mGameEventCreatureQuests;
     GameEventQuestMap mGameEventGameObjectQuests;
     GameEventNPCVendorMap mGameEventVendors;
@@ -174,6 +176,7 @@ private:
     GameEventNPCFlagMap mGameEventNPCFlags;
     ActiveEvents m_ActiveEvents;
     bool isSystemInit;
+    GameEventSeasonalQuestsMap _gameEventSeasonalQuestsMap;
 public:
     GameEventGuidMap  mGameEventCreatureGuids;
     GameEventGuidMap  mGameEventGameobjectGuids;

@@ -66,6 +66,16 @@ public:
                     {
                         player->KilledMonsterCredit(NPC_EXPEDITION_RESEARCHER);
                     }
+                    else if (killer->IsPet())
+                    {
+                        if (Unit* owner = killer->GetOwner())
+                        {
+                            if (owner->GetTypeId() == TYPEID_PLAYER)
+                            {
+                                owner->ToPlayer()->KilledMonsterCredit(NPC_EXPEDITION_RESEARCHER);
+                            }
+                        }
+                    }
                     spawnCreatureID = NPC_EXPEDITION_RESEARCHER;
                     break;
                 case 1:

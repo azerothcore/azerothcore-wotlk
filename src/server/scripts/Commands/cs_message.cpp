@@ -23,7 +23,6 @@ Category: commandscripts
 EndScriptData */
 
 #include "Channel.h"
-#include "ChannelMgr.h"
 #include "Chat.h"
 #include "DBCStores.h"
 #include "DatabaseEnv.h"

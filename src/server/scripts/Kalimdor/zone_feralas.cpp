@@ -98,8 +98,8 @@ public:
 
         void InitializeAI() override
         {
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
+            me->SetImmuneToAll(true);
             me->RestoreFaction();
 
             _events.Reset();
@@ -149,9 +149,9 @@ public:
             _events.ScheduleEvent(EVENT_FINAL_TALK, 5 * IN_MILLISECONDS);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            _EnterEvadeMode();
+            _EnterEvadeMode(why);
 
             if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
             {
@@ -202,8 +202,8 @@ public:
 
                 Talk(TALK_0, player);
 
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
+                me->SetImmuneToAll(false);
                 me->SetFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
                 me->GetMotionMaster()->MoveFollow(player, 3.f, M_PI);
 

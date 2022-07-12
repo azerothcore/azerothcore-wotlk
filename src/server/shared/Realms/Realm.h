@@ -36,10 +36,10 @@ enum RealmFlags
 
 struct AC_SHARED_API RealmHandle
 {
-    RealmHandle() : Realm(0) { }
+    RealmHandle()  = default;
     RealmHandle(uint32 index) : Realm(index) { }
 
-    uint32 Realm;   // primary key in `realmlist` table
+    uint32 Realm{0};   // primary key in `realmlist` table
 
     bool operator<(RealmHandle const& r) const
     {
@@ -78,7 +78,7 @@ struct AC_SHARED_API Realm
     AccountTypes AllowedSecurityLevel;
     float PopulationLevel;
 
-    boost::asio::ip::tcp_endpoint GetAddressForClient(boost::asio::ip::address const& clientAddr) const;
+    [[nodiscard]] boost::asio::ip::tcp_endpoint GetAddressForClient(boost::asio::ip::address const& clientAddr) const;
 };
 
 #endif // Realm_h__

@@ -21,6 +21,7 @@
 #include "CombatAI.h"
 #include "GameGraveyard.h"
 #include "GameObjectAI.h"
+#include "GameTime.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "PoolMgr.h"
@@ -31,11 +32,6 @@
 #include "Vehicle.h"
 #include "World.h"
 
-#define GOSSIP_HELLO_DEMO1  "Build catapult."
-#define GOSSIP_HELLO_DEMO2  "Build demolisher."
-#define GOSSIP_HELLO_DEMO3  "Build siege engine."
-#define GOSSIP_HELLO_DEMO4  "I cannot build more!"
-
 enum eWGqueuenpctext
 {
     WG_NPCQUEUE_TEXT_H_NOWAR            = 14775,
@@ -45,6 +41,8 @@ enum eWGqueuenpctext
     WG_NPCQUEUE_TEXT_A_QUEUE            = 14791,
     WG_NPCQUEUE_TEXT_A_WAR              = 14781,
     WG_NPCQUEUE_TEXTOPTION_JOIN         = -1850507,
+
+    WG_GOSSIP_MENU_QUEUE                = 10662,
 };
 
 enum Spells
@@ -133,21 +131,20 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (canBuild(creature))
         {
-            if (player->HasAura(SPELL_CORPORAL))
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-            else if (player->HasAura(SPELL_LIEUTENANT))
-            {
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-            }
+            player->PrepareQuestMenu(creature->GetGUID());
         }
-        else
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
+
+        if (player->HasAura(SPELL_CORPORAL))
+        {
+            AddGossipItemFor(player, 9923, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+        }
+        else if (player->HasAura(SPELL_LIEUTENANT))
+        {
+            AddGossipItemFor(player, 9923, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+            AddGossipItemFor(player, 9923, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, 9923, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+        }
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         return true;
@@ -157,21 +154,33 @@ public:
     {
         CloseGossipMenuFor(player);
 
+        uint32 spellId = 0;
+        switch (action - GOSSIP_ACTION_INFO_DEF)
+        {
+        case 0:
+            spellId = SPELL_BUILD_CATAPULT_FORCE;
+            break;
+        case 1:
+            spellId = SPELL_BUILD_DEMOLISHER_FORCE;
+            break;
+        case 2:
+            spellId = player->GetTeamId() == TEAM_ALLIANCE ? SPELL_BUILD_SIEGE_VEHICLE_FORCE_ALLIANCE : SPELL_BUILD_SIEGE_VEHICLE_FORCE_HORDE;
+            break;
+        }
+
         if (canBuild(creature))
         {
-            switch (action - GOSSIP_ACTION_INFO_DEF)
-            {
-                case 0:
-                    creature->CastSpell(player, SPELL_BUILD_CATAPULT_FORCE, true);
-                    break;
-                case 1:
-                    creature->CastSpell(player, SPELL_BUILD_DEMOLISHER_FORCE, true);
-                    break;
-                case 2:
-                    creature->CastSpell(player, player->GetTeamId() == TEAM_ALLIANCE ? SPELL_BUILD_SIEGE_VEHICLE_FORCE_ALLIANCE : SPELL_BUILD_SIEGE_VEHICLE_FORCE_HORDE, true);
-                    break;
-            }
+            creature->CastSpell(player, spellId, true);
             creature->CastSpell(creature, SPELL_ACTIVATE_CONTROL_ARMS, true);
+        }
+        else
+        {
+            WorldPacket data(SMSG_CAST_FAILED, 1 + 4 + 1 + 4);
+            data << uint8(0);
+            data << spellId;
+            data << uint8(SPELL_FAILED_CUSTOM_ERROR);
+            data << uint32(SPELL_CUSTOM_ERROR_CANT_BUILD_MORE_VEHICLES);
+            player->GetSession()->SendPacket(&data);
         }
         return true;
     }
@@ -288,16 +297,16 @@ public:
 
         if (wintergrasp->IsWarTime())
         {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT_19, "Queue for Wintergrasp.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+            AddGossipItemFor(player, WG_GOSSIP_MENU_QUEUE, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
             SendGossipMenuFor(player, wintergrasp->GetDefenderTeam() ? WG_NPCQUEUE_TEXT_H_WAR : WG_NPCQUEUE_TEXT_A_WAR, creature->GetGUID());
         }
         else
         {
             uint32 timer = wintergrasp->GetTimer() / 1000;
-            player->SendUpdateWorldState(4354, time(nullptr) + timer);
+            player->SendUpdateWorldState(4354, GameTime::GetGameTime().count() + timer);
             if (timer < 15 * MINUTE)
             {
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Queue for Wintergrasp.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+                AddGossipItemFor(player, WG_GOSSIP_MENU_QUEUE, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
                 SendGossipMenuFor(player, wintergrasp->GetDefenderTeam() ? WG_NPCQUEUE_TEXT_H_QUEUE : WG_NPCQUEUE_TEXT_A_QUEUE, creature->GetGUID());
             }
             else
@@ -396,11 +405,20 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (creature->IsQuestGiver())
+        {
             player->PrepareQuestMenu(creature->GetGUID());
+        }
+
+        if (creature->IsVendor())
+        {
+            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+        }
 
         Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
         if (!wintergrasp)
+        {
             return true;
+        }
 
         if (creature->IsQuestGiver())
         {
@@ -576,6 +594,8 @@ public:
         QuestRelationBounds qir = sObjectMgr->GetCreatureQuestInvolvedRelationBounds(creature->GetEntry());
         QuestGiverStatus result = DIALOG_STATUS_NONE;
 
+        Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
+
         for (QuestRelations::const_iterator i = qir.first; i != qir.second; ++i)
         {
             QuestGiverStatus result2 = DIALOG_STATUS_NONE;
@@ -652,6 +672,73 @@ public:
                     break;
             }
 
+            if (wintergrasp)
+            {
+                // Certain quests are only available when attacking / defending
+                bool hasCorrectZoneControl = false;
+                switch (questId)
+                {
+                    // Horde attacker
+                    case QUEST_BONES_AND_ARROWS_HORDE_ATT:
+                    case QUEST_JINXING_THE_WALLS_HORDE_ATT:
+                    case QUEST_SLAY_THEM_ALL_HORDE_ATT:
+                    case QUEST_FUELING_THE_DEMOLISHERS_HORDE_ATT:
+                    case QUEST_HEALING_WITH_ROSES_HORDE_ATT:
+                    case QUEST_DEFEND_THE_SIEGE_HORDE_ATT:
+                        if (wintergrasp->GetAttackerTeam() == TEAM_HORDE)
+                        {
+                            hasCorrectZoneControl = true;
+                        }
+                        break;
+                    // Horde defender
+                    case QUEST_BONES_AND_ARROWS_HORDE_DEF:
+                    case QUEST_WARDING_THE_WALLS_HORDE_DEF:
+                    case QUEST_SLAY_THEM_ALL_HORDE_DEF:
+                    case QUEST_FUELING_THE_DEMOLISHERS_HORDE_DEF:
+                    case QUEST_HEALING_WITH_ROSES_HORDE_DEF:
+                    case QUEST_TOPPLING_THE_TOWERS_HORDE_DEF:
+                    case QUEST_STOP_THE_SIEGE_HORDE_DEF:
+                        if (wintergrasp->GetDefenderTeam() == TEAM_HORDE)
+                        {
+                            hasCorrectZoneControl = true;
+                        }
+                        break;
+                    // Alliance attacker
+                    case QUEST_BONES_AND_ARROWS_ALLIANCE_ATT:
+                    case QUEST_WARDING_THE_WARRIORS_ALLIANCE_ATT:
+                    case QUEST_NO_MERCY_FOR_THE_MERCILESS_ALLIANCE_ATT:
+                    case QUEST_DEFEND_THE_SIEGE_ALLIANCE_ATT:
+                    case QUEST_A_RARE_HERB_ALLIANCE_ATT:
+                    case QUEST_FUELING_THE_DEMOLISHERS_ALLIANCE_ATT:
+                        if (wintergrasp->GetAttackerTeam() == TEAM_ALLIANCE)
+                        {
+                            hasCorrectZoneControl = true;
+                        }
+                        break;
+                    // Alliance defender
+                    case QUEST_BONES_AND_ARROWS_ALLIANCE_DEF:
+                    case QUEST_WARDING_THE_WARRIORS_ALLIANCE_DEF:
+                    case QUEST_NO_MERCY_FOR_THE_MERCILESS_ALLIANCE_DEF:
+                    case QUEST_SHOUTHERN_SABOTAGE_ALLIANCE_DEF:
+                    case QUEST_STOP_THE_SIEGE_ALLIANCE_DEF:
+                    case QUEST_A_RARE_HERB_ALLIANCE_DEF:
+                    case QUEST_FUELING_THE_DEMOLISHERS_ALLIANCE_DEF:
+                        if (wintergrasp->GetDefenderTeam() == TEAM_ALLIANCE)
+                        {
+                            hasCorrectZoneControl = true;
+                        }
+                        break;
+                    default:
+                        hasCorrectZoneControl = true;
+                        break;
+                }
+
+                if (!hasCorrectZoneControl)
+                {
+                    continue;
+                }
+            }
+
             QuestStatus status = player->GetQuestStatus(questId);
             if (status == QUEST_STATUS_NONE)
             {
@@ -681,6 +768,19 @@ public:
         }
 
         return result;
+    }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
+    {
+        ClearGossipMenuFor(player);
+        switch (action)
+        {
+            case GOSSIP_ACTION_TRADE:
+                player->GetSession()->SendListInventory(creature->GetGUID());
+                break;
+        }
+
+        return true;
     }
 };
 
@@ -856,16 +956,30 @@ public:
         {
             PreventHitEffect(effIndex);
 
-            uint32 entry = GetSpellInfo()->Effects[effIndex].MiscValue;
-            SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(GetSpellInfo()->Effects[effIndex].MiscValueB);
-            int32 duration = GetSpellInfo()->GetDuration();
-            if (!GetOriginalCaster() || !properties)
-                return;
-
-            if (TempSummon* summon = GetCaster()->GetMap()->SummonCreature(entry, *GetHitDest(), properties, duration, GetOriginalCaster(), GetSpellInfo()->Id))
+            if (Unit* caster = GetCaster())
             {
-                summon->SetCreatorGUID(GetOriginalCaster()->GetGUID());
-                summon->HandleSpellClick(GetCaster());
+                Unit* originalCaster = GetOriginalCaster();
+                if (!originalCaster)
+                {
+                    return;
+                }
+
+                SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(GetSpellInfo()->Effects[effIndex].MiscValueB);
+                if (!properties)
+                {
+                    return;
+                }
+
+                uint32 entry = GetSpellInfo()->Effects[effIndex].MiscValue;
+                int32 duration = GetSpellInfo()->GetDuration();
+                if (TempSummon* summon = caster->GetMap()->SummonCreature(entry, *GetHitDest(), properties, duration, originalCaster, GetSpellInfo()->Id))
+                {
+                    if (summon->IsInMap(caster))
+                    {
+                        summon->SetCreatorGUID(originalCaster->GetGUID());
+                        summon->HandleSpellClick(caster);
+                    }
+                }
             }
         }
 

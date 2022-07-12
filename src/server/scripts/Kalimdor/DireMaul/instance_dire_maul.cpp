@@ -22,7 +22,7 @@
 class instance_dire_maul : public InstanceMapScript
 {
 public:
-    instance_dire_maul() : InstanceMapScript("instance_dire_maul", 429) { }
+    instance_dire_maul() : InstanceMapScript(DMScriptName, 429) { }
 
     struct instance_dire_maul_InstanceMapScript : public InstanceScript
     {
@@ -46,11 +46,11 @@ public:
                     _immoltharGUID = creature->GetGUID();
                     if (_pylonsState == ALL_PYLONS_OFF)
                     {
-                        creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        creature->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     }
                     else
                     {
-                        creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        creature->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     }
                     break;
                 case NPC_HIGHBORNE_SUMMONER:
@@ -60,7 +60,7 @@ public:
                     }
                     else
                     {
-                        creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        creature->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     }
                     HighborneSummoners.push_back(creature->GetGUID());
                     break;
@@ -116,13 +116,13 @@ public:
                         {
                             immol->setActive(true);
                             immol->GetAI()->SetData(1, 1);
-                            immol->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            immol->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                         }
                         for (const auto& guid : HighborneSummoners)
                         {
                             if (Creature* summoner = instance->GetCreature(guid))
                             {
-                                summoner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                summoner->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             }
                         }
                     }

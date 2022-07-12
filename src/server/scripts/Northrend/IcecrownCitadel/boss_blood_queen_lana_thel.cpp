@@ -172,7 +172,7 @@ public:
         {
             if (!instance->CheckRequiredBosses(DATA_BLOOD_QUEEN_LANA_THEL, who->ToPlayer()) || !me->IsVisible())
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 instance->DoCastSpellOnPlayers(LIGHT_S_HAMMER_TELEPORT);
                 return;
             }
@@ -311,7 +311,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim() || !CheckInRoom())
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
@@ -335,7 +335,7 @@ public:
                             if (Player* p = itr->GetSource())
                                 if (p->IsAlive() && p != me->GetVictim() && p->GetGUID() != _offtankGUID && !p->IsGameMaster() && p->GetDistance(me) < 70.0f)
                                 {
-                                    float th = me->getThreatMgr().getThreatWithoutTemp(p);
+                                    float th = me->GetThreatMgr().getThreatWithoutTemp(p);
                                     if (!target || th > maxThreat)
                                     {
                                         target = p;
@@ -552,7 +552,7 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             const Map::PlayerList& pl = me->GetMap()->GetPlayers();
             for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
@@ -564,7 +564,7 @@ public:
             {
                 if (!me->IsAlive())
                     return;
-                _EnterEvadeMode();
+                _EnterEvadeMode(why);
                 Reset();
                 GoToMinchar();
                 return;
@@ -573,7 +573,7 @@ public:
             BossAI::EnterEvadeMode();
         }
 
-        bool CanAIAttack(const Unit*  /*target*/) const override
+        bool CanAIAttack(Unit const*  /*target*/) const override
         {
             return me->IsVisible();
         }

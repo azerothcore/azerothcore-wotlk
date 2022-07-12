@@ -20,6 +20,12 @@
 #include "ScriptedCreature.h"
 #include "forge_of_souls.h"
 
+BossBoundaryData const boundaries =
+{
+    { DATA_BRONJAHM,    new CircleBoundary(Position(5297.3f, 2506.45f), 100.96)                                                                                   },
+    { DATA_DEVOURER,    new ParallelogramBoundary(Position(5663.56f, 2570.53f), Position(5724.39f, 2520.45f), Position(5570.36f, 2461.42f)) }
+};
+
 class instance_forge_of_souls : public InstanceMapScript
 {
 public:
@@ -32,7 +38,10 @@ public:
 
     struct instance_forge_of_souls_InstanceScript : public InstanceScript
     {
-        instance_forge_of_souls_InstanceScript(Map* map) : InstanceScript(map) {}
+        instance_forge_of_souls_InstanceScript(Map* map) : InstanceScript(map)
+        {
+            LoadBossBoundaries(boundaries);
+        }
 
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         TeamId teamIdInInstance;
@@ -74,7 +83,7 @@ public:
             if (teamIdInInstance == TEAM_NEUTRAL)
             {
                 Map::PlayerList const& players = instance->GetPlayers();
-                if (!players.isEmpty())
+                if (!players.IsEmpty())
                     if (Player* player = players.begin()->GetSource())
                         teamIdInInstance = player->GetTeamId();
             }
@@ -130,7 +139,7 @@ public:
                     if (Creature* boss = instance->GetCreature(NPC_DevourerGUID))
                     {
                         float angle = boss->GetAngle(leader);
-                        leader->GetMotionMaster()->MovePoint(1, boss->GetPositionX() + 10.0f * cos(angle), boss->GetPositionY() + 10.0f * sin(angle), boss->GetPositionZ());
+                        leader->GetMotionMaster()->MovePoint(1, boss->GetPositionX() + 10.0f * cos(angle), boss->GetPositionY() + 10.0f * std::sin(angle), boss->GetPositionZ());
                     }
 
             for (int8 i = 0; outroPositions[i].entry[teamIdInInstance] != 0; ++i)

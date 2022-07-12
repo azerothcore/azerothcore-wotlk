@@ -156,7 +156,7 @@ public:
             OrbGUID.Clear();
             Counter = 0;
             me->CastSpell(me, SPELL_FREEZE, true);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
             me->SetControlled(false, UNIT_STATE_STUNNED);
 
             if (m_pInstance)
@@ -166,7 +166,7 @@ public:
                 // Reset statue
                 if (GameObject* statisGenerator = m_pInstance->instance->GetGameObject(m_pInstance->GetGuidData(STATIS_GENERATOR)))
                 {
-                    statisGenerator->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                    statisGenerator->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     statisGenerator->SetGoState(GO_STATE_READY);
                 }
 
@@ -218,7 +218,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+            if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                 return;
 
             ScriptedAI::MoveInLineOfSight(who);
@@ -283,7 +283,7 @@ public:
                             orb->RemoveAurasDueToSpell(SPELL_AWAKEN_SUBBOSS);
 
                         me->RemoveAurasDueToSpell(SPELL_FREEZE);
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                         me->SetControlled(false, UNIT_STATE_STUNNED);
                         // SETINCOMBATWITHZONE
 
@@ -301,7 +301,7 @@ public:
                     }
                 case EVENT_PALEHOOF_IMPALE:
                     {
-                        if (Unit* tgt = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* tgt = SelectTarget(SelectTargetMethod::Random, 0))
                             me->CastSpell(tgt, IsHeroic() ? SPELL_IMPALE_H : SPELL_IMPALE_N, false);
 
                         events.RepeatEvent(8000 + rand() % 4000);
@@ -364,7 +364,7 @@ public:
         {
             summons.DespawnAll();
             events.Reset();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void EnterCombat(Unit*) override {}
@@ -373,12 +373,12 @@ public:
         {
             if (param == ACTION_UNFREEZE)
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             }
             else if (param == ACTION_UNFREEZE2)
             {
                 me->RemoveAurasDueToSpell(SPELL_FREEZE);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetInCombatWithZone();
 
                 events.ScheduleEvent(EVENT_JORMUNGAR_ACID_SPIT, 3000);
@@ -391,7 +391,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 return;
 
             ScriptedAI::MoveInLineOfSight(who);
@@ -415,7 +415,7 @@ public:
             {
                 case EVENT_JORMUNGAR_ACID_SPIT:
                     {
-                        if (Unit* tgt = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* tgt = SelectTarget(SelectTargetMethod::Random, 0))
                             me->CastSpell(tgt, SPELL_ACID_SPIT, false);
 
                         events.RepeatEvent(2000 + rand() % 2000);
@@ -441,7 +441,7 @@ public:
                     }
                 case EVENT_JORMUNGAR_POISON_BREATH:
                     {
-                        if (Unit* tgt = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* tgt = SelectTarget(SelectTargetMethod::Random, 0))
                             me->CastSpell(tgt, IsHeroic() ? SPELL_POISON_BREATH_H : SPELL_POISON_BREATH_N, false);
 
                         events.RepeatEvent(8000 + rand() % 4000);
@@ -490,7 +490,7 @@ public:
         void Reset() override
         {
             events.Reset();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void EnterCombat(Unit*) override {}
@@ -499,12 +499,12 @@ public:
         {
             if (param == ACTION_UNFREEZE)
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             }
             else if (param == ACTION_UNFREEZE2)
             {
                 me->RemoveAurasDueToSpell(SPELL_FREEZE);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetInCombatWithZone();
 
                 events.ScheduleEvent(EVENT_RHINO_STOMP, 3000);
@@ -515,7 +515,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 return;
 
             ScriptedAI::MoveInLineOfSight(who);
@@ -551,7 +551,7 @@ public:
                     }
                 case EVENT_RHINO_WOUND:
                     {
-                        if (Unit* tgt = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* tgt = SelectTarget(SelectTargetMethod::Random, 0))
                             me->CastSpell(tgt, IsHeroic() ? SPELL_GRIEVOUS_WOUND_H : SPELL_GRIEVOUS_WOUND_N, false);
 
                         events.RepeatEvent(18000 + rand() % 4000);
@@ -600,7 +600,7 @@ public:
         void Reset() override
         {
             events.Reset();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void EnterCombat(Unit*) override {}
@@ -609,12 +609,12 @@ public:
         {
             if (param == ACTION_UNFREEZE)
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             }
             else if (param == ACTION_UNFREEZE2)
             {
                 me->RemoveAurasDueToSpell(SPELL_FREEZE);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetInCombatWithZone();
 
                 events.ScheduleEvent(EVENT_FURBOLG_CHAIN, 3000);
@@ -625,7 +625,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 return;
 
             ScriptedAI::MoveInLineOfSight(who);
@@ -708,7 +708,7 @@ public:
         void Reset() override
         {
             events.Reset();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void EnterCombat(Unit*) override {}
@@ -717,12 +717,12 @@ public:
         {
             if (param == ACTION_UNFREEZE)
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             }
             else if (param == ACTION_UNFREEZE2)
             {
                 me->RemoveAurasDueToSpell(SPELL_FREEZE);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetInCombatWithZone();
 
                 events.ScheduleEvent(EVENT_WORGEN_MORTAL, 3000);
@@ -733,7 +733,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+            if (me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 return;
 
             ScriptedAI::MoveInLineOfSight(who);
@@ -802,7 +802,7 @@ public:
         if (pPalehoof && pPalehoof->IsAlive())
         {
             // maybe these are hacks :(
-            go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+            go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
             go->SetGoState(GO_STATE_ACTIVE);
 
             pPalehoof->AI()->DoAction(ACTION_START_EVENT);

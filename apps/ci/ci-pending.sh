@@ -22,12 +22,14 @@ for i in `find data/sql/updates/pending* -name "*.sql" -type f`; do
     fi
 done
 
-for i in `find data/sql/updates/pending* -name "*.sql" -type f`; do
-    if $(cat "$i"|sed "s/'.*'\(.*\)/\1/g"|grep -q -i -E "version_db_"); then
-        echo "> version_db check - OK"
-    else
-        echo "> version_db check - Failed"
+for i in `find data/sql/updates/pending* -name "*sql" -type f`; do
+    if $(cat "$i"|sed "s/'.*'\(.*\)/\1/g"|grep -q -i -E "broadcast_text"); then
+        echo "> broadcast_text check - Failed"
+        echo "    - DON'T EDIT broadcast_text TABLE UNLESS YOU KNOW WHAT YOU ARE DOING!"
+        echo "    - This error can safely be ignored if the changes are approved to be sniffed."
         exit 1
+    else
+        echo "> broadcast_text check - OK"
     fi
 done
 

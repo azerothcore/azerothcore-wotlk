@@ -164,7 +164,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_ARCING_SMASH, 15000);
                     break;
                 case EVENT_SPELL_FEL_GEYSER:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 40.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 40.0f, true))
                     {
                         me->RemoveAurasByType(SPELL_AURA_MOD_TAUNT);
                         me->CastSpell(me, SPELL_FEL_RAGE_SELF, true);
@@ -188,7 +188,6 @@ public:
             }
 
             DoMeleeAttackIfReady();
-            EnterEvadeIfOutOfCombatArea();
         }
 
         bool CheckEvadeIfOutOfCombatArea() const override
@@ -246,7 +245,7 @@ public:
         {
             PreventHitEffect(effIndex);
             if (Unit* target = GetHitUnit())
-                GetCaster()->getThreatMgr().modifyThreatPercent(target, -20);
+                GetCaster()->GetThreatMgr().modifyThreatPercent(target, -20);
         }
 
         void Register() override

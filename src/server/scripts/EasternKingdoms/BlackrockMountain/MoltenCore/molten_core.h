@@ -109,6 +109,7 @@ enum MCGameObjects
     // Ragnaros event related
     GO_LAVA_STEAM                   = 178107,
     GO_LAVA_SPLASH                  = 178108,
+    GO_LAVA_BURST                   = 178088,
 };
 
 enum MCSpells

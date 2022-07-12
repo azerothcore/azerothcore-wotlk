@@ -123,12 +123,12 @@ public:
         {
             if (remove)
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->RemoveAurasDueToSpell(SPELL_FROZEN_PRISON);
             }
             else
             {
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->CastSpell(me, SPELL_FROZEN_PRISON, true);
             }
         }
@@ -181,7 +181,7 @@ public:
                     Talk(SAY_CRYSTAL_NOVA);
                     if (IsHeroic())
                         me->CastSpell(me, SPELL_CRYSTALIZE, false);
-                    else if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
+                    else if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
                         me->CastSpell(target, SPELL_CRYSTAL_CHAINS, false);
                     events.ScheduleEvent(EVENT_CRYSTAL_CHAINS, DUNGEON_MODE(20000, 11000));
                     break;

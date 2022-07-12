@@ -36,16 +36,14 @@ npc_locksmith            75%    list of keys needs to be confirmed
 npc_firework            100%    NPC's summoned by rockets and rocket clusters, for making them cast visual
 EndContentData */
 
-#include "Cell.h"
 #include "CellImpl.h"
 #include "Chat.h"
 #include "CombatAI.h"
 #include "CreatureTextMgr.h"
 #include "DBCStructure.h"
 #include "GameEventMgr.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
-#include "Group.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Pet.h"
@@ -57,6 +55,12 @@ EndContentData */
 #include "SpellAuras.h"
 #include "WaypointMgr.h"
 #include "World.h"
+
+// TODO: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+//  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
+#include "GridNotifiersImpl.h"
 
 enum elderClearwater
 {
@@ -116,9 +120,7 @@ public:
             {
                 case EVENT_CLEARWATER_ANNOUNCE:
                     {
-                        time_t curtime = time(nullptr);
-                        tm strdate;
-                        localtime_r(&curtime, &strdate);
+                        tm strdate = Acore::Time::TimeBreakdown();
 
                         if (!preWarning && strdate.tm_hour == 13 && strdate.tm_min == 55)
                         {
@@ -216,6 +218,8 @@ enum riggleBassbait
     QUEST_MASTER_ANGLER                 = 8193,
 
     DATA_ANGLER_FINISHED                = 1,
+
+    GAME_EVENT_FISHING                  = 62
 };
 
 class npc_riggle_bassbait : public CreatureScript
@@ -229,7 +233,7 @@ public:
         {
             events.Reset();
             events.ScheduleEvent(EVENT_RIGGLE_ANNOUNCE, 1000, 1, 0);
-            finished = false;
+            finished = sWorld->getWorldState(GAME_EVENT_FISHING) == 1;
             startWarning = false;
             finishWarning = false;
         }
@@ -250,7 +254,10 @@ public:
         void DoAction(int32 param) override
         {
             if (param == DATA_ANGLER_FINISHED)
+            {
                 finished = true;
+                sWorld->setWorldState(GAME_EVENT_FISHING, 1);
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -260,14 +267,14 @@ public:
             {
                 case EVENT_RIGGLE_ANNOUNCE:
                     {
-                        time_t curtime = time(nullptr);
-                        tm strdate;
-                        localtime_r(&curtime, &strdate);
+                        tm strdate = Acore::Time::TimeBreakdown();
+
                         if (!startWarning && strdate.tm_hour == 14 && strdate.tm_min == 0)
                         {
                             sCreatureTextMgr->SendChat(me, RIGGLE_SAY_START, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
                             startWarning = true;
                         }
+
                         if (!finishWarning && strdate.tm_hour == 16 && strdate.tm_min == 0)
                         {
                             sCreatureTextMgr->SendChat(me, RIGGLE_SAY_END, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
@@ -338,9 +345,9 @@ public:
             resetTimer = 5000;
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            if (!_EnterEvadeMode())
+            if (!_EnterEvadeMode(why))
                 return;
 
             Reset();
@@ -359,7 +366,7 @@ public:
 
             if (resetTimer <= diff)
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
                 resetTimer = 5000;
             }
             else
@@ -398,9 +405,9 @@ public:
             me->SelectLevel();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            if (!_EnterEvadeMode())
+            if (!_EnterEvadeMode(why))
                 return;
 
             Reset();
@@ -514,14 +521,14 @@ public:
             }
 
             if (!SpawnAssoc)
-                LOG_ERROR("sql.sql", "TCSR: Creature template entry %u has ScriptName npc_air_force_bots, but it's not handled by that script", creature->GetEntry());
+                LOG_ERROR("sql.sql", "TCSR: Creature template entry {} has ScriptName npc_air_force_bots, but it's not handled by that script", creature->GetEntry());
             else
             {
                 CreatureTemplate const* spawnedTemplate = sObjectMgr->GetCreatureTemplate(SpawnAssoc->spawnedCreatureEntry);
 
                 if (!spawnedTemplate)
                 {
-                    LOG_ERROR("sql.sql", "TCSR: Creature template entry %u does not exist in DB, which is required by npc_air_force_bots", SpawnAssoc->spawnedCreatureEntry);
+                    LOG_ERROR("sql.sql", "TCSR: Creature template entry {} does not exist in DB, which is required by npc_air_force_bots", SpawnAssoc->spawnedCreatureEntry);
                     SpawnAssoc = nullptr;
                     return;
                 }
@@ -541,7 +548,7 @@ public:
                 SpawnedGUID = summoned->GetGUID();
             else
             {
-                LOG_ERROR("sql.sql", "TCSR: npc_air_force_bots: wasn't able to spawn Creature %u", SpawnAssoc->spawnedCreatureEntry);
+                LOG_ERROR("sql.sql", "TCSR: npc_air_force_bots: wasn't able to spawn Creature {}", SpawnAssoc->spawnedCreatureEntry);
                 SpawnAssoc = nullptr;
             }
 
@@ -668,7 +675,7 @@ public:
         {
             ResetFlagTimer = 120000;
             me->SetFaction(FACTION_PREY);
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
         }
 
         void EnterCombat(Unit* /*who*/) override { }
@@ -676,7 +683,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
             // Reset flags after a certain time has passed so that the next player has to start the 'event' again
-            if (me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER))
+            if (me->HasNpcFlag(UNIT_NPC_FLAG_QUESTGIVER))
             {
                 if (ResetFlagTimer <= diff)
                 {
@@ -698,7 +705,7 @@ public:
                 case TEXT_EMOTE_CHICKEN:
                     if (player->GetQuestStatus(QUEST_CLUCK) == QUEST_STATUS_NONE && rand() % 30 == 1)
                     {
-                        me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                        me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                         me->SetFaction(FACTION_FRIENDLY);
                         Talk(EMOTE_HELLO);
                     }
@@ -706,7 +713,7 @@ public:
                 case TEXT_EMOTE_CHEER:
                     if (player->GetQuestStatus(QUEST_CLUCK) == QUEST_STATUS_COMPLETE)
                     {
-                        me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                        me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                         me->SetFaction(FACTION_FRIENDLY);
                         Talk(EMOTE_CLUCK_TEXT);
                     }
@@ -762,13 +769,12 @@ public:
 
         void Reset() override
         {
-            Active = true;
-            CanIteract = 3500;
+            Active = false;
+            CanIteract = 0;
             DoCast(me, SPELL_BRAZIER, true);
             DoCast(me, SPELL_FIERY_AURA, false);
             me->UpdateHeight(me->GetPositionZ() + 0.94f);
             me->SetDisableGravity(true);
-            me->HandleEmoteCommand(EMOTE_ONESHOT_DANCE);
             me->SendMovementFlagUpdate();
         }
 
@@ -927,7 +933,7 @@ public:
 
             Event = false;
 
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void BeginEvent(Player* player)
@@ -952,7 +958,7 @@ public:
             }
 
             Event = true;
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void PatientDied(Location* point)
@@ -1054,10 +1060,10 @@ public:
             Coord = nullptr;
 
             //no select
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
             //no regen health
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
+            me->SetUnitFlag(UNIT_FLAG_IN_COMBAT);
 
             //to make them lay with face down
             me->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_DEAD);
@@ -1096,10 +1102,10 @@ public:
                         CAST_AI(npc_doctor::npc_doctorAI, doctor->AI())->PatientSaved(me, player, Coord);
 
             //make not selectable
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
             //regen health
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
+            me->RemoveUnitFlag(UNIT_FLAG_IN_COMBAT);
 
             //stand up
             me->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_STAND);
@@ -1132,10 +1138,10 @@ public:
 
             if (me->IsAlive() && me->GetHealth() <= 6)
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_IN_COMBAT);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->setDeathState(JUST_DIED);
-                me->SetFlag(UNIT_DYNAMIC_FLAGS, 32);
+                me->SetDynamicFlag(32);
 
                 if (DoctorGUID)
                     if (Creature* doctor = ObjectAccessor::GetCreature((*me), DoctorGUID))
@@ -1186,7 +1192,7 @@ void npc_doctor::npc_doctorAI::UpdateAI(uint32 diff)
                 if (Creature* Patient = me->SummonCreature(patientEntry, point->x, point->y, point->z, point->o, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
                 {
                     //303, this flag appear to be required for client side item->spell to work (TARGET_SINGLE_FRIEND)
-                    Patient->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+                    Patient->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
 
                     Patients.push_back(Patient->GetGUID());
                     CAST_AI(npc_injured_patient::npc_injured_patientAI, Patient->AI())->DoctorGUID = me->GetGUID();
@@ -1442,7 +1448,7 @@ public:
 
         void Reset() override
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -1977,7 +1983,7 @@ public:
     bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
-        bool noXPGain = player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_XP_GAIN);
+        bool noXPGain = player->HasPlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
         bool doSwitch = false;
         auto toggleXpCost = sWorld->getIntConfig(CONFIG_TOGGLE_XP_COST);
 
@@ -2005,12 +2011,12 @@ public:
             else if (noXPGain)
             {
                 player->ModifyMoney(-toggleXpCost);
-                player->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_XP_GAIN);
+                player->RemovePlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
             }
             else if (!noXPGain)
             {
                 player->ModifyMoney(-toggleXpCost);
-                player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_XP_GAIN);
+                player->SetPlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
             }
         }
         player->PlayerTalkClass->SendCloseGossip();
@@ -2238,7 +2244,7 @@ public:
                     break;
             }
 
-            const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
 
             if (spellInfo && spellInfo->Effects[0].Effect == SPELL_EFFECT_SUMMON_OBJECT_WILD)
                 return spellInfo->Effects[0].MiscValue;

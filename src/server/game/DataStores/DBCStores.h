@@ -23,9 +23,9 @@
 #include "DBCStructure.h"
 #include <list>
 #include <unordered_map>
+#include <unordered_set>
 
 typedef std::list<uint32> SimpleFactionsList;
-typedef std::vector<FlyByCamera> FlyByCameraCollection;
 
 SimpleFactionsList const* GetFactionTeamList(uint32 faction);
 
@@ -64,6 +64,8 @@ PvPDifficultyEntry const* GetBattlegroundBracketById(uint32 mapid, BattlegroundB
 CharStartOutfitEntry const* GetCharStartOutfitEntry(uint8 race, uint8 class_, uint8 gender);
 
 LFGDungeonEntry const* GetLFGDungeon(uint32 mapId, Difficulty difficulty);
+LFGDungeonEntry const* GetZoneLFGDungeonEntry(std::string const& zoneName, LocaleConstant locale);
+
 uint32 GetDefaultMapLight(uint32 mapId);
 
 typedef std::unordered_multimap<uint32, SkillRaceClassInfoEntry const*> SkillRaceClassInfoMap;
@@ -88,6 +90,7 @@ extern DBCStorage <ChrRacesEntry>                sChrRacesStore;
 extern DBCStorage <CinematicCameraEntry>         sCinematicCameraStore;
 extern DBCStorage <CinematicSequencesEntry>      sCinematicSequencesStore;
 extern DBCStorage <CreatureDisplayInfoEntry>     sCreatureDisplayInfoStore;
+extern DBCStorage <CreatureDisplayInfoExtraEntry> sCreatureDisplayInfoExtraStore;
 extern DBCStorage <CreatureFamilyEntry>          sCreatureFamilyStore;
 extern DBCStorage <CreatureModelDataEntry>       sCreatureModelDataStore;
 extern DBCStorage <CreatureSpellDataEntry>       sCreatureSpellDataStore;
@@ -101,6 +104,7 @@ extern DBCStorage <EmotesEntry>                  sEmotesStore;
 extern DBCStorage <EmotesTextEntry>              sEmotesTextStore;
 extern DBCStorage <FactionEntry>                 sFactionStore;
 extern DBCStorage <FactionTemplateEntry>         sFactionTemplateStore;
+extern DBCStorage <GameObjectArtKitEntry>        sGameObjectArtKitStore;
 extern DBCStorage <GameObjectDisplayInfoEntry>   sGameObjectDisplayInfoStore;
 extern DBCStorage <GemPropertiesEntry>           sGemPropertiesStore;
 extern DBCStorage <GlyphPropertiesEntry>         sGlyphPropertiesStore;
@@ -155,6 +159,7 @@ extern DBCStorage <SpellItemEnchantmentEntry>    sSpellItemEnchantmentStore;
 extern DBCStorage <SpellItemEnchantmentConditionEntry> sSpellItemEnchantmentConditionStore;
 extern SpellCategoryStore                        sSpellsByCategoryStore;
 extern PetFamilySpellsStore                      sPetFamilySpellsStore;
+extern std::unordered_set<uint32>                sPetTalentSpells;
 extern DBCStorage <SpellRadiusEntry>             sSpellRadiusStore;
 extern DBCStorage <SpellRangeEntry>              sSpellRangeStore;
 extern DBCStorage <SpellRuneCostEntry>           sSpellRuneCostStore;
@@ -181,9 +186,7 @@ extern DBCStorage <VehicleSeatEntry>             sVehicleSeatStore;
 extern DBCStorage <WMOAreaTableEntry>            sWMOAreaTableStore;
 //extern DBCStorage <WorldMapAreaEntry>           sWorldMapAreaStore; -- use Zone2MapCoordinates and Map2ZoneCoordinates
 extern DBCStorage <WorldMapOverlayEntry>         sWorldMapOverlayStore;
-extern std::unordered_map<uint32, FlyByCameraCollection> sFlyByCameraStore;
 
 void LoadDBCStores(const std::string& dataPath);
-void LoadM2Cameras(const std::string& dataPath);
 
 #endif

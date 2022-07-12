@@ -350,7 +350,7 @@ public:
                 ///// BATTLE STANCE
                 ///////////////////////////////////////////////////////
                 case EVENT_BJARNGRIM_INTERCEPT:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                         me->CastSpell(target, SPELL_INTERCEPT, true);
 
                     events.RepeatEvent(30000);

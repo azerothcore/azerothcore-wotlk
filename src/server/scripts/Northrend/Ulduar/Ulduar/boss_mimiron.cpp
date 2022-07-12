@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameTime.h"
 #include "MapMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"
@@ -213,29 +214,6 @@ enum EVENTS
     EVENT_EMERGENCY_BOT_ATTACK                      = 70,
 };
 
-enum SOUNDS
-{
-    SOUND_TANK_INTRO                                = 15611,
-    SOUND_TANK_ACTIVE                               = 15612,
-    SOUND_TANK_SLAY_1                               = 15613,
-    SOUND_TANK_SLAY_2                               = 15614,
-    SOUND_TANK_DEATH                                = 15615,
-    SOUND_TORSO_ACTIVE                              = 15616,
-    SOUND_TORSO_SLAY_1                              = 15617,
-    SOUND_TORSO_SLAY_2                              = 15618,
-    SOUND_TORSO_DEATH                               = 15619,
-    SOUND_HEAD_ACTIVE                               = 15620,
-    SOUND_HEAD_SLAY_1                               = 15621,
-    SOUND_HEAD_SLAY_2                               = 15622,
-    SOUND_HEAD_DEATH                                = 15623,
-    SOUND_VOLTRON_ACTIVE                            = 15624,
-    SOUND_VOLTRON_SLAY_1                            = 15625,
-    SOUND_VOLTRON_SLAY_2                            = 15626,
-    SOUND_VOLTRON_DEATH                             = 15627,
-    SOUND_BERSERK                                   = 15628,
-    SOUND_TANK_HARD_INTRO                           = 15629,
-};
-
 #define SPELL_NAPALM_SHELL                          RAID_MODE(SPELL_NAPALM_SHELL_10, SPELL_NAPALM_SHELL_25)
 #define SPELL_PLASMA_BLAST                          RAID_MODE(SPELL_PLASMA_BLAST_10, SPELL_PLASMA_BLAST_25)
 #define SPELL_MINE_EXPLOSION                        RAID_MODE(SPELL_MINE_EXPLOSION_10, SPELL_MINE_EXPLOSION_25)
@@ -244,41 +222,42 @@ enum SOUNDS
 #define SPELL_HAND_PULSE_L                          RAID_MODE(SPELL_HAND_PULSE_10_L, SPELL_HAND_PULSE_25_L)
 #define SPELL_FROST_BOMB_EXPLOSION                  RAID_MODE(SPELL_FROST_BOMB_EXPLOSION_10, SPELL_FROST_BOMB_EXPLOSION_25)
 
-#define TEXT_AGGRO                                  "Oh, my! I wasn't expecting company! The workshop is such a mess! How embarrassing!"
-#define TEXT_BERSERK                                "Oh, my! It would seem that we are out of time, my friends!"
-#define TEXT_HARDMODE                               "Now why would you go and do something like that? Didn't you see the sign that said 'DO NOT PUSH THIS BUTTON!'? How will we finish testing with the self-destruct mechanism active?"
-#define TEXT_LMK2_ACTIVATE                          "We haven't much time, friends! You're going to help me test out my latest and greatest creation. Now, before you change your minds, remember, that you kind of owe it to me after the mess you made with the XT-002."
-#define TEXT_LMK2_SLAIN_1                           "MEDIC!"
-#define TEXT_LMK2_SLAIN_2                           "I can fix that... or, maybe not! Sheesh, what a mess..."
-#define TEXT_LMK2_DEATH                             "WONDERFUL! Positively marvelous results! Hull integrity at 98.9 percent! Barely a dent! Moving right along."
-#define TEXT_VX001_ACTIVATE                         "Behold the VX-001 Anti-personnel Assault Cannon! You might want to take cover."
-#define TEXT_VX001_SLAIN_1                          "Fascinating. I think they call that a \"clean kill\"."
-#define TEXT_VX001_SLAIN_2                          "Note to self: Cannon highly effective against flesh."
-#define TEXT_VX001_DEATH                            "Thank you, friends! Your efforts have yielded some fantastic data! Now, where did I put-- oh, there it is!"
-#define TEXT_ACU_ACTIVATE                           "Isn't it beautiful? I call it the magnificent aerial command unit!"
-#define TEXT_ACU_SLAIN_1                            "Outplayed!"
-#define TEXT_ACU_SLAIN_2                            "You can do better than that!"
-#define TEXT_ACU_DEATH                              "Preliminary testing phase complete. Now comes the true test!!"
-#define TEXT_VOLTRON_ACTIVATE                       "Gaze upon its magnificence! Bask in its glorious, um, glory! I present you... V-07-TR-0N!"
-#define TEXT_VOLTRON_SLAIN_1                        "Prognosis: Negative!"
-#define TEXT_VOLTRON_SLAIN_2                        "You're not going to get up from that one, friend."
-#define TEXT_VOLTRON_DEATH                          "It would appear that I've made a slight miscalculation. I allowed my mind to be corrupted by the fiend in the prison, overriding my primary directive. All systems seem to be functional now. Clear."
-
-enum ComputerTalks
+enum Texts
 {
-    TALK_COMPUTER_INITIATED = 0,
-    TALK_COMPUTER_TERMINATED = 1,
-    TALK_COMPUTER_TEN = 2,
-    TALK_COMPUTER_NINE = 3,
-    TALK_COMPUTER_EIGHT = 4,
-    TALK_COMPUTER_SEVEN = 5,
-    TALK_COMPUTER_SIX = 6,
-    TALK_COMPUTER_FIVE = 7,
-    TALK_COMPUTER_FOUR = 8,
-    TALK_COMPUTER_THREE = 9,
-    TALK_COMPUTER_TWO = 10,
-    TALK_COMPUTER_ONE = 11,
-    TALK_COMPUTER_ZERO = 12,
+    // Mimiron
+    SAY_AGGRO                                       = 0, // Unused
+    SAY_HARDMODE_ON                                 = 1,
+    SAY_MKII_ACTIVATE                               = 2,
+    SAY_MKII_SLAY                                   = 3,
+    SAY_MKII_DEATH                                  = 4,
+    SAY_VX001_ACTIVATE                              = 5,
+    SAY_VX001_SLAY                                  = 6,
+    SAY_VX001_DEATH                                 = 7,
+    SAY_AERIAL_ACTIVATE                             = 8,
+    SAY_AERIAL_SLAY                                 = 9,
+    SAY_AERIAL_DEATH                                = 10,
+    SAY_V07TRON_ACTIVATE                            = 11,
+    SAY_V07TRON_SLAY                                = 12,
+    SAY_V07TRON_DEATH                               = 13,
+    SAY_BERSERK                                     = 14,
+
+    // MK II
+    EMOTE_PLASMA_BLAST                              = 0,
+
+    // Computer (Hardmode countdown)
+    TALK_COMPUTER_INITIATED                         = 0,
+    TALK_COMPUTER_TERMINATED                        = 1,
+    TALK_COMPUTER_TEN                               = 2,
+    TALK_COMPUTER_NINE                              = 3,
+    TALK_COMPUTER_EIGHT                             = 4,
+    TALK_COMPUTER_SEVEN                             = 5,
+    TALK_COMPUTER_SIX                               = 6,
+    TALK_COMPUTER_FIVE                              = 7,
+    TALK_COMPUTER_FOUR                              = 8,
+    TALK_COMPUTER_THREE                             = 9,
+    TALK_COMPUTER_TWO                               = 10,
+    TALK_COMPUTER_ONE                               = 11,
+    TALK_COMPUTER_ZERO                              = 12,
 };
 
 #define GetMimiron() ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_MIMIRON))
@@ -334,7 +313,7 @@ public:
             ResetGameObjects();
             events.Reset();
             summons.DespawnAll();
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
             if (pInstance && pInstance->GetData(TYPE_MIMIRON) != DONE)
                 pInstance->SetData(TYPE_MIMIRON, NOT_STARTED);
@@ -357,14 +336,14 @@ public:
             me->setActive(true);
             DoZoneInCombat();
             me->RemoveAllAuras();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             events.Reset();
 
             if (Creature* c = GetLMK2())
             {
                 if (c->IsInEvadeMode())
                 {
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     return;
                 }
                 if (!c->IsAlive())
@@ -374,15 +353,14 @@ public:
             }
             else
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 return;
             }
             CloseDoorAndButton();
 
             if (!hardmode)
             {
-                me->Yell(TEXT_LMK2_ACTIVATE, LANG_UNIVERSAL);
-                me->PlayDirectSound(SOUND_TANK_ACTIVE);
+                Talk(SAY_MKII_ACTIVATE);
                 events.ScheduleEvent(EVENT_SIT_LMK2, 6000);
                 events.ScheduleEvent(EVENT_BERSERK, 900000);
             }
@@ -428,7 +406,7 @@ public:
             Position p = me->GetHomePosition();
             if (me->GetExactDist(&p) > 80.0f || !SelectTargetFromPlayerList(150.0f))
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 return;
             }
 
@@ -447,15 +425,14 @@ public:
                         computer->AI()->Talk(minutesTalkNum++);
                     break;
                 case EVENT_MIMIRON_SAY_HARDMODE:
-                    me->Yell(TEXT_HARDMODE, LANG_UNIVERSAL);
-                    me->PlayDirectSound(SOUND_TANK_HARD_INTRO);
+                    Talk(SAY_HARDMODE_ON);
                     events.ScheduleEvent(EVENT_SPAWN_FLAMES_INITIAL, 0);
                     events.ScheduleEvent(EVENT_SIT_LMK2, 4000);
                     break;
                 case EVENT_SPAWN_FLAMES_INITIAL:
                     {
                         if (changeAllowedFlameSpreadTime)
-                            allowedFlameSpreadTime = time(nullptr);
+                            allowedFlameSpreadTime = GameTime::GetGameTime().count();
 
                         std::vector<Player*> pg;
                         Map::PlayerList const& pl = me->GetMap()->GetPlayers();
@@ -471,11 +448,11 @@ public:
                                 Player* player = pg[index];
                                 float angle = rand_norm() * 2 * M_PI;
                                 float z = 364.35f;
-                                if (!player->IsWithinLOS(player->GetPositionX() + cos(angle) * 5.0f, player->GetPositionY() + sin(angle) * 5.0f, z))
+                                if (!player->IsWithinLOS(player->GetPositionX() + cos(angle) * 5.0f, player->GetPositionY() + std::sin(angle) * 5.0f, z))
                                 {
                                     angle = player->GetAngle(2744.65f, 2569.46f);
                                 }
-                                me->CastSpell(player->GetPositionX() + cos(angle) * 5.0f, player->GetPositionY() + sin(angle) * 5.0f, z, SPELL_SUMMON_FLAMES_INITIAL, true);
+                                me->CastSpell(player->GetPositionX() + cos(angle) * 5.0f, player->GetPositionY() + std::sin(angle) * 5.0f, z, SPELL_SUMMON_FLAMES_INITIAL, true);
                                 pg.erase(pg.begin() + index);
                             }
 
@@ -484,8 +461,7 @@ public:
                     break;
                 case EVENT_BERSERK:
                     berserk = true;
-                    me->Yell(TEXT_BERSERK, LANG_UNIVERSAL);
-                    me->PlayDirectSound(SOUND_BERSERK);
+                    Talk(SAY_BERSERK);
                     if( hardmode )
                         me->SummonCreature(33576, 2744.78f, 2569.47f, 364.32f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 120000);
                     events.ScheduleEvent(EVENT_BERSERK_2, 0);
@@ -511,7 +487,7 @@ public:
                         events.ScheduleEvent(EVENT_SIT_LMK2_INTERVAL, 2000);
                         break;
                     }
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_SIT_LMK2_INTERVAL:
                     if (Creature* LMK2 = GetLMK2())
@@ -526,19 +502,18 @@ public:
                         LMK2->AI()->SetData(1, 1);
                         break;
                     }
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_LMK2_RETREAT_INTERVAL:
                     if (Creature* LMK2 = GetLMK2())
                     {
                         me->EnterVehicle(LMK2, 1);
-                        me->Yell(TEXT_LMK2_DEATH, LANG_UNIVERSAL);
-                        me->PlayDirectSound(SOUND_TANK_DEATH);
+                        Talk(SAY_MKII_DEATH);
                         LMK2->SetFacingTo(3.58f);
                         events.ScheduleEvent(EVENT_ELEVATOR_INTERVAL_0, 6000);
                         break;
                     }
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_ELEVATOR_INTERVAL_0:
                     if( GameObject* elevator = me->FindNearestGameObject(GO_MIMIRON_ELEVATOR, 100.0f) )
@@ -561,7 +536,7 @@ public:
                         events.ScheduleEvent(EVENT_ELEVATOR_INTERVAL_2, 18000);
                         break;
                     }
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_ELEVATOR_INTERVAL_2:
                     if (Creature* VX001 = GetVX001())
@@ -570,11 +545,10 @@ public:
                         events.ScheduleEvent(EVENT_SITTING_ON_VX001, 4000);
                         break;
                     }
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_SITTING_ON_VX001:
-                    me->Yell(TEXT_VX001_ACTIVATE, LANG_UNIVERSAL);
-                    me->PlayDirectSound(SOUND_TORSO_ACTIVE);
+                    Talk(SAY_VX001_ACTIVATE);
                     events.ScheduleEvent(EVENT_ENTER_VX001, 5000);
                     break;
                 case EVENT_ENTER_VX001:
@@ -584,7 +558,7 @@ public:
                         events.ScheduleEvent(EVENT_EMOTE_VX001, 2000);
                         break;
                     }
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_EMOTE_VX001:
                     if( Creature* VX001 = GetVX001() )
@@ -593,7 +567,7 @@ public:
                         events.ScheduleEvent(EVENT_VX001_START_FIGHT, 1750);
                         break;
                     }
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_VX001_START_FIGHT:
                     if( Creature* VX001 = GetVX001() )
@@ -604,7 +578,7 @@ public:
                         me->SetInCombatWithZone();
                         break;
                     }
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_VX001_EMOTESTATE_DEATH:
                     if( Creature* VX001 = GetVX001() )
@@ -614,7 +588,7 @@ public:
                         events.ScheduleEvent(EVENT_GET_OUT_VX001, 2500);
                         break;
                     }
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_GET_OUT_VX001:
                     if( Creature* VX001 = GetVX001() )
@@ -627,12 +601,11 @@ public:
                             events.ScheduleEvent(EVENT_SAY_VX001_DEAD, 2000);
                             break;
                         }
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_SAY_VX001_DEAD:
                     changeAllowedFlameSpreadTime = true;
-                    me->Yell(TEXT_VX001_DEATH, LANG_UNIVERSAL);
-                    me->PlayDirectSound(SOUND_TORSO_DEATH);
+                    Talk(SAY_VX001_DEATH);
                     events.ScheduleEvent(EVENT_ENTER_ACU, 7000);
                     break;
                 case EVENT_ENTER_ACU:
@@ -642,11 +615,10 @@ public:
                         events.ScheduleEvent(EVENT_SAY_ACU_ACTIVATE, 6000);
                         break;
                     }
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_SAY_ACU_ACTIVATE:
-                    me->Yell(TEXT_ACU_ACTIVATE, LANG_UNIVERSAL);
-                    me->PlayDirectSound(SOUND_HEAD_ACTIVE);
+                    Talk(SAY_AERIAL_ACTIVATE);
                     events.ScheduleEvent(EVENT_ACU_START_ATTACK, 4000);
                     break;
                 case EVENT_ACU_START_ATTACK:
@@ -658,11 +630,10 @@ public:
                         me->SetInCombatWithZone();
                         break;
                     }
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_SAY_ACU_DEAD:
-                    me->Yell(TEXT_ACU_DEATH, LANG_UNIVERSAL);
-                    me->PlayDirectSound(SOUND_HEAD_DEATH);
+                    Talk(SAY_AERIAL_DEATH);
                     events.ScheduleEvent(EVENT_LEVIATHAN_COME_CLOSER, 5000);
                     break;
                 case EVENT_LEVIATHAN_COME_CLOSER:
@@ -672,7 +643,7 @@ public:
                         events.ScheduleEvent(EVENT_VX001_EMOTE_JUMP, 4000);
                         break;
                     }
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_VX001_EMOTE_JUMP:
                     {
@@ -680,7 +651,7 @@ public:
                         Creature* VX001 = GetVX001();
                         if( !VX001 || !LMK2 )
                         {
-                            EnterEvadeMode();
+                            EnterEvadeMode(EVADE_REASON_OTHER);
                             return;
                         }
 
@@ -696,7 +667,7 @@ public:
                         Creature* LMK2 = GetLMK2();
                         if( !VX001 || !LMK2 )
                         {
-                            EnterEvadeMode();
+                            EnterEvadeMode(EVADE_REASON_OTHER);
                             return;
                         }
 
@@ -713,15 +684,14 @@ public:
                         Creature* VX001 = GetVX001();
                         if( !VX001 || !ACU )
                         {
-                            EnterEvadeMode();
+                            EnterEvadeMode(EVADE_REASON_OTHER);
                             return;
                         }
 
                         ACU->SetDisableGravity(false);
                         ACU->EnterVehicle(VX001, 3);
                         me->EnterVehicle(VX001, 1);
-                        me->Yell(TEXT_VOLTRON_ACTIVATE, LANG_UNIVERSAL);
-                        me->PlayDirectSound(SOUND_VOLTRON_ACTIVE);
+                        Talk(SAY_V07TRON_ACTIVATE);
                         events.ScheduleEvent(EVENT_START_PHASE4, 10000);
                     }
                     break;
@@ -732,7 +702,7 @@ public:
                         Creature* ACU = GetACU();
                         if( !VX001 || !LMK2 || !ACU )
                         {
-                            EnterEvadeMode();
+                            EnterEvadeMode(EVADE_REASON_OTHER);
                             return;
                         }
 
@@ -789,7 +759,7 @@ public:
 
                         float angle = VX001->GetOrientation();
                         float v_x = me->GetPositionX() + cos(angle) * 10.0f;
-                        float v_y = me->GetPositionY() + sin(angle) * 10.0f;
+                        float v_y = me->GetPositionY() + std::sin(angle) * 10.0f;
                         me->GetMotionMaster()->MoveJump(v_x, v_y, 364.32f, 7.0f, 7.0f);
 
                         if( pInstance )
@@ -814,12 +784,16 @@ public:
                     }
                     break;
                 case EVENT_SAY_VOLTRON_DEAD:
-                    me->Yell(TEXT_VOLTRON_DEATH, LANG_UNIVERSAL);
-                    me->PlayDirectSound(SOUND_VOLTRON_DEATH);
+                    Talk(SAY_V07TRON_DEATH);
                     // spawn chest
-                    if( uint32 chestId = (hardmode ? RAID_MODE(GO_MIMIRON_CHEST_HARD, GO_MIMIRON_CHEST_HERO_HARD) : RAID_MODE(GO_MIMIRON_CHEST, GO_MIMIRON_CHEST_HERO)) )
-                        if( GameObject* go = me->SummonGameObject(chestId, 2744.65f, 2569.46f, 364.397f, 0, 0, 0, 0, 0, 0) )
-                            go->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
+                    if (uint32 chestId = (hardmode ? RAID_MODE(GO_MIMIRON_CHEST_HARD, GO_MIMIRON_CHEST_HERO_HARD) : RAID_MODE(GO_MIMIRON_CHEST, GO_MIMIRON_CHEST_HERO)))
+                    {
+                        if (GameObject* go = me->SummonGameObject(chestId, 2744.65f, 2569.46f, 364.397f, 0, 0, 0, 0, 0, 0))
+                        {
+                            go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
+                            go->SetLootRecipient(me->GetMap());
+                        }
+                    }
                     events.ScheduleEvent(EVENT_DISAPPEAR, 15000);
                     break;
                 case EVENT_DISAPPEAR:
@@ -833,7 +807,7 @@ public:
 
         void MoveInLineOfSight(Unit*  /*mover*/) override {}
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (bIsEvading)
                 return;
@@ -841,16 +815,16 @@ public:
 
             if (Creature* c = GetLMK2())
             {
-                c->AI()->EnterEvadeMode();
+                c->AI()->EnterEvadeMode(why);
             }
             if (Creature* c = GetVX001())
             {
-                c->AI()->EnterEvadeMode();
+                c->AI()->EnterEvadeMode(why);
                 c->DespawnOrUnsummon();
             }
             if (Creature* c = GetACU())
             {
-                c->AI()->EnterEvadeMode();
+                c->AI()->EnterEvadeMode(why);
                 c->DespawnOrUnsummon();
             }
 
@@ -858,7 +832,7 @@ public:
 
             me->RemoveAllAuras();
             me->ExitVehicle();
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
 
             bIsEvading = false;
         }
@@ -900,7 +874,7 @@ public:
                 {
                     button->SetLootState(GO_READY);
                     button->UseDoorOrButton(0, false);
-                    button->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
+                    button->RemoveGameObjectFlag(GO_FLAG_IN_USE);
                 }
         }
 
@@ -946,7 +920,7 @@ public:
                         Creature* ACU = GetACU();
                         if (!LMK2 || !VX001 || !ACU)
                         {
-                            EnterEvadeMode();
+                            EnterEvadeMode(EVADE_REASON_OTHER);
                             return;
                         }
 
@@ -1024,8 +998,8 @@ public:
                 c->ExitVehicle(); // this should never happen!
             if (Creature* c = me->SummonCreature(NPC_LEVIATHAN_MKII_CANNON, *me, TEMPSUMMON_MANUAL_DESPAWN))
                 c->EnterVehicle(me, 3);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             me->SetReactState(REACT_AGGRESSIVE);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
 
@@ -1044,7 +1018,7 @@ public:
                         break;
                     case 1:
                         Phase = 1;
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         if (Unit* target = SelectTargetFromPlayerList(75.0f))
                             AttackStart(target);
                         DoZoneInCombat();
@@ -1061,7 +1035,7 @@ public:
                         me->SetReactState(REACT_AGGRESSIVE);
                         DoResetThreat();
                         Phase = 4;
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         if (Unit* target = SelectTargetFromPlayerList(75.0f))
                             AttackStart(target);
                         DoZoneInCombat();
@@ -1083,9 +1057,9 @@ public:
                 me->SetReactState(REACT_PASSIVE);
                 if (Phase == 1)
                 {
-                    if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+                    if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                     {
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         me->GetMotionMaster()->Clear();
                         me->AttackStop();
                         me->SetReactState(REACT_PASSIVE);
@@ -1101,9 +1075,9 @@ public:
                 }
                 else if (Phase == 4)
                 {
-                    if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+                    if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                     {
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                         me->InterruptNonMeleeSpells(false);
                         me->RemoveAllAurasExceptType(SPELL_AURA_CONTROL_VEHICLE);
                         me->CastSpell(me, SPELL_SELF_REPAIR, false);
@@ -1151,7 +1125,7 @@ public:
                         if (!pList.empty())
                             pTarget = pList[urand(0, pList.size() - 1)];
                         else
-                            pTarget = (Player*)SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true);
+                            pTarget = (Player*)SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true);
 
                         if( pTarget )
                             cannon->CastSpell(pTarget, SPELL_NAPALM_SHELL, false);
@@ -1162,7 +1136,7 @@ public:
                 case EVENT_SPELL_PLASMA_BLAST:
                     if (Unit* victim = me->GetVictim())
                     {
-                        me->TextEmote("Leviathan Mk II begins to cast Plasma Blast!", nullptr, true);
+                        Talk(EMOTE_PLASMA_BLAST);
                         cannon->CastSpell(victim, SPELL_PLASMA_BLAST, false);
                     }
                     events.RepeatEvent(22000);
@@ -1188,39 +1162,21 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if( who->GetTypeId() == TYPEID_PLAYER )
+            if (who->GetTypeId() == TYPEID_PLAYER)
                 if (Creature* c = GetMimiron())
                 {
-                    if( Phase == 1 )
+                    if (Phase == 1)
                     {
-                        if( rand() % 2 )
-                        {
-                            c->Yell(TEXT_LMK2_SLAIN_1, LANG_UNIVERSAL);
-                            c->PlayDirectSound(SOUND_TANK_SLAY_1);
-                        }
-                        else
-                        {
-                            c->Yell(TEXT_LMK2_SLAIN_2, LANG_UNIVERSAL);
-                            c->PlayDirectSound(SOUND_TANK_SLAY_2);
-                        }
+                        c->AI()->Talk(SAY_MKII_SLAY);
                     }
                     else
                     {
-                        if( rand() % 2 )
-                        {
-                            c->Yell(TEXT_VOLTRON_SLAIN_1, LANG_UNIVERSAL);
-                            c->PlayDirectSound(SOUND_VOLTRON_SLAY_1);
-                        }
-                        else
-                        {
-                            c->Yell(TEXT_VOLTRON_SLAIN_2, LANG_UNIVERSAL);
-                            c->PlayDirectSound(SOUND_VOLTRON_SLAY_2);
-                        }
+                        c->AI()->Talk(SAY_V07TRON_SLAY);
                     }
                 }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (bIsEvading)
                 return;
@@ -1231,7 +1187,7 @@ public:
             ScriptedAI::EnterEvadeMode();
 
             if (Creature* mimiron = GetMimiron())
-                mimiron->AI()->EnterEvadeMode();
+                mimiron->AI()->EnterEvadeMode(why);
 
             bIsEvading = false;
         }
@@ -1254,11 +1210,11 @@ public:
             return 0;
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
         {
             if( spell->Id == SPELL_SELF_REPAIR )
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetReactState(REACT_AGGRESSIVE);
             }
         }
@@ -1320,7 +1276,7 @@ public:
                         Phase = 2;
                         fighting = true;
                         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_SPELL_CAST_OMNI);
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         events.Reset();
                         events.ScheduleEvent(EVENT_SPELL_HEAT_WAVE, 10000);
                         events.ScheduleEvent(EVENT_SPELL_ROCKET_STRIKE, 16000);
@@ -1337,7 +1293,7 @@ public:
                     case 4:
                         Phase = 4;
                         fighting = true;
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         events.Reset();
                         events.ScheduleEvent(EVENT_REINSTALL_ROCKETS, 3000);
                         events.ScheduleEvent(EVENT_SPELL_ROCKET_STRIKE, 16000);
@@ -1376,9 +1332,9 @@ public:
                 me->SetReactState(REACT_PASSIVE);
                 if (Phase == 2)
                 {
-                    if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+                    if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                     {
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         SetData(1, 0);
                         me->InterruptNonMeleeSpells(false);
                         me->RemoveAllAurasExceptType(SPELL_AURA_CONTROL_VEHICLE);
@@ -1391,9 +1347,9 @@ public:
                 }
                 else if (Phase == 4)
                 {
-                    if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+                    if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                     {
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                         me->InterruptNonMeleeSpells(false);
                         me->RemoveAllAurasExceptType(SPELL_AURA_CONTROL_VEHICLE);
                         me->CastSpell(me, SPELL_SELF_REPAIR, false);
@@ -1454,7 +1410,7 @@ public:
                                         trigger->CastSpell(trigger, SPELL_ROCKET_STRIKE_AURA, true);
                                     Position exitPos = r->GetPosition();
                                     exitPos.m_positionX += cos(me->GetOrientation()) * 2.35f;
-                                    exitPos.m_positionY += sin(me->GetOrientation()) * 2.35f;
+                                    exitPos.m_positionY += std::sin(me->GetOrientation()) * 2.35f;
                                     exitPos.m_positionZ += 2.0f * Phase;
                                     r->_ExitVehicle(&exitPos);
                                     me->RemoveAurasByType(SPELL_AURA_CONTROL_VEHICLE, r->GetGUID());
@@ -1542,39 +1498,21 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if( who->GetTypeId() == TYPEID_PLAYER )
-                if( Creature* c = GetMimiron() )
+            if (who->GetTypeId() == TYPEID_PLAYER)
+                if (Creature* c = GetMimiron())
                 {
-                    if( Phase == 2 )
+                    if (Phase == 2)
                     {
-                        if( rand() % 2 )
-                        {
-                            c->Yell(TEXT_VX001_SLAIN_1, LANG_UNIVERSAL);
-                            c->PlayDirectSound(SOUND_TORSO_SLAY_1);
-                        }
-                        else
-                        {
-                            c->Yell(TEXT_VX001_SLAIN_2, LANG_UNIVERSAL);
-                            c->PlayDirectSound(SOUND_TORSO_SLAY_2);
-                        }
+                        c->AI()->Talk(SAY_VX001_SLAY);
                     }
                     else
                     {
-                        if( rand() % 2 )
-                        {
-                            c->Yell(TEXT_VOLTRON_SLAIN_1, LANG_UNIVERSAL);
-                            c->PlayDirectSound(SOUND_VOLTRON_SLAY_1);
-                        }
-                        else
-                        {
-                            c->Yell(TEXT_VOLTRON_SLAIN_2, LANG_UNIVERSAL);
-                            c->PlayDirectSound(SOUND_VOLTRON_SLAY_2);
-                        }
+                        c->AI()->Talk(SAY_V07TRON_SLAY);
                     }
                 }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (bIsEvading)
                 return;
@@ -1585,7 +1523,7 @@ public:
             _EnterEvadeMode();
             Reset();
             if (Creature* mimiron = GetMimiron())
-                mimiron->AI()->EnterEvadeMode();
+                mimiron->AI()->EnterEvadeMode(why);
 
             bIsEvading = false;
         }
@@ -1596,11 +1534,11 @@ public:
                 p->ToCreature()->DespawnOrUnsummon(8000);
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
         {
             if( spell->Id == SPELL_SELF_REPAIR )
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetReactState(REACT_AGGRESSIVE);
             }
         }
@@ -1660,7 +1598,7 @@ public:
                         break;
                     case 3:
                         Phase = 3;
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         if (Unit* target = SelectTargetFromPlayerList(75.0f))
                             AttackStart(target);
                         DoZoneInCombat();
@@ -1677,7 +1615,7 @@ public:
                         me->SetReactState(REACT_AGGRESSIVE);
                         DoResetThreat();
                         Phase = 4;
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         if (Unit* target = SelectTargetFromPlayerList(75.0f))
                             AttackStart(target);
                         DoZoneInCombat();
@@ -1708,9 +1646,9 @@ public:
                 me->SetReactState(REACT_PASSIVE);
                 if (Phase == 3)
                 {
-                    if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+                    if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                     {
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         me->GetMotionMaster()->Clear();
                         me->StopMoving();
                         me->AttackStop();
@@ -1728,9 +1666,9 @@ public:
                 }
                 else if (Phase == 4)
                 {
-                    if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+                    if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                     {
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                         me->InterruptNonMeleeSpells(false);
                         me->RemoveAllAurasExceptType(SPELL_AURA_CONTROL_VEHICLE);
                         me->CastSpell(me, SPELL_SELF_REPAIR, false);
@@ -1760,7 +1698,7 @@ public:
                         float angle = victim->GetAngle(me->GetPositionX(), me->GetPositionY());
                         me->SetOrientation( me->GetAngle(victim->GetPositionX(), victim->GetPositionY()) );
                         float x = victim->GetPositionX() + 15.0f * cos(angle);
-                        float y = victim->GetPositionY() + 15.0f * sin(angle);
+                        float y = victim->GetPositionY() + 15.0f * std::sin(angle);
 
                         // check if there's magnetic core in line of movement
                         Creature* mc = nullptr;
@@ -1806,7 +1744,7 @@ public:
                         }
                         else
                         {
-                            if (Unit* victim = SelectTarget(SELECT_TARGET_RANDOM, 0, 27.5f, true))
+                            if (Unit* victim = SelectTarget(SelectTargetMethod::Random, 0, 27.5f, true))
                             {
                                 me->SetFacingToObject(victim);
                                 me->CastSpell(victim, SPELL_PLASMA_BALL, false);
@@ -1865,39 +1803,21 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if( who->GetTypeId() == TYPEID_PLAYER )
-                if( Creature* c = GetMimiron() )
+            if (who->GetTypeId() == TYPEID_PLAYER)
+                if (Creature* c = GetMimiron())
                 {
-                    if( Phase == 3 )
+                    if (Phase == 3)
                     {
-                        if( rand() % 2 )
-                        {
-                            c->Yell(TEXT_ACU_SLAIN_1, LANG_UNIVERSAL);
-                            c->PlayDirectSound(SOUND_HEAD_SLAY_1);
-                        }
-                        else
-                        {
-                            c->Yell(TEXT_ACU_SLAIN_2, LANG_UNIVERSAL);
-                            c->PlayDirectSound(SOUND_HEAD_SLAY_2);
-                        }
+                        c->AI()->Talk(SAY_AERIAL_SLAY);
                     }
                     else
                     {
-                        if( rand() % 2 )
-                        {
-                            c->Yell(TEXT_VOLTRON_SLAIN_1, LANG_UNIVERSAL);
-                            c->PlayDirectSound(SOUND_VOLTRON_SLAY_1);
-                        }
-                        else
-                        {
-                            c->Yell(TEXT_VOLTRON_SLAIN_2, LANG_UNIVERSAL);
-                            c->PlayDirectSound(SOUND_VOLTRON_SLAY_2);
-                        }
+                        c->AI()->Talk(SAY_V07TRON_SLAY);
                     }
                 }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (bIsEvading)
                 return;
@@ -1908,7 +1828,7 @@ public:
             _EnterEvadeMode();
             Reset();
             if (Creature* mimiron = GetMimiron())
-                mimiron->AI()->EnterEvadeMode();
+                mimiron->AI()->EnterEvadeMode(why);
 
             bIsEvading = false;
         }
@@ -1925,11 +1845,11 @@ public:
             summons.Despawn(s);
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
         {
             if( spell->Id == SPELL_SELF_REPAIR )
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetReactState(REACT_AGGRESSIVE);
             }
         }
@@ -1961,9 +1881,9 @@ public:
 
         void AttackStart(Unit* /*who*/) override {}
         void MoveInLineOfSight(Unit* /*who*/) override {}
-        bool CanAIAttack(const Unit*  /*target*/) const override { return false; }
+        bool CanAIAttack(Unit const*  /*target*/) const override { return false; }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if (target && spell && target->GetTypeId() == TYPEID_PLAYER && spell->Id == SPELL_MINE_EXPLOSION)
                 if (InstanceScript* pInstance = me->GetInstanceScript())
@@ -2204,7 +2124,7 @@ public:
 
         bool Load() override
         {
-            lastMSTime = World::GetGameTimeMS();
+            lastMSTime = GameTime::GetGameTimeMS().count();
             lastOrientation = -1.0f;
             return true;
         }
@@ -2215,14 +2135,14 @@ public:
             {
                 if (c->GetTypeId() != TYPEID_UNIT)
                     return;
-                uint32 diff = getMSTimeDiff(lastMSTime, World::GetGameTimeMS());
+                uint32 diff = getMSTimeDiff(lastMSTime, GameTime::GetGameTimeMS().count());
                 if (lastOrientation == -1.0f)
                 {
                     lastOrientation = (c->ToCreature()->AI()->GetData(0) * 2 * M_PI) / 100.0f;
                     diff = 0;
                 }
                 float new_o = Position::NormalizeOrientation(lastOrientation - (M_PI / 60) * (diff / 250.0f));
-                lastMSTime = World::GetGameTimeMS();
+                lastMSTime = GameTime::GetGameTimeMS().count();
                 lastOrientation = new_o;
                 c->SetFacingTo(new_o);
 
@@ -2283,7 +2203,7 @@ public:
     {
         npc_ulduar_flames_initialAI(Creature* pCreature) : NullCreatureAI(pCreature)
         {
-            CreateTime = time(nullptr);
+            CreateTime = GameTime::GetGameTime().count();
             events.Reset();
             events.ScheduleEvent(EVENT_FLAMES_SPREAD, 5750);
             if( Creature* flame = me->SummonCreature(NPC_FLAMES_SPREAD, me->GetPositionX(), me->GetPositionY(), 364.32f, 0.0f) )
@@ -2377,7 +2297,7 @@ public:
                             if (target && prevdist >= 4.0f) // no need to spread when player is standing in fire, check distance
                             {
                                 float angle = last->GetAngle(target->GetPositionX(), target->GetPositionY()) - M_PI / 8 + rand_norm() * 2 * M_PI / 8;
-                                SpreadFlame(last->GetPositionX() + 7.0f * cos(angle), last->GetPositionY() + 7.0f * sin(angle));
+                                SpreadFlame(last->GetPositionX() + 7.0f * cos(angle), last->GetPositionY() + 7.0f * std::sin(angle));
                             }
                         }
 
@@ -2403,7 +2323,7 @@ public:
     {
         npc_ulduar_flames_spreadAI(Creature* pCreature) : NullCreatureAI(pCreature) {}
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
         {
             switch( spell->Id )
             {
@@ -2469,9 +2389,9 @@ public:
                     break;
                 case EVENT_EMERGENCY_BOT_CHECK:
                     events.RepeatEvent(15000); // just in case, will be rescheduled
-                    if( Creature* flame = me->FindNearestCreature(NPC_FLAMES_SPREAD, 150.0f, true) )
+                    if (Creature* flame = me->FindNearestCreature(NPC_FLAMES_SPREAD, 150.0f, true))
                     {
-                        me->m_orientation = me->GetAngle(flame->GetPositionX(), flame->GetPositionY());
+                        me->SetOrientation(me->GetAngle(flame->GetPositionX(), flame->GetPositionY()));
                         float dist = me->GetExactDist2d(flame);
                         if (dist <= 5.0f)
                             events.ScheduleEvent(EVENT_EMERGENCY_BOT_ATTACK, 0);
@@ -2502,7 +2422,7 @@ public:
     {
         npc_ulduar_rocket_strike_triggerAI(Creature* pCreature) : NullCreatureAI(pCreature) {}
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if (!target || !spell)
                 return;

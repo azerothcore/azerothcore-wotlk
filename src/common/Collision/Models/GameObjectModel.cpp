@@ -18,6 +18,7 @@
 #include "GameObjectModel.h"
 #include "Log.h"
 #include "MapTree.h"
+#include "ModelInstance.h"
 #include "Timer.h"
 #include "VMapDefinitions.h"
 #include "VMapFactory.h"
@@ -48,14 +49,15 @@ void LoadGameObjectModelList(std::string const& dataPath)
     FILE* model_list_file = fopen((dataPath + "vmaps/" + VMAP::GAMEOBJECT_MODELS).c_str(), "rb");
     if (!model_list_file)
     {
-        LOG_ERROR("maps", "Unable to open '%s' file.", VMAP::GAMEOBJECT_MODELS);
+        LOG_ERROR("maps", "Unable to open '{}' file.", VMAP::GAMEOBJECT_MODELS);
         return;
     }
 
     char magic[8];
     if (fread(magic, 1, 8, model_list_file) != 8 || memcmp(magic, VMAP::VMAP_MAGIC, 8) != 0)
     {
-        LOG_ERROR("maps", "File '%s' has wrong header, expected %s.", VMAP::GAMEOBJECT_MODELS, VMAP::VMAP_MAGIC);
+        LOG_ERROR("maps", "File '{}' has wrong header, expected {}.", VMAP::GAMEOBJECT_MODELS, VMAP::VMAP_MAGIC);
+        fclose(model_list_file);
         return;
     }
 
@@ -78,15 +80,15 @@ void LoadGameObjectModelList(std::string const& dataPath)
                 || fread(&v1, sizeof(Vector3), 1, model_list_file) != 1
                 || fread(&v2, sizeof(Vector3), 1, model_list_file) != 1)
         {
-            LOG_ERROR("maps", "File '%s' seems to be corrupted!", VMAP::GAMEOBJECT_MODELS);
+            LOG_ERROR("maps", "File '{}' seems to be corrupted!", VMAP::GAMEOBJECT_MODELS);
             fclose(model_list_file);
             break;
         }
 
         if (v1.isNaN() || v2.isNaN())
         {
-            LOG_ERROR("maps", "File '%s' Model '%s' has invalid v1%s v2%s values!",
-                      VMAP::GAMEOBJECT_MODELS, std::string(buff, name_length).c_str(), v1.toString().c_str(), v2.toString().c_str());
+            LOG_ERROR("maps", "File '{}' Model '{}' has invalid v1{} v2{} values!",
+                      VMAP::GAMEOBJECT_MODELS, std::string(buff, name_length), v1.toString(), v2.toString());
             continue;
         }
 
@@ -95,7 +97,7 @@ void LoadGameObjectModelList(std::string const& dataPath)
 
     fclose(model_list_file);
 
-    LOG_INFO("server.loading", ">> Loaded %u GameObject models in %u ms", uint32(model_list.size()), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} GameObject models in {} ms", uint32(model_list.size()), GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
@@ -119,11 +121,12 @@ bool GameObjectModel::initialize(std::unique_ptr<GameObjectModelOwnerBase> model
     // ignore models with no bounds
     if (mdl_box == G3D::AABox::zero())
     {
-        LOG_ERROR("maps", "GameObject model %s has zero bounds, loading skipped", it->second.name.c_str());
+        LOG_ERROR("maps", "GameObject model {} has zero bounds, loading skipped", it->second.name);
         return false;
     }
 
-    iModel = VMAP::VMapFactory::createOrGetVMapMgr()->acquireModelInstance(dataPath + "vmaps/", it->second.name);
+    iModel = VMAP::VMapFactory::createOrGetVMapMgr()->acquireModelInstance(dataPath + "vmaps/", it->second.name,
+        it->second.isWmo ? VMAP::ModelFlags::MOD_WORLDSPAWN : VMAP::ModelFlags::MOD_M2);
 
     if (!iModel)
     {
@@ -174,7 +177,7 @@ GameObjectModel* GameObjectModel::Create(std::unique_ptr<GameObjectModelOwnerBas
     return mdl;
 }
 
-bool GameObjectModel::intersectRay(const G3D::Ray& ray, float& MaxDist, bool StopAtFirstHit, uint32 ph_mask) const
+bool GameObjectModel::intersectRay(const G3D::Ray& ray, float& MaxDist, bool StopAtFirstHit, uint32 ph_mask, VMAP::ModelIgnoreFlags ignoreFlags) const
 {
     if (!(phasemask & ph_mask) || !owner->IsSpawned())
     {
@@ -191,7 +194,7 @@ bool GameObjectModel::intersectRay(const G3D::Ray& ray, float& MaxDist, bool Sto
     Vector3 p = iInvRot * (ray.origin() - iPos) * iInvScale;
     Ray modRay(p, iInvRot * ray.direction());
     float distance = MaxDist * iInvScale;
-    bool hit = iModel->IntersectRay(modRay, distance, StopAtFirstHit);
+    bool hit = iModel->IntersectRay(modRay, distance, StopAtFirstHit, ignoreFlags);
     if (hit)
     {
         distance *= iScale;

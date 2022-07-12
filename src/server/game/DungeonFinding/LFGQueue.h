@@ -18,11 +18,12 @@
 #ifndef _LFGQUEUE_H
 #define _LFGQUEUE_H
 
+#include <utility>
+
 #include "LFG.h"
 
 namespace lfg
 {
-
     enum LfgCompatibility
     {
         LFG_COMPATIBILITY_PENDING,
@@ -36,33 +37,31 @@ namespace lfg
         LFG_COMPATIBLES_MATCH                                  // Must be the last one
     };
 
-    /// Stores player or group queue info
+    // Stores player or group queue info
     struct LfgQueueData
     {
-        LfgQueueData(): joinTime(time_t(time(nullptr))), lastRefreshTime(joinTime), tanks(LFG_TANKS_NEEDED),
-            healers(LFG_HEALERS_NEEDED), dps(LFG_DPS_NEEDED)
-        { }
+        LfgQueueData();
 
-        LfgQueueData(time_t _joinTime, LfgDungeonSet const& _dungeons, LfgRolesMap const& _roles):
+        LfgQueueData(time_t _joinTime, LfgDungeonSet  _dungeons, LfgRolesMap  _roles):
             joinTime(_joinTime), lastRefreshTime(_joinTime), tanks(LFG_TANKS_NEEDED), healers(LFG_HEALERS_NEEDED),
-            dps(LFG_DPS_NEEDED), dungeons(_dungeons), roles(_roles)
+            dps(LFG_DPS_NEEDED), dungeons(std::move(_dungeons)), roles(std::move(_roles))
         { }
 
-        time_t joinTime;                                       ///< Player queue join time (to calculate wait times)
-        time_t lastRefreshTime;                                ///< pussywizard
-        uint8 tanks;                                           ///< Tanks needed
-        uint8 healers;                                         ///< Healers needed
-        uint8 dps;                                             ///< Dps needed
-        LfgDungeonSet dungeons;                                ///< Selected Player/Group Dungeon/s
-        LfgRolesMap roles;                                     ///< Selected Player Role/s
-        Lfg5Guids bestCompatible;                              ///< Best compatible combination of people queued
+        time_t joinTime;                                       // Player queue join time (to calculate wait times)
+        time_t lastRefreshTime;                                // pussywizard
+        uint8 tanks{LFG_TANKS_NEEDED};                         // Tanks needed
+        uint8 healers{LFG_HEALERS_NEEDED};                     // Healers needed
+        uint8 dps{LFG_DPS_NEEDED};                             // Dps needed
+        LfgDungeonSet dungeons;                                // Selected Player/Group Dungeon/s
+        LfgRolesMap roles;                                     // Selected Player Role/s
+        Lfg5Guids bestCompatible;                              // Best compatible combination of people queued
     };
 
     struct LfgWaitTime
     {
-        LfgWaitTime(): time(-1), number(0) {}
-        int32 time;                                            ///< Wait time
-        uint32 number;                                         ///< Number of people used to get that wait time
+        LfgWaitTime() = default;
+        int32 time{-1};                                        // Wait time
+        uint32 number{0};                                      // Number of people used to get that wait time
     };
 
     typedef std::map<uint32, LfgWaitTime> LfgWaitTimesContainer;
@@ -110,19 +109,18 @@ namespace lfg
         LfgCompatibility CheckCompatibility(Lfg5Guids const& checkWith, const ObjectGuid& newGuid, uint64& foundMask, uint32& foundCount, const std::set<Lfg5Guids>& currentCompatibles);
 
         // Queue
-        uint32 m_QueueStatusTimer;                         ///< used to check interval of sending queue status
-        LfgQueueDataContainer QueueDataStore;              ///< Queued groups
-        LfgCompatibleContainer CompatibleList;             ///< Compatible dungeons
-        LfgCompatibleContainer CompatibleTempList;         ///< new compatibles are added to this container while main one is being iterated
+        uint32 m_QueueStatusTimer;                         // used to check interval of sending queue status
+        LfgQueueDataContainer QueueDataStore;              // Queued groups
+        LfgCompatibleContainer CompatibleList;             // Compatible dungeons
+        LfgCompatibleContainer CompatibleTempList;         // new compatibles are added to this container while main one is being iterated
 
-        LfgWaitTimesContainer waitTimesAvgStore;           ///< Average wait time to find a group queuing as multiple roles
-        LfgWaitTimesContainer waitTimesTankStore;          ///< Average wait time to find a group queuing as tank
-        LfgWaitTimesContainer waitTimesHealerStore;        ///< Average wait time to find a group queuing as healer
-        LfgWaitTimesContainer waitTimesDpsStore;           ///< Average wait time to find a group queuing as dps
-        LfgGuidList newToQueueStore;                       ///< New groups to add to queue
+        LfgWaitTimesContainer waitTimesAvgStore;           // Average wait time to find a group queuing as multiple roles
+        LfgWaitTimesContainer waitTimesTankStore;          // Average wait time to find a group queuing as tank
+        LfgWaitTimesContainer waitTimesHealerStore;        // Average wait time to find a group queuing as healer
+        LfgWaitTimesContainer waitTimesDpsStore;           // Average wait time to find a group queuing as dps
+        LfgGuidList newToQueueStore;                       // New groups to add to queue
         LfgGuidList restoredAfterProposal;
     };
-
-} // namespace lfg
+}
 
 #endif

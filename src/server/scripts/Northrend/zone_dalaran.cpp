@@ -115,6 +115,10 @@ enum DisguiseMisc
     SPELL_EVOCATION_VISUAL          = 69659,
 
     NPC_AQUANOS_ENTRY               = 36851,
+
+    GOSSIP_MENU_AQUANOS             = 10854,
+    GOSSIP_AQUANOS_ALLIANCE         = 0,
+    GOSSIP_AQUANOS_HORDE            = 1,
 };
 
 enum spells
@@ -222,7 +226,7 @@ public:
                     break;
                 case EVENT_OUTRO_DH:
                     me->GetMotionMaster()->MoveTargetedHome();
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     _events.Reset();
                     break;
             }
@@ -246,9 +250,9 @@ public:
                 player->GetQuestStatus(QUEST_SUITABLE_DISGUISE_H) == QUEST_STATUS_INCOMPLETE)
         {
             if(player->GetTeamId() == TEAM_ALLIANCE)
-                AddGossipItemFor(player, 0, "Arcanist Tybalin said you might be able to lend me a certain tabard.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+                AddGossipItemFor(player, GOSSIP_MENU_AQUANOS, GOSSIP_AQUANOS_ALLIANCE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
             else
-                AddGossipItemFor(player, 0, "Magister Hathorel said you might be able to lend me a certain tabard.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+                AddGossipItemFor(player, GOSSIP_MENU_AQUANOS, GOSSIP_AQUANOS_HORDE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
         }
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
@@ -261,7 +265,7 @@ public:
         {
             case GOSSIP_ACTION_INFO_DEF:
                 CloseGossipMenuFor(player);
-                creature->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+                creature->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
                 creature->AI()->SetData(ACTION_SHANDY_INTRO, 0);
                 break;
         }
@@ -433,7 +437,7 @@ public:
     {
         npc_mageguard_dalaranAI(Creature* creature) : ScriptedAI(creature)
         {
-            creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            creature->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_NORMAL, true);
             creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_MAGIC, true);
         }

@@ -88,7 +88,7 @@ public:
         void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
-            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
                 summon->AI()->AttackStart(target);
             else if (me->GetVictim())
                 summon->AI()->AttackStart(me->GetVictim());
@@ -129,19 +129,19 @@ public:
                     events.RepeatEvent(urand(10000, 15000));
                     break;
                 case EVENT_SPELL_CHAIN:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_CHAIN_LIGHTNING, false);
                     events.DelayEvents(3000);
                     events.RepeatEvent(9000);
                     break;
                 case EVENT_SPELL_STATIC:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30, true))
                         me->CastSpell(target, SPELL_STATIC_CHARGE, false);
                     events.RepeatEvent(10000);
                     break;
                 case EVENT_LEVITATE:
                     events.RepeatEvent(15000);
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
                     {
                         me->CastSpell(target, SPELL_LEVITATE, false);
                         lTarget = target->GetGUID();

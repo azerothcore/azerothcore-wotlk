@@ -165,7 +165,8 @@ struct boss_jedoga_shadowseeker : public BossAI
     void Reset() override
     {
         me->SetReactState(REACT_PASSIVE);
-        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+        me->SetImmuneToAll(true);
         me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
         me->SetDisableGravity(true);
         me->SetHover(true);
@@ -186,7 +187,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                     summon->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, false);
                     summon->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_MAGIC, false);
                     summon->RemoveAurasDueToSpell(SPELL_WHITE_SPHERE);
-                    summon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                    summon->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                     summon->SetStandState(UNIT_STAND_STATE_KNEEL);
                     oocSummons.push_back(summon->GetGUID());
                 }
@@ -254,7 +255,8 @@ struct boss_jedoga_shadowseeker : public BossAI
                         {
                             summon->GetMotionMaster()->MovePoint(POINT_INITIAL, VolunteerSpotPositions[i][1]);
                             summon->SetReactState(REACT_PASSIVE);
-                            summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC );
+                            summon->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                            summon->SetImmuneToAll(true);
                             summons.Summon(summon);
                         }
                     }
@@ -294,7 +296,7 @@ struct boss_jedoga_shadowseeker : public BossAI
             me->InterruptNonMeleeSpells(false);
             me->AttackStop();
             me->SetReactState(REACT_PASSIVE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
 
             events.SetPhase(PHASE_RITUAL);
             events.ScheduleEvent(EVENT_JEDOGA_PREPARE_RITUAL, 1000, 0, PHASE_RITUAL);
@@ -336,7 +338,7 @@ struct boss_jedoga_shadowseeker : public BossAI
         Talk(SAY_SLAY);
     }
 
-    void JustDied(Unit* /*Killer*/) override
+    void JustDied(Unit* /*killer*/) override
     {
         _JustDied();
         DespawnOOCSummons();
@@ -356,7 +358,8 @@ struct boss_jedoga_shadowseeker : public BossAI
             {
                 me->ClearUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
                 ReschedulleCombatEvents();
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                me->SetImmuneToAll(false);
                 me->SetReactState(REACT_AGGRESSIVE);
 
                 me->RemoveAurasDueToSpell(SPELL_SPHERE_VISUAL);
@@ -463,7 +466,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                 }
                 case EVENT_JEDOGA_LIGHTNING_BOLT:
                 {
-                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    if (Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                     {
                         DoCast(pTarget, DUNGEON_MODE(SPELL_LIGHTNING_BOLT, SPELL_LIGHTNING_BOLT_H), false);
                     }
@@ -472,7 +475,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                 }
                 case EVENT_JEDOGA_THUNDERSHOCK:
                 {
-                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    if (Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                     {
                         DoCast(pTarget, DUNGEON_MODE(SPELL_THUNDERSHOCK, SPELL_THUNDERSHOCK_H), false);
                     }
@@ -583,7 +586,8 @@ struct npc_twilight_volunteer : public ScriptedAI
             DoCastSelf(SPELL_ACTIVATE_INITIATE, true);
             me->RemoveAurasDueToSpell(SPELL_WHITE_SPHERE);
             me->SetControlled(false, UNIT_STATE_STUNNED);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+            me->SetImmuneToAll(false);
 
             Talk(SAY_CHOSEN);
             me->SetStandState(UNIT_STAND_STATE_STAND);
@@ -592,11 +596,11 @@ struct npc_twilight_volunteer : public ScriptedAI
         }
     }
 
-    void EnterEvadeMode() override
+    void EnterEvadeMode(EvadeReason why) override
     {
         if (!isSacraficeTarget)
         {
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
     }
 

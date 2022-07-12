@@ -23,6 +23,8 @@ Category: commandscripts
 EndScriptData */
 
 #include "Chat.h"
+#include "DBCStores.h"
+#include "DatabaseEnv.h"
 #include "Group.h"
 #include "Language.h"
 #include "MapMgr.h"
@@ -39,13 +41,24 @@ public:
 
     ChatCommandTable GetCommands() const override
     {
+        static ChatCommandTable teleNameNpcCommandTable =
+        {
+            { "id",     HandleTeleNameNpcIdCommand,      SEC_GAMEMASTER,    Console::Yes },
+            { "guid",   HandleTeleNameNpcSpawnIdCommand, SEC_GAMEMASTER,    Console::Yes },
+            { "name",   HandleTeleNameNpcNameCommand,    SEC_GAMEMASTER,    Console::Yes },
+        };
+        static ChatCommandTable teleNameCommandTable =
+        {
+            { "npc",    teleNameNpcCommandTable },
+            { "",       HandleTeleNameCommand,           SEC_GAMEMASTER,    Console::Yes },
+        };
         static ChatCommandTable teleCommandTable =
         {
-            { "add",    HandleTeleAddCommand,   SEC_ADMINISTRATOR, Console::No },
-            { "del",    HandleTeleDelCommand,   SEC_ADMINISTRATOR, Console::Yes },
-            { "name",   HandleTeleNameCommand,  SEC_GAMEMASTER,    Console::Yes },
-            { "group",  HandleTeleGroupCommand, SEC_GAMEMASTER,    Console::No },
-            { "",       HandleTeleCommand,      SEC_GAMEMASTER,    Console::No }
+            { "add",    HandleTeleAddCommand,            SEC_ADMINISTRATOR, Console::No },
+            { "del",    HandleTeleDelCommand,            SEC_ADMINISTRATOR, Console::Yes },
+            { "name",   teleNameCommandTable },
+            { "group",  HandleTeleGroupCommand,          SEC_GAMEMASTER,    Console::No },
+            { "",       HandleTeleCommand,               SEC_GAMEMASTER,    Console::No }
         };
         static ChatCommandTable commandTable =
         {
@@ -97,7 +110,6 @@ public:
             handler->SetSentErrorMessage(true);
             return false;
         }
-
         std::string name = tele->name;
         sObjectMgr->DeleteGameTele(name);
         handler->SendSysMessage(LANG_COMMAND_TP_DELETED);
@@ -174,14 +186,14 @@ public:
             else
             {
                 CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_HOMEBIND);
-                stmt->setUInt32(0, player->GetGUID().GetCounter());
+                stmt->SetData(0, player->GetGUID().GetCounter());
                 PreparedQueryResult resultDB = CharacterDatabase.Query(stmt);
 
                 if (resultDB)
                 {
                     Field* fieldsDB = resultDB->Fetch();
-                    WorldLocation loc(fieldsDB[0].GetUInt16(), fieldsDB[2].GetFloat(), fieldsDB[3].GetFloat(), fieldsDB[4].GetFloat(), 0.0f);
-                    uint32 zoneId = fieldsDB[1].GetUInt16();
+                    WorldLocation loc(fieldsDB[0].Get<uint16>(), fieldsDB[2].Get<float>(), fieldsDB[3].Get<float>(), fieldsDB[4].Get<float>(), 0.0f);
+                    uint32 zoneId = fieldsDB[1].Get<uint16>();
 
                     Player::SavePositionInDB(loc, zoneId, player->GetGUID(), nullptr);
                 }
@@ -309,6 +321,71 @@ public:
 
         player->TeleportTo(tele->mapId, tele->position_x, tele->position_y, tele->position_z, tele->orientation);
         return true;
+    }
+
+    static bool HandleTeleNameNpcIdCommand(ChatHandler* handler, PlayerIdentifier player, Variant<Hyperlink<creature_entry>, uint32> creatureId)
+    {
+        CreatureData const* spawnpoint = nullptr;
+        for (auto const& pair : sObjectMgr->GetAllCreatureData())
+        {
+            if (pair.second.id1 != *creatureId)
+                continue;
+
+            if (!spawnpoint)
+                spawnpoint = &pair.second;
+            else
+            {
+                handler->SendSysMessage(LANG_COMMAND_GOCREATMULTIPLE);
+                break;
+            }
+        }
+
+        if (!spawnpoint)
+        {
+            handler->SendSysMessage(LANG_COMMAND_GOCREATNOTFOUND);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        CreatureTemplate const* creatureTemplate = ASSERT_NOTNULL(sObjectMgr->GetCreatureTemplate(*creatureId));
+
+        return DoNameTeleport(handler, player, spawnpoint->mapid, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, creatureTemplate->Name);
+    }
+
+    static bool HandleTeleNameNpcSpawnIdCommand(ChatHandler* handler, PlayerIdentifier player, Variant<Hyperlink<creature>, ObjectGuid::LowType> spawnId)
+    {
+        CreatureData const* spawnpoint = sObjectMgr->GetCreatureData(spawnId);
+        if (!spawnpoint)
+        {
+            handler->SendSysMessage(LANG_COMMAND_GOCREATNOTFOUND);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        CreatureTemplate const* creatureTemplate = ASSERT_NOTNULL(sObjectMgr->GetCreatureTemplate(spawnpoint->id1));
+
+        return DoNameTeleport(handler, player, spawnpoint->mapid, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, creatureTemplate->Name);
+    }
+
+    static bool HandleTeleNameNpcNameCommand(ChatHandler* handler, PlayerIdentifier player, Tail name)
+    {
+        std::string normalizedName(name);
+        WorldDatabase.EscapeString(normalizedName);
+
+        // May need work //PussyWizardEliteMalcrom
+        QueryResult result = WorldDatabase.Query("SELECT c.position_x, c.position_y, c.position_z, c.orientation, c.map, ct.name FROM creature c INNER JOIN creature_template ct ON c.id1 = ct.entry WHERE ct.name LIKE '{}'", normalizedName);
+        if (!result)
+        {
+            handler->SendSysMessage(LANG_COMMAND_GOCREATNOTFOUND);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (result->GetRowCount() > 1)
+            handler->SendSysMessage(LANG_COMMAND_GOCREATMULTIPLE);
+
+        Field* fields = result->Fetch();
+        return DoNameTeleport(handler, player, fields[4].Get<uint16>(), { fields[0].Get<float>(), fields[1].Get<float>(), fields[2].Get<float>(), fields[3].Get<float>() }, fields[5].Get<std::string>());
     }
 };
 

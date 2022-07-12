@@ -89,10 +89,10 @@ enum AuctionSortOrder
 
 struct AuctionSortInfo
 {
-    AuctionSortInfo() : sortOrder(AUCTION_SORT_MAX), isDesc(true) { }
+    AuctionSortInfo()  = default;
 
-    AuctionSortOrder sortOrder;
-    bool isDesc;
+    AuctionSortOrder sortOrder{AUCTION_SORT_MAX};
+    bool isDesc{true};
 };
 
 typedef std::vector<AuctionSortInfo> AuctionSortOrderVector;

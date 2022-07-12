@@ -276,11 +276,14 @@ public:
             {
                 if (pInstance->GetBossState(BOSS_HORSEMAN) == DONE)
                 {
-                    if (!me->GetMap()->GetPlayers().isEmpty())
+                    if (!me->GetMap()->GetPlayers().IsEmpty())
                     {
                         if (Player* player = me->GetMap()->GetPlayers().getFirst()->GetSource())
                         {
-                            player->SummonGameObject(RAID_MODE(GO_HORSEMEN_CHEST_10, GO_HORSEMEN_CHEST_25), 2514.8f, -2944.9f, 245.55f, 5.51f, 0, 0, 0, 0, 0);
+                            if (GameObject* chest = player->SummonGameObject(RAID_MODE(GO_HORSEMEN_CHEST_10, GO_HORSEMEN_CHEST_25), 2514.8f, -2944.9f, 245.55f, 5.51f, 0, 0, 0, 0, 0))
+                            {
+                                chest->SetLootRecipient(me);
+                            }
                         }
                     }
                     if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_HORSEMEN_GATE)))
@@ -346,7 +349,7 @@ public:
                     events.RepeatEvent(15000);
                     return;
                 case EVENT_PUNISH:
-                    if (!SelectTarget(SELECT_TARGET_NEAREST, 0, 45.0f, true))
+                    if (!SelectTarget(SelectTargetMethod::MaxDistance, 0, 45.0f, true))
                     {
                         me->CastSpell(me, TABLE_SPELL_PUNISH[horsemanId], false);
                         Talk(EMOTE_RAGECAST);
@@ -361,7 +364,7 @@ public:
 
             if ((me->GetEntry() == NPC_LADY_BLAUMEUX || me->GetEntry() == NPC_SIR_ZELIEK))
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_NEAREST, 0, 45.0f, true))
+                if (Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 45.0f, true))
                 {
                     me->CastSpell(target, RAID_MODE(TABLE_SPELL_PRIMARY_10[horsemanId], TABLE_SPELL_PRIMARY_25[horsemanId]), false);
                 }
@@ -431,8 +434,25 @@ public:
     }
 };
 
+class spell_four_horsemen_consumption : public SpellScript
+{
+    PrepareSpellScript(spell_four_horsemen_consumption);
+
+    void HandleDamageCalc(SpellEffIndex /*effIndex*/)
+    {
+        uint32 damage = GetCaster()->GetMap()->ToInstanceMap()->GetDifficulty() == REGULAR_DIFFICULTY ? 2750 : 4250;
+        SetHitDamage(damage);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_four_horsemen_consumption::HandleDamageCalc, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+    }
+};
+
 void AddSC_boss_four_horsemen()
 {
     new boss_four_horsemen();
     new spell_four_horsemen_mark();
+    RegisterSpellScript(spell_four_horsemen_consumption);
 }
