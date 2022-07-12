@@ -273,7 +273,8 @@ public:
 
                 for (const auto attacker : attackers)
                 {
-                    ++attackersCount;
+                    if ((*attacker)->ToPlayer() && (*attacker)->IsAlive())
+                        ++attackersCount;
                 }
 
                 uint8 amount = attackersCount < 30 ? attackersCount * 0.5f : 15;
