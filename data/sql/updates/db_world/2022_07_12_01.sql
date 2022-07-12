@@ -1,3 +1,4 @@
+-- DB update 2022_07_12_00 -> 2022_07_12_01
 --
 /* Maintenance on ZG Entranceway mobs part 1 Unpooled */
 
