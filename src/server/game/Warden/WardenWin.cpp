@@ -19,6 +19,7 @@
 #include "ByteBuffer.h"
 #include "Common.h"
 #include "CryptoRandom.h"
+#include "GameTime.h"
 #include "HMAC.h"
 #include "Log.h"
 #include "Opcodes.h"
