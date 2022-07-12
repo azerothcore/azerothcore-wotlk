@@ -916,6 +916,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->SpellLevel = 0;
         spellInfo->BaseLevel = 0;
         spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(5); // 40yd
     });
 
     // Earth Shield
@@ -1199,13 +1200,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER_AREA_PARTY);
     });
 
-    // Shadow Weaving
-    ApplySpellFix({ 15257, 15331, 15332 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
-        spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_PROC_TRIGGER_SPELL;
-    });
-
     // Hymn of Hope
     ApplySpellFix({ 64904 }, [](SpellInfo* spellInfo)
     {
@@ -1367,6 +1361,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 49099 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].Amplitude = 15000;
+    });
+
+    // Frightening Shout
+    ApplySpellFix({ 19134 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
     });
 
     // Isle of Conquest
@@ -4268,6 +4268,59 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21);
+    });
+
+    // Mana Tide Totem
+    // Cleansing Totem Effect
+    ApplySpellFix({ 39609, 52025 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(5); // 40yd
+    });
+
+    // Increased Totem Radius
+    ApplySpellFix({ 21895 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[0].SpellClassMask = flag96(0x0603E000, 0x00200100);
+    });
+
+    // Jokkum Summon
+    ApplySpellFix({ 56541 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].MiscValueB = 844;
+    });
+
+    // Hakkar Cause Insanity
+    ApplySpellFix({ 24327 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Dispel = DISPEL_NONE;
+    });
+
+    // Summon Nightmare Illusions
+    ApplySpellFix({ 24681, 24728, 24729 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].MiscValueB = 64;
+    });
+
+    // Blood Siphon
+    ApplySpellFix({ 24322, 24323 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_MOD_STUN;
+        spellInfo->Effects[EFFECT_2].Effect = 0;
+        spellInfo->Attributes |= SPELL_ATTR0_NO_AURA_CANCEL;
+        spellInfo->AttributesEx5 |= SPELL_ATTR5_ALLOW_ACTION_DURING_CHANNEL;
+        spellInfo->ChannelInterruptFlags &= ~AURA_INTERRUPT_FLAG_MOVE;
+    });
+
+    // Place Fake Fur
+    ApplySpellFix({ 46085 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].MiscValue = 8;
+    });
+
+    // Smash Mammoth Trap
+    ApplySpellFix({ 46201 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].MiscValue = 8;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

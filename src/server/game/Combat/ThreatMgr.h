@@ -39,7 +39,7 @@ class SpellInfo;
 
 struct ThreatCalcHelper
 {
-    static float calcThreat(Unit* hatedUnit, Unit* hatingUnit, float threat, SpellSchoolMask schoolMask = SPELL_SCHOOL_MASK_NORMAL, SpellInfo const* threatSpell = nullptr);
+    static float calcThreat(Unit* hatedUnit, float threat, SpellSchoolMask schoolMask = SPELL_SCHOOL_MASK_NORMAL, SpellInfo const* threatSpell = nullptr);
     static bool isValidProcess(Unit* hatedUnit, Unit* hatingUnit, SpellInfo const* threatSpell = nullptr);
 };
 
@@ -232,6 +232,11 @@ public:
 
     // Reset all aggro without modifying the threadlist.
     void resetAllAggro();
+
+    // -- compatibility layer for combat rewrite
+    void ResetAllThreat() { resetAllAggro(); }
+
+    void ClearAllThreat();
 
     // Reset all aggro of unit in threadlist satisfying the predicate.
     template<class PREDICATE> void resetAggro(PREDICATE predicate)

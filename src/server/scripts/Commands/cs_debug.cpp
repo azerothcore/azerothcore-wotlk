@@ -58,7 +58,8 @@ public:
             { "cinematic",      HandleDebugPlayCinematicCommand,       SEC_ADMINISTRATOR, Console::No },
             { "movie",          HandleDebugPlayMovieCommand,           SEC_ADMINISTRATOR, Console::No },
             { "sound",          HandleDebugPlaySoundCommand,           SEC_ADMINISTRATOR, Console::No },
-            { "music",          HandleDebugPlayMusicCommand,           SEC_ADMINISTRATOR, Console::No }
+            { "music",          HandleDebugPlayMusicCommand,           SEC_ADMINISTRATOR, Console::No },
+            { "visual",         HandleDebugVisualCommand,              SEC_ADMINISTRATOR, Console::No }
         };
         static ChatCommandTable debugSendCommandTable =
         {
@@ -200,6 +201,28 @@ public:
         player->PlayDirectMusic(musicId, player);
 
         handler->PSendSysMessage(LANG_YOU_HEAR_SOUND, musicId);
+        return true;
+    }
+
+    static bool HandleDebugVisualCommand(ChatHandler* handler, uint32 visualId)
+    {
+        if (!visualId)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        Player* player = handler->GetPlayer();
+        Unit* target = handler->getSelectedUnit();
+
+        if (!target)
+        {
+            player->SendPlaySpellVisual(visualId);
+            return true;
+        }
+
+        player->SendPlaySpellImpact(target->GetGUID(), visualId);
         return true;
     }
 
@@ -783,7 +806,7 @@ public:
         if (!target || target->IsTotem() || target->IsPet())
             return false;
 
-        auto const& threatList = target->getThreatMgr().getThreatList();
+        auto const& threatList = target->GetThreatMgr().getThreatList();
         ThreatContainer::StorageType::const_iterator itr;
         uint32 count = 0;
 
@@ -801,7 +824,7 @@ public:
             handler->PSendSysMessage("   %u.   %s   (%s)  - threat %f", ++count, unit->GetName().c_str(), unit->GetGUID().ToString().c_str(), (*itr)->getThreat());
         }
 
-        auto const& threatList2 = target->getThreatMgr().getOfflineThreatList();
+        auto const& threatList2 = target->GetThreatMgr().getOfflineThreatList();
         for (itr = threatList2.begin(); itr != threatList2.end(); ++itr)
         {
             Unit* unit = (*itr)->getTarget();

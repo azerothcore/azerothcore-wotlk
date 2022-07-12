@@ -708,7 +708,7 @@ public:
     bool UpdateChanneledTargetList();
     bool IsValidDeadOrAliveTarget(Unit const* target) const;
     void HandleLaunchPhase();
-    void DoAllEffectOnLaunchTarget(TargetInfo& targetInfo, float* multiplier, bool firstTarget);
+    void DoAllEffectOnLaunchTarget(TargetInfo& targetInfo, float* multiplier);
 
     void PrepareTargetProcessing();
     void FinishTargetProcessing();

@@ -139,7 +139,7 @@ public:
                 })
                 .Schedule(12s, [this](TaskContext context)
                 {
-                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->SetImmuneToAll(false);
                     _phase = PHASE_COMBAT;
                     DoZoneInCombat();
 
@@ -185,7 +185,7 @@ public:
                     }
                 });
 
-                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                me->SetImmuneToPC(true);
                 me->SetFaction(FACTION_MONSTER);
                 summons.DoAction(ACTION_START_EVENT);
             }
@@ -293,13 +293,13 @@ struct npc_apothecary_genericAI : public ScriptedAI
     {
         if (action == ACTION_START_EVENT)
         {
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetImmuneToPC(true);
             me->SetFaction(FACTION_MONSTER);
             me->GetMotionMaster()->MovePoint(1, _movePos);
         }
         else if (action == ACTION_START_FIGHT)
         {
-            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(false);
             DoZoneInCombat();
         }
     }

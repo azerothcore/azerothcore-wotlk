@@ -491,7 +491,7 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
     if (!spellInfo)
         return;
 
-    // not allow remove spells with attr SPELL_ATTR0_CANT_CANCEL
+    // not allow remove spells with attr SPELL_ATTR0_NO_AURA_CANCEL
     if (spellInfo->HasAttribute(SPELL_ATTR0_NO_AURA_CANCEL))
     {
         return;
@@ -569,14 +569,35 @@ void WorldSession::HandleCancelAutoRepeatSpellOpcode(WorldPacket& /*recvPacket*/
 
 void WorldSession::HandleCancelChanneling(WorldPacket& recvData)
 {
-    recvData.read_skip<uint32>();                          // spellid, not used
+    uint32 spellID = 0;
+    recvData >> spellID;
 
     // ignore for remote control state (for player case)
     Unit* mover = _player->m_mover;
-    if (mover != _player && mover->GetTypeId() == TYPEID_PLAYER)
+    if (!mover)
+    {
         return;
+    }
 
-    mover->InterruptSpell(CURRENT_CHANNELED_SPELL, true, true, true);
+    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellID);
+    if (!spellInfo)
+    {
+        return;
+    }
+
+    // not allow remove spells with attr SPELL_ATTR0_NO_AURA_CANCEL
+    if (spellInfo->HasAttribute(SPELL_ATTR0_NO_AURA_CANCEL))
+    {
+        return;
+    }
+
+    Spell* spell = mover->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
+    if (!spell || spell->GetSpellInfo()->Id != spellInfo->Id)
+    {
+        return;
+    }
+
+    mover->InterruptSpell(CURRENT_CHANNELED_SPELL);
 }
 
 void WorldSession::HandleTotemDestroyed(WorldPackets::Totem::TotemDestroyed& totemDestroyed)

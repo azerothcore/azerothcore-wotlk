@@ -496,7 +496,7 @@ public:
     }
 
     //show info of gameobject
-    static bool HandleGameObjectInfoCommand(ChatHandler* handler, Optional<Variant<GameObjectEntry, std::string_view>> objectId)
+    static bool HandleGameObjectInfoCommand(ChatHandler* handler, Optional<EXACT_SEQUENCE("guid")> isGuid, Variant<Hyperlink<gameobject_entry>, Hyperlink<gameobject>, uint32> data)
     {
         uint32 entry = 0;
         uint32 type = 0;
@@ -505,17 +505,24 @@ public:
         uint32 lootId = 0;
         GameObject* gameObject = nullptr;
 
-        if (!objectId)
+        ObjectGuid::LowType spawnId = 0;
+        if (isGuid || data.holds_alternative<Hyperlink<gameobject>>())
         {
-            if (WorldObject* object = handler->getSelectedObject())
+            spawnId = *data;
+            GameObjectData const* spawnData = sObjectMgr->GetGOData(spawnId);
+            if (!spawnData)
             {
-                entry = object->GetEntry();
-                if (object->GetTypeId() == TYPEID_GAMEOBJECT)
-                    gameObject = object->ToGameObject();
+                handler->PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, spawnId);
+                handler->SetSentErrorMessage(true);
+                return false;
             }
+            entry = spawnData->id;
+            gameObject = handler->GetObjectFromPlayerMapByDbGuid(spawnId);
         }
         else
-            entry = static_cast<uint32>(objectId->get<GameObjectEntry>());
+        {
+            entry = *data;
+        }
 
         GameObjectTemplate const* gameObjectInfo = sObjectMgr->GetGameObjectTemplate(entry);
         if (!gameObjectInfo)

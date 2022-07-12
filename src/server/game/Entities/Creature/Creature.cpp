@@ -207,21 +207,21 @@ bool TemporaryThreatModifierEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
     {
         if (m_owner.IsInCombatWith(victim))
         {
-            m_owner.getThreatMgr().modifyThreatPercent(victim, -100); // Reset threat to zero.
-            m_owner.getThreatMgr().addThreat(victim, m_threatValue);  // Set to the previous value it had, first before modification.
+            m_owner.GetThreatMgr().modifyThreatPercent(victim, -100); // Reset threat to zero.
+            m_owner.GetThreatMgr().addThreat(victim, m_threatValue);  // Set to the previous value it had, first before modification.
         }
     }
 
     return true;
 }
 
-Creature::Creature(bool isWorldObject): Unit(isWorldObject), MovableMapObject(), m_groupLootTimer(0), lootingGroupLowGUID(0), m_PlayerDamageReq(0), m_lootRecipientGroup(0),
+Creature::Creature(bool isWorldObject): Unit(isWorldObject), MovableMapObject(), m_groupLootTimer(0), lootingGroupLowGUID(0), m_lootRecipientGroup(0),
     m_corpseRemoveTime(0), m_respawnTime(0), m_respawnDelay(300), m_corpseDelay(60), m_wanderDistance(0.0f), m_boundaryCheckTime(2500),
     m_transportCheckTimer(1000), lootPickPocketRestoreTime(0),  m_reactState(REACT_AGGRESSIVE), m_defaultMovementType(IDLE_MOTION_TYPE),
     m_spawnId(0), m_equipmentId(0), m_originalEquipmentId(0), m_AlreadyCallAssistance(false),
     m_AlreadySearchedAssistance(false), m_regenHealth(true), m_AI_locked(false), m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), m_moveInLineOfSightDisabled(false), m_moveInLineOfSightStrictlyDisabled(false),
     m_homePosition(), m_transportHomePosition(), m_creatureInfo(nullptr), m_creatureData(nullptr), m_detectionDistance(20.0f), m_waypointID(0), m_path_id(0), m_formation(nullptr), _lastDamagedTime(nullptr), m_cannotReachTarget(false), m_cannotReachTimer(0),
-    _isMissingSwimmingFlagOutOfCombat(false), m_assistanceTimer(0)
+    _isMissingSwimmingFlagOutOfCombat(false), m_assistanceTimer(0), _playerDamageReq(0), _damagedByPlayer(false)
 {
     m_regenTimer = CREATURE_REGEN_INTERVAL;
     m_valuesCount = UNIT_END;
@@ -283,6 +283,8 @@ void Creature::AddToWorld()
         {
             GetZoneScript()->OnCreatureCreate(this);
         }
+
+        loot.sourceWorldObjectGUID = GetGUID();
 
         sScriptMgr->OnCreatureAddWorld(this);
     }
@@ -487,7 +489,7 @@ bool Creature::InitEntry(uint32 Entry, const CreatureData* data)
     return true;
 }
 
-bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changelevel)
+bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changelevel, bool updateAI)
 {
     if (!InitEntry(Entry, data))
         return false;
@@ -526,7 +528,7 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
 
     uint32 previousHealth = GetHealth();
     uint32 previousMaxHealth = GetMaxHealth();
-    uint32 previousPlayerDamageReq = m_PlayerDamageReq;
+    uint32 previousPlayerDamageReq = _playerDamageReq;
 
     SelectLevel(changelevel);
     if (previousHealth > 0)
@@ -535,11 +537,11 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
 
         if (previousMaxHealth && previousMaxHealth > GetMaxHealth())
         {
-            m_PlayerDamageReq = (uint32)(previousPlayerDamageReq * GetMaxHealth() / previousMaxHealth);
+            _playerDamageReq = (uint32)(previousPlayerDamageReq * GetMaxHealth() / previousMaxHealth);
         }
         else
         {
-            m_PlayerDamageReq = previousPlayerDamageReq;
+            _playerDamageReq = previousPlayerDamageReq;
         }
     }
 
@@ -596,6 +598,12 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
     SetDetectionDistance(cInfo->detection_range);
 
     LoadSpellTemplateImmunity();
+
+    if (updateAI)
+    {
+        AIM_Initialize();
+    }
+
     return true;
 }
 
@@ -704,7 +712,7 @@ void Creature::Update(uint32 diff)
                 }
 
                 // periodic check to see if the creature has passed an evade boundary
-                if (IsAIEnabled && !IsInEvadeMode() && IsInCombat())
+                if (IsAIEnabled && !IsInEvadeMode() && IsEngaged())
                 {
                     if (diff >= m_boundaryCheckTime)
                     {
@@ -1809,20 +1817,35 @@ bool Creature::CanAlwaysSee(WorldObject const* obj) const
     return false;
 }
 
+bool Creature::IsAlwaysDetectableFor(WorldObject const* seer) const
+{
+    if (Unit::IsAlwaysDetectableFor(seer))
+    {
+        return true;
+    }
+
+    if (IsAIEnabled && AI()->CanAlwaysBeDetectable(seer))
+    {
+        return true;
+    }
+
+    return false;
+}
+
 bool Creature::CanStartAttack(Unit const* who) const
 {
     if (IsCivilian())
         return false;
 
     // This set of checks is should be done only for creatures
-    if ((HasUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC) && who->GetTypeId() != TYPEID_PLAYER) ||      // flag is valid only for non player characters
-        (HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC) && who->GetTypeId() == TYPEID_PLAYER))         // immune to PC and target is a player, return false
+    if ((IsImmuneToNPC() && who->GetTypeId() != TYPEID_PLAYER) ||      // flag is valid only for non player characters
+        (IsImmuneToPC() && who->GetTypeId() == TYPEID_PLAYER))         // immune to PC and target is a player, return false
     {
         return false;
     }
 
     if (Unit* owner = who->GetOwner())
-        if (owner->GetTypeId() == TYPEID_PLAYER && HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC))     // immune to PC and target has player owner
+        if (owner->GetTypeId() == TYPEID_PLAYER && IsImmuneToPC())     // immune to PC and target has player owner
             return false;
 
     // Do not attack non-combat pets
@@ -1838,7 +1861,7 @@ bool Creature::CanStartAttack(Unit const* who) const
     // pussywizard: at this point we are either hostile to who or friendly to who->getAttackerForHelper()
     // pussywizard: if who is in combat and has an attacker, help him if the distance is right (help because who is hostile or help because attacker is friendly)
     bool assist = false;
-    if (who->IsInCombat() && IsWithinDist(who, ATTACK_DISTANCE))
+    if (who->IsEngaged() && IsWithinDist(who, ATTACK_DISTANCE))
         if (Unit* victim = who->getAttackerForHelper())
             if (IsWithinDistInMap(victim, sWorld->getFloatConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_RADIUS)))
                 assist = true;
@@ -2353,11 +2376,11 @@ bool Creature::CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction /
     if (IsCivilian())
         return false;
 
-    if (HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_NPC))
+    if (HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE) || IsImmuneToNPC())
         return false;
 
     // skip fighting creature
-    if (IsInCombat())
+    if (IsEngaged())
         return false;
 
     // only free creature
@@ -2408,11 +2431,10 @@ bool Creature::_IsTargetAcceptable(Unit const* target) const
             return false;
     }
 
-    Unit const* myVictim = getAttackerForHelper();
     Unit const* targetVictim = target->getAttackerForHelper();
 
     // if I'm already fighting target, or I'm hostile towards the target, the target is acceptable
-    if (myVictim == target || targetVictim == this || IsHostileTo(target))
+    if (IsEngagedBy(target) || IsHostileTo(target))
         return true;
 
     // if the target's victim is friendly, and the target is neutral, the target is acceptable
@@ -3417,7 +3439,7 @@ bool Creature::IsMovementPreventedByCasting() const
 {
     Spell* spell = m_currentSpells[CURRENT_CHANNELED_SPELL];
     // first check if currently a movement allowed channel is active and we're not casting
-    if (spell && spell->getState() != SPELL_STATE_FINISHED && spell->IsChannelActive() && spell->GetSpellInfo()->IsMoveAllowedChannel())
+    if (spell && spell->getState() != SPELL_STATE_FINISHED && spell->IsChannelActive() && spell->GetSpellInfo()->IsActionAllowedChannel())
     {
         return false;
     }
@@ -3548,14 +3570,41 @@ void Creature::ModifyThreatPercentTemp(Unit* victim, int32 percent, Milliseconds
 {
     if (victim)
     {
-        float currentThreat = getThreatMgr().getThreat(victim);
+        float currentThreat = GetThreatMgr().getThreat(victim);
 
         if (percent != 0.0f)
         {
-            getThreatMgr().modifyThreatPercent(victim, percent);
+            GetThreatMgr().modifyThreatPercent(victim, percent);
         }
 
         TemporaryThreatModifierEvent* pEvent = new TemporaryThreatModifierEvent(*this, victim->GetGUID(), currentThreat);
         m_Events.AddEvent(pEvent, m_Events.CalculateTime(duration.count()));
     }
+}
+
+bool Creature::IsDamageEnoughForLootingAndReward() const
+{
+    return (m_creatureInfo->flags_extra & CREATURE_FLAG_EXTRA_NO_PLAYER_DAMAGE_REQ) || (_playerDamageReq == 0 && _damagedByPlayer);
+}
+
+void Creature::LowerPlayerDamageReq(uint32 unDamage, bool damagedByPlayer /*= true*/)
+{
+    if (_playerDamageReq)
+        _playerDamageReq > unDamage ? _playerDamageReq -= unDamage : _playerDamageReq = 0;
+
+    if (!_damagedByPlayer)
+    {
+        _damagedByPlayer = damagedByPlayer;
+    }
+}
+
+void Creature::ResetPlayerDamageReq()
+{
+    _playerDamageReq = GetHealth() / 2;
+    _damagedByPlayer = false;
+}
+
+uint32 Creature::GetPlayerDamageReq() const
+{
+    return _playerDamageReq;
 }

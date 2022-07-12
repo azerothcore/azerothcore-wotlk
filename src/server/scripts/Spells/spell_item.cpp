@@ -273,24 +273,28 @@ class spell_item_with_mount_speed : public AuraScript
     }
 };
 
-class spell_item_magic_dust : public AuraScript
+class spell_item_magic_dust : public SpellScript
 {
-    PrepareAuraScript(spell_item_magic_dust);
+    PrepareSpellScript(spell_item_magic_dust);
 
-    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    void HandlePreventAura(SpellEffIndex /*effIndex*/)
     {
-        Unit* target = GetTarget();
-        if (target->getLevel() >= 30)
+        if (Unit* target = GetHitUnit())
         {
-            uint8 chance = 100 - std::min<uint8>(100, target->getLevel() - 30 * urand(3, 10));
-            if (!roll_chance_i(chance))
-                PreventDefaultAction();
+            if (target->getLevel() >= 30)
+            {
+                uint8 chance = 100 - std::min<uint8>(100, target->getLevel() - 30 * urand(3, 10));
+                if (!roll_chance_i(chance))
+                {
+                    PreventHitAura();
+                }
+            }
         }
     }
 
     void Register() override
     {
-        OnEffectApply += AuraEffectApplyFn(spell_item_magic_dust::OnApply, EFFECT_0, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
+        OnEffectHitTarget += SpellEffectFn(spell_item_magic_dust::HandlePreventAura, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
     }
 };
 
@@ -1100,7 +1104,7 @@ class spell_item_draenic_pale_ale : public SpellScript
 
             summon->SetOwnerGUID(GetCaster()->GetGUID());
             summon->SetFaction(GetCaster()->GetFaction());
-            summon->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            summon->SetImmuneToAll(true);
             summon->SetReactState(REACT_PASSIVE);
             summon->GetMotionMaster()->MoveFollow(GetCaster(), PET_FOLLOW_DIST, GetCaster()->GetAngle(summon), MOTION_SLOT_CONTROLLED);
             GetSpell()->ExecuteLogEffectSummonObject(effIndex, summon);

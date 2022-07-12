@@ -168,7 +168,7 @@ public:
                 cr->InterruptNonMeleeSpells(true);
                 cr->CastSpell(cr, SPELL_FEUGEN_CHAIN, false);
                 cr->SetDisableGravity(true);
-                cr->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                cr->SetImmuneToPC(false);
                 cr->SetControlled(true, UNIT_STATE_ROOT);
             }
             if (Creature* cr = me->SummonCreature(NPC_TESLA_COIL, 3487.04f, -2911.68f, 318.75f, 0.0f))
@@ -177,7 +177,7 @@ public:
                 cr->InterruptNonMeleeSpells(true);
                 cr->CastSpell(cr, SPELL_STALAGG_CHAIN, false);
                 cr->SetDisableGravity(true);
-                cr->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                cr->SetImmuneToPC(false);
                 cr->SetControlled(true, UNIT_STATE_ROOT);
             }
 
@@ -403,7 +403,7 @@ public:
             if (Creature* cr = me->FindNearestCreature(NPC_TESLA_COIL, 150.0f))
             {
                 cr->CastSpell(cr, me->GetEntry() == NPC_STALAGG ? SPELL_STALAGG_CHAIN : SPELL_FEUGEN_CHAIN, false);
-                cr->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                cr->SetImmuneToPC(false);
                 myCoil = cr->GetGUID();
             }
         }
@@ -553,17 +553,17 @@ public:
                             if (!feugen->IsAlive() || !feugen->GetVictim() || !me->GetVictim())
                                 return;
 
-                            float threatFeugen = feugen->getThreatMgr().getThreat(feugen->GetVictim());
-                            float threatStalagg = me->getThreatMgr().getThreat(me->GetVictim());
+                            float threatFeugen = feugen->GetThreatMgr().getThreat(feugen->GetVictim());
+                            float threatStalagg = me->GetThreatMgr().getThreat(me->GetVictim());
                             Unit* tankFeugen = feugen->GetVictim();
                             Unit* tankStalagg = me->GetVictim();
 
-                            feugen->getThreatMgr().modifyThreatPercent(tankFeugen, -100);
+                            feugen->GetThreatMgr().modifyThreatPercent(tankFeugen, -100);
                             feugen->AddThreat(tankStalagg, threatFeugen);
                             feugen->CastSpell(tankStalagg, SPELL_MAGNETIC_PULL, true);
                             feugen->AI()->DoAction(ACTION_MAGNETIC_PULL);
 
-                            me->getThreatMgr().modifyThreatPercent(tankStalagg, -100);
+                            me->GetThreatMgr().modifyThreatPercent(tankStalagg, -100);
                             me->AddThreat(tankFeugen, threatStalagg);
                             me->CastSpell(tankFeugen, SPELL_MAGNETIC_PULL, true);
                             DoAction(ACTION_MAGNETIC_PULL);

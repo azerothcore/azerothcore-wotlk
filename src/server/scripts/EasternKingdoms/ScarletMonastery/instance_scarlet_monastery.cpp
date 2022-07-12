@@ -244,7 +244,8 @@ public:
 enum MograineEvents
 {
     EVENT_SPELL_CRUSADER_STRIKE     =   1,
-    EVENT_SPELL_HAMMER_OF_JUSTICE   =   2
+    EVENT_SPELL_HAMMER_OF_JUSTICE   =   2,
+    EVENT_PULL_CATHEDRAL            =   3
 };
 
 enum WhitemaneEvents
@@ -284,6 +285,8 @@ enum Says
     SAY_WH_KILL                     =   1,
     SAY_WH_RESURRECT                =   2,
 };
+
+float const CATHEDRAL_PULL_RANGE    = 80.0f; // Distance from the Cathedral doors to where Mograine is standing
 
 class npc_mograine : public CreatureScript
 {
@@ -357,6 +360,22 @@ public:
             }
         }
 
+        void PullCathedral() // CallForHelp will ignore any npcs without LOS
+        {
+            std::list<Creature*> creatureList;
+            GetCreatureListWithEntryInGrid(creatureList, me, NPC_SCARLET_MONK, CATHEDRAL_PULL_RANGE);
+            GetCreatureListWithEntryInGrid(creatureList, me, NPC_SCARLET_ABBOT, CATHEDRAL_PULL_RANGE);
+            GetCreatureListWithEntryInGrid(creatureList, me, NPC_SCARLET_CHAMPION, CATHEDRAL_PULL_RANGE);
+            GetCreatureListWithEntryInGrid(creatureList, me, NPC_SCARLET_CENTURION, CATHEDRAL_PULL_RANGE);
+            GetCreatureListWithEntryInGrid(creatureList, me, NPC_SCARLET_WIZARD, CATHEDRAL_PULL_RANGE);
+            GetCreatureListWithEntryInGrid(creatureList, me, NPC_SCARLET_CHAPLAIN, CATHEDRAL_PULL_RANGE);
+            for (std::list<Creature*>::iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
+            {
+                if (Creature* creature = *itr)
+                    creature->AI()->AttackStart(me->GetVictim());
+            }
+        }
+
         void Reset() override
         {
             //Incase wipe during phase that mograine fake death
@@ -392,8 +411,8 @@ public:
         void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_MO_AGGRO);
-            me->CallForHelp(150.0f);
             me->CastSpell(me, SPELL_RETRIBUTION_AURA, true);
+            events.ScheduleEvent(EVENT_PULL_CATHEDRAL, 1000); // Has to be done via event, otherwise mob aggroing Mograine DOES NOT aggro the room
             events.ScheduleEvent(EVENT_SPELL_CRUSADER_STRIKE, urand(1000, 5000));
             events.ScheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, urand(6000, 11000));
         }
@@ -495,6 +514,9 @@ public:
                     case EVENT_SPELL_HAMMER_OF_JUSTICE:
                         me->CastSpell(me->GetVictim(), SPELL_HAMMER_OF_JUSTICE, true);
                         events.ScheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, 60000);
+                        break;
+                    case EVENT_PULL_CATHEDRAL:
+                        PullCathedral();
                         break;
                 }
             }

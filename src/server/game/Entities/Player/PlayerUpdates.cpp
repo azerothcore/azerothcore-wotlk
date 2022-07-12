@@ -277,10 +277,11 @@ void Player::Update(uint32 p_time)
             // supposed to be in one
             if (HasRestFlag(REST_FLAG_IN_TAVERN))
             {
-                AreaTrigger const* atEntry =
-                    sObjectMgr->GetAreaTrigger(GetInnTriggerId());
-                if (!atEntry || !IsInAreaTriggerRadius(atEntry))
+                AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(GetInnTriggerId());
+                if (!atEntry || !IsInAreaTriggerRadius(atEntry, 5.f))
+                {
                     RemoveRestFlag(REST_FLAG_IN_TAVERN);
+                }
             }
 
             uint32 newzone, newarea;
@@ -1548,6 +1549,10 @@ void Player::UpdateVisibilityForPlayer(bool mapChange)
 
 void Player::UpdateObjectVisibility(bool forced, bool fromUpdate)
 {
+    // Prevent updating visibility if player is not in world (example: LoadFromDB sets drunkstate which updates invisibility while player is not in map)
+    if (!IsInWorld())
+        return;
+
     if (!forced)
         AddToNotify(NOTIFY_VISIBILITY_CHANGED);
     else if (!isBeingLoaded())

@@ -79,11 +79,12 @@ void SmartWaypointMgr::LoadFromDB()
         Field* fields = result->Fetch();
         uint32 entry = fields[0].Get<uint32>();
         uint32 id = fields[1].Get<uint32>();
-        float x, y, z, o;
-        x = fields[2].Get<float>();
-        y = fields[3].Get<float>();
-        z = fields[4].Get<float>();
-        o = fields[5].Get<float>();
+        float x = fields[2].Get<float>();
+        float y = fields[3].Get<float>();
+        float z = fields[4].Get<float>();
+        Optional<float> o;
+        if (!fields[5].IsNull())
+            o = fields[5].Get<float>();
         uint32 delay = fields[6].Get<uint32>();
 
         if (last_entry != entry)
@@ -1773,9 +1774,13 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             AC_SAI_IS_BOOLEAN_VALID(e, e.action.setHealthRegen.regenHealth);
             break;
         }
+        case SMART_ACTION_CALL_TIMED_ACTIONLIST:
+        {
+            AC_SAI_IS_BOOLEAN_VALID(e, e.action.timedActionList.allowOverride);
+            break;
+        }
         case SMART_ACTION_FLEE_FOR_ASSIST:
         case SMART_ACTION_MOVE_TO_POS:
-        case SMART_ACTION_CALL_TIMED_ACTIONLIST:
         case SMART_ACTION_EVADE:
         case SMART_ACTION_SET_ACTIVE:
         case SMART_ACTION_START_CLOSEST_WAYPOINT:

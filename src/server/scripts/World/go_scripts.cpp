@@ -24,7 +24,6 @@ go_sacred_fire_of_life
 go_shrine_of_the_birds
 go_southfury_moonstone
 go_resonite_cask
-go_tablet_of_madness
 go_tablet_of_the_seven
 go_tele_to_dalaran_crystal
 go_tele_to_violet_stand
@@ -822,19 +821,19 @@ public:
                             if (!IsHolidayActive(HOLIDAY_FIRE_FESTIVAL))
                                 break;
 
-                            Map::PlayerList const& players = me->GetMap()->GetPlayers();
-                            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                            std::list<Player*> targets;
+                            Acore::AnyPlayerInObjectRangeCheck check(me, me->GetVisibilityRange(), false);
+                            Acore::PlayerListSearcherWithSharedVision<Acore::AnyPlayerInObjectRangeCheck> searcher(me, targets, check);
+                            Cell::VisitWorldObjects(me, searcher, me->GetVisibilityRange());
+                            for (Player* player : targets)
                             {
-                                if (Player* player = itr->GetSource())
+                                if (player->GetTeamId() == TEAM_HORDE)
                                 {
-                                    if (player->GetTeamId() == TEAM_HORDE)
-                                    {
-                                        me->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_H, player);
-                                    }
-                                    else
-                                    {
-                                        me->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_A, player);
-                                    }
+                                    me->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_H, player);
+                                }
+                                else
+                                {
+                                    me->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_A, player);
                                 }
                             }
 
@@ -940,24 +939,6 @@ public:
     GameObjectAI* GetAI(GameObject* go) const override
     {
         return new go_gilded_brazierAI(go);
-    }
-};
-
-/*######
-## go_tablet_of_madness
-######*/
-
-class go_tablet_of_madness : public GameObjectScript
-{
-public:
-    go_tablet_of_madness() : GameObjectScript("go_tablet_of_madness") { }
-
-    bool OnGossipHello(Player* player, GameObject* /*go*/) override
-    {
-        if (player->HasSkill(SKILL_ALCHEMY) && player->GetSkillValue(SKILL_ALCHEMY) >= 300 && !player->HasSpell(24266))
-            player->CastSpell(player, 24267, false);
-
-        return true;
     }
 };
 
@@ -1975,7 +1956,6 @@ void AddSC_go_scripts()
     new go_gilded_brazier();
     //new go_shrine_of_the_birds();
     new go_southfury_moonstone();
-    new go_tablet_of_madness();
     new go_tablet_of_the_seven();
     new go_jump_a_tron();
     new go_sacred_fire_of_life();

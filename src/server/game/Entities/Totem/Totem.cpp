@@ -33,7 +33,8 @@ Totem::Totem(SummonPropertiesEntry const* properties, ObjectGuid owner) : Minion
 
 void Totem::Update(uint32 time)
 {
-    if (!GetOwner()->IsAlive() || !IsAlive())
+    Unit* owner = GetOwner();
+    if (!owner || !owner->IsAlive() || !IsAlive())
     {
         UnSummon();                                         // remove self
         return;
@@ -85,6 +86,8 @@ void Totem::InitStats(uint32 duration)
 
 void Totem::InitSummon()
 {
+    Minion::InitSummon();
+
     if (m_type == TOTEM_PASSIVE && GetSpell())
         CastSpell(this, GetSpell(), true);
 
@@ -97,6 +100,10 @@ void Totem::InitSummon()
     {
         SetReactState(REACT_AGGRESSIVE);
         GetOwner()->CastSpell(this, 6277, true);
+
+        // Farsight objects should be active
+        setActive(true);
+        SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
     }
 
     if (!IsInWater())

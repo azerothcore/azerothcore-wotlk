@@ -212,7 +212,7 @@ public:
 
                 me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
                 me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
-                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetImmuneToAll(true);
                 me->SetReactState(REACT_PASSIVE);
             }
         }
@@ -367,7 +367,8 @@ public:
             {
                 case ACTION_STAND_UP:
                     summons.DespawnEntry(WORLD_TRIGGER);
-                    me->RemoveUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->RemoveUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetImmuneToAll(false);
                     me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
                     me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                     me->SetReactState(REACT_AGGRESSIVE);
@@ -471,7 +472,7 @@ public:
 
                 me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
                 me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
-                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetImmuneToAll(true);
                 me->SetReactState(REACT_PASSIVE);
             }
         }
@@ -636,7 +637,8 @@ public:
             {
                 case ACTION_STAND_UP:
                     summons.DespawnEntry(WORLD_TRIGGER);
-                    me->RemoveUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->RemoveUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetImmuneToAll(false);
                     me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
                     me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                     me->SetReactState(REACT_AGGRESSIVE);
@@ -755,7 +757,7 @@ public:
 
                 me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
                 me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
-                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetImmuneToAll(true);
                 me->SetReactState(REACT_PASSIVE);
             }
         }
@@ -929,7 +931,8 @@ public:
             {
                 case ACTION_STAND_UP:
                     summons.DespawnEntry(WORLD_TRIGGER);
-                    me->RemoveUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->RemoveUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetImmuneToAll(false);
                     me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
                     me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                     me->SetReactState(REACT_AGGRESSIVE);
@@ -1202,7 +1205,7 @@ public:
             if (!attacker || attacker == me || attacker == me->GetVictim() || (det != DIRECT_DAMAGE && det != SPELL_DIRECT_DAMAGE))
                 return;
 
-            me->DeleteThreatList();
+            me->GetThreatMgr().ClearAllThreat();
             me->AddThreat(attacker, 500000000.0f);
         }
 

@@ -107,7 +107,7 @@ void SummonCroneIfReady(InstanceScript* instance, Creature* creature)
             if (creature->GetVictim())
                 pCrone->AI()->AttackStart(creature->GetVictim());
             pCrone->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-            pCrone->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+            pCrone->SetImmuneToPC(false);
         }
     }
 }
@@ -1243,7 +1243,7 @@ public:
                         Julianne->GetMotionMaster()->Clear();
                         Julianne->setDeathState(JUST_DIED);
                         Julianne->CombatStop(true);
-                        Julianne->DeleteThreatList();
+                        Julianne->GetThreatMgr().ClearAllThreat();
                         Julianne->ReplaceAllDynamicFlags(UNIT_DYNFLAG_LOOTABLE);
                     }
                     return;
@@ -1546,7 +1546,7 @@ void boss_julianne::boss_julianneAI::DamageTaken(Unit* /*done_by*/, uint32& dama
                 Romulo->GetMotionMaster()->Clear();
                 Romulo->setDeathState(JUST_DIED);
                 Romulo->CombatStop(true);
-                Romulo->DeleteThreatList();
+                Romulo->GetThreatMgr().ClearAllThreat();
                 Romulo->ReplaceAllDynamicFlags(UNIT_DYNFLAG_LOOTABLE);
             }
 
