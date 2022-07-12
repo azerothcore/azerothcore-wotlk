@@ -142,6 +142,36 @@ public:
             return 0;
         }
 
+        void RemoveHakkarPowerStack()
+        {
+            if (Creature* hakkar = instance->GetCreature(_hakkarGUID))
+            {
+                hakkar->CastSpell(hakkar, SPELL_HAKKAR_POWER_DOWN, true);
+            }
+        }
+
+        bool SetBossState(uint32 type, EncounterState state) override
+        {
+            if (!InstanceScript::SetBossState(type, state))
+                return false;
+
+            switch (type)
+            {
+                case DATA_JEKLIK:
+                case DATA_VENOXIS:
+                case DATA_MARLI:
+                case DATA_ARLOKK:
+                case DATA_THEKAL:
+                    if (state == DONE)
+                        RemoveHakkarPowerStack();
+                    break;
+                default:
+                    break;
+            }
+
+            return true;
+        }
+
         std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;

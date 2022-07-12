@@ -56,23 +56,23 @@ enum BattlegroundDesertionType
 
 enum BattlegroundMaps
 {
-    MAP_BG_ALTERAC_VALLEY         = 30,
-    MAP_BG_WARSONG_GULCH          = 489,
-    MAP_BG_ARATHI_BASIN           = 529,
-    MAP_BG_EYE_OF_THE_STORM       = 566,
-    MAP_BG_STRAND_OF_THE_ANCIENTS = 607,
-    MAP_BG_ISLE_OF_CONQUEST       = 628
+    MAP_BG_ALTERAC_VALLEY           = 30,
+    MAP_BG_WARSONG_GULCH            = 489,
+    MAP_BG_ARATHI_BASIN             = 529,
+    MAP_BG_EYE_OF_THE_STORM         = 566,
+    MAP_BG_STRAND_OF_THE_ANCIENTS   = 607,
+    MAP_BG_ISLE_OF_CONQUEST         = 628
 };
 
 enum BattlegroundBroadcastTexts
 {
-    BG_TEXT_ALLIANCE_WINS       = 10633,
-    BG_TEXT_HORDE_WINS          = 10634,
+    BG_TEXT_ALLIANCE_WINS           = 10633,
+    BG_TEXT_HORDE_WINS              = 10634,
 
-    BG_TEXT_START_TWO_MINUTES   = 18193,
-    BG_TEXT_START_ONE_MINUTE    = 18194,
-    BG_TEXT_START_HALF_MINUTE   = 18195,
-    BG_TEXT_BATTLE_HAS_BEGUN    = 18196,
+    BG_TEXT_START_TWO_MINUTES       = 18193,
+    BG_TEXT_START_ONE_MINUTE        = 18194,
+    BG_TEXT_START_HALF_MINUTE       = 18195,
+    BG_TEXT_BATTLE_HAS_BEGUN        = 18196,
 };
 
 enum BattlegroundSounds
@@ -122,8 +122,8 @@ enum BattlegroundMarksCount
 
 enum BattlegroundCreatures
 {
-    BG_CREATURE_ENTRY_A_SPIRITGUIDE      = 13116,           // alliance
-    BG_CREATURE_ENTRY_H_SPIRITGUIDE      = 13117,           // horde
+    BG_CREATURE_ENTRY_A_SPIRITGUIDE = 13116,                // alliance
+    BG_CREATURE_ENTRY_H_SPIRITGUIDE = 13117,                // horde
 };
 
 enum BattlegroundSpells
@@ -143,18 +143,18 @@ enum BattlegroundSpells
 
 enum BattlegroundReputations
 {
-    BG_REP_AV_HORDE         = 729,
-    BG_REP_AV_ALLIANCE      = 730,
-    BG_REP_AB_HORDE         = 510,
-    BG_REP_AB_ALLIANCE      = 509,
-    BG_REP_WS_HORDE         = 889,
-    BG_REP_WS_ALLIANCE      = 890,
+    BG_REP_AV_HORDE                 = 729,
+    BG_REP_AV_ALLIANCE              = 730,
+    BG_REP_AB_HORDE                 = 510,
+    BG_REP_AB_ALLIANCE              = 509,
+    BG_REP_WS_HORDE                 = 889,
+    BG_REP_WS_ALLIANCE              = 890,
 };
 
 enum BattlegroundTimeIntervals
 {
     CHECK_PLAYER_POSITION_INVERVAL  = 9000,                 // ms
-    //REMIND_INTERVAL                 = 10000,                // ms
+    //REMIND_INTERVAL               = 10000,                // ms
     INVITATION_REMIND_TIME          = 20000,                // ms
     INVITE_ACCEPT_WAIT_TIME         = 60000,                // ms
     TIME_TO_AUTOREMOVE              = 120000,               // ms
@@ -190,11 +190,11 @@ const uint32 Buff_Entries[3] = { BG_OBJECTID_SPEEDBUFF_ENTRY, BG_OBJECTID_REGENB
 
 enum BattlegroundStatus
 {
-    STATUS_NONE         = 0,                                // first status, should mean bg is not instance
-    STATUS_WAIT_QUEUE   = 1,                                // means bg is empty and waiting for queue
-    STATUS_WAIT_JOIN    = 2,                                // this means, that BG has already started and it is waiting for more players
-    STATUS_IN_PROGRESS  = 3,                                // means bg is running
-    STATUS_WAIT_LEAVE   = 4                                 // means some faction has won BG and it is ending
+    STATUS_NONE                     = 0,                     // first status, should mean bg is not instance
+    STATUS_WAIT_QUEUE               = 1,                     // means bg is empty and waiting for queue
+    STATUS_WAIT_JOIN                = 2,                     // this means, that BG has already started and it is waiting for more players
+    STATUS_IN_PROGRESS              = 3,                     // means bg is running
+    STATUS_WAIT_LEAVE               = 4                      // means some faction has won BG and it is ending
 };
 
 struct BattlegroundObjectInfo
@@ -208,32 +208,32 @@ struct BattlegroundObjectInfo
 
 enum ArenaType : uint8
 {
-    ARENA_TYPE_2v2          = 2,
-    ARENA_TYPE_3v3          = 3,
-    ARENA_TYPE_5v5          = 5
+    ARENA_TYPE_2v2                  = 2,
+    ARENA_TYPE_3v3                  = 3,
+    ARENA_TYPE_5v5                  = 5
 };
 
 enum BattlegroundType
 {
-    TYPE_BATTLEGROUND     = 3,
-    TYPE_ARENA            = 4
+    TYPE_BATTLEGROUND               = 3,
+    TYPE_ARENA                      = 4
 };
 
 enum BattlegroundStartingEvents
 {
-    BG_STARTING_EVENT_NONE  = 0x00,
-    BG_STARTING_EVENT_1     = 0x01,
-    BG_STARTING_EVENT_2     = 0x02,
-    BG_STARTING_EVENT_3     = 0x04,
-    BG_STARTING_EVENT_4     = 0x08
+    BG_STARTING_EVENT_NONE          = 0x00,
+    BG_STARTING_EVENT_1             = 0x01,
+    BG_STARTING_EVENT_2             = 0x02,
+    BG_STARTING_EVENT_3             = 0x04,
+    BG_STARTING_EVENT_4             = 0x08
 };
 
 enum BattlegroundStartingEventsIds
 {
-    BG_STARTING_EVENT_FIRST     = 0,
-    BG_STARTING_EVENT_SECOND    = 1,
-    BG_STARTING_EVENT_THIRD     = 2,
-    BG_STARTING_EVENT_FOURTH    = 3
+    BG_STARTING_EVENT_FIRST         = 0,
+    BG_STARTING_EVENT_SECOND        = 1,
+    BG_STARTING_EVENT_THIRD         = 2,
+    BG_STARTING_EVENT_FOURTH        = 3
 };
 
 constexpr auto BG_STARTING_EVENT_COUNT = 4;

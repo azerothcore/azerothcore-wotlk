@@ -90,9 +90,19 @@ public:
             return true;
         }
 
+        void ApplyHakkarPowerStacks()
+        {
+            me->RemoveAurasDueToSpell(SPELL_HAKKAR_POWER);
+            for (int i = DATA_JEKLIK; i < DATA_HAKKAR; i++)
+                if (instance->GetBossState(i) != DONE)
+                    DoCastSelf(SPELL_HAKKAR_POWER, true);
+        }
+
         void Reset() override
         {
             _Reset();
+
+            ApplyHakkarPowerStacks();
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -108,13 +118,13 @@ public:
             events.ScheduleEvent(EVENT_CAUSE_INSANITY, 17000);
             events.ScheduleEvent(EVENT_ENRAGE, 600000);
             if (instance->GetBossState(DATA_JEKLIK) != DONE)
-                events.ScheduleEvent(EVENT_ASPECT_OF_JEKLIK, 4000);
+                events.ScheduleEvent(EVENT_ASPECT_OF_JEKLIK, 21000);
             if (instance->GetBossState(DATA_VENOXIS) != DONE)
-                events.ScheduleEvent(EVENT_ASPECT_OF_VENOXIS, 7000);
+                events.ScheduleEvent(EVENT_ASPECT_OF_VENOXIS, 14000);
             if (instance->GetBossState(DATA_MARLI) != DONE)
-                events.ScheduleEvent(EVENT_ASPECT_OF_MARLI, 12000);
+                events.ScheduleEvent(EVENT_ASPECT_OF_MARLI, 15000);
             if (instance->GetBossState(DATA_THEKAL) != DONE)
-                events.ScheduleEvent(EVENT_ASPECT_OF_THEKAL, 8000);
+                events.ScheduleEvent(EVENT_ASPECT_OF_THEKAL, 10000);
             if (instance->GetBossState(DATA_ARLOKK) != DONE)
                 events.ScheduleEvent(EVENT_ASPECT_OF_ARLOKK, 18000);
             Talk(SAY_AGGRO);
@@ -166,11 +176,11 @@ public:
                         break;
                     case EVENT_ASPECT_OF_JEKLIK:
                         DoCastVictim(SPELL_ASPECT_OF_JEKLIK, true);
-                        events.ScheduleEvent(EVENT_ASPECT_OF_JEKLIK, urand(10000, 14000));
+                        events.ScheduleEvent(EVENT_ASPECT_OF_JEKLIK, 24000);
                         break;
                     case EVENT_ASPECT_OF_VENOXIS:
                         DoCastVictim(SPELL_ASPECT_OF_VENOXIS, true);
-                        events.ScheduleEvent(EVENT_ASPECT_OF_VENOXIS, 8000);
+                        events.ScheduleEvent(EVENT_ASPECT_OF_VENOXIS, urand(16000, 18000));
                         break;
                     case EVENT_ASPECT_OF_MARLI:
                         if (Unit* victim = SelectTarget(SelectTargetMethod::MaxThreat, 0, 5.f, true))
@@ -178,7 +188,7 @@ public:
                             DoCast(victim, SPELL_ASPECT_OF_MARLI, true);
                             me->GetThreatMgr().modifyThreatPercent(victim, -100.f);
                         }
-                        events.ScheduleEvent(EVENT_ASPECT_OF_MARLI, 10000);
+                        events.ScheduleEvent(EVENT_ASPECT_OF_MARLI, 45000);
                         break;
                     case EVENT_ASPECT_OF_THEKAL:
                         DoCastVictim(SPELL_ASPECT_OF_THEKAL, true);
@@ -374,6 +384,23 @@ class spell_blood_siphon : public SpellScript
     }
 };
 
+class spell_hakkar_power_down : public SpellScript
+{
+    PrepareSpellScript(spell_hakkar_power_down);
+
+    void HandleOnHit()
+    {
+        if (Unit* caster = GetCaster())
+            if (caster->HasAura(SPELL_HAKKAR_POWER))
+                caster->RemoveAuraFromStack(SPELL_HAKKAR_POWER);
+    }
+
+    void Register() override
+    {
+        OnHit += SpellHitFn(spell_hakkar_power_down::HandleOnHit);
+    }
+};
+
 void AddSC_boss_hakkar()
 {
     new boss_hakkar();
@@ -383,4 +410,5 @@ void AddSC_boss_hakkar()
     new at_zulgurub_bloodfire_pit_speech();
     new at_zulgurub_edge_of_madness_speech();
     RegisterSpellScript(spell_blood_siphon);
+    RegisterSpellScript(spell_hakkar_power_down);
 }
