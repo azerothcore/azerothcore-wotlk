@@ -608,11 +608,6 @@ void WardenWin::HandleData(ByteBuffer& buff)
         }
     }
 
-    if (checkFailed == 780 || checkFailed == 59)
-    {
-        return;
-    }
-
     if (checkFailed > 0)
     {
         ApplyPenalty(checkFailed, "");
