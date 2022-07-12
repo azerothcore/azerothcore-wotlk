@@ -21,14 +21,6 @@
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 
-enum MenuTexts
-{
-    MSG_TESTED                      = 724001,
-    MSG_NEXT_STAGE                  = 724002,
-    MSG_CRUSADERS                   = 724003,
-    MSG_ANUBARAK                    = 724005,
-};
-
 class npc_announcer_toc10 : public CreatureScript
 {
 public:
@@ -36,56 +28,167 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if(!creature->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
+        ClearGossipMenuFor(player);
+
+        if (!creature->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
+        {
             return true;
+        }
 
         InstanceScript* pInstance = creature->GetInstanceScript();
-        if(!pInstance)
+        if (!pInstance)
+        {
             return true;
+        }
 
-        uint32 gossipTextId = 0;
-        switch(pInstance->GetData(TYPE_INSTANCE_PROGRESS))
+        switch (pInstance->GetData(TYPE_INSTANCE_PROGRESS))
         {
             case INSTANCE_PROGRESS_INITIAL:
-                gossipTextId = MSG_TESTED;
-                break;
             case INSTANCE_PROGRESS_INTRO_DONE:
+                {
+                    if (player->GetTeamId() == TEAM_ALLIANCE)
+                    {
+                        AddGossipItemFor(player, 10599, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                        SendGossipMenuFor(player, 14664, creature->GetGUID());
+                    }
+                    else
+                    {
+                        AddGossipItemFor(player, 10599, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                        SendGossipMenuFor(player, 14664, creature->GetGUID());
+                    }
+                }
+                break;
             case INSTANCE_PROGRESS_BEASTS_DEAD:
-            case INSTANCE_PROGRESS_FACTION_CHAMPIONS_DEAD:
-            case INSTANCE_PROGRESS_VALKYR_DEAD:
-                gossipTextId = MSG_NEXT_STAGE;
+                {
+                    AddGossipItemFor(player, 10609, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                    SendGossipMenuFor(player, 14678, creature->GetGUID());
+                }
                 break;
             case INSTANCE_PROGRESS_JARAXXUS_DEAD:
-                gossipTextId = MSG_CRUSADERS;
+                {
+                    if (player->GetTeamId() == TEAM_ALLIANCE)
+                    {
+                        AddGossipItemFor(player, 10678, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                        SendGossipMenuFor(player, 14813, creature->GetGUID());
+                    }
+                    else
+                    {
+                        AddGossipItemFor(player, 10678, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                        SendGossipMenuFor(player, 14813, creature->GetGUID());
+                    }
+                }
+                break;
+            case INSTANCE_PROGRESS_FACTION_CHAMPIONS_DEAD:
+                {
+                    if (player->GetTeamId() == TEAM_ALLIANCE)
+                    {
+                        AddGossipItemFor(player, 10679, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+                        SendGossipMenuFor(player, 14819, creature->GetGUID());
+                    }
+                    else
+                    {
+                        AddGossipItemFor(player, 10679, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+                        SendGossipMenuFor(player, 14819, creature->GetGUID());
+                    }
+                }
+                break;
+            case INSTANCE_PROGRESS_VALKYR_DEAD:
+                {
+                    AddGossipItemFor(player, 10692, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+                    SendGossipMenuFor(player, 14828, creature->GetGUID());
+                }
                 break;
             case INSTANCE_PROGRESS_DONE:
                 creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 return true;
+                break;
             default:
                 return true;
+                break;
         }
-
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "We are ready!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1337);
-        SendGossipMenuFor(player, gossipTextId, creature->GetGUID());
         return true;
     }
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 uiAction) override
     {
-        if( !creature->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP) )
+        ClearGossipMenuFor(player);
+
+        if ( !creature->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
             return true;
 
         InstanceScript* pInstance = creature->GetInstanceScript();
-        if( !pInstance )
+        if ( !pInstance )
             return true;
 
-        if( uiAction == GOSSIP_ACTION_INFO_DEF + 1337 )
+        if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
         {
+            if (player->GetTeamId() == TEAM_ALLIANCE)
+            {
+                AddGossipItemFor(player, 10600, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1337);
+                SendGossipMenuFor(player, 14665, creature->GetGUID());
+            }
+            else
+            {
+                AddGossipItemFor(player, 10600, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1337);
+                SendGossipMenuFor(player, 14665, creature->GetGUID());
+            }
+        }
+
+        if (uiAction == GOSSIP_ACTION_INFO_DEF + 2)
+        {
+            if (player->GetTeamId() == TEAM_ALLIANCE)
+            {
+                AddGossipItemFor(player, 10610, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1337);
+                SendGossipMenuFor(player, 14680, creature->GetGUID());
+            }
+            else
+            {
+                AddGossipItemFor(player, 10610, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1337);
+                SendGossipMenuFor(player, 14682, creature->GetGUID());
+            }
+        }
+
+        if (uiAction == GOSSIP_ACTION_INFO_DEF + 3)
+        {
+            if (player->GetTeamId() == TEAM_ALLIANCE)
+            {
+                AddGossipItemFor(player, 10687, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1337);
+                SendGossipMenuFor(player, 14814, creature->GetGUID());
+            }
+            else
+            {
+                AddGossipItemFor(player, 10687, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1337);
+                SendGossipMenuFor(player, 14814, creature->GetGUID());
+            }
+        }
+
+        if (uiAction == GOSSIP_ACTION_INFO_DEF + 4)
+        {
+            if (player->GetTeamId() == TEAM_ALLIANCE)
+            {
+                AddGossipItemFor(player, 10688, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1337);
+                SendGossipMenuFor(player, 14821, creature->GetGUID());
+            }
+            else
+            {
+                AddGossipItemFor(player, 10688, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1337);
+                SendGossipMenuFor(player, 14821, creature->GetGUID());
+            }
+        }
+
+        if (uiAction == GOSSIP_ACTION_INFO_DEF + 5)
+        {
+            AddGossipItemFor(player, 10693, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1337);
+            SendGossipMenuFor(player, 14829, creature->GetGUID());
+        }
+
+        if (uiAction == GOSSIP_ACTION_INFO_DEF + 1337)
+        {
+            CloseGossipMenuFor(player);
             pInstance->SetData(TYPE_ANNOUNCER_GOSSIP_SELECT, 0);
             creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
         }
 
-        CloseGossipMenuFor(player);
         return true;
     }
 };
