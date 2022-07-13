@@ -60,9 +60,9 @@ enum ItemModType
     ITEM_MOD_EXPERTISE_RATING         = 37,
     ITEM_MOD_ATTACK_POWER             = 38,
     ITEM_MOD_RANGED_ATTACK_POWER      = 39,
-    //ITEM_MOD_FERAL_ATTACK_POWER       = 40, not in 3.3
-    ITEM_MOD_SPELL_HEALING_DONE       = 41,                 // deprecated
-    ITEM_MOD_SPELL_DAMAGE_DONE        = 42,                 // deprecated
+    //ITEM_MOD_FERAL_ATTACK_POWER     = 40, not in 3.3
+    ITEM_MOD_SPELL_HEALING_DONE       = 41, // deprecated
+    ITEM_MOD_SPELL_DAMAGE_DONE        = 42, // deprecated
     ITEM_MOD_MANA_REGENERATION        = 43,
     ITEM_MOD_ARMOR_PENETRATION_RATING = 44,
     ITEM_MOD_SPELL_POWER              = 45,
@@ -75,7 +75,7 @@ enum ItemModType
 
 enum ItemSpelltriggerType
 {
-    ITEM_SPELLTRIGGER_ON_USE          = 0,                  // use after equip cooldown
+    ITEM_SPELLTRIGGER_ON_USE          = 0,  // use after equip cooldown
     ITEM_SPELLTRIGGER_ON_EQUIP        = 1,
     ITEM_SPELLTRIGGER_CHANCE_ON_HIT   = 2,
     ITEM_SPELLTRIGGER_SOULSTONE       = 4,
@@ -85,20 +85,20 @@ enum ItemSpelltriggerType
      * other hand the item is destroyed if the aura is removed ("removed on
      * death" of spell 57348 makes me think so)
      */
-    ITEM_SPELLTRIGGER_ON_NO_DELAY_USE = 5,                  // no equip cooldown
-    ITEM_SPELLTRIGGER_LEARN_SPELL_ID  = 6                   // used in item_template.spell_2 with spell_id with SPELL_GENERIC_LEARN in spell_1
+    ITEM_SPELLTRIGGER_ON_NO_DELAY_USE = 5,  // no equip cooldown
+    ITEM_SPELLTRIGGER_LEARN_SPELL_ID  = 6   // used in item_template.spell_2 with spell_id with SPELL_GENERIC_LEARN in spell_1
 };
 
 #define MAX_ITEM_SPELLTRIGGER           7
 
 enum ItemBondingType
 {
-    NO_BIND                                     = 0,
-    BIND_WHEN_PICKED_UP                         = 1,
-    BIND_WHEN_EQUIPED                           = 2,
-    BIND_WHEN_USE                               = 3,
-    BIND_QUEST_ITEM                             = 4,
-    BIND_QUEST_ITEM1                            = 5         // not used in game
+    NO_BIND                           = 0,
+    BIND_WHEN_PICKED_UP               = 1,
+    BIND_WHEN_EQUIPED                 = 2,
+    BIND_WHEN_USE                     = 3,
+    BIND_QUEST_ITEM                   = 4,
+    BIND_QUEST_ITEM1                  = 5                   // not used in game
 };
 
 #define MAX_BIND_TYPE                             6
@@ -597,7 +597,7 @@ struct _ItemStat
 };
 struct _Spell
 {
-    int32 SpellId;                                         // id from Spell.dbc
+    int32 SpellId;                                          // id from Spell.dbc
     uint32 SpellTrigger;
     int32  SpellCharges;
     float  SpellPPMRate;
@@ -701,7 +701,7 @@ struct ItemTemplate
     uint32 MinMoneyLoot;
     uint32 MaxMoneyLoot;
     uint32 FlagsCu;
-    WorldPacket queryData; // pussywizard
+    WorldPacket queryData;                                  // pussywizard
 
     // helpers
     [[nodiscard]] bool HasSignature() const

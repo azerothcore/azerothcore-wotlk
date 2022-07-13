@@ -51,11 +51,11 @@ enum VehicleFlags
 
 enum VehicleSpells
 {
-    VEHICLE_SPELL_RIDE_HARDCODED                = 46598,
-    VEHICLE_SPELL_PARACHUTE                     = 45472,
+    VEHICLE_SPELL_RIDE_HARDCODED                 = 46598,
+    VEHICLE_SPELL_PARACHUTE                      = 45472,
 
-    VEHICLE_SPELL_GEIST_CONTROL_END             = 58119,
-    VEHICLE_SPELL_SHADE_CONTROL_END             = 58664
+    VEHICLE_SPELL_GEIST_CONTROL_END              = 58119,
+    VEHICLE_SPELL_SHADE_CONTROL_END              = 58664
 };
 
 enum VehicleNPCs

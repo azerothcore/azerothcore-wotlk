@@ -813,7 +813,7 @@ int32 Player::getMaxTimer(MirrorTimerType timer)
             {
                 if (!IsAlive() || HasAuraType(SPELL_AURA_WATER_BREATHING) || GetSession()->GetSecurity() >= AccountTypes(sWorld->getIntConfig(CONFIG_DISABLE_BREATHING)))
                     return DISABLED_MIRROR_TIMER;
-                int32 UnderWaterTime = static_cast<int32>(sWorld->getFloatConfig(CONFIG_WATER_BREATH_TIMER) * MINUTE * IN_MILLISECONDS);
+                int32 UnderWaterTime = sWorld->getIntConfig(CONFIG_WATER_BREATH_TIMER);
                 AuraEffectList const& mModWaterBreathing = GetAuraEffectsByType(SPELL_AURA_MOD_WATER_BREATHING);
                 for (AuraEffectList::const_iterator i = mModWaterBreathing.begin(); i != mModWaterBreathing.end(); ++i)
                     AddPct(UnderWaterTime, (*i)->GetAmount());
@@ -13192,7 +13192,7 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
             return;
         }
 
-    if (!item->AllowedForPlayer(this))
+    if (!item->AllowedForPlayer(this, loot->sourceWorldObjectGUID))
     {
         SendLootRelease(GetLootGUID());
         return;
