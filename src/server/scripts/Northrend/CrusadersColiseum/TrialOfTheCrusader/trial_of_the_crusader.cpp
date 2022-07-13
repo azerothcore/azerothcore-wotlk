@@ -35,21 +35,6 @@ enum BarrettRamseyGossip
     CHALLENGE_ANUBARAK_CONFIRM = 10693
 };
 
-enum BarrettRamseyNpcText
-{
-    CHALLENGE_BEASTS_TEXT = 14664,
-    CHALLENGE_BEASTS_TEXT_CONFIRM = 14665,
-    CHALLENGE_JARAXXUS_TEXT = 14678,
-    CHALLENGE_JARAXXUS_TEXT_ALLIANCE = 14680,
-    CHALLENGE_JARAXXUS_TEXT_HORDE = 14682,
-    CHALLENGE_FACTION_CHAMPIONS_TEXT = 14813,
-    CHALLENGE_FACTION_CHAMPIONS_TEXT_CONFIRM = 14814,
-    CHALLENGE_VALKYR_TEXT = 14819,
-    CHALLENGE_VALKYR_TEXT_CONFIRM = 14821,
-    CHALLENGE_ANUBARAK_TEXT = 14828,
-    CHALLENGE_ANUBARAK_TEXT_CONFIRM = 14829
-};
-
 class npc_announcer_toc10 : public CreatureScript
 {
 public:
@@ -78,19 +63,19 @@ public:
                     if (player->GetTeamId() == TEAM_ALLIANCE)
                     {
                         AddGossipItemFor(player, CHALLENGE_BEASTS, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                        SendGossipMenuFor(player, CHALLENGE_BEASTS_TEXT, creature->GetGUID());
+                        SendGossipMenuFor(player, player->GetGossipTextId(CHALLENGE_BEASTS, creature), creature->GetGUID());
                     }
                     else
                     {
                         AddGossipItemFor(player, CHALLENGE_BEASTS, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                        SendGossipMenuFor(player, CHALLENGE_BEASTS_TEXT, creature->GetGUID());
+                        SendGossipMenuFor(player, player->GetGossipTextId(CHALLENGE_BEASTS, creature), creature->GetGUID());
                     }
                 }
                 break;
             case INSTANCE_PROGRESS_BEASTS_DEAD:
                 {
                     AddGossipItemFor(player, CHALLENGE_JARAXXUS, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                    SendGossipMenuFor(player, CHALLENGE_JARAXXUS_TEXT, creature->GetGUID());
+                    SendGossipMenuFor(player, player->GetGossipTextId(CHALLENGE_JARAXXUS, creature), creature->GetGUID());
                 }
                 break;
             case INSTANCE_PROGRESS_JARAXXUS_DEAD:
@@ -98,12 +83,12 @@ public:
                     if (player->GetTeamId() == TEAM_ALLIANCE)
                     {
                         AddGossipItemFor(player, CHALLENGE_FACTION_CHAMPIONS, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                        SendGossipMenuFor(player, CHALLENGE_FACTION_CHAMPIONS_TEXT, creature->GetGUID());
+                        SendGossipMenuFor(player, player->GetGossipTextId(CHALLENGE_FACTION_CHAMPIONS, creature), creature->GetGUID());
                     }
                     else
                     {
                         AddGossipItemFor(player, CHALLENGE_FACTION_CHAMPIONS, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                        SendGossipMenuFor(player, CHALLENGE_FACTION_CHAMPIONS_TEXT, creature->GetGUID());
+                        SendGossipMenuFor(player, player->GetGossipTextId(CHALLENGE_FACTION_CHAMPIONS, creature), creature->GetGUID());
                     }
                 }
                 break;
@@ -112,19 +97,19 @@ public:
                     if (player->GetTeamId() == TEAM_ALLIANCE)
                     {
                         AddGossipItemFor(player, CHALLENGE_VALKYR, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-                        SendGossipMenuFor(player, CHALLENGE_VALKYR_TEXT, creature->GetGUID());
+                        SendGossipMenuFor(player, player->GetGossipTextId(CHALLENGE_VALKYR, creature), creature->GetGUID());
                     }
                     else
                     {
                         AddGossipItemFor(player, CHALLENGE_VALKYR, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-                        SendGossipMenuFor(player, CHALLENGE_VALKYR_TEXT, creature->GetGUID());
+                        SendGossipMenuFor(player, player->GetGossipTextId(CHALLENGE_VALKYR, creature), creature->GetGUID());
                     }
                 }
                 break;
             case INSTANCE_PROGRESS_VALKYR_DEAD:
                 {
                     AddGossipItemFor(player, CHALLENGE_ANUBARAK, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-                    SendGossipMenuFor(player, CHALLENGE_ANUBARAK_TEXT, creature->GetGUID());
+                    SendGossipMenuFor(player, player->GetGossipTextId(CHALLENGE_ANUBARAK, creature), creature->GetGUID());
                 }
                 break;
             case INSTANCE_PROGRESS_DONE:
@@ -154,12 +139,12 @@ public:
             if (player->GetTeamId() == TEAM_ALLIANCE)
             {
                 AddGossipItemFor(player, CHALLENGE_BEASTS_CONFIRM, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-                SendGossipMenuFor(player, CHALLENGE_BEASTS_TEXT_CONFIRM, creature->GetGUID());
+                SendGossipMenuFor(player, player->GetGossipTextId(CHALLENGE_BEASTS_CONFIRM, creature), creature->GetGUID());
             }
             else
             {
                 AddGossipItemFor(player, CHALLENGE_BEASTS_CONFIRM, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-                SendGossipMenuFor(player, CHALLENGE_BEASTS_TEXT_CONFIRM, creature->GetGUID());
+                SendGossipMenuFor(player, player->GetGossipTextId(CHALLENGE_BEASTS_CONFIRM, creature), creature->GetGUID());
             }
         }
 
@@ -168,12 +153,12 @@ public:
             if (player->GetTeamId() == TEAM_ALLIANCE)
             {
                 AddGossipItemFor(player, CHALLENGE_JARAXXUS_CONFIRM, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-                SendGossipMenuFor(player, CHALLENGE_JARAXXUS_TEXT_ALLIANCE, creature->GetGUID());
+                SendGossipMenuFor(player, player->GetGossipTextId(CHALLENGE_JARAXXUS_CONFIRM, creature), creature->GetGUID());
             }
             else
             {
                 AddGossipItemFor(player, CHALLENGE_JARAXXUS_CONFIRM, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-                SendGossipMenuFor(player, CHALLENGE_JARAXXUS_TEXT_HORDE, creature->GetGUID());
+                SendGossipMenuFor(player, player->GetGossipTextId(CHALLENGE_JARAXXUS_CONFIRM, creature), creature->GetGUID());
             }
         }
 
@@ -182,12 +167,12 @@ public:
             if (player->GetTeamId() == TEAM_ALLIANCE)
             {
                 AddGossipItemFor(player, CHALLENGE_FACTION_CHAMPIONS_CONFIRM, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-                SendGossipMenuFor(player, CHALLENGE_FACTION_CHAMPIONS_TEXT_CONFIRM, creature->GetGUID());
+                SendGossipMenuFor(player, player->GetGossipTextId(CHALLENGE_FACTION_CHAMPIONS_CONFIRM, creature), creature->GetGUID());
             }
             else
             {
                 AddGossipItemFor(player, CHALLENGE_FACTION_CHAMPIONS_CONFIRM, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-                SendGossipMenuFor(player, CHALLENGE_FACTION_CHAMPIONS_TEXT_CONFIRM, creature->GetGUID());
+                SendGossipMenuFor(player, player->GetGossipTextId(CHALLENGE_FACTION_CHAMPIONS_CONFIRM, creature), creature->GetGUID());
             }
         }
 
@@ -196,19 +181,19 @@ public:
             if (player->GetTeamId() == TEAM_ALLIANCE)
             {
                 AddGossipItemFor(player, CHALLENGE_VALKYR_CONFIRM, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-                SendGossipMenuFor(player, CHALLENGE_VALKYR_TEXT_CONFIRM, creature->GetGUID());
+                SendGossipMenuFor(player, player->GetGossipTextId(CHALLENGE_VALKYR_CONFIRM, creature), creature->GetGUID());
             }
             else
             {
                 AddGossipItemFor(player, CHALLENGE_VALKYR_CONFIRM, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-                SendGossipMenuFor(player, CHALLENGE_VALKYR_TEXT_CONFIRM, creature->GetGUID());
+                SendGossipMenuFor(player, player->GetGossipTextId(CHALLENGE_VALKYR_CONFIRM, creature), creature->GetGUID());
             }
         }
 
         if (uiAction == GOSSIP_ACTION_INFO_DEF + 5)
         {
             AddGossipItemFor(player, CHALLENGE_ANUBARAK_CONFIRM, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-            SendGossipMenuFor(player, CHALLENGE_ANUBARAK_TEXT_CONFIRM, creature->GetGUID());
+            SendGossipMenuFor(player, player->GetGossipTextId(CHALLENGE_ANUBARAK_CONFIRM, creature), creature->GetGUID());
         }
 
         if (uiAction == GOSSIP_ACTION_INFO_DEF + 6)
