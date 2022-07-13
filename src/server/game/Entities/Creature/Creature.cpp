@@ -284,6 +284,8 @@ void Creature::AddToWorld()
             GetZoneScript()->OnCreatureCreate(this);
         }
 
+        loot.sourceWorldObjectGUID = GetGUID();
+
         sScriptMgr->OnCreatureAddWorld(this);
     }
 }
@@ -487,7 +489,7 @@ bool Creature::InitEntry(uint32 Entry, const CreatureData* data)
     return true;
 }
 
-bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changelevel)
+bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changelevel, bool updateAI)
 {
     if (!InitEntry(Entry, data))
         return false;
@@ -596,6 +598,12 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
     SetDetectionDistance(cInfo->detection_range);
 
     LoadSpellTemplateImmunity();
+
+    if (updateAI)
+    {
+        AIM_Initialize();
+    }
+
     return true;
 }
 
@@ -3431,7 +3439,7 @@ bool Creature::IsMovementPreventedByCasting() const
 {
     Spell* spell = m_currentSpells[CURRENT_CHANNELED_SPELL];
     // first check if currently a movement allowed channel is active and we're not casting
-    if (spell && spell->getState() != SPELL_STATE_FINISHED && spell->IsChannelActive() && spell->GetSpellInfo()->IsMoveAllowedChannel())
+    if (spell && spell->getState() != SPELL_STATE_FINISHED && spell->IsChannelActive() && spell->GetSpellInfo()->IsActionAllowedChannel())
     {
         return false;
     }

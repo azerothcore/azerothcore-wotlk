@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Boss_Hazzarah
-SD%Complete: 100
-SDComment:
-SDCategory: Zul'Gurub
-EndScriptData */
-
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
@@ -45,100 +38,98 @@ enum Events
     EVENT_ILLUSIONS                         = 4
 };
 
-class boss_hazzarah : public CreatureScript
+struct boss_hazzarah : public BossAI
 {
-public:
-    boss_hazzarah() : CreatureScript("boss_hazzarah") { }
+    boss_hazzarah(Creature* creature) : BossAI(creature, DATA_EDGE_OF_MADNESS) { }
 
-    struct boss_hazzarahAI : public BossAI
+    void JustSummoned(Creature* summon) override
     {
-        boss_hazzarahAI(Creature* creature) : BossAI(creature, DATA_EDGE_OF_MADNESS) { }
+        summons.Summon(summon);
 
-        void JustSummoned(Creature* summon) override
-        {
-            summons.Summon(summon);
-
-            summon->SetCorpseDelay(10);
-            summon->SetReactState(REACT_PASSIVE);
-            summon->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE);
-            summon->SetVisible(false);
-            summon->m_Events.AddEventAtOffset([summon]()
+        summon->SetCorpseDelay(10);
+        summon->SetReactState(REACT_PASSIVE);
+        summon->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE);
+        summon->SetVisible(false);
+        summon->m_Events.AddEventAtOffset([summon]()
             {
                 summon->SetVisible(true);
             }, 2s);
 
-            summon->m_Events.AddEventAtOffset([summon]()
+        summon->m_Events.AddEventAtOffset([summon]()
             {
                 summon->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
                 summon->SetReactState(REACT_AGGRESSIVE);
                 summon->SetInCombatWithZone();
-            }, 3500ms);
-        }
+            }, 5s);
+    }
 
-        void EnterCombat(Unit* /*who*/) override
+    void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
+    {
+        summons.Despawn(summon);
+        summon->DespawnOrUnsummon();
+    }
+
+    void EnterCombat(Unit* /*who*/) override
+    {
+        _EnterCombat();
+        events.ScheduleEvent(EVENT_SLEEP, 12s, 15s);
+        events.ScheduleEvent(EVENT_EARTH_SHOCK, 8s, 18s);
+        events.ScheduleEvent(EVENT_CHAIN_BURN, 12s, 28s);
+        events.ScheduleEvent(EVENT_ILLUSIONS, 16s, 24s);
+    }
+
+    bool CanAIAttack(Unit const* target) const override
+    {
+        if (me->GetThreatMgr().getThreatList().size() > 1 && me->GetThreatMgr().getOnlineContainer().getMostHated()->getTarget() == target)
+            return !target->HasAura(SPELL_SLEEP);
+
+        return true;
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        while (uint32 eventId = events.ExecuteEvent())
         {
-            _EnterCombat();
-            events.ScheduleEvent(EVENT_SLEEP, 12s, 15s);
-            events.ScheduleEvent(EVENT_EARTH_SHOCK, 8s, 18s);
-            events.ScheduleEvent(EVENT_CHAIN_BURN, 12s, 28s);
-            events.ScheduleEvent(EVENT_ILLUSIONS, 16s, 24s);
-        }
-
-        bool CanAIAttack(Unit const* target) const override
-        {
-            if (me->GetThreatMgr().getThreatList().size() > 1 && me->GetThreatMgr().getOnlineContainer().getMostHated()->getTarget() == target)
-                return !target->HasAura(SPELL_SLEEP);
-
-            return true;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            while (uint32 eventId = events.ExecuteEvent())
+            switch (eventId)
             {
-                switch (eventId)
-                {
-                    case EVENT_SLEEP:
-                        DoCastVictim(SPELL_SLEEP, true);
-                        events.ScheduleEvent(EVENT_SLEEP, 24s, 32s);
-                        return;
-                    case EVENT_EARTH_SHOCK:
-                        DoCastVictim(SPELL_EARTH_SHOCK);
-                        events.ScheduleEvent(EVENT_EARTH_SHOCK, 8s, 18s);
-                        break;
-                    case EVENT_CHAIN_BURN:
+                case EVENT_SLEEP:
+                    DoCastVictim(SPELL_SLEEP, true);
+                    events.ScheduleEvent(EVENT_SLEEP, 24s, 32s);
+                    return;
+                case EVENT_EARTH_SHOCK:
+                    DoCastVictim(SPELL_EARTH_SHOCK);
+                    events.ScheduleEvent(EVENT_EARTH_SHOCK, 8s, 18s);
+                    break;
+                case EVENT_CHAIN_BURN:
+                    if (me->GetPowerPct(POWER_MANA) > 5.f) // totally guessed
+                    {
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, [&](Unit* u) { return u && !u->IsPet() && u->getPowerType() == POWER_MANA; }))
                         {
-                            DoCast(target, SPELL_CHAIN_BURN, false);
+                            DoCast(target, SPELL_CHAIN_BURN);
                         }
-                        events.ScheduleEvent(EVENT_CHAIN_BURN, 12s, 28s);
-                        break;
-                    case EVENT_ILLUSIONS:
-                        DoCastSelf(SPELL_SUMMON_NIGHTMARE_ILLUSION_LEFT, true);
-                        DoCastSelf(SPELL_SUMMON_NIGHTMARE_ILLUSION_BACK, true);
-                        DoCastSelf(SPELL_SUMMON_NIGHTMARE_ILLUSION_RIGHT, true);
-                        events.ScheduleEvent(EVENT_ILLUSIONS, 16s, 24s);
-                        break;
-                    default:
-                        break;
-                }
+                    }
+                    events.ScheduleEvent(EVENT_CHAIN_BURN, 12s, 28s);
+                    break;
+                case EVENT_ILLUSIONS:
+                    DoCastSelf(SPELL_SUMMON_NIGHTMARE_ILLUSION_LEFT, true);
+                    DoCastSelf(SPELL_SUMMON_NIGHTMARE_ILLUSION_BACK, true);
+                    DoCastSelf(SPELL_SUMMON_NIGHTMARE_ILLUSION_RIGHT, true);
+                    events.ScheduleEvent(EVENT_ILLUSIONS, 15s, 25s);
+                    break;
+                default:
+                    break;
             }
-
-            DoMeleeAttackIfReady();
         }
-    };
 
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetZulGurubAI<boss_hazzarahAI>(creature);
+        DoMeleeAttackIfReady();
     }
 };
 
@@ -164,6 +155,6 @@ class spell_chain_burn : public SpellScript
 
 void AddSC_boss_hazzarah()
 {
-    new boss_hazzarah();
+    RegisterZulGurubCreatureAI(boss_hazzarah);
     RegisterSpellScript(spell_chain_burn);
 }

@@ -405,7 +405,7 @@ LootItem::LootItem(LootStoreItem const& li)
 }
 
 // Basic checks for player/item compatibility - if false no chance to see the item in the loot
-bool LootItem::AllowedForPlayer(Player const* player, bool isGivenByMasterLooter /*= false*/, bool allowQuestLoot /*= true*/) const
+bool LootItem::AllowedForPlayer(Player const* player, bool isGivenByMasterLooter /*= false*/, bool allowQuestLoot /*= true*/, ObjectGuid source) const
 {
     ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(itemid);
     if (!pProto)
@@ -473,6 +473,11 @@ bool LootItem::AllowedForPlayer(Player const* player, bool isGivenByMasterLooter
         return false;
     }
 
+    if (!sScriptMgr->OnAllowedForPlayerLootCheck(player, source))
+    {
+        return false;
+    }
+
     return true;
 }
 
@@ -516,7 +521,7 @@ void Loot::AddItem(LootStoreItem const& item)
                 {
                     if (auto member = itr->GetSource())
                     {
-                        if (generatedLoot.AllowedForPlayer(member))
+                        if (generatedLoot.AllowedForPlayer(member, sourceWorldObjectGUID))
                         {
                             canSeeItemInLootWindow = true;
                             break;
@@ -524,7 +529,7 @@ void Loot::AddItem(LootStoreItem const& item)
                     }
                 }
             }
-            else if (generatedLoot.AllowedForPlayer(player))
+            else if (generatedLoot.AllowedForPlayer(player, sourceWorldObjectGUID))
             {
                 canSeeItemInLootWindow = true;
             }
@@ -628,7 +633,7 @@ void Loot::FillNotNormalLootFor(Player* player)
         else
             item = &quest_items[i - itemsSize];
 
-        if (!item->is_looted && item->freeforall && item->AllowedForPlayer(player))
+        if (!item->is_looted && item->freeforall && item->AllowedForPlayer(player, sourceWorldObjectGUID))
             if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item->itemid))
                 if (proto->IsCurrencyToken())
                     player->StoreLootItem(i, this);
@@ -642,7 +647,7 @@ QuestItemList* Loot::FillFFALoot(Player* player)
     for (uint8 i = 0; i < items.size(); ++i)
     {
         LootItem& item = items[i];
-        if (!item.is_looted && item.freeforall && item.AllowedForPlayer(player))
+        if (!item.is_looted && item.freeforall && item.AllowedForPlayer(player, containerGUID))
         {
             ql->push_back(QuestItem(i));
             ++unlootedCount;
@@ -703,7 +708,7 @@ QuestItemList* Loot::FillNonQuestNonFFAConditionalLoot(Player* player)
     for (uint8 i = 0; i < items.size(); ++i)
     {
         LootItem& item = items[i];
-        if (!item.is_looted && !item.freeforall && (item.AllowedForPlayer(player) || (item.follow_loot_rules && player->GetGroup() && ((player->GetGroup()->GetLootMethod() == MASTER_LOOT && player->GetGroup()->GetMasterLooterGuid() == player->GetGUID()) || player->GetGroup()->GetLootMethod() != MASTER_LOOT ))))
+        if (!item.is_looted && !item.freeforall && (item.AllowedForPlayer(player, sourceWorldObjectGUID) || (item.follow_loot_rules && player->GetGroup() && ((player->GetGroup()->GetLootMethod() == MASTER_LOOT && player->GetGroup()->GetMasterLooterGuid() == player->GetGUID()) || player->GetGroup()->GetLootMethod() != MASTER_LOOT ))))
         {
             item.AddAllowedLooter(player);
 
@@ -822,7 +827,7 @@ LootItem* Loot::LootItemInSlot(uint32 lootSlot, Player* player, QuestItem * *qit
             if (qitem)
                 *qitem = qitem2;
             item = &quest_items[qitem2->index];
-            if (item->follow_loot_rules && !item->AllowedForPlayer(player)) // pussywizard: such items (follow_loot_rules) are added to every player, but not everyone is allowed, check it here
+            if (item->follow_loot_rules && !item->AllowedForPlayer(player, sourceWorldObjectGUID)) // pussywizard: such items (follow_loot_rules) are added to every player, but not everyone is allowed, check it here
                 return nullptr;
             is_looted = qitem2->is_looted;
         }
@@ -991,7 +996,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
                 // blocked rolled items and quest items, and !ffa items
                 for (uint8 i = 0; i < l.items.size(); ++i)
                 {
-                    if (!l.items[i].is_looted && !l.items[i].freeforall && (l.items[i].conditions.empty() || isMasterLooter) && l.items[i].AllowedForPlayer(lv.viewer))
+                    if (!l.items[i].is_looted && !l.items[i].freeforall && (l.items[i].conditions.empty() || isMasterLooter) && l.items[i].AllowedForPlayer(lv.viewer, l.sourceWorldObjectGUID))
                     {
                         uint8 slot_type = 0;
 
@@ -1049,7 +1054,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
             {
                 for (uint8 i = 0; i < l.items.size(); ++i)
                 {
-                    if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].conditions.empty() && l.items[i].AllowedForPlayer(lv.viewer))
+                    if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].conditions.empty() && l.items[i].AllowedForPlayer(lv.viewer, l.sourceWorldObjectGUID))
                     {
                         if (l.roundRobinPlayer && lv.viewer->GetGUID() != l.roundRobinPlayer)
                             // item shall not be displayed.
@@ -1068,7 +1073,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
                 uint8 slot_type = lv.permission == OWNER_PERMISSION ? LOOT_SLOT_TYPE_OWNER : LOOT_SLOT_TYPE_ALLOW_LOOT;
                 for (uint8 i = 0; i < l.items.size(); ++i)
                 {
-                    if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].conditions.empty() && l.items[i].AllowedForPlayer(lv.viewer))
+                    if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].conditions.empty() && l.items[i].AllowedForPlayer(lv.viewer, l.sourceWorldObjectGUID))
                     {
                         b << uint8(i) << l.items[i];
                         b << uint8(slot_type);
