@@ -126,6 +126,8 @@ enum Events
     EVENT_SCENE_410,
     EVENT_SCENE_501,
     EVENT_SCENE_502,
+
+    EVENT_OPEN_DOOR // Door opening event
 };
 
 enum NPCs

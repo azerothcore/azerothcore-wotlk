@@ -44,10 +44,7 @@ void getGossip(Player* player, Creature* creature, uint32 gossipMenuID, uint32 g
 class npc_announcer_toc10 : public CreatureScript
 {
 public:
-    npc_announcer_toc10() : CreatureScript("npc_announcer_toc10")
-    {
-        gossipMenuID = 0;
-    }
+    npc_announcer_toc10() : CreatureScript("npc_announcer_toc10") {}
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
@@ -63,6 +60,8 @@ public:
         {
             return true;
         }
+
+        gossipMenuID = 0;
 
         switch (pInstance->GetData(TYPE_INSTANCE_PROGRESS))
         {
@@ -93,11 +92,10 @@ public:
                 break;
             case INSTANCE_PROGRESS_VALKYR_DEAD:
                 {
-                    getGossip(player, creature, CHALLENGE_VALKYR, gossipMenuID, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+                    getGossip(player, creature, CHALLENGE_ANUBARAK, gossipMenuID, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
                 }
                 break;
             case INSTANCE_PROGRESS_DONE:
-                creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 return true;
                 break;
             default:
@@ -117,6 +115,8 @@ public:
         InstanceScript* pInstance = creature->GetInstanceScript();
         if ( !pInstance )
             return true;
+
+        gossipMenuID = 0;
 
         switch (action)
         {

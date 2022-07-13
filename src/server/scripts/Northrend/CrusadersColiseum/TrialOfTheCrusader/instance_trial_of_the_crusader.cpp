@@ -386,7 +386,6 @@ public:
                         northrendBeastsMask = 0;
                         EncounterStatus = NOT_STARTED;
                         InstanceProgress = INSTANCE_PROGRESS_BEASTS_DEAD;
-                        HandleGameObject(GO_EnterGateGUID, true);
                         events.CancelEvent(EVENT_NORTHREND_BEASTS_ENRAGE);
                         events.RescheduleEvent(EVENT_SCENE_BEASTS_DONE, 2500);
                         SaveToDB();
@@ -398,9 +397,8 @@ public:
                         HandleGameObject(GO_EnterGateGUID, false);
                     else if( data == DONE )
                     {
-                        HandleGameObject(GO_EnterGateGUID, true);
                         InstanceProgress = INSTANCE_PROGRESS_JARAXXUS_DEAD;
-                        events.RescheduleEvent(EVENT_SCENE_110, 2500);
+                        events.RescheduleEvent(EVENT_SCENE_110, 7000);
                         SaveToDB();
                     }
                     break;
@@ -446,8 +444,6 @@ public:
                                 }
                             }
 
-                            HandleGameObject(GO_EnterGateGUID, true);
-
                             if( AchievementTimer + 60 >= GameTime::GetGameTime().count() )
                                 DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_RESILIENCE_WILL_FIX_IT_CREDIT);
                             AchievementTimer = 0;
@@ -490,7 +486,6 @@ public:
                         DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, 34497, 1); // Lightbane
                         DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, 34496, 1); // Darkbane
                         events.RescheduleEvent(EVENT_SCENE_VALKYR_DEAD, 2500);
-                        HandleGameObject(GO_EnterGateGUID, true);
                         SaveToDB();
                     }
                     break;
@@ -769,6 +764,7 @@ public:
                             c->AI()->Talk(SAY_STAGE_0_06);
                         if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
                             c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                        events.RescheduleEvent(EVENT_OPEN_DOOR, 5000);
                         break;
                     }
                 case EVENT_SCENE_101:
@@ -949,6 +945,7 @@ public:
                             c->AI()->Talk(SAY_STAGE_1_11);
                         if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
                             c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                        events.RescheduleEvent(EVENT_OPEN_DOOR, 14000);
                         break;
                     }
                 case EVENT_SCENE_201:
@@ -1123,6 +1120,7 @@ public:
                             c->AI()->Talk(SAY_STAGE_2_06);
                         if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
                             c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                        events.RescheduleEvent(EVENT_OPEN_DOOR, 20000);
                         break;
                     }
                 case EVENT_SCENE_301:
@@ -1208,7 +1206,9 @@ public:
                         if( Creature* c = instance->GetCreature(TeamIdInInstance == TEAM_ALLIANCE ? NPC_VarianGUID : NPC_GarroshGUID) )
                             c->AI()->Talk((TeamIdInInstance == TEAM_ALLIANCE ? SAY_STAGE_3_03a : SAY_STAGE_3_03h));
 
-                        events.RescheduleEvent(EVENT_SCENE_401, 60000);
+                        if (Creature* c = instance->GetCreature(NPC_BarrettGUID))
+                            c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                        events.RescheduleEvent(EVENT_OPEN_DOOR, 10000);
                         break;
                     }
                 case EVENT_SCENE_401:
@@ -1390,6 +1390,11 @@ public:
                         }
                         break;
                     }
+                case EVENT_OPEN_DOOR:
+                    {
+                        HandleGameObject(GO_EnterGateGUID, true);
+                        break;
+                    }
             }
         }
 
@@ -1515,6 +1520,9 @@ public:
                     NPC_LightbaneGUID.Clear();
                     break;
                 case INSTANCE_PROGRESS_VALKYR_DEAD:
+                    if (Creature* c = instance->GetCreature(NPC_BarrettGUID))
+                        c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                    break;
                 case INSTANCE_PROGRESS_ANUB_ARAK:
                     /*if( GameObject* floor = instance->GetGameObject(GO_FloorGUID) )
                         floor->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, nullptr, true);*/
