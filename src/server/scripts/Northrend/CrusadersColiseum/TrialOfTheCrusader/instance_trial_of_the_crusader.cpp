@@ -760,10 +760,8 @@ public:
                     }
                 case EVENT_SCENE_BEASTS_DONE:
                     {
-                        if( Creature* c = instance->GetCreature(NPC_TirionGUID) )
+                        if (Creature* c = instance->GetCreature(NPC_TirionGUID))
                             c->AI()->Talk(SAY_STAGE_0_06);
-                        if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
-                            c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         events.RescheduleEvent(EVENT_OPEN_DOOR, 5000);
                         break;
                     }
@@ -960,8 +958,6 @@ public:
                     {
                         if( Creature* c = instance->GetCreature(NPC_TirionGUID) )
                             c->AI()->Talk(SAY_STAGE_1_11);
-                        if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
-                            c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         events.RescheduleEvent(EVENT_OPEN_DOOR, 14000);
                         break;
                     }
@@ -1135,8 +1131,6 @@ public:
                     {
                         if( Creature* c = instance->GetCreature(NPC_TirionGUID) )
                             c->AI()->Talk(SAY_STAGE_2_06);
-                        if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
-                            c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         events.RescheduleEvent(EVENT_OPEN_DOOR, 20000);
                         break;
                     }
@@ -1223,8 +1217,6 @@ public:
                         if( Creature* c = instance->GetCreature(TeamIdInInstance == TEAM_ALLIANCE ? NPC_VarianGUID : NPC_GarroshGUID) )
                             c->AI()->Talk((TeamIdInInstance == TEAM_ALLIANCE ? SAY_STAGE_3_03a : SAY_STAGE_3_03h));
 
-                        if (Creature* c = instance->GetCreature(NPC_BarrettGUID))
-                            c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         events.RescheduleEvent(EVENT_OPEN_DOOR, 10000);
                         break;
                     }
@@ -1410,6 +1402,8 @@ public:
                 case EVENT_OPEN_DOOR:
                     {
                         HandleGameObject(GO_EnterGateGUID, true);
+                        if (Creature* barrett = instance->GetCreature(NPC_BarrettGUID))
+                            barrett->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         break;
                     }
             }
