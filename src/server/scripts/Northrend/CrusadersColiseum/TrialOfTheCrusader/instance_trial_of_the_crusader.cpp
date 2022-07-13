@@ -584,6 +584,7 @@ public:
                     break;
                 case EVENT_SCENE_001:
                     {
+                        HandleGameObject(GO_EnterGateGUID, false);
                         if( Creature* c = instance->GetCreature(NPC_TirionGUID) )
                             c->AI()->Talk(SAY_STAGE_0_01);
 
@@ -608,13 +609,13 @@ public:
                     break;
                 case EVENT_SCENE_004:
                     {
+                        HandleGameObject(GO_EnterGateGUID, false);
                         InstanceProgress = INSTANCE_PROGRESS_INTRO_DONE;
                         EncounterStatus = IN_PROGRESS;
 
                         if( Creature* c = instance->GetCreature(NPC_TirionGUID) )
                             c->AI()->Talk(SAY_STAGE_0_02);
                         HandleGameObject(GO_MainGateGUID, true);
-                        HandleGameObject(GO_EnterGateGUID, false);
 
                         events.RescheduleEvent(EVENT_SUMMON_GORMOK, 1000);
                         if (instance->IsHeroic())
@@ -772,6 +773,7 @@ public:
                     }
                 case EVENT_SCENE_101:
                     {
+                        HandleGameObject(GO_EnterGateGUID, false);
                         if( Creature* c = instance->GetCreature(NPC_TirionGUID) )
                         {
                             HandleGameObject(GO_MainGateGUID, true);
@@ -951,6 +953,7 @@ public:
                     }
                 case EVENT_SCENE_201:
                     {
+                        HandleGameObject(GO_EnterGateGUID, false);
                         // move Jaraxxus to side, can't remove corpse because of loot!
                         if( Creature* jaraxxus = instance->GetCreature(NPC_JaraxxusGUID) )
                         {
@@ -1094,7 +1097,6 @@ public:
                             ++pos2;
                         }
 
-                        HandleGameObject(GO_EnterGateGUID, false);
                         events.RescheduleEvent(EVENT_CHAMPIONS_ATTACK, 4000);
                         break;
                     }
@@ -1125,6 +1127,7 @@ public:
                     }
                 case EVENT_SCENE_301:
                     {
+                        HandleGameObject(GO_EnterGateGUID, false);
                         if( Creature* c = instance->GetCreature(NPC_TirionGUID) )
                             c->AI()->Talk(SAY_STAGE_3_01);
 
@@ -1141,7 +1144,6 @@ public:
                     }
                 case EVENT_SCENE_303:
                     {
-                        HandleGameObject(GO_EnterGateGUID, false);
                         if( Creature* c = instance->GetCreature(NPC_TirionGUID) )
                         {
                             HandleGameObject(GO_MainGateGUID, true);
@@ -1211,6 +1213,7 @@ public:
                     }
                 case EVENT_SCENE_401:
                     {
+                        HandleGameObject(GO_EnterGateGUID, false);
                         if( Creature* c = instance->GetCreature(NPC_TirionGUID) )
                             c->AI()->Talk(SAY_STAGE_4_01);
 
@@ -1219,7 +1222,6 @@ public:
                     }
                 case EVENT_SCENE_402:
                     {
-                        HandleGameObject(GO_EnterGateGUID, false);
                         EncounterStatus = IN_PROGRESS;
                         if( Creature* c = instance->GetCreature(NPC_TirionGUID) )
                             if( Creature* t = c->SummonCreature(NPC_LICH_KING, Locs[LOC_ARTHAS_PORTAL]) )
