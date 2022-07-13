@@ -112,10 +112,8 @@ void Player::UpdatePlayerSetting(std::string source, uint8 index, uint32 value)
     if (itr == m_charSettingsMap.end())
     {
         // Settings not found, initialize a new entry.
-        uint8 size = index ? index : index + 1;
-
         PlayerSettingVector setting;
-        setting.resize(size);
+        setting.resize(index + 1);
 
         for (uint32 itr = 0; itr <= index; ++itr)
         {
@@ -129,6 +127,10 @@ void Player::UpdatePlayerSetting(std::string source, uint8 index, uint32 value)
     }
     else
     {
+        if (index + 1 > itr->second.size())
+        {
+            itr->second.resize(index + 1);
+        }
         itr->second[index].value = value;
     }
 }
