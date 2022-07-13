@@ -1,3 +1,4 @@
+-- DB update 2022_07_12_01 -> 2022_07_13_00
 --
 
 UPDATE `creature_template` SET `exp`=0, `ManaModifier`=1 WHERE `entry`=11657;
