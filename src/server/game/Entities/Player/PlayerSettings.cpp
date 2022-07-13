@@ -108,12 +108,13 @@ void Player::_SavePlayerSettings(CharacterDatabaseTransaction trans)
 void Player::UpdatePlayerSetting(std::string source, uint8 index, uint32 value)
 {
     auto itr = m_charSettingsMap.find(source);
+    uint8 size = index + 1;
 
     if (itr == m_charSettingsMap.end())
     {
         // Settings not found, initialize a new entry.
         PlayerSettingVector setting;
-        setting.resize(index + 1);
+        setting.resize(size);
 
         for (uint32 itr = 0; itr <= index; ++itr)
         {
@@ -127,9 +128,9 @@ void Player::UpdatePlayerSetting(std::string source, uint8 index, uint32 value)
     }
     else
     {
-        if (index + 1 > itr->second.size())
+        if (size > itr->second.size())
         {
-            itr->second.resize(index + 1);
+            itr->second.resize(size);
         }
         itr->second[index].value = value;
     }
