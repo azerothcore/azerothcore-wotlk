@@ -877,8 +877,25 @@ public:
                     {
                         if( Creature* c = instance->GetCreature(NPC_JaraxxusGUID) )
                         {
-                            c->Yell("Banished to the Nether!", LANG_UNIVERSAL);
-                            c->PlayDirectSound(16146, 0);
+                            uint8 textID = urand(0, 1);
+                            switch (textID)
+                            {
+                                case 0:
+                                {
+                                    c->AI()->Talk(9);
+                                    c->PlayDirectSound(16145, 0);
+                                    break;
+                                }
+                                case 1:
+                                {
+                                    c->AI()->Talk(9);
+                                    c->PlayDirectSound(16146, 0);
+                                    break;
+                                }
+                                default:
+                                    break;
+                            }
+
                             if( Creature* f = instance->GetCreature(NPC_FizzlebangGUID) )
                             {
                                 c->CastSpell(f, 67888, true);

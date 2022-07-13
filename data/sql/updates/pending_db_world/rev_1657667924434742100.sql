@@ -1,4 +1,3 @@
-
 DELETE FROM `gossip_menu` WHERE `MenuID` IN (10599, 10600, 10609, 10610, 10678, 10679, 10687, 10688, 10692, 10693);
 
 INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
@@ -12,3 +11,5 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 (10688, 14821),
 (10692, 14828),
 (10693, 14829);
+
+UPDATE `creature_text` SET `BroadcastTextId`=36129 WHERE `CreatureID`=34996 AND `GroupID`=17;
