@@ -809,21 +809,21 @@ public:
         ThreatMgr& mgr = target->GetThreatMgr();
         if (!target->IsAlive())
         {
-            handler->PSendSysMessage("%s (GUID %u) is not alive.%s", target->GetName().c_str(), target->GetGUID().GetCounter(), target->IsEngaged() ? " (It is, however, engaged. Huh?)" : "");
+            handler->PSendSysMessage("{} (GUID {}) is not alive.{}", target->GetName().c_str(), target->GetGUID().GetCounter(), target->IsEngaged() ? " (It is, however, engaged. Huh?)" : "");
             return true;
         }
 
         uint32 count = 0;
         auto const& threatenedByMe = target->GetThreatMgr().GetThreatenedByMeList();
         if (threatenedByMe.empty())
-            handler->PSendSysMessage("%s (GUID %u) does not threaten any units.", target->GetName().c_str(), target->GetGUID().GetCounter());
+            handler->PSendSysMessage("{} (GUID {}) does not threaten any units.", target->GetName().c_str(), target->GetGUID().GetCounter());
         else
         {
-            handler->PSendSysMessage("List of units threatened by %s (GUID %u)", target->GetName().c_str(), target->GetGUID().GetCounter());
+            handler->PSendSysMessage("List of units threatened by {} (GUID {})", target->GetName().c_str(), target->GetGUID().GetCounter());
             for (auto const& pair : threatenedByMe)
             {
                 Unit* unit = pair.second->GetOwner();
-                handler->PSendSysMessage("   %u.   %s   (GUID %u, SpawnID %u)  - threat %f", ++count, unit->GetName().c_str(), unit->GetGUID().GetCounter(), unit->GetTypeId() == TYPEID_UNIT ? unit->ToCreature()->GetSpawnId() : 0, pair.second->GetThreat());
+                handler->PSendSysMessage("   {}.   {}   (GUID {}, SpawnID {})  - threat {}", ++count, unit->GetName().c_str(), unit->GetGUID().GetCounter(), unit->GetTypeId() == TYPEID_UNIT ? unit->ToCreature()->GetSpawnId() : 0, pair.second->GetThreat());
             }
             handler->SendSysMessage("End of threatened-by-me list.");
         }
@@ -833,9 +833,9 @@ public:
             if (!mgr.IsThreatListEmpty(true))
             {
                 if (target->IsEngaged())
-                    handler->PSendSysMessage("Threat list of %s (GUID %u, SpawnID %u):", target->GetName().c_str(), target->GetGUID().GetCounter(), target->GetTypeId() == TYPEID_UNIT ? target->ToCreature()->GetSpawnId() : 0);
+                    handler->PSendSysMessage("Threat list of {} (GUID {}, SpawnID {}):", target->GetName().c_str(), target->GetGUID().GetCounter(), target->GetTypeId() == TYPEID_UNIT ? target->ToCreature()->GetSpawnId() : 0);
                 else
-                    handler->PSendSysMessage("%s (GUID %u, SpawnID %u) is not engaged, but still has a threat list? Well, here it is:", target->GetName().c_str(), target->GetGUID().GetCounter(), target->GetTypeId() == TYPEID_UNIT ? target->ToCreature()->GetSpawnId() : 0);
+                    handler->PSendSysMessage("{} (GUID {}, SpawnID {}) is not engaged, but still has a threat list? Well, here it is:", target->GetName().c_str(), target->GetGUID().GetCounter(), target->GetTypeId() == TYPEID_UNIT ? target->ToCreature()->GetSpawnId() : 0);
 
                 count = 0;
                 Unit* fixateVictim = mgr.GetFixateTarget();
@@ -869,19 +869,19 @@ public:
                         default:
                             tauntStr = "";
                         }
-                    handler->PSendSysMessage("   %u.   %s   (GUID %u)  - threat %f%s%s", ++count, unit->GetName().c_str(), unit->GetGUID().GetCounter(), ref->GetThreat(), tauntStr, onlineStr);
+                    handler->PSendSysMessage("   {}.   {}   (GUID {})  - threat %f%s%s", ++count, unit->GetName().c_str(), unit->GetGUID().GetCounter(), ref->GetThreat(), tauntStr, onlineStr);
                 }
                 handler->SendSysMessage("End of threat list.");
             }
             else if (!target->IsEngaged())
-                handler->PSendSysMessage("%s (GUID %u, SpawnID %u) is not currently engaged.", target->GetName().c_str(), target->GetGUID().GetCounter(), target->GetTypeId() == TYPEID_UNIT ? target->ToCreature()->GetSpawnId() : 0);
+                handler->PSendSysMessage("{} (GUID {}, SpawnID {}) is not currently engaged.", target->GetName().c_str(), target->GetGUID().GetCounter(), target->GetTypeId() == TYPEID_UNIT ? target->ToCreature()->GetSpawnId() : 0);
             else
-                handler->PSendSysMessage("%s (GUID %u, SpawnID %u) seems to be engaged, but does not have a threat list??", target->GetName().c_str(), target->GetGUID().GetCounter(), target->GetTypeId() == TYPEID_UNIT ? target->ToCreature()->GetSpawnId() : 0);
+                handler->PSendSysMessage("{} (GUID {}, SpawnID {}) seems to be engaged, but does not have a threat list??", target->GetName().c_str(), target->GetGUID().GetCounter(), target->GetTypeId() == TYPEID_UNIT ? target->ToCreature()->GetSpawnId() : 0);
         }
         else if (target->IsEngaged())
-            handler->PSendSysMessage("%s (GUID %u) is currently engaged. (This unit cannot have a threat list.)", target->GetName().c_str(), target->GetGUID().GetCounter());
+            handler->PSendSysMessage("{} (GUID {}) is currently engaged. (This unit cannot have a threat list.)", target->GetName().c_str(), target->GetGUID().GetCounter());
         else
-            handler->PSendSysMessage("%s (GUID %u) is not currently engaged. (This unit cannot have a threat list.)", target->GetName().c_str(), target->GetGUID().GetCounter());
+            handler->PSendSysMessage("{} (GUID {}) is not currently engaged. (This unit cannot have a threat list.)", target->GetName().c_str(), target->GetGUID().GetCounter());
         return true;
     }
 
@@ -891,16 +891,16 @@ public:
         if (!target)
             target = handler->GetSession()->GetPlayer();
 
-        handler->PSendSysMessage("Combat refs: (Combat state: %d | Manager state: %d)", target->IsInCombat(), target->GetCombatMgr().HasCombat());
+        handler->PSendSysMessage("Combat refs: (Combat state: {} | Manager state: {})", target->IsInCombat(), target->GetCombatMgr().HasCombat());
         for (auto const& ref : target->GetCombatMgr().GetPvPCombatRefs())
         {
             Unit* unit = ref.second->GetOther(target);
-            handler->PSendSysMessage("[PvP] %s (DBGUID %u)", unit->GetName().c_str(), unit->GetTypeId() == TYPEID_UNIT ? unit->ToCreature()->GetSpawnId() : 0);
+            handler->PSendSysMessage("[PvP] {} (DBGUID {})", unit->GetName().c_str(), unit->GetTypeId() == TYPEID_UNIT ? unit->ToCreature()->GetSpawnId() : 0);
         }
         for (auto const& ref : target->GetCombatMgr().GetPvECombatRefs())
         {
             Unit* unit = ref.second->GetOther(target);
-            handler->PSendSysMessage("[PvE] %s (DBGUID %u)", unit->GetName().c_str(), unit->GetTypeId() == TYPEID_UNIT ? unit->ToCreature()->GetSpawnId() : 0);
+            handler->PSendSysMessage("[PvE] {} (DBGUID {})", unit->GetName().c_str(), unit->GetTypeId() == TYPEID_UNIT ? unit->ToCreature()->GetSpawnId() : 0);
         }
 
         return true;

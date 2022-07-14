@@ -121,8 +121,8 @@ void PvPCombatReference::SuppressFor(Unit* who)
 
 CombatMgr::~CombatMgr()
 {
-    ASSERT(_pveRefs.empty(), "CombatManager::~CombatManager - %s: we still have %zu PvE combat references, one of them is with %s", _owner->GetGUID().ToString().c_str(), _pveRefs.size(), _pveRefs.begin()->first.ToString().c_str());
-    ASSERT(_pvpRefs.empty(), "CombatManager::~CombatManager - %s: we still have %zu PvP combat references, one of them is with %s", _owner->GetGUID().ToString().c_str(), _pvpRefs.size(), _pvpRefs.begin()->first.ToString().c_str());
+    ASSERT(_pveRefs.empty(), "CombatManager::~CombatManager - {}: we still have {} PvE combat references, one of them is with {}", _owner->GetGUID().ToString().c_str(), _pveRefs.size(), _pveRefs.begin()->first.ToString().c_str());
+    ASSERT(_pvpRefs.empty(), "CombatManager::~CombatManager - {}: we still have {} PvP combat references, one of them is with {}", _owner->GetGUID().ToString().c_str(), _pvpRefs.size(), _pvpRefs.begin()->first.ToString().c_str());
 }
 
 void CombatMgr::Update(uint32 tdiff)

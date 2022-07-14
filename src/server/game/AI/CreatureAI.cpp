@@ -25,6 +25,7 @@
 #include "MapReference.h"
 #include "Player.h"
 #include "Vehicle.h"
+#include "ScriptMgr.h"
 #include "Language.h"
 
 class PhasedRespawn : public BasicEvent
@@ -224,6 +225,8 @@ void CreatureAI::EnterEvadeMode(EvadeReason why)
         me->DespawnOnEvade();
         me->m_Events.AddEvent(new PhasedRespawn(*me), me->m_Events.CalculateTime(20000));
     }
+
+    sScriptMgr->OnUnitEnterEvadeMode(me, why);
 }
 
 void CreatureAI::SetGazeOn(Unit* target)
@@ -282,7 +285,7 @@ void CreatureAI::EngagementStart(Unit* who)
 {
     if (_isEngaged)
     {
-        LOG_ERROR("scripts.ai", "CreatureAI::EngagementStart called even though creature is already engaged. Creature debug info:\n%s", GetDebugInfo());
+        LOG_ERROR("scripts.ai", "CreatureAI::EngagementStart called even though creature is already engaged. Creature debug info: {}", GetDebugInfo());
         return;
     }
     _isEngaged = true;
@@ -294,7 +297,7 @@ void CreatureAI::EngagementOver()
 {
     if (!_isEngaged)
     {
-        LOG_ERROR("scripts.ai", "CreatureAI::EngagementOver called even though creature is not currently engaged. Creature debug info:\n%s", GetDebugInfo());
+        LOG_ERROR("scripts.ai", "CreatureAI::EngagementOver called even though creature is not currently engaged. Creature debug info: {}", GetDebugInfo());
         return;
     }
     _isEngaged = false;

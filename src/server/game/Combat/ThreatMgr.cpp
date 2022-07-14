@@ -178,9 +178,9 @@ ThreatMgr::ThreatMgr(Unit* owner) : _owner(owner), _ownerCanHaveThreatList(false
 
 ThreatMgr::~ThreatMgr()
 {
-    ASSERT(_myThreatListEntries.empty(), "ThreatManager::~ThreatManager - %s: we still have %zu things threatening us, one of them is %s.", _owner->GetGUID().ToString().c_str(), _myThreatListEntries.size(), _myThreatListEntries.begin()->first.ToString().c_str());
-    ASSERT(_sortedThreatList.empty(), "ThreatManager::~ThreatManager - %s: we still have %zu things threatening us, one of them is %s.", _owner->GetGUID().ToString().c_str(), _sortedThreatList.size(), (*_sortedThreatList.begin())->GetVictim()->GetGUID().ToString().c_str());
-    ASSERT(_threatenedByMe.empty(), "ThreatManager::~ThreatManager - %s: we are still threatening %zu things, one of them is %s.", _owner->GetGUID().ToString().c_str(), _threatenedByMe.size(), _threatenedByMe.begin()->first.ToString().c_str());
+    ASSERT(_myThreatListEntries.empty(), "ThreatManager::~ThreatManager - {}: we still have {} things threatening us, one of them is {}.", _owner->GetGUID().ToString().c_str(), _myThreatListEntries.size(), _myThreatListEntries.begin()->first.ToString().c_str());
+    ASSERT(_sortedThreatList.empty(), "ThreatManager::~ThreatManager - {}: we still have {} things threatening us, one of them is {}.", _owner->GetGUID().ToString().c_str(), _sortedThreatList.size(), (*_sortedThreatList.begin())->GetVictim()->GetGUID().ToString().c_str());
+    ASSERT(_threatenedByMe.empty(), "ThreatManager::~ThreatManager - {}: we are still threatening {} things, one of them is {}.", _owner->GetGUID().ToString().c_str(), _threatenedByMe.size(), _threatenedByMe.begin()->first.ToString().c_str());
 }
 
 void ThreatMgr::Initialize()

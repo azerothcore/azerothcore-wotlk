@@ -35,7 +35,7 @@ int TotemAI::Permissible(Creature const* creature)
 
 TotemAI::TotemAI(Creature* creature) : NullCreatureAI(creature)
 {
-    ASSERT(creature->IsTotem(), "TotemAI: AI assigned to a non-totem creature (%s)!", creature->GetGUID().ToString().c_str());
+    ASSERT(creature->IsTotem(), "TotemAI: AI assigned to a non-totem creature ({})!", creature->GetGUID().ToString().c_str());
 }
 
 void TotemAI::SpellHit(Unit* /*caster*/, SpellInfo const* /*spellInfo*/)
