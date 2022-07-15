@@ -80,7 +80,11 @@ namespace FactorySelector
     {
         MovementGeneratorType type = IDLE_MOTION_TYPE;
         if (unit->GetTypeId() == TYPEID_UNIT)
+        {
             type = unit->ToCreature()->GetDefaultMovementType();
+            if (type == FLEEING_MOTION_TYPE)
+                type = IDLE_MOTION_TYPE;
+        }
 
         MovementGeneratorCreator const* mv_factory = sMovementGeneratorRegistry->GetRegistryItem(type);
         return ASSERT_NOTNULL(mv_factory)->Create(unit);
