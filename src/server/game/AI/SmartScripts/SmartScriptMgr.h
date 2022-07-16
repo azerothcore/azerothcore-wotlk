@@ -1081,6 +1081,7 @@ struct SmartAction
         {
             uint32 id;
             uint32 timerType;
+            SAIBool allowOverride;
         } timedActionList;
 
         struct

@@ -207,6 +207,9 @@ public:
 
     static bool IsInBounds(CreatureBoundary const& boundary, Position const* who);
     bool IsInBoundary(Position const* who = nullptr) const;
+
+    virtual void CalculateThreat(Unit* /*hatedUnit*/, float& /*threat*/, SpellInfo const* /*threatSpell*/) { }
+
 protected:
     virtual void MoveInLineOfSight(Unit* /*who*/);
 
@@ -219,7 +222,7 @@ private:
     bool m_MoveInLineOfSight_locked;
 };
 
-enum Permitions
+enum Permitions : int32
 {
     PERMIT_BASE_NO                 = -1,
     PERMIT_BASE_IDLE               = 1,
