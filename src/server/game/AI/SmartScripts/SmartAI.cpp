@@ -763,13 +763,6 @@ void SmartAI::JustRespawned()
     mFollowArrivedAlive = true;
 }
 
-int SmartAI::Permissible(Creature const* creature)
-{
-    if (creature->GetAIName() == "SmartAI")
-        return PERMIT_BASE_SPECIAL;
-    return PERMIT_BASE_NO;
-}
-
 void SmartAI::JustReachedHome()
 {
     GetScript()->OnReset();
@@ -1131,13 +1124,6 @@ void SmartAI::OnSpellClick(Unit* clicker, bool&  /*result*/)
 void SmartGameObjectAI::SummonedCreatureDies(Creature* summon, Unit* /*killer*/)
 {
     GetScript()->ProcessEventsFor(SMART_EVENT_SUMMONED_UNIT_DIES, summon);
-}
-
-int SmartGameObjectAI::Permissible(GameObject const* g)
-{
-    if (g->GetAIName() == "SmartGameObjectAI")
-        return PERMIT_BASE_SPECIAL;
-    return PERMIT_BASE_NO;
 }
 
 void SmartGameObjectAI::UpdateAI(uint32 diff)
