@@ -76,14 +76,15 @@ struct boss_jindo : public BossAI
 
         switch (summon->GetEntry())
         {
-        case NPC_BRAIN_WASH_TOTEM:
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
-            {
-                summon->CastSpell(target, summon->m_spells[0], true);
-            }
-            break;
-        default:
-            break;
+            case NPC_BRAIN_WASH_TOTEM:
+                summon->SetReactState(REACT_PASSIVE);
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
+                {
+                    summon->CastSpell(target, summon->m_spells[0], true);
+                }
+                break;
+            default:
+                break;
         }
     }
 
@@ -282,11 +283,23 @@ class spell_delusions_of_jindo : public SpellScript
     }
 };
 
+struct npc_brain_wash_totem : public ScriptedAI
+{
+    npc_brain_wash_totem(Creature* creature) : ScriptedAI(creature)
+    {
+    }
+
+    void EnterEvadeMode(EvadeReason /*evadeReason*/) override
+    {
+    }
+};
+
 void AddSC_boss_jindo()
 {
     RegisterZulGurubCreatureAI(boss_jindo);
     RegisterZulGurubCreatureAI(npc_healing_ward);
     RegisterZulGurubCreatureAI(npc_shade_of_jindo);
+    RegisterZulGurubCreatureAI(npc_brain_wash_totem);
     RegisterSpellScript(spell_random_aggro);
     RegisterSpellScript(spell_delusions_of_jindo);
 }
