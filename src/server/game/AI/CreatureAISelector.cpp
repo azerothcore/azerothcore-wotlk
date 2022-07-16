@@ -63,10 +63,10 @@ namespace FactorySelector
         // AIName in db
         std::string const& aiName = obj->GetAIName();
         if (!aiName.empty())
-            return AIRegsitry::instance()->GetRegistryItem(aiName);
+            return AIRegistry::instance()->GetRegistryItem(aiName);
 
         // select by permit check
-        typename AIRegsitry::RegistryMapType const& items = AIRegistry::instance()->GetRegisteredItems();
+        typename AIRegistry::RegistryMapType const& items = AIRegistry::instance()->GetRegisteredItems();
         auto itr = std::max_element(items.begin(), items.end(), PermissibleOrderPred<T>(obj));
         if (itr != items.end() && GetPermitFor(obj, *itr) >= 0)
             return itr->second.get();
