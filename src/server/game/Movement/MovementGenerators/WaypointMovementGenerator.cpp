@@ -350,11 +350,7 @@ void FlightPathMovementGenerator::DoFinalize(Player* player)
     player->ClearUnitState(UNIT_STATE_IN_FLIGHT);
 
     uint32 taxiNodeId = player->m_taxi.GetTaxiDestination();
-    if (!player->IsInWorld())
-    {
-        player->m_taxi.ClearTaxiDestinations();
-    }
-
+    player->m_taxi.ClearTaxiDestinations();
     player->Dismount();
     player->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_TAXI_FLIGHT);
 
