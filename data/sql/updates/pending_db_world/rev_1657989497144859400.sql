@@ -1,5 +1,5 @@
 --
-SET @EVENT := 9;
+SET @EVENT := 8;
 
 DELETE FROM `game_event_creature` WHERE `eventEntry` = @EVENT AND `guid` IN
 (146602,
