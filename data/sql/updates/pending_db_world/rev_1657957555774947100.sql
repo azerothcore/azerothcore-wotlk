@@ -25,3 +25,11 @@ CHANGE `basemana` `basemana` INT UNSIGNED DEFAULT 0 NOT NULL,
 CHANGE `basearmor` `basearmor` INT UNSIGNED DEFAULT 1 NOT NULL,
 CHANGE `attackpower` `attackpower` INT UNSIGNED DEFAULT 0 NOT NULL,
 CHANGE `rangedattackpower` `rangedattackpower` INT UNSIGNED DEFAULT 0 NOT NULL; 
+
+ALTER TABLE `item_template` CHANGE `armor` `armor` INT UNSIGNED DEFAULT 0 NOT NULL,
+CHANGE `holy_res` `holy_res` INT UNSIGNED DEFAULT 0 NOT NULL,
+CHANGE `fire_res` `fire_res` INT UNSIGNED DEFAULT 0 NOT NULL,
+CHANGE `nature_res` `int` INT UNSIGNED DEFAULT 0 NOT NULL,
+CHANGE `frost_res` `frost_res` INT UNSIGNED DEFAULT 0 NOT NULL,
+CHANGE `shadow_res` `shadow_res` INT UNSIGNED DEFAULT 0 NOT NULL,
+CHANGE `arcane_res` `arcane_res` INT UNSIGNED DEFAULT 0 NOT NULL; 
