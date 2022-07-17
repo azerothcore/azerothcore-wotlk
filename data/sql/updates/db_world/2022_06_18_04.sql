@@ -1,12 +1,12 @@
 -- DB update 2022_06_18_03 -> 2022_06_18_04
 --
-DELETE FROM `pool_template` WHERE `entry` IN (391, 392, 393); 
+DELETE FROM `pool_template` WHERE `entry` IN (391, 392, 393, 394); 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (391, 4, 'Brontus Kodo Pack Combo 1 -- 4 Barrens Kodo Pack');
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (392, 4, 'Brontus Kodo Pack Combo 2 -- Mixed Kodo Pack');
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (393, 4, 'Brontus Kodo Pack Combo 3 -- Brontus Pack');
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (394, 1, 'Brontus Kodo Pack Pool of Pools');
 
-DELETE FROM `creature` WHERE `guid` IN (51815);
+DELETE FROM `creature` WHERE `guid` IN (51815, 45809, 45810, 45811, 45812, 45813, 45814, 45815, 45816, 45817, 45818, 45819, 45820);
 /* Combo 1 */
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 (45809, 3236, 0, 0, 1, 0, 0, 1, 1, 0, -3787.7153, -1848.3755, 93.918015, 2.55345463752746582, 600, 0, 0, 1, 0, 2, 0, 0, 0, '', 0), -- .go xyz -3787.7153 -1848.3755 93.918015 Leader 
@@ -39,7 +39,7 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
 (45819, 393, 'Brontus Kodo Pack Combo 3 -- Brontus Pack'),
 (45820, 393, 'Brontus Kodo Pack Combo 3 -- Brontus Pack');
 
-DELETE FROM `pool_pool` WHERE `pool_id` IN (391, 392, 393);
+DELETE FROM `pool_pool` WHERE `pool_id` IN (391, 392, 393, 394);
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES 
 (391, 394, 55, 'Brontus Kodo Pack Combo 1 -- 4 Barrens Kodo Pack'),
 (392, 394, 30, 'Brontus Kodo Pack Combo 2 -- Mixed Kodo Pack'),
