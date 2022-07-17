@@ -2732,7 +2732,7 @@ public:
     ActionButtonList m_actionButtons;
 
     float m_auraBaseMod[BASEMOD_END][MOD_END];
-    int16 m_baseRatingValue[MAX_COMBAT_RATING];
+    int32 m_baseRatingValue[MAX_COMBAT_RATING];
     uint32 m_baseSpellPower;
     uint32 m_baseFeralAP;
     uint32 m_baseManaRegen;
