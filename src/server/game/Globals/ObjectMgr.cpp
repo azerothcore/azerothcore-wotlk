@@ -2678,13 +2678,13 @@ void ObjectMgr::LoadItemTemplates()
             itemTemplate.Damage[i].DamageType = uint32(fields[52 + i * 3].Get<uint8>());
         }
 
-        itemTemplate.Armor          = uint32(fields[56].Get<uint16>());
-        itemTemplate.HolyRes        = uint32(fields[57].Get<uint8>());
-        itemTemplate.FireRes        = uint32(fields[58].Get<uint8>());
-        itemTemplate.NatureRes      = uint32(fields[59].Get<uint8>());
-        itemTemplate.FrostRes       = uint32(fields[60].Get<uint8>());
-        itemTemplate.ShadowRes      = uint32(fields[61].Get<uint8>());
-        itemTemplate.ArcaneRes      = uint32(fields[62].Get<uint8>());
+        itemTemplate.Armor          = fields[56].Get<uint32>();
+        itemTemplate.HolyRes        = fields[57].Get<uint32>();
+        itemTemplate.FireRes        = fields[58].Get<uint32>();
+        itemTemplate.NatureRes      = fields[59].Get<uint32>();
+        itemTemplate.FrostRes       = fields[60].Get<uint32>();
+        itemTemplate.ShadowRes      = fields[61].Get<uint32>();
+        itemTemplate.ArcaneRes      = fields[62].Get<uint32>();
         itemTemplate.Delay          = uint32(fields[63].Get<uint16>());
         itemTemplate.AmmoType       = uint32(fields[64].Get<uint8>());
         itemTemplate.RangedModRange = fields[65].Get<float>();
