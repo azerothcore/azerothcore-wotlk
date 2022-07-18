@@ -195,6 +195,18 @@ public:
             instance->SetData(DATA_CTHUN_PHASE, PHASE_EYE_GREEN_BEAM);
         }
 
+        void MoveInLineOfSight(Unit* who) override
+        {
+            if (who->GetTypeId() == TYPEID_PLAYER && !me->IsInCombat())
+            {
+                // Z checks are necessary here because AQ maps do funky stuff.
+                if (me->IsWithinDist2d(who, 50.0f) && who->GetPositionZ() > 100.0f)
+                {
+                    AttackStart(who);
+                }
+            }
+        }
+
         void DoAction(int32 action) override
         {
             if (action == ACTION_SPAWN_EYE_TENTACLES)
