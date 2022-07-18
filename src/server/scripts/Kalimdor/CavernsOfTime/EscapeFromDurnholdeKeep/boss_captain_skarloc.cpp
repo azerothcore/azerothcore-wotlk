@@ -82,7 +82,7 @@ public:
             summons.Summon(summon);
             if (Creature* thrall = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(DATA_THRALL_GUID)))
                 thrall->AI()->JustSummoned(summon);
-            summon->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            summon->SetImmuneToAll(true);
 
             if (summon->GetEntry() == NPC_SKARLOC_MOUNT)
                 return;
@@ -103,7 +103,7 @@ public:
                 path.push_back(G3D::Vector3(startPath[i].GetPositionX(), startPath[i].GetPositionY(), startPath[i].GetPositionZ()));
 
             me->GetMotionMaster()->MoveSplinePath(&path);
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(true);
             me->Mount(SKARLOC_MOUNT_MODEL);
         }
 
@@ -168,13 +168,13 @@ public:
                     Talk(SAY_ENTER);
                     break;
                 case EVENT_START_FIGHT:
-                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->SetImmuneToAll(false);
                     me->SetInCombatWithZone();
                     for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                         if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
                             if (summon->GetEntry() != NPC_SKARLOC_MOUNT)
                             {
-                                summon->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                                summon->SetImmuneToAll(false);
                                 summon->SetInCombatWithZone();
                             }
                     break;

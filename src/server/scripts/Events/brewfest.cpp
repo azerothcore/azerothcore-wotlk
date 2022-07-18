@@ -1557,7 +1557,7 @@ struct npc_coren_direbrew : public ScriptedAI
     {
         _events.Reset();
         _summons.DespawnAll();
-        me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+        me->SetImmuneToPC(true);
         me->SetFaction(FACTION_FRIENDLY);
         _events.SetPhase(PHASE_ALL);
 
@@ -1596,7 +1596,7 @@ struct npc_coren_direbrew : public ScriptedAI
         if (action == ACTION_START_FIGHT)
         {
             _events.SetPhase(PHASE_ONE);
-            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetImmuneToPC(false);
             me->SetFaction(FACTION_GOBLIN_DARK_IRON_BAR_PATRON);
             DoZoneInCombat();
 
@@ -1830,7 +1830,7 @@ struct npc_direbrew_antagonist : public ScriptedAI
                 Talk(SAY_ANTAGONIST_2);
                 break;
             case ACTION_ANTAGONIST_HOSTILE:
-                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                me->SetImmuneToPC(false);
                 me->SetFaction(FACTION_GOBLIN_DARK_IRON_BAR_PATRON);
                 DoZoneInCombat();
                 break;

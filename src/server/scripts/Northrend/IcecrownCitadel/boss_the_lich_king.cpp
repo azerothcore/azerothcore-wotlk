@@ -631,7 +631,7 @@ public:
         boss_the_lich_kingAI(Creature* creature) : BossAI(creature, DATA_THE_LICH_KING)
         {
             me->AddAura(SPELL_EMOTE_SIT_NO_SHEATH, me);
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetImmuneToPC(true);
             me->SetReactState(REACT_PASSIVE);
         }
 
@@ -658,7 +658,7 @@ public:
             _Reset();
             DoAction(ACTION_RESTORE_LIGHT);
             SetEquipmentSlots(true);
-            if (me->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC))
+            if (me->IsImmuneToPC())
                 me->SetStandState(UNIT_STAND_STATE_SIT);
         }
 
@@ -704,7 +704,7 @@ public:
             Cell::VisitGridObjects(me, worker, 333.0f);
 
             me->AddAura(SPELL_EMOTE_SIT_NO_SHEATH, me);
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetImmuneToPC(true);
             me->SetReactState(REACT_PASSIVE);
             me->SetStandState(UNIT_STAND_STATE_SIT);
         }
@@ -1207,7 +1207,7 @@ public:
                             spawner->CastSpell(spawner, SPELL_SUMMON_SPIRIT_BOMB_1, true);  // summons bombs randomly
                             spawner->CastSpell(spawner, SPELL_SUMMON_SPIRIT_BOMB_2, true);  // summons bombs on players
                             spawner->m_Events.AddEvent(new TriggerWickedSpirit(spawner), spawner->m_Events.CalculateTime(3000));
-                            terenas->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC); // to avoid being healed by player trinket procs. terenas' health doesn't matter on heroic
+                            terenas->SetImmuneToAll(true); // to avoid being healed by player trinket procs. terenas' health doesn't matter on heroic
                         }
                     }
                     break;
@@ -1454,7 +1454,7 @@ public:
                     if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                     {
                         theLichKing->SetWalk(false);
-                        theLichKing->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                        theLichKing->SetImmuneToPC(false);
                         theLichKing->SetReactState(REACT_AGGRESSIVE);
                         theLichKing->SetInCombatWithZone();
                         if (!theLichKing->IsInCombat())
@@ -1587,7 +1587,7 @@ public:
                         terenas->CastSpell((Unit*)nullptr, SPELL_MASS_RESURRECTION, false);
                         if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                         {
-                            lichKing->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+                            lichKing->SetImmuneToNPC(false);
                             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                             me->RemoveAllAuras();
                             SetEquipmentSlots(true);
@@ -3708,7 +3708,8 @@ public:
             if (!target)
                 return;
 
-            target->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            target->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1);
+            target->SetImmuneToAll(false);
             target->ForceValuesUpdateAtIndex(UNIT_FIELD_FLAGS);
             VileSpiritActivateEvent(target).Execute(0, 0);
         }

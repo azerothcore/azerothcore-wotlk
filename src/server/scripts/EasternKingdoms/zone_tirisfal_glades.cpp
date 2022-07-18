@@ -53,7 +53,7 @@ public:
         if (quest->GetQuestId() == QUEST_590)
         {
             creature->SetFaction(FACTION_ENEMY);
-            creature->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+            creature->SetImmuneToPC(false);
             CAST_AI(npc_calvin_montague::npc_calvin_montagueAI, creature->AI())->AttackStart(player);
         }
         return true;
@@ -80,8 +80,8 @@ public:
 
             me->RestoreFaction();
 
-            if (!me->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC))
-                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+            if (!me->IsImmuneToPC())
+                me->SetImmuneToPC(true);
         }
 
         void EnterCombat(Unit* /*who*/) override { }
@@ -104,7 +104,7 @@ public:
                 uiDamage = 0;
 
                 me->RestoreFaction();
-                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                me->SetImmuneToPC(true);
                 me->CombatStop(true);
 
                 m_uiPhase = 1;

@@ -813,7 +813,7 @@ int32 Player::getMaxTimer(MirrorTimerType timer)
             {
                 if (!IsAlive() || HasAuraType(SPELL_AURA_WATER_BREATHING) || GetSession()->GetSecurity() >= AccountTypes(sWorld->getIntConfig(CONFIG_DISABLE_BREATHING)))
                     return DISABLED_MIRROR_TIMER;
-                int32 UnderWaterTime = 3 * MINUTE * IN_MILLISECONDS;
+                int32 UnderWaterTime = sWorld->getIntConfig(CONFIG_WATER_BREATH_TIMER);
                 AuraEffectList const& mModWaterBreathing = GetAuraEffectsByType(SPELL_AURA_MOD_WATER_BREATHING);
                 for (AuraEffectList::const_iterator i = mModWaterBreathing.begin(); i != mModWaterBreathing.end(); ++i)
                     AddPct(UnderWaterTime, (*i)->GetAmount());
@@ -2643,12 +2643,13 @@ void Player::InitStatsForLevel(bool reapplyMods)
 
     // cleanup unit flags (will be re-applied if need at aura load).
     RemoveFlag(UNIT_FIELD_FLAGS,
-               UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_ATTACKABLE_1 |
-               UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC  | UNIT_FLAG_LOOTING          |
-               UNIT_FLAG_PET_IN_COMBAT  | UNIT_FLAG_SILENCED     | UNIT_FLAG_PACIFIED         |
-               UNIT_FLAG_STUNNED        | UNIT_FLAG_IN_COMBAT    | UNIT_FLAG_DISARMED         |
-               UNIT_FLAG_CONFUSED       | UNIT_FLAG_FLEEING      | UNIT_FLAG_NOT_SELECTABLE   |
-               UNIT_FLAG_SKINNABLE      | UNIT_FLAG_MOUNT        | UNIT_FLAG_TAXI_FLIGHT      );
+               UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE  | UNIT_FLAG_NOT_ATTACKABLE_1 |
+               UNIT_FLAG_LOOTING        | UNIT_FLAG_PET_IN_COMBAT | UNIT_FLAG_SILENCED         |
+               UNIT_FLAG_PACIFIED       | UNIT_FLAG_STUNNED       | UNIT_FLAG_IN_COMBAT        |
+               UNIT_FLAG_DISARMED       | UNIT_FLAG_CONFUSED      | UNIT_FLAG_FLEEING          |
+               UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_SKINNABLE     | UNIT_FLAG_MOUNT            |
+               UNIT_FLAG_TAXI_FLIGHT);
+    SetImmuneToAll(false);
     SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);   // must be set
 
     SetUnitFlag2(UNIT_FLAG2_REGENERATE_POWER);// must be set
@@ -8972,16 +8973,18 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
         // only if current pet in slot
         pet->SavePetToDB(mode);
 
-        ASSERT(m_petStable->CurrentPet && m_petStable->CurrentPet->PetNumber == pet->GetCharmInfo()->GetPetNumber());
-        if (mode == PET_SAVE_NOT_IN_SLOT)
+        if (m_petStable->CurrentPet && m_petStable->CurrentPet->PetNumber == pet->GetCharmInfo()->GetPetNumber())
         {
-            m_petStable->UnslottedPets.push_back(std::move(*m_petStable->CurrentPet));
-            m_petStable->CurrentPet.reset();
+            if (mode == PET_SAVE_NOT_IN_SLOT)
+            {
+                m_petStable->UnslottedPets.push_back(std::move(*m_petStable->CurrentPet));
+                m_petStable->CurrentPet.reset();
+            }
+            else if (mode == PET_SAVE_AS_DELETED)
+                m_petStable->CurrentPet.reset();
+            // else if (stable slots) handled in opcode handlers due to required swaps
+            // else (current pet) doesnt need to do anything
         }
-        else if (mode == PET_SAVE_AS_DELETED)
-            m_petStable->CurrentPet.reset();
-        // else if (stable slots) handled in opcode handlers due to required swaps
-        // else (current pet) doesnt need to do anything
 
         SetMinion(pet, false);
 
@@ -10591,7 +10594,7 @@ void Player::AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 ite
     // cooldown information stored in item prototype
     // This used in same way in WorldSession::HandleItemQuerySingleOpcode data sending to client.
 
-    bool useSpellCooldown = false;
+    bool useSpellCooldown = spellInfo->HasAttribute(SPELL_ATTR7_CAN_BE_MULTI_CAST);
     if (itemId)
     {
         if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId))
@@ -13177,7 +13180,7 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
             return;
         }
 
-    if (!item->AllowedForPlayer(this))
+    if (!item->AllowedForPlayer(this, loot->sourceWorldObjectGUID))
     {
         SendLootRelease(GetLootGUID());
         return;

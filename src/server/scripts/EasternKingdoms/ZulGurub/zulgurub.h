@@ -76,6 +76,12 @@ enum GameobjectIds
     GO_GONG_OF_BETHEKK      = 180526  // Arlokk Event
 };
 
+enum SpellIds
+{
+    SPELL_HAKKAR_POWER      = 24692,
+    SPELL_HAKKAR_POWER_DOWN = 24693
+};
+
 template <class AI, class T>
 inline AI* GetZulGurubAI(T* obj)
 {

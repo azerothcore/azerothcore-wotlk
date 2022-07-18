@@ -96,7 +96,7 @@ bool GameObject::AIM_Initialize()
     return true;
 }
 
-std::string GameObject::GetAIName() const
+std::string const& GameObject::GetAIName() const
 {
     return sObjectMgr->GetGameObjectTemplate(GetEntry())->AIName;
 }
@@ -158,6 +158,8 @@ void GameObject::AddToWorld()
         EnableCollision(GetGoState() == GO_STATE_READY || IsTransport()); // pussywizard: this startOpen is unneeded here, collision depends entirely on GOState
 
         WorldObject::AddToWorld();
+
+        loot.sourceWorldObjectGUID = GetGUID();
 
         sScriptMgr->OnGameObjectAddWorld(this);
     }
@@ -2053,20 +2055,19 @@ void GameObject::CastSpell(Unit* target, uint32 spellId)
     if (!spellInfo)
         return;
 
-    bool self = false;
+    bool self = true;
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
-        if (spellInfo->Effects[i].TargetA.GetTarget() == TARGET_UNIT_CASTER)
+        if (spellInfo->Effects[i].TargetA.GetReferenceType() != TARGET_REFERENCE_TYPE_CASTER || spellInfo->Effects[i].TargetB.GetTarget())
         {
-            self = true;
+            self = false;
             break;
         }
     }
 
-    if (self)
+    if (self && target && target->GetGUID() != GetGUID())
     {
-        if (target)
-            target->CastSpell(target, spellInfo, true);
+        target->CastSpell(target, spellInfo, true);
         return;
     }
 
@@ -2088,7 +2089,7 @@ void GameObject::CastSpell(Unit* target, uint32 spellId)
             trigger->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
 
         // xinef: Remove Immunity flags
-        trigger->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+        trigger->SetImmuneToNPC(false);
         // xinef: set proper orientation, fixes cast against stealthed targets
         if (target)
             trigger->SetInFront(target);

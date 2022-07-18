@@ -169,7 +169,8 @@ public:
 
     void UpdateMovementFlags();
     uint32 GetRandomId(uint32 id1, uint32 id2, uint32 id3);
-    bool UpdateEntry(uint32 entry, const CreatureData* data = nullptr, bool changelevel = true );
+    bool UpdateEntry(uint32 entry, const CreatureData* data = nullptr, bool changelevel = true, bool updateAI = false);
+    bool UpdateEntry(uint32 entry, bool updateAI) { return UpdateEntry(entry, nullptr, true, updateAI); }
     bool UpdateStats(Stats stat) override;
     bool UpdateAllStats() override;
     void UpdateResistances(uint32 school) override;
@@ -197,7 +198,7 @@ public:
     void SetDetectionDistance(float dist){ m_detectionDistance = dist; }
     [[nodiscard]] CreatureAddon const* GetCreatureAddon() const;
 
-    [[nodiscard]] std::string GetAIName() const;
+    [[nodiscard]] std::string const& GetAIName() const;
     [[nodiscard]] std::string GetScriptName() const;
     [[nodiscard]] uint32 GetScriptId() const;
 
@@ -341,14 +342,10 @@ public:
 
     void SetDisableReputationGain(bool disable) { DisableReputationGain = disable; }
     [[nodiscard]] bool IsReputationGainDisabled() const { return DisableReputationGain; }
-    [[nodiscard]] bool IsDamageEnoughForLootingAndReward() const { return (m_creatureInfo->flags_extra & CREATURE_FLAG_EXTRA_NO_PLAYER_DAMAGE_REQ) || (m_PlayerDamageReq == 0); }
-    void LowerPlayerDamageReq(uint32 unDamage)
-    {
-        if (m_PlayerDamageReq)
-            m_PlayerDamageReq > unDamage ? m_PlayerDamageReq -= unDamage : m_PlayerDamageReq = 0;
-    }
-    void ResetPlayerDamageReq() { m_PlayerDamageReq = GetHealth() / 2; }
-    uint32 m_PlayerDamageReq;
+    [[nodiscard]] bool IsDamageEnoughForLootingAndReward() const;
+    void LowerPlayerDamageReq(uint32 unDamage, bool damagedByPlayer = true);
+    void ResetPlayerDamageReq();
+    [[nodiscard]] uint32 GetPlayerDamageReq() const;
 
     [[nodiscard]] uint32 GetOriginalEntry() const { return m_originalEntry; }
     void SetOriginalEntry(uint32 entry) { m_originalEntry = entry; }
@@ -386,8 +383,6 @@ public:
     void SetAssistanceTimer(uint32 value) { m_assistanceTimer = value; }
 
     void ModifyThreatPercentTemp(Unit* victim, int32 percent, Milliseconds duration);
-
-    void ResetFaction() { SetFaction(GetCreatureTemplate()->faction); }
 
 protected:
     bool CreateFromProto(ObjectGuid::LowType guidlow, uint32 Entry, uint32 vehId, const CreatureData* data = nullptr);
@@ -470,6 +465,8 @@ private:
 
     uint32 m_assistanceTimer;
 
+    uint32 _playerDamageReq;
+    bool _damagedByPlayer;
 };
 
 class AssistDelayEvent : public BasicEvent

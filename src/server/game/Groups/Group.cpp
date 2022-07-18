@@ -18,6 +18,7 @@
 #include "Group.h"
 #include "Battleground.h"
 #include "BattlegroundMgr.h"
+#include "Config.h"
 #include "DatabaseEnv.h"
 #include "GameTime.h"
 #include "GroupMgr.h"
@@ -276,6 +277,16 @@ void Group::ConvertToLFG(bool restricted /*= true*/)
     }
 
     SendUpdate();
+}
+
+bool Group::CheckLevelForRaid()
+{
+    for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
+        if (Player* player = ObjectAccessor::FindPlayer(citr->guid))
+            if (player->getLevel() < sConfigMgr->GetOption<int32>("Group.Raid.LevelRestriction", 10))
+                return true;
+
+    return false;
 }
 
 void Group::ConvertToRaid()
@@ -1004,7 +1015,7 @@ void Group::GroupLoot(Loot* loot, WorldObject* pLootedObject)
                     continue;
                 if (member->IsAtLootRewardDistance(pLootedObject))
                 {
-                    if (i->AllowedForPlayer(member))
+                    if (i->AllowedForPlayer(member, loot->sourceWorldObjectGUID))
                     {
                         r->totalPlayersRolling++;
 
@@ -1088,7 +1099,7 @@ void Group::GroupLoot(Loot* loot, WorldObject* pLootedObject)
 
             if (member->IsAtLootRewardDistance(pLootedObject))
             {
-                if (i->AllowedForPlayer(member))
+                if (i->AllowedForPlayer(member, loot->sourceWorldObjectGUID))
                 {
                     r->totalPlayersRolling++;
                     r->playerVote[member->GetGUID()] = NOT_EMITED_YET;
@@ -1146,7 +1157,7 @@ void Group::NeedBeforeGreed(Loot* loot, WorldObject* lootedObject)
                 if (!playerToRoll)
                     continue;
 
-                if (i->AllowedForPlayer(playerToRoll) && playerToRoll->IsAtLootRewardDistance(lootedObject))
+                if (i->AllowedForPlayer(playerToRoll, loot->sourceWorldObjectGUID) && playerToRoll->IsAtLootRewardDistance(lootedObject))
                 {
                     r->totalPlayersRolling++;
                     if (playerToRoll->GetPassOnGroupLoot())
@@ -1220,7 +1231,7 @@ void Group::NeedBeforeGreed(Loot* loot, WorldObject* lootedObject)
             if (!playerToRoll)
                 continue;
 
-            if (i->AllowedForPlayer(playerToRoll) && playerToRoll->IsAtLootRewardDistance(lootedObject))
+            if (i->AllowedForPlayer(playerToRoll, loot->sourceWorldObjectGUID) && playerToRoll->IsAtLootRewardDistance(lootedObject))
             {
                 r->totalPlayersRolling++;
                 r->playerVote[playerToRoll->GetGUID()] = NOT_EMITED_YET;

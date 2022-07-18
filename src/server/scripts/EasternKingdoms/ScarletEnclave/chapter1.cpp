@@ -219,7 +219,7 @@ public:
             if (creature->AI()->GetData(DATA_IN_PROGRESS))
                 return true;
 
-            creature->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+            creature->SetImmuneToPC(false);
             creature->RemoveUnitFlag(UNIT_FLAG_SWIMMING);
 
             player->CastSpell(creature, SPELL_DUEL, false);
@@ -584,7 +584,7 @@ public:
         {
             ScriptedAI::MoveInLineOfSight(who);
 
-            if (!who->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC) && who->GetEntry() == NPC_GHOUL && me->IsWithinDistInMap(who, 10.0f))
+            if (!who->IsImmuneToNPC() && who->GetEntry() == NPC_GHOUL && me->IsWithinDistInMap(who, 10.0f))
                 if (Unit* owner = who->GetOwner())
                     if (Player* player = owner->ToPlayer())
                     {
@@ -593,7 +593,7 @@ public:
                             creature->CastSpell(owner, 52517, true);
 
                         creature->AI()->SetGUID(me->GetGUID());
-                        creature->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        creature->SetImmuneToAll(true);
                     }
         }
 
@@ -743,7 +743,7 @@ public:
             phase = PHASE_CHAINED;
             events.Reset();
             me->SetFaction(FACTION_CREATURE);
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetImmuneToPC(true);
             me->SetUInt32Value(UNIT_FIELD_BYTES_1, 8);
             me->LoadEquipment(0, true);
         }
@@ -844,7 +844,7 @@ public:
                         else
                         {
                             me->SetFaction(FACTION_MONSTER);
-                            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                            me->SetImmuneToPC(false);
                             phase = PHASE_ATTACKING;
 
                             if (Player* target = ObjectAccessor::GetPlayer(*me, playerGUID))
@@ -964,7 +964,7 @@ public:
     {
         npc_scarlet_miner_cartAI(Creature* creature) : PassiveAI(creature)
         {
-            me->ReplaceAllUnitFlags(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(true);
             me->SetFaction(FACTION_FRIENDLY);
             me->SetDisplayId(me->GetCreatureTemplate()->Modelid1); // Modelid2 is a horse.
         }
@@ -987,7 +987,8 @@ public:
                 me->SetSpeed(MOVE_RUN, 1.25f);
 
                 me->GetMotionMaster()->MoveFollow(miner, 1.0f, 0);
-                me->ReplaceAllUnitFlags(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                me->ReplaceAllUnitFlags(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetImmuneToAll(true);
                 me->SetFaction(FACTION_FRIENDLY);
             }
         }
@@ -1097,7 +1098,8 @@ public:
                     {
                         me->SetFacingToObject(car);
                         // xinef: add some flags
-                        car->ReplaceAllUnitFlags(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        car->ReplaceAllUnitFlags(UNIT_FLAG_NON_ATTACKABLE);
+                        car->SetImmuneToAll(true);
                         car->SetFaction(FACTION_FRIENDLY);
                     }
                     Talk(SAY_SCARLET_MINER_0);

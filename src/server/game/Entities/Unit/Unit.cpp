@@ -999,7 +999,11 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             victim->ToCreature()->SetLootRecipient(attacker);
 
         if (!attacker || attacker->IsControlledByPlayer() || attacker->IsCreatedByPlayer())
-            victim->ToCreature()->LowerPlayerDamageReq(health < damage ?  health : damage);
+        {
+            uint32 unDamage = health < damage ? health : damage;
+            bool damagedByPlayer = unDamage && attacker && attacker->m_movedByPlayer != nullptr;
+            victim->ToCreature()->LowerPlayerDamageReq(unDamage, damagedByPlayer);
+        }
     }
 
     if (health <= damage)
@@ -2325,14 +2329,14 @@ void Unit::CalcHealAbsorb(HealInfo& healInfo)
         healInfo.AbsorbHeal(absorbAmount);
 }
 
-void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType, bool extra)
+void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType /*= BASE_ATTACK*/, bool extra /*= false*/, bool ignoreCasting /*= false*/)
 {
     if (HasUnitFlag(UNIT_FLAG_PACIFIED))
     {
         return;
     }
 
-    if (HasUnitState(UNIT_STATE_CANNOT_AUTOATTACK) && !extra)
+    if (HasUnitState(UNIT_STATE_CANNOT_AUTOATTACK) && !extra && !ignoreCasting)
     {
         return;
     }
@@ -3618,8 +3622,12 @@ void Unit::SetCurrentCastedSpell(Spell* pSpell)
             {
                 // generic spells always break channeled not delayed spells
                 if (Spell* s = GetCurrentSpell(CURRENT_CHANNELED_SPELL))
-                    if (s->GetSpellInfo()->Id != 69051) // pussywizard: FoS, boss Devourer of Souls, Mirrored Soul, does not have any special attribute
+                {
+                    if (!s->GetSpellInfo()->IsActionAllowedChannel())
+                    {
                         InterruptSpell(CURRENT_CHANNELED_SPELL, false);
+                    }
+                }
 
                 // autorepeat breaking
                 if (m_currentSpells[CURRENT_AUTOREPEAT_SPELL])
@@ -3654,7 +3662,14 @@ void Unit::SetCurrentCastedSpell(Spell* pSpell)
                 if (pSpell->m_spellInfo->Id != 75)
                 {
                     // generic autorepeats break generic non-delayed and channeled non-delayed spells
-                    InterruptSpell(CURRENT_GENERIC_SPELL, false);
+                    if (Spell* s = GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+                    {
+                        if (!s->GetSpellInfo()->IsActionAllowedChannel())
+                        {
+                            InterruptSpell(CURRENT_CHANNELED_SPELL, false);
+                        }
+                    }
+
                     InterruptSpell(CURRENT_CHANNELED_SPELL, false);
                 }
                 // special action: set first cast flag
@@ -3789,7 +3804,7 @@ bool Unit::IsMovementPreventedByCasting() const
     {
         if (spell->getState() != SPELL_STATE_FINISHED && spell->IsChannelActive())
         {
-            if (spell->GetSpellInfo()->IsMoveAllowedChannel())
+            if (spell->GetSpellInfo()->IsActionAllowedChannel())
             {
                 return false;
             }
@@ -3798,15 +3813,6 @@ bool Unit::IsMovementPreventedByCasting() const
 
     // prohibit movement for all other spell casts
     return true;
-}
-
-bool Unit::CanMoveDuringChannel() const
-{
-    if (Spell* spell = m_currentSpells[CURRENT_CHANNELED_SPELL])
-        if (spell->getState() != SPELL_STATE_FINISHED)
-            return spell->GetSpellInfo()->HasAttribute(SPELL_ATTR5_ALLOW_ACTION_DURING_CHANNEL) && spell->IsChannelActive();
-
-    return false;
 }
 
 bool Unit::isInFrontInMap(Unit const* target, float distance,  float arc) const
@@ -3866,7 +3872,11 @@ bool Unit::isInAccessiblePlaceFor(Creature const* c) const
             return false;
     }
 
-    if (IsInWater())
+    LiquidStatus liquidStatus = GetLiquidData().Status;
+    bool isInWater = (liquidStatus & MAP_LIQUID_STATUS_SWIMMING) != 0;
+
+    // In water or jumping in water
+    if (isInWater || (liquidStatus == LIQUID_MAP_ABOVE_WATER && (IsFalling() || (ToPlayer() && ToPlayer()->IsFalling()))))
     {
         return c->CanEnterWater();
     }
@@ -7836,13 +7846,9 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             if (AuraEffect const* aurEff = target->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_SHAMAN, 0x10000000, 0x0, 0x0, GetGUID()))
                             {
                                 Aura* flameShock  = aurEff->GetBase();
-                                int32 maxDuration = flameShock->GetMaxDuration();
-                                int32 newDuration = flameShock->GetDuration() + 2 * aurEff->GetAmplitude();
-
-                                flameShock->SetDuration(newDuration);
-                                // is it blizzlike to change max duration for FS?
-                                if (newDuration > maxDuration)
-                                    flameShock->SetMaxDuration(newDuration);
+                                int32 extraTime = 2 * aurEff->GetAmplitude();
+                                flameShock->SetMaxDuration(flameShock->GetMaxDuration() + extraTime);
+                                flameShock->SetDuration(flameShock->GetDuration() + extraTime);
 
                                 return true;
                             }
@@ -13027,6 +13033,24 @@ void Unit::SetInCombatWith(Unit* enemy, uint32 duration)
     SetInCombatState(false, enemy, duration);
 }
 
+void Unit::SetImmuneToPC(bool apply, bool keepCombat)
+{
+    (void)keepCombat;
+    if (apply)
+        SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+    else
+        RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+}
+
+void Unit::SetImmuneToNPC(bool apply, bool keepCombat)
+{
+    (void)keepCombat;
+    if (apply)
+        SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+    else
+        RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+}
+
 void Unit::CombatStart(Unit* victim, bool initialAggro)
 {
     // Xinef: Dont allow to start combat with triggers
@@ -13140,8 +13164,8 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
         return;
 
     // xinef: if we somehow engage in combat (scripts, dunno) with player, remove this flag so he can fight back
-    if (GetTypeId() == TYPEID_UNIT && enemy && HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC) && enemy->GetCharmerOrOwnerPlayerOrPlayerItself())
-        RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC); // unit has engaged in combat, remove immunity so players can fight back
+    if (GetTypeId() == TYPEID_UNIT && enemy && IsImmuneToPC() && enemy->GetCharmerOrOwnerPlayerOrPlayerItself())
+        SetImmuneToPC(false); // unit has engaged in combat, remove immunity so players can fight back
 
     if (IsInCombat())
         return;
@@ -13163,6 +13187,8 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
 
             if (creature->GetFormation())
                 creature->GetFormation()->MemberEngagingTarget(creature, enemy);
+
+            sScriptMgr->OnUnitEnterCombat(creature, enemy);
         }
 
         creature->RefreshSwimmingFlag();
@@ -13207,7 +13233,7 @@ void Unit::ClearInCombat()
     if (Creature* creature = ToCreature())
     {
         if (creature->GetCreatureTemplate() && creature->GetCreatureTemplate()->unit_flags & UNIT_FLAG_IMMUNE_TO_PC)
-            SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC); // set immunity state to the one from db on evade
+            SetImmuneToPC(true); // set immunity state to the one from db on evade
 
         ClearUnitState(UNIT_STATE_ATTACK_PLAYER);
         if (HasDynamicFlag(UNIT_DYNFLAG_TAPPED))
@@ -13251,7 +13277,7 @@ bool Unit::isTargetableForAttack(bool checkFakeDeath, Unit const* byWho) const
     if (HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE))
         return false;
 
-    if (HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC) && byWho && byWho->GetCharmerOrOwnerPlayerOrPlayerItself())
+    if (IsImmuneToPC() && byWho && byWho->GetCharmerOrOwnerPlayerOrPlayerItself())
         return false;
 
     if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->IsGameMaster())
@@ -13306,11 +13332,11 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, Wo
     }
     // check flags
     if (target->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_TAXI_FLIGHT | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_NON_ATTACKABLE_2)
-            || (!HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && target->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC))
-            || (!target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && HasUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC))
-            || (HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && target->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC))
+            || (!HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && target->IsImmuneToNPC())
+            || (!target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && IsImmuneToNPC())
+            || (HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && target->IsImmuneToPC())
             // check if this is a world trigger cast - GOs are using world triggers to cast their spells, so we need to ignore their immunity flag here, this is a temp workaround, needs removal when go cast is implemented properly
-            || ((GetEntry() != WORLD_TRIGGER && (!obj || !obj->isType(TYPEMASK_GAMEOBJECT | TYPEMASK_DYNAMICOBJECT))) && target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC)))
+            || ((GetEntry() != WORLD_TRIGGER && (!obj || !obj->isType(TYPEMASK_GAMEOBJECT | TYPEMASK_DYNAMICOBJECT))) && target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && IsImmuneToPC()))
         return false;
 
     // CvC case - can attack each other only when one of them is hostile
@@ -13425,12 +13451,12 @@ bool Unit::_IsValidAssistTarget(Unit const* target, SpellInfo const* bySpell) co
 
         if (HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
         {
-            if (target->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC))
+            if (target->IsImmuneToPC())
                 return false;
         }
         else
         {
-            if (target->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC))
+            if (target->IsImmuneToNPC())
                 return false;
         }
     }
@@ -15719,9 +15745,9 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
             else // For attacker
             {
                 // Overpower on victim dodge
-                if (procExtra & PROC_EX_DODGE )
+                if (procExtra & PROC_EX_DODGE)
                 {
-                    if (GetTypeId() == TYPEID_PLAYER && getClass() == CLASS_WARRIOR)
+                    if (getClass() == CLASS_WARRIOR)
                     {
                         AddComboPoints(target, 1);
                         StartReactiveTimer(REACTIVE_OVERPOWER);
@@ -16335,6 +16361,8 @@ void Unit::SetDisplayId(uint32 modelId)
     // Set Gender by modelId
     if (CreatureModelInfo const* minfo = sObjectMgr->GetCreatureModelInfo(modelId))
         SetByteValue(UNIT_FIELD_BYTES_0, 2, minfo->gender);
+
+    sScriptMgr->OnDisplayIdChange(this, modelId);
 }
 
 void Unit::RestoreDisplayId()
@@ -16512,8 +16540,10 @@ void Unit::UpdateReactives(uint32 p_time)
                         ModifyAuraState(AURA_STATE_HUNTER_PARRY, false);
                     break;
                 case REACTIVE_OVERPOWER:
-                    if (getClass() == CLASS_WARRIOR && GetTypeId() == TYPEID_PLAYER)
+                    if (getClass() == CLASS_WARRIOR)
+                    {
                         ClearComboPoints();
+                    }
                     break;
                 case REACTIVE_WOLVERINE_BITE:
                     if (IsHunterPet())
@@ -17470,6 +17500,7 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
         if (CreatureAI* ai = creature->AI())
         {
             ai->JustDied(killer);
+            sScriptMgr->OnUnitDeath(creature, killer);
         }
 
         if (TempSummon* summon = creature->ToTempSummon())
@@ -17946,8 +17977,7 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
         GetMotionMaster()->MoveIdle();
         StopMoving();
 
-        if (charmer->GetTypeId() == TYPEID_PLAYER &&
-            charmer->getClass() == CLASS_WARLOCK)
+        if (charmer->GetTypeId() == TYPEID_PLAYER && charmer->getClass() == CLASS_WARLOCK && ToCreature()->GetCreatureTemplate()->type == CREATURE_TYPE_DEMON)
         {
             // Disable CreatureAI/SmartAI and switch to CharmAI when charmed by warlock
             Creature* charmed = ToCreature();
@@ -18589,23 +18619,38 @@ void Unit::SetPhaseMask(uint32 newPhaseMask, bool update)
         }
     }
 
-    WorldObject::SetPhaseMask(newPhaseMask, update);
+    WorldObject::SetPhaseMask(newPhaseMask, false);
 
     if (!IsInWorld())
+    {
         return;
+    }
 
     for (ControlSet::const_iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); )
     {
         Unit* controlled = *itr;
         ++itr;
         if (controlled->GetTypeId() == TYPEID_UNIT)
+        {
             controlled->SetPhaseMask(newPhaseMask, true);
+        }
     }
 
     for (uint8 i = 0; i < MAX_SUMMON_SLOT; ++i)
+    {
         if (m_SummonSlot[i])
+        {
             if (Creature* summon = GetMap()->GetCreature(m_SummonSlot[i]))
+            {
                 summon->SetPhaseMask(newPhaseMask, true);
+            }
+        }
+    }
+
+    if (update)
+    {
+        UpdateObjectVisibility();
+    }
 }
 
 void Unit::UpdateObjectVisibility(bool forced, bool /*fromUpdate*/)

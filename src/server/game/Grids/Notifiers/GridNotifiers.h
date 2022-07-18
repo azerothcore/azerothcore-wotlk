@@ -925,7 +925,19 @@ namespace Acore
                 return false;
             }
 
-            if (!i_obj->IsWithinDistInMap(u, i_range) || !i_owner->IsValidAttackTarget(u) || !i_obj->IsWithinLOSInMap(u))
+            uint32 losChecks = LINEOFSIGHT_ALL_CHECKS;
+            Optional<float> collisionHeight = { };
+            if (i_obj->GetTypeId() == TYPEID_GAMEOBJECT)
+            {
+                losChecks &= ~LINEOFSIGHT_CHECK_GOBJECT_M2;
+                if (i_owner->IsPlayer())
+                {
+                    collisionHeight = i_owner->GetCollisionHeight();
+                }
+            }
+
+            if (!i_obj->IsWithinDistInMap(u, i_range) || !i_owner->IsValidAttackTarget(u) ||
+                !i_obj->IsWithinLOSInMap(u, VMAP::ModelIgnoreFlags::Nothing, LineOfSightChecks(losChecks), collisionHeight))
             {
                 return false;
             }
@@ -1113,7 +1125,7 @@ namespace Acore
         {}
         bool operator()(Unit* u)
         {
-            if (!u->IsAlive() || u->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE) || (u->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC) && !u->IsInCombat()))
+            if (!u->IsAlive() || u->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE) || (u->IsImmuneToPC() && !u->IsInCombat()))
                 return false;
             if (u->GetGUID() == i_funit->GetGUID())
                 return false;

@@ -25,6 +25,7 @@
 #include "MapReference.h"
 #include "Player.h"
 #include "Vehicle.h"
+#include "ScriptMgr.h"
 #include "Language.h"
 
 class PhasedRespawn : public BasicEvent
@@ -226,6 +227,8 @@ void CreatureAI::EnterEvadeMode(EvadeReason why)
         me->DespawnOnEvade();
         me->m_Events.AddEvent(new PhasedRespawn(*me), me->m_Events.CalculateTime(20000));
     }
+
+    sScriptMgr->OnUnitEnterEvadeMode(me, why);
 }
 
 /*void CreatureAI::AttackedBy(Unit* attacker)

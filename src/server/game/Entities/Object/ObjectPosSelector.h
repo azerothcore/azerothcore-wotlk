@@ -42,7 +42,7 @@ struct ObjectPosSelector
         float dist;                                         // dist to central point (including central point size)
     };
 
-    typedef std::multimap<float, UsedPos> UsedPosList;       // std::abs(angle)->Node
+    typedef std::multimap<float, UsedPos> UsedPosList;      // std::abs(angle)->Node
 
     ObjectPosSelector(float x, float y, float size, float dist);
 
@@ -60,7 +60,7 @@ struct ObjectPosSelector
         float angle_step2  = GetAngle(nextUsedPos.second);
 
         float next_angle = nextUsedPos.first;
-        if (nextUsedPos.second.sign * sign < 0)              // last node from diff. list (-pi+alpha)
+        if (nextUsedPos.second.sign * sign < 0)             // last node from diff. list (-pi+alpha)
             next_angle = 2 * M_PI - next_angle;             // move to positive
 
         return std::fabs(angle) + angle_step2 <= next_angle;
