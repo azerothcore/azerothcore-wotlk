@@ -84,11 +84,6 @@ public:
 
             events.Update(diff);
 
-            if (me->GetDistance(me->GetVictim()) > 60.00f && me->GetDistance(me->GetVictim()) < 120.00f)
-            {
-                DoCastVictim(SPELL_SUMMON_PLAYER);
-            }
-
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
