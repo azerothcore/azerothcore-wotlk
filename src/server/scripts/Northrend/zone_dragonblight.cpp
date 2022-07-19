@@ -590,6 +590,238 @@ public:
     };
 };
 
+enum WintergardeGryphon
+{
+    SPELL_RESCUE_VILLAGER                       = 48363,
+    SPELL_DROP_OFF_VILLAGER                     = 48397,
+    SPELL_RIDE_VEHICLE                          = 43671,
+    SPELL_CALL_WINTERGARDE_GRYPHON              = 48388,
+
+    EVENT_VEHICLE_GET                           = 1,
+    EVENT_TAKE_OFF                              = 2,
+    EVENT_GET_VILLAGER                          = 3,
+
+    POINT_LAND                                  = 1,
+    POINT_TAKE_OFF                              = 2,
+
+    QUEST_FLIGHT_OF_THE_WINTERGARDE_DEFENDER    = 12237,
+    GO_TEMP_GRYPHON_STATION                     = 188679
+};
+
+class npc_wintergarde_gryphon : public VehicleAI
+{
+public:
+    npc_wintergarde_gryphon(Creature* creature) : VehicleAI(creature)
+    {
+        creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        me->DespawnOrUnsummon(3000);
+    }
+
+    void IsSummonedBy(Unit* summoner) override
+    {
+        me->SetFacingToObject(summoner);
+        Position pos = summoner->GetPosition();
+        me->GetMotionMaster()->MovePoint(POINT_LAND, pos);
+    }
+
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type == POINT_MOTION_TYPE && id == POINT_LAND)
+            events.ScheduleEvent(EVENT_VEHICLE_GET, 0);
+    }
+
+    void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override
+    {
+        if (!apply && seatId == 0)
+        {
+            // left the vehicle with a passenger will result in despawn
+            if (Vehicle* gryphon = me->GetVehicleKit())
+                if (Unit* villager = gryphon->GetPassenger(1))
+                {
+                    if (villager->GetTypeId() != TYPEID_UNIT)
+                        return;
+
+                    if (Creature* seat = villager->ToCreature())
+                    {
+                        seat->ExitVehicle();
+                        seat->DespawnOrUnsummon();
+                    }
+                }
+
+            me->RemoveVehicleKit(); // not Crash (;
+            events.ScheduleEvent(EVENT_TAKE_OFF, 2 * IN_MILLISECONDS);
+            me->CastSpell(passenger, VEHICLE_SPELL_PARACHUTE, true);
+        }
+    }
+
+    Creature* getVillager() { return ObjectAccessor::GetCreature(*me, villagerGUID); }
+
+    void UpdateAI(uint32 diff) override
+    {
+        events.Update(diff);
+        while (uint32 eventId = events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+                case EVENT_VEHICLE_GET:
+                {
+                    me->SetDisableGravity(false);
+                    me->SetHover(false);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    break;
+                }
+                case EVENT_TAKE_OFF:
+                {
+                    me->DespawnOrUnsummon(4050);
+                    me->SetOrientation(2.5f);
+                    me->SetSpeedRate(MOVE_FLIGHT, 1.0f);
+                    Position pos = me->GetPosition();
+                    Position offset = { 14.0f, 14.0f, 16.0f, 0.0f };
+                    pos.RelocateOffset(offset);
+                    me->GetMotionMaster()->MovePoint(POINT_TAKE_OFF, pos);
+                    break;
+                }
+                case EVENT_GET_VILLAGER:
+                {
+                    if (getVillager())
+                        getVillager()->GetMotionMaster()->MovePoint(0, 3660.0f, -706.4f, 215.0f);
+                    break;
+                }
+            }
+        }
+    }
+
+    void SpellHit(Unit* caster, SpellInfo const* spell) override
+    {
+        if (spell->Id != SPELL_DROP_OFF_VILLAGER)
+            return;
+
+        if (Vehicle* gryphon = me->GetVehicleKit())
+            if (Unit* villager = gryphon->GetPassenger(1))
+            {
+                if (Creature* seat = villager->ToCreature())
+                {
+                    seat->ExitVehicle();
+                    seat->DespawnOrUnsummon(10 * IN_MILLISECONDS);
+                    seat->GetMotionMaster()->Clear(false);
+                    villagerGUID = seat->GetGUID();
+                    seat->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
+                    events.ScheduleEvent(EVENT_GET_VILLAGER, 3 * IN_MILLISECONDS);
+                }
+            }
+    }
+private:
+    ObjectGuid villagerGUID;
+};
+
+class spell_q12237_rescue_villager : public SpellScript
+{
+    PrepareSpellScript(spell_q12237_rescue_villager);
+
+    SpellCastResult CheckCast()
+    {
+        Player* owner = GetCaster()->GetCharmerOrOwnerPlayerOrPlayerItself();
+
+        if (!owner)
+            return SPELL_FAILED_DONT_REPORT;
+
+        SpellCustomErrors extension = SPELL_CUSTOM_ERROR_NONE;
+        SpellCastResult result = SPELL_CAST_OK;
+
+        if (GetCaster()->FindNearestGameObject(GO_TEMP_GRYPHON_STATION, 15.0f))
+        {
+            extension = SPELL_CUSTOM_ERROR_NEED_HELPLESS_VILLAGER;
+            result = SPELL_FAILED_CUSTOM_ERROR;
+        }
+
+        if (GetCaster()->HasAura(SPELL_RIDE_VEHICLE))
+            result = SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+
+        if (result != SPELL_CAST_OK)
+        {
+            Spell::SendCastResult(owner, GetSpellInfo(), 0, result, extension);
+            return result;
+        }
+
+        return SPELL_CAST_OK;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_q12237_rescue_villager::CheckCast);
+    }
+};
+
+class spell_q12237_drop_off_villager : public SpellScript
+{
+    PrepareSpellScript(spell_q12237_drop_off_villager);
+
+    SpellCastResult CheckCast()
+    {
+        Player* master = GetCaster()->GetCharmerOrOwnerPlayerOrPlayerItself();
+
+        if (!master)
+            return SPELL_FAILED_DONT_REPORT;
+
+        SpellCustomErrors extension = SPELL_CUSTOM_ERROR_NONE;
+        SpellCastResult result = SPELL_CAST_OK;
+
+        if (!GetCaster()->FindNearestGameObject(GO_TEMP_GRYPHON_STATION, 10.0f))
+            result = SPELL_FAILED_REQUIRES_SPELL_FOCUS;
+
+        if (!GetCaster()->HasAura(SPELL_RIDE_VEHICLE))
+        {
+            extension = SPELL_CUSTOM_ERROR_NO_PASSENGER;
+            result = SPELL_FAILED_CUSTOM_ERROR;
+        }
+
+        if (result != SPELL_CAST_OK)
+        {
+            Spell::SendCastResult(master, GetSpellInfo(), 0, result, extension);
+            return result;
+        }
+
+        return SPELL_CAST_OK;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_q12237_drop_off_villager::CheckCast);
+    }
+};
+
+class spell_call_wintergarde_gryphon : public SpellScript
+{
+    PrepareSpellScript(spell_call_wintergarde_gryphon);
+
+    void SetDest(SpellDestination& dest)
+    {
+        // Adjust effect summon position
+        Position const offset = { 0.0f, 0.0f, 9.0f, 0.0f };
+        dest.RelocateOffset(offset);
+    }
+
+    SpellCastResult CheckRequirement()
+    {
+        Unit* caster = GetCaster();
+        Player* playerCaster = caster->ToPlayer();
+
+        if (!playerCaster || playerCaster->GetQuestStatus(QUEST_FLIGHT_OF_THE_WINTERGARDE_DEFENDER) == QUEST_STATUS_INCOMPLETE)
+            return SPELL_CAST_OK;
+        return SPELL_FAILED_DONT_REPORT;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_call_wintergarde_gryphon::CheckRequirement);
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_call_wintergarde_gryphon::SetDest, EFFECT_0, TARGET_DEST_CASTER_FRONT);
+    }
+};
+
 class npc_injured_7th_legion_soldier : public CreatureScript
 {
 public:
@@ -2008,6 +2240,10 @@ void AddSC_dragonblight()
     new npc_hourglass_of_eternity();
     new npc_future_you();
     new npc_mindless_ghoul();
+    RegisterCreatureAI(npc_wintergarde_gryphon);
+    RegisterSpellScript(spell_q12237_rescue_villager);
+    RegisterSpellScript(spell_q12237_drop_off_villager);
+    RegisterSpellScript(spell_call_wintergarde_gryphon);
     new npc_injured_7th_legion_soldier();
     new npc_heated_battle();
     new spell_q12478_frostmourne_cavern();
