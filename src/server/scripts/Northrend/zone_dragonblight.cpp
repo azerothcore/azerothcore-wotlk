@@ -695,7 +695,7 @@ public:
         }
     }
 
-    void SpellHit(Unit* caster, SpellInfo const* spell) override
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
     {
         if (spell->Id != SPELL_DROP_OFF_VILLAGER)
             return;
