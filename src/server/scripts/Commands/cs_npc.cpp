@@ -575,7 +575,7 @@ public:
         handler->PSendSysMessage(LANG_CREATURE_FOLLOW_YOU_NOW, creature->GetName().c_str());
         return true;
     }
-      
+
     static bool HandleNpcInfoCommand(ChatHandler* handler)
     {
         Creature* target = handler->getSelectedCreature();
