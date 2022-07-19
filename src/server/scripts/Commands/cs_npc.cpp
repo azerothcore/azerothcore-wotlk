@@ -663,7 +663,6 @@ public:
             return false;
         }
 
-        CreatureTemplate const* cInfo = target->GetCreatureTemplate();
         uint32 faction = target->GetFaction();
         uint32 npcflags = target->GetNpcFlags();
         uint32 displayid = target->GetDisplayId();
