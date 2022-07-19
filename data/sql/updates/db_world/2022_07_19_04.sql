@@ -1,3 +1,4 @@
+-- DB update 2022_07_19_03 -> 2022_07_19_04
 --
 /* Maintenance on ZG Entranceway mobs part 2 Pooling */
 DELETE FROM `creature` WHERE `guid` IN (49116, 49117, 49118, 49119);
