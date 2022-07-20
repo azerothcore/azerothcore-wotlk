@@ -249,7 +249,7 @@ public:
                     case EVENT_VANISH_2:
                         DoCastSelf(SPELL_VANISH);
                         DoCastSelf(SPELL_SUPER_INVIS);
-                        events.ScheduleEvent(EVENT_VISIBLE, urand(7000, 10000), 0, PHASE_ONE);
+                        events.ScheduleEvent(EVENT_VISIBLE, urand(41000, 47000), 0, PHASE_ONE);
                         break;
                     case EVENT_VISIBLE:
                         me->SetReactState(REACT_AGGRESSIVE);
