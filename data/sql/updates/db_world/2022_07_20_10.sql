@@ -1,3 +1,4 @@
+-- DB update 2022_07_20_09 -> 2022_07_20_10
 --
 /* Snakes */
 UPDATE `creature` SET `id1`=11371 WHERE `guid` IN (49096, 49097);
