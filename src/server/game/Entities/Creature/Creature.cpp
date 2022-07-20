@@ -284,6 +284,8 @@ void Creature::AddToWorld()
             GetZoneScript()->OnCreatureCreate(this);
         }
 
+        loot.sourceWorldObjectGUID = GetGUID();
+
         sScriptMgr->OnCreatureAddWorld(this);
     }
 }
@@ -1018,7 +1020,7 @@ bool Creature::AIM_Initialize(CreatureAI* ai)
     // Xinef: called in add to world
     //Motion_Initialize();
 
-    i_AI = ai ? ai : FactorySelector::selectAI(this);
+    i_AI = ai ? ai : FactorySelector::SelectAI(this);
     delete oldAI;
     IsAIEnabled = true;
     i_AI->InitializeAI();
@@ -2858,7 +2860,7 @@ uint8 Creature::getLevelForTarget(WorldObject const* target) const
     return uint8(level);
 }
 
-std::string Creature::GetAIName() const
+std::string const& Creature::GetAIName() const
 {
     return sObjectMgr->GetCreatureTemplate(GetEntry())->AIName;
 }
@@ -3437,7 +3439,7 @@ bool Creature::IsMovementPreventedByCasting() const
 {
     Spell* spell = m_currentSpells[CURRENT_CHANNELED_SPELL];
     // first check if currently a movement allowed channel is active and we're not casting
-    if (spell && spell->getState() != SPELL_STATE_FINISHED && spell->IsChannelActive() && spell->GetSpellInfo()->IsMoveAllowedChannel())
+    if (spell && spell->getState() != SPELL_STATE_FINISHED && spell->IsChannelActive() && spell->GetSpellInfo()->IsActionAllowedChannel())
     {
         return false;
     }

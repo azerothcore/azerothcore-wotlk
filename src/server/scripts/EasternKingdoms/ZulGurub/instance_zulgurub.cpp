@@ -82,6 +82,12 @@ public:
                 case NPC_GAHZRANKA:
                     _gahzrankaGUID = creature->GetGUID();
                     break;
+                case NPC_GRILEK:
+                case NPC_HAZZARAH:
+                case NPC_RENATAKI:
+                case NPC_WUSHOOLAY:
+                    _edgeOfMadnessGUID = creature->GetGUID();
+                    break;
                 default:
                     break;
             }
@@ -119,6 +125,8 @@ public:
                     return _goGongOfBethekkGUID;
                 case DATA_HAKKAR:
                     return _hakkarGUID;
+                case DATA_EDGE_OF_MADNESS:
+                    return _edgeOfMadnessGUID;
             }
 
             return ObjectGuid::Empty;
@@ -132,6 +140,36 @@ public:
             }
 
             return 0;
+        }
+
+        void RemoveHakkarPowerStack()
+        {
+            if (Creature* hakkar = instance->GetCreature(_hakkarGUID))
+            {
+                hakkar->CastSpell(hakkar, SPELL_HAKKAR_POWER_DOWN, true);
+            }
+        }
+
+        bool SetBossState(uint32 type, EncounterState state) override
+        {
+            if (!InstanceScript::SetBossState(type, state))
+                return false;
+
+            switch (type)
+            {
+                case DATA_JEKLIK:
+                case DATA_VENOXIS:
+                case DATA_MARLI:
+                case DATA_ARLOKK:
+                case DATA_THEKAL:
+                    if (state == DONE)
+                        RemoveHakkarPowerStack();
+                    break;
+                default:
+                    break;
+            }
+
+            return true;
         }
 
         std::string GetSaveData() override
@@ -186,6 +224,7 @@ public:
         ObjectGuid _goGongOfBethekkGUID;
         ObjectGuid _hakkarGUID;
         ObjectGuid _gahzrankaGUID;
+        ObjectGuid _edgeOfMadnessGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
@@ -221,6 +260,14 @@ struct go_brazier_of_madness : public GameObjectAI
         if (reportUse)
         {
             return true;
+        }
+
+        if (InstanceScript* instanceScript = me->GetInstanceScript())
+        {
+            if (instanceScript->GetGuidData(DATA_EDGE_OF_MADNESS))
+            {
+                return false;
+            }
         }
 
         uint32 bossEntry = 0;

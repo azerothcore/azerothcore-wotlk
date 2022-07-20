@@ -4301,8 +4301,24 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].MiscValueB = 64;
     });
 
+    // Blood Siphon
+    ApplySpellFix({ 24322, 24323 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_MOD_STUN;
+        spellInfo->Effects[EFFECT_2].Effect = 0;
+        spellInfo->Attributes |= SPELL_ATTR0_NO_AURA_CANCEL;
+        spellInfo->AttributesEx5 |= SPELL_ATTR5_ALLOW_ACTION_DURING_CHANNEL;
+        spellInfo->ChannelInterruptFlags &= ~AURA_INTERRUPT_FLAG_MOVE;
+    });
+
     // Place Fake Fur
     ApplySpellFix({ 46085 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].MiscValue = 8;
+    });
+
+    // Smash Mammoth Trap
+    ApplySpellFix({ 46201 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].MiscValue = 8;
     });

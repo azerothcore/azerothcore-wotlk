@@ -30,7 +30,8 @@ enum Spells
 {
     SPELL_AVATAR                    = 24646, // Enrage Spell
     SPELL_GROUND_TREMOR             = 6524,
-    SPELL_ENTANGLING_ROOTS          = 24648
+    SPELL_ENTANGLING_ROOTS          = 24648,
+    SPELL_SWEEPING_STRIKES          = 18765
 };
 
 enum Events
@@ -39,7 +40,8 @@ enum Events
     EVENT_GROUND_TREMOR             = 2,
     EVENT_START_PURSUIT             = 3,
     EVENT_STOP_PURSUIT              = 4,
-    EVENT_ENTANGLING_ROOTS          = 5
+    EVENT_ENTANGLING_ROOTS          = 5,
+    EVENT_SWEEPING_STRIKES          = 6
 };
 
 class boss_grilek : public CreatureScript // grilek
@@ -65,6 +67,7 @@ public:
             events.ScheduleEvent(EVENT_AVATAR, 20s, 30s);
             events.ScheduleEvent(EVENT_GROUND_TREMOR, 15s, 25s);
             events.ScheduleEvent(EVENT_ENTANGLING_ROOTS, 5s, 15s);
+            events.ScheduleEvent(EVENT_SWEEPING_STRIKES, 30s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -114,6 +117,10 @@ public:
                     case EVENT_ENTANGLING_ROOTS:
                         DoCastVictim(SPELL_ENTANGLING_ROOTS);
                         events.ScheduleEvent(EVENT_ENTANGLING_ROOTS, 10s, 20s);
+                        break;
+                    case EVENT_SWEEPING_STRIKES:
+                        DoCastSelf(SPELL_SWEEPING_STRIKES, true);
+                        events.ScheduleEvent(EVENT_SWEEPING_STRIKES, 30s);
                         break;
                     default:
                         break;

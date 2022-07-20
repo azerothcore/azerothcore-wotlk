@@ -22,10 +22,12 @@
 #include "CharacterCache.h"
 #include "Chat.h"
 #include "Common.h"
+#include "CreatureAIFactory.h"
 #include "Config.h"
 #include "Containers.h"
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
+#include "GameObjectAIFactory.h"
 #include "GameEventMgr.h"
 #include "GameTime.h"
 #include "GossipDef.h"
@@ -977,6 +979,12 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
         _hasDifficultyEntries[diff].insert(cInfo->Entry);
         _difficultyEntries[diff].insert(cInfo->DifficultyEntry[diff]);
         ok = true;
+    }
+
+    if (!cInfo->AIName.empty() && !sCreatureAIRegistry->HasItem(cInfo->AIName))
+    {
+        LOG_ERROR("sql.sql", "Creature (Entry: {}) has non-registered `AIName` '{}' set, removing", cInfo->Entry, cInfo->AIName);
+        const_cast<CreatureTemplate*>(cInfo)->AIName.clear();
     }
 
     FactionTemplateEntry const* factionTemplate = sFactionTemplateStore.LookupEntry(cInfo->faction);
@@ -2161,6 +2169,11 @@ void ObjectMgr::LoadCreatures()
             if (!mapEntry->IsDungeon())
                 LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: {} Entries: {}, {}, {}) with a `creature_template`.`flags_extra` in one or more entries including CREATURE_FLAG_EXTRA_INSTANCE_BIND but creature are not in instance.",
                     spawnId, data.id1, data.id2, data.id3);
+        }
+        if (data.movementType >= MAX_DB_MOTION_TYPE)
+        {
+            LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: {} Entries: {}, {}, {}) with wrong movement generator type ({}), ignored and set to IDLE.", spawnId, data.id1, data.id2, data.id3, data.movementType);
+            data.movementType = IDLE_MOTION_TYPE;
         }
         if (data.wander_distance < 0.0f)
         {
@@ -7040,6 +7053,10 @@ void ObjectMgr::LoadGameObjectTemplate()
         got.IsForQuests = false;
 
         // Checks
+        if (!got.AIName.empty() && !sGameObjectAIRegistry->HasItem(got.AIName))
+        {
+            LOG_ERROR("sql.sql", "GameObject (Entry: {}) has non-registered `AIName` '{}' set, removing", got.entry, got.AIName);
+        }
 
         switch (got.type)
         {
