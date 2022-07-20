@@ -36,7 +36,8 @@ enum Huhuran
     SPELL_POISONBOLT            = 26052,
     SPELL_NOXIOUSPOISON         = 26053,
     SPELL_WYVERNSTING           = 26180,
-    SPELL_ACIDSPIT              = 26050
+    SPELL_ACIDSPIT              = 26050,
+    SPELL_WYVERN_STING_DAMAGE   = 26233
 };
 
 class boss_huhuran : public CreatureScript
@@ -76,10 +77,6 @@ public:
             Berserk = false;
         }
 
-        void EnterCombat(Unit* /*who*/) override
-        {
-        }
-
         void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
@@ -100,8 +97,7 @@ public:
             // Wyvern Timer
             if (Wyvern_Timer <= diff)
             {
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                    DoCast(target, SPELL_WYVERNSTING);
+                DoCastAOE( SPELL_WYVERNSTING);
                 Wyvern_Timer = urand(15000, 32000);
             }
             else Wyvern_Timer -= diff;
@@ -155,7 +151,27 @@ public:
     };
 };
 
+// 26180 - Wyvern Sting
+class spell_huhuran_wyvern_sting : public AuraScript
+{
+    PrepareAuraScript(spell_huhuran_wyvern_sting);
+
+    void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            caster->CastCustomSpell(SPELL_WYVERN_STING_DAMAGE, SPELLVALUE_BASE_POINT0, 3000, GetUnitOwner(), true);
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_huhuran_wyvern_sting::HandleRemove, EFFECT_0, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_boss_huhuran()
 {
     new boss_huhuran();
+    RegisterSpellScript(spell_huhuran_wyvern_sting);
 }
