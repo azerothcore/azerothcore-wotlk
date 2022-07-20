@@ -2959,7 +2959,7 @@ bool InstanceMap::AddPlayerToMap(Player* player)
                 return false;
             }
         }
-        else if (playerBind && playerBind->save != mapSave)
+        else if (player->GetSession()->PlayerLoading() && playerBind && playerBind->save != mapSave)
         {
             // Prevent "Convert to Raid" exploit to reset instances
             return false;
