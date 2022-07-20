@@ -4472,6 +4472,34 @@ class spell_gen_remove_impairing_auras : public SpellScript
     }
 };
 
+enum AQSpells
+{
+    SPELL_CONSUME_LEECH = 25373
+};
+
+class spell_gen_consume : public AuraScript
+{
+    PrepareAuraScript(spell_gen_consume);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_CONSUME_LEECH });
+    }
+
+    void HandleProc(AuraEffect* aurEff)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            caster->CastSpell(GetUnitOwner(), SPELL_CONSUME_LEECH, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_gen_consume::HandleProc, EFFECT_2, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -4569,6 +4597,7 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_teleporting);
     RegisterSpellScript(spell_gen_ds_flush_knockback);
     RegisterSpellScriptWithArgs(spell_gen_count_pct_from_max_hp, "spell_gen_default_count_pct_from_max_hp");
+    RegisterSpellScriptWithArgs(spell_gen_count_pct_from_max_hp, "spell_gen_10pct_count_pct_from_max_hp", 10);
     RegisterSpellScriptWithArgs(spell_gen_count_pct_from_max_hp, "spell_gen_50pct_count_pct_from_max_hp", 50);
     RegisterSpellScriptWithArgs(spell_gen_count_pct_from_max_hp, "spell_gen_100pct_count_pct_from_max_hp", 100);
     RegisterSpellScript(spell_gen_despawn_self);
@@ -4605,4 +4634,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_holiday_buff_food);
     RegisterSpellScript(spell_gen_arcane_charge);
     RegisterSpellScript(spell_gen_remove_impairing_auras);
+    RegisterSpellScript(spell_gen_consume);
 }
