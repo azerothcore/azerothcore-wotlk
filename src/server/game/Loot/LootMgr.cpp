@@ -1665,7 +1665,7 @@ void LootTemplate::Process(Loot& loot, LootStore const& store, uint16 lootMode, 
         if (!Groups[groupId - 1])
             return;
 
-        Groups[groupId - 1]->Process(loot, player, store, lootMode);
+        Groups[groupId - 1]->Process(loot, player, store, lootMode, 0, creature);
         return;
     }
 
