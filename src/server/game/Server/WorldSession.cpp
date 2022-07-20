@@ -50,7 +50,6 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSocket.h"
-#include "../Entities/Player/Player.h"
 #include <zlib.h>
 
 namespace
