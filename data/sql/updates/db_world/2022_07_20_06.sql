@@ -1,3 +1,4 @@
+-- DB update 2022_07_20_05 -> 2022_07_20_06
 -- Remorseful Highborne --> Add gossip texts (Credit: https://github.com/Haeniken/FairyCore/commit/25260b92a6c5163643248deeae7247a3bac6cbb7)
 UPDATE `creature_template` SET `gossip_menu_id`=3803, `npcflag` = `npcflag` | 1 WHERE `entry`=10684;
 
