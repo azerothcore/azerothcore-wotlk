@@ -673,11 +673,6 @@ void WorldSession::LogoutPlayer(bool save)
             }
         }
 
-        // If the player has a countdown to be removed from instance and logs out, send them to the beginning of the instance
-        // Prevents instance farming exploit
-        if (_player->m_HomebindTimer && (_player->GetMap()->IsDungeon() || _player->GetMap()->IsRaidOrHeroicDungeon()))
-            _player->TeleportToEntryPoint();
-
         //! Broadcast a logout message to the player's friends
         sSocialMgr->SendFriendStatus(_player, FRIEND_OFFLINE, _player->GetGUID(), true);
         sSocialMgr->RemovePlayerSocial(_player->GetGUID());
