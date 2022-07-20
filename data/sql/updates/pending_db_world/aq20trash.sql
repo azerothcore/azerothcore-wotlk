@@ -1,6 +1,6 @@
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` IN (15325, 15343, 15320, 15335, 15336, 15319);
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` IN (15325, 15343, 15320, 15335, 15336, 15319, 15461);
 
-DELETE FROM `smart_scripts` WHERE `entryorguid`IN (15325, 15343, 15320, 15335, 15336, 15319);
+DELETE FROM `smart_scripts` WHERE `entryorguid`IN (15325, 15343, 15320, 15335, 15336, 15319, 15461);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (15343, 0, 0, 0, 9, 0, 100, 0, 0, 5, 8000, 12000, 0, 11, 25174, 3, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Qiraji Swarmguard - Within 0-5 Range - Cast \'Sundering Cleave\''),
 (15325, 0, 0, 0, 9, 0, 100, 0, 0, 40, 5000, 7000, 0, 11, 25185, 4, 32, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Hive\'Zara Wasp - Within 0-40 Range - Cast \'Itch\''),
@@ -20,5 +20,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (15336, 0, 4, 0, 9, 0, 100, 0, 0, 30, 7000, 10000, 0, 11, 25654, 4, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Hive\'Zara Tail Lasher - Within 0-30 Range - Cast \'Tail Lash\''),
 (15336, 0, 5, 0, 7, 0, 100, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Hive\'Zara Tail Lasher - On Evade - Set Event Phase 0'),
 (15319, 0, 0, 0, 9, 0, 100, 0, 0, 30, 10000, 16000, 0, 11, 12252, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Hive\'Zara Collector - Within 0-30 Range - Cast \'Web Spray\''),
-(15319, 0, 1, 0, 0, 0, 100, 0, 7000, 11000, 12000, 15000, 0, 11, 3589, 4, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Hive\'Zara Collector - In Combat - Cast \'Deafening Screech\'');
+(15319, 0, 1, 0, 0, 0, 100, 0, 7000, 11000, 12000, 15000, 0, 11, 3589, 4, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Hive\'Zara Collector - In Combat - Cast \'Deafening Screech\''),
+(15461, 0, 0, 0, 9, 0, 100, 0, 0, 40, 14000, 18000, 0, 11, 22886, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Shrieker Scarab - Within 0-40 Range - Cast \'Berserker Charge\''),
+(15461, 0, 1, 0, 0, 0, 100, 0, 5000, 9000, 10000, 15000, 0, 11, 26379, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Shrieker Scarab - In Combat - Cast \'Piercing Shriek\'');
 
