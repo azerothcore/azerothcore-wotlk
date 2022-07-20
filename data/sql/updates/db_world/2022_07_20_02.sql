@@ -1,3 +1,4 @@
+-- DB update 2022_07_20_01 -> 2022_07_20_02
 -- Rocklance
 SET @NPC := 20720;
 SET @PATH := @NPC * 10;
