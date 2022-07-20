@@ -3469,6 +3469,8 @@ bool Creature::SetCannotReachTarget(bool cannotReach, bool isChase /*= true*/)
 
     if (cannotReach)
         LOG_DEBUG("entities.unit", "Creature::SetCannotReachTarget() called with true. Details: {}", GetDebugInfo());
+
+    return true;
 }
 
 time_t Creature::GetLastDamagedTime() const
