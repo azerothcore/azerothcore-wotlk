@@ -1,3 +1,4 @@
+-- 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` IN (15325, 15343, 15320, 15335, 15336, 15319, 15461, 15462, 15505);
 
 DELETE FROM `smart_scripts` WHERE `entryorguid`IN (15325, 15343, 15320, 15335, 15336, 15319, 15461, 15462, 15505);
