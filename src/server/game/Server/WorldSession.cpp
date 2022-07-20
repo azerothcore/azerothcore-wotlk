@@ -50,6 +50,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSocket.h"
+#include "../Entities/Player/Player.h"
 #include <zlib.h>
 
 namespace
@@ -665,14 +666,20 @@ void WorldSession::LogoutPlayer(bool save)
             _player->GetGroup()->SendUpdate();
             _player->GetGroup()->ResetMaxEnchantingLevel();
 
-            Map::PlayerList const& playerList = _player->GetMap()->GetPlayers();
-
             if (_player->GetMap()->IsDungeon() || _player->GetMap()->IsRaidOrHeroicDungeon())
+            {
+                Map::PlayerList const &playerList = _player->GetMap()->GetPlayers();
                 if (playerList.IsEmpty())
                     _player->TeleportToEntryPoint();
+            }
         }
 
-        //! Broadcast a logout message to the player's friends
+        // If the player has a countdown to be removed from instance and logs out, send them to the beginning of the instance
+        // Prevents instance farming exploit
+        if (_player->m_HomebindTimer && (_player->GetMap()->IsDungeon() || _player->GetMap()->IsRaidOrHeroicDungeon()))
+            _player->TeleportToEntryPoint();
+
+            //! Broadcast a logout message to the player's friends
         sSocialMgr->SendFriendStatus(_player, FRIEND_OFFLINE, _player->GetGUID(), true);
         sSocialMgr->RemovePlayerSocial(_player->GetGUID());
 
