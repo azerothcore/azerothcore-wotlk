@@ -4498,7 +4498,7 @@ public:
         }
     }
 
-    void AfterRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         // Final heal only on duration end
         if (GetTargetApplication() && GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
