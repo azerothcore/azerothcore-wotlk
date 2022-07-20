@@ -4474,30 +4474,51 @@ class spell_gen_remove_impairing_auras : public SpellScript
 
 enum AQSpells
 {
-    SPELL_CONSUME_LEECH = 25373
+    SPELL_CONSUME_LEECH_AQ20      = 25373,
+    SPELL_CONSUME_LEECH_HEAL_AQ20 = 25378
 };
 
 class spell_gen_consume : public AuraScript
 {
     PrepareAuraScript(spell_gen_consume);
 
+public:
+    spell_gen_consume(uint32 spellId1, uint32 spellId2) : AuraScript(), _spellId1(spellId1), _spellId2(spellId2) { }
+
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_CONSUME_LEECH });
+        return ValidateSpellInfo({ _spellId1, _spellId2 });
     }
 
     void HandleProc(AuraEffect* /*aurEff*/)
     {
         if (Unit* caster = GetCaster())
         {
-            caster->CastSpell(GetUnitOwner(), SPELL_CONSUME_LEECH, true);
+            caster->CastSpell(GetUnitOwner(), _spellId1, true);
+        }
+    }
+
+    void AfterRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        // Final heal only on duration end
+        if (GetTargetApplication() && GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                caster->CastSpell(caster, _spellId2, true);
+            }
         }
     }
 
     void Register() override
     {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_gen_consume::AfterRemove, EFFECT_1, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
         OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_gen_consume::HandleProc, EFFECT_2, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
+
+private:
+    uint32 _spellId1;
+    uint32 _spellId2;
 };
 
 void AddSC_generic_spell_scripts()
@@ -4634,5 +4655,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_holiday_buff_food);
     RegisterSpellScript(spell_gen_arcane_charge);
     RegisterSpellScript(spell_gen_remove_impairing_auras);
-    RegisterSpellScript(spell_gen_consume);
+    RegisterSpellScriptWithArgs(spell_gen_consume, "spell_consume_aq20", SPELL_CONSUME_LEECH_AQ20, SPELL_CONSUME_LEECH_HEAL_AQ20);
 }
