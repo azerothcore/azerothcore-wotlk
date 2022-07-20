@@ -4486,7 +4486,7 @@ class spell_gen_consume : public AuraScript
         return ValidateSpellInfo({ SPELL_CONSUME_LEECH });
     }
 
-    void HandleProc(AuraEffect* aurEff)
+    void HandleProc(AuraEffect* /*aurEff*/)
     {
         if (Unit* caster = GetCaster())
         {
