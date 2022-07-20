@@ -97,7 +97,7 @@ public:
             // Wyvern Timer
             if (Wyvern_Timer <= diff)
             {
-                DoCastAOE( SPELL_WYVERNSTING);
+                DoCastAOE(SPELL_WYVERNSTING);
                 Wyvern_Timer = urand(15000, 32000);
             }
             else Wyvern_Timer -= diff;
