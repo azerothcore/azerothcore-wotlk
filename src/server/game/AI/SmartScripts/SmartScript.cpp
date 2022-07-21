@@ -671,7 +671,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             {
                 if (IsUnit(target))
                 {
-                    target->ToUnit()->AddAura(e.action.cast.spell, target->ToUnit());
+                    target->ToUnit()->AddAura(e.action.addAura.spell, target->ToUnit());
                     LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction:: SMART_ACTION_ADD_AURA: Adding aura {} to unit {}",
                               e.action.cast.spell, target->GetGUID().ToString());
                 }
@@ -1817,21 +1817,21 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         {
             for (WorldObject* target : targets)
                 if (IsCreature(target))
-                    target->ToUnit()->ReplaceAllNpcFlags(NPCFlags(e.action.unitFlag.flag));
+                    target->ToUnit()->ReplaceAllNpcFlags(NPCFlags(e.action.flag.flag));
             break;
         }
         case SMART_ACTION_ADD_NPC_FLAG:
         {
             for (WorldObject* target : targets)
                 if (IsCreature(target))
-                    target->ToUnit()->SetNpcFlag(NPCFlags(e.action.unitFlag.flag));
+                    target->ToUnit()->SetNpcFlag(NPCFlags(e.action.flag.flag));
             break;
         }
         case SMART_ACTION_REMOVE_NPC_FLAG:
         {
             for (WorldObject* target : targets)
                 if (IsCreature(target))
-                    target->ToUnit()->RemoveNpcFlag(NPCFlags(e.action.unitFlag.flag));
+                    target->ToUnit()->RemoveNpcFlag(NPCFlags(e.action.flag.flag));
             break;
         }
         case SMART_ACTION_CROSS_CAST:
@@ -1989,21 +1989,21 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         {
             for (WorldObject* target : targets)
                 if (IsUnit(target))
-                    target->ToUnit()->ReplaceAllDynamicFlags(e.action.unitFlag.flag);
+                    target->ToUnit()->ReplaceAllDynamicFlags(e.action.flag.flag);
             break;
         }
         case SMART_ACTION_ADD_DYNAMIC_FLAG:
         {
             for (WorldObject* target : targets)
                 if (IsUnit(target))
-                    target->ToUnit()->SetDynamicFlag(e.action.unitFlag.flag);
+                    target->ToUnit()->SetDynamicFlag(e.action.flag.flag);
             break;
         }
         case SMART_ACTION_REMOVE_DYNAMIC_FLAG:
         {
             for (WorldObject* target : targets)
                 if (IsUnit(target))
-                    target->ToUnit()->RemoveDynamicFlag(e.action.unitFlag.flag);
+                    target->ToUnit()->RemoveDynamicFlag(e.action.flag.flag);
             break;
         }
         case SMART_ACTION_JUMP_TO_POS:
