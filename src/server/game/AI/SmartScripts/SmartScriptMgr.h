@@ -843,6 +843,11 @@ struct SmartAction
         struct
         {
             uint32 spell;
+        } addAura;
+
+        struct
+        {
+            uint32 spell;
             uint32 charges;
         } removeAura;
 
@@ -1052,6 +1057,11 @@ struct SmartAction
             uint32 flag;
             uint32 type;
         } unitFlag;
+
+        struct
+        {
+            uint32 flag;
+        } flag;
 
         struct
         {
