@@ -255,7 +255,10 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 if (IsUnit(target))
                 {
                     uint32 sound = temp[urand(0, count - 1)];
-                    target->PlayDirectSound(sound, e.action.randomSound.onlySelf ? target->ToPlayer() : nullptr);
+                    if (e.action.randomSound.distance == 1)
+                        target->PlayDistanceSound(sound, e.action.randomSound.onlySelf ? target->ToPlayer() : nullptr);
+                    else
+                        target->PlayDirectSound(sound, e.action.randomSound.onlySelf ? target->ToPlayer() : nullptr);
                     LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_RANDOM_SOUND: target: {} ({}), sound: {}, onlyself: {}",
                               target->GetName(), target->GetGUID().ToString(), sound, e.action.randomSound.onlySelf);
                 }
@@ -556,10 +559,15 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             {
                 // Special handling for vehicles
                 if (IsUnit(target))
+                {
                     if (Vehicle* vehicle = target->ToUnit()->GetVehicleKit())
-                        for (auto & Seat : vehicle->Seats)
+                        for (auto& Seat : vehicle->Seats)
                             if (Player* player = ObjectAccessor::GetPlayer(*target, Seat.second.Passenger.Guid))
                                 player->AreaExploredOrEventHappens(e.action.quest.quest);
+
+                    if (Player* player = target->ToUnit()->GetCharmerOrOwnerPlayerOrPlayerItself())
+                        player->GroupEventHappens(e.action.quest.quest, GetBaseObject());
+                }
 
                 if (IsPlayer(target))
                 {
@@ -611,7 +619,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(e.action.cast.spell);
                         int32 currentPower = me->GetPower(GetCasterPowerType());
 
-                        if ((spellInfo && (currentPower < spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()) || me->IsSpellProhibited(spellInfo->GetSchoolMask()))) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED))
+                        if ((spellInfo && (currentPower < spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()) || me->IsSpellProhibited(spellInfo->GetSchoolMask()))) || me->HasUnitFlag(UNIT_FLAG_SILENCED))
                         {
                             SetCasterActualDist(0);
                             CAST_AI(SmartAI, me->AI())->SetForcedCombatMove(0);
@@ -725,13 +733,13 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 {
                     if (!e.action.unitFlag.type)
                     {
-                        target->ToUnit()->SetFlag(UNIT_FIELD_FLAGS, e.action.unitFlag.flag);
+                        target->ToUnit()->SetUnitFlag(UnitFlags(e.action.unitFlag.flag));
                         LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction:: SMART_ACTION_SET_UNIT_FLAG. Unit {} added flag {} to UNIT_FIELD_FLAGS",
                                   target->GetGUID().ToString(), e.action.unitFlag.flag);
                     }
                     else
                     {
-                        target->ToUnit()->SetFlag(UNIT_FIELD_FLAGS_2, e.action.unitFlag.flag);
+                        target->ToUnit()->SetUnitFlag2(UnitFlags2(e.action.unitFlag.flag));
                         LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction:: SMART_ACTION_SET_UNIT_FLAG. Unit {} added flag {} to UNIT_FIELD_FLAGS_2",
                                   target->GetGUID().ToString(), e.action.unitFlag.flag);
                     }
@@ -747,13 +755,13 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 {
                     if (!e.action.unitFlag.type)
                     {
-                        target->ToUnit()->RemoveFlag(UNIT_FIELD_FLAGS, e.action.unitFlag.flag);
+                        target->ToUnit()->RemoveUnitFlag(UnitFlags(e.action.unitFlag.flag));
                         LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction:: SMART_ACTION_REMOVE_UNIT_FLAG. Unit {} removed flag {} to UNIT_FIELD_FLAGS",
                                   target->GetGUID().ToString(), e.action.unitFlag.flag);
                     }
                     else
                     {
-                        target->ToUnit()->RemoveFlag(UNIT_FIELD_FLAGS_2, e.action.unitFlag.flag);
+                        target->ToUnit()->RemoveUnitFlag2(UnitFlags2(e.action.unitFlag.flag));
                         LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction:: SMART_ACTION_REMOVE_UNIT_FLAG. Unit {} removed flag {} to UNIT_FIELD_FLAGS_2",
                                   target->GetGUID().ToString(), e.action.unitFlag.flag);
                     }
@@ -907,7 +915,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 if (IsUnit(target))
                 {
                     float angle = e.action.follow.angle > 6 ? (e.action.follow.angle * M_PI / 180.0f) : e.action.follow.angle;
-                    CAST_AI(SmartAI, me->AI())->SetFollow(target->ToUnit(), float(e.action.follow.dist) + 0.1f, angle, e.action.follow.credit, e.action.follow.entry, e.action.follow.creditType);
+                    CAST_AI(SmartAI, me->AI())->SetFollow(target->ToUnit(), float(e.action.follow.dist) + 0.1f, angle, e.action.follow.credit, e.action.follow.entry, e.action.follow.creditType, e.action.follow.aliveState != 0);
                     LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction: SMART_ACTION_FOLLOW: Creature {} following target {}",
                               me->GetGUID().ToString(), target->GetGUID().ToString());
                     break;
@@ -1334,7 +1342,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     z += e.target.z;
                     o += e.target.o;
                     if (!e.action.summonGO.targetsummon)
-                        GetBaseObject()->SummonGameObject(e.action.summonGO.entry, x, y, z, o, 0, 0, 0, 0, e.action.summonGO.despawnTime);
+                        GetBaseObject()->SummonGameObject(e.action.summonGO.entry, x, y, z, o, 0.0f, 0.0f, 0.0f, 0.0f, e.action.summonGO.despawnTime, true, GOSummonType(e.action.summonGO.summonType));
                     else
                         target->SummonGameObject(e.action.summonGO.entry, GetBaseObject()->GetPositionX(), GetBaseObject()->GetPositionY(), GetBaseObject()->GetPositionZ(), GetBaseObject()->GetOrientation(), 0, 0, 0, 0, e.action.summonGO.despawnTime);
                 }
@@ -1343,7 +1351,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             if (e.GetTargetType() != SMART_TARGET_POSITION)
                 break;
 
-            GetBaseObject()->SummonGameObject(e.action.summonGO.entry, e.target.x, e.target.y, e.target.z, e.target.o, 0, 0, 0, 0, e.action.summonGO.despawnTime);
+            GetBaseObject()->SummonGameObject(e.action.summonGO.entry, e.target.x, e.target.y, e.target.z, e.target.o, 0.0f, 0.0f, 0.0f, 0.0f, e.action.summonGO.despawnTime, true, GOSummonType(e.action.summonGO.summonType));
             break;
         }
         case SMART_ACTION_KILL_UNIT:
@@ -1809,21 +1817,21 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         {
             for (WorldObject* target : targets)
                 if (IsCreature(target))
-                    target->ToUnit()->SetUInt32Value(UNIT_NPC_FLAGS, e.action.unitFlag.flag);
+                    target->ToUnit()->ReplaceAllNpcFlags(NPCFlags(e.action.unitFlag.flag));
             break;
         }
         case SMART_ACTION_ADD_NPC_FLAG:
         {
             for (WorldObject* target : targets)
                 if (IsCreature(target))
-                    target->ToUnit()->SetFlag(UNIT_NPC_FLAGS, e.action.unitFlag.flag);
+                    target->ToUnit()->SetNpcFlag(NPCFlags(e.action.unitFlag.flag));
             break;
         }
         case SMART_ACTION_REMOVE_NPC_FLAG:
         {
             for (WorldObject* target : targets)
                 if (IsCreature(target))
-                    target->ToUnit()->RemoveFlag(UNIT_NPC_FLAGS, e.action.unitFlag.flag);
+                    target->ToUnit()->RemoveNpcFlag(NPCFlags(e.action.unitFlag.flag));
             break;
         }
         case SMART_ACTION_CROSS_CAST:
@@ -1894,7 +1902,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         }
         case SMART_ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST:
         {
-            uint32 id = urand(e.action.randTimedActionList.actionLists[0], e.action.randTimedActionList.actionLists[1]);
+            uint32 id = urand(e.action.randRangeTimedActionList.idMin, e.action.randRangeTimedActionList.idMax);
             if (e.GetTargetType() == SMART_TARGET_NONE)
             {
                 LOG_ERROR("sql.sql", "SmartScript: Entry {} SourceType {} Event {} Action {} is using TARGET_NONE(0) for Script9 target. Please correct target_type in database.", e.entryOrGuid, e.GetScriptType(), e.GetEventType(), e.GetActionType());
@@ -1981,21 +1989,21 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         {
             for (WorldObject* target : targets)
                 if (IsUnit(target))
-                    target->ToUnit()->SetUInt32Value(UNIT_DYNAMIC_FLAGS, e.action.unitFlag.flag);
+                    target->ToUnit()->ReplaceAllDynamicFlags(e.action.unitFlag.flag);
             break;
         }
         case SMART_ACTION_ADD_DYNAMIC_FLAG:
         {
             for (WorldObject* target : targets)
                 if (IsUnit(target))
-                    target->ToUnit()->SetFlag(UNIT_DYNAMIC_FLAGS, e.action.unitFlag.flag);
+                    target->ToUnit()->SetDynamicFlag(e.action.unitFlag.flag);
             break;
         }
         case SMART_ACTION_REMOVE_DYNAMIC_FLAG:
         {
             for (WorldObject* target : targets)
                 if (IsUnit(target))
-                    target->ToUnit()->RemoveFlag(UNIT_DYNAMIC_FLAGS, e.action.unitFlag.flag);
+                    target->ToUnit()->RemoveDynamicFlag(e.action.unitFlag.flag);
             break;
         }
         case SMART_ACTION_JUMP_TO_POS:
@@ -2144,21 +2152,21 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         {
             for (WorldObject* target : targets)
                 if (IsGameObject(target))
-                    target->ToGameObject()->SetUInt32Value(GAMEOBJECT_FLAGS, e.action.goFlag.flag);
+                    target->ToGameObject()->ReplaceAllGameObjectFlags((GameObjectFlags)e.action.goFlag.flag);
             break;
         }
         case SMART_ACTION_ADD_GO_FLAG:
         {
             for (WorldObject* target : targets)
                 if (IsGameObject(target))
-                    target->ToGameObject()->SetFlag(GAMEOBJECT_FLAGS, e.action.goFlag.flag);
+                    target->ToGameObject()->SetGameObjectFlag((GameObjectFlags)e.action.goFlag.flag);
             break;
         }
         case SMART_ACTION_REMOVE_GO_FLAG:
         {
             for (WorldObject* target : targets)
                 if (IsGameObject(target))
-                    target->ToGameObject()->RemoveFlag(GAMEOBJECT_FLAGS, e.action.goFlag.flag);
+                    target->ToGameObject()->RemoveGameObjectFlag((GameObjectFlags)e.action.goFlag.flag);
             break;
         }
     case SMART_ACTION_SUMMON_CREATURE_GROUP:
@@ -3101,6 +3109,10 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
                 {
                     targets.push_back(owner);
                 }
+                else if (me->IsSummon() && me->ToTempSummon()->GetSummonerUnit()) //dont add same unit twice
+                {
+                    targets.push_back(me->ToTempSummon()->GetSummonerUnit());
+                }
             }
             else if (go)
             {
@@ -3157,7 +3169,7 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
         case SMART_TARGET_PLAYER_WITH_AURA:
         {
             ObjectVector units;
-            GetWorldObjectsInDist(units, static_cast<float>(e.target.playerDistance.dist));
+            GetWorldObjectsInDist(units, static_cast<float>(e.target.playerWithAura.distMax));
 
             for (WorldObject* unit : units)
                 if (IsPlayer(unit) && unit->ToPlayer()->IsAlive() && !unit->ToPlayer()->IsGameMaster())
@@ -3173,7 +3185,7 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
         case SMART_TARGET_ROLE_SELECTION:
         {
             ObjectVector units;
-            GetWorldObjectsInDist(units, static_cast<float>(e.target.playerDistance.dist));
+            GetWorldObjectsInDist(units, static_cast<float>(e.target.roleSelection.maxDist));
             // 1 = Tanks, 2 = Healer, 4 = Damage
             uint32 roleMask = e.target.roleSelection.roleMask;
             for (WorldObject* unit : units)

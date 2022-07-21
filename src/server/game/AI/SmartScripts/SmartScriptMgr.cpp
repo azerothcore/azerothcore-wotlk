@@ -653,15 +653,15 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_CLOSE_GOSSIP: return NO_PARAMS;
             case SMART_ACTION_TRIGGER_TIMED_EVENT: return sizeof(SmartAction::timeEvent);
             case SMART_ACTION_REMOVE_TIMED_EVENT: return sizeof(SmartAction::timeEvent);
-            case SMART_ACTION_ADD_AURA: return sizeof(SmartAction::addAura);
+            case SMART_ACTION_ADD_AURA: return sizeof(SmartAction::cast);
             case SMART_ACTION_OVERRIDE_SCRIPT_BASE_OBJECT: return NO_PARAMS;
             case SMART_ACTION_RESET_SCRIPT_BASE_OBJECT: return NO_PARAMS;
             case SMART_ACTION_CALL_SCRIPT_RESET: return NO_PARAMS;
             case SMART_ACTION_SET_RANGED_MOVEMENT: return sizeof(SmartAction::setRangedMovement);
             case SMART_ACTION_CALL_TIMED_ACTIONLIST: return sizeof(SmartAction::timedActionList);
-            case SMART_ACTION_SET_NPC_FLAG: return sizeof(SmartAction::flag);
-            case SMART_ACTION_ADD_NPC_FLAG: return sizeof(SmartAction::flag);
-            case SMART_ACTION_REMOVE_NPC_FLAG: return sizeof(SmartAction::flag);
+            case SMART_ACTION_SET_NPC_FLAG: return sizeof(SmartAction::unitFlag);
+            case SMART_ACTION_ADD_NPC_FLAG: return sizeof(SmartAction::unitFlag);
+            case SMART_ACTION_REMOVE_NPC_FLAG: return sizeof(SmartAction::unitFlag);
             case SMART_ACTION_SIMPLE_TALK: return sizeof(SmartAction::simpleTalk);
             // case SMART_ACTION_SELF_CAST: return sizeof(SmartAction::cast);
             case SMART_ACTION_CROSS_CAST: return sizeof(SmartAction::crossCast);
@@ -672,9 +672,9 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_REMOVE_UNIT_FIELD_BYTES_1: return sizeof(SmartAction::delunitByte);
             case SMART_ACTION_INTERRUPT_SPELL: return sizeof(SmartAction::interruptSpellCasting);
             case SMART_ACTION_SEND_GO_CUSTOM_ANIM: return sizeof(SmartAction::sendGoCustomAnim);
-            case SMART_ACTION_SET_DYNAMIC_FLAG: return sizeof(SmartAction::flag);
-            case SMART_ACTION_ADD_DYNAMIC_FLAG: return sizeof(SmartAction::flag);
-            case SMART_ACTION_REMOVE_DYNAMIC_FLAG: return sizeof(SmartAction::flag);
+            case SMART_ACTION_SET_DYNAMIC_FLAG: return sizeof(SmartAction::unitFlag);
+            case SMART_ACTION_ADD_DYNAMIC_FLAG: return sizeof(SmartAction::unitFlag);
+            case SMART_ACTION_REMOVE_DYNAMIC_FLAG: return sizeof(SmartAction::unitFlag);
             case SMART_ACTION_JUMP_TO_POS: return sizeof(SmartAction::jump);
             case SMART_ACTION_SEND_GOSSIP_MENU: return sizeof(SmartAction::sendGossipMenu);
             case SMART_ACTION_GO_SET_LOOT_STATE: return sizeof(SmartAction::setGoLootState);
@@ -1405,7 +1405,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                 return false;
             break;
         case SMART_ACTION_ADD_AURA:
-            if (!IsSpellValid(e, e.action.addAura.spell))
+            if (!IsSpellValid(e, e.action.cast.spell))
                 return false;
             break;
         case SMART_ACTION_CALL_AREAEXPLOREDOREVENTHAPPENS:
