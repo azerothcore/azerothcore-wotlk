@@ -3071,7 +3071,7 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
                             targets.push_back(unit);
 
                 if (e.target.playerRange.maxCount > 0)
-                    WotLK::Containers::RandomResize(targets, e.target.playerRange.maxCount);
+                    Acore::Containers::RandomResize(targets, e.target.playerRange.maxCount);
             }
             break;
         }
