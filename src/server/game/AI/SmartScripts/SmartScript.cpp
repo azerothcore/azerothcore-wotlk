@@ -855,6 +855,9 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         }
         case SMART_ACTION_CALL_GROUPEVENTHAPPENS:
         {
+            if (!unit)
+                break;
+
             if (!GetBaseObject())
                 break;
 
