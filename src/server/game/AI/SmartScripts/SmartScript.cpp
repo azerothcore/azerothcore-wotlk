@@ -1075,7 +1075,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             if (!me->GetMap()->IsDungeon())
             {
                 ObjectVector units;
-                GetWorldObjectsInDist(units, static_cast<float>(e.target.unitRange.maxDist));
+                GetWorldObjectsInDist(units, static_cast<float>(e.action.combatZone.range));
 
                 if (!units.empty() && GetBaseObject())
                     for (WorldObject* unit : units)
