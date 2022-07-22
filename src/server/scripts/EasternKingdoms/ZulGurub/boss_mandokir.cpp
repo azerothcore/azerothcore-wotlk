@@ -286,7 +286,7 @@ public:
             if (_chargeTarget.first == hatedUnit->GetGUID())
             {
                 // Do not count DOTs/HOTs
-                if (!threatSpell || !threatSpell->HasAttribute(SPELL_ATTR0_CU_NO_INITIAL_THREAT))
+                if (!(threatSpell && (threatSpell->HasAura(SPELL_AURA_DAMAGE_SHIELD) || threatSpell->HasAttribute(SPELL_ATTR0_CU_NO_INITIAL_THREAT))))
                 {
                     _chargeTarget.second += threat;
                 }
