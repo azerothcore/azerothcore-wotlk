@@ -39,7 +39,7 @@ CHANGE `stat_value10` `stat_value10` INT DEFAULT 0 NOT NULL,
 CHANGE `armor` `armor` INT UNSIGNED DEFAULT 0 NOT NULL,
 CHANGE `holy_res` `holy_res` INT UNSIGNED DEFAULT 0 NOT NULL,
 CHANGE `fire_res` `fire_res` INT UNSIGNED DEFAULT 0 NOT NULL,
-CHANGE `nature_res` `int` INT UNSIGNED DEFAULT 0 NOT NULL,
+CHANGE `nature_res` `nature_res` INT UNSIGNED DEFAULT 0 NOT NULL,
 CHANGE `frost_res` `frost_res` INT UNSIGNED DEFAULT 0 NOT NULL,
 CHANGE `shadow_res` `shadow_res` INT UNSIGNED DEFAULT 0 NOT NULL,
 CHANGE `arcane_res` `arcane_res` INT UNSIGNED DEFAULT 0 NOT NULL; 
