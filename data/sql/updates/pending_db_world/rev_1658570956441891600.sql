@@ -11,3 +11,12 @@ UPDATE `creature_template` SET `scriptName`='npc_jang' WHERE `entry` = 15078;
 
 -- Assign script to Fishbot5000
 UPDATE `creature_template` SET `scriptName`='npc_fishbot_5000' WHERE `entry` = 15079;
+
+-- Minimum fishing skill for Stranglethorn Vale Fishing Extravaganza quests is 150
+DELETE FROM `quest_template_addon` WHERE `ID` IN (8194, 8193, 8225, 8224, 8221);
+INSERT INTO `quest_template_addon` (`ID`, `MaxLevel`, `AllowableClasses`, `SourceSpellID`, `PrevQuestID`, `NextQuestID`, `ExclusiveGroup`, `RewardMailTemplateID`, `RewardMailDelay`, `RequiredSkillID`, `RequiredSkillPoints`, `RequiredMinRepFaction`, `RequiredMaxRepFaction`, `RequiredMinRepValue`, `RequiredMaxRepValue`, `ProvidedItemCount`, `SpecialFlags`) VALUES
+(8194,0,0,0,0,0,0,0,0,356,150,0,0,0,0,0,1),
+(8193,0,0,0,0,0,0,0,0,356,150,0,0,0,0,0,1),
+(8225,0,0,0,0,0,0,0,0,356,150,0,0,0,0,0,1),
+(8224,0,0,0,0,0,0,0,0,356,150,0,0,0,0,0,1),
+(8221,0,0,0,0,0,0,0,0,356,150,0,0,0,0,0,1);
