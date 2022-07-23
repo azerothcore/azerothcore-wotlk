@@ -1,4 +1,4 @@
--- Spawns npc's from 13:00 - 17:01 (keep npc's spawned 1 min longer to make sure riggle over announcement at 17:00 works)
+-- Spawns npc's from 13:00 - 17:01 (keep npc's spawned 1 min longer to make event over message at 17:00 works)
 UPDATE `game_event` SET `start_time`= '2016-10-30 13:00:00', `length` = 241,  `description`= 'Stranglethorn Fishing Extravaganza - The Crew' WHERE `eventEntry` = 62;
 
 -- Quests can be turned in 14:00 - 17:00

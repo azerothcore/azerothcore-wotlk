@@ -209,8 +209,6 @@ public:
 
 /*
  * Stranglethorn Vale Fishing Extravaganza World States
- *
- * used by npcs Riggle Bassbait and Jang
  */
 enum fishingExtravaganzaWorldStates
 {
