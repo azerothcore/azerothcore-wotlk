@@ -26,3 +26,6 @@ DELETE FROM `quest_template_addon` WHERE `ID` IN (8228, 8229);
 INSERT INTO `quest_template_addon` (`ID`, `MaxLevel`, `AllowableClasses`, `SourceSpellID`, `PrevQuestID`, `NextQuestID`, `ExclusiveGroup`, `RewardMailTemplateID`, `RewardMailDelay`, `RequiredSkillID`, `RequiredSkillPoints`, `RequiredMinRepFaction`, `RequiredMaxRepFaction`, `RequiredMinRepValue`, `RequiredMaxRepValue`, `ProvidedItemCount`, `SpecialFlags`) VALUES
 (8228,0,0,0,0,0,0,0,0,356,150,0,0,0,0,0,1),
 (8229,0,0,0,0,0,0,0,0,356,150,0,0,0,0,0,1);
+
+-- Link box to Riggle Bassbait spawn event
+UPDATE `game_event_gameobject` SET `eventEntry`= 62 WHERE `guid`= 164445;
