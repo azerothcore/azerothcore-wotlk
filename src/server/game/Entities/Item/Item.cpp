@@ -1117,7 +1117,7 @@ Item* Item::CreateItem(uint32 item, uint32 count, Player const* player, bool clo
     return nullptr;
 }
 
-Item* Item::CloneItem(uint32 count, Player const* player) const
+Item* Item::CloneItem(uint32 count, Player* player)
 {
     // player CAN be nullptr in which case we must not update random properties because that accesses player's item update queue
     Item* newItem = CreateItem(GetEntry(), count, player, true, player ? GetItemRandomPropertyId() : 0);
@@ -1128,6 +1128,18 @@ Item* Item::CloneItem(uint32 count, Player const* player) const
     newItem->SetUInt32Value(ITEM_FIELD_GIFTCREATOR,  GetUInt32Value(ITEM_FIELD_GIFTCREATOR));
     newItem->SetUInt32Value(ITEM_FIELD_FLAGS,        GetUInt32Value(ITEM_FIELD_FLAGS) & ~(ITEM_FIELD_FLAG_REFUNDABLE | ITEM_FIELD_FLAG_BOP_TRADEABLE));
     newItem->SetUInt32Value(ITEM_FIELD_DURATION,     GetUInt32Value(ITEM_FIELD_DURATION));
+
+    if (allowedGUIDs.size() > 1 && IsSoulBound() && !GetTemplate()->StartQuest && sWorld->getBoolConfig(CONFIG_SET_BOP_ITEM_TRADEABLE))
+    {
+        newItem->SetSoulboundTradeable(allowedGUIDs);
+        
+        if (player)
+        {
+            newItem->SetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME, player->GetTotalPlayedTime());
+            player->AddTradeableItem(newItem);
+        }
+    }
+
     return newItem;
 }
 

@@ -214,7 +214,7 @@ class Item : public Object
 {
 public:
     static Item* CreateItem(uint32 item, uint32 count, Player const* player = nullptr, bool clone = false, uint32 randomPropertyId = 0);
-    Item* CloneItem(uint32 count, Player const* player = nullptr) const;
+    Item* CloneItem(uint32 count, Player* player = nullptr);
 
     Item();
 
