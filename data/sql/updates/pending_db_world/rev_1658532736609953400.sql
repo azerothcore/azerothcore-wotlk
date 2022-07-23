@@ -55,11 +55,11 @@ DELETE FROM `pool_creature` WHERE `guid` BETWEEN @GUID+0 AND @GUID+24;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOL+0, 1, 'ZG Before Bats 4-5 Pack Pool of Zulian Crocs Pool of Pools'),
 (@POOL+1, 5, 'ZG Before Bats 5 Pack of Zulian Crocs 15043 50% 1/6'),
-(@POOL+2, 5, 'ZG Before Bats 4 Pack of Zulian Crocs 15043 10% 2/6'),
-(@POOL+3, 5, 'ZG Before Bats 4 Pack of Zulian Crocs 15043 10% 3/6'),
-(@POOL+4, 5, 'ZG Before Bats 4 Pack of Zulian Crocs 15043 10% 4/6'),
-(@POOL+5, 5, 'ZG Before Bats 4 Pack of Zulian Crocs 15043 10% 5/6'),
-(@POOL+6, 5, 'ZG Before Bats 4 Pack of Zulian Crocs 15043 10% 6/6');
+(@POOL+2, 4, 'ZG Before Bats 4 Pack of Zulian Crocs 15043 10% 2/6'),
+(@POOL+3, 4, 'ZG Before Bats 4 Pack of Zulian Crocs 15043 10% 3/6'),
+(@POOL+4, 4, 'ZG Before Bats 4 Pack of Zulian Crocs 15043 10% 4/6'),
+(@POOL+5, 4, 'ZG Before Bats 4 Pack of Zulian Crocs 15043 10% 5/6'),
+(@POOL+6, 4, 'ZG Before Bats 4 Pack of Zulian Crocs 15043 10% 6/6');
 
 DELETE FROM `pool_pool` WHERE `pool_id` BETWEEN @POOL+0 AND @POOL+6;
 DELETE FROM `pool_pool` WHERE `mother_pool` BETWEEN @POOL+0 AND @POOL+6;
