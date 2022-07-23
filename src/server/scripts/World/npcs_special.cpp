@@ -237,6 +237,11 @@ public:
     {
         npc_riggle_bassbaitAI(Creature* c) : ScriptedAI(c)
         {
+            auto prevWinTime = sWorld->getWorldState(STV_FISHING_PREV_WIN_TIME);
+            if (time(nullptr) - prevWinTime > DAY)
+            {
+                sWorld->setWorldState(STV_FISHING_HAS_WINNER, 0);
+            }
             events.Reset();
             events.ScheduleEvent(EVENT_RIGGLE_CHECK_TOURNAMENT_STATE, 1000, 1, 0);;
         }
@@ -250,8 +255,6 @@ public:
             {
                 case EVENT_RIGGLE_CHECK_TOURNAMENT_STATE:
                 {
-                    // complex system to keep things safe in case of crashes/restarts during the event
-                    // yells should not be repeatable, quest credit should go to a single person per week
                     if (sGameEventMgr->IsActiveEvent(GAME_EVENT_FISHING_TURN_INS))
                     {
                         if (!me->IsQuestGiver())
