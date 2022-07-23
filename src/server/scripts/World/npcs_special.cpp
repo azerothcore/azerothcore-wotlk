@@ -209,7 +209,7 @@ public:
 
 enum riggleBassbait
 {
-    EVENT_RIGGLE_ANNOUNCE               = 1,
+    EVENT_RIGGLE_CHECK_TOURNAMENT_STATE = 1,
 
     RIGGLE_SAY_START                    = 0,
     RIGGLE_SAY_WINNER                   = 1,
@@ -217,9 +217,15 @@ enum riggleBassbait
 
     QUEST_MASTER_ANGLER                 = 8193,
 
-    DATA_ANGLER_FINISHED                = 1,
+    GAME_EVENT_FISHING_TURN_INS         = 90,
 
-    GAME_EVENT_FISHING                  = 62
+    GOSSIP_TEXT_EVENT_ACTIVE            = 7614,
+    GOSSIP_TEXT_EVENT_OVER              = 7714,
+
+    STV_FISHING_PREV_WIN_TIME           = 100000,
+    STV_FISHING_HAS_WINNER              = 100002,
+    STV_FISHING_ANNOUNCE_EVENT_BEGIN    = 100001,
+    STV_FISHING_ANNOUNCE_EVENT_OVER     = 100003
 };
 
 class npc_riggle_bassbait : public CreatureScript
@@ -232,83 +238,87 @@ public:
         npc_riggle_bassbaitAI(Creature* c) : ScriptedAI(c)
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_RIGGLE_ANNOUNCE, 1000, 1, 0);
-            finished = sWorld->getWorldState(GAME_EVENT_FISHING) == 1;
-            startWarning = false;
-            finishWarning = false;
+            events.ScheduleEvent(EVENT_RIGGLE_CHECK_TOURNAMENT_STATE, 1000, 1, 0);;
         }
 
         EventMap events;
-        bool finished;
-        bool startWarning;
-        bool finishWarning;
-
-        uint32 GetData(uint32 type) const override
-        {
-            if (type == DATA_ANGLER_FINISHED)
-                return (uint32)finished;
-
-            return 0;
-        }
-
-        void DoAction(int32 param) override
-        {
-            if (param == DATA_ANGLER_FINISHED)
-            {
-                finished = true;
-                sWorld->setWorldState(GAME_EVENT_FISHING, 1);
-            }
-        }
 
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch (events.ExecuteEvent())
             {
-                case EVENT_RIGGLE_ANNOUNCE:
+                case EVENT_RIGGLE_CHECK_TOURNAMENT_STATE:
+                {
+                    // complex system to keep things safe in case of crashes/restarts during the event
+                    // yells should not be repeatable, quest credit should go to a single person per week
+                    if (sGameEventMgr->IsActiveEvent(GAME_EVENT_FISHING_TURN_INS))
                     {
-                        tm strdate = Acore::Time::TimeBreakdown();
-
-                        if (!startWarning && strdate.tm_hour == 14 && strdate.tm_min == 0)
+                        if (!me->IsQuestGiver())
                         {
-                            sCreatureTextMgr->SendChat(me, RIGGLE_SAY_START, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
-                            startWarning = true;
-                        }
-
-                        if (!finishWarning && strdate.tm_hour == 16 && strdate.tm_min == 0)
-                        {
-                            sCreatureTextMgr->SendChat(me, RIGGLE_SAY_END, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
-                            finishWarning = true;
-                            // no one won - despawn
-                            if (!finished)
+                            auto prevWinTime = sWorld->getWorldState(STV_FISHING_PREV_WIN_TIME);
+                            if (time(nullptr) - prevWinTime > DAY)
                             {
-                                me->DespawnOrUnsummon();
-                                break;
+                                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                                auto startedAlready = sWorld->getWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN);
+                                if (!startedAlready)
+                                {
+                                    sCreatureTextMgr->SendChat(me, RIGGLE_SAY_START, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
+                                    sWorld->setWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN, 1);
+                                    sWorld->setWorldState(STV_FISHING_ANNOUNCE_EVENT_OVER, 1);
+                                }
                             }
                         }
-
-                        events.RepeatEvent(1000);
-                        break;
                     }
+                    else
+                    {
+                        if (me->IsQuestGiver())
+                        {
+                            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                            sWorld->setWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN, 0);
+                        }
+                        auto announceOver = sWorld->getWorldState(STV_FISHING_ANNOUNCE_EVENT_OVER);
+                        if (announceOver)
+                        {
+                            sCreatureTextMgr->SendChat(me, RIGGLE_SAY_END, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
+                            sWorld->setWorldState(STV_FISHING_ANNOUNCE_EVENT_OVER, 0);
+                        }
+                    }
+                events.RepeatEvent(1000);
+                break;
+                }
             }
         }
     };
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if (!creature->AI()->GetData(DATA_ANGLER_FINISHED))
-            player->PrepareQuestMenu(creature->GetGUID());
 
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
+        if (creature->IsQuestGiver())
+        {
+            player->PrepareQuestMenu(creature->GetGUID());
+        }
+
+        if (sGameEventMgr->IsActiveEvent(GAME_EVENT_FISHING_TURN_INS) && sWorld->getWorldState(STV_FISHING_HAS_WINNER))
+        {
+            SendGossipMenuFor(player, GOSSIP_TEXT_EVENT_OVER, creature->GetGUID());
+        }
+        else
+        {
+            SendGossipMenuFor(player, GOSSIP_TEXT_EVENT_ACTIVE, creature->GetGUID());
+        }
+
         return true;
     }
 
     bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/) override
     {
-        if (!creature->AI()->GetData(DATA_ANGLER_FINISHED) && quest->GetQuestId() == QUEST_MASTER_ANGLER)
+        if (quest->GetQuestId() == QUEST_MASTER_ANGLER)
         {
-            creature->AI()->DoAction(DATA_ANGLER_FINISHED);
             sCreatureTextMgr->SendChat(creature, RIGGLE_SAY_WINNER, player, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
+            sWorld->setWorldState(STV_FISHING_PREV_WIN_TIME, time(nullptr));
+            sWorld->setWorldState(STV_FISHING_HAS_WINNER, 1);
+            sWorld->setWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN, 0);
         }
         return true;
     }
