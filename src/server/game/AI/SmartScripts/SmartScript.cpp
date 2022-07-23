@@ -1486,8 +1486,11 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             }
 
             if (e.action.wpStart.reactState > REACT_AGGRESSIVE)
+            {
+                e.action.wpStart.reactState = REACT_AGGRESSIVE;
                 LOG_ERROR("scripts.ai.sai", "SMART_ACTION_WP_START: Entry {} SourceType {} Event {} Action {} Target {} reactState > REACT_AGGRESSIVE",
                         e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetTargetType());
+            }
 
             me->SetReactState((ReactStates)e.action.wpStart.reactState);
             CAST_AI(SmartAI, me->AI())->StartPath(run, entry, repeat, unit);
