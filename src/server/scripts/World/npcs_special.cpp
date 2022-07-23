@@ -394,6 +394,10 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
+        if (creature->IsQuestGiver())
+        {
+            player->PrepareQuestMenu(creature->GetGUID());
+        }
         SendGossipMenuFor(player, GOSSIP_TEXT_SECOND_PRICE, creature->GetGUID());
         return true;
     }
