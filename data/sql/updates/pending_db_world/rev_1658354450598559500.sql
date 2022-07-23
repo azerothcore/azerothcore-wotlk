@@ -1,5 +1,5 @@
 --
-/* Crocs movement is a scripted action that occurs about every 30 seconds, not normal random movement */
+-- Crocs movement is a scripted action that occurs about every 30 seconds, not normal random movement
 UPDATE `creature` SET `wander_distance`=0, `MovementType`=0 WHERE `id1`=15043;
 
 DELETE FROM `smart_scripts` WHERE `entryorguid`=15043;
