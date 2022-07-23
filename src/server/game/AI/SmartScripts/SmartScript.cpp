@@ -853,28 +853,20 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             if (!unit)
                 break;
 
-            if (!GetBaseObject())
-                break;
-
-            for (WorldObject* target : targets)
+            // If invoker was pet or charm
+            Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself();
+            if (player && GetBaseObject())
             {
-                if (IsUnit(target))
-                {
-                    //If invoker was pet or charm
-                    if (Player* player = target->ToUnit()->GetCharmerOrOwnerPlayerOrPlayerItself())
-                    {
-                        player->GroupEventHappens(e.action.quest.quest, GetBaseObject());
-                        LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction: SMART_ACTION_CALL_GROUPEVENTHAPPENS: Player {}, group credit for quest {}",
-                                  unit->GetGUID().ToString(), e.action.quest.quest);
-                    }
-
-                    //Special handling for vehicles
-                    if (Vehicle* vehicle = target->ToUnit()->GetVehicleKit())
-                        for (auto& Seat : vehicle->Seats)
-                            if (Player* player = ObjectAccessor::GetPlayer(*target, Seat.second.Passenger.Guid))
-                                player->GroupEventHappens(e.action.quest.quest, GetBaseObject());
-                }
+                player->GroupEventHappens(e.action.quest.quest, GetBaseObject());
+                LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction: SMART_ACTION_CALL_GROUPEVENTHAPPENS: Player {}, group credit for quest {}",
+                          unit->GetGUID().ToString(), e.action.quest.quest);
             }
+
+            // Special handling for vehicles
+            if (Vehicle* vehicle = unit->GetVehicleKit())
+                for (auto & Seat : vehicle->Seats)
+                    if (Player* player = ObjectAccessor::GetPlayer(*unit, Seat.second.Passenger.Guid))
+                        player->GroupEventHappens(e.action.quest.quest, GetBaseObject());
             break;
         }
         case SMART_ACTION_REMOVEAURASFROMSPELL:
