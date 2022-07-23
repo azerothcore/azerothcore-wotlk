@@ -20,3 +20,9 @@ INSERT INTO `quest_template_addon` (`ID`, `MaxLevel`, `AllowableClasses`, `Sourc
 (8225,0,0,0,0,0,0,0,0,356,150,0,0,0,0,0,1),
 (8224,0,0,0,0,0,0,0,0,356,150,0,0,0,0,0,1),
 (8221,0,0,0,0,0,0,0,0,356,150,0,0,0,0,0,1);
+
+-- Quest [Could I get a Fishing Flier?] requires fishing skill of 150
+DELETE FROM `quest_template_addon` WHERE `ID` IN (8228, 8229);
+INSERT INTO `quest_template_addon` (`ID`, `MaxLevel`, `AllowableClasses`, `SourceSpellID`, `PrevQuestID`, `NextQuestID`, `ExclusiveGroup`, `RewardMailTemplateID`, `RewardMailDelay`, `RequiredSkillID`, `RequiredSkillPoints`, `RequiredMinRepFaction`, `RequiredMaxRepFaction`, `RequiredMinRepValue`, `RequiredMaxRepValue`, `ProvidedItemCount`, `SpecialFlags`) VALUES
+(8228,0,0,0,0,0,0,0,0,356,150,0,0,0,0,0,1),
+(8229,0,0,0,0,0,0,0,0,356,150,0,0,0,0,0,1);
