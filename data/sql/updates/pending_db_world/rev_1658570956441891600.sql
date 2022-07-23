@@ -8,3 +8,6 @@ INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `
 
 -- Assign script to Jang
 UPDATE `creature_template` SET `scriptName`='npc_jang' WHERE `entry`=15078;
+
+-- Assign script to Fishbot5000
+UPDATE `creature_template` SET `scriptName`='npc_fishbot_5000' WHERE `entry`=15079;

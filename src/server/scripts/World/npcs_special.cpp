@@ -408,6 +408,71 @@ public:
     }
 };
 
+enum fishbot5000
+{
+    EVENT_FISHBOT_CHECK_TOURNAMENT_STATE = 1,
+};
+
+class npc_fishbot_5000 : public CreatureScript
+{
+public:
+    npc_fishbot_5000() : CreatureScript("npc_fishbot_5000") { }
+
+    struct npc_fishbot_5000AI : public ScriptedAI
+    {
+        npc_fishbot_5000AI(Creature* c) : ScriptedAI(c)
+        {
+            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+            events.Reset();
+            events.ScheduleEvent(EVENT_FISHBOT_CHECK_TOURNAMENT_STATE, 1000, 1, 0);
+        }
+
+        EventMap events;
+
+        void UpdateAI(uint32 diff) override
+        {
+            events.Update(diff);
+            switch (events.ExecuteEvent())
+            {
+            case EVENT_FISHBOT_CHECK_TOURNAMENT_STATE:
+            {
+                if (sGameEventMgr->IsActiveEvent(GAME_EVENT_FISHING_TURN_INS))
+                {
+                    if (!me->IsQuestGiver())
+                    {
+                        me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                    }
+                }
+                else
+                {
+                    if (me->IsQuestGiver())
+                    {
+                        me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                    }
+                }
+                events.RepeatEvent(1000);
+                break;
+            }
+            }
+        }
+    };
+
+    bool OnGossipHello(Player* player, Creature* creature) override
+    {
+        if (creature->IsQuestGiver())
+        {
+            player->PrepareQuestMenu(creature->GetGUID());
+        }
+        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
+        return true;
+    }
+
+    CreatureAI* GetAI(Creature* pCreature) const override
+    {
+        return new npc_fishbot_5000AI(pCreature);
+    }
+};
+
 enum eTrainingDummy
 {
     SPELL_STUN_PERMANENT        = 61204
@@ -2637,6 +2702,7 @@ void AddSC_npcs_special()
     new npc_elder_clearwater();
     new npc_riggle_bassbait();
     new npc_jang();
+    new npc_fishbot_5000();
     new npc_target_dummy();
     new npc_training_dummy();
     new npc_venomhide_hatchling();
