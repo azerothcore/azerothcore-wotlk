@@ -214,10 +214,10 @@ public:
  */
 enum fishingExtravaganzaWorldStates
 {
-    STV_FISHING_PREV_WIN_TIME           = 100000,
-    STV_FISHING_HAS_WINNER              = 100002,
-    STV_FISHING_ANNOUNCE_EVENT_BEGIN    = 100001,
-    STV_FISHING_ANNOUNCE_EVENT_OVER     = 100003
+    STV_FISHING_PREV_WIN_TIME           = 500000,
+    STV_FISHING_HAS_WINNER              = 500001,
+    STV_FISHING_ANNOUNCE_EVENT_BEGIN    = 500002,
+    STV_FISHING_ANNOUNCE_EVENT_OVER     = 500003
 };
 
 enum riggleBassbait
@@ -289,8 +289,8 @@ public:
                             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                             sWorld->setWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN, 0);
                         }
-                        auto announceOver = sWorld->getWorldState(STV_FISHING_ANNOUNCE_EVENT_OVER);
-                        if (announceOver)
+                        auto announceEventOver = sWorld->getWorldState(STV_FISHING_ANNOUNCE_EVENT_OVER);
+                        if (announceEventOver)
                         {
                             sCreatureTextMgr->SendChat(me, RIGGLE_SAY_END, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
                             sWorld->setWorldState(STV_FISHING_ANNOUNCE_EVENT_OVER, 0);

@@ -7,7 +7,7 @@ INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `
 (90,'2016-10-30 14:00:00','2030-12-31 07:00:00',10080,180,0,0,'Stranglethorn Fishing Extravaganza - Turn-ins',0,2);
 
 -- Assign script to Jang
-UPDATE `creature_template` SET `scriptName`='npc_jang' WHERE `entry`=15078;
+UPDATE `creature_template` SET `scriptName`='npc_jang' WHERE `entry` = 15078;
 
 -- Assign script to Fishbot5000
-UPDATE `creature_template` SET `scriptName`='npc_fishbot_5000' WHERE `entry`=15079;
+UPDATE `creature_template` SET `scriptName`='npc_fishbot_5000' WHERE `entry` = 15079;
