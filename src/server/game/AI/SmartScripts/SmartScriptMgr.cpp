@@ -679,7 +679,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_SEND_GOSSIP_MENU: return sizeof(SmartAction::sendGossipMenu);
             case SMART_ACTION_GO_SET_LOOT_STATE: return sizeof(SmartAction::setGoLootState);
             case SMART_ACTION_SEND_TARGET_TO_TARGET: return sizeof(SmartAction::sendTargetToTarget);
-            case SMART_ACTION_SET_HOME_POS: return NO_PARAMS;
+            case SMART_ACTION_SET_HOME_POS: return sizeof(SmartAction::setHomePos);
             case SMART_ACTION_SET_HEALTH_REGEN: return sizeof(SmartAction::setHealthRegen);
             case SMART_ACTION_SET_ROOT: return sizeof(SmartAction::setRoot);
             case SMART_ACTION_SET_GO_FLAG: return sizeof(SmartAction::goFlag);
