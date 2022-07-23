@@ -207,6 +207,19 @@ public:
     }
 };
 
+/*
+ * Stranglethorn Vale Fishing Extravaganza World States
+ *
+ * used by npcs Riggle Bassbait and Jang
+ */
+enum fishingExtravaganzaWorldStates
+{
+    STV_FISHING_PREV_WIN_TIME           = 100000,
+    STV_FISHING_HAS_WINNER              = 100002,
+    STV_FISHING_ANNOUNCE_EVENT_BEGIN    = 100001,
+    STV_FISHING_ANNOUNCE_EVENT_OVER     = 100003
+};
+
 enum riggleBassbait
 {
     EVENT_RIGGLE_CHECK_TOURNAMENT_STATE = 1,
@@ -220,12 +233,7 @@ enum riggleBassbait
     GAME_EVENT_FISHING_TURN_INS         = 90,
 
     GOSSIP_TEXT_EVENT_ACTIVE            = 7614,
-    GOSSIP_TEXT_EVENT_OVER              = 7714,
-
-    STV_FISHING_PREV_WIN_TIME           = 100000,
-    STV_FISHING_HAS_WINNER              = 100002,
-    STV_FISHING_ANNOUNCE_EVENT_BEGIN    = 100001,
-    STV_FISHING_ANNOUNCE_EVENT_OVER     = 100003
+    GOSSIP_TEXT_EVENT_OVER              = 7714
 };
 
 class npc_riggle_bassbait : public CreatureScript
@@ -237,6 +245,7 @@ public:
     {
         npc_riggle_bassbaitAI(Creature* c) : ScriptedAI(c)
         {
+            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
             auto prevWinTime = sWorld->getWorldState(STV_FISHING_PREV_WIN_TIME);
             if (time(nullptr) - prevWinTime > DAY)
             {
@@ -255,7 +264,7 @@ public:
             {
                 case EVENT_RIGGLE_CHECK_TOURNAMENT_STATE:
                 {
-                    if (sGameEventMgr->IsActiveEvent(GAME_EVENT_FISHING_TURN_INS))
+                    if (sGameEventMgr->IsActiveEvent(GAME_EVENT_FISHING_TURN_INS) && !sWorld->getWorldState(STV_FISHING_HAS_WINNER))
                     {
                         if (!me->IsQuestGiver())
                         {
@@ -318,6 +327,7 @@ public:
     {
         if (quest->GetQuestId() == QUEST_MASTER_ANGLER)
         {
+            creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
             sCreatureTextMgr->SendChat(creature, RIGGLE_SAY_WINNER, player, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
             sWorld->setWorldState(STV_FISHING_PREV_WIN_TIME, time(nullptr));
             sWorld->setWorldState(STV_FISHING_HAS_WINNER, 1);
@@ -329,6 +339,68 @@ public:
     CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_riggle_bassbaitAI (pCreature);
+    }
+};
+
+enum jang
+{
+    EVENT_JANG_CHECK_TOURNAMENT_STATE = 1,
+    GOSSIP_TEXT_SECOND_PRICE          = 7696
+};
+
+class npc_jang : public CreatureScript
+{
+public:
+    npc_jang() : CreatureScript("npc_jang") { }
+
+    struct npc_jangAI : public ScriptedAI
+    {
+        npc_jangAI(Creature* c) : ScriptedAI(c)
+        {
+            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+            events.Reset();
+            events.ScheduleEvent(EVENT_JANG_CHECK_TOURNAMENT_STATE, 1000, 1, 0);
+        }
+
+        EventMap events;
+
+        void UpdateAI(uint32 diff) override
+        {
+            events.Update(diff);
+            switch (events.ExecuteEvent())
+            {
+                case EVENT_JANG_CHECK_TOURNAMENT_STATE:
+                {
+                    if (sGameEventMgr->IsActiveEvent(GAME_EVENT_FISHING_TURN_INS) && sWorld->getWorldState(STV_FISHING_HAS_WINNER))
+                    {
+                        if (!me->IsQuestGiver())
+                        {
+                            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                        }
+                    }
+                    else
+                    {
+                        if (me->IsQuestGiver())
+                        {
+                            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                        }
+                    }
+                    events.RepeatEvent(1000);
+                    break;
+                }
+            }
+        }
+    };
+
+    bool OnGossipHello(Player* player, Creature* creature) override
+    {
+        SendGossipMenuFor(player, GOSSIP_TEXT_SECOND_PRICE, creature->GetGUID());
+        return true;
+    }
+
+    CreatureAI* GetAI(Creature* pCreature) const override
+    {
+        return new npc_jangAI(pCreature);
     }
 };
 
@@ -2560,6 +2632,7 @@ void AddSC_npcs_special()
     // Ours
     new npc_elder_clearwater();
     new npc_riggle_bassbait();
+    new npc_jang();
     new npc_target_dummy();
     new npc_training_dummy();
     new npc_venomhide_hatchling();
