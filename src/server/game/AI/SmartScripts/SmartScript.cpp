@@ -559,15 +559,10 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             {
                 // Special handling for vehicles
                 if (IsUnit(target))
-                {
                     if (Vehicle* vehicle = target->ToUnit()->GetVehicleKit())
                         for (auto& Seat : vehicle->Seats)
                             if (Player* player = ObjectAccessor::GetPlayer(*target, Seat.second.Passenger.Guid))
                                 player->AreaExploredOrEventHappens(e.action.quest.quest);
-
-                    if (Player* player = target->ToUnit()->GetCharmerOrOwnerPlayerOrPlayerItself())
-                        player->GroupEventHappens(e.action.quest.quest, GetBaseObject());
-                }
 
                 if (IsPlayer(target))
                 {
