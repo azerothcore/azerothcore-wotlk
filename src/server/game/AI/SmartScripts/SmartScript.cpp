@@ -3049,21 +3049,10 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
             ObjectVector units;
             GetWorldObjectsInDist(units, static_cast<float>(e.target.playerRange.maxDist));
 
-            if (!units.empty() && GetBaseObject())
-            {
+            if (!units.empty() && baseObject)
                 for (WorldObject* unit : units)
-                    if (IsPlayer(unit) && GetBaseObject()->IsInRange(unit, float(e.target.playerRange.minDist), float(e.target.playerRange.maxDist)))
+                    if (IsPlayer(unit) && baseObject->IsInRange(unit, float(e.target.playerRange.minDist), float(e.target.playerRange.maxDist)))
                         targets.push_back(unit);
-
-                //If Orientation is also set and we didnt find targets, try it with all the range
-                if (targets.empty() && e.target.o > 0)
-                    for (WorldObject* unit : units)
-                        if (IsPlayer(unit) && baseObject->IsInRange(unit, 0.0f, float(e.target.playerRange.maxDist)) && unit->ToPlayer()->IsAlive() && !unit->ToPlayer()->IsGameMaster())
-                            targets.push_back(unit);
-
-                if (e.target.playerRange.maxCount > 0)
-                    Acore::Containers::RandomResize(targets, e.target.playerRange.maxCount);
-            }
             break;
         }
         case SMART_TARGET_PLAYER_DISTANCE:
