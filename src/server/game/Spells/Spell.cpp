@@ -6640,6 +6640,11 @@ SpellCastResult Spell::CheckCast(bool strict)
                                     !transformSpellInfo->HasAttribute(SpellAttr0(SPELL_ATTR0_ALLOW_WHILE_MOUNTED | SPELL_ATTR0_AURA_IS_DEBUFF)))
                                 return SPELL_FAILED_NOT_SHAPESHIFT;
 
+                    if (m_caster->GetCharmGUID())
+                    {
+                        return SPELL_FAILED_CHARMED;
+                    }
+
                     break;
                 }
             case SPELL_AURA_RANGED_ATTACK_POWER_ATTACKER_BONUS:
