@@ -1,3 +1,4 @@
+-- DB update 2022_07_23_00 -> 2022_07_23_01
 --
 ALTER TABLE `pet_levelstats` CHANGE `hp` `hp` INT UNSIGNED DEFAULT 0 NOT NULL,
 CHANGE `mana` `mana` INT UNSIGNED DEFAULT 0 NOT NULL,
