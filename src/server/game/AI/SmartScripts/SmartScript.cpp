@@ -97,7 +97,7 @@ void SmartScript::ProcessEventsFor(SMART_EVENT e, Unit* unit, uint32 var0, uint3
     for (SmartAIEventList::iterator i = mEvents.begin(); i != mEvents.end(); ++i)
     {
         SMART_EVENT eventType = SMART_EVENT((*i).GetEventType());
-        if (eventType == SMART_EVENT_LINK) //special handling
+        if (eventType == SMART_EVENT_LINK)//special handling
             continue;
 
         if (eventType == e)
@@ -560,7 +560,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 // Special handling for vehicles
                 if (IsUnit(target))
                     if (Vehicle* vehicle = target->ToUnit()->GetVehicleKit())
-                        for (auto& Seat : vehicle->Seats)
+                        for (auto & Seat : vehicle->Seats)
                             if (Player* player = ObjectAccessor::GetPlayer(*target, Seat.second.Passenger.Guid))
                                 player->AreaExploredOrEventHappens(e.action.quest.quest);
 
@@ -1337,7 +1337,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     z += e.target.z;
                     o += e.target.o;
                     if (!e.action.summonGO.targetsummon)
-                        GetBaseObject()->SummonGameObject(e.action.summonGO.entry, x, y, z, o, 0.0f, 0.0f, 0.0f, 0.0f, e.action.summonGO.despawnTime, true, GOSummonType(e.action.summonGO.summonType));
+                        GetBaseObject()->SummonGameObject(e.action.summonGO.entry, x, y, z, o, 0, 0, 0, 0, e.action.summonGO.despawnTime, true, GOSummonType(e.action.summonGO.summonType));
                     else
                         target->SummonGameObject(e.action.summonGO.entry, GetBaseObject()->GetPositionX(), GetBaseObject()->GetPositionY(), GetBaseObject()->GetPositionZ(), GetBaseObject()->GetOrientation(), 0, 0, 0, 0, e.action.summonGO.despawnTime);
                 }
@@ -1346,7 +1346,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             if (e.GetTargetType() != SMART_TARGET_POSITION)
                 break;
 
-            GetBaseObject()->SummonGameObject(e.action.summonGO.entry, e.target.x, e.target.y, e.target.z, e.target.o, 0.0f, 0.0f, 0.0f, 0.0f, e.action.summonGO.despawnTime, true, GOSummonType(e.action.summonGO.summonType));
+            GetBaseObject()->SummonGameObject(e.action.summonGO.entry, e.target.x, e.target.y, e.target.z, e.target.o, 0, 0, 0, 0, e.action.summonGO.despawnTime, true, GOSummonType(e.action.summonGO.summonType));
             break;
         }
         case SMART_ACTION_KILL_UNIT:
