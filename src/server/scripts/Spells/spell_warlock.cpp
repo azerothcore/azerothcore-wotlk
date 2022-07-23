@@ -21,6 +21,7 @@
  * Scriptnames of files in this file should be prefixed with "spell_warl_".
  */
 
+#include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
@@ -1229,6 +1230,45 @@ class spell_warl_shadowburn : public AuraScript
     }
 };
 
+class spell_warl_glyph_of_felguard : public AuraScript
+{
+    PrepareAuraScript(spell_warl_glyph_of_felguard);
+
+    void HandleApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+        {
+            if (Pet* pet = player->GetPet())
+            {
+                if (pet->GetEntry() == NPC_FELGUARD)
+                {
+                    pet->HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, aurEff->GetAmount(), true);
+                }
+            }
+        }
+    }
+
+    void HandleRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+        {
+            if (Pet* pet = player->GetPet())
+            {
+                if (pet->GetEntry() == NPC_FELGUARD)
+                {
+                    pet->HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, aurEff->GetAmount(), false);
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_warl_glyph_of_felguard::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_warl_glyph_of_felguard::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_warlock_spell_scripts()
 {
     RegisterSpellScript(spell_warl_eye_of_kilrogg);
@@ -1260,4 +1300,5 @@ void AddSC_warlock_spell_scripts()
     RegisterSpellScript(spell_warl_unstable_affliction);
     RegisterSpellScript(spell_warl_drain_soul);
     RegisterSpellScript(spell_warl_shadowburn);
+    RegisterSpellScript(spell_warl_glyph_of_felguard);
 }
