@@ -1,3 +1,4 @@
+-- DB update 2022_07_24_06 -> 2022_07_24_07
 --
 UPDATE `gameobject_template` SET `ScriptName` = 'go_sand_trap' WHERE `entry` = 180647;
 
