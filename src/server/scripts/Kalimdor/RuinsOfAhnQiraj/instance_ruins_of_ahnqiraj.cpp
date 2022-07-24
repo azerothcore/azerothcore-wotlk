@@ -73,8 +73,6 @@ public:
                     _ossirianGUID = creature->GetGUID();
                     break;
             }
-
-            InstanceScript::OnCreatureCreate(creature);
         }
 
         void OnCreatureEvade(Creature* creature) override
