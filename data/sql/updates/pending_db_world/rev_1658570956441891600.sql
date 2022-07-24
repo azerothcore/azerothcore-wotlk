@@ -1,5 +1,5 @@
--- Spawns npc's from 13:00 - 17:01 (keep npc's spawned 1 min longer to make event over message at 17:00 works)
-UPDATE `game_event` SET `start_time`= '2016-10-30 13:00:00', `length` = 241,  `description`= 'Stranglethorn Fishing Extravaganza - The Crew' WHERE `eventEntry` = 62;
+-- Spawns npc's from 13:00 - 17:00
+UPDATE `game_event` SET `start_time`= '2016-10-30 13:00:00', `length` = 240,  `description`= 'Stranglethorn Fishing Extravaganza - The Crew' WHERE `eventEntry` = 62;
 
 -- Quests can be turned in 14:00 - 17:00
 DELETE FROM `game_event` WHERE `eventEntry` = 90;
@@ -29,3 +29,8 @@ INSERT INTO `quest_template_addon` (`ID`, `MaxLevel`, `AllowableClasses`, `Sourc
 
 -- Link box to Riggle Bassbait spawn event
 UPDATE `game_event_gameobject` SET `eventEntry`= 62 WHERE `guid`= 164445;
+
+-- Riggle Bassbait - broadcast texts
+UPDATE `creature_text` SET `BroadcastTextId` = 10608, `Text`='Let the Fishing Tournament BEGIN!' WHERE `CreatureID` = 15077 AND `GroupID` = 0;
+UPDATE `creature_text` SET `BroadcastTextId` = 10609, `Text`='And the Tastyfish have gone for the week! I will remain for another hour to allow you to turn in your fish!' WHERE `CreatureID` = 15077 AND `GroupID` = 1;
+UPDATE `creature_text` SET `BroadcastTextId` = 10610, `Text`='We have a winner! $n has won FIRST PLACE in the tournament!' WHERE `CreatureID` = 15077 AND `GroupID` = 2;

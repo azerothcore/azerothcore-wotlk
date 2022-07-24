@@ -215,7 +215,7 @@ enum fishingExtravaganzaWorldStates
     STV_FISHING_PREV_WIN_TIME           = 500000,
     STV_FISHING_HAS_WINNER              = 500001,
     STV_FISHING_ANNOUNCE_EVENT_BEGIN    = 500002,
-    STV_FISHING_ANNOUNCE_EVENT_OVER     = 500003
+    STV_FISHING_ANNOUNCE_POOLS_DESPAN   = 500003
 };
 
 enum riggleBassbait
@@ -223,12 +223,13 @@ enum riggleBassbait
     EVENT_RIGGLE_CHECK_TOURNAMENT_STATE = 1,
 
     RIGGLE_SAY_START                    = 0,
-    RIGGLE_SAY_WINNER                   = 1,
-    RIGGLE_SAY_END                      = 2,
+    RIGGLE_SAY_POOLS_END                = 1,
+    RIGGLE_SAY_WINNER                   = 2,
 
     QUEST_MASTER_ANGLER                 = 8193,
 
     GAME_EVENT_FISHING_TURN_INS         = 90,
+    GAME_EVENT_FISHING_POOLS            = 15,
 
     GOSSIP_TEXT_EVENT_ACTIVE            = 7614,
     GOSSIP_TEXT_EVENT_OVER              = 7714
@@ -247,7 +248,10 @@ public:
             auto prevWinTime = sWorld->getWorldState(STV_FISHING_PREV_WIN_TIME);
             if (time(nullptr) - prevWinTime > DAY)
             {
+                // reset all after 1 day
                 sWorld->setWorldState(STV_FISHING_HAS_WINNER, 0);
+                sWorld->setWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN, 0);
+                sWorld->setWorldState(STV_FISHING_ANNOUNCE_POOLS_DESPAN, 0);
             }
             events.Reset();
             events.ScheduleEvent(EVENT_RIGGLE_CHECK_TOURNAMENT_STATE, 1000, 1, 0);;
@@ -266,17 +270,11 @@ public:
                     {
                         if (!me->IsQuestGiver())
                         {
-                            auto prevWinTime = sWorld->getWorldState(STV_FISHING_PREV_WIN_TIME);
-                            if (time(nullptr) - prevWinTime > DAY)
+                            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                            if (!sWorld->getWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN))
                             {
-                                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                                auto startedAlready = sWorld->getWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN);
-                                if (!startedAlready)
-                                {
-                                    sCreatureTextMgr->SendChat(me, RIGGLE_SAY_START, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
-                                    sWorld->setWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN, 1);
-                                    sWorld->setWorldState(STV_FISHING_ANNOUNCE_EVENT_OVER, 1);
-                                }
+                                sCreatureTextMgr->SendChat(me, RIGGLE_SAY_START, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
+                                sWorld->setWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN, 1);
                             }
                         }
                     }
@@ -285,13 +283,19 @@ public:
                         if (me->IsQuestGiver())
                         {
                             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                            sWorld->setWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN, 0);
                         }
-                        auto announceEventOver = sWorld->getWorldState(STV_FISHING_ANNOUNCE_EVENT_OVER);
-                        if (announceEventOver)
+                    }
+                    if (sGameEventMgr->IsActiveEvent(GAME_EVENT_FISHING_POOLS))
+                    {
+                        // enable announcement: when pools despawn
+                        sWorld->setWorldState(STV_FISHING_ANNOUNCE_POOLS_DESPAN, 1);
+                    }
+                    else
+                    {
+                        if (sWorld->getWorldState(STV_FISHING_ANNOUNCE_POOLS_DESPAN))
                         {
-                            sCreatureTextMgr->SendChat(me, RIGGLE_SAY_END, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
-                            sWorld->setWorldState(STV_FISHING_ANNOUNCE_EVENT_OVER, 0);
+                            sCreatureTextMgr->SendChat(me, RIGGLE_SAY_POOLS_END, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
+                            sWorld->setWorldState(STV_FISHING_ANNOUNCE_POOLS_DESPAN, 0);
                         }
                     }
                 events.RepeatEvent(1000);
