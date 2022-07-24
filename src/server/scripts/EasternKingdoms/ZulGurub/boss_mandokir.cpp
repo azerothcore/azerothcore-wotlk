@@ -313,6 +313,12 @@ public:
             }
         }
 
+        bool OnTeleportUnreacheablePlayer(Player* player) override
+        {
+            DoCast(player, SPELL_SUMMON_PLAYER, true);
+            return true;
+        }
+
         void DoMeleeAttackIfReady(bool ignoreCasting)
         {
             if (!ignoreCasting && me->HasUnitState(UNIT_STATE_CASTING))

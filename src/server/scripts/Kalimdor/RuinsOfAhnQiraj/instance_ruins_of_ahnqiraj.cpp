@@ -23,13 +23,15 @@
 
 ObjectData const creatureData[] =
 {
-    { NPC_QUUEZ, DATA_QUUEZ     },
-    { NPC_TUUBID, DATA_TUUBID   },
-    { NPC_DRENN, DATA_DRENN     },
-    { NPC_XURREM,  DATA_XURREM  },
-    { NPC_YEGGETH, DATA_YEGGETH },
-    { NPC_PAKKON, DATA_PAKKON   },
-    { NPC_ZERRAN, DATA_ZERRAN   },
+    { NPC_QUUEZ,     DATA_QUUEZ     },
+    { NPC_TUUBID,    DATA_TUUBID    },
+    { NPC_DRENN,     DATA_DRENN     },
+    { NPC_XURREM,    DATA_XURREM    },
+    { NPC_YEGGETH,   DATA_YEGGETH   },
+    { NPC_PAKKON,    DATA_PAKKON    },
+    { NPC_ZERRAN,    DATA_ZERRAN    },
+    { NPC_OSSIRIAN,  DATA_OSSIRIAN  },
+    { NPC_KURINNAXX, DATA_KURINNAXX }
 };
 
 class instance_ruins_of_ahnqiraj : public InstanceMapScript
@@ -48,10 +50,12 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
+            InstanceScript::OnCreatureCreate(creature);
+
             switch (creature->GetEntry())
             {
-                case NPC_KURINAXX:
-                    _kurinaxxGUID = creature->GetGUID();
+                case NPC_KURINNAXX:
+                    _kurinnaxxGUID = creature->GetGUID();
                     break;
                 case NPC_RAJAXX:
                     _rajaxxGUID = creature->GetGUID();
@@ -163,7 +167,7 @@ public:
             switch (type)
             {
                 case DATA_KURINNAXX:
-                    return _kurinaxxGUID;
+                    return _kurinnaxxGUID;
                 case DATA_RAJAXX:
                     return _rajaxxGUID;
                 case DATA_MOAM:
@@ -248,7 +252,7 @@ public:
 
 
     private:
-        ObjectGuid _kurinaxxGUID;
+        ObjectGuid _kurinnaxxGUID;
         ObjectGuid _rajaxxGUID;
         ObjectGuid _moamGUID;
         ObjectGuid _buruGUID;
