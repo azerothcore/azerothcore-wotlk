@@ -1,3 +1,4 @@
+-- DB update 2022_07_24_01 -> 2022_07_24_02
 -- Warmaul Chef Bufferlo
 UPDATE `creature_template` SET `AIName`="SmartAI", `speed_walk`=1 WHERE `entry`=18440;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=18440 AND `source_type`=0;
