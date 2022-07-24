@@ -125,7 +125,7 @@ struct go_sand_trap : public GameObjectAI
 
     void Reset() override
     {
-        _scheduler.Schedule(5s, [this](TaskContext context)
+        _scheduler.Schedule(5s, [this](TaskContext /*context*/)
         {
             if (InstanceScript* instance = me->GetInstanceScript())
                 if (Creature* kurinnaxx = instance->GetCreature(DATA_KURINNAXX))
