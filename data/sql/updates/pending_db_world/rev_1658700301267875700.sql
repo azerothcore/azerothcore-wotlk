@@ -2,6 +2,7 @@
 -- Maintenance on ZG Before Bats Part 4:  Pooling Part 3 Standing Bats Pack
 -- Old Locations Pre-work
 DELETE FROM `creature` WHERE `guid` IN (49190, 49191, 49192, 49193);
+DELETE FROM `creature_addon` WHERE `guid` IN (49190, 49191, 49192, 49193);
 
 /* Bat Pack in ZG Bat Rider (14750) should shift spawn positions with 11368 and they agro together as one
 
@@ -10,6 +11,11 @@ INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, 
 (@GUID+, , 0, 0, 309, 0, 0, 1, 1, 0, -11978.2, -1464.7, 80.1628, 1.46608, 7200, 2, 0, 5341, 0, 1, 0, 0, 0, '', 0),
 (@GUID+, , 0, 0, 309, 0, 0, 1, 1, 0, -11988.6, -1467.06, 80.3768, 1.98968, 7200, 2, 0, 5341, 0, 1, 0, 0, 0, '', 0),
 (@GUID+, , 0, 0, 309, 0, 0, 1, 1, 0, -11981.1, -1475.36, 79.7364, 0.874606, 7200, 2, 0, 31440, 0, 1, 0, 0, 0, '', 0);
+
+This ZG Bat Rider had a row in creautre_addon:
+
+INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES 
+(XRIDERX, 0, 0, 0, 4097, 0, 0, NULL);
 
 */
 
@@ -44,6 +50,12 @@ INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, 
 (@GUID+13, 11368, 0, 0, 309, 0, 0, 1, 1, 0, -11978.2, -1464.7, 80.1628, 1.46608, 7200, 2, 0, 5341, 0, 1, 0, 0, 0, '', 0),
 (@GUID+14, 11368, 0, 0, 309, 0, 0, 1, 1, 0, -11988.6, -1467.06, 80.3768, 1.98968, 7200, 2, 0, 5341, 0, 1, 0, 0, 0, '', 0),
 (@GUID+15, 14750, 0, 0, 309, 0, 0, 1, 1, 0, -11981.1, -1475.36, 79.7364, 0.874606, 7200, 2, 0, 31440, 0, 1, 0, 0, 0, '', 0);
+
+INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES 
+(@GUID+0, 0, 0, 0, 4097, 0, 0, NULL),
+(@GUID+5, 0, 0, 0, 4097, 0, 0, NULL),
+(@GUID+10, 0, 0, 0, 4097, 0, 0, NULL),
+(@GUID+15, 0, 0, 0, 4097, 0, 0, NULL);
 
 -- Insert Pooling 
 
