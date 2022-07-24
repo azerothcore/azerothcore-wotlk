@@ -37,7 +37,7 @@ enum DataTypes
 
 enum Creatures
 {
-    NPC_KURINAXX                = 15348,
+    NPC_KURINNAXX               = 15348,
     NPC_RAJAXX                  = 15341,
     NPC_MOAM                    = 15340,
     NPC_BURU                    = 15370,
@@ -64,5 +64,7 @@ inline AI* GetRuinsOfAhnQirajAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, RuinsOfAhnQirajScriptName);
 }
+
+#define RegisterRuinsOfAhnQirajCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetRuinsOfAhnQirajAI)
 
 #endif

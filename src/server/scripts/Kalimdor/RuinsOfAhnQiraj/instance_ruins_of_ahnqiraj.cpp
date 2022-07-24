@@ -19,6 +19,12 @@
 #include "ScriptMgr.h"
 #include "ruins_of_ahnqiraj.h"
 
+ObjectData const creatureData[] =
+{
+    { NPC_OSSIRIAN,  DATA_OSSIRIAN },
+    { NPC_KURINNAXX, DATA_KURINNAXX }
+};
+
 class instance_ruins_of_ahnqiraj : public InstanceMapScript
 {
 public:
@@ -29,14 +35,17 @@ public:
         instance_ruins_of_ahnqiraj_InstanceMapScript(Map* map) : InstanceScript(map)
         {
             SetBossNumber(NUM_ENCOUNTER);
+            LoadObjectData(creatureData, nullptr);
         }
 
         void OnCreatureCreate(Creature* creature) override
         {
+            InstanceScript::OnCreatureCreate(creature);
+
             switch (creature->GetEntry())
             {
-                case NPC_KURINAXX:
-                    _kurinaxxGUID = creature->GetGUID();
+                case NPC_KURINNAXX:
+                    _kurinnaxxGUID = creature->GetGUID();
                     break;
                 case NPC_RAJAXX:
                     _rajaxxGUID = creature->GetGUID();
@@ -75,7 +84,7 @@ public:
             switch (type)
             {
                 case DATA_KURINNAXX:
-                    return _kurinaxxGUID;
+                    return _kurinnaxxGUID;
                 case DATA_RAJAXX:
                     return _rajaxxGUID;
                 case DATA_MOAM:
@@ -137,7 +146,7 @@ public:
         }
 
     private:
-        ObjectGuid _kurinaxxGUID;
+        ObjectGuid _kurinnaxxGUID;
         ObjectGuid _rajaxxGUID;
         ObjectGuid _moamGUID;
         ObjectGuid _buruGUID;
