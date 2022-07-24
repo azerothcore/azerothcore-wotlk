@@ -111,6 +111,7 @@ public:
     void MemberEvaded(Creature* member);
     void RespawnFormation(bool force = false);
     [[nodiscard]] bool IsFormationInCombat();
+    [[nodiscard]] bool IsAnyMemberAlive();
 
 private:
     Creature* m_leader; //Important do not forget sometimes to work with pointers instead synonims :D:D

@@ -405,3 +405,16 @@ bool CreatureGroup::IsFormationInCombat()
 
     return false;
 }
+
+bool CreatureGroup::IsAnyMemberAlive()
+{
+    for (auto const& itr : m_members)
+    {
+        if (itr.first && itr.first->IsAlive())
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
