@@ -847,23 +847,33 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         }
         case SMART_ACTION_CALL_GROUPEVENTHAPPENS:
         {
-            if (!unit)
-                break;
-
-            // If invoker was pet or charm
-            Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself();
-            if (player && GetBaseObject())
+            for (WorldObject* target : targets)
             {
-                player->GroupEventHappens(e.action.quest.quest, GetBaseObject());
-                LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction: SMART_ACTION_CALL_GROUPEVENTHAPPENS: Player {}, group credit for quest {}",
-                          unit->GetGUID().ToString(), e.action.quest.quest);
-            }
+                if (!IsUnit(target))
+                    continue;
 
-            // Special handling for vehicles
-            if (Vehicle* vehicle = unit->GetVehicleKit())
-                for (auto & Seat : vehicle->Seats)
-                    if (Player* player = ObjectAccessor::GetPlayer(*unit, Seat.second.Passenger.Guid))
-                        player->GroupEventHappens(e.action.quest.quest, GetBaseObject());
+                Unit* unitTarget = target->ToUnit();
+                // If invoker was pet or charm
+                Player* player = unitTarget->GetCharmerOrOwnerPlayerOrPlayerItself();
+                if (player && GetBaseObject())
+                {
+                    player->GroupEventHappens(e.action.quest.quest, GetBaseObject());
+                    LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction: SMART_ACTION_CALL_GROUPEVENTHAPPENS: Player {}, group credit for quest {}",
+                        unit->GetGUID().ToString(), e.action.quest.quest);
+                }
+
+                // Special handling for vehicles
+                if (Vehicle* vehicle = unitTarget->GetVehicleKit())
+                {
+                    for (auto& Seat : vehicle->Seats)
+                    {
+                        if (Player* player = ObjectAccessor::GetPlayer(*unitTarget, Seat.second.Passenger.Guid))
+                        {
+                            player->GroupEventHappens(e.action.quest.quest, GetBaseObject());
+                        }
+                    }
+                }
+            }
             break;
         }
         case SMART_ACTION_REMOVEAURASFROMSPELL:
