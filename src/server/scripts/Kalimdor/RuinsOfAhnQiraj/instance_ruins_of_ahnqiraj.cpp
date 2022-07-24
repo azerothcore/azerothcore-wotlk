@@ -248,7 +248,6 @@ public:
             }
         }
 
-
     private:
         ObjectGuid _kurinnaxxGUID;
         ObjectGuid _rajaxxGUID;
