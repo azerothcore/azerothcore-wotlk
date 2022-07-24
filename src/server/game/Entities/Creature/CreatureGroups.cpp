@@ -386,7 +386,7 @@ void CreatureGroup::RespawnFormation(bool force)
 {
     for (auto const& itr : m_members)
     {
-        if (!itr.first->IsAlive())
+        if (itr.first && !itr.first->IsAlive())
         {
             itr.first->Respawn(force);
         }
@@ -397,7 +397,7 @@ bool CreatureGroup::IsFormationInCombat()
 {
     for (auto const& itr : m_members)
     {
-        if (itr.first->IsInCombat())
+        if (itr.first && itr.first->IsInCombat())
         {
             return true;
         }
