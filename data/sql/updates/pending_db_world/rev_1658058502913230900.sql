@@ -1,2 +1,2 @@
 -- Undertaker Mordo https://classic.wowhead.com/npc=1568/undertaker-mordo
-UPDATE `creature` SET `position_x` = 1678.99,`position_y` = 1667.86,`position_z` = 135.855, `orientation` = 3.76991 WHERE `id1` = 1568;
+UPDATE `creature` SET `position_x` = 1671.89,`position_y` = 1678.29,`position_z` = 120.802, `orientation` = 0.0349066 WHERE `id1` = 1568;
