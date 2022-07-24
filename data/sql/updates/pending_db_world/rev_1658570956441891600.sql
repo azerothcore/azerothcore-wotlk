@@ -9,28 +9,27 @@ INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `
 -- Assign script to Jang
 UPDATE `creature_template` SET `scriptName`='npc_jang' WHERE `entry` = 15078;
 
--- Assign script to Fishbot5000
-UPDATE `creature_template` SET `scriptName`='npc_fishbot_5000' WHERE `entry` = 15079;
-
--- Minimum fishing skill for Stranglethorn Vale Fishing Extravaganza quests is 150
-DELETE FROM `quest_template_addon` WHERE `ID` IN (8194, 8193, 8225, 8224, 8221);
+-- Minimum fishing skill for Stranglethorn Vale Fishing Extravaganza quests is 150, also [Could I get a Fishing Flier?]
+DELETE FROM `quest_template_addon` WHERE `ID` IN (8194, 8193, 8225, 8224, 8221, 8228, 8229);
 INSERT INTO `quest_template_addon` (`ID`, `MaxLevel`, `AllowableClasses`, `SourceSpellID`, `PrevQuestID`, `NextQuestID`, `ExclusiveGroup`, `RewardMailTemplateID`, `RewardMailDelay`, `RequiredSkillID`, `RequiredSkillPoints`, `RequiredMinRepFaction`, `RequiredMaxRepFaction`, `RequiredMinRepValue`, `RequiredMaxRepValue`, `ProvidedItemCount`, `SpecialFlags`) VALUES
 (8194,0,0,0,0,0,0,0,0,356,150,0,0,0,0,0,1),
 (8193,0,0,0,0,0,0,0,0,356,150,0,0,0,0,0,1),
 (8225,0,0,0,0,0,0,0,0,356,150,0,0,0,0,0,1),
 (8224,0,0,0,0,0,0,0,0,356,150,0,0,0,0,0,1),
-(8221,0,0,0,0,0,0,0,0,356,150,0,0,0,0,0,1);
-
--- Quest [Could I get a Fishing Flier?] requires fishing skill of 150
-DELETE FROM `quest_template_addon` WHERE `ID` IN (8228, 8229);
-INSERT INTO `quest_template_addon` (`ID`, `MaxLevel`, `AllowableClasses`, `SourceSpellID`, `PrevQuestID`, `NextQuestID`, `ExclusiveGroup`, `RewardMailTemplateID`, `RewardMailDelay`, `RequiredSkillID`, `RequiredSkillPoints`, `RequiredMinRepFaction`, `RequiredMaxRepFaction`, `RequiredMinRepValue`, `RequiredMaxRepValue`, `ProvidedItemCount`, `SpecialFlags`) VALUES
+(8221,0,0,0,0,0,0,0,0,356,150,0,0,0,0,0,1),
 (8228,0,0,0,0,0,0,0,0,356,150,0,0,0,0,0,1),
 (8229,0,0,0,0,0,0,0,0,356,150,0,0,0,0,0,1);
 
--- Link box to Riggle Bassbait spawn event
+-- Box on which Riggle Bassbait stands: linked to event 62 (The Crew)
 UPDATE `game_event_gameobject` SET `eventEntry`= 62 WHERE `guid`= 164445;
 
--- Riggle Bassbait - broadcast texts
+-- Riggle Bassbait: use broadcast texts
 UPDATE `creature_text` SET `BroadcastTextId` = 10608, `Text`='Let the Fishing Tournament BEGIN!' WHERE `CreatureID` = 15077 AND `GroupID` = 0;
 UPDATE `creature_text` SET `BroadcastTextId` = 10609, `Text`='And the Tastyfish have gone for the week! I will remain for another hour to allow you to turn in your fish!' WHERE `CreatureID` = 15077 AND `GroupID` = 1;
 UPDATE `creature_text` SET `BroadcastTextId` = 10610, `Text`='We have a winner! $n has won FIRST PLACE in the tournament!' WHERE `CreatureID` = 15077 AND `GroupID` = 2;
+
+-- Fishbot 5000 quests: only available when event 90 (Turn-ins) is active
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(19,0,8225,0,0,12,0,90,0,0,0,0,0,'','Fishing Extravaganza - Turn-ins active'),
+(19,0,8224,0,0,12,0,90,0,0,0,0,0,'','Fishing Extravaganza - Turn-ins active'),
+(19,0,8221,0,0,12,0,90,0,0,0,0,0,'','Fishing Extravaganza - Turn-ins active');
