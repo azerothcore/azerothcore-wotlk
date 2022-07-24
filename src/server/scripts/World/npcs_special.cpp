@@ -313,7 +313,7 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
         }
 
-        if (sGameEventMgr->IsActiveEvent(GAME_EVENT_FISHING_TURN_INS) && sWorld->getWorldState(STV_FISHING_HAS_WINNER))
+        if (sWorld->getWorldState(STV_FISHING_HAS_WINNER))
         {
             SendGossipMenuFor(player, GOSSIP_TEXT_EVENT_OVER, creature->GetGUID());
         }
@@ -333,7 +333,6 @@ public:
             sCreatureTextMgr->SendChat(creature, RIGGLE_SAY_WINNER, player, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
             sWorld->setWorldState(STV_FISHING_PREV_WIN_TIME, time(nullptr));
             sWorld->setWorldState(STV_FISHING_HAS_WINNER, 1);
-            sWorld->setWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN, 0);
         }
         return true;
     }
