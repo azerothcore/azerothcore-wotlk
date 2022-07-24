@@ -3945,7 +3945,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
 
             if (!units.empty())
             {
-                if (unit->GetTypeId() != TYPEID_PLAYER)
+                if (!unit || unit->GetTypeId() != TYPEID_PLAYER)
                     return;
 
                 if (units.size() >= e.event.nearPlayer.minCount)
@@ -3961,7 +3961,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
 
             if (!units.empty())
             {
-                if (unit->GetTypeId() != TYPEID_PLAYER)
+                if (!unit || unit->GetTypeId() != TYPEID_PLAYER)
                     return;
 
                 if (units.size() < e.event.nearPlayerNegation.minCount)
