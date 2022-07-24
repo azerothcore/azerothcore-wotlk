@@ -15,9 +15,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureGroups.h"
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
+#include "TaskScheduler.h"
 #include "ruins_of_ahnqiraj.h"
+
+ObjectData const creatureData[] =
+{
+    { NPC_QUUEZ, DATA_QUUEZ     },
+    { NPC_TUUBID, DATA_TUUBID   },
+    { NPC_DRENN, DATA_DRENN     },
+    { NPC_XURREM,  DATA_XURREM  },
+    { NPC_YEGGETH, DATA_YEGGETH },
+    { NPC_PAKKON, DATA_PAKKON   },
+    { NPC_ZERRAN, DATA_ZERRAN   },
+};
 
 class instance_ruins_of_ahnqiraj : public InstanceMapScript
 {
@@ -29,6 +42,8 @@ public:
         instance_ruins_of_ahnqiraj_InstanceMapScript(Map* map) : InstanceScript(map)
         {
             SetBossNumber(NUM_ENCOUNTER);
+            LoadObjectData(creatureData, nullptr);
+            _RajaxxFormationLeaders = { DATA_QUUEZ, DATA_TUUBID, DATA_DRENN, DATA_XURREM, DATA_YEGGETH, DATA_PAKKON, DATA_ZERRAN };
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -54,6 +69,42 @@ public:
                     _ossirianGUID = creature->GetGUID();
                     break;
             }
+
+            InstanceScript::OnCreatureCreate(creature);
+        }
+
+        void OnCreatureEvade(Creature* creature) override
+        {
+            if (CreatureGroup* formation = creature->GetFormation())
+            {
+                if (Creature* leader = formation->GetLeader())
+                {
+                    switch (leader->GetEntry())
+                    {
+                        case NPC_QUUEZ:
+                        case NPC_TUUBID:
+                        case NPC_DRENN:
+                        case NPC_XURREM:
+                        case NPC_YEGGETH:
+                        case NPC_PAKKON:
+                        case NPC_ZERRAN:
+                            _RajaxxFormationLeaders = { DATA_QUUEZ, DATA_TUUBID, DATA_DRENN, DATA_XURREM, DATA_YEGGETH, DATA_PAKKON, DATA_ZERRAN };
+                            for (auto const& data : _RajaxxFormationLeaders)
+                            {
+                                if (Creature* creature = GetCreature(data))
+                                {
+                                    if (CreatureGroup* group = creature->GetFormation())
+                                    {
+                                        group->RespawnFormation(true);
+                                    }
+                                }
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
         }
 
         bool SetBossState(uint32 bossId, EncounterState state) override
@@ -62,6 +113,43 @@ public:
                 return false;
 
             return true;
+        }
+
+        void OnUnitDeath(Unit* unit) override
+        {
+            if (Creature* creature = unit->ToCreature())
+            {
+                if (CreatureGroup* formation = creature->GetFormation())
+                {
+                    if (Creature* leader = formation->GetLeader())
+                    {
+                        switch (leader->GetEntry())
+                        {
+                            case NPC_QUUEZ:
+                            case NPC_TUUBID:
+                            case NPC_DRENN:
+                            case NPC_XURREM:
+                            case NPC_YEGGETH:
+                            case NPC_PAKKON:
+                            case NPC_ZERRAN:
+                                _scheduler.Schedule(1s, [this, formation](TaskContext /*context*/) {
+                                    if (!formation->IsAnyMemberAlive())
+                                    {
+                                        CallNextRajaxxLeader();
+                                    }
+                                });
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
+        void Update(uint32 diff) override
+        {
+            _scheduler.Update(diff);
         }
 
         void SetGuidData(uint32 type, ObjectGuid data) override
@@ -136,6 +224,29 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
+        void CallNextRajaxxLeader()
+        {
+            // Remove dead formations.
+            _RajaxxFormationLeaders.remove_if([&](uint32 data) -> bool
+            {
+                if (Creature* creature = GetCreature(data))
+                {
+                    if (CreatureGroup* group = creature->GetFormation())
+                    {
+                        return !group->IsAnyMemberAlive();
+                    }
+                }
+
+                return false;
+            });
+
+            if (Creature* nextLeader = GetCreature(_RajaxxFormationLeaders.front()))
+            {
+                nextLeader->SetInCombatWithZone();
+            }
+        }
+
+
     private:
         ObjectGuid _kurinaxxGUID;
         ObjectGuid _rajaxxGUID;
@@ -144,6 +255,8 @@ public:
         ObjectGuid _ayamissGUID;
         ObjectGuid _ossirianGUID;
         ObjectGuid _paralyzedGUID;
+        std::list<uint32> _RajaxxFormationLeaders;
+        TaskScheduler _scheduler;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

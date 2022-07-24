@@ -63,16 +63,12 @@ public:
 
     struct boss_rajaxxAI : public BossAI
     {
-        boss_rajaxxAI(Creature* creature) : BossAI(creature, DATA_RAJAXX)
-        {
-        }
+        boss_rajaxxAI(Creature* creature) : BossAI(creature, DATA_RAJAXX) { }
 
         void Reset() override
         {
             _Reset();
             enraged = false;
-            events.ScheduleEvent(EVENT_DISARM, 10000);
-            events.ScheduleEvent(EVENT_THUNDERCRASH, 12000);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -84,6 +80,8 @@ public:
         void EnterCombat(Unit* /*victim*/) override
         {
             _EnterCombat();
+            events.ScheduleEvent(EVENT_DISARM, 10000);
+            events.ScheduleEvent(EVENT_THUNDERCRASH, 12000);
         }
 
         void UpdateAI(uint32 diff) override
