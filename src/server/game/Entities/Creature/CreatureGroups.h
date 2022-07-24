@@ -109,6 +109,8 @@ public:
     void LeaderMoveTo(float x, float y, float z, bool run);
     void MemberEngagingTarget(Creature* member, Unit* target);
     void MemberEvaded(Creature* member);
+    void RespawnFormation(bool force = false);
+    [[nodiscard]] bool IsFormationInCombat();
 
 private:
     Creature* m_leader; //Important do not forget sometimes to work with pointers instead synonims :D:D
