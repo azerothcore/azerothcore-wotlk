@@ -43,8 +43,7 @@ enum Events
     EVENT_TRAMPLE               = 1,
     EVENT_DRAIN_MANA            = 2,
     EVENT_STONE_PHASE           = 3,
-    EVENT_STONE_PHASE_END       = 4,
-    EVENT_WIDE_SLASH            = 5
+    EVENT_STONE_PHASE_END       = 4
 };
 
 enum Actions
@@ -69,7 +68,6 @@ public:
             me->SetRegeneratingPower(false);
             _isStonePhase = false;
             events.ScheduleEvent(EVENT_STONE_PHASE, 90000);
-            //events.ScheduleEvent(EVENT_WIDE_SLASH, 11000);
         }
 
         void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
@@ -118,7 +116,6 @@ public:
                 return;
 
             events.Update(diff);
-
             if (me->GetPower(POWER_MANA) == me->GetMaxPower(POWER_MANA))
             {
                 if (_isStonePhase)
@@ -162,22 +159,14 @@ public:
                                     }
                                 }
                             }
-                            Acore::Containers::RandomResize(targetList, 5);
+                            Acore::Containers::RandomResize(targetList, 6);
                             for (std::list<Unit*>::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
                             {
                                 DoCast(*itr, SPELL_DRAIN_MANA);
                             }
                             events.ScheduleEvent(EVENT_DRAIN_MANA, urand(5000, 15000));
                             break;
-                        }/*
-                        case EVENT_WIDE_SLASH:
-                            DoCastSelf(SPELL_WIDE_SLASH);
-                            events.ScheduleEvent(EVENT_WIDE_SLASH, 11000);
-                            break;
-                        case EVENT_TRASH:
-                            DoCastSelf(SPELL_TRASH);
-                            events.ScheduleEvent(EVENT_WIDE_SLASH, 16000);
-                            break;*/
+                        }
                     default:
                         break;
                 }
