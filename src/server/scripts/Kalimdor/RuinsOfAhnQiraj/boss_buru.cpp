@@ -209,7 +209,7 @@ struct boss_buru : public BossAI
                     break;
             }
         }
-        
+
         DoMeleeAttackIfReady();
     }
 private:
