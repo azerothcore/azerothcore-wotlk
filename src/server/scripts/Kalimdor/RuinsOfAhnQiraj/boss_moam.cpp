@@ -66,6 +66,7 @@ public:
         {
             _Reset();
             me->SetPower(POWER_MANA, 0);
+            me->SetRegeneratingPower(false);
             _isStonePhase = false;
             events.ScheduleEvent(EVENT_STONE_PHASE, 90000);
             //events.ScheduleEvent(EVENT_WIDE_SLASH, 11000);
