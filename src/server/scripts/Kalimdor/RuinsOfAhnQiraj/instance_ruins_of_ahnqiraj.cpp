@@ -21,8 +21,9 @@
 
 ObjectData const creatureData[] =
 {
-    { NPC_OSSIRIAN,  DATA_OSSIRIAN },
-    { NPC_KURINNAXX, DATA_KURINNAXX }
+    { NPC_OSSIRIAN,  DATA_OSSIRIAN  },
+    { NPC_KURINNAXX, DATA_KURINNAXX },
+    { NPC_BURU,      DATA_BURU      }
 };
 
 class instance_ruins_of_ahnqiraj : public InstanceMapScript
