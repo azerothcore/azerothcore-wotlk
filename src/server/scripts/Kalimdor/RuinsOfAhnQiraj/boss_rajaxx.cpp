@@ -22,16 +22,6 @@
 
 enum Yells
 {
-    // The time of our retribution is at hand! Let darkness reign in the hearts of our enemies! Sound: 8645 Emote: 35
-    SAY_ANDOROV_INTRO         = 0,   // Before for the first wave
-    SAY_ANDOROV_ATTACK        = 1,   // Beginning the event
-
-    SAY_WAVE3                 = 0,
-    SAY_WAVE4                 = 1,
-    SAY_WAVE5                 = 2,
-    SAY_WAVE6                 = 3,
-    SAY_WAVE7                 = 4,
-    SAY_INTRO                 = 5,
     SAY_UNK1                  = 6,
     SAY_UNK2                  = 7,
     SAY_UNK3                  = 8,
