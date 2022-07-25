@@ -91,8 +91,6 @@ public:
                 default:
                     break;
             }
-
-            InstanceScript::OnCreatureCreate(creature);
         }
 
         void OnGameObjectCreate(GameObject* go) override
