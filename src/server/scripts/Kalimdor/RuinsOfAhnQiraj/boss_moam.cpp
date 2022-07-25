@@ -72,15 +72,6 @@ public:
             events.ScheduleEvent(EVENT_SPELL_DRAIN_MANA, 3000);
         }
 
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
-        {
-            if (!_isStonePhase && HealthBelowPct(45))
-            {
-                _isStonePhase = true;
-                DoAction(ACTION_STONE_PHASE_START);
-            }
-        }
-
         void DoAction(int32 action) override
         {
             switch (action)
