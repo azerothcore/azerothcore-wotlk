@@ -15,6 +15,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (15324, 0, 0, 0, 0, 0, 100, 0, 7000, 11000, 6000, 17000, 0, 11, 5568, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Qiraji Gladiator - In Combat - Cast \'Trample\''),
 (15324, 0, 1, 0, 9, 0, 100, 0, 0, 10, 6000, 16000, 0, 11, 10966, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Qiraji Gladiator - Within 0-10 Range - Cast \'Uppercut\''),
 (15324, 0, 2, 3, 0, 1, 100, 0, 0, 0, 60000, 60000, 0, 11, 25164, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Qiraji Gladiator - In Combat - Cast \'Vengeance\' (Phase 1)'),
-(15324, 0, 3, 0, 61, 0, 100, 0, 0, 0, 60000, 60000, 0, 5, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Qiraji Gladiator - In Combat - Play Emote 1 (Phase 1)'),
+(15324, 0, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 5, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Qiraji Gladiator - In Combat - Play Emote 1 (Phase 1)'),
 (15324, 0, 4, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 15324, 60, 0, 0, 0, 0, 0, 0, 'Qiraji Gladiator - On Just Died - Set Data 1 1'),
 (15324, 0, 5, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Qiraji Gladiator - On Data Set 1 1 - Set Event Phase 1');
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 15338;
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 15338) AND (`source_type` = 0) AND (`id` IN (1, 2));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(15338, 0, 1, 0, 0, 0, 100, 0, 2000, 4000, 6000, 6000, 0, 11, 25755, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Obsidian Destroyer - In Combat - Cast \'Drain Mana\''),
+(15338, 0, 2, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 11, 27627, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Obsidian Destroyer - On Just Died - Cast \'Serverside - Drop Obsidian\'');
