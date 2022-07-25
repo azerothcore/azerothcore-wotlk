@@ -63,7 +63,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            //SAY_DEATH
+            Talk(SAY_DEATH);
             _JustDied();
         }
 
