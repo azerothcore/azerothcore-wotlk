@@ -22,6 +22,7 @@
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "ruins_of_ahnqiraj.h"
+#include "TaskScheduler.h"
 
 enum Texts
 {
@@ -293,8 +294,85 @@ public:
     }
 };
 
+enum AnubisathGuardian
+{
+    SPELL_METEOR                 = 24340,
+    SPELL_PLAGUE                 = 22997,
+    SPELL_SHADOW_STORM           = 2148,
+    SPELL_THUNDER_CLAP           = 2834,
+    SPELL_REFLECT_ARCANE_FIRE    = 13022,
+    SPELL_REFLECT_FROST_SHADOW   = 19595,
+    SPELL_ENRAGE                 = 8599,
+    SPELL_EXPLODE                = 25698,
+
+    SPELL_SUMMON_ANUB_SWARMGUARD = 17430,
+    SPELL_SUMMON_ANUB_WARRIOR    = 17431,
+};
+
+
+struct npc_anubisath_guardian : public ScriptedAI
+{
+    npc_anubisath_guardian(Creature* creature) : ScriptedAI(creature) { }
+
+    void Reset() override
+    {
+        _enraged = false;
+        _spells[0] = RAND(SPELL_SHADOW_STORM, SPELL_THUNDER_CLAP);
+        _spells[1] = RAND(SPELL_REFLECT_ARCANE_FIRE, SPELL_REFLECT_FROST_SHADOW);
+
+        _scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
+
+    void EnterCombat(Unit* /*who*/) override
+    {
+        DoCastSelf(_spells[0]);
+        DoCastSelf(_spells[1]);
+
+        _scheduler.CancelAll();
+
+        uint32 spell = RAND(SPELL_METEOR, SPELL_PLAGUE);
+        _scheduler.Schedule(10s, [this, spell](TaskContext context) {
+            DoCastRandomTarget(spell);
+            context.Repeat(10s, 15s);
+        });
+
+        spell = RAND(SPELL_SUMMON_ANUB_SWARMGUARD, SPELL_SUMMON_ANUB_WARRIOR);
+        _scheduler.Schedule(10s, [this, spell](TaskContext context) {
+            DoCastAOE(spell);
+            context.Repeat(10s, 15s);
+        });
+    }
+
+    void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType /* damagetype */, SpellSchoolMask /*damageSchoolMask*/) override
+    {
+        if (!_enraged && me->HealthBelowPctDamaged(10, damage))
+        {
+            _enraged = true;
+            DoCastSelf(RAND(SPELL_ENRAGE, SPELL_EXPLODE), true);
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        _scheduler.Update(diff,
+            std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
+    }
+
+private:
+    bool _enraged;
+    uint32 _spells[2];
+    TaskScheduler _scheduler;
+};
+
 void AddSC_boss_ossirian()
 {
     new boss_ossirian();
     new go_ossirian_crystal();
+    RegisterCreatureAI(npc_anubisath_guardian);
 }
