@@ -128,10 +128,6 @@ public:
                 return;
             }
 
-            // Messing up mana-drain channel
-            //if (me->HasUnitState(UNIT_STATE_CASTING))
-            //    return;
-
             while (uint32 eventId = events.ExecuteEvent())
             {
                 switch (eventId)
