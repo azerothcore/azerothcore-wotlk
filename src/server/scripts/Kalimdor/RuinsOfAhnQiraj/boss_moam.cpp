@@ -117,22 +117,9 @@ public:
             events.Update(diff);
             if (me->GetPower(POWER_MANA) == me->GetMaxPower(POWER_MANA))
             {
-                if (_isStonePhase)
-                {
-                    DoAction(ACTION_STONE_PHASE_END);
-                }
                 Talk(EMOTE_MANA_FULL);
-                DoCastAOE(SPELL_ARCANE_ERUPTION);
+                DoCastAOE(SPELL_ARCANE_ERUPTION, true);
                 me->SetPower(POWER_MANA, 0);
-            }
-
-            if (_isStonePhase)
-            {
-                if (events.ExecuteEvent() == EVENT_STONE_PHASE_END)
-                {
-                    DoAction(ACTION_STONE_PHASE_END);
-                }
-                return;
             }
 
             while (uint32 eventId = events.ExecuteEvent())
@@ -141,6 +128,9 @@ public:
                 {
                     case EVENT_STONE_PHASE:
                         DoAction(ACTION_STONE_PHASE_START);
+                        break;
+                    case EVENT_STONE_PHASE_END:
+                        DoAction(ACTION_STONE_PHASE_END);
                         break;
                     case EVENT_SPELL_DRAIN_MANA:
                         {
