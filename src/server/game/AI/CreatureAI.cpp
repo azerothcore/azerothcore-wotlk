@@ -27,6 +27,7 @@
 #include "Vehicle.h"
 #include "ScriptMgr.h"
 #include "Language.h"
+#include "ZoneScript.h"
 
 class PhasedRespawn : public BasicEvent
 {
@@ -307,6 +308,9 @@ bool CreatureAI::_EnterEvadeMode(EvadeReason /*why*/)
     me->ResetPlayerDamageReq();
     me->SetLastDamagedTime(0);
     me->SetCannotReachTarget();
+
+    if (ZoneScript* zoneScript = me->GetZoneScript() ? me->GetZoneScript() : (ZoneScript*)me->GetInstanceScript())
+        zoneScript->OnCreatureEvade(me);
 
     if (me->IsInEvadeMode())
     {
