@@ -108,7 +108,7 @@ public:
             }
         }
 
-        void JustDied(Unit* killer) override
+        void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
             DoCastAOE(SPELL_LARGE_OBSIDIAN_CHUNK, true);
