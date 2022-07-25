@@ -14,5 +14,5 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (15338, 0, 0, 0, 0, 0, 100, 0, 5000, 9000, 8000, 11000, 0, 11, 25756, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Obsidian Destroyer - In Combat - Cast \'Purge\''),
 (15338, 0, 1, 0, 0, 0, 100, 0, 2000, 4000, 6000, 6000, 0, 11, 25755, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Obsidian Destroyer - In Combat - Cast \'Drain Mana\''),
 (15338, 0, 2, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 11, 27627, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Obsidian Destroyer - On Just Died - Cast \'Serverside - Drop Obsidian\''),
-(15338, 0, 3, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 11, 25756, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Obsidian Destroyer - On Respawn - Cast \'Purge\'');
+(15338, 0, 3, 0, 7, 0, 100, 0, 0, 0, 0, 0, 0, 108, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Obsidian Destroyer - On Respawn - Set Mana To 0');
 UPDATE `creature_template` SET `unit_flags2` = 0 WHERE (`entry` = 15338);
