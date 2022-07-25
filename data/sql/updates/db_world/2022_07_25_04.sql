@@ -1,3 +1,4 @@
+-- DB update 2022_07_25_03 -> 2022_07_25_04
 -- Captain Qeez
 DELETE FROM `creature_formations` WHERE `leaderGUID` = 144676;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
