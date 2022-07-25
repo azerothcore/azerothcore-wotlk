@@ -38,7 +38,6 @@ enum Spells
     SPELL_ENVELOPING_WINDS      = 25189,
     SPELL_WAR_STOMP             = 25188,
     SPELL_STRENGHT_OF_OSSIRIAN  = 25176,
-    SPELL_SUMMON_PLAYER         = 20477,
     SPELL_SAND_STORM            = 25160,
     SPELL_SUMMON_CRYSTAL        = 25192
 };
@@ -56,10 +55,6 @@ enum Events
 };
 
 uint8 const NUM_CRYSTALS        = 9;
-
-// You spin me right round, baby
-// right round like a record, baby
-// right round round round
 Position CrystalCoordinates[NUM_CRYSTALS] =
 {
     { -9394.230469f, 1951.808594f, 85.97733f, 0.0f },
@@ -73,9 +68,9 @@ Position CrystalCoordinates[NUM_CRYSTALS] =
     { -9406.73f, 1863.13f, 85.5558f, 0.0f }
 };
 
-float RoomRadius = 165.0f;
-uint8 const NUM_TORNADOS = 5; /// @todo This number is completly random!
-uint8 const NUM_WEAKNESS = 5;
+float RoomRadius                = 165.0f;
+uint8 const NUM_TORNADOS        = 2;
+uint8 const NUM_WEAKNESS        = 5;
 uint32 const SpellWeakness[NUM_WEAKNESS] = { 25177, 25178, 25180, 25181, 25183 };
 Position const RoomCenter = { -9343.041992f, 1923.278198f, 85.555984f, 0.0 };
 
@@ -138,7 +133,7 @@ public:
             events.ScheduleEvent(EVENT_SILENCE, 30000);
             events.ScheduleEvent(EVENT_CYCLONE, 20000);
             events.ScheduleEvent(EVENT_STOMP, 30000);
-            DoCast(me, SPELL_STRENGHT_OF_OSSIRIAN);
+            DoCastSelf(SPELL_STRENGHT_OF_OSSIRIAN);
             Talk(SAY_AGGRO);
 
             Map* map = me->GetMap();
@@ -222,10 +217,6 @@ public:
                 return;
 
             events.Update(diff);
-            if (me->GetDistance(me->GetVictim()) > 60.00f && me->GetDistance(me->GetVictim()) < 120.00f)
-            {
-                DoCastVictim(SPELL_SUMMON_PLAYER);
-            }
             bool ApplySupreme = true;
             if (me->HasAura(SPELL_STRENGHT_OF_OSSIRIAN))
             {
@@ -245,7 +236,7 @@ public:
 
             if (ApplySupreme)
             {
-                DoCast(me, SPELL_STRENGHT_OF_OSSIRIAN);
+                DoCastSelf(SPELL_STRENGHT_OF_OSSIRIAN);
                 Talk(SAY_SUPREME);
             }
 
