@@ -309,7 +309,6 @@ enum AnubisathGuardian
     SPELL_SUMMON_ANUB_WARRIOR    = 17431,
 };
 
-
 struct npc_anubisath_guardian : public ScriptedAI
 {
     npc_anubisath_guardian(Creature* creature) : ScriptedAI(creature) { }
