@@ -813,7 +813,7 @@ int32 Player::getMaxTimer(MirrorTimerType timer)
             {
                 if (!IsAlive() || HasAuraType(SPELL_AURA_WATER_BREATHING) || GetSession()->GetSecurity() >= AccountTypes(sWorld->getIntConfig(CONFIG_DISABLE_BREATHING)))
                     return DISABLED_MIRROR_TIMER;
-                int32 UnderWaterTime = 3 * MINUTE * IN_MILLISECONDS;
+                int32 UnderWaterTime = sWorld->getIntConfig(CONFIG_WATER_BREATH_TIMER);
                 AuraEffectList const& mModWaterBreathing = GetAuraEffectsByType(SPELL_AURA_MOD_WATER_BREATHING);
                 for (AuraEffectList::const_iterator i = mModWaterBreathing.begin(); i != mModWaterBreathing.end(); ++i)
                     AddPct(UnderWaterTime, (*i)->GetAmount());
@@ -8909,7 +8909,7 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
             return;
     }
 
-    if (returnreagent && (pet || m_temporaryUnsummonedPetNumber) && !InBattleground())
+    if (returnreagent && (pet || (m_temporaryUnsummonedPetNumber && (!m_session || !m_session->PlayerLogout()))) && !InBattleground())
     {
         //returning of reagents only for players, so best done here
         uint32 spellId = pet ? pet->GetUInt32Value(UNIT_CREATED_BY_SPELL) : m_oldpetspell;
@@ -8973,16 +8973,18 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
         // only if current pet in slot
         pet->SavePetToDB(mode);
 
-        ASSERT(m_petStable->CurrentPet && m_petStable->CurrentPet->PetNumber == pet->GetCharmInfo()->GetPetNumber());
-        if (mode == PET_SAVE_NOT_IN_SLOT)
+        if (m_petStable->CurrentPet && m_petStable->CurrentPet->PetNumber == pet->GetCharmInfo()->GetPetNumber())
         {
-            m_petStable->UnslottedPets.push_back(std::move(*m_petStable->CurrentPet));
-            m_petStable->CurrentPet.reset();
+            if (mode == PET_SAVE_NOT_IN_SLOT)
+            {
+                m_petStable->UnslottedPets.push_back(std::move(*m_petStable->CurrentPet));
+                m_petStable->CurrentPet.reset();
+            }
+            else if (mode == PET_SAVE_AS_DELETED)
+                m_petStable->CurrentPet.reset();
+            // else if (stable slots) handled in opcode handlers due to required swaps
+            // else (current pet) doesnt need to do anything
         }
-        else if (mode == PET_SAVE_AS_DELETED)
-            m_petStable->CurrentPet.reset();
-        // else if (stable slots) handled in opcode handlers due to required swaps
-        // else (current pet) doesnt need to do anything
 
         SetMinion(pet, false);
 
@@ -10592,7 +10594,7 @@ void Player::AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 ite
     // cooldown information stored in item prototype
     // This used in same way in WorldSession::HandleItemQuerySingleOpcode data sending to client.
 
-    bool useSpellCooldown = false;
+    bool useSpellCooldown = spellInfo->HasAttribute(SPELL_ATTR7_CAN_BE_MULTI_CAST);
     if (itemId)
     {
         if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId))
@@ -12559,8 +12561,13 @@ void Player::SetMover(Unit* target)
         LOG_INFO("misc", "Player::SetMover (B2) - {}, {}, {}, {}, {}, {}, {}, {}", target->GetGUID().ToString(), target->GetMapId(), target->GetInstanceId(), target->FindMap()->GetId(), target->IsInWorld() ? 1 : 0, target->IsDuringRemoveFromWorld() ? 1 : 0, (target->ToPlayer() && target->ToPlayer()->IsBeingTeleported() ? 1 : 0), target->isBeingLoaded() ? 1 : 0);
     }
     m_mover->m_movedByPlayer = nullptr;
+    if (m_mover->GetTypeId() == TYPEID_UNIT)
+        m_mover->GetMotionMaster()->Initialize();
+
     m_mover = target;
     m_mover->m_movedByPlayer = this;
+    if (m_mover->GetTypeId() == TYPEID_UNIT)
+        m_mover->GetMotionMaster()->Initialize();
 }
 
 uint32 Player::GetCorpseReclaimDelay(bool pvp) const
@@ -13178,7 +13185,7 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
             return;
         }
 
-    if (!item->AllowedForPlayer(this))
+    if (!item->AllowedForPlayer(this, loot->sourceWorldObjectGUID))
     {
         SendLootRelease(GetLootGUID());
         return;

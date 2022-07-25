@@ -33,7 +33,9 @@ enum Spells
     SPELL_SUMMON_MANA_FIEND_1   = 25681, // TARGET_DEST_CASTER_FRONT
     SPELL_SUMMON_MANA_FIEND_2   = 25682, // TARGET_DEST_CASTER_LEFT
     SPELL_SUMMON_MANA_FIEND_3   = 25683, // TARGET_DEST_CASTER_RIGHT
-    SPELL_ENERGIZE              = 25685
+    SPELL_ENERGIZE              = 25685,
+
+    SPELL_LARGE_OBSIDIAN_CHUNK  = 27630 //  Server-side
 };
 
 enum Events
@@ -64,6 +66,7 @@ public:
         {
             _Reset();
             me->SetPower(POWER_MANA, 0);
+            me->SetRegeneratingPower(false);
             _isStonePhase = false;
             events.ScheduleEvent(EVENT_STONE_PHASE, 90000);
             //events.ScheduleEvent(EVENT_WIDE_SLASH, 11000);
@@ -101,6 +104,12 @@ public:
                 default:
                     break;
             }
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            _JustDied();
+            DoCastAOE(SPELL_LARGE_OBSIDIAN_CHUNK, true);
         }
 
         void UpdateAI(uint32 diff) override

@@ -35,7 +35,7 @@ enum Spells
     SPELL_BURU_TRANSFORM        = 24721,
     SPELL_SUMMON_HATCHLING      = 1881,
     SPELL_EXPLODE               = 19593,
-    SPELL_EXPLODE_2             = 5255,
+    SPELL_EXPLODE_2             = 5255, // Server-side script
     SPELL_BURU_EGG_TRIGGER      = 26646
 };
 
@@ -66,18 +66,19 @@ public:
 
     struct boss_buruAI : public BossAI
     {
-        boss_buruAI(Creature* creature) : BossAI(creature, DATA_BURU)
-        {
-        }
+        boss_buruAI(Creature* creature) : BossAI(creature, DATA_BURU) {}
 
         void EnterEvadeMode(EvadeReason why) override
         {
             BossAI::EnterEvadeMode(why);
 
             for (ObjectGuid const& guid : Eggs)
+            {
                 if (Creature* egg = me->GetMap()->GetCreature(guid))
+                {
                     egg->Respawn();
-
+                }
+            }
             Eggs.clear();
         }
 
@@ -86,25 +87,37 @@ public:
             _EnterCombat();
             Talk(EMOTE_TARGET, who);
             DoCast(me, SPELL_THORNS);
-
             events.ScheduleEvent(EVENT_DISMEMBER, 5000);
             events.ScheduleEvent(EVENT_GATHERING_SPEED, 9000);
             events.ScheduleEvent(EVENT_FULL_SPEED, 60000);
-
             _phase = PHASE_EGG;
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            if (InstanceScript* pInstance = me->GetInstanceScript())
+            {
+                pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_CREEPING_PLAGUE);
+            }
         }
 
         void DoAction(int32 action) override
         {
             if (action == ACTION_EXPLODE)
+            {
                 if (_phase == PHASE_EGG)
+                {
                     Unit::DealDamage(me, me, 45000);
+                }
+            }
         }
 
         void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
+            {
                 ChaseNewVictim();
+            }
         }
 
         void ChaseNewVictim()
@@ -116,7 +129,6 @@ public:
             me->RemoveAurasDueToSpell(SPELL_GATHERING_SPEED);
             events.ScheduleEvent(EVENT_GATHERING_SPEED, 9000);
             events.ScheduleEvent(EVENT_FULL_SPEED, 60000);
-
             if (Unit* victim = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
             {
                 DoResetThreat();
@@ -148,15 +160,15 @@ public:
                         events.ScheduleEvent(EVENT_DISMEMBER, 5000);
                         break;
                     case EVENT_GATHERING_SPEED:
-                        DoCast(me, SPELL_GATHERING_SPEED);
+                        DoCastSelf(SPELL_GATHERING_SPEED);
                         events.ScheduleEvent(EVENT_GATHERING_SPEED, 9000);
                         break;
                     case EVENT_FULL_SPEED:
-                        DoCast(me, SPELL_FULL_SPEED);
+                        DoCastSelf(SPELL_FULL_SPEED);
                         break;
                     case EVENT_CREEPING_PLAGUE:
-                        DoCast(me, SPELL_CREEPING_PLAGUE);
-                        events.ScheduleEvent(EVENT_CREEPING_PLAGUE, 6000);
+                        DoCastAOE(SPELL_CREEPING_PLAGUE);
+                        events.ScheduleEvent(EVENT_CREEPING_PLAGUE, urand(6250, 6500));
                         break;
                     case EVENT_RESPAWN_EGG:
                         if (Creature* egg = me->GetMap()->GetCreature(*Eggs.begin()))
@@ -172,12 +184,19 @@ public:
 
             if (me->GetHealthPct() < 20.0f && _phase == PHASE_EGG)
             {
-                DoCast(me, SPELL_BURU_TRANSFORM); // Enrage
-                DoCast(me, SPELL_FULL_SPEED, true);
+                DoCastSelf(SPELL_BURU_TRANSFORM);
+                DoCastSelf(SPELL_FULL_SPEED, true);
                 me->RemoveAurasDueToSpell(SPELL_THORNS);
+                events.CancelEvent(EVENT_DISMEMBER);
+                events.ScheduleEvent(EVENT_CREEPING_PLAGUE, 2000);
                 _phase = PHASE_TRANSFORM;
+                std::list<Creature*> RemainingEgg;
+                me->GetCreaturesWithEntryInRange(RemainingEgg, 100.0f, NPC_BURU_EGG);
+                for (std::list<Creature*>::const_iterator itr = RemainingEgg.begin(); itr != RemainingEgg.end(); ++itr)
+                {
+                    Unit::Kill(me, *itr);
+                }
             }
-
             DoMeleeAttackIfReady();
         }
     private:
@@ -207,27 +226,44 @@ public:
         void EnterCombat(Unit* attacker) override
         {
             if (Creature* buru = me->GetMap()->GetCreature(_instance->GetGuidData(DATA_BURU)))
+            {
                 if (!buru->IsInCombat())
+                {
                     buru->AI()->AttackStart(attacker);
+                }
+            }
         }
 
         void JustSummoned(Creature* who) override
         {
             if (who->GetEntry() == NPC_HATCHLING)
+            {
                 if (Creature* buru = me->GetMap()->GetCreature(_instance->GetGuidData(DATA_BURU)))
+                {
                     if (Unit* target = buru->AI()->SelectTarget(SelectTargetMethod::Random))
+                    {
                         who->AI()->AttackStart(target);
+                    }
+                }
+            }
         }
 
         void JustDied(Unit* /*killer*/) override
         {
-            DoCastAOE(SPELL_EXPLODE, true);
-            DoCastAOE(SPELL_EXPLODE_2, true); // Unknown purpose
-            DoCast(me, SPELL_SUMMON_HATCHLING, true);
-
             if (Creature* buru = me->GetMap()->GetCreature(_instance->GetGuidData(DATA_BURU)))
+            {
+                if (!buru->HasAura(SPELL_BURU_TRANSFORM))
+                {
+                    DoCast(me, SPELL_EXPLODE, true);
+                    DoCast(me, SPELL_EXPLODE_2, true);
+                    DoCast(me, SPELL_BURU_EGG_TRIGGER, true);
+                }
                 if (boss_buru::boss_buruAI* buruAI = dynamic_cast<boss_buru::boss_buruAI*>(buru->AI()))
+                {
                     buruAI->ManageRespawn(me->GetGUID());
+                }
+            }
+            DoCast(me, SPELL_SUMMON_HATCHLING, true);
         }
     private:
         InstanceScript* _instance;
@@ -251,13 +287,17 @@ public:
         void HandleAfterCast()
         {
             if (Creature* buru = GetCaster()->FindNearestCreature(NPC_BURU, 5.f))
+            {
                 buru->AI()->DoAction(ACTION_EXPLODE);
+            }
         }
 
         void HandleDummyHitTarget(SpellEffIndex /*effIndex*/)
         {
             if (Unit* target = GetHitUnit())
+            {
                 Unit::DealDamage(GetCaster(), target, -16 * GetCaster()->GetDistance(target) + 500);
+            }
         }
 
         void Register() override
