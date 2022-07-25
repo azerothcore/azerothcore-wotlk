@@ -289,8 +289,8 @@ typedef std::list<PlayerCreateInfoItem> PlayerCreateInfoItems;
 struct PlayerClassLevelInfo
 {
     PlayerClassLevelInfo()  = default;
-    uint16 basehealth{0};
-    uint16 basemana{0};
+    uint32 basehealth{0};
+    uint32 basemana{0};
 };
 
 struct PlayerClassInfo
@@ -302,9 +302,12 @@ struct PlayerClassInfo
 
 struct PlayerLevelInfo
 {
-    PlayerLevelInfo() { for (unsigned char & stat : stats) stat = 0; }
+    PlayerLevelInfo()
+    {
+        stats.fill(0);
+    }
 
-    uint8 stats[MAX_STATS];
+    std::array<uint32, MAX_STATS> stats = { };
 };
 
 typedef std::list<uint32> PlayerCreateInfoSpells;
@@ -2729,7 +2732,7 @@ public:
     ActionButtonList m_actionButtons;
 
     float m_auraBaseMod[BASEMOD_END][MOD_END];
-    int16 m_baseRatingValue[MAX_COMBAT_RATING];
+    int32 m_baseRatingValue[MAX_COMBAT_RATING];
     uint32 m_baseSpellPower;
     uint32 m_baseFeralAP;
     uint32 m_baseManaRegen;
