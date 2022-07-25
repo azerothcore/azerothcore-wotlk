@@ -40,8 +40,8 @@ enum Spells
 
 enum Events
 {
-    EVENT_TRAMPLE               = 1,
-    EVENT_DRAIN_MANA            = 2,
+    EVENT_SPELL_TRAMPLE         = 1,
+    EVENT_SPELL_DRAIN_MANA      = 2,
     EVENT_STONE_PHASE           = 3,
     EVENT_STONE_PHASE_END       = 4
 };
@@ -68,6 +68,8 @@ public:
             me->SetRegeneratingPower(false);
             _isStonePhase = false;
             events.ScheduleEvent(EVENT_STONE_PHASE, 90000);
+            events.ScheduleEvent(EVENT_SPELL_TRAMPLE, 9000);
+            events.ScheduleEvent(EVENT_SPELL_DRAIN_MANA, 3000);
         }
 
         void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
@@ -146,7 +148,7 @@ public:
                     case EVENT_STONE_PHASE:
                         DoAction(ACTION_STONE_PHASE_START);
                         break;
-                    case EVENT_DRAIN_MANA:
+                    case EVENT_SPELL_DRAIN_MANA:
                         {
                             std::list<Unit*> targetList;
                             {
@@ -164,9 +166,13 @@ public:
                             {
                                 DoCast(*itr, SPELL_DRAIN_MANA);
                             }
-                            events.ScheduleEvent(EVENT_DRAIN_MANA, urand(5000, 15000));
+                            events.ScheduleEvent(EVENT_SPELL_DRAIN_MANA, urand(2000, 6000));
                             break;
                         }
+                    case EVENT_SPELL_TRAMPLE:
+                            DoCastVictim(SPELL_TRAMPLE);
+                            events.ScheduleEvent(EVENT_SPELL_TRAMPLE, 15000);
+                            break;
                     default:
                         break;
                 }
