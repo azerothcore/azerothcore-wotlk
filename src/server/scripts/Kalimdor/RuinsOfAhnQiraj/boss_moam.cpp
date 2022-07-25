@@ -67,9 +67,6 @@ public:
             me->SetPower(POWER_MANA, 0);
             me->SetRegeneratingPower(false);
             _isStonePhase = false;
-            events.ScheduleEvent(EVENT_STONE_PHASE, 90000);
-            events.ScheduleEvent(EVENT_SPELL_TRAMPLE, 9000);
-            events.ScheduleEvent(EVENT_SPELL_DRAIN_MANA, 3000);
         }
 
         void DoAction(int32 action) override
@@ -97,6 +94,15 @@ public:
             }
         }
 
+        void EnterCombat(Unit* who) override
+        {
+            BossAI::EnterCombat(who);
+            Talk(EMOTE_AGGRO);
+            events.ScheduleEvent(EVENT_STONE_PHASE, 90000);
+            events.ScheduleEvent(EVENT_SPELL_TRAMPLE, 9000);
+            events.ScheduleEvent(EVENT_SPELL_DRAIN_MANA, 3000);
+        }
+
         void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
@@ -115,6 +121,7 @@ public:
                 {
                     DoAction(ACTION_STONE_PHASE_END);
                 }
+                Talk(EMOTE_MANA_FULL);
                 DoCastAOE(SPELL_ARCANE_ERUPTION);
                 me->SetPower(POWER_MANA, 0);
             }
