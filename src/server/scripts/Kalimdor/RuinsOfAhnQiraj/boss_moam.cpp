@@ -51,12 +51,6 @@ enum Events
     EVENT_STONE_PHASE_END       = 4
 };
 
-enum Actions
-{
-    ACTION_STONE_PHASE_START    = 1,
-    ACTION_STONE_PHASE_END      = 2
-};
-
 struct boss_moam : public BossAI
 {
     boss_moam(Creature* creature) : BossAI(creature, DATA_MOAM) {}
@@ -66,25 +60,6 @@ struct boss_moam : public BossAI
         _Reset();
         me->SetPower(POWER_MANA, 0);
         me->SetRegeneratingPower(false);
-    }
-
-    void DoAction(int32 action) override
-    {
-        switch (action)
-        {
-            case ACTION_STONE_PHASE_END:
-                me->RemoveAurasDueToSpell(SPELL_ENERGIZE);
-                events.ScheduleEvent(EVENT_STONE_PHASE, 90000);
-                break;
-            case ACTION_STONE_PHASE_START:
-                Talk(EMOTE_STONE_PHASE);
-                DoCastAOE(SPELL_SUMMON_MANA_FIENDS);
-                DoCastSelf(SPELL_ENERGIZE);
-                events.ScheduleEvent(EVENT_STONE_PHASE_END, 90000);
-                break;
-            default:
-                break;
-        }
     }
 
     void EnterCombat(Unit* who) override
@@ -106,7 +81,7 @@ struct boss_moam : public BossAI
     {
         if (!summons.IsAnyCreatureAlive() && me->HasAura(SPELL_ENERGIZE))
         {
-            DoAction(ACTION_STONE_PHASE_END);
+            events.RescheduleEvent(EVENT_STONE_PHASE_END, 1s);
         }
     }
 
@@ -119,35 +94,42 @@ struct boss_moam : public BossAI
 
         if (me->GetPower(POWER_MANA) == me->GetMaxPower(POWER_MANA))
         {
-            Talk(EMOTE_MANA_FULL);
-            DoCastAOE(SPELL_ARCANE_ERUPTION);
-
             if (me->HasAura(SPELL_ENERGIZE))
             {
-                DoAction(ACTION_STONE_PHASE_END);
+                me->RemoveAurasDueToSpell(SPELL_ENERGIZE);
+                events.RescheduleEvent(EVENT_STONE_PHASE_END, 1s);
             }
+
+            Talk(EMOTE_MANA_FULL);
+            DoCastAOE(SPELL_ARCANE_ERUPTION);
         }
 
         while (uint32 eventId = events.ExecuteEvent())
         {
             switch (eventId)
             {
-            case EVENT_STONE_PHASE:
-                DoAction(ACTION_STONE_PHASE_START);
-                break;
-            case EVENT_STONE_PHASE_END:
-                DoAction(ACTION_STONE_PHASE_END);
-                break;
-            case EVENT_SPELL_DRAIN_MANA:
-                DoCastAOE(SPELL_DRAIN_MANA_SERVERSIDE);
-                events.ScheduleEvent(EVENT_SPELL_DRAIN_MANA, urand(2000, 6000));
-                break;
-            case EVENT_SPELL_TRAMPLE:
-                DoCastVictim(SPELL_TRAMPLE);
-                events.ScheduleEvent(EVENT_SPELL_TRAMPLE, 15000);
-                break;
-            default:
-                break;
+                case EVENT_STONE_PHASE:
+                    Talk(EMOTE_STONE_PHASE);
+                    DoCastAOE(SPELL_SUMMON_MANA_FIENDS);
+                    DoCastSelf(SPELL_ENERGIZE);
+                    events.CancelEvent(EVENT_SPELL_DRAIN_MANA);
+                    events.ScheduleEvent(EVENT_STONE_PHASE_END, 90000);
+                    break;
+                case EVENT_STONE_PHASE_END:
+                    me->RemoveAurasDueToSpell(SPELL_ENERGIZE);
+                    events.ScheduleEvent(EVENT_SPELL_DRAIN_MANA, urand(2000, 6000));
+                    events.ScheduleEvent(EVENT_STONE_PHASE, 90000);
+                    break;
+                case EVENT_SPELL_DRAIN_MANA:
+                    DoCastAOE(SPELL_DRAIN_MANA_SERVERSIDE);
+                    events.ScheduleEvent(EVENT_SPELL_DRAIN_MANA, urand(2000, 6000));
+                    break;
+                case EVENT_SPELL_TRAMPLE:
+                    DoCastAOE(SPELL_TRAMPLE);
+                    events.ScheduleEvent(EVENT_SPELL_TRAMPLE, 15000);
+                    break;
+                default:
+                    break;
             }
         }
 
