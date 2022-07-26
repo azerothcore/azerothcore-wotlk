@@ -17,6 +17,7 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "ruins_of_ahnqiraj.h"
 
 enum Texts
@@ -31,6 +32,7 @@ enum Spells
     SPELL_DRAIN_MANA_SERVERSIDE = 25676,
     SPELL_DRAIN_MANA            = 25671,
     SPELL_ARCANE_ERUPTION       = 25672,
+    SPELL_SUMMON_MANA_FIENDS    = 25684,
     SPELL_SUMMON_MANA_FIEND_1   = 25681, // TARGET_DEST_CASTER_FRONT
     SPELL_SUMMON_MANA_FIEND_2   = 25682, // TARGET_DEST_CASTER_LEFT
     SPELL_SUMMON_MANA_FIEND_3   = 25683, // TARGET_DEST_CASTER_RIGHT
@@ -83,9 +85,7 @@ public:
                     }
                 case ACTION_STONE_PHASE_START:
                     {
-                        DoCastSelf(SPELL_SUMMON_MANA_FIEND_1);
-                        DoCastSelf(SPELL_SUMMON_MANA_FIEND_2);
-                        DoCastSelf(SPELL_SUMMON_MANA_FIEND_3);
+                        DoCastAOE(SPELL_SUMMON_MANA_FIENDS);
                         DoCastSelf(SPELL_ENERGIZE);
                         events.ScheduleEvent(EVENT_STONE_PHASE_END, 90000);
                         break;
@@ -108,6 +108,14 @@ public:
         {
             _JustDied();
             DoCastAOE(SPELL_LARGE_OBSIDIAN_CHUNK, true);
+        }
+
+        void SummonedCreatureDies(Creature* /*creature*/, Unit* /*killer*/) override
+        {
+            if (!summons.IsAnyCreatureAlive())
+            {
+                DoAction(ACTION_STONE_PHASE_END);
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -135,14 +143,12 @@ public:
                         break;
                     case EVENT_SPELL_DRAIN_MANA:
                         DoCastAOE(SPELL_DRAIN_MANA_SERVERSIDE);
-                        {
-                            events.ScheduleEvent(EVENT_SPELL_DRAIN_MANA, urand(2000, 6000));
-                            break;
-                        }
+                        events.ScheduleEvent(EVENT_SPELL_DRAIN_MANA, urand(2000, 6000));
+                        break;
                     case EVENT_SPELL_TRAMPLE:
-                            DoCastVictim(SPELL_TRAMPLE);
-                            events.ScheduleEvent(EVENT_SPELL_TRAMPLE, 15000);
-                            break;
+                        DoCastVictim(SPELL_TRAMPLE);
+                        events.ScheduleEvent(EVENT_SPELL_TRAMPLE, 15000);
+                        break;
                     default:
                         break;
                 }
@@ -187,8 +193,30 @@ class spell_moam_mana_drain_filter : public SpellScript
     }
 };
 
+// 25684 - Summon Mana Fiends (Server-side)
+class spell_moam_summon_mana_fiends : public SpellScript
+{
+    PrepareSpellScript(spell_moam_summon_mana_fiends);
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        const uint32 spellIds[3] = { SPELL_SUMMON_MANA_FIEND_1, SPELL_SUMMON_MANA_FIEND_2, SPELL_SUMMON_MANA_FIEND_3 };
+
+        for (uint32 spellId : spellIds)
+        {
+            GetCaster()->CastSpell((Unit*)nullptr, spellId, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_moam_summon_mana_fiends::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_boss_moam()
 {
     new boss_moam();
     RegisterSpellScript(spell_moam_mana_drain_filter);
+    RegisterSpellScript(spell_moam_summon_mana_fiends);
 }
