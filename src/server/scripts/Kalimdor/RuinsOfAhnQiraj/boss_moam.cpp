@@ -148,6 +148,11 @@ class spell_moam_mana_drain_filter : public SpellScript
         {
             return !target->IsPlayer() || target->ToPlayer()->getPowerType() != POWER_MANA;
         });
+
+        if (!targets.empty())
+        {
+            Acore::Containers::RandomResize(targets, 6);
+        }
     }
 
     void HandleScript(SpellEffIndex /*effIndex*/)
