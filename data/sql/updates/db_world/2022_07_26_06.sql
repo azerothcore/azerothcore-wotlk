@@ -1,3 +1,4 @@
+-- DB update 2022_07_26_05 -> 2022_07_26_06
 --
 UPDATE `creature_text` SET `BroadcastTextId` = 1456 WHERE `CreatureID` = 10000 AND `GroupID` = 0;
 UPDATE `creature_text` SET `BroadcastTextId` = 5680 WHERE `CreatureID` = 10000 AND `GroupID` = 1;
