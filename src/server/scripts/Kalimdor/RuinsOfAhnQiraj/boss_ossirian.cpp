@@ -84,7 +84,7 @@ struct boss_ossirian : public BossAI
 
     void Reset() override
     {
-        _Reset();
+        BossAI::Reset();
         CrystalIterator = 0;
         TriggerGUID.Clear();
         CrystalGUID.Clear();
@@ -117,9 +117,9 @@ struct boss_ossirian : public BossAI
         }
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void EnterCombat(Unit* who) override
     {
-        _EnterCombat();
+        BossAI::EnterCombat(who);
         events.Reset();
         events.ScheduleEvent(EVENT_SILENCE, 30s);
         events.ScheduleEvent(EVENT_CYCLONE, 20s);
@@ -156,10 +156,10 @@ struct boss_ossirian : public BossAI
         BossAI::EnterEvadeMode(why);
     }
 
-    void JustDied(Unit* /*killer*/) override
+    void JustDied(Unit* killer) override
     {
         Cleanup();
-        _JustDied();
+        BossAI::JustDied(killer);
     }
 
     void Cleanup()
