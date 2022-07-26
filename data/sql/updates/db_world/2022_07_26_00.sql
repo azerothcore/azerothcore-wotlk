@@ -1,3 +1,4 @@
+-- DB update 2022_07_25_08 -> 2022_07_26_00
 --
 
 UPDATE `creature_template` SET `mingold`=0, `maxgold`=0, `AIName`='SmartAI' WHERE `entry`=15527;
