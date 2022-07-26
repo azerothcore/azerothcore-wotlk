@@ -28,6 +28,13 @@
 
 namespace FactorySelector
 {
+    template <class T, class Value>
+    inline int32 GetPermitFor(T const* obj, Value const& value)
+    {
+        Permissible<T> const* const p = ASSERT_NOTNULL(dynamic_cast<Permissible<T> const*>(value.second.get()));
+        return p->Permit(obj);
+    }
+
     template <class T>
     struct PermissibleOrderPred
     {
@@ -37,50 +44,57 @@ namespace FactorySelector
         template <class Value>
         bool operator()(Value const& left, Value const& right) const
         {
-            Permissible<T> const* leftPermit = ASSERT_NOTNULL(dynamic_cast<Permissible<T> const*>(left.second.get()));
-            Permissible<T> const* rightPermit = ASSERT_NOTNULL(dynamic_cast<Permissible<T> const*>(right.second.get()));
-
-            return leftPermit->Permit(_obj) < rightPermit->Permit(_obj);
+            return GetPermitFor(_obj, left) < GetPermitFor(_obj, right);
         }
 
     private:
         T const* const _obj;
     };
 
-    CreatureAI* SelectAI(Creature* creature)
+    template <class AI, class T>
+    inline FactoryHolder<AI, T> const* SelectFactory(T* obj)
     {
-        CreatureAICreator const* ai_factory = nullptr;
+        static_assert(std::is_same<AI, CreatureAI>::value || std::is_same<AI, GameObjectAI>::value, "Invalid template parameter");
+        static_assert(std::is_same<AI, CreatureAI>::value == std::is_same<T, Creature>::value, "Incompatible AI for type");
+        static_assert(std::is_same<AI, GameObjectAI>::value == std::is_same<T, GameObject>::value, "Incompatible AI for type");
 
-        // scriptname in db
-        if (!ai_factory)
-            if (CreatureAI* scriptedAI = sScriptMgr->GetCreatureAI(creature))
-                return scriptedAI;
+        using AIRegistry = typename FactoryHolder<AI, T>::FactoryHolderRegistry;
 
-        // AIname in db
-        std::string const& aiName = creature->GetAIName();
-        if (!ai_factory && !aiName.empty())
-            ai_factory = sCreatureAIRegistry->GetRegistryItem(aiName);
+        // AIName in db
+        std::string const& aiName = obj->GetAIName();
+        if (!aiName.empty())
+            return AIRegistry::instance()->GetRegistryItem(aiName);
 
         // select by permit check
-        if (!ai_factory)
-        {
-            CreatureAIRegistry::RegistryMapType const& items = sCreatureAIRegistry->GetRegisteredItems();
-            auto itr = std::max_element(items.begin(), items.end(), PermissibleOrderPred<Creature>(creature));
-            if (itr != items.end())
-                ai_factory = itr->second.get();
-        }
+        typename AIRegistry::RegistryMapType const& items = AIRegistry::instance()->GetRegisteredItems();
+        auto itr = std::max_element(items.begin(), items.end(), PermissibleOrderPred<T>(obj));
+        if (itr != items.end() && GetPermitFor(obj, *itr) >= 0)
+            return itr->second.get();
 
-        if (!ai_factory)
-            ai_factory = sCreatureAIRegistry->GetRegistryItem("NullCreatureAI");
+        // should _never_ happen, Null AI types defined as PERMIT_BASE_IDLE, it must've been found
+        ABORT();
+        return nullptr;
+    }
 
-        return ASSERT_NOTNULL(ai_factory)->Create(creature);
+    CreatureAI* SelectAI(Creature* creature)
+    {
+        // special pet case, if a tamed creature uses AIName (example SmartAI) we need to override it
+        if (creature->IsPet())
+            return ASSERT_NOTNULL(sCreatureAIRegistry->GetRegistryItem("PetAI"))->Create(creature);
+
+        // scriptname in db
+        if (CreatureAI* scriptedAI = sScriptMgr->GetCreatureAI(creature))
+            return scriptedAI;
+
+        return SelectFactory<CreatureAI>(creature)->Create(creature);
     }
 
     MovementGenerator* SelectMovementGenerator(Unit* unit)
     {
         MovementGeneratorType type = IDLE_MOTION_TYPE;
-        if (unit->GetTypeId() == TYPEID_UNIT)
-            type = unit->ToCreature()->GetDefaultMovementType();
+        if (Creature* creature = unit->ToCreature())
+            if (!creature->GetCharmerOrOwnerPlayerOrPlayerItself())
+                type = creature->GetDefaultMovementType();
 
         MovementGeneratorCreator const* mv_factory = sMovementGeneratorRegistry->GetRegistryItem(type);
         return ASSERT_NOTNULL(mv_factory)->Create(unit);
@@ -88,29 +102,10 @@ namespace FactorySelector
 
     GameObjectAI* SelectGameObjectAI(GameObject* go)
     {
-        GameObjectAICreator const* ai_factory = nullptr;
-
         // scriptname in db
         if (GameObjectAI* scriptedAI = sScriptMgr->GetGameObjectAI(go))
             return scriptedAI;
 
-        // AIname in db
-        std::string const& aiName = go->GetAIName();
-        if (!ai_factory && !aiName.empty())
-            ai_factory = sGameObjectAIRegistry->GetRegistryItem(aiName);
-
-        // select by permit check
-        if (!ai_factory)
-        {
-            GameObjectAIRegistry::RegistryMapType const& items = sGameObjectAIRegistry->GetRegisteredItems();
-            auto itr = std::max_element(items.begin(), items.end(), PermissibleOrderPred<GameObject>(go));
-            if (itr != items.end())
-                ai_factory = itr->second.get();
-        }
-
-        if (!ai_factory)
-            ai_factory = sGameObjectAIRegistry->GetRegistryItem("NullGameObjectAI");
-
-        return ASSERT_NOTNULL(ai_factory)->Create(go);
+        return SelectFactory<GameObjectAI>(go)->Create(go);
     }
 }

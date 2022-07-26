@@ -1567,6 +1567,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Initializing PlayerDump tables...");
     PlayerDump::InitializeTables();
 
+    ///- Initilize static helper structures
+    AIRegistry::Initialize();
+
     LOG_INFO("server.loading", "Loading SpellInfo store...");
     sSpellMgr->LoadSpellInfoStore();
 
@@ -2034,9 +2037,6 @@ void World::SetInitialWorldSettings()
     m_timers[WUPDATE_WHO_LIST].SetInterval(5 * IN_MILLISECONDS); // update who list cache every 5 seconds
 
     mail_expire_check_timer = GameTime::GetGameTime() + 6h;
-
-    ///- Initilize static helper structures
-    AIRegistry::Initialize();
 
     ///- Initialize MapMgr
     LOG_INFO("server.loading", "Starting Map System");
