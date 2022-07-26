@@ -69,32 +69,32 @@ Position CrystalCoordinates[NUM_CRYSTALS] =
     { -9406.73f,     1863.13f,     85.5558f,   0.0f }
 };
 
-float RoomRadius = 165.0f;
+float roomRadius = 165.0f;
 uint8 const NUM_TORNADOS = 2;
 uint8 const NUM_WEAKNESS = 5;
-uint32 const SpellWeakness[NUM_WEAKNESS] = { 25177, 25178, 25180, 25181, 25183 };
+uint32 const spellWeakness[NUM_WEAKNESS] = { 25177, 25178, 25180, 25181, 25183 };
 Position const RoomCenter = { -9343.041992f, 1923.278198f, 85.555984f, 0.0 };
 
 struct boss_ossirian : public BossAI
 {
     boss_ossirian(Creature* creature) : BossAI(creature, DATA_OSSIRIAN)
     {
-        SaidIntro = false;
+        _saidIntro = false;
     }
 
     void Reset() override
     {
         BossAI::Reset();
-        CrystalIterator = 0;
-        TriggerGUID.Clear();
-        CrystalGUID.Clear();
+        _crystalIterator = 0;
+        _triggerGUID.Clear();
+        _crystalGUID.Clear();
     }
 
     void SpellHit(Unit* caster, SpellInfo const* spell) override
     {
-        for (uint8 i = 0; i < NUM_WEAKNESS; ++i)
+        for (uint8 weakness : spellWeakness)
         {
-            if (spell->Id == SpellWeakness[i])
+            if (spell->Id == weakness)
             {
                 me->RemoveAurasDueToSpell(SPELL_STRENGHT_OF_OSSIRIAN);
                 ((TempSummon*)caster)->UnSummon();
@@ -107,11 +107,11 @@ struct boss_ossirian : public BossAI
     {
         if (action == ACTION_TRIGGER_WEAKNESS)
         {
-            if (Creature* Trigger = me->GetMap()->GetCreature(TriggerGUID))
+            if (Creature* trigger = me->GetMap()->GetCreature(_triggerGUID))
             {
-                if (!Trigger->HasUnitState(UNIT_STATE_CASTING))
+                if (!trigger->HasUnitState(UNIT_STATE_CASTING))
                 {
-                    Trigger->CastSpell(Trigger, SpellWeakness[urand(0, 4)], false);
+                    trigger->CastSpell(trigger, spellWeakness[urand(0, 4)], false);
                 }
             }
         }
@@ -135,7 +135,7 @@ struct boss_ossirian : public BossAI
         map->SendToPlayers(weather.Write());
         for (uint8 i = 0; i < NUM_TORNADOS; ++i)
         {
-            Position Point = me->GetRandomPoint(RoomCenter, RoomRadius);
+            Position Point = me->GetRandomPoint(RoomCenter, roomRadius);
             if (Creature* Tornado = me->GetMap()->SummonCreature(NPC_SAND_VORTEX, Point))
             {
                 Tornado->CastSpell(Tornado, SPELL_SAND_STORM, true);
@@ -164,29 +164,29 @@ struct boss_ossirian : public BossAI
 
     void Cleanup()
     {
-        if (GameObject* Crystal = me->GetMap()->GetGameObject(CrystalGUID))
+        if (GameObject* crystal = me->GetMap()->GetGameObject(_crystalGUID))
         {
-            Crystal->Use(me);
+            crystal->Use(me);
         }
     }
 
     void SpawnNextCrystal()
     {
-        if (CrystalIterator == NUM_CRYSTALS)
-            CrystalIterator = 0;
+        if (_crystalIterator == NUM_CRYSTALS)
+            _crystalIterator = 0;
 
-        if (Creature* Trigger = me->GetMap()->SummonCreature(NPC_OSSIRIAN_TRIGGER, CrystalCoordinates[CrystalIterator]))
+        if (Creature* trigger = me->GetMap()->SummonCreature(NPC_OSSIRIAN_TRIGGER, CrystalCoordinates[_crystalIterator]))
         {
-            TriggerGUID = Trigger->GetGUID();
-            if (GameObject* Crystal = Trigger->SummonGameObject(GO_OSSIRIAN_CRYSTAL,
-                CrystalCoordinates[CrystalIterator].GetPositionX(),
-                CrystalCoordinates[CrystalIterator].GetPositionY(),
-                CrystalCoordinates[CrystalIterator].GetPositionZ(),
+            _triggerGUID = trigger->GetGUID();
+            if (GameObject* crystal = trigger->SummonGameObject(GO_OSSIRIAN_CRYSTAL,
+                CrystalCoordinates[_crystalIterator].GetPositionX(),
+                CrystalCoordinates[_crystalIterator].GetPositionY(),
+                CrystalCoordinates[_crystalIterator].GetPositionZ(),
                 0, 0, 0, 0, 0, uint32(-1)))
             {
-                CrystalGUID = Crystal->GetGUID();
-                ++CrystalIterator;
-                Crystal->SetOwnerGUID(ObjectGuid::Empty);
+                _crystalGUID = crystal->GetGUID();
+                ++_crystalIterator;
+                crystal->SetOwnerGUID(ObjectGuid::Empty);
             }
         }
     }
@@ -194,10 +194,10 @@ struct boss_ossirian : public BossAI
     void MoveInLineOfSight(Unit* who) override
 
     {
-        if (!SaidIntro)
+        if (!_saidIntro)
         {
             Talk(SAY_INTRO);
-            SaidIntro = true;
+            _saidIntro = true;
         }
         BossAI::MoveInLineOfSight(who);
     }
@@ -208,24 +208,24 @@ struct boss_ossirian : public BossAI
             return;
 
         events.Update(diff);
-        bool ApplySupreme = true;
+        bool applySupreme = true;
         if (me->HasAura(SPELL_STRENGHT_OF_OSSIRIAN))
         {
-            ApplySupreme = false;
+            applySupreme = false;
         }
         else
         {
-            for (uint8 i = 0; i < NUM_WEAKNESS; ++i)
+            for (uint8 weakness : spellWeakness)
             {
-                if (me->HasAura(SpellWeakness[i]))
+                if (me->HasAura(weakness))
                 {
-                    ApplySupreme = false;
+                    applySupreme = false;
                     break;
                 }
             }
         }
 
-        if (ApplySupreme)
+        if (applySupreme)
         {
             DoCastSelf(SPELL_STRENGHT_OF_OSSIRIAN);
             Talk(SAY_SUPREME);
@@ -255,10 +255,10 @@ struct boss_ossirian : public BossAI
     }
 
 protected:
-    ObjectGuid TriggerGUID;
-    ObjectGuid CrystalGUID;
-    uint8 CrystalIterator;
-    bool SaidIntro;
+    ObjectGuid _triggerGUID;
+    ObjectGuid _crystalGUID;
+    uint8 _crystalIterator;
+    bool _saidIntro;
 };
 
 class go_ossirian_crystal : public GameObjectScript
