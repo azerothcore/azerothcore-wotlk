@@ -300,6 +300,7 @@ public:
 
     bool isRegeneratingHealth() { return m_regenHealth; }
     void SetRegeneratingHealth(bool c) { m_regenHealth = c; }
+    void SetRegeneratingPower(bool c) { m_regenPower = c; }
     [[nodiscard]] virtual uint8 GetPetAutoSpellSize() const { return MAX_SPELL_CHARM; }
     [[nodiscard]] virtual uint32 GetPetAutoSpellOnPos(uint8 pos) const
     {
@@ -417,6 +418,7 @@ protected:
     bool m_AlreadyCallAssistance;
     bool m_AlreadySearchedAssistance;
     bool m_regenHealth;
+    bool m_regenPower;
     bool m_AI_locked;
 
     SpellSchoolMask m_meleeDamageSchoolMask;

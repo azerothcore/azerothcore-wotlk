@@ -22,16 +22,6 @@
 
 enum Yells
 {
-    // The time of our retribution is at hand! Let darkness reign in the hearts of our enemies! Sound: 8645 Emote: 35
-    SAY_ANDOROV_INTRO         = 0,   // Before for the first wave
-    SAY_ANDOROV_ATTACK        = 1,   // Beginning the event
-
-    SAY_WAVE3                 = 0,
-    SAY_WAVE4                 = 1,
-    SAY_WAVE5                 = 2,
-    SAY_WAVE6                 = 3,
-    SAY_WAVE7                 = 4,
-    SAY_INTRO                 = 5,
     SAY_UNK1                  = 6,
     SAY_UNK2                  = 7,
     SAY_UNK3                  = 8,
@@ -63,27 +53,25 @@ public:
 
     struct boss_rajaxxAI : public BossAI
     {
-        boss_rajaxxAI(Creature* creature) : BossAI(creature, DATA_RAJAXX)
-        {
-        }
+        boss_rajaxxAI(Creature* creature) : BossAI(creature, DATA_RAJAXX) { }
 
         void Reset() override
         {
             _Reset();
             enraged = false;
-            events.ScheduleEvent(EVENT_DISARM, 10000);
-            events.ScheduleEvent(EVENT_THUNDERCRASH, 12000);
         }
 
         void JustDied(Unit* /*killer*/) override
         {
-            //SAY_DEATH
+            Talk(SAY_DEATH);
             _JustDied();
         }
 
         void EnterCombat(Unit* /*victim*/) override
         {
             _EnterCombat();
+            events.ScheduleEvent(EVENT_DISARM, 10000);
+            events.ScheduleEvent(EVENT_THUNDERCRASH, 12000);
         }
 
         void UpdateAI(uint32 diff) override
