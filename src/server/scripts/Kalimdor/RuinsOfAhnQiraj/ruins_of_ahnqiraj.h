@@ -32,7 +32,17 @@ enum DataTypes
     DATA_OSSIRIAN           = 5,
     NUM_ENCOUNTER           = 6,
 
-    DATA_PARALYZED          = 7
+    DATA_PARALYZED          = 7,
+
+    DATA_QUUEZ              = 8,
+    DATA_TUUBID             = 9,
+    DATA_DRENN              = 10,
+    DATA_XURREM             = 11,
+    DATA_YEGGETH            = 12,
+    DATA_PAKKON             = 13,
+    DATA_ZERRAN             = 14,
+
+    DATA_ENGAGED_FORMATION  = 1
 };
 
 enum Creatures
@@ -52,7 +62,16 @@ enum Creatures
     NPC_BURU_EGG                = 15514,
     NPC_LARVA                   = 15555,
     NPC_SWARMER                 = 15546,
-    NPC_HORNET                  = 15934
+    NPC_HORNET                  = 15934,
+
+    // Rajaxx
+    NPC_QUUEZ                   = 15391,
+    NPC_TUUBID                  = 15392,
+    NPC_DRENN                   = 15389,
+    NPC_XURREM                  = 15390,
+    NPC_YEGGETH                 = 15386,
+    NPC_PAKKON                  = 15388,
+    NPC_ZERRAN                  = 15385
 };
 
 enum GameObjects
