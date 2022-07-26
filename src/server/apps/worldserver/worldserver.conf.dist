@@ -2423,7 +2423,16 @@ Rate.InstanceResetTime = 1
 #       The lower the rate the less experience is required.
 #        Default:     0.05
 #
+
 Rate.Pet.LevelXP = 0.05
+
+#
+#    WaterBreath.Timer
+#        Description: The timer for player's breath underwater in milliseconds
+#        Default:     180000 (3 minutes)
+#
+
+WaterBreath.Timer = 180000
 
 #
 #    SkillGain.Crafting
