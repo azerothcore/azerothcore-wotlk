@@ -21,6 +21,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "SpellScript.h"
 #include "ruins_of_ahnqiraj.h"
 #include "TaskScheduler.h"
 
@@ -40,7 +41,14 @@ enum Spells
     SPELL_WAR_STOMP             = 25188,
     SPELL_STRENGHT_OF_OSSIRIAN  = 25176,
     SPELL_SAND_STORM            = 25160,
-    SPELL_SUMMON_CRYSTAL        = 25192
+    SPELL_SUMMON_CRYSTAL        = 25192,
+
+    // Crystal
+    SPELL_FIRE_WEAKNESS         = 25177,
+    SPELL_FROST_WEAKNESS        = 25178,
+    SPELL_NATURE_WEAKNESS       = 25180,
+    SPELL_ARCANE_WEAKNESS       = 25181,
+    SPELL_SHADOW_WEAKNESS       = 25183
 };
 
 enum Actions
@@ -72,7 +80,8 @@ Position CrystalCoordinates[NUM_CRYSTALS] =
 float roomRadius = 165.0f;
 uint8 const NUM_TORNADOS = 2;
 uint8 const NUM_WEAKNESS = 5;
-uint32 const spellWeakness[NUM_WEAKNESS] = { 25177, 25178, 25180, 25181, 25183 };
+uint32 const spellWeakness[NUM_WEAKNESS] =
+{ SPELL_FIRE_WEAKNESS, SPELL_FROST_WEAKNESS, SPELL_NATURE_WEAKNESS, SPELL_ARCANE_WEAKNESS, SPELL_SHADOW_WEAKNESS };
 Position const RoomCenter = { -9343.041992f, 1923.278198f, 85.555984f, 0.0 };
 
 struct boss_ossirian : public BossAI
@@ -358,9 +367,28 @@ private:
     TaskScheduler _scheduler;
 };
 
+class spell_crystal_weakness : public SpellScript
+{
+    PrepareSpellScript(spell_crystal_weakness);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if([&](WorldObject const* target) -> bool
+            {
+                return target->GetEntry() != NPC_OSSIRIAN;
+            });
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_crystal_weakness::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENTRY);
+    }
+};
+
 void AddSC_boss_ossirian()
 {
     RegisterRuinsOfAhnQirajCreatureAI(boss_ossirian);
     new go_ossirian_crystal();
     RegisterCreatureAI(npc_anubisath_guardian);
+    RegisterSpellScript(spell_crystal_weakness);
 }
