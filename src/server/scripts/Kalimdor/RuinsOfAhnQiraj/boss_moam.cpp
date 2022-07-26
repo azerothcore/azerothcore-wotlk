@@ -15,21 +15,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "ruins_of_ahnqiraj.h"
 
 enum Texts
 {
-    EMOTE_AGGRO             = 0,
-    EMOTE_MANA_FULL         = 1
+    EMOTE_AGGRO                 = 0,
+    EMOTE_MANA_FULL             = 1,
+    EMOTE_STONE_PHASE           = 2
 };
 
 enum Spells
 {
     SPELL_TRAMPLE               = 15550,
+    SPELL_DRAIN_MANA_SERVERSIDE = 25676,
     SPELL_DRAIN_MANA            = 25671,
     SPELL_ARCANE_ERUPTION       = 25672,
+    SPELL_SUMMON_MANA_FIENDS    = 25684,
     SPELL_SUMMON_MANA_FIEND_1   = 25681, // TARGET_DEST_CASTER_FRONT
     SPELL_SUMMON_MANA_FIEND_2   = 25682, // TARGET_DEST_CASTER_LEFT
     SPELL_SUMMON_MANA_FIEND_3   = 25683, // TARGET_DEST_CASTER_RIGHT
@@ -40,157 +45,150 @@ enum Spells
 
 enum Events
 {
-    EVENT_TRAMPLE           = 1,
-    EVENT_DRAIN_MANA        = 2,
-    EVENT_STONE_PHASE       = 3,
-    EVENT_STONE_PHASE_END   = 4,
-    EVENT_WIDE_SLASH        = 5,
+    EVENT_SPELL_TRAMPLE         = 1,
+    EVENT_SPELL_DRAIN_MANA      = 2,
+    EVENT_STONE_PHASE           = 3,
+    EVENT_STONE_PHASE_END       = 4
 };
 
-enum Actions
+struct boss_moam : public BossAI
 {
-    ACTION_STONE_PHASE_START = 1,
-    ACTION_STONE_PHASE_END   = 2,
-};
+    boss_moam(Creature* creature) : BossAI(creature, DATA_MOAM) {}
 
-class boss_moam : public CreatureScript
-{
-public:
-    boss_moam() : CreatureScript("boss_moam") { }
-
-    struct boss_moamAI : public BossAI
+    void Reset() override
     {
-        boss_moamAI(Creature* creature) : BossAI(creature, DATA_MOAM)
-        {
-        }
+        _Reset();
+        me->SetPower(POWER_MANA, 0);
+        me->SetRegeneratingPower(false);
+    }
 
-        void Reset() override
-        {
-            _Reset();
-            me->SetPower(POWER_MANA, 0);
-            me->SetRegeneratingPower(false);
-            _isStonePhase = false;
-            events.ScheduleEvent(EVENT_STONE_PHASE, 90000);
-            //events.ScheduleEvent(EVENT_WIDE_SLASH, 11000);
-        }
+    void EnterCombat(Unit* who) override
+    {
+        BossAI::EnterCombat(who);
+        Talk(EMOTE_AGGRO);
+        events.ScheduleEvent(EVENT_STONE_PHASE, 90000);
+        events.ScheduleEvent(EVENT_SPELL_TRAMPLE, 9000);
+        events.ScheduleEvent(EVENT_SPELL_DRAIN_MANA, 3000);
+    }
 
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+    void JustDied(Unit* /*killer*/) override
+    {
+        _JustDied();
+        DoCastAOE(SPELL_LARGE_OBSIDIAN_CHUNK, true);
+    }
+
+    void SummonedCreatureDies(Creature* /*creature*/, Unit* /*killer*/) override
+    {
+        if (!summons.IsAnyCreatureAlive() && me->HasAura(SPELL_ENERGIZE))
         {
-            if (!_isStonePhase && HealthBelowPct(45))
+            events.RescheduleEvent(EVENT_STONE_PHASE_END, 1s);
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+
+        if (me->GetPower(POWER_MANA) == me->GetMaxPower(POWER_MANA))
+        {
+            if (me->HasAura(SPELL_ENERGIZE))
             {
-                _isStonePhase = true;
-                DoAction(ACTION_STONE_PHASE_START);
+                me->RemoveAurasDueToSpell(SPELL_ENERGIZE);
+                events.RescheduleEvent(EVENT_STONE_PHASE_END, 1s);
             }
+
+            Talk(EMOTE_MANA_FULL);
+            DoCastAOE(SPELL_ARCANE_ERUPTION);
         }
 
-        void DoAction(int32 action) override
+        while (uint32 eventId = events.ExecuteEvent())
         {
-            switch (action)
+            switch (eventId)
             {
-                case ACTION_STONE_PHASE_END:
-                    {
-                        me->RemoveAurasDueToSpell(SPELL_ENERGIZE);
-                        events.ScheduleEvent(EVENT_STONE_PHASE, 90000);
-                        _isStonePhase = false;
-                        break;
-                    }
-                case ACTION_STONE_PHASE_START:
-                    {
-                        DoCast(me, SPELL_SUMMON_MANA_FIEND_1);
-                        DoCast(me, SPELL_SUMMON_MANA_FIEND_2);
-                        DoCast(me, SPELL_SUMMON_MANA_FIEND_3);
-                        DoCast(me, SPELL_ENERGIZE);
-                        events.ScheduleEvent(EVENT_STONE_PHASE_END, 90000);
-                        break;
-                    }
+                case EVENT_STONE_PHASE:
+                    Talk(EMOTE_STONE_PHASE);
+                    DoCastAOE(SPELL_SUMMON_MANA_FIENDS);
+                    DoCastSelf(SPELL_ENERGIZE);
+                    events.CancelEvent(EVENT_SPELL_DRAIN_MANA);
+                    events.ScheduleEvent(EVENT_STONE_PHASE_END, 90000);
+                    break;
+                case EVENT_STONE_PHASE_END:
+                    me->RemoveAurasDueToSpell(SPELL_ENERGIZE);
+                    events.ScheduleEvent(EVENT_SPELL_DRAIN_MANA, urand(2000, 6000));
+                    events.ScheduleEvent(EVENT_STONE_PHASE, 90000);
+                    break;
+                case EVENT_SPELL_DRAIN_MANA:
+                    DoCastAOE(SPELL_DRAIN_MANA_SERVERSIDE);
+                    events.ScheduleEvent(EVENT_SPELL_DRAIN_MANA, urand(2000, 6000));
+                    break;
+                case EVENT_SPELL_TRAMPLE:
+                    DoCastAOE(SPELL_TRAMPLE);
+                    events.ScheduleEvent(EVENT_SPELL_TRAMPLE, 15000);
+                    break;
                 default:
                     break;
             }
         }
 
-        void JustDied(Unit* /*killer*/) override
-        {
-            _JustDied();
-            DoCastAOE(SPELL_LARGE_OBSIDIAN_CHUNK, true);
-        }
+        DoMeleeAttackIfReady();
+    }
+};
 
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
+// 25676 - Drain Mana (server-side)
+class spell_moam_mana_drain_filter : public SpellScript
+{
+    PrepareSpellScript(spell_moam_mana_drain_filter);
 
-            events.Update(diff);
-
-            if (me->GetPower(POWER_MANA) == me->GetMaxPower(POWER_MANA))
-            {
-                if (_isStonePhase)
-                    DoAction(ACTION_STONE_PHASE_END);
-                DoCastAOE(SPELL_ARCANE_ERUPTION);
-                me->SetPower(POWER_MANA, 0);
-            }
-
-            if (_isStonePhase)
-            {
-                if (events.ExecuteEvent() == EVENT_STONE_PHASE_END)
-                    DoAction(ACTION_STONE_PHASE_END);
-                return;
-            }
-
-            // Messing up mana-drain channel
-            //if (me->HasUnitState(UNIT_STATE_CASTING))
-            //    return;
-
-            while (uint32 eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    case EVENT_STONE_PHASE:
-                        DoAction(ACTION_STONE_PHASE_START);
-                        break;
-                    case EVENT_DRAIN_MANA:
-                        {
-                            std::list<Unit*> targetList;
-                            {
-                                const std::list<HostileReference*>& threatlist = me->GetThreatMgr().getThreatList();
-                                for (std::list<HostileReference*>::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
-                                    if ((*itr)->getTarget()->GetTypeId() == TYPEID_PLAYER && (*itr)->getTarget()->getPowerType() == POWER_MANA)
-                                        targetList.push_back((*itr)->getTarget());
-                            }
-
-                            Acore::Containers::RandomResize(targetList, 5);
-
-                            for (std::list<Unit*>::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
-                                DoCast(*itr, SPELL_DRAIN_MANA);
-
-                            events.ScheduleEvent(EVENT_DRAIN_MANA, urand(5000, 15000));
-                            break;
-                        }/*
-                        case EVENT_WIDE_SLASH:
-                            DoCast(me, SPELL_WIDE_SLASH);
-                            events.ScheduleEvent(EVENT_WIDE_SLASH, 11000);
-                            break;
-                        case EVENT_TRASH:
-                            DoCast(me, SPELL_TRASH);
-                            events.ScheduleEvent(EVENT_WIDE_SLASH, 16000);
-                            break;*/
-                    default:
-                        break;
-                }
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    private:
-        bool _isStonePhase;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        return GetRuinsOfAhnQirajAI<boss_moamAI>(creature);
+        targets.remove_if([&](WorldObject* target) -> bool
+        {
+            return !target->IsPlayer() || target->ToPlayer()->getPowerType() != POWER_MANA;
+        });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            caster->CastSpell(GetHitUnit(), SPELL_DRAIN_MANA, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_moam_mana_drain_filter::FilterTargets, EFFECT_ALL, TARGET_UNIT_DEST_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_moam_mana_drain_filter::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 25684 - Summon Mana Fiends (server-side)
+class spell_moam_summon_mana_fiends : public SpellScript
+{
+    PrepareSpellScript(spell_moam_summon_mana_fiends);
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        const uint32 spellIds[3] = { SPELL_SUMMON_MANA_FIEND_1, SPELL_SUMMON_MANA_FIEND_2, SPELL_SUMMON_MANA_FIEND_3 };
+
+        for (uint32 spellId : spellIds)
+        {
+            GetCaster()->CastSpell((Unit*)nullptr, spellId, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_moam_summon_mana_fiends::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
 void AddSC_boss_moam()
 {
-    new boss_moam();
+    RegisterRuinsOfAhnQirajCreatureAI(boss_moam);
+    RegisterSpellScript(spell_moam_mana_drain_filter);
+    RegisterSpellScript(spell_moam_summon_mana_fiends);
 }
