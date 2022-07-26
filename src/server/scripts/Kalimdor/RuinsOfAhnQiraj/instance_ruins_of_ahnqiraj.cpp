@@ -45,7 +45,8 @@ enum RajaxxWaveEvent
     SAY_WAVE7  = 4,
     SAY_ENGAGE = 5,
 
-    DATA_RAJAXX_WAVE_ENGAGED = 1
+    DATA_RAJAXX_WAVE_ENGAGED = 1,
+    GROUP_RAJAXX_WAVE_TIMER  = 1
 };
 
 std::array<uint32, 8> RajaxxWavesData[] =
@@ -136,9 +137,11 @@ public:
         {
             if (type == DATA_RAJAXX_WAVE_ENGAGED)
             {
+                _scheduler.CancelGroup(GROUP_RAJAXX_WAVE_TIMER);
                 _scheduler.Schedule(3min, [this](TaskContext context)
                 {
                     CallNextRajaxxLeader();
+                    context.SetGroup(GROUP_RAJAXX_WAVE_TIMER);
                     context.Repeat();
                 });
             }
