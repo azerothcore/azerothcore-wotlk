@@ -23,7 +23,8 @@
 enum Texts
 {
     EMOTE_AGGRO                 = 0,
-    EMOTE_MANA_FULL             = 1
+    EMOTE_MANA_FULL             = 1,
+    EMOTE_STONE_PHASE           = 2
 };
 
 enum Spells
@@ -77,19 +78,16 @@ public:
             switch (action)
             {
                 case ACTION_STONE_PHASE_END:
-                    {
-                        me->RemoveAurasDueToSpell(SPELL_ENERGIZE);
-                        events.ScheduleEvent(EVENT_STONE_PHASE, 90000);
-                        _isStonePhase = false;
-                        break;
-                    }
+                    me->RemoveAurasDueToSpell(SPELL_ENERGIZE);
+                    events.ScheduleEvent(EVENT_STONE_PHASE, 90000);
+                    _isStonePhase = false;
+                    break;
                 case ACTION_STONE_PHASE_START:
-                    {
-                        DoCastAOE(SPELL_SUMMON_MANA_FIENDS);
-                        DoCastSelf(SPELL_ENERGIZE);
-                        events.ScheduleEvent(EVENT_STONE_PHASE_END, 90000);
-                        break;
-                    }
+                    Talk(EMOTE_STONE_PHASE);
+                    DoCastAOE(SPELL_SUMMON_MANA_FIENDS);
+                    DoCastSelf(SPELL_ENERGIZE);
+                    events.ScheduleEvent(EVENT_STONE_PHASE_END, 90000);
+                    break;
                 default:
                     break;
             }
@@ -154,6 +152,7 @@ public:
                         break;
                 }
             }
+
             DoMeleeAttackIfReady();
         }
     private:
@@ -194,7 +193,7 @@ class spell_moam_mana_drain_filter : public SpellScript
     }
 };
 
-// 25684 - Summon Mana Fiends (Server-side)
+// 25684 - Summon Mana Fiends (server-side)
 class spell_moam_summon_mana_fiends : public SpellScript
 {
     PrepareSpellScript(spell_moam_summon_mana_fiends);
