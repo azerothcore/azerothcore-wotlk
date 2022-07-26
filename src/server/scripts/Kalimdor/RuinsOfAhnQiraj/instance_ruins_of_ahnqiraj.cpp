@@ -285,6 +285,7 @@ public:
         void ResetRajaxxWaves()
         {
             _rajaxWaveCounter = 0;
+            _scheduler.CancelAll();
             for (auto const& data : RajaxxWavesData)
             {
                 if (Creature* creature = GetCreature(data.at(0)))
