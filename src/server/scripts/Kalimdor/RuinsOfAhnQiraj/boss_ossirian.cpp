@@ -298,13 +298,15 @@ enum AnubisathGuardian
 
 struct npc_anubisath_guardian : public ScriptedAI
 {
-    npc_anubisath_guardian(Creature* creature) : ScriptedAI(creature) { }
+    npc_anubisath_guardian(Creature* creature) : ScriptedAI(creature)
+    {
+        _spells[0] = RAND(SPELL_SHADOW_STORM, SPELL_THUNDER_CLAP);
+        _spells[1] = RAND(SPELL_REFLECT_ARCANE_FIRE, SPELL_REFLECT_FROST_SHADOW);
+    }
 
     void Reset() override
     {
         _enraged = false;
-        _spells[0] = RAND(SPELL_SHADOW_STORM, SPELL_THUNDER_CLAP);
-        _spells[1] = RAND(SPELL_REFLECT_ARCANE_FIRE, SPELL_REFLECT_FROST_SHADOW);
 
         _scheduler.SetValidator([this]
         {
