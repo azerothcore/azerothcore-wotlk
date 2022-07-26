@@ -129,6 +129,7 @@ public:
             {
                 Talk(EMOTE_MANA_FULL);
                 DoCastAOE(SPELL_ARCANE_ERUPTION);
+                DoAction(ACTION_STONE_PHASE_END);
             }
 
             while (uint32 eventId = events.ExecuteEvent())
