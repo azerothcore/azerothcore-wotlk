@@ -88,6 +88,7 @@ public:
         EVADE_REASON_NO_HOSTILES,       // the creature's threat list is empty
         EVADE_REASON_BOUNDARY,          // the creature has moved outside its evade boundary
         EVADE_REASON_SEQUENCE_BREAK,    // this is a boss and the pre-requisite encounters for engaging it are not defeated yet
+        EVADE_REASON_NO_PATH,           // the creature was unable to reach its target for over 5 seconds
         EVADE_REASON_OTHER
     };
 
@@ -216,6 +217,8 @@ public:
     static bool IsInBounds(CreatureBoundary const& boundary, Position const* who);
     bool IsInBoundary(Position const* who = nullptr) const;
 
+    virtual bool OnTeleportUnreacheablePlayer(Player* /*player*/) { return false; }
+
 protected:
     void EngagementStart(Unit* who);
     void EngagementOver();
@@ -232,7 +235,7 @@ private:
     bool m_MoveInLineOfSight_locked;
 };
 
-enum Permitions
+enum Permitions : int32
 {
     PERMIT_BASE_NO                 = -1,
     PERMIT_BASE_IDLE               = 1,

@@ -58,6 +58,7 @@ public:
 
         void Reset() override
         {
+            _Reset();
             _flag = 0;
             _hpct = 75.0f;
             me->SetVisible(true);
@@ -96,9 +97,6 @@ public:
             if (_flag & (1 << 7))
                 _flag = 0;
 
-            if (Unit* Target = SelectTarget(SelectTargetMethod::Random))
-                creature->AI()->AttackStart(Target);
-
             float ImageHealthPct;
 
             if (me->GetHealthPct() < 25.0f)
@@ -110,12 +108,16 @@ public:
 
             creature->SetMaxHealth(me->GetMaxHealth() * ImageHealthPct);
             creature->SetHealth(creature->GetMaxHealth() * (me->GetHealthPct() / 100.0f));
+            BossAI::JustSummoned(creature);
         }
 
         void JustDied(Unit* /*killer*/) override
         {
             if (!me->IsSummon())
+            {
+                _JustDied();
                 Talk(SAY_DEATH);
+            }
             else
                 me->RemoveCorpse();
         }
@@ -169,7 +171,7 @@ public:
 
             if (!me->IsSummon() && me->GetHealthPct() < _hpct)
             {
-                DoCast(me, SPELL_SUMMON_IMAGES);
+                DoCast(me, SPELL_SUMMON_IMAGES, true);
                 Talk(SAY_SPLIT);
                 _hpct -= 25.0f;
                 me->SetVisible(false);

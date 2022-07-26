@@ -30,7 +30,7 @@ public:
     void AttackStart(Unit*) override {}
     void UpdateAI(uint32) override;
 
-    static int Permissible(Creature const*) { return PERMIT_BASE_IDLE;  }
+    static int32 Permissible(Creature const* /*creature*/) { return PERMIT_BASE_NO; }
 };
 
 class PossessedAI : public CreatureAI
@@ -49,7 +49,7 @@ public:
     void JustDied(Unit*) override;
     void KilledUnit(Unit* victim) override;
 
-    static int Permissible(Creature const*) { return PERMIT_BASE_IDLE;  }
+    static int32 Permissible(Creature const* /*creature*/) { return PERMIT_BASE_NO; }
 };
 
 class NullCreatureAI : public CreatureAI
@@ -65,7 +65,7 @@ public:
     void EnterEvadeMode(EvadeReason /*why*/) override {}
     void OnCharmed(bool /*apply*/) override {}
 
-    static int Permissible(Creature const*) { return PERMIT_BASE_IDLE;  }
+    static int32 Permissible(Creature const* creature);
 };
 
 class CritterAI : public PassiveAI
@@ -77,6 +77,7 @@ public:
     void EnterEvadeMode(EvadeReason why) override;
     void UpdateAI(uint32) override;
 
+    static int32 Permissible(Creature const* creature);
     // Xinef: Added
 private:
     uint32 _combatTimer;
@@ -87,6 +88,8 @@ class TriggerAI : public NullCreatureAI
 public:
     explicit TriggerAI(Creature* c) : NullCreatureAI(c) {}
     void IsSummonedBy(Unit* summoner) override;
+
+    static int32 Permissible(Creature const* creature);
 };
 
 #endif

@@ -25,7 +25,6 @@ enum Spells
     SPELL_STINGER_SPRAY         =  25749,
     SPELL_POISON_STINGER        =  25748,
     SPELL_PARALYZE              =  25725,
-    SPELL_TRASH                 =  3391,
     SPELL_FRENZY                =  8269,
     SPELL_LASH                  =  25852,
     SPELL_FEED                  =  25721
@@ -38,8 +37,7 @@ enum Events
     EVENT_SUMMON_SWARMER        = 3,
     EVENT_SWARMER_ATTACK        = 4,
     EVENT_PARALYZE              = 5,
-    EVENT_LASH                  = 6,
-    EVENT_TRASH                 = 7
+    EVENT_LASH                  = 6
 };
 
 enum Emotes
@@ -77,9 +75,7 @@ public:
 
     struct boss_ayamissAI : public BossAI
     {
-        boss_ayamissAI(Creature* creature) : BossAI(creature, DATA_AYAMISS)
-        {
-        }
+        boss_ayamissAI(Creature* creature) : BossAI(creature, DATA_AYAMISS) {}
 
         void Reset() override
         {
@@ -101,7 +97,9 @@ public:
                     break;
                 case NPC_HORNET:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random))
+                    {
                         who->AI()->AttackStart(target);
+                    }
                     break;
             }
         }
@@ -116,7 +114,7 @@ public:
                         me->AddUnitState(UNIT_STATE_ROOT);
                         break;
                     case POINT_GROUND:
-                        me->ClearUnitState(UNIT_STATE_ROOT);
+                        me->GetMotionMaster()->MoveChase(me->GetVictim());
                         break;
                 }
             }
@@ -131,16 +129,37 @@ public:
         void EnterCombat(Unit* attacker) override
         {
             BossAI::EnterCombat(attacker);
-
             events.ScheduleEvent(EVENT_STINGER_SPRAY, urand(20000, 30000));
             events.ScheduleEvent(EVENT_POISON_STINGER, 5000);
             events.ScheduleEvent(EVENT_SUMMON_SWARMER, 5000);
             events.ScheduleEvent(EVENT_SWARMER_ATTACK, 60000);
             events.ScheduleEvent(EVENT_PARALYZE, 15000);
-
             me->SetCanFly(true);
             me->SetDisableGravity(true);
             me->GetMotionMaster()->MovePoint(POINT_AIR, AyamissAirPos);
+        }
+
+        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+        {
+            if (_phase == PHASE_AIR && me->GetHealthPct() < 70.0f)
+            {
+                _phase = PHASE_GROUND;
+                SetCombatMovement(true);
+                me->ClearUnitState(UNIT_STATE_ROOT);
+                me->SetCanFly(false);
+                me->SetDisableGravity(false);
+                Position VictimPos = me->GetVictim()->GetPosition();
+                me->GetMotionMaster()->MovePoint(POINT_GROUND, VictimPos);
+                events.ScheduleEvent(EVENT_LASH, urand(5000, 8000));
+                events.CancelEvent(EVENT_POISON_STINGER);
+                ResetThreatList();
+            }
+            if (!_enraged && me->GetHealthPct() < 20.0f)
+            {
+                DoCastSelf(SPELL_FRENZY);
+                Talk(EMOTE_FRENZY);
+                _enraged = true;
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -149,37 +168,12 @@ public:
                 return;
 
             events.Update(diff);
-
-            if (_phase == PHASE_AIR && me->GetHealthPct() < 70.0f)
-            {
-                _phase = PHASE_GROUND;
-                SetCombatMovement(true);
-                me->SetCanFly(false);
-                Position VictimPos = me->GetVictim()->GetPosition();
-                me->GetMotionMaster()->MovePoint(POINT_GROUND, VictimPos);
-                ResetThreatList();
-                events.ScheduleEvent(EVENT_LASH, urand(5000, 8000));
-                events.ScheduleEvent(EVENT_TRASH, urand(3000, 6000));
-                events.CancelEvent(EVENT_POISON_STINGER);
-            }
-            else
-            {
-                DoMeleeAttackIfReady();
-            }
-
-            if (!_enraged && me->GetHealthPct() < 20.0f)
-            {
-                DoCast(me, SPELL_FRENZY);
-                Talk(EMOTE_FRENZY);
-                _enraged = true;
-            }
-
             while (uint32 eventId = events.ExecuteEvent())
             {
                 switch (eventId)
                 {
                     case EVENT_STINGER_SPRAY:
-                        DoCast(me, SPELL_STINGER_SPRAY);
+                        DoCastSelf(SPELL_STINGER_SPRAY);
                         events.ScheduleEvent(EVENT_STINGER_SPRAY, urand(15000, 20000));
                         break;
                     case EVENT_POISON_STINGER:
@@ -198,30 +192,32 @@ public:
                         break;
                     case EVENT_SWARMER_ATTACK:
                         for (ObjectGuid const& guid : _swarmers)
+                        {
                             if (Creature* swarmer = me->GetMap()->GetCreature(guid))
+                            {
                                 if (Unit* target = SelectTarget(SelectTargetMethod::Random))
+                                {
                                     swarmer->AI()->AttackStart(target);
-
+                                }
+                            }
+                        }
                         _swarmers.clear();
                         events.ScheduleEvent(EVENT_SWARMER_ATTACK, 60000);
                         break;
                     case EVENT_SUMMON_SWARMER:
                         {
                             Position Pos = me->GetRandomPoint(SwarmerPos, 80.0f);
-                            me->SummonCreature(NPC_SWARMER, Pos);
+                            me->SummonCreature(NPC_SWARMER, Pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
                             events.ScheduleEvent(EVENT_SUMMON_SWARMER, 5000);
                             break;
                         }
-                    case EVENT_TRASH:
-                        DoCastVictim(SPELL_TRASH);
-                        events.ScheduleEvent(EVENT_TRASH, urand(5000, 7000));
-                        break;
                     case EVENT_LASH:
                         DoCastVictim(SPELL_LASH);
                         events.ScheduleEvent(EVENT_LASH, urand(8000, 15000));
                         break;
                 }
             }
+            DoMeleeAttackIfReady();
         }
     private:
         GuidList _swarmers;
@@ -250,9 +246,15 @@ public:
         void MovementInform(uint32 type, uint32 id) override
         {
             if (type == POINT_MOTION_TYPE)
+            {
                 if (id == POINT_PARALYZE)
+                {
                     if (Player* target = ObjectAccessor::GetPlayer(*me, _instance->GetGuidData(DATA_PARALYZED)))
-                        DoCast(target, SPELL_FEED); // Omnomnom
+                    {
+                        DoCast(target, SPELL_FEED);
+                    }
+                }
+            }
         }
 
         void MoveInLineOfSight(Unit* who) override

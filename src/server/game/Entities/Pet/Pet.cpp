@@ -1156,7 +1156,9 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                         {
                             // xinef: Glyph of Felguard, so ugly im crying... no appropriate spell
                             if (AuraEffect* aurEff = owner->GetAuraEffectDummy(SPELL_GLYPH_OF_FELGUARD))
-                                SetModifierValue(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, 1.0f + float(aurEff->GetAmount() / 100.0f));
+                            {
+                                HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, aurEff->GetAmount(), true);
+                            }
 
                             break;
                         }

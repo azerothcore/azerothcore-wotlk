@@ -15,9 +15,48 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureGroups.h"
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
+#include "TaskScheduler.h"
 #include "ruins_of_ahnqiraj.h"
+
+ObjectData const creatureData[] =
+{
+    { NPC_BURU,      DATA_BURU      },
+    { NPC_KURINNAXX, DATA_KURINNAXX },
+    { NPC_RAJAXX,    DATA_RAJAXX    },
+    { NPC_OSSIRIAN,  DATA_OSSIRIAN  },
+    { NPC_QUUEZ,     DATA_QUUEZ     },
+    { NPC_TUUBID,    DATA_TUUBID    },
+    { NPC_DRENN,     DATA_DRENN     },
+    { NPC_XURREM,    DATA_XURREM    },
+    { NPC_YEGGETH,   DATA_YEGGETH   },
+    { NPC_PAKKON,    DATA_PAKKON    },
+    { NPC_ZERRAN,    DATA_ZERRAN    },
+};
+
+enum RajaxxText
+{
+    SAY_WAVE3  = 0,
+    SAY_WAVE4  = 1,
+    SAY_WAVE5  = 2,
+    SAY_WAVE6  = 3,
+    SAY_WAVE7  = 4,
+    SAY_ENGAGE = 5
+};
+
+std::array<uint32, 8> RajaxxWavesData[] =
+{
+    { DATA_QUUEZ,     0          },
+    { DATA_TUUBID,    0          },
+    { DATA_DRENN,     SAY_WAVE3  },
+    { DATA_XURREM,    SAY_WAVE4  },
+    { DATA_YEGGETH,   SAY_WAVE5  },
+    { DATA_PAKKON,    SAY_WAVE6  },
+    { DATA_ZERRAN,    SAY_WAVE7  },
+    { DATA_RAJAXX,    SAY_ENGAGE }
+};
 
 class instance_ruins_of_ahnqiraj : public InstanceMapScript
 {
@@ -29,14 +68,18 @@ public:
         instance_ruins_of_ahnqiraj_InstanceMapScript(Map* map) : InstanceScript(map)
         {
             SetBossNumber(NUM_ENCOUNTER);
+            LoadObjectData(creatureData, nullptr);
+            _rajaxWaveCounter = 0;
         }
 
         void OnCreatureCreate(Creature* creature) override
         {
+            InstanceScript::OnCreatureCreate(creature);
+
             switch (creature->GetEntry())
             {
-                case NPC_KURINAXX:
-                    _kurinaxxGUID = creature->GetGUID();
+                case NPC_KURINNAXX:
+                    _kurinnaxxGUID = creature->GetGUID();
                     break;
                 case NPC_RAJAXX:
                     _rajaxxGUID = creature->GetGUID();
@@ -56,12 +99,73 @@ public:
             }
         }
 
-        bool SetBossState(uint32 bossId, EncounterState state) override
+        void OnCreatureEvade(Creature* creature) override
         {
-            if (!InstanceScript::SetBossState(bossId, state))
-                return false;
+            if (CreatureGroup* formation = creature->GetFormation())
+            {
+                if (Creature* leader = formation->GetLeader())
+                {
+                    switch (leader->GetEntry())
+                    {
+                        case NPC_QUUEZ:
+                        case NPC_TUUBID:
+                        case NPC_DRENN:
+                        case NPC_XURREM:
+                        case NPC_YEGGETH:
+                        case NPC_PAKKON:
+                        case NPC_ZERRAN:
+                            if (!formation->IsFormationInCombat())
+                            {
+                                ResetRajaxxWaves();
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+            else if (creature->GetEntry() == NPC_RAJAXX)
+            {
+                ResetRajaxxWaves();
+            }
+        }
 
-            return true;
+        void OnUnitDeath(Unit* unit) override
+        {
+            if (Creature* creature = unit->ToCreature())
+            {
+                if (CreatureGroup* formation = creature->GetFormation())
+                {
+                    if (Creature* leader = formation->GetLeader())
+                    {
+                        switch (leader->GetEntry())
+                        {
+                            case NPC_QUUEZ:
+                            case NPC_TUUBID:
+                            case NPC_DRENN:
+                            case NPC_XURREM:
+                            case NPC_YEGGETH:
+                            case NPC_PAKKON:
+                            case NPC_ZERRAN:
+                                _scheduler.CancelAll();
+                                _scheduler.Schedule(1s, [this, formation](TaskContext /*context*/) {
+                                    if (!formation->IsAnyMemberAlive())
+                                    {
+                                        CallNextRajaxxLeader();
+                                    }
+                                });
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
+        void Update(uint32 diff) override
+        {
+            _scheduler.Update(diff);
         }
 
         void SetGuidData(uint32 type, ObjectGuid data) override
@@ -75,7 +179,7 @@ public:
             switch (type)
             {
                 case DATA_KURINNAXX:
-                    return _kurinaxxGUID;
+                    return _kurinnaxxGUID;
                 case DATA_RAJAXX:
                     return _rajaxxGUID;
                 case DATA_MOAM:
@@ -136,14 +240,56 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
+        void CallNextRajaxxLeader()
+        {
+            ++_rajaxWaveCounter;
+
+            if (Creature* nextLeader = GetCreature(RajaxxWavesData[_rajaxWaveCounter].at(0)))
+            {
+                if (_rajaxWaveCounter >= 2)
+                {
+                    if (Creature* rajaxx = GetCreature(DATA_RAJAXX))
+                    {
+                        rajaxx->AI()->Talk(RajaxxWavesData[_rajaxWaveCounter].at(1));
+                    }
+                }
+
+                if (nextLeader->IsAlive())
+                {
+                    nextLeader->SetInCombatWithZone();
+                }
+                else
+                {
+                    CallNextRajaxxLeader();
+                }
+            }
+        }
+
+        void ResetRajaxxWaves()
+        {
+            _rajaxWaveCounter = 0;
+            for (auto const& data : RajaxxWavesData)
+            {
+                if (Creature* creature = GetCreature(data.at(0)))
+                {
+                    if (CreatureGroup* group = creature->GetFormation())
+                    {
+                        group->RespawnFormation(true);
+                    }
+                }
+            }
+        }
+
     private:
-        ObjectGuid _kurinaxxGUID;
+        ObjectGuid _kurinnaxxGUID;
         ObjectGuid _rajaxxGUID;
         ObjectGuid _moamGUID;
         ObjectGuid _buruGUID;
         ObjectGuid _ayamissGUID;
         ObjectGuid _ossirianGUID;
         ObjectGuid _paralyzedGUID;
+        uint32 _rajaxWaveCounter;
+        TaskScheduler _scheduler;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

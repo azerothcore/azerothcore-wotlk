@@ -268,12 +268,11 @@ public:
             {
                 Talk(SAY_YSONDRE_SUMMON_DRUIDS);
 
-                auto const& attackers = me->GetThreatMgr().GetThreatListSize();
                 uint8 attackersCount = 0;
 
-                for (const auto attacker : attackers)
+                for (auto const& attacker : me->GetCombatMgr().GetPvECombatRefs())
                 {
-                    if ((*attacker)->ToPlayer() && (*attacker)->IsAlive())
+                    if (attacker.second->GetOther(me)->ToPlayer()->IsAlive())
                         ++attackersCount;
                 }
 
