@@ -139,35 +139,34 @@ public:
             me->GetMotionMaster()->MovePoint(POINT_AIR, AyamissAirPos);
         }
 
-        void UpdateAI(uint32 diff) override
+        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
         {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
             if (_phase == PHASE_AIR && me->GetHealthPct() < 70.0f)
             {
                 _phase = PHASE_GROUND;
                 SetCombatMovement(true);
                 me->SetCanFly(false);
+                me->SetDisableGravity(false);
                 Position VictimPos = me->GetVictim()->GetPosition();
                 me->GetMotionMaster()->MovePoint(POINT_GROUND, VictimPos);
                 DoResetThreat();
                 events.ScheduleEvent(EVENT_LASH, urand(5000, 8000));
                 events.CancelEvent(EVENT_POISON_STINGER);
             }
-            else
-            {
-                DoMeleeAttackIfReady();
-            }
-
             if (!_enraged && me->GetHealthPct() < 20.0f)
             {
                 DoCastSelf(SPELL_FRENZY);
                 Talk(EMOTE_FRENZY);
                 _enraged = true;
             }
+        }
 
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
             while (uint32 eventId = events.ExecuteEvent())
             {
                 switch (eventId)
@@ -207,7 +206,7 @@ public:
                     case EVENT_SUMMON_SWARMER:
                         {
                             Position Pos = me->GetRandomPoint(SwarmerPos, 80.0f);
-                            me->SummonCreature(NPC_SWARMER, Pos);
+                            me->SummonCreature(NPC_SWARMER, Pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
                             events.ScheduleEvent(EVENT_SUMMON_SWARMER, 5000);
                             break;
                         }
@@ -217,6 +216,7 @@ public:
                         break;
                 }
             }
+            DoMeleeAttackIfReady();
         }
     private:
         GuidList _swarmers;
