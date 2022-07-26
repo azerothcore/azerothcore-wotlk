@@ -72,18 +72,18 @@ struct boss_moam : public BossAI
     {
         switch (action)
         {
-        case ACTION_STONE_PHASE_END:
-            me->RemoveAurasDueToSpell(SPELL_ENERGIZE);
-            events.ScheduleEvent(EVENT_STONE_PHASE, 90000);
-            break;
-        case ACTION_STONE_PHASE_START:
-            Talk(EMOTE_STONE_PHASE);
-            DoCastAOE(SPELL_SUMMON_MANA_FIENDS);
-            DoCastSelf(SPELL_ENERGIZE);
-            events.ScheduleEvent(EVENT_STONE_PHASE_END, 90000);
-            break;
-        default:
-            break;
+            case ACTION_STONE_PHASE_END:
+                me->RemoveAurasDueToSpell(SPELL_ENERGIZE);
+                events.ScheduleEvent(EVENT_STONE_PHASE, 90000);
+                break;
+            case ACTION_STONE_PHASE_START:
+                Talk(EMOTE_STONE_PHASE);
+                DoCastAOE(SPELL_SUMMON_MANA_FIENDS);
+                DoCastSelf(SPELL_ENERGIZE);
+                events.ScheduleEvent(EVENT_STONE_PHASE_END, 90000);
+                break;
+            default:
+                break;
         }
     }
 
@@ -104,7 +104,7 @@ struct boss_moam : public BossAI
 
     void SummonedCreatureDies(Creature* /*creature*/, Unit* /*killer*/) override
     {
-        if (!summons.IsAnyCreatureAlive())
+        if (!summons.IsAnyCreatureAlive() && me->HasAura(SPELL_ENERGIZE))
         {
             DoAction(ACTION_STONE_PHASE_END);
         }
