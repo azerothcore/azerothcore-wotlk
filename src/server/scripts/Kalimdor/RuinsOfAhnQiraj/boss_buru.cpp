@@ -18,6 +18,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "TaskScheduler.h"
 #include "ruins_of_ahnqiraj.h"
 
 enum Emotes
@@ -35,8 +36,9 @@ enum Spells
     SPELL_BURU_TRANSFORM        = 24721,
     SPELL_SUMMON_HATCHLING      = 1881,
     SPELL_EXPLODE               = 19593,
-    SPELL_EXPLODE_2             = 5255, // Server-side script
-    SPELL_BURU_EGG_TRIGGER      = 26646
+    SPELL_EXPLODE_2             = 5255,
+    SPELL_BURU_EGG_TRIGGER      = 26646,
+    SPELL_CREATURE_SPECIAL      = 7155, // from sniffs
 };
 
 enum Events
@@ -45,7 +47,7 @@ enum Events
     EVENT_GATHERING_SPEED       = 2,
     EVENT_FULL_SPEED            = 3,
     EVENT_CREEPING_PLAGUE       = 4,
-    EVENT_RESPAWN_EGG           = 5
+    EVENT_RESPAWN_EGG           = 5,
 };
 
 enum Phases
@@ -54,268 +56,229 @@ enum Phases
     PHASE_TRANSFORM             = 1
 };
 
-enum Actions
+struct boss_buru : public BossAI
 {
-    ACTION_EXPLODE              = 0
-};
+    boss_buru(Creature* creature) : BossAI(creature, DATA_BURU) {}
 
-class boss_buru : public CreatureScript
-{
-public:
-    boss_buru() : CreatureScript("boss_buru") { }
-
-    struct boss_buruAI : public BossAI
+    void EnterEvadeMode(EvadeReason why) override
     {
-        boss_buruAI(Creature* creature) : BossAI(creature, DATA_BURU) {}
+        BossAI::EnterEvadeMode(why);
 
-        void EnterEvadeMode(EvadeReason why) override
-        {
-            BossAI::EnterEvadeMode(why);
+        DoCastSelf(SPELL_FULL_SPEED, true);
 
-            for (ObjectGuid const& guid : Eggs)
-            {
-                if (Creature* egg = me->GetMap()->GetCreature(guid))
-                {
-                    egg->Respawn();
-                }
-            }
-            Eggs.clear();
-        }
+        ManipulateEggs(true);
+        _eggs.clear();
+    }
 
-        void EnterCombat(Unit* who) override
-        {
-            _EnterCombat();
-            Talk(EMOTE_TARGET, who);
-            DoCast(me, SPELL_THORNS);
-            events.ScheduleEvent(EVENT_DISMEMBER, 5000);
-            events.ScheduleEvent(EVENT_GATHERING_SPEED, 9000);
-            events.ScheduleEvent(EVENT_FULL_SPEED, 60000);
-            _phase = PHASE_EGG;
-        }
+    void ManipulateEggs(bool respawn)
+    {
+        std::list<Creature*> eggs;
+        me->GetCreaturesWithEntryInRange(eggs, 150.0f, NPC_BURU_EGG);
+        for (Creature* egg : eggs)
+            respawn ? egg->Respawn() : Unit::Kill(me, egg);
+    }
 
-        void JustDied(Unit* /*killer*/) override
-        {
-            if (InstanceScript* pInstance = me->GetInstanceScript())
-            {
-                pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_CREEPING_PLAGUE);
-            }
-        }
+    void EnterCombat(Unit* who) override
+    {
+        _EnterCombat();
+        Talk(EMOTE_TARGET, who);
+        DoCastSelf(SPELL_THORNS);
+        ManipulateEggs(true);
+        me->RemoveAurasDueToSpell(SPELL_FULL_SPEED);
+        events.ScheduleEvent(EVENT_DISMEMBER, 5s);
+        events.ScheduleEvent(EVENT_GATHERING_SPEED, 9s);
+        events.ScheduleEvent(EVENT_FULL_SPEED, 60s);
+        _phase = PHASE_EGG;
+    }
 
-        void DoAction(int32 action) override
-        {
-            if (action == ACTION_EXPLODE)
-            {
-                if (_phase == PHASE_EGG)
-                {
-                    Unit::DealDamage(me, me, 45000);
-                }
-            }
-        }
-
-        void KilledUnit(Unit* victim) override
-        {
-            if (victim->GetTypeId() == TYPEID_PLAYER)
-            {
-                ChaseNewVictim();
-            }
-        }
-
-        void ChaseNewVictim()
-        {
-            if (_phase != PHASE_EGG)
-                return;
-
-            me->RemoveAurasDueToSpell(SPELL_FULL_SPEED);
-            me->RemoveAurasDueToSpell(SPELL_GATHERING_SPEED);
-            events.ScheduleEvent(EVENT_GATHERING_SPEED, 9000);
-            events.ScheduleEvent(EVENT_FULL_SPEED, 60000);
-            if (Unit* victim = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
-            {
-                DoResetThreat();
-                AttackStart(victim);
-                Talk(EMOTE_TARGET, victim);
-            }
-        }
-
-        void ManageRespawn(ObjectGuid EggGUID)
-        {
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+    {
+        if (spell->Id == SPELL_CREATURE_SPECIAL)
             ChaseNewVictim();
-            Eggs.push_back(EggGUID);
-            events.ScheduleEvent(EVENT_RESPAWN_EGG, 100000);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            while (uint32 eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    case EVENT_DISMEMBER:
-                        DoCastVictim(SPELL_DISMEMBER);
-                        events.ScheduleEvent(EVENT_DISMEMBER, 5000);
-                        break;
-                    case EVENT_GATHERING_SPEED:
-                        DoCastSelf(SPELL_GATHERING_SPEED);
-                        events.ScheduleEvent(EVENT_GATHERING_SPEED, 9000);
-                        break;
-                    case EVENT_FULL_SPEED:
-                        DoCastSelf(SPELL_FULL_SPEED);
-                        break;
-                    case EVENT_CREEPING_PLAGUE:
-                        DoCastAOE(SPELL_CREEPING_PLAGUE);
-                        events.ScheduleEvent(EVENT_CREEPING_PLAGUE, urand(6250, 6500));
-                        break;
-                    case EVENT_RESPAWN_EGG:
-                        if (Creature* egg = me->GetMap()->GetCreature(*Eggs.begin()))
-                        {
-                            egg->Respawn();
-                            Eggs.pop_front();
-                        }
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            if (me->GetHealthPct() < 20.0f && _phase == PHASE_EGG)
-            {
-                DoCastSelf(SPELL_BURU_TRANSFORM);
-                DoCastSelf(SPELL_FULL_SPEED, true);
-                me->RemoveAurasDueToSpell(SPELL_THORNS);
-                events.CancelEvent(EVENT_DISMEMBER);
-                events.ScheduleEvent(EVENT_CREEPING_PLAGUE, 2000);
-                _phase = PHASE_TRANSFORM;
-                std::list<Creature*> RemainingEgg;
-                me->GetCreaturesWithEntryInRange(RemainingEgg, 100.0f, NPC_BURU_EGG);
-                for (std::list<Creature*>::const_iterator itr = RemainingEgg.begin(); itr != RemainingEgg.end(); ++itr)
-                {
-                    Unit::Kill(me, *itr);
-                }
-            }
-            DoMeleeAttackIfReady();
-        }
-    private:
-        uint8 _phase;
-        GuidList Eggs;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetRuinsOfAhnQirajAI<boss_buruAI>(creature);
     }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        if (InstanceScript* pInstance = me->GetInstanceScript())
+        {
+            pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_CREEPING_PLAGUE);
+        }
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim->GetTypeId() == TYPEID_PLAYER)
+            ChaseNewVictim();
+    }
+
+    void ChaseNewVictim()
+    {
+        if (_phase != PHASE_EGG)
+            return;
+
+        me->RemoveAurasDueToSpell(SPELL_FULL_SPEED);
+        me->RemoveAurasDueToSpell(SPELL_GATHERING_SPEED);
+        events.ScheduleEvent(EVENT_GATHERING_SPEED, 9s);
+        events.ScheduleEvent(EVENT_FULL_SPEED, 60s);
+        if (Unit* victim = SelectTarget(SelectTargetMethod::Random, 0, 0.f, true))
+        {
+            DoResetThreat();
+            AttackStart(victim);
+            me->AddThreat(victim, 1000000.f);
+            Talk(EMOTE_TARGET, victim);
+        }
+    }
+
+    void SetGUID(ObjectGuid const guid, int32 /*type*/) override
+    {
+        _eggs.push_back(guid);
+        events.ScheduleEvent(EVENT_RESPAWN_EGG, 120s);
+    }
+
+    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    {
+        if (attacker->GetEntry() != NPC_BURU_EGG && _phase == PHASE_EGG)
+        {
+            damage = damage * 0.01f; // 99% dmg resist
+        }
+
+        if (me->HealthBelowPctDamaged(20, damage) && _phase == PHASE_EGG)
+        {
+            DoCastSelf(SPELL_FULL_SPEED, true);
+            ManipulateEggs(false);
+            me->RemoveAurasDueToSpell(SPELL_THORNS);
+            events.Reset();
+            _phase = PHASE_TRANSFORM;
+            DoResetThreat();
+            events.ScheduleEvent(EVENT_CREEPING_PLAGUE, 2s);
+            DoCastSelf(SPELL_BURU_TRANSFORM);
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+
+        while (uint32 eventId = events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+                case EVENT_DISMEMBER:
+                    DoCastVictim(SPELL_DISMEMBER);
+                    events.ScheduleEvent(EVENT_DISMEMBER, 5s);
+                    break;
+                case EVENT_GATHERING_SPEED:
+                    DoCastSelf(SPELL_GATHERING_SPEED);
+                    events.ScheduleEvent(EVENT_GATHERING_SPEED, 9s);
+                    break;
+                case EVENT_FULL_SPEED:
+                    DoCastSelf(SPELL_FULL_SPEED);
+                    break;
+                case EVENT_CREEPING_PLAGUE:
+                    DoCastAOE(SPELL_CREEPING_PLAGUE);
+                    events.ScheduleEvent(EVENT_CREEPING_PLAGUE, 6s);
+                    break;
+                case EVENT_RESPAWN_EGG:
+                    if (Creature* egg = me->GetMap()->GetCreature(*_eggs.begin()))
+                        egg->Respawn();
+
+                    _eggs.pop_front();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        DoMeleeAttackIfReady();
+    }
+private:
+    uint8 _phase;
+    GuidList _eggs;
 };
 
-class npc_buru_egg : public CreatureScript
+struct npc_buru_egg : public ScriptedAI
 {
-public:
-    npc_buru_egg() : CreatureScript("npc_buru_egg") { }
-
-    struct npc_buru_eggAI : public ScriptedAI
+    npc_buru_egg(Creature* creature) : ScriptedAI(creature)
     {
-        npc_buru_eggAI(Creature* creature) : ScriptedAI(creature)
-        {
-            _instance = me->GetInstanceScript();
-            SetCombatMovement(false);
-        }
-
-        void EnterCombat(Unit* attacker) override
-        {
-            if (Creature* buru = me->GetMap()->GetCreature(_instance->GetGuidData(DATA_BURU)))
-            {
-                if (!buru->IsInCombat())
-                {
-                    buru->AI()->AttackStart(attacker);
-                }
-            }
-        }
-
-        void JustSummoned(Creature* who) override
-        {
-            if (who->GetEntry() == NPC_HATCHLING)
-            {
-                if (Creature* buru = me->GetMap()->GetCreature(_instance->GetGuidData(DATA_BURU)))
-                {
-                    if (Unit* target = buru->AI()->SelectTarget(SelectTargetMethod::Random))
-                    {
-                        who->AI()->AttackStart(target);
-                    }
-                }
-            }
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            if (Creature* buru = me->GetMap()->GetCreature(_instance->GetGuidData(DATA_BURU)))
-            {
-                if (!buru->HasAura(SPELL_BURU_TRANSFORM))
-                {
-                    DoCast(me, SPELL_EXPLODE, true);
-                    DoCast(me, SPELL_EXPLODE_2, true);
-                    DoCast(me, SPELL_BURU_EGG_TRIGGER, true);
-                }
-                if (boss_buru::boss_buruAI* buruAI = dynamic_cast<boss_buru::boss_buruAI*>(buru->AI()))
-                {
-                    buruAI->ManageRespawn(me->GetGUID());
-                }
-            }
-            DoCast(me, SPELL_SUMMON_HATCHLING, true);
-        }
-    private:
-        InstanceScript* _instance;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetRuinsOfAhnQirajAI<npc_buru_eggAI>(creature);
+        _instance = me->GetInstanceScript();
+        SetCombatMovement(false);
+        me->SetReactState(REACT_PASSIVE);
     }
+
+    void EnterCombat(Unit* attacker) override
+    {
+        if (Creature* buru = _instance->GetCreature(DATA_BURU))
+        {
+            if (!buru->IsInCombat())
+            {
+                buru->AI()->AttackStart(attacker);
+            }
+        }
+    }
+
+    void JustSummoned(Creature* who) override
+    {
+        if (who->GetEntry() == NPC_HATCHLING)
+        {
+            if (Creature* buru = _instance->GetCreature(DATA_BURU))
+            {
+                if (Unit* target = buru->AI()->SelectTarget(SelectTargetMethod::Random))
+                {
+                    who->AI()->AttackStart(target);
+                }
+            }
+        }
+    }
+
+    void JustDied(Unit* killer) override
+    {
+        DoCastSelf(SPELL_SUMMON_HATCHLING, true);
+        if (killer->GetEntry() != NPC_BURU)
+        {
+            if (Creature* buru = _instance->GetCreature(DATA_BURU))
+            {
+                DoCastSelf(SPELL_EXPLODE);
+                DoCastSelf(SPELL_BURU_EGG_TRIGGER, true);
+                buru->CastSpell(buru, SPELL_CREATURE_SPECIAL, true);
+                if (buru->GetAI())
+                    buru->AI()->SetGUID(me->GetGUID());
+            }
+        }
+    }
+private:
+    InstanceScript* _instance;
 };
 
-class spell_egg_explosion : public SpellScriptLoader
+class spell_egg_explosion : public SpellScript
 {
-public:
-    spell_egg_explosion() : SpellScriptLoader("spell_egg_explosion") { }
+    PrepareSpellScript(spell_egg_explosion);
 
-    class spell_egg_explosion_SpellScript : public SpellScript
+    void HandleDummyHitTarget(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_egg_explosion_SpellScript);
-
-        void HandleAfterCast()
+        if (Unit* target = GetHitUnit())
         {
-            if (Creature* buru = GetCaster()->FindNearestCreature(NPC_BURU, 5.f))
-            {
-                buru->AI()->DoAction(ACTION_EXPLODE);
-            }
-        }
+            int32 damage = 0;
+            if (target->IsPlayer())
+                damage = -16 * GetCaster()->GetDistance(target) + 500;
+            else if (target->GetEntry() == NPC_BURU && target->HasAura(SPELL_THORNS))
+                damage = target->GetMaxHealth() * 7.f / 100;
 
-        void HandleDummyHitTarget(SpellEffIndex /*effIndex*/)
-        {
-            if (Unit* target = GetHitUnit())
-            {
-                Unit::DealDamage(GetCaster(), target, -16 * GetCaster()->GetDistance(target) + 500);
-            }
+            GetCaster()->CastCustomSpell(target, SPELL_EXPLODE_2, &damage, nullptr, nullptr, true);
         }
+    }
 
-        void Register() override
-        {
-            AfterCast += SpellCastFn(spell_egg_explosion_SpellScript::HandleAfterCast);
-            OnEffectHitTarget += SpellEffectFn(spell_egg_explosion_SpellScript::HandleDummyHitTarget, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_egg_explosion_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_egg_explosion::HandleDummyHitTarget, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
 void AddSC_boss_buru()
 {
-    new boss_buru();
-    new npc_buru_egg();
-    new spell_egg_explosion();
+    RegisterRuinsOfAhnQirajCreatureAI(boss_buru);
+    RegisterRuinsOfAhnQirajCreatureAI(npc_buru_egg);
+    RegisterSpellScript(spell_egg_explosion);
 }

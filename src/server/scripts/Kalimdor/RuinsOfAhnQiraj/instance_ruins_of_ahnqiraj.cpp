@@ -23,6 +23,7 @@
 
 ObjectData const creatureData[] =
 {
+    { NPC_BURU,      DATA_BURU      },
     { NPC_KURINNAXX, DATA_KURINNAXX },
     { NPC_RAJAXX,    DATA_RAJAXX    },
     { NPC_OSSIRIAN,  DATA_OSSIRIAN  },
