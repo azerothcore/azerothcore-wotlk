@@ -144,8 +144,8 @@ public:
                 SetCombatMovement(true);
                 me->SetCanFly(false);
                 me->SetDisableGravity(false);
-                me->ClearUnitState(UNIT_STATE_ROOT);
                 Position VictimPos = me->GetVictim()->GetPosition();
+                me->ClearUnitState(UNIT_STATE_ROOT);
                 me->GetMotionMaster()->MovePoint(POINT_GROUND, VictimPos);
                 DoResetThreat();
                 events.ScheduleEvent(EVENT_LASH, urand(5000, 8000));
