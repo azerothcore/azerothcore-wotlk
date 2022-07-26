@@ -131,9 +131,9 @@ public:
             BossAI::EnterCombat(attacker);
             events.ScheduleEvent(EVENT_STINGER_SPRAY, urand(20000, 30000));
             events.ScheduleEvent(EVENT_POISON_STINGER, 5000);
-            //events.ScheduleEvent(EVENT_SUMMON_SWARMER, 5000);
-            //events.ScheduleEvent(EVENT_SWARMER_ATTACK, 60000);
-            //events.ScheduleEvent(EVENT_PARALYZE, 15000);
+            events.ScheduleEvent(EVENT_SUMMON_SWARMER, 5000);
+            events.ScheduleEvent(EVENT_SWARMER_ATTACK, 60000);
+            events.ScheduleEvent(EVENT_PARALYZE, 15000);
             me->SetCanFly(true);
             me->SetDisableGravity(true);
             me->GetMotionMaster()->MovePoint(POINT_AIR, AyamissAirPos);
