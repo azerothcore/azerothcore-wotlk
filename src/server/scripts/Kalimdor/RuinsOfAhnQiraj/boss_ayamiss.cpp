@@ -113,9 +113,6 @@ public:
                     case POINT_AIR:
                         me->AddUnitState(UNIT_STATE_ROOT);
                         break;
-                    case POINT_GROUND:
-                        me->ClearUnitState(UNIT_STATE_ROOT);
-                        break;
                 }
             }
         }
@@ -147,6 +144,7 @@ public:
                 SetCombatMovement(true);
                 me->SetCanFly(false);
                 me->SetDisableGravity(false);
+                me->ClearUnitState(UNIT_STATE_ROOT);
                 Position VictimPos = me->GetVictim()->GetPosition();
                 me->GetMotionMaster()->MovePoint(POINT_GROUND, VictimPos);
                 DoResetThreat();
