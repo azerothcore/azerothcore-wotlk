@@ -28,6 +28,7 @@ enum Texts
 enum Spells
 {
     SPELL_TRAMPLE               = 15550,
+    SPELL_DRAIN_MANA_SERVERSIDE = 25676,
     SPELL_DRAIN_MANA            = 25671,
     SPELL_ARCANE_ERUPTION       = 25672,
     SPELL_SUMMON_MANA_FIEND_1   = 25681, // TARGET_DEST_CASTER_FRONT
@@ -115,11 +116,11 @@ public:
                 return;
 
             events.Update(diff);
+
             if (me->GetPower(POWER_MANA) == me->GetMaxPower(POWER_MANA))
             {
                 Talk(EMOTE_MANA_FULL);
-                DoCastAOE(SPELL_ARCANE_ERUPTION, true);
-                me->SetPower(POWER_MANA, 0);
+                DoCastAOE(SPELL_ARCANE_ERUPTION);
             }
 
             while (uint32 eventId = events.ExecuteEvent())
@@ -133,23 +134,8 @@ public:
                         DoAction(ACTION_STONE_PHASE_END);
                         break;
                     case EVENT_SPELL_DRAIN_MANA:
+                        DoCastAOE(SPELL_DRAIN_MANA_SERVERSIDE);
                         {
-                            std::list<Unit*> targetList;
-                            {
-                                const std::list<HostileReference*>& threatlist = me->GetThreatMgr().getThreatList();
-                                for (std::list<HostileReference*>::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
-                                {
-                                    if ((*itr)->getTarget()->GetTypeId() == TYPEID_PLAYER && (*itr)->getTarget()->getPowerType() == POWER_MANA)
-                                    {
-                                        targetList.push_back((*itr)->getTarget());
-                                    }
-                                }
-                            }
-                            Acore::Containers::RandomResize(targetList, 6);
-                            for (std::list<Unit*>::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
-                            {
-                                DoCast(*itr, SPELL_DRAIN_MANA);
-                            }
                             events.ScheduleEvent(EVENT_SPELL_DRAIN_MANA, urand(2000, 6000));
                             break;
                         }
@@ -173,7 +159,36 @@ public:
     }
 };
 
+// 25676 - Drain Mana (server-side)
+class spell_moam_mana_drain_filter : public SpellScript
+{
+    PrepareSpellScript(spell_moam_mana_drain_filter);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if([&](WorldObject* target) -> bool
+        {
+            return !target->IsPlayer() || target->ToPlayer()->getPowerType() != POWER_MANA;
+        });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            caster->CastSpell(GetHitUnit(), SPELL_DRAIN_MANA, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_moam_mana_drain_filter::FilterTargets, EFFECT_ALL, TARGET_UNIT_DEST_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_moam_mana_drain_filter::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_boss_moam()
 {
     new boss_moam();
+    RegisterSpellScript(spell_moam_mana_drain_filter);
 }
