@@ -58,7 +58,7 @@ enum Phases
 
 struct boss_buru : public BossAI
 {
-    boss_buru(Creature* creature) : BossAI(creature, DATA_BURU), _transforming(false) {}
+    boss_buru(Creature* creature) : BossAI(creature, DATA_BURU) {}
 
     void EnterEvadeMode(EvadeReason why) override
     {
@@ -68,8 +68,6 @@ struct boss_buru : public BossAI
 
         ManipulateEggs(true);
         _eggs.clear();
-        _transforming = false;
-        _scheduler.CancelAll();
     }
 
     void ManipulateEggs(bool respawn)
@@ -91,7 +89,6 @@ struct boss_buru : public BossAI
         events.ScheduleEvent(EVENT_GATHERING_SPEED, 9s);
         events.ScheduleEvent(EVENT_FULL_SPEED, 60s);
         _phase = PHASE_EGG;
-        _scheduler.CancelAll();
     }
 
     void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
@@ -147,35 +144,20 @@ struct boss_buru : public BossAI
 
         if (me->HealthBelowPctDamaged(20.f, damage) && _phase == PHASE_EGG)
         {
-            _transforming = true;
             DoCastSelf(SPELL_FULL_SPEED, true);
             ManipulateEggs(false);
-            SetCombatMovement(false);
-            me->StopMoving();
-            me->SetReactState(REACT_PASSIVE);
             me->RemoveAurasDueToSpell(SPELL_THORNS);
             events.Reset();
             _phase = PHASE_TRANSFORM;
             DoResetThreat();
+            events.ScheduleEvent(EVENT_CREEPING_PLAGUE, 2s);
             DoCastSelf(SPELL_BURU_TRANSFORM);
-
-            _scheduler.Schedule(6s, [this](TaskContext /*context*/)
-                {
-                    SetCombatMovement(true);
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.f, true))
-                        AttackStart(target);
-                    _transforming = false;
-                    events.ScheduleEvent(EVENT_CREEPING_PLAGUE, 2s);
-                });
         }
     }
 
     void UpdateAI(uint32 diff) override
     {
-        _scheduler.Update(diff);
-
-        if (!UpdateVictim() || _transforming)
+        if (!UpdateVictim())
             return;
 
         events.Update(diff);
@@ -215,8 +197,6 @@ struct boss_buru : public BossAI
 private:
     uint8 _phase;
     GuidList _eggs;
-    TaskScheduler _scheduler;
-    bool _transforming;
 };
 
 struct npc_buru_egg : public ScriptedAI
@@ -260,14 +240,11 @@ struct npc_buru_egg : public ScriptedAI
         {
             if (Creature* buru = _instance->GetCreature(DATA_BURU))
             {
-                if (!buru->HasAura(SPELL_BURU_TRANSFORM))
-                {
-                    DoCastSelf(SPELL_EXPLODE);
-                    DoCastSelf(SPELL_BURU_EGG_TRIGGER, true);
-                    buru->CastSpell(buru, SPELL_CREATURE_SPECIAL, true);
-                    if (buru->GetAI())
-                        buru->AI()->SetGUID(me->GetGUID());
-                }
+                DoCastSelf(SPELL_EXPLODE);
+                DoCastSelf(SPELL_BURU_EGG_TRIGGER, true);
+                buru->CastSpell(buru, SPELL_CREATURE_SPECIAL, true);
+                if (buru->GetAI())
+                    buru->AI()->SetGUID(me->GetGUID());
             }
         }
     }
