@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
@@ -70,7 +71,6 @@ public:
             _Reset();
             me->SetPower(POWER_MANA, 0);
             me->SetRegeneratingPower(false);
-            _isStonePhase = false;
         }
 
         void DoAction(int32 action) override
@@ -80,7 +80,6 @@ public:
                 case ACTION_STONE_PHASE_END:
                     me->RemoveAurasDueToSpell(SPELL_ENERGIZE);
                     events.ScheduleEvent(EVENT_STONE_PHASE, 90000);
-                    _isStonePhase = false;
                     break;
                 case ACTION_STONE_PHASE_START:
                     Talk(EMOTE_STONE_PHASE);
@@ -155,8 +154,6 @@ public:
 
             DoMeleeAttackIfReady();
         }
-    private:
-        bool _isStonePhase;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
