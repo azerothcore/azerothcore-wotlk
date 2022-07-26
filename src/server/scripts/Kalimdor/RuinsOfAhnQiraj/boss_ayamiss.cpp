@@ -25,7 +25,6 @@ enum Spells
     SPELL_STINGER_SPRAY         =  25749,
     SPELL_POISON_STINGER        =  25748,
     SPELL_PARALYZE              =  25725,
-    SPELL_TRASH                 =  3391,
     SPELL_FRENZY                =  8269,
     SPELL_LASH                  =  25852,
     SPELL_FEED                  =  25721
@@ -38,8 +37,7 @@ enum Events
     EVENT_SUMMON_SWARMER        = 3,
     EVENT_SWARMER_ATTACK        = 4,
     EVENT_PARALYZE              = 5,
-    EVENT_LASH                  = 6,
-    EVENT_TRASH                 = 7
+    EVENT_LASH                  = 6
 };
 
 enum Emotes
@@ -156,7 +154,6 @@ public:
                 me->GetMotionMaster()->MovePoint(POINT_GROUND, VictimPos);
                 DoResetThreat();
                 events.ScheduleEvent(EVENT_LASH, urand(5000, 8000));
-                events.ScheduleEvent(EVENT_TRASH, urand(3000, 6000));
                 events.CancelEvent(EVENT_POISON_STINGER);
             }
             else
@@ -214,10 +211,6 @@ public:
                             events.ScheduleEvent(EVENT_SUMMON_SWARMER, 5000);
                             break;
                         }
-                    case EVENT_TRASH:
-                        DoCastVictim(SPELL_TRASH);
-                        events.ScheduleEvent(EVENT_TRASH, urand(5000, 7000));
-                        break;
                     case EVENT_LASH:
                         DoCastVictim(SPELL_LASH);
                         events.ScheduleEvent(EVENT_LASH, urand(8000, 15000));
