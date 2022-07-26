@@ -102,6 +102,8 @@ public:
                     }
                     break;
             }
+
+            summons.Summon(who);
         }
 
         void MovementInform(uint32 type, uint32 id) override
