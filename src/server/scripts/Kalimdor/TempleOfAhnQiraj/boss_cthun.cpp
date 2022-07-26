@@ -379,6 +379,7 @@ public:
 
                     me->InterruptNonMeleeSpells(true);
                     me->RemoveAllAuras();
+                    _scheduler.CancelAll();
                     break;
 
                 case PHASE_CTHUN_DONE:
