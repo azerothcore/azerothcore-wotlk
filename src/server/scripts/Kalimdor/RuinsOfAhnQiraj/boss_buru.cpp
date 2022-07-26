@@ -142,7 +142,7 @@ struct boss_buru : public BossAI
             damage = damage * 0.01f; // 99% dmg resist
         }
 
-        if (me->HealthBelowPctDamaged(20.f, damage) && _phase == PHASE_EGG)
+        if (me->HealthBelowPctDamaged(20, damage) && _phase == PHASE_EGG)
         {
             DoCastSelf(SPELL_FULL_SPEED, true);
             ManipulateEggs(false);
