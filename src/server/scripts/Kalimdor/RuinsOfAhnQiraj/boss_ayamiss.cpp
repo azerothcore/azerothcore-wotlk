@@ -259,6 +259,14 @@ public:
             }
         }
 
+        void JustSummoned(Creature* summon) override
+        {
+            if (Creature* ayamiss = _instance->GetCreature(DATA_AYAMISS))
+            {
+                ayamiss->AI()->JustSummoned(summon);
+            }
+        }
+
         void MoveInLineOfSight(Unit* who) override
 
         {
