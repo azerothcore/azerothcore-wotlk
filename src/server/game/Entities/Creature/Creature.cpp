@@ -3507,6 +3507,8 @@ bool Creature::SetCannotReachTarget(bool cannotReach, bool isChase /*= true*/)
     {
         LOG_DEBUG("entities.unit", "Creature::SetCannotReachTarget() called with true. Details: {}", GetDebugInfo());
     }
+
+    return true;
 }
 
 bool Creature::CanNotReachTarget() const
