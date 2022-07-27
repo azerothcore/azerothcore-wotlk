@@ -168,6 +168,11 @@ struct boss_ossirian : public BossAI
         {
             crystal->Use(me);
         }
+
+        std::list<Creature*> vortexes;
+        me->GetCreaturesWithEntryInRange(vortexes, 200.f, NPC_SAND_VORTEX);
+        for (Creature* vortex : vortexes)
+            vortex->DespawnOrUnsummon();
     }
 
     void SpawnNextCrystal()
