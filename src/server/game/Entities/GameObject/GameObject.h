@@ -1001,7 +1001,7 @@ public:
     [[nodiscard]] virtual uint32 GetScriptId() const;
     [[nodiscard]] GameObjectAI* AI() const { return m_AI; }
 
-    [[nodiscard]] std::string GetAIName() const;
+    [[nodiscard]] std::string const& GetAIName() const;
     void SetDisplayId(uint32 displayid);
     [[nodiscard]] uint32 GetDisplayId() const { return GetUInt32Value(GAMEOBJECT_DISPLAYID); }
 

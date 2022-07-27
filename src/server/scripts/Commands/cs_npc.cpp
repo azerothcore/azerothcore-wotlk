@@ -186,6 +186,7 @@ public:
         static ChatCommandTable npcCommandTable =
         {
             { "info",           HandleNpcInfoCommand,              SEC_GAMEMASTER, Console::No },
+            { "guid",           HandleNpcGuidCommand,              SEC_GAMEMASTER, Console::No },
             { "near",           HandleNpcNearCommand,              SEC_GAMEMASTER, Console::No },
             { "move",           HandleNpcMoveCommand,              SEC_GAMEMASTER, Console::No },
             { "playemote",      HandleNpcPlayEmoteCommand,         SEC_GAMEMASTER, Console::No },
@@ -649,6 +650,36 @@ public:
                 handler->PSendSysMessage(spellSchoolImmunes[i].text, spellSchoolImmunes[i].flag);
             }
         }
+
+        return true;
+    }
+    static bool HandleNpcGuidCommand(ChatHandler* handler)
+    {
+        Creature* target = handler->getSelectedCreature();
+
+        if (!target)
+        {
+            handler->SendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        uint32 faction = target->GetFaction();
+        uint32 npcflags = target->GetNpcFlags();
+        uint32 displayid = target->GetDisplayId();
+        uint32 nativeid = target->GetNativeDisplayId();
+        uint32 entry = target->GetEntry();
+        uint32 id1 = 0;
+        uint32 id2 = 0;
+        uint32 id3 = 0;
+        if (CreatureData const* cData = target->GetCreatureData())
+        {
+            id1 = cData->id1;
+            id2 = cData->id2;
+            id3 = cData->id3;
+        }
+
+        handler->PSendSysMessage(LANG_NPCINFO_CHAR, target->GetSpawnId(), target->GetGUID().GetCounter(), entry, id1, id2, id3, displayid, nativeid, faction, npcflags);
 
         return true;
     }

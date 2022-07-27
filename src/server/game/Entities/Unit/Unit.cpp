@@ -1034,7 +1034,14 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
                 victim->ToCreature()->SetLastDamagedTime(GameTime::GetGameTime().count() + MAX_AGGRO_RESET_TIME);
 
             if (attacker)
+            {
+                if (spellProto && !victim->IsInCombatWith(attacker))
+                {
+                    victim->CombatStart(attacker, !(spellProto->AttributesEx3 & SPELL_ATTR3_SUPRESS_TARGET_PROCS));
+                }
+
                 victim->AddThreat(attacker, float(damage), damageSchoolMask, spellProto);
+            }
         }
         else                                                // victim is a player
         {
@@ -8921,6 +8928,15 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                     // Lightning Shield (overwrite non existing triggered spell call in spell.dbc
                     if (auraSpellInfo->SpellFamilyFlags[0] & 0x400)
                     {
+                        // Do not proc off from self-casted items
+                        if (Spell const* spell = eventInfo.GetProcSpell())
+                        {
+                            if (spell->m_castItemGUID && victim->GetGUID() == GetGUID())
+                            {
+                                return false;
+                            }
+                        }
+
                         trigger_spell_id = sSpellMgr->GetSpellWithRank(26364, auraSpellInfo->GetRank());
                     }
                     // Nature's Guardian

@@ -198,7 +198,7 @@ public:
     void SetDetectionDistance(float dist){ m_detectionDistance = dist; }
     [[nodiscard]] CreatureAddon const* GetCreatureAddon() const;
 
-    [[nodiscard]] std::string GetAIName() const;
+    [[nodiscard]] std::string const& GetAIName() const;
     [[nodiscard]] std::string GetScriptName() const;
     [[nodiscard]] uint32 GetScriptId() const;
 
@@ -300,6 +300,7 @@ public:
 
     bool isRegeneratingHealth() { return m_regenHealth; }
     void SetRegeneratingHealth(bool c) { m_regenHealth = c; }
+    void SetRegeneratingPower(bool c) { m_regenPower = c; }
     [[nodiscard]] virtual uint8 GetPetAutoSpellSize() const { return MAX_SPELL_CHARM; }
     [[nodiscard]] virtual uint32 GetPetAutoSpellOnPos(uint8 pos) const
     {
@@ -417,6 +418,7 @@ protected:
     bool m_AlreadyCallAssistance;
     bool m_AlreadySearchedAssistance;
     bool m_regenHealth;
+    bool m_regenPower;
     bool m_AI_locked;
 
     SpellSchoolMask m_meleeDamageSchoolMask;
@@ -455,7 +457,7 @@ private:
 
     mutable std::shared_ptr<time_t> _lastDamagedTime; // Part of Evade mechanics
 
-    bool m_cannotReachTarget;
+    ObjectGuid m_cannotReachTarget;
     uint32 m_cannotReachTimer;
 
     Spell const* _focusSpell;   ///> Locks the target during spell cast for proper facing
