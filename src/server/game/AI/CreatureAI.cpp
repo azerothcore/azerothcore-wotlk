@@ -307,7 +307,7 @@ bool CreatureAI::_EnterEvadeMode(EvadeReason /*why*/)
     me->SetLootRecipient(nullptr);
     me->ResetPlayerDamageReq();
     me->SetLastDamagedTime(0);
-    me->SetCannotReachTarget();
+    me->SetCannotReachTarget(true);
 
     if (ZoneScript* zoneScript = me->GetZoneScript() ? me->GetZoneScript() : (ZoneScript*)me->GetInstanceScript())
         zoneScript->OnCreatureEvade(me);
