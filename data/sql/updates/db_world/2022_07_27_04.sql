@@ -1,3 +1,4 @@
+-- DB update 2022_07_27_03 -> 2022_07_27_04
 DELETE FROM `creature_formations` WHERE `leaderguid` IN (49609, 49059, 51584, 49309, 51350, 51974, 51570, 49793, 49274, 51979, 49290);
 DELETE FROM `creature_formations` WHERE `leaderguid` = 49065 AND `memberGUID` = 49051;
 DELETE FROM `creature_formations` WHERE `leaderguid` = 49062 AND `memberGUID` = 49052;
