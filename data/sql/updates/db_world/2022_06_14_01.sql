@@ -1,5 +1,11 @@
 -- DB update 2022_06_14_00 -> 2022_06_14_01
 --
+ALTER TABLE `gameobject_template_addon` 
+	DROP COLUMN artkit0,
+	DROP COLUMN artkit1,
+	DROP COLUMN artkit2,
+	DROP COLUMN artkit3;
+
 ALTER TABLE `gameobject_template_addon`
 	ADD COLUMN `artkit0` INT NOT NULL DEFAULT 0 AFTER `maxgold`,
 	ADD COLUMN `artkit1` INT NOT NULL DEFAULT 0 AFTER `artkit0`,
