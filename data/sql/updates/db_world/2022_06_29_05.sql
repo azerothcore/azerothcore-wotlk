@@ -10,6 +10,7 @@ INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `position_x`, `posit
 DELETE FROM `creature_addon` WHERE `guid` = @NPC;
 INSERT INTO `creature_addon` (`guid`, `path_id`) VALUES (@NPC, @PATH);
 
+DELETE FROM `creature_addon` WHERE `guid` = @PATH;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES
 (@PATH, 1, -7404.57, -894.073, 171.873, 100, 0),
 (@PATH, 2, -7397.19, -934.067, 169.109, 100, 0),
