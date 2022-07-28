@@ -101,7 +101,7 @@ struct boss_ossirian : public BossAI
 
     void SpellHit(Unit* caster, SpellInfo const* spell) override
     {
-        for (uint8 weakness : spellWeakness)
+        for (uint32 weakness : spellWeakness)
         {
             if (spell->Id == weakness)
             {
@@ -224,7 +224,7 @@ struct boss_ossirian : public BossAI
         }
         else
         {
-            for (uint8 weakness : spellWeakness)
+            for (uint32 weakness : spellWeakness)
             {
                 if (me->HasAura(weakness))
                 {
