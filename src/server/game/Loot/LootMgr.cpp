@@ -99,7 +99,7 @@ public:
     bool HasQuestDrop(LootTemplateMap const& store) const;  // True if group includes at least 1 quest drop entry
     bool HasQuestDropForPlayer(Player const* player, LootTemplateMap const& store) const;
     // The same for active quests of the player
-    void Process(Loot& loot, Player const* player, LootStore const& lootstore, uint16 lootMode) const;    // Rolls an item from the group (if any) and adds the item to the loot
+    void Process(Loot& loot, Player const* player, LootStore const& lootstore, uint16 lootMode, Creature* creature = nullptr) const;    // Rolls an item from the group (if any) and adds the item to the loot
     float RawTotalChance() const;                       // Overall chance for the group (without equal chanced items)
     float TotalChance() const;                          // Overall chance for the group
 
@@ -1401,10 +1401,14 @@ void LootTemplate::LootGroup::CopyConditions(ConditionList /*conditions*/)
 }
 
 // Rolls an item from the group (if any takes its chance) and adds the item to the loot
-void LootTemplate::LootGroup::Process(Loot& loot, Player const* player, LootStore const& store, uint16 lootMode) const
+void LootTemplate::LootGroup::Process(Loot& loot, Player const* player, LootStore const& store, uint16 lootMode, Creature* creature) const
 {
     if (LootStoreItem const* item = Roll(loot, player, store, lootMode))
     {
+        if (creature && item->reqlevel > 0 && creature->getLevel() < item->reqlevel) // The creature is not a high enough level to drop this item
+            return;
+        if (creature && item->reqlevel < 0 && creature->getLevel() > -(item->reqlevel)) // The creature is too high a level to drop this item
+            return;
         bool rate = store.IsRatesAllowed();
 
         if (item->reference) // References processing
@@ -1665,7 +1669,7 @@ void LootTemplate::Process(Loot& loot, LootStore const& store, uint16 lootMode, 
         if (!Groups[groupId - 1])
             return;
 
-        Groups[groupId - 1]->Process(loot, player, store, lootMode, 0, creature);
+        Groups[groupId - 1]->Process(loot, player, store, lootMode, creature);
         return;
     }
 
