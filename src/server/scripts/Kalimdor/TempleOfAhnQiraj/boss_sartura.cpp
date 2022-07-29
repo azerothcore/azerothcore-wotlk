@@ -26,11 +26,11 @@ EndScriptData */
 #include "ScriptedCreature.h"
 #include "temple_of_ahnqiraj.h"
 
-enum Yells
+enum Says
 {
     SAY_AGGRO               = 0,
     SAY_SLAY                = 1,
-    SAY_DEATH               = 2,
+    SAY_DEATH               = 2
 };
 
 enum Spells
@@ -46,10 +46,12 @@ enum Spells
 
 enum events
 {
-    EVENT_SPELL_WHIRLWIND   = 1,
-    EVENT_SPELL_ENRAGE      = 2,
-    EVENT_SPELL_BERSERK     = 3,
-    EVENT_AGGRO_RESET       = 4
+    EVENT_WHIRLWIND         = 1,
+    EVENT_WHIRLWIND_RANDOM  = 2,
+    EVENT_WHIRLWIND_END     = 3,
+    EVENT_SPELL_BERSERK     = 5,
+    EVENT_AGGRO_RESET       = 6,
+    EVENT_AGGRO_RESET_END   = 7
 };
 
 struct boss_sartura : public BossAI
@@ -60,8 +62,10 @@ struct boss_sartura : public BossAI
     void Reset() override
     {
         _Reset();
+        whirlwind = false;
         enraged = false;
         berserked = false;
+        aggroReset = false;
     }
 
     void EnterCombat(Unit* who) override
@@ -93,7 +97,6 @@ struct boss_sartura : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
-        //Return since we have no target
         if (!UpdateVictim())
             return;
 
@@ -103,28 +106,52 @@ struct boss_sartura : public BossAI
         {
             switch (eventId)
             {
-            case EVENT_STONE_PHASE:
-                Talk(EMOTE_STONE_PHASE);
-                DoCastAOE(SPELL_SUMMON_MANA_FIENDS);
-                DoCastSelf(SPELL_ENERGIZE);
-                events.CancelEvent(EVENT_SPELL_DRAIN_MANA);
-                events.ScheduleEvent(EVENT_STONE_PHASE_END, 90000);
-                break;
-            case EVENT_STONE_PHASE_END:
-                me->RemoveAurasDueToSpell(SPELL_ENERGIZE);
-                events.ScheduleEvent(EVENT_SPELL_DRAIN_MANA, urand(2000, 6000));
-                events.ScheduleEvent(EVENT_STONE_PHASE, 90000);
-                break;
-            case EVENT_SPELL_DRAIN_MANA:
-                DoCastAOE(SPELL_DRAIN_MANA_SERVERSIDE);
-                events.ScheduleEvent(EVENT_SPELL_DRAIN_MANA, urand(2000, 6000));
-                break;
-            case EVENT_SPELL_TRAMPLE:
-                DoCastAOE(SPELL_TRAMPLE);
-                events.ScheduleEvent(EVENT_SPELL_TRAMPLE, 15000);
-                break;
-            default:
-                break;
+                case EVENT_WHIRLWIND:
+                    DoCastSelf(SPELL_WHIRLWIND);
+                    whirlwind = true;
+                    events.ScheduleEvent(EVENT_WHIRLWIND_RANDOM, urand(3000, 7000));
+                    events.ScheduleEvent(EVENT_WHIRLWIND_END, 15000);
+                    break;
+                case EVENT_WHIRLWIND_RANDOM:
+                    if (whirlwind == true)
+                    {
+                        if (Unit* pUnit = SelectTarget(SELECT_TARGET_RANDOM, 1, 100.0f, true))
+                        {
+                            me->AddThreat(pUnit, 1.0f);
+                            me->TauntApply(pUnit);
+                            AttackStart(pUnit);
+                        }
+                        events.RepeatEvent(urand(3000, 7000));
+                    }
+                    break;
+                case EVENT_WHIRLWIND_END:
+                    events.CancelEvent(EVENT_WHIRLWIND_RANDOM);
+                    whirlwind = false;
+                    events.ScheduleEvent(EVENT_WHIRLWIND, urand(25000, 40000));
+                    break;
+                case EVENT_AGGRO_RESET:
+                    if (aggroReset != true)
+                    {
+                        aggroReset = true;
+                        events.ScheduleEvent(EVENT_AGGRO_RESET_END, 15000);
+                    }
+                    if (Unit* pUnit = SelectTarget(SELECT_TARGET_RANDOM, 1, 100.0f, true))
+                    {
+                        me->AddThreat(pUnit, 1.0f);
+                        me->TauntApply(pUnit);
+                        AttackStart(pUnit);
+                    }
+                    events.RepeatEvent(urand(2000, 5000));
+                    break;
+                case EVENT_AGGRO_RESET_END:
+                    aggroReset = false;
+                    events.RescheduleEvent(EVENT_AGGRO_RESET, urand(30000, 40000));
+                    break;
+                case EVENT_SPELL_BERSERK:
+                    DoCastSelf(SPELL_BERSERK);
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -200,8 +227,10 @@ struct boss_sartura : public BossAI
         DoMeleeAttackIfReady();
     };
     private:
+        bool whirlwind;
         bool enraged;
         bool berserked;
+        bool aggroReset;
 };
 
 class npc_sartura_royal_guard : public CreatureScript
