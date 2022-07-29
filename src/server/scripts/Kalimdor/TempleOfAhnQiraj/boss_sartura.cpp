@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Boss_Sartura
-SD%Complete: 95
-SDComment:
-SDCategory: Temple of Ahn'Qiraj
-EndScriptData */
-
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "temple_of_ahnqiraj.h"
@@ -179,100 +172,87 @@ struct boss_sartura : public BossAI
         bool aggroReset;
 };
 
-class npc_sartura_royal_guard : public CreatureScript
+struct npc_sartura_royal_guard : public ScriptedAI
 {
-public:
-    npc_sartura_royal_guard() : CreatureScript("npc_sartura_royal_guard") { }
+    npc_sartura_royal_guard(Creature* creature) : ScriptedAI(creature) {}
 
-    CreatureAI* GetAI(Creature* creature) const
+    void Reset()
     {
-        return new npc_sartura_royal_guardAI(creature);
+        events.Reset();
+        whirlwind = false;
+        aggroReset = false;
     }
 
-    struct npc_sartura_royal_guardAI : public ScriptedAI
+    void EnterCombat(Unit* /*who*/)
     {
-        npc_sartura_royal_guardAI(Creature* creature) : ScriptedAI(creature) {}
+        events.ScheduleEvent(EVENT_GUARD_WHIRLWIND, 30000);
+        events.ScheduleEvent(EVENT_GUARD_AGGRO_RESET, urand(45000, 55000));
+        events.ScheduleEvent(EVENT_GUARD_KNOCKBACk, 10000);
+    }
 
-        void Reset()
+    void UpdateAI(uint32 diff)
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+
+        while (uint32 eventid = events.ExecuteEvent())
         {
-            events.Reset();
-
-            whirlwind = false;
-            aggroReset = false;
-        }
-
-        void EnterCombat(Unit* /*who*/)
-        {
-            events.ScheduleEvent(EVENT_GUARD_WHIRLWIND, 30000);
-            events.ScheduleEvent(EVENT_GUARD_AGGRO_RESET, urand(45000, 55000));
-            events.ScheduleEvent(EVENT_GUARD_KNOCKBACk, 10000);
-        }
-
-        void UpdateAI(uint32 diff)
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            while (uint32 eventid = events.ExecuteEvent())
+            switch (eventid)
             {
-                switch (eventid)
-                {
-                    case EVENT_GUARD_WHIRLWIND:
-                        DoCastSelf(SPELL_GUARD_WHIRLWIND);
-                        whirlwind = true;
-                        events.ScheduleEvent(EVENT_GUARD_WHIRLWIND_RANDOM, urand(3000, 7000));
-                        events.ScheduleEvent(EVENT_GUARD_WHIRLWIND_END, 15000);
-                        break;
-                    case EVENT_GUARD_WHIRLWIND_RANDOM:
-                        if (whirlwind == true)
-                        {
-                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
-                            {
-                                me->AddThreat(target, 1.0f);
-                                me->TauntApply(target);
-                                AttackStart(target);
-                            }
-                            events.RepeatEvent(urand(3000, 7000));
-                        }
-                        break;
-                    case EVENT_GUARD_WHIRLWIND_END:
-                        events.CancelEvent(EVENT_SARTURA_WHIRLWIND_RANDOM);
-                        whirlwind = false;
-                        events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND, urand(25000, 40000));
-                        break;
-                    case EVENT_GUARD_AGGRO_RESET:
-                        if (aggroReset != true)
-                        {
-                            aggroReset = true;
-                            events.ScheduleEvent(EVENT_GUARD_AGGRO_RESET_END, 15000);
-                        }
+                case EVENT_GUARD_WHIRLWIND:
+                    DoCastSelf(SPELL_GUARD_WHIRLWIND);
+                    whirlwind = true;
+                    events.ScheduleEvent(EVENT_GUARD_WHIRLWIND_RANDOM, urand(3000, 7000));
+                    events.ScheduleEvent(EVENT_GUARD_WHIRLWIND_END, 15000);
+                    break;
+                case EVENT_GUARD_WHIRLWIND_RANDOM:
+                    if (whirlwind == true)
+                    {
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
                         {
                             me->AddThreat(target, 1.0f);
                             me->TauntApply(target);
                             AttackStart(target);
                         }
-                        events.RepeatEvent(urand(2000, 5000));
-                        break;
-                    case EVENT_GUARD_AGGRO_RESET_END:
-                        aggroReset = false;
-                        events.RescheduleEvent(EVENT_SARTURA_AGGRO_RESET, urand(30000, 40000));
-                        break;
-                    case EVENT_GUARD_KNOCKBACk:
-                        DoCastSelf(SPELL_GUARD_WHIRLWIND);
-                        events.RepeatEvent(urand(10000, 20000));
-                        break;
-                }
+                        events.RepeatEvent(urand(3000, 7000));
+                    }
+                    break;
+                case EVENT_GUARD_WHIRLWIND_END:
+                    events.CancelEvent(EVENT_SARTURA_WHIRLWIND_RANDOM);
+                    whirlwind = false;
+                    events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND, urand(25000, 40000));
+                    break;
+                case EVENT_GUARD_AGGRO_RESET:
+                    if (aggroReset != true)
+                    {
+                        aggroReset = true;
+                        events.ScheduleEvent(EVENT_GUARD_AGGRO_RESET_END, 15000);
+                    }
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
+                    {
+                        me->AddThreat(target, 1.0f);
+                        me->TauntApply(target);
+                        AttackStart(target);
+                    }
+                    events.RepeatEvent(urand(2000, 5000));
+                    break;
+                case EVENT_GUARD_AGGRO_RESET_END:
+                    aggroReset = false;
+                    events.RescheduleEvent(EVENT_SARTURA_AGGRO_RESET, urand(30000, 40000));
+                    break;
+                case EVENT_GUARD_KNOCKBACk:
+                    DoCastSelf(SPELL_GUARD_WHIRLWIND);
+                    events.RepeatEvent(urand(10000, 20000));
+                    break;
             }
-            DoMeleeAttackIfReady();
         }
+        DoMeleeAttackIfReady();
+    }
     private:
         bool whirlwind;
         bool aggroReset;
-    };
-
 };
 
 void AddSC_boss_sartura()
