@@ -292,6 +292,6 @@ public:
 
 void AddSC_boss_sartura()
 {
-    RegisterRuinsOfAhnQirajCreatureAI(boss_sartura);
+    RegisterTempleOfAhnQirajCreatureAI(boss_sartura);
     new npc_sartura_royal_guard();
 }
