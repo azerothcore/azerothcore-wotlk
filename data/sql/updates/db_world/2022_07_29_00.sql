@@ -1,3 +1,4 @@
+-- DB update 2022_07_27_04 -> 2022_07_29_00
 --
 UPDATE `creature_template` SET `skinloot` = 14887 WHERE (`entry` IN (14887, 14888, 14889, 14890));
 
