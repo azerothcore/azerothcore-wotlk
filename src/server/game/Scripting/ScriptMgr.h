@@ -1177,7 +1177,7 @@ public:
     virtual void OnGroupRollRewardItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/, RollVote /*voteType*/, Roll* /*roll*/) { }
 
     //Before opening an item
-    [[nodiscard]] virtual bool OnBeforeOpenItem(Player* player, Item* item) { return true; }
+    [[nodiscard]] virtual bool OnBeforeOpenItem(Player* /*player*/, Item* /*item*/) { return true; }
 
     // After completed a quest
     [[nodiscard]] virtual bool OnBeforeQuestComplete(Player* /*player*/, uint32 /*quest_id*/) { return true; }
