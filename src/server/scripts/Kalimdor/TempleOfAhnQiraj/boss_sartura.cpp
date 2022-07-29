@@ -72,7 +72,10 @@ struct boss_sartura : public BossAI
     {
         BossAI::EnterCombat(who);
         Talk(SAY_AGGRO);
-        //events.ScheduleEvent(EVENT_STONE_PHASE, 90000);
+        events.ScheduleEvent(EVENT_WHIRLWIND, 30000);
+        events.ScheduleEvent(EVENT_WHIRLWIND_RANDOM, urand(3000, 7000));
+        events.ScheduleEvent(EVENT_AGGRO_RESET, urand(45000, 55000));
+        events.ScheduleEvent(EVENT_SPELL_BERSERK, 10 * 60000);
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -115,11 +118,11 @@ struct boss_sartura : public BossAI
                 case EVENT_WHIRLWIND_RANDOM:
                     if (whirlwind == true)
                     {
-                        if (Unit* pUnit = SelectTarget(SELECT_TARGET_RANDOM, 1, 100.0f, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
                         {
-                            me->AddThreat(pUnit, 1.0f);
-                            me->TauntApply(pUnit);
-                            AttackStart(pUnit);
+                            me->AddThreat(target, 1.0f);
+                            me->TauntApply(target);
+                            AttackStart(target);
                         }
                         events.RepeatEvent(urand(3000, 7000));
                     }
@@ -135,11 +138,11 @@ struct boss_sartura : public BossAI
                         aggroReset = true;
                         events.ScheduleEvent(EVENT_AGGRO_RESET_END, 15000);
                     }
-                    if (Unit* pUnit = SelectTarget(SELECT_TARGET_RANDOM, 1, 100.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
                     {
-                        me->AddThreat(pUnit, 1.0f);
-                        me->TauntApply(pUnit);
-                        AttackStart(pUnit);
+                        me->AddThreat(target, 1.0f);
+                        me->TauntApply(target);
+                        AttackStart(target);
                     }
                     events.RepeatEvent(urand(2000, 5000));
                     break;
@@ -148,80 +151,14 @@ struct boss_sartura : public BossAI
                     events.RescheduleEvent(EVENT_AGGRO_RESET, urand(30000, 40000));
                     break;
                 case EVENT_SPELL_BERSERK:
-                    DoCastSelf(SPELL_BERSERK);
+                    if (!berserked)
+                    {
+                        DoCastSelf(SPELL_BERSERK);
+                        berserked = true;
+                    }
                     break;
                 default:
                     break;
-            }
-        }
-
-        if (WhirlWind)
-        {
-            if (WhirlWindRandom_Timer <= diff)
-            {
-                //Attack random Gamers
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
-                {
-                    me->AddThreat(target, 1.0f);
-                    me->TauntApply(target);
-                    AttackStart(target);
-                }
-                WhirlWindRandom_Timer = urand(3000, 7000);
-            }
-            else WhirlWindRandom_Timer -= diff;
-
-            if (WhirlWindEnd_Timer <= diff)
-            {
-                WhirlWind = false;
-                WhirlWind_Timer = urand(25000, 40000);
-            }
-            else WhirlWindEnd_Timer -= diff;
-        }
-
-        if (!WhirlWind)
-        {
-            if (WhirlWind_Timer <= diff)
-            {
-                DoCast(me, SPELL_WHIRLWIND);
-                WhirlWind = true;
-                WhirlWindEnd_Timer = 15000;
-            }
-            else WhirlWind_Timer -= diff;
-
-            if (AggroReset_Timer <= diff)
-            {
-                //Attack random Gamers
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
-                {
-                    me->AddThreat(target, 1.0f);
-                    me->TauntApply(target);
-                    AttackStart(target);
-                }
-                AggroReset = true;
-                AggroReset_Timer = urand(2000, 5000);
-            }
-            else AggroReset_Timer -= diff;
-
-            if (AggroReset)
-            {
-                if (AggroResetEnd_Timer <= diff)
-                {
-                    AggroReset = false;
-                    AggroResetEnd_Timer = 5000;
-                    AggroReset_Timer = urand(35000, 45000);
-                }
-                else AggroResetEnd_Timer -= diff;
-            }
-
-            //After 10 minutes hard enrage
-            if (!EnragedHard)
-            {
-                if (EnrageHard_Timer <= diff)
-                {
-                    DoCast(me, SPELL_BERSERK, true);
-                    EnragedHard = true;
-                }
-                else EnrageHard_Timer -= diff;
             }
         }
         DoMeleeAttackIfReady();
