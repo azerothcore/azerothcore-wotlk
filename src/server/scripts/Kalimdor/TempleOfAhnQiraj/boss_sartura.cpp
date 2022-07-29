@@ -28,30 +28,40 @@ EndScriptData */
 
 enum Says
 {
-    SAY_AGGRO               = 0,
-    SAY_SLAY                = 1,
-    SAY_DEATH               = 2
+    SAY_AGGRO                       = 0,
+    SAY_SLAY                        = 1,
+    SAY_DEATH                       = 2
 };
 
 enum Spells
 {
-    SPELL_WHIRLWIND         = 26083,
-    SPELL_ENRAGE            = 8269,
-    SPELL_BERSERK           = 27680,
+    // Battleguard Sartura
+    SPELL_WHIRLWIND                 = 26083,
+    SPELL_ENRAGE                    = 8269,
+    SPELL_BERSERK                   = 27680,
 
     // Sartura's Royal Guard
-    SPELL_WHIRLWINDADD      = 26038,
-    SPELL_KNOCKBACK         = 26027
+    SPELL_WHIRLWINDADD              = 26038,
+    SPELL_KNOCKBACK                 = 26027
 };
 
 enum events
 {
-    EVENT_WHIRLWIND         = 1,
-    EVENT_WHIRLWIND_RANDOM  = 2,
-    EVENT_WHIRLWIND_END     = 3,
-    EVENT_SPELL_BERSERK     = 5,
-    EVENT_AGGRO_RESET       = 6,
-    EVENT_AGGRO_RESET_END   = 7
+    // Battleguard Sartura
+    EVENT_SARTURA_WHIRLWIND         = 1,
+    EVENT_SARTURA_WHIRLWIND_RANDOM  = 2,
+    EVENT_SARTURA_WHIRLWIND_END     = 3,
+    EVENT_SPELL_BERSERK             = 5,
+    EVENT_SARTURA_AGGRO_RESET       = 6,
+    EVENT_SARTURA_AGGRO_RESET_END   = 7,
+
+    // Sartura's Royal Guard
+    EVENT_GUARD_WHIRLWIND           = 8,
+    EVENT_GUARD_WHIRLWIND_RANDOM    = 9,
+    EVENT_GUARD_WHIRLWIND_END       = 10,
+    EVENT_GUARD_KNOCKBACk           = 11,
+    EVENT_GUARD_AGGRO_RESET         = 12,
+    EVENT_GUARD_AGGRO_RESET_END     = 13
 };
 
 struct boss_sartura : public BossAI
@@ -72,9 +82,9 @@ struct boss_sartura : public BossAI
     {
         BossAI::EnterCombat(who);
         Talk(SAY_AGGRO);
-        events.ScheduleEvent(EVENT_WHIRLWIND, 30000);
-        events.ScheduleEvent(EVENT_WHIRLWIND_RANDOM, urand(3000, 7000));
-        events.ScheduleEvent(EVENT_AGGRO_RESET, urand(45000, 55000));
+        events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND, 30000);
+        events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND_RANDOM, urand(3000, 7000));
+        events.ScheduleEvent(EVENT_SARTURA_AGGRO_RESET, urand(45000, 55000));
         events.ScheduleEvent(EVENT_SPELL_BERSERK, 10 * 60000);
     }
 
@@ -109,13 +119,13 @@ struct boss_sartura : public BossAI
         {
             switch (eventId)
             {
-                case EVENT_WHIRLWIND:
+                case EVENT_SARTURA_WHIRLWIND:
                     DoCastSelf(SPELL_WHIRLWIND);
                     whirlwind = true;
-                    events.ScheduleEvent(EVENT_WHIRLWIND_RANDOM, urand(3000, 7000));
-                    events.ScheduleEvent(EVENT_WHIRLWIND_END, 15000);
+                    events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND_RANDOM, urand(3000, 7000));
+                    events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND_END, 15000);
                     break;
-                case EVENT_WHIRLWIND_RANDOM:
+                case EVENT_SARTURA_WHIRLWIND_RANDOM:
                     if (whirlwind == true)
                     {
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
@@ -127,16 +137,16 @@ struct boss_sartura : public BossAI
                         events.RepeatEvent(urand(3000, 7000));
                     }
                     break;
-                case EVENT_WHIRLWIND_END:
-                    events.CancelEvent(EVENT_WHIRLWIND_RANDOM);
+                case EVENT_SARTURA_WHIRLWIND_END:
+                    events.CancelEvent(EVENT_SARTURA_WHIRLWIND_RANDOM);
                     whirlwind = false;
-                    events.ScheduleEvent(EVENT_WHIRLWIND, urand(25000, 40000));
+                    events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND, urand(25000, 40000));
                     break;
-                case EVENT_AGGRO_RESET:
+                case EVENT_SARTURA_AGGRO_RESET:
                     if (aggroReset != true)
                     {
                         aggroReset = true;
-                        events.ScheduleEvent(EVENT_AGGRO_RESET_END, 15000);
+                        events.ScheduleEvent(EVENT_SARTURA_AGGRO_RESET_END, 15000);
                     }
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
                     {
@@ -146,9 +156,9 @@ struct boss_sartura : public BossAI
                     }
                     events.RepeatEvent(urand(2000, 5000));
                     break;
-                case EVENT_AGGRO_RESET_END:
+                case EVENT_SARTURA_AGGRO_RESET_END:
                     aggroReset = false;
-                    events.RescheduleEvent(EVENT_AGGRO_RESET, urand(30000, 40000));
+                    events.RescheduleEvent(EVENT_SARTURA_AGGRO_RESET, urand(30000, 40000));
                     break;
                 case EVENT_SPELL_BERSERK:
                     if (!berserked)
