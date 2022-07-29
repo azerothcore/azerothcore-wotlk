@@ -26,6 +26,7 @@
 #include "DBCStores.h"
 #include "DynamicObject.h"
 #include "GameEventMgr.h"
+#include "Group.h"
 #include "LFGMgr.h"
 #include "ObjectMgr.h"
 #include "PetDefines.h"
@@ -1172,6 +1173,9 @@ public:
     // After receiving item as a quest reward
     virtual void OnQuestRewardItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/) { }
 
+    // After receiving item as a group roll reward
+    virtual void OnGroupRollRewardItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/, RollVote /*voteType*/, Roll* /*roll*/) { }
+
     // After completed a quest
     [[nodiscard]] virtual bool OnBeforeQuestComplete(Player* /*player*/, uint32 /*quest_id*/) { return true; }
 
@@ -2244,6 +2248,7 @@ public: /* PlayerScript */
     void OnLootItem(Player* player, Item* item, uint32 count, ObjectGuid lootguid);
     void OnCreateItem(Player* player, Item* item, uint32 count);
     void OnQuestRewardItem(Player* player, Item* item, uint32 count);
+    void OnGroupRollRewardItem(Player* player, Item* item, uint32 count, RollVote voteType, Roll* roll);
     bool OnBeforePlayerQuestComplete(Player* player, uint32 quest_id);
     void OnQuestComputeXP(Player* player, Quest const* quest, uint32& xpValue);
     void OnBeforePlayerDurabilityRepair(Player* player, ObjectGuid npcGUID, ObjectGuid itemGUID, float& discountMod, uint8 guildBank);
