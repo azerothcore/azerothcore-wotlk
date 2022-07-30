@@ -29,12 +29,13 @@ enum Says
 enum Spells
 {
     // Battleguard Sartura
-    SPELL_WHIRLWIND                 = 26083,
+    SPELL_WHIRLWIND                 = 26083, // MechanicImmunity (Stunned) - 15sec
     SPELL_ENRAGE                    = 8269,
     SPELL_BERSERK                   = 27680,
+    SPELL_SUNDERING_CLEAVE          = 25174,
 
     // Sartura's Royal Guard
-    SPELL_GUARD_WHIRLWIND           = 26038,
+    SPELL_GUARD_WHIRLWIND           = 26038, // 8sec
     SPELL_GUARD_KNOCKBACK           = 26027
 };
 
@@ -42,7 +43,6 @@ enum events
 {
     // Battleguard Sartura
     EVENT_SARTURA_WHIRLWIND         = 1,
-    EVENT_SARTURA_WHIRLWIND_RANDOM  = 2,
     EVENT_SARTURA_WHIRLWIND_END     = 3,
     EVENT_SPELL_BERSERK             = 5,
     EVENT_SARTURA_AGGRO_RESET       = 6,
@@ -50,8 +50,6 @@ enum events
 
     // Sartura's Royal Guard
     EVENT_GUARD_WHIRLWIND           = 8,
-    EVENT_GUARD_WHIRLWIND_RANDOM    = 9,
-    EVENT_GUARD_WHIRLWIND_END       = 10,
     EVENT_GUARD_KNOCKBACK           = 11,
     EVENT_GUARD_AGGRO_RESET         = 12,
     EVENT_GUARD_AGGRO_RESET_END     = 13
@@ -64,7 +62,6 @@ struct boss_sartura : public BossAI
     void Reset() override
     {
         _Reset();
-        whirlwind = false;
         enraged = false;
         berserked = false;
         aggroReset = false;
@@ -77,7 +74,6 @@ struct boss_sartura : public BossAI
         BossAI::EnterCombat(who);
         Talk(SAY_AGGRO);
         events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND, 30000);
-        events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND_RANDOM, urand(3000, 7000));
         events.ScheduleEvent(EVENT_SARTURA_AGGRO_RESET, urand(45000, 55000));
         events.ScheduleEvent(EVENT_SPELL_BERSERK, 10 * 60000);
     }
@@ -114,26 +110,11 @@ struct boss_sartura : public BossAI
             switch (eventId)
             {
                 case EVENT_SARTURA_WHIRLWIND:
-                    DoCastSelf(SPELL_WHIRLWIND);
-                    whirlwind = true;
-                    events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND_RANDOM, urand(3000, 7000));
+                    DoCastSelf(SPELL_WHIRLWIND, true);
                     events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND_END, 15000);
                     break;
-                case EVENT_SARTURA_WHIRLWIND_RANDOM:
-                    if (whirlwind == true)
-                    {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
-                        {
-                            me->AddThreat(target, 1.0f);
-                            me->TauntApply(target);
-                            AttackStart(target);
-                        }
-                        events.RepeatEvent(urand(3000, 7000));
-                    }
-                    break;
                 case EVENT_SARTURA_WHIRLWIND_END:
-                    events.CancelEvent(EVENT_SARTURA_WHIRLWIND_RANDOM);
-                    whirlwind = false;
+                    DoCastVictim(SPELL_SUNDERING_CLEAVE);
                     events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND, urand(25000, 40000));
                     break;
                 case EVENT_SARTURA_AGGRO_RESET:
@@ -183,7 +164,6 @@ struct boss_sartura : public BossAI
         DoMeleeAttackIfReady();
     };
     private:
-        bool whirlwind;
         bool enraged;
         bool berserked;
         bool aggroReset;
@@ -198,7 +178,6 @@ struct npc_sartura_royal_guard : public ScriptedAI
     void Reset()
     {
         events.Reset();
-        whirlwind = false;
         aggroReset = false;
         _savedTargetGUID.Clear();
         _savedTargetThreat = 0.f;
@@ -224,25 +203,6 @@ struct npc_sartura_royal_guard : public ScriptedAI
             {
                 case EVENT_GUARD_WHIRLWIND:
                     DoCastSelf(SPELL_GUARD_WHIRLWIND);
-                    whirlwind = true;
-                    events.ScheduleEvent(EVENT_GUARD_WHIRLWIND_RANDOM, urand(3000, 7000));
-                    events.ScheduleEvent(EVENT_GUARD_WHIRLWIND_END, 15000);
-                    break;
-                case EVENT_GUARD_WHIRLWIND_RANDOM:
-                    if (whirlwind == true)
-                    {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
-                        {
-                            me->AddThreat(target, 1.0f);
-                            me->TauntApply(target);
-                            AttackStart(target);
-                        }
-                        events.RepeatEvent(urand(3000, 7000));
-                    }
-                    break;
-                case EVENT_GUARD_WHIRLWIND_END:
-                    events.CancelEvent(EVENT_GUARD_WHIRLWIND_RANDOM);
-                    whirlwind = false;
                     events.ScheduleEvent(EVENT_GUARD_WHIRLWIND, urand(25000, 40000));
                     break;
                 case EVENT_GUARD_AGGRO_RESET:
@@ -287,7 +247,6 @@ struct npc_sartura_royal_guard : public ScriptedAI
         DoMeleeAttackIfReady();
     }
     private:
-        bool whirlwind;
         bool aggroReset;
         ObjectGuid _savedTargetGUID;
         float _savedTargetThreat;
