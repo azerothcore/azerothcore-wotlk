@@ -137,7 +137,7 @@ struct boss_sartura : public BossAI
                     events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND, urand(25000, 40000));
                     break;
                 case EVENT_SARTURA_AGGRO_RESET:
-                    if (aggroReset = false)
+                    if (aggroReset == false)
                     {
                         if (Unit* originalTarget = SelectTarget(SelectTargetMethod::Random, 0))
                         {
@@ -272,6 +272,8 @@ struct npc_sartura_royal_guard : public ScriptedAI
     private:
         bool whirlwind;
         bool aggroReset;
+        ObjectGuid _savedTargetGUID;
+        float _savedTargetThreat;
 };
 
 void AddSC_boss_sartura()
