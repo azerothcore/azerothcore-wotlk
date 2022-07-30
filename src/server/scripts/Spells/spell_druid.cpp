@@ -569,7 +569,7 @@ class spell_dru_lifebloom : public AuraScript
 
         if (Unit* caster = GetCaster())
         {
-            healAmount = caster->SpellHealingBonusDone(GetTarget(), finalHeal, healAmount, HEAL, 0.0f, stack);
+            healAmount = caster->SpellHealingBonusDone(GetTarget(), finalHeal, healAmount, HEAL, aurEff->GetEffIndex(), 0.0f, stack);
             healAmount = GetTarget()->SpellHealingBonusTaken(caster, finalHeal, healAmount, HEAL, stack);
             // restore mana
             int32 returnmana = (GetSpellInfo()->ManaCostPercentage * caster->GetCreateMana() / 100) * stack / 2;
@@ -590,7 +590,7 @@ class spell_dru_lifebloom : public AuraScript
                 if (caster)
                 {
                     // healing with bonus
-                    healAmount = caster->SpellHealingBonusDone(target, finalHeal, healAmount, HEAL, 0.0f, dispelInfo->GetRemovedCharges());
+                    healAmount = caster->SpellHealingBonusDone(target, finalHeal, healAmount, HEAL, aurEff->GetEffIndex(), 0.0f, dispelInfo->GetRemovedCharges());
                     healAmount = target->SpellHealingBonusTaken(caster, finalHeal, healAmount, HEAL, dispelInfo->GetRemovedCharges());
 
                     // mana amount
