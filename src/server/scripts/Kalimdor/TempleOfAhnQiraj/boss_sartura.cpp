@@ -200,6 +200,8 @@ struct npc_sartura_royal_guard : public ScriptedAI
         events.Reset();
         whirlwind = false;
         aggroReset = false;
+        _savedTargetGUID.Clear();
+        _savedTargetThreat = 0.f;
     }
 
     void EnterCombat(Unit* /*who*/)
@@ -239,30 +241,45 @@ struct npc_sartura_royal_guard : public ScriptedAI
                     }
                     break;
                 case EVENT_GUARD_WHIRLWIND_END:
-                    events.CancelEvent(EVENT_SARTURA_WHIRLWIND_RANDOM);
+                    events.CancelEvent(EVENT_GUARD_WHIRLWIND_RANDOM);
                     whirlwind = false;
-                    events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND, urand(25000, 40000));
+                    events.ScheduleEvent(EVENT_GUARD_WHIRLWIND, urand(25000, 40000));
                     break;
                 case EVENT_GUARD_AGGRO_RESET:
-                    if (aggroReset != true)
+                    if (aggroReset == true)
                     {
+                        if (Unit* originalTarget = SelectTarget(SelectTargetMethod::Random, 0))
+                        {
+                            _savedTargetGUID = originalTarget->GetGUID();
+                            _savedTargetThreat = me->GetThreatMgr().getThreat(originalTarget);
+                            me->GetThreatMgr().modifyThreatPercent(originalTarget, -100);
+                        }
                         aggroReset = true;
-                        events.ScheduleEvent(EVENT_GUARD_AGGRO_RESET_END, 15000);
+                        events.ScheduleEvent(EVENT_GUARD_AGGRO_RESET_END, 5000);
                     }
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
+                    else
                     {
-                        me->AddThreat(target, 1.0f);
-                        me->TauntApply(target);
-                        AttackStart(target);
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
+                        {
+                            me->AddThreat(target, 1.0f);
+                            me->TauntApply(target);
+                            AttackStart(target);
+                        }
                     }
-                    events.RepeatEvent(urand(2000, 5000));
+                    events.RepeatEvent(urand(1000, 2000));
                     break;
                 case EVENT_GUARD_AGGRO_RESET_END:
+                    events.CancelEvent(EVENT_GUARD_AGGRO_RESET);
+                    if (Unit* originalTarget = ObjectAccessor::GetUnit(*me, _savedTargetGUID))
+                    {
+                        me->GetThreatMgr().addThreat(originalTarget, _savedTargetThreat);
+                        _savedTargetGUID.Clear();
+                    }
                     aggroReset = false;
-                    events.RescheduleEvent(EVENT_SARTURA_AGGRO_RESET, urand(30000, 40000));
+                    events.RescheduleEvent(EVENT_GUARD_AGGRO_RESET, urand(30000, 40000));
                     break;
                 case EVENT_GUARD_KNOCKBACK:
-                    DoCastSelf(SPELL_GUARD_WHIRLWIND);
+                    DoCastVictim(SPELL_GUARD_KNOCKBACK);
                     events.RepeatEvent(urand(10000, 20000));
                     break;
             }
