@@ -45,17 +45,17 @@ enum events
     EVENT_SARTURA_WHIRLWIND         = 1,
     EVENT_SARTURA_WHIRLWIND_RANDOM  = 2,
     EVENT_SARTURA_WHIRLWIND_END     = 3,
-    EVENT_SPELL_BERSERK             = 5,
-    EVENT_SARTURA_AGGRO_RESET       = 6,
-    EVENT_SARTURA_AGGRO_RESET_END   = 7,
+    EVENT_SPELL_BERSERK             = 4,
+    EVENT_SARTURA_AGGRO_RESET       = 5,
+    EVENT_SARTURA_AGGRO_RESET_END   = 6,
 
     // Sartura's Royal Guard
-    EVENT_GUARD_WHIRLWIND           = 8,
-    EVENT_GUARD_WHIRLWIND_RANDOM    = 9,
-    EVENT_GUARD_WHIRLWIND_END       = 10,
-    EVENT_GUARD_KNOCKBACK           = 11,
-    EVENT_GUARD_AGGRO_RESET         = 12,
-    EVENT_GUARD_AGGRO_RESET_END     = 13
+    EVENT_GUARD_WHIRLWIND           = 7,
+    EVENT_GUARD_WHIRLWIND_RANDOM    = 8,
+    EVENT_GUARD_WHIRLWIND_END       = 9,
+    EVENT_GUARD_KNOCKBACK           = 10,
+    EVENT_GUARD_AGGRO_RESET         = 11,
+    EVENT_GUARD_AGGRO_RESET_END     = 12
 };
 
 struct boss_sartura : public BossAI
@@ -78,7 +78,6 @@ struct boss_sartura : public BossAI
         BossAI::EnterCombat(who);
         Talk(SAY_AGGRO);
         events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND, 30000);
-        events.ScheduleEvent(EVENT_SARTURA_WHIRLWIND_RANDOM, urand(3000, 7000));
         events.ScheduleEvent(EVENT_SARTURA_AGGRO_RESET, urand(45000, 55000));
         events.ScheduleEvent(EVENT_SPELL_BERSERK, 10 * 60000);
     }
