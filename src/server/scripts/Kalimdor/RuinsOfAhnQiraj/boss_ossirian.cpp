@@ -367,28 +367,9 @@ private:
     TaskScheduler _scheduler;
 };
 
-class spell_crystal_weakness : public SpellScript
-{
-    PrepareSpellScript(spell_crystal_weakness);
-
-    void FilterTargets(std::list<WorldObject*>& targets)
-    {
-        targets.remove_if([&](WorldObject const* target) -> bool
-            {
-                return target->GetEntry() != NPC_OSSIRIAN;
-            });
-    }
-
-    void Register() override
-    {
-        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_crystal_weakness::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENTRY);
-    }
-};
-
 void AddSC_boss_ossirian()
 {
     RegisterRuinsOfAhnQirajCreatureAI(boss_ossirian);
     new go_ossirian_crystal();
     RegisterCreatureAI(npc_anubisath_guardian);
-    RegisterSpellScript(spell_crystal_weakness);
 }
