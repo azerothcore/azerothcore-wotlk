@@ -215,7 +215,7 @@ struct npc_sartura_royal_guard : public ScriptedAI
 {
     npc_sartura_royal_guard(Creature* creature) : ScriptedAI(creature) {}
 
-    void Reset()
+    void Reset() override
     {
         events.Reset();
         whirlwind = false;
