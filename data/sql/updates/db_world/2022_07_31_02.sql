@@ -1,3 +1,4 @@
+-- DB update 2022_07_31_01 -> 2022_07_31_02
 --
 -- Kum'isha the Collector
 UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=7363;
