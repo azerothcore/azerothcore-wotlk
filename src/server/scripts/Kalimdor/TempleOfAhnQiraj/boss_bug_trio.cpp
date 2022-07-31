@@ -53,7 +53,7 @@ enum Misc
 
     EMOTE_DEVOURED       = 0,
 
-    POINT_CONSUME        = 99,
+    POINT_CONSUME        = 0,
 
     VEM_WAYPOINT_PATH    = 876030
 };
