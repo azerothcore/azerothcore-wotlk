@@ -464,6 +464,7 @@ void Unit::Update(uint32 p_time)
     // xinef: if attack time > 0, reduce by diff
     // if on next update, attack time < 0 assume player didnt attack - set to 0
     bool suspendAttackTimer = false;
+    bool suspendRangedAttackTimer = false;
     if (IsPlayer() && HasUnitState(UNIT_STATE_CASTING))
     {
         for (Spell* spell : m_currentSpells)
@@ -472,6 +473,11 @@ void Unit::Update(uint32 p_time)
             {
                 if (spell->GetSpellInfo()->HasAttribute(SPELL_ATTR2_DO_NOT_RESET_COMBAT_TIMERS))
                 {
+                    if (spell->IsChannelActive())
+                    {
+                        suspendRangedAttackTimer = true;
+                    }
+
                     suspendAttackTimer = true;
                     break;
                 }
@@ -492,9 +498,12 @@ void Unit::Update(uint32 p_time)
         }
     }
 
-    if (int32 ranged_attack = getAttackTimer(RANGED_ATTACK))
+    if (!suspendRangedAttackTimer)
     {
-        setAttackTimer(RANGED_ATTACK, ranged_attack > 0 ? ranged_attack - (int32) p_time : 0);
+        if (int32 ranged_attack = getAttackTimer(RANGED_ATTACK))
+        {
+            setAttackTimer(RANGED_ATTACK, ranged_attack > 0 ? ranged_attack - (int32)p_time : 0);
+        }
     }
 
     // update abilities available only for fraction of time
