@@ -590,7 +590,7 @@ class spell_dru_lifebloom : public AuraScript
                 if (caster)
                 {
                     // healing with bonus
-                    healAmount = caster->SpellHealingBonusDone(target, finalHeal, healAmount, HEAL, aurEff->GetEffIndex(), 0.0f, dispelInfo->GetRemovedCharges());
+                    healAmount = caster->SpellHealingBonusDone(target, finalHeal, healAmount, HEAL, EFFECT_1, 0.0f, dispelInfo->GetRemovedCharges());
                     healAmount = target->SpellHealingBonusTaken(caster, finalHeal, healAmount, HEAL, dispelInfo->GetRemovedCharges());
 
                     // mana amount
