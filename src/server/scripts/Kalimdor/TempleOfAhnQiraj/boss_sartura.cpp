@@ -224,7 +224,7 @@ struct npc_sartura_royal_guard : public ScriptedAI
         _savedTargetThreat = 0.f;
     }
 
-    void EnterCombat(Unit* /*who*/)
+    void EnterCombat(Unit* /*who*/) override
     {
         events.ScheduleEvent(EVENT_GUARD_WHIRLWIND, 30000);
         events.ScheduleEvent(EVENT_GUARD_AGGRO_RESET, urand(45000, 55000));
