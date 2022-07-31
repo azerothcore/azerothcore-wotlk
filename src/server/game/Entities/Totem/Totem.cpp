@@ -116,38 +116,40 @@ void Totem::UnSummon(uint32 msTime)
     CombatStop();
     RemoveAurasDueToSpell(GetSpell(), GetGUID());
 
-    Unit* owner = GetOwner();
-    // clear owner's totem slot
-    for (uint8 i = SUMMON_SLOT_TOTEM; i < MAX_TOTEM_SLOT; ++i)
+    if (Unit* owner = GetOwner())
     {
-        if (owner->m_SummonSlot[i] == GetGUID())
+        // clear owner's totem slot
+        for (uint8 i = SUMMON_SLOT_TOTEM; i < MAX_TOTEM_SLOT; ++i)
         {
-            owner->m_SummonSlot[i].Clear();
-            break;
-        }
-    }
-
-    owner->RemoveAurasDueToSpell(GetSpell(), GetGUID());
-
-    // Remove Sentry Totem Aura
-    if (GetEntry() == SENTRY_TOTEM_ENTRY)
-        owner->RemoveAurasDueToSpell(SENTRY_TOTEM_SPELLID);
-
-    //remove aura all party members too
-    if (Player* player = owner->ToPlayer())
-    {
-        player->SendAutoRepeatCancel(this);
-
-        if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(GetUInt32Value(UNIT_CREATED_BY_SPELL)))
-            player->SendCooldownEvent(spell, 0, nullptr, false);
-
-        if (Group* group = player->GetGroup())
-        {
-            for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+            if (owner->m_SummonSlot[i] == GetGUID())
             {
-                Player* target = itr->GetSource();
-                if (target && target->IsInMap(player) && group->SameSubGroup(player, target))
-                    target->RemoveAurasDueToSpell(GetSpell(), GetGUID());
+                owner->m_SummonSlot[i].Clear();
+                break;
+            }
+        }
+
+        owner->RemoveAurasDueToSpell(GetSpell(), GetGUID());
+
+        // Remove Sentry Totem Aura
+        if (GetEntry() == SENTRY_TOTEM_ENTRY)
+            owner->RemoveAurasDueToSpell(SENTRY_TOTEM_SPELLID);
+
+        //remove aura all party members too
+        if (Player* player = owner->ToPlayer())
+        {
+            player->SendAutoRepeatCancel(this);
+
+            if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(GetUInt32Value(UNIT_CREATED_BY_SPELL)))
+                player->SendCooldownEvent(spell, 0, nullptr, false);
+
+            if (Group* group = player->GetGroup())
+            {
+                for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+                {
+                    Player* target = itr->GetSource();
+                    if (target && target->IsInMap(player) && group->SameSubGroup(player, target))
+                        target->RemoveAurasDueToSpell(GetSpell(), GetGUID());
+                }
             }
         }
     }
