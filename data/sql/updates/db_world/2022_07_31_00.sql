@@ -1,3 +1,4 @@
+-- DB update 2022_07_29_00 -> 2022_07_31_00
 -- Chief Hawkwind
 UPDATE `creature_template` SET `gossip_menu_id`=0, `npcflag`=`npcflag`&~1 WHERE `entry`=2981;
 
