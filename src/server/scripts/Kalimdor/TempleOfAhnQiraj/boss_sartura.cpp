@@ -239,7 +239,7 @@ struct npc_sartura_royal_guard : public ScriptedAI
         me->RemoveAura(SPELL_SUNDERING_CLEAVE);
     }
 
-    void UpdateAI(uint32 diff)
+    void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
             return;
