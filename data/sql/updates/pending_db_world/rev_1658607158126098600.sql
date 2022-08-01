@@ -26,7 +26,6 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALU
 (478, 476, 50, 'ZG Before Bats Troll 3-Pack with 2x entry 11351');
 
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
-
 (12814, 477, 'ZG Before Bats Troll 3-Pack entry 11831'),
 (12815, 477, 'ZG Before Bats Troll 3-Pack entry 11831'),
 (12816, 477, 'ZG Before Bats Troll 3-Pack entry 11351'),
