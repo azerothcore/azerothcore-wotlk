@@ -194,10 +194,10 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 return;
         }
     }
-    // LANG_ADDON should not be changed nor be affected by flood control
+
     else
     {
-        uint32 specialMessageLimit = 0;
+
         // send in universal language if player in .gmon mode (ignore spell effects)
         if (sender->IsGameMaster())
             lang = LANG_UNIVERSAL;
@@ -218,20 +218,17 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                         // allow two side chat at group channel if two side group allowed
                         if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
                             lang = LANG_UNIVERSAL;
-
-                        specialMessageLimit = 35;
                         break;
                     case CHAT_MSG_GUILD:
                     case CHAT_MSG_OFFICER:
                         // allow two side chat at guild channel if two side guild allowed
                         if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD))
                             lang = LANG_UNIVERSAL;
-
-                        specialMessageLimit = 15;
                         break;
+
                     case CHAT_MSG_WHISPER:
                         if (sender->getLevel() >= 80)
-                            specialMessageLimit = 15;
+                            lang = LANG_UNIVERSAL;
                         break;
                 }
             }
@@ -242,7 +239,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         }
 
         if (type != CHAT_MSG_AFK && type != CHAT_MSG_DND)
-            sender->UpdateSpeakTime(specialMessageLimit);
+            sender->UpdateSpeakTime(lang == LANG_ADDON ? Player::ChatFloodThrottle::ADDON : Player::ChatFloodThrottle::REGULAR);
     }
 
     std::string to, channel, msg;
@@ -342,6 +339,11 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         {
             return;
         }
+    }
+
+    else
+    {
+        ++_addonMessageReceiveCount;
     }
 
     sScriptMgr->OnBeforeSendChatMessage(_player, type, lang, msg);
@@ -726,7 +728,7 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
     if (!GetPlayer()->IsAlive())
         return;
 
-    GetPlayer()->UpdateSpeakTime();
+    GetPlayer()->UpdateSpeakTime(Player::ChatFloodThrottle::REGULAR);
 
     if (!GetPlayer()->CanSpeak())
     {

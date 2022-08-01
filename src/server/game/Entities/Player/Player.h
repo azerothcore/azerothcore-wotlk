@@ -2254,9 +2254,21 @@ public:
     /***               FLOOD FILTER SYSTEM                 ***/
     /*********************************************************/
 
-    void UpdateSpeakTime(uint32 specialMessageLimit = 0);
+    struct ChatFloodThrottle
+    {
+        enum Index
+        {
+            REGULAR = 0,
+            ADDON = 1,
+            MAX
+        };
+
+        time_t Time = 0;
+        uint32 Count = 0;
+    };
+
+    void UpdateSpeakTime(ChatFloodThrottle::Index index);
     [[nodiscard]] bool CanSpeak() const;
-    void ChangeSpeakTime(int utime);
 
     /*********************************************************/
     /***                 VARIOUS SYSTEMS                   ***/
@@ -2689,8 +2701,7 @@ public:
     uint16 m_additionalSaveTimer; // pussywizard
     uint8 m_additionalSaveMask; // pussywizard
     uint16 m_hostileReferenceCheckTimer; // pussywizard
-    time_t m_speakTime;
-    uint32 m_speakCount;
+    std::array<ChatFloodThrottle, ChatFloodThrottle::MAX> m_chatFloodData;
     Difficulty m_dungeonDifficulty;
     Difficulty m_raidDifficulty;
     Difficulty m_raidMapDifficulty;
