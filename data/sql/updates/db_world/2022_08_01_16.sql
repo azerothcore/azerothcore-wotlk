@@ -1,3 +1,4 @@
+-- DB update 2022_08_01_15 -> 2022_08_01_16
 --
 -- Maintenance on ZG Before Bats Part 3:  Pooling Part 2 Troll Pack before Bat Area
 -- Formations shouldn't be needed on this pack (they agro properly without) 
