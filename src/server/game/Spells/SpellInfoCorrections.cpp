@@ -4329,6 +4329,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(0x00000003, 0x00001000);
     });
 
+    // Elemental Vulnerability
+    ApplySpellFix({ 28772 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Speed = 1;
+    });
+
     // Find the Ancient Hero: Kill Credit
     ApplySpellFix({ 25729 }, [](SpellInfo* spellInfo)
     {
