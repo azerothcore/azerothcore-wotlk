@@ -1,3 +1,4 @@
+-- DB update 2022_08_01_04 -> 2022_08_01_05
 -- Sprinkle
 DELETE FROM `creature_text` WHERE `CreatureID`=7583 AND `GroupID`=3;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
