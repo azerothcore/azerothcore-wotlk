@@ -1,3 +1,4 @@
+-- DB update 2022_08_01_07 -> 2022_08_01_08
 
 SET @GUID :=86939;
 DELETE FROM `creature_formations` WHERE `memberGUID` BETWEEN @GUID+0 AND @GUID+71;
