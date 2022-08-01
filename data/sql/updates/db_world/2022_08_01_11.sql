@@ -1,3 +1,4 @@
+-- DB update 2022_08_01_10 -> 2022_08_01_11
 --
 -- Maintenance on ZG Before Bats Part 4:  Pooling Part 3 Standing Bats Pack
 -- Old Locations Pre-work
