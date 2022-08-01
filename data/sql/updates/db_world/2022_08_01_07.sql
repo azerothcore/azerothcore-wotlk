@@ -1,3 +1,4 @@
+-- DB update 2022_08_01_06 -> 2022_08_01_07
 --
 /* Maintenance on ZG Before Bats Part 2:  Pooling Part 1 */
 DELETE FROM `creature` WHERE `guid` BETWEEN 91480 AND 91484;
