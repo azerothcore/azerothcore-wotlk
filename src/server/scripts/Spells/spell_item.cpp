@@ -3685,6 +3685,12 @@ class spell_item_freeze_rookery_egg : public SpellScript
     void HandleOpenObject(SpellEffIndex effIndex)
     {
         PreventHitDefaultEffect(effIndex);
+
+        if (GameObject* rookery = GetHitGObj())
+        {
+            if (rookery->getLootState() == GO_READY)
+                rookery->UseDoorOrButton(0, true);
+        }
     }
 
     void Register() override
