@@ -272,6 +272,8 @@ public:
 
     void SendGossipMenu(uint32 titleTextId, ObjectGuid objectGUID);
     void SendCloseGossip();
+    void SendGossipMenu(std::string text, ObjectGuid objectGUID, uint32 textid = 2147483647);
+    void SendCloseGossip() const;
     void SendPointOfInterest(uint32 poiId) const;
 
     /*********************************************************/

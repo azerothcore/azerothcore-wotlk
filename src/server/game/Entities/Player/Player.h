@@ -69,7 +69,7 @@ typedef std::deque<Mail*> PlayerMails;
 typedef void(*bgZoneRef)(Battleground*, WorldPacket&);
 
 #define PLAYER_MAX_SKILLS           127
-#define PLAYER_MAX_DAILY_QUESTS     25
+#define PLAYER_MAX_DAILY_QUESTS     30
 #define PLAYER_EXPLORED_ZONES_SIZE  128
 
 // corpse reclaim times
@@ -695,6 +695,10 @@ enum EquipmentSlots                                         // 19 slots
 enum InventorySlots                                         // 4 slots
 {
     INVENTORY_SLOT_BAG_START    = 19,
+    INVENTORY_SLOT_BAG_1 = 19,
+    INVENTORY_SLOT_BAG_2 = 20,
+    INVENTORY_SLOT_BAG_3 = 21,
+    INVENTORY_SLOT_BAG_4 = 22,
     INVENTORY_SLOT_BAG_END      = 23
 };
 
@@ -1846,6 +1850,7 @@ public:
     [[nodiscard]] Guild* GetGuild() const;
     uint32 GetGuildIdInvited() { return m_GuildIdInvited; }
     static void RemovePetitionsAndSigns(ObjectGuid guid, uint32 type);
+    static uint8 GetRankFromDB(ObjectGuid guid);
 
     // Arena Team
     void SetInArenaTeam(uint32 ArenaTeamId, uint8 slot, uint8 type)
@@ -2830,6 +2835,9 @@ public:
     bool m_needZoneUpdate;
 
     [[nodiscard]] AchievementMgr* GetAchievementMgr() const { return m_achievementMgr; }
+
+            // Played rewards
+        uint32 m_PlayedRewardsTimer;
 
 private:
     // internal common parts for CanStore/StoreItem functions

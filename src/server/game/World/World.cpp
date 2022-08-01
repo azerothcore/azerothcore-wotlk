@@ -1017,6 +1017,7 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_WEATHER]                       = sConfigMgr->GetOption<bool>("ActivateWeather", true);
 
     m_int_configs[CONFIG_DISABLE_BREATHING] = sConfigMgr->GetOption<int32>("DisableWaterBreath", SEC_CONSOLE);
+    m_int_configs[CONFIG_DISABLE_FATIGUE] = sConfigMgr->GetOption<int32>("DisableFatigue", SEC_CONSOLE); //Disable Fatigue
 
     m_bool_configs[CONFIG_ALWAYS_MAX_SKILL_FOR_LEVEL] = sConfigMgr->GetOption<bool>("AlwaysMaxSkillForLevel", false);
 
@@ -2724,6 +2725,37 @@ void World::SendZoneText(uint32 zone, const char* text, WorldSession* self, Team
     ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, text);
     SendZoneMessage(zone, &data, self, teamId);
 }
+
+/// Send GUILD-LEVEL
+bool World::SendGuildMessage(uint32 guild, WorldPacket* packet, WorldSession* self, uint32 team)
+{
+    bool foundPlayerToSend = false;
+    SessionMap::const_iterator itr;
+
+    for (itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
+    {
+        if (itr->second &&
+            itr->second->GetPlayer() &&
+            itr->second->GetPlayer()->IsInWorld() &&
+            itr->second->GetPlayer()->GetGuildId() == guild &&
+            itr->second != self &&
+            (team == 0 || itr->second->GetPlayer()->GetTeamId() == team))
+        {
+            itr->second->SendPacket(packet);
+            foundPlayerToSend = true;
+        }
+    }
+    return foundPlayerToSend;
+}
+
+/// Send a System Message GUILD-LEVEL
+void World::SendGuildText(uint32 guild, const char* text, WorldSession* self, uint32 team)
+{
+    WorldPacket data;
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, text);
+    SendGuildMessage(guild, &data, self, team);
+}
+
 
 /// Kick (and save) all players
 void World::KickAll()

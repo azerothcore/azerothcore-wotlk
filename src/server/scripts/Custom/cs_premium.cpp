@@ -4,7 +4,8 @@
 #include "ScriptMgr.h"
 //#include "AuctionHouseMgr.h"
 
-#define EMOTE_NO_VIP "Извините, доступно только VIP игрокам..."
+#define EMOTE_NO_VIP "Доступно только VIP игрокам. Приобретается в ЛК."
+#define EMOTE_ZONE_VIP "На текущий момент команда недоступна! Попробуйте позже."
 using namespace Acore::ChatCommands;
 
 class premium_commandscript : public CommandScript
@@ -36,13 +37,16 @@ public:
             //Different Checks
             if (player->IsInCombat() || player->IsInFlight() || player->GetMap()->IsBattlegroundOrArena() || player->HasStealthAura() || player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH) || player->isDead())
             {
-                handler->SendSysMessage(EMOTE_NO_VIP);
+                handler->SendSysMessage(EMOTE_ZONE_VIP);
                 handler->SetSentErrorMessage(true);
                 return false;
             }
 
             handler->GetSession()->SendShowBank(handler->GetSession()->GetPlayer()->GetGUID());
         }
+        else
+            handler->SendSysMessage(EMOTE_NO_VIP);
+            handler->SetSentErrorMessage(true);
         return true;
     }
 
@@ -54,13 +58,16 @@ public:
             //Different Checks
             if (player->IsInCombat() || player->IsInFlight() || player->GetMap()->IsBattlegroundOrArena() || player->HasStealthAura() || player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH) || player->isDead())
             {
-                handler->SendSysMessage(EMOTE_NO_VIP);
+                handler->SendSysMessage(EMOTE_ZONE_VIP);
                 handler->SetSentErrorMessage(true);
                 return false;
             }
 
             handler->GetSession()->SendShowMailBox(player->GetGUID());
         }
+        else
+            handler->SendSysMessage(EMOTE_NO_VIP);
+            handler->SetSentErrorMessage(true);
         return true;
     }
 

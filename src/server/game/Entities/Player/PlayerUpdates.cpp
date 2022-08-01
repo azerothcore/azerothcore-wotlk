@@ -37,6 +37,7 @@
 #include "Vehicle.h"
 #include "WeatherMgr.h"
 #include "WorldStatePackets.h"
+#include "../scripts/Custom/PlayerRewards/PlayedRewards.h"
 
 // TODO: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -420,6 +421,15 @@ void Player::Update(uint32 p_time)
         m_delayed_unit_relocation_timer = 0;
         RemoveFromNotify(NOTIFY_VISIBILITY_CHANGED);
     }
+
+    // Check for played rewards every second
+        if (m_PlayedRewardsTimer <= p_time)
+         {
+        m_PlayedRewardsTimer = sPlayedRewards->PLAYED_UPDATE_TIME;
+        sPlayedRewards->SendReward(this);
+        }
+     else
+        m_PlayedRewardsTimer -= p_time;
 }
 
 void Player::UpdateMirrorTimers()

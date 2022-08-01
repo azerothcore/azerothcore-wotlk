@@ -659,7 +659,6 @@ void Player::UpdateCritPercentage(WeaponAttackType attType)
         value = value > sConfigMgr->GetOption<float>("Stats.Limits.Crit", 95.0f) ? sConfigMgr->GetOption<float>("Stats.Limits.Crit", 95.0f) : value;
     }
 
-    value = value < 0.0f ? 0.0f : value;
     SetStatFloatValue(index, value);
 }
 
@@ -827,6 +826,10 @@ void Player::UpdateSpellCritChance(uint32 school)
     crit += GetRatingBonusValue(CR_CRIT_SPELL);
 
     // Store crit value
+    if (sConfigMgr->GetOption<bool>("Stats.Limits.Enable", false))
+    {
+        crit = crit > sConfigMgr->GetOption<float>("Stats.Limits.CritSpell", 95.0f) ? sConfigMgr->GetOption<float>("Stats.Limits.CritSpell", 95.0f) : crit;
+    }
     SetFloatValue(PLAYER_SPELL_CRIT_PERCENTAGE1 + school, crit);
 }
 
