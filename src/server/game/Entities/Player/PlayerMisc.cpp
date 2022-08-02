@@ -36,17 +36,17 @@ void Player::UpdateSpeakTime(ChatFloodThrottle::Index index)
     uint32 delay;
     switch (index)
     {
-    case ChatFloodThrottle::REGULAR:
-        limit = sWorld->getIntConfig(CONFIG_CHATFLOOD_MESSAGE_COUNT);
-        delay = sWorld->getIntConfig(CONFIG_CHATFLOOD_MESSAGE_DELAY);
+        case ChatFloodThrottle::REGULAR:
+            limit = sWorld->getIntConfig(CONFIG_CHATFLOOD_MESSAGE_COUNT);
+            delay = sWorld->getIntConfig(CONFIG_CHATFLOOD_MESSAGE_DELAY);
+                return;
+            break;
+        case ChatFloodThrottle::ADDON:
+            limit = sWorld->getIntConfig(CONFIG_CHATFLOOD_ADDON_MESSAGE_COUNT);
+            delay = sWorld->getIntConfig(CONFIG_CHATFLOOD_ADDON_MESSAGE_DELAY);
+            break;
+        default:
             return;
-        break;
-    case ChatFloodThrottle::ADDON:
-        limit = sWorld->getIntConfig(CONFIG_CHATFLOOD_ADDON_MESSAGE_COUNT);
-        delay = sWorld->getIntConfig(CONFIG_CHATFLOOD_ADDON_MESSAGE_DELAY);
-        break;
-    default:
-        return;
     }
     time_t current = GameTime::GetGameTime().count();
     if (m_chatFloodData[index].Time > current)

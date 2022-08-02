@@ -194,10 +194,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 return;
         }
     }
-
     else
     {
-
         // send in universal language if player in .gmon mode (ignore spell effects)
         if (sender->IsGameMaster())
             lang = LANG_UNIVERSAL;
