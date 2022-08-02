@@ -2195,7 +2195,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
 
                 // Update Taxi path
                 TaxiMask newTaxiMask;
-                memset(newTaxiMask, 0, sizeof(newTaxiMask));
+                newTaxiMask.fill(0);
 
                 TaxiMask const& factionMask = newTeam == TEAM_HORDE ? sHordeTaxiNodesMask : sAllianceTaxiNodesMask;
                 for (auto const& itr : sTaxiPathSetBySource)
