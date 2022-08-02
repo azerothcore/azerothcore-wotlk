@@ -20,34 +20,23 @@
 #include "SpellInfo.h"
 #include "SpellScript.h"
 
-class spell_q12779_an_end_to_all_things : public SpellScriptLoader
+class spell_q12779_an_end_to_all_things : public SpellScript
 {
-public:
-    spell_q12779_an_end_to_all_things() : SpellScriptLoader("spell_q12779_an_end_to_all_things") { }
+    PrepareSpellScript(spell_q12779_an_end_to_all_things);
 
-    class spell_q12779_an_end_to_all_things_SpellScript : public SpellScript
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_q12779_an_end_to_all_things_SpellScript);
+        if (GetHitUnit())
+            GetHitUnit()->CastSpell(GetCaster(), GetEffectValue(), true);
+    }
 
-        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
-        {
-            if (GetHitUnit())
-                GetHitUnit()->CastSpell(GetCaster(), GetEffectValue(), true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_q12779_an_end_to_all_things_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_q12779_an_end_to_all_things_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_q12779_an_end_to_all_things::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
 void AddSC_the_scarlet_enclave_c3()
 {
-    new spell_q12779_an_end_to_all_things();
+    RegisterSpellScript(spell_q12779_an_end_to_all_things());
 }
