@@ -223,11 +223,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                         if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD))
                             lang = LANG_UNIVERSAL;
                         break;
-
-                    case CHAT_MSG_WHISPER:
-                        if (sender->getLevel() >= 80)
-                            lang = LANG_UNIVERSAL;
-                        break;
                 }
             }
             // but overwrite it by SPELL_AURA_MOD_LANGUAGE auras (only single case used)
