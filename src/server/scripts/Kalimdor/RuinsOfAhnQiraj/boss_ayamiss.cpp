@@ -152,8 +152,8 @@ public:
                 me->SetDisableGravity(false);
                 if (Unit* victim = me->GetVictim())
                 {
-                    Position VictimPos = victim->GetPosition();
-                    me->GetMotionMaster()->MovePoint(POINT_GROUND, VictimPos);
+                    Position victimPos = victim->GetPosition();
+                    me->GetMotionMaster()->MovePoint(POINT_GROUND, victimPos);
                 }
                 events.ScheduleEvent(EVENT_LASH, urand(5000, 8000));
                 events.CancelEvent(EVENT_POISON_STINGER);
