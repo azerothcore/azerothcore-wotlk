@@ -1220,33 +1220,6 @@ public:
     };
 };
 
-class spell_q12779_an_end_to_all_things : public SpellScriptLoader
-{
-public:
-    spell_q12779_an_end_to_all_things() : SpellScriptLoader("spell_q12779_an_end_to_all_things") { }
-
-    class spell_q12779_an_end_to_all_things_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_q12779_an_end_to_all_things_SpellScript);
-
-        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
-        {
-            if (GetHitUnit())
-                GetHitUnit()->CastSpell(GetCaster(), GetEffectValue(), true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_q12779_an_end_to_all_things_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_q12779_an_end_to_all_things_SpellScript();
-    }
-};
-
 void AddSC_the_scarlet_enclave_c2()
 {
     new npc_crusade_persuaded();
@@ -1254,7 +1227,4 @@ void AddSC_the_scarlet_enclave_c2()
     new npc_koltira_deathweaver();
     new npc_high_inquisitor_valroth();
     new npc_a_special_surprise();
-
-    // Xinef: Should be in chapter III
-    new spell_q12779_an_end_to_all_things();
 }
