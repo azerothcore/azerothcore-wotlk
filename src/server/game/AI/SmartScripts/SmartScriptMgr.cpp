@@ -602,8 +602,8 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_ALLOW_COMBAT_MOVEMENT: return sizeof(SmartAction::combatMove);
             case SMART_ACTION_SET_EVENT_PHASE: return sizeof(SmartAction::setEventPhase);
             case SMART_ACTION_INC_EVENT_PHASE: return sizeof(SmartAction::incEventPhase);
-            // case SMART_ACTION_EVADE: return sizeof(SmartAction::evade);
-            // case SMART_ACTION_FLEE_FOR_ASSIST: return sizeof(SmartAction::fleeAssist);
+            case SMART_ACTION_EVADE: return NO_PARAMS;
+            case SMART_ACTION_FLEE_FOR_ASSIST: return sizeof(SmartAction::flee);
             case SMART_ACTION_CALL_GROUPEVENTHAPPENS: return sizeof(SmartAction::quest);
             case SMART_ACTION_COMBAT_STOP: return NO_PARAMS;
             case SMART_ACTION_REMOVEAURASFROMSPELL: return sizeof(SmartAction::removeAura);
@@ -626,7 +626,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_SET_DATA: return sizeof(SmartAction::setData);
             case SMART_ACTION_ATTACK_STOP: return NO_PARAMS;
             case SMART_ACTION_SET_VISIBILITY: return sizeof(SmartAction::visibility);
-            // case SMART_ACTION_SET_ACTIVE: return sizeof(SmartAction::active);
+            case SMART_ACTION_SET_ACTIVE: return sizeof(SmartAction::setActive);
             case SMART_ACTION_ATTACK_START: return NO_PARAMS;
             case SMART_ACTION_SUMMON_GO: return sizeof(SmartAction::summonGO);
             case SMART_ACTION_KILL_UNIT: return NO_PARAMS;
