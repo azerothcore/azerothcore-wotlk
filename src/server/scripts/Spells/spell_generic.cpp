@@ -1199,7 +1199,7 @@ class spell_gen_adaptive_warding : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        if (eventInfo.GetSpellInfo())
+        if (!eventInfo.GetSpellInfo())
             return false;
 
         // find Mage Armor

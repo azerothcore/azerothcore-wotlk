@@ -23,8 +23,10 @@
 
 ObjectData const creatureData[] =
 {
+    { NPC_BURU,      DATA_BURU      },
     { NPC_KURINNAXX, DATA_KURINNAXX },
     { NPC_RAJAXX,    DATA_RAJAXX    },
+    { NPC_AYAMISS,   DATA_AYAMISS   },
     { NPC_OSSIRIAN,  DATA_OSSIRIAN  },
     { NPC_QUUEZ,     DATA_QUUEZ     },
     { NPC_TUUBID,    DATA_TUUBID    },
@@ -88,9 +90,6 @@ public:
                     break;
                 case NPC_BURU:
                     _buruGUID = creature->GetGUID();
-                    break;
-                case NPC_AYAMISS:
-                    _ayamissGUID = creature->GetGUID();
                     break;
                 case NPC_OSSIRIAN:
                     _ossirianGUID = creature->GetGUID();
@@ -185,8 +184,6 @@ public:
                     return _moamGUID;
                 case DATA_BURU:
                     return _buruGUID;
-                case DATA_AYAMISS:
-                    return _ayamissGUID;
                 case DATA_OSSIRIAN:
                     return _ossirianGUID;
                 case DATA_PARALYZED:
@@ -284,7 +281,6 @@ public:
         ObjectGuid _rajaxxGUID;
         ObjectGuid _moamGUID;
         ObjectGuid _buruGUID;
-        ObjectGuid _ayamissGUID;
         ObjectGuid _ossirianGUID;
         ObjectGuid _paralyzedGUID;
         uint32 _rajaxWaveCounter;
