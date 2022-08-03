@@ -80,7 +80,7 @@ public:
     {
         // insert or replace
         _storedTargets.erase(id);
-        _storedTargets.emplace(id, ObjectGuidVector(GetBaseObject(), targets));
+        _storedTargets.emplace(id, ObjectGuidVector(targets));
     }
 
     bool IsSmart(Creature* c = nullptr)
@@ -112,11 +112,11 @@ public:
         return smart;
     }
 
-    ObjectVector const* GetStoredTargetVector(uint32 id) const
+    ObjectVector const* GetStoredTargetVector(uint32 id, WorldObject const& ref) const
     {
         auto itr = _storedTargets.find(id);
         if (itr != _storedTargets.end())
-            return itr->second.GetObjectVector();
+            return itr->second.GetObjectVector(ref);
         return nullptr;
     }
 

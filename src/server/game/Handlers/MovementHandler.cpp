@@ -188,6 +188,22 @@ void WorldSession::HandleMoveWorldportAck()
 
     GetPlayer()->SendInitialPacketsAfterAddToMap();
 
+    // flight fast teleport case
+    if (GetPlayer()->IsInFlight())
+    {
+        if (!GetPlayer()->InBattleground())
+        {
+            // short preparations to continue flight
+            MovementGenerator* movementGenerator = GetPlayer()->GetMotionMaster()->top();
+            movementGenerator->Initialize(GetPlayer());
+            return;
+        }
+
+        // battleground state prepare, stop flight
+        GetPlayer()->GetMotionMaster()->MovementExpired();
+        GetPlayer()->CleanupAfterTaxiFlight();
+    }
+
     // resurrect character at enter into instance where his corpse exist after add to map
     Corpse* corpse = GetPlayer()->GetMap()->GetCorpseByPlayer(GetPlayer()->GetGUID());
     if (corpse && corpse->GetType() != CORPSE_BONES)
