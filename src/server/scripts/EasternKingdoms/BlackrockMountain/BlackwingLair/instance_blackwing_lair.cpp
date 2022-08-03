@@ -38,7 +38,7 @@ DoorData const doorData[] =
     { GO_PORTCULLIS_CHROMAGGUS,     DATA_CHROMAGGUS,             DOOR_TYPE_PASSAGE }, // ID 179116 || GUID 75161
     { GO_PORTCULLIS_CHROMAGGUS_EXIT,DATA_CHROMAGGUS,             DOOR_TYPE_PASSAGE }, // ID 179117 || GUID 75164
     { GO_PORTCULLIS_CHROMAGGUS_EXIT,DATA_NEFARIAN,               DOOR_TYPE_ROOM    }, // ID 179117 || GUID 75164
-    { GO_PORTCULLIS_NEFARIAN,       DATA_NEFARIAN,               DOOR_TYPE_ROOM    }, // ID 176966 
+    { GO_PORTCULLIS_NEFARIAN,       DATA_NEFARIAN,               DOOR_TYPE_ROOM    }, // ID 176966
     { 0,                            0,                           DOOR_TYPE_ROOM    }  // END
 };
 
