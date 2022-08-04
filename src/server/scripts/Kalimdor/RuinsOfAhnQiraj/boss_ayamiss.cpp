@@ -89,17 +89,11 @@ public:
         {
             switch (who->GetEntry())
             {
-                case NPC_SWARMER:
+                case NPC_HIVEZARA_SWARMER:
                     _swarmers.push_back(who->GetGUID());
                     break;
-                case NPC_LARVA:
+                case NPC_HIVEZARA_LARVA:
                     who->GetMotionMaster()->MovePoint(POINT_PARALYZE, AltarPos);
-                    break;
-                case NPC_HORNET:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
-                    {
-                        who->AI()->AttackStart(target);
-                    }
                     break;
             }
 
@@ -191,7 +185,7 @@ public:
                             DoCast(target, SPELL_PARALYZE);
                             instance->SetGuidData(DATA_PARALYZED, target->GetGUID());
                             uint8 Index = urand(0, 1);
-                            me->SummonCreature(NPC_LARVA, LarvaPos[Index], TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000);
+                            me->SummonCreature(NPC_HIVEZARA_LARVA, LarvaPos[Index], TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000);
                         }
                         events.ScheduleEvent(EVENT_PARALYZE, 15000);
                         break;
@@ -212,7 +206,7 @@ public:
                     case EVENT_SUMMON_SWARMER:
                         {
                             Position Pos = me->GetRandomPoint(SwarmerPos, 80.0f);
-                            me->SummonCreature(NPC_SWARMER, Pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
+                            me->SummonCreature(NPC_HIVEZARA_SWARMER, Pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
                             events.ScheduleEvent(EVENT_SUMMON_SWARMER, 5000);
                             break;
                         }
