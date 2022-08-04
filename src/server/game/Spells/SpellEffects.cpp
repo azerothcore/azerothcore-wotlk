@@ -6092,7 +6092,7 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
         // xinef: set calculated level
         summon->SetLevel(summonLevel);
 
-        // if summonLevel changed, set stats for calculated level 
+        // if summonLevel changed, set stats for calculated level
         if (summonLevel != caster->getLevel()){
             ((Guardian*)summon)->InitStatsForLevel(summonLevel);
         }
