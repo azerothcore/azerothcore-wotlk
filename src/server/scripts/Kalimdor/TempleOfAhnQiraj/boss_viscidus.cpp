@@ -240,9 +240,9 @@ private:
     Phases _phase;
 };
 
-struct npc_glob_of_viscidus : public ScriptedAI
+struct boss_glob_of_viscidus : public ScriptedAI
 {
-    npc_glob_of_viscidus(Creature* creature) : ScriptedAI(creature) { }
+    boss_glob_of_viscidus(Creature* creature) : ScriptedAI(creature) { }
 
     void JustDied(Unit* /*killer*/) override
     {
@@ -280,5 +280,5 @@ struct npc_glob_of_viscidus : public ScriptedAI
 void AddSC_boss_viscidus()
 {
     RegisterTempleOfAhnQirajCreatureAI(boss_viscidus);
-    RegisterTempleOfAhnQirajCreatureAI(npc_glob_of_viscidus);
+    RegisterTempleOfAhnQirajCreatureAI(boss_glob_of_viscidus);
 }
