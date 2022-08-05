@@ -18718,6 +18718,7 @@ void Unit::KnockbackFrom(float x, float y, float speedXY, float speedZ)
             player->SetCanFly(true, true);
 
         sScriptMgr->AnticheatSetSkipOnePacketForASH(player, true);
+        player->SetCanKnockback(true);
     }
 }
 
