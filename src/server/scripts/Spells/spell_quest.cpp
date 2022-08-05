@@ -2403,6 +2403,51 @@ class spell_q5056_summon_shy_rotam : public SpellScript
     }
 };
 
+enum RookeryEgg
+{
+    ITEM_COLLECTED_DRAGON_EGG   = 12241,
+    QUEST_EGG_COLLECTION        = 4735,
+    GO_ROOKERY_EGG              = 175124
+};
+
+class spell_q4735_collect_rookery_egg : public SpellScript
+{
+    PrepareSpellScript(spell_q4735_collect_rookery_egg);
+
+    SpellCastResult CheckCast()
+    {
+        if (GameObject* rookery = GetCaster()->FindNearestGameObject(GO_ROOKERY_EGG, 5.0f, true))
+        {
+            if (rookery->GetGoState() != GO_STATE_ACTIVE_ALTERNATIVE)
+                return SPELL_FAILED_BAD_TARGETS;
+        }
+        return SPELL_CAST_OK;
+    }
+
+    SpellCastResult CheckQuest()
+    {
+        if (Player* playerCaster = GetCaster()->ToPlayer())
+        {
+            if (playerCaster->GetQuestStatus(QUEST_EGG_COLLECTION) == QUEST_STATUS_INCOMPLETE)
+                return SPELL_CAST_OK;
+        }
+        return SPELL_FAILED_DONT_REPORT;
+    }
+
+    void HandleActiveObject(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* playerCaster = GetCaster()->ToPlayer())
+            playerCaster->AddItem(ITEM_COLLECTED_DRAGON_EGG, 1);
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_q4735_collect_rookery_egg::CheckQuest);
+        OnCheckCast += SpellCheckCastFn(spell_q4735_collect_rookery_egg::CheckCast);
+        OnEffectHit += SpellEffectFn(spell_q4735_collect_rookery_egg::HandleActiveObject, EFFECT_0, SPELL_EFFECT_ACTIVATE_OBJECT);
+    }
+};
+
 void AddSC_quest_spell_scripts()
 {
     RegisterSpellAndAuraScriptPair(spell_q11065_wrangle_some_aether_rays, spell_q11065_wrangle_some_aether_rays_aura);
@@ -2473,4 +2518,5 @@ void AddSC_quest_spell_scripts()
     RegisterSpellScript(spell_q12919_gymers_grab);
     RegisterSpellScript(spell_q12919_gymers_throw);
     RegisterSpellScript(spell_q5056_summon_shy_rotam);
+    RegisterSpellScript(spell_q4735_collect_rookery_egg);
 }
