@@ -454,9 +454,9 @@ class spell_vem_vengeance : public SpellScript
 
 void AddSC_bug_trio()
 {
-    RegisterCreatureAI(boss_kri);
-    RegisterCreatureAI(boss_vem);
-    RegisterCreatureAI(boss_yauj);
+    RegisterTempleOfAhnQirajCreatureAI(boss_kri);
+    RegisterTempleOfAhnQirajCreatureAI(boss_vem);
+    RegisterTempleOfAhnQirajCreatureAI(boss_yauj);
     RegisterSpellScript(spell_vem_knockback);
     RegisterSpellScript(spell_vem_vengeance);
 }
