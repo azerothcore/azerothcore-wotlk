@@ -179,7 +179,7 @@ struct boss_ayamiss : public BossAI
                     DoCast(target, SPELL_PARALYZE);
                     instance->SetGuidData(DATA_PARALYZED, target->GetGUID());
                     uint8 index = urand(0, 1);
-                    me->SummonCreature(NPC_LARVA, LarvaPos[index], TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000);
+                    me->SummonCreature(NPC_HIVEZARA_LARVA, LarvaPos[index], TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000);
                 }
                 events.ScheduleEvent(EVENT_PARALYZE, 15s);
                 break;
