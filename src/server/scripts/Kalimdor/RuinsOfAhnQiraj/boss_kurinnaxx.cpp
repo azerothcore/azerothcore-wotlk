@@ -68,7 +68,14 @@ struct boss_kurinnaxx : public BossAI
     void JustDied(Unit* killer) override
     {
         if (killer)
+        {
             killer->GetMap()->LoadGrid(-9502.80f, 2042.65f); // Ossirian grid
+
+            if (Player* player = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                player->SummonCreature(NPC_ANDRONOV, -8877.254883f, 1645.267578f, 21.386303f, 4.669808f, TEMPSUMMON_CORPSE_DESPAWN, 600000000);
+            }
+        }
 
         if (Creature* ossirian = instance->GetCreature(DATA_OSSIRIAN))
         {

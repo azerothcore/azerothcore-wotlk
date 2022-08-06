@@ -73,6 +73,13 @@ public:
             _rajaxWaveCounter = 0;
         }
 
+        void OnPlayerEnter(Player* player) override
+        {
+            if (GetBossState(DATA_KURINNAXX) == DONE && GetBossState(DATA_RAJAXX) != DONE)
+                if (!_andronovGUID)
+                    player->SummonCreature(NPC_ANDRONOV, -8877.254883f, 1645.267578f, 21.386303f, 4.669808f, TEMPSUMMON_CORPSE_DESPAWN, 600000000);
+        }
+
         void OnCreatureCreate(Creature* creature) override
         {
             InstanceScript::OnCreatureCreate(creature);
@@ -93,6 +100,9 @@ public:
                     break;
                 case NPC_OSSIRIAN:
                     _ossirianGUID = creature->GetGUID();
+                    break;
+                case NPC_ANDRONOV:
+                    _andronovGUID = creature->GetGUID();
                     break;
             }
         }
@@ -188,6 +198,8 @@ public:
                     return _ossirianGUID;
                 case DATA_PARALYZED:
                     return _paralyzedGUID;
+                case DATA_ANDRONOV:
+                    return _andronovGUID;
             }
 
             return ObjectGuid::Empty;
@@ -283,6 +295,7 @@ public:
         ObjectGuid _buruGUID;
         ObjectGuid _ossirianGUID;
         ObjectGuid _paralyzedGUID;
+        ObjectGuid _andronovGUID;
         uint32 _rajaxWaveCounter;
         TaskScheduler _scheduler;
     };
