@@ -36,167 +36,145 @@ enum Spells
     SPELL_SUMMON_OURO           = 26061
 };
 
-class npc_ouro_spawner : public CreatureScript
+struct npc_ouro_spawner : public ScriptedAI
 {
-public:
-    npc_ouro_spawner() : CreatureScript("npc_ouro_spawner") {}
-
-    CreatureAI* GetAI(Creature* creature) const
+    npc_ouro_spawner(Creature* creature) : ScriptedAI(creature)
     {
-        return new npc_ouro_spawnerAI(creature);
+        Reset();
     }
 
-    struct npc_ouro_spawnerAI : public ScriptedAI
+    bool hasSummoned;
+
+    void Reset() override
     {
-        npc_ouro_spawnerAI(Creature* creature) : ScriptedAI(creature)
+        hasSummoned = false;
+        DoCast(me, SPELL_DIRTMOUND_PASSIVE);
+    }
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        // Spawn Ouro on LoS check
+        if (!hasSummoned && who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 40.0f))
         {
-            Reset();
+            DoCast(me, SPELL_SUMMON_OURO);
+            hasSummoned = true;
         }
 
-        bool hasSummoned;
+        ScriptedAI::MoveInLineOfSight(who);
+    }
 
-        void Reset() override
+    void JustSummoned(Creature* creature) override
+    {
+        // Despawn when Ouro is spawned
+        if (creature->GetEntry() == NPC_OURO)
         {
-            hasSummoned = false;
-            DoCast(me, SPELL_DIRTMOUND_PASSIVE);
+            creature->SetInCombatWithZone();
+            creature->CastSpell(creature, SPELL_BIRTH, false);
+            me->DespawnOrUnsummon();
         }
+    }
 
-        void MoveInLineOfSight(Unit* who) override
-        {
-            // Spawn Ouro on LoS check
-            if (!hasSummoned && who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 40.0f))
-            {
-                DoCast(me, SPELL_SUMMON_OURO);
-                hasSummoned = true;
-            }
-
-            ScriptedAI::MoveInLineOfSight(who);
-        }
-
-        void JustSummoned(Creature* creature) override
-        {
-            // Despawn when Ouro is spawned
-            if (creature->GetEntry() == NPC_OURO)
-            {
-                creature->SetInCombatWithZone();
-                creature->CastSpell(creature, SPELL_BIRTH, false);
-                me->DespawnOrUnsummon();
-            }
-        }
-
-    };
 };
 
-class boss_ouro : public CreatureScript
+struct boss_ouro : public ScriptedAI
 {
-public:
-    boss_ouro() : CreatureScript("boss_ouro") { }
+    boss_ouro(Creature* creature) : ScriptedAI(creature) { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    uint32 Sweep_Timer;
+    uint32 SandBlast_Timer;
+    uint32 Submerge_Timer;
+    uint32 Back_Timer;
+    uint32 ChangeTarget_Timer;
+    uint32 Spawn_Timer;
+
+    bool Enrage;
+    bool Submerged;
+
+    void Reset() override
     {
-        return GetTempleOfAhnQirajAI<boss_ouroAI>(creature);
+        Sweep_Timer = urand(5000, 10000);
+        SandBlast_Timer = urand(20000, 35000);
+        Submerge_Timer = urand(90000, 150000);
+        Back_Timer = urand(30000, 45000);
+        ChangeTarget_Timer = urand(5000, 8000);
+        Spawn_Timer = urand(10000, 20000);
+
+        Enrage = false;
+        Submerged = false;
     }
 
-    struct boss_ouroAI : public ScriptedAI
+    void EnterCombat(Unit* /*who*/) override
     {
-        boss_ouroAI(Creature* creature) : ScriptedAI(creature) { }
+        DoCastVictim(SPELL_BIRTH);
+    }
 
-        uint32 Sweep_Timer;
-        uint32 SandBlast_Timer;
-        uint32 Submerge_Timer;
-        uint32 Back_Timer;
-        uint32 ChangeTarget_Timer;
-        uint32 Spawn_Timer;
+    void UpdateAI(uint32 diff) override
+    {
+        //Return since we have no target
+        if (!UpdateVictim())
+            return;
 
-        bool Enrage;
-        bool Submerged;
-
-        void Reset() override
+        //Sweep_Timer
+        if (!Submerged && Sweep_Timer <= diff)
         {
-            Sweep_Timer = urand(5000, 10000);
+            DoCastVictim(SPELL_SWEEP);
+            Sweep_Timer = urand(15000, 30000);
+        }
+        else Sweep_Timer -= diff;
+
+        //SandBlast_Timer
+        if (!Submerged && SandBlast_Timer <= diff)
+        {
+            DoCastVictim(SPELL_SANDBLAST);
             SandBlast_Timer = urand(20000, 35000);
-            Submerge_Timer = urand(90000, 150000);
+        }
+        else SandBlast_Timer -= diff;
+
+        //Submerge_Timer
+        if (!Submerged && Submerge_Timer <= diff)
+        {
+            //Cast
+            me->HandleEmoteCommand(EMOTE_ONESHOT_SUBMERGE);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            me->SetFaction(FACTION_FRIENDLY);
+            DoCast(me, SPELL_DIRTMOUND_PASSIVE);
+
+            Submerged = true;
             Back_Timer = urand(30000, 45000);
-            ChangeTarget_Timer = urand(5000, 8000);
-            Spawn_Timer = urand(10000, 20000);
+        }
+        else Submerge_Timer -= diff;
 
-            Enrage = false;
+        //ChangeTarget_Timer
+        if (Submerged && ChangeTarget_Timer <= diff)
+        {
+            Unit* target = SelectTarget(SelectTargetMethod::Random, 0);
+
+            if (target)
+                me->NearTeleportTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), me->GetOrientation());
+
+            ChangeTarget_Timer = urand(10000, 20000);
+        }
+        else ChangeTarget_Timer -= diff;
+
+        //Back_Timer
+        if (Submerged && Back_Timer <= diff)
+        {
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            me->SetFaction(FACTION_MONSTER);
+
+            DoCastVictim(SPELL_GROUND_RUPTURE);
+
             Submerged = false;
+            Submerge_Timer = urand(60000, 120000);
         }
+        else Back_Timer -= diff;
 
-        void EnterCombat(Unit* /*who*/) override
-        {
-            DoCastVictim(SPELL_BIRTH);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            //Return since we have no target
-            if (!UpdateVictim())
-                return;
-
-            //Sweep_Timer
-            if (!Submerged && Sweep_Timer <= diff)
-            {
-                DoCastVictim(SPELL_SWEEP);
-                Sweep_Timer = urand(15000, 30000);
-            }
-            else Sweep_Timer -= diff;
-
-            //SandBlast_Timer
-            if (!Submerged && SandBlast_Timer <= diff)
-            {
-                DoCastVictim(SPELL_SANDBLAST);
-                SandBlast_Timer = urand(20000, 35000);
-            }
-            else SandBlast_Timer -= diff;
-
-            //Submerge_Timer
-            if (!Submerged && Submerge_Timer <= diff)
-            {
-                //Cast
-                me->HandleEmoteCommand(EMOTE_ONESHOT_SUBMERGE);
-                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                me->SetFaction(FACTION_FRIENDLY);
-                DoCast(me, SPELL_DIRTMOUND_PASSIVE);
-
-                Submerged = true;
-                Back_Timer = urand(30000, 45000);
-            }
-            else Submerge_Timer -= diff;
-
-            //ChangeTarget_Timer
-            if (Submerged && ChangeTarget_Timer <= diff)
-            {
-                Unit* target = SelectTarget(SelectTargetMethod::Random, 0);
-
-                if (target)
-                    me->NearTeleportTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), me->GetOrientation());
-
-                ChangeTarget_Timer = urand(10000, 20000);
-            }
-            else ChangeTarget_Timer -= diff;
-
-            //Back_Timer
-            if (Submerged && Back_Timer <= diff)
-            {
-                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                me->SetFaction(FACTION_MONSTER);
-
-                DoCastVictim(SPELL_GROUND_RUPTURE);
-
-                Submerged = false;
-                Submerge_Timer = urand(60000, 120000);
-            }
-            else Back_Timer -= diff;
-
-            DoMeleeAttackIfReady();
-        }
-    };
+        DoMeleeAttackIfReady();
+    }
 };
 
 void AddSC_boss_ouro()
 {
-    new npc_ouro_spawner();
-    new boss_ouro();
+    RegisterTempleOfAhnQirajCreatureAI(npc_ouro_spawner);
+    RegisterTempleOfAhnQirajCreatureAI(boss_ouro);
 }

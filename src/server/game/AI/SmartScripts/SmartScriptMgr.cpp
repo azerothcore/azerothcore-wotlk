@@ -492,7 +492,7 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
             case SMART_EVENT_IC_LOS: return sizeof(SmartEvent::los);
             case SMART_EVENT_PASSENGER_BOARDED: return sizeof(SmartEvent::minMax);
             case SMART_EVENT_PASSENGER_REMOVED: return sizeof(SmartEvent::minMax);
-            // case SMART_EVENT_CHARMED: return sizeof(SmartEvent::charm);
+            case SMART_EVENT_CHARMED: return sizeof(SmartEvent::charm);
             case SMART_EVENT_CHARMED_TARGET: return NO_PARAMS;
             case SMART_EVENT_SPELLHIT_TARGET: return sizeof(SmartEvent::spellHit);
             case SMART_EVENT_DAMAGED: return sizeof(SmartEvent::minMaxRepeat);
@@ -533,7 +533,7 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
             case SMART_EVENT_IS_BEHIND_TARGET: return sizeof(SmartEvent::behindTarget);
             case SMART_EVENT_GAME_EVENT_START: return sizeof(SmartEvent::gameEvent);
             case SMART_EVENT_GAME_EVENT_END: return sizeof(SmartEvent::gameEvent);
-            // case SMART_EVENT_GO_LOOT_STATE_CHANGED: return sizeof(SmartEvent::goLootStateChanged);
+            case SMART_EVENT_GO_STATE_CHANGED: return sizeof(SmartEvent::goStateChanged);
             case SMART_EVENT_GO_EVENT_INFORM: return sizeof(SmartEvent::eventInform);
             case SMART_EVENT_ACTION_DONE: return sizeof(SmartEvent::doAction);
             case SMART_EVENT_ON_SPELLCLICK: return NO_PARAMS;
@@ -546,9 +546,11 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
                 //case SMART_EVENT_SCENE_CANCEL: return sizeof(SmartEvent::raw);
                 //case SMART_EVENT_SCENE_COMPLETE: return sizeof(SmartEvent::raw);
             case SMART_EVENT_SUMMONED_UNIT_DIES: return sizeof(SmartEvent::summoned);
+            case SMART_EVENT_NEAR_PLAYERS: return sizeof(SmartEvent::nearPlayer);
+            case SMART_EVENT_NEAR_PLAYERS_NEGATION: return sizeof(SmartEvent::nearPlayerNegation);
             default:
-                LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using an event with no unused params specified in SmartAIMgr::CheckUnusedEventParams(), please report this.",
-                            e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
+                LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using an event {} with no unused params specified in SmartAIMgr::CheckUnusedEventParams(), please report this.",
+                            e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetEventType());
                 return sizeof(SmartEvent::raw);
         }
     }();
@@ -602,8 +604,8 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_ALLOW_COMBAT_MOVEMENT: return sizeof(SmartAction::combatMove);
             case SMART_ACTION_SET_EVENT_PHASE: return sizeof(SmartAction::setEventPhase);
             case SMART_ACTION_INC_EVENT_PHASE: return sizeof(SmartAction::incEventPhase);
-            // case SMART_ACTION_EVADE: return sizeof(SmartAction::evade);
-            // case SMART_ACTION_FLEE_FOR_ASSIST: return sizeof(SmartAction::fleeAssist);
+            case SMART_ACTION_EVADE: return NO_PARAMS;
+            case SMART_ACTION_FLEE_FOR_ASSIST: return sizeof(SmartAction::flee);
             case SMART_ACTION_CALL_GROUPEVENTHAPPENS: return sizeof(SmartAction::quest);
             case SMART_ACTION_COMBAT_STOP: return NO_PARAMS;
             case SMART_ACTION_REMOVEAURASFROMSPELL: return sizeof(SmartAction::removeAura);
@@ -624,9 +626,10 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_MOUNT_TO_ENTRY_OR_MODEL: return sizeof(SmartAction::morphOrMount);
             case SMART_ACTION_SET_INGAME_PHASE_MASK: return sizeof(SmartAction::ingamePhaseMask);
             case SMART_ACTION_SET_DATA: return sizeof(SmartAction::setData);
+            case SMART_ACTION_MOVE_FORWARD: return sizeof(SmartAction::moveRandom);
             case SMART_ACTION_ATTACK_STOP: return NO_PARAMS;
             case SMART_ACTION_SET_VISIBILITY: return sizeof(SmartAction::visibility);
-            // case SMART_ACTION_SET_ACTIVE: return sizeof(SmartAction::active);
+            case SMART_ACTION_SET_ACTIVE: return sizeof(SmartAction::setActive);
             case SMART_ACTION_ATTACK_START: return NO_PARAMS;
             case SMART_ACTION_SUMMON_GO: return sizeof(SmartAction::summonGO);
             case SMART_ACTION_KILL_UNIT: return NO_PARAMS;
@@ -638,7 +641,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_REMOVE_ITEM: return sizeof(SmartAction::item);
             case SMART_ACTION_INSTALL_AI_TEMPLATE: return sizeof(SmartAction::installTtemplate);
             case SMART_ACTION_SET_RUN: return sizeof(SmartAction::setRun);
-            // case SMART_ACTION_SET_DISABLE_GRAVITY: return sizeof(SmartAction::setDisableGravity);
+            case SMART_ACTION_SET_FLY: return sizeof(SmartAction::setFly);
             case SMART_ACTION_SET_SWIM: return sizeof(SmartAction::setSwim);
             case SMART_ACTION_TELEPORT: return sizeof(SmartAction::teleport);
             case SMART_ACTION_SET_COUNTER: return sizeof(SmartAction::setCounter);
@@ -648,7 +651,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_CREATE_TIMED_EVENT: return sizeof(SmartAction::timeEvent);
             case SMART_ACTION_PLAYMOVIE: return sizeof(SmartAction::movie);
             case SMART_ACTION_MOVE_TO_POS: return sizeof(SmartAction::moveToPos);
-            // case SMART_ACTION_ENABLE_TEMP_GOBJ: return sizeof(SmartAction::enableTempGO);
+            case SMART_ACTION_RESPAWN_TARGET: return sizeof(SmartAction::RespawnTarget);
             case SMART_ACTION_EQUIP: return sizeof(SmartAction::equip);
             case SMART_ACTION_CLOSE_GOSSIP: return NO_PARAMS;
             case SMART_ACTION_TRIGGER_TIMED_EVENT: return sizeof(SmartAction::timeEvent);
@@ -663,7 +666,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_ADD_NPC_FLAG: return sizeof(SmartAction::flag);
             case SMART_ACTION_REMOVE_NPC_FLAG: return sizeof(SmartAction::flag);
             case SMART_ACTION_SIMPLE_TALK: return sizeof(SmartAction::simpleTalk);
-            // case SMART_ACTION_SELF_CAST: return sizeof(SmartAction::cast);
+            case SMART_ACTION_INVOKER_CAST: return sizeof(SmartAction::cast);
             case SMART_ACTION_CROSS_CAST: return sizeof(SmartAction::crossCast);
             case SMART_ACTION_CALL_RANDOM_TIMED_ACTIONLIST: return sizeof(SmartAction::randTimedActionList);
             case SMART_ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST: return sizeof(SmartAction::randRangeTimedActionList);
@@ -692,7 +695,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_GAME_EVENT_STOP: return sizeof(SmartAction::gameEventStop);
             case SMART_ACTION_GAME_EVENT_START: return sizeof(SmartAction::gameEventStart);
             case SMART_ACTION_START_CLOSEST_WAYPOINT: return sizeof(SmartAction::closestWaypointFromList);
-            // case SMART_ACTION_MOVE_OFFSET: return NO_PARAMS;
+            case SMART_ACTION_RISE_UP: return sizeof(SmartAction::moveRandom);
             case SMART_ACTION_RANDOM_SOUND: return sizeof(SmartAction::randomSound);
             case SMART_ACTION_SET_CORPSE_DELAY: return sizeof(SmartAction::corpseDelay);
             case SMART_ACTION_DISABLE_EVADE: return sizeof(SmartAction::disableEvade);
@@ -722,6 +725,19 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_SET_HOVER: return sizeof(SmartAction::setHover);
             case SMART_ACTION_SET_HEALTH_PCT: return sizeof(SmartAction::setHealthPct);
                 //case SMART_ACTION_CREATE_CONVERSATION: return sizeof(SmartAction::raw);
+            case SMART_ACTION_MOVE_TO_POS_TARGET: return sizeof(SmartAction::moveToPos);
+            case SMART_ACTION_SET_GO_STATE: return sizeof(SmartAction::goState);
+            case SMART_ACTION_EXIT_VEHICLE: return NO_PARAMS;
+            case SMART_ACTION_SET_UNIT_MOVEMENT_FLAGS: return sizeof(SmartAction::movementFlag);
+            case SMART_ACTION_SET_COMBAT_DISTANCE: return sizeof(SmartAction::combatDistance);
+            case SMART_ACTION_SET_CASTER_COMBAT_DIST: return sizeof(SmartAction::casterDistance);
+            case SMART_ACTION_FALL: return NO_PARAMS;
+            case SMART_ACTION_SET_EVENT_FLAG_RESET: return sizeof(SmartAction::setActive);
+            case SMART_ACTION_STOP_MOTION: return sizeof(SmartAction::stopMotion);
+            case SMART_ACTION_NO_ENVIRONMENT_UPDATE: return NO_PARAMS;
+            case SMART_ACTION_ZONE_UNDER_ATTACK: return NO_PARAMS;
+            case SMART_ACTION_LOAD_GRID: return NO_PARAMS;
+            case SMART_ACTION_MUSIC: return sizeof(SmartAction::music);
             default:
                 LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using an action with no unused params specified in SmartAIMgr::CheckUnusedActionParams(), please report this.",
                             e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
@@ -785,9 +801,10 @@ bool SmartAIMgr::CheckUnusedTargetParams(SmartScriptHolder const& e)
             case SMART_TARGET_FARTHEST: return sizeof(SmartTarget::farthest);
             case SMART_TARGET_VEHICLE_PASSENGER: return sizeof(SmartTarget::vehicle);
             // case SMART_TARGET_CLOSEST_UNSPAWNED_GAMEOBJECT: return sizeof(SmartTarget::goClosest);
+            case SMART_TARGET_PLAYER_WITH_AURA: return sizeof(SmartTarget::playerWithAura);
             default:
-                LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using a target with no unused params specified in SmartAIMgr::CheckUnusedTargetParams(), please report this.",
-                            e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
+                LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using a target {} with no unused params specified in SmartAIMgr::CheckUnusedTargetParams(), please report this.",
+                            e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetTargetType());
                 return sizeof(SmartTarget::raw);
         }
     }();

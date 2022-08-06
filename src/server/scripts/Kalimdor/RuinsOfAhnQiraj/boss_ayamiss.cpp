@@ -68,244 +68,222 @@ const Position LarvaPos[2] =
     { -9701.6005f, 1566.9993f, 24.118f, 0.0f }
 };
 
-class boss_ayamiss : public CreatureScript
+struct boss_ayamiss : public BossAI
 {
-public:
-    boss_ayamiss() : CreatureScript("boss_ayamiss") { }
+    boss_ayamiss(Creature* creature) : BossAI(creature, DATA_AYAMISS) {}
 
-    struct boss_ayamissAI : public BossAI
+    void Reset() override
     {
-        boss_ayamissAI(Creature* creature) : BossAI(creature, DATA_AYAMISS) {}
-
-        void Reset() override
-        {
-            _Reset();
-            _phase = PHASE_AIR;
-            _enraged = false;
-            SetCombatMovement(false);
-        }
-
-        void JustSummoned(Creature* who) override
-        {
-            switch (who->GetEntry())
-            {
-                case NPC_SWARMER:
-                    _swarmers.push_back(who->GetGUID());
-                    break;
-                case NPC_LARVA:
-                    who->GetMotionMaster()->MovePoint(POINT_PARALYZE, AltarPos);
-                    break;
-                case NPC_HORNET:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
-                    {
-                        who->AI()->AttackStart(target);
-                    }
-                    break;
-            }
-
-            summons.Summon(who);
-        }
-
-        void MovementInform(uint32 type, uint32 id) override
-        {
-            if (type == POINT_MOTION_TYPE)
-            {
-                switch (id)
-                {
-                    case POINT_AIR:
-                        me->AddUnitState(UNIT_STATE_ROOT);
-                        break;
-                    case POINT_GROUND:
-                        me->GetMotionMaster()->MoveChase(me->GetVictim());
-                        break;
-                }
-            }
-        }
-
-        void EnterEvadeMode(EvadeReason why) override
-        {
-            me->ClearUnitState(UNIT_STATE_ROOT);
-            BossAI::EnterEvadeMode(why);
-        }
-
-        void EnterCombat(Unit* attacker) override
-        {
-            BossAI::EnterCombat(attacker);
-            events.ScheduleEvent(EVENT_STINGER_SPRAY, urand(20000, 30000));
-            events.ScheduleEvent(EVENT_POISON_STINGER, 5000);
-            events.ScheduleEvent(EVENT_SUMMON_SWARMER, 5000);
-            events.ScheduleEvent(EVENT_SWARMER_ATTACK, 60000);
-            events.ScheduleEvent(EVENT_PARALYZE, 15000);
-            me->SetCanFly(true);
-            me->SetDisableGravity(true);
-            me->GetMotionMaster()->MovePoint(POINT_AIR, AyamissAirPos);
-        }
-
-        void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
-        {
-            if (_phase == PHASE_AIR && me->GetHealthPct() < 70.0f)
-            {
-                _phase = PHASE_GROUND;
-                SetCombatMovement(true);
-                me->ClearUnitState(UNIT_STATE_ROOT);
-                me->SetCanFly(false);
-                me->SetDisableGravity(false);
-                if (Unit* victim = me->GetVictim())
-                {
-                    Position victimPos = victim->GetPosition();
-                    me->GetMotionMaster()->MovePoint(POINT_GROUND, victimPos);
-                }
-                events.ScheduleEvent(EVENT_LASH, urand(5000, 8000));
-                events.CancelEvent(EVENT_POISON_STINGER);
-                DoResetThreat();
-            }
-            if (!_enraged && me->GetHealthPct() < 20.0f)
-            {
-                DoCastSelf(SPELL_FRENZY);
-                Talk(EMOTE_FRENZY);
-                _enraged = true;
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            while (uint32 eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    case EVENT_STINGER_SPRAY:
-                        DoCastSelf(SPELL_STINGER_SPRAY);
-                        events.ScheduleEvent(EVENT_STINGER_SPRAY, urand(15000, 20000));
-                        break;
-                    case EVENT_POISON_STINGER:
-                        DoCastVictim(SPELL_POISON_STINGER);
-                        events.ScheduleEvent(EVENT_POISON_STINGER, urand(2000, 3000));
-                        break;
-                    case EVENT_PARALYZE:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0, true))
-                        {
-                            DoCast(target, SPELL_PARALYZE);
-                            instance->SetGuidData(DATA_PARALYZED, target->GetGUID());
-                            uint8 Index = urand(0, 1);
-                            me->SummonCreature(NPC_LARVA, LarvaPos[Index], TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000);
-                        }
-                        events.ScheduleEvent(EVENT_PARALYZE, 15000);
-                        break;
-                    case EVENT_SWARMER_ATTACK:
-                        for (ObjectGuid const& guid : _swarmers)
-                        {
-                            if (Creature* swarmer = me->GetMap()->GetCreature(guid))
-                            {
-                                if (Unit* target = SelectTarget(SelectTargetMethod::Random))
-                                {
-                                    swarmer->AI()->AttackStart(target);
-                                }
-                            }
-                        }
-                        _swarmers.clear();
-                        events.ScheduleEvent(EVENT_SWARMER_ATTACK, 60000);
-                        break;
-                    case EVENT_SUMMON_SWARMER:
-                        {
-                            Position Pos = me->GetRandomPoint(SwarmerPos, 80.0f);
-                            me->SummonCreature(NPC_SWARMER, Pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
-                            events.ScheduleEvent(EVENT_SUMMON_SWARMER, 5000);
-                            break;
-                        }
-                    case EVENT_LASH:
-                        DoCastVictim(SPELL_LASH);
-                        events.ScheduleEvent(EVENT_LASH, urand(8000, 15000));
-                        break;
-                }
-            }
-            DoMeleeAttackIfReady();
-        }
-    private:
-        GuidList _swarmers;
-        uint8 _phase;
-        bool _enraged;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetRuinsOfAhnQirajAI<boss_ayamissAI>(creature);
+        BossAI::Reset();
+        _phase = PHASE_AIR;
+        _enraged = false;
+        SetCombatMovement(false);
     }
+
+    void JustSummoned(Creature* who) override
+    {
+        switch (who->GetEntry())
+        {
+            case NPC_SWARMER:
+                _swarmers.push_back(who->GetGUID());
+                break;
+            case NPC_LARVA:
+                who->GetMotionMaster()->MovePoint(POINT_PARALYZE, AltarPos);
+                break;
+            case NPC_HORNET:
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random))
+                {
+                    who->AI()->AttackStart(target);
+                }
+                break;
+        }
+
+        summons.Summon(who);
+    }
+
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type == POINT_MOTION_TYPE)
+        {
+            switch (id)
+            {
+                case POINT_AIR:
+                    me->AddUnitState(UNIT_STATE_ROOT);
+                    break;
+                case POINT_GROUND:
+                    me->GetMotionMaster()->MoveChase(me->GetVictim());
+                    break;
+            }
+        }
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        me->ClearUnitState(UNIT_STATE_ROOT);
+        BossAI::EnterEvadeMode(why);
+    }
+
+    void EnterCombat(Unit* attacker) override
+    {
+        BossAI::EnterCombat(attacker);
+        events.ScheduleEvent(EVENT_STINGER_SPRAY, 20s, 30s);
+        events.ScheduleEvent(EVENT_POISON_STINGER, 5s);
+        events.ScheduleEvent(EVENT_SUMMON_SWARMER, 5s);
+        events.ScheduleEvent(EVENT_SWARMER_ATTACK, 60s);
+        events.ScheduleEvent(EVENT_PARALYZE, 15s);
+        me->SetCanFly(true);
+        me->SetDisableGravity(true);
+        me->GetMotionMaster()->MovePoint(POINT_AIR, AyamissAirPos);
+    }
+
+    void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+    {
+        if (_phase == PHASE_AIR && me->GetHealthPct() < 70.0f)
+        {
+            _phase = PHASE_GROUND;
+            SetCombatMovement(true);
+            me->ClearUnitState(UNIT_STATE_ROOT);
+            me->SetCanFly(false);
+            me->SetDisableGravity(false);
+            if (Unit* victim = me->GetVictim())
+            {
+                Position victimPos = victim->GetPosition();
+                me->GetMotionMaster()->MovePoint(POINT_GROUND, victimPos);
+            }
+            events.ScheduleEvent(EVENT_LASH, 5s, 8s);
+            events.CancelEvent(EVENT_POISON_STINGER);
+            DoResetThreat();
+        }
+        if (!_enraged && me->GetHealthPct() < 20.0f)
+        {
+            DoCastSelf(SPELL_FRENZY);
+            Talk(EMOTE_FRENZY);
+            _enraged = true;
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+        while (uint32 eventId = events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+            case EVENT_STINGER_SPRAY:
+                DoCastSelf(SPELL_STINGER_SPRAY);
+                events.ScheduleEvent(EVENT_STINGER_SPRAY, 15s, 20s);
+                break;
+            case EVENT_POISON_STINGER:
+                DoCastVictim(SPELL_POISON_STINGER);
+                events.ScheduleEvent(EVENT_POISON_STINGER, 2s, 3s);
+                break;
+            case EVENT_PARALYZE:
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0, true))
+                {
+                    DoCast(target, SPELL_PARALYZE);
+                    instance->SetGuidData(DATA_PARALYZED, target->GetGUID());
+                    uint8 index = urand(0, 1);
+                    me->SummonCreature(NPC_LARVA, LarvaPos[index], TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000);
+                }
+                events.ScheduleEvent(EVENT_PARALYZE, 15s);
+                break;
+            case EVENT_SWARMER_ATTACK:
+                for (ObjectGuid const& guid : _swarmers)
+                {
+                    if (Creature* swarmer = me->GetMap()->GetCreature(guid))
+                    {
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random))
+                        {
+                            swarmer->AI()->AttackStart(target);
+                        }
+                    }
+                }
+                _swarmers.clear();
+                events.ScheduleEvent(EVENT_SWARMER_ATTACK, 60s);
+                break;
+            case EVENT_SUMMON_SWARMER:
+            {
+                Position Pos = me->GetRandomPoint(SwarmerPos, 80.0f);
+                me->SummonCreature(NPC_SWARMER, Pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
+                events.ScheduleEvent(EVENT_SUMMON_SWARMER, 5s);
+                break;
+            }
+            case EVENT_LASH:
+                DoCastVictim(SPELL_LASH);
+                events.ScheduleEvent(EVENT_LASH, 8s, 15s);
+                break;
+            }
+        }
+        DoMeleeAttackIfReady();
+    }
+private:
+    GuidList _swarmers;
+    uint8 _phase;
+    bool _enraged;
 };
 
-class npc_hive_zara_larva : public CreatureScript
+struct npc_hive_zara_larva : public ScriptedAI
 {
-public:
-    npc_hive_zara_larva() : CreatureScript("npc_hive_zara_larva") { }
-
-    struct npc_hive_zara_larvaAI : public ScriptedAI
+    npc_hive_zara_larva(Creature* creature) : ScriptedAI(creature)
     {
-        npc_hive_zara_larvaAI(Creature* creature) : ScriptedAI(creature)
-        {
-            _instance = me->GetInstanceScript();
-        }
+        _instance = me->GetInstanceScript();
+    }
 
-        void MovementInform(uint32 type, uint32 id) override
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type == POINT_MOTION_TYPE)
         {
-            if (type == POINT_MOTION_TYPE)
+            if (id == POINT_PARALYZE)
             {
-                if (id == POINT_PARALYZE)
+                if (Player* target = ObjectAccessor::GetPlayer(*me, _instance->GetGuidData(DATA_PARALYZED)))
                 {
-                    if (Player* target = ObjectAccessor::GetPlayer(*me, _instance->GetGuidData(DATA_PARALYZED)))
-                    {
-                        DoCast(target, SPELL_FEED);
-                    }
+                    DoCast(target, SPELL_FEED);
                 }
             }
         }
-
-        void JustSummoned(Creature* summon) override
-        {
-            if (Creature* ayamiss = _instance->GetCreature(DATA_AYAMISS))
-            {
-                ayamiss->AI()->JustSummoned(summon);
-            }
-        }
-
-        void MoveInLineOfSight(Unit* who) override
-
-        {
-            if (_instance->GetBossState(DATA_AYAMISS) == IN_PROGRESS)
-                return;
-
-            ScriptedAI::MoveInLineOfSight(who);
-        }
-
-        void AttackStart(Unit* victim) override
-        {
-            if (_instance->GetBossState(DATA_AYAMISS) == IN_PROGRESS)
-                return;
-
-            ScriptedAI::AttackStart(victim);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (_instance->GetBossState(DATA_AYAMISS) == IN_PROGRESS)
-                return;
-
-            ScriptedAI::UpdateAI(diff);
-        }
-    private:
-        InstanceScript* _instance;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetRuinsOfAhnQirajAI<npc_hive_zara_larvaAI>(creature);
     }
+
+    void JustSummoned(Creature* summon) override
+    {
+        if (Creature* ayamiss = _instance->GetCreature(DATA_AYAMISS))
+        {
+            ayamiss->AI()->JustSummoned(summon);
+        }
+    }
+
+    void MoveInLineOfSight(Unit* who) override
+
+    {
+        if (_instance->GetBossState(DATA_AYAMISS) == IN_PROGRESS)
+            return;
+
+        ScriptedAI::MoveInLineOfSight(who);
+    }
+
+    void AttackStart(Unit* victim) override
+    {
+        if (_instance->GetBossState(DATA_AYAMISS) == IN_PROGRESS)
+            return;
+
+        ScriptedAI::AttackStart(victim);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (_instance->GetBossState(DATA_AYAMISS) == IN_PROGRESS)
+            return;
+
+        ScriptedAI::UpdateAI(diff);
+    }
+private:
+    InstanceScript* _instance;
 };
 
 void AddSC_boss_ayamiss()
 {
-    new boss_ayamiss();
-    new npc_hive_zara_larva();
+    RegisterRuinsOfAhnQirajCreatureAI(boss_ayamiss);
+    RegisterRuinsOfAhnQirajCreatureAI(npc_hive_zara_larva);
 }
