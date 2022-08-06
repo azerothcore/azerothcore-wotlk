@@ -84,223 +84,201 @@ enum MovePoints
 Position const ViscidusCoord = { -7992.36f, 908.19f, -52.62f, 1.68f }; /// @todo Visci isn't in room middle
 float const RoomRadius = 40.0f; /// @todo Not sure if its correct
 
-class boss_viscidus : public CreatureScript
+struct boss_viscidus : public BossAI
 {
-public:
-    boss_viscidus() : CreatureScript("boss_viscidus") { }
+    boss_viscidus(Creature* creature) : BossAI(creature, DATA_VISCIDUS) { }
 
-    struct boss_viscidusAI : public BossAI
+    void Reset() override
     {
-        boss_viscidusAI(Creature* creature) : BossAI(creature, DATA_VISCIDUS) { }
+        _Reset();
+        _hitcounter = 0;
+        _phase = PHASE_FROST;
+    }
 
-        void Reset() override
+    void DamageTaken(Unit* attacker, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+    {
+        if (!attacker || _phase != PHASE_MELEE)
+            return;
+
+        ++_hitcounter;
+
+        if (attacker->HasUnitState(UNIT_STATE_MELEE_ATTACKING) && _hitcounter >= HITCOUNTER_EXPLODE)
         {
-            _Reset();
-            _hitcounter = 0;
-            _phase = PHASE_FROST;
+            Talk(EMOTE_EXPLODE);
+            events.Reset();
+            _phase = PHASE_GLOB;
+            DoCast(me, SPELL_VISCIDUS_EXPLODE);
+            me->SetVisible(false);
+            me->RemoveAura(SPELL_TOXIN);
+            me->RemoveAura(SPELL_VISCIDUS_FREEZE);
+
+            uint8 NumGlobes = me->GetHealthPct() / 5.0f;
+            for (uint8 i = 0; i < NumGlobes; ++i)
+            {
+                float Angle = i * 2 * M_PI / NumGlobes;
+                float X = ViscidusCoord.GetPositionX() + std::cos(Angle) * RoomRadius;
+                float Y = ViscidusCoord.GetPositionY() + std::sin(Angle) * RoomRadius;
+                float Z = -35.0f;
+
+                if (TempSummon* Glob = me->SummonCreature(NPC_GLOB_OF_VISCIDUS, X, Y, Z))
+                {
+                    Glob->UpdateAllowedPositionZ(X, Y, Z);
+                    Glob->NearTeleportTo(X, Y, Z, 0.0f);
+                    Glob->GetMotionMaster()->MovePoint(ROOM_CENTER, ViscidusCoord);
+                }
+            }
         }
+        else if (_hitcounter == HITCOUNTER_SHATTER)
+            Talk(EMOTE_SHATTER);
+        else if (_hitcounter == HITCOUNTER_CRACK)
+            Talk(EMOTE_CRACK);
+    }
 
-        void DamageTaken(Unit* attacker, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+    {
+        if ((spell->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST) && _phase == PHASE_FROST && me->GetHealthPct() > 5.0f)
         {
-            if (!attacker || _phase != PHASE_MELEE)
-                return;
-
             ++_hitcounter;
 
-            if (attacker->HasUnitState(UNIT_STATE_MELEE_ATTACKING) && _hitcounter >= HITCOUNTER_EXPLODE)
+            if (_hitcounter >= HITCOUNTER_FREEZE)
             {
-                Talk(EMOTE_EXPLODE);
-                events.Reset();
-                _phase = PHASE_GLOB;
-                DoCast(me, SPELL_VISCIDUS_EXPLODE);
-                me->SetVisible(false);
-                me->RemoveAura(SPELL_TOXIN);
-                me->RemoveAura(SPELL_VISCIDUS_FREEZE);
-
-                uint8 NumGlobes = me->GetHealthPct() / 5.0f;
-                for (uint8 i = 0; i < NumGlobes; ++i)
-                {
-                    float Angle = i * 2 * M_PI / NumGlobes;
-                    float X = ViscidusCoord.GetPositionX() + std::cos(Angle) * RoomRadius;
-                    float Y = ViscidusCoord.GetPositionY() + std::sin(Angle) * RoomRadius;
-                    float Z = -35.0f;
-
-                    if (TempSummon* Glob = me->SummonCreature(NPC_GLOB_OF_VISCIDUS, X, Y, Z))
-                    {
-                        Glob->UpdateAllowedPositionZ(X, Y, Z);
-                        Glob->NearTeleportTo(X, Y, Z, 0.0f);
-                        Glob->GetMotionMaster()->MovePoint(ROOM_CENTER, ViscidusCoord);
-                    }
-                }
-            }
-            else if (_hitcounter == HITCOUNTER_SHATTER)
-                Talk(EMOTE_SHATTER);
-            else if (_hitcounter == HITCOUNTER_CRACK)
-                Talk(EMOTE_CRACK);
-        }
-
-        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
-        {
-            if ((spell->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST) && _phase == PHASE_FROST && me->GetHealthPct() > 5.0f)
-            {
-                ++_hitcounter;
-
-                if (_hitcounter >= HITCOUNTER_FREEZE)
-                {
-                    _hitcounter = 0;
-                    Talk(EMOTE_FROZEN);
-                    _phase = PHASE_MELEE;
-                    DoCast(me, SPELL_VISCIDUS_FREEZE);
-                    me->RemoveAura(SPELL_VISCIDUS_SLOWED_MORE);
-                    events.ScheduleEvent(EVENT_RESET_PHASE, 15000);
-                }
-                else if (_hitcounter >= HITCOUNTER_SLOW_MORE)
-                {
-                    Talk(EMOTE_FREEZE);
-                    me->RemoveAura(SPELL_VISCIDUS_SLOWED);
-                    DoCast(me, SPELL_VISCIDUS_SLOWED_MORE);
-                }
-                else if (_hitcounter >= HITCOUNTER_SLOW)
-                {
-                    Talk(EMOTE_SLOW);
-                    DoCast(me, SPELL_VISCIDUS_SLOWED);
-                }
-            }
-        }
-
-        void EnterCombat(Unit* /*who*/) override
-        {
-            _EnterCombat();
-            events.Reset();
-            InitSpells();
-        }
-
-        void InitSpells()
-        {
-            DoCast(me, SPELL_TOXIN);
-            events.ScheduleEvent(EVENT_POISONBOLT_VOLLEY, urand(10000, 15000));
-            events.ScheduleEvent(EVENT_POISON_SHOCK, urand(7000, 12000));
-        }
-
-        void EnterEvadeMode(EvadeReason why) override
-        {
-            summons.DespawnAll();
-            ScriptedAI::EnterEvadeMode(why);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            DoCast(me, SPELL_VISCIDUS_SUICIDE);
-            summons.DespawnAll();
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            if (_phase == PHASE_GLOB && summons.empty())
-            {
-                DoResetThreat();
-                me->NearTeleportTo(ViscidusCoord.GetPositionX(),
-                                   ViscidusCoord.GetPositionY(),
-                                   ViscidusCoord.GetPositionZ(),
-                                   ViscidusCoord.GetOrientation());
-
                 _hitcounter = 0;
-                _phase = PHASE_FROST;
-                InitSpells();
-                me->SetVisible(true);
+                Talk(EMOTE_FROZEN);
+                _phase = PHASE_MELEE;
+                DoCast(me, SPELL_VISCIDUS_FREEZE);
+                me->RemoveAura(SPELL_VISCIDUS_SLOWED_MORE);
+                events.ScheduleEvent(EVENT_RESET_PHASE, 15000);
             }
-
-            events.Update(diff);
-
-            while (uint32 eventId = events.ExecuteEvent())
+            else if (_hitcounter >= HITCOUNTER_SLOW_MORE)
             {
-                switch (eventId)
-                {
-                    case EVENT_POISONBOLT_VOLLEY:
-                        DoCast(me, SPELL_POISONBOLT_VOLLEY);
-                        events.ScheduleEvent(EVENT_POISONBOLT_VOLLEY, urand(10000, 15000));
-                        break;
-                    case EVENT_POISON_SHOCK:
-                        DoCast(me, SPELL_POISON_SHOCK);
-                        events.ScheduleEvent(EVENT_POISON_SHOCK, urand(7000, 12000));
-                        break;
-                    case EVENT_RESET_PHASE:
-                        _hitcounter = 0;
-                        _phase = PHASE_FROST;
-                        break;
-                    default:
-                        break;
-                }
+                Talk(EMOTE_FREEZE);
+                me->RemoveAura(SPELL_VISCIDUS_SLOWED);
+                DoCast(me, SPELL_VISCIDUS_SLOWED_MORE);
             }
+            else if (_hitcounter >= HITCOUNTER_SLOW)
+            {
+                Talk(EMOTE_SLOW);
+                DoCast(me, SPELL_VISCIDUS_SLOWED);
+            }
+        }
+    }
 
-            if (_phase != PHASE_GLOB)
-                DoMeleeAttackIfReady();
+    void EnterCombat(Unit* /*who*/) override
+    {
+        _EnterCombat();
+        events.Reset();
+        InitSpells();
+    }
+
+    void InitSpells()
+    {
+        DoCast(me, SPELL_TOXIN);
+        events.ScheduleEvent(EVENT_POISONBOLT_VOLLEY, 10s, 15s);
+        events.ScheduleEvent(EVENT_POISON_SHOCK, 7s, 12s);
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        summons.DespawnAll();
+        ScriptedAI::EnterEvadeMode(why);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        DoCast(me, SPELL_VISCIDUS_SUICIDE);
+        summons.DespawnAll();
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        if (_phase == PHASE_GLOB && summons.empty())
+        {
+            DoResetThreat();
+            me->NearTeleportTo(ViscidusCoord.GetPositionX(),
+                ViscidusCoord.GetPositionY(),
+                ViscidusCoord.GetPositionZ(),
+                ViscidusCoord.GetOrientation());
+
+            _hitcounter = 0;
+            _phase = PHASE_FROST;
+            InitSpells();
+            me->SetVisible(true);
         }
 
-    private:
-        uint8 _hitcounter;
-        Phases _phase;
-    };
+        events.Update(diff);
 
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetTempleOfAhnQirajAI<boss_viscidusAI>(creature);
+        while (uint32 eventId = events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+                case EVENT_POISONBOLT_VOLLEY:
+                    DoCast(me, SPELL_POISONBOLT_VOLLEY);
+                    events.ScheduleEvent(EVENT_POISONBOLT_VOLLEY, 10s, 15s);
+                    break;
+                case EVENT_POISON_SHOCK:
+                    DoCast(me, SPELL_POISON_SHOCK);
+                    events.ScheduleEvent(EVENT_POISON_SHOCK, 7s, 12s);
+                    break;
+                case EVENT_RESET_PHASE:
+                    _hitcounter = 0;
+                    _phase = PHASE_FROST;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        if (_phase != PHASE_GLOB)
+            DoMeleeAttackIfReady();
     }
+
+private:
+    uint8 _hitcounter;
+    Phases _phase;
 };
 
-class npc_glob_of_viscidus : public CreatureScript
+struct boss_glob_of_viscidus : public ScriptedAI
 {
-public:
-    npc_glob_of_viscidus() : CreatureScript("boss_glob_of_viscidus") { }
+    boss_glob_of_viscidus(Creature* creature) : ScriptedAI(creature) { }
 
-    struct npc_glob_of_viscidusAI : public ScriptedAI
+    void JustDied(Unit* /*killer*/) override
     {
-        npc_glob_of_viscidusAI(Creature* creature) : ScriptedAI(creature) { }
+        InstanceScript* instance = me->GetInstanceScript();
 
-        void JustDied(Unit* /*killer*/) override
+        if (Creature* viscidus = me->GetMap()->GetCreature(instance->GetGuidData(DATA_VISCIDUS)))
         {
-            InstanceScript* Instance = me->GetInstanceScript();
+            if (BossAI* viscidusAI = dynamic_cast<BossAI*>(viscidus->GetAI()))
+                viscidusAI->SummonedCreatureDespawn(me);
 
-            if (Creature* Viscidus = me->GetMap()->GetCreature(Instance->GetGuidData(DATA_VISCIDUS)))
+            if (viscidus->IsAlive() && viscidus->GetHealthPct() < 5.0f)
             {
-                if (BossAI* ViscidusAI = dynamic_cast<BossAI*>(Viscidus->GetAI()))
-                    ViscidusAI->SummonedCreatureDespawn(me);
-
-                if (Viscidus->IsAlive() && Viscidus->GetHealthPct() < 5.0f)
-                {
-                    Viscidus->SetVisible(true);
-                    Unit::Kill(Viscidus->GetVictim(), Viscidus);
-                }
-                else
-                {
-                    Viscidus->SetHealth(Viscidus->GetHealth() - Viscidus->GetMaxHealth() / 20);
-                    Viscidus->CastSpell(Viscidus, SPELL_VISCIDUS_SHRINKS);
-                }
+                viscidus->SetVisible(true);
+                Unit::Kill(viscidus->GetVictim(), viscidus);
+            }
+            else
+            {
+                viscidus->SetHealth(viscidus->GetHealth() - viscidus->GetMaxHealth() / 20);
+                viscidus->CastSpell(viscidus, SPELL_VISCIDUS_SHRINKS);
             }
         }
+    }
 
-        void MovementInform(uint32 /*type*/, uint32 id) override
-        {
-            if (id == ROOM_CENTER)
-            {
-                DoCast(me, SPELL_REJOIN_VISCIDUS);
-                if (TempSummon* summon = me->ToTempSummon())
-                    summon->UnSummon();
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void MovementInform(uint32 /*type*/, uint32 id) override
     {
-        return GetTempleOfAhnQirajAI<npc_glob_of_viscidusAI>(creature);
+        if (id == ROOM_CENTER)
+        {
+            DoCast(me, SPELL_REJOIN_VISCIDUS);
+            if (TempSummon* summon = me->ToTempSummon())
+                summon->UnSummon();
+        }
     }
 };
 
 void AddSC_boss_viscidus()
 {
-    new boss_viscidus();
-    new npc_glob_of_viscidus();
+    RegisterTempleOfAhnQirajCreatureAI(boss_viscidus);
+    RegisterTempleOfAhnQirajCreatureAI(boss_glob_of_viscidus);
 }
