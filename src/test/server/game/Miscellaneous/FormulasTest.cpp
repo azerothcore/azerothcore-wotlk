@@ -16,6 +16,7 @@
  */
 
 #include "Formulas.h"
+#include "DBCStores.h"
 #include "WorldMock.h"
 #include "gtest/gtest.h"
 

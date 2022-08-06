@@ -18,9 +18,11 @@
 #ifndef ACORE_FORMULAS_H
 #define ACORE_FORMULAS_H
 
-#include "ScriptMgr.h"
 #include "SharedDefines.h"
 #include <cmath>
+
+class Player;
+class Unit;
 
 namespace Acore::Honor
 {
