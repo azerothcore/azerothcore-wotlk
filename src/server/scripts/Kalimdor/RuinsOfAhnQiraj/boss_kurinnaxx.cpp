@@ -47,6 +47,12 @@ struct boss_kurinnaxx : public BossAI
 {
     boss_kurinnaxx(Creature* creature) : BossAI(creature, DATA_KURINNAXX) {}
 
+    void InitializeAI() override
+    {
+        me->m_CombatDistance = 50.0f;
+        Reset();
+    }
+
     void Reset() override
     {
         BossAI::Reset();
