@@ -16,7 +16,7 @@
  */
 
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "maraudon.h"
 
 class instance_maraudon : public InstanceMapScript

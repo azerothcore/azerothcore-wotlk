@@ -17,7 +17,7 @@
 
 #include "CreatureAI.h"
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "blood_furnace.h"
 
 class instance_blood_furnace : public InstanceMapScript

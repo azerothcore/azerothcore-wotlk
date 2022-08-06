@@ -15,12 +15,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
+#include "ScriptObject.h"
 
-void ScriptMgr::OnPlayerMove(Player* player, MovementInfo movementInfo, uint32 opcode)
+void ScriptMgr::OnPlayerMove(Player* player, MovementInfo* movementInfo, uint32 opcode)
 {
-    ExecuteScript<MovementHandlerScript>([&](MovementHandlerScript* script)
+    ExecuteScript<MovementHandlerScript>([player, movementInfo, opcode](MovementHandlerScript* script)
     {
         script->OnPlayerMove(player, movementInfo, opcode);
     });

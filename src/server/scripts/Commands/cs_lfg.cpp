@@ -21,7 +21,7 @@
 #include "LFGMgr.h"
 #include "Language.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 
 void GetPlayerInfo(ChatHandler*  handler, Player* player)
 {

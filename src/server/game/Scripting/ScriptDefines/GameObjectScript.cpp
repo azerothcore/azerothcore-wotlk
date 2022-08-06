@@ -15,8 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+#include "Errors.h"
+#include "GameObject.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
+#include "ScriptObject.h"
 #include "ScriptedGossip.h"
 
 bool ScriptMgr::OnGossipHello(Player* player, GameObject* go)
@@ -30,11 +36,9 @@ bool ScriptMgr::OnGossipHello(Player* player, GameObject* go)
     });
 
     if (ret && *ret)
-    {
         return true;
-    }
 
-    auto tempScript = ScriptRegistry<GameObjectScript>::GetScriptById(go->GetScriptId());
+    auto tempScript = ScriptRegistry<GameObjectScript>::Instance()->GetScriptById(go->GetScriptId());
     ClearGossipMenuFor(player);
     return tempScript ? tempScript->OnGossipHello(player, go) : false;
 }
@@ -50,11 +54,9 @@ bool ScriptMgr::OnGossipSelect(Player* player, GameObject* go, uint32 sender, ui
     });
 
     if (ret && *ret)
-    {
         return true;
-    }
 
-    auto tempScript = ScriptRegistry<GameObjectScript>::GetScriptById(go->GetScriptId());
+    auto tempScript = ScriptRegistry<GameObjectScript>::Instance()->GetScriptById(go->GetScriptId());
     return tempScript ? tempScript->OnGossipSelect(player, go, sender, action) : false;
 }
 
@@ -70,11 +72,9 @@ bool ScriptMgr::OnGossipSelectCode(Player* player, GameObject* go, uint32 sender
     });
 
     if (ret && *ret)
-    {
         return true;
-    }
 
-    auto tempScript = ScriptRegistry<GameObjectScript>::GetScriptById(go->GetScriptId());
+    auto tempScript = ScriptRegistry<GameObjectScript>::Instance()->GetScriptById(go->GetScriptId());
     return tempScript ? tempScript->OnGossipSelectCode(player, go, sender, action, code) : false;
 }
 
@@ -90,11 +90,9 @@ bool ScriptMgr::OnQuestAccept(Player* player, GameObject* go, Quest const* quest
     });
 
     if (ret && *ret)
-    {
         return true;
-    }
 
-    auto tempScript = ScriptRegistry<GameObjectScript>::GetScriptById(go->GetScriptId());
+    auto tempScript = ScriptRegistry<GameObjectScript>::Instance()->GetScriptById(go->GetScriptId());
     ClearGossipMenuFor(player);
     return tempScript ? tempScript->OnQuestAccept(player, go, quest) : false;
 }
@@ -111,11 +109,9 @@ bool ScriptMgr::OnQuestReward(Player* player, GameObject* go, Quest const* quest
     });
 
     if (ret && *ret)
-    {
         return false;
-    }
 
-    auto tempScript = ScriptRegistry<GameObjectScript>::GetScriptById(go->GetScriptId());
+    auto tempScript = ScriptRegistry<GameObjectScript>::Instance()->GetScriptById(go->GetScriptId());
     ClearGossipMenuFor(player);
     return tempScript ? tempScript->OnQuestReward(player, go, quest, opt) : false;
 }
@@ -125,7 +121,7 @@ uint32 ScriptMgr::GetDialogStatus(Player* player, GameObject* go)
     ASSERT(player);
     ASSERT(go);
 
-    auto tempScript = ScriptRegistry<GameObjectScript>::GetScriptById(go->GetScriptId());
+    auto tempScript = ScriptRegistry<GameObjectScript>::Instance()->GetScriptById(go->GetScriptId());
     ClearGossipMenuFor(player);
     return tempScript ? tempScript->GetDialogStatus(player, go) : DIALOG_STATUS_SCRIPTED_NO_STATUS;
 }
@@ -139,7 +135,7 @@ void ScriptMgr::OnGameObjectDestroyed(GameObject* go, Player* player)
         script->OnGameObjectDestroyed(go, player);
     });
 
-    if (auto tempScript = ScriptRegistry<GameObjectScript>::GetScriptById(go->GetScriptId()))
+    if (auto tempScript = ScriptRegistry<GameObjectScript>::Instance()->GetScriptById(go->GetScriptId()))
     {
         tempScript->OnDestroyed(go, player);
     }
@@ -154,7 +150,7 @@ void ScriptMgr::OnGameObjectDamaged(GameObject* go, Player* player)
         script->OnGameObjectDamaged(go, player);
     });
 
-    if (auto tempScript = ScriptRegistry<GameObjectScript>::GetScriptById(go->GetScriptId()))
+    if (auto tempScript = ScriptRegistry<GameObjectScript>::Instance()->GetScriptById(go->GetScriptId()))
     {
         tempScript->OnDamaged(go, player);
     }
@@ -169,7 +165,7 @@ void ScriptMgr::OnGameObjectLootStateChanged(GameObject* go, uint32 state, Unit*
         script->OnGameObjectLootStateChanged(go, state, unit);
     });
 
-    if (auto tempScript = ScriptRegistry<GameObjectScript>::GetScriptById(go->GetScriptId()))
+    if (auto tempScript = ScriptRegistry<GameObjectScript>::Instance()->GetScriptById(go->GetScriptId()))
     {
         tempScript->OnLootStateChanged(go, state, unit);
     }
@@ -184,7 +180,7 @@ void ScriptMgr::OnGameObjectStateChanged(GameObject* go, uint32 state)
         script->OnGameObjectStateChanged(go, state);
     });
 
-    if (auto tempScript = ScriptRegistry<GameObjectScript>::GetScriptById(go->GetScriptId()))
+    if (auto tempScript = ScriptRegistry<GameObjectScript>::Instance()->GetScriptById(go->GetScriptId()))
     {
         tempScript->OnGameObjectStateChanged(go, state);
     }
@@ -199,7 +195,7 @@ void ScriptMgr::OnGameObjectUpdate(GameObject* go, uint32 diff)
         script->OnGameObjectUpdate(go, diff);
     });
 
-    if (auto tempScript = ScriptRegistry<GameObjectScript>::GetScriptById(go->GetScriptId()))
+    if (auto tempScript = ScriptRegistry<GameObjectScript>::Instance()->GetScriptById(go->GetScriptId()))
     {
         tempScript->OnUpdate(go, diff);
     }
@@ -219,6 +215,6 @@ GameObjectAI* ScriptMgr::GetGameObjectAI(GameObject* go)
         return retAI;
     }
 
-    auto tempScript = ScriptRegistry<GameObjectScript>::GetScriptById(go->GetScriptId());
+    auto tempScript = ScriptRegistry<GameObjectScript>::Instance()->GetScriptById(go->GetScriptId());
     return tempScript ? tempScript->GetAI(go) : nullptr;
 }

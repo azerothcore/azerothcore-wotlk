@@ -17,7 +17,7 @@
 
 #include "InstanceScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "sunwell_plateau.h"
 
 DoorData const doorData[] =

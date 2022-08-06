@@ -18,7 +18,7 @@
 #include "AreaBoundary.h"
 #include "CreatureAIImpl.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "obsidian_sanctum.h"
 

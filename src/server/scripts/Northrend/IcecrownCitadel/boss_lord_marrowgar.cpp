@@ -19,7 +19,7 @@
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "Vehicle.h"

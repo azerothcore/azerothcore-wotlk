@@ -1278,7 +1278,7 @@ LootStoreItem const* LootTemplate::LootGroup::Roll(Loot& loot, Player const* pla
         }
     }
 
-    if (!sScriptMgr->OnBeforeLootEqualChanced(player, EqualChanced, loot, store))
+    if (!sScriptMgr->OnBeforeLootEqualChanced(player, &EqualChanced, loot, store))
         return nullptr;
 
     possibleLoot = EqualChanced;

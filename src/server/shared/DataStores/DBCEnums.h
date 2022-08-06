@@ -18,6 +18,8 @@
 #ifndef DBCENUMS_H
 #define DBCENUMS_H
 
+#include "Define.h"
+
 #pragma pack(push, 1)
 
 struct DBCPosition2D
@@ -267,7 +269,7 @@ enum AreaFlags
     AREA_FLAG_NO_FLY_ZONE        = 0x20000000                 // Marks zones where you cannot fly
 };
 
-enum Difficulty
+enum Difficulty : uint8
 {
     REGULAR_DIFFICULTY           = 0,
 

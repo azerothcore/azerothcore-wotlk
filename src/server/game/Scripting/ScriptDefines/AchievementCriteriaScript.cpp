@@ -15,13 +15,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+#include "Errors.h"
 #include "ScriptMgr.h"
+#include "ScriptObject.h"
+#include "ScriptRegistry.h"
 
 bool ScriptMgr::OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target, uint32 criteria_id)
 {
     ASSERT(source);
     // target can be nullptr.
 
-    auto tempScript = ScriptRegistry<AchievementCriteriaScript>::GetScriptById(scriptId);
+    auto tempScript = ScriptRegistry<AchievementCriteriaScript>::Instance()->GetScriptById(scriptId);
     return tempScript ? tempScript->OnCheck(source, target, criteria_id) : false;
 }

@@ -22,7 +22,7 @@ SDComment: sound not implemented
 SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "TaskScheduler.h"
 #include "temple_of_ahnqiraj.h"

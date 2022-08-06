@@ -82,10 +82,17 @@ GameObject::~GameObject()
     //    CleanupsBeforeDelete();
 }
 
-bool GameObject::AIM_Initialize()
+void GameObject::AIM_Destroy()
 {
     if (m_AI)
         delete m_AI;
+
+    m_AI = nullptr;
+}
+
+bool GameObject::AIM_Initialize()
+{
+    AIM_Destroy();
 
     m_AI = FactorySelector::SelectGameObjectAI(this);
 

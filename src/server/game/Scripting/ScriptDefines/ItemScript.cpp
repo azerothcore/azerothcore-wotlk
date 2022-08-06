@@ -15,8 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+#include "Errors.h"
+#include "Item.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
+#include "ScriptObject.h"
 #include "ScriptedGossip.h"
 
 bool ScriptMgr::OnQuestAccept(Player* player, Item* item, Quest const* quest)
@@ -31,11 +37,9 @@ bool ScriptMgr::OnQuestAccept(Player* player, Item* item, Quest const* quest)
     });
 
     if (ret && *ret)
-    {
         return false;
-    }
 
-    auto tempScript = ScriptRegistry<ItemScript>::GetScriptById(item->GetScriptId());
+    auto tempScript = ScriptRegistry<ItemScript>::Instance()->GetScriptById(item->GetScriptId());
     ClearGossipMenuFor(player);
     return tempScript ? tempScript->OnQuestAccept(player, item, quest) : false;
 }
@@ -51,11 +55,9 @@ bool ScriptMgr::OnItemUse(Player* player, Item* item, SpellCastTargets const& ta
     });
 
     if (ret && *ret)
-    {
         return true;
-    }
 
-    auto tempScript = ScriptRegistry<ItemScript>::GetScriptById(item->GetScriptId());
+    auto tempScript = ScriptRegistry<ItemScript>::Instance()->GetScriptById(item->GetScriptId());
     return tempScript ? tempScript->OnUse(player, item, targets) : false;
 }
 
@@ -70,11 +72,9 @@ bool ScriptMgr::OnItemExpire(Player* player, ItemTemplate const* proto)
     });
 
     if (ret && *ret)
-    {
         return false;
-    }
 
-    auto tempScript = ScriptRegistry<ItemScript>::GetScriptById(proto->ScriptId);
+    auto tempScript = ScriptRegistry<ItemScript>::Instance()->GetScriptById(proto->ScriptId);
     return tempScript ? tempScript->OnExpire(player, proto) : false;
 }
 
@@ -89,11 +89,9 @@ bool ScriptMgr::OnItemRemove(Player* player, Item* item)
     });
 
     if (ret && *ret)
-    {
         return false;
-    }
 
-    auto tempScript = ScriptRegistry<ItemScript>::GetScriptById(item->GetScriptId());
+    auto tempScript = ScriptRegistry<ItemScript>::Instance()->GetScriptById(item->GetScriptId());
     return tempScript ? tempScript->OnRemove(player, item) : false;
 }
 
@@ -104,7 +102,7 @@ bool ScriptMgr::OnCastItemCombatSpell(Player* player, Unit* victim, SpellInfo co
     ASSERT(spellInfo);
     ASSERT(item);
 
-    auto tempScript = ScriptRegistry<ItemScript>::GetScriptById(item->GetScriptId());
+    auto tempScript = ScriptRegistry<ItemScript>::Instance()->GetScriptById(item->GetScriptId());
     return tempScript ? tempScript->OnCastItemCombatSpell(player, victim, spellInfo, item) : true;
 }
 
@@ -118,7 +116,7 @@ void ScriptMgr::OnGossipSelect(Player* player, Item* item, uint32 sender, uint32
         script->OnItemGossipSelect(player, item, sender, action);
     });
 
-    if (auto tempScript = ScriptRegistry<ItemScript>::GetScriptById(item->GetScriptId()))
+    if (auto tempScript = ScriptRegistry<ItemScript>::Instance()->GetScriptById(item->GetScriptId()))
     {
         tempScript->OnGossipSelect(player, item, sender, action);
     }
@@ -134,7 +132,7 @@ void ScriptMgr::OnGossipSelectCode(Player* player, Item* item, uint32 sender, ui
         script->OnItemGossipSelectCode(player, item, sender, action, code);
     });
 
-    if (auto tempScript = ScriptRegistry<ItemScript>::GetScriptById(item->GetScriptId()))
+    if (auto tempScript = ScriptRegistry<ItemScript>::Instance()->GetScriptById(item->GetScriptId()))
     {
         tempScript->OnGossipSelectCode(player, item, sender, action, code);
     }

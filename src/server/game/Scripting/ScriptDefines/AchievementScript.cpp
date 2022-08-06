@@ -15,8 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
+#include "ScriptObject.h"
 
 void ScriptMgr::SetRealmCompleted(AchievementEntry const* achievement)
 {
@@ -33,12 +37,7 @@ bool ScriptMgr::IsCompletedCriteria(AchievementMgr* mgr, AchievementCriteriaEntr
         return !script->IsCompletedCriteria(mgr, achievementCriteria, achievement, progress);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::IsRealmCompleted(AchievementGlobalMgr const* globalmgr, AchievementEntry const* achievement, SystemTimePoint completionTime)
@@ -48,15 +47,10 @@ bool ScriptMgr::IsRealmCompleted(AchievementGlobalMgr const* globalmgr, Achievem
         return !script->IsRealmCompleted(globalmgr, achievement, completionTime);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
-void ScriptMgr::OnBeforeCheckCriteria(AchievementMgr* mgr, AchievementCriteriaEntryList const* achievementCriteriaList)
+void ScriptMgr::OnBeforeCheckCriteria(AchievementMgr* mgr, std::list<AchievementCriteriaEntry const*> const* achievementCriteriaList)
 {
     ExecuteScript<AchievementScript>([&](AchievementScript* script)
     {
@@ -71,10 +65,5 @@ bool ScriptMgr::CanCheckCriteria(AchievementMgr* mgr, AchievementCriteriaEntry c
         return !script->CanCheckCriteria(mgr, achievementCriteria);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }

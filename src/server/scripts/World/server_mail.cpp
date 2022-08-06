@@ -16,7 +16,7 @@
  */
 
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "Mail.h"
 #include "ObjectMgr.h"
 #include "QueryResult.h"

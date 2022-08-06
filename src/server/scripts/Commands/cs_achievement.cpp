@@ -26,7 +26,7 @@ EndScriptData */
 #include "Chat.h"
 #include "Language.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 
 using namespace Acore::ChatCommands;
 

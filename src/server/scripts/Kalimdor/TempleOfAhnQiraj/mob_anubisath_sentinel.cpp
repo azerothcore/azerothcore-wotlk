@@ -27,7 +27,7 @@ EndScriptData */
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "Spell.h"
 #include "WorldPacket.h"

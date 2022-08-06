@@ -44,6 +44,7 @@
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "SpellMgr.h"
+#include "ScriptObject.h"
 #include "SpellScript.h"
 #include "Transport.h"
 #include "Unit.h"
@@ -5079,7 +5080,7 @@ void ObjectMgr::LoadScripts(ScriptsType type)
     if (tableName.empty())
         return;
 
-    if (sScriptMgr->IsScriptScheduled())                    // function cannot be called when scripts are in use.
+    if (sMapMgr->IsScriptScheduled())                    // function cannot be called when scripts are in use.
         return;
 
     LOG_INFO("server.loading", "Loading {}...", tableName);
@@ -5527,12 +5528,12 @@ void ObjectMgr::LoadSpellScriptNames()
             }
             while (spellInfo)
             {
-                _spellScriptsStore.insert(SpellScriptsContainer::value_type(spellInfo->Id, GetScriptId(scriptName)));
+                _spellScriptsStore.emplace(spellInfo->Id, std::make_pair(GetScriptId(scriptName), true));
                 spellInfo = spellInfo->GetNextRankSpell();
             }
         }
         else
-            _spellScriptsStore.insert(SpellScriptsContainer::value_type(spellInfo->Id, GetScriptId(scriptName)));
+            _spellScriptsStore.emplace(spellInfo->Id, std::make_pair(GetScriptId(scriptName), true));
         ++count;
     } while (result->NextRow());
 
@@ -5553,45 +5554,59 @@ void ObjectMgr::ValidateSpellScripts()
 
     uint32 count = 0;
 
-    for (SpellScriptsContainer::iterator itr = _spellScriptsStore.begin(); itr != _spellScriptsStore.end();)
+    for (auto const& spell : _spellScriptsStore)
     {
-        SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(itr->first);
-        std::vector<std::pair<SpellScriptLoader*, SpellScriptsContainer::iterator> > SpellScriptLoaders;
-        sScriptMgr->CreateSpellScriptLoaders(itr->first, SpellScriptLoaders);
-        itr = _spellScriptsStore.upper_bound(itr->first);
+        SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(spell.first);
 
-        for (std::vector<std::pair<SpellScriptLoader*, SpellScriptsContainer::iterator> >::iterator sitr = SpellScriptLoaders.begin(); sitr != SpellScriptLoaders.end(); ++sitr)
+        auto const bounds = sObjectMgr->GetSpellScriptsBounds(spell.first);
+
+        for (auto itr = bounds.first; itr != bounds.second; ++itr)
         {
-            SpellScript* spellScript = sitr->first->GetSpellScript();
-            AuraScript* auraScript = sitr->first->GetAuraScript();
-            bool valid = true;
-            if (!spellScript && !auraScript)
+            if (SpellScriptLoader* spellScriptLoader = sScriptMgr->GetSpellScriptLoader(itr->second.first))
             {
-                LOG_ERROR("sql.sql", "Functions GetSpellScript() and GetAuraScript() of script `{}` do not return objects - script skipped", GetScriptName(sitr->second->second));
-                valid = false;
+                ++count;
+
+                std::unique_ptr<SpellScript> spellScript(spellScriptLoader->GetSpellScript());
+                std::unique_ptr<AuraScript> auraScript(spellScriptLoader->GetAuraScript());
+
+                if (!spellScript && !auraScript)
+                {
+                    LOG_ERROR("scripts", "Functions GetSpellScript() and GetAuraScript() of script `{}` do not return objects - script skipped", GetScriptName(itr->second.first));
+
+                    itr->second.second = false;
+                    continue;
+                }
+
+                if (spellScript)
+                {
+                    spellScript->_Init(spellScriptLoader->GetName(), spellEntry->Id);
+                    spellScript->_Register();
+
+                    if (!spellScript->_Validate(spellEntry))
+                    {
+                        itr->second.second = false;
+                        continue;
+                    }
+                }
+
+                if (auraScript)
+                {
+                    auraScript->_Init(spellScriptLoader->GetName(), spellEntry->Id);
+                    auraScript->_Register();
+
+                    if (!auraScript->_Validate(spellEntry))
+                    {
+                        itr->second.second = false;
+                        continue;
+                    }
+                }
+
+                // Enable the script when all checks passed
+                itr->second.second = true;
             }
-            if (spellScript)
-            {
-                spellScript->_Init(&sitr->first->GetName(), spellEntry->Id);
-                spellScript->_Register();
-                if (!spellScript->_Validate(spellEntry))
-                    valid = false;
-                delete spellScript;
-            }
-            if (auraScript)
-            {
-                auraScript->_Init(&sitr->first->GetName(), spellEntry->Id);
-                auraScript->_Register();
-                if (!auraScript->_Validate(spellEntry))
-                    valid = false;
-                delete auraScript;
-            }
-            if (!valid)
-            {
-                _spellScriptsStore.erase(sitr->second);
-            }
+            else
+                itr->second.second = false;
         }
-        ++count;
     }
 
     LOG_INFO("server.loading", ">> Validated {} scripts in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
@@ -9159,21 +9174,28 @@ void ObjectMgr::LoadScriptNames()
     LOG_INFO("server.loading", " ");
 }
 
+ObjectMgr::ScriptNameContainer const& ObjectMgr::GetAllScriptNames() const
+{
+    return _scriptNamesStore;
+}
+
 std::string const& ObjectMgr::GetScriptName(uint32 id) const
 {
     static std::string const empty = "";
     return (id < _scriptNamesStore.size()) ? _scriptNamesStore[id] : empty;
 }
 
-uint32 ObjectMgr::GetScriptId(std::string const& name)
+uint32 ObjectMgr::GetScriptId(std::string_view name)
 {
     // use binary search to find the script name in the sorted vector
     // assume "" is the first element
     if (name.empty())
         return 0;
 
-    ScriptNameContainer::const_iterator itr = std::lower_bound(_scriptNamesStore.begin(), _scriptNamesStore.end(), name);
-    if (itr == _scriptNamesStore.end() || (*itr != name))
+    std::string saveName{ name };
+
+    ScriptNameContainer::const_iterator itr = std::lower_bound(_scriptNamesStore.begin(), _scriptNamesStore.end(), saveName);
+    if (itr == _scriptNamesStore.end() || (*itr != saveName))
         return 0;
 
     return uint32(itr - _scriptNamesStore.begin());

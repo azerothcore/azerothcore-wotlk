@@ -17,7 +17,7 @@
 
 #include "utgarde_keep.h"
 #include "GameObjectAI.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "Vehicle.h"
 

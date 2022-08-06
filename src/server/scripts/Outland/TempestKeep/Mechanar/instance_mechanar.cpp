@@ -16,7 +16,7 @@
  */
 
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "mechanar.h"
 
 static DoorData const doorData[] =

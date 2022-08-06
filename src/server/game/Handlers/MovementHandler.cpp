@@ -517,7 +517,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
     if (plrMover)//Hook for OnPlayerMove
     {
-        sScriptMgr->OnPlayerMove(plrMover, movementInfo, opcode);
+        sScriptMgr->OnPlayerMove(plrMover, &movementInfo, opcode);
     }
 
     bool jumpopcode = false;

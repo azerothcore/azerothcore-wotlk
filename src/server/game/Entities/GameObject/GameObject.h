@@ -1060,8 +1060,11 @@ public:
     void UpdateSaveToDb(bool enable);
 
     void SavingStateOnDB();
-protected:
+
+    void AIM_Destroy();
     bool AIM_Initialize();
+
+protected:
     GameObjectModel* CreateModel();
     void UpdateModel();                                 // updates model in case displayId were changed
     uint32      m_spellId;

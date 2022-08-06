@@ -17,7 +17,7 @@
 
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "icecrown_citadel.h"

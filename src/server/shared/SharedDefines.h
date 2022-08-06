@@ -18,6 +18,7 @@
 #ifndef ACORE_SHAREDDEFINES_H
 #define ACORE_SHAREDDEFINES_H
 
+#include "DBCEnums.h"
 #include "Define.h"
 #include "EnumFlag.h"
 #include <cassert>

@@ -15,6 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+#include "Errors.h"
 #include "ScriptMgr.h"
 
 Battleground* ScriptMgr::CreateBattleground(BattlegroundTypeId /*typeId*/)

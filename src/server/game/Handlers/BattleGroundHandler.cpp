@@ -30,6 +30,7 @@
 #include "ScriptMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "LFGMgr.h"
 
 void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket& recvData)
 {

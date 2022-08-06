@@ -16,7 +16,7 @@
  */
 
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "sethekk_halls.h"
 
 class instance_sethekk_halls : public InstanceMapScript

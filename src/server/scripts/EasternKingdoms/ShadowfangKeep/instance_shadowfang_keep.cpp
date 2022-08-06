@@ -16,7 +16,7 @@
  */
 
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "TemporarySummon.h"
 #include "shadowfang_keep.h"
 

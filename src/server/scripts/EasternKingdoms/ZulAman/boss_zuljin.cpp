@@ -21,7 +21,7 @@ SD%Complete: 85%
 SDComment:
 EndScriptData */
 
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "zulaman.h"

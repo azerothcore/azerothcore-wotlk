@@ -27,7 +27,7 @@ npc_webbed_creature
 EndContentData */
 
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 
 /*######

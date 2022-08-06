@@ -23,7 +23,7 @@
 #include "Group.h"
 #include "ObjectDefines.h"
 #include "ObjectMgr.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "SpellMgr.h"
 #include "Vehicle.h"

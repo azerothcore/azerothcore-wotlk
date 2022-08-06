@@ -16,7 +16,7 @@
  */
 
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "azjol_nerub.h"
 

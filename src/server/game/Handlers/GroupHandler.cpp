@@ -33,6 +33,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "LFGMgr.h"
 
 class Aura;
 

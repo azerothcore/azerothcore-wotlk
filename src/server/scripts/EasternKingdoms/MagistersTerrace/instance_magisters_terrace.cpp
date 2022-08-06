@@ -16,7 +16,7 @@
  */
 
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "magisters_terrace.h"
 
 class instance_magisters_terrace : public InstanceMapScript

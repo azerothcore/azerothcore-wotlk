@@ -20489,14 +20489,14 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
                         fieldBuffer << (uint32)target->GetFaction();
                 }
                 else
-                    if (!sScriptMgr->IsCustomBuildValuesUpdate(this, updateType, fieldBuffer, target, index))
+                    if (!sScriptMgr->IsCustomBuildValuesUpdate(this, updateType, &fieldBuffer, target, index))
                     {
                         fieldBuffer << m_uint32Values[index];
                     }
             }
             else
             {
-                if (sScriptMgr->OnBuildValuesUpdate(this, updateType, fieldBuffer, target, index))
+                if (sScriptMgr->OnBuildValuesUpdate(this, updateType, &fieldBuffer, target, index))
                 {
                     continue;
                 }

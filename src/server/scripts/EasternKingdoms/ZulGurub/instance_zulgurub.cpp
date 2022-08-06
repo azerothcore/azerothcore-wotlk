@@ -24,7 +24,8 @@ EndScriptData */
 
 #include "GameObjectAI.h"
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
+#include "GameEventMgr.h"
 #include "zulgurub.h"
 
 DoorData const doorData[] =

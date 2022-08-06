@@ -23,7 +23,7 @@
 #include "CombatAI.h"
 #include "Pet.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
 

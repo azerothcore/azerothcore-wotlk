@@ -37,6 +37,8 @@
 #include "Vehicle.h"
 #include "WeatherMgr.h"
 #include "WorldStatePackets.h"
+#include "AchievementMgr.h"
+#include "Weather.h"
 
 // TODO: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue

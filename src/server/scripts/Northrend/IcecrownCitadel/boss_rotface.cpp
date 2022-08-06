@@ -17,7 +17,7 @@
 
 #include "GridNotifiers.h"
 #include "ObjectMgr.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "icecrown_citadel.h"

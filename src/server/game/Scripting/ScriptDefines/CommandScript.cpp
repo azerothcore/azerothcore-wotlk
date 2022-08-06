@@ -15,14 +15,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 #include "Chat.h"
 #include "ScriptMgr.h"
+#include "ScriptObject.h"
+#include "ScriptRegistry.h"
 
 Acore::ChatCommands::ChatCommandTable ScriptMgr::GetChatCommands()
 {
     Acore::ChatCommands::ChatCommandTable table;
 
-    for (auto const& [scriptID, script] : ScriptRegistry<CommandScript>::ScriptPointerList)
+    for (auto const& [scriptID, script] : ScriptRegistry<CommandScript>::Instance()->GetScripts())
     {
         Acore::ChatCommands::ChatCommandTable cmds = script->GetCommands();
         std::move(cmds.begin(), cmds.end(), std::back_inserter(table));

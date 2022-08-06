@@ -15,14 +15,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+#include "Errors.h"
 #include "ScriptMgr.h"
+#include "ScriptObject.h"
+#include "ScriptRegistry.h"
 
 void ScriptMgr::OnDynamicObjectUpdate(DynamicObject* dynobj, uint32 diff)
 {
     ASSERT(dynobj);
 
-    for (auto const& [scriptID, script] : ScriptRegistry<DynamicObjectScript>::ScriptPointerList)
-    {
+    if (ScriptRegistry<DynamicObjectScript>::Instance()->GetScripts().empty())
+        return;
+
+    for (auto const& [scriptID, script] : ScriptRegistry<DynamicObjectScript>::Instance()->GetScripts())
         script->OnUpdate(dynobj, diff);
-    }
 }

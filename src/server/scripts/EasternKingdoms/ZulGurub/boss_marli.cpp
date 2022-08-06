@@ -17,7 +17,7 @@
 
 #include "GameObjectAI.h"
 #include "SpellScript.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "TaskScheduler.h"
 #include "zulgurub.h"

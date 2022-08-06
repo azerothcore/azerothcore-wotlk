@@ -15,8 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+#include "Errors.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
+#include "ScriptObject.h"
+#include "Weather.h"
 
 void ScriptMgr::OnWeatherChange(Weather* weather, WeatherState state, float grade)
 {
@@ -27,18 +33,14 @@ void ScriptMgr::OnWeatherChange(Weather* weather, WeatherState state, float grad
         script->OnWeatherChange(weather, state, grade);
     });
 
-    if (auto tempScript = ScriptRegistry<WeatherScript>::GetScriptById(weather->GetScriptId()))
-    {
+    if (auto tempScript = ScriptRegistry<WeatherScript>::Instance()->GetScriptById(weather->GetScriptId()))
         tempScript->OnChange(weather, state, grade);
-    }
 }
 
 void ScriptMgr::OnWeatherUpdate(Weather* weather, uint32 diff)
 {
     ASSERT(weather);
 
-    if (auto tempScript = ScriptRegistry<WeatherScript>::GetScriptById(weather->GetScriptId()))
-    {
+    if (auto tempScript = ScriptRegistry<WeatherScript>::Instance()->GetScriptById(weather->GetScriptId()))
         tempScript->OnUpdate(weather, diff);
-    }
 }

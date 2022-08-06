@@ -42,6 +42,7 @@
 #include "VMapMgr2.h"
 #include "Vehicle.h"
 #include "Weather.h"
+#include "MapMgr.h"
 
 union u_map_magic
 {
@@ -78,7 +79,7 @@ Map::~Map()
     }
 
     if (!m_scriptSchedule.empty())
-        sScriptMgr->DecreaseScheduledScriptCount(m_scriptSchedule.size());
+        sMapMgr->DecreaseScheduledScriptCount(m_scriptSchedule.size());
 
     //MMAP::MMapFactory::createOrGetMMapMgr()->unloadMap(GetId());
     MMAP::MMapFactory::createOrGetMMapMgr()->unloadMapInstance(GetId(), i_InstanceId);

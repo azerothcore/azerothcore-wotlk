@@ -17,7 +17,7 @@
 
 #include "CombatAI.h"
 #include "GridNotifiers.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "naxxramas.h"

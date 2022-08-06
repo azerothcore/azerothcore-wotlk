@@ -19,7 +19,7 @@
 #include "GameTime.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "SpellScript.h"
 #include "Transport.h"
 #include "TransportMgr.h"

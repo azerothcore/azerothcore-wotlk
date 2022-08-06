@@ -26,7 +26,7 @@ EndScriptData */
 #include "Creature.h"
 #include "Language.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "WorldSession.h"

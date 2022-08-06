@@ -1042,7 +1042,24 @@ void Creature::DoFleeToGetAssistance()
     }
 }
 
-bool Creature::AIM_Initialize(CreatureAI* ai)
+bool Creature::AIM_Destroy()
+{
+    if (m_AI_locked)
+    {
+        LOG_DEBUG("scripts", "AIM_Destroy: failed to destroy, locked.");
+        return false;
+    }
+
+    ASSERT(!i_disabledAI, "The disabled AI wasn't cleared!");
+
+    delete i_AI;
+    i_AI = nullptr;
+
+    IsAIEnabled = false;
+    return true;
+}
+
+bool Creature::AIM_Create(CreatureAI* ai /*= nullptr*/)
 {
     // make sure nothing can change the AI during AI update
     if (m_AI_locked)
@@ -1051,19 +1068,28 @@ bool Creature::AIM_Initialize(CreatureAI* ai)
         return false;
     }
 
-    UnitAI* oldAI = i_AI;
-
-    // Xinef: called in add to world
-    //Motion_Initialize();
+    AIM_Destroy();
 
     i_AI = ai ? ai : FactorySelector::SelectAI(this);
-    delete oldAI;
+    return true;
+}
+
+void Creature::AI_InitializeAndEnable()
+{
     IsAIEnabled = true;
     i_AI->InitializeAI();
 
     // Xinef: Initialize vehicle if it is not summoned!
     if (GetVehicleKit() && m_spawnId)
         GetVehicleKit()->Reset();
+}
+
+bool Creature::AIM_Initialize(CreatureAI* ai)
+{
+    if (!AIM_Create(ai))
+        return false;
+
+    AI_InitializeAndEnable();
     return true;
 }
 

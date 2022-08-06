@@ -20,6 +20,7 @@
 
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
+#include <cmath>
 
 namespace Acore::Honor
 {

@@ -16,7 +16,7 @@
  */
 
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "pit_of_saron.h"
 

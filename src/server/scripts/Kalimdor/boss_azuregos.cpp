@@ -19,7 +19,7 @@
 #include "Player.h"
 #include "ScriptedGossip.h"
 #include "ScriptedCreature.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "SpellScript.h"
 #include "TaskScheduler.h"
 

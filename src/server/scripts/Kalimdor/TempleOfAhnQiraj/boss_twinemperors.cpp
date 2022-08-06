@@ -23,7 +23,7 @@ SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
 #include "Item.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "Spell.h"
 #include "WorldPacket.h"

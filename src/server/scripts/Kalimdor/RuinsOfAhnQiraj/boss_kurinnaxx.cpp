@@ -17,7 +17,7 @@
 
 #include "CreatureTextMgr.h"
 #include "GameObjectAI.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "TaskScheduler.h"
 #include "ruins_of_ahnqiraj.h"

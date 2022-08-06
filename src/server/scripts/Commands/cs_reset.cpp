@@ -28,6 +28,7 @@ EndScriptData */
 #include "ObjectAccessor.h"
 #include "Pet.h"
 #include "Player.h"
+#include "ScriptObject.h"
 #include "ScriptMgr.h"
 
 #if AC_COMPILER == AC_COMPILER_GNU

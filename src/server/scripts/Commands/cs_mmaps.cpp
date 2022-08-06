@@ -33,7 +33,7 @@
 #include "PathGenerator.h"
 #include "Player.h"
 #include "PointMovementGenerator.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "TargetedMovementGenerator.h"
 
 using namespace Acore::ChatCommands;

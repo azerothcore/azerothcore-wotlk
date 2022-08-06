@@ -15,62 +15,54 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 #include "ScriptMgr.h"
+#include "ScriptObject.h"
+#include "ScriptRegistry.h"
 #include "SpellScript.h"
 
-void ScriptMgr::CreateSpellScripts(uint32 spellId, std::list<SpellScript*>& scriptVector)
+template<typename T, typename F, typename O>
+void CreateSpellOrAuraScripts(uint32 spellId, std::vector<T*>& scriptVector, F&& extractor, O* objectInvoker)
 {
     SpellScriptsBounds bounds = sObjectMgr->GetSpellScriptsBounds(spellId);
-
-    for (SpellScriptsContainer::iterator itr = bounds.first; itr != bounds.second; ++itr)
+    for (auto itr = bounds.first; itr != bounds.second; ++itr)
     {
-        SpellScriptLoader* tempScript = ScriptRegistry<SpellScriptLoader>::GetScriptById(itr->second);
-        if (!tempScript)
+        // When the script is disabled continue with the next one
+        if (!itr->second.second)
             continue;
 
-        SpellScript* script = tempScript->GetSpellScript();
+        SpellScriptLoader* tmpscript = sScriptMgr->GetSpellScriptLoader(itr->second.first);
+        if (!tmpscript)
+            continue;
 
+        T* script = (*tmpscript.*extractor)();
         if (!script)
             continue;
 
-        script->_Init(&tempScript->GetName(), spellId);
+        script->_Init(tmpscript->GetName(), spellId);
+        if (!script->_Load(objectInvoker))
+        {
+            delete script;
+            continue;
+        }
 
-        scriptVector.push_back(script);
+        scriptVector.emplace_back(script);
     }
 }
 
-void ScriptMgr::CreateAuraScripts(uint32 spellId, std::list<AuraScript*>& scriptVector)
+void ScriptMgr::CreateSpellScripts(uint32 spellId, std::vector<SpellScript*>& scriptVector, Spell* invoker) const
 {
-    SpellScriptsBounds bounds = sObjectMgr->GetSpellScriptsBounds(spellId);
-
-    for (SpellScriptsContainer::iterator itr = bounds.first; itr != bounds.second; ++itr)
-    {
-        SpellScriptLoader* tempScript = ScriptRegistry<SpellScriptLoader>::GetScriptById(itr->second);
-        if (!tempScript)
-            continue;
-
-        AuraScript* script = tempScript->GetAuraScript();
-
-        if (!script)
-            continue;
-
-        script->_Init(&tempScript->GetName(), spellId);
-
-        scriptVector.push_back(script);
-    }
+    CreateSpellOrAuraScripts(spellId, scriptVector, &SpellScriptLoader::GetSpellScript, invoker);
 }
 
-void ScriptMgr::CreateSpellScriptLoaders(uint32 spellId, std::vector<std::pair<SpellScriptLoader*, SpellScriptsContainer::iterator>>& scriptVector)
+void ScriptMgr::CreateAuraScripts(uint32 spellId, std::vector<AuraScript*>& scriptVector, Aura* invoker) const
 {
-    SpellScriptsBounds bounds = sObjectMgr->GetSpellScriptsBounds(spellId);
-    scriptVector.reserve(std::distance(bounds.first, bounds.second));
+    CreateSpellOrAuraScripts(spellId, scriptVector, &SpellScriptLoader::GetAuraScript, invoker);
+}
 
-    for (SpellScriptsContainer::iterator itr = bounds.first; itr != bounds.second; ++itr)
-    {
-        SpellScriptLoader* tempScript = ScriptRegistry<SpellScriptLoader>::GetScriptById(itr->second);
-        if (!tempScript)
-            continue;
-
-        scriptVector.emplace_back(tempScript, itr);
-    }
+SpellScriptLoader* ScriptMgr::GetSpellScriptLoader(uint32 scriptId)
+{
+    return ScriptRegistry<SpellScriptLoader>::Instance()->GetScriptById(scriptId);
 }

@@ -18,7 +18,7 @@
 #include "Channel.h"
 #include "Group.h"
 #include "Guild.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 
 #define LOG_CHAT(TYPE, ...)                             \
     if (lang != LANG_ADDON)                             \

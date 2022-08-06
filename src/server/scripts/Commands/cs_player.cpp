@@ -16,7 +16,7 @@
  */
 
 #include "PlayerCommand.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 
 using namespace Acore::ChatCommands;
 

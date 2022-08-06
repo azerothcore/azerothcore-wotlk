@@ -17,7 +17,7 @@
 
 #include "GridNotifiers.h"
 #include "PassiveAI.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"

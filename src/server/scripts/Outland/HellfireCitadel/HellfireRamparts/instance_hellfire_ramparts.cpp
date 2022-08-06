@@ -16,7 +16,7 @@
  */
 
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "hellfire_ramparts.h"
 
 class instance_hellfire_ramparts : public InstanceMapScript

@@ -15,12 +15,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
+#include "ScriptObject.h"
 
 void ScriptMgr::OnOpenStateChange(bool open)
 {
-    ExecuteScript<WorldScript>([&](WorldScript* script)
+    ExecuteScript<WorldScript>([open](WorldScript* script)
     {
         script->OnOpenStateChange(open);
     });
@@ -28,7 +32,7 @@ void ScriptMgr::OnOpenStateChange(bool open)
 
 void ScriptMgr::OnLoadCustomDatabaseTable()
 {
-    ExecuteScript<WorldScript>([&](WorldScript* script)
+    ExecuteScript<WorldScript>([](WorldScript* script)
     {
         script->OnLoadCustomDatabaseTable();
     });
@@ -36,7 +40,7 @@ void ScriptMgr::OnLoadCustomDatabaseTable()
 
 void ScriptMgr::OnBeforeConfigLoad(bool reload)
 {
-    ExecuteScript<WorldScript>([&](WorldScript* script)
+    ExecuteScript<WorldScript>([reload](WorldScript* script)
     {
         script->OnBeforeConfigLoad(reload);
     });
@@ -44,7 +48,7 @@ void ScriptMgr::OnBeforeConfigLoad(bool reload)
 
 void ScriptMgr::OnAfterConfigLoad(bool reload)
 {
-    ExecuteScript<WorldScript>([&](WorldScript* script)
+    ExecuteScript<WorldScript>([reload](WorldScript* script)
     {
         script->OnAfterConfigLoad(reload);
     });
@@ -68,7 +72,7 @@ void ScriptMgr::OnMotdChange(std::string& newMotd)
 
 void ScriptMgr::OnShutdownInitiate(ShutdownExitCode code, ShutdownMask mask)
 {
-    ExecuteScript<WorldScript>([&](WorldScript* script)
+    ExecuteScript<WorldScript>([code, mask](WorldScript* script)
     {
         script->OnShutdownInitiate(code, mask);
     });
@@ -84,7 +88,7 @@ void ScriptMgr::OnShutdownCancel()
 
 void ScriptMgr::OnWorldUpdate(uint32 diff)
 {
-    ExecuteScript<WorldScript>([&](WorldScript* script)
+    ExecuteScript<WorldScript>([diff](WorldScript* script)
     {
         script->OnUpdate(diff);
     });
@@ -92,7 +96,7 @@ void ScriptMgr::OnWorldUpdate(uint32 diff)
 
 void ScriptMgr::OnStartup()
 {
-    ExecuteScript<WorldScript>([&](WorldScript* script)
+    ExecuteScript<WorldScript>([](WorldScript* script)
     {
         script->OnStartup();
     });
@@ -100,7 +104,7 @@ void ScriptMgr::OnStartup()
 
 void ScriptMgr::OnShutdown()
 {
-    ExecuteScript<WorldScript>([&](WorldScript* script)
+    ExecuteScript<WorldScript>([](WorldScript* script)
     {
         script->OnShutdown();
     });

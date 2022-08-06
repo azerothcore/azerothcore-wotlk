@@ -16,7 +16,7 @@
  */
 
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "steam_vault.h"
 
 class go_main_chambers_access_panel : public GameObjectScript

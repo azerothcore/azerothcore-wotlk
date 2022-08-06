@@ -20,7 +20,7 @@
 #include "BattlegroundMgr.h"
 #include "Chat.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "World.h"
 
 using namespace Acore::ChatCommands;

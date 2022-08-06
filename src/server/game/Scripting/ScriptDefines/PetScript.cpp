@@ -15,8 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+#include "Errors.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
+#include "ScriptObject.h"
 
 void ScriptMgr::OnInitStatsForLevel(Guardian* guardian, uint8 petlevel)
 {
@@ -41,12 +46,7 @@ bool ScriptMgr::CanUnlearnSpellSet(Pet* pet, uint32 level, uint32 spell)
         return !script->CanUnlearnSpellSet(pet, level, spell);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::CanUnlearnSpellDefault(Pet* pet, SpellInfo const* spellEntry)
@@ -56,12 +56,7 @@ bool ScriptMgr::CanUnlearnSpellDefault(Pet* pet, SpellInfo const* spellEntry)
         return !script->CanUnlearnSpellDefault(pet, spellEntry);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::CanResetTalents(Pet* pet)
@@ -71,12 +66,7 @@ bool ScriptMgr::CanResetTalents(Pet* pet)
         return !script->CanResetTalents(pet);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 void ScriptMgr::OnPetAddToWorld(Pet* pet)

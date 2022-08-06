@@ -24,7 +24,7 @@
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "World.h"
 #include "WorldPacket.h"
 

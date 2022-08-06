@@ -15,8 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
+#include "ScriptObject.h"
 
 void ScriptMgr::OnItemCreate(Item* item, ItemTemplate const* itemProto, Player const* owner)
 {
@@ -33,12 +37,7 @@ bool ScriptMgr::CanApplySoulboundFlag(Item* item, ItemTemplate const* proto)
         return !script->CanApplySoulboundFlag(item, proto);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 void ScriptMgr::OnConstructObject(Object* origin)
@@ -112,12 +111,7 @@ bool ScriptMgr::CanItemApplyEquipSpell(Player* player, Item* item)
         return !script->CanItemApplyEquipSpell(player, item);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::CanSendAuctionHello(WorldSession const* session, ObjectGuid guid, Creature* creature)
@@ -127,12 +121,7 @@ bool ScriptMgr::CanSendAuctionHello(WorldSession const* session, ObjectGuid guid
         return !script->CanSendAuctionHello(session, guid, creature);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 void ScriptMgr::ValidateSpellAtCastSpell(Player* player, uint32& oldSpellId, uint32& spellId, uint8& castCount, uint8& castFlags)

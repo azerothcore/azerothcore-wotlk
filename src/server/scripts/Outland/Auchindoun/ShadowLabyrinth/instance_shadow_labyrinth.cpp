@@ -16,7 +16,7 @@
  */
 
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "shadow_labyrinth.h"
 
 class instance_shadow_labyrinth : public InstanceMapScript

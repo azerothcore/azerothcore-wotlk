@@ -19,12 +19,10 @@
 #define ACORE_MAPMANAGER_H
 
 #include "Common.h"
-#include "Define.h"
 #include "Map.h"
 #include "MapInstanced.h"
 #include "MapUpdater.h"
 #include "Object.h"
-
 #include <mutex>
 
 class Transport;
@@ -144,6 +142,11 @@ public:
 
     MapUpdater* GetMapUpdater() { return &m_updater; }
 
+    void IncreaseScheduledScriptsCount() { ++_scheduledScripts; }
+    void DecreaseScheduledScriptCount() { --_scheduledScripts; }
+    void DecreaseScheduledScriptCount(std::size_t count) { _scheduledScripts -= count; }
+    bool IsScriptScheduled() const { return _scheduledScripts > 0; }
+
     template<typename Worker>
     void DoForAllMaps(Worker&& worker);
 
@@ -168,6 +171,9 @@ private:
     InstanceIds _instanceIds;
     uint32 _nextInstanceId;
     MapUpdater m_updater;
+
+    // atomic op counter for active scripts amount
+    std::atomic<std::size_t> _scheduledScripts{ 0 };
 };
 
 template<typename Worker>

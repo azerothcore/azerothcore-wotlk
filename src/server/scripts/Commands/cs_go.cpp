@@ -28,7 +28,7 @@ EndScriptData */
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "TicketMgr.h"
 
 using namespace Acore::ChatCommands;

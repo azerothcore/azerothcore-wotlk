@@ -22,7 +22,7 @@
 #include "InstanceScript.h"
 #include "ObjectDefines.h"
 #include "ObjectMgr.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "blackrock_spire.h"
 

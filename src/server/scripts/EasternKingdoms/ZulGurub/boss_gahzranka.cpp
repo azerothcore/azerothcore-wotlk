@@ -22,7 +22,7 @@ SDComment: Massive Geyser with knockback not working. Spell buggy.
 SDCategory: Zul'Gurub
 EndScriptData */
 
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "zulgurub.h"

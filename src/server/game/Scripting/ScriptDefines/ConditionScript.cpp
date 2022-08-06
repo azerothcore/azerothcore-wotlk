@@ -15,12 +15,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+#include "ConditionMgr.h"
+#include "Errors.h"
 #include "ScriptMgr.h"
+#include "ScriptObject.h"
+#include "ScriptRegistry.h"
 
 bool ScriptMgr::OnConditionCheck(Condition* condition, ConditionSourceInfo& sourceInfo)
 {
     ASSERT(condition);
 
-    auto tempScript = ScriptRegistry<ConditionScript>::GetScriptById(condition->ScriptId);
+    auto tempScript = ScriptRegistry<ConditionScript>::Instance()->GetScriptById(condition->ScriptId);
     return tempScript ? tempScript->OnConditionCheck(condition, sourceInfo) : true;
 }

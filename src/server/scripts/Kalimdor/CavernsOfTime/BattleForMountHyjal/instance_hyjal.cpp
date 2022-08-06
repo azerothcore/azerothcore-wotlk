@@ -25,7 +25,7 @@ EndScriptData */
 #include "Chat.h"
 #include "InstanceScript.h"
 #include "Opcodes.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "WorldPacket.h"
 #include "hyjal_trash.h"
 

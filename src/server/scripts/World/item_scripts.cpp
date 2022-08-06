@@ -30,7 +30,7 @@ item_only_for_flight                Items which should only useable while flying
 EndContentData */
 
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "Spell.h"
 

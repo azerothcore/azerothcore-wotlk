@@ -19,7 +19,7 @@
 #include "InstanceScript.h"
 #include "MotionMaster.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellScript.h"

@@ -15,8 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
+#include "ScriptObject.h"
 
 void ScriptMgr::OnHandleDevCommand(Player* player, bool& enable)
 {
@@ -33,10 +37,5 @@ bool ScriptMgr::CanExecuteCommand(ChatHandler& handler, std::string_view cmdStr)
         return !script->CanExecuteCommand(handler, cmdStr);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }

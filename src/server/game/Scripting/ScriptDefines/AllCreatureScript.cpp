@@ -15,14 +15,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+#include "Errors.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
+#include "ScriptObject.h"
 
 void ScriptMgr::OnCreatureAddWorld(Creature* creature)
 {
     ASSERT(creature);
 
-    ExecuteScript<AllCreatureScript>([&](AllCreatureScript* script)
+    ExecuteScript<AllCreatureScript>([creature](AllCreatureScript* script)
     {
         script->OnCreatureAddWorld(creature);
     });
@@ -32,7 +37,7 @@ void ScriptMgr::OnCreatureRemoveWorld(Creature* creature)
 {
     ASSERT(creature);
 
-    ExecuteScript<AllCreatureScript>([&](AllCreatureScript* script)
+    ExecuteScript<AllCreatureScript>([creature](AllCreatureScript* script)
     {
         script->OnCreatureRemoveWorld(creature);
     });
@@ -42,7 +47,7 @@ void ScriptMgr::OnCreatureSaveToDB(Creature* creature)
 {
     ASSERT(creature);
 
-    ExecuteScript<AllCreatureScript>([&](AllCreatureScript* script)
+    ExecuteScript<AllCreatureScript>([creature](AllCreatureScript* script)
     {
         script->OnCreatureSaveToDB(creature);
     });
@@ -50,21 +55,8 @@ void ScriptMgr::OnCreatureSaveToDB(Creature* creature)
 
 void ScriptMgr::Creature_SelectLevel(const CreatureTemplate* cinfo, Creature* creature)
 {
-    ExecuteScript<AllCreatureScript>([&](AllCreatureScript* script)
+    ExecuteScript<AllCreatureScript>([cinfo, creature](AllCreatureScript* script)
     {
         script->Creature_SelectLevel(cinfo, creature);
     });
 }
-
-//bool ScriptMgr::CanCreatureSendListInventory(Player* player, Creature* creature, uint32 vendorEntry)
-//{
-//    auto ret = IsValidBoolScript<AllCreatureScript>([&](AllCreatureScript* script)
-//    {
-//        return !script->CanCreatureSendListInventory(player, creature, vendorEntry);
-//    });
-//
-//    if (ret && *ret)
-//        return false;
-//
-//    return true;
-//}

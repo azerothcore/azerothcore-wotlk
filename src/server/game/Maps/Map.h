@@ -302,7 +302,7 @@ typedef std::map<uint32/*leaderDBGUID*/, CreatureGroup*>        CreatureGroupHol
 typedef std::unordered_map<uint32 /*zoneId*/, ZoneDynamicInfo> ZoneDynamicInfoMap;
 typedef std::set<MotionTransport*> TransportsContainer;
 
-enum EncounterCreditType
+enum EncounterCreditType : uint8
 {
     ENCOUNTER_CREDIT_KILL_CREATURE  = 0,
     ENCOUNTER_CREDIT_CAST_SPELL     = 1,

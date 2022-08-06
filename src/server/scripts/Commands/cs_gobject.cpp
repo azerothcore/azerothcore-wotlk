@@ -32,7 +32,7 @@ EndScriptData */
 #include "Opcodes.h"
 #include "Player.h"
 #include "PoolMgr.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "Transport.h"
 
 using namespace Acore::ChatCommands;

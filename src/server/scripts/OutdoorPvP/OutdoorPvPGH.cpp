@@ -20,7 +20,7 @@
 #include "MapMgr.h"
 #include "OutdoorPvPMgr.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "WorldPacket.h"
 
 OutdoorPvPGH::OutdoorPvPGH()

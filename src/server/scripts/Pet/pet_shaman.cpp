@@ -21,7 +21,7 @@
  */
 
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 
 enum ShamanSpells

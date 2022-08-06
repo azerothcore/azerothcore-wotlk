@@ -18,7 +18,7 @@
 #include "CombatAI.h"
 #include "CreatureTextMgr.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "SpellInfo.h"

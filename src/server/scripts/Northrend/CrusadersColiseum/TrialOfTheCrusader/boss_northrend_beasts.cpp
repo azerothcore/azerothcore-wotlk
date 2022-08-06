@@ -16,7 +16,7 @@
  */
 
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "Vehicle.h"
 #include "trial_of_the_crusader.h"

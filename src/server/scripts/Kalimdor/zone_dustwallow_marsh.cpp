@@ -27,7 +27,7 @@ npc_cassa_crimsonwing - handled by npc_taxi
 EndContentData */
 
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellScript.h"

@@ -16,7 +16,7 @@
  */
 
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "the_eye.h"
 
 class instance_the_eye : public InstanceMapScript

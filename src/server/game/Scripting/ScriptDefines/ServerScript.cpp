@@ -15,8 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+#include "Errors.h"
+#include "IoContext.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
+#include "ScriptObject.h"
+#include "WorldPacket.h"
 
 void ScriptMgr::OnNetworkStart()
 {
@@ -56,7 +63,9 @@ void ScriptMgr::OnSocketClose(std::shared_ptr<WorldSocket> socket)
 
 bool ScriptMgr::CanPacketReceive(WorldSession* session, WorldPacket const& packet)
 {
-    if (ScriptRegistry<ServerScript>::ScriptPointerList.empty())
+    ASSERT(session);
+
+    if (ScriptRegistry<ServerScript>::Instance()->GetScripts().empty())
         return true;
 
     WorldPacket copy(packet);
@@ -66,19 +75,14 @@ bool ScriptMgr::CanPacketReceive(WorldSession* session, WorldPacket const& packe
         return !script->CanPacketReceive(session, copy);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::CanPacketSend(WorldSession* session, WorldPacket const& packet)
 {
     ASSERT(session);
 
-    if (ScriptRegistry<ServerScript>::ScriptPointerList.empty())
+    if (ScriptRegistry<ServerScript>::Instance()->GetScripts().empty())
         return true;
 
     WorldPacket copy(packet);
@@ -88,10 +92,5 @@ bool ScriptMgr::CanPacketSend(WorldSession* session, WorldPacket const& packet)
         return !script->CanPacketSend(session, copy);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }

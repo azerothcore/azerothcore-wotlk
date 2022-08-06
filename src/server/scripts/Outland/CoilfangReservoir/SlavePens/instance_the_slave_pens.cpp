@@ -25,7 +25,7 @@
 #include "Creature.h"
 #include "InstanceScript.h"
 #include "Map.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "the_slave_pens.h"
 
 class instance_the_slave_pens : public InstanceMapScript

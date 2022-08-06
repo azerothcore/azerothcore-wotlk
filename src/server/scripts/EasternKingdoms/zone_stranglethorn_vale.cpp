@@ -27,7 +27,7 @@ npc_yenniku
 EndContentData */
 
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
 

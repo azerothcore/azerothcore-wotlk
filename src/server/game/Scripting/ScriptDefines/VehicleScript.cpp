@@ -15,7 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+#include "Creature.h"
+#include "Errors.h"
 #include "ScriptMgr.h"
+#include "ScriptObject.h"
+#include "ScriptRegistry.h"
 #include "Vehicle.h"
 
 void ScriptMgr::OnInstall(Vehicle* veh)
@@ -23,10 +30,8 @@ void ScriptMgr::OnInstall(Vehicle* veh)
     ASSERT(veh);
     ASSERT(veh->GetBase()->GetTypeId() == TYPEID_UNIT);
 
-    if (auto tempScript = ScriptRegistry<VehicleScript>::GetScriptById(veh->GetBase()->ToCreature()->GetScriptId()))
-    {
+    if (auto tempScript = ScriptRegistry<VehicleScript>::Instance()->GetScriptById(veh->GetBase()->ToCreature()->GetScriptId()))
         tempScript->OnInstall(veh);
-    }
 }
 
 void ScriptMgr::OnUninstall(Vehicle* veh)
@@ -34,10 +39,8 @@ void ScriptMgr::OnUninstall(Vehicle* veh)
     ASSERT(veh);
     ASSERT(veh->GetBase()->GetTypeId() == TYPEID_UNIT);
 
-    if (auto tempScript = ScriptRegistry<VehicleScript>::GetScriptById(veh->GetBase()->ToCreature()->GetScriptId()))
-    {
+    if (auto tempScript = ScriptRegistry<VehicleScript>::Instance()->GetScriptById(veh->GetBase()->ToCreature()->GetScriptId()))
         tempScript->OnUninstall(veh);
-    }
 }
 
 void ScriptMgr::OnReset(Vehicle* veh)
@@ -45,10 +48,8 @@ void ScriptMgr::OnReset(Vehicle* veh)
     ASSERT(veh);
     ASSERT(veh->GetBase()->GetTypeId() == TYPEID_UNIT);
 
-    if (auto tempScript = ScriptRegistry<VehicleScript>::GetScriptById(veh->GetBase()->ToCreature()->GetScriptId()))
-    {
+    if (auto tempScript = ScriptRegistry<VehicleScript>::Instance()->GetScriptById(veh->GetBase()->ToCreature()->GetScriptId()))
         tempScript->OnReset(veh);
-    }
 }
 
 void ScriptMgr::OnInstallAccessory(Vehicle* veh, Creature* accessory)
@@ -57,10 +58,8 @@ void ScriptMgr::OnInstallAccessory(Vehicle* veh, Creature* accessory)
     ASSERT(veh->GetBase()->GetTypeId() == TYPEID_UNIT);
     ASSERT(accessory);
 
-    if (auto tempScript = ScriptRegistry<VehicleScript>::GetScriptById(veh->GetBase()->ToCreature()->GetScriptId()))
-    {
+    if (auto tempScript = ScriptRegistry<VehicleScript>::Instance()->GetScriptById(veh->GetBase()->ToCreature()->GetScriptId()))
         tempScript->OnInstallAccessory(veh, accessory);
-    }
 }
 
 void ScriptMgr::OnAddPassenger(Vehicle* veh, Unit* passenger, int8 seatId)
@@ -69,10 +68,8 @@ void ScriptMgr::OnAddPassenger(Vehicle* veh, Unit* passenger, int8 seatId)
     ASSERT(veh->GetBase()->GetTypeId() == TYPEID_UNIT);
     ASSERT(passenger);
 
-    if (auto tempScript = ScriptRegistry<VehicleScript>::GetScriptById(veh->GetBase()->ToCreature()->GetScriptId()))
-    {
+    if (auto tempScript = ScriptRegistry<VehicleScript>::Instance()->GetScriptById(veh->GetBase()->ToCreature()->GetScriptId()))
         tempScript->OnAddPassenger(veh, passenger, seatId);
-    }
 }
 
 void ScriptMgr::OnRemovePassenger(Vehicle* veh, Unit* passenger)
@@ -81,8 +78,6 @@ void ScriptMgr::OnRemovePassenger(Vehicle* veh, Unit* passenger)
     ASSERT(veh->GetBase()->GetTypeId() == TYPEID_UNIT);
     ASSERT(passenger);
 
-    if (auto tempScript = ScriptRegistry<VehicleScript>::GetScriptById(veh->GetBase()->ToCreature()->GetScriptId()))
-    {
+    if (auto tempScript = ScriptRegistry<VehicleScript>::Instance()->GetScriptById(veh->GetBase()->ToCreature()->GetScriptId()))
         tempScript->OnRemovePassenger(veh, passenger);
-    }
 }

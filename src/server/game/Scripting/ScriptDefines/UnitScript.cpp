@@ -15,23 +15,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
+#include "ScriptObject.h"
 
 uint32 ScriptMgr::DealDamage(Unit* AttackerUnit, Unit* pVictim, uint32 damage, DamageEffectType damagetype)
 {
-    if (ScriptRegistry<UnitScript>::ScriptPointerList.empty())
-    {
+    if (ScriptRegistry<UnitScript>::Instance()->GetScripts().empty())
         return damage;
-    }
 
-    for (auto const& [scriptID, script] : ScriptRegistry<UnitScript>::ScriptPointerList)
+    for (auto const& [scriptID, script] : ScriptRegistry<UnitScript>::Instance()->GetScripts())
     {
         auto const& dmg = script->DealDamage(AttackerUnit, pVictim, damage, damagetype);
         if (dmg != damage)
-        {
             return damage;
-        }
     }
 
     return damage;
@@ -108,12 +108,7 @@ bool ScriptMgr::IfNormalReaction(Unit const* unit, Unit const* target, Reputatio
         return !script->IfNormalReaction(unit, target, repRank);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::IsNeedModSpellDamagePercent(Unit const* unit, AuraEffect* auraEff, float& doneTotalMod, SpellInfo const* spellProto)
@@ -123,12 +118,7 @@ bool ScriptMgr::IsNeedModSpellDamagePercent(Unit const* unit, AuraEffect* auraEf
         return !script->IsNeedModSpellDamagePercent(unit, auraEff, doneTotalMod, spellProto);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::IsNeedModMeleeDamagePercent(Unit const* unit, AuraEffect* auraEff, float& doneTotalMod, SpellInfo const* spellProto)
@@ -138,12 +128,7 @@ bool ScriptMgr::IsNeedModMeleeDamagePercent(Unit const* unit, AuraEffect* auraEf
         return !script->IsNeedModMeleeDamagePercent(unit, auraEff, doneTotalMod, spellProto);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::IsNeedModHealPercent(Unit const* unit, AuraEffect* auraEff, float& doneTotalMod, SpellInfo const* spellProto)
@@ -153,12 +138,7 @@ bool ScriptMgr::IsNeedModHealPercent(Unit const* unit, AuraEffect* auraEff, floa
         return !script->IsNeedModHealPercent(unit, auraEff, doneTotalMod, spellProto);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::CanSetPhaseMask(Unit const* unit, uint32 newPhaseMask, bool update)
@@ -168,39 +148,27 @@ bool ScriptMgr::CanSetPhaseMask(Unit const* unit, uint32 newPhaseMask, bool upda
         return !script->CanSetPhaseMask(unit, newPhaseMask, update);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
-bool ScriptMgr::IsCustomBuildValuesUpdate(Unit const* unit, uint8 updateType, ByteBuffer& fieldBuffer, Player const* target, uint16 index)
+bool ScriptMgr::IsCustomBuildValuesUpdate(Unit const* unit, uint8 updateType, ByteBuffer* fieldBuffer, Player const* target, uint16 index)
 {
     auto ret = IsValidBoolScript<UnitScript>([&](UnitScript* script)
     {
         return script->IsCustomBuildValuesUpdate(unit, updateType, fieldBuffer, target, index);
     });
 
-    if (ret && *ret)
-    {
-        return true;
-    }
-
-    return false;
+    return ReturnValidBool(ret, true);
 }
 
-bool ScriptMgr::OnBuildValuesUpdate(Unit const* unit, uint8 updateType, ByteBuffer& fieldBuffer, Player* target, uint16 index)
+bool ScriptMgr::OnBuildValuesUpdate(Unit const* unit, uint8 updateType, ByteBuffer* fieldBuffer, Player* target, uint16 index)
 {
-    auto ret = IsValidBoolScript<UnitScript>([&](UnitScript* script) { return script->OnBuildValuesUpdate(unit, updateType, fieldBuffer, target, index); });
-
-    if (ret && *ret)
+    auto ret = IsValidBoolScript<UnitScript>([&](UnitScript* script)
     {
-        return true;
-    }
+        return script->OnBuildValuesUpdate(unit, updateType, fieldBuffer, target, index);
+    });
 
-    return false;
+    return ReturnValidBool(ret, true);
 }
 
 void ScriptMgr::OnUnitUpdate(Unit* unit, uint32 diff)

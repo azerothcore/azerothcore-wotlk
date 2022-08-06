@@ -17,7 +17,7 @@
 
 #include "InstanceScript.h"
 #include "Map.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "auchenai_crypts.h"
 
 class instance_auchenai_crypts : public InstanceMapScript

@@ -15,13 +15,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+#include "Errors.h"
 #include "OutdoorPvPMgr.h"
 #include "ScriptMgr.h"
+#include "ScriptObject.h"
+#include "ScriptRegistry.h"
 
 OutdoorPvP* ScriptMgr::CreateOutdoorPvP(OutdoorPvPData const* data)
 {
     ASSERT(data);
 
-    auto tempScript = ScriptRegistry<OutdoorPvPScript>::GetScriptById(data->ScriptId);
+    auto tempScript = ScriptRegistry<OutdoorPvPScript>::Instance()->GetScriptById(data->ScriptId);
     return tempScript ? tempScript->GetOutdoorPvP() : nullptr;
 }

@@ -15,8 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
+#include "ScriptObject.h"
 
 void ScriptMgr::OnCalcMaxDuration(Aura const* aura, int32& maxDuration)
 {
@@ -33,12 +37,7 @@ bool ScriptMgr::CanModAuraEffectDamageDone(AuraEffect const* auraEff, Unit* targ
         return !script->CanModAuraEffectDamageDone(auraEff, target, aurApp, mode, apply);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::CanModAuraEffectModDamagePercentDone(AuraEffect const* auraEff, Unit* target, AuraApplication const* aurApp, uint8 mode, bool apply)
@@ -48,12 +47,7 @@ bool ScriptMgr::CanModAuraEffectModDamagePercentDone(AuraEffect const* auraEff, 
         return !script->CanModAuraEffectModDamagePercentDone(auraEff, target, aurApp, mode, apply);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 void ScriptMgr::OnSpellCheckCast(Spell* spell, bool strict, SpellCastResult& res)
@@ -71,12 +65,7 @@ bool ScriptMgr::CanPrepare(Spell* spell, SpellCastTargets const* targets, AuraEf
         return !script->CanPrepare(spell, targets, triggeredByAura);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 bool ScriptMgr::CanScalingEverything(Spell* spell)
@@ -86,12 +75,7 @@ bool ScriptMgr::CanScalingEverything(Spell* spell)
         return script->CanScalingEverything(spell);
     });
 
-    if (ret && *ret)
-    {
-        return true;
-    }
-
-    return false;
+    return ReturnValidBool(ret, true);
 }
 
 bool ScriptMgr::CanSelectSpecTalent(Spell* spell)
@@ -101,12 +85,7 @@ bool ScriptMgr::CanSelectSpecTalent(Spell* spell)
         return !script->CanSelectSpecTalent(spell);
     });
 
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    return ReturnValidBool(ret);
 }
 
 void ScriptMgr::OnScaleAuraUnitAdd(Spell* spell, Unit* target, uint32 effectMask, bool checkIfValid, bool implicit, uint8 auraScaleMask, TargetInfo& targetInfo)

@@ -29,7 +29,7 @@ EndScriptData */
 #include "Opcodes.h"
 #include "Player.h"
 #include "Realm.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "TicketMgr.h"
 
 #if AC_COMPILER == AC_COMPILER_GNU

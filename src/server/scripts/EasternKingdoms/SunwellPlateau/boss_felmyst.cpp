@@ -18,7 +18,7 @@
 #include "Cell.h"
 #include "CellImpl.h"
 #include "GridNotifiers.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "ScriptedCreature.h"
 #include "sunwell_plateau.h"
 

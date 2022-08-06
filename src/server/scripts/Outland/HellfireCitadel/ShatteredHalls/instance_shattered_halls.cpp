@@ -17,7 +17,7 @@
 
 #include "CreatureTextMgr.h"
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "shattered_halls.h"
 
 class instance_shattered_halls : public InstanceMapScript

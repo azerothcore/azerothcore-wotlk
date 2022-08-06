@@ -17,7 +17,7 @@
 
 #include "GameTime.h"
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
+#include "ScriptObject.h"
 #include "the_botanica.h"
 
 class instance_the_botanica : public InstanceMapScript
