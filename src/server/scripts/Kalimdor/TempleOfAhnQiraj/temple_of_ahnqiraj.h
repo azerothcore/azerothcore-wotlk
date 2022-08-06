@@ -75,4 +75,6 @@ inline AI* GetTempleOfAhnQirajAI(T* obj)
     return GetInstanceAI<AI>(obj, TempleOfAhnQirajScriptName);
 }
 
+#define RegisterTempleOfAhnQirajCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetTempleOfAhnQirajAI)
+
 #endif

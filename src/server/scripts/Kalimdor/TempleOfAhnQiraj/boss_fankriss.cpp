@@ -42,72 +42,68 @@ enum Spells
     SPELL_ENRAGE            = 28798
 };
 
-class boss_fankriss : public CreatureScript
+struct boss_fankriss : public ScriptedAI
 {
-public:
-    boss_fankriss() : CreatureScript("boss_fankriss") { }
+    boss_fankriss(Creature* creature) : ScriptedAI(creature) { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    void SummonSpawn()
     {
-        return GetTempleOfAhnQirajAI<boss_fankrissAI>(creature);
-    }
-
-    struct boss_fankrissAI : public ScriptedAI
-    {
-        boss_fankrissAI(Creature* creature) : ScriptedAI(creature) { }
-
-        void SummonSpawn()
+        Rand = 10 + (rand() % 10);
+        switch (rand() % 2)
         {
-            Rand = 10 + (rand() % 10);
-            switch (rand() % 2)
-            {
-                case 0:
-                    RandX = 0.0f - Rand;
-                    break;
-                case 1:
-                    RandX = 0.0f + Rand;
-                    break;
-            }
-
-            Rand = 10 + (rand() % 10);
-            switch (rand() % 2)
-            {
-                case 0:
-                    RandY = 0.0f - Rand;
-                    break;
-                case 1:
-                    RandY = 0.0f + Rand;
-                    break;
-            }
-            Rand = 0;
-            DoSpawnCreature(15630, RandX, RandY, 0, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+            case 0:
+                RandX = 0.0f - Rand;
+                break;
+            case 1:
+                RandX = 0.0f + Rand;
+                break;
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        Rand = 10 + (rand() % 10);
+        switch (rand() % 2)
         {
-            _scheduler.CancelAll();
+            case 0:
+                RandY = 0.0f - Rand;
+                break;
+            case 1:
+                RandY = 0.0f + Rand;
+                break;
+        }
+        Rand = 0;
+        DoSpawnCreature(15630, RandX, RandY, 0, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+    }
 
-            _scheduler.Schedule(4s, 8s, [this](TaskContext context) {
+    void EnterCombat(Unit* /*who*/) override
+    {
+        _scheduler.CancelAll();
+
+        _scheduler
+            .Schedule(4s, 8s, [this](TaskContext context)
+            {
                 DoCastVictim(SPELL_MORTAL_WOUND);
                 context.Repeat();
-            }).Schedule(15s, 45s, [this](TaskContext context) {
+            })
+            .Schedule(15s, 45s, [this](TaskContext context)
+            {
                 switch (urand(0, 2))
                 {
-                case 0:
-                    SummonSpawn();
-                    break;
-                case 1:
-                    SummonSpawn();
-                    SummonSpawn();
-                    break;
-                case 2:
-                    SummonSpawn();
-                    SummonSpawn();
-                    SummonSpawn();
-                    break;
+                    case 0:
+                        SummonSpawn();
+                        break;
+                    case 1:
+                        SummonSpawn();
+                        SummonSpawn();
+                        break;
+                    case 2:
+                        SummonSpawn();
+                        SummonSpawn();
+                        SummonSpawn();
+                        break;
                 }
                 context.Repeat(30s, 60s);
-            }).Schedule(15s, 45s, [this](TaskContext context) {
+            })
+            .Schedule(15s, 45s, [this](TaskContext context)
+            {
                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                 {
                     DoCast(target, SPELL_ROOT);
@@ -142,27 +138,26 @@ public:
                 }
                 context.Repeat(45s, 60s);
             });
-        }
+    }
 
-        void UpdateAI(uint32 diff) override
-        {
-            //Return since we have no target
-            if (!UpdateVictim())
-                return;
+    void UpdateAI(uint32 diff) override
+    {
+        //Return since we have no target
+        if (!UpdateVictim())
+            return;
 
-            _scheduler.Update(diff,
-                std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
-        }
+        _scheduler.Update(diff,
+            std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
+    }
 
-    private:
-        TaskScheduler _scheduler;
-        int Rand;
-        float RandX;
-        float RandY;
-    };
+private:
+    TaskScheduler _scheduler;
+    int Rand;
+    float RandX;
+    float RandY;
 };
 
 void AddSC_boss_fankriss()
 {
-    new boss_fankriss();
+    RegisterTempleOfAhnQirajCreatureAI(boss_fankriss);
 }

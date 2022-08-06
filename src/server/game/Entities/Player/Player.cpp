@@ -219,6 +219,7 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     m_bHasDelayedTeleport = false;
     teleportStore_options = 0;
     m_canTeleport = false;
+    m_canKnockback = false;
 
     m_trade = nullptr;
 
