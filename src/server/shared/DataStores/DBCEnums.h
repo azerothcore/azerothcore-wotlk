@@ -415,33 +415,33 @@ enum TotemCategoryType
 // SummonProperties.dbc, col 1
 enum SummonPropGroup
 {
-    SUMMON_PROP_GROUP_UNKNOWN1       = 0,                   // 1160 spells in 3.0.3
-    SUMMON_PROP_GROUP_UNKNOWN2       = 1,                   // 861 spells in 3.0.3
+    SUMMON_PROP_GROUP_NONE           = 0,                   // 1160 spells in 3.0.3
+    SUMMON_PROP_GROUP_GUARDIAN       = 1,                   // 861 spells in 3.0.3
     SUMMON_PROP_GROUP_PETS           = 2,                   // 52 spells in 3.0.3, pets mostly
     SUMMON_PROP_GROUP_CONTROLLABLE   = 3,                   // 13 spells in 3.0.3, mostly controllable
-    SUMMON_PROP_GROUP_UNKNOWN3       = 4                    // 86 spells in 3.0.3, taxi/mounts
+    SUMMON_PROP_GROUP_VEHICLE        = 4                    // 86 spells in 3.0.3, taxi/mounts
 };
 
 // SummonProperties.dbc, col 5
 enum SummonPropFlags
 {
-    SUMMON_PROP_FLAG_NONE            = 0x00000000,          // 1342 spells in 3.0.3
-    SUMMON_PROP_FLAG_UNK1            = 0x00000001,          // 75 spells in 3.0.3, something unfriendly
-    SUMMON_PROP_FLAG_UNK2            = 0x00000002,          // 616 spells in 3.0.3, something friendly
-    SUMMON_PROP_FLAG_UNK3            = 0x00000004,          // 22 spells in 3.0.3, no idea...
-    SUMMON_PROP_FLAG_DESPAWN_ON_SUMMONER_DEATH = 0x00000008, // 49 spells in 3.0.3, some mounts
-    SUMMON_PROP_FLAG_PERSONAL_SPAWN            = 0x00000010, // 25 spells in 3.0.3, quest related?
-    SUMMON_PROP_FLAG_UNK6            = 0x00000020,          // 0 spells in 3.3.5, unused
-    SUMMON_PROP_FLAG_UNK7            = 0x00000040,          // 12 spells in 3.0.3, no idea
-    SUMMON_PROP_FLAG_UNK8            = 0x00000080,          // 4 spells in 3.0.3, no idea
-    SUMMON_PROP_FLAG_UNK9            = 0x00000100,          // 51 spells in 3.0.3, no idea, many quest related
-    SUMMON_PROP_FLAG_UNK10           = 0x00000200,          // 51 spells in 3.0.3, something defensive
-    SUMMON_PROP_FLAG_UNK11           = 0x00000400,          // 3 spells, requires something near?
-    SUMMON_PROP_FLAG_UNK12           = 0x00000800,          // 30 spells in 3.0.3, no idea
-    SUMMON_PROP_FLAG_UNK13           = 0x00001000,          // Lightwell, Jeeves, Gnomish Alarm-o-bot, Build vehicles(wintergrasp)
-    SUMMON_PROP_FLAG_UNK14           = 0x00002000,          // Guides, player follows
-    SUMMON_PROP_FLAG_UNK15           = 0x00004000,          // Force of Nature, Shadowfiend, Feral Spirit, Summon Water Elemental
-    SUMMON_PROP_FLAG_UNK16           = 0x00008000,          // Light/Dark Bullet, Soul/Fiery Consumption, Twisted Visage, Twilight Whelp. Phase related?
+    SUMMON_PROP_FLAG_NONE                            = 0x00000000,          // 1342 spells in 3.0.3
+    SUMMON_PROP_FLAG_ATTACK_SUMMONER                 = 0x00000001,          // 75 spells in 3.0.3, something unfriendly
+    SUMMON_PROP_FLAG_ASSIST_COMBAT_SUMMON            = 0x00000002,          // 616 spells in 3.0.3, something friendly
+    SUMMON_PROP_FLAG_USE_LEVEL_OFFSET                = 0x00000004,          // 22 spells in 3.0.3, no idea...
+    SUMMON_PROP_FLAG_DESPAWN_ON_SUMMONER_DEATH       = 0x00000008,          // 49 spells in 3.0.3, some mounts
+    SUMMON_PROP_FLAG_ONLY_VISIBLE_TO_SUMMONER        = 0x00000010,          // 25 spells in 3.0.3, quest related?
+    SUMMON_PROP_FLAG_CANNOT_DISMISS_PET              = 0x00000020,          // 0 spells in 3.3.5, unused
+    SUMMON_PROP_FLAG_USE_DEMON_TIMEOUT               = 0x00000040,          // 12 spells in 3.0.3, no idea
+    SUMMON_PROP_FLAG_UNLIMITED_SUMMONS               = 0x00000080,          // 4 spells in 3.0.3, no idea
+    SUMMON_PROP_FLAG_USE_CREATURE_LEVEL              = 0x00000100,          // 51 spells in 3.0.3, no idea, many quest related
+    SUMMON_PROP_FLAG_JOIN_SUMMONER_SPAWN_GROUP       = 0x00000200,          // 51 spells in 3.0.3, something defensive
+    SUMMON_PROP_FLAG_DO_NOT_TOGGLE                   = 0x00000400,          // 3 spells, requires something near?
+    SUMMON_PROP_FLAG_DESPAWN_WHEN_EXPIRED            = 0x00000800,          // 30 spells in 3.0.3, no idea
+    SUMMON_PROP_FLAG_USE_SUMMONER_FACTION            = 0x00001000,          // Lightwell, Jeeves, Gnomish Alarm-o-bot, Build vehicles(wintergrasp)
+    SUMMON_PROP_FLAG_DO_NOT_FOLLOW_MOUNTED_SUMMONER  = 0x00002000,          // Guides, player follows
+    SUMMON_PROP_FLAG_SAVE_PET_AUTOCAST               = 0x00004000,          // Force of Nature, Shadowfiend, Feral Spirit, Summon Water Elemental
+    SUMMON_PROP_FLAG_IGNORE_SUMMONER_PHASE           = 0x00008000,          // Light/Dark Bullet, Soul/Fiery Consumption, Twisted Visage, Twilight Whelp. Phase related?
 };
 
 enum VehicleSeatFlags
