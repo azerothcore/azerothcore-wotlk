@@ -138,7 +138,7 @@ public:
             if (type == DATA_RAJAXX_WAVE_ENGAGED)
             {
                 _scheduler.CancelGroup(GROUP_RAJAXX_WAVE_TIMER);
-                _scheduler.Schedule(3min, [this](TaskContext context)
+                _scheduler.Schedule(2min, [this](TaskContext context)
                 {
                     CallNextRajaxxLeader();
                     context.SetGroup(GROUP_RAJAXX_WAVE_TIMER);
