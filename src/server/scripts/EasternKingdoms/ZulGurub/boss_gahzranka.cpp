@@ -174,10 +174,9 @@ class spell_pagles_point_cast : public SpellScript
                     {
                         if (GameObject* lure = caster->SummonGameObject(GAMEOBJECT_MUDSKUNK_LURE, -11688.5f, -1737.74f, 10.409842f, 1.f, 0.f, 0.f, 0.f, 0.f, 30 * IN_MILLISECONDS))
                         {
-                            caster->m_Events.AddEventAtOffset([caster, lure]()
+                            lure->DespawnOrUnsummon(5s);
+                            caster->m_Events.AddEventAtOffset([caster]()
                             {
-                                if (lure)
-                                    lure->DespawnOrUnsummon();
                                 caster->CastSpell(caster, SPELL_SPLASH, true);
                                 caster->SummonCreature(NPC_GAHZRANKA, -11688.5f, -1723.74f, -5.78f, 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5 * DAY * IN_MILLISECONDS);
                             }, 5s);

@@ -46,71 +46,60 @@ enum Events
     EVENT_CHANGE_AGGRO      = 3,
 };
 
-class boss_rajaxx : public CreatureScript
+struct boss_rajaxx : public BossAI
 {
-public:
-    boss_rajaxx() : CreatureScript("boss_rajaxx") { }
+    boss_rajaxx(Creature* creature) : BossAI(creature, DATA_RAJAXX) { }
 
-    struct boss_rajaxxAI : public BossAI
+    void Reset() override
     {
-        boss_rajaxxAI(Creature* creature) : BossAI(creature, DATA_RAJAXX) { }
-
-        void Reset() override
-        {
-            _Reset();
-            enraged = false;
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            Talk(SAY_DEATH);
-            _JustDied();
-        }
-
-        void EnterCombat(Unit* /*victim*/) override
-        {
-            _EnterCombat();
-            events.ScheduleEvent(EVENT_DISARM, 10000);
-            events.ScheduleEvent(EVENT_THUNDERCRASH, 12000);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            while (uint32 eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    case EVENT_DISARM:
-                        DoCastVictim(SPELL_DISARM);
-                        events.ScheduleEvent(EVENT_DISARM, 22000);
-                        break;
-                    case EVENT_THUNDERCRASH:
-                        DoCast(me, SPELL_THUNDERCRASH);
-                        events.ScheduleEvent(EVENT_THUNDERCRASH, 21000);
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    private:
-        bool enraged;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetRuinsOfAhnQirajAI<boss_rajaxxAI>(creature);
+        BossAI::Reset();
+        enraged = false;
     }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        Talk(SAY_DEATH);
+        _JustDied();
+    }
+
+    void EnterCombat(Unit* /*victim*/) override
+    {
+        _EnterCombat();
+        events.ScheduleEvent(EVENT_DISARM, 10s);
+        events.ScheduleEvent(EVENT_THUNDERCRASH, 12s);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        while (uint32 eventId = events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+                case EVENT_DISARM:
+                    DoCastVictim(SPELL_DISARM);
+                    events.ScheduleEvent(EVENT_DISARM, 22s);
+                    break;
+                case EVENT_THUNDERCRASH:
+                    DoCastSelf(SPELL_THUNDERCRASH);
+                    events.ScheduleEvent(EVENT_THUNDERCRASH, 21s);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        DoMeleeAttackIfReady();
+    }
+private:
+    bool enraged;
 };
 
 class spell_rajaxx_thundercrash : public SpellScript
@@ -136,6 +125,6 @@ class spell_rajaxx_thundercrash : public SpellScript
 
 void AddSC_boss_rajaxx()
 {
-    new boss_rajaxx();
+    RegisterRuinsOfAhnQirajCreatureAI(boss_rajaxx);
     RegisterSpellScript(spell_rajaxx_thundercrash);
 }

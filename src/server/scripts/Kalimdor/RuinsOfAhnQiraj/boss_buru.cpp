@@ -80,7 +80,7 @@ struct boss_buru : public BossAI
 
     void EnterCombat(Unit* who) override
     {
-        _EnterCombat();
+        BossAI::EnterCombat(who);
         Talk(EMOTE_TARGET, who);
         DoCastSelf(SPELL_THORNS);
         ManipulateEggs(true);
