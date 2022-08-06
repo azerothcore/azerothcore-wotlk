@@ -313,6 +313,12 @@ public:
             }
         }
 
+        bool OnTeleportUnreacheablePlayer(Player* player) override
+        {
+            DoCast(player, SPELL_SUMMON_PLAYER, true);
+            return true;
+        }
+
         void DoMeleeAttackIfReady(bool ignoreCasting)
         {
             if (!ignoreCasting && me->HasUnitState(UNIT_STATE_CASTING))
@@ -713,11 +719,14 @@ public:
             {
                 if (Unit* target = GetTarget())
                 {
-                    if (Creature* caster = GetCaster()->ToCreature())
+                    if (Unit* caster = GetCaster())
                     {
-                        if (caster->IsAIEnabled)
+                        if (Creature* cCaster = caster->ToCreature())
                         {
-                            caster->AI()->SetGUID(target->GetGUID(), ACTION_CHARGE);
+                            if (cCaster->IsAIEnabled)
+                            {
+                                cCaster->AI()->SetGUID(target->GetGUID(), ACTION_CHARGE);
+                            }
                         }
                     }
                 }

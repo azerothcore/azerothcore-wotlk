@@ -1199,7 +1199,7 @@ class spell_gen_adaptive_warding : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        if (eventInfo.GetSpellInfo())
+        if (!eventInfo.GetSpellInfo())
             return false;
 
         // find Mage Armor
@@ -4475,7 +4475,10 @@ class spell_gen_remove_impairing_auras : public SpellScript
 enum AQSpells
 {
     SPELL_CONSUME_LEECH_AQ20      = 25373,
-    SPELL_CONSUME_LEECH_HEAL_AQ20 = 25378
+    SPELL_CONSUME_LEECH_HEAL_AQ20 = 25378,
+    SPELL_CONSUME_SPIT_OUT        = 25383,
+
+    SPELL_HIVEZARA_CATALYST       = 25187
 };
 
 class spell_gen_consume : public AuraScript
@@ -4494,18 +4497,30 @@ public:
     {
         if (Unit* caster = GetCaster())
         {
+            if (!caster->IsAlive())
+            {
+                GetUnitOwner()->RemoveAurasDueToSpell(GetSpellInfo()->Id);
+                return;
+            }
+
             caster->CastSpell(GetUnitOwner(), _spellId1, true);
         }
     }
 
     void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        // Final heal only on duration end
-        if (GetTargetApplication() && GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
+        if (GetTargetApplication())
         {
             if (Unit* caster = GetCaster())
             {
-                caster->CastSpell(caster, _spellId2, true);
+                if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
+                {
+                    caster->CastSpell(caster, _spellId2, true);
+                }
+                else if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
+                {
+                    caster->CastSpell(GetTarget(), SPELL_CONSUME_SPIT_OUT, true);
+                }
             }
         }
     }
@@ -4519,6 +4534,40 @@ public:
 private:
     uint32 _spellId1;
     uint32 _spellId2;
+};
+
+class spell_gen_apply_aura_after_expiration : public AuraScript
+{
+    PrepareAuraScript(spell_gen_apply_aura_after_expiration);
+
+public:
+    spell_gen_apply_aura_after_expiration(uint32 spellId, uint32 effect, uint32 aura) : AuraScript(), _spellId(spellId), _effect(effect), _aura(aura) { }
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ _spellId });
+    }
+
+    void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetTargetApplication() && GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                caster->CastSpell(GetTarget(), _spellId, true);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_gen_apply_aura_after_expiration::AfterRemove, _effect, _aura, AURA_EFFECT_HANDLE_REAL);
+    }
+
+private:
+    uint32 _spellId;
+    uint32 _effect;
+    uint32 _aura;
 };
 
 void AddSC_generic_spell_scripts()
@@ -4656,4 +4705,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_arcane_charge);
     RegisterSpellScript(spell_gen_remove_impairing_auras);
     RegisterSpellScriptWithArgs(spell_gen_consume, "spell_consume_aq20", SPELL_CONSUME_LEECH_AQ20, SPELL_CONSUME_LEECH_HEAL_AQ20);
+    RegisterSpellScriptWithArgs(spell_gen_apply_aura_after_expiration, "spell_itch_aq20", SPELL_HIVEZARA_CATALYST, EFFECT_0, SPELL_AURA_DUMMY);
 }

@@ -2678,7 +2678,7 @@ void ObjectMgr::LoadItemTemplates()
         for (uint8 i = 0; i < itemTemplate.StatsCount; ++i)
         {
             itemTemplate.ItemStat[i].ItemStatType  = uint32(fields[28 + i * 2].Get<uint8>());
-            itemTemplate.ItemStat[i].ItemStatValue = int32(fields[29 + i * 2].Get<int16>());
+            itemTemplate.ItemStat[i].ItemStatValue = fields[29 + i * 2].Get<int32>();
         }
 
         itemTemplate.ScalingStatDistribution = uint32(fields[48].Get<uint16>());
@@ -2691,13 +2691,13 @@ void ObjectMgr::LoadItemTemplates()
             itemTemplate.Damage[i].DamageType = uint32(fields[52 + i * 3].Get<uint8>());
         }
 
-        itemTemplate.Armor          = uint32(fields[56].Get<uint16>());
-        itemTemplate.HolyRes        = uint32(fields[57].Get<uint8>());
-        itemTemplate.FireRes        = uint32(fields[58].Get<uint8>());
-        itemTemplate.NatureRes      = uint32(fields[59].Get<uint8>());
-        itemTemplate.FrostRes       = uint32(fields[60].Get<uint8>());
-        itemTemplate.ShadowRes      = uint32(fields[61].Get<uint8>());
-        itemTemplate.ArcaneRes      = uint32(fields[62].Get<uint8>());
+        itemTemplate.Armor          = fields[56].Get<uint32>();
+        itemTemplate.HolyRes        = fields[57].Get<uint32>();
+        itemTemplate.FireRes        = fields[58].Get<uint32>();
+        itemTemplate.NatureRes      = fields[59].Get<uint32>();
+        itemTemplate.FrostRes       = fields[60].Get<uint32>();
+        itemTemplate.ShadowRes      = fields[61].Get<uint32>();
+        itemTemplate.ArcaneRes      = fields[62].Get<uint32>();
         itemTemplate.Delay          = uint32(fields[63].Get<uint16>());
         itemTemplate.AmmoType       = uint32(fields[64].Get<uint8>());
         itemTemplate.RangedModRange = fields[65].Get<float>();
@@ -3448,14 +3448,14 @@ void ObjectMgr::LoadPetLevelInfo()
         // data for level 1 stored in [0] array element, ...
         PetLevelInfo* pLevelInfo = &pInfoMapEntry[current_level - 1];
 
-        pLevelInfo->health = fields[2].Get<uint16>();
-        pLevelInfo->mana   = fields[3].Get<uint16>();
+        pLevelInfo->health = fields[2].Get<uint32>();
+        pLevelInfo->mana   = fields[3].Get<uint32>();
         pLevelInfo->armor  = fields[9].Get<uint32>();
-        pLevelInfo->min_dmg = fields[10].Get<uint16>();
-        pLevelInfo->max_dmg = fields[11].Get<uint16>();
-        for (int i = 0; i < MAX_STATS; i++)
+        pLevelInfo->min_dmg = fields[10].Get<uint32>();
+        pLevelInfo->max_dmg = fields[11].Get<uint32>();
+        for (uint8 i = 0; i < MAX_STATS; i++)
         {
-            pLevelInfo->stats[i] = fields[i + 4].Get<uint16>();
+            pLevelInfo->stats[i] = fields[i + 4].Get<uint32>();
         }
 
         ++count;
@@ -3973,8 +3973,8 @@ void ObjectMgr::LoadPlayerInfo()
 
             PlayerClassLevelInfo& levelInfo = info->levelInfo[current_level - 1];
 
-            levelInfo.basehealth = fields[2].Get<uint16>();
-            levelInfo.basemana   = fields[3].Get<uint16>();
+            levelInfo.basehealth = fields[2].Get<uint32>();
+            levelInfo.basemana   = fields[3].Get<uint32>();
 
             ++count;
         } while (result->NextRow());
@@ -4064,8 +4064,8 @@ void ObjectMgr::LoadPlayerInfo()
                     info->levelInfo = new PlayerLevelInfo[sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)];
 
                 PlayerLevelInfo& levelInfo = info->levelInfo[current_level - 1];
-                for (int i = 0; i < MAX_STATS; i++)
-                    levelInfo.stats[i] = fields[i + 3].Get<uint8>();
+                for (uint8 i = 0; i < MAX_STATS; i++)
+                    levelInfo.stats[i] = fields[i + 3].Get<uint32>();
             }
 
             ++count;
@@ -9359,7 +9359,7 @@ void ObjectMgr::LoadCreatureClassLevelStats()
 
         for (uint8 i = 0; i < MAX_EXPANSIONS; ++i)
         {
-            stats.BaseHealth[i] = fields[2 + i].Get<uint16>();
+            stats.BaseHealth[i] = fields[2 + i].Get<uint32>();
 
             if (stats.BaseHealth[i] == 0)
             {
@@ -9389,11 +9389,11 @@ void ObjectMgr::LoadCreatureClassLevelStats()
             }
         }
 
-        stats.BaseMana = fields[5].Get<uint16>();
-        stats.BaseArmor = fields[6].Get<uint16>();
+        stats.BaseMana = fields[5].Get<uint32>();
+        stats.BaseArmor = fields[6].Get<uint32>();
 
-        stats.AttackPower = fields[7].Get<uint16>();
-        stats.RangedAttackPower = fields[8].Get<uint16>();
+        stats.AttackPower = fields[7].Get<uint32>();
+        stats.RangedAttackPower = fields[8].Get<uint32>();
 
         _creatureBaseStatsStore[MAKE_PAIR16(Level, Class)] = stats;
 
@@ -9875,8 +9875,8 @@ void ObjectMgr::SendServerMail(Player* player, uint32 id, uint32 reqLevel, uint3
         MailSender sender(MAIL_NORMAL, player->GetGUID().GetCounter(), MAIL_STATIONERY_GM);
         MailDraft draft(subject, body);
 
-        draft.AddMoney(player->GetTeamId() == TEAM_ALLIANCE ? rewardMoneyH : rewardMoneyA);
-        if (Item* mailItem = Item::CreateItem(player->GetTeamId() == TEAM_ALLIANCE ? rewardItemH : rewardItemA, player->GetTeamId() == TEAM_ALLIANCE ? rewardItemCountH : rewardItemCountA))
+        draft.AddMoney(player->GetTeamId() == TEAM_ALLIANCE ? rewardMoneyA : rewardMoneyH);
+        if (Item* mailItem = Item::CreateItem(player->GetTeamId() == TEAM_ALLIANCE ? rewardItemA : rewardItemH, player->GetTeamId() == TEAM_ALLIANCE ? rewardItemCountA : rewardItemCountH))
         {
             mailItem->SaveToDB(trans);
             draft.AddItem(mailItem);

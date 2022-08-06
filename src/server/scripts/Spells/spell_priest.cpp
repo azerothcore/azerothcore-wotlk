@@ -428,9 +428,26 @@ class spell_pri_lightwell_renew : public AuraScript
         }
     }
 
+    void HandleUpdateSpellclick(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            if (Player* player = GetTarget()->ToPlayer())
+            {
+                UpdateData data;
+                WorldPacket packet;
+                caster->BuildValuesUpdateBlockForPlayer(&data, player);
+                data.BuildPacket(&packet);
+                player->SendDirectMessage(&packet);
+            }
+        }
+    }
+
     void Register() override
     {
         DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pri_lightwell_renew::CalculateAmount, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
+        AfterEffectApply += AuraEffectApplyFn(spell_pri_lightwell_renew::HandleUpdateSpellclick, EFFECT_0, SPELL_AURA_PERIODIC_HEAL, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_pri_lightwell_renew::HandleUpdateSpellclick, EFFECT_0, SPELL_AURA_PERIODIC_HEAL, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -842,22 +859,17 @@ class spell_pri_vampiric_touch : public AuraScript
     bool CheckProc(ProcEventInfo& eventInfo)
     {
         if (!eventInfo.GetActionTarget() || GetOwner()->GetGUID() != eventInfo.GetActionTarget()->GetGUID())
-            return false;
-
-        if (eventInfo.GetTypeMask() & PROC_FLAG_KILLED)
         {
-            if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
-            {
-                if (spellInfo->SpellFamilyName == SPELLFAMILY_PRIEST && (spellInfo->SpellFamilyFlags[0] & 0x00002000))
-                {
-                    return true;
-                }
-            }
-
             return false;
         }
 
-        return eventInfo.GetActionTarget()->IsAlive();
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo || spellInfo->SpellFamilyName != SPELLFAMILY_PRIEST || !(spellInfo->SpellFamilyFlags[0] & 0x00002000))
+        {
+            return false;
+        }
+
+        return true;
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)

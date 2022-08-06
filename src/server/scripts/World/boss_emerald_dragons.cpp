@@ -64,6 +64,7 @@ enum Events
     EVENT_SEEPING_FOG = 1,
     EVENT_NOXIOUS_BREATH,
     EVENT_TAIL_SWEEP,
+    EVENT_SUMMON_PLAYER,
 
     // Ysondre
     EVENT_LIGHTNING_WAVE,
@@ -102,6 +103,7 @@ struct emerald_dragonAI : public WorldBossAI
         events.ScheduleEvent(EVENT_TAIL_SWEEP, 4000);
         events.ScheduleEvent(EVENT_NOXIOUS_BREATH, urand(7500, 15000));
         events.ScheduleEvent(EVENT_SEEPING_FOG, urand(12500, 20000));
+        events.ScheduleEvent(EVENT_SUMMON_PLAYER, 1s);
     }
 
     // Target killed during encounter, mark them as suspectible for Aura Of Nature
@@ -133,6 +135,12 @@ struct emerald_dragonAI : public WorldBossAI
                 DoCast(me, SPELL_TAIL_SWEEP);
                 events.ScheduleEvent(EVENT_TAIL_SWEEP, 2000);
                 break;
+            case EVENT_SUMMON_PLAYER:
+                if (Unit* target = me->GetVictim())
+                    if (!target->IsWithinRange(me, 50.f))
+                        DoCast(target, SPELL_SUMMON_PLAYER);
+                events.ScheduleEvent(EVENT_SUMMON_PLAYER, 500ms);
+                break;
         }
     }
 
@@ -148,9 +156,6 @@ struct emerald_dragonAI : public WorldBossAI
 
         while (uint32 eventId = events.ExecuteEvent())
             ExecuteEvent(eventId);
-
-        if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, -50.0f, true))
-            DoCast(target, SPELL_SUMMON_PLAYER);
 
         DoMeleeAttackIfReady();
     }
