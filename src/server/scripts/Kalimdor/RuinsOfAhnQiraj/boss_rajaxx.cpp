@@ -166,7 +166,7 @@ struct npc_general_andorov : public npc_escortAI
         if (uiAction)
         {
             CloseGossipMenuFor(player);
-            Start(false, true);
+            SetEscortPaused(false);
         }
     }
 
@@ -191,6 +191,8 @@ struct npc_general_andorov : public npc_escortAI
         me->SetFaction(FACTION_ANDOROV_ESCORT);
         Endwaypoint = false;
         _initialAttackTimer = 5 * IN_MILLISECONDS;
+
+        Start(false, true);
     }
 
     void JustSummoned(Creature* summon) override
@@ -209,11 +211,12 @@ struct npc_general_andorov : public npc_escortAI
     {
         switch (waypointId)
         {
-            case 0:
+            case 10:
                 me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
-                SetRun(true);
-                break;
-            case 8:
+                me->SetFacingTo(5.63741350f);
+                SetEscortPaused(true);
+            case 17:
+                me->SetFacingTo(2.8772139f);
                 SetEscortPaused(true);
                 if (!Endwaypoint)
                 {
@@ -248,7 +251,7 @@ struct npc_general_andorov : public npc_escortAI
         }
     }
 
-    void KilledUnit(Unit* victim) override 
+    void KilledUnit(Unit* victim) override
     {
         if (victim->GetEntry() == NPC_RAJAXX)
         {

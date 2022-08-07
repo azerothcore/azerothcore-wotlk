@@ -3,20 +3,29 @@ UPDATE `creature_template` SET `ScriptName`='npc_general_andorov' WHERE `entry`=
 UPDATE `creature_template` SET `npcflag`=129, `speed_walk`=1.4, `speed_run`=1.4, `gossip_menu_id`=7047, `type_flags`=`type_flags`|0x08000000 WHERE  `entry`=15471;
 
 DELETE FROM `script_waypoint` WHERE `entry`=15471;
-INSERT INTO `script_waypoint` (`entry`, `pointid`, `location_x`, `location_y`, `location_z`, `waittime`, `point_comment`) VALUES 
-(15471, 0, -8876.79, 1634.59, 21.3864, 0, 'Andorov'),
-(15471, 1, -8877.69, 1627.65, 21.3864, 0, 'Andorov'),
-(15471, 2, -8884.18, 1606.13, 21.3864, 0, 'Andorov'),
-(15471, 3, -8892.82, 1591.76, 21.3864, 0, 'Andorov'),
-(15471, 4, -8905.6, 1575.1, 21.387, 0, 'Andorov'),
-(15471, 5, -8914.31, 1564.14, 21.387, 0, 'Andorov'),
-(15471, 6, -8928.91, 1551.86, 21.387, 0, 'Andorov'),
-(15471, 7, -8937.75, 1551.09, 21.388, 0, 'Andorov'),
-(15471, 8, -8941.71, 1550.75, 21.7797, 90000000, 'Andorov');
+INSERT INTO `script_waypoint` (`entry`, `pointid`, `location_x`, `location_y`, `location_z`, `waittime`, `point_comment`) VALUES
+(15471,0,-8623.171,1470.4077,32.006413,0,'Andorov'),
+(15471,1,-8657.297,1506.1847,32.586697,0,'Andorov'),
+(15471,2,-8679.187,1535.1178,31.96736,0,'Andorov'),
+(15471,3,-8701.477,1561.7574,32.17472,0,'Andorov'),
+(15471,4,-8720.072,1580.9626,21.511324,0,'Andorov'),
+(15471,5,-8746.162,1603.494,21.613367,0,'Andorov'),
+(15471,6,-8780.431,1617.8787,21.455776,0,'Andorov'),
+(15471,7,-8823.478,1624.6688,19.80574,0,'Andorov'),
+(15471,8,-8855.329,1637.9473,19.790516,0,'Andorov'),
+(15471,9,-8870.721,1648.4009,21.511328,0,'Andorov'),
+(15471,10,-8870.721,1648.4009,21.511328,90000000,'Andorov'),
+(15471,11,-8886.095,1598.713,21.4053,0,'Andorov'),
+(15471,12,-8904.383,1578.6167,21.511332,0,'Andorov'),
+(15471,13,-8920.576,1551.9479,21.407932,0,'Andorov'),
+(15471,14,-8939.951,1551.127,21.566868,0,'Andorov'),
+(15471,15,-8914.426,1546.6278,21.342258,0,'Andorov'),
+(15471,16,-8914.426,1546.6278,21.342258,0,'Andorov'),
+(15471,17,-8939.951,1551.127,21.566868,90000000,'Andorov');
 
 DELETE FROM `gossip_menu_option` WHERE `menuid`=7047;
 INSERT INTO `gossip_menu_option` (`menuid`, `optionId`, `optionicon`, `optiontext`, `optiontype`, `optionnpcflag`, `actionmenuid`, `actionpoiid`, `boxcoded`, `boxmoney`, `boxtext`) VALUES 
-(7047, 0, 1, 'Let me see your goods', 3, 128, 0, 0, 0, 0, ''), -- 15471
+(7047, 0, 0, 'Let me see your goods', 3, 128, 0, 0, 0, 0, ''), -- 15471
 (7047, 1, 1, 'I would be happy to support you in the fight!', 1, 1, 0, 0, 0, 0, '');
 
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=15 AND `SourceGroup`=7047;

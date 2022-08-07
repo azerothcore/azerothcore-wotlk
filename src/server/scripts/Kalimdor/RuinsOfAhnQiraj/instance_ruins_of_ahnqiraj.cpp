@@ -79,7 +79,7 @@ public:
             {
                 if (!_andorovGUID)
                 {
-                    player->SummonCreature(NPC_ANDOROV, -8877.254883f, 1645.267578f, 21.386303f, 4.669808f, TEMPSUMMON_CORPSE_DESPAWN, 600000000);
+                    player->SummonCreature(NPC_ANDOROV, -8538.177f, 1486.0956f, 32.39054f, 3.7638654f, TEMPSUMMON_CORPSE_DESPAWN, 600000000);
                 }
             }
         }
