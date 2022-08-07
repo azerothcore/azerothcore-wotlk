@@ -20,3 +20,11 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (87911, 87796, 0, 0, 3, 0, 0),
 (87911, 87806, 0, 0, 3, 0, 0),
 (87911, 87792, 0, 0, 3, 0, 0);
+
+DELETE FROM `linked_respawn` WHERE `guid` IN (87773, 87775, 87796, 87806, 87792);
+INSERT INTO `linked_respawn` (`guid`, `linkedGuid`, `linkType`) VALUES
+(87773, 87911, 0),
+(87775, 87911, 0),
+(87796, 87911, 0),
+(87806, 87911, 0),
+(87792, 87911, 0);
