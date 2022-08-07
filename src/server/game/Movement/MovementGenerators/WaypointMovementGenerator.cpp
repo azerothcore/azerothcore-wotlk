@@ -361,10 +361,7 @@ void FlightPathMovementGenerator::DoFinalize(Player* player)
         player->StopMoving();
 
         // When the player reaches the last flight point, teleport to destination taxi node location
-        if (TaxiNodesEntry const* node = sTaxiNodesStore.LookupEntry(taxiNodeId))
-        {
-            player->SetFallInformation(GameTime::GetGameTime().count(), player->GetPositionZ());
-        }
+        player->SetFallInformation(GameTime::GetGameTime().count(), player->GetPositionZ());
     }
 
     player->RemovePlayerFlag(PLAYER_FLAGS_TAXI_BENCHMARK);
