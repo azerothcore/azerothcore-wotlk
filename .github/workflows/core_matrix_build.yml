@@ -4,7 +4,7 @@ on:
     branches:
       - 'master'
   pull_request:
-    types: ['labeled', 'labeled', 'opened', 'synchronize', 'reopened']
+    types: ['labeled', 'opened', 'synchronize', 'reopened']
 
 concurrency:
   group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
@@ -17,14 +17,18 @@ jobs:
       matrix:
         # the result of the matrix will be the combination of all attributes, so we get os*compiler builds
         include:
+          - os: ubuntu-22.04
+            compiler: clang # default in 22.04 is clang 14
+          - os: ubuntu-22.04
+            compiler: clang13
+          - os: ubuntu-22.04
+            compiler: clang12
+          - os: ubuntu-22.04
+            compiler: clang11
           - os: ubuntu-20.04
             compiler: clang12
           - os: ubuntu-20.04
             compiler: clang11
-          - os: ubuntu-18.04
-            compiler: clang10
-          - os: ubuntu-18.04
-            compiler: gcc8
           - os: ubuntu-20.04
             compiler: gcc # default in 20.04 is gcc 9
           - os: ubuntu-20.04
