@@ -10,7 +10,7 @@ sudo apt update
 sudo apt-get -y install ccache clang cmake curl google-perftools libmysqlclient-dev make unzip
 
 if [[ $CONTINUOUS_INTEGRATION && $UBUNTU_VERSION == "22.04" || $DOCKER && $UBUNTU_VERSION == "22.04" ]]; then
-  sudo apt update && sudo apt-get -y install build-essential cmake-data  \
+  sudo apt update && sudo apt remove libunwind-14-dev && sudo apt-get -y install build-essential cmake-data  \
   libboost-all-dev libbz2-dev libncurses5-dev libmysql++-dev libgoogle-perftools-dev libreadline6-dev libssl-dev libtool \
   openssl zlib1g-dev
 elif [[ $CONTINUOUS_INTEGRATION && $UBUNTU_VERSION == "20.04" || $DOCKER && $UBUNTU_VERSION == "20.04" ]]; then
