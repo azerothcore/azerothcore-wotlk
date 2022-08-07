@@ -1,3 +1,4 @@
+-- DB update 2022_08_02_00 -> 2022_08_07_00
 --
 ALTER TABLE `character_entry_point`
 ADD COLUMN `taxiPath0` INT UNSIGNED DEFAULT 0 NOT NULL AFTER `joinMapId`,
