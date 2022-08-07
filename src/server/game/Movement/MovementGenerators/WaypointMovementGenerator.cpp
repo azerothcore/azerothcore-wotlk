@@ -315,8 +315,6 @@ void FlightPathMovementGenerator::LoadPath(Player* player)
             bool passedPreviousSegmentProximityCheck = false;
             for (uint32 i = 0; i < nodes.size(); ++i)
             {
-                sMapMgr->CreateMap(nodes[i]->mapid, player)->SummonCreature(1, { nodes[i]->x, nodes[i]->y, nodes[i]->z, 0.0f })->SetLevel(i ? i : 1);
-
                 if (passedPreviousSegmentProximityCheck || !src || i_path.empty() || IsNodeIncludedInShortenedPath(i_path[i_path.size() - 1], nodes[i]))
                 {
                     if ((!src || (IsNodeIncludedInShortenedPath(start, nodes[i]) && i >= 2)) &&
@@ -366,7 +364,6 @@ void FlightPathMovementGenerator::DoFinalize(Player* player)
         if (TaxiNodesEntry const* node = sTaxiNodesStore.LookupEntry(taxiNodeId))
         {
             player->SetFallInformation(GameTime::GetGameTime().count(), player->GetPositionZ());
-            player->TeleportTo(node->map_id, node->x, node->y, node->z, player->GetOrientation());
         }
     }
 
