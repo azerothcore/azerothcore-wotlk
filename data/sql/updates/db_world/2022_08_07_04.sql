@@ -1,3 +1,4 @@
+-- DB update 2022_08_07_03 -> 2022_08_07_04
 --
 UPDATE `gossip_menu_option` SET `OptionBroadcastTextID`=5316 WHERE `MenuID`=435 AND `OptionID`=0;
 UPDATE `gossip_menu_option` SET `OptionBroadcastTextID`=3428 WHERE `MenuID`=435 AND `OptionID`=6;
