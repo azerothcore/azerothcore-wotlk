@@ -36,10 +36,6 @@ struct npc_hivezara_stinger : public ScriptedAI
     void Reset() override
     {
         _scheduler.CancelAll();
-        _scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
     }
 
     void EnterCombat(Unit* who) override
@@ -48,10 +44,19 @@ struct npc_hivezara_stinger : public ScriptedAI
 
         _scheduler.Schedule(10s, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, [&](Unit* u)
+            Unit* target = SelectTarget(SelectTargetMethod::Random, 1, [&](Unit* u)
             {
-                return u && !u->IsPet() && u->IsInRange(me, 5.f, 20.f);
-            }))
+                return u && !u->IsPet() && u->IsWithinDist2d(me, 20.f) && u->HasAura(SPELL_HIVEZARA_CATALYST);
+            });
+            if (!target)
+            {
+                target = SelectTarget(SelectTargetMethod::Random, 1, [&](Unit* u)
+                {
+                    return u && !u->IsPet() && u->IsWithinDist2d(me, 20.f);
+                });
+            }
+
+            if (target)
             {
                 DoCast(target, target->HasAura(SPELL_HIVEZARA_CATALYST) ? SPELL_STINGER_CHARGE_BUFFED : SPELL_STINGER_CHARGE_NORMAL, true);
             }
@@ -63,15 +68,15 @@ struct npc_hivezara_stinger : public ScriptedAI
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
+        {
             return;
+        }
 
         _scheduler.Update(diff,
             std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
     }
 
 private:
-    bool _enraged;
-    uint32 _spells[2];
     TaskScheduler _scheduler;
 };
 
