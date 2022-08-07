@@ -1,3 +1,4 @@
+-- DB update 2022_08_07_05 -> 2022_08_07_06
 --
 UPDATE `creature_template` SET `lootid` = 0, `skinloot` = 0, `mingold` = 0, `maxgold` = 0 WHERE (`entry` = 11374);
 DELETE FROM `creature_loot_template` WHERE `entry` = 11374;
