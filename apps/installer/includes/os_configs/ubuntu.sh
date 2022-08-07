@@ -36,3 +36,11 @@ else
        ;;
   esac
 fi
+
+#########################################################
+###### Openssl 1.1 workaround ###########################
+if [[ $UBUNTU_VERSION == "22.04" ]]; then
+  CI=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  brew install openssl@1.1
+fi
+#########################################################
