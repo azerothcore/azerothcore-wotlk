@@ -42,7 +42,7 @@ struct npc_hivezara_stinger : public ScriptedAI
     {
         DoCast(who ,who->HasAura(SPELL_HIVEZARA_CATALYST) ? SPELL_STINGER_CHARGE_BUFFED : SPELL_STINGER_CHARGE_NORMAL, true);
 
-        _scheduler.Schedule(10s, [this](TaskContext context)
+        _scheduler.Schedule(5s, [this](TaskContext context)
         {
             Unit* target = SelectTarget(SelectTargetMethod::Random, 1, [&](Unit* u)
             {
@@ -61,7 +61,7 @@ struct npc_hivezara_stinger : public ScriptedAI
                 DoCast(target, target->HasAura(SPELL_HIVEZARA_CATALYST) ? SPELL_STINGER_CHARGE_BUFFED : SPELL_STINGER_CHARGE_NORMAL, true);
             }
 
-            context.Repeat(10s, 15s);
+            context.Repeat(4500ms, 6500ms);
         });
     }
 
