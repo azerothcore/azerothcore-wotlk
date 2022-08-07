@@ -1,0 +1,5 @@
+--
+ALTER TABLE `character_entry_point`
+ADD COLUMN `taxiPath0` INT UNSIGNED DEFAULT 0 NOT NULL AFTER `joinMapId`,
+ADD COLUMN `taxiPath1` INT UNSIGNED DEFAULT 0 NOT NULL AFTER `taxiPath0`,
+DROP COLUMN `taxiPath`;
