@@ -284,14 +284,14 @@ public:
     {
         InstanceScript* instance = player->GetInstanceScript();
         if (!instance)
-            return false;
+            return true;
 
         Creature* ossirian = instance->GetCreature(DATA_OSSIRIAN);
         if (!ossirian || instance->GetBossState(DATA_OSSIRIAN) != IN_PROGRESS)
-            return false;
+            return true;
 
         ossirian->AI()->DoAction(ACTION_TRIGGER_WEAKNESS);
-        return true;
+        return false;
     }
 };
 
