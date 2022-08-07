@@ -36,19 +36,20 @@ enum Texts
 
 enum Spells
 {
-    SPELL_CURSE_OF_TONGUES      = 25195,
-    SPELL_ENVELOPING_WINDS      = 25189,
-    SPELL_WAR_STOMP             = 25188,
-    SPELL_STRENGHT_OF_OSSIRIAN  = 25176,
-    SPELL_SAND_STORM            = 25160,
-    SPELL_SUMMON_CRYSTAL        = 25192,
+    SPELL_CURSE_OF_TONGUES              = 25195,
+    SPELL_ENVELOPING_WINDS              = 25189,
+    SPELL_WAR_STOMP                     = 25188,
+    SPELL_STRENGHT_OF_OSSIRIAN          = 25176,
+    SPELL_SAND_STORM                    = 25160,
+    SPELL_SUMMON_CRYSTAL                = 25192,
+    SPELL_SUMMON_SMALL_OBSIDIAN_CHUNK   = 27627, // Server-side
 
     // Crystal
-    SPELL_FIRE_WEAKNESS         = 25177,
-    SPELL_FROST_WEAKNESS        = 25178,
-    SPELL_NATURE_WEAKNESS       = 25180,
-    SPELL_ARCANE_WEAKNESS       = 25181,
-    SPELL_SHADOW_WEAKNESS       = 25183
+    SPELL_FIRE_WEAKNESS                 = 25177,
+    SPELL_FROST_WEAKNESS                = 25178,
+    SPELL_NATURE_WEAKNESS               = 25180,
+    SPELL_ARCANE_WEAKNESS               = 25181,
+    SPELL_SHADOW_WEAKNESS               = 25183
 };
 
 enum Actions
@@ -355,6 +356,11 @@ struct npc_anubisath_guardian : public ScriptedAI
             _enraged = true;
             DoCastSelf(RAND(SPELL_ENRAGE, SPELL_EXPLODE), true);
         }
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        DoCastSelf(SPELL_SUMMON_SMALL_OBSIDIAN_CHUNK, true);
     }
 
     void UpdateAI(uint32 diff) override

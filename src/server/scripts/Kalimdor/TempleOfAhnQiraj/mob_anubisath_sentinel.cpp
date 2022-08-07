@@ -34,25 +34,27 @@ EndScriptData */
 
 enum Spells
 {
-    SPELL_MENDING_BUFF     = 2147,
+    SPELL_MENDING_BUFF                  = 2147,
 
-    SPELL_KNOCK_BUFF       = 21737,
-    SPELL_KNOCK            = 25778,
-    SPELL_MANAB_BUFF       = 812,
-    SPELL_MANAB            = 25779,
+    SPELL_KNOCK_BUFF                    = 21737,
+    SPELL_KNOCK                         = 25778,
+    SPELL_MANAB_BUFF                    = 812,
+    SPELL_MANAB                         = 25779,
 
-    SPELL_REFLECTAF_BUFF   = 13022,
-    SPELL_REFLECTSFr_BUFF  = 19595,
-    SPELL_THORNS_BUFF      = 25777,
+    SPELL_REFLECTAF_BUFF                = 13022,
+    SPELL_REFLECTSFr_BUFF               = 19595,
+    SPELL_THORNS_BUFF                   = 25777,
 
-    SPELL_THUNDER_BUFF     = 2834,
-    SPELL_THUNDER          = 8732,
+    SPELL_THUNDER_BUFF                  = 2834,
+    SPELL_THUNDER                       = 8732,
 
-    SPELL_MSTRIKE_BUFF     = 9347,
-    SPELL_MSTRIKE          = 24573,
+    SPELL_MSTRIKE_BUFF                  = 9347,
+    SPELL_MSTRIKE                       = 24573,
 
-    SPELL_STORM_BUFF       = 2148,
-    SPELL_STORM            = 26546
+    SPELL_STORM_BUFF                    = 2148,
+    SPELL_STORM                         = 26546,
+
+    SPELL_SUMMON_SMALL_OBSIDIAN_CHUNK   = 27627 // Server-side
 };
 
 class npc_anubisath_sentinel : public CreatureScript
@@ -273,6 +275,8 @@ public:
                 sent->ModifyHealth(int32(sent->CountPctFromMaxHealth(50)));
                 CAST_AI(aqsentinelAI, sent->AI())->GainSentinelAbility(ability);
             }
+
+            DoCastSelf(SPELL_SUMMON_SMALL_OBSIDIAN_CHUNK, true);
         }
     };
 };
