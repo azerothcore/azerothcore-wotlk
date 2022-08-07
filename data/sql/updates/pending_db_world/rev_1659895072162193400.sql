@@ -1,2 +1,2 @@
 --
-UPDATE `gameobject` SET `ScriptName` = '' WHERE `id` = 2135480;
+UPDATE `gameobject` SET `ScriptName` = '' WHERE `id` = 176966;
