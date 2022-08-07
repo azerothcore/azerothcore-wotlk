@@ -55,7 +55,7 @@ Versions of Ubuntu:
 | Ubuntu version | Supported          |
 | -------------- | ------------------ |
 | 20.04          | :white_check_mark: |
-| 18.04 and lower| :red_circle: |
+| 18.04 and lower| :red_circle:       |
 
 Versions of macOS:
 
