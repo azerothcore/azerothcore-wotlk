@@ -11,7 +11,7 @@ sudo apt-get -y install ccache clang cmake curl google-perftools libmysqlclient-
 
 if [[ $CONTINUOUS_INTEGRATION && $UBUNTU_VERSION == "22.04" || $DOCKER && $UBUNTU_VERSION == "22.04" ]]; then
   sudo apt update && sudo apt-get -y install build-essential cmake-data  \
-  libboost-dev libbz2-dev libncurses5-dev libmysql++-dev libgoogle-perftools-dev libreadline6-dev libssl-dev libtool \
+  libboost-all-dev libbz2-dev libncurses5-dev libmysql++-dev libgoogle-perftools-dev libreadline6-dev libssl-dev libtool \
   openssl zlib1g-dev
 elif [[ $CONTINUOUS_INTEGRATION && $UBUNTU_VERSION == "20.04" || $DOCKER && $UBUNTU_VERSION == "20.04" ]]; then
   sudo add-apt-repository -y ppa:mhier/libboost-latest && sudo apt update && sudo apt-get -y install build-essential cmake-data  \
