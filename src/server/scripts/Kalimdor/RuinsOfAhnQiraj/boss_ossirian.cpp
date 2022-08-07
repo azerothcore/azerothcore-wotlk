@@ -66,17 +66,17 @@ enum Events
 uint8 const NUM_CRYSTALS = 11;
 Position CrystalCoordinates[NUM_CRYSTALS] =
 {
+    { -9388.4404296875f, 1940.20996093750f, 85.6390991210937f, 3.17650008201599f },
+    { -9357.8603515625f, 1929.07995605469f, 85.6390991210937f, 1.06465005874634f },
+    { -9383.2900390625f, 2012.68005371094f, 85.6511001586914f, 2.93214988708496f },
+    { -9248.4101562500f, 1974.82995605469f, 85.6390991210937f, 5.89920997619629f },
     { -9432.4003906250f, 1782.53002929687f, 85.6390991210937f, 5.86430978775024f },
     { -9299.7304687500f, 1748.44995117187f, 85.6390991210937f, 1.44861996173859f },
     { -9406.0996093750f, 1862.38000488281f, 85.6390991210937f, 6.23082017898560f },
-    { -9248.4101562500f, 1974.82995605469f, 85.6390991210937f, 5.89920997619629f },
     { -9506.1904296875f, 1865.56994628906f, 85.6390991210937f, 4.27606010437012f },
-    { -9383.2900390625f, 2012.68005371094f, 85.6511001586914f, 2.93214988708496f },
     { -9282.0800781250f, 1887.33996582031f, 85.6390991210937f, 2.00712990760803f },
     { -9244.4101562500f, 1808.97998046875f, 85.6390991210937f, 5.63741016387939f },
-    { -9357.8603515625f, 1929.07995605469f, 85.6390991210937f, 1.06465005874634f },
-    { -9367.1699218750f, 1780.89001464844f, 85.6390991210937f, 1.90241003036499f },
-    { -9188.4404296875f, 1940.20996093750f, 85.6390991210937f, 3.17650008201599f }
+    { -9367.1699218750f, 1780.89001464844f, 85.6390991210937f, 1.90241003036499f }
 };
 
 Position initialCrystalPosition = { -9407.7197265625f, 1960.2099609375f, 85.6390991210937f, 1.11700999736786f };
@@ -95,9 +95,19 @@ struct boss_ossirian : public BossAI
         _saidIntro = false;
     }
 
-    void InitializeAI() override
+    void Reset() override
     {
-        if (Creature* trigger = me->GetMap()->SummonCreature(NPC_OSSIRIAN_TRIGGER, initialCrystalPosition))
+        BossAI::Reset();
+
+        Creature* trigger = me->GetMap()->GetCreature(_triggerGUID[0]);
+        if (trigger)
+        {
+            trigger->DespawnOrUnsummon();
+            if (GameObject* crystal = me->GetMap()->GetGameObject(_crystalGUID[0]))
+                crystal->Delete();
+        }
+
+        if (trigger = me->GetMap()->SummonCreature(NPC_OSSIRIAN_TRIGGER, initialCrystalPosition))
         {
             _triggerGUID[0] = trigger->GetGUID();
             if (GameObject* crystal = trigger->SummonGameObject(GO_OSSIRIAN_CRYSTAL,
@@ -108,21 +118,8 @@ struct boss_ossirian : public BossAI
             {
                 _crystalGUID[0] = crystal->GetGUID();
                 crystal->SetOwnerGUID(ObjectGuid::Empty);
-                crystal->SetSpellId(0);
                 crystal->RemoveGameObjectFlag(GO_FLAG_IN_USE);
             }
-        }
-
-        Reset();
-    }
-
-    void Reset() override
-    {
-        BossAI::Reset();
-
-        if (GameObject* initialCrystal = me->GetMap()->GetGameObject(_crystalGUID[0]))
-        {
-            initialCrystal->RemoveGameObjectFlag(GO_FLAG_IN_USE);
         }
 
         _crystalIterator = 0;
