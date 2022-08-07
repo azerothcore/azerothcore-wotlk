@@ -415,7 +415,7 @@ enum TotemCategoryType
 // SummonProperties.dbc, col 1
 enum SummonPropGroup
 {
-    SUMMON_PROP_GROUP_NONE           = 0,                   // 1160 spells in 3.0.3                     TODO: Needs implementation
+    SUMMON_PROP_GROUP_NONE           = 0,                   // 1160 spells in 3.0.3
     SUMMON_PROP_GROUP_GUARDIAN       = 1,                   // 861 spells in 3.0.3                      TODO: Needs implementation
     SUMMON_PROP_GROUP_PETS           = 2,                   // 52 spells in 3.0.3, pets mostly          TODO: Needs implementation
     SUMMON_PROP_GROUP_CONTROLLABLE   = 3,                   // 13 spells in 3.0.3, mostly controllable  TODO: Needs implementation
@@ -425,7 +425,7 @@ enum SummonPropGroup
 // SummonProperties.dbc, col 5
 enum SummonPropFlags
 {
-    SUMMON_PROP_FLAG_NONE                            = 0x00000000,          // 1342 spells in 3.0.3                                                                       TODO: Needs implementation
+    SUMMON_PROP_FLAG_NONE                            = 0x00000000,          // 1342 spells in 3.0.3
     SUMMON_PROP_FLAG_ATTACK_SUMMONER                 = 0x00000001,          // 75 spells in 3.0.3, something unfriendly                                                   TODO: Needs implementation
     SUMMON_PROP_FLAG_ASSIST_COMBAT_SUMMON            = 0x00000002,          // 616 spells in 3.0.3, something friendly                                                    TODO: Needs implementation
     SUMMON_PROP_FLAG_USE_LEVEL_OFFSET                = 0x00000004,          // 22 spells in 3.0.3, no idea...                                                             TODO: Needs implementation
