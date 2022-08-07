@@ -41,7 +41,7 @@ enum DataTypes
     DATA_YEGGETH            = 12,
     DATA_PAKKON             = 13,
     DATA_ZERRAN             = 14,
-    DATA_ANDRONOV           = 15,
+    DATA_ANDOROV            = 15,
 
     DATA_ENGAGED_FORMATION  = 1
 };
@@ -73,7 +73,7 @@ enum Creatures
     NPC_YEGGETH                 = 15386,
     NPC_PAKKON                  = 15388,
     NPC_ZERRAN                  = 15385,
-    NPC_ANDRONOV                = 15471,
+    NPC_ANDOROV                 = 15471,
     NPC_KALDOREI_ELITE          = 15473
 };
 

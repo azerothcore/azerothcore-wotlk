@@ -76,8 +76,12 @@ public:
         void OnPlayerEnter(Player* player) override
         {
             if (GetBossState(DATA_KURINNAXX) == DONE && GetBossState(DATA_RAJAXX) != DONE)
-                if (!_andronovGUID)
-                    player->SummonCreature(NPC_ANDRONOV, -8877.254883f, 1645.267578f, 21.386303f, 4.669808f, TEMPSUMMON_CORPSE_DESPAWN, 600000000);
+            {
+                if (!_andorovGUID)
+                {
+                    player->SummonCreature(NPC_ANDOROV, -8877.254883f, 1645.267578f, 21.386303f, 4.669808f, TEMPSUMMON_CORPSE_DESPAWN, 600000000);
+                }
+            }
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -101,8 +105,8 @@ public:
                 case NPC_OSSIRIAN:
                     _ossirianGUID = creature->GetGUID();
                     break;
-                case NPC_ANDRONOV:
-                    _andronovGUID = creature->GetGUID();
+                case NPC_ANDOROV:
+                    _andorovGUID = creature->GetGUID();
                     break;
             }
         }
@@ -198,8 +202,8 @@ public:
                     return _ossirianGUID;
                 case DATA_PARALYZED:
                     return _paralyzedGUID;
-                case DATA_ANDRONOV:
-                    return _andronovGUID;
+                case DATA_ANDOROV:
+                    return _andorovGUID;
             }
 
             return ObjectGuid::Empty;
@@ -264,7 +268,15 @@ public:
 
                 if (nextLeader->IsAlive())
                 {
-                    nextLeader->SetInCombatWithZone();
+                    Creature* generalAndorov = instance->GetCreature(_andorovGUID);
+                    if (generalAndorov && generalAndorov->IsAlive() && generalAndorov->AI()->GetData(DATA_ANDOROV))
+                    {
+                        nextLeader->AI()->AttackStart(generalAndorov);
+                    }
+                    else
+                    {
+                        nextLeader->SetInCombatWithZone();
+                    }
                 }
                 else
                 {
@@ -295,7 +307,7 @@ public:
         ObjectGuid _buruGUID;
         ObjectGuid _ossirianGUID;
         ObjectGuid _paralyzedGUID;
-        ObjectGuid _andronovGUID;
+        ObjectGuid _andorovGUID;
         uint32 _rajaxWaveCounter;
         TaskScheduler _scheduler;
     };
