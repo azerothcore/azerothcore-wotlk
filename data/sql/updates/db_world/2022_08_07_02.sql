@@ -1,3 +1,4 @@
+-- DB update 2022_08_07_01 -> 2022_08_07_02
 --
 DELETE FROM `creature_formations` WHERE `leaderguid` IN (144466, 144476, 144473, 144469, 144481, 144470, 144452, 144456, 144454);
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES 
