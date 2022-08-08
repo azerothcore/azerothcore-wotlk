@@ -22,40 +22,47 @@
 
 enum Spells
 {
-    SPELL_STINGER_SPRAY         =  25749,
-    SPELL_POISON_STINGER        =  25748,
-    SPELL_PARALYZE              =  25725,
-    SPELL_FRENZY                =  8269,
-    SPELL_LASH                  =  25852,
-    SPELL_FEED                  =  25721
+    SPELL_STINGER_SPRAY  = 25749,
+    SPELL_POISON_STINGER = 25748,
+    SPELL_PARALYZE       = 25725,
+    SPELL_FRENZY         = 8269,
+    SPELL_LASH           = 25852,
+    SPELL_FEED           = 25721,
+
+    // Server-side spells
+    SPELL_SUMMON_LARVA_A = 26538,
+    SPELL_SUMMON_LARVA_B = 26539,
+    SPELL_LARVA_AGGRO_EFFECT = 25724, // Unknown purpose
+    SPELL_LARVA_FEAR_EFFECT  = 25726, // Unknown purpose
+    
 };
 
 enum Events
 {
-    EVENT_STINGER_SPRAY         = 1,
-    EVENT_POISON_STINGER        = 2,
-    EVENT_SUMMON_SWARMER        = 3,
-    EVENT_SWARMER_ATTACK        = 4,
-    EVENT_PARALYZE              = 5,
-    EVENT_LASH                  = 6
+    EVENT_STINGER_SPRAY  = 1,
+    EVENT_POISON_STINGER = 2,
+    EVENT_SUMMON_SWARMER = 3,
+    EVENT_SWARMER_ATTACK = 4,
+    EVENT_PARALYZE       = 5,
+    EVENT_LASH           = 6
 };
 
 enum Emotes
 {
-    EMOTE_FRENZY                =  0
+    EMOTE_FRENZY         =  0
 };
 
 enum Phases
 {
-    PHASE_AIR                   = 0,
-    PHASE_GROUND                = 1
+    PHASE_AIR            = 0,
+    PHASE_GROUND         = 1
 };
 
 enum Points
 {
-    POINT_AIR                   = 0,
-    POINT_GROUND                = 1,
-    POINT_PARALYZE              = 2
+    POINT_AIR            = 0,
+    POINT_GROUND         = 1,
+    POINT_PARALYZE       = 2
 };
 
 const Position AyamissAirPos =  { -9689.292f, 1547.912f, 48.02729f, 0.0f };
