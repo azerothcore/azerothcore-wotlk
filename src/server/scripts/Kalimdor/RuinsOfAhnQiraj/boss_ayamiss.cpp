@@ -186,7 +186,7 @@ struct boss_ayamiss : public BossAI
             case EVENT_PARALYZE:
                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0, true))
                 {
-                    DoCast(target, SPELL_PARALYZE);
+                    DoCast(target, SPELL_PARALYZE, true);
                     instance->SetGuidData(DATA_PARALYZED, target->GetGUID());
                     DoCastAOE(RAND(SPELL_SUMMON_LARVA_A, SPELL_SUMMON_LARVA_B), true);
                 }
