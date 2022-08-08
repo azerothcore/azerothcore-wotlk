@@ -61,7 +61,7 @@ enum Phases
 enum Points
 {
     POINT_AIR            = 0,
-    POINT_GROUND         = 1,
+    POINT_GROUND         = 2,
     POINT_PARALYZE       = 2
 };
 
@@ -77,7 +77,7 @@ const Position LarvaPos[2] =
 
 struct boss_ayamiss : public BossAI
 {
-    boss_ayamiss(Creature* creature) : BossAI(creature, DATA_AYAMISS) {}
+    boss_ayamiss(Creature* creature) : BossAI(creature, DATA_AYAMISS) { homePos = creature->GetHomePosition(); }
 
     void Reset() override
     {
@@ -110,23 +110,29 @@ struct boss_ayamiss : public BossAI
 
     void MovementInform(uint32 type, uint32 id) override
     {
-        if (type == POINT_MOTION_TYPE)
+        if (type == POINT_MOTION_TYPE && id == POINT_AIR)
         {
-            switch (id)
+            me->AddUnitState(UNIT_STATE_ROOT);
+        }
+        else if (type == WAYPOINT_MOTION_TYPE && id == POINT_GROUND)
+        {
+            SetCombatMovement(true);
+            me->m_Events.AddEventAtOffset([this]()
             {
-                case POINT_AIR:
-                    me->AddUnitState(UNIT_STATE_ROOT);
-                    break;
-                case POINT_GROUND:
+                me->GetMotionMaster()->Clear();
+                if (me->GetVictim())
+                {
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
-                    break;
-            }
+                }
+
+            }, 1s);
         }
     }
 
     void EnterEvadeMode(EvadeReason why) override
     {
         me->ClearUnitState(UNIT_STATE_ROOT);
+        me->SetHomePosition(homePos);
         BossAI::EnterEvadeMode(why);
     }
 
@@ -143,25 +149,21 @@ struct boss_ayamiss : public BossAI
         me->GetMotionMaster()->MovePoint(POINT_AIR, AyamissAirPos);
     }
 
-    void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
-        if (_phase == PHASE_AIR && me->GetHealthPct() < 70.0f)
+        if (_phase == PHASE_AIR && me->HealthBelowPctDamaged(70, damage))
         {
             _phase = PHASE_GROUND;
-            SetCombatMovement(true);
             me->ClearUnitState(UNIT_STATE_ROOT);
             me->SetCanFly(false);
             me->SetDisableGravity(false);
-            if (Unit* victim = me->GetVictim())
-            {
-                Position victimPos = victim->GetPosition();
-                me->GetMotionMaster()->MovePoint(POINT_GROUND, victimPos);
-            }
+            me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
             events.ScheduleEvent(EVENT_LASH, 5s, 8s);
             events.CancelEvent(EVENT_POISON_STINGER);
             DoResetThreat();
         }
-        if (!_enraged && me->GetHealthPct() < 20.0f)
+
+        if (!_enraged && me->HealthBelowPctDamaged(20, damage))
         {
             DoCastSelf(SPELL_FRENZY);
             Talk(EMOTE_FRENZY);
@@ -230,6 +232,7 @@ private:
     GuidList _swarmers;
     uint8 _phase;
     bool _enraged;
+    Position homePos;
 };
 
 struct npc_hive_zara_larva : public ScriptedAI
