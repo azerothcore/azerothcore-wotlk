@@ -34,7 +34,6 @@ enum Spells
     SPELL_SUMMON_LARVA_B = 26539,
     SPELL_LARVA_AGGRO_EFFECT = 25724, // Unknown purpose
     SPELL_LARVA_FEAR_EFFECT  = 25726, // Unknown purpose
-    
 };
 
 enum Events
