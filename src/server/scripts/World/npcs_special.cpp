@@ -220,8 +220,6 @@ enum fishingExtravaganzaWorldStates
 
 enum riggleBassbait
 {
-    EVENT_RIGGLE_CHECK_TOURNAMENT_STATE = 1,
-
     RIGGLE_SAY_START                    = 0,
     RIGGLE_SAY_POOLS_END                = 1,
     RIGGLE_SAY_WINNER                   = 2,
@@ -244,7 +242,7 @@ public:
     {
         npc_riggle_bassbaitAI(Creature* c) : ScriptedAI(c)
         {
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+            m_uiTimer = 0;
             auto prevWinTime = sWorld->getWorldState(STV_FISHING_PREV_WIN_TIME);
             if (time(nullptr) - prevWinTime > DAY)
             {
@@ -253,61 +251,62 @@ public:
                 sWorld->setWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN, 0);
                 sWorld->setWorldState(STV_FISHING_ANNOUNCE_POOLS_DESPAN, 0);
             }
-            events.Reset();
-            events.ScheduleEvent(EVENT_RIGGLE_CHECK_TOURNAMENT_STATE, 1000, 1, 0);;
         }
 
-        EventMap events;
+        uint32 m_uiTimer;
+
+        void CheckTournamentState() const
+        {
+            if (sGameEventMgr->IsActiveEvent(GAME_EVENT_FISHING_TURN_INS) && !sWorld->getWorldState(STV_FISHING_HAS_WINNER))
+            {
+                if (!me->IsQuestGiver())
+                {
+                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                    if (!sWorld->getWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN))
+                    {
+                        sCreatureTextMgr->SendChat(me, RIGGLE_SAY_START, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
+                        sWorld->setWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN, 1);
+                    }
+                }
+            }
+            else
+            {
+                if (me->IsQuestGiver())
+                {
+                    me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                }
+            }
+            if (sGameEventMgr->IsActiveEvent(GAME_EVENT_FISHING_POOLS))
+            {
+                // enable announcement: when pools despawn
+                sWorld->setWorldState(STV_FISHING_ANNOUNCE_POOLS_DESPAN, 1);
+            }
+            else
+            {
+                if (sWorld->getWorldState(STV_FISHING_ANNOUNCE_POOLS_DESPAN))
+                {
+                    sCreatureTextMgr->SendChat(me, RIGGLE_SAY_POOLS_END, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
+                    sWorld->setWorldState(STV_FISHING_ANNOUNCE_POOLS_DESPAN, 0);
+                }
+            }
+        }
 
         void UpdateAI(uint32 diff) override
         {
-            events.Update(diff);
-            switch (events.ExecuteEvent())
+            if (m_uiTimer < diff)
             {
-                case EVENT_RIGGLE_CHECK_TOURNAMENT_STATE:
-                {
-                    if (sGameEventMgr->IsActiveEvent(GAME_EVENT_FISHING_TURN_INS) && !sWorld->getWorldState(STV_FISHING_HAS_WINNER))
-                    {
-                        if (!me->IsQuestGiver())
-                        {
-                            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                            if (!sWorld->getWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN))
-                            {
-                                sCreatureTextMgr->SendChat(me, RIGGLE_SAY_START, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
-                                sWorld->setWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN, 1);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (me->IsQuestGiver())
-                        {
-                            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                        }
-                    }
-                    if (sGameEventMgr->IsActiveEvent(GAME_EVENT_FISHING_POOLS))
-                    {
-                        // enable announcement: when pools despawn
-                        sWorld->setWorldState(STV_FISHING_ANNOUNCE_POOLS_DESPAN, 1);
-                    }
-                    else
-                    {
-                        if (sWorld->getWorldState(STV_FISHING_ANNOUNCE_POOLS_DESPAN))
-                        {
-                            sCreatureTextMgr->SendChat(me, RIGGLE_SAY_POOLS_END, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
-                            sWorld->setWorldState(STV_FISHING_ANNOUNCE_POOLS_DESPAN, 0);
-                        }
-                    }
-                events.RepeatEvent(1000);
-                break;
-                }
+                CheckTournamentState();
+                m_uiTimer = 1000;
+            }
+            else
+            {
+                m_uiTimer -= diff;
             }
         }
     };
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-
         if (creature->IsQuestGiver())
         {
             player->PrepareQuestMenu(creature->GetGUID());
@@ -321,7 +320,6 @@ public:
         {
             SendGossipMenuFor(player, GOSSIP_TEXT_EVENT_ACTIVE, creature->GetGUID());
         }
-
         return true;
     }
 
@@ -345,7 +343,6 @@ public:
 
 enum jang
 {
-    EVENT_JANG_CHECK_TOURNAMENT_STATE = 1,
     GOSSIP_TEXT_SECOND_PRICE          = 7696
 };
 
@@ -358,37 +355,39 @@ public:
     {
         npc_jangAI(Creature* c) : ScriptedAI(c)
         {
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-            events.Reset();
-            events.ScheduleEvent(EVENT_JANG_CHECK_TOURNAMENT_STATE, 1000, 1, 0);
+            m_uiTimer = 0;
         }
 
-        EventMap events;
+        uint32 m_uiTimer;
+
+        void CheckTournamentState() const
+        {
+            if (sGameEventMgr->IsActiveEvent(GAME_EVENT_FISHING_TURN_INS) && sWorld->getWorldState(STV_FISHING_HAS_WINNER))
+            {
+                if (!me->IsQuestGiver())
+                {
+                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                }
+            }
+            else
+            {
+                if (me->IsQuestGiver())
+                {
+                    me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                }
+            }
+        }
 
         void UpdateAI(uint32 diff) override
         {
-            events.Update(diff);
-            switch (events.ExecuteEvent())
+            if (m_uiTimer < diff)
             {
-                case EVENT_JANG_CHECK_TOURNAMENT_STATE:
-                {
-                    if (sGameEventMgr->IsActiveEvent(GAME_EVENT_FISHING_TURN_INS) && sWorld->getWorldState(STV_FISHING_HAS_WINNER))
-                    {
-                        if (!me->IsQuestGiver())
-                        {
-                            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                        }
-                    }
-                    else
-                    {
-                        if (me->IsQuestGiver())
-                        {
-                            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                        }
-                    }
-                    events.RepeatEvent(1000);
-                    break;
-                }
+                CheckTournamentState();
+                m_uiTimer = 1000;
+            }
+            else
+            {
+                m_uiTimer -= diff;
             }
         }
     };
@@ -399,6 +398,7 @@ public:
         {
             player->PrepareQuestMenu(creature->GetGUID());
         }
+        // TODO: remove gossip when event has a winner (sWorld->getWorldState(STV_FISHING_HAS_WINNER))
         SendGossipMenuFor(player, GOSSIP_TEXT_SECOND_PRICE, creature->GetGUID());
         return true;
     }
