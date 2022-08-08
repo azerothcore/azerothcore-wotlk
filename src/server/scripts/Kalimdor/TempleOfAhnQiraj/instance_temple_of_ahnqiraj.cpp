@@ -30,7 +30,8 @@ EndScriptData */
 ObjectData const creatureData[] =
 {
     { NPC_SARTURA, DATA_SARTURA },
-    { NPC_EYE_OF_CTHUN, DATA_EYE_OF_CTHUN }
+    { NPC_EYE_OF_CTHUN, DATA_EYE_OF_CTHUN },
+    { NPC_OURO_SPAWNER, DATA_OURO_SPAWNER }
 };
 
 class instance_temple_of_ahnqiraj : public InstanceMapScript
@@ -101,6 +102,10 @@ public:
                     break;
                 case NPC_VISCIDUS:
                     ViscidusGUID = creature->GetGUID();
+                    break;
+                case NPC_OURO_SPAWNER:
+                    if (GetBossState(DATA_OURO) != DONE)
+                        creature->Respawn();
                     break;
             }
 

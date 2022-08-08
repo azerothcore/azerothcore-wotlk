@@ -330,6 +330,7 @@ public:
 
     void DoMeleeAttackIfReady();
     bool DoSpellAttackIfReady(uint32 spell);
+    void DoSpellAttackToRandomTargetIfReady(uint32 spell, uint32 threatTablePosition = 0, float dist = 0.f, bool playerOnly = true);
 
     static AISpellInfoType* AISpellInfo;
     static void FillAISpellInfo();
