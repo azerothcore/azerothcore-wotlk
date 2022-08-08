@@ -168,7 +168,7 @@ class spell_pagles_point_cast : public SpellScript
         {
             if (InstanceScript* instanceScript = caster->GetInstanceScript())
             {
-                if (!instanceScript->GetData(DATA_GAHZRANKA))
+                if (!instanceScript->GetData(DATA_GAHZRANKA) && !caster->FindNearestCreature(NPC_GAHZRANKA, 50.0f))
                 {
                     caster->m_Events.AddEventAtOffset([caster]()
                     {
