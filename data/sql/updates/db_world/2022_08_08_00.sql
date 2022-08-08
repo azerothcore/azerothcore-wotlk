@@ -1,3 +1,4 @@
+-- DB update 2022_08_07_07 -> 2022_08_08_00
 --
 -- Pathing for Sand Vortex Entry: 15428
 SET @NPC := 144680;
