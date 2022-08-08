@@ -14245,16 +14245,9 @@ void Player::_SaveEntryPoint(CharacterDatabaseTransaction trans)
     stmt->SetData (3, m_entryPointData.joinPos.GetPositionZ());
     stmt->SetData (4, m_entryPointData.joinPos.GetOrientation());
     stmt->SetData(5, m_entryPointData.joinPos.GetMapId());
-
-    std::ostringstream ss("");
-    if (m_entryPointData.HasTaxiPath())
-    {
-        for (size_t i = 0; i < m_entryPointData.taxiPath.size(); ++i)
-            ss << m_entryPointData.taxiPath[i] << ' '; // xinef: segment is stored as last point
-    }
-
-    stmt->SetData(6, ss.str());
-    stmt->SetData(7, m_entryPointData.mountSpell);
+    stmt->SetData(6, m_entryPointData.taxiPath[0]);
+    stmt->SetData(7, m_entryPointData.taxiPath[1]);
+    stmt->SetData(8, m_entryPointData.mountSpell);
     trans->Append(stmt);
 }
 
