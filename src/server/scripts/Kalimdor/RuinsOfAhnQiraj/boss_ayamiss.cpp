@@ -69,11 +69,6 @@ const Position AyamissAirPos =  { -9689.292f, 1547.912f, 48.02729f, 0.0f };
 const Position AltarPos =       { -9717.18f, 1517.72f, 27.4677f, 0.0f };
 /// @todo These below are probably incorrect, taken from SD2
 const Position SwarmerPos =     { -9647.352f, 1578.062f, 55.32f, 0.0f };
-const Position LarvaPos[2] =
-{
-    { -9674.4707f, 1528.4133f, 22.457f, 0.0f },
-    { -9701.6005f, 1566.9993f, 24.118f, 0.0f }
-};
 
 struct boss_ayamiss : public BossAI
 {
@@ -119,7 +114,6 @@ struct boss_ayamiss : public BossAI
             SetCombatMovement(true);
             me->m_Events.AddEventAtOffset([this]()
             {
-                me->GetMotionMaster()->Clear();
                 if (me->GetVictim())
                 {
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
@@ -194,8 +188,7 @@ struct boss_ayamiss : public BossAI
                 {
                     DoCast(target, SPELL_PARALYZE);
                     instance->SetGuidData(DATA_PARALYZED, target->GetGUID());
-                    uint8 index = urand(0, 1);
-                    me->SummonCreature(NPC_LARVA, LarvaPos[index], TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000);
+                    DoCastAOE(RAND(SPELL_SUMMON_LARVA_A, SPELL_SUMMON_LARVA_B), true);
                 }
                 events.ScheduleEvent(EVENT_PARALYZE, 15s);
                 break;
