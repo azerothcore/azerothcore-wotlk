@@ -207,8 +207,13 @@ struct boss_ayamiss : public BossAI
                 break;
             case EVENT_SUMMON_SWARMER:
             {
-                Position Pos = me->GetRandomPoint(SwarmerPos, 80.0f);
-                me->SummonCreature(NPC_SWARMER, Pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
+                Position const offset = { 0.0f, 0.0f, 20.0f, 0.0f };
+                Position spawnpos = me->GetRandomPoint(SwarmerPos, 80.0f);
+                spawnpos.RelocateOffset(offset);
+                if (Creature* wasp = me->SummonCreature(NPC_SWARMER, spawnpos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
+                {
+                    wasp->GetMotionMaster()->MoveRandom(10.0f);
+                }
                 events.ScheduleEvent(EVENT_SUMMON_SWARMER, 5s);
                 break;
             }
