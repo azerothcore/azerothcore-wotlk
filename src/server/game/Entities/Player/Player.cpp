@@ -13895,20 +13895,24 @@ void Player::ResummonPetTemporaryUnSummonedIfAny()
 
 bool Player::CanResummonPet(uint32 spellid)
 {
-    if (getClass() == CLASS_DEATH_KNIGHT)
+    switch (getClass())
     {
+    case CLASS_DEATH_KNIGHT:
         if (CanSeeDKPet())
             return true;
         else if (spellid == 52150)
             return false;
-    }
-    else if (getClass() == CLASS_HUNTER || getClass() == CLASS_MAGE || getClass() == CLASS_WARLOCK)
+        break;
+    case CLASS_MAGE:
+        if (HasSpell(31687) && HasAura(70937))
+            return true;
+        break;
+    case CLASS_HUNTER:
+    case CLASS_WARLOCK:
         return true;
+    }
 
-    if (!HasSpell(spellid))
-        return false;
-
-    return true;
+    return HasSpell(spellid);
 }
 
 bool Player::CanSeeSpellClickOn(Creature const* c) const
