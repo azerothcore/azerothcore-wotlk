@@ -14,3 +14,7 @@ DELETE FROM `spell_target_position` WHERE `ID` IN (26538, 26539);
 INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `Orientation`, `VerifiedBuild`) VALUES
 (26538, 0, 509, -9678.29, 1526.39, 24.403833,0,0),
 (26539, 0, 509, -9709, 1551.2, 23.988834, 0, 0);
+
+DELETE FROM `creature_template_movement` WHERE `CreatureId` = 15546;
+INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
+(15546, 1, 0, 1, 0, 0, NULL);
