@@ -315,8 +315,6 @@ void FlightPathMovementGenerator::LoadPath(Player* player)
             bool passedPreviousSegmentProximityCheck = false;
             for (uint32 i = 0; i < nodes.size(); ++i)
             {
-                sMapMgr->CreateMap(nodes[i]->mapid, player)->SummonCreature(1, { nodes[i]->x, nodes[i]->y, nodes[i]->z, 0.0f })->SetLevel(i ? i : 1);
-
                 if (passedPreviousSegmentProximityCheck || !src || i_path.empty() || IsNodeIncludedInShortenedPath(i_path[i_path.size() - 1], nodes[i]))
                 {
                     if ((!src || (IsNodeIncludedInShortenedPath(start, nodes[i]) && i >= 2)) &&
@@ -349,7 +347,6 @@ void FlightPathMovementGenerator::DoFinalize(Player* player)
     // remove flag to prevent send object build movement packets for flight state and crash (movement generator already not at top of stack)
     player->ClearUnitState(UNIT_STATE_IN_FLIGHT);
 
-    uint32 taxiNodeId = player->m_taxi.GetTaxiDestination();
     player->m_taxi.ClearTaxiDestinations();
     player->Dismount();
     player->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_TAXI_FLIGHT);
@@ -363,11 +360,7 @@ void FlightPathMovementGenerator::DoFinalize(Player* player)
         player->StopMoving();
 
         // When the player reaches the last flight point, teleport to destination taxi node location
-        if (TaxiNodesEntry const* node = sTaxiNodesStore.LookupEntry(taxiNodeId))
-        {
-            player->SetFallInformation(GameTime::GetGameTime().count(), player->GetPositionZ());
-            player->TeleportTo(node->map_id, node->x, node->y, node->z, player->GetOrientation());
-        }
+        player->SetFallInformation(GameTime::GetGameTime().count(), player->GetPositionZ());
     }
 
     player->RemovePlayerFlag(PLAYER_FLAGS_TAXI_BENCHMARK);

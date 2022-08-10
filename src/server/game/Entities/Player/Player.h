@@ -1035,11 +1035,11 @@ struct EntryPointData
     }
 
     uint32 mountSpell{0};
-    std::vector<uint32> taxiPath;
+    std::array<uint32, 2> taxiPath;
     WorldLocation joinPos;
 
-    void ClearTaxiPath()     { taxiPath.clear(); }
-    [[nodiscard]] bool HasTaxiPath() const { return !taxiPath.empty(); }
+    void ClearTaxiPath() { taxiPath.fill(0); }
+    [[nodiscard]] bool HasTaxiPath() const { return taxiPath[0] && taxiPath[1]; }
 };
 
 class Player : public Unit, public GridObject<Player>
@@ -2430,6 +2430,8 @@ public:
 
     bool CanTeleport() { return m_canTeleport; }
     void SetCanTeleport(bool value) { m_canTeleport = value; }
+    bool CanKnockback() { return m_canKnockback; }
+    void SetCanKnockback(bool value) { m_canKnockback = value; }
 
     bool isAllowedToLoot(Creature const* creature);
 
@@ -2883,6 +2885,7 @@ private:
     bool m_bMustDelayTeleport;
     bool m_bHasDelayedTeleport;
     bool m_canTeleport;
+    bool m_canKnockback;
 
     std::unique_ptr<PetStable> m_petStable;
 
