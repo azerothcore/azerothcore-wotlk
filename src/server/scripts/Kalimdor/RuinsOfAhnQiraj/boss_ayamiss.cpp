@@ -22,55 +22,56 @@
 
 enum Spells
 {
-    SPELL_STINGER_SPRAY         =  25749,
-    SPELL_POISON_STINGER        =  25748,
-    SPELL_PARALYZE              =  25725,
-    SPELL_FRENZY                =  8269,
-    SPELL_LASH                  =  25852,
-    SPELL_FEED                  =  25721
+    SPELL_STINGER_SPRAY  = 25749,
+    SPELL_POISON_STINGER = 25748,
+    SPELL_PARALYZE       = 25725,
+    SPELL_FRENZY         = 8269,
+    SPELL_LASH           = 25852,
+    SPELL_FEED           = 25721,
+
+    // Server-side spells
+    SPELL_SUMMON_LARVA_A = 26538,
+    SPELL_SUMMON_LARVA_B = 26539,
+    SPELL_LARVA_AGGRO_EFFECT = 25724, // Unknown purpose
+    SPELL_LARVA_FEAR_EFFECT  = 25726, // Unknown purpose
 };
 
 enum Events
 {
-    EVENT_STINGER_SPRAY         = 1,
-    EVENT_POISON_STINGER        = 2,
-    EVENT_SUMMON_SWARMER        = 3,
-    EVENT_SWARMER_ATTACK        = 4,
-    EVENT_PARALYZE              = 5,
-    EVENT_LASH                  = 6
+    EVENT_STINGER_SPRAY  = 1,
+    EVENT_POISON_STINGER = 2,
+    EVENT_SUMMON_SWARMER = 3,
+    EVENT_SWARMER_ATTACK = 4,
+    EVENT_PARALYZE       = 5,
+    EVENT_LASH           = 6
 };
 
 enum Emotes
 {
-    EMOTE_FRENZY                =  0
+    EMOTE_FRENZY         =  0
 };
 
 enum Phases
 {
-    PHASE_AIR                   = 0,
-    PHASE_GROUND                = 1
+    PHASE_AIR            = 0,
+    PHASE_GROUND         = 1
 };
 
 enum Points
 {
-    POINT_AIR                   = 0,
-    POINT_GROUND                = 1,
-    POINT_PARALYZE              = 2
+    POINT_AIR            = 0,
+    POINT_GROUND         = 2,
+    POINT_PARALYZE       = 2
 };
 
 const Position AyamissAirPos =  { -9689.292f, 1547.912f, 48.02729f, 0.0f };
 const Position AltarPos =       { -9717.18f, 1517.72f, 27.4677f, 0.0f };
 /// @todo These below are probably incorrect, taken from SD2
 const Position SwarmerPos =     { -9647.352f, 1578.062f, 55.32f, 0.0f };
-const Position LarvaPos[2] =
-{
-    { -9674.4707f, 1528.4133f, 22.457f, 0.0f },
-    { -9701.6005f, 1566.9993f, 24.118f, 0.0f }
-};
 
 struct boss_ayamiss : public BossAI
 {
-    boss_ayamiss(Creature* creature) : BossAI(creature, DATA_AYAMISS) {}
+    boss_ayamiss(Creature* creature) : BossAI(creature, DATA_AYAMISS) { homePos = creature->GetHomePosition(); }
 
     void Reset() override
     {
@@ -103,23 +104,28 @@ struct boss_ayamiss : public BossAI
 
     void MovementInform(uint32 type, uint32 id) override
     {
-        if (type == POINT_MOTION_TYPE)
+        if (type == POINT_MOTION_TYPE && id == POINT_AIR)
         {
-            switch (id)
+            me->AddUnitState(UNIT_STATE_ROOT);
+        }
+        else if (type == WAYPOINT_MOTION_TYPE && id == POINT_GROUND)
+        {
+            SetCombatMovement(true);
+            me->m_Events.AddEventAtOffset([this]()
             {
-                case POINT_AIR:
-                    me->AddUnitState(UNIT_STATE_ROOT);
-                    break;
-                case POINT_GROUND:
+                if (me->GetVictim())
+                {
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
-                    break;
-            }
+                }
+
+            }, 1s);
         }
     }
 
     void EnterEvadeMode(EvadeReason why) override
     {
         me->ClearUnitState(UNIT_STATE_ROOT);
+        me->SetHomePosition(homePos);
         BossAI::EnterEvadeMode(why);
     }
 
@@ -136,25 +142,21 @@ struct boss_ayamiss : public BossAI
         me->GetMotionMaster()->MovePoint(POINT_AIR, AyamissAirPos);
     }
 
-    void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
-        if (_phase == PHASE_AIR && me->GetHealthPct() < 70.0f)
+        if (_phase == PHASE_AIR && me->HealthBelowPctDamaged(70, damage))
         {
             _phase = PHASE_GROUND;
-            SetCombatMovement(true);
             me->ClearUnitState(UNIT_STATE_ROOT);
             me->SetCanFly(false);
             me->SetDisableGravity(false);
-            if (Unit* victim = me->GetVictim())
-            {
-                Position victimPos = victim->GetPosition();
-                me->GetMotionMaster()->MovePoint(POINT_GROUND, victimPos);
-            }
+            me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
             events.ScheduleEvent(EVENT_LASH, 5s, 8s);
             events.CancelEvent(EVENT_POISON_STINGER);
             DoResetThreat();
         }
-        if (!_enraged && me->GetHealthPct() < 20.0f)
+
+        if (!_enraged && me->HealthBelowPctDamaged(20, damage))
         {
             DoCastSelf(SPELL_FRENZY);
             Talk(EMOTE_FRENZY);
@@ -183,10 +185,9 @@ struct boss_ayamiss : public BossAI
             case EVENT_PARALYZE:
                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0, true))
                 {
-                    DoCast(target, SPELL_PARALYZE);
+                    DoCast(target, SPELL_PARALYZE, true);
                     instance->SetGuidData(DATA_PARALYZED, target->GetGUID());
-                    uint8 index = urand(0, 1);
-                    me->SummonCreature(NPC_LARVA, LarvaPos[index], TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000);
+                    DoCastAOE(RAND(SPELL_SUMMON_LARVA_A, SPELL_SUMMON_LARVA_B), true);
                 }
                 events.ScheduleEvent(EVENT_PARALYZE, 15s);
                 break;
@@ -206,8 +207,13 @@ struct boss_ayamiss : public BossAI
                 break;
             case EVENT_SUMMON_SWARMER:
             {
-                Position Pos = me->GetRandomPoint(SwarmerPos, 80.0f);
-                me->SummonCreature(NPC_SWARMER, Pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
+                Position const offset = { 0.0f, 0.0f, 20.0f, 0.0f };
+                Position spawnpos = me->GetRandomPoint(SwarmerPos, 80.0f);
+                spawnpos.RelocateOffset(offset);
+                if (Creature* wasp = me->SummonCreature(NPC_SWARMER, spawnpos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
+                {
+                    wasp->GetMotionMaster()->MoveRandom(10.0f);
+                }
                 events.ScheduleEvent(EVENT_SUMMON_SWARMER, 5s);
                 break;
             }
@@ -223,6 +229,7 @@ private:
     GuidList _swarmers;
     uint8 _phase;
     bool _enraged;
+    Position homePos;
 };
 
 struct npc_hive_zara_larva : public ScriptedAI
