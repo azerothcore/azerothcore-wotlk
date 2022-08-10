@@ -230,7 +230,7 @@ struct boss_ouro : public BossAI
         _enraged = false;
     }
 
-    void EnterEvadeMode(EvadeReason why) override
+    void EnterEvadeMode(EvadeReason /*why*/) override
     {
         DoCastSelf(SPELL_OURO_SUBMERGE_VISUAL);
         me->DespawnOrUnsummon(1000);
@@ -335,7 +335,7 @@ struct npc_dirt_mound : ScriptedAI
         DoCastSelf(SPELL_QUAKE, true);
     }
 
-    void EnterEvadeMode(EvadeReason why) override
+    void EnterEvadeMode(EvadeReason /*why*/) override
     {
         if (_instance)
         {
