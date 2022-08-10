@@ -182,6 +182,27 @@ public:
                     break;
             }
         }
+
+        bool SetBossState(uint32 type, EncounterState state) override
+        {
+            if (!InstanceScript::SetBossState(type, state))
+                return false;
+
+            switch (type)
+            {
+                case DATA_OURO:
+                    if (state == FAIL)
+                    {
+                        if (Creature* ouroSpawner = GetCreature(DATA_OURO))
+                            ouroSpawner->Respawn();
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            return true;
+        }
     };
 };
 

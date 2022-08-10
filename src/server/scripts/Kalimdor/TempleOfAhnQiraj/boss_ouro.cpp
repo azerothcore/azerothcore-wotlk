@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "TaskScheduler.h"
@@ -28,6 +29,8 @@ enum Spells
     SPELL_GROUND_RUPTURE        = 26100,
     SPELL_BERSERK               = 26615,
     SPELL_BOULDER               = 26616,
+    SPELL_OURO_SUBMERGE_VISUAL  = 26063,
+    SPELL_SUMMON_SANDWORM_BASE  = 26133,
 
     // Misc - Mounds, Ouro Spawner
     SPELL_BIRTH                 = 26586,
@@ -35,14 +38,20 @@ enum Spells
     SPELL_SUMMON_OURO           = 26061,
     SPELL_SUMMON_OURO_MOUNDS    = 26058,
     SPELL_QUAKE                 = 26093,
-    SPELL_SUMMON_SCARABS        = 26060
+    SPELL_SUMMON_SCARABS        = 26060,
+    SPELL_SUMMON_OURO_AURA      = 26642,
+    SPELL_DREAM_FOG             = 24780
 };
 
 enum Misc
 {
     GROUP_EMERGED               = 0,
     GROUP_PHASE_TRANSITION      = 1,
-    GROUP_SUBMERGED             = 2,
+
+    NPC_DIRT_MOUND              = 15712,
+    GO_SANDWORM_BASE            = 180795,
+
+    DATA_OURO_HEALTH            = 0
 };
 
 struct npc_ouro_spawner : public ScriptedAI
@@ -78,7 +87,6 @@ struct npc_ouro_spawner : public ScriptedAI
         if (creature->GetEntry() == NPC_OURO)
         {
             creature->SetInCombatWithZone();
-            creature->CastSpell(creature, SPELL_BIRTH, false);
             me->DespawnOrUnsummon();
         }
     }
@@ -100,57 +108,77 @@ struct boss_ouro : public BossAI
             DoCastSelf(SPELL_BERSERK, true);
             _enraged = true;
             _scheduler.CancelGroup(GROUP_PHASE_TRANSITION);
+            _scheduler.Schedule(1s, [this](TaskContext context)
+                {
+                    if (!IsPlayerWithinMeleeRange())
+                        DoSpellAttackToRandomTargetIfReady(SPELL_BOULDER);
+
+                    context.Repeat();
+                });
         }
     }
 
     void Submerge()
     {
-        me->HandleEmoteCommand(EMOTE_ONESHOT_SUBMERGE);
-        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
-        _scheduler.CancelGroup(GROUP_EMERGED);
-        _scheduler.CancelGroup(GROUP_PHASE_TRANSITION);
-        me->SetReactState(REACT_PASSIVE);
         me->AttackStop();
+        me->SetReactState(REACT_PASSIVE);
+        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
         _submergeMelee = 0;
         _submerged = true;
+        DoCastSelf(SPELL_OURO_SUBMERGE_VISUAL);
+        _scheduler.CancelGroup(GROUP_EMERGED);
+        _scheduler.CancelGroup(GROUP_PHASE_TRANSITION);
 
-        _scheduler.Schedule(20s, [this](TaskContext /*context*/)
+        if (GameObject* base = me->FindNearestGameObject(GO_SANDWORM_BASE, 10.f))
+        {
+            base->Use(me);
+        }
+
+        DoCastSelf(SPELL_SUMMON_OURO_MOUNDS, true);
+        // According to sniffs, Ouro uses his mounds to respawn. The health management could be a little scuffed.
+        std::list<Creature*> ouroMounds;
+        me->GetCreatureListWithEntryInGrid(ouroMounds, NPC_DIRT_MOUND, 200.f);
+        if (!ouroMounds.empty()) // This can't be possible, but just to be sure.
+        {
+            if (Creature* mound = Acore::Containers::SelectRandomContainerElement(ouroMounds))
             {
-                Emerge();
-            });
+                mound->AddAura(SPELL_SUMMON_OURO_AURA, mound);
+                mound->AI()->SetData(DATA_OURO_HEALTH, me->GetHealth());
+            }
+        }
+
+        me->DespawnOrUnsummon(1000);
+    }
+
+    void CastGroundRupture()
+    {
+        std::list<WorldObject*> targets;
+        Acore::AllWorldObjectsInRange checker(me, 10.0f);
+        Acore::WorldObjectListSearcher<Acore::AllWorldObjectsInRange> searcher(me, targets, checker);
+        Cell::VisitAllObjects(me, searcher, 10.0f);
+
+        for (WorldObject* target : targets)
+        {
+            if (Unit* unitTarget = target->ToUnit())
+            {
+                if (unitTarget->IsHostileTo(me))
+                    DoCast(unitTarget, SPELL_GROUND_RUPTURE, true);
+            }
+        }
+    }
+
+    void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
+    {
+        if (spellInfo->Id == SPELL_SAND_BLAST && target)
+            me->GetThreatMgr().modifyThreatPercent(target, 100);
     }
 
     void Emerge()
     {
         DoCastSelf(SPELL_BIRTH);
+        DoCastSelf(SPELL_SUMMON_SANDWORM_BASE, true);
         me->SetReactState(REACT_AGGRESSIVE);
-        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
-        DoCastVictim(SPELL_GROUND_RUPTURE);
-        _submergeMelee = 0;
-        _submerged = false;
-        ScheduleEmerged();
-    }
-
-    void Reset() override
-    {
-        BossAI::Reset();
-        _scheduler.CancelAll();
-        _submergeMelee = 0;
-        _submerged = false;
-        _enraged = false;
-    }
-
-    void EnterEvadeMode(EvadeReason why) override
-    {
-        me->HandleEmoteCommand(EMOTE_ONESHOT_SUBMERGE);
-        me->DespawnOrUnsummon(1000);
-        if (Creature* ouroSpawner = instance->GetCreature(DATA_OURO_SPAWNER))
-            ouroSpawner->Respawn();
-        BossAI::EnterEvadeMode(why);
-    }
-
-    void ScheduleEmerged()
-    {
+        CastGroundRupture();
         _scheduler
             .Schedule(20s, GROUP_EMERGED, [this](TaskContext context)
                 {
@@ -162,22 +190,22 @@ struct boss_ouro : public BossAI
                     DoCastVictim(SPELL_SWEEP);
                     context.Repeat();
                 })
-            .Schedule(3min, GROUP_PHASE_TRANSITION, [this](TaskContext /*context*/)
+            .Schedule(90s, GROUP_PHASE_TRANSITION, [this](TaskContext /*context*/)
                 {
                     Submerge();
                 })
-            .Schedule(1s, GROUP_PHASE_TRANSITION, [this](TaskContext context)
+            .Schedule(3s, GROUP_PHASE_TRANSITION, [this](TaskContext context)
                 {
-                    if (!IsVictimWithinMeleeRange() && !_submerged)
+                    if (!IsPlayerWithinMeleeRange() && !_submerged)
                     {
                         if (_submergeMelee < 10)
                         {
                             _submergeMelee++;
-                            DoSpellAttackToRandomTargetIfReady(SPELL_BOULDER);
                         }
                         else
                         {
-                            Submerge();
+                            if (!_enraged)
+                                Submerge();
                             _submergeMelee = 0;
                         }
                     }
@@ -187,13 +215,34 @@ struct boss_ouro : public BossAI
                     }
 
                     if (!_submerged)
-                        context.Repeat();
+                        context.Repeat(1s);
                 });
+    }
+
+    void Reset() override
+    {
+        instance->SetBossState(DATA_OURO, NOT_STARTED);
+        _scheduler.CancelAll();
+        _submergeMelee = 0;
+        _submerged = false;
+        _enraged = false;
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        DoCastSelf(SPELL_OURO_SUBMERGE_VISUAL);
+        me->DespawnOrUnsummon(1000);
+        // Remove after the header file is sorted with the bosses first.
+        if (Creature* ouroSpawner = instance->GetCreature(DATA_OURO_SPAWNER))
+            ouroSpawner->Respawn();
+        instance->SetBossState(DATA_OURO, FAIL);
+        if (GameObject* base = me->FindNearestGameObject(GO_SANDWORM_BASE, 10.f))
+            base->DespawnOrUnsummon();
     }
 
     void EnterCombat(Unit* who) override
     {
-        ScheduleEmerged();
+        Emerge();
 
         BossAI::EnterCombat(who);
     }
@@ -216,14 +265,96 @@ protected:
     uint8 _submergeMelee;
     bool _submerged;
 
-    bool IsVictimWithinMeleeRange() const
+    bool IsPlayerWithinMeleeRange() const
     {
-        return me->GetVictim() && me->IsWithinMeleeRange(me->GetVictim());
+        return me->SelectNearestPlayer(me->GetMeleeReach());
     }
+};
+
+struct npc_dirt_mound : ScriptedAI
+{
+    npc_dirt_mound(Creature* creature) : ScriptedAI(creature)
+    {
+        _instance = creature->GetInstanceScript();
+    }
+
+    void JustSummoned(Creature* creature) override
+    {
+        if (creature->GetEntry() == NPC_OURO)
+        {
+            creature->SetInCombatWithZone();
+            creature->SetHealth(_ouroHealth);
+        }
+    }
+
+    void SetData(uint32 type, uint32 data) override
+    {
+        if (type == DATA_OURO_HEALTH)
+            _ouroHealth = data;
+    }
+
+    void EnterCombat(Unit* /*who*/) override
+    {
+        DoZoneInCombat();
+        _scheduler.Schedule(30s, [this](TaskContext /*context*/)
+            {
+                DoCastSelf(SPELL_SUMMON_SCARABS, true);
+                me->DespawnOrUnsummon(1000);
+            })
+            .Schedule(100ms, [this](TaskContext context)
+            {
+                ChaseNewTarget();
+                context.Repeat(5s, 10s);
+            });
+    }
+
+    void ChaseNewTarget()
+    {
+        DoResetThreat();
+        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200.f, true))
+        {
+            me->AddThreat(target, 1000000.f);
+            AttackStart(target);
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        _scheduler.Update(diff);
+    }
+
+    void Reset() override
+    {
+        DoCastSelf(SPELL_DIRTMOUND_PASSIVE, true);
+        DoCastSelf(SPELL_DREAM_FOG, true);
+        DoCastSelf(SPELL_QUAKE, true);
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        if (_instance)
+        {
+            _instance->SetBossState(DATA_OURO, FAIL);
+
+            // Remove after the header file is sorted with the bosses first.
+            if (Creature* ouroSpawner = _instance->GetCreature(DATA_OURO_SPAWNER))
+                ouroSpawner->Respawn();
+        }
+        me->DespawnOrUnsummon();
+    }
+
+protected:
+    TaskScheduler _scheduler;
+    uint32 _ouroHealth;
+    InstanceScript* _instance;
 };
 
 void AddSC_boss_ouro()
 {
     RegisterTempleOfAhnQirajCreatureAI(npc_ouro_spawner);
     RegisterTempleOfAhnQirajCreatureAI(boss_ouro);
+    RegisterTempleOfAhnQirajCreatureAI(npc_dirt_mound);
 }
