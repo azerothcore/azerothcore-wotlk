@@ -1,3 +1,4 @@
+-- DB update 2022_08_09_00 -> 2022_08_10_00
 --
 DELETE FROM `spell_target_position` WHERE `ID` IN (720, 731, 1121, 518, 25831, 25832);
 INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `Orientation`) VALUES
