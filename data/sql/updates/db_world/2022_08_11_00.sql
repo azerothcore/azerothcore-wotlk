@@ -1,3 +1,4 @@
+-- DB update 2022_08_10_02 -> 2022_08_11_00
 --
 UPDATE `quest_template_addon` SET `AllowableClasses`=1 WHERE `id`=8316;
 UPDATE `quest_template_addon` SET `AllowableClasses`=2 WHERE `id`=8376;
