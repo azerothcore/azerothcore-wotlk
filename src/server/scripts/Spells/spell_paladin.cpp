@@ -257,13 +257,6 @@ class spell_pal_sacred_shield_base : public AuraScript
         }
     }
 
-    bool CheckProc(ProcEventInfo& eventInfo)
-    {
-        HealInfo* healinfo = eventInfo.GetHealInfo();
-        DamageInfo* damageinfo = eventInfo.GetDamageInfo();
-        return !(eventInfo.GetHitMask() & PROC_EX_INTERNAL_HOT) && ((healinfo && healinfo->GetHeal() > 0) || (damageinfo && damageinfo->GetDamage() > 0));
-    }
-
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();

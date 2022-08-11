@@ -68,7 +68,7 @@ enum WarriorSpells
     SPELL_WARRIOR_SECOND_WIND_TRIGGER_2             = 29842,
     SPELL_WARRIOR_GLYPH_OF_BLOCKING                 = 58374,
     SPELL_WARRIOR_STOICISM                          = 70845,
-    SPELL_WARRIOR_T10_MELEE_4P_BONUS                = 70847
+    SPELL_WARRIOR_T10_MELEE_4P_BONUS                = 70847,
     SPELL_WARRIOR_WHIRLWIND_OFF                     = 44949
 };
 

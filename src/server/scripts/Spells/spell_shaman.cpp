@@ -1238,10 +1238,11 @@ class spell_sha_nature_guardian : public AuraScript
                 uint32 bp = CalculatePct(target->GetMaxHealth(), aurEff->GetAmount());
                 target->CastCustomSpell(SPELL_SHAMAN_NATURE_GUARDIAN, SPELLVALUE_BASE_POINT0, bp, target, true, nullptr, aurEff);
 
+                // @TODO: FIX ME PLEASE
                 // Threat reduction is around 10% confirmed in retail and from wiki
-                Unit* attacker = eventInfo.GetActor();
-                if (attacker->IsAlive())
-                    attacker->getThreatMgr().modifyThreatPercent(target, -10);
+//                Unit* attacker = eventInfo.GetActor();
+//                if (attacker->IsAlive())
+//                    attacker->getThreatMgr().modifyThreatPercent(target, -10);
             }
         }
     }
