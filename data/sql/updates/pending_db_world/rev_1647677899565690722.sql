@@ -1,5 +1,3 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1647677899565690722');
-
 -- Earth shield heal is DAMAGE_CLASS_NONE, it won't scale
 -- Entry is unneeded
 DELETE FROM `spell_bonus_data` WHERE `entry`=379;
