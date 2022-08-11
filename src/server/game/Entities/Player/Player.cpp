@@ -13911,6 +13911,8 @@ bool Player::CanResummonPet(uint32 spellid)
         case CLASS_WARLOCK:
             return true;
         break;
+        default:
+        break;
     }
 
     return HasSpell(spellid);
