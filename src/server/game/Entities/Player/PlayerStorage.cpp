@@ -4758,6 +4758,14 @@ void Player::SendEnchantmentDurations()
     }
 }
 
+void Player::UpdateEnchantmentDurations()
+{
+    for (EnchantDurationList::iterator itr = m_enchantDuration.begin(); itr != m_enchantDuration.end(); ++itr)
+    {
+        itr->item->SetEnchantmentDuration(itr->slot, itr->leftduration, this);
+    }
+}
+
 void Player::SendItemDurations()
 {
     for (ItemDurationList::const_iterator itr = m_itemDuration.begin(); itr != m_itemDuration.end(); ++itr)
@@ -4886,21 +4894,9 @@ void Player::_LoadEntryPointData(PreparedQueryResult result)
                                              fields[2].Get<float>(),   // Z
                                              fields[3].Get<float>());  // Orientation
 
-    std::string_view taxi = fields[5].Get<std::string_view>();
-    if (!taxi.empty())
-    {
-        for (auto const& itr : Acore::Tokenize(taxi, ' ', false))
-        {
-            uint32 node = Acore::StringTo<uint32>(itr).value_or(0);
-            m_entryPointData.taxiPath.emplace_back(node);
-        }
-
-        // Check integrity
-        if (m_entryPointData.taxiPath.size() < 3)
-            m_entryPointData.ClearTaxiPath();
-    }
-
-    m_entryPointData.mountSpell   = fields[6].Get<uint32>();
+    m_entryPointData.taxiPath[0] = fields[5].Get<uint32>();
+    m_entryPointData.taxiPath[1] = fields[6].Get<uint32>();
+    m_entryPointData.mountSpell = fields[7].Get<uint32>();
 }
 
 bool Player::LoadPositionFromDB(uint32& mapid, float& x, float& y, float& z, float& o, bool& in_flight, ObjectGuid::LowType guid)
@@ -5182,10 +5178,8 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
             // xinef: restore taxi flight from entry point data
             if (m_entryPointData.HasTaxiPath())
             {
-                for (size_t i = 0; i < m_entryPointData.taxiPath.size() - 1; ++i)
-                    m_taxi.AddTaxiDestination(m_entryPointData.taxiPath[i]);
-                m_taxi.SetTaxiSegment(m_entryPointData.taxiPath[m_entryPointData.taxiPath.size() - 1]);
-
+                m_taxi.AddTaxiDestination(m_entryPointData.taxiPath[0]);
+                m_taxi.AddTaxiDestination(m_entryPointData.taxiPath[1]);
                 m_entryPointData.ClearTaxiPath();
             }
         }
@@ -7331,7 +7325,7 @@ void Player::_SaveInventory(CharacterDatabaseTransaction trans)
         if (item->GetState() != ITEM_REMOVED)
         {
             Item* test = GetItemByPos(item->GetBagSlot(), item->GetSlot());
-            if (test == nullptr)
+            if (!test)
             {
                 ObjectGuid::LowType bagTestGUID = 0;
                 if (Item* test2 = GetItemByPos(INVENTORY_SLOT_BAG_0, item->GetBagSlot()))

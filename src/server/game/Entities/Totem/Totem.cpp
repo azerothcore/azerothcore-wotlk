@@ -33,20 +33,14 @@ Totem::Totem(SummonPropertiesEntry const* properties, ObjectGuid owner) : Minion
 
 void Totem::Update(uint32 time)
 {
-    if (!GetOwner()->IsAlive() || !IsAlive())
+    Unit* owner = GetOwner();
+    if (!owner || !owner->IsAlive() || !IsAlive() || m_duration <= time)
     {
         UnSummon();                                         // remove self
         return;
     }
 
-    if (m_duration <= time)
-    {
-        UnSummon();                                         // remove self
-        return;
-    }
-    else
-        m_duration -= time;
-
+    m_duration -= time;
     Creature::Update(time);
 }
 
@@ -85,6 +79,8 @@ void Totem::InitStats(uint32 duration)
 
 void Totem::InitSummon()
 {
+    Minion::InitSummon();
+
     if (m_type == TOTEM_PASSIVE && GetSpell())
         CastSpell(this, GetSpell(), true);
 
@@ -97,6 +93,10 @@ void Totem::InitSummon()
     {
         SetReactState(REACT_AGGRESSIVE);
         GetOwner()->CastSpell(this, 6277, true);
+
+        // Farsight objects should be active
+        setActive(true);
+        SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
     }
 
     if (!IsInWater())
@@ -116,38 +116,40 @@ void Totem::UnSummon(uint32 msTime)
     CombatStop();
     RemoveAurasDueToSpell(GetSpell(), GetGUID());
 
-    Unit* owner = GetOwner();
-    // clear owner's totem slot
-    for (uint8 i = SUMMON_SLOT_TOTEM; i < MAX_TOTEM_SLOT; ++i)
+    if (Unit* owner = GetOwner())
     {
-        if (owner->m_SummonSlot[i] == GetGUID())
+        // clear owner's totem slot
+        for (uint8 i = SUMMON_SLOT_TOTEM; i < MAX_TOTEM_SLOT; ++i)
         {
-            owner->m_SummonSlot[i].Clear();
-            break;
-        }
-    }
-
-    owner->RemoveAurasDueToSpell(GetSpell(), GetGUID());
-
-    // Remove Sentry Totem Aura
-    if (GetEntry() == SENTRY_TOTEM_ENTRY)
-        owner->RemoveAurasDueToSpell(SENTRY_TOTEM_SPELLID);
-
-    //remove aura all party members too
-    if (Player* player = owner->ToPlayer())
-    {
-        player->SendAutoRepeatCancel(this);
-
-        if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(GetUInt32Value(UNIT_CREATED_BY_SPELL)))
-            player->SendCooldownEvent(spell, 0, nullptr, false);
-
-        if (Group* group = player->GetGroup())
-        {
-            for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+            if (owner->m_SummonSlot[i] == GetGUID())
             {
-                Player* target = itr->GetSource();
-                if (target && target->IsInMap(player) && group->SameSubGroup(player, target))
-                    target->RemoveAurasDueToSpell(GetSpell(), GetGUID());
+                owner->m_SummonSlot[i].Clear();
+                break;
+            }
+        }
+
+        owner->RemoveAurasDueToSpell(GetSpell(), GetGUID());
+
+        // Remove Sentry Totem Aura
+        if (GetEntry() == SENTRY_TOTEM_ENTRY)
+            owner->RemoveAurasDueToSpell(SENTRY_TOTEM_SPELLID);
+
+        //remove aura all party members too
+        if (Player* player = owner->ToPlayer())
+        {
+            player->SendAutoRepeatCancel(this);
+
+            if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(GetUInt32Value(UNIT_CREATED_BY_SPELL)))
+                player->SendCooldownEvent(spell, 0, nullptr, false);
+
+            if (Group* group = player->GetGroup())
+            {
+                for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+                {
+                    Player* target = itr->GetSource();
+                    if (target && target->IsInMap(player) && group->SameSubGroup(player, target))
+                        target->RemoveAurasDueToSpell(GetSpell(), GetGUID());
+                }
             }
         }
     }

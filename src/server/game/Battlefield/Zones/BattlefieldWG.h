@@ -218,6 +218,8 @@ enum WintergraspNpcs
     NPC_QUEST_SOUTHERN_TOWER_KILL                   = 35074,
     NPC_QUEST_VEHICLE_PROTECTED                     = 31284,
     NPC_QUEST_PVP_KILL_VEHICLE                      = 31093,
+    NPC_QUEST_PVP_KILL_HORDE                        = 39019,
+    NPC_QUEST_PVP_KILL_ALLIANCE                     = 31086,
 };
 
 struct BfWGCoordGY

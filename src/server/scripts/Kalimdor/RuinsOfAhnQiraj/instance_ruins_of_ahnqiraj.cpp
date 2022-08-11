@@ -15,9 +15,52 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureGroups.h"
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
+#include "TaskScheduler.h"
 #include "ruins_of_ahnqiraj.h"
+
+ObjectData const creatureData[] =
+{
+    { NPC_BURU,      DATA_BURU      },
+    { NPC_KURINNAXX, DATA_KURINNAXX },
+    { NPC_RAJAXX,    DATA_RAJAXX    },
+    { NPC_AYAMISS,   DATA_AYAMISS   },
+    { NPC_OSSIRIAN,  DATA_OSSIRIAN  },
+    { NPC_QUUEZ,     DATA_QUUEZ     },
+    { NPC_TUUBID,    DATA_TUUBID    },
+    { NPC_DRENN,     DATA_DRENN     },
+    { NPC_XURREM,    DATA_XURREM    },
+    { NPC_YEGGETH,   DATA_YEGGETH   },
+    { NPC_PAKKON,    DATA_PAKKON    },
+    { NPC_ZERRAN,    DATA_ZERRAN    },
+};
+
+enum RajaxxWaveEvent
+{
+    SAY_WAVE3  = 0,
+    SAY_WAVE4  = 1,
+    SAY_WAVE5  = 2,
+    SAY_WAVE6  = 3,
+    SAY_WAVE7  = 4,
+    SAY_ENGAGE = 5,
+
+    DATA_RAJAXX_WAVE_ENGAGED = 1,
+    GROUP_RAJAXX_WAVE_TIMER  = 1
+};
+
+std::array<uint32, 8> RajaxxWavesData[] =
+{
+    { DATA_QUUEZ,     0          },
+    { DATA_TUUBID,    0          },
+    { DATA_DRENN,     SAY_WAVE3  },
+    { DATA_XURREM,    SAY_WAVE4  },
+    { DATA_YEGGETH,   SAY_WAVE5  },
+    { DATA_PAKKON,    SAY_WAVE6  },
+    { DATA_ZERRAN,    SAY_WAVE7  },
+    { DATA_RAJAXX,    SAY_ENGAGE }
+};
 
 class instance_ruins_of_ahnqiraj : public InstanceMapScript
 {
@@ -29,14 +72,18 @@ public:
         instance_ruins_of_ahnqiraj_InstanceMapScript(Map* map) : InstanceScript(map)
         {
             SetBossNumber(NUM_ENCOUNTER);
+            LoadObjectData(creatureData, nullptr);
+            _rajaxWaveCounter = 0;
         }
 
         void OnCreatureCreate(Creature* creature) override
         {
+            InstanceScript::OnCreatureCreate(creature);
+
             switch (creature->GetEntry())
             {
-                case NPC_KURINAXX:
-                    _kurinaxxGUID = creature->GetGUID();
+                case NPC_KURINNAXX:
+                    _kurinnaxxGUID = creature->GetGUID();
                     break;
                 case NPC_RAJAXX:
                     _rajaxxGUID = creature->GetGUID();
@@ -47,21 +94,97 @@ public:
                 case NPC_BURU:
                     _buruGUID = creature->GetGUID();
                     break;
-                case NPC_AYAMISS:
-                    _ayamissGUID = creature->GetGUID();
-                    break;
                 case NPC_OSSIRIAN:
                     _ossirianGUID = creature->GetGUID();
+                    break;
+                case NPC_SAND_VORTEX:
+                    _sandVortexes.push_back(creature->GetGUID());
+                    creature->SetVisible(false);
                     break;
             }
         }
 
-        bool SetBossState(uint32 bossId, EncounterState state) override
+        void OnCreatureEvade(Creature* creature) override
         {
-            if (!InstanceScript::SetBossState(bossId, state))
-                return false;
+            if (CreatureGroup* formation = creature->GetFormation())
+            {
+                if (Creature* leader = formation->GetLeader())
+                {
+                    switch (leader->GetEntry())
+                    {
+                        case NPC_QUUEZ:
+                        case NPC_TUUBID:
+                        case NPC_DRENN:
+                        case NPC_XURREM:
+                        case NPC_YEGGETH:
+                        case NPC_PAKKON:
+                        case NPC_ZERRAN:
+                            if (!formation->IsFormationInCombat())
+                            {
+                                ResetRajaxxWaves();
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+            else if (creature->GetEntry() == NPC_RAJAXX)
+            {
+                ResetRajaxxWaves();
+            }
+        }
 
-            return true;
+        void SetData(uint32 type, uint32 /*data*/) override
+        {
+            if (type == DATA_RAJAXX_WAVE_ENGAGED)
+            {
+                _scheduler.CancelGroup(GROUP_RAJAXX_WAVE_TIMER);
+                _scheduler.Schedule(2min, [this](TaskContext context)
+                {
+                    CallNextRajaxxLeader();
+                    context.SetGroup(GROUP_RAJAXX_WAVE_TIMER);
+                    context.Repeat();
+                });
+            }
+        }
+
+        void OnUnitDeath(Unit* unit) override
+        {
+            if (Creature* creature = unit->ToCreature())
+            {
+                if (CreatureGroup* formation = creature->GetFormation())
+                {
+                    if (Creature* leader = formation->GetLeader())
+                    {
+                        switch (leader->GetEntry())
+                        {
+                            case NPC_QUUEZ:
+                            case NPC_TUUBID:
+                            case NPC_DRENN:
+                            case NPC_XURREM:
+                            case NPC_YEGGETH:
+                            case NPC_PAKKON:
+                            case NPC_ZERRAN:
+                                _scheduler.CancelAll();
+                                _scheduler.Schedule(1s, [this, formation](TaskContext /*context*/) {
+                                    if (!formation->IsAnyMemberAlive())
+                                    {
+                                        CallNextRajaxxLeader(true);
+                                    }
+                                });
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
+        void Update(uint32 diff) override
+        {
+            _scheduler.Update(diff);
         }
 
         void SetGuidData(uint32 type, ObjectGuid data) override
@@ -70,20 +193,43 @@ public:
                 _paralyzedGUID = data;
         }
 
+        bool SetBossState(uint32 type, EncounterState state) override
+        {
+            if (!InstanceScript::SetBossState(type, state))
+                return false;
+
+            switch (type)
+            {
+                case DATA_OSSIRIAN:
+                {
+                    for (ObjectGuid const& guid : _sandVortexes)
+                    {
+                        if (Creature* sandVortex = instance->GetCreature(guid))
+                        {
+                            sandVortex->SetVisible(state == IN_PROGRESS);
+                        }
+                    }
+                    break;
+                default:
+                    break;
+                }
+            }
+
+            return true;
+        }
+
         ObjectGuid GetGuidData(uint32 type) const override
         {
             switch (type)
             {
                 case DATA_KURINNAXX:
-                    return _kurinaxxGUID;
+                    return _kurinnaxxGUID;
                 case DATA_RAJAXX:
                     return _rajaxxGUID;
                 case DATA_MOAM:
                     return _moamGUID;
                 case DATA_BURU:
                     return _buruGUID;
-                case DATA_AYAMISS:
-                    return _ayamissGUID;
                 case DATA_OSSIRIAN:
                     return _ossirianGUID;
                 case DATA_PARALYZED:
@@ -136,14 +282,60 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
+        void CallNextRajaxxLeader(bool announce = false)
+        {
+            ++_rajaxWaveCounter;
+
+            if (Creature* nextLeader = GetCreature(RajaxxWavesData[_rajaxWaveCounter].at(0)))
+            {
+                if (announce)
+                {
+                    if (_rajaxWaveCounter >= 2)
+                    {
+                        if (Creature* rajaxx = GetCreature(DATA_RAJAXX))
+                        {
+                            rajaxx->AI()->Talk(RajaxxWavesData[_rajaxWaveCounter].at(1));
+                        }
+                    }
+                }
+
+                if (nextLeader->IsAlive())
+                {
+                    nextLeader->SetInCombatWithZone();
+                }
+                else
+                {
+                    CallNextRajaxxLeader();
+                }
+            }
+        }
+
+        void ResetRajaxxWaves()
+        {
+            _rajaxWaveCounter = 0;
+            _scheduler.CancelAll();
+            for (auto const& data : RajaxxWavesData)
+            {
+                if (Creature* creature = GetCreature(data.at(0)))
+                {
+                    if (CreatureGroup* group = creature->GetFormation())
+                    {
+                        group->RespawnFormation(true);
+                    }
+                }
+            }
+        }
+
     private:
-        ObjectGuid _kurinaxxGUID;
+        ObjectGuid _kurinnaxxGUID;
         ObjectGuid _rajaxxGUID;
         ObjectGuid _moamGUID;
         ObjectGuid _buruGUID;
-        ObjectGuid _ayamissGUID;
         ObjectGuid _ossirianGUID;
         ObjectGuid _paralyzedGUID;
+        GuidVector _sandVortexes;
+        uint32 _rajaxWaveCounter;
+        TaskScheduler _scheduler;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

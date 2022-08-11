@@ -67,8 +67,8 @@ enum NotifyFlags
 
 enum GOSummonType
 {
-    GO_SUMMON_TIMED_OR_CORPSE_DESPAWN = 0,    // despawns after a specified time OR when the summoner dies
-    GO_SUMMON_TIMED_DESPAWN = 1     // despawns after a specified time
+    GO_SUMMON_TIMED_OR_CORPSE_DESPAWN = 0,      // despawns after a specified time OR when the summoner dies
+    GO_SUMMON_TIMED_DESPAWN = 1                 // despawns after a specified time
 };
 
 class WorldPacket;
@@ -349,14 +349,14 @@ public:
         m_flags = 0;
     }
 
-    [[nodiscard]] T_FLAGS  GetFlags() const { return m_flags; }
-    [[nodiscard]] bool     HasFlag(FLAG_TYPE flag) const { return m_flags & (1 << flag); }
-    void     AddFlag(FLAG_TYPE flag) { m_flags |= (1 << flag); }
-    void     DelFlag(FLAG_TYPE flag) { m_flags &= ~(1 << flag); }
+    [[nodiscard]] T_FLAGS GetFlags() const { return m_flags; }
+    [[nodiscard]] bool HasFlag(FLAG_TYPE flag) const { return m_flags & (1 << flag); }
+    void AddFlag(FLAG_TYPE flag) { m_flags |= (1 << flag); }
+    void DelFlag(FLAG_TYPE flag) { m_flags &= ~(1 << flag); }
 
     [[nodiscard]] T_VALUES GetValue(FLAG_TYPE flag) const { return m_values[flag]; }
-    void     SetValue(FLAG_TYPE flag, T_VALUES value) { m_values[flag] = value; }
-    void     AddValue(FLAG_TYPE flag, T_VALUES value) { m_values[flag] += value; }
+    void SetValue(FLAG_TYPE flag, T_VALUES value) { m_values[flag] = value; }
+    void AddValue(FLAG_TYPE flag, T_VALUES value) { m_values[flag] += value; }
 
 private:
     T_VALUES m_values[ARRAY_SIZE];
@@ -463,9 +463,9 @@ public:
     bool IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D = true, bool useBoundingRadius = true) const;
     bool IsWithinDistInMap(WorldObject const* obj, float dist2compare, bool is3D = true, bool useBoundingRadius = true) const;
     [[nodiscard]] bool IsWithinLOS(float x, float y, float z, VMAP::ModelIgnoreFlags ignoreFlags = VMAP::ModelIgnoreFlags::Nothing, LineOfSightChecks checks = LINEOFSIGHT_ALL_CHECKS) const;
-    [[nodiscard]] bool IsWithinLOSInMap(WorldObject const* obj, VMAP::ModelIgnoreFlags ignoreFlags = VMAP::ModelIgnoreFlags::Nothing, LineOfSightChecks checks = LINEOFSIGHT_ALL_CHECKS) const;
-    [[nodiscard]] Position GetHitSpherePointFor(Position const& dest) const;
-    void GetHitSpherePointFor(Position const& dest, float& x, float& y, float& z) const;
+    [[nodiscard]] bool IsWithinLOSInMap(WorldObject const* obj, VMAP::ModelIgnoreFlags ignoreFlags = VMAP::ModelIgnoreFlags::Nothing, LineOfSightChecks checks = LINEOFSIGHT_ALL_CHECKS, Optional<float> collisionHeight = { }) const;
+    [[nodiscard]] Position GetHitSpherePointFor(Position const& dest, Optional<float> collisionHeight = { }) const;
+    void GetHitSpherePointFor(Position const& dest, float& x, float& y, float& z, Optional<float> collisionHeight = { }) const;
     bool GetDistanceOrder(WorldObject const* obj1, WorldObject const* obj2, bool is3D = true) const;
     bool IsInRange(WorldObject const* obj, float minRange, float maxRange, bool is3D = true) const;
     [[nodiscard]] bool IsInRange2d(float x, float y, float minRange, float maxRange) const;

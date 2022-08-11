@@ -242,7 +242,7 @@ public:
 
         void EnterEvadeMode(EvadeReason /*why*/) override
         {
-            me->DeleteThreatList();
+            me->GetThreatMgr().ClearAllThreat();
             me->CombatStop(false);
             me->SetLootRecipient(nullptr);
 
@@ -255,7 +255,7 @@ public:
             else
             {
                 me->GetMotionMaster()->MoveTargetedHome();
-                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetImmuneToNPC(true);
                 Reset();
             }
         }
@@ -313,7 +313,7 @@ public:
                 m_uiValrothGUID = summoned->GetGUID();
 
             summoned->AddThreat(me, 0.0f);
-            summoned->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+            summoned->SetImmuneToPC(false);
             summons.Summon(summoned);
         }
 
@@ -666,7 +666,7 @@ public:
             ExecuteSpeech_Counter = 0;
             PlayerGUID.Clear();
 
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetImmuneToPC(false);
         }
 
         bool MeetQuestCondition(Player* player)
@@ -780,7 +780,7 @@ public:
                                 case 9:
                                     Talk(SAY_EXEC_TIME_6, player);
                                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                                    me->SetImmuneToPC(false);
                                     break;
                                 case 10:
                                     Talk(SAY_EXEC_WAITING, player);
@@ -826,7 +826,7 @@ public:
                                 case 9:
                                     Talk(SAY_EXEC_TIME_8, player);
                                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                                    me->SetImmuneToPC(false);
                                     break;
                                 case 10:
                                     Talk(SAY_EXEC_WAITING, player);
@@ -872,7 +872,7 @@ public:
                                 case 9:
                                     Talk(SAY_EXEC_TIME_3, player);
                                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                                    me->SetImmuneToPC(false);
                                     break;
                                 case 10:
                                     Talk(SAY_EXEC_WAITING, player);
@@ -918,7 +918,7 @@ public:
                                 case 9:
                                     Talk(SAY_EXEC_TIME_7, player);
                                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                                    me->SetImmuneToPC(false);
                                     break;
                                 case 10:
                                     Talk(SAY_EXEC_WAITING, player);
@@ -964,7 +964,7 @@ public:
                                 case 9:
                                     Talk(SAY_EXEC_TIME_4, player);
                                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                                    me->SetImmuneToPC(false);
                                     break;
                                 case 10:
                                     Talk(SAY_EXEC_WAITING, player);
@@ -1010,7 +1010,7 @@ public:
                                 case 9:
                                     Talk(SAY_EXEC_TIME_9, player);
                                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                                    me->SetImmuneToPC(false);
                                     break;
                                 case 10:
                                     Talk(SAY_EXEC_WAITING, player);
@@ -1056,7 +1056,7 @@ public:
                                 case 9:
                                     Talk(SAY_EXEC_TIME_5, player);
                                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                                    me->SetImmuneToPC(false);
                                     break;
                                 case 10:
                                     Talk(SAY_EXEC_WAITING, player);
@@ -1102,7 +1102,7 @@ public:
                                 case 9:
                                     Talk(SAY_EXEC_TIME_10, player);
                                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                                    me->SetImmuneToPC(false);
                                     break;
                                 case 10:
                                     Talk(SAY_EXEC_WAITING, player);
@@ -1146,7 +1146,7 @@ public:
                                 case 9:
                                     Talk(SAY_EXEC_TIME_1, player);
                                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                                    me->SetImmuneToPC(false);
                                     break;
                                 case 10:
                                     Talk(SAY_EXEC_WAITING, player);
@@ -1192,7 +1192,7 @@ public:
                                 case 9:
                                     Talk(SAY_EXEC_TIME_2, player);
                                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                                    me->SetImmuneToPC(false);
                                     break;
                                 case 10:
                                     Talk(SAY_EXEC_WAITING, player);
@@ -1220,33 +1220,6 @@ public:
     };
 };
 
-class spell_q12779_an_end_to_all_things : public SpellScriptLoader
-{
-public:
-    spell_q12779_an_end_to_all_things() : SpellScriptLoader("spell_q12779_an_end_to_all_things") { }
-
-    class spell_q12779_an_end_to_all_things_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_q12779_an_end_to_all_things_SpellScript);
-
-        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
-        {
-            if (GetHitUnit())
-                GetHitUnit()->CastSpell(GetCaster(), GetEffectValue(), true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_q12779_an_end_to_all_things_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_q12779_an_end_to_all_things_SpellScript();
-    }
-};
-
 void AddSC_the_scarlet_enclave_c2()
 {
     new npc_crusade_persuaded();
@@ -1254,7 +1227,4 @@ void AddSC_the_scarlet_enclave_c2()
     new npc_koltira_deathweaver();
     new npc_high_inquisitor_valroth();
     new npc_a_special_surprise();
-
-    // Xinef: Should be in chapter III
-    new spell_q12779_an_end_to_all_things();
 }

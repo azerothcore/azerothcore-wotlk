@@ -296,7 +296,7 @@ public:
                             uint8 rnd = LIST.size() > 1 ? urand(0, LIST.size() - 1) : 0;
                             if( Unit* target = ObjectAccessor::GetUnit(*me, LIST.at(rnd)) )
                             {
-                                me->getThreatMgr().resetAllAggro();
+                                me->GetThreatMgr().ResetAllThreat();
                                 me->AddThreat(target, 10000.0f);
                                 AttackStart(target);
                                 me->CastSpell(target, SPELL_MINIONS_CHARGE, false);
@@ -400,7 +400,8 @@ public:
             {
                 DoAction(1);
                 DoAction(2);
-                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetImmuneToAll(false);
                 me->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, 0);
                 me->SetReactState(REACT_AGGRESSIVE);
             }
@@ -488,7 +489,8 @@ public:
                 me->SetRegeneratingHealth(true);
                 me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
                 me->SetSpeed(MOVE_RUN, 1.0f, false);
-                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetImmuneToAll(true);
                 me->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                 me->RemoveAllAuras();
                 AddCreatureAddonAuras();
@@ -550,13 +552,14 @@ public:
                     me->SetReactState(REACT_PASSIVE);
                     me->RemoveAllAuras();
                     AddCreatureAddonAuras();
-                    me->DeleteThreatList();
+                    me->GetThreatMgr().ClearAllThreat();
                     me->CombatStop(true);
                     me->GetMotionMaster()->Clear();
                     me->StopMoving();
                     me->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, 0);
                     me->SetRegeneratingHealth(false);
-                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetImmuneToAll(true);
                     me->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
                     if( pInstance )
                     {
@@ -580,11 +583,12 @@ public:
                     me->SetReactState(REACT_PASSIVE);
                     me->RemoveAllAuras();
                     AddCreatureAddonAuras();
-                    me->DeleteThreatList();
+                    me->GetThreatMgr().ClearAllThreat();
                     me->CombatStop(true);
                     me->GetMotionMaster()->Clear();
                     me->SetRegeneratingHealth(false);
-                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetImmuneToAll(true);
                     if( pInstance )
                         pInstance->SetData(DATA_GRAND_CHAMPION_DIED, BossOrder);
                 }
@@ -627,7 +631,8 @@ public:
                             events.ScheduleEvent(EVENT_SHIELD_BREAKER, urand(5000, 8000));
                             events.ScheduleEvent(EVENT_THRUST, urand(3000, 5000));
                             me->SetReactState(REACT_AGGRESSIVE);
-                            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                            me->SetImmuneToAll(false);
                             if( Unit* target = me->SelectNearestTarget(200.0f) )
                                 AttackStart(target);
                             DoZoneInCombat();
@@ -720,7 +725,8 @@ public:
                         {
                             me->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
                             NewMountGUID = mount->GetGUID();
-                            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                            me->SetImmuneToAll(true);
                             me->GetMotionMaster()->MovePoint(7, *mount);
                             events.RepeatEvent(200);
                             break;
@@ -749,7 +755,7 @@ public:
                             uint8 rnd = LIST.size() > 1 ? urand(0, LIST.size() - 1) : 0;
                             if( Unit* target = ObjectAccessor::GetUnit(*me, LIST.at(rnd)) )
                             {
-                                me->getThreatMgr().resetAllAggro();
+                                me->GetThreatMgr().ResetAllThreat();
                                 me->AddThreat(target, 10000.0f);
                                 AttackStart(target);
                                 me->CastSpell(target, SPELL_MINIONS_CHARGE, false);

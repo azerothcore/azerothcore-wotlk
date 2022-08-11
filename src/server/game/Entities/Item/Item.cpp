@@ -183,46 +183,64 @@ bool ItemCanGoIntoBag(ItemTemplate const* pProto, ItemTemplate const* pBagProto)
     switch (pBagProto->Class)
     {
         case ITEM_CLASS_CONTAINER:
-            switch (pBagProto->SubClass)
+        {
+            if (pBagProto->SubClass == ITEM_SUBCLASS_CONTAINER)
             {
-                case ITEM_SUBCLASS_CONTAINER:
-                    return true;
-                case ITEM_SUBCLASS_SOUL_CONTAINER:
-                    if (!(pProto->BagFamily & BAG_FAMILY_MASK_SOUL_SHARDS))
-                        return false;
-                    return true;
-                case ITEM_SUBCLASS_HERB_CONTAINER:
-                    if (!(pProto->BagFamily & BAG_FAMILY_MASK_HERBS))
-                        return false;
-                    return true;
-                case ITEM_SUBCLASS_ENCHANTING_CONTAINER:
-                    if (!(pProto->BagFamily & BAG_FAMILY_MASK_ENCHANTING_SUPP))
-                        return false;
-                    return true;
-                case ITEM_SUBCLASS_MINING_CONTAINER:
-                    if (!(pProto->BagFamily & BAG_FAMILY_MASK_MINING_SUPP))
-                        return false;
-                    return true;
-                case ITEM_SUBCLASS_ENGINEERING_CONTAINER:
-                    if (!(pProto->BagFamily & BAG_FAMILY_MASK_ENGINEERING_SUPP))
-                        return false;
-                    return true;
-                case ITEM_SUBCLASS_GEM_CONTAINER:
-                    if (!(pProto->BagFamily & BAG_FAMILY_MASK_GEMS))
-                        return false;
-                    return true;
-                case ITEM_SUBCLASS_LEATHERWORKING_CONTAINER:
-                    if (!(pProto->BagFamily & BAG_FAMILY_MASK_LEATHERWORKING_SUPP))
-                        return false;
-                    return true;
-                case ITEM_SUBCLASS_INSCRIPTION_CONTAINER:
-                    if (!(pProto->BagFamily & BAG_FAMILY_MASK_INSCRIPTION_SUPP))
-                        return false;
-                    return true;
-                default:
-                    return false;
+                return true;
             }
+            else
+            {
+                if (pProto->Class == ITEM_CLASS_CONTAINER)
+                {
+                    return false;
+                }
+
+                switch (pBagProto->SubClass)
+                {
+                    case ITEM_SUBCLASS_SOUL_CONTAINER:
+                        if (!(pProto->BagFamily & BAG_FAMILY_MASK_SOUL_SHARDS))
+                            return false;
+                        return true;
+                    case ITEM_SUBCLASS_HERB_CONTAINER:
+                        if (!(pProto->BagFamily & BAG_FAMILY_MASK_HERBS))
+                            return false;
+                        return true;
+                    case ITEM_SUBCLASS_ENCHANTING_CONTAINER:
+                        if (!(pProto->BagFamily & BAG_FAMILY_MASK_ENCHANTING_SUPP))
+                            return false;
+                        return true;
+                    case ITEM_SUBCLASS_MINING_CONTAINER:
+                        if (!(pProto->BagFamily & BAG_FAMILY_MASK_MINING_SUPP))
+                            return false;
+                        return true;
+                    case ITEM_SUBCLASS_ENGINEERING_CONTAINER:
+                        if (!(pProto->BagFamily & BAG_FAMILY_MASK_ENGINEERING_SUPP))
+                            return false;
+                        return true;
+                    case ITEM_SUBCLASS_GEM_CONTAINER:
+                        if (!(pProto->BagFamily & BAG_FAMILY_MASK_GEMS))
+                            return false;
+                        return true;
+                    case ITEM_SUBCLASS_LEATHERWORKING_CONTAINER:
+                        if (!(pProto->BagFamily & BAG_FAMILY_MASK_LEATHERWORKING_SUPP))
+                            return false;
+                        return true;
+                    case ITEM_SUBCLASS_INSCRIPTION_CONTAINER:
+                        if (!(pProto->BagFamily & BAG_FAMILY_MASK_INSCRIPTION_SUPP))
+                            return false;
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        }
         case ITEM_CLASS_QUIVER:
+        {
+            if (pProto->Class == ITEM_CLASS_QUIVER)
+            {
+                return false;
+            }
+
             switch (pBagProto->SubClass)
             {
                 case ITEM_SUBCLASS_QUIVER:
@@ -236,7 +254,9 @@ bool ItemCanGoIntoBag(ItemTemplate const* pProto, ItemTemplate const* pBagProto)
                 default:
                     return false;
             }
+        }
     }
+
     return false;
 }
 
@@ -728,7 +748,7 @@ void Item::AddToUpdateQueueOf(Player* player)
     if (IsInUpdateQueue())
         return;
 
-    ASSERT(player != nullptr);
+    ASSERT(player);
 
     if (player->GetGUID() != GetOwnerGUID())
     {
@@ -748,7 +768,7 @@ void Item::RemoveFromUpdateQueueOf(Player* player)
     if (!IsInUpdateQueue())
         return;
 
-    ASSERT(player != nullptr);
+    ASSERT(player);
 
     if (player->GetGUID() != GetOwnerGUID())
     {

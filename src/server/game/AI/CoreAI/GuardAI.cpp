@@ -19,10 +19,10 @@
 #include "CreatureAIImpl.h"
 #include "Player.h"
 
-int GuardAI::Permissible(Creature const* creature)
+int32 GuardAI::Permissible(Creature const* creature)
 {
     if (creature->IsGuard())
-        return PERMIT_BASE_SPECIAL;
+        return PERMIT_BASE_PROACTIVE;
 
     return PERMIT_BASE_NO;
 }
@@ -43,14 +43,14 @@ void GuardAI::EnterEvadeMode(EvadeReason /*why*/)
     {
         me->GetMotionMaster()->MoveIdle();
         me->CombatStop(true);
-        me->DeleteThreatList();
+        me->GetThreatMgr().ClearAllThreat();
         return;
     }
 
     LOG_DEBUG("entities.unit", "Guard entry: {} enters evade mode.", me->GetEntry());
 
     me->RemoveAllAuras();
-    me->DeleteThreatList();
+    me->GetThreatMgr().ClearAllThreat();
     me->CombatStop(true);
 
     // Remove ChaseMovementGenerator from MotionMaster stack list, and add HomeMovementGenerator instead

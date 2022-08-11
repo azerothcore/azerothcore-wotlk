@@ -68,7 +68,7 @@ public:
                 break;
             case 8:
                 _owner.SetReactState(REACT_AGGRESSIVE);
-                _owner.RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                _owner.SetImmuneToAll(false);
                 if (InstanceScript* instance = _owner.GetInstanceScript())
                     instance->SetData(DATA_BATTERED_HILT, 8);
                 break;
@@ -96,7 +96,7 @@ public:
                 {
                     Position homePos = _owner.GetHomePosition();
                     _owner.SetReactState(REACT_PASSIVE);
-                    _owner.SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    _owner.SetImmuneToAll(true);
                     _owner.SetVisible(false);
                     _owner.UpdatePosition(homePos.GetPositionX(), homePos.GetPositionY(), homePos.GetPositionZ(), homePos.GetOrientation(), true);
                     _owner.StopMovingOnCurrentPos();
@@ -523,7 +523,7 @@ public:
                             if (TeamIdInInstance == TEAM_ALLIANCE)
                                 c->UpdateEntry(NPC_JAINA_PART2);
                         }
-                        c->DeleteThreatList();
+                        c->GetThreatMgr().ClearAllThreat();
                         c->CombatStop(true);
                         c->InterruptNonMeleeSpells(true);
                         c->GetMotionMaster()->Clear();
@@ -540,7 +540,7 @@ public:
                     }
                     if (Creature* c = instance->GetCreature(NPC_LichKingGUID))
                     {
-                        c->DeleteThreatList();
+                        c->GetThreatMgr().ClearAllThreat();
                         c->CombatStop(true);
                         c->InterruptNonMeleeSpells(true);
                         c->GetMotionMaster()->Clear();
@@ -629,7 +629,7 @@ public:
                                 if (Creature* c = instance->GetCreature(NPC_QuelDelarGUID))
                                 {
                                     c->SetReactState(REACT_AGGRESSIVE);
-                                    c->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                                    c->SetImmuneToAll(false);
                                     c->RemoveAurasDueToSpell(70300);
                                 }
                                 break;
@@ -889,7 +889,8 @@ public:
                                 if (c->GetEntry() == entry)
                                 {
                                     TrashActive[j] = true;
-                                    c->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+                                    c->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                                    c->SetImmuneToAll(false);
                                     c->AI()->DoAction(1);
                                     break;
                                 }
@@ -915,10 +916,11 @@ public:
                 if (TrashActive[i])
                     if (Creature* c = instance->GetCreature(NPC_TrashGUID[i]))
                     {
-                        c->DeleteThreatList();
+                        c->GetThreatMgr().ClearAllThreat();
                         c->CombatStop(true);
                         c->InterruptNonMeleeSpells(true);
-                        c->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+                        c->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                        c->SetImmuneToAll(true);
                         c->Respawn(true);
                         c->UpdatePosition(c->GetHomePosition(), true);
                         c->StopMovingOnCurrentPos();
@@ -1126,7 +1128,7 @@ public:
                             if (Creature* c = instance->GetCreature(NPC_LichKingGUID))
                             {
                                 c->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-                                c->DeleteThreatList();
+                                c->GetThreatMgr().ClearAllThreat();
                                 c->CombatStop(true);
                                 c->InterruptNonMeleeSpells(true);
                                 c->SetVisible(false);

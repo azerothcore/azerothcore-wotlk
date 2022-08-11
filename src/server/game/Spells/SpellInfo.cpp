@@ -1241,7 +1241,7 @@ bool SpellInfo::IsChanneled() const
     return (AttributesEx & (SPELL_ATTR1_IS_CHANNELED | SPELL_ATTR1_IS_SELF_CHANNELED));
 }
 
-bool SpellInfo::IsMoveAllowedChannel() const
+bool SpellInfo::IsActionAllowedChannel() const
 {
     return IsChanneled() && HasAttribute(SPELL_ATTR5_ALLOW_ACTION_DURING_CHANNEL);
 }
@@ -1371,14 +1371,6 @@ bool SpellInfo::IsSingleTarget() const
     // all other single target spells have if it has AttributesEx5
     if (AttributesEx5 & SPELL_ATTR5_LIMIT_N)
         return true;
-
-    switch (GetSpellSpecific())
-    {
-        case SPELL_SPECIFIC_JUDGEMENT:
-            return true;
-        default:
-            break;
-    }
 
     return false;
 }

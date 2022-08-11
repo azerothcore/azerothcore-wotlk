@@ -30,7 +30,7 @@
 
 WMORoot::WMORoot(std::string const& filename)
     : filename(filename), color(0), nTextures(0), nGroups(0), nPortals(0), nLights(0),
-    nDoodadNames(0), nDoodadDefs(0), nDoodadSets(0), RootWMOID(0), liquidType(0)
+      nDoodadNames(0), nDoodadDefs(0), nDoodadSets(0), RootWMOID(0), flags(0)
 {
     memset(bbcorn1, 0, sizeof(bbcorn1));
     memset(bbcorn2, 0, sizeof(bbcorn2));
@@ -71,7 +71,7 @@ bool WMORoot::open()
             f.read(&RootWMOID, 4);
             f.read(bbcorn1, 12);
             f.read(bbcorn2, 12);
-            f.read(&liquidType, 4);
+            f.read(&flags, 4);
         }
         else if (!strcmp(fourcc, "MODS"))
         {
@@ -158,14 +158,14 @@ WMOGroup::WMOGroup(std::string const& filename) :
     filename(std::move(filename)), MOPY(nullptr), MOVI(nullptr), MoviEx(nullptr), MOVT(nullptr), MOBA(nullptr), MobaEx(nullptr),
     hlq(nullptr), LiquEx(nullptr), LiquBytes(nullptr), groupName(0), descGroupName(0), mogpFlags(0),
     moprIdx(0), moprNItems(0), nBatchA(0), nBatchB(0), nBatchC(0), fogIdx(0),
-    liquidType(0), groupWMOID(0), mopy_size(0), moba_size(0), LiquEx_size(0),
+    groupLiquid(0), groupWMOID(0), mopy_size(0), moba_size(0), LiquEx_size(0),
     nVertices(0), nTriangles(0), liquflags(0)
 {
     memset(bbcorn1, 0, sizeof(bbcorn1));
     memset(bbcorn2, 0, sizeof(bbcorn2));
 }
 
-bool WMOGroup::open()
+bool WMOGroup::open(WMORoot* rootWMO)
 {
     MPQFile f(filename.c_str());
     if (f.isEof ())
@@ -202,8 +202,19 @@ bool WMOGroup::open()
             f.read(&nBatchB, 2);
             f.read(&nBatchC, 4);
             f.read(&fogIdx, 4);
-            f.read(&liquidType, 4);
+            f.read(&groupLiquid, 4);
             f.read(&groupWMOID, 4);
+
+            // according to WoW.Dev Wiki:
+            if (rootWMO->flags & 4)
+                groupLiquid = GetLiquidTypeId(groupLiquid);
+            else if (groupLiquid == 15)
+                groupLiquid = 0;
+            else
+                groupLiquid = GetLiquidTypeId(groupLiquid + 1);
+
+            if (groupLiquid)
+                liquflags |= 2;
         }
         else if (!strcmp(fourcc, "MOPY"))
         {
@@ -252,6 +263,19 @@ bool WMOGroup::open()
             LiquBytes = new char[nLiquBytes];
             f.read(LiquBytes, nLiquBytes);
 
+            // Determine legacy liquid type
+            if (!groupLiquid)
+            {
+                for (int i = 0; i < hlq->xtiles * hlq->ytiles; ++i)
+                {
+                    if ((LiquBytes[i] & 0xF) != 15)
+                    {
+                        groupLiquid = GetLiquidTypeId((LiquBytes[i] & 0xF) + 1);
+                        break;
+                    }
+                }
+            }
+
             /* std::ofstream llog("Buildings/liquid.log", ios_base::out | ios_base::app);
             llog << filename;
             llog << "\nbbox: " << bbcorn1[0] << ", " << bbcorn1[1] << ", " << bbcorn1[2] << " | " << bbcorn2[0] << ", " << bbcorn2[1] << ", " << bbcorn2[2];
@@ -265,7 +289,7 @@ bool WMOGroup::open()
     return true;
 }
 
-int WMOGroup::ConvertToVMAPGroupWmo(FILE* output, WMORoot* rootWMO, bool preciseVectorData)
+int WMOGroup::ConvertToVMAPGroupWmo(FILE* output, bool preciseVectorData)
 {
     fwrite(&mogpFlags, sizeof(uint32), 1, output);
     fwrite(&groupWMOID, sizeof(uint32), 1, output);
@@ -423,76 +447,53 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE* output, WMORoot* rootWMO, bool precise
     }
 
     //------LIQU------------------------
-    if (LiquEx_size != 0)
+    if (liquflags & 3)
     {
-        int LIQU_h[] = { 0x5551494C, static_cast<int>(sizeof(WMOLiquidHeader) + LiquEx_size) + hlq->xtiles * hlq->ytiles }; // "LIQU"
+        int LIQU_totalSize = sizeof(uint32);
+        if (liquflags & 1)
+        {
+            LIQU_totalSize += sizeof(WMOLiquidHeader);
+            LIQU_totalSize += LiquEx_size / sizeof(WMOLiquidVert) * sizeof(float);
+            LIQU_totalSize += hlq->xtiles * hlq->ytiles;
+        }
+
+        int LIQU_h[] = { 0x5551494C, LIQU_totalSize };// "LIQU"
         fwrite(LIQU_h, 4, 2, output);
-
-        // according to WoW.Dev Wiki:
-        uint32 liquidEntry;
-        if (rootWMO->liquidType & 4)
-            liquidEntry = liquidType;
-        else if (liquidType == 15)
-            liquidEntry = 0;
-        else
-            liquidEntry = liquidType + 1;
-
-        if (!liquidEntry)
-        {
-            int v1; // edx@1
-            int v2; // eax@1
-
-            v1 = hlq->xtiles * hlq->ytiles;
-            v2 = 0;
-            if (v1 > 0)
-            {
-                while ((LiquBytes[v2] & 0xF) == 15)
-                {
-                    ++v2;
-                    if (v2 >= v1)
-                        break;
-                }
-
-                if (v2 < v1 && (LiquBytes[v2] & 0xF) != 15)
-                    liquidEntry = (LiquBytes[v2] & 0xF) + 1;
-            }
-        }
-
-        if (liquidEntry && liquidEntry < 21)
-        {
-            switch ((liquidEntry - 1) & 3)
-            {
-                case 0:
-                    liquidEntry = ((mogpFlags & 0x80000) != 0) + 13;
-                    break;
-                case 1:
-                    liquidEntry = 14;
-                    break;
-                case 2:
-                    liquidEntry = 19;
-                    break;
-                case 3:
-                    liquidEntry = 20;
-                    break;
-            }
-        }
-
-        hlq->type = liquidEntry;
 
         /* std::ofstream llog("Buildings/liquid.log", ios_base::out | ios_base::app);
         llog << filename;
         llog << ":\nliquidEntry: " << liquidEntry << " type: " << hlq->type << " (root:" << rootWMO->liquidType << " group:" << liquidType << ")\n";
         llog.close(); */
 
-        fwrite(hlq, sizeof(WMOLiquidHeader), 1, output);
-        // only need height values, the other values are unknown anyway
-        for (uint32 i = 0; i < LiquEx_size / sizeof(WMOLiquidVert); ++i)
-            fwrite(&LiquEx[i].height, sizeof(float), 1, output);
-        // todo: compress to bit field
-        fwrite(LiquBytes, 1, hlq->xtiles * hlq->ytiles, output);
+        fwrite(&groupLiquid, sizeof(uint32), 1, output);
+        if (liquflags & 1)
+        {
+            fwrite(hlq, sizeof(WMOLiquidHeader), 1, output);
+            // only need height values, the other values are unknown anyway
+            for (uint32 i = 0; i < LiquEx_size / sizeof(WMOLiquidVert); ++i)
+                fwrite(&LiquEx[i].height, sizeof(float), 1, output);
+            // todo: compress to bit field
+            fwrite(LiquBytes, 1, hlq->xtiles * hlq->ytiles, output);
+        }
     }
 
     return nColTriangles;
+}
+
+uint32 WMOGroup::GetLiquidTypeId(uint32 liquidTypeId)
+{
+    if (liquidTypeId < 21 && liquidTypeId)
+    {
+        switch (((static_cast<uint8>(liquidTypeId) - 1) & 3))
+        {
+            case 0: return ((mogpFlags & 0x80000) != 0) + 13;
+            case 1: return 14;
+            case 2: return 19;
+            case 3: return 20;
+            default: break;
+        }
+    }
+    return liquidTypeId;
 }
 
 WMOGroup::~WMOGroup()

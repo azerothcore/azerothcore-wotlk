@@ -28,7 +28,7 @@ namespace MMAP
 
     MMapMgr* MMapFactory::createOrGetMMapMgr()
     {
-        if (g_MMapMgr == nullptr)
+        if (!g_MMapMgr)
         {
             g_MMapMgr = new MMapMgr();
         }

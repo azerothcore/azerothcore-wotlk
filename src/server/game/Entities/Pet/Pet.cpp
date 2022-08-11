@@ -553,8 +553,10 @@ void Pet::SavePetToDB(PetSaveMode mode)
         // save pet
         std::string actionBar = GenerateActionBarData();
 
-        ASSERT(owner->GetPetStable()->CurrentPet && owner->GetPetStable()->CurrentPet->PetNumber == m_charmInfo->GetPetNumber());
-        FillPetInfo(&owner->GetPetStable()->CurrentPet.value());
+        if (owner->GetPetStable()->CurrentPet && owner->GetPetStable()->CurrentPet->PetNumber == m_charmInfo->GetPetNumber())
+        {
+            FillPetInfo(&owner->GetPetStable()->CurrentPet.value());
+        }
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHAR_PET);
         stmt->SetData(0, m_charmInfo->GetPetNumber());
@@ -1152,7 +1154,9 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                         {
                             // xinef: Glyph of Felguard, so ugly im crying... no appropriate spell
                             if (AuraEffect* aurEff = owner->GetAuraEffectDummy(SPELL_GLYPH_OF_FELGUARD))
-                                SetModifierValue(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, 1.0f + float(aurEff->GetAmount() / 100.0f));
+                            {
+                                HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, aurEff->GetAmount(), true);
+                            }
 
                             break;
                         }
@@ -1831,16 +1835,16 @@ bool Pet::addSpell(uint32 spellId, ActiveStates active /*= ACT_DECIDE*/, PetSpel
         m_charmInfo->AddSpellToActionBar(spellInfo);
 
     // unapply aura stats if dont meet requirements
-    // handle only if player is not loaded, loading is handled in loadfromdb
-    if (!m_loading)
-        if (Aura* aura = GetAura(spellId))
-        {
-            if (aura->GetSpellInfo()->CasterAuraState == AURA_STATE_HEALTHLESS_35_PERCENT ||
-                    aura->GetSpellInfo()->CasterAuraState == AURA_STATE_HEALTH_ABOVE_75_PERCENT ||
-                    aura->GetSpellInfo()->CasterAuraState == AURA_STATE_HEALTHLESS_20_PERCENT )
-                if (!HasAuraState((AuraStateType)aura->GetSpellInfo()->CasterAuraState))
-                    aura->HandleAllEffects(aura->GetApplicationOfTarget(GetGUID()), AURA_EFFECT_HANDLE_REAL, false);
-        }
+    if (Aura* aura = GetAura(spellId))
+    {
+        if (aura->GetSpellInfo()->CasterAuraState == AURA_STATE_HEALTHLESS_35_PERCENT ||
+                aura->GetSpellInfo()->CasterAuraState == AURA_STATE_HEALTH_ABOVE_75_PERCENT ||
+                aura->GetSpellInfo()->CasterAuraState == AURA_STATE_HEALTHLESS_20_PERCENT )
+            if (!HasAuraState((AuraStateType)aura->GetSpellInfo()->CasterAuraState))
+            {
+                aura->HandleAllEffects(aura->GetApplicationOfTarget(GetGUID()), AURA_EFFECT_HANDLE_REAL, false);
+            }
+    }
 
     ToggleAutocast(spellInfo, (newspell.active == ACT_ENABLED));
 

@@ -186,6 +186,7 @@ public:
         static ChatCommandTable npcCommandTable =
         {
             { "info",           HandleNpcInfoCommand,              SEC_GAMEMASTER, Console::No },
+            { "guid",           HandleNpcGuidCommand,              SEC_GAMEMASTER, Console::No },
             { "near",           HandleNpcNearCommand,              SEC_GAMEMASTER, Console::No },
             { "move",           HandleNpcMoveCommand,              SEC_GAMEMASTER, Console::No },
             { "playemote",      HandleNpcPlayEmoteCommand,         SEC_GAMEMASTER, Console::No },
@@ -651,6 +652,36 @@ public:
 
         return true;
     }
+    static bool HandleNpcGuidCommand(ChatHandler* handler)
+    {
+        Creature* target = handler->getSelectedCreature();
+
+        if (!target)
+        {
+            handler->SendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        uint32 faction = target->GetFaction();
+        uint32 npcflags = target->GetNpcFlags();
+        uint32 displayid = target->GetDisplayId();
+        uint32 nativeid = target->GetNativeDisplayId();
+        uint32 entry = target->GetEntry();
+        uint32 id1 = 0;
+        uint32 id2 = 0;
+        uint32 id3 = 0;
+        if (CreatureData const* cData = target->GetCreatureData())
+        {
+            id1 = cData->id1;
+            id2 = cData->id2;
+            id3 = cData->id3;
+        }
+
+        handler->PSendSysMessage(LANG_NPCINFO_CHAR, target->GetSpawnId(), target->GetGUID().GetCounter(), entry, id1, id2, id3, displayid, nativeid, faction, npcflags);
+
+        return true;
+    }
 
     static bool HandleNpcNearCommand(ChatHandler* handler, Optional<float> dist)
     {
@@ -987,11 +1018,36 @@ public:
     }
 
     //spawn time handling
-    static bool HandleNpcSetSpawnTimeCommand(ChatHandler* handler, uint32 spawnTime)
+    static bool HandleNpcSetSpawnTimeCommand(ChatHandler* handler, std::string spawnTimeStr)
     {
+        if (spawnTimeStr.empty())
+        {
+            return false;
+        }
+
+        if (Acore::StringTo<int32>(spawnTimeStr).value_or(0) < 0)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
         Creature* creature = handler->getSelectedCreature();
         if (!creature)
             return false;
+
+        int32 spawnTime = TimeStringToSecs(spawnTimeStr);
+        if (spawnTime <= 0)
+        {
+            spawnTime = Acore::StringTo<int32>(spawnTimeStr).value_or(0);
+        }
+
+        if (spawnTime <= 0)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
 
         WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_SPAWN_TIME_SECS);
         stmt->SetData(0, spawnTime);
@@ -999,7 +1055,7 @@ public:
         WorldDatabase.Execute(stmt);
 
         creature->SetRespawnDelay(spawnTime);
-        handler->PSendSysMessage(LANG_COMMAND_SPAWNTIME, spawnTime);
+        handler->PSendSysMessage(LANG_COMMAND_SPAWNTIME, secsToTimeString(spawnTime, true).c_str());
 
         return true;
     }

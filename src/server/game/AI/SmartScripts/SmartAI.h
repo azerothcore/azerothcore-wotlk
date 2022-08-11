@@ -47,6 +47,9 @@ public:
     ~SmartAI() override {};
     explicit SmartAI(Creature* c);
 
+    // Check whether we are currently permitted to make the creature take action
+    bool IsAIControlled() const;
+
     // Start moving to the desired MovePoint
     void StartPath(bool run = false, uint32 path = 0, bool repeat = false, Unit* invoker = nullptr);
     bool LoadPath(uint32 entry);
@@ -133,9 +136,6 @@ public:
     // called when the corpse of this creature gets removed
     void CorpseRemoved(uint32& respawnDelay) override;
 
-    // Called at World update tick if creature is charmed
-    void UpdateAIWhileCharmed(const uint32 diff);
-
     // Called when a Player/Creature enters the creature (vehicle)
     void PassengerBoarded(Unit* who, int8 seatId, bool apply) override;
 
@@ -164,7 +164,7 @@ public:
     ObjectGuid GetGUID(int32 id = 0) const override;
 
     //core related
-    static int32 Permissible(Creature const*);
+    static int32 Permissible(Creature const* /*creature*/) { return PERMIT_BASE_NO; }
 
     // Called at movepoint reached
     void MovepointReached(uint32 id);
@@ -205,6 +205,7 @@ public:
     void SetForcedCombatMove(float dist);
 
 private:
+    bool mIsCharmed;
     uint32 mFollowCreditType;
     uint32 mFollowArrivedTimer;
     uint32 mFollowCredit;
@@ -234,7 +235,7 @@ private:
     bool mForcedPaused;
     uint32 mInvincibilityHpLevel;
 
-    bool AssistPlayerInCombat(Unit* who);
+    bool AssistPlayerInCombatAgainst(Unit* who);
 
     uint32 mDespawnTime;
     uint32 mDespawnState;
@@ -258,7 +259,7 @@ public:
     void InitializeAI() override;
     void Reset() override;
     SmartScript* GetScript() { return &mScript; }
-    static int32 Permissible(GameObject const* g);
+    static int32 Permissible(GameObject const* /*go*/) { return PERMIT_BASE_NO; }
 
     bool GossipHello(Player* player, bool reportUse) override;
     bool GossipSelect(Player* player, uint32 sender, uint32 action) override;

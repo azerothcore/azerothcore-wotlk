@@ -64,6 +64,7 @@ enum Events
     EVENT_SEEPING_FOG = 1,
     EVENT_NOXIOUS_BREATH,
     EVENT_TAIL_SWEEP,
+    EVENT_SUMMON_PLAYER,
 
     // Ysondre
     EVENT_LIGHTNING_WAVE,
@@ -102,6 +103,7 @@ struct emerald_dragonAI : public WorldBossAI
         events.ScheduleEvent(EVENT_TAIL_SWEEP, 4000);
         events.ScheduleEvent(EVENT_NOXIOUS_BREATH, urand(7500, 15000));
         events.ScheduleEvent(EVENT_SEEPING_FOG, urand(12500, 20000));
+        events.ScheduleEvent(EVENT_SUMMON_PLAYER, 1s);
     }
 
     // Target killed during encounter, mark them as suspectible for Aura Of Nature
@@ -133,6 +135,12 @@ struct emerald_dragonAI : public WorldBossAI
                 DoCast(me, SPELL_TAIL_SWEEP);
                 events.ScheduleEvent(EVENT_TAIL_SWEEP, 2000);
                 break;
+            case EVENT_SUMMON_PLAYER:
+                if (Unit* target = me->GetVictim())
+                    if (!target->IsWithinRange(me, 50.f))
+                        DoCast(target, SPELL_SUMMON_PLAYER);
+                events.ScheduleEvent(EVENT_SUMMON_PLAYER, 500ms);
+                break;
         }
     }
 
@@ -148,9 +156,6 @@ struct emerald_dragonAI : public WorldBossAI
 
         while (uint32 eventId = events.ExecuteEvent())
             ExecuteEvent(eventId);
-
-        if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, -50.0f, true))
-            DoCast(target, SPELL_SUMMON_PLAYER);
 
         DoMeleeAttackIfReady();
     }
@@ -262,13 +267,25 @@ public:
         }
 
         // Summon druid spirits on 75%, 50% and 25% health
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (!HealthAbovePct(100 - 25 * _stage))
+            if (me->HealthBelowPctDamaged(100 - (25 * _stage), damage))
             {
                 Talk(SAY_YSONDRE_SUMMON_DRUIDS);
 
-                for (uint8 i = 0; i < 10; ++i)
+                auto const& attackers = me->GetThreatMgr().getThreatList();
+                uint8 attackersCount = 0;
+
+                for (const auto attacker : attackers)
+                {
+                    if ((*attacker)->ToPlayer() && (*attacker)->IsAlive())
+                        ++attackersCount;
+                }
+
+                uint8 amount = attackersCount < 30 ? attackersCount * 0.5f : 15;
+                amount = amount < 1 ? 1 : amount;
+
+                for (uint8 i = 0; i < amount; ++i)
                     DoCast(me, SPELL_SUMMON_DRUID_SPIRITS, true);
                 ++_stage;
             }
@@ -302,9 +319,6 @@ public:
  * ---
  * --- Dragonspecific scripts and handling: LETHON
  * ---
- *
- * @todo
- * - Spell: Shadow bolt whirl casts needs custom handling (spellscript)
  */
 
 enum LethonTexts
@@ -318,6 +332,14 @@ enum LethonSpells
     SPELL_DRAW_SPIRIT               = 24811,
     SPELL_SHADOW_BOLT_WHIRL         = 24834,
     SPELL_DARK_OFFERING             = 24804,
+    SPELL_SHADOW_BOLT_WHIRL1        = 24820,
+    SPELL_SHADOW_BOLT_WHIRL2        = 24821,
+    SPELL_SHADOW_BOLT_WHIRL3        = 24822,
+    SPELL_SHADOW_BOLT_WHIRL4        = 24823,
+    SPELL_SHADOW_BOLT_WHIRL5        = 24835,
+    SPELL_SHADOW_BOLT_WHIRL6        = 24836,
+    SPELL_SHADOW_BOLT_WHIRL7        = 24837,
+    SPELL_SHADOW_BOLT_WHIRL8        = 24838,
 };
 
 enum LethonCreatures
@@ -340,18 +362,19 @@ public:
         {
             _stage = 1;
             emerald_dragonAI::Reset();
-            events.ScheduleEvent(EVENT_SHADOW_BOLT_WHIRL, 10000);
+            me->RemoveAurasDueToSpell(SPELL_SHADOW_BOLT_WHIRL);
         }
 
         void EnterCombat(Unit* who) override
         {
             Talk(SAY_LETHON_AGGRO);
             WorldBossAI::EnterCombat(who);
+            DoCastSelf(SPELL_SHADOW_BOLT_WHIRL, true);
         }
 
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (!HealthAbovePct(100 - 25 * _stage))
+            if (me->HealthBelowPctDamaged(100 - (25 * _stage), damage))
             {
                 Talk(SAY_LETHON_DRAW_SPIRIT);
                 DoCast(me, SPELL_DRAW_SPIRIT);
@@ -365,20 +388,6 @@ public:
             {
                 Position targetPos = target->GetPosition();
                 me->SummonCreature(NPC_SPIRIT_SHADE, targetPos, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 50000);
-            }
-        }
-
-        void ExecuteEvent(uint32 eventId) override
-        {
-            switch (eventId)
-            {
-                case EVENT_SHADOW_BOLT_WHIRL:
-                    me->CastSpell((Unit*)nullptr, SPELL_SHADOW_BOLT_WHIRL, false);
-                    events.ScheduleEvent(EVENT_SHADOW_BOLT_WHIRL, urand(15000, 30000));
-                    break;
-                default:
-                    emerald_dragonAI::ExecuteEvent(eventId);
-                    break;
             }
         }
 
@@ -471,7 +480,10 @@ public:
         void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
-                DoCast(who, SPELL_PUTRID_MUSHROOM, true);
+            {
+                who->CastSpell(who, SPELL_PUTRID_MUSHROOM, true);
+            }
+
             emerald_dragonAI::KilledUnit(who);
         }
 
@@ -481,9 +493,9 @@ public:
             WorldBossAI::EnterCombat(who);
         }
 
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (!HealthAbovePct(100 - 25 * _stage))
+            if (me->HealthBelowPctDamaged(100 - (25 * _stage), damage))
             {
                 Talk(SAY_EMERISS_CAST_CORRUPTION);
                 DoCast(me, SPELL_CORRUPTION_OF_EARTH, true);
@@ -541,7 +553,6 @@ uint32 const TaerarShadeSpells[] =
 {
     SPELL_SUMMON_SHADE_1, SPELL_SUMMON_SHADE_2, SPELL_SUMMON_SHADE_3
 };
-
 class boss_taerar : public CreatureScript
 {
 public:
@@ -578,11 +589,11 @@ public:
             --_shades;
         }
 
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             // At 75, 50 or 25 percent health, we need to activate the shades and go "banished"
             // Note: _stage holds the amount of times they have been summoned
-            if (!_banished && !HealthAbovePct(100 - 25 * _stage))
+            if (!_banished && me->HealthBelowPctDamaged(100 - (25 * _stage), damage))
             {
                 _banished = true;
                 _banishedTimer = 60000;
@@ -594,9 +605,8 @@ public:
 
                 uint32 count = sizeof(TaerarShadeSpells) / sizeof(uint32);
                 for (uint32 i = 0; i < count; ++i)
-                    DoCastVictim(TaerarShadeSpells[i], true);
+                    DoCast(TaerarShadeSpells[i]);
                 _shades += count;
-
                 DoCast(SPELL_SHADE);
                 me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                 me->SetReactState(REACT_PASSIVE);
@@ -604,7 +614,6 @@ public:
                 ++_stage;
             }
         }
-
         void ExecuteEvent(uint32 eventId) override
         {
             switch (eventId)
@@ -648,8 +657,13 @@ public:
 
                 return;
             }
-
             emerald_dragonAI::UpdateAI(diff);
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            _JustDied();
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
         }
 
     private:
@@ -713,6 +727,41 @@ public:
     }
 };
 
+class spell_shadow_bolt_whirl : public AuraScript
+{
+    PrepareAuraScript(spell_shadow_bolt_whirl);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SHADOW_BOLT_WHIRL1, SPELL_SHADOW_BOLT_WHIRL2, SPELL_SHADOW_BOLT_WHIRL3, SPELL_SHADOW_BOLT_WHIRL4, SPELL_SHADOW_BOLT_WHIRL5, SPELL_SHADOW_BOLT_WHIRL6, SPELL_SHADOW_BOLT_WHIRL7, SPELL_SHADOW_BOLT_WHIRL8 });
+    }
+
+    void HandlePeriodic(AuraEffect const* aurEff)
+    {
+        Unit* caster = GetCaster();
+        Unit* target = GetTarget();
+
+        if (!caster || !target)
+            return;
+        std::array<uint32, 8> spellForTick = { SPELL_SHADOW_BOLT_WHIRL1, SPELL_SHADOW_BOLT_WHIRL2, SPELL_SHADOW_BOLT_WHIRL3, SPELL_SHADOW_BOLT_WHIRL4, SPELL_SHADOW_BOLT_WHIRL5, SPELL_SHADOW_BOLT_WHIRL6, SPELL_SHADOW_BOLT_WHIRL7, SPELL_SHADOW_BOLT_WHIRL8 };
+        uint32 tick = (aurEff->GetTickNumber() + 7/*-1*/) % 8;
+
+        // casted in left/right (but triggered spell have wide forward cone)
+        float forward = target->GetOrientation();
+        if (tick <= 3)
+            target->SetOrientation(forward + 0.75f * M_PI - tick * M_PI / 8);       // Left
+        else
+            target->SetOrientation(forward - 0.75f * M_PI + (8 - tick) * M_PI / 8); // Right
+
+        target->CastSpell(target, spellForTick[tick], true);
+        target->SetOrientation(forward);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_shadow_bolt_whirl::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
 class spell_mark_of_nature : public SpellScriptLoader
 {
 public:
@@ -766,4 +815,5 @@ void AddSC_emerald_dragons()
     // dragon spellscripts
     new spell_dream_fog_sleep();
     new spell_mark_of_nature();
+    RegisterSpellScript(spell_shadow_bolt_whirl);
 };

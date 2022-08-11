@@ -520,14 +520,17 @@ typedef std::pair<QuestRelations::const_iterator, QuestRelations::const_iterator
 
 struct PetLevelInfo
 {
-    PetLevelInfo() { for (unsigned short & stat : stats) stat = 0; }
+    PetLevelInfo()
+    {
+        stats.fill(0);
+    }
 
-    uint16 stats[MAX_STATS];
-    uint16 health{0};
-    uint16 mana{0};
+    std::array<uint32, MAX_STATS> stats = { };
+    uint32 health{0};
+    uint32 mana{0};
     uint32 armor{0};
-    uint16 min_dmg{0};
-    uint16 max_dmg{0};
+    uint32 min_dmg{0};
+    uint32 max_dmg{0};
 };
 
 struct MailLevelReward
@@ -1410,6 +1413,11 @@ public:
     [[nodiscard]] uint32 GetQuestMoneyReward(uint8 level, uint32 questMoneyDifficulty) const;
     void SendServerMail(Player* player, uint32 id, uint32 reqLevel, uint32 reqPlayTime, uint32 rewardMoneyA, uint32 rewardMoneyH, uint32 rewardItemA, uint32 rewardItemCountA, uint32 rewardItemH, uint32 rewardItemCountH, std::string subject, std::string body, uint8 active) const;
 
+    void LoadInstanceSavedGameobjectStateData();
+    bool FindInstanceSavedGameobjectState(uint32 id, uint32 guid);
+    uint8 GetInstanceSavedGameobjectState(uint32 id, uint32 guid);
+    void SetInstanceSavedGameobjectState(uint32 id, uint32 guid, uint8 state);
+    void NewInstanceSavedGameobjectState(uint32 id, uint32 guid, uint8 state);
 private:
     // first free id for selected id type
     uint32 _auctionId; // pussywizard: accessed by a single thread
@@ -1579,6 +1587,14 @@ private:
     std::set<uint32> _transportMaps; // Helper container storing map ids that are for transports only, loaded from gameobject_template
 
     QuestMoneyRewardStore _questMoneyRewards;
+
+    struct GameobjectInstanceSavedState
+    {
+        uint32 m_instance;
+        uint32 m_guid;
+        unsigned short m_state;
+    };
+    std::vector<GameobjectInstanceSavedState> GameobjectInstanceSavedStateList;
 };
 
 #define sObjectMgr ObjectMgr::instance()

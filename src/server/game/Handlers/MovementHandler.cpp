@@ -188,6 +188,22 @@ void WorldSession::HandleMoveWorldportAck()
 
     GetPlayer()->SendInitialPacketsAfterAddToMap();
 
+    // flight fast teleport case
+    if (GetPlayer()->IsInFlight())
+    {
+        if (!GetPlayer()->InBattleground())
+        {
+            // short preparations to continue flight
+            MovementGenerator* movementGenerator = GetPlayer()->GetMotionMaster()->top();
+            movementGenerator->Initialize(GetPlayer());
+            return;
+        }
+
+        // battleground state prepare, stop flight
+        GetPlayer()->GetMotionMaster()->MovementExpired();
+        GetPlayer()->CleanupAfterTaxiFlight();
+    }
+
     // resurrect character at enter into instance where his corpse exist after add to map
     Corpse* corpse = GetPlayer()->GetMap()->GetCorpseByPlayer(GetPlayer()->GetGUID());
     if (corpse && corpse->GetType() != CORPSE_BONES)
@@ -321,7 +337,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
     Unit* mover = _player->m_mover;
 
-    ASSERT(mover != nullptr);                      // there must always be a mover
+    ASSERT(mover);                      // there must always be a mover
 
     Player* plrMover = mover->ToPlayer();
 
@@ -764,7 +780,7 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket& recvData)
     WorldPacket data(MSG_MOVE_KNOCK_BACK, 66);
     data << guid.WriteAsPacked();
     _player->m_mover->BuildMovementPacket(&data);
-
+    _player->SetCanTeleport(true);
     // knockback specific info
     data << movementInfo.jump.sinAngle;
     data << movementInfo.jump.cosAngle;

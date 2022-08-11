@@ -96,7 +96,7 @@ bool GameObject::AIM_Initialize()
     return true;
 }
 
-std::string GameObject::GetAIName() const
+std::string const& GameObject::GetAIName() const
 {
     return sObjectMgr->GetGameObjectTemplate(GetEntry())->AIName;
 }
@@ -131,7 +131,7 @@ void GameObject::RemoveFromOwner()
         return;
     }
 
-    LOG_FATAL("entities.gameobject", "Delete GameObject ({} Entry: {} SpellId {} LinkedGO {}) that lost references to owner {} GO list. Crash possible later.",
+    LOG_DEBUG("entities.gameobject", "Delete GameObject ({} Entry: {} SpellId {} LinkedGO {}) that lost references to owner {} GO list.",
         GetGUID().ToString(), GetGOInfo()->entry, m_spellId, GetGOInfo()->GetLinkedGameObjectEntry(), ownerGUID.ToString());
 
     SetOwnerGUID(ObjectGuid::Empty);
@@ -158,6 +158,8 @@ void GameObject::AddToWorld()
         EnableCollision(GetGoState() == GO_STATE_READY || IsTransport()); // pussywizard: this startOpen is unneeded here, collision depends entirely on GOState
 
         WorldObject::AddToWorld();
+
+        loot.sourceWorldObjectGUID = GetGUID();
 
         sScriptMgr->OnGameObjectAddWorld(this);
     }
@@ -329,7 +331,31 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
 
     // GAMEOBJECT_BYTES_1, index at 0, 1, 2 and 3
     SetGoType(GameobjectTypes(goinfo->type));
-    SetGoState(go_state);
+
+    if (IsInstanceGameobject())
+    {
+        switch (GetStateSavedOnInstance())
+        {
+            case 0:
+                SetGoState(GO_STATE_READY);
+                SwitchDoorOrButton(true);
+                break;
+            case 1:
+                SetGoState(GO_STATE_READY);
+                break;
+            case 2:
+                SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+                break;
+            default:
+                SetGoState(go_state);
+                break;
+        }
+    }
+    else
+    {
+        SetGoState(go_state);
+    }
+
     SetGoArtKit(artKit);
 
     SetDisplayId(goinfo->displayId);
@@ -677,8 +703,8 @@ void GameObject::Update(uint32 diff)
                         // search unfriendly creature
                         if (owner && goInfo->trap.autoCloseTime != -1) // hunter trap
                         {
-                            Acore::AnyUnfriendlyNoTotemUnitInObjectRangeCheck checker(this, owner, radius);
-                            Acore::UnitSearcher<Acore::AnyUnfriendlyNoTotemUnitInObjectRangeCheck> searcher(this, target, checker);
+                            Acore::NearestAttackableNoTotemUnitInObjectRangeCheck checker(this, owner, radius);
+                            Acore::UnitSearcher<Acore::NearestAttackableNoTotemUnitInObjectRangeCheck> searcher(this, target, checker);
                             Cell::VisitAllObjects(this, searcher, radius);
                         }
                         else                                        // environmental trap
@@ -1061,6 +1087,7 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask, bool 
     }
 
     WorldDatabase.CommitTransaction(trans);
+    sScriptMgr->OnGameObjectSaveToDB(this);
 }
 
 bool GameObject::LoadGameObjectFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap)
@@ -2028,20 +2055,19 @@ void GameObject::CastSpell(Unit* target, uint32 spellId)
     if (!spellInfo)
         return;
 
-    bool self = false;
+    bool self = true;
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
-        if (spellInfo->Effects[i].TargetA.GetTarget() == TARGET_UNIT_CASTER)
+        if (spellInfo->Effects[i].TargetA.GetReferenceType() != TARGET_REFERENCE_TYPE_CASTER || spellInfo->Effects[i].TargetB.GetTarget())
         {
-            self = true;
+            self = false;
             break;
         }
     }
 
-    if (self)
+    if (self && target && target->GetGUID() != GetGUID())
     {
-        if (target)
-            target->CastSpell(target, spellInfo, true);
+        target->CastSpell(target, spellInfo, true);
         return;
     }
 
@@ -2063,7 +2089,7 @@ void GameObject::CastSpell(Unit* target, uint32 spellId)
             trigger->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
 
         // xinef: Remove Immunity flags
-        trigger->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+        trigger->SetImmuneToNPC(false);
         // xinef: set proper orientation, fixes cast against stealthed targets
         if (target)
             trigger->SetInFront(target);
@@ -2430,6 +2456,146 @@ void GameObject::SetGoState(GOState state)
         else if (state == GO_STATE_READY)
             EnableCollision(!startOpen);*/
     }
+    /* Whenever a gameobject inside an instance changes
+     * save it's state on the database to be loaded properly
+     * on server restart or crash.
+     */
+    if (IsInstanceGameobject() && IsAbleToSaveOnDb())
+    {
+        // Save the gameobject state on the Database
+        if (!FindStateSavedOnInstance())
+        {
+            SaveInstanceData(GameobjectStateToInt(&state));
+        }
+        else
+        {
+            UpdateInstanceData(GameobjectStateToInt(&state));
+        }
+    }
+}
+
+bool GameObject::IsInstanceGameobject()
+{
+    // Avoid checking for unecessary gameobjects whose
+    // states don't matter for the dungeon progression
+    if (!ValidateGameobjectType())
+    {
+        return false;
+    }
+
+    if (auto* map = FindMap())
+    {
+        if (map->IsDungeon() || map->IsRaid())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool GameObject::ValidateGameobjectType()
+{
+    switch (m_goInfo->type)
+    {
+        case GAMEOBJECT_TYPE_DOOR:
+        case GAMEOBJECT_TYPE_BUTTON:
+        case GAMEOBJECT_TYPE_TRAP:
+        case GAMEOBJECT_TYPE_DESTRUCTIBLE_BUILDING:
+        case GAMEOBJECT_TYPE_TRAPDOOR:
+            return true;
+        default:
+            return false;
+    }
+}
+
+uint8 GameObject::GameobjectStateToInt(GOState* state)
+{
+    uint8 m_state = 3;
+
+    if (state)
+    {
+        switch (*state)
+        {
+            case GO_STATE_ACTIVE:
+                m_state = 0;
+                return m_state;
+            case GO_STATE_READY:
+                m_state = 1;
+                return m_state;
+            case GO_STATE_ACTIVE_ALTERNATIVE:
+                m_state = 2;
+                return m_state;
+        }
+    }
+
+    // Returning any value that is not one of the specified ones
+    // Which will default into the invalid part of the switch
+    return m_state;
+}
+
+bool GameObject::IsAbleToSaveOnDb()
+{
+    return m_saveStateOnDb;
+}
+
+void GameObject::UpdateSaveToDb(bool enable)
+{
+    m_saveStateOnDb = enable;
+
+    if (enable)
+    {
+        SavingStateOnDB();
+    }
+}
+
+void GameObject::SavingStateOnDB()
+{
+    if (IsInstanceGameobject())
+    {
+        GOState param = GetGoState();
+        if (!FindStateSavedOnInstance())
+        {
+            SaveInstanceData(GameobjectStateToInt(&param));
+        }
+    }
+}
+
+void GameObject::SaveInstanceData(uint8 state)
+{
+    uint32 id       = GetInstanceId();
+    uint32 guid     = GetSpawnId();
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INSERT_INSTANCE_SAVED_DATA);
+    stmt->SetData(0, id);
+    stmt->SetData(1, guid);
+    stmt->SetData(2, state);
+    CharacterDatabase.Execute(stmt);
+
+    sObjectMgr->NewInstanceSavedGameobjectState(id, guid, state);
+}
+
+void GameObject::UpdateInstanceData(uint8 state)
+{
+    uint32 id       = GetInstanceId();
+    uint32 guid     = GetSpawnId();
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPDATE_INSTANCE_SAVED_DATA);
+    stmt->SetData(0, state);
+    stmt->SetData(1, guid);
+    stmt->SetData(2, id);
+    CharacterDatabase.Execute(stmt);
+
+    sObjectMgr->SetInstanceSavedGameobjectState(id, guid, state);
+}
+
+uint8 GameObject::GetStateSavedOnInstance()
+{
+    return sObjectMgr->GetInstanceSavedGameobjectState(GetInstanceId(), GetSpawnId());
+}
+
+bool GameObject::FindStateSavedOnInstance()
+{
+    return sObjectMgr->FindInstanceSavedGameobjectState(GetInstanceId(), GetSpawnId());
 }
 
 void GameObject::SetDisplayId(uint32 displayid)

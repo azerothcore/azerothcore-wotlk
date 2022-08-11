@@ -213,9 +213,6 @@ public:
         handler->PSendSysMessage("Using %s DBC Locale as default. All available DBC locales: %s", localeNames[defaultLocale], availableLocales.c_str());
 
         handler->PSendSysMessage("Using World DB: %s", sWorld->GetDBVersion());
-        handler->PSendSysMessage("Using World DB Revision: %s", sWorld->GetWorldDBRevision());
-        handler->PSendSysMessage("Using Character DB Revision: %s", sWorld->GetCharacterDBRevision());
-        handler->PSendSysMessage("Using Auth DB Revision: %s", sWorld->GetAuthDBRevision());
 
         handler->PSendSysMessage("LoginDatabase queue size: %zu", LoginDatabase.QueueSize());
         handler->PSendSysMessage("CharacterDatabase queue size: %zu", CharacterDatabase.QueueSize());
@@ -272,10 +269,22 @@ public:
         return true;
     }
 
-    static bool HandleServerShutDownCommand(ChatHandler* /*handler*/, int32 time, Optional<int32> exitCode, Tail reason)
+    static bool HandleServerShutDownCommand(ChatHandler* handler, std::string time, Optional<int32> exitCode, Tail reason)
     {
         std::wstring wReason   = std::wstring();
         std::string  strReason = std::string();
+
+        if (time.empty())
+        {
+            return false;
+        }
+
+        if (Acore::StringTo<int32>(time).value_or(0) < 0)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
 
         if (!reason.empty())
         {
@@ -290,23 +299,48 @@ public:
             }
         }
 
+        int32 delay = TimeStringToSecs(time);
+        if (delay <= 0)
+        {
+            delay = Acore::StringTo<int32>(time).value_or(0);
+        }
+
+        if (delay <= 0)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
         if (exitCode && *exitCode >= 0 && *exitCode <= 125)
         {
-            sWorld->ShutdownServ(time, 0, *exitCode);
+            sWorld->ShutdownServ(delay, 0, *exitCode);
         }
         else
         {
-            sWorld->ShutdownServ(time, 0, SHUTDOWN_EXIT_CODE, strReason);
+            sWorld->ShutdownServ(delay, 0, SHUTDOWN_EXIT_CODE, strReason);
         }
 
         return true;
     }
 
-    static bool HandleServerRestartCommand(ChatHandler* /*handler*/, int32 time, Optional<int32> exitCode, Tail reason)
+    static bool HandleServerRestartCommand(ChatHandler* handler, std::string time, Optional<int32> exitCode, Tail reason)
     {
         std::wstring wReason = std::wstring();
         std::string strReason    = std::string();
 
+        if (time.empty())
+        {
+            return false;
+        }
+
+        if (Acore::StringTo<int32>(time).value_or(0) < 0)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
         if (!reason.empty())
         {
             if (!Utf8toWStr(reason, wReason))
@@ -320,22 +354,47 @@ public:
             }
         }
 
+        int32 delay = TimeStringToSecs(time);
+        if (delay <= 0)
+        {
+            delay = Acore::StringTo<int32>(time).value_or(0);
+        }
+
+        if (delay <= 0)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
         if (exitCode && *exitCode >= 0 && *exitCode <= 125)
         {
-            sWorld->ShutdownServ(time, SHUTDOWN_MASK_RESTART, *exitCode);
+            sWorld->ShutdownServ(delay, SHUTDOWN_MASK_RESTART, *exitCode);
         }
         else
         {
-            sWorld->ShutdownServ(time, SHUTDOWN_MASK_RESTART, RESTART_EXIT_CODE, strReason);
+            sWorld->ShutdownServ(delay, SHUTDOWN_MASK_RESTART, RESTART_EXIT_CODE, strReason);
         }
 
         return true;
     }
 
-    static bool HandleServerIdleRestartCommand(ChatHandler* /*handler*/, int32 time, Optional<int32> exitCode, Tail reason)
+    static bool HandleServerIdleRestartCommand(ChatHandler* handler, std::string time, Optional<int32> exitCode, Tail reason)
     {
         std::wstring wReason   = std::wstring();
         std::string  strReason = std::string();
+
+        if (time.empty())
+        {
+            return false;
+        }
+
+        if (Acore::StringTo<int32>(time).value_or(0) < 0)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
 
         if (!reason.empty())
         {
@@ -350,22 +409,47 @@ public:
             }
         }
 
+        int32 delay = TimeStringToSecs(time);
+        if (delay <= 0)
+        {
+            delay = Acore::StringTo<int32>(time).value_or(0);
+        }
+
+        if (delay <= 0)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
         if (exitCode && *exitCode >= 0 && *exitCode <= 125)
         {
-            sWorld->ShutdownServ(time, SHUTDOWN_MASK_RESTART | SHUTDOWN_MASK_IDLE, *exitCode);
+            sWorld->ShutdownServ(delay, SHUTDOWN_MASK_RESTART | SHUTDOWN_MASK_IDLE, *exitCode);
         }
         else
         {
-            sWorld->ShutdownServ(time, SHUTDOWN_MASK_RESTART | SHUTDOWN_MASK_IDLE, RESTART_EXIT_CODE, strReason);
+            sWorld->ShutdownServ(delay, SHUTDOWN_MASK_RESTART | SHUTDOWN_MASK_IDLE, RESTART_EXIT_CODE, strReason);
         }
 
         return true;
     }
 
-    static bool HandleServerIdleShutDownCommand(ChatHandler* /*handler*/, int32 time, Optional<int32> exitCode, Tail reason)
+    static bool HandleServerIdleShutDownCommand(ChatHandler* handler, std::string time, Optional<int32> exitCode, Tail reason)
     {
         std::wstring wReason   = std::wstring();
         std::string  strReason = std::string();
+
+        if (time.empty())
+        {
+            return false;
+        }
+
+        if (Acore::StringTo<int32>(time).value_or(0) < 0)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
 
         if (!reason.empty())
         {
@@ -380,13 +464,26 @@ public:
             }
         }
 
+        int32 delay = TimeStringToSecs(time);
+        if (delay <= 0)
+        {
+            delay = Acore::StringTo<int32>(time).value_or(0);
+        }
+
+        if (delay <= 0)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
         if (exitCode && *exitCode >= 0 && *exitCode <= 125)
         {
-            sWorld->ShutdownServ(time, SHUTDOWN_MASK_IDLE, *exitCode);
+            sWorld->ShutdownServ(delay, SHUTDOWN_MASK_IDLE, *exitCode);
         }
         else
         {
-            sWorld->ShutdownServ(time, SHUTDOWN_MASK_IDLE, SHUTDOWN_EXIT_CODE, strReason);
+            sWorld->ShutdownServ(delay, SHUTDOWN_MASK_IDLE, SHUTDOWN_EXIT_CODE, strReason);
         }
 
         return true;

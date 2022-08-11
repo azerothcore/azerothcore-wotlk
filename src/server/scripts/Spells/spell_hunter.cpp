@@ -293,7 +293,7 @@ class spell_hun_taming_the_beast : public AuraScript
         {
             if (Creature* creature = target->ToCreature())
             {
-                creature->DeleteThreatList();
+                creature->GetThreatMgr().ClearAllThreat();
             }
         }
     }
@@ -670,10 +670,13 @@ class spell_hun_readiness : public SpellScript
             && spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER
             && spellInfo->Id != SPELL_HUNTER_READINESS
             && spellInfo->Id != SPELL_HUNTER_BESTIAL_WRATH
-            && spellInfo->Id != SPELL_DRAENEI_GIFT_OF_THE_NAARU
-            && spellInfo->GetRecoveryTime() > 0)
+            && spellInfo->Id != SPELL_DRAENEI_GIFT_OF_THE_NAARU)
             {
-                caster->RemoveSpellCooldown(spellInfo->Id, itr->second.needSendToClient);
+                if (spellInfo->RecoveryTime > 0)
+                    caster->RemoveSpellCooldown(spellInfo->Id, itr->second.needSendToClient);
+
+                if (spellInfo->CategoryRecoveryTime > 0)
+                    caster->RemoveCategoryCooldown(spellInfo->GetCategory());
             }
         }
     }

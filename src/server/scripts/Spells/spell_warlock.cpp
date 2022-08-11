@@ -21,6 +21,7 @@
  * Scriptnames of files in this file should be prefixed with "spell_warl_".
  */
 
+#include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
@@ -897,7 +898,7 @@ class spell_warl_soulshatter : public SpellScript
         Unit* caster = GetCaster();
         if (Unit* target = GetHitUnit())
         {
-            if (target->CanHaveThreatList() && target->getThreatMgr().getThreat(caster) > 0.0f)
+            if (target->CanHaveThreatList() && target->GetThreatMgr().getThreat(caster) > 0.0f)
                 caster->CastSpell(target, SPELL_WARLOCK_SOULSHATTER, true);
         }
     }
@@ -1570,6 +1571,66 @@ class spell_warl_drain_soul : public AuraScript
     }
 };
 
+// 29341 - Shadowburn
+class spell_warl_shadowburn : public AuraScript
+{
+    PrepareAuraScript(spell_warl_shadowburn);
+
+    void RemoveEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* caster = GetCaster();
+        Unit* target = GetTarget();
+        if (!(GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH && caster && target && caster->IsPlayer() && caster->ToPlayer()->isHonorOrXPTarget(target)))
+        {
+            PreventDefaultAction();
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_warl_shadowburn::RemoveEffect, EFFECT_0, SPELL_AURA_CHANNEL_DEATH_ITEM, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+class spell_warl_glyph_of_felguard : public AuraScript
+{
+    PrepareAuraScript(spell_warl_glyph_of_felguard);
+
+    void HandleApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+        {
+            if (Pet* pet = player->GetPet())
+            {
+                if (pet->GetEntry() == NPC_FELGUARD)
+                {
+                    pet->HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, aurEff->GetAmount(), true);
+                }
+            }
+        }
+    }
+
+    void HandleRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+        {
+            if (Pet* pet = player->GetPet())
+            {
+                if (pet->GetEntry() == NPC_FELGUARD)
+                {
+                    pet->HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, aurEff->GetAmount(), false);
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_warl_glyph_of_felguard::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_warl_glyph_of_felguard::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_warlock_spell_scripts()
 {
     RegisterSpellScript(spell_warl_eye_of_kilrogg);
@@ -1610,4 +1671,6 @@ void AddSC_warlock_spell_scripts()
     RegisterSpellScriptWithArgs(spell_warl_t4_2p_bonus<SPELL_WARLOCK_SHADOWFLAME>, "spell_warl_t4_2p_bonus_fire");
     RegisterSpellScript(spell_warl_glyph_of_corruption_nightfall);
     RegisterSpellScript(spell_warl_glyph_of_life_tap);
+    RegisterSpellScript(spell_warl_shadowburn);
+    RegisterSpellScript(spell_warl_glyph_of_felguard);
 }

@@ -183,25 +183,26 @@ enum FreyaEvents
     EVENT_DETONATING_LASHER_FLAME_LASH          = 55,
 };
 
-enum FreyaSounds
+enum Texts
 {
-    // STONEBARK
-    SOUND_STONEBARK_AGGRO                       = 15500,
-    SOUND_STONEBARK_SLAY1                       = 15501,
-    SOUND_STONEBARK_SLAY2                       = 15502,
-    SOUND_STONEBARK_DEATH                       = 15503,
+    // Elder Brightleaf / Elder Ironbranch / Elder Stonebark
+    SAY_ELDER_AGGRO                              = 0,
+    SAY_ELDER_SLAY                               = 1,
+    SAY_ELDER_DEATH                              = 2,
 
-    // IRONBRANCH
-    SOUND_IRONBRANCH_AGGRO                      = 15493,
-    SOUND_IRONBRANCH_SLAY1                      = 15494,
-    SOUND_IRONBRANCH_SLAY2                      = 15495,
-    SOUND_IRONBRANCH_DEATH                      = 15496,
-
-    // BRIGHTLEAF
-    SOUND_BRIGHTLEAF_AGGRO                      = 15483,
-    SOUND_BRIGHTLEAF_SLAY1                      = 15485,
-    SOUND_BRIGHTLEAF_SLAY2                      = 15486,
-    SOUND_BRIGHTLEAF_DEATH                      = 15487,
+    // Freya
+    SAY_AGGRO                                    = 0,
+    SAY_AGGRO_WITH_ELDER                         = 1,
+    SAY_SLAY                                     = 2,
+    SAY_DEATH                                    = 3,
+    SAY_BERSERK                                  = 4,
+    SAY_SUMMON_CONSERVATOR                       = 5,
+    SAY_SUMMON_TRIO                              = 6,
+    SAY_SUMMON_LASHERS                           = 7,
+    EMOTE_LIFEBINDERS_GIFT                       = 8,
+    EMOTE_ALLIES_OF_NATURE                       = 9,
+    EMOTE_GROUND_TREMOR                          = 10,
+    EMOTE_IRON_ROOTS                             = 11,
 };
 
 enum FreyaNPCs
@@ -222,20 +223,6 @@ enum FreyaNPCs
 
     // THIRD WAVE
     NPC_DETONATING_LASHER                       = 32918,
-};
-
-enum FreyaSouns
-{
-    SOUND_AGGRO                                 = 15526,
-    SOUND_ELDERS                                = 15527,
-    SOUND_CONSERVATOR                           = 15528,
-    SOUND_SLAY1                                 = 15529,
-    SOUND_SLAY2                                 = 15530,
-    SOUND_DEATH                                 = 15531,
-    SOUND_BERSERK                               = 15532,
-    SOUND_TRIO                                  = 15533,
-    SOUND_DETONATING                            = 15534,
-    SOUND_ASKHELP                               = 15535,
 };
 
 enum Misc
@@ -322,64 +309,56 @@ public:
             if (victim->GetTypeId() != TYPEID_PLAYER || urand(0, 2))
                 return;
 
-            if (urand(0, 1))
-            {
-                me->Yell("Forgive me.", LANG_UNIVERSAL);
-                me->PlayDirectSound(SOUND_SLAY1);
-            }
-            else
-            {
-                me->Yell("From your death springs life anew!", LANG_UNIVERSAL);
-                me->PlayDirectSound(SOUND_SLAY2);
-            }
+            Talk(SAY_SLAY);
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            // kaboom!
             if (damage >= me->GetHealth())
             {
-                me->Yell("His hold on me dissipates. I can see clearly once more. Thank you, heroes.", LANG_UNIVERSAL);
-                me->PlayDirectSound(SOUND_DEATH);
-
                 damage = 0;
-                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                me->SetFaction(FACTION_FRIENDLY);
-                me->SetHealth(me->GetMaxHealth());
-                me->CombatStop();
-                me->RemoveAllAuras();
-                events.Reset();
-
-                summons.DespawnAll();
-                events.Reset();
-
-                uint8 _elderCount = 0;
-                for (uint8 i = 0; i < 3; ++i)
+                if (m_pInstance->GetData(TYPE_FREYA) != DONE)
                 {
-                    if (!_elderGUID[i])
-                        continue;
+                    Talk(SAY_DEATH);
 
-                    if (Creature* e = ObjectAccessor::GetCreature(*me, _elderGUID[i]))
-                        Unit::Kill(e, e);
+                    me->SetReactState(REACT_PASSIVE);
+                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetFaction(FACTION_FRIENDLY);
+                    me->RemoveAllAuras();
+                    me->AttackStop();
+                    events.Reset();
 
-                    ++_elderCount;
-                }
+                    summons.DespawnAll();
+                    events.Reset();
 
-                uint32 chestId = RAID_MODE(GO_FREYA_CHEST, GO_FREYA_CHEST_HERO);
-                chestId -= 2 * _elderCount; // offset
+                    uint8 _elderCount = 0;
+                    for (uint8 i = 0; i < 3; ++i)
+                    {
+                        if (!_elderGUID[i])
+                            continue;
 
-                me->DespawnOrUnsummon(5000);
-                if (GameObject* go = me->SummonGameObject(chestId, 2345.61f, -71.20f, 425.104f, 3.0f, 0, 0, 0, 0, 0))
-                {
-                    go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
-                    go->SetLootRecipient(me->GetMap());
-                }
+                        if (Creature* e = ObjectAccessor::GetCreature(*me, _elderGUID[i]))
+                            e->DespawnOrUnsummon();
 
-                // Defeat credit
-                if (m_pInstance)
-                {
-                    me->CastSpell(me, 65074, true); // credit
-                    m_pInstance->SetData(TYPE_FREYA, DONE);
+                        ++_elderCount;
+                    }
+
+                    uint32 chestId = RAID_MODE(GO_FREYA_CHEST, GO_FREYA_CHEST_HERO);
+                    chestId -= 2 * _elderCount; // offset
+
+                    me->DespawnOrUnsummon(5000);
+                    if (GameObject* go = me->SummonGameObject(chestId, 2345.61f, -71.20f, 425.104f, 3.0f, 0, 0, 0, 0, 0))
+                    {
+                        go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
+                        go->SetLootRecipient(me->GetMap());
+                    }
+
+                    // Defeat credit
+                    if (m_pInstance)
+                    {
+                        me->CastSpell(me, 65074, true); // credit
+                        m_pInstance->SetData(TYPE_FREYA, DONE);
+                    }
                 }
             }
         }
@@ -397,12 +376,12 @@ public:
         void SpawnWave()
         {
             _waveNumber = _waveNumber == 1 ? 3 : _waveNumber - 1;
+            Talk(EMOTE_ALLIES_OF_NATURE);
 
             // Wave of three
             if (_waveNumber == 1)
             {
-                me->Yell("Children, assist me!", LANG_UNIVERSAL);
-                me->PlayDirectSound(SOUND_TRIO);
+                Talk(SAY_SUMMON_TRIO);
                 me->SummonCreature(NPC_ANCIENT_WATER_SPIRIT, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
                 me->SummonCreature(NPC_STORM_LASHER, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
                 me->SummonCreature(NPC_SNAPLASHER, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
@@ -410,15 +389,13 @@ public:
             // Ancient Conservator
             else if (_waveNumber == 2)
             {
-                me->Yell("Eonar, your servant requires aid!", LANG_UNIVERSAL);
-                me->PlayDirectSound(SOUND_CONSERVATOR);
+                Talk(SAY_SUMMON_CONSERVATOR);
                 me->SummonCreature(NPC_ANCIENT_CONSERVATOR, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_CORPSE_DESPAWN);
             }
             // Detonating Lashers
             else if (_waveNumber == 3)
             {
-                me->Yell("The swarm of the elements shall overtake you!", LANG_UNIVERSAL);
-                me->PlayDirectSound(SOUND_DETONATING);
+                Talk(SAY_SUMMON_LASHERS);
                 for (uint8 i = 0; i < 10; ++i)
                     me->SummonCreature(NPC_DETONATING_LASHER, me->GetPositionX() + urand(5, 20), me->GetPositionY() + urand(5, 20), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_CORPSE_DESPAWN);
             }
@@ -553,13 +530,11 @@ public:
 
             if (_elderGUID[0] || _elderGUID[1] || _elderGUID[2])
             {
-                me->Yell("Elders, grant me your strength!", LANG_UNIVERSAL);
-                me->PlayDirectSound(SOUND_ELDERS);
+                Talk(SAY_AGGRO_WITH_ELDER);
             }
             else
             {
-                me->Yell("The Conservatory must be protected!", LANG_UNIVERSAL);
-                me->PlayDirectSound(SOUND_AGGRO);
+                Talk(SAY_AGGRO);
             }
         }
 
@@ -595,6 +570,7 @@ public:
                     break;
                 case EVENT_FREYA_LIFEBINDER:
                     {
+                        Talk(EMOTE_LIFEBINDERS_GIFT);
                         events.RepeatEvent(45000);
                         float x, y, z;
                         for (uint8 i = 0; i < 10; ++i)
@@ -643,15 +619,16 @@ public:
                         break;
                     }
                 case EVENT_FREYA_BERSERK:
-                    me->Yell("You have strayed too far, wasted too much time!", LANG_UNIVERSAL);
-                    me->PlayDirectSound(SOUND_BERSERK);
+                    Talk(SAY_BERSERK);
                     me->CastSpell(me, SPELL_BERSERK, true);
                     break;
                 case EVENT_FREYA_GROUND_TREMOR:
+                    Talk(EMOTE_GROUND_TREMOR);
                     me->CastSpell(me, SPELL_GROUND_TREMOR_FREYA, false);
                     events.RepeatEvent(25000 + urand(0, 10000));
                     break;
                 case EVENT_FREYA_IRON_ROOT:
+                    Talk(EMOTE_IRON_ROOTS);
                     me->CastCustomSpell(SPELL_IRON_ROOTS_FREYA, SPELLVALUE_MAX_TARGETS, 1, me, false);
                     events.RepeatEvent(45000 + urand(0, 10000));
                     break;
@@ -706,24 +683,14 @@ public:
             if (urand(0, 1))
                 return;
 
-            if (urand(0, 1))
-            {
-                me->TextEmote("Angry roar");
-                me->PlayDirectSound(SOUND_STONEBARK_SLAY1);
-            }
-            else
-            {
-                me->Yell("Such a waste.", LANG_UNIVERSAL);
-                me->PlayDirectSound(SOUND_STONEBARK_SLAY2);
-            }
+            Talk(SAY_ELDER_SLAY);
         }
 
         void JustDied(Unit* killer) override
         {
             if (killer && me->GetEntry() == killer->GetEntry())
                 return;
-            me->Yell("Matron, flee! They are ruthless....", LANG_UNIVERSAL);
-            me->PlayDirectSound(SOUND_STONEBARK_DEATH);
+            Talk(SAY_ELDER_DEATH);
 
             // Lumberjacked
             if (me->GetInstanceScript())
@@ -737,8 +704,8 @@ public:
             events.ScheduleEvent(EVENT_STONEBARK_GROUND_TREMOR, 5000);
             events.ScheduleEvent(EVENT_STONEBARK_PETRIFIED_BARK, 20000);
 
-            me->Yell("This place will serve as your graveyard.", LANG_UNIVERSAL);
-            me->PlayDirectSound(SOUND_STONEBARK_AGGRO);
+            if (!me->HasAura(SPELL_DRAINED_OF_POWER)) // Prevents speech if combat is initiated by hardmode activation
+                Talk(SAY_ELDER_AGGRO);
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType damageType, SpellSchoolMask damageSchoolMask) override
@@ -812,24 +779,14 @@ public:
             if (urand(0, 1))
                 return;
 
-            if (urand(0, 1))
-            {
-                me->Yell("Fertilizer.", LANG_UNIVERSAL);
-                me->PlayDirectSound(SOUND_BRIGHTLEAF_SLAY1);
-            }
-            else
-            {
-                me->Yell("Your corpse will nourish the soil!", LANG_UNIVERSAL);
-                me->PlayDirectSound(SOUND_BRIGHTLEAF_SLAY2);
-            }
+            Talk(SAY_ELDER_SLAY);
         }
 
         void JustDied(Unit* killer) override
         {
             if (killer && me->GetEntry() == killer->GetEntry())
                 return;
-            me->Yell("Matron, one has fallen!", LANG_UNIVERSAL);
-            me->PlayDirectSound(SOUND_BRIGHTLEAF_DEATH);
+            Talk(SAY_ELDER_DEATH);
 
             // Lumberjacked
             if (me->GetInstanceScript())
@@ -843,8 +800,8 @@ public:
             events.ScheduleEvent(EVENT_BRIGHTLEAF_SOLAR_FLARE, 5000);
             events.ScheduleEvent(EVENT_BRIGHTLEAF_UNSTABLE_SUN_BEAM, 8000);
 
-            me->Yell("Matron, the Conservatory has been breached!", LANG_UNIVERSAL);
-            me->PlayDirectSound(SOUND_BRIGHTLEAF_AGGRO);
+            if (!me->HasAura(SPELL_DRAINED_OF_POWER)) // Prevents speech if combat is initiated by hardmode activation
+                Talk(SAY_ELDER_AGGRO);
         }
 
         void UpdateAI(uint32 diff) override
@@ -933,24 +890,14 @@ public:
             if (urand(0, 1))
                 return;
 
-            if (urand(0, 1))
-            {
-                me->Yell("I return you whence you came!", LANG_UNIVERSAL);
-                me->PlayDirectSound(SOUND_IRONBRANCH_SLAY1);
-            }
-            else
-            {
-                me->Yell("BEGONE!", LANG_UNIVERSAL);
-                me->PlayDirectSound(SOUND_IRONBRANCH_SLAY2);
-            }
+            Talk(SAY_ELDER_SLAY);
         }
 
         void JustDied(Unit* killer) override
         {
             if (killer && me->GetEntry() == killer->GetEntry())
                 return;
-            me->Yell("Freya! They come for you.", LANG_UNIVERSAL);
-            me->PlayDirectSound(SOUND_IRONBRANCH_DEATH);
+            Talk(SAY_ELDER_DEATH);
 
             // Lumberjacked
             if (me->GetInstanceScript())
@@ -964,8 +911,8 @@ public:
             events.ScheduleEvent(EVENT_IRONBRANCH_IRON_ROOT, 15000);
             events.ScheduleEvent(EVENT_IRONBRANCH_THORN_SWARM, 3000);
 
-            me->Yell("Mortals have no place here!", LANG_UNIVERSAL);
-            me->PlayDirectSound(SOUND_IRONBRANCH_AGGRO);
+            if (!me->HasAura(SPELL_DRAINED_OF_POWER)) // Prevents speech if combat is initiated by hardmode activation
+                Talk(SAY_ELDER_AGGRO);
         }
 
         void UpdateAI(uint32 diff) override

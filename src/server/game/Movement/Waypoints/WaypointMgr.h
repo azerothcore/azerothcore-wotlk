@@ -35,7 +35,8 @@ enum WaypointMoveType
 struct WaypointData
 {
     uint32 id;
-    float x, y, z, orientation;
+    float x, y, z;
+    std::optional<float> orientation;
     uint32 delay;
     uint32 event_id;
     uint32 move_type;

@@ -28,19 +28,22 @@ class CreatureGroup;
 
 enum class GroupAIFlags : uint16
 {
-    GROUP_AI_FLAG_MEMBER_ASSIST_LEADER  = 0x001,
-    GROUP_AI_FLAG_LEADER_ASSIST_MEMBER  = 0x002,
-    GROUP_AI_FLAG_EVADE_TOGETHER        = 0x004,
-    //GROUP_AI_FLAG_UNK2                  = 0x008,
-    //GROUP_AI_FLAG_UNK3                  = 0x010,
-    //GROUP_AI_FLAG_UNK4                  = 0x020,
-    //GROUP_AI_FLAG_UNK5                  = 0x040,
-    //GROUP_AI_FLAG_UNK6                  = 0x080,
-    //GROUP_AI_FLAG_UNK7                  = 0x100,
+    GROUP_AI_FLAG_MEMBER_ASSIST_LEADER         = 0x001,
+    GROUP_AI_FLAG_LEADER_ASSIST_MEMBER         = 0x002,
+    GROUP_AI_FLAG_EVADE_TOGETHER               = 0x004,
+    GROUP_AI_FLAG_RESPAWN_ON_EVADE             = 0x008,
+    GROUP_AI_FLAG_DONT_RESPAWN_LEADER_ON_EVADE = 0x010,
+    //GROUP_AI_FLAG_UNK3                = 0x010,
+    //GROUP_AI_FLAG_UNK4                = 0x020,
+    //GROUP_AI_FLAG_UNK5                = 0x040,
+    //GROUP_AI_FLAG_UNK6                = 0x080,
+    //GROUP_AI_FLAG_UNK7                = 0x100,
     GROUP_AI_FLAG_FOLLOW_LEADER         = 0x200,
 
+    GROUP_AI_FLAG_EVADE_MASK = GROUP_AI_FLAG_EVADE_TOGETHER | GROUP_AI_FLAG_RESPAWN_ON_EVADE,
+
     // Used to verify valid and usable flags
-    GROUP_AI_FLAG_SUPPORTED = GROUP_AI_FLAG_MEMBER_ASSIST_LEADER | GROUP_AI_FLAG_LEADER_ASSIST_MEMBER | GROUP_AI_FLAG_EVADE_TOGETHER | GROUP_AI_FLAG_FOLLOW_LEADER
+    GROUP_AI_FLAG_SUPPORTED = GROUP_AI_FLAG_MEMBER_ASSIST_LEADER | GROUP_AI_FLAG_LEADER_ASSIST_MEMBER | GROUP_AI_FLAG_EVADE_MASK | GROUP_AI_FLAG_FOLLOW_LEADER
 };
 
 struct FormationInfo
@@ -104,8 +107,11 @@ public:
     void FormationReset(bool dismiss, bool initMotionMaster);
 
     void LeaderMoveTo(float x, float y, float z, bool run);
-    void MemberAttackStart(Creature* member, Unit* target);
+    void MemberEngagingTarget(Creature* member, Unit* target);
     void MemberEvaded(Creature* member);
+    void RespawnFormation(bool force = false);
+    [[nodiscard]] bool IsFormationInCombat();
+    [[nodiscard]] bool IsAnyMemberAlive();
 
 private:
     Creature* m_leader; //Important do not forget sometimes to work with pointers instead synonims :D:D

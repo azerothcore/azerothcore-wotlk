@@ -32,11 +32,11 @@
 //==============================================================
 
 // The hatingUnit is not used yet
-float ThreatCalcHelper::calcThreat(Unit* hatedUnit, Unit* /*hatingUnit*/, float threat, SpellSchoolMask schoolMask, SpellInfo const* threatSpell)
+float ThreatCalcHelper::calcThreat(Unit* hatedUnit, float threat, SpellSchoolMask schoolMask, SpellInfo const* threatSpell)
 {
     if (threatSpell)
     {
-        if (SpellThreatEntry const*  threatEntry = sSpellMgr->GetSpellThreatEntry(threatSpell->Id))
+        if (SpellThreatEntry const* threatEntry = sSpellMgr->GetSpellThreatEntry(threatSpell->Id))
             if (threatEntry->pctMod != 1.0f)
                 threat *= threatEntry->pctMod;
 
@@ -261,12 +261,18 @@ HostileReference* ThreatContainer::getReferenceByTarget(Unit* victim) const
     if (!victim)
         return nullptr;
 
-    ObjectGuid const guid = victim->GetGUID();
+    return getReferenceByTarget(victim->GetGUID());
+}
+
+HostileReference* ThreatContainer::getReferenceByTarget(ObjectGuid const& guid) const
+{
     for (ThreatContainer::StorageType::const_iterator i = iThreatList.begin(); i != iThreatList.end(); ++i)
     {
         HostileReference* ref = (*i);
         if (ref && ref->getUnitGuid() == guid)
+        {
             return ref;
+        }
     }
 
     return nullptr;
@@ -406,6 +412,13 @@ ThreatMgr::ThreatMgr(Unit* owner) : iCurrentVictim(nullptr), iOwner(owner), iUpd
 {
 }
 
+void ThreatMgr::ClearAllThreat()
+{
+    if (iOwner->CanHaveThreatList() && !isThreatListEmpty())
+        iOwner->SendClearThreatListOpcode();
+    clearReferences();
+}
+
 //============================================================
 
 void ThreatMgr::clearReferences()
@@ -420,10 +433,19 @@ void ThreatMgr::clearReferences()
 
 void ThreatMgr::addThreat(Unit* victim, float threat, SpellSchoolMask schoolMask, SpellInfo const* threatSpell)
 {
-    if (!ThreatCalcHelper::isValidProcess(victim, GetOwner(), threatSpell))
+    if (!ThreatCalcHelper::isValidProcess(victim, iOwner, threatSpell))
         return;
 
-    doAddThreat(victim, ThreatCalcHelper::calcThreat(victim, iOwner, threat, schoolMask, threatSpell));
+    threat = ThreatCalcHelper::calcThreat(victim, threat, schoolMask, threatSpell);
+    if (Creature* hatingCreature = iOwner->ToCreature())
+    {
+        if (hatingCreature->IsAIEnabled)
+        {
+            hatingCreature->AI()->CalculateThreat(victim, threat, threatSpell);
+        }
+    }
+
+    doAddThreat(victim, threat);
 }
 
 void ThreatMgr::doAddThreat(Unit* victim, float threat)

@@ -41,7 +41,7 @@ void PointMovementGenerator<T>::DoInitialize(T* unit)
         unit->StopMoving();
 
     unit->AddUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
-    if (id == EVENT_CHARGE)
+    if (id == EVENT_CHARGE || id == EVENT_CHARGE_PREPATH)
     {
         unit->AddUnitState(UNIT_STATE_CHARGING);
     }
@@ -117,7 +117,7 @@ bool PointMovementGenerator<T>::DoUpdate(T* unit, uint32 /*diff*/)
 
     unit->AddUnitState(UNIT_STATE_ROAMING_MOVE);
 
-    if (i_recalculateSpeed && !unit->movespline->Finalized())
+    if (id != EVENT_CHARGE_PREPATH && i_recalculateSpeed && !unit->movespline->Finalized())
     {
         i_recalculateSpeed = false;
         Movement::MoveSplineInit init(unit);
@@ -158,7 +158,7 @@ template<class T>
 void PointMovementGenerator<T>::DoFinalize(T* unit)
 {
     unit->ClearUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
-    if (id == EVENT_CHARGE)
+    if (id == EVENT_CHARGE || id == EVENT_CHARGE_PREPATH)
     {
         unit->ClearUnitState(UNIT_STATE_CHARGING);
 
@@ -182,7 +182,7 @@ void PointMovementGenerator<T>::DoReset(T* unit)
         unit->StopMoving();
 
     unit->AddUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
-    if (id == EVENT_CHARGE)
+    if (id == EVENT_CHARGE || id == EVENT_CHARGE_PREPATH)
     {
         unit->AddUnitState(UNIT_STATE_CHARGING);
     }

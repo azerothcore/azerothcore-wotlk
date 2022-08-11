@@ -37,3 +37,13 @@ void ScriptMgr::OnGameObjectRemoveWorld(GameObject* go)
         script->OnGameObjectRemoveWorld(go);
     });
 }
+
+void ScriptMgr::OnGameObjectSaveToDB(GameObject* go)
+{
+    ASSERT(go);
+
+    ExecuteScript<AllGameObjectScript>([&](AllGameObjectScript* script)
+    {
+        script->OnGameObjectSaveToDB(go);
+    });
+}

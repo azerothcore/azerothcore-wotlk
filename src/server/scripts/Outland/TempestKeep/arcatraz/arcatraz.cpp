@@ -92,7 +92,7 @@ public:
             ScriptedAI::InitializeAI();
 
             me->SetReactState(REACT_PASSIVE);
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(true);
             events2.Reset();
             events2.ScheduleEvent(EVENT_TELEPORT_VISUAL, 0);
             events2.ScheduleEvent(EVENT_MILLHOUSE_INTRO1, 3000);
@@ -174,7 +174,7 @@ public:
                 case EVENT_MILLHOUSE_INTRO9:
                     me->SetFacingTo(M_PI * 1.5f);
                     me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), M_PI * 1.5f);
-                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->SetImmuneToAll(false);
                     me->SetReactState(REACT_AGGRESSIVE);
                     events2.ScheduleEvent(EVENT_SEARCH_FIGHT, 1000);
                     break;
@@ -365,7 +365,7 @@ public:
         {
             _Reset();
             me->setActive(false);
-            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetImmuneToAll(false);
             me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
             me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
             me->CastSpell((Unit*)nullptr, SPELL_TARGET_OMEGA, false);
@@ -379,7 +379,7 @@ public:
             {
                 me->setActive(true);
                 me->InterruptNonMeleeSpells(false);
-                me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetImmuneToAll(true);
                 events.ScheduleEvent(EVENT_WARDEN_INTRO1, 1500);
                 events.ScheduleEvent(EVENT_WARDEN_CHECK_PLAYERS, 1000);
                 instance->SetBossState(DATA_WARDEN_MELLICHAR, IN_PROGRESS);
@@ -535,7 +535,7 @@ public:
                 case EVENT_WARDEN_INTRO25:
                     if (Creature* cr = me->SummonCreature(NPC_HARBINGER_SKYRISS, 445.763f, -191.639f, 44.64f, 1.60f, TEMPSUMMON_MANUAL_DESPAWN))
                     {
-                        cr->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        cr->SetImmuneToAll(true);
                         cr->CastSpell(cr, SPELL_TELEPORT_VISUAL, true);
                     }
                     events.ScheduleEvent(EVENT_WARDEN_INTRO26, 1000);
@@ -562,7 +562,7 @@ public:
                     me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                     if (Creature* creature = summons.GetCreatureWithEntry(NPC_HARBINGER_SKYRISS))
                     {
-                        creature->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        creature->SetImmuneToAll(false);
                         if (Player* player = SelectTargetFromPlayerList(50.0f))
                             AttackStart(player);
                     }

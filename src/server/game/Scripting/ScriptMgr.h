@@ -26,6 +26,7 @@
 #include "DBCStores.h"
 #include "DynamicObject.h"
 #include "GameEventMgr.h"
+#include "Group.h"
 #include "LFGMgr.h"
 #include "ObjectMgr.h"
 #include "PetDefines.h"
@@ -459,6 +460,12 @@ public:
      * @param diff Contains information about the diff time
      */
     virtual void OnUnitUpdate(Unit* /*unit*/, uint32 /*diff*/) { }
+
+    virtual void OnDisplayIdChange(Unit* /*unit*/, uint32 /*displayId*/) { }
+
+    virtual void OnUnitEnterEvadeMode(Unit* /*unit*/, uint8 /*evadeReason*/) { }
+    virtual void OnUnitEnterCombat(Unit* /*unit*/, Unit* /*victim*/) { }
+    virtual void OnUnitDeath(Unit* /*unit*/, Unit* /*killer*/) { }
 };
 
 class MovementHandlerScript : public ScriptObject
@@ -562,6 +569,13 @@ public:
     virtual void OnCreatureRemoveWorld(Creature* /*creature*/) { }
 
     /**
+     * @brief This hook runs after creature has been saved to DB
+     *
+     * @param creature Contains information about the Creature
+    */
+     virtual void OnCreatureSaveToDB(Creature* /*creature*/) { }
+
+    /**
      * @brief This hook called when a player opens a gossip dialog with the creature.
      *
      * @param player Contains information about the Player
@@ -643,7 +657,12 @@ public:
      * @param go Contains information about the GameObject
      */
     virtual void OnGameObjectAddWorld(GameObject* /*go*/) { }
-
+    /**
+     * @brief This hook runs after the game object iis saved to the database
+     *
+     * @param go Contains information about the GameObject
+     */
+    virtual void OnGameObjectSaveToDB(GameObject* /*go*/) { }
     /**
      * @brief This hook runs after remove game object in world
      *
@@ -1154,6 +1173,9 @@ public:
     // After receiving item as a quest reward
     virtual void OnQuestRewardItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/) { }
 
+    // After receiving item as a group roll reward
+    virtual void OnGroupRollRewardItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/, RollVote /*voteType*/, Roll* /*roll*/) { }
+
     // After completed a quest
     [[nodiscard]] virtual bool OnBeforeQuestComplete(Player* /*player*/, uint32 /*quest_id*/) { return true; }
 
@@ -1537,6 +1559,9 @@ public:
 
     // Called after loading spell dbc corrections
     virtual void OnLoadSpellCustomAttr(SpellInfo* /*spell*/) { }
+
+    // Called when checking if a player can see the creature loot
+    virtual bool OnAllowedForPlayerLootCheck(Player const* /*player*/, ObjectGuid /*source*/) { return false; };
 };
 
 class BGScript : public ScriptObject
@@ -2223,6 +2248,7 @@ public: /* PlayerScript */
     void OnLootItem(Player* player, Item* item, uint32 count, ObjectGuid lootguid);
     void OnCreateItem(Player* player, Item* item, uint32 count);
     void OnQuestRewardItem(Player* player, Item* item, uint32 count);
+    void OnGroupRollRewardItem(Player* player, Item* item, uint32 count, RollVote voteType, Roll* roll);
     bool OnBeforePlayerQuestComplete(Player* player, uint32 quest_id);
     void OnQuestComputeXP(Player* player, Quest const* quest, uint32& xpValue);
     void OnBeforePlayerDurabilityRepair(Player* player, ObjectGuid npcGUID, ObjectGuid itemGUID, float& discountMod, uint8 guildBank);
@@ -2359,6 +2385,7 @@ public: /* GlobalScript */
     bool OnIsAffectedBySpellModCheck(SpellInfo const* affectSpell, SpellInfo const* checkSpell, SpellModifier const* mod);
     bool OnSpellHealingBonusTakenNegativeModifiers(Unit const* target, Unit const* caster, SpellInfo const* spellInfo, float& val);
     void OnLoadSpellCustomAttr(SpellInfo* spell);
+    bool OnAllowedForPlayerLootCheck(Player const* player, ObjectGuid source);
 
 public: /* Scheduled scripts */
     uint32 IncreaseScheduledScriptsCount() { return ++_scheduledScripts; }
@@ -2384,6 +2411,10 @@ public: /* UnitScript */
     bool IsCustomBuildValuesUpdate(Unit const* unit, uint8 updateType, ByteBuffer& fieldBuffer, Player const* target, uint16 index);
     bool OnBuildValuesUpdate(Unit const* unit, uint8 updateType, ByteBuffer& fieldBuffer, Player* target, uint16 index);
     void OnUnitUpdate(Unit* unit, uint32 diff);
+    void OnDisplayIdChange(Unit* unit, uint32 displayId);
+    void OnUnitEnterEvadeMode(Unit* unit, uint8 why);
+    void OnUnitEnterCombat(Unit* unit, Unit* victim);
+    void OnUnitDeath(Unit* unit, Unit* killer);
 
 public: /* MovementHandlerScript */
     void OnPlayerMove(Player* player, MovementInfo movementInfo, uint32 opcode);
@@ -2392,6 +2423,10 @@ public: /* AllCreatureScript */
     //listener function (OnAllCreatureUpdate) is called by OnCreatureUpdate
     //void OnAllCreatureUpdate(Creature* creature, uint32 diff);
     void Creature_SelectLevel(const CreatureTemplate* cinfo, Creature* creature);
+    void OnCreatureSaveToDB(Creature* creature);
+
+public: /* AllGameobjectScript */
+    void OnGameObjectSaveToDB(GameObject* go);
 
 public: /* AllMapScript */
     void OnBeforeCreateInstanceScript(InstanceMap* instanceMap, InstanceScript* instanceData, bool load, std::string data, uint32 completedEncounterMask);
