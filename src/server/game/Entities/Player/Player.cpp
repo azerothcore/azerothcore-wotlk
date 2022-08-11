@@ -13897,19 +13897,20 @@ bool Player::CanResummonPet(uint32 spellid)
 {
     switch (getClass())
     {
-    case CLASS_DEATH_KNIGHT:
-        if (CanSeeDKPet())
-            return true;
-        else if (spellid == 52150)  //Raise Dead
-            return false;
+        case CLASS_DEATH_KNIGHT:
+            if (CanSeeDKPet())
+                return true;
+            else if (spellid == 52150)  //Raise Dead
+                return false;
         break;
-    case CLASS_MAGE:
-        if (HasSpell(31687) && HasAura(70937))  //Has [Summon Water Elemental] spell and [Glyph of Eternal Water].
+        case CLASS_MAGE:
+            if (HasSpell(31687) && HasAura(70937))  //Has [Summon Water Elemental] spell and [Glyph of Eternal Water].
+                return true;
+            break;
+        case CLASS_HUNTER:
+        case CLASS_WARLOCK:
             return true;
         break;
-    case CLASS_HUNTER:
-    case CLASS_WARLOCK:
-        return true;
     }
 
     return HasSpell(spellid);
