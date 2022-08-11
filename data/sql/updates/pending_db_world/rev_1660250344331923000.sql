@@ -7,7 +7,8 @@ DELETE FROM `creature` WHERE `id3`=2955;
 -- Corrects spawn points to sniffed values, mostly this was fine, but the XYZ values were done manually rather than from sniffed variables
 -- Wander distance was already set to 20, which is a good minimum value, about half of them have a wander value of around 30 or more, the sniff will be uploaded later to the collective if anyone wants to deep dive that for some reason
 -- Similarly, 155 was the spawntime set before this fix, 180 is probbably correct, but this is fine imo without dynamic spawning
-
+SET @GUID :=88354;
+DELETE FROM `creature` WHERE `guid` BETWEEN @GUID+0 AND @GUID+96;
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 (@GUID+0, 2955, 0, 0, 1, 0, 0, 1, 1, 0, -2915.9321, -117.10601, 77.61542, 1.884955525398254394, 155, 20, 0, 1, 0, 1, 0, 0, 0, '', 0), -- .go xyz -2915.9321 -117.10601 77.61542
 (@GUID+1, 2955, 0, 0, 1, 0, 0, 1, 1, 0, -2881.4697, -150.06369, 67.3019, 3.03687286376953125, 155, 20, 0, 1, 0, 1, 0, 0, 0, '', 0), -- .go xyz -2881.4697 -150.06369 67.3019
