@@ -118,7 +118,12 @@ struct boss_ouro : public BossAI
                         DoSpellAttackToRandomTargetIfReady(SPELL_BOULDER);
 
                     context.Repeat();
-                });
+                })
+                .Schedule(20s, [this](TaskContext context)
+                    {
+                        DoCastSelf(SPELL_SUMMON_OURO_MOUNDS, true);
+                        context.Repeat();
+                    });
         }
     }
 
@@ -240,7 +245,7 @@ struct boss_ouro : public BossAI
         if (Creature* ouroSpawner = instance->GetCreature(DATA_OURO_SPAWNER))
             ouroSpawner->Respawn();
         instance->SetBossState(DATA_OURO, FAIL);
-        if (GameObject* base = me->FindNearestGameObject(GO_SANDWORM_BASE, 10.f))
+        if (GameObject* base = me->FindNearestGameObject(GO_SANDWORM_BASE, 200.f))
             base->DespawnOrUnsummon();
     }
 
@@ -271,7 +276,7 @@ protected:
 
     bool IsPlayerWithinMeleeRange() const
     {
-        return me->SelectNearestPlayer(me->GetMeleeReach());
+        return me->IsWithinMeleeRange(me->GetVictim());
     }
 };
 
@@ -347,6 +352,10 @@ struct npc_dirt_mound : ScriptedAI
             if (Creature* ouroSpawner = _instance->GetCreature(DATA_OURO_SPAWNER))
                 ouroSpawner->Respawn();
         }
+
+        if (GameObject* base = me->FindNearestGameObject(GO_SANDWORM_BASE, 200.f))
+            base->DespawnOrUnsummon();
+
         me->DespawnOrUnsummon();
     }
 
