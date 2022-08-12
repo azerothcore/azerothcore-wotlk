@@ -61,7 +61,8 @@ enum Events
 {
     EVENT_SILENCE               = 1,
     EVENT_CYCLONE               = 2,
-    EVENT_STOMP                 = 3
+    EVENT_STOMP                 = 3,
+    EVENT_SPEEDUP               = 4
 };
 
 uint8 const NUM_CRYSTALS = 9;
@@ -128,6 +129,9 @@ struct boss_ossirian : public BossAI
     {
         BossAI::EnterCombat(who);
         events.Reset();
+        _speedUpCount = 0;
+        me->SetSpeedRate(MOVE_RUN, 1.0f);
+        events.ScheduleEvent(EVENT_SPEEDUP, 1s);
         events.ScheduleEvent(EVENT_SILENCE, 30s);
         events.ScheduleEvent(EVENT_CYCLONE, 20s);
         events.ScheduleEvent(EVENT_STOMP, 30s);
@@ -207,6 +211,12 @@ struct boss_ossirian : public BossAI
         BossAI::MoveInLineOfSight(who);
     }
 
+    void SpeedUpBoss()
+    {
+        float speed = 2.0f - (0.1f * (10 - ++_speedUpCount));
+        me->SetSpeedRate(MOVE_RUN, speed);
+    }
+
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
@@ -240,6 +250,13 @@ struct boss_ossirian : public BossAI
         {
             switch (eventId)
             {
+                case EVENT_SPEEDUP:
+                    SpeedUpBoss();
+                    if (_speedUpCount < 10)
+                    {
+                        events.ScheduleEvent(EVENT_SPEEDUP, 1s);
+                    }
+                    break;
                 case EVENT_SILENCE:
                     DoCastAOE(SPELL_CURSE_OF_TONGUES);
                     events.ScheduleEvent(EVENT_SILENCE, 20s, 30s);
@@ -263,6 +280,7 @@ protected:
     ObjectGuid _triggerGUID;
     ObjectGuid _crystalGUID;
     uint8 _crystalIterator;
+    uint8 _speedUpCount;
     bool _saidIntro;
 };
 
