@@ -22,52 +22,52 @@
 
 enum Spells
 {
-    SPELL_STINGER_SPRAY  = 25749,
-    SPELL_POISON_STINGER = 25748,
-    SPELL_PARALYZE       = 25725,
-    SPELL_FRENZY         = 8269,
-    SPELL_LASH           = 25852,
-    SPELL_FEED           = 25721,
+    SPELL_STINGER_SPRAY       = 25749,
+    SPELL_POISON_STINGER      = 25748,
+    SPELL_PARALYZE            = 25725,
+    SPELL_FRENZY              = 8269,
+    SPELL_LASH                = 25852,
+    SPELL_FEED                = 25721,
 
     // Server-side spells
-    SPELL_SUMMON_LARVA_A = 26538,
-    SPELL_SUMMON_LARVA_B = 26539,
-    SPELL_LARVA_AGGRO_EFFECT = 25724, // Unknown purpose
-    SPELL_LARVA_FEAR_EFFECT  = 25726, // Unknown purpose
+    SPELL_SUMMON_LARVA_A      = 26538,
+    SPELL_SUMMON_LARVA_B      = 26539,
+    SPELL_LARVA_AGGRO_EFFECT  = 25724, // Unknown purpose
+    SPELL_LARVA_FEAR_EFFECT   = 25726, // Unknown purpose
 };
 
 enum Events
 {
-    EVENT_STINGER_SPRAY  = 1,
-    EVENT_POISON_STINGER = 2,
-    EVENT_SUMMON_SWARMER = 3,
-    EVENT_SWARMER_ATTACK = 4,
-    EVENT_PARALYZE       = 5,
-    EVENT_LASH           = 6
+    EVENT_STINGER_SPRAY       = 1,
+    EVENT_POISON_STINGER      = 2,
+    EVENT_SUMMON_SWARMER      = 3,
+    EVENT_SWARMER_ATTACK      = 4,
+    EVENT_PARALYZE            = 5,
+    EVENT_LASH                = 6
 };
 
 enum Emotes
 {
-    EMOTE_FRENZY         =  0
+    EMOTE_FRENZY              =  0
 };
 
 enum Phases
 {
-    PHASE_AIR            = 0,
-    PHASE_GROUND         = 1
+    PHASE_AIR                 = 0,
+    PHASE_GROUND              = 1
 };
 
 enum Points
 {
-    POINT_AIR            = 0,
-    POINT_GROUND         = 2,
-    POINT_PARALYZE       = 2
+    POINT_AIR                 = 0,
+    POINT_GROUND              = 2,
+    POINT_PARALYZE            = 2
 };
 
-const Position AyamissAirPos =  { -9689.292f, 1547.912f, 48.02729f, 0.0f };
-const Position AltarPos =       { -9717.18f, 1517.72f, 27.4677f, 0.0f };
+const Position AyamissAirPos  = { -9689.292f, 1547.912f, 48.02729f, 0.0f };
+const Position AltarPos       = { -9717.18f, 1517.72f, 27.4677f, 0.0f };
 /// @todo These below are probably incorrect, taken from SD2
-const Position SwarmerPos =     { -9647.352f, 1578.062f, 55.32f, 0.0f };
+const Position SwarmerPos     = { -9647.352f, 1578.062f, 55.32f, 0.0f };
 
 struct boss_ayamiss : public BossAI
 {
@@ -85,20 +85,13 @@ struct boss_ayamiss : public BossAI
     {
         switch (who->GetEntry())
         {
-            case NPC_SWARMER:
+            case NPC_HIVEZARA_SWARMER:
                 _swarmers.push_back(who->GetGUID());
                 break;
-            case NPC_LARVA:
+            case NPC_HIVEZARA_LARVA:
                 who->GetMotionMaster()->MovePoint(POINT_PARALYZE, AltarPos);
                 break;
-            case NPC_HORNET:
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random))
-                {
-                    who->AI()->AttackStart(target);
-                }
-                break;
         }
-
         summons.Summon(who);
     }
 
@@ -210,7 +203,7 @@ struct boss_ayamiss : public BossAI
                 Position const offset = { 0.0f, 0.0f, 20.0f, 0.0f };
                 Position spawnpos = me->GetRandomPoint(SwarmerPos, 80.0f);
                 spawnpos.RelocateOffset(offset);
-                if (Creature* wasp = me->SummonCreature(NPC_SWARMER, spawnpos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
+                if (Creature* wasp = me->SummonCreature(NPC_HIVEZARA_SWARMER, spawnpos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
                 {
                     wasp->GetMotionMaster()->MoveRandom(10.0f);
                 }
