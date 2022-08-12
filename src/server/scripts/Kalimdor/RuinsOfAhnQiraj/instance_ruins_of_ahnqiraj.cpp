@@ -37,14 +37,17 @@ ObjectData const creatureData[] =
     { NPC_ZERRAN,    DATA_ZERRAN    },
 };
 
-enum RajaxxText
+enum RajaxxWaveEvent
 {
     SAY_WAVE3  = 0,
     SAY_WAVE4  = 1,
     SAY_WAVE5  = 2,
     SAY_WAVE6  = 3,
     SAY_WAVE7  = 4,
-    SAY_ENGAGE = 5
+    SAY_ENGAGE = 5,
+
+    DATA_RAJAXX_WAVE_ENGAGED = 1,
+    GROUP_RAJAXX_WAVE_TIMER  = 1
 };
 
 std::array<uint32, 8> RajaxxWavesData[] =
@@ -94,6 +97,10 @@ public:
                 case NPC_OSSIRIAN:
                     _ossirianGUID = creature->GetGUID();
                     break;
+                case NPC_SAND_VORTEX:
+                    _sandVortexes.push_back(creature->GetGUID());
+                    creature->SetVisible(false);
+                    break;
             }
         }
 
@@ -128,6 +135,20 @@ public:
             }
         }
 
+        void SetData(uint32 type, uint32 /*data*/) override
+        {
+            if (type == DATA_RAJAXX_WAVE_ENGAGED)
+            {
+                _scheduler.CancelGroup(GROUP_RAJAXX_WAVE_TIMER);
+                _scheduler.Schedule(2min, [this](TaskContext context)
+                {
+                    CallNextRajaxxLeader();
+                    context.SetGroup(GROUP_RAJAXX_WAVE_TIMER);
+                    context.Repeat();
+                });
+            }
+        }
+
         void OnUnitDeath(Unit* unit) override
         {
             if (Creature* creature = unit->ToCreature())
@@ -149,7 +170,7 @@ public:
                                 _scheduler.Schedule(1s, [this, formation](TaskContext /*context*/) {
                                     if (!formation->IsAnyMemberAlive())
                                     {
-                                        CallNextRajaxxLeader();
+                                        CallNextRajaxxLeader(true);
                                     }
                                 });
                                 break;
@@ -170,6 +191,31 @@ public:
         {
             if (type == DATA_PARALYZED)
                 _paralyzedGUID = data;
+        }
+
+        bool SetBossState(uint32 type, EncounterState state) override
+        {
+            if (!InstanceScript::SetBossState(type, state))
+                return false;
+
+            switch (type)
+            {
+                case DATA_OSSIRIAN:
+                {
+                    for (ObjectGuid const& guid : _sandVortexes)
+                    {
+                        if (Creature* sandVortex = instance->GetCreature(guid))
+                        {
+                            sandVortex->SetVisible(state == IN_PROGRESS);
+                        }
+                    }
+                    break;
+                default:
+                    break;
+                }
+            }
+
+            return true;
         }
 
         ObjectGuid GetGuidData(uint32 type) const override
@@ -236,17 +282,20 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
-        void CallNextRajaxxLeader()
+        void CallNextRajaxxLeader(bool announce = false)
         {
             ++_rajaxWaveCounter;
 
             if (Creature* nextLeader = GetCreature(RajaxxWavesData[_rajaxWaveCounter].at(0)))
             {
-                if (_rajaxWaveCounter >= 2)
+                if (announce)
                 {
-                    if (Creature* rajaxx = GetCreature(DATA_RAJAXX))
+                    if (_rajaxWaveCounter >= 2)
                     {
-                        rajaxx->AI()->Talk(RajaxxWavesData[_rajaxWaveCounter].at(1));
+                        if (Creature* rajaxx = GetCreature(DATA_RAJAXX))
+                        {
+                            rajaxx->AI()->Talk(RajaxxWavesData[_rajaxWaveCounter].at(1));
+                        }
                     }
                 }
 
@@ -264,6 +313,7 @@ public:
         void ResetRajaxxWaves()
         {
             _rajaxWaveCounter = 0;
+            _scheduler.CancelAll();
             for (auto const& data : RajaxxWavesData)
             {
                 if (Creature* creature = GetCreature(data.at(0)))
@@ -283,6 +333,7 @@ public:
         ObjectGuid _buruGUID;
         ObjectGuid _ossirianGUID;
         ObjectGuid _paralyzedGUID;
+        GuidVector _sandVortexes;
         uint32 _rajaxWaveCounter;
         TaskScheduler _scheduler;
     };

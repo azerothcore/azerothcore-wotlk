@@ -4,7 +4,7 @@ on:
     branches:
       - 'master'
   pull_request:
-    types: ['labeled', 'labeled', 'opened', 'synchronize', 'reopened']
+    types: ['labeled', 'opened', 'synchronize', 'reopened']
 
 concurrency:
   group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
@@ -21,10 +21,6 @@ jobs:
             compiler: clang12
           - os: ubuntu-20.04
             compiler: clang11
-          - os: ubuntu-18.04
-            compiler: clang10
-          - os: ubuntu-18.04
-            compiler: gcc8
           - os: ubuntu-20.04
             compiler: gcc # default in 20.04 is gcc 9
           - os: ubuntu-20.04
