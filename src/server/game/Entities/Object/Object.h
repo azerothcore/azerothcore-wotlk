@@ -208,6 +208,8 @@ public:
     DynamicObject* ToDynObject() { if (GetTypeId() == TYPEID_DYNAMICOBJECT) return reinterpret_cast<DynamicObject*>(this); else return nullptr; }
     [[nodiscard]] DynamicObject const* ToDynObject() const { if (GetTypeId() == TYPEID_DYNAMICOBJECT) return reinterpret_cast<DynamicObject const*>(this); else return nullptr; }
 
+    virtual std::string GetDebugInfo() const;
+
     DataMap CustomData;
 
 protected:
@@ -612,6 +614,8 @@ public:
     void SetAllowedLooters(GuidUnorderedSet const looters);
     [[nodiscard]] bool HasAllowedLooter(ObjectGuid guid) const;
     [[nodiscard]] GuidUnorderedSet const& GetAllowedLooters() const;
+
+    std::string GetDebugInfo() const override;
 
     ElunaEventProcessor* elunaEvents;
 

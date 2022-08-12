@@ -208,3 +208,10 @@ ByteBuffer& operator<<(ByteBuffer& buf, Position::PositionXYZOStreamer const& st
     buf << x << y << z << o;
     return buf;
 }
+
+std::string WorldLocation::GetDebugInfo() const
+{
+    std::stringstream sstr;
+    sstr << "MapID: " << m_mapId << " " << Position::ToString();
+    return sstr.str();
+}

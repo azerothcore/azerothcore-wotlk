@@ -1097,7 +1097,7 @@ Item* Item::CreateItem(uint32 item, uint32 count, Player const* player, bool clo
         if (count > pProto->GetMaxStackSize())
             count = pProto->GetMaxStackSize();
 
-        ASSERT(count != 0 && "pProto->Stackable == 0 but checked at loading already");
+        ASSERT_NODEBUGINFO(count != 0 && "pProto->Stackable == 0 but checked at loading already");
 
         Item* pItem = NewItemOrBag(pProto);
         if (pItem->Create(sObjectMgr->GetGenerator<HighGuid::Item>().Generate(), item, player))
@@ -1286,4 +1286,14 @@ bool Item::CheckSoulboundTradeExpire()
     }
 
     return false;
+}
+
+std::string Item::GetDebugInfo() const
+{
+    std::stringstream sstr;
+    sstr << Object::GetDebugInfo() << "\n"
+        << std::boolalpha
+        << "Owner: " << GetOwnerGUID().ToString() << " Count: " << GetCount()
+        << " BagSlot: " << std::to_string(GetBagSlot()) << " Slot: " << std::to_string(GetSlot()) << " Equipped: " << IsEquipped();
+    return sstr.str();
 }

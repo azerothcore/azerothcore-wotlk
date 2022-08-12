@@ -15965,3 +15965,10 @@ uint32 Player::GetSpellCooldownDelay(uint32 spell_id) const
     SpellCooldowns::const_iterator itr = m_spellCooldowns.find(spell_id);
     return uint32(itr != m_spellCooldowns.end() && itr->second.end > getMSTime() ? itr->second.end - getMSTime() : 0);
 }
+
+std::string Player::GetDebugInfo() const
+{
+    std::stringstream sstr;
+    sstr << Unit::GetDebugInfo();
+    return sstr.str();
+}

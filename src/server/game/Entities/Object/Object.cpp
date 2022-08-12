@@ -1010,6 +1010,13 @@ bool Object::PrintIndexError(uint32 index, bool set) const
     return false;
 }
 
+std::string Object::GetDebugInfo() const
+{
+    std::stringstream sstr;
+    sstr << GetGUID().ToString() + " Entry " << GetEntry();
+    return sstr.str();
+}
+
 void MovementInfo::OutDebug()
 {
     LOG_INFO("movement", "MOVEMENT INFO");
@@ -2417,6 +2424,15 @@ Player* WorldObject::SelectNearestPlayer(float distance) const
     Cell::VisitWorldObjects(this, searcher, distance);
 
     return target;
+}
+
+std::string WorldObject::GetDebugInfo() const
+{
+    std::stringstream sstr;
+    sstr << WorldLocation::GetDebugInfo() << "\n"
+        << Object::GetDebugInfo() << "\n"
+        << "Name: " << GetName();
+    return sstr.str();
 }
 
 void WorldObject::GetGameObjectListWithEntryInGrid(std::list<GameObject*>& gameobjectList, uint32 entry, float maxSearchRange) const

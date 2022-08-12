@@ -2426,6 +2426,8 @@ public:
 
     [[nodiscard]] bool CanRestoreMana(SpellInfo const* spellInfo) const;
 
+    std::string GetDebugInfo() const override;
+
 protected:
     explicit Unit (bool isWorldObject);
 

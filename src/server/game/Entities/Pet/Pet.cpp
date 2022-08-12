@@ -2439,3 +2439,13 @@ std::string Pet::GenerateActionBarData() const
 
     return oss.str();
 }
+
+std::string Pet::GetDebugInfo() const
+{
+    std::stringstream sstr;
+    sstr << Guardian::GetDebugInfo() << "\n"
+        << std::boolalpha
+        << "PetType: " << std::to_string(getPetType()) << " "
+        << "PetNumber: " << m_charmInfo->GetPetNumber();
+    return sstr.str();
+}
