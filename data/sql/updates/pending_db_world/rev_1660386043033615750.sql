@@ -20,8 +20,8 @@ VALUES
 (@CANNIBAL_W, @CANNIBAL_ENTRY, 0, 0, 530, 0, 0, 1, 1, 0, 9128.29, -6993.02, 10.3157, 0.897486, 300, 0.0, 0, 137, 0, 0, 0, 0, 0, '', 0);
 
 DELETE FROM `waypoint_data` WHERE `id` = @PATH;
-INSERT INTO waypoint_data
-(id, `point`, position_x, position_y, position_z, orientation, delay, move_type, `action`, action_chance, wpguid)
+INSERT INTO `waypoint_data`
+(`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`)
 VALUES
 (@PATH, 1, 9139.89, -6984.13, 8.89487, NULL, 0, 1, 0, 100, 0),
 (@PATH, 2, 9179.08, -6940.46, 5.09185, NULL, 0, 1, 0, 100, 0),
@@ -39,7 +39,7 @@ VALUES
 (@CANNIBAL_ENTRY, 0, 1, 0, 75, 0, 100, 0, 0, @RANGER_ID, 20, 1200, NULL, 49, 0, 0, 0, 0, 0, 0, 10, 0, @RANGER_ID, 0, 0, 0, 0, 0, 0, 'Rotlimb Cannibal - On Distance To Creature - Start Attacking');
 
 DELETE FROM `creature_formations` WHERE `leaderGUID` = @CANNIBAL_N;
-INSERT INTO creature_formations
+INSERT INTO `creature_formations`
 (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`)
 VALUES
 (@CANNIBAL_N, @CANNIBAL_N, 0.0, 0.0, 2, 0, 0),
