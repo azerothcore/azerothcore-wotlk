@@ -22,6 +22,7 @@
 #include "Define.h"
 #include "SharedDefines.h"
 #include "Util.h"
+#include <array>
 #include <map>
 #include <set>
 #include <unordered_map>
@@ -2203,6 +2204,7 @@ typedef std::map<uint32, TaxiPathSetForSource> TaxiPathSetBySource;
 typedef std::vector<TaxiPathNodeEntry const*> TaxiPathNodeList;
 typedef std::vector<TaxiPathNodeList> TaxiPathNodesByPath;
 
-#define TaxiMaskSize 14
-typedef uint32 TaxiMask[TaxiMaskSize];
+static constexpr size_t TaxiMaskSize = 14;
+typedef std::array<uint32, TaxiMaskSize> TaxiMask;
+
 #endif

@@ -15,154 +15,118 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Boss_Fankriss
-SD%Complete: 100
-SDComment: sound not implemented
-SDCategory: Temple of Ahn'Qiraj
-EndScriptData */
-
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "TaskScheduler.h"
 #include "temple_of_ahnqiraj.h"
 
-#define SOUND_SENTENCE_YOU 8588
-#define SOUND_SERVE_TO     8589
-#define SOUND_LAWS         8590
-#define SOUND_TRESPASS     8591
-#define SOUND_WILL_BE      8592
-
 enum Spells
 {
     SPELL_MORTAL_WOUND      = 25646,
-    SPELL_ROOT              = 28858,
+    SPELL_ENTANGLE_RIGHT    = 720,
+    SPELL_ENTANGLE_CENTER   = 731,
+    SPELL_ENTANGLE_LEFT     = 1121,
 
-    // Enrage for his spawns
-    SPELL_ENRAGE            = 28798
+    SPELL_SUMMON_WORM_1     = 518,
+    SPELL_SUMMON_WORM_2     = 25831,
+    SPELL_SUMMON_WORM_3     = 25832
 };
 
-class boss_fankriss : public CreatureScript
+enum Misc
 {
-public:
-    boss_fankriss() : CreatureScript("boss_fankriss") { }
+    MAX_HATCHLING_SPAWN     = 4,
+    NPC_VEKNISS_HATCHLING   = 15962
+};
 
-    CreatureAI* GetAI(Creature* creature) const override
+const std::array<Position, 3> hatchlingsSpawnPoints
+{
     {
-        return GetTempleOfAhnQirajAI<boss_fankrissAI>(creature);
+        { -8043.6f, 1254.1f, -84.3f }, // Right
+        { -8003.0f, 1222.9f, -82.1f }, // Center
+        { -8022.3f, 1149.0f, -89.1f }  // Left
+    }
+};
+
+const std::array<uint32, 3> entangleSpells = { SPELL_ENTANGLE_RIGHT, SPELL_ENTANGLE_CENTER, SPELL_ENTANGLE_LEFT };
+
+struct boss_fankriss : public BossAI
+{
+    boss_fankriss(Creature* creature) : BossAI(creature, DATA_FANKRISS) { }
+
+    void Reset() override
+    {
+        _scheduler.CancelAll();
+        summonWormSpells = { SPELL_SUMMON_WORM_1, SPELL_SUMMON_WORM_2, SPELL_SUMMON_WORM_3};
+
+        BossAI::Reset();
     }
 
-    struct boss_fankrissAI : public ScriptedAI
+    void SummonWorms()
     {
-        boss_fankrissAI(Creature* creature) : ScriptedAI(creature) { }
+        uint32 amount = urand(1, 3);
+        Acore::Containers::RandomResize(summonWormSpells, amount);
+        for (uint32 summonSpell : summonWormSpells)
+            DoCastAOE(summonSpell, true);
+        summonWormSpells = { SPELL_SUMMON_WORM_1, SPELL_SUMMON_WORM_2, SPELL_SUMMON_WORM_3 };
+    }
 
-        void SummonSpawn()
+    void SummonHatchlingWaves()
+    {
+        for (Position spawnPos : hatchlingsSpawnPoints)
         {
-            Rand = 10 + (rand() % 10);
-            switch (rand() % 2)
+            for (uint8 i = 0; i < MAX_HATCHLING_SPAWN; i++)
             {
-                case 0:
-                    RandX = 0.0f - Rand;
-                    break;
-                case 1:
-                    RandX = 0.0f + Rand;
-                    break;
+                Position randSpawn = me->GetRandomPoint(spawnPos, 10.f);
+                me->SummonCreature(NPC_VEKNISS_HATCHLING, randSpawn, TEMPSUMMON_CORPSE_DESPAWN);
             }
-
-            Rand = 10 + (rand() % 10);
-            switch (rand() % 2)
-            {
-                case 0:
-                    RandY = 0.0f - Rand;
-                    break;
-                case 1:
-                    RandY = 0.0f + Rand;
-                    break;
-            }
-            Rand = 0;
-            DoSpawnCreature(15630, RandX, RandY, 0, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
         }
+    }
 
-        void EnterCombat(Unit* /*who*/) override
-        {
-            _scheduler.CancelAll();
+    void EnterCombat(Unit* who) override
+    {
+        _scheduler.CancelAll();
+        BossAI::EnterCombat(who);
 
-            _scheduler.Schedule(4s, 8s, [this](TaskContext context) {
+        _scheduler
+            .Schedule(7s, 14s, [this](TaskContext context)
+            {
                 DoCastVictim(SPELL_MORTAL_WOUND);
                 context.Repeat();
-            }).Schedule(15s, 45s, [this](TaskContext context) {
-                switch (urand(0, 2))
+            })
+            .Schedule(30s, 50s, [this](TaskContext context)
+            {
+                SummonWorms();
+                context.Repeat(22s, 70s);
+            })
+            .Schedule(15s, 20s, [this](TaskContext context)
+            {
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true))
                 {
-                case 0:
-                    SummonSpawn();
-                    break;
-                case 1:
-                    SummonSpawn();
-                    SummonSpawn();
-                    break;
-                case 2:
-                    SummonSpawn();
-                    SummonSpawn();
-                    SummonSpawn();
-                    break;
+                    uint32 spellId = Acore::Containers::SelectRandomContainerElement(entangleSpells);
+                    DoCast(target, spellId);
                 }
-                context.Repeat(30s, 60s);
-            }).Schedule(15s, 45s, [this](TaskContext context) {
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
-                {
-                    DoCast(target, SPELL_ROOT);
 
-                    if (DoGetThreat(target))
-                        DoModifyThreatPercent(target, -100);
-
-                    switch (urand(0, 2))
-                    {
-                        case 0:
-                            DoTeleportPlayer(target, -8106.0142f, 1289.2900f, -74.419533f, 5.112f);
-                            me->SummonCreature(15962, target->GetPositionX() - 3, target->GetPositionY() - 3, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-                            me->SummonCreature(15962, target->GetPositionX() - 3, target->GetPositionY() + 3, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-                            me->SummonCreature(15962, target->GetPositionX() - 5, target->GetPositionY() - 5, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-                            me->SummonCreature(15962, target->GetPositionX() - 5, target->GetPositionY() + 5, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-                            break;
-                        case 1:
-                            DoTeleportPlayer(target, -7990.135354f, 1155.1907f, -78.849319f, 2.608f);
-                            me->SummonCreature(15962, target->GetPositionX() - 3, target->GetPositionY() - 3, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-                            me->SummonCreature(15962, target->GetPositionX() - 3, target->GetPositionY() + 3, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-                            me->SummonCreature(15962, target->GetPositionX() - 5, target->GetPositionY() - 5, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-                            me->SummonCreature(15962, target->GetPositionX() - 5, target->GetPositionY() + 5, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-                            break;
-                        case 2:
-                            DoTeleportPlayer(target, -8159.7753f, 1127.9064f, -76.868660f, 0.675f);
-                            me->SummonCreature(15962, target->GetPositionX() - 3, target->GetPositionY() - 3, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-                            me->SummonCreature(15962, target->GetPositionX() - 3, target->GetPositionY() + 3, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-                            me->SummonCreature(15962, target->GetPositionX() - 5, target->GetPositionY() - 5, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-                            me->SummonCreature(15962, target->GetPositionX() - 5, target->GetPositionY() + 5, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-                            break;
-                    }
-                }
-                context.Repeat(45s, 60s);
+                SummonHatchlingWaves();
+                context.Repeat(25s, 55s);
             });
-        }
+    }
 
-        void UpdateAI(uint32 diff) override
-        {
-            //Return since we have no target
-            if (!UpdateVictim())
-                return;
+    void UpdateAI(uint32 diff) override
+    {
+        //Return since we have no target
+        if (!UpdateVictim())
+            return;
 
-            _scheduler.Update(diff,
-                std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
-        }
+        _scheduler.Update(diff,
+            std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
+    }
 
-    private:
-        TaskScheduler _scheduler;
-        int Rand;
-        float RandX;
-        float RandY;
-    };
+private:
+    TaskScheduler _scheduler;
+    std::vector<uint32> summonWormSpells;
 };
 
 void AddSC_boss_fankriss()
 {
-    new boss_fankriss();
+    RegisterTempleOfAhnQirajCreatureAI(boss_fankriss);
 }

@@ -101,40 +101,48 @@ private:
 class FlightPathMovementGenerator : public MovementGeneratorMedium< Player, FlightPathMovementGenerator >,
     public PathMovementBase<Player, TaxiPathNodeList>
 {
-public:
-    explicit FlightPathMovementGenerator(uint32 startNode = 0)
-    {
-        i_currentNode = startNode;
-        _endGridX = 0.0f;
-        _endGridY = 0.0f;
-        _endMapId = 0;
-        _preloadTargetNode = 0;
-        _mapSwitch = false;
-    }
-    void LoadPath(Player* player);
-    void DoInitialize(Player*);
-    void DoReset(Player*);
-    void DoFinalize(Player*);
-    bool DoUpdate(Player*, uint32);
-    MovementGeneratorType GetMovementGeneratorType() { return FLIGHT_MOTION_TYPE; }
+    public:
+        explicit FlightPathMovementGenerator(uint32 startNode = 0)
+        {
+            i_currentNode = startNode;
+            _endGridX = 0.0f;
+            _endGridY = 0.0f;
+            _endMapId = 0;
+            _preloadTargetNode = 0;
+        }
+        void LoadPath(Player* player);
+        void DoInitialize(Player*);
+        void DoReset(Player*);
+        void DoFinalize(Player*);
+        bool DoUpdate(Player*, uint32);
+        MovementGeneratorType GetMovementGeneratorType() override { return FLIGHT_MOTION_TYPE; }
 
-    TaxiPathNodeList const& GetPath() { return i_path; }
-    uint32 GetPathAtMapEnd() const;
-    bool HasArrived() const { return (i_currentNode >= i_path.size()); }
-    void SetCurrentNodeAfterTeleport();
-    void SkipCurrentNode() { ++i_currentNode; }
-    void DoEventIfAny(Player* player, TaxiPathNodeEntry const* node, bool departure);
+        TaxiPathNodeList const& GetPath() { return i_path; }
+        uint32 GetPathAtMapEnd() const;
+        bool HasArrived() const { return (i_currentNode >= i_path.size()); }
+        void SetCurrentNodeAfterTeleport();
+        void SkipCurrentNode() { ++i_currentNode; }
+        void DoEventIfAny(Player* player, TaxiPathNodeEntry const* node, bool departure);
 
-    void InitEndGridInfo();
-    void PreloadEndGrid();
+        bool GetResetPos(Player*, float& x, float& y, float& z);
 
-private:
-    float _endGridX;                //! X coord of last node location
-    float _endGridY;                //! Y coord of last node location
-    uint32 _endMapId;               //! map Id of last node location
-    uint32 _preloadTargetNode;      //! node index where preloading starts
-    bool _mapSwitch;
+        void InitEndGridInfo();
+        void PreloadEndGrid();
 
-    std::deque<uint32> _pointsForPathSwitch;    //! node indexes and costs where TaxiPath changes
+    private:
+
+        float _endGridX;                            //! X coord of last node location
+        float _endGridY;                            //! Y coord of last node location
+        uint32 _endMapId;                           //! map Id of last node location
+        uint32 _preloadTargetNode;                  //! node index where preloading starts
+
+        struct TaxiNodeChangeInfo
+        {
+            uint32 PathIndex;
+            int32 Cost;
+        };
+
+        std::deque<TaxiNodeChangeInfo> _pointsForPathSwitch;    //! node indexes and costs where TaxiPath changes
 };
+
 #endif
