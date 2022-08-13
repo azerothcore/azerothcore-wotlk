@@ -146,11 +146,11 @@ bool Weather::ReGenerate()
     uint32 chance3 = chance2 + m_weatherChances->data[season].stormChance;
 
     uint32 rnd = urand(0, 99);
-    if (rnd <= chance1)
+    if (rnd < chance1)
         m_type = WEATHER_TYPE_RAIN;
-    else if (rnd <= chance2)
+    else if (rnd < chance2)
         m_type = WEATHER_TYPE_SNOW;
-    else if (rnd <= chance3)
+    else if (rnd < chance3)
         m_type = WEATHER_TYPE_STORM;
     else
         m_type = WEATHER_TYPE_FINE;
