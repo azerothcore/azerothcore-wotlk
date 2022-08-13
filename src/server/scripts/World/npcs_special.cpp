@@ -212,10 +212,10 @@ public:
  */
 enum fishingExtravaganzaWorldStates
 {
-    STV_FISHING_PREV_WIN_TIME           = 500000,
-    STV_FISHING_HAS_WINNER              = 500001,
-    STV_FISHING_ANNOUNCE_EVENT_BEGIN    = 500002,
-    STV_FISHING_ANNOUNCE_POOLS_DESPAN   = 500003
+    STV_FISHING_PREV_WIN_TIME           = 197,
+    STV_FISHING_HAS_WINNER              = 198,
+    STV_FISHING_ANNOUNCE_EVENT_BEGIN    = 199,
+    STV_FISHING_ANNOUNCE_POOLS_DESPAN   = 200
 };
 
 enum riggleBassbait
@@ -338,74 +338,6 @@ public:
     CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_riggle_bassbaitAI (pCreature);
-    }
-};
-
-enum jang
-{
-    GOSSIP_TEXT_SECOND_PRICE          = 7696
-};
-
-class npc_jang : public CreatureScript
-{
-public:
-    npc_jang() : CreatureScript("npc_jang") { }
-
-    struct npc_jangAI : public ScriptedAI
-    {
-        npc_jangAI(Creature* c) : ScriptedAI(c)
-        {
-            m_uiTimer = 0;
-        }
-
-        uint32 m_uiTimer;
-
-        void CheckTournamentState() const
-        {
-            if (sGameEventMgr->IsActiveEvent(GAME_EVENT_FISHING_TURN_INS) && sWorld->getWorldState(STV_FISHING_HAS_WINNER))
-            {
-                if (!me->IsQuestGiver())
-                {
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                }
-            }
-            else
-            {
-                if (me->IsQuestGiver())
-                {
-                    me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                }
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (m_uiTimer < diff)
-            {
-                CheckTournamentState();
-                m_uiTimer = 1000;
-            }
-            else
-            {
-                m_uiTimer -= diff;
-            }
-        }
-    };
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-        {
-            player->PrepareQuestMenu(creature->GetGUID());
-        }
-        // TODO: remove gossip when event has a winner (sWorld->getWorldState(STV_FISHING_HAS_WINNER))
-        SendGossipMenuFor(player, GOSSIP_TEXT_SECOND_PRICE, creature->GetGUID());
-        return true;
-    }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
-    {
-        return new npc_jangAI(pCreature);
     }
 };
 
@@ -2637,7 +2569,6 @@ void AddSC_npcs_special()
     // Ours
     new npc_elder_clearwater();
     new npc_riggle_bassbait();
-    new npc_jang();
     new npc_target_dummy();
     new npc_training_dummy();
     new npc_venomhide_hatchling();

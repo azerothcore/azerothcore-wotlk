@@ -6,9 +6,6 @@ DELETE FROM `game_event` WHERE `eventEntry` = 90;
 INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `holidayStage`, `description`, `world_event`, `announce`) VALUES
 (90,'2016-10-30 14:00:00','2030-12-31 07:00:00',10080,180,0,0,'Stranglethorn Fishing Extravaganza - Turn-ins',0,2);
 
--- Assign script to Jang
-UPDATE `creature_template` SET `scriptName`='npc_jang' WHERE `entry` = 15078;
-
 -- Minimum fishing skill for Stranglethorn Vale Fishing Extravaganza quests is 150, also [Could I get a Fishing Flier?]
 DELETE FROM `quest_template_addon` WHERE `ID` IN (8194, 8193, 8225, 8224, 8221, 8228, 8229);
 INSERT INTO `quest_template_addon` (`ID`, `MaxLevel`, `AllowableClasses`, `SourceSpellID`, `PrevQuestID`, `NextQuestID`, `ExclusiveGroup`, `RewardMailTemplateID`, `RewardMailDelay`, `RequiredSkillID`, `RequiredSkillPoints`, `RequiredMinRepFaction`, `RequiredMaxRepFaction`, `RequiredMinRepValue`, `RequiredMaxRepValue`, `ProvidedItemCount`, `SpecialFlags`) VALUES
@@ -33,3 +30,12 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (19,0,8225,0,0,12,0,90,0,0,0,0,0,'','Fishing Extravaganza - Turn-ins active'),
 (19,0,8224,0,0,12,0,90,0,0,0,0,0,'','Fishing Extravaganza - Turn-ins active'),
 (19,0,8221,0,0,12,0,90,0,0,0,0,0,'','Fishing Extravaganza - Turn-ins active');
+
+-- Jang quest: event 90 (Turn-ins) is active and event has a winner (world state id 198)
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(19,0,8194,0,0,12,0,90,0,0,0,0,0,'','Fishing Extravaganza - Turn-ins active'),
+(19,0,8194,0,0,11,0,198,1,0,0,0,0,'','Fishing Extravaganza - fishing event has a winner');
+
+-- Jang gossip: fishing event has no winner (world state id 198)
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(14,6514,7696,0,0,11,0,198,0,0,0,0,0,'','Fishing Extravaganza - fishing event has no winner');
