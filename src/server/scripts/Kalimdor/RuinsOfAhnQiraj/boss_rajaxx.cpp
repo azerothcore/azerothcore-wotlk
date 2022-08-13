@@ -166,6 +166,7 @@ struct npc_general_andorov : public npc_escortAI
         if (uiAction)
         {
             CloseGossipMenuFor(player);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             SetEscortPaused(false);
         }
     }
@@ -215,6 +216,7 @@ struct npc_general_andorov : public npc_escortAI
                 me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
                 me->SetFacingTo(5.63741350f);
                 SetEscortPaused(true);
+                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 break;
             case 17:
                 me->SetFacingTo(2.8772139f);
