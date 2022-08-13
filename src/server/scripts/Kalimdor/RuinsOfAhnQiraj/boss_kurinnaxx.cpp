@@ -28,14 +28,16 @@ enum Spells
     SPELL_SAND_TRAP         = 25648,
     SPELL_ENRAGE            = 26527,
     SPELL_SUMMON_PLAYER     = 26446,
-    SPELL_WIDE_SLASH        = 25814
+    SPELL_WIDE_SLASH        = 25814,
+    SPELL_THRASH            = 3391
 };
 
 enum Events
 {
     EVENT_MORTAL_WOUND      = 1,
     EVENT_SAND_TRAP         = 2,
-    EVENT_WIDE_SLASH        = 3
+    EVENT_WIDE_SLASH        = 3,
+    EVENT_THRASH            = 4
 };
 
 enum Texts
@@ -47,6 +49,12 @@ struct boss_kurinnaxx : public BossAI
 {
     boss_kurinnaxx(Creature* creature) : BossAI(creature, DATA_KURINNAXX) {}
 
+    void InitializeAI() override
+    {
+        me->m_CombatDistance = 50.0f;
+        Reset();
+    }
+
     void Reset() override
     {
         BossAI::Reset();
@@ -54,6 +62,7 @@ struct boss_kurinnaxx : public BossAI
         events.ScheduleEvent(EVENT_MORTAL_WOUND, 8s, 10s);
         events.ScheduleEvent(EVENT_SAND_TRAP, 5s, 15s);
         events.ScheduleEvent(EVENT_WIDE_SLASH, 10s, 15s);
+        events.ScheduleEvent(EVENT_THRASH, 16s);
     }
 
     void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
@@ -114,6 +123,10 @@ struct boss_kurinnaxx : public BossAI
                 case EVENT_WIDE_SLASH:
                     DoCastSelf(SPELL_WIDE_SLASH);
                     events.ScheduleEvent(EVENT_WIDE_SLASH, 12s, 15s);
+                    break;
+                case EVENT_THRASH:
+                    DoCastSelf(SPELL_THRASH);
+                    events.ScheduleEvent(EVENT_THRASH, 16s);
                     break;
                 default:
                     break;
