@@ -35,7 +35,3 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (19,0,8194,0,0,12,0,90,0,0,0,0,0,'','Fishing Extravaganza - Turn-ins active'),
 (19,0,8194,0,0,11,0,198,1,0,0,0,0,'','Fishing Extravaganza - fishing event has a winner');
-
--- Jang gossip: fishing event has no winner (world state id 198)
-INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(14,6514,7696,0,0,11,0,198,0,0,0,0,0,'','Fishing Extravaganza - fishing event has no winner');
