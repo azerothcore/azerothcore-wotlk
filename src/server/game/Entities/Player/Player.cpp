@@ -13902,7 +13902,7 @@ bool Player::CanResummonPet(uint32 spellid)
                 return true;
             else if (spellid == 52150)  //Raise Dead
                 return false;
-        break;
+            break;
         case CLASS_MAGE:
             if (HasSpell(31687) && HasAura(70937))  //Has [Summon Water Elemental] spell and [Glyph of Eternal Water].
                 return true;
@@ -13910,9 +13910,9 @@ bool Player::CanResummonPet(uint32 spellid)
         case CLASS_HUNTER:
         case CLASS_WARLOCK:
             return true;
-        break;
+            break;
         default:
-        break;
+            break;
     }
 
     return HasSpell(spellid);
