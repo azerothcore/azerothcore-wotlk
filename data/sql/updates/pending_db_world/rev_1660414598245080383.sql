@@ -1,0 +1,1 @@
+UPDATE `quest_offer_reward` SET `RewardText` = 'I no longer belong to this world and must admit defeat.  The land has forever changed and nothing will ever be the same. Leave the pendant here with me, maybe one day, long after the elves are gone, a new tree will grow on this very spot - amongst a burnt forest and the husks of dead treants. ' WHERE (`ID` = 10166);
