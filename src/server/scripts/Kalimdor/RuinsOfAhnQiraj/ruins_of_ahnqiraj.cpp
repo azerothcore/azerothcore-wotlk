@@ -50,12 +50,10 @@ struct npc_obsidian_destroyer : public ScriptedAI
         .Schedule(6s, 10s, [this](TaskContext context)
         {
             std::list<Unit*> targets;
-            SelectTargetList(targets, [this](Unit* target)
+            SelectTargetList(targets, [&](Unit* target)
             {
                 return target && target->IsPlayer() && target->GetPower(POWER_MANA) > 0;
-            }, 0, SelectTargetMethod::Random);
-
-            Acore::Containers::RandomResize(targets, 6);
+            }, 6, SelectTargetMethod::Random);
 
             for (Unit* target : targets)
             {
