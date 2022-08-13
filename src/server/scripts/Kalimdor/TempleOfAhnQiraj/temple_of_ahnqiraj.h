@@ -35,6 +35,7 @@ enum DataTypes
     DATA_VEKNILASH          = 9,
     DATA_VEKNILASHISDEAD    = 10,
     DATA_VEKNILASH_DEATH    = 11,
+    DATA_FANKRISS           = 12,
     DATA_BUG_TRIO_DEATH     = 14,
     DATA_CTHUN_PHASE        = 20,
     DATA_VISCIDUS           = 21,

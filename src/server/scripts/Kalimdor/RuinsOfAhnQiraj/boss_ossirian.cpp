@@ -36,19 +36,20 @@ enum Texts
 
 enum Spells
 {
-    SPELL_CURSE_OF_TONGUES      = 25195,
-    SPELL_ENVELOPING_WINDS      = 25189,
-    SPELL_WAR_STOMP             = 25188,
-    SPELL_STRENGHT_OF_OSSIRIAN  = 25176,
-    SPELL_SAND_STORM            = 25160,
-    SPELL_SUMMON_CRYSTAL        = 25192,
+    SPELL_CURSE_OF_TONGUES              = 25195,
+    SPELL_ENVELOPING_WINDS              = 25189,
+    SPELL_WAR_STOMP                     = 25188,
+    SPELL_STRENGHT_OF_OSSIRIAN          = 25176,
+    SPELL_SAND_STORM                    = 25160,
+    SPELL_SUMMON_CRYSTAL                = 25192,
+    SPELL_SUMMON_SMALL_OBSIDIAN_CHUNK   = 27627, // Server-side
 
     // Crystal
-    SPELL_FIRE_WEAKNESS         = 25177,
-    SPELL_FROST_WEAKNESS        = 25178,
-    SPELL_NATURE_WEAKNESS       = 25180,
-    SPELL_ARCANE_WEAKNESS       = 25181,
-    SPELL_SHADOW_WEAKNESS       = 25183
+    SPELL_FIRE_WEAKNESS                 = 25177,
+    SPELL_FROST_WEAKNESS                = 25178,
+    SPELL_NATURE_WEAKNESS               = 25180,
+    SPELL_ARCANE_WEAKNESS               = 25181,
+    SPELL_SHADOW_WEAKNESS               = 25183
 };
 
 enum Actions
@@ -81,12 +82,9 @@ Position CrystalCoordinates[NUM_CRYSTALS] =
 
 Position initialCrystalPosition = { -9407.7197265625f, 1960.2099609375f, 85.6390991210937f, 1.11700999736786f };
 
-float roomRadius = 165.0f;
-uint8 const NUM_TORNADOS = 2;
 uint8 const NUM_WEAKNESS = 5;
 uint32 const spellWeakness[NUM_WEAKNESS] =
 { SPELL_FIRE_WEAKNESS, SPELL_FROST_WEAKNESS, SPELL_NATURE_WEAKNESS, SPELL_ARCANE_WEAKNESS, SPELL_SHADOW_WEAKNESS };
-Position const RoomCenter = { -9343.041992f, 1923.278198f, 85.555984f, 0.0 };
 
 struct boss_ossirian : public BossAI
 {
@@ -186,14 +184,6 @@ struct boss_ossirian : public BossAI
 
         WorldPackets::Misc::Weather weather(WEATHER_STATE_HEAVY_SANDSTORM, 1.0f);
         map->SendToPlayers(weather.Write());
-        for (uint8 i = 0; i < NUM_TORNADOS; ++i)
-        {
-            Position Point = me->GetRandomPoint(RoomCenter, roomRadius);
-            if (Creature* Tornado = me->SummonCreature(NPC_SAND_VORTEX, Point))
-            {
-                Tornado->CastSpell(Tornado, SPELL_SAND_STORM, true);
-            }
-        }
 
         SpawnNextCrystal();
     }
@@ -385,6 +375,11 @@ struct npc_anubisath_guardian : public ScriptedAI
             _enraged = true;
             DoCastSelf(RAND(SPELL_ENRAGE, SPELL_EXPLODE), true);
         }
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        DoCastSelf(SPELL_SUMMON_SMALL_OBSIDIAN_CHUNK, true);
     }
 
     void UpdateAI(uint32 diff) override
