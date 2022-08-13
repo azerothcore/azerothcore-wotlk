@@ -105,7 +105,8 @@ struct boss_ossirian : public BossAI
                 crystal->Delete();
         }
 
-        if (trigger = me->GetMap()->SummonCreature(NPC_OSSIRIAN_TRIGGER, initialCrystalPosition))
+        trigger = me->GetMap()->SummonCreature(NPC_OSSIRIAN_TRIGGER, initialCrystalPosition);
+        if (trigger)
         {
             _triggerGUID[0] = trigger->GetGUID();
             if (GameObject* crystal = trigger->SummonGameObject(GO_OSSIRIAN_CRYSTAL,
