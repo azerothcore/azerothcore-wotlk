@@ -195,24 +195,18 @@ public:
             _scheduler.Schedule(1s, [this](TaskContext context)
             {
                 // Chase target, but don't attack - otherwise just roam around
-                if (Creature* dragon = ObjectAccessor::GetCreature(*me, _dragonGUID))
+                if (Unit* chaseTarget = GetRandomUnitFromDragonThreatList())
                 {
-                    if (dragon->GetAI())
-                    {
-                        if (Unit* chaseTarget = dragon->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
-                        {
-                            me->GetMotionMaster()->Clear(false);
-                            me->GetMotionMaster()->MoveChase(chaseTarget, 0.2f);
-                            _targetGUID = chaseTarget->GetGUID();
-                            context.Repeat(15s, 30s);
-                        }
-                        else
-                        {
-                            me->GetMotionMaster()->Clear(false);
-                            me->GetMotionMaster()->MoveRandom(25.0f);
-                            context.Repeat(2500ms);
-                        }
-                    }
+                    me->GetMotionMaster()->Clear(false);
+                    me->GetMotionMaster()->MoveChase(chaseTarget, 0.2f);
+                    _targetGUID = chaseTarget->GetGUID();
+                    context.Repeat(15s, 30s);
+                }
+                else
+                {
+                    me->GetMotionMaster()->Clear(false);
+                    me->GetMotionMaster()->MoveRandom(25.0f);
+                    context.Repeat(2500ms);
                 }
 
                 // Seeping fog movement is slow enough for a player to be able to walk backwards and still outpace it
@@ -240,6 +234,19 @@ public:
             {
                 _dragonGUID = guid;
             }
+        }
+
+        Unit* GetRandomUnitFromDragonThreatList()
+        {
+            if (Creature* dragon = ObjectAccessor::GetCreature(*me, _dragonGUID))
+            {
+                if (dragon->GetAI())
+                {
+                    return dragon->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true);
+                }
+            }
+
+            return nullptr;
         }
 
         void UpdateAI(uint32 diff) override
