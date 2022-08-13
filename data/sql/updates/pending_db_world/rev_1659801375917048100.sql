@@ -1,6 +1,7 @@
 --
 UPDATE `creature_template` SET `ScriptName`='npc_general_andorov' WHERE `entry`=15471;
 UPDATE `creature_template` SET `npcflag`=129, `speed_walk`=1.4, `speed_run`=1.4, `gossip_menu_id`=7047, `type_flags`=`type_flags`|0x08000000 WHERE  `entry`=15471;
+UPDATE `creature_template` SET `speed_walk`=1.4, `speed_run`=1.4 `entry`=15473;
 
 DELETE FROM `script_waypoint` WHERE `entry`=15471;
 INSERT INTO `script_waypoint` (`entry`, `pointid`, `location_x`, `location_y`, `location_z`, `waittime`, `point_comment`) VALUES

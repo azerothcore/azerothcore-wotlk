@@ -215,6 +215,7 @@ struct npc_general_andorov : public npc_escortAI
                 me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
                 me->SetFacingTo(5.63741350f);
                 SetEscortPaused(true);
+                break;
             case 17:
                 me->SetFacingTo(2.8772139f);
                 SetEscortPaused(true);
