@@ -36,7 +36,7 @@ enum EmeraldDragonNPC
     DRAGON_EMERISS                  = 14889,
     DRAGON_TAERAR                   = 14890,
 
-    GUID_DREAM_FOG_TARGET           = 1
+    GUID_DRAGON                     = 1
 };
 
 //
@@ -151,10 +151,7 @@ struct emerald_dragonAI : public WorldBossAI
     {
         if (summon->GetEntry() == NPC_DREAM_FOG)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
-            {
-                summon->AI()->SetGUID(target->GetGUID(), GUID_DREAM_FOG_TARGET);
-            }
+            summon->AI()->SetGUID(me->GetGUID(), GUID_DRAGON);
         }
     }
 
@@ -188,55 +185,50 @@ public:
     {
         npc_dream_fogAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void SetGUID(ObjectGuid guid, int32 type) override
+        void Reset() override
         {
-            if (type == GUID_DREAM_FOG_TARGET)
-            {
-                ScheduleEvents(guid);
-            }
+            ScheduleEvents();
         }
 
-        void ScheduleEvents(ObjectGuid target)
+        void ScheduleEvents()
         {
-            if (target.IsEmpty())
-            {
-                if (Unit* newTarget = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
-                {
-                    target = newTarget->GetGUID();
-                }
-            }
-
-            _scheduler.Schedule(1s, [this, target](TaskContext context)
+            _scheduler.Schedule(1s, [this](TaskContext context)
             {
                 // Chase target, but don't attack - otherwise just roam around
-                if (Unit* chaseTarget = ObjectAccessor::GetUnit(*me, target))
+                if (Creature* dragon = ObjectAccessor::GetCreature(*me, _dragonGUID))
                 {
-                    ChaseTarget(chaseTarget);
-                    context.Repeat(15s, 30s);
+                    if (dragon->GetAI())
+                    {
+                        if (Unit* chaseTarget = dragon->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
+                        {
+                            ChaseTarget(chaseTarget);
+                            context.Repeat(15s, 30s);
+                        }
+                        else
+                        {
+                            me->GetMotionMaster()->Clear(false);
+                            me->GetMotionMaster()->MoveRandom(25.0f);
+                            context.Repeat(2500ms);
+                        }
+                    }
                 }
-                else
-                {
-                    me->GetMotionMaster()->Clear(false);
-                    me->GetMotionMaster()->MoveRandom(25.0f);
-                    context.Repeat(2500ms);
-                }
+
                 // Seeping fog movement is slow enough for a player to be able to walk backwards and still outpace it
                 me->SetWalk(true);
                 me->SetSpeed(MOVE_WALK, 0.75f);
             }).Schedule(1s, [this](TaskContext context)
             {
-                if (Unit* target = ObjectAccessor::GetUnit(*me, targetGUID))
+                if (Unit* target = ObjectAccessor::GetUnit(*me, _targetGUID))
                 {
-                    if (target->IsWithinDistInMap(me, 3.0f))
+                    if (target->IsWithinDistInMap(me, 5.0f))
                     {
                         _scheduler.CancelAll();
-                        ScheduleEvents(ObjectGuid::Empty);
-                    }
-                    else
-                    {
-                        context.Repeat();
+                        ScheduleEvents();
+                        return;
                     }
                 }
+
+                context.Repeat();
             });
         }
 
@@ -244,7 +236,15 @@ public:
         {
             me->GetMotionMaster()->Clear(false);
             me->GetMotionMaster()->MoveChase(target, 0.2f);
-            targetGUID = target->GetGUID();
+            _targetGUID = target->GetGUID();
+        }
+
+        void SetGUID(ObjectGuid guid, int32 type) override
+        {
+            if (type == GUID_DRAGON)
+            {
+                _dragonGUID = guid;
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -256,7 +256,8 @@ public:
         }
 
     private:
-        ObjectGuid targetGUID;
+        ObjectGuid _targetGUID;
+        ObjectGuid _dragonGUID;
         TaskScheduler _scheduler;
     };
 
