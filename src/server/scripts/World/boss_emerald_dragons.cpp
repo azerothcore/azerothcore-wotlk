@@ -201,7 +201,9 @@ public:
                     {
                         if (Unit* chaseTarget = dragon->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                         {
-                            ChaseTarget(chaseTarget);
+                            me->GetMotionMaster()->Clear(false);
+                            me->GetMotionMaster()->MoveChase(chaseTarget, 0.2f);
+                            _targetGUID = chaseTarget->GetGUID();
                             context.Repeat(15s, 30s);
                         }
                         else
@@ -230,13 +232,6 @@ public:
 
                 context.Repeat();
             });
-        }
-
-        void ChaseTarget(Unit* target)
-        {
-            me->GetMotionMaster()->Clear(false);
-            me->GetMotionMaster()->MoveChase(target, 0.2f);
-            _targetGUID = target->GetGUID();
         }
 
         void SetGUID(ObjectGuid guid, int32 type) override
