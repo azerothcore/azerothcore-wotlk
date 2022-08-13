@@ -22,6 +22,7 @@
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "TaskScheduler.h"
 
 //
 //  Emerald Dragon NPCs and IDs (kept here for reference)
@@ -34,6 +35,8 @@ enum EmeraldDragonNPC
     DRAGON_LETHON                   = 14888,
     DRAGON_EMERISS                  = 14889,
     DRAGON_TAERAR                   = 14890,
+
+    GUID_DREAM_FOG_TARGET           = 1
 };
 
 //
@@ -144,6 +147,17 @@ struct emerald_dragonAI : public WorldBossAI
         }
     }
 
+    void JustSummoned(Creature* summon) override
+    {
+        if (summon->GetEntry() == NPC_DREAM_FOG)
+        {
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
+            {
+                summon->AI()->SetGUID(target->GetGUID(), GUID_DREAM_FOG_TARGET);
+            }
+        }
+    }
+
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
@@ -172,13 +186,65 @@ public:
 
     struct npc_dream_fogAI : public ScriptedAI
     {
-        npc_dream_fogAI(Creature* creature) : ScriptedAI(creature)
+        npc_dream_fogAI(Creature* creature) : ScriptedAI(creature) { }
+
+        void SetGUID(ObjectGuid guid, int32 type) override
         {
+            if (type == GUID_DREAM_FOG_TARGET)
+            {
+                ScheduleEvents(guid);
+            }
         }
 
-        void Reset() override
+        void ScheduleEvents(ObjectGuid target)
         {
-            _roamTimer = 0;
+            if (target.IsEmpty())
+            {
+                if (Unit* newTarget = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
+                {
+                    target = newTarget->GetGUID();
+                }
+            }
+
+            _scheduler.Schedule(1s, [this, target](TaskContext context)
+            {
+                // Chase target, but don't attack - otherwise just roam around
+                if (Unit* chaseTarget = ObjectAccessor::GetUnit(*me, target))
+                {
+                    ChaseTarget(chaseTarget);
+                    context.Repeat(15s, 30s);
+                }
+                else
+                {
+                    me->GetMotionMaster()->Clear(false);
+                    me->GetMotionMaster()->MoveRandom(25.0f);
+                    context.Repeat(2500ms);
+                }
+                // Seeping fog movement is slow enough for a player to be able to walk backwards and still outpace it
+                me->SetWalk(true);
+                me->SetSpeed(MOVE_WALK, 0.75f);
+            }).Schedule(1s, [this](TaskContext context)
+            {
+                if (Unit* target = ObjectAccessor::GetUnit(*me, targetGUID))
+                {
+                    if (target->IsWithinDistInMap(me, 3.0f))
+                    {
+                        _scheduler.CancelAll();
+                        ScheduleEvents(ObjectGuid::Empty);
+                    }
+                    else
+                    {
+                        context.Repeat();
+                    }
+                }
+            });
+        }
+
+        void ChaseTarget(Unit* target)
+        {
+            me->GetMotionMaster()->Clear(false);
+            me->GetMotionMaster()->MoveChase(target, 0.2f);
+            targetGUID = target->GetGUID();
         }
 
         void UpdateAI(uint32 diff) override
@@ -186,31 +252,12 @@ public:
             if (!UpdateVictim())
                 return;
 
-            if (!_roamTimer)
-            {
-                // Chase target, but don't attack - otherwise just roam around
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
-                {
-                    _roamTimer = urand(15000, 30000);
-                    me->GetMotionMaster()->Clear(false);
-                    me->GetMotionMaster()->MoveChase(target, 0.2f);
-                }
-                else
-                {
-                    _roamTimer = 2500;
-                    me->GetMotionMaster()->Clear(false);
-                    me->GetMotionMaster()->MoveRandom(25.0f);
-                }
-                // Seeping fog movement is slow enough for a player to be able to walk backwards and still outpace it
-                me->SetWalk(true);
-                me->SetSpeed(MOVE_WALK, 0.75f);
-            }
-            else
-                _roamTimer -= diff;
+            _scheduler.Update(diff);
         }
 
     private:
-        uint32 _roamTimer;
+        ObjectGuid targetGUID;
+        TaskScheduler _scheduler;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
