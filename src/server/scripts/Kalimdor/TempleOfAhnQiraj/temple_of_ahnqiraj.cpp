@@ -17,7 +17,7 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "ruins_of_ahnqiraj.h"
+#include "temple_of_ahnqiraj.h"
 #include "TaskScheduler.h"
 
 enum Spells
@@ -31,7 +31,7 @@ enum Spells
 
     SPELL_ENRAGE                        = 14204,
     SPELL_EXPLODE                       = 25699,
-    
+
     SPELL_SUMMON_WARRIOR                = 17431,
     SPELL_SUMMON_SWARMGUARD             = 17430,
 
@@ -150,7 +150,7 @@ private:
     bool _enraged;
 };
 
-void AddSC_ruins_of_ahnqiraj()
+void AddSC_temple_of_ahnqiraj()
 {
-    RegisterRuinsOfAhnQirajCreatureAI(npc_anubisath_defender);
+    RegisterTempleOfAhnQirajCreatureAI(npc_anubisath_defender);
 }

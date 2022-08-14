@@ -57,7 +57,6 @@ void AddSC_boss_moam();
 void AddSC_boss_buru();
 void AddSC_boss_ayamiss();
 void AddSC_boss_ossirian();
-void AddSC_ruins_of_ahnqiraj();
 void AddSC_instance_ruins_of_ahnqiraj();
 void AddSC_boss_cthun();                     //Temple of ahn'qiraj
 void AddSC_boss_viscidus();
@@ -69,6 +68,7 @@ void AddSC_boss_skeram();
 void AddSC_boss_twinemperors();
 void AddSC_boss_ouro();
 void AddSC_npc_anubisath_sentinel();
+void AddSC_temple_of_ahnqiraj();
 void AddSC_instance_temple_of_ahnqiraj();
 void AddSC_instance_wailing_caverns();       //Wailing caverns
 void AddSC_zulfarrak();
@@ -140,7 +140,6 @@ void AddKalimdorScripts()
     AddSC_boss_buru();
     AddSC_boss_ayamiss();
     AddSC_boss_ossirian();
-    AddSC_ruins_of_ahnqiraj();
     AddSC_instance_ruins_of_ahnqiraj();
     AddSC_boss_cthun();                     //Temple of ahn'qiraj
     AddSC_boss_viscidus();
@@ -152,6 +151,7 @@ void AddKalimdorScripts()
     AddSC_boss_twinemperors();
     AddSC_boss_ouro();
     AddSC_npc_anubisath_sentinel();
+    AddSC_temple_of_ahnqiraj();
     AddSC_instance_temple_of_ahnqiraj();
     AddSC_instance_wailing_caverns();       //Wailing caverns
     AddSC_zulfarrak();
