@@ -86,28 +86,29 @@ bool BattlegroundQueue::SelectionPool::KickGroup(const uint32 size)
 
     // find last group with proper size or largest
     bool foundProper = false;
-    auto groupToKick = SelectedGroups.begin();
-    for (auto& itr = groupToKick; itr != SelectedGroups.end(); ++itr)
+    GroupQueueInfo* groupToKick{ SelectedGroups.front() };
+
+    for (auto const& gInfo : SelectedGroups)
     {
         // if proper size - overwrite to kick last one
-        if (std::abs(int32((*itr)->Players.size()) - (int32)size) <= 1)
+        if (std::abs(int32(gInfo->Players.size()) - (int32)size) <= 1)
         {
-            groupToKick = itr;
+            groupToKick = gInfo;
             foundProper = true;
         }
-        else if (!foundProper && (*itr)->Players.size() >= (*groupToKick)->Players.size())
-            groupToKick = itr;
+        else if (!foundProper && gInfo->Players.size() >= groupToKick->Players.size())
+            groupToKick = gInfo;
     }
 
     // remove selected from pool
-    GroupQueueInfo* ginfo = (*groupToKick);
-    SelectedGroups.erase(groupToKick);
-    PlayerCount -= ginfo->Players.size();
+    auto playersCountInGroup{ groupToKick->Players.size() };
+    PlayerCount -= playersCountInGroup;
+    std::erase(SelectedGroups, groupToKick);
 
     if (foundProper)
         return false;
 
-    return (ginfo->Players.size() > size);
+    return playersCountInGroup > size;
 }
 
 // returns true if added or desired count not yet reached
