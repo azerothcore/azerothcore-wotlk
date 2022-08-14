@@ -1,3 +1,4 @@
+-- DB update 2022_08_14_02 -> 2022_08_14_03
 --
 UPDATE `smart_scripts` SET `link`=2 WHERE `entryorguid` = 15323 AND `source_type` = 0 AND `id`=1;
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 15323 AND `source_type` = 0 AND `id` IN (2,3,4,5,6,7);
