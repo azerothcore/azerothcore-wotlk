@@ -141,6 +141,7 @@ struct boss_ouro : public BossAI
         if (GameObject* base = me->FindNearestGameObject(GO_SANDWORM_BASE, 10.f))
         {
             base->Use(me);
+            base->DespawnOrUnsummon(6s);
         }
 
         DoCastSelf(SPELL_SUMMON_OURO_MOUNDS, true);
