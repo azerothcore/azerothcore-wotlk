@@ -142,13 +142,13 @@ struct boss_skeram : public BossAI
             switch (eventId)
             {
                 case EVENT_ARCANE_EXPLOSION:
-                    DoCastAOE(SPELL_ARCANE_EXPLOSION, true);
+                    DoCastAOE(SPELL_ARCANE_EXPLOSION, false);
                     events.ScheduleEvent(EVENT_ARCANE_EXPLOSION, 8s, 18s);
                     break;
                 case EVENT_FULLFILMENT:
                     /// @todo For some weird reason boss does not cast this
                     // Spell actually works, tested in duel
-                    DoCast(SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true), SPELL_TRUE_FULFILLMENT, true);
+                    DoCast(SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true), SPELL_TRUE_FULFILLMENT, false);
                     events.ScheduleEvent(EVENT_FULLFILMENT, 20s, 30s);
                     break;
                 case EVENT_BLINK:
