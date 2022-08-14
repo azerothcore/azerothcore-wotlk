@@ -19,6 +19,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ruins_of_ahnqiraj.h"
+#include "TaskScheduler.h"
 
 enum Spells
 {
@@ -30,20 +31,28 @@ enum Spells
     SPELL_FEED                = 25721,
 
     // Server-side spells
-    SPELL_SUMMON_LARVA_A      = 26538,
-    SPELL_SUMMON_LARVA_B      = 26539,
-    SPELL_LARVA_AGGRO_EFFECT  = 25724, // Unknown purpose
-    SPELL_LARVA_FEAR_EFFECT   = 25726, // Unknown purpose
+    SPELL_SUMMON_LARVA_A                    = 26538,
+    SPELL_SUMMON_LARVA_B                    = 26539,
+    SPELL_LARVA_AGGRO_EFFECT                = 25724, // Unknown purpose
+    SPELL_LARVA_FEAR_EFFECT                 = 25726, // Unknown purpose
+    SPELL_SUMMON_HIVEZARA_SWARMER           = 25708,
+    SPELL_HIVEZARA_SWARMER_TELEPORT_1       = 25709,
+    SPELL_HIVEZARA_SWARMER_TELEPORT_2       = 25825,
+    SPELL_HIVEZARA_SWARMER_TELEPORT_3       = 25826,
+    SPELL_HIVEZARA_SWARMER_TELEPORT_4       = 25827,
+    SPELL_HIVEZARA_SWARMER_TELEPORT_5       = 25828,
+    SPELL_HIVEZARA_SWARMER_TELEPORT_TRIGGER = 25830,
+    SPELL_HIVEZARA_SWARMER_START_LOOP       = 25711,
+    SPELL_HIVEZARA_SWARMER_LOOP_1           = 25833,
+    SPELL_HIVEZARA_SWARMER_LOOP_2           = 25834,
+    SPELL_HIVEZARA_SWARMER_LOOP_3           = 25835,
+    SPELL_HIVEZARA_SWARMER_SWARM            = 25844
 };
 
-enum Events
+enum Misc
 {
-    EVENT_STINGER_SPRAY       = 1,
-    EVENT_POISON_STINGER      = 2,
-    EVENT_SUMMON_SWARMER      = 3,
-    EVENT_SWARMER_ATTACK      = 4,
-    EVENT_PARALYZE            = 5,
-    EVENT_LASH                = 6
+    MAX_SWARMER_COUNT    = 28,
+    ACTION_SWARMER_SWARM = 1,
 };
 
 enum Emotes
@@ -86,6 +95,7 @@ struct boss_ayamiss : public BossAI
         switch (who->GetEntry())
         {
             case NPC_HIVEZARA_SWARMER:
+                who->CastSpell(who, SPELL_HIVEZARA_SWARMER_TELEPORT_TRIGGER, true);
                 _swarmers.push_back(who->GetGUID());
                 break;
             case NPC_HIVEZARA_LARVA:
@@ -115,6 +125,55 @@ struct boss_ayamiss : public BossAI
         }
     }
 
+    void ScheduleTasks()
+    {
+        _scheduler.Schedule(20s, 30s, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_STINGER_SPRAY);
+            context.Repeat(15s, 20s);
+        }).Schedule(5s, [this](TaskContext context) {
+            DoCastVictim(SPELL_POISON_STINGER);
+            context.SetGroup(PHASE_AIR);
+            context.Repeat(2s, 3s);
+        }).Schedule(5s, [this](TaskContext context) {
+            DoCastAOE(SPELL_SUMMON_HIVEZARA_SWARMER);
+
+            if (_swarmers.size() >= MAX_SWARMER_COUNT)
+            {
+                DoCastAOE(SPELL_HIVEZARA_SWARMER_SWARM, true);
+            }
+
+            context.Repeat(RAND(2400ms, 3600ms));
+        }).Schedule(15s, [this](TaskContext context) {
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0, true))
+            {
+                DoCast(target, SPELL_PARALYZE, true);
+                instance->SetGuidData(DATA_PARALYZED, target->GetGUID());
+                DoCastAOE(RAND(SPELL_SUMMON_LARVA_A, SPELL_SUMMON_LARVA_B), true);
+            }
+            context.Repeat();
+        });
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_SWARMER_SWARM)
+        {
+            for (ObjectGuid const& guid : _swarmers)
+            {
+                if (Creature* swarmer = me->GetMap()->GetCreature(guid))
+                {
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
+                    {
+                        swarmer->AI()->AttackStart(target);
+                    }
+                }
+            }
+
+            _swarmers.clear();
+        }
+    }
+
     void EnterEvadeMode(EvadeReason why) override
     {
         me->ClearUnitState(UNIT_STATE_ROOT);
@@ -125,14 +184,10 @@ struct boss_ayamiss : public BossAI
     void EnterCombat(Unit* attacker) override
     {
         BossAI::EnterCombat(attacker);
-        events.ScheduleEvent(EVENT_STINGER_SPRAY, 20s, 30s);
-        events.ScheduleEvent(EVENT_POISON_STINGER, 5s);
-        events.ScheduleEvent(EVENT_SUMMON_SWARMER, 5s);
-        events.ScheduleEvent(EVENT_SWARMER_ATTACK, 60s);
-        events.ScheduleEvent(EVENT_PARALYZE, 15s);
         me->SetCanFly(true);
         me->SetDisableGravity(true);
         me->GetMotionMaster()->MovePoint(POINT_AIR, AyamissAirPos);
+        ScheduleTasks();
     }
 
     void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -144,9 +199,14 @@ struct boss_ayamiss : public BossAI
             me->SetCanFly(false);
             me->SetDisableGravity(false);
             me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
-            events.ScheduleEvent(EVENT_LASH, 5s, 8s);
-            events.CancelEvent(EVENT_POISON_STINGER);
             DoResetThreat();
+
+            _scheduler.Schedule(5s, 8s, [this](TaskContext context) {
+                DoCastVictim(SPELL_LASH);
+                context.Repeat(8s, 15s);
+            });
+
+            _scheduler.CancelGroup(PHASE_AIR);
         }
 
         if (!_enraged && me->HealthBelowPctDamaged(20, damage))
@@ -162,66 +222,14 @@ struct boss_ayamiss : public BossAI
         if (!UpdateVictim())
             return;
 
-        events.Update(diff);
-        while (uint32 eventId = events.ExecuteEvent())
-        {
-            switch (eventId)
-            {
-            case EVENT_STINGER_SPRAY:
-                DoCastSelf(SPELL_STINGER_SPRAY);
-                events.ScheduleEvent(EVENT_STINGER_SPRAY, 15s, 20s);
-                break;
-            case EVENT_POISON_STINGER:
-                DoCastVictim(SPELL_POISON_STINGER);
-                events.ScheduleEvent(EVENT_POISON_STINGER, 2s, 3s);
-                break;
-            case EVENT_PARALYZE:
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0, true))
-                {
-                    DoCast(target, SPELL_PARALYZE, true);
-                    instance->SetGuidData(DATA_PARALYZED, target->GetGUID());
-                    DoCastAOE(RAND(SPELL_SUMMON_LARVA_A, SPELL_SUMMON_LARVA_B), true);
-                }
-                events.ScheduleEvent(EVENT_PARALYZE, 15s);
-                break;
-            case EVENT_SWARMER_ATTACK:
-                for (ObjectGuid const& guid : _swarmers)
-                {
-                    if (Creature* swarmer = me->GetMap()->GetCreature(guid))
-                    {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random))
-                        {
-                            swarmer->AI()->AttackStart(target);
-                        }
-                    }
-                }
-                _swarmers.clear();
-                events.ScheduleEvent(EVENT_SWARMER_ATTACK, 60s);
-                break;
-            case EVENT_SUMMON_SWARMER:
-            {
-                Position const offset = { 0.0f, 0.0f, 20.0f, 0.0f };
-                Position spawnpos = me->GetRandomPoint(SwarmerPos, 80.0f);
-                spawnpos.RelocateOffset(offset);
-                if (Creature* wasp = me->SummonCreature(NPC_HIVEZARA_SWARMER, spawnpos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
-                {
-                    wasp->GetMotionMaster()->MoveRandom(10.0f);
-                }
-                events.ScheduleEvent(EVENT_SUMMON_SWARMER, 5s);
-                break;
-            }
-            case EVENT_LASH:
-                DoCastVictim(SPELL_LASH);
-                events.ScheduleEvent(EVENT_LASH, 8s, 15s);
-                break;
-            }
-        }
-        DoMeleeAttackIfReady();
+        _scheduler.Update(diff,
+            std::bind(&BossAI::DoMeleeAttackIfReady, this));
     }
 private:
     GuidList _swarmers;
     uint8 _phase;
     bool _enraged;
+    TaskScheduler _scheduler;
     Position homePos;
 };
 
@@ -282,8 +290,62 @@ private:
     InstanceScript* _instance;
 };
 
+struct WaspTeleportData
+{
+    uint32 spellId;
+    Position movePos;
+};
+
+class spell_ayamiss_swarmer_teleport_trigger : public SpellScript
+{
+    PrepareSpellScript(spell_ayamiss_swarmer_teleport_trigger);
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        WaspTeleportData telData[5] =
+        {
+            { SPELL_HIVEZARA_SWARMER_TELEPORT_1, Position(-9750.208f, 1479.4608f, 45.937202f) },
+            { SPELL_HIVEZARA_SWARMER_TELEPORT_2, Position(-9750.661f, 1477.6143f, 48.96516f) },
+            { SPELL_HIVEZARA_SWARMER_TELEPORT_3, Position(-9753.014f, 1478.1317f, 50.817974f) },
+            { SPELL_HIVEZARA_SWARMER_TELEPORT_4, Position(-9747.529f, 1473.6367f, 49.077087f) },
+            { SPELL_HIVEZARA_SWARMER_TELEPORT_5, Position(-9754.684f, 1475.3403f, 49.030098f) }
+        };
+
+        WaspTeleportData data = Acore::Containers::SelectRandomContainerElement(telData);
+        GetCaster()->CastSpell((Unit*)nullptr, data.spellId, true);
+        GetCaster()->MovePosition(data.movePos, 0.0f, 0.0f);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_ayamiss_swarmer_teleport_trigger::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+class spell_ayamiss_swarmer_swarm : public SpellScript
+{
+    PrepareSpellScript(spell_ayamiss_swarmer_swarm);
+
+    bool Load() override
+    {
+        return GetCaster()->GetEntry() == NPC_AYAMISS;
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        GetCaster()->ToCreature()->AI()->DoAction(ACTION_SWARMER_SWARM);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_ayamiss_swarmer_swarm::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 void AddSC_boss_ayamiss()
 {
     RegisterRuinsOfAhnQirajCreatureAI(boss_ayamiss);
     RegisterRuinsOfAhnQirajCreatureAI(npc_hive_zara_larva);
+    RegisterSpellScript(spell_ayamiss_swarmer_teleport_trigger);
+    RegisterSpellScript(spell_ayamiss_swarmer_swarm);
 }
