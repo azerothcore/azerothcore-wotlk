@@ -18,6 +18,7 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "ruins_of_ahnqiraj.h"
 #include "TaskScheduler.h"
 
