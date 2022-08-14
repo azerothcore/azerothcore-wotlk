@@ -740,7 +740,7 @@ public:
     {
         PrepareSpellScript(spell_dream_fog_sleep_SpellScript);
 
-        void HandleEffect(SpellEffIndex effIndex)
+        void HandleEffect(SpellEffIndex /*effIndex*/)
         {
             if (Unit* caster = GetCaster())
             {
