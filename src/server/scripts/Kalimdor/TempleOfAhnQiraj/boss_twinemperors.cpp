@@ -96,6 +96,8 @@ struct boss_twinemperorsAI : public ScriptedAI
         me->ClearUnitState(UNIT_STATE_STUNNED);
         DontYellWhenDead = false;
         EnrageTimer = 15 * 60000;
+
+        instance->HandleGameObject(instance->GetGuidData(AQ40_DOOR_1), true);
     }
 
     Creature* GetOtherBoss()
@@ -132,6 +134,9 @@ struct boss_twinemperorsAI : public ScriptedAI
         }
         if (!DontYellWhenDead)                              // I hope AI is not threaded
             DoPlaySoundToSet(me, IAmVeklor() ? SOUND_VL_DEATH : SOUND_VN_DEATH);
+
+        instance->HandleGameObject(instance->GetGuidData(AQ40_DOOR_1), true);
+        instance->HandleGameObject(instance->GetGuidData(AQ40_DOOR_2), true);
     }
 
     void KilledUnit(Unit* /*victim*/) override
@@ -155,6 +160,8 @@ struct boss_twinemperorsAI : public ScriptedAI
                 otherAI->DoZoneInCombat();
             }
         }
+
+        instance->HandleGameObject(instance->GetGuidData(AQ40_DOOR_1), false);
     }
 
     void SpellHit(Unit* caster, SpellInfo const* entry) override

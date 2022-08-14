@@ -112,6 +112,8 @@ struct boss_skeram : public BossAI
         {
             _JustDied();
             Talk(SAY_DEATH);
+
+            instance->HandleGameObject(instance->GetGuidData(AQ40_DOOR_3), true);
         }
         else
             me->RemoveCorpse();
