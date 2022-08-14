@@ -37,19 +37,22 @@ struct npc_obsidian_eradicator : public ScriptedAI
     {
         _scheduler.CancelAll();
         me->SetPower(POWER_MANA, 0);
+        _targets.clear();
     }
 
-    void EnterCombat(Unit* who) override
+    void EnterCombat(Unit* /*who*/) override
     {
-        std::list<Unit*> targets;
-        SelectTargetList(targets, [&](Unit* target)
+        _scheduler.Schedule(3500ms, [this](TaskContext context)
         {
-            return target && target->IsPlayer() && target->GetPower(POWER_MANA) > 0;
-        }, 10, SelectTargetMethod::Random);
+            if (_targets.empty())
+            {
+                SelectTargetList(_targets, [&](Unit* target)
+                {
+                    return target && target->IsPlayer() && target->GetPower(POWER_MANA) > 0;
+                }, 10, SelectTargetMethod::Random);
+            }
 
-        _scheduler.Schedule(3500ms, [this, targets](TaskContext context)
-        {
-            for (Unit* target : targets)
+            for (Unit* target : _targets)
             {
                 DoCast(target, SPELL_DRAIN_MANA, true);
             }
@@ -76,6 +79,7 @@ struct npc_obsidian_eradicator : public ScriptedAI
 
 private:
     TaskScheduler _scheduler;
+    std::list<Unit*> _targets;
 };
 
 class spell_drain_mana : public SpellScript
