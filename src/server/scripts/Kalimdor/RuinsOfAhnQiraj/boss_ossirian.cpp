@@ -93,20 +93,11 @@ struct boss_ossirian : public BossAI
         _saidIntro = false;
     }
 
-    void Reset() override
+    void InitializeAI() override
     {
-        BossAI::Reset();
+        Reset();
 
-        Creature* trigger = me->GetMap()->GetCreature(_triggerGUID[0]);
-        if (trigger)
-        {
-            trigger->DespawnOrUnsummon();
-            if (GameObject* crystal = me->GetMap()->GetGameObject(_crystalGUID[0]))
-                crystal->Delete();
-        }
-
-        trigger = me->GetMap()->SummonCreature(NPC_OSSIRIAN_TRIGGER, initialCrystalPosition);
-        if (trigger)
+        if (Creature* trigger = me->GetMap()->SummonCreature(NPC_OSSIRIAN_TRIGGER, initialCrystalPosition))
         {
             _triggerGUID[0] = trigger->GetGUID();
             if (GameObject* crystal = trigger->SummonGameObject(GO_OSSIRIAN_CRYSTAL,
@@ -120,10 +111,45 @@ struct boss_ossirian : public BossAI
                 crystal->RemoveGameObjectFlag(GO_FLAG_IN_USE);
             }
         }
+    }
 
-        _crystalIterator = 0;
+    void Reset() override
+    {
+        BossAI::Reset();
+
+        _crystalIterator = urand(0, NUM_CRYSTALS - 1);
         _triggerGUID[1].Clear();
         _crystalGUID[1].Clear();
+    }
+
+    void JustReachedHome() override
+    {
+        if (me->IsVisible())
+        {
+            Creature* trigger = me->GetMap()->GetCreature(_triggerGUID[0]);
+            if (trigger)
+            {
+                trigger->DespawnOrUnsummon();
+                if (GameObject* crystal = me->GetMap()->GetGameObject(_crystalGUID[0]))
+                    crystal->Delete();
+            }
+
+            trigger = me->GetMap()->SummonCreature(NPC_OSSIRIAN_TRIGGER, initialCrystalPosition);
+            if (trigger)
+            {
+                _triggerGUID[0] = trigger->GetGUID();
+                if (GameObject* crystal = trigger->SummonGameObject(GO_OSSIRIAN_CRYSTAL,
+                    initialCrystalPosition.GetPositionX(),
+                    initialCrystalPosition.GetPositionY(),
+                    initialCrystalPosition.GetPositionZ(),
+                    0, 0, 0, 0, 0, uint32(-1)))
+                {
+                    _crystalGUID[0] = crystal->GetGUID();
+                    crystal->SetOwnerGUID(ObjectGuid::Empty);
+                    crystal->RemoveGameObjectFlag(GO_FLAG_IN_USE);
+                }
+            }
+        }
     }
 
     void SpellHit(Unit* caster, SpellInfo const* spell) override
@@ -140,8 +166,6 @@ struct boss_ossirian : public BossAI
                     {
                         creatureCaster->DespawnOrUnsummon();
                     }
-
-                    SpawnNextCrystal();
                 }
             }
         }
@@ -162,6 +186,8 @@ struct boss_ossirian : public BossAI
                             trigger->CastSpell(trigger, spellWeakness[urand(0, 4)], false);
                         }
                     }
+
+                    SpawnNextCrystal();
 
                     break;
                 }
