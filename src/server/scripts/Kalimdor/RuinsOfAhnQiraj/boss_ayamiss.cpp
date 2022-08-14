@@ -76,8 +76,6 @@ enum Points
 
 const Position AyamissAirPos  = { -9689.292f, 1547.912f, 48.02729f, 0.0f };
 const Position AltarPos       = { -9717.18f, 1517.72f, 27.4677f, 0.0f };
-/// @todo These below are probably incorrect, taken from SD2
-const Position SwarmerPos     = { -9647.352f, 1578.062f, 55.32f, 0.0f };
 
 struct boss_ayamiss : public BossAI
 {
@@ -243,14 +241,11 @@ struct npc_hive_zara_larva : public ScriptedAI
 
     void MovementInform(uint32 type, uint32 id) override
     {
-        if (type == POINT_MOTION_TYPE)
+        if (type == POINT_MOTION_TYPE && id == POINT_PARALYZE)
         {
-            if (id == POINT_PARALYZE)
+            if (Player* target = ObjectAccessor::GetPlayer(*me, _instance->GetGuidData(DATA_PARALYZED)))
             {
-                if (Player* target = ObjectAccessor::GetPlayer(*me, _instance->GetGuidData(DATA_PARALYZED)))
-                {
-                    DoCast(target, SPELL_FEED);
-                }
+                DoCast(target, SPELL_FEED);
             }
         }
     }
@@ -294,7 +289,7 @@ private:
 struct WaspTeleportData
 {
     uint32 spellId;
-    Position movePos;
+    uint32 pathId;
 };
 
 class spell_ayamiss_swarmer_teleport_trigger : public SpellScript
@@ -306,20 +301,20 @@ class spell_ayamiss_swarmer_teleport_trigger : public SpellScript
         Unit* caster = GetCaster();
         WaspTeleportData telData[5] =
         {
-            { SPELL_HIVEZARA_SWARMER_TELEPORT_1, Position(-9750.208f, 1479.4608f, 45.937202f) },
-            { SPELL_HIVEZARA_SWARMER_TELEPORT_2, Position(-9750.661f, 1477.6143f, 48.96516f) },
-            { SPELL_HIVEZARA_SWARMER_TELEPORT_3, Position(-9753.014f, 1478.1317f, 50.817974f) },
-            { SPELL_HIVEZARA_SWARMER_TELEPORT_4, Position(-9747.529f, 1473.6367f, 49.077087f) },
-            { SPELL_HIVEZARA_SWARMER_TELEPORT_5, Position(-9754.684f, 1475.3403f, 49.030098f) }
+            { SPELL_HIVEZARA_SWARMER_TELEPORT_1, NPC_HIVEZARA_SWARMER * 10 },
+            { SPELL_HIVEZARA_SWARMER_TELEPORT_2, (NPC_HIVEZARA_SWARMER + 1) * 10 },
+            { SPELL_HIVEZARA_SWARMER_TELEPORT_3, (NPC_HIVEZARA_SWARMER + 2) * 10 },
+            { SPELL_HIVEZARA_SWARMER_TELEPORT_4, (NPC_HIVEZARA_SWARMER + 3) * 10 },
+            { SPELL_HIVEZARA_SWARMER_TELEPORT_5, (NPC_HIVEZARA_SWARMER + 4) * 10 }
         };
 
         WaspTeleportData data = Acore::Containers::SelectRandomContainerElement(telData);
         caster->CastSpell((Unit*)nullptr, data.spellId, true);
 
-        Position const targetPosition = data.movePos;
-        caster->m_Events.AddEventAtOffset([caster, targetPosition]()
+        uint32 pathId = data.pathId;
+        caster->m_Events.AddEventAtOffset([caster, pathId]()
         {
-            caster->GetMotionMaster()->MovePoint(0, targetPosition);
+            caster->GetMotionMaster()->MovePath(pathId, false);
         }, 1s);
     }
 
