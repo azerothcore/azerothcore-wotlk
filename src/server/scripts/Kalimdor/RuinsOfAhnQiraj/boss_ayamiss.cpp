@@ -286,6 +286,21 @@ private:
     InstanceScript* _instance;
 };
 
+struct npc_hive_zara_swarmer : public ScriptedAI
+{
+    npc_hive_zara_swarmer(Creature* creature) : ScriptedAI(creature) { }
+
+    void PathEndReached(uint32 pathId) override
+    {
+        // Delay is required because we are calling the movement generator from inside the pathing hook.
+        // If we issue another call here, it will be flushed before it is executed.
+        me->m_Events.AddEventAtOffset([this]()
+        {
+            DoCastSelf(SPELL_HIVEZARA_SWARMER_START_LOOP);
+        }, 1s);
+    }
+};
+
 struct WaspTeleportData
 {
     uint32 spellId;
@@ -295,6 +310,16 @@ struct WaspTeleportData
 class spell_ayamiss_swarmer_teleport_trigger : public SpellScript
 {
     PrepareSpellScript(spell_ayamiss_swarmer_teleport_trigger);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo
+        ( {
+             SPELL_HIVEZARA_SWARMER_TELEPORT_1, SPELL_HIVEZARA_SWARMER_TELEPORT_2,
+             SPELL_HIVEZARA_SWARMER_TELEPORT_3, SPELL_HIVEZARA_SWARMER_TELEPORT_4,
+             SPELL_HIVEZARA_SWARMER_TELEPORT_5
+        });
+    }
 
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
@@ -344,10 +369,68 @@ class spell_ayamiss_swarmer_swarm : public SpellScript
     }
 };
 
+class spell_ayamiss_swarmer_start_loop : public SpellScript
+{
+    PrepareSpellScript(spell_ayamiss_swarmer_start_loop);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_HIVEZARA_SWARMER_LOOP_1, SPELL_HIVEZARA_SWARMER_LOOP_2, SPELL_HIVEZARA_SWARMER_LOOP_3 });
+    }
+
+    bool Load() override
+    {
+        return GetCaster()->GetEntry() == NPC_HIVEZARA_SWARMER;
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        uint32 loopSpells[3] = { SPELL_HIVEZARA_SWARMER_LOOP_1, SPELL_HIVEZARA_SWARMER_LOOP_2, SPELL_HIVEZARA_SWARMER_LOOP_3 };
+        GetCaster()->CastSpell((Unit*)nullptr, Acore::Containers::SelectRandomContainerElement(loopSpells));
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_ayamiss_swarmer_start_loop::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+class spell_gen_ayamiss_swarmer_loop: public SpellScript
+{
+    PrepareSpellScript(spell_gen_ayamiss_swarmer_loop);
+
+public:
+    spell_gen_ayamiss_swarmer_loop(uint32 pathId) : SpellScript(), _pathId(pathId) { }
+
+    bool Load()
+    {
+        return GetCaster()->GetEntry() == NPC_HIVEZARA_SWARMER;
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        GetCaster()->ToCreature()->GetMotionMaster()->Clear();
+        GetCaster()->ToCreature()->GetMotionMaster()->MovePath(_pathId, false);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_gen_ayamiss_swarmer_loop::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+
+private:
+    uint32 _pathId;
+};
+
 void AddSC_boss_ayamiss()
 {
     RegisterRuinsOfAhnQirajCreatureAI(boss_ayamiss);
     RegisterRuinsOfAhnQirajCreatureAI(npc_hive_zara_larva);
+    RegisterRuinsOfAhnQirajCreatureAI(npc_hive_zara_swarmer);
     RegisterSpellScript(spell_ayamiss_swarmer_teleport_trigger);
     RegisterSpellScript(spell_ayamiss_swarmer_swarm);
+    RegisterSpellScript(spell_ayamiss_swarmer_start_loop);
+    RegisterSpellScriptWithArgs(spell_gen_ayamiss_swarmer_loop, "spell_gen_ayamiss_swarmer_loop_1", (NPC_HIVEZARA_SWARMER + 5) * 10);
+    RegisterSpellScriptWithArgs(spell_gen_ayamiss_swarmer_loop, "spell_gen_ayamiss_swarmer_loop_2", (NPC_HIVEZARA_SWARMER + 6) * 10);
+    RegisterSpellScriptWithArgs(spell_gen_ayamiss_swarmer_loop, "spell_gen_ayamiss_swarmer_loop_3", (NPC_HIVEZARA_SWARMER + 7) * 10);
 }
