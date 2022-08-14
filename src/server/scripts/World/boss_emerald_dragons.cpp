@@ -36,7 +36,8 @@ enum EmeraldDragonNPC
     DRAGON_EMERISS                  = 14889,
     DRAGON_TAERAR                   = 14890,
 
-    GUID_DRAGON                     = 1
+    GUID_DRAGON                     = 1,
+    GUID_FOG_TARGET                 = 2
 };
 
 //
@@ -192,19 +193,21 @@ public:
 
         void ScheduleEvents()
         {
+            _scheduler.CancelAll();
+
             _scheduler.Schedule(1s, [this](TaskContext context)
             {
                 // Chase target, but don't attack - otherwise just roam around
                 if (Unit* chaseTarget = GetRandomUnitFromDragonThreatList())
                 {
-                    me->GetMotionMaster()->Clear(false);
-                    me->GetMotionMaster()->MoveChase(chaseTarget, 0.2f);
+                    me->GetMotionMaster()->Clear();
+                    me->GetMotionMaster()->MoveFollow(chaseTarget, 0.02f, 0.0f);
                     _targetGUID = chaseTarget->GetGUID();
                     context.Repeat(15s, 30s);
                 }
                 else
                 {
-                    me->GetMotionMaster()->Clear(false);
+                    me->GetMotionMaster()->Clear();
                     me->GetMotionMaster()->MoveRandom(25.0f);
                     context.Repeat(2500ms);
                 }
@@ -212,19 +215,6 @@ public:
                 // Seeping fog movement is slow enough for a player to be able to walk backwards and still outpace it
                 me->SetWalk(true);
                 me->SetSpeed(MOVE_WALK, 0.75f);
-            }).Schedule(1s, [this](TaskContext context)
-            {
-                if (Unit* target = ObjectAccessor::GetUnit(*me, _targetGUID))
-                {
-                    if (target->IsWithinDistInMap(me, 5.0f))
-                    {
-                        _scheduler.CancelAll();
-                        ScheduleEvents();
-                        return;
-                    }
-                }
-
-                context.Repeat();
             });
         }
 
@@ -233,6 +223,13 @@ public:
             if (type == GUID_DRAGON)
             {
                 _dragonGUID = guid;
+            }
+            else if (type == GUID_FOG_TARGET)
+            {
+                if (guid == _targetGUID)
+                {
+                    ScheduleEvents();
+                }
             }
         }
 
@@ -664,6 +661,7 @@ public:
                 ++_stage;
             }
         }
+
         void ExecuteEvent(uint32 eventId) override
         {
             switch (eventId)
@@ -742,6 +740,17 @@ public:
     {
         PrepareSpellScript(spell_dream_fog_sleep_SpellScript);
 
+        void HandleEffect(SpellEffIndex effIndex)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                if (Unit* target = GetHitUnit())
+                {
+                    caster->GetAI()->SetGUID(target->GetGUID(), GUID_FOG_TARGET);
+                }
+            }
+        }
+
         void FilterTargets(std::list<WorldObject*>& targets)
         {
             targets.remove_if(Acore::UnitAuraCheck(true, SPELL_SLEEP));
@@ -749,6 +758,7 @@ public:
 
         void Register() override
         {
+            OnEffectHitTarget += SpellEffectFn(spell_dream_fog_sleep_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_dream_fog_sleep_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
         }
     };
