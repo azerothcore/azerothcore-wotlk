@@ -125,7 +125,7 @@ struct boss_skeram : public BossAI
         events.ScheduleEvent(EVENT_ARCANE_EXPLOSION, 6s, 12s);
         events.ScheduleEvent(EVENT_FULLFILMENT, 15s);
         events.ScheduleEvent(EVENT_BLINK, 30s, 45s);
-        events.ScheduleEvent(EVENT_EARTH_SHOCK, 2s);
+        events.ScheduleEvent(EVENT_EARTH_SHOCK, 1200ms);
 
         Talk(SAY_AGGRO);
     }
@@ -159,7 +159,7 @@ struct boss_skeram : public BossAI
                     break;
                 case EVENT_EARTH_SHOCK:
                     DoCastVictim(SPELL_EARTH_SHOCK);
-                    events.ScheduleEvent(EVENT_EARTH_SHOCK, 2s);
+                    events.ScheduleEvent(EVENT_EARTH_SHOCK, 1200ms);
                     break;
             }
         }
@@ -173,10 +173,21 @@ struct boss_skeram : public BossAI
             events.RescheduleEvent(EVENT_BLINK, 2s);
         }
 
-        if (me->IsWithinMeleeRange(me->GetVictim()))
+        if (Unit* myVictim = me->GetVictim())
         {
-            events.RescheduleEvent(EVENT_EARTH_SHOCK, 2s);
-            DoMeleeAttackIfReady();
+            if (me->IsWithinMeleeRange(myVictim))
+            {
+                DoMeleeAttackIfReady();
+
+                if (Unit* victimTarget = myVictim->GetVictim())
+                {
+                    if (victimTarget->GetGUID() == me->GetGUID())
+                    {
+                        events.RescheduleEvent(EVENT_EARTH_SHOCK, 1200ms);
+                    }
+                }
+                
+            }
         }
     }
 
