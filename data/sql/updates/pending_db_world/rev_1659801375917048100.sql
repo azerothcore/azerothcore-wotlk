@@ -19,10 +19,7 @@ INSERT INTO `script_waypoint` (`entry`, `pointid`, `location_x`, `location_y`, `
 (15471,11,-8886.095,1598.713,21.4053,0,'Andorov'),
 (15471,12,-8904.383,1578.6167,21.511332,0,'Andorov'),
 (15471,13,-8920.576,1551.9479,21.407932,0,'Andorov'),
-(15471,14,-8939.951,1551.127,21.566868,0,'Andorov'),
-(15471,15,-8914.426,1546.6278,21.342258,0,'Andorov'),
-(15471,16,-8914.426,1546.6278,21.342258,0,'Andorov'),
-(15471,17,-8939.951,1551.127,21.566868,0,'Andorov');
+(15471,14,-8939.951,1551.127,21.566868,0,'Andorov');
 
 DELETE FROM `gossip_menu_option` WHERE `menuid`=7048;
 INSERT INTO `gossip_menu_option` (`menuid`, `optionId`, `optionicon`, `optiontext`, `optiontype`, `optionnpcflag`, `actionmenuid`, `actionpoiid`, `boxcoded`, `boxmoney`, `boxtext`) VALUES 

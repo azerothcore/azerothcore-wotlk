@@ -220,8 +220,7 @@ struct npc_general_andorov : public npc_escortAI
                 me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 _paused = true;
                 break;
-            case 17:
-                me->SetFacingTo(2.8772139f);
+            case 14:
                 SetEscortPaused(true);
                 if (!Endwaypoint)
                 {
@@ -289,6 +288,8 @@ struct npc_general_andorov : public npc_escortAI
     {
         if (Endwaypoint && _initialAttackTimer)
         {
+            me->SetFacingTo(2.8772139f);
+
             if (_initialAttackTimer <= diff)
             {
                 _initialAttackTimer = 0;
