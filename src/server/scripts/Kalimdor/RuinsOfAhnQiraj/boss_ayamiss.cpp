@@ -136,7 +136,7 @@ struct boss_ayamiss : public BossAI
             context.SetGroup(PHASE_AIR);
             context.Repeat(2s, 3s);
         }).Schedule(5s, [this](TaskContext context) {
-            DoCastAOE(SPELL_SUMMON_HIVEZARA_SWARMER);
+            DoCastAOE(SPELL_SUMMON_HIVEZARA_SWARMER, true);
 
             if (_swarmers.size() >= MAX_SWARMER_COUNT)
             {
@@ -302,6 +302,7 @@ class spell_ayamiss_swarmer_teleport_trigger : public SpellScript
 
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
+        Unit* caster = GetCaster();
         WaspTeleportData telData[5] =
         {
             { SPELL_HIVEZARA_SWARMER_TELEPORT_1, Position(-9750.208f, 1479.4608f, 45.937202f) },
@@ -312,8 +313,13 @@ class spell_ayamiss_swarmer_teleport_trigger : public SpellScript
         };
 
         WaspTeleportData data = Acore::Containers::SelectRandomContainerElement(telData);
-        GetCaster()->CastSpell((Unit*)nullptr, data.spellId, true);
-        GetCaster()->MovePosition(data.movePos, 0.0f, 0.0f);
+        caster->CastSpell((Unit*)nullptr, data.spellId, true);
+
+        Position const targetPosition = data.movePos;
+        caster->m_Events.AddEventAtOffset([caster, targetPosition]()
+        {
+            caster->GetMotionMaster()->MovePoint(0, targetPosition);
+        }, 1s);
     }
 
     void Register() override
