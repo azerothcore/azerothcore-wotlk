@@ -42,12 +42,7 @@ struct npc_obsidian_destroyer : public ScriptedAI
 
     void EnterCombat(Unit* who) override
     {
-        _scheduler.Schedule(5s, 9s, [this](TaskContext context)
-        {
-            DoCastVictim(SPELL_PURGE, true);
-            context.Repeat(8s, 11s);
-        })
-        .Schedule(6s, 10s, [this](TaskContext context)
+        _scheduler.Schedule(6s, [this](TaskContext context)
         {
             std::list<Unit*> targets;
             SelectTargetList(targets, [&](Unit* target)
@@ -60,7 +55,12 @@ struct npc_obsidian_destroyer : public ScriptedAI
                 DoCast(target, SPELL_DRAIN_MANA, true);
             }
 
-            context.Repeat(10s, 16s);
+            if (me->GetPowerPct(POWER_MANA) >= 100.f)
+            {
+                DoCastAOE(SPELL_PURGE, true);
+            }
+
+            context.Repeat(6s);
         });
     }
 
