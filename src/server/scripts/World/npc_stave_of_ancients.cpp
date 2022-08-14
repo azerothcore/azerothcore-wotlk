@@ -394,6 +394,14 @@ public:
             DoMeleeAttackIfReady();
         }
 
+        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
+        {
+            if (attacker == me)
+            {
+                me->LowerPlayerDamageReq(damage);
+            }
+        }
+
         void SpellHit(Unit* /*Caster*/, SpellInfo const* Spell) override
         {
             uint32 serpentStings[12] = { 1978, 13549, 13550, 13551, 13552, 13553, 13554, 13555, 25295, 27016, 49000, 49001 };
@@ -1170,6 +1178,14 @@ public:
             if (Spell->Id == FRANKLIN_WEAKNESS_SCORPID_STING)
             {
                 me->CastSpell(me, FRANKLIN_SPELL_ENTROPIC_STING, false);
+            }
+        }
+
+        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
+        {
+            if (attacker == me)
+            {
+                me->LowerPlayerDamageReq(damage);
             }
         }
 
