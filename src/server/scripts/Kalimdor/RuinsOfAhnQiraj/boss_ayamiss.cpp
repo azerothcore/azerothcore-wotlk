@@ -30,6 +30,7 @@ enum Spells
     SPELL_FRENZY              = 8269,
     SPELL_LASH                = 25852,
     SPELL_FEED                = 25721,
+    SPELL_THRASH              = 3391,
 
     // Server-side spells
     SPELL_SUMMON_LARVA_A                    = 26538,
@@ -87,6 +88,7 @@ struct boss_ayamiss : public BossAI
         _phase = PHASE_AIR;
         _enraged = false;
         SetCombatMovement(false);
+        _scheduler.CancelAll();
     }
 
     void JustSummoned(Creature* who) override
@@ -101,6 +103,7 @@ struct boss_ayamiss : public BossAI
                 who->GetMotionMaster()->MovePoint(POINT_PARALYZE, AltarPos);
                 break;
         }
+
         summons.Summon(who);
     }
 
@@ -203,6 +206,10 @@ struct boss_ayamiss : public BossAI
             _scheduler.Schedule(5s, 8s, [this](TaskContext context) {
                 DoCastVictim(SPELL_LASH);
                 context.Repeat(8s, 15s);
+            }).Schedule(16s, [this](TaskContext context)
+            {
+                DoCastSelf(SPELL_THRASH);
+                context.Repeat();
             });
 
             _scheduler.CancelGroup(PHASE_AIR);
@@ -259,7 +266,6 @@ struct npc_hive_zara_larva : public ScriptedAI
     }
 
     void MoveInLineOfSight(Unit* who) override
-
     {
         if (_instance->GetBossState(DATA_AYAMISS) == IN_PROGRESS)
             return;

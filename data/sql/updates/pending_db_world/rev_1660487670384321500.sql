@@ -149,3 +149,5 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (@PATH, 13, -9690.304, 1535.7795, 44.167366, 0, 0, 0, 0, 100, 0),
 (@PATH, 14, -9711.632, 1498.4967, 41.334064, 0, 0, 0, 0, 100, 0),
 (@PATH, 15, -9741.987, 1484.3424, 45.7785, 0, 0, 0, 0, 100, 0);
+
+DELETE FROM `creature_addon` WHERE `guid` = 144641;
