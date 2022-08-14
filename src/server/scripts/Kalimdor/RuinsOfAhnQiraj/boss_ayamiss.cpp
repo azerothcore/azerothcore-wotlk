@@ -408,7 +408,7 @@ class spell_gen_ayamiss_swarmer_loop: public SpellScript
 public:
     spell_gen_ayamiss_swarmer_loop(uint32 pathId) : SpellScript(), _pathId(pathId) { }
 
-    bool Load()
+    bool Load() override
     {
         return GetCaster()->GetEntry() == NPC_HIVEZARA_SWARMER;
     }
