@@ -54,7 +54,13 @@ enum Spells
     SPELL_STORM_BUFF                    = 2148,
     SPELL_STORM                         = 26546,
 
-    SPELL_SUMMON_SMALL_OBSIDIAN_CHUNK   = 27627 // Server-side
+    SPELL_SUMMON_SMALL_OBSIDIAN_CHUNK   = 27627, // Server-side
+
+    SPELL_TRANSFER_POWER                = 2400,
+    SPELL_HEAL_BRETHEN                  = 26565,
+    SPELL_ENRAGE                        = 8599,
+
+    TALK_ENRAGE                         = 0
 };
 
 class npc_anubisath_sentinel : public CreatureScript
@@ -247,6 +253,7 @@ public:
             }
             ClearBuddyList();
             gatherOthersWhenAggro = true;
+            _enraged = false;
         }
 
         void GainSentinelAbility(uint32 id)
@@ -263,6 +270,20 @@ public:
             DoZoneInCombat();
         }
 
+        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
+        {
+            if (spellInfo->Id == SPELL_TRANSFER_POWER)
+            {
+                if (Creature* sentinel = target->ToCreature())
+                {
+                    if (sentinel->IsAIEnabled)
+                    {
+                        CAST_AI(aqsentinelAI, sentinel->AI())->GainSentinelAbility(ability);
+                    }
+                }
+            }
+        }
+
         void JustDied(Unit* /*killer*/) override
         {
             for (int ni = 0; ni < 3; ++ni)
@@ -272,12 +293,26 @@ public:
                     continue;
                 if (sent->isDead())
                     continue;
-                sent->ModifyHealth(int32(sent->CountPctFromMaxHealth(50)));
-                CAST_AI(aqsentinelAI, sent->AI())->GainSentinelAbility(ability);
+                DoCast(sent, SPELL_HEAL_BRETHEN, true);
+                DoCast(sent, SPELL_TRANSFER_POWER, true);
             }
 
             DoCastSelf(SPELL_SUMMON_SMALL_OBSIDIAN_CHUNK, true);
         }
+
+        void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
+        {
+            if (!_enraged && me->HealthBelowPctDamaged(50, damage))
+            {
+                _enraged = true;
+                damage = 0;
+                DoCastSelf(SPELL_ENRAGE, true);
+                Talk(TALK_ENRAGE);
+            }
+        }
+
+    private:
+        bool _enraged;
     };
 };
 
