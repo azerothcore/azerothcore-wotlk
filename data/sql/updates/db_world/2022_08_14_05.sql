@@ -1,3 +1,4 @@
+-- DB update 2022_08_14_04 -> 2022_08_14_05
 -- Fix Silithid Carapace to depend only to Agent of Nozdormu item
 UPDATE `creature_loot_template` SET `QuestRequired` = 0 WHERE `Item` = 20384;
 
