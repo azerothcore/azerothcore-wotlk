@@ -19,6 +19,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
 #include "SpellScript.h"
 #include "ruins_of_ahnqiraj.h"
 
@@ -192,6 +193,7 @@ struct npc_general_andorov : public npc_escortAI
         me->SetFaction(FACTION_ANDOROV_ESCORT);
         Endwaypoint = false;
         _initialAttackTimer = 5 * IN_MILLISECONDS;
+        _paused = false;
 
         Start(false, true);
     }
@@ -214,9 +216,9 @@ struct npc_general_andorov : public npc_escortAI
         {
             case 10:
                 me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
-                me->SetFacingTo(5.63741350f);
                 SetEscortPaused(true);
                 me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                _paused = true;
                 break;
             case 17:
                 me->SetFacingTo(2.8772139f);
@@ -302,6 +304,12 @@ struct npc_general_andorov : public npc_escortAI
             }
         }
 
+        if (_paused)
+        {
+            _paused = false;
+            me->SetFacingTo(5.63741350f);
+        }
+
         if (!UpdateVictim())
         {
             return;
@@ -344,6 +352,7 @@ private:
     SummonList _summons;
     uint32 _initialAttackTimer;
     bool Endwaypoint;
+    bool _paused;
 };
 
 void AddSC_boss_rajaxx()
