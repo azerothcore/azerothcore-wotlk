@@ -17,6 +17,7 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "SpellAuras.h"
 #include "temple_of_ahnqiraj.h"
 
@@ -26,7 +27,7 @@ enum Emotes
     EMOTE_BERSERK               = 1
 };
 
-enum Huhuran
+enum Spells
 {
     SPELL_FRENZY                = 26051, // triggers SPELL_POISON_BOLT
     SPELL_BERSERK               = 26068, // triggers SPELL_POISON_BOLT
