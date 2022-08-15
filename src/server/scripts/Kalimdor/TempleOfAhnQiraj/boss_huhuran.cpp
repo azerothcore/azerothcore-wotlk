@@ -17,7 +17,7 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "SpellScript.h"
+#include "SpellAuras.h"
 #include "temple_of_ahnqiraj.h"
 
 enum Emotes
