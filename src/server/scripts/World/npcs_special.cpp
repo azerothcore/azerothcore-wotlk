@@ -247,9 +247,9 @@ public:
             if (time(nullptr) - prevWinTime > DAY)
             {
                 // reset all after 1 day
-                sWorld->setWorldState(STV_FISHING_HAS_WINNER, 0);
-                sWorld->setWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN, 0);
+                sWorld->setWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN, 1);
                 sWorld->setWorldState(STV_FISHING_ANNOUNCE_POOLS_DESPAN, 0);
+                sWorld->setWorldState(STV_FISHING_HAS_WINNER, 0);
             }
         }
 
@@ -262,11 +262,11 @@ public:
                 if (!me->IsQuestGiver())
                 {
                     me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                    if (!sWorld->getWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN))
-                    {
-                        sCreatureTextMgr->SendChat(me, RIGGLE_SAY_START, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
-                        sWorld->setWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN, 1);
-                    }
+                }
+                if (sWorld->getWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN))
+                {
+                    sCreatureTextMgr->SendChat(me, RIGGLE_SAY_START, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
+                    sWorld->setWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN, 0);
                 }
             }
             else
