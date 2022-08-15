@@ -1,3 +1,4 @@
+-- DB update 2022_08_15_06 -> 2022_08_15_07
 DELETE FROM `creature_queststarter` WHERE `quest` IN (6821, 6822, 6823, 6824, 7486) AND `id` = 13278;
 INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
 (13278, 6821), -- Eye of the Emberseer
