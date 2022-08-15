@@ -36,7 +36,9 @@ enum DataTypes
     DATA_VEKNILASHISDEAD    = 10,
     DATA_VEKNILASH_DEATH    = 11,
     DATA_FANKRISS           = 12,
-    DATA_BUG_TRIO_DEATH     = 14,
+    DATA_OURO               = 13,
+    DATA_OURO_SPAWNER       = 14,
+    DATA_BUG_TRIO_DEATH     = 15,
     DATA_CTHUN_PHASE        = 20,
     DATA_VISCIDUS           = 21,
     DATA_SARTURA            = 22,
@@ -67,6 +69,7 @@ enum Creatures
     NPC_VEKLOR              = 15276,
     NPC_VEKNILASH           = 15275,
     NPC_OURO                = 15517,
+    NPC_OURO_SPAWNER        = 15957,
     NPC_SARTURA             = 15516
 };
 
