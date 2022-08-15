@@ -34,14 +34,22 @@ SET @NPC := 15546;
 SET @PATH := @NPC * 10;
 DELETE FROM `waypoint_data` WHERE `id` = @PATH;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
-(@PATH, 1, -9818.173, 1460.0463, 95.69417, 0, 0, 0, 0, 100, 0),
-(@PATH, 2, -9811.176, 1460.6091, 92.56013, 0, 0, 0, 0, 100, 0),
-(@PATH, 3, -9802.768, 1455.1123, 86.143425, 0, 0, 0, 0, 100, 0),
-(@PATH, 4, -9797.88, 1450.7151, 81.69902, 0, 0, 0, 0, 100, 0),
-(@PATH, 5, -9761.196, 1470.298, 64.64121, 0, 0, 0, 0, 100, 0),
-(@PATH, 6, -9754.684, 1475.3403, 49.030098, 0, 0, 0, 0, 100, 0);
+(@PATH, 1, -9758.247, 1426.3112, 84.167656, 0, 0, 0, 0, 100, 0),
+(@PATH, 2, -9762.383, 1436.3455, 84.428795, 0, 0, 0, 0, 100, 0),
+(@PATH, 3, -9760.481, 1452.1432, 75.32612, 0, 0, 0, 0, 100, 0),
+(@PATH, 4, -9754.527, 1466.5826, 61.60388, 0, 0, 0, 0, 100, 0),
+(@PATH, 5, -9750.208, 1479.4608, 45.937202, 0, 0, 0, 0, 100, 0);
 
 SET @PATH := (@NPC + 1) * 10;
+DELETE FROM `waypoint_data` WHERE `id` = @PATH;
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
+(@PATH, 1, -9804.298, 1432.3503, 85.9217, 0, 0, 0, 0, 100, 0),
+(@PATH, 2, -9799.983, 1443.1294, 82.55095, 0, 0, 0, 0, 100, 0),
+(@PATH, 3, -9785.31, 1456.0002, 76.88425, 0, 0, 0, 0, 100, 0),
+(@PATH, 4, -9769.325, 1467.856, 68.520706, 0, 0, 0, 0, 100, 0),
+(@PATH, 5, -9750.661, 1477.6143, 48.96516, 0, 0, 0, 0, 100, 0);
+
+SET @PATH := (@NPC + 2) * 10;
 DELETE FROM `waypoint_data` WHERE `id` = @PATH;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
 (@PATH, 1, -9818.727, 1512.838, 89.24695, 0, 0, 0, 0, 100, 0),
@@ -51,15 +59,6 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (@PATH, 5, -9781.221, 1486.8652, 71.7902, 0, 0, 0, 0, 100, 0),
 (@PATH, 6, -9765.105, 1476.7782, 63.17909, 0, 0, 0, 0, 100, 0),
 (@PATH, 7, -9753.014, 1478.1317, 50.817974, 0, 0, 0, 0, 100, 0);
-
-SET @PATH := (@NPC + 2) * 10;
-DELETE FROM `waypoint_data` WHERE `id` = @PATH;
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
-(@PATH, 1, -9804.298, 1432.3503, 85.9217, 0, 0, 0, 0, 100, 0),
-(@PATH, 2, -9799.983, 1443.1294, 82.55095, 0, 0, 0, 0, 100, 0),
-(@PATH, 3, -9785.31, 1456.0002, 76.88425, 0, 0, 0, 0, 100, 0),
-(@PATH, 4, -9769.325, 1467.856, 68.520706, 0, 0, 0, 0, 100, 0),
-(@PATH, 5, -9750.661, 1477.6143, 48.96516, 0, 0, 0, 0, 100, 0);
 
 SET @PATH := (@NPC + 3) * 10;
 DELETE FROM `waypoint_data` WHERE `id` = @PATH;
@@ -73,11 +72,12 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 SET @PATH := (@NPC + 4) * 10;
 DELETE FROM `waypoint_data` WHERE `id` = @PATH;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
-(@PATH, 1, -9758.247, 1426.3112, 84.167656, 0, 0, 0, 0, 100, 0),
-(@PATH, 2, -9762.383, 1436.3455, 84.428795, 0, 0, 0, 0, 100, 0),
-(@PATH, 3, -9760.481, 1452.1432, 75.32612, 0, 0, 0, 0, 100, 0),
-(@PATH, 4, -9754.527, 1466.5826, 61.60388, 0, 0, 0, 0, 100, 0),
-(@PATH, 5, -9750.208, 1479.4608, 45.937202, 0, 0, 0, 0, 100, 0);
+(@PATH, 1, -9818.173, 1460.0463, 95.69417, 0, 0, 0, 0, 100, 0),
+(@PATH, 2, -9811.176, 1460.6091, 92.56013, 0, 0, 0, 0, 100, 0),
+(@PATH, 3, -9802.768, 1455.1123, 86.143425, 0, 0, 0, 0, 100, 0),
+(@PATH, 4, -9797.88, 1450.7151, 81.69902, 0, 0, 0, 0, 100, 0),
+(@PATH, 5, -9761.196, 1470.298, 64.64121, 0, 0, 0, 0, 100, 0),
+(@PATH, 6, -9754.684, 1475.3403, 49.030098, 0, 0, 0, 0, 100, 0);
 
 SET @PATH := (@NPC + 5) * 10;
 DELETE FROM `waypoint_data` WHERE `id` = @PATH;
