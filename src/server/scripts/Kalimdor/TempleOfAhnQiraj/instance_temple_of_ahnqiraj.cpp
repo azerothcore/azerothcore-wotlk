@@ -194,7 +194,7 @@ public:
                 case DATA_OURO:
                     if (state == FAIL)
                     {
-                        if (Creature* ouroSpawner = GetCreature(DATA_OURO))
+                        if (Creature* ouroSpawner = GetCreature(DATA_OURO_SPAWNER))
                             ouroSpawner->Respawn();
                     }
                     break;
