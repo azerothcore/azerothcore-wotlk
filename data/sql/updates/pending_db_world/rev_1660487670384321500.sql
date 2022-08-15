@@ -151,3 +151,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (@PATH, 15, -9741.987, 1484.3424, 45.7785, 0, 0, 0, 0, 100, 0);
 
 DELETE FROM `creature_addon` WHERE `guid` = 144641;
+
+DELETE FROM `creature_template_movement` WHERE `CreatureId` = 15369;
+INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
+(15369, 1, 0, 1, 0, 0, NULL);

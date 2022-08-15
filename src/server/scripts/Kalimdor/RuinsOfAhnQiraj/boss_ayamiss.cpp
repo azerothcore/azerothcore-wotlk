@@ -116,6 +116,7 @@ struct boss_ayamiss : public BossAI
         else if (type == WAYPOINT_MOTION_TYPE && id == POINT_GROUND)
         {
             SetCombatMovement(true);
+
             me->m_Events.AddEventAtOffset([this]()
             {
                 if (me->GetVictim())
@@ -212,6 +213,7 @@ struct boss_ayamiss : public BossAI
                 context.Repeat();
             });
 
+            _scheduler.DelayAll(5s);
             _scheduler.CancelGroup(PHASE_AIR);
         }
 
