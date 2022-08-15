@@ -106,6 +106,14 @@ float UnitAI::DoGetSpellMaxRange(uint32 spellId, bool positive)
     return spellInfo ? spellInfo->GetMaxRange(positive) : 0;
 }
 
+std::string UnitAI::GetDebugInfo() const
+{
+    std::stringstream sstr;
+    sstr << std::boolalpha
+        << "Me: " << (me ? me->GetDebugInfo() : "NULL");
+    return sstr.str();
+}
+
 SpellCastResult UnitAI::DoAddAuraToAllHostilePlayers(uint32 spellid)
 {
     if (me->IsInCombat())
