@@ -25,25 +25,30 @@
 enum DataTypes
 {
     DATA_SKERAM             = 1,
-    DATA_KRI                = 2,
-    DATA_VEM                = 3,
-    DATA_YAUJ               = 4,
-    DATA_BUG_TRIO           = 5,
-    DATA_VEKLOR             = 6,
-    DATA_VEKLORISDEAD       = 7,
-    DATA_VEKLOR_DEATH       = 8,
-    DATA_VEKNILASH          = 9,
-    DATA_VEKNILASHISDEAD    = 10,
-    DATA_VEKNILASH_DEATH    = 11,
-    DATA_FANKRISS           = 12,
-    DATA_OURO               = 13,
-    DATA_OURO_SPAWNER       = 14,
-    DATA_BUG_TRIO_DEATH     = 15,
-    DATA_CTHUN_PHASE        = 20,
-    DATA_VISCIDUS           = 21,
-    DATA_SARTURA            = 22,
+    DATA_BUG_TRIO           = 2,
+    DATA_SARTURA            = 3,
+    DATA_FANKRISS           = 4,
+    DATA_VISCIDUS           = 5,
+    DATA_HUHURAN            = 6,
+    DATA_TWIN_EMPERORS      = 7,
+    DATA_OURO               = 8,
+    DATA_CTHUN              = 9,
 
-    DATA_EYE_OF_CTHUN       = 23
+    MAX_BOSS_NUMBER         = 10,
+
+    DATA_KRI                = 10,
+    DATA_VEM                = 11,
+    DATA_YAUJ               = 12,
+    DATA_BUG_TRIO_DEATH     = 13,
+    DATA_OURO_SPAWNER       = 14,
+    DATA_VEKLOR             = 15,
+    DATA_VEKLORISDEAD       = 16,
+    DATA_VEKLOR_DEATH       = 17,
+    DATA_VEKNILASH          = 18,
+    DATA_VEKNILASHISDEAD    = 19,
+    DATA_VEKNILASH_DEATH    = 20,
+    DATA_CTHUN_PHASE        = 21,
+    DATA_EYE_OF_CTHUN       = 22
 };
 
 enum Creatures
