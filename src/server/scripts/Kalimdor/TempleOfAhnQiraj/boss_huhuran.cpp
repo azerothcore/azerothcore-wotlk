@@ -102,10 +102,7 @@ struct boss_huhuran : public BossAI
                     events.RepeatEvent(urand(5000, 10000));
                     break;
                 case EVENT_NOXIOUS_POISON:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
-                    {
-                        DoCast(target, SPELL_NOXIOUS_POISON);
-                    }
+                    DoCastRandomTarget(SPELL_NOXIOUS_POISON, 0, 100);
                     events.RepeatEvent(urand(12000, 24000));
                     break;
                 case EVENT_HARD_ENRAGE:
