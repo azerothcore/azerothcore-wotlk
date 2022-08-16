@@ -17,15 +17,75 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "ruins_of_ahnqiraj.h"
 #include "TaskScheduler.h"
 
 enum Spells
 {
+    // Hive'Zara Stinger
+    SPELL_HIVEZARA_CATALYST             = 25187,
+    SPELL_STINGER_CHARGE_NORMAL         = 25190,
+    SPELL_STINGER_CHARGE_BUFFED         = 25191,
+
+    // Obsidian Destroyer
     SPELL_PURGE                         = 25756,
     SPELL_DRAIN_MANA                    = 25755,
     SPELL_DRAIN_MANA_VISUAL             = 26639,
-    SPELL_SUMMON_SMALL_OBSIDIAN_CHUNK   = 27627 // Server-side
+    SPELL_SUMMON_SMALL_OBSIDIAN_CHUNK   = 27627, // Server-side
+};
+
+struct npc_hivezara_stinger : public ScriptedAI
+{
+    npc_hivezara_stinger(Creature* creature) : ScriptedAI(creature)
+    {
+    }
+
+    void Reset() override
+    {
+        _scheduler.CancelAll();
+    }
+
+    void EnterCombat(Unit* who) override
+    {
+        DoCast(who ,who->HasAura(SPELL_HIVEZARA_CATALYST) ? SPELL_STINGER_CHARGE_BUFFED : SPELL_STINGER_CHARGE_NORMAL, true);
+
+        _scheduler.Schedule(5s, [this](TaskContext context)
+        {
+            Unit* target = SelectTarget(SelectTargetMethod::Random, 1, [&](Unit* u)
+            {
+                return u && !u->IsPet() && u->IsWithinDist2d(me, 20.f) && u->HasAura(SPELL_HIVEZARA_CATALYST);
+            });
+            if (!target)
+            {
+                target = SelectTarget(SelectTargetMethod::Random, 1, [&](Unit* u)
+                {
+                    return u && !u->IsPet() && u->IsWithinDist2d(me, 20.f);
+                });
+            }
+
+            if (target)
+            {
+                DoCast(target, target->HasAura(SPELL_HIVEZARA_CATALYST) ? SPELL_STINGER_CHARGE_BUFFED : SPELL_STINGER_CHARGE_NORMAL, true);
+            }
+
+            context.Repeat(4500ms, 6500ms);
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+        {
+            return;
+        }
+
+        _scheduler.Update(diff,
+            std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
+    }
+
+private:
+    TaskScheduler _scheduler;
 };
 
 struct npc_obsidian_destroyer : public ScriptedAI
@@ -40,7 +100,7 @@ struct npc_obsidian_destroyer : public ScriptedAI
         me->SetPower(POWER_MANA, 0);
     }
 
-    void EnterCombat(Unit* who) override
+    void EnterCombat(Unit* /*who*/) override
     {
         _scheduler.Schedule(6s, [this](TaskContext context)
         {
@@ -107,6 +167,7 @@ class spell_drain_mana : public SpellScript
 
 void AddSC_ruins_of_ahnqiraj()
 {
+    RegisterRuinsOfAhnQirajCreatureAI(npc_hivezara_stinger);
     RegisterRuinsOfAhnQirajCreatureAI(npc_obsidian_destroyer);
     RegisterSpellScript(spell_drain_mana);
 }

@@ -353,6 +353,8 @@ public:
     void RemoveFromObjectUpdate() override;
 
     [[nodiscard]] uint32 GetScriptId() const { return GetTemplate()->ScriptId; }
+
+    std::string GetDebugInfo() const override;
 private:
     std::string m_text;
     uint8 m_slot;
