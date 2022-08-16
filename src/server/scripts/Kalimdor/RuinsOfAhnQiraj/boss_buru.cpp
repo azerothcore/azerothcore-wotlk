@@ -97,12 +97,13 @@ struct boss_buru : public BossAI
             ChaseNewVictim();
     }
 
-    void JustDied(Unit* /*killer*/) override
+    void JustDied(Unit* killer) override
     {
         if (InstanceScript* pInstance = me->GetInstanceScript())
         {
             pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_CREEPING_PLAGUE);
         }
+        BossAI::JustDied(killer);
     }
 
     void KilledUnit(Unit* victim) override
