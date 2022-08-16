@@ -186,7 +186,6 @@ struct boss_skeram : public BossAI
                         events.RescheduleEvent(EVENT_EARTH_SHOCK, 1200ms);
                     }
                 }
-                
             }
         }
     }
