@@ -4329,6 +4329,25 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(0x00000003, 0x00001000);
     });
 
+    // Elemental Vulnerability
+    ApplySpellFix({ 28772 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Speed = 1;
+    });
+
+    // Find the Ancient Hero: Kill Credit
+    ApplySpellFix({ 25729 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_SUMMONER;
+    });
+
+    // Artorius Demonic Doom
+    ApplySpellFix({ 23298 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_IGNORE_DAMAGE_TAKEN_MODIFIERS;
+        spellInfo->AttributesEx6 |= SPELL_ATTR6_IGNORE_CASTER_DAMAGE_MODIFIERS;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];

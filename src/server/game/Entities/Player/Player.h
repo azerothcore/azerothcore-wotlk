@@ -1035,11 +1035,11 @@ struct EntryPointData
     }
 
     uint32 mountSpell{0};
-    std::vector<uint32> taxiPath;
+    std::array<uint32, 2> taxiPath;
     WorldLocation joinPos;
 
-    void ClearTaxiPath()     { taxiPath.clear(); }
-    [[nodiscard]] bool HasTaxiPath() const { return !taxiPath.empty(); }
+    void ClearTaxiPath() { taxiPath.fill(0); }
+    [[nodiscard]] bool HasTaxiPath() const { return taxiPath[0] && taxiPath[1]; }
 };
 
 class Player : public Unit, public GridObject<Player>
@@ -1126,6 +1126,7 @@ public:
     bool ActivateTaxiPathTo(uint32 taxi_path_id, uint32 spellid = 1);
     void CleanupAfterTaxiFlight();
     void ContinueTaxiFlight();
+    void SendTaxiNodeStatusMultiple();
     // mount_id can be used in scripting calls
 
     [[nodiscard]] bool IsDeveloper() const { return HasPlayerFlag(PLAYER_FLAGS_DEVELOPER); }
@@ -1336,8 +1337,8 @@ public:
     bool BuyItemFromVendorSlot(ObjectGuid vendorguid, uint32 vendorslot, uint32 item, uint8 count, uint8 bag, uint8 slot);
     bool _StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 count, uint8 bag, uint8 slot, int32 price, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore);
 
-    float GetReputationPriceDiscount(Creature const* creature) const;
-    float GetReputationPriceDiscount(FactionTemplateEntry const* vendorFaction) const;
+    [[nodiscard]] float GetReputationPriceDiscount(Creature const* creature) const;
+    [[nodiscard]] float GetReputationPriceDiscount(FactionTemplateEntry const* factionTemplate) const;
 
     [[nodiscard]] Player* GetTrader() const { return m_trade ? m_trade->GetTrader() : nullptr; }
     [[nodiscard]] TradeData* GetTradeData() const { return m_trade; }
@@ -2429,6 +2430,8 @@ public:
 
     bool CanTeleport() { return m_canTeleport; }
     void SetCanTeleport(bool value) { m_canTeleport = value; }
+    bool CanKnockback() { return m_canKnockback; }
+    void SetCanKnockback(bool value) { m_canKnockback = value; }
 
     bool isAllowedToLoot(Creature const* creature);
 
@@ -2556,6 +2559,8 @@ public:
     void UpdatePlayerSetting(std::string source, uint8 index, uint32 value);
 
     void ResetSpeakTimers();
+
+    std::string GetDebugInfo() const override;
 
  protected:
     // Gamemaster whisper whitelist
@@ -2884,6 +2889,7 @@ private:
     bool m_bMustDelayTeleport;
     bool m_bHasDelayedTeleport;
     bool m_canTeleport;
+    bool m_canKnockback;
 
     std::unique_ptr<PetStable> m_petStable;
 

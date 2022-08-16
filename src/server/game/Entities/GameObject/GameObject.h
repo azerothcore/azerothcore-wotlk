@@ -1061,6 +1061,8 @@ public:
     void UpdateSaveToDb(bool enable);
 
     void SavingStateOnDB();
+
+    std::string GetDebugInfo() const override;
 protected:
     bool AIM_Initialize();
     GameObjectModel* CreateModel();

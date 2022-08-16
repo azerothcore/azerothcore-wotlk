@@ -222,6 +222,7 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     m_bHasDelayedTeleport = false;
     teleportStore_options = 0;
     m_canTeleport = false;
+    m_canKnockback = false;
 
     m_trade = nullptr;
 
@@ -1644,10 +1645,8 @@ void Player::ProcessDelayedOperations()
     {
         if (m_entryPointData.HasTaxiPath())
         {
-            for (size_t i = 0; i < m_entryPointData.taxiPath.size() - 1; ++i)
-                m_taxi.AddTaxiDestination(m_entryPointData.taxiPath[i]);
-            m_taxi.SetTaxiSegment(m_entryPointData.taxiPath[m_entryPointData.taxiPath.size() - 1]);
-
+            m_taxi.AddTaxiDestination(m_entryPointData.taxiPath[0]);
+            m_taxi.AddTaxiDestination(m_entryPointData.taxiPath[1]);
             m_entryPointData.ClearTaxiPath();
             ContinueTaxiFlight();
         }
@@ -10004,26 +10003,6 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
         return false;
     }
 
-    // check node starting pos data set case if provided
-    if (node->x != 0.0f || node->y != 0.0f || node->z != 0.0f)
-    {
-        if (node->map_id != GetMapId() ||
-                (node->x - GetPositionX()) * (node->x - GetPositionX()) +
-                (node->y - GetPositionY()) * (node->y - GetPositionY()) +
-                (node->z - GetPositionZ()) * (node->z - GetPositionZ()) >
-                (2 * INTERACTION_DISTANCE) * (2 * INTERACTION_DISTANCE) * (2 * INTERACTION_DISTANCE))
-        {
-            GetSession()->SendActivateTaxiReply(ERR_TAXITOOFARAWAY);
-            return false;
-        }
-    }
-    // node must have pos if taxi master case (npc != nullptr)
-    else if (npc)
-    {
-        GetSession()->SendActivateTaxiReply(ERR_TAXIUNSPECIFIEDSERVERERROR);
-        return false;
-    }
-
     // Prepare to flight start now
 
     // stop combat at start taxi flight if any
@@ -10045,6 +10024,7 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
     // fill destinations path tail
     uint32 sourcepath = 0;
     uint32 totalcost = 0;
+    uint32 firstcost = 0;
 
     uint32 prevnode = sourcenode;
     uint32 lastnode = 0;
@@ -10063,6 +10043,8 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
         }
 
         totalcost += cost;
+        if (i == 1)
+            firstcost = cost;
 
         if (prevnode == sourcenode)
             sourcepath = path;
@@ -10091,7 +10073,16 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
     uint32 money = GetMoney();
 
     if (npc)
-        totalcost = (uint32)ceil(totalcost * GetReputationPriceDiscount(npc));
+    {
+        float discount = GetReputationPriceDiscount(npc);
+        totalcost = uint32(ceil(totalcost * discount));
+        firstcost = uint32(ceil(firstcost * discount));
+        m_taxi.SetFlightMasterFactionTemplateId(npc->GetFaction());
+    }
+    else
+    {
+        m_taxi.SetFlightMasterFactionTemplateId(0);
+    }
 
     if (money < totalcost)
     {
@@ -10102,8 +10093,6 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
 
     //Checks and preparations done, DO FLIGHT
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_FLIGHT_PATHS_TAKEN, 1);
-    ModifyMoney(-(int32)totalcost);
-    UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GOLD_SPENT_FOR_TRAVELLING, totalcost);
 
     // prevent stealth flight
     //RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK);
@@ -10113,12 +10102,16 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
     {
         TaxiNodesEntry const* lastPathNode = sTaxiNodesStore.LookupEntry(nodes[nodes.size() - 1]);
         m_taxi.ClearTaxiDestinations();
+        ModifyMoney(-(int32)totalcost);
+        UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GOLD_SPENT_FOR_TRAVELLING, totalcost);
         TeleportTo(lastPathNode->map_id, lastPathNode->x, lastPathNode->y, lastPathNode->z, GetOrientation());
         return false;
     }
     else
     {
         m_flightSpellActivated = spellid;
+        ModifyMoney(-(int32)firstcost);
+        UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GOLD_SPENT_FOR_TRAVELLING, firstcost);
         GetSession()->SendActivateTaxiReply(ERR_TAXIOK);
         GetSession()->SendDoFlight(mount_display_id, sourcepath);
     }
@@ -10212,6 +10205,39 @@ void Player::ContinueTaxiFlight()
     }
 
     GetSession()->SendDoFlight(mountDisplayId, path, startNode);
+}
+
+void Player::SendTaxiNodeStatusMultiple()
+{
+    for (auto itr = m_clientGUIDs.begin(); itr != m_clientGUIDs.end(); ++itr)
+    {
+        if (!itr->IsCreature())
+        {
+            continue;
+        }
+
+        Creature* creature = ObjectAccessor::GetCreature(*this, *itr);
+        if (!creature || creature->IsHostileTo(this))
+        {
+            continue;
+        }
+
+        if (!creature->HasNpcFlag(UNIT_NPC_FLAG_FLIGHTMASTER))
+        {
+            continue;
+        }
+
+        uint32 nearestNode = sObjectMgr->GetNearestTaxiNode(creature->GetPositionX(), creature->GetPositionY(), creature->GetPositionZ(), creature->GetMapId(), GetTeamId());
+        if (!nearestNode)
+        {
+            continue;
+        }
+
+        WorldPacket data(SMSG_TAXINODE_STATUS, 9);
+        data << *itr;
+        data << uint8(m_taxi.IsTaximaskNodeKnown(nearestNode) ? 1 : 0);
+        SendDirectMessage(&data);
+    }
 }
 
 void Player::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs)
@@ -10984,11 +11010,8 @@ void Player::SetEntryPoint()
         m_entryPointData.mountSpell  = 0;
         m_entryPointData.joinPos = WorldLocation(GetMapId(), GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
 
-        std::vector<uint32> const& taxi = m_taxi.GetPath();
-        for (std::vector<uint32>::const_iterator itr = taxi.begin(); itr != taxi.end(); ++itr)
-            m_entryPointData.taxiPath.push_back(*itr);
-
-        m_entryPointData.taxiPath.push_back(m_taxi.GetTaxiSegment());
+        m_entryPointData.taxiPath[0] = m_taxi.GetTaxiSource();
+        m_entryPointData.taxiPath[1] = m_taxi.GetTaxiDestination();
     }
     else
     {
@@ -11353,6 +11376,7 @@ void Player::SendInitialPacketsAfterAddToMap()
     SendEnchantmentDurations();                             // must be after add to map
     SendItemDurations();                                    // must be after add to map
     SendQuestGiverStatusMultiple();
+    SendTaxiNodeStatusMultiple();
 
     // raid downscaling - send difficulty to player
     if (GetMap()->IsRaid())
@@ -12007,23 +12031,21 @@ bool Player::GetBGAccessByLevel(BattlegroundTypeId bgTypeId) const
 
 float Player::GetReputationPriceDiscount(Creature const* creature) const
 {
-    FactionTemplateEntry const* vendorFaction = creature->GetFactionTemplateEntry();
-    if (!vendorFaction)
+    return GetReputationPriceDiscount(creature->GetFactionTemplateEntry());
+}
+
+float Player::GetReputationPriceDiscount(FactionTemplateEntry const* factionTemplate) const
+{
+    if (!factionTemplate || !factionTemplate->faction)
     {
         return 1.0f;
     }
 
-    return GetReputationPriceDiscount(vendorFaction);
-}
-
-float Player::GetReputationPriceDiscount(FactionTemplateEntry const* vendorFaction) const
-{
-    if (!vendorFaction->faction)
-        return 1.0f;
-
-    ReputationRank rank = GetReputationRank(vendorFaction->faction);
+    ReputationRank rank = GetReputationRank(factionTemplate->faction);
     if (rank <= REP_NEUTRAL)
+    {
         return 1.0f;
+    }
 
     return 1.0f - 0.05f * (rank - REP_NEUTRAL);
 }
@@ -13875,20 +13897,27 @@ void Player::ResummonPetTemporaryUnSummonedIfAny()
 
 bool Player::CanResummonPet(uint32 spellid)
 {
-    if (getClass() == CLASS_DEATH_KNIGHT)
+    switch (getClass())
     {
-        if (CanSeeDKPet())
+        case CLASS_DEATH_KNIGHT:
+            if (CanSeeDKPet())
+                return true;
+            else if (spellid == 52150)  //Raise Dead
+                return false;
+            break;
+        case CLASS_MAGE:
+            if (HasSpell(31687) && HasAura(70937))  //Has [Summon Water Elemental] spell and [Glyph of Eternal Water].
+                return true;
+            break;
+        case CLASS_HUNTER:
+        case CLASS_WARLOCK:
             return true;
-        else if (spellid == 52150)
-            return false;
+            break;
+        default:
+            break;
     }
-    else if (getClass() == CLASS_HUNTER || getClass() == CLASS_MAGE || getClass() == CLASS_WARLOCK)
-        return true;
 
-    if (!HasSpell(spellid))
-        return false;
-
-    return true;
+    return HasSpell(spellid);
 }
 
 bool Player::CanSeeSpellClickOn(Creature const* c) const
@@ -14228,16 +14257,9 @@ void Player::_SaveEntryPoint(CharacterDatabaseTransaction trans)
     stmt->SetData (3, m_entryPointData.joinPos.GetPositionZ());
     stmt->SetData (4, m_entryPointData.joinPos.GetOrientation());
     stmt->SetData(5, m_entryPointData.joinPos.GetMapId());
-
-    std::ostringstream ss("");
-    if (m_entryPointData.HasTaxiPath())
-    {
-        for (size_t i = 0; i < m_entryPointData.taxiPath.size(); ++i)
-            ss << m_entryPointData.taxiPath[i] << ' '; // xinef: segment is stored as last point
-    }
-
-    stmt->SetData(6, ss.str());
-    stmt->SetData(7, m_entryPointData.mountSpell);
+    stmt->SetData(6, m_entryPointData.taxiPath[0]);
+    stmt->SetData(7, m_entryPointData.taxiPath[1]);
+    stmt->SetData(8, m_entryPointData.mountSpell);
     trans->Append(stmt);
 }
 
@@ -15957,4 +15979,11 @@ void Player::ResetSpeakTimers()
 {
     m_speakTime = 0;
     m_speakCount = 0;
+}
+
+std::string Player::GetDebugInfo() const
+{
+    std::stringstream sstr;
+    sstr << Unit::GetDebugInfo();
+    return sstr.str();
 }

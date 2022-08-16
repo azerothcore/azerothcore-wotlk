@@ -2189,7 +2189,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
 
                 // Update Taxi path
                 TaxiMask newTaxiMask;
-                memset(newTaxiMask, 0, sizeof(newTaxiMask));
+                newTaxiMask.fill(0);
 
                 TaxiMask const& factionMask = newTeam == TEAM_HORDE ? sHordeTaxiNodesMask : sAllianceTaxiNodesMask;
                 for (auto const& itr : sTaxiPathSetBySource)
@@ -2534,6 +2534,12 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
             }
         }
     }
+
+    // Re-check all achievement criterias
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
+    stmt->SetData(0, uint16(AT_LOGIN_CHECK_ACHIEVS));
+    stmt->SetData(1, lowGuid);
+    trans->Append(stmt);
 
     CharacterDatabase.CommitTransaction(trans);
 
