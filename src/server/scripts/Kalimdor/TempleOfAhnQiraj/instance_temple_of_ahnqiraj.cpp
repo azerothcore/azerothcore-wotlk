@@ -23,7 +23,8 @@
 ObjectData const creatureData[] =
 {
     { NPC_SARTURA, DATA_SARTURA },
-    { NPC_EYE_OF_CTHUN, DATA_EYE_OF_CTHUN }
+    { NPC_EYE_OF_CTHUN, DATA_EYE_OF_CTHUN },
+    { NPC_OURO_SPAWNER, DATA_OURO_SPAWNER }
 };
 
 class instance_temple_of_ahnqiraj : public InstanceMapScript
@@ -93,6 +94,10 @@ public:
                     break;
                 case NPC_VISCIDUS:
                     ViscidusGUID = creature->GetGUID();
+                    break;
+                case NPC_OURO_SPAWNER:
+                    if (GetBossState(DATA_OURO) != DONE)
+                        creature->Respawn();
                     break;
             }
             InstanceScript::OnCreatureCreate(creature);
@@ -169,6 +174,27 @@ public:
                     CthunPhase = data;
                     break;
             }
+        }
+
+        bool SetBossState(uint32 type, EncounterState state) override
+        {
+            if (!InstanceScript::SetBossState(type, state))
+                return false;
+
+            switch (type)
+            {
+                case DATA_OURO:
+                    if (state == FAIL)
+                    {
+                        if (Creature* ouroSpawner = GetCreature(DATA_OURO))
+                            ouroSpawner->Respawn();
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            return true;
         }
     };
 };

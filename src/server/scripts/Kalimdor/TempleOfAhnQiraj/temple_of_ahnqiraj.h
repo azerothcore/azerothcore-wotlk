@@ -71,6 +71,7 @@ enum Creatures
     NPC_VEKLOR              = 15276,
     NPC_VEKNILASH           = 15275,
     NPC_OURO                = 15517,
+    NPC_OURO_SPAWNER        = 15957,
     NPC_SARTURA             = 15516
 };
 

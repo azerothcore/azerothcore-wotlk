@@ -90,6 +90,24 @@ bool UnitAI::DoSpellAttackIfReady(uint32 spell)
     return false;
 }
 
+void UnitAI::DoSpellAttackToRandomTargetIfReady(uint32 spell, uint32 threatTablePosition /*= 0*/, float dist /*= 0.f*/, bool playerOnly /*= true*/)
+{
+    if (me->HasUnitState(UNIT_STATE_CASTING) || !me->isAttackReady())
+        return;
+
+    if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell))
+    {
+        if (Unit* target = SelectTarget(SelectTargetMethod::Random, threatTablePosition, dist, playerOnly))
+        {
+            if (me->IsWithinCombatRange(target, spellInfo->GetMaxRange(false)))
+            {
+                me->CastSpell(target, spell, false);
+                me->resetAttackTimer();
+            }
+        }
+    }
+}
+
 Unit* UnitAI::SelectTarget(SelectTargetMethod targetType, uint32 position, float dist, bool playerOnly, int32 aura)
 {
     return SelectTarget(targetType, position, DefaultTargetSelector(me, dist, playerOnly, aura));
