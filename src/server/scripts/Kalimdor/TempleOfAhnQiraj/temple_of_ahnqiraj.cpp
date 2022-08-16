@@ -52,7 +52,7 @@ struct npc_anubisath_defender : public ScriptedAI
         _enraged = false;
     }
 
-    void EnterCombat(Unit* who) override
+    void EnterCombat(Unit* /*who*/) override
     {
         DoCastSelf(urand(0, 1) ? SPELL_SHADOW_FROST_REFLECT : SPELL_FIRE_ARCANE_REFLECT, true);
 
