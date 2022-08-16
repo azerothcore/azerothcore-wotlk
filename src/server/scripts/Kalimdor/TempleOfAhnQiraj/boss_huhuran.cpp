@@ -99,10 +99,7 @@ struct boss_huhuran : public BossAI
                     events.RepeatEvent(urand(25000, 35000));
                     break;
                 case EVENT_WYVERN_STING:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance))
-                    {
-                        me->CastCustomSpell(SPELL_WYVERN_STING, SPELLVALUE_MAX_TARGETS, 10, target, true);
-                    }
+                    me->CastCustomSpell(SPELL_WYVERN_STING, SPELLVALUE_MAX_TARGETS, 10, me, true);
                     events.RepeatEvent(urand(15000, 32000));
                     break;
                 case EVENT_ACID_SPIT:
