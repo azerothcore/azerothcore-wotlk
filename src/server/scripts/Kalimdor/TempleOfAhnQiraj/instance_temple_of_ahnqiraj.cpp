@@ -51,7 +51,6 @@ public:
         ObjectGuid VemGUID;
         ObjectGuid KriGUID;
         ObjectGuid YaujGUID;
-        ObjectGuid HuhuranGUID;
         ObjectGuid VeklorGUID;
         ObjectGuid VeknilashGUID;
         ObjectGuid ViscidusGUID;
@@ -83,9 +82,6 @@ public:
                 case NPC_YAUJ:
                     YaujGUID = creature->GetGUID();
                     break;
-                case NPC_HUHURAN:
-                    HuhuranGUID = creature->GetGUID();
-                    break;
                 case NPC_VEKLOR:
                     VeklorGUID = creature->GetGUID();
                     break;
@@ -100,6 +96,7 @@ public:
                         creature->Respawn();
                     break;
             }
+
             InstanceScript::OnCreatureCreate(creature);
         }
 
@@ -138,8 +135,6 @@ public:
                     return KriGUID;
                 case DATA_YAUJ:
                     return YaujGUID;
-                case DATA_HUHURAN:
-                    return HuhuranGUID;
                 case DATA_VEKLOR:
                     return VeklorGUID;
                 case DATA_VEKNILASH:
@@ -156,13 +151,9 @@ public:
             {
                 case DATA_BUG_TRIO_DEATH:
                     if (data != 0)
-                    {
                         ++BugTrioDeathCount;
-                    }
                     else
-                    {
                         BugTrioDeathCount = 0;
-                    }
                     break;
                 case DATA_VEKLOR_DEATH:
                     IsBossDied[1] = true;

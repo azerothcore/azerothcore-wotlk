@@ -55,8 +55,8 @@ struct boss_huhuran : public BossAI
     void Reset() override
     {
         _Reset();
-        berserk = false;
-        hardEnrage = false;
+        _berserk = false;
+        _hardEnrage = false;
     }
 
     void EnterCombat(Unit* /*who*/) override
@@ -68,18 +68,13 @@ struct boss_huhuran : public BossAI
         events.ScheduleEvent(EVENT_HARD_ENRAGE, 300000);
     }
 
-    void JustDied(Unit* /*killer*/) override
-    {
-        _JustDied();
-    }
-
     void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
     {
-        if (!berserk && HealthBelowPct(30))
+        if (!_berserk && HealthBelowPct(30))
         {
             DoCastSelf(SPELL_BERSERK, true);
             Talk(EMOTE_BERSERK);
-            berserk = true;
+            _berserk = true;
         }
     }
 
@@ -114,10 +109,10 @@ struct boss_huhuran : public BossAI
                     events.RepeatEvent(urand(12000, 24000));
                     break;
                 case EVENT_HARD_ENRAGE:
-                    if (!hardEnrage)
+                    if (!_hardEnrage)
                     {
                         DoCastSelf(SPELL_HARD_ENRAGE, true);
-                        hardEnrage = true;
+                        _hardEnrage = true;
                     }
                     else
                     {
@@ -130,8 +125,8 @@ struct boss_huhuran : public BossAI
         DoMeleeAttackIfReady();
     }
     private:
-        bool berserk;
-        bool hardEnrage;
+        bool _berserk;
+        bool _hardEnrage;
 };
 
 // 26180 - Wyvern Sting

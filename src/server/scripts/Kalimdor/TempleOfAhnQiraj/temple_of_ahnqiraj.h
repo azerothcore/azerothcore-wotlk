@@ -39,12 +39,12 @@ enum DataTypes
     DATA_OURO               = 13,
     DATA_OURO_SPAWNER       = 14,
     DATA_BUG_TRIO_DEATH     = 15,
-    DATA_HUHURAN            = 16,
     DATA_CTHUN_PHASE        = 20,
     DATA_VISCIDUS           = 21,
     DATA_SARTURA            = 22,
 
-    DATA_EYE_OF_CTHUN       = 23
+    DATA_EYE_OF_CTHUN       = 23,
+    DATA_HUHURAN            = 24
 };
 
 enum Creatures
