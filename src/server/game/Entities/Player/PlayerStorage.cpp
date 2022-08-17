@@ -4894,21 +4894,9 @@ void Player::_LoadEntryPointData(PreparedQueryResult result)
                                              fields[2].Get<float>(),   // Z
                                              fields[3].Get<float>());  // Orientation
 
-    std::string_view taxi = fields[5].Get<std::string_view>();
-    if (!taxi.empty())
-    {
-        for (auto const& itr : Acore::Tokenize(taxi, ' ', false))
-        {
-            uint32 node = Acore::StringTo<uint32>(itr).value_or(0);
-            m_entryPointData.taxiPath.emplace_back(node);
-        }
-
-        // Check integrity
-        if (m_entryPointData.taxiPath.size() < 3)
-            m_entryPointData.ClearTaxiPath();
-    }
-
-    m_entryPointData.mountSpell   = fields[6].Get<uint32>();
+    m_entryPointData.taxiPath[0] = fields[5].Get<uint32>();
+    m_entryPointData.taxiPath[1] = fields[6].Get<uint32>();
+    m_entryPointData.mountSpell = fields[7].Get<uint32>();
 }
 
 bool Player::LoadPositionFromDB(uint32& mapid, float& x, float& y, float& z, float& o, bool& in_flight, ObjectGuid::LowType guid)

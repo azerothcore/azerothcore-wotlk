@@ -22,6 +22,7 @@
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "TaskScheduler.h"
 
 //
 //  Emerald Dragon NPCs and IDs (kept here for reference)
@@ -34,6 +35,9 @@ enum EmeraldDragonNPC
     DRAGON_LETHON                   = 14888,
     DRAGON_EMERISS                  = 14889,
     DRAGON_TAERAR                   = 14890,
+
+    GUID_DRAGON                     = 1,
+    GUID_FOG_TARGET                 = 2
 };
 
 //
@@ -144,6 +148,14 @@ struct emerald_dragonAI : public WorldBossAI
         }
     }
 
+    void JustSummoned(Creature* summon) override
+    {
+        if (summon->GetEntry() == NPC_DREAM_FOG)
+        {
+            summon->AI()->SetGUID(me->GetGUID(), GUID_DRAGON);
+        }
+    }
+
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
@@ -172,13 +184,66 @@ public:
 
     struct npc_dream_fogAI : public ScriptedAI
     {
-        npc_dream_fogAI(Creature* creature) : ScriptedAI(creature)
-        {
-        }
+        npc_dream_fogAI(Creature* creature) : ScriptedAI(creature) { }
 
         void Reset() override
         {
-            _roamTimer = 0;
+            ScheduleEvents();
+        }
+
+        void ScheduleEvents()
+        {
+            _scheduler.CancelAll();
+
+            _scheduler.Schedule(1s, [this](TaskContext context)
+            {
+                // Chase target, but don't attack - otherwise just roam around
+                if (Unit* chaseTarget = GetRandomUnitFromDragonThreatList())
+                {
+                    me->GetMotionMaster()->Clear();
+                    me->GetMotionMaster()->MoveFollow(chaseTarget, 0.02f, 0.0f);
+                    _targetGUID = chaseTarget->GetGUID();
+                    context.Repeat(15s, 30s);
+                }
+                else
+                {
+                    me->GetMotionMaster()->Clear();
+                    me->GetMotionMaster()->MoveRandom(25.0f);
+                    context.Repeat(2500ms);
+                }
+
+                // Seeping fog movement is slow enough for a player to be able to walk backwards and still outpace it
+                me->SetWalk(true);
+                me->SetSpeed(MOVE_WALK, 0.75f);
+            });
+        }
+
+        void SetGUID(ObjectGuid guid, int32 type) override
+        {
+            if (type == GUID_DRAGON)
+            {
+                _dragonGUID = guid;
+            }
+            else if (type == GUID_FOG_TARGET)
+            {
+                if (guid == _targetGUID)
+                {
+                    ScheduleEvents();
+                }
+            }
+        }
+
+        Unit* GetRandomUnitFromDragonThreatList()
+        {
+            if (Creature* dragon = ObjectAccessor::GetCreature(*me, _dragonGUID))
+            {
+                if (dragon->GetAI())
+                {
+                    return dragon->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true);
+                }
+            }
+
+            return nullptr;
         }
 
         void UpdateAI(uint32 diff) override
@@ -186,31 +251,13 @@ public:
             if (!UpdateVictim())
                 return;
 
-            if (!_roamTimer)
-            {
-                // Chase target, but don't attack - otherwise just roam around
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
-                {
-                    _roamTimer = urand(15000, 30000);
-                    me->GetMotionMaster()->Clear(false);
-                    me->GetMotionMaster()->MoveChase(target, 0.2f);
-                }
-                else
-                {
-                    _roamTimer = 2500;
-                    me->GetMotionMaster()->Clear(false);
-                    me->GetMotionMaster()->MoveRandom(25.0f);
-                }
-                // Seeping fog movement is slow enough for a player to be able to walk backwards and still outpace it
-                me->SetWalk(true);
-                me->SetSpeed(MOVE_WALK, 0.75f);
-            }
-            else
-                _roamTimer -= diff;
+            _scheduler.Update(diff);
         }
 
     private:
-        uint32 _roamTimer;
+        ObjectGuid _targetGUID;
+        ObjectGuid _dragonGUID;
+        TaskScheduler _scheduler;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -614,6 +661,7 @@ public:
                 ++_stage;
             }
         }
+
         void ExecuteEvent(uint32 eventId) override
         {
             switch (eventId)
@@ -692,6 +740,17 @@ public:
     {
         PrepareSpellScript(spell_dream_fog_sleep_SpellScript);
 
+        void HandleEffect(SpellEffIndex /*effIndex*/)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                if (Unit* target = GetHitUnit())
+                {
+                    caster->GetAI()->SetGUID(target->GetGUID(), GUID_FOG_TARGET);
+                }
+            }
+        }
+
         void FilterTargets(std::list<WorldObject*>& targets)
         {
             targets.remove_if(Acore::UnitAuraCheck(true, SPELL_SLEEP));
@@ -699,6 +758,7 @@ public:
 
         void Register() override
         {
+            OnEffectHitTarget += SpellEffectFn(spell_dream_fog_sleep_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_dream_fog_sleep_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
         }
     };

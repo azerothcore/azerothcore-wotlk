@@ -35,7 +35,10 @@ enum DataTypes
     DATA_VEKNILASH          = 9,
     DATA_VEKNILASHISDEAD    = 10,
     DATA_VEKNILASH_DEATH    = 11,
-    DATA_BUG_TRIO_DEATH     = 14,
+    DATA_FANKRISS           = 12,
+    DATA_OURO               = 13,
+    DATA_OURO_SPAWNER       = 14,
+    DATA_BUG_TRIO_DEATH     = 15,
     DATA_CTHUN_PHASE        = 20,
     DATA_VISCIDUS           = 21,
     DATA_SARTURA            = 22,
@@ -55,7 +58,7 @@ enum Creatures
     NPC_GIANT_EYE_TENTACLE  = 15334,
     NPC_FLESH_TENTACLE      = 15802,
     NPC_GIANT_PORTAL        = 15910,
-
+    NPC_SARTURA_ROYAL_GUARD = 15984,
     NPC_VISCIDUS            = 15299,
     NPC_GLOB_OF_VISCIDUS    = 15667,
 
@@ -66,6 +69,7 @@ enum Creatures
     NPC_VEKLOR              = 15276,
     NPC_VEKNILASH           = 15275,
     NPC_OURO                = 15517,
+    NPC_OURO_SPAWNER        = 15957,
     NPC_SARTURA             = 15516
 };
 

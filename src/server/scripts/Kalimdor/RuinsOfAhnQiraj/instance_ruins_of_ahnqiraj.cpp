@@ -97,6 +97,10 @@ public:
                 case NPC_OSSIRIAN:
                     _ossirianGUID = creature->GetGUID();
                     break;
+                case NPC_SAND_VORTEX:
+                    _sandVortexes.push_back(creature->GetGUID());
+                    creature->SetVisible(false);
+                    break;
             }
         }
 
@@ -187,6 +191,31 @@ public:
         {
             if (type == DATA_PARALYZED)
                 _paralyzedGUID = data;
+        }
+
+        bool SetBossState(uint32 type, EncounterState state) override
+        {
+            if (!InstanceScript::SetBossState(type, state))
+                return false;
+
+            switch (type)
+            {
+                case DATA_OSSIRIAN:
+                {
+                    for (ObjectGuid const& guid : _sandVortexes)
+                    {
+                        if (Creature* sandVortex = instance->GetCreature(guid))
+                        {
+                            sandVortex->SetVisible(state == IN_PROGRESS);
+                        }
+                    }
+                    break;
+                default:
+                    break;
+                }
+            }
+
+            return true;
         }
 
         ObjectGuid GetGuidData(uint32 type) const override
@@ -304,6 +333,7 @@ public:
         ObjectGuid _buruGUID;
         ObjectGuid _ossirianGUID;
         ObjectGuid _paralyzedGUID;
+        GuidVector _sandVortexes;
         uint32 _rajaxWaveCounter;
         TaskScheduler _scheduler;
     };

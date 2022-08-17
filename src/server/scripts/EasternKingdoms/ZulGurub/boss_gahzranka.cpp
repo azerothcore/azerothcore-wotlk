@@ -168,7 +168,7 @@ class spell_pagles_point_cast : public SpellScript
         {
             if (InstanceScript* instanceScript = caster->GetInstanceScript())
             {
-                if (!instanceScript->GetData(DATA_GAHZRANKA))
+                if (!instanceScript->GetData(DATA_GAHZRANKA) && !caster->FindNearestCreature(NPC_GAHZRANKA, 50.0f))
                 {
                     caster->m_Events.AddEventAtOffset([caster]()
                     {
@@ -177,8 +177,11 @@ class spell_pagles_point_cast : public SpellScript
                             lure->DespawnOrUnsummon(5s);
                             caster->m_Events.AddEventAtOffset([caster]()
                             {
-                                caster->CastSpell(caster, SPELL_SPLASH, true);
-                                caster->SummonCreature(NPC_GAHZRANKA, -11688.5f, -1723.74f, -5.78f, 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5 * DAY * IN_MILLISECONDS);
+                                if (!caster->FindNearestCreature(NPC_GAHZRANKA, 50.0f))
+                                {
+                                    caster->CastSpell(caster, SPELL_SPLASH, true);
+                                    caster->SummonCreature(NPC_GAHZRANKA, -11688.5f, -1723.74f, -5.78f, 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5 * DAY * IN_MILLISECONDS);
+                                }
                             }, 5s);
                         }
                     }, 2s);
