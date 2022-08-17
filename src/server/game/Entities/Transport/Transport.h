@@ -78,6 +78,7 @@ public:
     uint32 GetPeriod() const { return GetUInt32Value(GAMEOBJECT_LEVEL); }
     void SetPeriod(uint32 period) { SetUInt32Value(GAMEOBJECT_LEVEL, period); }
 
+    std::string GetDebugInfo() const override;
 private:
     void MoveToNextWaypoint();
     float CalculateSegmentPos(float perc);

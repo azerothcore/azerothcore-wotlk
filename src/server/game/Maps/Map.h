@@ -649,6 +649,8 @@ public:
         return m_activeNonPlayers.size();
     }
 
+    virtual std::string GetDebugInfo() const;
+
 private:
     void LoadMapAndVMap(int gx, int gy);
     void LoadVMap(int gx, int gy);
@@ -830,6 +832,9 @@ public:
     [[nodiscard]] uint32 GetMaxResetDelay() const;
 
     void InitVisibilityDistance() override;
+
+    std::string GetDebugInfo() const override;
+
 private:
     bool m_resetAfterUnload;
     bool m_unloadWhenEmpty;

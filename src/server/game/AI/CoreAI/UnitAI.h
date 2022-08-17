@@ -330,6 +330,7 @@ public:
 
     void DoMeleeAttackIfReady();
     bool DoSpellAttackIfReady(uint32 spell);
+    void DoSpellAttackToRandomTargetIfReady(uint32 spell, uint32 threatTablePosition = 0, float dist = 0.f, bool playerOnly = true);
 
     static AISpellInfoType* AISpellInfo;
     static void FillAISpellInfo();
@@ -345,6 +346,8 @@ public:
     virtual void sQuestComplete(Player* /*player*/, Quest const* /*quest*/) {}
     virtual void sQuestReward(Player* /*player*/, Quest const* /*quest*/, uint32 /*opt*/) {}
     virtual void sOnGameEvent(bool /*start*/, uint16 /*eventId*/) {}
+
+    virtual std::string GetDebugInfo() const;
 };
 
 class PlayerAI : public UnitAI
