@@ -101,6 +101,12 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
         return;
     }
 
+    if (!_player->IsAlive())
+    {
+        _player->GetSession()->SendNotification("You are not alive");
+        return;
+    }
+
     LOG_DEBUG("network", "WORLD: Recvd CMSG_BATTLEMASTER_JOIN Message from {}", guid.ToString());
 
     // get queue typeid and random typeid to check if already queued for them
