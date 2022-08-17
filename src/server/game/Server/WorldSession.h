@@ -1176,6 +1176,9 @@ private:
     // Packets cooldown
     time_t _calendarEventCreationCooldown;
 
+    // Addon Message count for Metric
+    std::atomic<uint32> _addonMessageReceiveCount;
+
     CircularBuffer<std::pair<int64, uint32>> _timeSyncClockDeltaQueue; // first member: clockDelta. Second member: latency of the packet exchange that was used to compute that clockDelta.
     int64 _timeSyncClockDelta;
     void ComputeNewClockDelta();
