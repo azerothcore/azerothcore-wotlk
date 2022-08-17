@@ -381,6 +381,7 @@ public:
                                 break;
                             case EVENT_STARTED:
                                 me->SetImmuneToAll(false);
+                                me->SetInCombatWithZone();
                                 break;
                             default:
                                 break;
