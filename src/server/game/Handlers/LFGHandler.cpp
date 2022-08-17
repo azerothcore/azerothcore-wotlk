@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Chat.h"
 #include "DBCStores.h"
 #include "GameTime.h"
 #include "Group.h"
@@ -56,6 +57,12 @@ void WorldSession::HandleLfgJoinOpcode(WorldPackets::LFG::LFGJoin& packet)
     if (packet.Slots.empty())
     {
         LOG_DEBUG("lfg", "CMSG_LFG_JOIN {} no dungeons selected", GetPlayerInfo().c_str());
+        return;
+    }
+
+    if (_player->IsInCombat())
+    {
+        _player->GetSession()->SendNotification(LANG_YOU_IN_COMBAT);
         return;
     }
 
