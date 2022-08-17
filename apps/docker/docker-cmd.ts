@@ -51,11 +51,11 @@ shellCommandFactory(
 
 shellCommandFactory(
   "build:compile",
-  "Run the compilation process only, without rebuilding all docker images and importing db",
+  "Run the compilation process only, without rebuilding all docker images",
   [
     "docker-compose build --parallel ac-build",
     "docker image prune -f",
-    "docker-compose run --rm ac-build bash apps/docker/docker-build-dev.sh 0",
+    "docker-compose run --rm ac-build bash apps/docker/docker-build-dev.sh",
   ],
   env,
 );
