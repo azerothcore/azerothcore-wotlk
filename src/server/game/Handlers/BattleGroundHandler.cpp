@@ -95,6 +95,12 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
         return;
     }
 
+    if (_player->IsInCombat())
+    {
+        _player->GetSession()->SendNotification(LANG_YOU_IN_COMBAT);
+        return;
+    }
+
     LOG_DEBUG("network", "WORLD: Recvd CMSG_BATTLEMASTER_JOIN Message from {}", guid.ToString());
 
     // get queue typeid and random typeid to check if already queued for them
