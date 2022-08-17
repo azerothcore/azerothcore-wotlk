@@ -1,0 +1,4 @@
+--
+
+DELETE FROM `creature_loot_template` WHERE `item` IN (19813,19814,19815,19816,19817,19818,19819,19820,19821);
+
