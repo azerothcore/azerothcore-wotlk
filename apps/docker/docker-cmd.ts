@@ -78,13 +78,6 @@ shellCommandFactory(
 );
 
 shellCommandFactory(
-  "db-import",
-  "Create and upgrade the database with latest updates",
-  ["docker-compose run --rm ac-build bash acore.sh db-assembler import-all"],
-  env,
-);
-
-shellCommandFactory(
   "dev:up",
   "Start the dev server container in background",
   ["docker-compose up -d ac-dev-server"],
