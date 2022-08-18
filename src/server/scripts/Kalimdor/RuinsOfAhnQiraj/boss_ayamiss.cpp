@@ -24,13 +24,13 @@
 
 enum Spells
 {
-    SPELL_STINGER_SPRAY       = 25749,
-    SPELL_POISON_STINGER      = 25748,
-    SPELL_PARALYZE            = 25725,
-    SPELL_FRENZY              = 8269,
-    SPELL_LASH                = 25852,
-    SPELL_FEED                = 25721,
-    SPELL_THRASH              = 3391,
+    SPELL_STINGER_SPRAY                     = 25749,
+    SPELL_POISON_STINGER                    = 25748,
+    SPELL_PARALYZE                          = 25725,
+    SPELL_FRENZY                            = 8269,
+    SPELL_LASH                              = 25852,
+    SPELL_FEED                              = 25721,
+    SPELL_THRASH                            = 3391,
 
     // Server-side spells
     SPELL_SUMMON_LARVA_A                    = 26538,
@@ -53,26 +53,26 @@ enum Spells
 
 enum Misc
 {
-    MAX_SWARMER_COUNT    = 28,
-    ACTION_SWARMER_SWARM = 1,
+    MAX_SWARMER_COUNT                       = 28,
+    ACTION_SWARMER_SWARM                    = 1,
 };
 
 enum Emotes
 {
-    EMOTE_FRENZY              =  0
+    EMOTE_FRENZY                            =  0
 };
 
 enum Phases
 {
-    PHASE_AIR                 = 0,
-    PHASE_GROUND              = 1
+    PHASE_AIR                               = 0,
+    PHASE_GROUND                            = 1
 };
 
 enum Points
 {
-    POINT_AIR                 = 0,
-    POINT_GROUND              = 2,
-    POINT_PARALYZE            = 2
+    POINT_AIR                               = 0,
+    POINT_GROUND                            = 2,
+    POINT_PARALYZE                          = 2
 };
 
 const Position AyamissAirPos  = { -9689.292f, 1547.912f, 48.02729f, 0.0f };
@@ -175,6 +175,12 @@ struct boss_ayamiss : public BossAI
 
             _swarmers.clear();
         }
+    }
+
+    void JustDied(Unit* killer) override
+    {
+        me->GetMotionMaster()->MoveFall();
+        BossAI::JustDied(killer);
     }
 
     void EnterEvadeMode(EvadeReason why) override
