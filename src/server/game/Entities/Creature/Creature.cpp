@@ -3494,26 +3494,35 @@ bool Creature::IsMovementPreventedByCasting() const
     return false;
 }
 
-bool Creature::SetCannotReachTarget()
+void Creature::SetCannotReachTarget(ObjectGuid const& cannotReach)
 {
-    return SetCannotReachTarget(true);
-}
-
-bool Creature::SetCannotReachTarget(bool cannotReach, bool isChase /*= true*/)
+    if (cannotReach == m_cannotReachTarget)
 {
-    if (!isChase || !Unit::SetCannotReachTarget(cannotReach))
-    {
-        return false;
+        return;
     }
 
+    m_cannotReachTarget = cannotReach;
     m_cannotReachTimer = 0;
 
     if (cannotReach)
     {
         LOG_DEBUG("entities.unit", "Creature::SetCannotReachTarget() called with true. Details: {}", GetDebugInfo());
     }
+}
 
-    return true;
+bool Creature::CanNotReachTarget() const
+{
+    return m_cannotReachTarget;
+}
+
+bool Creature::IsNotReachableAndNeedRegen() const
+{
+    if (CanNotReachTarget())
+    {
+        return m_cannotReachTimer >= (sWorld->getIntConfig(CONFIG_NPC_REGEN_TIME_IF_NOT_REACHABLE_IN_RAID) * IN_MILLISECONDS);
+    }
+
+    return false;
 }
 
 time_t Creature::GetLastDamagedTime() const

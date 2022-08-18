@@ -2428,10 +2428,11 @@ public:
 
     [[nodiscard]] bool CanRestoreMana(SpellInfo const* spellInfo) const;
 
-    virtual bool SetCannotReachTarget(bool cannotReach, bool isChase = true);
-    [[nodiscard]] bool CanNotReachTarget() const { return m_cannotReachTarget; }
-
     std::string GetDebugInfo() const override;
+    void SetCannotReachTargetUnit(bool target, bool isChase);
+    [[nodiscard]] bool CanNotReachTarget() const;
+
+    bool m_cannotReachTarget;
 
 protected:
     explicit Unit (bool isWorldObject);
@@ -2512,8 +2513,6 @@ protected:
     bool IsAlwaysVisibleFor(WorldObject const* seer) const override;
     bool IsAlwaysDetectableFor(WorldObject const* seer) const override;
     bool _instantCast;
-
-    bool m_cannotReachTarget;
 
 private:
     bool IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, WeaponAttackType attType, bool isVictim, bool active, SpellProcEventEntry const*& spellProcEvent, ProcEventInfo const& eventInfo);

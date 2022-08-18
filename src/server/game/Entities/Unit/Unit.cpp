@@ -212,7 +212,6 @@ Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
     m_vehicleKit(nullptr),
     m_unitTypeMask(UNIT_MASK_NONE),
     m_HostileRefMgr(this),
-    m_cannotReachTarget(false),
     m_comboTarget(nullptr),
     m_comboPoints(0)
 {
@@ -20787,18 +20786,6 @@ bool Unit::CanRestoreMana(SpellInfo const* spellInfo) const
     return false;
 }
 
-bool Unit::SetCannotReachTarget(bool cannotReach, bool /*isChase = true*/)
-{
-    if (cannotReach == m_cannotReachTarget)
-    {
-        return false;
-    }
-
-    m_cannotReachTarget = cannotReach;
-
-    return true;
-}
-
 bool Unit::IsInDisallowedMountForm() const
 {
     if (SpellInfo const* transformSpellInfo = sSpellMgr->GetSpellInfo(getTransForm()))
@@ -20863,4 +20850,19 @@ std::string Unit::GetDebugInfo() const
         << " UnitMovementFlags: " << GetUnitMovementFlags() << " ExtraUnitMovementFlags: " << GetExtraUnitMovementFlags()
         << " Class: " << std::to_string(getClass());
     return sstr.str();
+}
+
+void Unit::SetCannotReachTargetUnit(bool cannotReach, bool isChase)
+{
+    if (cannotReach == m_cannotReachTarget)
+    {
+        return;
+    }
+
+    m_cannotReachTarget = cannotReach;
+}
+
+bool Unit::CanNotReachTarget() const
+{
+    return m_cannotReachTarget;
 }
