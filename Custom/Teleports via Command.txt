@@ -1,8 +1,46 @@
-Start
-INSERT INTO `game_tele` VALUES (1492, 131.828, 1012.28, 295.271, 5.48354, 37, 'Start');
+delete from game_tele where id >= 1492;
+
+-- Start
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1492, 131.828, 1012.28, 295.271, 5.48354, 37, 'Start');
 INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1493, -117.003, 850.815, 294.579, 5.58488, 37, 'start2');
 INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1494, 147.987, 269.417, 273.524, 1.22673, 37, 'start3');
 INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1495, 902.614, 154.535, 285.419, 3.56091, 37, 'start4');
 INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1496, 865.102, 438.741, 281.501, 3.79633, 37, 'start5');
 
+-- Stonetalon Logging Camp
+-- 1 1951.512085 1530.475586 247.288147
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1497, 1951.512085, 1530.475586, 247.288147, 1, 1, 'StonetalonCamp');
+
+-- Stonetalon Logging Cave
+-- 1 2691.832275 2296.176025 194.033310
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1498, 2691.832275, 2296.176025, 194.033310, 1, 1, 'StonetalonCave');
+
+-- Old Ironforge
+-- 0 -4818 -973 465
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1499, -4818, -973, 465, 1, 0, 'OldIronforge');
+
+-- Ironforge Airport
+-- 0 -4789 -1691 504
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1500, -4789, -1691, 504, 1, 0, 'IronforgeAirport');
+
+-- Old Sunken Monastery
+-- 44 126 -1 19
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1501, 126, -1, 19, 1, 44, 'OldSunkenMonastery');
+
+-- Stormwind vault
+-- 35 -1 52 -27
+-- empty space
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1502, -1, 52, -27, 1, 35, 'Stormwindvault');
+
+-- Hidden Silithus Farm along with a Cave:
+-- 1 -10735.790 2463.18 6.834
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1503, -10735.790, 2463.18, 6.834, 1, 1, 'SilithusFarm');
+
+-- Two Tanaris Islands
+-- 1 -11805.5 -4754.129 5.966
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1504, 11805.5, -4754.129, 5.966, 1, 1, 'TanarisIslands');
+
+-- Secret Dancing Troll City
+-- 1 7333 -1542 162
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1505, 7333, -1542, 162, 1, 1, 'DancingTrollCity');
 
