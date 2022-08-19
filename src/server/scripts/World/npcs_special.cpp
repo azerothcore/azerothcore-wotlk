@@ -229,8 +229,8 @@ enum RiggleBassbait
     EVENT_FISHING_TURN_INS              = 90,
     EVENT_FISHING_POOLS                 = 15,
 
-    GOSSIP_TEXT_EVENT_ACTIVE            = 7614,
-    GOSSIP_TEXT_EVENT_OVER              = 7714
+    GOSSIP_EVENT_ACTIVE            = 7614,
+    GOSSIP_EVENT_OVER              = 7714
 };
 
 class npc_riggle_bassbait : public CreatureScript
