@@ -15972,12 +15972,6 @@ uint32 Player::GetSpellCooldownDelay(uint32 spell_id) const
     return uint32(itr != m_spellCooldowns.end() && itr->second.end > getMSTime() ? itr->second.end - getMSTime() : 0);
 }
 
-void Player::ResetSpeakTimers()
-{
-    m_speakTime = 0;
-    m_speakCount = 0;
-}
-
 std::string Player::GetDebugInfo() const
 {
     std::stringstream sstr;
