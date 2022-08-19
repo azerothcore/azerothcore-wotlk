@@ -220,17 +220,17 @@ enum FishingExtravaganzaWorldStates
 
 enum RiggleBassbait
 {
-    RIGGLE_SAY_START                    = 0,
-    RIGGLE_SAY_POOLS_END                = 1,
-    RIGGLE_SAY_WINNER                   = 2,
+    RIGGLE_SAY_START            = 0,
+    RIGGLE_SAY_POOLS_END        = 1,
+    RIGGLE_SAY_WINNER           = 2,
 
-    QUEST_MASTER_ANGLER                 = 8193,
+    QUEST_MASTER_ANGLER         = 8193,
 
-    EVENT_FISHING_TURN_INS              = 90,
-    EVENT_FISHING_POOLS                 = 15,
+    EVENT_FISHING_TURN_INS      = 90,
+    EVENT_FISHING_POOLS         = 15,
 
-    GOSSIP_EVENT_ACTIVE            = 7614,
-    GOSSIP_EVENT_OVER              = 7714
+    GOSSIP_EVENT_ACTIVE         = 7614,
+    GOSSIP_EVENT_OVER           = 7714
 };
 
 class npc_riggle_bassbait : public CreatureScript
@@ -314,11 +314,11 @@ public:
 
         if (sWorld->getWorldState(STV_FISHING_HAS_WINNER))
         {
-            SendGossipMenuFor(player, GOSSIP_TEXT_EVENT_OVER, creature->GetGUID());
+            SendGossipMenuFor(player, GOSSIP_EVENT_OVER, creature->GetGUID());
         }
         else
         {
-            SendGossipMenuFor(player, GOSSIP_TEXT_EVENT_ACTIVE, creature->GetGUID());
+            SendGossipMenuFor(player, GOSSIP_EVENT_ACTIVE, creature->GetGUID());
         }
         return true;
     }
