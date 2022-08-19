@@ -60,18 +60,6 @@ void WorldSession::HandleLfgJoinOpcode(WorldPackets::LFG::LFGJoin& packet)
         return;
     }
 
-    if (_player->IsInCombat())
-    {
-        _player->GetSession()->SendNotification(LANG_YOU_IN_COMBAT);
-        return;
-    }
-
-    if (!_player->IsAlive())
-    {
-        _player->GetSession()->SendNotification("You are not alive");
-        return;
-    }
-
     lfg::LfgDungeonSet newDungeons;
     for (uint32 slot : packet.Slots)
     {
