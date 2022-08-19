@@ -218,7 +218,7 @@ enum fishingExtravaganzaWorldStates
     STV_FISHING_ANNOUNCE_POOLS_DESPAN   = 200
 };
 
-enum riggleBassbait
+enum RiggleBassbait
 {
     RIGGLE_SAY_START                    = 0,
     RIGGLE_SAY_POOLS_END                = 1,
