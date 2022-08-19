@@ -1,0 +1,3 @@
+Start
+INSERT INTO `game_tele` VALUES (1492, 131.828, 1012.28, 295.271, 5.48354, 37, 'Start');
+
