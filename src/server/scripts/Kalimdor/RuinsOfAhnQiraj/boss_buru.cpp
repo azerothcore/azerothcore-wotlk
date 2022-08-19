@@ -114,6 +114,7 @@ struct boss_buru : public BossAI
             return;
 
         me->RemoveAurasDueToSpell(SPELL_GATHERING_SPEED);
+        events.CancelEvent(EVENT_GATHERING_SPEED);
         events.ScheduleEvent(EVENT_GATHERING_SPEED, 2s);
         if (Unit* victim = SelectTarget(SelectTargetMethod::Random, 0, 0.f, true))
         {
