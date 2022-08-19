@@ -45,9 +45,8 @@ enum Events
 {
     EVENT_DISMEMBER             = 1,
     EVENT_GATHERING_SPEED       = 2,
-    EVENT_FULL_SPEED            = 3,
-    EVENT_CREEPING_PLAGUE       = 4,
-    EVENT_RESPAWN_EGG           = 5,
+    EVENT_CREEPING_PLAGUE       = 3,
+    EVENT_RESPAWN_EGG           = 4,
 };
 
 enum Phases
@@ -81,13 +80,13 @@ struct boss_buru : public BossAI
     void EnterCombat(Unit* who) override
     {
         BossAI::EnterCombat(who);
+        me->AddThreat(who, 1000000.f);
         Talk(EMOTE_TARGET, who);
         DoCastSelf(SPELL_THORNS);
         ManipulateEggs(true);
         me->RemoveAurasDueToSpell(SPELL_FULL_SPEED);
         events.ScheduleEvent(EVENT_DISMEMBER, 5s);
-        events.ScheduleEvent(EVENT_GATHERING_SPEED, 9s);
-        events.ScheduleEvent(EVENT_FULL_SPEED, 60s);
+        events.ScheduleEvent(EVENT_GATHERING_SPEED, 2s);
         _phase = PHASE_EGG;
     }
 
@@ -114,10 +113,8 @@ struct boss_buru : public BossAI
         if (_phase != PHASE_EGG)
             return;
 
-        me->RemoveAurasDueToSpell(SPELL_FULL_SPEED);
         me->RemoveAurasDueToSpell(SPELL_GATHERING_SPEED);
-        events.ScheduleEvent(EVENT_GATHERING_SPEED, 9s);
-        events.ScheduleEvent(EVENT_FULL_SPEED, 60s);
+        events.ScheduleEvent(EVENT_GATHERING_SPEED, 2s);
         if (Unit* victim = SelectTarget(SelectTargetMethod::Random, 0, 0.f, true))
         {
             DoResetThreat();
@@ -145,6 +142,7 @@ struct boss_buru : public BossAI
             DoCastSelf(SPELL_FULL_SPEED, true);
             ManipulateEggs(false);
             me->RemoveAurasDueToSpell(SPELL_THORNS);
+            me->RemoveAurasDueToSpell(SPELL_GATHERING_SPEED);
             events.Reset();
             _phase = PHASE_TRANSFORM;
             DoResetThreat();
@@ -171,9 +169,6 @@ struct boss_buru : public BossAI
                 case EVENT_GATHERING_SPEED:
                     DoCastSelf(SPELL_GATHERING_SPEED);
                     events.ScheduleEvent(EVENT_GATHERING_SPEED, 9s);
-                    break;
-                case EVENT_FULL_SPEED:
-                    DoCastSelf(SPELL_FULL_SPEED);
                     break;
                 case EVENT_CREEPING_PLAGUE:
                     DoCastAOE(SPELL_CREEPING_PLAGUE);
