@@ -1,3 +1,182 @@
+select entry, name, subname from creature_template where entry >= '179820';
+
 601014 - ALL MOUNTS VENDOR
 199999 - Profession NPC
 190010 - Transmog
+800000 - Gadgetzan Guard - Level 83
+800001 - Gadgetzan Innkeeper - Level 80
+
+entry   | name                               | subname                     |
++---------+------------------------------------+-----------------------------+
+|  179820 | Q-9759 Trigger Barrel Bomb         |                             |
+|  182753 | Kor'kron Honor Guard               |                             |
+|  182754 | Kor'kron Honor Guard               |                             |
+|  182755 | Kor'kron Warrior                   |                             |
+|  182756 | Kor'kron Warrior                   |                             |
+|  182757 | Kor'kron Warrior                   |                             |
+|  182758 | Kor'kron Warrior                   |                             |
+|  182759 | Kor'kron Warrior                   |                             |
+|  182760 | Kor'kron Warrior                   |                             |
+|  182761 | Kor'kron Warrior                   |                             |
+|  182762 | Kor'kron Warrior                   |                             |
+|  182763 | Kor'kron Warrior                   |                             |
+|  182764 | Kor'kron Warrior                   |                             |
+|  182765 | Kor'kron Warrior                   |                             |
+|  182766 | Kor'kron Warrior                   |                             |
+|  182767 | Kor'kron Warrior                   |                             |
+|  182768 | Kor'kron Warrior                   |                             |
+|  182769 | Kor'kron Warrior                   |                             |
+|  182770 | Kor'kron Warrior                   |                             |
+|  182771 | Kor'kron Warrior                   |                             |
+|  182772 | Kor'kron Warrior                   |                             |
+|  190010 | Warpweaver                         | Transmogrifier              |
+|  199999 | Kaylub                             | |cff00ccffProfessions NPC|r |
+|  601014 | The Mountain                       | Mount Trainer               |
+|  601500 | Alchemy                            | Recipes                     |
+|  601501 | Amulets                            | Armor                       |
+|  601502 | Arena Season 1                     | Item Sets                   |
+|  601503 | Arena Season 2                     | Item Sets                   |
+|  601504 | Arena Season 3                     | Item Sets                   |
+|  601505 | Arena Season 4                     | Item Sets                   |
+|  601506 | Arena Season 5 (Deadly Gladiator)  | Item Sets                   |
+|  601507 | Arena Season 5 (Hateful Gladiator) | Item Sets                   |
+|  601508 | Arena Season 5 (Savage Gladiator)  | Item Sets                   |
+|  601509 | Arena Season 6                     | Item Sets                   |
+|  601510 | Arena Season 7                     | Item Sets                   |
+|  601511 | Armor Tokens                       | Miscellaneous               |
+|  601512 | Bandages                           | Consumables                 |
+|  601513 | Blacksmithing                      | Recipes                     |
+|  601514 | Azuria                             | Gemstones                   |
+|  601515 | Books                              | Recipes                     |
+|  601516 | Bows                               | Weapons                     |
+|  601517 | Cloaks                             | Armor                       |
+|  601518 | Rezzaka                            | Cloth Goods                 |
+|  601519 | Commendations                      | Miscellaneous               |
+|  601520 | Containers                         | Miscellaneous               |
+|  601521 | Cooking                            | Recipes                     |
+|  601522 | Crafting                           | Trade Goods                 |
+|  601523 | Crossbows                          | Weapons                     |
+|  601524 | Trump                              | Currency Exchange           |
+|  601525 | Daggers                            | Weapons                     |
+|  601526 | Deathius                           | Glyphs                      |
+|  601527 | Druidius                           | Glyphs                      |
+|  601528 | Palatki                            | Elemental Goods             |
+|  601529 | Elixirs                            | Consumables                 |
+|  601530 | Enchanting                         | Recipes                     |
+|  601531 | Enchanting                         | Trade Goods                 |
+|  601532 | Engineering                        | Recipes                     |
+|  601533 | Epic Mounts                        | Miscellaneous               |
+|  601534 | First Aid                          | Recipes                     |
+|  601535 | Fishing                            | Recipes                     |
+|  601536 | Fishing Poles                      | Weapons                     |
+|  601537 | Fist Weapons                       | Weapons                     |
+|  601538 | Flasks                             | Consumables                 |
+|  601539 | Flying Mounts                      | Miscellaneous               |
+|  601540 | Gems                               | Trade Goods                 |
+|  601541 | Trailia                            | Gemstones                   |
+|  601542 | Guns                               | Weapons                     |
+|  601543 | Herbs                              | Trade Goods                 |
+|  601544 | Hierlooms                          | Weapons                     |
+|  601545 | Hierlooms                          | Armor                       |
+|  601546 | Hunterius                          | Glyphs                      |
+|  601547 | Inscription                        | Recipes                     |
+|  601548 | Inscription                        | Trade Goods                 |
+|  601549 | Item Enhancements (Permanent)      | Miscellaneous               |
+|  601550 | Item Enhancements (Temporary)      | Miscellaneous               |
+|  601551 | Jewelcrafting                      | Recipes                     |
+|  601552 | Jewelcrafting                      | Trade Goods                 |
+|  601553 | Keys                               | Miscellaneous               |
+|  601554 | Leather                            | Trade Goods                 |
+|  601555 | Leatherworking                     | Recipes                     |
+|  601556 | Legendary                          | Weapons                     |
+|  601557 | Magius                             | Glyphs                      |
+|  601558 | Cooking                            | Trade Goods                 |
+|  601559 | Metaria                            | Gemstones                   |
+|  601560 | Tovar                              | Metal & Stone Goods         |
+|  601561 | Mining                             | Recipes                     |
+|  601562 | Mounts                             | Miscellaneous               |
+|  601563 | Off-Hand                           | Armor                       |
+|  601564 | One-Handed Axes                    | Weapons                     |
+|  601565 | One-Handed Maces                   | Weapons                     |
+|  601566 | One-Handed Swords                  | Weapons                     |
+|  601567 | Emberia                            | Gemstones                   |
+|  601568 | Paladius                           | Glyphs                      |
+|  601569 | Pets                               | Miscellaneous               |
+|  601570 | Polearms                           | Weapons                     |
+|  601571 | Prismia                            | Gemstones                   |
+|  601572 | Projectiles                        | Miscellaneous               |
+|  601573 | Starria                            | Gemstones                   |
+|  601574 | Quivers                            | Miscellaneous               |
+|  601575 | Raid Tier 1                        | Item Sets                   |
+|  601576 | Raid Tier 2                        | Item Sets                   |
+|  601577 | Raid Tier 3                        | Item Sets                   |
+|  601578 | Raid Tier 4                        | Item Sets                   |
+|  601579 | Raid Tier 5                        | Item Sets                   |
+|  601580 | Raid Tier 6                        | Item Sets                   |
+|  601581 | Raid Tier 7                        | Item Sets                   |
+|  601582 | Raid Tier 7.5                      | Item Sets                   |
+|  601583 | Raid Tier 8                        | Item Sets                   |
+|  601584 | Raid Tier 8.5                      | Item Sets                   |
+|  601585 | Raid Tier 9 (Alliance)             | Item Sets                   |
+|  601586 | Raid Tier 9.5 (Alliance)           | Item Sets                   |
+|  601587 | Raid Tier 9.5 (Alliance-Heroic)    | Item Sets                   |
+|  601588 | Raid Tier 10                       | Item Sets                   |
+|  601589 | Raid Tier 10.5                     | Item Sets                   |
+|  601590 | Raid Tier 10.5 (Heroic)            | Item Sets                   |
+|  601591 | Reagents                           | Miscellaneous               |
+|  601592 | Crimsonia                          | Gemstones                   |
+|  601593 | Relics                             | Armor                       |
+|  601594 | Rings                              | Armor                       |
+|  601595 | Rogius                             | Glyphs                      |
+|  601596 | Scrolls                            | Consumables                 |
+|  601597 | Shamanius                          | Glyphs                      |
+|  601598 | Shields                            | Armor                       |
+|  601599 | Shirts                             | Armor                       |
+|  601600 | Staves                             | Weapons                     |
+|  601601 | Tabards                            | Armor                       |
+|  601602 | Tailoring                          | Recipes                     |
+|  601603 | Blizzard Collectables              | Miscellaneous               |
+|  601604 | Thrown                             | Weapons                     |
+|  601605 | Trinkets                           | Armor                       |
+|  601606 | Two-Handed Axes                    | Weapons                     |
+|  601607 | Two-Handed Maces                   | Weapons                     |
+|  601608 | Two-Handed Swords                  | Weapons                     |
+|  601609 | Wands                              | Weapons                     |
+|  601610 | Warloius                           | Glyphs                      |
+|  601611 | Warrius                            | Glyphs                      |
+|  601612 | Sunfloria                          | Gemstones                   |
+|  601613 | Priestius                          | Glyphs                      |
+|  601614 | Arena Season 8                     | Item Sets                   |
+|  601615 | PvP Accessories                    | Armor                       |
+|  601616 | Arena Season 1                     | Weapons                     |
+|  601617 | Arena Season 2                     | Weapons                     |
+|  601618 | Arena Season 3                     | Weapons                     |
+|  601619 | Arena Season 4                     | Weapons                     |
+|  601620 | Arena Season 5                     | Weapons                     |
+|  601621 | Arena Season 6                     | Weapons                     |
+|  601622 | Arena Season 7                     | Weapons                     |
+|  601623 | Arena Season 8                     | Weapons                     |
+|  601624 | Rings II                           | Armor                       |
+|  601625 | Blacksmithing II                   | Recipes                     |
+|  601626 | Enchanting II                      | Recipes                     |
+|  601627 | Tailoring II                       | Recipes                     |
+|  601628 | Leatherworking II                  | Recipes                     |
+|  601629 | Leatherworking III                 | Recipes                     |
+|  601630 | Jewelcrafting II                   | Recipes                     |
+|  601631 | Jewelcrafting III                  | Recipes                     |
+|  601632 | Raid Tier 9 (Horde)                | Item Sets                   |
+|  601633 | Raid Tier 9.5 (Horde)              | Item Sets                   |
+|  601634 | Raid Tier 9.5 (Horde-Heroic)       | Item Sets                   |
+|  601635 | Potions                            | Consumables                 |
+|  601636 | Weapon Enchant Scrolls             | Miscellaneous               |
+|  601637 | Armor Enchant Scrolls              | Miscellaneous               |
+|  601638 | Armor Enchant Scrolls II           | Miscellaneous               |
+|  601639 | Boots                              | Armor                       |
+|  601640 | Boots II                           | Armor                       |
+|  601641 | Belts                              | Armor                       |
+|  601642 | Belts II                           | Armor                       |
+|  601643 | Bracers                            | Armor                       |
+|  601644 | Bracers II                         | Armor                       |
+|  601645 | Blizzard                           | Blizzard Entertainment      |
+| 3460602 | Frost Sphere (2)                   |                             |
+| 3460603 | Frost Sphere (3)                   |                             
