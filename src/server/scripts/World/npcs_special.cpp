@@ -210,7 +210,7 @@ public:
 /*
  * Stranglethorn Vale Fishing Extravaganza World States
  */
-enum fishingExtravaganzaWorldStates
+enum FishingExtravaganzaWorldStates
 {
     STV_FISHING_PREV_WIN_TIME           = 197,
     STV_FISHING_HAS_WINNER              = 198,
