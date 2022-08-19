@@ -26,12 +26,14 @@ UPDATE `creature_text` SET `BroadcastTextId` = 10609, `Text`='And the Tastyfish 
 UPDATE `creature_text` SET `BroadcastTextId` = 10610, `Text`='We have a winner! $n has won FIRST PLACE in the tournament!' WHERE `CreatureID` = 15077 AND `GroupID` = 2;
 
 -- Fishbot 5000 quests: only available when event 90 (Turn-ins) is active
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`= 19 AND `SourceEntry` IN (8225,8224,8221);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (19,0,8225,0,0,12,0,90,0,0,0,0,0,'','Fishing Extravaganza - Turn-ins active'),
 (19,0,8224,0,0,12,0,90,0,0,0,0,0,'','Fishing Extravaganza - Turn-ins active'),
 (19,0,8221,0,0,12,0,90,0,0,0,0,0,'','Fishing Extravaganza - Turn-ins active');
 
 -- Jang quest: event 90 (Turn-ins) is active and event has a winner (world state id 198)
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`= 19 AND `SourceEntry`= 8194;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (19,0,8194,0,0,12,0,90,0,0,0,0,0,'','Fishing Extravaganza - Turn-ins active'),
 (19,0,8194,0,0,11,0,198,1,0,0,0,0,'','Fishing Extravaganza - fishing event has a winner');

@@ -226,8 +226,8 @@ enum RiggleBassbait
 
     QUEST_MASTER_ANGLER                 = 8193,
 
-    EVENT_FISHING_TURN_INS         = 90,
-    EVENT_FISHING_POOLS            = 15,
+    EVENT_FISHING_TURN_INS              = 90,
+    EVENT_FISHING_POOLS                 = 15,
 
     GOSSIP_TEXT_EVENT_ACTIVE            = 7614,
     GOSSIP_TEXT_EVENT_OVER              = 7714
@@ -244,7 +244,7 @@ public:
         {
             m_uiTimer = 0;
             auto prevWinTime = sWorld->getWorldState(STV_FISHING_PREV_WIN_TIME);
-            if (time(nullptr) - prevWinTime > DAY)
+            if (GameTime::GetGameTime().count() - prevWinTime > DAY)
             {
                 // reset all after 1 day
                 sWorld->setWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN, 1);
@@ -257,11 +257,11 @@ public:
 
         void CheckTournamentState() const
         {
-            if (sGameEventMgr->IsActiveEvent(GAME_EVENT_FISHING_TURN_INS) && !sWorld->getWorldState(STV_FISHING_HAS_WINNER))
+            if (sGameEventMgr->IsActiveEvent(EVENT_FISHING_TURN_INS) && !sWorld->getWorldState(STV_FISHING_HAS_WINNER))
             {
                 if (!me->IsQuestGiver())
                 {
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                 }
                 if (sWorld->getWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN))
                 {
@@ -273,10 +273,10 @@ public:
             {
                 if (me->IsQuestGiver())
                 {
-                    me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                    me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                 }
             }
-            if (sGameEventMgr->IsActiveEvent(GAME_EVENT_FISHING_POOLS))
+            if (sGameEventMgr->IsActiveEvent(EVENT_FISHING_POOLS))
             {
                 // enable announcement: when pools despawn
                 sWorld->setWorldState(STV_FISHING_ANNOUNCE_POOLS_DESPAN, 1);
@@ -329,7 +329,7 @@ public:
         {
             creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
             sCreatureTextMgr->SendChat(creature, RIGGLE_SAY_WINNER, player, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
-            sWorld->setWorldState(STV_FISHING_PREV_WIN_TIME, time(nullptr));
+            sWorld->setWorldState(STV_FISHING_PREV_WIN_TIME, GameTime::GetGameTime().count());
             sWorld->setWorldState(STV_FISHING_HAS_WINNER, 1);
         }
         return true;
