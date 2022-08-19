@@ -59,8 +59,13 @@ INSERT INTO `eluna_teleporter` (id, parent, type, faction, icon, name, map, x, y
 ('36', '5', '2', '-1', '2', 'Blade\'s Edge Arena', '530', '2910.000', '5976.000', '2.000', '4.000');
 
 -- Custom additions
--- Starter location
-INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (47, 0, 2, -1, 2, 'Ashzara Crater', 37, 131.000, 1012.000, 295.000, 5.000);
+-- Starter locations
+INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (47, 0, 1, -1, 2, 'Ashzara Crater', 37, 131.000, 1012.000, 295.000, 5.000);
+INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (48, 47, 2, -1, 2, 'Startcamp', 37, 131.000, 1012.000, 295.000, 5.000);
+INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (49, 47, 2, -1, 2, 'Start2', 37, -117.003, 850.815, 294.579, 5.58488);
+INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (50, 47, 2, -1, 2, 'Start3', 37, 147.987, 269.417, 273.524, 1.22673);
+INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (51, 47, 2, -1, 2, 'Start4', 37, 902.614, 154.535, 285.419, 3.56091);
+INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (52, 47, 2, -1, 2, 'Start5', 37, 865.102, 438.741, 281.501, 3.79633);
 
 -- Custom Menu
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES ('63', '0', '1', '-1', '0', 'Custom Stuff', null, null, null, null, null);

@@ -1,3 +1,8 @@
 Start
 INSERT INTO `game_tele` VALUES (1492, 131.828, 1012.28, 295.271, 5.48354, 37, 'Start');
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1493, -117.003, 850.815, 294.579, 5.58488, 37, 'start2');
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1494, 147.987, 269.417, 273.524, 1.22673, 37, 'start3');
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1495, 902.614, 154.535, 285.419, 3.56091, 37, 'start4');
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1496, 865.102, 438.741, 281.501, 3.79633, 37, 'start5');
+
 
