@@ -23,6 +23,8 @@ void AddSC_outdoorpvp_si();
 void AddSC_outdoorpvp_tf();
 void AddSC_outdoorpvp_zm();
 void AddSC_outdoorpvp_gh();
+void AddSC_outdoorpvp_autogroup();
+void AddSC_outdoorpvp_hl();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
@@ -35,4 +37,6 @@ void AddOutdoorPvPScripts()
     AddSC_outdoorpvp_tf();
     AddSC_outdoorpvp_zm();
     AddSC_outdoorpvp_gh();
+    AddSC_outdoorpvp_autogroup();
+    AddSC_outdoorpvp_hl();
 }
