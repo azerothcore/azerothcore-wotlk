@@ -1,16 +1,16 @@
 -- Add formation linking to stationary packs in AQ40
 DELETE FROM `creature_formations` WHERE `leaderguid` IN (87595, 87598, 87606, 87604, 87615, 87625, 87621, 87622, 88077, 87657, 87656, 87655, 87654);
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES 
---Brainwasher Pack .go xyz -8428.73 2047.70 116.1214 531 0.44
+/* Brainwasher Pack .go xyz -8428.73 2047.70 116.1214 531 0.44 */
 (87595, 87595, 0, 0, 3, 0, 0),
 (87595, 87596, 0, 0, 3, 0, 0),
 (87595, 87597, 0, 0, 3, 0, 0),
---Brainwasher Pack .go xyz -8565 1943 2.68527 531 2.3
+/* Brainwasher Pack .go xyz -8565 1943 2.68527 531 2.3 */
 (87598, 87598, 0, 0, 3, 0, 0),
 (87598, 87599, 0, 0, 3, 0, 0),
 (87598, 87600, 0, 0, 3, 0, 0),
 (87598, 87608, 0, 0, 3, 0, 0),
---Two Brainwasher & Guardian packs .go xyz -8591.233 2074.435303 -1.465834 531 1.544
+/* Two Brainwasher & Guardian packs .go xyz -8591.233 2074.435303 -1.465834 531 1.544 */
 (87606, 87606, 0, 0, 3, 0, 0),
 (87606, 87607, 0, 0, 3, 0, 0),
 (87606, 87612, 0, 0, 3, 0, 0),
@@ -21,14 +21,14 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (87604, 87609, 0, 0, 3, 0, 0),
 (87604, 87610, 0, 0, 3, 0, 0),
 (87604, 87611, 0, 0, 3, 0, 0),
---Vekniss Guardian pack .go xyz -8432.95 2034.7 8.914 531 0.396
+/* Vekniss Guardian pack .go xyz -8432.95 2034.7 8.914 531 0.396 */
 (87615, 87615, 0, 0, 3, 0, 0),
 (87615, 87616, 0, 0, 3, 0, 0),
 (87615, 87617, 0, 0, 3, 0, 0),
 (87615, 87618, 0, 0, 3, 0, 0),
 (87615, 87619, 0, 0, 3, 0, 0),
 (87615, 87620, 0, 0, 3, 0, 0),
---Vekniss Guardian Tunnel, 3 packs .go xyz -8406.5 1999.4 7.9 531 5
+/* Vekniss Guardian Tunnel, 3 packs .go xyz -8406.5 1999.4 7.9 531 5 */
 (87625, 87625, 0, 0, 3, 0, 0),
 (87625, 87628, 0, 0, 3, 0, 0),
 (87625, 87631, 0, 0, 3, 0, 0),
@@ -47,14 +47,14 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (87622, 87632, 0, 0, 3, 0, 0),
 (87622, 87637, 0, 0, 3, 0, 0),
 (87622, 87638, 0, 0, 3, 0, 0),
---Anubisath Defender tunnel .go xyz -8958 1263 -112.3 531 4.9
+/* Anubisath Defender tunnel .go xyz -8958 1263 -112.3 531 4.9 */
 (88077, 88077, 0, 0, 1, 0, 0),
 (88077, 88015, 0, 0, 1, 0, 0),
 (88077, 88016, 0, 0, 1, 0, 0),
 (88077, 88017, 0, 0, 1, 0, 0),
 (88077, 88018, 0, 0, 1, 0, 0),
 (88077, 88019, 0, 0, 1, 0, 0),
---Anubisath Warder & Obsidian Nullifier 4 packs .go xyz -9160 1732 -41.186 531 0.865
+/* Anubisath Warder & Obsidian Nullifier 4 packs .go xyz -9160 1732 -41.186 531 0.865 */
 (87657, 87657, 0, 0, 3, 0, 0),
 (87657, 88028, 0, 0, 3, 0, 0),
 (87657, 88029, 0, 0, 3, 0, 0),
