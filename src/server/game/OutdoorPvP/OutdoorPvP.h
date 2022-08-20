@@ -21,6 +21,7 @@
 #include "SharedDefines.h"
 #include "Util.h"
 #include "ZoneScript.h"
+#include "ObjectGuid.h"
 
 class GameObject;
 
@@ -85,7 +86,7 @@ class Unit;
 struct GossipMenuItems;
 class OutdoorPvP;
 
-typedef GuidSet PlayerSet;
+//typedef GuidSet PlayerSet;
 
 class OPvPCapturePoint
 {
