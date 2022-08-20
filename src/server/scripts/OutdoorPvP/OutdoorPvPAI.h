@@ -10,6 +10,9 @@
 
 #include "ObjectGuid.h"
 #include "OutdoorPvP.h"
+#include "SharedDefines.h"
+#include "Util.h"
+#include "ZoneScript.h"
 
 using namespace std;
 

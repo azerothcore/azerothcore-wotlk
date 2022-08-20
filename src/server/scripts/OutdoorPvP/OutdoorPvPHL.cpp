@@ -10,6 +10,8 @@
     #include "OutdoorPvPHL.h"
     #include "Player.h"
     #include "OutdoorPvP.h"
+    #include "World.h"
+    #include "WorldPacket.h"
 
     OutdoorPvPHL::OutdoorPvPHL()
     {

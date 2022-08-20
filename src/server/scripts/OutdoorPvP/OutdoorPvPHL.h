@@ -15,6 +15,9 @@
     #include "Chat.h"
 	#include "Player.h"
     #include "ObjectGuid.h"
+    #include "SharedDefines.h"
+    #include "Util.h"
+    #include "ZoneScript.h"
 
     using namespace std;
 

@@ -32,7 +32,8 @@ bool OutdoorPvPAI::SetupOutdoorPvP()
 
 Group * OutdoorPvPAI::GetFreeBfRaid(uint32 TeamId)
 {
-    for(GuidSet::const_iterator itr=m_Groups[TeamId].begin();itr!=m_Groups[TeamId].end();++itr)
+    GuidSet::iterator itr;
+    for(itr=m_Groups[TeamId].begin();itr!=m_Groups[TeamId].end();++itr)
     {
            Group* group = sGroupMgr->GetGroupByGUID(*itr);
            if (!group->IsFull())
@@ -82,7 +83,8 @@ void OutdoorPvPAI::HandlePlayerEnterZone(Player* player, uint32 zone)
 
 Group* OutdoorPvPAI::GetGroupPlayer(uint32 guid, uint32 TeamId)
 {
-    for(GuidSet::const_iterator itr=m_Groups[TeamId].begin();itr!=m_Groups[TeamId].end();++itr)
+    GuidSet::iterator itr;
+    for(itr=m_Groups[TeamId].begin();itr!=m_Groups[TeamId].end();++itr)
     {
         if (Group* group = sGroupMgr->GetGroupByGUID(*itr))
             if (group->IsMember(guid))
