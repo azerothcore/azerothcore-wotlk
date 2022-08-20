@@ -54,15 +54,15 @@
         //else
             //snprintf(message, 250, "[Hinterland Verteidigung]: Die Horde hat %u Ressourcen uebrig!", m_horde_gathered);
 
-        if (HL_RESOURCES_A <= 250)
-        {
-            sWorld->SendZoneText(zone, "[Hinterland Verteidigung]: Die Allianz hat noch %u Ressourcen uebrig!", TEAM_ALLIANCE);
-        }
+        //if (HL_RESOURCES_A <= 250)
+        //{
+        //    sWorld->SendZoneText(zone, "[Hinterland Verteidigung]: Die Allianz hat noch %u Ressourcen uebrig!", TEAM_ALLIANCE);
+        //}
 
-        if (HL_RESOURCES_H <= 250)
-        {
-            sWorld->SendZoneText(zone, "[Hinterland Verteidigung]: Die Horde hat %u Ressourcen uebrig!", TEAM_HORDE);
-        }           
+        //if (HL_RESOURCES_H <= 250)
+        //{
+        //    sWorld->SendZoneText(zone, "[Hinterland Verteidigung]: Die Horde hat %u Ressourcen uebrig!", TEAM_HORDE);
+        //}           
              
         // player->MonsterTextEmote(message, player->GetGUID());
         OutdoorPvP::HandlePlayerEnterZone(player, zone);
