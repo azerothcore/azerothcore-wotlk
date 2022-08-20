@@ -85,10 +85,12 @@ void OutdoorPvPAI::HandlePlayerEnterZone(Player* player, uint32 zone)
 
 Group* OutdoorPvPAI::GetGroupPlayer(uint32 guid, uint32 TeamId)
 {
+    int itrtemp;
     GuidSet::iterator itr;
     for(itr=m_Groups[TeamId].begin();itr!=m_Groups[TeamId].end();++itr)
     {
-        if (Group* group = sGroupMgr->GetGroupByGUID(*itr))
+        itrtemp = (int) itr;
+        if (Group* group = sGroupMgr->GetGroupByGUID(itrtemp))
             if (group->IsMember(guid))
                 return group;
     }
