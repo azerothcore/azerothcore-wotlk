@@ -32,11 +32,11 @@ bool OutdoorPvPAI::SetupOutdoorPvP()
 
 Group * OutdoorPvPAI::GetFreeBfRaid(uint32 TeamId)
 {
-    int itrtemp;
+    uint32 itrtemp;
     GuidSet::iterator itr;
     for(itr =m_Groups[TeamId].begin();itr!=m_Groups[TeamId].end();++itr)
     {
-        itrtemp = (int) itr;
+        itrtemp = (uint32) itr;
            Group* group = sGroupMgr->GetGroupByGUID(itrtemp);
            if (!group->IsFull())
                return group;
