@@ -9,6 +9,7 @@
 #define OUTDOOR_PVP_AI_
 
 #include "OutdoorPvP.h"
+using namespace std;
 
 #define OutdoorPvPHPBuffZonesNum 1
 const uint32 OutdoorPvPHPBuffZones[OutdoorPvPHPBuffZonesNum] = { 47 }; // Westfall 40 Mapid ;)
@@ -16,7 +17,7 @@ const uint32 OutdoorPvPHPBuffZones[OutdoorPvPHPBuffZonesNum] = { 47 }; // Westfa
 //typedef std::set<Player*> PlayerSet;
 typedef std::set<Player> PlayerSet;
 //typedef std::set<uint64> GuidSet;
-typedef std::set<ObjectGuid> GuidSet;
+typedef std::set<Player> GuidSet;
 
 class OutdoorPvPAI : public OutdoorPvP
 {

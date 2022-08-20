@@ -52,11 +52,12 @@
 			Hordeboss = 14996
     };
 
+/* OutdoorPvPHL Related */
     class OutdoorPvPHL : public OutdoorPvP
     {
-        public:
-            /* OutdoorPvPHL Related */
-            class OutdoorPvPHL();
+        public:            
+            OutdoorPvPHL();
+
             bool SetupOutdoorPvP();
 
             /* Handle Player Action */
