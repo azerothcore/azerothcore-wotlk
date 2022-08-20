@@ -253,6 +253,7 @@ class ObjectGuid
 
 // Some Shared defines
 typedef std::set<ObjectGuid> GuidSet;
+typedef std::set<Player*> PlayerSet;
 typedef std::list<ObjectGuid> GuidList;
 typedef std::deque<ObjectGuid> GuidDeque;
 typedef std::vector<ObjectGuid> GuidVector;

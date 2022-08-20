@@ -34,10 +34,10 @@ enum OutdoorPvPTypes
     OUTDOOR_PVP_EP = 6,
     OUTDOOR_PVP_GH = 7,
     OUTDOOR_PVP_AI = 8,
-    OUTDOOR_PVP_HL = 9,
+    OUTDOOR_PVP_HL = 9;
 };
 
-#define MAX_OUTDOORPVP_TYPES 10
+#define MAX_OUTDOORPVP_TYPES 8
 
 enum ObjectiveStates
 {

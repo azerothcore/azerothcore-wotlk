@@ -52,16 +52,14 @@
         //else
             //snprintf(message, 250, "[Hinterland Verteidigung]: Die Horde hat %u Ressourcen uebrig!", m_horde_gathered);
 
-        if HL_RESOURCES_A <= 250
+        if (HL_RESOURCES_A <= 250)
         {
             sWorld->SendZoneText(zone, "[Hinterland Verteidigung]: Die Allianz hat noch %u Ressourcen uebrig!", TEAM_ALLIANCE);
-            break;
         }
 
-        if HL_RESOURCES_H <= 250
+        if (HL_RESOURCES_H <= 250)
         {
             sWorld->SendZoneText(zone, "[Hinterland Verteidigung]: Die Horde hat %u Ressourcen uebrig!", TEAM_HORDE);
-            break;
         }           
              
         // player->MonsterTextEmote(message, player->GetGUID());
@@ -84,6 +82,7 @@
     void OutdoorPvPHL::PlaySounds(bool side)
     {
         SessionMap m_sessions = sWorld->GetAllSessions();
+        SessionMap::iterator itr;
         for(SessionMap::iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
         {
             for (uint8 i = 0; i < OutdoorPvPHLBuffZonesNum; ++i)
