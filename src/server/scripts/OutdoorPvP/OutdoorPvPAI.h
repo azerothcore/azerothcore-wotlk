@@ -21,8 +21,7 @@ const uint32 OutdoorPvPHPBuffZones[OutdoorPvPHPBuffZonesNum] = { 47 }; // Westfa
 class OutdoorPvPAI : public OutdoorPvP
 {
    public:
-
-        void OUTDOOR_PVP_AI();
+        OUTDOOR_PVP_AI();
         
         bool SetupOutdoorPvP();
         bool AddOrSetPlayerToCorrectBfGroup(Player *plr);

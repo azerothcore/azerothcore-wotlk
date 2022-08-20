@@ -13,7 +13,7 @@
 
     OutdoorPvPHL::OutdoorPvPHL()
     {
-        m_TypeId = OutdoorPvPHL;
+        m_TypeId = OUTDOOR_PVP_HL;
 
         m_ally_gathered = HL_RESOURCES_A;
         m_horde_gathered = HL_RESOURCES_H;
