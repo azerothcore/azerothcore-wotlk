@@ -24,7 +24,7 @@ INSERT INTO `script_waypoint` (`entry`, `pointid`, `location_x`, `location_y`, `
 DELETE FROM `gossip_menu_option` WHERE `menuid`=7048;
 INSERT INTO `gossip_menu_option` (`menuid`, `optionId`, `optionicon`, `optiontext`, `optiontype`, `optionnpcflag`, `actionmenuid`, `actionpoiid`, `boxcoded`, `boxmoney`, `boxtext`) VALUES 
 (7048, 0, 1, 'Let me see your goods', 3, 128, 0, 0, 0, 0, ''), -- 15471
-(7048, 1, 0, 'I would be happy to support you in the fight!', 1, 1, 0, 0, 0, 0, '');
+(7048, 1, 0, 'Let\'s find out.', 1, 1, 0, 0, 0, 0, '');
 
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` IN (14,15) AND `SourceGroup`=7048;
 INSERT INTO `conditions` VALUES

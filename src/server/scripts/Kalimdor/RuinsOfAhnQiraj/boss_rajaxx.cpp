@@ -174,8 +174,6 @@ struct npc_general_andorov : public npc_escortAI
 
     void InitializeAI() override
     {
-        me->SetImmuneToNPC(true);
-        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         me->SetReactState(REACT_PASSIVE);
 
         for (uint8 i = 0; i < 4; ++i)
@@ -196,6 +194,9 @@ struct npc_general_andorov : public npc_escortAI
         _paused = false;
 
         Start(false, true);
+
+        me->SetImmuneToNPC(true);
+        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
     }
 
     void JustSummoned(Creature* summon) override

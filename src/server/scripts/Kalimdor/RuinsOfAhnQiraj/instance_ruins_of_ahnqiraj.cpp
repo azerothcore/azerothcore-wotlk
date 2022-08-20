@@ -182,7 +182,8 @@ public:
                             case NPC_PAKKON:
                             case NPC_ZERRAN:
                                 _scheduler.CancelAll();
-                                _scheduler.Schedule(1s, [this, formation](TaskContext /*context*/) {
+                                _scheduler.Schedule(1s, [this, formation](TaskContext /*context*/)
+                                {
                                     if (!formation->IsAnyMemberAlive())
                                     {
                                         CallNextRajaxxLeader(true);
