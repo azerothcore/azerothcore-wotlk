@@ -8,6 +8,7 @@
             Now: Released - 5/4/2012
 */
     #include "OutdoorPvPHL.h"
+    #include "Player.h"
 
     OutdoorPvPHL::OutdoorPvPHL()
     {
@@ -44,19 +45,32 @@
 		m_ally_gathered = HL_RESOURCES_A;
 		m_horde_gathered = HL_RESOURCES_H;
 
-        char message[250];
-        if(player->GetTeam() == ALLIANCE)
-            snprintf(message, 250, "[Hinterland Verteidigung]: Die Allianz hat noch %u Ressourcen �brig!", m_ally_gathered);
-        else
-            snprintf(message, 250, "[Hinterland Verteidigung]: Die Horde hat %u Ressourcen �brig!", m_horde_gathered);
+        //char message[250];
+        //if(player->GetTeam() == ALLIANCE)
+            //snprintf(message, 250, "[Hinterland Verteidigung]: Die Allianz hat noch %u Ressourcen uebrig!", m_ally_gathered);
+        //else
+            //snprintf(message, 250, "[Hinterland Verteidigung]: Die Horde hat %u Ressourcen uebrig!", m_horde_gathered);
 
+        if HL_RESOURCES_A <= 250
+        {
+            sWorld->SendZoneText(zone, "[Hinterland Verteidigung]: Die Allianz hat noch %u Ressourcen uebrig!", TEAM_ALLIANCE);
+            break;
+        }
+
+        if HL_RESOURCES_H <= 250
+        {
+            sWorld->SendZoneText(zone, "[Hinterland Verteidigung]: Die Horde hat %u Ressourcen uebrig!", TEAM_HORDE);
+            break;
+        }           
+             
         // player->MonsterTextEmote(message, player->GetGUID());
         OutdoorPvP::HandlePlayerEnterZone(player, zone);
     }
 
     void OutdoorPvPHL::HandlePlayerLeaveZone(Player* player, uint32 zone)
     {
-        player->MonsterTextEmote("Du verl�sst die Zone, w�hrend ein PvP-Kampf l�uft!", player->GetGUID());
+        //player->MonsterTextEmote("Du verl�sst die Zone, w�hrend ein PvP-Kampf l�uft!", player->GetGUID());
+        player->TextEmote("Du verlaesst die Zone, waehrend ein PvP-Kampf laeuft!");
         OutdoorPvP::HandlePlayerLeaveZone(player, zone);
     }
 
@@ -78,7 +92,7 @@
 
                 if(itr->second->GetPlayer()->GetZoneId() == OutdoorPvPHLBuffZones[i])
                 {
-                    if(itr->second->GetPlayer()->GetTeam() == ALLIANCE && side == true)
+                    if(itr->second->GetPlayer()->GetTeamId() == TEAM_ALLIANCE && side == true)
                         itr->second->GetPlayer()->PlayDirectSound(HL_SOUND_ALLIANCE_GOOD, itr->second->GetPlayer());
                     else
                         itr->second->GetPlayer()->PlayDirectSound(HL_SOUND_HORDE_GOOD, itr->second->GetPlayer());
@@ -151,12 +165,12 @@
         OutdoorPvP::Update(diff);
         if(m_FirstLoad == false)
         {
-            if(m_LastWin == ALLIANCE)
-                sLog->outString("[OutdoorPvPHL]: Die Schlacht um das Hinterland hat begonnen! Letzter Sieger: Alliance(%u)", ALLIANCE);
-            else if(m_LastWin == HORDE)
-                sLog->outString("[OutdoorPvPHL]: Die Schlacht um das Hinterland hat begonnen! Letzter Sieger: Horde(%u)", HORDE);
-            else if(m_LastWin == 0)
-                sLog->outString("[OutdoorPvPHL]: Die Schlacht um das Hinterland hat begonnen! Es gab letztes mal keinen Sieger!(0)");
+            //if(m_LastWin == ALLIANCE)
+                //sLog->outmessage("[OutdoorPvPHL]: Die Schlacht um das Hinterland hat begonnen! Letzter Sieger: Alliance(%u)", ALLIANCE);
+            //else if(m_LastWin == HORDE)
+                //sLog->outString("[OutdoorPvPHL]: Die Schlacht um das Hinterland hat begonnen! Letzter Sieger: Horde(%u)", HORDE);
+            //else if(m_LastWin == 0)
+                //sLog->outString("[OutdoorPvPHL]: Die Schlacht um das Hinterland hat begonnen! Es gab letztes mal keinen Sieger!(0)");
 
             m_FirstLoad = true;
         }
@@ -293,7 +307,7 @@
                             itr->second->GetPlayer()->GetGUID());
                             HandleWinMessage("F�r die Allianz!");
                             HandleRewards(itr->second->GetPlayer(), 1500, true, false, false);
-                            switch(itr->second->GetPlayer()->GetTeam())
+                            switch(itr->second->GetPlayer()->GetTeamId())
                             {
                                 case ALLIANCE:
                                     HandleBuffs(itr->second->GetPlayer(), false);
@@ -354,7 +368,7 @@
             if(player->GetGUID() != killed->GetGUID())
                     return;
      
-            switch(killed->ToPlayer()->GetTeam())
+            switch(killed->ToPlayer()->GetTeamId())
             {
                case ALLIANCE:
                     m_ally_gathered -= PointsLoseOnPvPKill;
@@ -370,7 +384,7 @@
         }
         else // If is something besides a player
         {
-            if(player->GetTeam() == ALLIANCE)
+            if(player->GetTeamId() == ALLIANCE)
             {
                 switch(killed->GetEntry()) // Alliance killing horde guards
                 {
