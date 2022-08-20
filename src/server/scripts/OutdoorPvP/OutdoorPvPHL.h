@@ -14,6 +14,7 @@
     #include "OutdoorPvPMgr.h"
     #include "Chat.h"
 	#include "Player.h"
+    #include "ObjectGuid.h"
 
     using namespace std;
 
