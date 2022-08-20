@@ -9,6 +9,7 @@
 #define OUTDOOR_PVP_AI_
 
 #include "OutdoorPvP.h"
+
 using namespace std;
 
 #define OutdoorPvPHPBuffZonesNum 1
