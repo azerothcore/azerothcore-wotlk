@@ -68,7 +68,9 @@ enum Creatures
     NPC_XURREM                  = 15390,
     NPC_YEGGETH                 = 15386,
     NPC_PAKKON                  = 15388,
-    NPC_ZERRAN                  = 15385
+    NPC_ZERRAN                  = 15385,
+    NPC_QIRAJI_WARRIOR          = 15387,
+    NPC_SWARMGUARD_NEEDLER      = 15344
 };
 
 enum GameObjects

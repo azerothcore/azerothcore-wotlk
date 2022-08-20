@@ -101,6 +101,17 @@ public:
                     _sandVortexes.push_back(creature->GetGUID());
                     creature->SetVisible(false);
                     break;
+                case NPC_QUUEZ:
+                case NPC_TUUBID:
+                case NPC_DRENN:
+                case NPC_XURREM:
+                case NPC_YEGGETH:
+                case NPC_PAKKON:
+                case NPC_ZERRAN:
+                case NPC_QIRAJI_WARRIOR:
+                case NPC_SWARMGUARD_NEEDLER:
+                    creature->SetNoCallAssistance(true);
+                    break;
             }
         }
 
