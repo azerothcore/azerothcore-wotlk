@@ -79,7 +79,8 @@ Group* OutdoorPvPAI::GetGroupPlayer(uint32 guid, uint32 TeamId)
 {
     for(GuidSet::const_iterator itr=m_Groups[TeamId].begin();itr!=m_Groups[TeamId].end();++itr)
     {
-        if (Group* group = sGroupMgr->GetGroupByGUID(guid))
+        temp = ObjectGuid::Create<HighGuid::Item>(guid);
+        if (Group* group = sGroupMgr->GetGroupByGUID(temp))
             if (group->IsMember(guid))
                 return group;
     }
