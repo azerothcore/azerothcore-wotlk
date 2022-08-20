@@ -56,7 +56,7 @@
     {
         public:
             /* OutdoorPvPHL Related */
-            OutdoorPvPHL();
+            class OutdoorPvPHL();
             bool SetupOutdoorPvP();
 
             /* Handle Player Action */

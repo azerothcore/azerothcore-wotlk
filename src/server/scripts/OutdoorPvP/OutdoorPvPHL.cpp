@@ -118,7 +118,7 @@
         limit_resources_message_A = 0;
         limit_resources_message_H = 0;
 
-        sLog->outString("[OutdoorPvPHL]: Hinterland: Reset Hinterland BG");
+        //sLog->outMessage("[OutdoorPvPHL]: Hinterland: Reset Hinterland BG", 1,);
     }
 
     void OutdoorPvPHL::HandleBuffs(Player* player, bool loser)
@@ -255,12 +255,12 @@
                     if(limit_resources_message_A == 1 || limit_resources_message_A == 2 || limit_resources_message_A == 3)
                     {
                         snprintf(msg, 250, "[Hinterland Verteidigung]: Die Allianz hat nur noch %u Ressourcen �brig!", m_ally_gathered);
-                        itr->second->GetPlayer()->MonsterTextEmote(msg, itr->second->GetPlayer()->GetGUID());
+                        itr->second->GetPlayer()->TextEmote(msg);
                     }
                     else if(limit_resources_message_H == 1 || limit_resources_message_H == 2 || limit_resources_message_H == 3)
                     {
                         snprintf(msg, 250, "[Hinterland Verteidigung]: Die Horde hat nur noch %u Ressourcen �brig!", m_horde_gathered);
-                        itr->second->GetPlayer()->MonsterTextEmote(msg, itr->second->GetPlayer()->GetGUID());
+                        itr->second->GetPlayer()->TextEmote(msg);
                     }
      
                     if(IS_RESOURCE_MESSAGE_A == true)
@@ -268,17 +268,17 @@
                         if(limit_A == 1)
                         {
                             snprintf(msg, 250, "[Hinterland Verteidigung]: Die Allianz hat nur noch %u Ressourcen �brig!", m_ally_gathered);
-                            itr->second->GetPlayer()->MonsterTextEmote(msg, itr->second->GetPlayer()->GetGUID());
+                            itr->second->GetPlayer()->TextEmote(msg);
                             IS_RESOURCE_MESSAGE_A = false; // Reset
                         }
                         else if(limit_A == 2)
                         {
-                            itr->second->GetPlayer()->MonsterTextEmote("[Hinterland Verteidigung]: Die Allianz hat keine Ressourcen mehr �brig! Die Horde gewinnt!",
-                            itr->second->GetPlayer()->GetGUID());
+                            itr->second->GetPlayer()->TextEmote("[Hinterland Verteidigung]: Die Allianz hat keine Ressourcen mehr �brig! Die Horde gewinnt!");
+                            itr->second->GetPlayer()->GetGUID();
                             HandleWinMessage("Lok'thar ogar!");
                             HandleRewards(itr->second->GetPlayer(), 1500, true, false, false);
                             
-                            switch(itr->second->GetPlayer()->GetTeam())
+                            switch(itr->second->GetPlayer()->GetTeamId())
                             {
                                 case ALLIANCE:
                                     HandleBuffs(itr->second->GetPlayer(), true);
@@ -298,13 +298,13 @@
                         if(limit_H == 1)
                         {
                             snprintf(msg, 250	, "[Hinterland Verteidigung]: Die Horde hat nurnoch %u Ressourcen �brig!", m_horde_gathered);
-                            itr->second->GetPlayer()->MonsterTextEmote(msg, itr->second->GetPlayer()->GetGUID());
+                            itr->second->GetPlayer()->TextEmote(msg);
                             IS_RESOURCE_MESSAGE_H = false; // Reset
                         }
                         else if(limit_H == 2)
                         {
-                            itr->second->GetPlayer()->MonsterTextEmote("[Hinterland Verteidigung]: Die Horde hat keine Ressourcen mehr �brig! Die Allianz gewinnt!",
-                            itr->second->GetPlayer()->GetGUID());
+                            itr->second->GetPlayer()->TextEmote("[Hinterland Verteidigung]: Die Horde hat keine Ressourcen mehr �brig! Die Allianz gewinnt!");
+                            itr->second->GetPlayer()->GetGUID();
                             HandleWinMessage("F�r die Allianz!");
                             HandleRewards(itr->second->GetPlayer(), 1500, true, false, false);
                             switch(itr->second->GetPlayer()->GetTeamId())

@@ -27,7 +27,7 @@ Group * OutdoorPvPAI::GetFreeBfRaid(uint32 TeamId)
 {
     for(GuidSet::const_iterator itr=m_Groups[TeamId].begin();itr!=m_Groups[TeamId].end();++itr)
     {
-           Group* group = sGroupMgr->GetGroupByGUID(*itr);
+           Group* group = sGroupMgr->GetGroupByGUID(itr);
            if (!group->IsFull())
                return group;
     }

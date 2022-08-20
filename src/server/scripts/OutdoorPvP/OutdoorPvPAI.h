@@ -22,7 +22,7 @@ class OutdoorPvPAI : public OutdoorPvP
 {
    public:
 
-       OutdoorPvPAI();
+        void OUTDOOR_PVP_AI();
         
         bool SetupOutdoorPvP();
         bool AddOrSetPlayerToCorrectBfGroup(Player *plr);
