@@ -639,7 +639,7 @@ void BattlegroundMgr::SendToBattleground(Player* player, uint32 instanceId, Batt
         uint32 mapid = bg->GetMapId();
         Position const* pos = bg->GetTeamStartPosition(player->GetBgTeamId());
 
-        if (player->IsInCombat())
+        if (player->GetCharmGUID() || player->IsInCombat())
         {
             player->GetSession()->SendNotification(LANG_YOU_IN_COMBAT);
             return;
