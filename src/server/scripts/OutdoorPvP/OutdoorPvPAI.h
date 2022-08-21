@@ -25,7 +25,7 @@ class OutdoorPvPAI : public OutdoorPvP
         OutdoorPvPAI();
         
         bool SetupOutdoorPvP();
-        bool AddOrSetPlayerToCorrectBfGroup(Player player);
+        bool AddOrSetPlayerToCorrectBfGroup(Player *plr);
         void HandlePlayerEnterZone(Player* player, uint32 zone);
         void HandlePlayerLeaveZone(Player* player, uint32 zone);
         Group* GetFreeBfRaid(TeamId TeamId);
