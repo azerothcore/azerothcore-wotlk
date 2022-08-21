@@ -75,7 +75,7 @@ void OutdoorPvPAI::HandlePlayerEnterZone(Player* player, uint32 zone)
 	OutdoorPvP::HandlePlayerEnterZone(player, zone);
 }
 
-Group* OutdoorPvPAI::GetGroupPlayer(ObjectGuid guid, uint32 TeamId)
+Group* OutdoorPvPAI::GetGroupPlayer(uint32 guid, uint32 TeamId)
 {
     for(GuidSet::const_iterator itr=m_Groups[TeamId].begin();itr!=m_Groups[TeamId].end();++itr)
     {
