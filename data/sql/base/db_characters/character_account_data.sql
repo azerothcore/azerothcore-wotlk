@@ -15,12 +15,12 @@
 -- Dumpar struktur för tabell acore_characters.character_account_data
 DROP TABLE IF EXISTS `character_account_data`;
 CREATE TABLE IF NOT EXISTS `character_account_data` (
-  `guid` INT unsigned NOT NULL DEFAULT 0,
-  `type` TINYINT unsigned NOT NULL DEFAULT 0,
-  `time` INT unsigned NOT NULL DEFAULT 0,
+  `guid` int unsigned NOT NULL DEFAULT '0',
+  `type` tinyint unsigned NOT NULL DEFAULT '0',
+  `time` int unsigned NOT NULL DEFAULT '0',
   `data` blob NOT NULL,
   PRIMARY KEY (`guid`,`type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_characters.character_account_data: ~0 rows (ungefär)
 DELETE FROM `character_account_data`;

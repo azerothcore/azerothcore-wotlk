@@ -15,10 +15,10 @@
 -- Dumpar struktur för tabell acore_world.quest_mail_sender
 DROP TABLE IF EXISTS `quest_mail_sender`;
 CREATE TABLE IF NOT EXISTS `quest_mail_sender` (
-  `QuestId` INT unsigned NOT NULL DEFAULT 0,
-  `RewardMailSenderEntry` INT unsigned NOT NULL DEFAULT 0,
+  `QuestId` int unsigned NOT NULL DEFAULT '0',
+  `RewardMailSenderEntry` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`QuestId`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=COMPACT;
 
 -- Dumpar data för tabell acore_world.quest_mail_sender: ~10 rows (ungefär)
 DELETE FROM `quest_mail_sender`;

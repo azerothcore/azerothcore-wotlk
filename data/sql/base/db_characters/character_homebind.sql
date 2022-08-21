@@ -15,14 +15,14 @@
 -- Dumpar struktur för tabell acore_characters.character_homebind
 DROP TABLE IF EXISTS `character_homebind`;
 CREATE TABLE IF NOT EXISTS `character_homebind` (
-  `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
-  `mapId` SMALLINT unsigned NOT NULL DEFAULT 0 COMMENT 'Map Identifier',
-  `zoneId` SMALLINT unsigned NOT NULL DEFAULT 0 COMMENT 'Zone Identifier',
-  `posX` float NOT NULL DEFAULT 0,
-  `posY` float NOT NULL DEFAULT 0,
-  `posZ` float NOT NULL DEFAULT 0,
+  `guid` int unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
+  `mapId` smallint unsigned NOT NULL DEFAULT '0' COMMENT 'Map Identifier',
+  `zoneId` smallint unsigned NOT NULL DEFAULT '0' COMMENT 'Zone Identifier',
+  `posX` float NOT NULL DEFAULT '0',
+  `posY` float NOT NULL DEFAULT '0',
+  `posZ` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Player System';
 
 -- Dumpar data för tabell acore_characters.character_homebind: ~0 rows (ungefär)
 DELETE FROM `character_homebind`;

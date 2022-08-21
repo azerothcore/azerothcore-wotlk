@@ -15,15 +15,15 @@
 -- Dumpar struktur för tabell acore_world.lfg_dungeon_template
 DROP TABLE IF EXISTS `lfg_dungeon_template`;
 CREATE TABLE IF NOT EXISTS `lfg_dungeon_template` (
-  `dungeonId` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Unique id from LFGDungeons.dbc',
-  `name` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
-  `position_x` float NOT NULL DEFAULT 0,
-  `position_y` float NOT NULL DEFAULT 0,
-  `position_z` float NOT NULL DEFAULT 0,
-  `orientation` float NOT NULL DEFAULT 0,
-  `VerifiedBuild` SMALLINT DEFAULT 0,
+  `dungeonId` int unsigned NOT NULL DEFAULT '0' COMMENT 'Unique id from LFGDungeons.dbc',
+  `name` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+  `position_x` float NOT NULL DEFAULT '0',
+  `position_y` float NOT NULL DEFAULT '0',
+  `position_z` float NOT NULL DEFAULT '0',
+  `orientation` float NOT NULL DEFAULT '0',
+  `VerifiedBuild` smallint DEFAULT '0',
   PRIMARY KEY (`dungeonId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_world.lfg_dungeon_template: 21 rows
 DELETE FROM `lfg_dungeon_template`;

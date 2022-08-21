@@ -15,22 +15,22 @@
 -- Dumpar struktur för tabell acore_world.factiontemplate_dbc
 DROP TABLE IF EXISTS `factiontemplate_dbc`;
 CREATE TABLE IF NOT EXISTS `factiontemplate_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `Faction` INT NOT NULL DEFAULT 0,
-  `Flags` INT NOT NULL DEFAULT 0,
-  `FactionGroup` INT NOT NULL DEFAULT 0,
-  `FriendGroup` INT NOT NULL DEFAULT 0,
-  `EnemyGroup` INT NOT NULL DEFAULT 0,
-  `Enemies_1` INT NOT NULL DEFAULT 0,
-  `Enemies_2` INT NOT NULL DEFAULT 0,
-  `Enemies_3` INT NOT NULL DEFAULT 0,
-  `Enemies_4` INT NOT NULL DEFAULT 0,
-  `Friend_1` INT NOT NULL DEFAULT 0,
-  `Friend_2` INT NOT NULL DEFAULT 0,
-  `Friend_3` INT NOT NULL DEFAULT 0,
-  `Friend_4` INT NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `Faction` int NOT NULL DEFAULT '0',
+  `Flags` int NOT NULL DEFAULT '0',
+  `FactionGroup` int NOT NULL DEFAULT '0',
+  `FriendGroup` int NOT NULL DEFAULT '0',
+  `EnemyGroup` int NOT NULL DEFAULT '0',
+  `Enemies_1` int NOT NULL DEFAULT '0',
+  `Enemies_2` int NOT NULL DEFAULT '0',
+  `Enemies_3` int NOT NULL DEFAULT '0',
+  `Enemies_4` int NOT NULL DEFAULT '0',
+  `Friend_1` int NOT NULL DEFAULT '0',
+  `Friend_2` int NOT NULL DEFAULT '0',
+  `Friend_3` int NOT NULL DEFAULT '0',
+  `Friend_4` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_world.factiontemplate_dbc: 841 rows
 DELETE FROM `factiontemplate_dbc`;

@@ -15,14 +15,14 @@
 -- Dumpar struktur för tabell acore_world.disables
 DROP TABLE IF EXISTS `disables`;
 CREATE TABLE IF NOT EXISTS `disables` (
-  `sourceType` INT unsigned NOT NULL,
-  `entry` INT unsigned NOT NULL,
-  `flags` TINYINT unsigned NOT NULL DEFAULT 0,
-  `params_0` VARCHAR(255) NOT NULL DEFAULT '',
-  `params_1` VARCHAR(255) NOT NULL DEFAULT '',
-  `comment` VARCHAR(255) NOT NULL DEFAULT '',
+  `sourceType` int unsigned NOT NULL,
+  `entry` int unsigned NOT NULL,
+  `flags` tinyint unsigned NOT NULL DEFAULT '0',
+  `params_0` varchar(255) NOT NULL DEFAULT '',
+  `params_1` varchar(255) NOT NULL DEFAULT '',
+  `comment` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`sourceType`,`entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_world.disables: 904 rows
 DELETE FROM `disables`;

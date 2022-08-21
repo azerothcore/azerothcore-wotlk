@@ -15,10 +15,10 @@
 -- Dumpar struktur för tabell acore_world.exploration_basexp
 DROP TABLE IF EXISTS `exploration_basexp`;
 CREATE TABLE IF NOT EXISTS `exploration_basexp` (
-  `level` TINYINT unsigned NOT NULL DEFAULT 0,
-  `basexp` MEDIUMINT NOT NULL DEFAULT 0,
+  `level` tinyint unsigned NOT NULL DEFAULT '0',
+  `basexp` mediumint NOT NULL DEFAULT '0',
   PRIMARY KEY (`level`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Exploration System';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=FIXED COMMENT='Exploration System';
 
 -- Dumpar data för tabell acore_world.exploration_basexp: 80 rows
 DELETE FROM `exploration_basexp`;

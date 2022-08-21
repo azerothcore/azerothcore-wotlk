@@ -15,11 +15,11 @@
 -- Dumpar struktur för tabell acore_characters.game_event_condition_save
 DROP TABLE IF EXISTS `game_event_condition_save`;
 CREATE TABLE IF NOT EXISTS `game_event_condition_save` (
-  `eventEntry` TINYINT unsigned NOT NULL,
-  `condition_id` INT unsigned NOT NULL DEFAULT 0,
-  `done` float DEFAULT 0,
+  `eventEntry` tinyint unsigned NOT NULL,
+  `condition_id` int unsigned NOT NULL DEFAULT '0',
+  `done` float DEFAULT '0',
   PRIMARY KEY (`eventEntry`,`condition_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_characters.game_event_condition_save: ~0 rows (ungefär)
 DELETE FROM `game_event_condition_save`;

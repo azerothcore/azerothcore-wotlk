@@ -15,10 +15,10 @@
 -- Dumpar struktur för tabell acore_characters.item_soulbound_trade_data
 DROP TABLE IF EXISTS `item_soulbound_trade_data`;
 CREATE TABLE IF NOT EXISTS `item_soulbound_trade_data` (
-  `itemGuid` INT unsigned NOT NULL COMMENT 'Item GUID',
+  `itemGuid` int unsigned NOT NULL COMMENT 'Item GUID',
   `allowedPlayers` text NOT NULL COMMENT 'Space separated GUID list of players who can receive this item in trade',
   PRIMARY KEY (`itemGuid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Item Refund System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Item Refund System';
 
 -- Dumpar data för tabell acore_characters.item_soulbound_trade_data: ~0 rows (ungefär)
 DELETE FROM `item_soulbound_trade_data`;

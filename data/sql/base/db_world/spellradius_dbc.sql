@@ -15,12 +15,12 @@
 -- Dumpar struktur för tabell acore_world.spellradius_dbc
 DROP TABLE IF EXISTS `spellradius_dbc`;
 CREATE TABLE IF NOT EXISTS `spellradius_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `Radius` float NOT NULL DEFAULT 0,
-  `RadiusPerLevel` float NOT NULL DEFAULT 0,
-  `RadiusMax` float NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `Radius` float NOT NULL DEFAULT '0',
+  `RadiusPerLevel` float NOT NULL DEFAULT '0',
+  `RadiusMax` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_world.spellradius_dbc: 0 rows
 DELETE FROM `spellradius_dbc`;

@@ -16,12 +16,12 @@
 DROP TABLE IF EXISTS `log_encounter`;
 CREATE TABLE IF NOT EXISTS `log_encounter` (
   `time` datetime NOT NULL,
-  `map` SMALLINT unsigned NOT NULL,
-  `difficulty` TINYINT unsigned NOT NULL,
-  `creditType` TINYINT unsigned NOT NULL,
-  `creditEntry` INT unsigned NOT NULL,
+  `map` smallint unsigned NOT NULL,
+  `difficulty` tinyint unsigned NOT NULL,
+  `creditType` tinyint unsigned NOT NULL,
+  `creditEntry` int unsigned NOT NULL,
   `playersInfo` text NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_characters.log_encounter: 0 rows
 DELETE FROM `log_encounter`;

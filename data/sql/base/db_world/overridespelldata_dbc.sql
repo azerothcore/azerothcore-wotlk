@@ -15,20 +15,20 @@
 -- Dumpar struktur för tabell acore_world.overridespelldata_dbc
 DROP TABLE IF EXISTS `overridespelldata_dbc`;
 CREATE TABLE IF NOT EXISTS `overridespelldata_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `Spells_1` INT NOT NULL DEFAULT 0,
-  `Spells_2` INT NOT NULL DEFAULT 0,
-  `Spells_3` INT NOT NULL DEFAULT 0,
-  `Spells_4` INT NOT NULL DEFAULT 0,
-  `Spells_5` INT NOT NULL DEFAULT 0,
-  `Spells_6` INT NOT NULL DEFAULT 0,
-  `Spells_7` INT NOT NULL DEFAULT 0,
-  `Spells_8` INT NOT NULL DEFAULT 0,
-  `Spells_9` INT NOT NULL DEFAULT 0,
-  `Spells_10` INT NOT NULL DEFAULT 0,
-  `Flags` INT NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `Spells_1` int NOT NULL DEFAULT '0',
+  `Spells_2` int NOT NULL DEFAULT '0',
+  `Spells_3` int NOT NULL DEFAULT '0',
+  `Spells_4` int NOT NULL DEFAULT '0',
+  `Spells_5` int NOT NULL DEFAULT '0',
+  `Spells_6` int NOT NULL DEFAULT '0',
+  `Spells_7` int NOT NULL DEFAULT '0',
+  `Spells_8` int NOT NULL DEFAULT '0',
+  `Spells_9` int NOT NULL DEFAULT '0',
+  `Spells_10` int NOT NULL DEFAULT '0',
+  `Flags` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_world.overridespelldata_dbc: 0 rows
 DELETE FROM `overridespelldata_dbc`;

@@ -15,18 +15,18 @@
 -- Dumpar struktur för tabell acore_world.disenchant_loot_template
 DROP TABLE IF EXISTS `disenchant_loot_template`;
 CREATE TABLE IF NOT EXISTS `disenchant_loot_template` (
-  `Entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `Item` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `Reference` MEDIUMINT NOT NULL DEFAULT 0,
+  `Entry` mediumint unsigned NOT NULL DEFAULT '0',
+  `Item` mediumint unsigned NOT NULL DEFAULT '0',
+  `Reference` mediumint NOT NULL DEFAULT '0',
   `Chance` float NOT NULL DEFAULT '100',
-  `QuestRequired` TINYINT NOT NULL DEFAULT 0,
-  `LootMode` SMALLINT unsigned NOT NULL DEFAULT 1,
-  `GroupId` TINYINT unsigned NOT NULL DEFAULT 0,
-  `MinCount` TINYINT unsigned NOT NULL DEFAULT 1,
-  `MaxCount` TINYINT unsigned NOT NULL DEFAULT 1,
-  `Comment` VARCHAR(255) DEFAULT NULL,
+  `QuestRequired` tinyint NOT NULL DEFAULT '0',
+  `LootMode` smallint unsigned NOT NULL DEFAULT '1',
+  `GroupId` tinyint unsigned NOT NULL DEFAULT '0',
+  `MinCount` tinyint unsigned NOT NULL DEFAULT '1',
+  `MaxCount` tinyint unsigned NOT NULL DEFAULT '1',
+  `Comment` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`Entry`,`Item`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Loot System';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=FIXED COMMENT='Loot System';
 
 -- Dumpar data för tabell acore_world.disenchant_loot_template: 124 rows
 DELETE FROM `disenchant_loot_template`;

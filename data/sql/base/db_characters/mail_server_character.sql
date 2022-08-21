@@ -15,10 +15,10 @@
 -- Dumpar struktur för tabell acore_characters.mail_server_character
 DROP TABLE IF EXISTS `mail_server_character`;
 CREATE TABLE IF NOT EXISTS `mail_server_character` (
-  `guid` INT unsigned NOT NULL,
-  `mailId` INT unsigned NOT NULL,
+  `guid` int unsigned NOT NULL,
+  `mailId` int unsigned NOT NULL,
   PRIMARY KEY (`guid`,`mailId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_characters.mail_server_character: ~0 rows (ungefär)
 DELETE FROM `mail_server_character`;

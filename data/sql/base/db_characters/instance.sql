@@ -15,17 +15,17 @@
 -- Dumpar struktur för tabell acore_characters.instance
 DROP TABLE IF EXISTS `instance`;
 CREATE TABLE IF NOT EXISTS `instance` (
-  `id` INT unsigned NOT NULL DEFAULT 0,
-  `map` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `resettime` INT unsigned NOT NULL DEFAULT 0,
-  `difficulty` TINYINT unsigned NOT NULL DEFAULT 0,
-  `completedEncounters` INT unsigned NOT NULL DEFAULT 0,
+  `id` int unsigned NOT NULL DEFAULT '0',
+  `map` smallint unsigned NOT NULL DEFAULT '0',
+  `resettime` int unsigned NOT NULL DEFAULT '0',
+  `difficulty` tinyint unsigned NOT NULL DEFAULT '0',
+  `completedEncounters` int unsigned NOT NULL DEFAULT '0',
   `data` tinytext NOT NULL,
   PRIMARY KEY (`id`),
   KEY `map` (`map`),
   KEY `resettime` (`resettime`),
   KEY `difficulty` (`difficulty`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_characters.instance: ~0 rows (ungefär)
 DELETE FROM `instance`;

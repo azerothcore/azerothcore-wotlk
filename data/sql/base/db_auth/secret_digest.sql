@@ -13,12 +13,11 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 -- Dumpar struktur för tabell acore_auth.secret_digest
-DROP TABLE IF EXISTS `secret_digest`;
 CREATE TABLE IF NOT EXISTS `secret_digest` (
-  `id` INT unsigned NOT NULL,
-  `digest` VARCHAR(100) NOT NULL,
+  `id` int unsigned NOT NULL,
+  `digest` varchar(100) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_auth.secret_digest: ~0 rows (ungefär)
 DELETE FROM `secret_digest`;

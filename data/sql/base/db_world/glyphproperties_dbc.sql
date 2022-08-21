@@ -15,12 +15,12 @@
 -- Dumpar struktur för tabell acore_world.glyphproperties_dbc
 DROP TABLE IF EXISTS `glyphproperties_dbc`;
 CREATE TABLE IF NOT EXISTS `glyphproperties_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `SpellID` INT NOT NULL DEFAULT 0,
-  `GlyphSlotFlags` INT NOT NULL DEFAULT 0,
-  `SpellIconID` INT NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `SpellID` int NOT NULL DEFAULT '0',
+  `GlyphSlotFlags` int NOT NULL DEFAULT '0',
+  `SpellIconID` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_world.glyphproperties_dbc: 0 rows
 DELETE FROM `glyphproperties_dbc`;

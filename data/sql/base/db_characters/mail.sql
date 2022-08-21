@@ -15,23 +15,23 @@
 -- Dumpar struktur för tabell acore_characters.mail
 DROP TABLE IF EXISTS `mail`;
 CREATE TABLE IF NOT EXISTS `mail` (
-  `id` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Identifier',
-  `messageType` TINYINT unsigned NOT NULL DEFAULT 0,
-  `stationery` TINYINT NOT NULL DEFAULT '41',
-  `mailTemplateId` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `sender` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Character Global Unique Identifier',
-  `receiver` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Character Global Unique Identifier',
+  `id` int unsigned NOT NULL DEFAULT '0' COMMENT 'Identifier',
+  `messageType` tinyint unsigned NOT NULL DEFAULT '0',
+  `stationery` tinyint NOT NULL DEFAULT '41',
+  `mailTemplateId` smallint unsigned NOT NULL DEFAULT '0',
+  `sender` int unsigned NOT NULL DEFAULT '0' COMMENT 'Character Global Unique Identifier',
+  `receiver` int unsigned NOT NULL DEFAULT '0' COMMENT 'Character Global Unique Identifier',
   `subject` longtext,
   `body` longtext,
-  `has_items` TINYINT unsigned NOT NULL DEFAULT 0,
-  `expire_time` INT unsigned NOT NULL DEFAULT 0,
-  `deliver_time` INT unsigned NOT NULL DEFAULT 0,
-  `money` INT unsigned NOT NULL DEFAULT 0,
-  `cod` INT unsigned NOT NULL DEFAULT 0,
-  `checked` TINYINT unsigned NOT NULL DEFAULT 0,
+  `has_items` tinyint unsigned NOT NULL DEFAULT '0',
+  `expire_time` int unsigned NOT NULL DEFAULT '0',
+  `deliver_time` int unsigned NOT NULL DEFAULT '0',
+  `money` int unsigned NOT NULL DEFAULT '0',
+  `cod` int unsigned NOT NULL DEFAULT '0',
+  `checked` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `idx_receiver` (`receiver`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Mail System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Mail System';
 
 -- Dumpar data för tabell acore_characters.mail: ~0 rows (ungefär)
 DELETE FROM `mail`;

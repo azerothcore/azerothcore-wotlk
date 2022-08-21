@@ -15,12 +15,12 @@
 -- Dumpar struktur för tabell acore_world.spellcasttimes_dbc
 DROP TABLE IF EXISTS `spellcasttimes_dbc`;
 CREATE TABLE IF NOT EXISTS `spellcasttimes_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `Base` INT NOT NULL DEFAULT 0,
-  `PerLevel` INT NOT NULL DEFAULT 0,
-  `Minimum` INT NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `Base` int NOT NULL DEFAULT '0',
+  `PerLevel` int NOT NULL DEFAULT '0',
+  `Minimum` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_world.spellcasttimes_dbc: 0 rows
 DELETE FROM `spellcasttimes_dbc`;

@@ -15,14 +15,14 @@
 -- Dumpar struktur för tabell acore_characters.guild_bank_right
 DROP TABLE IF EXISTS `guild_bank_right`;
 CREATE TABLE IF NOT EXISTS `guild_bank_right` (
-  `guildid` INT unsigned NOT NULL DEFAULT 0,
-  `TabId` TINYINT unsigned NOT NULL DEFAULT 0,
-  `rid` TINYINT unsigned NOT NULL DEFAULT 0,
-  `gbright` TINYINT unsigned NOT NULL DEFAULT 0,
-  `SlotPerDay` INT unsigned NOT NULL DEFAULT 0,
+  `guildid` int unsigned NOT NULL DEFAULT '0',
+  `TabId` tinyint unsigned NOT NULL DEFAULT '0',
+  `rid` tinyint unsigned NOT NULL DEFAULT '0',
+  `gbright` tinyint unsigned NOT NULL DEFAULT '0',
+  `SlotPerDay` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guildid`,`TabId`,`rid`),
   KEY `guildid_key` (`guildid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_characters.guild_bank_right: ~0 rows (ungefär)
 DELETE FROM `guild_bank_right`;

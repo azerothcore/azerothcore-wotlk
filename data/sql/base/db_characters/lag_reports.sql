@@ -15,17 +15,17 @@
 -- Dumpar struktur för tabell acore_characters.lag_reports
 DROP TABLE IF EXISTS `lag_reports`;
 CREATE TABLE IF NOT EXISTS `lag_reports` (
-  `reportId` INT unsigned NOT NULL AUTO_INCREMENT,
-  `guid` INT unsigned NOT NULL DEFAULT 0,
-  `lagType` TINYINT unsigned NOT NULL DEFAULT 0,
-  `mapId` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `posX` float NOT NULL DEFAULT 0,
-  `posY` float NOT NULL DEFAULT 0,
-  `posZ` float NOT NULL DEFAULT 0,
-  `latency` INT unsigned NOT NULL DEFAULT 0,
-  `createTime` INT unsigned NOT NULL DEFAULT 0,
+  `reportId` int unsigned NOT NULL AUTO_INCREMENT,
+  `guid` int unsigned NOT NULL DEFAULT '0',
+  `lagType` tinyint unsigned NOT NULL DEFAULT '0',
+  `mapId` smallint unsigned NOT NULL DEFAULT '0',
+  `posX` float NOT NULL DEFAULT '0',
+  `posY` float NOT NULL DEFAULT '0',
+  `posZ` float NOT NULL DEFAULT '0',
+  `latency` int unsigned NOT NULL DEFAULT '0',
+  `createTime` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`reportId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Player System';
 
 -- Dumpar data för tabell acore_characters.lag_reports: ~0 rows (ungefär)
 DELETE FROM `lag_reports`;

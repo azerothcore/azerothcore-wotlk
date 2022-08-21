@@ -15,14 +15,14 @@
 -- Dumpar struktur för tabell acore_world.pvpdifficulty_dbc
 DROP TABLE IF EXISTS `pvpdifficulty_dbc`;
 CREATE TABLE IF NOT EXISTS `pvpdifficulty_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `MapID` INT NOT NULL DEFAULT 0,
-  `RangeIndex` INT NOT NULL DEFAULT 0,
-  `MinLevel` INT NOT NULL DEFAULT 0,
-  `MaxLevel` INT NOT NULL DEFAULT 0,
-  `Difficulty` INT NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `MapID` int NOT NULL DEFAULT '0',
+  `RangeIndex` int NOT NULL DEFAULT '0',
+  `MinLevel` int NOT NULL DEFAULT '0',
+  `MaxLevel` int NOT NULL DEFAULT '0',
+  `Difficulty` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_world.pvpdifficulty_dbc: 0 rows
 DELETE FROM `pvpdifficulty_dbc`;

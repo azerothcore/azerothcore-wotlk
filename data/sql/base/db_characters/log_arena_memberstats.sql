@@ -15,18 +15,18 @@
 -- Dumpar struktur för tabell acore_characters.log_arena_memberstats
 DROP TABLE IF EXISTS `log_arena_memberstats`;
 CREATE TABLE IF NOT EXISTS `log_arena_memberstats` (
-  `fight_id` INT unsigned NOT NULL,
-  `member_id` TINYINT unsigned NOT NULL,
+  `fight_id` int unsigned NOT NULL,
+  `member_id` tinyint unsigned NOT NULL,
   `name` char(20) NOT NULL,
-  `guid` INT unsigned NOT NULL,
-  `team` INT unsigned NOT NULL,
-  `account` INT unsigned NOT NULL,
+  `guid` int unsigned NOT NULL,
+  `team` int unsigned NOT NULL,
+  `account` int unsigned NOT NULL,
   `ip` char(15) NOT NULL,
-  `damage` INT unsigned NOT NULL,
-  `heal` INT unsigned NOT NULL,
-  `kblows` INT unsigned NOT NULL,
+  `damage` int unsigned NOT NULL,
+  `heal` int unsigned NOT NULL,
+  `kblows` int unsigned NOT NULL,
   PRIMARY KEY (`fight_id`,`member_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_characters.log_arena_memberstats: 0 rows
 DELETE FROM `log_arena_memberstats`;

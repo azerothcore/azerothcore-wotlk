@@ -15,10 +15,10 @@
 -- Dumpar struktur för tabell acore_world.player_xp_for_level
 DROP TABLE IF EXISTS `player_xp_for_level`;
 CREATE TABLE IF NOT EXISTS `player_xp_for_level` (
-  `Level` TINYINT unsigned NOT NULL,
-  `Experience` INT unsigned NOT NULL,
+  `Level` tinyint unsigned NOT NULL,
+  `Experience` int unsigned NOT NULL,
   PRIMARY KEY (`Level`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_world.player_xp_for_level: 79 rows
 DELETE FROM `player_xp_for_level`;

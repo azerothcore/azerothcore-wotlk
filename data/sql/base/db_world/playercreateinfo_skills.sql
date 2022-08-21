@@ -15,13 +15,13 @@
 -- Dumpar struktur för tabell acore_world.playercreateinfo_skills
 DROP TABLE IF EXISTS `playercreateinfo_skills`;
 CREATE TABLE IF NOT EXISTS `playercreateinfo_skills` (
-  `raceMask` INT unsigned NOT NULL,
-  `classMask` INT unsigned NOT NULL,
-  `skill` SMALLINT unsigned NOT NULL,
-  `rank` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `comment` VARCHAR(255) DEFAULT NULL,
+  `raceMask` int unsigned NOT NULL,
+  `classMask` int unsigned NOT NULL,
+  `skill` smallint unsigned NOT NULL,
+  `rank` smallint unsigned NOT NULL DEFAULT '0',
+  `comment` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`raceMask`,`classMask`,`skill`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_world.playercreateinfo_skills: ~77 rows (ungefär)
 DELETE FROM `playercreateinfo_skills`;

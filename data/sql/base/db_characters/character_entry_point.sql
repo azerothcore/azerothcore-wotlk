@@ -15,16 +15,17 @@
 -- Dumpar struktur för tabell acore_characters.character_entry_point
 DROP TABLE IF EXISTS `character_entry_point`;
 CREATE TABLE IF NOT EXISTS `character_entry_point` (
-  `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
-  `joinX` float NOT NULL DEFAULT 0,
-  `joinY` float NOT NULL DEFAULT 0,
-  `joinZ` float NOT NULL DEFAULT 0,
-  `joinO` float NOT NULL DEFAULT 0,
-  `joinMapId` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Map Identifier',
-  `taxiPath` text,
-  `mountSpell` INT unsigned NOT NULL DEFAULT 0,
+  `guid` int unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
+  `joinX` float NOT NULL DEFAULT '0',
+  `joinY` float NOT NULL DEFAULT '0',
+  `joinZ` float NOT NULL DEFAULT '0',
+  `joinO` float NOT NULL DEFAULT '0',
+  `joinMapId` int unsigned NOT NULL DEFAULT '0' COMMENT 'Map Identifier',
+  `taxiPath0` int unsigned NOT NULL DEFAULT '0',
+  `taxiPath1` int unsigned NOT NULL DEFAULT '0',
+  `mountSpell` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Player System';
 
 -- Dumpar data för tabell acore_characters.character_entry_point: ~0 rows (ungefär)
 DELETE FROM `character_entry_point`;

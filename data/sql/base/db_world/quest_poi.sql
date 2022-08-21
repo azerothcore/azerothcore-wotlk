@@ -15,18 +15,18 @@
 -- Dumpar struktur för tabell acore_world.quest_poi
 DROP TABLE IF EXISTS `quest_poi`;
 CREATE TABLE IF NOT EXISTS `quest_poi` (
-  `QuestID` INT unsigned NOT NULL DEFAULT 0,
-  `id` INT unsigned NOT NULL DEFAULT 0,
-  `ObjectiveIndex` INT NOT NULL DEFAULT 0,
-  `MapID` INT unsigned NOT NULL DEFAULT 0,
-  `WorldMapAreaId` INT unsigned NOT NULL DEFAULT 0,
-  `Floor` INT unsigned NOT NULL DEFAULT 0,
-  `Priority` INT unsigned NOT NULL DEFAULT 0,
-  `Flags` INT unsigned NOT NULL DEFAULT 0,
-  `VerifiedBuild` SMALLINT DEFAULT 0,
+  `QuestID` int unsigned NOT NULL DEFAULT '0',
+  `id` int unsigned NOT NULL DEFAULT '0',
+  `ObjectiveIndex` int NOT NULL DEFAULT '0',
+  `MapID` int unsigned NOT NULL DEFAULT '0',
+  `WorldMapAreaId` int unsigned NOT NULL DEFAULT '0',
+  `Floor` int unsigned NOT NULL DEFAULT '0',
+  `Priority` int unsigned NOT NULL DEFAULT '0',
+  `Flags` int unsigned NOT NULL DEFAULT '0',
+  `VerifiedBuild` smallint DEFAULT '0',
   PRIMARY KEY (`QuestID`,`id`),
   KEY `idx` (`QuestID`,`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_world.quest_poi: 18 771 rows
 DELETE FROM `quest_poi`;

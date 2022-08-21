@@ -15,16 +15,16 @@
 -- Dumpar struktur för tabell acore_world.player_levelstats
 DROP TABLE IF EXISTS `player_levelstats`;
 CREATE TABLE IF NOT EXISTS `player_levelstats` (
-  `race` TINYINT unsigned NOT NULL,
-  `class` TINYINT unsigned NOT NULL,
-  `level` TINYINT unsigned NOT NULL,
-  `str` TINYINT unsigned NOT NULL,
-  `agi` TINYINT unsigned NOT NULL,
-  `sta` TINYINT unsigned NOT NULL,
-  `inte` TINYINT unsigned NOT NULL,
-  `spi` TINYINT unsigned NOT NULL,
+  `race` tinyint unsigned NOT NULL,
+  `class` tinyint unsigned NOT NULL,
+  `level` tinyint unsigned NOT NULL,
+  `str` int unsigned NOT NULL DEFAULT '0',
+  `agi` int unsigned NOT NULL DEFAULT '0',
+  `sta` int unsigned NOT NULL DEFAULT '0',
+  `inte` int unsigned NOT NULL DEFAULT '0',
+  `spi` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`race`,`class`,`level`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 PACK_KEYS=0 COMMENT='Stores levels stats.';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci PACK_KEYS=0 COMMENT='Stores levels stats.';
 
 -- Dumpar data för tabell acore_world.player_levelstats: 4 960 rows
 DELETE FROM `player_levelstats`;

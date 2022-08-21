@@ -15,11 +15,11 @@
 -- Dumpar struktur för tabell acore_characters.character_achievement
 DROP TABLE IF EXISTS `character_achievement`;
 CREATE TABLE IF NOT EXISTS `character_achievement` (
-  `guid` INT unsigned NOT NULL,
-  `achievement` SMALLINT unsigned NOT NULL,
-  `date` INT unsigned NOT NULL DEFAULT 0,
+  `guid` int unsigned NOT NULL,
+  `achievement` smallint unsigned NOT NULL,
+  `date` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`achievement`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_characters.character_achievement: ~0 rows (ungefär)
 DELETE FROM `character_achievement`;

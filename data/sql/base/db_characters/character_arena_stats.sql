@@ -15,12 +15,12 @@
 -- Dumpar struktur för tabell acore_characters.character_arena_stats
 DROP TABLE IF EXISTS `character_arena_stats`;
 CREATE TABLE IF NOT EXISTS `character_arena_stats` (
-  `guid` INT unsigned NOT NULL DEFAULT 0,
-  `slot` TINYINT unsigned NOT NULL DEFAULT 0,
-  `matchMakerRating` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `maxMMR` SMALLINT NOT NULL,
+  `guid` int unsigned NOT NULL DEFAULT '0',
+  `slot` tinyint unsigned NOT NULL DEFAULT '0',
+  `matchMakerRating` smallint unsigned NOT NULL DEFAULT '0',
+  `maxMMR` smallint NOT NULL,
   PRIMARY KEY (`guid`,`slot`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_characters.character_arena_stats: ~0 rows (ungefär)
 DELETE FROM `character_arena_stats`;

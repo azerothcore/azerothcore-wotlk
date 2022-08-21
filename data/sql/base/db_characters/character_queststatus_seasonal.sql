@@ -15,12 +15,12 @@
 -- Dumpar struktur för tabell acore_characters.character_queststatus_seasonal
 DROP TABLE IF EXISTS `character_queststatus_seasonal`;
 CREATE TABLE IF NOT EXISTS `character_queststatus_seasonal` (
-  `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
-  `quest` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Quest Identifier',
-  `event` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Event Identifier',
+  `guid` int unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
+  `quest` int unsigned NOT NULL DEFAULT '0' COMMENT 'Quest Identifier',
+  `event` int unsigned NOT NULL DEFAULT '0' COMMENT 'Event Identifier',
   PRIMARY KEY (`guid`,`quest`),
   KEY `idx_guid` (`guid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Player System';
 
 -- Dumpar data för tabell acore_characters.character_queststatus_seasonal: ~0 rows (ungefär)
 DELETE FROM `character_queststatus_seasonal`;

@@ -15,11 +15,11 @@
 -- Dumpar struktur för tabell acore_characters.bugreport
 DROP TABLE IF EXISTS `bugreport`;
 CREATE TABLE IF NOT EXISTS `bugreport` (
-  `id` INT unsigned NOT NULL AUTO_INCREMENT COMMENT 'Identifier',
+  `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Identifier',
   `type` longtext NOT NULL,
   `content` longtext NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Debug System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Debug System';
 
 -- Dumpar data för tabell acore_characters.bugreport: ~0 rows (ungefär)
 DELETE FROM `bugreport`;

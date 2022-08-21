@@ -15,12 +15,12 @@
 -- Dumpar struktur för tabell acore_world.pool_quest
 DROP TABLE IF EXISTS `pool_quest`;
 CREATE TABLE IF NOT EXISTS `pool_quest` (
-  `entry` INT unsigned NOT NULL DEFAULT 0,
-  `pool_entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `description` VARCHAR(255) DEFAULT NULL,
+  `entry` int unsigned NOT NULL DEFAULT '0',
+  `pool_entry` mediumint unsigned NOT NULL DEFAULT '0',
+  `description` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`entry`),
   KEY `idx_guid` (`entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_world.pool_quest: 162 rows
 DELETE FROM `pool_quest`;

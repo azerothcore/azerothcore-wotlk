@@ -15,13 +15,13 @@
 -- Dumpar struktur för tabell acore_world.transports
 DROP TABLE IF EXISTS `transports`;
 CREATE TABLE IF NOT EXISTS `transports` (
-  `guid` INT unsigned NOT NULL AUTO_INCREMENT,
-  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `guid` int unsigned NOT NULL AUTO_INCREMENT,
+  `entry` mediumint unsigned NOT NULL DEFAULT '0',
   `name` text,
   `ScriptName` char(64) NOT NULL DEFAULT '',
   PRIMARY KEY (`guid`),
   UNIQUE KEY `idx_entry` (`entry`)
-) ENGINE=MyISAM AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Transports';
+) ENGINE=MyISAM AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=FIXED COMMENT='Transports';
 
 -- Dumpar data för tabell acore_world.transports: 20 rows
 DELETE FROM `transports`;

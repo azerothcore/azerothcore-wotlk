@@ -15,16 +15,16 @@
 -- Dumpar struktur för tabell acore_world.areagroup_dbc
 DROP TABLE IF EXISTS `areagroup_dbc`;
 CREATE TABLE IF NOT EXISTS `areagroup_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `AreaID_1` INT NOT NULL DEFAULT 0,
-  `AreaID_2` INT NOT NULL DEFAULT 0,
-  `AreaID_3` INT NOT NULL DEFAULT 0,
-  `AreaID_4` INT NOT NULL DEFAULT 0,
-  `AreaID_5` INT NOT NULL DEFAULT 0,
-  `AreaID_6` INT NOT NULL DEFAULT 0,
-  `NextAreaID` INT NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `AreaID_1` int NOT NULL DEFAULT '0',
+  `AreaID_2` int NOT NULL DEFAULT '0',
+  `AreaID_3` int NOT NULL DEFAULT '0',
+  `AreaID_4` int NOT NULL DEFAULT '0',
+  `AreaID_5` int NOT NULL DEFAULT '0',
+  `AreaID_6` int NOT NULL DEFAULT '0',
+  `NextAreaID` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_world.areagroup_dbc: 0 rows
 DELETE FROM `areagroup_dbc`;

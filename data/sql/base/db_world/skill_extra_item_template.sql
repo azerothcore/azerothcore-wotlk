@@ -15,12 +15,12 @@
 -- Dumpar struktur för tabell acore_world.skill_extra_item_template
 DROP TABLE IF EXISTS `skill_extra_item_template`;
 CREATE TABLE IF NOT EXISTS `skill_extra_item_template` (
-  `spellId` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'SpellId of the item creation spell',
-  `requiredSpecialization` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Specialization spell id',
-  `additionalCreateChance` float NOT NULL DEFAULT 0 COMMENT 'chance to create add',
-  `additionalMaxNum` TINYINT NOT NULL DEFAULT 0,
+  `spellId` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'SpellId of the item creation spell',
+  `requiredSpecialization` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Specialization spell id',
+  `additionalCreateChance` float NOT NULL DEFAULT '0' COMMENT 'chance to create add',
+  `additionalMaxNum` tinyint NOT NULL DEFAULT '0',
   PRIMARY KEY (`spellId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Skill Specialization System';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=FIXED COMMENT='Skill Specialization System';
 
 -- Dumpar data för tabell acore_world.skill_extra_item_template: 226 rows
 DELETE FROM `skill_extra_item_template`;

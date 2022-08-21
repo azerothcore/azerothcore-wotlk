@@ -15,13 +15,13 @@
 -- Dumpar struktur för tabell acore_world.quest_greeting_locale
 DROP TABLE IF EXISTS `quest_greeting_locale`;
 CREATE TABLE IF NOT EXISTS `quest_greeting_locale` (
-  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `type` TINYINT unsigned NOT NULL DEFAULT 0,
-  `locale` VARCHAR(4) NOT NULL,
+  `ID` mediumint unsigned NOT NULL DEFAULT '0',
+  `type` tinyint unsigned NOT NULL DEFAULT '0',
+  `locale` varchar(4) NOT NULL,
   `Greeting` text,
-  `VerifiedBuild` SMALLINT NOT NULL DEFAULT 0,
+  `VerifiedBuild` smallint NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`,`type`,`locale`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_world.quest_greeting_locale: 1 rows
 DELETE FROM `quest_greeting_locale`;

@@ -15,14 +15,14 @@
 -- Dumpar struktur för tabell acore_characters.character_declinedname
 DROP TABLE IF EXISTS `character_declinedname`;
 CREATE TABLE IF NOT EXISTS `character_declinedname` (
-  `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
-  `genitive` VARCHAR(15) NOT NULL DEFAULT '',
-  `dative` VARCHAR(15) NOT NULL DEFAULT '',
-  `accusative` VARCHAR(15) NOT NULL DEFAULT '',
-  `instrumental` VARCHAR(15) NOT NULL DEFAULT '',
-  `prepositional` VARCHAR(15) NOT NULL DEFAULT '',
+  `guid` int unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
+  `genitive` varchar(15) NOT NULL DEFAULT '',
+  `dative` varchar(15) NOT NULL DEFAULT '',
+  `accusative` varchar(15) NOT NULL DEFAULT '',
+  `instrumental` varchar(15) NOT NULL DEFAULT '',
+  `prepositional` varchar(15) NOT NULL DEFAULT '',
   PRIMARY KEY (`guid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_characters.character_declinedname: ~0 rows (ungefär)
 DELETE FROM `character_declinedname`;

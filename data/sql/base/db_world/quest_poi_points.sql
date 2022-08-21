@@ -15,15 +15,15 @@
 -- Dumpar struktur för tabell acore_world.quest_poi_points
 DROP TABLE IF EXISTS `quest_poi_points`;
 CREATE TABLE IF NOT EXISTS `quest_poi_points` (
-  `QuestID` INT unsigned NOT NULL DEFAULT 0,
-  `Idx1` INT unsigned NOT NULL DEFAULT 0,
-  `Idx2` INT unsigned NOT NULL DEFAULT 0,
-  `X` INT NOT NULL DEFAULT 0,
-  `Y` INT NOT NULL DEFAULT 0,
-  `VerifiedBuild` SMALLINT DEFAULT 0,
+  `QuestID` int unsigned NOT NULL DEFAULT '0',
+  `Idx1` int unsigned NOT NULL DEFAULT '0',
+  `Idx2` int unsigned NOT NULL DEFAULT '0',
+  `X` int NOT NULL DEFAULT '0',
+  `Y` int NOT NULL DEFAULT '0',
+  `VerifiedBuild` smallint DEFAULT '0',
   PRIMARY KEY (`QuestID`,`Idx1`,`Idx2`),
   KEY `questId_id` (`QuestID`,`Idx1`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_world.quest_poi_points: 57 147 rows
 DELETE FROM `quest_poi_points`;

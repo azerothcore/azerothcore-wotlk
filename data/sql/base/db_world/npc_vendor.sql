@@ -15,16 +15,16 @@
 -- Dumpar struktur för tabell acore_world.npc_vendor
 DROP TABLE IF EXISTS `npc_vendor`;
 CREATE TABLE IF NOT EXISTS `npc_vendor` (
-  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `slot` SMALLINT NOT NULL DEFAULT 0,
-  `item` MEDIUMINT NOT NULL DEFAULT 0,
-  `maxcount` TINYINT unsigned NOT NULL DEFAULT 0,
-  `incrtime` INT unsigned NOT NULL DEFAULT 0,
-  `ExtendedCost` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `VerifiedBuild` SMALLINT DEFAULT 0,
+  `entry` mediumint unsigned NOT NULL DEFAULT '0',
+  `slot` smallint NOT NULL DEFAULT '0',
+  `item` mediumint NOT NULL DEFAULT '0',
+  `maxcount` tinyint unsigned NOT NULL DEFAULT '0',
+  `incrtime` int unsigned NOT NULL DEFAULT '0',
+  `ExtendedCost` mediumint unsigned NOT NULL DEFAULT '0',
+  `VerifiedBuild` smallint DEFAULT '0',
   PRIMARY KEY (`entry`,`item`,`ExtendedCost`),
   KEY `slot` (`slot`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Npc System';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=FIXED COMMENT='Npc System';
 
 -- Dumpar data för tabell acore_world.npc_vendor: 37 606 rows
 DELETE FROM `npc_vendor`;

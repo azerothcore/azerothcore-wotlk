@@ -15,16 +15,16 @@
 -- Dumpar struktur för tabell acore_characters.guild_member_withdraw
 DROP TABLE IF EXISTS `guild_member_withdraw`;
 CREATE TABLE IF NOT EXISTS `guild_member_withdraw` (
-  `guid` INT unsigned NOT NULL,
-  `tab0` INT unsigned NOT NULL DEFAULT 0,
-  `tab1` INT unsigned NOT NULL DEFAULT 0,
-  `tab2` INT unsigned NOT NULL DEFAULT 0,
-  `tab3` INT unsigned NOT NULL DEFAULT 0,
-  `tab4` INT unsigned NOT NULL DEFAULT 0,
-  `tab5` INT unsigned NOT NULL DEFAULT 0,
-  `money` INT unsigned NOT NULL DEFAULT 0,
+  `guid` int unsigned NOT NULL,
+  `tab0` int unsigned NOT NULL DEFAULT '0',
+  `tab1` int unsigned NOT NULL DEFAULT '0',
+  `tab2` int unsigned NOT NULL DEFAULT '0',
+  `tab3` int unsigned NOT NULL DEFAULT '0',
+  `tab4` int unsigned NOT NULL DEFAULT '0',
+  `tab5` int unsigned NOT NULL DEFAULT '0',
+  `money` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Guild Member Daily Withdraws';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Guild Member Daily Withdraws';
 
 -- Dumpar data för tabell acore_characters.guild_member_withdraw: ~0 rows (ungefär)
 DELETE FROM `guild_member_withdraw`;

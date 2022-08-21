@@ -15,11 +15,11 @@
 -- Dumpar struktur för tabell acore_world.outdoorpvp_template
 DROP TABLE IF EXISTS `outdoorpvp_template`;
 CREATE TABLE IF NOT EXISTS `outdoorpvp_template` (
-  `TypeId` TINYINT unsigned NOT NULL,
+  `TypeId` tinyint unsigned NOT NULL,
   `ScriptName` char(64) NOT NULL DEFAULT '',
   `comment` text,
   PRIMARY KEY (`TypeId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='OutdoorPvP Templates';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='OutdoorPvP Templates';
 
 -- Dumpar data för tabell acore_world.outdoorpvp_template: 7 rows
 DELETE FROM `outdoorpvp_template`;

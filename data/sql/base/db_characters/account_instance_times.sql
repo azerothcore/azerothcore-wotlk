@@ -15,11 +15,11 @@
 -- Dumpar struktur för tabell acore_characters.account_instance_times
 DROP TABLE IF EXISTS `account_instance_times`;
 CREATE TABLE IF NOT EXISTS `account_instance_times` (
-  `accountId` INT unsigned NOT NULL,
-  `instanceId` INT unsigned NOT NULL DEFAULT 0,
-  `releaseTime` BIGINT unsigned NOT NULL DEFAULT 0,
+  `accountId` int unsigned NOT NULL,
+  `instanceId` int unsigned NOT NULL DEFAULT '0',
+  `releaseTime` bigint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`accountId`,`instanceId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_characters.account_instance_times: ~0 rows (ungefär)
 DELETE FROM `account_instance_times`;

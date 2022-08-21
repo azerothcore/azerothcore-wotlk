@@ -15,10 +15,10 @@
 -- Dumpar struktur för tabell acore_world.game_event_prerequisite
 DROP TABLE IF EXISTS `game_event_prerequisite`;
 CREATE TABLE IF NOT EXISTS `game_event_prerequisite` (
-  `eventEntry` TINYINT unsigned NOT NULL COMMENT 'Entry of the game event',
-  `prerequisite_event` MEDIUMINT unsigned NOT NULL,
+  `eventEntry` tinyint unsigned NOT NULL COMMENT 'Entry of the game event',
+  `prerequisite_event` mediumint unsigned NOT NULL,
   PRIMARY KEY (`eventEntry`,`prerequisite_event`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_world.game_event_prerequisite: 0 rows
 DELETE FROM `game_event_prerequisite`;

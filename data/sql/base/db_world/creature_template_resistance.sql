@@ -15,13 +15,13 @@
 -- Dumpar struktur för tabell acore_world.creature_template_resistance
 DROP TABLE IF EXISTS `creature_template_resistance`;
 CREATE TABLE IF NOT EXISTS `creature_template_resistance` (
-  `CreatureID` MEDIUMINT unsigned NOT NULL,
-  `School` TINYINT unsigned NOT NULL,
-  `Resistance` SMALLINT DEFAULT NULL,
-  `VerifiedBuild` SMALLINT DEFAULT 0,
+  `CreatureID` mediumint unsigned NOT NULL,
+  `School` tinyint unsigned NOT NULL,
+  `Resistance` smallint DEFAULT NULL,
+  `VerifiedBuild` smallint DEFAULT '0',
   PRIMARY KEY (`CreatureID`,`School`),
   CONSTRAINT `creature_template_resistance_chk_1` CHECK (((`School` >= 1) and (`School` <= 6)))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_world.creature_template_resistance: ~1 600 rows (ungefär)
 DELETE FROM `creature_template_resistance`;

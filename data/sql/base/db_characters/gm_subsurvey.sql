@@ -15,12 +15,12 @@
 -- Dumpar struktur för tabell acore_characters.gm_subsurvey
 DROP TABLE IF EXISTS `gm_subsurvey`;
 CREATE TABLE IF NOT EXISTS `gm_subsurvey` (
-  `surveyId` INT unsigned NOT NULL AUTO_INCREMENT,
-  `questionId` INT unsigned NOT NULL DEFAULT 0,
-  `answer` INT unsigned NOT NULL DEFAULT 0,
+  `surveyId` int unsigned NOT NULL AUTO_INCREMENT,
+  `questionId` int unsigned NOT NULL DEFAULT '0',
+  `answer` int unsigned NOT NULL DEFAULT '0',
   `answerComment` text NOT NULL,
   PRIMARY KEY (`surveyId`,`questionId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Player System';
 
 -- Dumpar data för tabell acore_characters.gm_subsurvey: ~0 rows (ungefär)
 DELETE FROM `gm_subsurvey`;

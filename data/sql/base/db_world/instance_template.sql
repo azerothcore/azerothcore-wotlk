@@ -15,12 +15,12 @@
 -- Dumpar struktur för tabell acore_world.instance_template
 DROP TABLE IF EXISTS `instance_template`;
 CREATE TABLE IF NOT EXISTS `instance_template` (
-  `map` SMALLINT unsigned NOT NULL,
-  `parent` SMALLINT unsigned NOT NULL,
-  `script` VARCHAR(128) NOT NULL DEFAULT '',
-  `allowMount` TINYINT unsigned NOT NULL DEFAULT 0,
+  `map` smallint unsigned NOT NULL,
+  `parent` smallint unsigned NOT NULL,
+  `script` varchar(128) NOT NULL DEFAULT '',
+  `allowMount` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`map`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_world.instance_template: 85 rows
 DELETE FROM `instance_template`;

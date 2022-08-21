@@ -15,26 +15,26 @@
 -- Dumpar struktur för tabell acore_characters.groups
 DROP TABLE IF EXISTS `groups`;
 CREATE TABLE IF NOT EXISTS `groups` (
-  `guid` INT unsigned NOT NULL,
-  `leaderGuid` INT unsigned NOT NULL,
-  `lootMethod` TINYINT unsigned NOT NULL,
-  `looterGuid` INT unsigned NOT NULL,
-  `lootThreshold` TINYINT unsigned NOT NULL,
-  `icon1` BIGINT unsigned NOT NULL,
-  `icon2` BIGINT unsigned NOT NULL,
-  `icon3` BIGINT unsigned NOT NULL,
-  `icon4` BIGINT unsigned NOT NULL,
-  `icon5` BIGINT unsigned NOT NULL,
-  `icon6` BIGINT unsigned NOT NULL,
-  `icon7` BIGINT unsigned NOT NULL,
-  `icon8` BIGINT unsigned NOT NULL,
-  `groupType` TINYINT unsigned NOT NULL,
-  `difficulty` TINYINT unsigned NOT NULL DEFAULT 0,
-  `raidDifficulty` TINYINT unsigned NOT NULL DEFAULT 0,
-  `masterLooterGuid` INT unsigned NOT NULL,
+  `guid` int unsigned NOT NULL,
+  `leaderGuid` int unsigned NOT NULL,
+  `lootMethod` tinyint unsigned NOT NULL,
+  `looterGuid` int unsigned NOT NULL,
+  `lootThreshold` tinyint unsigned NOT NULL,
+  `icon1` bigint unsigned NOT NULL,
+  `icon2` bigint unsigned NOT NULL,
+  `icon3` bigint unsigned NOT NULL,
+  `icon4` bigint unsigned NOT NULL,
+  `icon5` bigint unsigned NOT NULL,
+  `icon6` bigint unsigned NOT NULL,
+  `icon7` bigint unsigned NOT NULL,
+  `icon8` bigint unsigned NOT NULL,
+  `groupType` tinyint unsigned NOT NULL,
+  `difficulty` tinyint unsigned NOT NULL DEFAULT '0',
+  `raidDifficulty` tinyint unsigned NOT NULL DEFAULT '0',
+  `masterLooterGuid` int unsigned NOT NULL,
   PRIMARY KEY (`guid`),
   KEY `leaderGuid` (`leaderGuid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Groups';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Groups';
 
 -- Dumpar data för tabell acore_characters.groups: ~0 rows (ungefär)
 DELETE FROM `groups`;

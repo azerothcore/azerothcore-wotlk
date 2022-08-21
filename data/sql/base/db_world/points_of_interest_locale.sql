@@ -15,12 +15,12 @@
 -- Dumpar struktur för tabell acore_world.points_of_interest_locale
 DROP TABLE IF EXISTS `points_of_interest_locale`;
 CREATE TABLE IF NOT EXISTS `points_of_interest_locale` (
-  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `locale` VARCHAR(4) NOT NULL,
+  `ID` mediumint unsigned NOT NULL DEFAULT '0',
+  `locale` varchar(4) NOT NULL,
   `Name` text,
-  `VerifiedBuild` SMALLINT DEFAULT 0,
+  `VerifiedBuild` smallint DEFAULT '0',
   PRIMARY KEY (`ID`,`locale`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=COMPACT;
 
 -- Dumpar data för tabell acore_world.points_of_interest_locale: ~2 524 rows (ungefär)
 DELETE FROM `points_of_interest_locale`;

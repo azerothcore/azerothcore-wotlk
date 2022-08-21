@@ -15,12 +15,12 @@
 -- Dumpar struktur för tabell acore_world.playercreateinfo_spell_custom
 DROP TABLE IF EXISTS `playercreateinfo_spell_custom`;
 CREATE TABLE IF NOT EXISTS `playercreateinfo_spell_custom` (
-  `racemask` INT unsigned NOT NULL DEFAULT 0,
-  `classmask` INT unsigned NOT NULL DEFAULT 0,
-  `Spell` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `Note` VARCHAR(255) DEFAULT NULL,
+  `racemask` int unsigned NOT NULL DEFAULT '0',
+  `classmask` int unsigned NOT NULL DEFAULT '0',
+  `Spell` mediumint unsigned NOT NULL DEFAULT '0',
+  `Note` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`racemask`,`classmask`,`Spell`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_world.playercreateinfo_spell_custom: 0 rows
 DELETE FROM `playercreateinfo_spell_custom`;

@@ -15,13 +15,13 @@
 -- Dumpar struktur för tabell acore_characters.creature_respawn
 DROP TABLE IF EXISTS `creature_respawn`;
 CREATE TABLE IF NOT EXISTS `creature_respawn` (
-  `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
-  `respawnTime` INT unsigned NOT NULL DEFAULT 0,
-  `mapId` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `instanceId` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Instance Identifier',
+  `guid` int unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
+  `respawnTime` int unsigned NOT NULL DEFAULT '0',
+  `mapId` smallint unsigned NOT NULL DEFAULT '0',
+  `instanceId` int unsigned NOT NULL DEFAULT '0' COMMENT 'Instance Identifier',
   PRIMARY KEY (`guid`,`instanceId`),
   KEY `idx_instance` (`instanceId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Grid Loading System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Grid Loading System';
 
 -- Dumpar data för tabell acore_characters.creature_respawn: ~0 rows (ungefär)
 DELETE FROM `creature_respawn`;

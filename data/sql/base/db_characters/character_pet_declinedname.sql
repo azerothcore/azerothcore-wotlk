@@ -15,16 +15,16 @@
 -- Dumpar struktur för tabell acore_characters.character_pet_declinedname
 DROP TABLE IF EXISTS `character_pet_declinedname`;
 CREATE TABLE IF NOT EXISTS `character_pet_declinedname` (
-  `id` INT unsigned NOT NULL DEFAULT 0,
-  `owner` INT unsigned NOT NULL DEFAULT 0,
-  `genitive` VARCHAR(12) NOT NULL DEFAULT '',
-  `dative` VARCHAR(12) NOT NULL DEFAULT '',
-  `accusative` VARCHAR(12) NOT NULL DEFAULT '',
-  `instrumental` VARCHAR(12) NOT NULL DEFAULT '',
-  `prepositional` VARCHAR(12) NOT NULL DEFAULT '',
+  `id` int unsigned NOT NULL DEFAULT '0',
+  `owner` int unsigned NOT NULL DEFAULT '0',
+  `genitive` varchar(12) NOT NULL DEFAULT '',
+  `dative` varchar(12) NOT NULL DEFAULT '',
+  `accusative` varchar(12) NOT NULL DEFAULT '',
+  `instrumental` varchar(12) NOT NULL DEFAULT '',
+  `prepositional` varchar(12) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `owner_key` (`owner`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_characters.character_pet_declinedname: ~0 rows (ungefär)
 DELETE FROM `character_pet_declinedname`;

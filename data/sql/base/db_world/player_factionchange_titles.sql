@@ -15,12 +15,12 @@
 -- Dumpar struktur för tabell acore_world.player_factionchange_titles
 DROP TABLE IF EXISTS `player_factionchange_titles`;
 CREATE TABLE IF NOT EXISTS `player_factionchange_titles` (
-  `alliance_id` INT NOT NULL,
+  `alliance_id` int NOT NULL,
   `alliance_comment` text,
-  `horde_id` INT NOT NULL,
+  `horde_id` int NOT NULL,
   `horde_comment` text,
   PRIMARY KEY (`alliance_id`,`horde_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_world.player_factionchange_titles: 22 rows
 DELETE FROM `player_factionchange_titles`;

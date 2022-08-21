@@ -15,15 +15,15 @@
 -- Dumpar struktur för tabell acore_world.game_tele
 DROP TABLE IF EXISTS `game_tele`;
 CREATE TABLE IF NOT EXISTS `game_tele` (
-  `id` MEDIUMINT unsigned NOT NULL AUTO_INCREMENT,
-  `position_x` float NOT NULL DEFAULT 0,
-  `position_y` float NOT NULL DEFAULT 0,
-  `position_z` float NOT NULL DEFAULT 0,
-  `orientation` float NOT NULL DEFAULT 0,
-  `map` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `name` VARCHAR(100) NOT NULL DEFAULT '',
+  `id` mediumint unsigned NOT NULL AUTO_INCREMENT,
+  `position_x` float NOT NULL DEFAULT '0',
+  `position_y` float NOT NULL DEFAULT '0',
+  `position_z` float NOT NULL DEFAULT '0',
+  `orientation` float NOT NULL DEFAULT '0',
+  `map` smallint unsigned NOT NULL DEFAULT '0',
+  `name` varchar(100) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=1492 DEFAULT CHARSET=utf8mb4 COMMENT='Tele Command';
+) ENGINE=MyISAM AUTO_INCREMENT=1492 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Tele Command';
 
 -- Dumpar data för tabell acore_world.game_tele: 1 491 rows
 DELETE FROM `game_tele`;

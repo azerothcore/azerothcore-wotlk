@@ -15,15 +15,15 @@
 -- Dumpar struktur för tabell acore_world.npc_trainer
 DROP TABLE IF EXISTS `npc_trainer`;
 CREATE TABLE IF NOT EXISTS `npc_trainer` (
-  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `SpellID` MEDIUMINT NOT NULL DEFAULT 0,
-  `MoneyCost` INT unsigned NOT NULL DEFAULT 0,
-  `ReqSkillLine` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `ReqSkillRank` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `ReqLevel` TINYINT unsigned NOT NULL DEFAULT 0,
-  `ReqSpell` INT unsigned NOT NULL DEFAULT 0,
+  `ID` mediumint unsigned NOT NULL DEFAULT '0',
+  `SpellID` mediumint NOT NULL DEFAULT '0',
+  `MoneyCost` int unsigned NOT NULL DEFAULT '0',
+  `ReqSkillLine` smallint unsigned NOT NULL DEFAULT '0',
+  `ReqSkillRank` smallint unsigned NOT NULL DEFAULT '0',
+  `ReqLevel` tinyint unsigned NOT NULL DEFAULT '0',
+  `ReqSpell` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`,`SpellID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_world.npc_trainer: 4 986 rows
 DELETE FROM `npc_trainer`;

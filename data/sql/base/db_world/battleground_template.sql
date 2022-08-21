@@ -15,21 +15,21 @@
 -- Dumpar struktur för tabell acore_world.battleground_template
 DROP TABLE IF EXISTS `battleground_template`;
 CREATE TABLE IF NOT EXISTS `battleground_template` (
-  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `MinPlayersPerTeam` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `MaxPlayersPerTeam` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `MinLvl` TINYINT unsigned NOT NULL DEFAULT 0,
-  `MaxLvl` TINYINT unsigned NOT NULL DEFAULT 0,
-  `AllianceStartLoc` MEDIUMINT unsigned NOT NULL,
+  `ID` mediumint unsigned NOT NULL DEFAULT '0',
+  `MinPlayersPerTeam` smallint unsigned NOT NULL DEFAULT '0',
+  `MaxPlayersPerTeam` smallint unsigned NOT NULL DEFAULT '0',
+  `MinLvl` tinyint unsigned NOT NULL DEFAULT '0',
+  `MaxLvl` tinyint unsigned NOT NULL DEFAULT '0',
+  `AllianceStartLoc` mediumint unsigned NOT NULL,
   `AllianceStartO` float NOT NULL,
-  `HordeStartLoc` MEDIUMINT unsigned NOT NULL,
+  `HordeStartLoc` mediumint unsigned NOT NULL,
   `HordeStartO` float NOT NULL,
-  `StartMaxDist` float NOT NULL DEFAULT 0,
-  `Weight` TINYINT unsigned NOT NULL DEFAULT 1,
+  `StartMaxDist` float NOT NULL DEFAULT '0',
+  `Weight` tinyint unsigned NOT NULL DEFAULT '1',
   `ScriptName` char(64) NOT NULL DEFAULT '',
   `Comment` char(38) NOT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_world.battleground_template: 13 rows
 DELETE FROM `battleground_template`;

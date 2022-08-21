@@ -15,15 +15,15 @@
 -- Dumpar struktur för tabell acore_world.cinematiccamera_dbc
 DROP TABLE IF EXISTS `cinematiccamera_dbc`;
 CREATE TABLE IF NOT EXISTS `cinematiccamera_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `model` VARCHAR(100) DEFAULT NULL,
-  `soundEntry` INT NOT NULL DEFAULT 0,
-  `locationX` float NOT NULL DEFAULT 0,
-  `locationY` float NOT NULL DEFAULT 0,
-  `locationZ` float NOT NULL DEFAULT 0,
-  `rotation` float NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `model` varchar(100) DEFAULT NULL,
+  `soundEntry` int NOT NULL DEFAULT '0',
+  `locationX` float NOT NULL DEFAULT '0',
+  `locationY` float NOT NULL DEFAULT '0',
+  `locationZ` float NOT NULL DEFAULT '0',
+  `rotation` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='Cinematic camera DBC';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='Cinematic camera DBC';
 
 -- Dumpar data för tabell acore_world.cinematiccamera_dbc: 0 rows
 DELETE FROM `cinematiccamera_dbc`;

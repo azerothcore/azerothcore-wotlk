@@ -15,16 +15,16 @@
 -- Dumpar struktur för tabell acore_characters.calendar_invites
 DROP TABLE IF EXISTS `calendar_invites`;
 CREATE TABLE IF NOT EXISTS `calendar_invites` (
-  `id` BIGINT unsigned NOT NULL DEFAULT 0,
-  `event` BIGINT unsigned NOT NULL DEFAULT 0,
-  `invitee` INT unsigned NOT NULL DEFAULT 0,
-  `sender` INT unsigned NOT NULL DEFAULT 0,
-  `status` TINYINT unsigned NOT NULL DEFAULT 0,
-  `statustime` INT unsigned NOT NULL DEFAULT 0,
-  `rank` TINYINT unsigned NOT NULL DEFAULT 0,
-  `text` VARCHAR(255) NOT NULL DEFAULT '',
+  `id` bigint unsigned NOT NULL DEFAULT '0',
+  `event` bigint unsigned NOT NULL DEFAULT '0',
+  `invitee` int unsigned NOT NULL DEFAULT '0',
+  `sender` int unsigned NOT NULL DEFAULT '0',
+  `status` tinyint unsigned NOT NULL DEFAULT '0',
+  `statustime` int unsigned NOT NULL DEFAULT '0',
+  `rank` tinyint unsigned NOT NULL DEFAULT '0',
+  `text` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_characters.calendar_invites: ~0 rows (ungefär)
 DELETE FROM `calendar_invites`;

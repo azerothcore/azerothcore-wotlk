@@ -15,11 +15,11 @@
 -- Dumpar struktur för tabell acore_world.movie_dbc
 DROP TABLE IF EXISTS `movie_dbc`;
 CREATE TABLE IF NOT EXISTS `movie_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `Filename` VARCHAR(100) DEFAULT NULL,
-  `Volume` INT NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `Filename` varchar(100) DEFAULT NULL,
+  `Volume` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_world.movie_dbc: 0 rows
 DELETE FROM `movie_dbc`;

@@ -15,11 +15,11 @@
 -- Dumpar struktur för tabell acore_world.game_event_creature_quest
 DROP TABLE IF EXISTS `game_event_creature_quest`;
 CREATE TABLE IF NOT EXISTS `game_event_creature_quest` (
-  `eventEntry` TINYINT unsigned NOT NULL COMMENT 'Entry of the game event.',
-  `id` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `quest` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `eventEntry` tinyint unsigned NOT NULL COMMENT 'Entry of the game event.',
+  `id` mediumint unsigned NOT NULL DEFAULT '0',
+  `quest` mediumint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`,`quest`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_world.game_event_creature_quest: 215 rows
 DELETE FROM `game_event_creature_quest`;

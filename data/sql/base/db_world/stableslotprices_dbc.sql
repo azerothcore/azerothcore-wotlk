@@ -15,10 +15,10 @@
 -- Dumpar struktur för tabell acore_world.stableslotprices_dbc
 DROP TABLE IF EXISTS `stableslotprices_dbc`;
 CREATE TABLE IF NOT EXISTS `stableslotprices_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `Cost` INT NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `Cost` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_world.stableslotprices_dbc: 0 rows
 DELETE FROM `stableslotprices_dbc`;

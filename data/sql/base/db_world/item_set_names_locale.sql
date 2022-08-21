@@ -15,12 +15,12 @@
 -- Dumpar struktur för tabell acore_world.item_set_names_locale
 DROP TABLE IF EXISTS `item_set_names_locale`;
 CREATE TABLE IF NOT EXISTS `item_set_names_locale` (
-  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `locale` VARCHAR(4) NOT NULL,
+  `ID` mediumint unsigned NOT NULL DEFAULT '0',
+  `locale` varchar(4) NOT NULL,
   `Name` text,
-  `VerifiedBuild` SMALLINT DEFAULT 0,
+  `VerifiedBuild` smallint DEFAULT '0',
   PRIMARY KEY (`ID`,`locale`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
 
 -- Dumpar data för tabell acore_world.item_set_names_locale: 14 850 rows
 DELETE FROM `item_set_names_locale`;

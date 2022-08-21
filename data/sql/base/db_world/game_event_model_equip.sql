@@ -15,12 +15,12 @@
 -- Dumpar struktur för tabell acore_world.game_event_model_equip
 DROP TABLE IF EXISTS `game_event_model_equip`;
 CREATE TABLE IF NOT EXISTS `game_event_model_equip` (
-  `eventEntry` TINYINT NOT NULL COMMENT 'Entry of the game event.',
-  `guid` INT unsigned NOT NULL DEFAULT 0,
-  `modelid` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `equipment_id` TINYINT unsigned NOT NULL DEFAULT 0,
+  `eventEntry` tinyint NOT NULL COMMENT 'Entry of the game event.',
+  `guid` int unsigned NOT NULL DEFAULT '0',
+  `modelid` mediumint unsigned NOT NULL DEFAULT '0',
+  `equipment_id` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_world.game_event_model_equip: 0 rows
 DELETE FROM `game_event_model_equip`;

@@ -15,12 +15,12 @@
 -- Dumpar struktur för tabell acore_world.spellduration_dbc
 DROP TABLE IF EXISTS `spellduration_dbc`;
 CREATE TABLE IF NOT EXISTS `spellduration_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `Duration` INT NOT NULL DEFAULT 0,
-  `DurationPerLevel` INT NOT NULL DEFAULT 0,
-  `MaxDuration` INT NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `Duration` int NOT NULL DEFAULT '0',
+  `DurationPerLevel` int NOT NULL DEFAULT '0',
+  `MaxDuration` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_world.spellduration_dbc: 0 rows
 DELETE FROM `spellduration_dbc`;

@@ -15,12 +15,12 @@
 -- Dumpar struktur för tabell acore_characters.pet_spell_cooldown
 DROP TABLE IF EXISTS `pet_spell_cooldown`;
 CREATE TABLE IF NOT EXISTS `pet_spell_cooldown` (
-  `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier, Low part',
-  `spell` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Spell Identifier',
-  `category` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `time` INT unsigned NOT NULL DEFAULT 0,
+  `guid` int unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier, Low part',
+  `spell` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Spell Identifier',
+  `category` mediumint unsigned NOT NULL DEFAULT '0',
+  `time` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`spell`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_characters.pet_spell_cooldown: ~0 rows (ungefär)
 DELETE FROM `pet_spell_cooldown`;

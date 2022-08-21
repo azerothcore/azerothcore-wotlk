@@ -15,9 +15,9 @@
 -- Dumpar struktur för tabell acore_characters.character_battleground_random
 DROP TABLE IF EXISTS `character_battleground_random`;
 CREATE TABLE IF NOT EXISTS `character_battleground_random` (
-  `guid` INT unsigned NOT NULL DEFAULT 0,
+  `guid` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumpar data för tabell acore_characters.character_battleground_random: ~0 rows (ungefär)
 DELETE FROM `character_battleground_random`;
