@@ -1,3 +1,4 @@
+-- DB update 2022_08_21_00 -> 2022_08_21_01
 --
 UPDATE `creature_template` SET `ScriptName`='npc_general_andorov' WHERE `entry`=15471;
 UPDATE `creature_template` SET `npcflag`=129, `speed_walk`=1.4, `speed_run`=1.4, `gossip_menu_id`=7048, `type_flags`=`type_flags`|0x08000000 WHERE  `entry`=15471;
