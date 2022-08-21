@@ -33,7 +33,7 @@ Group* OutdoorPvPAI::GetFreeBfRaid(TeamId TeamId)
     return nullptr;
 }
 
-bool OutdoorPvPAI::AddOrSetPlayerToCorrectBfGroup(Player *plr)
+bool OutdoorPvPAI::AddOrSetPlayerToCorrectBfGroup(Player* plr)
 {
     if (!plr->IsInWorld())
         return false;
@@ -48,7 +48,8 @@ bool OutdoorPvPAI::AddOrSetPlayerToCorrectBfGroup(Player *plr)
     if (!group)
     {
         group = new Group;
-        group->SetBattlefieldGroup(this);
+        Battleground *bg = (Battleground*)sOutdoorPvPMgr->GetOutdoorPvPToZoneId(47);
+        group->SetBattlegroundGroup(bg);
         group->Create(plr);
         sGroupMgr->AddGroup(group);
         m_Groups[plr->GetTeamId()].insert(group->GetGUID());
@@ -87,7 +88,7 @@ Group* OutdoorPvPAI::GetGroupPlayer(ObjectGuid guid, TeamId TeamId)
     return nullptr;
 }
 
-void OutdoorPvPAI::HandlePlayerLeaveZone(Player* plr, uint32 zone)
+void OutdoorPvPAI::HandlePlayerLeaveZone(Player *plr, uint32 zone)
 {
     if(Group* group = GetGroupPlayer(plr->GetGUID(), plr->GetTeamId()))
     {
