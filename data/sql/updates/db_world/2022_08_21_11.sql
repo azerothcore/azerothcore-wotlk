@@ -1,3 +1,4 @@
+-- DB update 2022_08_21_10 -> 2022_08_21_11
 --
 -- Remove all entries, they will be replaced
 DELETE FROM `creature` WHERE `id1`=2961;

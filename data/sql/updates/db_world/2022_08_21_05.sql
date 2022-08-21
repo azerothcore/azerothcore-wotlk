@@ -1,3 +1,4 @@
+-- DB update 2022_08_21_04 -> 2022_08_21_05
 --
 REPLACE INTO `gossip_menu_option_locale` (`MenuID`, `OptionID`, `Locale`, `OptionText`) VALUES
 (0, 1, 'esMX', 'Quiero ver tus mercancías.'),

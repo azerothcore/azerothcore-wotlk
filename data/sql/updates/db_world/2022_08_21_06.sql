@@ -1,3 +1,4 @@
+-- DB update 2022_08_21_05 -> 2022_08_21_06
 --
 REPLACE INTO `gossip_menu_option_locale` (`MenuID`, `OptionID`, `Locale`, `OptionText`) VALUES
 (21, 0, 'frFR', 'Comment puis-je vous aider ?'),

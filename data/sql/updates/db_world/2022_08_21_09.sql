@@ -1,3 +1,4 @@
+-- DB update 2022_08_21_08 -> 2022_08_21_09
 --
 REPLACE INTO `gossip_menu_option_locale` (`MenuID`, `OptionID`, `Locale`, `OptionText`) VALUES
 (0, 1, 'zhTW', '我想要看看你賣的貨物。'),

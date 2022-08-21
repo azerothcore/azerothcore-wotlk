@@ -1,3 +1,4 @@
+-- DB update 2022_08_21_02 -> 2022_08_21_03
 --
 REPLACE INTO `gossip_menu_option_locale` (`MenuID`, `OptionID`, `Locale`, `OptionText`) VALUES
 (21, 1, 'deDE', 'Erzählt mir von dem leuchtenden Splitter.'),

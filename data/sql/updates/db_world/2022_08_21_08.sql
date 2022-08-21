@@ -1,3 +1,4 @@
+-- DB update 2022_08_21_07 -> 2022_08_21_08
 --
 REPLACE INTO `gossip_menu_option_locale` (`MenuID`, `OptionID`, `Locale`, `OptionText`) VALUES
 (0, 1, 'ruRU', 'Я хочу посмотреть на ваши товары.'),

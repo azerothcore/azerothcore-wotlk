@@ -1,3 +1,4 @@
+-- DB update 2022_08_21_06 -> 2022_08_21_07
 --
 REPLACE INTO `gossip_menu_option_locale` (`MenuID`, `OptionID`, `Locale`, `OptionText`) VALUES
 (0, 1, 'koKR', '물건을 보고 싶습니다.'),
