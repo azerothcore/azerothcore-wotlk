@@ -285,7 +285,7 @@ public:
             {
                 if (sWorld->getWorldState(STV_FISHING_ANNOUNCE_POOLS_DESPAN))
                 {
-                    sCreatureTextMgr->SendChat(me, RIGGLE_SAY_POOLS_END, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
+                    me->Yell(RIGGLE_SAY_POOLS_END, LANG_UNIVERSAL);
                     sWorld->setWorldState(STV_FISHING_ANNOUNCE_POOLS_DESPAN, 0);
                 }
             }
