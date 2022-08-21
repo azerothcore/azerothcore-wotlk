@@ -46,10 +46,19 @@ struct npc_obsidian_eradicator : public ScriptedAI
         {
             if (_targets.empty())
             {
-                SelectTargetList(_targets, [&](Unit* target)
+                Map::PlayerList const& players = me->GetMap()->GetPlayers();
+                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                 {
-                    return target && target->IsPlayer() && target->GetPower(POWER_MANA) > 0;
-                }, 10, SelectTargetMethod::Random);
+                    if (Player* player = itr->GetSource())
+                    {
+                        if (player->IsAlive() && !player->IsGameMaster() && !player->IsSpectator() && player->GetPower(POWER_MANA) > 0)
+                        {
+                            _targets.push_back(player);
+                        }
+                    }
+                }
+
+                Acore::Containers::RandomResize(_targets, 10);
             }
 
             for (Unit* target : _targets)
@@ -79,7 +88,7 @@ struct npc_obsidian_eradicator : public ScriptedAI
 
 private:
     TaskScheduler _scheduler;
-    std::list<Unit*> _targets;
+    std::list<Player*> _targets;
 };
 
 class spell_drain_mana : public SpellScript
