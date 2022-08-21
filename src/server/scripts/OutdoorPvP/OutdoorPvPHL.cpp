@@ -278,24 +278,24 @@
                     {
                         if(limit_A == 1)
                         {
-                            snprintf(msg, 250, "[Hinterland Verteidigung]: Die Allianz hat nur noch %u Ressourcen �brig!", m_ally_gathered);
+                            snprintf(msg, 250, "[Hinterland Verteidigung]: Die Allianz hat nur noch %u Ressourcen uebrig!", m_ally_gathered);
                             itr->second->GetPlayer()->TextEmote(msg);
                             IS_RESOURCE_MESSAGE_A = false; // Reset
                         }
                         else if(limit_A == 2)
                         {
-                            itr->second->GetPlayer()->TextEmote("[Hinterland Verteidigung]: Die Allianz hat keine Ressourcen mehr �brig! Die Horde gewinnt!");
+                            itr->second->GetPlayer()->TextEmote("[Hinterland Verteidigung]: Die Allianz hat keine Ressourcen mehr uebrig! Die Horde gewinnt!");
                             itr->second->GetPlayer()->GetGUID();
                             HandleWinMessage("Lok'thar ogar!");
                             HandleRewards(itr->second->GetPlayer(), 1500, true, false, false);
                             
                             switch(itr->second->GetPlayer()->GetTeamId())
                             {
-                                case ALLIANCE:
+                                case TEAM_ALLIANCE:
                                     HandleBuffs(itr->second->GetPlayer(), true);
                                     break;
      
-                                case HORDE:
+                                case TEAM_HORDE:
                                     HandleBuffs(itr->second->GetPlayer(), false);
                                     break;
                             }
@@ -308,23 +308,23 @@
                     {
                         if(limit_H == 1)
                         {
-                            snprintf(msg, 250	, "[Hinterland Verteidigung]: Die Horde hat nurnoch %u Ressourcen �brig!", m_horde_gathered);
+                            snprintf(msg, 250	, "[Hinterland Verteidigung]: Die Horde hat nurnoch %u Ressourcen uebrig!", m_horde_gathered);
                             itr->second->GetPlayer()->TextEmote(msg);
                             IS_RESOURCE_MESSAGE_H = false; // Reset
                         }
                         else if(limit_H == 2)
                         {
-                            itr->second->GetPlayer()->TextEmote("[Hinterland Verteidigung]: Die Horde hat keine Ressourcen mehr �brig! Die Allianz gewinnt!");
+                            itr->second->GetPlayer()->TextEmote("[Hinterland Verteidigung]: Die Horde hat keine Ressourcen mehr uebrig! Die Allianz gewinnt!");
                             itr->second->GetPlayer()->GetGUID();
-                            HandleWinMessage("F�r die Allianz!");
+                            HandleWinMessage("Fuer die Allianz!");
                             HandleRewards(itr->second->GetPlayer(), 1500, true, false, false);
                             switch(itr->second->GetPlayer()->GetTeamId())
                             {
-                                case ALLIANCE:
+                                case TEAM_ALLIANCE:
                                     HandleBuffs(itr->second->GetPlayer(), false);
                                     break;
      
-                                case HORDE:
+                                case TEAM_HORDE:
                                     HandleBuffs(itr->second->GetPlayer(), true);
                                     break;
                             }
@@ -374,19 +374,19 @@
 
 	void OutdoorPvPHL::HandleKill(Player* player, Unit* killed)
     {
-        if(killed->GetTypeId() == TYPEID_PLAYER) // Killing players will take their Ressourcen �brig away. It also gives extra honor.
+        if(killed->GetTypeId() == TYPEID_PLAYER) // Killing players will take their Resources away. It also gives extra honor.
         {
             if(player->GetGUID() != killed->GetGUID())
                     return;
      
             switch(killed->ToPlayer()->GetTeamId())
             {
-               case ALLIANCE:
+               case TEAM_ALLIANCE:
                     m_ally_gathered -= PointsLoseOnPvPKill;
 					player->AddItem(40752, 1);
                     Randomizer(player);					
                     break;
-               case HORDE:
+               case TEAM_HORDE:
                     m_horde_gathered -= PointsLoseOnPvPKill;					
                     Randomizer(player);
 					player->AddItem(40752, 1);
@@ -395,7 +395,7 @@
         }
         else // If is something besides a player
         {
-            if(player->GetTeamId() == ALLIANCE)
+            if(player->GetTeamId() == TEAM_ALLIANCE)
             {
                 switch(killed->GetEntry()) // Alliance killing horde guards
                 {
@@ -439,7 +439,7 @@
                     */
                 }
             }
-            else // Horde
+            else // Team Horde
             {
                 switch(killed->GetEntry()) // Horde killing alliance guards
                 {
