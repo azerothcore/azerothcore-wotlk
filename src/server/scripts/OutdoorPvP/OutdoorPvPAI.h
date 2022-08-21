@@ -29,7 +29,7 @@ class OutdoorPvPAI : public OutdoorPvP
         void HandlePlayerEnterZone(Player* plr, uint32 zone);
         void HandlePlayerLeaveZone(Player* plr, uint32 zone);
         Group* GetFreeBfRaid(uint32 TeamId);
-        Group* GetGroupPlayer(uint32 guid, uint32 TeamId);
+        Group* GetGroupPlayer(ObjectGuid guid, uint32 TeamId);
 
    protected:
 	  GuidSet m_Groups[2];
