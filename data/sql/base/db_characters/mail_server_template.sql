@@ -15,18 +15,18 @@
 -- Dumpar struktur för tabell acore_characters.mail_server_template
 DROP TABLE IF EXISTS `mail_server_template`;
 CREATE TABLE IF NOT EXISTS `mail_server_template` (
-  `id` INT unsigned NOT NULL AUTO_INCREMENT,
-  `reqLevel` TINYINT unsigned NOT NULL DEFAULT 0,
-  `reqPlayTime` INT unsigned NOT NULL DEFAULT 0,
-  `moneyA` INT unsigned NOT NULL DEFAULT 0,
-  `moneyH` INT unsigned NOT NULL DEFAULT 0,
-  `itemA` INT unsigned NOT NULL DEFAULT 0,
-  `itemCountA` INT unsigned NOT NULL DEFAULT 0,
-  `itemH` INT unsigned NOT NULL DEFAULT 0,
-  `itemCountH` INT unsigned NOT NULL DEFAULT 0,
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `reqLevel` tinyint unsigned NOT NULL DEFAULT '0',
+  `reqPlayTime` int unsigned NOT NULL DEFAULT '0',
+  `moneyA` int unsigned NOT NULL DEFAULT '0',
+  `moneyH` int unsigned NOT NULL DEFAULT '0',
+  `itemA` int unsigned NOT NULL DEFAULT '0',
+  `itemCountA` int unsigned NOT NULL DEFAULT '0',
+  `itemH` int unsigned NOT NULL DEFAULT '0',
+  `itemCountH` int unsigned NOT NULL DEFAULT '0',
   `subject` text NOT NULL,
   `body` text NOT NULL,
-  `active` TINYINT unsigned NOT NULL DEFAULT 1,
+  `active` tinyint unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

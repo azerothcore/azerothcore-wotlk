@@ -49,6 +49,7 @@ public:
         instance_temple_of_ahnqiraj_InstanceMapScript(Map* map) : InstanceScript(map)
         {
             LoadObjectData(creatureData, nullptr);
+            SetBossNumber(MAX_BOSS_NUMBER);
         }
 
         //If Vem is dead...
@@ -193,7 +194,7 @@ public:
                 case DATA_OURO:
                     if (state == FAIL)
                     {
-                        if (Creature* ouroSpawner = GetCreature(DATA_OURO))
+                        if (Creature* ouroSpawner = GetCreature(DATA_OURO_SPAWNER))
                             ouroSpawner->Respawn();
                     }
                     break;

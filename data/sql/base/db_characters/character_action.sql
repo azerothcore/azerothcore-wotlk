@@ -15,11 +15,11 @@
 -- Dumpar struktur för tabell acore_characters.character_action
 DROP TABLE IF EXISTS `character_action`;
 CREATE TABLE IF NOT EXISTS `character_action` (
-  `guid` INT unsigned NOT NULL DEFAULT 0,
-  `spec` TINYINT unsigned NOT NULL DEFAULT 0,
-  `button` TINYINT unsigned NOT NULL DEFAULT 0,
-  `action` INT unsigned NOT NULL DEFAULT 0,
-  `type` TINYINT unsigned NOT NULL DEFAULT 0,
+  `guid` int unsigned NOT NULL DEFAULT '0',
+  `spec` tinyint unsigned NOT NULL DEFAULT '0',
+  `button` tinyint unsigned NOT NULL DEFAULT '0',
+  `action` int unsigned NOT NULL DEFAULT '0',
+  `type` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`spec`,`button`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

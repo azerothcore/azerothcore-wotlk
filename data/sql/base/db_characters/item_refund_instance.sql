@@ -15,10 +15,10 @@
 -- Dumpar struktur för tabell acore_characters.item_refund_instance
 DROP TABLE IF EXISTS `item_refund_instance`;
 CREATE TABLE IF NOT EXISTS `item_refund_instance` (
-  `item_guid` INT unsigned NOT NULL COMMENT 'Item GUID',
-  `player_guid` INT unsigned NOT NULL COMMENT 'Player GUID',
-  `paidMoney` INT unsigned NOT NULL DEFAULT 0,
-  `paidExtendedCost` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `item_guid` int unsigned NOT NULL COMMENT 'Item GUID',
+  `player_guid` int unsigned NOT NULL COMMENT 'Player GUID',
+  `paidMoney` int unsigned NOT NULL DEFAULT '0',
+  `paidExtendedCost` smallint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`item_guid`,`player_guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Item Refund System';
 

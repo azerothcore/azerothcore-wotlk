@@ -15,17 +15,17 @@
 -- Dumpar struktur för tabell acore_world.worldmaparea_dbc
 DROP TABLE IF EXISTS `worldmaparea_dbc`;
 CREATE TABLE IF NOT EXISTS `worldmaparea_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `MapID` INT NOT NULL DEFAULT 0,
-  `AreaID` INT NOT NULL DEFAULT 0,
-  `AreaName` VARCHAR(100) DEFAULT NULL,
-  `LocLeft` float NOT NULL DEFAULT 0,
-  `LocRight` float NOT NULL DEFAULT 0,
-  `LocTop` float NOT NULL DEFAULT 0,
-  `LocBottom` float NOT NULL DEFAULT 0,
-  `DisplayMapID` INT NOT NULL DEFAULT 0,
-  `DefaultDungeonFloor` INT NOT NULL DEFAULT 0,
-  `ParentWorldMapID` INT NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `MapID` int NOT NULL DEFAULT '0',
+  `AreaID` int NOT NULL DEFAULT '0',
+  `AreaName` varchar(100) DEFAULT NULL,
+  `LocLeft` float NOT NULL DEFAULT '0',
+  `LocRight` float NOT NULL DEFAULT '0',
+  `LocTop` float NOT NULL DEFAULT '0',
+  `LocBottom` float NOT NULL DEFAULT '0',
+  `DisplayMapID` int NOT NULL DEFAULT '0',
+  `DefaultDungeonFloor` int NOT NULL DEFAULT '0',
+  `ParentWorldMapID` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
