@@ -250,14 +250,14 @@ struct boss_ossirian : public BossAI
 
             if (Creature* trigger = me->SummonCreature(NPC_OSSIRIAN_TRIGGER, CrystalCoordinates[_crystalIterator]))
             {
-                _triggerGUID[1] = trigger->GetGUID();
+                _triggerGUID[i] = trigger->GetGUID();
                 if (GameObject* crystal = trigger->SummonGameObject(GO_OSSIRIAN_CRYSTAL,
                     CrystalCoordinates[_crystalIterator].GetPositionX(),
                     CrystalCoordinates[_crystalIterator].GetPositionY(),
                     CrystalCoordinates[_crystalIterator].GetPositionZ(),
                     0, 0, 0, 0, 0, uint32(-1)))
                 {
-                    _crystalGUID[1] = crystal->GetGUID();
+                    _crystalGUID[i] = crystal->GetGUID();
                     ++_crystalIterator;
                     crystal->SetOwnerGUID(ObjectGuid::Empty);
                     crystal->RemoveGameObjectFlag(GO_FLAG_IN_USE);
