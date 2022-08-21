@@ -1,3 +1,4 @@
+-- DB update 2022_08_21_18 -> 2022_08_21_19
 --
 
 -- Immune to Taunt
