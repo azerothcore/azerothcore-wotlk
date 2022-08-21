@@ -75,16 +75,14 @@ void OutdoorPvPAI::HandlePlayerEnterZone(Player* player, uint32 zone)
 	OutdoorPvP::HandlePlayerEnterZone(player, zone);
 }
 
-Group* OutdoorPvPAI::GetGroupPlayer(uint32 guid, uint32 TeamId)
+Group* Battlefield::GetGroupPlayer(ObjectGuid guid, TeamId TeamId)
 {
-    for(GuidSet::const_iterator itr=m_Groups[TeamId].begin();itr!=m_Groups[TeamId].end();++itr)
-    {
-        //ObjectGuid::LowType guid = guid.get<uint32>();
-        if (Group* group = sGroupMgr->GetGroupByGUID(*itr)
+    for (GuidUnorderedSet::const_iterator itr = m_Groups[TeamId].begin(); itr != m_Groups[TeamId].end(); ++itr)
+        if (Group* group = sGroupMgr->GetGroupByGUID(itr->GetCounter()))
             if (group->IsMember(guid))
                 return group;
-    }
-    return NULL;
+
+    return nullptr;
 }
 
 void OutdoorPvPAI::HandlePlayerLeaveZone(Player* plr, uint32 zone)
