@@ -15,16 +15,16 @@
 -- Dumpar struktur för tabell acore_characters.log_money
 DROP TABLE IF EXISTS `log_money`;
 CREATE TABLE IF NOT EXISTS `log_money` (
-  `sender_acc` INT unsigned NOT NULL,
-  `sender_guid` INT unsigned NOT NULL,
-  `sender_name` char(32) CHARACTER SET utf8mb4 NOT NULL,
-  `sender_ip` char(32) CHARACTER SET utf8mb4 NOT NULL,
-  `receiver_acc` INT unsigned NOT NULL,
-  `receiver_name` char(32) CHARACTER SET utf8mb4 NOT NULL,
-  `money` BIGINT unsigned NOT NULL,
-  `topic` char(255) CHARACTER SET utf8mb4 NOT NULL,
+  `sender_acc` int unsigned NOT NULL,
+  `sender_guid` int unsigned NOT NULL,
+  `sender_name` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `sender_ip` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `receiver_acc` int unsigned NOT NULL,
+  `receiver_name` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `money` bigint unsigned NOT NULL,
+  `topic` char(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `date` datetime NOT NULL,
-  `type` TINYINT NOT NULL COMMENT '1=COD,2=AH,3=GB DEPOSIT,4=GB WITHDRAW,5=MAIL,6=TRADE'
+  `type` tinyint NOT NULL COMMENT '1=COD,2=AH,3=GB DEPOSIT,4=GB WITHDRAW,5=MAIL,6=TRADE'
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- Dumpar data för tabell acore_characters.log_money: 0 rows

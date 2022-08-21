@@ -15,7 +15,7 @@
 -- Dumpar struktur för tabell acore_characters.bugreport
 DROP TABLE IF EXISTS `bugreport`;
 CREATE TABLE IF NOT EXISTS `bugreport` (
-  `id` INT unsigned NOT NULL AUTO_INCREMENT COMMENT 'Identifier',
+  `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Identifier',
   `type` longtext NOT NULL,
   `content` longtext NOT NULL,
   PRIMARY KEY (`id`)

@@ -15,8 +15,8 @@
 -- Dumpar struktur för tabell acore_world.player_xp_for_level
 DROP TABLE IF EXISTS `player_xp_for_level`;
 CREATE TABLE IF NOT EXISTS `player_xp_for_level` (
-  `Level` TINYINT unsigned NOT NULL,
-  `Experience` INT unsigned NOT NULL,
+  `Level` tinyint unsigned NOT NULL,
+  `Experience` int unsigned NOT NULL,
   PRIMARY KEY (`Level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

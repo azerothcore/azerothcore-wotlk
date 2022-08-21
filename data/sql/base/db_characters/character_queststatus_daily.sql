@@ -15,9 +15,9 @@
 -- Dumpar struktur för tabell acore_characters.character_queststatus_daily
 DROP TABLE IF EXISTS `character_queststatus_daily`;
 CREATE TABLE IF NOT EXISTS `character_queststatus_daily` (
-  `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
-  `quest` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Quest Identifier',
-  `time` INT unsigned NOT NULL DEFAULT 0,
+  `guid` int unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
+  `quest` int unsigned NOT NULL DEFAULT '0' COMMENT 'Quest Identifier',
+  `time` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`quest`),
   KEY `idx_guid` (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';

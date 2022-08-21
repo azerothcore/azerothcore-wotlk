@@ -15,18 +15,18 @@
 -- Dumpar struktur för tabell acore_world.warden_checks
 DROP TABLE IF EXISTS `warden_checks`;
 CREATE TABLE IF NOT EXISTS `warden_checks` (
-  `id` SMALLINT unsigned NOT NULL AUTO_INCREMENT,
-  `type` TINYINT unsigned DEFAULT NULL,
-  `data` VARCHAR(48) DEFAULT NULL,
-  `str` VARCHAR(170) DEFAULT NULL,
-  `address` INT unsigned DEFAULT NULL,
-  `length` TINYINT unsigned DEFAULT NULL,
-  `result` VARCHAR(24) DEFAULT NULL,
-  `comment` VARCHAR(50) DEFAULT NULL,
+  `id` smallint unsigned NOT NULL AUTO_INCREMENT,
+  `type` tinyint unsigned DEFAULT NULL,
+  `data` varchar(48) DEFAULT NULL,
+  `str` varchar(170) DEFAULT NULL,
+  `address` int unsigned DEFAULT NULL,
+  `length` tinyint unsigned DEFAULT NULL,
+  `result` varchar(24) DEFAULT NULL,
+  `comment` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=793 DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM AUTO_INCREMENT=795 DEFAULT CHARSET=utf8mb4;
 
--- Dumpar data för tabell acore_world.warden_checks: 791 rows
+-- Dumpar data för tabell acore_world.warden_checks: 793 rows
 DELETE FROM `warden_checks`;
 /*!40000 ALTER TABLE `warden_checks` DISABLE KEYS */;
 INSERT INTO `warden_checks` (`id`, `type`, `data`, `str`, `address`, `length`, `result`, `comment`) VALUES
@@ -820,7 +820,9 @@ INSERT INTO `warden_checks` (`id`, `type`, `data`, `str`, `address`, `length`, `
 	(261, 191, 'FB13A8360C8E23B83ED7309625A7EFBAEE7DCF737068C5A6', '', 174688, 37, '', NULL),
 	(402, 243, '', '', 4609675, 5, '5E5DC20800', 'Loggin Result'),
 	(437, 243, '', '', 11287980, 8, '04000000903C9F00', 'Login State - (May be false positive)'),
-	(777, 191, 'AD5A8CBF55EC436DA968EE0B9744C93F65D9E0D6E3C1B136', '', 174688, 37, '', NULL);
+	(777, 191, 'AD5A8CBF55EC436DA968EE0B9744C93F65D9E0D6E3C1B136', '', 174688, 37, '', NULL),
+	(794, 139, NULL, 'local f=DEFAULT_CHAT_FRAME for i=1,f:GetNumMessages() do if (f:GetMessageInfo(i)):find(". It\'s in new directory not this one") then return true end end', NULL, NULL, NULL, 'Detects KickKitty'),
+	(793, 139, NULL, 'local f=DEFAULT_CHAT_FRAME for i=1,f:GetNumMessages() do if (f:GetMessageInfo(i)):find("New addon name is ") then return true end end', NULL, NULL, NULL, 'Detects KickKitty');
 /*!40000 ALTER TABLE `warden_checks` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

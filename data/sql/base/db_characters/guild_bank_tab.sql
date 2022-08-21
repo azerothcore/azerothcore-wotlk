@@ -15,11 +15,11 @@
 -- Dumpar struktur för tabell acore_characters.guild_bank_tab
 DROP TABLE IF EXISTS `guild_bank_tab`;
 CREATE TABLE IF NOT EXISTS `guild_bank_tab` (
-  `guildid` INT unsigned NOT NULL DEFAULT 0,
-  `TabId` TINYINT unsigned NOT NULL DEFAULT 0,
-  `TabName` VARCHAR(16) NOT NULL DEFAULT '',
-  `TabIcon` VARCHAR(100) NOT NULL DEFAULT '',
-  `TabText` VARCHAR(500) DEFAULT NULL,
+  `guildid` int unsigned NOT NULL DEFAULT '0',
+  `TabId` tinyint unsigned NOT NULL DEFAULT '0',
+  `TabName` varchar(16) NOT NULL DEFAULT '',
+  `TabIcon` varchar(100) NOT NULL DEFAULT '',
+  `TabText` varchar(500) DEFAULT NULL,
   PRIMARY KEY (`guildid`,`TabId`),
   KEY `guildid_key` (`guildid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

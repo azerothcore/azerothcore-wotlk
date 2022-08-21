@@ -15,8 +15,8 @@
 -- Dumpar struktur för tabell acore_characters.character_settings
 DROP TABLE IF EXISTS `character_settings`;
 CREATE TABLE IF NOT EXISTS `character_settings` (
-  `guid` INT unsigned NOT NULL,
-  `source` VARCHAR(40) NOT NULL,
+  `guid` int unsigned NOT NULL,
+  `source` varchar(40) NOT NULL,
   `data` text,
   PRIMARY KEY (`guid`,`source`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Player Settings';

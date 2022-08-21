@@ -15,11 +15,11 @@
 -- Dumpar struktur för tabell acore_characters.petition_sign
 DROP TABLE IF EXISTS `petition_sign`;
 CREATE TABLE IF NOT EXISTS `petition_sign` (
-  `ownerguid` INT unsigned NOT NULL,
-  `petitionguid` INT unsigned NOT NULL DEFAULT 0,
-  `playerguid` INT unsigned NOT NULL DEFAULT 0,
-  `player_account` INT unsigned NOT NULL DEFAULT 0,
-  `type` TINYINT unsigned NOT NULL DEFAULT 0,
+  `ownerguid` int unsigned NOT NULL,
+  `petitionguid` int unsigned NOT NULL DEFAULT '0',
+  `playerguid` int unsigned NOT NULL DEFAULT '0',
+  `player_account` int unsigned NOT NULL DEFAULT '0',
+  `type` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`petitionguid`,`playerguid`),
   KEY `Idx_playerguid` (`playerguid`),
   KEY `Idx_ownerguid` (`ownerguid`)

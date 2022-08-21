@@ -15,12 +15,12 @@
 -- Dumpar struktur för tabell acore_world.powerdisplay_dbc
 DROP TABLE IF EXISTS `powerdisplay_dbc`;
 CREATE TABLE IF NOT EXISTS `powerdisplay_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `ActualType` INT NOT NULL DEFAULT 0,
-  `GlobalstringBaseTag` VARCHAR(100) DEFAULT NULL,
-  `Red` TINYINT unsigned NOT NULL DEFAULT 0,
-  `Green` TINYINT unsigned NOT NULL DEFAULT 0,
-  `Blue` TINYINT unsigned NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `ActualType` int NOT NULL DEFAULT '0',
+  `GlobalstringBaseTag` varchar(100) DEFAULT NULL,
+  `Red` tinyint unsigned NOT NULL DEFAULT '0',
+  `Green` tinyint unsigned NOT NULL DEFAULT '0',
+  `Blue` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

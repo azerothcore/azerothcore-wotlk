@@ -15,8 +15,8 @@
 -- Dumpar struktur för tabell acore_world.skill_fishing_base_level
 DROP TABLE IF EXISTS `skill_fishing_base_level`;
 CREATE TABLE IF NOT EXISTS `skill_fishing_base_level` (
-  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Area identifier',
-  `skill` SMALLINT NOT NULL DEFAULT 0 COMMENT 'Base skill level requirement',
+  `entry` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Area identifier',
+  `skill` smallint NOT NULL DEFAULT '0' COMMENT 'Base skill level requirement',
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Fishing system';
 

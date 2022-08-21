@@ -15,8 +15,8 @@
 -- Dumpar struktur för tabell acore_characters.battleground_deserters
 DROP TABLE IF EXISTS `battleground_deserters`;
 CREATE TABLE IF NOT EXISTS `battleground_deserters` (
-  `guid` INT unsigned NOT NULL COMMENT 'characters.guid',
-  `type` TINYINT unsigned NOT NULL COMMENT 'type of the desertion',
+  `guid` int unsigned NOT NULL COMMENT 'characters.guid',
+  `type` tinyint unsigned NOT NULL COMMENT 'type of the desertion',
   `datetime` datetime NOT NULL COMMENT 'datetime of the desertion'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
