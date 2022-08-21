@@ -297,8 +297,8 @@ void AuraApplication::ClientUpdate(bool remove)
 
 uint8 Aura::BuildEffectMaskForOwner(SpellInfo const* spellProto, uint8 avalibleEffectMask, WorldObject* owner)
 {
-    ASSERT(spellProto);
-    ASSERT(owner);
+    ASSERT_NODEBUGINFO(spellProto);
+    ASSERT_NODEBUGINFO(owner);
     uint8 effMask = 0;
     switch (owner->GetTypeId())
     {
@@ -325,10 +325,10 @@ uint8 Aura::BuildEffectMaskForOwner(SpellInfo const* spellProto, uint8 avalibleE
 
 Aura* Aura::TryRefreshStackOrCreate(SpellInfo const* spellproto, uint8 tryEffMask, WorldObject* owner, Unit* caster, int32* baseAmount /*= nullptr*/, Item* castItem /*= nullptr*/, ObjectGuid casterGUID /*= ObjectGuid::Empty*/, bool* refresh /*= nullptr*/, bool periodicReset /*= false*/)
 {
-    ASSERT(spellproto);
-    ASSERT(owner);
-    ASSERT(caster || casterGUID);
-    ASSERT(tryEffMask <= MAX_EFFECT_MASK);
+    ASSERT_NODEBUGINFO(spellproto);
+    ASSERT_NODEBUGINFO(owner);
+    ASSERT_NODEBUGINFO(caster || casterGUID);
+    ASSERT_NODEBUGINFO(tryEffMask <= MAX_EFFECT_MASK);
     if (refresh)
         *refresh = false;
     uint8 effMask = Aura::BuildEffectMaskForOwner(spellproto, tryEffMask, owner);
@@ -351,10 +351,10 @@ Aura* Aura::TryRefreshStackOrCreate(SpellInfo const* spellproto, uint8 tryEffMas
 
 Aura* Aura::TryCreate(SpellInfo const* spellproto, uint8 tryEffMask, WorldObject* owner, Unit* caster, int32* baseAmount /*= nullptr*/, Item* castItem /*= nullptr*/, ObjectGuid casterGUID /*= ObjectGuid::Empty*/, ObjectGuid itemGUID /*= ObjectGuid::Empty*/)
 {
-    ASSERT(spellproto);
-    ASSERT(owner);
-    ASSERT(caster || casterGUID);
-    ASSERT(tryEffMask <= MAX_EFFECT_MASK);
+    ASSERT_NODEBUGINFO(spellproto);
+    ASSERT_NODEBUGINFO(owner);
+    ASSERT_NODEBUGINFO(caster || casterGUID);
+    ASSERT_NODEBUGINFO(tryEffMask <= MAX_EFFECT_MASK);
     uint8 effMask = Aura::BuildEffectMaskForOwner(spellproto, tryEffMask, owner);
     if (!effMask)
         return nullptr;
@@ -363,11 +363,11 @@ Aura* Aura::TryCreate(SpellInfo const* spellproto, uint8 tryEffMask, WorldObject
 
 Aura* Aura::Create(SpellInfo const* spellproto, uint8 effMask, WorldObject* owner, Unit* caster, int32* baseAmount, Item* castItem, ObjectGuid casterGUID, ObjectGuid itemGUID /*= ObjectGuid::Empty*/)
 {
-    ASSERT(effMask);
-    ASSERT(spellproto);
-    ASSERT(owner);
-    ASSERT(caster || casterGUID);
-    ASSERT(effMask <= MAX_EFFECT_MASK);
+    ASSERT_NODEBUGINFO(effMask);
+    ASSERT_NODEBUGINFO(spellproto);
+    ASSERT_NODEBUGINFO(owner);
+    ASSERT_NODEBUGINFO(caster || casterGUID);
+    ASSERT_NODEBUGINFO(effMask <= MAX_EFFECT_MASK);
     // try to get caster of aura
     if (casterGUID)
     {
@@ -2705,6 +2705,15 @@ void Aura::CallScriptAfterEffectProcHandlers(AuraEffect const* aurEff, AuraAppli
 void Aura::SetTriggeredByAuraSpellInfo(SpellInfo const* triggeredByAuraSpellInfo)
 {
     m_triggeredByAuraSpellInfo = triggeredByAuraSpellInfo;
+}
+
+std::string Aura::GetDebugInfo() const
+{
+    std::stringstream sstr;
+    sstr << std::boolalpha
+        << "Id: " << GetId() << " Caster: " << GetCasterGUID().ToString()
+        << "\nOwner: " << (GetOwner() ? GetOwner()->GetDebugInfo() : "NULL");
+    return sstr.str();
 }
 
 SpellInfo const* Aura::GetTriggeredByAuraSpellInfo() const

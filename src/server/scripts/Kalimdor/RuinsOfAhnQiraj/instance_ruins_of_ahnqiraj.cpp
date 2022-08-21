@@ -17,6 +17,7 @@
 
 #include "CreatureGroups.h"
 #include "InstanceScript.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "TaskScheduler.h"
 #include "ruins_of_ahnqiraj.h"
@@ -76,6 +77,17 @@ public:
             _rajaxWaveCounter = 0;
         }
 
+        void OnPlayerEnter(Player* player) override
+        {
+            if (GetBossState(DATA_KURINNAXX) == DONE && GetBossState(DATA_RAJAXX) != DONE)
+            {
+                if (!_andorovGUID)
+                {
+                    player->SummonCreature(NPC_ANDOROV, -8538.177f, 1486.0956f, 32.39054f, 3.7638654f, TEMPSUMMON_CORPSE_DESPAWN, 600000000);
+                }
+            }
+        }
+
         void OnCreatureCreate(Creature* creature) override
         {
             InstanceScript::OnCreatureCreate(creature);
@@ -101,16 +113,8 @@ public:
                     _sandVortexes.push_back(creature->GetGUID());
                     creature->SetVisible(false);
                     break;
-                case NPC_QUUEZ:
-                case NPC_TUUBID:
-                case NPC_DRENN:
-                case NPC_XURREM:
-                case NPC_YEGGETH:
-                case NPC_PAKKON:
-                case NPC_ZERRAN:
-                case NPC_QIRAJI_WARRIOR:
-                case NPC_SWARMGUARD_NEEDLER:
-                    creature->SetNoCallAssistance(true);
+                case NPC_ANDOROV:
+                    _andorovGUID = creature->GetGUID();
                     break;
             }
         }
@@ -178,7 +182,8 @@ public:
                             case NPC_PAKKON:
                             case NPC_ZERRAN:
                                 _scheduler.CancelAll();
-                                _scheduler.Schedule(1s, [this, formation](TaskContext /*context*/) {
+                                _scheduler.Schedule(1s, [this, formation](TaskContext /*context*/)
+                                {
                                     if (!formation->IsAnyMemberAlive())
                                     {
                                         CallNextRajaxxLeader(true);
@@ -245,6 +250,8 @@ public:
                     return _ossirianGUID;
                 case DATA_PARALYZED:
                     return _paralyzedGUID;
+                case DATA_ANDOROV:
+                    return _andorovGUID;
             }
 
             return ObjectGuid::Empty;
@@ -312,7 +319,15 @@ public:
 
                 if (nextLeader->IsAlive())
                 {
-                    nextLeader->SetInCombatWithZone();
+                    Creature* generalAndorov = instance->GetCreature(_andorovGUID);
+                    if (generalAndorov && generalAndorov->IsAlive() && generalAndorov->AI()->GetData(DATA_ANDOROV))
+                    {
+                        nextLeader->AI()->AttackStart(generalAndorov);
+                    }
+                    else
+                    {
+                        nextLeader->SetInCombatWithZone();
+                    }
                 }
                 else
                 {
@@ -344,6 +359,7 @@ public:
         ObjectGuid _buruGUID;
         ObjectGuid _ossirianGUID;
         ObjectGuid _paralyzedGUID;
+        ObjectGuid _andorovGUID;
         GuidVector _sandVortexes;
         uint32 _rajaxWaveCounter;
         TaskScheduler _scheduler;
