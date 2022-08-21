@@ -64,7 +64,7 @@
         //    sWorld->SendZoneText(zone, "[Hinterland Verteidigung]: Die Horde hat %u Ressourcen uebrig!", TEAM_HORDE);
         //}           
              
-        // player->MonsterTextEmote(message, player->GetGUID());
+        player->TextEmote(message);
         OutdoorPvP::HandlePlayerEnterZone(player, zone);
     }
 
@@ -121,6 +121,7 @@
         limit_resources_message_H = 0;
 
         //sLog->outMessage("[OutdoorPvPHL]: Hinterland: Reset Hinterland BG", 1,);
+        LOG_INFO("misc", "[OutdoorPvPHL]: Hinterland: Reset Hinterland BG");
     }
 
     void OutdoorPvPHL::HandleBuffs(Player* player, bool loser)
@@ -167,13 +168,24 @@
         OutdoorPvP::Update(diff);
         if(m_FirstLoad == false)
         {
-            //if(m_LastWin == ALLIANCE)
-                //sLog->outmessage("[OutdoorPvPHL]: Die Schlacht um das Hinterland hat begonnen! Letzter Sieger: Alliance(%u)", ALLIANCE);
-            //else if(m_LastWin == HORDE)
-                //sLog->outString("[OutdoorPvPHL]: Die Schlacht um das Hinterland hat begonnen! Letzter Sieger: Horde(%u)", HORDE);
-            //else if(m_LastWin == 0)
-                //sLog->outString("[OutdoorPvPHL]: Die Schlacht um das Hinterland hat begonnen! Es gab letztes mal keinen Sieger!(0)");
-
+            if(m_LastWin == ALLIANCE) //sLog->outmessage("[OutdoorPvPHL]: Die Schlacht um das Hinterland hat begonnen! Letzter Sieger: Alliance(%u)", ALLIANCE);
+            {
+                LOG_INFO("misc", "[OutdoorPvPHL]: Die Schlacht um das Hinterland hat begonnen! Letzter Sieger: Allianz");
+                return;
+            }
+             
+            else if(m_LastWin == HORDE) //sLog->outString("[OutdoorPvPHL]: Die Schlacht um das Hinterland hat begonnen! Letzter Sieger: Horde(%u)", HORDE);
+            {
+                LOG_INFO("misc", "[OutdoorPvPHL]: Die Schlacht um das Hinterland hat begonnen! Letzter Sieger: Horde ");
+                return;
+            }
+                
+            else if(m_LastWin == 0) //sLog->outString("[OutdoorPvPHL]: Die Schlacht um das Hinterland hat begonnen! Es gab letztes mal keinen Sieger!(0)");
+            {
+                LOG_INFO("misc", "[OutdoorPvPHL]: Die Schlacht um das Hinterland hat begonnen! Es gab letztes mal keinen Sieger!");
+                return;
+            }
+                
             m_FirstLoad = true;
         }
 

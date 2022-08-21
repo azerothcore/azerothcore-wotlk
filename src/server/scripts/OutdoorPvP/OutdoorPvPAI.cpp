@@ -12,7 +12,7 @@
 
 OutdoorPvPAI::OutdoorPvPAI()
 {
-    m_TypeId = OUTDOOR_PVP_AI;
+    m_TypeId = OUTDOOR_PVP_AI; // also defined in OutdoorPvP.h
 }
 
 bool OutdoorPvPAI::SetupOutdoorPvP()
@@ -41,6 +41,7 @@ bool OutdoorPvPAI::AddOrSetPlayerToCorrectBfGroup(Player* plr)
     if (plr->GetGroup() && (plr->GetGroup()->isBGGroup() || plr->GetGroup()->isBFGroup()))
     {
         //LOG_INFO("misc", "Battlefield::AddOrSetPlayerToCorrectBfGroup - player is already in {} group!", (player->GetGroup()->isBGGroup() ? "BG" : "BF"));
+        LOG_INFO("misc", "Battlefield::AddOrSetPlayerToCorrectBfGroup - player is already in {} group! AutoGroup HL");
         return false;
     }
 

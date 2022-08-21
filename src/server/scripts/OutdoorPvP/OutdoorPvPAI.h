@@ -17,7 +17,7 @@
 using namespace std;
 
 #define OutdoorPvPHPBuffZonesNum 1
-const uint32 OutdoorPvPHPBuffZones[OutdoorPvPHPBuffZonesNum] = { 47 }; // Westfall 40 Mapid ;)
+const uint32 OutdoorPvPHPBuffZones[OutdoorPvPHPBuffZonesNum] = { 47 }; // Hinterland Zone ID = 47
 
 class OutdoorPvPAI : public OutdoorPvP
 {
