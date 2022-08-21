@@ -9,8 +9,6 @@
 #include "OutdoorPvPMgr.h"
 #include "Group.h"
 #include "GroupMgr.h"
-#include "Battlefield.h"
-#include "BattlefieldMgr.h"
 
 OutdoorPvPAI::OutdoorPvPAI()
 {
@@ -27,7 +25,7 @@ bool OutdoorPvPAI::SetupOutdoorPvP()
 
 Group* OutdoorPvPAI::GetFreeBfRaid(TeamId TeamId)
 {
-    for (GuidUnorderedSet::const_iterator itr = m_Groups[TeamId].begin(); itr != m_Groups[TeamId].end(); ++itr)
+    for (GuidSet::const_iterator itr = m_Groups[TeamId].begin(); itr != m_Groups[TeamId].end(); ++itr)
         if (Group* group = sGroupMgr->GetGroupByGUID(itr->GetCounter()))
             if (!group->IsFull())
                 return group;
@@ -77,7 +75,7 @@ void OutdoorPvPAI::HandlePlayerEnterZone(Player* player, uint32 zone)
 
 Group* OutdoorPvPAI::GetGroupPlayer(ObjectGuid guid, TeamId TeamId)
 {
-    for (GuidUnorderedSet::const_iterator itr = m_Groups[TeamId].begin(); itr != m_Groups[TeamId].end(); ++itr)
+    for (GuidSet::const_iterator itr = m_Groups[TeamId].begin(); itr != m_Groups[TeamId].end(); ++itr)
         if (Group* group = sGroupMgr->GetGroupByGUID(itr->GetCounter()))
             if (group->IsMember(guid))
                 return group;
