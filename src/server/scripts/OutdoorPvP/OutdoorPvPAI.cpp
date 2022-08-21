@@ -25,7 +25,7 @@ bool OutdoorPvPAI::SetupOutdoorPvP()
     return true;
 }
 
-Group* Battlefield::GetFreeBfRaid(TeamId TeamId)
+Group* OutdoorPvPAI::GetFreeBfRaid(TeamId TeamId)
 {
     for (GuidUnorderedSet::const_iterator itr = m_Groups[TeamId].begin(); itr != m_Groups[TeamId].end(); ++itr)
         if (Group* group = sGroupMgr->GetGroupByGUID(itr->GetCounter()))
@@ -35,7 +35,7 @@ Group* Battlefield::GetFreeBfRaid(TeamId TeamId)
     return nullptr;
 }
 
-bool Battlefield::AddOrSetPlayerToCorrectBfGroup(Player* player)
+bool OutdoorPvPAI::AddOrSetPlayerToCorrectBfGroup(Player* player)
 {
     if (!player->IsInWorld())
         return false;
@@ -75,7 +75,7 @@ void OutdoorPvPAI::HandlePlayerEnterZone(Player* player, uint32 zone)
 	OutdoorPvP::HandlePlayerEnterZone(player, zone);
 }
 
-Group* Battlefield::GetGroupPlayer(ObjectGuid guid, TeamId TeamId)
+Group* OutdoorPvPAI::GetGroupPlayer(ObjectGuid guid, TeamId TeamId)
 {
     for (GuidUnorderedSet::const_iterator itr = m_Groups[TeamId].begin(); itr != m_Groups[TeamId].end(); ++itr)
         if (Group* group = sGroupMgr->GetGroupByGUID(itr->GetCounter()))
