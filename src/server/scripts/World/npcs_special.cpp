@@ -328,7 +328,7 @@ public:
         if (quest->GetQuestId() == QUEST_MASTER_ANGLER)
         {
             creature->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
-            sCreatureTextMgr->SendChat(creature, RIGGLE_SAY_WINNER, player, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
+            me->Yell(RIGGLE_SAY_WINNER, LANG_UNIVERSAL, player);
             sWorld->setWorldState(STV_FISHING_PREV_WIN_TIME, GameTime::GetGameTime().count());
             sWorld->setWorldState(STV_FISHING_HAS_WINNER, 1);
         }
