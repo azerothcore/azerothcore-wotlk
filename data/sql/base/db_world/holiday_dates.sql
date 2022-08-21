@@ -15,10 +15,10 @@
 -- Dumpar struktur för tabell acore_world.holiday_dates
 DROP TABLE IF EXISTS `holiday_dates`;
 CREATE TABLE IF NOT EXISTS `holiday_dates` (
-  `id` INT unsigned NOT NULL,
-  `date_id` TINYINT unsigned NOT NULL,
-  `date_value` INT unsigned NOT NULL,
-  `holiday_duration` INT unsigned NOT NULL DEFAULT 0,
+  `id` int unsigned NOT NULL,
+  `date_id` tinyint unsigned NOT NULL,
+  `date_value` int unsigned NOT NULL,
+  `holiday_duration` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`,`date_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 

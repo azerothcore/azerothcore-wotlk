@@ -15,15 +15,15 @@
 -- Dumpar struktur för tabell acore_world.creature_text_locale
 DROP TABLE IF EXISTS `creature_text_locale`;
 CREATE TABLE IF NOT EXISTS `creature_text_locale` (
-  `CreatureID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `GroupID` TINYINT unsigned NOT NULL DEFAULT 0,
-  `ID` TINYINT unsigned NOT NULL DEFAULT 0,
-  `Locale` VARCHAR(4) NOT NULL,
+  `CreatureID` mediumint unsigned NOT NULL DEFAULT '0',
+  `GroupID` tinyint unsigned NOT NULL DEFAULT '0',
+  `ID` tinyint unsigned NOT NULL DEFAULT '0',
+  `Locale` varchar(4) NOT NULL,
   `Text` text,
   PRIMARY KEY (`CreatureID`,`GroupID`,`ID`,`Locale`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
--- Dumpar data för tabell acore_world.creature_text_locale: ~13 104 rows (ungefär)
+-- Dumpar data för tabell acore_world.creature_text_locale: ~14 705 rows (ungefär)
 DELETE FROM `creature_text_locale`;
 /*!40000 ALTER TABLE `creature_text_locale` DISABLE KEYS */;
 INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES

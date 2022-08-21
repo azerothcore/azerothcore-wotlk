@@ -15,10 +15,10 @@
 -- Dumpar struktur för tabell acore_world.item_set_names
 DROP TABLE IF EXISTS `item_set_names`;
 CREATE TABLE IF NOT EXISTS `item_set_names` (
-  `entry` MEDIUMINT unsigned NOT NULL,
-  `name` VARCHAR(255) NOT NULL DEFAULT '',
-  `InventoryType` TINYINT unsigned NOT NULL DEFAULT 0,
-  `VerifiedBuild` SMALLINT DEFAULT 0,
+  `entry` mediumint unsigned NOT NULL,
+  `name` varchar(255) NOT NULL DEFAULT '',
+  `InventoryType` tinyint unsigned NOT NULL DEFAULT '0',
+  `VerifiedBuild` smallint DEFAULT '0',
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

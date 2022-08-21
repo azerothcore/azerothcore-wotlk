@@ -15,18 +15,18 @@
 -- Dumpar struktur för tabell acore_world.version
 DROP TABLE IF EXISTS `version`;
 CREATE TABLE IF NOT EXISTS `version` (
-  `core_version` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Core revision dumped at startup.',
-  `core_revision` VARCHAR(120) DEFAULT NULL,
-  `db_version` VARCHAR(120) DEFAULT NULL COMMENT 'Version of world DB.',
-  `cache_id` INT DEFAULT 0,
+  `core_version` varchar(255) NOT NULL DEFAULT '' COMMENT 'Core revision dumped at startup.',
+  `core_revision` varchar(120) DEFAULT NULL,
+  `db_version` varchar(120) DEFAULT NULL COMMENT 'Version of world DB.',
+  `cache_id` int DEFAULT '0',
   PRIMARY KEY (`core_version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Version Notes';
 
--- Dumpar data för tabell acore_world.version: ~0 rows (ungefär)
+-- Dumpar data för tabell acore_world.version: ~1 rows (ungefär)
 DELETE FROM `version`;
 /*!40000 ALTER TABLE `version` DISABLE KEYS */;
 INSERT INTO `version` (`core_version`, `core_revision`, `db_version`, `cache_id`) VALUES
-	('AzerothCore rev. 66fa80d9eada 2022-04-24 06:32:03 +0000 (master branch) (Win64, RelWithDebInfo, Static)', '66fa80d9eada', 'ACDB 335.6-dev', 6);
+	('AzerothCore rev. 5d6dfca80cf1 2022-08-21 09:48:09 +0200 (new-squash-POGGIES branch) (Win64, RelWithDebInfo, Static)', '5d6dfca80cf1', 'ACDB 335.7-dev', 7);
 /*!40000 ALTER TABLE `version` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

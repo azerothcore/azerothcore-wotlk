@@ -15,11 +15,11 @@
 -- Dumpar struktur för tabell acore_characters.channels_rights
 DROP TABLE IF EXISTS `channels_rights`;
 CREATE TABLE IF NOT EXISTS `channels_rights` (
-  `name` VARCHAR(128) NOT NULL,
-  `flags` INT unsigned NOT NULL,
-  `speakdelay` INT unsigned NOT NULL,
-  `joinmessage` VARCHAR(255) NOT NULL DEFAULT '',
-  `delaymessage` VARCHAR(255) NOT NULL DEFAULT '',
+  `name` varchar(128) NOT NULL,
+  `flags` int unsigned NOT NULL,
+  `speakdelay` int unsigned NOT NULL,
+  `joinmessage` varchar(255) NOT NULL DEFAULT '',
+  `delaymessage` varchar(255) NOT NULL DEFAULT '',
   `moderators` text,
   PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -15,14 +15,14 @@
 -- Dumpar struktur för tabell acore_world.creature_movement_override
 DROP TABLE IF EXISTS `creature_movement_override`;
 CREATE TABLE IF NOT EXISTS `creature_movement_override` (
-  `SpawnId` INT unsigned NOT NULL DEFAULT 0,
-  `Ground` TINYINT unsigned DEFAULT NULL,
-  `Swim` TINYINT unsigned DEFAULT NULL,
-  `Flight` TINYINT unsigned DEFAULT NULL,
-  `Rooted` TINYINT unsigned DEFAULT NULL,
-  `Chase` TINYINT unsigned DEFAULT NULL,
-  `Random` TINYINT unsigned DEFAULT NULL,
-  `InteractionPauseTimer` INT unsigned DEFAULT NULL COMMENT 'Time (in milliseconds) during which creature will not move after interaction with player',
+  `SpawnId` int unsigned NOT NULL DEFAULT '0',
+  `Ground` tinyint unsigned DEFAULT NULL,
+  `Swim` tinyint unsigned DEFAULT NULL,
+  `Flight` tinyint unsigned DEFAULT NULL,
+  `Rooted` tinyint unsigned DEFAULT NULL,
+  `Chase` tinyint unsigned DEFAULT NULL,
+  `Random` tinyint unsigned DEFAULT NULL,
+  `InteractionPauseTimer` int unsigned DEFAULT NULL COMMENT 'Time (in milliseconds) during which creature will not move after interaction with player',
   PRIMARY KEY (`SpawnId`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

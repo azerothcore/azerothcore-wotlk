@@ -15,20 +15,20 @@
 -- Dumpar struktur för tabell acore_world.skinning_loot_template
 DROP TABLE IF EXISTS `skinning_loot_template`;
 CREATE TABLE IF NOT EXISTS `skinning_loot_template` (
-  `Entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `Item` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `Reference` MEDIUMINT NOT NULL DEFAULT 0,
+  `Entry` mediumint unsigned NOT NULL DEFAULT '0',
+  `Item` mediumint unsigned NOT NULL DEFAULT '0',
+  `Reference` mediumint NOT NULL DEFAULT '0',
   `Chance` float NOT NULL DEFAULT '100',
-  `QuestRequired` TINYINT NOT NULL DEFAULT 0,
-  `LootMode` SMALLINT unsigned NOT NULL DEFAULT 1,
-  `GroupId` TINYINT unsigned NOT NULL DEFAULT 0,
-  `MinCount` TINYINT unsigned NOT NULL DEFAULT 1,
-  `MaxCount` TINYINT unsigned NOT NULL DEFAULT 1,
-  `Comment` VARCHAR(255) DEFAULT NULL,
+  `QuestRequired` tinyint NOT NULL DEFAULT '0',
+  `LootMode` smallint unsigned NOT NULL DEFAULT '1',
+  `GroupId` tinyint unsigned NOT NULL DEFAULT '0',
+  `MinCount` tinyint unsigned NOT NULL DEFAULT '1',
+  `MaxCount` tinyint unsigned NOT NULL DEFAULT '1',
+  `Comment` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`Entry`,`Item`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Loot System';
 
--- Dumpar data för tabell acore_world.skinning_loot_template: 1 871 rows
+-- Dumpar data för tabell acore_world.skinning_loot_template: 1 873 rows
 DELETE FROM `skinning_loot_template`;
 /*!40000 ALTER TABLE `skinning_loot_template` DISABLE KEYS */;
 INSERT INTO `skinning_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
@@ -1902,7 +1902,9 @@ INSERT INTO `skinning_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 	(100014, 4304, 0, 50, 0, 1, 1, 1, 1, NULL),
 	(100014, 8169, 0, 3, 0, 1, 1, 1, 1, NULL),
 	(3124, 2318, 0, 10, 0, 1, 1, 1, 1, 'Light Leather'),
-	(3124, 2934, 0, 88, 0, 1, 1, 1, 1, 'Ruined Leather Scraps');
+	(3124, 2934, 0, 88, 0, 1, 1, 1, 1, 'Ruined Leather Scraps'),
+	(14887, 15412, 0, 60, 0, 1, 1, 5, 8, ''),
+	(14887, 20381, 0, 40, 0, 1, 1, 3, 5, '');
 /*!40000 ALTER TABLE `skinning_loot_template` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

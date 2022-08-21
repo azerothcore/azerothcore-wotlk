@@ -15,8 +15,8 @@
 -- Dumpar struktur för tabell acore_world.transports
 DROP TABLE IF EXISTS `transports`;
 CREATE TABLE IF NOT EXISTS `transports` (
-  `guid` INT unsigned NOT NULL AUTO_INCREMENT,
-  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `guid` int unsigned NOT NULL AUTO_INCREMENT,
+  `entry` mediumint unsigned NOT NULL DEFAULT '0',
   `name` text,
   `ScriptName` char(64) NOT NULL DEFAULT '',
   PRIMARY KEY (`guid`),

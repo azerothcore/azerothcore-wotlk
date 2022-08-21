@@ -15,9 +15,9 @@
 -- Dumpar struktur för tabell acore_characters.channels_bans
 DROP TABLE IF EXISTS `channels_bans`;
 CREATE TABLE IF NOT EXISTS `channels_bans` (
-  `channelId` INT unsigned NOT NULL,
-  `playerGUID` INT unsigned NOT NULL,
-  `banTime` INT unsigned NOT NULL,
+  `channelId` int unsigned NOT NULL,
+  `playerGUID` int unsigned NOT NULL,
+  `banTime` int unsigned NOT NULL,
   PRIMARY KEY (`channelId`,`playerGUID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
