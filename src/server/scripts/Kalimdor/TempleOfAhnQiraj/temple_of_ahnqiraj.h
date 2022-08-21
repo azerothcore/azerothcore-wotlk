@@ -71,6 +71,7 @@ enum Creatures
     NPC_VEM                 = 15544,
     NPC_KRI                 = 15511,
     NPC_YAUJ                = 15543,
+    NPC_HUHURAN             = 15509,
     NPC_VEKLOR              = 15276,
     NPC_VEKNILASH           = 15275,
     NPC_OURO                = 15517,
