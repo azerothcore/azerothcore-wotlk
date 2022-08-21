@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS `characters` (
   KEY `idx_account` (`account`),
   KEY `idx_online` (`online`),
   KEY `idx_name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
 
 -- Dumpar data för tabell acore_characters.characters: ~0 rows (ungefär)
 DELETE FROM `characters`;

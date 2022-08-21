@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `quest_greeting_locale` (
   `Greeting` text,
   `VerifiedBuild` smallint NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`,`type`,`locale`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumpar data för tabell acore_world.quest_greeting_locale: 1 rows
 DELETE FROM `quest_greeting_locale`;

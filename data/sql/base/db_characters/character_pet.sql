@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS `character_pet` (
   PRIMARY KEY (`id`),
   KEY `owner` (`owner`),
   KEY `idx_slot` (`slot`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Pet System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Pet System';
 
 -- Dumpar data för tabell acore_characters.character_pet: ~0 rows (ungefär)
 DELETE FROM `character_pet`;

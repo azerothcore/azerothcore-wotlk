@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `npc_vendor` (
   `VerifiedBuild` smallint DEFAULT '0',
   PRIMARY KEY (`entry`,`item`,`ExtendedCost`),
   KEY `slot` (`slot`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=FIXED COMMENT='Npc System';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Npc System';
 
 -- Dumpar data för tabell acore_world.npc_vendor: 37 606 rows
 DELETE FROM `npc_vendor`;

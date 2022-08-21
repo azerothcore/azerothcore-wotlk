@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `creature_respawn` (
   `instanceId` int unsigned NOT NULL DEFAULT '0' COMMENT 'Instance Identifier',
   PRIMARY KEY (`guid`,`instanceId`),
   KEY `idx_instance` (`instanceId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Grid Loading System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Grid Loading System';
 
 -- Dumpar data för tabell acore_characters.creature_respawn: ~0 rows (ungefär)
 DELETE FROM `creature_respawn`;

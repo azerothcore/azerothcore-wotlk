@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `version` (
   `db_version` varchar(120) DEFAULT NULL COMMENT 'Version of world DB.',
   `cache_id` int DEFAULT '0',
   PRIMARY KEY (`core_version`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Version Notes';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Version Notes';
 
 -- Dumpar data för tabell acore_world.version: ~1 rows (ungefär)
 DELETE FROM `version`;

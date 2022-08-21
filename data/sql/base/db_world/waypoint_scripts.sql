@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `waypoint_scripts` (
   `o` float NOT NULL DEFAULT '0',
   `guid` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumpar data för tabell acore_world.waypoint_scripts: 584 rows
 DELETE FROM `waypoint_scripts`;

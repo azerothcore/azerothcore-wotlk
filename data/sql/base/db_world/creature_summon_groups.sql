@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `creature_summon_groups` (
   `orientation` float NOT NULL DEFAULT '0',
   `summonType` tinyint unsigned NOT NULL DEFAULT '0',
   `summonTime` int unsigned NOT NULL DEFAULT '0'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumpar data för tabell acore_world.creature_summon_groups: 604 rows
 DELETE FROM `creature_summon_groups`;

@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `quest_request_items_locale` (
   `CompletionText` text,
   `VerifiedBuild` smallint NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`,`locale`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
 -- Dumpar data för tabell acore_world.quest_request_items_locale: ~39 818 rows (ungefär)
 DELETE FROM `quest_request_items_locale`;

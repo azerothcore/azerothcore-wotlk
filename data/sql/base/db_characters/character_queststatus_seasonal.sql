@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `character_queststatus_seasonal` (
   `event` int unsigned NOT NULL DEFAULT '0' COMMENT 'Event Identifier',
   PRIMARY KEY (`guid`,`quest`),
   KEY `idx_guid` (`guid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
 
 -- Dumpar data för tabell acore_characters.character_queststatus_seasonal: ~0 rows (ungefär)
 DELETE FROM `character_queststatus_seasonal`;

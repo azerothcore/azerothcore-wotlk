@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `guild_bank_eventlog` (
   KEY `guildid_key` (`guildid`),
   KEY `Idx_PlayerGuid` (`PlayerGuid`),
   KEY `Idx_LogGuid` (`LogGuid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Dumpar data för tabell acore_characters.guild_bank_eventlog: ~0 rows (ungefär)
 DELETE FROM `guild_bank_eventlog`;

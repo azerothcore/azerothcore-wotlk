@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `creature_template_spell` (
   `VerifiedBuild` smallint DEFAULT '0',
   PRIMARY KEY (`CreatureID`,`Index`),
   CONSTRAINT `creature_template_spell_chk_1` CHECK (((`Index` >= 0) and (`Index` <= 7)))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Dumpar data för tabell acore_world.creature_template_spell: ~9 511 rows (ungefär)
 DELETE FROM `creature_template_spell`;

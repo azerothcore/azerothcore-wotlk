@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `game_graveyard` (
   `z` float NOT NULL DEFAULT '0',
   `Comment` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`ID`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
 -- Dumpar data för tabell acore_world.game_graveyard: ~685 rows (ungefär)
 DELETE FROM `game_graveyard`;

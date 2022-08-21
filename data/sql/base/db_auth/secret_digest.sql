@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS `secret_digest` (
   `id` int unsigned NOT NULL,
   `digest` varchar(100) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Dumpar data för tabell acore_auth.secret_digest: ~0 rows (ungefär)
 DELETE FROM `secret_digest`;

@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS `spell_custom_attr` (
   `spell_id` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'spell id',
   `attributes` int unsigned NOT NULL DEFAULT '0' COMMENT 'SpellCustomAttributes',
   PRIMARY KEY (`spell_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='SpellInfo custom attributes';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='SpellInfo custom attributes';
 
 -- Dumpar data för tabell acore_world.spell_custom_attr: 264 rows
 DELETE FROM `spell_custom_attr`;

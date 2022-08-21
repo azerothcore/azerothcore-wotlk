@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS `gameobject_template` (
   `VerifiedBuild` smallint DEFAULT '0',
   PRIMARY KEY (`entry`),
   KEY `idx_name` (`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=FIXED COMMENT='Gameobject System';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Gameobject System';
 
 -- Dumpar data för tabell acore_world.gameobject_template: 21 579 rows
 DELETE FROM `gameobject_template`;

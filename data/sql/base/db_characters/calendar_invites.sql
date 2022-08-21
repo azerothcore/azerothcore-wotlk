@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `calendar_invites` (
   `rank` tinyint unsigned NOT NULL DEFAULT '0',
   `text` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Dumpar data för tabell acore_characters.calendar_invites: ~0 rows (ungefär)
 DELETE FROM `calendar_invites`;

@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `account_data` (
   `time` int unsigned NOT NULL DEFAULT '0',
   `data` blob NOT NULL,
   PRIMARY KEY (`accountId`,`type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Dumpar data för tabell acore_characters.account_data: ~0 rows (ungefär)
 DELETE FROM `account_data`;

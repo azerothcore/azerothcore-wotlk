@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `warden_checks` (
   `result` varchar(24) DEFAULT NULL,
   `comment` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=795 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=795 DEFAULT CHARSET=utf8mb4;
 
 -- Dumpar data för tabell acore_world.warden_checks: 793 rows
 DELETE FROM `warden_checks`;

@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `graveyard_zone` (
   `Faction` smallint unsigned NOT NULL DEFAULT '0',
   `Comment` text,
   PRIMARY KEY (`ID`,`GhostZone`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Trigger System';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Trigger System';
 
 -- Dumpar data för tabell acore_world.graveyard_zone: 703 rows
 DELETE FROM `graveyard_zone`;

@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `pool_pool` (
   `chance` float NOT NULL DEFAULT '0',
   `description` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`pool_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumpar data för tabell acore_world.pool_pool: 2 328 rows
 DELETE FROM `pool_pool`;

@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `creature_onkill_reputation` (
   `RewOnKillRepValue2` mediumint NOT NULL DEFAULT '0',
   `TeamDependent` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`creature_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='Creature OnKill Reputation gain';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='Creature OnKill Reputation gain';
 
 -- Dumpar data för tabell acore_world.creature_onkill_reputation: 2 044 rows
 DELETE FROM `creature_onkill_reputation`;

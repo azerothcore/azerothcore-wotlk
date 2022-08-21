@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS `areatrigger_tavern` (
   `id` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Identifier',
   `name` text,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=FIXED COMMENT='Trigger System';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Trigger System';
 
 -- Dumpar data för tabell acore_world.areatrigger_tavern: 113 rows
 DELETE FROM `areatrigger_tavern`;

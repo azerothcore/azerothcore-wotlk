@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `quest_poi` (
   `VerifiedBuild` smallint DEFAULT '0',
   PRIMARY KEY (`QuestID`,`id`),
   KEY `idx` (`QuestID`,`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumpar data för tabell acore_world.quest_poi: 18 771 rows
 DELETE FROM `quest_poi`;

@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `character_arena_stats` (
   `matchMakerRating` smallint unsigned NOT NULL DEFAULT '0',
   `maxMMR` smallint NOT NULL,
   PRIMARY KEY (`guid`,`slot`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Dumpar data för tabell acore_characters.character_arena_stats: ~0 rows (ungefär)
 DELETE FROM `character_arena_stats`;

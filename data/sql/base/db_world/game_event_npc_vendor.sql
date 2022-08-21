@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `game_event_npc_vendor` (
   `ExtendedCost` mediumint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`item`),
   KEY `slot` (`slot`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumpar data för tabell acore_world.game_event_npc_vendor: 14 rows
 DELETE FROM `game_event_npc_vendor`;

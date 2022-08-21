@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS `corpse` (
   KEY `idx_type` (`corpseType`),
   KEY `idx_instance` (`instanceId`),
   KEY `idx_time` (`time`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Death System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Death System';
 
 -- Dumpar data för tabell acore_characters.corpse: ~0 rows (ungefär)
 DELETE FROM `corpse`;

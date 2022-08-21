@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `transportrotation_dbc` (
   `RotZ` float NOT NULL DEFAULT '0',
   `RotW` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumpar data för tabell acore_world.transportrotation_dbc: 0 rows
 DELETE FROM `transportrotation_dbc`;

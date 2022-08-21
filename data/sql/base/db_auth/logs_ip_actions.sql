@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `logs_ip_actions` (
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp',
   `comment` text COMMENT 'Allows users to add a comment',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Used to log ips of individual actions';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Used to log ips of individual actions';
 
 -- Dumpar data för tabell acore_auth.logs_ip_actions: ~0 rows (ungefär)
 DELETE FROM `logs_ip_actions`;

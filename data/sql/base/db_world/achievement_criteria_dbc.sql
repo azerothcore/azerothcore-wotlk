@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS `achievement_criteria_dbc` (
   `Timer_Time` int NOT NULL DEFAULT '0',
   `Ui_Order` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
 
 -- Dumpar data för tabell acore_world.achievement_criteria_dbc: 0 rows
 DELETE FROM `achievement_criteria_dbc`;

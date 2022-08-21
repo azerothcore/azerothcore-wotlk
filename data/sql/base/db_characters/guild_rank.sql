@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `guild_rank` (
   `BankMoneyPerDay` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guildid`,`rid`),
   KEY `Idx_rid` (`rid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Guild System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Guild System';
 
 -- Dumpar data för tabell acore_characters.guild_rank: ~0 rows (ungefär)
 DELETE FROM `guild_rank`;

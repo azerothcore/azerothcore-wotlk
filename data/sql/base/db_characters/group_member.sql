@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `group_member` (
   `subgroup` tinyint unsigned NOT NULL DEFAULT '0',
   `roles` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`memberGuid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Groups';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Groups';
 
 -- Dumpar data för tabell acore_characters.group_member: ~0 rows (ungefär)
 DELETE FROM `group_member`;

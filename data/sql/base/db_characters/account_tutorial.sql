@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `account_tutorial` (
   `tut6` int unsigned NOT NULL DEFAULT '0',
   `tut7` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`accountId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
 
 -- Dumpar data för tabell acore_characters.account_tutorial: ~0 rows (ungefär)
 DELETE FROM `account_tutorial`;

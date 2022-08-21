@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `pet_spell_cooldown` (
   `category` mediumint unsigned NOT NULL DEFAULT '0',
   `time` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`spell`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Dumpar data för tabell acore_characters.pet_spell_cooldown: ~0 rows (ungefär)
 DELETE FROM `pet_spell_cooldown`;

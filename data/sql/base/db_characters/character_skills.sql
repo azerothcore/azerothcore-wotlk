@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `character_skills` (
   `value` smallint unsigned NOT NULL,
   `max` smallint unsigned NOT NULL,
   PRIMARY KEY (`guid`,`skill`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
 
 -- Dumpar data för tabell acore_characters.character_skills: ~0 rows (ungefär)
 DELETE FROM `character_skills`;

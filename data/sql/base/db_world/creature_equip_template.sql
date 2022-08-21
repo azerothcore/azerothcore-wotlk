@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `creature_equip_template` (
   `ItemID3` mediumint unsigned NOT NULL DEFAULT '0',
   `VerifiedBuild` smallint DEFAULT '0',
   PRIMARY KEY (`CreatureID`,`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumpar data för tabell acore_world.creature_equip_template: 10 759 rows
 DELETE FROM `creature_equip_template`;

@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `item_instance` (
   `text` text,
   PRIMARY KEY (`guid`),
   KEY `idx_owner_guid` (`owner_guid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Item System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Item System';
 
 -- Dumpar data för tabell acore_characters.item_instance: ~0 rows (ungefär)
 DELETE FROM `item_instance`;

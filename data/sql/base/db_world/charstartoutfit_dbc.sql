@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS `charstartoutfit_dbc` (
   `InventoryType_23` int NOT NULL DEFAULT '0',
   `InventoryType_24` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumpar data för tabell acore_world.charstartoutfit_dbc: 0 rows
 DELETE FROM `charstartoutfit_dbc`;

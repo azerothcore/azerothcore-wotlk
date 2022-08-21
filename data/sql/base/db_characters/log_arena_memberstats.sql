@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `log_arena_memberstats` (
   `heal` int unsigned NOT NULL,
   `kblows` int unsigned NOT NULL,
   PRIMARY KEY (`fight_id`,`member_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumpar data för tabell acore_characters.log_arena_memberstats: 0 rows
 DELETE FROM `log_arena_memberstats`;

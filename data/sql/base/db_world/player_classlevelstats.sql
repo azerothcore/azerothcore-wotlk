@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `player_classlevelstats` (
   `basehp` int unsigned NOT NULL DEFAULT '1',
   `basemana` int unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`class`,`level`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci PACK_KEYS=0 COMMENT='Stores levels stats.';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 PACK_KEYS=0 COMMENT='Stores levels stats.';
 
 -- Dumpar data för tabell acore_world.player_classlevelstats: 800 rows
 DELETE FROM `player_classlevelstats`;

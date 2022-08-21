@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `character_banned` (
   `banreason` varchar(255) NOT NULL,
   `active` tinyint unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`guid`,`bandate`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Ban List';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Ban List';
 
 -- Dumpar data för tabell acore_characters.character_banned: ~0 rows (ungefär)
 DELETE FROM `character_banned`;

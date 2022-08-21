@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `item_set_names` (
   `InventoryType` tinyint unsigned NOT NULL DEFAULT '0',
   `VerifiedBuild` smallint DEFAULT '0',
   PRIMARY KEY (`entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumpar data för tabell acore_world.item_set_names: 2 481 rows
 DELETE FROM `item_set_names`;

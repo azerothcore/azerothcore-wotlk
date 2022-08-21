@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS `gtchancetospellcritbase_dbc` (
   `ID` int NOT NULL DEFAULT '0',
   `Data` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=FIXED;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED;
 
 -- Dumpar data för tabell acore_world.gtchancetospellcritbase_dbc: 11 rows
 DELETE FROM `gtchancetospellcritbase_dbc`;

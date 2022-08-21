@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `mail_server_template` (
   `body` text NOT NULL,
   `active` tinyint unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Dumpar data för tabell acore_characters.mail_server_template: ~0 rows (ungefär)
 DELETE FROM `mail_server_template`;

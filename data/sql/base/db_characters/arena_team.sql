@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `arena_team` (
   `borderStyle` tinyint unsigned NOT NULL DEFAULT '0',
   `borderColor` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`arenaTeamId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Dumpar data för tabell acore_characters.arena_team: ~0 rows (ungefär)
 DELETE FROM `arena_team`;

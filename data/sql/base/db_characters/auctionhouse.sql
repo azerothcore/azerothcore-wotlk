@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `auctionhouse` (
   `deposit` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `item_guid` (`itemguid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Dumpar data för tabell acore_characters.auctionhouse: ~0 rows (ungefär)
 DELETE FROM `auctionhouse`;
