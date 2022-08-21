@@ -1,3 +1,4 @@
+-- DB update 2022_08_21_17 -> 2022_08_21_18
 -- Update wander_distance
 UPDATE `creature` SET `wander_distance`=3 WHERE `wander_distance`=5 AND `id1`=15300;
 UPDATE `creature` SET `wander_distance`=16 WHERE `guid` IN (87766,87773,87744);
