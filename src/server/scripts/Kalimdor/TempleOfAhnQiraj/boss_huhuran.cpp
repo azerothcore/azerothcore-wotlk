@@ -73,7 +73,7 @@ struct boss_huhuran : public BossAI
         if (!_berserk && HealthBelowPct(30))
         {
             DoCastSelf(SPELL_BERSERK, true);
-            Talk(EMOTE_BERSERK);
+            TextEmote(EMOTE_BERSERK);
             _berserk = true;
         }
     }
