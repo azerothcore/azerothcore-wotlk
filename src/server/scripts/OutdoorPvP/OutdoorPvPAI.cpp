@@ -9,6 +9,8 @@
 #include "OutdoorPvPMgr.h"
 #include "Group.h"
 #include "GroupMgr.h"
+#include "Battlefield.h"
+#include "BattlefieldMgr.h"
 
 OutdoorPvPAI::OutdoorPvPAI()
 {
@@ -23,46 +25,44 @@ bool OutdoorPvPAI::SetupOutdoorPvP()
     return true;
 }
 
-Group * OutdoorPvPAI::GetFreeBfRaid(uint32 TeamId)
+Group* Battlefield::GetFreeBfRaid(TeamId TeamId)
 {
-    uint32 itrtemp;
-    for(GuidSet::const_iterator itr=m_Groups[TeamId].begin();itr!=m_Groups[TeamId].end();++itr)
-    {
-           itrtemp = itr->GetEntry();
-           Group* group = sGroupMgr->GetGroupByGUID(itrtemp);
-           if (!group->IsFull())
-               return group;
-    }
-    return NULL;
+    for (GuidUnorderedSet::const_iterator itr = m_Groups[TeamId].begin(); itr != m_Groups[TeamId].end(); ++itr)
+        if (Group* group = sGroupMgr->GetGroupByGUID(itr->GetCounter()))
+            if (!group->IsFull())
+                return group;
+
+    return nullptr;
 }
 
-bool OutdoorPvPAI::AddOrSetPlayerToCorrectBfGroup(Player *plr)
+bool Battlefield::AddOrSetPlayerToCorrectBfGroup(Player* player)
 {
-    if(!plr->IsInWorld())
+    if (!player->IsInWorld())
         return false;
 
-    Group* group = GetFreeBfRaid(plr->GetTeamId());
+    if (player->GetGroup() && (player->GetGroup()->isBGGroup() || player->GetGroup()->isBFGroup()))
+    {
+        LOG_INFO("misc", "Battlefield::AddOrSetPlayerToCorrectBfGroup - player is already in {} group!", (player->GetGroup()->isBGGroup() ? "BG" : "BF"));
+        return false;
+    }
+
+    Group* group = GetFreeBfRaid(player->GetTeamId());
     if (!group)
     {
         group = new Group;
-        Battleground *bg = (Battleground*)sOutdoorPvPMgr->GetOutdoorPvPToZoneId(47);
-        group->SetBattlegroundGroup(bg);
-        group->Create(plr);
+        group->SetBattlefieldGroup(this);
+        group->Create(player);
         sGroupMgr->AddGroup(group);
-        m_Groups[plr->GetTeamId()].insert(group->GetGUID());
+        m_Groups[player->GetTeamId()].insert(group->GetGUID());
     }
-    else if (group->IsMember(plr->GetGUID()))
+    else if (group->IsMember(player->GetGUID()))
     {
-        uint8 subgroup = group->GetMemberGroup(plr->GetGUID());
-        //group->SetBattlegroundOrBattlefieldRaid(group, subgroup);
+        uint8 subgroup = group->GetMemberGroup(player->GetGUID());
+        player->SetBattlegroundOrBattlefieldRaid(group, subgroup);
     }
     else
-    {
-        group->AddMember(plr);
-        if (Group* originalGroup = plr->GetOriginalGroup())
-            if (originalGroup->IsLeader(plr->GetGUID()))
-                group->ChangeLeader(plr->GetGUID());
-    }
+        group->AddMember(player);
+
     return true;
 }
 
