@@ -71,7 +71,7 @@
     void OutdoorPvPHL::HandlePlayerLeaveZone(Player* player, uint32 zone)
     {
         //player->MonsterTextEmote("Du verl�sst die Zone, w�hrend ein PvP-Kampf l�uft!", player->GetGUID());
-        player->TextEmote("Du verlaesst die Zone, waehrend ein PvP-Kampf laeuft!");
+        player->TextEmote(", you are leaving the zone, while a battle is going on!");
         OutdoorPvP::HandlePlayerLeaveZone(player, zone);
     }
 
