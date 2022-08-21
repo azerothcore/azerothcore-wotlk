@@ -37,3 +37,6 @@ DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`= 19 AND `SourceEntry`= 
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (19,0,8194,0,0,12,0,90,0,0,0,0,0,'','Fishing Extravaganza - Turn-ins active'),
 (19,0,8194,0,0,11,0,198,1,0,0,0,0,'','Fishing Extravaganza - fishing event has a winner');
+
+-- Riggle texts: zone wide announcement
+UPDATE `creature_text` SET `TextRange` = 2 WHERE `CreatureID` = 15077 AND `GroupID` IN (0,1,2);
