@@ -116,6 +116,7 @@ struct boss_ayamiss : public BossAI
         else if (type == WAYPOINT_MOTION_TYPE && id == POINT_GROUND)
         {
             SetCombatMovement(true);
+            me->SetDisableGravity(false);
 
             me->m_Events.AddEventAtOffset([this]()
             {
