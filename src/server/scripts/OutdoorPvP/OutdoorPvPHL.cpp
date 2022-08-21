@@ -64,7 +64,7 @@
         //    sWorld->SendZoneText(zone, "[Hinterland Verteidigung]: Die Horde hat %u Ressourcen uebrig!", TEAM_HORDE);
         //}           
              
-        player->TextEmote(message);
+        //player->TextEmote(message);
         OutdoorPvP::HandlePlayerEnterZone(player, zone);
     }
 
@@ -170,20 +170,17 @@
         {
             if(m_LastWin == ALLIANCE) //sLog->outmessage("[OutdoorPvPHL]: Die Schlacht um das Hinterland hat begonnen! Letzter Sieger: Alliance(%u)", ALLIANCE);
             {
-                LOG_INFO("misc", "[OutdoorPvPHL]: Die Schlacht um das Hinterland hat begonnen! Letzter Sieger: Allianz");
-                return;
+                LOG_INFO("misc", "[OutdoorPvPHL]: Die Schlacht um das Hinterland hat begonnen! Letzter Sieger: Allianz");                
             }
              
             else if(m_LastWin == HORDE) //sLog->outString("[OutdoorPvPHL]: Die Schlacht um das Hinterland hat begonnen! Letzter Sieger: Horde(%u)", HORDE);
             {
                 LOG_INFO("misc", "[OutdoorPvPHL]: Die Schlacht um das Hinterland hat begonnen! Letzter Sieger: Horde ");
-                return;
             }
                 
             else if(m_LastWin == 0) //sLog->outString("[OutdoorPvPHL]: Die Schlacht um das Hinterland hat begonnen! Es gab letztes mal keinen Sieger!(0)");
             {
                 LOG_INFO("misc", "[OutdoorPvPHL]: Die Schlacht um das Hinterland hat begonnen! Es gab letztes mal keinen Sieger!");
-                return;
             }
                 
             m_FirstLoad = true;
