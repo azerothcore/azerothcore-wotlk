@@ -590,16 +590,69 @@ public:
     };
 };
 
+class npc_injured_7th_legion_soldier : public CreatureScript
+{
+public:
+    npc_injured_7th_legion_soldier() : CreatureScript("npc_injured_7th_legion_soldier") { }
+
+    CreatureAI* GetAI(Creature* pCreature) const override
+    {
+        return new npc_injured_7th_legion_soldierAI (pCreature);
+    }
+
+    struct npc_injured_7th_legion_soldierAI : public NullCreatureAI
+    {
+        npc_injured_7th_legion_soldierAI(Creature* c) : NullCreatureAI(c) {}
+
+        void Reset() override
+        {
+            me->CastSpell(me, SPELL_FEAR_AURA_WITH_COWER, true);
+            me->SetWalk(false);
+            uint32 path = me->GetEntry() * 10 + urand(0, 4);
+            if (me->GetPositionY() > -1150.0f)
+                path += 5;
+            me->GetMotionMaster()->MovePath(path, false);
+        }
+
+        void MovementInform(uint32 type, uint32 point) override
+        {
+            if (type != WAYPOINT_MOTION_TYPE)
+                return;
+
+            if (point == 8) // max-1
+            {
+                Talk(0);
+                me->RemoveAllAuras();
+                me->DespawnOrUnsummon(1000);
+                if (TempSummon* summon = me->ToTempSummon())
+                    if (Unit* owner = summon->GetSummonerUnit())
+                        if (Player* player = owner->ToPlayer())
+                            player->KilledMonsterCredit(me->GetEntry());
+            }
+        }
+    };
+};
+
 enum WintergardeGryphon
 {
     SPELL_RESCUE_VILLAGER                       = 48363,
     SPELL_DROP_OFF_VILLAGER                     = 48397,
     SPELL_RIDE_VEHICLE                          = 43671,
+    SPELL_COWER_FEAR                            = 49774,
     SPELL_CALL_WINTERGARDE_GRYPHON              = 48388,
+
+    SAY_FEAR                                    = 0,
+    SAY_IN_VEHICLE                              = 1,
+    SAY_RESCUED                                 = 2,
 
     EVENT_VEHICLE_GET                           = 1,
     EVENT_TAKE_OFF                              = 2,
     EVENT_GET_VILLAGER                          = 3,
+    EVENT_FEAR                                  = 4,
+    EVENT_VEHICLE                               = 5,
+
+    EVENT_PHASE_FEAR                            = 1,
+    EVENT_PHASE_VEHICLE                         = 2,
 
     POINT_LAND                                  = 1,
     POINT_TAKE_OFF                              = 2,
@@ -618,7 +671,7 @@ public:
 
     void JustDied(Unit* /*killer*/) override
     {
-        me->DespawnOrUnsummon(3000);
+        me->DespawnOrUnsummon(3s, 0s);
     }
 
     void IsSummonedBy(Unit* summoner) override
@@ -631,7 +684,7 @@ public:
     void MovementInform(uint32 type, uint32 id) override
     {
         if (type == POINT_MOTION_TYPE && id == POINT_LAND)
-            events.ScheduleEvent(EVENT_VEHICLE_GET, 0);
+            events.ScheduleEvent(EVENT_VEHICLE_GET, 0s);
     }
 
     void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override
@@ -653,7 +706,7 @@ public:
                 }
 
             me->RemoveVehicleKit(); // not Crash (;
-            events.ScheduleEvent(EVENT_TAKE_OFF, 2 * IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_TAKE_OFF, 2s);
             me->CastSpell(passenger, VEHICLE_SPELL_PARACHUTE, true);
         }
     }
@@ -688,7 +741,10 @@ public:
                 case EVENT_GET_VILLAGER:
                 {
                     if (getVillager())
+                    {
                         getVillager()->GetMotionMaster()->MovePoint(0, 3660.0f, -706.4f, 215.0f);
+                        getVillager()->DespawnOrUnsummon(7s, 0s);
+                    }
                     break;
                 }
             }
@@ -706,16 +762,85 @@ public:
                 if (Creature* seat = villager->ToCreature())
                 {
                     seat->ExitVehicle();
-                    seat->DespawnOrUnsummon(10 * IN_MILLISECONDS);
                     seat->GetMotionMaster()->Clear(false);
+                    seat->GetMotionMaster()->MoveIdle();
+                    seat->SetCanFly(false); // prevents movement in flight
                     villagerGUID = seat->GetGUID();
                     seat->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
-                    events.ScheduleEvent(EVENT_GET_VILLAGER, 3 * IN_MILLISECONDS);
+                    seat->AI()->Talk(SAY_RESCUED);
+                    events.ScheduleEvent(EVENT_GET_VILLAGER, 3s);
                 }
             }
     }
 private:
     ObjectGuid villagerGUID;
+};
+
+class npc_helpless_wintergarde_villager : public ScriptedAI
+{
+public:
+    npc_helpless_wintergarde_villager(Creature* creature) : ScriptedAI(creature), freed(false) { }
+
+    void InitializeAI() override
+    {
+        me->SetReactState(REACT_PASSIVE);
+        me->CastSpell(me, SPELL_COWER_FEAR, true);
+        events.ScheduleEvent(EVENT_FEAR, 30s, 45s, 0, EVENT_PHASE_FEAR);
+        freed = false;
+    }
+
+    void JustRespawned() override
+    {
+        Reset();
+    }
+
+    void DamageTaken(Unit* attacker, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+    {
+        if (!freed)
+            me->GetMotionMaster()->MoveFleeing(attacker);
+    }
+
+    void SpellHit(Unit* caster, SpellInfo const* spell) override
+    {
+        if (spell->Id != SPELL_RESCUE_VILLAGER)
+            return;
+
+        if (Vehicle* gryphon = caster->GetVehicleKit())
+        {
+            if (gryphon->GetAvailableSeatCount() != 0)
+            {
+                me->RemoveAura(SPELL_COWER_FEAR);
+                me->CastSpell(caster, SPELL_RIDE_VEHICLE, true);
+                me->GetMotionMaster()->Clear(false);
+                events.SetPhase(EVENT_PHASE_VEHICLE);
+                events.ScheduleEvent(EVENT_VEHICLE, 15s, 20s, 0, EVENT_PHASE_VEHICLE);
+                events.CancelEvent(EVENT_FEAR);
+                freed = true;
+            }
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        events.Update(diff);
+
+        while (uint32 eventId = events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+                case EVENT_FEAR:
+                    Talk(SAY_FEAR);
+                    events.ScheduleEvent(EVENT_FEAR, 20s, 25s, 0, EVENT_PHASE_FEAR);
+                    break;
+                case EVENT_VEHICLE:
+                    Talk(SAY_IN_VEHICLE);
+                    events.ScheduleEvent(EVENT_VEHICLE, 19s, 24s, 0, EVENT_PHASE_VEHICLE);
+                    break;
+            }
+        }
+    }
+private:
+    bool freed;
 };
 
 class spell_q12237_rescue_villager : public SpellScript
@@ -807,11 +932,11 @@ class spell_call_wintergarde_gryphon : public SpellScript
 
     SpellCastResult CheckRequirement()
     {
-        Unit* caster = GetCaster();
-        Player* playerCaster = caster->ToPlayer();
-
-        if (!playerCaster || playerCaster->GetQuestStatus(QUEST_FLIGHT_OF_THE_WINTERGARDE_DEFENDER) == QUEST_STATUS_INCOMPLETE)
-            return SPELL_CAST_OK;
+        if (Player* playerCaster = GetCaster()->ToPlayer())
+        {
+            if (playerCaster->GetQuestStatus(QUEST_FLIGHT_OF_THE_WINTERGARDE_DEFENDER) == QUEST_STATUS_INCOMPLETE)
+                return SPELL_CAST_OK;
+        }
         return SPELL_FAILED_DONT_REPORT;
     }
 
@@ -820,49 +945,6 @@ class spell_call_wintergarde_gryphon : public SpellScript
         OnCheckCast += SpellCheckCastFn(spell_call_wintergarde_gryphon::CheckRequirement);
         OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_call_wintergarde_gryphon::SetDest, EFFECT_0, TARGET_DEST_CASTER_FRONT);
     }
-};
-
-class npc_injured_7th_legion_soldier : public CreatureScript
-{
-public:
-    npc_injured_7th_legion_soldier() : CreatureScript("npc_injured_7th_legion_soldier") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
-    {
-        return new npc_injured_7th_legion_soldierAI (pCreature);
-    }
-
-    struct npc_injured_7th_legion_soldierAI : public NullCreatureAI
-    {
-        npc_injured_7th_legion_soldierAI(Creature* c) : NullCreatureAI(c) {}
-
-        void Reset() override
-        {
-            me->CastSpell(me, SPELL_FEAR_AURA_WITH_COWER, true);
-            me->SetWalk(false);
-            uint32 path = me->GetEntry() * 10 + urand(0, 4);
-            if (me->GetPositionY() > -1150.0f)
-                path += 5;
-            me->GetMotionMaster()->MovePath(path, false);
-        }
-
-        void MovementInform(uint32 type, uint32 point) override
-        {
-            if (type != WAYPOINT_MOTION_TYPE)
-                return;
-
-            if (point == 8) // max-1
-            {
-                Talk(0);
-                me->RemoveAllAuras();
-                me->DespawnOrUnsummon(1000);
-                if (TempSummon* summon = me->ToTempSummon())
-                    if (Unit* owner = summon->GetSummonerUnit())
-                        if (Player* player = owner->ToPlayer())
-                            player->KilledMonsterCredit(me->GetEntry());
-            }
-        }
-    };
 };
 
 class npc_heated_battle : public CreatureScript
@@ -2240,11 +2322,12 @@ void AddSC_dragonblight()
     new npc_hourglass_of_eternity();
     new npc_future_you();
     new npc_mindless_ghoul();
+    new npc_injured_7th_legion_soldier();
     RegisterCreatureAI(npc_wintergarde_gryphon);
+    RegisterCreatureAI(npc_helpless_wintergarde_villager);
     RegisterSpellScript(spell_q12237_rescue_villager);
     RegisterSpellScript(spell_q12237_drop_off_villager);
     RegisterSpellScript(spell_call_wintergarde_gryphon);
-    new npc_injured_7th_legion_soldier();
     new npc_heated_battle();
     new spell_q12478_frostmourne_cavern();
     new spell_q12243_fire_upon_the_waters();
