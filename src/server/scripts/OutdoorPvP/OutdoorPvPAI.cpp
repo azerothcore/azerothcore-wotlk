@@ -10,6 +10,7 @@
 #include "OutdoorPvP.h"
 #include "Group.h"
 #include "GroupMgr.h"
+#include "Log.h"
 
 OutdoorPvPAI::OutdoorPvPAI()
 {
