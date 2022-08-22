@@ -1,0 +1,120 @@
+Normal Rarity IDs.
+182703 - Blood Elf Chair
+Titan-Dwarf Table - 183399
+Bleachers - 186393
+Tower - 192820 (8335)
+"Working Place" - 192821
+Town Wall 192245
+Mailbox - 182363
+Bloodelf Bench - 182631
+Wooden Table - 181075
+Pirate Ship! - 191148 (7552)
+Picnic Bench - 180326
+Cannon 113531
+Horde Metal Barricade - (8451) - 193447
+barricades: 189997(7851), 194849
+Gnomeregan elevator - 152614 (however i cant stand on it..)
+brewfest tent - 186682
+bookcase 190693
+Outhouse 180006 (3332)
+Azshara Statue - 181964 (4853)
+Giant Doors (dwarven-titan) - 157923 (2790)
+Serpentbloom (flower) - 13891
+Speed Buff (battleground) - 179871
+Slain Paesant (hang) - 179699
+
+Rare Objects.
+Shredder Goblin - 178146
+festival tent - 180042
+Horrendous Larva - 178559
+Corpse Laden Boat - 1593
+Little House (closed) - 191173
+Little House (closed, abandoned) - 191175 (8055)
+Northrend House-tent - 194839 (8698)
+Mage Statue - 19509 (9509)
+(that farm thing) granary - 191172
+191173 - red house
+191176 - farm thing ruined
+191177 - ruinedstable
+191178 - stable
+191206 - scourge evil circle
+191203+ 191204 scourge altar & stairs (for speech in Ebon Hold)
+191267 - northrend abomination parts (flesh giant*)
+191261...191269 - Scourge Laboratory Themed Objects
+190377 - Wintergrasp Tower
+192032 - goblin workshop (8208)
+192162 - spider web
+192492 - Thorim's mace
+192491 - the lorehammer
+192524 - angrim the insatiable
+192578 - green plaguespreader (floating thing)
+192579 - scourge platform
+spider's web - 192812
+alexstrasza's flames - 192804
+Scourge Flag - 192937
+192957 - ghost tree
+ice tree - 192956
+193163 - supplies
+193160 - horde supplies
+193158, 193159 - training dummy & training dummy for archers
+193192 - broken plaguespreader
+
+193357 pink flower, 193364 red flower, 193368 grass, 193370 yellow flower, 193393 pink flower 2, blue flower 193399; ((these flowers: red dragonflight wrathgate theme))
+193384 - wall of fire
+193400 - saronite bomb
+193439- Lordaeron Banner
+193451 - hordeflag
+intense fire no smoke - 193455
+fire - 193456 (the next, 193457 is called lava bomb, however is the same of 193456)
+193590...193592...193594 - celestial square
+temple of invention orb - 193589
+dark anvil 193596
+underbelly elixir - 193610
+tent - 193801, 193802
+catapult - 193803
+open book - 193825
+skeleton - 193893
+194820 - screen to change your dress
+194832 ice rock, 194838 ice rock 2
+grain 194862
+194860 - torch
+194868 - cushion / hassock
+194869 - ruined carpet
+194888 - map
+194890 - crate of scrolls
+194893, scroll
+candle 194896
+"lavaman" as lich king 202436
+lavaman chained (bolvar fordragon) 202437
+altar of hyjal 211019
+211067 - sarcophag
+401012 - bread
+193994 - colossus (ulduar style) (8523)
+
+Other IDs of Interest
+Orgrim's Hammer (8253) - 192241
+194148 - universe globe
+195191 (8964) - dwarven table
+195303 - bountiful feast
+21148 - feast goublet
+bowl fruit 181144
+180370 - harvest fruit
+186662 - reagent pouch
+186681 - brewfest tent
+185491 - emerald dream big tree
+emerald dream catcher (red tree) - 19490 (9490)
+192920 (8358) - crates and supplies
+shattrath soup tent - 183355
+193971...193975 cask of dalaran red
+AQWar - Resource - 180679
+180031 - festival tent (darkmoon)
+187561 - arcane prison
+Magic Vortex (similar to Nexus) - 179506 (5693)
+bottle of dalaran red 193970
+192783 - dalaran apple bowl
+
+models of..
+gold: (2614)
+red dragon egg (5972)
+arcane crystal formation (7210)
+blue dragon egg (8465)
