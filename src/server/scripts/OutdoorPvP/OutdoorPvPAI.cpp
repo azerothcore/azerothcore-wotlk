@@ -76,6 +76,19 @@ void OutdoorPvPAI::HandlePlayerEnterZone(Player* player, uint32 zone)
     {
 
     }
+
+    if (player->GetTeamId() == TEAM_ALLIANCE)
+    {
+        int = AllianceBuff = 32071;    
+        //if (m_AllianceTowersControlled >= 3)
+        player->CastSpell(player, AllianceBuff, true);
+    }
+    else
+    {
+        int HordeBuff = 32049;
+        //if (m_HordeTowersControlled >= 3)
+        player->CastSpell(player, HordeBuff, true);
+    }        
 	OutdoorPvP::HandlePlayerEnterZone(player, zone);
 }
 
