@@ -7,6 +7,7 @@
 
 #include "OutdoorPvPAI.h"
 #include "OutdoorPvPMgr.h"
+#include "OutdoorPvP.h"
 #include "Group.h"
 #include "GroupMgr.h"
 
@@ -77,6 +78,7 @@ void OutdoorPvPAI::HandlePlayerEnterZone(Player* player, uint32 zone)
 
     }
 
+    //Faction buffs from Wintergrasp
     if (player->GetTeamId() == TEAM_ALLIANCE)
     {
         //if (m_AllianceTowersControlled >= 3)
