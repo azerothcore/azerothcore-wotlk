@@ -34,5 +34,15 @@ class OutdoorPvPAI : public OutdoorPvP
    protected:
 	  GuidSet m_Groups[2];
 	  PlayerSet m_PlayersInWar[2];
+
+    //Faction buffs
+    //AllianceBuff = 32071,
+    //HordeBuff = 32049
+
+    enum OutdoorPvPAISpells
+    {
+    AllianceBuff = 32071,
+    HordeBuff = 32049
+    };
 };
 #endif
