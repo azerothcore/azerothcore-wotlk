@@ -324,7 +324,7 @@
                                     HandleBuffs(itr->second->GetPlayer(), false);
                                     break;
      
-                                case TEAM_HORDE:
+                                default: //Horde
                                     HandleBuffs(itr->second->GetPlayer(), true);
                                     break;
                             }
@@ -386,7 +386,7 @@
 					player->AddItem(40752, 1);
                     Randomizer(player);					
                     break;
-               case TEAM_HORDE:
+               default: //Horde
                     m_horde_gathered -= PointsLoseOnPvPKill;					
                     Randomizer(player);
 					player->AddItem(40752, 1);
