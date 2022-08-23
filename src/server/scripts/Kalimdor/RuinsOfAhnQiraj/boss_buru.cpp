@@ -137,6 +137,10 @@ struct boss_buru : public BossAI
         {
             damage = damage * 0.01f; // 99% dmg resist
         }
+        else if (attacker->GetEntry() == NPC_BURU_EGG)
+        {
+            me->LowerPlayerDamageReq(damage);
+        }
 
         if (me->HealthBelowPctDamaged(20, damage) && _phase == PHASE_EGG)
         {
