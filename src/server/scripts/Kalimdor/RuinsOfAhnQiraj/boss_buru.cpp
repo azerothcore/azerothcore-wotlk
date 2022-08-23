@@ -232,7 +232,7 @@ struct npc_buru_egg : public ScriptedAI
         }
     }
 
-    void UpdateAI(uint32 diff) override { }
+    void UpdateAI(uint32 /*diff*/) override { }
 
 private:
     InstanceScript* _instance;
