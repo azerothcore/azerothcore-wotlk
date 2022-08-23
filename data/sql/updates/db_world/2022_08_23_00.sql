@@ -1,3 +1,4 @@
+-- DB update 2022_08_21_19 -> 2022_08_23_00
 --
 UPDATE `creature` SET `spawntimesecs` = 120 WHERE `id1` = 15514;
 
