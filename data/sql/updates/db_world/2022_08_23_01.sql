@@ -1,3 +1,4 @@
+-- DB update 2022_08_23_00 -> 2022_08_23_01
 -- aq20 boss reference table
 DELETE FROM `reference_loot_template` WHERE (`Entry` = 34024) AND (`Item` IN (20727, 20728, 20729, 20730, 20731, 20734, 20736));
 INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
