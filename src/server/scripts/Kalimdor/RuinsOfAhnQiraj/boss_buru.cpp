@@ -194,7 +194,7 @@ struct npc_buru_egg : public ScriptedAI
         _instance = me->GetInstanceScript();
         SetCombatMovement(false);
         me->SetReactState(REACT_PASSIVE);
-        me->SetCorpseRemoveTime(3000);
+        me->SetCorpseRemoveTime(5000);
     }
 
     void EnterCombat(Unit* attacker) override
