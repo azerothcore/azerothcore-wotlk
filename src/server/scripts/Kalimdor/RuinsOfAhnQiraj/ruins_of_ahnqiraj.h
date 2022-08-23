@@ -43,6 +43,8 @@ enum DataTypes
     DATA_ZERRAN             = 14,
     DATA_ANDOROV            = 15,
 
+    DATA_BURU_PHASE         = 16,
+
     DATA_ENGAGED_FORMATION  = 1
 };
 
