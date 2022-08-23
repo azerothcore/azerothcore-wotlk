@@ -190,6 +190,7 @@ struct npc_buru_egg : public ScriptedAI
         _instance = me->GetInstanceScript();
         SetCombatMovement(false);
         me->SetReactState(REACT_PASSIVE);
+        me->SetControlled(true, UNIT_STATE_STUNNED);
     }
 
     void EnterCombat(Unit* attacker) override
@@ -224,7 +225,7 @@ struct npc_buru_egg : public ScriptedAI
         {
             if (Creature* buru = _instance->GetCreature(DATA_BURU))
             {
-                DoCastSelf(SPELL_EXPLODE);
+                DoCastSelf(SPELL_EXPLODE, true);
                 DoCastSelf(SPELL_BURU_EGG_TRIGGER, true);
                 buru->CastSpell(buru, SPELL_CREATURE_SPECIAL, true);
             }
