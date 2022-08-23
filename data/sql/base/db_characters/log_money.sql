@@ -17,15 +17,15 @@ DROP TABLE IF EXISTS `log_money`;
 CREATE TABLE IF NOT EXISTS `log_money` (
   `sender_acc` int unsigned NOT NULL,
   `sender_guid` int unsigned NOT NULL,
-  `sender_name` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `sender_ip` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `sender_name` text NOT NULL,
+  `sender_ip` text NOT NULL,
   `receiver_acc` int unsigned NOT NULL,
-  `receiver_name` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `receiver_name` text NOT NULL,
   `money` bigint unsigned NOT NULL,
-  `topic` char(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `topic` text NOT NULL,
   `date` datetime NOT NULL,
   `type` tinyint NOT NULL COMMENT '1=COD,2=AH,3=GB DEPOSIT,4=GB WITHDRAW,5=MAIL,6=TRADE'
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumpar data för tabell acore_characters.log_money: 0 rows
 DELETE FROM `log_money`;
