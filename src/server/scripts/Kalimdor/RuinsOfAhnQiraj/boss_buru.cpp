@@ -190,7 +190,6 @@ struct npc_buru_egg : public ScriptedAI
         _instance = me->GetInstanceScript();
         SetCombatMovement(false);
         me->SetReactState(REACT_PASSIVE);
-        me->SetCorpseRemoveTime(5000);
     }
 
     void EnterCombat(Unit* attacker) override
@@ -230,6 +229,8 @@ struct npc_buru_egg : public ScriptedAI
                 buru->CastSpell(buru, SPELL_CREATURE_SPECIAL, true);
             }
         }
+
+        me->DespawnOrUnsummon(5000);
     }
 
     void UpdateAI(uint32 /*diff*/) override { }
