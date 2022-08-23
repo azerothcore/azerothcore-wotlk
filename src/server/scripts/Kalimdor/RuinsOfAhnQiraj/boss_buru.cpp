@@ -129,11 +129,7 @@ struct boss_buru : public BossAI
 
     void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
-        if (attacker->GetEntry() != NPC_BURU_EGG && _phase == PHASE_EGG)
-        {
-            damage = damage * 0.01f; // 99% dmg resist
-        }
-        else if (attacker->GetEntry() == NPC_BURU_EGG)
+        if (attacker->GetEntry() == NPC_BURU_EGG)
         {
             me->LowerPlayerDamageReq(damage);
         }
