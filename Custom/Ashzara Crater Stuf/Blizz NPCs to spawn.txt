@@ -27,6 +27,8 @@ https://www.wowhead.com/wotlk/de/npc=3398/gesharahan
 https://www.wowhead.com/wotlk/de/npc=3652/trigore-der-peitscher
 https://www.wowhead.com/wotlk/de/npc=16358/kelgash-der-boshafte
 https://www.wowhead.com/wotlk/de/npc=448/hogger
+https://www.wowhead.com/wotlk/de/npc=12432/zwingenkiefer
+https://www.wowhead.com/wotlk/de/npc=5823/todesschinder
 
 -- 21 - 30
 https://www.wowhead.com/wotlk/de/npc=4126/klippenpirscher
