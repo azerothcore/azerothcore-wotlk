@@ -75,6 +75,7 @@ public:
             SetBossNumber(NUM_ENCOUNTER);
             LoadObjectData(creatureData, nullptr);
             _rajaxWaveCounter = 0;
+            _buruPhase = 1;
         }
 
         void OnPlayerEnter(Player* player) override
@@ -150,18 +151,33 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 /*data*/) override
+        void SetData(uint32 type, uint32 data) override
         {
-            if (type == DATA_RAJAXX_WAVE_ENGAGED)
+            switch (type)
             {
-                _scheduler.CancelGroup(GROUP_RAJAXX_WAVE_TIMER);
-                _scheduler.Schedule(2min, [this](TaskContext context)
-                {
-                    CallNextRajaxxLeader();
-                    context.SetGroup(GROUP_RAJAXX_WAVE_TIMER);
-                    context.Repeat();
-                });
+                case DATA_RAJAXX_WAVE_ENGAGED:
+                    _scheduler.CancelGroup(GROUP_RAJAXX_WAVE_TIMER);
+                    _scheduler.Schedule(2min, [this](TaskContext context)
+                    {
+                        CallNextRajaxxLeader();
+                        context.SetGroup(GROUP_RAJAXX_WAVE_TIMER);
+                        context.Repeat();
+                    });
+                    break;
+                case DATA_BURU_PHASE:
+                    _buruPhase = data;
+                    break;
+                default:
+                    break;
             }
+        }
+
+        uint32 GetData(uint32 type) const override
+        {
+            if (type == DATA_BURU_PHASE)
+                return _buruPhase;
+
+            return 0;
         }
 
         void OnUnitDeath(Unit* unit) override
@@ -362,6 +378,7 @@ public:
         ObjectGuid _andorovGUID;
         GuidVector _sandVortexes;
         uint32 _rajaxWaveCounter;
+        uint8 _buruPhase;
         TaskScheduler _scheduler;
     };
 
