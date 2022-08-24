@@ -39,7 +39,8 @@ enum Spells
     SPELL_GIFT_OF_THE_DOOMSAYER     = 36173,
     SPELL_WHIRLWIND                 = 36142,
     SPELL_HEAL                      = 36144,
-    SPELL_SHADOW_WAVE               = 39016
+    SPELL_SHADOW_WAVE               = 39016,
+    SPELL_SARONITE = 633650
 };
 
 enum Events
@@ -114,6 +115,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            DoCast(me, SPELL_SARONITE);
             events2.Update(diff);
             switch (events2.ExecuteEvent())
             {

@@ -403,6 +403,10 @@ bool ReputationMgr::SetOneFactionReputation(FactionEntry const* factionEntry, fl
             itr->second.roundedUp = !itr->second.roundedUp;
         }
 
+        // VIP
+        if (_player->GetSession()->IsPremium())
+            standing *= sWorld->getRate(RATE_REPUTATION_PREMIUM);
+
         if (incremental)
         {
             standing += itr->second.Standing + BaseRep;

@@ -46,7 +46,8 @@ enum Spells
     SPELL_FELFIRE_SHOCK             = 35759,
     SPELL_KNOCK_AWAY                = 36512,
     SPELL_FELFIRE                   = 35769,
-    SPELL_CHARGE                    = 35754
+    SPELL_CHARGE                    = 35754,
+    SPELL_SARONITE = 633650
 };
 
 enum Events
@@ -142,6 +143,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            DoCast(me, SPELL_SARONITE);
             events2.Update(diff);
             switch (events2.ExecuteEvent())
             {

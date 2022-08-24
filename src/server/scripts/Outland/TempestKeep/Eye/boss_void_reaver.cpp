@@ -30,6 +30,7 @@ enum voidReaver
     SPELL_ARCANE_ORB            = 34172,
     SPELL_KNOCK_AWAY            = 25778,
     SPELL_BERSERK               = 26662,
+    SPELL_SARONITE = 633650,
 
     EVENT_SPELL_POUNDING        = 1,
     EVENT_SPELL_ARCANEORB       = 2,
@@ -84,6 +85,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            DoCast(me, SPELL_SARONITE);
             if (!UpdateVictim())
                 return;
 

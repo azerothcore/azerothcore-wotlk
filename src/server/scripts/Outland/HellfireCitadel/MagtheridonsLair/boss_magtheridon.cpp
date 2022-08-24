@@ -140,9 +140,9 @@ public:
             events2.Reset();
             _EnterCombat();
             events.ScheduleEvent(EVENT_EMOTE1, 0);
-            events.ScheduleEvent(EVENT_EMOTE2, 60000);
-            events.ScheduleEvent(EVENT_EMOTE3, 120000);
-            events.ScheduleEvent(EVENT_ENTER_COMBAT, 123000);
+            events.ScheduleEvent(EVENT_EMOTE2, 10000);
+            events.ScheduleEvent(EVENT_EMOTE3, 25000);
+            events.ScheduleEvent(EVENT_ENTER_COMBAT, 30000);
         }
 
         void UpdateAI(uint32 diff) override
@@ -189,9 +189,9 @@ public:
                     me->SetImmuneToPC(false);
                     me->SetReactState(REACT_AGGRESSIVE);
                     events.ScheduleEvent(EVENT_CLEAVE, 9000);
-                    events.ScheduleEvent(EVENT_BLAST_NOVA, 60000);
+                    events.ScheduleEvent(EVENT_BLAST_NOVA, 15000);
                     events.ScheduleEvent(EVENT_BLAZE, 10000);
-                    events.ScheduleEvent(EVENT_QUAKE, 40000);
+                    events.ScheduleEvent(EVENT_QUAKE, 20000);
                     events.ScheduleEvent(EVENT_CHECK_HEALTH, 500);
                     events.ScheduleEvent(EVENT_ENRAGE, 22 * MINUTE * IN_MILLISECONDS);
 
@@ -204,7 +204,7 @@ public:
                     break;
                 case EVENT_BLAST_NOVA:
                     me->CastSpell(me, SPELL_BLAST_NOVA, false);
-                    events.ScheduleEvent(EVENT_BLAST_NOVA, 60000);
+                    events.ScheduleEvent(EVENT_BLAST_NOVA, 10000);
                     events.ScheduleEvent(EVENT_CANCEL_GRASP_CHECK, 12000);
                     events2.ScheduleEvent(EVENT_CHECK_GRASP, 0);
                     break;

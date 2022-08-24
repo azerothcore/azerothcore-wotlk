@@ -37,7 +37,8 @@ enum Spells
 
     // Onyx Flamecaller
     SPELL_BLAST_NOVA            = 74392,
-    SPELL_LAVA_GOUT             = 74394
+    SPELL_LAVA_GOUT             = 74394,
+    SPELL_SARONITE = 63364
 };
 
 enum Misc
@@ -145,6 +146,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            DoCast(me, SPELL_SARONITE);
             if (!UpdateVictim())
                 return;
 

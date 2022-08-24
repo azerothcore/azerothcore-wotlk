@@ -271,6 +271,7 @@ public:
     [[nodiscard]] bool IsGossipOptionCoded(uint32 selection) const { return _gossipMenu.IsMenuItemCoded(selection); }
 
     void SendGossipMenu(uint32 titleTextId, ObjectGuid objectGUID);
+    void SendGossipMenu(std::string text, ObjectGuid objectGUID, uint32 textid = 2147483647);
     void SendCloseGossip();
     void SendPointOfInterest(uint32 poiId) const;
 

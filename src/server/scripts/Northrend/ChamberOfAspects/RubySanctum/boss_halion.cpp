@@ -115,7 +115,8 @@ enum Spells
     SPELL_TWILIGHT_MENDING              = 75509,
     SPELL_TWILIGHT_REALM                = 74807,
     SPELL_DUSK_SHROUD                   = 75476,
-    SPELL_COPY_DAMAGE                   = 74810
+    SPELL_COPY_DAMAGE                   = 74810,
+    SPELL_SARONITE = 63364
 };
 
 enum Events
@@ -349,6 +350,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            DoCast(me, SPELL_SARONITE);
             _events2.Update(diff);
             switch (_events2.ExecuteEvent())
             {

@@ -49,7 +49,8 @@ enum Spells
     SPELL_GRAVITY_LAPSE_FLY         = 44227,
     SPELL_GRAVITY_LAPSE_DOT         = 44226,
     SPELL_GRAVITY_LAPSE_CHANNEL     = 44251,
-    SPELL_POWER_FEEDBACK            = 44233
+    SPELL_POWER_FEEDBACK            = 44233,
+    SPELL_SARONITE = 633650
 };
 
 enum Misc
@@ -197,6 +198,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            DoCast(me, SPELL_SARONITE);
             events2.Update(diff);
             switch (events2.ExecuteEvent())
             {

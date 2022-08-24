@@ -43,7 +43,8 @@ enum Spells
 
     SPELL_SUMMON_PURE_ENERGY_N      = 44322,
     SPELL_SUMMON_PURE_ENERGY_H1     = 46154,
-    SPELL_SUMMON_PURE_ENERGY_H2     = 46159
+    SPELL_SUMMON_PURE_ENERGY_H2     = 46159,
+    SPELL_SARONITE = 633650
 };
 
 enum Misc
@@ -134,6 +135,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            DoCast(me, SPELL_SARONITE);
             if (!UpdateVictim())
                 return;
 

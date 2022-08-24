@@ -38,6 +38,7 @@ enum Spells
     SPELL_MANA_BURN             = 39020,
     SPELL_66_ILLUSION           = 36931,
     SPELL_33_ILLUSION           = 36932,
+    SPELL_SARONITE = 633650,
 
     SPELL_MIND_REND_IMAGE   = 36929,
     H_SPELL_MIND_REND_IMAGE = 39021
@@ -115,6 +116,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            DoCast(me, SPELL_SARONITE);
             if (!UpdateVictim())
                 return;
 

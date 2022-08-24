@@ -1102,7 +1102,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
         if (pInfo->armor > 0)
             SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(pInfo->armor));
 
-        for (uint8 stat = 0; stat < MAX_STATS; ++stat)
+        for (uint16 stat = 0; stat < MAX_STATS; ++stat)
             SetCreateStat(Stats(stat), float(pInfo->stats[stat]));
     }
     else                                            // not exist in DB, use some default fake data

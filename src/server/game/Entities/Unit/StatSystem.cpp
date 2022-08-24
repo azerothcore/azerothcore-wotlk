@@ -458,7 +458,7 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
                             val2 = (getLevel() * mLevelMult) + GetStat(STAT_STRENGTH) * 2.0f - 20.0f + m_baseFeralAP;
                             break;
                         default:
-                            val2 = GetStat(STAT_STRENGTH) * 2.0f - 20.0f;
+                            val2 = GetStat(STAT_STRENGTH) * 3.0f - 20.0f;
                             break;
                     }
                     break;
@@ -556,11 +556,11 @@ void Player::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, bo
     if (IsInFeralForm()) // check if player is druid and in cat or bear forms
     {
         uint8 lvl = getLevel();
-        if (lvl > 60)
-            lvl = 60;
+        if (lvl > 200)
+            lvl = 200;
 
-        weaponMinDamage = lvl * 0.85f * attackSpeedMod;
-        weaponMaxDamage = lvl * 1.25f * attackSpeedMod;
+        weaponMinDamage = lvl * 1.85f * attackSpeedMod;
+        weaponMaxDamage = lvl * 2.25f * attackSpeedMod;
     }
     else if (!CanUseAttackType(attType)) // check if player not in form but still can't use (disarm case)
     {
@@ -722,13 +722,13 @@ void Player::UpdateParryPercentage()
 {
     const float parry_cap[MAX_CLASSES] =
     {
-        47.003525f,     // Warrior
-        47.003525f,     // Paladin
-        145.560408f,    // Hunter
-        145.560408f,    // Rogue
+        15.003525f,     // Warrior
+        15.003525f,     // Paladin
+        50.560408f,    // Hunter
+        50.560408f,    // Rogue
         0.0f,           // Priest
-        47.003525f,     // DK
-        145.560408f,    // Shaman
+        15.003525f,     // DK
+        60.560408f,    // Shaman
         0.0f,           // Mage
         0.0f,           // Warlock
         0.0f,           // ??
@@ -757,7 +757,7 @@ void Player::UpdateParryPercentage()
 
         if (sConfigMgr->GetOption<bool>("Stats.Limits.Enable", false))
         {
-            value = value > sConfigMgr->GetOption<float>("Stats.Limits.Parry", 95.0f) ? sConfigMgr->GetOption<float>("Stats.Limits.Parry", 95.0f) : value;
+            value = value > sConfigMgr->GetOption<float>("Stats.Limits.Parry", 10.0f) ? sConfigMgr->GetOption<float>("Stats.Limits.Parry", 10.0f) : value;
         }
     }
 
@@ -768,17 +768,17 @@ void Player::UpdateDodgePercentage()
 {
     const float dodge_cap[MAX_CLASSES] =
     {
-        88.129021f,     // Warrior
-        88.129021f,     // Paladin
-        145.560408f,    // Hunter
-        145.560408f,    // Rogue
-        150.375940f,    // Priest
-        88.129021f,     // DK
-        145.560408f,    // Shaman
-        150.375940f,    // Mage
-        150.375940f,    // Warlock
+        18.129021f,     // Warrior
+        18.129021f,     // Paladin
+        35.560408f,    // Hunter
+        35.560408f,    // Rogue
+        80.375940f,    // Priest
+        18.129021f,     // DK
+        80.560408f,    // Shaman
+        80.375940f,    // Mage
+        80.375940f,    // Warlock
         0.0f,           // ??
-        116.890707f     // Druid
+        40.890707f     // Druid
     };
 
     float diminishing = 0.0f, nondiminishing = 0.0f;
@@ -799,7 +799,7 @@ void Player::UpdateDodgePercentage()
 
     if (sConfigMgr->GetOption<bool>("Stats.Limits.Enable", false))
     {
-        value = value > sConfigMgr->GetOption<float>("Stats.Limits.Dodge", 95.0f) ? sConfigMgr->GetOption<float>("Stats.Limits.Dodge", 95.0f) : value;
+        value = value > sConfigMgr->GetOption<float>("Stats.Limits.Dodge", 10.0f) ? sConfigMgr->GetOption<float>("Stats.Limits.Dodge", 10.0f) : value;
     }
 
     SetStatFloatValue(PLAYER_DODGE_PERCENTAGE, value);
@@ -826,6 +826,10 @@ void Player::UpdateSpellCritChance(uint32 school)
     // Increase crit from spell crit ratings
     crit += GetRatingBonusValue(CR_CRIT_SPELL);
 
+    if (sConfigMgr->GetOption<bool>("Stats.Limits.Enable", false))
+    {
+        crit = crit > sConfigMgr->GetOption<float>("Stats.Limits.CritSpell", 50.0f) ? sConfigMgr->GetOption<float>("Stats.Limits.CritSpell", 50.0f) : crit;
+    }
     // Store crit value
     SetFloatValue(PLAYER_SPELL_CRIT_PERCENTAGE1 + school, crit);
 }
@@ -1321,9 +1325,9 @@ void Guardian::UpdateDamagePhysical(WeaponAttackType attType)
     float mindamage = ((base_value + weapon_mindamage) * base_pct + total_value) * total_pct;
     float maxdamage = ((base_value + weapon_maxdamage) * base_pct + total_value) * total_pct;
 
-    if (mindamage < 0.0f || mindamage > 10000000.0f)
+    if (mindamage < 0.0f || mindamage > 50000000.0f) // pet damage cap
         mindamage = BASE_MINDAMAGE;
-    if (maxdamage < 0.0f || maxdamage > 10000000.0f)
+    if (maxdamage < 0.0f || maxdamage > 50000000.0f) // pet damage cap
         maxdamage = BASE_MAXDAMAGE;
     if (mindamage > maxdamage)
         mindamage = maxdamage;

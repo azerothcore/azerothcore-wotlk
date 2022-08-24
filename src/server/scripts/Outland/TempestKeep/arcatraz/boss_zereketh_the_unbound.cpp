@@ -31,7 +31,8 @@ enum Spells
 {
     SPELL_VOID_ZONE                 = 36119,
     SPELL_SHADOW_NOVA               = 36127,
-    SPELL_SEED_OF_CORRUPTION        = 36123
+    SPELL_SEED_OF_CORRUPTION        = 36123,
+    SPELL_SARONITE = 633650
 };
 
 enum Events
@@ -73,6 +74,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            DoCast(me, SPELL_SARONITE);
             if (!UpdateVictim())
                 return;
 

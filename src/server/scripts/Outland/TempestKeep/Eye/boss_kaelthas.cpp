@@ -102,7 +102,8 @@ enum Spells
     SPELL_NETHER_BEAM                   = 35869,
     SPELL_NETHER_BEAM_DAMAGE            = 35873,
 
-    SPELL_REMOTE_TOY_STUN               = 37029
+    SPELL_REMOTE_TOY_STUN               = 37029,
+    SPELL_SARONITE = 63364
 };
 
 enum Misc
@@ -258,8 +259,8 @@ public:
                 phase = PHASE_SINGLE_ADVISOR;
                 me->SetInCombatWithZone();
                 Talk(SAY_INTRO);
-                events2.ScheduleEvent(EVENT_PREFIGHT_PHASE11, 23000);
-                events2.ScheduleEvent(EVENT_PREFIGHT_PHASE12, 30000);
+                events2.ScheduleEvent(EVENT_PREFIGHT_PHASE11, 10000);
+                events2.ScheduleEvent(EVENT_PREFIGHT_PHASE12, 15000);
             }
         }
 
@@ -338,18 +339,18 @@ public:
                 events2.ScheduleEvent(EVENT_SCENE_2, 2500);
                 events2.ScheduleEvent(EVENT_SCENE_3, 4000);
                 events2.ScheduleEvent(EVENT_SCENE_4, 7000);
-                events2.ScheduleEvent(EVENT_SCENE_5, 10000);
-                events2.ScheduleEvent(EVENT_SCENE_6, 14000);
-                events2.ScheduleEvent(EVENT_SCENE_7, 17500);
-                events2.ScheduleEvent(EVENT_SCENE_8, 19000);
-                events2.ScheduleEvent(EVENT_SCENE_9, 22000); // two first lightnings + aura
-                events2.ScheduleEvent(EVENT_SCENE_10, 22800); // two
-                events2.ScheduleEvent(EVENT_SCENE_11, 23600); // two
-                events2.ScheduleEvent(EVENT_SCENE_12, 24500); // two
-                events2.ScheduleEvent(EVENT_SCENE_13, 24800); // two
-                events2.ScheduleEvent(EVENT_SCENE_14, 25300); // two
-                events2.ScheduleEvent(EVENT_SCENE_15, 32000); // full power
-                events2.ScheduleEvent(EVENT_SCENE_16, 36000); // remove lightnings + aura, move down
+                events2.ScheduleEvent(EVENT_SCENE_5, 9000);
+                events2.ScheduleEvent(EVENT_SCENE_6, 11000);
+                events2.ScheduleEvent(EVENT_SCENE_7, 13500);
+                events2.ScheduleEvent(EVENT_SCENE_8, 15000);
+                events2.ScheduleEvent(EVENT_SCENE_9, 17000); // two first lightnings + aura
+                events2.ScheduleEvent(EVENT_SCENE_10, 19800); // two
+                events2.ScheduleEvent(EVENT_SCENE_11, 20600); // two
+                events2.ScheduleEvent(EVENT_SCENE_12, 20500); // two
+                events2.ScheduleEvent(EVENT_SCENE_13, 20800); // two
+                events2.ScheduleEvent(EVENT_SCENE_14, 21300); // two
+                events2.ScheduleEvent(EVENT_SCENE_15, 23000); // full power
+                events2.ScheduleEvent(EVENT_SCENE_16, 25000); // remove lightnings + aura, move down
             }
             else if (point == POINT_START_LAST_PHASE)
             {
@@ -360,9 +361,9 @@ public:
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                 events.SetTimer(60000);
                 events.ScheduleEvent(EVENT_SPELL_FIREBALL, 0);
-                events.ScheduleEvent(EVENT_SPELL_FLAMESTRIKE, 10000);
-                events.ScheduleEvent(EVENT_SPELL_SUMMON_PHOENIX, 20000);
-                events.ScheduleEvent(EVENT_SPELL_GRAVITY_LAPSE, 5000);
+                events.ScheduleEvent(EVENT_SPELL_FLAMESTRIKE, 5000);
+                events.ScheduleEvent(EVENT_SPELL_SUMMON_PHOENIX, 10000);
+                events.ScheduleEvent(EVENT_SPELL_GRAVITY_LAPSE, 7000);
                 if (me->GetVictim())
                 {
                     me->SetTarget(me->GetVictim()->GetGUID());
@@ -373,6 +374,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            DoCast(me, SPELL_SARONITE);
             events2.Update(diff);
             switch (events2.ExecuteEvent())
             {
@@ -488,11 +490,11 @@ public:
                     events2.Reset();
                     events.Reset();
                     events.ScheduleEvent(EVENT_SPELL_FIREBALL, 1000);
-                    events.ScheduleEvent(EVENT_SPELL_FLAMESTRIKE, 15000);
-                    events.ScheduleEvent(EVENT_SPELL_SUMMON_PHOENIX, 30000);
-                    events.ScheduleEvent(EVENT_SPELL_SEQ_1, 20000);
-                    events.ScheduleEvent(EVENT_SPELL_SEQ_2, 40000);
-                    events.ScheduleEvent(EVENT_SPELL_SEQ_3, 60000);
+                    events.ScheduleEvent(EVENT_SPELL_FLAMESTRIKE, 5000);
+                    events.ScheduleEvent(EVENT_SPELL_SUMMON_PHOENIX, 10000);
+                    events.ScheduleEvent(EVENT_SPELL_SEQ_1, 15000);
+                    events.ScheduleEvent(EVENT_SPELL_SEQ_2, 22000);
+                    events.ScheduleEvent(EVENT_SPELL_SEQ_3, 30000);
                     events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
                     break;
                 case EVENT_SCENE_1:
@@ -618,17 +620,17 @@ public:
                 case EVENT_SPELL_SEQ_1:
                     events.ScheduleEvent(EVENT_SPELL_MIND_CONTROL, 0);
                     events.ScheduleEvent(EVENT_SPELL_ARCANE_DISRUPTION, 3000);
-                    events.ScheduleEvent(EVENT_SPELL_SEQ_1, 50000);
+                    events.ScheduleEvent(EVENT_SPELL_SEQ_1, 30000);
                     break;
                 case EVENT_SPELL_SEQ_2:
                     events.ScheduleEvent(EVENT_SPELL_MIND_CONTROL, 3000);
                     events.ScheduleEvent(EVENT_SPELL_ARCANE_DISRUPTION, 6000);
-                    events.ScheduleEvent(EVENT_SPELL_SEQ_2, 50000);
+                    events.ScheduleEvent(EVENT_SPELL_SEQ_2, 30000);
                     break;
                 case EVENT_SPELL_SEQ_3:
                     Talk(SAY_PYROBLAST);
                     me->CastSpell(me, SPELL_SHOCK_BARRIER, false);
-                    events.ScheduleEvent(EVENT_SPELL_SEQ_3, 50000);
+                    events.ScheduleEvent(EVENT_SPELL_SEQ_3, 30000);
                     events.DelayEvents(10000);
                     events.ScheduleEvent(EVENT_SPELL_PYROBLAST, 0);
                     events.ScheduleEvent(EVENT_SPELL_PYROBLAST, 4000);
@@ -660,7 +662,7 @@ public:
                 case EVENT_SPELL_SUMMON_PHOENIX:
                     Talk(SAY_SUMMON_PHOENIX);
                     me->CastSpell(me, SPELL_PHOENIX, false);
-                    events.ScheduleEvent(EVENT_SPELL_SUMMON_PHOENIX, 40000);
+                    events.ScheduleEvent(EVENT_SPELL_SUMMON_PHOENIX, 35000);
                     break;
                 case EVENT_CHECK_HEALTH:
                     if (me->HealthBelowPct(51))

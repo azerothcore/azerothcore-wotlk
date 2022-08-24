@@ -519,6 +519,15 @@ void World::LoadConfigSettings(bool reload)
     rate_values[RATE_XP_PET_NEXT_LEVEL]           = sConfigMgr->GetOption<float>("Rate.Pet.LevelXP", 0.05f);
     rate_values[RATE_REPAIRCOST]                  = sConfigMgr->GetOption<float>("Rate.RepairCost", 1.0f);
 
+    // VIP
+    rate_values[RATE_XP_KILL_PREMIUM] = sConfigMgr->GetOption<float>("Rate.XP.Kill.Premium", 1.0f);
+    rate_values[RATE_XP_QUEST_PREMIUM] = sConfigMgr->GetOption<float>("Rate.XP.Quest.Premium", 1.0f);
+    rate_values[RATE_XP_EXPLORE_PREMIUM] = sConfigMgr->GetOption<float>("Rate.XP.Explore.Premium", 1.0f);
+    rate_values[RATE_REPUTATION_PREMIUM] = sConfigMgr->GetOption<float>("Rate.Reputation.Premium", 1.0f);
+    rate_values[RATE_HONOR_PREMIUM] = sConfigMgr->GetOption<float>("Rate.Honor.Premium", 1.0f);
+    m_bool_configs[COMMAND_BANK_PREMIUM] = sConfigMgr->GetOption<float>("Command.Bank.Premium", false);
+    m_bool_configs[COMMAND_MAIL_PREMIUM] = sConfigMgr->GetOption<float>("Command.Mail.Premium", false);
+
     rate_values[RATE_SELLVALUE_ITEM_POOR]         = sConfigMgr->GetOption<float>("Rate.SellValue.Item.Poor", 1.0f);
     rate_values[RATE_SELLVALUE_ITEM_NORMAL]       = sConfigMgr->GetOption<float>("Rate.SellValue.Item.Normal", 1.0f);
     rate_values[RATE_SELLVALUE_ITEM_UNCOMMON]     = sConfigMgr->GetOption<float>("Rate.SellValue.Item.Uncommon", 1.0f);
@@ -1008,6 +1017,7 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_WEATHER]                       = sConfigMgr->GetOption<bool>("ActivateWeather", true);
 
     m_int_configs[CONFIG_DISABLE_BREATHING] = sConfigMgr->GetOption<int32>("DisableWaterBreath", SEC_CONSOLE);
+    m_int_configs[CONFIG_DISABLE_FATIGUE] = sConfigMgr->GetOption<int32>("DisableFatigue", SEC_CONSOLE); //Disable Fatigue
 
     m_bool_configs[CONFIG_ALWAYS_MAX_SKILL_FOR_LEVEL] = sConfigMgr->GetOption<bool>("AlwaysMaxSkillForLevel", false);
 

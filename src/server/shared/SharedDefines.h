@@ -66,42 +66,48 @@ enum Gender
 // EnumUtils: DESCRIBE THIS
 enum Races
 {
-    RACE_NONE               = 0,  // SKIP
-    RACE_HUMAN              = 1,  // TITLE Human
-    RACE_ORC                = 2,  // TITLE Orc
-    RACE_DWARF              = 3,  // TITLE Dwarf
-    RACE_NIGHTELF           = 4,  // TITLE Night Elf
-    RACE_UNDEAD_PLAYER      = 5,  // TITLE Undead
-    RACE_TAUREN             = 6,  // TITLE Tauren
-    RACE_GNOME              = 7,  // TITLE Gnome
-    RACE_TROLL              = 8,  // TITLE Troll
-    //RACE_GOBLIN             = 9,
-    RACE_BLOODELF           = 10, // TITLE Blood Elf
-    RACE_DRAENEI            = 11 //, TITLE Draenei
-    //RACE_FEL_ORC        = 12,
-    //RACE_NAGA           = 13,
-    //RACE_BROKEN         = 14,
-    //RACE_SKELETON       = 15,
-    //RACE_VRYKUL         = 16,
-    //RACE_TUSKARR        = 17,
-    //RACE_FOREST_TROLL   = 18,
-    //RACE_TAUNKA         = 19,
-    //RACE_NORTHREND_SKELETON = 20,
-    //RACE_ICE_TROLL      = 21
+    RACE_NONE = 0,  // SKIP
+    RACE_HUMAN = 1,  // TITLE Human
+    RACE_ORC = 2,  // TITLE Orc
+    RACE_DWARF = 3,  // TITLE Dwarf
+    RACE_NIGHTELF = 4,  // TITLE Night Elf
+    RACE_UNDEAD_PLAYER = 5,  // TITLE Undead
+    RACE_TAUREN = 6,  // TITLE Tauren
+    RACE_GNOME = 7,  // TITLE Gnome
+    RACE_TROLL = 8,  // TITLE Troll
+  //  RACE_GOBLIN           = 9,  // TITLE Goblin
+  RACE_BLOODELF = 10, // TITLE Blood Elf
+  RACE_DRAENEI = 11, // TITLE Draenei
+  RACE_WORGEN = 12, // Worgen
+  RACE_GOBLINNEW = 13, // Well... It's Naga
+  RACE_PANDARENA = 14,
+  RACE_PANDARENH = 15
+  //RACE_FEL_ORC        = 12,
+  //RACE_NAGA           = 13,
+  //RACE_BROKEN         = 14,
+  //RACE_SKELETON       = 15,
+  //RACE_VRYKUL         = 16,
+  //RACE_TUSKARR        = 17,
+  //RACE_FOREST_TROLL   = 18,
+  //RACE_TAUNKA         = 19,
+  //RACE_NORTHREND_SKELETON = 20,
+  //RACE_ICE_TROLL      = 21
 };
 
 // max+1 for player race
-#define MAX_RACES         12
+#define MAX_RACES         16
 
 #define RACEMASK_ALL_PLAYABLE \
     ((1<<(RACE_HUMAN-1))   |(1<<(RACE_ORC-1))          |(1<<(RACE_DWARF-1))   | \
     (1<<(RACE_NIGHTELF-1))|(1<<(RACE_UNDEAD_PLAYER-1))|(1<<(RACE_TAUREN-1))  | \
-    (1<<(RACE_GNOME-1))   |(1<<(RACE_TROLL-1))        |(1<<(RACE_BLOODELF-1))| \
-    (1<<(RACE_DRAENEI-1)))
+    (1<<(RACE_GNOME-1))   |(1<<(RACE_TROLL-1))        |(1<<(RACE_GOBLINNEW-1))| \
+    (1<<(RACE_BLOODELF-1))|(1<<(RACE_DRAENEI-1))      |(1<<(RACE_WORGEN-1)) | \
+    (1<<(RACE_PANDARENA-1))|(1<<(RACE_PANDARENH-1)))
 
 #define RACEMASK_ALLIANCE \
-    ((1<<(RACE_HUMAN-1)) | (1<<(RACE_DWARF-1)) | (1<<(RACE_NIGHTELF-1)) | \
-    (1<<(RACE_GNOME-1)) | (1<<(RACE_DRAENEI-1)))
+    ((1<<(RACE_HUMAN-1)) | (1<<(RACE_DWARF-1))   | (1<<(RACE_NIGHTELF-1)) | \
+    (1<<(RACE_GNOME-1)) | (1<<(RACE_DRAENEI-1)) | (1<<(RACE_WORGEN-1))| \
+    (1<<(RACE_PANDARENA-1)))
 
 #define RACEMASK_HORDE RACEMASK_ALL_PLAYABLE & ~RACEMASK_ALLIANCE
 

@@ -27,7 +27,8 @@ enum Spells
     SPELL_REFLECTIVE_MAGIC_SHIELD   = 35158,
     SPELL_REFLECTIVE_DAMAGE_SHIELD  = 35159,
     SPELL_POLARITY_SHIFT            = 39096,
-    SPELL_BERSERK                   = 26662
+    SPELL_BERSERK                   = 26662,
+    SPELL_SARONITE = 633650
 };
 
 enum Yells
@@ -93,6 +94,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            DoCast(me, SPELL_SARONITE);
             if (!UpdateVictim())
                 return;
 

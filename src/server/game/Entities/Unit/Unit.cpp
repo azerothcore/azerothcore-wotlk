@@ -19273,7 +19273,7 @@ void Unit::ChangeSeat(int8 seatId, bool next)
 void Unit::ExitVehicle(Position const* /*exitPosition*/)
 {
     //! This function can be called at upper level code to initialize an exit from the passenger's side.
-    if (!m_vehicle)
+    if (!m_vehicle || IsInFlight())
         return;
 
     GetVehicleBase()->RemoveAurasByType(SPELL_AURA_CONTROL_VEHICLE, GetGUID());
@@ -19281,6 +19281,7 @@ void Unit::ExitVehicle(Position const* /*exitPosition*/)
     {
         player->SetCanTeleport(true);
     }
+
     //! The following call would not even be executed successfully as the
     //! SPELL_AURA_CONTROL_VEHICLE unapply handler already calls _ExitVehicle without
     //! specifying an exitposition. The subsequent call below would return on if (!m_vehicle).

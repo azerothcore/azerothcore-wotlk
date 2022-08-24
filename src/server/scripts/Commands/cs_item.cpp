@@ -95,7 +95,7 @@ public:
         else
         {
             MailSender sender(MAIL_CREATURE, 34337 /* The Postmaster */);
-            MailDraft draft("Recovered Item", "We recovered a lost item in the twisting nether and noted that it was yours.$B$BPlease find said object enclosed.");
+            MailDraft draft("Восстановленные предметы", "Мы нашли потерянный предмет в вихре Пустоты и заметили, что он был вашим.$B$BПожалуйста, заберите его.");
 
             CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 

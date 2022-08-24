@@ -36,17 +36,17 @@ public:
         switch (type)
         {
             case CHAT_MSG_SAY:
-                LOG_CHAT("say", "Player {} says (language {}): {}",
+                LOG_CHAT("say", "[SAY] Игрок {} говорит (язык {}): {}",
                     player->GetName(), lang, msg);
                 break;
 
             case CHAT_MSG_EMOTE:
-                LOG_CHAT("emote", "Player {} emotes: {}",
+                LOG_CHAT("emote", "Игрок {} показывают эмоцию: {}",
                     player->GetName(), msg);
                 break;
 
             case CHAT_MSG_YELL:
-                LOG_CHAT("yell", "Player {} yells (language {}): {}",
+                LOG_CHAT("yell", "Игрок {} кричит (язык {}): {}",
                     player->GetName(), lang, msg);
                 break;
         }
@@ -54,7 +54,7 @@ public:
 
     void OnChat(Player* player, uint32 /*type*/, uint32 lang, std::string& msg, Player* receiver) override
     {
-        LOG_CHAT("whisper", "Player {} tells {}: {}",
+        LOG_CHAT("whisper", "[WHISPER] Игрок {} шепчет {}: {}",
                player->GetName(), receiver ? receiver->GetName() : "<unknown>", msg);
     }
 
@@ -65,37 +65,37 @@ public:
         switch (type)
         {
             case CHAT_MSG_PARTY:
-                LOG_CHAT("party", "Player {} tells group with leader {}: {}",
+                LOG_CHAT("party", "[PARTY] Игрок {} говорит группе с лидером {}: {}",
                     player->GetName(), group ? group->GetLeaderName() : "<unknown>", msg);
                 break;
 
             case CHAT_MSG_PARTY_LEADER:
-                LOG_CHAT("party", "Leader {} tells group: {}",
+                LOG_CHAT("party", "[PARTY] Лидер группы {} говорит: {}",
                     player->GetName(), msg);
                 break;
 
             case CHAT_MSG_RAID:
-                LOG_CHAT("raid", "Player {} tells raid with leader {}: {}",
+                LOG_CHAT("raid", "[RAID] Игрок {} говорит рейду с лидером {}: {}",
                     player->GetName(), group ? group->GetLeaderName() : "<unknown>", msg);
                 break;
 
             case CHAT_MSG_RAID_LEADER:
-                LOG_CHAT("raid", "Leader player {} tells raid: {}",
+                LOG_CHAT("raid", "[RAID] Лидер рейда {} говорит: {}",
                     player->GetName(), msg);
                 break;
 
             case CHAT_MSG_RAID_WARNING:
-                LOG_CHAT("raid", "Leader player {} warns raid with: {}",
+                LOG_CHAT("raid", "Лидер рейда {} предупреждает рейд с: {}",
                     player->GetName(), msg);
                 break;
 
             case CHAT_MSG_BATTLEGROUND:
-                LOG_CHAT("bg", "Player {} tells battleground with leader {}: {}",
+                LOG_CHAT("bg", "[BG] Игрок {} говорит на BG с лидером {}: {}",
                     player->GetName(), group ? group->GetLeaderName() : "<unknown>", msg);
                 break;
 
             case CHAT_MSG_BATTLEGROUND_LEADER:
-                LOG_CHAT("bg", "Leader player {} tells battleground: {}",
+                LOG_CHAT("bg", "[BG] Лидер BG {} говорит: {}",
                     player->GetName(), msg);
                 break;
         }
@@ -106,12 +106,12 @@ public:
         switch (type)
         {
             case CHAT_MSG_GUILD:
-                LOG_CHAT("guild", "Player {} tells guild {}: {}",
+                LOG_CHAT("guild", "[GUILD] Игрок {} говорит гильдии {}: {}",
                     player->GetName(), guild ? guild->GetName() : "<unknown>", msg);
                 break;
 
             case CHAT_MSG_OFFICER:
-                LOG_CHAT("guild.officer", "Player {} tells guild {} officers: {}",
+                LOG_CHAT("guild.officer", "[GUILD] Игрок {} говорит гильдии {} офицерам: {}",
                     player->GetName(), guild ? guild->GetName() : "<unknown>", msg);
                 break;
         }
@@ -127,13 +127,13 @@ public:
 
         if (isSystem)
         {
-            LOG_CHAT("system", "Player {} tells channel {}: {}",
+            LOG_CHAT("system", "[CHANNEL] Игрок {} говорит в канале {}: {}",
                 player->GetName(), channel->GetName(), msg);
         }
         else
         {
             std::string channelName = channel ? channel->GetName() : "<unknown>";
-            LOG_CHAT("channel." + channelName, "Player {} tells channel {}: {}",
+            LOG_CHAT("channel." + channelName, "[CHANNEL] Игрок {} говорит в канале [{}]: {}",
                 player->GetName(), channelName, msg);
         }
     }

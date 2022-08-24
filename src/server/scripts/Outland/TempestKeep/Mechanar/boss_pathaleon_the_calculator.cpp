@@ -41,6 +41,7 @@ enum Spells
     SPELL_SUMMON_NETHER_WRAITH_2    = 35286,
     SPELL_SUMMON_NETHER_WRAITH_3    = 35287,
     SPELL_SUMMON_NETHER_WRAITH_4    = 35288,
+    SPELL_SARONITE = 633650
 };
 
 enum Events
@@ -104,6 +105,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            DoCast(me, SPELL_SARONITE);
             if (!UpdateVictim())
                 return;
 

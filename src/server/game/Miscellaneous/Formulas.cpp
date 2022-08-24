@@ -129,6 +129,10 @@ uint32 Acore::XP::Gain(Player* player, Unit* unit, bool isBattleGround /*= false
             xpMod *= 1.0f - 2.0f * creature->GetPlayerDamageReq() / creature->GetMaxHealth();
         }
 
+        // VIP
+        if (player->GetSession()->IsPremium())
+            xpMod *= sWorld->getRate(RATE_XP_KILL_PREMIUM);
+
         gain = uint32(gain * xpMod);
     }
 

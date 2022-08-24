@@ -38,6 +38,7 @@ enum Spells
     SPELL_POWER_WORD_SHIELD_H   = 46193,
     SPELL_RENEW_N               = 44174,
     SPELL_RENEW_H               = 46192,
+    SPELL_SARONITE = 633650,
 };
 
 enum Misc
@@ -182,6 +183,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            DoCast(me, SPELL_SARONITE);
             if (!UpdateVictim())
                 return;
 

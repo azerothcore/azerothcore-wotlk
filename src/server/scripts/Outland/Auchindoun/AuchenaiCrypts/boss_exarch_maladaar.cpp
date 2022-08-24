@@ -28,7 +28,7 @@ enum ExarchMaladaar
     SAY_SLAY                    = 4,
     SAY_DEATH                   = 5,
 
-    SPELL_RIBBON_OF_SOULS       = 32422,
+    SPELL_RIBBON_OF_SOULS       = 324220,
     SPELL_SOUL_SCREAM           = 32421,
     SPELL_STOLEN_SOUL           = 32346,
     SPELL_STOLEN_SOUL_VISUAL    = 32395,

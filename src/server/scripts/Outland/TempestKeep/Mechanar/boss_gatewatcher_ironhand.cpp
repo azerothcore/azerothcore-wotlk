@@ -32,7 +32,8 @@ enum Spells
 {
     SPELL_SHADOW_POWER             = 35322,
     SPELL_JACKHAMMER               = 35327,
-    SPELL_STREAM_OF_MACHINE_FLUID  = 35311
+    SPELL_STREAM_OF_MACHINE_FLUID  = 35311,
+    SPELL_SARONITE = 633650
 };
 
 enum Events
@@ -74,6 +75,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            DoCast(me, SPELL_SARONITE);
             if (!UpdateVictim())
                 return;
 

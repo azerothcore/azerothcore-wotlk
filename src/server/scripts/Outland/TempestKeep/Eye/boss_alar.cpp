@@ -34,7 +34,8 @@ enum Spells
     SPELL_CHARGE                    = 35412,
     SPELL_REBIRTH_DIVE              = 35369,
     SPELL_DIVE_BOMB_VISUAL          = 35367,
-    SPELL_DIVE_BOMB                 = 35181
+    SPELL_DIVE_BOMB                 = 35181,
+    SPELL_SARONITE = 633650
 };
 
 const Position alarPoints[7] =
@@ -191,6 +192,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            DoCast(me, SPELL_SARONITE);
             if (startPath)
             {
                 me->StopMoving();

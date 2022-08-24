@@ -34,6 +34,7 @@ enum Spells
     SPELL_FROST_ATTACK             = 35263,
     SPELL_ARCANE_BLAST             = 35314,
     SPELL_DRAGONS_BREATH           = 35250,
+    SPELL_SARONITE = 633650
 };
 
 enum Events
@@ -97,6 +98,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            DoCast(me, SPELL_SARONITE);
             if (!UpdateVictim())
                 return;
 

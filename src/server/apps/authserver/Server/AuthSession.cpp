@@ -367,6 +367,9 @@ void AuthSession::LogonChallengeCallback(PreparedQueryResult result)
         }
     }
 
+    //set expired premium to inactive - VIP
+    LoginDatabase.DirectExecute(LoginDatabase.GetPreparedStatement(LOGIN_UPD_EXPIRED_ACCOUNT_PREMIUM));
+
     // If the account is banned, reject the logon attempt
     if (_accountInfo.IsBanned)
     {
