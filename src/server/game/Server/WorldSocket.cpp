@@ -580,10 +580,11 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     stmt->SetData(0, account.Id);
     PreparedQueryResult premresult = LoginDatabase.Query(stmt);
 
-    if (premresult)
-    {
+
+        if (premresult)
+        {
         isPremium = true;
-    }
+        }
 
     // Check locked state for server
     AccountTypes allowedAccountType = sWorld->GetPlayerSecurityLimit();

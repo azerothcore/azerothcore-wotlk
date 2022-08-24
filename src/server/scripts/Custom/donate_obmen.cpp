@@ -18,6 +18,7 @@ public:
         AddGossipItemFor(player,5, "|TInterface/ICONS/Inv_misc_coin_01:25:25:-20:0|tПерейти к обмену", GOSSIP_SENDER_MAIN, 777);
         AddGossipItemFor(player, GOSSIP_ICON_DOT, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:25:25:-20:0|tВыйти", GOSSIP_SENDER_MAIN, 444);
         player->PlayerTalkClass->SendGossipMenu(info.str().c_str(), _creature->GetGUID());
+
         return true;
     }
 
@@ -307,6 +308,12 @@ public:
             case 444:
                 CloseGossipMenuFor(player);
                 break;
+
+        if (sender == GOSSIP_SENDER_MAIN)
+        {
+            player->PlayerTalkClass->ClearMenus();
+            switch(uiAction)
+            {          
             case 1: 
                 if (player->HasItemCount(500000, 1, false ))
                 {
@@ -954,6 +961,7 @@ public:
                 _creature->Whisper("Необходимо [Монета-Donate]x100 для совершения обмена.", LANG_UNIVERSAL, player);
                 return false;
              }
+        } 
         return true;
     } 
 };

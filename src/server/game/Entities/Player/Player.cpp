@@ -388,6 +388,7 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     m_achievementMgr = new AchievementMgr(this);
     m_reputationMgr = new ReputationMgr(this);
+    m_PlayedRewardsTimer = 0;
 
     // Ours
     m_NeedToSaveGlyphs = false;
@@ -811,6 +812,14 @@ int32 Player::getMaxTimer(MirrorTimerType timer)
             return DISABLED_MIRROR_TIMER;
         return MINUTE * IN_MILLISECONDS;
     }
+
+        case FATIGUE_TIMER: //Отключение Усталости
+        {
+            if (!IsAlive() || MirrorTimerType(FATIGUE_TIMER) || GetSession()->GetSecurity() >= AccountTypes(sWorld->getIntConfig(CONFIG_DISABLE_FATIGUE)))
+                return DISABLED_MIRROR_TIMER;
+            return MINUTE * IN_MILLISECONDS;
+        }
+
         case BREATH_TIMER:
             {
                 if (!IsAlive() || HasAuraType(SPELL_AURA_WATER_BREATHING) || GetSession()->GetSecurity() >= AccountTypes(sWorld->getIntConfig(CONFIG_DISABLE_BREATHING)))
@@ -6119,6 +6128,10 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
         }
     }
 
+    // VIP
+     if (GetSession()->IsPremium())
+        honor_f *= sWorld->getRate(RATE_HONOR_PREMIUM);
+
     return true;
 }
 
@@ -6182,6 +6195,24 @@ void Player::ModifyArenaPoints(int32 value, CharacterDatabaseTransaction trans)
         stmt->SetData(1, GetGUID().GetCounter());
         trans->Append(stmt);
     }
+}
+
+uint8 Player::GetRankFromDB(ObjectGuid guid)
+{
+
+    ObjectGuid::LowType guidLow = guid.GetCounter();
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GUILD_MEMBER);
+    stmt->SetData(0, guidLow);
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+    if (result)
+    {
+        uint32 v = result->Fetch()[1].Get<uint8>();
+        return v;
+    }
+    else
+        return 0;
 }
 
 uint32 Player::GetArenaTeamIdFromDB(ObjectGuid guid, uint8 type)

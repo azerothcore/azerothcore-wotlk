@@ -44,13 +44,14 @@ public:
 			snprintf(msg, 250, "|CFF7BBEF7[World-Boss]|r: Игрок|cffff0000 %s|r и его группа, уничтожили Мирового Босса [Кил'джеден], следующий респавн босса через: 6 часов.", killer->GetName());
 			sWorld->SendServerMessage(SERVER_MSG_STRING, msg);
 		}
-
+		
         if (killed->GetEntry() == 50029)
         {
             char msg[250];
             snprintf(msg, 250, "|CFF7BBEF7[World-Boss]|r: Игрок|cffff0000 %s|r и его группа, уничтожили Мирового Босса [Повелитель Стихий], следующий респавн босса через: 4 часа.", killer->GetName());
             sWorld->SendServerMessage(SERVER_MSG_STRING, msg);
         }
+
 	}
 
 };

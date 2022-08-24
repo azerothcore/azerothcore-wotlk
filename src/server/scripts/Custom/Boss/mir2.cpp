@@ -6,13 +6,14 @@
  #define SPELL_4          30852    // Спелл Могучее сокрушение 
  #define SPELL_5          41545    // Спелл Всплеск адреналина
 #define SPELL_SARONITE               63364
-                
+
  #define SAY_AGGRO        "Вы зачем ко мне пришли ? Помереть захотели ? Вперёд !" 
  #define SAY_KILL         "Вы все умерете! Моё пророчество всегда сбывается !" 
  #define SAY_DEATH        "На этот раз моё пророчество ошиблось, нееееееет.............." 
  #define SAY_SPS2         "А как вам такое: !" 
  #define SAY_SPS4         "Не стоит меня недооценивать !" 
  #define SAY_SPS5         "ПРОПРОЧЕСТВО МОЁ СБУДЕТCЯ ! БЕГИТЕ !" 
+
 
 class Arzhara_Fun_boss_2 : public CreatureScript
 {
@@ -79,7 +80,9 @@ public:
               if(Timer4 <= diff){ 
                me->Say(SAY_SPS4, LANG_UNIVERSAL, 0); 
                 DoCast(me->GetVictim(),SPELL_4);
+
                 Timer4 = 22000; 
+
               }else Timer4 -= diff; 
                 
                           
@@ -87,6 +90,7 @@ public:
                 me->Say(SAY_SPS5, LANG_UNIVERSAL, 0); 
                 DoCast(me,SPELL_5); 
                 Timer5 = 30000; 
+
               }else Timer5 -= diff; 
             DoMeleeAttackIfReady(); 
           }       

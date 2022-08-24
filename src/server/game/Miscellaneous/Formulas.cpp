@@ -21,6 +21,7 @@
 #include "Log.h"
 #include "Player.h"
 #include "World.h"
+#include "WorldSession.h"
 
 uint32 Acore::XP::BaseGain(uint8 pl_level, uint8 mob_level, ContentLevels content)
 {

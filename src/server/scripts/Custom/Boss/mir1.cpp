@@ -9,6 +9,7 @@
  #define SPELL_7          57949    // Спелл Всплеск адреналина 
  #define SPELL_8          53406    // Спелл Всплеск адреналина 
  #define SPELL_SARONITE               63364
+
                 
  #define SAY_AGGRO        "Смертные, Вам конец" 
  #define SAY_KILL         "Хахаха! Не приходите больше суда, смертные слабаки !" 

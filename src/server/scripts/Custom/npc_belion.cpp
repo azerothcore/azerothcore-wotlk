@@ -262,6 +262,7 @@ public: npc_bonus_buff() : CreatureScript("npc_bonus_buff") { }
 				case 14:
 				{
 						   uint32 need = action == 122 ? 100 : action == 12 ? 500 : action == 13 ? 1000 : 2000;
+						   
 						   if (GetBonusDP(player) < need)
 						   {
 							   ChatHandler(player->GetSession()).PSendSysMessage("У вас не хватает очков пожертвования.\nНужно %u", need);
@@ -383,7 +384,9 @@ public: npc_bonus_buff() : CreatureScript("npc_bonus_buff") { }
 					std::ostringstream message;
 					message << "|cff5da673[BELION]|CFFFE8A0E Игрок |CFFE55BB0" << name << "|CFFFE8A0E баффнул всех игроков баффом [|cffEAF4F5" << vvData[action].Name << "|cff02A4B1]|r";
 					GetBuffOnline(action);
+
 					CharacterDatabase.Query("UPDATE u1756783_blizzcms.users SET vp = vp - {} WHERE id = {}", vvData[action].Cost, player->GetSession()->GetAccountId());
+
 					sWorld->SendServerMessage(SERVER_MSG_STRING, message.str().c_str());
 					CloseGossipMenuFor(player);
 				}
@@ -400,9 +403,11 @@ public:
 	void OnLogin(Player* player)
 	{
 		uint32 accId = player->GetSession()->GetAccountId();
+
 		QueryResult result = CharacterDatabase.Query("SELECT vp FROM u1756783_blizzcms.users WHERE id = {}", accId);
 		if (!result)
 			CharacterDatabase.Query("INSERT INTO u1756783_blizzcms.users (id, dp, vp) VALUES ({}, 0, 0)", accId);
+
 	}
 };
 

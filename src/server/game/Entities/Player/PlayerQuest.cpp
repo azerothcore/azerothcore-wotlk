@@ -749,7 +749,11 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     }
 
     // VIP
+
     if (GetSession()->IsPremium())
+        XP *= sWorld->getRate(RATE_XP_QUEST_PREMIUM);
+
+     if (GetSession()->IsPremium())
         XP *= sWorld->getRate(RATE_XP_QUEST_PREMIUM);
 
     // Give player extra money if GetRewOrReqMoney > 0 and get ReqMoney if negative

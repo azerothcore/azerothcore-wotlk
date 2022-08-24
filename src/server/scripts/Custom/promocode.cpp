@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 
+
 #define SQL_CODE "SELECT `CodeId`, `MailMoney`, `MaxCountForCharacter`, `MaxCountForAccount`, `MaxCountTotal`, `MailSubject`, `MailText` FROM `world_coded` WHERE `CodeStart` <= CURRENT_TIMESTAMP AND `CodeEnd` >= CURRENT_TIMESTAMP AND `CodeData` = {} LIMIT 1"
 #define SQL_CODE_COUNT "SELECT COUNT(*) FROM `world_coded_history` WHERE `CodeId` = {}"
 #define SQL_CODE_COUNT_ACCOUNT "SELECT COUNT(*) FROM `world_coded_history` WHERE `CodeId` = {} AND `AccountId` = {}"
@@ -12,10 +13,17 @@
 
 bool SCEnable = true;
 
+
 class Mod_SpecialCode_WorldScript : public WorldScript
 {
     public:
         Mod_SpecialCode_WorldScript() : WorldScript("Mod_SpecialCode_WorldScript") { }
+
+    void OnConfigLoad(bool /*reload*/)
+    {
+        SCEnable = sConfigMgr->GetBoolDefault("SpecialCode.Enable", false);
+    }
+
 };
 
 class Mod_SpecialCode_AllCreatureScript : public AllCreatureScript

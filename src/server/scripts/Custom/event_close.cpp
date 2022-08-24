@@ -23,7 +23,6 @@ public:
 			}
 		}
 	}
-
 };
 
 void AddSC_CloseZone()
