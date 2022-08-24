@@ -16,8 +16,7 @@
     OutdoorPvPHL::OutdoorPvPHL()
     {
         m_TypeId = OUTDOOR_PVP_HL;
-        m_obj = nullptr;
-
+        
         m_ally_gathered = HL_RESOURCES_A;
         m_horde_gathered = HL_RESOURCES_H;
 
@@ -296,7 +295,7 @@
                                     HandleBuffs(itr->second->GetPlayer(), true);
                                     break;
      
-                                case TEAM_HORDE:
+                                default: //Horde
                                     HandleBuffs(itr->second->GetPlayer(), false);
                                     break;
                             }
@@ -486,12 +485,7 @@
             }
         }
     }
-
-    void OutdoorPvPHL::FillInitialWorldStates(WorldPacket& data)
-    {
-    m_obj->FillInitialWorldStates(data);
-    }
-     
+    
     class OutdoorPvP_hinterland : public OutdoorPvPScript
     {
         public:

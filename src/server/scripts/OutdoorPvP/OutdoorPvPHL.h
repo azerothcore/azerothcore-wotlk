@@ -62,14 +62,14 @@
         public:            
             OutdoorPvPHL();
 
-            bool SetupOutdoorPvP();
+            bool SetupOutdoorPvP() override;
 
             /* Handle Player Action */
-            void HandlePlayerEnterZone(Player * player, uint32 zone);
-            void HandlePlayerLeaveZone(Player * player, uint32 zone);
+            void HandlePlayerEnterZone(Player * player, uint32 zone) override;
+            void HandlePlayerLeaveZone(Player * player, uint32 zone) override;
 
             /* Handle Killer Kill */
-            void HandleKill(Player * player, Unit * killed);
+            void HandleKill(Player * player, Unit * killed) override;
 			
             /* Handle Randomizer */
             void Randomizer(Player * player);
@@ -91,7 +91,7 @@
             void HandleRewards(Player * player, uint32 honorpointsorarena, bool honor, bool arena, bool both);
 
             /* Updates */
-            bool Update(uint32 diff);
+            bool Update(uint32 diff) override;
 
             /* Sounds */
             void PlaySounds(bool side);
