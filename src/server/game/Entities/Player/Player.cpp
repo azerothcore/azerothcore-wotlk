@@ -813,13 +813,6 @@ int32 Player::getMaxTimer(MirrorTimerType timer)
         return MINUTE * IN_MILLISECONDS;
     }
 
-        case FATIGUE_TIMER: //Отключение Усталости
-        {
-            if (!IsAlive() || MirrorTimerType(FATIGUE_TIMER) || GetSession()->GetSecurity() >= AccountTypes(sWorld->getIntConfig(CONFIG_DISABLE_FATIGUE)))
-                return DISABLED_MIRROR_TIMER;
-            return MINUTE * IN_MILLISECONDS;
-        }
-
         case BREATH_TIMER:
             {
                 if (!IsAlive() || HasAuraType(SPELL_AURA_WATER_BREATHING) || GetSession()->GetSecurity() >= AccountTypes(sWorld->getIntConfig(CONFIG_DISABLE_BREATHING)))
