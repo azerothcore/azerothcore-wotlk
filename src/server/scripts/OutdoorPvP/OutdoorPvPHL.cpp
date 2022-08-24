@@ -16,6 +16,7 @@
     OutdoorPvPHL::OutdoorPvPHL()
     {
         m_TypeId = OUTDOOR_PVP_HL;
+        m_obj = nullptr;
 
         m_ally_gathered = HL_RESOURCES_A;
         m_horde_gathered = HL_RESOURCES_H;
@@ -484,6 +485,11 @@
                 }
             }
         }
+    }
+
+    void OutdoorPvPHL::FillInitialWorldStates(WorldPacket& data)
+    {
+    m_obj->FillInitialWorldStates(data);
     }
      
     class OutdoorPvP_hinterland : public OutdoorPvPScript

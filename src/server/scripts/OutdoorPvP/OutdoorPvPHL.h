@@ -96,6 +96,9 @@
             /* Sounds */
             void PlaySounds(bool side);
 
+            /* Worldstates */
+            void FillInitialWorldStates(WorldPacket& data) override;
+
         private:
             uint32 m_ally_gathered;
             uint32 m_horde_gathered;

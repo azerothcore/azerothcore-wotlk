@@ -35,10 +35,9 @@ class OutdoorPvPAI : public OutdoorPvP
 	  GuidSet m_Groups[2];
 	  PlayerSet m_PlayersInWar[2];
 
-    //Faction buffs
+    //Faction buffs Wintergrasp
     //AllianceBuff = 32071,
     //HordeBuff = 32049
-
     enum OutdoorPvPAISpells
     {
     AllianceBuff = 32071,
