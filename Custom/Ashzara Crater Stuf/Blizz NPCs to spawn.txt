@@ -1,23 +1,59 @@
-1 - 10
+-- 1 - 10
 https://www.wowhead.com/wotlk/de/npc=69/erkrankter-wilder-waldwolf
 https://www.wowhead.com/wotlk/de/npc=1509/struppiger-aasfresser
-
 https://www.wowhead.com/wotlk/de/npc=1505/nachtweber
 https://www.wowhead.com/wotlk/de/npc=1688/nachtwebermatriarchin
-
 https://www.wowhead.com/wotlk/de/npc=15656/zornschemen
-
 https://www.wowhead.com/wotlk/de/npc=15641/axtwerfer-der-amani
 
 Rares:
 https://www.wowhead.com/wotlk/de/npc=14432/threggil
 https://www.wowhead.com/wotlk/de/npc=1531/verirrte-seele
 
-11 - 20
-
+-- 11 - 20
+https://www.wowhead.com/wotlk/de/npc=1189/schwarzb%C3%A4renpatriarch
+https://www.wowhead.com/wotlk/de/npc=3282/s%C3%B6ldner-der-venture-co
+https://www.wowhead.com/wotlk/de/npc=3988/maschinenf%C3%BChrer-der-venture-co
+https://www.wowhead.com/wotlk/de/npc=3283/vollstrecker-der-venture-co
+https://www.wowhead.com/wotlk/de/npc=17496/schandflosse
+https://www.wowhead.com/wotlk/de/npc=1797/ergrauter-riesenb%C3%A4r
 
 Rares:
 https://www.wowhead.com/wotlk/de/npc=1130/bjarn
 https://www.wowhead.com/wotlk/de/npc=1132/holzkopf
 https://www.wowhead.com/wotlk/de/npc=472/fedfennel
+https://www.wowhead.com/wotlk/de/npc=3672/boahn
+https://www.wowhead.com/wotlk/de/npc=3398/gesharahan
+https://www.wowhead.com/wotlk/de/npc=3652/trigore-der-peitscher
+https://www.wowhead.com/wotlk/de/npc=16358/kelgash-der-boshafte
+https://www.wowhead.com/wotlk/de/npc=448/hogger
 
+-- 21 - 30
+https://www.wowhead.com/wotlk/de/npc=4126/klippenpirscher
+https://www.wowhead.com/wotlk/de/npc=3743/krieger-der-f%C3%A4ulnisklauen
+https://www.wowhead.com/wotlk/de/npc=3745/pfadfinder-der-f%C3%A4ulnisklauen
+https://www.wowhead.com/wotlk/de/npc=3750/totemiker-der-f%C3%A4ulnisklauen
+https://www.wowhead.com/wotlk/de/npc=4094/sp%C3%A4her-der-galak
+https://www.wowhead.com/wotlk/de/npc=4096/windhetzerin-der-galak
+https://www.wowhead.com/wotlk/de/npc=3789/terrowulffleischrei%C3%9Fer
+https://www.wowhead.com/wotlk/de/npc=3821/wilddornlauerer
+https://www.wowhead.com/wotlk/de/npc=3754/verr%C3%A4ter-von-xavian
+
+Rares:
+https://www.wowhead.com/wotlk/de/npc=5828/humar-der-rudellord
+https://www.wowhead.com/wotlk/de/npc=5831/flinkm%C3%A4hne
+https://www.wowhead.com/wotlk/de/npc=1112/egelwitwe
+https://www.wowhead.com/wotlk/de/npc=5832/donnerstampfer
+https://www.wowhead.com/wotlk/de/npc=14425/knochennager
+https://www.wowhead.com/wotlk/de/npc=5915/bruder-rabeneiche
+https://www.wowhead.com/wotlk/de/npc=2108/garneg-brandsch%C3%A4del
+
+-- 31 - 40
+https://www.wowhead.com/wotlk/de/npc=4635/windhetzer-der-kolkar
+https://www.wowhead.com/wotlk/de/npc=4634/raufer-der-kolkar
+
+Rares:
+https://www.wowhead.com/wotlk/de/npc=522/morladim
+https://www.wowhead.com/wotlk/de/npc=2600/s%C3%A4nger
+https://www.wowhead.com/wotlk/de/npc=3985/gro%C3%9Fvater-vishas
+https://www.wowhead.com/wotlk/de/npc=13602/der-monstr%C3%B6se-griesgram
