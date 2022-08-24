@@ -70,7 +70,6 @@ enum Events
 enum Misc
 {
     GUID_TRIGGER_PAIR = 1,
-    CREATURE_GROUP_VORTEXES = 1
 };
 
 uint8 const NUM_CRYSTALS = 12;
