@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Chat.h"
 #include "DBCStores.h"
 #include "GameTime.h"
 #include "Group.h"
