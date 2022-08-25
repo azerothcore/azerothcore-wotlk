@@ -470,10 +470,30 @@ class spell_crystal_weakness : public SpellScript
     }
 };
 
+class spell_aq_shadow_storm : public SpellScript
+{
+    PrepareSpellScript(spell_aq_shadow_storm);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        Unit* caster = GetCaster();
+        targets.remove_if([caster](WorldObject const* obj)
+        {
+            return caster->GetExactDist2d(obj) < 25.0f;
+        });
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_aq_shadow_storm::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
+
 void AddSC_boss_ossirian()
 {
     RegisterRuinsOfAhnQirajCreatureAI(boss_ossirian);
     new go_ossirian_crystal();
     RegisterCreatureAI(npc_anubisath_guardian);
     RegisterSpellScript(spell_crystal_weakness);
+    RegisterSpellScript(spell_aq_shadow_storm);
 }
