@@ -1,3 +1,4 @@
+-- DB update 2022_08_25_01 -> 2022_08_25_02
 --
 UPDATE `creature_template` SET `DamageModifier`=2.35, `ArmorModifier`=1.1, `AIName`='SmartAI' WHERE `entry`=14668;
 
