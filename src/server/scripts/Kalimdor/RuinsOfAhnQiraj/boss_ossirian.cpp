@@ -340,7 +340,7 @@ public:
                 {
                     if (!trigger->HasUnitState(UNIT_STATE_CASTING))
                     {
-                        ossirian->AI()->SetGUID(me->GetGUID(), ACTION_TRIGGER_WEAKNESS);
+                        ossirian->AI()->DoAction(ACTION_TRIGGER_WEAKNESS);
                         trigger->CastSpell(trigger, spellWeakness[urand(0, 4)], false);
                     }
                 }
