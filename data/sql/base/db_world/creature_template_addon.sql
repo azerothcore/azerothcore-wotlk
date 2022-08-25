@@ -15,18 +15,18 @@
 -- Dumpar struktur för tabell acore_world.creature_template_addon
 DROP TABLE IF EXISTS `creature_template_addon`;
 CREATE TABLE IF NOT EXISTS `creature_template_addon` (
-  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `path_id` INT unsigned NOT NULL DEFAULT 0,
-  `mount` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `bytes1` INT unsigned NOT NULL DEFAULT 0,
-  `bytes2` INT unsigned NOT NULL DEFAULT 0,
-  `emote` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `visibilityDistanceType` TINYINT unsigned NOT NULL DEFAULT 0,
+  `entry` mediumint unsigned NOT NULL DEFAULT '0',
+  `path_id` int unsigned NOT NULL DEFAULT '0',
+  `mount` mediumint unsigned NOT NULL DEFAULT '0',
+  `bytes1` int unsigned NOT NULL DEFAULT '0',
+  `bytes2` int unsigned NOT NULL DEFAULT '0',
+  `emote` mediumint unsigned NOT NULL DEFAULT '0',
+  `visibilityDistanceType` tinyint unsigned NOT NULL DEFAULT '0',
   `auras` text,
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Dumpar data för tabell acore_world.creature_template_addon: 11 769 rows
+-- Dumpar data för tabell acore_world.creature_template_addon: 11 771 rows
 DELETE FROM `creature_template_addon`;
 /*!40000 ALTER TABLE `creature_template_addon` DISABLE KEYS */;
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
@@ -3213,7 +3213,7 @@ INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `b
 	(15371, 0, 0, 0, 4097, 0, 0, NULL),
 	(15372, 0, 0, 0, 4097, 0, 0, NULL),
 	(15384, 0, 0, 0, 4097, 0, 0, NULL),
-	(15385, 0, 0, 0, 1, 0, 3, '25462'),
+	(15385, 0, 0, 0, 1, 0, 3, ''),
 	(15386, 0, 0, 0, 0, 0, 3, NULL),
 	(15387, 0, 0, 0, 1, 0, 3, '18950'),
 	(15388, 0, 0, 0, 0, 0, 3, NULL),
@@ -11799,7 +11799,9 @@ INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `b
 	(36296, 0, 0, 0, 1, 0, 3, '68589 71856'),
 	(36710, 0, 0, 0, 1, 0, 3, '69216'),
 	(10682, 0, 2328, 0, 1, 0, 0, NULL),
-	(8937, 0, 0, 0, 1, 0, 0, '13260 8327');
+	(8937, 0, 0, 0, 1, 0, 0, '13260 8327'),
+	(15933, 0, 0, 0, 0, 0, 0, '25786 26575'),
+	(29415, 0, 0, 50331648, 1, 0, 0, '57764');
 /*!40000 ALTER TABLE `creature_template_addon` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

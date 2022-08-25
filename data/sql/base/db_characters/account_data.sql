@@ -15,9 +15,9 @@
 -- Dumpar struktur för tabell acore_characters.account_data
 DROP TABLE IF EXISTS `account_data`;
 CREATE TABLE IF NOT EXISTS `account_data` (
-  `accountId` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Account Identifier',
-  `type` TINYINT unsigned NOT NULL DEFAULT 0,
-  `time` INT unsigned NOT NULL DEFAULT 0,
+  `accountId` int unsigned NOT NULL DEFAULT '0' COMMENT 'Account Identifier',
+  `type` tinyint unsigned NOT NULL DEFAULT '0',
+  `time` int unsigned NOT NULL DEFAULT '0',
   `data` blob NOT NULL,
   PRIMARY KEY (`accountId`,`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

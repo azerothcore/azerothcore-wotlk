@@ -13,15 +13,14 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 -- Dumpar struktur för tabell acore_auth.logs_ip_actions
-DROP TABLE IF EXISTS `logs_ip_actions`;
 CREATE TABLE IF NOT EXISTS `logs_ip_actions` (
-  `id` INT unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique Identifier',
-  `account_id` INT unsigned NOT NULL COMMENT 'Account ID',
-  `character_guid` INT unsigned NOT NULL COMMENT 'Character Guid',
-  `type` TINYINT unsigned NOT NULL,
-  `ip` VARCHAR(15) NOT NULL DEFAULT '127.0.0.1',
+  `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique Identifier',
+  `account_id` int unsigned NOT NULL COMMENT 'Account ID',
+  `character_guid` int unsigned NOT NULL COMMENT 'Character Guid',
+  `type` tinyint unsigned NOT NULL,
+  `ip` varchar(15) NOT NULL DEFAULT '127.0.0.1',
   `systemnote` text COMMENT 'Notes inserted by system',
-  `unixtime` INT unsigned NOT NULL COMMENT 'Unixtime',
+  `unixtime` int unsigned NOT NULL COMMENT 'Unixtime',
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp',
   `comment` text COMMENT 'Allows users to add a comment',
   PRIMARY KEY (`id`)

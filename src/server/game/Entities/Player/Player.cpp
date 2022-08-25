@@ -3210,7 +3210,7 @@ void Player::learnSpell(uint32 spellId, bool temporary /*= false*/, bool learnFr
     if (HasActiveSpell(spellId))
     {
 #ifndef MOD_PLAYERBOTS
-        LOG_ERROR("entities.player", "Player ({}) tries to learn already active spell: {}", GetGUID().ToString(), spellId);
+        LOG_DEBUG("entities.player", "Player ({}) tries to learn already active spell: {}", GetGUID().ToString(), spellId);
 #endif
         return;
     }
