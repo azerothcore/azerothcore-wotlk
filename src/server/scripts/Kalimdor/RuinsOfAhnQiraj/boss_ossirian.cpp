@@ -326,21 +326,24 @@ public:
 
         bool GossipHello(Player* player, bool reportUse) override
         {
-            InstanceScript* instance = player->GetInstanceScript();
-            if (!instance)
-                return true;
-
-            Creature* ossirian = instance->GetCreature(DATA_OSSIRIAN);
-            if (!ossirian)
-                return true;
-
-            ossirian->AI()->SetGUID(me->GetGUID(), ACTION_TRIGGER_WEAKNESS);
-
-            if (Creature* trigger = ObjectAccessor::GetCreature(*me, _triggerGUID))
+            if (reportUse)
             {
-                if (!trigger->HasUnitState(UNIT_STATE_CASTING))
+                InstanceScript* instance = player->GetInstanceScript();
+                if (!instance)
+                    return true;
+
+                Creature* ossirian = instance->GetCreature(DATA_OSSIRIAN);
+                if (!ossirian)
+                    return true;
+
+                ossirian->AI()->SetGUID(me->GetGUID(), ACTION_TRIGGER_WEAKNESS);
+
+                if (Creature* trigger = ObjectAccessor::GetCreature(*me, _triggerGUID))
                 {
-                    trigger->CastSpell(trigger, spellWeakness[urand(0, 4)], false);
+                    if (!trigger->HasUnitState(UNIT_STATE_CASTING))
+                    {
+                        trigger->CastSpell(trigger, spellWeakness[urand(0, 4)], false);
+                    }
                 }
             }
 
