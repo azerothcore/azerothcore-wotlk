@@ -405,3 +405,14 @@ INSERT INTO `creature_template_resistance` (`CreatureID`, `School`, `Resistance`
 (15802, 4, 75, 0),
 (15802, 5, 75, 0),
 (15802, 6, 75, 0);
+
+-- Vekniss Borer (15622)
+UPDATE `creature_template` SET `DamageModifier` = 7.05, `ArmorModifier` = 1.1 WHERE (`entry` = 15622);
+
+DELETE FROM `creature_template_resistance` WHERE (`CreatureID` = 15622) AND (`School` IN (2, 3, 4, 5, 6));
+INSERT INTO `creature_template_resistance` (`CreatureID`, `School`, `Resistance`, `VerifiedBuild`) VALUES
+(15622, 2, 75, 0),
+(15622, 3, 75, 0),
+(15622, 4, 75, 0),
+(15622, 5, 75, 0),
+(15622, 6, 75, 0);
