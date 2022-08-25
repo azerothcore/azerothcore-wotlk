@@ -44,6 +44,7 @@ enum Spells
     SPELL_SAND_STORM                    = 25160,
     SPELL_SUMMON_CRYSTAL                = 25192,
     SPELL_SUMMON_SMALL_OBSIDIAN_CHUNK   = 27627, // Server-side
+    SPELL_SPEED_BURST                   = 25184,
 
     // Crystal
     SPELL_FIRE_WEAKNESS                 = 25177,
@@ -117,7 +118,7 @@ struct boss_ossirian : public BossAI
 
         _crystalIterator = urand(1, NUM_CRYSTALS - 1);
 
-        if (!ObjectAccessor::GetGameObject(*me, _firstCrystal))
+        if (!ObjectAccessor::GetGameObject(*me, _firstCrystalGUID))
         {
             if (Creature* trigger = me->GetMap()->SummonCreature(NPC_OSSIRIAN_TRIGGER, CrystalCoordinates[0]))
             {
@@ -127,7 +128,7 @@ struct boss_ossirian : public BossAI
                     CrystalCoordinates[0].GetPositionZ(),
                     0, 0, 0, 0, 0, uint32(-1)))
                 {
-                    _firstCrystal = crystal->GetGUID();
+                    _firstCrystalGUID = crystal->GetGUID();
                     crystal->SetOwnerGUID(ObjectGuid::Empty);
                     crystal->RemoveGameObjectFlag(GO_FLAG_IN_USE);
                     crystal->AI()->SetGUID(trigger->GetGUID(), GUID_TRIGGER_PAIR);
@@ -152,9 +153,9 @@ struct boss_ossirian : public BossAI
         }
     }
 
-    void DoAction(int32 action) override
+    void SetGUID(ObjectGuid guid, int32 action) override
     {
-        if (action == ACTION_TRIGGER_WEAKNESS)
+        if (action == ACTION_TRIGGER_WEAKNESS && guid != _firstCrystalGUID)
         {
             SpawnNextCrystal();
         }
@@ -164,7 +165,6 @@ struct boss_ossirian : public BossAI
     {
         BossAI::EnterCombat(who);
         events.Reset();
-        me->SetSpeedRate(MOVE_RUN, 1.0f);
         events.ScheduleEvent(EVENT_SPEEDUP, 10s);
         events.ScheduleEvent(EVENT_SILENCE, 30s);
         events.ScheduleEvent(EVENT_CYCLONE, 20s);
@@ -280,7 +280,7 @@ struct boss_ossirian : public BossAI
             switch (eventId)
             {
                 case EVENT_SPEEDUP:
-                    me->SetSpeedRate(MOVE_RUN, 2.2f);
+                    DoCastSelf(SPELL_SPEED_BURST);
                     break;
                 case EVENT_SILENCE:
                     DoCastAOE(SPELL_CURSE_OF_TONGUES);
@@ -303,7 +303,7 @@ struct boss_ossirian : public BossAI
 
 protected:
     uint8 _crystalIterator;
-    ObjectGuid _firstCrystal;
+    ObjectGuid _firstCrystalGUID;
     bool _saidIntro;
 };
 
@@ -340,7 +340,7 @@ public:
                 {
                     if (!trigger->HasUnitState(UNIT_STATE_CASTING))
                     {
-                        ossirian->AI()->DoAction(ACTION_TRIGGER_WEAKNESS);
+                        ossirian->AI()->SetGUID(me->GetGUID(), ACTION_TRIGGER_WEAKNESS);
                         trigger->CastSpell(trigger, spellWeakness[urand(0, 4)], false);
                     }
                 }
