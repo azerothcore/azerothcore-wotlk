@@ -328,11 +328,10 @@ public:
         {
             if (reportUse)
             {
-                InstanceScript* instance = player->GetInstanceScript();
-                if (!instance)
+                if (!_instance)
                     return true;
 
-                Creature* ossirian = instance->GetCreature(DATA_OSSIRIAN);
+                Creature* ossirian = _instance->GetCreature(DATA_OSSIRIAN);
                 if (!ossirian)
                     return true;
 
