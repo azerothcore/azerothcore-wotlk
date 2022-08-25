@@ -324,7 +324,7 @@ public:
             }
         }
 
-        bool GossipHello(Player* player, bool reportUse) override
+        bool GossipHello(Player* /*player*/, bool reportUse) override
         {
             if (reportUse)
             {
