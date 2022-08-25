@@ -336,12 +336,11 @@ public:
                 if (!ossirian)
                     return true;
 
-                ossirian->AI()->SetGUID(me->GetGUID(), ACTION_TRIGGER_WEAKNESS);
-
                 if (Creature* trigger = ObjectAccessor::GetCreature(*me, _triggerGUID))
                 {
                     if (!trigger->HasUnitState(UNIT_STATE_CASTING))
                     {
+                        ossirian->AI()->SetGUID(me->GetGUID(), ACTION_TRIGGER_WEAKNESS);
                         trigger->CastSpell(trigger, spellWeakness[urand(0, 4)], false);
                     }
                 }
