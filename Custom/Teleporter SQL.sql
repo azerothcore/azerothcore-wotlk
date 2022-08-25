@@ -97,7 +97,7 @@ INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (156, 150, 2, -1, 2, 'DrakTharon', 571, 4774.32, -2036.68, 229.38, 1.567);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (157, 150, 2, -1, 2, 'AhnKahet', 571, 3700.87, 2152.58, 36.044, 3.5956);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (158, 150, 2, -1, 2, 'Azjol Nerub', 571, 3700.87, 2152.58, 36.044, 3.5956);
-INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (159, 150, 2, -1, 2, 'Nexus', 571, 3780.6, 6955.63, 104.89, 0.3676);
+
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (160, 150, 2, -1, 2, 'Utgarde Keep', 571, 1206.94, -4868.05, 41.249,0.2804);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (161, 150, 2, -1, 2, 'Utgarde Castle', 571, 1206.94, -4868.05, 41.249,0.2804);
 
@@ -152,8 +152,7 @@ INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name
 
 -- Custom Dungeons ID 700 - 799
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES ('700', '0', '1', '-1', '2', 'Custom Dungeons', null, null, null, null, null);
--- INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (461, 460, 2, 1, 2, 'Hinterland Outdoor BG Horde', 0, -581.244, -4577.71, 10.2148, 0.5484);
--- INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (462, 460, 2, 0, 2, 'Hinterland Outdoor BG Alliance', 0, -17.7433, -4635.11, 12.933, 2.42161);
+INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (701, 700, 2, -1, 2, 'Nexus - Level 100', 571, 3876.24, 6985, 75.68, 0.01);
 
 
 
