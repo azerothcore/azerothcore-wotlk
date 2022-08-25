@@ -141,7 +141,7 @@ struct boss_ossirian : public BossAI
         summons.Summon(creature);
     }
 
-    void SpellHit(Unit* caster, SpellInfo const* spell) override
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
     {
         for (uint32 weakness : spellWeakness)
         {
