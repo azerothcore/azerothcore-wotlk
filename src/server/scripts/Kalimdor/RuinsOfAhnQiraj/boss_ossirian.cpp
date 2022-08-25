@@ -152,7 +152,7 @@ struct boss_ossirian : public BossAI
         }
     }
 
-    void SetGUID(ObjectGuid guid, int32 action) override
+    void DoAction(int32 action) override
     {
         if (action == ACTION_TRIGGER_WEAKNESS)
         {
