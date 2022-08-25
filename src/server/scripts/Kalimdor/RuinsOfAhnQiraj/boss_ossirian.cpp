@@ -44,7 +44,7 @@ enum Spells
     SPELL_SAND_STORM                    = 25160,
     SPELL_SUMMON_CRYSTAL                = 25192,
     SPELL_SUMMON_SMALL_OBSIDIAN_CHUNK   = 27627, // Server-side
-    SPELL_SPEED_BURST                   = 25184,
+    SPELL_SPEED_BURST                   = 25184, // Server-side
 
     // Crystal
     SPELL_FIRE_WEAKNESS                 = 25177,
