@@ -71,7 +71,7 @@ struct boss_rajaxx : public BossAI
 
         me->GetMap()->DoForAllPlayers([&, creatureList](Player* player)
         {
-            for (Creature* creature : creatureList)
+            for (uint8 i = 0; i >= creatureList.size(); ++i)
             {
                 player->CastSpell(player, SPELL_CENARION_REPUTATION, true);
             }
