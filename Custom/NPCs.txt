@@ -357,6 +357,12 @@ select entry, name, subname from creature_template where entry >= '60000';
 |  800001 | Innkeeper Fizzgrimble              | Innkeeper                   |
 |  800002 | Teleporter                         | NULL                        |
 |  800003 | Booty Bay Bruiser                  | NULL                        |
+|  800004 | Ashzara Wyvern Rider               | NULL                        |
+|  810000 | Revantusk Watcher                  | NULL                        |
+|  810001 | Stormwind City Guard               | NULL                        |
+|  810002 | Thrall                             | Warchief                    |
+|  810003 | King Varian Wrynn                  | King of Stormwind           |
+|  820000 | Archmage Berinand                  | Nexus - Questgiver          |
 | 3460602 | Frost Sphere (2)                   |                             |
 | 3460603 | Frost Sphere (3)                   |                             |
 +---------+------------------------------------+-----------------------------+
