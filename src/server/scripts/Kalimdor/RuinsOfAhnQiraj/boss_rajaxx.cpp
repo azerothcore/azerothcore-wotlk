@@ -35,9 +35,12 @@ enum Yells
 
 enum Spells
 {
-    SPELL_DISARM            = 6713,
-    SPELL_FRENZY            = 8269,
-    SPELL_THUNDERCRASH      = 25599
+    SPELL_DISARM              = 6713,
+    SPELL_FRENZY              = 8269,
+    SPELL_THUNDERCRASH        = 25599,
+
+    // Server-side
+    SPELL_CENARION_REPUTATION = 26342
 };
 
 enum Events
@@ -61,6 +64,26 @@ struct boss_rajaxx : public BossAI
             andorov->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_VENDOR);
             andorov->ForceValuesUpdateAtIndex(UNIT_NPC_FLAGS);
         }
+
+        std::list<Creature*> creatureList;
+        me->GetCreatureListWithEntryInGrid(creatureList, NPC_KALDOREI_ELITE, 200.0f);
+        creatureList.remove_if([&](Creature* creature) -> bool { return !creature->IsAlive(); });
+
+        me->GetMap()->DoForAllPlayers([&, creatureList](Player* player)
+        {
+            for (uint8 i = 0; i < creatureList.size(); ++i)
+            {
+                player->CastSpell(player, SPELL_CENARION_REPUTATION, true);
+            }
+
+            if (Creature* andorov = instance->instance->GetCreature(instance->GetGuidData(DATA_ANDOROV)))
+            {
+                if (andorov->IsAlive())
+                {
+                    player->CastSpell(player, SPELL_CENARION_REPUTATION, true);
+                }
+            }
+        });
     }
 
     void EnterCombat(Unit* /*victim*/) override
@@ -237,13 +260,16 @@ struct npc_general_andorov : public npc_escortAI
         }
     }
 
-    void JustDied(Unit* /*killer*/) override
+    void JustDied(Unit* killer) override
     {
         _summons.DespawnAll();
 
-        if (Creature* rajaxx = instance->GetCreature(DATA_RAJAXX))
+        if (killer->GetEntry() == NPC_RAJAXX)
         {
-            rajaxx->AI()->Talk(SAY_KILLS_ANDOROV);
+            if (Creature* rajaxx = instance->GetCreature(DATA_RAJAXX))
+            {
+                rajaxx->AI()->Talk(SAY_KILLS_ANDOROV);
+            }
         }
     }
 
