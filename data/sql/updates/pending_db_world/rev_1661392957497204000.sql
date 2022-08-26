@@ -1,6 +1,3 @@
--- Remove unused extra_flags generating worldserver warnings. These are all part of the Rajaxx Event. Flag was 25 (33554432)
-UPDATE `creature_template` SET `flags_extra` = 0 WHERE `entry` IN (15344,15385,15386,15387,15388,15389,15390,15391,15392);
-
 -- Remove gold drops from a summoned creature before I forget again
 UPDATE `creature_template` SET `mingold` = 0, `maxgold` = 0 WHERE (`entry` = 15538);
 
