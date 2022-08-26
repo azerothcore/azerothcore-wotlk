@@ -1,4 +1,6 @@
 --
+INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Chance`, `GroupId`, `Comment`) VALUES (14503, 21156, 0, 1, Scarab Bag);
+
 DELETE FROM `gameobject_loot_template` WHERE (`Entry` = 17532) AND (`Item` IN (1, 21156, 21157));
 INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (17532, 21156, 0, 100, 0, 1, 0, 1, 1, 'Scarab Coffer - Scarab Bag'),
