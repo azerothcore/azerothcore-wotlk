@@ -1,3 +1,4 @@
+-- DB update 2022_08_25_05 -> 2022_08_26_00
 --
 DELETE FROM `reference_loot_template` WHERE `Entry`=14503;
 INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Chance`, `GroupId`, `Comment`) VALUES (14503, 21156, 0, 1, 'Scarab Bag');
