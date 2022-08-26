@@ -1,3 +1,9 @@
+-- Remove unused extra_flags generating worldserver warnings. These are all part of the Rajaxx Event. Flag was 25 (33554432)
+UPDATE `creature_template` SET `flags_extra` = 0 WHERE `entry` IN (15344,15385,15386,15387,15388,15389,15390,15391,15392);
+
+-- Remove gold drops from a summoned creature before I forget again
+UPDATE `creature_template` SET `mingold` = 0, `maxgold` = 0 WHERE (`entry` = 15538);
+
 -- Anubisath Guardian (15355)
 UPDATE `creature_template` SET `DamageModifier` = 11.85, `ArmorModifier` = 1.3 WHERE (`entry` = 15355);
 
@@ -314,3 +320,9 @@ UPDATE `creature_template` SET `detection_range` = 30, `DamageModifier` = 33.35,
 DELETE FROM `creature_template_resistance` WHERE (`CreatureID` = 15339) AND (`School` IN (6));
 INSERT INTO `creature_template_resistance` (`CreatureID`, `School`, `Resistance`, `VerifiedBuild`) VALUES
 (15339, 6, 1000, 0);
+
+-- Vile Scarab (15168)
+UPDATE `creature_template` SET `DamageModifier` = 1.5 WHERE (`entry` = 15168);
+
+-- Silicate Feeder (15333)
+UPDATE `creature_template` SET `DamageModifier` = 5.05 WHERE (`entry` = 15333);
