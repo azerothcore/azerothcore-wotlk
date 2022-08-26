@@ -51,12 +51,6 @@ struct boss_rajaxx : public BossAI
 {
     boss_rajaxx(Creature* creature) : BossAI(creature, DATA_RAJAXX) { }
 
-    void Reset() override
-    {
-        BossAI::Reset();
-        enraged = false;
-    }
-
     void JustDied(Unit* /*killer*/) override
     {
         Talk(SAY_DEATH);
@@ -105,8 +99,6 @@ struct boss_rajaxx : public BossAI
 
         DoMeleeAttackIfReady();
     }
-private:
-    bool enraged;
 };
 
 class spell_rajaxx_thundercrash : public SpellScript
@@ -183,7 +175,6 @@ struct npc_general_andorov : public npc_escortAI
                 kaldoreielitist->SetImmuneToNPC(true);
                 kaldoreielitist->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 kaldoreielitist->SetReactState(REACT_PASSIVE);
-                kaldoreielitist->SetFaction(FACTION_ESCORT_H_ACTIVE);
                 CAST_AI(SmartAI, kaldoreielitist->AI())->SetFollow(me, 2.5f, 0.f + i * (M_PI / 2));
             }
         }
@@ -330,7 +321,7 @@ struct npc_general_andorov : public npc_escortAI
             {
                 case EVENT_BASH:
                     DoCastVictim(SPELL_BASH);
-                    events.ScheduleEvent(EVENT_BASH, urand(12, 15) * IN_MILLISECONDS);
+                    events.ScheduleEvent(EVENT_BASH, urand(25, 38) * IN_MILLISECONDS);
                     break;
                 case EVENT_COMMAND_AURA:
                     DoCastSelf(SPELL_AURA_OF_COMMAND, true);
