@@ -112,6 +112,8 @@ struct boss_skeram : public BossAI
         {
             _JustDied();
             Talk(SAY_DEATH);
+
+            instance->HandleGameObject(instance->GetGuidData(AQ40_DOOR_3), true);
         }
         else
             me->RemoveCorpse();
@@ -146,9 +148,7 @@ struct boss_skeram : public BossAI
                     events.ScheduleEvent(EVENT_ARCANE_EXPLOSION, 8s, 18s);
                     break;
                 case EVENT_FULLFILMENT:
-                    /// @todo For some weird reason boss does not cast this
-                    // Spell actually works, tested in duel
-                    DoCast(SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true), SPELL_TRUE_FULFILLMENT, false);
+                    DoCast(SelectTarget(SelectTargetMethod::MinDistance, 1, 0.0f, true), SPELL_TRUE_FULFILLMENT, false);
                     events.ScheduleEvent(EVENT_FULLFILMENT, 20s, 30s);
                     break;
                 case EVENT_BLINK:
