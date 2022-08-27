@@ -127,7 +127,7 @@ public:
                     break;
                 case AQ40_DOOR_2:
                     doorGUIDs[1] = go->GetGUID();
-                    if (Creature* veklor = instance->GetCreature(VeklorGUID))
+                    if (Creature* veklor = GetCreature(DATA_VEKLOR))
                     {
                         if (!veklor->IsAlive())
                         {
