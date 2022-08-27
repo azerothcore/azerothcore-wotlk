@@ -15,20 +15,20 @@
 -- Dumpar struktur för tabell acore_world.creature_onkill_reputation
 DROP TABLE IF EXISTS `creature_onkill_reputation`;
 CREATE TABLE IF NOT EXISTS `creature_onkill_reputation` (
-  `creature_id` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Creature Identifier',
-  `RewOnKillRepFaction1` SMALLINT NOT NULL DEFAULT 0,
-  `RewOnKillRepFaction2` SMALLINT NOT NULL DEFAULT 0,
-  `MaxStanding1` TINYINT NOT NULL DEFAULT 0,
-  `IsTeamAward1` TINYINT NOT NULL DEFAULT 0,
-  `RewOnKillRepValue1` MEDIUMINT NOT NULL DEFAULT 0,
-  `MaxStanding2` TINYINT NOT NULL DEFAULT 0,
-  `IsTeamAward2` TINYINT NOT NULL DEFAULT 0,
-  `RewOnKillRepValue2` MEDIUMINT NOT NULL DEFAULT 0,
-  `TeamDependent` TINYINT unsigned NOT NULL DEFAULT 0,
+  `creature_id` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Creature Identifier',
+  `RewOnKillRepFaction1` smallint NOT NULL DEFAULT '0',
+  `RewOnKillRepFaction2` smallint NOT NULL DEFAULT '0',
+  `MaxStanding1` tinyint NOT NULL DEFAULT '0',
+  `IsTeamAward1` tinyint NOT NULL DEFAULT '0',
+  `RewOnKillRepValue1` mediumint NOT NULL DEFAULT '0',
+  `MaxStanding2` tinyint NOT NULL DEFAULT '0',
+  `IsTeamAward2` tinyint NOT NULL DEFAULT '0',
+  `RewOnKillRepValue2` mediumint NOT NULL DEFAULT '0',
+  `TeamDependent` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`creature_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='Creature OnKill Reputation gain';
 
--- Dumpar data för tabell acore_world.creature_onkill_reputation: 2 045 rows
+-- Dumpar data för tabell acore_world.creature_onkill_reputation: 2 044 rows
 DELETE FROM `creature_onkill_reputation`;
 /*!40000 ALTER TABLE `creature_onkill_reputation` DISABLE KEYS */;
 INSERT INTO `creature_onkill_reputation` (`creature_id`, `RewOnKillRepFaction1`, `RewOnKillRepFaction2`, `MaxStanding1`, `IsTeamAward1`, `RewOnKillRepValue1`, `MaxStanding2`, `IsTeamAward2`, `RewOnKillRepValue2`, `TeamDependent`) VALUES
@@ -194,9 +194,9 @@ INSERT INTO `creature_onkill_reputation` (`creature_id`, `RewOnKillRepFaction1`,
 	(7153, 576, 0, 5, 0, 20, 0, 0, 0, 0),
 	(7154, 576, 0, 5, 0, 20, 0, 0, 0, 0),
 	(7155, 576, 0, 5, 0, 20, 0, 0, 0, 0),
-	(7156, 576, 0, 6, 0, 20, 0, 0, 0, 0),
-	(7157, 576, 0, 6, 0, 20, 0, 0, 0, 0),
-	(7158, 576, 0, 6, 0, 20, 0, 0, 0, 0),
+	(7156, 576, 0, 5, 0, 20, 0, 0, 0, 0),
+	(7157, 576, 0, 5, 0, 20, 0, 0, 0, 0),
+	(7158, 576, 0, 5, 0, 20, 0, 0, 0, 0),
 	(7323, 70, 349, 3, 0, 5, 3, 0, -25, 0),
 	(7324, 70, 349, 3, 0, 5, 3, 0, -25, 0),
 	(7325, 70, 349, 3, 0, 5, 3, 0, -25, 0),
@@ -496,7 +496,6 @@ INSERT INTO `creature_onkill_reputation` (`creature_id`, `RewOnKillRepFaction1`,
 	(14880, 270, 0, 6, 0, 5, 0, 0, 0, 0),
 	(14882, 270, 0, 6, 0, 3, 0, 0, 0, 0),
 	(14883, 270, 0, 6, 0, 5, 0, 0, 0, 0),
-	(14889, 946, 947, 5, 0, 5, 5, 0, 5, 1),
 	(14988, 270, 0, 7, 0, 25, 0, 0, 0, 0),
 	(15043, 270, 0, 6, 0, 3, 0, 0, 0, 0),
 	(15068, 270, 0, 6, 0, 5, 0, 0, 0, 0),

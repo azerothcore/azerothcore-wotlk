@@ -15,18 +15,18 @@
 -- Dumpar struktur för tabell acore_world.pet_levelstats
 DROP TABLE IF EXISTS `pet_levelstats`;
 CREATE TABLE IF NOT EXISTS `pet_levelstats` (
-  `creature_entry` MEDIUMINT unsigned NOT NULL,
-  `level` TINYINT unsigned NOT NULL,
-  `hp` SMALLINT unsigned NOT NULL,
-  `mana` SMALLINT unsigned NOT NULL,
-  `armor` INT unsigned NOT NULL DEFAULT 0,
-  `str` SMALLINT unsigned NOT NULL,
-  `agi` SMALLINT unsigned NOT NULL,
-  `sta` SMALLINT unsigned NOT NULL,
-  `inte` SMALLINT unsigned NOT NULL,
-  `spi` SMALLINT unsigned NOT NULL,
-  `min_dmg` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `max_dmg` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `creature_entry` mediumint unsigned NOT NULL,
+  `level` tinyint unsigned NOT NULL,
+  `hp` int unsigned NOT NULL DEFAULT '0',
+  `mana` int unsigned NOT NULL DEFAULT '0',
+  `armor` int unsigned NOT NULL DEFAULT '0',
+  `str` int unsigned NOT NULL DEFAULT '0',
+  `agi` int unsigned NOT NULL DEFAULT '0',
+  `sta` int unsigned NOT NULL DEFAULT '0',
+  `inte` int unsigned NOT NULL DEFAULT '0',
+  `spi` int unsigned NOT NULL DEFAULT '0',
+  `min_dmg` int unsigned NOT NULL DEFAULT '0',
+  `max_dmg` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`creature_entry`,`level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 PACK_KEYS=0 COMMENT='Stores pet levels stats.';
 

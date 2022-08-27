@@ -15,10 +15,10 @@
 -- Dumpar struktur för tabell acore_characters.character_reputation
 DROP TABLE IF EXISTS `character_reputation`;
 CREATE TABLE IF NOT EXISTS `character_reputation` (
-  `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
-  `faction` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `standing` INT NOT NULL DEFAULT 0,
-  `flags` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `guid` int unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
+  `faction` smallint unsigned NOT NULL DEFAULT '0',
+  `standing` int NOT NULL DEFAULT '0',
+  `flags` smallint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`faction`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
 

@@ -15,130 +15,115 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Boss_Huhuran
-SD%Complete: 100
-SDComment:
-SDCategory: Temple of Ahn'Qiraj
-EndScriptData */
-
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellAuras.h"
 #include "temple_of_ahnqiraj.h"
 
-enum Huhuran
+enum Emotes
 {
     EMOTE_FRENZY_KILL           = 0,
-    EMOTE_BERSERK               = 1,
-
-    SPELL_FRENZY                = 26051,
-    SPELL_BERSERK               = 26068,
-    SPELL_POISONBOLT            = 26052,
-    SPELL_NOXIOUSPOISON         = 26053,
-    SPELL_WYVERNSTING           = 26180,
-    SPELL_ACIDSPIT              = 26050,
-    SPELL_WYVERN_STING_DAMAGE   = 26233
+    EMOTE_BERSERK               = 1
 };
 
-struct boss_huhuran : public ScriptedAI
+enum Spells
 {
-    boss_huhuran(Creature* creature) : ScriptedAI(creature) { }
+    SPELL_FRENZY                = 26051, // triggers SPELL_POISON_BOLT
+    SPELL_BERSERK               = 26068, // triggers SPELL_POISON_BOLT
+    SPELL_NOXIOUS_POISON        = 26053,
+    SPELL_WYVERN_STING          = 26180,
+    SPELL_ACID_SPIT             = 26050,
+    SPELL_WYVERN_STING_DAMAGE   = 26233,
+    SPELL_POISON_BOLT           = 26052,
+    SPELL_HARD_ENRAGE           = 26662
+};
 
-    uint32 Frenzy_Timer;
-    uint32 Wyvern_Timer;
-    uint32 Spit_Timer;
-    uint32 PoisonBolt_Timer;
-    uint32 NoxiousPoison_Timer;
-    uint32 FrenzyBack_Timer;
+enum Events
+{
+    EVENT_FRENZY                = 1,
+    EVENT_WYVERN_STING          = 2,
+    EVENT_ACID_SPIT             = 3,
+    EVENT_NOXIOUS_POISON        = 4,
+    EVENT_HARD_ENRAGE           = 5
+};
 
-    bool Frenzy;
-    bool Berserk;
+struct boss_huhuran : public BossAI
+{
+    boss_huhuran(Creature* creature) : BossAI(creature, DATA_HUHURAN) { }
 
     void Reset() override
     {
-        Frenzy_Timer = urand(25000, 35000);
-        Wyvern_Timer = urand(18000, 28000);
-        Spit_Timer = 8000;
-        PoisonBolt_Timer = 4000;
-        NoxiousPoison_Timer = urand(10000, 20000);
-        FrenzyBack_Timer = 15000;
+        _Reset();
+        _berserk = false;
+        _hardEnrage = false;
+    }
 
-        Frenzy = false;
-        Berserk = false;
+    void EnterCombat(Unit* /*who*/) override
+    {
+        events.ScheduleEvent(EVENT_FRENZY, urand(25000, 35000));
+        events.ScheduleEvent(EVENT_WYVERN_STING, urand(18000, 28000));
+        events.ScheduleEvent(EVENT_ACID_SPIT, 8000);
+        events.ScheduleEvent(EVENT_NOXIOUS_POISON, urand(10000, 20000));
+        events.ScheduleEvent(EVENT_HARD_ENRAGE, 300000);
+    }
+
+    void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+    {
+        if (!_berserk && HealthBelowPct(30))
+        {
+            DoCastSelf(SPELL_BERSERK, true);
+            me->TextEmote(EMOTE_BERSERK);
+            _berserk = true;
+        }
     }
 
     void UpdateAI(uint32 diff) override
     {
-        //Return since we have no target
         if (!UpdateVictim())
             return;
 
-        //Frenzy_Timer
-        if (!Frenzy && Frenzy_Timer <= diff)
+        events.Update(diff);
+        while (uint32 eventid = events.ExecuteEvent())
         {
-            DoCast(me, SPELL_FRENZY);
-            Talk(EMOTE_FRENZY_KILL);
-            Frenzy = true;
-            PoisonBolt_Timer = 3000;
-            Frenzy_Timer = urand(25000, 35000);
-        }
-        else Frenzy_Timer -= diff;
-
-        // Wyvern Timer
-        if (Wyvern_Timer <= diff)
-        {
-            DoCastAOE(SPELL_WYVERNSTING);
-            Wyvern_Timer = urand(15000, 32000);
-        }
-        else Wyvern_Timer -= diff;
-
-        //Spit Timer
-        if (Spit_Timer <= diff)
-        {
-            DoCastVictim(SPELL_ACIDSPIT);
-            Spit_Timer = urand(5000, 10000);
-        }
-        else Spit_Timer -= diff;
-
-        //NoxiousPoison_Timer
-        if (NoxiousPoison_Timer <= diff)
-        {
-            DoCastVictim(SPELL_NOXIOUSPOISON);
-            NoxiousPoison_Timer = urand(12000, 24000);
-        }
-        else NoxiousPoison_Timer -= diff;
-
-        //PoisonBolt only if frenzy or berserk
-        if (Frenzy || Berserk)
-        {
-            if (PoisonBolt_Timer <= diff)
+            switch (eventid)
             {
-                DoCastVictim(SPELL_POISONBOLT);
-                PoisonBolt_Timer = 3000;
+                case EVENT_FRENZY:
+                    DoCastSelf(SPELL_FRENZY, true);
+                    Talk(EMOTE_FRENZY_KILL);
+                    events.RepeatEvent(urand(25000, 35000));
+                    break;
+                case EVENT_WYVERN_STING:
+                    me->CastCustomSpell(SPELL_WYVERN_STING, SPELLVALUE_MAX_TARGETS, 10, me, true);
+                    events.RepeatEvent(urand(15000, 32000));
+                    break;
+                case EVENT_ACID_SPIT:
+                    DoCastVictim(SPELL_ACID_SPIT);
+                    events.RepeatEvent(urand(5000, 10000));
+                    break;
+                case EVENT_NOXIOUS_POISON:
+                    DoCastRandomTarget(SPELL_NOXIOUS_POISON, 0, 100, true);
+                    events.RepeatEvent(urand(12000, 24000));
+                    break;
+                case EVENT_HARD_ENRAGE:
+                    if (!_hardEnrage)
+                    {
+                        DoCastSelf(SPELL_HARD_ENRAGE, true);
+                        _hardEnrage = true;
+                    }
+                    else
+                    {
+                        DoCastAOE(SPELL_POISON_BOLT);
+                    }
+                    events.RepeatEvent(3000);
+                    break;
             }
-            else PoisonBolt_Timer -= diff;
         }
-
-        //FrenzyBack_Timer
-        if (Frenzy && FrenzyBack_Timer <= diff)
-        {
-            me->InterruptNonMeleeSpells(false);
-            Frenzy = false;
-            FrenzyBack_Timer = 15000;
-        }
-        else FrenzyBack_Timer -= diff;
-
-        if (!Berserk && HealthBelowPct(31))
-        {
-            me->InterruptNonMeleeSpells(false);
-            Talk(EMOTE_BERSERK);
-            DoCast(me, SPELL_BERSERK);
-            Berserk = true;
-        }
-
         DoMeleeAttackIfReady();
     }
+    private:
+        bool _berserk;
+        bool _hardEnrage;
 };
 
 // 26180 - Wyvern Sting
@@ -146,17 +131,20 @@ class spell_huhuran_wyvern_sting : public AuraScript
 {
     PrepareAuraScript(spell_huhuran_wyvern_sting);
 
-    void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        if (Unit* caster = GetCaster())
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_ENEMY_SPELL) // dispelled
         {
-            caster->CastCustomSpell(SPELL_WYVERN_STING_DAMAGE, SPELLVALUE_BASE_POINT0, 3000, GetUnitOwner(), true);
+            if (Unit* caster = GetCaster())
+            {
+                caster->CastCustomSpell(SPELL_WYVERN_STING_DAMAGE, SPELLVALUE_BASE_POINT0, 3000, GetUnitOwner(), true);
+            }
         }
     }
 
     void Register() override
     {
-        AfterEffectRemove += AuraEffectRemoveFn(spell_huhuran_wyvern_sting::HandleRemove, EFFECT_0, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_huhuran_wyvern_sting::OnRemove, EFFECT_0, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
     }
 };
 

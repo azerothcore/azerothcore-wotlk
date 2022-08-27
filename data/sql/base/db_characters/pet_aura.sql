@@ -15,21 +15,21 @@
 -- Dumpar struktur för tabell acore_characters.pet_aura
 DROP TABLE IF EXISTS `pet_aura`;
 CREATE TABLE IF NOT EXISTS `pet_aura` (
-  `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
-  `casterGuid` BIGINT unsigned NOT NULL DEFAULT 0 COMMENT 'Full Global Unique Identifier',
-  `spell` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `effectMask` TINYINT unsigned NOT NULL DEFAULT 0,
-  `recalculateMask` TINYINT unsigned NOT NULL DEFAULT 0,
-  `stackCount` TINYINT unsigned NOT NULL DEFAULT 1,
-  `amount0` MEDIUMINT NOT NULL,
-  `amount1` MEDIUMINT NOT NULL,
-  `amount2` MEDIUMINT NOT NULL,
-  `base_amount0` MEDIUMINT NOT NULL,
-  `base_amount1` MEDIUMINT NOT NULL,
-  `base_amount2` MEDIUMINT NOT NULL,
-  `maxDuration` INT NOT NULL DEFAULT 0,
-  `remainTime` INT NOT NULL DEFAULT 0,
-  `remainCharges` TINYINT unsigned NOT NULL DEFAULT 0,
+  `guid` int unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
+  `casterGuid` bigint unsigned NOT NULL DEFAULT '0' COMMENT 'Full Global Unique Identifier',
+  `spell` mediumint unsigned NOT NULL DEFAULT '0',
+  `effectMask` tinyint unsigned NOT NULL DEFAULT '0',
+  `recalculateMask` tinyint unsigned NOT NULL DEFAULT '0',
+  `stackCount` tinyint unsigned NOT NULL DEFAULT '1',
+  `amount0` mediumint NOT NULL,
+  `amount1` mediumint NOT NULL,
+  `amount2` mediumint NOT NULL,
+  `base_amount0` mediumint NOT NULL,
+  `base_amount1` mediumint NOT NULL,
+  `base_amount2` mediumint NOT NULL,
+  `maxDuration` int NOT NULL DEFAULT '0',
+  `remainTime` int NOT NULL DEFAULT '0',
+  `remainCharges` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`casterGuid`,`spell`,`effectMask`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Pet System';
 

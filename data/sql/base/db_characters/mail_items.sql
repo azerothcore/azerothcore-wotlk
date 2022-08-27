@@ -15,9 +15,9 @@
 -- Dumpar struktur för tabell acore_characters.mail_items
 DROP TABLE IF EXISTS `mail_items`;
 CREATE TABLE IF NOT EXISTS `mail_items` (
-  `mail_id` INT unsigned NOT NULL DEFAULT 0,
-  `item_guid` INT unsigned NOT NULL DEFAULT 0,
-  `receiver` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Character Global Unique Identifier',
+  `mail_id` int unsigned NOT NULL DEFAULT '0',
+  `item_guid` int unsigned NOT NULL DEFAULT '0',
+  `receiver` int unsigned NOT NULL DEFAULT '0' COMMENT 'Character Global Unique Identifier',
   PRIMARY KEY (`item_guid`),
   KEY `idx_receiver` (`receiver`),
   KEY `idx_mail_id` (`mail_id`)

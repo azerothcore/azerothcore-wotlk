@@ -15,11 +15,11 @@
 -- Dumpar struktur för tabell acore_characters.guild_rank
 DROP TABLE IF EXISTS `guild_rank`;
 CREATE TABLE IF NOT EXISTS `guild_rank` (
-  `guildid` INT unsigned NOT NULL DEFAULT 0,
-  `rid` TINYINT unsigned NOT NULL,
-  `rname` VARCHAR(20) NOT NULL DEFAULT '',
-  `rights` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `BankMoneyPerDay` INT unsigned NOT NULL DEFAULT 0,
+  `guildid` int unsigned NOT NULL DEFAULT '0',
+  `rid` tinyint unsigned NOT NULL,
+  `rname` varchar(20) NOT NULL DEFAULT '',
+  `rights` mediumint unsigned NOT NULL DEFAULT '0',
+  `BankMoneyPerDay` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guildid`,`rid`),
   KEY `Idx_rid` (`rid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Guild System';

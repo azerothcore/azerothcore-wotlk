@@ -2275,6 +2275,11 @@ GameObject* Map::SummonGameObject(uint32 entry, float x, float y, float z, float
     return go;
 }
 
+GameObject* Map::SummonGameObject(uint32 entry, Position const& pos, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, bool checkTransport)
+{
+    return SummonGameObject(entry, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), rotation0, rotation1, rotation2, rotation3, respawnTime, checkTransport);
+}
+
 void WorldObject::SetZoneScript()
 {
     if (Map* map = FindMap())

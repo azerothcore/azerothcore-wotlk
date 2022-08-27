@@ -15,13 +15,13 @@
 -- Dumpar struktur för tabell acore_world.transportanimation_dbc
 DROP TABLE IF EXISTS `transportanimation_dbc`;
 CREATE TABLE IF NOT EXISTS `transportanimation_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `TransportID` INT NOT NULL DEFAULT 0,
-  `TimeIndex` INT NOT NULL DEFAULT 0,
-  `PosX` float NOT NULL DEFAULT 0,
-  `PosY` float NOT NULL DEFAULT 0,
-  `PosZ` float NOT NULL DEFAULT 0,
-  `SequenceID` INT NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `TransportID` int NOT NULL DEFAULT '0',
+  `TimeIndex` int NOT NULL DEFAULT '0',
+  `PosX` float NOT NULL DEFAULT '0',
+  `PosY` float NOT NULL DEFAULT '0',
+  `PosZ` float NOT NULL DEFAULT '0',
+  `SequenceID` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
