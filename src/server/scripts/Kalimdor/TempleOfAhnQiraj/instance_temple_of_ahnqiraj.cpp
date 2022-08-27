@@ -56,6 +56,8 @@ public:
         ObjectGuid VeklorGUID;
         ObjectGuid VeknilashGUID;
         ObjectGuid ViscidusGUID;
+        ObjectGuid CThunGUID;
+        GuidVector CThunGraspGUIDs;
         std::array<ObjectGuid, 3> doorGUIDs;
 
         uint32 BugTrioDeathCount;
@@ -107,6 +109,21 @@ public:
                     if (GetBossState(DATA_OURO) != DONE)
                         creature->Respawn();
                     break;
+                case NPC_CTHUN:
+                    CThunGUID = creature->GetGUID();
+                    if (!creature->IsAlive())
+                    {
+                        for (ObjectGuid const& guid : CThunGraspGUIDs)
+                        {
+                            if (GameObject* cthunGrasp = instance->GetGameObject(guid))
+                            {
+                                cthunGrasp->DespawnOrUnsummon(1s);
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    break;
             }
 
             InstanceScript::OnCreatureCreate(creature);
@@ -136,6 +153,16 @@ public:
                         if (!skeram->IsAlive())
                         {
                             HandleGameObject(go->GetGUID(), true);
+                        }
+                    }
+                    break;
+                case GO_CTHUN_GRASP:
+                    CThunGraspGUIDs.push_back(go->GetGUID());
+                    if (Creature* CThun = instance->GetCreature(CThunGUID))
+                    {
+                        if (!CThun->IsAlive())
+                        {
+                            go->DespawnOrUnsummon(1s);
                         }
                     }
                     break;
@@ -215,6 +242,16 @@ public:
                     break;
                 case DATA_CTHUN_PHASE:
                     CthunPhase = data;
+                    if (data == PHASE_CTHUN_DONE)
+                    {
+                        for (ObjectGuid const& guid : CThunGraspGUIDs)
+                        {
+                            if (GameObject* cthunGrasp = instance->GetGameObject(guid))
+                            {
+                                cthunGrasp->DespawnOrUnsummon(1s);
+                            }
+                        }
+                    }
                     break;
             }
         }
