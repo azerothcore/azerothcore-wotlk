@@ -15,14 +15,14 @@
 -- Dumpar struktur för tabell acore_world.reputation_reward_rate
 DROP TABLE IF EXISTS `reputation_reward_rate`;
 CREATE TABLE IF NOT EXISTS `reputation_reward_rate` (
-  `faction` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `quest_rate` float NOT NULL DEFAULT 1,
-  `quest_daily_rate` float NOT NULL DEFAULT 1,
-  `quest_weekly_rate` float NOT NULL DEFAULT 1,
-  `quest_monthly_rate` float NOT NULL DEFAULT 1,
-  `quest_repeatable_rate` float NOT NULL DEFAULT 1,
-  `creature_rate` float NOT NULL DEFAULT 1,
-  `spell_rate` float NOT NULL DEFAULT 1,
+  `faction` mediumint unsigned NOT NULL DEFAULT '0',
+  `quest_rate` float NOT NULL DEFAULT '1',
+  `quest_daily_rate` float NOT NULL DEFAULT '1',
+  `quest_weekly_rate` float NOT NULL DEFAULT '1',
+  `quest_monthly_rate` float NOT NULL DEFAULT '1',
+  `quest_repeatable_rate` float NOT NULL DEFAULT '1',
+  `creature_rate` float NOT NULL DEFAULT '1',
+  `spell_rate` float NOT NULL DEFAULT '1',
   PRIMARY KEY (`faction`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

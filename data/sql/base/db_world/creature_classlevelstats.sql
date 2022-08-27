@@ -15,18 +15,18 @@
 -- Dumpar struktur för tabell acore_world.creature_classlevelstats
 DROP TABLE IF EXISTS `creature_classlevelstats`;
 CREATE TABLE IF NOT EXISTS `creature_classlevelstats` (
-  `level` TINYINT unsigned NOT NULL,
-  `class` TINYINT unsigned NOT NULL,
-  `basehp0` SMALLINT unsigned NOT NULL DEFAULT 1,
-  `basehp1` SMALLINT unsigned NOT NULL DEFAULT 1,
-  `basehp2` SMALLINT unsigned NOT NULL DEFAULT 1,
-  `basemana` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `basearmor` SMALLINT unsigned NOT NULL DEFAULT 1,
-  `attackpower` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `rangedattackpower` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `damage_base` float NOT NULL DEFAULT 0,
-  `damage_exp1` float NOT NULL DEFAULT 0,
-  `damage_exp2` float NOT NULL DEFAULT 0,
+  `level` tinyint unsigned NOT NULL,
+  `class` tinyint unsigned NOT NULL,
+  `basehp0` int unsigned NOT NULL DEFAULT '1',
+  `basehp1` int unsigned NOT NULL DEFAULT '1',
+  `basehp2` int unsigned NOT NULL DEFAULT '1',
+  `basemana` int unsigned NOT NULL DEFAULT '0',
+  `basearmor` int unsigned NOT NULL DEFAULT '1',
+  `attackpower` int unsigned NOT NULL DEFAULT '0',
+  `rangedattackpower` int unsigned NOT NULL DEFAULT '0',
+  `damage_base` float NOT NULL DEFAULT '0',
+  `damage_exp1` float NOT NULL DEFAULT '0',
+  `damage_exp2` float NOT NULL DEFAULT '0',
   `comment` text,
   PRIMARY KEY (`level`,`class`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;

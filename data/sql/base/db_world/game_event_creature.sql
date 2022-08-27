@@ -15,12 +15,12 @@
 -- Dumpar struktur för tabell acore_world.game_event_creature
 DROP TABLE IF EXISTS `game_event_creature`;
 CREATE TABLE IF NOT EXISTS `game_event_creature` (
-  `eventEntry` TINYINT NOT NULL COMMENT 'Entry of the game event. Put negative entry to remove during event.',
-  `guid` INT unsigned NOT NULL,
+  `eventEntry` tinyint NOT NULL COMMENT 'Entry of the game event. Put negative entry to remove during event.',
+  `guid` int unsigned NOT NULL,
   PRIMARY KEY (`guid`,`eventEntry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Dumpar data för tabell acore_world.game_event_creature: 8 808 rows
+-- Dumpar data för tabell acore_world.game_event_creature: 8 811 rows
 DELETE FROM `game_event_creature`;
 /*!40000 ALTER TABLE `game_event_creature` DISABLE KEYS */;
 INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
@@ -2800,6 +2800,11 @@ INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
 	(8, 146574),
 	(8, 146575),
 	(8, 146576),
+	(8, 146602),
+	(8, 146609),
+	(8, 146618),
+	(8, 146619),
+	(8, 146621),
 	(8, 146623),
 	(50, 150156),
 	(50, 150157),
@@ -8576,7 +8581,6 @@ INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
 	(9, 244843),
 	(9, 244844),
 	(9, 244845),
-	(10, 245000),
 	(1, 245500),
 	(1, 245501),
 	(1, 245502),
@@ -8794,7 +8798,6 @@ INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
 	(1, 248572),
 	(1, 248575),
 	(1, 248581),
-	(1, 248582),
 	(1, 248584),
 	(1, 248585),
 	(1, 248586),

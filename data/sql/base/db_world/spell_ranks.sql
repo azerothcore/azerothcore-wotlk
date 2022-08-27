@@ -15,9 +15,9 @@
 -- Dumpar struktur för tabell acore_world.spell_ranks
 DROP TABLE IF EXISTS `spell_ranks`;
 CREATE TABLE IF NOT EXISTS `spell_ranks` (
-  `first_spell_id` INT unsigned NOT NULL DEFAULT 0,
-  `spell_id` INT unsigned NOT NULL DEFAULT 0,
-  `rank` TINYINT unsigned NOT NULL DEFAULT 0,
+  `first_spell_id` int unsigned NOT NULL DEFAULT '0',
+  `spell_id` int unsigned NOT NULL DEFAULT '0',
+  `rank` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`first_spell_id`,`rank`),
   UNIQUE KEY `spell_id` (`spell_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Spell Rank Data';

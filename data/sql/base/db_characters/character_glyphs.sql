@@ -15,14 +15,14 @@
 -- Dumpar struktur för tabell acore_characters.character_glyphs
 DROP TABLE IF EXISTS `character_glyphs`;
 CREATE TABLE IF NOT EXISTS `character_glyphs` (
-  `guid` INT unsigned NOT NULL,
-  `talentGroup` TINYINT unsigned NOT NULL DEFAULT 0,
-  `glyph1` SMALLINT unsigned DEFAULT 0,
-  `glyph2` SMALLINT unsigned DEFAULT 0,
-  `glyph3` SMALLINT unsigned DEFAULT 0,
-  `glyph4` SMALLINT unsigned DEFAULT 0,
-  `glyph5` SMALLINT unsigned DEFAULT 0,
-  `glyph6` SMALLINT unsigned DEFAULT 0,
+  `guid` int unsigned NOT NULL,
+  `talentGroup` tinyint unsigned NOT NULL DEFAULT '0',
+  `glyph1` smallint unsigned DEFAULT '0',
+  `glyph2` smallint unsigned DEFAULT '0',
+  `glyph3` smallint unsigned DEFAULT '0',
+  `glyph4` smallint unsigned DEFAULT '0',
+  `glyph5` smallint unsigned DEFAULT '0',
+  `glyph6` smallint unsigned DEFAULT '0',
   PRIMARY KEY (`guid`,`talentGroup`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

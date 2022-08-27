@@ -15,14 +15,14 @@
 -- Dumpar struktur för tabell acore_world.player_factionchange_items
 DROP TABLE IF EXISTS `player_factionchange_items`;
 CREATE TABLE IF NOT EXISTS `player_factionchange_items` (
-  `alliance_id` INT unsigned NOT NULL,
+  `alliance_id` int unsigned NOT NULL,
   `alliance_comment` text NOT NULL,
-  `horde_id` INT unsigned NOT NULL,
+  `horde_id` int unsigned NOT NULL,
   `horde_comment` text NOT NULL,
   PRIMARY KEY (`alliance_id`,`horde_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Dumpar data för tabell acore_world.player_factionchange_items: 1 353 rows
+-- Dumpar data för tabell acore_world.player_factionchange_items: 1 395 rows
 DELETE FROM `player_factionchange_items`;
 /*!40000 ALTER TABLE `player_factionchange_items` DISABLE KEYS */;
 INSERT INTO `player_factionchange_items` (`alliance_id`, `alliance_comment`, `horde_id`, `horde_comment`) VALUES
@@ -1378,7 +1378,49 @@ INSERT INTO `player_factionchange_items` (`alliance_id`, `alliance_comment`, `ho
 	(50379, 'Battered Hilt', 50380, 'Battered Hilt'),
 	(51377, 'Medallion of the Alliance(264)', 51378, 'Medallion of the Horde(264)'),
 	(53097, 'Gnomeregan Drape', 54617, 'Darkspear Shroud'),
-	(54651, 'Gnomeregan Pride', 54653, 'Darkspear Pride');
+	(54651, 'Gnomeregan Pride', 54653, 'Darkspear Pride'),
+	(16393, 'Knight-Lieutenant\'s Dragonhide Footwraps', 16494, 'Blood Guard\'s Dragonhide Boots'),
+	(16397, 'Knight-Lieutenant\'s Dragonhide Gloves', 16496, 'Blood Guard\'s Dragonhide Gauntlets'),
+	(16423, 'Lieutenant Commander\'s Dragonhide Epaulets', 16501, 'Champion\'s Dragonhide Spaulders'),
+	(16422, 'Knight-Captain\'s Dragonhide Leggings', 16502, 'Legionnaire\'s Dragonhide Trousers'),
+	(16424, 'Lieutenant Commander\'s Dragonhide Shroud', 16503, 'Champion\'s Dragonhide Helm'),
+	(16421, 'Knight-Captain\'s Dragonhide Tunic', 16504, 'Legionnaire\'s Dragonhide Breastplate'),
+	(16401, 'Knight-Lieutenant\'s Chain Boots', 16531, 'Blood Guard\'s Chain Boots'),
+	(16403, 'Knight-Lieutenant\'s Chain Gauntlets', 16530, 'Blood Guard\'s Chain Gauntlets'),
+	(16425, 'Knight-Captain\'s Chain Hauberk', 16525, 'Legionnaire\'s Chain Breastplate'),
+	(16426, 'Knight-Captain\'s Chain Leggings', 16527, 'Legionnaire\'s Chain Leggings'),
+	(16427, 'Lieutenant Commander\'s Chain Pauldrons', 16528, 'Champion\'s Chain Pauldrons'),
+	(16428, 'Lieutenant Commander\'s Chain Helmet', 16526, 'Champion\'s Chain Headguard'),
+	(16369, 'Knight-Lieutenant\'s Silk Boots', 16485, 'Blood Guard\'s Silk Footwraps'),
+	(16391, 'Knight-Lieutenant\'s Silk Gloves', 16487, 'Blood Guard\'s Silk Gloves'),
+	(16413, 'Knight-Captain\'s Silk Raiment', 16491, 'Legionnaire\'s Silk Robes'),
+	(16414, 'Knight-Captain\'s Silk Leggings', 16490, 'Legionnaire\'s Silk Pants'),
+	(16415, 'Lieutenant Commander\'s Silk Spaulders', 16492, 'Champion\'s Silk Shoulderpads'),
+	(16416, 'Lieutenant Commander\'s Crown', 16489, 'Champion\'s Silk Hood'),
+	(16392, 'Knight-Lieutenant\'s Leather Boots', 16498, 'Blood Guard\'s Leather Treads'),
+	(16396, 'Knight-Lieutenant\'s Leather Gauntlets', 16499, 'Blood Guard\'s Leather Vices'),
+	(16417, 'Knight-Captain\'s Leather Armor', 16505, 'Legionnaire\'s Leather Hauberk'),
+	(16418, 'Lieutenant Commander\'s Leather Veil', 16506, 'Champion\'s Leather Headguard'),
+	(16419, 'Knight-Captain\'s Leather Legguards', 16508, 'Legionnaire\'s Leather Leggings'),
+	(16420, 'Lieutenant Commander\'s Leather Spaulders', 16507, 'Champion\'s Leather Mantle'),
+	(17594, 'Knight-Lieutenant\'s Satin Boots', 17616, 'Blood Guard\'s Satin Boots'),
+	(17596, 'Knight-Lieutenant\'s Satin Gloves', 17617, 'Blood Guard\'s Satin Gloves'),
+	(17598, 'Lieutenant Commander\'s Diadem', 17610, 'Champion\'s Satin Cowl'),
+	(17599, 'Knight-Captain\'s Satin Leggings', 17611, 'Legionnaire\'s Satin Trousers'),
+	(17600, 'Knight-Captain\'s Satin Robes', 17612, 'Legionnaire\'s Satin Vestments'),
+	(17601, 'Lieutenant Commander\'s Satin Amice', 17613, 'Champion\'s Satin Shoulderpads'),
+	(17562, 'Knight-Lieutenant\'s Dreadweave Boots', 17576, 'Blood Guard\'s Dreadweave Boots'),
+	(17564, 'Knight-Lieutenant\'s Dreadweave Gloves', 17577, 'Blood Guard\'s Dreadweave Gloves'),
+	(17566, 'Lieutenant Commander\'s Headguard', 17570, 'Champion\'s Dreadweave Hood'),
+	(17567, 'Knight-Captain\'s Dreadweave Leggings', 17571, 'Legionnaire\'s Dreadweave Leggings'),
+	(17568, 'Knight-Captain\'s Dreadweave Robe', 17572, 'Legionnaire\'s Dreadweave Robe'),
+	(17569, 'Lieutenant Commander\'s Dreadweave Mantle', 17573, 'Champion\'s Dreadweave Shoulders'),
+	(16405, 'Knight-Lieutenant\'s Plate Boots', 16509, 'Blood Guard\'s Plate Boots'),
+	(16406, 'Knight-Lieutenant\'s Plate Gauntlets', 16510, 'Blood Guard\'s Plate Gloves'),
+	(16429, 'Lieutenant Commander\'s Plate Helm', 16514, 'Champion\'s Plate Headguard'),
+	(16430, 'Knight-Captain\'s Plate Chestguard', 16513, 'Legionnaire\'s Plate Armor'),
+	(16431, 'Knight-Captain\'s Plate Leggings', 16515, 'Legionnaire\'s Plate Legguards'),
+	(16432, 'Lieutenant Commander\'s Plate Pauldrons', 16516, 'Champion\'s Plate Pauldrons');
 /*!40000 ALTER TABLE `player_factionchange_items` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

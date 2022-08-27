@@ -15,19 +15,19 @@
 -- Dumpar struktur för tabell acore_world.skilllineability_dbc
 DROP TABLE IF EXISTS `skilllineability_dbc`;
 CREATE TABLE IF NOT EXISTS `skilllineability_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `SkillLine` INT NOT NULL DEFAULT 0,
-  `Spell` INT NOT NULL DEFAULT 0,
-  `RaceMask` INT NOT NULL DEFAULT 0,
-  `ClassMask` INT NOT NULL DEFAULT 0,
-  `MinSkillLineRank` INT NOT NULL DEFAULT 0,
-  `SupercededBySpell` INT NOT NULL DEFAULT 0,
-  `AcquireMethod` INT NOT NULL DEFAULT 0,
-  `TrivialSkillLineRankHigh` INT NOT NULL DEFAULT 0,
-  `TrivialSkillLineRankLow` INT NOT NULL DEFAULT 0,
-  `CharacterPoints_1` INT NOT NULL DEFAULT 0,
-  `CharacterPoints_2` INT NOT NULL DEFAULT 0,
-  `TradeSkillCategoryID` INT NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `SkillLine` int NOT NULL DEFAULT '0',
+  `Spell` int NOT NULL DEFAULT '0',
+  `RaceMask` int NOT NULL DEFAULT '0',
+  `ClassMask` int NOT NULL DEFAULT '0',
+  `MinSkillLineRank` int NOT NULL DEFAULT '0',
+  `SupercededBySpell` int NOT NULL DEFAULT '0',
+  `AcquireMethod` int NOT NULL DEFAULT '0',
+  `TrivialSkillLineRankHigh` int NOT NULL DEFAULT '0',
+  `TrivialSkillLineRankLow` int NOT NULL DEFAULT '0',
+  `CharacterPoints_1` int NOT NULL DEFAULT '0',
+  `CharacterPoints_2` int NOT NULL DEFAULT '0',
+  `TradeSkillCategoryID` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
