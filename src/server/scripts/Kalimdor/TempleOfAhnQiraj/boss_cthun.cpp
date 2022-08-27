@@ -28,22 +28,6 @@ EndScriptData */
 #include "TaskScheduler.h"
 #include "temple_of_ahnqiraj.h"
 
-enum Phases
-{
-    PHASE_NOT_STARTED                           = 0,
-
-    // Main Phase 1 - EYE
-    PHASE_EYE_GREEN_BEAM                        = 1,
-    PHASE_EYE_RED_BEAM                          = 2,
-
-    // Main Phase 2 - CTHUN
-    PHASE_CTHUN_TRANSITION                      = 3,
-    PHASE_CTHUN_STOMACH                         = 4,
-    PHASE_CTHUN_WEAK                            = 5,
-
-    PHASE_CTHUN_DONE                            = 6,
-};
-
 enum Spells
 {
     // ***** Main Phase 1 ********

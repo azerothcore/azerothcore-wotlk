@@ -45,6 +45,7 @@ public:
         instance_temple_of_ahnqiraj_InstanceMapScript(Map* map) : InstanceScript(map)
         {
             LoadObjectData(creatureData, nullptr);
+            doorGUIDs.fill(ObjectGuid::Empty);
             SetBossNumber(MAX_BOSS_NUMBER);
         }
 
@@ -53,6 +54,10 @@ public:
         ObjectGuid KriGUID;
         ObjectGuid YaujGUID;
         ObjectGuid ViscidusGUID;
+        ObjectGuid CThunGUID;
+        GuidVector CThunGraspGUIDs;
+        std::array<ObjectGuid, 3> doorGUIDs;
+
         uint32 BugTrioDeathCount;
         uint32 CthunPhase;
 
@@ -68,6 +73,10 @@ public:
             {
                 case NPC_SKERAM:
                     SkeramGUID = creature->GetGUID();
+                    if (!creature->IsAlive())
+                    {
+                        HandleGameObject(doorGUIDs[2], true);
+                    }
                     break;
                 case NPC_VEM:
                     VemGUID = creature->GetGUID();
@@ -89,11 +98,68 @@ public:
                     if (GetBossState(DATA_TWIN_EMPERORS) != DONE)
                         creature->Respawn();
                     break;
+                case NPC_CTHUN:
+                    CThunGUID = creature->GetGUID();
+                    if (!creature->IsAlive())
+                    {
+                        for (ObjectGuid const& guid : CThunGraspGUIDs)
+                        {
+                            if (GameObject* cthunGrasp = instance->GetGameObject(guid))
+                            {
+                                cthunGrasp->DespawnOrUnsummon(1s);
+                            }
+                        }
+                    }
+                    break;
                 default:
                     break;
             }
 
             InstanceScript::OnCreatureCreate(creature);
+        }
+
+        void OnGameObjectCreate(GameObject* go) override
+        {
+            switch (go->GetEntry())
+            {
+                case AQ40_DOOR_1:
+                    doorGUIDs[0] = go->GetGUID();
+                    break;
+                case AQ40_DOOR_2:
+                    doorGUIDs[1] = go->GetGUID();
+                    if (Creature* veklor = instance->GetCreature(VeklorGUID))
+                    {
+                        if (!veklor->IsAlive())
+                        {
+                            HandleGameObject(go->GetGUID(), true);
+                        }
+                    }
+                    break;
+                case AQ40_DOOR_3:
+                    doorGUIDs[2] = go->GetGUID();
+                    if (Creature* skeram = instance->GetCreature(SkeramGUID))
+                    {
+                        if (!skeram->IsAlive())
+                        {
+                            HandleGameObject(go->GetGUID(), true);
+                        }
+                    }
+                    break;
+                case GO_CTHUN_GRASP:
+                    CThunGraspGUIDs.push_back(go->GetGUID());
+                    if (Creature* CThun = instance->GetCreature(CThunGUID))
+                    {
+                        if (!CThun->IsAlive())
+                        {
+                            go->DespawnOrUnsummon(1s);
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            InstanceScript::OnGameObjectCreate(go);
         }
 
         uint32 GetData(uint32 type) const override
@@ -123,6 +189,12 @@ public:
                     return YaujGUID;
                 case DATA_VISCIDUS:
                     return ViscidusGUID;
+                case AQ40_DOOR_1:
+                    return doorGUIDs[0];
+                case AQ40_DOOR_2:
+                    return doorGUIDs[1];
+                case AQ40_DOOR_3:
+                    return doorGUIDs[2];
             }
             return ObjectGuid::Empty;
         }
@@ -139,6 +211,16 @@ public:
                     break;
                 case DATA_CTHUN_PHASE:
                     CthunPhase = data;
+                    if (data == PHASE_CTHUN_DONE)
+                    {
+                        for (ObjectGuid const& guid : CThunGraspGUIDs)
+                        {
+                            if (GameObject* cthunGrasp = instance->GetGameObject(guid))
+                            {
+                                cthunGrasp->DespawnOrUnsummon(1s);
+                            }
+                        }
+                    }
                     break;
                 default:
                     break;
