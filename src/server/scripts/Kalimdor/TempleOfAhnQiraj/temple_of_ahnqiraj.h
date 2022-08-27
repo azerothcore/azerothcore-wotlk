@@ -80,8 +80,11 @@ enum Creatures
     NPC_SARTURA             = 15516
 };
 
-enum GameObjects
+enum ObjectsAQ40
 {
+    AQ40_DOOR_1             = 180634,
+    AQ40_DOOR_2             = 180635,
+    AQ40_DOOR_3             = 180636,
     GO_CTHUN_GRASP          = 180745
 };
 
