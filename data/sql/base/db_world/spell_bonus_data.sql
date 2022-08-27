@@ -15,16 +15,16 @@
 -- Dumpar struktur för tabell acore_world.spell_bonus_data
 DROP TABLE IF EXISTS `spell_bonus_data`;
 CREATE TABLE IF NOT EXISTS `spell_bonus_data` (
-  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `direct_bonus` float NOT NULL DEFAULT 0,
-  `dot_bonus` float NOT NULL DEFAULT 0,
-  `ap_bonus` float NOT NULL DEFAULT 0,
-  `ap_dot_bonus` float NOT NULL DEFAULT 0,
-  `comments` VARCHAR(255) DEFAULT NULL,
+  `entry` mediumint unsigned NOT NULL DEFAULT '0',
+  `direct_bonus` float NOT NULL DEFAULT '0',
+  `dot_bonus` float NOT NULL DEFAULT '0',
+  `ap_bonus` float NOT NULL DEFAULT '0',
+  `ap_dot_bonus` float NOT NULL DEFAULT '0',
+  `comments` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Dumpar data för tabell acore_world.spell_bonus_data: 1 269 rows
+-- Dumpar data för tabell acore_world.spell_bonus_data: 1 270 rows
 DELETE FROM `spell_bonus_data`;
 /*!40000 ALTER TABLE `spell_bonus_data` DISABLE KEYS */;
 INSERT INTO `spell_bonus_data` (`entry`, `direct_bonus`, `dot_bonus`, `ap_bonus`, `ap_dot_bonus`, `comments`) VALUES
@@ -1296,7 +1296,8 @@ INSERT INTO `spell_bonus_data` (`entry`, `direct_bonus`, `dot_bonus`, `ap_bonus`
 	(72790, 1, 0, 0, 0, 'Blood Prince Council Ball of Falmes Explosion'),
 	(72791, 1, 0, 0, 0, 'Blood Prince Council Ball of Falmes Explosion'),
 	(72898, 0.83, 0, 0, 0, 'Pet Mage - Water Elemental Frostbolt'),
-	(18817, 1, 0, 0, 0, 'Skullflame Shield - Drain Life');
+	(18817, 1, 0, 0, 0, 'Skullflame Shield - Drain Life'),
+	(22009, 0, 0.2, 0, 0, 'Priest - Greater Heal - 8P T2');
 /*!40000 ALTER TABLE `spell_bonus_data` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

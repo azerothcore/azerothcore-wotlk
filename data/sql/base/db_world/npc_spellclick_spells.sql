@@ -15,14 +15,14 @@
 -- Dumpar struktur för tabell acore_world.npc_spellclick_spells
 DROP TABLE IF EXISTS `npc_spellclick_spells`;
 CREATE TABLE IF NOT EXISTS `npc_spellclick_spells` (
-  `npc_entry` INT unsigned NOT NULL COMMENT 'reference to creature_template',
-  `spell_id` INT unsigned NOT NULL COMMENT 'spell which should be casted ',
-  `cast_flags` TINYINT unsigned NOT NULL COMMENT 'first bit defines caster: 1=player, 0=creature; second bit defines target, same mapping as caster bit',
-  `user_type` SMALLINT unsigned NOT NULL DEFAULT 0 COMMENT 'relation with summoner: 0-no 1-friendly 2-raid 3-party player can click',
+  `npc_entry` int unsigned NOT NULL COMMENT 'reference to creature_template',
+  `spell_id` int unsigned NOT NULL COMMENT 'spell which should be casted ',
+  `cast_flags` tinyint unsigned NOT NULL COMMENT 'first bit defines caster: 1=player, 0=creature; second bit defines target, same mapping as caster bit',
+  `user_type` smallint unsigned NOT NULL DEFAULT '0' COMMENT 'relation with summoner: 0-no 1-friendly 2-raid 3-party player can click',
   PRIMARY KEY (`npc_entry`,`spell_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Dumpar data för tabell acore_world.npc_spellclick_spells: 331 rows
+-- Dumpar data för tabell acore_world.npc_spellclick_spells: 330 rows
 DELETE FROM `npc_spellclick_spells`;
 /*!40000 ALTER TABLE `npc_spellclick_spells` DISABLE KEYS */;
 INSERT INTO `npc_spellclick_spells` (`npc_entry`, `spell_id`, `cast_flags`, `user_type`) VALUES
@@ -107,7 +107,6 @@ INSERT INTO `npc_spellclick_spells` (`npc_entry`, `spell_id`, `cast_flags`, `use
 	(29005, 60944, 1, 0),
 	(29351, 46598, 0, 0),
 	(29358, 46598, 0, 0),
-	(29403, 49641, 1, 0),
 	(29433, 47020, 1, 0),
 	(29460, 54513, 1, 0),
 	(29488, 54568, 3, 0),

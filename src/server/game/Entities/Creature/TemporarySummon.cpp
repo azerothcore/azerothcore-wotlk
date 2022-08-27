@@ -320,6 +320,15 @@ void TempSummon::RemoveFromWorld()
     Creature::RemoveFromWorld();
 }
 
+std::string TempSummon::GetDebugInfo() const
+{
+    std::stringstream sstr;
+    sstr << Creature::GetDebugInfo() << "\n"
+        << std::boolalpha
+        << "TempSummonType : " << std::to_string(GetSummonType()) << " Summoner: " << GetSummonerGUID().ToString();
+    return sstr.str();
+}
+
 Minion::Minion(SummonPropertiesEntry const* properties, ObjectGuid owner, bool isWorldObject) : TempSummon(properties, owner, isWorldObject)
     , m_owner(owner)
 {
@@ -378,6 +387,15 @@ void Minion::setDeathState(DeathState s, bool despawn)
                     }
 }
 
+std::string Minion::GetDebugInfo() const
+{
+    std::stringstream sstr;
+    sstr << TempSummon::GetDebugInfo() << "\n"
+        << std::boolalpha
+        << "Owner: " << (GetOwner() ? GetOwner()->GetGUID().ToString() : "");
+    return sstr.str();
+}
+
 Guardian::Guardian(SummonPropertiesEntry const* properties, ObjectGuid owner, bool isWorldObject) : Minion(properties, owner, isWorldObject)
 {
     m_unitTypeMask |= UNIT_MASK_GUARDIAN;
@@ -414,6 +432,13 @@ void Guardian::InitSummon()
             m_owner->ToPlayer()->CharmSpellInitialize();
         }
     }
+}
+
+std::string Guardian::GetDebugInfo() const
+{
+    std::stringstream sstr;
+    sstr << Minion::GetDebugInfo();
+    return sstr.str();
 }
 
 Puppet::Puppet(SummonPropertiesEntry const* properties, ObjectGuid owner) : Minion(properties, owner, false), m_owner(owner) //maybe true?

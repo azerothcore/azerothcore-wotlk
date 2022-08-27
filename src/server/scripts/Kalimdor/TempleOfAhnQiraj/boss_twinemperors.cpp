@@ -62,14 +62,9 @@ enum Misc
     TELEPORTTIME                  = 30000
 };
 
-struct boss_twinemperorsAI : public ScriptedAI
+struct boss_twinemperorsAI : public BossAI
 {
-    boss_twinemperorsAI(Creature* creature): ScriptedAI(creature)
-    {
-        instance = creature->GetInstanceScript();
-    }
-
-    InstanceScript* instance;
+    boss_twinemperorsAI(Creature* creature): BossAI(creature, DATA_TWIN_EMPERORS) { }
 
     uint32 Heal_Timer;
     uint32 Teleport_Timer;

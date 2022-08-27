@@ -15,8 +15,8 @@
 -- Dumpar struktur för tabell acore_world.spell_required
 DROP TABLE IF EXISTS `spell_required`;
 CREATE TABLE IF NOT EXISTS `spell_required` (
-  `spell_id` MEDIUMINT NOT NULL DEFAULT 0,
-  `req_spell` MEDIUMINT NOT NULL DEFAULT 0,
+  `spell_id` mediumint NOT NULL DEFAULT '0',
+  `req_spell` mediumint NOT NULL DEFAULT '0',
   PRIMARY KEY (`spell_id`,`req_spell`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Spell Additinal Data';
 

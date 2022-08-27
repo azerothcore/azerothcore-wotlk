@@ -15,13 +15,13 @@
 -- Dumpar struktur för tabell acore_world.linked_respawn
 DROP TABLE IF EXISTS `linked_respawn`;
 CREATE TABLE IF NOT EXISTS `linked_respawn` (
-  `guid` INT unsigned NOT NULL COMMENT 'dependent creature',
-  `linkedGuid` INT unsigned NOT NULL COMMENT 'master creature',
-  `linkType` TINYINT unsigned NOT NULL DEFAULT 0,
+  `guid` int unsigned NOT NULL COMMENT 'dependent creature',
+  `linkedGuid` int unsigned NOT NULL COMMENT 'master creature',
+  `linkType` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`linkType`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='Creature Respawn Link System';
 
--- Dumpar data för tabell acore_world.linked_respawn: 5 462 rows
+-- Dumpar data för tabell acore_world.linked_respawn: 5 467 rows
 DELETE FROM `linked_respawn`;
 /*!40000 ALTER TABLE `linked_respawn` DISABLE KEYS */;
 INSERT INTO `linked_respawn` (`guid`, `linkedGuid`, `linkType`) VALUES
@@ -5486,7 +5486,12 @@ INSERT INTO `linked_respawn` (`guid`, `linkedGuid`, `linkType`) VALUES
 	(84180, 85601, 0),
 	(84181, 85601, 0),
 	(84163, 85601, 0),
-	(84164, 85601, 0);
+	(84164, 85601, 0),
+	(87773, 87911, 0),
+	(87775, 87911, 0),
+	(87796, 87911, 0),
+	(87806, 87911, 0),
+	(87792, 87911, 0);
 /*!40000 ALTER TABLE `linked_respawn` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

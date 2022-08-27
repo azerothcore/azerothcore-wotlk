@@ -429,14 +429,6 @@ bool LootItem::AllowedForPlayer(Player const* player, bool isGivenByMasterLooter
         return false;
     }
 
-    // Checking for unique or unique(XX) objects
-    // master looter should still be able to see the loot to give to people.
-    // casting to avoid warnings, it's unlikely there's an item with unique but 2^31 items allowed.
-    if (!isMasterLooter && pProto->MaxCount > 0 && ((int32)player->GetItemCount(itemid, true) >= pProto->MaxCount))
-    {
-        return false;
-    }
-
     // not show loot for not own team
     if ((pProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && player->GetTeamId(true) != TEAM_HORDE)
     {

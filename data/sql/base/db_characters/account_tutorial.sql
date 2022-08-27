@@ -15,15 +15,15 @@
 -- Dumpar struktur för tabell acore_characters.account_tutorial
 DROP TABLE IF EXISTS `account_tutorial`;
 CREATE TABLE IF NOT EXISTS `account_tutorial` (
-  `accountId` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Account Identifier',
-  `tut0` INT unsigned NOT NULL DEFAULT 0,
-  `tut1` INT unsigned NOT NULL DEFAULT 0,
-  `tut2` INT unsigned NOT NULL DEFAULT 0,
-  `tut3` INT unsigned NOT NULL DEFAULT 0,
-  `tut4` INT unsigned NOT NULL DEFAULT 0,
-  `tut5` INT unsigned NOT NULL DEFAULT 0,
-  `tut6` INT unsigned NOT NULL DEFAULT 0,
-  `tut7` INT unsigned NOT NULL DEFAULT 0,
+  `accountId` int unsigned NOT NULL DEFAULT '0' COMMENT 'Account Identifier',
+  `tut0` int unsigned NOT NULL DEFAULT '0',
+  `tut1` int unsigned NOT NULL DEFAULT '0',
+  `tut2` int unsigned NOT NULL DEFAULT '0',
+  `tut3` int unsigned NOT NULL DEFAULT '0',
+  `tut4` int unsigned NOT NULL DEFAULT '0',
+  `tut5` int unsigned NOT NULL DEFAULT '0',
+  `tut6` int unsigned NOT NULL DEFAULT '0',
+  `tut7` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`accountId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
 

@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Instance_Temple_of_Ahnqiraj
-SD%Complete: 80
-SDComment:
-SDCategory: Temple of Ahn'Qiraj
-EndScriptData */
-
 #include "InstanceScript.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -30,7 +23,8 @@ EndScriptData */
 ObjectData const creatureData[] =
 {
     { NPC_SARTURA, DATA_SARTURA },
-    { NPC_EYE_OF_CTHUN, DATA_EYE_OF_CTHUN }
+    { NPC_EYE_OF_CTHUN, DATA_EYE_OF_CTHUN },
+    { NPC_OURO_SPAWNER, DATA_OURO_SPAWNER }
 };
 
 class instance_temple_of_ahnqiraj : public InstanceMapScript
@@ -49,12 +43,12 @@ public:
         {
             LoadObjectData(creatureData, nullptr);
             doorGUIDs.fill(ObjectGuid::Empty);
+            SetBossNumber(MAX_BOSS_NUMBER);
         }
 
         //If Vem is dead...
         bool IsBossDied[3];
 
-        //Storing Skeram, Vem and Kri.
         ObjectGuid SkeramGUID;
         ObjectGuid VemGUID;
         ObjectGuid KriGUID;
@@ -65,7 +59,6 @@ public:
         std::array<ObjectGuid, 3> doorGUIDs;
 
         uint32 BugTrioDeathCount;
-
         uint32 CthunPhase;
 
         void Initialize() override
@@ -73,9 +66,7 @@ public:
             IsBossDied[0] = false;
             IsBossDied[1] = false;
             IsBossDied[2] = false;
-
             BugTrioDeathCount = 0;
-
             CthunPhase = 0;
         }
 
@@ -111,6 +102,10 @@ public:
                     break;
                 case NPC_VISCIDUS:
                     ViscidusGUID = creature->GetGUID();
+                    break;
+                case NPC_OURO_SPAWNER:
+                    if (GetBossState(DATA_OURO) != DONE)
+                        creature->Respawn();
                     break;
             }
 
@@ -199,7 +194,6 @@ public:
                 case AQ40_DOOR_3:
                     return doorGUIDs[2];
             }
-
             return ObjectGuid::Empty;
         }
 
@@ -213,19 +207,37 @@ public:
                     else
                         BugTrioDeathCount = 0;
                     break;
-
                 case DATA_VEKLOR_DEATH:
                     IsBossDied[1] = true;
                     break;
-
                 case DATA_VEKNILASH_DEATH:
                     IsBossDied[2] = true;
                     break;
-
                 case DATA_CTHUN_PHASE:
                     CthunPhase = data;
                     break;
             }
+        }
+
+        bool SetBossState(uint32 type, EncounterState state) override
+        {
+            if (!InstanceScript::SetBossState(type, state))
+                return false;
+
+            switch (type)
+            {
+                case DATA_OURO:
+                    if (state == FAIL)
+                    {
+                        if (Creature* ouroSpawner = GetCreature(DATA_OURO_SPAWNER))
+                            ouroSpawner->Respawn();
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            return true;
         }
     };
 };
@@ -248,7 +260,6 @@ public:
                 }
             }
         }
-
         return true;
     }
 };

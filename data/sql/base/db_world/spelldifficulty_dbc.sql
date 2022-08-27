@@ -15,11 +15,11 @@
 -- Dumpar struktur för tabell acore_world.spelldifficulty_dbc
 DROP TABLE IF EXISTS `spelldifficulty_dbc`;
 CREATE TABLE IF NOT EXISTS `spelldifficulty_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `DifficultySpellID_1` INT NOT NULL DEFAULT 0,
-  `DifficultySpellID_2` INT NOT NULL DEFAULT 0,
-  `DifficultySpellID_3` INT NOT NULL DEFAULT 0,
-  `DifficultySpellID_4` INT unsigned NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `DifficultySpellID_1` int NOT NULL DEFAULT '0',
+  `DifficultySpellID_2` int NOT NULL DEFAULT '0',
+  `DifficultySpellID_3` int NOT NULL DEFAULT '0',
+  `DifficultySpellID_4` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
