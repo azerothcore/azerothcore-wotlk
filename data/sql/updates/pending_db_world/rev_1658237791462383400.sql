@@ -1,10 +1,11 @@
 --
-DELETE FROM `smart_scripts` WHERE `entryorguid` IN (27336,27315) AND `source_type`=0;
-
-UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_helpless_wintergarde_villager' WHERE `entry` IN (27336,27315);
 UPDATE `creature_template` SET `ScriptName`='npc_wintergarde_gryphon' WHERE `entry`=27258;
 
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 17) AND (`SourceGroup` = 0) AND (`SourceEntry` = 48397) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 30) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 188679) AND (`ConditionValue2` = 15) AND (`ConditionValue3` = 0);
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 17) AND (`SourceGroup` = 0) AND (`SourceEntry` = 48363) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 29) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 27315) AND (`ConditionValue2` = 5) AND (`ConditionValue3` = 0);
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 17) AND (`SourceGroup` = 0) AND (`SourceEntry` = 48363) AND (`SourceId` = 0) AND (`ElseGroup` = 1) AND (`ConditionTypeOrReference` = 29) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 27336) AND (`ConditionValue2` = 5) AND (`ConditionValue3` = 0);
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 17) AND (`SourceGroup` = 0) AND (`SourceEntry` = 48397) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 29) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 27315) AND (`ConditionValue2` = 5) AND (`ConditionValue3` = 0);
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 17) AND (`SourceGroup` = 0) AND (`SourceEntry` = 48397) AND (`SourceId` = 0) AND (`ElseGroup` = 1) AND (`ConditionTypeOrReference` = 29) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 27336) AND (`ConditionValue2` = 5) AND (`ConditionValue3` = 0);
 
 -- fly speed 200%
 UPDATE `creature_template_addon` SET `bytes1` = 50331648, `auras` = '60534' WHERE (`entry` = 27258);
@@ -59,3 +60,27 @@ INSERT INTO `creature_text` (`creatureid`,`groupid`,`id`,`text`,`type`,`language
 (27315,2,6,"We made it! We actually made it!",12,0,100,0,0,0,26384,0, "Helpless Wintergarde Villager"),
 (27315,2,7,"You are my guardian angel! Like a white knight you flew in from the heavens and lifted me from the pit of damnation!",12,0,100,0,0,0,26362,0, "Helpless Wintergarde Villager"),
 (27315,2,8,"You saved my life! Thanks!",12,0,100,0,0,0,26358,0, "Helpless Wintergarde Villager");
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 27315;
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 27315);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(27315, 0, 0, 1, 8, 0, 100, 512, 48363, 0, 0, 0, 0, 28, 49774, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Helpless Wintergarde Villager - On Spellhit \'Rescue Villager\' - Remove Aura \'Cower + Fear Visual\''),
+(27315, 0, 1, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Helpless Wintergarde Villager - On Spellhit \'Rescue Villager\' - Set Event Phase 2'),
+(27315, 0, 2, 0, 1, 2, 100, 1, 18000, 18000, 18000, 18000, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Helpless Wintergarde Villager - Out of Combat - Say Line 1 (Phase 2) (No Repeat)'),
+(27315, 0, 3, 0, 23, 2, 100, 1, 43671, 0, 1000, 1000, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Helpless Wintergarde Villager - On Aura \'Ride Vehicle\' - Say Line 2 (Phase 2) (No Repeat)'),
+(27315, 0, 4, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Helpless Wintergarde Villager - On Update - Set Event Phase 1 (No Repeat)'),
+(27315, 0, 5, 0, 1, 1, 100, 0, 30000, 45000, 50000, 50000, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Helpless Wintergarde Villager - Out of Combat - Say Line 0 (Phase 1)'),
+(27315, 0, 6, 0, 1, 1, 100, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Helpless Wintergarde Villager - Out of Combat - Set Reactstate Passive (Phase 1)');
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 27336;
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 27336);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(27336, 0, 0, 1, 8, 0, 100, 512, 48363, 0, 0, 0, 0, 28, 49774, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Helpless Wintergarde Villager - On Spellhit \'Rescue Villager\' - Remove Aura \'Cower + Fear Visual\''),
+(27336, 0, 1, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Helpless Wintergarde Villager - On Spellhit \'Rescue Villager\' - Set Event Phase 2'),
+(27336, 0, 2, 0, 1, 2, 100, 1, 18000, 18000, 18000, 18000, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Helpless Wintergarde Villager - Out of Combat - Say Line 1 (Phase 2) (No Repeat)'),
+(27336, 0, 3, 0, 23, 2, 100, 1, 43671, 0, 1000, 1000, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Helpless Wintergarde Villager - On Aura \'Ride Vehicle\' - Say Line 2 (Phase 2) (No Repeat)'),
+(27336, 0, 4, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Helpless Wintergarde Villager - On Update - Set Event Phase 1 (No Repeat)'),
+(27336, 0, 5, 0, 1, 1, 100, 0, 30000, 45000, 50000, 50000, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Helpless Wintergarde Villager - Out of Combat - Say Line 0 (Phase 1)'),
+(27336, 0, 6, 0, 1, 1, 100, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Helpless Wintergarde Villager - Out of Combat - Set Reactstate Passive (Phase 1)');

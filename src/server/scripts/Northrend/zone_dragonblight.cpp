@@ -638,18 +638,13 @@ enum WintergardeGryphon
     SPELL_RESCUE_VILLAGER                       = 48363,
     SPELL_DROP_OFF_VILLAGER                     = 48397,
     SPELL_RIDE_VEHICLE                          = 43671,
-    SPELL_COWER_FEAR                            = 49774,
-    SPELL_CALL_WINTERGARDE_GRYPHON              = 48388,
 
-    SAY_FEAR                                    = 0,
-    SAY_IN_VEHICLE                              = 1,
-    SAY_RESCUED                                 = 2,
+    NPC_HELPLESS_VILLAGER_A                     = 27315,
+    NPC_HELPLESS_VILLAGER_B                     = 27336,
 
     EVENT_VEHICLE_GET                           = 1,
     EVENT_TAKE_OFF                              = 2,
     EVENT_GET_VILLAGER                          = 3,
-    EVENT_FEAR                                  = 4,
-    EVENT_VEHICLE                               = 5,
 
     EVENT_PHASE_FEAR                            = 1,
     EVENT_PHASE_VEHICLE                         = 2,
@@ -658,7 +653,8 @@ enum WintergardeGryphon
     POINT_TAKE_OFF                              = 2,
 
     QUEST_FLIGHT_OF_THE_WINTERGARDE_DEFENDER    = 12237,
-    GO_TEMP_GRYPHON_STATION                     = 188679
+    GO_TEMP_GRYPHON_STATION                     = 188679,
+    AREA_WINTERGARDE_KEEP                       = 4177
 };
 
 class npc_wintergarde_gryphon : public VehicleAI
@@ -759,88 +755,17 @@ public:
         if (Vehicle* gryphon = me->GetVehicleKit())
             if (Unit* villager = gryphon->GetPassenger(1))
             {
-                if (Creature* seat = villager->ToCreature())
-                {
-                    seat->ExitVehicle();
-                    seat->GetMotionMaster()->Clear(false);
-                    seat->GetMotionMaster()->MoveIdle();
-                    seat->SetCanFly(false); // prevents movement in flight
-                    villagerGUID = seat->GetGUID();
-                    seat->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
-                    seat->AI()->Talk(SAY_RESCUED);
-                    events.ScheduleEvent(EVENT_GET_VILLAGER, 3s);
-                }
+                villager->ExitVehicle();
+                villager->GetMotionMaster()->Clear(false);
+                villager->GetMotionMaster()->MoveIdle();
+                villager->SetCanFly(false); // prevents movement in flight
+                villagerGUID = villager->GetGUID();
+                villager->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
+                events.ScheduleEvent(EVENT_GET_VILLAGER, 3s);
             }
     }
 private:
     ObjectGuid villagerGUID;
-};
-
-class npc_helpless_wintergarde_villager : public ScriptedAI
-{
-public:
-    npc_helpless_wintergarde_villager(Creature* creature) : ScriptedAI(creature), freed(false) { }
-
-    void InitializeAI() override
-    {
-        me->SetReactState(REACT_PASSIVE);
-        me->CastSpell(me, SPELL_COWER_FEAR, true);
-        events.ScheduleEvent(EVENT_FEAR, 30s, 45s, 0, EVENT_PHASE_FEAR);
-        freed = false;
-    }
-
-    void JustRespawned() override
-    {
-        Reset();
-    }
-
-    void DamageTaken(Unit* attacker, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
-    {
-        if (!freed)
-            me->GetMotionMaster()->MoveFleeing(attacker);
-    }
-
-    void SpellHit(Unit* caster, SpellInfo const* spell) override
-    {
-        if (spell->Id != SPELL_RESCUE_VILLAGER)
-            return;
-
-        if (Vehicle* gryphon = caster->GetVehicleKit())
-        {
-            if (gryphon->GetAvailableSeatCount() != 0)
-            {
-                me->RemoveAura(SPELL_COWER_FEAR);
-                me->CastSpell(caster, SPELL_RIDE_VEHICLE, true);
-                me->GetMotionMaster()->Clear(false);
-                events.SetPhase(EVENT_PHASE_VEHICLE);
-                events.ScheduleEvent(EVENT_VEHICLE, 15s, 20s, 0, EVENT_PHASE_VEHICLE);
-                events.CancelEvent(EVENT_FEAR);
-                freed = true;
-            }
-        }
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        events.Update(diff);
-
-        while (uint32 eventId = events.ExecuteEvent())
-        {
-            switch (eventId)
-            {
-                case EVENT_FEAR:
-                    Talk(SAY_FEAR);
-                    events.ScheduleEvent(EVENT_FEAR, 20s, 25s, 0, EVENT_PHASE_FEAR);
-                    break;
-                case EVENT_VEHICLE:
-                    Talk(SAY_IN_VEHICLE);
-                    events.ScheduleEvent(EVENT_VEHICLE, 19s, 24s, 0, EVENT_PHASE_VEHICLE);
-                    break;
-            }
-        }
-    }
-private:
-    bool freed;
 };
 
 class spell_q12237_rescue_villager : public SpellScript
@@ -856,6 +781,18 @@ class spell_q12237_rescue_villager : public SpellScript
 
         SpellCustomErrors extension = SPELL_CUSTOM_ERROR_NONE;
         SpellCastResult result = SPELL_CAST_OK;
+
+        if (GetCaster()->GetAreaId() == AREA_WINTERGARDE_KEEP)
+        {
+            extension = SPELL_CUSTOM_ERROR_MUST_BE_NEAR_HELPLESS_VILLAGER;
+            result = SPELL_FAILED_CUSTOM_ERROR;
+        }
+
+        if (!GetCaster()->FindNearestCreature(NPC_HELPLESS_VILLAGER_A, 5.0f) && !GetCaster()->FindNearestCreature(NPC_HELPLESS_VILLAGER_B, 5.0f))
+        {
+            extension = SPELL_CUSTOM_ERROR_MUST_BE_NEAR_HELPLESS_VILLAGER;
+            result = SPELL_FAILED_CUSTOM_ERROR;
+        }
 
         if (GetCaster()->FindNearestGameObject(GO_TEMP_GRYPHON_STATION, 15.0f))
         {
@@ -875,8 +812,15 @@ class spell_q12237_rescue_villager : public SpellScript
         return SPELL_CAST_OK;
     }
 
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* target = GetHitUnit())
+            target->CastSpell(GetCaster(), uint32(GetEffectValue()), true);
+    }
+
     void Register() override
     {
+        OnEffectHitTarget += SpellEffectFn(spell_q12237_rescue_villager::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         OnCheckCast += SpellCheckCastFn(spell_q12237_rescue_villager::CheckCast);
     }
 };
@@ -2324,7 +2268,6 @@ void AddSC_dragonblight()
     new npc_mindless_ghoul();
     new npc_injured_7th_legion_soldier();
     RegisterCreatureAI(npc_wintergarde_gryphon);
-    RegisterCreatureAI(npc_helpless_wintergarde_villager);
     RegisterSpellScript(spell_q12237_rescue_villager);
     RegisterSpellScript(spell_q12237_drop_off_villager);
     RegisterSpellScript(spell_call_wintergarde_gryphon);
