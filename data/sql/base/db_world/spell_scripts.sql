@@ -15,17 +15,17 @@
 -- Dumpar struktur för tabell acore_world.spell_scripts
 DROP TABLE IF EXISTS `spell_scripts`;
 CREATE TABLE IF NOT EXISTS `spell_scripts` (
-  `id` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `effIndex` TINYINT unsigned NOT NULL DEFAULT 0,
-  `delay` INT unsigned NOT NULL DEFAULT 0,
-  `command` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `datalong` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `datalong2` INT unsigned NOT NULL DEFAULT 0,
-  `dataint` INT NOT NULL DEFAULT 0,
-  `x` float NOT NULL DEFAULT 0,
-  `y` float NOT NULL DEFAULT 0,
-  `z` float NOT NULL DEFAULT 0,
-  `o` float NOT NULL DEFAULT 0
+  `id` mediumint unsigned NOT NULL DEFAULT '0',
+  `effIndex` tinyint unsigned NOT NULL DEFAULT '0',
+  `delay` int unsigned NOT NULL DEFAULT '0',
+  `command` mediumint unsigned NOT NULL DEFAULT '0',
+  `datalong` mediumint unsigned NOT NULL DEFAULT '0',
+  `datalong2` int unsigned NOT NULL DEFAULT '0',
+  `dataint` int NOT NULL DEFAULT '0',
+  `x` float NOT NULL DEFAULT '0',
+  `y` float NOT NULL DEFAULT '0',
+  `z` float NOT NULL DEFAULT '0',
+  `o` float NOT NULL DEFAULT '0'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Dumpar data för tabell acore_world.spell_scripts: 130 rows

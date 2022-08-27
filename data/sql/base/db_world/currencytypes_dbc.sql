@@ -15,10 +15,10 @@
 -- Dumpar struktur för tabell acore_world.currencytypes_dbc
 DROP TABLE IF EXISTS `currencytypes_dbc`;
 CREATE TABLE IF NOT EXISTS `currencytypes_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `ItemID` INT NOT NULL DEFAULT 0,
-  `CategoryID` INT NOT NULL DEFAULT 0,
-  `BitIndex` INT NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `ItemID` int NOT NULL DEFAULT '0',
+  `CategoryID` int NOT NULL DEFAULT '0',
+  `BitIndex` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

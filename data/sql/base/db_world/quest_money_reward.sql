@@ -15,17 +15,17 @@
 -- Dumpar struktur för tabell acore_world.quest_money_reward
 DROP TABLE IF EXISTS `quest_money_reward`;
 CREATE TABLE IF NOT EXISTS `quest_money_reward` (
-  `Level` INT NOT NULL DEFAULT 0,
-  `Money0` INT NOT NULL DEFAULT 0,
-  `Money1` INT NOT NULL DEFAULT 0,
-  `Money2` INT NOT NULL DEFAULT 0,
-  `Money3` INT NOT NULL DEFAULT 0,
-  `Money4` INT NOT NULL DEFAULT 0,
-  `Money5` INT NOT NULL DEFAULT 0,
-  `Money6` INT NOT NULL DEFAULT 0,
-  `Money7` INT NOT NULL DEFAULT 0,
-  `Money8` INT NOT NULL DEFAULT 0,
-  `Money9` INT NOT NULL DEFAULT 0,
+  `Level` int NOT NULL DEFAULT '0',
+  `Money0` int NOT NULL DEFAULT '0',
+  `Money1` int NOT NULL DEFAULT '0',
+  `Money2` int NOT NULL DEFAULT '0',
+  `Money3` int NOT NULL DEFAULT '0',
+  `Money4` int NOT NULL DEFAULT '0',
+  `Money5` int NOT NULL DEFAULT '0',
+  `Money6` int NOT NULL DEFAULT '0',
+  `Money7` int NOT NULL DEFAULT '0',
+  `Money8` int NOT NULL DEFAULT '0',
+  `Money9` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`Level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

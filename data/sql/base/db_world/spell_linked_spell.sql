@@ -15,14 +15,14 @@
 -- Dumpar struktur för tabell acore_world.spell_linked_spell
 DROP TABLE IF EXISTS `spell_linked_spell`;
 CREATE TABLE IF NOT EXISTS `spell_linked_spell` (
-  `spell_trigger` MEDIUMINT NOT NULL,
-  `spell_effect` MEDIUMINT NOT NULL DEFAULT 0,
-  `type` TINYINT unsigned NOT NULL DEFAULT 0,
+  `spell_trigger` mediumint NOT NULL,
+  `spell_effect` mediumint NOT NULL DEFAULT '0',
+  `type` tinyint unsigned NOT NULL DEFAULT '0',
   `comment` text NOT NULL,
   UNIQUE KEY `trigger_effect_type` (`spell_trigger`,`spell_effect`,`type`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Spell System';
 
--- Dumpar data för tabell acore_world.spell_linked_spell: 573 rows
+-- Dumpar data för tabell acore_world.spell_linked_spell: 576 rows
 DELETE FROM `spell_linked_spell`;
 /*!40000 ALTER TABLE `spell_linked_spell` DISABLE KEYS */;
 INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comment`) VALUES
@@ -598,7 +598,10 @@ INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comm
 	(65917, 66122, 0, 'Magic Rooster'),
 	(23414, -1856, 2, 'Nefarian Rogue class call - Vanish'),
 	(23414, -1857, 2, 'Nefarian Rogue class call - Vanish'),
-	(23414, -26889, 2, 'Nefarian Rogue class call - Vanish');
+	(23414, -26889, 2, 'Nefarian Rogue class call - Vanish'),
+	(25654, 6608, 1, 'Hive\'Zara Tail Lasher: On Tail Lash - Apply Dropped Weapon'),
+	(28757, 28758, 0, 'Stalker\'s Ally'),
+	(26084, 25174, 1, 'Battleguard Sartura - OnHit Whirlwind - Apply Sundering Cleave');
 /*!40000 ALTER TABLE `spell_linked_spell` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

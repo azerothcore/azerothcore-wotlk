@@ -242,9 +242,6 @@ struct boss_ouro : public BossAI
     {
         DoCastSelf(SPELL_OURO_SUBMERGE_VISUAL);
         me->DespawnOrUnsummon(1000);
-        // Remove after the header file is sorted with the bosses first.
-        if (Creature* ouroSpawner = instance->GetCreature(DATA_OURO_SPAWNER))
-            ouroSpawner->Respawn();
         instance->SetBossState(DATA_OURO, FAIL);
         if (GameObject* base = me->FindNearestGameObject(GO_SANDWORM_BASE, 200.f))
             base->DespawnOrUnsummon();
@@ -348,10 +345,6 @@ struct npc_dirt_mound : ScriptedAI
         if (_instance)
         {
             _instance->SetBossState(DATA_OURO, FAIL);
-
-            // Remove after the header file is sorted with the bosses first.
-            if (Creature* ouroSpawner = _instance->GetCreature(DATA_OURO_SPAWNER))
-                ouroSpawner->Respawn();
         }
 
         if (GameObject* base = me->FindNearestGameObject(GO_SANDWORM_BASE, 200.f))

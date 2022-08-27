@@ -15,13 +15,13 @@
 -- Dumpar struktur för tabell acore_characters.worldstates
 DROP TABLE IF EXISTS `worldstates`;
 CREATE TABLE IF NOT EXISTS `worldstates` (
-  `entry` INT unsigned NOT NULL DEFAULT 0,
-  `value` INT unsigned NOT NULL DEFAULT 0,
+  `entry` int unsigned NOT NULL DEFAULT '0',
+  `value` int unsigned NOT NULL DEFAULT '0',
   `comment` tinytext,
   PRIMARY KEY (`entry`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Variable Saves';
 
--- Dumpar data för tabell acore_characters.worldstates: ~93 rows (ungefär)
+-- Dumpar data för tabell acore_characters.worldstates: ~98 rows (ungefär)
 DELETE FROM `worldstates`;
 /*!40000 ALTER TABLE `worldstates` DISABLE KEYS */;
 INSERT INTO `worldstates` (`entry`, `value`, `comment`) VALUES
@@ -39,8 +39,10 @@ INSERT INTO `worldstates` (`entry`, `value`, `comment`) VALUES
 	(12, 0, NULL),
 	(13, 0, NULL),
 	(14, 0, NULL),
+	(15, 0, NULL),
 	(16, 0, NULL),
 	(17, 0, NULL),
+	(18, 0, NULL),
 	(19, 0, NULL),
 	(20, 0, NULL),
 	(21, 0, NULL),
@@ -61,6 +63,7 @@ INSERT INTO `worldstates` (`entry`, `value`, `comment`) VALUES
 	(37, 0, NULL),
 	(38, 0, NULL),
 	(39, 0, NULL),
+	(40, 0, NULL),
 	(41, 0, NULL),
 	(42, 0, NULL),
 	(43, 0, NULL),
@@ -82,6 +85,7 @@ INSERT INTO `worldstates` (`entry`, `value`, `comment`) VALUES
 	(59, 0, NULL),
 	(60, 0, NULL),
 	(61, 0, NULL),
+	(62, 0, NULL),
 	(63, 0, NULL),
 	(64, 0, NULL),
 	(65, 0, NULL),
@@ -97,6 +101,7 @@ INSERT INTO `worldstates` (`entry`, `value`, `comment`) VALUES
 	(75, 0, NULL),
 	(76, 0, NULL),
 	(77, 0, NULL),
+	(79, 0, NULL),
 	(80, 0, NULL),
 	(81, 0, NULL),
 	(82, 0, NULL),
@@ -111,13 +116,13 @@ INSERT INTO `worldstates` (`entry`, `value`, `comment`) VALUES
 	(3801, 0, NULL),
 	(3802, 1, NULL),
 	(20001, 1454691600, 'NextArenaPointDistributionTime'),
-	(20002, 1651118400, 'NextWeeklyQuestResetTime'),
-	(20003, 1650859200, 'NextBGRandomDailyResetTime'),
+	(20002, 1661400000, 'NextWeeklyQuestResetTime'),
+	(20003, 1661140800, 'NextBGRandomDailyResetTime'),
 	(20004, 0, 'cleaning_flags'),
-	(20005, 1650859200, 'NextDailyQuestResetTime'),
-	(20006, 1650859200, 'NextGuildDailyResetTime'),
-	(20007, 1651377600, 'NextMonthlyQuestResetTime'),
-	(20008, 1650859200, NULL);
+	(20005, 1661140800, 'NextDailyQuestResetTime'),
+	(20006, 1661140800, 'NextGuildDailyResetTime'),
+	(20007, 1662004800, 'NextMonthlyQuestResetTime'),
+	(20008, 1661140800, NULL);
 /*!40000 ALTER TABLE `worldstates` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
