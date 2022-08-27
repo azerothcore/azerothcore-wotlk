@@ -1,3 +1,4 @@
+-- DB update 2022_08_26_00 -> 2022_08_27_00
 --
 DELETE FROM `gameobject` WHERE `id` IN (180634,180635,180636);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`) VALUES
