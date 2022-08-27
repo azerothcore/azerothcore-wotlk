@@ -15,7 +15,8 @@
 -- 29630 Fanged Pit Viper -> updated manually, as not done via script above
 UPDATE `creature_template` SET `minlevel` = 101, `maxlevel` = 101 WHERE (`entry` = 29630);
 
--- Dungeon updated to level 98+ for NHC and HC
-INSERT INTO `dungeon_access_template` (`id`, `map_id`, `difficulty`, `min_level`, `max_level`, `min_avg_item_level`, `comment`) VALUES (71, 576, 0, 98, 0, 0, 'The Nexus');
-INSERT INTO `dungeon_access_template` (`id`, `map_id`, `difficulty`, `min_level`, `max_level`, `min_avg_item_level`, `comment`) VALUES (72, 576, 1, 98, 0, 180, 'The Nexus');
+-- Dungeon updated to level 125+ for NHC and HC
+INSERT INTO `dungeon_access_template` (`id`, `map_id`, `difficulty`, `min_level`, `max_level`, `min_avg_item_level`, `comment`) VALUES (90, 604, 0, 125, 0, 0, 'Gundrak (North entrance)');
+INSERT INTO `dungeon_access_template` (`id`, `map_id`, `difficulty`, `min_level`, `max_level`, `min_avg_item_level`, `comment`) VALUES (91, 604, 1, 125, 0, 180, 'Gundrak (North entrance)');
+
 
