@@ -126,6 +126,15 @@ struct boss_ayamiss : public BossAI
                 }
 
             }, 1s);
+
+            _scheduler.Schedule(5s, 8s, [this](TaskContext context) {
+                DoCastVictim(SPELL_LASH);
+                context.Repeat(8s, 15s);
+            }).Schedule(16s, [this](TaskContext context)
+            {
+                DoCastSelf(SPELL_THRASH);
+                context.Repeat();
+            });
         }
     }
 
@@ -210,17 +219,6 @@ struct boss_ayamiss : public BossAI
             me->SetDisableGravity(false);
             me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
             DoResetThreat();
-
-            _scheduler.Schedule(5s, 8s, [this](TaskContext context) {
-                DoCastVictim(SPELL_LASH);
-                context.Repeat(8s, 15s);
-            }).Schedule(16s, [this](TaskContext context)
-            {
-                DoCastSelf(SPELL_THRASH);
-                context.Repeat();
-            });
-
-            _scheduler.DelayAll(5s);
             _scheduler.CancelGroup(PHASE_AIR);
         }
 
@@ -271,6 +269,7 @@ struct npc_hive_zara_larva : public ScriptedAI
         if (Creature* ayamiss = _instance->GetCreature(DATA_AYAMISS))
         {
             ayamiss->AI()->JustSummoned(summon);
+            summon->SetInCombatWithZone();
         }
     }
 
