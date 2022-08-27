@@ -15,17 +15,17 @@
 -- Dumpar struktur för tabell acore_world.taxipathnode_dbc
 DROP TABLE IF EXISTS `taxipathnode_dbc`;
 CREATE TABLE IF NOT EXISTS `taxipathnode_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `PathID` INT NOT NULL DEFAULT 0,
-  `NodeIndex` INT NOT NULL DEFAULT 0,
-  `ContinentID` INT NOT NULL DEFAULT 0,
-  `LocX` float NOT NULL DEFAULT 0,
-  `LocY` float NOT NULL DEFAULT 0,
-  `LocZ` float NOT NULL DEFAULT 0,
-  `Flags` INT NOT NULL DEFAULT 0,
-  `Delay` INT NOT NULL DEFAULT 0,
-  `ArrivalEventID` INT NOT NULL DEFAULT 0,
-  `DepartureEventID` INT NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `PathID` int NOT NULL DEFAULT '0',
+  `NodeIndex` int NOT NULL DEFAULT '0',
+  `ContinentID` int NOT NULL DEFAULT '0',
+  `LocX` float NOT NULL DEFAULT '0',
+  `LocY` float NOT NULL DEFAULT '0',
+  `LocZ` float NOT NULL DEFAULT '0',
+  `Flags` int NOT NULL DEFAULT '0',
+  `Delay` int NOT NULL DEFAULT '0',
+  `ArrivalEventID` int NOT NULL DEFAULT '0',
+  `DepartureEventID` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

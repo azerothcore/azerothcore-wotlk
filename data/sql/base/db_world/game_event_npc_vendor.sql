@@ -15,13 +15,13 @@
 -- Dumpar struktur för tabell acore_world.game_event_npc_vendor
 DROP TABLE IF EXISTS `game_event_npc_vendor`;
 CREATE TABLE IF NOT EXISTS `game_event_npc_vendor` (
-  `eventEntry` TINYINT NOT NULL COMMENT 'Entry of the game event.',
-  `guid` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `slot` SMALLINT NOT NULL DEFAULT 0,
-  `item` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `maxcount` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `incrtime` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `ExtendedCost` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `eventEntry` tinyint NOT NULL COMMENT 'Entry of the game event.',
+  `guid` mediumint unsigned NOT NULL DEFAULT '0',
+  `slot` smallint NOT NULL DEFAULT '0',
+  `item` mediumint unsigned NOT NULL DEFAULT '0',
+  `maxcount` mediumint unsigned NOT NULL DEFAULT '0',
+  `incrtime` mediumint unsigned NOT NULL DEFAULT '0',
+  `ExtendedCost` mediumint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`item`),
   KEY `slot` (`slot`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;

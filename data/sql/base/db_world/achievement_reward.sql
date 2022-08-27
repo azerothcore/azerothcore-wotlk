@@ -15,14 +15,14 @@
 -- Dumpar struktur för tabell acore_world.achievement_reward
 DROP TABLE IF EXISTS `achievement_reward`;
 CREATE TABLE IF NOT EXISTS `achievement_reward` (
-  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `TitleA` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `TitleH` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `ItemID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `Sender` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `Subject` VARCHAR(255) DEFAULT NULL,
+  `ID` mediumint unsigned NOT NULL DEFAULT '0',
+  `TitleA` mediumint unsigned NOT NULL DEFAULT '0',
+  `TitleH` mediumint unsigned NOT NULL DEFAULT '0',
+  `ItemID` mediumint unsigned NOT NULL DEFAULT '0',
+  `Sender` mediumint unsigned NOT NULL DEFAULT '0',
+  `Subject` varchar(255) DEFAULT NULL,
   `Body` text,
-  `MailTemplateID` MEDIUMINT unsigned DEFAULT 0,
+  `MailTemplateID` mediumint unsigned DEFAULT '0',
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Loot System';
 

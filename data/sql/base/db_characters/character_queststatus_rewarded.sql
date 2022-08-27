@@ -15,9 +15,9 @@
 -- Dumpar struktur för tabell acore_characters.character_queststatus_rewarded
 DROP TABLE IF EXISTS `character_queststatus_rewarded`;
 CREATE TABLE IF NOT EXISTS `character_queststatus_rewarded` (
-  `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
-  `quest` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Quest Identifier',
-  `active` TINYINT unsigned NOT NULL DEFAULT 1,
+  `guid` int unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
+  `quest` int unsigned NOT NULL DEFAULT '0' COMMENT 'Quest Identifier',
+  `active` tinyint unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`guid`,`quest`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
 

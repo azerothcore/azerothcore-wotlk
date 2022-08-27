@@ -15,12 +15,12 @@
 -- Dumpar struktur för tabell acore_world.spellrange_dbc
 DROP TABLE IF EXISTS `spellrange_dbc`;
 CREATE TABLE IF NOT EXISTS `spellrange_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `RangeMin_1` float NOT NULL DEFAULT 0,
-  `RangeMin_2` float NOT NULL DEFAULT 0,
-  `RangeMax_1` float NOT NULL DEFAULT 0,
-  `RangeMax_2` float NOT NULL DEFAULT 0,
-  `Flags` INT NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `RangeMin_1` float NOT NULL DEFAULT '0',
+  `RangeMin_2` float NOT NULL DEFAULT '0',
+  `RangeMax_1` float NOT NULL DEFAULT '0',
+  `RangeMax_2` float NOT NULL DEFAULT '0',
+  `Flags` int NOT NULL DEFAULT '0',
   `DisplayName_Lang_enUS` text,
   `DisplayName_Lang_enGB` text,
   `DisplayName_Lang_koKR` text,
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS `spellrange_dbc` (
   `DisplayName_Lang_ptBR` text,
   `DisplayName_Lang_itIT` text,
   `DisplayName_Lang_Unk` text,
-  `DisplayName_Lang_Mask` INT unsigned NOT NULL DEFAULT 0,
+  `DisplayName_Lang_Mask` int unsigned NOT NULL DEFAULT '0',
   `DisplayNameShort_Lang_enUS` text,
   `DisplayNameShort_Lang_enGB` text,
   `DisplayNameShort_Lang_koKR` text,
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS `spellrange_dbc` (
   `DisplayNameShort_Lang_ptBR` text,
   `DisplayNameShort_Lang_itIT` text,
   `DisplayNameShort_Lang_Unk` text,
-  `DisplayNameShort_Lang_Mask` INT unsigned NOT NULL DEFAULT 0,
+  `DisplayNameShort_Lang_Mask` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

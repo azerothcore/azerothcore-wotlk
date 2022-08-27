@@ -15,15 +15,15 @@
 -- Dumpar struktur för tabell acore_characters.updates
 DROP TABLE IF EXISTS `updates`;
 CREATE TABLE IF NOT EXISTS `updates` (
-  `name` VARCHAR(200) NOT NULL COMMENT 'filename with extension of the update.',
+  `name` varchar(200) NOT NULL COMMENT 'filename with extension of the update.',
   `hash` char(40) DEFAULT '' COMMENT 'sha1 hash of the sql file.',
   `state` enum('RELEASED','CUSTOM','MODULE','ARCHIVED') NOT NULL DEFAULT 'RELEASED' COMMENT 'defines if an update is released or archived.',
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'timestamp when the query was applied.',
-  `speed` INT unsigned NOT NULL DEFAULT 0 COMMENT 'time the query takes to apply in ms.',
+  `speed` int unsigned NOT NULL DEFAULT '0' COMMENT 'time the query takes to apply in ms.',
   PRIMARY KEY (`name`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='List of all applied updates in this database.';
 
--- Dumpar data för tabell acore_characters.updates: 49 rows
+-- Dumpar data för tabell acore_characters.updates: 54 rows
 DELETE FROM `updates`;
 /*!40000 ALTER TABLE `updates` DISABLE KEYS */;
 INSERT INTO `updates` (`name`, `hash`, `state`, `timestamp`, `speed`) VALUES
@@ -75,7 +75,12 @@ INSERT INTO `updates` (`name`, `hash`, `state`, `timestamp`, `speed`) VALUES
 	('2022_01_29_00.sql', '1EADA7852AC70F49E8EA0030CC5FA087075F9DD4', 'ARCHIVED', '2022-04-24 15:20:00', 40),
 	('2022_02_16_00.sql', '60440F15D2DD99B7327FD5BB77E03B44B29768EE', 'ARCHIVED', '2022-04-24 15:20:00', 33),
 	('2022_03_01_00.sql', 'CB1DF259CAF17989F36DC7E24DFA7B08F86AE6FD', 'ARCHIVED', '2022-04-24 15:20:00', 61),
-	('2022_04_19_00.sql', '5D7010FF56BC3BDFF19BEEDCE394471F768763FE', 'ARCHIVED', '2022-04-24 15:20:00', 62);
+	('2022_04_19_00.sql', '5D7010FF56BC3BDFF19BEEDCE394471F768763FE', 'ARCHIVED', '2022-04-24 15:20:00', 62),
+	('2022_04_24_00.sql', 'A2533CA2289827F447D37EDD003F84D44FCB3B98', 'ARCHIVED', '2022-08-21 09:57:27', 48),
+	('2022_04_28_00.sql', 'C311595439669E38C754C975DDD0FD0ECCDD446B', 'ARCHIVED', '2022-08-21 09:57:27', 35),
+	('2022_05_24_00.sql', '4E4A70F946ECB111D9C2197BB87A3930E5AC5B5C', 'ARCHIVED', '2022-08-21 09:57:27', 38),
+	('2022_08_02_00.sql', '91C7A066B1885F9AE59CF74FFF327D9A1875ED8B', 'ARCHIVED', '2022-08-21 09:57:27', 30),
+	('2022_08_07_00.sql', 'AC270742E652BFD6AF1A5C7F0DEC943C95CC3880', 'ARCHIVED', '2022-08-21 09:57:27', 46);
 /*!40000 ALTER TABLE `updates` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

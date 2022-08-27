@@ -17,6 +17,7 @@
 
 #include "CreatureGroups.h"
 #include "InstanceScript.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "TaskScheduler.h"
 #include "ruins_of_ahnqiraj.h"
@@ -74,6 +75,18 @@ public:
             SetBossNumber(NUM_ENCOUNTER);
             LoadObjectData(creatureData, nullptr);
             _rajaxWaveCounter = 0;
+            _buruPhase = 1;
+        }
+
+        void OnPlayerEnter(Player* player) override
+        {
+            if (GetBossState(DATA_KURINNAXX) == DONE && GetBossState(DATA_RAJAXX) != DONE)
+            {
+                if (!_andorovGUID)
+                {
+                    player->SummonCreature(NPC_ANDOROV, -8538.177f, 1486.0956f, 32.39054f, 3.7638654f, TEMPSUMMON_CORPSE_DESPAWN, 600000000);
+                }
+            }
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -97,9 +110,8 @@ public:
                 case NPC_OSSIRIAN:
                     _ossirianGUID = creature->GetGUID();
                     break;
-                case NPC_SAND_VORTEX:
-                    _sandVortexes.push_back(creature->GetGUID());
-                    creature->SetVisible(false);
+                case NPC_ANDOROV:
+                    _andorovGUID = creature->GetGUID();
                     break;
             }
         }
@@ -135,18 +147,33 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 /*data*/) override
+        void SetData(uint32 type, uint32 data) override
         {
-            if (type == DATA_RAJAXX_WAVE_ENGAGED)
+            switch (type)
             {
-                _scheduler.CancelGroup(GROUP_RAJAXX_WAVE_TIMER);
-                _scheduler.Schedule(2min, [this](TaskContext context)
-                {
-                    CallNextRajaxxLeader();
-                    context.SetGroup(GROUP_RAJAXX_WAVE_TIMER);
-                    context.Repeat();
-                });
+                case DATA_RAJAXX_WAVE_ENGAGED:
+                    _scheduler.CancelGroup(GROUP_RAJAXX_WAVE_TIMER);
+                    _scheduler.Schedule(2min, [this](TaskContext context)
+                    {
+                        CallNextRajaxxLeader();
+                        context.SetGroup(GROUP_RAJAXX_WAVE_TIMER);
+                        context.Repeat();
+                    });
+                    break;
+                case DATA_BURU_PHASE:
+                    _buruPhase = data;
+                    break;
+                default:
+                    break;
             }
+        }
+
+        uint32 GetData(uint32 type) const override
+        {
+            if (type == DATA_BURU_PHASE)
+                return _buruPhase;
+
+            return 0;
         }
 
         void OnUnitDeath(Unit* unit) override
@@ -167,7 +194,8 @@ public:
                             case NPC_PAKKON:
                             case NPC_ZERRAN:
                                 _scheduler.CancelAll();
-                                _scheduler.Schedule(1s, [this, formation](TaskContext /*context*/) {
+                                _scheduler.Schedule(1s, [this, formation](TaskContext /*context*/)
+                                {
                                     if (!formation->IsAnyMemberAlive())
                                     {
                                         CallNextRajaxxLeader(true);
@@ -193,31 +221,6 @@ public:
                 _paralyzedGUID = data;
         }
 
-        bool SetBossState(uint32 type, EncounterState state) override
-        {
-            if (!InstanceScript::SetBossState(type, state))
-                return false;
-
-            switch (type)
-            {
-                case DATA_OSSIRIAN:
-                {
-                    for (ObjectGuid const& guid : _sandVortexes)
-                    {
-                        if (Creature* sandVortex = instance->GetCreature(guid))
-                        {
-                            sandVortex->SetVisible(state == IN_PROGRESS);
-                        }
-                    }
-                    break;
-                default:
-                    break;
-                }
-            }
-
-            return true;
-        }
-
         ObjectGuid GetGuidData(uint32 type) const override
         {
             switch (type)
@@ -234,6 +237,8 @@ public:
                     return _ossirianGUID;
                 case DATA_PARALYZED:
                     return _paralyzedGUID;
+                case DATA_ANDOROV:
+                    return _andorovGUID;
             }
 
             return ObjectGuid::Empty;
@@ -301,7 +306,15 @@ public:
 
                 if (nextLeader->IsAlive())
                 {
-                    nextLeader->SetInCombatWithZone();
+                    Creature* generalAndorov = instance->GetCreature(_andorovGUID);
+                    if (generalAndorov && generalAndorov->IsAlive() && generalAndorov->AI()->GetData(DATA_ANDOROV))
+                    {
+                        nextLeader->AI()->AttackStart(generalAndorov);
+                    }
+                    else
+                    {
+                        nextLeader->SetInCombatWithZone();
+                    }
                 }
                 else
                 {
@@ -333,8 +346,9 @@ public:
         ObjectGuid _buruGUID;
         ObjectGuid _ossirianGUID;
         ObjectGuid _paralyzedGUID;
-        GuidVector _sandVortexes;
+        ObjectGuid _andorovGUID;
         uint32 _rajaxWaveCounter;
+        uint8 _buruPhase;
         TaskScheduler _scheduler;
     };
 

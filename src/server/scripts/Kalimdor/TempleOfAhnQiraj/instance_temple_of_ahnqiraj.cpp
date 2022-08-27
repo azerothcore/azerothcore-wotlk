@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Instance_Temple_of_Ahnqiraj
-SD%Complete: 80
-SDComment:
-SDCategory: Temple of Ahn'Qiraj
-EndScriptData */
-
 #include "InstanceScript.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -49,12 +42,12 @@ public:
         instance_temple_of_ahnqiraj_InstanceMapScript(Map* map) : InstanceScript(map)
         {
             LoadObjectData(creatureData, nullptr);
+            SetBossNumber(MAX_BOSS_NUMBER);
         }
 
         //If Vem is dead...
         bool IsBossDied[3];
 
-        //Storing Skeram, Vem and Kri.
         ObjectGuid SkeramGUID;
         ObjectGuid VemGUID;
         ObjectGuid KriGUID;
@@ -66,7 +59,6 @@ public:
         GuidVector CThunGraspGUIDs;
 
         uint32 BugTrioDeathCount;
-
         uint32 CthunPhase;
 
         void Initialize() override
@@ -74,9 +66,7 @@ public:
             IsBossDied[0] = false;
             IsBossDied[1] = false;
             IsBossDied[2] = false;
-
             BugTrioDeathCount = 0;
-
             CthunPhase = 0;
         }
 
@@ -192,7 +182,6 @@ public:
                 case DATA_VISCIDUS:
                     return ViscidusGUID;
             }
-
             return ObjectGuid::Empty;
         }
 
@@ -206,15 +195,12 @@ public:
                     else
                         BugTrioDeathCount = 0;
                     break;
-
                 case DATA_VEKLOR_DEATH:
                     IsBossDied[1] = true;
                     break;
-
                 case DATA_VEKNILASH_DEATH:
                     IsBossDied[2] = true;
                     break;
-
                 case DATA_CTHUN_PHASE:
                     CthunPhase = data;
                     if (data == PHASE_CTHUN_DONE)
@@ -241,7 +227,7 @@ public:
                 case DATA_OURO:
                     if (state == FAIL)
                     {
-                        if (Creature* ouroSpawner = GetCreature(DATA_OURO))
+                        if (Creature* ouroSpawner = GetCreature(DATA_OURO_SPAWNER))
                             ouroSpawner->Respawn();
                     }
                     break;
@@ -272,7 +258,6 @@ public:
                 }
             }
         }
-
         return true;
     }
 };

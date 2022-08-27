@@ -15,12 +15,12 @@
 -- Dumpar struktur för tabell acore_world.game_event_condition
 DROP TABLE IF EXISTS `game_event_condition`;
 CREATE TABLE IF NOT EXISTS `game_event_condition` (
-  `eventEntry` TINYINT unsigned NOT NULL COMMENT 'Entry of the game event',
-  `condition_id` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `req_num` float DEFAULT 0,
-  `max_world_state_field` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `done_world_state_field` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `description` VARCHAR(25) NOT NULL DEFAULT '',
+  `eventEntry` tinyint unsigned NOT NULL COMMENT 'Entry of the game event',
+  `condition_id` mediumint unsigned NOT NULL DEFAULT '0',
+  `req_num` float DEFAULT '0',
+  `max_world_state_field` smallint unsigned NOT NULL DEFAULT '0',
+  `done_world_state_field` smallint unsigned NOT NULL DEFAULT '0',
+  `description` varchar(25) NOT NULL DEFAULT '',
   PRIMARY KEY (`eventEntry`,`condition_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
