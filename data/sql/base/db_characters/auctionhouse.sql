@@ -15,16 +15,16 @@
 -- Dumpar struktur för tabell acore_characters.auctionhouse
 DROP TABLE IF EXISTS `auctionhouse`;
 CREATE TABLE IF NOT EXISTS `auctionhouse` (
-  `id` INT unsigned NOT NULL DEFAULT 0,
-  `houseid` TINYINT unsigned NOT NULL DEFAULT '7',
-  `itemguid` INT unsigned NOT NULL DEFAULT 0,
-  `itemowner` INT unsigned NOT NULL DEFAULT 0,
-  `buyoutprice` INT unsigned NOT NULL DEFAULT 0,
-  `time` INT unsigned NOT NULL DEFAULT 0,
-  `buyguid` INT unsigned NOT NULL DEFAULT 0,
-  `lastbid` INT unsigned NOT NULL DEFAULT 0,
-  `startbid` INT unsigned NOT NULL DEFAULT 0,
-  `deposit` INT unsigned NOT NULL DEFAULT 0,
+  `id` int unsigned NOT NULL DEFAULT '0',
+  `houseid` tinyint unsigned NOT NULL DEFAULT '7',
+  `itemguid` int unsigned NOT NULL DEFAULT '0',
+  `itemowner` int unsigned NOT NULL DEFAULT '0',
+  `buyoutprice` int unsigned NOT NULL DEFAULT '0',
+  `time` int unsigned NOT NULL DEFAULT '0',
+  `buyguid` int unsigned NOT NULL DEFAULT '0',
+  `lastbid` int unsigned NOT NULL DEFAULT '0',
+  `startbid` int unsigned NOT NULL DEFAULT '0',
+  `deposit` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `item_guid` (`itemguid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

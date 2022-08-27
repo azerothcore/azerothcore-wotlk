@@ -15,11 +15,11 @@
 -- Dumpar struktur för tabell acore_world.creature_model_info
 DROP TABLE IF EXISTS `creature_model_info`;
 CREATE TABLE IF NOT EXISTS `creature_model_info` (
-  `DisplayID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `BoundingRadius` float NOT NULL DEFAULT 0,
-  `CombatReach` float NOT NULL DEFAULT 0,
-  `Gender` TINYINT unsigned NOT NULL DEFAULT '2',
-  `DisplayID_Other_Gender` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `DisplayID` mediumint unsigned NOT NULL DEFAULT '0',
+  `BoundingRadius` float NOT NULL DEFAULT '0',
+  `CombatReach` float NOT NULL DEFAULT '0',
+  `Gender` tinyint unsigned NOT NULL DEFAULT '2',
+  `DisplayID_Other_Gender` mediumint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`DisplayID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Creature System (Model related info)';
 
@@ -2107,7 +2107,7 @@ INSERT INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`,
 	(2578, 0, 0, 0, 2579),
 	(2579, 2, 3, 1, 2578),
 	(2581, 0, 0, 0, 2590),
-	(2582, 0.3825, 1.875, 2, 15880),
+	(2582, 0.3825, 1.875, 2, 0),
 	(2583, 0, 0, 1, 0),
 	(2584, 0.347, 1.5, 0, 0),
 	(2585, 0.347, 1.5, 1, 0),
@@ -2287,7 +2287,7 @@ INSERT INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`,
 	(2833, 0, 0, 2, 0),
 	(2834, 0.403, 1.5, 1, 0),
 	(2835, 0.2958, 1.0625, 2, 0),
-	(2836, 1.5, 4, 2, 0),
+	(2836, 1.5, 1.5, 2, 0),
 	(2837, 2, 10, 2, 0),
 	(2838, 0.244, 2, 2, 0),
 	(2850, 1.8057, 3.25, 2, 0),

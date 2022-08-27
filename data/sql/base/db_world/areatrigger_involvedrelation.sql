@@ -15,8 +15,8 @@
 -- Dumpar struktur för tabell acore_world.areatrigger_involvedrelation
 DROP TABLE IF EXISTS `areatrigger_involvedrelation`;
 CREATE TABLE IF NOT EXISTS `areatrigger_involvedrelation` (
-  `id` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Identifier',
-  `quest` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Quest Identifier',
+  `id` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Identifier',
+  `quest` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Quest Identifier',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Trigger System';
 

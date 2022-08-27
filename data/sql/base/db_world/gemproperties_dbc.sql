@@ -15,11 +15,11 @@
 -- Dumpar struktur för tabell acore_world.gemproperties_dbc
 DROP TABLE IF EXISTS `gemproperties_dbc`;
 CREATE TABLE IF NOT EXISTS `gemproperties_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `Enchant_Id` INT NOT NULL DEFAULT 0,
-  `Maxcount_Inv` INT NOT NULL DEFAULT 0,
-  `Maxcount_Item` INT NOT NULL DEFAULT 0,
-  `Type` INT NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `Enchant_Id` int NOT NULL DEFAULT '0',
+  `Maxcount_Inv` int NOT NULL DEFAULT '0',
+  `Maxcount_Item` int NOT NULL DEFAULT '0',
+  `Type` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

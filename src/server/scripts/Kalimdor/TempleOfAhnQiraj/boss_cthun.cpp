@@ -142,12 +142,10 @@ public:
 //Kick out position
 const Position KickPos = { -8545.0f, 1984.0f, -96.0f, 0.0f};
 
-struct boss_eye_of_cthun : public ScriptedAI
+struct boss_eye_of_cthun : public BossAI
 {
-    boss_eye_of_cthun(Creature* creature) : ScriptedAI(creature), _summons(creature)
+    boss_eye_of_cthun(Creature* creature) : BossAI(creature, DATA_CTHUN), _summons(creature)
     {
-        instance = creature->GetInstanceScript();
-
         SetCombatMovement(false);
     }
 
@@ -176,13 +174,18 @@ struct boss_eye_of_cthun : public ScriptedAI
 
         _summons.DespawnAll();
         _scheduler.CancelAll();
+
+        BossAI::Reset();
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustDied(Unit* /*killer*/) override { }
+
+    void EnterCombat(Unit* who) override
     {
         DoZoneInCombat();
         ScheduleTasks();
         instance->SetData(DATA_CTHUN_PHASE, PHASE_EYE_GREEN_BEAM);
+        BossAI::EnterCombat(who);
     }
 
     void MoveInLineOfSight(Unit* who) override
@@ -388,8 +391,6 @@ struct boss_eye_of_cthun : public ScriptedAI
     }
 
 private:
-    InstanceScript* instance;
-
     //Dark Glare phase
     uint32 DarkGlareTick;
     float DarkGlareAngle;
@@ -400,16 +401,12 @@ private:
     SummonList _summons;
 };
 
-struct boss_cthun : public ScriptedAI
+struct boss_cthun : public BossAI
 {
-    boss_cthun(Creature* creature) : ScriptedAI(creature)
+    boss_cthun(Creature* creature) : BossAI(creature, DATA_CTHUN)
     {
         SetCombatMovement(false);
-
-        instance = creature->GetInstanceScript();
     }
-
-    InstanceScript* instance;
 
     //Out of combat whisper timer
     uint32 WisperTimer;
@@ -784,9 +781,10 @@ struct boss_cthun : public ScriptedAI
         }
     }
 
-    void JustDied(Unit* /*killer*/) override
+    void JustDied(Unit* killer) override
     {
         instance->SetData(DATA_CTHUN_PHASE, PHASE_CTHUN_DONE);
+        BossAI::JustDied(killer);
     }
 
     void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override

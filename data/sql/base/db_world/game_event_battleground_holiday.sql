@@ -15,8 +15,8 @@
 -- Dumpar struktur för tabell acore_world.game_event_battleground_holiday
 DROP TABLE IF EXISTS `game_event_battleground_holiday`;
 CREATE TABLE IF NOT EXISTS `game_event_battleground_holiday` (
-  `eventEntry` TINYINT unsigned NOT NULL COMMENT 'Entry of the game event',
-  `bgflag` INT unsigned NOT NULL DEFAULT 0,
+  `eventEntry` tinyint unsigned NOT NULL COMMENT 'Entry of the game event',
+  `bgflag` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`eventEntry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

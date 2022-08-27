@@ -15,10 +15,10 @@
 -- Dumpar struktur för tabell acore_world.spell_threat
 DROP TABLE IF EXISTS `spell_threat`;
 CREATE TABLE IF NOT EXISTS `spell_threat` (
-  `entry` MEDIUMINT unsigned NOT NULL,
-  `flatMod` INT DEFAULT NULL,
+  `entry` mediumint unsigned NOT NULL,
+  `flatMod` int DEFAULT NULL,
   `pctMod` float NOT NULL DEFAULT '1' COMMENT 'threat multiplier for damage/healing',
-  `apPctMod` float NOT NULL DEFAULT 0 COMMENT 'additional threat bonus from attack power',
+  `apPctMod` float NOT NULL DEFAULT '0' COMMENT 'additional threat bonus from attack power',
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED;
 
