@@ -148,8 +148,30 @@ class spell_huhuran_wyvern_sting : public AuraScript
     }
 };
 
+// 26052 - Poison Bolt
+class spell_huhuran_poison_bolt : public SpellScript
+{
+    PrepareSpellScript(spell_huhuran_poison_bolt);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        uint32 const maxTargets = GetSpellInfo()->MaxAffectedTargets;
+        if (targets.size() > maxTargets)
+        {
+            targets.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
+            targets.resize(maxTargets);
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_huhuran_poison_bolt::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
+
 void AddSC_boss_huhuran()
 {
     RegisterTempleOfAhnQirajCreatureAI(boss_huhuran);
     RegisterSpellScript(spell_huhuran_wyvern_sting);
+    RegisterSpellScript(spell_huhuran_poison_bolt);
 }
