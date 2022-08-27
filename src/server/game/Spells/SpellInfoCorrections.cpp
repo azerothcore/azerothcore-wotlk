@@ -4361,6 +4361,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
+    // Death's Respite
+    ApplySpellFix({ 67731, 68305 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+    });
+
     // Wyvern Sting DoT
     ApplySpellFix({ 24131, 24134, 24135 }, [](SpellInfo* spellInfo)
     {
