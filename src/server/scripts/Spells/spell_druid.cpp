@@ -1150,7 +1150,7 @@ class spell_dru_berserk : public SpellScript
     }
 };
 
-// 24905 - Moonkin Form (Passive) (Passive)
+// 24905 - Moonkin Form (Passive)
 class spell_dru_moonkin_form_passive_proc : public AuraScript
 {
     PrepareAuraScript(spell_dru_moonkin_form_passive_proc);
