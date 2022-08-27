@@ -12045,6 +12045,8 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
         {
             case 4415: // Increased Rejuvenation Healing
             case 4953:
+                DoneTotal += (*i)->GetAmount() / 5; // 5 ticks of Rejuvenation
+                break;
             case 3736: // Hateful Totem of the Third Wind / Increased Lesser Healing Wave / LK Arena (4/5/6) Totem of the Third Wind / Savage Totem of the Third Wind
                 DoneTotal += (*i)->GetAmount();
                 break;
