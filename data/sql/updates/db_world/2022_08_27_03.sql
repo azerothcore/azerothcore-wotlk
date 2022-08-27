@@ -1,3 +1,4 @@
+-- DB update 2022_08_27_02 -> 2022_08_27_03
 --
 UPDATE `creature_template` SET `ScriptName`='npc_wintergarde_gryphon' WHERE `entry`=27258;
 

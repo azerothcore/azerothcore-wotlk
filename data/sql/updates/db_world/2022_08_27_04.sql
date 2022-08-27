@@ -1,3 +1,4 @@
+-- DB update 2022_08_27_03 -> 2022_08_27_04
 --
 -- Cleanup on creatures that don't exist
 DELETE FROM `creature` WHERE `guid` IN (200616);
