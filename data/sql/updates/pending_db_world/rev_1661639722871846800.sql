@@ -1,0 +1,6 @@
+-- Update Vekniss Hive Crawler formations.
+UPDATE `creature_formations` SET `dist`=9 WHERE `memberGUID` IN (87940, 87942, 87944);
+UPDATE `creature_formations` SET `groupAI`=515 WHERE `memberGUID` BETWEEN 87939 AND 87944;
+
+-- Update GroupAI in Stinger packs
+UPDATE `creature_formations` SET `groupAI`=515 WHERE `memberGUID` BETWEEN 87962 AND 87998;
