@@ -15,7 +15,7 @@
 -- Dumpar struktur för tabell acore_world.outdoorpvp_template
 DROP TABLE IF EXISTS `outdoorpvp_template`;
 CREATE TABLE IF NOT EXISTS `outdoorpvp_template` (
-  `TypeId` TINYINT unsigned NOT NULL,
+  `TypeId` tinyint unsigned NOT NULL,
   `ScriptName` char(64) NOT NULL DEFAULT '',
   `comment` text,
   PRIMARY KEY (`TypeId`)

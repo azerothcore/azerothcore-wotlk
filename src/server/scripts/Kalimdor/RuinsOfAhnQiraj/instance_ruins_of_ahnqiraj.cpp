@@ -75,6 +75,7 @@ public:
             SetBossNumber(NUM_ENCOUNTER);
             LoadObjectData(creatureData, nullptr);
             _rajaxWaveCounter = 0;
+            _buruPhase = 1;
         }
 
         void OnPlayerEnter(Player* player) override
@@ -108,10 +109,6 @@ public:
                     break;
                 case NPC_OSSIRIAN:
                     _ossirianGUID = creature->GetGUID();
-                    break;
-                case NPC_SAND_VORTEX:
-                    _sandVortexes.push_back(creature->GetGUID());
-                    creature->SetVisible(false);
                     break;
                 case NPC_ANDOROV:
                     _andorovGUID = creature->GetGUID();
@@ -150,18 +147,33 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 /*data*/) override
+        void SetData(uint32 type, uint32 data) override
         {
-            if (type == DATA_RAJAXX_WAVE_ENGAGED)
+            switch (type)
             {
-                _scheduler.CancelGroup(GROUP_RAJAXX_WAVE_TIMER);
-                _scheduler.Schedule(2min, [this](TaskContext context)
-                {
-                    CallNextRajaxxLeader();
-                    context.SetGroup(GROUP_RAJAXX_WAVE_TIMER);
-                    context.Repeat();
-                });
+                case DATA_RAJAXX_WAVE_ENGAGED:
+                    _scheduler.CancelGroup(GROUP_RAJAXX_WAVE_TIMER);
+                    _scheduler.Schedule(2min, [this](TaskContext context)
+                    {
+                        CallNextRajaxxLeader();
+                        context.SetGroup(GROUP_RAJAXX_WAVE_TIMER);
+                        context.Repeat();
+                    });
+                    break;
+                case DATA_BURU_PHASE:
+                    _buruPhase = data;
+                    break;
+                default:
+                    break;
             }
+        }
+
+        uint32 GetData(uint32 type) const override
+        {
+            if (type == DATA_BURU_PHASE)
+                return _buruPhase;
+
+            return 0;
         }
 
         void OnUnitDeath(Unit* unit) override
@@ -207,31 +219,6 @@ public:
         {
             if (type == DATA_PARALYZED)
                 _paralyzedGUID = data;
-        }
-
-        bool SetBossState(uint32 type, EncounterState state) override
-        {
-            if (!InstanceScript::SetBossState(type, state))
-                return false;
-
-            switch (type)
-            {
-                case DATA_OSSIRIAN:
-                {
-                    for (ObjectGuid const& guid : _sandVortexes)
-                    {
-                        if (Creature* sandVortex = instance->GetCreature(guid))
-                        {
-                            sandVortex->SetVisible(state == IN_PROGRESS);
-                        }
-                    }
-                    break;
-                default:
-                    break;
-                }
-            }
-
-            return true;
         }
 
         ObjectGuid GetGuidData(uint32 type) const override
@@ -360,8 +347,8 @@ public:
         ObjectGuid _ossirianGUID;
         ObjectGuid _paralyzedGUID;
         ObjectGuid _andorovGUID;
-        GuidVector _sandVortexes;
         uint32 _rajaxWaveCounter;
+        uint8 _buruPhase;
         TaskScheduler _scheduler;
     };
 

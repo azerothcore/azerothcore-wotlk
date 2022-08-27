@@ -15,21 +15,21 @@
 -- Dumpar struktur för tabell acore_world.light_dbc
 DROP TABLE IF EXISTS `light_dbc`;
 CREATE TABLE IF NOT EXISTS `light_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `ContinentID` INT NOT NULL DEFAULT 0,
-  `X` float NOT NULL DEFAULT 0,
-  `Y` float NOT NULL DEFAULT 0,
-  `Z` float NOT NULL DEFAULT 0,
-  `FalloffStart` float NOT NULL DEFAULT 0,
-  `FalloffEnd` float NOT NULL DEFAULT 0,
-  `LightParamsID_1` INT NOT NULL DEFAULT 0,
-  `LightParamsID_2` INT NOT NULL DEFAULT 0,
-  `LightParamsID_3` INT NOT NULL DEFAULT 0,
-  `LightParamsID_4` INT NOT NULL DEFAULT 0,
-  `LightParamsID_5` INT NOT NULL DEFAULT 0,
-  `LightParamsID_6` INT NOT NULL DEFAULT 0,
-  `LightParamsID_7` INT NOT NULL DEFAULT 0,
-  `LightParamsID_8` INT NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `ContinentID` int NOT NULL DEFAULT '0',
+  `X` float NOT NULL DEFAULT '0',
+  `Y` float NOT NULL DEFAULT '0',
+  `Z` float NOT NULL DEFAULT '0',
+  `FalloffStart` float NOT NULL DEFAULT '0',
+  `FalloffEnd` float NOT NULL DEFAULT '0',
+  `LightParamsID_1` int NOT NULL DEFAULT '0',
+  `LightParamsID_2` int NOT NULL DEFAULT '0',
+  `LightParamsID_3` int NOT NULL DEFAULT '0',
+  `LightParamsID_4` int NOT NULL DEFAULT '0',
+  `LightParamsID_5` int NOT NULL DEFAULT '0',
+  `LightParamsID_6` int NOT NULL DEFAULT '0',
+  `LightParamsID_7` int NOT NULL DEFAULT '0',
+  `LightParamsID_8` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

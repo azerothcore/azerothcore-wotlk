@@ -15,10 +15,10 @@
 -- Dumpar struktur för tabell acore_characters.character_social
 DROP TABLE IF EXISTS `character_social`;
 CREATE TABLE IF NOT EXISTS `character_social` (
-  `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Character Global Unique Identifier',
-  `friend` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Friend Global Unique Identifier',
-  `flags` TINYINT unsigned NOT NULL DEFAULT 0 COMMENT 'Friend Flags',
-  `note` VARCHAR(48) NOT NULL DEFAULT '' COMMENT 'Friend Note',
+  `guid` int unsigned NOT NULL DEFAULT '0' COMMENT 'Character Global Unique Identifier',
+  `friend` int unsigned NOT NULL DEFAULT '0' COMMENT 'Friend Global Unique Identifier',
+  `flags` tinyint unsigned NOT NULL DEFAULT '0' COMMENT 'Friend Flags',
+  `note` varchar(48) NOT NULL DEFAULT '' COMMENT 'Friend Note',
   PRIMARY KEY (`guid`,`friend`,`flags`),
   KEY `friend` (`friend`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
