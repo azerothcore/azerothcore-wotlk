@@ -15,10 +15,10 @@
 -- Dumpar struktur för tabell acore_world.pet_name_generation
 DROP TABLE IF EXISTS `pet_name_generation`;
 CREATE TABLE IF NOT EXISTS `pet_name_generation` (
-  `id` MEDIUMINT unsigned NOT NULL AUTO_INCREMENT,
+  `id` mediumint unsigned NOT NULL AUTO_INCREMENT,
   `word` tinytext NOT NULL,
-  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `half` TINYINT unsigned NOT NULL DEFAULT 0,
+  `entry` mediumint unsigned NOT NULL DEFAULT '0',
+  `half` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=314 DEFAULT CHARSET=utf8mb4;
 

@@ -15,11 +15,11 @@
 -- Dumpar struktur för tabell acore_world.spellrunecost_dbc
 DROP TABLE IF EXISTS `spellrunecost_dbc`;
 CREATE TABLE IF NOT EXISTS `spellrunecost_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `Blood` INT NOT NULL DEFAULT 0,
-  `Unholy` INT NOT NULL DEFAULT 0,
-  `Frost` INT NOT NULL DEFAULT 0,
-  `RunicPower` INT NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `Blood` int NOT NULL DEFAULT '0',
+  `Unholy` int NOT NULL DEFAULT '0',
+  `Frost` int NOT NULL DEFAULT '0',
+  `RunicPower` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

@@ -45,15 +45,13 @@ enum Events
 {
     EVENT_DISMEMBER             = 1,
     EVENT_GATHERING_SPEED       = 2,
-    EVENT_FULL_SPEED            = 3,
-    EVENT_CREEPING_PLAGUE       = 4,
-    EVENT_RESPAWN_EGG           = 5,
+    EVENT_CREEPING_PLAGUE       = 3
 };
 
 enum Phases
 {
-    PHASE_EGG                   = 0,
-    PHASE_TRANSFORM             = 1
+    PHASE_EGG                   = 1,
+    PHASE_TRANSFORM             = 2
 };
 
 struct boss_buru : public BossAI
@@ -66,8 +64,10 @@ struct boss_buru : public BossAI
 
         DoCastSelf(SPELL_FULL_SPEED, true);
 
+        _phase = PHASE_EGG;
+        instance->SetData(DATA_BURU_PHASE, _phase);
+
         ManipulateEggs(true);
-        _eggs.clear();
     }
 
     void ManipulateEggs(bool respawn)
@@ -81,14 +81,15 @@ struct boss_buru : public BossAI
     void EnterCombat(Unit* who) override
     {
         BossAI::EnterCombat(who);
+        me->AddThreat(who, 1000000.f);
         Talk(EMOTE_TARGET, who);
         DoCastSelf(SPELL_THORNS);
+        _phase = PHASE_EGG;
+        instance->SetData(DATA_BURU_PHASE, _phase);
         ManipulateEggs(true);
         me->RemoveAurasDueToSpell(SPELL_FULL_SPEED);
         events.ScheduleEvent(EVENT_DISMEMBER, 5s);
-        events.ScheduleEvent(EVENT_GATHERING_SPEED, 9s);
-        events.ScheduleEvent(EVENT_FULL_SPEED, 60s);
-        _phase = PHASE_EGG;
+        events.ScheduleEvent(EVENT_GATHERING_SPEED, 2s);
     }
 
     void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
@@ -97,12 +98,10 @@ struct boss_buru : public BossAI
             ChaseNewVictim();
     }
 
-    void JustDied(Unit* /*killer*/) override
+    void JustDied(Unit* killer) override
     {
-        if (InstanceScript* pInstance = me->GetInstanceScript())
-        {
-            pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_CREEPING_PLAGUE);
-        }
+        instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_CREEPING_PLAGUE);
+        BossAI::JustDied(killer);
     }
 
     void KilledUnit(Unit* victim) override
@@ -116,10 +115,9 @@ struct boss_buru : public BossAI
         if (_phase != PHASE_EGG)
             return;
 
-        me->RemoveAurasDueToSpell(SPELL_FULL_SPEED);
         me->RemoveAurasDueToSpell(SPELL_GATHERING_SPEED);
-        events.ScheduleEvent(EVENT_GATHERING_SPEED, 9s);
-        events.ScheduleEvent(EVENT_FULL_SPEED, 60s);
+        events.CancelEvent(EVENT_GATHERING_SPEED);
+        events.ScheduleEvent(EVENT_GATHERING_SPEED, 2s);
         if (Unit* victim = SelectTarget(SelectTargetMethod::Random, 0, 0.f, true))
         {
             DoResetThreat();
@@ -129,17 +127,11 @@ struct boss_buru : public BossAI
         }
     }
 
-    void SetGUID(ObjectGuid const guid, int32 /*type*/) override
-    {
-        _eggs.push_back(guid);
-        events.ScheduleEvent(EVENT_RESPAWN_EGG, 120s);
-    }
-
     void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
-        if (attacker->GetEntry() != NPC_BURU_EGG && _phase == PHASE_EGG)
+        if (attacker && attacker->GetEntry() == NPC_BURU_EGG)
         {
-            damage = damage * 0.01f; // 99% dmg resist
+            me->LowerPlayerDamageReq(damage);
         }
 
         if (me->HealthBelowPctDamaged(20, damage) && _phase == PHASE_EGG)
@@ -147,8 +139,10 @@ struct boss_buru : public BossAI
             DoCastSelf(SPELL_FULL_SPEED, true);
             ManipulateEggs(false);
             me->RemoveAurasDueToSpell(SPELL_THORNS);
+            me->RemoveAurasDueToSpell(SPELL_GATHERING_SPEED);
             events.Reset();
             _phase = PHASE_TRANSFORM;
+            instance->SetData(DATA_BURU_PHASE, _phase);
             DoResetThreat();
             events.ScheduleEvent(EVENT_CREEPING_PLAGUE, 2s);
             DoCastSelf(SPELL_BURU_TRANSFORM);
@@ -174,18 +168,9 @@ struct boss_buru : public BossAI
                     DoCastSelf(SPELL_GATHERING_SPEED);
                     events.ScheduleEvent(EVENT_GATHERING_SPEED, 9s);
                     break;
-                case EVENT_FULL_SPEED:
-                    DoCastSelf(SPELL_FULL_SPEED);
-                    break;
                 case EVENT_CREEPING_PLAGUE:
                     DoCastAOE(SPELL_CREEPING_PLAGUE);
                     events.ScheduleEvent(EVENT_CREEPING_PLAGUE, 6s);
-                    break;
-                case EVENT_RESPAWN_EGG:
-                    if (Creature* egg = me->GetMap()->GetCreature(*_eggs.begin()))
-                        egg->Respawn();
-
-                    _eggs.pop_front();
                     break;
                 default:
                     break;
@@ -196,7 +181,6 @@ struct boss_buru : public BossAI
     }
 private:
     uint8 _phase;
-    GuidList _eggs;
 };
 
 struct npc_buru_egg : public ScriptedAI
@@ -206,6 +190,7 @@ struct npc_buru_egg : public ScriptedAI
         _instance = me->GetInstanceScript();
         SetCombatMovement(false);
         me->SetReactState(REACT_PASSIVE);
+        me->SetControlled(true, UNIT_STATE_STUNNED);
     }
 
     void EnterCombat(Unit* attacker) override
@@ -240,14 +225,17 @@ struct npc_buru_egg : public ScriptedAI
         {
             if (Creature* buru = _instance->GetCreature(DATA_BURU))
             {
-                DoCastSelf(SPELL_EXPLODE);
+                DoCastSelf(SPELL_EXPLODE, true);
                 DoCastSelf(SPELL_BURU_EGG_TRIGGER, true);
                 buru->CastSpell(buru, SPELL_CREATURE_SPECIAL, true);
-                if (buru->GetAI())
-                    buru->AI()->SetGUID(me->GetGUID());
             }
         }
+
+        me->DespawnOrUnsummon(5000);
     }
+
+    void UpdateAI(uint32 /*diff*/) override { }
+
 private:
     InstanceScript* _instance;
 };

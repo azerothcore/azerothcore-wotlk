@@ -15,10 +15,10 @@
 -- Dumpar struktur för tabell acore_world.skill_perfect_item_template
 DROP TABLE IF EXISTS `skill_perfect_item_template`;
 CREATE TABLE IF NOT EXISTS `skill_perfect_item_template` (
-  `spellId` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'SpellId of the item creation spell',
-  `requiredSpecialization` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Specialization spell id',
-  `perfectCreateChance` float NOT NULL DEFAULT 0 COMMENT 'chance to create the perfect item instead',
-  `perfectItemType` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'perfect item type to create instead',
+  `spellId` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'SpellId of the item creation spell',
+  `requiredSpecialization` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Specialization spell id',
+  `perfectCreateChance` float NOT NULL DEFAULT '0' COMMENT 'chance to create the perfect item instead',
+  `perfectItemType` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'perfect item type to create instead',
   PRIMARY KEY (`spellId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Crafting Perfection System';
 

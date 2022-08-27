@@ -15,18 +15,18 @@
 -- Dumpar struktur för tabell acore_characters.guild
 DROP TABLE IF EXISTS `guild`;
 CREATE TABLE IF NOT EXISTS `guild` (
-  `guildid` INT unsigned NOT NULL DEFAULT 0,
-  `name` VARCHAR(24) NOT NULL DEFAULT '',
-  `leaderguid` INT unsigned NOT NULL DEFAULT 0,
-  `EmblemStyle` TINYINT unsigned NOT NULL DEFAULT 0,
-  `EmblemColor` TINYINT unsigned NOT NULL DEFAULT 0,
-  `BorderStyle` TINYINT unsigned NOT NULL DEFAULT 0,
-  `BorderColor` TINYINT unsigned NOT NULL DEFAULT 0,
-  `BackgroundColor` TINYINT unsigned NOT NULL DEFAULT 0,
-  `info` VARCHAR(500) NOT NULL DEFAULT '',
-  `motd` VARCHAR(128) NOT NULL DEFAULT '',
-  `createdate` INT unsigned NOT NULL DEFAULT 0,
-  `BankMoney` BIGINT unsigned NOT NULL DEFAULT 0,
+  `guildid` int unsigned NOT NULL DEFAULT '0',
+  `name` varchar(24) NOT NULL DEFAULT '',
+  `leaderguid` int unsigned NOT NULL DEFAULT '0',
+  `EmblemStyle` tinyint unsigned NOT NULL DEFAULT '0',
+  `EmblemColor` tinyint unsigned NOT NULL DEFAULT '0',
+  `BorderStyle` tinyint unsigned NOT NULL DEFAULT '0',
+  `BorderColor` tinyint unsigned NOT NULL DEFAULT '0',
+  `BackgroundColor` tinyint unsigned NOT NULL DEFAULT '0',
+  `info` varchar(500) NOT NULL DEFAULT '',
+  `motd` varchar(128) NOT NULL DEFAULT '',
+  `createdate` int unsigned NOT NULL DEFAULT '0',
+  `BankMoney` bigint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guildid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Guild System';
 

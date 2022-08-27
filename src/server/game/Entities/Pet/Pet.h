@@ -143,6 +143,8 @@ public:
     void SetLoading(bool load) { m_loading = load; }
 
     [[nodiscard]] bool HasTempSpell() const { return m_tempspell != 0; }
+
+    std::string GetDebugInfo() const override;
 protected:
     Player* m_owner;
     int32   m_happinessTimer;

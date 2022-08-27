@@ -15,7 +15,7 @@
 -- Dumpar struktur för tabell acore_world.areatrigger_tavern
 DROP TABLE IF EXISTS `areatrigger_tavern`;
 CREATE TABLE IF NOT EXISTS `areatrigger_tavern` (
-  `id` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Identifier',
+  `id` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Identifier',
   `name` text,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Trigger System';

@@ -15,15 +15,15 @@
 -- Dumpar struktur för tabell acore_characters.calendar_events
 DROP TABLE IF EXISTS `calendar_events`;
 CREATE TABLE IF NOT EXISTS `calendar_events` (
-  `id` BIGINT unsigned NOT NULL DEFAULT 0,
-  `creator` INT unsigned NOT NULL DEFAULT 0,
-  `title` VARCHAR(255) NOT NULL DEFAULT '',
-  `description` VARCHAR(255) NOT NULL DEFAULT '',
-  `type` TINYINT unsigned NOT NULL DEFAULT '4',
-  `dungeon` INT NOT NULL DEFAULT '-1',
-  `eventtime` INT unsigned NOT NULL DEFAULT 0,
-  `flags` INT unsigned NOT NULL DEFAULT 0,
-  `time2` INT unsigned NOT NULL DEFAULT 0,
+  `id` bigint unsigned NOT NULL DEFAULT '0',
+  `creator` int unsigned NOT NULL DEFAULT '0',
+  `title` varchar(255) NOT NULL DEFAULT '',
+  `description` varchar(255) NOT NULL DEFAULT '',
+  `type` tinyint unsigned NOT NULL DEFAULT '4',
+  `dungeon` int NOT NULL DEFAULT '-1',
+  `eventtime` int unsigned NOT NULL DEFAULT '0',
+  `flags` int unsigned NOT NULL DEFAULT '0',
+  `time2` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
