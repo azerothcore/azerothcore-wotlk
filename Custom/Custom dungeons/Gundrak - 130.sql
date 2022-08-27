@@ -14,6 +14,9 @@
 
 -- 29630 Fanged Pit Viper -> updated manually, as not done via script above
 UPDATE `creature_template` SET `minlevel` = 101, `maxlevel` = 101 WHERE (`entry` = 29630);
+-- 29836 Drakkari Battle Rider + 30925 HC version
+UPDATE `creature_template` SET `minlevel` = 127, `maxlevel` = 127 WHERE (`entry` = 29836);
+UPDATE `creature_template` SET `minlevel` = 130, `maxlevel` = 130 WHERE (`entry` = 30925);
 
 -- Dungeon updated to level 125+ for NHC and HC
 INSERT INTO `dungeon_access_template` (`id`, `map_id`, `difficulty`, `min_level`, `max_level`, `min_avg_item_level`, `comment`) VALUES (90, 604, 0, 125, 0, 0, 'Gundrak (North entrance)');
