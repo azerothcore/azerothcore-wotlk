@@ -15,14 +15,14 @@
 -- Dumpar struktur för tabell acore_world.pool_pool
 DROP TABLE IF EXISTS `pool_pool`;
 CREATE TABLE IF NOT EXISTS `pool_pool` (
-  `pool_id` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `mother_pool` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `chance` float NOT NULL DEFAULT 0,
-  `description` VARCHAR(255) DEFAULT NULL,
+  `pool_id` mediumint unsigned NOT NULL DEFAULT '0',
+  `mother_pool` mediumint unsigned NOT NULL DEFAULT '0',
+  `chance` float NOT NULL DEFAULT '0',
+  `description` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`pool_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Dumpar data för tabell acore_world.pool_pool: 2 293 rows
+-- Dumpar data för tabell acore_world.pool_pool: 2 328 rows
 DELETE FROM `pool_pool`;
 /*!40000 ALTER TABLE `pool_pool` DISABLE KEYS */;
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES
@@ -2318,7 +2318,42 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALU
 	(4496, 11650, 0, 'Minerals - Rolands Doom - Duskwood'),
 	(4505, 11650, 0, 'Minerals - Rolands Doom - Duskwood'),
 	(4508, 11650, 0, 'Minerals - Rolands Doom - Duskwood'),
-	(4510, 11650, 0, 'Minerals - Rolands Doom - Duskwood');
+	(4510, 11650, 0, 'Minerals - Rolands Doom - Duskwood'),
+	(391, 394, 55, 'Brontus Kodo Pack Combo 1 -- 4 Barrens Kodo Pack'),
+	(392, 394, 30, 'Brontus Kodo Pack Combo 2 -- Mixed Kodo Pack'),
+	(393, 394, 15, 'Brontus Kodo Pack Combo 3 -- Brontus Pack'),
+	(449, 448, 6, 'ZG Entrance Snake as 3 Pack 1/8'),
+	(450, 448, 6, 'ZG Entrance Snake as 3 Pack 2/8'),
+	(451, 448, 6, 'ZG Entrance Snake as 3 Pack 3/8'),
+	(452, 448, 7, 'ZG Entrance Snake as 3 Pack 4/8'),
+	(453, 448, 6, 'ZG Entrance Snake as 3 Pack 5/8'),
+	(454, 448, 6, 'ZG Entrance Snake as 3 Pack 6/8'),
+	(455, 448, 6, 'ZG Entrance Snake as 3 Pack 7/8'),
+	(456, 448, 7, 'ZG Entrance Snake as 3 Pack 8/8'),
+	(457, 448, 5, 'ZG Entrance Snake as 4 Pack 1/12'),
+	(458, 448, 4, 'ZG Entrance Snake as 4 Pack 2/12'),
+	(459, 448, 4, 'ZG Entrance Snake as 4 Pack 3/12'),
+	(460, 448, 4, 'ZG Entrance Snake as 4 Pack 4/12'),
+	(461, 448, 4, 'ZG Entrance Snake as 4 Pack 5/12'),
+	(462, 448, 5, 'ZG Entrance Snake as 4 Pack 6/12'),
+	(463, 448, 4, 'ZG Entrance Snake as 4 Pack 7/12'),
+	(464, 448, 4, 'ZG Entrance Snake as 4 Pack 8/12'),
+	(465, 448, 4, 'ZG Entrance Snake as 4 Pack 9/12'),
+	(466, 448, 4, 'ZG Entrance Snake as 4 Pack 10/12'),
+	(467, 448, 4, 'ZG Entrance Snake as 4 Pack 11/12'),
+	(468, 448, 4, 'ZG Entrance Snake as 4 Pack 12/12'),
+	(470, 469, 50, 'ZG Before Bats 5 Pack of Zulian Crocs 1/1'),
+	(471, 469, 10, 'ZG Before Bats 4 Pack of Zulian Crocs 1/5'),
+	(472, 469, 10, 'ZG Before Bats 4 Pack of Zulian Crocs 2/5'),
+	(473, 469, 10, 'ZG Before Bats 4 Pack of Zulian Crocs 3/5'),
+	(474, 469, 10, 'ZG Before Bats 4 Pack of Zulian Crocs 4/5'),
+	(475, 469, 10, 'ZG Before Bats 4 Pack of Zulian Crocs 5/5'),
+	(480, 479, 25, 'ZG Before Bats Bat Pack Loc 1'),
+	(481, 479, 25, 'ZG Before Bats Bat Pack Loc 2'),
+	(482, 479, 25, 'ZG Before Bats Bat Pack Loc 3'),
+	(483, 479, 25, 'ZG Before Bats Bat Pack Loc 4'),
+	(477, 476, 50, 'ZG Before Bats Troll 3-Pack with 2x entry 11831'),
+	(478, 476, 50, 'ZG Before Bats Troll 3-Pack with 2x entry 11351');
 /*!40000 ALTER TABLE `pool_pool` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

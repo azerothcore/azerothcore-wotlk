@@ -15,13 +15,13 @@
 -- Dumpar struktur för tabell acore_world.areatrigger_teleport
 DROP TABLE IF EXISTS `areatrigger_teleport`;
 CREATE TABLE IF NOT EXISTS `areatrigger_teleport` (
-  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `ID` mediumint unsigned NOT NULL DEFAULT '0',
   `Name` text,
-  `target_map` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `target_position_x` float NOT NULL DEFAULT 0,
-  `target_position_y` float NOT NULL DEFAULT 0,
-  `target_position_z` float NOT NULL DEFAULT 0,
-  `target_orientation` float NOT NULL DEFAULT 0,
+  `target_map` smallint unsigned NOT NULL DEFAULT '0',
+  `target_position_x` float NOT NULL DEFAULT '0',
+  `target_position_y` float NOT NULL DEFAULT '0',
+  `target_position_z` float NOT NULL DEFAULT '0',
+  `target_orientation` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`),
   FULLTEXT KEY `name` (`Name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Trigger System';
@@ -104,7 +104,7 @@ INSERT INTO `areatrigger_teleport` (`ID`, `Name`, `target_map`, `target_position
 	(2608, 'Alterac Valley - Alliance Exit', 0, 98.432, -182.274, 127.52, 5.02654),
 	(2848, 'Onyxia\'s Lair Entrance', 249, 29.1607, -71.3372, -8.18032, 4.58),
 	(2886, 'The Molten Bridge', 409, 1096, -467, -104.6, 3.64),
-	(2890, 'Molten Core Entrance, Inside', 230, 1115.35, -457.35, -102.7, 0.5),
+	(2890, 'Molten Core Entrance, Inside', 0, -7510.59, -1041.45, 180.911, 3.8666),
 	(3126, 'Maraudon', 1, -1186.98, 2875.95, 85.7258, 1.78443),
 	(3131, 'Maraudon', 1, -1471.07, 2618.57, 76.1944, 0),
 	(3133, 'Maraudon', 349, 1019.69, -458.31, -43.43, 0.31),

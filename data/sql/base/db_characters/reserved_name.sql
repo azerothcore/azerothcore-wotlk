@@ -15,7 +15,7 @@
 -- Dumpar struktur för tabell acore_characters.reserved_name
 DROP TABLE IF EXISTS `reserved_name`;
 CREATE TABLE IF NOT EXISTS `reserved_name` (
-  `name` VARCHAR(12) NOT NULL DEFAULT '',
+  `name` varchar(12) NOT NULL DEFAULT '',
   PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player Reserved Names';
 

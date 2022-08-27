@@ -17,14 +17,17 @@
 
 #include "CreatureGroups.h"
 #include "InstanceScript.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "TaskScheduler.h"
 #include "ruins_of_ahnqiraj.h"
 
 ObjectData const creatureData[] =
 {
+    { NPC_BURU,      DATA_BURU      },
     { NPC_KURINNAXX, DATA_KURINNAXX },
     { NPC_RAJAXX,    DATA_RAJAXX    },
+    { NPC_AYAMISS,   DATA_AYAMISS   },
     { NPC_OSSIRIAN,  DATA_OSSIRIAN  },
     { NPC_QUUEZ,     DATA_QUUEZ     },
     { NPC_TUUBID,    DATA_TUUBID    },
@@ -35,14 +38,17 @@ ObjectData const creatureData[] =
     { NPC_ZERRAN,    DATA_ZERRAN    },
 };
 
-enum RajaxxText
+enum RajaxxWaveEvent
 {
     SAY_WAVE3  = 0,
     SAY_WAVE4  = 1,
     SAY_WAVE5  = 2,
     SAY_WAVE6  = 3,
     SAY_WAVE7  = 4,
-    SAY_ENGAGE = 5
+    SAY_ENGAGE = 5,
+
+    DATA_RAJAXX_WAVE_ENGAGED = 1,
+    GROUP_RAJAXX_WAVE_TIMER  = 1
 };
 
 std::array<uint32, 8> RajaxxWavesData[] =
@@ -69,6 +75,18 @@ public:
             SetBossNumber(NUM_ENCOUNTER);
             LoadObjectData(creatureData, nullptr);
             _rajaxWaveCounter = 0;
+            _buruPhase = 1;
+        }
+
+        void OnPlayerEnter(Player* player) override
+        {
+            if (GetBossState(DATA_KURINNAXX) == DONE && GetBossState(DATA_RAJAXX) != DONE)
+            {
+                if (!_andorovGUID)
+                {
+                    player->SummonCreature(NPC_ANDOROV, -8538.177f, 1486.0956f, 32.39054f, 3.7638654f, TEMPSUMMON_CORPSE_DESPAWN, 600000000);
+                }
+            }
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -89,11 +107,11 @@ public:
                 case NPC_BURU:
                     _buruGUID = creature->GetGUID();
                     break;
-                case NPC_AYAMISS:
-                    _ayamissGUID = creature->GetGUID();
-                    break;
                 case NPC_OSSIRIAN:
                     _ossirianGUID = creature->GetGUID();
+                    break;
+                case NPC_ANDOROV:
+                    _andorovGUID = creature->GetGUID();
                     break;
             }
         }
@@ -129,6 +147,35 @@ public:
             }
         }
 
+        void SetData(uint32 type, uint32 data) override
+        {
+            switch (type)
+            {
+                case DATA_RAJAXX_WAVE_ENGAGED:
+                    _scheduler.CancelGroup(GROUP_RAJAXX_WAVE_TIMER);
+                    _scheduler.Schedule(2min, [this](TaskContext context)
+                    {
+                        CallNextRajaxxLeader();
+                        context.SetGroup(GROUP_RAJAXX_WAVE_TIMER);
+                        context.Repeat();
+                    });
+                    break;
+                case DATA_BURU_PHASE:
+                    _buruPhase = data;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        uint32 GetData(uint32 type) const override
+        {
+            if (type == DATA_BURU_PHASE)
+                return _buruPhase;
+
+            return 0;
+        }
+
         void OnUnitDeath(Unit* unit) override
         {
             if (Creature* creature = unit->ToCreature())
@@ -147,10 +194,11 @@ public:
                             case NPC_PAKKON:
                             case NPC_ZERRAN:
                                 _scheduler.CancelAll();
-                                _scheduler.Schedule(1s, [this, formation](TaskContext /*context*/) {
+                                _scheduler.Schedule(1s, [this, formation](TaskContext /*context*/)
+                                {
                                     if (!formation->IsAnyMemberAlive())
                                     {
-                                        CallNextRajaxxLeader();
+                                        CallNextRajaxxLeader(true);
                                     }
                                 });
                                 break;
@@ -185,12 +233,12 @@ public:
                     return _moamGUID;
                 case DATA_BURU:
                     return _buruGUID;
-                case DATA_AYAMISS:
-                    return _ayamissGUID;
                 case DATA_OSSIRIAN:
                     return _ossirianGUID;
                 case DATA_PARALYZED:
                     return _paralyzedGUID;
+                case DATA_ANDOROV:
+                    return _andorovGUID;
             }
 
             return ObjectGuid::Empty;
@@ -239,23 +287,34 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
-        void CallNextRajaxxLeader()
+        void CallNextRajaxxLeader(bool announce = false)
         {
             ++_rajaxWaveCounter;
 
             if (Creature* nextLeader = GetCreature(RajaxxWavesData[_rajaxWaveCounter].at(0)))
             {
-                if (_rajaxWaveCounter >= 2)
+                if (announce)
                 {
-                    if (Creature* rajaxx = GetCreature(DATA_RAJAXX))
+                    if (_rajaxWaveCounter >= 2)
                     {
-                        rajaxx->AI()->Talk(RajaxxWavesData[_rajaxWaveCounter].at(1));
+                        if (Creature* rajaxx = GetCreature(DATA_RAJAXX))
+                        {
+                            rajaxx->AI()->Talk(RajaxxWavesData[_rajaxWaveCounter].at(1));
+                        }
                     }
                 }
 
                 if (nextLeader->IsAlive())
                 {
-                    nextLeader->SetInCombatWithZone();
+                    Creature* generalAndorov = instance->GetCreature(_andorovGUID);
+                    if (generalAndorov && generalAndorov->IsAlive() && generalAndorov->AI()->GetData(DATA_ANDOROV))
+                    {
+                        nextLeader->AI()->AttackStart(generalAndorov);
+                    }
+                    else
+                    {
+                        nextLeader->SetInCombatWithZone();
+                    }
                 }
                 else
                 {
@@ -267,6 +326,7 @@ public:
         void ResetRajaxxWaves()
         {
             _rajaxWaveCounter = 0;
+            _scheduler.CancelAll();
             for (auto const& data : RajaxxWavesData)
             {
                 if (Creature* creature = GetCreature(data.at(0)))
@@ -284,10 +344,11 @@ public:
         ObjectGuid _rajaxxGUID;
         ObjectGuid _moamGUID;
         ObjectGuid _buruGUID;
-        ObjectGuid _ayamissGUID;
         ObjectGuid _ossirianGUID;
         ObjectGuid _paralyzedGUID;
+        ObjectGuid _andorovGUID;
         uint32 _rajaxWaveCounter;
+        uint8 _buruPhase;
         TaskScheduler _scheduler;
     };
 

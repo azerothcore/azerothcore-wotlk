@@ -15,12 +15,12 @@
 -- Dumpar struktur för tabell acore_characters.warden_action
 DROP TABLE IF EXISTS `warden_action`;
 CREATE TABLE IF NOT EXISTS `warden_action` (
-  `wardenId` SMALLINT unsigned NOT NULL,
-  `action` TINYINT unsigned DEFAULT NULL,
+  `wardenId` smallint unsigned NOT NULL,
+  `action` tinyint unsigned DEFAULT NULL,
   PRIMARY KEY (`wardenId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Dumpar data för tabell acore_characters.warden_action: ~0 rows (ungefär)
+-- Dumpar data för tabell acore_characters.warden_action: ~1 rows (ungefär)
 DELETE FROM `warden_action`;
 /*!40000 ALTER TABLE `warden_action` DISABLE KEYS */;
 INSERT INTO `warden_action` (`wardenId`, `action`) VALUES

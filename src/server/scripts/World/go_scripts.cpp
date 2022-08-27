@@ -1877,6 +1877,12 @@ public:
                     uint8 _rings = (local_tm.tm_hour) % 12;
                     _rings = (_rings == 0) ? 12 : _rings; // 00:00 and 12:00
 
+                    // Dwarf hourly horn should only play a single time, each time the next hour begins.
+                    if (_soundId == BELLTOLLDWARFGNOME)
+                    {
+                        _rings = 1;
+                    }
+
                     // Schedule ring event
                     for (auto i = 0; i < _rings; ++i)
                     {

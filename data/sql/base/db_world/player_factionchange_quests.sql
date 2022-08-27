@@ -15,14 +15,14 @@
 -- Dumpar struktur för tabell acore_world.player_factionchange_quests
 DROP TABLE IF EXISTS `player_factionchange_quests`;
 CREATE TABLE IF NOT EXISTS `player_factionchange_quests` (
-  `alliance_id` INT unsigned NOT NULL,
-  `horde_id` INT unsigned NOT NULL,
+  `alliance_id` int unsigned NOT NULL,
+  `horde_id` int unsigned NOT NULL,
   PRIMARY KEY (`alliance_id`,`horde_id`),
   UNIQUE KEY `alliance_uniq` (`alliance_id`),
   UNIQUE KEY `horde_uniq` (`horde_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Dumpar data för tabell acore_world.player_factionchange_quests: 293 rows
+-- Dumpar data för tabell acore_world.player_factionchange_quests: 292 rows
 DELETE FROM `player_factionchange_quests`;
 /*!40000 ALTER TABLE `player_factionchange_quests` DISABLE KEYS */;
 INSERT INTO `player_factionchange_quests` (`alliance_id`, `horde_id`) VALUES
@@ -297,7 +297,6 @@ INSERT INTO `player_factionchange_quests` (`alliance_id`, `horde_id`) VALUES
 	(14054, 14060),
 	(14055, 14058),
 	(14096, 14142),
-	(14111, 14100),
 	(20438, 24556),
 	(20439, 24451),
 	(24498, 24507),

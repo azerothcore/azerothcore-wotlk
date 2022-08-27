@@ -41,6 +41,9 @@ enum DataTypes
     DATA_YEGGETH            = 12,
     DATA_PAKKON             = 13,
     DATA_ZERRAN             = 14,
+    DATA_ANDOROV            = 15,
+
+    DATA_BURU_PHASE         = 16,
 
     DATA_ENGAGED_FORMATION  = 1
 };
@@ -60,9 +63,6 @@ enum Creatures
     NPC_OSSIRIAN_TRIGGER        = 15590,
     NPC_HATCHLING               = 15521,
     NPC_BURU_EGG                = 15514,
-    NPC_LARVA                   = 15555,
-    NPC_SWARMER                 = 15546,
-    NPC_HORNET                  = 15934,
 
     // Rajaxx
     NPC_QUUEZ                   = 15391,
@@ -71,7 +71,9 @@ enum Creatures
     NPC_XURREM                  = 15390,
     NPC_YEGGETH                 = 15386,
     NPC_PAKKON                  = 15388,
-    NPC_ZERRAN                  = 15385
+    NPC_ZERRAN                  = 15385,
+    NPC_ANDOROV                 = 15471,
+    NPC_KALDOREI_ELITE          = 15473
 };
 
 enum GameObjects
