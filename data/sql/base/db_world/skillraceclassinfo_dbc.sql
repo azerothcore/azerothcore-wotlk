@@ -15,14 +15,14 @@
 -- Dumpar struktur för tabell acore_world.skillraceclassinfo_dbc
 DROP TABLE IF EXISTS `skillraceclassinfo_dbc`;
 CREATE TABLE IF NOT EXISTS `skillraceclassinfo_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `SkillID` INT NOT NULL DEFAULT 0,
-  `RaceMask` INT NOT NULL DEFAULT 0,
-  `ClassMask` INT NOT NULL DEFAULT 0,
-  `Flags` INT NOT NULL DEFAULT 0,
-  `MinLevel` INT NOT NULL DEFAULT 0,
-  `SkillTierID` INT NOT NULL DEFAULT 0,
-  `SkillCostIndex` INT NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `SkillID` int NOT NULL DEFAULT '0',
+  `RaceMask` int NOT NULL DEFAULT '0',
+  `ClassMask` int NOT NULL DEFAULT '0',
+  `Flags` int NOT NULL DEFAULT '0',
+  `MinLevel` int NOT NULL DEFAULT '0',
+  `SkillTierID` int NOT NULL DEFAULT '0',
+  `SkillCostIndex` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

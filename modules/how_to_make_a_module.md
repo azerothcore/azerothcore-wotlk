@@ -18,3 +18,5 @@ NOTE: You can also clone our skeleton-module manually, clean the history, and co
 3) Share it with the community!
 
 Join us on our discord, share it there, then we might fork it officially and it will appear in the module catalogue.
+
+Note: For Advanced CMake implementations a <ModuleName>.cmake file in your module folder will be included in the config of Modules if it exists. See: ./CMakeList.txt around line #290

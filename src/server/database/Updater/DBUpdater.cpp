@@ -441,7 +441,7 @@ void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& hos
                              std::string const& password, std::string const& port_or_socket, std::string const& database, std::string const& ssl, Path const& path)
 {
     std::vector<std::string> args;
-    args.reserve(7);
+    args.reserve(9);
 
     // CLI Client connection info
     args.emplace_back("-h" + host);
@@ -491,13 +491,17 @@ void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& hos
 
 #endif
 
+    // Execute sql file
+    args.emplace_back("-e");
+    args.emplace_back(Acore::StringFormat("BEGIN; SOURCE %s; COMMIT;", path.generic_string().c_str()));
+
     // Database
     if (!database.empty())
         args.emplace_back(database);
 
     // Invokes a mysql process which doesn't leak credentials to logs
     int const ret = Acore::StartProcess(DBUpdaterUtil::GetCorrectedMySQLExecutable(), args,
-        "sql.updates", path.generic_string(), true);
+        "sql.updates", "", true);
 
     if (ret != EXIT_SUCCESS)
     {

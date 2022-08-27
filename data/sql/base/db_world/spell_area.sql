@@ -15,16 +15,16 @@
 -- Dumpar struktur för tabell acore_world.spell_area
 DROP TABLE IF EXISTS `spell_area`;
 CREATE TABLE IF NOT EXISTS `spell_area` (
-  `spell` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `area` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `quest_start` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `quest_end` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `aura_spell` MEDIUMINT NOT NULL DEFAULT 0,
-  `racemask` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `gender` TINYINT unsigned NOT NULL DEFAULT '2',
-  `autocast` TINYINT unsigned NOT NULL DEFAULT 0,
-  `quest_start_status` INT NOT NULL DEFAULT '64',
-  `quest_end_status` INT NOT NULL DEFAULT '11',
+  `spell` mediumint unsigned NOT NULL DEFAULT '0',
+  `area` mediumint unsigned NOT NULL DEFAULT '0',
+  `quest_start` mediumint unsigned NOT NULL DEFAULT '0',
+  `quest_end` mediumint unsigned NOT NULL DEFAULT '0',
+  `aura_spell` mediumint NOT NULL DEFAULT '0',
+  `racemask` mediumint unsigned NOT NULL DEFAULT '0',
+  `gender` tinyint unsigned NOT NULL DEFAULT '2',
+  `autocast` tinyint unsigned NOT NULL DEFAULT '0',
+  `quest_start_status` int NOT NULL DEFAULT '64',
+  `quest_end_status` int NOT NULL DEFAULT '11',
   PRIMARY KEY (`spell`,`area`,`quest_start`,`aura_spell`,`racemask`,`gender`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

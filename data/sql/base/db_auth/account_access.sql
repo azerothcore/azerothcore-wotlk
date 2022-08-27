@@ -13,12 +13,11 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 -- Dumpar struktur för tabell acore_auth.account_access
-DROP TABLE IF EXISTS `account_access`;
 CREATE TABLE IF NOT EXISTS `account_access` (
-  `id` INT unsigned NOT NULL,
-  `gmlevel` TINYINT unsigned NOT NULL,
-  `RealmID` INT NOT NULL DEFAULT '-1',
-  `comment` VARCHAR(255) DEFAULT '',
+  `id` int unsigned NOT NULL,
+  `gmlevel` tinyint unsigned NOT NULL,
+  `RealmID` int NOT NULL DEFAULT '-1',
+  `comment` varchar(255) DEFAULT '',
   PRIMARY KEY (`id`,`RealmID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

@@ -15,12 +15,12 @@
 -- Dumpar struktur för tabell acore_world.points_of_interest
 DROP TABLE IF EXISTS `points_of_interest`;
 CREATE TABLE IF NOT EXISTS `points_of_interest` (
-  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `PositionX` float NOT NULL DEFAULT 0,
-  `PositionY` float NOT NULL DEFAULT 0,
-  `Icon` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `Flags` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `Importance` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `ID` mediumint unsigned NOT NULL DEFAULT '0',
+  `PositionX` float NOT NULL DEFAULT '0',
+  `PositionY` float NOT NULL DEFAULT '0',
+  `Icon` mediumint unsigned NOT NULL DEFAULT '0',
+  `Flags` mediumint unsigned NOT NULL DEFAULT '0',
+  `Importance` mediumint unsigned NOT NULL DEFAULT '0',
   `Name` text NOT NULL,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;

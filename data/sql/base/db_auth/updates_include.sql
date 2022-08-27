@@ -13,9 +13,8 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 -- Dumpar struktur för tabell acore_auth.updates_include
-DROP TABLE IF EXISTS `updates_include`;
 CREATE TABLE IF NOT EXISTS `updates_include` (
-  `path` VARCHAR(200) NOT NULL COMMENT 'directory to include. $ means relative to the source directory.',
+  `path` varchar(200) NOT NULL COMMENT 'directory to include. $ means relative to the source directory.',
   `state` enum('RELEASED','ARCHIVED','CUSTOM') NOT NULL DEFAULT 'RELEASED' COMMENT 'defines if the directory contains released or archived updates.',
   PRIMARY KEY (`path`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='List of directories where we want to include sql updates.';

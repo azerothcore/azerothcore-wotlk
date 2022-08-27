@@ -15,9 +15,9 @@
 -- Dumpar struktur för tabell acore_world.gameobject_addon
 DROP TABLE IF EXISTS `gameobject_addon`;
 CREATE TABLE IF NOT EXISTS `gameobject_addon` (
-  `guid` INT unsigned NOT NULL DEFAULT 0,
-  `invisibilityType` TINYINT unsigned NOT NULL DEFAULT 0,
-  `invisibilityValue` INT unsigned NOT NULL DEFAULT 0,
+  `guid` int unsigned NOT NULL DEFAULT '0',
+  `invisibilityType` tinyint unsigned NOT NULL DEFAULT '0',
+  `invisibilityValue` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

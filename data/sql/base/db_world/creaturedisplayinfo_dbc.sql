@@ -15,22 +15,22 @@
 -- Dumpar struktur för tabell acore_world.creaturedisplayinfo_dbc
 DROP TABLE IF EXISTS `creaturedisplayinfo_dbc`;
 CREATE TABLE IF NOT EXISTS `creaturedisplayinfo_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `ModelID` INT NOT NULL DEFAULT 0,
-  `SoundID` INT NOT NULL DEFAULT 0,
-  `ExtendedDisplayInfoID` INT NOT NULL DEFAULT 0,
-  `CreatureModelScale` float NOT NULL DEFAULT 0,
-  `CreatureModelAlpha` INT NOT NULL DEFAULT 0,
-  `TextureVariation_1` VARCHAR(100) DEFAULT NULL,
-  `TextureVariation_2` VARCHAR(100) DEFAULT NULL,
-  `TextureVariation_3` VARCHAR(100) DEFAULT NULL,
-  `PortraitTextureName` VARCHAR(100) DEFAULT NULL,
-  `BloodLevel` INT NOT NULL DEFAULT 0,
-  `BloodID` INT NOT NULL DEFAULT 0,
-  `NPCSoundID` INT NOT NULL DEFAULT 0,
-  `ParticleColorID` INT NOT NULL DEFAULT 0,
-  `CreatureGeosetData` INT NOT NULL DEFAULT 0,
-  `ObjectEffectPackageID` INT NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `ModelID` int NOT NULL DEFAULT '0',
+  `SoundID` int NOT NULL DEFAULT '0',
+  `ExtendedDisplayInfoID` int NOT NULL DEFAULT '0',
+  `CreatureModelScale` float NOT NULL DEFAULT '0',
+  `CreatureModelAlpha` int NOT NULL DEFAULT '0',
+  `TextureVariation_1` varchar(100) DEFAULT NULL,
+  `TextureVariation_2` varchar(100) DEFAULT NULL,
+  `TextureVariation_3` varchar(100) DEFAULT NULL,
+  `PortraitTextureName` varchar(100) DEFAULT NULL,
+  `BloodLevel` int NOT NULL DEFAULT '0',
+  `BloodID` int NOT NULL DEFAULT '0',
+  `NPCSoundID` int NOT NULL DEFAULT '0',
+  `ParticleColorID` int NOT NULL DEFAULT '0',
+  `CreatureGeosetData` int NOT NULL DEFAULT '0',
+  `ObjectEffectPackageID` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

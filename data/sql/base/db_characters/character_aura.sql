@@ -15,22 +15,22 @@
 -- Dumpar struktur för tabell acore_characters.character_aura
 DROP TABLE IF EXISTS `character_aura`;
 CREATE TABLE IF NOT EXISTS `character_aura` (
-  `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
-  `casterGuid` BIGINT unsigned NOT NULL DEFAULT 0 COMMENT 'Full Global Unique Identifier',
-  `itemGuid` BIGINT unsigned NOT NULL DEFAULT 0,
-  `spell` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `effectMask` TINYINT unsigned NOT NULL DEFAULT 0,
-  `recalculateMask` TINYINT unsigned NOT NULL DEFAULT 0,
-  `stackCount` TINYINT unsigned NOT NULL DEFAULT 1,
-  `amount0` INT NOT NULL DEFAULT 0,
-  `amount1` INT NOT NULL DEFAULT 0,
-  `amount2` INT NOT NULL DEFAULT 0,
-  `base_amount0` INT NOT NULL DEFAULT 0,
-  `base_amount1` INT NOT NULL DEFAULT 0,
-  `base_amount2` INT NOT NULL DEFAULT 0,
-  `maxDuration` INT NOT NULL DEFAULT 0,
-  `remainTime` INT NOT NULL DEFAULT 0,
-  `remainCharges` TINYINT unsigned NOT NULL DEFAULT 0,
+  `guid` int unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
+  `casterGuid` bigint unsigned NOT NULL DEFAULT '0' COMMENT 'Full Global Unique Identifier',
+  `itemGuid` bigint unsigned NOT NULL DEFAULT '0',
+  `spell` mediumint unsigned NOT NULL DEFAULT '0',
+  `effectMask` tinyint unsigned NOT NULL DEFAULT '0',
+  `recalculateMask` tinyint unsigned NOT NULL DEFAULT '0',
+  `stackCount` tinyint unsigned NOT NULL DEFAULT '1',
+  `amount0` int NOT NULL DEFAULT '0',
+  `amount1` int NOT NULL DEFAULT '0',
+  `amount2` int NOT NULL DEFAULT '0',
+  `base_amount0` int NOT NULL DEFAULT '0',
+  `base_amount1` int NOT NULL DEFAULT '0',
+  `base_amount2` int NOT NULL DEFAULT '0',
+  `maxDuration` int NOT NULL DEFAULT '0',
+  `remainTime` int NOT NULL DEFAULT '0',
+  `remainCharges` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`casterGuid`,`itemGuid`,`spell`,`effectMask`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
 

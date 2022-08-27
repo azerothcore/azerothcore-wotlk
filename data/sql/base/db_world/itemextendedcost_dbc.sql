@@ -15,22 +15,22 @@
 -- Dumpar struktur för tabell acore_world.itemextendedcost_dbc
 DROP TABLE IF EXISTS `itemextendedcost_dbc`;
 CREATE TABLE IF NOT EXISTS `itemextendedcost_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `HonorPoints` INT NOT NULL DEFAULT 0,
-  `ArenaPoints` INT NOT NULL DEFAULT 0,
-  `ArenaBracket` INT NOT NULL DEFAULT 0,
-  `ItemID_1` INT NOT NULL DEFAULT 0,
-  `ItemID_2` INT NOT NULL DEFAULT 0,
-  `ItemID_3` INT NOT NULL DEFAULT 0,
-  `ItemID_4` INT NOT NULL DEFAULT 0,
-  `ItemID_5` INT NOT NULL DEFAULT 0,
-  `ItemCount_1` INT NOT NULL DEFAULT 0,
-  `ItemCount_2` INT NOT NULL DEFAULT 0,
-  `ItemCount_3` INT NOT NULL DEFAULT 0,
-  `ItemCount_4` INT NOT NULL DEFAULT 0,
-  `ItemCount_5` INT NOT NULL DEFAULT 0,
-  `RequiredArenaRating` INT NOT NULL DEFAULT 0,
-  `ItemPurchaseGroup` INT NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `HonorPoints` int NOT NULL DEFAULT '0',
+  `ArenaPoints` int NOT NULL DEFAULT '0',
+  `ArenaBracket` int NOT NULL DEFAULT '0',
+  `ItemID_1` int NOT NULL DEFAULT '0',
+  `ItemID_2` int NOT NULL DEFAULT '0',
+  `ItemID_3` int NOT NULL DEFAULT '0',
+  `ItemID_4` int NOT NULL DEFAULT '0',
+  `ItemID_5` int NOT NULL DEFAULT '0',
+  `ItemCount_1` int NOT NULL DEFAULT '0',
+  `ItemCount_2` int NOT NULL DEFAULT '0',
+  `ItemCount_3` int NOT NULL DEFAULT '0',
+  `ItemCount_4` int NOT NULL DEFAULT '0',
+  `ItemCount_5` int NOT NULL DEFAULT '0',
+  `RequiredArenaRating` int NOT NULL DEFAULT '0',
+  `ItemPurchaseGroup` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
