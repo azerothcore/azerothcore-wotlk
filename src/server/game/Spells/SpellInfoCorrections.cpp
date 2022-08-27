@@ -4367,6 +4367,42 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
     });
 
+    // Boundary Warning
+    ApplySpellFix({ 51259 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->Effects[EFFECT_1].DieSides = 1;
+        spellInfo->Effects[EFFECT_1].BasePoints = 122;
+        spellInfo->Effects[EFFECT_1].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
+        spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE;
+        spellInfo->Effects[EFFECT_1].Amplitude = 15500;
+        spellInfo->Effects[EFFECT_1].TriggerSpell = 50068;
+    });
+
+    // Boundary Warning
+    ApplySpellFix({ 51272 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->Effects[EFFECT_1].DieSides = 1;
+        spellInfo->Effects[EFFECT_1].BasePoints = 122;
+        spellInfo->Effects[EFFECT_1].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
+        spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE;
+        spellInfo->Effects[EFFECT_1].Amplitude = 10500;
+        spellInfo->Effects[EFFECT_1].TriggerSpell = 50068;
+    });
+
+    // Boundary Warning
+    ApplySpellFix({ 56966 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_2].Effect = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->Effects[EFFECT_2].DieSides = 1;
+        spellInfo->Effects[EFFECT_2].BasePoints = 122;
+        spellInfo->Effects[EFFECT_2].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
+        spellInfo->Effects[EFFECT_2].ApplyAuraName = SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE;
+        spellInfo->Effects[EFFECT_2].Amplitude = 15500;
+        spellInfo->Effects[EFFECT_2].TriggerSpell = 50068;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
