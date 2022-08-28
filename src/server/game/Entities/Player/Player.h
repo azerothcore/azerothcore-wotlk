@@ -69,7 +69,7 @@ typedef std::deque<Mail*> PlayerMails;
 typedef void(*bgZoneRef)(Battleground*, WorldPacket&);
 
 #define PLAYER_MAX_SKILLS           127
-#define PLAYER_MAX_DAILY_QUESTS     30
+#define PLAYER_MAX_DAILY_QUESTS     25
 #define PLAYER_EXPLORED_ZONES_SIZE  128
 
 // corpse reclaim times

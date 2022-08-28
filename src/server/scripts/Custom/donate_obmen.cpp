@@ -308,12 +308,6 @@ public:
             case 444:
                 CloseGossipMenuFor(player);
                 break;
-
-                if (sender == GOSSIP_SENDER_MAIN)
-                {
-                    player->PlayerTalkClass->ClearMenus();
-                    switch (uiAction)
-                    {
                     case 1:
                         if (player->HasItemCount(500000, 1, false))
                         {
@@ -962,9 +956,6 @@ public:
                     return false;
                 }
             }
-        }
-        return true;
-    } 
 };
 
 void AddSC_Exchanger_NPC()
