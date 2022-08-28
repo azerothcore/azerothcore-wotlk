@@ -214,7 +214,7 @@ void MailDraft::SendMailTo(CharacterDatabaseTransaction trans, MailReceiver cons
     // default case: expire time if COD 3 days, if no COD 30 days (or 90 days if sender is a game master)
     else if (m_COD)
         expire_delay = 3 * DAY;
-    else if (custom_expiration > 0 )
+    else if (custom_expiration > 0)
         expire_delay = custom_expiration * DAY;
     else
     {
