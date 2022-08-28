@@ -60,8 +60,23 @@ void TotemAI::UpdateAI(uint32 /*diff*/)
     if (me->ToTotem()->GetTotemType() != TOTEM_ACTIVE)
         return;
 
-    if (!me->IsAlive() || me->IsNonMeleeSpellCast(false))
+    if (!me->IsAlive())
+    {
         return;
+    }
+
+    if (me->IsNonMeleeSpellCast(false))
+    {
+        if (Unit* victim = ObjectAccessor::GetUnit(*me, i_victimGuid))
+        {
+            if (!victim || !victim->IsAlive())
+            {
+                me->InterruptNonMeleeSpells(false);
+            }
+        }
+
+        return;
+    }
 
     // Search spell
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(me->ToTotem()->GetSpell());
