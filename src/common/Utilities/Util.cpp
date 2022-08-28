@@ -29,6 +29,7 @@
 #include <sstream>
 #include <string>
 #include <utf8.h>
+#include <Timer.h>
 
 void stripLineInvisibleChars(std::string& str)
 {
@@ -104,6 +105,19 @@ std::string secsToTimeString(uint64 timeInSecs, bool shortText)
     }
 
     return str;
+}
+
+std::string TimeToTimestampStr(time_t t)
+{
+    tm aTm;
+    localtime_r(&t, &aTm);
+    //       YYYY   year
+    //       MM     month (2 digits 01-12)
+    //       DD     day (2 digits 01-31)
+    //       HH     hour (2 digits 00-23)
+    //       MM     minutes (2 digits 00-59)
+    //       SS     seconds (2 digits 00-59)
+    return Acore::StringFormat("%04d-%02d-%02d_%02d-%02d-%02d", aTm.tm_year + 1900, aTm.tm_mon + 1, aTm.tm_mday, aTm.tm_hour, aTm.tm_min, aTm.tm_sec);
 }
 
 Optional<int32> MoneyStringToMoney(std::string_view moneyString)

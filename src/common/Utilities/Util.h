@@ -46,6 +46,7 @@ AC_COMMON_API Optional<int32> MoneyStringToMoney(std::string_view moneyString);
 
 std::string secsToTimeString(uint64 timeInSecs, bool shortText = false);
 uint32 TimeStringToSecs(const std::string& timestring);
+std::string TimeToTimestampStr(time_t t);
 
 inline void ApplyPercentModFloatVar(float& var, float val, bool apply)
 {
