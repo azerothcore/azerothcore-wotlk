@@ -1,6 +1,6 @@
 --
-UPDATE `creature_template_addon` SET `bytes1` = 8 WHERE `entry` IN (15275, 15276);
-UPDATE `creature_template_addon` SET `bytes1` = 54432 WHERE (`entry` = 15963);
+UPDATE `creature_template_addon` SET `bytes1` = 54432 WHERE `entry` = 15963;
+UPDATE `creature_template_addon` SET `auras` = '18943' WHERE `entry` = 15275;
 
 DELETE FROM `areatrigger_scripts` WHERE `ScriptName` = 'at_twin_emperors';
 INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES
@@ -20,3 +20,5 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 UPDATE `creature_template_movement` SET `Ground` = 2, `Flight` = 1 WHERE `CreatureId` = 15963;
 
 UPDATE `creature_template` SET `unit_flags` = `unit_flags`|512|256 WHERE `entry` = 15963;
+UPDATE `creature_template` SET `spell_school_immune_mask` = `spell_school_immune_mask`|1 WHERE `entry` = 15276; -- Vek'lor immunity to phys
+UPDATE `creature_template` SET `spell_school_immune_mask` = `spell_school_immune_mask`|4|8|16|32|64 WHERE `entry` = 15275; -- Vek'nilash immunity to everything but holy and phys

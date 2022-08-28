@@ -23,6 +23,7 @@
 
 enum Spells
 {
+    // Both
     SPELL_HEAL_BROTHER            = 7393,
     SPELL_TWIN_TELEPORT           = 800,
     SPELL_TWIN_TELEPORT_VISUAL    = 26638,
@@ -34,11 +35,14 @@ enum Spells
     SPELL_SHADOW_BOLT             = 26006,
     SPELL_BLIZZARD                = 26607,
     SPELL_ARCANEBURST             = 568,
+    // Vek'lor
+    // Vek'nilash
 };
 
 enum Actions
 {
-    ACTION_START_INTRO            = 0
+    ACTION_START_INTRO            = 0,
+    ACTION_CANCEL_INTRO           = 1,
 };
 
 enum Say
@@ -50,12 +54,20 @@ enum Say
     EMOTE_MASTERS_EYE_AT          = 0
 };
 
+enum Misc
+{
+    GROUP_INTRO = 0
+};
+
 constexpr float veklorOrientationIntro = 2.241519f;
 constexpr float veknilashOrientationIntro = 1.144451f;
 
 struct boss_twinemperorsAI : public BossAI
 {
-    boss_twinemperorsAI(Creature* creature): BossAI(creature, DATA_TWIN_EMPERORS), _introDone(false) { }
+    boss_twinemperorsAI(Creature* creature): BossAI(creature, DATA_TWIN_EMPERORS), _introDone(false)
+    {
+        me->SetStandState(UNIT_STAND_STATE_KNEEL);
+    }
 
     Creature* GetTwin()
     {
@@ -64,6 +76,13 @@ struct boss_twinemperorsAI : public BossAI
 
     void DoAction(int32 action) override
     {
+        if (action == ACTION_CANCEL_INTRO)
+        {
+            _introDone = true;
+            _scheduler.CancelGroup(GROUP_INTRO);
+            return;
+        }
+
         if (action != ACTION_START_INTRO)
             return;
 
@@ -76,55 +95,71 @@ struct boss_twinemperorsAI : public BossAI
         if (IAmVeklor())
         {
             _scheduler
-                .Schedule(12s, [this](TaskContext /*context*/)
+                .Schedule(12s, GROUP_INTRO, [this](TaskContext /*context*/)
                 {
                     Talk(SAY_INTRO_0);
                 })
-                .Schedule(20s, [this](TaskContext /*context*/)
+                .Schedule(20s, GROUP_INTRO, [this](TaskContext /*context*/)
                 {
                     Talk(SAY_INTRO_1);
                 })
-                .Schedule(28s, [this](TaskContext /*context*/)
+                .Schedule(28s, GROUP_INTRO, [this](TaskContext /*context*/)
                 {
                     me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
                 })
-                .Schedule(30s, [this](TaskContext /*context*/)
+                .Schedule(30s, GROUP_INTRO, [this](TaskContext /*context*/)
                 {
                     me->SetFacingTo(veklorOrientationIntro);
                     Talk(SAY_INTRO_2);
-                    _introDone = true;
                 })
-                .Schedule(33s, [this](TaskContext /*context*/)
+                .Schedule(33s, GROUP_INTRO, [this](TaskContext /*context*/)
                 {
                     me->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
+                    _introDone = true;
                 });
         }
         else
         {
             _scheduler
-                .Schedule(17s, [this](TaskContext /*context*/)
+                .Schedule(17s, GROUP_INTRO, [this](TaskContext /*context*/)
                 {
                     Talk(SAY_INTRO_0);
                 })
-                .Schedule(23s, [this](TaskContext /*context*/)
+                .Schedule(23s, GROUP_INTRO, [this](TaskContext /*context*/)
                 {
                     Talk(SAY_INTRO_1);
                 })
-                .Schedule(28s, [this](TaskContext /*context*/)
+                .Schedule(28s, GROUP_INTRO, [this](TaskContext /*context*/)
                 {
                     me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
                 })
-                .Schedule(32s, [this](TaskContext /*context*/)
+                .Schedule(32s, GROUP_INTRO, [this](TaskContext /*context*/)
                 {
                     me->SetFacingTo(veknilashOrientationIntro);
                     Talk(SAY_INTRO_2);
-                    _introDone = true;
                 })
-                .Schedule(33s, [this](TaskContext /*context*/)
+                .Schedule(33s, GROUP_INTRO, [this](TaskContext /*context*/)
                 {
                     me->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
+                    _introDone = true;
                 });
         }
+    }
+
+    void EnterCombat(Unit* who) override
+    {
+        if (!_introDone)
+        {
+            DoAction(ACTION_CANCEL_INTRO);
+            if (Creature* twin = GetTwin())
+                twin->AI()->DoAction(ACTION_CANCEL_INTRO);
+        }
+
+        if (Creature* twin = GetTwin())
+            if (!twin->IsInCombat())
+                twin->AI()->EnterCombat(who);
+
+        BossAI::EnterCombat(who);
     }
 
     void UpdateAI(uint32 diff) override
