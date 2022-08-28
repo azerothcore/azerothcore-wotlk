@@ -66,9 +66,9 @@ struct boss_moam : public BossAI
     {
         BossAI::EnterCombat(who);
         Talk(EMOTE_AGGRO);
-        events.ScheduleEvent(EVENT_STONE_PHASE, 90000);
-        events.ScheduleEvent(EVENT_SPELL_TRAMPLE, 9000);
-        events.ScheduleEvent(EVENT_SPELL_DRAIN_MANA, 3000);
+        events.ScheduleEvent(EVENT_STONE_PHASE, 90s);
+        events.ScheduleEvent(EVENT_SPELL_TRAMPLE, 9s);
+        events.ScheduleEvent(EVENT_SPELL_DRAIN_MANA, 3s);
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -113,20 +113,20 @@ struct boss_moam : public BossAI
                     DoCastAOE(SPELL_SUMMON_MANA_FIENDS);
                     DoCastSelf(SPELL_ENERGIZE);
                     events.CancelEvent(EVENT_SPELL_DRAIN_MANA);
-                    events.ScheduleEvent(EVENT_STONE_PHASE_END, 90000);
+                    events.ScheduleEvent(EVENT_STONE_PHASE_END, 90s);
                     break;
                 case EVENT_STONE_PHASE_END:
                     me->RemoveAurasDueToSpell(SPELL_ENERGIZE);
-                    events.ScheduleEvent(EVENT_SPELL_DRAIN_MANA, urand(2000, 6000));
-                    events.ScheduleEvent(EVENT_STONE_PHASE, 90000);
+                    events.ScheduleEvent(EVENT_SPELL_DRAIN_MANA, 2s, 6s);
+                    events.ScheduleEvent(EVENT_STONE_PHASE, 90s);
                     break;
                 case EVENT_SPELL_DRAIN_MANA:
                     DoCastAOE(SPELL_DRAIN_MANA_SERVERSIDE);
-                    events.ScheduleEvent(EVENT_SPELL_DRAIN_MANA, urand(2000, 6000));
+                    events.ScheduleEvent(EVENT_SPELL_DRAIN_MANA, 2s, 6s);
                     break;
                 case EVENT_SPELL_TRAMPLE:
                     DoCastAOE(SPELL_TRAMPLE);
-                    events.ScheduleEvent(EVENT_SPELL_TRAMPLE, 15000);
+                    events.ScheduleEvent(EVENT_SPELL_TRAMPLE, 15s);
                     break;
                 default:
                     break;

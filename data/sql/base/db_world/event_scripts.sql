@@ -15,19 +15,19 @@
 -- Dumpar struktur för tabell acore_world.event_scripts
 DROP TABLE IF EXISTS `event_scripts`;
 CREATE TABLE IF NOT EXISTS `event_scripts` (
-  `id` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `delay` INT unsigned NOT NULL DEFAULT 0,
-  `command` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `datalong` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `datalong2` INT unsigned NOT NULL DEFAULT 0,
-  `dataint` INT NOT NULL DEFAULT 0,
-  `x` float NOT NULL DEFAULT 0,
-  `y` float NOT NULL DEFAULT 0,
-  `z` float NOT NULL DEFAULT 0,
-  `o` float NOT NULL DEFAULT 0
+  `id` mediumint unsigned NOT NULL DEFAULT '0',
+  `delay` int unsigned NOT NULL DEFAULT '0',
+  `command` mediumint unsigned NOT NULL DEFAULT '0',
+  `datalong` mediumint unsigned NOT NULL DEFAULT '0',
+  `datalong2` int unsigned NOT NULL DEFAULT '0',
+  `dataint` int NOT NULL DEFAULT '0',
+  `x` float NOT NULL DEFAULT '0',
+  `y` float NOT NULL DEFAULT '0',
+  `z` float NOT NULL DEFAULT '0',
+  `o` float NOT NULL DEFAULT '0'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Dumpar data för tabell acore_world.event_scripts: 453 rows
+-- Dumpar data för tabell acore_world.event_scripts: 452 rows
 DELETE FROM `event_scripts`;
 /*!40000 ALTER TABLE `event_scripts` DISABLE KEYS */;
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `dataint`, `x`, `y`, `z`, `o`) VALUES
@@ -168,7 +168,6 @@ INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, 
 	(8420, 5, 10, 14482, 1000000, 0, -14.66, 817.02, -29.53, 0),
 	(8420, 5, 10, 14482, 1000000, 0, -15.42, 812.75, -29.53, 0),
 	(8420, 0, 10, 14500, 60000, 0, -38.8, 812.69, -29.53, 0),
-	(9104, 0, 10, 15114, 9000000, 0, -11688.5, -1737.74, 2.6789, 3.9),
 	(9208, 0, 10, 14862, 9000000, 0, -7276.38, 852.34, 3.64, 0.5),
 	(17609, 0, 7, 12028, 0, 0, 0, 0, 0, 0),
 	(9542, 0, 10, 15571, 9000000, 0, 3483, -6692.79, -2.43, 0.8),

@@ -15,10 +15,10 @@
 -- Dumpar struktur för tabell acore_characters.pvpstats_battlegrounds
 DROP TABLE IF EXISTS `pvpstats_battlegrounds`;
 CREATE TABLE IF NOT EXISTS `pvpstats_battlegrounds` (
-  `id` BIGINT unsigned NOT NULL AUTO_INCREMENT,
-  `winner_faction` TINYINT NOT NULL,
-  `bracket_id` TINYINT unsigned NOT NULL,
-  `type` TINYINT unsigned NOT NULL,
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `winner_faction` tinyint NOT NULL,
+  `bracket_id` tinyint unsigned NOT NULL,
+  `type` tinyint unsigned NOT NULL,
   `date` datetime NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

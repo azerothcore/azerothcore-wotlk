@@ -606,6 +606,8 @@ public:
 
     Spell** m_selfContainer;                            // pointer to our spell container (if applicable)
 
+    std::string GetDebugInfo() const;
+
     //Spell data
     SpellSchoolMask m_spellSchoolMask;                  // Spell school (can be overwrite for some spells (wand shoot for example)
     WeaponAttackType m_attackType;                      // For weapon based attack

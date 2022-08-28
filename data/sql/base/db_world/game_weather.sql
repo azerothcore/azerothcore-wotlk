@@ -15,19 +15,19 @@
 -- Dumpar struktur för tabell acore_world.game_weather
 DROP TABLE IF EXISTS `game_weather`;
 CREATE TABLE IF NOT EXISTS `game_weather` (
-  `zone` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `spring_rain_chance` TINYINT unsigned NOT NULL DEFAULT '25',
-  `spring_snow_chance` TINYINT unsigned NOT NULL DEFAULT '25',
-  `spring_storm_chance` TINYINT unsigned NOT NULL DEFAULT '25',
-  `summer_rain_chance` TINYINT unsigned NOT NULL DEFAULT '25',
-  `summer_snow_chance` TINYINT unsigned NOT NULL DEFAULT '25',
-  `summer_storm_chance` TINYINT unsigned NOT NULL DEFAULT '25',
-  `fall_rain_chance` TINYINT unsigned NOT NULL DEFAULT '25',
-  `fall_snow_chance` TINYINT unsigned NOT NULL DEFAULT '25',
-  `fall_storm_chance` TINYINT unsigned NOT NULL DEFAULT '25',
-  `winter_rain_chance` TINYINT unsigned NOT NULL DEFAULT '25',
-  `winter_snow_chance` TINYINT unsigned NOT NULL DEFAULT '25',
-  `winter_storm_chance` TINYINT unsigned NOT NULL DEFAULT '25',
+  `zone` mediumint unsigned NOT NULL DEFAULT '0',
+  `spring_rain_chance` tinyint unsigned NOT NULL DEFAULT '25',
+  `spring_snow_chance` tinyint unsigned NOT NULL DEFAULT '25',
+  `spring_storm_chance` tinyint unsigned NOT NULL DEFAULT '25',
+  `summer_rain_chance` tinyint unsigned NOT NULL DEFAULT '25',
+  `summer_snow_chance` tinyint unsigned NOT NULL DEFAULT '25',
+  `summer_storm_chance` tinyint unsigned NOT NULL DEFAULT '25',
+  `fall_rain_chance` tinyint unsigned NOT NULL DEFAULT '25',
+  `fall_snow_chance` tinyint unsigned NOT NULL DEFAULT '25',
+  `fall_storm_chance` tinyint unsigned NOT NULL DEFAULT '25',
+  `winter_rain_chance` tinyint unsigned NOT NULL DEFAULT '25',
+  `winter_snow_chance` tinyint unsigned NOT NULL DEFAULT '25',
+  `winter_storm_chance` tinyint unsigned NOT NULL DEFAULT '25',
   `ScriptName` char(64) NOT NULL DEFAULT '',
   PRIMARY KEY (`zone`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Weather System';

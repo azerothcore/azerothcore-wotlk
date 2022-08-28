@@ -15,10 +15,10 @@
 -- Dumpar struktur för tabell acore_characters.character_inventory
 DROP TABLE IF EXISTS `character_inventory`;
 CREATE TABLE IF NOT EXISTS `character_inventory` (
-  `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
-  `bag` INT unsigned NOT NULL DEFAULT 0,
-  `slot` TINYINT unsigned NOT NULL DEFAULT 0,
-  `item` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Item Global Unique Identifier',
+  `guid` int unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
+  `bag` int unsigned NOT NULL DEFAULT '0',
+  `slot` tinyint unsigned NOT NULL DEFAULT '0',
+  `item` int unsigned NOT NULL DEFAULT '0' COMMENT 'Item Global Unique Identifier',
   PRIMARY KEY (`item`),
   UNIQUE KEY `guid` (`guid`,`bag`,`slot`),
   KEY `idx_guid` (`guid`)

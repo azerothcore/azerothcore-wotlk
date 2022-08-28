@@ -15,17 +15,17 @@
 -- Dumpar struktur för tabell acore_world.questxp_dbc
 DROP TABLE IF EXISTS `questxp_dbc`;
 CREATE TABLE IF NOT EXISTS `questxp_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `Difficulty_1` INT NOT NULL DEFAULT 0,
-  `Difficulty_2` INT NOT NULL DEFAULT 0,
-  `Difficulty_3` INT NOT NULL DEFAULT 0,
-  `Difficulty_4` INT NOT NULL DEFAULT 0,
-  `Difficulty_5` INT NOT NULL DEFAULT 0,
-  `Difficulty_6` INT NOT NULL DEFAULT 0,
-  `Difficulty_7` INT NOT NULL DEFAULT 0,
-  `Difficulty_8` INT NOT NULL DEFAULT 0,
-  `Difficulty_9` INT NOT NULL DEFAULT 0,
-  `Difficulty_10` INT NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `Difficulty_1` int NOT NULL DEFAULT '0',
+  `Difficulty_2` int NOT NULL DEFAULT '0',
+  `Difficulty_3` int NOT NULL DEFAULT '0',
+  `Difficulty_4` int NOT NULL DEFAULT '0',
+  `Difficulty_5` int NOT NULL DEFAULT '0',
+  `Difficulty_6` int NOT NULL DEFAULT '0',
+  `Difficulty_7` int NOT NULL DEFAULT '0',
+  `Difficulty_8` int NOT NULL DEFAULT '0',
+  `Difficulty_9` int NOT NULL DEFAULT '0',
+  `Difficulty_10` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

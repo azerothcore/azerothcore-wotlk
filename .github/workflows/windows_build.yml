@@ -4,7 +4,7 @@ on:
     branches:
       - 'master'
   pull_request:
-    types: ['labeled', 'labeled', 'opened', 'synchronize', 'reopened']
+    types: ['labeled', 'opened', 'synchronize', 'reopened']
 
 concurrency:
   group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
@@ -24,7 +24,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Configure OS
-        run: choco install --no-progress openssl boost-msvc-14.3
+        run: |
+          choco install --no-progress openssl
+          choco install --no-progress boost-msvc-14.3 --version=1.79.0
       - name: Build
         shell: bash
         run: |

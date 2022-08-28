@@ -15,19 +15,19 @@
 -- Dumpar struktur för tabell acore_characters.log_arena_fights
 DROP TABLE IF EXISTS `log_arena_fights`;
 CREATE TABLE IF NOT EXISTS `log_arena_fights` (
-  `fight_id` INT unsigned NOT NULL,
+  `fight_id` int unsigned NOT NULL,
   `time` datetime NOT NULL,
-  `type` TINYINT unsigned NOT NULL,
-  `duration` INT unsigned NOT NULL,
-  `winner` INT unsigned NOT NULL,
-  `loser` INT unsigned NOT NULL,
-  `winner_tr` SMALLINT unsigned NOT NULL,
-  `winner_mmr` SMALLINT unsigned NOT NULL,
-  `winner_tr_change` SMALLINT NOT NULL,
-  `loser_tr` SMALLINT unsigned NOT NULL,
-  `loser_mmr` SMALLINT unsigned NOT NULL,
-  `loser_tr_change` SMALLINT NOT NULL,
-  `currOnline` INT unsigned NOT NULL,
+  `type` tinyint unsigned NOT NULL,
+  `duration` int unsigned NOT NULL,
+  `winner` int unsigned NOT NULL,
+  `loser` int unsigned NOT NULL,
+  `winner_tr` smallint unsigned NOT NULL,
+  `winner_mmr` smallint unsigned NOT NULL,
+  `winner_tr_change` smallint NOT NULL,
+  `loser_tr` smallint unsigned NOT NULL,
+  `loser_mmr` smallint unsigned NOT NULL,
+  `loser_tr_change` smallint NOT NULL,
+  `currOnline` int unsigned NOT NULL,
   PRIMARY KEY (`fight_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

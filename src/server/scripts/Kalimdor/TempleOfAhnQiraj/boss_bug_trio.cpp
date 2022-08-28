@@ -137,9 +137,9 @@ public:
         me->SetReactState(REACT_PASSIVE);
     }
 
-    void MovementInform(uint32 type, uint32 /*id*/) override
+    void MovementInform(uint32 type, uint32 id) override
     {
-        if (type != POINT_MOTION_TYPE)
+        if (type != POINT_MOTION_TYPE || id != POINT_CONSUME)
             return;
 
         me->GetMotionMaster()->MoveIdle();
@@ -153,6 +153,7 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
             if (Unit* target = me->GetVictim())
             {
+                me->GetMotionMaster()->Clear();
                 me->GetMotionMaster()->MoveChase(target);
                 AttackStart(target);
             }
@@ -195,7 +196,7 @@ public:
 
     void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
-        if (me->HealthBelowPctDamaged(1, damage) && instance->GetData(DATA_BUG_TRIO_DEATH) < 2 && who->GetGUID() != me->GetGUID())
+        if (me->HealthBelowPctDamaged(1, damage) && instance->GetData(DATA_BUG_TRIO_DEATH) < 2 && who->GetGUID() != me->GetGUID() && !dying)
         {
             damage = 0;
             if (isEating)
@@ -205,6 +206,7 @@ public:
             me->SetStandState(UNIT_STAND_STATE_DEAD);
             me->SetReactState(REACT_PASSIVE);
             me->SetControlled(true, UNIT_STATE_ROOT);
+            dying = true;
 
             DoFinalSpell();
 
@@ -236,7 +238,7 @@ public:
 
             _scheduler.Schedule(4s, [this](TaskContext /*context*/)
             {
-                if (!me->IsInEvadeMode())
+                if (!me->IsInEvadeMode() && instance->GetData(DATA_BUG_TRIO_DEATH) < 2)
                 {
                     DoCastSelf(SPELL_BLOODY_DEATH, true);
                     Talk(EMOTE_DEVOURED);
@@ -452,9 +454,9 @@ class spell_vem_vengeance : public SpellScript
 
 void AddSC_bug_trio()
 {
-    RegisterCreatureAI(boss_kri);
-    RegisterCreatureAI(boss_vem);
-    RegisterCreatureAI(boss_yauj);
+    RegisterTempleOfAhnQirajCreatureAI(boss_kri);
+    RegisterTempleOfAhnQirajCreatureAI(boss_vem);
+    RegisterTempleOfAhnQirajCreatureAI(boss_yauj);
     RegisterSpellScript(spell_vem_knockback);
     RegisterSpellScript(spell_vem_vengeance);
 }
