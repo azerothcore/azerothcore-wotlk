@@ -1,0 +1,24 @@
+To Do:
+- Nexus Loot update + Quests for T11
+- T12+++ and Weapons, other items
+- Gundrak loot update + Quests for T12
+- more dungeons, more quests
+- finish Ashzara Crater Level Area (Level 1- 80), Quests completely missing
+- implement full token system for Hinterland BG and Maybe Dungeons?
+- Levelareas above Level 80
+
+
+Done:
+- 255 Stats done (to be tested and improved, all stat increases taken from Level 79 - 80 or the highest available two levels, done also for ARAC modules of AC)
+- Teleporter NPCs done (to be updated with custom locations coming in the future)
+- WOTLK vendors done
+- profession trainers done
+- mount trainers down
+- HinterlandBG and AutoGroup Scripts ported from EuropeWoW (to be tested)
+- Hinterland BG gameobjects, bosses, NPCs (to be finished)
+- first custom bags implemented
+- HinterlandBG + Ashzara Crater graveyards added (also DBC changes needed)
+- 
+
+
+more ideas and topics to come......................
