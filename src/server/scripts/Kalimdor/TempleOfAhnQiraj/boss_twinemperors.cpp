@@ -24,19 +24,19 @@
 enum Spells
 {
     // Both
-    SPELL_HEAL_BROTHER            = 7393,
+    SPELL_BERSERK                 = 27680,
     SPELL_TWIN_TELEPORT           = 800,
     SPELL_TWIN_TELEPORT_VISUAL    = 26638,
     SPELL_EXPLODEBUG              = 804,
     SPELL_MUTATE_BUG              = 802,
-    SPELL_BERSERK                 = 26662,
-    SPELL_UPPERCUT                = 26007,
-    SPELL_UNBALANCING_STRIKE      = 26613,
+    // Vek'lor
     SPELL_SHADOW_BOLT             = 26006,
     SPELL_BLIZZARD                = 26607,
     SPELL_ARCANEBURST             = 568,
-    // Vek'lor
     // Vek'nilash
+    SPELL_UPPERCUT                = 26007,
+    SPELL_UNBALANCING_STRIKE      = 26613,
+    SPELL_HEAL_BROTHER            = 7393,
 };
 
 enum Actions
@@ -50,16 +50,22 @@ enum Say
     SAY_INTRO_0                   = 0,
     SAY_INTRO_1                   = 1,
     SAY_INTRO_2                   = 2,
+    SAY_ENRAGE                    = 3, // add to db
 
     EMOTE_MASTERS_EYE_AT          = 0
 };
 
-enum Misc
+enum Sounds
 {
-    GROUP_INTRO = 0
+
 };
 
-constexpr float veklorOrientationIntro = 2.241519f;
+enum Misc
+{
+    GROUP_INTRO                   = 0
+};
+
+constexpr float veklorOrientationIntro    = 2.241519f;
 constexpr float veknilashOrientationIntro = 1.144451f;
 
 struct boss_twinemperorsAI : public BossAI
@@ -67,6 +73,11 @@ struct boss_twinemperorsAI : public BossAI
     boss_twinemperorsAI(Creature* creature): BossAI(creature, DATA_TWIN_EMPERORS), _introDone(false)
     {
         me->SetStandState(UNIT_STAND_STATE_KNEEL);
+
+        _scheduler.SetValidator([this]
+            {
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
     }
 
     Creature* GetTwin()
@@ -159,6 +170,12 @@ struct boss_twinemperorsAI : public BossAI
             if (!twin->IsInCombat())
                 twin->AI()->EnterCombat(who);
 
+        _scheduler.Schedule(15min, [this](TaskContext /*context*/)
+            {
+                DoCastSelf(SPELL_BERSERK, true);
+                Talk(SAY_ENRAGE);
+            });
+
         BossAI::EnterCombat(who);
     }
 
@@ -186,13 +203,44 @@ struct boss_veknilash : public boss_twinemperorsAI
     boss_veknilash(Creature* creature) : boss_twinemperorsAI(creature) { }
 
     bool IAmVeklor() override { return false; }
+
+    void EnterCombat(Unit* who) override
+    {
+        boss_twinemperorsAI::EnterCombat(who);
+
+        _scheduler.Schedule(14s, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_UPPERCUT);
+                context.Repeat(6s, 16s);
+            });
+    }
 };
 
 struct boss_veklor : public boss_twinemperorsAI
 {
-    boss_veklor(Creature* creature) : boss_twinemperorsAI(creature) { }
+    boss_veklor(Creature* creature) : boss_twinemperorsAI(creature)
+    {
+        me->SetFloatValue(UNIT_FIELD_COMBATREACH, 20.f);
+    }
 
     bool IAmVeklor() override { return true; }
+
+    void EnterCombat(Unit* who) override
+    {
+        boss_twinemperorsAI::EnterCombat(who);
+
+        _scheduler
+            .Schedule(2s, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_SHADOW_BOLT);
+                context.Repeat();
+            })
+            .Schedule(10s, 15s, [this](TaskContext context)
+                {
+                    DoCastRandomTarget(SPELL_BLIZZARD, 0, 45.f);
+                    context.Repeat(15s, 30s);
+                });
+    }
 };
 
 class at_twin_emperors : public OnlyOnceAreaTriggerScript
