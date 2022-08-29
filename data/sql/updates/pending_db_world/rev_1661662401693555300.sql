@@ -111,7 +111,132 @@ INSERT INTO `linked_respawn` (`guid`, `linkedGuid`, `linkType`) VALUES
 (88018, @BOSS, 0),
 (88019, @BOSS, 0);
 
+-- Critters in Twin Emperors room. Yes. All of them.
+SET @NPC=144238;
+DELETE FROM `linked_respawn` WHERE `linkedGuid`=@BOSS AND `guid` BETWEEN @NPC AND @NPC+3;
+INSERT INTO `linked_respawn` (`guid`, `linkedGuid`, `linkType`) VALUES
+(@NPC, @BOSS, 0),
+(@NPC+1, @BOSS, 0),
+(@NPC+2, @BOSS, 0),
+(@NPC+3, @BOSS, 0);
+SET @NPC=144245;
+DELETE FROM `linked_respawn` WHERE `linkedGuid`=@BOSS AND `guid` BETWEEN @NPC AND @NPC+13;
+INSERT INTO `linked_respawn` (`guid`, `linkedGuid`, `linkType`) VALUES
+(@NPC, @BOSS, 0),
+(@NPC+1, @BOSS, 0),
+(@NPC+2, @BOSS, 0),
+(@NPC+3, @BOSS, 0),
+(@NPC+4, @BOSS, 0),
+(@NPC+5, @BOSS, 0),
+(@NPC+6, @BOSS, 0),
+(@NPC+7, @BOSS, 0),
+(@NPC+8, @BOSS, 0),
+(@NPC+9, @BOSS, 0),
+(@NPC+10, @BOSS, 0),
+(@NPC+11, @BOSS, 0),
+(@NPC+12, @BOSS, 0),
+(@NPC+13, @BOSS, 0);
+SET @NPC=144260;
+DELETE FROM `linked_respawn` WHERE `linkedGuid`=@BOSS AND `guid` BETWEEN @NPC AND @NPC+30;
+INSERT INTO `linked_respawn` (`guid`, `linkedGuid`, `linkType`) VALUES
+(@NPC, @BOSS, 0),
+(@NPC+1, @BOSS, 0),
+(@NPC+2, @BOSS, 0),
+(@NPC+3, @BOSS, 0),
+(@NPC+4, @BOSS, 0),
+(@NPC+5, @BOSS, 0),
+(@NPC+6, @BOSS, 0),
+(@NPC+7, @BOSS, 0),
+(@NPC+8, @BOSS, 0),
+(@NPC+9, @BOSS, 0),
+(@NPC+10, @BOSS, 0),
+(@NPC+11, @BOSS, 0),
+(@NPC+12, @BOSS, 0),
+(@NPC+13, @BOSS, 0),
+(@NPC+14, @BOSS, 0),
+(@NPC+15, @BOSS, 0),
+(@NPC+16, @BOSS, 0),
+(@NPC+17, @BOSS, 0),
+(@NPC+18, @BOSS, 0),
+(@NPC+19, @BOSS, 0),
+(@NPC+20, @BOSS, 0),
+(@NPC+21, @BOSS, 0),
+(@NPC+22, @BOSS, 0),
+(@NPC+23, @BOSS, 0),
+(@NPC+24, @BOSS, 0),
+(@NPC+25, @BOSS, 0),
+(@NPC+26, @BOSS, 0),
+(@NPC+27, @BOSS, 0),
+(@NPC+28, @BOSS, 0),
+(@NPC+29, @BOSS, 0),
+(@NPC+30, @BOSS, 0);
+SET @NPC=144334;
+DELETE FROM `linked_respawn` WHERE `linkedGuid`=@BOSS AND `guid` BETWEEN @NPC AND @NPC+13;
+INSERT INTO `linked_respawn` (`guid`, `linkedGuid`, `linkType`) VALUES
+(@NPC, @BOSS, 0),
+(@NPC+1, @BOSS, 0),
+(@NPC+2, @BOSS, 0),
+(@NPC+3, @BOSS, 0),
+(@NPC+4, @BOSS, 0),
+(@NPC+5, @BOSS, 0),
+(@NPC+6, @BOSS, 0),
+(@NPC+7, @BOSS, 0),
+(@NPC+8, @BOSS, 0),
+(@NPC+9, @BOSS, 0),
+(@NPC+10, @BOSS, 0),
+(@NPC+11, @BOSS, 0),
+(@NPC+12, @BOSS, 0),
+(@NPC+13, @BOSS, 0);
+SET @NPC=144349;
+DELETE FROM `linked_respawn` WHERE `linkedGuid`=@BOSS AND `guid` BETWEEN @NPC AND @NPC+6;
+INSERT INTO `linked_respawn` (`guid`, `linkedGuid`, `linkType`) VALUES
+(@NPC, @BOSS, 0),
+(@NPC+1, @BOSS, 0),
+(@NPC+2, @BOSS, 0),
+(@NPC+3, @BOSS, 0),
+(@NPC+4, @BOSS, 0),
+(@NPC+5, @BOSS, 0),
+(@NPC+6, @BOSS, 0);
+SET @NPC=144357;
+DELETE FROM `linked_respawn` WHERE `linkedGuid`=@BOSS AND `guid` BETWEEN @NPC AND @NPC+27;
+INSERT INTO `linked_respawn` (`guid`, `linkedGuid`, `linkType`) VALUES
+(@NPC, @BOSS, 0),
+(@NPC+1, @BOSS, 0),
+(@NPC+2, @BOSS, 0),
+(@NPC+3, @BOSS, 0),
+(@NPC+4, @BOSS, 0),
+(@NPC+5, @BOSS, 0),
+(@NPC+6, @BOSS, 0),
+(@NPC+7, @BOSS, 0),
+(@NPC+8, @BOSS, 0),
+(@NPC+9, @BOSS, 0),
+(@NPC+10, @BOSS, 0),
+(@NPC+11, @BOSS, 0),
+(@NPC+12, @BOSS, 0),
+(@NPC+13, @BOSS, 0),
+(@NPC+14, @BOSS, 0),
+(@NPC+15, @BOSS, 0),
+(@NPC+16, @BOSS, 0),
+(@NPC+17, @BOSS, 0),
+(@NPC+18, @BOSS, 0),
+(@NPC+19, @BOSS, 0),
+(@NPC+20, @BOSS, 0),
+(@NPC+21, @BOSS, 0),
+(@NPC+22, @BOSS, 0),
+(@NPC+23, @BOSS, 0),
+(@NPC+24, @BOSS, 0),
+(@NPC+25, @BOSS, 0),
+(@NPC+26, @BOSS, 0),
+(@NPC+27, @BOSS, 0);
+DELETE FROM `linked_respawn` WHERE `linkedGuid`=@BOSS AND `guid` IN (144243, 144386);
+INSERT INTO `linked_respawn` (`guid`, `linkedGuid`, `linkType`) VALUES
+(144243, @BOSS, 0),
+(144386, @BOSS, 0);
+
 -- Trash before C'Thun does not respawn
 
 -- Update respawn timers
 UPDATE `creature` SET `spawntimesecs`=7200 WHERE `map`=531 AND `id1` IN (15264, 15262, 15233, 15247, 15230, 15240, 15235, 15236, 15249, 15277);
+
+-- Update Critter respawn timer
+UPDATE `creature` SET `spawntimesecs`=1740 WHERE `map`=531 AND `id1` IN (15316, 15317);
