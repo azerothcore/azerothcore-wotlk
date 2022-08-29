@@ -17,6 +17,7 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "temple_of_ahnqiraj.h"
 #include "TaskScheduler.h"
 
@@ -150,7 +151,40 @@ private:
     bool _enraged;
 };
 
+enum NPCs
+{
+    NPC_VEKNISS_DRONE   = 15300
+};
+
+class spell_aggro_drones : public SpellScript
+{
+    PrepareSpellScript(spell_aggro_drones);
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            if (Creature* target = GetHitCreature())
+            {
+                if (target->GetEntry() == NPC_VEKNISS_DRONE)
+                {
+                    if (Unit* victim = caster->GetVictim())
+                    {
+                        target->AI()->AttackStart(victim);
+                    }
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_aggro_drones::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 void AddSC_temple_of_ahnqiraj()
 {
     RegisterTempleOfAhnQirajCreatureAI(npc_anubisath_defender);
+    RegisterSpellScript(spell_aggro_drones);
 }
