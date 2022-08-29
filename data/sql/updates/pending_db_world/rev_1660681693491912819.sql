@@ -1,4 +1,4 @@
-DELETE FROM `lfg_dungeon_template` WHERE `dungeonId` IN (2, 44, 276);
+DELETE FROM `lfg_dungeon_template` WHERE `dungeonId` IN (2, 276);
 INSERT INTO `lfg_dungeon_template`
 (`dungeonId`, `name`, `position_x`, `position_y`, `position_z`, `orientation`,
 `VerifiedBuild`)
