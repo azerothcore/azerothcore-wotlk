@@ -600,6 +600,11 @@ void Player::CompleteQuest(uint32 quest_id)
         return;
     }
 
+    if (!sScriptMgr->OnBeforePlayerQuestComplete(this, quest_id))
+    {
+        return;
+    }
+
     SetQuestStatus(quest_id, QUEST_STATUS_COMPLETE);
 
     auto log_slot = FindQuestSlot(quest_id);
