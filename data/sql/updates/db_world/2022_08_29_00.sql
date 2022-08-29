@@ -1,3 +1,4 @@
+-- DB update 2022_08_28_00 -> 2022_08_29_00
 --
 DELETE FROM `quest_offer_reward` WHERE `ID` IN (8504, 8506, 8510, 8527, 8550, 8581, 8601, 8605, 8608, 8610, 8612, 8614, 8616, 8846, 8847, 8848, 8849, 8850, 8851, 8852, 8853, 8854, 8855);
 INSERT INTO `quest_offer_reward` (`ID`, `RewardText`, `VerifiedBuild`) VALUES
