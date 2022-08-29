@@ -28,14 +28,14 @@ INSERT INTO `item_template` (`entry`, `class`, `subclass`, `SoundOverrideSubclas
 -- Itemset ID 1010
 -- all values up by 10% from T10,5
 update item_template set itemset = 1010 where entry in (81050, 81051, 81052, 81053, 81054);
-update item_template set stat_value1 = (stat_value1 * 1.1) where entry in (81050, 81051, 81052, 81053, 81054);
-update item_template set stat_value1 = (stat_value1 * 1.1) where entry in (81050, 81051, 81052, 81053, 81054);
-update item_template set stat_value2 = (stat_value2 * 1.1) where entry in (81050, 81051, 81052, 81053, 81054);
-update item_template set stat_value3 = (stat_value3 * 1.1) where entry in (81050, 81051, 81052, 81053, 81054);
-update item_template set stat_value4 = (stat_value4 * 1.1) where entry in (81050, 81051, 81052, 81053, 81054);
-update item_template set stat_value5 = (stat_value5 * 1.1) where entry in (81050, 81051, 81052, 81053, 81054);
-update item_template set stat_value6 = (stat_value6 * 1.1) where entry in (81050, 81051, 81052, 81053, 81054);
-update item_template set stat_value7 = (stat_value7 * 1.1) where entry in (81050, 81051, 81052, 81053, 81054);
-update item_template set stat_value8 = (stat_value8 * 1.1) where entry in (81050, 81051, 81052, 81053, 81054);
-update item_template set stat_value9 = (stat_value9 * 1.1) where entry in (81050, 81051, 81052, 81053, 81054);
-update item_template set armor = (armor * 1.1) where entry in (81050, 81051, 81052, 81053, 81054);
+update item_template set stat_value1 = (stat_value1 * 1.2) where entry in (81050, 81051, 81052, 81053, 81054);
+update item_template set stat_value1 = (stat_value1 * 1.2) where entry in (81050, 81051, 81052, 81053, 81054);
+update item_template set stat_value2 = (stat_value2 * 1.2) where entry in (81050, 81051, 81052, 81053, 81054);
+update item_template set stat_value3 = (stat_value3 * 1.2) where entry in (81050, 81051, 81052, 81053, 81054);
+update item_template set stat_value4 = (stat_value4 * 1.2) where entry in (81050, 81051, 81052, 81053, 81054);
+update item_template set stat_value5 = (stat_value5 * 1.2) where entry in (81050, 81051, 81052, 81053, 81054);
+update item_template set stat_value6 = (stat_value6 * 1.2) where entry in (81050, 81051, 81052, 81053, 81054);
+update item_template set stat_value7 = (stat_value7 * 1.2) where entry in (81050, 81051, 81052, 81053, 81054);
+update item_template set stat_value8 = (stat_value8 * 1.2) where entry in (81050, 81051, 81052, 81053, 81054);
+update item_template set stat_value9 = (stat_value9 * 1.2) where entry in (81050, 81051, 81052, 81053, 81054);
+update item_template set armor = (armor * 1.2) where entry in (81050, 81051, 81052, 81053, 81054);
