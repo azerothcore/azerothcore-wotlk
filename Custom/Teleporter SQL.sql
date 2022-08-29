@@ -71,7 +71,6 @@ INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (88, 80, 2, -1, 2, 'Razorfen Depths', 1, -4645.08, -2470.85, 85.53, 4.39);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (89, 80, 2, -1, 2, 'Scarlet Monastery', 0, 42843.89, -693.74, 139.32, 5.11);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (90, 80, 2, -1, 2, 'Uldaman', 1, -6119.70, -2957.30, 204.11, 0.03);
-INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (91, 80, 2, -1, 2, 'Zul`Farrak', 1, -6839.39, -2911.03, 8.87, 0.41);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (92, 80, 2, -1, 2, 'Mauradon', 1, -1433.33, 2955.34, 96.21, 4.82);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (93, 80, 2, -1, 2, 'Sunken Temple', 1, -10346.92, -3851.90, -43.41, 6.09);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (94, 80, 2, -1, 2, 'Duesterbruch', 1, -3982.47, 1127.79, 161.02, 0.05);
@@ -155,6 +154,7 @@ INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (701, 700, 2, -1, 2, 'Nexus - Level 100', 571, 3876.24, 6985, 75.68, 0.01);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (702, 700, 2, -1, 2, 'Gundrak - Level 130', 571, 6936.08, -4436.54, 450.51, 0.7698);
 INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (703, 700, 2, -1, 2, 'Auchenai Crypts - Level 160', 530, -3362.535645, 5220.6640, -101.04, 1.48);
+INSERT INTO `eluna_teleporter` (`id`, `parent`, `type`, `faction`, `icon`, `name`, `map`, `x`, `y`, `z`, `o`) VALUES (704, 700, 2, -1, 2, 'Zul`Farrak - Level 190', 1, -6839.39, -2911.03, 8.87, 0.41);
 
 
 
