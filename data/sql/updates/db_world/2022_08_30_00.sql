@@ -1,3 +1,4 @@
+-- DB update 2022_08_29_00 -> 2022_08_30_00
 --
 -- Values not sniffed sadly
 SET @NPC := 15571;
