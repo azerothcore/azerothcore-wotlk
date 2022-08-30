@@ -1,13 +1,11 @@
--- Gurubashi Axe Thrower (11350)
-UPDATE `creature_template` SET `DamageModifier` = 4.05, `ArmorModifier` = 1.1 WHERE (`entry` = 11350);
+-- Gurubashi Axe Thrower (11350) & Zulian Crocolisk (15043)
+UPDATE `creature_template` SET `DamageModifier` = 4.05, `ArmorModifier` = 1.1 WHERE `entry` IN (11350,15043);
 -- Hakkari Priest (11830)
 UPDATE `creature_template` SET `DamageModifier` = 5.05, `ArmorModifier` = 1.1 WHERE (`entry` = 11830);
 -- Razzashi Serpent (11371)
 UPDATE `creature_template` SET `DamageModifier` = 4, `ArmorModifier` = 1.1 WHERE (`entry` = 11371);
 -- Razzashi Adder (11372)
 UPDATE `creature_template` SET `DamageModifier` = 4.2, `ArmorModifier` = 1.1 WHERE (`entry` = 11372);
--- Zulian Crocolisk (15043)
-UPDATE `creature_template` SET `DamageModifier` = 4.05, `ArmorModifier` = 1.1 WHERE (`entry` = 15043);
 -- Hooktooth Frenzy (11374)
 UPDATE `creature_template` SET `DamageModifier` = 2.4, `ArmorModifier` = 1.1 WHERE (`entry` = 11374);
 -- Gurubashi Headhunter (11351)
