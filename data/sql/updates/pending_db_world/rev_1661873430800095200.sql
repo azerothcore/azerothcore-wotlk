@@ -115,7 +115,7 @@ UPDATE `creature_template` SET `DamageModifier` = 7.15, `ArmorModifier` = 1.65 W
 -- Bloodscalp Speaker (11389)
 UPDATE `creature_template` SET `DamageModifier` = 5, `ArmorModifier` = 1.15 WHERE (`entry` = 11389);
 -- Skullsplitter Speaker (11390)
-UPDATE `creature_template` SET `gossip_menu_id` = NULL, `DamageModifier` = 5, `ArmorModifier` = 1.15 WHERE (`entry` = 11390);
+UPDATE `creature_template` SET `gossip_menu_id` = 0, `DamageModifier` = 5, `ArmorModifier` = 1.15 WHERE (`entry` = 11390);
 -- Hakkar (14834)
 UPDATE `creature_template` SET `ArmorModifier` = 1.3 WHERE (`entry` = 14834);
 
