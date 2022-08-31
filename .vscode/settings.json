@@ -118,5 +118,6 @@
     "deno.enable": true,
     "deno.path": "deps/deno/bin/deno",
     "deno.lint": true,
-    "C_Cpp.errorSquiggles": "Disabled"
+    "C_Cpp.errorSquiggles": "Disabled",
+    "cmake.configureOnOpen": false
 }
