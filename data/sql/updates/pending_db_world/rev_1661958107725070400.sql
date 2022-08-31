@@ -4,7 +4,6 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 (1675, 159, 0, 6, 0, 1, 2, 1, 1, 'Rot Hide Mongrel - Refreshing Spring Water'),
 (1675, 2589, 0, 44, 0, 1, 0, 1, 2, 'Rot Hide Mongrel - Linen Cloth'),
 (1675, 2834, 0, 31, 1, 1, 0, 1, 1, 'Rot Hide Mongrel - Embalming Ichor'),
-(1675, 3300, 0, 0.01, 1, 1, 0, 1, 1, 'Rot Hide Mongrel - Rabbits Foot'),
 (1675, 4604, 0, 11, 0, 1, 2, 1, 1, 'Rot Hide Mongrel - Forest Mushroom Cap'),
 (1675, 11111, 11111, 0.1, 0, 1, 0, 1, 1, 'Rot Hide Mongrel - (ReferenceTable)'),
 (1675, 24073, 24073, 30, 0, 1, 1, 1, 1, 'Rot Hide Mongrel - (ReferenceTable)'),
