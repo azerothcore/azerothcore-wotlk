@@ -26,7 +26,7 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES (12039, 3301), (12039, 331
 
 -- Vaelan, Remove static Vaelan
 DELETE FROM `creature` WHERE `guid` = 42797 AND `id1`= 10296;
-UPDATE `creature_template` SET `AIName` = 'SmartAI', `gossip_menu_id` = 12039, `MovementType` = 0 WHERE (`entry` = 10296);
+UPDATE `creature_template` SET `AIName` = 'SmartAI', `npcflag`=1|2, `gossip_menu_id` = 12039, `MovementType` = 0 WHERE (`entry` = 10296);
 -- Scarshield Infiltrator
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `gossip_menu_id` = 0, `npcflag` = 0, `MovementType` = 0 WHERE (`entry` = 10299);
 
