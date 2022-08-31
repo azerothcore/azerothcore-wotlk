@@ -304,3 +304,6 @@ INSERT INTO `linked_respawn` (`guid`, `linkedGuid`, `linkType`) VALUES
 (@NPC+6, @BOSS, 0),
 (@NPC+7, @BOSS, 0),
 (@NPC+8, @BOSS, 0);
+
+-- Flesh Hunters do not respawn
+UPDATE `creature` SET `spawntimesecs`=259200 WHERE `id1`=15335 AND `map`=509;
