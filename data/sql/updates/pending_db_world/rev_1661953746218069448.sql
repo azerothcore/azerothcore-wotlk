@@ -26,7 +26,7 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES (12039, 3301), (12039, 331
 
 -- Vaelan, Remove static Vaelan
 DELETE FROM `creature` WHERE `guid` = 42797 AND `id1`= 10296;
-UPDATE `creature_template` SET `AIName` = 'SmartAI', `npcflag` = 0, `gossip_menu_id` = 12039, `MovementType` = 0 WHERE (`entry` = 10296);
+UPDATE `creature_template` SET `AIName` = 'SmartAI', `gossip_menu_id` = 12039, `MovementType` = 0 WHERE (`entry` = 10296);
 -- Scarshield Infiltrator
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `gossip_menu_id` = 0, `npcflag` = 0, `MovementType` = 0 WHERE (`entry` = 10299);
 
@@ -43,8 +43,8 @@ DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 1029900
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (1029900, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 11, 16037, 0, 0, 0, 0, 0, 21, 90, 0, 0, 0, 0, 0, 0, 0, 'Scarshield Infiltrator - Actionlist - Cast \'Mind Probe\''),
 (1029900, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarshield Infiltrator - Actionlist - Remove FlagStandstate Kneel'),
-(1029900, 9, 2, 0, 0, 0, 100, 0, 1500, 1500, 0, 0, 0, 3, 0, 9643, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarshield Infiltrator - Actionlist - Morph To Model 9643'),
-(1029900, 9, 3, 0, 0, 0, 100, 0, 1500, 1500, 0, 0, 0, 36, 10296, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarshield Infiltrator - Actionlist - Update Template To \'Vaelan\''),
+(1029900, 9, 2, 0, 0, 0, 100, 0, 1500, 1500, 0, 0, 0, 36, 10296, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarshield Infiltrator - Actionlist - Update Template To \'Vaelan\''),
+(1029900, 9, 3, 0, 0, 0, 100, 0, 1500, 1500, 0, 0, 0, 83, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarshield Infiltrator - Actionlist - Remove Npc Flags Gossip & Questgiver'),
 (1029900, 9, 4, 0, 0, 0, 100, 0, 1500, 1500, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 21, 90, 0, 0, 0, 0, 0, 0, 0, 'Scarshield Infiltrator - Actionlist - Set Orientation Closest Player'),
 (1029900, 9, 5, 0, 0, 0, 100, 0, 2500, 2500, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarshield Infiltrator - Actionlist - Say Line 0'),
 (1029900, 9, 6, 0, 0, 0, 100, 0, 8500, 8500, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarshield Infiltrator - Actionlist - Say Line 1'),
