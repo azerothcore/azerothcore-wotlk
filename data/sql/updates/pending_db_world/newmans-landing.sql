@@ -13,3 +13,4 @@ UPDATE `creature_equip_template` SET `VerifiedBuild` = '0' WHERE  `CreatureID` =
 UPDATE `creature` SET `position_x` = -6378.96, `position_y` = 1263.02, `position_z` = 7.1876, `orientation` = 2.274 WHERE `guid` = 1975958; -- RE-PARSE SNIFF FOR COORDINATES
 UPDATE `creature` SET `position_x` = -6373.69, `position_y` = 1267.84, `position_z` = 7.1876, `orientation` = 2.18761 WHERE `guid` = 1975959; -- RE-PARSE SNIFF FOR COORDINATES
 UPDATE `creature` SET `position_x` = -6378.09, `position_y` = 1268.65, `position_z` = 7.1876, `orientation` = 2.26222 WHERE `guid` = 1975960; -- RE-PARSE SNIFF FOR COORDINATES
+
