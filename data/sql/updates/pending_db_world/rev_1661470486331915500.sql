@@ -23,6 +23,7 @@ UPDATE `creature_template` SET `unit_flags` = `unit_flags`|512|256 WHERE `entry`
 UPDATE `creature_template` SET `spell_school_immune_mask` = `spell_school_immune_mask`|1 WHERE `entry` = 15276; -- Vek'lor immunity to phys
 UPDATE `creature_template` SET `spell_school_immune_mask` = `spell_school_immune_mask`|4|8|16|32|64 WHERE `entry` = 15275; -- Vek'nilash immunity to everything but holy and phys
 
-DELETE FROM `spell_script_names` WHERE `spell_id` = 802;
+DELETE FROM `spell_script_names` WHERE `spell_id` IN (802, 804);
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
-(802, 'spell_mutate_bug');
+(802, 'spell_mutate_bug'),
+(804, 'spell_explode_bug');
