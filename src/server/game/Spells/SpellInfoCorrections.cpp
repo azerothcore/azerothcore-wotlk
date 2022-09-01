@@ -4414,7 +4414,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_2].Amplitude = 15500;
         spellInfo->Effects[EFFECT_2].TriggerSpell = 50068;
     });
-    
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
