@@ -41,6 +41,7 @@ enum Spells
     SPELL_UNBALANCING_STRIKE      = 26613,
     SPELL_BERSERK                 = 27680,
     SPELL_MUTATE_BUG              = 802,
+    SPELL_VIRULENT_POISON_PROC    = 22413
 };
 
 enum Actions
@@ -70,7 +71,9 @@ enum Misc
     GROUP_INTRO                   = 0,
 
     NPC_QIRAJI_SCARAB             = 15316,
-    NPC_QIRAJI_SCORPION           = 15317
+    NPC_QIRAJI_SCORPION           = 15317,
+
+    FACTION_HOSTILE               = 16
 };
 
 constexpr float veklorOrientationIntro    = 2.241519f;
@@ -432,6 +435,8 @@ class spell_mutate_bug : public SpellScript
 
         Creature* target = GetHitUnit()->ToCreature();
 
+        target->CastSpell(target, SPELL_VIRULENT_POISON_PROC, true);
+        target->SetFaction(FACTION_HOSTILE);
         target->SetReactState(REACT_AGGRESSIVE);
         target->SetInCombatWithZone();
     }
