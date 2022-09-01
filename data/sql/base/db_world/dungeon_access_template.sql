@@ -15,13 +15,13 @@
 -- Dumpar struktur för tabell acore_world.dungeon_access_template
 DROP TABLE IF EXISTS `dungeon_access_template`;
 CREATE TABLE IF NOT EXISTS `dungeon_access_template` (
-  `id` TINYINT unsigned NOT NULL AUTO_INCREMENT COMMENT 'The dungeon template ID',
-  `map_id` MEDIUMINT unsigned NOT NULL COMMENT 'Map ID from instance_template',
-  `difficulty` TINYINT unsigned NOT NULL DEFAULT 0 COMMENT '5 man: 0 = normal, 1 = heroic, 2 = epic (not implemented) | 10 man: 0 = normal, 2 = heroic | 25 man: 1 = normal, 3 = heroic',
-  `min_level` TINYINT unsigned DEFAULT NULL,
-  `max_level` TINYINT unsigned DEFAULT NULL,
-  `min_avg_item_level` SMALLINT unsigned DEFAULT NULL COMMENT 'Min average ilvl required to enter',
-  `comment` VARCHAR(255) DEFAULT NULL COMMENT 'Dungeon Name 5/10/25/40 man - Normal/Heroic',
+  `id` tinyint unsigned NOT NULL AUTO_INCREMENT COMMENT 'The dungeon template ID',
+  `map_id` mediumint unsigned NOT NULL COMMENT 'Map ID from instance_template',
+  `difficulty` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '5 man: 0 = normal, 1 = heroic, 2 = epic (not implemented) | 10 man: 0 = normal, 2 = heroic | 25 man: 1 = normal, 3 = heroic',
+  `min_level` tinyint unsigned DEFAULT NULL,
+  `max_level` tinyint unsigned DEFAULT NULL,
+  `min_avg_item_level` smallint unsigned DEFAULT NULL COMMENT 'Min average ilvl required to enter',
+  `comment` varchar(255) DEFAULT NULL COMMENT 'Dungeon Name 5/10/25/40 man - Normal/Heroic',
   PRIMARY KEY (`id`),
   KEY `FK_dungeon_access_template__instance_template` (`map_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=122 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='Dungeon/raid access template and single requirements';

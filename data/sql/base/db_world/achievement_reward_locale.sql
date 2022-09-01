@@ -15,8 +15,8 @@
 -- Dumpar struktur för tabell acore_world.achievement_reward_locale
 DROP TABLE IF EXISTS `achievement_reward_locale`;
 CREATE TABLE IF NOT EXISTS `achievement_reward_locale` (
-  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `Locale` VARCHAR(4) NOT NULL,
+  `ID` mediumint unsigned NOT NULL DEFAULT '0',
+  `Locale` varchar(4) NOT NULL,
   `Subject` text,
   `Text` text,
   PRIMARY KEY (`ID`,`Locale`)

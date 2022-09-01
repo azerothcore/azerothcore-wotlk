@@ -13,11 +13,10 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 -- Dumpar struktur för tabell acore_auth.realmcharacters
-DROP TABLE IF EXISTS `realmcharacters`;
 CREATE TABLE IF NOT EXISTS `realmcharacters` (
-  `realmid` INT unsigned NOT NULL DEFAULT 0,
-  `acctid` INT unsigned NOT NULL,
-  `numchars` TINYINT unsigned NOT NULL DEFAULT 0,
+  `realmid` int unsigned NOT NULL DEFAULT '0',
+  `acctid` int unsigned NOT NULL,
+  `numchars` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`realmid`,`acctid`),
   KEY `acctid` (`acctid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Realm Character Tracker';

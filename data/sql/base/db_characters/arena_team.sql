@@ -15,21 +15,21 @@
 -- Dumpar struktur för tabell acore_characters.arena_team
 DROP TABLE IF EXISTS `arena_team`;
 CREATE TABLE IF NOT EXISTS `arena_team` (
-  `arenaTeamId` INT unsigned NOT NULL DEFAULT 0,
-  `name` VARCHAR(24) NOT NULL,
-  `captainGuid` INT unsigned NOT NULL DEFAULT 0,
-  `type` TINYINT unsigned NOT NULL DEFAULT 0,
-  `rating` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `seasonGames` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `seasonWins` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `weekGames` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `weekWins` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `rank` INT unsigned NOT NULL DEFAULT 0,
-  `backgroundColor` INT unsigned NOT NULL DEFAULT 0,
-  `emblemStyle` TINYINT unsigned NOT NULL DEFAULT 0,
-  `emblemColor` INT unsigned NOT NULL DEFAULT 0,
-  `borderStyle` TINYINT unsigned NOT NULL DEFAULT 0,
-  `borderColor` INT unsigned NOT NULL DEFAULT 0,
+  `arenaTeamId` int unsigned NOT NULL DEFAULT '0',
+  `name` varchar(24) NOT NULL,
+  `captainGuid` int unsigned NOT NULL DEFAULT '0',
+  `type` tinyint unsigned NOT NULL DEFAULT '0',
+  `rating` smallint unsigned NOT NULL DEFAULT '0',
+  `seasonGames` smallint unsigned NOT NULL DEFAULT '0',
+  `seasonWins` smallint unsigned NOT NULL DEFAULT '0',
+  `weekGames` smallint unsigned NOT NULL DEFAULT '0',
+  `weekWins` smallint unsigned NOT NULL DEFAULT '0',
+  `rank` int unsigned NOT NULL DEFAULT '0',
+  `backgroundColor` int unsigned NOT NULL DEFAULT '0',
+  `emblemStyle` tinyint unsigned NOT NULL DEFAULT '0',
+  `emblemColor` int unsigned NOT NULL DEFAULT '0',
+  `borderStyle` tinyint unsigned NOT NULL DEFAULT '0',
+  `borderColor` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`arenaTeamId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

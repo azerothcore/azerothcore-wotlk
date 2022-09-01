@@ -9991,8 +9991,13 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
         AddThreat(victim, 0.0f);
 
         creature->SendAIReaction(AI_REACTION_HOSTILE);
-        creature->CallAssistance();
-        creature->SetAssistanceTimer(sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_PERIOD));
+
+        CreatureTemplate const* cInfo = creature->GetCreatureTemplate();
+        if (!cInfo || !cInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_DONT_CALL_ASSISTANCE))
+        {
+            creature->CallAssistance();
+            creature->SetAssistanceTimer(sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_PERIOD));
+        }
 
         SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
     }
@@ -12040,6 +12045,8 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
         {
             case 4415: // Increased Rejuvenation Healing
             case 4953:
+                DoneTotal += (*i)->GetAmount() / 5; // 5 ticks of Rejuvenation
+                break;
             case 3736: // Hateful Totem of the Third Wind / Increased Lesser Healing Wave / LK Arena (4/5/6) Totem of the Third Wind / Savage Totem of the Third Wind
                 DoneTotal += (*i)->GetAmount();
                 break;
@@ -16121,9 +16128,13 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                     {
                         if (SpellModifier* mod = triggeredByAura->GetSpellModifier())
                         {
-                            if (mod->op == SPELLMOD_CASTING_TIME && procSpell && (procSpell->GetTriggeredCastFlags() & TRIGGERED_CAST_DIRECTLY) != 0)
+                            if (mod->op == SPELLMOD_CASTING_TIME && mod->value < 0 && procSpell)
                             {
-                                break;
+                                // Skip instant spells
+                                if (procSpellInfo->CalcCastTime() <= 0 || (procSpell->GetTriggeredCastFlags() & TRIGGERED_CAST_DIRECTLY) != 0)
+                                {
+                                    break;
+                                }
                             }
                         }
                         takeCharges = true;

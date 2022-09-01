@@ -15,8 +15,8 @@
 -- Dumpar struktur för tabell acore_world.game_event_arena_seasons
 DROP TABLE IF EXISTS `game_event_arena_seasons`;
 CREATE TABLE IF NOT EXISTS `game_event_arena_seasons` (
-  `eventEntry` TINYINT unsigned NOT NULL COMMENT 'Entry of the game event',
-  `season` TINYINT unsigned NOT NULL COMMENT 'Arena season number',
+  `eventEntry` tinyint unsigned NOT NULL COMMENT 'Entry of the game event',
+  `season` tinyint unsigned NOT NULL COMMENT 'Arena season number',
   UNIQUE KEY `season` (`season`,`eventEntry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

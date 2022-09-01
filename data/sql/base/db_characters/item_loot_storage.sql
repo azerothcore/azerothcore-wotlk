@@ -15,19 +15,19 @@
 -- Dumpar struktur för tabell acore_characters.item_loot_storage
 DROP TABLE IF EXISTS `item_loot_storage`;
 CREATE TABLE IF NOT EXISTS `item_loot_storage` (
-  `containerGUID` INT unsigned NOT NULL,
-  `itemid` INT unsigned NOT NULL,
-  `count` INT unsigned NOT NULL,
-  `item_index` INT unsigned NOT NULL DEFAULT 0,
-  `randomPropertyId` INT NOT NULL,
-  `randomSuffix` INT unsigned NOT NULL,
-  `follow_loot_rules` TINYINT unsigned NOT NULL,
-  `freeforall` TINYINT unsigned NOT NULL,
-  `is_blocked` TINYINT unsigned NOT NULL,
-  `is_counted` TINYINT unsigned NOT NULL,
-  `is_underthreshold` TINYINT unsigned NOT NULL,
-  `needs_quest` TINYINT unsigned NOT NULL,
-  `conditionLootId` INT NOT NULL DEFAULT 0
+  `containerGUID` int unsigned NOT NULL,
+  `itemid` int unsigned NOT NULL,
+  `count` int unsigned NOT NULL,
+  `item_index` int unsigned NOT NULL DEFAULT '0',
+  `randomPropertyId` int NOT NULL,
+  `randomSuffix` int unsigned NOT NULL,
+  `follow_loot_rules` tinyint unsigned NOT NULL,
+  `freeforall` tinyint unsigned NOT NULL,
+  `is_blocked` tinyint unsigned NOT NULL,
+  `is_counted` tinyint unsigned NOT NULL,
+  `is_underthreshold` tinyint unsigned NOT NULL,
+  `needs_quest` tinyint unsigned NOT NULL,
+  `conditionLootId` int NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Dumpar data för tabell acore_characters.item_loot_storage: ~0 rows (ungefär)

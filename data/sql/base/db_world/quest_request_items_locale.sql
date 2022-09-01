@@ -15,14 +15,14 @@
 -- Dumpar struktur för tabell acore_world.quest_request_items_locale
 DROP TABLE IF EXISTS `quest_request_items_locale`;
 CREATE TABLE IF NOT EXISTS `quest_request_items_locale` (
-  `ID` INT unsigned NOT NULL DEFAULT 0,
-  `locale` VARCHAR(4) NOT NULL,
+  `ID` int unsigned NOT NULL DEFAULT '0',
+  `locale` varchar(4) NOT NULL,
   `CompletionText` text,
-  `VerifiedBuild` SMALLINT NOT NULL DEFAULT 0,
+  `VerifiedBuild` smallint NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`,`locale`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
--- Dumpar data för tabell acore_world.quest_request_items_locale: ~37 650 rows (ungefär)
+-- Dumpar data för tabell acore_world.quest_request_items_locale: ~39 818 rows (ungefär)
 DELETE FROM `quest_request_items_locale`;
 /*!40000 ALTER TABLE `quest_request_items_locale` DISABLE KEYS */;
 INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES
