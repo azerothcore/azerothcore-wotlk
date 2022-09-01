@@ -18,31 +18,36 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "TaskScheduler.h"
 #include "temple_of_ahnqiraj.h"
 
 enum Spells
 {
     // Both
-    SPELL_BERSERK                 = 27680,
-    SPELL_TWIN_TELEPORT           = 800,
+    SPELL_TWIN_EMPATHY            = 1177,
+    SPELL_TWIN_TELEPORT_1         = 800,
     SPELL_TWIN_TELEPORT_VISUAL    = 26638,
-    SPELL_EXPLODEBUG              = 804,
-    SPELL_MUTATE_BUG              = 802,
+    SPELL_HEAL_BROTHER            = 7393,
     // Vek'lor
     SPELL_SHADOW_BOLT             = 26006,
     SPELL_BLIZZARD                = 26607,
-    SPELL_ARCANEBURST             = 568,
+    SPELL_FRENZY                  = 27897,
+    SPELL_ARCANE_BURST            = 568,
+    SPELL_EXPLODE_BUG             = 804,
+    SPELL_TWIN_TELEPORT_0         = 799,
     // Vek'nilash
     SPELL_UPPERCUT                = 26007,
     SPELL_UNBALANCING_STRIKE      = 26613,
-    SPELL_HEAL_BROTHER            = 7393,
+    SPELL_BERSERK                 = 27680,
+    SPELL_MUTATE_BUG              = 802,
 };
 
 enum Actions
 {
     ACTION_START_INTRO            = 0,
     ACTION_CANCEL_INTRO           = 1,
+    ACTION_AFTER_TELEPORT         = 2
 };
 
 enum Say
@@ -62,7 +67,10 @@ enum Sounds
 
 enum Misc
 {
-    GROUP_INTRO                   = 0
+    GROUP_INTRO                   = 0,
+
+    NPC_QIRAJI_SCARAB             = 15316,
+    NPC_QIRAJI_SCORPION           = 15317
 };
 
 constexpr float veklorOrientationIntro    = 2.241519f;
@@ -85,6 +93,55 @@ struct boss_twinemperorsAI : public BossAI
         return instance->GetCreature(IAmVeklor() ? DATA_VEKNILASH : DATA_VEKLOR);
     }
 
+    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    {
+        if (attacker)
+        {
+            if (attacker->GetEntry() == NPC_VEKLOR || attacker->GetEntry() == NPC_VEKNILASH)
+            {
+                me->LowerPlayerDamageReq(damage);
+                return;
+            }
+
+            if (Creature* twin = GetTwin())
+            {
+                float dmgPct = damage / (float)me->GetMaxHealth();
+                int32 actualDmg = dmgPct * twin->GetMaxHealth();
+                twin->CastCustomSpell(twin, SPELL_TWIN_EMPATHY, &actualDmg, nullptr, nullptr, true);
+            }
+        }
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        BossAI::EnterEvadeMode(why);
+
+        if (Creature* twin = GetTwin())
+            if (!twin->IsInEvadeMode())
+                twin->AI()->EnterEvadeMode(why);
+
+        _scheduler.CancelAll();
+    }
+
+    void JustDied(Unit* killer) override
+    {
+        if (killer)
+        {
+            if (killer->GetEntry() == NPC_VEKLOR || killer->GetEntry() == NPC_VEKNILASH)
+            {
+                me->RemoveDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
+            }
+            else
+            {
+                if (Creature* twin = GetTwin())
+                    if (twin->IsAlive())
+                        Unit::Kill(me, twin);
+            }
+        }
+
+        BossAI::JustDied(killer);
+    }
+
     void DoAction(int32 action) override
     {
         if (action == ACTION_CANCEL_INTRO)
@@ -92,6 +149,24 @@ struct boss_twinemperorsAI : public BossAI
             _introDone = true;
             _scheduler.CancelGroup(GROUP_INTRO);
             return;
+        }
+
+        if (action == ACTION_AFTER_TELEPORT)
+        {
+            DoResetThreat();
+            me->SetReactState(REACT_PASSIVE);
+            DoCastSelf(SPELL_TWIN_TELEPORT_VISUAL, true);
+            _scheduler.DelayAll(2300ms);
+            _scheduler.Schedule(2s, [this](TaskContext /*context*/)
+                {
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->SetControlled(false, UNIT_STATE_ROOT);
+                    if (Unit* victim = me->SelectNearestTarget())
+                    {
+                        me->AddThreat(victim, 200000.f);
+                        AttackStart(victim);
+                    }
+                });
         }
 
         if (action != ACTION_START_INTRO)
@@ -159,6 +234,8 @@ struct boss_twinemperorsAI : public BossAI
 
     void EnterCombat(Unit* who) override
     {
+        BossAI::EnterCombat(who);
+
         if (!_introDone)
         {
             DoAction(ACTION_CANCEL_INTRO);
@@ -170,13 +247,25 @@ struct boss_twinemperorsAI : public BossAI
             if (!twin->IsInCombat())
                 twin->AI()->EnterCombat(who);
 
-        _scheduler.Schedule(15min, [this](TaskContext /*context*/)
+        _scheduler
+            .Schedule(15min, [this](TaskContext /*context*/)
             {
-                DoCastSelf(SPELL_BERSERK, true);
+                if (IAmVeklor())
+                    DoCastSelf(SPELL_FRENZY, true);
+                else
+                    DoCastSelf(SPELL_BERSERK, true);
                 Talk(SAY_ENRAGE);
-            });
+            })
+            .Schedule(3600ms, [this](TaskContext context) // according to sniffs it should be casted by both emperors.
+            {
+                if (Creature* twin = GetTwin())
+                {
+                    if (me->IsWithinDist(twin, 60.f))
+                        DoCast(twin, SPELL_HEAL_BROTHER, true);
+                }
 
-        BossAI::EnterCombat(who);
+                context.Repeat();
+            });
     }
 
     void UpdateAI(uint32 diff) override
@@ -208,10 +297,21 @@ struct boss_veknilash : public boss_twinemperorsAI
     {
         boss_twinemperorsAI::EnterCombat(who);
 
-        _scheduler.Schedule(14s, [this](TaskContext context)
+        _scheduler
+            .Schedule(14s, [this](TaskContext context)
             {
-                DoCastVictim(SPELL_UPPERCUT);
-                context.Repeat(6s, 16s);
+                DoCastRandomTarget(SPELL_UPPERCUT, 0, me->GetMeleeReach(), true);
+                context.Repeat(4s, 15s);
+            })
+            .Schedule(12s, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_UNBALANCING_STRIKE);
+                context.Repeat(8s, 20s);
+            })
+            .Schedule(16s, [this](TaskContext context)
+            {
+                DoCastAOE(SPELL_MUTATE_BUG);
+                context.Repeat(10s, 20s);
             });
     }
 };
@@ -230,16 +330,55 @@ struct boss_veklor : public boss_twinemperorsAI
         boss_twinemperorsAI::EnterCombat(who);
 
         _scheduler
-            .Schedule(2s, [this](TaskContext context)
+            .Schedule(4s, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_SHADOW_BOLT);
-                context.Repeat();
+                context.Repeat(2500ms);
             })
             .Schedule(10s, 15s, [this](TaskContext context)
-                {
-                    DoCastRandomTarget(SPELL_BLIZZARD, 0, 45.f);
-                    context.Repeat(15s, 30s);
-                });
+            {
+                DoCastRandomTarget(SPELL_BLIZZARD, 0, 45.f);
+                context.Repeat(5s, 12s);
+            })
+            .Schedule(1s, [this](TaskContext context)
+            {
+                if (me->SelectNearestPlayer(NOMINAL_MELEE_RANGE))
+                    DoCastAOE(SPELL_ARCANE_BURST);
+                context.Repeat(7s, 12s);
+            })
+            .Schedule(30s, 40s, [this](TaskContext context)
+            {
+                DoCastSelf(SPELL_TWIN_TELEPORT_0);
+                context.Repeat();
+            })
+            .Schedule(5s, [this](TaskContext context)
+            {
+                DoCastAOE(SPELL_EXPLODE_BUG);
+                context.Repeat(4500ms, 10s);
+            });
+    }
+
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
+    {
+        if (spellInfo->Id == SPELL_TWIN_TELEPORT_0)
+        {
+            if (Creature* veknilash = GetTwin())
+            {
+                DoCastSelf(SPELL_TWIN_TELEPORT_1, true);
+                me->SetControlled(true, UNIT_STATE_ROOT);
+
+                Position veklorPos = me->GetPosition();
+                Position veknilashPos = veknilash->GetPosition();
+                me->NearTeleportTo(veknilashPos);
+
+                veknilash->CastSpell(veknilash, SPELL_TWIN_TELEPORT_1, true);
+                veknilash->SetControlled(true, UNIT_STATE_ROOT);
+                veknilash->NearTeleportTo(veklorPos);
+
+                veknilash->AI()->DoAction(ACTION_AFTER_TELEPORT);
+                DoAction(ACTION_AFTER_TELEPORT);
+            }
+        }
     }
 };
 
@@ -272,9 +411,63 @@ public:
     }
 };
 
+class spell_mutate_bug : public SpellScript
+{
+    PrepareSpellScript(spell_mutate_bug);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if([&](WorldObject const* target) -> bool
+            {
+                return target->GetEntry() != NPC_QIRAJI_SCARAB && target->GetEntry() != NPC_QIRAJI_SCORPION;
+            });
+
+        Acore::Containers::RandomResize(targets, 1);
+    }
+
+    void HandleOnHit()
+    {
+        if (!GetHitUnit())
+            return;
+
+        Creature* target = GetHitUnit()->ToCreature();
+
+        target->SetReactState(REACT_AGGRESSIVE);
+        target->SetInCombatWithZone();
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mutate_bug::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENTRY);
+        OnHit += SpellHitFn(spell_mutate_bug::HandleOnHit);
+    }
+};
+
+class spell_explode_bug : public SpellScript
+{
+    PrepareSpellScript(spell_explode_bug);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if([&](WorldObject const* target) -> bool
+            {
+                return target->GetEntry() != NPC_QIRAJI_SCARAB && target->GetEntry() != NPC_QIRAJI_SCORPION;
+            });
+
+        Acore::Containers::RandomResize(targets, 1);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_explode_bug::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENTRY);
+    }
+};
+
 void AddSC_boss_twinemperors()
 {
     RegisterTempleOfAhnQirajCreatureAI(boss_veknilash);
     RegisterTempleOfAhnQirajCreatureAI(boss_veklor);
     new at_twin_emperors();
+    RegisterSpellScript(spell_mutate_bug);
+    RegisterSpellScript(spell_explode_bug);
 }
