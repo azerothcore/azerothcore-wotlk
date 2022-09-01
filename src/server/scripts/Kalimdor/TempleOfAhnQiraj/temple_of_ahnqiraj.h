@@ -53,6 +53,7 @@ enum DataTypes
 
 enum Creatures
 {
+    NPC_CTHUN               = 15727,
     NPC_EYE_OF_CTHUN        = 15589,
     NPC_CTHUN_PORTAL        = 15896,
     NPC_CLAW_TENTACLE       = 15725,
@@ -83,7 +84,24 @@ enum ObjectsAQ40
 {
     AQ40_DOOR_1             = 180634,
     AQ40_DOOR_2             = 180635,
-    AQ40_DOOR_3             = 180636
+    AQ40_DOOR_3             = 180636,
+    GO_CTHUN_GRASP          = 180745
+};
+
+enum CThunPhases
+{
+    PHASE_NOT_STARTED       = 0,
+
+    // Main Phase 1 - EYE
+    PHASE_EYE_GREEN_BEAM    = 1,
+    PHASE_EYE_RED_BEAM      = 2,
+
+    // Main Phase 2 - CTHUN
+    PHASE_CTHUN_TRANSITION  = 3,
+    PHASE_CTHUN_STOMACH     = 4,
+    PHASE_CTHUN_WEAK        = 5,
+
+    PHASE_CTHUN_DONE        = 6
 };
 
 template <class AI, class T>
