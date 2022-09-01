@@ -3418,12 +3418,32 @@ uint8 constexpr PVP_TEAMS_COUNT = 2;
 
 inline PvPTeamId GetPvPTeamId(TeamId teamId)
 {
-    return teamId == TEAM_ALLIANCE ? PVP_TEAM_ALLIANCE : PVP_TEAM_HORDE;
+    if (teamId == TEAM_ALLIANCE)
+    {
+        return PVP_TEAM_ALLIANCE;
+    }
+
+    if (teamId == TEAM_HORDE)
+    {
+        return PVP_TEAM_HORDE;
+    }
+
+    return PVP_TEAM_NEUTRAL;
 }
 
 inline TeamId GetTeamId(PvPTeamId teamId)
 {
-    return teamId == PVP_TEAM_ALLIANCE ? TEAM_ALLIANCE : TEAM_HORDE;
+    if (teamId == PVP_TEAM_ALLIANCE)
+    {
+        return TEAM_ALLIANCE;
+    }
+
+    if (teamId == PVP_TEAM_HORDE)
+    {
+        return TEAM_HORDE;
+    }
+
+    return TEAM_NEUTRAL;
 }
 
 // indexes of BattlemasterList.dbc
