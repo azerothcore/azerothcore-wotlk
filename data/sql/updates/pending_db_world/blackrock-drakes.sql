@@ -23,8 +23,8 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (33430, 19, -7502.94, -1142.82, 286.44, NULL, 0, 2, 0, 100, 0),
 (33430, 20, -7499.3, -1120.66, 286.44, NULL, 0, 2, 0, 100, 0),
 (33430, 21, -7502.99, -1091.51, 286.44, NULL, 0, 2, 0, 100, 0),
-(33430, 22, -7526.11, -1065.07, 290.051, NULL, 5000, 2, 0, 100, 0), -- Don't know if the delay belongs here or somewhere else, nor am I sure of the length of time.
-(33430, 23, -7526.11, -1065.07, 290.051, NULL, 0, 2, 0, 100, 0);
+(33430, 22, -7526.11, -1065.07, 290.051, NULL, 0, 2, 0, 100, 0),
+(33430, 23, -7526.11, -1065.07, 290.051, NULL, 2500, 2, 0, 100, 0); -- Again, this delay needs to be parsed, but timing it in 45327 seems to be about 2.5s
 
 DELETE FROM `waypoint_data` WHERE `id` = 33440;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES (33440, 1, -7591.27, -1118.1, 297.518, NULL, 0, 2, 0, 100, 0), -- Center drake
