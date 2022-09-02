@@ -1,3 +1,4 @@
+-- DB update 2022_09_01_00 -> 2022_09_02_00
 -- Obsidian Eradicator (15262)
 UPDATE `creature_template` SET `DamageModifier` = 22.5, `ArmorModifier` = 1.55 WHERE (`entry` = 15262);
 -- Anubisath Sentinel (15264)
