@@ -56,14 +56,17 @@ enum Say
     SAY_INTRO_0                   = 0,
     SAY_INTRO_1                   = 1,
     SAY_INTRO_2                   = 2,
-    SAY_ENRAGE                    = 3, // add to db
+    SAY_KILL                      = 3,
+    SAY_DEATH                     = 4,
+    EMOTE_ENRAGE                  = 5,
 
-    EMOTE_MASTERS_EYE_AT          = 0
+    EMOTE_MASTERS_EYE_AT          = 0,
 };
 
 enum Sounds
 {
-
+    SOUND_VK_AGGRO = 8657,
+    SOUND_VN_AGGRO = 8661
 };
 
 enum Misc
@@ -115,6 +118,12 @@ struct boss_twinemperorsAI : public BossAI
         }
     }
 
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim && victim->GetTypeId() == TYPEID_PLAYER)
+            Talk(SAY_KILL);
+    }
+
     void EnterEvadeMode(EvadeReason why) override
     {
         BossAI::EnterEvadeMode(why);
@@ -141,6 +150,8 @@ struct boss_twinemperorsAI : public BossAI
                         Unit::Kill(me, twin);
             }
         }
+
+        Talk(SAY_DEATH);
 
         BossAI::JustDied(killer);
     }
@@ -254,10 +265,12 @@ struct boss_twinemperorsAI : public BossAI
             .Schedule(15min, [this](TaskContext /*context*/)
             {
                 if (IAmVeklor())
+                {
                     DoCastSelf(SPELL_FRENZY, true);
+                    Talk(EMOTE_ENRAGE);
+                }
                 else
                     DoCastSelf(SPELL_BERSERK, true);
-                Talk(SAY_ENRAGE);
             })
             .Schedule(3600ms, [this](TaskContext context) // according to sniffs it should be casted by both emperors.
             {
@@ -300,6 +313,8 @@ struct boss_veknilash : public boss_twinemperorsAI
     {
         boss_twinemperorsAI::EnterCombat(who);
 
+        DoPlaySoundToSet(me, SOUND_VN_AGGRO);
+
         _scheduler
             .Schedule(14s, [this](TaskContext context)
             {
@@ -331,6 +346,8 @@ struct boss_veklor : public boss_twinemperorsAI
     void EnterCombat(Unit* who) override
     {
         boss_twinemperorsAI::EnterCombat(who);
+
+        DoPlaySoundToSet(me, SOUND_VK_AGGRO);
 
         _scheduler
             .Schedule(4s, [this](TaskContext context)
@@ -394,21 +411,24 @@ public:
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {
-            if (Creature* mastersEye = instance->GetCreature(DATA_MASTERS_EYE))
+            if (instance->GetBossState(DATA_TWIN_EMPERORS) != DONE)
             {
-                mastersEye->AI()->Talk(EMOTE_MASTERS_EYE_AT, player);
-                mastersEye->DespawnOrUnsummon(11000);
-                mastersEye->m_Events.AddEventAtOffset([mastersEye, player]()
-                    {
-                        mastersEye->SetFacingToObject(player);
-                    }, 3s);
+                if (Creature* mastersEye = instance->GetCreature(DATA_MASTERS_EYE))
+                {
+                    mastersEye->AI()->Talk(EMOTE_MASTERS_EYE_AT, player);
+                    mastersEye->DespawnOrUnsummon(11000);
+                    mastersEye->m_Events.AddEventAtOffset([mastersEye, player]()
+                        {
+                            mastersEye->SetFacingToObject(player);
+                        }, 3s);
+                }
+
+                if (Creature* veklor = instance->GetCreature(DATA_VEKLOR))
+                    veklor->AI()->DoAction(ACTION_START_INTRO);
+
+                if (Creature* veknilash = instance->GetCreature(DATA_VEKNILASH))
+                    veknilash->AI()->DoAction(ACTION_START_INTRO);
             }
-
-            if (Creature* veklor = instance->GetCreature(DATA_VEKLOR))
-                veklor->AI()->DoAction(ACTION_START_INTRO);
-
-            if (Creature* veknilash = instance->GetCreature(DATA_VEKNILASH))
-                veknilash->AI()->DoAction(ACTION_START_INTRO);
         }
         return false;
     }
@@ -434,6 +454,9 @@ class spell_mutate_bug : public SpellScript
             return;
 
         Creature* target = GetHitUnit()->ToCreature();
+
+        if (!target)
+            return;
 
         target->CastSpell(target, SPELL_VIRULENT_POISON_PROC, true);
         target->SetFaction(FACTION_HOSTILE);
