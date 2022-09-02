@@ -41,6 +41,7 @@ enum Spells
     SPELL_UNBALANCING_STRIKE      = 26613,
     SPELL_BERSERK                 = 27680,
     SPELL_MUTATE_BUG              = 802,
+    // Bugs
     SPELL_VIRULENT_POISON_PROC    = 22413
 };
 
