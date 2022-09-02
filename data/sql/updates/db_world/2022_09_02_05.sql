@@ -1,3 +1,4 @@
+-- DB update 2022_09_02_04 -> 2022_09_02_05
 --
 DELETE FROM `gossip_menu` WHERE `MenuID` = 6644 AND `TextID` = 8701;
 INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
