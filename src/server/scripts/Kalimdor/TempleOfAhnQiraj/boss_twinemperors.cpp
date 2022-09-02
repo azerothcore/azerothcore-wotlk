@@ -65,8 +65,8 @@ enum Say
 
 enum Sounds
 {
-    SOUND_VK_AGGRO = 8657,
-    SOUND_VN_AGGRO = 8661
+    SOUND_VK_AGGRO                = 8657,
+    SOUND_VN_AGGRO                = 8661
 };
 
 enum Misc
