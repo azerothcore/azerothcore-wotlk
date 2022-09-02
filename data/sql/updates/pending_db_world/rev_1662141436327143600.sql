@@ -1,4 +1,8 @@
 --
+DELETE FROM `gossip_menu` WHERE `MenuID` = 6644 AND `TextID` = 8701;
+INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
+(6644, 8701);
+
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 14 AND `SourceGroup` = 6644 AND `SourceEntry` IN (7899, 8701, 8702);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (14, 6644, 7899, 0, 0, 13, 0, 7, 3, 2, 1, 0, 0, '', 'Andorgos show text 7899 if Twin Emperors is not done'),
