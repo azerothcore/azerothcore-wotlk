@@ -1,3 +1,4 @@
+-- DB update 2022_09_02_03 -> 2022_09_02_04
 -- Gurubashi Axe Thrower (11350) & Zulian Crocolisk (15043)
 UPDATE `creature_template` SET `DamageModifier` = 4.05, `ArmorModifier` = 1.1 WHERE `entry` IN (11350,15043);
 -- Hakkari Priest (11830)
