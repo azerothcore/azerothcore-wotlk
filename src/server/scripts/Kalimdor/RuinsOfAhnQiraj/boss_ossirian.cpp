@@ -109,6 +109,7 @@ struct boss_ossirian : public BossAI
 
     void InitializeAI() override
     {
+        me->m_CombatDistance = 50.0f;
         Reset();
     }
 
