@@ -15,10 +15,10 @@
 -- Dumpar struktur för tabell acore_characters.character_achievement_progress
 DROP TABLE IF EXISTS `character_achievement_progress`;
 CREATE TABLE IF NOT EXISTS `character_achievement_progress` (
-  `guid` INT unsigned NOT NULL,
-  `criteria` SMALLINT unsigned NOT NULL,
-  `counter` INT unsigned NOT NULL,
-  `date` INT unsigned NOT NULL DEFAULT 0,
+  `guid` int unsigned NOT NULL,
+  `criteria` smallint unsigned NOT NULL,
+  `counter` int unsigned NOT NULL,
+  `date` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`criteria`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

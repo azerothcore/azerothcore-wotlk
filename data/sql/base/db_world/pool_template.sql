@@ -15,13 +15,13 @@
 -- Dumpar struktur för tabell acore_world.pool_template
 DROP TABLE IF EXISTS `pool_template`;
 CREATE TABLE IF NOT EXISTS `pool_template` (
-  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Pool entry',
-  `max_limit` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Max number of objects (0) is no limit',
-  `description` VARCHAR(255) DEFAULT NULL,
+  `entry` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Pool entry',
+  `max_limit` int unsigned NOT NULL DEFAULT '0' COMMENT 'Max number of objects (0) is no limit',
+  `description` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Dumpar data för tabell acore_world.pool_template: 3 186 rows
+-- Dumpar data för tabell acore_world.pool_template: 3 246 rows
 DELETE FROM `pool_template`;
 /*!40000 ALTER TABLE `pool_template` DISABLE KEYS */;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
@@ -3210,7 +3210,67 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 	(430, 4, 'Teldrassil Earthroot Pool 2 of 4--4 spawns active'),
 	(431, 3, 'Teldrassil Earthroot Pool 3 of 4--3 spawns active'),
 	(432, 4, 'Teldrassil Earthroot Pool 4 of 4--4 spawns active'),
-	(86300, 1, 'Sewer Beast Pool');
+	(86300, 1, 'Sewer Beast Pool'),
+	(391, 4, 'Brontus Kodo Pack Combo 1 -- 4 Barrens Kodo Pack'),
+	(392, 4, 'Brontus Kodo Pack Combo 2 -- Mixed Kodo Pack'),
+	(393, 4, 'Brontus Kodo Pack Combo 3 -- Brontus Pack'),
+	(394, 1, 'Brontus Kodo Pack Pool of Pools'),
+	(433, 1, 'Mulgore NW Harpies, Battered Chest 106318'),
+	(434, 1, 'Mulgore N Harpies, Battered Chest 106318'),
+	(435, 1, 'Wildmane Water Well, Battered Chest 106318'),
+	(436, 1, 'Mulgore NE Harpies, Battered Chest 106318'),
+	(437, 1, 'Mulgore Venture Co Cave Inside, Battered Chest 106318'),
+	(438, 1, 'Mulgore Venture Co Cave Outside, Battered Chest 106318'),
+	(439, 1, 'Mulgore SE Harpies, Battered Chest 106318'),
+	(440, 1, 'Mulgore East Palemane Gnoll Camp, Battered Chest 106318'),
+	(441, 1, 'Mulgore West Palemane Gnoll Camp, Battered Chest 106318'),
+	(442, 1, 'Mulgore Gnolls Outside Cave Camp, Battered Chest 106318'),
+	(443, 1, 'Mulgore Gnoll Cave, Battered Chest 106318'),
+	(444, 1, 'Mulgore Dwarven Camp, Battered Chest 106318'),
+	(445, 1, 'Mulgore Western Harpies, Battered Chest 106318'),
+	(446, 1, 'Mulgore Venture Co Caravan, Battered Chest 106318'),
+	(395, 2, 'ZG Sungrass'),
+	(396, 3, 'ZG Purple Lotus'),
+	(397, 4, 'ZG Mountain Silversage'),
+	(398, 5, 'ZG Golden Sansam'),
+	(399, 5, 'ZG Dreamfoil'),
+	(447, 4, 'ZG Hakkari Thorium Vein'),
+	(448, 1, 'ZG Entrance Snake 3-4 Pack Pool of Pools'),
+	(449, 3, 'ZG Entrance Snake as 3 Pack 1/8'),
+	(450, 3, 'ZG Entrance Snake as 3 Pack 2/8'),
+	(451, 3, 'ZG Entrance Snake as 3 Pack 3/8'),
+	(452, 3, 'ZG Entrance Snake as 3 Pack 4/8'),
+	(453, 3, 'ZG Entrance Snake as 3 Pack 5/8'),
+	(454, 3, 'ZG Entrance Snake as 3 Pack 6/8'),
+	(455, 3, 'ZG Entrance Snake as 3 Pack 7/8'),
+	(456, 3, 'ZG Entrance Snake as 3 Pack 8/8'),
+	(457, 4, 'ZG Entrance Snake as 4 Pack 1/12'),
+	(458, 4, 'ZG Entrance Snake as 4 Pack 2/12'),
+	(459, 4, 'ZG Entrance Snake as 4 Pack 3/12'),
+	(460, 4, 'ZG Entrance Snake as 4 Pack 4/12'),
+	(461, 4, 'ZG Entrance Snake as 4 Pack 5/12'),
+	(462, 4, 'ZG Entrance Snake as 4 Pack 6/12'),
+	(463, 4, 'ZG Entrance Snake as 4 Pack 7/12'),
+	(464, 4, 'ZG Entrance Snake as 4 Pack 8/12'),
+	(465, 4, 'ZG Entrance Snake as 4 Pack 9/12'),
+	(466, 4, 'ZG Entrance Snake as 4 Pack 10/12'),
+	(467, 4, 'ZG Entrance Snake as 4 Pack 11/12'),
+	(468, 4, 'ZG Entrance Snake as 4 Pack 12/12'),
+	(469, 1, 'ZG Before Bats 4-5 Pack Pool of Zulian Crocs Pool of Pools'),
+	(470, 5, 'ZG Before Bats 5 Pack of Zulian Crocs 15043 50% 1/6'),
+	(471, 4, 'ZG Before Bats 4 Pack of Zulian Crocs 15043 10% 2/6'),
+	(472, 4, 'ZG Before Bats 4 Pack of Zulian Crocs 15043 10% 3/6'),
+	(473, 4, 'ZG Before Bats 4 Pack of Zulian Crocs 15043 10% 4/6'),
+	(474, 4, 'ZG Before Bats 4 Pack of Zulian Crocs 15043 10% 5/6'),
+	(475, 4, 'ZG Before Bats 4 Pack of Zulian Crocs 15043 10% 6/6'),
+	(479, 1, 'ZG Before Bats Bat Pack Rider Location Shuffle'),
+	(480, 4, 'ZG Before Bats Bat Pack Loc 1/4'),
+	(481, 4, 'ZG Before Bats Bat Pack Loc 2/4'),
+	(482, 4, 'ZG Before Bats Bat Pack Loc 3/4'),
+	(483, 4, 'ZG Before Bats Bat Pack Loc 4/4'),
+	(476, 1, 'ZG Before Bats Troll 3-Pack'),
+	(477, 3, 'ZG Before Bats Troll 3-Pack with 2x entry 11831 50% 1/2'),
+	(478, 3, 'ZG Before Bats Troll 3-Pack with 2x entry 11351 50% 2/2');
 /*!40000 ALTER TABLE `pool_template` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

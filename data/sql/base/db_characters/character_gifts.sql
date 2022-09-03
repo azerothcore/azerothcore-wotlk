@@ -15,10 +15,10 @@
 -- Dumpar struktur för tabell acore_characters.character_gifts
 DROP TABLE IF EXISTS `character_gifts`;
 CREATE TABLE IF NOT EXISTS `character_gifts` (
-  `guid` INT unsigned NOT NULL DEFAULT 0,
-  `item_guid` INT unsigned NOT NULL DEFAULT 0,
-  `entry` INT unsigned NOT NULL DEFAULT 0,
-  `flags` INT unsigned NOT NULL DEFAULT 0,
+  `guid` int unsigned NOT NULL DEFAULT '0',
+  `item_guid` int unsigned NOT NULL DEFAULT '0',
+  `entry` int unsigned NOT NULL DEFAULT '0',
+  `flags` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`item_guid`),
   KEY `idx_guid` (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

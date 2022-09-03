@@ -15,21 +15,21 @@
 -- Dumpar struktur för tabell acore_world.waypoint_scripts
 DROP TABLE IF EXISTS `waypoint_scripts`;
 CREATE TABLE IF NOT EXISTS `waypoint_scripts` (
-  `id` INT unsigned NOT NULL DEFAULT 0,
-  `delay` INT unsigned NOT NULL DEFAULT 0,
-  `command` INT unsigned NOT NULL DEFAULT 0,
-  `datalong` INT unsigned NOT NULL DEFAULT 0,
-  `datalong2` INT unsigned NOT NULL DEFAULT 0,
-  `dataint` INT unsigned NOT NULL DEFAULT 0,
-  `x` float NOT NULL DEFAULT 0,
-  `y` float NOT NULL DEFAULT 0,
-  `z` float NOT NULL DEFAULT 0,
-  `o` float NOT NULL DEFAULT 0,
-  `guid` INT NOT NULL DEFAULT 0,
+  `id` int unsigned NOT NULL DEFAULT '0',
+  `delay` int unsigned NOT NULL DEFAULT '0',
+  `command` int unsigned NOT NULL DEFAULT '0',
+  `datalong` int unsigned NOT NULL DEFAULT '0',
+  `datalong2` int unsigned NOT NULL DEFAULT '0',
+  `dataint` int unsigned NOT NULL DEFAULT '0',
+  `x` float NOT NULL DEFAULT '0',
+  `y` float NOT NULL DEFAULT '0',
+  `z` float NOT NULL DEFAULT '0',
+  `o` float NOT NULL DEFAULT '0',
+  `guid` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Dumpar data för tabell acore_world.waypoint_scripts: 585 rows
+-- Dumpar data för tabell acore_world.waypoint_scripts: 584 rows
 DELETE FROM `waypoint_scripts`;
 /*!40000 ALTER TABLE `waypoint_scripts` DISABLE KEYS */;
 INSERT INTO `waypoint_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `dataint`, `x`, `y`, `z`, `o`, `guid`) VALUES
@@ -158,7 +158,6 @@ INSERT INTO `waypoint_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2
 	(157, 0, 2, 83, 1, 0, 0, 0, 0, 0, 167),
 	(158, 0, 2, 83, 6, 0, 0, 0, 0, 0, 168),
 	(159, 0, 2, 83, 1, 0, 0, 0, 0, 0, 169),
-	(160, 0, 0, 0, 0, 16059, 0, 0, 0, 0, 170),
 	(161, 0, 2, 83, 36, 0, 0, 0, 0, 0, 171),
 	(162, 0, 2, 83, 36, 0, 0, 0, 0, 0, 172),
 	(163, 0, 2, 83, 36, 0, 0, 0, 0, 0, 173),

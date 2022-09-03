@@ -15,8 +15,8 @@
 -- Dumpar struktur för tabell acore_world.gtoctclasscombatratingscalar_dbc
 DROP TABLE IF EXISTS `gtoctclasscombatratingscalar_dbc`;
 CREATE TABLE IF NOT EXISTS `gtoctclasscombatratingscalar_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `Data` float NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `Data` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED;
 

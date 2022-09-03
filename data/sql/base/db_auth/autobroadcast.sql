@@ -13,11 +13,10 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 -- Dumpar struktur för tabell acore_auth.autobroadcast
-DROP TABLE IF EXISTS `autobroadcast`;
 CREATE TABLE IF NOT EXISTS `autobroadcast` (
-  `realmid` INT NOT NULL DEFAULT '-1',
-  `id` TINYINT unsigned NOT NULL AUTO_INCREMENT,
-  `weight` TINYINT unsigned DEFAULT 1,
+  `realmid` int NOT NULL DEFAULT '-1',
+  `id` tinyint unsigned NOT NULL AUTO_INCREMENT,
+  `weight` tinyint unsigned DEFAULT '1',
   `text` longtext NOT NULL,
   PRIMARY KEY (`id`,`realmid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
