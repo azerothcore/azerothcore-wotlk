@@ -329,7 +329,7 @@ struct boss_veklor : public boss_twinemperorsAI
 {
     boss_veklor(Creature* creature) : boss_twinemperorsAI(creature)
     {
-        me->SetFloatValue(UNIT_FIELD_COMBATREACH, 20.f);
+        me->SetFloatValue(UNIT_FIELD_COMBATREACH, 45.f);
     }
 
     bool IAmVeklor() override { return true; }
