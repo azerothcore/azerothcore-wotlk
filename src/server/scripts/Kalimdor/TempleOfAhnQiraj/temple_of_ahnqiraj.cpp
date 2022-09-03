@@ -36,6 +36,12 @@ enum Spells
     SPELL_SUMMON_WARRIOR                = 17431,
     SPELL_SUMMON_SWARMGUARD             = 17430,
 
+    SPELL_FEAR                          = 26070,
+    SPELL_ENTAGLING_ROOTS               = 26071,
+    SPELL_SILENCE                       = 26069,
+    SPELL_DUST_CLOUD                    = 26072,
+    SPELL_FIRE_NOVA                     = 26073,
+
     SPELL_SUMMON_LARGE_OBSIDIAN_CHUNK   = 27630, // Server-side
 
     TALK_ENRAGE                         = 0
@@ -183,8 +189,78 @@ class spell_aggro_drones : public SpellScript
     }
 };
 
+struct npc_obsidian_warder : public ScriptedAI
+{
+    npc_obsidian_warder(Creature* creature) : ScriptedAI(creature)
+    {
+    }
+
+    void Reset() override
+    {
+        _scheduler.CancelAll();
+    }
+
+    void EnterCombat(Unit* /*who*/) override
+    {
+        if (urand(0, 1))
+        {
+            _scheduler.Schedule(5s, 5s, [this](TaskContext context)
+            {
+                DoCastAOE(SPELL_FEAR, true);
+                context.Repeat(20s, 20s);
+            });
+        }
+        else
+        {
+            _scheduler.Schedule(5s, 5s, [this](TaskContext context)
+            {
+                DoCastAOE(SPELL_ENTAGLING_ROOTS, true);
+                context.Repeat(20s, 20s);
+            });
+        }
+
+        if (urand(0, 1))
+        {
+            _scheduler.Schedule(4s, 4s, [this](TaskContext context)
+            {
+                DoCastAOE(SPELL_SILENCE, true);
+                context.Repeat(15s, 15s);
+            });
+        }
+        else
+        {
+            _scheduler.Schedule(4s, 4s, [this](TaskContext context)
+            {
+                DoCastAOE(SPELL_DUST_CLOUD, true);
+                context.Repeat(15s, 15s);
+            });
+        }
+
+        _scheduler.Schedule(2s, 2s, [this](TaskContext context)
+        {
+            DoCastAOE(SPELL_FIRE_NOVA, true);
+            context.Repeat(8s, 15s);
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+        {
+            return;
+        }
+
+        _scheduler.Update(diff,
+            std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
+    }
+
+private:
+    TaskScheduler _scheduler;
+};
+
 void AddSC_temple_of_ahnqiraj()
 {
     RegisterTempleOfAhnQirajCreatureAI(npc_anubisath_defender);
     RegisterSpellScript(spell_aggro_drones);
+    RegisterTempleOfAhnQirajCreatureAI(npc_obsidian_warder);
 }
