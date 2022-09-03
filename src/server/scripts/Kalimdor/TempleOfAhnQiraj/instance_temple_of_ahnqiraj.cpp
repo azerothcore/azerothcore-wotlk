@@ -96,7 +96,7 @@ public:
                     break;
                 case NPC_MASTERS_EYE:
                     if (GetBossState(DATA_TWIN_EMPERORS) != DONE)
-                        creature->Respawn();
+                        creature->Respawn(true);
                     break;
                 case NPC_CTHUN:
                     CThunGUID = creature->GetGUID();
