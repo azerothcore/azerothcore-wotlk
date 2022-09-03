@@ -138,19 +138,9 @@ struct boss_twinemperorsAI : public BossAI
 
     void JustDied(Unit* killer) override
     {
-        if (killer)
-        {
-            if (killer->GetEntry() == NPC_VEKLOR || killer->GetEntry() == NPC_VEKNILASH)
-            {
-                me->RemoveDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
-            }
-            else
-            {
-                if (Creature* twin = GetTwin())
-                    if (twin->IsAlive())
-                        Unit::Kill(me, twin);
-            }
-        }
+        if (Creature* twin = GetTwin())
+            if (twin->IsAlive())
+                Unit::Kill(me, twin);
 
         Talk(SAY_DEATH);
 
@@ -260,7 +250,7 @@ struct boss_twinemperorsAI : public BossAI
 
         if (Creature* twin = GetTwin())
             if (!twin->IsInCombat())
-                twin->AI()->EnterCombat(who);
+                twin->AI()->AttackStart(who);
 
         _scheduler
             .Schedule(15min, [this](TaskContext /*context*/)
@@ -435,15 +425,21 @@ public:
     }
 };
 
-class spell_mutate_bug : public SpellScript
+class spell_mutate_explode_bug : public SpellScript
 {
-    PrepareSpellScript(spell_mutate_bug);
+    PrepareSpellScript(spell_mutate_explode_bug);
 
     void FilterTargets(std::list<WorldObject*>& targets)
     {
         targets.remove_if([&](WorldObject const* target) -> bool
             {
-                return target->GetEntry() != NPC_QIRAJI_SCARAB && target->GetEntry() != NPC_QIRAJI_SCORPION;
+                if (target->GetEntry() != NPC_QIRAJI_SCARAB && target->GetEntry() != NPC_QIRAJI_SCORPION)
+                    return true;
+                if (Creature const* creature = target->ToCreature())
+                    if (creature->HasAura(SPELL_EXPLODE_BUG) || creature->HasAura(SPELL_MUTATE_BUG))
+                        return true;
+
+                return false;
             });
 
         Acore::Containers::RandomResize(targets, 1);
@@ -459,7 +455,8 @@ class spell_mutate_bug : public SpellScript
         if (!target)
             return;
 
-        target->CastSpell(target, SPELL_VIRULENT_POISON_PROC, true);
+        if (m_scriptSpellId == SPELL_MUTATE_BUG)
+            target->CastSpell(target, SPELL_VIRULENT_POISON_PROC, true);
         target->SetFaction(FACTION_HOSTILE);
         target->SetReactState(REACT_AGGRESSIVE);
         target->SetInCombatWithZone();
@@ -467,28 +464,8 @@ class spell_mutate_bug : public SpellScript
 
     void Register() override
     {
-        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mutate_bug::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENTRY);
-        OnHit += SpellHitFn(spell_mutate_bug::HandleOnHit);
-    }
-};
-
-class spell_explode_bug : public SpellScript
-{
-    PrepareSpellScript(spell_explode_bug);
-
-    void FilterTargets(std::list<WorldObject*>& targets)
-    {
-        targets.remove_if([&](WorldObject const* target) -> bool
-            {
-                return target->GetEntry() != NPC_QIRAJI_SCARAB && target->GetEntry() != NPC_QIRAJI_SCORPION;
-            });
-
-        Acore::Containers::RandomResize(targets, 1);
-    }
-
-    void Register() override
-    {
-        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_explode_bug::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENTRY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mutate_explode_bug::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENTRY);
+        OnHit += SpellHitFn(spell_mutate_explode_bug::HandleOnHit);
     }
 };
 
@@ -497,6 +474,5 @@ void AddSC_boss_twinemperors()
     RegisterTempleOfAhnQirajCreatureAI(boss_veknilash);
     RegisterTempleOfAhnQirajCreatureAI(boss_veklor);
     new at_twin_emperors();
-    RegisterSpellScript(spell_mutate_bug);
-    RegisterSpellScript(spell_explode_bug);
+    RegisterSpellScript(spell_mutate_explode_bug);
 }
