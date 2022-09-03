@@ -90,7 +90,7 @@ struct boss_viscidus : public BossAI
 
     void Reset() override
     {
-        _Reset();
+        BossAI::Reset();
         _hitcounter = 0;
         _phase = PHASE_FROST;
     }
@@ -107,7 +107,7 @@ struct boss_viscidus : public BossAI
             Talk(EMOTE_EXPLODE);
             events.Reset();
             _phase = PHASE_GLOB;
-            DoCast(me, SPELL_VISCIDUS_EXPLODE);
+            DoCastSelf(SPELL_VISCIDUS_EXPLODE);
             me->SetVisible(false);
             me->RemoveAura(SPELL_TOXIN);
             me->RemoveAura(SPELL_VISCIDUS_FREEZE);
@@ -145,7 +145,7 @@ struct boss_viscidus : public BossAI
                 _hitcounter = 0;
                 Talk(EMOTE_FROZEN);
                 _phase = PHASE_MELEE;
-                DoCast(me, SPELL_VISCIDUS_FREEZE);
+                DoCastSelf(SPELL_VISCIDUS_FREEZE);
                 me->RemoveAura(SPELL_VISCIDUS_SLOWED_MORE);
                 events.ScheduleEvent(EVENT_RESET_PHASE, 15000);
             }
@@ -153,26 +153,25 @@ struct boss_viscidus : public BossAI
             {
                 Talk(EMOTE_FREEZE);
                 me->RemoveAura(SPELL_VISCIDUS_SLOWED);
-                DoCast(me, SPELL_VISCIDUS_SLOWED_MORE);
+                DoCastSelf(SPELL_VISCIDUS_SLOWED_MORE);
             }
             else if (_hitcounter >= HITCOUNTER_SLOW)
             {
                 Talk(EMOTE_SLOW);
-                DoCast(me, SPELL_VISCIDUS_SLOWED);
+                DoCastSelf(SPELL_VISCIDUS_SLOWED);
             }
         }
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void EnterCombat(Unit* who) override
     {
-        _EnterCombat();
-        events.Reset();
+        BossAI::EnterCombat(who);
         InitSpells();
     }
 
     void InitSpells()
     {
-        DoCast(me, SPELL_TOXIN);
+        DoCastSelf(SPELL_TOXIN);
         events.ScheduleEvent(EVENT_POISONBOLT_VOLLEY, 10s, 15s);
         events.ScheduleEvent(EVENT_POISON_SHOCK, 7s, 12s);
     }
@@ -180,12 +179,12 @@ struct boss_viscidus : public BossAI
     void EnterEvadeMode(EvadeReason why) override
     {
         summons.DespawnAll();
-        ScriptedAI::EnterEvadeMode(why);
+        BossAI::EnterEvadeMode(why);
     }
 
     void JustDied(Unit* /*killer*/) override
     {
-        DoCast(me, SPELL_VISCIDUS_SUICIDE);
+        DoCastSelf(SPELL_VISCIDUS_SUICIDE);
         summons.DespawnAll();
     }
 
@@ -215,11 +214,11 @@ struct boss_viscidus : public BossAI
             switch (eventId)
             {
                 case EVENT_POISONBOLT_VOLLEY:
-                    DoCast(me, SPELL_POISONBOLT_VOLLEY);
+                    DoCastSelf(SPELL_POISONBOLT_VOLLEY);
                     events.ScheduleEvent(EVENT_POISONBOLT_VOLLEY, 10s, 15s);
                     break;
                 case EVENT_POISON_SHOCK:
-                    DoCast(me, SPELL_POISON_SHOCK);
+                    DoCastSelf(SPELL_POISON_SHOCK);
                     events.ScheduleEvent(EVENT_POISON_SHOCK, 7s, 12s);
                     break;
                 case EVENT_RESET_PHASE:
@@ -270,7 +269,7 @@ struct boss_glob_of_viscidus : public ScriptedAI
     {
         if (id == ROOM_CENTER)
         {
-            DoCast(me, SPELL_REJOIN_VISCIDUS);
+            DoCastSelf(SPELL_REJOIN_VISCIDUS);
             if (TempSummon* summon = me->ToTempSummon())
                 summon->UnSummon();
         }
