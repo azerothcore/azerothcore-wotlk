@@ -4367,6 +4367,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
     });
 
+    // Wyvern Sting DoT
+    ApplySpellFix({ 24131, 24134, 24135 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY);
+    });
+
      // Feed Pet
     ApplySpellFix({ 1539, 51284 }, [](SpellInfo* spellInfo)
     {
