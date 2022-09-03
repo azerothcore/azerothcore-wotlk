@@ -4379,6 +4379,16 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Attributes |= SPELL_ATTR0_ALLOW_WHILE_SITTING;
     });
 
+    // Eye of Kilrogg Passive (DND)
+    ApplySpellFix({ 58083 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_2].Effect = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->Effects[EFFECT_2].BasePoints = 49;
+        spellInfo->Effects[EFFECT_2].DieSides = 1;
+        spellInfo->Effects[EFFECT_2].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
+        spellInfo->Effects[EFFECT_2].ApplyAuraName = SPELL_AURA_MOD_INCREASE_SPEED;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];

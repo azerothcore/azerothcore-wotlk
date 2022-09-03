@@ -62,7 +62,9 @@ enum WarlockSpells
     SPELL_WARLOCK_SIPHON_LIFE_HEAL                  = 63106,
     SPELL_WARLOCK_UNSTABLE_AFFLICTION_DISPEL        = 31117,
     SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_R1            = 18213,
-    SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_PROC          = 18371
+    SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_PROC          = 18371,
+    SPELL_WARLOCK_GLYPH_OF_KILROGG                  = 58081,
+    SPELL_WARLOCK_EYE_OF_KILROGG_PASSIVE            = 58083
 };
 
 enum WarlockSpellIcons
@@ -78,23 +80,6 @@ class spell_warl_eye_of_kilrogg : public AuraScript
     void HandleAuraApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         PreventDefaultAction();
-        if (Player* player = GetTarget()->ToPlayer())
-        {
-            player->UnsummonPetTemporaryIfAny();
-
-            // Glyph of Kilrogg
-            if (player->HasAura(58081))
-                if (Unit* charm = player->GetCharm())
-                {
-                    charm->SetSpeed(MOVE_RUN, 2.14f, true);
-                    if (charm->GetMapId() == 530 || charm->GetMapId() == 571)
-                    {
-                        charm->SetCanFly(true);
-                        charm->SetSpeed(MOVE_FLIGHT, 2.14f, true);
-                        charm->SendMovementFlagUpdate();
-                    }
-                }
-        }
     }
 
     void HandleAuraRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -113,6 +98,26 @@ class spell_warl_eye_of_kilrogg : public AuraScript
         OnEffectApply += AuraEffectApplyFn(spell_warl_eye_of_kilrogg::HandleAuraApply, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         AfterEffectRemove += AuraEffectRemoveFn(spell_warl_eye_of_kilrogg::HandleAuraRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
+};
+
+struct npc_eye_of_kilrogg : public CreatureAI
+{
+public:
+    npc_eye_of_kilrogg(Creature* creature) : CreatureAI(creature) { }
+
+    void Reset() override
+    {
+        if (Unit* owner = me->GetCharmerOrOwner())
+        {
+            if (owner->HasAura(SPELL_WARLOCK_GLYPH_OF_KILROGG))
+            {
+                if (me->GetMapId() == 530 || me->GetMapId() == 571)
+                    me->AddAura(SPELL_WARLOCK_EYE_OF_KILROGG_PASSIVE, me);
+            }
+        }
+    }
+
+    void UpdateAI(uint32 /*diff*/) override { }
 };
 
 class spell_warl_shadowflame : public SpellScript
@@ -1272,6 +1277,7 @@ class spell_warl_glyph_of_felguard : public AuraScript
 void AddSC_warlock_spell_scripts()
 {
     RegisterSpellScript(spell_warl_eye_of_kilrogg);
+    RegisterCreatureAI(npc_eye_of_kilrogg);
     RegisterSpellScript(spell_warl_shadowflame);
     RegisterSpellScript(spell_warl_seduction);
     RegisterSpellScript(spell_warl_improved_demonic_tactics);
