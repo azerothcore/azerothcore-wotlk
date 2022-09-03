@@ -235,6 +235,7 @@ public:
 			AddGossipItemFor(player,5, "|TInterface/ICONS/icon_roga:20|t ViP-Диадема [Разбойник]", GOSSIP_SENDER_MAIN, 1253);
 			AddGossipItemFor(player,5, "|TInterface/ICONS/icon_roga:20|t ViP-Диадема [Жрец]", GOSSIP_SENDER_MAIN, 1254);
 			AddGossipItemFor(player,5, "|TInterface/ICONS/icon_roga:20|t ViP-Диадема [Шаман]", GOSSIP_SENDER_MAIN, 1255);
+            AddGossipItemFor(player, 5, "|TInterface/ICONS/icon_roga:20|t ViP-Диадема [Шаман СПД]", GOSSIP_SENDER_MAIN, 1260);
 			AddGossipItemFor(player,5, "|TInterface/ICONS/icon_roga:20|t ViP-Диадема [Маг]", GOSSIP_SENDER_MAIN, 1256);
 			AddGossipItemFor(player,5, "|TInterface/ICONS/icon_roga:20|t ViP-Диадема [Чернокнижник]", GOSSIP_SENDER_MAIN, 1257);
 			AddGossipItemFor(player,5, "|TInterface/ICONS/icon_roga:20|t ViP-Диадема [Друид]", GOSSIP_SENDER_MAIN, 1258);
@@ -857,6 +858,18 @@ public:
 				player->AddItem(80054, 1);
 			}
 			break;
+        case 1260: // Шаман СПД
+            if (player->HasItemCount(80085, 1))
+            {
+                CloseGossipMenuFor(player);
+                creature->Whisper(EMOTE_ALREADY_ITEM, LANG_UNIVERSAL, player);
+            }
+            else
+            {
+                CloseGossipMenuFor(player);
+                player->AddItem(80085, 1);
+            }
+            break;
 		case 1216: // 36 Slot Bag
 			if (player->HasItemCount(300048, 1))
 			{

@@ -52,6 +52,20 @@ public:
             sWorld->SendServerMessage(SERVER_MSG_STRING, msg);
         }
 
+        if (killed->GetEntry() == 29611)
+        {
+            char msg[250];
+            snprintf(msg, 250, "|CFF7BBEF7[Boss]|r: Игрок|cffff0000 %s|r и его группа, уничтожили [Короля Вариана], следующий респавн босса через: 2 часа.", killer->GetName());
+            sWorld->SendServerMessage(SERVER_MSG_STRING, msg);
+        }
+
+        if (killed->GetEntry() == 4949)
+        {
+            char msg[250];
+            snprintf(msg, 250, "|CFF7BBEF7[Boss]|r: Игрок|cffff0000 %s|r и его группа, уничтожили [Тралла], следующий респавн босса через: 2 часа.", killer->GetName());
+            sWorld->SendServerMessage(SERVER_MSG_STRING, msg);
+        }
+
 	}
 
 };

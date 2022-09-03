@@ -76,6 +76,7 @@ public:
                 AddGossipItemFor(player, 5, "[Extreme Sword] Скорость: 3.00", GOSSIP_SENDER_MAIN, 26, "Вы уверены?", 0, false);
                 AddGossipItemFor(player, 5, "[Extreme Sword One-Hand]", GOSSIP_SENDER_MAIN, 56, "Вы уверены?", 0, false);
                 AddGossipItemFor(player, 5, "[Extreme Dagger] х1", GOSSIP_SENDER_MAIN, 40, "Вы уверены?", 0, false);
+                AddGossipItemFor(player, 5, "[Unique Dagger] х1", GOSSIP_SENDER_MAIN, 158, "Вы уверены?", 0, false);
                 AddGossipItemFor(player, 5, "[Unique Wand] х1", GOSSIP_SENDER_MAIN, 25, "Вы уверены?", 0, false);
                 AddGossipItemFor(player, 5, "[Extreme Bow] х1", GOSSIP_SENDER_MAIN, 58, "Вы уверены?", 0, false);
                 AddGossipItemFor(player, 5, "[Unique Bow] х1", GOSSIP_SENDER_MAIN, 59, "Вы уверены?", 0, false);
@@ -296,6 +297,22 @@ public:
                     player->DestroyItemCount(90033, 100, true, false);
                     player->DestroyItemCount(500064, 1, true, false);
                     player->AddItem(90033, 5000);
+                    _creature->Whisper("Вы совершили обмен!", LANG_UNIVERSAL, player);
+                }
+                else
+                {
+                    CloseGossipMenuFor(player);
+                    _creature->Whisper("Вы не владеете этой вещью!", LANG_UNIVERSAL, player);
+                    return false;
+                }
+                break;
+            case 158:
+                if (player->HasItemCount(500040, 1, false))
+                {
+                    CloseGossipMenuFor(player);
+                    player->DestroyItemCount(90033, 100, true, false);
+                    player->DestroyItemCount(500040, 1, true, false);
+                    player->AddItem(90033, 7000);
                     _creature->Whisper("Вы совершили обмен!", LANG_UNIVERSAL, player);
                 }
                 else
