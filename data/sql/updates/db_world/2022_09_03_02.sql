@@ -1,3 +1,4 @@
+-- DB update 2022_09_03_01 -> 2022_09_03_02
 -- General Angerforge
 SET @BOSS=45954;
 DELETE FROM `linked_respawn` WHERE `linkedGuid`=@BOSS AND `guid` IN (45955,45956,45958,45959);
