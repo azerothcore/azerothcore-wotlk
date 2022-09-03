@@ -40,7 +40,7 @@ enum Spells
     SPELL_CURSE_OF_TONGUES              = 25195,
     SPELL_ENVELOPING_WINDS              = 25189,
     SPELL_WAR_STOMP                     = 25188,
-    SPELL_STRENGHT_OF_OSSIRIAN          = 25176,
+    SPELL_STRENGTH_OF_OSSIRIAN          = 25176,
     SPELL_SAND_STORM                    = 25160,
     SPELL_SUMMON_CRYSTAL                = 25192,
     SPELL_SUMMON_SMALL_OBSIDIAN_CHUNK   = 27627, // Server-side
@@ -148,7 +148,7 @@ struct boss_ossirian : public BossAI
         {
             if (spell->Id == weakness)
             {
-                me->RemoveAurasDueToSpell(SPELL_STRENGHT_OF_OSSIRIAN);
+                me->RemoveAurasDueToSpell(SPELL_STRENGTH_OF_OSSIRIAN);
             }
         }
     }
@@ -169,7 +169,7 @@ struct boss_ossirian : public BossAI
         events.ScheduleEvent(EVENT_SILENCE, 30s);
         events.ScheduleEvent(EVENT_CYCLONE, 20s);
         events.ScheduleEvent(EVENT_STOMP, 30s);
-        DoCastSelf(SPELL_STRENGHT_OF_OSSIRIAN);
+        DoCastSelf(SPELL_STRENGTH_OF_OSSIRIAN);
         Talk(SAY_AGGRO);
 
         Map* map = me->GetMap();
@@ -253,7 +253,7 @@ struct boss_ossirian : public BossAI
 
         events.Update(diff);
         bool applySupreme = true;
-        if (me->HasAura(SPELL_STRENGHT_OF_OSSIRIAN))
+        if (me->HasAura(SPELL_STRENGTH_OF_OSSIRIAN))
         {
             applySupreme = false;
         }
@@ -271,7 +271,7 @@ struct boss_ossirian : public BossAI
 
         if (applySupreme)
         {
-            DoCastSelf(SPELL_STRENGHT_OF_OSSIRIAN);
+            DoCastSelf(SPELL_STRENGTH_OF_OSSIRIAN);
             Talk(SAY_SUPREME);
         }
 
