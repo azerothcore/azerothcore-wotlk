@@ -75,17 +75,19 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 -- Qiraji Scorpion and Scarab (15316 & 15317) - Cmangos
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` IN (15316,15317);
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 15316) AND (`source_type` = 0) AND (`id` IN (0, 1, 2));
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 15316) AND (`source_type` = 0) AND (`id` IN (0, 1, 2, 3));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (15316, 0, 0, 0, 9, 0, 100, 0, 0, 5, 5000, 9000, 0, 11, 6016, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Qiraji Scarab - Within 0-5 Range - Cast \'Pierce Armor\''),
 (15316, 0, 1, 0, 0, 0, 100, 0, 5000, 9000, 6000, 12000, 0, 11, 26050, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Qiraji Scarab - In Combat - Cast \'Acid Spit\''),
-(15316, 0, 2, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 41, 5000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Qiraji Scarab - On Just Died - Despawn In 5000 ms');
+(15316, 0, 2, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 41, 5000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Qiraji Scarab - On Just Died - Despawn In 5000 ms'),
+(15316, 0, 3, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 2, 311, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Qiraji Scarab - On Reset - Set Faction 311');
 
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 15317) AND (`source_type` = 0) AND (`id` IN (0, 1, 2));
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 15317) AND (`source_type` = 0) AND (`id` IN (0, 1, 2, 3));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (15317, 0, 0, 0, 9, 0, 100, 0, 0, 5, 5000, 9000, 0, 11, 6016, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Qiraji Scorpion - Within 0-5 Range - Cast \'Pierce Armor\''),
 (15317, 0, 1, 0, 0, 0, 100, 0, 5000, 9000, 6000, 12000, 0, 11, 26050, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Qiraji Scorpion - In Combat - Cast \'Acid Spit\''),
-(15317, 0, 2, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 41, 5000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Qiraji Scorpion - On Just Died - Despawn In 5000 ms');
+(15317, 0, 2, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 41, 5000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Qiraji Scorpion - On Just Died - Despawn In 5000 ms'),
+(15317, 0, 3, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 2, 311, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Qiraji Scorpion - On Reset - Set Faction 311');
 
 -- Spawn of Fankriss (15630) - Cmangos and Sniffs
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 15630) AND (`source_type` = 0) AND (`id` IN (0));
