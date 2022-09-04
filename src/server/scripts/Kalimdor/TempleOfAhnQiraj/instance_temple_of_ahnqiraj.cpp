@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureGroups.h"
 #include "InstanceScript.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -171,6 +172,34 @@ public:
             }
 
             InstanceScript::OnGameObjectCreate(go);
+        }
+
+        void OnUnitDeath(Unit* unit) override
+        {
+            switch (unit->GetEntry())
+            {
+                case NPC_QIRAJI_SLAYER:
+                case NPC_QIRAJI_MINDSLAYER:
+                    if (Creature* creature = unit->ToCreature())
+                    {
+                        if (CreatureGroup* formation = creature->GetFormation())
+                        {
+                            if (!formation->IsAnyMemberAlive(true))
+                            {
+                                if (Creature* leader = formation->GetLeader())
+                                {
+                                    if (leader->IsAlive())
+                                    {
+                                        leader->AI()->SetData(0, 1);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
 
         uint32 GetData(uint32 type) const override
