@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Map.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
@@ -229,7 +230,7 @@ struct npc_obsidian_nullifier : public ScriptedAI
 
             if (me->GetPowerPct(POWER_MANA) >= 100.f)
             {
-                DoCastAOE(SPELL_NULLIFY, true);
+                DoCastAOE(SPELL_NULLIFY, false);
             }
 
             context.Repeat(6s);

@@ -1,5 +1,5 @@
 --
-UPDATE `creature_template` SET `unit_flags2`=`unit_flags2`|0x00000800, `AiName`='', `ScriptName`='npc_obsidian_nullifier' WHERE `entry`=15312;
+UPDATE `creature_template` SET `unit_flags2`=0, `AiName`='', `ScriptName`='npc_obsidian_nullifier' WHERE `entry`=15312;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=15312 AND `source_type`=0;
 
 DELETE FROM `spell_script_names` WHERE `spell_id` IN (25671,26552);
