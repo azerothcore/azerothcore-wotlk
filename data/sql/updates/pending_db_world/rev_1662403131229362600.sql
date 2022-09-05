@@ -1,4 +1,3 @@
---
 /*  Dark Iron Agent  - GUID 30132  */
 
 UPDATE `creature` SET `MovementType` = 2 WHERE `guid` = 30132;
@@ -389,7 +388,7 @@ UPDATE `creature` SET `position_x` = -521.4, `position_y` = 539.471, `position_z
 
 DELETE FROM `creature_formations` WHERE `memberGUID` = 30368;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
-(30369, 30368, 1.91798, 3.16248, 519, 0, 0);
+(30369, 30368, 1.91798, 181.19675679453258, 519, 0, 0);
 
 /*  Leprous Assistant  - GUID 30369  */
 
@@ -420,7 +419,7 @@ UPDATE `creature` SET `position_x` = -519.507, `position_y` = 540.309, `position
 
 DELETE FROM `creature_formations` WHERE `memberGUID` = 30370;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
-(30369, 30370, 2.79247, 2.32772, 519, 0, 0);
+(30369, 30370, 2.79247, 133.36853188819197, 519, 0, 0);
 
 /*  Leprous Assistant  - GUID 30371  */
 
@@ -428,7 +427,7 @@ UPDATE `creature` SET `position_x` = -522.189, `position_y` = 541.254, `position
 
 DELETE FROM `creature_formations` WHERE `memberGUID` = 30371;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
-(30369, 30371, 3.86772, 3.15194, 519, 0, 0);
+(30369, 30371, 3.86772, 180.59285927846472, 519, 0, 0);
 
 /*  Leprous Technician  - GUID 30372  */
 
@@ -436,7 +435,7 @@ UPDATE `creature` SET `position_x` = -523.258, `position_y` = 538.648, `position
 
 DELETE FROM `creature_formations` WHERE `memberGUID` = 30372;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
-(30369, 30372, 2.82354, 3.96581, 519, 0, 0);
+(30369, 30372, 2.82354, 227.224175350777, 519, 0, 0);
 
 /*  Mechano-Flamewalker  - GUID 30385  */
 
