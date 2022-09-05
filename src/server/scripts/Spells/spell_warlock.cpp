@@ -114,6 +114,8 @@ public:
             {
                 if (me->GetMapId() == 530 || me->GetMapId() == 571)
                     me->AddAura(SPELL_WARLOCK_EYE_OF_KILROGG_PASSIVE, me);
+                else if (me->AddAura(SPELL_WARLOCK_EYE_OF_KILROGG_PASSIVE, me))
+                    me->SetCanFly(false);
             }
         }
     }
