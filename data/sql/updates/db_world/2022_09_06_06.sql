@@ -1,3 +1,4 @@
+-- DB update 2022_09_06_05 -> 2022_09_06_06
 DELETE FROM `lfg_dungeon_template` WHERE `dungeonId` IN (2, 276);
 INSERT INTO `lfg_dungeon_template`
 (`dungeonId`, `name`, `position_x`, `position_y`, `position_z`, `orientation`,
