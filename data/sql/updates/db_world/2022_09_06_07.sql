@@ -1,3 +1,4 @@
+-- DB update 2022_09_06_06 -> 2022_09_06_07
 --
 -- Brambleblade Ravine is in regards to entries 2952 (Bristleback Quilboar), 2954 (Bristbleback Battleboar), 2953 (Bristleback Shaman), 8554 (Chief Sharptusk Thornmantle), and 3229 (Squealer)
 -- A few Bristbleback are still movement type
