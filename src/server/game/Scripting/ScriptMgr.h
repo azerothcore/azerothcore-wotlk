@@ -1316,6 +1316,9 @@ public:
 
     virtual void OnPlayerResurrect(Player* /*player*/, float /*restore_percent*/, bool /*applySickness*/) { }
 
+    // Called before selecting the graveyard when releasing spirit
+    virtual void OnBeforeChooseGraveyard(Player* /*player*/, TeamId /*teamId*/, bool /*nearCorpse*/, uint32& /*graveyardOverride*/) { }
+
     /**
      * @brief This hook called before player sending message in default chat
      *
@@ -2317,6 +2320,7 @@ public: /* PlayerScript */
     void OnSetServerSideVisibility(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
     void OnSetServerSideVisibilityDetect(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
     void OnPlayerResurrect(Player* player, float restore_percent, bool applySickness);
+    void OnBeforeChooseGraveyard(Player* player, TeamId teamId, bool nearCorpse, uint32& graveyardOverride);
     bool CanPlayerUseChat(Player* player, uint32 type, uint32 language, std::string& msg);
     bool CanPlayerUseChat(Player* player, uint32 type, uint32 language, std::string& msg, Player* receiver);
     bool CanPlayerUseChat(Player* player, uint32 type, uint32 language, std::string& msg, Group* group);

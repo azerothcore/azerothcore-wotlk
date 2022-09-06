@@ -1349,6 +1349,14 @@ void ScriptMgr::OnPlayerResurrect(Player* player, float restore_percent, bool ap
     });
 }
 
+void ScriptMgr::OnBeforeChooseGraveyard(Player* player, TeamId teamId, bool nearCorpse, uint32& graveyardOverride)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->OnBeforeChooseGraveyard(player, teamId, nearCorpse, graveyardOverride);
+    });
+}
+
 bool ScriptMgr::CanPlayerUseChat(Player* player, uint32 type, uint32 language, std::string& msg)
 {
     auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript* script)
