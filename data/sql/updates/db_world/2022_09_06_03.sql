@@ -1,3 +1,4 @@
+-- DB update 2022_09_06_02 -> 2022_09_06_03
 DELETE FROM `creature_template_movement` WHERE `CreatureId` = 8964;
 INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES (8964, 1, 0, 2, 0, 0, 0, NULL); -- Sets the drakes to be flying.
 
