@@ -15,11 +15,11 @@
 -- Dumpar struktur för tabell acore_characters.guild_member
 DROP TABLE IF EXISTS `guild_member`;
 CREATE TABLE IF NOT EXISTS `guild_member` (
-  `guildid` INT unsigned NOT NULL COMMENT 'Guild Identificator',
-  `guid` INT unsigned NOT NULL,
-  `rank` TINYINT unsigned NOT NULL,
-  `pnote` VARCHAR(31) NOT NULL DEFAULT '',
-  `offnote` VARCHAR(31) NOT NULL DEFAULT '',
+  `guildid` int unsigned NOT NULL COMMENT 'Guild Identificator',
+  `guid` int unsigned NOT NULL,
+  `rank` tinyint unsigned NOT NULL,
+  `pnote` varchar(31) NOT NULL DEFAULT '',
+  `offnote` varchar(31) NOT NULL DEFAULT '',
   UNIQUE KEY `guid_key` (`guid`),
   KEY `guildid_key` (`guildid`),
   KEY `guildid_rank_key` (`guildid`,`rank`)

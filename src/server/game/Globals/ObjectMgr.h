@@ -520,14 +520,17 @@ typedef std::pair<QuestRelations::const_iterator, QuestRelations::const_iterator
 
 struct PetLevelInfo
 {
-    PetLevelInfo() { for (unsigned short & stat : stats) stat = 0; }
+    PetLevelInfo()
+    {
+        stats.fill(0);
+    }
 
-    uint16 stats[MAX_STATS];
-    uint16 health{0};
-    uint16 mana{0};
+    std::array<uint32, MAX_STATS> stats = { };
+    uint32 health{0};
+    uint32 mana{0};
     uint32 armor{0};
-    uint16 min_dmg{0};
-    uint16 max_dmg{0};
+    uint32 min_dmg{0};
+    uint32 max_dmg{0};
 };
 
 struct MailLevelReward

@@ -15,138 +15,113 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Duskwood
-SD%Complete: 100
-SDComment: Quest Support:8735
-SDCategory: Duskwood
-EndScriptData */
-
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "TaskScheduler.h"
 
-enum TwilightCorrupter
+enum Spells
 {
-    ITEM_FRAGMENT                   = 21149,
-    NPC_TWILIGHT_CORRUPTER          = 15625,
-    YELL_TWILIGHTCORRUPTOR_RESPAWN  = 0,
-    YELL_TWILIGHTCORRUPTOR_AGGRO    = 1,
-    YELL_TWILIGHTCORRUPTOR_KILL     = 2,
     SPELL_SOUL_CORRUPTION           = 25805,
     SPELL_CREATURE_OF_NIGHTMARE     = 25806,
-    SPELL_LEVEL_UP                  = 24312,
+    SPELL_SWELL_OF_SOULS            = 21307,
+};
 
-    EVENT_SOUL_CORRUPTION           = 1,
-    EVENT_CREATURE_OF_NIGHTMARE     = 2
+enum Misc
+{
+    ITEM_FRAGMENT                   = 21149,
+    NPC_TWILIGHT_CORRUPTER          = 15625
+};
+
+enum Say
+{
+    SAY_RESPAWN = 0,
+    SAY_AGGRO,
+    SAY_KILL
 };
 
 /*######
 # boss_twilight_corrupter
 ######*/
 
-class boss_twilight_corrupter : public CreatureScript
+struct boss_twilight_corrupter : public ScriptedAI
 {
-public:
-    boss_twilight_corrupter() : CreatureScript("boss_twilight_corrupter") { }
+    boss_twilight_corrupter(Creature* creature) : ScriptedAI(creature) { }
 
-    struct boss_twilight_corrupterAI : public ScriptedAI
+    void Reset() override
     {
-        boss_twilight_corrupterAI(Creature* creature) : ScriptedAI(creature) { }
-
-        void Reset() override
-        {
-            KillCount                 = 0;
-        }
-
-        void InitializeAI() override
-        {
-            // Xinef: check if copy is summoned
-            std::list<Creature*> cList;
-            me->GetCreatureListWithEntryInGrid(cList, me->GetEntry(), 50.0f);
-            if (!cList.empty())
-                for (std::list<Creature*>::const_iterator itr = cList.begin(); itr != cList.end(); ++itr)
-                    if ((*itr)->IsAlive() && me->GetGUID() != (*itr)->GetGUID())
-                    {
-                        me->DespawnOrUnsummon(1);
-                        break;
-                    }
-
-            _introSpoken = false;
-            ScriptedAI::InitializeAI();
-        }
-
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (!_introSpoken && who->GetTypeId() == TYPEID_PLAYER)
-            {
-                _introSpoken = true;
-                Talk(YELL_TWILIGHTCORRUPTOR_RESPAWN, who);
-                me->SetFaction(FACTION_MONSTER);
-            }
-            ScriptedAI::MoveInLineOfSight(who);
-        }
-
-        void EnterCombat(Unit* /*who*/) override
-        {
-            Talk(YELL_TWILIGHTCORRUPTOR_AGGRO);
-            _events.Reset();
-            _events.ScheduleEvent(EVENT_SOUL_CORRUPTION, 15000);
-            _events.ScheduleEvent(EVENT_CREATURE_OF_NIGHTMARE, 30000);
-        }
-
-        void KilledUnit(Unit* victim) override
-        {
-            if (victim->GetTypeId() == TYPEID_PLAYER)
-            {
-                ++KillCount;
-                Talk(YELL_TWILIGHTCORRUPTOR_KILL, victim);
-
-                if (KillCount == 3)
-                {
-                    DoCast(me, SPELL_LEVEL_UP, true);
-                    KillCount = 0;
-                }
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            _events.Update(diff);
-
-            while (uint32 eventId = _events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    case EVENT_SOUL_CORRUPTION:
-                        DoCastVictim(SPELL_SOUL_CORRUPTION);
-                        _events.ScheduleEvent(EVENT_SOUL_CORRUPTION, rand() % 4000 + 15000);
-                        break;
-                    case EVENT_CREATURE_OF_NIGHTMARE:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true))
-                            DoCast(target, SPELL_CREATURE_OF_NIGHTMARE);
-                        _events.ScheduleEvent(EVENT_CREATURE_OF_NIGHTMARE, 45000);
-                        break;
-                    default:
-                        break;
-                }
-            }
-            DoMeleeAttackIfReady();
-        }
-
-    private:
-        EventMap _events;
-        uint8 KillCount;
-        bool _introSpoken;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new boss_twilight_corrupterAI(creature);
+        _scheduler.CancelAll();
+        me->RemoveAurasDueToSpell(SPELL_SWELL_OF_SOULS);
     }
+
+    void InitializeAI() override
+    {
+        // Xinef: check if copy is summoned
+        std::list<Creature*> cList;
+        me->GetCreatureListWithEntryInGrid(cList, me->GetEntry(), 50.0f);
+        for (Creature* creature : cList)
+        {
+            if (creature->IsAlive() && me->GetGUID() != creature->GetGUID())
+            {
+                me->DespawnOrUnsummon(1);
+                break;
+            }
+        }
+
+        _introSpoken = false;
+        ScriptedAI::InitializeAI();
+    }
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (!_introSpoken && who->GetTypeId() == TYPEID_PLAYER)
+        {
+            _introSpoken = true;
+            Talk(SAY_RESPAWN, who);
+            me->SetFaction(FACTION_MONSTER);
+        }
+        ScriptedAI::MoveInLineOfSight(who);
+    }
+
+    void EnterCombat(Unit* /*who*/) override
+    {
+        Talk(SAY_AGGRO);
+        _scheduler
+            .Schedule(12s, 18s, [this](TaskContext context)
+            {
+                DoCastRandomTarget(SPELL_CREATURE_OF_NIGHTMARE, 1, 100.f);
+                context.Repeat(35s, 45s);
+            })
+            .Schedule(9s, 16s, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_SOUL_CORRUPTION);
+                context.Repeat(5s, 9s);
+            });
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim->GetTypeId() == TYPEID_PLAYER)
+        {
+            Talk(SAY_KILL, victim);
+            DoCastSelf(SPELL_SWELL_OF_SOULS);
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        _scheduler.Update(diff, [this]
+            {
+                DoMeleeAttackIfReady();
+            });
+    }
+
+private:
+    bool _introSpoken;
+    TaskScheduler _scheduler;
 };
 
 /*######
@@ -169,6 +144,6 @@ public:
 
 void AddSC_duskwood()
 {
-    new boss_twilight_corrupter();
+    RegisterCreatureAI(boss_twilight_corrupter);
     new at_twilight_grove();
 }

@@ -1913,6 +1913,10 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
             case FORM_FLIGHT:
             case FORM_MOONKIN:
                 {
+                    if (Player* player = target->ToPlayer())
+                    {
+                        player->SetCanTeleport(true);
+                    }
                     // remove movement affects
                     target->RemoveAurasByShapeShift();
 
@@ -3949,20 +3953,11 @@ void AuraEffect::HandleAuraModBaseResistancePCT(AuraApplication const* aurApp, u
         return;
 
     Unit* target = aurApp->GetTarget();
-
-    // only players have base stats
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    for (int8 x = SPELL_SCHOOL_NORMAL; x < MAX_SPELL_SCHOOL; x++)
     {
-        //pets only have base armor
-        if (target->IsPet() && (GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL))
-            target->HandleStatModifier(UNIT_MOD_ARMOR, BASE_PCT, float(GetAmount()), apply);
-    }
-    else
-    {
-        for (int8 x = SPELL_SCHOOL_NORMAL; x < MAX_SPELL_SCHOOL; x++)
+        if (GetMiscValue() & int32(1 << x))
         {
-            if (GetMiscValue() & int32(1 << x))
-                target->HandleStatModifier(UnitMods(UNIT_MOD_RESISTANCE_START + x), BASE_PCT, float(GetAmount()), apply);
+            target->HandleStatModifier(UnitMods(UNIT_MOD_RESISTANCE_START + x), BASE_PCT, float(GetAmount()), apply);
         }
     }
 }
@@ -3994,16 +3989,11 @@ void AuraEffect::HandleModBaseResistance(AuraApplication const* aurApp, uint8 mo
         return;
 
     Unit* target = aurApp->GetTarget();
-
-    // only players and pets have base stats
-    if (target->IsPlayer() || target->IsPet())
+    for (uint8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; i++)
     {
-        for (uint8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; i++)
+        if (GetMiscValue() & (1 << i))
         {
-            if (GetMiscValue() & (1 << i))
-            {
-                target->HandleStatModifier(UnitMods(UNIT_MOD_RESISTANCE_START + i), TOTAL_VALUE, float(GetAmount()), apply);
-            }
+            target->HandleStatModifier(UnitMods(UNIT_MOD_RESISTANCE_START + i), TOTAL_VALUE, float(GetAmount()), apply);
         }
     }
 }
@@ -6396,8 +6386,8 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
     target->SendPeriodicAuraLog(&pInfo);
 
     Unit::DealDamage(caster, target, damage, &cleanDamage, DOT, GetSpellInfo()->GetSchoolMask(), GetSpellInfo(), true);
-    // allow null caster to call this function
-    caster->ProcDamageAndSpell(target, caster ? procAttacker : 0, procVictim, procEx, damage, BASE_ATTACK, GetSpellInfo(), nullptr, GetEffIndex(), nullptr, &dmgInfo);
+
+    Unit::ProcDamageAndSpell(caster, target, caster ? procAttacker : 0, procVictim, procEx, damage, BASE_ATTACK, GetSpellInfo(), nullptr, GetEffIndex(), nullptr, &dmgInfo);
 }
 
 void AuraEffect::HandlePeriodicHealthLeechAuraTick(Unit* target, Unit* caster) const
@@ -6485,8 +6475,8 @@ void AuraEffect::HandlePeriodicHealthLeechAuraTick(Unit* target, Unit* caster) c
     int32 new_damage;
 
     new_damage = Unit::DealDamage(caster, target, damage, &cleanDamage, DOT, GetSpellInfo()->GetSchoolMask(), GetSpellInfo(), false);
-    // allow null caster to call this function
-    caster->ProcDamageAndSpell(target, caster ? procAttacker : 0, procVictim, procEx, damage, BASE_ATTACK, GetSpellInfo(), nullptr, GetEffIndex(), nullptr, &dmgInfo);
+
+    Unit::ProcDamageAndSpell(caster, target, caster ? procAttacker : 0, procVictim, procEx, damage, BASE_ATTACK, GetSpellInfo(), nullptr, GetEffIndex(), nullptr, &dmgInfo);
 
     if (!caster || !caster->IsAlive())
         return;
@@ -6668,8 +6658,7 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
 
     // ignore item heals
     if (!haveCastItem && GetAuraType() != SPELL_AURA_OBS_MOD_HEALTH) // xinef: dont allow obs_mod_health to proc spells, this is passive regeneration and not hot
-        // xinef: allow null caster to proc
-        caster->ProcDamageAndSpell(target, caster ? procAttacker : 0, procVictim, procEx, heal, BASE_ATTACK, GetSpellInfo(), nullptr, GetEffIndex(), nullptr, nullptr, &healInfo);
+        Unit::ProcDamageAndSpell(caster, target, caster ? procAttacker : 0, procVictim, procEx, heal, BASE_ATTACK, GetSpellInfo(), nullptr, GetEffIndex(), nullptr, nullptr, &healInfo);
 }
 
 void AuraEffect::HandlePeriodicManaLeechAuraTick(Unit* target, Unit* caster) const
@@ -6857,7 +6846,7 @@ void AuraEffect::HandlePeriodicPowerBurnAuraTick(Unit* target, Unit* caster) con
     caster->DealSpellDamage(&damageInfo, true);
 
     DamageInfo dmgInfo(damageInfo, DOT);
-    caster->ProcDamageAndSpell(damageInfo.target, procAttacker, procVictim, procEx, damageInfo.damage, BASE_ATTACK, spellProto, nullptr, GetEffIndex(), nullptr, &dmgInfo);
+    Unit::ProcDamageAndSpell(caster, damageInfo.target, procAttacker, procVictim, procEx, damageInfo.damage, BASE_ATTACK, spellProto, nullptr, GetEffIndex(), nullptr, &dmgInfo);
 }
 
 void AuraEffect::HandleProcTriggerSpellAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo)

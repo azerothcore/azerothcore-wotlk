@@ -15,11 +15,11 @@
 -- Dumpar struktur för tabell acore_world.instance_encounters
 DROP TABLE IF EXISTS `instance_encounters`;
 CREATE TABLE IF NOT EXISTS `instance_encounters` (
-  `entry` INT unsigned NOT NULL COMMENT 'Unique entry from DungeonEncounter.dbc',
-  `creditType` TINYINT unsigned NOT NULL DEFAULT 0,
-  `creditEntry` INT unsigned NOT NULL DEFAULT 0,
-  `lastEncounterDungeon` SMALLINT unsigned NOT NULL DEFAULT 0 COMMENT 'If not 0, LfgDungeon.dbc entry for the instance it is last encounter in',
-  `comment` VARCHAR(255) NOT NULL DEFAULT '',
+  `entry` int unsigned NOT NULL COMMENT 'Unique entry from DungeonEncounter.dbc',
+  `creditType` tinyint unsigned NOT NULL DEFAULT '0',
+  `creditEntry` int unsigned NOT NULL DEFAULT '0',
+  `lastEncounterDungeon` smallint unsigned NOT NULL DEFAULT '0' COMMENT 'If not 0, LfgDungeon.dbc entry for the instance it is last encounter in',
+  `comment` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

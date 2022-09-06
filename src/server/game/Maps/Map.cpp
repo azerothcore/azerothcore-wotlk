@@ -2959,6 +2959,11 @@ bool InstanceMap::AddPlayerToMap(Player* player)
                 return false;
             }
         }
+        else if (player->GetSession()->PlayerLoading() && playerBind && playerBind->save != mapSave)
+        {
+            // Prevent "Convert to Raid" exploit to reset instances
+            return false;
+        }
         else
         {
             playerBind = sInstanceSaveMgr->PlayerBindToInstance(player->GetGUID(), mapSave, false, player);
@@ -4015,4 +4020,22 @@ void Map::DeleteCorpseData()
     stmt->SetData(0, GetId());
     stmt->SetData(1, GetInstanceId());
     CharacterDatabase.Execute(stmt);
+}
+
+std::string Map::GetDebugInfo() const
+{
+    std::stringstream sstr;
+    sstr << std::boolalpha
+        << "Id: " << GetId() << " InstanceId: " << GetInstanceId() << " Difficulty: " << std::to_string(GetDifficulty())
+        << " HasPlayers: " << HavePlayers();
+    return sstr.str();
+}
+
+std::string InstanceMap::GetDebugInfo() const
+{
+    std::stringstream sstr;
+    sstr << Map::GetDebugInfo() << "\n"
+        << std::boolalpha
+        << "ScriptId: " << GetScriptId() << " ScriptName: " << GetScriptName();
+    return sstr.str();
 }

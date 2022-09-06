@@ -15,12 +15,12 @@
 -- Dumpar struktur för tabell acore_characters.character_spell_cooldown
 DROP TABLE IF EXISTS `character_spell_cooldown`;
 CREATE TABLE IF NOT EXISTS `character_spell_cooldown` (
-  `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier, Low part',
-  `spell` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Spell Identifier',
-  `category` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `item` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Item Identifier',
-  `time` INT unsigned NOT NULL DEFAULT 0,
-  `needSend` TINYINT unsigned NOT NULL DEFAULT 1,
+  `guid` int unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier, Low part',
+  `spell` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'Spell Identifier',
+  `category` mediumint unsigned NOT NULL DEFAULT '0',
+  `item` int unsigned NOT NULL DEFAULT '0' COMMENT 'Item Identifier',
+  `time` int unsigned NOT NULL DEFAULT '0',
+  `needSend` tinyint unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`guid`,`spell`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

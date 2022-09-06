@@ -25,26 +25,35 @@
 enum DataTypes
 {
     DATA_SKERAM             = 1,
-    DATA_KRI                = 2,
-    DATA_VEM                = 3,
-    DATA_YAUJ               = 4,
-    DATA_BUG_TRIO           = 5,
-    DATA_VEKLOR             = 6,
-    DATA_VEKLORISDEAD       = 7,
-    DATA_VEKLOR_DEATH       = 8,
-    DATA_VEKNILASH          = 9,
-    DATA_VEKNILASHISDEAD    = 10,
-    DATA_VEKNILASH_DEATH    = 11,
-    DATA_BUG_TRIO_DEATH     = 14,
-    DATA_CTHUN_PHASE        = 20,
-    DATA_VISCIDUS           = 21,
-    DATA_SARTURA            = 22,
+    DATA_BUG_TRIO           = 2,
+    DATA_SARTURA            = 3,
+    DATA_FANKRISS           = 4,
+    DATA_VISCIDUS           = 5,
+    DATA_HUHURAN            = 6,
+    DATA_TWIN_EMPERORS      = 7,
+    DATA_OURO               = 8,
+    DATA_CTHUN              = 9,
 
-    DATA_EYE_OF_CTHUN       = 23
+    MAX_BOSS_NUMBER         = 10,
+
+    DATA_KRI                = 10,
+    DATA_VEM                = 11,
+    DATA_YAUJ               = 12,
+    DATA_BUG_TRIO_DEATH     = 13,
+    DATA_OURO_SPAWNER       = 14,
+    DATA_VEKLOR             = 15,
+    DATA_VEKLORISDEAD       = 16,
+    DATA_VEKLOR_DEATH       = 17,
+    DATA_VEKNILASH          = 18,
+    DATA_VEKNILASHISDEAD    = 19,
+    DATA_VEKNILASH_DEATH    = 20,
+    DATA_CTHUN_PHASE        = 21,
+    DATA_EYE_OF_CTHUN       = 22
 };
 
 enum Creatures
 {
+    NPC_CTHUN               = 15727,
     NPC_EYE_OF_CTHUN        = 15589,
     NPC_CTHUN_PORTAL        = 15896,
     NPC_CLAW_TENTACLE       = 15725,
@@ -55,7 +64,7 @@ enum Creatures
     NPC_GIANT_EYE_TENTACLE  = 15334,
     NPC_FLESH_TENTACLE      = 15802,
     NPC_GIANT_PORTAL        = 15910,
-
+    NPC_SARTURA_ROYAL_GUARD = 15984,
     NPC_VISCIDUS            = 15299,
     NPC_GLOB_OF_VISCIDUS    = 15667,
 
@@ -63,10 +72,36 @@ enum Creatures
     NPC_VEM                 = 15544,
     NPC_KRI                 = 15511,
     NPC_YAUJ                = 15543,
+    NPC_HUHURAN             = 15509,
     NPC_VEKLOR              = 15276,
     NPC_VEKNILASH           = 15275,
     NPC_OURO                = 15517,
+    NPC_OURO_SPAWNER        = 15957,
     NPC_SARTURA             = 15516
+};
+
+enum ObjectsAQ40
+{
+    AQ40_DOOR_1             = 180634,
+    AQ40_DOOR_2             = 180635,
+    AQ40_DOOR_3             = 180636,
+    GO_CTHUN_GRASP          = 180745
+};
+
+enum CThunPhases
+{
+    PHASE_NOT_STARTED       = 0,
+
+    // Main Phase 1 - EYE
+    PHASE_EYE_GREEN_BEAM    = 1,
+    PHASE_EYE_RED_BEAM      = 2,
+
+    // Main Phase 2 - CTHUN
+    PHASE_CTHUN_TRANSITION  = 3,
+    PHASE_CTHUN_STOMACH     = 4,
+    PHASE_CTHUN_WEAK        = 5,
+
+    PHASE_CTHUN_DONE        = 6
 };
 
 template <class AI, class T>
@@ -74,5 +109,7 @@ inline AI* GetTempleOfAhnQirajAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, TempleOfAhnQirajScriptName);
 }
+
+#define RegisterTempleOfAhnQirajCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetTempleOfAhnQirajAI)
 
 #endif

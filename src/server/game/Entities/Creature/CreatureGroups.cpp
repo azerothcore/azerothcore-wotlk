@@ -381,3 +381,40 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, bool run)
         }
     }
 }
+
+void CreatureGroup::RespawnFormation(bool force)
+{
+    for (auto const& itr : m_members)
+    {
+        if (itr.first && !itr.first->IsAlive())
+        {
+            itr.first->Respawn(force);
+        }
+    }
+}
+
+bool CreatureGroup::IsFormationInCombat()
+{
+    for (auto const& itr : m_members)
+    {
+        if (itr.first && itr.first->IsInCombat())
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool CreatureGroup::IsAnyMemberAlive()
+{
+    for (auto const& itr : m_members)
+    {
+        if (itr.first && itr.first->IsAlive())
+        {
+            return true;
+        }
+    }
+
+    return false;
+}

@@ -1150,6 +1150,27 @@ class spell_dru_berserk : public SpellScript
     }
 };
 
+// 24905 - Moonkin Form (Passive)
+class spell_dru_moonkin_form_passive_proc : public AuraScript
+{
+    PrepareAuraScript(spell_dru_moonkin_form_passive_proc);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
+        {
+            return !spellInfo->IsAffectingArea();
+        }
+
+        return false;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_dru_moonkin_form_passive_proc::CheckProc);
+    }
+};
+
 void AddSC_druid_spell_scripts()
 {
     RegisterSpellScript(spell_dru_bear_form_passive);
@@ -1185,4 +1206,5 @@ void AddSC_druid_spell_scripts()
     RegisterSpellScript(spell_dru_typhoon);
     RegisterSpellScript(spell_dru_t10_restoration_4p_bonus);
     RegisterSpellScript(spell_dru_wild_growth);
+    RegisterSpellScript(spell_dru_moonkin_form_passive_proc);
 }

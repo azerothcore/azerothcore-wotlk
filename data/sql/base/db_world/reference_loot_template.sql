@@ -15,20 +15,20 @@
 -- Dumpar struktur för tabell acore_world.reference_loot_template
 DROP TABLE IF EXISTS `reference_loot_template`;
 CREATE TABLE IF NOT EXISTS `reference_loot_template` (
-  `Entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `Item` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `Reference` MEDIUMINT NOT NULL DEFAULT 0,
+  `Entry` mediumint unsigned NOT NULL DEFAULT '0',
+  `Item` mediumint unsigned NOT NULL DEFAULT '0',
+  `Reference` mediumint NOT NULL DEFAULT '0',
   `Chance` float NOT NULL DEFAULT '100',
-  `QuestRequired` TINYINT NOT NULL DEFAULT 0,
-  `LootMode` SMALLINT unsigned NOT NULL DEFAULT 1,
-  `GroupId` TINYINT unsigned NOT NULL DEFAULT 0,
-  `MinCount` TINYINT unsigned NOT NULL DEFAULT 1,
-  `MaxCount` TINYINT unsigned NOT NULL DEFAULT 1,
-  `Comment` VARCHAR(255) DEFAULT NULL,
+  `QuestRequired` tinyint NOT NULL DEFAULT '0',
+  `LootMode` smallint unsigned NOT NULL DEFAULT '1',
+  `GroupId` tinyint unsigned NOT NULL DEFAULT '0',
+  `MinCount` tinyint unsigned NOT NULL DEFAULT '1',
+  `MaxCount` tinyint unsigned NOT NULL DEFAULT '1',
+  `Comment` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`Entry`,`Item`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Loot System';
 
--- Dumpar data för tabell acore_world.reference_loot_template: 15 322 rows
+-- Dumpar data för tabell acore_world.reference_loot_template: 15 332 rows
 DELETE FROM `reference_loot_template`;
 /*!40000 ALTER TABLE `reference_loot_template` DISABLE KEYS */;
 INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
@@ -9323,20 +9323,20 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `
 	(34089, 19892, 0, 0, 0, 1, 1, 1, 1, 'Animist\'s Boots'),
 	(34089, 19894, 0, 0, 0, 1, 1, 1, 1, 'Bloodsoaked Gauntlets'),
 	(34089, 19929, 0, 0, 0, 1, 1, 1, 1, 'Bloodtinged Gloves'),
-	(34090, 19852, 0, 0, 0, 1, 1, 1, 1, 'Ancient Hakkari Manslayer'),
-	(34090, 19853, 0, 0, 0, 1, 1, 1, 1, 'Gurubashi Dwarf Destroyer'),
+	(30546, 22718, 0, 0, 0, 1, 1, 1, 1, ''),
+	(30546, 22716, 0, 0, 0, 1, 1, 1, 1, ''),
 	(34090, 19854, 0, 0, 0, 1, 1, 1, 1, 'Zin\'rokh, Destroyer of Worlds'),
 	(34090, 19855, 0, 0, 0, 1, 1, 1, 1, 'Bloodsoaked Legplates'),
-	(34090, 19856, 0, 0, 0, 1, 1, 1, 1, 'The Eye of Hakkar'),
-	(34090, 19857, 0, 0, 0, 1, 1, 1, 1, 'Cloak of Consumption'),
+	(30546, 22715, 0, 0, 0, 1, 1, 1, 1, ''),
+	(30546, 22714, 0, 0, 0, 1, 1, 1, 1, ''),
 	(34090, 19859, 0, 0, 0, 1, 1, 1, 1, 'Fang of the Faceless'),
 	(34090, 19861, 0, 0, 0, 1, 1, 1, 1, 'Touch of Chaos'),
 	(34090, 19862, 0, 0, 0, 1, 1, 1, 1, 'Aegis of the Blood God'),
-	(34090, 19864, 0, 0, 0, 1, 1, 1, 1, 'Bloodcaller'),
+	(30546, 22713, 0, 0, 0, 1, 1, 1, 1, ''),
 	(34090, 19865, 0, 0, 0, 1, 1, 1, 1, 'Warblade of the Hakkari'),
 	(34090, 19876, 0, 0, 0, 1, 1, 1, 1, 'Soul Corrupter\'s Necklace'),
-	(34090, 20257, 0, 0, 0, 1, 1, 1, 1, 'Seafury Gauntlets'),
-	(34090, 20264, 0, 0, 0, 1, 1, 1, 1, 'Peacekeeper Gauntlets'),
+	(30546, 22712, 0, 0, 0, 1, 1, 1, 1, ''),
+	(30546, 22711, 0, 0, 0, 1, 1, 1, 1, ''),
 	(34091, 35198, 0, 0, 0, 1, 1, 1, 1, 'Design: Loop of Forged Power'),
 	(34091, 35199, 0, 0, 0, 1, 1, 1, 1, 'Design: Ring of Flowing Life'),
 	(34091, 35200, 0, 0, 0, 1, 1, 1, 1, 'Design: Hard Khorium Band'),
@@ -12882,11 +12882,11 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `
 	(35026, 13382, 0, 0, 0, 1, 1, 1, 1, 'Cannonball Runner'),
 	(35026, 16708, 0, 0, 0, 1, 1, 1, 1, 'Shadowcraft Spaulders'),
 	(35026, 18721, 0, 0, 0, 1, 1, 1, 1, 'Barrage Girdle'),
-	(35026, 22403, 0, 20, 0, 1, 1, 1, 1, 'Diana\'s Pearl Necklace'),
-	(35026, 22404, 0, 8, 0, 1, 1, 1, 1, 'Willey\'s Back Scratcher'),
-	(35026, 22405, 0, 20, 0, 1, 1, 1, 1, 'Mantle of the Scarlet Crusade'),
-	(35026, 22406, 0, 10, 0, 1, 1, 1, 1, 'Redemption'),
-	(35026, 22407, 0, 20, 0, 1, 1, 1, 1, 'Helm of the New Moon'),
+	(35026, 22403, 0, 0, 0, 1, 1, 1, 1, 'Diana\'s Pearl Necklace'),
+	(35026, 22404, 0, 0, 0, 1, 1, 1, 1, 'Willey\'s Back Scratcher'),
+	(35026, 22405, 0, 0, 0, 1, 1, 1, 1, 'Mantle of the Scarlet Crusade'),
+	(35026, 22406, 0, 0, 0, 1, 1, 1, 1, 'Redemption'),
+	(35026, 22407, 0, 0, 0, 1, 1, 1, 1, 'Helm of the New Moon'),
 	(35027, 12103, 0, 0, 0, 1, 1, 1, 1, 'Star of Mystaria'),
 	(35027, 13348, 0, 0, 0, 1, 1, 1, 1, 'Demonshear'),
 	(35027, 13353, 0, 2, 0, 1, 1, 1, 1, 'Book of the Dead'),
@@ -15354,7 +15354,17 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `
 	(34009, 16908, 0, 0, 0, 1, 1, 1, 1, NULL),
 	(34009, 16900, 0, 0, 0, 1, 1, 1, 1, NULL),
 	(30089, 10151, 0, 0, 0, 1, 1, 1, 1, NULL),
-	(30172, 14980, 0, 0, 0, 1, 1, 1, 1, NULL);
+	(30172, 14980, 0, 0, 0, 1, 1, 1, 1, NULL),
+	(30546, 22720, 0, 0, 0, 1, 1, 1, 1, ''),
+	(30546, 22721, 0, 0, 0, 1, 1, 1, 1, ''),
+	(30546, 22722, 0, 0, 0, 1, 1, 1, 1, ''),
+	(30398, 19852, 0, 0, 0, 1, 1, 1, 1, ''),
+	(30398, 19853, 0, 0, 0, 1, 1, 1, 1, ''),
+	(30398, 19856, 0, 0, 0, 1, 1, 1, 1, ''),
+	(30398, 19857, 0, 0, 0, 1, 1, 1, 1, ''),
+	(30398, 19864, 0, 0, 0, 1, 1, 1, 1, ''),
+	(30398, 20257, 0, 0, 0, 1, 1, 1, 1, ''),
+	(30398, 20264, 0, 0, 0, 1, 1, 1, 1, '');
 /*!40000 ALTER TABLE `reference_loot_template` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

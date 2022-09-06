@@ -590,6 +590,14 @@ void ScriptMgr::OnQuestRewardItem(Player* player, Item* item, uint32 count)
     });
 }
 
+void ScriptMgr::OnGroupRollRewardItem(Player* player, Item* item, uint32 count, RollVote voteType, Roll* roll)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->OnGroupRollRewardItem(player, item, count, voteType, roll);
+    });
+}
+
 void ScriptMgr::OnFirstLogin(Player* player)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)

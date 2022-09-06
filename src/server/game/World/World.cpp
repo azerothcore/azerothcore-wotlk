@@ -1022,6 +1022,8 @@ void World::LoadConfigSettings(bool reload)
 
     m_int_configs[CONFIG_CHATFLOOD_MESSAGE_COUNT]    = sConfigMgr->GetOption<int32>("ChatFlood.MessageCount", 10);
     m_int_configs[CONFIG_CHATFLOOD_MESSAGE_DELAY]    = sConfigMgr->GetOption<int32>("ChatFlood.MessageDelay", 1);
+    m_int_configs[CONFIG_CHATFLOOD_ADDON_MESSAGE_COUNT] = sConfigMgr->GetOption<int32>("ChatFlood.AddonMessageCount", 100);
+    m_int_configs[CONFIG_CHATFLOOD_ADDON_MESSAGE_DELAY] = sConfigMgr->GetOption<int32>("ChatFlood.AddonMessageDelay", 1);
     m_int_configs[CONFIG_CHATFLOOD_MUTE_TIME]        = sConfigMgr->GetOption<int32>("ChatFlood.MuteTime", 10);
     m_bool_configs[CONFIG_CHAT_MUTE_FIRST_LOGIN]     = sConfigMgr->GetOption<bool>("Chat.MuteFirstLogin", false);
     m_int_configs[CONFIG_CHAT_TIME_MUTE_FIRST_LOGIN] = sConfigMgr->GetOption<int32>("Chat.MuteTimeFirstLogin", 120);
@@ -1567,6 +1569,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Initializing PlayerDump tables...");
     PlayerDump::InitializeTables();
 
+    ///- Initilize static helper structures
+    AIRegistry::Initialize();
+
     LOG_INFO("server.loading", "Loading SpellInfo store...");
     sSpellMgr->LoadSpellInfoStore();
 
@@ -2034,9 +2039,6 @@ void World::SetInitialWorldSettings()
     m_timers[WUPDATE_WHO_LIST].SetInterval(5 * IN_MILLISECONDS); // update who list cache every 5 seconds
 
     mail_expire_check_timer = GameTime::GetGameTime() + 6h;
-
-    ///- Initilize static helper structures
-    AIRegistry::Initialize();
 
     ///- Initialize MapMgr
     LOG_INFO("server.loading", "Starting Map System");

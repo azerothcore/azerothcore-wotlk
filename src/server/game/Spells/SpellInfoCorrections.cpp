@@ -4323,6 +4323,62 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].MiscValue = 8;
     });
 
+    // Elemental Mastery
+    ApplySpellFix({ 16166 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(0x00000003, 0x00001000);
+    });
+
+    // Elemental Vulnerability
+    ApplySpellFix({ 28772 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Speed = 1;
+    });
+
+    // Find the Ancient Hero: Kill Credit
+    ApplySpellFix({ 25729 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_SUMMONER;
+    });
+
+    // Artorius Demonic Doom
+    ApplySpellFix({ 23298 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_IGNORE_DAMAGE_TAKEN_MODIFIERS;
+        spellInfo->AttributesEx6 |= SPELL_ATTR6_IGNORE_CASTER_DAMAGE_MODIFIERS;
+    });
+
+    // Lash
+    ApplySpellFix({ 25852 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].Effect = 0;
+    });
+
+    // Explosion
+    ApplySpellFix({ 5255 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
+    });
+
+    // Death's Respite
+    ApplySpellFix({ 67731, 68305 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+    });
+
+    // Wyvern Sting DoT
+    ApplySpellFix({ 24131, 24134, 24135 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY);
+    });
+
+     // Feed Pet
+    ApplySpellFix({ 1539, 51284 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Attributes |= SPELL_ATTR0_ALLOW_WHILE_SITTING;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];

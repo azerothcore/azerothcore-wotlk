@@ -15,14 +15,14 @@
 -- Dumpar struktur för tabell acore_world.graveyard_zone
 DROP TABLE IF EXISTS `graveyard_zone`;
 CREATE TABLE IF NOT EXISTS `graveyard_zone` (
-  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `GhostZone` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `Faction` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `ID` mediumint unsigned NOT NULL DEFAULT '0',
+  `GhostZone` mediumint unsigned NOT NULL DEFAULT '0',
+  `Faction` smallint unsigned NOT NULL DEFAULT '0',
   `Comment` text,
   PRIMARY KEY (`ID`,`GhostZone`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Trigger System';
 
--- Dumpar data för tabell acore_world.graveyard_zone: 704 rows
+-- Dumpar data för tabell acore_world.graveyard_zone: 703 rows
 DELETE FROM `graveyard_zone`;
 /*!40000 ALTER TABLE `graveyard_zone` DISABLE KEYS */;
 INSERT INTO `graveyard_zone` (`ID`, `GhostZone`, `Faction`, `Comment`) VALUES
@@ -54,7 +54,7 @@ INSERT INTO `graveyard_zone` (`ID`, `GhostZone`, `Faction`, `Comment`) VALUES
 	(89, 215, 67, 'Mulgore, Bloodhoof Village GY - Mulgore'),
 	(90, 141, 469, 'Teldrassil, Darnassus GY'),
 	(90, 1657, 469, 'Teldrassil, Darnassus GY'),
-	(91, 141, 469, 'Teldrassil, Dolanaar GY - Teldrassil'),
+	(91, 141, 0, 'Teldrassil, Dolanaar GY'),
 	(92, 331, 0, 'Ashenvale, Astranaar GY - Ashenvale'),
 	(93, 141, 469, 'Teldrassil, Aldrassil GY - Teldrassil'),
 	(94, 85, 67, 'Tirisfal Glades, Deathknell - Tirisfal Glades'),
@@ -112,10 +112,9 @@ INSERT INTO `graveyard_zone` (`ID`, `GhostZone`, `Faction`, `Comment`) VALUES
 	(429, 2057, 0, NULL),
 	(449, 361, 0, 'Felwood, Morlos\'Aran - Felwood'),
 	(450, 490, 0, 'Un\'Goro Crater, The Marshlands - Un\'Goro Crater'),
-	(469, 141, 67, 'Darkshore, Twilight Vale GY'),
 	(469, 148, 0, 'Darkshore, Twilight Vale GY'),
 	(469, 719, 0, 'Darkshore, Twilight Vale GY'),
-	(469, 1657, 67, 'Darkshore, Twilight Vale GY'),
+	(91, 1657, 67, 'Teldrassil, Dolanaar GY'),
 	(489, 11, 0, 'Wetlands, Baradin Bay GY - Wetlands'),
 	(509, 28, 469, 'Western Plaguelands, Chillwind Camp - Western Plaguelands'),
 	(510, 139, 0, 'Eastern Plaguelands, Pestilent Scar - Eastern Plaguelands'),
