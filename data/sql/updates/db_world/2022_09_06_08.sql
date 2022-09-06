@@ -1,3 +1,4 @@
+-- DB update 2022_09_06_07 -> 2022_09_06_08
 -- Kurinnaxx
 SET @BOSS=144632;
 SET @NPC=144521;
