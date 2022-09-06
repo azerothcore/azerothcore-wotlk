@@ -3,7 +3,7 @@ UPDATE `creature_template` SET `DamageModifier` = 1.05, `ArmorModifier` = 1.1 WH
 UPDATE `creature_template` SET `ArmorModifier` = 1.1 WHERE (`entry` = 15317);
 UPDATE `creature_template` SET `DamageModifier` = 20, `ArmorModifier` = 1.15 WHERE (`entry` = 15246);
 
-DELETE FROM `creature_template_resistance` WHERE (`CreatureID` = 15316) AND (`School` IN (2, 3, 4, 5, 6));
+DELETE FROM `creature_template_resistance` WHERE `CreatureID` IN (15316,15317,15246);
 INSERT INTO `creature_template_resistance` (`CreatureID`, `School`, `Resistance`, `VerifiedBuild`) VALUES
 (15316, 2, 75, 0),
 (15316, 3, 75, 0),
