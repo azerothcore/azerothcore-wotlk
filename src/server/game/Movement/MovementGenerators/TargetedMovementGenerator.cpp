@@ -98,10 +98,6 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
             i_recalculateTravel = false;
             i_path = nullptr;
-            if (Creature* cOwner2 = owner->ToCreature())
-            {
-                cOwner2->SetCannotReachTarget(this->i_target.getTarget()->GetGUID());
-            }
 
             owner->StopMoving();
             owner->SetInFront(target);
@@ -414,7 +410,6 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     {
         i_path = nullptr;
         owner->StopMoving();
-        owner->SetCannotReachTargetUnit(false, false);
         _lastTargetPosition.reset();
         return true;
     }
@@ -438,7 +433,6 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         if (owner->HasUnitState(UNIT_STATE_FOLLOW_MOVE) && owner->movespline->Finalized())
         {
             owner->ClearUnitState(UNIT_STATE_FOLLOW_MOVE);
-            owner->SetCannotReachTargetUnit(false, false);
             i_path = nullptr;
             MovementInform(owner);
 
@@ -491,12 +485,8 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
             if (!owner->IsStopped())
                 owner->StopMoving();
 
-            owner->SetCannotReachTargetUnit(true, false);
-
             return true;
         }
-
-        owner->SetCannotReachTargetUnit(false, false);
 
         owner->AddUnitState(UNIT_STATE_FOLLOW_MOVE);
 
@@ -523,7 +513,6 @@ template<class T>
 void FollowMovementGenerator<T>::DoFinalize(T* owner)
 {
     owner->ClearUnitState(UNIT_STATE_FOLLOW | UNIT_STATE_FOLLOW_MOVE);
-    owner->SetCannotReachTargetUnit(false, false);
 }
 
 template<class T>
