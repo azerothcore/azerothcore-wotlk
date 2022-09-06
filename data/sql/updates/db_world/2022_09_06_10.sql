@@ -1,3 +1,4 @@
+-- DB update 2022_09_06_09 -> 2022_09_06_10
 -- Araga (14222)
 DELETE FROM `creature_addon` WHERE (`guid` IN (17066));
 
