@@ -598,6 +598,21 @@ void ScriptMgr::OnGroupRollRewardItem(Player* player, Item* item, uint32 count, 
     });
 }
 
+bool ScriptMgr::OnBeforeOpenItem(Player* player, Item* item)
+{
+    auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript* script)
+        {
+            return !script->OnBeforeOpenItem(player, item);
+        });
+
+    if (ret && *ret)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 void ScriptMgr::OnFirstLogin(Player* player)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
