@@ -1,3 +1,4 @@
+-- DB update 2022_09_06_08 -> 2022_09_06_09
 -- Set random movement to all of them
 UPDATE `creature` SET `MovementType`=1, `wander_distance`=3 WHERE `id1` IN (15316,15317) AND `map`=531;
 
