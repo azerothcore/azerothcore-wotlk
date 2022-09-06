@@ -1585,7 +1585,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 {
                     if (sSpellMgr->GetSpellGroup(GetId()) == 1) /*Elixirs*/
                     {
-                        if (caster->HasSpell(GetSpellInfo()->Effects[EFFECT_0].TriggerSpell))
+                        if (GetSpellInfo()->Effects[EFFECT_0].TriggerSpell > 0)
                         {
                             for (int i = 0; i < MAX_SPELL_EFFECTS; ++i)
                                 if (GetEffect(i))
