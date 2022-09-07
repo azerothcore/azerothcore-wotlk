@@ -1,3 +1,4 @@
+-- DB update 2022_09_07_04 -> 2022_09_07_05
 -- I forgot these
 UPDATE `creature_template` SET `DamageModifier` = 1.05, `ArmorModifier` = 1.1 WHERE (`entry` = 15316);
 UPDATE `creature_template` SET `ArmorModifier` = 1.1 WHERE (`entry` = 15317);
