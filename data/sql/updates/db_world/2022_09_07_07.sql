@@ -1,3 +1,4 @@
+-- DB update 2022_09_07_06 -> 2022_09_07_07
 --
 UPDATE `creature_template_addon` SET `bytes1` = 54432 WHERE `entry` = 15963;
 UPDATE `creature_template_addon` SET `auras` = '18943' WHERE `entry` = 15275;
