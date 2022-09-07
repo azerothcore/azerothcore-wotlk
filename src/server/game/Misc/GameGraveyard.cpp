@@ -20,6 +20,7 @@
 #include "DatabaseEnv.h"
 #include "Log.h"
 #include "MapMgr.h"
+#include "ScriptMgr.h"
 
 Graveyard* Graveyard::instance()
 {
@@ -95,6 +96,13 @@ GraveyardStruct const* Graveyard::GetDefaultGraveyard(TeamId teamId)
 
 GraveyardStruct const* Graveyard::GetClosestGraveyard(Player* player, TeamId teamId, bool nearCorpse)
 {
+    uint32 graveyardOverride = 0;
+    sScriptMgr->OnBeforeChooseGraveyard(player, teamId, nearCorpse, graveyardOverride);
+    if (graveyardOverride)
+    {
+        return sGraveyard->GetGraveyard(graveyardOverride);
+    }
+
     WorldLocation loc = player->GetWorldLocation();
 
     if (nearCorpse)
