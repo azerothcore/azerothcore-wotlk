@@ -65,7 +65,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (15230, 0, 2, 0, 0, 0, 100, 1, 5000, 60000, 0, 0, 0, 11, 26025, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Vekniss Warrior - In Combat - Cast \'Impale\' (No Repeat)');
 */
 
--- Qiraji Slayer Qiraji Slayer (15250) - Battle Shout timers taken from Cmangos
+-- Qiraji Slayer (15250) - Battle Shout timers taken from Cmangos
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 15250) AND (`source_type` = 0) AND (`id` IN (0, 1, 2, 3));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (15250, 0, 0, 0, 0, 0, 100, 0, 1000, 3000, 21000, 30500, 0, 11, 26043, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Qiraji Slayer - In Combat - Cast \'Battle Shout\''),
@@ -93,3 +93,16 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 15630) AND (`source_type` = 0) AND (`id` IN (0));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (15630, 0, 0, 0, 0, 0, 100, 1, 30000, 30000, 0, 0, 0, 11, 26662, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Spawn of Fankriss - In Combat - Cast \'Berserk\' (No Repeat)');
+
+-- Anubisath Warrior (15537) - Cmangos
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 15537) AND (`source_type` = 0) AND (`id` IN (0, 1, 2, 3));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(15537, 0, 0, 1, 2, 0, 100, 1, 0, 30, 0, 0, 0, 11, 8599, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Warrior - Between 0-30% Health - Cast \'Enrage\' (No Repeat)'),
+(15537, 0, 1, 0, 61, 0, 100, 0, 0, 30, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Warrior - Between 0-30% Health - Say Line 0 (No Repeat)'),
+(15537, 0, 2, 0, 0, 0, 100, 0, 7000, 11000, 9000, 13000, 0, 11, 15550, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Warrior - In Combat - Cast \'Trample\''),
+(15537, 0, 3, 0, 9, 0, 100, 0, 0, 10, 7000, 11000, 0, 11, 10966, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Warrior - In Combat - Cast \'Uppercut\'');
+
+-- Anubisath Swarmguard (15538) - Cmangos
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 15538) AND (`source_type` = 0) AND (`id` IN (0));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(15538, 0, 0, 0, 9, 0, 100, 0, 0, 5, 5000, 7000, 0, 11, 40504, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Swarmguard - Within 0-5 Range - Cast \'Cleave\'');
