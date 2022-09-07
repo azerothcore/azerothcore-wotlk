@@ -21,7 +21,7 @@ UPDATE `creature_template` SET `DamageModifier` = 12.3, `ArmorModifier` = 1.1 WH
 -- Hive'Zara Tail Lasher (15336)
 UPDATE `creature_template` SET `DamageModifier` = 12.1, `ArmorModifier` = 1.15 WHERE (`entry` = 15336);
 -- Hive'Zara Drone (15318)
-UPDATE `creature_template` SET `DamageModifier` = 7.9, `HealthModifier` = 6, `ArmorModifier` = 1.1 WHERE (`entry` = 15318);
+UPDATE `creature_template` SET `DamageModifier` = 7.9, `ArmorModifier` = 1.1 WHERE (`entry` = 15318);
 -- Shrieker Scarab (15461)
 UPDATE `creature_template` SET `DamageModifier` = 2.9, `ArmorModifier` = 1.1 WHERE (`entry` = 15461);
 -- Spitting Scarab (15462)
