@@ -1,3 +1,4 @@
+-- DB update 2022_09_07_00 -> 2022_09_07_01
 DELETE FROM `npc_vendor` WHERE `entry` = 26081;
 INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`, `VerifiedBuild`) VALUES
 (26081, 2, 2880, 0, 0, 0, 0),
