@@ -647,10 +647,6 @@ class spell_hun_readiness : public SpellScript
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        if (!GetCaster())
-        {
-            return;
-        }
         Player* caster = GetCaster()->ToPlayer();
         // immediately finishes the cooldown on your other Hunter abilities except Bestial Wrath
 
@@ -660,7 +656,7 @@ class spell_hun_readiness : public SpellScript
         SpellCooldowns& cooldowns = caster->GetSpellCooldownMap();
 
         SpellCooldowns::iterator itr, next;
-        for (itr = cooldowns.begin(); itr != cooldowns.end(); itr = next)
+        for (itr = cooldowns.begin(); itr != cooldowns.end();)
         {
             next = itr;
             ++next;
