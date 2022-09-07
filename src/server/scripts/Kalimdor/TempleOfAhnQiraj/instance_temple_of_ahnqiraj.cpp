@@ -24,7 +24,10 @@ ObjectData const creatureData[] =
 {
     { NPC_SARTURA, DATA_SARTURA },
     { NPC_EYE_OF_CTHUN, DATA_EYE_OF_CTHUN },
-    { NPC_OURO_SPAWNER, DATA_OURO_SPAWNER }
+    { NPC_OURO_SPAWNER, DATA_OURO_SPAWNER },
+    { NPC_MASTERS_EYE, DATA_MASTERS_EYE },
+    { NPC_VEKLOR, DATA_VEKLOR },
+    { NPC_VEKNILASH, DATA_VEKNILASH }
 };
 
 class instance_temple_of_ahnqiraj : public InstanceMapScript
@@ -46,15 +49,10 @@ public:
             SetBossNumber(MAX_BOSS_NUMBER);
         }
 
-        //If Vem is dead...
-        bool IsBossDied[3];
-
         ObjectGuid SkeramGUID;
         ObjectGuid VemGUID;
         ObjectGuid KriGUID;
         ObjectGuid YaujGUID;
-        ObjectGuid VeklorGUID;
-        ObjectGuid VeknilashGUID;
         ObjectGuid ViscidusGUID;
         ObjectGuid CThunGUID;
         GuidVector CThunGraspGUIDs;
@@ -65,9 +63,6 @@ public:
 
         void Initialize() override
         {
-            IsBossDied[0] = false;
-            IsBossDied[1] = false;
-            IsBossDied[2] = false;
             BugTrioDeathCount = 0;
             CthunPhase = 0;
         }
@@ -92,22 +87,16 @@ public:
                 case NPC_YAUJ:
                     YaujGUID = creature->GetGUID();
                     break;
-                case NPC_VEKLOR:
-                    VeklorGUID = creature->GetGUID();
-                    if (!creature->IsAlive())
-                    {
-                        HandleGameObject(doorGUIDs[1], true);
-                    }
-                    break;
-                case NPC_VEKNILASH:
-                    VeknilashGUID = creature->GetGUID();
-                    break;
                 case NPC_VISCIDUS:
                     ViscidusGUID = creature->GetGUID();
                     break;
                 case NPC_OURO_SPAWNER:
                     if (GetBossState(DATA_OURO) != DONE)
                         creature->Respawn();
+                    break;
+                case NPC_MASTERS_EYE:
+                    if (GetBossState(DATA_TWIN_EMPERORS) != DONE)
+                        creature->Respawn(true);
                     break;
                 case NPC_CTHUN:
                     CThunGUID = creature->GetGUID();
@@ -138,7 +127,7 @@ public:
                     break;
                 case AQ40_DOOR_2:
                     doorGUIDs[1] = go->GetGUID();
-                    if (Creature* veklor = instance->GetCreature(VeklorGUID))
+                    if (Creature* veklor = GetCreature(DATA_VEKLOR))
                     {
                         if (!veklor->IsAlive())
                         {
@@ -177,16 +166,6 @@ public:
         {
             switch (type)
             {
-                case DATA_VEKLORISDEAD:
-                    if (IsBossDied[1])
-                        return 1;
-                    break;
-
-                case DATA_VEKNILASHISDEAD:
-                    if (IsBossDied[2])
-                        return 1;
-                    break;
-
                 case DATA_BUG_TRIO_DEATH:
                     return BugTrioDeathCount;
 
@@ -208,10 +187,6 @@ public:
                     return KriGUID;
                 case DATA_YAUJ:
                     return YaujGUID;
-                case DATA_VEKLOR:
-                    return VeklorGUID;
-                case DATA_VEKNILASH:
-                    return VeknilashGUID;
                 case DATA_VISCIDUS:
                     return ViscidusGUID;
                 case AQ40_DOOR_1:
@@ -234,12 +209,6 @@ public:
                     else
                         BugTrioDeathCount = 0;
                     break;
-                case DATA_VEKLOR_DEATH:
-                    IsBossDied[1] = true;
-                    break;
-                case DATA_VEKNILASH_DEATH:
-                    IsBossDied[2] = true;
-                    break;
                 case DATA_CTHUN_PHASE:
                     CthunPhase = data;
                     if (data == PHASE_CTHUN_DONE)
@@ -252,6 +221,8 @@ public:
                             }
                         }
                     }
+                    break;
+                default:
                     break;
             }
         }
