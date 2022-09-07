@@ -63,6 +63,13 @@ struct boss_sartura : public BossAI
 {
     boss_sartura(Creature* creature) : BossAI(creature, DATA_SARTURA) {}
 
+    void InitializeAI() override
+    {
+        me->m_CombatDistance = 60.f;
+        me->m_SightDistance = 60.f;
+        Reset();
+    }
+
     void Reset() override
     {
         _Reset();
