@@ -189,9 +189,9 @@ class spell_aggro_drones : public SpellScript
     }
 };
 
-struct npc_obsidian_warder : public ScriptedAI
+struct npc_anubisath_warder : public ScriptedAI
 {
-    npc_obsidian_warder(Creature* creature) : ScriptedAI(creature)
+    npc_anubisath_warder(Creature* creature) : ScriptedAI(creature)
     {
     }
 
@@ -262,5 +262,5 @@ void AddSC_temple_of_ahnqiraj()
 {
     RegisterTempleOfAhnQirajCreatureAI(npc_anubisath_defender);
     RegisterSpellScript(spell_aggro_drones);
-    RegisterTempleOfAhnQirajCreatureAI(npc_obsidian_warder);
+    RegisterTempleOfAhnQirajCreatureAI(npc_anubisath_warder);
 }
