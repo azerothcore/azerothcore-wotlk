@@ -23,6 +23,7 @@
 ObjectData const creatureData[] =
 {
     { NPC_SARTURA, DATA_SARTURA },
+    { NPC_CTHUN, DATA_CTHUN },
     { NPC_EYE_OF_CTHUN, DATA_EYE_OF_CTHUN },
     { NPC_OURO_SPAWNER, DATA_OURO_SPAWNER }
 };

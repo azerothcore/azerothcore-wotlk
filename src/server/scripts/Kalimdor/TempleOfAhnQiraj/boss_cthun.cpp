@@ -46,7 +46,7 @@ enum Spells
 
     // ***** Main Phase 2 ******
     //Body spells
-    //SPELL_CARAPACE_CTHUN                        = 26156   //Was removed from client dbcs
+    SPELL_CARAPACE_CTHUN                        = 26156,     // Server-side
     SPELL_TRANSFORM                             = 26232,
     SPELL_PURPLE_COLORATION                     = 22581,     //Probably not the right spell but looks similar
 
@@ -69,7 +69,12 @@ enum Spells
 
     // Tentacles
     SPELL_SUBMERGE_VISUAL                       = 26234,
-    SPELL_BIRTH                                 = 26262
+    SPELL_BIRTH                                 = 26262,
+
+    // Areatriggers
+    SPELL_SPIT_OUT                              = 25383,
+    SPELL_EXIT_STOMACH                          = 26221,
+    SPELL_RUBBLE_ROCKY                          = 26271
 };
 
 enum Actions
@@ -82,7 +87,9 @@ enum Actions
 enum Misc
 {
     MAX_TENTACLE_GROUPS                         = 5,
-    GROUP_BEAM_PHASE                            = 1
+    GROUP_BEAM_PHASE                            = 1,
+    NPC_TRIGGER                                 = 15384,
+    PHASE_BODY                                  = 2
 };
 
 enum Yells
@@ -405,13 +412,10 @@ struct boss_cthun : public BossAI
 
     //Body Phase
     uint32 EyeTentacleTimer;
-    uint8 FleshTentaclesKilled;
+    uint8 _fleshTentaclesKilled;
     uint32 GiantClawTentacleTimer;
     uint32 GiantEyeTentacleTimer;
-    uint32 StomachAcidTimer;
-    uint32 StomachEnterTimer;
-    uint32 StomachEnterVisTimer;
-    ObjectGuid StomachEnterTarget;
+    TaskScheduler _scheduler;
 
     //Stomach map, bool = true then in stomach
     std::unordered_map<ObjectGuid, bool> Stomach_Map;
@@ -429,16 +433,9 @@ struct boss_cthun : public BossAI
 
         //Body Phase
         EyeTentacleTimer = 30000;
-        FleshTentaclesKilled = 0;
+        _fleshTentaclesKilled = 0;
         GiantClawTentacleTimer = 15000;                     //15 seconds into body phase (1 min repeat)
         GiantEyeTentacleTimer = 45000;                      //15 seconds into body phase (1 min repeat)
-        StomachAcidTimer = 4000;                            //Every 4 seconds
-        StomachEnterTimer = 10000;                          //Every 10 seconds
-        StomachEnterVisTimer = 0;                           //Always 3.5 seconds after Stomach Enter Timer
-        StomachEnterTarget.Clear();                         //Target to be teleported to stomach
-
-        //Clear players in stomach and outside
-        Stomach_Map.clear();
 
         //Reset flags
         me->RemoveAurasDueToSpell(SPELL_TRANSFORM);
@@ -486,6 +483,33 @@ struct boss_cthun : public BossAI
             advance(j, rand() % (temp.size() - 1));
 
         return (*j);
+    }
+
+    void ScheduleTasks(uint8 phase)
+    {
+        switch (phase)
+        {
+            case PHASE_BODY:
+                _scheduler.Schedule(13800ms, [this](TaskContext context)
+                {
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, -SPELL_DIGESTIVE_ACID))
+                    {
+                        //Set target in stomach
+                        target->InterruptNonMeleeSpells(false);
+                        target->CastSpell(target, SPELL_MOUTH_TENTACLE, true, nullptr, nullptr, me->GetGUID());
+
+                        target->m_Events.AddEventAtOffset([target, this]()
+                        {
+                            DoTeleportPlayer(target, STOMACH_X, STOMACH_Y, STOMACH_Z, STOMACH_O);
+                            //Cast digestive acid on them
+                            DoCast(target, SPELL_DIGESTIVE_ACID, true);
+                        }, 3800ms);
+                    }
+
+                    context.Repeat();
+                });
+                break;
+        }
     }
 
     void UpdateAI(uint32 diff) override
@@ -567,15 +591,10 @@ struct boss_cthun : public BossAI
                     for (std::list<HostileReference*>::const_iterator i = me->GetThreatMgr().getThreatList().begin(); i != me->GetThreatMgr().getThreatList().end(); ++i)
                         Stomach_Map[(*i)->getUnitGuid()] = false;   //Outside stomach
 
-                    //Spawn 2 flesh tentacles
-                    FleshTentaclesKilled = 0;
-
                     //Spawn flesh tentacle
                     for (uint8 i = 0; i < 2; i++)
                     {
-                        Creature* spawned = me->SummonCreature(NPC_FLESH_TENTACLE, FleshTentaclePos[i], TEMPSUMMON_CORPSE_DESPAWN);
-                        if (!spawned)
-                            ++FleshTentaclesKilled;
+                        me->SummonCreature(NPC_FLESH_TENTACLE, FleshTentaclePos[i], TEMPSUMMON_CORPSE_DESPAWN);
                     }
 
                     PhaseTimer = 0;
@@ -588,118 +607,6 @@ struct boss_cthun : public BossAI
             case PHASE_CTHUN_STOMACH:
                 //Remove Target field
                 me->SetTarget();
-
-                //Weaken
-                if (FleshTentaclesKilled > 1)
-                {
-                    instance->SetData(DATA_CTHUN_PHASE, PHASE_CTHUN_WEAK);
-
-                    Talk(EMOTE_WEAKENED);
-                    PhaseTimer = 45000;
-
-                    DoCast(me, SPELL_PURPLE_COLORATION, true);
-
-                    std::unordered_map<ObjectGuid, bool>::iterator i = Stomach_Map.begin();
-
-                    //Kick all players out of stomach
-                    while (i != Stomach_Map.end())
-                    {
-                        //Check for valid player
-                        Unit* unit = ObjectAccessor::GetUnit(*me, i->first);
-
-                        //Only move units in stomach
-                        if (unit && i->second)
-                        {
-                            //Teleport each player out
-                            DoTeleportPlayer(unit, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 10, float(rand() % 6));
-
-                            //Cast knockback on them
-                            DoCast(unit, SPELL_EXIT_STOMACH_KNOCKBACK, true);
-
-                            //Remove the acid debuff
-                            unit->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
-
-                            i->second = false;
-                        }
-                        ++i;
-                    }
-
-                    return;
-                }
-
-                //Stomach acid
-                if (StomachAcidTimer <= diff)
-                {
-                    //Apply aura to all players in stomach
-                    std::unordered_map<ObjectGuid, bool>::iterator i = Stomach_Map.begin();
-
-                    while (i != Stomach_Map.end())
-                    {
-                        //Check for valid player
-                        Unit* unit = ObjectAccessor::GetUnit(*me, i->first);
-
-                        //Only apply to units in stomach
-                        if (unit && i->second)
-                        {
-                            //Cast digestive acid on them
-                            DoCast(unit, SPELL_DIGESTIVE_ACID, true);
-
-                            //Check if player should be kicked from stomach
-                            if (unit->IsWithinDist3d(&KickPos, 15.0f))
-                            {
-                                //Teleport each player out
-                                DoTeleportPlayer(unit, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 10, float(rand() % 6));
-
-                                //Cast knockback on them
-                                DoCast(unit, SPELL_EXIT_STOMACH_KNOCKBACK, true);
-
-                                //Remove the acid debuff
-                                unit->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
-
-                                i->second = false;
-                            }
-                        }
-                        ++i;
-                    }
-
-                    StomachAcidTimer = 4000;
-                }
-                else StomachAcidTimer -= diff;
-
-                //Stomach Enter Timer
-                if (StomachEnterTimer <= diff)
-                {
-                    if (Unit* target = SelectRandomNotStomach())
-                    {
-                        //Set target in stomach
-                        Stomach_Map[target->GetGUID()] = true;
-                        target->InterruptNonMeleeSpells(false);
-                        target->CastSpell(target, SPELL_MOUTH_TENTACLE, true, nullptr, nullptr, me->GetGUID());
-                        StomachEnterTarget = target->GetGUID();
-                        StomachEnterVisTimer = 3800;
-                    }
-
-                    StomachEnterTimer = 13800;
-                }
-                else StomachEnterTimer -= diff;
-
-                if (StomachEnterVisTimer && StomachEnterTarget)
-                {
-                    if (StomachEnterVisTimer <= diff)
-                    {
-                        //Check for valid player
-                        Unit* unit = ObjectAccessor::GetUnit(*me, StomachEnterTarget);
-
-                        if (unit)
-                        {
-                            DoTeleportPlayer(unit, STOMACH_X, STOMACH_Y, STOMACH_Z, STOMACH_O);
-                        }
-
-                        StomachEnterTarget.Clear();
-                        StomachEnterVisTimer = 0;
-                    }
-                    else StomachEnterVisTimer -= diff;
-                }
 
                 //GientClawTentacleTimer
                 if (GiantClawTentacleTimer <= diff)
@@ -746,15 +653,10 @@ struct boss_cthun : public BossAI
                     //Remove purple coloration
                     me->RemoveAurasDueToSpell(SPELL_PURPLE_COLORATION);
 
-                    //Spawn 2 flesh tentacles
-                    FleshTentaclesKilled = 0;
-
                     //Spawn flesh tentacle
                     for (uint8 i = 0; i < 2; i++)
                     {
-                        Creature* spawned = me->SummonCreature(NPC_FLESH_TENTACLE, FleshTentaclePos[i], TEMPSUMMON_CORPSE_DESPAWN);
-                        if (!spawned)
-                            ++FleshTentaclesKilled;
+                        me->SummonCreature(NPC_FLESH_TENTACLE, FleshTentaclePos[i], TEMPSUMMON_CORPSE_DESPAWN);
                     }
 
                     PhaseTimer = 0;
@@ -801,7 +703,19 @@ struct boss_cthun : public BossAI
     {
         if (creature->GetEntry() == NPC_FLESH_TENTACLE)
         {
-            ++FleshTentaclesKilled;
+            ++_fleshTentaclesKilled;
+
+            if (_fleshTentaclesKilled > 1)
+            {
+                _fleshTentaclesKilled = 0;
+
+                instance->SetData(DATA_CTHUN_PHASE, PHASE_CTHUN_WEAK);
+
+                Talk(EMOTE_WEAKENED);
+                PhaseTimer = 45000;
+
+                DoCast(me, SPELL_PURPLE_COLORATION, true);
+            }
         }
     }
 };
@@ -1113,6 +1027,70 @@ private:
     ObjectGuid _portalGUID;
 };
 
+class ExitStomachPortEvent : public BasicEvent
+{
+public:
+    ExitStomachPortEvent(Creature* invoker, ObjectGuid playerGuid) : _invoker(invoker), _playerGuid(playerGuid) { }
+
+    bool Execute(uint64 /*time*/, uint32 /*diff*/)
+    {
+        if (Player* player = ObjectAccessor::GetPlayer(*_invoker, _playerGuid))
+            _invoker->AI()->SetGUID(_playerGuid, 0);
+        return true;
+    }
+
+private:
+    Creature* _invoker;
+    ObjectGuid _playerGuid;
+};
+
+class ExitStomachJumpEvent : public BasicEvent
+{
+public:
+    ExitStomachJumpEvent(Player* invoker) : _invoker(invoker) { }
+
+    bool Execute(uint64 /*time*/, uint32 /*diff*/)
+    {
+        if (_invoker)
+            _invoker->JumpTo(0.0f, 80.0f, false);
+
+        return true;
+    }
+
+private:
+    Player* _invoker;
+};
+
+// 4033 - At C'thun's stomach
+class at_cthun_stomach_exit : public AreaTriggerScript
+{
+public:
+    at_cthun_stomach_exit() : AreaTriggerScript("at_cthun_stomach_exit") { }
+
+    bool OnTrigger(Player* player, AreaTrigger const* /*at*/) override
+    {
+        if (InstanceScript* instance = player->GetInstanceScript())
+        {
+            if (Creature* cthun = instance->GetCreature(DATA_CTHUN))
+            {
+                player->CastSpell(player, SPELL_RUBBLE_ROCKY, true);
+
+                player->m_Events.AddEventAtOffset([player]()
+                {
+                    if (Creature* trigger = player->FindNearestCreature(NPC_TRIGGER, 15.0f))
+                    {
+                        trigger->CastSpell(player, SPELL_EXIT_STOMACH, true);
+                    }
+                }, 3s);
+
+                cthun->m_Events.AddEvent(new ExitStomachPortEvent(cthun, player->GetGUID()), cthun->m_Events.CalculateTime(4000));
+            }
+        }
+
+        return true;
+    }
+};
+
 void AddSC_boss_cthun()
 {
     RegisterTempleOfAhnQirajCreatureAI(boss_eye_of_cthun);
@@ -1121,4 +1099,5 @@ void AddSC_boss_cthun()
     RegisterTempleOfAhnQirajCreatureAI(npc_claw_tentacle);
     RegisterTempleOfAhnQirajCreatureAI(npc_giant_claw_tentacle);
     RegisterTempleOfAhnQirajCreatureAI(npc_giant_eye_tentacle);
+    new at_cthun_stomach_exit();
 }
