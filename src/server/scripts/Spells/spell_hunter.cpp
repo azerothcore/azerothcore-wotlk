@@ -642,7 +642,7 @@ class spell_hun_readiness : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER;
     }
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
