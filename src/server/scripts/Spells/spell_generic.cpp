@@ -893,7 +893,7 @@ class spell_gen_knock_away : public SpellScript
         PreventHitDefaultEffect(effIndex);
         if (Unit* target = GetHitUnit())
             if (Creature* caster = GetCaster()->ToCreature())
-                caster->GetThreatMgr().modifyThreatPercent(target, -25); // Xinef: amount confirmed by onyxia and void reaver notes
+                caster->GetThreatMgr().ModifyThreatByPercent(target, -25); // Xinef: amount confirmed by onyxia and void reaver notes
     }
 
     void Register() override
@@ -999,7 +999,7 @@ class spell_gen_hate_to_zero : public SpellScript
         PreventHitDefaultEffect(effIndex);
         if (Unit* target = GetHitUnit())
             if (Creature* caster = GetCaster()->ToCreature())
-                caster->GetThreatMgr().modifyThreatPercent(target, -100);
+                caster->GetThreatMgr().ModifyThreatByPercent(target, -100);
     }
 
     void Register() override

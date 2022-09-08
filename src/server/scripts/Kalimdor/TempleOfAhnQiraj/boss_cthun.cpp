@@ -564,7 +564,7 @@ struct boss_cthun : public BossAI
                     //Place all units in threat list on outside of stomach
                     Stomach_Map.clear();
 
-                    for (std::list<HostileReference*>::const_iterator i = me->GetThreatMgr().getThreatList().begin(); i != me->GetThreatMgr().getThreatList().end(); ++i)
+                    for (std::list<HostileReference*>::const_iterator i = me->GetThreatMgr().GetThreatList().begin(); i != me->GetThreatMgr().GetThreatList().end(); ++i)
                         Stomach_Map[(*i)->getUnitGuid()] = false;   //Outside stomach
 
                     //Spawn 2 flesh tentacles
