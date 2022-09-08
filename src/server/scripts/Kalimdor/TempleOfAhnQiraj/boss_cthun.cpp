@@ -82,6 +82,8 @@ enum Actions
     ACTION_FLESH_TENTACLE_KILLED                = 1,
 
     ACTION_SPAWN_EYE_TENTACLES                  = 1,
+
+    ACTION_START_PHASE_TWO                      = 1,
 };
 
 enum Misc
@@ -135,7 +137,7 @@ const Position KickPos = { -8545.0f, 1984.0f, -96.0f, 0.0f};
 
 struct boss_eye_of_cthun : public BossAI
 {
-    boss_eye_of_cthun(Creature* creature) : BossAI(creature, DATA_CTHUN), _summons(creature)
+    boss_eye_of_cthun(Creature* creature) : BossAI(creature, DATA_CTHUN)
     {
         SetCombatMovement(false);
     }
@@ -163,13 +165,18 @@ struct boss_eye_of_cthun : public BossAI
         if (pPortal)
             pPortal->SetReactState(REACT_PASSIVE);
 
-        _summons.DespawnAll();
         _scheduler.CancelAll();
 
         BossAI::Reset();
     }
 
-    void JustDied(Unit* /*killer*/) override { }
+    void JustDied(Unit* /*killer*/) override
+    {
+        if (Creature* cthun = instance->GetCreature(DATA_CTHUN))
+        {
+            cthun->AI()->DoAction(ACTION_START_PHASE_TWO);
+        }
+    }
 
     void EnterCombat(Unit* who) override
     {
@@ -303,7 +310,7 @@ struct boss_eye_of_cthun : public BossAI
 
     void JustSummoned(Creature* summon) override
     {
-        _summons.Summon(summon);
+        summons.Summon(summon);
         summon->SetInCombatWithZone();
     }
 
@@ -389,7 +396,6 @@ private:
 
     uint32 _eyeTentacleCounter;
     TaskScheduler _scheduler;
-    SummonList _summons;
 };
 
 struct boss_cthun : public BossAI
@@ -447,11 +453,11 @@ struct boss_cthun : public BossAI
         DoZoneInCombat();
     }
 
-    void ScheduleTasks(uint8 phase)
+    void DoAction(int32 actionId)
     {
-        switch (phase)
+        switch (actionId)
         {
-            case PHASE_BODY:
+            case ACTION_START_PHASE_TWO:
                 _scheduler.Schedule(13800ms, [this](TaskContext context)
                 {
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_DIGESTIVE_ACID))
