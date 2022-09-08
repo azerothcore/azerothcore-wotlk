@@ -671,8 +671,8 @@ class spell_hun_readiness : public SpellScript
                 if (spellInfo->CategoryRecoveryTime > 0)
                     caster->RemoveCategoryCooldown(spellInfo->GetCategory());
             }
-
-            ++itr;
+            if (itr != cooldowns.end())
+                ++itr;
         }
     }
 
