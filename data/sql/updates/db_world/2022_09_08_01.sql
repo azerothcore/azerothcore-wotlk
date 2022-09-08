@@ -1,3 +1,4 @@
+-- DB update 2022_09_08_00 -> 2022_09_08_01
 -- Remove gold drops from a summoned creature before I forget again
 UPDATE `creature_template` SET `mingold` = 0, `maxgold` = 0 WHERE (`entry` = 15538);
 -- Anubisath Guardian (15355)
