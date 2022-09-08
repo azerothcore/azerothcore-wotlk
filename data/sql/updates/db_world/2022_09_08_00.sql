@@ -1,3 +1,4 @@
+-- DB update 2022_09_07_09 -> 2022_09_08_00
 DELETE FROM creature_loot_template
 WHERE Item IN (
 	20874, #Idol of the Sun
