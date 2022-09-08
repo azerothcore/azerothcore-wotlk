@@ -417,9 +417,6 @@ struct boss_cthun : public BossAI
     uint32 GiantEyeTentacleTimer;
     TaskScheduler _scheduler;
 
-    //Stomach map, bool = true then in stomach
-    std::unordered_map<ObjectGuid, bool> Stomach_Map;
-
     void Reset() override
     {
         //One random wisper every 90 - 300 seconds
@@ -450,41 +447,6 @@ struct boss_cthun : public BossAI
         DoZoneInCombat();
     }
 
-    Unit* SelectRandomNotStomach()
-    {
-        if (Stomach_Map.empty())
-            return nullptr;
-
-        std::unordered_map<ObjectGuid, bool>::const_iterator i = Stomach_Map.begin();
-
-        std::list<Unit*> temp;
-        std::list<Unit*>::const_iterator j;
-
-        //Get all players in map
-        while (i != Stomach_Map.end())
-        {
-            //Check for valid player
-            Unit* unit = ObjectAccessor::GetUnit(*me, i->first);
-
-            //Only units out of stomach
-            if (unit && !i->second)
-                temp.push_back(unit);
-
-            ++i;
-        }
-
-        if (temp.empty())
-            return nullptr;
-
-        j = temp.begin();
-
-        //Get random but only if we have more than one unit on threat list
-        if (temp.size() > 1)
-            advance(j, rand() % (temp.size() - 1));
-
-        return (*j);
-    }
-
     void ScheduleTasks(uint8 phase)
     {
         switch (phase)
@@ -492,10 +454,8 @@ struct boss_cthun : public BossAI
             case PHASE_BODY:
                 _scheduler.Schedule(13800ms, [this](TaskContext context)
                 {
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, -SPELL_DIGESTIVE_ACID))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_DIGESTIVE_ACID))
                     {
-                        //Set target in stomach
-                        target->InterruptNonMeleeSpells(false);
                         target->CastSpell(target, SPELL_MOUTH_TENTACLE, true, nullptr, nullptr, me->GetGUID());
 
                         target->m_Events.AddEventAtOffset([target, this]()
@@ -585,12 +545,6 @@ struct boss_cthun : public BossAI
                     //AttackStart(ObjectAccessor::GetUnit(*me, HoldpPlayer));
                     DoZoneInCombat();
 
-                    //Place all units in threat list on outside of stomach
-                    Stomach_Map.clear();
-
-                    for (std::list<HostileReference*>::const_iterator i = me->GetThreatMgr().getThreatList().begin(); i != me->GetThreatMgr().getThreatList().end(); ++i)
-                        Stomach_Map[(*i)->getUnitGuid()] = false;   //Outside stomach
-
                     //Spawn flesh tentacle
                     for (uint8 i = 0; i < 2; i++)
                     {
@@ -611,7 +565,7 @@ struct boss_cthun : public BossAI
                 //GientClawTentacleTimer
                 if (GiantClawTentacleTimer <= diff)
                 {
-                    if (Unit* target = SelectRandomNotStomach())
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_DIGESTIVE_ACID))
                     {
                         //Spawn claw tentacle on the random target
                         if (Creature* spawned = me->SummonCreature(NPC_GIANT_CLAW_TENTACLE, *target, TEMPSUMMON_CORPSE_DESPAWN, 500))
@@ -627,7 +581,7 @@ struct boss_cthun : public BossAI
                 //GiantEyeTentacleTimer
                 if (GiantEyeTentacleTimer <= diff)
                 {
-                    if (Unit* target = SelectRandomNotStomach())
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_DIGESTIVE_ACID))
                     {
                         //Spawn claw tentacle on the random target
                         if (Creature* spawned = me->SummonCreature(NPC_GIANT_EYE_TENTACLE, *target, TEMPSUMMON_CORPSE_DESPAWN, 500))
