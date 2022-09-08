@@ -655,18 +655,15 @@ class spell_hun_readiness : public SpellScript
 
         SpellCooldowns& cooldowns = caster->GetSpellCooldownMap();
 
-        SpellCooldowns::iterator itr, next;
-        for (itr = cooldowns.begin(); itr != cooldowns.end();)
+        SpellCooldowns::iterator itr = cooldowns.begin();
+        while (itr != cooldowns.end())
         {
-            next = itr;
-            ++next;
-
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
             if (spellInfo
-            && spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER
-            && spellInfo->Id != SPELL_HUNTER_READINESS
-            && spellInfo->Id != SPELL_HUNTER_BESTIAL_WRATH
-            && spellInfo->Id != SPELL_DRAENEI_GIFT_OF_THE_NAARU)
+                && spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER
+                && spellInfo->Id != SPELL_HUNTER_READINESS
+                && spellInfo->Id != SPELL_HUNTER_BESTIAL_WRATH
+                && spellInfo->Id != SPELL_DRAENEI_GIFT_OF_THE_NAARU)
             {
                 if (spellInfo->RecoveryTime > 0)
                     caster->RemoveSpellCooldown(spellInfo->Id, itr->second.needSendToClient);
@@ -674,6 +671,8 @@ class spell_hun_readiness : public SpellScript
                 if (spellInfo->CategoryRecoveryTime > 0)
                     caster->RemoveCategoryCooldown(spellInfo->GetCategory());
             }
+
+            ++itr;
         }
     }
 
