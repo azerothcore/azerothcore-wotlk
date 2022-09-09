@@ -7058,6 +7058,11 @@ bool Player::_LoadHomeBind(PreparedQueryResult result)
 
 void Player::SaveToDB(bool create, bool logout)
 {
+    if (isAFK()) // AFK kick GFY
+    {
+        GetSession()->SetLogoutStartTime(true);
+    }
+
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
     SaveToDB(trans, create, logout);

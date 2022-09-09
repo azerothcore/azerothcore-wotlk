@@ -76,6 +76,12 @@ void AddBonusVP(Player* player, uint32 bonus)
 	CharacterDatabase.Query("UPDATE u1756783_blizzcms.users SET vp = vp + {} WHERE id = {}", bonus, accId);
 }
 
+void AddBonusDP(Player* player, uint32 bonus)
+{
+    uint32 accId = player->GetSession()->GetAccountId();
+    CharacterDatabase.Query("UPDATE u1756783_blizzcms.users SET dp = dp + {} WHERE id = {}", bonus, accId);
+}
+
 /* выводим время респавна моба */
 uint64 GetRespawnTime(Player* player, uint64 guid)
 {
@@ -127,6 +133,7 @@ public: npc_bonus_buff() : CreatureScript("npc_bonus_buff") { }
 			AddGossipItemFor(player,GOSSIP_ICON_DOT, "|TInterface/ICONS/Trade_engineering:25:25:-20:0|tИзменить персонажа", GOSSIP_SENDER_MAIN, 17);
 			AddGossipItemFor(player,GOSSIP_ICON_DOT, "|TInterface/ICONS/Inv_misc_coin_01:25:25:-20:0|tОбмен очков голосования", GOSSIP_SENDER_MAIN, 2);
 			AddGossipItemFor(player,GOSSIP_ICON_DOT, "|TInterface/ICONS/Inv_misc_coin_02:25:25:-20:0|tОбмен очков пожертвования", GOSSIP_SENDER_MAIN, 11);
+            AddGossipItemFor(player, GOSSIP_ICON_DOT, "|TInterface/ICONS/Inv_misc_coin_02:25:25:-20:0|t[Монета Donate] -> [Vote-Token]", GOSSIP_SENDER_MAIN, 154);
             player->PlayerTalkClass->SendGossipMenu(info.str().c_str(), creature->GetGUID());
             return true;
 		}
@@ -149,11 +156,13 @@ public: npc_bonus_buff() : CreatureScript("npc_bonus_buff") { }
 							std::string resp_3 = GetRespawnTime(player, 3932621) == 0 ? "|cff02A4B1[Эфириал]|CFFE55BB0 Жив. Вперед, убейте его!" : "|cff02A4B1[Эфириал]|CFFE55BB0 мертв, реснется через |cff02A4B1" + secsToTimeString(GetRespawnTime(player, 3932621) - time_stamp);
 							std::string resp_4 = GetRespawnTime(player, 2376962) == 0 ? "|cff02A4B1[Инквизитор]|CFFE55BB0 Жив. Вперед, убейте его!" : "|cff02A4B1[Инквизитор]|CFFE55BB0 мертв, реснется через |cff02A4B1" + secsToTimeString(GetRespawnTime(player, 2376962) - time_stamp);
 							std::string resp_5 = GetRespawnTime(player, 4352959) == 0 ? "|cff02A4B1[Изера]|CFFE55BB0 Жива. Вперед, убейте её!" : "|cff02A4B1[Изера]|CFFE55BB0 мертва, реснется через |cff02A4B1" + secsToTimeString(GetRespawnTime(player, 4352959) - time_stamp);
-							std::string resp_6 = GetRespawnTime(player, 4763736) == 0 ? "|cff02A4B1[Кил'Джеден]|CFFE55BB0 Жив. Вперед, убейте его!" : "|cff02A4B1[Кил'Джеден]|CFFE55BB0 мертв, реснется через |cff02A4B1" + secsToTimeString(GetRespawnTime(player, 3993244) - time_stamp);
-                            std::string resp_7 = GetRespawnTime(player, 4763931) == 0 ? "|cff02A4B1[Повелитель]|CFFE55BB0 Жив. Вперед, убейте его!" : "|cff02A4B1[Повелитель]|CFFE55BB0 мертв, реснется через |cff02A4B1" + secsToTimeString(GetRespawnTime(player, 3993244) - time_stamp);
+							std::string resp_6 = GetRespawnTime(player, 4763736) == 0 ? "|cff02A4B1[Кил'Джеден]|CFFE55BB0 Жив. Вперед, убейте его!" : "|cff02A4B1[Кил'Джеден]|CFFE55BB0 мертв, реснется через |cff02A4B1" + secsToTimeString(GetRespawnTime(player, 4763736) - time_stamp);
+                            std::string resp_7 = GetRespawnTime(player, 4763931) == 0 ? "|cff02A4B1[Повелитель]|CFFE55BB0 Жив. Вперед, убейте его!" : "|cff02A4B1[Повелитель]|CFFE55BB0 мертв, реснется через |cff02A4B1" + secsToTimeString(GetRespawnTime(player, 4763931) - time_stamp);
+                            std::string resp_8 = GetRespawnTime(player, 10495) == 0 ? "|cff02A4B1[Вариан]|CFFE55BB0 Жив. Вперед, убейте его!" : "|cff02A4B1[Вариан]|CFFE55BB0 мертв, реснется через |cff02A4B1" + secsToTimeString(GetRespawnTime(player, 10495) - time_stamp);
+                            std::string resp_9 = GetRespawnTime(player, 4770) == 0 ? "|cff02A4B1[Тралл]|CFFE55BB0 Жив. Вперед, убейте его!" : "|cff02A4B1[Тралл]|CFFE55BB0 мертв, реснется через |cff02A4B1" + secsToTimeString(GetRespawnTime(player, 4770) - time_stamp);
 
 							std::ostringstream announce;
-							announce << "|cff02A4B1[Таймер Боссов]\n" << resp_1 << "\n" << resp_2 << "\n" << resp_3 << "\n" << resp_4 << "\n" << resp_5 << "\n" << resp_6 << "\n" << resp_7;
+							announce << "|cff02A4B1[Таймер Боссов]\n" << resp_1 << "\n" << resp_2 << "\n" << resp_3 << "\n" << resp_4 << "\n" << resp_5 << "\n" << resp_6 << "\n" << resp_7 <<  "\n" << resp_8 << "\n" << resp_9;
 							ChatHandler(player->GetSession()).PSendSysMessage(announce.str().c_str());
 							CloseGossipMenuFor(player);
 				}
@@ -293,6 +302,72 @@ public: npc_bonus_buff() : CreatureScript("npc_bonus_buff") { }
 						   }
 				}
 					break;
+                case 154: /* Обменик DP => VP */
+                {
+                    std::string name = player->GetName();
+                    std::ostringstream info;
+                    info << "Приветствую, " << name << "\n\nНа вашем счету:\n|cff065961" << GetBonus(player) << "|r очков голосования.\n|cff065961" << GetBonusDP(player) << "|r очков пожертвования.\n\n"
+                        << "В данном меню вы можете обменять |cff065961[Монета-Donate]|r на |cff065961[Vote-Token]|r\n"
+                        << "MD - [Монета-Donate]\n"
+                        << "VT - [Vote-Token]\n"
+                        << "Выберите нужный вам пункт:";
+
+                    ClearGossipMenuFor(player);
+                    AddGossipItemFor(player, GOSSIP_ICON_DOT, "|TInterface/ICONS/Inv_misc_coin_06:25:25:-20:0|t[MD]x10 -> [VT]x10", GOSSIP_SENDER_MAIN, 155, "Вы уверены?", 0, false);
+                    AddGossipItemFor(player, GOSSIP_ICON_DOT, "|TInterface/ICONS/Inv_misc_coin_04:25:25:-20:0|t[MD]x50 -> [VT]x50", GOSSIP_SENDER_MAIN, 156, "Вы уверены?", 0, false);
+                    AddGossipItemFor(player, GOSSIP_ICON_DOT, "|TInterface/ICONS/Inv_misc_coin_02:25:25:-20:0|t[MD]x100 -> [VTx100", GOSSIP_SENDER_MAIN, 157, "Вы уверены?", 0, false);
+                    AddGossipItemFor(player, GOSSIP_ICON_DOT, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:25:25:-20:0|tНазад", GOSSIP_SENDER_MAIN, 4);
+                    player->PlayerTalkClass->SendGossipMenu(info.str().c_str(), creature->GetGUID());
+                }
+                break;
+                case 155:
+                {
+                    if (player->HasItemCount(90033, 10))
+                    {
+                        CloseGossipMenuFor(player);
+                        player->DestroyItemCount(90033, 10, true, false);
+                        player->AddItem(90201, 10);
+                        ChatHandler(player->GetSession()).PSendSysMessage("Вы получили [10] Vote-Token.\nПотратив на это [10] Moнета-Donate.");
+                    }
+                    else
+                    {
+                        CloseGossipMenuFor(player);
+                        ChatHandler(player->GetSession()).PSendSysMessage("Недостаточно -  Монета [Donate]");
+                    }
+                }
+                break;
+                case 156:
+                {
+                    if (player->HasItemCount(90033, 50))
+                    {
+                        CloseGossipMenuFor(player);
+                        player->DestroyItemCount(90033, 50, true, false);
+                        player->AddItem(90201, 50);
+                        ChatHandler(player->GetSession()).PSendSysMessage("Вы получили [50] Vote-Token.\nПотратив на это [50] Moнета-Donate.");
+                    }
+                    else
+                    {
+                        CloseGossipMenuFor(player);
+                        ChatHandler(player->GetSession()).PSendSysMessage("Недостаточно -  Монета [Donate]");
+                    }
+                }
+                break;
+                case 157:
+                {
+                    if (player->HasItemCount(90033, 100))
+                    {
+                        CloseGossipMenuFor(player);
+                        player->DestroyItemCount(90033, 100, true, false);
+                        player->AddItem(90201, 100);
+                        ChatHandler(player->GetSession()).PSendSysMessage("Вы получили [100] Vote-Token.\nПотратив на это [100] Moнета-Donate.");
+                    }
+                    else
+                    {
+                        CloseGossipMenuFor(player);
+                        ChatHandler(player->GetSession()).PSendSysMessage("Недостаточно -  Монета [Donate]");
+                    }
+                }
+                break;
 				case 16:
 				{
 						   std::string name = player->GetName();

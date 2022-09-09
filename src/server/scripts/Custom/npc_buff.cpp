@@ -10,11 +10,11 @@
 #define MSG_GOSSIP_TEXT_BUFF_POWER_WORD "[Бафнуть] Слово силы: Стойкость"
 #define MSG_GOSSIP_TEXT_BUFF_BLESSING_OF_KINGS "[Бафнуть] Благословение Королей"
 #define MSG_GOSSIP_TEXT_BUFF_MARK_OF_THE_WILD "[Бафнуть] Знак дикой природы"
-#define MSG_GOSSIP_TEXT_BUFF_ARCANE_BRILLIANCE "[Бафнуть] Чародейская гениальность Даларана"
-#define MSG_GOSSIP_TEXT_BUFF_BLESSING_OF_MIGHT "[Бафнуть] Великое Благословение могущества"
+#define MSG_GOSSIP_TEXT_BUFF_ARCANE_BRILLIANCE "[Бафнуть] Чародейская гениальность"
+#define MSG_GOSSIP_TEXT_BUFF_BLESSING_OF_MIGHT "[Бафнуть] Благословение могущества"
 #define MSG_GOSSIP_TEXT_BUFF_BLESSING_OF_WISDOM "[Бафнуть] Благословение мудрости"
 #define MSG_GOSSIP_TEXT_BUFF_DIVINE_SPIRIT "[Бафнуть] Божественный дух"
-#define MSG_GOSSIP_TEXT_BUFF_SHADOW_PROTECTION "[Бафнуть] Защита от темной магии"
+#define MSG_GOSSIP_TEXT_BUFF_SHADOW_PROTECTION "[Бафнуть] Сопротивление магии"
 #define MSG_GOSSIP_TEXT_BUFF_STAMINA "[Бафнуть] Выносливость"
  
 #define MSG_GOSSIP_TEXT_SUPPER_BUFF_AEGIS_OF_NELTHARION "[Бафнуть] Защита Нелтариона"
@@ -67,11 +67,9 @@ class buff : public CreatureScript
                 AddGossipItemFor(player,GOSSIP_ICON_TRAINER, MSG_GOSSIP_TEXT_BUFF_BLESSING_OF_KINGS, GOSSIP_SENDER_MAIN, 4);
                 AddGossipItemFor(player,GOSSIP_ICON_TRAINER, MSG_GOSSIP_TEXT_BUFF_MARK_OF_THE_WILD, GOSSIP_SENDER_MAIN, 5);
                 AddGossipItemFor(player,GOSSIP_ICON_TRAINER, MSG_GOSSIP_TEXT_BUFF_ARCANE_BRILLIANCE, GOSSIP_SENDER_MAIN, 6);
-        AddGossipItemFor(player,GOSSIP_ICON_TRAINER, MSG_GOSSIP_TEXT_BUFF_BLESSING_OF_MIGHT, GOSSIP_SENDER_MAIN, 7);
-        AddGossipItemFor(player,GOSSIP_ICON_TRAINER, MSG_GOSSIP_TEXT_BUFF_BLESSING_OF_WISDOM, GOSSIP_SENDER_MAIN, 8);
+                AddGossipItemFor(player,GOSSIP_ICON_TRAINER, MSG_GOSSIP_TEXT_BUFF_BLESSING_OF_MIGHT, GOSSIP_SENDER_MAIN, 7);
                 AddGossipItemFor(player,GOSSIP_ICON_TRAINER, MSG_GOSSIP_TEXT_BUFF_DIVINE_SPIRIT, GOSSIP_SENDER_MAIN, 10);
                 AddGossipItemFor(player,GOSSIP_ICON_TRAINER, MSG_GOSSIP_TEXT_BUFF_SHADOW_PROTECTION, GOSSIP_SENDER_MAIN, 11);
-                AddGossipItemFor(player,GOSSIP_ICON_TRAINER, MSG_GOSSIP_TEXT_BUFF_STAMINA, GOSSIP_SENDER_MAIN, 12);
                 AddGossipItemFor(player,GOSSIP_ICON_TALK, MSG_GOSSIP_TEXT_MAIN_MENU, GOSSIP_SENDER_MAIN, 24);
             SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE,_creature->GetGUID());
                 break;
@@ -84,7 +82,7 @@ class buff : public CreatureScript
 			}
 			else{
 				// Наложение Защита Нелтариона(Доработано)
-				player->CastSpell(player, 69377, true);
+				player->CastSpell(player, 72591, true);
 				player->ModifyMoney(-CONST_MONEY);
 				CloseGossipMenuFor(player);
 			}
@@ -97,7 +95,7 @@ class buff : public CreatureScript
 		}
 		else{
 			// Наложение Защита Нелтариона(Доработано)
-			player->CastSpell(player, 56525, true);
+			player->CastSpell(player, 565250, true);
 			player->ModifyMoney(-CONST_MONEY);
 			CloseGossipMenuFor(player);
 		}
@@ -109,7 +107,7 @@ class buff : public CreatureScript
 				CloseGossipMenuFor(player);
 			}
 			else{
-				player->CastSpell(player, 1126, true);
+				player->CastSpell(player, 112600, true);
 				player->ModifyMoney(-CONST_MONEY);
 				CloseGossipMenuFor(player);
 			}
@@ -121,7 +119,7 @@ class buff : public CreatureScript
 				CloseGossipMenuFor(player);
 			}
 			else{
-				player->CastSpell(player, 61316, true);
+				player->CastSpell(player, 613160, true);
 				player->ModifyMoney(-CONST_MONEY);
 				CloseGossipMenuFor(player);
 			}
@@ -133,7 +131,7 @@ class buff : public CreatureScript
 				CloseGossipMenuFor(player);
 			}
 			else{
-				player->CastSpell(player, 29381, true);
+				player->CastSpell(player, 293810, true);
 				player->ModifyMoney(-CONST_MONEY);
 				CloseGossipMenuFor(player);
 			}
@@ -145,7 +143,7 @@ class buff : public CreatureScript
 				CloseGossipMenuFor(player);
 			}
 			else{
-				player->CastSpell(player, 56521, true);
+				player->CastSpell(player, 565210, true);
 				player->ModifyMoney(-CONST_MONEY);
 				CloseGossipMenuFor(player);
 			}
@@ -157,7 +155,7 @@ class buff : public CreatureScript
 				CloseGossipMenuFor(player);
 			}
 			else{
-				player->CastSpell(player, 48074, true);
+				player->CastSpell(player, 480740, true);
 				player->ModifyMoney(-CONST_MONEY);
 				CloseGossipMenuFor(player);
 			}
@@ -169,7 +167,7 @@ class buff : public CreatureScript
 				CloseGossipMenuFor(player);
 			}
 			else{
-				player->CastSpell(player, 48170, true);
+                player->AddAura(481701, player);
 				player->ModifyMoney(-CONST_MONEY);
 				CloseGossipMenuFor(player);
 			}
@@ -260,7 +258,7 @@ class buff : public CreatureScript
 		}
 		else{
 			// Элуна
-			player->CastSpell(player, 26393, true);
+			player->CastSpell(player, 263930, true);
 			player->ModifyMoney(-CONST_MONEY_1);
 			CloseGossipMenuFor(player);
 		}

@@ -44,6 +44,8 @@ static bool HandleAllCommand(ChatHandler* handler, char const* /*args*/)
 	std::string RespawnReg5 = "";
 	std::string RespawnReg6 = "";
     std::string RespawnReg7 = "";
+    std::string RespawnReg8 = "";
+    std::string RespawnReg9 = "";
 	
    // Лорж
 	QueryResult queryResult1 = CharacterDatabase.Query("SELECT respawnTime FROM creature_respawn WHERE guid = 4360017");
@@ -129,6 +131,30 @@ static bool HandleAllCommand(ChatHandler* handler, char const* /*args*/)
         RespawnReg7 = "Повелитель жив. Вперед, убейте его!";
     }
 
+    //Король Альянс
+    QueryResult queryResult8 = CharacterDatabase.Query("SELECT respawnTime FROM creature_respawn WHERE guid = 10495");
+    if (queryResult8)
+    {
+        uint32 respawnUnix = queryResult8->Fetch()[0].Get<uint32>();
+        RespawnReg8 = secsToTimeString(respawnUnix - time_stamp);
+    }
+    else
+    {
+        RespawnReg8 = "Вариан жив. Вперед, убейте его!";
+    }
+
+    //Тралл
+    QueryResult queryResult9 = CharacterDatabase.Query("SELECT respawnTime FROM creature_respawn WHERE guid = 4770");
+    if (queryResult9)
+    {
+        uint32 respawnUnix = queryResult9->Fetch()[0].Get<uint32>();
+        RespawnReg9 = secsToTimeString(respawnUnix - time_stamp);
+    }
+    else
+    {
+        RespawnReg9 = "Тралл жив. Вперед, убейте его!";
+    }
+
 	ChatHandler(pPlayer->GetSession()).PSendSysMessage("|CFFFE8A0E[Таймер Мировых Боссов]");
 	ChatHandler(pPlayer->GetSession()).PSendSysMessage("|CFFFE8A0EВозрождение [Лорд]:|r |CFFE55BB0 %s", RespawnReg1.c_str());
 	ChatHandler(pPlayer->GetSession()).PSendSysMessage("|CFFFE8A0EВозрождение [Иллидан]:|r |CFFE55BB0 %s", RespawnReg2.c_str());
@@ -137,6 +163,8 @@ static bool HandleAllCommand(ChatHandler* handler, char const* /*args*/)
 	ChatHandler(pPlayer->GetSession()).PSendSysMessage("|CFFFE8A0EВозрождение [Изера]:|r |CFFE55BB0 %s", RespawnReg5.c_str());
 	ChatHandler(pPlayer->GetSession()).PSendSysMessage("|CFFFE8A0EВозрождение [Кил'Джеден]:|r |CFFE55BB0 %s", RespawnReg6.c_str());
     ChatHandler(pPlayer->GetSession()).PSendSysMessage("|CFFFE8A0EВозрождение [Повелитель]:|r |CFFE55BB0 %s", RespawnReg7.c_str());
+    ChatHandler(pPlayer->GetSession()).PSendSysMessage("|CFFFE8A0EВозрождение [Вариан]:|r |CFFE55BB0 %s", RespawnReg8.c_str());
+    ChatHandler(pPlayer->GetSession()).PSendSysMessage("|CFFFE8A0EВозрождение [Тралл]:|r |CFFE55BB0 %s", RespawnReg9.c_str());
 	return true;
 }
 

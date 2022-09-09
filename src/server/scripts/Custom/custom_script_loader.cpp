@@ -39,6 +39,7 @@ void AddSC_pvp_token_rew();
 void AddSC_revive_zone();
 void AddSC_FallEvent();
 void AddSC_CloseInst();
+void AddSC_BuffInst();
 
 // WorldBoss
 void AddSC_Arzhara_Fun_boss_1();
@@ -82,4 +83,5 @@ void AddCustomScripts()
     AddSC_revive_zone();
     AddSC_FallEvent();
     AddSC_CloseInst();
+    AddSC_BuffInst();
 }
