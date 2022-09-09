@@ -55,6 +55,12 @@ struct boss_moam : public BossAI
 {
     boss_moam(Creature* creature) : BossAI(creature, DATA_MOAM) {}
 
+    void InitializeAI() override
+    {
+        me->m_CombatDistance = 50.0f;
+        Reset();
+    }
+
     void Reset() override
     {
         _Reset();
