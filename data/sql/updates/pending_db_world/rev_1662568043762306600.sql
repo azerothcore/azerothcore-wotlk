@@ -16,8 +16,8 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,
 (15, @GOSSIP_MENU_ID1, 0, 0, 0, 2, 0, @ITEM_ID1, 1, 0, 1, 0, '', 'Requires Missing Item'),
 (15, @GOSSIP_MENU_ID1, 0, 0, 0, 2, 0, @RUBBING_KIT, 1, 0, 0, 0, '', 'Requires Item'),
 (15, @GOSSIP_MENU_ID2, 0, 0, 0, 9, 0, @QUEST_ID, 0, 0, 0, 0, '', 'Requires Quest Taken'),
-(15, @GOSSIP_MENU_ID2, 0, 0, 0, 2, 0, @ITEM_ID2, 2, 0, 2, 0, '', 'Requires Missing Item'),
-(15, @GOSSIP_MENU_ID2, 0, 0, 0, 2, 0, @RUBBING_KIT, 2, 0, 0, 0, '', 'Requires Item'),
+(15, @GOSSIP_MENU_ID2, 0, 0, 0, 2, 0, @ITEM_ID2, 1, 0, 1, 0, '', 'Requires Missing Item'),
+(15, @GOSSIP_MENU_ID2, 0, 0, 0, 2, 0, @RUBBING_KIT, 1, 0, 0, 0, '', 'Requires Item'),
 (15, @GOSSIP_MENU_ID3, 0, 0, 0, 9, 0, @QUEST_ID, 0, 0, 0, 0, '', 'Requires Quest Taken'),
-(15, @GOSSIP_MENU_ID3, 0, 0, 0, 2, 0, @ITEM_ID3, 3, 0, 3, 0, '', 'Requires Missing Item'),
-(15, @GOSSIP_MENU_ID3, 0, 0, 0, 2, 0, @RUBBING_KIT, 3, 0, 0, 0, '', 'Requires Item');
+(15, @GOSSIP_MENU_ID3, 0, 0, 0, 2, 0, @ITEM_ID3, 1, 0, 1, 0, '', 'Requires Missing Item'),
+(15, @GOSSIP_MENU_ID3, 0, 0, 0, 2, 0, @RUBBING_KIT, 1, 0, 0, 0, '', 'Requires Item');
