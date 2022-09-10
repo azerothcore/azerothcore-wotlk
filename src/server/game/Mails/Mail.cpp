@@ -225,21 +225,22 @@ void MailDraft::SendMailTo(CharacterDatabaseTransaction trans, MailReceiver cons
     time_t expire_time = deliver_time + expire_delay;
 
     // Add to DB
+    uint8 index = 0;
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_MAIL);
-    stmt->SetData( 0, mailId);
-    stmt->SetData( 1, uint8(sender.GetMailMessageType()));
-    stmt->SetData( 2, int8(sender.GetStationery()));
-    stmt->SetData( 3, GetMailTemplateId());
-    stmt->SetData( 4, sender.GetSenderId());
-    stmt->SetData( 5, receiver.GetPlayerGUIDLow());
-    stmt->SetData( 6, GetSubject());
-    stmt->SetData( 7, GetBody());
-    stmt->SetData( 8, !m_items.empty());
-    stmt->SetData( 9, uint32(expire_time));
-    stmt->SetData(10, uint32(deliver_time));
-    stmt->SetData(11, m_money);
-    stmt->SetData(12, m_COD);
-    stmt->SetData(13, uint8(checked));
+    stmt->SetData(  index, mailId);
+    stmt->SetData(++index, uint8(sender.GetMailMessageType()));
+    stmt->SetData(++index, int8(sender.GetStationery()));
+    stmt->SetData(++index, GetMailTemplateId());
+    stmt->SetData(++index, sender.GetSenderId());
+    stmt->SetData(++index, receiver.GetPlayerGUIDLow());
+    stmt->SetData(++index, GetSubject());
+    stmt->SetData(++index, GetBody());
+    stmt->SetData(++index, !m_items.empty());
+    stmt->SetData(++index, uint32(expire_time));
+    stmt->SetData(++index, uint32(deliver_time));
+    stmt->SetData(++index, m_money);
+    stmt->SetData(++index, m_COD);
+    stmt->SetData(++index, uint8(checked));
     trans->Append(stmt);
 
     for (MailItemMap::const_iterator mailItemIter = m_items.begin(); mailItemIter != m_items.end(); ++mailItemIter)
