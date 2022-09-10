@@ -171,13 +171,13 @@ struct npc_vekniss_stinger : public ScriptedAI
 
         _scheduler.Schedule(6s, [this](TaskContext context)
         {
-            Unit* target = SelectTarget(SelectTargetMethod::Random, 1, [&](Unit* u)
+            Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [&](Unit* u)
             {
                 return u && !u->IsPet() && u->IsWithinDist2d(me, 20.f) && u->HasAura(SPELL_VEKNISS_CATALYST);
             });
             if (!target)
             {
-                target = SelectTarget(SelectTargetMethod::Random, 1, [&](Unit* u)
+                target = SelectTarget(SelectTargetMethod::Random, 0, [&](Unit* u)
                 {
                     return u && !u->IsPet() && u->IsWithinDist2d(me, 20.f);
                 });
