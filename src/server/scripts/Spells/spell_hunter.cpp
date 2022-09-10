@@ -642,7 +642,7 @@ class spell_hun_readiness : public SpellScript
 
     bool Load() override
     {
-        return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
     }
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -655,8 +655,7 @@ class spell_hun_readiness : public SpellScript
 
         SpellCooldowns& cooldowns = caster->GetSpellCooldownMap();
 
-        SpellCooldowns::iterator itr = cooldowns.begin();
-        while (itr != cooldowns.end())
+        for (SpellCooldowns::const_iterator itr = cooldowns.begin(); itr != cooldowns.end();)
         {
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
             if (spellInfo
@@ -671,8 +670,8 @@ class spell_hun_readiness : public SpellScript
                 if (spellInfo->CategoryRecoveryTime > 0)
                     caster->RemoveCategoryCooldown(spellInfo->GetCategory());
             }
-            if (itr != cooldowns.end())
-                ++itr;
+
+            ++itr;
         }
     }
 
