@@ -1,6 +1,6 @@
 --
 -- Add missing quest greetings from 1.13 sniffs.
-DELETE FROM `quest_greeting` WHERE `ID` IN (661, 1377, 2487, 3050, 4047, 5393, 6868, 8256, 8379, 10428, 1738, 138492, 2277, 5888, 6169, 6946, 7802);
+DELETE FROM `quest_greeting` WHERE `ID` IN (661, 1377, 2487, 3050, 4047, 5393, 5637, 6868, 8256, 8379, 10428, 1738, 138492, 2277, 5888, 6169, 6946, 7802);
 INSERT INTO `quest_greeting` (`ID`, `type`, `Greeting`, `GreetEmoteType`, `GreetEmoteDelay`) VALUES
 (661, 0, 'Greetings. What business have you with the Carevin family? Do you seek to assist the Carevins in their battle against the undead?', 0, 0),
 (1377, 0, 'Driving a Steam Tank isn\'t for everyone.  It takes an iron grip and nerves of steel...lucky I have both!  How about you?  How\'s your mettle?  Want to prove it to me?', 0, 0),
