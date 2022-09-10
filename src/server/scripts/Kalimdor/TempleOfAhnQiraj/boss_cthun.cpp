@@ -482,6 +482,7 @@ struct boss_cthun : public BossAI
                 me->m_Events.AddEventAtOffset([this]()
                 {
                     DoCastSelf(SPELL_TRANSFORM);
+                    DoCastSelf(SPELL_CARAPACE_CTHUN, true);
                     me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
 
                     //Emerging phase
@@ -590,29 +591,7 @@ struct boss_cthun : public BossAI
                 else GiantEyeTentacleTimer -= diff;
 
                 break;
-
-                //Weakened state
-            case PHASE_CTHUN_WEAK:
-                //PhaseTimer
-                if (PhaseTimer <= diff)
-                {
-                    //Switch
-                    instance->SetData(DATA_CTHUN_PHASE, PHASE_CTHUN_STOMACH);
-
-                    //Remove purple coloration
-                    me->RemoveAurasDueToSpell(SPELL_PURPLE_COLORATION);
-
-                    //Spawn flesh tentacle
-                    for (uint8 i = 0; i < 2; i++)
-                    {
-                        me->SummonCreature(NPC_FLESH_TENTACLE, FleshTentaclePos[i], TEMPSUMMON_CORPSE_DESPAWN);
-                    }
-
-                    PhaseTimer = 0;
-                }
-                else PhaseTimer -= diff;
-
-                break;
+ 
         }
 
         _scheduler.Update(diff);
@@ -622,32 +601,6 @@ struct boss_cthun : public BossAI
     {
         instance->SetData(DATA_CTHUN_PHASE, PHASE_CTHUN_DONE);
         BossAI::JustDied(killer);
-    }
-
-    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
-    {
-        switch (instance->GetData(DATA_CTHUN_PHASE))
-        {
-            case PHASE_CTHUN_STOMACH:
-                //Not weakened so reduce damage by 99%
-                damage /= 100;
-                if (damage == 0)
-                    damage = 1;
-
-                //Prevent death in non-weakened state
-                if (damage >= me->GetHealth())
-                    damage = 0;
-
-                return;
-
-            case PHASE_CTHUN_WEAK:
-                //Weakened - takes normal damage
-                return;
-
-            default:
-                damage = 0;
-                break;
-        }
     }
 
     void SummonedCreatureDies(Creature* creature, Unit* /*killer*/) override
@@ -666,6 +619,22 @@ struct boss_cthun : public BossAI
                 PhaseTimer = 45000;
 
                 DoCast(me, SPELL_PURPLE_COLORATION, true);
+                me->RemoveAurasDueToSpell(SPELL_CARAPACE_CTHUN);
+
+                _scheduler.Schedule(45s, [this](TaskContext context)
+                {
+                    //Switch
+                    instance->SetData(DATA_CTHUN_PHASE, PHASE_CTHUN_STOMACH);
+
+                    //Remove purple coloration
+                    me->RemoveAurasDueToSpell(SPELL_PURPLE_COLORATION);
+
+                    //Spawn flesh tentacle
+                    for (uint8 i = 0; i < 2; i++)
+                    {
+                        me->SummonCreature(NPC_FLESH_TENTACLE, FleshTentaclePos[i], TEMPSUMMON_CORPSE_DESPAWN);
+                    }
+                });
             }
         }
     }
