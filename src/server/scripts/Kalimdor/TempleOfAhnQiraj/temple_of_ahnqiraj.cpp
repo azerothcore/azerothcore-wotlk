@@ -151,6 +151,47 @@ private:
     bool _enraged;
 };
 
+struct npc_ahnqiraji_critter : public ScriptedAI
+{
+    npc_ahnqiraji_critter(Creature* creature) : ScriptedAI(creature)
+    {
+    }
+
+    void Reset() override
+    {
+        me->RestoreFaction();
+
+        _scheduler.CancelAll();
+        _scheduler.Schedule(100ms, [this](TaskContext context)
+        {
+            if (Player* player = me->SelectNearestPlayer(10.f))
+            {
+                if (player->IsInCombat())
+                {
+                    AttackStart(player);
+                }
+            }
+
+            context.Repeat(3500ms, 4000ms);
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+        {
+            _scheduler.Update(diff);
+
+            return;
+        }
+
+        DoMeleeAttackIfReady();
+    }
+
+private:
+    TaskScheduler _scheduler;
+};
+
 enum NPCs
 {
     NPC_VEKNISS_DRONE   = 15300
@@ -186,5 +227,6 @@ class spell_aggro_drones : public SpellScript
 void AddSC_temple_of_ahnqiraj()
 {
     RegisterTempleOfAhnQirajCreatureAI(npc_anubisath_defender);
+    RegisterTempleOfAhnQirajCreatureAI(npc_ahnqiraji_critter);
     RegisterSpellScript(spell_aggro_drones);
 }
