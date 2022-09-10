@@ -152,8 +152,6 @@ struct boss_eye_of_cthun : public BossAI
         _eyeTentacleCounter = 0;
 
         //Reset flags
-        me->RemoveAurasDueToSpell(SPELL_RED_COLORATION);
-        me->RemoveAurasDueToSpell(SPELL_FREEZE_ANIM);
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
         me->SetVisible(true);
 
@@ -308,12 +306,6 @@ struct boss_eye_of_cthun : public BossAI
             });
     }
 
-    void JustSummoned(Creature* summon) override
-    {
-        summons.Summon(summon);
-        summon->SetInCombatWithZone();
-    }
-
     void UpdateAI(uint32 diff) override
     {
         //Check if we have a target
@@ -375,6 +367,12 @@ struct boss_eye_of_cthun : public BossAI
                 me->InterruptNonMeleeSpells(true);
                 me->RemoveAllAuras();
                 _scheduler.CancelAll();
+
+                if (Creature* cthun = instance->GetCreature(DATA_CTHUN))
+                {
+                    cthun->AI()->DoAction(ACTION_START_PHASE_TWO);
+                }
+
                 break;
 
             case PHASE_CTHUN_DONE:
@@ -443,9 +441,9 @@ struct boss_cthun : public BossAI
         //Reset flags
         me->RemoveAurasDueToSpell(SPELL_TRANSFORM);
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
-        me->SetVisible(false);
 
         instance->SetData(DATA_CTHUN_PHASE, PHASE_NOT_STARTED);
+        BossAI::Reset();
     }
 
     void EnterCombat(Unit* /*who*/) override
@@ -474,6 +472,29 @@ struct boss_cthun : public BossAI
 
                     context.Repeat();
                 });
+
+                //Switch
+                instance->SetData(DATA_CTHUN_PHASE, PHASE_CTHUN_STOMACH);
+
+                // Animation only plays if Cthun already has this aura...
+                DoCastSelf(SPELL_TRANSFORM);
+
+                me->m_Events.AddEventAtOffset([this]()
+                {
+                    DoCastSelf(SPELL_TRANSFORM);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+
+                    //Emerging phase
+                    //AttackStart(ObjectAccessor::GetUnit(*me, HoldpPlayer));
+                    DoZoneInCombat();
+                }, 500ms);
+
+                //Spawn flesh tentacle
+                for (uint8 i = 0; i < 2; i++)
+                {
+                    me->SummonCreature(NPC_FLESH_TENTACLE, FleshTentaclePos[i], TEMPSUMMON_CORPSE_DESPAWN);
+                }
+
                 break;
         }
     }
@@ -531,38 +552,6 @@ struct boss_cthun : public BossAI
 
         switch (currentPhase)
         {
-                //Transition phase
-            case PHASE_CTHUN_TRANSITION:
-                //PhaseTimer
-                if (PhaseTimer <= diff)
-                {
-                    //Switch
-                    instance->SetData(DATA_CTHUN_PHASE, PHASE_CTHUN_STOMACH);
-
-                    //Switch to c'thun model
-                    me->InterruptNonMeleeSpells(false);
-                    DoCast(me, SPELL_TRANSFORM, false);
-                    me->SetFullHealth();
-
-                    me->SetVisible(true);
-                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
-
-                    //Emerging phase
-                    //AttackStart(ObjectAccessor::GetUnit(*me, HoldpPlayer));
-                    DoZoneInCombat();
-
-                    //Spawn flesh tentacle
-                    for (uint8 i = 0; i < 2; i++)
-                    {
-                        me->SummonCreature(NPC_FLESH_TENTACLE, FleshTentaclePos[i], TEMPSUMMON_CORPSE_DESPAWN);
-                    }
-
-                    PhaseTimer = 0;
-                }
-                else PhaseTimer -= diff;
-
-                break;
-
                 //Body Phase
             case PHASE_CTHUN_STOMACH:
                 //Remove Target field
