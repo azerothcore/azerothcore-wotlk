@@ -591,7 +591,6 @@ struct boss_cthun : public BossAI
                 else GiantEyeTentacleTimer -= diff;
 
                 break;
- 
         }
 
         _scheduler.Update(diff);
