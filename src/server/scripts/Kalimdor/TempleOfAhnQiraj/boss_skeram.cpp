@@ -92,7 +92,6 @@ struct boss_skeram : public BossAI
         creature->SetHealth(creature->GetMaxHealth() * (me->GetHealthPct() / 100.0f));
 
         creature->CastSpell(creature, SPELL_BIRTH, true);
-        creature->SetDisplayId(11686);
         creature->SetControlled(true, UNIT_STATE_ROOT);
         creature->SetReactState(REACT_PASSIVE);
         creature->SetImmuneToAll(true);
@@ -120,20 +119,11 @@ struct boss_skeram : public BossAI
         creature->SetImmuneToAll(false);
         creature->SetControlled(false, UNIT_STATE_ROOT);
         creature->CastSpell(creature, BlinkSpells[rand], true);
-        creature->CastSpell(creature, SPELL_INITIALIZE_IMAGE, true);
 
         _flag |= (1 << rand);
 
         if (_flag & (1 << 7))
             _flag = 0;
-    }
-
-    void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
-    {
-        if (spellInfo->Id != SPELL_INITIALIZE_IMAGE)
-        {
-            return;
-        }
 
         events.ScheduleEvent(EVENT_INIT_IMAGE, 400ms);
     }
@@ -161,7 +151,10 @@ struct boss_skeram : public BossAI
         events.ScheduleEvent(EVENT_BLINK, 30s, 45s);
         events.ScheduleEvent(EVENT_EARTH_SHOCK, 1200ms);
 
-        Talk(SAY_AGGRO);
+        if (!me->IsSummon())
+        {
+            Talk(SAY_AGGRO);
+        }
     }
 
     void UpdateAI(uint32 diff) override
@@ -207,7 +200,7 @@ struct boss_skeram : public BossAI
                     events.RescheduleEvent(EVENT_BLINK, 10s, 30s);
                     break;
                 case EVENT_INIT_IMAGE:
-                    me->RestoreDisplayId();
+                    me->CastSpell(me, SPELL_INITIALIZE_IMAGE, true);
                     break;
             }
         }
