@@ -598,6 +598,21 @@ void ScriptMgr::OnGroupRollRewardItem(Player* player, Item* item, uint32 count, 
     });
 }
 
+bool ScriptMgr::OnBeforeOpenItem(Player* player, Item* item)
+{
+    auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript* script)
+        {
+            return !script->OnBeforeOpenItem(player, item);
+        });
+
+    if (ret && *ret)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 void ScriptMgr::OnFirstLogin(Player* player)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
@@ -1346,6 +1361,14 @@ void ScriptMgr::OnPlayerResurrect(Player* player, float restore_percent, bool ap
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
     {
         script->OnPlayerResurrect(player, restore_percent, applySickness);
+    });
+}
+
+void ScriptMgr::OnBeforeChooseGraveyard(Player* player, TeamId teamId, bool nearCorpse, uint32& graveyardOverride)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->OnBeforeChooseGraveyard(player, teamId, nearCorpse, graveyardOverride);
     });
 }
 
