@@ -451,7 +451,7 @@ struct boss_cthun : public BossAI
         DoZoneInCombat();
     }
 
-    void DoAction(int32 actionId)
+    void DoAction(int32 actionId) override
     {
         switch (actionId)
         {
@@ -471,6 +471,19 @@ struct boss_cthun : public BossAI
                     }
 
                     context.Repeat();
+                }).Schedule(30s, [this](TaskContext context)
+                {
+                    if (me->HasAura(SPELL_CARAPACE_CTHUN))
+                    {
+                        if (Creature* eye = instance->GetCreature(DATA_EYE_OF_CTHUN))
+                        {
+                            eye->AI()->DoAction(ACTION_SPAWN_EYE_TENTACLES);
+                        }
+
+                        context.Repeat(30s);
+                    }
+                    else
+                        context.Repeat(1s);
                 });
 
                 //Switch
@@ -536,20 +549,6 @@ struct boss_cthun : public BossAI
         me->SetTarget();
 
         uint32 currentPhase = instance->GetData(DATA_CTHUN_PHASE);
-        if (currentPhase == PHASE_CTHUN_STOMACH || currentPhase == PHASE_CTHUN_WEAK)
-        {
-            // EyeTentacleTimer
-            if (EyeTentacleTimer <= diff)
-            {
-                if (Creature* eye = instance->GetCreature(DATA_EYE_OF_CTHUN))
-                {
-                    eye->AI()->DoAction(ACTION_SPAWN_EYE_TENTACLES);
-                }
-
-                EyeTentacleTimer = 30000; // every 30sec in phase 2
-            }
-            else EyeTentacleTimer -= diff;
-        }
 
         switch (currentPhase)
         {
