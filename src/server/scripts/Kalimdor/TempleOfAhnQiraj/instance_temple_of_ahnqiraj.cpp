@@ -19,6 +19,7 @@
 #include "InstanceScript.h"
 #include "Player.h"
 #include "ScriptMgr.h"
+#include "TaskScheduler.h"
 #include "temple_of_ahnqiraj.h"
 
 ObjectData const creatureData[] =
@@ -61,6 +62,8 @@ public:
 
         uint32 BugTrioDeathCount;
         uint32 CthunPhase;
+
+        TaskScheduler scheduler;
 
         void Initialize() override
         {
@@ -173,16 +176,19 @@ public:
                     {
                         if (CreatureGroup* formation = creature->GetFormation())
                         {
-                            if (!formation->IsAnyMemberAlive(true))
+                            scheduler.Schedule(100ms, [this, formation](TaskContext /*context*/)
                             {
-                                if (Creature* leader = formation->GetLeader())
+                                if (!formation->IsAnyMemberAlive(true))
                                 {
-                                    if (leader->IsAlive())
+                                    if (Creature* leader = formation->GetLeader())
                                     {
-                                        leader->AI()->SetData(0, 1);
+                                        if (leader->IsAlive())
+                                        {
+                                            leader->AI()->SetData(0, 1);
+                                        }
                                     }
                                 }
-                            }
+                            });
                         }
                     }
                     break;
@@ -275,6 +281,11 @@ public:
             }
 
             return true;
+        }
+
+        void Update(uint32 diff) override
+        {
+            scheduler.Update(diff);
         }
     };
 };
