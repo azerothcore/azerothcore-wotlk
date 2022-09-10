@@ -614,6 +614,8 @@ struct boss_cthun : public BossAI
 
                 break;
         }
+
+        _scheduler.Update(diff);
     }
 
     void JustDied(Unit* killer) override
@@ -976,40 +978,6 @@ private:
     ObjectGuid _portalGUID;
 };
 
-class ExitStomachPortEvent : public BasicEvent
-{
-public:
-    ExitStomachPortEvent(Creature* invoker, ObjectGuid playerGuid) : _invoker(invoker), _playerGuid(playerGuid) { }
-
-    bool Execute(uint64 /*time*/, uint32 /*diff*/)
-    {
-        if (Player* player = ObjectAccessor::GetPlayer(*_invoker, _playerGuid))
-            _invoker->AI()->SetGUID(_playerGuid, 0);
-        return true;
-    }
-
-private:
-    Creature* _invoker;
-    ObjectGuid _playerGuid;
-};
-
-class ExitStomachJumpEvent : public BasicEvent
-{
-public:
-    ExitStomachJumpEvent(Player* invoker) : _invoker(invoker) { }
-
-    bool Execute(uint64 /*time*/, uint32 /*diff*/)
-    {
-        if (_invoker)
-            _invoker->JumpTo(0.0f, 80.0f, false);
-
-        return true;
-    }
-
-private:
-    Player* _invoker;
-};
-
 // 4033 - At C'thun's stomach
 class at_cthun_stomach_exit : public AreaTriggerScript
 {
@@ -1032,7 +1000,20 @@ public:
                     }
                 }, 3s);
 
-                cthun->m_Events.AddEvent(new ExitStomachPortEvent(cthun, player->GetGUID()), cthun->m_Events.CalculateTime(4000));
+                player->m_Events.AddEventAtOffset([player]()
+                {
+                    player->JumpTo(0.0f, 80.0f, false);
+                }, 5s);
+
+                player->m_Events.AddEventAtOffset([player, cthun]()
+                {
+                    if (cthun)
+                    {
+                        player->NearTeleportTo(cthun->GetPositionX(), cthun->GetPositionY(), cthun->GetPositionZ() + 10, float(rand32() % 6));
+                    }
+
+                    player->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
+                }, 6s);
             }
         }
 
