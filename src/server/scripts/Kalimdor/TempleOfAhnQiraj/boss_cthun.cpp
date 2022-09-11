@@ -312,27 +312,6 @@ struct boss_eye_of_cthun : public BossAI
         if (!UpdateVictim())
             return;
 
-        switch (instance->GetData(DATA_CTHUN_PHASE))
-        {
-            //Transition phase
-            case PHASE_CTHUN_TRANSITION:
-                //Remove any target
-                me->SetTarget();
-                me->SetHealth(0);
-                me->SetVisible(false);
-                break;
-
-            //Dead phase
-            case PHASE_CTHUN_DONE:
-                if (Creature* pPortal = me->FindNearestCreature(NPC_CTHUN_PORTAL, 10))
-                {
-                    pPortal->DespawnOrUnsummon();
-                }
-
-                me->DespawnOrUnsummon();
-                break;
-        }
-
         _scheduler.Update(diff);
     }
 
@@ -357,9 +336,6 @@ struct boss_eye_of_cthun : public BossAI
 
                 //Remove Target field
                 me->SetTarget();
-
-                //Death animation/respawning;
-                instance->SetData(DATA_CTHUN_PHASE, PHASE_CTHUN_TRANSITION);
 
                 me->SetHealth(0);
                 damage = 0;
@@ -454,11 +430,12 @@ struct boss_cthun : public BossAI
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_DIGESTIVE_ACID))
             {
-                target->CastSpell(target, SPELL_MOUTH_TENTACLE, true, nullptr, nullptr, me->GetGUID());
+                target->CastSpell(target, SPELL_MOUTH_TENTACLE, true);
 
                 target->m_Events.AddEventAtOffset([target, this]()
                 {
                     DoTeleportPlayer(target, STOMACH_X, STOMACH_Y, STOMACH_Z, STOMACH_O);
+                    target->RemoveAurasDueToSpell(SPELL_MIND_FLAY);
                     //Cast digestive acid on them
                     DoCast(target, SPELL_DIGESTIVE_ACID, true);
                 }, 3800ms);
@@ -538,8 +515,12 @@ struct boss_cthun : public BossAI
 
     void JustDied(Unit* killer) override
     {
-        instance->SetData(DATA_CTHUN_PHASE, PHASE_CTHUN_DONE);
         BossAI::JustDied(killer);
+
+        if (Creature* pPortal = me->FindNearestCreature(NPC_CTHUN_PORTAL, 10))
+        {
+            pPortal->DespawnOrUnsummon();
+        }
     }
 
     void SummonedCreatureDies(Creature* creature, Unit* /*killer*/) override
@@ -550,9 +531,9 @@ struct boss_cthun : public BossAI
 
             if (_fleshTentaclesKilled > 1)
             {
-                _fleshTentaclesKilled = 0;
+                _scheduler.CancelAll();
 
-                instance->SetData(DATA_CTHUN_PHASE, PHASE_CTHUN_WEAK);
+                _fleshTentaclesKilled = 0;
 
                 Talk(EMOTE_WEAKENED);
 
