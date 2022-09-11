@@ -1007,7 +1007,6 @@ public:
 
 private:
     float _chance = 0.f;
-    float _oldChance = 0.f;
     Spell const* _spell = nullptr;
 };
 
