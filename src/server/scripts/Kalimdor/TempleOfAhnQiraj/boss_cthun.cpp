@@ -403,47 +403,19 @@ struct boss_cthun : public BossAI
         SetCombatMovement(false);
     }
 
-    //Out of combat whisper timer
-    uint32 WisperTimer;
-
-    //Global variables
-    uint32 PhaseTimer;
-
-    //-------------------
-
-    //Phase transition
-    ObjectGuid HoldPlayer;
-
-    //Body Phase
-    uint32 EyeTentacleTimer;
-    uint8 _fleshTentaclesKilled;
-    uint32 GiantClawTentacleTimer;
-    uint32 GiantEyeTentacleTimer;
-    TaskScheduler _scheduler;
-
     void Reset() override
     {
         //One random wisper every 90 - 300 seconds
         WisperTimer = 90000;
 
-        //Phase information
-        PhaseTimer = 10000;                                 //Emerge in 10 seconds
-
-        //No hold player for transition
-        HoldPlayer.Clear();
-
-        //Body Phase
-        EyeTentacleTimer = 30000;
         _fleshTentaclesKilled = 0;
-        GiantClawTentacleTimer = 15000;                     //15 seconds into body phase (1 min repeat)
-        GiantEyeTentacleTimer = 45000;                      //15 seconds into body phase (1 min repeat)
 
         //Reset flags
         me->RemoveAurasDueToSpell(SPELL_TRANSFORM);
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
 
-        instance->SetData(DATA_CTHUN_PHASE, PHASE_NOT_STARTED);
         BossAI::Reset();
+        _scheduler.CancelAll();
     }
 
     void EnterCombat(Unit* /*who*/) override
@@ -453,64 +425,77 @@ struct boss_cthun : public BossAI
 
     void DoAction(int32 actionId) override
     {
-        switch (actionId)
+        if (actionId == ACTION_START_PHASE_TWO)
         {
-            case ACTION_START_PHASE_TWO:
-                _scheduler.Schedule(13800ms, [this](TaskContext context)
-                {
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_DIGESTIVE_ACID))
-                    {
-                        target->CastSpell(target, SPELL_MOUTH_TENTACLE, true, nullptr, nullptr, me->GetGUID());
+            // Animation only plays if Cthun already has this aura...
+            DoCastSelf(SPELL_TRANSFORM);
 
-                        target->m_Events.AddEventAtOffset([target, this]()
-                        {
-                            DoTeleportPlayer(target, STOMACH_X, STOMACH_Y, STOMACH_Z, STOMACH_O);
-                            //Cast digestive acid on them
-                            DoCast(target, SPELL_DIGESTIVE_ACID, true);
-                        }, 3800ms);
-                    }
-
-                    context.Repeat();
-                }).Schedule(30s, [this](TaskContext context)
-                {
-                    if (me->HasAura(SPELL_CARAPACE_CTHUN))
-                    {
-                        if (Creature* eye = instance->GetCreature(DATA_EYE_OF_CTHUN))
-                        {
-                            eye->AI()->DoAction(ACTION_SPAWN_EYE_TENTACLES);
-                        }
-
-                        context.Repeat(30s);
-                    }
-                    else
-                        context.Repeat(1s);
-                });
-
-                //Switch
-                instance->SetData(DATA_CTHUN_PHASE, PHASE_CTHUN_STOMACH);
-
-                // Animation only plays if Cthun already has this aura...
+            me->m_Events.AddEventAtOffset([this]()
+            {
                 DoCastSelf(SPELL_TRANSFORM);
+                DoCastSelf(SPELL_CARAPACE_CTHUN, true);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                DoZoneInCombat();
+            }, 500ms);
 
-                me->m_Events.AddEventAtOffset([this]()
-                {
-                    DoCastSelf(SPELL_TRANSFORM);
-                    DoCastSelf(SPELL_CARAPACE_CTHUN, true);
-                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+            //Spawn flesh tentacle
+            for (uint8 i = 0; i < 2; i++)
+            {
+                me->SummonCreature(NPC_FLESH_TENTACLE, FleshTentaclePos[i], TEMPSUMMON_CORPSE_DESPAWN);
+            }
 
-                    //Emerging phase
-                    //AttackStart(ObjectAccessor::GetUnit(*me, HoldpPlayer));
-                    DoZoneInCombat();
-                }, 500ms);
-
-                //Spawn flesh tentacle
-                for (uint8 i = 0; i < 2; i++)
-                {
-                    me->SummonCreature(NPC_FLESH_TENTACLE, FleshTentaclePos[i], TEMPSUMMON_CORPSE_DESPAWN);
-                }
-
-                break;
+            ScheduleTasks();
         }
+    }
+
+    void ScheduleTasks()
+    {
+        _scheduler.Schedule(13800ms, [this](TaskContext context)
+        {
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_DIGESTIVE_ACID))
+            {
+                target->CastSpell(target, SPELL_MOUTH_TENTACLE, true, nullptr, nullptr, me->GetGUID());
+
+                target->m_Events.AddEventAtOffset([target, this]()
+                {
+                    DoTeleportPlayer(target, STOMACH_X, STOMACH_Y, STOMACH_Z, STOMACH_O);
+                    //Cast digestive acid on them
+                    DoCast(target, SPELL_DIGESTIVE_ACID, true);
+                }, 3800ms);
+            }
+
+            context.Repeat();
+        }).Schedule(30s, [this](TaskContext context)
+        {
+            if (Creature* eye = instance->GetCreature(DATA_EYE_OF_CTHUN))
+            {
+                eye->AI()->DoAction(ACTION_SPAWN_EYE_TENTACLES);
+            }
+
+            context.Repeat(30s);
+        }).Schedule(15s, [this](TaskContext context)
+        {
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_DIGESTIVE_ACID))
+            {
+                //Spawn claw tentacle on the random target
+                if (Creature* spawned = me->SummonCreature(NPC_GIANT_CLAW_TENTACLE, *target, TEMPSUMMON_CORPSE_DESPAWN, 500))
+                    if (spawned->AI())
+                        spawned->AI()->AttackStart(target);
+            }
+
+            context.Repeat(1min);
+        }).Schedule(15s, [this](TaskContext context)
+        {
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_DIGESTIVE_ACID))
+            {
+                //Spawn claw tentacle on the random target
+                if (Creature* spawned = me->SummonCreature(NPC_GIANT_EYE_TENTACLE, *target, TEMPSUMMON_CORPSE_DESPAWN, 500))
+                    if (spawned->AI())
+                        spawned->AI()->AttackStart(target);
+            }
+
+            context.Repeat(1min);
+        });
     }
 
     void UpdateAI(uint32 diff) override
@@ -548,50 +533,6 @@ struct boss_cthun : public BossAI
 
         me->SetTarget();
 
-        uint32 currentPhase = instance->GetData(DATA_CTHUN_PHASE);
-
-        switch (currentPhase)
-        {
-                //Body Phase
-            case PHASE_CTHUN_STOMACH:
-                //Remove Target field
-                me->SetTarget();
-
-                //GientClawTentacleTimer
-                if (GiantClawTentacleTimer <= diff)
-                {
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_DIGESTIVE_ACID))
-                    {
-                        //Spawn claw tentacle on the random target
-                        if (Creature* spawned = me->SummonCreature(NPC_GIANT_CLAW_TENTACLE, *target, TEMPSUMMON_CORPSE_DESPAWN, 500))
-                            if (spawned->AI())
-                                spawned->AI()->AttackStart(target);
-                    }
-
-                    //One giant claw tentacle every minute
-                    GiantClawTentacleTimer = 60000;
-                }
-                else GiantClawTentacleTimer -= diff;
-
-                //GiantEyeTentacleTimer
-                if (GiantEyeTentacleTimer <= diff)
-                {
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_DIGESTIVE_ACID))
-                    {
-                        //Spawn claw tentacle on the random target
-                        if (Creature* spawned = me->SummonCreature(NPC_GIANT_EYE_TENTACLE, *target, TEMPSUMMON_CORPSE_DESPAWN, 500))
-                            if (spawned->AI())
-                                spawned->AI()->AttackStart(target);
-                    }
-
-                    //One giant eye tentacle every minute
-                    GiantEyeTentacleTimer = 60000;
-                }
-                else GiantEyeTentacleTimer -= diff;
-
-                break;
-        }
-
         _scheduler.Update(diff);
     }
 
@@ -614,16 +555,13 @@ struct boss_cthun : public BossAI
                 instance->SetData(DATA_CTHUN_PHASE, PHASE_CTHUN_WEAK);
 
                 Talk(EMOTE_WEAKENED);
-                PhaseTimer = 45000;
 
                 DoCast(me, SPELL_PURPLE_COLORATION, true);
                 me->RemoveAurasDueToSpell(SPELL_CARAPACE_CTHUN);
 
                 _scheduler.Schedule(45s, [this](TaskContext context)
                 {
-                    //Switch
-                    instance->SetData(DATA_CTHUN_PHASE, PHASE_CTHUN_STOMACH);
-
+                    ScheduleTasks();
                     //Remove purple coloration
                     me->RemoveAurasDueToSpell(SPELL_PURPLE_COLORATION);
 
@@ -636,6 +574,14 @@ struct boss_cthun : public BossAI
             }
         }
     }
+
+    private:
+        //Out of combat whisper timer
+        uint32 WisperTimer;
+
+        //Body Phase
+        uint8 _fleshTentaclesKilled;
+        TaskScheduler _scheduler;
 };
 
 struct npc_eye_tentacle : public ScriptedAI
