@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
@@ -23,6 +24,7 @@
 
 enum Spells
 {
+    // Anubisath Defender
     SPELL_SHADOW_FROST_REFLECT          = 19595,
     SPELL_FIRE_ARCANE_REFLECT           = 13022,
     SPELL_METEOR                        = 26558,
@@ -38,7 +40,14 @@ enum Spells
 
     SPELL_SUMMON_LARGE_OBSIDIAN_CHUNK   = 27630, // Server-side
 
-    TALK_ENRAGE                         = 0
+    TALK_ENRAGE                         = 0,
+
+    // Qiraji Scorpion
+    // Qiraji Scarab
+    SPELL_PIERCE_ARMOR                  = 6016,
+    SPELL_ACID_SPIT                     = 26050,
+
+    NPC_QIRAJI_SCORPION                 = 15317
 };
 
 struct npc_anubisath_defender : public ScriptedAI
@@ -176,12 +185,39 @@ struct npc_ahnqiraji_critter : public ScriptedAI
         });
     }
 
+    void EnterCombat(Unit* /*who*/) override
+    {
+        _scheduler.CancelAll();
+
+        if (me->GetEntry() == NPC_QIRAJI_SCORPION)
+        {
+            _scheduler.Schedule(2s, 5s, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_PIERCE_ARMOR, true);
+                context.Repeat(5s, 9s);
+            })
+            .Schedule(5s, 9s, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_ACID_SPIT, true);
+                context.Repeat(6s, 12s);
+            });
+        }
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        if (me->GetEntry() == NPC_QIRAJI_SCORPION)
+        {
+            me->DespawnOrUnsummon(5 * IN_MILLISECONDS);
+        }
+    }
+
     void UpdateAI(uint32 diff) override
     {
+        _scheduler.Update(diff);
+
         if (!UpdateVictim())
         {
-            _scheduler.Update(diff);
-
             return;
         }
 
