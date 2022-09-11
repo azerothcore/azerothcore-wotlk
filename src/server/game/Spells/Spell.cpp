@@ -3278,12 +3278,14 @@ void Spell::DoTriggersOnSpellHit(Unit* unit, uint8 effMask)
                     }
                     else
                     {
-                        m_caster->CastCustomSpell(i->triggeredSpell->Id, SPELLVALUE_AURA_DURATION, _duration, unit, true);
+                        AuraEffect const* triggeringAuraEffect = m_caster->GetAuraEffect(i->triggeredByAura->Id, i->triggeredByEffIdx);
+                        m_caster->CastCustomSpell(i->triggeredSpell->Id, SPELLVALUE_AURA_DURATION, _duration, unit, true, nullptr, triggeringAuraEffect);
                     }
                 }
                 else
                 {
-                    m_caster->CastSpell(unit, i->triggeredSpell, true);
+                    AuraEffect const* triggeringAuraEffect = m_caster->GetAuraEffect(i->triggeredByAura->Id, i->triggeredByEffIdx);
+                    m_caster->CastSpell(unit, i->triggeredSpell, true, nullptr, triggeringAuraEffect);
                 }
             }
         }
@@ -8751,6 +8753,7 @@ void Spell::PrepareTriggersExecutedOnHit()
             HitTriggerSpell spellTriggerInfo;
             spellTriggerInfo.triggeredSpell = spellInfo;
             spellTriggerInfo.triggeredByAura = auraSpellInfo;
+            spellTriggerInfo.triggeredByEffIdx = (*i)->GetEffIndex();
             spellTriggerInfo.chance = chance * (*i)->GetBase()->GetStackAmount();
             m_hitTriggerSpells.push_back(spellTriggerInfo);
         }
