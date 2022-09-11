@@ -935,91 +935,90 @@ class spell_mage_summon_water_elemental : public SpellScript
 
 #define FingersOfFrostScriptName "spell_mage_fingers_of_frost_proc_aura"
 class spell_mage_fingers_of_frost_proc_aura : public AuraScript
-{
-	PrepareAuraScript(spell_mage_fingers_of_frost_proc_aura);
+{   PrepareAuraScript(spell_mage_fingers_of_frost_proc_aura);
 
-	bool CheckProc(ProcEventInfo& eventInfo)
-	{
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
         if (eventInfo.GetSpellPhaseMask() != PROC_SPELL_PHASE_CAST)
         {
             eventInfo.SetProcChance(_chance);
         }
 
-		return true;
-	}
+        return true;
+    }
 
-	bool CheckAfterProc(ProcEventInfo& eventInfo)
-	{
+    bool CheckAfterProc(ProcEventInfo& eventInfo)
+    {
         if (eventInfo.GetSpellPhaseMask() != PROC_SPELL_PHASE_CAST)
         {
             eventInfo.ResetProcChance();
         }
 
-		return true;
-	}
+        return true;
+    }
 
-	void HandleOnEffectProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
-	{
-		if (eventInfo.GetSpellPhaseMask() == PROC_SPELL_PHASE_CAST)
-		{
-			_chance = 100.f;
-			_spell = eventInfo.GetProcSpell();
+    void HandleOnEffectProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        if (eventInfo.GetSpellPhaseMask() == PROC_SPELL_PHASE_CAST)
+        {
+            _chance = 100.f;
+            _spell = eventInfo.GetProcSpell();
 
             if (!_spell || _spell->GetDelayMoment() <= 0)
             {
                 PreventDefaultAction();
             }
-		}
-		else
-		{
+        }
+        else
+        {
             if (eventInfo.GetSpellPhaseMask() == PROC_SPELL_PHASE_FINISH || ((_spell && _spell->GetDelayMoment() > 0) || !eventInfo.GetDamageInfo()))
             {
                 PreventDefaultAction();
             }
 
-			_chance = 0.f;
-			_spell = nullptr;
-		}
-	}
+            _chance = 0.f;
+            _spell = nullptr;
+        }
+    }
 
-	void HandleAfterEffectProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
-	{
+    void HandleAfterEffectProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
         if (eventInfo.GetSpellPhaseMask() == PROC_SPELL_PHASE_HIT)
         {
             _chance = 100.f;
         }
-		else if (eventInfo.GetSpellPhaseMask() == PROC_SPELL_PHASE_FINISH)
-		{
-			_chance = 0.f;
-			_spell = nullptr;
-		}
-	}
+        else if (eventInfo.GetSpellPhaseMask() == PROC_SPELL_PHASE_FINISH)
+        {
+            _chance = 0.f;
+            _spell = nullptr;
+        }
+    }
 
-	void Register()
-	{
-		DoCheckProc += AuraCheckProcFn(spell_mage_fingers_of_frost_proc_aura::CheckProc);
-		DoCheckAfterProc += AuraCheckProcFn(spell_mage_fingers_of_frost_proc_aura::CheckAfterProc);
-		OnEffectProc += AuraEffectProcFn(spell_mage_fingers_of_frost_proc_aura::HandleOnEffectProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
-		AfterEffectProc += AuraEffectProcFn(spell_mage_fingers_of_frost_proc_aura::HandleAfterEffectProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
-	}
+    void Register()
+    {
+        DoCheckProc += AuraCheckProcFn(spell_mage_fingers_of_frost_proc_aura::CheckProc);
+        DoCheckAfterProc += AuraCheckProcFn(spell_mage_fingers_of_frost_proc_aura::CheckAfterProc);
+        OnEffectProc += AuraEffectProcFn(spell_mage_fingers_of_frost_proc_aura::HandleOnEffectProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+        AfterEffectProc += AuraEffectProcFn(spell_mage_fingers_of_frost_proc_aura::HandleAfterEffectProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
 
 public:
-	Spell const* GetProcSpell() const { return _spell; }
+    Spell const* GetProcSpell() const { return _spell; }
 
 private:
-	float _chance = 0.f;
-	float _oldChance = 0.f;
-	Spell const* _spell = nullptr;
+    float _chance = 0.f;
+    float _oldChance = 0.f;
+    Spell const* _spell = nullptr;
 };
 
 typedef spell_mage_fingers_of_frost_proc_aura spell_mage_fingers_of_frost_proc_aura_script;
 
 class spell_mage_fingers_of_frost_proc : public AuraScript
 {
-	PrepareAuraScript(spell_mage_fingers_of_frost_proc);
+    PrepareAuraScript(spell_mage_fingers_of_frost_proc);
 
-	bool CheckProc(ProcEventInfo& eventInfo)
-	{
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
         if (Aura* aura = GetCaster()->GetAuraOfRankedSpell(SPELL_MAGE_FINGERS_OF_FROST))
         {
             if (spell_mage_fingers_of_frost_proc_aura_script* script = dynamic_cast<spell_mage_fingers_of_frost_proc_aura_script*>(aura->GetScriptByName(FingersOfFrostScriptName)))
@@ -1034,13 +1033,13 @@ class spell_mage_fingers_of_frost_proc : public AuraScript
             }
         }
 
-		return true;
-	}
+        return true;
+    }
 
-	void Register()
-	{
-		DoCheckProc += AuraCheckProcFn(spell_mage_fingers_of_frost_proc::CheckProc);
-	}
+    void Register()
+    {
+        DoCheckProc += AuraCheckProcFn(spell_mage_fingers_of_frost_proc::CheckProc);
+    }
 };
 
 void AddSC_mage_spell_scripts()
