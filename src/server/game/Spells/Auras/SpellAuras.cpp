@@ -1450,6 +1450,22 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                             else
                                 target->AddAura(74396, target);
                         }
+                    case 12494: // Frostbite, synchronise with Fingers of Frost
+                    {
+                        // Find Fingers of Frost
+                        if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_MAGE, 2947, EFFECT_0))
+                        {
+                            uint8 fbRank = sSpellMgr->GetSpellRank(GetId());
+                            uint8 fofRank = sSpellMgr->GetSpellRank(aurEff->GetId());
+                            uint8 chance = uint8(std::ceil(fofRank * fbRank * 16.6f));
+
+                            if (roll_chance_i(chance))
+                            {
+                                caster->CastSpell(caster, aurEff->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, true);
+                            }
+                        }
+                        break;
+                    }
                     default:
                         break;
                 }
