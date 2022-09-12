@@ -2149,6 +2149,14 @@ Visibility.Notify.Period.InInstances  = 1000
 Visibility.Notify.Period.InBGArenas   = 1000
 
 #
+#    Visibility.ObjectQuestMarkers
+#        Description: Show quest icons above game objects in the same way as creature quest givers.
+#        Default:     1 - (Show quest markers, post patch 2.3 behavior)
+#                     0 - (Hide quest markers, pre patch 2.3 behavior)
+
+Visibility.ObjectQuestMarkers = 1
+
+#
 ###################################################################################################
 
 ###################################################################################################
