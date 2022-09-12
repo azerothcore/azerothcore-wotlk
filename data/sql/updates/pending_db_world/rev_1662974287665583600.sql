@@ -1,6 +1,7 @@
 --
 -- New Gameobject Finds Spuh 01 + Cookpot
 SET @OGUID :=7080;
+DELETE FROM `gameobject` WHERE `guid` BETWEEN @OGUID+0 AND @OGUID+3;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `VerifiedBuild`) VALUES
 (@OGUID+0, 181488, 530, 3524, 3559, 1, 1, -4469.01904296875, -14118.9169921875, 109.05523681640625, 0.253072351217269897, 0, 0, 0.126198768615722656, 0.992004990577697753, 120, 255, 1, 0), -- 181488 (Area: 3559 - Difficulty: 0)
 (@OGUID+1, 181984, 530, 3524, 0, 1, 1, -3704.78125, -13588.146484375, 8.325993537902832031, 4.127703666687011718, 0, 0, -0.8808908462524414, 0.473319470882415771, 120, 255, 1, 0), -- 181984 (Area: 0 - Difficulty: 0)
