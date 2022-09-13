@@ -86,12 +86,20 @@ enum Actions
     ACTION_START_PHASE_TWO                      = 1,
 };
 
+enum TaskGroups
+{
+    GROUP_BEAM_PHASE = 1
+};
+
+enum Phases
+{
+    PHASE_BODY = 2
+};
+
 enum Misc
 {
     MAX_TENTACLE_GROUPS                         = 5,
-    GROUP_BEAM_PHASE                            = 1,
     NPC_TRIGGER                                 = 15384,
-    PHASE_BODY                                  = 2
 };
 
 enum Yells
@@ -180,7 +188,6 @@ struct boss_eye_of_cthun : public BossAI
     {
         DoZoneInCombat();
         ScheduleTasks();
-        instance->SetData(DATA_CTHUN_PHASE, PHASE_EYE_GREEN_BEAM);
         BossAI::EnterCombat(who);
     }
 
@@ -517,7 +524,7 @@ struct boss_cthun : public BossAI
     {
         BossAI::JustDied(killer);
 
-        if (Creature* pPortal = me->FindNearestCreature(NPC_CTHUN_PORTAL, 10))
+        if (Creature* pPortal = me->FindNearestCreature(NPC_CTHUN_PORTAL, 10.0f))
         {
             pPortal->DespawnOrUnsummon();
         }
@@ -540,7 +547,7 @@ struct boss_cthun : public BossAI
                 DoCast(me, SPELL_PURPLE_COLORATION, true);
                 me->RemoveAurasDueToSpell(SPELL_CARAPACE_CTHUN);
 
-                _scheduler.Schedule(45s, [this](TaskContext context)
+                _scheduler.Schedule(45s, [this](TaskContext /*context*/)
                 {
                     ScheduleTasks();
                     //Remove purple coloration
