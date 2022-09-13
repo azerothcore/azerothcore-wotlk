@@ -734,6 +734,8 @@ struct npc_giant_claw_tentacle : public ScriptedAI
                 DoCastSelf(SPELL_THRASH);
                 context.Repeat(10s);
             });
+
+        ScheduleMeleeCheck();
     }
 
     void ScheduleMeleeCheck()
