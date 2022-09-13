@@ -1,3 +1,4 @@
+-- DB update 2022_09_13_01 -> 2022_09_13_02
 --
 SET @GOSSIP_MENU_ID1 := 6560; /* Hive'Ashi Glyphed Crystal */
 SET @GOSSIP_MENU_ID2 := 6561; /* Hive'Regal Glyphed Crystal */
