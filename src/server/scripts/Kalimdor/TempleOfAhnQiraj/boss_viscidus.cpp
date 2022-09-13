@@ -228,6 +228,7 @@ struct boss_viscidus : public BossAI
                 case EVENT_TOXIN:
                     DoCastRandomTarget(SPELL_SUMMON_TOXIN_SLIME);
                     events.ScheduleEvent(EVENT_TOXIN, 15s, 20s);
+                    break;
                 case EVENT_RESET_PHASE:
                     _hitcounter = 0;
                     _phase = PHASE_FROST;
