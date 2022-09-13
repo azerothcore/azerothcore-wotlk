@@ -27,7 +27,8 @@ ObjectData const creatureData[] =
     { NPC_OURO_SPAWNER, DATA_OURO_SPAWNER },
     { NPC_MASTERS_EYE, DATA_MASTERS_EYE },
     { NPC_VEKLOR, DATA_VEKLOR },
-    { NPC_VEKNILASH, DATA_VEKNILASH }
+    { NPC_VEKNILASH, DATA_VEKNILASH },
+    { NPC_VISCIDUS, DATA_VISCIDUS }
 };
 
 class instance_temple_of_ahnqiraj : public InstanceMapScript
@@ -53,7 +54,6 @@ public:
         ObjectGuid VemGUID;
         ObjectGuid KriGUID;
         ObjectGuid YaujGUID;
-        ObjectGuid ViscidusGUID;
         ObjectGuid CThunGUID;
         GuidVector CThunGraspGUIDs;
         std::array<ObjectGuid, 3> doorGUIDs;
@@ -86,9 +86,6 @@ public:
                     break;
                 case NPC_YAUJ:
                     YaujGUID = creature->GetGUID();
-                    break;
-                case NPC_VISCIDUS:
-                    ViscidusGUID = creature->GetGUID();
                     break;
                 case NPC_OURO_SPAWNER:
                     if (GetBossState(DATA_OURO) != DONE)
@@ -187,8 +184,6 @@ public:
                     return KriGUID;
                 case DATA_YAUJ:
                     return YaujGUID;
-                case DATA_VISCIDUS:
-                    return ViscidusGUID;
                 case AQ40_DOOR_1:
                     return doorGUIDs[0];
                 case AQ40_DOOR_2:
