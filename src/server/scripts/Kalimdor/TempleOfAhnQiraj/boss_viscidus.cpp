@@ -126,7 +126,7 @@ struct boss_viscidus : public BossAI
             me->HandleEmoteCommand(EMOTE_ONESHOT_FLYDEATH); // not found in sniff, this is the best one I found
             DoCastSelf(SPELL_EXPLODE_TRIGGER);
             me->RemoveAura(SPELL_VISCIDUS_FREEZE);
-            _scheduler.Schedule(3s, [this](TaskContext context)
+            _scheduler.Schedule(3s, [this](TaskContext /*context*/)
                 {
                     me->SetVisible(false);
                 });
