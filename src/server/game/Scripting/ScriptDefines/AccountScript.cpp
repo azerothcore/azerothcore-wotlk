@@ -81,3 +81,18 @@ void ScriptMgr::OnFailedPasswordChange(uint32 accountId)
         script->OnFailedPasswordChange(accountId);
     });
 }
+
+bool ScriptMgr::CanAccountCreateCharacter(std::shared_ptr<CharacterCreateInfo> createInfo, uint32 accountId)
+{
+    auto ret = IsValidBoolScript<AccountScript>([&](AccountScript* script)
+    {
+        return !script->CanAccountCreateCharacter(createInfo, accountId);
+    });
+
+    if (ret && *ret)
+    {
+        return false;
+    }
+
+    return true;
+}
