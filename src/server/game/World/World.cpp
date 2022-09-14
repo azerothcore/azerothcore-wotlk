@@ -950,6 +950,8 @@ void World::LoadConfigSettings(bool reload)
 
     m_int_configs[CONFIG_GROUP_VISIBILITY]      = sConfigMgr->GetOption<int32>("Visibility.GroupMode", 1);
 
+    m_bool_configs[CONFIG_OBJECT_SPARKLES]      = sConfigMgr->GetOption<bool>("Visibility.ObjectSparkles", true);
+
     m_int_configs[CONFIG_MAIL_DELIVERY_DELAY]   = sConfigMgr->GetOption<int32>("MailDeliveryDelay", HOUR);
 
     m_int_configs[CONFIG_UPTIME_UPDATE]         = sConfigMgr->GetOption<int32>("UpdateUptimeInterval", 10);
