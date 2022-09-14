@@ -4419,7 +4419,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 23591 }, [](SpellInfo* spellInfo)
     {
         spellInfo->ProcFlags = PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS;
-
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
