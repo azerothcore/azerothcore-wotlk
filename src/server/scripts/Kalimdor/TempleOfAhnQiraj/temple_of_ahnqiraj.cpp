@@ -25,16 +25,15 @@
 
 enum Spells
 {
+    // Anubisath Defender
     SPELL_SHADOW_FROST_REFLECT          = 19595,
     SPELL_FIRE_ARCANE_REFLECT           = 13022,
     SPELL_METEOR                        = 26558,
     SPELL_PLAGUE                        = 26556,
     SPELL_SHADOW_STORM                  = 26555,
     SPELL_THUNDERCLAP                   = 26554,
-
     SPELL_ENRAGE                        = 14204,
     SPELL_EXPLODE                       = 25699,
-
     SPELL_SUMMON_WARRIOR                = 17431,
     SPELL_SUMMON_SWARMGUARD             = 17430,
 
@@ -50,7 +49,12 @@ enum Spells
     SPELL_DRAIN_MANA                    = 25671,
     SPELL_DRAIN_MANA_VISUAL             = 26639,
 
-    TALK_ENRAGE                         = 0
+    TALK_ENRAGE                         = 0,
+
+    // Vekniss Stinger
+    SPELL_VEKNISS_CATALYST              = 26078,
+    SPELL_STINGER_CHARGE_NORMAL         = 26081,
+    SPELL_STINGER_CHARGE_BUFFED         = 26082,
 };
 
 struct npc_anubisath_defender : public ScriptedAI
@@ -161,6 +165,59 @@ struct npc_anubisath_defender : public ScriptedAI
 private:
     TaskScheduler _scheduler;
     bool _enraged;
+};
+
+struct npc_vekniss_stinger : public ScriptedAI
+{
+    npc_vekniss_stinger(Creature* creature) : ScriptedAI(creature)
+    {
+    }
+
+    void Reset() override
+    {
+        _scheduler.CancelAll();
+    }
+
+    void EnterCombat(Unit* who) override
+    {
+        DoCast(who ,who->HasAura(SPELL_VEKNISS_CATALYST) ? SPELL_STINGER_CHARGE_BUFFED : SPELL_STINGER_CHARGE_NORMAL, true);
+
+        _scheduler.Schedule(6s, [this](TaskContext context)
+        {
+            Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [&](Unit* u)
+            {
+                return u && !u->IsPet() && u->IsWithinDist2d(me, 20.f) && u->HasAura(SPELL_VEKNISS_CATALYST);
+            });
+            if (!target)
+            {
+                target = SelectTarget(SelectTargetMethod::Random, 0, [&](Unit* u)
+                {
+                    return u && !u->IsPet() && u->IsWithinDist2d(me, 20.f);
+                });
+            }
+
+            if (target)
+            {
+                DoCast(target, target->HasAura(SPELL_VEKNISS_CATALYST) ? SPELL_STINGER_CHARGE_BUFFED : SPELL_STINGER_CHARGE_NORMAL, true);
+            }
+
+            context.Repeat(6s);
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+        {
+            return;
+        }
+
+        _scheduler.Update(diff,
+            std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
+    }
+
+private:
+    TaskScheduler _scheduler;
 };
 
 enum NPCs
@@ -352,6 +409,7 @@ private:
 void AddSC_temple_of_ahnqiraj()
 {
     RegisterTempleOfAhnQirajCreatureAI(npc_anubisath_defender);
+    RegisterTempleOfAhnQirajCreatureAI(npc_vekniss_stinger);
     RegisterSpellScript(spell_aggro_drones);
     RegisterTempleOfAhnQirajCreatureAI(npc_obsidian_eradicator);
     RegisterSpellScript(spell_drain_mana);
