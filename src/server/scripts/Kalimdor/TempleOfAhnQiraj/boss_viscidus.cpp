@@ -31,10 +31,9 @@ enum Spells
     SPELL_VISCIDUS_SLOWED       = 26034,
     SPELL_VISCIDUS_SLOWED_MORE  = 26036,
     SPELL_VISCIDUS_FREEZE       = 25937,
-    SPELL_REJOIN_VISCIDUS       = 25896,
+    SPELL_REJOIN_VISCIDUS       = 25896, // Unknown usage
     SPELL_EXPLODE_TRIGGER       = 25938,
     SPELL_VISCIDUS_SHRINKS      = 25893, // Server-side
-    SPELL_VISCIDUS_TELEPORT     = 25904, // removed from DBC
 
     // Toxic slime
     SPELL_TOXIN                 = 26575,
@@ -104,8 +103,11 @@ struct boss_viscidus : public BossAI
         _scheduler.CancelAll();
     }
 
-    void DamageTaken(Unit* attacker, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
+        if (me->HealthBelowPct(5))
+            damage = 0;
+
         if (!attacker || _phase != PHASE_MELEE)
             return;
 
@@ -113,7 +115,7 @@ struct boss_viscidus : public BossAI
 
         if (attacker->HasUnitState(UNIT_STATE_MELEE_ATTACKING) && _hitcounter >= HITCOUNTER_EXPLODE)
         {
-            if (me->GetHealthPct() <= 10.f)
+            if (me->GetHealthPct() <= 5.f)
             {
                 Unit::Kill(me, me);
                 return;
@@ -254,7 +256,11 @@ struct boss_glob_of_viscidus : public ScriptedAI
 
     void JustRespawned() override
     {
-        me->GetMotionMaster()->MovePoint(ROOM_CENTER, ViscidusCoord);
+        _scheduler.CancelAll();
+        _scheduler.Schedule(2400ms, [this](TaskContext /*context*/)
+            {
+                me->GetMotionMaster()->MovePoint(ROOM_CENTER, ViscidusCoord);
+            });
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -263,19 +269,9 @@ struct boss_glob_of_viscidus : public ScriptedAI
 
         if (Creature* viscidus = instance->GetCreature(DATA_VISCIDUS))
         {
-            // TODO: REWORK HERE
-            if (viscidus->IsAlive() && viscidus->GetHealthPct() < 5.0f)
-            {
-                viscidus->SetVisible(true);
-                Unit::Kill(viscidus->GetVictim(), viscidus);
-            }
-            else
-            {
-                uint32 newHealth = viscidus->GetHealth() - (viscidus->GetMaxHealth() / 20);
-                uint32 minHealth = CalculatePct(viscidus->GetMaxHealth(), 10);
-                viscidus->SetHealth(newHealth <= minHealth ? minHealth : newHealth);
-                viscidus->CastSpell(viscidus, SPELL_VISCIDUS_SHRINKS);
-            }
+            uint32 newHealth = viscidus->GetHealth() - (viscidus->GetMaxHealth() / 20);
+            viscidus->SetHealth(newHealth <= 0 ? 1 : newHealth);
+            viscidus->CastSpell(viscidus, SPELL_VISCIDUS_SHRINKS);
         }
     }
 
@@ -284,10 +280,17 @@ struct boss_glob_of_viscidus : public ScriptedAI
         if (id == ROOM_CENTER)
         {
             DoCastSelf(SPELL_REJOIN_VISCIDUS);
-            if (TempSummon* summon = me->ToTempSummon())
-                summon->UnSummon();
+            me->DespawnOrUnsummon();
         }
     }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _scheduler.Update(diff);
+    }
+
+protected:
+    TaskScheduler _scheduler;
 };
 
 struct npc_toxic_slime : public ScriptedAI
@@ -319,12 +322,8 @@ class spell_explode_trigger : public SpellScript
         Unit* caster = GetCaster();
 
         uint8 globsToSpawn = std::floor(caster->GetHealthPct() / 5.f);
-        uint8 spawned = 0;
-        for (int i = 0; spawned < globsToSpawn && i < MAX_GLOB_SPAWN; i += MAX_GLOB_SPAWN / globsToSpawn)
-        {
+        for (int i = 0; i < globsToSpawn; i++)
             caster->CastSpell((Unit*)nullptr, spawnGlobSpells[i], true);
-            spawned++;
-        }
     }
 
     void Register() override
