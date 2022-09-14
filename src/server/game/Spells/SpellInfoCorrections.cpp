@@ -4413,6 +4413,13 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_2].ApplyAuraName = SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE;
         spellInfo->Effects[EFFECT_2].Amplitude = 15500;
         spellInfo->Effects[EFFECT_2].TriggerSpell = 50068;
+    }
+
+    // Judgement (Paladin T2 8P Bonus)
+    ApplySpellFix({ 23591 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ProcFlags = PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS;
+
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
