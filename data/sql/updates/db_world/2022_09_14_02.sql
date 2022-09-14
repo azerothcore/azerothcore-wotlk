@@ -1,3 +1,4 @@
+-- DB update 2022_09_14_01 -> 2022_09_14_02
 --
 UPDATE `creature_template` SET `ScriptName`='npc_obsidian_eradicator', `AiName`='' WHERE `entry`=15262;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=15262 AND `source_type`=0;
