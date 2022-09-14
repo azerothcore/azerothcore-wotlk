@@ -310,7 +310,7 @@ class spell_explode_trigger : public SpellScript
         Unit* caster = GetCaster();
 
         uint8 globsToSpawn = std::floor(caster->GetHealthPct() / 5.f);
-        for (int i = 0; i < globsToSpawn; i++)
+        for (uint8 i = 0; i < globsToSpawn; i++)
             caster->CastSpell((Unit*)nullptr, spawnGlobSpells[i], true);
     }
 
