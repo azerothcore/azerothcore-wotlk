@@ -50,7 +50,7 @@ enum Spells
     SPELL_DRAIN_MANA_VISUAL             = 26639,
 
     TALK_ENRAGE                         = 0,
-    
+
     // Vekniss Stinger
     SPELL_VEKNISS_CATALYST              = 26078,
     SPELL_STINGER_CHARGE_NORMAL         = 26081,
