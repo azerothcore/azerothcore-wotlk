@@ -181,18 +181,6 @@ struct boss_viscidus : public BossAI
         events.ScheduleEvent(EVENT_POISON_SHOCK, 7s, 12s);
     }
 
-    void EnterEvadeMode(EvadeReason why) override
-    {
-        summons.DespawnAll();
-        BossAI::EnterEvadeMode(why);
-    }
-
-    void JustDied(Unit* killer) override
-    {
-        summons.DespawnAll();
-        BossAI::JustDied(killer);
-    }
-
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
