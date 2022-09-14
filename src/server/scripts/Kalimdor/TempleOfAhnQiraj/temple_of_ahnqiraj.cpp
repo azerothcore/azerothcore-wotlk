@@ -15,6 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "MapReference.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
@@ -43,6 +45,10 @@ enum Spells
     SPELL_FIRE_NOVA                     = 26073,
 
     SPELL_SUMMON_LARGE_OBSIDIAN_CHUNK   = 27630, // Server-side
+
+    SPELL_SHOCK_BLAST                   = 26458,
+    SPELL_DRAIN_MANA                    = 25671,
+    SPELL_DRAIN_MANA_VISUAL             = 26639,
 
     TALK_ENRAGE                         = 0
 };
@@ -189,6 +195,91 @@ class spell_aggro_drones : public SpellScript
     }
 };
 
+struct npc_obsidian_eradicator : public ScriptedAI
+{
+    npc_obsidian_eradicator(Creature* creature) : ScriptedAI(creature)
+    {
+    }
+
+    void Reset() override
+    {
+        _scheduler.CancelAll();
+        me->SetPower(POWER_MANA, 0);
+        _targets.clear();
+    }
+
+    void EnterCombat(Unit* /*who*/) override
+    {
+        _scheduler.Schedule(3500ms, [this](TaskContext context)
+        {
+            if (_targets.empty())
+            {
+                Map::PlayerList const& players = me->GetMap()->GetPlayers();
+                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                {
+                    if (Player* player = itr->GetSource())
+                    {
+                        if (player->IsAlive() && !player->IsGameMaster() && !player->IsSpectator() && player->GetPower(POWER_MANA) > 0)
+                        {
+                            _targets.push_back(player);
+                        }
+                    }
+                }
+
+                Acore::Containers::RandomResize(_targets, 10);
+            }
+
+            for (Unit* target : _targets)
+            {
+                DoCast(target, SPELL_DRAIN_MANA, true);
+            }
+
+            if (me->GetPowerPct(POWER_MANA) >= 100.f)
+            {
+                DoCastAOE(SPELL_SHOCK_BLAST, true);
+            }
+
+            context.Repeat(3500ms);
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+        {
+            return;
+        }
+
+        _scheduler.Update(diff,
+            std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
+    }
+
+private:
+    TaskScheduler _scheduler;
+    std::list<Player*> _targets;
+};
+
+class spell_drain_mana : public SpellScript
+{
+    PrepareSpellScript(spell_drain_mana);
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            if (Unit* target = GetHitUnit())
+            {
+                target->CastSpell(caster, SPELL_DRAIN_MANA_VISUAL, true);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_drain_mana::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 struct npc_anubisath_warder : public ScriptedAI
 {
     npc_anubisath_warder(Creature* creature) : ScriptedAI(creature)
@@ -262,5 +353,7 @@ void AddSC_temple_of_ahnqiraj()
 {
     RegisterTempleOfAhnQirajCreatureAI(npc_anubisath_defender);
     RegisterSpellScript(spell_aggro_drones);
+    RegisterTempleOfAhnQirajCreatureAI(npc_obsidian_eradicator);
+    RegisterSpellScript(spell_drain_mana);
     RegisterTempleOfAhnQirajCreatureAI(npc_anubisath_warder);
 }
