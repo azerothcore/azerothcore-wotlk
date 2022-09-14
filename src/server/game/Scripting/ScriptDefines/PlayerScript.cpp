@@ -1240,6 +1240,7 @@ void ScriptMgr::OnGetArenaTeamId(Player* player, uint8 slot, uint32& result)
     });
 }
 
+//Signifies that IsFfaPvp has been called.
 void ScriptMgr::OnIsFFAPvP(Player* player, bool& result)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
@@ -1247,6 +1248,15 @@ void ScriptMgr::OnIsFFAPvP(Player* player, bool& result)
         script->OnIsFFAPvP(player, result);
     });
 }
+//Fires whenever the UNIT_BYTE2_FLAG_FFA_PVP bit is Changed
+void ScriptMgr::OnFfaPvpStateUpdate(Player* player, bool result)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+        {
+            script->OnFfaPvpStateUpdate(player, result);
+        });
+}
+
 
 void ScriptMgr::OnIsPvP(Player* player, bool& result)
 {
