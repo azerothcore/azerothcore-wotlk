@@ -48,6 +48,9 @@ public:
 			handler.PSendSysMessage("|cfffcc141Доступные команды:|r");
 			handler.PSendSysMessage("|cff8ab6fc[.vip bank]|cfffcc141 - открыть банк|r");
 			handler.PSendSysMessage("|cff8ab6fc[.vip mail]|cfffcc141 - открыть почту|r");
+            handler.PSendSysMessage("|cff8ab6fc[.vip home]|cfffcc141 - телепорт в Столицу|r");
+            handler.PSendSysMessage("|cff8ab6fc[.ins un all]|cfffcc141 - сбросить КД подземелий|r");
+            handler.PSendSysMessage("|cff8ab6fc[.mir all|cfffcc141 - таймер Мировых боссов|r");
             handler.PSendSysMessage("|cfffcc141[Рейты:] Опыт: х2, Репутация: х2");
 			handler.PSendSysMessage("|cfffcc141Приятной игры.|r|TInterface/ICONS/Achievement_bg_tophealer_wsg:15|t");
 			QueryResult result = LoginDatabase.Query("SELECT unsetdate FROM account_premium WHERE id = {}", accid);
@@ -65,6 +68,9 @@ public:
 		{
 			ChatHandler handler(player->GetSession());
 			handler.PSendSysMessage("|cff8ab6fc[VIP] |cfffcc141Премиум аккаунт не активен.|r");
+            handler.PSendSysMessage("|cfffcc141Доступные команды:|r");
+            handler.PSendSysMessage("|cff8ab6fc[.ins un all]|cfffcc141 - сбросить КД подземелий|r");
+            handler.PSendSysMessage("|cff8ab6fc[.mir all|cfffcc141 - таймер Мировых боссов|r");
 			player->DestroyItemCount(68912, 1, true, false);
 			player->DestroyItemCount(68913, 1, true, false);
 			player->DestroyItemCount(68914, 1, true, false);

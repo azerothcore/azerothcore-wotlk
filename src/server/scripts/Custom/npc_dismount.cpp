@@ -94,6 +94,14 @@ public:
 							player->RemoveAura(300194);
 							player->RemoveAura(300048);
                             player->RemoveAura(49303);
+                            player->RemoveAura(1706);
+                            player->RemoveAura(27986);
+                            player->RemoveAura(59200);
+                            player->RemoveAura(52970);
+                            player->RemoveAura(12438);
+                            player->RemoveAura(54168);
+                            player->RemoveAura(79404);
+                            player->RemoveAura(50550);
 						}
 						else
 						{
@@ -103,6 +111,14 @@ public:
 							player->RemoveAura(300194);
 							player->RemoveAura(300048);
                             player->RemoveAura(49303);
+                            player->RemoveAura(1706);
+                            player->RemoveAura(27986);
+                            player->RemoveAura(59200);
+                            player->RemoveAura(52970);
+                            player->RemoveAura(12438);
+                            player->RemoveAura(54168);
+                            player->RemoveAura(79404);
+                            player->RemoveAura(50550);
 						}
 					}
 				}

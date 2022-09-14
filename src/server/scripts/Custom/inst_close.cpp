@@ -327,6 +327,15 @@ public:
                 ChatHandler(player->GetSession()).PSendSysMessage("|cffff6060[Доступ Запрещен]:|r\nНеобходимо выполнить задание [Захват Механар]");
             }
         }
+
+        // проверка бота
+        if (newZone == 3847)
+        {
+            if (!player->GetQuestRewardStatus(20212)) {
+                player->TeleportTo(530, 3335.149658f, 1542.210815f, 180.851791f, 5.635699f);
+                ChatHandler(player->GetSession()).PSendSysMessage("|cffff6060[Доступ Запрещен]:|r\nНеобходимо выполнить задание [Освобождение Аркатрац]");
+            }
+        }
     }
 };
 

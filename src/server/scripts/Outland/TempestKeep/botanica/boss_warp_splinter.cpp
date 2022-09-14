@@ -34,7 +34,8 @@ enum Spells
     SPELL_ARCANE_VOLLEY             = 36705,
 
     SPELL_SUMMON_SAPLINGS_SUMMON    = 34730,
-    SPELL_SUMMON_SAPLINGS_PERIODIC  = 34741
+    SPELL_SUMMON_SAPLINGS_PERIODIC  = 34741,
+    SPELL_SARONITE = 633650
 };
 
 enum Misc
@@ -81,6 +82,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            DoCast(me, SPELL_SARONITE);
             if (!UpdateVictim())
                 return;
 

@@ -36,7 +36,8 @@ enum Spells
 {
     SPELL_SACRIFICE             = 34661,
     SPELL_HELLFIRE              = 34659,
-    SPELL_ENRAGE                = 34670
+    SPELL_ENRAGE                = 34670,
+    SPELL_SARONITE = 633650
 };
 
 enum Events
@@ -101,6 +102,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            DoCast(me, SPELL_SARONITE);
             if (!UpdateVictim())
                 return;
 

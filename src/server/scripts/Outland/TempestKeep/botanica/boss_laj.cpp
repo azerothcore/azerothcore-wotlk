@@ -37,7 +37,8 @@ enum Spells
     SPELL_DAMAGE_IMMUNE_FIRE    = 34305,
     SPELL_DAMAGE_IMMUNE_FROST   = 34306,
     SPELL_DAMAGE_IMMUNE_NATURE  = 34308,
-    SPELL_DAMAGE_IMMUNE_SHADOW  = 34309
+    SPELL_DAMAGE_IMMUNE_SHADOW  = 34309,
+    SPELL_SARONITE = 633650
 };
 
 enum Misc
@@ -109,6 +110,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            DoCast(me, SPELL_SARONITE);
             if (!UpdateVictim())
                 return;
 

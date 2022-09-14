@@ -37,7 +37,8 @@ enum Spells
     SPELL_PLANT_WHITE           = 34759,
     SPELL_PLANT_GREEN           = 34761,
     SPELL_PLANT_BLUE            = 34762,
-    SPELL_PLANT_RED             = 34763
+    SPELL_PLANT_RED             = 34763,
+    SPELL_SARONITE = 633650
 };
 
 enum Misc
@@ -94,6 +95,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            DoCast(me, SPELL_SARONITE);
             if (!UpdateVictim())
                 return;
 
