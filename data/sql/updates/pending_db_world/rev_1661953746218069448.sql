@@ -1,6 +1,8 @@
 --
-DELETE FROM `areatrigger_scripts` WHERE `entry` = 1946;
-INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES (1946, 'at_scarshield_infiltrator');
+DELETE FROM `areatrigger_scripts` WHERE `entry` IN (1946, 1986);
+INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES
+(1986, 'near_scarshield_infiltrator'),
+(1946, 'at_scarshield_infiltrator');
 
 -- Update Position and set kneel animation
 -- VMangos Position: https://github.com/vmangos/core/blob/5073ba81290178612580acba6991bfba8bed632d/sql/migrations/20220402225440_world.sql
@@ -12,13 +14,17 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 15) AND (`SourceGroup` = 12039);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (15, 12039, 1, 0, 0, 2, 0, 12219, 1, 0, 0, 0, 0, '', 'Show gossip option if player has Unadorned Seal of Ascension'),
-(15, 12039, 0, 0, 0, 2, 0, 12219, 1, 0, 1, 0, 0, '', 'Show gossip option if player does not have Unadorned Seal of Ascension');
+(15, 12039, 1, 0, 0, 27, 0,   57, 3, 0, 0, 0, 0, '', 'Show gossip option if player is at least level 57'),
+(15, 12039, 0, 0, 0, 2, 0, 12219, 1, 0, 1, 0, 0, '', 'Show gossip option if player does not have Unadorned Seal of Ascension'),
+(15, 12039, 0, 0, 0, 27, 0,   57, 3, 0, 0, 0, 0, '', 'Show gossip option if player is at least level 57');
 
 -- Add condition to send the right gossip text
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceEntry` = 10299);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(22, 4, 10299, 0, 0, 2, 0, 12219, 1, 0, 1, 0, 0, '', 'Show gossip if player does not have Unadorned Seal of Ascension'),
-(22, 5, 10299, 0, 0, 2, 0, 12219, 1, 0, 0, 0, 0, '', 'Show gossip if player has Unadorned Seal of Ascension');
+(22, 4, 10299, 0, 0,  2, 0, 12219, 1, 0, 1, 0, 0, '', 'Show gossip text if player does not have Unadorned Seal of Ascension'),
+(22, 4, 10299, 0, 1, 27, 0,    57, 3, 0, 1, 0, 0, '', 'Show gossip text if player is below level 57'),
+(22, 5, 10299, 0, 0,  2, 0, 12219, 1, 0, 0, 0, 0, '', 'Show gossip text if player has Unadorned Seal of Ascension'),
+(22, 5, 10299, 0, 0, 27, 0,    57, 3, 0, 0, 0, 0, '', 'Show gossip text if player is at least level 57');
 
 -- Link npc_text with gossip_menu
 DELETE FROM `gossip_menu` WHERE `MenuID` IN (12039, 12040, 12041, 12042, 12043, 12044, 12045, 12046, 12047, 12048);
@@ -26,9 +32,9 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES (12039, 3301), (12039, 331
 
 -- Vaelan, Remove static Vaelan
 DELETE FROM `creature` WHERE `guid` = 42797 AND `id1`= 10296;
-UPDATE `creature_template` SET `AIName` = 'SmartAI', `npcflag`=1|2, `gossip_menu_id` = 12039, `MovementType` = 0 WHERE (`entry` = 10296);
+UPDATE `creature_template` SET `AIName` = 'SmartAI', `npcflag`=1|2, `gossip_menu_id` = 12039, `MovementType` = 0, `minlevel` = 55 WHERE (`entry` = 10296);
 -- Scarshield Infiltrator
-UPDATE `creature_template` SET `AIName` = 'SmartAI', `gossip_menu_id` = 0, `npcflag` = 0, `MovementType` = 0 WHERE (`entry` = 10299);
+UPDATE `creature_template` SET `AIName` = 'SmartAI', `gossip_menu_id` = 0, `npcflag` = 0, `MovementType` = 0, `minlevel` = 55 WHERE (`entry` = 10299);
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 10299);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES

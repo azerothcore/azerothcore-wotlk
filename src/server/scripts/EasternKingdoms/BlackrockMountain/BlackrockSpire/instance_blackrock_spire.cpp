@@ -824,6 +824,37 @@ public:
     }
 };
 
+class near_scarshield_infiltrator : public AreaTriggerScript
+{
+public:
+    near_scarshield_infiltrator() : AreaTriggerScript("near_scarshield_infiltrator") { }
+
+    bool OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    {
+        if (player && player->IsAlive())
+        {
+            if (Creature* creature = player->FindNearestCreature(NPC_SCARSHIELD_INFILTRATOR, 100.0f, true))
+            {
+                bool transformHasStarted = creature->AI()->GetData(0) == 1;
+                if ((player->getLevel() < 57 || !player->HasItemCount(ITEM_UNADORNED_SEAL))  && !transformHasStarted)
+                {
+                    // Send whisper if not already sent
+                    std::list<ObjectGuid>::iterator itr = std::find(whisperedTargets.begin(), whisperedTargets.end(), player->GetGUID());
+                    if (itr == whisperedTargets.end())
+                    {
+                        creature->AI()->Talk(SAY_SCARSHIELD_INF_WHISPER, player);
+                        whisperedTargets.push_back(player->GetGUID());
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    private:
+        GuidList whisperedTargets;
+};
+
 class at_scarshield_infiltrator : public AreaTriggerScript
 {
 public:
@@ -835,28 +866,15 @@ public:
         {
             if (Creature* creature = player->FindNearestCreature(NPC_SCARSHIELD_INFILTRATOR, 100.0f, true))
             {
-                if (player->HasItemCount(ITEM_UNADORNED_SEAL))
+                if (player->getLevel() >= 57 && player->HasItemCount(ITEM_UNADORNED_SEAL))
                 {
-                    // Start transform into Vaelan
-                    creature->AI()->SetData(0, 1);
+                    creature->AI()->SetData(0, 1); // Start transform into Vaelan
+                    return true;
                 }
-                else if (creature->AI()->GetData(0) != 1) // transform has not started
-                {
-                    // Send whisper if not already sent
-                    std::list<ObjectGuid>::iterator itr = std::find(whisperedTargets.begin(), whisperedTargets.end(), player->GetGUID());
-                    if (itr == whisperedTargets.end())
-                    {
-                        creature->AI()->Talk(SAY_SCARSHIELD_INF_WHISPER, player);
-                        whisperedTargets.push_back(player->GetGUID());
-                    }
-                }
-                return true;
             }
         }
         return false;
     }
-    private:
-        GuidList whisperedTargets;
 };
 
 void AddSC_instance_blackrock_spire()
@@ -865,5 +883,6 @@ void AddSC_instance_blackrock_spire()
     new at_dragonspire_hall();
     new at_blackrock_stadium();
     new go_father_flame();
+    new near_scarshield_infiltrator();
     new at_scarshield_infiltrator();
 }
