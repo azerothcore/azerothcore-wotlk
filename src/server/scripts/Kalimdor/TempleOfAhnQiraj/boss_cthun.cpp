@@ -924,6 +924,22 @@ public:
     }
 };
 
+class at_cthun_center : public AreaTriggerScript
+{
+public:
+    at_cthun_center() : AreaTriggerScript("at_cthun_center") { }
+
+    bool OnTrigger(Player* player, AreaTrigger const* /*at*/) override
+    {
+        if (Creature* trigger = player->FindNearestCreature(NPC_TRIGGER, 15.0f))
+        {
+            trigger->CastSpell(player, SPELL_SPIT_OUT, true);
+        }
+
+        return true;
+    }
+};
+
 void AddSC_boss_cthun()
 {
     RegisterTempleOfAhnQirajCreatureAI(boss_eye_of_cthun);
@@ -933,4 +949,5 @@ void AddSC_boss_cthun()
     RegisterTempleOfAhnQirajCreatureAI(npc_giant_claw_tentacle);
     RegisterTempleOfAhnQirajCreatureAI(npc_giant_eye_tentacle);
     new at_cthun_stomach_exit();
+    new at_cthun_center();
 }
