@@ -1,3 +1,4 @@
+-- DB update 2022_09_15_00 -> 2022_09_15_01
 -- Replace Pathing for Simone the Inconspicuous Entry: 14527 "Replace 347 points with correct 138 points"
 SET @NPC := 24439;
 SET @PATH := @NPC * 10;
