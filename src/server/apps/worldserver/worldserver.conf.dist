@@ -2149,6 +2149,14 @@ Visibility.Notify.Period.InInstances  = 1000
 Visibility.Notify.Period.InBGArenas   = 1000
 
 #
+#    Visibility.ObjectSparkles
+#        Description: Whether or not to display sparkles on gameobjects related to active quests.
+#        Default:     1 - (Show Sparkles)
+#                     0 - (Hide Sparkles)
+
+Visibility.ObjectSparkles = 1
+
+#
 #    Visibility.ObjectQuestMarkers
 #        Description: Show quest icons above game objects in the same way as creature quest givers.
 #        Default:     1 - (Show quest markers, post patch 2.3 behavior)
