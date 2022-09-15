@@ -64,7 +64,9 @@ void WorldSession::HandleQuestgiverStatusQueryOpcode(WorldPacket& recvData)
             {
                 LOG_DEBUG("network", "WORLD: Received CMSG_QUESTGIVER_STATUS_QUERY for GameObject {}", guid.ToString());
                 if (sWorld->getBoolConfig(CONFIG_OBJECT_QUEST_MARKERS))
+                {
                     questStatus = _player->GetQuestDialogStatus(questGiver);
+                }
                 break;
             }
         default:
