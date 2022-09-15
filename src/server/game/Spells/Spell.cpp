@@ -1549,7 +1549,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                         // collision occured
                         if (col || dcol || (overdistance > 0.0f && !map->IsInWater(phasemask, tstX, tstY, ground, collisionHeight)) || (fabs(prevZ - tstZ) > maxtravelDistZ && (tstZ > prevZ)))
                         {
-                            if ((overdistance > 0.0f) && (overdistance < step))
+                            if ((overdistance > 0.0f) && (overdistance < 1.f))
                             {
                                 destx = prevX + overdistance * cos(pos.GetOrientation());
                                 desty = prevY + overdistance * sin(pos.GetOrientation());
@@ -1592,7 +1592,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                     }
                     //}
 
-                    lastpos.Relocate(destx, desty, destz + 0.5f, pos.GetOrientation());
+                    lastpos.Relocate(destx, desty, destz, pos.GetOrientation());
                     dest = SpellDestination(lastpos);
                 }
                 else

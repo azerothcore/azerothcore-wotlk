@@ -34,7 +34,8 @@ enum Spells
     SPELL_EARTH_SHOCK           = 26194,
     SPELL_TRUE_FULFILLMENT      = 785,
     SPELL_INITIALIZE_IMAGE      = 3730,
-    SPELL_SUMMON_IMAGES         = 747
+    SPELL_SUMMON_IMAGES         = 747,
+    SPELL_BIRTH                 = 34115
 };
 
 enum Events
@@ -42,7 +43,9 @@ enum Events
     EVENT_ARCANE_EXPLOSION      = 1,
     EVENT_FULLFILMENT           = 2,
     EVENT_BLINK                 = 3,
-    EVENT_EARTH_SHOCK           = 4
+    EVENT_EARTH_SHOCK           = 4,
+    EVENT_TELEPORT              = 5,
+    EVENT_INIT_IMAGE            = 6
 };
 
 uint32 const BlinkSpells[3] = { 4801, 8195, 20449 };
@@ -56,7 +59,9 @@ struct boss_skeram : public BossAI
         _Reset();
         _flag = 0;
         _hpct = 75.0f;
-        me->SetVisible(true);
+        me->SetReactState(REACT_AGGRESSIVE);
+        me->SetImmuneToAll(false);
+        me->SetControlled(false, UNIT_STATE_ROOT);
     }
 
     void KilledUnit(Unit* /*victim*/) override
@@ -73,6 +78,29 @@ struct boss_skeram : public BossAI
 
     void JustSummoned(Creature* creature) override
     {
+        BossAI::JustSummoned(creature);
+
+        float ImageHealthPct = 0.f;
+        if (me->GetHealthPct() < 25.0f)
+            ImageHealthPct = 0.50f;
+        else if (me->GetHealthPct() < 50.0f)
+            ImageHealthPct = 0.20f;
+        else
+            ImageHealthPct = 0.10f;
+
+        creature->SetMaxHealth(me->GetMaxHealth() * ImageHealthPct);
+        creature->SetHealth(creature->GetMaxHealth() * (me->GetHealthPct() / 100.0f));
+
+        creature->CastSpell(creature, SPELL_BIRTH, true);
+        creature->SetControlled(true, UNIT_STATE_ROOT);
+        creature->SetReactState(REACT_PASSIVE);
+        creature->SetImmuneToAll(true);
+
+        _copiesGUIDs.push_back(creature->GetGUID());
+    }
+
+    void DoTeleport(Creature* creature)
+    {
         // Shift the boss and images (Get it? *Shift*?)
         uint8 rand = 0;
         if (_flag != 0)
@@ -86,24 +114,18 @@ struct boss_skeram : public BossAI
 
         while (_flag & (1 << rand))
             rand = urand(0, 2);
-        creature->CastSpell(creature, BlinkSpells[rand]);
+
+        creature->SetReactState(REACT_AGGRESSIVE);
+        creature->SetImmuneToAll(false);
+        creature->SetControlled(false, UNIT_STATE_ROOT);
+        creature->CastSpell(creature, BlinkSpells[rand], true);
+
         _flag |= (1 << rand);
 
         if (_flag & (1 << 7))
             _flag = 0;
 
-        float ImageHealthPct;
-
-        if (me->GetHealthPct() < 25.0f)
-            ImageHealthPct = 0.50f;
-        else if (me->GetHealthPct() < 50.0f)
-            ImageHealthPct = 0.20f;
-        else
-            ImageHealthPct = 0.10f;
-
-        creature->SetMaxHealth(me->GetMaxHealth() * ImageHealthPct);
-        creature->SetHealth(creature->GetMaxHealth() * (me->GetHealthPct() / 100.0f));
-        BossAI::JustSummoned(creature);
+        events.ScheduleEvent(EVENT_INIT_IMAGE, 400ms);
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -129,7 +151,10 @@ struct boss_skeram : public BossAI
         events.ScheduleEvent(EVENT_BLINK, 30s, 45s);
         events.ScheduleEvent(EVENT_EARTH_SHOCK, 1200ms);
 
-        Talk(SAY_AGGRO);
+        if (!me->IsSummon())
+        {
+            Talk(SAY_AGGRO);
+        }
     }
 
     void UpdateAI(uint32 diff) override
@@ -154,23 +179,42 @@ struct boss_skeram : public BossAI
                 case EVENT_BLINK:
                     DoCast(me, BlinkSpells[urand(0, 2)]);
                     DoResetThreat();
-                    me->SetVisible(true);
                     events.ScheduleEvent(EVENT_BLINK, 10s, 30s);
                     break;
                 case EVENT_EARTH_SHOCK:
                     DoCastVictim(SPELL_EARTH_SHOCK);
                     events.ScheduleEvent(EVENT_EARTH_SHOCK, 1200ms);
                     break;
+                case EVENT_TELEPORT:
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->SetImmuneToAll(false);
+                    me->SetControlled(false, UNIT_STATE_ROOT);
+                    for (ObjectGuid const& guid : _copiesGUIDs)
+                    {
+                        if (Creature* image = ObjectAccessor::GetCreature(*me, guid))
+                        {
+                            DoTeleport(image);
+                        }
+                    }
+                    DoResetThreat();
+                    events.RescheduleEvent(EVENT_BLINK, 10s, 30s);
+                    break;
+                case EVENT_INIT_IMAGE:
+                    me->CastSpell(me, SPELL_INITIALIZE_IMAGE, true);
+                    break;
             }
         }
 
         if (!me->IsSummon() && me->GetHealthPct() < _hpct)
         {
+            _copiesGUIDs.clear();
             DoCast(me, SPELL_SUMMON_IMAGES, true);
+            me->SetReactState(REACT_PASSIVE);
+            me->SetImmuneToAll(true);
+            me->SetControlled(true, UNIT_STATE_ROOT);
             Talk(SAY_SPLIT);
             _hpct -= 25.0f;
-            me->SetVisible(false);
-            events.RescheduleEvent(EVENT_BLINK, 2s);
+            events.ScheduleEvent(EVENT_TELEPORT, 2s);
         }
 
         if (Unit* myVictim = me->GetVictim())
@@ -193,6 +237,7 @@ struct boss_skeram : public BossAI
 private:
     float _hpct;
     uint8 _flag;
+    GuidVector _copiesGUIDs;
 };
 
 class spell_skeram_arcane_explosion : public SpellScript
