@@ -186,7 +186,7 @@ struct boss_viscidus : public BossAI
         if (!UpdateVictim())
             return;
 
-        if (_phase == PHASE_GLOB && summons.empty())
+        if (_phase == PHASE_GLOB && summons.GetEntryCount(NPC_GLOB_OF_VISCIDUS) == 0)
         {
             DoResetThreat();
             me->NearTeleportTo(ViscidusCoord.GetPositionX(),
@@ -240,14 +240,24 @@ private:
 
 struct boss_glob_of_viscidus : public ScriptedAI
 {
-    boss_glob_of_viscidus(Creature* creature) : ScriptedAI(creature) { }
-
-    void JustRespawned() override
+    boss_glob_of_viscidus(Creature* creature) : ScriptedAI(creature)
     {
+        me->SetReactState(REACT_PASSIVE);
+    }
+
+    void InitializeAI() override
+    {
+        me->SetInCombatWithZone();
         _scheduler.CancelAll();
-        _scheduler.Schedule(2400ms, [this](TaskContext /*context*/)
+        me->SetSpeedRate(MOVE_RUN, 2.f);
+        _scheduler.Schedule(2400ms, [this](TaskContext context)
             {
                 me->GetMotionMaster()->MovePoint(ROOM_CENTER, ViscidusCoord);
+                context.Schedule(1s, [this](TaskContext context)
+                    {
+                        me->SetSpeedRate(MOVE_RUN, me->GetSpeedRate(MOVE_RUN) + 1.5f);
+                        context.Repeat();
+                    });
             });
     }
 
@@ -283,16 +293,16 @@ protected:
 
 struct npc_toxic_slime : public ScriptedAI
 {
-    npc_toxic_slime(Creature* creature) : ScriptedAI(creature) { }
+    npc_toxic_slime(Creature* creature) : ScriptedAI(creature)
+    {
+        me->SetReactState(REACT_PASSIVE);
+    }
 
     void InitializeAI() override
     {
         SetCombatMovement(false);
         DoCastSelf(SPELL_TOXIN);
-    }
 
-    void JustRespawned() override
-    {
         InstanceScript* instance = me->GetInstanceScript();
 
         if (Creature* viscidus = instance->GetCreature(DATA_VISCIDUS))

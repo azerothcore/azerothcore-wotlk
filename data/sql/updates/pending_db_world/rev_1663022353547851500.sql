@@ -28,7 +28,7 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (25938, 'spell_explode_trigger'),
 (26584, 'spell_summon_toxin_slime');
 
-UPDATE `creature_template` SET `flags_extra` = `flags_extra`|1073741824 WHERE `entry` = 15667;
+UPDATE `creature_template` SET `flags_extra` = `flags_extra`|1073741824, `speed_walk` = 1, `speed_run` = 1 WHERE `entry` = 15667;
 
 UPDATE `creature_template_addon` SET `auras` = '25994' WHERE `entry` = 15299;
 
@@ -38,4 +38,4 @@ DELETE FROM `creature_template_movement` WHERE `CreatureId` = 15925;
 INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
 (15925, 0, 0, 0, 1, 0, 0, 0);
 
-UPDATE `spell_dbc` SET `Effect_1` = 28, `EffectBasePoints_1` = 5, `EffectMiscValueB_1` = 64 WHERE `ID` = 26577;
+UPDATE `spell_dbc` SET `Effect_1` = 28, `EffectBasePoints_1` = 1, `EffectDieSides_1` = 0, `EffectMiscValueB_1` = 64 WHERE `ID` = 26577;
