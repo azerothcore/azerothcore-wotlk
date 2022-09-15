@@ -1,3 +1,4 @@
+-- DB update 2022_09_14_05 -> 2022_09_15_00
 -- Pathing for Razorspine Entry: 23841
 SET @NPC := 39309;
 SET @PATH := @NPC * 10;
