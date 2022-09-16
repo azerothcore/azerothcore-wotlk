@@ -15686,10 +15686,15 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
         // only when you are not fighting other players or their pets/totems (pvp)
         if (IsPlayer() && !target->IsCharmedOwnedByPlayerOrPlayer())
         {
-            // On melee based hit/miss/resist/parry/dodge/block need to update skill (for victim and attacker)
-            if (procExtra & (PROC_EX_NORMAL_HIT | PROC_EX_MISS | PROC_EX_RESIST | PROC_EX_PARRY | PROC_EX_DODGE | PROC_EX_BLOCK))
+            // On melee based hit/miss/resist/parry/dodge need to update skill (for victim and attacker)
+            if (procExtra & (PROC_EX_NORMAL_HIT | PROC_EX_MISS | PROC_EX_RESIST | PROC_EX_PARRY | PROC_EX_DODGE))
             {
                 ToPlayer()->UpdateCombatSkills(target, attType, isVictim, procSpell ? procSpell->m_weaponItem : nullptr);
+            }
+            // Update defence if player is victim and we block - TODO: confirm that blocked attacks only have a chance to increase defence skill
+            else if (isVictim && procExtra & (PROC_EX_BLOCK))
+            {
+                ToPlayer()->UpdateCombatSkills(target, attType, true);
             }
         }
         // If exist crit/parry/dodge/block need update aura state (for victim and attacker)
