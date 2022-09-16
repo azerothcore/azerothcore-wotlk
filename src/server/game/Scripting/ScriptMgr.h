@@ -620,7 +620,7 @@ public:
     [[nodiscard]] virtual CreatureAI* GetCreatureAI(Creature* /*creature*/) const { return nullptr; }
 
     //Called Whenever the UNIT_BYTE2_FLAG_FFA_PVP Bit is set on the creature
-    virtual void OnFfaPvpStateUpdate(Creature* creature, bool InPvp) {}
+    virtual void OnFfaPvpStateUpdate(Creature* /*creature*/, bool /*InPvp*/) {}
 };
 
 class AllItemScript : public ScriptObject
@@ -1309,7 +1309,7 @@ public:
     virtual void OnIsFFAPvP(Player* /*player*/, bool& /*result*/) { }
 
     //Fires whenever the UNIT_BYTE2_FLAG_FFA_PVP bit is Changed on the player
-    virtual void OnFfaPvpStateUpdate(Player* /*player*/, bool& /*result*/) { }
+    virtual void OnFfaPvpStateUpdate(Player* /*player*/, bool /*result*/) { }
 
     virtual void OnIsPvP(Player* /*player*/, bool& /*result*/) { }
 

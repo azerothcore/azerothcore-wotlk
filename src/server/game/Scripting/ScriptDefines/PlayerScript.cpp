@@ -1257,7 +1257,6 @@ void ScriptMgr::OnFfaPvpStateUpdate(Player* player, bool result)
         });
 }
 
-
 void ScriptMgr::OnIsPvP(Player* player, bool& result)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)

@@ -179,7 +179,6 @@ void ScriptMgr::OnFfaPvpStateUpdate(Creature* creature, bool InPvp)
         });
 }
 
-
 void ScriptMgr::OnCreatureUpdate(Creature* creature, uint32 diff)
 {
     ASSERT(creature);
