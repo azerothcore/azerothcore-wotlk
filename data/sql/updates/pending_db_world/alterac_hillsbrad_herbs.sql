@@ -301,7 +301,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VA
 (76636, 538, 0, 'Wintersbite'),
 (76637, 534, 0, 'Goldthorn');
 
-DELETE FROM `gameobject` WHERE `guid` BETWEEN 76354 AND 76637;
+DELETE FROM `gameobject` WHERE `zoneId`=36 AND `guid` BETWEEN 76354 AND 76637;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`) VALUES
 (76354, 1622, 0, 36, -98.9951, 244.966, 53.2755, 4.67748, 0, 0, -0.719339, 0.694659, 1800, 255, 1),
 (76355, 1622, 0, 36, 49.357, 437.539, 41.9076, 5.49779, 0, 0, -0.382683, 0.92388, 1800, 255, 1),
@@ -816,7 +816,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VA
 (79317, 542, 0, 'Briarthorn'),
 (79318, 541, 0, 'Kingsblood');
 
-DELETE FROM `gameobject` WHERE `guid` BETWEEN 79108 AND 79318;
+DELETE FROM `gameobject` WHERE `zoneId`=267 AND `guid` BETWEEN 79108 AND 79318;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`) VALUES
 (79108, 1620, 0, 267, -710, -294, 18.871, 3.374, 0, 0, 0.993242, -0.116064, 900, 100, 1),
 (79109, 1620, 0, 267, -787, -342, 20.132, 6.182, 0, 0, 0.050551, -0.998721, 900, 100, 1),
