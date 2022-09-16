@@ -4962,8 +4962,6 @@ class spell_item_blood_draining_enchant : public AuraScript
     }
 };
 
-void AddSC_item_spell_scripts()
-{
 class spell_item_snowman : public SpellScript
 {
     PrepareSpellScript(spell_item_snowman);
@@ -5140,6 +5138,5 @@ void AddSC_item_spell_scripts()
     new spell_item_sunwell_neck<SPELL_LIGHTS_SALVATION, SPELL_ARCANE_SURGE>("spell_item_sunwell_exalted_healer_neck");
     new spell_item_zandalarian_charm("spell_item_unstable_power", SPELL_UNSTABLE_POWER_AURA_STACK);
     new spell_item_zandalarian_charm("spell_item_restless_strength", SPELL_RESTLESS_STRENGTH_AURA_STACK);
-    RegisterSpellScript(spell_item_blood_draining_enchant);
     RegisterSpellScript(spell_item_snowman);
 }
