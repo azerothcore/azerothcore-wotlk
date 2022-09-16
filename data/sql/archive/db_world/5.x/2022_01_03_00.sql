@@ -1,0 +1,244 @@
+-- DB update 2022_01_02_04 -> 2022_01_03_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_01_02_04';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_01_02_04 2022_01_03_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1640126290282588522'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1640126290282588522');
+
+DELETE FROM `creature` WHERE `guid` IN (82551,82548,145262,145263,145258,82797,145239,82719,82716,82446);
+DELETE FROM `creature_addon` WHERE `guid` IN (82551,82548,145262,145263,145258,82797,145239,82719,82716,82446);
+
+-- Pathing for Spindleweb Spider Entry: 16350.
+SET @NPC := 82173;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=7717.712,`position_y`=-6330.0884,`position_z`=22.734991 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,7717.712,-6330.0884,22.734991,0,0,0,0,100,0),
+(@PATH,2,7690.8306,-6307.467,27.6038,0,0,0,0,100,0),
+(@PATH,3,7671.4854,-6276.3716,31.565416,0,0,0,0,100,0),
+(@PATH,4,7666.8447,-6243.9272,29.262594,0,0,0,0,100,0),
+(@PATH,5,7658.7856,-6212.7876,23.081932,0,0,0,0,100,0),
+(@PATH,6,7666.8447,-6243.9272,29.262594,0,0,0,0,100,0),
+(@PATH,7,7671.4854,-6276.3716,31.565416,0,0,0,0,100,0),
+(@PATH,8,7690.8306,-6307.467,27.6038,0,0,0,0,100,0);
+
+-- Pathing for Mana Shifter Entry: 16310
+SET @NPC := 82422;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=7508.0913,`position_y`=-6428.413,`position_z`=13.69941 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,7508.0913,-6428.413,13.69941,0,0,0,0,100,0),
+(@PATH,2,7533.385,-6440.4434,13.476432,0,0,0,0,100,0),
+(@PATH,3,7579.522,-6443.2715,11.441927,0,0,0,0,100,0),
+(@PATH,4,7593.905,-6433.082,16.203667,0,0,0,0,100,0),
+(@PATH,5,7577.0234,-6412.217,12.933722,0,0,0,0,100,0),
+(@PATH,6,7583.7153,-6388.513,12.910128,0,0,0,0,100,0),
+(@PATH,7,7601.385,-6354.406,14.2001,0,0,0,0,100,0),
+(@PATH,8,7575.8267,-6328.1484,13.515205,0,0,0,0,100,0),
+(@PATH,9,7551.375,-6325.5923,12.232813,0,0,0,0,100,0),
+(@PATH,10,7528.51,-6328.1074,11.362928,0,0,0,0,100,0),
+(@PATH,11,7507.8394,-6342.2085,13.260005,0,0,0,0,100,0),
+(@PATH,12,7485.5376,-6355.259,13.7642975,0,0,0,0,100,0),
+(@PATH,13,7470.434,-6380.24,13.889555,0,0,0,0,100,0),
+(@PATH,14,7473.6875,-6401.5107,14.347273,0,0,0,0,100,0),
+(@PATH,15,7493.6562,-6418.146,13.847273,0,0,0,0,100,0);
+
+-- Pathing for Mana Shifter Entry: 16310
+SET @NPC := 82410;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=7539.8125,`position_y`=-6388.4346,`position_z`=38.761337 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,7539.8125,-6388.4346,38.761337,0,0,0,0,100,0),
+(@PATH,2,7538.2993,-6373.2803,37.60449,0,0,0,0,100,0),
+(@PATH,3,7527.8696,-6362.4624,37.503418,0,0,0,0,100,0),
+(@PATH,4,7518.232,-6361.598,38.175617,0,0,0,0,100,0),
+(@PATH,5,7505.858,-6366.499,39.54402,0,0,0,0,100,0),
+(@PATH,6,7499.272,-6378.8696,41.093895,0,0,0,0,100,0),
+(@PATH,7,7502.9966,-6396.4004,42.27976,0,0,0,0,100,0),
+(@PATH,8,7512.113,-6391.0283,41.12891,0,0,0,0,100,0),
+(@PATH,9,7518.6494,-6393.4175,39.847836,0,0,0,0,100,0),
+(@PATH,10,7526.3706,-6391.301,35.841858,0,0,0,0,100,0),
+(@PATH,11,7529.44,-6386.936,32.666138,0,0,0,0,100,0),
+(@PATH,12,7529.4907,-6380.036,29.394146,0,0,0,0,100,0),
+(@PATH,13,7525.638,-6376.0254,29.356081,0,0,0,0,100,0),
+(@PATH,14,7517.7847,-6372.229,31.714624,0,0,0,0,100,0),
+(@PATH,15,7511.5366,-6375.772,35.82468,0,0,0,0,100,0),
+(@PATH,16,7507.2207,-6382.0225,39.35642,0,0,0,0,100,0),
+(@PATH,17,7511.6597,-6389.8296,41.062866,0,0,0,0,100,0),
+(@PATH,18,7509.211,-6392.9062,41.51183,0,0,0,0,100,0),
+(@PATH,19,7503.9688,-6396.7344,42.232723,0,0,0,0,100,0),
+(@PATH,20,7523.4307,-6403.814,41.322086,0,0,0,0,100,0),
+(@PATH,21,7503.9688,-6396.7344,42.232723,0,0,0,0,100,0),
+(@PATH,22,7509.211,-6392.9062,41.51183,0,0,0,0,100,0),
+(@PATH,23,7511.6597,-6389.8296,41.062866,0,0,0,0,100,0),
+(@PATH,24,7507.2207,-6382.0225,39.35642,0,0,0,0,100,0),
+(@PATH,25,7511.5366,-6375.772,35.82468,0,0,0,0,100,0),
+(@PATH,26,7517.7847,-6372.229,31.714624,0,0,0,0,100,0),
+(@PATH,27,7525.638,-6376.0254,29.356081,0,0,0,0,100,0),
+(@PATH,28,7529.4907,-6380.0205,29.392557,0,0,0,0,100,0),
+(@PATH,29,7529.44,-6386.936,32.666138,0,0,0,0,100,0),
+(@PATH,30,7526.3706,-6391.301,35.841858,0,0,0,0,100,0),
+(@PATH,31,7518.6494,-6393.4175,39.847836,0,0,0,0,100,0),
+(@PATH,32,7512.113,-6391.0283,41.12891,0,0,0,0,100,0),
+(@PATH,33,7504.889,-6396.0176,42.101257,0,0,0,0,100,0),
+(@PATH,34,7502.9966,-6396.4004,42.27976,0,0,0,0,100,0),
+(@PATH,35,7499.272,-6378.8696,41.093895,0,0,0,0,100,0),
+(@PATH,36,7505.858,-6366.499,39.54402,0,0,0,0,100,0),
+(@PATH,37,7518.232,-6361.598,38.175617,0,0,0,0,100,0),
+(@PATH,38,7527.8696,-6362.4624,37.503418,0,0,0,0,100,0),
+(@PATH,39,7538.2993,-6373.2803,37.60449,0,0,0,0,100,0);
+
+-- Pathing for Mistbat Entry: 16353
+SET @NPC := 82237;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=7967.7744,`position_y`=-6014.6533,`position_z`=12.223246 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,7967.7744,-6014.6533,12.223246,0,0,0,0,100,0),
+(@PATH,2,7921.0815,-6005.3765,13.229752,0,0,0,0,100,0),
+(@PATH,3,7895.441,-6011.4897,12.992978,0,0,0,0,100,0),
+(@PATH,4,7863.9185,-6011.8716,9.633485,0,0,0,0,100,0),
+(@PATH,5,7822.002,-6027.272,13.131089,0,0,0,0,100,0),
+(@PATH,6,7795.1426,-6050.5073,13.754081,0,0,0,0,100,0),
+(@PATH,7,7784.691,-6082.868,15.938102,0,0,0,0,100,0),
+(@PATH,8,7756.146,-6109.4966,17.100712,0,0,0,0,100,0),
+(@PATH,9,7784.673,-6082.912,15.944938,0,0,0,0,100,0),
+(@PATH,10,7795.1426,-6050.5073,13.754081,0,0,0,0,100,0),
+(@PATH,11,7822.002,-6027.272,13.131089,0,0,0,0,100,0),
+(@PATH,12,7863.9185,-6011.8716,9.633485,0,0,0,0,100,0),
+(@PATH,13,7895.441,-6011.4897,12.992978,0,0,0,0,100,0),
+(@PATH,14,7921.0815,-6005.3765,13.229752,0,0,0,0,100,0);
+
+-- Pathing for Mistbat Entry: 16353
+SET @NPC := 82171;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=7519.6113,`position_y`=-6158.268,`position_z`=15.855954 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,7519.6113,-6158.268,15.855954,0,0,0,0,100,0),
+(@PATH,2,7557.178,-6187.186,19.31848,0,0,0,0,100,0),
+(@PATH,3,7585.5557,-6185.538,17.97511,0,0,0,0,100,0),
+(@PATH,4,7625.3516,-6194.787,23.067734,0,0,0,0,100,0),
+(@PATH,5,7658.7856,-6212.7876,23.081932,0,0,0,0,100,0),
+(@PATH,6,7666.8447,-6243.9272,29.262594,0,0,0,0,100,0),
+(@PATH,7,7671.4854,-6276.3716,31.565416,0,0,0,0,100,0),
+(@PATH,8,7690.8306,-6307.467,27.6038,0,0,0,0,100,0),
+(@PATH,9,7717.712,-6330.0884,22.734991,0,0,0,0,100,0),
+(@PATH,10,7690.8306,-6307.467,27.6038,0,0,0,0,100,0),
+(@PATH,11,7671.4854,-6276.3716,31.565416,0,0,0,0,100,0),
+(@PATH,12,7666.8447,-6243.9272,29.262594,0,0,0,0,100,0),
+(@PATH,13,7658.7856,-6212.7876,23.081932,0,0,0,0,100,0),
+(@PATH,14,7625.3516,-6194.787,23.067734,0,0,0,0,100,0),
+(@PATH,15,7585.5557,-6185.538,17.97511,0,0,0,0,100,0),
+(@PATH,16,7557.178,-6187.186,19.31848,0,0,0,0,100,0);
+
+-- Pathing for Vampiric Mistbat Entry: 16354 Partial
+SET @NPC := 82380;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=7350.08,`position_y`=-6121.606,`position_z`=16.971992 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,7350.08,-6121.606,16.971992,0,0,0,0,100,0),
+(@PATH,2,7326.979,-6136.07,20.861383,0,0,0,0,100,0),
+(@PATH,3,7308.296,-6118.389,18.643427,0,0,0,0,100,0),
+(@PATH,4,7289.093,-6093.4297,21.98679,0,0,0,0,100,0),
+(@PATH,5,7256.208,-6067.121,18.846153,0,0,0,0,100,0),
+(@PATH,6,7289.093,-6093.4297,21.98679,0,0,0,0,100,0),
+(@PATH,7,7308.296,-6118.389,18.643427,0,0,0,0,100,0),
+(@PATH,8,7326.979,-6136.07,20.861383,0,0,0,0,100,0),
+(@PATH,9,7350.08,-6121.606,16.971992,0,0,0,0,100,0),
+(@PATH,10,7386.936,-6078.34,17.086975,0,0,0,0,100,0),
+(@PATH,11,7421.6704,-5999.2534,5.647041,0,0,0,0,100,0),
+(@PATH,12,7444.6084,-5978.183,6.29399,0,0,0,0,100,0),
+(@PATH,13,7451.941,-5947.761,6.246754,0,0,0,0,100,0),
+(@PATH,14,7459.1353,-5915.365,7.322413,0,0,0,0,100,0);
+
+-- Pathing for Mistbat Entry: 16353
+SET @NPC := 82162;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=7752.1753,`position_y`=-6549.98,`position_z`=22.36541 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,7752.1753,-6549.98,22.36541,0,0,0,0,100,0),
+(@PATH,2,7750.393,-6519.6973,22.693193,0,0,0,0,100,0),
+(@PATH,3,7748.731,-6485.211,18.751125,0,0,0,0,100,0),
+(@PATH,4,7789.21,-6482.4556,14.384915,0,0,0,0,100,0),
+(@PATH,5,7806.867,-6447.1743,15.652014,0,0,0,0,100,0),
+(@PATH,6,7809.3384,-6430.884,14.593022,0,0,0,0,100,0),
+(@PATH,7,7815.889,-6399.1016,17.241566,0,0,0,0,100,0),
+(@PATH,8,7811.954,-6375.9834,19.34203,0,0,0,0,100,0),
+(@PATH,9,7812.233,-6350.8755,18.854897,0,0,0,0,100,0),
+(@PATH,10,7799.3735,-6314.081,18.865036,0,0,0,0,100,0),
+(@PATH,11,7809.684,-6285.9155,20.719416,0,0,0,0,100,0),
+(@PATH,12,7799.3735,-6314.081,18.865036,0,0,0,0,100,0),
+(@PATH,13,7812.233,-6350.8755,18.854897,0,0,0,0,100,0),
+(@PATH,14,7811.954,-6375.9834,19.34203,0,0,0,0,100,0),
+(@PATH,15,7815.889,-6399.1016,17.241566,0,0,0,0,100,0),
+(@PATH,16,7809.3384,-6430.884,14.593022,0,0,0,0,100,0),
+(@PATH,17,7806.867,-6447.1743,15.652014,0,0,0,0,100,0),
+(@PATH,18,7789.21,-6482.4556,14.384915,0,0,0,0,100,0),
+(@PATH,19,7748.731,-6485.211,18.751125,0,0,0,0,100,0),
+(@PATH,20,7750.393,-6519.6973,22.693193,0,0,0,0,100,0);
+
+-- Pathing for Spindleweb Lurker Entry: 16351
+SET @NPC := 82617;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=7105.9546,`position_y`=-6287.665,`position_z`=43.889828 WHERE `guid`=@NPC;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,7105.9546,-6287.665,43.889828,0,0,0,0,100,0),
+(@PATH,2,7091.5728,-6233.3213,45.767567,0,0,0,0,100,0),
+(@PATH,3,7096.605,-6210.6816,42.489613,0,0,0,0,100,0),
+(@PATH,4,7099.334,-6179.2446,31.418114,0,0,0,0,100,0),
+(@PATH,5,7102.498,-6151.2656,22.885132,0,0,0,0,100,0),
+(@PATH,6,7122.833,-6128.799,15.287588,0,0,0,0,100,0),
+(@PATH,7,7144.6655,-6110.788,13.271673,0,0,0,0,100,0),
+(@PATH,8,7177.496,-6100.424,11.849574,0,0,0,0,100,0),
+(@PATH,9,7215.9243,-6084.995,14.282121,0,0,0,0,100,0),
+(@PATH,10,7177.496,-6100.424,11.849574,0,0,0,0,100,0),
+(@PATH,11,7144.6655,-6110.788,13.271673,0,0,0,0,100,0),
+(@PATH,12,7122.833,-6128.799,15.287588,0,0,0,0,100,0),
+(@PATH,13,7102.498,-6151.2656,22.885132,0,0,0,0,100,0),
+(@PATH,14,7099.334,-6179.2446,31.418114,0,0,0,0,100,0),
+(@PATH,15,7096.605,-6210.6816,42.489613,0,0,0,0,100,0),
+(@PATH,16,7091.5728,-6233.3213,45.767567,0,0,0,0,100,0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_01_03_00' WHERE sql_rev = '1640126290282588522';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

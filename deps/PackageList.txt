@@ -1,0 +1,61 @@
+AzerothCore uses (parts of or in whole) the following opensource software:
+
+argon2
+  https://github.com/P-H-C/phc-winner-argon2
+  Version: 62358ba
+
+Boost (external)
+  http://www.boost.org
+  Version: external
+
+bzip2 (a freely available, patent free, high-quality data compressor)
+  http://www.bzip.org/
+  Version: 1.0.6
+
+G3D (a commercial-grade C++ 3D engine available as Open Source (BSD License)
+  http://g3d.sourceforge.net/
+  Version: 8.01-Release
+
+jemalloc (a general-purpose scalable concurrent malloc-implementation)
+  http://www.canonware.com/jemalloc/
+  Version: 5.0.1
+
+libMPQ (a library for reading MPQ files)
+  https://libmpq.org/
+  Version: 1.0.4
+
+libreadline (command line editing library)
+  https://cnswww.cns.cwru.edu/php/chet/readline/rltop.html
+  Version: external
+
+OpenSSL (general-purpose cryptography library)
+  https://www.openssl.org/
+  Version: external
+
+MySQL (the world's most popular open source database software)
+  http://www.mysql.com/
+  Version: 5.5.9 (GA)
+
+SFMT (SIMD-oriented Fast Mersenne Twister)
+  Based on http://agner.org/random/
+  Version: 2010-Aug-03
+
+utf8-cpp (UTF-8 with C++ in a Portable Way)
+  http://utfcpp.sourceforge.net/
+  Version: 2.3.4
+
+zlib (A Massively Spiffy Yet Delicately Unobtrusive Compression Library)
+  http://www.zlib.net/
+  Version: 1.2.12
+
+gSOAP (a portable development toolkit for C and C++ XML Web services and XML data bindings)
+  http://gsoap2.sourceforge.net/
+  Version: 2.8.10
+
+recastnavigation (Recast is state of the art navigation mesh construction toolset for games)
+  https://github.com/memononen/recastnavigation
+  Version: 64385e9ed0822427bca5814d03a3f4c4d7a6db9f
+
+{fmt} is an open-source formatting library providing a fast and safe alternative to C stdio and C++ iostreams.
+  https://github.com/fmtlib/fmt
+  Version: 7.1.3

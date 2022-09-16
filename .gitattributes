@@ -1,6 +1,5 @@
 # Auto detect text files and perform LF normalization
-* text=auto
-
+* text eol=lf
 
 # Whitespace rules
 # strict (no trailing, no tabs)
@@ -28,4 +27,4 @@
 *.RTF    diff=astextplain
 
 # Ignore sql/* files
-sql/*    linguist-documentation
+data/sql/*    linguist-documentation

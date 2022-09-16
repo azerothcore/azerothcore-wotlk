@@ -1,0 +1,30 @@
+-- DB update 2018_09_26_00 -> 2018_10_02_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2018_09_26_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2018_09_26_00 2018_10_02_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1537654210905936070'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
+INSERT INTO version_db_world (`sql_rev`) VALUES ('1537654210905936070');
+
+UPDATE `creature_text` SET `BroadcastTextID` = 37093 WHERE `entry` = 36794 AND `groupid` = 1;
+UPDATE `creature_text` SET `BroadcastTextID` = 37392 WHERE `entry` = 36990 AND `groupid` = 3;
+UPDATE `creature_text` SET `BroadcastTextID` = 37087 WHERE `entry` = 36993 AND `groupid` = 2;
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

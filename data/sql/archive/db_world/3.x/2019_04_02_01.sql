@@ -1,0 +1,33 @@
+-- DB update 2019_04_02_00 -> 2019_04_02_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_04_02_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_04_02_00 2019_04_02_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1553973207096786300'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1553973207096786300');
+
+DELETE FROM gameobject_loot_template WHERE Item=2835 AND Entry IN (18092, 1502, 1735, 2626);
+INSERT INTO gameobject_loot_template (Entry, Item, Reference, Chance, QuestRequired, LootMode, GroupId, MinCount, MaxCount, Comment) VALUES
+(18092, 2835, 0, 88, 0, 1, 0, 1, 6, NULL),
+(1502, 2835, 0, 80, 0, 1, 0, 1, 11, NULL),
+(1735, 2835, 0, 80, 0, 1, 0, 1, 6, NULL),
+(2626, 2835, 0, 80, 0, 1, 0, 1, 6, NULL);
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

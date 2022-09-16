@@ -1,0 +1,45 @@
+name: windows-build
+on:
+  push:
+    branches:
+      - 'master'
+  pull_request:
+    types: ['labeled', 'opened', 'synchronize', 'reopened']
+
+concurrency:
+  group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
+  cancel-in-progress: true
+
+jobs:
+  windows-build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest]
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }}
+    env:
+      BOOST_ROOT: C:\local\boost_1_79_0
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && (github.ref == 'refs/heads/master' || contains(github.event.pull_request.labels.*.name, 'run-build') || github.event.label.name == 'run-build')
+    steps:
+      - uses: actions/checkout@v2
+      - name: Configure OS
+        run: |
+          choco install --no-progress openssl
+          choco install --no-progress boost-msvc-14.3 --version=1.79.0
+      - name: Build
+        shell: bash
+        run: |
+          mkdir -p build && cd build
+          cmake .. -DTOOLS_BUILD=all
+          cmake --build . --config Release --parallel 4
+      - name: Copy dll files
+        shell: bash
+        run: |
+          cp "/c/mysql/lib/libmysql.dll" "build/bin/Release/"
+          cp "/c/Program Files/OpenSSL-Win64/bin/libcrypto-1_1-x64.dll" "build/bin/Release/"
+          cp "/c/Program Files/OpenSSL-Win64/bin/libssl-1_1-x64.dll" "build/bin/Release/"
+      - uses: actions/upload-artifact@v2
+        with:
+          name: windows-2022-MSVC17-release
+          path: build/bin/Release

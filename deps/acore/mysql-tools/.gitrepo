@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/azerothcore/mysql-tools
+	branch = master
+	commit = 6e9f39989cf4769c8972fb575aecf2b0291f3e6e
+	parent = 2668a0e170fbfd776380bf2d5edc4d0c39e0630d
+	method = merge
+	cmdver = 0.4.3

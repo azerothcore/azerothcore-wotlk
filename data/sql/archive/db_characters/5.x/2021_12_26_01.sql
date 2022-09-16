@@ -1,0 +1,36 @@
+-- DB update 2021_12_26_00 -> 2021_12_26_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_characters' AND COLUMN_NAME = '2021_12_26_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_characters CHANGE COLUMN 2021_12_26_00 2021_12_26_01 bit;
+SELECT sql_rev INTO OK FROM version_db_characters WHERE sql_rev = '1640532476858588300'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
+INSERT INTO `version_db_characters` (`sql_rev`) VALUES ('1640532476858588300');
+
+-- Create table
+DROP TABLE IF EXISTS `character_settings`;
+CREATE TABLE `character_settings` (
+  `guid` INT UNSIGNED NOT NULL,
+  `source` VARCHAR(40) NOT NULL,
+  `data` TEXT NULL,
+  PRIMARY KEY (`guid`, `source`)
+) ENGINE=MYISAM DEFAULT CHARSET=utf8mb4 COMMENT='Player Settings';
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_characters SET date = '2021_12_26_01' WHERE sql_rev = '1640532476858588300';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

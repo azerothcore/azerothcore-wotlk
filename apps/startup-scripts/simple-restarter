@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+
+#PARAMETER 1: directory
+#PARAMETER 2: binary file
+#PARAMETER 3: gdb on/off
+
+bin_path="${1:-$AC_RESTARTER_BINPATH}"
+bin_file="${2:-$AC_RESTARTER_BINFILE}"
+with_gdb="${3:-$AC_RESTARTER_WITHGDB}"
+
+CURRENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd )
+
+_instant_crash_count=0
+_restart_count=0
+
+if [ "$#" -ne 2 ]; then
+    echo "Usage:    $0 path filename"
+    echo "Example:  $0 $HOME/azerothcore/bin worldserver"
+    exit 1
+fi
+
+while true
+do
+    if [ ! -f "$bin_path/$bin_file" ]; then
+        echo "$bin_path/$bin_file doesn't exists!"
+        exit 1
+    fi
+
+    STARTING_TIME=$(date +%s)
+
+    cd "$bin_path";
+
+    if [ "$with_gdb" = true ]; then
+        echo "Running with GDB enabled"
+        gdb -x "$CURRENT_PATH/gdb.conf" --batch "./$bin_file"
+    else
+        echo "Running without GDB"
+        "./$bin_file"
+    fi
+
+    _exit_code=$?
+
+    echo "exit code: $_exit_code"
+    # stop restarter on SIGKILL (disabled for now)
+    # 128 + 9 (SIGKILL)
+    #if [ $_exit_code -eq 137 ]; then
+    #	echo "$bin_file has been killed"
+    #    exit 0
+    #fi
+
+    echo "$bin_file terminated, restarting..."
+
+    ENDING_TIME=$(date +%s)
+    DIFFERENCE=$(( $ENDING_TIME - $STARTING_TIME ))
+
+    ((_restart_count++))
+    echo "$bin_file Terminated after $DIFFERENCE seconds, termination count: : $_restart_count"
+
+    if [ $DIFFERENCE -lt 10 ]; then
+        # increment instant crash if runtime is lower than 10 seconds
+        ((_instant_crash_count++))
+    else
+        _instant_crash_count=0 # reset count
+    fi
+
+    if [ $_instant_crash_count -gt 5 ]; then
+        echo "$bin_file Restarter exited. Infinite crash loop prevented. Please check your system"
+        exit 1
+    fi
+done
