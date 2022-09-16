@@ -2149,6 +2149,14 @@ Visibility.Notify.Period.InInstances  = 1000
 Visibility.Notify.Period.InBGArenas   = 1000
 
 #
+#    Visibility.ObjectSparkles
+#        Description: Whether or not to display sparkles on gameobjects related to active quests.
+#        Default:     1 - (Show Sparkles)
+#                     0 - (Hide Sparkles)
+
+Visibility.ObjectSparkles = 1
+
+#
 ###################################################################################################
 
 ###################################################################################################
