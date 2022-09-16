@@ -18,6 +18,10 @@ message(STATUS "CMake version: ${CMAKE_VERSION}")
 # CMake policies (can not be handled elsewhere)
 cmake_policy(SET CMP0005 NEW)
 
+ if(DEFINED ENV{_VCPKG_INSTALLED_DIR})
+ SET(CMAKE_TOOLCHAIN_FILE ${_VCPKG_INSTALLED_DIR}/scripts/buildsystems/vcpkg.cmake")
+  endif()
+
 # Set projectname (must be done AFTER setting configurationtypes)
 project(AzerothCore VERSION 3.0.0 LANGUAGES CXX C)
 

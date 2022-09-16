@@ -21,6 +21,9 @@ if(WIN32)
   set(Boost_USE_STATIC_LIBS        ON)
   set(Boost_USE_MULTITHREADED      ON)
   set(Boost_USE_STATIC_RUNTIME     OFF)
+ if(DEFINED ENV{_VCPKG_INSTALLED_DIR})
+  set(Boost_INCLUDE_DIR ${_VCPKG_INSTALLED_DIR}/installed/x64-windows/include)
+  endif()
 endif()
 
 include (CheckCXXSourceCompiles)
@@ -32,6 +35,7 @@ else()
   set(BOOST_REQUIRED_VERSION 1.67)
 endif()
 
+include(${_VCPKG_INSTALLED_DIR}/scripts/buildsystems/vcpkg.cmake)
 find_package(Boost ${BOOST_REQUIRED_VERSION} REQUIRED system filesystem program_options iostreams regex)
 
 if(NOT Boost_FOUND)
