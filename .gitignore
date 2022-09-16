@@ -64,6 +64,7 @@ nbproject/
 .browse.VC*
 .idea
 cmake-build-debug/*
+cmake-build-debug-visual-studio/*
 cmake-build-debug-coverage/*
 cmake-build-debug-event-trace/*
 coverage-report/
