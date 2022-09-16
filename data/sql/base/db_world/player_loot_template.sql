@@ -15,20 +15,20 @@
 -- Dumpar struktur för tabell acore_world.player_loot_template
 DROP TABLE IF EXISTS `player_loot_template`;
 CREATE TABLE IF NOT EXISTS `player_loot_template` (
-  `Entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `Item` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `Reference` MEDIUMINT NOT NULL DEFAULT 0,
+  `Entry` mediumint unsigned NOT NULL DEFAULT '0',
+  `Item` mediumint unsigned NOT NULL DEFAULT '0',
+  `Reference` mediumint NOT NULL DEFAULT '0',
   `Chance` float NOT NULL DEFAULT '100',
-  `QuestRequired` TINYINT NOT NULL DEFAULT 0,
-  `LootMode` SMALLINT unsigned NOT NULL DEFAULT 1,
-  `GroupId` TINYINT unsigned NOT NULL DEFAULT 0,
-  `MinCount` TINYINT unsigned NOT NULL DEFAULT 1,
-  `MaxCount` TINYINT unsigned NOT NULL DEFAULT 1,
+  `QuestRequired` tinyint NOT NULL DEFAULT '0',
+  `LootMode` smallint unsigned NOT NULL DEFAULT '1',
+  `GroupId` tinyint unsigned NOT NULL DEFAULT '0',
+  `MinCount` tinyint unsigned NOT NULL DEFAULT '1',
+  `MaxCount` tinyint unsigned NOT NULL DEFAULT '1',
   `Comment` text,
   PRIMARY KEY (`Entry`,`Item`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Loot System';
 
--- Dumpar data för tabell acore_world.player_loot_template: 12 rows
+-- Dumpar data för tabell acore_world.player_loot_template: 20 rows
 DELETE FROM `player_loot_template`;
 /*!40000 ALTER TABLE `player_loot_template` DISABLE KEYS */;
 INSERT INTO `player_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
@@ -43,7 +43,15 @@ INSERT INTO `player_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Que
 	(0, 17503, 0, 20, 0, 1, 0, 1, 1, 'Alterac Valley - Horde - Frostwolf Lieutenants Medal'),
 	(0, 17504, 0, 10, 0, 1, 0, 1, 1, 'Alterac Valley - Horde - Frostwolf Commander\'s Medal'),
 	(0, 17422, 0, 85, 0, 1, 0, 15, 22, 'Alterac Valley - Horde - Armor Scraps'),
-	(0, 18228, 0, 1, 0, 1, 0, 1, 1, 'Alterac Valley - Horde - Autographed Picture of Foror & Tigule');
+	(0, 18228, 0, 1, 0, 1, 0, 1, 1, 'Alterac Valley - Horde - Autographed Picture of Foror & Tigule'),
+	(0, 43323, 0, 100, 1, 1, 0, 5, 5, 'Wintergrasp - Alliance - Quiver of Dragonbone Arrows'),
+	(1, 43323, 0, 100, 1, 1, 0, 5, 5, 'Wintergrasp - Horde - Quiver of Dragonbone Arrows'),
+	(0, 43314, 0, 100, 1, 1, 0, 5, 5, 'Wintergrasp - Alliance - Eternal Ember'),
+	(1, 43314, 0, 100, 1, 1, 0, 5, 5, 'Wintergrasp - Horde - Eternal Ember'),
+	(0, 44809, 0, 100, 1, 1, 0, 5, 5, 'Wintergrasp - Alliance - Horde Herb Pouch'),
+	(1, 43324, 0, 100, 1, 1, 0, 5, 5, 'Wintergrasp - Horde - Alliance Herb Pouch'),
+	(0, 44808, 0, 100, 1, 1, 0, 5, 5, 'Wintergrasp - Alliance - Imbued Horde Armor'),
+	(1, 43322, 0, 100, 1, 1, 0, 5, 5, 'Wintergrasp - Horde - Enchanted Alliance Breastplates');
 /*!40000 ALTER TABLE `player_loot_template` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

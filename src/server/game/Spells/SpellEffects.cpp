@@ -1668,6 +1668,7 @@ void Spell::DoCreateItem(uint8 /*effIndex*/, uint32 itemId)
         case SPELL_AV_MARK_LOSER:
         case SPELL_WS_MARK_WINNER:
         case SPELL_WS_MARK_LOSER:
+        case SPELL_WS_MARK_TIE:
         case SPELL_AB_MARK_WINNER:
         case SPELL_AB_MARK_LOSER:
             SelfCast = true;

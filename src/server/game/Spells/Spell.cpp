@@ -1549,7 +1549,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                         // collision occured
                         if (col || dcol || (overdistance > 0.0f && !map->IsInWater(phasemask, tstX, tstY, ground, collisionHeight)) || (fabs(prevZ - tstZ) > maxtravelDistZ && (tstZ > prevZ)))
                         {
-                            if ((overdistance > 0.0f) && (overdistance < step))
+                            if ((overdistance > 0.0f) && (overdistance < 1.f))
                             {
                                 destx = prevX + overdistance * cos(pos.GetOrientation());
                                 desty = prevY + overdistance * sin(pos.GetOrientation());
@@ -1592,7 +1592,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                     }
                     //}
 
-                    lastpos.Relocate(destx, desty, destz + 0.5f, pos.GetOrientation());
+                    lastpos.Relocate(destx, desty, destz, pos.GetOrientation());
                     dest = SpellDestination(lastpos);
                 }
                 else
@@ -6289,11 +6289,26 @@ SpellCastResult Spell::CheckCast(bool strict)
                 {
                     Unit* unitCaster = m_caster->ToUnit();
                     if (!unitCaster)
+                    {
                         return SPELL_FAILED_BAD_TARGETS;
+                    }
 
                     Creature* pet = unitCaster->GetGuardianPet();
-                    if (pet && pet->IsAlive())
-                        return SPELL_FAILED_ALREADY_HAVE_SUMMON;
+                    if (pet)
+                    {
+                        if (pet->IsAlive())
+                        {
+                            return SPELL_FAILED_ALREADY_HAVE_SUMMON;
+                        }
+                    }
+                    else if (Player* playerCaster = m_caster->ToPlayer())
+                    {
+                        PetStable& petStable = playerCaster->GetOrInitPetStable();
+                        if (!petStable.CurrentPet && petStable.UnslottedPets.empty())
+                        {
+                            return SPELL_FAILED_NO_PET;
+                        }
+                    }
 
                     break;
                 }
@@ -8805,6 +8820,15 @@ void TriggeredByAuraSpellData::Init(AuraEffect const* aurEff)
     spellInfo = aurEff->GetSpellInfo();
     effectIndex = aurEff->GetEffIndex();
     tickNumber = aurEff->GetTickNumber();
+}
+
+std::string Spell::GetDebugInfo() const
+{
+    std::stringstream sstr;
+    sstr << std::boolalpha
+        << "Id: " << GetSpellInfo()->Id << " OriginalCaster: " << m_originalCasterGUID.ToString()
+        << " State: " << getState();
+    return sstr.str();
 }
 
 namespace Acore

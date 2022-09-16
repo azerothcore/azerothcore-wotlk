@@ -15,10 +15,10 @@
 -- Dumpar struktur för tabell acore_world.mail_level_reward
 DROP TABLE IF EXISTS `mail_level_reward`;
 CREATE TABLE IF NOT EXISTS `mail_level_reward` (
-  `level` TINYINT unsigned NOT NULL DEFAULT 0,
-  `raceMask` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `mailTemplateId` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `senderEntry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `level` tinyint unsigned NOT NULL DEFAULT '0',
+  `raceMask` mediumint unsigned NOT NULL DEFAULT '0',
+  `mailTemplateId` mediumint unsigned NOT NULL DEFAULT '0',
+  `senderEntry` mediumint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`level`,`raceMask`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Mail System';
 

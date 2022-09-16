@@ -13,18 +13,17 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 -- Dumpar struktur för tabell acore_auth.build_info
-DROP TABLE IF EXISTS `build_info`;
 CREATE TABLE IF NOT EXISTS `build_info` (
-  `build` INT NOT NULL,
-  `majorVersion` INT DEFAULT NULL,
-  `minorVersion` INT DEFAULT NULL,
-  `bugfixVersion` INT DEFAULT NULL,
+  `build` int NOT NULL,
+  `majorVersion` int DEFAULT NULL,
+  `minorVersion` int DEFAULT NULL,
+  `bugfixVersion` int DEFAULT NULL,
   `hotfixVersion` char(3) DEFAULT NULL,
-  `winAuthSeed` VARCHAR(32) DEFAULT NULL,
-  `win64AuthSeed` VARCHAR(32) DEFAULT NULL,
-  `mac64AuthSeed` VARCHAR(32) DEFAULT NULL,
-  `winChecksumSeed` VARCHAR(40) DEFAULT NULL,
-  `macChecksumSeed` VARCHAR(40) DEFAULT NULL,
+  `winAuthSeed` varchar(32) DEFAULT NULL,
+  `win64AuthSeed` varchar(32) DEFAULT NULL,
+  `mac64AuthSeed` varchar(32) DEFAULT NULL,
+  `winChecksumSeed` varchar(40) DEFAULT NULL,
+  `macChecksumSeed` varchar(40) DEFAULT NULL,
   PRIMARY KEY (`build`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

@@ -15,13 +15,13 @@
 -- Dumpar struktur för tabell acore_characters.arena_team_member
 DROP TABLE IF EXISTS `arena_team_member`;
 CREATE TABLE IF NOT EXISTS `arena_team_member` (
-  `arenaTeamId` INT unsigned NOT NULL DEFAULT 0,
-  `guid` INT unsigned NOT NULL DEFAULT 0,
-  `weekGames` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `weekWins` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `seasonGames` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `seasonWins` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `personalRating` SMALLINT NOT NULL DEFAULT 0,
+  `arenaTeamId` int unsigned NOT NULL DEFAULT '0',
+  `guid` int unsigned NOT NULL DEFAULT '0',
+  `weekGames` smallint unsigned NOT NULL DEFAULT '0',
+  `weekWins` smallint unsigned NOT NULL DEFAULT '0',
+  `seasonGames` smallint unsigned NOT NULL DEFAULT '0',
+  `seasonWins` smallint unsigned NOT NULL DEFAULT '0',
+  `personalRating` smallint NOT NULL DEFAULT '0',
   PRIMARY KEY (`arenaTeamId`,`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

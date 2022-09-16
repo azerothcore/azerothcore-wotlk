@@ -15,13 +15,13 @@
 -- Dumpar struktur för tabell acore_characters.guild_eventlog
 DROP TABLE IF EXISTS `guild_eventlog`;
 CREATE TABLE IF NOT EXISTS `guild_eventlog` (
-  `guildid` INT unsigned NOT NULL COMMENT 'Guild Identificator',
-  `LogGuid` INT unsigned NOT NULL COMMENT 'Log record identificator - auxiliary column',
-  `EventType` TINYINT unsigned NOT NULL COMMENT 'Event type',
-  `PlayerGuid1` INT unsigned NOT NULL COMMENT 'Player 1',
-  `PlayerGuid2` INT unsigned NOT NULL COMMENT 'Player 2',
-  `NewRank` TINYINT unsigned NOT NULL COMMENT 'New rank(in case promotion/demotion)',
-  `TimeStamp` INT unsigned NOT NULL COMMENT 'Event UNIX time',
+  `guildid` int unsigned NOT NULL COMMENT 'Guild Identificator',
+  `LogGuid` int unsigned NOT NULL COMMENT 'Log record identificator - auxiliary column',
+  `EventType` tinyint unsigned NOT NULL COMMENT 'Event type',
+  `PlayerGuid1` int unsigned NOT NULL COMMENT 'Player 1',
+  `PlayerGuid2` int unsigned NOT NULL COMMENT 'Player 2',
+  `NewRank` tinyint unsigned NOT NULL COMMENT 'New rank(in case promotion/demotion)',
+  `TimeStamp` int unsigned NOT NULL COMMENT 'Event UNIX time',
   PRIMARY KEY (`guildid`,`LogGuid`),
   KEY `Idx_PlayerGuid1` (`PlayerGuid1`),
   KEY `Idx_PlayerGuid2` (`PlayerGuid2`),

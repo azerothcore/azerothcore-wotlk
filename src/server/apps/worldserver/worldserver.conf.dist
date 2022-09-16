@@ -1881,8 +1881,23 @@ ChatFlood.MessageCount = 10
 ChatFlood.MessageDelay = 1
 
 #
+#    ChatFlood.AddonMessageCount
+#        Description: Chat flood protection, number of addon messages before player gets muted.
+#        Default:     100 - (Enabled)
+#                     0  - (Disabled)
+
+ChatFlood.AddonMessageCount = 100
+
+#
+#    ChatFlood.AddonMessageDelay
+#        Description: Time (in seconds) between addon messages to be counted into ChatFlood.AddonMessageCount.
+#        Default:     1
+
+ChatFlood.AddonMessageDelay = 1
+
+#
 #    ChatFlood.MuteTime
-#        Description: Time (in seconds) characters get muted for violating ChatFlood.MessageCount.
+#        Description: Time (in seconds) characters get muted for violating ChatFlood.MessageCount / ChatFlood.AddonMessageCount.
 #        Default:     10
 
 ChatFlood.MuteTime = 10
@@ -2132,6 +2147,14 @@ Visibility.Distance.BGArenas = 180
 Visibility.Notify.Period.OnContinents = 1000
 Visibility.Notify.Period.InInstances  = 1000
 Visibility.Notify.Period.InBGArenas   = 1000
+
+#
+#    Visibility.ObjectSparkles
+#        Description: Whether or not to display sparkles on gameobjects related to active quests.
+#        Default:     1 - (Show Sparkles)
+#                     0 - (Hide Sparkles)
+
+Visibility.ObjectSparkles = 1
 
 #
 ###################################################################################################

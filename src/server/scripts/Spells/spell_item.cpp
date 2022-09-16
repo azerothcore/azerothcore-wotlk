@@ -4964,6 +4964,34 @@ class spell_item_blood_draining_enchant : public AuraScript
 
 void AddSC_item_spell_scripts()
 {
+class spell_item_snowman : public SpellScript
+{
+    PrepareSpellScript(spell_item_snowman);
+
+    SpellCastResult CheckCast()
+    {
+        if (Player* caster = GetCaster()->ToPlayer())
+        {
+            if (Battleground* bg = caster->GetBattleground())
+            {
+                if (bg->GetStatus() == STATUS_WAIT_JOIN)
+                {
+                    return SPELL_FAILED_NOT_READY;
+                }
+            }
+        }
+
+        return SPELL_CAST_OK;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_item_snowman::CheckCast);
+    }
+};
+
+void AddSC_item_spell_scripts()
+{
     RegisterSpellScript(spell_item_massive_seaforium_charge);
     RegisterSpellScript(spell_item_titanium_seal_of_dalaran);
     RegisterSpellScript(spell_item_mind_amplify_dish);
@@ -4994,6 +5022,7 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_oracle_ablutions);
     RegisterSpellScript(spell_item_trauma);
     RegisterSpellScript(spell_item_blade_ward_enchant);
+    RegisterSpellScript(spell_item_blood_draining_enchant);
     RegisterSpellScript(spell_item_dragon_kite_summon_lightning_bunny);
     RegisterSpellScript(spell_item_enchanted_broom_periodic);
     RegisterSpellScript(spell_item_summon_or_dismiss);
@@ -5112,4 +5141,5 @@ void AddSC_item_spell_scripts()
     new spell_item_zandalarian_charm("spell_item_unstable_power", SPELL_UNSTABLE_POWER_AURA_STACK);
     new spell_item_zandalarian_charm("spell_item_restless_strength", SPELL_RESTLESS_STRENGTH_AURA_STACK);
     RegisterSpellScript(spell_item_blood_draining_enchant);
+    RegisterSpellScript(spell_item_snowman);
 }
