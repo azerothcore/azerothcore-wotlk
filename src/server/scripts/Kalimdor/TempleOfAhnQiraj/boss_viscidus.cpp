@@ -228,6 +228,7 @@ struct boss_viscidus : public BossAI
             return;
 
         events.Update(diff);
+        _scheduler.Update(diff);
 
         while (uint32 eventId = events.ExecuteEvent())
         {
@@ -276,7 +277,6 @@ struct boss_glob_of_viscidus : public ScriptedAI
     {
         me->SetInCombatWithZone();
         _scheduler.CancelAll();
-        me->SetSpeedRate(MOVE_RUN, 2.f);
         _scheduler.Schedule(2400ms, [this](TaskContext context)
             {
                 me->GetMotionMaster()->MovePoint(ROOM_CENTER, roomCenter);
@@ -293,6 +293,7 @@ struct boss_glob_of_viscidus : public ScriptedAI
         if (id == ROOM_CENTER)
         {
             DoCastSelf(SPELL_REJOIN_VISCIDUS);
+            Unit::Kill(me, me);
             me->DespawnOrUnsummon();
         }
     }

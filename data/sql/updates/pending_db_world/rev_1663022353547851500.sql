@@ -28,7 +28,7 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (25938, 'spell_explode_trigger'),
 (26584, 'spell_summon_toxin_slime');
 
-UPDATE `creature_template` SET `flags_extra` = `flags_extra`|1073741824, `speed_walk` = 1, `speed_run` = 1 WHERE `entry` = 15667;
+UPDATE `creature_template` SET `flags_extra` = `flags_extra`|1073741824 WHERE `entry` = 15667;
 
 UPDATE `creature_template_addon` SET `auras` = '25994' WHERE `entry` = 15299;
 
