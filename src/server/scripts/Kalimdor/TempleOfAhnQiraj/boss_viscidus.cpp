@@ -86,13 +86,26 @@ enum Misc
     MAX_GLOB_SPAWN             = 20
 };
 
-Position const ViscidusCoord = { -7992.36f, 908.19f, -52.62f, 1.68f };
+Position const roomCenter = { -7992.36f, 908.19f, -52.62f, 1.68f };
+
+Position const resetPoint = { -7992.0f, 1041.0f, -23.84f };
 
 std::array<uint32, MAX_GLOB_SPAWN> const spawnGlobSpells = { 25865, 25866, 25867, 25868, 25869, 25870, 25871, 25872, 25873, 25874, 25875, 25876, 25877, 25878, 25879, 25880, 25881, 25882, 25883, 25884 };
 
 struct boss_viscidus : public BossAI
 {
     boss_viscidus(Creature* creature) : BossAI(creature, DATA_VISCIDUS) { }
+
+    bool CheckInRoom() override
+    {
+        if (me->GetExactDist2d(resetPoint) <= 10.f)
+        {
+            EnterEvadeMode(EVADE_REASON_BOUNDARY);
+            return false;
+        }
+
+        return true;
+    }
 
     void Reset() override
     {
@@ -126,7 +139,7 @@ struct boss_viscidus : public BossAI
             _phase = PHASE_GLOB;
             me->SetControlled(true, UNIT_STATE_ROOT);
             me->HandleEmoteCommand(EMOTE_ONESHOT_FLYDEATH); // not found in sniff, this is the best one I found
-            DoCastSelf(SPELL_EXPLODE_TRIGGER);
+            DoCastSelf(SPELL_EXPLODE_TRIGGER, true);
             me->RemoveAura(SPELL_VISCIDUS_FREEZE);
             _scheduler.Schedule(3s, [this](TaskContext /*context*/)
                 {
@@ -150,21 +163,49 @@ struct boss_viscidus : public BossAI
                 _hitcounter = 0;
                 Talk(EMOTE_FROZEN);
                 _phase = PHASE_MELEE;
-                DoCastSelf(SPELL_VISCIDUS_FREEZE);
                 me->RemoveAura(SPELL_VISCIDUS_SLOWED_MORE);
-                events.ScheduleEvent(EVENT_RESET_PHASE, 15000);
+                DoCastSelf(SPELL_VISCIDUS_FREEZE);
+                events.ScheduleEvent(EVENT_RESET_PHASE, 15s);
             }
-            else if (_hitcounter >= HITCOUNTER_SLOW_MORE)
+            else if (_hitcounter == HITCOUNTER_SLOW_MORE)
             {
                 Talk(EMOTE_FREEZE);
                 me->RemoveAura(SPELL_VISCIDUS_SLOWED);
                 DoCastSelf(SPELL_VISCIDUS_SLOWED_MORE);
             }
-            else if (_hitcounter >= HITCOUNTER_SLOW)
+            else if (_hitcounter == HITCOUNTER_SLOW)
             {
                 Talk(EMOTE_SLOW);
                 DoCastSelf(SPELL_VISCIDUS_SLOWED);
             }
+        }
+    }
+
+    void SummonedCreatureDies(Creature* summon, Unit* killer) override
+    {
+        if (_phase != PHASE_GLOB || summon->GetEntry() != NPC_GLOB_OF_VISCIDUS)
+            return;
+
+        if (killer && killer->GetEntry() != NPC_GLOB_OF_VISCIDUS)
+        {
+            uint32 newHealth = me->GetHealth() - (me->GetMaxHealth() / 20);
+            me->SetHealth(newHealth <= 0 ? 1 : newHealth);
+            DoCastSelf(SPELL_VISCIDUS_SHRINKS, true);
+        }
+
+        if (!summons.IsAnyCreatureWithEntryAlive(NPC_GLOB_OF_VISCIDUS))
+        {
+            DoResetThreat();
+            me->NearTeleportTo(roomCenter.GetPositionX(),
+                roomCenter.GetPositionY(),
+                roomCenter.GetPositionZ(),
+                roomCenter.GetOrientation());
+
+            _hitcounter = 0;
+            _phase = PHASE_FROST;
+            InitSpells();
+            me->SetVisible(true);
+            me->SetControlled(false, UNIT_STATE_ROOT);
         }
     }
 
@@ -183,23 +224,8 @@ struct boss_viscidus : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
-        if (!UpdateVictim())
+        if (!UpdateVictim() || !CheckInRoom())
             return;
-
-        if (_phase == PHASE_GLOB && summons.GetEntryCount(NPC_GLOB_OF_VISCIDUS) == 0)
-        {
-            DoResetThreat();
-            me->NearTeleportTo(ViscidusCoord.GetPositionX(),
-                ViscidusCoord.GetPositionY(),
-                ViscidusCoord.GetPositionZ(),
-                ViscidusCoord.GetOrientation());
-
-            _hitcounter = 0;
-            _phase = PHASE_FROST;
-            InitSpells();
-            me->SetVisible(true);
-            me->SetControlled(false, UNIT_STATE_ROOT);
-        }
 
         events.Update(diff);
 
@@ -221,6 +247,7 @@ struct boss_viscidus : public BossAI
                     break;
                 case EVENT_RESET_PHASE:
                     _hitcounter = 0;
+                    me->RemoveAura(SPELL_VISCIDUS_FREEZE);
                     _phase = PHASE_FROST;
                     break;
                 default:
@@ -252,25 +279,13 @@ struct boss_glob_of_viscidus : public ScriptedAI
         me->SetSpeedRate(MOVE_RUN, 2.f);
         _scheduler.Schedule(2400ms, [this](TaskContext context)
             {
-                me->GetMotionMaster()->MovePoint(ROOM_CENTER, ViscidusCoord);
+                me->GetMotionMaster()->MovePoint(ROOM_CENTER, roomCenter);
                 context.Schedule(1s, [this](TaskContext context)
                     {
                         me->SetSpeedRate(MOVE_RUN, me->GetSpeedRate(MOVE_RUN) + 1.5f);
                         context.Repeat();
                     });
             });
-    }
-
-    void JustDied(Unit* /*killer*/) override
-    {
-        InstanceScript* instance = me->GetInstanceScript();
-
-        if (Creature* viscidus = instance->GetCreature(DATA_VISCIDUS))
-        {
-            uint32 newHealth = viscidus->GetHealth() - (viscidus->GetMaxHealth() / 20);
-            viscidus->SetHealth(newHealth <= 0 ? 1 : newHealth);
-            viscidus->CastSpell(viscidus, SPELL_VISCIDUS_SHRINKS);
-        }
     }
 
     void MovementInform(uint32 /*type*/, uint32 id) override
