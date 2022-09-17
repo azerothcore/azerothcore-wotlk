@@ -120,6 +120,7 @@ struct boss_ayamiss : public BossAI
 
             me->m_Events.AddEventAtOffset([this]()
             {
+                me->SetReactState(REACT_AGGRESSIVE);
                 if (me->GetVictim())
                 {
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
@@ -215,6 +216,7 @@ struct boss_ayamiss : public BossAI
         {
             _phase = PHASE_GROUND;
             me->ClearUnitState(UNIT_STATE_ROOT);
+            me->SetReactState(REACT_PASSIVE);
             me->SetCanFly(false);
             me->SetDisableGravity(false);
             me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
