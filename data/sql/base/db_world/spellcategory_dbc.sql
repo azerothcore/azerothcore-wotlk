@@ -15,8 +15,8 @@
 -- Dumpar struktur för tabell acore_world.spellcategory_dbc
 DROP TABLE IF EXISTS `spellcategory_dbc`;
 CREATE TABLE IF NOT EXISTS `spellcategory_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `Flags` INT NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `Flags` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

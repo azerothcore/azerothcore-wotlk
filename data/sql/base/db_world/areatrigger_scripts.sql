@@ -15,12 +15,12 @@
 -- Dumpar struktur för tabell acore_world.areatrigger_scripts
 DROP TABLE IF EXISTS `areatrigger_scripts`;
 CREATE TABLE IF NOT EXISTS `areatrigger_scripts` (
-  `entry` MEDIUMINT NOT NULL,
+  `entry` mediumint NOT NULL,
   `ScriptName` char(64) NOT NULL,
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Dumpar data för tabell acore_world.areatrigger_scripts: 127 rows
+-- Dumpar data för tabell acore_world.areatrigger_scripts: 131 rows
 DELETE FROM `areatrigger_scripts`;
 /*!40000 ALTER TABLE `areatrigger_scripts` DISABLE KEYS */;
 INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES
@@ -150,7 +150,11 @@ INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES
 	(2066, 'at_trigger_the_beast_movement'),
 	(2067, 'at_the_beast_room'),
 	(3960, 'at_zulgurub_temple_speech'),
-	(3847, 'at_orb_of_command');
+	(3847, 'at_orb_of_command'),
+	(4052, 'at_battleguard_sartura'),
+	(3956, 'at_zulgurub_bridge_speech'),
+	(3961, 'at_zulgurub_bloodfire_pit_speech'),
+	(3962, 'at_zulgurub_edge_of_madness_speech');
 /*!40000 ALTER TABLE `areatrigger_scripts` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

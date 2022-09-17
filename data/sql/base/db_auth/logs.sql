@@ -13,12 +13,11 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 -- Dumpar struktur för tabell acore_auth.logs
-DROP TABLE IF EXISTS `logs`;
 CREATE TABLE IF NOT EXISTS `logs` (
-  `time` INT unsigned NOT NULL,
-  `realm` INT unsigned NOT NULL,
-  `type` VARCHAR(250) NOT NULL,
-  `level` TINYINT unsigned NOT NULL DEFAULT 0,
+  `time` int unsigned NOT NULL,
+  `realm` int unsigned NOT NULL,
+  `type` varchar(250) NOT NULL,
+  `level` tinyint unsigned NOT NULL DEFAULT '0',
   `string` text
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

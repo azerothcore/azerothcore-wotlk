@@ -15,17 +15,17 @@
 -- Dumpar struktur för tabell acore_world.script_waypoint
 DROP TABLE IF EXISTS `script_waypoint`;
 CREATE TABLE IF NOT EXISTS `script_waypoint` (
-  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'creature_template entry',
-  `pointid` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `location_x` float NOT NULL DEFAULT 0,
-  `location_y` float NOT NULL DEFAULT 0,
-  `location_z` float NOT NULL DEFAULT 0,
-  `waittime` INT unsigned NOT NULL DEFAULT 0 COMMENT 'waittime in millisecs',
+  `entry` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'creature_template entry',
+  `pointid` mediumint unsigned NOT NULL DEFAULT '0',
+  `location_x` float NOT NULL DEFAULT '0',
+  `location_y` float NOT NULL DEFAULT '0',
+  `location_z` float NOT NULL DEFAULT '0',
+  `waittime` int unsigned NOT NULL DEFAULT '0' COMMENT 'waittime in millisecs',
   `point_comment` text,
   PRIMARY KEY (`entry`,`pointid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Script Creature waypoints';
 
--- Dumpar data för tabell acore_world.script_waypoint: 2 373 rows
+-- Dumpar data för tabell acore_world.script_waypoint: 2 388 rows
 DELETE FROM `script_waypoint`;
 /*!40000 ALTER TABLE `script_waypoint` DISABLE KEYS */;
 INSERT INTO `script_waypoint` (`entry`, `pointid`, `location_x`, `location_y`, `location_z`, `waittime`, `point_comment`) VALUES
@@ -2401,7 +2401,22 @@ INSERT INTO `script_waypoint` (`entry`, `pointid`, `location_x`, `location_y`, `
 	(37129, 1, 4357, 2617, 351.101, 0, 'Crok Scourgebane - at second trash pack'),
 	(37129, 2, 4357.21, 2569.5, 351.15, 0, NULL),
 	(37129, 3, 4357.09, 2540, 358.5, 0, NULL),
-	(37129, 4, 4356.88, 2521.8, 358.5, 0, 'Crok Scourgebane - at Sister Svalna');
+	(37129, 4, 4356.88, 2521.8, 358.5, 0, 'Crok Scourgebane - at Sister Svalna'),
+	(15471, 0, -8623.17, 1470.41, 32.0064, 0, 'Andorov'),
+	(15471, 1, -8657.3, 1506.18, 32.5867, 0, 'Andorov'),
+	(15471, 2, -8679.19, 1535.12, 31.9674, 0, 'Andorov'),
+	(15471, 3, -8701.48, 1561.76, 32.1747, 0, 'Andorov'),
+	(15471, 4, -8720.07, 1580.96, 21.5113, 0, 'Andorov'),
+	(15471, 5, -8746.16, 1603.49, 21.6134, 0, 'Andorov'),
+	(15471, 6, -8780.43, 1617.88, 21.4558, 0, 'Andorov'),
+	(15471, 7, -8823.48, 1624.67, 19.8057, 0, 'Andorov'),
+	(15471, 8, -8855.33, 1637.95, 19.7905, 0, 'Andorov'),
+	(15471, 9, -8870.72, 1648.4, 21.5113, 0, 'Andorov'),
+	(15471, 10, -8870.72, 1648.4, 21.5113, 0, 'Andorov'),
+	(15471, 11, -8886.09, 1598.71, 21.4053, 0, 'Andorov'),
+	(15471, 12, -8904.38, 1578.62, 21.5113, 0, 'Andorov'),
+	(15471, 13, -8920.58, 1551.95, 21.4079, 0, 'Andorov'),
+	(15471, 14, -8939.95, 1551.13, 21.5669, 0, 'Andorov');
 /*!40000 ALTER TABLE `script_waypoint` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

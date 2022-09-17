@@ -15,12 +15,12 @@
 -- Dumpar struktur för tabell acore_world.game_graveyard
 DROP TABLE IF EXISTS `game_graveyard`;
 CREATE TABLE IF NOT EXISTS `game_graveyard` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `Map` INT NOT NULL DEFAULT 0,
-  `x` float NOT NULL DEFAULT 0,
-  `y` float NOT NULL DEFAULT 0,
-  `z` float NOT NULL DEFAULT 0,
-  `Comment` VARCHAR(255) DEFAULT NULL,
+  `ID` int NOT NULL DEFAULT '0',
+  `Map` int NOT NULL DEFAULT '0',
+  `x` float NOT NULL DEFAULT '0',
+  `y` float NOT NULL DEFAULT '0',
+  `z` float NOT NULL DEFAULT '0',
+  `Comment` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`ID`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 

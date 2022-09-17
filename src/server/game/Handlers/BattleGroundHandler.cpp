@@ -403,6 +403,12 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recvData)
         return;
     }
 
+    if (_player->GetCharmGUID() || _player->IsInCombat())
+    {
+        _player->GetSession()->SendNotification(LANG_YOU_IN_COMBAT);
+        return;
+    }
+
     // get BattlegroundQueue for received
     BattlegroundTypeId bgTypeId = BattlegroundTypeId(bgTypeId_);
     BattlegroundQueueTypeId bgQueueTypeId = BattlegroundMgr::BGQueueTypeId(bgTypeId, arenaType);
@@ -533,13 +539,20 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recvData)
     }
     else // leave queue
     {
-        bgQueue.RemovePlayer(_player->GetGUID(), true);
-        _player->RemoveBattlegroundQueueId(bgQueueTypeId);
+        for (auto const& playerGuid : ginfo.Players)
+        {
+            auto player = ObjectAccessor::FindConnectedPlayer(playerGuid);
+            if (!player)
+                continue;
 
-        sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_NONE, 0, 0, 0, TEAM_NEUTRAL);
-        SendPacket(&data);
+            bgQueue.RemovePlayer(playerGuid, true);
+            player->RemoveBattlegroundQueueId(bgQueueTypeId);
 
-        LOG_DEBUG("bg.battleground", "Battleground: player {} {} left queue for bgtype {}, queue type {}.", _player->GetName(), _player->GetGUID().ToString(), bg->GetBgTypeID(), bgQueueTypeId);
+            sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_NONE, 0, 0, 0, TEAM_NEUTRAL);
+            player->SendDirectMessage(&data);
+
+            LOG_DEBUG("bg.battleground", "Battleground: player {} {} left queue for bgtype {}, queue type {}.", player->GetName(), playerGuid.ToString(), bg->GetBgTypeID(), bgQueueTypeId);
+        }
 
         // player left queue, we should update it - do not update Arena Queue
         if (!ginfo.ArenaType)

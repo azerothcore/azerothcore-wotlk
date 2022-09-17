@@ -381,7 +381,7 @@ struct SpellThreatEntry
     float       apPctMod;                                   // Pct of AP that is added as Threat - default: 0.0f
 };
 
-typedef std::map<uint32, SpellThreatEntry> SpellThreatMap;
+typedef std::unordered_map<uint32, SpellThreatEntry> SpellThreatMap;
 typedef std::map<uint32, float> SpellMixologyMap;
 
 // coordinates for spells (accessed using SpellMgr functions)
@@ -752,7 +752,7 @@ public:
     void LoadSpellGroupStackRules();
     void LoadSpellProcEvents();
     void LoadSpellProcs();
-    void LoadSpellBonusess();
+    void LoadSpellBonuses();
     void LoadSpellThreats();
     void LoadSpellMixology();
     void LoadSkillLineAbilityMap();

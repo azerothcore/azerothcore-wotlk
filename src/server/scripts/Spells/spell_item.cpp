@@ -3676,6 +3676,32 @@ class spell_item_mirrens_drinking_hat : public SpellScript
     }
 };
 
+class spell_item_snowman : public SpellScript
+{
+    PrepareSpellScript(spell_item_snowman);
+
+    SpellCastResult CheckCast()
+    {
+        if (Player* caster = GetCaster()->ToPlayer())
+        {
+            if (Battleground* bg = caster->GetBattleground())
+            {
+                if (bg->GetStatus() == STATUS_WAIT_JOIN)
+                {
+                    return SPELL_FAILED_NOT_READY;
+                }
+            }
+        }
+        
+        return SPELL_CAST_OK;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_item_snowman::CheckCast);
+    }
+};
+
 // https://www.wowhead.com/wotlk/spell=16028 Freeze Rookery Egg - Prototype
 // https://www.wowhead.com/wotlk/spell=15748 Freeze Rookery Egg
 class spell_item_freeze_rookery_egg : public SpellScript
@@ -3691,8 +3717,8 @@ class spell_item_freeze_rookery_egg : public SpellScript
             if (rookery->getLootState() == GO_READY)
                 rookery->UseDoorOrButton(0, true);
         }
-    }
-
+     }
+     
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_item_freeze_rookery_egg::HandleOpenObject, EFFECT_0, SPELL_EFFECT_OPEN_LOCK);
@@ -3812,5 +3838,6 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_recall);
     RegisterSpellScript(spell_item_wraith_scythe_drain_life);
     RegisterSpellScript(spell_item_mirrens_drinking_hat);
+    RegisterSpellScript(spell_item_snowman);
     RegisterSpellScript(spell_item_freeze_rookery_egg);
 }

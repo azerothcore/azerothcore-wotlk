@@ -15,15 +15,15 @@
 -- Dumpar struktur för tabell acore_world.creaturespelldata_dbc
 DROP TABLE IF EXISTS `creaturespelldata_dbc`;
 CREATE TABLE IF NOT EXISTS `creaturespelldata_dbc` (
-  `ID` INT NOT NULL DEFAULT 0,
-  `Spells_1` INT NOT NULL DEFAULT 0,
-  `Spells_2` INT NOT NULL DEFAULT 0,
-  `Spells_3` INT NOT NULL DEFAULT 0,
-  `Spells_4` INT NOT NULL DEFAULT 0,
-  `Availability_1` INT NOT NULL DEFAULT 0,
-  `Availability_2` INT NOT NULL DEFAULT 0,
-  `Availability_3` INT NOT NULL DEFAULT 0,
-  `Availability_4` INT NOT NULL DEFAULT 0,
+  `ID` int NOT NULL DEFAULT '0',
+  `Spells_1` int NOT NULL DEFAULT '0',
+  `Spells_2` int NOT NULL DEFAULT '0',
+  `Spells_3` int NOT NULL DEFAULT '0',
+  `Spells_4` int NOT NULL DEFAULT '0',
+  `Availability_1` int NOT NULL DEFAULT '0',
+  `Availability_2` int NOT NULL DEFAULT '0',
+  `Availability_3` int NOT NULL DEFAULT '0',
+  `Availability_4` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

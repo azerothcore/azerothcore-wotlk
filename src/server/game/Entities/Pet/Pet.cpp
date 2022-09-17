@@ -1281,6 +1281,12 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                             AddAura(SPELL_FERAL_SPIRIT_SCALING_01, this);
                             AddAura(SPELL_FERAL_SPIRIT_SCALING_02, this);
                             AddAura(SPELL_FERAL_SPIRIT_SCALING_03, this);
+
+                            if (owner->getRace() == RACE_ORC)
+                            {
+                                CastSpell(this, SPELL_ORC_RACIAL_COMMAND_SHAMAN, true, nullptr, nullptr, owner->GetGUID());
+                            }
+
                             break;
                         }
                     case NPC_MIRROR_IMAGE: // Mirror Image
@@ -1357,7 +1363,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
 
         // xinef: fixes orc death knight command racial
         if (owner->getRace() == RACE_ORC)
-            CastSpell(this, SPELL_ORC_RACIAL_COMMAND, true, nullptr, nullptr, owner->GetGUID());
+            CastSpell(this, SPELL_ORC_RACIAL_COMMAND_DK, true, nullptr, nullptr, owner->GetGUID());
 
         // Avoidance, Night of the Dead
         if (Aura* aur = AddAura(SPELL_NIGHT_OF_THE_DEAD_AVOIDANCE, this))
@@ -2438,4 +2444,14 @@ std::string Pet::GenerateActionBarData() const
     }
 
     return oss.str();
+}
+
+std::string Pet::GetDebugInfo() const
+{
+    std::stringstream sstr;
+    sstr << Guardian::GetDebugInfo() << "\n"
+        << std::boolalpha
+        << "PetType: " << std::to_string(getPetType()) << " "
+        << "PetNumber: " << m_charmInfo->GetPetNumber();
+    return sstr.str();
 }

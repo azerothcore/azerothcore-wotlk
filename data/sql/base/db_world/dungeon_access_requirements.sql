@@ -15,14 +15,14 @@
 -- Dumpar struktur för tabell acore_world.dungeon_access_requirements
 DROP TABLE IF EXISTS `dungeon_access_requirements`;
 CREATE TABLE IF NOT EXISTS `dungeon_access_requirements` (
-  `dungeon_access_id` TINYINT unsigned NOT NULL COMMENT 'ID from dungeon_access_template',
-  `requirement_type` TINYINT unsigned NOT NULL COMMENT '0 = achiev, 1 = quest, 2 = item',
-  `requirement_id` MEDIUMINT unsigned NOT NULL COMMENT 'Achiev/quest/item ID',
-  `requirement_note` VARCHAR(255) DEFAULT NULL COMMENT 'Optional msg shown ingame to player if he cannot enter. You can add extra info',
-  `faction` TINYINT unsigned NOT NULL DEFAULT '2' COMMENT '0 = Alliance, 1 = Horde, 2 = Both factions',
-  `priority` TINYINT unsigned DEFAULT NULL COMMENT 'Priority order for the requirement, sorted by type. 0 is the highest priority',
-  `leader_only` TINYINT NOT NULL DEFAULT 0 COMMENT '0 = check the requirement for the player trying to enter, 1 = check the requirement for the party leader',
-  `comment` VARCHAR(255) DEFAULT NULL,
+  `dungeon_access_id` tinyint unsigned NOT NULL COMMENT 'ID from dungeon_access_template',
+  `requirement_type` tinyint unsigned NOT NULL COMMENT '0 = achiev, 1 = quest, 2 = item',
+  `requirement_id` mediumint unsigned NOT NULL COMMENT 'Achiev/quest/item ID',
+  `requirement_note` varchar(255) DEFAULT NULL COMMENT 'Optional msg shown ingame to player if he cannot enter. You can add extra info',
+  `faction` tinyint unsigned NOT NULL DEFAULT '2' COMMENT '0 = Alliance, 1 = Horde, 2 = Both factions',
+  `priority` tinyint unsigned DEFAULT NULL COMMENT 'Priority order for the requirement, sorted by type. 0 is the highest priority',
+  `leader_only` tinyint NOT NULL DEFAULT '0' COMMENT '0 = check the requirement for the player trying to enter, 1 = check the requirement for the party leader',
+  `comment` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`dungeon_access_id`,`requirement_type`,`requirement_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Add (multiple) requirements before being able to enter a dungeon/raid';
 

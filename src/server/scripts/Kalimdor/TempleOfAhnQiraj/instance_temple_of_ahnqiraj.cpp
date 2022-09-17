@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Instance_Temple_of_Ahnqiraj
-SD%Complete: 80
-SDComment:
-SDCategory: Temple of Ahn'Qiraj
-EndScriptData */
-
 #include "InstanceScript.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -30,7 +23,12 @@ EndScriptData */
 ObjectData const creatureData[] =
 {
     { NPC_SARTURA, DATA_SARTURA },
-    { NPC_EYE_OF_CTHUN, DATA_EYE_OF_CTHUN }
+    { NPC_CTHUN, DATA_CTHUN },
+    { NPC_EYE_OF_CTHUN, DATA_EYE_OF_CTHUN },
+    { NPC_OURO_SPAWNER, DATA_OURO_SPAWNER },
+    { NPC_MASTERS_EYE, DATA_MASTERS_EYE },
+    { NPC_VEKLOR, DATA_VEKLOR },
+    { NPC_VEKNILASH, DATA_VEKNILASH }
 };
 
 class instance_temple_of_ahnqiraj : public InstanceMapScript
@@ -48,32 +46,25 @@ public:
         instance_temple_of_ahnqiraj_InstanceMapScript(Map* map) : InstanceScript(map)
         {
             LoadObjectData(creatureData, nullptr);
+            doorGUIDs.fill(ObjectGuid::Empty);
+            SetBossNumber(MAX_BOSS_NUMBER);
         }
 
-        //If Vem is dead...
-        bool IsBossDied[3];
-
-        //Storing Skeram, Vem and Kri.
         ObjectGuid SkeramGUID;
         ObjectGuid VemGUID;
         ObjectGuid KriGUID;
         ObjectGuid YaujGUID;
-        ObjectGuid VeklorGUID;
-        ObjectGuid VeknilashGUID;
         ObjectGuid ViscidusGUID;
+        ObjectGuid CThunGUID;
+        GuidVector CThunGraspGUIDs;
+        std::array<ObjectGuid, 3> doorGUIDs;
 
         uint32 BugTrioDeathCount;
-
         uint32 CthunPhase;
 
         void Initialize() override
         {
-            IsBossDied[0] = false;
-            IsBossDied[1] = false;
-            IsBossDied[2] = false;
-
             BugTrioDeathCount = 0;
-
             CthunPhase = 0;
         }
 
@@ -83,6 +74,10 @@ public:
             {
                 case NPC_SKERAM:
                     SkeramGUID = creature->GetGUID();
+                    if (!creature->IsAlive())
+                    {
+                        HandleGameObject(doorGUIDs[2], true);
+                    }
                     break;
                 case NPC_VEM:
                     VemGUID = creature->GetGUID();
@@ -93,34 +88,85 @@ public:
                 case NPC_YAUJ:
                     YaujGUID = creature->GetGUID();
                     break;
-                case NPC_VEKLOR:
-                    VeklorGUID = creature->GetGUID();
-                    break;
-                case NPC_VEKNILASH:
-                    VeknilashGUID = creature->GetGUID();
-                    break;
                 case NPC_VISCIDUS:
                     ViscidusGUID = creature->GetGUID();
+                    break;
+                case NPC_OURO_SPAWNER:
+                    if (GetBossState(DATA_OURO) != DONE)
+                        creature->Respawn();
+                    break;
+                case NPC_MASTERS_EYE:
+                    if (GetBossState(DATA_TWIN_EMPERORS) != DONE)
+                        creature->Respawn(true);
+                    break;
+                case NPC_CTHUN:
+                    CThunGUID = creature->GetGUID();
+                    if (!creature->IsAlive())
+                    {
+                        for (ObjectGuid const& guid : CThunGraspGUIDs)
+                        {
+                            if (GameObject* cthunGrasp = instance->GetGameObject(guid))
+                            {
+                                cthunGrasp->DespawnOrUnsummon(1s);
+                            }
+                        }
+                    }
+                    break;
+                default:
                     break;
             }
 
             InstanceScript::OnCreatureCreate(creature);
         }
 
+        void OnGameObjectCreate(GameObject* go) override
+        {
+            switch (go->GetEntry())
+            {
+                case AQ40_DOOR_1:
+                    doorGUIDs[0] = go->GetGUID();
+                    break;
+                case AQ40_DOOR_2:
+                    doorGUIDs[1] = go->GetGUID();
+                    if (Creature* veklor = GetCreature(DATA_VEKLOR))
+                    {
+                        if (!veklor->IsAlive())
+                        {
+                            HandleGameObject(go->GetGUID(), true);
+                        }
+                    }
+                    break;
+                case AQ40_DOOR_3:
+                    doorGUIDs[2] = go->GetGUID();
+                    if (Creature* skeram = instance->GetCreature(SkeramGUID))
+                    {
+                        if (!skeram->IsAlive())
+                        {
+                            HandleGameObject(go->GetGUID(), true);
+                        }
+                    }
+                    break;
+                case GO_CTHUN_GRASP:
+                    CThunGraspGUIDs.push_back(go->GetGUID());
+                    if (Creature* CThun = instance->GetCreature(CThunGUID))
+                    {
+                        if (!CThun->IsAlive())
+                        {
+                            go->DespawnOrUnsummon(1s);
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            InstanceScript::OnGameObjectCreate(go);
+        }
+
         uint32 GetData(uint32 type) const override
         {
             switch (type)
             {
-                case DATA_VEKLORISDEAD:
-                    if (IsBossDied[1])
-                        return 1;
-                    break;
-
-                case DATA_VEKNILASHISDEAD:
-                    if (IsBossDied[2])
-                        return 1;
-                    break;
-
                 case DATA_BUG_TRIO_DEATH:
                     return BugTrioDeathCount;
 
@@ -142,14 +188,15 @@ public:
                     return KriGUID;
                 case DATA_YAUJ:
                     return YaujGUID;
-                case DATA_VEKLOR:
-                    return VeklorGUID;
-                case DATA_VEKNILASH:
-                    return VeknilashGUID;
                 case DATA_VISCIDUS:
                     return ViscidusGUID;
+                case AQ40_DOOR_1:
+                    return doorGUIDs[0];
+                case AQ40_DOOR_2:
+                    return doorGUIDs[1];
+                case AQ40_DOOR_3:
+                    return doorGUIDs[2];
             }
-
             return ObjectGuid::Empty;
         }
 
@@ -163,19 +210,43 @@ public:
                     else
                         BugTrioDeathCount = 0;
                     break;
-
-                case DATA_VEKLOR_DEATH:
-                    IsBossDied[1] = true;
-                    break;
-
-                case DATA_VEKNILASH_DEATH:
-                    IsBossDied[2] = true;
-                    break;
-
                 case DATA_CTHUN_PHASE:
                     CthunPhase = data;
+                    if (data == PHASE_CTHUN_DONE)
+                    {
+                        for (ObjectGuid const& guid : CThunGraspGUIDs)
+                        {
+                            if (GameObject* cthunGrasp = instance->GetGameObject(guid))
+                            {
+                                cthunGrasp->DespawnOrUnsummon(1s);
+                            }
+                        }
+                    }
+                    break;
+                default:
                     break;
             }
+        }
+
+        bool SetBossState(uint32 type, EncounterState state) override
+        {
+            if (!InstanceScript::SetBossState(type, state))
+                return false;
+
+            switch (type)
+            {
+                case DATA_OURO:
+                    if (state == FAIL)
+                    {
+                        if (Creature* ouroSpawner = GetCreature(DATA_OURO_SPAWNER))
+                            ouroSpawner->Respawn();
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            return true;
         }
     };
 };
@@ -198,7 +269,6 @@ public:
                 }
             }
         }
-
         return true;
     }
 };

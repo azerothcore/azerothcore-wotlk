@@ -15,8 +15,8 @@
 -- Dumpar struktur för tabell acore_characters.addons
 DROP TABLE IF EXISTS `addons`;
 CREATE TABLE IF NOT EXISTS `addons` (
-  `name` VARCHAR(120) NOT NULL DEFAULT '',
-  `crc` INT unsigned NOT NULL DEFAULT 0,
+  `name` varchar(120) NOT NULL DEFAULT '',
+  `crc` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Addons';
 
