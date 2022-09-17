@@ -16,6 +16,7 @@
  */
 
 #include "MapReference.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
@@ -24,27 +25,43 @@
 
 enum Spells
 {
+    // Anubisath Defender
     SPELL_SHADOW_FROST_REFLECT          = 19595,
     SPELL_FIRE_ARCANE_REFLECT           = 13022,
     SPELL_METEOR                        = 26558,
     SPELL_PLAGUE                        = 26556,
     SPELL_SHADOW_STORM                  = 26555,
     SPELL_THUNDERCLAP                   = 26554,
-
     SPELL_ENRAGE                        = 14204,
     SPELL_EXPLODE                       = 25699,
-
     SPELL_SUMMON_WARRIOR                = 17431,
     SPELL_SUMMON_SWARMGUARD             = 17430,
+    SPELL_SUMMON_LARGE_OBSIDIAN_CHUNK   = 27630, // Server-side
 
-    SPELL_NULLIFY                       = 26552,
-    SPELL_CLEAVE                        = 40504,
+    TALK_ENRAGE                         = 0,
+
+    // Vekniss Stinger
+    SPELL_VEKNISS_CATALYST              = 26078,
+    SPELL_STINGER_CHARGE_NORMAL         = 26081,
+    SPELL_STINGER_CHARGE_BUFFED         = 26082,
+    
+    // Obsidian Eradicator
+    SPELL_SHOCK_BLAST                   = 26458,
     SPELL_DRAIN_MANA                    = 25671,
     SPELL_DRAIN_MANA_VISUAL             = 26639,
 
-    SPELL_SUMMON_LARGE_OBSIDIAN_CHUNK   = 27630, // Server-side
+    // Anubisath Warder
+    SPELL_FEAR                          = 26070,
+    SPELL_ENTAGLING_ROOTS               = 26071,
+    SPELL_SILENCE                       = 26069,
+    SPELL_DUST_CLOUD                    = 26072,
+    SPELL_FIRE_NOVA                     = 26073,
 
-    TALK_ENRAGE                         = 0
+    // Obsidian Nullifier
+    SPELL_NULLIFY                       = 26552,
+    SPELL_CLEAVE                        = 40504,
+    SPELL_DRAIN_MANA                    = 25671,
+    SPELL_DRAIN_MANA_VISUAL             = 26639
 };
 
 struct npc_anubisath_defender : public ScriptedAI
@@ -157,36 +174,192 @@ private:
     bool _enraged;
 };
 
-enum NPCs
+struct npc_vekniss_stinger : public ScriptedAI
 {
-    NPC_VEKNISS_DRONE   = 15300
+    npc_vekniss_stinger(Creature* creature) : ScriptedAI(creature)
+    {
+    }
+
+    void Reset() override
+    {
+        _scheduler.CancelAll();
+    }
+
+    void EnterCombat(Unit* who) override
+    {
+        DoCast(who ,who->HasAura(SPELL_VEKNISS_CATALYST) ? SPELL_STINGER_CHARGE_BUFFED : SPELL_STINGER_CHARGE_NORMAL, true);
+
+        _scheduler.Schedule(6s, [this](TaskContext context)
+        {
+            Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [&](Unit* u)
+            {
+                return u && !u->IsPet() && u->IsWithinDist2d(me, 20.f) && u->HasAura(SPELL_VEKNISS_CATALYST);
+            });
+            if (!target)
+            {
+                target = SelectTarget(SelectTargetMethod::Random, 0, [&](Unit* u)
+                {
+                    return u && !u->IsPet() && u->IsWithinDist2d(me, 20.f);
+                });
+            }
+
+            if (target)
+            {
+                DoCast(target, target->HasAura(SPELL_VEKNISS_CATALYST) ? SPELL_STINGER_CHARGE_BUFFED : SPELL_STINGER_CHARGE_NORMAL, true);
+            }
+
+            context.Repeat(6s);
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+        {
+            return;
+        }
+
+        _scheduler.Update(diff,
+            std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
+    }
+
+private:
+    TaskScheduler _scheduler;
 };
 
-class spell_aggro_drones : public SpellScript
-{
-    PrepareSpellScript(spell_aggro_drones);
 
-    void HandleDummy(SpellEffIndex /*effIndex*/)
+
+struct npc_obsidian_eradicator : public ScriptedAI
+{
+    npc_obsidian_eradicator(Creature* creature) : ScriptedAI(creature)
     {
-        if (Unit* caster = GetCaster())
+    }
+
+    void Reset() override
+    {
+        _scheduler.CancelAll();
+        me->SetPower(POWER_MANA, 0);
+        _targets.clear();
+    }
+
+    void EnterCombat(Unit* /*who*/) override
+    {
+        _scheduler.Schedule(3500ms, [this](TaskContext context)
         {
-            if (Creature* target = GetHitCreature())
+            if (_targets.empty())
             {
-                if (target->GetEntry() == NPC_VEKNISS_DRONE)
+                Map::PlayerList const& players = me->GetMap()->GetPlayers();
+                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                 {
-                    if (Unit* victim = caster->GetVictim())
+                    if (Player* player = itr->GetSource())
                     {
-                        target->AI()->AttackStart(victim);
+                        if (player->IsAlive() && !player->IsGameMaster() && !player->IsSpectator() && player->GetPower(POWER_MANA) > 0)
+                        {
+                            _targets.push_back(player);
+                        }
                     }
                 }
+
+                Acore::Containers::RandomResize(_targets, 10);
             }
-        }
+
+            for (Unit* target : _targets)
+            {
+                DoCast(target, SPELL_DRAIN_MANA, true);
+            }
+
+            if (me->GetPowerPct(POWER_MANA) >= 100.f)
+            {
+                DoCastAOE(SPELL_SHOCK_BLAST, true);
+            }
+
+            context.Repeat(3500ms);
+        });
     }
 
-    void Register() override
+    void UpdateAI(uint32 diff) override
     {
-        OnEffectHitTarget += SpellEffectFn(spell_aggro_drones::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        if (!UpdateVictim())
+        {
+            return;
+        }
+
+        _scheduler.Update(diff,
+            std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
     }
+
+private:
+    TaskScheduler _scheduler;
+    std::list<Player*> _targets;
+};
+
+struct npc_anubisath_warder : public ScriptedAI
+{
+    npc_anubisath_warder(Creature* creature) : ScriptedAI(creature)
+    {
+    }
+
+    void Reset() override
+    {
+        _scheduler.CancelAll();
+    }
+
+    void EnterCombat(Unit* /*who*/) override
+    {
+        if (urand(0, 1))
+        {
+            _scheduler.Schedule(5s, 5s, [this](TaskContext context)
+            {
+                DoCastAOE(SPELL_FEAR, true);
+                context.Repeat(20s, 20s);
+            });
+        }
+        else
+        {
+            _scheduler.Schedule(5s, 5s, [this](TaskContext context)
+            {
+                DoCastAOE(SPELL_ENTAGLING_ROOTS, true);
+                context.Repeat(20s, 20s);
+            });
+        }
+
+        if (urand(0, 1))
+        {
+            _scheduler.Schedule(4s, 4s, [this](TaskContext context)
+            {
+                DoCastAOE(SPELL_SILENCE, true);
+                context.Repeat(15s, 15s);
+            });
+        }
+        else
+        {
+            _scheduler.Schedule(4s, 4s, [this](TaskContext context)
+            {
+                DoCastAOE(SPELL_DUST_CLOUD, true);
+                context.Repeat(15s, 15s);
+            });
+        }
+
+        _scheduler.Schedule(2s, 2s, [this](TaskContext context)
+        {
+            DoCastAOE(SPELL_FIRE_NOVA, true);
+            context.Repeat(8s, 15s);
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+        {
+            return;
+        }
+
+        _scheduler.Update(diff,
+            std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
+    }
+
+private:
+    TaskScheduler _scheduler;
 };
 
 struct npc_obsidian_nullifier : public ScriptedAI
@@ -230,7 +403,7 @@ struct npc_obsidian_nullifier : public ScriptedAI
 
             if (me->GetPowerPct(POWER_MANA) >= 100.f)
             {
-                DoCastAOE(SPELL_NULLIFY, false);
+                DoCastAOE(SPELL_NULLIFY, true);
             }
 
             context.Repeat(6s);
@@ -256,6 +429,38 @@ struct npc_obsidian_nullifier : public ScriptedAI
 private:
     TaskScheduler _scheduler;
     std::list<Player*> _targets;
+};
+
+enum NPCs
+{
+    NPC_VEKNISS_DRONE   = 15300
+};
+
+class spell_aggro_drones : public SpellScript
+{
+    PrepareSpellScript(spell_aggro_drones);
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            if (Creature* target = GetHitCreature())
+            {
+                if (target->GetEntry() == NPC_VEKNISS_DRONE)
+                {
+                    if (Unit* victim = caster->GetVictim())
+                    {
+                        target->AI()->AttackStart(victim);
+                    }
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_aggro_drones::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
 };
 
 class spell_drain_mana : public SpellScript
@@ -300,8 +505,11 @@ class spell_nullify : public AuraScript
 void AddSC_temple_of_ahnqiraj()
 {
     RegisterTempleOfAhnQirajCreatureAI(npc_anubisath_defender);
-    RegisterSpellScript(spell_aggro_drones);
+    RegisterTempleOfAhnQirajCreatureAI(npc_vekniss_stinger);
+    RegisterTempleOfAhnQirajCreatureAI(npc_obsidian_eradicator);
+    RegisterTempleOfAhnQirajCreatureAI(npc_anubisath_warder);
     RegisterTempleOfAhnQirajCreatureAI(npc_obsidian_nullifier);
+    RegisterSpellScript(spell_aggro_drones);
     RegisterSpellScript(spell_drain_mana);
     RegisterSpellScript(spell_nullify);
 }
