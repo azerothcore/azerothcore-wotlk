@@ -71,7 +71,7 @@ struct LootGroupInvalidSelector : public Acore::unary_function<LootStoreItem*, b
 
             uint8 foundDuplicates = 0;
             for (std::vector<LootItem>::const_iterator itr = _loot.items.begin(); itr != _loot.items.end(); ++itr)
-                if (itr->itemid == item->itemid)
+                if (itr->itemid == item->itemid && itr->groupid == item->groupid)
                 {
                     ++foundDuplicates;
                     if (_proto->InventoryType == 0 && foundDuplicates == 3 && _proto->ItemId != 47242 /*Trophy of the Crusade*/) // Non-equippable items are limited to 3 drops
@@ -401,6 +401,7 @@ LootItem::LootItem(LootStoreItem const& li)
     is_underthreshold = 0;
     is_counted = 0;
     rollWinnerGUID = ObjectGuid::Empty;
+    groupid = li.groupid;
 }
 
 // Basic checks for player/item compatibility - if false no chance to see the item in the loot
