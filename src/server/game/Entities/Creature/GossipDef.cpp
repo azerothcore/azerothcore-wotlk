@@ -467,7 +467,6 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, ObjectGuid npcGU
         else
         {
             questXp = 0;
-
         }
         sScriptMgr->OnQuestComputeXP(player, quest, questXp);
         data << questXp;
@@ -721,7 +720,6 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* quest, ObjectGuid npcGUI
     else
     {
         questXp = 0;
-
     }
     sScriptMgr->OnQuestComputeXP(player, quest, questXp);
     data << questXp;
