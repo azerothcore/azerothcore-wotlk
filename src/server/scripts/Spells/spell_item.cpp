@@ -3692,7 +3692,7 @@ class spell_item_snowman : public SpellScript
                 }
             }
         }
-        
+
         return SPELL_CAST_OK;
     }
 
@@ -3718,7 +3718,7 @@ class spell_item_freeze_rookery_egg : public SpellScript
                 rookery->UseDoorOrButton(0, true);
         }
      }
-     
+
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_item_freeze_rookery_egg::HandleOpenObject, EFFECT_0, SPELL_EFFECT_OPEN_LOCK);
