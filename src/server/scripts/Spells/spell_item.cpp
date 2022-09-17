@@ -3717,7 +3717,7 @@ class spell_item_freeze_rookery_egg : public SpellScript
             if (rookery->getLootState() == GO_READY)
                 rookery->UseDoorOrButton(0, true);
         }
-     }
+    }
 
     void Register() override
     {
