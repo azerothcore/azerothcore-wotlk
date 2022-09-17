@@ -1,3 +1,4 @@
+-- DB update 2022_09_15_01 -> 2022_09_17_00
 --
 DELETE FROM `spell_bonus_data` WHERE `entry` IN (
 116, /* Mage - Frost Bolt */
