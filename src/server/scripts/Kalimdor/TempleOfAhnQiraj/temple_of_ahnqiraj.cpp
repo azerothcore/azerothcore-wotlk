@@ -59,9 +59,7 @@ enum Spells
 
     // Obsidian Nullifier
     SPELL_NULLIFY                       = 26552,
-    SPELL_CLEAVE                        = 40504,
-    SPELL_DRAIN_MANA                    = 25671,
-    SPELL_DRAIN_MANA_VISUAL             = 26639
+    SPELL_CLEAVE                        = 40504
 };
 
 struct npc_anubisath_defender : public ScriptedAI
@@ -463,27 +461,6 @@ class spell_aggro_drones : public SpellScript
     }
 };
 
-class spell_drain_mana : public SpellScript
-{
-    PrepareSpellScript(spell_drain_mana);
-
-    void HandleScript(SpellEffIndex /*effIndex*/)
-    {
-        if (Unit* caster = GetCaster())
-        {
-            if (Unit* target = GetHitUnit())
-            {
-                target->CastSpell(caster, SPELL_DRAIN_MANA_VISUAL, true);
-            }
-        }
-    }
-
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_drain_mana::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
-    }
-};
-
 class spell_nullify : public AuraScript
 {
     PrepareAuraScript(spell_nullify);
@@ -510,6 +487,5 @@ void AddSC_temple_of_ahnqiraj()
     RegisterTempleOfAhnQirajCreatureAI(npc_anubisath_warder);
     RegisterTempleOfAhnQirajCreatureAI(npc_obsidian_nullifier);
     RegisterSpellScript(spell_aggro_drones);
-    RegisterSpellScript(spell_drain_mana);
     RegisterSpellScript(spell_nullify);
 }
