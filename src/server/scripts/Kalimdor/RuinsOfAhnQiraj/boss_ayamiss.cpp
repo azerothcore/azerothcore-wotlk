@@ -89,6 +89,7 @@ struct boss_ayamiss : public BossAI
         _enraged = false;
         SetCombatMovement(false);
         _scheduler.CancelAll();
+        me->SetReactState(REACT_AGGRESSIVE);
     }
 
     void JustSummoned(Creature* who) override
