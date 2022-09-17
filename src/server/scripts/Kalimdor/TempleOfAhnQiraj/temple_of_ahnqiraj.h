@@ -42,17 +42,15 @@ enum DataTypes
     DATA_BUG_TRIO_DEATH     = 13,
     DATA_OURO_SPAWNER       = 14,
     DATA_VEKLOR             = 15,
-    DATA_VEKLORISDEAD       = 16,
-    DATA_VEKLOR_DEATH       = 17,
-    DATA_VEKNILASH          = 18,
-    DATA_VEKNILASHISDEAD    = 19,
-    DATA_VEKNILASH_DEATH    = 20,
-    DATA_CTHUN_PHASE        = 21,
-    DATA_EYE_OF_CTHUN       = 22
+    DATA_VEKNILASH          = 16,
+    DATA_CTHUN_PHASE        = 17,
+    DATA_EYE_OF_CTHUN       = 18,
+    DATA_MASTERS_EYE        = 19
 };
 
 enum Creatures
 {
+    NPC_MASTERS_EYE         = 15963,
     NPC_CTHUN               = 15727,
     NPC_EYE_OF_CTHUN        = 15589,
     NPC_CTHUN_PORTAL        = 15896,
