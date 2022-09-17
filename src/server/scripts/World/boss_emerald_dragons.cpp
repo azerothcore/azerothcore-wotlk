@@ -154,6 +154,8 @@ struct emerald_dragonAI : public WorldBossAI
         {
             summon->AI()->SetGUID(me->GetGUID(), GUID_DRAGON);
         }
+
+        summons.Summon(summon);
     }
 
     void UpdateAI(uint32 diff) override
@@ -207,6 +209,7 @@ public:
                 }
                 else
                 {
+                    _targetGUID.Clear();
                     me->GetMotionMaster()->Clear();
                     me->GetMotionMaster()->MoveRandom(25.0f);
                     context.Repeat(2500ms);
@@ -239,7 +242,10 @@ public:
             {
                 if (dragon->GetAI())
                 {
-                    return dragon->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true);
+                    return dragon->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, [&](Unit* u)
+                    {
+                        return u && u->IsPlayer() && u->GetGUID() != _targetGUID;
+                    });
                 }
             }
 
