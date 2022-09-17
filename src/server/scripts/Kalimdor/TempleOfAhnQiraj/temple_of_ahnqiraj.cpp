@@ -44,7 +44,7 @@ enum Spells
     SPELL_VEKNISS_CATALYST              = 26078,
     SPELL_STINGER_CHARGE_NORMAL         = 26081,
     SPELL_STINGER_CHARGE_BUFFED         = 26082,
-    
+
     // Obsidian Eradicator
     SPELL_SHOCK_BLAST                   = 26458,
     SPELL_DRAIN_MANA                    = 25671,
@@ -224,8 +224,6 @@ struct npc_vekniss_stinger : public ScriptedAI
 private:
     TaskScheduler _scheduler;
 };
-
-
 
 struct npc_obsidian_eradicator : public ScriptedAI
 {
