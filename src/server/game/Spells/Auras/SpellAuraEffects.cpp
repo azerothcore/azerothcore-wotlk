@@ -2977,7 +2977,6 @@ void AuraEffect::HandleAuraMounted(AuraApplication const* aurApp, uint8 mode, bo
                     displayId = 0;
                 }
             }
-
         }
         target->Mount(displayId, vehicleId, GetMiscValue());
     }
@@ -6446,7 +6445,6 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
         dmg -= resilienceReduction;
         mitigatedDamage += resilienceReduction;
     }
-
 
     DamageInfo dmgInfo(caster, target, damage, GetSpellInfo(), GetSpellInfo()->GetSchoolMask(), DOT, BASE_ATTACK, cleanDamage.mitigated_damage);
 
