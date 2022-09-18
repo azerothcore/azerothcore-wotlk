@@ -159,9 +159,13 @@ struct boss_viscidus : public BossAI
             me->AttackStop();
             me->CastStop();
             me->HandleEmoteCommand(EMOTE_ONESHOT_FLYDEATH); // not found in sniff, this is the best one I found
-            _scheduler.Schedule(2500ms, [this](TaskContext /*context*/)
+            _scheduler
+                .Schedule(2500ms, [this](TaskContext /*context*/)
                 {
                     DoCastSelf(SPELL_EXPLODE_TRIGGER, true);
+                })
+                .Schedule(3000ms, [this](TaskContext /*context*/)
+                {
                     DoCastSelf(SPELL_INVIS_SELF, true);
                     me->SetAuraStack(SPELL_VISCIDUS_SHRINKS, me, 20);
                     me->LowerPlayerDamageReq(me->GetMaxHealth());
@@ -311,7 +315,7 @@ struct boss_glob_of_viscidus : public ScriptedAI
                 me->GetMotionMaster()->MovePoint(ROOM_CENTER, roomCenter);
                 context.Schedule(1s, [this](TaskContext context)
                     {
-                        me->SetSpeedRate(MOVE_RUN, me->GetSpeedRate(MOVE_RUN) * 2);
+                        me->SetSpeed(MOVE_RUN, me->GetSpeedRate(MOVE_RUN) + 0.2142855f);
                         context.Repeat();
                     });
             });
