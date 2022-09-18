@@ -224,7 +224,7 @@ struct boss_viscidus : public BossAI
         if (summon->GetEntry() != NPC_GLOB_OF_VISCIDUS)
             return;
 
-        if (killer && killer->GetEntry() != NPC_GLOB_OF_VISCIDUS)
+        if (killer && killer->GetEntry() == NPC_GLOB_OF_VISCIDUS)
         {
             int32 heal = me->GetMaxHealth() * 0.05f;
             me->CastCustomSpell(me, SPELL_VISCIDUS_GROWS, &heal, nullptr, nullptr, true);
