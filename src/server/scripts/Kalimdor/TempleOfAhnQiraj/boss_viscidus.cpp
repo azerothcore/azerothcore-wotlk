@@ -86,7 +86,6 @@ enum MovePoints
 enum Misc
 {
     MAX_GLOB_SPAWN             = 20,
-    ACTION_REJOIN              = 1,
 };
 
 Position const roomCenter = { -7992.36f, 908.19f, -52.62f, 1.68f };
@@ -176,22 +175,13 @@ struct boss_viscidus : public BossAI
             Talk(EMOTE_CRACK);
     }
 
-    void DoAction(int32 action) override
-    {
-        if (action != ACTION_REJOIN)
-            return;
-
-        me->RemoveAuraFromStack(SPELL_VISCIDUS_SHRINKS);
-
-        if (_phase == PHASE_GLOB)
-        {
-            _phase = PHASE_FROST;
-            me->RemoveAurasDueToSpell(SPELL_INVIS_SELF);
-        }
-    }
-
     void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
     {
+        if (spell->Id == SPELL_REJOIN_VISCIDUS)
+        {
+            me->RemoveAuraFromStack(SPELL_VISCIDUS_SHRINKS);
+        }
+
         if ((spell->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST) && _phase == PHASE_FROST)
         {
             ++_hitcounter;
@@ -223,6 +213,12 @@ struct boss_viscidus : public BossAI
     {
         if (summon->GetEntry() != NPC_GLOB_OF_VISCIDUS)
             return;
+
+        if (_phase == PHASE_GLOB)
+        {
+            _phase = PHASE_FROST;
+            me->RemoveAurasDueToSpell(SPELL_INVIS_SELF);
+        }
 
         if (killer && killer->GetEntry() == NPC_GLOB_OF_VISCIDUS)
         {
@@ -374,28 +370,6 @@ class spell_explode_trigger : public SpellScript
     }
 };
 
-class spell_rejoin_viscidus : public SpellScript
-{
-    PrepareSpellScript(spell_rejoin_viscidus);
-
-    void HandleScript()
-    {
-        if (Unit* caster = GetCaster())
-        {
-            InstanceScript* instance = caster->GetInstanceScript();
-
-            if (Creature* viscidus = instance->GetCreature(DATA_VISCIDUS))
-                if (viscidus->AI())
-                    viscidus->AI()->DoAction(ACTION_REJOIN);
-        }
-    }
-
-    void Register() override
-    {
-        AfterCast += SpellCastFn(spell_rejoin_viscidus::HandleScript);
-    }
-};
-
 class spell_summon_toxin_slime : public SpellScript
 {
     PrepareSpellScript(spell_summon_toxin_slime);
@@ -418,6 +392,5 @@ void AddSC_boss_viscidus()
     RegisterTempleOfAhnQirajCreatureAI(boss_glob_of_viscidus);
     RegisterTempleOfAhnQirajCreatureAI(npc_toxic_slime);
     RegisterSpellScript(spell_explode_trigger);
-    RegisterSpellScript(spell_rejoin_viscidus);
     RegisterSpellScript(spell_summon_toxin_slime);
 }
