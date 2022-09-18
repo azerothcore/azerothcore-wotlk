@@ -158,12 +158,14 @@ struct boss_viscidus : public BossAI
             me->RemoveAura(SPELL_VISCIDUS_FREEZE);
             me->SetReactState(REACT_PASSIVE);
             me->HandleEmoteCommand(EMOTE_ONESHOT_FLYDEATH); // not found in sniff, this is the best one I found
+            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_FLYDEATH);
             _scheduler.Schedule(3s, [this](TaskContext /*context*/)
                 {
                     DoCastSelf(SPELL_INVIS_SELF, true);
                     me->SetAuraStack(SPELL_VISCIDUS_SHRINKS, me, 20);
                     me->LowerPlayerDamageReq(me->GetMaxHealth());
                     me->SetHealth(me->GetMaxHealth() * 0.01f); // set 1% health
+                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                     DoResetThreat();
                     me->NearTeleportTo(roomCenter.GetPositionX(),
                         roomCenter.GetPositionY(),
