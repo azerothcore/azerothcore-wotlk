@@ -214,14 +214,14 @@ struct boss_viscidus : public BossAI
         if (summon->GetEntry() != NPC_GLOB_OF_VISCIDUS)
             return;
 
-        if (_phase == PHASE_GLOB)
-        {
-            _phase = PHASE_FROST;
-            me->RemoveAurasDueToSpell(SPELL_INVIS_SELF);
-        }
-
         if (killer && killer->GetEntry() == NPC_GLOB_OF_VISCIDUS)
         {
+            if (_phase == PHASE_GLOB)
+            {
+                _phase = PHASE_FROST;
+                me->RemoveAurasDueToSpell(SPELL_INVIS_SELF);
+            }
+
             int32 heal = me->GetMaxHealth() * 0.05f;
             me->CastCustomSpell(me, SPELL_VISCIDUS_GROWS, &heal, nullptr, nullptr, true);
         }
