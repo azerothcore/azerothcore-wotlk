@@ -2708,22 +2708,6 @@ public:
     }
 };
 
-// 71201 - Battle Experience - proc should never happen, handled in script
-class spell_igb_battle_experience_check : public AuraScript
-{
-    PrepareAuraScript(spell_igb_battle_experience_check);
-
-    bool CheckProc(ProcEventInfo& /*eventInfo*/)
-    {
-        return false;
-    }
-
-    void Register() override
-    {
-        DoCheckProc += AuraCheckProcFn(spell_igb_battle_experience_check::CheckProc);
-    }
-};
-
 class achievement_im_on_a_boat : public AchievementCriteriaScript
 {
 public:
