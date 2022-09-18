@@ -156,12 +156,12 @@ struct boss_viscidus : public BossAI
             _phase = PHASE_GLOB;
             me->RemoveAura(SPELL_VISCIDUS_FREEZE);
             DoCastSelf(SPELL_STUN_SELF, true);
-            DoCastSelf(SPELL_EXPLODE_TRIGGER, true);
             me->AttackStop();
             me->CastStop();
             me->HandleEmoteCommand(EMOTE_ONESHOT_FLYDEATH); // not found in sniff, this is the best one I found
-            _scheduler.Schedule(3s, [this](TaskContext /*context*/)
+            _scheduler.Schedule(2500ms, [this](TaskContext /*context*/)
                 {
+                    DoCastSelf(SPELL_EXPLODE_TRIGGER, true);
                     DoCastSelf(SPELL_INVIS_SELF, true);
                     me->SetAuraStack(SPELL_VISCIDUS_SHRINKS, me, 20);
                     me->LowerPlayerDamageReq(me->GetMaxHealth());
