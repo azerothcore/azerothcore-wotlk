@@ -121,6 +121,27 @@ public:
             InstanceScript::OnCreatureCreate(creature);
         }
 
+        void OnGameObjectCreate(GameObject* go) override
+        {
+            switch (go->GetEntry())
+            {
+                case GO_CTHUN_GRASP:
+                    CThunGraspGUIDs.push_back(go->GetGUID());
+                    if (Creature* CThun = instance->GetCreature(CThunGUID))
+                    {
+                        if (!CThun->IsAlive())
+                        {
+                            go->DespawnOrUnsummon(1s);
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            InstanceScript::OnGameObjectCreate(go);
+        }
+
         uint32 GetData(uint32 type) const override
         {
             switch (type)
