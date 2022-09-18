@@ -253,11 +253,11 @@ struct boss_viscidus : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
-        _scheduler.Update(diff);
         if (!UpdateVictim() || !CheckInRoom())
             return;
 
         events.Update(diff);
+        _scheduler.Update(diff);
 
         while (uint32 eventId = events.ExecuteEvent())
         {
