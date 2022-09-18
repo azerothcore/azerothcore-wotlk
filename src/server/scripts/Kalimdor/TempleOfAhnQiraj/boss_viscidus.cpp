@@ -113,6 +113,8 @@ struct boss_viscidus : public BossAI
         _hitcounter = 0;
         _phase = PHASE_FROST;
         events.Reset();
+        me->SetReactState(REACT_AGGRESSIVE);
+        me->SetVisible(true);
         _scheduler.CancelAll();
     }
 
@@ -138,9 +140,10 @@ struct boss_viscidus : public BossAI
             events.Reset();
             _phase = PHASE_GLOB;
             me->SetControlled(true, UNIT_STATE_ROOT);
-            me->HandleEmoteCommand(EMOTE_ONESHOT_FLYDEATH); // not found in sniff, this is the best one I found
             DoCastSelf(SPELL_EXPLODE_TRIGGER, true);
             me->RemoveAura(SPELL_VISCIDUS_FREEZE);
+            me->SetReactState(REACT_PASSIVE);
+            me->HandleEmoteCommand(EMOTE_ONESHOT_FLYDEATH); // not found in sniff, this is the best one I found
             _scheduler.Schedule(3s, [this](TaskContext /*context*/)
                 {
                     me->SetVisible(false);
@@ -206,6 +209,7 @@ struct boss_viscidus : public BossAI
             InitSpells();
             me->SetVisible(true);
             me->SetControlled(false, UNIT_STATE_ROOT);
+            me->SetReactState(REACT_AGGRESSIVE);
         }
     }
 
