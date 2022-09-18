@@ -31,7 +31,7 @@ enum Spells
     SPELL_VISCIDUS_SLOWED       = 26034,
     SPELL_VISCIDUS_SLOWED_MORE  = 26036,
     SPELL_VISCIDUS_FREEZE       = 25937,
-    SPELL_REJOIN_VISCIDUS       = 25896, // Unknown usage
+    SPELL_REJOIN_VISCIDUS       = 25896,
     SPELL_EXPLODE_TRIGGER       = 25938,
     SPELL_VISCIDUS_SHRINKS      = 25893, // Server-side
 
@@ -110,12 +110,18 @@ struct boss_viscidus : public BossAI
     void Reset() override
     {
         BossAI::Reset();
-        _hitcounter = 0;
-        _phase = PHASE_FROST;
         events.Reset();
-        me->SetReactState(REACT_AGGRESSIVE);
-        me->SetVisible(true);
+        SoftReset();
         _scheduler.CancelAll();
+    }
+
+    void SoftReset()
+    {
+        _hitcounter = 0;
+        me->SetControlled(false, UNIT_STATE_ROOT);
+        me->SetReactState(REACT_AGGRESSIVE);
+        _phase = PHASE_FROST;
+        me->SetVisible(true);
     }
 
     void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -147,6 +153,12 @@ struct boss_viscidus : public BossAI
             _scheduler.Schedule(3s, [this](TaskContext /*context*/)
                 {
                     me->SetVisible(false);
+                    me->SetAuraStack(SPELL_VISCIDUS_SHRINKS, me, 20);
+                    DoResetThreat();
+                    me->NearTeleportTo(roomCenter.GetPositionX(),
+                        roomCenter.GetPositionY(),
+                        roomCenter.GetPositionZ(),
+                        roomCenter.GetOrientation());
                 });
         }
         else if (_hitcounter == HITCOUNTER_SHATTER)
@@ -157,7 +169,18 @@ struct boss_viscidus : public BossAI
 
     void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
     {
-        if ((spell->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST) && _phase == PHASE_FROST && me->GetHealthPct() > 5.0f)
+        if (spell->Id == SPELL_REJOIN_VISCIDUS)
+        {
+            me->RemoveAuraFromStack(SPELL_VISCIDUS_SHRINKS);
+
+            if (_phase == PHASE_GLOB)
+            {
+                SoftReset();
+                InitSpells();
+            }
+        }
+
+        if ((spell->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST) && _phase == PHASE_FROST)
         {
             ++_hitcounter;
 
@@ -186,30 +209,19 @@ struct boss_viscidus : public BossAI
 
     void SummonedCreatureDies(Creature* summon, Unit* killer) override
     {
-        if (_phase != PHASE_GLOB || summon->GetEntry() != NPC_GLOB_OF_VISCIDUS)
+        if (summon->GetEntry() != NPC_GLOB_OF_VISCIDUS)
             return;
 
         if (killer && killer->GetEntry() != NPC_GLOB_OF_VISCIDUS)
         {
             uint32 newHealth = me->GetHealth() - (me->GetMaxHealth() / 20);
             me->SetHealth(newHealth <= 0 ? 1 : newHealth);
-            DoCastSelf(SPELL_VISCIDUS_SHRINKS, true);
         }
 
-        if (!summons.IsAnyCreatureWithEntryAlive(NPC_GLOB_OF_VISCIDUS))
+        if (!summons.IsAnyCreatureWithEntryAlive(NPC_GLOB_OF_VISCIDUS) && _phase == PHASE_GLOB) // all globs were killed
         {
-            DoResetThreat();
-            me->NearTeleportTo(roomCenter.GetPositionX(),
-                roomCenter.GetPositionY(),
-                roomCenter.GetPositionZ(),
-                roomCenter.GetOrientation());
-
-            _hitcounter = 0;
-            _phase = PHASE_FROST;
+            SoftReset();
             InitSpells();
-            me->SetVisible(true);
-            me->SetControlled(false, UNIT_STATE_ROOT);
-            me->SetReactState(REACT_AGGRESSIVE);
         }
     }
 
@@ -286,7 +298,7 @@ struct boss_glob_of_viscidus : public ScriptedAI
                 me->GetMotionMaster()->MovePoint(ROOM_CENTER, roomCenter);
                 context.Schedule(1s, [this](TaskContext context)
                     {
-                        me->SetSpeed(MOVE_RUN, me->GetSpeed(MOVE_RUN) * 2);
+                        me->SetSpeedRate(MOVE_RUN, me->GetSpeedRate(MOVE_RUN) * 2);
                         context.Repeat();
                     });
             });
