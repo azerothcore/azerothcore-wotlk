@@ -24,8 +24,10 @@ INSERT INTO `spell_target_position` (`ID`, `MapID`, `PositionX`, `PositionY`, `P
 
 DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_explode_trigger' AND `spell_id` = 25938;
 DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_summon_toxin_slime' AND `spell_id` = 26584;
+DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_rejoin_viscidus' AND `spell_id` = 25896;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (25938, 'spell_explode_trigger'),
+(25896, 'spell_rejoin_viscidus'),
 (26584, 'spell_summon_toxin_slime');
 
 UPDATE `creature_template` SET `flags_extra` = `flags_extra`|1073741824 WHERE `entry` = 15667;

@@ -34,6 +34,7 @@ enum Spells
     SPELL_REJOIN_VISCIDUS       = 25896,
     SPELL_EXPLODE_TRIGGER       = 25938,
     SPELL_VISCIDUS_SHRINKS      = 25893, // Server-side
+    SPELL_INVIS_SELF            = 25905,
 
     // Toxic slime
     SPELL_TOXIN                 = 26575,
@@ -83,7 +84,8 @@ enum MovePoints
 
 enum Misc
 {
-    MAX_GLOB_SPAWN             = 20
+    MAX_GLOB_SPAWN             = 20,
+    ACTION_REJOIN              = 1,
 };
 
 Position const roomCenter = { -7992.36f, 908.19f, -52.62f, 1.68f };
@@ -94,7 +96,10 @@ std::array<uint32, MAX_GLOB_SPAWN> const spawnGlobSpells = { 25865, 25866, 25867
 
 struct boss_viscidus : public BossAI
 {
-    boss_viscidus(Creature* creature) : BossAI(creature, DATA_VISCIDUS) { }
+    boss_viscidus(Creature* creature) : BossAI(creature, DATA_VISCIDUS)
+    {
+        me->LowerPlayerDamageReq(me->GetHealth());
+    }
 
     bool CheckInRoom() override
     {
@@ -113,6 +118,7 @@ struct boss_viscidus : public BossAI
         events.Reset();
         SoftReset();
         _scheduler.CancelAll();
+        me->RemoveAurasDueToSpell(SPELL_VISCIDUS_SHRINKS);
     }
 
     void SoftReset()
@@ -121,7 +127,7 @@ struct boss_viscidus : public BossAI
         me->SetControlled(false, UNIT_STATE_ROOT);
         me->SetReactState(REACT_AGGRESSIVE);
         _phase = PHASE_FROST;
-        me->SetVisible(true);
+        me->RemoveAurasDueToSpell(SPELL_INVIS_SELF);
     }
 
     void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -152,7 +158,7 @@ struct boss_viscidus : public BossAI
             me->HandleEmoteCommand(EMOTE_ONESHOT_FLYDEATH); // not found in sniff, this is the best one I found
             _scheduler.Schedule(3s, [this](TaskContext /*context*/)
                 {
-                    me->SetVisible(false);
+                    DoCastSelf(SPELL_INVIS_SELF, true);
                     me->SetAuraStack(SPELL_VISCIDUS_SHRINKS, me, 20);
                     DoResetThreat();
                     me->NearTeleportTo(roomCenter.GetPositionX(),
@@ -167,19 +173,22 @@ struct boss_viscidus : public BossAI
             Talk(EMOTE_CRACK);
     }
 
+    void DoAction(int32 action) override
+    {
+        if (action != ACTION_REJOIN)
+            return;
+
+        me->RemoveAuraFromStack(SPELL_VISCIDUS_SHRINKS);
+
+        if (_phase == PHASE_GLOB)
+        {
+            SoftReset();
+            InitSpells();
+        }
+    }
+
     void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
     {
-        if (spell->Id == SPELL_REJOIN_VISCIDUS)
-        {
-            me->RemoveAuraFromStack(SPELL_VISCIDUS_SHRINKS);
-
-            if (_phase == PHASE_GLOB)
-            {
-                SoftReset();
-                InitSpells();
-            }
-        }
-
         if ((spell->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST) && _phase == PHASE_FROST)
         {
             ++_hitcounter;
@@ -362,6 +371,28 @@ class spell_explode_trigger : public SpellScript
     }
 };
 
+class spell_rejoin_viscidus : public SpellScript
+{
+    PrepareSpellScript(spell_rejoin_viscidus);
+
+    void HandleScript()
+    {
+        if (Unit* caster = GetCaster())
+        {
+            InstanceScript* instance = caster->GetInstanceScript();
+
+            if (Creature* viscidus = instance->GetCreature(DATA_VISCIDUS))
+                if (viscidus->AI())
+                    viscidus->AI()->DoAction(ACTION_REJOIN);
+        }
+    }
+
+    void Register() override
+    {
+        AfterCast += SpellCastFn(spell_rejoin_viscidus::HandleScript);
+    }
+};
+
 class spell_summon_toxin_slime : public SpellScript
 {
     PrepareSpellScript(spell_summon_toxin_slime);
@@ -384,5 +415,6 @@ void AddSC_boss_viscidus()
     RegisterTempleOfAhnQirajCreatureAI(boss_glob_of_viscidus);
     RegisterTempleOfAhnQirajCreatureAI(npc_toxic_slime);
     RegisterSpellScript(spell_explode_trigger);
+    RegisterSpellScript(spell_rejoin_viscidus);
     RegisterSpellScript(spell_summon_toxin_slime);
 }
