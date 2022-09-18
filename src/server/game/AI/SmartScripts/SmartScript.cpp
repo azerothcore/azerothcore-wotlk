@@ -3431,7 +3431,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                 if (me->IsInRange(me->GetVictim(), (float)e.event.minMaxRepeat.min, (float)e.event.minMaxRepeat.max))
                     ProcessTimedAction(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax, me->GetVictim());
                 else
-                {   
+                {
                     if (!e.event.minMaxRepeat.controller)
                         RecalcTimer(e, 500, 500); // xinef: make it predictable "Malcrom: This seems to be done to standardize min, max start rather than using the range values for the timer."
                     else
