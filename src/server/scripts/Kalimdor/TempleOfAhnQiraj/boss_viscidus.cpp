@@ -318,7 +318,6 @@ struct boss_glob_of_viscidus : public ScriptedAI
         {
             DoCastSelf(SPELL_REJOIN_VISCIDUS);
             Unit::Kill(me, me);
-            me->DespawnOrUnsummon();
         }
     }
 
