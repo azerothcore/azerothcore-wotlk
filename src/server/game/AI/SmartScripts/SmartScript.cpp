@@ -3437,7 +3437,6 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                     else
                         RecalcTimer(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax); // Malcrom: if param5 value is greater than 0 first action will not happen until after repeat timer fires.
                 }
-
                 break;
             }
         case SMART_EVENT_VICTIM_CASTING:
