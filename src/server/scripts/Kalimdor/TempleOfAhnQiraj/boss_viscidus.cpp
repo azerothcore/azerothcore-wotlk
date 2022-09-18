@@ -36,6 +36,7 @@ enum Spells
     SPELL_VISCIDUS_SHRINKS      = 25893, // Server-side
     SPELL_INVIS_SELF            = 25905,
     SPELL_VISCIDUS_GROWS        = 25897,
+    SPELL_STUN_SELF             = 25900,
 
     // Toxic slime
     SPELL_TOXIN                 = 26575,
@@ -124,7 +125,7 @@ struct boss_viscidus : public BossAI
     void SoftReset()
     {
         _hitcounter = 0;
-        me->SetControlled(false, UNIT_STATE_ROOT);
+        me->RemoveAurasDueToSpell(SPELL_STUN_SELF);
         me->SetReactState(REACT_AGGRESSIVE);
         _phase = PHASE_FROST;
         me->RemoveAurasDueToSpell(SPELL_INVIS_SELF);
@@ -152,7 +153,7 @@ struct boss_viscidus : public BossAI
             Talk(EMOTE_EXPLODE);
             events.Reset();
             _phase = PHASE_GLOB;
-            me->SetControlled(true, UNIT_STATE_ROOT);
+            DoCastSelf(SPELL_STUN_SELF, true);
             DoCastSelf(SPELL_EXPLODE_TRIGGER, true);
             me->RemoveAura(SPELL_VISCIDUS_FREEZE);
             me->SetReactState(REACT_PASSIVE);
