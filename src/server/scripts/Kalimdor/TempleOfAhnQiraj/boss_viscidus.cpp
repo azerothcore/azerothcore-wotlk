@@ -161,6 +161,7 @@ struct boss_viscidus : public BossAI
                 {
                     DoCastSelf(SPELL_INVIS_SELF, true);
                     me->SetAuraStack(SPELL_VISCIDUS_SHRINKS, me, 20);
+                    me->LowerPlayerDamageReq(me->GetMaxHealth());
                     me->SetHealth(me->GetMaxHealth() * 0.01f); // set 1% health
                     DoResetThreat();
                     me->NearTeleportTo(roomCenter.GetPositionX(),
@@ -230,6 +231,7 @@ struct boss_viscidus : public BossAI
         {
             SoftReset();
             InitSpells();
+            me->LowerPlayerDamageReq(me->GetMaxHealth());
         }
     }
 
