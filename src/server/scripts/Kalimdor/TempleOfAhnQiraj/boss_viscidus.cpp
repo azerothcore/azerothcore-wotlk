@@ -286,7 +286,7 @@ struct boss_glob_of_viscidus : public ScriptedAI
                 me->GetMotionMaster()->MovePoint(ROOM_CENTER, roomCenter);
                 context.Schedule(1s, [this](TaskContext context)
                     {
-                        me->SetSpeedRate(MOVE_RUN, me->GetSpeedRate(MOVE_RUN) + 1.5f);
+                        me->SetSpeed(MOVE_RUN, me->GetSpeed(MOVE_RUN) * 2);
                         context.Repeat();
                     });
             });
