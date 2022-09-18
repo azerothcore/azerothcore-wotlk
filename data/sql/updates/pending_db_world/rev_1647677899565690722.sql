@@ -1065,7 +1065,6 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (71519,  'spell_item_deathbringers_will_normal'),
 (71562,  'spell_item_deathbringers_will_heroic'),
 
-(71201,  'spell_igb_battle_experience_check'),
 (61685,  'spell_pet_charge'),
 (-49200,  'spell_dk_acclimation'),
 (70656,  'spell_dk_advantage_t10_4p'),
