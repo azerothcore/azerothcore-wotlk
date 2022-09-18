@@ -33,10 +33,10 @@ ObjectData const creatureData[] =
 
 DoorData const doorData[] =
 {
-    { AQ40_DOOR_SKERAM, DATA_SKERAM, DOOR_TYPE_PASSAGE },
+    { AQ40_DOOR_SKERAM,      DATA_SKERAM,        DOOR_TYPE_PASSAGE },
     { AQ40_DOOR_TE_ENTRANCE, DATA_TWIN_EMPERORS, DOOR_TYPE_ROOM },
-    { AQ40_DOOR_TE_EXIT, DATA_TWIN_EMPERORS, DOOR_TYPE_PASSAGE },
-    { 0, 0, DOOR_TYPE_ROOM}
+    { AQ40_DOOR_TE_EXIT,     DATA_TWIN_EMPERORS, DOOR_TYPE_PASSAGE },
+    { 0,                     0,                  DOOR_TYPE_ROOM}
 };
 
 class instance_temple_of_ahnqiraj : public InstanceMapScript
