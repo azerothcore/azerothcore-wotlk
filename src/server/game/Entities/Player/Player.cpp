@@ -15517,9 +15517,13 @@ void Player::_SaveInstanceTimeRestrictions(CharacterDatabaseTransaction trans)
 
 bool Player::IsInWhisperWhiteList(ObjectGuid guid)
 {
-    for (WhisperListContainer::const_iterator itr = WhisperList.begin(); itr != WhisperList.end(); ++itr)
-        if (*itr == guid)
+    for (auto const& itr : WhisperList)
+    {
+        if (itr == guid)
+        {
             return true;
+        }
+    }
 
     return false;
 }
