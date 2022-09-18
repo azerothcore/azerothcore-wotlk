@@ -130,7 +130,7 @@ struct boss_viscidus : public BossAI
         me->RemoveAurasDueToSpell(SPELL_INVIS_SELF);
     }
 
-    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType effType, SpellSchoolMask) override
     {
         if (me->HealthBelowPct(5))
             damage = 0;
@@ -138,7 +138,8 @@ struct boss_viscidus : public BossAI
         if (!attacker || _phase != PHASE_MELEE)
             return;
 
-        ++_hitcounter;
+        if (effType == DIRECT_DAMAGE)
+            ++_hitcounter;
 
         if (attacker->HasUnitState(UNIT_STATE_MELEE_ATTACKING) && _hitcounter >= HITCOUNTER_EXPLODE)
         {
