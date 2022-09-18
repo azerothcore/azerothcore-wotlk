@@ -35,6 +35,7 @@ enum Spells
     SPELL_EXPLODE_TRIGGER       = 25938,
     SPELL_VISCIDUS_SHRINKS      = 25893, // Server-side
     SPELL_INVIS_SELF            = 25905,
+    SPELL_VISCIDUS_GROWS        = 25897,
 
     // Toxic slime
     SPELL_TOXIN                 = 26575,
@@ -98,7 +99,7 @@ struct boss_viscidus : public BossAI
 {
     boss_viscidus(Creature* creature) : BossAI(creature, DATA_VISCIDUS)
     {
-        me->LowerPlayerDamageReq(me->GetHealth());
+        me->LowerPlayerDamageReq(me->GetMaxHealth());
     }
 
     bool CheckInRoom() override
@@ -145,7 +146,7 @@ struct boss_viscidus : public BossAI
         {
             if (me->GetHealthPct() <= 5.f)
             {
-                Unit::Kill(me, me);
+                Unit::Kill(attacker, me);
                 return;
             }
 
@@ -161,6 +162,7 @@ struct boss_viscidus : public BossAI
                 {
                     DoCastSelf(SPELL_INVIS_SELF, true);
                     me->SetAuraStack(SPELL_VISCIDUS_SHRINKS, me, 20);
+                    me->SetHealth(me->GetMaxHealth() * 0.01f); // set 1% health
                     DoResetThreat();
                     me->NearTeleportTo(roomCenter.GetPositionX(),
                         roomCenter.GetPositionY(),
@@ -183,8 +185,8 @@ struct boss_viscidus : public BossAI
 
         if (_phase == PHASE_GLOB)
         {
-            SoftReset();
-            InitSpells();
+            _phase = PHASE_FROST;
+            me->RemoveAurasDueToSpell(SPELL_INVIS_SELF);
         }
     }
 
@@ -224,11 +226,11 @@ struct boss_viscidus : public BossAI
 
         if (killer && killer->GetEntry() != NPC_GLOB_OF_VISCIDUS)
         {
-            uint32 newHealth = me->GetHealth() - (me->GetMaxHealth() / 20);
-            me->SetHealth(newHealth <= 0 ? 1 : newHealth);
+            int32 heal = me->GetMaxHealth() * 0.05f;
+            me->CastCustomSpell(me, SPELL_VISCIDUS_GROWS, &heal, nullptr, nullptr, true);
         }
 
-        if (!summons.IsAnyCreatureWithEntryAlive(NPC_GLOB_OF_VISCIDUS) && _phase == PHASE_GLOB) // all globs were killed
+        if (!summons.IsAnyCreatureWithEntryAlive(NPC_GLOB_OF_VISCIDUS)) // all globs were killed
         {
             SoftReset();
             InitSpells();
@@ -282,7 +284,7 @@ struct boss_viscidus : public BossAI
             }
         }
 
-        if (_phase != PHASE_GLOB)
+        if (_phase != PHASE_GLOB && me->GetReactState() == REACT_AGGRESSIVE)
             DoMeleeAttackIfReady();
     }
 
