@@ -3424,25 +3424,25 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                 break;
             }
         case SMART_EVENT_RANGE:
-        {
-            if (!me || !me->IsEngaged() || !me->GetVictim())
-                return;
-
-            if (me->IsInRange(me->GetVictim(), (float)e.event.rangeRepeat.minRange, (float)e.event.rangeRepeat.maxRange))
             {
-                if (e.event.rangeRepeat.onlyFireOnRepeat == 2)
+                if (!me || !me->IsEngaged() || !me->GetVictim())
+                    return;
+
+                if (me->IsInRange(me->GetVictim(), (float)e.event.rangeRepeat.minRange, (float)e.event.rangeRepeat.maxRange))
                 {
-                    e.event.rangeRepeat.onlyFireOnRepeat = 1;
-                    RecalcTimer(e, e.event.rangeRepeat.repeatMin, e.event.rangeRepeat.repeatMax);
+                    if (e.event.rangeRepeat.onlyFireOnRepeat == 2)
+                    {
+                        e.event.rangeRepeat.onlyFireOnRepeat = 1;
+                        RecalcTimer(e, e.event.rangeRepeat.repeatMin, e.event.rangeRepeat.repeatMax);
+                    }
+                    else
+                        ProcessTimedAction(e, e.event.rangeRepeat.repeatMin, e.event.rangeRepeat.repeatMax, me->GetVictim());
                 }
                 else
-                    ProcessTimedAction(e, e.event.rangeRepeat.repeatMin, e.event.rangeRepeat.repeatMax, me->GetVictim());
-            }
-            else
-                RecalcTimer(e, 500, 500); // make it predictable
+                    RecalcTimer(e, 500, 500); // make it predictable
 
-            break;
-        }
+                break;
+            }
         case SMART_EVENT_VICTIM_CASTING:
             {
                 if (!me || !me->IsEngaged())
