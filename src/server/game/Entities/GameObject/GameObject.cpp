@@ -1744,11 +1744,13 @@ void GameObject::Use(Unit* user)
 
                             LOG_DEBUG("entities.gameobject", "Fishing check (skill: {} zone min skill: {} chance {} roll: {}", skill, zone_skill, chance, roll);
 
+                            if (sScriptMgr->OnUpdateFishingSkill(player, skill, zone_skill, chance, roll))
+                            {
+                                player->UpdateFishingSkill();
+                            }
                             // but you will likely cause junk in areas that require a high fishing skill (not yet implemented)
                             if (chance >= roll)
                             {
-                                player->UpdateFishingSkill();
-
                                 //TODO: I do not understand this hack. Need some explanation.
                                 // prevent removing GO at spell cancel
                                 RemoveFromOwner();
