@@ -1461,7 +1461,7 @@ public:
     virtual void OnFailedPasswordChange(uint32 /*accountId*/) { }
 
     // Called when creating a character on the Account
-    [[nodiscard]] virtual bool CanAccountCreateCharacter(std::shared_ptr<CharacterCreateInfo> /*createInfo*/, uint32 /*accountId*/) { return true;}
+    [[nodiscard]] virtual bool CanAccountCreateCharacter(uint32 /*accountId*/, uint8 /*charRace*/, uint8 /*charClass*/) { return true;}
 };
 
 class GuildScript : public ScriptObject
@@ -2360,7 +2360,7 @@ public: /* AccountScript */
     void OnFailedEmailChange(uint32 accountId);
     void OnPasswordChange(uint32 accountId);
     void OnFailedPasswordChange(uint32 accountId);
-    bool CanAccountCreateCharacter(std::shared_ptr<CharacterCreateInfo> createInfo, uint32 accountId);
+    bool CanAccountCreateCharacter(uint32 accountId, uint8 charRace, uint8 charClass);
 
 public: /* GuildScript */
     void OnGuildAddMember(Guild* guild, Player* player, uint8& plRank);
