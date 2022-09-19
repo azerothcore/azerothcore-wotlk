@@ -73,6 +73,7 @@ class Vehicle;
 class WorldObject;
 class WorldPacket;
 class WorldSocket;
+class CharacterCreateInfo;
 
 struct AchievementCriteriaData;
 struct AuctionEntry;
@@ -1458,6 +1459,9 @@ public:
 
     // Called when Password failed to change for Account
     virtual void OnFailedPasswordChange(uint32 /*accountId*/) { }
+
+    // Called when creating a character on the Account
+    [[nodiscard]] virtual bool CanAccountCreateCharacter(std::shared_ptr<CharacterCreateInfo> /*createInfo*/, uint32 /*accountId*/) { return true;}
 };
 
 class GuildScript : public ScriptObject
@@ -2356,6 +2360,7 @@ public: /* AccountScript */
     void OnFailedEmailChange(uint32 accountId);
     void OnPasswordChange(uint32 accountId);
     void OnFailedPasswordChange(uint32 accountId);
+    bool CanAccountCreateCharacter(std::shared_ptr<CharacterCreateInfo> createInfo, uint32 accountId);
 
 public: /* GuildScript */
     void OnGuildAddMember(Guild* guild, Player* player, uint8& plRank);
