@@ -3424,21 +3424,25 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                 break;
             }
         case SMART_EVENT_RANGE:
-            {
-                if (!me || !me->IsEngaged() || !me->GetVictim())
-                    return;
+        {
+            if (!me || !me->IsEngaged() || !me->GetVictim())
+                return;
 
-                if (me->IsInRange(me->GetVictim(), (float)e.event.minMaxRepeat.min, (float)e.event.minMaxRepeat.max))
-                    ProcessTimedAction(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax, me->GetVictim());
-                else
+            if (me->IsInRange(me->GetVictim(), (float)e.event.rangeRepeat.minRange, (float)e.event.rangeRepeat.maxRange))
+            {
+                if (e.event.rangeRepeat.onlyFireOnRepeat == 2)
                 {
-                    if (!e.event.minMaxRepeat.controller)
-                        RecalcTimer(e, 500, 500); // xinef: make it predictable "Malcrom: This seems to be done to standardize min, max start rather than using the range values for the timer."
-                    else
-                        RecalcTimer(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax); // Malcrom: if param5 value is greater than 0 first action will not happen until after repeat timer fires.
+                    e.event.rangeRepeat.onlyFireOnRepeat = 1;
+                    RecalcTimer(e, e.event.rangeRepeat.repeatMin, e.event.rangeRepeat.repeatMax);
                 }
-                break;
+                else
+                    ProcessTimedAction(e, e.event.rangeRepeat.repeatMin, e.event.rangeRepeat.repeatMax, me->GetVictim());
             }
+            else
+                RecalcTimer(e, 500, 500); // make it predictable
+
+            break;
+        }
         case SMART_EVENT_VICTIM_CASTING:
             {
                 if (!me || !me->IsEngaged())
@@ -4000,6 +4004,13 @@ void SmartScript::InitTimer(SmartScriptHolder& e)
     switch (e.GetEventType())
     {
         //set only events which have initial timers
+        case SMART_EVENT_RANGE:
+            // If onlyFireOnRepeat is true set to 2 before entering combat. Will be set back to 1 after entering combat to ignore initial firing.
+            if (e.event.rangeRepeat.onlyFireOnRepeat == 1)
+                e.event.rangeRepeat.onlyFireOnRepeat = 2;
+            // make it predictable
+            RecalcTimer(e, 500, 500);
+            break;
         case SMART_EVENT_NEAR_PLAYERS:
         case SMART_EVENT_NEAR_PLAYERS_NEGATION:
             RecalcTimer(e, e.event.nearPlayer.firstTimer, e.event.nearPlayer.firstTimer);
