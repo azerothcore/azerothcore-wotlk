@@ -1,3 +1,4 @@
+-- DB update 2022_09_19_02 -> 2022_09_19_03
 --
 -- Add missing quest greetings from 1.13 sniffs.
 DELETE FROM `quest_greeting` WHERE `ID` IN (661, 1377, 2487, 3050, 4047, 5393, 5637, 6868, 8256, 8379, 10428, 1738, 138492, 2277, 5888, 6169, 6946, 7802);
