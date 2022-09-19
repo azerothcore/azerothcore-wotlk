@@ -169,6 +169,7 @@ ProcEventInfo::ProcEventInfo(Unit* actor, Unit* actionTarget, Unit* procTarget, 
     : _actor(actor), _actionTarget(actionTarget), _procTarget(procTarget), _typeMask(typeMask), _spellTypeMask(spellTypeMask), _spellPhaseMask(spellPhaseMask),
       _hitMask(hitMask), _spell(spell), _damageInfo(damageInfo), _healInfo(healInfo), _triggeredByAuraSpell(triggeredByAuraSpell), _procAuraEffectIndex(procAuraEffectIndex)
 {
+    _chance.reset();
 }
 
 SpellInfo const* ProcEventInfo::GetSpellInfo() const
@@ -15869,18 +15870,29 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
         if (!active && !isVictim && !(procFlag & PROC_FLAG_DONE_PERIODIC) && procSpellInfo && procSpellInfo->SpellFamilyName && (procSpellInfo->HasAura(SPELL_AURA_PERIODIC_DAMAGE) || procSpellInfo->HasAura(SPELL_AURA_PERIODIC_HEAL)))
             active = true;
 
-        if (!IsTriggeredAtSpellProcEvent(target, triggerData.aura, attType, isVictim, active, triggerData.spellProcEvent, eventInfo))
+        // AuraScript Hook
+        if (!triggerData.aura->CallScriptCheckProcHandlers(itr->second, eventInfo))
+        {
             continue;
+        }
+
+        bool isTriggeredAtSpellProcEvent = IsTriggeredAtSpellProcEvent(target, triggerData.aura, attType, isVictim, active, triggerData.spellProcEvent, eventInfo);
+
+        // AuraScript Hook
+        triggerData.aura->CallScriptCheckAfterProcHandlers(itr->second, eventInfo);
+
+        if (!isTriggeredAtSpellProcEvent)
+        {
+            continue;
+        }
 
         // do checks using conditions table
         ConditionList conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_SPELL_PROC, spellProto->Id);
         ConditionSourceInfo condInfo = ConditionSourceInfo(eventInfo.GetActor(), eventInfo.GetActionTarget());
         if (!sConditionMgr->IsObjectMeetToConditions(condInfo, conditions))
+        {
             continue;
-
-        // AuraScript Hook
-        if (!triggerData.aura->CallScriptCheckProcHandlers(itr->second, eventInfo))
-            continue;
+        }
 
         // Triggered spells not triggering additional spells
         //bool triggered = !spellProto->HasAttribute(SPELL_ATTR3_CAN_PROC_FROM_PROCS) ?
@@ -17181,11 +17193,17 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, WeaponAttackTyp
             }
     }
 
+    if (eventInfo.GetProcChance())
+    {
+        chance = *eventInfo.GetProcChance();
+    }
+
     // Apply chance modifer aura
     if (Player* modOwner = GetSpellModOwner())
     {
         modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_CHANCE_OF_SUCCESS, chance);
     }
+
     return roll_chance_f(chance);
 }
 

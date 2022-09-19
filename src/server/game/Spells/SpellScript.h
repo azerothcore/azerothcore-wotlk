@@ -499,6 +499,7 @@ enum AuraScriptHookType
     AURA_SCRIPT_HOOK_AFTER_DISPEL,
     // Spell Proc Hooks
     AURA_SCRIPT_HOOK_CHECK_PROC,
+    AURA_SCRIPT_HOOK_CHECK_AFTER_PROC,
     AURA_SCRIPT_HOOK_PREPARE_PROC,
     AURA_SCRIPT_HOOK_PROC,
     AURA_SCRIPT_HOOK_EFFECT_PROC,
@@ -804,6 +805,10 @@ public:
     // example: DoCheckProc += AuraCheckProcFn(class::function);
     // where function is: bool function (ProcEventInfo& eventInfo);
     HookList<CheckProcHandler> DoCheckProc;
+    // executed when aura checks if it can proc
+    // example: DoCheckAfterProc += AuraCheckProcFn(class::function);
+    // where function is: bool function (ProcEventInfo& eventInfo);
+    HookList<CheckProcHandler> DoCheckAfterProc;
 #define AuraCheckProcFn(F) CheckProcHandlerFunction(&F)
 
     // executed before aura procs (possibility to prevent charge drop/cooldown)

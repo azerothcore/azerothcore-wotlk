@@ -36,18 +36,7 @@ enum Spells
     SPELL_EXPLODE                       = 25699,
     SPELL_SUMMON_WARRIOR                = 17431,
     SPELL_SUMMON_SWARMGUARD             = 17430,
-
-    SPELL_FEAR                          = 26070,
-    SPELL_ENTAGLING_ROOTS               = 26071,
-    SPELL_SILENCE                       = 26069,
-    SPELL_DUST_CLOUD                    = 26072,
-    SPELL_FIRE_NOVA                     = 26073,
-
     SPELL_SUMMON_LARGE_OBSIDIAN_CHUNK   = 27630, // Server-side
-
-    SPELL_SHOCK_BLAST                   = 26458,
-    SPELL_DRAIN_MANA                    = 25671,
-    SPELL_DRAIN_MANA_VISUAL             = 26639,
 
     TALK_ENRAGE                         = 0,
 
@@ -55,6 +44,22 @@ enum Spells
     SPELL_VEKNISS_CATALYST              = 26078,
     SPELL_STINGER_CHARGE_NORMAL         = 26081,
     SPELL_STINGER_CHARGE_BUFFED         = 26082,
+
+    // Obsidian Eradicator
+    SPELL_SHOCK_BLAST                   = 26458,
+    SPELL_DRAIN_MANA                    = 25671,
+    SPELL_DRAIN_MANA_VISUAL             = 26639,
+
+    // Anubisath Warder
+    SPELL_FEAR                          = 26070,
+    SPELL_ENTAGLING_ROOTS               = 26071,
+    SPELL_SILENCE                       = 26069,
+    SPELL_DUST_CLOUD                    = 26072,
+    SPELL_FIRE_NOVA                     = 26073,
+
+    // Obsidian Nullifier
+    SPELL_NULLIFY                       = 26552,
+    SPELL_CLEAVE                        = 40504
 };
 
 struct npc_anubisath_defender : public ScriptedAI
@@ -220,38 +225,6 @@ private:
     TaskScheduler _scheduler;
 };
 
-enum NPCs
-{
-    NPC_VEKNISS_DRONE   = 15300
-};
-
-class spell_aggro_drones : public SpellScript
-{
-    PrepareSpellScript(spell_aggro_drones);
-
-    void HandleDummy(SpellEffIndex /*effIndex*/)
-    {
-        if (Unit* caster = GetCaster())
-        {
-            if (Creature* target = GetHitCreature())
-            {
-                if (target->GetEntry() == NPC_VEKNISS_DRONE)
-                {
-                    if (Unit* victim = caster->GetVictim())
-                    {
-                        target->AI()->AttackStart(victim);
-                    }
-                }
-            }
-        }
-    }
-
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_aggro_drones::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-    }
-};
-
 struct npc_obsidian_eradicator : public ScriptedAI
 {
     npc_obsidian_eradicator(Creature* creature) : ScriptedAI(creature)
@@ -314,27 +287,6 @@ struct npc_obsidian_eradicator : public ScriptedAI
 private:
     TaskScheduler _scheduler;
     std::list<Player*> _targets;
-};
-
-class spell_drain_mana : public SpellScript
-{
-    PrepareSpellScript(spell_drain_mana);
-
-    void HandleScript(SpellEffIndex /*effIndex*/)
-    {
-        if (Unit* caster = GetCaster())
-        {
-            if (Unit* target = GetHitUnit())
-            {
-                target->CastSpell(caster, SPELL_DRAIN_MANA_VISUAL, true);
-            }
-        }
-    }
-
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_drain_mana::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
-    }
 };
 
 struct npc_anubisath_warder : public ScriptedAI
@@ -406,12 +358,132 @@ private:
     TaskScheduler _scheduler;
 };
 
+struct npc_obsidian_nullifier : public ScriptedAI
+{
+    npc_obsidian_nullifier(Creature* creature) : ScriptedAI(creature)
+    {
+    }
+
+    void Reset() override
+    {
+        _scheduler.CancelAll();
+        me->SetPower(POWER_MANA, 0);
+        _targets.clear();
+    }
+
+    void EnterCombat(Unit* /*who*/) override
+    {
+        _scheduler.Schedule(6s, [this](TaskContext context)
+        {
+            if (_targets.empty())
+            {
+                Map::PlayerList const& players = me->GetMap()->GetPlayers();
+                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                {
+                    if (Player* player = itr->GetSource())
+                    {
+                        if (player->IsAlive() && !player->IsGameMaster() && !player->IsSpectator() && player->GetPower(POWER_MANA) > 0)
+                        {
+                            _targets.push_back(player);
+                        }
+                    }
+                }
+
+                Acore::Containers::RandomResize(_targets, 11);
+            }
+
+            for (Unit* target : _targets)
+            {
+                DoCast(target, SPELL_DRAIN_MANA, true);
+            }
+
+            if (me->GetPowerPct(POWER_MANA) >= 100.f)
+            {
+                DoCastAOE(SPELL_NULLIFY, true);
+            }
+
+            context.Repeat(6s);
+        })
+        .Schedule(6000ms, 8400ms, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_CLEAVE, true);
+            context.Repeat(6000ms, 8400ms);
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+        {
+            return;
+        }
+
+        _scheduler.Update(diff,
+            std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
+    }
+
+private:
+    TaskScheduler _scheduler;
+    std::list<Player*> _targets;
+};
+
+enum NPCs
+{
+    NPC_VEKNISS_DRONE   = 15300
+};
+
+class spell_aggro_drones : public SpellScript
+{
+    PrepareSpellScript(spell_aggro_drones);
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            if (Creature* target = GetHitCreature())
+            {
+                if (target->GetEntry() == NPC_VEKNISS_DRONE)
+                {
+                    if (Unit* victim = caster->GetVictim())
+                    {
+                        target->AI()->AttackStart(victim);
+                    }
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_aggro_drones::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+class spell_nullify : public AuraScript
+{
+    PrepareAuraScript(spell_nullify);
+
+    void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* target = GetTarget())
+        {
+            target->SetHealth(1);
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_nullify::HandleApply, EFFECT_1, SPELL_AURA_SCHOOL_IMMUNITY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_temple_of_ahnqiraj()
 {
     RegisterTempleOfAhnQirajCreatureAI(npc_anubisath_defender);
     RegisterTempleOfAhnQirajCreatureAI(npc_vekniss_stinger);
-    RegisterSpellScript(spell_aggro_drones);
     RegisterTempleOfAhnQirajCreatureAI(npc_obsidian_eradicator);
-    RegisterSpellScript(spell_drain_mana);
     RegisterTempleOfAhnQirajCreatureAI(npc_anubisath_warder);
+    RegisterTempleOfAhnQirajCreatureAI(npc_obsidian_nullifier);
+    RegisterSpellScript(spell_aggro_drones);
+    RegisterSpellScript(spell_nullify);
 }

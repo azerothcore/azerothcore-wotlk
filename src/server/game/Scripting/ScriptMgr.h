@@ -73,6 +73,7 @@ class Vehicle;
 class WorldObject;
 class WorldPacket;
 class WorldSocket;
+class CharacterCreateInfo;
 
 struct AchievementCriteriaData;
 struct AuctionEntry;
@@ -1251,6 +1252,8 @@ public:
 
     virtual void OnGetMaxSkillValue(Player* /*player*/, uint32 /*skill*/, int32& /*result*/, bool /*IsPure*/) { }
 
+    [[nodiscard]] virtual bool OnUpdateFishingSkill(Player* /*player*/, int32 /*skill*/, int32 /*zone_skill*/, int32 /*chance*/, int32 /*roll*/) { return true; }
+
     [[nodiscard]] virtual bool CanAreaExploreAndOutdoor(Player* /*player*/) { return true; }
 
     virtual void OnVictimRewardBefore(Player* /*player*/, Player* /*victim*/, uint32& /*killer_title*/, uint32& /*victim_title*/) { }
@@ -1458,6 +1461,9 @@ public:
 
     // Called when Password failed to change for Account
     virtual void OnFailedPasswordChange(uint32 /*accountId*/) { }
+
+    // Called when creating a character on the Account
+    [[nodiscard]] virtual bool CanAccountCreateCharacter(std::shared_ptr<CharacterCreateInfo> /*createInfo*/, uint32 /*accountId*/) { return true;}
 };
 
 class GuildScript : public ScriptObject
@@ -2330,6 +2336,7 @@ public: /* PlayerScript */
     void OnDeleteFromDB(CharacterDatabaseTransaction trans, uint32 guid);
     bool CanRepopAtGraveyard(Player* player);
     void OnGetMaxSkillValue(Player* player, uint32 skill, int32& result, bool IsPure);
+    bool OnUpdateFishingSkill(Player* player, int32 skill, int32 zone_skill, int32 chance, int32 roll);
     bool CanAreaExploreAndOutdoor(Player* player);
     void OnVictimRewardBefore(Player* player, Player* victim, uint32& killer_title, uint32& victim_title);
     void OnVictimRewardAfter(Player* player, Player* victim, uint32& killer_title, uint32& victim_rank, float& honor_f);
@@ -2394,6 +2401,7 @@ public: /* AccountScript */
     void OnFailedEmailChange(uint32 accountId);
     void OnPasswordChange(uint32 accountId);
     void OnFailedPasswordChange(uint32 accountId);
+    bool CanAccountCreateCharacter(std::shared_ptr<CharacterCreateInfo> createInfo, uint32 accountId);
 
 public: /* GuildScript */
     void OnGuildAddMember(Guild* guild, Player* player, uint8& plRank);
