@@ -81,6 +81,7 @@ public:
             {
                 case NPC_SKERAM:
                     SkeramGUID = creature->GetGUID();
+                    break;
                 case NPC_VEM:
                     VemGUID = creature->GetGUID();
                     break;
