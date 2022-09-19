@@ -3428,10 +3428,19 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                 if (!me || !me->IsEngaged() || !me->GetVictim())
                     return;
 
-                if (me->IsInRange(me->GetVictim(), (float)e.event.minMaxRepeat.min, (float)e.event.minMaxRepeat.max))
-                    ProcessTimedAction(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax, me->GetVictim());
-                else // xinef: make it predictable
-                    RecalcTimer(e, 500, 500);
+                if (me->IsInRange(me->GetVictim(), (float)e.event.rangeRepeat.minRange, (float)e.event.rangeRepeat.maxRange))
+                {
+                    if (e.event.rangeRepeat.onlyFireOnRepeat == 2)
+                    {
+                        e.event.rangeRepeat.onlyFireOnRepeat = 1;
+                        RecalcTimer(e, e.event.rangeRepeat.repeatMin, e.event.rangeRepeat.repeatMax);
+                    }
+                    else
+                        ProcessTimedAction(e, e.event.rangeRepeat.repeatMin, e.event.rangeRepeat.repeatMax, me->GetVictim());
+                }
+                else
+                    RecalcTimer(e, 500, 500); // make it predictable
+
                 break;
             }
         case SMART_EVENT_VICTIM_CASTING:
@@ -3995,6 +4004,13 @@ void SmartScript::InitTimer(SmartScriptHolder& e)
     switch (e.GetEventType())
     {
         //set only events which have initial timers
+        case SMART_EVENT_RANGE:
+            // If onlyFireOnRepeat is true set to 2 before entering combat. Will be set back to 1 after entering combat to ignore initial firing.
+            if (e.event.rangeRepeat.onlyFireOnRepeat == 1)
+                e.event.rangeRepeat.onlyFireOnRepeat = 2;
+            // make it predictable
+            RecalcTimer(e, 500, 500);
+            break;
         case SMART_EVENT_NEAR_PLAYERS:
         case SMART_EVENT_NEAR_PLAYERS_NEGATION:
             RecalcTimer(e, e.event.nearPlayer.firstTimer, e.event.nearPlayer.firstTimer);
@@ -4052,6 +4068,13 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
                     return;
                 }
             }
+        }
+
+        // Delay flee for assist event if casting
+        if (e.GetActionType() == SMART_ACTION_FLEE_FOR_ASSIST && me && me->HasUnitState(UNIT_STATE_CASTING))
+        {
+            e.timer = 1;
+            return;
         }
 
         e.active = true;//activate events with cooldown
