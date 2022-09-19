@@ -1,3 +1,4 @@
+-- DB update 2022_09_19_03 -> 2022_09_19_04
 --
 -- New Gameobject Finds Spuh 01 + Cookpot
 SET @OGUID :=7080;
