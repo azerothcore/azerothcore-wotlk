@@ -276,7 +276,7 @@ public:
     void JustDied(Unit* killer) override
     {
         instance->SetData(DATA_BUG_TRIO_DEATH, 1);
-        if (instance->GetData(DATA_BUG_TRIO_DEATH) < 2)
+        if (instance->GetData(DATA_BUG_TRIO_DEATH) < 3)
         {
             me->RemoveDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
             return;
