@@ -736,6 +736,9 @@ bool AuraScript::_Validate(SpellInfo const* entry)
     for (std::list<CheckEffectProcHandler>::iterator itr = DoCheckEffectProc.begin(); itr != DoCheckEffectProc.end(); ++itr)
         if (!itr->GetAffectedEffectsMask(entry))
             LOG_ERROR("spells.scripts", "Spell `{}` Effect `{}` of script `{}` did not match dbc effect data - handler bound to hook `DoCheckEffectProc` of AuraScript won't be executed", entry->Id, (*itr).ToString(), m_scriptName->c_str());
+    for (std::list<CheckProcHandler>::iterator itr = DoCheckAfterProc.begin(); itr != DoCheckAfterProc.end(); ++itr)
+        if (!entry->HasEffect(SPELL_EFFECT_APPLY_AURA) && !entry->HasAreaAuraEffect())
+            LOG_ERROR("spells.scripts", "Spell `{}` of script `{}` does not have apply aura effect - handler bound to hook `DoCheckAfterProc` of AuraScript won't be executed", entry->Id, m_scriptName->c_str());
 
     for (std::list<AuraProcHandler>::iterator itr = DoPrepareProc.begin(); itr != DoPrepareProc.end(); ++itr)
         if (!entry->HasEffect(SPELL_EFFECT_APPLY_AURA) && !entry->HasAreaAuraEffect())
@@ -1179,6 +1182,7 @@ Unit* AuraScript::GetTarget() const
         case AURA_SCRIPT_HOOK_EFFECT_SPLIT:
         case AURA_SCRIPT_HOOK_CHECK_PROC:
         case AURA_SCRIPT_HOOK_CHECK_EFFECT_PROC:
+        case AURA_SCRIPT_HOOK_CHECK_AFTER_PROC:
         case AURA_SCRIPT_HOOK_PREPARE_PROC:
         case AURA_SCRIPT_HOOK_PROC:
         case AURA_SCRIPT_HOOK_AFTER_PROC:

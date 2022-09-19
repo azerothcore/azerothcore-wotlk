@@ -2842,7 +2842,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
 
             if (m_caster->IsAlive())
             {
-                healthGain = m_caster->SpellHealingBonusDone(m_caster, m_spellInfo, healthGain, HEAL);
+                healthGain = m_caster->SpellHealingBonusDone(m_caster, m_spellInfo, healthGain, HEAL, effIndex);
                 healthGain = m_caster->SpellHealingBonusTaken(m_caster, m_spellInfo, healthGain, HEAL);
 
                 HealInfo healInfo(m_caster, m_caster, healthGain, m_spellInfo, m_spellInfo->GetSchoolMask());
@@ -3267,12 +3267,14 @@ void Spell::DoTriggersOnSpellHit(Unit* unit, uint8 effMask)
                     }
                     else
                     {
-                        m_caster->CastCustomSpell(i->triggeredSpell->Id, SPELLVALUE_AURA_DURATION, _duration, unit, true);
+                        AuraEffect const* triggeringAuraEffect = m_caster->GetAuraEffect(i->triggeredByAura->Id, i->triggeredByEffIdx);
+                        m_caster->CastCustomSpell(i->triggeredSpell->Id, SPELLVALUE_AURA_DURATION, _duration, unit, true, nullptr, triggeringAuraEffect);
                     }
                 }
                 else
                 {
-                    m_caster->CastSpell(unit, i->triggeredSpell, true);
+                    AuraEffect const* triggeringAuraEffect = m_caster->GetAuraEffect(i->triggeredByAura->Id, i->triggeredByEffIdx);
+                    m_caster->CastSpell(unit, i->triggeredSpell, true, nullptr, triggeringAuraEffect);
                 }
             }
         }

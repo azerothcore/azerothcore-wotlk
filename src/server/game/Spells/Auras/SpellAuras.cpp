@@ -1436,6 +1436,37 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         // Refresh or add visual aura
                         target->CastCustomSpell(74396, SPELLVALUE_AURA_STACK, sSpellMgr->AssertSpellInfo(74396)->StackAmount, (Unit*)nullptr, true);
                         break;
+                        {
+                            // See if we already have the indicator aura. If not, create one.
+                            if (Aura* aur = target->GetAura(74396))
+                            {
+                                // Aura already there. Refresh duration and set original charges
+                                aur->SetCharges(2);
+                                aur->RefreshDuration();
+                            }
+                            else
+                                target->AddAura(74396, target);
+                        }
+                        break;
+                    case 12494: // Frostbite, synchronise with Fingers of Frost
+                    {
+                        // Find Fingers of Frost
+                        if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_MAGE, 2947, EFFECT_0))
+                        {
+                            if (SpellInfo const* triggeringSpellInfo = GetTriggeredByAuraSpellInfo())
+                            {
+                                uint8 fbRank = sSpellMgr->GetSpellRank(triggeringSpellInfo->Id);
+                                uint8 fofRank = sSpellMgr->GetSpellRank(aurEff->GetId());
+                                uint8 chance = uint8(std::ceil(fofRank * fbRank * 16.6f));
+
+                                if (roll_chance_i(chance))
+                                {
+                                    caster->CastSpell(caster, aurEff->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, true);
+                                }
+                            }
+                        }
+                        break;
+                    }
                     default:
                         break;
                 }
@@ -2657,6 +2688,22 @@ bool Aura::CallScriptCheckProcHandlers(AuraApplication const* aurApp, ProcEventI
             result &= hookItr->Call(m_loadedScript, eventInfo);
 
         m_loadedScript->_FinishScriptCall();
+    }
+
+    return result;
+}
+
+bool Aura::CallScriptCheckAfterProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo)
+{
+    bool result = true;
+    for (std::list<AuraScript*>::iterator scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    {
+        (*scritr)->_PrepareScriptCall(AURA_SCRIPT_HOOK_CHECK_AFTER_PROC, aurApp);
+        std::list<AuraScript::CheckProcHandler>::iterator hookItrEnd = (*scritr)->DoCheckAfterProc.end(), hookItr = (*scritr)->DoCheckAfterProc.begin();
+        for (; hookItr != hookItrEnd; ++hookItr)
+            result &= hookItr->Call(*scritr, eventInfo);
+
+        (*scritr)->_FinishScriptCall();
     }
 
     return result;

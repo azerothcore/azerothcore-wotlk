@@ -432,6 +432,11 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
 
         std::function<void(PreparedQueryResult)> finalizeCharacterCreation = [this, createInfo](PreparedQueryResult result)
         {
+            if (!sScriptMgr->CanAccountCreateCharacter(createInfo, GetAccountId()))
+            {
+                SendCharCreate(CHAR_CREATE_DISABLED);
+                return;
+            }
             bool haveSameRace = false;
             uint32 heroicReqLevel = sWorld->getIntConfig(CONFIG_CHARACTER_CREATING_MIN_LEVEL_FOR_HEROIC_CHARACTER);
             bool hasHeroicReqLevel = (heroicReqLevel == 0);

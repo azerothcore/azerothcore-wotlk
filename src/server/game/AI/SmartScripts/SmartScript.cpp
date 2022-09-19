@@ -3430,8 +3430,13 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
 
                 if (me->IsInRange(me->GetVictim(), (float)e.event.minMaxRepeat.min, (float)e.event.minMaxRepeat.max))
                     ProcessTimedAction(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax, me->GetVictim());
-                else // xinef: make it predictable
-                    RecalcTimer(e, 500, 500);
+                else
+                {
+                    if (!e.event.minMaxRepeat.controller)
+                        RecalcTimer(e, 500, 500); // xinef: make it predictable "Malcrom: This seems to be done to standardize min, max start rather than using the range values for the timer."
+                    else
+                        RecalcTimer(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax); // Malcrom: if param5 value is greater than 0 first action will not happen until after repeat timer fires.
+                }
                 break;
             }
         case SMART_EVENT_VICTIM_CASTING:
@@ -4052,6 +4057,13 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
                     return;
                 }
             }
+        }
+
+        // Delay flee for assist event if casting
+        if (e.GetActionType() == SMART_ACTION_FLEE_FOR_ASSIST && me && me->HasUnitState(UNIT_STATE_CASTING))
+        {
+            e.timer = 1;
+            return;
         }
 
         e.active = true;//activate events with cooldown

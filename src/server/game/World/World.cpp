@@ -1658,7 +1658,7 @@ void World::SetInitialWorldSettings()
     sSpellMgr->LoadSpellProcs();
 
     LOG_INFO("server.loading", "Loading Spell Bonus Data...");
-    sSpellMgr->LoadSpellBonusess();
+    sSpellMgr->LoadSpellBonuses();
 
     LOG_INFO("server.loading", "Loading Aggro Spells Definitions...");
     sSpellMgr->LoadSpellThreats();

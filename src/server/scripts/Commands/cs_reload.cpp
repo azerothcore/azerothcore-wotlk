@@ -862,7 +862,7 @@ public:
     static bool HandleReloadSpellBonusesCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Spell Bonus Data...");
-        sSpellMgr->LoadSpellBonusess();
+        sSpellMgr->LoadSpellBonuses();
         handler->SendGlobalGMSysMessage("DB table `spell_bonus_data` (spell damage/healing coefficients) reloaded.");
         return true;
     }
