@@ -22,6 +22,9 @@
 
 ObjectData const creatureData[] =
 {
+    { NPC_VEM, DATA_VEM },
+    { NPC_KRI, DATA_KRI },
+    { NPC_YAUJ, DATA_YAUJ },
     { NPC_SARTURA, DATA_SARTURA },
     { NPC_CTHUN, DATA_CTHUN },
     { NPC_EYE_OF_CTHUN, DATA_EYE_OF_CTHUN },
@@ -59,9 +62,6 @@ public:
         }
 
         ObjectGuid SkeramGUID;
-        ObjectGuid VemGUID;
-        ObjectGuid KriGUID;
-        ObjectGuid YaujGUID;
         ObjectGuid ViscidusGUID;
         ObjectGuid CThunGUID;
         GuidVector CThunGraspGUIDs;
@@ -81,15 +81,6 @@ public:
             {
                 case NPC_SKERAM:
                     SkeramGUID = creature->GetGUID();
-                    break;
-                case NPC_VEM:
-                    VemGUID = creature->GetGUID();
-                    break;
-                case NPC_KRI:
-                    KriGUID = creature->GetGUID();
-                    break;
-                case NPC_YAUJ:
-                    YaujGUID = creature->GetGUID();
                     break;
                 case NPC_VISCIDUS:
                     ViscidusGUID = creature->GetGUID();
@@ -162,12 +153,6 @@ public:
             {
                 case DATA_SKERAM:
                     return SkeramGUID;
-                case DATA_VEM:
-                    return VemGUID;
-                case DATA_KRI:
-                    return KriGUID;
-                case DATA_YAUJ:
-                    return YaujGUID;
                 case DATA_VISCIDUS:
                     return ViscidusGUID;
             }

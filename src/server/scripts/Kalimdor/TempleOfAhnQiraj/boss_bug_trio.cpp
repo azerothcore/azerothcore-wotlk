@@ -78,20 +78,20 @@ public:
 
     void EnterCombatWithTrio(Unit* who)
     {
-        if (Creature* vem = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_VEM)))
+        if (Creature* vem = instance->GetCreature(DATA_VEM))
             if (vem->GetGUID() != me->GetGUID())
                 vem->GetAI()->AttackStart(who);
-        if (Creature* kri = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_KRI)))
+        if (Creature* kri = instance->GetCreature(DATA_KRI))
             if (kri->GetGUID() != me->GetGUID())
                 kri->GetAI()->AttackStart(who);
-        if (Creature* yauj = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_YAUJ)))
+        if (Creature* yauj = instance->GetCreature(DATA_YAUJ))
             if (yauj->GetGUID() != me->GetGUID())
                 yauj->GetAI()->AttackStart(who);
     }
 
     void EvadeAllBosses(EvadeReason why)
     {
-        if (Creature* vem = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_VEM)))
+        if (Creature* vem = instance->GetCreature(DATA_VEM))
         {
             if (vem->GetGUID() != me->GetGUID())
             {
@@ -102,7 +102,7 @@ public:
             }
         }
 
-        if (Creature* kri = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_KRI)))
+        if (Creature* kri = instance->GetCreature(DATA_KRI))
         {
             if (kri->GetGUID() != me->GetGUID())
             {
@@ -113,7 +113,7 @@ public:
             }
         }
 
-        if (Creature* yauj = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_YAUJ)))
+        if (Creature* yauj = instance->GetCreature(DATA_YAUJ))
         {
             if (yauj->GetGUID() != me->GetGUID())
             {
@@ -127,12 +127,12 @@ public:
 
     void DoAction(int32 action) override
     {
-        if (action != ACTION_CONSUME || dying)
+        if (action != ACTION_CONSUME || _dying)
         {
             return;
         }
 
-        isEating = true;
+        _isEating = true;
         me->SetSpeed(MOVE_RUN, 45.f/7.f); // From sniffs
         me->SetReactState(REACT_PASSIVE);
     }
@@ -145,8 +145,9 @@ public:
         me->GetMotionMaster()->MoveIdle();
         me->SetSpeed(MOVE_RUN, 15.f/7.f); // From sniffs
         DoCastSelf(SPELL_FULL_HEAL, true);
+        me->LowerPlayerDamageReq(me->GetMaxHealth());
         DoResetThreat();
-        isEating = false;
+        _isEating = false;
 
         _scheduler.Schedule(4s, [this](TaskContext /*context*/)
         {
@@ -170,8 +171,8 @@ public:
     {
         BossAI::Reset();
         _scheduler.CancelAll();
-        dying = false;
-        isEating = false;
+        _dying = false;
+        _isEating = false;
         instance->SetData(DATA_BUG_TRIO_DEATH, 0);
         me->SetSpeed(MOVE_RUN, 15.f / 7.f); // From sniffs
         me->SetStandState(UNIT_STAND_STATE_STAND);
@@ -185,33 +186,32 @@ public:
 
     void UpdateAI(uint32 diff) override
     {
-        if (!UpdateVictim() || isEating || !CheckInRoom())
+        if (!UpdateVictim() || _isEating || !CheckInRoom())
             return;
 
         _scheduler.Update(diff, [this]
         {
-            DoMeleeAttackIfReady();
+            if (!_dying)
+                DoMeleeAttackIfReady();
         });
     }
 
     void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
-        if (me->HealthBelowPctDamaged(1, damage) && instance->GetData(DATA_BUG_TRIO_DEATH) < 2 && who->GetGUID() != me->GetGUID() && !dying)
+        if (me->HealthBelowPctDamaged(1, damage) && instance->GetData(DATA_BUG_TRIO_DEATH) < 2 && who->GetGUID() != me->GetGUID() && !_dying)
         {
             damage = 0;
-            if (isEating)
+            if (_isEating)
                 return;
 
             _scheduler.CancelAll();
             me->SetStandState(UNIT_STAND_STATE_DEAD);
             me->SetReactState(REACT_PASSIVE);
             me->SetControlled(true, UNIT_STATE_ROOT);
-            dying = true;
-
-            DoFinalSpell();
+            _dying = true;
 
             // Move the other bugs to this bug position
-            if (Creature* vem = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_VEM)))
+            if (Creature* vem = instance->GetCreature(DATA_VEM))
             {
                 if (vem->GetGUID() != me->GetGUID())
                 {
@@ -219,7 +219,7 @@ public:
                     vem->GetMotionMaster()->MovePoint(POINT_CONSUME, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
                 }
             }
-            if (Creature* kri = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_KRI)))
+            if (Creature* kri = instance->GetCreature(DATA_KRI))
             {
                 if (kri->GetGUID() != me->GetGUID())
                 {
@@ -227,7 +227,7 @@ public:
                     kri->GetMotionMaster()->MovePoint(POINT_CONSUME, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
                 }
             }
-            if (Creature* yauj = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_YAUJ)))
+            if (Creature* yauj = instance->GetCreature(DATA_YAUJ))
             {
                 if (yauj->GetGUID() != me->GetGUID())
                 {
@@ -240,6 +240,7 @@ public:
             {
                 if (!me->IsInEvadeMode() && instance->GetData(DATA_BUG_TRIO_DEATH) < 2)
                 {
+                    DoFinalSpell();
                     DoCastSelf(SPELL_BLOODY_DEATH, true);
                     Talk(EMOTE_DEVOURED);
                     me->DespawnOrUnsummon(1000);
@@ -274,9 +275,9 @@ public:
 
     void JustDied(Unit* killer) override
     {
-        if (killer->GetGUID() == me->GetGUID())
+        instance->SetData(DATA_BUG_TRIO_DEATH, 1);
+        if (instance->GetData(DATA_BUG_TRIO_DEATH) < 2)
         {
-            instance->SetData(DATA_BUG_TRIO_DEATH, 1);
             me->RemoveDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
             return;
         }
@@ -285,8 +286,8 @@ public:
     }
 
     TaskScheduler _scheduler;
-    bool dying;
-    bool isEating;
+    bool _dying;
+    bool _isEating;
 };
 
 struct boss_kri : public boss_bug_trio
