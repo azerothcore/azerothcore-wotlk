@@ -80,9 +80,9 @@ enum Creatures
 
 enum ObjectsAQ40
 {
-    AQ40_DOOR_1             = 180634,
-    AQ40_DOOR_2             = 180635,
-    AQ40_DOOR_3             = 180636,
+    AQ40_DOOR_TE_ENTRANCE   = 180634,
+    AQ40_DOOR_TE_EXIT       = 180635,
+    AQ40_DOOR_SKERAM        = 180636,
     GO_CTHUN_GRASP          = 180745
 };
 

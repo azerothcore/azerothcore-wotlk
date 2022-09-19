@@ -23,11 +23,20 @@
 ObjectData const creatureData[] =
 {
     { NPC_SARTURA, DATA_SARTURA },
+    { NPC_CTHUN, DATA_CTHUN },
     { NPC_EYE_OF_CTHUN, DATA_EYE_OF_CTHUN },
     { NPC_OURO_SPAWNER, DATA_OURO_SPAWNER },
     { NPC_MASTERS_EYE, DATA_MASTERS_EYE },
     { NPC_VEKLOR, DATA_VEKLOR },
     { NPC_VEKNILASH, DATA_VEKNILASH }
+};
+
+DoorData const doorData[] =
+{
+    { AQ40_DOOR_SKERAM,      DATA_SKERAM,        DOOR_TYPE_PASSAGE },
+    { AQ40_DOOR_TE_ENTRANCE, DATA_TWIN_EMPERORS, DOOR_TYPE_ROOM },
+    { AQ40_DOOR_TE_EXIT,     DATA_TWIN_EMPERORS, DOOR_TYPE_PASSAGE },
+    { 0,                     0,                  DOOR_TYPE_ROOM}
 };
 
 class instance_temple_of_ahnqiraj : public InstanceMapScript
@@ -44,9 +53,9 @@ public:
     {
         instance_temple_of_ahnqiraj_InstanceMapScript(Map* map) : InstanceScript(map)
         {
-            LoadObjectData(creatureData, nullptr);
-            doorGUIDs.fill(ObjectGuid::Empty);
             SetBossNumber(MAX_BOSS_NUMBER);
+            LoadObjectData(creatureData, nullptr);
+            LoadDoorData(doorData);
         }
 
         ObjectGuid SkeramGUID;
@@ -56,7 +65,6 @@ public:
         ObjectGuid ViscidusGUID;
         ObjectGuid CThunGUID;
         GuidVector CThunGraspGUIDs;
-        std::array<ObjectGuid, 3> doorGUIDs;
 
         uint32 BugTrioDeathCount;
         uint32 CthunPhase;
@@ -73,10 +81,6 @@ public:
             {
                 case NPC_SKERAM:
                     SkeramGUID = creature->GetGUID();
-                    if (!creature->IsAlive())
-                    {
-                        HandleGameObject(doorGUIDs[2], true);
-                    }
                     break;
                 case NPC_VEM:
                     VemGUID = creature->GetGUID();
@@ -122,29 +126,6 @@ public:
         {
             switch (go->GetEntry())
             {
-                case AQ40_DOOR_1:
-                    doorGUIDs[0] = go->GetGUID();
-                    break;
-                case AQ40_DOOR_2:
-                    doorGUIDs[1] = go->GetGUID();
-                    if (Creature* veklor = GetCreature(DATA_VEKLOR))
-                    {
-                        if (!veklor->IsAlive())
-                        {
-                            HandleGameObject(go->GetGUID(), true);
-                        }
-                    }
-                    break;
-                case AQ40_DOOR_3:
-                    doorGUIDs[2] = go->GetGUID();
-                    if (Creature* skeram = instance->GetCreature(SkeramGUID))
-                    {
-                        if (!skeram->IsAlive())
-                        {
-                            HandleGameObject(go->GetGUID(), true);
-                        }
-                    }
-                    break;
                 case GO_CTHUN_GRASP:
                     CThunGraspGUIDs.push_back(go->GetGUID());
                     if (Creature* CThun = instance->GetCreature(CThunGUID))
@@ -189,12 +170,6 @@ public:
                     return YaujGUID;
                 case DATA_VISCIDUS:
                     return ViscidusGUID;
-                case AQ40_DOOR_1:
-                    return doorGUIDs[0];
-                case AQ40_DOOR_2:
-                    return doorGUIDs[1];
-                case AQ40_DOOR_3:
-                    return doorGUIDs[2];
             }
             return ObjectGuid::Empty;
         }

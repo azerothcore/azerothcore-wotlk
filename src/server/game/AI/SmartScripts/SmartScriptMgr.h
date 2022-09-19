@@ -221,6 +221,7 @@ struct SmartEvent
             uint32 max;
             uint32 repeatMin;
             uint32 repeatMax;
+            uint32 controller;
         } minMaxRepeat;
 
         struct

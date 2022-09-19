@@ -53,7 +53,8 @@ Position SolakarPosBoss  = Position(80.0f, -280.0f, 93.0f, 3.0f * M_PI / 2.0);
 enum Texts
 {
     SAY_NEFARIUS_REND_WIPE      = 11,
-    SAY_SOLAKAR_FIRST_HATCHER   = 0
+    SAY_SOLAKAR_FIRST_HATCHER   = 0,
+    SAY_SCARSHIELD_INF_WHISPER  = 0
 };
 
 MinionData const minionData[] =
@@ -823,10 +824,65 @@ public:
     }
 };
 
+class near_scarshield_infiltrator : public AreaTriggerScript
+{
+public:
+    near_scarshield_infiltrator() : AreaTriggerScript("near_scarshield_infiltrator") { }
+
+    bool OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    {
+        if (player && player->IsAlive())
+        {
+            if (Creature* creature = player->FindNearestCreature(NPC_SCARSHIELD_INFILTRATOR, 100.0f, true))
+            {
+                bool transformHasStarted = creature->AI()->GetData(0) == 1;
+                if ((player->getLevel() < 57 || !player->HasItemCount(ITEM_UNADORNED_SEAL))  && !transformHasStarted)
+                {
+                    // Send whisper if not already sent
+                    std::list<ObjectGuid>::iterator itr = std::find(whisperedTargets.begin(), whisperedTargets.end(), player->GetGUID());
+                    if (itr == whisperedTargets.end())
+                    {
+                        creature->AI()->Talk(SAY_SCARSHIELD_INF_WHISPER, player);
+                        whisperedTargets.push_back(player->GetGUID());
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    private:
+        GuidList whisperedTargets;
+};
+
+class at_scarshield_infiltrator : public AreaTriggerScript
+{
+public:
+    at_scarshield_infiltrator() : AreaTriggerScript("at_scarshield_infiltrator") { }
+
+    bool OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    {
+        if (player && player->IsAlive())
+        {
+            if (Creature* creature = player->FindNearestCreature(NPC_SCARSHIELD_INFILTRATOR, 100.0f, true))
+            {
+                if (player->getLevel() >= 57 && player->HasItemCount(ITEM_UNADORNED_SEAL))
+                {
+                    creature->AI()->SetData(0, 1); // Start transform into Vaelan
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+};
+
 void AddSC_instance_blackrock_spire()
 {
     new instance_blackrock_spire();
     new at_dragonspire_hall();
     new at_blackrock_stadium();
     new go_father_flame();
+    new near_scarshield_infiltrator();
+    new at_scarshield_infiltrator();
 }
