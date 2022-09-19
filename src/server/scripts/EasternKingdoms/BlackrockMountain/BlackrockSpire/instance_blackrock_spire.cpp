@@ -884,6 +884,9 @@ public:
             }
         }
         return false;
+    }
+};
+
 /*#####
 # npc_vaelastrasz_the_red and Seal of Ascension event
 #####*/
