@@ -76,6 +76,8 @@ enum CreaturesIds
     NPC_BLACKHAND_INCARCERATOR      = 10316,
     NPC_LORD_VICTOR_NEFARIUS        = 10162,
 
+    NPC_SCARSHIELD_INFILTRATOR      = 10299,
+
     NPC_SOLAKAR                     = 10264,
     NPC_ROOKERY_GUARDIAN            = 10258,
     NPC_ROOKERY_HATCHER             = 10683,
@@ -95,7 +97,8 @@ enum AdditionalData
     AREATRIGGER                     = 1,
     AREATRIGGER_DRAGONSPIRE_HALL    = 2046,
     AREATRIGGER_BLACKROCK_STADIUM   = 2026,
-    SAY_FINKLE_GANG                 = 0
+    SAY_FINKLE_GANG                 = 0,
+    ITEM_UNADORNED_SEAL             = 12219
 };
 
 enum GameObjectsIds
