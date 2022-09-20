@@ -950,7 +950,8 @@ public:
                     events.ScheduleEvent(EVENT_QUAKE_2, 62500);
                     events.ScheduleEvent(EVENT_PAIN_AND_SUFFERING, 3500, EVENT_GROUP_ABILITIES);
                     events.ScheduleEvent(EVENT_SUMMON_ICE_SPHERE, 8000, EVENT_GROUP_ABILITIES);
-                    events.ScheduleEvent(EVENT_SUMMON_RAGING_SPIRIT, 4000, EVENT_GROUP_ABILITIES);
+                    //events.ScheduleEvent(EVENT_SUMMON_RAGING_SPIRIT, 4000, EVENT_GROUP_ABILITIES);ÐÞ¸Ä
+                    events.ScheduleEvent(EVENT_SUMMON_RAGING_SPIRIT, 6000, EVENT_GROUP_ABILITIES);
                     break;
                 default:
                     break;
@@ -1861,7 +1862,8 @@ public:
 
         bool CanAIAttack(Unit const* target) const override
         {
-            return IsValidPlatformTarget(target) && !target->GetVehicle();
+            //return IsValidPlatformTarget(target) && !target->GetVehicle();
+			return IsValidPlatformTarget(target) && !target->GetVehicle() && target->GetTypeId() == TYPEID_PLAYER;
         }
     };
 
@@ -2413,7 +2415,8 @@ public:
 
         bool CanAIAttack(Unit const* target) const override
         {
-            return IsValidPlatformTarget(target) && !target->GetVehicle();
+            //return IsValidPlatformTarget(target) && !target->GetVehicle();
+			return IsValidPlatformTarget(target) && !target->GetVehicle() && target->GetTypeId() == TYPEID_PLAYER;
         }
 
     private:
@@ -3599,7 +3602,8 @@ public:
 
         bool CanAIAttack(Unit const* target) const override
         {
-            return IsValidPlatformTarget(target) && !target->GetVehicle();
+            //return IsValidPlatformTarget(target) && !target->GetVehicle();
+			return IsValidPlatformTarget(target) && !target->GetVehicle() && target->GetTypeId() == TYPEID_PLAYER;
         }
     };
 
