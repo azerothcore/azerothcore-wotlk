@@ -210,8 +210,8 @@ public:
         {
             return;
         }
-
-        if (summon->GetEntry() == NPC_ONYXIAN_LAIR_GUARD && Phase != PHASE_LANDED)
+        if (summon->GetEntry() == NPC_ONYXIAN_LAIR_GUARD && Phase != PHASE_AIRPHASE)
+        //if (summon->GetEntry() == NPC_ONYXIAN_LAIR_GUARD && Phase != PHASE_LANDED) ÐÞ¸Ä
         {
             return;
         }
