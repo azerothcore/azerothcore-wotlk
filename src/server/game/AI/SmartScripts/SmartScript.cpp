@@ -4302,10 +4302,10 @@ void SmartScript::OnInitialize(WorldObject* obj, AreaTrigger const* at)
         InitTimer((*i));//calculate timers for first time use
         if (i->GetEventType() == SMART_EVENT_RANGE && i->GetActionType() == SMART_ACTION_ALLOW_COMBAT_MOVEMENT)
         {
-            if (i->action.combatMove.move == 1 && i->event.minMaxRepeat.min > minEnableDist)
-                minEnableDist = i->event.minMaxRepeat.min;
-            else if (i->action.combatMove.move == 0 && (i->event.minMaxRepeat.max < maxDisableDist || maxDisableDist == 0))
-                maxDisableDist = i->event.minMaxRepeat.max;
+            if (i->action.combatMove.move == 1 && i->event.rangeRepeat.minRange > minEnableDist)
+                minEnableDist = i->event.rangeRepeat.minRange;
+            else if (i->action.combatMove.move == 0 && (i->event.rangeRepeat.maxRange < maxDisableDist || maxDisableDist == 0))
+                maxDisableDist = i->event.rangeRepeat.maxRange;
         }
 
         // Xinef: if smartcast combat move flag is present
