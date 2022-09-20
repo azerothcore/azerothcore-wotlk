@@ -483,6 +483,8 @@ void BattlegroundAB::Init()
 
 void BattlegroundAB::EndBattleground(TeamId winnerTeamId)
 {
+    // 完成日常战场
+    CastSpellOnTeam(SPELL_AB_QUEST_REWARD, winnerTeamId);
     RewardHonorToTeam(GetBonusHonorFromKill(1), winnerTeamId);
     RewardHonorToTeam(GetBonusHonorFromKill(1), TEAM_HORDE);
     RewardHonorToTeam(GetBonusHonorFromKill(1), TEAM_ALLIANCE);

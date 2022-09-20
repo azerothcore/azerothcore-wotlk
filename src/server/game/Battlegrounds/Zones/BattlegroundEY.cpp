@@ -177,6 +177,8 @@ void BattlegroundEY::UpdatePointsState()
 
 void BattlegroundEY::EndBattleground(TeamId winnerTeamId)
 {
+    // 完成日常战场
+    CastSpellOnTeam(43477, winnerTeamId);
     RewardHonorToTeam(GetBonusHonorFromKill(1), winnerTeamId);
     RewardHonorToTeam(GetBonusHonorFromKill(1), TEAM_ALLIANCE);
     RewardHonorToTeam(GetBonusHonorFromKill(1), TEAM_HORDE);

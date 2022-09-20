@@ -493,6 +493,8 @@ void BattlegroundAV::AddPlayer(Player* player)
 
 void BattlegroundAV::EndBattleground(TeamId winnerTeamId)
 {
+    // 完成日常战场
+    CastSpellOnTeam(43475, winnerTeamId);
     //calculate bonuskills for both teams:
     //first towers:
     uint8 kills[2] = {0, 0}; // 0 = Alliance 1 = Horde

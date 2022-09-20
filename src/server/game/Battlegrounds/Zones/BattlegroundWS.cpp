@@ -497,6 +497,8 @@ void BattlegroundWS::Init()
 
 void BattlegroundWS::EndBattleground(TeamId winnerTeamId)
 {
+    // 完成日常战场
+    CastSpellOnTeam(43483, winnerTeamId);
     // Win reward
     RewardHonorToTeam(GetBonusHonorFromKill(_honorWinKills), winnerTeamId);
 
