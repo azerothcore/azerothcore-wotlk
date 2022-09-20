@@ -794,8 +794,9 @@ public:
             if( TargetGUID )
             {
                 Unit* target = ObjectAccessor::GetPlayer(*me, TargetGUID);
-                if( !target || !target->HasAura(SPELL_MARK) || !me->IsValidAttackTarget(target) || me->GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE || !me->HasUnitState(UNIT_STATE_CHASE_MOVE) )
-                {
+                //if( !target || !target->HasAura(SPELL_MARK) || !me->IsValidAttackTarget(target) || me->GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE || !me->HasUnitState(UNIT_STATE_CHASE_MOVE) ) ÐÞ¸Ä
+                if (!target || !target->HasAura(SPELL_MARK) || !me->IsValidAttackTarget(target) || me->GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE )
+				{
                     SelectNewTarget(true);
                     return;
                 }
