@@ -1753,11 +1753,12 @@ enum SmartCastFlags
 // one line in DB is one event
 struct SmartScriptHolder
 {
-    SmartScriptHolder() : entryOrGuid(0), source_type(SMART_SCRIPT_TYPE_CREATURE)
+    SmartScriptHolder() : entry(0), guid(0), source_type(SMART_SCRIPT_TYPE_CREATURE)
         , event_id(0), link(0), event(), action(), target(), timer(0), active(false), runOnce(false)
         , enableTimed(false) {}
 
-    int32 entryOrGuid;
+    int32 entry;
+    int32 guid;
     SmartScriptType source_type;
     uint32 event_id;
     uint32 link;
@@ -1859,10 +1860,12 @@ public:
     {
         SmartAIEventList temp;
         if (mEventMap[uint32(type)].find(entry) != mEventMap[uint32(type)].end())
+        {
             return mEventMap[uint32(type)][entry];
+        }
         else
         {
-            if (entry > 0) //first search is for guid (negative), do not drop error if not found
+            if (entry < 0) //first search is for guid (negative), do not drop error if not found
                 LOG_DEBUG("sql.sql", "SmartAIMgr::GetScript: Could not load Script for Entry {} ScriptType {}.", entry, uint32(type));
             return temp;
         }
@@ -1881,7 +1884,7 @@ private:
     {
         if (target < SMART_TARGET_NONE || target >= SMART_TARGET_END)
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses invalid Target type {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), target);
+            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses invalid Target type {}, skipped.", e.entry, e.GetScriptType(), e.event_id, e.GetActionType(), target);
             return false;
         }
         return true;
@@ -1891,7 +1894,7 @@ private:
     {
         if (max < min)
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses min/max params wrong ({}/{}), skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), min, max);
+            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses min/max params wrong ({}/{}), skipped.", e.entry, e.GetScriptType(), e.event_id, e.GetActionType(), min, max);
             return false;
         }
         return true;
@@ -1901,7 +1904,7 @@ private:
     {
         if (pct < -100 || pct > 100)
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has invalid Percent set ({}), skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), pct);
+            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has invalid Percent set ({}), skipped.", e.entry, e.GetScriptType(), e.event_id, e.GetActionType(), pct);
             return false;
         }
         return true;
@@ -1911,7 +1914,7 @@ private:
     {
         if (!data)
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} Parameter can not be nullptr, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
+            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} Parameter can not be nullptr, skipped.", e.entry, e.GetScriptType(), e.event_id, e.GetActionType());
             return false;
         }
         return true;
@@ -1921,7 +1924,7 @@ private:
     {
         if (!sObjectMgr->GetCreatureTemplate(entry))
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent Creature entry {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
+            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent Creature entry {}, skipped.", e.entry, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
             return false;
         }
         return true;
@@ -1931,7 +1934,7 @@ private:
     {
         if (!sObjectMgr->GetQuestTemplate(entry))
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent Quest entry {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
+            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent Quest entry {}, skipped.", e.entry, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
             return false;
         }
         return true;
@@ -1941,7 +1944,7 @@ private:
     {
         if (!sObjectMgr->GetGameObjectTemplate(entry))
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent GameObject entry {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
+            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent GameObject entry {}, skipped.", e.entry, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
             return false;
         }
         return true;
@@ -1951,7 +1954,7 @@ private:
     {
         if (!sSpellMgr->GetSpellInfo(entry))
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent Spell entry {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
+            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent Spell entry {}, skipped.", e.entry, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
             return false;
         }
         return true;
@@ -1961,7 +1964,7 @@ private:
     {
         if (!sObjectMgr->GetItemTemplate(entry))
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent Item entry {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
+            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent Item entry {}, skipped.", e.entry, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
             return false;
         }
         return true;
@@ -1971,7 +1974,7 @@ private:
     {
         if (!sEmotesTextStore.LookupEntry(entry))
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent Text Emote entry {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
+            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent Text Emote entry {}, skipped.", e.entry, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
             return false;
         }
         return true;
@@ -1981,7 +1984,7 @@ private:
     {
         if (!sEmotesStore.LookupEntry(entry))
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent Emote entry {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
+            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent Emote entry {}, skipped.", e.entry, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
             return false;
         }
         return true;
@@ -1991,7 +1994,7 @@ private:
     {
         if (!sObjectMgr->GetAreaTrigger(entry))
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent AreaTrigger entry {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
+            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent AreaTrigger entry {}, skipped.", e.entry, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
             return false;
         }
         return true;
@@ -2001,7 +2004,7 @@ private:
     {
         if (!sSoundEntriesStore.LookupEntry(entry))
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent Sound entry {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
+            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent Sound entry {}, skipped.", e.entry, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
             return false;
         }
         return true;

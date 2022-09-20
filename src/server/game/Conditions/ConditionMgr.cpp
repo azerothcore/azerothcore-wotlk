@@ -974,17 +974,17 @@ ConditionList ConditionMgr::GetConditionsForVehicleSpell(uint32 creatureId, uint
     return cond;
 }
 
-ConditionList ConditionMgr::GetConditionsForSmartEvent(int32 entryOrGuid, uint32 eventId, uint32 sourceType)
+ConditionList ConditionMgr::GetConditionsForSmartEvent(int32 entry, uint32 eventId, uint32 sourceType)
 {
     ConditionList                                cond;
-    SmartEventConditionContainer::const_iterator itr = SmartEventConditionStore.find(std::make_pair(entryOrGuid, sourceType));
+    SmartEventConditionContainer::const_iterator itr = SmartEventConditionStore.find(std::make_pair(entry, sourceType));
     if (itr != SmartEventConditionStore.end())
     {
         ConditionTypeContainer::const_iterator i = (*itr).second.find(eventId + 1);
         if (i != (*itr).second.end())
         {
             cond = (*i).second;
-            LOG_DEBUG("condition", "GetConditionsForSmartEvent: found conditions for Smart Event entry or guid {} event_id {}", entryOrGuid, eventId);
+            LOG_DEBUG("condition", "GetConditionsForSmartEvent: found conditions for Smart Event entry or guid {} event_id {}", entry, eventId);
         }
     }
     return cond;

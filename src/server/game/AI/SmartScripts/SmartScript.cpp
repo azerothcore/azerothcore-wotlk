@@ -102,11 +102,14 @@ void SmartScript::ProcessEventsFor(SMART_EVENT e, Unit* unit, uint32 var0, uint3
 
         if (eventType == e)
         {
-            ConditionList conds = sConditionMgr->GetConditionsForSmartEvent((*i).entryOrGuid, (*i).event_id, (*i).source_type);
-            ConditionSourceInfo info = ConditionSourceInfo(unit, GetBaseObject(), me ? me->GetVictim() : nullptr);
+                
+                ConditionList conds = sConditionMgr->GetConditionsForSmartEvent((*i).entry, (*i).event_id, (*i).source_type);
+                ConditionSourceInfo info = ConditionSourceInfo(unit, GetBaseObject(), me ? me->GetVictim() : nullptr);
 
-            if (sConditionMgr->IsObjectMeetToConditions(info, conds))
-                ProcessEvent(*i, unit, var0, var1, bvar, spell, gob);
+                if (sConditionMgr->IsObjectMeetToConditions(info, conds))
+                {
+                    ProcessEvent(*i, unit, var0, var1, bvar, spell, gob);
+                }
         }
     }
 }
@@ -169,7 +172,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
             if (!sCreatureTextMgr->TextExist(talker->GetEntry(), uint8(e.action.talk.textGroupID)))
             {
-                LOG_ERROR("sql.sql", "SmartScript::ProcessAction: SMART_ACTION_TALK: EntryOrGuid {} SourceType {} EventType {} TargetType {} using non-existent Text id {} for talker {}, ignored.", e.entryOrGuid, e.GetScriptType(), e.GetEventType(), e.GetTargetType(), e.action.talk.textGroupID, talker->GetEntry());
+                LOG_ERROR("sql.sql", "SmartScript::ProcessAction: SMART_ACTION_TALK: entry {} SourceType {} EventType {} TargetType {} using non-existent Text id {} for talker {}, ignored.", e.entry, e.GetScriptType(), e.GetEventType(), e.GetTargetType(), e.action.talk.textGroupID, talker->GetEntry());
                 break;
             }
 
@@ -1001,7 +1004,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             InstanceScript* instance = obj->GetInstanceScript();
             if (!instance)
             {
-                LOG_ERROR("scripts.ai.sai", "SmartScript: Event {} attempt to set instance data without instance script. EntryOrGuid {}", e.GetEventType(), e.entryOrGuid);
+                LOG_ERROR("scripts.ai.sai", "SmartScript: Event {} attempt to set instance data without instance script. entry {}", e.GetEventType(), e.entry);
                 break;
             }
 
@@ -1036,7 +1039,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             InstanceScript* instance = obj->GetInstanceScript();
             if (!instance)
             {
-                LOG_ERROR("sql.sql", "SmartScript: Event {} attempt to set instance data without instance script. EntryOrGuid {}", e.GetEventType(), e.entryOrGuid);
+                LOG_ERROR("sql.sql", "SmartScript: Event {} attempt to set instance data without instance script. entry {}", e.GetEventType(), e.entry);
                 break;
             }
 
@@ -1796,7 +1799,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         {
             if (e.GetTargetType() == SMART_TARGET_NONE)
             {
-                LOG_ERROR("sql.sql", "SmartScript: Entry {} SourceType {} Event {} Action {} is using TARGET_NONE(0) for Script9 target. Please correct target_type in database.", e.entryOrGuid, e.GetScriptType(), e.GetEventType(), e.GetActionType());
+                LOG_ERROR("sql.sql", "SmartScript: Entry {} SourceType {} Event {} Action {} is using TARGET_NONE(0) for Script9 target. Please correct target_type in database.", e.entry, e.GetScriptType(), e.GetEventType(), e.GetActionType());
                 break;
             }
 
@@ -1883,7 +1886,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             uint32 id = Acore::Containers::SelectRandomContainerElement(actionLists);
             if (e.GetTargetType() == SMART_TARGET_NONE)
             {
-                LOG_ERROR("sql.sql", "SmartScript: Entry {} SourceType {} Event {} Action {} is using TARGET_NONE(0) for Script9 target. Please correct target_type in database.", e.entryOrGuid, e.GetScriptType(), e.GetEventType(), e.GetActionType());
+                LOG_ERROR("sql.sql", "SmartScript: Entry {} SourceType {} Event {} Action {} is using TARGET_NONE(0) for Script9 target. Please correct target_type in database.", e.entry, e.GetScriptType(), e.GetEventType(), e.GetActionType());
                 break;
             }
 
@@ -1907,7 +1910,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             uint32 id = urand(e.action.randTimedActionList.actionLists[0], e.action.randTimedActionList.actionLists[1]);
             if (e.GetTargetType() == SMART_TARGET_NONE)
             {
-                LOG_ERROR("sql.sql", "SmartScript: Entry {} SourceType {} Event {} Action {} is using TARGET_NONE(0) for Script9 target. Please correct target_type in database.", e.entryOrGuid, e.GetScriptType(), e.GetEventType(), e.GetActionType());
+                LOG_ERROR("sql.sql", "SmartScript: Entry {} SourceType {} Event {} Action {} is using TARGET_NONE(0) for Script9 target. Please correct target_type in database.", e.entry, e.GetScriptType(), e.GetEventType(), e.GetActionType());
                 break;
             }
 
@@ -2691,7 +2694,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             break;
         }
         default:
-            LOG_ERROR("sql.sql", "SmartScript::ProcessAction: Entry {} SourceType {}, Event {}, Unhandled Action type {}", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
+            LOG_ERROR("sql.sql", "SmartScript::ProcessAction: Entry {} SourceType {}, Event {}, Unhandled Action type {}", e.entry, e.GetScriptType(), e.event_id, e.GetActionType());
             break;
     }
 
@@ -2701,14 +2704,14 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         if (linked.GetActionType() && linked.GetEventType() == SMART_EVENT_LINK)
             ProcessEvent(linked, unit, var0, var1, bvar, spell, gob);
         else
-            LOG_ERROR("sql.sql", "SmartScript::ProcessAction: Entry {} SourceType {}, Event {}, Link Event {} not found or invalid, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.link);
+            LOG_ERROR("sql.sql", "SmartScript::ProcessAction: Entry {} SourceType {}, Event {}, Link Event {} not found or invalid, skipped.", e.entry, e.GetScriptType(), e.event_id, e.link);
     }
 }
 
 void SmartScript::ProcessTimedAction(SmartScriptHolder& e, uint32 const& min, uint32 const& max, Unit* unit, uint32 var0, uint32 var1, bool bvar, SpellInfo const* spell, GameObject* gob)
 {
     // xinef: extended by selfs victim
-    ConditionList const conds = sConditionMgr->GetConditionsForSmartEvent(e.entryOrGuid, e.event_id, e.source_type);
+    ConditionList const conds = sConditionMgr->GetConditionsForSmartEvent(e.entry, e.event_id, e.source_type);
     ConditionSourceInfo info = ConditionSourceInfo(unit, GetBaseObject(), me ? me->GetVictim() : nullptr);
 
     if (sConditionMgr->IsObjectMeetToConditions(info, conds))
@@ -2726,7 +2729,7 @@ void SmartScript::InstallTemplate(SmartScriptHolder const& e)
         return;
     if (mTemplate != SMARTAI_TEMPLATE_BASIC)
     {
-        LOG_ERROR("sql.sql", "SmartScript::InstallTemplate: Entry {} SourceType {} AI Template can not be set more then once, skipped.", e.entryOrGuid, e.GetScriptType());
+        LOG_ERROR("sql.sql", "SmartScript::InstallTemplate: Entry {} SourceType {} AI Template can not be set more then once, skipped.", e.entry, e.GetScriptType());
         return;
     }
     mTemplate = (SMARTAI_TEMPLATE)e.action.installTtemplate.id;
@@ -2944,7 +2947,7 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
             if (!ref)
             {
                 LOG_ERROR("scripts.ai.sai", "SMART_TARGET_CREATURE_RANGE: Entry {} SourceType {} Event {} Action {} Target {} is missing base object or invoker",
-                    e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetTargetType());
+                    e.entry, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetTargetType());
                 break;
             }
 
@@ -3031,7 +3034,7 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
             if (!ref)
             {
                 LOG_ERROR("scripts.ai.sai", "SMART_TARGET_GAMEOBJECT_RANGE: Entry: {} SourceType {} Event {} Action {} Target {} is missing base object or invoker.",
-                    e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetTargetType());
+                    e.entry, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetTargetType());
                 break;
             }
 
@@ -3057,7 +3060,7 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
             if (!scriptTrigger && !baseObject)
             {
                 LOG_ERROR("scripts.ai.sai", "SMART_TARGET_CREATURE_GUID: Entry {} SourceType {} Event {} Action {} Target {} is missing base object or invoker.",
-                    e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetTargetType());
+                    e.entry, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetTargetType());
                 break;
             }
 
@@ -3071,7 +3074,7 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
             if (!scriptTrigger && !GetBaseObject())
             {
                 LOG_ERROR("scripts.ai.sai", "SMART_TARGET_GAMEOBJECT_GUID: Entry {} SourceType {} Event {} Action {} Target {} is missing base object or invoker.",
-                    e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetTargetType());
+                    e.entry, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetTargetType());
                 break;
             }
 
@@ -3110,7 +3113,7 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
             if (!ref)
             {
                 LOG_ERROR("scripts.ai.sai", "SMART_TARGET_STORED: Entry {} SourceType {} Event {} Action {} Target {} is missing base object or invoker.",
-                    e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetTargetType());
+                    e.entry, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetTargetType());
                 break;
             }
 
@@ -3128,7 +3131,7 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
             if (!ref)
             {
                 LOG_ERROR("scripts.ai.sai", "SMART_TARGET_CLOSEST_CREATURE: Entry {} SourceType {} Event {} Action {} Target {} is missing base object or invoker.",
-                    e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetTargetType());
+                    e.entry, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetTargetType());
                 break;
             }
 
@@ -3147,7 +3150,7 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
             if (!ref)
             {
                 LOG_ERROR("scripts.ai.sai", "SMART_TARGET_CLOSEST_GAMEOBJECT: Entry {} SourceType {} Event {} Action {} Target {} is missing base object or invoker.",
-                    e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetTargetType());
+                    e.entry, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetTargetType());
                 break;
             }
 
@@ -3166,7 +3169,7 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
             if (!ref)
             {
                 LOG_ERROR("scripts.ai.sai", "SMART_TARGET_CLOSEST_PLAYER: Entry {} SourceType {} Event {} Action {} Target {} is missing base object or invoker.",
-                    e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetTargetType());
+                    e.entry, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetTargetType());
                 break;
             }
 
@@ -4216,19 +4219,27 @@ void SmartScript::FillScript(SmartAIEventList e, WorldObject* obj, AreaTrigger c
 void SmartScript::GetScript()
 {
     SmartAIEventList e;
+    SmartAIEventList eventList;
+
     if (me)
     {
-        e = sSmartScriptMgr->GetScript(-((int32)me->GetSpawnId()), mScriptType);
-        if (e.empty())
-            e = sSmartScriptMgr->GetScript((int32)me->GetEntry(), mScriptType);
-        FillScript(e, me, nullptr);
+        e = sSmartScriptMgr->GetScript((int32)me->GetEntry(), mScriptType);
+        for (SmartAIEventList::iterator i = e.begin(); i != e.end(); ++i)
+        {
+            if ((*i).guid == 0 || (*i).guid == me->GetSpawnId())
+                eventList.push_back(*i);
+        }
+        FillScript(eventList, me, nullptr);
     }
     else if (go)
     {
-        e = sSmartScriptMgr->GetScript(-((int32)go->GetSpawnId()), mScriptType);
-        if (e.empty())
-            e = sSmartScriptMgr->GetScript((int32)go->GetEntry(), mScriptType);
-        FillScript(e, go, nullptr);
+        e = sSmartScriptMgr->GetScript((int32)go->GetEntry(), mScriptType);
+        for (SmartAIEventList::iterator i = e.begin(); i != e.end(); ++i)
+        {
+            if ((*i).guid == 0 || (*i).guid == go->GetSpawnId())
+                eventList.push_back(*i);
+        }
+        FillScript(eventList, go, nullptr);
     }
     else if (trigger)
     {
@@ -4427,7 +4438,7 @@ void SmartScript::SetScript9(SmartScriptHolder& e, uint32 entry)
     // any SmartScriptHolder contained like the "e" parameter passed to this function
     if (isProcessingTimedActionList)
     {
-        LOG_ERROR("scripts.ai.sai", "Entry {} SourceType {} Event {} Action {} is trying to overwrite timed action list from a timed action, this is not allowed!.", e.entryOrGuid, e.GetScriptType(), e.GetEventType(), e.GetActionType());
+        LOG_ERROR("scripts.ai.sai", "Entry {} SourceType {} Event {} Action {} is trying to overwrite timed action list from a timed action, this is not allowed!.", e.entry, e.GetScriptType(), e.GetEventType(), e.GetActionType());
         return;
     }
 

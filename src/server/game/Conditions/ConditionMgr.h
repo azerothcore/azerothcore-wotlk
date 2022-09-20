@@ -263,7 +263,7 @@ public:
     [[nodiscard]] bool CanHaveSourceIdSet(ConditionSourceType sourceType) const;
     ConditionList GetConditionsForNotGroupedEntry(ConditionSourceType sourceType, uint32 entry);
     ConditionList GetConditionsForSpellClickEvent(uint32 creatureId, uint32 spellId);
-    ConditionList GetConditionsForSmartEvent(int32 entryOrGuid, uint32 eventId, uint32 sourceType);
+    ConditionList GetConditionsForSmartEvent(int32 entry, uint32 eventId, uint32 sourceType);
     ConditionList GetConditionsForVehicleSpell(uint32 creatureId, uint32 spellId);
     ConditionList GetConditionsForNpcVendorEvent(uint32 creatureId, uint32 itemId);
 
