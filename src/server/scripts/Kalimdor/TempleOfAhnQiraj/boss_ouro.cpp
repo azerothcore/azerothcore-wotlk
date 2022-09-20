@@ -250,6 +250,7 @@ struct boss_ouro : public BossAI
     void EnterCombat(Unit* who) override
     {
         Emerge();
+        me->LowerPlayerDamageReq(me->GetMaxHealth() - me->GetHealth());
 
         BossAI::EnterCombat(who);
     }
