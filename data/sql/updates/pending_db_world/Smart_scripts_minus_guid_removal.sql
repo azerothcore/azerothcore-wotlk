@@ -375,6 +375,103 @@ INSERT INTO `smart_scripts` (`entry`,`guid`,`source_type`,`id`,`link`,`event_typ
 (37011,247114,0,26,0,6,0,100,513,0,0,0,0,0,11,70961,3,0,0,0,0,1,0,0,0,0,0,0,0,0,'The Damned - On Death - Cast ''Shattered Bones'''),
 (37011,247115,0,27,0,6,0,100,513,0,0,0,0,0,11,70961,3,0,0,0,0,1,0,0,0,0,0,0,0,0,'The Damned - On Death - Cast ''Shattered Bones''');
 
+-- Ash''ari Crystal
+DELETE FROM `smart_scripts` WHERE `entry` IN (-53955,-53963,-53968) AND `source_type`=0;
+DELETE FROM `smart_scripts` WHERE `entry` IN (10415) AND `source_type`=0;
+INSERT INTO `smart_scripts` (`entry`,`guid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(10415,53955,0,0,1,38,0,100,769,2,2,0,0,0,34,1,2,0,0,0,0,1,0,0,0,0,0,0,0,0,'Ash''ari Crystal - On Data Set - Set Instance Data 1 to 2'),
+(10415,53955,0,1,0,61,0,100,512,0,0,0,0,0,37,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Ash''ari Crystal - On Data Set - Die'),
+(10415,53963,0,2,3,38,0,100,769,2,2,0,0,0,34,3,2,0,0,0,0,1,0,0,0,0,0,0,0,0,'Ash''ari Crystal - On Data Set - Set Instance Data 3 to 2'),
+(10415,53963,0,3,0,61,0,100,512,0,0,0,0,0,37,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Ash''ari Crystal - On Data Set - Die'),
+(10415,53968,0,4,5,38,0,100,769,2,2,0,0,0,34,2,2,0,0,0,0,1,0,0,0,0,0,0,0,0,'Ash''ari Crystal - On Data Set - Set Instance Data 2 to 2'),
+(10415,53968,0,5,0,61,0,100,512,0,0,0,0,0,37,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Ash''ari Crystal - On Data Set - Die');
+
+-- Deeprun Diver
+DELETE FROM `smart_scripts` WHERE `entry` IN (-53790) AND `source_type`=0;
+DELETE FROM `smart_scripts` WHERE `entry` IN (14121) AND `source_type`=0;
+INSERT INTO `smart_scripts` (`entry`,`guid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(14121,53790,0,0,0,1,0,100,513,1,1,0,0,0,53,0,14121,1,0,0,0,1,0,0,0,0,0,0,0,0,'Deeprun Diver - ooc no repeat - Start wp'),
+(14121,53790,0,1,2,40,0,100,512,4,14121,0,0,0,54,10000,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deeprun Diver - On wp reached - pause wp'),
+(14121,53790,0,2,0,61,0,100,512,0,0,0,0,0,9,0,0,0,0,0,0,20,179345,10,0,0,0,0,0,0,'Deeprun Diver - On wp reached - activate object');
+
+-- Stormforged Artificer (2 less lines)
+DELETE FROM `smart_scripts` WHERE `entry` IN (-53927,-53928) AND `source_type`=0;
+DELETE FROM `smart_scripts` WHERE `entry` IN (29376) AND `source_type`=0;
+INSERT INTO `smart_scripts` (`entry`,`guid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(29376,0,0,0,0,9,0,100,0,0,40,7000,9000,0,11,57580,0,0,0,0,0,5,0,0,0,0,0,0,0,0,'Stormforged Artificer - Within 0-40 Range - Cast ''Lightning Infusion'''),
+(29376,53927,0,1,0,1,0,100,0,4000,4000,14000,14000,0,11,54464,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormforged Artificer - Out of Combat - Cast ''Artificer''s Beam'''),
+(29376,53928,0,2,0,1,0,100,0,4000,4000,14000,14000,0,11,54464,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormforged Artificer - Out of Combat - Cast ''Artificer''s Beam''');
+
+-- Dragonmaw Ascendant (3 less lines)
+DELETE FROM `smart_scripts` WHERE `entry` IN (-52330) AND `source_type`=0;
+DELETE FROM `smart_scripts` WHERE `entry` IN (22253) AND `source_type`=0;
+INSERT INTO `smart_scripts` (`entry`,`guid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(22253,0,0,0,0,0,0,100,0,3000,5000,7000,7000,0,11,15496,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Dragonmaw Ascendant - IC - Cast ''Cleave'''),
+(22253,0,0,1,0,0,0,100,0,5000,7000,8000,10000,0,11,17547,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Dragonmaw Ascendant - IC - Cast ''Mortal Strike'''),
+(22253,0,0,2,0,0,0,100,0,4000,7000,9000,12000,0,11,10966,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Dragonmaw Ascendant - IC - Cast ''Uppercut'''),
+(22253,52330,0,3,0,1,0,100,0,2000,5000,12000,16000,0,12,23188,7,0,0,0,0,8,0,0,0,0,-4933.32,31.1347,61.7721,0.480736,'Dragonmaw Ascendant - OOC - Summon Creature ''Dragonmaw Transporter'''),
+(22253,52330,0,4,0,63,0,100,512,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Dragonmaw Ascendant - Just created - Set active');
+
+-- Crimson Monk (4 less lines)
+DELETE FROM `smart_scripts` WHERE `entry` IN (-52144) AND `source_type`=0;
+DELETE FROM `smart_scripts` WHERE `entry` IN (11043) AND `source_type`=0;
+INSERT INTO `smart_scripts` (`entry`,`guid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(11043,0,0,0,0,25,0,100,769,0,0,0,0,0,11,674,2,0,0,0,0,1,0,0,0,0,0,0,0,0,'Crimson Monk - On Reset - Cast ''Dual Wield'''),
+(11043,0,0,1,0,25,0,100,512,0,0,0,0,0,11,8876,2,0,0,0,0,1,0,0,0,0,0,0,0,0,'Crimson Monk - On Reset - ''Cast Thrash'''),
+(11043,0,0,2,0,13,0,100,0,8000,13000,0,0,0,11,11978,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Crimson Monk - Victim Casting - Cast ''Kick'''),
+(11043,0,0,3,0,2,0,100,1,0,15,0,0,0,25,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Crimson Monk - Between 0-15% Health - Flee For Assist'),
+(11043,0,0,4,0,4,0,20,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Crimson Monk - On Aggro - Say Line 0'),
+(11043,52144,0,5,0,6,0,100,0,0,0,0,0,0,1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Crimson Monk - On Death - Say Line 1');
+
+-- Grim Patron (22 More lines)
+DELETE FROM `smart_scripts` WHERE `entry` IN (-48172) AND `source_type`=0;
+DELETE FROM `smart_scripts` WHERE `entry` IN (9545) AND `source_type`=0;
+INSERT INTO `smart_scripts` (`entry`,`guid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(9545,0,0,0,0,0,0,100,0,3000,5000,5000,8000,0,11,15610,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Grim Patron - In Combat - Cast ''Kick'''),
+(9545,0,0,1,0,2,0,100,1,0,30,0,0,0,11,14822,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - Between 0-30% Health - Cast ''Drunken Rage'' (No Repeat)'),
+(9545,0,0,2,0,1,0,55,0,7000,15000,7000,15000,0,10,1,4,11,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - OOC - Play Random Emotes'),
+(9545,0,0,3,0,38,0,100,0,1,1,0,0,0,49,0,0,0,0,0,0,21,30,0,0,0,0,0,0,0,'Grim Patron - On Data set - Start Attack'),
+(9545,46621,0,4,0,38,0,100,512,1,4,0,0,0,80,954700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - On Data set - Action list'),
+(9545,46627,0,5,0,38,0,100,512,1,4,0,0,0,80,954700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - On Data set - Action list'),
+(9545,46629,0,6,0,38,0,100,512,1,4,0,0,0,80,954700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - On Data set - Action list'),
+(9545,48094,0,7,0,38,0,100,512,1,4,0,0,0,80,954700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - On Data set - Action list'),
+(9545,48152,0,8,0,38,0,100,512,1,4,0,0,0,80,954700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - On Data set - Action list'),
+(9545,48168,0,9,0,38,0,100,512,1,4,0,0,0,80,954700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - On Data set - Action list'),
+(9545,90740,0,10,0,38,0,100,512,1,4,0,0,0,80,954700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - On Data set - Action list'),
+(9545,90744,0,11,0,38,0,100,512,1,4,0,0,0,80,954700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - On Data set - Action list'),
+(9545,90746,0,12,0,38,0,100,512,1,4,0,0,0,80,954700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - On Data set - Action list'),
+(9545,90881,0,13,0,38,0,100,512,1,4,0,0,0,80,954700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - On Data set - Action list'),
+(9545,90882,0,14,0,38,0,100,512,1,4,0,0,0,80,954700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - On Data set - Action list'),
+(9545,90883,0,15,0,38,0,100,512,1,4,0,0,0,80,954700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - On Data set - Action list'),
+(9545,90885,0,16,0,38,0,100,512,1,4,0,0,0,80,954700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - On Data set - Action list'),
+(9545,90887,0,17,0,38,0,100,512,1,4,0,0,0,80,954700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - On Data set - Action list'),
+(9545,90889,0,18,0,38,0,100,512,1,4,0,0,0,80,954700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - On Data set - Action list'),
+(9545,91011,0,19,0,38,0,100,512,1,4,0,0,0,80,954700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - On Data set - Action list'),
+(9545,91012,0,20,0,38,0,100,512,1,4,0,0,0,80,954700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - On Data set - Action list'),
+(9545,91013,0,21,0,38,0,100,512,1,4,0,0,0,80,954700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - On Data set - Action list'),
+(9545,91014,0,22,0,38,0,100,512,1,4,0,0,0,80,954700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - On Data set - Action list'),
+(9545,91015,0,23,0,38,0,100,512,1,4,0,0,0,80,954700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - On Data set - Action list'),
+(9545,91016,0,24,0,38,0,100,512,1,4,0,0,0,80,954700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - On Data set - Action list'),
+(9545,91017,0,25,0,38,0,100,512,1,4,0,0,0,80,954700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - On Data set - Action list'),
+(9545,91018,0,26,0,38,0,100,512,1,4,0,0,0,80,954700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - On Data set - Action list'),
+(9545,91019,0,27,0,38,0,100,512,1,4,0,0,0,80,954700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - On Data set - Action list'),
+(9545,91045,0,28,0,38,0,100,512,1,4,0,0,0,80,954700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - On Data set - Action list'),
+(9545,91049,0,29,0,38,0,100,512,1,4,0,0,0,80,954700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - On Data set - Action list'),
+(9545,91070,0,30,0,38,0,100,512,1,4,0,0,0,80,954700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - On Data set - Action list'),
+(9545,48172,0,31,0,38,0,100,512,1,4,0,0,0,80,954500,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - On Data set - Action list'),
+(9545,48172,0,32,33,1,0,100,0,30000,30000,55000,60000,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Grim Patron - OOC - Say text1'),
+(9545,48172,0,33,0,61,0,100,512,0,0,0,0,0,45,1,1,0,0,0,0,19,9500,50,0,0,0,0,0,0,'Grim Patron - OOC - Set data');
+
+-- Warbringer Construct (4 less lines)
+DELETE FROM `smart_scripts` WHERE `entry` IN (-47704,-47708,-47712,-47716,-47717,-47721,-47725,-47729) AND `source_type`=0;
+DELETE FROM `smart_scripts` WHERE `entry` IN (8905) AND `source_type`=0;
+INSERT INTO `smart_scripts` (`entry`,`guid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(8905,0,0,0,0,0,0,100,0,3000,6000,8000,9000,0,11,15621,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Warbringer Construct - In Combat  - Cast ''Skull Crack'''),
+(8905,46608,1,0,0,4,0,30,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Warbringer Construct - On Aggro - Say Line 0'),
+(8905,46610,2,0,0,4,0,30,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Warbringer Construct - On Aggro - Say Line 0'),
+(8905,46611,3,0,0,4,0,30,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Warbringer Construct - On Aggro - Say Line 0'),
+(8905,46612,4,0,0,4,0,30,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Warbringer Construct - On Aggro - Say Line 0');
+
 -- Sunblade Protector (6 less lines)
 DELETE FROM `smart_scripts` WHERE `entry` IN (-45537,-45570,-45571) AND `source_type`=0;
 DELETE FROM `smart_scripts` WHERE `entry` IN (25507) AND `source_type`=0;
