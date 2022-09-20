@@ -135,6 +135,7 @@ public:
         _isEating = true;
         me->SetSpeed(MOVE_RUN, 45.f/7.f); // From sniffs
         me->SetReactState(REACT_PASSIVE);
+        _scheduler.DelayAll(6s);
     }
 
     void MovementInform(uint32 type, uint32 id) override
