@@ -486,6 +486,7 @@ public:
                 MountPhase = false;
                 NewMountGUID.Clear();
                 me->SetHealth(me->GetMaxHealth());
+                me->SetFaction(14);
                 me->SetRegeneratingHealth(true);
                 me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
                 me->SetSpeed(MOVE_RUN, 1.0f, false);
@@ -550,6 +551,7 @@ public:
                     events.Reset();
                     damage = me->GetHealth() - 1;
                     me->SetReactState(REACT_PASSIVE);
+                    me->SetFaction(35);
                     me->RemoveAllAuras();
                     AddCreatureAddonAuras();
                     me->GetThreatMgr().ClearAllThreat();
@@ -564,12 +566,12 @@ public:
                     if( pInstance )
                     {
                         pInstance->SetData(DATA_MOUNT_DIED, BossOrder);
-                        if( Creature* mount = me->FindNearestCreature( pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? VEHICLE_ARGENT_WARHORSE : VEHICLE_ARGENT_BATTLEWORG, 100.0f, true ) )
-                        {
-                            NewMountGUID = mount->GetGUID();
-                            me->GetMotionMaster()->MovePoint(7, *mount);
-                            events.RescheduleEvent(EVENT_FIND_NEW_MOUNT, 1000);
-                        }
+                        //if( Creature* mount = me->FindNearestCreature( pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? VEHICLE_ARGENT_WARHORSE : VEHICLE_ARGENT_BATTLEWORG, 100.0f, true ) )
+                        //{
+                           // NewMountGUID = mount->GetGUID();
+                            //me->GetMotionMaster()->MovePoint(7, *mount);
+                            //events.RescheduleEvent(EVENT_FIND_NEW_MOUNT, 1000);
+                        //}
                     }
                 }
             }
@@ -581,6 +583,7 @@ public:
                     events.Reset();
                     damage = me->GetHealth() - 1;
                     me->SetReactState(REACT_PASSIVE);
+                    me->SetFaction(35);
                     me->RemoveAllAuras();
                     AddCreatureAddonAuras();
                     me->GetThreatMgr().ClearAllThreat();
