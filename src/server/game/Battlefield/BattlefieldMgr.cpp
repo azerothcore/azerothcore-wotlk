@@ -40,7 +40,7 @@ BattlefieldMgr* BattlefieldMgr::instance()
 
 void BattlefieldMgr::InitBattlefield()
 {
-    if (sWorld->getIntConfig(CONFIG_WINTERGRASP_ENABLE) == -1)
+    if (sWorld->getIntConfig(CONFIG_WINTERGRASP_ENABLE) == 2)
     {
         LOG_INFO("server.loading", "Battlefield: Wintergrasp is disabled.");
         LOG_INFO("server.loading", " ");

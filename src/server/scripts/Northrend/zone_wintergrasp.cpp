@@ -350,7 +350,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (sWorld->getIntConfig(CONFIG_WINTERGRASP_ENABLE) < 1)
+            if (sWorld->getIntConfig(CONFIG_WINTERGRASP_ENABLE) != 1)
                 return;
 
             ScriptedAI::UpdateAI(diff);
