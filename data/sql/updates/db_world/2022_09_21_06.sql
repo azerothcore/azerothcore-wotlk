@@ -1,3 +1,4 @@
+-- DB update 2022_09_21_05 -> 2022_09_21_06
 SET @MAP_ID := 533;
 -- Fixes Naxxramas portals & teleport orbs
 -- Change portal animation from CCW to CW
