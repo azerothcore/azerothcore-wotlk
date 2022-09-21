@@ -170,6 +170,15 @@ CreatureAI* ScriptMgr::GetCreatureAI(Creature* creature)
     return tempScript ? tempScript->GetAI(creature) : nullptr;
 }
 
+//Fires whenever the UNIT_BYTE2_FLAG_FFA_PVP bit is Changed on the player
+void ScriptMgr::OnFfaPvpStateUpdate(Creature* creature, bool InPvp)
+{
+    ExecuteScript<AllCreatureScript>([&](AllCreatureScript* script)
+        {
+            script->OnFfaPvpStateUpdate(creature, InPvp);
+        });
+}
+
 void ScriptMgr::OnCreatureUpdate(Creature* creature, uint32 diff)
 {
     ASSERT(creature);
