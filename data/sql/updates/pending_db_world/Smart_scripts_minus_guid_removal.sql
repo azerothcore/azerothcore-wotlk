@@ -375,6 +375,95 @@ INSERT INTO `smart_scripts` (`entry`,`guid`,`source_type`,`id`,`link`,`event_typ
 (37011,247114,0,26,0,6,0,100,513,0,0,0,0,0,11,70961,3,0,0,0,0,1,0,0,0,0,0,0,0,0,'The Damned - On Death - Cast ''Shattered Bones'''),
 (37011,247115,0,27,0,6,0,100,513,0,0,0,0,0,11,70961,3,0,0,0,0,1,0,0,0,0,0,0,0,0,'The Damned - On Death - Cast ''Shattered Bones''');
 
+-- Honor Hold Archer
+DELETE FROM `smart_scripts` WHERE `entry` IN (-58449,-58450,-58451) AND `source_type`=0;
+DELETE FROM `smart_scripts` WHERE `entry` IN (16896) AND `source_type`=0;
+INSERT INTO `smart_scripts` (`entry`,`guid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(16896,58449,0,0,0,1,0,100,512,6000,6000,6000,6000,0,11,29120,2,0,0,0,0,10,58457,16898,0,0,0,0,0,0,'Honor Hold Archer - Out of Combat - Cast ''Shoot Bow'''),
+(16896,58450,0,1,0,1,0,100,512,4000,4000,6000,6000,0,11,29120,2,0,0,0,0,10,58461,16899,0,0,0,0,0,0,'Honor Hold Archer - Out of Combat - Cast ''Shoot Bow'''),
+(16896,58451,0,2,0,1,0,100,512,2000,2000,6000,6000,0,11,29120,2,0,0,0,0,10,58455,16897,0,0,0,0,0,0,'Honor Hold Archer - Out of Combat - Cast ''Shoot Bow''');
+
+-- Nethergarde Infantry
+DELETE FROM `smart_scripts` WHERE `entry` IN (-57890,-57891) AND `source_type`=0;
+DELETE FROM `smart_scripts` WHERE `entry` IN (16831) AND `source_type`=0;
+INSERT INTO `smart_scripts` (`entry`,`guid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(16831,57890,0,0,1,11,0,100,512,0,0,0,0,0,2,1755,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Nethergarde Infantry - On Respawn - Set Faction'),
+(16831,57890,0,1,0,61,0,100,512,0,0,0,0,0,18,768,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Nethergarde Infantry - On Respawn - Set Unit Flags'),
+(16831,57891,0,2,3,11,0,100,512,0,0,0,0,0,2,1755,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Nethergarde Infantry - On Respawn - Set Faction'),
+(16831,57891,0,3,0,61,0,100,512,0,0,0,0,0,18,768,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Nethergarde Infantry - On Respawn - Set Unit Flags');
+
+-- Stormwind Infantry
+DELETE FROM `smart_scripts` WHERE `entry` IN (-58137) AND `source_type`=0;
+DELETE FROM `smart_scripts` WHERE `entry` IN (16864) AND `source_type`=0;
+INSERT INTO `smart_scripts` (`entry`,`guid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(16864,58137,0,0,1,11,0,100,512,0,0,0,0,0,2,1755,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Infantry - On Respawn - Set Faction'),
+(16864,58137,0,1,0,61,0,100,512,0,0,0,0,0,18,768,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Infantry - On Respawn - Set Unit Flags');
+
+-- Thrallmar Marksman
+DELETE FROM `smart_scripts` WHERE `entry` IN (-57542,-57543) AND `source_type`=0;
+DELETE FROM `smart_scripts` WHERE `entry` IN (16582) AND `source_type`=0;
+INSERT INTO `smart_scripts` (`entry`,`guid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(16582,57542,0,0,1,11,0,100,512,0,0,0,0,0,2,1759,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Thrallmar Marksman - On Respawn - Set Faction'),
+(16582,57542,0,1,0,61,0,100,512,0,0,0,0,0,18,768,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Thrallmar Marksman - On Respawn - Set Unit Flags'),
+(16582,57543,0,2,3,11,0,100,512,0,0,0,0,0,2,1759,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Thrallmar Marksman - On Respawn - Set Faction'),
+(16582,57543,0,3,0,61,0,100,512,0,0,0,0,0,18,768,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Thrallmar Marksman - On Respawn - Set Unit Flags');
+
+-- Thrallmar Grunt
+DELETE FROM `smart_scripts` WHERE `entry` IN (-57492) AND `source_type`=0;
+DELETE FROM `smart_scripts` WHERE `entry` IN (16580) AND `source_type`=0;
+INSERT INTO `smart_scripts` (`entry`,`guid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(16580,0,0,0,0,25,0,100,1,0,0,0,0,0,11,18950,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Thrallmar Grunt - On Reset - Cast Invisibility and Stealth Detection'),
+(16580,57492,0,0,1,11,0,100,512,0,0,0,0,0,2,1759,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Thrallmar Grunt - On Respawn - Set Faction'),
+(16580,57492,0,1,0,61,0,100,512,0,0,0,0,0,18,768,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Thrallmar Grunt - On Respawn - Set Unit Flags');
+
+-- Power Source Invisible Bunny
+DELETE FROM `smart_scripts` WHERE `entry` IN (-56028,-56029,-63690,-63691,-63693,-63694,-63695,-63697) AND `source_type`=0;
+DELETE FROM `smart_scripts` WHERE `entry` IN (17984) AND `source_type`=0;
+INSERT INTO `smart_scripts` (`entry`,`guid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(17984,56028,0,0,0,60,0,100,0,1000,1000,1000,2000,0,11,31630,256,0,0,0,0,10,56027,17984,0,0,0,0,0,0,'Power Source Invisible Bunny - OOC - Cast Green Beam'),
+(17984,56029,0,1,0,60,0,100,0,1000,1000,1000,2000,0,11,31630,256,0,0,0,0,10,56027,17984,0,0,0,0,0,0,'Power Source Invisible Bunny - OOC - Cast Green Beam'),
+(17984,63690,0,2,0,60,0,100,0,1000,1000,1000,2000,0,11,31628,256,0,0,0,0,10,63692,17984,0,0,0,0,0,0,'Power Source Invisible Bunny - OOC - Cast Green Beam'),
+(17984,63691,0,3,0,60,0,100,0,1000,1000,1000,2000,0,11,31630,256,0,0,0,0,10,56027,17984,0,0,0,0,0,0,'Power Source Invisible Bunny - OOC - Cast Green Beam'),
+(17984,63693,0,4,0,60,0,100,0,1000,1000,1000,2000,0,11,31628,256,0,0,0,0,10,63692,17984,0,0,0,0,0,0,'Power Source Invisible Bunny - OOC - Cast Green Beam'),
+(17984,63694,0,5,0,60,0,100,0,1000,1000,1000,2000,0,11,31628,256,0,0,0,0,10,63692,17984,0,0,0,0,0,0,'Power Source Invisible Bunny - OOC - Cast Green Beam'),
+(17984,63695,0,6,0,60,0,100,0,1000,1000,1000,2000,0,11,31631,256,0,0,0,0,10,63696,17984,0,0,0,0,0,0,'Power Source Invisible Bunny - OOC - Cast Green Beam'),
+(17984,63697,0,7,0,60,0,100,0,1000,1000,1000,2000,0,11,31631,256,0,0,0,0,10,63696,17984,0,0,0,0,0,0,'Power Source Invisible Bunny - OOC - Cast Green Beam');
+
+-- Crimson Gallant (8 less lines)
+DELETE FROM `smart_scripts` WHERE `entry` IN (-54204,-54219) AND `source_type`=0;
+DELETE FROM `smart_scripts` WHERE `entry` IN (10424) AND `source_type`=0;
+INSERT INTO `smart_scripts` (`entry`,`guid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(10424,0,0,0,0,1,0,100,1,0,5000,0,0,0,11,8990,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Crimson Gallant - Out of Combat - Cast ''Retribution Aura'''),
+(10424,0,0,1,0,0,0,100,0,2000,7000,8000,13800,0,11,14518,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Crimson Gallant - In Combat - Cast ''Crusader Strike'''),
+(10424,0,0,2,0,0,0,100,0,7000,12000,12000,18000,0,11,17143,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Crimson Gallant - In Combat - Cast ''Holy Strike'''),
+(10424,0,0,3,0,2,0,100,1,0,15,0,0,0,25,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,'Crimson Gallant - Between 0-15% Health - Flee For Assist'),
+(10424,54204,0,4,5,6,0,100,0,0,0,0,0,0,1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Crimson Gallant - On Death - Say Line 0'),
+(10424,54204,0,5,0,61,0,100,0,0,0,0,0,0,39,30,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Crimson Gallant - On Death - Call For Help'),
+(10424,54219,0,6,7,6,0,100,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Crimson Gallant - On Death - Say Line 0'),
+(10424,54219,0,7,0,61,0,100,0,0,0,0,0,0,39,30,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Crimson Gallant - On Death - Call For Help');
+
+-- Crimson Conjuror (4 less lines)
+DELETE FROM `smart_scripts` WHERE `entry` IN (-54079) AND `source_type`=0;
+DELETE FROM `smart_scripts` WHERE `entry` IN (10419) AND `source_type`=0;
+INSERT INTO `smart_scripts` (`entry`,`guid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(10419,0,0,0,0,0,0,100,0,0,1000,3000,4500,0,11,12675,64,0,0,0,0,2,0,0,0,0,0,0,0,0,'Crimson Conjuror - In Combat - Cast ''Frostbolt'''),
+(10419,0,0,1,0,0,0,100,0,4000,15000,12000,25800,0,11,12674,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Crimson Conjuror - In Combat - Cast ''Frost Nova'''),
+(10419,0,0,2,0,0,0,100,0,0,12000,40000,60000,0,11,17162,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Crimson Conjuror - In Combat - Cast ''Summon Water Elemental'''),
+(10419,0,0,3,0,2,0,100,1,0,15,0,0,0,25,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,'Crimson Conjuror - Between 0-15% Health - Flee For Assist'),
+(10419,54079,0,4,5,6,0,100,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Crimson Conjuror - On Death - Say Line 0'),
+(10419,54079,0,5,0,61,0,100,0,0,0,0,0,0,39,20,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Crimson Conjuror - On Death - Call For Help');
+
+-- Crimson Guardsman (4 less lines)
+DELETE FROM `smart_scripts` WHERE `entry` IN (-54069) AND `source_type`=0;
+DELETE FROM `smart_scripts` WHERE `entry` IN (10418) AND `source_type`=0;
+INSERT INTO `smart_scripts` (`entry`,`guid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(10418,0,0,0,0,9,0,100,0,8,25,10000,10000,0,11,15749,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Crimson Guardsman - Within Range 8-25yd - Cast ''Shield Charge'''),
+(10418,0,0,1,0,0,0,100,0,4000,15000,12000,25800,0,11,6713,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Crimson Guardsman - In Combat - Cast ''Disarm'''),
+(10418,0,0,2,0,13,0,100,0,10000,12000,0,0,0,11,11972,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Crimson Guardsman - Victim Casting - Cast ''Shield Bash'''),
+(10418,0,0,3,0,2,0,100,1,0,15,0,0,0,25,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,'Crimson Guardsman - Between 0-15% Health - Flee For Assist'),
+(10418,54069,0,4,5,6,0,100,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Crimson Guardsman - On Death - Say Line 0'),
+(10418,54069,0,5,0,61,0,100,0,0,0,0,0,0,39,30,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Crimson Guardsman - On Death - Call For Help');
+
 -- Ash''ari Crystal
 DELETE FROM `smart_scripts` WHERE `entry` IN (-53955,-53963,-53968) AND `source_type`=0;
 DELETE FROM `smart_scripts` WHERE `entry` IN (10415) AND `source_type`=0;
@@ -472,8 +561,8 @@ INSERT INTO `smart_scripts` (`entry`,`guid`,`source_type`,`id`,`link`,`event_typ
 (8905,46611,3,0,0,4,0,30,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Warbringer Construct - On Aggro - Say Line 0'),
 (8905,46612,4,0,0,4,0,30,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Warbringer Construct - On Aggro - Say Line 0');
 
--- Sunblade Protector (6 less lines)
-DELETE FROM `smart_scripts` WHERE `entry` IN (-45537,-45570,-45571) AND `source_type`=0;
+-- Sunblade Protector (16 less lines)
+DELETE FROM `smart_scripts` WHERE `entry` IN (-45537,-45570,-45571,-54994,-54996,-55062,-55064,-55065) AND `source_type`=0;
 DELETE FROM `smart_scripts` WHERE `entry` IN (25507) AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entry`,`guid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
 (25507,0,0,0,0,11,0,100,0,0,0,0,0,0,11,18950,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - On Respawn - Cast Invisibility and Stealth Detection'),
@@ -498,7 +587,42 @@ INSERT INTO `smart_scripts` (`entry`,`guid`,`source_type`,`id`,`link`,`event_typ
 (25507,45571,0,19,20,8,0,100,512,46476,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - On Spell Hit - Set React State'),
 (25507,45571,0,20,21,61,0,100,512,0,0,0,0,0,28,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - On Spell Hit - Remove All Auras'),
 (25507,45571,0,21,22,61,0,100,512,0,0,0,0,0,38,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - On Spell Hit - Set In Combat With Zone'),
-(25507,45571,0,22,0,61,0,100,512,0,0,0,0,0,19,33554432,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - On Spell Hit - Remove Unit Flag');
+(25507,45571,0,22,0,61,0,100,512,0,0,0,0,0,19,33554432,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - On Spell Hit - Remove Unit Flag'),
+(25507,54994,0,23,24,25,0,100,769,0,0,0,0,0,11,59123,2,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - On Reset - Cast Banish'),
+(25507,54994,0,24,25,61,0,100,512,0,0,0,0,0,18,33554432,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - ON RESET - ADD Unit Flag'),
+(25507,54994,0,25,0,61,0,100,512,0,0,0,0,0,8,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - On Reset - Set React State'),
+(25507,54994,0,26,27,8,0,100,512,46476,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - ON Spell Hit - SET React State'),
+(25507,54994,0,27,28,61,0,100,512,0,0,0,0,0,28,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - On Spell Hit - Remove All Auras'),
+(25507,54994,0,28,29,61,0,100,512,0,0,0,0,0,38,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - ON Spell Hit - SET IN Combat WITH Zone'),
+(25507,54994,0,29,0,61,0,100,512,0,0,0,0,0,19,33554432,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - On Spell Hit - Remove Unit Flag'),
+(25507,54996,0,30,31,25,0,100,769,0,0,0,0,0,11,59123,2,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - On Reset - Cast Banish'),
+(25507,54996,0,31,32,61,0,100,512,0,0,0,0,0,18,33554432,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - On Reset - Add Unit Flag'),
+(25507,54996,0,32,0,61,0,100,512,0,0,0,0,0,8,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - ON RESET - SET React State'),
+(25507,54996,0,33,34,8,0,100,512,46476,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - On Spell Hit - Set React State'),
+(25507,54996,0,34,35,61,0,100,512,0,0,0,0,0,28,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - ON Spell Hit - REMOVE ALL Auras'),
+(25507,54996,0,35,36,61,0,100,512,0,0,0,0,0,38,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - On Spell Hit - Set In Combat With Zone'),
+(25507,54996,0,36,0,61,0,100,512,0,0,0,0,0,19,33554432,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - ON Spell Hit - REMOVE Unit Flag'),
+(25507,55062,0,37,38,25,0,100,769,0,0,0,0,0,11,59123,2,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - On Reset - Cast Banish'),
+(25507,55062,0,38,39,61,0,100,512,0,0,0,0,0,18,33554432,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - ON RESET - ADD Unit Flag'),
+(25507,55062,0,39,0,61,0,100,512,0,0,0,0,0,8,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - On Reset - Set React State'),
+(25507,55062,0,40,41,8,0,100,512,46476,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - ON Spell Hit - SET React State'),
+(25507,55062,0,41,42,61,0,100,512,0,0,0,0,0,28,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - On Spell Hit - Remove All Auras'),
+(25507,55062,0,42,43,61,0,100,512,0,0,0,0,0,38,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - ON Spell Hit - SET IN Combat WITH Zone'),
+(25507,55062,0,43,0,61,0,100,512,0,0,0,0,0,19,33554432,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - On Spell Hit - Remove Unit Flag'),
+(25507,55064,0,44,45,25,0,100,769,0,0,0,0,0,11,59123,2,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - On Reset - Cast Banish'),
+(25507,55064,0,45,46,61,0,100,512,0,0,0,0,0,18,33554432,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - On Reset - Add Unit Flag'),
+(25507,55064,0,46,0,61,0,100,512,0,0,0,0,0,8,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - ON RESET - SET React State'),
+(25507,55064,0,47,48,8,0,100,512,46476,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - On Spell Hit - Set React State'),
+(25507,55064,0,48,49,61,0,100,512,0,0,0,0,0,28,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - ON Spell Hit - REMOVE ALL Auras'),
+(25507,55064,0,49,50,61,0,100,512,0,0,0,0,0,38,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - On Spell Hit - Set In Combat With Zone'),
+(25507,55064,0,50,0,61,0,100,512,0,0,0,0,0,19,33554432,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - ON Spell Hit - REMOVE Unit Flag'),
+(25507,55065,0,51,52,25,0,100,769,0,0,0,0,0,11,59123,2,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - On Reset - Cast Banish'),
+(25507,55065,0,52,53,61,0,100,512,0,0,0,0,0,18,33554432,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - ON RESET - ADD Unit Flag'),
+(25507,55065,0,53,0,61,0,100,512,0,0,0,0,0,8,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - On Reset - Set React State'),
+(25507,55065,0,54,55,8,0,100,512,46476,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - ON Spell Hit - SET React State'),
+(25507,55065,0,55,56,61,0,100,512,0,0,0,0,0,28,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - On Spell Hit - Remove All Auras'),
+(25507,55065,0,56,57,61,0,100,512,0,0,0,0,0,38,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - ON Spell Hit - SET IN Combat WITH Zone'),
+(25507,55065,0,57,0,61,0,100,512,0,0,0,0,0,19,33554432,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sunblade Protector - On Spell Hit - Remove Unit Flag');
 
 -- Shadowsword Assassin (6 less lines)
 DELETE FROM `smart_scripts` WHERE `entry` IN (-44268) AND `source_type`=0;
