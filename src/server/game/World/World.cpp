@@ -1384,7 +1384,7 @@ void World::LoadConfigSettings(bool reload)
     MMAP::MMapFactory::InitializeDisabledMaps();
 
     // Wintergrasp
-    m_bool_configs[CONFIG_WINTERGRASP_ENABLE]             = sConfigMgr->GetOption<bool>("Wintergrasp.Enable", false);
+    m_int_configs[CONFIG_WINTERGRASP_ENABLE]              = sConfigMgr->GetOption<int32>("Wintergrasp.Enable", 1);
     m_int_configs[CONFIG_WINTERGRASP_PLR_MAX]             = sConfigMgr->GetOption<int32>("Wintergrasp.PlayerMax", 100);
     m_int_configs[CONFIG_WINTERGRASP_PLR_MIN]             = sConfigMgr->GetOption<int32>("Wintergrasp.PlayerMin", 0);
     m_int_configs[CONFIG_WINTERGRASP_PLR_MIN_LVL]         = sConfigMgr->GetOption<int32>("Wintergrasp.PlayerMinLvl", 77);
