@@ -1,3 +1,4 @@
+-- DB update 2022_09_21_07 -> 2022_09_21_08
 --
 -- Correct speeds for display ids that were seen in 1.14 but not 1.13 sniffs. (Credit VMangos)
 UPDATE `creature_template` SET `speed_walk`=0.666668 WHERE `modelid1` IN (9444);
