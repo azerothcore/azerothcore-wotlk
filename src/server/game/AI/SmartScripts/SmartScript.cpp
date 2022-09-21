@@ -102,7 +102,6 @@ void SmartScript::ProcessEventsFor(SMART_EVENT e, Unit* unit, uint32 var0, uint3
 
         if (eventType == e)
         {
-                
                 ConditionList conds = sConditionMgr->GetConditionsForSmartEvent((*i).entry, (*i).event_id, (*i).source_type);
                 ConditionSourceInfo info = ConditionSourceInfo(unit, GetBaseObject(), me ? me->GetVictim() : nullptr);
 
