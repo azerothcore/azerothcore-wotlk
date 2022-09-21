@@ -15,6 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "MapReference.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
@@ -23,22 +25,41 @@
 
 enum Spells
 {
+    // Anubisath Defender
     SPELL_SHADOW_FROST_REFLECT          = 19595,
     SPELL_FIRE_ARCANE_REFLECT           = 13022,
     SPELL_METEOR                        = 26558,
     SPELL_PLAGUE                        = 26556,
     SPELL_SHADOW_STORM                  = 26555,
     SPELL_THUNDERCLAP                   = 26554,
-
     SPELL_ENRAGE                        = 14204,
     SPELL_EXPLODE                       = 25699,
-
     SPELL_SUMMON_WARRIOR                = 17431,
     SPELL_SUMMON_SWARMGUARD             = 17430,
-
     SPELL_SUMMON_LARGE_OBSIDIAN_CHUNK   = 27630, // Server-side
 
-    TALK_ENRAGE                         = 0
+    TALK_ENRAGE                         = 0,
+
+    // Vekniss Stinger
+    SPELL_VEKNISS_CATALYST              = 26078,
+    SPELL_STINGER_CHARGE_NORMAL         = 26081,
+    SPELL_STINGER_CHARGE_BUFFED         = 26082,
+
+    // Obsidian Eradicator
+    SPELL_SHOCK_BLAST                   = 26458,
+    SPELL_DRAIN_MANA                    = 25671,
+    SPELL_DRAIN_MANA_VISUAL             = 26639,
+
+    // Anubisath Warder
+    SPELL_FEAR                          = 26070,
+    SPELL_ENTAGLING_ROOTS               = 26071,
+    SPELL_SILENCE                       = 26069,
+    SPELL_DUST_CLOUD                    = 26072,
+    SPELL_FIRE_NOVA                     = 26073,
+
+    // Obsidian Nullifier
+    SPELL_NULLIFY                       = 26552,
+    SPELL_CLEAVE                        = 40504
 };
 
 struct npc_anubisath_defender : public ScriptedAI
@@ -151,6 +172,261 @@ private:
     bool _enraged;
 };
 
+struct npc_vekniss_stinger : public ScriptedAI
+{
+    npc_vekniss_stinger(Creature* creature) : ScriptedAI(creature)
+    {
+    }
+
+    void Reset() override
+    {
+        _scheduler.CancelAll();
+    }
+
+    void EnterCombat(Unit* who) override
+    {
+        DoCast(who ,who->HasAura(SPELL_VEKNISS_CATALYST) ? SPELL_STINGER_CHARGE_BUFFED : SPELL_STINGER_CHARGE_NORMAL, true);
+
+        _scheduler.Schedule(6s, [this](TaskContext context)
+        {
+            Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [&](Unit* u)
+            {
+                return u && !u->IsPet() && u->IsWithinDist2d(me, 20.f) && u->HasAura(SPELL_VEKNISS_CATALYST);
+            });
+            if (!target)
+            {
+                target = SelectTarget(SelectTargetMethod::Random, 0, [&](Unit* u)
+                {
+                    return u && !u->IsPet() && u->IsWithinDist2d(me, 20.f);
+                });
+            }
+
+            if (target)
+            {
+                DoCast(target, target->HasAura(SPELL_VEKNISS_CATALYST) ? SPELL_STINGER_CHARGE_BUFFED : SPELL_STINGER_CHARGE_NORMAL, true);
+            }
+
+            context.Repeat(6s);
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+        {
+            return;
+        }
+
+        _scheduler.Update(diff,
+            std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
+    }
+
+private:
+    TaskScheduler _scheduler;
+};
+
+struct npc_obsidian_eradicator : public ScriptedAI
+{
+    npc_obsidian_eradicator(Creature* creature) : ScriptedAI(creature)
+    {
+    }
+
+    void Reset() override
+    {
+        _scheduler.CancelAll();
+        me->SetPower(POWER_MANA, 0);
+        _targets.clear();
+    }
+
+    void EnterCombat(Unit* /*who*/) override
+    {
+        _scheduler.Schedule(3500ms, [this](TaskContext context)
+        {
+            if (_targets.empty())
+            {
+                Map::PlayerList const& players = me->GetMap()->GetPlayers();
+                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                {
+                    if (Player* player = itr->GetSource())
+                    {
+                        if (player->IsAlive() && !player->IsGameMaster() && !player->IsSpectator() && player->GetPower(POWER_MANA) > 0)
+                        {
+                            _targets.push_back(player);
+                        }
+                    }
+                }
+
+                Acore::Containers::RandomResize(_targets, 10);
+            }
+
+            for (Unit* target : _targets)
+            {
+                DoCast(target, SPELL_DRAIN_MANA, true);
+            }
+
+            if (me->GetPowerPct(POWER_MANA) >= 100.f)
+            {
+                DoCastAOE(SPELL_SHOCK_BLAST, true);
+            }
+
+            context.Repeat(3500ms);
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+        {
+            return;
+        }
+
+        _scheduler.Update(diff,
+            std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
+    }
+
+private:
+    TaskScheduler _scheduler;
+    std::list<Player*> _targets;
+};
+
+struct npc_anubisath_warder : public ScriptedAI
+{
+    npc_anubisath_warder(Creature* creature) : ScriptedAI(creature)
+    {
+    }
+
+    void Reset() override
+    {
+        _scheduler.CancelAll();
+    }
+
+    void EnterCombat(Unit* /*who*/) override
+    {
+        if (urand(0, 1))
+        {
+            _scheduler.Schedule(5s, 5s, [this](TaskContext context)
+            {
+                DoCastAOE(SPELL_FEAR, true);
+                context.Repeat(20s, 20s);
+            });
+        }
+        else
+        {
+            _scheduler.Schedule(5s, 5s, [this](TaskContext context)
+            {
+                DoCastAOE(SPELL_ENTAGLING_ROOTS, true);
+                context.Repeat(20s, 20s);
+            });
+        }
+
+        if (urand(0, 1))
+        {
+            _scheduler.Schedule(4s, 4s, [this](TaskContext context)
+            {
+                DoCastAOE(SPELL_SILENCE, true);
+                context.Repeat(15s, 15s);
+            });
+        }
+        else
+        {
+            _scheduler.Schedule(4s, 4s, [this](TaskContext context)
+            {
+                DoCastAOE(SPELL_DUST_CLOUD, true);
+                context.Repeat(15s, 15s);
+            });
+        }
+
+        _scheduler.Schedule(2s, 2s, [this](TaskContext context)
+        {
+            DoCastAOE(SPELL_FIRE_NOVA, true);
+            context.Repeat(8s, 15s);
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+        {
+            return;
+        }
+
+        _scheduler.Update(diff,
+            std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
+    }
+
+private:
+    TaskScheduler _scheduler;
+};
+
+struct npc_obsidian_nullifier : public ScriptedAI
+{
+    npc_obsidian_nullifier(Creature* creature) : ScriptedAI(creature)
+    {
+    }
+
+    void Reset() override
+    {
+        _scheduler.CancelAll();
+        me->SetPower(POWER_MANA, 0);
+        _targets.clear();
+    }
+
+    void EnterCombat(Unit* /*who*/) override
+    {
+        _scheduler.Schedule(6s, [this](TaskContext context)
+        {
+            if (_targets.empty())
+            {
+                Map::PlayerList const& players = me->GetMap()->GetPlayers();
+                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                {
+                    if (Player* player = itr->GetSource())
+                    {
+                        if (player->IsAlive() && !player->IsGameMaster() && !player->IsSpectator() && player->GetPower(POWER_MANA) > 0)
+                        {
+                            _targets.push_back(player);
+                        }
+                    }
+                }
+
+                Acore::Containers::RandomResize(_targets, 11);
+            }
+
+            for (Unit* target : _targets)
+            {
+                DoCast(target, SPELL_DRAIN_MANA, true);
+            }
+
+            if (me->GetPowerPct(POWER_MANA) >= 100.f)
+            {
+                DoCastAOE(SPELL_NULLIFY, true);
+            }
+
+            context.Repeat(6s);
+        })
+        .Schedule(6000ms, 8400ms, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_CLEAVE, true);
+            context.Repeat(6000ms, 8400ms);
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+        {
+            return;
+        }
+
+        _scheduler.Update(diff,
+            std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
+    }
+
+private:
+    TaskScheduler _scheduler;
+    std::list<Player*> _targets;
+};
+
 enum NPCs
 {
     NPC_VEKNISS_DRONE   = 15300
@@ -183,8 +459,31 @@ class spell_aggro_drones : public SpellScript
     }
 };
 
+class spell_nullify : public AuraScript
+{
+    PrepareAuraScript(spell_nullify);
+
+    void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* target = GetTarget())
+        {
+            target->SetHealth(1);
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_nullify::HandleApply, EFFECT_1, SPELL_AURA_SCHOOL_IMMUNITY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_temple_of_ahnqiraj()
 {
     RegisterTempleOfAhnQirajCreatureAI(npc_anubisath_defender);
+    RegisterTempleOfAhnQirajCreatureAI(npc_vekniss_stinger);
+    RegisterTempleOfAhnQirajCreatureAI(npc_obsidian_eradicator);
+    RegisterTempleOfAhnQirajCreatureAI(npc_anubisath_warder);
+    RegisterTempleOfAhnQirajCreatureAI(npc_obsidian_nullifier);
     RegisterSpellScript(spell_aggro_drones);
+    RegisterSpellScript(spell_nullify);
 }

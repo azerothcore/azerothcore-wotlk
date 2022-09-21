@@ -109,8 +109,10 @@ void Vehicle::Uninstall()
     LOG_DEBUG("vehicles", "Vehicle::Uninstall {}", _me->GetGUID().ToString());
     RemoveAllPassengers();
 
-    if (GetBase()->GetTypeId() == TYPEID_UNIT)
+    if (_me && _me->GetTypeId() == TYPEID_UNIT)
+    {
         sScriptMgr->OnUninstall(this);
+    }
 }
 
 void Vehicle::Reset(bool evading /*= false*/)
