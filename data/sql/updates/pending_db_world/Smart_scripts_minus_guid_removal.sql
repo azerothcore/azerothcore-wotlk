@@ -556,10 +556,10 @@ DELETE FROM `smart_scripts` WHERE `entry` IN (-47704,-47708,-47712,-47716,-47717
 DELETE FROM `smart_scripts` WHERE `entry` IN (8905) AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entry`,`guid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
 (8905,0,0,0,0,0,0,100,0,3000,6000,8000,9000,0,11,15621,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Warbringer Construct - In Combat  - Cast ''Skull Crack'''),
-(8905,46608,1,0,0,4,0,30,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Warbringer Construct - On Aggro - Say Line 0'),
-(8905,46610,2,0,0,4,0,30,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Warbringer Construct - On Aggro - Say Line 0'),
-(8905,46611,3,0,0,4,0,30,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Warbringer Construct - On Aggro - Say Line 0'),
-(8905,46612,4,0,0,4,0,30,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Warbringer Construct - On Aggro - Say Line 0');
+(8905,46608,0,1,0,4,0,30,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Warbringer Construct - On Aggro - Say Line 0'),
+(8905,46610,0,2,0,4,0,30,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Warbringer Construct - On Aggro - Say Line 0'),
+(8905,46611,0,3,0,4,0,30,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Warbringer Construct - On Aggro - Say Line 0'),
+(8905,46612,0,4,0,4,0,30,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Warbringer Construct - On Aggro - Say Line 0');
 
 -- Sunblade Protector (16 less lines)
 DELETE FROM `smart_scripts` WHERE `entry` IN (-45537,-45570,-45571,-54994,-54996,-55062,-55064,-55065) AND `source_type`=0;

@@ -203,33 +203,6 @@ void SmartAIMgr::LoadSmartAIFromDB()
                     continue;
             }
         }
-        else if (temp.entry < 0)
-        {
-            switch (source_type)
-            {
-            case SMART_SCRIPT_TYPE_CREATURE:
-            {
-                if (!sObjectMgr->GetCreatureData(temp.guid))
-                {
-                    LOG_ERROR("sql.sql", "SmartAIMgr::LoadSmartAIFromDB: Creature guid ({}) does not exist, skipped loading.", uint32(temp.guid));
-                    continue;
-                }
-                break;
-            }
-            case SMART_SCRIPT_TYPE_GAMEOBJECT:
-            {
-                if (!sObjectMgr->GetGOData((uint32)temp.guid))
-                {
-                    LOG_ERROR("sql.sql", "SmartAIMgr::LoadSmartAIFromDB: GameObject guid ({}) does not exist, skipped loading.", uint32(temp.guid));
-                    continue;
-                }
-                break;
-            }
-            default:
-                LOG_ERROR("sql.sql", "SmartAIMgr::LoadSmartAIFromDB: entry ({}) source_type {} cannot have guid assigned. Only creatures and gameobjects can have guid assigned.", uint32(temp.entry), (uint32)source_type);
-                continue;
-            }
-        }
 
         temp.source_type = source_type;
         temp.event_id = fields[3].Get<uint16>();
