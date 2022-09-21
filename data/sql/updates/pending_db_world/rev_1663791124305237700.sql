@@ -8,4 +8,5 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (12265, 0, 1, 2, 0, 0, 100, 0, 12000, 12000, 12000, 12000, 0, 11, 19569, 3, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lava Spawn - In Combat - Cast \'Split\''),
 (12265, 0, 2, 3, 61, 0, 100, 0, 0, 0, 0, 0, 0, 11, 19570, 3, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lava Spawn - In Combat - Cast \'Split\''),
 (12265, 0, 3, 4, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lava Spawn - In Combat - Say Line 0'),
-(12265, 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lava Spawn - In Combat - Despawn Instant');
+(12265, 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lava Spawn - In Combat - Despawn Instant'),
+(12265, 0, 5, 0, 1, 0, 100, 0, 10000, 10000, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lava Spawn - Out of Combat - Despawn Instant');
