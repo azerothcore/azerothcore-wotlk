@@ -63,38 +63,13 @@ enum WarlockSpells
     SPELL_WARLOCK_SIPHON_LIFE_HEAL                  = 63106,
     SPELL_WARLOCK_UNSTABLE_AFFLICTION_DISPEL        = 31117,
     SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_R1            = 18213,
-    SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_PROC          = 18371,
-    SPELL_WARLOCK_GLYPH_OF_KILROGG                  = 58081,
-    SPELL_WARLOCK_EYE_OF_KILROGG_PASSIVE            = 58083,
-    SPELL_TRIGGER_WARLOCK_EYE_OF_KILROGG_PASSIVE    = 2585
+    SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_PROC          = 18371
 };
 
 enum WarlockSpellIcons
 {
     WARLOCK_ICON_ID_IMPROVED_LIFE_TAP               = 208,
     WARLOCK_ICON_ID_MANA_FEED                       = 1982
-};
-
-struct npc_eye_of_kilrogg : public ScriptedAI
-{
-public:
-    npc_eye_of_kilrogg(Creature* creature) : ScriptedAI(creature) { }
-
-    void Reset() override
-    {
-        if (Unit* owner = me->GetOwner())
-        {
-            if (owner->HasAura(SPELL_WARLOCK_GLYPH_OF_KILROGG))
-            {
-                if (me->GetMapId() == 530 || me->GetMapId() == 571)
-                    me->AddAura(SPELL_WARLOCK_EYE_OF_KILROGG_PASSIVE, me);
-                else if (me->AddAura(SPELL_WARLOCK_EYE_OF_KILROGG_PASSIVE, me))
-                    me->SetCanFly(false);
-
-                me->CastSpell(me, SPELL_TRIGGER_WARLOCK_EYE_OF_KILROGG_PASSIVE, true);
-            }
-        }
-    }
 };
 
 class spell_warl_shadowflame : public SpellScript
@@ -1253,7 +1228,6 @@ class spell_warl_glyph_of_felguard : public AuraScript
 
 void AddSC_warlock_spell_scripts()
 {
-    RegisterCreatureAI(npc_eye_of_kilrogg);
     RegisterSpellScript(spell_warl_shadowflame);
     RegisterSpellScript(spell_warl_seduction);
     RegisterSpellScript(spell_warl_improved_demonic_tactics);
