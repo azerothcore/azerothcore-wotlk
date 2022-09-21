@@ -187,6 +187,10 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
         {
             err = ERR_BATTLEGROUND_NONE;
         }
+        else if (!_player->GetBGAccessByLevel(bgTypeId))
+        {
+            err = ERR_BATTLEGROUND_NONE;
+        }
 
         if (err <= 0)
         {
@@ -235,6 +239,10 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
             else if (member->InBattlegroundQueueForBattlegroundQueueType(bgQueueTypeId)) // queued for this bg
             {
                 err = ERR_BATTLEGROUND_NONE;
+            }
+            else if (!member->GetBGAccessByLevel(bgTypeId))
+            {
+                err = ERR_BATTLEGROUND_JOIN_TIMED_OUT;
             }
 
             if (err < 0)
@@ -400,6 +408,12 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recvData)
     if (!_player->InBattlegroundQueue())
     {
         LOG_DEBUG("bg.battleground", "CMSG_BATTLEFIELD_PORT {} ArenaType: {}, Unk: {}, BgType: {}, Action: {}. Player not in queue!", GetPlayerInfo(), arenaType, unk2, bgTypeId_, action);
+        return;
+    }
+
+    if (_player->GetCharmGUID() || _player->IsInCombat())
+    {
+        _player->GetSession()->SendNotification(LANG_YOU_IN_COMBAT);
         return;
     }
 

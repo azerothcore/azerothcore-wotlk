@@ -573,10 +573,18 @@ bool BattlegroundQueue::CheckPremadeMatch(BattlegroundBracketId bracket_id, uint
 // this method tries to create battleground or arena with MinPlayersPerTeam against MinPlayersPerTeam
 bool BattlegroundQueue::CheckNormalMatch(Battleground* bgTemplate, BattlegroundBracketId bracket_id, uint32 minPlayers, uint32 maxPlayers)
 {
-    if (sScriptMgr->IsCheckNormalMatch(this, bgTemplate, bracket_id, minPlayers, maxPlayers))
+    auto CanStartMatch = [this, bgTemplate, minPlayers]()
     {
-        return true;
-    }
+        //allow 1v0 if debug bg
+        if (sBattlegroundMgr->isTesting() && bgTemplate->isBattleground() && (m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() || m_SelectionPools[TEAM_HORDE].GetPlayerCount()))
+            return true;
+
+        //return true if there are enough players in selection pools - enable to work .debug bg command correctly
+        return m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
+    };
+
+    if (sScriptMgr->IsCheckNormalMatch(this, bgTemplate, bracket_id, minPlayers, maxPlayers))
+        return CanStartMatch();
 
     GroupsQueueType::const_iterator itr_team[PVP_TEAMS_COUNT];
     for (uint32 i = 0; i < PVP_TEAMS_COUNT; i++)
@@ -615,12 +623,7 @@ bool BattlegroundQueue::CheckNormalMatch(Battleground* bgTemplate, BattlegroundB
             return false;
     }
 
-    //allow 1v0 if debug bg
-    if (sBattlegroundMgr->isTesting() && bgTemplate->isBattleground() && (m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() || m_SelectionPools[TEAM_HORDE].GetPlayerCount()))
-        return true;
-
-    //return true if there are enough players in selection pools - enable to work .debug bg command correctly
-    return m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
+    return CanStartMatch();
 }
 
 // this method will check if we can invite players to same faction skirmish match

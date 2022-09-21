@@ -4478,7 +4478,8 @@ enum AQSpells
     SPELL_CONSUME_LEECH_HEAL_AQ20 = 25378,
     SPELL_CONSUME_SPIT_OUT        = 25383,
 
-    SPELL_HIVEZARA_CATALYST       = 25187
+    SPELL_HIVEZARA_CATALYST       = 25187,
+    SPELL_VEKNISS_CATALYST        = 26078
 };
 
 class spell_gen_consume : public AuraScript
@@ -4706,4 +4707,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_remove_impairing_auras);
     RegisterSpellScriptWithArgs(spell_gen_consume, "spell_consume_aq20", SPELL_CONSUME_LEECH_AQ20, SPELL_CONSUME_LEECH_HEAL_AQ20);
     RegisterSpellScriptWithArgs(spell_gen_apply_aura_after_expiration, "spell_itch_aq20", SPELL_HIVEZARA_CATALYST, EFFECT_0, SPELL_AURA_DUMMY);
+    RegisterSpellScriptWithArgs(spell_gen_apply_aura_after_expiration, "spell_itch_aq40", SPELL_VEKNISS_CATALYST, EFFECT_0, SPELL_AURA_DUMMY);
 }

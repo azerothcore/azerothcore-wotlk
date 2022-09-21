@@ -146,6 +146,14 @@ void ScriptMgr::OnPlayerMoneyChanged(Player* player, int32& amount)
     });
 }
 
+void ScriptMgr::OnBeforeLootMoney(Player* player, Loot* loot)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->OnBeforeLootMoney(player, loot);
+    });
+}
+
 void ScriptMgr::OnGivePlayerXP(Player* player, uint32& amount, Unit* victim)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
@@ -598,6 +606,21 @@ void ScriptMgr::OnGroupRollRewardItem(Player* player, Item* item, uint32 count, 
     });
 }
 
+bool ScriptMgr::OnBeforeOpenItem(Player* player, Item* item)
+{
+    auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript* script)
+        {
+            return !script->OnBeforeOpenItem(player, item);
+        });
+
+    if (ret && *ret)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 void ScriptMgr::OnFirstLogin(Player* player)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
@@ -913,6 +936,21 @@ void ScriptMgr::OnGetMaxSkillValue(Player* player, uint32 skill, int32& result, 
     });
 }
 
+bool ScriptMgr::OnUpdateFishingSkill(Player* player, int32 skill, int32 zone_skill, int32 chance, int32 roll)
+{
+    auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript* script)
+    {
+        return !script->OnUpdateFishingSkill(player, skill, zone_skill, chance, roll);
+    });
+
+    if (ret && *ret)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 bool ScriptMgr::CanAreaExploreAndOutdoor(Player* player)
 {
     auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript* script)
@@ -1225,12 +1263,21 @@ void ScriptMgr::OnGetArenaTeamId(Player* player, uint8 slot, uint32& result)
     });
 }
 
+//Signifies that IsFfaPvp has been called.
 void ScriptMgr::OnIsFFAPvP(Player* player, bool& result)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
     {
         script->OnIsFFAPvP(player, result);
     });
+}
+//Fires whenever the UNIT_BYTE2_FLAG_FFA_PVP bit is Changed
+void ScriptMgr::OnFfaPvpStateUpdate(Player* player, bool result)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+        {
+            script->OnFfaPvpStateUpdate(player, result);
+        });
 }
 
 void ScriptMgr::OnIsPvP(Player* player, bool& result)
@@ -1346,6 +1393,14 @@ void ScriptMgr::OnPlayerResurrect(Player* player, float restore_percent, bool ap
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
     {
         script->OnPlayerResurrect(player, restore_percent, applySickness);
+    });
+}
+
+void ScriptMgr::OnBeforeChooseGraveyard(Player* player, TeamId teamId, bool nearCorpse, uint32& graveyardOverride)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->OnBeforeChooseGraveyard(player, teamId, nearCorpse, graveyardOverride);
     });
 }
 
