@@ -1,3 +1,4 @@
+-- DB update 2022_09_19_08 -> 2022_09_21_00
 --
 UPDATE `creature_template` SET `flags_extra`=`flags_extra`|0x02000000 WHERE `entry` IN (14825, 14882, 14883);
 UPDATE `creature_formations` SET `groupAI`=515 WHERE `LeaderGUID`=49359 AND `memberGUID` IN (49359,49361,49362,49389);
