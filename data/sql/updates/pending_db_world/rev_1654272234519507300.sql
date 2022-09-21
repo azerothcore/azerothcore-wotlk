@@ -1,4 +1,4 @@
--- locale correction
+-- ¯\_(ツ)_/¯
 REPLACE INTO `gossip_menu_option_locale` (`MenuID`, `OptionID`, `Locale`, `OptionText`) VALUES
 (161, 0, 'zhCN', '我还需要一套盗贼工具。'),
 (231, 0, 'zhCN', '告诉我提尔斯保险箱的密码。'),
@@ -534,3 +534,4 @@ REPLACE INTO `gossip_menu_option_locale` (`MenuID`, `OptionID`, `Locale`, `Optio
 (4242, 0, 'zhCN', '请让我接受训练。'),
 (4351, 0, 'zhCN', '请让我接受训练。');
 
+​
