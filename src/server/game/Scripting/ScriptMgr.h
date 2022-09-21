@@ -619,6 +619,9 @@ public:
 
     // Called when a CreatureAI object is needed for the creature.
     [[nodiscard]] virtual CreatureAI* GetCreatureAI(Creature* /*creature*/) const { return nullptr; }
+
+    //Called Whenever the UNIT_BYTE2_FLAG_FFA_PVP Bit is set on the creature
+    virtual void OnFfaPvpStateUpdate(Creature* /*creature*/, bool /*InPvp*/) {}
 };
 
 class AllItemScript : public ScriptObject
@@ -743,6 +746,10 @@ public:
 
     // Called when a CreatureAI object is needed for the creature.
     virtual CreatureAI* GetAI(Creature* /*creature*/) const { return nullptr; }
+
+    //Called whenever the UNIT_BYTE2_FLAG_FFA_PVP bit is Changed on the player
+    virtual void OnFfaPvpStateUpdate(Creature* /*player*/, bool /*result*/) { }
+
 };
 
 class GameObjectScript : public ScriptObject, public UpdatableScript<GameObject>
@@ -1306,6 +1313,9 @@ public:
     virtual void OnGetArenaTeamId(Player* /*player*/, uint8 /*slot*/, uint32& /*result*/) { }
 
     virtual void OnIsFFAPvP(Player* /*player*/, bool& /*result*/) { }
+
+    //Fires whenever the UNIT_BYTE2_FLAG_FFA_PVP bit is Changed on the player
+    virtual void OnFfaPvpStateUpdate(Player* /*player*/, bool /*result*/) { }
 
     virtual void OnIsPvP(Player* /*player*/, bool& /*result*/) { }
 
@@ -2127,6 +2137,7 @@ public: /* CreatureScript */
     void OnCreatureUpdate(Creature* creature, uint32 diff);
     void OnCreatureAddWorld(Creature* creature);
     void OnCreatureRemoveWorld(Creature* creature);
+    void OnFfaPvpStateUpdate(Creature* creature, bool InPvp);
 
 public: /* GameObjectScript */
     bool OnGossipHello(Player* player, GameObject* go);
@@ -2324,6 +2335,7 @@ public: /* PlayerScript */
     bool NotAvoidSatisfy(Player* player, DungeonProgressionRequirements const* ar, uint32 target_map, bool report);
     bool NotVisibleGloballyFor(Player* player, Player const* u);
     void OnGetArenaPersonalRating(Player* player, uint8 slot, uint32& result);
+    void OnFfaPvpStateUpdate(Player* player, bool result);
     void OnGetArenaTeamId(Player* player, uint8 slot, uint32& result);
     void OnIsFFAPvP(Player* player, bool& result);
     void OnIsPvP(Player* player, bool& result);

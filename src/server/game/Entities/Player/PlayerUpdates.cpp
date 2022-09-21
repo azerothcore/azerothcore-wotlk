@@ -1401,6 +1401,7 @@ void Player::UpdateFFAPvPState(bool reset /*= true*/)
     {
         if (!IsFFAPvP())
         {
+            sScriptMgr->OnFfaPvpStateUpdate(this, true);
             SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
             for (ControlSet::iterator itr = m_Controlled.begin();
                  itr != m_Controlled.end(); ++itr)
@@ -1419,8 +1420,11 @@ void Player::UpdateFFAPvPState(bool reset /*= true*/)
             !pvpInfo.EndTimer)
         {
             pvpInfo.FFAPvPEndTimer = time_t(0);
-
-            RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+            if (HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP))
+            {
+                RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+                sScriptMgr->OnFfaPvpStateUpdate(this, false);
+            }
             for (ControlSet::iterator itr = m_Controlled.begin();
                  itr != m_Controlled.end(); ++itr)
                 (*itr)->RemoveByteFlag(UNIT_FIELD_BYTES_2, 1,
