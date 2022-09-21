@@ -533,5 +533,4 @@ REPLACE INTO `gossip_menu_option_locale` (`MenuID`, `OptionID`, `Locale`, `Optio
 (4207, 0, 'zhCN', '请让我接受训练。'),
 (4242, 0, 'zhCN', '请让我接受训练。'),
 (4351, 0, 'zhCN', '请让我接受训练。');
-
 ​
