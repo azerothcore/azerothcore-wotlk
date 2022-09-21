@@ -146,6 +146,14 @@ void ScriptMgr::OnPlayerMoneyChanged(Player* player, int32& amount)
     });
 }
 
+void ScriptMgr::OnBeforeLootMoney(Player* player, Loot* loot)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->OnBeforeLootMoney(player, loot);
+    });
+}
+
 void ScriptMgr::OnGivePlayerXP(Player* player, uint32& amount, Unit* victim)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
