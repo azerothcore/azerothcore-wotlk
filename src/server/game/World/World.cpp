@@ -848,6 +848,13 @@ void World::LoadConfigSettings(bool reload)
         m_int_configs[CONFIG_START_PLAYER_MONEY] = 0;
     }
 
+    m_int_configs[CONFIG_START_HEROIC_PLAYER_MONEY] = sConfigMgr->GetOption<int32>("StartHeroicPlayerMoney", 2000);
+    if (int32(m_int_configs[CONFIG_START_HEROIC_PLAYER_MONEY]) < 0 || int32(m_int_configs[CONFIG_START_HEROIC_PLAYER_MONEY]) > MAX_MONEY_AMOUNT)
+    {
+        LOG_ERROR("server.loading", "StartHeroicPlayerMoney ({}) must be in range 0..{}. Set to {}.", m_int_configs[CONFIG_START_HEROIC_PLAYER_MONEY], MAX_MONEY_AMOUNT, 2000);
+        m_int_configs[CONFIG_START_HEROIC_PLAYER_MONEY] = 2000;
+    }
+
     m_int_configs[CONFIG_MAX_HONOR_POINTS] = sConfigMgr->GetOption<int32>("MaxHonorPoints", 75000);
     if (int32(m_int_configs[CONFIG_MAX_HONOR_POINTS]) < 0)
     {

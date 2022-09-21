@@ -869,6 +869,14 @@ StartHeroicPlayerLevel = 55
 StartPlayerMoney = 0
 
 #
+#    StartHeroicPlayerMoney
+#        Description: Amount of money (in Copper) that heroic class characters have after creation.
+#        Default:     2000
+#                     2000 - (20 Silver)
+
+StartHeroicPlayerMoney = 2000
+
+#
 #    MaxHonorPoints
 #        Description: Maximum honor points a character can have.
 #        Default:     75000
