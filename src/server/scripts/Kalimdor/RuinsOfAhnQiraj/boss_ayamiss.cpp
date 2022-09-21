@@ -89,6 +89,7 @@ struct boss_ayamiss : public BossAI
         _enraged = false;
         SetCombatMovement(false);
         _scheduler.CancelAll();
+        me->SetReactState(REACT_AGGRESSIVE);
     }
 
     void JustSummoned(Creature* who) override
@@ -120,6 +121,7 @@ struct boss_ayamiss : public BossAI
 
             me->m_Events.AddEventAtOffset([this]()
             {
+                me->SetReactState(REACT_AGGRESSIVE);
                 if (me->GetVictim())
                 {
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
@@ -157,7 +159,7 @@ struct boss_ayamiss : public BossAI
             }
 
             context.Repeat(RAND(2400ms, 3600ms));
-        }).Schedule(15s, [this](TaskContext context) {
+        }).Schedule(15s, 28s, [this](TaskContext context) {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0, true))
             {
                 DoCast(target, SPELL_PARALYZE, true);
@@ -215,6 +217,7 @@ struct boss_ayamiss : public BossAI
         {
             _phase = PHASE_GROUND;
             me->ClearUnitState(UNIT_STATE_ROOT);
+            me->SetReactState(REACT_PASSIVE);
             me->SetCanFly(false);
             me->SetDisableGravity(false);
             me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);

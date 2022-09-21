@@ -169,6 +169,7 @@ ProcEventInfo::ProcEventInfo(Unit* actor, Unit* actionTarget, Unit* procTarget, 
     : _actor(actor), _actionTarget(actionTarget), _procTarget(procTarget), _typeMask(typeMask), _spellTypeMask(spellTypeMask), _spellPhaseMask(spellPhaseMask),
       _hitMask(hitMask), _spell(spell), _damageInfo(damageInfo), _healInfo(healInfo), _triggeredByAuraSpell(triggeredByAuraSpell), _procAuraEffectIndex(procAuraEffectIndex)
 {
+    _chance.reset();
 }
 
 SpellInfo const* ProcEventInfo::GetSpellInfo() const
@@ -15741,21 +15742,18 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
 
         // Update skills here for players
         // only when you are not fighting other players or their pets/totems (pvp)
-        if (GetTypeId() == TYPEID_PLAYER &&
-                target->GetTypeId() != TYPEID_PLAYER &&
-                !(target->IsTotem() && target->ToTotem()->GetOwner()->IsPlayer()) &&
-                !target->IsPet()
-           )
+        if (IsPlayer() && !target->IsCharmedOwnedByPlayerOrPlayer())
         {
             // On melee based hit/miss/resist/parry/dodge need to update skill (for victim and attacker)
             if (procExtra & (PROC_EX_NORMAL_HIT | PROC_EX_MISS | PROC_EX_RESIST | PROC_EX_PARRY | PROC_EX_DODGE))
             {
-                if (target->GetTypeId() != TYPEID_PLAYER)
-                    ToPlayer()->UpdateCombatSkills(target, attType, isVictim, procSpell ? procSpell->m_weaponItem : nullptr);
+                ToPlayer()->UpdateCombatSkills(target, attType, isVictim, procSpell ? procSpell->m_weaponItem : nullptr);
             }
-            // Update defence if player is victim and we block
+            // Update defence if player is victim and we block - TODO: confirm that blocked attacks only have a chance to increase defence skill
             else if (isVictim && procExtra & (PROC_EX_BLOCK))
+            {
                 ToPlayer()->UpdateCombatSkills(target, attType, true);
+            }
         }
         // If exist crit/parry/dodge/block need update aura state (for victim and attacker)
         if (procExtra & (PROC_EX_CRITICAL_HIT | PROC_EX_PARRY | PROC_EX_DODGE | PROC_EX_BLOCK))
@@ -15852,18 +15850,29 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
         if (!active && !isVictim && !(procFlag & PROC_FLAG_DONE_PERIODIC) && procSpellInfo && procSpellInfo->SpellFamilyName && (procSpellInfo->HasAura(SPELL_AURA_PERIODIC_DAMAGE) || procSpellInfo->HasAura(SPELL_AURA_PERIODIC_HEAL)))
             active = true;
 
-        if (!IsTriggeredAtSpellProcEvent(target, triggerData.aura, attType, isVictim, active, triggerData.spellProcEvent, eventInfo))
+        // AuraScript Hook
+        if (!triggerData.aura->CallScriptCheckProcHandlers(itr->second, eventInfo))
+        {
             continue;
+        }
+
+        bool isTriggeredAtSpellProcEvent = IsTriggeredAtSpellProcEvent(target, triggerData.aura, attType, isVictim, active, triggerData.spellProcEvent, eventInfo);
+
+        // AuraScript Hook
+        triggerData.aura->CallScriptCheckAfterProcHandlers(itr->second, eventInfo);
+
+        if (!isTriggeredAtSpellProcEvent)
+        {
+            continue;
+        }
 
         // do checks using conditions table
         ConditionList conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_SPELL_PROC, spellProto->Id);
         ConditionSourceInfo condInfo = ConditionSourceInfo(eventInfo.GetActor(), eventInfo.GetActionTarget());
         if (!sConditionMgr->IsObjectMeetToConditions(condInfo, conditions))
+        {
             continue;
-
-        // AuraScript Hook
-        if (!triggerData.aura->CallScriptCheckProcHandlers(itr->second, eventInfo))
-            continue;
+        }
 
         // Triggered spells not triggering additional spells
         //bool triggered = !spellProto->HasAttribute(SPELL_ATTR3_CAN_PROC_FROM_PROCS) ?
@@ -17164,11 +17173,17 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, WeaponAttackTyp
             }
     }
 
+    if (eventInfo.GetProcChance())
+    {
+        chance = *eventInfo.GetProcChance();
+    }
+
     // Apply chance modifer aura
     if (Player* modOwner = GetSpellModOwner())
     {
         modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_CHANCE_OF_SUCCESS, chance);
     }
+
     return roll_chance_f(chance);
 }
 
