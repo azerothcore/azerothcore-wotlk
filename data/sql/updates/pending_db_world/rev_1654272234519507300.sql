@@ -148,9 +148,7 @@ REPLACE INTO `gossip_menu_option_locale` (`MenuID`, `OptionID`, `Locale`, `Optio
 (5709, 0, 'zhCN', '游戏？你疯了吗？'),
 (5762, 0, 'zhCN', '雷克斯洛特，我把瑟银镣铐弄丢了。'),
 (5764, 0, 'zhCN', '拉比恩，你为什么说这是个巧合？'),
-(5765, 0, 'zhCN', '丰饶之果？');
-
-REPLACE INTO `gossip_menu_option_locale` (`MenuID`, `OptionID`, `Locale`, `OptionText`) VALUES
+(5765, 0, 'zhCN', '丰饶之果？'),
 (5766, 0, 'zhCN', '但是，有些事情好像出了差错，是吗？'),
 (5767, 0, 'zhCN', '如果丰饶之果——或者说是魔藤——完全堕落，那会发生什么事呢？'),
 (5768, 0, 'zhCN', '下次再遇到这种事情的时候我会好好考虑一下的。'),
@@ -298,9 +296,7 @@ REPLACE INTO `gossip_menu_option_locale` (`MenuID`, `OptionID`, `Locale`, `Optio
 (9217, 0, 'zhCN', '你知道诅咒教派的情况吗？'),
 (9218, 0, 'zhCN', '我有理由相信你参与了信徒的行动。'),
 (9219, 0, 'zhCN', '你为诅咒教派效劳多长时间了？'),
-(9256, 0, 'zhCN', '把你的手放在石头上。');
-
-REPLACE INTO `gossip_menu_option_locale` (`MenuID`, `OptionID`, `Locale`, `OptionText`) VALUES
+(9256, 0, 'zhCN', '把你的手放在石头上。'),
 (9257, 0, 'zhCN', '把你的手放在石头上。'),
 (9258, 0, 'zhCN', '把你的手放在石头上。'),
 (9259, 0, 'zhCN', '把你的手放在石头上。'),
@@ -448,9 +444,7 @@ REPLACE INTO `gossip_menu_option_locale` (`MenuID`, `OptionID`, `Locale`, `Optio
 (21403, 0, 'zhCN', '我下定决心了。让我遗忘炼金专精吧！'),
 (21404, 0, 'zhCN', '我下定决心了。让我遗忘炼金专精吧！'),
 (1842, 0, 'zhCN', '我让你看看我的能力的证明，塞勒斯。'),
-(57000, 0, 'zhCN', '你的职责是什么？');
-
-REPLACE INTO `gossip_menu_option_locale` (`MenuID`, `OptionID`, `Locale`, `OptionText`) VALUES
+(57000, 0, 'zhCN', '你的职责是什么？'),
 (57001, 0, 'zhCN', '什么是奥丹姆圆盘？'),
 (57002, 0, 'zhCN', '奥丹姆圆盘在哪里？'),
 (57003, 0, 'zhCN', '什么？我们的世界“被安排了新的探访计划”？这是什么意思？！'),
@@ -539,5 +533,3 @@ REPLACE INTO `gossip_menu_option_locale` (`MenuID`, `OptionID`, `Locale`, `Optio
 (4207, 0, 'zhCN', '请让我接受训练。'),
 (4242, 0, 'zhCN', '请让我接受训练。'),
 (4351, 0, 'zhCN', '请让我接受训练。');
-
-
