@@ -1,3 +1,4 @@
+-- DB update 2022_09_21_03 -> 2022_09_21_04
 REPLACE INTO `gossip_menu_option_locale` (`MenuID`, `OptionID`, `Locale`, `OptionText`) VALUES
 (161, 0, 'zhCN', '我还需要一套盗贼工具。'),
 (231, 0, 'zhCN', '告诉我提尔斯保险箱的密码。'),
