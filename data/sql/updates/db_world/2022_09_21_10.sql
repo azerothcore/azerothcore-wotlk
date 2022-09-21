@@ -1,3 +1,4 @@
+-- DB update 2022_09_21_09 -> 2022_09_21_10
 --
 -- Update gold dropped by mobs based on classic sniffs.
 UPDATE `creature_template` SET `mingold`=3 WHERE `entry`=36 && `mingold`=13; -- Harvest Golem (sample size 30)
