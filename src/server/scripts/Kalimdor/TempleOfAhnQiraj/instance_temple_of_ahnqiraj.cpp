@@ -23,8 +23,21 @@
 ObjectData const creatureData[] =
 {
     { NPC_SARTURA, DATA_SARTURA },
+    { NPC_CTHUN, DATA_CTHUN },
     { NPC_EYE_OF_CTHUN, DATA_EYE_OF_CTHUN },
-    { NPC_OURO_SPAWNER, DATA_OURO_SPAWNER }
+    { NPC_OURO_SPAWNER, DATA_OURO_SPAWNER },
+    { NPC_MASTERS_EYE, DATA_MASTERS_EYE },
+    { NPC_VEKLOR, DATA_VEKLOR },
+    { NPC_VEKNILASH, DATA_VEKNILASH },
+    { NPC_VISCIDUS, DATA_VISCIDUS }
+};
+
+DoorData const doorData[] =
+{
+    { AQ40_DOOR_SKERAM,      DATA_SKERAM,        DOOR_TYPE_PASSAGE },
+    { AQ40_DOOR_TE_ENTRANCE, DATA_TWIN_EMPERORS, DOOR_TYPE_ROOM },
+    { AQ40_DOOR_TE_EXIT,     DATA_TWIN_EMPERORS, DOOR_TYPE_PASSAGE },
+    { 0,                     0,                  DOOR_TYPE_ROOM}
 };
 
 class instance_temple_of_ahnqiraj : public InstanceMapScript
@@ -41,33 +54,23 @@ public:
     {
         instance_temple_of_ahnqiraj_InstanceMapScript(Map* map) : InstanceScript(map)
         {
-            LoadObjectData(creatureData, nullptr);
-            doorGUIDs.fill(ObjectGuid::Empty);
             SetBossNumber(MAX_BOSS_NUMBER);
+            LoadObjectData(creatureData, nullptr);
+            LoadDoorData(doorData);
         }
-
-        //If Vem is dead...
-        bool IsBossDied[3];
 
         ObjectGuid SkeramGUID;
         ObjectGuid VemGUID;
         ObjectGuid KriGUID;
         ObjectGuid YaujGUID;
-        ObjectGuid VeklorGUID;
-        ObjectGuid VeknilashGUID;
-        ObjectGuid ViscidusGUID;
         ObjectGuid CThunGUID;
         GuidVector CThunGraspGUIDs;
-        std::array<ObjectGuid, 3> doorGUIDs;
 
         uint32 BugTrioDeathCount;
         uint32 CthunPhase;
 
         void Initialize() override
         {
-            IsBossDied[0] = false;
-            IsBossDied[1] = false;
-            IsBossDied[2] = false;
             BugTrioDeathCount = 0;
             CthunPhase = 0;
         }
@@ -78,10 +81,6 @@ public:
             {
                 case NPC_SKERAM:
                     SkeramGUID = creature->GetGUID();
-                    if (!creature->IsAlive())
-                    {
-                        HandleGameObject(doorGUIDs[2], true);
-                    }
                     break;
                 case NPC_VEM:
                     VemGUID = creature->GetGUID();
@@ -92,22 +91,13 @@ public:
                 case NPC_YAUJ:
                     YaujGUID = creature->GetGUID();
                     break;
-                case NPC_VEKLOR:
-                    VeklorGUID = creature->GetGUID();
-                    if (!creature->IsAlive())
-                    {
-                        HandleGameObject(doorGUIDs[1], true);
-                    }
-                    break;
-                case NPC_VEKNILASH:
-                    VeknilashGUID = creature->GetGUID();
-                    break;
-                case NPC_VISCIDUS:
-                    ViscidusGUID = creature->GetGUID();
-                    break;
                 case NPC_OURO_SPAWNER:
                     if (GetBossState(DATA_OURO) != DONE)
                         creature->Respawn();
+                    break;
+                case NPC_MASTERS_EYE:
+                    if (GetBossState(DATA_TWIN_EMPERORS) != DONE)
+                        creature->Respawn(true);
                     break;
                 case NPC_CTHUN:
                     CThunGUID = creature->GetGUID();
@@ -133,29 +123,6 @@ public:
         {
             switch (go->GetEntry())
             {
-                case AQ40_DOOR_1:
-                    doorGUIDs[0] = go->GetGUID();
-                    break;
-                case AQ40_DOOR_2:
-                    doorGUIDs[1] = go->GetGUID();
-                    if (Creature* veklor = instance->GetCreature(VeklorGUID))
-                    {
-                        if (!veklor->IsAlive())
-                        {
-                            HandleGameObject(go->GetGUID(), true);
-                        }
-                    }
-                    break;
-                case AQ40_DOOR_3:
-                    doorGUIDs[2] = go->GetGUID();
-                    if (Creature* skeram = instance->GetCreature(SkeramGUID))
-                    {
-                        if (!skeram->IsAlive())
-                        {
-                            HandleGameObject(go->GetGUID(), true);
-                        }
-                    }
-                    break;
                 case GO_CTHUN_GRASP:
                     CThunGraspGUIDs.push_back(go->GetGUID());
                     if (Creature* CThun = instance->GetCreature(CThunGUID))
@@ -177,16 +144,6 @@ public:
         {
             switch (type)
             {
-                case DATA_VEKLORISDEAD:
-                    if (IsBossDied[1])
-                        return 1;
-                    break;
-
-                case DATA_VEKNILASHISDEAD:
-                    if (IsBossDied[2])
-                        return 1;
-                    break;
-
                 case DATA_BUG_TRIO_DEATH:
                     return BugTrioDeathCount;
 
@@ -208,18 +165,6 @@ public:
                     return KriGUID;
                 case DATA_YAUJ:
                     return YaujGUID;
-                case DATA_VEKLOR:
-                    return VeklorGUID;
-                case DATA_VEKNILASH:
-                    return VeknilashGUID;
-                case DATA_VISCIDUS:
-                    return ViscidusGUID;
-                case AQ40_DOOR_1:
-                    return doorGUIDs[0];
-                case AQ40_DOOR_2:
-                    return doorGUIDs[1];
-                case AQ40_DOOR_3:
-                    return doorGUIDs[2];
             }
             return ObjectGuid::Empty;
         }
@@ -234,12 +179,6 @@ public:
                     else
                         BugTrioDeathCount = 0;
                     break;
-                case DATA_VEKLOR_DEATH:
-                    IsBossDied[1] = true;
-                    break;
-                case DATA_VEKNILASH_DEATH:
-                    IsBossDied[2] = true;
-                    break;
                 case DATA_CTHUN_PHASE:
                     CthunPhase = data;
                     if (data == PHASE_CTHUN_DONE)
@@ -252,6 +191,8 @@ public:
                             }
                         }
                     }
+                    break;
+                default:
                     break;
             }
         }

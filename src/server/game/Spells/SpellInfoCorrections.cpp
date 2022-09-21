@@ -4379,6 +4379,18 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Attributes |= SPELL_ATTR0_ALLOW_WHILE_SITTING;
     });
 
+    // Judgement (Paladin T2 8P Bonus)
+    ApplySpellFix({ 23591 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ProcFlags = PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS;
+    });
+
+    // Gift of Arthas
+    ApplySpellFix({ 11371 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->SpellFamilyName = SPELLFAMILY_POTION;
+    });
+
     // Eye of Kilrogg Passive (DND)
     ApplySpellFix({ 58083 }, [](SpellInfo* spellInfo)
     {
