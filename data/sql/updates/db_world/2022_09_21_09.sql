@@ -1,3 +1,4 @@
+-- DB update 2022_09_21_08 -> 2022_09_21_09
 --
 DELETE FROM `spell_target_position` WHERE `ID` IN (25865, 25866, 25867, 25868, 25869, 25870, 25871, 25872, 25873, 25874, 25875, 25876, 25877, 25878, 25879, 25880, 25881, 25882, 25883, 25884);
 INSERT INTO `spell_target_position` (`ID`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `Orientation`) VALUES
