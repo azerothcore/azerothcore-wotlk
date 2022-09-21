@@ -869,6 +869,14 @@ StartHeroicPlayerLevel = 55
 StartPlayerMoney = 0
 
 #
+#    StartHeroicPlayerMoney
+#        Description: Amount of money (in Copper) that heroic class characters have after creation.
+#        Default:     2000
+#                     2000 - (20 Silver)
+
+StartHeroicPlayerMoney = 2000
+
+#
 #    MaxHonorPoints
 #        Description: Maximum honor points a character can have.
 #        Default:     75000
@@ -2155,6 +2163,14 @@ Visibility.Notify.Period.InBGArenas   = 1000
 #                     0 - (Hide Sparkles)
 
 Visibility.ObjectSparkles = 1
+
+#
+#    Visibility.ObjectQuestMarkers
+#        Description: Show quest icons above game objects in the same way as creature quest givers.
+#        Default:     1 - (Show quest markers, post patch 2.3 behavior)
+#                     0 - (Hide quest markers, pre patch 2.3 behavior)
+
+Visibility.ObjectQuestMarkers = 1
 
 #
 ###################################################################################################

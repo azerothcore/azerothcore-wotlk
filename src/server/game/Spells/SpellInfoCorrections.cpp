@@ -4385,6 +4385,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->ProcFlags = PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS;
     });
 
+    // Gift of Arthas
+    ApplySpellFix({ 11371 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->SpellFamilyName = SPELLFAMILY_POTION;
+    });
+
     // Boundary Warning
     ApplySpellFix({ 51259 }, [](SpellInfo* spellInfo)
     {
