@@ -432,7 +432,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
 
         std::function<void(PreparedQueryResult)> finalizeCharacterCreation = [this, createInfo](PreparedQueryResult result)
         {
-            if (!sScriptMgr->CanAccountCreateCharacter(createInfo, GetAccountId()))
+            if (!sScriptMgr->CanAccountCreateCharacter(GetAccountId(), createInfo->Race, createInfo->Class))
             {
                 SendCharCreate(CHAR_CREATE_DISABLED);
                 return;
