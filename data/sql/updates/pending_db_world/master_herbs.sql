@@ -21036,3 +21036,10 @@ UPDATE `gameobject` SET `ZoneId`=10 WHERE `guid` IN (2255,2256,2257,2258,2259,22
 
 -- Delete old unpooled nodes
 DELETE FROM `gameobject` WHERE `id` IN (1618, 3724, 1617, 3725, 1620, 3727, 1619, 3726, 1621, 3729, 1622, 3730, 2045, 1623, 1628, 1624, 2041, 2042, 2046, 2043, 2044, 2866, 142140, 142141, 176642, 142142, 176636, 142143, 183046, 142144, 142145, 176637, 176583, 176638, 176584, 176639, 176586, 176640, 176587, 176641, 176588) AND `position_z`<1200 AND `map` IN (0, 1) AND `guid` NOT IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` BETWEEN 489 AND 716);
+
+-- Remove non-sensical spawns
+DELETE FROM `gameobject` WHERE `guid` IN (82447, 82417);
+DELETE FROM `pool_gameobject` WHERE `guid` IN (82447, 82417);
+
+-- Update unreachable nodes
+UPDATE `gameobject` SET `position_z`=-4.4 WHERE `guid`=78786;
