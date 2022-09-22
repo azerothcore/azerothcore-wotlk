@@ -1,3 +1,4 @@
+-- DB update 2022_09_21_10 -> 2022_09_22_00
 -- Update spawnpoints in Ghostlands for multispawn Shadowpine Catlord & Shadowpine Hexxer
 UPDATE `creature` SET `id1`=16345, `id2`=16346 WHERE `guid` IN (85790,85835,85914,85826,85769,85933,85771,85763,85905,85833,85904,85846,85803,85931,85868,85929);
 
