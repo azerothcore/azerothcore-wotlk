@@ -51,7 +51,8 @@ enum DataTypes
     DATA_HALL_RUNE_6                = 21,
     DATA_HALL_RUNE_7                = 22,
     DATA_SOLAKAR_FLAMEWREATH        = 23,
-    DATA_MOR_GRAYHOOF               = 24
+    DATA_MOR_GRAYHOOF               = 24,
+    DATA_VAELASTRASZ                = 25
 };
 
 enum CreaturesIds
@@ -75,6 +76,8 @@ enum CreaturesIds
     NPC_BLACKHAND_VETERAN           = 9819,
     NPC_BLACKHAND_INCARCERATOR      = 10316,
     NPC_LORD_VICTOR_NEFARIUS        = 10162,
+    NPC_VAELASTRASZ_THE_RED         = 10340,
+    NPC_VAELASTRASZ_UBRS            = 10538,
 
     NPC_SCARSHIELD_INFILTRATOR      = 10299,
 
