@@ -1688,7 +1688,7 @@ void LootTemplate::Process(Loot& loot, LootStore const& store, uint16 lootMode, 
             uint32 maxcount = uint32(float(item->maxcount) * sWorld->getRate(RATE_DROP_ITEM_REFERENCED_AMOUNT));
             sScriptMgr->OnAfterRefCount(player, loot, rate, lootMode, item, maxcount, store);
             for (uint32 loop = 0; loop < maxcount; ++loop)      // Ref multiplicator
-                Referenced->Process(loot, store, lootMode, player, item->groupid);
+                Referenced->Process(loot, store, lootMode, player, item->groupid, creature);
         }
         else
         {
@@ -1701,7 +1701,7 @@ void LootTemplate::Process(Loot& loot, LootStore const& store, uint16 lootMode, 
     // Now processing groups
     for (LootGroups::const_iterator i = Groups.begin(); i != Groups.end(); ++i)
         if (LootGroup* group = *i)
-            group->Process(loot, player, store, lootMode);
+            group->Process(loot, player, store, lootMode, creature);
 }
 
 // True if template includes at least 1 quest drop entry
