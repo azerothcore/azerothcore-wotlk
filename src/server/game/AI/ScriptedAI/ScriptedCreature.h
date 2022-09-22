@@ -91,6 +91,7 @@ public:
     void DespawnEntry(uint32 entry);
     void DespawnAll();
     bool IsAnyCreatureAlive() const;
+    bool IsAnyCreatureWithEntryAlive(uint32 entry) const;
     bool IsAnyCreatureInCombat() const;
 
     template <typename T>
