@@ -12247,18 +12247,21 @@ void Unit::ProcSkillsAndReactives(bool isVictim, Unit* procTarget, uint32 typeMa
 
         // Update skills here for players
         // only when you are not fighting other players or their pets/totems (pvp)
-        if (IsPlayer() && !target->IsCharmedOwnedByPlayerOrPlayer())
+        if (GetTypeId() == TYPEID_PLAYER &&
+            procTarget->GetTypeId() != TYPEID_PLAYER &&
+            !(procTarget->IsTotem() && procTarget->ToTotem()->GetOwner()->IsPlayer()) &&
+            !procTarget->IsPet()
+                )
         {
             // On melee based hit/miss/resist/parry/dodge need to update skill (for victim and attacker)
             if (hitMask & (PROC_HIT_NORMAL | PROC_HIT_MISS | PROC_HIT_FULL_RESIST))
             {
-                ToPlayer()->UpdateCombatSkills(target, attType, isVictim, procSpell ? procSpell->m_weaponItem : nullptr);
+                if (procTarget->GetTypeId() != TYPEID_PLAYER && !procTarget->IsCritter())
+                    ToPlayer()->UpdateCombatSkills(procTarget, attType, isVictim);
             }
-            // Update defence if player is victim and we block - TODO: confirm that blocked attacks only have a chance to increase defence skill
-            else if (isVictim && procExtra & (PROC_EX_BLOCK))
-            {
-                ToPlayer()->UpdateCombatSkills(target, attType, true);
-            }
+                // Update defence if player is victim and we block
+            else if (isVictim && (hitMask & (PROC_HIT_DODGE | PROC_HIT_PARRY | PROC_HIT_BLOCK)))
+                ToPlayer()->UpdateCombatSkills(procTarget, attType, true);
         }
         // If exist crit/parry/dodge/block need update aura state (for victim and attacker)
         if (hitMask & (PROC_HIT_CRITICAL | PROC_HIT_PARRY | PROC_HIT_DODGE | PROC_HIT_BLOCK))
