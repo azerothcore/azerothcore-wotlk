@@ -1,3 +1,4 @@
+-- DB update 2022_09_22_01 -> 2022_09_23_00
 ALTER TABLE `skilllineability_dbc`
     CHANGE `MinSkillLineRank` `ExcludeRace` INT NOT NULL DEFAULT 0,
     CHANGE `SupercededBySpell` `ExcludeClass` INT NOT NULL DEFAULT 0,
