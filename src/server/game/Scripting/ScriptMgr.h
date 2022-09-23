@@ -73,6 +73,7 @@ class Vehicle;
 class WorldObject;
 class WorldPacket;
 class WorldSocket;
+class CharacterCreateInfo;
 
 struct AchievementCriteriaData;
 struct AuctionEntry;
@@ -1027,6 +1028,9 @@ public:
     // Called when a player's money is modified (before the modification is done)
     virtual void OnMoneyChanged(Player* /*player*/, int32& /*amount*/) { }
 
+    // Called before looted money is added to a player
+    virtual void OnBeforeLootMoney(Player* /*player*/, Loot* /*loot*/) {}
+
     // Called when a player gains XP (before anything is given)
     virtual void OnGiveXP(Player* /*player*/, uint32& /*amount*/, Unit* /*victim*/) { }
 
@@ -1256,6 +1260,8 @@ public:
 
     virtual void OnGetMaxSkillValue(Player* /*player*/, uint32 /*skill*/, int32& /*result*/, bool /*IsPure*/) { }
 
+    [[nodiscard]] virtual bool OnUpdateFishingSkill(Player* /*player*/, int32 /*skill*/, int32 /*zone_skill*/, int32 /*chance*/, int32 /*roll*/) { return true; }
+
     [[nodiscard]] virtual bool CanAreaExploreAndOutdoor(Player* /*player*/) { return true; }
 
     virtual void OnVictimRewardBefore(Player* /*player*/, Player* /*victim*/, uint32& /*killer_title*/, uint32& /*victim_title*/) { }
@@ -1466,6 +1472,9 @@ public:
 
     // Called when Password failed to change for Account
     virtual void OnFailedPasswordChange(uint32 /*accountId*/) { }
+
+    // Called when creating a character on the Account
+    [[nodiscard]] virtual bool CanAccountCreateCharacter(uint32 /*accountId*/, uint8 /*charRace*/, uint8 /*charClass*/) { return true;}
 };
 
 class GuildScript : public ScriptObject
@@ -2213,6 +2222,7 @@ public: /* PlayerScript */
     void OnPlayerFreeTalentPointsChanged(Player* player, uint32 newPoints);
     void OnPlayerTalentsReset(Player* player, bool noCost);
     void OnPlayerMoneyChanged(Player* player, int32& amount);
+    void OnBeforeLootMoney(Player* player, Loot* loot);
     void OnGivePlayerXP(Player* player, uint32& amount, Unit* victim);
     bool OnPlayerReputationChange(Player* player, uint32 factionID, int32& standing, bool incremental);
     void OnPlayerReputationRankChange(Player* player, uint32 factionID, ReputationRank newRank, ReputationRank oldRank, bool increased);
@@ -2300,6 +2310,7 @@ public: /* PlayerScript */
     void OnDeleteFromDB(CharacterDatabaseTransaction trans, uint32 guid);
     bool CanRepopAtGraveyard(Player* player);
     void OnGetMaxSkillValue(Player* player, uint32 skill, int32& result, bool IsPure);
+    bool OnUpdateFishingSkill(Player* player, int32 skill, int32 zone_skill, int32 chance, int32 roll);
     bool CanAreaExploreAndOutdoor(Player* player);
     void OnVictimRewardBefore(Player* player, Player* victim, uint32& killer_title, uint32& victim_title);
     void OnVictimRewardAfter(Player* player, Player* victim, uint32& killer_title, uint32& victim_rank, float& honor_f);
@@ -2365,6 +2376,7 @@ public: /* AccountScript */
     void OnFailedEmailChange(uint32 accountId);
     void OnPasswordChange(uint32 accountId);
     void OnFailedPasswordChange(uint32 accountId);
+    bool CanAccountCreateCharacter(uint32 accountId, uint8 charRace, uint8 charClass);
 
 public: /* GuildScript */
     void OnGuildAddMember(Guild* guild, Player* player, uint8& plRank);

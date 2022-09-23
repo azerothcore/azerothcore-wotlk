@@ -146,6 +146,14 @@ void ScriptMgr::OnPlayerMoneyChanged(Player* player, int32& amount)
     });
 }
 
+void ScriptMgr::OnBeforeLootMoney(Player* player, Loot* loot)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->OnBeforeLootMoney(player, loot);
+    });
+}
+
 void ScriptMgr::OnGivePlayerXP(Player* player, uint32& amount, Unit* victim)
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
@@ -926,6 +934,21 @@ void ScriptMgr::OnGetMaxSkillValue(Player* player, uint32 skill, int32& result, 
     {
         script->OnGetMaxSkillValue(player, skill, result, IsPure);
     });
+}
+
+bool ScriptMgr::OnUpdateFishingSkill(Player* player, int32 skill, int32 zone_skill, int32 chance, int32 roll)
+{
+    auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript* script)
+    {
+        return !script->OnUpdateFishingSkill(player, skill, zone_skill, chance, roll);
+    });
+
+    if (ret && *ret)
+    {
+        return false;
+    }
+
+    return true;
 }
 
 bool ScriptMgr::CanAreaExploreAndOutdoor(Player* player)
