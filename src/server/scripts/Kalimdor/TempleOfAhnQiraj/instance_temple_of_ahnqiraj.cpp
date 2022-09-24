@@ -154,7 +154,7 @@ public:
                     {
                         if (CreatureGroup* formation = creature->GetFormation())
                         {
-                            scheduler.Schedule(100ms, [this, formation](TaskContext /*context*/)
+                            scheduler.Schedule(100ms, [formation](TaskContext /*context*/)
                             {
                                 if (!formation->IsAnyMemberAlive(true))
                                 {
