@@ -294,6 +294,7 @@ enum darkIronAttack
     SPELL_DRUNKEN_MASTER                = 42696,
     SPELL_SUMMON_PLANS_A                = 48145,
     SPELL_SUMMON_PLANS_H                = 49318,
+    SPELL_WEAK_ALCOHOL                  = 42523,
 
     // Dark Irons
     SPELL_ATTACK_KEG                    = 42393,
@@ -1271,6 +1272,8 @@ class spell_brewfest_toss_mug : public SpellScript
                 creature->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
             }
         }
+
+        caster->CastSpell(caster, SPELL_WEAK_ALCOHOL, true);
     }
 
     void Register() override
