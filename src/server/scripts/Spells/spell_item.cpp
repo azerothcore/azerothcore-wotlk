@@ -3702,6 +3702,29 @@ class spell_item_snowman : public SpellScript
     }
 };
 
+// https://www.wowhead.com/wotlk/spell=16028 Freeze Rookery Egg - Prototype
+// https://www.wowhead.com/wotlk/spell=15748 Freeze Rookery Egg
+class spell_item_freeze_rookery_egg : public SpellScript
+{
+    PrepareSpellScript(spell_item_freeze_rookery_egg);
+
+    void HandleOpenObject(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+
+        if (GameObject* rookery = GetHitGObj())
+        {
+            if (rookery->getLootState() == GO_READY)
+                rookery->UseDoorOrButton(0, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_item_freeze_rookery_egg::HandleOpenObject, EFFECT_0, SPELL_EFFECT_OPEN_LOCK);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     RegisterSpellScript(spell_item_massive_seaforium_charge);
@@ -3816,4 +3839,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_wraith_scythe_drain_life);
     RegisterSpellScript(spell_item_mirrens_drinking_hat);
     RegisterSpellScript(spell_item_snowman);
+    RegisterSpellScript(spell_item_freeze_rookery_egg);
 }
