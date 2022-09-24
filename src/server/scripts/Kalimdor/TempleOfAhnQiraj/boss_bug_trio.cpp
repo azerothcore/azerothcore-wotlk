@@ -146,7 +146,6 @@ public:
         me->GetMotionMaster()->MoveIdle();
         me->SetSpeed(MOVE_RUN, 15.f/7.f); // From sniffs
         DoCastSelf(SPELL_FULL_HEAL, true);
-        me->LowerPlayerDamageReq(me->GetMaxHealth());
         DoResetThreat();
         _isEating = false;
 
