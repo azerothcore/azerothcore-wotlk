@@ -848,6 +848,13 @@ void World::LoadConfigSettings(bool reload)
         m_int_configs[CONFIG_START_PLAYER_MONEY] = 0;
     }
 
+    m_int_configs[CONFIG_START_HEROIC_PLAYER_MONEY] = sConfigMgr->GetOption<int32>("StartHeroicPlayerMoney", 2000);
+    if (int32(m_int_configs[CONFIG_START_HEROIC_PLAYER_MONEY]) < 0 || int32(m_int_configs[CONFIG_START_HEROIC_PLAYER_MONEY]) > MAX_MONEY_AMOUNT)
+    {
+        LOG_ERROR("server.loading", "StartHeroicPlayerMoney ({}) must be in range 0..{}. Set to {}.", m_int_configs[CONFIG_START_HEROIC_PLAYER_MONEY], MAX_MONEY_AMOUNT, 2000);
+        m_int_configs[CONFIG_START_HEROIC_PLAYER_MONEY] = 2000;
+    }
+
     m_int_configs[CONFIG_MAX_HONOR_POINTS] = sConfigMgr->GetOption<int32>("MaxHonorPoints", 75000);
     if (int32(m_int_configs[CONFIG_MAX_HONOR_POINTS]) < 0)
     {
@@ -940,6 +947,10 @@ void World::LoadConfigSettings(bool reload)
     m_float_configs[CONFIG_CHANCE_OF_GM_SURVEY] = sConfigMgr->GetOption<float>("GM.TicketSystem.ChanceOfGMSurvey", 50.0f);
 
     m_int_configs[CONFIG_GROUP_VISIBILITY]      = sConfigMgr->GetOption<int32>("Visibility.GroupMode", 1);
+
+    m_bool_configs[CONFIG_OBJECT_SPARKLES]      = sConfigMgr->GetOption<bool>("Visibility.ObjectSparkles", true);
+
+    m_bool_configs[CONFIG_OBJECT_QUEST_MARKERS] = sConfigMgr->GetOption<bool>("Visibility.ObjectQuestMarkers", true);
 
     m_int_configs[CONFIG_MAIL_DELIVERY_DELAY]   = sConfigMgr->GetOption<int32>("MailDeliveryDelay", HOUR);
 
@@ -1659,7 +1670,7 @@ void World::SetInitialWorldSettings()
     sSpellMgr->LoadSpellProcs();
 
     LOG_INFO("server.loading", "Loading Spell Bonus Data...");
-    sSpellMgr->LoadSpellBonusess();
+    sSpellMgr->LoadSpellBonuses();
 
     LOG_INFO("server.loading", "Loading Aggro Spells Definitions...");
     sSpellMgr->LoadSpellThreats();

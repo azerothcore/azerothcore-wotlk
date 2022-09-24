@@ -17,34 +17,37 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "SpellInfo.h"
+#include "SpellScript.h"
+#include "TaskScheduler.h"
 #include "temple_of_ahnqiraj.h"
 
 enum Spells
 {
+    // Viscidus - Glob of Viscidus
     SPELL_POISON_SHOCK          = 25993,
     SPELL_POISONBOLT_VOLLEY     = 25991,
-    SPELL_TOXIN                 = 26575,
+    SPELL_SUMMON_TOXIN_SLIME    = 26584,
+    SPELL_SUMMON_TOXIN_SLIME_2  = 26577,
     SPELL_VISCIDUS_SLOWED       = 26034,
     SPELL_VISCIDUS_SLOWED_MORE  = 26036,
     SPELL_VISCIDUS_FREEZE       = 25937,
     SPELL_REJOIN_VISCIDUS       = 25896,
-    SPELL_VISCIDUS_EXPLODE      = 25938,
-    SPELL_VISCIDUS_SUICIDE      = 26003,
-    SPELL_VISCIDUS_SHRINKS      = 25893,                   // Removed from client, in world.spell_dbc
+    SPELL_EXPLODE_TRIGGER       = 25938,
+    SPELL_VISCIDUS_SHRINKS      = 25893, // Server-side
+    SPELL_INVIS_SELF            = 25905,
+    SPELL_VISCIDUS_GROWS        = 25897,
+    SPELL_STUN_SELF             = 25900,
 
-    SPELL_MEMBRANE_VISCIDUS     = 25994,                   // damage reduction spell - removed from DBC
-    SPELL_VISCIDUS_WEAKNESS     = 25926,                   // aura which procs at damage - should trigger the slow spells - removed from DBC
-    SPELL_VISCIDUS_GROWS        = 25897,                   // removed from DBC
-    SPELL_SUMMON_GLOBS          = 25885,                   // summons npc 15667 using spells from 25865 to 25884; All spells have target coords - removed from DBC
-    SPELL_VISCIDUS_TELEPORT     = 25904,                   // removed from DBC
+    // Toxic slime
+    SPELL_TOXIN                 = 26575,
 };
 
 enum Events
 {
     EVENT_POISONBOLT_VOLLEY     = 1,
     EVENT_POISON_SHOCK          = 2,
-    EVENT_RESET_PHASE           = 3
+    EVENT_TOXIN                 = 3,
+    EVENT_RESET_PHASE           = 4
 };
 
 enum Phases
@@ -81,52 +84,98 @@ enum MovePoints
     ROOM_CENTER                 = 1
 };
 
-Position const ViscidusCoord = { -7992.36f, 908.19f, -52.62f, 1.68f }; /// @todo Visci isn't in room middle
-float const RoomRadius = 40.0f; /// @todo Not sure if its correct
+enum Misc
+{
+    MAX_GLOB_SPAWN             = 20,
+};
+
+Position const roomCenter = { -7992.36f, 908.19f, -52.62f, 1.68f };
+
+Position const resetPoint = { -7992.0f, 1041.0f, -23.84f };
+
+std::array<uint32, MAX_GLOB_SPAWN> const spawnGlobSpells = { 25865, 25866, 25867, 25868, 25869, 25870, 25871, 25872, 25873, 25874, 25875, 25876, 25877, 25878, 25879, 25880, 25881, 25882, 25883, 25884 };
 
 struct boss_viscidus : public BossAI
 {
-    boss_viscidus(Creature* creature) : BossAI(creature, DATA_VISCIDUS) { }
+    boss_viscidus(Creature* creature) : BossAI(creature, DATA_VISCIDUS)
+    {
+        me->LowerPlayerDamageReq(me->GetMaxHealth());
+    }
+
+    bool CheckInRoom() override
+    {
+        if (me->GetExactDist2d(resetPoint) <= 10.f)
+        {
+            EnterEvadeMode(EVADE_REASON_BOUNDARY);
+            return false;
+        }
+
+        return true;
+    }
 
     void Reset() override
     {
-        _Reset();
-        _hitcounter = 0;
-        _phase = PHASE_FROST;
+        BossAI::Reset();
+        events.Reset();
+        SoftReset();
+        _scheduler.CancelAll();
+        me->RemoveAurasDueToSpell(SPELL_VISCIDUS_SHRINKS);
     }
 
-    void DamageTaken(Unit* attacker, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+    void SoftReset()
     {
+        _hitcounter = 0;
+        me->RemoveAurasDueToSpell(SPELL_STUN_SELF);
+        me->SetReactState(REACT_AGGRESSIVE);
+        _phase = PHASE_FROST;
+        me->RemoveAurasDueToSpell(SPELL_INVIS_SELF);
+    }
+
+    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType effType, SpellSchoolMask) override
+    {
+        if (me->HealthBelowPct(5))
+            damage = 0;
+
         if (!attacker || _phase != PHASE_MELEE)
             return;
 
-        ++_hitcounter;
+        if (effType == DIRECT_DAMAGE)
+            ++_hitcounter;
 
         if (attacker->HasUnitState(UNIT_STATE_MELEE_ATTACKING) && _hitcounter >= HITCOUNTER_EXPLODE)
         {
+            if (me->GetHealthPct() <= 5.f)
+            {
+                Unit::Kill(attacker, me);
+                return;
+            }
+
             Talk(EMOTE_EXPLODE);
+            me->SetReactState(REACT_PASSIVE);
             events.Reset();
             _phase = PHASE_GLOB;
-            DoCast(me, SPELL_VISCIDUS_EXPLODE);
-            me->SetVisible(false);
-            me->RemoveAura(SPELL_TOXIN);
             me->RemoveAura(SPELL_VISCIDUS_FREEZE);
-
-            uint8 NumGlobes = me->GetHealthPct() / 5.0f;
-            for (uint8 i = 0; i < NumGlobes; ++i)
-            {
-                float Angle = i * 2 * M_PI / NumGlobes;
-                float X = ViscidusCoord.GetPositionX() + std::cos(Angle) * RoomRadius;
-                float Y = ViscidusCoord.GetPositionY() + std::sin(Angle) * RoomRadius;
-                float Z = -35.0f;
-
-                if (TempSummon* Glob = me->SummonCreature(NPC_GLOB_OF_VISCIDUS, X, Y, Z))
+            DoCastSelf(SPELL_STUN_SELF, true);
+            me->AttackStop();
+            me->CastStop();
+            me->HandleEmoteCommand(EMOTE_ONESHOT_FLYDEATH); // not found in sniff, this is the best one I found
+            _scheduler
+                .Schedule(2500ms, [this](TaskContext /*context*/)
                 {
-                    Glob->UpdateAllowedPositionZ(X, Y, Z);
-                    Glob->NearTeleportTo(X, Y, Z, 0.0f);
-                    Glob->GetMotionMaster()->MovePoint(ROOM_CENTER, ViscidusCoord);
-                }
-            }
+                    DoCastSelf(SPELL_EXPLODE_TRIGGER, true);
+                })
+                .Schedule(3000ms, [this](TaskContext /*context*/)
+                {
+                    DoCastSelf(SPELL_INVIS_SELF, true);
+                    me->SetAuraStack(SPELL_VISCIDUS_SHRINKS, me, 20);
+                    me->LowerPlayerDamageReq(me->GetMaxHealth());
+                    me->SetHealth(me->GetMaxHealth() * 0.01f); // set 1% health
+                    DoResetThreat();
+                    me->NearTeleportTo(roomCenter.GetPositionX(),
+                        roomCenter.GetPositionY(),
+                        roomCenter.GetPositionZ(),
+                        roomCenter.GetOrientation());
+                });
         }
         else if (_hitcounter == HITCOUNTER_SHATTER)
             Talk(EMOTE_SHATTER);
@@ -136,7 +185,12 @@ struct boss_viscidus : public BossAI
 
     void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
     {
-        if ((spell->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST) && _phase == PHASE_FROST && me->GetHealthPct() > 5.0f)
+        if (spell->Id == SPELL_REJOIN_VISCIDUS)
+        {
+            me->RemoveAuraFromStack(SPELL_VISCIDUS_SHRINKS);
+        }
+
+        if ((spell->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST) && _phase == PHASE_FROST)
         {
             ++_hitcounter;
 
@@ -145,85 +199,89 @@ struct boss_viscidus : public BossAI
                 _hitcounter = 0;
                 Talk(EMOTE_FROZEN);
                 _phase = PHASE_MELEE;
-                DoCast(me, SPELL_VISCIDUS_FREEZE);
                 me->RemoveAura(SPELL_VISCIDUS_SLOWED_MORE);
-                events.ScheduleEvent(EVENT_RESET_PHASE, 15000);
+                DoCastSelf(SPELL_VISCIDUS_FREEZE);
+                events.ScheduleEvent(EVENT_RESET_PHASE, 15s);
             }
-            else if (_hitcounter >= HITCOUNTER_SLOW_MORE)
+            else if (_hitcounter == HITCOUNTER_SLOW_MORE)
             {
                 Talk(EMOTE_FREEZE);
                 me->RemoveAura(SPELL_VISCIDUS_SLOWED);
-                DoCast(me, SPELL_VISCIDUS_SLOWED_MORE);
+                DoCastSelf(SPELL_VISCIDUS_SLOWED_MORE);
             }
-            else if (_hitcounter >= HITCOUNTER_SLOW)
+            else if (_hitcounter == HITCOUNTER_SLOW)
             {
                 Talk(EMOTE_SLOW);
-                DoCast(me, SPELL_VISCIDUS_SLOWED);
+                DoCastSelf(SPELL_VISCIDUS_SLOWED);
             }
         }
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void SummonedCreatureDies(Creature* summon, Unit* killer) override
     {
-        _EnterCombat();
-        events.Reset();
+        if (summon->GetEntry() != NPC_GLOB_OF_VISCIDUS)
+            return;
+
+        if (killer && killer->GetEntry() == NPC_GLOB_OF_VISCIDUS)
+        {
+            if (_phase == PHASE_GLOB)
+            {
+                _phase = PHASE_FROST;
+                me->RemoveAurasDueToSpell(SPELL_INVIS_SELF);
+            }
+
+            int32 heal = me->GetMaxHealth() * 0.05f;
+            me->CastCustomSpell(me, SPELL_VISCIDUS_GROWS, &heal, nullptr, nullptr, true);
+        }
+
+        if (!summons.IsAnyCreatureWithEntryAlive(NPC_GLOB_OF_VISCIDUS)) // all globs were killed
+        {
+            SoftReset();
+            InitSpells();
+            me->LowerPlayerDamageReq(me->GetMaxHealth());
+        }
+    }
+
+    void EnterCombat(Unit* who) override
+    {
+        BossAI::EnterCombat(who);
         InitSpells();
     }
 
     void InitSpells()
     {
-        DoCast(me, SPELL_TOXIN);
+        events.ScheduleEvent(EVENT_TOXIN, 15s, 20s);
         events.ScheduleEvent(EVENT_POISONBOLT_VOLLEY, 10s, 15s);
         events.ScheduleEvent(EVENT_POISON_SHOCK, 7s, 12s);
     }
 
-    void EnterEvadeMode(EvadeReason why) override
-    {
-        summons.DespawnAll();
-        ScriptedAI::EnterEvadeMode(why);
-    }
-
-    void JustDied(Unit* /*killer*/) override
-    {
-        DoCast(me, SPELL_VISCIDUS_SUICIDE);
-        summons.DespawnAll();
-    }
-
     void UpdateAI(uint32 diff) override
     {
-        if (!UpdateVictim())
+        if (!UpdateVictim() || !CheckInRoom())
             return;
 
-        if (_phase == PHASE_GLOB && summons.empty())
-        {
-            DoResetThreat();
-            me->NearTeleportTo(ViscidusCoord.GetPositionX(),
-                ViscidusCoord.GetPositionY(),
-                ViscidusCoord.GetPositionZ(),
-                ViscidusCoord.GetOrientation());
-
-            _hitcounter = 0;
-            _phase = PHASE_FROST;
-            InitSpells();
-            me->SetVisible(true);
-        }
-
         events.Update(diff);
+        _scheduler.Update(diff);
 
         while (uint32 eventId = events.ExecuteEvent())
         {
             switch (eventId)
             {
                 case EVENT_POISONBOLT_VOLLEY:
-                    DoCast(me, SPELL_POISONBOLT_VOLLEY);
+                    DoCastSelf(SPELL_POISONBOLT_VOLLEY);
                     events.ScheduleEvent(EVENT_POISONBOLT_VOLLEY, 10s, 15s);
                     break;
                 case EVENT_POISON_SHOCK:
-                    DoCast(me, SPELL_POISON_SHOCK);
+                    DoCastSelf(SPELL_POISON_SHOCK);
                     events.ScheduleEvent(EVENT_POISON_SHOCK, 7s, 12s);
+                    break;
+                case EVENT_TOXIN:
+                    DoCastRandomTarget(SPELL_SUMMON_TOXIN_SLIME);
+                    events.ScheduleEvent(EVENT_TOXIN, 15s, 20s);
                     break;
                 case EVENT_RESET_PHASE:
                     _hitcounter = 0;
+                    me->RemoveAura(SPELL_VISCIDUS_FREEZE);
                     _phase = PHASE_FROST;
                     break;
                 default:
@@ -231,49 +289,110 @@ struct boss_viscidus : public BossAI
             }
         }
 
-        if (_phase != PHASE_GLOB)
+        if (_phase != PHASE_GLOB && me->GetReactState() == REACT_AGGRESSIVE)
             DoMeleeAttackIfReady();
     }
 
 private:
     uint8 _hitcounter;
-    Phases _phase;
+    uint8 _phase;
+    TaskScheduler _scheduler;
 };
 
 struct boss_glob_of_viscidus : public ScriptedAI
 {
-    boss_glob_of_viscidus(Creature* creature) : ScriptedAI(creature) { }
-
-    void JustDied(Unit* /*killer*/) override
+    boss_glob_of_viscidus(Creature* creature) : ScriptedAI(creature)
     {
-        InstanceScript* instance = me->GetInstanceScript();
+        me->SetReactState(REACT_PASSIVE);
+    }
 
-        if (Creature* viscidus = me->GetMap()->GetCreature(instance->GetGuidData(DATA_VISCIDUS)))
-        {
-            if (BossAI* viscidusAI = dynamic_cast<BossAI*>(viscidus->GetAI()))
-                viscidusAI->SummonedCreatureDespawn(me);
-
-            if (viscidus->IsAlive() && viscidus->GetHealthPct() < 5.0f)
+    void InitializeAI() override
+    {
+        me->SetInCombatWithZone();
+        _scheduler.CancelAll();
+        _scheduler.Schedule(2400ms, [this](TaskContext context)
             {
-                viscidus->SetVisible(true);
-                Unit::Kill(viscidus->GetVictim(), viscidus);
-            }
-            else
-            {
-                viscidus->SetHealth(viscidus->GetHealth() - viscidus->GetMaxHealth() / 20);
-                viscidus->CastSpell(viscidus, SPELL_VISCIDUS_SHRINKS);
-            }
-        }
+                me->GetMotionMaster()->MovePoint(ROOM_CENTER, roomCenter);
+                float topSpeed = me->GetSpeedRate(MOVE_RUN) + 0.2142855f * 4;
+                context.Schedule(1s, [this, topSpeed](TaskContext context)
+                    {
+                        float newSpeed = me->GetSpeedRate(MOVE_RUN) + 0.2142855f; // sniffed
+                        me->SetSpeed(MOVE_RUN, newSpeed < topSpeed ? newSpeed : topSpeed);
+                        context.Repeat();
+                    });
+            });
     }
 
     void MovementInform(uint32 /*type*/, uint32 id) override
     {
         if (id == ROOM_CENTER)
         {
-            DoCast(me, SPELL_REJOIN_VISCIDUS);
-            if (TempSummon* summon = me->ToTempSummon())
-                summon->UnSummon();
+            DoCastSelf(SPELL_REJOIN_VISCIDUS);
+            Unit::Kill(me, me);
         }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _scheduler.Update(diff);
+    }
+
+protected:
+    TaskScheduler _scheduler;
+};
+
+struct npc_toxic_slime : public ScriptedAI
+{
+    npc_toxic_slime(Creature* creature) : ScriptedAI(creature)
+    {
+        me->SetReactState(REACT_PASSIVE);
+    }
+
+    void InitializeAI() override
+    {
+        SetCombatMovement(false);
+        DoCastSelf(SPELL_TOXIN);
+
+        InstanceScript* instance = me->GetInstanceScript();
+
+        if (Creature* viscidus = instance->GetCreature(DATA_VISCIDUS))
+            if (viscidus->AI())
+                viscidus->AI()->JustSummoned(me);
+    }
+};
+
+class spell_explode_trigger : public SpellScript
+{
+    PrepareSpellScript(spell_explode_trigger);
+
+    void HandleOnHit()
+    {
+        Unit* caster = GetCaster();
+
+        uint8 globsToSpawn = std::floor(caster->GetHealthPct() / 5.f);
+        for (uint8 i = 0; i < globsToSpawn; i++)
+            caster->CastSpell((Unit*)nullptr, spawnGlobSpells[i], true);
+    }
+
+    void Register() override
+    {
+        OnHit += SpellHitFn(spell_explode_trigger::HandleOnHit);
+    }
+};
+
+class spell_summon_toxin_slime : public SpellScript
+{
+    PrepareSpellScript(spell_summon_toxin_slime);
+
+    void HandleOnHit()
+    {
+        if (Unit* target = GetHitUnit())
+            target->CastSpell(target, SPELL_SUMMON_TOXIN_SLIME_2, true);
+    }
+
+    void Register() override
+    {
+        OnHit += SpellHitFn(spell_summon_toxin_slime::HandleOnHit);
     }
 };
 
@@ -281,4 +400,7 @@ void AddSC_boss_viscidus()
 {
     RegisterTempleOfAhnQirajCreatureAI(boss_viscidus);
     RegisterTempleOfAhnQirajCreatureAI(boss_glob_of_viscidus);
+    RegisterTempleOfAhnQirajCreatureAI(npc_toxic_slime);
+    RegisterSpellScript(spell_explode_trigger);
+    RegisterSpellScript(spell_summon_toxin_slime);
 }
