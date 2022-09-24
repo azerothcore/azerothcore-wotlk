@@ -153,6 +153,22 @@ bool SummonList::IsAnyCreatureAlive() const
     return false;
 }
 
+bool SummonList::IsAnyCreatureWithEntryAlive(uint32 entry) const
+{
+    for (auto const& guid : storage_)
+    {
+        if (Creature* summon = ObjectAccessor::GetCreature(*me, guid))
+        {
+            if (summon->GetEntry() == entry && summon->IsAlive())
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 bool SummonList::IsAnyCreatureInCombat() const
 {
     for (auto const& guid : storage_)
