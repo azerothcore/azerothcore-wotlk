@@ -104,6 +104,9 @@ class spell_rog_blade_flurry : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
+        if (!eventInfo.GetActor())
+            return false;
+
         Unit* _procTarget = eventInfo.GetActor()->SelectNearbyNoTotemTarget(eventInfo.GetProcTarget());
         if (_procTarget)
             _procTargetGUID = _procTarget->GetGUID();
