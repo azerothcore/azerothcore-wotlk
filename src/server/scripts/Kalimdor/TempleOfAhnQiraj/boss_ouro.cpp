@@ -250,7 +250,6 @@ struct boss_ouro : public BossAI
     void EnterCombat(Unit* who) override
     {
         Emerge();
-        me->LowerPlayerDamageReq(me->GetMaxHealth() - me->GetHealth());
 
         BossAI::EnterCombat(who);
     }
@@ -292,6 +291,7 @@ struct npc_dirt_mound : ScriptedAI
         {
             creature->SetInCombatWithZone();
             creature->SetHealth(_ouroHealth);
+            creature->LowerPlayerDamageReq(creature->GetMaxHealth() - creature->GetHealth());
         }
     }
 
