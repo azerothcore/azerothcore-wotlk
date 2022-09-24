@@ -3403,9 +3403,7 @@ class spell_item_chicken_cover : public SpellScript
 
 enum Refocus
 {
-    SPELL_AIMED_SHOT    = 19434,
-    SPELL_MULTISHOT     = 2643,
-    SPELL_VOLLEY        = 42243,
+    SPELL_CATEGORY_AIMED_MULTI = 85
 };
 
 class spell_item_refocus : public SpellScript
@@ -3419,9 +3417,7 @@ class spell_item_refocus : public SpellScript
         if (!caster || caster->getClass() != CLASS_HUNTER)
             return;
 
-        caster->RemoveSpellCooldown(SPELL_AIMED_SHOT, true);
-        caster->RemoveSpellCooldown(SPELL_MULTISHOT, true);
-        caster->RemoveSpellCooldown(SPELL_VOLLEY, true);
+        caster->RemoveCategoryCooldown(SPELL_CATEGORY_AIMED_MULTI);
     }
 
     void Register() override
