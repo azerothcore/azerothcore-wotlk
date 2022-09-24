@@ -1,3 +1,4 @@
+-- DB update 2022_09_23_00 -> 2022_09_24_00
 --
 DELETE FROM `spell_bonus_data` WHERE `entry` BETWEEN 110 AND 50000;
 INSERT INTO `spell_bonus_data` (`entry`, `direct_bonus`, `dot_bonus`, `ap_bonus`, `ap_dot_bonus`, `comments`) VALUES
