@@ -291,6 +291,7 @@ struct npc_dirt_mound : ScriptedAI
         {
             creature->SetInCombatWithZone();
             creature->SetHealth(_ouroHealth);
+            creature->LowerPlayerDamageReq(creature->GetMaxHealth() - creature->GetHealth());
         }
     }
 
