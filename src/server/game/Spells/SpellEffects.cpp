@@ -3658,8 +3658,8 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
     uint32 eff_damage(std::max(weaponDamage, 0));
 
     // Add melee damage bonuses (also check for negative)
-    eff_damage = m_caster->MeleeDamageBonusDone(unitTarget, eff_damage, m_attackType, m_spellInfo);
-    eff_damage = unitTarget->MeleeDamageBonusTaken(m_caster, eff_damage, m_attackType, m_spellInfo);
+    eff_damage = m_caster->MeleeDamageBonusDone(unitTarget, eff_damage, m_attackType, m_spellInfo, m_spellSchoolMask);
+    eff_damage = unitTarget->MeleeDamageBonusTaken(m_caster, eff_damage, m_attackType, m_spellInfo, m_spellSchoolMask);
 
     // Meteor like spells (divided damage to targets)
     if (m_spellInfo->HasAttribute(SPELL_ATTR0_CU_SHARE_DAMAGE))

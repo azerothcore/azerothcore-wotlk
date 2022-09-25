@@ -6726,21 +6726,11 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
     if (proto->ArcaneRes)
         HandleStatModifier(UNIT_MOD_RESISTANCE_ARCANE, BASE_VALUE, float(proto->ArcaneRes), apply);
 
-    WeaponAttackType attType = BASE_ATTACK;
-
-    if (slot == EQUIPMENT_SLOT_RANGED && (
-                proto->InventoryType == INVTYPE_RANGED || proto->InventoryType == INVTYPE_THROWN ||
-                proto->InventoryType == INVTYPE_RANGEDRIGHT))
+    uint8 attType = Player::GetAttackBySlot(slot);
+    if (attType != MAX_ATTACK)
     {
-        attType = RANGED_ATTACK;
-    }
-    else if (slot == EQUIPMENT_SLOT_OFFHAND)
-    {
-        attType = OFF_ATTACK;
-    }
-
-    if (CanUseAttackType(attType))
         _ApplyWeaponDamage(slot, proto, ssv, apply);
+    }
 
     // Druids get feral AP bonus from weapon dps (also use DPS from ScalingStatValue)
     if (getClass() == CLASS_DRUID)
@@ -6783,20 +6773,13 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingSt
         ssv = ScalingStatValue ? sScalingStatValuesStore.LookupEntry(ssd_level) : nullptr;
     }
 
-    WeaponAttackType attType = BASE_ATTACK;
+    uint8 attType = Player::GetAttackBySlot(slot);
+    if (!IsInFeralForm() && apply && !CanUseAttackType(attType))
+    {
+        return;
+    }
+
     float damage = 0.0f;
-
-    if (slot == EQUIPMENT_SLOT_RANGED && (
-                proto->InventoryType == INVTYPE_RANGED || proto->InventoryType == INVTYPE_THROWN ||
-                proto->InventoryType == INVTYPE_RANGEDRIGHT))
-    {
-        attType = RANGED_ATTACK;
-    }
-    else if (slot == EQUIPMENT_SLOT_OFFHAND)
-    {
-        attType = OFF_ATTACK;
-    }
-
     for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
     {
         float minDamage = proto->Damage[i].DamageMin;
@@ -6819,13 +6802,13 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingSt
             if (minDamage > 0.f)
             {
                 damage = minDamage;
-                SetBaseWeaponDamage(attType, MINDAMAGE, minDamage, i);
+                SetBaseWeaponDamage(WeaponAttackType(attType), MINDAMAGE, minDamage, i);
             }
 
             if (maxDamage > 0.f)
             {
                 damage = maxDamage;
-                SetBaseWeaponDamage(attType, MAXDAMAGE, maxDamage, i);
+                SetBaseWeaponDamage(WeaponAttackType(attType), MAXDAMAGE, maxDamage, i);
             }
         }
     }
@@ -6834,8 +6817,8 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingSt
     {
         for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
         {
-            SetBaseWeaponDamage(attType, MINDAMAGE, i == 0 ? BASE_MINDAMAGE : 0.f, i);
-            SetBaseWeaponDamage(attType, MAXDAMAGE, i == 0 ? BASE_MAXDAMAGE : 0.f, i);
+            SetBaseWeaponDamage(WeaponAttackType(attType), MINDAMAGE, i == 0 ? BASE_MINDAMAGE : 0.f, i);
+            SetBaseWeaponDamage(WeaponAttackType(attType), MAXDAMAGE, i == 0 ? BASE_MAXDAMAGE : 0.f, i);
         }
     }
 
@@ -6854,7 +6837,7 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingSt
         return;
 
     if (CanModifyStats() && (damage || proto->Delay))
-        UpdateDamagePhysical(attType);
+        UpdateDamagePhysical(WeaponAttackType(attType));
 }
 
 SpellSchoolMask Player::GetMeleeDamageSchoolMask(WeaponAttackType attackType /*= BASE_ATTACK*/, uint8 damageIndex /*= 0*/) const

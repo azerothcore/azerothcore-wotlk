@@ -1536,8 +1536,8 @@ void Unit::CalculateMeleeDamage(Unit* victim, uint32 damage, CalcDamageInfo* dam
 
         damage += CalculateDamage(damageInfo->attackType, false, addPctMods, itemDamagesMask);
         // Add melee damage bonus
-        damage = MeleeDamageBonusDone(damageInfo->target, damage, damageInfo->attackType);
-        damage = damageInfo->target->MeleeDamageBonusTaken(this, damage, damageInfo->attackType);
+        damage = MeleeDamageBonusDone(damageInfo->target, damage, damageInfo->attackType, nullptr, schoolMask);
+        damage = damageInfo->target->MeleeDamageBonusTaken(this, damage, damageInfo->attackType, nullptr, schoolMask);
 
         // Script Hook For CalculateMeleeDamage -- Allow scripts to change the Damage pre class mitigation calculations
         sScriptMgr->ModifyMeleeDamage(damageInfo->target, damageInfo->attacker, damage);
@@ -12738,7 +12738,7 @@ bool Unit::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) cons
     return false;
 }
 
-uint32 Unit::MeleeDamageBonusDone(Unit* victim, uint32 pdamage, WeaponAttackType attType, SpellInfo const* spellProto)
+uint32 Unit::MeleeDamageBonusDone(Unit* victim, uint32 pdamage, WeaponAttackType attType, SpellInfo const* spellProto, SpellSchoolMask damageSchoolMask /*= SPELL_SCHOOL_MASK_NORMAL*/)
 {
     if (!victim || pdamage == 0)
         return 0;
@@ -12749,7 +12749,7 @@ uint32 Unit::MeleeDamageBonusDone(Unit* victim, uint32 pdamage, WeaponAttackType
         if (GetEntry() == 27893)
         {
             if (Unit* owner = GetOwner())
-                return owner->MeleeDamageBonusDone(victim, pdamage, attType, spellProto) / 2;
+                return owner->MeleeDamageBonusDone(victim, pdamage, attType, spellProto, damageSchoolMask) / 2;
         }
     }
 
@@ -12807,26 +12807,25 @@ uint32 Unit::MeleeDamageBonusDone(Unit* victim, uint32 pdamage, WeaponAttackType
     // Done total percent damage auras
     float DoneTotalMod = 1.0f;
 
-    // Some spells don't benefit from pct done mods
-    if (spellProto)
+    // mods for SPELL_SCHOOL_MASK_NORMAL are already factored in base melee damage calculation
+    if (!(damageSchoolMask & SPELL_SCHOOL_MASK_NORMAL))
     {
+        // Some spells don't benefit from pct done mods
         AuraEffectList const& mModDamagePercentDone = GetAuraEffectsByType(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
         for (AuraEffectList::const_iterator i = mModDamagePercentDone.begin(); i != mModDamagePercentDone.end(); ++i)
         {
-            if (!spellProto->ValidateAttribute6SpellDamageMods(this, *i, false))
-                continue;
-
-            if (!sScriptMgr->IsNeedModMeleeDamagePercent(this, *i, DoneTotalMod, spellProto))
-                continue;
-
-            if (((*i)->GetMiscValue() & spellProto->GetSchoolMask()) && !((*i)->GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL))
+            if (!spellProto || (spellProto->ValidateAttribute6SpellDamageMods(this, *i, false) &&
+                sScriptMgr->IsNeedModMeleeDamagePercent(this, *i, DoneTotalMod, spellProto)))
             {
-                if ((*i)->GetSpellInfo()->EquippedItemClass == -1)
-                    AddPct(DoneTotalMod, (*i)->GetAmount());
-                else if (!(*i)->GetSpellInfo()->HasAttribute(SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPED_ITEM) && ((*i)->GetSpellInfo()->EquippedItemSubClassMask == 0))
-                    AddPct(DoneTotalMod, (*i)->GetAmount());
-                else if (ToPlayer() && ToPlayer()->HasItemFitToSpellRequirements((*i)->GetSpellInfo()))
-                    AddPct(DoneTotalMod, (*i)->GetAmount());
+                if (((*i)->GetMiscValue() & damageSchoolMask))
+                {
+                    if ((*i)->GetSpellInfo()->EquippedItemClass == -1)
+                        AddPct(DoneTotalMod, (*i)->GetAmount());
+                    else if (!(*i)->GetSpellInfo()->HasAttribute(SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPED_ITEM) && ((*i)->GetSpellInfo()->EquippedItemSubClassMask == 0))
+                        AddPct(DoneTotalMod, (*i)->GetAmount());
+                    else if (ToPlayer() && ToPlayer()->HasItemFitToSpellRequirements((*i)->GetSpellInfo()))
+                        AddPct(DoneTotalMod, (*i)->GetAmount());
+                }
             }
         }
     }
@@ -12941,7 +12940,7 @@ uint32 Unit::MeleeDamageBonusDone(Unit* victim, uint32 pdamage, WeaponAttackType
     return uint32(std::max(tmpDamage, 0.0f));
 }
 
-uint32 Unit::MeleeDamageBonusTaken(Unit* attacker, uint32 pdamage, WeaponAttackType attType, SpellInfo const* spellProto)
+uint32 Unit::MeleeDamageBonusTaken(Unit* attacker, uint32 pdamage, WeaponAttackType attType, SpellInfo const* spellProto/*= nullptr*/, SpellSchoolMask damageSchoolMask /*= SPELL_SCHOOL_MASK_NORMAL*/)
 {
     if (pdamage == 0)
         return 0;
@@ -12951,7 +12950,7 @@ uint32 Unit::MeleeDamageBonusTaken(Unit* attacker, uint32 pdamage, WeaponAttackT
     // ..taken
     AuraEffectList const& mDamageTaken = GetAuraEffectsByType(SPELL_AURA_MOD_DAMAGE_TAKEN);
     for (AuraEffectList::const_iterator i = mDamageTaken.begin(); i != mDamageTaken.end(); ++i)
-        if ((*i)->GetMiscValue() & (spellProto ? spellProto->GetSchoolMask() : attacker->GetMeleeDamageSchoolMask()))
+        if ((*i)->GetMiscValue() & damageSchoolMask)
             TakenFlatBenefit += (*i)->GetAmount();
 
     if (attType != RANGED_ATTACK)
@@ -12962,7 +12961,7 @@ uint32 Unit::MeleeDamageBonusTaken(Unit* attacker, uint32 pdamage, WeaponAttackT
     // Taken total percent damage auras
     float TakenTotalMod = 1.0f;
 
-    TakenTotalMod *= GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, spellProto ? spellProto->GetSchoolMask() : attacker->GetMeleeDamageSchoolMask());
+    TakenTotalMod *= GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, damageSchoolMask);
 
     // .. taken pct (special attacks)
     if (spellProto)
@@ -13028,7 +13027,7 @@ uint32 Unit::MeleeDamageBonusTaken(Unit* attacker, uint32 pdamage, WeaponAttackT
         bool addModifier = false;
         AuraEffectList const& ResIgnoreAuras = attacker->GetAuraEffectsByType(SPELL_AURA_MOD_IGNORE_TARGET_RESIST);
         for (AuraEffectList::const_iterator j = ResIgnoreAuras.begin(); j != ResIgnoreAuras.end(); ++j)
-            if ((*j)->GetMiscValue() & (spellProto ? spellProto->GetSchoolMask() : SPELL_SCHOOL_MASK_NORMAL))
+            if ((*j)->GetMiscValue() & damageSchoolMask)
             {
                 ApplyPct(ignoreModifier, (*j)->GetAmount());
                 addModifier = true;
