@@ -612,7 +612,7 @@ public:
         InstanceScript* pInstance;
         uint32 _phase;
         bool _flyPhase;
-        Unit* _flyTarget;
+        ObjectGuid _flyTargetGUID;
         uint32 _channelTimer;
 
         bool _stunnedAchievement;
@@ -625,7 +625,7 @@ public:
             _channelTimer = 0;
             _phase = 0;
             _flyPhase = false;
-            _flyTarget = nullptr;
+            _flyTargetGUID.Clear();
             _stunnedAchievement = true;
 
             events.Reset();
@@ -756,11 +756,14 @@ public:
 
             if (_flyPhase)
             {
-                if (_flyTarget && me->GetDistance2d(_flyTarget) >= 6 )
+                if (Unit* flyTarget = ObjectAccessor::GetUnit(*me, _flyTargetGUID))
                 {
-                    //float speed = me->GetDistance(_flyTarget->GetPositionX(), _flyTarget->GetPositionY(), _flyTarget->GetPositionZ()+15) / (1500.0f * 0.001f);
-                    me->SendMonsterMove(_flyTarget->GetPositionX(), _flyTarget->GetPositionY(), _flyTarget->GetPositionZ() + 15, 1500, SPLINEFLAG_FLYING);
-                    me->SetPosition(_flyTarget->GetPositionX(), _flyTarget->GetPositionY(), _flyTarget->GetPositionZ(), _flyTarget->GetOrientation());
+                    if (me->GetDistance2d(flyTarget) >= 6)
+                    {
+                        //float speed = me->GetDistance(_flyTarget->GetPositionX(), _flyTarget->GetPositionY(), _flyTarget->GetPositionZ()+15) / (1500.0f * 0.001f);
+                        me->SendMonsterMove(flyTarget->GetPositionX(), flyTarget->GetPositionY(), flyTarget->GetPositionZ() + 15, 1500, SPLINEFLAG_FLYING);
+                        me->SetPosition(flyTarget->GetPositionX(), flyTarget->GetPositionY(), flyTarget->GetPositionZ(), flyTarget->GetOrientation());
+                    }
                 }
             }
 
@@ -794,7 +797,8 @@ public:
                         Talk(SAY_BRUNDIR_FLIGHT);
 
                         _flyPhase = true;
-                        _flyTarget = me->GetVictim();
+                        Unit* oldVictim = me->GetVictim();
+                        _flyTargetGUID = oldVictim->GetGUID();
                         me->SetRegeneratingHealth(false);
                         me->SetDisableGravity(true);
 
@@ -803,7 +807,7 @@ public:
                         me->SetReactState(REACT_PASSIVE);
                         me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
                         me->SetUnitFlag(UNIT_FLAG_STUNNED);
-                        me->SendMonsterMove(_flyTarget->GetPositionX(), _flyTarget->GetPositionY(), _flyTarget->GetPositionZ() + 15, 1500, SPLINEFLAG_FLYING);
+                        me->SendMonsterMove(oldVictim->GetPositionX(), oldVictim->GetPositionY(), oldVictim->GetPositionZ() + 15, 1500, SPLINEFLAG_FLYING);
 
                         me->CastSpell(me, SPELL_LIGHTNING_TENDRILS, true);
                         me->CastSpell(me, 61883, true);
@@ -822,11 +826,13 @@ public:
                     me->SetCanFly(false);
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->SetDisableGravity(false);
-                    if (_flyTarget)
-                        me->Attack(_flyTarget, false);
+                    if (Unit* flyTarget = ObjectAccessor::GetUnit(*me, _flyTargetGUID))
+                    {
+                        me->Attack(flyTarget, false);
+                    }
 
                     me->SetRegeneratingHealth(true);
-                    _flyTarget = nullptr;
+                    _flyTargetGUID.Clear();
                     me->RemoveAura(SPELL_LIGHTNING_TENDRILS);
                     me->RemoveAura(61883);
                     DoResetThreat();
