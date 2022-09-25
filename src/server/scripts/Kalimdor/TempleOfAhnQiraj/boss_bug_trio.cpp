@@ -146,7 +146,7 @@ public:
         me->GetMotionMaster()->MoveIdle();
         me->SetSpeed(MOVE_RUN, 15.f/7.f); // From sniffs
         DoCastSelf(SPELL_FULL_HEAL, true);
-        if (me->GetThreatMgr().getThreatList().size())
+        if (me->GetThreatListSize())
             DoResetThreat();
         _isEating = false;
 
