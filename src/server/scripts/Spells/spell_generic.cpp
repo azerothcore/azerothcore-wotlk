@@ -4571,6 +4571,29 @@ private:
     uint32 _aura;
 };
 
+// 818 Basic Campfire
+class spell_gen_basic_campfire : public SpellScript
+{
+    PrepareSpellScript(spell_gen_basic_campfire);
+
+    void ModDest(SpellDestination& dest)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            if (caster->GetMap()->GetGameObjectFloor(caster->GetPhaseMask(), caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ()) == -G3D::finf())
+            {
+                float ground = caster->GetMap()->GetHeight(dest._position.GetPositionX(), dest._position.GetPositionY(), dest._position.GetPositionZ() + caster->GetCollisionHeight() * 0.5f);
+                dest._position.m_positionZ = ground;
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_gen_basic_campfire::ModDest, EFFECT_0, TARGET_DEST_CASTER_SUMMON);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -4708,4 +4731,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScriptWithArgs(spell_gen_consume, "spell_consume_aq20", SPELL_CONSUME_LEECH_AQ20, SPELL_CONSUME_LEECH_HEAL_AQ20);
     RegisterSpellScriptWithArgs(spell_gen_apply_aura_after_expiration, "spell_itch_aq20", SPELL_HIVEZARA_CATALYST, EFFECT_0, SPELL_AURA_DUMMY);
     RegisterSpellScriptWithArgs(spell_gen_apply_aura_after_expiration, "spell_itch_aq40", SPELL_VEKNISS_CATALYST, EFFECT_0, SPELL_AURA_DUMMY);
+    RegisterSpellScript(spell_gen_basic_campfire);
 }
