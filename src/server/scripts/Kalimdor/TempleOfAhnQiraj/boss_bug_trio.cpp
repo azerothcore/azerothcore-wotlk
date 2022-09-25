@@ -146,7 +146,8 @@ public:
         me->GetMotionMaster()->MoveIdle();
         me->SetSpeed(MOVE_RUN, 15.f/7.f); // From sniffs
         DoCastSelf(SPELL_FULL_HEAL, true);
-        DoResetThreat();
+        if (me->GetThreatMgr().getThreatList().size())
+            DoResetThreat();
         _isEating = false;
 
         _scheduler.Schedule(4s, [this](TaskContext /*context*/)
@@ -191,7 +192,7 @@ public:
 
         _scheduler.Update(diff, [this]
         {
-            if (!_dying)
+            if (!_dying && !_isEating)
                 DoMeleeAttackIfReady();
         });
     }
