@@ -1,3 +1,4 @@
+-- DB update 2022_09_25_02 -> 2022_09_25_03
 -- Alter AzerothCore table to support Vanilla negative resistance values
 ALTER TABLE item_template MODIFY fire_res SMALLINT;
 ALTER TABLE item_template MODIFY holy_res SMALLINT;

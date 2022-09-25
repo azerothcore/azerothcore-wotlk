@@ -1,3 +1,4 @@
+-- DB update 2022_09_25_03 -> 2022_09_25_04
 --
 DELETE FROM `gossip_menu_option` WHERE `MenuId`=8934 AND `OptionId`=4 AND `ActionMenuId`=0;
 UPDATE `gossip_menu_option` SET `OptionId`=4 WHERE `MenuId`=8934 AND `OptionId`=0 AND `ActionMenuId`=8953;
