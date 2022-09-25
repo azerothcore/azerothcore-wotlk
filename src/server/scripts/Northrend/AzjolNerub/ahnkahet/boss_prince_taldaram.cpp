@@ -411,7 +411,7 @@ struct boss_taldaram : public BossAI
                 {
                     //Count alive players
                     uint8 count = 0;
-                    std::list<HostileReference*> const t_list = me->GetThreatMgr().getThreatList();
+                    std::list<HostileReference*> const t_list = me->GetThreatMgr().GetThreatList();
                     if (!t_list.empty())
                     {
                         for (HostileReference const* reference : t_list)
