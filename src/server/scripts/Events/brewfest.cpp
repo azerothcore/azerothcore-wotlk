@@ -49,10 +49,13 @@ enum kegThrowers
     SPELL_THROW_KEG                             = 43660,
     SPELL_RAM_AURA                              = 43883,
     SPELL_ADD_TOKENS                            = 44501,
+    SPELL_RAM_RACING_CROP                       = 44262,
     SPELL_COOLDOWN_CHECKER                      = 44689,
     NPC_RAM_MASTER_RAY                          = 24497,
     NPC_NEILL_RAMSTEIN                          = 23558,
     KEG_KILL_CREDIT                             = 24337,
+    GOSSIP_NEIL                                 = 8953,
+    GOSSIP_RAY                                  = 8973
 };
 
 struct npc_brewfest_keg_thrower : public ScriptedAI
@@ -114,7 +117,7 @@ struct npc_brewfest_keg_reciver : public ScriptedAI
 
     void sGossipSelect(Player* player, uint32 uiSender, uint32 uiAction) override
     {
-        if (uiSender == 8953 || uiSender == 8973)
+        if (uiSender == GOSSIP_NEIL || uiSender == GOSSIP_RAY)
         {
             player->CastSpell(player, SPELL_COOLDOWN_CHECKER, true);
             player->AddSpellCooldown(SPELL_COOLDOWN_CHECKER, 0, 18 * HOUR * IN_MILLISECONDS);
@@ -124,8 +127,8 @@ struct npc_brewfest_keg_reciver : public ScriptedAI
         {
             CloseGossipMenuFor(player);
 
-            player->CastSpell(player, 43883, true);
-            player->CastSpell(player, 44262, true);
+            player->CastSpell(player, SPELL_RAM_AURA, true);
+            player->CastSpell(player, SPELL_RAM_RACING_CROP, true);
         }
     }
 };
