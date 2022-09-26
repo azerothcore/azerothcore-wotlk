@@ -50,6 +50,7 @@ enum Spells
 enum Misc
 {
     ACTION_CONSUME       = 0,
+    ACTION_EXPLODE       = 1,
 
     EMOTE_DEVOURED       = 0,
 
@@ -127,15 +128,18 @@ public:
 
     void DoAction(int32 action) override
     {
-        if (action != ACTION_CONSUME || _dying)
+        if (action == ACTION_CONSUME && !_dying)
         {
-            return;
+            _isEating = true;
+            me->SetSpeed(MOVE_RUN, 45.f / 7.f); // From sniffs
+            me->SetReactState(REACT_PASSIVE);
+            _scheduler.DelayAll(6s);
+        }
+        else if (action == ACTION_EXPLODE && _dying)
+        {
+            DoCastSelf(SPELL_BLOODY_DEATH);
         }
 
-        _isEating = true;
-        me->SetSpeed(MOVE_RUN, 45.f/7.f); // From sniffs
-        me->SetReactState(REACT_PASSIVE);
-        _scheduler.DelayAll(6s);
     }
 
     void MovementInform(uint32 type, uint32 id) override
@@ -148,8 +152,14 @@ public:
         DoCastSelf(SPELL_FULL_HEAL, true);
         if (me->GetThreatMgr().GetThreatListSize())
             DoResetThreat();
+        if (Creature* vem = instance->GetCreature(DATA_VEM))
+            vem->AI()->DoAction(ACTION_EXPLODE);
+        if (Creature* kri = instance->GetCreature(DATA_KRI))
+            kri->AI()->DoAction(ACTION_EXPLODE);
+        if (Creature* yauj = instance->GetCreature(DATA_YAUJ))
+            yauj->AI()->DoAction(ACTION_EXPLODE);
 
-        _scheduler.Schedule(4s, [this](TaskContext /*context*/)
+        _scheduler.Schedule(2s, [this](TaskContext /*context*/)
         {
             me->SetReactState(REACT_AGGRESSIVE);
             _isEating = false;
@@ -202,25 +212,25 @@ public:
         if (_dying && who->GetGUID() != me->GetGUID())
             damage = 0;
 
-        if (me->HealthBelowPctDamaged(1, damage) && instance->GetData(DATA_BUG_TRIO_DEATH) < 2 && !_dying)
+        if (me->HealthBelowPctDamaged(0, damage) && instance->GetData(DATA_BUG_TRIO_DEATH) < 2 && !_dying)
         {
             damage = 0;
             if (_isEating)
                 return;
 
             _scheduler.CancelAll();
-            me->SetStandState(UNIT_STAND_STATE_DEAD);
             me->SetReactState(REACT_PASSIVE);
             me->SetControlled(true, UNIT_STATE_ROOT);
             _dying = true;
-
+            float x, float y, float z;
             // Move the other bugs to this bug position
             if (Creature* vem = instance->GetCreature(DATA_VEM))
             {
                 if (vem->GetGUID() != me->GetGUID())
                 {
                     vem->AI()->DoAction(ACTION_CONSUME);
-                    vem->GetMotionMaster()->MovePoint(POINT_CONSUME, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
+                    me->GetRandomContactPoint(vem, x, y, z);
+                    vem->GetMotionMaster()->MovePoint(POINT_CONSUME, x, y, z);
                 }
             }
             if (Creature* kri = instance->GetCreature(DATA_KRI))
@@ -228,7 +238,8 @@ public:
                 if (kri->GetGUID() != me->GetGUID())
                 {
                     kri->AI()->DoAction(ACTION_CONSUME);
-                    kri->GetMotionMaster()->MovePoint(POINT_CONSUME, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
+                    me->GetRandomContactPoint(kri, x, y, z);
+                    kri->GetMotionMaster()->MovePoint(POINT_CONSUME, x, y, z);
                 }
             }
             if (Creature* yauj = instance->GetCreature(DATA_YAUJ))
@@ -236,23 +247,10 @@ public:
                 if (yauj->GetGUID() != me->GetGUID())
                 {
                     yauj->AI()->DoAction(ACTION_CONSUME);
-                    yauj->GetMotionMaster()->MovePoint(POINT_CONSUME, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
+                    me->GetRandomContactPoint(yauj, x, y, z);
+                    yauj->GetMotionMaster()->MovePoint(POINT_CONSUME, x, y, z);
                 }
             }
-
-            _scheduler.Schedule(4s, [this](TaskContext context)
-            {
-                if (!me->IsInEvadeMode() && instance->GetData(DATA_BUG_TRIO_DEATH) < 2)
-                {
-                    DoFinalSpell();
-                    Talk(EMOTE_DEVOURED);
-                    context.Schedule(500ms, [this](TaskContext /*context*/)
-                        {
-                            DoCastSelf(SPELL_BLOODY_DEATH);
-                        });
-                    me->DespawnOrUnsummon(2000);
-                }
-            });
         }
     }
 
@@ -286,6 +284,9 @@ public:
         if (instance->GetData(DATA_BUG_TRIO_DEATH) < 3)
         {
             me->RemoveDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
+            DoFinalSpell();
+            Talk(EMOTE_DEVOURED);
+            me->DespawnOrUnsummon(3000);
             return;
         }
 
@@ -362,14 +363,6 @@ struct boss_vem : public boss_bug_trio
         {
             DoCastVictim(SPELL_KNOCKDOWN);
             context.Repeat();
-        })
-        .Schedule(1s, [this](TaskContext context)
-        {
-            if (instance->GetData(DATA_BUG_TRIO_DEATH) == 2 && !me->HasAura(SPELL_VENGEANCE)) // Vem is the only one left.
-            {
-                DoCastSelf(SPELL_VENGEANCE, true);
-            }
-            context.Repeat(1s);
         });
     }
 };
