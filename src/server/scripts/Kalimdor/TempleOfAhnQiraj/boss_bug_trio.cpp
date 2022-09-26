@@ -227,9 +227,12 @@ public:
             {
                 if (vem->GetGUID() != me->GetGUID())
                 {
-                    vem->AI()->DoAction(ACTION_CONSUME);
-                    me->GetRandomContactPoint(vem, x, y, z);
-                    vem->GetMotionMaster()->MovePoint(POINT_CONSUME, x, y, z);
+                    if (vem->IsAlive())
+                    {
+                        vem->AI()->DoAction(ACTION_CONSUME);
+                        me->GetRandomContactPoint(vem, x, y, z);
+                        vem->GetMotionMaster()->MovePoint(POINT_CONSUME, x, y, z);
+                    }
                 }
                 else _creatureDying = DATA_VEM;
             }
@@ -237,9 +240,12 @@ public:
             {
                 if (kri->GetGUID() != me->GetGUID())
                 {
-                    kri->AI()->DoAction(ACTION_CONSUME);
-                    me->GetRandomContactPoint(kri, x, y, z);
-                    kri->GetMotionMaster()->MovePoint(POINT_CONSUME, x, y, z);
+                    if (kri->IsAlive())
+                    {
+                        kri->AI()->DoAction(ACTION_CONSUME);
+                        me->GetRandomContactPoint(kri, x, y, z);
+                        kri->GetMotionMaster()->MovePoint(POINT_CONSUME, x, y, z);
+                    }
                 }
                 else _creatureDying = DATA_KRI;
             }
@@ -247,9 +253,12 @@ public:
             {
                 if (yauj->GetGUID() != me->GetGUID())
                 {
-                    yauj->AI()->DoAction(ACTION_CONSUME);
-                    me->GetRandomContactPoint(yauj, x, y, z);
-                    yauj->GetMotionMaster()->MovePoint(POINT_CONSUME, x, y, z);
+                    if (yauj->IsAlive())
+                    {
+                        yauj->AI()->DoAction(ACTION_CONSUME);
+                        me->GetRandomContactPoint(yauj, x, y, z);
+                        yauj->GetMotionMaster()->MovePoint(POINT_CONSUME, x, y, z);
+                    }
                 }
                 else _creatureDying = DATA_YAUJ;
             }
