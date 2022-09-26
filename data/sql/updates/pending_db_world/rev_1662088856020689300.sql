@@ -63,7 +63,7 @@ DELETE FROM `smart_scripts` WHERE (`entryorguid` = 15230) AND (`source_type` = 0
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (15230, 0, 0, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 11, 6122, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Vekniss Warrior - On Just Died - Cast \'Summon Vekniss Borer\''),
 (15230, 0, 1, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 59, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Vekniss Warrior - On Reset - Set Run On'),
-(15230, 0, 2, 0, 0, 0, 100, 1, 5000, 60000, 0, 0, 0, 11, 26025, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Vekniss Warrior - In Combat - Cast \'Impale\' (No Repeat)');
+(15230, 0, 2, 0, 0, 0, 100, 0, 8000, 11000, 11000, 21000, 0, 11, 26025, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Vekniss Warrior - In Combat - Cast \'Impale\'');
 
 -- Qiraji Slayer (15250) - Battle Shout and Whirlwind timers taken from Cmangos
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 15250) AND (`source_type` = 0) AND (`id` IN (0, 1, 2, 3));
@@ -98,3 +98,10 @@ DELETE FROM `smart_scripts` WHERE (`entryorguid` = 15621) AND (`source_type` = 0
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (15621, 0, 0, 0, 9, 0, 100, 0, 0, 5, 9000, 13000, 0, 11, 25788, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Yauj Brood - Within 0-5 Range - Cast \'Head Butt\''),
 (15621, 0, 1, 0, 13, 0, 100, 0, 8000, 10000, 0, 0, 0, 11, 25788, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Yauj Brood - On Victim Casting - Cast \'Head Butt\'');
+
+-- Vekniss Borer (15622)
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 15622;
+
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 15622) AND (`source_type` = 0) AND (`id` IN (0));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(15622, 0, 0, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Vekniss Borer - On Just Died - Despawn Instant');
