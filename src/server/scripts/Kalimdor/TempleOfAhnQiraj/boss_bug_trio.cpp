@@ -99,7 +99,7 @@ public:
                 if (vem->IsAlive() && !vem->IsInEvadeMode())
                     vem->AI()->EnterEvadeMode(why);
                 else
-                    vem->Respawn();
+                    vem->Respawn(true);
             }
         }
 
@@ -110,7 +110,7 @@ public:
                 if (kri->IsAlive() && !kri->IsInEvadeMode())
                     kri->AI()->EnterEvadeMode(why);
                 else
-                    kri->Respawn();
+                    kri->Respawn(true);
             }
         }
 
@@ -121,7 +121,7 @@ public:
                 if (yauj->IsAlive() && !yauj->IsInEvadeMode())
                     yauj->AI()->EnterEvadeMode(why);
                 else
-                    yauj->Respawn();
+                    yauj->Respawn(true);
             }
         }
     }
@@ -135,9 +135,11 @@ public:
             me->SetReactState(REACT_PASSIVE);
             _scheduler.DelayAll(6s);
         }
-        else if (action == ACTION_EXPLODE && _dying)
+
+        if (action == ACTION_EXPLODE && _dying)
         {
             DoCastSelf(SPELL_BLOODY_DEATH);
+            _dying = false;
         }
 
     }
@@ -152,12 +154,11 @@ public:
         DoCastSelf(SPELL_FULL_HEAL, true);
         if (me->GetThreatMgr().GetThreatListSize())
             DoResetThreat();
-        if (Creature* vem = instance->GetCreature(DATA_VEM))
-            vem->AI()->DoAction(ACTION_EXPLODE);
-        if (Creature* kri = instance->GetCreature(DATA_KRI))
-            kri->AI()->DoAction(ACTION_EXPLODE);
-        if (Creature* yauj = instance->GetCreature(DATA_YAUJ))
-            yauj->AI()->DoAction(ACTION_EXPLODE);
+        if (Creature* dying = instance->GetCreature(_creatureDying))
+        {
+            dying->AI()->DoAction(ACTION_EXPLODE);
+            me->SetTarget(dying->GetGUID());
+        }
 
         _scheduler.Schedule(2s, [this](TaskContext /*context*/)
         {
@@ -184,10 +185,9 @@ public:
         _scheduler.CancelAll();
         _dying = false;
         _isEating = false;
+        _creatureDying = 0;
         instance->SetData(DATA_BUG_TRIO_DEATH, 0);
         me->SetSpeed(MOVE_RUN, 15.f / 7.f); // From sniffs
-        me->SetStandState(UNIT_STAND_STATE_STAND);
-        me->SetControlled(false, UNIT_STATE_ROOT);
 
         if (me->GetEntry() == NPC_VEM)
         {
@@ -220,7 +220,6 @@ public:
 
             _scheduler.CancelAll();
             me->SetReactState(REACT_PASSIVE);
-            me->SetControlled(true, UNIT_STATE_ROOT);
             _dying = true;
             float x, y, z;
             // Move the other bugs to this bug position
@@ -232,6 +231,7 @@ public:
                     me->GetRandomContactPoint(vem, x, y, z);
                     vem->GetMotionMaster()->MovePoint(POINT_CONSUME, x, y, z);
                 }
+                else _creatureDying = DATA_VEM;
             }
             if (Creature* kri = instance->GetCreature(DATA_KRI))
             {
@@ -241,6 +241,7 @@ public:
                     me->GetRandomContactPoint(kri, x, y, z);
                     kri->GetMotionMaster()->MovePoint(POINT_CONSUME, x, y, z);
                 }
+                else _creatureDying = DATA_KRI;
             }
             if (Creature* yauj = instance->GetCreature(DATA_YAUJ))
             {
@@ -250,6 +251,7 @@ public:
                     me->GetRandomContactPoint(yauj, x, y, z);
                     yauj->GetMotionMaster()->MovePoint(POINT_CONSUME, x, y, z);
                 }
+                else _creatureDying = DATA_YAUJ;
             }
         }
     }
@@ -280,6 +282,8 @@ public:
 
     void JustDied(Unit* killer) override
     {
+        if (killer && killer->GetGUID() == me->GetGUID())
+            std::cout << "yes" << std::endl;
         instance->SetData(DATA_BUG_TRIO_DEATH, 1);
         if (instance->GetData(DATA_BUG_TRIO_DEATH) < 3)
         {
@@ -296,7 +300,10 @@ public:
     TaskScheduler _scheduler;
     bool _dying;
     bool _isEating;
+    static uint32 _creatureDying;
 };
+
+uint32 boss_bug_trio::_creatureDying = 0;
 
 struct boss_kri : public boss_bug_trio
 {
