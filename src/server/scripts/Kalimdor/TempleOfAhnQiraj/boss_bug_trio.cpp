@@ -240,13 +240,16 @@ public:
                 }
             }
 
-            _scheduler.Schedule(4s, [this](TaskContext /*context*/)
+            _scheduler.Schedule(4s, [this](TaskContext context)
             {
                 if (!me->IsInEvadeMode() && instance->GetData(DATA_BUG_TRIO_DEATH) < 2)
                 {
                     DoFinalSpell();
                     Talk(EMOTE_DEVOURED);
-                    DoCastSelf(SPELL_BLOODY_DEATH);
+                    context.Schedule(500ms, [this](TaskContext /*context*/)
+                        {
+                            DoCastSelf(SPELL_BLOODY_DEATH);
+                        });
                     me->DespawnOrUnsummon(2000);
                 }
             });
