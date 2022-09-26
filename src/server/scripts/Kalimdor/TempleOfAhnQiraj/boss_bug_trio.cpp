@@ -127,7 +127,7 @@ public:
 
     void DoAction(int32 action) override
     {
-        if (action != ACTION_CONSUME || _dying)
+        if (action != ACTION_CONSUME)
         {
             return;
         }
@@ -149,7 +149,7 @@ public:
         if (me->GetThreatMgr().GetThreatListSize())
             DoResetThreat();
 
-        _scheduler.Schedule(4s, [this](TaskContext /*context*/)
+        _scheduler.Schedule(2s, [this](TaskContext /*context*/)
         {
             me->SetReactState(REACT_AGGRESSIVE);
             _isEating = false;
@@ -172,7 +172,6 @@ public:
     {
         BossAI::Reset();
         _scheduler.CancelAll();
-        _dying = false;
         _isEating = false;
         instance->SetData(DATA_BUG_TRIO_DEATH, 0);
         me->SetSpeed(MOVE_RUN, 15.f / 7.f); // From sniffs
@@ -192,67 +191,22 @@ public:
 
         _scheduler.Update(diff, [this]
         {
-            if (!_dying && !_isEating)
+            if (!_isEating)
                 DoMeleeAttackIfReady();
         });
     }
 
     void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
-        if (_dying && who->GetGUID() != me->GetGUID())
-            damage = 0;
-
-        if (me->HealthBelowPctDamaged(1, damage) && instance->GetData(DATA_BUG_TRIO_DEATH) < 2 && !_dying)
+        if (me->HealthBelowPctDamaged(0, damage) && instance->GetData(DATA_BUG_TRIO_DEATH) < 2)
         {
-            damage = 0;
             if (_isEating)
+            {
+                damage = 0;
                 return;
-
-            _scheduler.CancelAll();
-            me->SetStandState(UNIT_STAND_STATE_DEAD);
-            me->SetReactState(REACT_PASSIVE);
-            me->SetControlled(true, UNIT_STATE_ROOT);
-            _dying = true;
-
-            // Move the other bugs to this bug position
-            if (Creature* vem = instance->GetCreature(DATA_VEM))
-            {
-                if (vem->GetGUID() != me->GetGUID())
-                {
-                    vem->AI()->DoAction(ACTION_CONSUME);
-                    vem->GetMotionMaster()->MovePoint(POINT_CONSUME, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
-                }
-            }
-            if (Creature* kri = instance->GetCreature(DATA_KRI))
-            {
-                if (kri->GetGUID() != me->GetGUID())
-                {
-                    kri->AI()->DoAction(ACTION_CONSUME);
-                    kri->GetMotionMaster()->MovePoint(POINT_CONSUME, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
-                }
-            }
-            if (Creature* yauj = instance->GetCreature(DATA_YAUJ))
-            {
-                if (yauj->GetGUID() != me->GetGUID())
-                {
-                    yauj->AI()->DoAction(ACTION_CONSUME);
-                    yauj->GetMotionMaster()->MovePoint(POINT_CONSUME, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
-                }
             }
 
-            _scheduler.Schedule(4s, [this](TaskContext context)
-            {
-                if (!me->IsInEvadeMode() && instance->GetData(DATA_BUG_TRIO_DEATH) < 2)
-                {
-                    DoFinalSpell();
-                    Talk(EMOTE_DEVOURED);
-                    context.Schedule(500ms, [this](TaskContext /*context*/)
-                        {
-                            DoCastSelf(SPELL_BLOODY_DEATH);
-                        });
-                    me->DespawnOrUnsummon(2000);
-                }
-            });
+            DoCastSelf(SPELL_BLOODY_DEATH);
         }
     }
 
@@ -286,6 +240,35 @@ public:
         if (instance->GetData(DATA_BUG_TRIO_DEATH) < 3)
         {
             me->RemoveDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
+
+            // Move the other bugs to this bug position
+            if (Creature* vem = instance->GetCreature(DATA_VEM))
+            {
+                if (vem->GetGUID() != me->GetGUID())
+                {
+                    vem->AI()->DoAction(ACTION_CONSUME);
+                    vem->GetMotionMaster()->MovePoint(POINT_CONSUME, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
+                }
+            }
+            if (Creature* kri = instance->GetCreature(DATA_KRI))
+            {
+                if (kri->GetGUID() != me->GetGUID())
+                {
+                    kri->AI()->DoAction(ACTION_CONSUME);
+                    kri->GetMotionMaster()->MovePoint(POINT_CONSUME, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
+                }
+            }
+            if (Creature* yauj = instance->GetCreature(DATA_YAUJ))
+            {
+                if (yauj->GetGUID() != me->GetGUID())
+                {
+                    yauj->AI()->DoAction(ACTION_CONSUME);
+                    yauj->GetMotionMaster()->MovePoint(POINT_CONSUME, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
+                }
+            }
+
+            DoFinalSpell();
+            Talk(EMOTE_DEVOURED);
             return;
         }
 
@@ -293,7 +276,6 @@ public:
     }
 
     TaskScheduler _scheduler;
-    bool _dying;
     bool _isEating;
 };
 
