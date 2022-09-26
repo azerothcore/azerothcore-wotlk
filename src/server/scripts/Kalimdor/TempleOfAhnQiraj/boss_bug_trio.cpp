@@ -246,7 +246,7 @@ public:
                 {
                     DoFinalSpell();
                     Talk(EMOTE_DEVOURED);
-                    DoCastSelf(SPELL_BLOODY_DEATH, true);
+                    DoCastSelf(SPELL_BLOODY_DEATH);
                     me->DespawnOrUnsummon(2000);
                 }
             });
