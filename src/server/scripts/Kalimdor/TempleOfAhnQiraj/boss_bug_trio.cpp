@@ -187,7 +187,7 @@ public:
 
     void UpdateAI(uint32 diff) override
     {
-        if (!UpdateVictim() || _isEating || !CheckInRoom())
+        if (!UpdateVictim() || !CheckInRoom())
             return;
 
         _scheduler.Update(diff, [this]
